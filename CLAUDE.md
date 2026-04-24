@@ -2,6 +2,17 @@
 
 力量举学员 + 教练双端 iOS app。这个目录是代码仓库。读这个文件你就知道是在什么项目里、遵守什么规则。
 
+## 🚨 Session 启动必读顺序
+
+**每次新开 session,按顺序做**:
+
+1. 读本文件(CLAUDE.md)
+2. 读 [FOLLOWUPS.md](./FOLLOWUPS.md) — **逐条检查触发条件**,满足的主动提醒用户
+3. 读 [AGENTS.md](./AGENTS.md)(Codex 视角,但你也要知道边界)
+4. 扫 `git log --oneline -10` 了解最近进展
+
+跳过第 2 步 = FOLLOWUPS 变黑洞。
+
 ## 项目阶段
 
 **规划中** — 尚未生成 Xcode 项目骨架，没写代码。当前仓库只有文档。
