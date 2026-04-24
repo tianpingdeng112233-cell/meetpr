@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swift:
+    name: Swift Build & Test
+    runs-on: macos-15
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Swift package
+        id: pkg
+        run: |
+          if [ -f Package.swift ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No Package.swift yet — skipping Swift build/test."
+          fi
+
+      - name: Select Xcode
+        if: steps.pkg.outputs.exists == 'true'
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Swift version
+        if: steps.pkg.outputs.exists == 'true'
+        run: swift --version
+
+      - name: Swift Package resolve
+        if: steps.pkg.outputs.exists == 'true'
+        run: swift package resolve
+
+      - name: Build
+        if: steps.pkg.outputs.exists == 'true'
+        run: swift build -v
+
+      - name: Test
+        if: steps.pkg.outputs.exists == 'true'
+        run: swift test --parallel
+
+  lint:
+    name: Lint (swift-format)
+    runs-on: macos-15
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Swift sources
+        id: swift
+        run: |
+          if ls **/*.swift Sources/**/*.swift Tests/**/*.swift 2>/dev/null | head -1 > /dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No Swift sources yet — skipping lint."
+          fi
+
+      - name: swift-format lint
+        if: steps.swift.outputs.exists == 'true'
+        run: |
+          sudo xcode-select -s /Applications/Xcode.app
+          swift format lint --recursive --strict .
