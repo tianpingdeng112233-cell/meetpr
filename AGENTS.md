@@ -246,6 +246,9 @@ Claude 裁决三种结果:
 
 **核心原则**:自审有确认偏误,代码必须经第三方视角。
 
+> **⚠️ 当前执行方式**:GitHub branch protection 里 `required_approving_review_count: 0`,所以本矩阵**目前靠流程自律**,不是服务器强制。
+> solo 阶段这是可接受的折衷(自己 review 自己的 PR 很别扭)。FOLLOWUPS.md F-006 会在有第二个合作者时触发,把 required review count 上调到 1 并加 CODEOWNERS。
+
 | 改动类型 | 你可自审自 merge | 必须 Claude review | 理由 |
 |---|---|---|---|
 | 纯文档(`*.md`,不含 ADR / AGENTS / CLAUDE) | ✅ | ❌ | 错字/表述无复利风险 |

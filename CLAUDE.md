@@ -64,7 +64,7 @@
 - **数据层**：待定（SwiftData / CoreData / 直连后端）
 - **后端**：待定（Supabase / Firebase / 自建）
 - **包管理**：Swift Package Manager
-- **测试**：XCTest + 可能加 ViewInspector
+- **测试**：Swift Testing(+ ViewInspector 按需加,用于 SwiftUI 视图测试)
 
 ## 代码规范
 
