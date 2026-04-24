@@ -96,6 +96,20 @@
 - **为什么等**:没代码没测试;太早配置等于空转
 - **创建于**:2026-04-24
 
+### F-009 — 明确 SPM vs Xcode project(由 ADR-004 锁定)
+
+- **触发条件**:写 ADR-004 之前(明天第一 session 最早动作)
+- **动作**:
+  1. 在 ADR-004(或独立 ADR)中明确选型:
+     - **SPM-first**(Package.swift 为真,无 `.xcodeproj`)→ 现有 ci.yml 可用
+     - **xcodeproj-first**(Xcode 工程为真)→ ci.yml 需改为 `xcodebuild` 驱动 app scheme
+     - **混合**(SPM 模块 + app-level xcodeproj)→ ci.yml 需双通道
+  2. 如果是非 SPM-first,起 chore PR 重写 CI(build/test step 换 `xcodebuild -scheme ... test`)
+  3. 更新 AGENTS.md §技术栈 里"包管理"项,明确锁定到选型
+- **验证**:ADR-004 decision 段有明确选型;001-bootstrap 后 CI 从 skip 变为真跑
+- **为什么**:Codex review #8 发现当前 CI 假设 Package.swift。若 ADR-004 选 xcodeproj,CI 会静默跳过测试 / build,等发现时已经在 main 上积累错误
+- **创建于**:2026-04-24
+
 ### F-008 — 定期 ADR review
 
 - **触发条件**:距离上次 ADR review **满 30 天**(first review: 2026-05-24)
