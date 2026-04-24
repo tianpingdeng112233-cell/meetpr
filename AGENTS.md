@@ -79,6 +79,50 @@
 
 ---
 
+## 文档质疑权(Challenge Rights)
+
+**你有权,且应该,质疑任何文档。**
+
+AGENTS.md、CLAUDE.md、ARCHITECTURE.md、SPEC.md、ADR、PRD — 都是 Claude 或用户写的。Claude 会犯错。架构可能错,spec 可能漏,约束可能自相矛盾。**你作为 implementer 看到的东西,Claude 可能没看到**。
+
+### 什么时候行使
+
+读完任何文档后,**如果你不认可任何一条**,停下,不开始实现。典型触发:
+- Spec 要求的接口和现有架构冲突
+- ADR 的技术选型在实操上有坑(你知道某个 API 不能这么用)
+- AGENTS.md 规则之间相互矛盾
+- PRD 的验收标准不可实现
+
+### 协议
+
+1. **停止动手**(不起分支、不写代码)
+2. 在仓库根写 `CHALLENGE.md`,按格式:
+   ```markdown
+   ## Challenge #N — [简短标题]
+   - **目标文档**:AGENTS.md §X / specs/NNN/SPEC.md §Y / ADR-NNN
+   - **原文**:[引用]
+   - **问题**:[你质疑什么]
+   - **你的提案**:[怎么改]
+   - **依据**:[为什么这样更对 — 代码/文档/外部资料引用]
+   ```
+3. Commit 到当前分支(如果没 branch 就起 `challenge/N-slug`),push
+4. 告诉用户:"Challenge #N 待裁决,已写 CHALLENGE.md"
+
+### 裁决路径
+
+Claude 裁决三种结果:
+- **你对** → 文档改,重新给你 spec
+- **你不对** → 文档补解释,你按原 spec 做(解释进 ADR 或 SPEC.md 的 FAQ 段)
+- **部分对** → 部分修改后继续
+
+**裁决落地之前,不动代码**。
+
+### 不行使的后果
+
+不行使质疑权 = 放弃反驳机会。文档有坑你还闷头实现,出锅**各打五十大板**(Claude 写坏了规矩,你没叫停)。
+
+---
+
 ## 技术栈(跟随 CLAUDE.md,此处简述)
 
 - **平台**:iOS 17+
@@ -113,6 +157,39 @@
 - [ ] 没动 spec 范围外的文件
 - [ ] 没动 `~/Documents/AppDev/prds/` 或 `~/Brain/wiki/` 下任何文件
 - [ ] 更新了 `SPEC.md` 状态为 `InReview`
+
+---
+
+## Review 授权矩阵
+
+**核心原则**:自审有确认偏误,代码必须经第三方视角。
+
+| 改动类型 | 你可自审自 merge | 必须 Claude review | 理由 |
+|---|---|---|---|
+| 纯文档(`*.md`,不含 ADR / AGENTS / CLAUDE) | ✅ | ❌ | 错字/表述无复利风险 |
+| 依赖 **patch** 升级(1.2.3 → 1.2.4) | ✅ | ❌ | 机械改动 |
+| 你最近一个 PR 的 revert/rollback | ✅ | ❌ | 撤销比引入安全 |
+| **任何 `.swift` / `Package.swift`** | ❌ | ✅ 必过 | 代码是复利性资产 |
+| 配置文件(`.swiftlint.yml`、`.swift-format`、CI、`.gitignore` 等) | ❌ | ✅ | 一次配错腐蚀几个月 |
+| 依赖 **minor/major** 升级 | ❌ | ✅ | 可能引入 breaking change |
+| `AGENTS.md`、`CLAUDE.md`、ADR、`prds/` | ❌ | ✅ + **用户最终确认** | 规则不能被执行者改 |
+
+### 怎么判定可以自 merge
+
+PR diff 全部满足"可自审"类别 **且**:
+- CI 全绿
+- 没有其他未完成任务的 cross-reference
+- 不是刚被裁决过的 CHALLENGE 的直接产出(那种要 Claude 确认)
+
+### 自 merge 时必须做的
+
+- commit message 明确 `[self-merged]` 前缀
+- PR body 注明"本 PR 属于可自审类别,因 X 自 merge"
+- 合并后在汇报里列出 self-merged PR 编号,方便我回溯
+
+### 不确定时
+
+**不确定 = 不能自 merge**。宁可等 Claude,不要赌。
 
 ---
 
