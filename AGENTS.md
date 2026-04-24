@@ -170,7 +170,8 @@ Claude 裁决三种结果:
 - **Tab**:iOS 18+ 用 `Tab` API;iOS 17 回退到 `tabItem()`。Spec 里会明确。
 - **ScrollView**:
   - 隐藏 indicator 用 `.scrollIndicators(.hidden)` modifier,不用 `showsIndicators:` 参数
-  - 定位用 `ScrollPosition` + `defaultScrollAnchor`,不用老的 `ScrollViewReader`
+  - **定位(iOS 17+)**:用 `.scrollPosition(id:)` modifier + `.defaultScrollAnchor(_:)`,替代老的 `ScrollViewReader`
+  - **高级 ScrollPosition struct(iOS 18+ only)**:edge / offset 精细控制可用 `ScrollPosition` 值类型配合 `.scrollPosition(_:)` modifier。**iOS 17 不可用**,需降级到上一条的 id 版本。Spec 会明确最低 iOS 基线
 - **onChange**:禁止 1 参数版本,必须用 2 参数或 0 参数版本。
 - **点击**:用 `Button`,不用 `onTapGesture()`(除非需要坐标或计数)。`Button("Label", systemImage: "plus", action: ...)` 样式首选。
 - **View 拆分**:**不要用 computed property 拆 view**,要拆成独立的 `View` struct。
