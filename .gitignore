@@ -1,0 +1,56 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+DerivedData/
+build/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.moved-aside
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.build/
+.swiftpm/
+.swiftlint-cache/
+Package.resolved
+Packages/
+*.xcodeproj
+
+# CocoaPods (如果将来用)
+Pods/
+
+# Carthage (如果将来用)
+Carthage/Build/
+
+# fastlane (如果将来用)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# 环境 / 敏感
+*.env
+.env.local
+secrets.plist
+GoogleService-Info.plist
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code
+.claude/cache/

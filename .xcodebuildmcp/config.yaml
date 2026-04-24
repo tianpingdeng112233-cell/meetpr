@@ -1,0 +1,5 @@
+schemaVersion: 1
+enabledWorkflows:
+  - simulator
+  - swift-package
+  - ui-automation
