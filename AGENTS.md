@@ -137,6 +137,87 @@ Claude 裁决三种结果:
 
 ---
 
+## Swift & SwiftUI 实操约定
+
+> 改写自 [twostraws/SwiftAgents](https://github.com/twostraws/SwiftAgents)(MIT,Paul Hudson / HackingWithSwift)。针对本项目 **iOS 17+ / Swift 6 / SPM 多模块**调整。
+
+### 角色延伸
+
+除了 AGENTS.md 开头的 implementer 定义,写 Swift 代码时**你是 Senior iOS Engineer**,专长 SwiftUI + SwiftData + 现代 Swift 并发。所有代码必须**遵守 Apple HIG 和 App Review Guidelines**。
+
+### Swift 语言约定
+
+- **并发**:假设 strict Swift concurrency 已开启。`async/await` 替代所有 closure-based API。禁止 `DispatchQueue.main.async` 等 GCD 老写法。
+- **`@Observable`**:共享状态用 `@Observable` 类(不是 `ObservableObject`/`@Published`/`@StateObject`/`@ObservedObject`/`@EnvironmentObject`)。`@Observable` 类必须标 `@MainActor`(除非项目启用 Main Actor default actor isolation)。
+- **强制解包**:禁止 `!` 和 `try!`,除非是不可恢复的启动失败。
+- **字符串**:用 `"hello".replacing("x", with: "y")`,不用 `replacingOccurrences(of:with:)`。
+- **文件路径**:用 `URL.documentsDirectory`、`appending(path:)`,不用老 API。
+- **格式化**:**禁止** `DateFormatter`、`NumberFormatter`、`MeasurementFormatter`、C 风格 `String(format:)`。一律用 `FormatStyle`:
+  - 日期:`myDate.formatted(date: .abbreviated, time: .shortened)`
+  - 数字:`myNumber.formatted(.number.precision(.fractionLength(2)))`
+  - 解析:`Date(inputString, strategy: .iso8601)`
+- **搜索**:用户输入过滤用 `localizedStandardContains()`,不是 `contains()`。
+- **静态成员**:优先 `.circle` 而非 `Circle()`,`.borderedProminent` 而非 `BorderedProminentButtonStyle()`。
+- **sleep**:`Task.sleep(for: .seconds(1))`,不是 `Task.sleep(nanoseconds:)`。
+
+### SwiftUI 约定
+
+- **现代 modifier**:
+  - `foregroundStyle()` 不是 `foregroundColor()`
+  - `clipShape(.rect(cornerRadius:))` 不是 `cornerRadius()`
+  - `bold()` 不是 `fontWeight(.bold)`(除非需要其他 weight)
+- **导航**:`NavigationStack` + `navigationDestination(for:)`,不是 `NavigationView`。
+- **Tab**:iOS 18+ 用 `Tab` API;iOS 17 回退到 `tabItem()`。Spec 里会明确。
+- **ScrollView**:
+  - 隐藏 indicator 用 `.scrollIndicators(.hidden)` modifier,不用 `showsIndicators:` 参数
+  - 定位用 `ScrollPosition` + `defaultScrollAnchor`,不用老的 `ScrollViewReader`
+- **onChange**:禁止 1 参数版本,必须用 2 参数或 0 参数版本。
+- **点击**:用 `Button`,不用 `onTapGesture()`(除非需要坐标或计数)。`Button("Label", systemImage: "plus", action: ...)` 样式首选。
+- **View 拆分**:**不要用 computed property 拆 view**,要拆成独立的 `View` struct。
+- **字体/尺寸**:不硬编码字号,用 Dynamic Type。不硬编码 padding / stack spacing,除非明确要求。
+- **AnyView**:禁用,除非绝对必要。
+- **颜色**:SwiftUI 代码里不用 UIKit color(`UIColor.red` 等)。
+- **`GeometryReader`**:有更新 API(`containerRelativeFrame()`、`visualEffect()`)时,优先新 API。
+- **`UIScreen.main.bounds`**:禁用(多窗口时代这玩意儿会骗你)。
+- **渲染**:渲染 View 成图用 `ImageRenderer`,不是 `UIGraphicsImageRenderer`。
+- **ForEach**:`ForEach(x.enumerated(), id: \.element.id)`,不要 `Array(...)` 包一层。
+- **可测性**:View 里不要放业务逻辑,挪到 ViewModel / UseCase,方便单测。
+
+### SwiftData(若启用)+ CloudKit 规则
+
+如果 SwiftData 配了 CloudKit 同步:
+- **禁用** `@Attribute(.unique)`(CloudKit 不支持)
+- 所有 model property 必须有默认值,或标 optional
+- 所有 relationship 必须 optional
+
+### 本地化(xcstrings)
+
+- 用户可见字符串走 `Localizable.xcstrings`
+- 用 **symbol key**(如 `helloWorld`),`extractionState: manual`
+- 访问:`Text(.helloWorld)`(代码生成的 symbol)
+- 新增 key 要提出为所有已支持语言翻译
+
+### 测试
+
+- 核心应用逻辑**必须有单元测试**(Swift Testing 框架)
+- **只有**单元测试不可行时才写 UI 测试
+- ViewModel / UseCase / Repository / 纯逻辑:单元测试覆盖
+- 交互 / 视觉回归:screenshot test 或 UI test(按需)
+
+### 第三方依赖
+
+- **引入前必须问**(写 QUESTIONS.md),不要默默加到 `Package.swift`
+- 每次新增依赖都要有 ADR 解释"为什么它,为什么不是标准库"
+
+### 通用工程
+
+- **文件组织**:类型按 feature 分目录,一个 struct/class/enum 一个文件(除非紧密相关)
+- **命名**:严格 Swift API Design Guidelines
+- **注释**:必要时加,特别是文档注释(`///`)
+- **secrets**:API key / token 永不入库(`.gitignore` 已配)
+
+---
+
 ## 工具接入
 
 - XcodeBuildMCP 已接入 Codex MCP。涉及 iOS/macOS/watchOS/tvOS/visionOS 的 build / run / test / debug / log / UI automation 时,先使用已安装的 `xcodebuildmcp` skill,再调用 XcodeBuildMCP 工具。
