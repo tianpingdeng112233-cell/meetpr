@@ -15,7 +15,26 @@
 
 ## 项目阶段
 
-**规划中** — 尚未生成 Xcode 项目骨架，没写代码。当前仓库只有文档。
+**规划完成 / 待产品定义** — 基础设施、治理、规范全就位,尚未生成 Xcode 项目,没写代码。
+下一步阻塞在**产品定义**(PRD 内容 + 前 3 条技术 ADR)。
+
+## 下一步(给新 session 的入口)
+
+**明确的下一轮工作**,按顺序:
+
+1. **填 `~/Documents/AppDev/prds/MeetPR/prd.md`**
+   建议流程:调用 `gstack-office-hours` skill,用 YC 6 问拷问产品,把用户答案沉淀进 PRD
+   (可跳过,如果用户已经有清晰的 PRD 想法,直接对话产出)
+
+2. **起前 3 个技术 ADR**(在 `~/Brain/wiki/projects/MeetPR/decisions/`)
+   - ADR 004:架构选型(MVVM + `@Observable` vs TCA vs 其他)
+   - ADR 005:后端选型(Supabase vs Firebase vs 自建)
+   - ADR 006:模块切分策略(单 target vs SPM 多 package,以及怎么切)
+
+3. **写 `specs/001-bootstrap/SPEC.md`**
+   第一个给 Codex 的任务:起 Xcode 项目骨架。完成后 CI 就从 skip 变成真跑。
+
+**不要跳过 1 直接做 2**:没 PRD 的 ADR 是空中楼阁。
 
 ## 角色
 
