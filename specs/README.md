@@ -19,7 +19,7 @@ specs/
 
 - **状态**:Ready / Blocked / InProgress / InReview / Done
 - **PR**:(填入 PR 链接)
-- **来源**:`~/Documents/AppDev/prds/MeetPR/prd.md#section` 或 user-story ID
+- **来源**:`~/Brain/wiki/projects/MeetPR/prd.md#section` 或 user-story ID
 
 ## 目标
 _一句话_

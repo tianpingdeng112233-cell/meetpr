@@ -21,7 +21,12 @@ pre-commit install
 
 ## 相关
 
-- 产品文档：`~/Documents/AppDev/prds/MeetPR/`
-- 知识库：`~/Brain/wiki/projects/MeetPR/`
+- 知识库 / 产品文档（统一入口）：`~/Brain/wiki/projects/MeetPR/index.md`
+  - PRD: `~/Brain/wiki/projects/MeetPR/prd.md`
+  - 团队治理: `~/Brain/wiki/projects/MeetPR/team-governance.md`
+  - 技术 ADR: `~/Brain/wiki/projects/MeetPR/decisions/`
+  - 产品 PD: `~/Brain/wiki/projects/MeetPR/product-decisions/`
 - 工程上下文：[CLAUDE.md](./CLAUDE.md)
 - Codex 规范：[AGENTS.md](./AGENTS.md)
+
+> **2026-04-25 重构**：所有非代码 markdown 已统一进入 Brain Obsidian vault。之前 `~/Documents/AppDev/prds/MeetPR/` 已废弃。

@@ -50,20 +50,33 @@
 - **为什么等**:现阶段笔记少,风险低;大了才值得花精力规划
 - **创建于**:2026-04-24
 
-### F-004 — PRD 仓库推 GitHub
+### F-004 — Brain vault 推 GitHub(远端备份 / 跨机访问)
 
-- **触发条件**:出现以下任一情况
+> **2026-04-26 重写**:原条目针对已废弃的 `~/Documents/AppDev/prds/` 仓库。PRD 迁到 Brain vault 后,远端备份目标改为 Brain。需先满足 F-003(Brain 本地 git 化),再推远端。
+
+- **依赖**:F-003(Brain vault 本地 git 化)必须先完成
+- **触发条件**:F-003 已完成 **且** 出现以下任一
   - 你开始跨机器工作(办公室 / 家 / 咖啡馆)
-  - MeetPR 进入 beta 阶段,需要团队成员访问 PRD
-  - PRD 笔记量 > 50 个文件,本地丢失代价过高
+  - MeetPR 进入 beta 阶段,需要合作者(教练 / 测试者 / 设计师)访问 PRD 或决策文档
+  - Brain 笔记量 > 100 个文件,本地丢失代价过高
 - **动作**:
   ```bash
-  cd ~/Documents/AppDev/prds
-  gh repo create prds --private --source=. --remote=origin --push
+  cd ~/Brain
+  gh repo create brain --private --source=. --remote=origin --push
+  # 注意:Brain 含潜在敏感内容(用户访谈、商业策略、尚未发布的产品决策)
+  # 必须 private;考虑 git-crypt 加密敏感目录
   ```
-- **验证**:GitHub 上有 private repo,能 clone 回来
-- **为什么等**:现阶段单机开发,本地 git 足够;推远端增加同步成本和泄漏风险
+- **验证**:GitHub 上有 private repo;能从另一台机器 clone 回来并打开 Obsidian 正常
+- **风险**:
+  - 商业敏感内容(竞品分析、定价策略、用户研究原始数据)上云
+  - GitHub 账号被攻破 = 全部商业机密泄漏
+  - 缓解:推前过一遍 Brain 内容,把高度敏感的(访谈录音转录、未发布的定价数字)隔离到 git-crypt 加密分支或本地 only 目录
+- **为什么等**:
+  - F-003 还没完成(Brain 没 git 化)
+  - 现阶段单机开发,本地够用
+  - 加密 + 远端同步策略需要明确思考,不能为推而推
 - **创建于**:2026-04-24
+- **最后修订**:2026-04-26(PRD 迁移后重写)
 
 ### F-005 — swift-ios-skills 按 SPEC 按需 symlink
 
@@ -94,20 +107,6 @@
   2. 输出覆盖率到 GitHub Actions summary
   3. 记录每次 build 时长,异常增长时告警
 - **为什么等**:没代码没测试;太早配置等于空转
-- **创建于**:2026-04-24
-
-### F-009 — 明确 SPM vs Xcode project(由 ADR-004 锁定)
-
-- **触发条件**:写 ADR-004 之前(明天第一 session 最早动作)
-- **动作**:
-  1. 在 ADR-004(或独立 ADR)中明确选型:
-     - **SPM-first**(Package.swift 为真,无 `.xcodeproj`)→ 现有 ci.yml 可用
-     - **xcodeproj-first**(Xcode 工程为真)→ ci.yml 需改为 `xcodebuild` 驱动 app scheme
-     - **混合**(SPM 模块 + app-level xcodeproj)→ ci.yml 需双通道
-  2. 如果是非 SPM-first,起 chore PR 重写 CI(build/test step 换 `xcodebuild -scheme ... test`)
-  3. 更新 AGENTS.md §技术栈 里"包管理"项,明确锁定到选型
-- **验证**:ADR-004 decision 段有明确选型;001-bootstrap 后 CI 从 skip 变为真跑
-- **为什么**:Codex review #8 发现当前 CI 假设 Package.swift。若 ADR-004 选 xcodeproj,CI 会静默跳过测试 / build,等发现时已经在 main 上积累错误
 - **创建于**:2026-04-24
 
 ### F-010 — 评估迁移到 gbrain
@@ -150,6 +149,14 @@
 ## 已完成
 
 _(执行完的触发条目移到这里,保留作历史。格式:日期 + 原触发条件 + 执行结果链接)_
+
+### F-009 — 明确 SPM vs Xcode project(由 ADR-004 锁定)— **关闭于 2026-04-26**
+
+- **原触发条件**:写 ADR-004 之前
+- **关闭原因**:ADR-004 已写,内容是后端选型(阿里云 + 自建 Node.js),没在 ADR-004 中显式锁定 SPM vs xcodeproj。但当前 AGENTS.md §技术栈 仍写 "包管理:SPM",这是事实上的隐式锁定;CI 也按 SPM 假设设计。
+- **遗留风险**:SPM 选型未走正式 ADR,只在 AGENTS.md 文本里。如未来需要 app-level xcodeproj(比如 widget extension、watchOS target),会需要新 ADR + CI 改造。
+- **缓解**:如果 SPEC-001 bootstrap 时发现这是真问题,新起 ADR(ADR-007 或更靠后)正式锁定;CI 同时调整。届时可以从这条 history 反查 context。
+- **关闭决定**:用户 2026-04-26
 
 ---
 
