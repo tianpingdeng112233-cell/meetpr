@@ -110,6 +110,29 @@
 - **为什么**:Codex review #8 发现当前 CI 假设 Package.swift。若 ADR-004 选 xcodeproj,CI 会静默跳过测试 / build,等发现时已经在 main 上积累错误
 - **创建于**:2026-04-24
 
+### F-010 — 评估迁移到 gbrain
+
+- **触发条件**:满足以下任一
+  - `~/Brain/wiki/projects/MeetPR/` 下文件数 > 100(当前约 11)
+  - 关键字搜索常找不到东西(连续 3 次"我记得写过 X 但翻不到"的体验)
+  - 想让 Codex / Claude 跨 session 自动检索 Brain(MCP server 需求)
+  - Brain 里需要管理 50+ 个实体(人物 / 竞品 / 技术 / 用户访谈)且交叉引用变多
+- **动作**:
+  1. Clone [garrytan/gbrain](https://github.com/garrytan/gbrain) 到 `~/Projects/experiments/gbrain` 评估
+  2. 跑 `gbrain init` 试搭一个 MeetPR 子集
+  3. 读 [GBRAIN_SKILLPACK.md](https://github.com/garrytan/gbrain/blob/master/docs/GBRAIN_SKILLPACK.md),挑出用得上的 skill(创业家方向不要,知识检索方向要)
+  4. 决定:**全迁移** / **混合**(Brain 写、gbrain 索引)/ **借鉴架构不迁移**
+  5. 起 ADR 记录决策(无论选哪条)
+- **验证**:决策落地为 ADR;迁移则 Brain 内容能在 Codex/Claude 里通过 MCP 搜到
+- **为什么等**:
+  - gbrain 设计规模是 17,000+ 页,你目前 11 页
+  - Postgres + cron + 29 个 skill 的运维负担,小规模用不抵
+  - 现有 Obsidian 关键字搜索 + wikilink 在你这个文件量下完全够用
+- **不要做的事**(防止过早优化):
+  - 在 Brain < 50 文件时强行迁移
+  - 把 gbrain 整套 skill 全装到 ~/.claude/skills/(只挑相关的)
+- **创建于**:2026-04-26
+
 ### F-008 — 定期 ADR review
 
 - **触发条件**:距离上次 ADR review **满 30 天**(first review: 2026-05-24)
