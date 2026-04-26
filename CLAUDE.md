@@ -22,7 +22,7 @@
 
 **明确的下一轮工作**,按顺序:
 
-1. **填 `~/Documents/AppDev/prds/MeetPR/prd.md`**
+1. **填 `~/Brain/wiki/projects/MeetPR/prd.md`**
    建议流程:调用 `gstack-office-hours` skill,用 YC 6 问拷问产品,把用户答案沉淀进 PRD
    (可跳过,如果用户已经有清晰的 PRD 想法,直接对话产出)
 
@@ -45,14 +45,20 @@
 - 调试、重构、review 代码
 
 **不在这里做**：
-- ❌ 写 PRD、做产品决策 → 去 `~/Documents/AppDev/prds/MeetPR/`
+- ❌ 写 PRD、做产品决策 → 去 `~/Brain/wiki/projects/MeetPR/`
 - ❌ 整理领域知识、竞品研究 → 去 `~/Brain/sources/` + `~/Brain/wiki/projects/MeetPR/`
 
 ## 关联资产
 
-- **产品文档**：`~/Documents/AppDev/prds/MeetPR/`（PRD、用户故事、决策记录）
-- **项目知识**：`~/Brain/wiki/projects/MeetPR/index.md`（领域知识、竞品、架构 ADR）
+- **统一入口**：`~/Brain/wiki/projects/MeetPR/index.md` — Brain Obsidian vault 内 MeetPR 主页
+  - PRD: `~/Brain/wiki/projects/MeetPR/prd.md`
+  - 团队治理: `~/Brain/wiki/projects/MeetPR/team-governance.md`
+  - 技术 ADR: `~/Brain/wiki/projects/MeetPR/decisions/`
+  - 产品 PD: `~/Brain/wiki/projects/MeetPR/product-decisions/`
+  - 用户研究 / 竞品 / 领域: `~/Brain/wiki/projects/MeetPR/{user-research.md,competitors/,domain/}`
 - **全局知识**：`~/Brain/wiki/ios/`（SwiftUI 模式、Apple 平台踩坑）
+
+> 2026-04-25 重构：所有 MeetPR 非代码 markdown 已统一进 Brain vault。原 `~/Documents/AppDev/prds/MeetPR/` 已废弃。
 
 写代码前遇到不确定的决策，先查这三个地方。没写过的决策就回 ① 规划 session 讨论，不要擅自定调。
 

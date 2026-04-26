@@ -29,10 +29,10 @@
 
 1. **`./CLAUDE.md`** — 项目工程上下文、技术栈、硬规矩(和本文件同步,以它为准)
 2. **`./specs/<当前任务>/SPEC.md`** — 你这次要实现什么
-3. `~/Documents/AppDev/prds/MeetPR/prd.md` — 如果 spec 引用了特定 PRD 段落
+3. `~/Brain/wiki/projects/MeetPR/prd.md` — 如果 spec 引用了特定 PRD 段落
 4. `~/Brain/wiki/projects/MeetPR/decisions/` — 技术决策 ADR(必须遵守)
 
-**不读**:`~/Documents/AppDev/prds/MeetPR/` 下其他产品文档(那是产品层,不归你)。
+**不读**:`~/Brain/wiki/projects/MeetPR/product-decisions/`、`team-governance.md`、`meetings/` 等产品/团队层文档(不归 Codex)。
 
 ---
 
@@ -300,6 +300,9 @@ commits: N 个
 | Codex 规范 | `./AGENTS.md`(本文件) | Claude |
 | 功能规格 | `./specs/NNN-slug/SPEC.md` | Claude |
 | 代码 | `./Sources/`、`./Tests/` | **Codex** |
-| PRD | `~/Documents/AppDev/prds/MeetPR/` | Claude(和用户) |
+| PRD | `~/Brain/wiki/projects/MeetPR/prd.md` | Claude(和用户) |
+| 团队治理 | `~/Brain/wiki/projects/MeetPR/team-governance.md` | Claude(和用户) |
+| 产品 PD | `~/Brain/wiki/projects/MeetPR/product-decisions/` | Claude(和用户) |
 | 技术 ADR | `~/Brain/wiki/projects/MeetPR/decisions/` | Claude |
-| 领域知识 | `~/Brain/wiki/projects/MeetPR/` | Claude |
+| 领域知识 / 用户研究 / 竞品 | `~/Brain/wiki/projects/MeetPR/` | Claude |
+| 会议纪要 | `~/Brain/wiki/projects/MeetPR/meetings/` | Claude(和用户) |
