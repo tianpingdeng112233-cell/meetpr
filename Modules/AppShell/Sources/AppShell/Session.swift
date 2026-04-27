@@ -21,7 +21,16 @@ public final class Session {
   }
 
   public func fakeLogin(role: UserRole) {
-    let user = User(id: UUID(), role: role, displayName: "Test User")
+    let now = Date()
+    let user = User(
+      id: UUID(),
+      phone: "00000000000",
+      name: "Test User",
+      unitSystem: .metric,
+      role: role,
+      createdAt: now,
+      updatedAt: now
+    )
     state = .authenticated(user)
   }
 
