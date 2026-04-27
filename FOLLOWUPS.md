@@ -185,6 +185,28 @@
 - **为什么等**:当前 spec 001 只需要 placeholder bundle ID 和 simulator 验证;公司账号注册另议
 - **创建于**:2026-04-27
 
+### F-013 — Logo SVG / wordmark 真实资产落地
+
+- **触发条件**:真实 MeetPR wordmark / app mark 设计定稿,或首个 onboarding / marketing / App Store 截图 spec 进入 Ready
+- **动作**:
+  1. 用真实 `meetpr-wordmark.svg` / `meetpr-mark.svg` 替换 design-bundle 占位资产
+  2. 新增 DesignSystem logo/mark 原子组件或 asset catalog 条目(按当时 spec 决定)
+  3. 验证 dark / light / small-size rendering,尤其是 onboarding splash 和 AppIcon 预览
+- **验证**:Xcode asset preview + 模拟器 dark/light 截图都清晰;占位 logo 不再出现在 app UI
+- **为什么等**:spec 003 只有占位 SVG,真实品牌资产未定稿;提前实现会把占位视觉固化进代码
+- **创建于**:2026-04-27
+
+### F-014 — 完整 SF Symbols ↔ Lucide mapping 表产品化
+
+- **触发条件**:第二个 feature spec 需要新增超出 spec 003 的 icon,或任一 UI kit screen 开始实装 tab / chart / upload / settings 等 icon-heavy 视图
+- **动作**:
+  1. 从 `specs/003-design-system-foundation/design-bundle/project/assets/icons/MAPPING.md` 整理完整生产映射
+  2. 在 DesignSystem 中提供受控 icon API 或文档(按当时 spec 决定)
+  3. 补缺失映射,并确认每个 SF Symbol 在 iOS 17 可用
+- **验证**:所有 feature 使用 SF Symbols,无 Lucide/SVG/emoji/custom icon 进入 SwiftUI 代码
+- **为什么等**:spec 003 只锁 4 个 icon;完整 mapping 需要跟真实 feature 用例一起验证语义
+- **创建于**:2026-04-27
+
 ---
 
 ## 已完成

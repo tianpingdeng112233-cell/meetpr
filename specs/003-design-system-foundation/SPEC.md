@@ -1,6 +1,6 @@
 # 003 — Design System Foundation (Tokens + Atomic Components)
 
-- **状态**: Ready
+- **状态**: InReview
 - **PR**: (待填)
 - **来源**:
   - Claude Design 产出的 **dev handoff bundle**:`specs/003-design-system-foundation/design-bundle/`
