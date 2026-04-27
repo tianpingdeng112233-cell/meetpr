@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>MeetPR — iOS UI Kit</title>
 <link rel="stylesheet" href="screens.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
 <style>
   body { margin: 0; background: #0A0A0A; }
   .canvas-bg { background: #0A0A0A; min-height: 100vh; padding: 48px 32px; }
@@ -46,9 +49,9 @@
 <body>
 <div class="canvas-bg">
   <div class="header">
-    <div class="eyebrow">UI KIT — IOS · DARK FIRST ────</div>
-    <h1>MeetPR — Composed Screens</h1>
-    <p>Five hi-fi screens demonstrating the design system in context: coach dashboard, planning editor, student training day, plan view, and auth flow.</p>
+    <div class="eyebrow">UI 套件 — IOS · 深色优先 ────</div>
+    <h1>MeetPR — 高保真界面</h1>
+    <p>五个高保真界面,在真实语境中展示设计系统:教练仪表盘、计划编辑器、学员训练日、计划总览、登录流程。</p>
   </div>
   <div class="grid" id="root"></div>
 </div>
@@ -65,11 +68,11 @@ const { CoachDashboard, PlanningEditor } = window.Screens1;
 const { StudentTrainingDay, StudentPlanView, AuthFlow } = window.Screens2;
 
 const SCREENS = [
-  { num: "01", label: "AUTH · ACCESS", screen: <AuthFlow/>, "data-screen-label": "01 Auth" },
-  { num: "02", label: "COACH · DASHBOARD", screen: <CoachDashboard/>, "data-screen-label": "02 Coach Dashboard" },
-  { num: "03", label: "COACH · PLANNING EDITOR", screen: <PlanningEditor/>, "data-screen-label": "03 Planning Editor" },
-  { num: "04", label: "STUDENT · TRAINING DAY", screen: <StudentTrainingDay/>, "data-screen-label": "04 Training Day" },
-  { num: "05", label: "STUDENT · PLAN VIEW", screen: <StudentPlanView/>, "data-screen-label": "05 Plan View" },
+  { num: "01", label: "登录 · 接入", screen: <AuthFlow/>, "data-screen-label": "01 登录" },
+  { num: "02", label: "教练 · 今日仪表盘", screen: <CoachDashboard/>, "data-screen-label": "02 教练仪表盘" },
+  { num: "03", label: "教练 · 计划编辑器", screen: <PlanningEditor/>, "data-screen-label": "03 计划编辑器" },
+  { num: "04", label: "学员 · 训练日", screen: <StudentTrainingDay/>, "data-screen-label": "04 训练日" },
+  { num: "05", label: "学员 · 计划总览", screen: <StudentPlanView/>, "data-screen-label": "05 计划总览" },
 ];
 
 const App = () => (

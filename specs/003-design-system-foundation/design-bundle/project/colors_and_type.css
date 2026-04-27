@@ -35,6 +35,9 @@
                "Roboto Mono", Consolas, monospace;
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display",
                   "PingFang SC", sans-serif;
+  /* Industrial CN display — Noto Sans SC at 900 weight gives the heavy,
+     chiseled, SBD-apparel feel. Used for hero headlines with tight tracking. */
+  --font-display-cn: "Noto Sans SC", "PingFang SC", -apple-system, sans-serif;
 
   /* ---------- Type scale (pt = px in iOS at 1x) ---------- */
   --t-displayHero-size:    44px; --t-displayHero-line:    0.95; --t-displayHero-weight:    700;
