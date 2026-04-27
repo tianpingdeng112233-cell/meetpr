@@ -8,7 +8,7 @@ import SwiftUI
 import Testing
 
 @Test func coreModelsSmoke() throws {
-  let now = Date()
+  let now = Date(timeIntervalSince1970: 1_777_248_000)
   let user = User(
     id: UUID(),
     phone: "00000000000",
