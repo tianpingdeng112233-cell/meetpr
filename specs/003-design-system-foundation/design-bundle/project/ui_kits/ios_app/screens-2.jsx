@@ -22,7 +22,7 @@ const StudentTrainingDay = () => {
         <div className="card elevated" style={{ marginBottom: 16 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <Eyebrow>第 03 / 04 组 — 顶组</Eyebrow>
-            <span className="badge badge-live"><span className="dot-pulse"/>直播</span>
+            <span className="badge badge-live"><span className="dot-pulse"/>训练中</span>
           </div>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 6, marginTop: 12 }}>
             <span className="tab-num" style={{ fontSize: 72, fontWeight: 800, lineHeight: 0.95, letterSpacing: "-0.02em" }}>170</span>
@@ -114,17 +114,17 @@ const StudentPlanView = () => (
       <div className="mono" style={{ fontSize: 10, color: "var(--fg-tertiary)", letterSpacing: "0.08em", marginTop: 20, marginBottom: 8, textTransform: "uppercase" }}>本周</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 6 }}>
         {[
-          ["一","蹲",true,false],
+          ["一","S",true,false],
           ["二","—",false,false],
-          ["三","卧",true,false],
-          ["四","硬",false,true],
+          ["三","B",true,false],
+          ["四","D",false,true],
           ["五","—",false,false],
-          ["六","蹲",false,false],
+          ["六","S",false,false],
           ["日","—",false,false],
         ].map(([d,e,done,active], i) => (
           <div key={i} style={{ aspectRatio: "1", background: active ? "var(--surface-2)" : "var(--surface-1)", border: active ? "1px solid #fff" : "1px solid var(--border)", borderRadius: 8, padding: 8, display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}>
             <span style={{ fontSize: 11, color: active ? "#fff" : "var(--fg-tertiary)" }}>{d}</span>
-            <span style={{ fontSize: 14, fontWeight: 600, color: e === "—" ? "var(--fg-tertiary)" : "#fff" }}>{e}</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 18, fontWeight: 700, color: e === "—" ? "var(--fg-tertiary)" : "#fff", letterSpacing: "0.04em" }}>{e}</span>
             {done && <div style={{ position: "absolute", top: 0, right: 0, width: 0, height: 0, borderTop: "10px solid var(--brand-red)", borderLeft: "10px solid transparent" }}/>}
           </div>
         ))}
@@ -178,8 +178,8 @@ const AuthFlow = () => {
             <div style={{ marginTop: 32 }}>
               <div className="mono" style={{ fontSize: 10, color: "var(--fg-tertiary)", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>手机号</div>
               <div style={{ display: "flex", gap: 8 }}>
-                <div style={{ background: "var(--surface-1)", border: "1px solid var(--border)", borderRadius: 8, padding: 14, color: "#fff", fontSize: 17, fontFamily: "var(--font-mono)" }}>+86</div>
-                <input defaultValue="138 0000 0000" style={{ flex: 1, background: "var(--surface-1)", border: "1px solid #fff", borderRadius: 8, padding: 14, color: "#fff", fontSize: 17, fontFamily: "var(--font-mono)", letterSpacing: "0.04em" }}/>
+                <div style={{ background: "var(--surface-1)", border: "1px solid var(--border)", borderRadius: 8, padding: "14px 12px", color: "#fff", fontSize: 16, fontFamily: "var(--font-mono)", flexShrink: 0 }}>+86</div>
+                <input defaultValue="138 0000 0000" style={{ flex: 1, minWidth: 0, width: "100%", background: "var(--surface-1)", border: "1px solid #fff", borderRadius: 8, padding: "14px 12px", color: "#fff", fontSize: 16, fontFamily: "var(--font-mono)", letterSpacing: "0.02em", boxSizing: "border-box" }}/>
               </div>
             </div>
 

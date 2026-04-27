@@ -68,7 +68,7 @@ const CoachDashboard = () => (
       <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--fg-tertiary)", letterSpacing: "0.08em", textTransform: "uppercase", margin: "16px 4px 8px" }}>学员 — 今日</div>
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
         <AthleteRow name="陈磊" sub="W3D1 · 2 小时前已记录 · 3 视频待看" badge={<span className="badge badge-pr">e1RM PR</span>} dotColor="#fff"/>
-        <AthleteRow name="张宇" sub="W3D1 · 训练中 · 第 3/4 组" badge={<span className="badge badge-live"><span className="dot-pulse"/>直播</span>} dotColor="var(--brand-red)" border/>
+        <AthleteRow name="张宇" sub="W3D1 · 第 3/4 组" badge={<span className="badge badge-live"><span className="dot-pulse"/>训练中</span>} dotColor="var(--brand-red)" border/>
         <AthleteRow name="马伟" sub="评估期 · 还剩 4 天 · 资料 6/9" badge={<span className="badge badge-pending" style={{ color: "var(--amber)", borderColor: "rgba(224,168,16,0.3)" }}>评估中</span>} dotColor="var(--amber)" border/>
         <AthleteRow name="严博" sub="W2D3 · 落后 5 天" badge={<span className="badge badge-overdue">逾期</span>} dotColor="var(--amber)" border/>
         <AthleteRow name="刘浩" sub="W3D1 · 已就绪 · 09:00" badge={<span className="badge badge-ready">就绪</span>} dotColor="var(--green)" border/>
@@ -94,6 +94,7 @@ const AthleteRow = ({ name, sub, badge, dotColor, border }) => (
 // 2) 教练端 · 计划编辑器
 // ============================================================
 const PlanningEditor = () => {
+  const [expanded, setExpanded] = React.useState(false);
   const days = ["一","二","三","四","五","六","日"];
   const weeks = [
     ["蹲 顶","—","卧","硬 顶","—","蹲 减","—"],
@@ -101,6 +102,8 @@ const PlanningEditor = () => {
     ["蹲 顶+","—","卧 +5","硬 顶+","—","蹲 减","—"],
     ["蹲 极限","—","卧 极限","硬 极限","—","—","—"],
   ];
+  const visibleWeeks = expanded ? weeks : [weeks[2]];
+  const visibleStartIdx = expanded ? 0 : 2;
   return (
     <div className="screen">
       <StatusBar />
@@ -134,24 +137,30 @@ const PlanningEditor = () => {
             {days.map(d => (
               <div key={d} style={{ background: "var(--surface-1)", padding: "8px 6px", fontSize: 11, color: "var(--fg-tertiary)", textAlign: "center" }}>{d}</div>
             ))}
-            {weeks.map((week, wi) => (
-              <React.Fragment key={wi}>
-                <div style={{ background: "var(--surface-1)", padding: "12px 6px", fontSize: 10, fontFamily: "var(--font-mono)", color: wi === 2 ? "var(--brand-red)" : "var(--fg-tertiary)", letterSpacing: "0.08em", textAlign: "center", fontWeight: 600 }}>W{wi+1}</div>
-                {week.map((cell, di) => {
-                  const isCurrent = wi === 2 && di === 0;
-                  const empty = cell === "—";
-                  return (
-                    <div key={di} style={{ background: isCurrent ? "var(--surface-2)" : "var(--surface-1)", padding: "12px 4px", textAlign: "center", fontSize: 11, fontWeight: empty ? 400 : 600, color: empty ? "var(--fg-tertiary)" : "#fff", border: isCurrent ? "1px solid #fff" : "none", position: "relative" }}>
-                      {cell}
-                      {wi < 2 && !empty && (
-                        <div style={{ position: "absolute", top: 2, right: 2, width: 0, height: 0, borderTop: "6px solid var(--brand-red)", borderLeft: "6px solid transparent" }}/>
-                      )}
-                    </div>
-                  );
-                })}
-              </React.Fragment>
-            ))}
+            {visibleWeeks.map((week, vi) => {
+              const wi = visibleStartIdx + vi;
+              return (
+                <React.Fragment key={wi}>
+                  <div style={{ background: "var(--surface-1)", padding: "12px 6px", fontSize: 10, fontFamily: "var(--font-mono)", color: wi === 2 ? "var(--brand-red)" : "var(--fg-tertiary)", letterSpacing: "0.08em", textAlign: "center", fontWeight: 600 }}>W{wi+1}</div>
+                  {week.map((cell, di) => {
+                    const isCurrent = wi === 2 && di === 0;
+                    const empty = cell === "—";
+                    return (
+                      <div key={di} style={{ background: isCurrent ? "var(--surface-2)" : "var(--surface-1)", padding: "12px 4px", textAlign: "center", fontSize: 11, fontWeight: empty ? 400 : 600, color: empty ? "var(--fg-tertiary)" : "#fff", border: isCurrent ? "1px solid #fff" : "none", position: "relative" }}>
+                        {cell}
+                        {wi < 2 && !empty && (
+                          <div style={{ position: "absolute", top: 2, right: 2, width: 0, height: 0, borderTop: "6px solid var(--brand-red)", borderLeft: "6px solid transparent" }}/>
+                        )}
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })}
           </div>
+          <button onClick={()=>setExpanded(e=>!e)} style={{ width: "100%", padding: "10px 12px", background: "var(--surface-1)", border: "none", borderTop: "1px solid var(--border)", color: "var(--fg-secondary)", fontSize: 12, fontFamily: "var(--font-mono)", letterSpacing: "0.06em", textTransform: "uppercase", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            {expanded ? "收起 ↑" : `展开 4 周中周期 ↓`}
+          </button>
         </div>
 
         <div className="mono" style={{ fontSize: 10, color: "var(--brand-red)", letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 20 }}>已选 · W3 D1 — 深蹲</div>

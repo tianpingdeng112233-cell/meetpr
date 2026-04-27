@@ -1,6 +1,28 @@
 # Spec 003 Design System — Bundle Changelog
 
-## v3 — 2026-04-27 (current)
+## v4 — 2026-04-27 (current)
+
+**Bundle source**:`https://api.anthropic.com/v1/design/h/YJ1p2nYRv-Ij6by3oRMVPg`
+
+### Fixed (vs v3) — David 视觉走查 4 项 feedback
+- **AuthFlow phone field 右侧遮住**(screens-2.jsx line 182)— 加 `flex:1 + minWidth:0 + width:100% + boxSizing:border-box`,标准 CSS overflow 修法
+- **CoachDashboard 学员状态徽章** "直播" → "训练中"(screens-1.jsx line 71;`comp-badges.html` 同步加 `badge-live` 变体)
+- **PlanningEditor 默认仅显示 W3,展开看完整 4 周中周期**(screens-1.jsx line 97 加 `useState(expanded)` + line 161 折叠按钮)
+- **StudentPlanView 周日历改为 SBD 字母制**(screens-2.jsx line 116-130)— 每天 cell 仅显示 `S` / `B` / `D` / `—`,不再展示具体动作名;done 状态用红色三角角标
+
+### Known design issue:Coach Planning Editor 4×7 grid 在 iPhone 仍偏挤
+即便 v4 默认仅 W3,展开 4 周后 7 列 × 4 行在 375pt 屏宽下每格仅 ~40pt,密度过高。
+
+**Spec 003 不修此问题**(hi-fi 屏 out-of-scope)。**真正解决**留到 Coach Planning Editor feature spec(预计 spec 010-015 区间),设计 3 模式 toggle:
+- 日模式(默认):单日完整组数次数 RPE
+- 周模式:7 天 × SBD 字母 grid(复用 StudentPlanView 同款)
+- 整块模式:动作 × W1-W4 sparkline 矩阵
+
+iOS native primitive 倾向:`Picker(.segmented)` 选模式 + `TabView(.page)` 切周。Codex 实施时按届时 feature spec 走,**不直接照搬当前 v4 hi-fi 屏的 4×7 grid 形态**。
+
+---
+
+## v3 — 2026-04-27 (replaced by v4)
 
 **Bundle source**:`https://api.anthropic.com/v1/design/h/I-fGVIP1JnB9ZRx7hK0kkQ`
 

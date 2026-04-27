@@ -695,3 +695,114 @@ Looking at the current 5 screens, the binding flow isn't represented. Should I a
 - Optional: shows what happens after submission (BindRequest pending → 等待教练接收)
 
 Or do you want me to just confirm the current Auth is right and leave the rest untouched? Let me know which direction.
+
+## User
+
+01 界面：电话号码那个框右侧被遮住了？
+02 界面：”直播“改正成“训练中”
+03 界面：只展示本周日历，展开后才能看满四周的
+
+## Assistant
+
+[tool call: snip — args removed]
+
+_[tool: read_file]_
+
+_[tool: read_file]_
+
+[tool call: snip — args removed]
+
+Now let me make the three fixes:
+
+**01 — Phone field overflow**: The 17px monospace input "138 0000 0000" with letter-spacing 0.04em + a +86 box at full padding likely overflows on the 375px frame. Reduce the right side padding/font.
+
+**02 — "直播" → "训练中"** (note: the row already says "训练中" as subtitle, but badge says 直播 — change badge label, keep the live dot).
+
+**03 — Calendar collapsed to current week, expandable**: Show only W3 by default, with expand affordance.
+
+_[tool: str_replace_edit]_
+
+_[tool: str_replace_edit]_
+
+[tool call: snip — args removed]
+
+Now for the calendar — collapse to current week, expandable. Let me read the planning editor and find the calendar's data source first:
+
+_[tool: read_file]_
+
+[tool call: snip — args removed]
+
+_[tool: snip]_
+
+_[tool: str_replace_edit]_
+
+_[tool: str_replace_edit]_
+
+_[tool: done]_
+
+_[tool: snip]_
+
+三处已修：
+
+- **01 Auth** — 手机号输入框 padding 从 14 减到 12,字号 17→16,letter-spacing 0.04→0.02em,加了 `min-width:0 + box-sizing` 防止 flex 溢出。
+- **02 Coach Dashboard** — 张宇 badge 从「直播」改为「训练中」(红点保留)。
+- **03 Planning Editor** — 日历默认只显示当前周 W3,底部按钮「展开 4 周中周期 ↓」点击后展开全部 4 周,再点收起。
+
+## User
+
+04界面的“直播”也改成“训练中”。本质是因为badges中的live被翻译成直播了，但这里应该是训练中的意思
+
+## Assistant
+
+[tool call: snip — args removed]
+
+_[tool: snip]_
+
+_[tool: grep]_
+
+Found it — screens-2.jsx line 25 is the StudentTrainingDay top-of-page badge. Let me also check the badges preview card and the 直播 in screens-2:
+
+_[tool: grep]_
+
+_[tool: str_replace_edit]_
+
+Now update the badges preview card too — change "LIVE" to "训练中" so the system reflects the correct meaning:
+
+_[tool: str_replace_edit]_
+
+_[tool: done]_
+
+已改：
+
+- 04 StudentTrainingDay 顶部 badge：直播 → 训练中
+- 设计系统 badges 卡片：LIVE → 训练中（保持系统一致）
+
+## User
+
+05 界面的蹲卧硬 改成S B D 而且日历里对应日期只展示当日是否有S/B/D
+
+## Assistant
+
+[tool call: snip — args removed]
+
+_[tool: snip]_
+
+_[tool: grep]_
+
+Now I'll change 蹲/卧/硬 to S/B/D in the calendar:
+
+_[tool: str_replace_edit]_
+
+Let me check the cell rendering to see the current style and ensure single-letter S/B/D looks good:
+
+_[tool: read_file]_
+
+Let me upgrade the S/B/D styling to be monospaced bolder, fitting the SBD military aesthetic:
+
+_[tool: str_replace_edit]_
+
+_[tool: done]_
+
+已改：
+
+- 05 StudentPlanView 周历单元格：蹲/卧/硬 → S/B/D（monospace 18px 加粗，配 SBD 工业风）。
