@@ -27,6 +27,8 @@ playground.xcworkspace
 Package.resolved
 Packages/
 *.xcodeproj
+!MeetPR.xcodeproj/
+!MeetPR.xcodeproj/**
 
 # CocoaPods (如果将来用)
 Pods/

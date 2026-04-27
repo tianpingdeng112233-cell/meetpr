@@ -3,3 +3,6 @@ enabledWorkflows:
   - simulator
   - swift-package
   - ui-automation
+project: MeetPR.xcodeproj
+scheme: MeetPR
+simulator: iPhone 17

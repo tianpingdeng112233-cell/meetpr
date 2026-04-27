@@ -173,6 +173,18 @@
 - **成本预估**:¥5000-15000 全套(代办 ¥2000-5000 + 律师 ¥3000-10000 + 印章/快递杂费)
 - **创建于**:2026-04-27
 
+### F-012 — Bundle ID `com.meetpr.app` 公司账号迁移
+
+- **触发条件**:Apple Developer 公司账号完成注册/迁移,且 App Store Connect 可创建正式 App ID
+- **动作**:
+  1. 在 Apple Developer / App Store Connect 用公司团队认领 `com.meetpr.app`
+  2. Xcode Signing & Capabilities 切到公司 team,保留 bundle ID 不变
+  3. 更新 `MeetPR.xcodeproj` signing 配置和 CI 签名策略(如需)
+  4. 验证 simulator build/test 不受影响;真机签名 build 通过
+- **验证**:公司 team 下 `com.meetpr.app` 可签名安装;CI simulator build/test 仍绿
+- **为什么等**:当前 spec 001 只需要 placeholder bundle ID 和 simulator 验证;公司账号注册另议
+- **创建于**:2026-04-27
+
 ---
 
 ## 已完成

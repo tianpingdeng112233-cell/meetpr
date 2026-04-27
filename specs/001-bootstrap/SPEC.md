@@ -1,6 +1,6 @@
 # 001 — Xcode 项目 + 6 SPM target 骨架 (Bootstrap)
 
-- **状态**: Ready
+- **状态**: InReview
 - **PR**: (待填)
 - **来源**: [ADR 005 §1 模块结构](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) · CLAUDE.md "下一步" §3
 
