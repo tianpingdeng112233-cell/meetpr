@@ -1,0 +1,204 @@
+/* ============================================================
+   MeetPR Design System — tokens
+   Dark-first. Light mode is a fallback.
+   All tokens are documented in README.md + the preview/ cards.
+   ============================================================ */
+
+:root {
+  /* ---------- Brand ---------- */
+  --brand-red:        #E5221E;   /* THE signal. PR / AI / active tab / danger */
+  --brand-red-press:  #B81A17;   /* pressed state */
+  --brand-red-soft:   rgba(229, 34, 30, 0.12); /* tinted bg */
+
+  /* ---------- Semantic ---------- */
+  --green:            #1FB358;   /* low fatigue / + delta / completion */
+  --green-soft:       rgba(31, 179, 88, 0.14);
+  --amber:            #E0A810;   /* RARE — overreaching */
+  --amber-soft:       rgba(224, 168, 16, 0.14);
+
+  /* ---------- Dark theme (PRIMARY) ---------- */
+  --bg:               #000000;   /* true black */
+  --surface-1:        #0E0E0E;   /* cards */
+  --surface-2:        #161616;   /* elevated card / modal / hover */
+  --surface-3:        #1F1F1F;   /* pressed / focus background */
+  --border:           #262626;   /* hairline divider */
+  --border-strong:    #3A3A3A;
+  --fg-primary:       #FFFFFF;
+  --fg-secondary:     #B5B5B5;
+  --fg-tertiary:      #737373;
+  --fg-disabled:      rgba(255,255,255,0.35);
+
+  /* ---------- Type stack ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+               "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Monaco, "Cascadia Mono",
+               "Roboto Mono", Consolas, monospace;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                  "PingFang SC", sans-serif;
+  /* Industrial CN display — Noto Sans SC at 900 weight gives the heavy,
+     chiseled, SBD-apparel feel. Used for hero headlines with tight tracking. */
+  --font-display-cn: "Noto Sans SC", "PingFang SC", -apple-system, sans-serif;
+
+  /* ---------- Type scale (pt = px in iOS at 1x) ---------- */
+  --t-displayHero-size:    44px; --t-displayHero-line:    0.95; --t-displayHero-weight:    700;
+  --t-title1-size:         34px; --t-title1-line:         1.05; --t-title1-weight:         700;
+  --t-title2-size:         28px; --t-title2-line:         1.10; --t-title2-weight:         700;
+  --t-headline-size:       20px; --t-headline-line:       1.20; --t-headline-weight:       600;
+  --t-body-size:           17px; --t-body-line:           1.40; --t-body-weight:           400;
+  --t-bodyEmphasis-weight: 600;
+  --t-footnote-size:       13px; --t-footnote-line:       1.30; --t-footnote-weight:       400;
+  --t-caption-size:        11px; --t-caption-line:        1.20; --t-caption-weight:        500;
+
+  --t-monoLabel-size:      12px; --t-monoLabel-line:      1.20; --t-monoLabel-weight:      500;
+  --t-monoLabel-track:     0.08em;
+
+  --t-displayNumeral-size: 60px; --t-displayNumeral-weight: 800; /* SF Pro Heavy */
+  --t-displayUnit-size:    24px; --t-displayUnit-weight:    800; --t-displayUnit-track: 0.04em;
+
+  /* ---------- Spacing (8pt grid) ---------- */
+  --sp-xs:   4px;
+  --sp-sm:   8px;
+  --sp-md:   12px;
+  --sp-base: 16px;
+  --sp-lg:   24px;
+  --sp-xl:   32px;
+  --sp-2xl:  48px;
+  --sp-3xl:  64px;
+
+  /* ---------- Radius ---------- */
+  --r-sm:    4px;   /* chips, micro-pills */
+  --r-md:    8px;   /* inputs */
+  --r-lg:    12px;  /* cards */
+  --r-xl:    16px;  /* modals */
+  --r-pill:  999px;
+
+  /* ---------- Hairlines ---------- */
+  --hairline: 1px solid var(--border);
+  --hairline-strong: 1px solid var(--border-strong);
+
+  /* ---------- Motion ---------- */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-fast: 200ms;
+  --dur-base: 240ms;
+  --dur-slow: 280ms;
+
+  /* ---------- Hit targets ---------- */
+  --hit-min: 44px;
+  --row-min: 56px;
+
+  /* ---------- Elevation (light mode only — dark uses borders) ---------- */
+  --elev-modal: 0 8px 24px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+}
+
+/* ---------- Light theme override ---------- */
+:root[data-theme="light"], .theme-light {
+  --bg:               #FAFAFA;
+  --surface-1:        #FFFFFF;
+  --surface-2:        #F4F4F5;
+  --surface-3:        #E9E9EB;
+  --border:           #E5E5E5;
+  --border-strong:    #C9C9C9;
+  --fg-primary:       #0A0A0A;
+  --fg-secondary:     #525252;
+  --fg-tertiary:      #A3A3A3;
+  --fg-disabled:      rgba(10,10,10,0.35);
+  --brand-red-soft:   rgba(229, 34, 30, 0.08);
+}
+
+/* ============================================================
+   Semantic / element styles
+   ============================================================ */
+
+html, body {
+  background: var(--bg);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  font-size: var(--t-body-size);
+  line-height: var(--t-body-line);
+  font-weight: var(--t-body-weight);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, .t-title1 {
+  font-family: var(--font-display);
+  font-size: var(--t-title1-size);
+  line-height: var(--t-title1-line);
+  font-weight: var(--t-title1-weight);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+h2, .t-title2 {
+  font-family: var(--font-display);
+  font-size: var(--t-title2-size);
+  line-height: var(--t-title2-line);
+  font-weight: var(--t-title2-weight);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.t-displayHero {
+  font-family: var(--font-display);
+  font-size: var(--t-displayHero-size);
+  line-height: var(--t-displayHero-line);
+  font-weight: var(--t-displayHero-weight);
+  letter-spacing: -0.02em;
+}
+.t-headline {
+  font-size: var(--t-headline-size);
+  line-height: var(--t-headline-line);
+  font-weight: var(--t-headline-weight);
+}
+.t-body          { font-size: var(--t-body-size); line-height: var(--t-body-line); font-weight: 400; }
+.t-body-emphasis { font-size: var(--t-body-size); line-height: var(--t-body-line); font-weight: 600; }
+.t-footnote      { font-size: var(--t-footnote-size); line-height: var(--t-footnote-line); color: var(--fg-secondary); }
+.t-caption       { font-size: var(--t-caption-size); line-height: var(--t-caption-line); font-weight: 500; color: var(--fg-tertiary); }
+
+.t-mono-label {
+  font-family: var(--font-mono);
+  font-size: var(--t-monoLabel-size);
+  line-height: var(--t-monoLabel-line);
+  font-weight: 500;
+  letter-spacing: var(--t-monoLabel-track);
+  text-transform: uppercase;
+  color: var(--brand-red);
+}
+
+.t-display-numeral {
+  font-family: var(--font-display);
+  font-size: var(--t-displayNumeral-size);
+  font-weight: var(--t-displayNumeral-weight);
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.t-display-unit {
+  font-family: var(--font-display);
+  font-size: var(--t-displayUnit-size);
+  font-weight: var(--t-displayUnit-weight);
+  letter-spacing: var(--t-displayUnit-track);
+  color: var(--brand-red);
+  text-transform: uppercase;
+}
+
+.t-mono   { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.t-tabular { font-variant-numeric: tabular-nums; }
+
+/* Eyebrow lockup: red mono caps + trailing rule */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-sm);
+  color: var(--brand-red);
+  font-family: var(--font-mono);
+  font-size: var(--t-monoLabel-size);
+  font-weight: 500;
+  letter-spacing: var(--t-monoLabel-track);
+  text-transform: uppercase;
+}
+.eyebrow::after {
+  content: "";
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--brand-red);
+}

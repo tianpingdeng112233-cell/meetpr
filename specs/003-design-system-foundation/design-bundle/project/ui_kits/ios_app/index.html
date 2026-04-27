@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MeetPR — iOS UI Kit</title>
+<link rel="stylesheet" href="screens.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+  body { margin: 0; background: #0A0A0A; }
+  .canvas-bg { background: #0A0A0A; min-height: 100vh; padding: 48px 32px; }
+  .header { color: #fff; font-family: -apple-system, sans-serif; max-width: 1400px; margin: 0 auto 32px; }
+  .header .eyebrow { font-family: ui-monospace, "SF Mono", monospace; font-size: 11px; color: #E5221E; letter-spacing: 0.08em; text-transform: uppercase; }
+  .header h1 { font-size: 36px; font-weight: 800; margin: 6px 0 4px; letter-spacing: -0.02em; }
+  .header p { color: #B5B5B5; font-size: 14px; max-width: 640px; line-height: 1.5; margin: 0; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+  .frame-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+  }
+  .frame-label {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px; color: #737373; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .frame-label .num { color: #E5221E; }
+  .phone {
+    width: 320px; height: 692px;
+    background: #000;
+    border-radius: 44px;
+    border: 8px solid #1a1a1a;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+  .phone::before {
+    content: ""; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 32px; background: #000; border-radius: 20px; z-index: 10;
+  }
+  .phone-screen { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div class="canvas-bg">
+  <div class="header">
+    <div class="eyebrow">UI 套件 — IOS · 深色优先 ────</div>
+    <h1>MeetPR — 高保真界面</h1>
+    <p>五个高保真界面,在真实语境中展示设计系统:教练仪表盘、计划编辑器、学员训练日、计划总览、登录流程。</p>
+  </div>
+  <div class="grid" id="root"></div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="screens-1.jsx"></script>
+<script type="text/babel" src="screens-2.jsx"></script>
+<script type="text/babel">
+const { CoachDashboard, PlanningEditor } = window.Screens1;
+const { StudentTrainingDay, StudentPlanView, AuthFlow } = window.Screens2;
+
+const SCREENS = [
+  { num: "01", label: "登录 · 接入", screen: <AuthFlow/>, "data-screen-label": "01 登录" },
+  { num: "02", label: "教练 · 今日仪表盘", screen: <CoachDashboard/>, "data-screen-label": "02 教练仪表盘" },
+  { num: "03", label: "教练 · 计划编辑器", screen: <PlanningEditor/>, "data-screen-label": "03 计划编辑器" },
+  { num: "04", label: "学员 · 训练日", screen: <StudentTrainingDay/>, "data-screen-label": "04 训练日" },
+  { num: "05", label: "学员 · 计划总览", screen: <StudentPlanView/>, "data-screen-label": "05 计划总览" },
+];
+
+const App = () => (
+  <>
+    {SCREENS.map((s) => (
+      <div key={s.num} className="frame-wrap" data-screen-label={s["data-screen-label"]}>
+        <div className="frame-label"><span className="num">{s.num}</span> ─── {s.label}</div>
+        <div className="phone"><div className="phone-screen">{s.screen}</div></div>
+      </div>
+    ))}
+  </>
+);
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

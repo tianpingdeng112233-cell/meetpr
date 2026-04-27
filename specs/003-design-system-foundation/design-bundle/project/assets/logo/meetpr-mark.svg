@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+
+  <rect width="120" height="120" rx="22" fill="#000000"></rect>
+  <text x="50%" y="62%" text-anchor="middle" font-family="ui-monospace, &#39;SF Mono&#39;, Menlo, monospace" font-weight="800" font-size="52" letter-spacing="-1" fill="#FFFFFF">PR</text>
+  <rect x="22" y="92" width="76" height="6" fill="#E5221E"></rect>
+</svg>

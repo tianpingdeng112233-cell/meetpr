@@ -1,0 +1,55 @@
+/* Shared preview-card layout. Each card is ~700px wide, content-only — no titles/framing. */
+@import url("../colors_and_type.css");
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg-primary);
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+
+.card {
+  width: 700px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card.light {
+  background: #FAFAFA;
+  color: #0A0A0A;
+}
+
+.row { display: flex; gap: 12px; align-items: center; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.spread { display: flex; gap: 16px; align-items: stretch; }
+
+.swatch {
+  flex: 1;
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid rgba(255,255,255,0.06);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.swatch .label { text-transform: uppercase; font-weight: 600; opacity: 0.95; }
+.swatch .hex   { opacity: 0.75; }
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-tertiary);
+}

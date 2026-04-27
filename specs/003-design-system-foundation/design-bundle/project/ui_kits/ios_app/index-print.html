@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MeetPR — iOS UI Kit (Print)</title>
+<link rel="stylesheet" href="screens.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+  @page { size: landscape; margin: 0.5cm; }
+
+  html, body { margin: 0; background: #0A0A0A; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+
+  .page {
+    width: 100%;
+    min-height: 100vh;
+    background: #0A0A0A;
+    color: #fff;
+    padding: 32px 40px;
+    box-sizing: border-box;
+    page-break-after: always;
+    break-after: page;
+    break-inside: avoid;
+    display: flex;
+    flex-direction: column;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+
+  .page-head {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 24px; border-bottom: 1px solid #262626; padding-bottom: 12px;
+  }
+  .page-head .eyebrow {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: #E5221E;
+  }
+  .page-head h1 { font-size: 22px; font-weight: 800; margin: 4px 0 0; letter-spacing: -0.01em; }
+  .page-head .pagenum {
+    font-family: ui-monospace, "SF Mono", monospace; font-size: 11px;
+    color: #737373; letter-spacing: 0.08em;
+  }
+  .page-head .pagenum b { color: #E5221E; font-weight: 600; }
+
+  .row {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+  }
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .frame-label {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 11px; color: #737373; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .frame-label .num { color: #E5221E; }
+  .phone {
+    width: 300px; height: 650px;
+    background: #000;
+    border-radius: 42px;
+    border: 7px solid #1a1a1a;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.5);
+  }
+  .phone::before {
+    content: ""; position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 104px; height: 30px; background: #000; border-radius: 18px; z-index: 10;
+  }
+  .phone-screen { width: 100%; height: 100%; }
+
+  /* COVER */
+  .cover {
+    height: 100vh;
+    display: flex; flex-direction: column; justify-content: space-between;
+    background: #000; padding: 48px 56px;
+  }
+  .cover .eyebrow {
+    font-family: ui-monospace, "SF Mono", monospace;
+    font-size: 12px; color: #E5221E; letter-spacing: 0.10em; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .cover .eyebrow::after { content: ""; display: block; width: 60px; height: 1px; background: #E5221E; }
+  .cover h1 {
+    font-size: 88px; font-weight: 800; line-height: 0.9;
+    letter-spacing: -0.03em; margin: 24px 0 0; color: #fff;
+  }
+  .cover .meta {
+    font-family: ui-monospace, "SF Mono", monospace; font-size: 11px;
+    color: #737373; letter-spacing: 0.08em; text-transform: uppercase;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; padding-top: 24px; border-top: 1px solid #262626;
+  }
+  .cover .meta b { color: #fff; font-weight: 600; display: block; margin-top: 4px; font-size: 13px; letter-spacing: -0.01em; text-transform: none; }
+  .cover .stats { display: flex; gap: 56px; align-items: flex-end; }
+  .cover .stats .stat .num {
+    font-size: 80px; font-weight: 800; line-height: 0.9; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .cover .stats .stat .unit { font-size: 16px; font-weight: 800; color: #E5221E; letter-spacing: 0.04em; margin-left: 6px; }
+  .cover .stats .stat .label {
+    font-family: ui-monospace, "SF Mono", monospace; font-size: 10px;
+    color: #E5221E; letter-spacing: 0.10em; text-transform: uppercase; margin-bottom: 6px;
+  }
+
+  /* Hide all motion */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="page cover">
+  <div>
+    <span class="eyebrow">DESIGN SYSTEM · IOS UI KIT</span>
+    <h1>MeetPR<br/>Composed Screens.</h1>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="label">SCREENS</div><span class="num">5</span></div>
+    <div class="stat"><div class="label">ROLES</div><span class="num">2</span></div>
+    <div class="stat"><div class="label">PROTOCOL</div><span class="num">01</span></div>
+  </div>
+  <div class="meta">
+    <div>SURFACE<b>iOS · dark-first</b></div>
+    <div>VOICE<b>Confident · terse · technical</b></div>
+    <div>ACCENT<b>#E5221E — the signal</b></div>
+    <div>VERSION<b>0.1 · 2026-04-27</b></div>
+  </div>
+</div>
+
+<!-- PAGES 2–4: 2 phones per page -->
+<div class="page">
+  <div class="page-head">
+    <div><div class="eyebrow">PAGE 02</div><h1>Auth · Coach Dashboard</h1></div>
+    <div class="pagenum">02 <b>/</b> 04</div>
+  </div>
+  <div class="row">
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="num">01</span> ─── AUTH · ACCESS</div>
+      <div class="phone"><div class="phone-screen" id="s1"></div></div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="num">02</span> ─── COACH · DASHBOARD</div>
+      <div class="phone"><div class="phone-screen" id="s2"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-head">
+    <div><div class="eyebrow">PAGE 03</div><h1>Planning · Training Day</h1></div>
+    <div class="pagenum">03 <b>/</b> 04</div>
+  </div>
+  <div class="row">
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="num">03</span> ─── COACH · PLANNING EDITOR</div>
+      <div class="phone"><div class="phone-screen" id="s3"></div></div>
+    </div>
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="num">04</span> ─── STUDENT · TRAINING DAY</div>
+      <div class="phone"><div class="phone-screen" id="s4"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="page-head">
+    <div><div class="eyebrow">PAGE 04</div><h1>Plan View</h1></div>
+    <div class="pagenum">04 <b>/</b> 04</div>
+  </div>
+  <div class="row">
+    <div class="frame-wrap">
+      <div class="frame-label"><span class="num">05</span> ─── STUDENT · PLAN VIEW</div>
+      <div class="phone"><div class="phone-screen" id="s5"></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="screens-1.jsx"></script>
+<script type="text/babel" src="screens-2.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { CoachDashboard, PlanningEditor } = window.Screens1;
+const { StudentTrainingDay, StudentPlanView, AuthFlow } = window.Screens2;
+
+ReactDOM.createRoot(document.getElementById("s1")).render(<AuthFlow/>);
+ReactDOM.createRoot(document.getElementById("s2")).render(<CoachDashboard/>);
+ReactDOM.createRoot(document.getElementById("s3")).render(<PlanningEditor/>);
+ReactDOM.createRoot(document.getElementById("s4")).render(<StudentTrainingDay/>);
+ReactDOM.createRoot(document.getElementById("s5")).render(<StudentPlanView/>);
+
+(async () => {
+  if (document.fonts && document.fonts.ready) {
+    try { await document.fonts.ready; } catch (e) {}
+  }
+  await new Promise(r => setTimeout(r, 800));
+  window.print();
+})();
+</script>
+</body>
+</html>
