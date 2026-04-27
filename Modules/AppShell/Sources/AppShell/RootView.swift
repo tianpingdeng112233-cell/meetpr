@@ -17,7 +17,7 @@ public struct RootView: View {
       switch user.role {
       case .coach:
         CoachRootView()
-      case .student:
+      case .coachedStudent, .selfTrainStudent:
         StudentRootView()
       }
     }
