@@ -1,6 +1,6 @@
 # 002 — CoreModels Phase 1: Identity & Onboarding 领域类型
 
-- **状态**: Ready (spec 001 已 merge 进 main 于 2026-04-27,Modules/CoreModels stub 就位,本 spec 接力替换)
+- **状态**: InReview (spec 001 已 merge 进 main 于 2026-04-27,Modules/CoreModels stub 就位,本 spec 接力替换)
 - **PR**: (待填)
 - **来源**: [data-model.md v1.1 §1.1–1.3, §1.5–1.6](~/Brain/wiki/projects/MeetPR/data-model.md) · [ADR 005 §1](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) · [ADR 003 v4](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md)
 
