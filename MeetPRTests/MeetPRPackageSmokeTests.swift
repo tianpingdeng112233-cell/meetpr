@@ -23,7 +23,7 @@ import Testing
 @MainActor
 @Test func designSystemSmoke() {
   _ = PrimaryButton("Continue") {}
-  #expect(Color.meetprPrimary != .clear)
+  #expect(Color.MeetPR.brandRed != .clear)
 }
 
 @MainActor
