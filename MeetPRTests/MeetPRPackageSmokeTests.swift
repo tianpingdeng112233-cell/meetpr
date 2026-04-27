@@ -8,9 +8,18 @@ import SwiftUI
 import Testing
 
 @Test func coreModelsSmoke() throws {
-  let user = User(id: UUID(), role: .student, displayName: "Student")
-  let data = try JSONEncoder().encode(user)
-  let decodedUser = try JSONDecoder().decode(User.self, from: data)
+  let now = Date(timeIntervalSince1970: 1_777_248_000)
+  let user = User(
+    id: UUID(),
+    phone: "00000000000",
+    name: "Student",
+    unitSystem: .metric,
+    role: .coachedStudent,
+    createdAt: now,
+    updatedAt: now
+  )
+  let data = try MeetPRCodec.encoder.encode(user)
+  let decodedUser = try MeetPRCodec.decoder.decode(User.self, from: data)
 
   #expect(decodedUser == user)
 }

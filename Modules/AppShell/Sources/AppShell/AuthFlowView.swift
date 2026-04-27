@@ -15,7 +15,7 @@ public struct AuthFlowView: View {
       }
 
       Button("Sign in as Student") {
-        session.fakeLogin(role: .student)
+        session.fakeLogin(role: .coachedStudent)
       }
       .buttonStyle(.bordered)
     }
