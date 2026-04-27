@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, "feat/**", "fix/**"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,35 +19,51 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detect Swift package
-        id: pkg
-        run: |
-          if [ -f Package.swift ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::No Package.swift yet — skipping Swift build/test."
-          fi
-
       - name: Select Xcode
-        if: steps.pkg.outputs.exists == 'true'
         run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Swift version
-        if: steps.pkg.outputs.exists == 'true'
         run: swift --version
 
-      - name: Swift Package resolve
-        if: steps.pkg.outputs.exists == 'true'
-        run: swift package resolve
+      - name: Build and test Swift packages
+        run: |
+          for package in Modules/*; do
+            if [ -f "$package/Package.swift" ]; then
+              echo "::group::swift build $package"
+              swift build --package-path "$package"
+              echo "::endgroup::"
 
-      - name: Build
-        if: steps.pkg.outputs.exists == 'true'
-        run: swift build -v
+              echo "::group::swift test $package"
+              swift test --package-path "$package" --parallel
+              echo "::endgroup::"
+            fi
+          done
 
-      - name: Test
-        if: steps.pkg.outputs.exists == 'true'
-        run: swift test --parallel
+      - name: Xcode build
+        run: |
+          xcodebuild \
+            -project MeetPR.xcodeproj \
+            -scheme MeetPR \
+            -destination 'generic/platform=iOS Simulator' \
+            build
+
+      - name: Select test simulator
+        id: simulator
+        run: |
+          simulator_name="iPhone 15"
+          if ! xcrun simctl list devices available | grep -q "$simulator_name"; then
+            simulator_name=$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ { gsub(/^[ \t]+|[ \t]+$/, "", $1); print $1; exit }')
+          fi
+          echo "name=$simulator_name" >> "$GITHUB_OUTPUT"
+          echo "Using simulator: $simulator_name"
+
+      - name: Xcode test
+        run: |
+          xcodebuild \
+            -project MeetPR.xcodeproj \
+            -scheme MeetPR \
+            -destination "platform=iOS Simulator,name=${{ steps.simulator.outputs.name }}" \
+            test
 
   lint:
     name: Lint
@@ -74,7 +90,7 @@ jobs:
 
       - name: swift-format lint
         if: steps.swift.outputs.exists == 'true'
-        run: swift format lint --recursive --strict .
+        run: xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR Modules
 
       - name: Install SwiftLint (if missing)
         if: steps.swift.outputs.exists == 'true'

@@ -1,16 +1,21 @@
 included:
-  - Sources
-  - Tests
+  - MeetPR
+  - Modules
 
 excluded:
   - .build
+  - Modules/**/.build
   - .swiftpm
+  - Modules/**/.swiftpm
   - .swiftlint-cache
   - DerivedData
 
 allow_zero_lintable_files: true
 cache_path: .swiftlint-cache
 reporter: xcode
+
+disabled_rules:
+  - trailing_comma
 
 line_length:
   warning: 100
