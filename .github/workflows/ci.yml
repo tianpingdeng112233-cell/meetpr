@@ -90,7 +90,7 @@ jobs:
 
       - name: swift-format lint
         if: steps.swift.outputs.exists == 'true'
-        run: xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR Modules
+        run: xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
 
       - name: Install SwiftLint (if missing)
         if: steps.swift.outputs.exists == 'true'

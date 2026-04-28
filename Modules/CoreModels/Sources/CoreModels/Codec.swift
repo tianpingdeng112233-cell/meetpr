@@ -12,8 +12,66 @@ public enum MeetPRCodec {
   public static var decoder: JSONDecoder {
     let decoder = JSONDecoder()
     decoder.keyDecodingStrategy = .convertFromSnakeCase
-    decoder.dateDecodingStrategy = .iso8601
+    decoder.dateDecodingStrategy = .custom { decoder in
+      let container = try decoder.singleValueContainer()
+      let rawValue = try container.decode(String.self)
+
+      // FormatStyle ISO8601 API requires macOS 12+; the availability check
+      // keeps `swift test` building under SPM's older default macOS deployment.
+      // (iOS minimum is 17 per CLAUDE.md, so on-device the check is always true.)
+      if #available(iOS 15.0, macOS 12.0, *) {
+        if let timestamp = try? Date(rawValue, strategy: .iso8601) {
+          return timestamp
+        }
+      }
+
+      if let dateOnly = parseDateOnly(rawValue) {
+        return dateOnly
+      }
+
+      throw DecodingError.dataCorruptedError(
+        in: container,
+        debugDescription: "Expected ISO 8601 timestamp or YYYY-MM-DD date string."
+      )
+    }
     return decoder
+  }
+
+  private static func parseDateOnly(_ rawValue: String) -> Date? {
+    let parts = rawValue.split(separator: "-", omittingEmptySubsequences: false)
+    guard parts.count == 3,
+      let year = Int(parts[0]),
+      let month = Int(parts[1]),
+      let day = Int(parts[2]),
+      let timeZone = TimeZone(secondsFromGMT: 0)
+    else {
+      return nil
+    }
+
+    var calendar = Calendar(identifier: .iso8601)
+    calendar.timeZone = timeZone
+
+    let components = DateComponents(
+      calendar: calendar,
+      timeZone: timeZone,
+      year: year,
+      month: month,
+      day: day
+    )
+
+    guard let date = calendar.date(from: components) else {
+      return nil
+    }
+
+    let resolved = calendar.dateComponents([.year, .month, .day], from: date)
+    guard resolved.year == year,
+      resolved.month == month,
+      resolved.day == day
+    else {
+      return nil
+    }
+
+    return date
   }
 }
 
