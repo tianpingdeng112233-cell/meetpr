@@ -207,6 +207,20 @@
 - **为什么等**:spec 003 只锁 4 个 icon;完整 mapping 需要跟真实 feature 用例一起验证语义
 - **创建于**:2026-04-27
 
+### F-015 — 首个 coach planning spec 必须按 v4.4 设计写(防 v4.3/v4.2 误引用)
+
+- **触发条件**:写第一个 coach planning UI 相关的 spec(很可能是 spec 004 或之后,任何涉及"教练排计划 / 4 周 / 周卡片 / cycle 历史 / Excel 预览"等关键字的 spec)
+- **动作**:
+  1. 阅读 `~/Brain/wiki/projects/MeetPR/coach-planning.md` §7b/7c/7d **v4.4**(2026-04-28 pivot 后版本)
+  2. 阅读 `~/Brain/wiki/projects/MeetPR/meetings/2026-04-28-office-hours-iphone-macro-pivot.md` 了解决策原委
+  3. spec SPEC.md 的"参考"段落显式引用 coach-planning v4.4 + 注明已废弃版本(v4.3 4 周扫视态 / v4.2 Excel grid)
+  4. iPhone 实装的是 **周卡片横滑**(`TabView(.page)`),**不是** 4 周宏观视图
+  5. spec 范围**不要**包含波形图 / 变式矩阵 / 密度条等组件——那些去网页端([PD-007](~/Brain/wiki/projects/MeetPR/product-decisions/007-web-companion-macro-analytics.md) V1.x defer)
+- **验证**:spec SPEC.md 显式列出 v4.4 引用;扫一遍 spec 不出现"4 周扫视态" / "Excel grid" / "波形图" / "变式矩阵" / "密度条" 字眼
+- **为什么记**:CLAUDE.md "Recent design changes (2026-04-28)" 已提示同样信息,但 spec 工作可能跨多个 session / 不同 implementer,FOLLOWUP 是双保险
+- **关联**:CLAUDE.md "Recent design changes (2026-04-28)" 节
+- **创建于**:2026-04-28
+
 ---
 
 ## 已完成
