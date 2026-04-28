@@ -1,7 +1,7 @@
 # 004 — CoreModels Phase 2: Training Plan & Exercise Catalog 领域类型
 
 - **状态**: InReview (spec 002/003 已 merge 进 main 于 2026-04-27,Modules/CoreModels identity + DesignSystem foundation 就位,本 spec 在 plan layer 接力)
-- **PR**: TBD (本 PR 创建后填入)
+- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/21
 - **来源**:
   - [data-model.md v1.1 §1.4 (Exercise) + §1.8 (TrainingPlan/PlanDay/PlanExercise/PlanSet)](~/Brain/wiki/projects/MeetPR/data-model.md)
   - [coach-planning.md v4.4 §Step 0-5 (训练计划领域 wireframes)](~/Brain/wiki/projects/MeetPR/coach-planning.md) — iPhone 周卡片横滑 UI 走 spec 005+
