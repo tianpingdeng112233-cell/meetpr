@@ -13,28 +13,65 @@
 
 跳过第 2 步 = FOLLOWUPS 变黑洞。
 
+## ⚠️ Recent design changes (2026-04-28)
+
+Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach planning 相关 spec 必须按新方向写**：
+
+- iPhone 7b = **周卡片横滑** (`TabView(.page)`，4 张卡片 W1↔W2↔W3↔W4)，**不是** v4.3 设计的 4 周扫视态
+- iPhone 7c = **学员历史 cycle 列表入口**（数据回查），**不是** drill-down 编辑态
+- iPhone **不做** 4 周宏观视图、跨 cycle 视觉对比、多学员 dashboard——全部在网页端
+- **网页端教练后台**（V1.x defer，[PD-007](~/Brain/wiki/projects/MeetPR/product-decisions/007-web-companion-macro-analytics.md)）承担所有宏观能力，hard gate 在 lifecycle Stage 4 Week 22-24
+
+**权威源**（按这个顺序读）：
+1. `~/Brain/wiki/projects/MeetPR/coach-planning.md` §7b/7c/7d **v4.4**
+2. `~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md`（iPhone 不再消费 macro endpoint，但 API 设计仍 valid）
+3. `~/Brain/wiki/projects/MeetPR/meetings/2026-04-28-office-hours-iphone-macro-pivot.md`（pivot 完整记录 + 7 议题处置表）
+
+**已废弃**（不要参考）：
+- v4.3 §7b 4 周扫视态设计（波形 + 变式矩阵 + 密度条）
+- v4.2 §7b Excel grid 仅作为 web V1.0 layout reference 保留，**不是** iPhone 实装目标
+
+**对昨天 (2026-04-27) 已合并代码的影响**：零冲突。bootstrap (#14) / CoreModels identity (#17) / DesignSystem 14 atomic 组件 (#18) 全部基础设施级，与 coach planning UI 无交集。可放心继续基于这些写下游 spec。
+
 ## 项目阶段
 
-**规划完成 / 待产品定义** — 基础设施、治理、规范全就位,尚未生成 Xcode 项目,没写代码。
-下一步阻塞在**产品定义**(PRD 内容 + 前 3 条技术 ADR)。
+**Stage 2 Engineering Build 进行中**(详见 [[lifecycle-stages|lifecycle-stages.md]] §3,Week 0-12)。foundation 全就位:
+
+- **6 个 SPM module 落地**:AppShell / CoachKit / CoreModels / DesignSystem / Networking / StudentKit
+- **CoreModels Phase 1**:identity + onboarding domain types(User / CoachProfile / StudentProfile / InviteCode / BindRequest + 10 enums)
+- **DesignSystem foundation**:5 token(Typography / Motion / Spacing / Radius / Colors)+ 14 atomic 组件(Button×4 / Card×2 / Badge×2 / Input×3 / Label×2 / List×1)
+- **Backend scaffold**:Node.js + auth spec 进行中(backend repo PR #1 OPEN)
+- **核心 ADR 落地**:[ADR-003](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md) 双端架构 / [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型 / [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构 / [ADR-006](~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md) macro 聚合 API(2026-04-28)
+
+**已合并 spec**:[001 bootstrap](./specs/001-bootstrap) / [002 CoreModels identity](./specs/002-core-models-identity) / [003 design system foundation](./specs/003-design-system-foundation)。
+
+**当前阻塞**:coach planning UI 的实装 spec 还没起——PRD §5 P0 教练端 + §4 使用场景需要按 [v4.4 pivot](#%EF%B8%8F-recent-design-changes-2026-04-28) 同步更新后,才能向 spec 004+ 拆解。
 
 ## 下一步(给新 session 的入口)
 
 **明确的下一轮工作**,按顺序:
 
-1. **填 `~/Brain/wiki/projects/MeetPR/prd.md`**
-   建议流程:调用 `gstack-office-hours` skill,用 YC 6 问拷问产品,把用户答案沉淀进 PRD
-   (可跳过,如果用户已经有清晰的 PRD 想法,直接对话产出)
+1. **Backend spec 001-auth review + merge**(repo `MeetPR-backend` PR #1 OPEN)
+   阻塞 backend 后续 spec 的起步。Claude review → 通过 merge / 不通过写 REVIEW.md
 
-2. **起前 3 个技术 ADR**(在 `~/Brain/wiki/projects/MeetPR/decisions/`)
-   - ADR 004:架构选型(MVVM + `@Observable` vs TCA vs 其他)
-   - ADR 005:后端选型(Supabase vs Firebase vs 自建)
-   - ADR 006:模块切分策略(单 target vs SPM 多 package,以及怎么切)
+2. **PRD coach planning 章节按 v4.4 同步**
+   `coach-planning.md` Step 1-9 现在 v4.4(2026-04-28 pivot 后),但 PRD §5 P0 教练端 + §4 使用场景 1-2 描述仍是旧版。建议从最痛的开始:
+   - §4 场景 1(教练周日晚排计划)→ 改成"周卡片横滑 + 单周编辑"叙事
+   - §5 P0 教练端 → 删除"4 周宏观预览"条目,改为"周卡片横滑 + 学员历史 cycle 列表"
 
-3. **写 `specs/001-bootstrap/SPEC.md`**
-   第一个给 Codex 的任务:起 Xcode 项目骨架。完成后 CI 就从 skip 变成真跑。
+3. **写第一组 coach planning 实装 spec**(预计 spec 004 起步)
+   依赖:#2 完成 + coach-planning.md Step 1-3 单步细节确认
+   建议拆分:
+   - spec 004 = Step 0-2 教练首页 / 选学员 / 选计划长度
+   - spec 005 = Step 3-4 选主项 + 添加辅助动作(三标签 facets)
+   - spec 006 = Step 5-7 W1 强度填写 / 规则配置 / 周卡片横滑预览
+   - spec 007 = Step 8-9 发布 + 模板保存
+   - **必读** [F-015](./FOLLOWUPS.md)——任何 coach planning spec 必须按 v4.4 写,不要参考已废弃的 v4.3 4 周扫视态
 
-**不要跳过 1 直接做 2**:没 PRD 的 ADR 是空中楼阁。
+4. **网页端教练后台 spec**(独立工作流,Stage 4 Week 22-24 hard gate)
+   不阻塞 iPhone spec,但需在 Stage 4 中段前 ship。框架选型(Next.js / SvelteKit)需先开 ADR-007。
+
+**不要跳过 1/2 直接做 3**:没 spec 输入的实装 = 凭感觉编码,违反 AGENTS.md 第一条。
 
 ## 角色
 
