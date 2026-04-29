@@ -1,5 +1,6 @@
 included:
   - MeetPR
+  - MeetPRTests
   - Modules
 
 excluded:
