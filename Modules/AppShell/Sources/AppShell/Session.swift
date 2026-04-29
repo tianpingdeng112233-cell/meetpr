@@ -1,6 +1,5 @@
 import CoreModels
 import Foundation
-import Networking
 import Observation
 
 @Observable
@@ -14,27 +13,79 @@ public final class Session {
   }
 
   public private(set) var state: State = .anonymous
-  @ObservationIgnored private let api: APIClient
 
-  public init(api: APIClient) {
-    self.api = api
+  @ObservationIgnored private let auth: any AuthRepository
+  @ObservationIgnored private let tokenStore: any TokenStoring
+  @ObservationIgnored private let onLogout: (@Sendable () async -> Void)?
+
+  public init(
+    auth: any AuthRepository,
+    tokenStore: any TokenStoring,
+    onLogout: (@Sendable () async -> Void)? = nil
+  ) {
+    self.auth = auth
+    self.tokenStore = tokenStore
+    self.onLogout = onLogout
   }
 
-  public func fakeLogin(role: UserRole) {
-    let now = Date()
-    let user = User(
-      id: UUID(),
-      phone: "00000000000",
-      name: "Test User",
-      unitSystem: .metric,
-      role: role,
-      createdAt: now,
-      updatedAt: now
-    )
-    state = .authenticated(user)
+  public func bootstrap() async {
+    let accessToken = await tokenStore.accessToken()
+    let refreshToken = await tokenStore.refreshToken()
+    let cachedUser = await tokenStore.cachedUser()
+
+    guard accessToken != nil, let refreshToken, let cachedUser else {
+      await tokenStore.clear()
+      state = .anonymous
+      return
+    }
+
+    state = .authenticated(cachedUser)
+
+    do {
+      let tokens = try await auth.refresh(refreshToken: refreshToken)
+      await tokenStore.save(access: tokens.accessToken, refresh: tokens.refreshToken)
+    } catch {
+      if let authError = error as? AuthRepositoryError, authError.clearsBootstrapSession {
+        await tokenStore.clear()
+        state = .anonymous
+      } else {
+        print("warning: bootstrap_refresh_deferred \(String(describing: error))")
+      }
+    }
   }
 
-  public func logout() {
+  public func signup(phone: String, password: String, role: UserRole) async throws {
+    state = .authenticating
+    do {
+      let result = try await auth.signup(phone: phone, password: password, role: role)
+      await persist(result)
+      state = .authenticated(result.user)
+    } catch {
+      state = .anonymous
+      throw error
+    }
+  }
+
+  public func login(phone: String, password: String) async throws {
+    state = .authenticating
+    do {
+      let result = try await auth.login(phone: phone, password: password)
+      await persist(result)
+      state = .authenticated(result.user)
+    } catch {
+      state = .anonymous
+      throw error
+    }
+  }
+
+  public func logout() async {
+    await tokenStore.clear()
+    await onLogout?()
     state = .anonymous
+  }
+
+  private func persist(_ result: AuthResult) async {
+    await tokenStore.save(access: result.accessToken, refresh: result.refreshToken)
+    await tokenStore.saveUser(result.user)
   }
 }
