@@ -48,3 +48,25 @@ import Testing
   #expect(try store.loadDraft(traineeID: PlanningFixtures.activeStudentID) == nil)
   #expect(try store.loadDraft(traineeID: PlanningFixtures.secondActiveStudentID)?.planWeeks == 1)
 }
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func draftStoreDeleteAllRemovesEveryDraft() async throws {
+  let store = try PlanningFixtures.store()
+  let draft = PlanningFixtures.draft()
+  let otherDraft = DraftTrainingPlan(
+    traineeID: PlanningFixtures.secondActiveStudentID,
+    name: "李四 1 周计划",
+    startDate: PlanningFixtures.now,
+    endDate: PlanningFixtures.now.addingTimeInterval(518_400),
+    planWeeks: 1
+  )
+
+  try store.saveDraft(draft)
+  try store.saveDraft(otherDraft)
+
+  try await store.deleteAll()
+
+  #expect(try store.loadDraft(traineeID: PlanningFixtures.activeStudentID) == nil)
+  #expect(try store.loadDraft(traineeID: PlanningFixtures.secondActiveStudentID) == nil)
+}

@@ -1,10 +1,8 @@
 import DesignSystem
-import SwiftData
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct CoachRootView: View {
-  @Environment(\.modelContext) private var modelContext
   @State private var showPlanning = false
 
   public init() {}
@@ -28,14 +26,14 @@ public struct CoachRootView: View {
         .fullScreenCover(isPresented: $showPlanning) {
           PlanningCoordinatorView(
             repository: InMemoryPlanRepository.preview(),
-            draftStore: DraftStore(context: modelContext)
+            draftStore: DraftStore.shared
           )
         }
       #else
         .sheet(isPresented: $showPlanning) {
           PlanningCoordinatorView(
             repository: InMemoryPlanRepository.preview(),
-            draftStore: DraftStore(context: modelContext)
+            draftStore: DraftStore.shared
           )
         }
       #endif

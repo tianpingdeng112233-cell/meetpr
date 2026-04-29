@@ -3,21 +3,29 @@ import SwiftData
 
 @MainActor
 public final class DraftStore {
+  public let modelContainer: ModelContainer
   private let context: ModelContext
 
   public init(context: ModelContext) {
+    self.modelContainer = context.container
     self.context = context
   }
 
+  public init(modelContainer: ModelContainer) {
+    self.modelContainer = modelContainer
+    self.context = ModelContext(modelContainer)
+  }
+
+  public static let shared: DraftStore = {
+    do {
+      return try DraftStore(modelContainer: makeModelContainer(isStoredInMemoryOnly: false))
+    } catch {
+      fatalError("Unable to create persistent draft store: \(error)")
+    }
+  }()
+
   public static func inMemory() throws -> DraftStore {
-    let schema = Schema([
-      DraftTrainingPlan.self,
-      DraftPlanDay.self,
-      DraftPlanExercise.self,
-    ])
-    let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-    let container = try ModelContainer(for: schema, configurations: [configuration])
-    return DraftStore(context: ModelContext(container))
+    try DraftStore(modelContainer: makeModelContainer(isStoredInMemoryOnly: true))
   }
 
   public func loadDraft(traineeID: UUID) throws -> DraftTrainingPlan? {
@@ -44,5 +52,26 @@ public final class DraftStore {
       context.delete(draft)
     }
     try context.save()
+  }
+
+  public func deleteAll() async throws {
+    let drafts = try context.fetch(FetchDescriptor<DraftTrainingPlan>())
+    for draft in drafts {
+      context.delete(draft)
+    }
+    try context.save()
+  }
+
+  private static func makeModelContainer(isStoredInMemoryOnly: Bool) throws -> ModelContainer {
+    let schema = Schema([
+      DraftTrainingPlan.self,
+      DraftPlanDay.self,
+      DraftPlanExercise.self,
+    ])
+    let configuration = ModelConfiguration(
+      schema: schema,
+      isStoredInMemoryOnly: isStoredInMemoryOnly
+    )
+    return try ModelContainer(for: schema, configurations: [configuration])
   }
 }
