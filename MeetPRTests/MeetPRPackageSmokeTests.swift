@@ -36,11 +36,11 @@ import Testing
 }
 
 @MainActor
-@Test func appShellSmoke() {
-  let session = Session(api: APIClient.shared)
+@Test func appShellSmoke() async throws {
+  let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
 
   #expect(session.state == .anonymous)
-  session.fakeLogin(role: .coach)
+  try await session.signup(phone: "13800000001", password: "password123", role: .coach)
 
   guard case .authenticated(let user) = session.state else {
     Issue.record("Expected authenticated session state")

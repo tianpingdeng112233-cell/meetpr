@@ -13,6 +13,7 @@ let package = Package(
     .package(path: "../DesignSystem"),
     .package(path: "../CoachKit"),
     .package(path: "../StudentKit"),
+    .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
   ],
   targets: [
     .target(
@@ -28,7 +29,10 @@ let package = Package(
     ),
     .testTarget(
       name: "AppShellTests",
-      dependencies: ["AppShell"],
+      dependencies: [
+        "AppShell",
+        .product(name: "ViewInspector", package: "ViewInspector"),
+      ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
   ]
