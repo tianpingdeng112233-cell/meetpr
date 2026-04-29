@@ -1,13 +1,8 @@
 import CoreModels
 import Foundation
 
-public enum DraftMappingError: Error, Equatable, Sendable {
-  case missingPlanID
-  case missingDayID
-}
-
 @MainActor
-public func toDomain(_ draft: DraftTrainingPlan) throws -> TrainingPlan {
+public func toDomain(_ draft: DraftTrainingPlan) -> TrainingPlan {
   TrainingPlan(
     id: draft.id,
     coachID: draft.coachID,
@@ -24,7 +19,7 @@ public func toDomain(_ draft: DraftTrainingPlan) throws -> TrainingPlan {
 }
 
 @MainActor
-public func toDomainDays(_ draft: DraftTrainingPlan) throws -> [PlanDay] {
+public func toDomainDays(_ draft: DraftTrainingPlan) -> [PlanDay] {
   draft.draftDays
     .sorted { lhs, rhs in
       if lhs.weekNumber == rhs.weekNumber {
@@ -45,7 +40,7 @@ public func toDomainDays(_ draft: DraftTrainingPlan) throws -> [PlanDay] {
 }
 
 @MainActor
-public func toDomainExercises(_ draft: DraftTrainingPlan) throws -> [PlanExercise] {
+public func toDomainExercises(_ draft: DraftTrainingPlan) -> [PlanExercise] {
   draft.draftDays
     .sorted { $0.sortOrder < $1.sortOrder }
     .flatMap { day in

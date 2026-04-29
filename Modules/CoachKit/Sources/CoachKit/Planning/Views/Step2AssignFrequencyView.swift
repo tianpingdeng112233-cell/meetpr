@@ -176,7 +176,7 @@ private struct AssignmentDayCard: View {
         }
 
         HStack(spacing: MeetPRSpacing.sm) {
-          ForEach([LiftFamily.squat, .bench, .deadlift], id: \.self) { family in
+          ForEach(LiftFamily.allCases, id: \.self) { family in
             LiftChip(
               title: PlanningDisplay.liftName(family),
               isSelected: viewModel.dayAssignments[dayOfWeek]?.contains(family) == true
@@ -210,33 +210,23 @@ private struct LiftChip: View {
   }
 }
 
-#Preview("Step2AssignFrequencyView") {
-  let store = try? DraftStore.inMemory()
-  let viewModel = PlanningViewModel(
-    repository: InMemoryPlanRepository.preview(),
-    draftStore: store ?? Step2PreviewFallback.make()
-  )
+#if DEBUG
+  #Preview("Step2AssignFrequencyView") {
+    let viewModel = PlanningViewModel(
+      repository: InMemoryPlanRepository.preview(),
+      draftStore: PlanningPreviewFactory.makeStore()
+    )
 
-  Step2AssignFrequencyView(viewModel: viewModel)
-    .task {
-      await viewModel.bootstrap()
-      if let student = viewModel.availableStudents.first(where: { summary in
-        if case .active = summary.status { return true }
-        return false
-      }) {
-        viewModel.selectStudent(student)
-        viewModel.selectDuration(4)
+    Step2AssignFrequencyView(viewModel: viewModel)
+      .task {
+        await viewModel.bootstrap()
+        if let student = viewModel.availableStudents.first(where: { summary in
+          if case .active = summary.status { return true }
+          return false
+        }) {
+          viewModel.selectStudent(student)
+          viewModel.selectDuration(4)
+        }
       }
-    }
-}
-
-@MainActor
-private enum Step2PreviewFallback {
-  static func make() -> DraftStore {
-    do {
-      return try DraftStore.inMemory()
-    } catch {
-      fatalError("Unable to create in-memory draft store for preview: \(error)")
-    }
   }
-}
+#endif

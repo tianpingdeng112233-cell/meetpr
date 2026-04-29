@@ -158,26 +158,16 @@ private struct StudentRow: View {
   }
 }
 
-#Preview("Step0SelectStudentView") {
-  let store = try? DraftStore.inMemory()
-  let viewModel = PlanningViewModel(
-    repository: InMemoryPlanRepository.preview(),
-    draftStore: store ?? Step0PreviewFallback.make()
-  )
+#if DEBUG
+  #Preview("Step0SelectStudentView") {
+    let viewModel = PlanningViewModel(
+      repository: InMemoryPlanRepository.preview(),
+      draftStore: PlanningPreviewFactory.makeStore()
+    )
 
-  Step0SelectStudentView(viewModel: viewModel)
-    .task {
-      await viewModel.bootstrap()
-    }
-}
-
-@MainActor
-private enum Step0PreviewFallback {
-  static func make() -> DraftStore {
-    do {
-      return try DraftStore.inMemory()
-    } catch {
-      fatalError("Unable to create in-memory draft store for preview: \(error)")
-    }
+    Step0SelectStudentView(viewModel: viewModel)
+      .task {
+        await viewModel.bootstrap()
+      }
   }
-}
+#endif

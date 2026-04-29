@@ -20,7 +20,6 @@ public final class PlanningViewModel {
   public var selectedVariants: [DayLiftKey: UUID] = [:]
   public private(set) var draftPlan: DraftTrainingPlan?
   public var didFinish = false
-  public private(set) var errorMessage: String?
 
   @ObservationIgnored private let repository: any PlanRepository
   @ObservationIgnored private let draftStore: DraftStore
@@ -71,9 +70,9 @@ public final class PlanningViewModel {
         exercise.mainLiftFamily ?? .squat
       }
       try resumeMostRecentDraft()
-      errorMessage = nil
     } catch {
-      errorMessage = error.localizedDescription
+      availableStudents = []
+      mainLiftCatalog = [:]
     }
   }
 
@@ -105,9 +104,8 @@ public final class PlanningViewModel {
   }
 
   public func sortedLiftFamilies(in dayOfWeek: Int) -> [LiftFamily] {
-    let order: [LiftFamily] = [.squat, .bench, .deadlift]
     let assignments = dayAssignments[dayOfWeek] ?? []
-    return order.filter { assignments.contains($0) }
+    return LiftFamily.allCases.filter { assignments.contains($0) }
   }
 
   public func assignedCount(for dayOfWeek: Int) -> Int {

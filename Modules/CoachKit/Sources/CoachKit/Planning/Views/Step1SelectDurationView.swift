@@ -111,29 +111,19 @@ private struct DurationChoiceCard: View {
   }
 }
 
-#Preview("Step1SelectDurationView") {
-  let store = try? DraftStore.inMemory()
-  let viewModel = PlanningViewModel(
-    repository: InMemoryPlanRepository.preview(),
-    draftStore: store ?? Step1PreviewFallback.make()
-  )
+#if DEBUG
+  #Preview("Step1SelectDurationView") {
+    let viewModel = PlanningViewModel(
+      repository: InMemoryPlanRepository.preview(),
+      draftStore: PlanningPreviewFactory.makeStore()
+    )
 
-  Step1SelectDurationView(viewModel: viewModel)
-    .task {
-      await viewModel.bootstrap()
-      if let student = viewModel.availableStudents.first {
-        viewModel.selectStudent(student)
+    Step1SelectDurationView(viewModel: viewModel)
+      .task {
+        await viewModel.bootstrap()
+        if let student = viewModel.availableStudents.first {
+          viewModel.selectStudent(student)
+        }
       }
-    }
-}
-
-@MainActor
-private enum Step1PreviewFallback {
-  static func make() -> DraftStore {
-    do {
-      return try DraftStore.inMemory()
-    } catch {
-      fatalError("Unable to create in-memory draft store for preview: \(error)")
-    }
   }
-}
+#endif

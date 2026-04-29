@@ -233,7 +233,7 @@ _(执行完的触发条目移到这里,保留作历史。格式:日期 + 原触�
 - **执行结果**:`DraftStore.deleteAll()` 已落地；`Session(auth:tokenStore:onLogout:)` 在 logout 时调用 cleanup；`MeetPRApp` 注入 `onLogout: { try? await DraftStore.shared.deleteAll() }`，并让 app + Coach Planning flow 共用 `DraftStore.shared` 的同一个 SwiftData container。
 - **验证**:PR #27 的 `SessionTests.logoutClearsStoreAndCallsLogoutHookOnce` 覆盖 logout callback exactly once；新增 `DraftStoreTests.draftStoreDeleteAllRemovesEveryDraft` 覆盖全量删除所有 draft。
 - **满足说明**:ADR-009 §后续需回顾 #4（跨账号 leak 验证前置工程要求）已满足；教练 A logout 后本机 SwiftData draft store 会清空，教练 B 进入规划器不会恢复 A 的 draft。
-- **commit ref**:feat/005-coach-planning-step-0-3 P1 fix commit
+- **commit ref**:`9282274` (`fix(coach-planning): clear drafts on logout`)
 
 ### F-009 — 明确 SPM vs Xcode project(由 ADR-004 锁定)— **关闭于 2026-04-26**
 

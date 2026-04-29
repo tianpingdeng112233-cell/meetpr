@@ -4,10 +4,10 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func draftTrainingPlanMapsToDomainPlan() throws {
+@Test func draftTrainingPlanMapsToDomainPlan() {
   let draft = PlanningFixtures.draft()
 
-  let plan = try toDomain(draft)
+  let plan = toDomain(draft)
 
   #expect(plan.id == draft.id)
   #expect(plan.traineeID == PlanningFixtures.activeStudentID)
@@ -17,10 +17,10 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func draftDaysMapToDomainDays() throws {
+@Test func draftDaysMapToDomainDays() {
   let draft = PlanningFixtures.draft()
 
-  let days = try toDomainDays(draft)
+  let days = toDomainDays(draft)
 
   #expect(days.count == 1)
   #expect(days[0].planID == draft.id)
@@ -29,10 +29,10 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func draftExercisesMapToDomainExercises() throws {
+@Test func draftExercisesMapToDomainExercises() {
   let draft = PlanningFixtures.draft()
 
-  let exercises = try toDomainExercises(draft)
+  let exercises = toDomainExercises(draft)
 
   #expect(exercises.count == 1)
   #expect(exercises[0].exerciseID == PlanningFixtures.squatID)

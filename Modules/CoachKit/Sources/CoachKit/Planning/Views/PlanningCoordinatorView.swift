@@ -55,22 +55,12 @@ public struct PlanningCoordinatorView: View {
   }
 }
 
-#Preview("PlanningCoordinatorView") {
-  let store = try? DraftStore.inMemory()
-  PlanningCoordinatorView(
-    repository: InMemoryPlanRepository.preview(),
-    draftStore: store ?? PreviewFallbackDraftStore.make()
-  )
-  .background(Color.MeetPR.bg)
-}
-
-@MainActor
-private enum PreviewFallbackDraftStore {
-  static func make() -> DraftStore {
-    do {
-      return try DraftStore.inMemory()
-    } catch {
-      fatalError("Unable to create in-memory draft store for preview: \(error)")
-    }
+#if DEBUG
+  #Preview("PlanningCoordinatorView") {
+    PlanningCoordinatorView(
+      repository: InMemoryPlanRepository.preview(),
+      draftStore: PlanningPreviewFactory.makeStore()
+    )
+    .background(Color.MeetPR.bg)
   }
-}
+#endif

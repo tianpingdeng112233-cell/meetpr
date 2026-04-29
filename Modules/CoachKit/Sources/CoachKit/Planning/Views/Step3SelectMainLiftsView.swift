@@ -30,7 +30,7 @@ public struct Step3SelectMainLiftsView: View {
         }
 
         PrimaryButton(
-          "完成基础编排（进入辅助项 TODO spec 006）",
+          "下一步",
           isDisabled: !viewModel.isCurrentStepValid,
           isFullWidth: true
         ) {
@@ -111,11 +111,7 @@ private struct MainLiftPickerRow: View {
     Binding {
       viewModel.selectedVariants[key]
     } set: { newValue in
-      if let newValue {
-        viewModel.selectedVariants[key] = newValue
-      } else {
-        viewModel.selectedVariants[key] = nil
-      }
+      viewModel.selectedVariants[key] = newValue
     }
   }
 
@@ -124,37 +120,27 @@ private struct MainLiftPickerRow: View {
   }
 }
 
-#Preview("Step3SelectMainLiftsView") {
-  let store = try? DraftStore.inMemory()
-  let viewModel = PlanningViewModel(
-    repository: InMemoryPlanRepository.preview(),
-    draftStore: store ?? Step3PreviewFallback.make()
-  )
+#if DEBUG
+  #Preview("Step3SelectMainLiftsView") {
+    let viewModel = PlanningViewModel(
+      repository: InMemoryPlanRepository.preview(),
+      draftStore: PlanningPreviewFactory.makeStore()
+    )
 
-  Step3SelectMainLiftsView(viewModel: viewModel)
-    .task {
-      await viewModel.bootstrap()
-      if let student = viewModel.availableStudents.first(where: { summary in
-        if case .active = summary.status { return true }
-        return false
-      }) {
-        viewModel.selectStudent(student)
-        viewModel.selectDuration(4)
-        viewModel.sbdFrequency = SBDFrequency(squat: 1, bench: 1, deadlift: 1)
-        viewModel.toggleAssignment(dayOfWeek: 1, liftFamily: .squat)
-        viewModel.toggleAssignment(dayOfWeek: 3, liftFamily: .bench)
-        viewModel.toggleAssignment(dayOfWeek: 5, liftFamily: .deadlift)
+    Step3SelectMainLiftsView(viewModel: viewModel)
+      .task {
+        await viewModel.bootstrap()
+        if let student = viewModel.availableStudents.first(where: { summary in
+          if case .active = summary.status { return true }
+          return false
+        }) {
+          viewModel.selectStudent(student)
+          viewModel.selectDuration(4)
+          viewModel.sbdFrequency = SBDFrequency(squat: 1, bench: 1, deadlift: 1)
+          viewModel.toggleAssignment(dayOfWeek: 1, liftFamily: .squat)
+          viewModel.toggleAssignment(dayOfWeek: 3, liftFamily: .bench)
+          viewModel.toggleAssignment(dayOfWeek: 5, liftFamily: .deadlift)
+        }
       }
-    }
-}
-
-@MainActor
-private enum Step3PreviewFallback {
-  static func make() -> DraftStore {
-    do {
-      return try DraftStore.inMemory()
-    } catch {
-      fatalError("Unable to create in-memory draft store for preview: \(error)")
-    }
   }
-}
+#endif
