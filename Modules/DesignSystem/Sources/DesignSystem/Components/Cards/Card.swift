@@ -21,10 +21,10 @@ public struct Card<Content: View>: View {
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
           .stroke(Color.MeetPR.border, lineWidth: 1)
+          .allowsHitTesting(false)
       }
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-      .accessibilityElement(children: .contain)
-      .accessibilityLabel(accessibilityLabelText)
+      .accessibilityIdentifier(accessibilityLabelText)
   }
 }
 
