@@ -225,7 +225,7 @@
 
 - **触发条件**:Codex 在起 `feat/005-coach-planning-step-0-3` PR 时,或在 spec 005 实装 PR (任何把 `DraftStore` / `DraftTrainingPlan` 等 SwiftData @Model class 引入仓库的 PR)
 - **动作**:
-  1. 修改 `MeetPR/MeetPRApp.swift` 中 `Session` 初始化,把 `onLogout: nil` 替换为 `onLogout: { await DraftStore.shared.deleteAll() }`(或等价 DI 写法)
+  1. Spec 005 PR 须把 `MeetPR/Sources/MeetPRApp.swift`(spec 011 文中写作 `MeetPR/MeetPRApp.swift`) 中 `Session` 初始化的 `onLogout: nil` 替换为 `onLogout: { await DraftStore.shared.deleteAll() }`(或等价 DI 写法)
   2. 在 spec 005 实装 PR 的 PR description 显式列出此修改(避免 reviewer 漏检)
   3. 简单手测:教练 A signup → 写 1 个 draft → logout → 教练 B signup → 验证 B 看不到 A 的 draft (per ADR-009 §后续需回顾 #4 跨账号 leak 验证)
 - **验证**:`MeetPR/MeetPRApp.swift` 不再含 `onLogout: nil`;手测 1 步通过
