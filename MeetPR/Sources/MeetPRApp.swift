@@ -1,5 +1,7 @@
 import AppShell
+import CoachKit
 import Networking
+import SwiftData
 import SwiftUI
 
 @main
@@ -18,6 +20,13 @@ struct MeetPRApp: App {
         .task {
           await session.bootstrap()
         }
+        .modelContainer(
+          for: [
+            DraftTrainingPlan.self,
+            DraftPlanDay.self,
+            DraftPlanExercise.self,
+          ]
+        )
     }
   }
 }

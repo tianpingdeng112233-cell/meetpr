@@ -11,6 +11,7 @@ let package = Package(
     .package(path: "../CoreModels"),
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
+    .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
   ],
   targets: [
     .target(
@@ -24,7 +25,10 @@ let package = Package(
     ),
     .testTarget(
       name: "CoachKitTests",
-      dependencies: ["CoachKit"],
+      dependencies: [
+        "CoachKit",
+        .product(name: "ViewInspector", package: "ViewInspector"),
+      ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
   ]

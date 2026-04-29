@@ -1,0 +1,183 @@
+import DesignSystem
+import SwiftUI
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+public struct Step0SelectStudentView: View {
+  @Bindable private var viewModel: PlanningViewModel
+
+  public init(viewModel: PlanningViewModel) {
+    self.viewModel = viewModel
+  }
+
+  public var body: some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+          Eyebrow("STEP 0")
+          Text("为谁创建计划？")
+            .font(Font.MeetPR.title2)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+        }
+
+        studentSection(
+          title: "评估期内",
+          students: students { status in
+            if case .inEvaluation = status { return true }
+            return false
+          }
+        )
+
+        studentSection(
+          title: "活跃",
+          students: students { status in
+            if case .active = status { return true }
+            return false
+          }
+        )
+
+        studentSection(
+          title: "异常",
+          students: students { status in
+            if case .abnormal = status { return true }
+            return false
+          }
+        )
+
+        PrimaryButton(
+          "开始编排",
+          isDisabled: viewModel.selectedStudent == nil,
+          isFullWidth: true
+        ) {
+          Task {
+            try? await viewModel.goNext()
+          }
+        }
+      }
+      .padding(MeetPRSpacing.base)
+    }
+    .background(Color.MeetPR.bg)
+  }
+
+  @ViewBuilder
+  private func studentSection(
+    title: String,
+    students: [CoachStudentSummary]
+  ) -> some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+      Eyebrow("\(title) (\(students.count))", showsRule: false)
+
+      VStack(spacing: 0) {
+        ForEach(students) { student in
+          StudentRow(
+            student: student,
+            isSelected: viewModel.selectedStudent?.id == student.id
+          ) {
+            viewModel.selectStudent(student)
+            Task {
+              try? await viewModel.goNext()
+            }
+          }
+
+          if student.id != students.last?.id {
+            Divider()
+              .background(Color.MeetPR.border)
+          }
+        }
+      }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.lg)
+          .stroke(Color.MeetPR.border, lineWidth: 1)
+      }
+    }
+  }
+
+  private func students(
+    matching predicate: (CoachStudentStatus) -> Bool
+  ) -> [CoachStudentSummary] {
+    viewModel.availableStudents.filter { predicate($0.status) }
+  }
+}
+
+@MainActor
+private struct StudentRow: View {
+  let student: CoachStudentSummary
+  let isSelected: Bool
+  let action: @MainActor () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      HStack(spacing: MeetPRSpacing.md) {
+        Text(leadingIcon)
+          .font(Font.MeetPR.body)
+          .frame(width: 24)
+
+        VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+          Text(student.displayName)
+            .font(Font.MeetPR.bodyEmphasis)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+
+          Text(subtitle)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+
+        if isSelected {
+          Image(systemName: "checkmark.circle.fill")
+            .foregroundStyle(Color.MeetPR.green)
+        }
+      }
+      .padding(MeetPRSpacing.base)
+      .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+    }
+    .buttonStyle(.plain)
+  }
+
+  private var leadingIcon: String {
+    switch student.status {
+    case .inEvaluation:
+      "⚠️"
+    case .active:
+      "•"
+    case .abnormal:
+      "🟡"
+    }
+  }
+
+  private var subtitle: String {
+    switch student.status {
+    case .inEvaluation(let days, let hours):
+      "评估期 \(days) 天 \(hours) 时剩"
+    case .active:
+      "训练日 \(PlanningDisplay.compactWeekdays(student.profile.trainingDaysOfWeek))"
+    case .abnormal(let reason):
+      PlanningDisplay.abnormalReason(reason)
+    }
+  }
+}
+
+#Preview("Step0SelectStudentView") {
+  let store = try? DraftStore.inMemory()
+  let viewModel = PlanningViewModel(
+    repository: InMemoryPlanRepository.preview(),
+    draftStore: store ?? Step0PreviewFallback.make()
+  )
+
+  Step0SelectStudentView(viewModel: viewModel)
+    .task {
+      await viewModel.bootstrap()
+    }
+}
+
+@MainActor
+private enum Step0PreviewFallback {
+  static func make() -> DraftStore {
+    do {
+      return try DraftStore.inMemory()
+    } catch {
+      fatalError("Unable to create in-memory draft store for preview: \(error)")
+    }
+  }
+}
