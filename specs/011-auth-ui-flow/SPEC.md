@@ -30,7 +30,7 @@
 
 - **替换 `Session.swift`**：删除 `fakeLogin(role:)`，新增 4 个 async 方法：
   - `func bootstrap() async`（app 启动时调用：Keychain 有 token → 乐观 setState(.authenticated(cachedUser)) → 后台 refresh；无 token 或 refresh 失败 → .anonymous + 清 Keychain）
-  - `func signup(phone: String, password: String, role: UserRole, name: String?) async throws`
+  - `func signup(phone: String, password: String, role: UserRole) async throws`
   - `func login(phone: String, password: String) async throws`
   - `func logout() async`（清 Keychain + 状态归位 + 通知 CoachKit DraftStore.deleteAll() 防跨账号 draft leak — per ADR-009 后果项）
   - 新增 internal: `private let auth: AuthRepository`, `private let tokenStore: TokenStore`
@@ -44,7 +44,7 @@
 | 文件 | 作用 |
 |---|---|
 | `LoginView.swift` | 手机号 + 密码 + "登录" 按钮 + "没账号? 注册" 链接 |
-| `SignupView.swift` | 手机号 + 密码 + 角色 picker (3 选 1) + 昵称(可选) + "注册" 按钮 |
+| `SignupView.swift` | 手机号 + 密码 + 角色 picker (3 选 1) + "注册" 按钮 |
 | `AuthFormViewModel.swift` | `@Observable @MainActor`，管 form state + 校验 + 提交；LoginView/SignupView 各自一个 instance（共享同一个 class，mode 通过 enum 区分） |
 | `AuthRepository.swift` | `protocol AuthRepository: Sendable` + `NetworkingAuthRepository` 实装 + `InMemoryAuthRepository` mock for tests |
 | `TokenStore.swift` | `actor TokenStore: Sendable`，封装 Keychain 读写；test 用 `InMemoryTokenStore` |
@@ -58,6 +58,15 @@
 - `POST /auth/refresh` body `{ refreshToken }` → `{ accessToken, refreshToken }`
 
 DTO 类型 (Codable struct) 放 `Modules/Networking/Sources/Networking/Auth/` 子目录，与 `CoreModels.User` 转换通过手写 mapper（避免 Networking 反向依赖 CoreModels 之外的东西）。
+
+**Mapper 默认值** (per review P2 #3) — backend register/login response user payload 是 `{ id, phone, role, createdAt }` 4 字段, 但 `CoreModels.User` (per spec 002) 有 13 字段含 non-optional `unitSystem` 和 `updatedAt`。Mapper 必须为缺失字段填默认, 否则 `JSONDecoder.decode(User.self, ...)` 直接 throw:
+
+| `CoreModels.User` 字段 | 默认值 | 备注 |
+|---|---|---|
+| `unitSystem` | `.metric` | V1 内部 dogfood 中国用户优先, 后续 profile spec 加切换 UI |
+| `updatedAt` | mirror `createdAt` from response | 注册时 createdAt = updatedAt 合理 |
+| `name` | `nil` | 本 spec V1 不收 name (per P1 #2 决策), Profile spec 后续加 `PATCH /me` 时填 |
+| `appleUserID` / `avatarURL` / `gender` / `birthDate` / `heightCm` / `weightKg` | `nil` | Optional 字段, mapper 一律 `nil` |
 
 #### 4. UI Wireframe
 
@@ -104,14 +113,11 @@ DTO 类型 (Codable struct) 放 `Modules/Networking/Sources/Networking/Auth/` �
 │  ( ) 学员 (有教练)                 │
 │  ( ) 学员 (自己练)                 │
 │                                  │
-│  昵称 (可选)                       │
-│  ┌────────────────────────────┐  │
-│  │                            │  │
-│  └────────────────────────────┘  │
-│                                  │
 │  [PrimaryButton 注册]              │
 └──────────────────────────────────┘
 ```
+
+> **`name` 字段不在本 spec V1 范围**（per review P1 #2）：backend spec 001-auth register body 是 `{ phone, password, role }`，不接 `name`。SignupView 不显示 name 字段，留 Profile/Onboarding 后续 spec 引入 `PATCH /me` 后再加。
 
 #### 5. 测试 (`Modules/AppShell/Tests/AppShellTests/Auth/`,新建子目录)
 
@@ -174,7 +180,7 @@ public final class Session {
     ) { ... }
 
     public func bootstrap() async { ... }
-    public func signup(phone: String, password: String, role: UserRole, name: String?) async throws { ... }
+    public func signup(phone: String, password: String, role: UserRole) async throws { ... }
     public func login(phone: String, password: String) async throws { ... }
     public func logout() async { ... }
 }
@@ -188,7 +194,9 @@ public final class Session {
 3. All present → setState(.authenticated(cachedUser)) // 乐观, 立即 render
 4. Background: try refresh(refreshToken) →
    - success: save new tokens to Keychain
-   - failure (401 AUTH_INVALID_REFRESH / AUTH_REFRESH_EXPIRED): clear Keychain + setState(.anonymous)
+   - **failure dispatch by error type** (per review P2 #4):
+     - **401 AUTH_INVALID_REFRESH / AUTH_REFRESH_EXPIRED**: clear Keychain + setState(.anonymous) — token 已失效,只能重登; 静默跳回 LoginView 不弹 toast
+     - **网络错误 / 5xx / decode error / timeout** (任何非 401 的失败): **保留** cached User + tokens (不清 Keychain), log `bootstrap_refresh_deferred` warn, 等下次 foreground 或用户主动操作触发再 refresh — 防止地铁信号差/服务器临时挂直接 logout 的差体验
 5. (Future spec) GET /me to refresh cached User; V1 minimal: trust cached User until next login
 ```
 
@@ -206,13 +214,13 @@ public actor TokenStore: Sendable {
 }
 ```
 
-Keychain accessibility = `kSecAttrAccessibleAfterFirstUnlock`（允许 background fetch 时访问;app 锁屏期间 OK）。Access group 不设（V1 单 app）。
+Keychain accessibility = `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` (per review P3 #8) — 允许 background fetch + app 锁屏期间访问, 但 **`ThisDeviceOnly`** 防止通过 iCloud Keychain 同步 token 到其他设备。与 backend V1 单设备 refresh tracking (`users.refresh_token_jti` 单 slot) 模型一致 — 防 iCloud sync 把 token leak 到其他设备造成 reuse-detection 强制 logout。Access group 不设 (V1 单 app)。
 
 ### AuthRepository protocol
 
 ```swift
 public protocol AuthRepository: Sendable {
-    func signup(phone: String, password: String, role: UserRole, name: String?) async throws -> AuthResult
+    func signup(phone: String, password: String, role: UserRole) async throws -> AuthResult
     func login(phone: String, password: String) async throws -> AuthResult
     func refresh(refreshToken: String) async throws -> TokenPair
 }
@@ -233,14 +241,15 @@ public struct TokenPair: Sendable, Equatable {
 
 ### AuthFormViewModel 校验规则
 
-- **手机号**: 正则 `^1[3-9]\d{9}$` (中国大陆 11 位); 不通过 → field error "手机号格式不正确"
+- **手机号**: 正则 `^1[3-9]\d{9}$` (中国大陆 11 位 national number); 不通过 → field error "手机号格式不正确"
+- **手机号 wire-format 转换** (per review P1 #1): validation regex 匹配用户输入的 11 位国内号码; **提交前 prepend `+86`** 构造 backend 期望的 E.164 格式 (`wirePhone = "+86" + userInput`). Backend `^\+[1-9]\d{7,14}$` 验 E.164, 例: 用户输 `13800000001` → 网络层发 `+8613800000001`. Response 里 `User.phone` 也是 E.164 形态 (`+86…`), 与原始用户输入做相等比较时必须用 wire form. 转换在 `NetworkingAuthRepository` 里做 (UI 层不感知 wire form), `InMemoryAuthRepository` mock 可选直接接受 raw 11 位
 - **密码**: length ≥ 8 chars **且** UTF-8 byte length ≤ 72 (与 backend bcrypt 限制一致); 不通过 → "密码至少 8 字符,最多 72 字节"
 - **角色** (signup only): 必选 1; 未选 → 提交按钮 disabled
-- **昵称** (signup only): 可空, 长度 ≤ 50 字符
 - **提交时**: 禁用按钮 (loading state), 失败 toast 显示后端 error code 对应的中文:
   - `AUTH_PHONE_TAKEN` → "该手机号已注册"
   - `AUTH_INVALID_CREDENTIALS` → "手机号或密码不正确"
   - `VALIDATION_ERROR` → 第一条 issue 的 message
+  - `RATE_LIMITED` → "请求过于频繁,请稍后重试"
   - 网络错误 (NSURLError* / 超时) → "网络异常,请重试"
 
 ### App entry wiring
@@ -278,17 +287,18 @@ struct MeetPRApp: App {
 - [ ] `Modules/Networking/Sources/Networking/Auth/` 新增 DTO + endpoint definitions 匹配 backend spec 001-auth
 - [ ] `MeetPR/MeetPRApp.swift` wiring 更新, `Session(auth:tokenStore:onLogout:)` 注入
 - [ ] `swift build` 在 Modules/AppShell + Modules/Networking 单独跑通过, 0 warning 0 error, Swift 6 strict concurrency
-- [ ] `swift test` 通过, 测试 ≥ **20** (5 AuthRepository + 4 TokenStore + 4 Session + 4 AuthFormViewModel + 3 AuthFlowSnapshot)
-- [ ] **iPhone 17 simulator 跑 happy path 5 步**:
+- [ ] `swift test` 通过, 测试 ≥ **22** (per review P3 #6 修正): 7 AuthRepository (3 round-trip + 4 error code 映射) + 4 TokenStore + 4 Session + 4 AuthFormViewModel + 3 AuthFlowSnapshot
+- [ ] **iPhone 17 simulator 跑 happy path 5 步 + 1 dev 验证** (per review P3 #7):
   1. 启动 app → 看到 LoginView (初次启动 Keychain 空)
   2. 点 "没账号? 注册" → SignupView push
-  3. 填手机号 13800000001 + 密码 password123 + 选教练 + 昵称 "Test Coach" → 提交
+  3. 填手机号 13800000001 + 密码 password123 + 选教练 → 提交 (Networking 层 prepend `+86` 后发 backend)
   4. 接口 200 → setState(.authenticated(coach)) → 自动路由到 CoachRootView (placeholder)
   5. **kill app → 重启 → bootstrap 成功 → 直接进 CoachRootView (跳过 LoginView)**
-  6. (可选 dev) 在 CoachRootView 触发 `session.logout()` → 清 Keychain + 回 LoginView
+  - **Dev 验证 (可选)**: 在 CoachRootView 触发 `session.logout()` → 清 Keychain + 回 LoginView
 - [ ] `xcodebuild build -scheme MeetPR` 通过 (整个 app 编译, 不破坏 CoachKit / StudentKit / CoreModels / DesignSystem 引用)
 - [ ] swiftlint + swift-format 全绿
 - [ ] CI 在 `feat/011-auth-ui-flow` 分支跑过, 全绿
+- [ ] [FOLLOWUPS.md](../../FOLLOWUPS.md) 加新条目 (per review P3 #9): "Spec 005 PR 须把 `MeetPR/MeetPRApp.swift` 的 `onLogout: nil` 替换为 `onLogout: { await DraftStore.shared.deleteAll() }` (per ADR-009 后果项 + spec 011 §3 deferred wiring)"
 
 ## 参考
 
