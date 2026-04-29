@@ -221,6 +221,18 @@
 - **关联**:CLAUDE.md "Recent design changes (2026-04-28)" 节
 - **创建于**:2026-04-28
 
+### F-016 — Spec 005 PR 必须 wire `onLogout` callback 到 DraftStore.deleteAll()
+
+- **触发条件**:Codex 在起 `feat/005-coach-planning-step-0-3` PR 时,或在 spec 005 实装 PR (任何把 `DraftStore` / `DraftTrainingPlan` 等 SwiftData @Model class 引入仓库的 PR)
+- **动作**:
+  1. 修改 `MeetPR/MeetPRApp.swift` 中 `Session` 初始化,把 `onLogout: nil` 替换为 `onLogout: { await DraftStore.shared.deleteAll() }`(或等价 DI 写法)
+  2. 在 spec 005 实装 PR 的 PR description 显式列出此修改(避免 reviewer 漏检)
+  3. 简单手测:教练 A signup → 写 1 个 draft → logout → 教练 B signup → 验证 B 看不到 A 的 draft (per ADR-009 §后续需回顾 #4 跨账号 leak 验证)
+- **验证**:`MeetPR/MeetPRApp.swift` 不再含 `onLogout: nil`;手测 1 步通过
+- **为什么记**:spec 011 ([SPEC.md](./specs/011-auth-ui-flow/SPEC.md) §3 + Notes) 显式 defer 此 wiring 到 spec 005 实装 PR — 单 spec 内部一致 (auth flow 不依赖 SwiftData),但跨 spec 边界容易遗漏。symptom = 跨账号 draft leak,只能手测发现,值得 trigger-based 提醒
+- **关联**:[ADR-009 后果项](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md) + [spec 011 §3 deferred wiring](./specs/011-auth-ui-flow/SPEC.md) + [spec 011 review P3 #9](./specs/011-auth-ui-flow/REVIEW.md)
+- **创建于**:2026-04-29
+
 ---
 
 ## 已完成
