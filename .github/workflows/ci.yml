@@ -2,8 +2,18 @@ name: CI
 
 on:
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "specs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
   push:
-    branches: [main, "feat/**", "fix/**"]
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "specs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,6 +34,17 @@ jobs:
 
       - name: Swift version
         run: swift --version
+
+      - name: Cache SPM build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            Modules/*/.build
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('Modules/*/Package.swift', 'MeetPR.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
       - name: Build and test Swift packages
         run: |
@@ -65,10 +86,10 @@ jobs:
             -destination "platform=iOS Simulator,name=${{ steps.simulator.outputs.name }}" \
             test
 
-  lint:
-    name: Lint
-    runs-on: macos-15
-    timeout-minutes: 10
+  lint-format:
+    name: swift-format
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -81,25 +102,36 @@ jobs:
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::No Swift sources tracked — skipping lint."
+            echo "::notice::No Swift sources tracked — skipping swift-format."
           fi
-
-      - name: Select Xcode
-        if: steps.swift.outputs.exists == 'true'
-        run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: swift-format lint
         if: steps.swift.outputs.exists == 'true'
-        run: xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
-
-      - name: Install SwiftLint (if missing)
-        if: steps.swift.outputs.exists == 'true'
         run: |
-          if ! command -v swiftlint &> /dev/null; then
-            brew install swiftlint
+          docker run --rm -v "$(pwd):/work" -w /work swift:5.10-jammy \
+            swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
+
+  lint-swiftlint:
+    name: SwiftLint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Swift sources
+        id: swift
+        run: |
+          if [ -n "$(git ls-files '*.swift')" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No Swift sources tracked — skipping SwiftLint."
           fi
-          swiftlint version
 
       - name: SwiftLint
         if: steps.swift.outputs.exists == 'true'
-        run: swiftlint --strict --reporter github-actions-logging
+        run: |
+          docker run --rm -v "$(pwd):/work" -w /work ghcr.io/realm/swiftlint:latest \
+            swiftlint --strict --reporter github-actions-logging
