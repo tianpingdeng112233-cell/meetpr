@@ -99,15 +99,15 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 
 写代码前遇到不确定的决策，先查这三个地方。没写过的决策就回 ① 规划 session 讨论，不要擅自定调。
 
-## 技术栈（待定 — 随 PRD 推进填充）
+## 技术栈
 
-- **平台**：iOS 17+（最低版本待定）
-- **UI 框架**：SwiftUI（首选）
-- **架构**：待定（考虑 MVVM / TCA / Observable）
-- **数据层**：待定（SwiftData / CoreData / 直连后端）
-- **后端**：待定（Supabase / Firebase / 自建）
+- **平台**：iOS 17+
+- **UI 框架**：SwiftUI
+- **架构**：MVVM + Repository(per [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md));ViewModel 用 `@Observable`(Swift 5.9+ macro,普通 class 属性变化自动驱动 SwiftUI view 重绘)
+- **数据层**:**默认**走 Repository → backend HTTP API(`Networking` module);**唯一例外**:CoachKit 编排器的 in-progress 计划草稿用 SwiftData 本地持久化(per [ADR-009](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md)),app 杀掉后能恢复;**仅限 `Modules/CoachKit/Sources/CoachKit/Planning/Drafts/` 子目录**,AppShell 等其他 module 严禁引 SwiftData
+- **后端**:自建 Node.js + Aliyun(RDS PostgreSQL),不走 Supabase / Firebase(per [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md))
 - **包管理**：Swift Package Manager
-- **测试**：Swift Testing(+ ViewInspector 按需加,用于 SwiftUI 视图测试)
+- **测试**：Swift Testing(`@Test` / `#expect` 语法,Xcode 16+ 苹果新测试框架,替代 XCTest)+ ViewInspector(开源库,在单元测试里渲染 SwiftUI view 并 assert 子节点,按需加)
 
 ## 代码规范
 
