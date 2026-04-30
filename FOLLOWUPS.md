@@ -99,16 +99,6 @@
 - **为什么等**:solo dev 不需要,过早设置反而阻塞自己
 - **创建于**:2026-04-24
 
-### F-007 — CI 扩展:测试覆盖率 + build 时长追踪
-
-- **触发条件**:项目有 **5 个以上 feature PR 合进 main**
-- **动作**:
-  1. CI 加 `swift test --enable-code-coverage`
-  2. 输出覆盖率到 GitHub Actions summary
-  3. 记录每次 build 时长,异常增长时告警
-- **为什么等**:没代码没测试;太早配置等于空转
-- **创建于**:2026-04-24
-
 ### F-010 — 评估迁移到 gbrain
 
 - **触发条件**:满足以下任一
@@ -226,6 +216,17 @@
 ## 已完成
 
 _(执行完的触发条目移到这里,保留作历史。格式:日期 + 原触发条件 + 执行结果链接)_
+
+### F-007 — CI 扩展:测试覆盖率 + build 时长追踪 — **关闭于 2026-04-30**
+
+- **原触发条件**:项目有 5 个以上 feature PR 合进 main(实际触发时已合并 6 个 feat commit)
+- **执行结果**:
+  1. `swift test --parallel --enable-code-coverage` 已加到 SPM 测试循环;`xcodebuild test` 加 `-enableCodeCoverage YES -resultBundlePath TestResults.xcresult`
+  2. 新增 "Coverage summary" step(`if: always()`),用 `swift test --show-codecov-path` 取每个 SPM module 的 codecov JSON,`jq` 解析 line coverage %;Xcode 总覆盖率从 `xcrun xccov view --report --json` 拿,details 折叠区展示 per-target breakdown
+  3. 新增 "Build duration summary" step,用 `date +%s` 在第一个 build 步骤前后打点,wall time 输出到 `$GITHUB_STEP_SUMMARY`
+- **验证**:CI 跑出绿色 + Actions run 页面 summary 区能看到覆盖率表格 + 总时长
+- **未做的部分**:"异常增长时告警"——需要历史 baseline 对比,目前没数据。如果未来想做,起新 FOLLOWUP 单独跟踪(可选方案:CI 输出时长写到 GitHub Cache,跟历史对比;或接 Codecov 类外部服务)
+- **commit ref**:见本 PR(stack 在 ci/cost-optimization 之上)
 
 ### F-016 — Logout 清 Coach Planning SwiftData draft，防跨账号 draft leak — **关闭于 2026-04-29**
 
