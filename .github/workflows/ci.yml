@@ -134,4 +134,4 @@ jobs:
         if: steps.swift.outputs.exists == 'true'
         run: |
           docker run --rm -v "$(pwd):/work" -w /work ghcr.io/realm/swiftlint:latest \
-            swiftlint --strict --reporter github-actions-logging
+            --strict --reporter github-actions-logging
