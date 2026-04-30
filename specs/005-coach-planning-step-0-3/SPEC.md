@@ -1,7 +1,7 @@
 # 005 — Coach Planning UI Step 0-3 (选学员 / 选周数 / SBD 频率 / 选主项变式)
 
-- **状态**: InReview
-- **PR**: (待填)
+- **状态**: Done
+- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/25 (impl — 含 review cleanups via squash) / https://github.com/tianpingdeng112233-cell/meetpr/pull/26 (review document)
 - **来源**:
   - [coach-planning.md v4.4 §Step 0-3](~/Brain/wiki/projects/MeetPR/coach-planning.md) — wireframe ground truth (2026-04-28 pivot 后)
   - [data-model.md v1.1 §1.3 (StudentProfile) + §1.4 (Exercise) + §1.8 (TrainingPlan/PlanDay/PlanExercise)](~/Brain/wiki/projects/MeetPR/data-model.md)
@@ -44,7 +44,6 @@
 | `PlanningViewModel.swift` | 单一 `@Observable @MainActor` 类持: `currentStep` / `draftPlan` / 各 step 输入字段 / available students / main lift catalog / 校验 + navigation 方法 |
 | `PlanningStep.swift` | enum: `.selectStudent` / `.selectDuration` / `.assignFrequency` / `.selectMainLifts` (`Hashable, Codable, Sendable`) — `navigationDestination(for:)` 用 |
 | `SBDFrequency.swift` | value struct: 三大项各自频率 (1-7) + 校验 helper |
-| `DayLiftAssignment.swift` | value struct: 单训练日 → `[LiftFamily]` 映射 |
 
 #### 3. SwiftData persistence layer (`Modules/CoachKit/Sources/CoachKit/Planning/Drafts/`)
 
