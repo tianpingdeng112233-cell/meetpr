@@ -1,7 +1,7 @@
 # 007 — Coach Planning UI Step 5-7 (W1 强度填写 / 规则配置 / 周卡片横滑预览)
 
 - **状态**: Done
-- **PR**: (待填)
+- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/37
 - **来源**:
   - [coach-planning.md v4.4 §Step 5 / §Step 6 / §Step 7a / §Step 7b](~/Brain/wiki/projects/MeetPR/coach-planning.md) — wireframe ground truth (2026-04-28 pivot 后)
   - [data-model.md v1.1 §1.8 (PlanSet) + §1.9 (ProgressionRuleGroup / ProgressionRuleAssignment / ExerciseWeekOverride)](~/Brain/wiki/projects/MeetPR/data-model.md)
