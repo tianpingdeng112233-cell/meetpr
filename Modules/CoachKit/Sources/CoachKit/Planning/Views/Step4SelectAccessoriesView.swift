@@ -63,7 +63,7 @@ public struct Step4SelectAccessoriesView: View {
           }
 
           PrimaryButton(
-            "完成辅助动作 — 下一步 (TODO spec 007)",
+            "完成辅助动作 — 填写 W1 强度",
             isFullWidth: true
           ) {
             Task {

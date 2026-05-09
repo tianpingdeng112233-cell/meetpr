@@ -53,6 +53,12 @@ public struct PlanningCoordinatorView: View {
       Step3SelectMainLiftsView(viewModel: viewModel)
     case .selectAccessories:
       Step4SelectAccessoriesView(viewModel: viewModel)
+    case .fillW1Intensity:
+      Step5SetIntensityView(viewModel: viewModel)
+    case .configureRules:
+      Step6ProgressionRulesView(viewModel: viewModel)
+    case .previewWeekCards:
+      Step7WeekCardSwipeView(viewModel: viewModel)
     }
   }
 }

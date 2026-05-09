@@ -2,7 +2,7 @@ import CoreModels
 import Foundation
 import Observation
 
-// swiftlint:disable file_length
+// swiftlint:disable file_length type_body_length
 @Observable
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
@@ -25,11 +25,16 @@ public final class PlanningViewModel {
   public var isLoadingAccessories = false
   public private(set) var accessoryCatalogByID: [UUID: Exercise] = [:]
   public private(set) var draftPlan: DraftTrainingPlan?
+  public var w1SetSpecs: [UUID: DraftSetSpec] = [:]
+  public var lastIntensityModeMemo: [UUID: IntensityMode] = [:]
+  public var progressionRules: [DraftProgressionRule] = []
+  public var currentPreviewWeek = 1
   public var didFinish = false
 
   @ObservationIgnored private let repository: any PlanRepository
   @ObservationIgnored private let draftStore: DraftStore
   @ObservationIgnored private var hasBootstrapped = false
+  @ObservationIgnored private var intensityValueMemo: [UUID: [IntensityMode: Decimal]] = [:]
 
   public init(repository: any PlanRepository, draftStore: DraftStore) {
     self.repository = repository
@@ -75,6 +80,10 @@ public final class PlanningViewModel {
       ) { exercise in
         exercise.mainLiftFamily ?? .squat
       }
+      let accessories = try await repository.fetchAccessoryExercises(filters: .empty)
+      accessoryCatalogByID = Dictionary(
+        uniqueKeysWithValues: accessories.map { ($0.id, $0) }
+      )
       try resumeMostRecentDraft()
       if currentStep == .selectAccessories, let currentDayID {
         await switchToDay(currentDayID)
@@ -140,6 +149,15 @@ public final class PlanningViewModel {
       return
     case .selectAccessories:
       try await proceedToStep5()
+      return
+    case .fillW1Intensity:
+      try await proceedToStep6()
+      return
+    case .configureRules:
+      try await proceedToStep7()
+      return
+    case .previewWeekCards:
+      try await proceedToStep8()
       return
     }
 
@@ -237,12 +255,238 @@ public final class PlanningViewModel {
   public func proceedToStep5() async throws {
     try validateStep(.selectAccessories)
     if let draftPlan {
-      draftPlan.currentStepRawValue = PlanningStep.selectAccessories.rawValue
+      draftPlan.currentStepRawValue = PlanningStep.fillW1Intensity.rawValue
       try draftStore.saveDraft(draftPlan)
     } else {
-      try persistDraft(currentStep: .selectAccessories)
+      try persistDraft(currentStep: .fillW1Intensity)
     }
-    print("step5_pending")
+    path.append(.fillW1Intensity)
+  }
+
+  public var sortedDraftExercises: [DraftPlanExercise] {
+    sortedDraftDays.flatMap { day in
+      sortedExercises(in: day)
+    }
+  }
+
+  public func sortedExercises(in day: DraftPlanDay) -> [DraftPlanExercise] {
+    day.draftExercises.sorted { lhs, rhs in
+      if lhs.isMainLift == rhs.isMainLift {
+        lhs.sortOrder < rhs.sortOrder
+      } else {
+        lhs.isMainLift && !rhs.isMainLift
+      }
+    }
+  }
+
+  public func catalogExercise(for draftExercise: DraftPlanExercise) -> Exercise? {
+    if let exercise = mainLiftCatalog.values.flatMap({ $0 }).first(where: {
+      $0.id == draftExercise.exerciseID
+    }) {
+      return exercise
+    }
+    return accessoryCatalogByID[draftExercise.exerciseID]
+  }
+
+  public func exerciseName(for draftExercise: DraftPlanExercise) -> String {
+    catalogExercise(for: draftExercise)?.name ?? "未知动作"
+  }
+
+  public func oneRM(for draftExercise: DraftPlanExercise) -> Decimal? {
+    guard
+      draftExercise.isMainLift,
+      let family = catalogExercise(for: draftExercise)?.mainLiftFamily,
+      let profile = selectedStudent?.profile
+    else {
+      return nil
+    }
+
+    switch family {
+    case .squat:
+      return profile.currentSquat1RM
+    case .bench:
+      return profile.bench1RM
+    case .deadlift:
+      return profile.deadlift1RM
+    }
+  }
+
+  public func defaultSetSpec(for draftExercise: DraftPlanExercise) -> DraftSetSpec {
+    DraftSetSpec(
+      setCount: draftExercise.isMainLift ? 4 : 3,
+      targetReps: draftExercise.isMainLift ? 5 : 10,
+      intensityMode: lastIntensityModeMemo[draftExercise.id] ?? .weight,
+      targetValue: intensityValueMemo[draftExercise.id]?[.weight] ?? Decimal(0)
+    )
+  }
+
+  public func setSpec(for draftExerciseID: UUID) -> DraftSetSpec? {
+    w1SetSpecs[draftExerciseID]
+  }
+
+  public func derivedSetSpec(
+    forWeek week: Int,
+    draftExercise: DraftPlanExercise
+  ) -> DraftSetSpec? {
+    guard let weekOne = w1SetSpecs[draftExercise.id] else { return nil }
+    return WeekDerivation.deriveSetSpec(
+      forWeek: week,
+      exerciseID: draftExercise.id,
+      w1: weekOne,
+      rules: progressionRules
+    )
+  }
+
+  public func updateW1SetSpec(
+    _ spec: DraftSetSpec,
+    for draftExerciseID: UUID
+  ) async throws {
+    guard let draftPlan, let exercise = draftExercise(with: draftExerciseID) else { return }
+    let normalized = normalizedSetSpec(spec)
+
+    w1SetSpecs[draftExerciseID] = normalized
+    lastIntensityModeMemo[draftExerciseID] = normalized.intensityMode
+    var memo = intensityValueMemo[draftExerciseID] ?? [:]
+    memo[normalized.intensityMode] = normalized.targetValue
+    intensityValueMemo[draftExerciseID] = memo
+
+    exercise.setsData = try encodeSetSpec(normalized)
+    draftPlan.currentStepRawValue = PlanningStep.fillW1Intensity.rawValue
+    try draftStore.saveDraft(draftPlan)
+  }
+
+  public func toggleIntensityMode(
+    to newMode: IntensityMode,
+    for draftExerciseID: UUID
+  ) async {
+    guard let draftExercise = draftExercise(with: draftExerciseID) else { return }
+    var spec = w1SetSpecs[draftExerciseID] ?? defaultSetSpec(for: draftExercise)
+    guard spec.intensityMode != newMode else { return }
+
+    var memo = intensityValueMemo[draftExerciseID] ?? [:]
+    memo[spec.intensityMode] = spec.targetValue
+    spec.targetValue = memo[newMode] ?? defaultTargetValue(for: newMode)
+    spec.intensityMode = newMode
+    intensityValueMemo[draftExerciseID] = memo
+
+    try? await updateW1SetSpec(spec, for: draftExerciseID)
+  }
+
+  public func proceedToStep6() async throws {
+    try validateStep(.fillW1Intensity)
+    let nextStep: PlanningStep = planWeeks == 1 ? .previewWeekCards : .configureRules
+    if let draftPlan {
+      draftPlan.currentStepRawValue = nextStep.rawValue
+      try draftStore.saveDraft(draftPlan)
+    }
+    path.append(nextStep)
+  }
+
+  public func makeDefaultProgressionRule() -> DraftProgressionRule {
+    DraftProgressionRule(
+      ruleType: .weightInc,
+      incrementValue: Decimal(5),
+      exerciseIDs: [],
+      appliedWeeks: planWeeks == 1 ? [] : [2, 3],
+      displayOrder: progressionRules.count
+    )
+  }
+
+  public func addRule(_ rule: DraftProgressionRule) async throws {
+    var nextRule = normalizedRule(rule)
+    nextRule.displayOrder = (progressionRules.map(\.displayOrder).max() ?? -1) + 1
+    progressionRules.append(nextRule)
+    try persistRules(currentStep: .configureRules)
+  }
+
+  public func updateRule(_ rule: DraftProgressionRule) async throws {
+    guard let index = progressionRules.firstIndex(where: { $0.id == rule.id }) else { return }
+    progressionRules[index] = normalizedRule(rule)
+    try persistRules(currentStep: .configureRules)
+  }
+
+  public func deleteRule(id: UUID) async throws {
+    progressionRules.removeAll { $0.id == id }
+    progressionRules =
+      progressionRules
+      .sorted { $0.displayOrder < $1.displayOrder }
+      .enumerated()
+      .map { offset, rule in
+        var nextRule = rule
+        nextRule.displayOrder = offset
+        return nextRule
+      }
+    try persistRules(currentStep: .configureRules)
+  }
+
+  public func toggleAppliedWeek(_ week: Int, for ruleID: UUID) async throws {
+    guard week != 1, (2...4).contains(week),
+      let index = progressionRules.firstIndex(where: { $0.id == ruleID })
+    else {
+      return
+    }
+
+    var rule = progressionRules[index]
+    if rule.appliedWeeks.contains(week) {
+      rule.appliedWeeks.remove(week)
+    } else {
+      rule.appliedWeeks.insert(week)
+    }
+    progressionRules[index] = normalizedRule(rule)
+    try persistRules(currentStep: .configureRules)
+  }
+
+  public func toggleRuleExercise(_ draftExerciseID: UUID, for ruleID: UUID) async throws {
+    guard let index = progressionRules.firstIndex(where: { $0.id == ruleID }) else { return }
+
+    var rule = progressionRules[index]
+    if rule.exerciseIDs.contains(draftExerciseID) {
+      rule.exerciseIDs.remove(draftExerciseID)
+    } else {
+      rule.exerciseIDs.insert(draftExerciseID)
+    }
+    progressionRules[index] = normalizedRule(rule)
+    try persistRules(currentStep: .configureRules)
+  }
+
+  public func uncoveredExercises(for week: Int) -> [DraftPlanExercise] {
+    sortedDraftExercises.filter { exercise in
+      !progressionRules.contains { rule in
+        rule.appliedWeeks.contains(week) && rule.exerciseIDs.contains(exercise.id)
+      }
+    }
+  }
+
+  public func isRuleOverridden(_ rule: DraftProgressionRule) -> Bool {
+    guard let dimension = rule.ruleType.dimension ?? rule.customDimension else { return false }
+    return progressionRules.contains { otherRule in
+      otherRule.id != rule.id
+        && (otherRule.ruleType.dimension ?? otherRule.customDimension) == dimension
+        && otherRule.displayOrder > rule.displayOrder
+        && !otherRule.exerciseIDs.isDisjoint(with: rule.exerciseIDs)
+        && !otherRule.appliedWeeks.isDisjoint(with: rule.appliedWeeks)
+    }
+  }
+
+  public func proceedToStep7() async throws {
+    try persistRules(currentStep: .previewWeekCards)
+    path.append(.previewWeekCards)
+  }
+
+  public func setCurrentPreviewWeek(_ week: Int) {
+    let upperBound = max(1, draftPlan?.planWeeks ?? planWeeks ?? 1)
+    currentPreviewWeek = min(upperBound, max(1, week))
+    if let draftPlan {
+      try? draftStore.saveDraft(draftPlan)
+    }
+  }
+
+  public func proceedToStep8() async throws {
+    if let draftPlan {
+      draftPlan.currentStepRawValue = PlanningStep.previewWeekCards.rawValue
+      try draftStore.saveDraft(draftPlan)
+    }
+    print("step8_pending")
   }
 }
 
@@ -256,6 +500,7 @@ extension PlanningViewModel {
     return false
   }
 
+  // swiftlint:disable:next cyclomatic_complexity
   private func validateStep(_ step: PlanningStep) throws {
     switch step {
     case .selectStudent:
@@ -281,7 +526,44 @@ extension PlanningViewModel {
       }
     case .selectAccessories:
       try validateStep(.selectMainLifts)
+    case .fillW1Intensity:
+      try validateStep(.selectAccessories)
+      try validateW1SetSpecs()
+    case .configureRules:
+      try validateStep(.fillW1Intensity)
+    case .previewWeekCards:
+      try validateStep(.fillW1Intensity)
     }
+  }
+
+  private func validateW1SetSpecs() throws {
+    let exerciseIDs = Set(sortedDraftExercises.map(\.id))
+    guard !exerciseIDs.isEmpty, exerciseIDs.isSubset(of: Set(w1SetSpecs.keys)) else {
+      throw PlanningValidationError.incompleteW1SetSpecs
+    }
+
+    let allSpecsAreValid = exerciseIDs.allSatisfy { exerciseID in
+      guard let spec = w1SetSpecs[exerciseID] else { return false }
+      return isValidSetSpec(spec)
+    }
+    guard allSpecsAreValid else {
+      throw PlanningValidationError.invalidW1SetSpec
+    }
+  }
+
+  private func isValidSetSpec(_ spec: DraftSetSpec) -> Bool {
+    let hasValidRepsMax = spec.targetRepsMax.map { $0 >= spec.targetReps } ?? true
+    let hasValidIntensity: Bool
+    switch spec.intensityMode {
+    case .weight:
+      hasValidIntensity = spec.targetValue >= Decimal(0)
+    case .rpe:
+      hasValidIntensity = spec.targetValue >= Decimal(1) && spec.targetValue <= Decimal(10)
+    }
+    return spec.setCount >= 1
+      && spec.targetReps >= 1
+      && hasValidRepsMax
+      && hasValidIntensity
   }
 
   private func validateAssignments() throws {
@@ -354,12 +636,20 @@ extension PlanningViewModel {
       let mainLiftExercises: [DraftPlanExercise] = families.enumerated().compactMap { pair in
         let key = DayLiftKey(dayOfWeek: dayOfWeek, liftFamily: pair.element)
         guard let exerciseID = selectedVariants[key] else { return nil }
-        return DraftPlanExercise(
-          exerciseID: exerciseID,
-          isMainLift: true,
-          sortOrder: pair.offset,
-          day: draftDay
-        )
+        let existingExercise = draftDay.draftExercises.first { exercise in
+          exercise.isMainLift && exercise.exerciseID == exerciseID
+        }
+        let draftExercise =
+          existingExercise
+          ?? DraftPlanExercise(
+            exerciseID: exerciseID,
+            isMainLift: true,
+            sortOrder: pair.offset,
+            day: draftDay
+          )
+        draftExercise.sortOrder = pair.offset
+        draftExercise.day = draftDay
+        return draftExercise
       }
       let accessoryExercises = draftDay.draftExercises
         .filter { !$0.isMainLift }
@@ -420,6 +710,7 @@ extension PlanningViewModel {
     dayAssignments = assignments
     selectedVariants = variants
     sbdFrequency = frequency
+    restoreStep7State(from: draft)
 
     if restoredStep == .selectAccessories {
       let sortedDays = draft.draftDays.sorted { $0.dayOfWeek < $1.dayOfWeek }
@@ -427,6 +718,25 @@ extension PlanningViewModel {
       let savedDayID = draftStore.loadCurrentDayID(traineeID: student.id)
       currentDayID = savedDayID.flatMap { dayIDs.contains($0) ? $0 : nil } ?? sortedDays.first?.id
     }
+  }
+
+  private func restoreStep7State(from draft: DraftTrainingPlan) {
+    var restoredSpecs: [UUID: DraftSetSpec] = [:]
+    var restoredModeMemo: [UUID: IntensityMode] = [:]
+    var restoredValueMemo: [UUID: [IntensityMode: Decimal]] = [:]
+
+    for exercise in draft.draftDays.flatMap(\.draftExercises) {
+      guard let spec = decodeSetSpec(exercise.setsData) else { continue }
+      restoredSpecs[exercise.id] = spec
+      restoredModeMemo[exercise.id] = spec.intensityMode
+      restoredValueMemo[exercise.id] = [spec.intensityMode: spec.targetValue]
+    }
+
+    w1SetSpecs = restoredSpecs
+    lastIntensityModeMemo = restoredModeMemo
+    intensityValueMemo = restoredValueMemo
+    progressionRules = decodeRules(draft.progressionRulesData)
+    currentPreviewWeek = 1
   }
 
   private func restoreFamilies(from day: DraftPlanDay) -> Set<LiftFamily> {
@@ -460,6 +770,38 @@ extension PlanningViewModel {
       [.selectDuration, .assignFrequency, .selectMainLifts]
     case .selectAccessories:
       [.selectDuration, .assignFrequency, .selectMainLifts, .selectAccessories]
+    case .fillW1Intensity:
+      [.selectDuration, .assignFrequency, .selectMainLifts, .selectAccessories, .fillW1Intensity]
+    case .configureRules:
+      [
+        .selectDuration,
+        .assignFrequency,
+        .selectMainLifts,
+        .selectAccessories,
+        .fillW1Intensity,
+        .configureRules,
+      ]
+    case .previewWeekCards:
+      if planWeeks == 4 {
+        [
+          .selectDuration,
+          .assignFrequency,
+          .selectMainLifts,
+          .selectAccessories,
+          .fillW1Intensity,
+          .configureRules,
+          .previewWeekCards,
+        ]
+      } else {
+        [
+          .selectDuration,
+          .assignFrequency,
+          .selectMainLifts,
+          .selectAccessories,
+          .fillW1Intensity,
+          .previewWeekCards,
+        ]
+      }
     }
   }
 
@@ -482,5 +824,109 @@ extension PlanningViewModel {
   private func draftDay(with dayID: UUID) -> DraftPlanDay? {
     draftPlan?.draftDays.first { $0.id == dayID }
   }
+
+  private func draftExercise(with draftExerciseID: UUID) -> DraftPlanExercise? {
+    draftPlan?.draftDays
+      .flatMap(\.draftExercises)
+      .first { $0.id == draftExerciseID }
+  }
+
+  private func normalizedSetSpec(_ spec: DraftSetSpec) -> DraftSetSpec {
+    var normalized = spec
+    normalized.setCount = max(1, normalized.setCount)
+    normalized.targetReps = max(1, normalized.targetReps)
+    if let targetRepsMax = normalized.targetRepsMax {
+      normalized.targetRepsMax = max(normalized.targetReps, targetRepsMax)
+    }
+    switch normalized.intensityMode {
+    case .weight:
+      normalized.targetValue = max(Decimal(0), normalized.targetValue)
+    case .rpe:
+      normalized.targetValue = min(Decimal(10), max(Decimal(1), normalized.targetValue))
+    }
+    return normalized
+  }
+
+  private func defaultTargetValue(for mode: IntensityMode) -> Decimal {
+    switch mode {
+    case .weight:
+      Decimal(0)
+    case .rpe:
+      Decimal(7)
+    }
+  }
+
+  private func normalizedRule(_ rule: DraftProgressionRule) -> DraftProgressionRule {
+    var normalized = rule
+    normalized.appliedWeeks = Set(normalized.appliedWeeks.filter { (2...4).contains($0) })
+
+    if normalized.ruleType == .custom {
+      normalized.incrementValue = nil
+      if normalized.customDimension == nil {
+        normalized.customDimension = .weight
+      }
+      let sortedWeeks = normalized.appliedWeeks.sorted()
+      var sequence = normalized.customSequence ?? []
+      if sequence.count < sortedWeeks.count {
+        let fillValue = sequence.last ?? defaultCustomValue(for: normalized.customDimension)
+        sequence += Array(repeating: fillValue, count: sortedWeeks.count - sequence.count)
+      } else if sequence.count > sortedWeeks.count {
+        sequence = Array(sequence.prefix(sortedWeeks.count))
+      }
+      normalized.customSequence = sequence
+    } else {
+      normalized.customDimension = nil
+      normalized.customSequence = nil
+      if normalized.incrementValue == nil {
+        normalized.incrementValue = defaultIncrement(for: normalized.ruleType)
+      }
+    }
+
+    return normalized
+  }
+
+  private func defaultCustomValue(for dimension: ProgressionRuleDimension?) -> Decimal {
+    switch dimension {
+    case .weight:
+      Decimal(100)
+    case .rpe:
+      Decimal(7)
+    case .sets:
+      Decimal(3)
+    case .reps:
+      Decimal(5)
+    case nil:
+      Decimal(0)
+    }
+  }
+
+  private func defaultIncrement(for ruleType: ProgressionRuleType) -> Decimal {
+    switch ruleType {
+    case .weightInc, .weightDec:
+      Decimal(5)
+    case .rpeInc, .rpeDec:
+      Decimal(string: "0.5") ?? Decimal(0)
+    case .setsInc, .setsDec, .repsInc, .repsDec:
+      Decimal(1)
+    case .custom:
+      Decimal(0)
+    }
+  }
+
+  private func persistRules(currentStep: PlanningStep) throws {
+    guard let draftPlan else { return }
+    progressionRules =
+      progressionRules
+      .sorted { $0.displayOrder < $1.displayOrder }
+      .enumerated()
+      .map { offset, rule in
+        var nextRule = normalizedRule(rule)
+        nextRule.displayOrder = offset
+        return nextRule
+      }
+    draftPlan.progressionRulesData = try encodeRules(progressionRules)
+    draftPlan.currentStepRawValue = currentStep.rawValue
+    try draftStore.saveDraft(draftPlan)
+  }
 }
-// swiftlint:enable file_length
+// swiftlint:enable file_length type_body_length

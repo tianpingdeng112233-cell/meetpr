@@ -12,6 +12,7 @@ public final class DraftTrainingPlan {
   public var planWeeks: Int = 1
   public var currentStepRawValue: Int = 0
   public var lastSavedAt: Date = Date()
+  public var progressionRulesData: Data?
 
   @Relationship(deleteRule: .cascade, inverse: \DraftPlanDay.plan)
   public var draftDays: [DraftPlanDay] = []
@@ -25,7 +26,8 @@ public final class DraftTrainingPlan {
     endDate: Date,
     planWeeks: Int,
     currentStepRawValue: Int = 0,
-    lastSavedAt: Date = Date()
+    lastSavedAt: Date = Date(),
+    progressionRulesData: Data? = nil
   ) {
     self.id = id
     self.traineeID = traineeID
@@ -36,5 +38,6 @@ public final class DraftTrainingPlan {
     self.planWeeks = planWeeks
     self.currentStepRawValue = currentStepRawValue
     self.lastSavedAt = lastSavedAt
+    self.progressionRulesData = progressionRulesData
   }
 }

@@ -211,6 +211,50 @@
 - **关联**:CLAUDE.md "Recent design changes (2026-04-28)" 节
 - **创建于**:2026-04-28
 
+### F-021 — 候选:Step 7 row tap 直跳 Step 5 该 exercise 上下文
+
+- **触发条件**:教练 dogfood 中 ≥3 次反馈"预览卡片里发现某动作强度要改, 但返回 Step 5 再找动作太慢"
+- **动作**:
+  1. 给 Step 7 `WeekCardView` 动作行增加 tap 行为
+  2. NavigationStack 回到 Step 5 并定位到对应 `DraftPlanExercise.id`
+  3. 保持长按 Peek 与横滑周卡片手势不冲突
+- **验证**:从 W2/W3/W4 任一动作行 tap 后进入 Step 5 对应卡片;edge swipe back 与 card swipe 仍正常
+- **为什么等**:V1 Step 7 行只读, 避免本 spec 扩大编辑状态与定位逻辑
+- **创建于**:2026-05-09(spec 007)
+
+### F-022 — 候选:Step 7 per-cell W2-W4 单格手覆盖
+
+- **触发条件**:教练 dogfood 中 ≥3 次明确需要"某一周某动作不按规则走, 手动改一次"
+- **动作**:
+  1. 引入 `ExerciseWeekOverride` 的 iOS draft 表达
+  2. Step 7 支持对 W2-W4 单动作派生值手动覆盖
+  3. 后续 publish spec 把 override 序列化进后端 payload
+- **验证**:有 override 的格子优先显示手填值;无 override 的格子仍由 W1 + rules derive
+- **为什么等**:V1 先保持 W2-W4 全 derive, 降低状态空间和发布 payload 复杂度
+- **创建于**:2026-05-09(spec 007)
+
+### F-023 — 候选:Step 5 per-set 变化
+
+- **触发条件**:教练 dogfood 中 ≥3 次要求同一动作内 warmup / top set / backoff / AMRAP 使用不同 reps 或 intensity
+- **动作**:
+  1. 将 Step 5 从 per-exercise 1 个 uniform `DraftSetSpec` 扩展为 per-set list
+  2. UI 支持新增/删除 set row 与 set_type 选择
+  3. DraftMapping 按 row 原样 expand 为 `PlanSet`
+- **验证**:同一动作可保存不同 set type / reps / intensity;旧 uniform draft 可迁移为 N 个 working set
+- **为什么等**:V1 只需要完整 W1 基线, uniform working sets 足够支撑 TestFlight happy path
+- **创建于**:2026-05-09(spec 007)
+
+### F-024 — 候选:custom rule 复合多维度
+
+- **触发条件**:教练 dogfood 中 ≥3 次需要同一 custom rule 同时改重量/RPE/组数/次数多个维度
+- **动作**:
+  1. 把 V1 `customDimension` 单选扩展为多维度 payload
+  2. `customSequence` 改为按 week + dimension 的结构化矩阵
+  3. WeekDerivation custom 分支支持多维度一次应用
+- **验证**:一个 custom rule 可在同一周同时产生 e.g. +5kg 与 -1 rep;Codable round-trip 保持稳定
+- **为什么等**:V1 custom = 1 维度 / 规则, 需要时可用多条规则表达复合效果
+- **创建于**:2026-05-09(spec 007)
+
 ---
 
 ## 已完成
