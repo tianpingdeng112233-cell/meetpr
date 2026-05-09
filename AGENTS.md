@@ -62,6 +62,42 @@
 
 ---
 
+## Spec 生命周期(2026-05-09 精简流程)
+
+> **背景**:之前每个 spec 走 5 个 PR(spec / impl / review / review-followup digest / spec finalize),solo 模式下 process tax 太高(spec 005 一个功能开了 16 PR)。**新流程上限 2 PR/feature**。
+
+### 流程(从 V0 起执行)
+
+| Step | PR | 谁做 | SPEC.md status 终点 |
+|---|---|---|---|
+| 1 | **spec PR**(`chore/spec-NNN-slug` branch,SPEC.md 一个文件) | Claude | `Draft` → 合并时维持 `Draft` |
+| 2 | **impl PR**(`feat/NNN-slug` branch,代码 + 测试 + SPEC.md 状态翻 `Done` + 任何 review fixups) | Codex(review fixups 也由 Codex push 到同 PR) | `Draft` → `Done` |
+
+### 不再开的 PR(过去做过,从 V0 起停)
+
+- ❌ **review followup digest PR** —— review 反馈直接在 impl PR 的 PR 评论里讨论,fix 通过 force-push 进同 impl PR
+- ❌ **spec finalize PR** —— SPEC.md 状态从 `InReview` → `Done` 在 impl PR 里改完合,不开新 PR
+- ❌ **REVIEW.md 单独 PR** —— review 走 GitHub PR review(`gh pr review` / web UI),不需要专门 commit `REVIEW.md` 文件作为 PR
+
+### review 反馈处理
+
+- Claude 在 GitHub PR review 里 leave comments(`request changes` / `comment` / `approve`)
+- 如果 `request changes`:Codex 在**同一个 impl PR** 的 feature branch 上 push 修复 commit(允许 force-push 到自己的 feature branch),Claude 重新 review
+- Approved 后 squash merge,impl PR 的 commit message 是该 spec 的 single source of truth
+- review 历史在 PR 页面留 trail,**不需要**额外 markdown 文件
+
+### 例外:确实需要独立 PR 的情况
+
+- spec 的 PRD / data-model 跨 spec 改动 → 单独 docs PR(改 `~/Brain/wiki/projects/MeetPR/` 不在 iOS repo 内,不计入 spec 的 2 PR 预算)
+- ADR 起草 → 单独 docs PR(`~/Brain/wiki/projects/MeetPR/decisions/`),不在 iOS repo 内
+- CLAUDE.md / AGENTS.md 改动 → 单独 docs PR,需用户最终确认(见 §Review 授权矩阵)
+
+### 旧 PR 历史保留
+
+2026-05-09 之前已存在的 review-followup / spec-finalize PR(如 #31 / #32)按原 5-PR 流程处理。不回溯改造。
+
+---
+
 ## 遇到疑问怎么办
 
 **不要脑补**。按以下协议:
@@ -228,7 +264,7 @@ Claude 裁决三种结果:
 
 ---
 
-## 交付检查清单(每个 PR)
+## 交付检查清单(每个 impl PR)
 
 在让 Claude review 之前,确保:
 
@@ -239,6 +275,7 @@ Claude 裁决三种结果:
 - [ ] 没动 spec 范围外的文件
 - [ ] 没动 `~/Documents/AppDev/prds/` 或 `~/Brain/wiki/` 下任何文件
 - [ ] 更新了 `SPEC.md` 状态为 `InReview`
+- [ ] **review approve 后**,在同 PR 内把 SPEC.md 状态翻 `Done` 再 squash merge(不开 spec finalize 独立 PR,见 §Spec 生命周期)
 
 ---
 
