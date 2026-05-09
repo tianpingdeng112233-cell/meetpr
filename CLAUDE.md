@@ -35,43 +35,41 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 
 ## 项目阶段
 
-**Stage 2 Engineering Build 进行中**(详见 [[lifecycle-stages|lifecycle-stages.md]] §3,Week 0-12)。foundation 全就位:
+**Stage 2 Engineering Build 进行中**(详见 [[lifecycle-stages|lifecycle-stages.md]] §3,Week 0-12)。
 
-- **6 个 SPM module 落地**:AppShell / CoachKit / CoreModels / DesignSystem / Networking / StudentKit
-- **CoreModels Phase 1**:identity + onboarding domain types(User / CoachProfile / StudentProfile / InviteCode / BindRequest + 10 enums)
-- **DesignSystem foundation**:5 token(Typography / Motion / Spacing / Radius / Colors)+ 14 atomic 组件(Button×4 / Card×2 / Badge×2 / Input×3 / Label×2 / List×1)
-- **Backend scaffold**:Node.js + auth spec 进行中(backend repo PR #1 OPEN)
-- **核心 ADR 落地**:[ADR-003](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md) 双端架构 / [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型 / [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构 / [ADR-006](~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md) macro 聚合 API(2026-04-28)
+### 🎯 V0 TestFlight north star — hard deadline **2026-06-20**(6 周)
 
-**已合并 spec**:[001 bootstrap](./specs/001-bootstrap) / [002 CoreModels identity](./specs/002-core-models-identity) / [003 design system foundation](./specs/003-design-system-foundation)。
+**所有 spec 决策按"是否在 V0 路径上"裁剪。** V0 路径 = `启动 → 登录 → 教练规划 Step 0-7(周卡片横滑) → 本机 DraftStore 保存`,**不接 backend,不开学员端**。详见 [[~/Brain/wiki/projects/MeetPR/roadmap|roadmap.md]]。
 
-**当前阻塞**:coach planning UI 的实装 spec 还没起——PRD §5 P0 教练端 + §4 使用场景需要按 [v4.4 pivot](#%EF%B8%8F-recent-design-changes-2026-04-28) 同步更新后,才能向 spec 004+ 拆解。
+### 当前完成态(2026-05-09)
 
-## 下一步(给新 session 的入口)
+- **8 SPM module + 14 atomic 组件** foundation 就位
+- **已合并 spec**(8 个):
+  - [001 bootstrap](./specs/001-bootstrap) / [002 CoreModels identity](./specs/002-core-models-identity) / [003 design system](./specs/003-design-system-foundation) / [004 training plan domain](./specs/004-core-models-training-plan)
+  - [005 coach planning step 0-3](./specs/005-coach-planning-step-0-3) / [006 step 4 accessories](./specs/006-coach-planning-step-4-accessories) — coach 规划 UI **0-4 步可点**
+  - [007 step 5-7 spec doc](./specs/007-coach-planning-step-5-7-week-card-swipe) — **SPEC 已定 / 实装未起 ← 当前关键路径**
+  - [011 auth UI flow](./specs/011-auth-ui-flow) — 登录 / 注册 / role-routed root
+- **Backend**: auth + coach planning CRUD 已合 staging(❄️ **FROZEN**,详见 [`MeetPR-backend/CLAUDE.md`](~/Projects/apps/MeetPR-backend/CLAUDE.md) 顶部 callout)
+- **核心 ADR**(8 个):[ADR-003](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md) 双端架构 / [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型 / [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构 / [ADR-006](~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md) macro API / [ADR-007](~/Brain/wiki/projects/MeetPR/decisions/007-web-framework-selection.md) 网页框架 / [ADR-009](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md) SwiftData 例外
 
-**明确的下一轮工作**,按顺序:
+## 下一步(按 V0 roadmap 严格执行)
 
-1. **Backend spec 001-auth review + merge**(repo `MeetPR-backend` PR #1 OPEN)
-   阻塞 backend 后续 spec 的起步。Claude review → 通过 merge / 不通过写 REVIEW.md
+权威源:[[~/Brain/wiki/projects/MeetPR/roadmap|roadmap.md]] §V0 周计划。
 
-2. **PRD coach planning 章节按 v4.4 同步**
-   `coach-planning.md` Step 1-9 现在 v4.4(2026-04-28 pivot 后),但 PRD §5 P0 教练端 + §4 使用场景 1-2 描述仍是旧版。建议从最痛的开始:
-   - §4 场景 1(教练周日晚排计划)→ 改成"周卡片横滑 + 单周编辑"叙事
-   - §5 P0 教练端 → 删除"4 周宏观预览"条目,改为"周卡片横滑 + 学员历史 cycle 列表"
+| 周 | 关键路径 | Status |
+|---|---|---|
+| **W20**(5/11-5/17)| **spec 007 implementation**(W1 强度 + 周卡片横滑)| 🔴 唯一阻塞 |
+| W21(5/18-5/24)| V0 happy path orchestration spec + impl(launch → login → planner home 串起,demo seed)| 🔴 |
+| W22(5/25-5/31)| App icon / Privacy manifest / Bundle ID 公司账号(F-012)/ TestFlight signing | 🔴 |
+| W23-25(6/1-6/20)| TestFlight build → Apple 审核 → ship | 🔴 |
 
-3. **写第一组 coach planning 实装 spec**(预计 spec 004 起步)
-   依赖:#2 完成 + coach-planning.md Step 1-3 单步细节确认
-   建议拆分:
-   - spec 004 = Step 0-2 教练首页 / 选学员 / 选计划长度
-   - spec 005 = Step 3-4 选主项 + 添加辅助动作(三标签 facets)
-   - spec 006 = Step 5-7 W1 强度填写 / 规则配置 / 周卡片横滑预览
-   - spec 007 = Step 8-9 发布 + 模板保存
-   - **必读** [F-015](./FOLLOWUPS.md)——任何 coach planning spec 必须按 v4.4 写,不要参考已废弃的 v4.3 4 周扫视态
+### ❄️ 硬冻结(本 session 不要尝试)
 
-4. **网页端教练后台 spec**(独立工作流,Stage 4 Week 22-24 hard gate)
-   不阻塞 iPhone spec,但需在 Stage 4 中段前 ship。框架选型(Next.js / SvelteKit)需先开 ADR-007。
-
-**不要跳过 1/2 直接做 3**:没 spec 输入的实装 = 凭感觉编码,违反 AGENTS.md 第一条。
+- ❌ **新 backend feature**:除非 iOS 有具体 spec 必须调某 endpoint。详见 [`MeetPR-backend/CLAUDE.md`](~/Projects/apps/MeetPR-backend/CLAUDE.md) 顶部
+- ❌ **meetcard 新功能**:V1 已 ship xty,post-V1 仅修 P0 bug,等 iOS V0 ship 再启动。详见 `~/Projects/apps/meetcard/README.md` 顶部
+- ❌ **网页端教练后台**:Stage 4 hard gate,V0 完全无关
+- ❌ **学员端 view**:V0.1 起;V0 = 教练 demo only
+- ❌ **不在 V0 路径上的 refactor / cleanup**:V0 ship 后再清
 
 ## 角色
 
