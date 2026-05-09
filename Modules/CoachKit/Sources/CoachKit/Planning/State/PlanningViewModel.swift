@@ -2,6 +2,7 @@ import CoreModels
 import Foundation
 import Observation
 
+// swiftlint:disable file_length
 @Observable
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
@@ -18,6 +19,11 @@ public final class PlanningViewModel {
   public var dayAssignments: [Int: Set<LiftFamily>] = [:]
   public private(set) var mainLiftCatalog: [LiftFamily: [Exercise]] = [:]
   public var selectedVariants: [DayLiftKey: UUID] = [:]
+  public var currentDayID: UUID?
+  public var accessoryFiltersByDay: [UUID: AccessoryFilters] = [:]
+  public var availableAccessoriesCache: [UUID: [Exercise]] = [:]
+  public var isLoadingAccessories = false
+  public private(set) var accessoryCatalogByID: [UUID: Exercise] = [:]
   public private(set) var draftPlan: DraftTrainingPlan?
   public var didFinish = false
 
@@ -70,6 +76,9 @@ public final class PlanningViewModel {
         exercise.mainLiftFamily ?? .squat
       }
       try resumeMostRecentDraft()
+      if currentStep == .selectAccessories, let currentDayID {
+        await switchToDay(currentDayID)
+      }
     } catch {
       availableStudents = []
       mainLiftCatalog = [:]
@@ -123,7 +132,14 @@ public final class PlanningViewModel {
     case .assignFrequency:
       path.append(.selectMainLifts)
     case .selectMainLifts:
-      try await finish()
+      path.append(.selectAccessories)
+      try persistDraft(currentStep: .selectAccessories)
+      if let dayID = currentDayID ?? sortedDraftDays.first?.id {
+        await switchToDay(dayID)
+      }
+      return
+    case .selectAccessories:
+      try await proceedToStep5()
       return
     }
 
@@ -143,6 +159,90 @@ public final class PlanningViewModel {
 
   public func validateCurrentStep() throws {
     try validateStep(currentStep)
+  }
+
+  public var sortedDraftDays: [DraftPlanDay] {
+    draftPlan?.draftDays.sorted { lhs, rhs in
+      if lhs.dayOfWeek == rhs.dayOfWeek {
+        lhs.sortOrder < rhs.sortOrder
+      } else {
+        lhs.dayOfWeek < rhs.dayOfWeek
+      }
+    } ?? []
+  }
+
+  public func accessoryFilters(for dayID: UUID) -> AccessoryFilters {
+    accessoryFiltersByDay[dayID] ?? .empty
+  }
+
+  public func availableAccessories(for dayID: UUID) -> [Exercise] {
+    availableAccessoriesCache[dayID] ?? []
+  }
+
+  public func selectedAccessories(for dayID: UUID) -> [DraftPlanExercise] {
+    draftDay(with: dayID)?
+      .draftExercises
+      .filter { !$0.isMainLift }
+      .sorted { $0.sortOrder < $1.sortOrder } ?? []
+  }
+
+  public func exerciseName(for exerciseID: UUID) -> String {
+    accessoryCatalogByID[exerciseID]?.name ?? "未知动作"
+  }
+
+  public func accessoryExercise(for exerciseID: UUID) -> Exercise? {
+    accessoryCatalogByID[exerciseID]
+  }
+
+  public func switchToDay(_ dayID: UUID) async {
+    currentDayID = dayID
+    if let traineeID = selectedStudent?.id {
+      draftStore.saveCurrentDayID(dayID, traineeID: traineeID)
+    }
+    guard availableAccessoriesCache[dayID] == nil else { return }
+    await reloadAccessoryExercises(for: dayID)
+  }
+
+  public func updateFilters(_ filters: AccessoryFilters, for dayID: UUID) async {
+    accessoryFiltersByDay[dayID] = filters
+    availableAccessoriesCache[dayID] = nil
+    await reloadAccessoryExercises(for: dayID)
+  }
+
+  public func addAccessory(_ exercise: Exercise, to dayID: UUID) async throws {
+    guard let draftPlan, let day = draftDay(with: dayID) else { return }
+    accessoryCatalogByID[exercise.id] = exercise
+
+    let nextSortOrder = (day.draftExercises.map(\.sortOrder).max() ?? -1) + 1
+    let draftExercise = DraftPlanExercise(
+      exerciseID: exercise.id,
+      isMainLift: false,
+      sortOrder: nextSortOrder,
+      day: day
+    )
+    day.draftExercises.append(draftExercise)
+    draftPlan.currentStepRawValue = PlanningStep.selectAccessories.rawValue
+    try draftStore.saveDraft(draftPlan)
+  }
+
+  public func deleteAccessory(_ draftExerciseID: UUID, from dayID: UUID) async throws {
+    guard let draftPlan, let day = draftDay(with: dayID) else { return }
+    day.draftExercises.removeAll { exercise in
+      exercise.id == draftExerciseID && !exercise.isMainLift
+    }
+    draftPlan.currentStepRawValue = PlanningStep.selectAccessories.rawValue
+    try draftStore.saveDraft(draftPlan)
+  }
+
+  public func proceedToStep5() async throws {
+    try validateStep(.selectAccessories)
+    if let draftPlan {
+      draftPlan.currentStepRawValue = PlanningStep.selectAccessories.rawValue
+      try draftStore.saveDraft(draftPlan)
+    } else {
+      try persistDraft(currentStep: .selectAccessories)
+    }
+    print("step5_pending")
   }
 }
 
@@ -179,6 +279,8 @@ extension PlanningViewModel {
       guard allVariantsSelected else {
         throw PlanningValidationError.incompleteMainLiftVariants
       }
+    case .selectAccessories:
+      try validateStep(.selectMainLifts)
     }
   }
 
@@ -233,25 +335,39 @@ extension PlanningViewModel {
   }
 
   private func makeDraftDays(for draft: DraftTrainingPlan) -> [DraftPlanDay] {
-    sortedAssignedDays.enumerated().map { index, dayOfWeek in
-      let families = sortedLiftFamilies(in: dayOfWeek)
-      let draftDay = DraftPlanDay(
-        dayOfWeek: dayOfWeek,
-        sortOrder: index,
-        assignedLiftFamilyRawValues: families.map(\.rawValue),
-        plan: draft
-      )
+    let existingDaysByDayOfWeek = Dictionary(
+      draft.draftDays.map { ($0.dayOfWeek, $0) },
+      uniquingKeysWith: { first, _ in first }
+    )
 
-      draftDay.draftExercises = families.enumerated().compactMap { exerciseIndex, family in
-        let key = DayLiftKey(dayOfWeek: dayOfWeek, liftFamily: family)
+    return sortedAssignedDays.enumerated().map { index, dayOfWeek in
+      let families = sortedLiftFamilies(in: dayOfWeek)
+      let draftDay =
+        existingDaysByDayOfWeek[dayOfWeek]
+        ?? DraftPlanDay(dayOfWeek: dayOfWeek, sortOrder: index, plan: draft)
+
+      draftDay.dayOfWeek = dayOfWeek
+      draftDay.sortOrder = index
+      draftDay.assignedLiftFamilyRawValues = families.map(\.rawValue)
+      draftDay.plan = draft
+
+      let mainLiftExercises: [DraftPlanExercise] = families.enumerated().compactMap { pair in
+        let key = DayLiftKey(dayOfWeek: dayOfWeek, liftFamily: pair.element)
         guard let exerciseID = selectedVariants[key] else { return nil }
         return DraftPlanExercise(
           exerciseID: exerciseID,
           isMainLift: true,
-          sortOrder: exerciseIndex,
+          sortOrder: pair.offset,
           day: draftDay
         )
       }
+      let accessoryExercises = draftDay.draftExercises
+        .filter { !$0.isMainLift }
+        .sorted { $0.sortOrder < $1.sortOrder }
+      for exercise in accessoryExercises {
+        exercise.day = draftDay
+      }
+      draftDay.draftExercises = mainLiftExercises + accessoryExercises
 
       return draftDay
     }
@@ -304,6 +420,13 @@ extension PlanningViewModel {
     dayAssignments = assignments
     selectedVariants = variants
     sbdFrequency = frequency
+
+    if restoredStep == .selectAccessories {
+      let sortedDays = draft.draftDays.sorted { $0.dayOfWeek < $1.dayOfWeek }
+      let dayIDs = Set(sortedDays.map(\.id))
+      let savedDayID = draftStore.loadCurrentDayID(traineeID: student.id)
+      currentDayID = savedDayID.flatMap { dayIDs.contains($0) ? $0 : nil } ?? sortedDays.first?.id
+    }
   }
 
   private func restoreFamilies(from day: DraftPlanDay) -> Set<LiftFamily> {
@@ -335,6 +458,29 @@ extension PlanningViewModel {
       [.selectDuration, .assignFrequency]
     case .selectMainLifts:
       [.selectDuration, .assignFrequency, .selectMainLifts]
+    case .selectAccessories:
+      [.selectDuration, .assignFrequency, .selectMainLifts, .selectAccessories]
     }
   }
+
+  private func reloadAccessoryExercises(for dayID: UUID) async {
+    isLoadingAccessories = true
+    defer { isLoadingAccessories = false }
+
+    do {
+      let exercises = try await repository.fetchAccessoryExercises(
+        filters: accessoryFilters(for: dayID))
+      availableAccessoriesCache[dayID] = exercises
+      for exercise in exercises {
+        accessoryCatalogByID[exercise.id] = exercise
+      }
+    } catch {
+      availableAccessoriesCache[dayID] = []
+    }
+  }
+
+  private func draftDay(with dayID: UUID) -> DraftPlanDay? {
+    draftPlan?.draftDays.first { $0.id == dayID }
+  }
 }
+// swiftlint:enable file_length

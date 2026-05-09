@@ -1,4 +1,5 @@
 import CoreModels
+import Foundation
 import Testing
 
 @testable import CoachKit
@@ -107,4 +108,12 @@ import Testing
   #expect(
     viewModel.selectedVariants[DayLiftKey(dayOfWeek: 1, liftFamily: .squat)]
       == PlanningFixtures.squatID)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func planningStepSelectAccessoriesCodableRoundTrip() throws {
+  let data = try JSONEncoder().encode(PlanningStep.selectAccessories)
+  let decoded = try JSONDecoder().decode(PlanningStep.self, from: data)
+
+  #expect(decoded == .selectAccessories)
 }
