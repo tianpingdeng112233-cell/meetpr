@@ -51,6 +51,8 @@ public struct PlanningCoordinatorView: View {
       Step2AssignFrequencyView(viewModel: viewModel)
     case .selectMainLifts:
       Step3SelectMainLiftsView(viewModel: viewModel)
+    case .selectAccessories:
+      Step4SelectAccessoriesView(viewModel: viewModel)
     }
   }
 }

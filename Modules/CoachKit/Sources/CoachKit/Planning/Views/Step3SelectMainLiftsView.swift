@@ -35,7 +35,7 @@ public struct Step3SelectMainLiftsView: View {
           isFullWidth: true
         ) {
           Task {
-            try? await viewModel.finish()
+            try? await viewModel.goNext()
           }
         }
       }
