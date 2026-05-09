@@ -2,8 +2,18 @@ name: CI
 
 on:
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "specs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
   push:
-    branches: [main, "feat/**", "fix/**"]
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "specs/**"
+      - ".github/ISSUE_TEMPLATE/**"
+      - "LICENSE"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,6 +35,21 @@ jobs:
       - name: Swift version
         run: swift --version
 
+      - name: Mark build start time
+        id: time-start
+        run: echo "value=$(date +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache SPM build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            Modules/*/.build
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-spm-${{ hashFiles('Modules/*/Package.swift', 'MeetPR.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
       - name: Build and test Swift packages
         run: |
           for package in Modules/*; do
@@ -34,7 +59,7 @@ jobs:
               echo "::endgroup::"
 
               echo "::group::swift test $package"
-              swift test --package-path "$package" --parallel
+              swift test --package-path "$package" --parallel --enable-code-coverage
               echo "::endgroup::"
             fi
           done
@@ -63,12 +88,68 @@ jobs:
             -project MeetPR.xcodeproj \
             -scheme MeetPR \
             -destination "platform=iOS Simulator,name=${{ steps.simulator.outputs.name }}" \
+            -enableCodeCoverage YES \
+            -resultBundlePath TestResults.xcresult \
             test
 
-  lint:
-    name: Lint
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo "## Code Coverage"
+            echo ""
+            echo "| Source | Line Coverage |"
+            echo "|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for package in Modules/*; do
+            if [ ! -f "$package/Package.swift" ]; then continue; fi
+            name=$(basename "$package")
+            json=$(swift test --package-path "$package" --enable-code-coverage --show-codecov-path 2>/dev/null || true)
+            if [ -n "$json" ] && [ -f "$json" ]; then
+              percent=$(jq -r '.data[0].totals.lines.percent // 0 | floor' "$json" 2>/dev/null || echo "n/a")
+              echo "| ${name} (SPM) | ${percent}% |" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "| ${name} (SPM) | n/a |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+          if [ -d TestResults.xcresult ]; then
+            xc_percent=$(xcrun xccov view --report --json TestResults.xcresult 2>/dev/null \
+              | jq -r '.lineCoverage // 0 | . * 100 | floor' 2>/dev/null || echo "n/a")
+            echo "| Xcode (App + UI) | ${xc_percent}% |" >> "$GITHUB_STEP_SUMMARY"
+
+            {
+              echo ""
+              echo "<details><summary>Per-target Xcode breakdown</summary>"
+              echo ""
+              echo '```'
+              xcrun xccov view --report --only-targets TestResults.xcresult 2>&1 || true
+              echo '```'
+              echo ""
+              echo "</details>"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Build duration summary
+        if: always()
+        run: |
+          start=${{ steps.time-start.outputs.value }}
+          end=$(date +%s)
+          elapsed=$((end - start))
+          mins=$((elapsed / 60))
+          secs=$((elapsed % 60))
+          {
+            echo ""
+            echo "## Build Duration"
+            echo ""
+            echo "Total wall time (build + test on \`${{ runner.os }}\`): **${mins}m ${secs}s**"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  lint-format:
+    name: swift-format
     runs-on: macos-15
-    timeout-minutes: 10
+    timeout-minutes: 5
 
     steps:
       - name: Checkout
@@ -81,7 +162,7 @@ jobs:
             echo "exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::No Swift sources tracked — skipping lint."
+            echo "::notice::No Swift sources tracked — skipping swift-format."
           fi
 
       - name: Select Xcode
@@ -92,14 +173,27 @@ jobs:
         if: steps.swift.outputs.exists == 'true'
         run: xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
 
-      - name: Install SwiftLint (if missing)
-        if: steps.swift.outputs.exists == 'true'
+  lint-swiftlint:
+    name: SwiftLint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Swift sources
+        id: swift
         run: |
-          if ! command -v swiftlint &> /dev/null; then
-            brew install swiftlint
+          if [ -n "$(git ls-files '*.swift')" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No Swift sources tracked — skipping SwiftLint."
           fi
-          swiftlint version
 
       - name: SwiftLint
         if: steps.swift.outputs.exists == 'true'
-        run: swiftlint --strict --reporter github-actions-logging
+        run: |
+          docker run --rm -v "$(pwd):/work" -w /work ghcr.io/realm/swiftlint:latest \
+            --strict --reporter github-actions-logging
