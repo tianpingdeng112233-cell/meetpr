@@ -20,6 +20,10 @@ enum PlanningFixtures {
   static let tempoDeadliftID = uuid(35)
   static let frontSquatID = uuid(36)
   static let accessoryID = uuid(37)
+  static let barbellLungeID = uuid(38)
+  static let pullUpID = uuid(39)
+  static let dumbbellCurlID = uuid(41)
+  static let cablePushdownID = uuid(42)
 
   static func uuid(_ byte: UInt8) -> UUID {
     UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte))
@@ -63,7 +67,56 @@ enum PlanningFixtures {
       exercise(id: pauseBenchID, name: "暂停卧推", type: .mainLiftVariation, family: .bench),
       exercise(id: tempoDeadliftID, name: "节奏硬拉", type: .mainLiftVariation, family: .deadlift),
       exercise(id: frontSquatID, name: "前蹲举", type: .mainLiftVariation, family: .squat),
-      exercise(id: accessoryID, name: "哈克深蹲", type: .accessory, family: nil),
+    ] + accessoryCatalog()
+  }
+
+  static func accessoryCatalog() -> [Exercise] {
+    [
+      exercise(
+        id: accessoryID,
+        name: "哈克深蹲",
+        type: .accessory,
+        family: nil,
+        muscleGroups: [.quad],
+        equipment: [.machine],
+        movementPattern: [.push]
+      ),
+      exercise(
+        id: barbellLungeID,
+        name: "杠铃箭步蹲",
+        type: .accessory,
+        family: nil,
+        muscleGroups: [.quad, .glute],
+        equipment: [.barbell],
+        movementPattern: [.push]
+      ),
+      exercise(
+        id: pullUpID,
+        name: "引体向上",
+        type: .accessory,
+        family: nil,
+        muscleGroups: [.back, .biceps],
+        equipment: [.bodyweight],
+        movementPattern: [.pull]
+      ),
+      exercise(
+        id: dumbbellCurlID,
+        name: "哑铃弯举",
+        type: .accessory,
+        family: nil,
+        muscleGroups: [.biceps],
+        equipment: [.dumbbell],
+        movementPattern: [.pull]
+      ),
+      exercise(
+        id: cablePushdownID,
+        name: "三头绳索下压",
+        type: .accessory,
+        family: nil,
+        muscleGroups: [.triceps],
+        equipment: [.machine],
+        movementPattern: [.push]
+      ),
     ]
   }
 
@@ -72,8 +125,8 @@ enum PlanningFixtures {
   }
 
   @MainActor
-  static func store() throws -> DraftStore {
-    try DraftStore.inMemory()
+  static func store(stateDefaults: UserDefaults? = nil) throws -> DraftStore {
+    try DraftStore.inMemory(stateDefaults: stateDefaults)
   }
 
   @MainActor
@@ -190,7 +243,10 @@ enum PlanningFixtures {
     id: UUID,
     name: String,
     type: ExerciseType,
-    family: LiftFamily?
+    family: LiftFamily?,
+    muscleGroups: [MuscleGroup] = [.quad],
+    equipment: [Equipment] = [.barbell],
+    movementPattern: [MovementPattern] = [.push]
   ) -> Exercise {
     Exercise(
       id: id,
@@ -198,9 +254,9 @@ enum PlanningFixtures {
       exerciseType: type,
       mainLiftFamily: family,
       isCompetitionLift: type == .mainLift,
-      muscleGroups: [.quad],
-      equipment: [.barbell],
-      movementPattern: [.push],
+      muscleGroups: muscleGroups,
+      equipment: equipment,
+      movementPattern: movementPattern,
       createdAt: now
     )
   }
