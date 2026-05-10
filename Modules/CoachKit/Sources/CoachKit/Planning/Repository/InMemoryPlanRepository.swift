@@ -164,29 +164,58 @@ public actor InMemoryPlanRepository: PlanRepository {
       updatedAt: now
     )
 
+    let noOneRMProfile = StudentProfile(
+      id: uuid(9),
+      userID: uuid(10),
+      trainingMode: .coached,
+      trainingYears: 0,
+      squatStance: .highBar,
+      deadliftStance: .conventional,
+      benchGrip: .standard,
+      currentSquat1RM: Decimal(0),
+      bench1RM: Decimal(0),
+      deadlift1RM: Decimal(0),
+      trainingDaysOfWeek: [2, 5],
+      gymTier: .commercial,
+      dailyIntensityLevel: 2,
+      lifeStressLevel: 3,
+      recoverySpeed: 3,
+      sleepHours: 7,
+      competitionTargeting: false,
+      notesToCoach: "刚开始评估，暂不使用百分比强度。",
+      createdAt: now,
+      updatedAt: now
+    )
+
     return [
       CoachStudentSummary(
         id: evaluationProfile.userID,
         profile: evaluationProfile,
-        displayName: "王小明",
+        displayName: "王晨曦",
         status: .inEvaluation(remainingDays: 4, remainingHours: 13)
       ),
       CoachStudentSummary(
         id: activeProfile.userID,
         profile: activeProfile,
-        displayName: "张三",
+        displayName: "张以恒",
         status: .active
       ),
       CoachStudentSummary(
         id: secondActiveProfile.userID,
         profile: secondActiveProfile,
-        displayName: "李四",
+        displayName: "李嘉宁",
         status: .active
+      ),
+      CoachStudentSummary(
+        id: noOneRMProfile.userID,
+        profile: noOneRMProfile,
+        displayName: "赵安然",
+        status: .inEvaluation(remainingDays: 6, remainingHours: 2)
       ),
       CoachStudentSummary(
         id: abnormalProfile.userID,
         profile: abnormalProfile,
-        displayName: "钱六",
+        displayName: "钱骁",
         status: .abnormal(reason: .noTrainingForDays(3))
       ),
     ]
