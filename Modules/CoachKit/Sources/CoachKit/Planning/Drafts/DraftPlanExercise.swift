@@ -8,6 +8,7 @@ public final class DraftPlanExercise {
   public var isMainLift: Bool = true
   public var sortOrder: Int = 0
   public var notes: String?
+  public var setsData: Data?
   public var day: DraftPlanDay?
 
   public init(
@@ -16,6 +17,7 @@ public final class DraftPlanExercise {
     isMainLift: Bool = true,
     sortOrder: Int,
     notes: String? = nil,
+    setsData: Data? = nil,
     day: DraftPlanDay? = nil
   ) {
     self.id = id
@@ -23,6 +25,7 @@ public final class DraftPlanExercise {
     self.isMainLift = isMainLift
     self.sortOrder = sortOrder
     self.notes = notes
+    self.setsData = setsData
     self.day = day
   }
 }

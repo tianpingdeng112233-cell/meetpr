@@ -60,6 +60,50 @@ public func toDomainExercises(_ draft: DraftTrainingPlan) -> [PlanExercise] {
 }
 
 @MainActor
+public func toDomainSets(_ draft: DraftTrainingPlan) -> [PlanSet] {
+  draft.draftDays
+    .sorted { $0.sortOrder < $1.sortOrder }
+    .flatMap { day in
+      day.draftExercises
+        .sorted { $0.sortOrder < $1.sortOrder }
+        .flatMap { exercise -> [PlanSet] in
+          guard let setSpec = decodeSetSpec(exercise.setsData) else { return [] }
+          return (1...setSpec.setCount).map { setNumber in
+            PlanSet(
+              id: UUID(),
+              planExerciseID: exercise.id,
+              setNumber: setNumber,
+              targetReps: setSpec.targetReps,
+              targetRepsMax: setSpec.targetRepsMax,
+              intensityMode: setSpec.intensityMode,
+              targetValue: setSpec.targetValue,
+              setType: setSpec.setType,
+              createdAt: draft.lastSavedAt
+            )
+          }
+        }
+    }
+}
+
+public func encodeSetSpec(_ spec: DraftSetSpec) throws -> Data {
+  try MeetPRCodec.encoder.encode(spec)
+}
+
+public func decodeSetSpec(_ data: Data?) -> DraftSetSpec? {
+  guard let data else { return nil }
+  return try? MeetPRCodec.decoder.decode(DraftSetSpec.self, from: data)
+}
+
+public func encodeRules(_ rules: [DraftProgressionRule]) throws -> Data {
+  try MeetPRCodec.encoder.encode(rules)
+}
+
+public func decodeRules(_ data: Data?) -> [DraftProgressionRule] {
+  guard let data else { return [] }
+  return (try? MeetPRCodec.decoder.decode([DraftProgressionRule].self, from: data)) ?? []
+}
+
+@MainActor
 public func fromDomain(
   plan: TrainingPlan,
   days: [PlanDay],

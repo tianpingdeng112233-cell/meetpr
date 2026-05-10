@@ -7,6 +7,8 @@ public enum PlanningValidationError: Error, Equatable, LocalizedError, Sendable 
   case invalidFrequency
   case assignmentOutsideTrainingDays
   case incompleteMainLiftVariants
+  case incompleteW1SetSpecs
+  case invalidW1SetSpec
 
   public var errorDescription: String? {
     switch self {
@@ -22,6 +24,10 @@ public enum PlanningValidationError: Error, Equatable, LocalizedError, Sendable 
       "大项只能分配到学员档案里的训练日。"
     case .incompleteMainLiftVariants:
       "每个已分配主项都需要选择动作变式。"
+    case .incompleteW1SetSpecs:
+      "每个已加入计划的动作都需要填写 Week 1 组数、次数和强度。"
+    case .invalidW1SetSpec:
+      "Week 1 组数、次数或强度超出范围。"
     }
   }
 }
