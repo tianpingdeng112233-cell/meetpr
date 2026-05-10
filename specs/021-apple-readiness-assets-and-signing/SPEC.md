@@ -1,6 +1,6 @@
 # 021 — Apple Readiness Assets + Signing(W22 关键路径)
 
-- **状态**: InReview
+- **状态**: Done
 - **PR**: [#44](https://github.com/tianpingdeng112233-cell/meetpr/pull/44)
 - **来源**:
   - [`~/Brain/wiki/projects/MeetPR/roadmap.md`](~/Brain/wiki/projects/MeetPR/roadmap.md) §V0 周计划 W22 — App icon / Launch screen / Privacy manifest / Bundle ID + TestFlight signing 准备
