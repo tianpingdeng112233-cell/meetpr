@@ -1,7 +1,7 @@
 import CoreModels
 import Foundation
-import OSLog
 import Observation
+import OSLog
 
 @Observable
 @MainActor
