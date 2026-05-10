@@ -71,6 +71,16 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func step5ZeroOneRMIsTreatedAsUnavailable() async throws {
+  let viewModel = try await Spec007Fixtures.configuredViewModelForStep5()
+  let mainLift = try #require(viewModel.sortedDraftExercises.first { $0.isMainLift })
+  viewModel.selectStudent(PlanningFixtures.studentWithoutOneRM())
+
+  #expect(viewModel.oneRM(for: mainLift) == nil)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func step5RPEValueIsClampedIntoRange() async throws {
   let viewModel = try await Spec007Fixtures.configuredViewModelForStep5()
   let exercise = try #require(viewModel.sortedDraftExercises.first)

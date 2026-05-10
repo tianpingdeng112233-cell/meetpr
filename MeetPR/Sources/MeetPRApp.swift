@@ -11,11 +11,18 @@ struct MeetPRApp: App {
   @State private var session: Session
 
   init() {
-    let api = APIClient.shared
-    let auth = NetworkingAuthRepository(api: api)
-    let tokenStore = TokenStore()
     let draftStore = DraftStore.shared
     self.draftStore = draftStore
+
+    #if DEMO_MODE
+      let auth: any AuthRepository = DemoAuthRepository()
+      let tokenStore: any TokenStoring = DemoTokenStore()
+    #else
+      let api = APIClient.shared
+      let auth: any AuthRepository = NetworkingAuthRepository(api: api)
+      let tokenStore: any TokenStoring = TokenStore()
+    #endif
+
     _session = State(
       initialValue: Session(
         auth: auth,

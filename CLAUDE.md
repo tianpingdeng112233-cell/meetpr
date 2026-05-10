@@ -44,12 +44,11 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 ### 当前完成态(2026-05-10)
 
 - **8 SPM module + 14 atomic 组件** foundation 就位
-- **已完整实装 + 合并 spec**(8 个):
+- **已完整实装 + 合并 spec**(9 个):
   - [001 bootstrap](./specs/001-bootstrap) / [002 CoreModels identity](./specs/002-core-models-identity) / [003 design system](./specs/003-design-system-foundation) / [004 training plan domain](./specs/004-core-models-training-plan)
   - [005 coach planning step 0-3](./specs/005-coach-planning-step-0-3) / [006 step 4 accessories](./specs/006-coach-planning-step-4-accessories) / [**007 step 5-7 week-card-swipe**](./specs/007-coach-planning-step-5-7-week-card-swipe) — coach 规划 UI **0-7 步全可点**(close-out 2026-05-10,impl PR #37)
   - [011 auth UI flow](./specs/011-auth-ui-flow) — 登录 / 注册 / role-routed root
-- **SPEC doc 已合 / impl 进行中**(1 个):
-  - [**020 V0 demo orchestration**](./specs/020-v0-demo-orchestration) — SPEC 合 main 2026-05-10(PR #39);impl 由 Codex 走 `feat/020-v0-demo-orchestration` 分支单 PR ← **当前关键路径**
+  - [**020 V0 demo orchestration**](./specs/020-v0-demo-orchestration) — SPEC + impl 全合 main 2026-05-10(spec PR #39 + impl PR #41);DemoAuthRepository / DemoTokenStore / DEMO_MODE build config 全就位
 - **Backend**: auth + coach planning CRUD 已合 staging(❄️ **FROZEN**,详见 [`MeetPR-backend/CLAUDE.md`](~/Projects/apps/MeetPR-backend/CLAUDE.md) 顶部 callout)
 - **核心 ADR**(8 个):[ADR-003](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md) 双端架构 / [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型 / [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构 / [ADR-006](~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md) macro API / [ADR-007](~/Brain/wiki/projects/MeetPR/decisions/007-web-framework-selection.md) 网页框架 / [ADR-009](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md) SwiftData 例外
 
@@ -60,8 +59,8 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 | 周 | 关键路径 | Status |
 |---|---|---|
 | W20(5/11-5/17,提前 5/9-5/10 完成)| spec 007 implementation(W1 强度 + 周卡片横滑)| ✅ DONE(impl PR #37 + finalize PR #38)|
-| **W21**(5/18-5/24,实际 5/10 起步)| **spec 020 V0 demo orchestration**(DemoAuthRepository / DemoTokenStore / DEMO_MODE build config / happy path checklist)| 🟡 SPEC 合 main(PR #39),**impl 进行中** via Codex `feat/020-v0-demo-orchestration` |
-| W22(5/25-5/31)| App icon / Launch screen / Privacy manifest / Bundle ID 公司账号(F-012)/ TestFlight signing | ⏸ |
+| W21(5/18-5/24,实际 5/10 起步并完成)| spec 020 V0 demo orchestration | ✅ DONE(spec PR #39 + impl PR #41,Demo build 启动直接 CoachRootView)|
+| **W22**(5/25-5/31,可提前)| **spec 021 候选**:App icon / Launch screen / Privacy manifest / Bundle ID 公司账号(F-012)/ TestFlight signing 准备 | ⏸ 待 Claude 起草 spec PR |
 | W23-25(6/1-6/20)| TestFlight build → Apple 审核 → ship | ⏸ |
 
 ### ❄️ 硬冻结(本 session 不要尝试)

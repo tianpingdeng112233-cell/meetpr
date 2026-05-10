@@ -1,7 +1,7 @@
 # 020 — V0 Demo Orchestration (auth bypass + demo build config + happy path 验证)
 
-- **状态**: Draft
-- **PR**: (待填)
+- **状态**: Done
+- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/41
 - **来源**:
   - [`~/Brain/wiki/projects/MeetPR/roadmap.md`](~/Brain/wiki/projects/MeetPR/roadmap.md) — V0 hard deadline 2026-06-20 + happy path 定义
   - 上游 [spec 002 CoreModels identity](../002-core-models-identity/SPEC.md) — `User` / `UserRole` / `CoachProfile`
@@ -353,6 +353,11 @@ XcodeBuildMCP 不直接管 build config, 但 Codex 可手动改 `MeetPR.xcodepro
 3. **DemoUserSeed.coach.id 必须 deterministic**: 否则跨重启 InMemoryPlanRepository.preview() 跟 user.id 关联失败 (虽然现在 preview 不依赖 user.id, 防御性). 用 UUID(uuidString: "0000...0001") 锁定.
 4. **Session.bootstrap 的 print warning P3**: 见 §技术要求 §Session.bootstrap() 行为验证, 不修.
 5. **Demo 模式 logout 行为**: 见 §不做什么 第 7 项, V0 不暴露登出 UI 所以不阻塞.
+
+## Implementation Notes
+
+- AppShell 真实 token refresh 类型名为 `TokenPair`, 不是草稿里的 `AuthTokens`; DemoAuthRepository 按现有 protocol 返回 `TokenPair`.
+- CoreModels `StudentProfile` 的 S/B/D 1RM 字段是非 optional `Decimal`. V0 demo 用 `0` 表示"尚未测 1RM"; `PlanningViewModel.oneRM(for:)` 将 `<= 0` 视为 unavailable, 以便 `%1RM` segmented control 锁定在 kg。
 
 ## F-015 自检 (扫一遍 spec 不出现以下字眼)
 

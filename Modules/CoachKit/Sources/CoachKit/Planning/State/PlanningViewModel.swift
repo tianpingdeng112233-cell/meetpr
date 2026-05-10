@@ -3,6 +3,7 @@ import CoreModels
 import Foundation
 import OSLog
 import Observation
+
 // swiftlint:enable sorted_imports
 
 // swiftlint:disable file_length type_body_length
@@ -309,14 +310,20 @@ public final class PlanningViewModel {
       return nil
     }
 
-    switch family {
-    case .squat:
-      return profile.currentSquat1RM
-    case .bench:
-      return profile.bench1RM
-    case .deadlift:
-      return profile.deadlift1RM
+    let oneRM =
+      switch family {
+      case .squat:
+        profile.currentSquat1RM
+      case .bench:
+        profile.bench1RM
+      case .deadlift:
+        profile.deadlift1RM
+      }
+
+    guard oneRM > 0 else {
+      return nil
     }
+    return oneRM
   }
 
   public func defaultSetSpec(for draftExercise: DraftPlanExercise) -> DraftSetSpec {
