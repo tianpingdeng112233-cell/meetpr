@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import OSLog
 import Observation
 
 @Observable
@@ -11,6 +12,9 @@ public final class Session {
     case authenticating
     case authenticated(User)
   }
+
+  @ObservationIgnored
+  private static let logger = Logger(subsystem: "com.meetpr.app.appshell", category: "auth")
 
   public private(set) var state: State = .anonymous
 
@@ -49,7 +53,7 @@ public final class Session {
         await tokenStore.clear()
         state = .anonymous
       } else {
-        print("warning: bootstrap_refresh_deferred \(String(describing: error))")
+        Self.logger.warning("bootstrap_refresh_deferred \(String(describing: error))")
       }
     }
   }
