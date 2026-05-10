@@ -1,7 +1,7 @@
 # 020 — V0 Demo Orchestration (auth bypass + demo build config + happy path 验证)
 
 - **状态**: InReview
-- **PR**: (待填)
+- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/41
 - **来源**:
   - [`~/Brain/wiki/projects/MeetPR/roadmap.md`](~/Brain/wiki/projects/MeetPR/roadmap.md) — V0 hard deadline 2026-06-20 + happy path 定义
   - 上游 [spec 002 CoreModels identity](../002-core-models-identity/SPEC.md) — `User` / `UserRole` / `CoachProfile`
