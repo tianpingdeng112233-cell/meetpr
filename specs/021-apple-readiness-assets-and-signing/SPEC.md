@@ -1,7 +1,7 @@
 # 021 — Apple Readiness Assets + Signing(W22 关键路径)
 
-- **状态**: Draft
-- **PR**: (待填)
+- **状态**: Done
+- **PR**: [#44](https://github.com/tianpingdeng112233-cell/meetpr/pull/44)
 - **来源**:
   - [`~/Brain/wiki/projects/MeetPR/roadmap.md`](~/Brain/wiki/projects/MeetPR/roadmap.md) §V0 周计划 W22 — App icon / Launch screen / Privacy manifest / Bundle ID + TestFlight signing 准备
   - 上游 [spec 020 V0 demo orchestration](../020-v0-demo-orchestration/SPEC.md) — Demo build / DEMO_MODE 已就位,本 spec 接力做 Apple-ready 资产
@@ -58,12 +58,14 @@ xcodebuild archive -scheme MeetPR-Demo -configuration Demo \
 
 #### 3. LaunchScreen 配置(无 storyboard,用 Info.plist `UILaunchScreen` dict)
 
-修 build settings:
-- `INFOPLIST_KEY_UILaunchScreen_Generation = YES` 已有 — 保留 generated launch screen 模式
-- 加 `INFOPLIST_KEY_UILaunchScreen_UIColorName = "AccentColor"` → launch 时背景 = AccentColor(brand-red)
+修 Info.plist / build settings:
+- V0 使用显式 `MeetPR/Info.plist` 内的 `UILaunchScreen` dict,不使用 storyboard
+- `UILaunchScreen` → `UIColorName = AccentColor` → launch 时背景 = AccentColor(brand-red)
+- `INFOPLIST_KEY_UILaunchScreen_UIColorName = "AccentColor"` 仍保留在 build settings 作为 Xcode Info tab 对齐值,但最终落地以 `MeetPR/Info.plist` dict 为准
 - (可选)`INFOPLIST_KEY_UILaunchScreen_UIImageName = "MeetPRWordmark"` — 居中显示 wordmark 图. **V0 不放图(占位资产质量低,空背景反而干净)**,留 F-013 后开
 
 > **不用 storyboard**: 现代 iOS 17+ 项目优先 Info.plist UILaunchScreen dict,storyboard 已经 deprecated 了 launch screen 用法.
+> **实现 note**:`INFOPLIST_KEY_UILaunchScreen_Generation = YES` 在本机 Xcode 仅生成空 `UILaunchScreen` dict;尝试 `INFOPLIST_KEY_UILaunchScreen_UIColorName` 会产出错误的嵌套空 dict. 为保证 archive 内最终 Info.plist 含 `UIColorName = AccentColor`,本 spec 实装改为显式 `MeetPR/Info.plist` + `GENERATE_INFOPLIST_FILE = NO`.
 
 #### 4. PrivacyInfo.xcprivacy(`MeetPR/PrivacyInfo.xcprivacy`)
 
@@ -109,10 +111,10 @@ Apple 2024 引入的 Required Reasons API 合规清单. 即便 V0 demo 不调网
 | File Timestamp APIs | 间接(SwiftData 内部用)| `C617.1` (App functionality) |
 | System Boot Time APIs | 否(V0 no analytics / crash reporting)| 不声明 |
 | Disk Space APIs | 否 | 不声明 |
-| User Defaults | 否(V0 no UserDefaults usage,DemoTokenStore 内存即丢)| 不声明 |
+| User Defaults | 是(`DraftStore` 用于本机草稿恢复状态)| `CA92.1` (app 自有 defaults) |
 | Active Keyboard | 否 | 不声明 |
 
-V0 PrivacyInfo.xcprivacy 仅声明 1 个(File Timestamp 给 SwiftData / DraftStore 用):
+V0 PrivacyInfo.xcprivacy 声明 File Timestamp(SwiftData / DraftStore) + UserDefaults(`DraftStore` 本机草稿恢复状态):
 
 ```xml
 <key>NSPrivacyAccessedAPITypes</key>
@@ -123,6 +125,14 @@ V0 PrivacyInfo.xcprivacy 仅声明 1 个(File Timestamp 给 SwiftData / DraftSto
         <key>NSPrivacyAccessedAPITypeReasons</key>
         <array>
             <string>C617.1</string>
+        </array>
+    </dict>
+    <dict>
+        <key>NSPrivacyAccessedAPIType</key>
+        <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+        <key>NSPrivacyAccessedAPITypeReasons</key>
+        <array>
+            <string>CA92.1</string>
         </array>
     </dict>
 </array>
@@ -148,13 +158,11 @@ V0 PrivacyInfo.xcprivacy 仅声明 1 个(File Timestamp 给 SwiftData / DraftSto
 | Key | 当前 | V0 应为 |
 |---|---|---|
 | `CODE_SIGN_STYLE` | `Automatic` | 维持 `Automatic`(personal Apple Developer 账号 Automatic 签名最简) |
-| `DEVELOPMENT_TEAM` | (无) | **占位 `<DEV_TEAM_ID_PLACEHOLDER>`,Codex 实装时跑 `xcodebuild -showBuildSettings` 查 user 当前 team / 在 SPEC NOTES 提示 user 提供** |
+| `DEVELOPMENT_TEAM` | (无) | **`XV97B4R4RZ`**(从本机 Apple Development 证书 CN `Apple Development: tianpingdeng@126.com (XV97B4R4RZ)` 解析) |
 | `PRODUCT_BUNDLE_IDENTIFIER` | `com.meetpr.app` / `com.meetpr.app.tests` | 维持(F-012 公司账号迁移触发后再改) |
 | `PROVISIONING_PROFILE_SPECIFIER` | (无) | 维持空(Automatic 模式下 Xcode 自管 profile) |
 
-> **DEVELOPMENT_TEAM**(10 位字母数字 ID):Codex 不知道 David 的 team ID. 实装时:
-> - 优先方案:`xcodebuild -showBuildSettings -scheme MeetPR-Demo` 看是否能从 keychain 自动 resolve
-> - 否则:在 SPEC NOTES 段写一行"待 user 提供 DEVELOPMENT_TEAM,可在 https://developer.apple.com/account/#!/membership 查",David 自己手动改 pbxproj(或 Xcode GUI)+ Codex 不阻塞继续做其他验收
+> **DEVELOPMENT_TEAM**(10 位字母数字 ID):Codex 先跑 `xcodebuild -showBuildSettings -scheme MeetPR-Demo`(未返回),再跑 `security find-identity -v -p codesigning`,从本机 Apple Development 证书 CN 解析到 `XV97B4R4RZ`,因此本 spec 直接写入该 team ID.
 
 #### 7. 资产编译验证 + Archive build 跑通
 
@@ -185,7 +193,7 @@ merge 前必须:
 - LaunchScreen ✅(纯背景)
 - PrivacyInfo.xcprivacy ✅
 - Bundle ID ✅(personal account)
-- DEVELOPMENT_TEAM ✅(待 user 提供 ID)
+- DEVELOPMENT_TEAM ✅(`XV97B4R4RZ`)
 - Info.plist 必需 key ✅
 - → 接下来 W23 release engineering: archive → upload → TestFlight → Apple 审核
 
@@ -220,8 +228,9 @@ merge 前必须:
 |---|---|
 | `MeetPR/Assets.xcassets/AppIcon.appiconset/` | 新建目录 + Contents.json + 3 个 PNG 占位资产 |
 | `MeetPR/Assets.xcassets/AccentColor.colorset/Contents.json` | 改(填 brand-red `#E5221E`)|
+| `MeetPR/Info.plist` | 新文件(显式 `UILaunchScreen` dict + V0 Info.plist keys) |
 | `MeetPR/PrivacyInfo.xcprivacy` | 新文件 |
-| `MeetPR.xcodeproj/project.pbxproj` | 改(加 6 条 INFOPLIST_KEY_* + DEVELOPMENT_TEAM 占位 + UIRequired/Supported orientation 改)|
+| `MeetPR.xcodeproj/project.pbxproj` | 改(加 6 条 INFOPLIST_KEY_* + DEVELOPMENT_TEAM + UIRequired/Supported orientation 改)|
 | `MeetPR/README.md` | 新建或扩展 V0 ship 准备状态段 |
 | `specs/021-apple-readiness-assets-and-signing/SPEC.md` | 状态 Draft → Done(merge 前最后一步,在同 impl PR 改) |
 
@@ -273,7 +282,7 @@ merge 前必须:
 }
 ```
 
-> Codex 用 (a) SF Symbol 渲染 1024 PNG. 推荐 SF Symbol:`figure.strengthtraining.traditional`(力量训练人形), `dumbbell.fill`(哑铃), `figure.run`(若上面两个不可用降级). 渲染配色:
+> Codex 首选 (a) SF Symbol 渲染;本机 Swift/AppKit RGB bitmap context 未可用且 PIL 未安装,因此实装用 ImageMagick 程序化 fallback 生成力量训练占位 mark. 渲染配色:
 > - light variant: brand-red `#E5221E` 背景 + 白色 symbol
 > - dark variant: deep-red `#7A1110` 背景 + 浅红 `#FF8B87` symbol
 > - tinted variant: 灰度(系统会按 user 选的 tint 着色)— 中灰 `#999999` 背景 + 白色 symbol
@@ -301,6 +310,14 @@ merge 前必须:
                 <string>C617.1</string>
             </array>
         </dict>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
     </array>
 </dict>
 </plist>
@@ -313,12 +330,14 @@ merge 前必须:
 在 Debug / Release / Demo 三个 configuration 都加(共 9 处加,3 个 target × 3 configuration):
 
 ```
-INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";  // 改,锁竖屏
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;  // 改,锁竖屏
 INFOPLIST_KEY_UILaunchScreen_UIColorName = AccentColor;  // 加
 INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 MeetPR. All rights reserved.";  // 加
 INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";  // 加
 INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;  // 加
-DEVELOPMENT_TEAM = <PLACEHOLDER>;  // 加,user 提供
+DEVELOPMENT_TEAM = XV97B4R4RZ;  // 加,本机 signing identity 解析
+GENERATE_INFOPLIST_FILE = NO;  // app target 用显式 MeetPR/Info.plist,确保 UILaunchScreen UIColorName 落地
+INFOPLIST_FILE = MeetPR/Info.plist;
 ```
 
 > **关于 DEMO_MODE INFOPLIST**:Demo configuration 跟 Debug 一样的 INFOPLIST_KEY_*, **不需要**额外为 DEMO_MODE 加 plist 区分(scheme 切换 + DEMO_MODE flag 已经在 Swift 编译期 swap 出 Demo* 实装,plist 层不需要再分).
@@ -328,8 +347,9 @@ DEVELOPMENT_TEAM = <PLACEHOLDER>;  // 加,user 提供
 - [ ] `MeetPR/Assets.xcassets/AppIcon.appiconset/Contents.json` 创建,含 3 entries(light / dark / tinted)
 - [ ] `MeetPR/Assets.xcassets/AppIcon.appiconset/meetpr-icon-1024{,-dark,-tinted}.png` 占位资产创建(1024×1024 sRGB no-alpha,SF Symbol 渲染或程序生成)
 - [ ] `MeetPR/Assets.xcassets/AccentColor.colorset/Contents.json` 填 brand-red `#E5221E`(light + dark 同色)
-- [ ] `MeetPR/PrivacyInfo.xcprivacy` 创建,内容跟 §技术要求 §PrivacyInfo template 一致;`plutil -lint` 通过
-- [ ] `MeetPR.xcodeproj/project.pbxproj` 加 6 条 INFOPLIST_KEY_*(UISupportedInterfaceOrientations 改竖屏 / UILaunchScreen_UIColorName / NSHumanReadableCopyright / LSApplicationCategoryType / ITSAppUsesNonExemptEncryption / DEVELOPMENT_TEAM 占位)
+- [ ] `MeetPR/Info.plist` 创建,含 `UILaunchScreen` → `UIColorName = AccentColor` + V0 必需 Info.plist keys
+- [ ] `MeetPR/PrivacyInfo.xcprivacy` 创建,内容跟 §技术要求 §PrivacyInfo template 一致(FileTimestamp + UserDefaults);`plutil -lint` 通过
+- [ ] `MeetPR.xcodeproj/project.pbxproj` 加 6 条 INFOPLIST_KEY_*(UISupportedInterfaceOrientations 改竖屏 / UILaunchScreen_UIColorName / NSHumanReadableCopyright / LSApplicationCategoryType / ITSAppUsesNonExemptEncryption / DEVELOPMENT_TEAM)
 - [ ] `xcodebuildmcp build_run_sim Scheme=MeetPR-Demo` iPhone 17 simulator 跑通,home screen 见占位 AppIcon,launch 闪屏 brand-red 背景
 - [ ] `xcodebuildmcp build_run_sim Scheme=MeetPR` iPhone 17 simulator 跑通(现有 scheme 不破)
 - [ ] **`xcodebuild archive -scheme MeetPR-Demo -configuration Demo` 跑通**(关键),archive 内 .app bundle 含 AppIcon 编译产物 + PrivacyInfo.xcprivacy 嵌入(`unzip -l MeetPR-Demo.xcarchive` 验证)
@@ -356,7 +376,7 @@ DEVELOPMENT_TEAM = <PLACEHOLDER>;  // 加,user 提供
 
 ## 风险 / 待 implementer 关注
 
-1. **DEVELOPMENT_TEAM ID 拿不到**:Codex 不知道 David 的 Apple Developer team ID. 优先尝试 `xcodebuild -showBuildSettings`(若 Xcode 已选了 team 会显示);否则在 SPEC NOTES 段写"待 user 提供 ID"+ pbxproj 留 `<PLACEHOLDER>` + 不阻塞其他验收(其他验收用 simulator build 不需要 team ID,只 archive build 需要)
+1. **DEVELOPMENT_TEAM ID 环境差异**:本机已从 code signing identity 解析并写入 `XV97B4R4RZ`;若换机或换 Apple team,需在 W23 release engineering 前重新确认 Xcode signing identity
 2. **Archive build 可能首次失败**:常见坑 = entitlements / capabilities 不匹配 / signing 没配齐. Codex 按错误提示一一修. 若 archive 死活不通,fallback "本地 simulator build_run_sim 通 + 把 archive 验证留 NOTES.md WIP" 也接受(W23 release engineering 时再 polish)
 3. **占位 AppIcon SF Symbol 渲染质量**:`xcrun symbol` 输出可能不是干净的 1024 PNG. 备选 swift script 用 `ImageRenderer<Image(systemName:)>` API 输出. Codex 找最 minimal 的方法
 4. **iOS 17 单 size icon 模式**: `Contents.json` 不接受老的 `"size": "29x29"` + `"scale": "2x"` 格式. 新格式见 §技术要求 sketch. 用错格式 Xcode 不报错但 archive 阶段会编译失败
@@ -380,3 +400,4 @@ DEVELOPMENT_TEAM = <PLACEHOLDER>;  // 加,user 提供
 ## 修订记录
 
 - 2026-05-10: 创建(Draft). Claude 起草, Codex 接力实装. 跟 spec 020 V0 demo orchestration 同 W22 节奏(实际 5/10 起步,提前 W22 计划日 5/25)
+- 2026-05-10: Codex implementation amend:状态改 InReview;`DEVELOPMENT_TEAM` 从本机 signing identity 解析为 `XV97B4R4RZ`;Required Reason API grep 发现 `DraftStore` 使用 `UserDefaults`,因此 `PrivacyInfo.xcprivacy` 追加 `NSPrivacyAccessedAPICategoryUserDefaults` + `CA92.1`;AppIcon 用 ImageMagick 程序化生成 RGB/no-alpha 占位 PNG,真 logo 仍由 F-013 后续替换;`UILaunchScreen_UIColorName` build setting 无法产出正确嵌套 plist,因此新增显式 `MeetPR/Info.plist` 保证 archive 内 `UILaunchScreen/UIColorName = AccentColor`.
