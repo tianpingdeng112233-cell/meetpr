@@ -1,7 +1,10 @@
+// swiftlint:disable sorted_imports
 import CoreModels
 import Foundation
-import Observation
 import OSLog
+import Observation
+
+// swiftlint:enable sorted_imports
 
 @Observable
 @MainActor
