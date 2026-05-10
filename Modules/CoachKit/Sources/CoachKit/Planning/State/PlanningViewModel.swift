@@ -1,12 +1,20 @@
+// swiftlint:disable sorted_imports
 import CoreModels
 import Foundation
+import OSLog
 import Observation
+// swiftlint:enable sorted_imports
 
 // swiftlint:disable file_length type_body_length
 @Observable
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 public final class PlanningViewModel {
+  private static let logger = Logger(
+    subsystem: "com.meetpr.app.coachkit",
+    category: "planning"
+  )
+
   public var path: [PlanningStep] = []
   public var currentStep: PlanningStep {
     path.last ?? .selectStudent
@@ -476,9 +484,6 @@ public final class PlanningViewModel {
   public func setCurrentPreviewWeek(_ week: Int) {
     let upperBound = max(1, draftPlan?.planWeeks ?? planWeeks ?? 1)
     currentPreviewWeek = min(upperBound, max(1, week))
-    if let draftPlan {
-      try? draftStore.saveDraft(draftPlan)
-    }
   }
 
   public func proceedToStep8() async throws {
@@ -486,7 +491,7 @@ public final class PlanningViewModel {
       draftPlan.currentStepRawValue = PlanningStep.previewWeekCards.rawValue
       try draftStore.saveDraft(draftPlan)
     }
-    print("step8_pending")
+    Self.logger.warning("step8_pending")
   }
 }
 
@@ -841,8 +846,10 @@ extension PlanningViewModel {
     switch normalized.intensityMode {
     case .weight:
       normalized.targetValue = max(Decimal(0), normalized.targetValue)
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
     case .rpe:
       normalized.targetValue = min(Decimal(10), max(Decimal(1), normalized.targetValue))
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
     }
     return normalized
   }
@@ -873,6 +880,9 @@ extension PlanningViewModel {
       } else if sequence.count > sortedWeeks.count {
         sequence = Array(sequence.prefix(sortedWeeks.count))
       }
+      sequence = sequence.map {
+        $0.roundedToPlanningIncrement(step(for: normalized.customDimension))
+      }
       normalized.customSequence = sequence
     } else {
       normalized.customDimension = nil
@@ -880,6 +890,8 @@ extension PlanningViewModel {
       if normalized.incrementValue == nil {
         normalized.incrementValue = defaultIncrement(for: normalized.ruleType)
       }
+      normalized.incrementValue = normalized.incrementValue?
+        .roundedToPlanningIncrement(step(for: normalized.ruleType.dimension))
     }
 
     return normalized
@@ -910,6 +922,15 @@ extension PlanningViewModel {
       Decimal(1)
     case .custom:
       Decimal(0)
+    }
+  }
+
+  private func step(for dimension: ProgressionRuleDimension?) -> Decimal {
+    switch dimension {
+    case .sets, .reps:
+      PlanningDecimalStep.whole
+    case .weight, .rpe, nil:
+      PlanningDecimalStep.half
     }
   }
 

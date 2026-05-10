@@ -1,4 +1,5 @@
 import CoreModels
+import Foundation
 import Testing
 
 @testable import CoachKit
@@ -80,6 +81,20 @@ import Testing
   )
 
   #expect(viewModel.w1SetSpecs[exercise.id]?.targetValue == 10)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func step5WeightValueRoundsToHalfKilogramIncrement() async throws {
+  let viewModel = try await Spec007Fixtures.configuredViewModelForStep5()
+  let exercise = try #require(viewModel.sortedDraftExercises.first)
+
+  try await viewModel.updateW1SetSpec(
+    Spec007Fixtures.setSpec(targetValue: Decimal(1227) / Decimal(10)),
+    for: exercise.id
+  )
+
+  #expect(viewModel.w1SetSpecs[exercise.id]?.targetValue == Decimal(245) / Decimal(2))
 }
 
 @MainActor

@@ -19,7 +19,7 @@ public struct WeightInputField: View {
     self.oneRM = oneRM
     self.onChange = onChange
     self._inputUnit = State(initialValue: .kg)
-    self._inputValue = State(initialValue: NSDecimalNumber(decimal: value).doubleValue)
+    self._inputValue = State(initialValue: value.planningDoubleValue)
   }
 
   public var body: some View {
@@ -66,13 +66,19 @@ public struct WeightInputField: View {
       return
     }
 
-    let oneRMValue = NSDecimalNumber(decimal: oneRM).doubleValue
-    guard oneRMValue > 0 else { return }
+    guard oneRM > 0 else { return }
+    let currentValue = Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half)
     switch newUnit {
     case .kg:
-      inputValue = oneRMValue * inputValue / 100
+      inputValue =
+        (oneRM * currentValue / 100)
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
+        .planningDoubleValue
     case .percent:
-      inputValue = inputValue / oneRMValue * 100
+      inputValue =
+        (currentValue / oneRM * 100)
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
+        .planningDoubleValue
     }
     publishValue()
   }
@@ -80,17 +86,19 @@ public struct WeightInputField: View {
   private func publishValue() {
     switch inputUnit {
     case .kg:
-      onChange(Decimal(inputValue))
+      onChange(Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half))
     case .percent:
       guard let oneRM else { return }
-      let oneRMValue = NSDecimalNumber(decimal: oneRM).doubleValue
-      onChange(Decimal(oneRMValue * inputValue / 100))
+      let percent = Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half)
+      onChange((oneRM * percent / 100).roundedToPlanningIncrement(PlanningDecimalStep.half))
     }
   }
 
   private func displayKg(for percent: Double, oneRM: Decimal) -> String {
-    let oneRMValue = NSDecimalNumber(decimal: oneRM).doubleValue
-    return (oneRMValue * percent / 100).formatted(.number.precision(.fractionLength(0...1)))
+    let roundedPercent = Decimal.planningRounded(percent, increment: PlanningDecimalStep.half)
+    return (oneRM * roundedPercent / 100)
+      .roundedToPlanningIncrement(PlanningDecimalStep.half)
+      .planningFormatted()
   }
 }
 

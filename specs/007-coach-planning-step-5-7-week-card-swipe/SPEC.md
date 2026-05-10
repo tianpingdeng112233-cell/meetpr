@@ -1,7 +1,7 @@
 # 007 — Coach Planning UI Step 5-7 (W1 强度填写 / 规则配置 / 周卡片横滑预览)
 
-- **状态**: Done
-- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/37
+- **状态**: InReview
+- **PR**: (待填)
 - **来源**:
   - [coach-planning.md v4.4 §Step 5 / §Step 6 / §Step 7a / §Step 7b](~/Brain/wiki/projects/MeetPR/coach-planning.md) — wireframe ground truth (2026-04-28 pivot 后)
   - [data-model.md v1.1 §1.8 (PlanSet) + §1.9 (ProgressionRuleGroup / ProgressionRuleAssignment / ExerciseWeekOverride)](~/Brain/wiki/projects/MeetPR/data-model.md)
@@ -102,7 +102,7 @@ Swift Testing (`@Test` / `#expect`) + ViewInspector (spec 005 已 add ≥ 0.10.0
 | `Step5IntensityViewModelTests.swift` (新) | 7 测试: `updateW1SetSpec` 写入 draft + 持久化 round-trip / `IntensityMode` 切换保留另一边输入 / kg ↔ %1RM 换算 (含学员该 lift family 有 1RM 时和无 1RM 时 toggle 锁定行为) / RPE 边界 [1.0, 10.0] (越界 clamp + 校验 fail 信号) / `setCount` ≥ 1 校验 / `targetReps` ≥ 1 校验 / `proceedToStep6` 校验所有 main lift + accessory `setsData != nil` (主项必填; accessory 也必填, 因为 spec 006 已加进 draft, 不允许"加了但没填") |
 | `Step6ProgressionRulesViewModelTests.swift` (新) | 7 测试: `addRule` 追加 + `displayOrder` 自增 / `updateRule` 按 id mutate / `deleteRule` 移除 + 重排 displayOrder / `toggleAppliedWeek` (W1 永远不可勾, W2/W3/W4 toggle) / `toggleRuleExercise` (添加 / 移除 exerciseIDs) / custom 规则的 `customSequence` 长度自动同步 `appliedWeeks.count` / `proceedToStep7` 无校验失败 (规则全空也允许; 默认行为 = 全部 W2-W4 同上周) |
 | `WeekDerivationTests.swift` (新, 纯函数) | 11 测试: weight inc 单规则 W2 → W2.targetValue = W1 + Δ / weight dec / RPE inc / RPE dec (RPE 衍生 clamp [1.0, 10.0]) / sets inc / sets dec (sets 衍生 clamp ≥ 1) / reps inc / reps dec (reps 衍生 clamp ≥ 1) / custom 规则 (`appliedWeeks = {2,3,4}`, `customSequence = [a,b,c]` → W2 用 a, W3 用 b, W4 用 c) / 多规则同 exercise 不同维度 = 复合 (e.g. weight+5 + reps-1 同时生效) / 多规则同 exercise 同维度 = `displayOrder` 大者优先 / skip 周递推 (rule 应用 W2+W4 跳过 W3): W3 = W2 (default 同上周), W4 = W3 + Δ |
-| `Step7WeekCardSwipeViewModelTests.swift` (新) | 4 测试: `currentPreviewWeek` 默认 = 1 / `currentPreviewWeek` 切换写 draft `lastSavedAt` (恢复用) / 1 周模式 N=1 仅 1 张卡片 / 4 周模式 N=4 共 4 张卡片 / `proceedToStep8` placeholder log (V1 不真推进) |
+| `Step7WeekCardSwipeViewModelTests.swift` (新) | 4 测试: `currentPreviewWeek` 默认 = 1 / `currentPreviewWeek` 切换不写 draft `lastSavedAt` / 1 周模式 N=1 仅 1 张卡片 / 4 周模式 N=4 共 4 张卡片 / `proceedToStep8` placeholder log (V1 不真推进) |
 | `DraftSetSpecCodableTests.swift` (新) | 3 测试: round-trip kg 模式 / round-trip RPE 模式 / `targetRepsMax` nil vs 非 nil (encodeIfPresent) |
 | `DraftProgressionRuleCodableTests.swift` (新) | 4 测试: 9 种 ruleType raw value 检查 / `incrementValue` Decimal-as-string round-trip / custom 规则 customSequence 数组 encode/decode / `exerciseIDs` Set 序列化为 array (Codable Set 默认行为) |
 | `Step5FlowSnapshotTests.swift` (新) | 4 ViewInspector 测试: per-exercise card 渲染主项 + 辅助项各 1 / IntensityModeToggle tap 切换 / WeightInputField kg / %1RM 切换 (学员有 1RM) / WeightInputField %1RM disabled (学员无该 lift family 1RM) |
@@ -305,7 +305,7 @@ public func deleteRule(id: UUID) async throws                         // 移除 
 public func proceedToStep7() async throws                              // 无校验 (规则全空也允许); push .previewWeekCards
 
 // step 7
-public func setCurrentPreviewWeek(_ week: Int)            // 0 < week ≤ planWeeks; 写入 currentPreviewWeek; 顺手触发 saveDraft 仅刷新 lastSavedAt, 不持久化 week index
+public func setCurrentPreviewWeek(_ week: Int)            // 0 < week ≤ planWeeks; 只写内存 currentPreviewWeek, 不触发 saveDraft, 不刷新 lastSavedAt
 public func proceedToStep8() async throws                  // V1 placeholder = log warn `step8_pending`, 不真推进 step (spec 008 替换 method body)
 ```
 
@@ -596,6 +596,12 @@ ADR-009 §"⚠️ 需警惕" 也写: "V1 改 `DraftTrainingPlan` 字段 (如新�
 
 > 默认走 (1). 若 review 选 (2), 本 spec 验收清单加 `VersionedSchema` 文件 (e.g. `PlanningSchemaV1.swift` / `PlanningSchemaV2.swift` + `PlanningMigrationPlan.swift`) 的实装条目.
 
+### PR #37 review fixup notes
+
+- P2-3 Decimal 精度处理选择 **round 到力量举颗粒度**: weight/RPE/custom weight 在落入 draft 前量化到 0.5, sets/reps/custom sets-reps 量化到 1. 这样保留现有 SwiftUI Stepper/TextField 交互, 同时避免 `Decimal(Double)` 的 binary noise 写入 Codable.
+- Simulator gate fix: Step 7 周卡片区域保留 leading-edge back swipe 命中区 (约 24pt), 左缘右滑调用 `viewModel.goBack()`; 卡片中央横滑仍交给 `TabView` 切换周.
+- P3 暂不修, 留后续 cleanup: computed view property 拆独立 `View` struct; `WeightInputField` kg/%1RM 交互层数学专项测试; `WeekDerivation.apply` 拆 `applyStandard` / `applyCustom`; context menu `menuItems` 改 `EmptyView()` 暂不采纳, 因模拟器实测会让 Peek 不弹出, V1 保留 disabled `查看详情` item 以维持长按预览.
+
 ### F-015 自检 (扫一遍 spec 不出现以下字眼, 除"不做什么"和"Notes"两个明示禁止词的 section 外)
 
 - ✅ "4 周扫视态" — v4.3 禁止词, 仅在 §不做什么 中作为废弃方案列出, 0 实装引用
@@ -615,7 +621,7 @@ ADR-009 §"⚠️ 需警惕" 也写: "V1 改 `DraftTrainingPlan` 字段 (如新�
 - `DraftPlanExercise.setsData` 与 `DraftTrainingPlan.progressionRulesData` 加字段后, 如果用 SwiftData lightweight 自动迁移路径 (推荐, 见 ADR-009 边界声明), 修改后**直接** 跑 `swift test` 验证 spec 005 已有 draft 测试不破坏, 不需要写 migration 代码
 - `WeekDerivation` 是 pure 函数, 在 `WeekDerivationTests.swift` 用各种 `DraftSetSpec` + `DraftProgressionRule` 组合断言. 不依赖 SwiftUI / SwiftData, 测试速度快
 - `customSequence` 长度 = `appliedWeeks.count`, 在 `updateRule` 时**自动同步** (用户 toggle 应用周 chip → ViewModel 检测到 appliedWeeks 变 → 自动调整 customSequence 数组长度: 加 chip → append nil; 减 chip → remove 对应 index). 这是隐式 invariant, 测试覆盖
-- `currentPreviewWeek` 切换时调 `setCurrentPreviewWeek(_:)` → 只更新 ViewModel 状态 + 触发 `saveDraft()` 让 `lastSavedAt` 推进. **不**新增 SwiftData 字段持久化 currentPreviewWeek 本身 — bootstrap 恢复永远从 W1 开始, 简化 UX
+- `currentPreviewWeek` 切换时调 `setCurrentPreviewWeek(_:)` → 只更新 ViewModel 内存状态, **不**触发 `saveDraft()`, **不**推进 `lastSavedAt`, **不**新增 SwiftData 字段持久化 currentPreviewWeek 本身 — bootstrap 恢复永远从 W1 开始, 简化 UX
 - W1 row 在 Step 7 长按 Peek 显示的 SetSpec 跟 Step 5 输入完全一致 (W1 是基线, derived = W1); W2-W4 row 显示 derived SetSpec (经过 `WeekDerivation`)
 - 测试 fixture `WeekDerivationFixtures.swift` 应集中常用 W1 SetSpec (kg 模式 4×5 @100kg, RPE 模式 3×5 @8.5) + 各 ruleType 单条规则 + 复合多规则的标准组合, 给后续 spec 008 (publish) / spec 009 (template) 测试复用
 - F-015 红线 grep 命令 (实装完跑一遍): 见验收清单 §F-015. 期望 0 命中 (除 spec 文档自身的 §不做什么 + Notes §F-015 自检 章节)

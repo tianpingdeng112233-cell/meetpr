@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import CoachKit
@@ -26,6 +27,19 @@ import Testing
 
   #expect(viewModel.progressionRules.first?.ruleType == .rpeInc)
   #expect(viewModel.progressionRules.first?.incrementValue == 0.5)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func step6RuleIncrementRoundsToPlanningIncrement() async throws {
+  let viewModel = try await configuredStep6ViewModel()
+  try await viewModel.addRule(viewModel.makeDefaultProgressionRule())
+  var rule = try #require(viewModel.progressionRules.first)
+
+  rule.incrementValue = Decimal(27) / Decimal(10)
+  try await viewModel.updateRule(rule)
+
+  #expect(viewModel.progressionRules.first?.incrementValue == Decimal(5) / Decimal(2))
 }
 
 @MainActor

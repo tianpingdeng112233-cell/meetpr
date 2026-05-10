@@ -18,7 +18,10 @@ public struct Step7WeekCardSwipeView: View {
           .padding(.top, MeetPRSpacing.base)
       }
 
-      weekTabs
+      ZStack(alignment: .leading) {
+        weekTabs
+        leadingEdgeBackSwipe
+      }
 
       PrimaryButton("进入发布 (TODO spec 008)", isFullWidth: true) {
         Task {
@@ -62,5 +65,22 @@ public struct Step7WeekCardSwipeView: View {
         .tag(week)
         .padding(.horizontal, MeetPRSpacing.base)
     }
+  }
+
+  private var leadingEdgeBackSwipe: some View {
+    Color.clear
+      .frame(width: 24)
+      .contentShape(.rect)
+      .gesture(
+        DragGesture(minimumDistance: 10)
+          .onEnded { value in
+            guard value.translation.width > 60,
+              abs(value.translation.height) < 40
+            else { return }
+
+            viewModel.goBack()
+          }
+      )
+      .frame(maxHeight: .infinity, alignment: .leading)
   }
 }

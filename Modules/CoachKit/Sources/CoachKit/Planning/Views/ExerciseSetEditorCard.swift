@@ -93,9 +93,9 @@ public struct ExerciseSetEditorCard: View {
 
   private var rpeBinding: Binding<Double> {
     Binding(
-      get: { NSDecimalNumber(decimal: targetValue).doubleValue },
+      get: { targetValue.planningDoubleValue },
       set: { newValue in
-        targetValue = Decimal(newValue)
+        targetValue = Decimal.planningRounded(newValue, increment: PlanningDecimalStep.half)
         persist()
       }
     )

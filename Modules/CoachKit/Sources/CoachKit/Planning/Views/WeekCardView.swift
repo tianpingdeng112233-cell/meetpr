@@ -122,19 +122,19 @@ private struct WeekExerciseRow: View {
     .background(Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .contextMenu {
-      Text("暂无操作")
+      Button("查看详情", systemImage: "info.circle") {}
+        .disabled(true)
     } preview: {
       ExercisePeekView(title: title, spec: spec)
     }
   }
 
   private var intensityText: String {
-    let value = NSDecimalNumber(decimal: spec.targetValue).doubleValue
     switch spec.intensityMode {
     case .weight:
-      return "\(value.formatted(.number.precision(.fractionLength(0...1))))kg"
+      return "\(spec.targetValue.planningFormatted())kg"
     case .rpe:
-      return "@RPE \(value.formatted(.number.precision(.fractionLength(0...1))))"
+      return "@RPE \(spec.targetValue.planningFormatted())"
     }
   }
 }
@@ -164,12 +164,11 @@ private struct ExercisePeekView: View {
   }
 
   private var detail: String {
-    let value = NSDecimalNumber(decimal: spec.targetValue).doubleValue
     switch spec.intensityMode {
     case .weight:
-      return "强度：\(value.formatted(.number.precision(.fractionLength(0...1))))kg"
+      return "强度：\(spec.targetValue.planningFormatted())kg"
     case .rpe:
-      return "强度：@RPE \(value.formatted(.number.precision(.fractionLength(0...1))))"
+      return "强度：@RPE \(spec.targetValue.planningFormatted())"
     }
   }
 }

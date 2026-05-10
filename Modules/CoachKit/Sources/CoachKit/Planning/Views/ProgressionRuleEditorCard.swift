@@ -154,8 +154,10 @@ public struct ProgressionRuleEditorCard: View {
 
   private var incrementBinding: Binding<Double> {
     Binding(
-      get: { NSDecimalNumber(decimal: rule.incrementValue ?? 0).doubleValue },
-      set: { rule.incrementValue = Decimal($0) }
+      get: { (rule.incrementValue ?? 0).planningDoubleValue },
+      set: {
+        rule.incrementValue = Decimal.planningRounded($0, increment: incrementDecimalStep)
+      }
     )
   }
 
@@ -170,14 +172,14 @@ public struct ProgressionRuleEditorCard: View {
     Binding(
       get: {
         guard let sequence = rule.customSequence, sequence.indices.contains(index) else { return 0 }
-        return NSDecimalNumber(decimal: sequence[index]).doubleValue
+        return sequence[index].planningDoubleValue
       },
       set: { value in
         var sequence = rule.customSequence ?? []
         while sequence.count <= index {
           sequence.append(0)
         }
-        sequence[index] = Decimal(value)
+        sequence[index] = Decimal.planningRounded(value, increment: customDecimalStep)
         rule.customSequence = sequence
       }
     )
@@ -205,15 +207,31 @@ public struct ProgressionRuleEditorCard: View {
     }
   }
 
+  private var incrementDecimalStep: Decimal {
+    switch rule.ruleType.dimension {
+    case .sets, .reps:
+      PlanningDecimalStep.whole
+    case .rpe, .weight, nil:
+      PlanningDecimalStep.half
+    }
+  }
+
+  private var customDecimalStep: Decimal {
+    switch rule.customDimension {
+    case .sets, .reps:
+      PlanningDecimalStep.whole
+    case .rpe, .weight, nil:
+      PlanningDecimalStep.half
+    }
+  }
+
   private var incrementLabel: String {
-    let value = NSDecimalNumber(decimal: rule.incrementValue ?? 0).doubleValue
-    return value.formatted(.number.precision(.fractionLength(0...1)))
+    (rule.incrementValue ?? 0).planningFormatted()
   }
 
   private func customValueLabel(index: Int) -> String {
     guard let sequence = rule.customSequence, sequence.indices.contains(index) else { return "0" }
-    let value = NSDecimalNumber(decimal: sequence[index]).doubleValue
-    return value.formatted(.number.precision(.fractionLength(0...1)))
+    return sequence[index].planningFormatted()
   }
 
   private func persistRule() {

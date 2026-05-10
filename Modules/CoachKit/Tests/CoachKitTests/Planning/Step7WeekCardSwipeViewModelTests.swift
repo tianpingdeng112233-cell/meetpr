@@ -23,13 +23,13 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func step7SetCurrentPreviewWeekTouchesDraftLastSavedAt() async throws {
+@Test func step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() async throws {
   let viewModel = try await configuredStep7ViewModel()
   let oldDate = try #require(viewModel.draftPlan?.lastSavedAt)
 
   viewModel.setCurrentPreviewWeek(2)
 
-  #expect((viewModel.draftPlan?.lastSavedAt ?? oldDate) >= oldDate)
+  #expect(viewModel.draftPlan?.lastSavedAt == oldDate)
 }
 
 @MainActor
