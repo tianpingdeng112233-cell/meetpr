@@ -26,18 +26,6 @@
 - **为什么等**:现阶段 ADR 少,手动目录够用;>10 个时站点才有价值
 - **创建于**:2026-04-24
 
-### F-002 — 生产发布 checklist 适配 iOS
-
-- **触发条件**:MeetPR **首个功能具备 TestFlight 提交条件**(有可运行的 Xcode 项目 + 一次完整的 build/test 流程)
-- **动作**:
-  1. 参考 `~/Projects/experiments/production-launch-checklist/README.md`
-  2. 抽出和 iOS app 相关的条目(跳过 web/CDN/SSL 等非 iOS 项)
-  3. 合成 `~/Projects/apps/meetpr/LAUNCH-CHECKLIST.md`
-  4. 针对 App Store 审核、TestFlight、crash reporting、privacy manifest、隐私协议等 iOS 特化补充
-- **验证**:checklist 覆盖从 TestFlight 到 App Store 提交全流程
-- **为什么等**:checklist 在 MVP 没雏形前没意义
-- **创建于**:2026-04-24
-
 ### F-003 — Brain vault git 化
 
 - **触发条件**:`~/Brain/wiki/projects/MeetPR/` 下文件数 > 30 **或** 出现第一次"找不到某个笔记在哪"的场景
@@ -186,17 +174,6 @@
 - **为什么等**:spec 003 只有占位 SVG,真实品牌资产未定稿;提前实现会把占位视觉固化进代码
 - **创建于**:2026-04-27
 
-### F-014 — 完整 SF Symbols ↔ Lucide mapping 表产品化
-
-- **触发条件**:第二个 feature spec 需要新增超出 spec 003 的 icon,或任一 UI kit screen 开始实装 tab / chart / upload / settings 等 icon-heavy 视图
-- **动作**:
-  1. 从 `specs/003-design-system-foundation/design-bundle/project/assets/icons/MAPPING.md` 整理完整生产映射
-  2. 在 DesignSystem 中提供受控 icon API 或文档(按当时 spec 决定)
-  3. 补缺失映射,并确认每个 SF Symbol 在 iOS 17 可用
-- **验证**:所有 feature 使用 SF Symbols,无 Lucide/SVG/emoji/custom icon 进入 SwiftUI 代码
-- **为什么等**:spec 003 只锁 4 个 icon;完整 mapping 需要跟真实 feature 用例一起验证语义
-- **创建于**:2026-04-27
-
 ### F-015 — 首个 coach planning spec 必须按 v4.4 设计写(防 v4.3/v4.2 误引用)
 
 - **触发条件**:写第一个 coach planning UI 相关的 spec(很可能是 spec 004 或之后,任何涉及"教练排计划 / 4 周 / 周卡片 / cycle 历史 / Excel 预览"等关键字的 spec)
@@ -260,6 +237,22 @@
 ## 已完成
 
 _(执行完的触发条目移到这里,保留作历史。格式:日期 + 原触发条件 + 执行结果链接)_
+
+### F-002 — 生产发布 checklist 适配 iOS — **关闭于 2026-05-10**
+
+- **原触发条件**:MeetPR 首个功能具备 TestFlight 提交条件(有可运行的 Xcode 项目 + 一次完整的 build/test 流程)
+- **执行结果**:`~/Projects/apps/MeetPR/LAUNCH-CHECKLIST.md` 已写,9 stage(A 环境前置 / B build artifacts / C 产品 metadata / D Privacy questionnaire / E 截图 / F upload / G TestFlight 内测 / H Apple 审核提交 / I Release)。Source `production-launch-checklist` 是 web-focused, 大部分跳过, iOS 特化条目从头写(App Store Connect / TestFlight / privacy manifest / Notes for Reviewer 模板等)。
+- **满足说明**:checklist 覆盖从 build artifact 验证 → TestFlight upload → Apple 审核提交 → V0 ship 全流程
+- **关联**:spec 020 V0 demo orchestration(已合)+ spec 021 Apple readiness(SPEC 已合,impl 进行中)
+- **关闭决定**:Claude 2026-05-10(同 PR 合 LAUNCH-CHECKLIST.md 落地)
+
+### F-014 — 完整 SF Symbols ↔ Lucide mapping 表产品化 — **关闭于 2026-05-10(V0.1+ 重启)**
+
+- **原触发条件**:第二个 feature spec 需要新增超出 spec 003 的 icon
+- **触发实际状态**:spec 005/006/007/011/020 都有 ad hoc 用 SF Symbols(`Image(systemName:)` 散落在各 view + DemoUserSeed),满足触发
+- **关闭原因**:V0 critical path 不要求"完整 mapping 表 + 受控 icon API"。当前各 feature spec 直接 import SwiftUI + 用 SF Symbols 没出问题,iOS 17 可用性也实操 OK。"完整 mapping 跟真实 feature 用例一起验证"在 V0.1+ DesignSystem 重整 spec 时再做更稳(那时全部 V0 feature 已 ship,真实用例齐全)
+- **遗留风险**:无外露(短期)。V0.1+ 时若发现某 SF Symbol iOS 17 不可用 / 跨 view 重复 / 命名不一致,起 spec 集中处理
+- **关闭决定**:Claude 2026-05-10. 重启条件:V0.1+ DesignSystem icon API spec 启动时复活本 followup 作为 input
 
 ### F-007 — CI 扩展:测试覆盖率 + build 时长追踪 — **关闭于 2026-04-30**
 
