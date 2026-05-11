@@ -170,9 +170,11 @@
   1. 用真实 `meetpr-wordmark.svg` / `meetpr-mark.svg` 替换 design-bundle 占位资产
   2. 新增 DesignSystem logo/mark 原子组件或 asset catalog 条目(按当时 spec 决定)
   3. 验证 dark / light / small-size rendering,尤其是 onboarding splash 和 AppIcon 预览
-- **验证**:Xcode asset preview + 模拟器 dark/light 截图都清晰;占位 logo 不再出现在 app UI
+  4. 替换 spec 021 落地的 tinted AppIcon 占位:`MeetPR/Assets.xcassets/AppIcon.appiconset/meetpr-icon-1024-tinted.png` 当前是 `#999` 实心方块,iOS 18 HIG 期望透明背景 + 暗色单色剪影(grayscale alpha mask);真 logo 定稿后重新导出 tinted 变体
+- **验证**:Xcode asset preview + 模拟器 dark/light 截图都清晰;占位 logo 不再出现在 app UI;iOS 18 主屏幕 tinted appearance 显示为正确单色剪影,而非灰色实心方块
 - **为什么等**:spec 003 只有占位 SVG,真实品牌资产未定稿;提前实现会把占位视觉固化进代码
 - **创建于**:2026-04-27
+- **最后修订**:2026-05-11(并入 spec 021 P3-1 tinted AppIcon `#999` 占位)
 
 ### F-025 — V0.1+ backend 启动前重新申请 RDS 单机版
 
