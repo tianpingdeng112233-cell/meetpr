@@ -4,7 +4,7 @@
 >
 > **关联**:
 > - [`specs/021-apple-readiness-assets-and-signing/SPEC.md`](./specs/021-apple-readiness-assets-and-signing/SPEC.md) — build artifacts (icon / launch / privacy / Info.plist / signing)
-> - [`~/Brain/wiki/projects/MeetPR/roadmap.md`](~/Brain/wiki/projects/MeetPR/roadmap.md) — V0 6 周计划,本 checklist 服务 W23-25
+> - [`~/Brain/wiki/projects/MeetPR/roadmap.md`](~/Brain/wiki/projects/MeetPR/roadmap.md) — V0 6 周计划(hard 6/20)+ soft target 5/20 加速窗口;本 checklist 服务 W23-25,加速窗口同样适用
 > - [FOLLOWUPS.md F-002](./FOLLOWUPS.md) — 本文档落地 = F-002 action 完成
 >
 > **创建于**:2026-05-10
@@ -170,7 +170,7 @@ App Store 要求 6.7" iPhone(iPhone 15 Pro Max)+ 6.5" iPhone(iPhone 11 Pro Max,�
 
 - [ ] 审核通过通知(邮件 + App Store Connect)
 - [ ] 由于 Stage H 选 Manual release,需要手动点 `Release this Version`
-- [ ] **2026-06-20 前**:V0 in App Store(不是 TestFlight)= V0 ship 完成
+- [ ] **2026-06-20 前**(hard)/ **2026-05-20 前**(soft target,Apple 审核一次过的话):V0 in App Store(不是 TestFlight)= V0 ship 完成
 - [ ] FOLLOWUPS.md F-002 移到 已完成
 - [ ] roadmap.md V0 路径 全部 ✅
 - [ ] 通知 xty / 肖天宇 / 里欧 真实下载使用 + 收 feedback
