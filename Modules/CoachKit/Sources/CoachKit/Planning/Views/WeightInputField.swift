@@ -93,9 +93,9 @@ public struct WeightInputField: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 extension WeightInputField {
-  nonisolated static func kgToPercent(_ kg: Double, oneRM: Decimal) -> Decimal {
+  nonisolated static func kgToPercent(_ kilograms: Double, oneRM: Decimal) -> Decimal {
     guard oneRM > 0 else { return 0 }
-    let rounded = Decimal.planningRounded(kg, increment: PlanningDecimalStep.half)
+    let rounded = Decimal.planningRounded(kilograms, increment: PlanningDecimalStep.half)
     return (rounded / oneRM * 100).roundedToPlanningIncrement(PlanningDecimalStep.half)
   }
 
