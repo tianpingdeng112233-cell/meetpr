@@ -67,18 +67,11 @@ public struct WeightInputField: View {
     }
 
     guard oneRM > 0 else { return }
-    let currentValue = Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half)
     switch newUnit {
     case .kg:
-      inputValue =
-        (oneRM * currentValue / 100)
-        .roundedToPlanningIncrement(PlanningDecimalStep.half)
-        .planningDoubleValue
+      inputValue = Self.percentToKg(inputValue, oneRM: oneRM).planningDoubleValue
     case .percent:
-      inputValue =
-        (currentValue / oneRM * 100)
-        .roundedToPlanningIncrement(PlanningDecimalStep.half)
-        .planningDoubleValue
+      inputValue = Self.kgToPercent(inputValue, oneRM: oneRM).planningDoubleValue
     }
     publishValue()
   }
@@ -89,16 +82,27 @@ public struct WeightInputField: View {
       onChange(Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half))
     case .percent:
       guard let oneRM else { return }
-      let percent = Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half)
-      onChange((oneRM * percent / 100).roundedToPlanningIncrement(PlanningDecimalStep.half))
+      onChange(Self.percentToKg(inputValue, oneRM: oneRM))
     }
   }
 
   private func displayKg(for percent: Double, oneRM: Decimal) -> String {
-    let roundedPercent = Decimal.planningRounded(percent, increment: PlanningDecimalStep.half)
-    return (oneRM * roundedPercent / 100)
-      .roundedToPlanningIncrement(PlanningDecimalStep.half)
-      .planningFormatted()
+    Self.percentToKg(percent, oneRM: oneRM).planningFormatted()
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+extension WeightInputField {
+  nonisolated static func kgToPercent(_ kg: Double, oneRM: Decimal) -> Decimal {
+    guard oneRM > 0 else { return 0 }
+    let rounded = Decimal.planningRounded(kg, increment: PlanningDecimalStep.half)
+    return (rounded / oneRM * 100).roundedToPlanningIncrement(PlanningDecimalStep.half)
+  }
+
+  nonisolated static func percentToKg(_ percent: Double, oneRM: Decimal) -> Decimal {
+    guard oneRM > 0 else { return 0 }
+    let rounded = Decimal.planningRounded(percent, increment: PlanningDecimalStep.half)
+    return (oneRM * rounded / 100).roundedToPlanningIncrement(PlanningDecimalStep.half)
   }
 }
 
