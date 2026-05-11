@@ -174,6 +174,34 @@
 - **为什么等**:spec 003 只有占位 SVG,真实品牌资产未定稿;提前实现会把占位视觉固化进代码
 - **创建于**:2026-04-27
 
+### F-025 — V0.1+ backend 启动前重新申请 RDS 单机版
+
+- **触发条件**:V0.1+ 阶段任一个 spec 需要 backend 真持久化(具体场景:学员端 spec 启动 / 真注册流程 spec / 教练 publish 计划 spec / 视频上传 spec 任一)
+- **背景**:试用版高可用系列 ¥580/月在 V0 阶段 overkill,2026-05-11 主动退订,实例 `pgm-bp1s6zj71e62vn01` 已释放
+- **动作**:
+  1. https://rdsnext.console.aliyun.com → 创建实例
+  2. 引擎 **PostgreSQL 17**,**基础版 / 单机版**(不是高可用),华东 1(杭州),专有网络 VPC
+  3. 规格 `pg.n2.2c.2m`(2 核 4G,跟原实例同款,V0.1+ 量级够)
+  4. 存储 50GB ESSD PL1(高性能)
+  5. **包年包月 1 年,开自动续费**(避免再次到期)
+  6. 创建后:
+     - 数据库名 `meetpr`(同原惯例)
+     - 高权限账号 `meetpr`,密码 Bitwarden generator 生成 24 位字母数字(避开阿里云不允许的特殊符号 `! " ' / \ @ : space`)
+     - 白名单先 `0.0.0.0/0` 开发用,**上线前收敛**
+     - SSL ❌ 关(开发);上线前必开
+  7. 更新 `~/Brain/wiki/projects/MeetPR/secrets-pointer.md` §3 用新实例 ID / 新 endpoint / 新创建日期 / 新到期日 替换被划掉的历史值,移除"已退订"banner
+  8. 更新 Bitwarden `MeetPR RDS meetpr` 条目密码(从 Bitwarden 把新生成的密码 paste 进阿里云重置密码表单)
+  9. 更新 backend `.env.example` 占位 + 提示 ops 设 backend `.env` `DATABASE_URL` 新 endpoint
+- **预算**:单机版 2c4G + 50GB ESSD PL1 ≈ **¥150-200/月** ≈ **¥1800-2400/年**(比退订的高可用版 ¥6960/年 省 ~70%)
+- **验证**:新实例运行中;backend `swift test` / `npm test` 用新 `DATABASE_URL` 通过;secrets-pointer.md §3 已无"已退订"banner,字段全用新值
+- **为什么等**:V0 demo 完全不用 RDS,提前买 = 浪费
+- **不要做的事**:
+  - ❌ 再买高可用系列(V0.1+ 仍不需要,等 Stage 4+ 多教练用上再考虑)
+  - ❌ 跨地域(数据库延迟,坚持 cn-hangzhou)
+  - ❌ Serverless(V0.1+ 量级用包年包月稳定 + 计费可预期)
+- **关联**:[secrets-pointer.md §3](~/Brain/wiki/projects/MeetPR/secrets-pointer.md);ADR-004 后端选型
+- **创建于**:2026-05-11(RDS 试用退订同日)
+
 ### F-015 — 首个 coach planning spec 必须按 v4.4 设计写(防 v4.3/v4.2 误引用)
 
 - **触发条件**:写第一个 coach planning UI 相关的 spec(很可能是 spec 004 或之后,任何涉及"教练排计划 / 4 周 / 周卡片 / cycle 历史 / Excel 预览"等关键字的 spec)
