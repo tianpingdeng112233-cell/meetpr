@@ -221,8 +221,33 @@ public actor InMemoryPlanRepository: PlanRepository {
     ]
   }
 
-  // swiftlint:disable:next function_body_length
   private static func previewCatalog() -> [Exercise] {
+    syntheticCompetitionLifts() + loadBundledCatalogV2()
+  }
+
+  static func loadBundledCatalogV2() -> [Exercise] {
+    guard
+      let url = Bundle.module.url(
+        forResource: "exercise-catalog-v2",
+        withExtension: "json"
+      )
+    else {
+      assertionFailure("Bundled catalog v2 missing. Check Package.swift resources declaration.")
+      return []
+    }
+
+    do {
+      let data = try Data(contentsOf: url)
+      let decoder = JSONDecoder()
+      decoder.dateDecodingStrategy = .iso8601
+      return try decoder.decode([Exercise].self, from: data)
+    } catch {
+      assertionFailure("Bundled catalog v2 decode failed: \(error)")
+      return []
+    }
+  }
+
+  static func syntheticCompetitionLifts() -> [Exercise] {
     let now = Date()
     return [
       Exercise(
@@ -233,7 +258,7 @@ public actor InMemoryPlanRepository: PlanRepository {
         isCompetitionLift: true,
         muscleGroups: [.quad, .glute],
         equipment: [.barbell],
-        movementPattern: [.push],
+        movementPattern: [.squat],
         createdAt: now
       ),
       Exercise(
@@ -244,7 +269,7 @@ public actor InMemoryPlanRepository: PlanRepository {
         isCompetitionLift: true,
         muscleGroups: [.chest, .triceps],
         equipment: [.barbell],
-        movementPattern: [.push],
+        movementPattern: [.horizontalPush],
         createdAt: now
       ),
       Exercise(
@@ -255,105 +280,10 @@ public actor InMemoryPlanRepository: PlanRepository {
         isCompetitionLift: true,
         muscleGroups: [.back, .hamstring],
         equipment: [.barbell],
-        movementPattern: [.pull],
+        movementPattern: [.hipHinge],
         createdAt: now
       ),
-      Exercise(
-        id: uuid(23),
-        name: "暂停卧推",
-        exerciseType: .mainLiftVariation,
-        mainLiftFamily: .bench,
-        isCompetitionLift: false,
-        muscleGroups: [.chest, .triceps],
-        equipment: [.barbell],
-        movementPattern: [.push],
-        createdAt: now
-      ),
-      Exercise(
-        id: uuid(24),
-        name: "节奏硬拉",
-        exerciseType: .mainLiftVariation,
-        mainLiftFamily: .deadlift,
-        isCompetitionLift: false,
-        muscleGroups: [.back, .hamstring],
-        equipment: [.barbell],
-        movementPattern: [.pull],
-        createdAt: now
-      ),
-      Exercise(
-        id: uuid(25),
-        name: "前蹲举",
-        exerciseType: .mainLiftVariation,
-        mainLiftFamily: .squat,
-        isCompetitionLift: false,
-        muscleGroups: [.quad, .core],
-        equipment: [.barbell],
-        movementPattern: [.push],
-        createdAt: now
-      ),
-    ] + previewAccessoryCatalog(createdAt: now)
-  }
-
-  private static func previewAccessoryCatalog(createdAt: Date) -> [Exercise] {
-    [
-      accessory(200, "哈克深蹲", [.quad], [.machine], [.push], createdAt),
-      accessory(201, "杠铃前蹲举", [.quad, .core], [.barbell], [.push], createdAt),
-      accessory(202, "杠铃箭步蹲", [.quad, .glute], [.barbell], [.push], createdAt),
-      accessory(203, "倒蹬", [.quad], [.machine], [.push], createdAt),
-      accessory(204, "腿屈伸", [.quad], [.machine], [.push], createdAt),
-      accessory(205, "高脚杯深蹲", [.quad], [.dumbbell], [.push], createdAt),
-      accessory(206, "臀冲", [.glute], [.barbell], [.push], createdAt),
-      accessory(207, "罗马尼亚硬拉", [.glute, .hamstring], [.barbell], [.pull], createdAt),
-      accessory(208, "单腿臀冲", [.glute], [.bodyweight], [.push], createdAt),
-      accessory(209, "反向髋伸", [.glute, .hamstring], [.machine], [.pull], createdAt),
-      accessory(210, "北欧腘绳", [.hamstring], [.bodyweight], [.pull], createdAt),
-      accessory(211, "腿弯举", [.hamstring], [.machine], [.pull], createdAt),
-      accessory(212, "哑铃罗马尼亚硬拉", [.hamstring, .glute], [.dumbbell], [.pull], createdAt),
-      accessory(213, "上斜哑铃推", [.chest], [.dumbbell], [.push], createdAt),
-      accessory(214, "平板哑铃推", [.chest], [.dumbbell], [.push], createdAt),
-      accessory(215, "双杠臂屈伸", [.chest, .triceps], [.bodyweight], [.push], createdAt),
-      accessory(216, "龙门夹胸", [.chest], [.machine], [.push], createdAt),
-      accessory(217, "俯卧撑", [.chest], [.bodyweight], [.push], createdAt),
-      accessory(218, "引体向上", [.back, .biceps], [.bodyweight], [.pull], createdAt),
-      accessory(219, "杠铃划船", [.back], [.barbell], [.pull], createdAt),
-      accessory(220, "高位下拉", [.back], [.machine], [.pull], createdAt),
-      accessory(221, "单臂哑铃划船", [.back], [.dumbbell], [.pull], createdAt),
-      accessory(222, "哑铃肩推", [.shoulder], [.dumbbell], [.push], createdAt),
-      accessory(223, "侧平举", [.shoulder], [.dumbbell], [.push], createdAt),
-      accessory(224, "面拉", [.shoulder, .back], [.machine], [.pull], createdAt),
-      accessory(225, "杠铃弯举", [.biceps], [.barbell], [.pull], createdAt),
-      accessory(226, "哑铃弯举", [.biceps], [.dumbbell], [.pull], createdAt),
-      accessory(227, "三头绳索下压", [.triceps], [.machine], [.push], createdAt),
-      accessory(228, "仰卧臂屈伸", [.triceps], [.barbell], [.push], createdAt),
-      accessory(229, "窄距俯卧撑", [.triceps], [.bodyweight], [.push], createdAt),
-      accessory(230, "平板支撑", [.core], [.bodyweight], [.push], createdAt),
-      accessory(231, "卷腹", [.core], [.bodyweight], [.pull], createdAt),
-      accessory(232, "哑铃转体", [.core], [.dumbbell], [.pull], createdAt),
-      accessory(233, "农夫行走", [.core, .back], [.dumbbell], [.pull], createdAt),
     ]
-  }
-
-  // swiftlint:disable:next function_parameter_count
-  private static func accessory(
-    _ byte: UInt8,
-    _ name: String,
-    _ muscleGroups: [MuscleGroup],
-    _ equipment: [Equipment],
-    _ movementPattern: [MovementPattern],
-    _ createdAt: Date
-  ) -> Exercise {
-    Exercise(
-      id: uuid(byte),
-      name: name,
-      exerciseType: .accessory,
-      mainLiftFamily: nil,
-      isCompetitionLift: false,
-      muscleGroups: muscleGroups,
-      equipment: equipment,
-      movementPattern: movementPattern,
-      createdByCoachID: nil,
-      createdAt: createdAt
-    )
   }
 
   private static func uuid(_ byte: UInt8) -> UUID {

@@ -128,7 +128,7 @@ import Testing
 
   #expect(json.contains(#""muscle_groups":["quad","core"]"#))
   #expect(json.contains(#""equipment":["barbell"]"#))
-  #expect(json.contains(#""movement_pattern":["push"]"#))
+  #expect(json.contains(#""movement_pattern":["squat"]"#))
 }
 
 private func makeExercise() throws -> Exercise {
@@ -140,7 +140,7 @@ private func makeExercise() throws -> Exercise {
     isCompetitionLift: false,
     muscleGroups: [.quad, .core],
     equipment: [.barbell],
-    movementPattern: [.push],
+    movementPattern: [.squat],
     createdByCoachID: try fixtureUUID("50000000-0000-0000-0000-000000000002"),
     createdAt: createdAt()
   )

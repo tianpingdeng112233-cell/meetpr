@@ -3,6 +3,7 @@ import Foundation
 
 @testable import CoachKit
 
+// swiftlint:disable type_body_length
 @available(iOS 17.0, macOS 14.0, *)
 enum PlanningFixtures {
   static let now = Date(timeIntervalSince1970: 1_766_630_400)
@@ -61,11 +62,35 @@ enum PlanningFixtures {
   static func catalog() -> [Exercise] {
     [
       exercise(id: squatID, name: "竞技深蹲", type: .mainLift, family: .squat),
-      exercise(id: benchID, name: "竞技卧推", type: .mainLift, family: .bench),
-      exercise(id: deadliftID, name: "竞技硬拉", type: .mainLift, family: .deadlift),
+      exercise(
+        id: benchID,
+        name: "竞技卧推",
+        type: .mainLift,
+        family: .bench,
+        movementPattern: [.horizontalPush]
+      ),
+      exercise(
+        id: deadliftID,
+        name: "竞技硬拉",
+        type: .mainLift,
+        family: .deadlift,
+        movementPattern: [.hipHinge]
+      ),
       exercise(id: pauseSquatID, name: "暂停深蹲", type: .mainLiftVariation, family: .squat),
-      exercise(id: pauseBenchID, name: "暂停卧推", type: .mainLiftVariation, family: .bench),
-      exercise(id: tempoDeadliftID, name: "节奏硬拉", type: .mainLiftVariation, family: .deadlift),
+      exercise(
+        id: pauseBenchID,
+        name: "暂停卧推",
+        type: .mainLiftVariation,
+        family: .bench,
+        movementPattern: [.horizontalPush]
+      ),
+      exercise(
+        id: tempoDeadliftID,
+        name: "节奏硬拉",
+        type: .mainLiftVariation,
+        family: .deadlift,
+        movementPattern: [.hipHinge]
+      ),
       exercise(id: frontSquatID, name: "前蹲举", type: .mainLiftVariation, family: .squat),
     ] + accessoryCatalog()
   }
@@ -79,7 +104,7 @@ enum PlanningFixtures {
         family: nil,
         muscleGroups: [.quad],
         equipment: [.machine],
-        movementPattern: [.push]
+        movementPattern: [.squat]
       ),
       exercise(
         id: barbellLungeID,
@@ -88,7 +113,7 @@ enum PlanningFixtures {
         family: nil,
         muscleGroups: [.quad, .glute],
         equipment: [.barbell],
-        movementPattern: [.push]
+        movementPattern: [.squat]
       ),
       exercise(
         id: pullUpID,
@@ -97,7 +122,7 @@ enum PlanningFixtures {
         family: nil,
         muscleGroups: [.back, .biceps],
         equipment: [.bodyweight],
-        movementPattern: [.pull]
+        movementPattern: [.verticalPull]
       ),
       exercise(
         id: dumbbellCurlID,
@@ -106,7 +131,7 @@ enum PlanningFixtures {
         family: nil,
         muscleGroups: [.biceps],
         equipment: [.dumbbell],
-        movementPattern: [.pull]
+        movementPattern: [.other]
       ),
       exercise(
         id: cablePushdownID,
@@ -114,8 +139,8 @@ enum PlanningFixtures {
         type: .accessory,
         family: nil,
         muscleGroups: [.triceps],
-        equipment: [.machine],
-        movementPattern: [.push]
+        equipment: [.cable],
+        movementPattern: [.other]
       ),
     ]
   }
@@ -246,7 +271,7 @@ enum PlanningFixtures {
     family: LiftFamily?,
     muscleGroups: [MuscleGroup] = [.quad],
     equipment: [Equipment] = [.barbell],
-    movementPattern: [MovementPattern] = [.push]
+    movementPattern: [MovementPattern] = [.squat]
   ) -> Exercise {
     Exercise(
       id: id,
@@ -261,3 +286,4 @@ enum PlanningFixtures {
     )
   }
 }
+// swiftlint:enable type_body_length

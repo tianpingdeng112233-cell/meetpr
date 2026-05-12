@@ -1,0 +1,75 @@
+import CoreModels
+import Foundation
+import Testing
+
+@testable import CoachKit
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogContainsThreeSyntheticCompetitionLifts() async throws {
+  let catalog = try await previewCatalog()
+  let competitionLifts = catalog.filter(\.isCompetitionLift)
+
+  #expect(competitionLifts.count == 3)
+  #expect(Set(competitionLifts.map(\.name)) == ["竞技深蹲", "竞技卧推", "竞技硬拉"])
+  #expect(competitionLifts.allSatisfy { $0.exerciseType == .mainLift })
+  #expect(competitionLifts.allSatisfy { $0.name.localizedStandardContains("竞技") })
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogTotalCountIsFourThirtyEight() async throws {
+  let catalog = try await previewCatalog()
+
+  #expect(catalog.count == 438)
+  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 435)
+  #expect(InMemoryPlanRepository.syntheticCompetitionLifts().count == 3)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogHasNoDuplicateIDs() async throws {
+  let catalog = try await previewCatalog()
+
+  #expect(Set(catalog.map(\.id)).count == catalog.count)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogAllExercisesHaveValidEnums() async throws {
+  let imported = InMemoryPlanRepository.loadBundledCatalogV2()
+  let encoder = JSONEncoder()
+  encoder.dateEncodingStrategy = .iso8601
+  let exerciseData = try encoder.encode(imported)
+  let decoder = JSONDecoder()
+  decoder.dateDecodingStrategy = .iso8601
+  let decoded = try decoder.decode([Exercise].self, from: exerciseData)
+
+  #expect(decoded.count == 435)
+  #expect(decoded.allSatisfy { !$0.muscleGroups.isEmpty })
+  #expect(decoded.allSatisfy { !$0.equipment.isEmpty })
+  #expect(decoded.allSatisfy { !$0.movementPattern.isEmpty })
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogCoversAllExerciseTypes() async throws {
+  let catalog = try await previewCatalog()
+
+  #expect(Set(catalog.map(\.exerciseType)) == [.mainLift, .mainLiftVariation, .accessory])
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogCoversAllLiftFamilies() async throws {
+  let catalog = try await previewCatalog()
+  let competitionFamilies = Set(
+    catalog
+      .filter { $0.exerciseType == .mainLift }
+      .compactMap(\.mainLiftFamily)
+  )
+
+  #expect(competitionFamilies == [.squat, .bench, .deadlift])
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private func previewCatalog() async throws -> [Exercise] {
+  let repository = InMemoryPlanRepository.preview()
+  let mainLifts = try await repository.fetchMainLiftCatalog()
+  let accessories = try await repository.fetchAccessoryExercises(filters: .empty)
+  return mainLifts + accessories
+}
