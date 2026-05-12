@@ -37,7 +37,10 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 
 **Stage 2 Engineering Build 进行中**(详见 [[lifecycle-stages|lifecycle-stages.md]] §3,Week 0-12)。
 
-### 🎯 V0 TestFlight north star — hard deadline **2026-06-20**(6 周)
+### 🎯 V0 TestFlight north star — hard deadline **2026-06-20** / soft target **2026-05-20**
+
+- **Hard 6/20**:真 ship deadline,40 天 buffer 不变,W23-25 release engineering 周表是这条路径的节奏(详见下表)
+- **Soft 5/20**(2026-05-11 加):内部努力把 W23-25 压到 9 天加速窗口里跑完;Apple 审核 24-48h~7d 不可控,达不到则回 hard deadline 节奏,**不是 ship gate**
 
 **所有 spec 决策按"是否在 V0 路径上"裁剪。** V0 路径 = `启动 → 登录 → 教练规划 Step 0-7(周卡片横滑) → 本机 DraftStore 保存`,**不接 backend,不开学员端**。详见 [[~/Brain/wiki/projects/MeetPR/roadmap|roadmap.md]]。
 
