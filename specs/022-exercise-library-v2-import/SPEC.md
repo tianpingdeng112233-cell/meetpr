@@ -1,7 +1,7 @@
 # 022 — Exercise Library v2 Catalog Import(V0 demo 升级)
 
-- **状态**: Draft
-- **PR**: TBD
+- **状态**: Done
+- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/51
 - **来源**:
   - [`~/Brain/wiki/projects/MeetPR/domain/exercise-library-v2.xlsx`](~/Brain/wiki/projects/MeetPR/domain/exercise-library-v2.xlsx) — 435 条动作库,教练 xty 已审完(2026-05-12,全过 + 一字未改)
   - [`~/Brain/wiki/projects/MeetPR/domain/exercise-library-v2-RATIONALE.md`](~/Brain/wiki/projects/MeetPR/domain/exercise-library-v2-RATIONALE.md) — v2 来源 / 分类方法论 / 字段定义
