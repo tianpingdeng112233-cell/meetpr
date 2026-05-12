@@ -262,6 +262,26 @@
 - **为什么等**:V1 custom = 1 维度 / 规则, 需要时可用多条规则表达复合效果
 - **创建于**:2026-05-09(spec 007)
 
+### F-026 — Apple Developer membership 开通(V0 ship 前置)
+
+- **触发条件**:满足以下任一
+  - 距 V0 hard deadline(currently 2026-06-20)≤ 7 天 → trigger 日 = **2026-06-13**(若 deadline 改, 按新值 -7 天)
+  - User 主动说"准备 ship" / "下周要给 xty / 肖天宇 / 里欧 装机" / "TestFlight 上传" / 任何 explicit ship intent
+- **动作**:
+  1. 提醒 user:"F-026 触发 — Apple Developer membership 该开了。$99/年,Stage A-I 全要前置。账号 verify(身份/信用卡)偶尔卡 24-48h,1 周 buffer 偏紧"
+  2. 走 [LAUNCH-CHECKLIST.md](./LAUNCH-CHECKLIST.md) Stage A 流程:Apple Developer enroll → Bundle ID `com.meetpr.app` register → App Store Connect 创建 App record(Name=MeetPR, Primary Lang=简体中文, SKU=meetpr-ios-v0)
+  3. 把 Team ID / Apple ID 关键值记进 LAUNCH-CHECKLIST.md Stage A 对应 checkbox
+- **验证**:LAUNCH-CHECKLIST.md Stage A 全部 ☑;Bundle ID 在 Developer Portal 可见;App record 在 App Store Connect 可见
+- **为什么等**:
+  - User 2026-05-12 决策:"放到我还剩一周就需要上线的时候再提醒,目前先注重产品建设"
+  - $99 年费,早开晚开都是这个钱,但开了空窗期不用就是浪费
+  - V0 product 已"差不多了"(教练规划 Step 0-7 全可点),ship 时机 user 定,Claude 不主动催
+- **不要做的事**:
+  - ❌ trigger 触发前主动 propose Stage A / 任何 release engineering 流程
+  - ❌ 跟 [F-012](./FOLLOWUPS.md) 混淆 — F-012 是 personal → 公司账号迁移(V0.1+,gated on F-011 公司注册);F-026 是初次开 personal account(V0 前置)
+- **关联**:[LAUNCH-CHECKLIST.md](./LAUNCH-CHECKLIST.md) Stage A;[CLAUDE.md ❄️ 硬冻结](./CLAUDE.md)
+- **创建于**:2026-05-12
+
 ---
 
 ## 已完成
