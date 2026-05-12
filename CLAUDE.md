@@ -74,6 +74,7 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 - ❌ **网页端教练后台**:Stage 4 hard gate,V0 完全无关
 - ❌ **学员端 view**:V0.1 起;V0 = 教练 demo only
 - ❌ **不在 V0 路径上的 refactor / cleanup**:V0 ship 后再清
+- ❌ **Apple Developer membership / Stage A-I release engineering**:User 2026-05-12 决策"还剩一周再开",自动提醒走 [F-026](./FOLLOWUPS.md);本 session 不要主动 propose Stage A 任何环节
 
 ## 角色
 
