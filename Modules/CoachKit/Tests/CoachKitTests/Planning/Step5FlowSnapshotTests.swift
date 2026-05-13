@@ -13,7 +13,7 @@ import ViewInspector
   let inspected = try Step5SetIntensityView(viewModel: viewModel).inspect()
 
   _ = try inspected.find(ViewType.ScrollView.self)
-  #expect(viewModel.sortedDraftExercises.contains { viewModel.exerciseName(for: $0) == "竞技深蹲" })
+  #expect(viewModel.sortedDraftExercises.contains { viewModel.exerciseName(for: $0) == "比赛式深蹲" })
   #expect(viewModel.sortedDraftExercises.contains { !$0.isMainLift })
 }
 

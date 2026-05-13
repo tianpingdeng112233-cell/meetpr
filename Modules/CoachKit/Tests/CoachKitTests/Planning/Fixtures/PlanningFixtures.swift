@@ -61,17 +61,17 @@ enum PlanningFixtures {
 
   static func catalog() -> [Exercise] {
     [
-      exercise(id: squatID, name: "竞技深蹲", type: .mainLift, family: .squat),
+      exercise(id: squatID, name: "比赛式深蹲", type: .mainLift, family: .squat),
       exercise(
         id: benchID,
-        name: "竞技卧推",
+        name: "比赛式卧推",
         type: .mainLift,
         family: .bench,
         movementPattern: [.horizontalPush]
       ),
       exercise(
         id: deadliftID,
-        name: "竞技硬拉",
+        name: "比赛式硬拉",
         type: .mainLift,
         family: .deadlift,
         movementPattern: [.hipHinge]

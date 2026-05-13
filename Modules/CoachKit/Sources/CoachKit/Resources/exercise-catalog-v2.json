@@ -73,7 +73,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000005",
-    "name": "弹力带前深蹲",
+    "name": "弹力带前蹲",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -91,7 +91,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000006",
-    "name": "前深蹲",
+    "name": "前蹲",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -109,7 +109,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000007",
-    "name": "暂停前深蹲",
+    "name": "暂停前蹲",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -220,24 +220,6 @@
   {
     "id": "00000000-0000-0000-ca70-00000000000d",
     "name": "1又¼ 深蹲",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "squat",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000000e",
-    "name": "4拍慢速3拍暂停比赛深蹲（430）",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -506,24 +488,6 @@
     "createdAt": "2026-05-12T10:11:42Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-00000000001d",
-    "name": "安全杆深蹲(JAI)",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "squat",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "specialty_bar"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-00000000001e",
     "name": "安全杆暂停深蹲",
     "exerciseType": "main_lift_variation",
@@ -561,7 +525,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000020",
-    "name": "深蹲/比赛深蹲",
+    "name": "比赛式深蹲",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -597,7 +561,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000022",
-    "name": "深蹲早安（早安蹲）",
+    "name": "早安式",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -669,25 +633,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000026",
-    "name": "垫高硬拉（架上）",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000027",
-    "name": "1拍暂停硬拉",
+    "name": "架上硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -722,42 +668,6 @@
     "createdAt": "2026-05-12T10:11:42Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000029",
-    "name": "2拍暂停硬拉",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000002a",
-    "name": "3拍暂停硬拉",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-00000000002b",
     "name": "弹力带硬拉",
     "exerciseType": "main_lift_variation",
@@ -768,24 +678,6 @@
     ],
     "equipment": [
       "band"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000002c",
-    "name": "C拍暂停硬拉",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
     ],
     "movementPattern": [
       "hip_hinge"
@@ -1155,7 +1047,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000041",
-    "name": "高位等长传统硬拉（高位静力 -> continuous pulling硬拉）",
+    "name": "高位传统硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1173,7 +1065,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000042",
-    "name": "高位等长相扑硬拉",
+    "name": "高位相扑硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1317,9 +1209,9 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004a",
-    "name": "错步罗马尼亚硬拉（前后站单腿罗拉）",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
+    "name": "前后站单腿罗拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
       "hamstring"
@@ -1517,7 +1409,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000055",
-    "name": "卧推/比赛卧推",
+    "name": "比赛式卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1553,7 +1445,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000057",
-    "name": "C拍暂停卧推（C秒暂停）",
+    "name": "暂停卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1625,7 +1517,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005b",
-    "name": "抬脚卧推",
+    "name": "无腿卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1698,24 +1590,6 @@
   {
     "id": "00000000-0000-0000-ca70-00000000005f",
     "name": "插销卧推（架上卧推）",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "bench",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000060",
-    "name": "弹力带辅助卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1823,7 +1697,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000066",
-    "name": "垫高推举 （卧推砖）",
+    "name": "卧推砖卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1841,7 +1715,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000067",
-    "name": "板推（木板垫高卧推）",
+    "name": "木板垫高卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,

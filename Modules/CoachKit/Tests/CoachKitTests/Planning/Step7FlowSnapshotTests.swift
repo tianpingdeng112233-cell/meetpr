@@ -33,7 +33,7 @@ import ViewInspector
   let inspected = try WeekCardView(viewModel: viewModel, weekNumber: 1).inspect()
 
   #expect(try inspected.find(text: "周一").string() == "周一")
-  #expect(try inspected.find(text: "竞技深蹲").string() == "竞技深蹲")
+  #expect(try inspected.find(text: "比赛式深蹲").string() == "比赛式深蹲")
   #expect(try inspected.find(text: "4 组 × 5 次").string() == "4 组 × 5 次")
 }
 

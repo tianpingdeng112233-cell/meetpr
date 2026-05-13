@@ -68,5 +68,5 @@ import ViewInspector
 
   #expect(try inspected.find(text: "周一 — 深蹲").string() == "周一 — 深蹲")
   #expect(try inspected.find(text: "深蹲:").string() == "深蹲:")
-  #expect(try inspected.find(text: "竞技深蹲").string() == "竞技深蹲")
+  #expect(try inspected.find(text: "比赛式深蹲").string() == "比赛式深蹲")
 }
