@@ -86,37 +86,52 @@ private struct MainLiftPickerRow: View {
   @State private var showingPicker = false
 
   var body: some View {
-    HStack(spacing: MeetPRSpacing.md) {
-      Text("\(PlanningDisplay.liftName(family)):")
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .frame(width: 56, alignment: .leading)
+    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+      HStack(spacing: MeetPRSpacing.md) {
+        Text("\(PlanningDisplay.liftName(family)):")
+          .font(Font.MeetPR.bodyEmphasis)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .frame(width: 56, alignment: .leading)
 
-      Button {
-        showingPicker = true
-      } label: {
-        HStack(spacing: MeetPRSpacing.xs) {
-          Text(currentSelectionLabel)
-            .font(Font.MeetPR.body)
-            .foregroundStyle(
-              currentSelection == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary
-            )
-            .lineLimit(1)
-            .truncationMode(.tail)
-          Spacer()
-          Image(systemName: "chevron.up.chevron.down")
-            .font(.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+        Button {
+          showingPicker = true
+        } label: {
+          HStack(spacing: MeetPRSpacing.xs) {
+            Text(currentSelectionLabel)
+              .font(Font.MeetPR.body)
+              .foregroundStyle(
+                currentSelection == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary
+              )
+              .lineLimit(1)
+              .truncationMode(.tail)
+            Spacer()
+            Image(systemName: "chevron.up.chevron.down")
+              .font(.footnote)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+          }
+          .padding(.horizontal, MeetPRSpacing.sm)
+          .padding(.vertical, MeetPRSpacing.xs)
+          .background(Color.MeetPR.surface2)
+          .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
+          .contentShape(.rect)
         }
-        .padding(.horizontal, MeetPRSpacing.sm)
-        .padding(.vertical, MeetPRSpacing.xs)
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityLabel("\(PlanningDisplay.liftName(family)) 变式: \(currentSelectionLabel)")
+      }
+
+      if currentSelection != nil {
+        TextField(
+          "备注(可选 · 比如暂停 3 秒 / 卧距宽 / 节奏 3-0-1)",
+          text: notesBinding,
+          axis: .vertical
+        )
+        .font(Font.MeetPR.footnote)
+        .lineLimit(1...3)
+        .padding(MeetPRSpacing.sm)
         .background(Color.MeetPR.surface2)
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
-        .contentShape(.rect)
       }
-      .buttonStyle(.plain)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .accessibilityLabel("\(PlanningDisplay.liftName(family)) 变式: \(currentSelectionLabel)")
     }
     .sheet(isPresented: $showingPicker) {
       VariantPickerSheet(
@@ -128,6 +143,14 @@ private struct MainLiftPickerRow: View {
           showingPicker = false
         }
       )
+    }
+  }
+
+  private var notesBinding: Binding<String> {
+    Binding {
+      viewModel.selectedVariantNotes[key] ?? ""
+    } set: { newValue in
+      viewModel.selectedVariantNotes[key] = newValue
     }
   }
 

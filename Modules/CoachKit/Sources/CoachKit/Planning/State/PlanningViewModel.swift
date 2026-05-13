@@ -28,6 +28,7 @@ public final class PlanningViewModel {
   public var dayAssignments: [Int: Set<LiftFamily>] = [:]
   public private(set) var mainLiftCatalog: [LiftFamily: [Exercise]] = [:]
   public var selectedVariants: [DayLiftKey: UUID] = [:]
+  public var selectedVariantNotes: [DayLiftKey: String] = [:]
   public var currentDayID: UUID?
   public var accessoryFiltersByDay: [UUID: AccessoryFilters] = [:]
   public var availableAccessoriesCache: [UUID: [Exercise]] = [:]
@@ -374,6 +375,37 @@ public final class PlanningViewModel {
     try draftStore.saveDraft(draftPlan)
   }
 
+  public func updateExerciseNotes(
+    _ notes: String?,
+    for draftExerciseID: UUID
+  ) async throws {
+    guard let draftPlan, let exercise = draftExercise(with: draftExerciseID) else { return }
+    let trimmed = notes?.trimmingCharacters(in: .whitespacesAndNewlines)
+    exercise.notes = (trimmed?.isEmpty == false) ? trimmed : nil
+
+    // Keep selectedVariantNotes dict in sync (for Step 3 binding consistency).
+    if exercise.isMainLift {
+      let key = dayLiftKey(for: exercise)
+      if let key {
+        if let updated = exercise.notes, !updated.isEmpty {
+          selectedVariantNotes[key] = updated
+        } else {
+          selectedVariantNotes.removeValue(forKey: key)
+        }
+      }
+    }
+
+    try draftStore.saveDraft(draftPlan)
+  }
+
+  private func dayLiftKey(for exercise: DraftPlanExercise) -> DayLiftKey? {
+    guard
+      let day = exercise.day,
+      let family = family(for: exercise.exerciseID)
+    else { return nil }
+    return DayLiftKey(dayOfWeek: day.dayOfWeek, liftFamily: family)
+  }
+
   public func toggleIntensityMode(
     to newMode: IntensityMode,
     for draftExerciseID: UUID
@@ -665,6 +697,10 @@ extension PlanningViewModel {
           )
         draftExercise.sortOrder = pair.offset
         draftExercise.day = draftDay
+        let trimmedNote = selectedVariantNotes[key]?.trimmingCharacters(
+          in: .whitespacesAndNewlines
+        )
+        draftExercise.notes = (trimmedNote?.isEmpty == false) ? trimmedNote : nil
         return draftExercise
       }
       let accessoryExercises = draftDay.draftExercises
@@ -698,6 +734,7 @@ extension PlanningViewModel {
 
     var assignments: [Int: Set<LiftFamily>] = [:]
     var variants: [DayLiftKey: UUID] = [:]
+    var notesByKey: [DayLiftKey: String] = [:]
     var frequency = SBDFrequency.empty
 
     for day in draft.draftDays {
@@ -719,12 +756,17 @@ extension PlanningViewModel {
 
       for exercise in day.draftExercises {
         guard let family = family(for: exercise.exerciseID) else { continue }
-        variants[DayLiftKey(dayOfWeek: day.dayOfWeek, liftFamily: family)] = exercise.exerciseID
+        let key = DayLiftKey(dayOfWeek: day.dayOfWeek, liftFamily: family)
+        variants[key] = exercise.exerciseID
+        if let note = exercise.notes, !note.isEmpty {
+          notesByKey[key] = note
+        }
       }
     }
 
     dayAssignments = assignments
     selectedVariants = variants
+    selectedVariantNotes = notesByKey
     sbdFrequency = frequency
     restoreStep7State(from: draft)
 
