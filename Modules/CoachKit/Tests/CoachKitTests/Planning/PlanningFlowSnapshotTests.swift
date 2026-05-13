@@ -68,5 +68,7 @@ import ViewInspector
 
   #expect(try inspected.find(text: "周一 — 深蹲").string() == "周一 — 深蹲")
   #expect(try inspected.find(text: "深蹲:").string() == "深蹲:")
-  #expect(try inspected.find(text: "比赛式深蹲").string() == "比赛式深蹲")
+  // Variant picker uses a Button + sheet pattern; the variant list itself is in
+  // the sheet (not in the inline view tree). Unselected row shows "请选择".
+  #expect(try inspected.find(text: "请选择").string() == "请选择")
 }
