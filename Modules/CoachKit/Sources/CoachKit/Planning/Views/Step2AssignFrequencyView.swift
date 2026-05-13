@@ -50,21 +50,24 @@ public struct Step2AssignFrequencyView: View {
 
           FrequencyControl(
             title: "深蹲",
-            value: viewModel.sbdFrequency.squat
+            value: viewModel.sbdFrequency.squat,
+            maxFrequency: maxFrequency
           ) { delta in
             adjust(.squat, by: delta)
           }
 
           FrequencyControl(
             title: "卧推",
-            value: viewModel.sbdFrequency.bench
+            value: viewModel.sbdFrequency.bench,
+            maxFrequency: maxFrequency
           ) { delta in
             adjust(.bench, by: delta)
           }
 
           FrequencyControl(
             title: "硬拉",
-            value: viewModel.sbdFrequency.deadlift
+            value: viewModel.sbdFrequency.deadlift,
+            maxFrequency: maxFrequency
           ) { delta in
             adjust(.deadlift, by: delta)
           }
@@ -110,7 +113,11 @@ public struct Step2AssignFrequencyView: View {
   }
 
   private func clamped(_ value: Int) -> Int {
-    min(max(value, 0), 7)
+    min(max(value, 0), maxFrequency)
+  }
+
+  private var maxFrequency: Int {
+    viewModel.sortedTrainingDays.count
   }
 }
 
@@ -118,6 +125,7 @@ public struct Step2AssignFrequencyView: View {
 private struct FrequencyControl: View {
   let title: String
   let value: Int
+  let maxFrequency: Int
   let adjust: @MainActor (Int) -> Void
 
   var body: some View {
@@ -151,7 +159,7 @@ private struct FrequencyControl: View {
             .frame(width: 36, height: 36)
         }
         .buttonStyle(.bordered)
-        .disabled(value >= 7)
+        .disabled(value >= maxFrequency)
       }
     }
   }
