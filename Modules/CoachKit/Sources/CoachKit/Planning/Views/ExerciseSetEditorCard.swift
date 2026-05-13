@@ -57,13 +57,18 @@ public struct ExerciseSetEditorCard: View {
         }
 
         HStack(spacing: MeetPRSpacing.md) {
-          CountStepper(title: "组数", value: $setCount, range: 1...20)
-          CountStepper(title: "次数", value: $targetReps, range: 1...50)
+          LabeledIntegerPlanningNumberField(title: "组数", value: $setCount, range: 1...20)
+          LabeledIntegerPlanningNumberField(title: "次数", value: $targetReps, range: 1...50)
         }
         .onChange(of: setCount) { _, _ in persist() }
-        .onChange(of: targetReps) { _, _ in persist() }
+        .onChange(of: targetReps) { _, newReps in
+          if let currentMax = targetRepsMax, currentMax < newReps {
+            targetRepsMax = newReps
+          }
+          persist()
+        }
 
-        OptionalRepsMaxStepper(value: $targetRepsMax, minimum: targetReps)
+        OptionalRepsMaxInput(value: $targetRepsMax, minimum: targetReps)
           .onChange(of: targetRepsMax) { _, _ in persist() }
 
         PrimaryButton(didSave ? "更新 W1 设置" : "保存 W1 设置", isFullWidth: true) {
@@ -136,74 +141,93 @@ private struct RPEInput: View {
   @Binding var value: Double
 
   var body: some View {
-    Stepper(value: $value, in: 1...10, step: 0.5) {
-      HStack {
-        Text("RPE")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Spacer()
-        Text(value.formatted(.number.precision(.fractionLength(1))))
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .monospacedDigit()
-      }
+    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+      Text("RPE")
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+
+      PlanningNumberField(
+        value: $value,
+        range: 1...10,
+        step: 0.5,
+        decimalIncrement: PlanningDecimalStep.half
+      )
     }
   }
 }
 
 @MainActor
-private struct CountStepper: View {
+private struct LabeledIntegerPlanningNumberField: View {
   let title: String
   @Binding var value: Int
   let range: ClosedRange<Int>
 
   var body: some View {
-    Stepper(value: $value, in: range) {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-        Text(title)
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Text(value.formatted())
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .monospacedDigit()
-      }
+    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+      Text(title)
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+
+      PlanningNumberField(
+        value: doubleBinding,
+        range: Double(range.lowerBound)...Double(range.upperBound),
+        step: 1,
+        decimalIncrement: PlanningDecimalStep.whole
+      )
     }
+  }
+
+  private var doubleBinding: Binding<Double> {
+    Binding(
+      get: { Double(value) },
+      set: { value = Int($0) }
+    )
   }
 }
 
 @MainActor
-private struct OptionalRepsMaxStepper: View {
+private struct OptionalRepsMaxInput: View {
   @Binding var value: Int?
   let minimum: Int
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Toggle("次数上限", isOn: hasRangeBinding)
+      Text("次数上限")
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
 
-      if value != nil {
-        Stepper(value: repsMaxBinding, in: minimum...60) {
-          Text("最多 \(value ?? minimum) 次")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+      if value == nil {
+        Button("添加上限", systemImage: "plus") {
+          value = minimum
+        }
+        .font(Font.MeetPR.footnote)
+        .buttonStyle(.borderless)
+      } else {
+        HStack(spacing: MeetPRSpacing.sm) {
+          PlanningNumberField(
+            value: repsMaxBinding,
+            range: Double(minimum)...60,
+            step: 1,
+            decimalIncrement: PlanningDecimalStep.whole
+          )
+
+          Button(role: .destructive) {
+            value = nil
+          } label: {
+            Image(systemName: "xmark.circle.fill")
+              .font(.body)
+          }
+          .buttonStyle(.borderless)
+          .accessibilityLabel("删除次数上限")
         }
       }
     }
   }
 
-  private var hasRangeBinding: Binding<Bool> {
+  private var repsMaxBinding: Binding<Double> {
     Binding(
-      get: { value != nil },
-      set: { isOn in value = isOn ? max(minimum, value ?? minimum) : nil }
-    )
-  }
-
-  private var repsMaxBinding: Binding<Int> {
-    Binding(
-      get: { value ?? minimum },
-      set: { value = max(minimum, $0) }
+      get: { Double(value ?? minimum) },
+      set: { value = max(minimum, Int($0)) }
     )
   }
 }
