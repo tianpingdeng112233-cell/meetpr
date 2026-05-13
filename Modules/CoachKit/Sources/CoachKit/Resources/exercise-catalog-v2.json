@@ -553,25 +553,6 @@
     "nameEn": "Safety Bar Squat"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000020",
-    "name": "比赛式深蹲",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "squat",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Competition Squat"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000021",
     "name": "深蹲跳",
     "exerciseType": "main_lift_variation",
@@ -1483,25 +1464,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Banded Medium Grip Bench Press"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000055",
-    "name": "比赛式卧推",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "bench",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Competition Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000056",
@@ -4935,24 +4897,6 @@
     "createdAt": "2026-05-12T10:11:42Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000114",
-    "name": "侧弓步",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "other"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000115",
     "name": "山羊挺身",
     "exerciseType": "accessory",
@@ -5260,24 +5204,6 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000126",
-    "name": "单腿臀推",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000127",
     "name": "单腿臀推",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
