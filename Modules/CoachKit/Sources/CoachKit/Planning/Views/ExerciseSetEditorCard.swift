@@ -28,7 +28,7 @@ public struct ExerciseSetEditorCard: View {
     self._targetRepsMax = State(initialValue: spec.targetRepsMax)
     self._intensityMode = State(initialValue: spec.intensityMode)
     self._targetValue = State(initialValue: spec.targetValue)
-    self._notes = State(initialValue: spec.notes ?? "")
+    self._notes = State(initialValue: draftExercise.notes ?? "")
     self._didSave = State(initialValue: viewModel.setSpec(for: draftExercise.id) != nil)
   }
 
@@ -103,7 +103,11 @@ public struct ExerciseSetEditorCard: View {
           .padding(MeetPRSpacing.sm)
           .background(Color.MeetPR.surface2)
           .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
-          .onChange(of: notes) { _, _ in persist() }
+          .onChange(of: notes) { _, newValue in
+            Task {
+              try? await viewModel.updateExerciseNotes(newValue, for: draftExercise.id)
+            }
+          }
         }
 
         PrimaryButton(didSave ? "更新 W1 设置" : "保存 W1 设置", isFullWidth: true) {
@@ -170,8 +174,7 @@ public struct ExerciseSetEditorCard: View {
       targetReps: targetReps,
       targetRepsMax: targetRepsMax,
       intensityMode: intensityMode,
-      targetValue: targetValue,
-      notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes
+      targetValue: targetValue
     )
   }
 
@@ -190,7 +193,7 @@ public struct ExerciseSetEditorCard: View {
     targetRepsMax = spec.targetRepsMax
     intensityMode = spec.intensityMode
     targetValue = spec.targetValue
-    notes = spec.notes ?? ""
+    notes = draftExercise.notes ?? ""
     didSave = true
   }
 }
