@@ -159,6 +159,77 @@ Claude 裁决三种结果:
 
 ---
 
+## PR review pass(Claude 开的任何 PR 你做 second-pair-of-eyes)
+
+**触发**:User paste 一段 self-contained review prompt(包含 PR # + URL + PR trigger 上下文 + review 任务)。这是 Claude 开 PR 后必经的流程,**不论 doc 还是 code**(Claude 端规定见 [`CLAUDE.md` §PR Codex review pass](./CLAUDE.md))。
+
+> **背景**:CLAUDE.md §角色 已规定 Claude 也写 Swift 代码(过去 default 走你,你限额触顶 Claude 接管 code 实装)。无论谁写,另一方必 review = 双向 second-pair-of-eyes。本节定义 Claude → 你 review 这一向;反向(你写 code → Claude review)是既有流程。
+
+### 你做什么
+
+1. **读** PR diff(`gh pr diff NN`)+ 涉及文件全文 + 任何相关上下文(ADR / 上游 spec / xlsx / 现有 view 等)
+2. **不动 PR 内任何文件**(纯 review,不开 commit / 不 push)
+3. **找问题**(按 PR 类型选 checklist):
+
+   **Doc / spec / ADR / *.md PR**(模板 spec 022 Q1):
+   - **Factual errors**:数字 / 路径 / API name / 引用是否真存在(spec 022 Q1: catalog 总条数 SPEC 写 436 实际 xlsx 435)
+   - **Scope ambiguity**:某条 SPEC 项指代不明 / 多种合理解读
+   - **缺细节**:实操时 implementer 会 stuck 的地方(e.g., SPEC 没说怎么生成 fixture / 没列 raw value)
+   - **Contradictions**:跟现有 ADR / spec / hard rules 冲突
+   - **Unsafe assumptions**:e.g., 假设某 backend endpoint 已存在但其实没
+
+   **Code(*.swift / Package.swift / project.pbxproj / *.py)PR** — 加上面 doc 项 + 以下 code-specific:
+   - **Build / test sanity**:跑 `swift test --package-path Modules/<X>` / `xcodebuild build -scheme MeetPR-Demo` 验是否真过(read-only,不 commit)
+   - **Type safety**:Swift force unwrap / `try!` / Sendable 缺 / Actor 隔离漏 / Codable schema drift
+   - **API style**:跟 Swift API Design Guidelines + 现有 codebase 风格(WeightInputField / DraftStore 等已合 view)是否一致
+   - **测试洞**:覆盖 happy path 但漏 edge case(空输入 / 越界 / 0 1RM 学员 / 评估期学员 等)
+   - **Lint conflicts**:swiftlint identifier_name(短变量名)/ swift-format OrderedImports 排序 — 跟 main 现有 disable comment pattern 是否一致
+
+   **JSON / fixture / data PR**:
+   - schema 跟 Codable model 对齐 / row count / id namespace 不冲突 / encode round-trip 不变
+
+   **`project.pbxproj` / build config / scheme PR**:
+   - INFOPLIST_KEY 是否 dead(GENERATE_INFOPLIST_FILE=NO 下的)/ signing setup / scheme 跟 build configuration 一致
+
+4. **回 review** via `gh pr review NN --repo OWNER/REPO --comment --body "..."`(可多次发,每条 finding 一段)
+   - **⚠️ same-account 限制**(per Codex review PR #53 finding P1):你通过 `gh` 用 David 账号 pose,跟 PR author 同账号,GitHub **拒绝自审**(`--approve` / `--request-changes` 都返 `422 Can not approve your own pull request`)。**always use `--comment`**;严重 blocker 在 body 内显式标 `## ⚠️ BLOCKER` 让 user 一眼看到
+   - 即便不能 `--request-changes`,blocker 也必须在 PR body 里明确,user 看到会决定让 Claude 改 PR 后再合
+5. **报告给 user**(简短 ack):列 finding 数 + 严重度分类(P1 BLOCKER / P2 应修 / P3 建议)+ PR comments URL,1-3 行
+
+### Claude amend 后是否要你 re-review
+
+(per Codex review PR #53 finding P2b — 之前没说)
+
+- **要 re-review**:Claude 在 Codex review 后做的 **非 typo amend**(改了 finding 涉及内容 / 改了 SPEC 实质 / 改了规则 wording)→ user 会再 paste 一次 review prompt 给你跑 second pass
+- **免 re-review**:typo / metadata 字段填值 / 单纯 commit message 改(不动 SPEC body)/ 紧急 hotfix(per CLAUDE.md 例外列表)
+- 你 second pass 时:read 同 PR diff(已 force-push 的新 commit) + 上次 review comments + 看 Claude 是否真采纳;若仍有遗漏 finding,继续 `--comment` 回新 finding
+
+### 跟 §文档质疑权 (CHALLENGE.md) 的边界
+
+(per Codex review PR #53 finding P2a — 之前模糊)
+
+| 情境 | 走 PR review pass 还是 CHALLENGE? |
+|---|---|
+| 发现 SPEC 数字 / API name / 路径错(spec 022 Q1 模板) | PR review pass(`gh pr review --comment`) |
+| 发现 SPEC 缺细节 / 歧义 / 跟现有 ADR contradicts | PR review pass |
+| 发现 SPEC 的**设计决策本身**有 fundamental 问题(e.g., 要求用一个 API 但该 API iOS 17 删了 / 架构方向跟 ADR-005 反向)且 review comment 不够分量 | **CHALLENGE.md**(走 §文档质疑权 协议:停止动手 + 写 CHALLENGE.md + 等 user 裁决) |
+| 发现 SPEC 的接口 / 数据 model 不可实现 | CHALLENGE.md |
+
+边界判断:**PR review pass = pre-merge tactical 反馈**(可在 PR 内 amend 解决);**CHALLENGE = strategic 反对**(需要重 spec / 重 ADR)。同 PR amend 能解决就走 review pass;不能就 CHALLENGE。
+
+### 不做的事
+
+- ❌ 不动 PR 内任何文件(纯 review,不 commit;若需修改 → 在 comment 里说"BLOCKER",让 Claude 改 PR 内容)
+- ❌ 不自己 merge(merge 决策仍归 user)
+- ❌ 不质疑 SPEC 的设计决策**用 PR review**(走 §文档质疑权 CHALLENGE.md 协议)
+- ❌ 不开新 spec(本 review 仅给现 PR 反馈)
+
+### 缘起
+
+2026-05-13 加。spec 022 由 Claude 写,你 impl 时 catch 到 436 vs 435 事实错误 + PlanningDisplay 中文映射 SPEC 漏。**前置你做 review 能省一次 amendment cycle,提高 PR quality 进入 merge 前的成熟度**。同日扩 Claude 也写 code(你限额 fallback)→ scope 包含 code PR(不只 doc)。规则本身也经你 review(meta:PR #53),3 个 findings 全采纳改进了 wording(same-account `--approve` 限制 / re-review 触发条件 / 跟 CHALLENGE 边界)。
+
+---
+
 ## 技术栈(跟随 CLAUDE.md,此处简述)
 
 - **平台**:iOS 17+
@@ -294,7 +365,24 @@ Claude 裁决三种结果:
 | **任何 `.swift` / `Package.swift`** | ❌ | ✅ 必过 | 代码是复利性资产 |
 | 配置文件(`.swiftlint.yml`、`.swift-format`、CI、`.gitignore` 等) | ❌ | ✅ | 一次配错腐蚀几个月 |
 | 依赖 **minor/major** 升级 | ❌ | ✅ | 可能引入 breaking change |
-| `AGENTS.md`、`CLAUDE.md`、ADR、`prds/` | ❌ | ✅ + **用户最终确认** | 规则不能被执行者改 |
+| `AGENTS.md`、`CLAUDE.md`、ADR、`prd.md` | ❌ | ✅ + **用户最终确认** | 规则不能被执行者改 |
+
+### 例外:spec impl PR 的 CLAUDE.md "当前完成态"段 sync
+
+(per 2026-05-10 lesson + Codex review PR #52 finding #4 — 之前模糊导致跟"CLAUDE.md 改动需独立 PR + 用户确认"冲突)
+
+**spec impl PR 允许同 PR 内** sync `CLAUDE.md` 的:
+- §当前完成态 段(加 spec NN 一行)
+- §下一步 表(W状态翻 ✅)
+
+**目的**:避免再开 follow-up sync PR drift(spec 020/021/022 都吃过亏)。spec impl PR squash merge 时这部分 CLAUDE.md 改动跟代码一起进 main,不算单独的"CLAUDE.md 改动",免独立 PR + 免用户最终确认。
+
+**仍需独立 PR + 用户最终确认的 CLAUDE.md 改动**:
+- §角色 / §硬冻结 / §约定 / §技术栈 / §代码规范 / §常用操作 / §关联资产 / §Recent design changes / §Session 启动必读顺序 / §PR Codex review pass 等所有非"当前完成态/下一步"段
+- AGENTS.md 任何改动
+- ADR 任何改动(`~/Brain/wiki/projects/MeetPR/decisions/*.md`)
+- PRD 任何改动(`~/Brain/wiki/projects/MeetPR/prd.md` — 单文件,**不是** `prds/` 目录;per Codex review PR #53 second-pass P3)
+- 产品决策 PD 任何改动(`~/Brain/wiki/projects/MeetPR/product-decisions/*.md`)
 
 ### 怎么判定可以自 merge
 
