@@ -14,6 +14,7 @@ public struct ExerciseSetEditorCard: View {
   @State private var targetRepsMax: Int?
   @State private var intensityMode: IntensityMode
   @State private var targetValue: Decimal
+  @State private var notes: String
   @State private var didSave = false
 
   public init(viewModel: PlanningViewModel, draftExercise: DraftPlanExercise) {
@@ -27,6 +28,7 @@ public struct ExerciseSetEditorCard: View {
     self._targetRepsMax = State(initialValue: spec.targetRepsMax)
     self._intensityMode = State(initialValue: spec.intensityMode)
     self._targetValue = State(initialValue: spec.targetValue)
+    self._notes = State(initialValue: spec.notes ?? "")
     self._didSave = State(initialValue: viewModel.setSpec(for: draftExercise.id) != nil)
   }
 
@@ -88,6 +90,22 @@ public struct ExerciseSetEditorCard: View {
         )
         .onChange(of: targetRepsMax) { _, _ in persist() }
 
+        VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+          Text("备注")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+          TextField(
+            "可选 · 比如暂停 3 秒 / 节奏 3-0-1 / 卧距宽",
+            text: $notes,
+            axis: .vertical
+          )
+          .lineLimit(1...3)
+          .padding(MeetPRSpacing.sm)
+          .background(Color.MeetPR.surface2)
+          .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
+          .onChange(of: notes) { _, _ in persist() }
+        }
+
         PrimaryButton(didSave ? "更新 W1 设置" : "保存 W1 设置", isFullWidth: true) {
           persist()
         }
@@ -144,7 +162,8 @@ public struct ExerciseSetEditorCard: View {
       targetReps: targetReps,
       targetRepsMax: targetRepsMax,
       intensityMode: intensityMode,
-      targetValue: targetValue
+      targetValue: targetValue,
+      notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes
     )
   }
 
@@ -163,6 +182,7 @@ public struct ExerciseSetEditorCard: View {
     targetRepsMax = spec.targetRepsMax
     intensityMode = spec.intensityMode
     targetValue = spec.targetValue
+    notes = spec.notes ?? ""
     didSave = true
   }
 }
