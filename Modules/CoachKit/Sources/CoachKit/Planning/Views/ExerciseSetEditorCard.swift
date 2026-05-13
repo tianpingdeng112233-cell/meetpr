@@ -15,14 +15,6 @@ public struct ExerciseSetEditorCard: View {
   @State private var intensityMode: IntensityMode
   @State private var targetValue: Decimal
   @State private var didSave = false
-  @State private var expandedField: ExpandedField?
-
-  private enum ExpandedField: Hashable {
-    case setCount
-    case targetReps
-    case targetRepsMax
-    case rpe
-  }
 
   public init(viewModel: PlanningViewModel, draftExercise: DraftPlanExercise) {
     self.viewModel = viewModel
@@ -65,8 +57,7 @@ public struct ExerciseSetEditorCard: View {
             label: "RPE",
             value: rpeBinding,
             range: 1...10,
-            step: 0.5,
-            isExpanded: isExpandedBinding(for: .rpe)
+            step: 0.5
           )
         }
 
@@ -74,8 +65,7 @@ public struct ExerciseSetEditorCard: View {
           label: "组数",
           value: setCountBinding,
           range: 1...20,
-          step: 1,
-          isExpanded: isExpandedBinding(for: .setCount)
+          step: 1
         )
         .onChange(of: setCount) { _, _ in persist() }
 
@@ -83,8 +73,7 @@ public struct ExerciseSetEditorCard: View {
           label: "次数",
           value: targetRepsBinding,
           range: 1...50,
-          step: 1,
-          isExpanded: isExpandedBinding(for: .targetReps)
+          step: 1
         )
         .onChange(of: targetReps) { _, newReps in
           if let currentMax = targetRepsMax, currentMax < newReps {
@@ -95,8 +84,7 @@ public struct ExerciseSetEditorCard: View {
 
         OptionalRepsMaxRow(
           value: $targetRepsMax,
-          minimum: targetReps,
-          isExpanded: isExpandedBinding(for: .targetRepsMax)
+          minimum: targetReps
         )
         .onChange(of: targetRepsMax) { _, _ in persist() }
 
@@ -149,13 +137,6 @@ public struct ExerciseSetEditorCard: View {
     )
   }
 
-  private func isExpandedBinding(for field: ExpandedField) -> Binding<Bool> {
-    Binding(
-      get: { expandedField == field },
-      set: { expandedField = $0 ? field : nil }
-    )
-  }
-
   private func currentSpec() -> DraftSetSpec {
     DraftSetSpec(
       id: specID,
@@ -191,15 +172,11 @@ public struct ExerciseSetEditorCard: View {
 private struct OptionalRepsMaxRow: View {
   @Binding var value: Int?
   let minimum: Int
-  @Binding var isExpanded: Bool
 
   var body: some View {
     if value == nil {
       Button("添加次数上限", systemImage: "plus") {
         value = minimum
-        withAnimation(.easeInOut(duration: 0.2)) {
-          isExpanded = true
-        }
       }
       .font(Font.MeetPR.footnote)
       .buttonStyle(.borderless)
@@ -209,13 +186,11 @@ private struct OptionalRepsMaxRow: View {
           label: "次数上限",
           value: repsMaxBinding,
           range: Double(minimum)...60,
-          step: 1,
-          isExpanded: $isExpanded
+          step: 1
         )
 
         Button(role: .destructive) {
           value = nil
-          isExpanded = false
         } label: {
           Image(systemName: "xmark.circle.fill")
             .font(.body)

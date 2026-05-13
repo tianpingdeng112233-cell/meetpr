@@ -6,43 +6,6 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func planningCountPickerInitialValueShowsInCollapsedLabel() throws {
-  let probe = CountProbe(5)
-  let expandProbe = ExpandProbe(false)
-  let inspected = try planningCountPicker(
-    probe: probe,
-    expandProbe: expandProbe,
-    label: "组数",
-    range: 1...20,
-    step: 1
-  ).inspect()
-
-  let texts = inspected.findAll(ViewType.Text.self).compactMap { try? $0.string() }
-  #expect(texts.contains("组数"))
-  #expect(texts.contains("5"))
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func planningCountPickerLabelTapTogglesIsExpandedBinding() throws {
-  let probe = CountProbe(3)
-  let expandProbe = ExpandProbe(false)
-  let inspected = try planningCountPicker(
-    probe: probe,
-    expandProbe: expandProbe,
-    label: "组数",
-    range: 1...20,
-    step: 1
-  ).inspect()
-
-  let toggleButton = try #require(inspected.findAll(ViewType.Button.self).first)
-  try toggleButton.tap()
-
-  #expect(expandProbe.value == true)
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
 @Test func planningCountPickerEnumeratesTagsByStepWithinRange() throws {
   let tags = PlanningCountPicker.tags(for: 1...10, step: 0.5)
   #expect(tags.count == 19)
@@ -87,18 +50,16 @@ import ViewInspector
 @available(iOS 17.0, macOS 14.0, *)
 @Test func planningCountPickerIncrementButtonAddsStep() throws {
   let probe = CountProbe(5)
-  let expandProbe = ExpandProbe(false)
   let inspected = try planningCountPicker(
     probe: probe,
-    expandProbe: expandProbe,
     label: "组数",
     range: 1...20,
     step: 1
   ).inspect()
 
-  // Button order: label-toggle (1), minus (2), plus (3), chevron-toggle (4)
+  // Button order: minus (0), plus (1) — only ± buttons in current layout
   let buttons = inspected.findAll(ViewType.Button.self)
-  try buttons[2].tap()  // plus
+  try buttons[1].tap()  // plus
 
   #expect(probe.value == 6)
 }
@@ -107,17 +68,15 @@ import ViewInspector
 @available(iOS 17.0, macOS 14.0, *)
 @Test func planningCountPickerDecrementButtonSubtractsStep() throws {
   let probe = CountProbe(5)
-  let expandProbe = ExpandProbe(false)
   let inspected = try planningCountPicker(
     probe: probe,
-    expandProbe: expandProbe,
     label: "组数",
     range: 1...20,
     step: 1
   ).inspect()
 
   let buttons = inspected.findAll(ViewType.Button.self)
-  try buttons[1].tap()  // minus
+  try buttons[0].tap()  // minus
 
   #expect(probe.value == 4)
 }
@@ -126,34 +85,30 @@ import ViewInspector
 @available(iOS 17.0, macOS 14.0, *)
 @Test func planningCountPickerIncrementDisabledAtUpperBound() throws {
   let probe = CountProbe(20)
-  let expandProbe = ExpandProbe(false)
   let inspected = try planningCountPicker(
     probe: probe,
-    expandProbe: expandProbe,
     label: "组数",
     range: 1...20,
     step: 1
   ).inspect()
 
   let buttons = inspected.findAll(ViewType.Button.self)
-  #expect(buttons[2].isDisabled())  // plus disabled
+  #expect(buttons[1].isDisabled())  // plus disabled
 }
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func planningCountPickerDecrementDisabledAtLowerBound() throws {
   let probe = CountProbe(1)
-  let expandProbe = ExpandProbe(false)
   let inspected = try planningCountPicker(
     probe: probe,
-    expandProbe: expandProbe,
     label: "组数",
     range: 1...20,
     step: 1
   ).inspect()
 
   let buttons = inspected.findAll(ViewType.Button.self)
-  #expect(buttons[1].isDisabled())  // minus disabled
+  #expect(buttons[0].isDisabled())  // minus disabled
 }
 
 @MainActor
@@ -161,17 +116,15 @@ import ViewInspector
 @Test func planningCountPickerIncrementSnapsOffGridValueToNextTag() throws {
   // Legacy value 7.3 with step 0.5 → displayed as 7.5 (nearest tag) → + → 8.0
   let probe = CountProbe(7.3)
-  let expandProbe = ExpandProbe(false)
   let inspected = try planningCountPicker(
     probe: probe,
-    expandProbe: expandProbe,
     label: "RPE",
     range: 1...10,
     step: 0.5
   ).inspect()
 
   let buttons = inspected.findAll(ViewType.Button.self)
-  try buttons[2].tap()  // plus
+  try buttons[1].tap()  // plus
 
   #expect(probe.value == 8.0)
 }
@@ -188,19 +141,8 @@ private final class CountProbe {
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-private final class ExpandProbe {
-  var value: Bool
-
-  init(_ value: Bool) {
-    self.value = value
-  }
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
 private func planningCountPicker(
   probe: CountProbe,
-  expandProbe: ExpandProbe,
   label: String,
   range: ClosedRange<Double>,
   step: Double
@@ -212,10 +154,6 @@ private func planningCountPicker(
       set: { probe.value = $0 }
     ),
     range: range,
-    step: step,
-    isExpanded: Binding(
-      get: { expandProbe.value },
-      set: { expandProbe.value = $0 }
-    )
+    step: step
   )
 }
