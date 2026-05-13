@@ -95,17 +95,18 @@ public struct ProgressionRuleEditorCard: View {
   }
 
   private var incrementControl: some View {
-    Stepper(value: incrementBinding, in: 0...100, step: incrementStep) {
-      HStack {
-        Text("增减量")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Spacer()
-        Text(incrementLabel)
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .monospacedDigit()
-      }
+    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+      Text("增减量")
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+
+      PlanningNumberField(
+        value: incrementBinding,
+        range: 0...100,
+        step: incrementStep,
+        decimalIncrement: incrementDecimalStep,
+        unitLabel: incrementUnitLabel
+      )
     }
   }
 
@@ -120,17 +121,18 @@ public struct ProgressionRuleEditorCard: View {
 
       ForEach(rule.appliedWeeks.sorted(), id: \.self) { week in
         let index = rule.appliedWeeks.sorted().firstIndex(of: week) ?? 0
-        Stepper(value: customValueBinding(index: index), in: 0...300, step: customStep) {
-          HStack {
-            Text("W\(week) 值")
-              .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
-            Spacer()
-            Text(customValueLabel(index: index))
-              .font(Font.MeetPR.bodyEmphasis)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
-              .monospacedDigit()
-          }
+        VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+          Text("W\(week) 值")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+
+          PlanningNumberField(
+            value: customValueBinding(index: index),
+            range: 0...300,
+            step: customStep,
+            decimalIncrement: customDecimalStep,
+            unitLabel: customUnitLabel
+          )
         }
       }
     }
@@ -225,13 +227,23 @@ public struct ProgressionRuleEditorCard: View {
     }
   }
 
-  private var incrementLabel: String {
-    (rule.incrementValue ?? 0).planningFormatted()
+  private var incrementUnitLabel: String? {
+    unitLabel(for: rule.ruleType.dimension)
   }
 
-  private func customValueLabel(index: Int) -> String {
-    guard let sequence = rule.customSequence, sequence.indices.contains(index) else { return "0" }
-    return sequence[index].planningFormatted()
+  private var customUnitLabel: String? {
+    unitLabel(for: rule.customDimension)
+  }
+
+  private func unitLabel(for dimension: ProgressionRuleDimension?) -> String? {
+    switch dimension {
+    case .weight, nil:
+      "kg"
+    case .rpe:
+      "RPE"
+    case .sets, .reps:
+      nil
+    }
   }
 
   private func persistRule() {

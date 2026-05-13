@@ -15,6 +15,14 @@ public struct ExerciseSetEditorCard: View {
   @State private var intensityMode: IntensityMode
   @State private var targetValue: Decimal
   @State private var didSave = false
+  @State private var expandedField: ExpandedField?
+
+  private enum ExpandedField: Hashable {
+    case setCount
+    case targetReps
+    case targetRepsMax
+    case rpe
+  }
 
   public init(viewModel: PlanningViewModel, draftExercise: DraftPlanExercise) {
     self.viewModel = viewModel
@@ -53,18 +61,44 @@ public struct ExerciseSetEditorCard: View {
             }
           )
         } else {
-          RPEInput(value: rpeBinding)
+          PlanningCountPicker(
+            label: "RPE",
+            value: rpeBinding,
+            range: 1...10,
+            step: 0.5,
+            isExpanded: isExpandedBinding(for: .rpe)
+          )
         }
 
-        HStack(spacing: MeetPRSpacing.md) {
-          CountStepper(title: "组数", value: $setCount, range: 1...20)
-          CountStepper(title: "次数", value: $targetReps, range: 1...50)
-        }
+        PlanningCountPicker(
+          label: "组数",
+          value: setCountBinding,
+          range: 1...20,
+          step: 1,
+          isExpanded: isExpandedBinding(for: .setCount)
+        )
         .onChange(of: setCount) { _, _ in persist() }
-        .onChange(of: targetReps) { _, _ in persist() }
 
-        OptionalRepsMaxStepper(value: $targetRepsMax, minimum: targetReps)
-          .onChange(of: targetRepsMax) { _, _ in persist() }
+        PlanningCountPicker(
+          label: "次数",
+          value: targetRepsBinding,
+          range: 1...50,
+          step: 1,
+          isExpanded: isExpandedBinding(for: .targetReps)
+        )
+        .onChange(of: targetReps) { _, newReps in
+          if let currentMax = targetRepsMax, currentMax < newReps {
+            targetRepsMax = newReps
+          }
+          persist()
+        }
+
+        OptionalRepsMaxRow(
+          value: $targetRepsMax,
+          minimum: targetReps,
+          isExpanded: isExpandedBinding(for: .targetRepsMax)
+        )
+        .onChange(of: targetRepsMax) { _, _ in persist() }
 
         PrimaryButton(didSave ? "更新 W1 设置" : "保存 W1 设置", isFullWidth: true) {
           persist()
@@ -101,6 +135,27 @@ public struct ExerciseSetEditorCard: View {
     )
   }
 
+  private var setCountBinding: Binding<Double> {
+    Binding(
+      get: { Double(setCount) },
+      set: { setCount = Int($0) }
+    )
+  }
+
+  private var targetRepsBinding: Binding<Double> {
+    Binding(
+      get: { Double(targetReps) },
+      set: { targetReps = Int($0) }
+    )
+  }
+
+  private func isExpandedBinding(for field: ExpandedField) -> Binding<Bool> {
+    Binding(
+      get: { expandedField == field },
+      set: { expandedField = $0 ? field : nil }
+    )
+  }
+
   private func currentSpec() -> DraftSetSpec {
     DraftSetSpec(
       id: specID,
@@ -132,78 +187,49 @@ public struct ExerciseSetEditorCard: View {
 }
 
 @MainActor
-private struct RPEInput: View {
-  @Binding var value: Double
-
-  var body: some View {
-    Stepper(value: $value, in: 1...10, step: 0.5) {
-      HStack {
-        Text("RPE")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Spacer()
-        Text(value.formatted(.number.precision(.fractionLength(1))))
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .monospacedDigit()
-      }
-    }
-  }
-}
-
-@MainActor
-private struct CountStepper: View {
-  let title: String
-  @Binding var value: Int
-  let range: ClosedRange<Int>
-
-  var body: some View {
-    Stepper(value: $value, in: range) {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-        Text(title)
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Text(value.formatted())
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .monospacedDigit()
-      }
-    }
-  }
-}
-
-@MainActor
-private struct OptionalRepsMaxStepper: View {
+@available(iOS 17.0, macOS 14.0, *)
+private struct OptionalRepsMaxRow: View {
   @Binding var value: Int?
   let minimum: Int
+  @Binding var isExpanded: Bool
 
   var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Toggle("次数上限", isOn: hasRangeBinding)
-        .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-
-      if value != nil {
-        Stepper(value: repsMaxBinding, in: minimum...60) {
-          Text("最多 \(value ?? minimum) 次")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+    if value == nil {
+      Button("添加次数上限", systemImage: "plus") {
+        value = minimum
+        withAnimation(.easeInOut(duration: 0.2)) {
+          isExpanded = true
         }
+      }
+      .font(Font.MeetPR.footnote)
+      .buttonStyle(.borderless)
+    } else {
+      HStack(spacing: MeetPRSpacing.sm) {
+        PlanningCountPicker(
+          label: "次数上限",
+          value: repsMaxBinding,
+          range: Double(minimum)...60,
+          step: 1,
+          isExpanded: $isExpanded
+        )
+
+        Button(role: .destructive) {
+          value = nil
+          isExpanded = false
+        } label: {
+          Image(systemName: "xmark.circle.fill")
+            .font(.body)
+        }
+        .buttonStyle(.borderless)
+        .accessibilityLabel("删除次数上限")
       }
     }
   }
 
-  private var hasRangeBinding: Binding<Bool> {
+  private var repsMaxBinding: Binding<Double> {
     Binding(
-      get: { value != nil },
-      set: { isOn in value = isOn ? max(minimum, value ?? minimum) : nil }
-    )
-  }
-
-  private var repsMaxBinding: Binding<Int> {
-    Binding(
-      get: { value ?? minimum },
-      set: { value = max(minimum, $0) }
+      get: { Double(value ?? minimum) },
+      set: { value = max(minimum, Int($0)) }
     )
   }
 }

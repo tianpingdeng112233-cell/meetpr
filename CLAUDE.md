@@ -44,16 +44,17 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 
 **所有 spec 决策按"是否在 V0 路径上"裁剪。** V0 路径 = `启动 → 登录 → 教练规划 Step 0-7(周卡片横滑) → 本机 DraftStore 保存`,**不接 backend,不开学员端**。详见 [[~/Brain/wiki/projects/MeetPR/roadmap|roadmap.md]]。
 
-### 当前完成态(2026-05-10)
+### 当前完成态(2026-05-13)
 
 - **8 SPM module + 14 atomic 组件** foundation 就位
-- **已完整实装 + 合并 spec**(10 个):
+- **已完整实装 + 合并 spec**(12 个):
   - [001 bootstrap](./specs/001-bootstrap) / [002 CoreModels identity](./specs/002-core-models-identity) / [003 design system](./specs/003-design-system-foundation) / [004 training plan domain](./specs/004-core-models-training-plan)
   - [005 coach planning step 0-3](./specs/005-coach-planning-step-0-3) / [006 step 4 accessories](./specs/006-coach-planning-step-4-accessories) / [**007 step 5-7 week-card-swipe**](./specs/007-coach-planning-step-5-7-week-card-swipe) — coach 规划 UI **0-7 步全可点**(close-out 2026-05-10,impl PR #37)
   - [011 auth UI flow](./specs/011-auth-ui-flow) — 登录 / 注册 / role-routed root
   - [**020 V0 demo orchestration**](./specs/020-v0-demo-orchestration) — SPEC + impl 全合 main 2026-05-10(spec PR #39 + impl PR #41);DemoAuthRepository / DemoTokenStore / DEMO_MODE build config 全就位
   - [**021 Apple readiness assets + signing**](./specs/021-apple-readiness-assets-and-signing) — AppIcon / LaunchScreen / PrivacyInfo.xcprivacy / signing build settings / archive 前置物就位
   - [**022 exercise library v2 import**](./specs/022-exercise-library-v2-import) — 动作库 v2 catalog 已导入(435 imported + 3 synthetic = 438),CoachKit bundle resource + enum schema 已同步
+  - [**023 planning numeric input**](./specs/023-planning-numeric-input) — Step 5 内 4 处数字栏(组数/次数/次数上限/RPE)换为 `PlanningCountPicker` iOS 转盘 + inline 展开;Step 6 内 2 处(weekly increment / custom 周值)换为 `PlanningNumberField` `[-][TextField][+]` sandwich(impl PR #54)
 - **Backend**: auth + coach planning CRUD 已合 staging(❄️ **FROZEN**,详见 [`MeetPR-backend/CLAUDE.md`](~/Projects/apps/MeetPR-backend/CLAUDE.md) 顶部 callout)
 - **核心 ADR**(8 个):[ADR-003](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md) 双端架构 / [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型 / [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构 / [ADR-006](~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md) macro API / [ADR-007](~/Brain/wiki/projects/MeetPR/decisions/007-web-framework-selection.md) 网页框架 / [ADR-009](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md) SwiftData 例外
 
