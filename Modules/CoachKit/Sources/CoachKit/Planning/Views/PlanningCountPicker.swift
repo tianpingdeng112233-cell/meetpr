@@ -42,40 +42,99 @@ struct PlanningCountPicker: View {
   }
 
   private var labelRow: some View {
-    Button {
-      withAnimation(.easeInOut(duration: 0.2)) {
-        isExpanded.toggle()
-      }
-    } label: {
-      HStack(spacing: MeetPRSpacing.sm) {
-        Text(label)
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-
-        Spacer()
-
-        Text(formattedDisplay(value))
-          .font(Font.MeetPR.body)
-          .monospacedDigit()
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-
-        if let unitLabel {
-          Text(unitLabel)
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+    HStack(spacing: MeetPRSpacing.sm) {
+      Button {
+        withAnimation(.easeInOut(duration: 0.2)) {
+          isExpanded.toggle()
         }
+      } label: {
+        HStack(spacing: 0) {
+          Text(label)
+            .font(Font.MeetPR.bodyEmphasis)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Spacer(minLength: MeetPRSpacing.sm)
+        }
+        .contentShape(.rect)
+        .padding(.vertical, MeetPRSpacing.sm)
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(accessibilityLabel)
+      .accessibilityHint(isExpanded ? "已展开转盘,双击收起" : "双击展开转盘")
 
+      stepButton(systemName: "minus", accessibilityLabel: "减少", action: decrementTapped)
+        .disabled(decrementDisabled)
+
+      Text(formattedDisplay(value))
+        .font(Font.MeetPR.body)
+        .monospacedDigit()
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .frame(minWidth: 36)
+
+      stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
+        .disabled(incrementDisabled)
+
+      if let unitLabel {
+        Text(unitLabel)
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
+
+      Button {
+        withAnimation(.easeInOut(duration: 0.2)) {
+          isExpanded.toggle()
+        }
+      } label: {
         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
           .font(.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
+          .frame(width: 28, height: 28)
+          .contentShape(.rect)
       }
-      .contentShape(.rect)
-      .padding(.vertical, MeetPRSpacing.sm)
+      .buttonStyle(.plain)
+      .accessibilityLabel(isExpanded ? "收起转盘" : "展开转盘")
+    }
+  }
+
+  private func stepButton(
+    systemName: String,
+    accessibilityLabel: String,
+    action: @escaping @MainActor () -> Void
+  ) -> some View {
+    Button(action: action) {
+      Image(systemName: systemName)
+        .font(.footnote)
+        .frame(width: 28, height: 28)
+        .background(Color.MeetPR.surface2)
+        .clipShape(.circle)
+        .contentShape(.rect)
     }
     .buttonStyle(.plain)
-    .accessibilityElement(children: .combine)
+    .foregroundStyle(Color.MeetPR.fgPrimary)
     .accessibilityLabel(accessibilityLabel)
-    .accessibilityHint(isExpanded ? "已展开转盘" : "双击展开转盘")
+  }
+
+  private func decrementTapped() {
+    let currentTag = Self.tag(for: value, range: range, step: step)
+    let nextTag = max(currentTag - 1, 0)
+    value = Self.value(forTag: nextTag, range: range, step: step)
+  }
+
+  private func incrementTapped() {
+    let currentTag = Self.tag(for: value, range: range, step: step)
+    let nextTag = min(currentTag + 1, maxTag)
+    value = Self.value(forTag: nextTag, range: range, step: step)
+  }
+
+  private var decrementDisabled: Bool {
+    Self.tag(for: value, range: range, step: step) <= 0
+  }
+
+  private var incrementDisabled: Bool {
+    Self.tag(for: value, range: range, step: step) >= maxTag
+  }
+
+  private var maxTag: Int {
+    Self.tag(for: range.upperBound, range: range, step: step)
   }
 
   private var wheel: some View {
