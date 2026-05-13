@@ -10,17 +10,17 @@ import Testing
   let competitionLifts = catalog.filter(\.isCompetitionLift)
 
   #expect(competitionLifts.count == 3)
-  #expect(Set(competitionLifts.map(\.name)) == ["竞技深蹲", "竞技卧推", "竞技硬拉"])
+  #expect(Set(competitionLifts.map(\.name)) == ["比赛式深蹲", "比赛式卧推", "比赛式硬拉"])
   #expect(competitionLifts.allSatisfy { $0.exerciseType == .mainLift })
-  #expect(competitionLifts.allSatisfy { $0.name.localizedStandardContains("竞技") })
+  #expect(competitionLifts.allSatisfy { $0.name.localizedStandardContains("比赛式") })
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func previewCatalogTotalCountIsFourThirtyEight() async throws {
+@Test func previewCatalogTotalCountIsFourThirtyOne() async throws {
   let catalog = try await previewCatalog()
 
-  #expect(catalog.count == 438)
-  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 435)
+  #expect(catalog.count == 431)
+  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 428)
   #expect(InMemoryPlanRepository.syntheticCompetitionLifts().count == 3)
 }
 
@@ -41,7 +41,7 @@ import Testing
   decoder.dateDecodingStrategy = .iso8601
   let decoded = try decoder.decode([Exercise].self, from: exerciseData)
 
-  #expect(decoded.count == 435)
+  #expect(decoded.count == 428)
   #expect(decoded.allSatisfy { !$0.muscleGroups.isEmpty })
   #expect(decoded.allSatisfy { !$0.equipment.isEmpty })
   #expect(decoded.allSatisfy { !$0.movementPattern.isEmpty })
