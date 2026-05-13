@@ -365,7 +365,7 @@ Claude 裁决三种结果:
 | **任何 `.swift` / `Package.swift`** | ❌ | ✅ 必过 | 代码是复利性资产 |
 | 配置文件(`.swiftlint.yml`、`.swift-format`、CI、`.gitignore` 等) | ❌ | ✅ | 一次配错腐蚀几个月 |
 | 依赖 **minor/major** 升级 | ❌ | ✅ | 可能引入 breaking change |
-| `AGENTS.md`、`CLAUDE.md`、ADR、`prds/` | ❌ | ✅ + **用户最终确认** | 规则不能被执行者改 |
+| `AGENTS.md`、`CLAUDE.md`、ADR、`prd.md` | ❌ | ✅ + **用户最终确认** | 规则不能被执行者改 |
 
 ### 例外:spec impl PR 的 CLAUDE.md "当前完成态"段 sync
 
