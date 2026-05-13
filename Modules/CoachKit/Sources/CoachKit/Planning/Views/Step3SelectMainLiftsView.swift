@@ -98,8 +98,13 @@ private struct MainLiftPickerRow: View {
           .tag(Optional<UUID>.none)
 
         ForEach(viewModel.mainLiftCatalog[family] ?? []) { exercise in
-          Text(exercise.name)
-            .tag(Optional(exercise.id))
+          if let nameEn = exercise.nameEn {
+            Text("\(exercise.name)  ·  \(nameEn)")
+              .tag(Optional(exercise.id))
+          } else {
+            Text(exercise.name)
+              .tag(Optional(exercise.id))
+          }
         }
       }
       .pickerStyle(.menu)
