@@ -263,7 +263,7 @@ if targetRepsMax == nil {
 引入 `@State textInput` 后,必须明确以下 4 个 sync 点(否则 textInput 跟外部 binding 漂移):
 
 1. **初始化**(组件首次 render):`init` 时 `_textInput = State(initialValue: formattedDisplay(value.wrappedValue))`,用同一个 display formatter(`.number.precision(.fractionLength(0...1))`)生成初始字符串
-2. **外部 binding 改变 + 用户没在打字**:`.onChange(of: value.wrappedValue) { _, newValue in if !isFocused { textInput = formattedDisplay(newValue) } }` — 防止 ProgressionRuleEditorCard `syncFromViewModel()` async save 后或 ExerciseSetEditorCard `targetReps` clamp 后 textInput 还是旧值
+2. **外部 binding 改变 + 用户没在打字**:`.onChange(of: value) { _, newValue in if !isFocused { textInput = formattedDisplay(newValue) } }` — 防止 ProgressionRuleEditorCard `syncFromViewModel()` async save 后或 ExerciseSetEditorCard `targetReps` clamp 后 textInput 还是旧值(注:`@Binding var value: Double` 在 view body 内 `value` 已是 `Double`;init/property-wrapper 上下文才用 `value.wrappedValue`)
 3. **`+` / `-` button tap**:**先 commit 当前 textInput**(走 normalize)再 apply ±step,否则用户刚打完"100"还没失焦就 tap `+`,会用旧 binding value 计算成 `oldValue + step` 而不是 `100 + step`。实装:
    ```swift
    private func incrementTapped() {
@@ -288,11 +288,11 @@ if targetRepsMax == nil {
 ## 验收清单
 
 - [ ] `Modules/CoachKit/Sources/CoachKit/Planning/Views/PlanningNumberField.swift` 创建,public API 跟 §做什么 #1 一致
-- [ ] `Modules/CoachKit/Tests/CoachKitTests/Planning/PlanningNumberFieldTests.swift` 创建,8 个 @Test 全过(per §做什么 #4)
+- [ ] `Modules/CoachKit/Tests/CoachKitTests/Planning/PlanningNumberFieldTests.swift` 创建,10 个 @Test 全过(per §做什么 #4 原 8 个 + §textInput 生命周期 新增 2 个 lifecycle test)
 - [ ] `ExerciseSetEditorCard.swift` 4 处 Stepper / CountStepper / OptionalRepsMaxStepper 替换为 PlanningNumberField
 - [ ] `ExerciseSetEditorCard.swift` 删除 `private struct CountStepper` + `private struct OptionalRepsMaxStepper`(grep 确认无其他引用)
 - [ ] `ProgressionRuleEditorCard.swift` 2 处 Stepper 替换为 PlanningNumberField
-- [ ] `swift test --parallel` 在 `Modules/CoachKit` 全绿(含新 8 个 + 现有测试)
+- [ ] `swift test --parallel` 在 `Modules/CoachKit` 全绿(含新 10 个 + 现有测试)
 - [ ] `xcodebuildmcp build_run_sim Scheme=MeetPR-Demo` iPhone 17 simulator 跑通,Step 5 + Step 6 visual sanity:input 控件不严重 overflow / 字号可读 / `-` / `+` Button hit area ≥ 28pt
 - [ ] spec 020 CHECKLIST.md 15 步 manual happy path 全过
 - [ ] `swiftlint lint --strict` + `swift-format lint` 通过(注意 swiftlint identifier_name — `value` 5 字符 OK,但 `step` 4 字符 < 5 也 OK,内部 `kg` 等 < 3 字符要 disable comment)
@@ -303,7 +303,7 @@ if targetRepsMax == nil {
 ## 估时(给 Codex 参考)
 
 - `PlanningNumberField` View 实装(layout C + binding + clamp + round):1.5 小时
-- `PlanningNumberFieldTests.swift` 8 个 @Test:1 小时
+- `PlanningNumberFieldTests.swift` 10 个 @Test:1 小时 15 分
 - `ExerciseSetEditorCard.swift` 替换 4 处 + 删 2 个 private struct + Optional reps max 处理:1 小时
 - `ProgressionRuleEditorCard.swift` 替换 2 处 + unit label 派生:30 分钟
 - `xcodebuildmcp build_run_sim` 视觉 sanity check + 修微调(布局可能需要 iterate):1 小时
