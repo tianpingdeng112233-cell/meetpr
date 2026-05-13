@@ -36,6 +36,7 @@ public struct WeightInputField: View {
 
       HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
         TextField(inputUnit.title, value: $inputValue, format: .number)
+          .planningDecimalKeyboard()
           .monospacedDigit()
           .padding(MeetPRSpacing.sm)
           .background(Color.MeetPR.surface2)
@@ -118,5 +119,16 @@ private enum WeightInputUnit: Hashable {
     case .percent:
       "%1RM"
     }
+  }
+}
+
+extension View {
+  @ViewBuilder
+  fileprivate func planningDecimalKeyboard() -> some View {
+    #if os(iOS)
+      keyboardType(.decimalPad)
+    #else
+      self
+    #endif
   }
 }
