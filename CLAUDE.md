@@ -150,3 +150,46 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 - **禁止**：在没有对应 PRD 条目的情况下实现新功能 — 产品决策先行
 - **禁止**：一次 commit 跨多个无关改动
 - **鼓励**：每写一个新决策（例如"为什么选 TCA 而不是 MVVM"）就沉淀到 `~/Brain/wiki/projects/MeetPR/decisions/` 里
+
+## PR Codex review pass(Claude 写的任何 PR merge 前必经 Codex 一遍)
+
+**触发**: 任何 PR(doc 或 code,`specs/NN/SPEC.md` / ADR / `CLAUDE.md` / `AGENTS.md` / `FOLLOWUPS.md` / README / 其他 `*.md` / `*.swift` / `Package.swift` / `*.json` / `*.py` / `project.pbxproj` 等)由 Claude 起草后,**merge 前必须先由 Codex review 一遍**。
+
+> **背景**:CLAUDE.md §角色 已规定 Claude 写 Swift 代码(过去 default 走 Codex,Codex 限额触顶 Claude 接管 code 实装)。无论谁写,另一方必 review = 双向 second-pair-of-eyes。本节定义 Claude 写 → Codex review 这一向;反向(Codex 写 → Claude review)是既有流程,无需新规则。
+
+**Claude 的程序**(开任意 PR 时):
+1. 开 PR(同既有流程,用 enforce_admins 套路 / 普通 push)
+2. 在汇报里给 user 一段 **self-contained Codex review prompt**(可直接 paste 到 Codex CLI),包含:
+   - PR # + URL + Files-changed 链接
+   - PR 的 trigger 上下文(为什么写这个)
+   - review 任务说明(按 PR 类型选项,见下表)
+   - 报告 expectation:**always `--comment`**(per Codex review PR #53 finding P1 — same-account `--approve` / `--request-changes` GitHub 拒绝);严重 blocker 在 comment body 显式标 `## ⚠️ BLOCKER`
+3. **不**在 Codex review 完成前催 user merge(让 user 看到 review 结果再决定)
+4. **Claude 修 review finding 后**(per Codex review PR #53 finding P2b):
+   - **非 typo amend**(改 SPEC body / 规则 wording / 任何 finding 涉及内容)→ user 会再 paste review prompt 给 Codex 跑 second pass(Codex 会 read 新 commit + 上次 comments + 看是否真采纳)
+   - **typo / metadata / 紧急 hotfix**:走 §例外 列表免 re-review
+
+**review 重点 by PR 类型**:
+
+| PR 类型 | 让 Codex 找的 |
+|---|---|
+| **Doc / spec / ADR / *.md** | factual errors / scope ambiguity / 缺细节 / contradictions / unsafe assumptions |
+| **Code(*.swift / Package.swift / config)** | 上面 + Swift API Design Guidelines / 现有 codebase 风格契合度 / Sendable + Actor 隔离 / force unwrap / type 错误 / 测试覆盖洞 / `swift test` + `xcodebuild` 是否能跑(快速 sanity) |
+| **JSON / fixture(数据)** | schema 跟 Codable model 对齐 / row count / id namespace 不冲突 / encode round-trip |
+| **`project.pbxproj` / build config** | INFOPLIST_KEY 是否 dead / signing setup / scheme 一致 |
+
+**为什么这条规则**:
+2026-05-13 加。spec 022 由 Claude 写,Codex impl 时 catch 到事实错误(catalog 总条数 SPEC 写 436 实际 xlsx 是 435)+ 补 PlanningDisplay 中文映射(SPEC 漏)。**前置 Codex review 能 catch 这类问题,省一次 amendment cycle**。同日扩 Claude 也写 code(Codex 限额 fallback)— 同样需要双向 review。规则本身经 Codex review(meta:PR #53)采纳了 3 个 wording fix(same-account `--approve` 限制 / re-review 触发 / 跟 CHALLENGE 边界)。
+
+**例外**(免 Codex review):
+- 修字符 typo / 链接 dead URL / 单纯 frontmatter 字段填值(无语义改动)
+- 已经经 Codex review 过的 PR 的**小修** follow-up commit(force-push 同 PR 内 + 改的不是 finding 内容)
+- 紧急 hotfix(Apple 审核拒回 / production blocker / CI red 阻塞)— merge 后补 review
+- 由 Codex 起草的 PR(它写它自己 review 不算 second-pair;Claude 接管 review,这是既有流程)
+
+**跟 CHALLENGE.md 的边界**(per Codex review PR #53 finding P2a):
+- **PR review pass**(本节)= pre-merge tactical 反馈,可在 PR 内 amend 解决(factual / scope / 缺细节)
+- **CHALLENGE.md**(详 [`AGENTS.md` §文档质疑权](./AGENTS.md))= strategic 反对,需要重 spec / 重 ADR(SPEC 设计本身 fundamental 错 / 接口不可实现 / 跟 ADR 反向)
+- 简单判断:同 PR amend 能解决就走 review pass;不能就 CHALLENGE
+
+详细 Codex 端职责见 [`AGENTS.md` §PR review pass](./AGENTS.md)。
