@@ -15,7 +15,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Box Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000002",
@@ -33,7 +34,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "High Box Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000003",
@@ -51,7 +53,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Low Box Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000004",
@@ -69,7 +72,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Wide Stance Zercher Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000005",
@@ -87,7 +91,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Banded Front Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000006",
@@ -105,7 +110,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Front Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000007",
@@ -123,7 +129,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pause Front Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000008",
@@ -141,7 +148,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Safety Bar Front Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000009",
@@ -159,7 +167,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Handle Safety Bar Pause Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000a",
@@ -177,7 +186,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Handle Safety Bar Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000b",
@@ -195,7 +205,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pin Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000c",
@@ -215,7 +226,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Tempo Pin Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000d",
@@ -233,7 +245,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "1¼ Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000f",
@@ -251,7 +264,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Anderson Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000010",
@@ -269,7 +283,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pause-on-Ascent Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000011",
@@ -287,7 +302,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Squat from the Floor"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000012",
@@ -305,7 +321,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Buffalo Bar Tempo Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000013",
@@ -323,7 +340,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Heels-Elevated Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000014",
@@ -341,7 +359,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Geared Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000015",
@@ -359,7 +378,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "High Bar Pause Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000016",
@@ -377,7 +397,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "High Bar Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000017",
@@ -395,7 +416,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "High Bar Tempo Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000018",
@@ -413,7 +435,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Slant Board Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000019",
@@ -431,7 +454,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pause Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001a",
@@ -449,7 +473,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pause Half-Down Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001b",
@@ -467,7 +492,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pause Half-Up Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001c",
@@ -485,7 +511,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Band-Assisted Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001e",
@@ -503,7 +530,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Safety Bar Pause Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001f",
@@ -521,7 +549,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Safety Bar Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000020",
@@ -539,7 +568,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Competition Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000021",
@@ -557,7 +587,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Squat Jump"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000022",
@@ -575,7 +606,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Good Morning"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000023",
@@ -593,7 +625,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Tempo Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000024",
@@ -611,7 +644,8 @@
       "squat"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Zercher Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000025",
@@ -629,7 +663,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "3-Inch Sumo Block Pull"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000026",
@@ -647,7 +682,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Rack Pull"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000028",
@@ -665,7 +701,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "1-Inch Sumo Deficit Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000002b",
@@ -683,7 +720,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Banded Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000002d",
@@ -701,7 +739,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Conventional Deadlift with Top 2-Count Pause"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000002e",
@@ -719,7 +758,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Conventional Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000002f",
@@ -737,7 +777,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Conventional Pause Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000030",
@@ -755,7 +796,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Conventional Deficit Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000031",
@@ -773,7 +815,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Sumo Deficit Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000032",
@@ -791,7 +834,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Jefferson Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000033",
@@ -809,7 +853,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Above-Knee Pause Conventional Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000034",
@@ -827,7 +872,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Above-Knee Pause Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000035",
@@ -845,7 +891,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Below-Knee Pause Conventional Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000036",
@@ -863,7 +910,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Below-Knee Pause Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000037",
@@ -881,7 +929,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Knee Pause Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000038",
@@ -899,7 +948,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Band-Assisted Conventional Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000039",
@@ -917,7 +967,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Band-Assisted Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003a",
@@ -935,7 +986,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Snatch Grip Tempo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003b",
@@ -953,7 +1005,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Touch-and-Go Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003c",
@@ -971,7 +1024,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003d",
@@ -989,7 +1043,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Sumo Pause Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003e",
@@ -1007,7 +1062,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Tempo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003f",
@@ -1025,7 +1081,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Half Deadlift (Below Knee)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000040",
@@ -1043,7 +1100,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Sumo Half Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000041",
@@ -1061,7 +1119,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Elevated Conventional Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000042",
@@ -1079,7 +1138,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Elevated Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000043",
@@ -1097,7 +1157,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Conventional Bottom Iso Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000044",
@@ -1115,7 +1176,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Sumo Bottom Iso Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000045",
@@ -1133,7 +1195,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Off-Floor Pause Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000046",
@@ -1151,7 +1214,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Knee Pause Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000047",
@@ -1169,7 +1233,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Romanian Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000048",
@@ -1187,7 +1252,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Hip-Banded RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000049",
@@ -1205,7 +1271,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Snatch Grip RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004a",
@@ -1241,7 +1308,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Sumo RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004c",
@@ -1259,7 +1327,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Sumo Stance RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004d",
@@ -1279,7 +1348,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Tempo RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004e",
@@ -1297,7 +1367,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Snatch Grip Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004f",
@@ -1315,7 +1386,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Stiff Leg Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000050",
@@ -1333,7 +1405,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Tempo Stiff Leg Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000051",
@@ -1351,7 +1424,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Trap Bar Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000052",
@@ -1369,7 +1443,8 @@
       "hip_hinge"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Zercher Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000053",
@@ -1387,7 +1462,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Banded Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000054",
@@ -1405,7 +1481,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Banded Medium Grip Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000055",
@@ -1423,7 +1500,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Competition Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000056",
@@ -1441,7 +1519,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Banded / Chained Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000057",
@@ -1459,7 +1538,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pause Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000058",
@@ -1477,7 +1557,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Close Grip Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000059",
@@ -1495,7 +1576,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Dead Stop Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005a",
@@ -1513,7 +1595,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Extra-Wide Grip Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005b",
@@ -1531,7 +1614,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Feet-Up Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005c",
@@ -1549,7 +1633,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Long Pause Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005d",
@@ -1567,7 +1652,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Medium Grip Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005e",
@@ -1585,7 +1671,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Wide Grip Pause Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005f",
@@ -1603,7 +1690,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Pin Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000061",
@@ -1621,7 +1709,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Reverse Grip Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000062",
@@ -1639,7 +1728,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Slingshot Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000063",
@@ -1657,7 +1747,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Tempo Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000064",
@@ -1675,7 +1766,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Wide Grip Tempo Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000065",
@@ -1693,7 +1785,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Wide Grip Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000066",
@@ -1711,7 +1804,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Bench Brick Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000067",
@@ -1729,7 +1823,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Board Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000068",
@@ -1747,7 +1842,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Decline Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000069",
@@ -1765,7 +1861,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Floor Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006a",
@@ -1783,7 +1880,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Incline Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006b",
@@ -1801,7 +1899,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Banded Larsen Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006c",
@@ -1819,7 +1918,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Larsen Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006d",
@@ -1837,7 +1937,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Medium Grip Larsen Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006e",
@@ -1855,7 +1956,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "High Pin Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006f",
@@ -1873,7 +1975,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Close Grip Spoto Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000070",
@@ -1891,7 +1994,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Spoto Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000071",
@@ -1909,7 +2013,8 @@
       "horizontal_push"
     ],
     "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z"
+    "createdAt": "2026-05-12T10:11:42Z",
+    "nameEn": "Wide Grip Spoto Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000072",

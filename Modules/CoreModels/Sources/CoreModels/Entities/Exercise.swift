@@ -3,6 +3,7 @@ import Foundation
 public struct Exercise: Codable, Hashable, Sendable, Identifiable {
   public let id: UUID
   public let name: String
+  public let nameEn: String?
   public let exerciseType: ExerciseType
   public let mainLiftFamily: LiftFamily?
   public let isCompetitionLift: Bool
@@ -15,6 +16,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
   public init(
     id: UUID,
     name: String,
+    nameEn: String? = nil,
     exerciseType: ExerciseType,
     mainLiftFamily: LiftFamily? = nil,
     isCompetitionLift: Bool,
@@ -26,6 +28,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
   ) {
     self.id = id
     self.name = name
+    self.nameEn = nameEn
     self.exerciseType = exerciseType
     self.mainLiftFamily = mainLiftFamily
     self.isCompetitionLift = isCompetitionLift
@@ -41,6 +44,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
 
     id = try container.decode(UUID.self, forKey: .id)
     name = try container.decode(String.self, forKey: .name)
+    nameEn = try container.decodeIfPresent(String.self, forKey: .nameEn)
     exerciseType = try container.decode(ExerciseType.self, forKey: .exerciseType)
     mainLiftFamily = try container.decodeIfPresent(LiftFamily.self, forKey: .mainLiftFamily)
     isCompetitionLift = try container.decode(Bool.self, forKey: .isCompetitionLift)
@@ -59,6 +63,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
 
     try container.encode(id, forKey: .id)
     try container.encode(name, forKey: .name)
+    try container.encodeIfPresent(nameEn, forKey: .nameEn)
     try container.encode(exerciseType, forKey: .exerciseType)
     try container.encodeIfPresent(mainLiftFamily, forKey: .mainLiftFamily)
     try container.encode(isCompetitionLift, forKey: .isCompetitionLift)
@@ -72,6 +77,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
   private enum CodingKeys: String, CodingKey {
     case id
     case name
+    case nameEn
     case exerciseType
     case mainLiftFamily
     case isCompetitionLift

@@ -114,10 +114,18 @@ public struct ExerciseSetEditorCard: View {
   }
 
   private var header: some View {
-    HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
-      Text(viewModel.exerciseName(for: draftExercise))
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+    HStack(alignment: .top, spacing: MeetPRSpacing.sm) {
+      VStack(alignment: .leading, spacing: 2) {
+        Text(viewModel.exerciseName(for: draftExercise))
+          .font(Font.MeetPR.bodyEmphasis)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+
+        if let nameEn = viewModel.exerciseNameEn(for: draftExercise) {
+          Text(nameEn)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
+      }
 
       if draftExercise.isMainLift {
         StatusBadge(status: .live, title: "主项")

@@ -253,6 +253,7 @@ public actor InMemoryPlanRepository: PlanRepository {
       Exercise(
         id: uuid(20),
         name: "比赛式深蹲",
+        nameEn: "Competition Squat",
         exerciseType: .mainLift,
         mainLiftFamily: .squat,
         isCompetitionLift: true,
@@ -264,6 +265,7 @@ public actor InMemoryPlanRepository: PlanRepository {
       Exercise(
         id: uuid(21),
         name: "比赛式卧推",
+        nameEn: "Competition Bench Press",
         exerciseType: .mainLift,
         mainLiftFamily: .bench,
         isCompetitionLift: true,
@@ -275,6 +277,7 @@ public actor InMemoryPlanRepository: PlanRepository {
       Exercise(
         id: uuid(22),
         name: "比赛式硬拉",
+        nameEn: "Competition Deadlift",
         exerciseType: .mainLift,
         mainLiftFamily: .deadlift,
         isCompetitionLift: true,
