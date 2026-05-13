@@ -78,10 +78,12 @@ private struct MainLiftDaySection: View {
 }
 
 @MainActor
+@available(iOS 17.0, macOS 14.0, *)
 private struct MainLiftPickerRow: View {
   let dayOfWeek: Int
   let family: LiftFamily
   @Bindable var viewModel: PlanningViewModel
+  @State private var showingPicker = false
 
   var body: some View {
     HStack(spacing: MeetPRSpacing.md) {
@@ -90,38 +92,119 @@ private struct MainLiftPickerRow: View {
         .foregroundStyle(Color.MeetPR.fgPrimary)
         .frame(width: 56, alignment: .leading)
 
-      Picker(
-        PlanningDisplay.liftName(family),
-        selection: selectedExerciseID
-      ) {
-        Text("请选择")
-          .tag(Optional<UUID>.none)
-
-        ForEach(viewModel.mainLiftCatalog[family] ?? []) { exercise in
-          if let nameEn = exercise.nameEn {
-            Text("\(exercise.name)  ·  \(nameEn)")
-              .tag(Optional(exercise.id))
-          } else {
-            Text(exercise.name)
-              .tag(Optional(exercise.id))
-          }
+      Button {
+        showingPicker = true
+      } label: {
+        HStack(spacing: MeetPRSpacing.xs) {
+          Text(currentSelectionLabel)
+            .font(Font.MeetPR.body)
+            .foregroundStyle(
+              currentSelection == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary
+            )
+            .lineLimit(1)
+            .truncationMode(.tail)
+          Spacer()
+          Image(systemName: "chevron.up.chevron.down")
+            .font(.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
         }
+        .padding(.horizontal, MeetPRSpacing.sm)
+        .padding(.vertical, MeetPRSpacing.xs)
+        .background(Color.MeetPR.surface2)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
+        .contentShape(.rect)
       }
-      .pickerStyle(.menu)
+      .buttonStyle(.plain)
       .frame(maxWidth: .infinity, alignment: .leading)
+      .accessibilityLabel("\(PlanningDisplay.liftName(family)) 变式: \(currentSelectionLabel)")
+    }
+    .sheet(isPresented: $showingPicker) {
+      VariantPickerSheet(
+        family: family,
+        variants: viewModel.mainLiftCatalog[family] ?? [],
+        selectedID: currentSelection?.id,
+        onSelect: { exercise in
+          viewModel.selectedVariants[key] = exercise.id
+          showingPicker = false
+        }
+      )
     }
   }
 
-  private var selectedExerciseID: Binding<UUID?> {
-    Binding {
-      viewModel.selectedVariants[key]
-    } set: { newValue in
-      viewModel.selectedVariants[key] = newValue
+  private var currentSelection: Exercise? {
+    guard let selectedID = viewModel.selectedVariants[key] else { return nil }
+    return (viewModel.mainLiftCatalog[family] ?? []).first { $0.id == selectedID }
+  }
+
+  private var currentSelectionLabel: String {
+    guard let exercise = currentSelection else { return "请选择" }
+    if let nameEn = exercise.nameEn {
+      return "\(exercise.name)  ·  \(nameEn)"
     }
+    return exercise.name
   }
 
   private var key: DayLiftKey {
     DayLiftKey(dayOfWeek: dayOfWeek, liftFamily: family)
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct VariantPickerSheet: View {
+  let family: LiftFamily
+  let variants: [Exercise]
+  let selectedID: UUID?
+  let onSelect: (Exercise) -> Void
+
+  @State private var searchText = ""
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    NavigationStack {
+      List(filteredVariants, id: \.id) { exercise in
+        Button {
+          onSelect(exercise)
+        } label: {
+          HStack(spacing: MeetPRSpacing.sm) {
+            VStack(alignment: .leading, spacing: 2) {
+              Text(exercise.name)
+                .font(Font.MeetPR.body)
+                .foregroundStyle(Color.MeetPR.fgPrimary)
+              if let nameEn = exercise.nameEn {
+                Text(nameEn)
+                  .font(Font.MeetPR.footnote)
+                  .foregroundStyle(Color.MeetPR.fgSecondary)
+              }
+            }
+            Spacer()
+            if exercise.id == selectedID {
+              Image(systemName: "checkmark")
+                .foregroundStyle(Color.MeetPR.brandRed)
+            }
+          }
+          .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+      }
+      .listStyle(.plain)
+      .searchable(text: $searchText, prompt: "搜索 / Search")
+      .navigationTitle("\(PlanningDisplay.liftName(family))变式")
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("取消") { dismiss() }
+        }
+      }
+    }
+  }
+
+  private var filteredVariants: [Exercise] {
+    let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    if trimmed.isEmpty { return variants }
+    return variants.filter { exercise in
+      exercise.name.localizedStandardContains(trimmed)
+        || (exercise.nameEn?.localizedStandardContains(trimmed) ?? false)
+    }
   }
 }
 
