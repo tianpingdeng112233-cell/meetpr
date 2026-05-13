@@ -1,7 +1,7 @@
 # 023 — Planning numeric input(Step 5 转盘 picker + Step 6 `[ - ] [ TextField ] [ + ]` sandwich)
 
-- **状态**: Draft
-- **PR**: TBD
+- **状态**: Done
+- **PR**: https://github.com/tianpingdeng112233-cell/meetpr/pull/54
 - **触发**: User 2026-05-13 dogfood 反馈 — Step 6 custom 规则 W2/W3/W4 重量值 Stepper-only 设到 100kg 要 ~40 次点,300kg 要 ~120 次点,极不顺手。Step 5 set count / 次数 / RPE / repsMax stepper 同问题(范围小但同 friction)。Layout 决策 (C):**Stepper 拆 -/+ 包夹 TextField**(用户拍板)
 - **来源**:
   - 已合 [spec 005-007](../) coach planning Step 0-7(本 spec 改 Step 5 ExerciseSetEditorCard + Step 6 ProgressionRuleEditorCard 内部 input UI,**不动** state machine / business logic)
