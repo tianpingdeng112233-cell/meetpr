@@ -53,6 +53,7 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
   - [011 auth UI flow](./specs/011-auth-ui-flow) — 登录 / 注册 / role-routed root
   - [**020 V0 demo orchestration**](./specs/020-v0-demo-orchestration) — SPEC + impl 全合 main 2026-05-10(spec PR #39 + impl PR #41);DemoAuthRepository / DemoTokenStore / DEMO_MODE build config 全就位
   - [**021 Apple readiness assets + signing**](./specs/021-apple-readiness-assets-and-signing) — AppIcon / LaunchScreen / PrivacyInfo.xcprivacy / signing build settings / archive 前置物就位
+  - [**022 exercise library v2 import**](./specs/022-exercise-library-v2-import) — 动作库 v2 catalog 已导入(435 imported + 3 synthetic = 438),CoachKit bundle resource + enum schema 已同步
 - **Backend**: auth + coach planning CRUD 已合 staging(❄️ **FROZEN**,详见 [`MeetPR-backend/CLAUDE.md`](~/Projects/apps/MeetPR-backend/CLAUDE.md) 顶部 callout)
 - **核心 ADR**(8 个):[ADR-003](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md) 双端架构 / [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型 / [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构 / [ADR-006](~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md) macro API / [ADR-007](~/Brain/wiki/projects/MeetPR/decisions/007-web-framework-selection.md) 网页框架 / [ADR-009](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md) SwiftData 例外
 

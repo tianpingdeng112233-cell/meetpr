@@ -38,6 +38,7 @@ enum PlanningDisplay {
     days.sorted().map(weekdayName).joined(separator: "·")
   }
 
+  // swiftlint:disable:next cyclomatic_complexity
   static func muscleGroupName(_ muscleGroup: MuscleGroup) -> String {
     switch muscleGroup {
     case .chest:
@@ -50,6 +51,8 @@ enum PlanningDisplay {
       "二头"
     case .triceps:
       "三头"
+    case .forearm:
+      "前臂"
     case .core:
       "核心"
     case .quad:
@@ -58,6 +61,24 @@ enum PlanningDisplay {
       "腘绳"
     case .glute:
       "臀"
+    case .hip:
+      "髋"
+    case .hipFlexor:
+      "屈髋"
+    case .adductor:
+      "内收"
+    case .calf:
+      "小腿"
+    case .tibialis:
+      "胫前"
+    case .trap:
+      "斜方"
+    case .mobility:
+      "活动度"
+    case .cardio:
+      "心肺"
+    case .grip:
+      "握力"
     }
   }
 
@@ -71,15 +92,35 @@ enum PlanningDisplay {
       "器械"
     case .bodyweight:
       "自重"
+    case .cable:
+      "绳索"
+    case .band:
+      "弹力带"
+    case .kettlebell:
+      "壶铃"
+    case .specialtyBar:
+      "特殊杆"
+    case .other:
+      "其他"
     }
   }
 
   static func movementPatternName(_ movementPattern: MovementPattern) -> String {
     switch movementPattern {
-    case .push:
-      "推"
-    case .pull:
-      "拉"
+    case .squat:
+      "蹲"
+    case .horizontalPush:
+      "水平推"
+    case .verticalPush:
+      "垂直推"
+    case .hipHinge:
+      "髋铰链"
+    case .horizontalPull:
+      "水平拉"
+    case .verticalPull:
+      "垂直拉"
+    case .other:
+      "其他"
     }
   }
 

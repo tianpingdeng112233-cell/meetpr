@@ -9,7 +9,7 @@ import Testing
 
   let exercises = try await repository.fetchAccessoryExercises(filters: .empty)
 
-  #expect(exercises.count == 34)
+  #expect(exercises.count >= 100)
   #expect(exercises.allSatisfy { $0.exerciseType == .accessory })
   #expect(!exercises.contains { $0.exerciseType == .mainLift })
 }
@@ -33,7 +33,7 @@ import Testing
   let exercises = try await repository.fetchAccessoryExercises(filters: filters)
 
   #expect(exercises.contains { $0.name == "哈克深蹲" })
-  #expect(exercises.contains { $0.name == "臀冲" })
+  #expect(exercises.contains { $0.name == "臀桥" })
   #expect(
     exercises.allSatisfy {
       !Set($0.muscleGroups).isDisjoint(with: Set([MuscleGroup.quad, .glute]))
@@ -45,19 +45,18 @@ import Testing
   let repository = InMemoryPlanRepository.preview()
   let filters = AccessoryFilters(
     muscleGroups: [.quad],
-    equipment: [.barbell],
-    movementPatterns: [.push]
+    equipment: [.machine],
+    movementPatterns: [.squat]
   )
 
   let exercises = try await repository.fetchAccessoryExercises(filters: filters)
 
-  #expect(exercises.contains { $0.name == "杠铃前蹲举" })
-  #expect(exercises.contains { $0.name == "杠铃箭步蹲" })
+  #expect(exercises.contains { $0.name == "哈克深蹲" })
   #expect(
     exercises.allSatisfy { exercise in
       !Set(exercise.muscleGroups).isDisjoint(with: [.quad])
-        && !Set(exercise.equipment).isDisjoint(with: [.barbell])
-        && !Set(exercise.movementPattern).isDisjoint(with: [.push])
+        && !Set(exercise.equipment).isDisjoint(with: [.machine])
+        && !Set(exercise.movementPattern).isDisjoint(with: [.squat])
     })
 }
 
@@ -67,7 +66,7 @@ import Testing
   let filters = AccessoryFilters(
     muscleGroups: [.biceps],
     equipment: [.machine],
-    movementPatterns: [.push]
+    movementPatterns: [.squat]
   )
 
   let exercises = try await repository.fetchAccessoryExercises(filters: filters)

@@ -1,6 +1,11 @@
 import Foundation
 
 public enum MovementPattern: String, Codable, Hashable, Sendable, CaseIterable {
-  case push = "push"  // swiftlint:disable:this redundant_string_enum_value
-  case pull = "pull"  // swiftlint:disable:this redundant_string_enum_value
+  case squat = "squat"
+  case horizontalPush = "horizontal_push"
+  case verticalPush = "vertical_push"
+  case hipHinge = "hip_hinge"
+  case horizontalPull = "horizontal_pull"
+  case verticalPull = "vertical_pull"
+  case other = "other"
 }

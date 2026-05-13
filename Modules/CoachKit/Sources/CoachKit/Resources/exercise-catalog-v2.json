@@ -1,0 +1,7912 @@
+[
+  {
+    "id": "00000000-0000-0000-ca70-000000000001",
+    "name": "箱式深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000002",
+    "name": "高箱深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000003",
+    "name": "低箱深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000004",
+    "name": "宽站距泽奇",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000005",
+    "name": "弹力带前深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000006",
+    "name": "前深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000007",
+    "name": "暂停前深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000008",
+    "name": "安全杆前蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000009",
+    "name": "扶手安全杆暂停深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000000a",
+    "name": "扶手安全杆深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000000b",
+    "name": "架上深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000000c",
+    "name": "节奏插销深蹲（架上）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000000d",
+    "name": "1又¼ 深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000000e",
+    "name": "4拍慢速3拍暂停比赛深蹲（430）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000000f",
+    "name": "Anderson 深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000010",
+    "name": "上升暂停深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000011",
+    "name": "背蹲地面起始设置",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000012",
+    "name": "水牛杆节奏深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000013",
+    "name": "单车深蹲(垫脚跟)",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000014",
+    "name": "装备深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000015",
+    "name": "高杠位暂停深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000016",
+    "name": "高杠位深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000017",
+    "name": "高杠位节奏深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000018",
+    "name": "坡上深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000019",
+    "name": "暂停深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000001a",
+    "name": "暂停深蹲(半程下)",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000001b",
+    "name": "暂停深蹲(半程上)",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000001c",
+    "name": "弹力带辅助深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000001d",
+    "name": "安全杆深蹲(JAI)",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000001e",
+    "name": "安全杆暂停深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000001f",
+    "name": "安全杆深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000020",
+    "name": "深蹲/比赛深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000021",
+    "name": "深蹲跳",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000022",
+    "name": "深蹲早安（早安蹲）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000023",
+    "name": "节奏深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000024",
+    "name": "泽奇深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000025",
+    "name": "3英寸相扑垫高拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000026",
+    "name": "垫高硬拉（架上）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000027",
+    "name": "1拍暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000028",
+    "name": "1英寸相扑站高 (下陷) 硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000029",
+    "name": "2拍暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000002a",
+    "name": "3拍暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000002b",
+    "name": "弹力带硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000002c",
+    "name": "C拍暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000002d",
+    "name": "传统硬拉顶部2拍暂停",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000002e",
+    "name": "传统硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000002f",
+    "name": "传统暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000030",
+    "name": "传统站高 (下陷)硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000031",
+    "name": "相扑站高 (下陷)硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000032",
+    "name": "Jefferson 硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000033",
+    "name": "膝上暂停传统硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000034",
+    "name": "膝上暂停相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000035",
+    "name": "膝下暂停传统硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000036",
+    "name": "膝下暂停相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000037",
+    "name": "膝部暂停相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000038",
+    "name": "弹力带辅助传统硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000039",
+    "name": "弹力带辅助相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000003a",
+    "name": "抓举握距节奏硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000003b",
+    "name": "相扑硬拉触地即起",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000003c",
+    "name": "相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000003d",
+    "name": "相扑暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000003e",
+    "name": "节奏硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000003f",
+    "name": "半程硬拉 (膝下）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000040",
+    "name": "半程相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000041",
+    "name": "高位等长传统硬拉（高位静力 -> continuous pulling硬拉）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000042",
+    "name": "高位等长相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000043",
+    "name": "低位等长传统硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000044",
+    "name": "低位等长相扑硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000045",
+    "name": "离地暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000046",
+    "name": "膝部暂停硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000047",
+    "name": "罗马尼亚硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000048",
+    "name": "弹力带绕髋RDL",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000049",
+    "name": "抓举握距RDL",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000004a",
+    "name": "错步罗马尼亚硬拉（前后站单腿罗拉）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000004b",
+    "name": "相扑RDL",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000004c",
+    "name": "相扑站距RDL",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000004d",
+    "name": "节奏RDL",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000004e",
+    "name": "抓举握距硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000004f",
+    "name": "直腿硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000050",
+    "name": "节奏直腿硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000051",
+    "name": "六角杆硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000052",
+    "name": "泽奇硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000053",
+    "name": "弹力带卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000054",
+    "name": "弹力带中握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000055",
+    "name": "卧推/比赛卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000056",
+    "name": "弹力带/链条卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000057",
+    "name": "C拍暂停卧推（C秒暂停）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000058",
+    "name": "窄握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000059",
+    "name": "死点卧推（无离心架上）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000005a",
+    "name": "超宽握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000005b",
+    "name": "抬脚卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000005c",
+    "name": "长暂停卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000005d",
+    "name": "中握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000005e",
+    "name": "暂停宽握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000005f",
+    "name": "插销卧推（架上卧推）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000060",
+    "name": "弹力带辅助卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000061",
+    "name": "反握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000062",
+    "name": "弹弓卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000063",
+    "name": "节奏卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000064",
+    "name": "节奏宽握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000065",
+    "name": "宽握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000066",
+    "name": "垫高推举 （卧推砖）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000067",
+    "name": "板推（木板垫高卧推）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000068",
+    "name": "下斜卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000069",
+    "name": "地板卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000006a",
+    "name": "上斜杠铃卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000006b",
+    "name": "弹力带拉森卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000006c",
+    "name": "拉森卧推（无腿直腿卧推）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000006d",
+    "name": "中握拉森卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000006e",
+    "name": "高位插销推举",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000006f",
+    "name": "窄握斯波托卧推（窄距 spoto）",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000070",
+    "name": "斯波托卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000071",
+    "name": "宽握斯波托卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000072",
+    "name": "俯身反向飞鸟",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000073",
+    "name": "哑铃古巴推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000074",
+    "name": "面拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000075",
+    "name": "哑铃前平举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000076",
+    "name": "杠铃片前平举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000077",
+    "name": "地雷推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000078",
+    "name": "绳索侧平举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000079",
+    "name": "哑铃侧平举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000007a",
+    "name": "侧平举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000007b",
+    "name": "坐姿哑铃侧平举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000007c",
+    "name": "器械军事推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000007d",
+    "name": "坐姿军事推举（坐姿杠铃推举）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000007e",
+    "name": "阿诺德推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000007f",
+    "name": "哑铃过头推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000080",
+    "name": "半跪姿过头推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000081",
+    "name": "单臂哑铃推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000082",
+    "name": "过头插销推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000083",
+    "name": "Y 字平举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000084",
+    "name": "哑铃后束划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000085",
+    "name": "直立划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000086",
+    "name": "坐姿哑铃推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000087",
+    "name": "维京推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000088",
+    "name": "Z推举（坐姿地板推举）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000089",
+    "name": "哑铃卧推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000008a",
+    "name": "哑铃反握卧推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000008b",
+    "name": "绳索交叉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000008c",
+    "name": "挤压推举（掌心相对）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000008d",
+    "name": "下斜哑铃卧推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000008e",
+    "name": "绳索飞鸟",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000008f",
+    "name": "绳索反向飞鸟",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000090",
+    "name": "哑铃飞鸟",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000091",
+    "name": "上斜哑铃飞鸟",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000092",
+    "name": "反向飞鸟",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000093",
+    "name": "六角推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000094",
+    "name": "上斜哑铃卧推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000095",
+    "name": "器械胸推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000096",
+    "name": "蝴蝶机夹胸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000097",
+    "name": "反向蝴蝶机",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000098",
+    "name": "俯卧撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000099",
+    "name": "斯文德推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000009a",
+    "name": "弹力带引体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000009b",
+    "name": "负重引体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000009c",
+    "name": "宽距引体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000009d",
+    "name": "反握引体向上",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000009e",
+    "name": "高位下拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000009f",
+    "name": "对握引体向上",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a0",
+    "name": "对握高位下拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a1",
+    "name": "引体向上",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a2",
+    "name": "单臂高位下拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a3",
+    "name": "直臂下拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a4",
+    "name": "颈后下拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a5",
+    "name": "抓举握距下拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a6",
+    "name": "哑铃仰卧上拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a7",
+    "name": "绳索仰卧直臂下拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a8",
+    "name": "斜方肌 3 区抬举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "trap"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000a9",
+    "name": "杠铃划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000aa",
+    "name": "绳索划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ab",
+    "name": "胸部支撑划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ac",
+    "name": "窄握绳索划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ad",
+    "name": "哑铃划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ae",
+    "name": "Helms 划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000af",
+    "name": "反向划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b0",
+    "name": "Kroc 划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b1",
+    "name": "器械划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b2",
+    "name": "梅多斯划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b3",
+    "name": "单臂绳索划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b4",
+    "name": "彭德雷划船（潘德雷）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b5",
+    "name": "俯撑哑铃划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b6",
+    "name": "海豹划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b7",
+    "name": "坐姿绳索划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b8",
+    "name": "坐姿划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000b9",
+    "name": "单臂哑铃划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ba",
+    "name": "T杆划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000bb",
+    "name": "高位划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000bc",
+    "name": "节奏划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000bd",
+    "name": "宽握绳索划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000be",
+    "name": "耶茨划船（反手划船）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000bf",
+    "name": "哑铃耸肩",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c0",
+    "name": "耸肩",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c1",
+    "name": "21 次法弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c2",
+    "name": "交替锤式弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c3",
+    "name": "杠铃弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c4",
+    "name": "贝叶斯弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c5",
+    "name": "绳索弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c6",
+    "name": "绳索锤式弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c7",
+    "name": "集中弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c8",
+    "name": "斜向锤式弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000c9",
+    "name": "哑铃弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ca",
+    "name": "哑铃锤式弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000cb",
+    "name": "拖动弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000cc",
+    "name": "曲杆弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000cd",
+    "name": "上斜哑铃弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ce",
+    "name": "牧师凳弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000cf",
+    "name": "反握弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "forearm"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d0",
+    "name": "蜘蛛弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d1",
+    "name": "佐特曼弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d2",
+    "name": "碎颅者",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d3",
+    "name": "JM推举（孤立三头）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d4",
+    "name": "钻石俯卧撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d5",
+    "name": "泰特推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d6",
+    "name": "哑铃三头肌伸展",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d7",
+    "name": "双杠臂屈伸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d8",
+    "name": "反握三头肌下压",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000d9",
+    "name": "三头肌后踢",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000da",
+    "name": "三头肌下压",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000db",
+    "name": "三头肌自选",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000dc",
+    "name": "绳索过头三头伸展",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000dd",
+    "name": "过头绳索伸展",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000de",
+    "name": "过头哑铃伸展",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000df",
+    "name": "杠铃片捏夹",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "forearm"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e0",
+    "name": "腕伸展",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "forearm"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e1",
+    "name": "腕屈曲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "forearm"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e2",
+    "name": "腰带深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e3",
+    "name": "哑铃/旋转腰带深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e4",
+    "name": "高脚杯深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e5",
+    "name": "节奏高脚杯深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e6",
+    "name": "哈克深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e7",
+    "name": "腿屈伸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e8",
+    "name": "倒蹬机",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000e9",
+    "name": "单腿倒蹬",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ea",
+    "name": "杠铃弓步蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000eb",
+    "name": "杠铃反向弓步蹲 (reverse as the motion not static)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ec",
+    "name": "屈膝礼弓步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ed",
+    "name": "哑铃反向弓步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ee",
+    "name": "高脚杯弓步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ef",
+    "name": "弓步蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f0",
+    "name": "行走弓步蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f1",
+    "name": "摆锤深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f2",
+    "name": "手枪蹲（单腿）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f3",
+    "name": "西斯深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f4",
+    "name": "辅助分腿蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f5",
+    "name": "保加利亚分腿蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f6",
+    "name": "哑铃保加利亚分腿蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f7",
+    "name": "哑铃分腿蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f8",
+    "name": "前脚抬高分腿蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000f9",
+    "name": "后脚抬高分腿蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000fa",
+    "name": "分腿蹲(臀部重点)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000fb",
+    "name": "分腿蹲(股四头重点)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000fc",
+    "name": "高脚杯暂停深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000fd",
+    "name": "登台",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000fe",
+    "name": "登台(股四头)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000000ff",
+    "name": "腘绳肌弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000100",
+    "name": "腿弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000101",
+    "name": "北欧弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000102",
+    "name": "坐姿腿弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000103",
+    "name": "单腿腿弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "biceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000104",
+    "name": "单腿硬拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000105",
+    "name": "腘绳肌弯举（GHR）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000106",
+    "name": "弹力带腿弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000107",
+    "name": "哑铃罗马尼亚硬拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000108",
+    "name": "单腿RDL",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000109",
+    "name": "单腿 RDL(纯单腿)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000010a",
+    "name": "反向北欧弯举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000010b",
+    "name": "哑铃直腿硬拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000010c",
+    "name": "驴式提踵",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "calf"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000010d",
+    "name": "坐姿提踵",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "calf"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000010e",
+    "name": "单腿提踵",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "calf"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000010f",
+    "name": "胫骨前肌抬举  same w calf raises but COM on the heel ",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "tibialis"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000110",
+    "name": "史密斯架提踵",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "calf"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000111",
+    "name": "站姿提踵",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "calf"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000112",
+    "name": "哥萨克深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000113",
+    "name": "侧弓步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000114",
+    "name": "侧弓步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000115",
+    "name": "山羊挺身",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000116",
+    "name": "反向挺身",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000117",
+    "name": "负重山羊挺身",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000118",
+    "name": "青蛙泵",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000119",
+    "name": "重负重弹力带臀桥",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000011a",
+    "name": "臀桥",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000011b",
+    "name": "杠铃臀桥",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000011c",
+    "name": "单腿臀桥",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000011d",
+    "name": "臀部后踢",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000011e",
+    "name": "早安屈体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000011f",
+    "name": "坐姿早安屈体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000120",
+    "name": "绳索髋外展",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000121",
+    "name": "髋外展机",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000122",
+    "name": "90/90 髋抬",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000123",
+    "name": "B 站距臀推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000124",
+    "name": "弹力带臀推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000125",
+    "name": "杠铃臀推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000126",
+    "name": "单腿臀推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000127",
+    "name": "单腿臀推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000128",
+    "name": "单腿哑铃臀推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000129",
+    "name": "壶铃摆动",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000012a",
+    "name": "重负重绳索穿裆",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000012b",
+    "name": "绳索穿裆拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000012c",
+    "name": "B 站距 RDL",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000012d",
+    "name": "单腿 RDL(B 站距)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000012e",
+    "name": "弹力带反向挺身",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000012f",
+    "name": "登台(臀部)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000130",
+    "name": "高跪姿臀部激活",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000131",
+    "name": "健腹轮",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000132",
+    "name": "弹力带抗旋转",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000133",
+    "name": "鸟狗式",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000134",
+    "name": "反向卷腹",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000135",
+    "name": "绳索卷腹",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000136",
+    "name": "卷腹",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000137",
+    "name": "负重仰卧起坐",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000138",
+    "name": "死虫",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000139",
+    "name": "墙壁推压死虫",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000013a",
+    "name": "公文包硬拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000013b",
+    "name": "悬垂屈膝",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000013c",
+    "name": "空心保持",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000013d",
+    "name": "空心摇",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000013e",
+    "name": "L 撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000013f",
+    "name": "悬垂举腿",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000140",
+    "name": "半跪姿帕洛夫推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000141",
+    "name": "帕洛夫推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000142",
+    "name": "哥本哈根平板",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000143",
+    "name": "平板支撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000144",
+    "name": "平板上下转换",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000145",
+    "name": "侧平板支撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000146",
+    "name": "侧平板带旋转",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000147",
+    "name": "药球俄罗斯转体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000148",
+    "name": "侧屈(哑铃)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000149",
+    "name": "搅锅",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000014a",
+    "name": "公文包负重行走",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000014b",
+    "name": "超人式",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000014c",
+    "name": "悬垂举腿至杠",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000014d",
+    "name": "土耳其起身",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000014e",
+    "name": "V字仰卧",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000014f",
+    "name": "靠墙蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000150",
+    "name": "壶铃风车",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000151",
+    "name": "绳索劈柴",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000152",
+    "name": "赫萨菲尔特石",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000153",
+    "name": "圆石装载",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000154",
+    "name": "圆石过杆",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000155",
+    "name": "粗杠推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000156",
+    "name": "粗杠硬拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000157",
+    "name": "农夫行走",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000158",
+    "name": "桶式搬运",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000159",
+    "name": "圆木推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000015a",
+    "name": "扛重登台",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000015b",
+    "name": "沙袋搬运",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000015c",
+    "name": "雪橇拖拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000015d",
+    "name": "翻轮胎",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000015e",
+    "name": "托盘行走",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000015f",
+    "name": "轭架行走（约克架行走）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000160",
+    "name": "单臂壶铃翻铃",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000161",
+    "name": "垫高翻铃",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000162",
+    "name": "翻铃",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000163",
+    "name": "悬挂翻铃",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000164",
+    "name": "高翻",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000165",
+    "name": "翻拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000166",
+    "name": "垫高上挺",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000167",
+    "name": "上挺",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000168",
+    "name": "过头推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000169",
+    "name": "借力推举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000016a",
+    "name": "单臂壶铃抓举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000016b",
+    "name": "垫高抓举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000016c",
+    "name": "悬挂抓举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000016d",
+    "name": "高抓",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000016e",
+    "name": "抓举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000016f",
+    "name": "抓拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000170",
+    "name": "90/90 髋切换",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000171",
+    "name": "弹力带拉开",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000172",
+    "name": "弹力带抗阻腘绳肌",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000173",
+    "name": "鸟狗(热身变式)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000174",
+    "name": "90/90呼吸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000175",
+    "name": "猫牛式",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000176",
+    "name": "弹力带蚌式",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000177",
+    "name": "哥萨克拉伸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000178",
+    "name": "沙发拉伸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip_flexor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000179",
+    "name": "熊爬肩部触摸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000017a",
+    "name": "死虫(热身变式)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000017b",
+    "name": "弹力带消防栓",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000017c",
+    "name": "泡沫轴背阔肌放松",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000017d",
+    "name": "弹力带臀桥",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000017e",
+    "name": "臀桥行进",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000017f",
+    "name": "高脚杯起身蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000180",
+    "name": "髋关节 CARs",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000181",
+    "name": "跪姿髋屈肌拉伸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip_flexor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000182",
+    "name": "墙壁髋铰链+球（夹球）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000183",
+    "name": "墙壁推髋铰链",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000184",
+    "name": "毛毛虫爬行",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000185",
+    "name": "弹力带侧步走/螃蟹步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000186",
+    "name": "前后摆腿",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000187",
+    "name": "侧向摆腿",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000188",
+    "name": "弹力带怪兽步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000189",
+    "name": "弹力带绕肩",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000018a",
+    "name": "PVC管/木棍绕肩",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000018b",
+    "name": "鸽子式伸展",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000018c",
+    "name": "平板支撑转下犬式",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000018d",
+    "name": "肩胛引体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000018e",
+    "name": "肩胛俯卧撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000018f",
+    "name": "后弓步手臂上举",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000190",
+    "name": "肩关节受控环转",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000191",
+    "name": "蜘蛛侠弓步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000192",
+    "name": "自重深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000193",
+    "name": "胸椎伸展+肩胛骨下回旋",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "mobility"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000194",
+    "name": "四足胸椎旋转",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000195",
+    "name": "靠墙滑动",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000196",
+    "name": "最伟大拉伸",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000197",
+    "name": "风扇车",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000198",
+    "name": "战绳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000199",
+    "name": "熊爬",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000019a",
+    "name": "跨步跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000019b",
+    "name": "箱跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000019c",
+    "name": "立定跳远",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000019d",
+    "name": "波比跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000019e",
+    "name": "螃蟹步",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000019f",
+    "name": "跳深",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a0",
+    "name": "高抬腿跑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a1",
+    "name": "六角杆跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a2",
+    "name": "忍者箱跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a3",
+    "name": "跳绳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "calf"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a4",
+    "name": "负重行走(通用)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "grip"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a5",
+    "name": "弓步跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a6",
+    "name": "军事俯卧撑（标准）",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a7",
+    "name": "俯身登山",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a8",
+    "name": "增强式俯卧撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001a9",
+    "name": "负重俯卧撑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001aa",
+    "name": "划船机",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ab",
+    "name": "二区有氧跑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ac",
+    "name": "滑冰跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ad",
+    "name": "滑雪机",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ae",
+    "name": "反向雪橇拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001af",
+    "name": "正向雪橇拉",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b0",
+    "name": "雪橇推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b1",
+    "name": "冲刺跑",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "cardio"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b2",
+    "name": "屈膝跳",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b3",
+    "name": "混沌锁链",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back",
+      "quad"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-12T10:11:42Z"
+  }
+]

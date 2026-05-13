@@ -28,7 +28,7 @@ import Testing
   let filters = AccessoryFilters(
     muscleGroups: [.quad, .glute],
     equipment: [.barbell],
-    movementPatterns: [.push]
+    movementPatterns: [.squat]
   )
   let set: Set<AccessoryFilters> = [filters]
 
@@ -38,6 +38,6 @@ import Testing
       == AccessoryFilters(
         muscleGroups: [.quad, .glute],
         equipment: [.barbell],
-        movementPatterns: [.push]
+        movementPatterns: [.squat]
       ))
 }

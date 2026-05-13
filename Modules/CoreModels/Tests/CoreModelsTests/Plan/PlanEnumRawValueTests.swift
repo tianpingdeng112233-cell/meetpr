@@ -11,15 +11,15 @@ import Testing
 }
 
 @Test func muscleGroupEncodesRawValue() throws {
-  try expectEncoded(MuscleGroup.hamstring, contains: #""hamstring""#)
+  try expectEncoded(MuscleGroup.hipFlexor, contains: #""hip_flexor""#)
 }
 
 @Test func equipmentEncodesRawValue() throws {
-  try expectEncoded(Equipment.bodyweight, contains: #""bodyweight""#)
+  try expectEncoded(Equipment.specialtyBar, contains: #""specialty_bar""#)
 }
 
 @Test func movementPatternEncodesRawValue() throws {
-  try expectEncoded(MovementPattern.pull, contains: #""pull""#)
+  try expectEncoded(MovementPattern.horizontalPush, contains: #""horizontal_push""#)
 }
 
 @Test func planSourceEncodesRawValue() throws {
