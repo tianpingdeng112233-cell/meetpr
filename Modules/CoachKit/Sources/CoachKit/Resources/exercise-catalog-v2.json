@@ -9292,5 +9292,646 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:07:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001f5",
+    "name": "双杠臂屈伸(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001f6",
+    "name": "上台阶俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001f7",
+    "name": "跪姿俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001f8",
+    "name": "俯卧撑(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001f9",
+    "name": "反手俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001fa",
+    "name": "反手俯卧撑(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001fb",
+    "name": "臂屈伸式俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001fc",
+    "name": "臂屈伸式俯卧撑(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001fd",
+    "name": "地板飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001fe",
+    "name": "地板飞鸟(中难度)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ff",
+    "name": "地板飞鸟(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000200",
+    "name": "派克俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000201",
+    "name": "俯卧撑-把柄",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000202",
+    "name": "上斜俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000203",
+    "name": "下斜俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000204",
+    "name": "下斜俯卧撑(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000205",
+    "name": "俯卧撑_支撑球",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000206",
+    "name": "单手俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000207",
+    "name": "鼓掌俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000208",
+    "name": "宽距俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000209",
+    "name": "侧姿俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000020a",
+    "name": "墙式俯卧撑_进阶版",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000020b",
+    "name": "射手俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000020c",
+    "name": "单侧射手俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000020d",
+    "name": "窄距跪姿俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000020e",
+    "name": "跪姿俯卧撑接婴儿式",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000020f",
+    "name": "俯卧撑进阶推展",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000210",
+    "name": "派克转眼镜蛇俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000211",
+    "name": "靠墙下斜俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000212",
+    "name": "跪姿旋转俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000213",
+    "name": "眼镜蛇俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000214",
+    "name": "箱上跪姿下斜俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:14:43Z"
   }
 ]
