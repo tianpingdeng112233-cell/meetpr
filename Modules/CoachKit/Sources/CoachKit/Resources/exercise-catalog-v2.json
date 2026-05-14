@@ -13810,5 +13810,561 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:39:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002dc",
+    "name": "毛巾腿弯举",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002dd",
+    "name": "毛巾腿弯举(高难度)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002de",
+    "name": "箭步踢腿",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002df",
+    "name": "保加利亚蹲(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e0",
+    "name": "自重腿弯举",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e1",
+    "name": "箭步跳",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e2",
+    "name": "后弓步踢腿",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e3",
+    "name": "跳跃深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e4",
+    "name": "跳跃式上步",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e5",
+    "name": "高抬腿深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e6",
+    "name": "相扑深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute",
+      "adductor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e7",
+    "name": "交替抬腿",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip_flexor",
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e8",
+    "name": "单腿四分之一深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002e9",
+    "name": "自重后弓步",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002ea",
+    "name": "站立提膝",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip_flexor",
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002eb",
+    "name": "垫高窄距深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002ec",
+    "name": "髋部屈伸拉伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hip",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002ed",
+    "name": "单腿触踵深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002ee",
+    "name": "冲刺弓步",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002ef",
+    "name": "单腿低箱深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f0",
+    "name": "六角杠深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f1",
+    "name": "史密斯单腿箭步蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f2",
+    "name": "负重拉伸箭步蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f3",
+    "name": "吊环腿弯举",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f4",
+    "name": "吊环分腿深蹲",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f5",
+    "name": "滑地屈膝后蹬",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f6",
+    "name": "椅子登阶",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f7",
+    "name": "史密斯机仰卧腿举",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:42:03Z"
   }
 ]
