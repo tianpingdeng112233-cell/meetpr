@@ -1866,7 +1866,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006f",
-    "name": "窄握斯波托卧推（窄距 spoto）",
+    "name": "窄握 spoto 卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1885,7 +1885,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000070",
-    "name": "斯波托卧推",
+    "name": "spoto 卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1904,7 +1904,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000071",
-    "name": "宽握斯波托卧推",
+    "name": "宽握 spoto 卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
