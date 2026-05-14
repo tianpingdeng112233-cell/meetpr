@@ -1885,27 +1885,8 @@
     "nameEn": "Wide Grip Spoto Press"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000072",
-    "name": "俯身反向飞鸟",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "shoulder"
-    ],
-    "equipment": [
-      "other"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bent Over Rear Delt Flies"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000073",
-    "name": "哑铃古巴推举",
+    "name": "古巴推举",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -1920,7 +1901,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "DB Cuban Press"
+    "nameEn": "Cuban Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000074",
@@ -1943,7 +1924,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000075",
-    "name": "哑铃前平举",
+    "name": "前平举",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -1958,7 +1939,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "DB Front Raise"
+    "nameEn": "Front Raise"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000076",
@@ -2076,7 +2057,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007c",
-    "name": "器械军事推举",
+    "name": "器械坐姿推举",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2091,11 +2072,11 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Machine Military Press"
+    "nameEn": "Seated Machine Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007d",
-    "name": "坐姿军事推举（坐姿杠铃推举）",
+    "name": "坐姿杠铃推举",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2110,11 +2091,11 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Seated Military Press"
+    "nameEn": "Seated Barbell Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007e",
-    "name": "阿诺德推",
+    "name": "阿诺德推肩",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2133,7 +2114,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007f",
-    "name": "哑铃过头推举",
+    "name": "哑铃推肩",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2148,7 +2129,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "DB OHP"
+    "nameEn": "DB Shoulder Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000080",
@@ -2247,7 +2228,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000085",
-    "name": "直立划船",
+    "name": "杠铃直立划船",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2262,7 +2243,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Upright Row"
+    "nameEn": "Barbell Upright Row"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000086",
@@ -2285,7 +2266,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000087",
-    "name": "维京推举",
+    "name": "悍马式站姿维京推举",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2437,7 +2418,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000008f",
-    "name": "绳索反向飞鸟",
+    "name": "绳索交叉反向飞鸟",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2452,7 +2433,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Cable Rear Delt Fly"
+    "nameEn": "Cable Cross Reverse Fly"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000090",
@@ -2494,7 +2475,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000092",
-    "name": "反向飞鸟",
+    "name": "俯身飞鸟",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2509,7 +2490,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Reverse Fly"
+    "nameEn": "Bent Over Fly"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000093",
@@ -2589,7 +2570,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000097",
-    "name": "反向蝴蝶机",
+    "name": "蝴蝶机反向飞鸟",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7346,7 +7327,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000190",
-    "name": "肩关节受控环转",
+    "name": "站姿哑铃肩部环绕",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7361,7 +7342,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Shoulder CARs"
+    "nameEn": "DB Shoulder Circle"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000191",
