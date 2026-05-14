@@ -14347,5 +14347,1202 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:42:03Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f8",
+    "name": "杠铃前平举",
+    "nameEn": "Barbell Front Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002f9",
+    "name": "杠铃片旋转",
+    "nameEn": "Plate Rotation",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "mobility"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002fa",
+    "name": "站姿杠铃推举",
+    "nameEn": "Standing Barbell Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002fb",
+    "name": "站姿布拉德福德推举",
+    "nameEn": "Bradford Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002fc",
+    "name": "杠铃俯身提拉",
+    "nameEn": "Barbell Bent-Over High Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002fd",
+    "name": "杠铃提拉",
+    "nameEn": "Barbell High Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002fe",
+    "name": "杠铃俯身三角肌后束上举",
+    "nameEn": "Barbell Bent-Over Rear Delt Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002ff",
+    "name": "坐姿杠铃颈后推举",
+    "nameEn": "Seated Behind-the-Neck Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000300",
+    "name": "EZ曲杆反重力推举",
+    "nameEn": "EZ-Bar Anti-Gravity Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000301",
+    "name": "斯科特推举",
+    "nameEn": "Scott Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000302",
+    "name": "站姿哑铃推举",
+    "nameEn": "Standing DB Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000303",
+    "name": "平板上斜侧平举",
+    "nameEn": "Incline Bench Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000304",
+    "name": "半俯身侧平举",
+    "nameEn": "Half Bent-Over Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000305",
+    "name": "平板哑铃提拉",
+    "nameEn": "Bench DB High Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000306",
+    "name": "哑铃直立划船",
+    "nameEn": "DB Upright Row",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000307",
+    "name": "单臂哑铃侧平举",
+    "nameEn": "Single-Arm DB Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000308",
+    "name": "坐姿哑铃前平举",
+    "nameEn": "Seated DB Front Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000309",
+    "name": "哑铃上斜俯身侧平举",
+    "nameEn": "Incline DB Bent-Over Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000030a",
+    "name": "哑铃弯举上推",
+    "nameEn": "DB Curl-to-Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "biceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000030b",
+    "name": "哑铃十字伸展",
+    "nameEn": "DB Crucifix",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000030c",
+    "name": "壶铃阿诺德推举",
+    "nameEn": "KB Arnold Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000030d",
+    "name": "俯身绳索飞鸟",
+    "nameEn": "Bent-Over Cable Fly",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000030e",
+    "name": "绳索胯裆前平举",
+    "nameEn": "Cable Front Raise Between Legs",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000030f",
+    "name": "Y字绳索侧平举",
+    "nameEn": "Cable Y Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000310",
+    "name": "站姿单臂绳索前平举",
+    "nameEn": "Standing Single-Arm Cable Front Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000311",
+    "name": "站姿绳索Y字",
+    "nameEn": "Standing Cable Y-Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000312",
+    "name": "史密斯机推举",
+    "nameEn": "Smith Machine Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000313",
+    "name": "器械侧平举",
+    "nameEn": "Machine Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000314",
+    "name": "器械把手侧平举",
+    "nameEn": "Machine Lateral Raise (Handle)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000315",
+    "name": "站姿器械侧平举",
+    "nameEn": "Standing Machine Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000316",
+    "name": "器械坐姿单臂后束飞鸟",
+    "nameEn": "Seated Single-Arm Machine Rear Delt Fly",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000317",
+    "name": "坐姿锤式握法器械肩推",
+    "nameEn": "Seated Hammer-Grip Machine Shoulder Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000318",
+    "name": "悍马机坐姿推举",
+    "nameEn": "Hammer Seated Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000319",
+    "name": "悍马机侧平举",
+    "nameEn": "Hammer Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000031a",
+    "name": "悍马机半俯身侧平举",
+    "nameEn": "Hammer Half-Bent Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000031b",
+    "name": "单手开肘悍马俯身划船",
+    "nameEn": "Single-Arm Open-Elbow Hammer Bent-Over Row",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000031c",
+    "name": "开肘悍马俯身划船",
+    "nameEn": "Open-Elbow Hammer Bent-Over Row",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "back"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000031d",
+    "name": "TRX-面拉",
+    "nameEn": "TRX Face Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000031e",
+    "name": "弹力带-面拉",
+    "nameEn": "Band Face Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000031f",
+    "name": "弹力带-坐姿推举",
+    "nameEn": "Band Seated Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000320",
+    "name": "弹力带-站姿推举",
+    "nameEn": "Band Standing Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000321",
+    "name": "弹力带-前平举",
+    "nameEn": "Band Front Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000322",
+    "name": "弹力带-侧平举",
+    "nameEn": "Band Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000323",
+    "name": "弹力带-提拉",
+    "nameEn": "Band High Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000324",
+    "name": "弹力带-侧拉",
+    "nameEn": "Band Side Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000325",
+    "name": "弹力带-俯身后束飞鸟",
+    "nameEn": "Band Bent-Over Rear Delt Fly",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000326",
+    "name": "TRX-后束飞鸟",
+    "nameEn": "TRX Rear Delt Fly",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000327",
+    "name": "弹力带_绳索_站姿侧平举",
+    "nameEn": "Band/Cable Standing Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000328",
+    "name": "弹力带俯身肩后束飞鸟",
+    "nameEn": "Band Bent-Over Shoulder Rear Delt Fly",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000329",
+    "name": "弹力带站姿面拉",
+    "nameEn": "Band Standing Face Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000032a",
+    "name": "站姿弹力带后束划船",
+    "nameEn": "Standing Band Rear Delt Row",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000032b",
+    "name": "悬挂带反向飞鸟",
+    "nameEn": "Suspension Strap Reverse Fly",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000032c",
+    "name": "V-俯卧撑",
+    "nameEn": "V Push-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000032d",
+    "name": "毛巾侧平举",
+    "nameEn": "Towel Lateral Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000032e",
+    "name": "靠墙倒立撑",
+    "nameEn": "Wall Handstand Push-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000032f",
+    "name": "自由倒立撑",
+    "nameEn": "Free Handstand Push-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000330",
+    "name": "肘关节环绕臂部运动",
+    "nameEn": "Elbow & Arm Circles",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000331",
+    "name": "手臂画圈肩部拉伸",
+    "nameEn": "Arm Circle Shoulder Stretch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000332",
+    "name": "站立交替手臂画圈",
+    "nameEn": "Standing Alternating Arm Circle",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000333",
+    "name": "站立双臂甩动",
+    "nameEn": "Standing Double-Arm Swing",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000334",
+    "name": "站立双臂画圈",
+    "nameEn": "Standing Double-Arm Circle",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000335",
+    "name": "站立单臂画圈",
+    "nameEn": "Standing Single-Arm Circle",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T00:00:00Z"
   }
 ]
