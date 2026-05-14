@@ -276,12 +276,24 @@ public actor InMemoryPlanRepository: PlanRepository {
       ),
       Exercise(
         id: uuid(22),
-        name: "比赛式硬拉",
-        nameEn: "Competition Deadlift",
+        name: "比赛式传统硬拉",
+        nameEn: "Competition Conventional Deadlift",
         exerciseType: .mainLift,
         mainLiftFamily: .deadlift,
         isCompetitionLift: true,
         muscleGroups: [.back, .hamstring],
+        equipment: [.barbell],
+        movementPattern: [.hipHinge],
+        createdAt: now
+      ),
+      Exercise(
+        id: uuid(23),
+        name: "比赛式相扑硬拉",
+        nameEn: "Competition Sumo Deadlift",
+        exerciseType: .mainLift,
+        mainLiftFamily: .deadlift,
+        isCompetitionLift: true,
+        muscleGroups: [.back, .hamstring, .glute],
         equipment: [.barbell],
         movementPattern: [.hipHinge],
         createdAt: now

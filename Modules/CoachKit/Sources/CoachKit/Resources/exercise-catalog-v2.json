@@ -705,25 +705,6 @@
     "nameEn": "Banded Deadlift"
   },
   {
-    "id": "00000000-0000-0000-ca70-00000000002e",
-    "name": "传统硬拉",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Conventional Deadlift"
-  },
-  {
     "id": "00000000-0000-0000-ca70-00000000002f",
     "name": "传统暂停硬拉",
     "exerciseType": "main_lift_variation",
@@ -969,25 +950,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Touch-and-Go Sumo Deadlift"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000003c",
-    "name": "相扑硬拉",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003d",

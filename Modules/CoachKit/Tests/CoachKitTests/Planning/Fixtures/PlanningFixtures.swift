@@ -71,7 +71,7 @@ enum PlanningFixtures {
       ),
       exercise(
         id: deadliftID,
-        name: "比赛式硬拉",
+        name: "比赛式传统硬拉",
         type: .mainLift,
         family: .deadlift,
         movementPattern: [.hipHinge]
