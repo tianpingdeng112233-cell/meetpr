@@ -2703,7 +2703,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000009d",
-    "name": "反握引体向上",
+    "name": "反手引体向上",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11959,5 +11959,629 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:24:05Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000027e",
+    "name": "引体向上(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "biceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000027f",
+    "name": "反手引体向上(负重)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "biceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000280",
+    "name": "澳式引体",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "biceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000281",
+    "name": "弹跳引体",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000282",
+    "name": "坐姿等长引体",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000283",
+    "name": "猫式伸展",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000284",
+    "name": "脊柱拉伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000285",
+    "name": "跪姿背阔肌拉伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000286",
+    "name": "仰卧下背拉伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000287",
+    "name": "仰卧下背拉伸_屈膝",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000288",
+    "name": "宽握颈后引体向上",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000289",
+    "name": "毛巾超人划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000028a",
+    "name": "毛巾滑动地面下拉",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000028b",
+    "name": "屈膝仰卧地板划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000028c",
+    "name": "肩宽握引体向上_中握距",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000028d",
+    "name": "背部胸肌拉伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "chest",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000028e",
+    "name": "窄距引体向上",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "biceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000028f",
+    "name": "肩胛屈伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "trap"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000290",
+    "name": "凳上辅助引体向上",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000291",
+    "name": "吊环膝触划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000292",
+    "name": "吊环高位划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000293",
+    "name": "吊环反向飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "trap"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000294",
+    "name": "吊环引体向上",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000295",
+    "name": "吊环宽握反身划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000296",
+    "name": "反手吊环引体向上",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "biceps"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000297",
+    "name": "吊环屈膝反身划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000298",
+    "name": "椅子反身划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000299",
+    "name": "窄距平行握引体向上_V把",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000029a",
+    "name": "自主辅助反向过顶拉伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back",
+      "mobility"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000029b",
+    "name": "椅间屈膝反向划船",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000029c",
+    "name": "椅间屈膝窄握反向引体",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000029d",
+    "name": "平板手肘撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:28:51Z"
   }
 ]
