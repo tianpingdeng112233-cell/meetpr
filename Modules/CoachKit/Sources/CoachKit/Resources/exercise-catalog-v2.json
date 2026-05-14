@@ -1639,7 +1639,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000065",
-    "name": "宽握卧推",
+    "name": "宽距杠铃卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1696,7 +1696,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000068",
-    "name": "下斜卧推",
+    "name": "下斜杠铃卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -2342,7 +2342,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000008a",
-    "name": "哑铃反握卧推",
+    "name": "反手哑铃卧推",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8039,5 +8039,830 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Close of Chaos"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b4",
+    "name": "杠铃卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b5",
+    "name": "杠铃片夹胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b6",
+    "name": "抬腿杠铃卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b7",
+    "name": "平躺哑铃卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b8",
+    "name": "窄距哑铃卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001b9",
+    "name": "平躺哑铃飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ba",
+    "name": "仰卧屈臂上抬",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001bb",
+    "name": "仰卧旋转屈臂上拉",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001bc",
+    "name": "上斜哑铃飞鸟(锤式)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001bd",
+    "name": "反手上斜哑铃卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001be",
+    "name": "地板反手哑铃卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001bf",
+    "name": "地板哑铃卧推(锤式)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c0",
+    "name": "哑铃卧推(锤式)",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c1",
+    "name": "上斜哑铃锤式推举",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c2",
+    "name": "掌心向内上斜哑铃卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c3",
+    "name": "深度俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c4",
+    "name": "健身球上斜哑铃飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c5",
+    "name": "仰卧哑铃锤式卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c6",
+    "name": "哑铃窄距卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c7",
+    "name": "哑铃下斜扭转飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c8",
+    "name": "哑铃挤压式卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001c9",
+    "name": "哑铃低位飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ca",
+    "name": "绳索十字夹胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001cb",
+    "name": "绳索夹胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001cc",
+    "name": "平板绳索夹胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001cd",
+    "name": "上斜绳索夹胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001ce",
+    "name": "下斜绳索夹胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001cf",
+    "name": "绳索下斜飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d0",
+    "name": "悍马机推胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d1",
+    "name": "上斜悍马机推胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d2",
+    "name": "悍马机卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d3",
+    "name": "下斜悍马机推胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d4",
+    "name": "上斜悍马机飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d5",
+    "name": "侧身单边悍马机推胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d6",
+    "name": "单边悍马机推胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d7",
+    "name": "直立器械推胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d8",
+    "name": "塔式平板卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001d9",
+    "name": "塔式上斜卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001da",
+    "name": "悍马多连杆卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001db",
+    "name": "史密斯机卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001dc",
+    "name": "下斜史密斯机推胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001dd",
+    "name": "上斜史密斯机卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000001de",
+    "name": "史密斯V-bar卧推",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T12:52:23Z"
   }
 ]
