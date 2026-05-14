@@ -1274,25 +1274,6 @@
     "nameEn": "Sumo RDL"
   },
   {
-    "id": "00000000-0000-0000-ca70-00000000004c",
-    "name": "相扑站距RDL",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sumo Stance RDL"
-  },
-  {
     "id": "00000000-0000-0000-ca70-00000000004d",
     "name": "节奏RDL",
     "exerciseType": "main_lift_variation",
