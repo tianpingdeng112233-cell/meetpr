@@ -241,9 +241,12 @@ def exercise_from_row(row: dict[str, str], created_at: str) -> dict[str, Any]:
         else None
     )
 
+    name_en = row.get("B", "").strip() or None
+
     return {
         "id": catalog_uuid(seq),
         "name": required(row, "C", "中文"),
+        "nameEn": name_en,
         "exerciseType": exercise_type,
         "mainLiftFamily": main_lift_family,
         "isCompetitionLift": False,

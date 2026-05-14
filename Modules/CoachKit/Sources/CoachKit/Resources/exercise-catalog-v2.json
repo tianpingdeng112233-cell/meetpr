@@ -35,7 +35,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "High Box Squat"
+    "nameEn": "Box Squat (High Box)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000003",
@@ -54,7 +54,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Low Box Squat"
+    "nameEn": "Box Squat (Low Box)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000004",
@@ -73,7 +73,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Wide Stance Zercher Squat"
+    "nameEn": "French Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000005",
@@ -92,7 +92,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Front Squat"
+    "nameEn": "Band Front Squats"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000006",
@@ -130,7 +130,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pause Front Squat"
+    "nameEn": "Paused Front Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000008",
@@ -149,7 +149,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Safety Bar Front Squat"
+    "nameEn": "Safety Seat Front Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000009",
@@ -168,7 +168,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Handle Safety Bar Pause Squat"
+    "nameEn": "Hatfield Pause Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000a",
@@ -187,7 +187,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Handle Safety Bar Squat"
+    "nameEn": "Hatfield Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000b",
@@ -284,7 +284,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pause-on-Ascent Squat"
+    "nameEn": "Ascent Pause Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000011",
@@ -303,7 +303,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Squat from the Floor"
+    "nameEn": "Back Squat Ground Setup"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000012",
@@ -322,7 +322,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Buffalo Bar Tempo Squat"
+    "nameEn": "Bow Bar Tempo Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000013",
@@ -341,7 +341,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Heels-Elevated Squat"
+    "nameEn": "Cyclist Squat (Heels Elevated)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000014",
@@ -360,7 +360,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Geared Squat"
+    "nameEn": "Equipped Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000015",
@@ -379,7 +379,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "High Bar Pause Squat"
+    "nameEn": "High Bar Paused Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000016",
@@ -436,7 +436,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Slant Board Squat"
+    "nameEn": "Incline Barbell Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000019",
@@ -474,7 +474,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pause Half-Down Squat"
+    "nameEn": "Pause Squat (Halfway Down)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001b",
@@ -493,7 +493,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pause Half-Up Squat"
+    "nameEn": "Pause Squat (Halfway Up)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001c",
@@ -512,7 +512,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Band-Assisted Squat"
+    "nameEn": "Reverse Band Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001e",
@@ -531,7 +531,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Safety Bar Pause Squat"
+    "nameEn": "Safety Bar Paused Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001f",
@@ -588,7 +588,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Good Morning"
+    "nameEn": "Squat Mornings"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000023",
@@ -645,7 +645,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "3-Inch Sumo Block Pull"
+    "nameEn": "3in Sumo Block Pull"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000026",
@@ -664,7 +664,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Rack Pull"
+    "nameEn": "Block Pull"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000028",
@@ -683,7 +683,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "1-Inch Sumo Deficit Deadlift"
+    "nameEn": "1in Sumo Deficit DL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000002b",
@@ -721,7 +721,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Conventional Pause Deadlift"
+    "nameEn": "Conventional Paused DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000030",
@@ -740,7 +740,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Conventional Deficit Deadlift"
+    "nameEn": "Deficit Conv. Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000031",
@@ -759,7 +759,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sumo Deficit Deadlift"
+    "nameEn": "Deficit Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000032",
@@ -797,7 +797,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Above-Knee Pause Conventional Deadlift"
+    "nameEn": "Pause Above Knee Conv DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000034",
@@ -816,7 +816,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Above-Knee Pause Sumo Deadlift"
+    "nameEn": "Pause Above Knee Sumo DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000035",
@@ -835,7 +835,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Below-Knee Pause Conventional Deadlift"
+    "nameEn": "Pause Below Knee Conv DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000036",
@@ -854,7 +854,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Below-Knee Pause Sumo Deadlift"
+    "nameEn": "Pause Below Knee Sumo DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000037",
@@ -873,7 +873,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Knee Pause Sumo Deadlift"
+    "nameEn": "Paused At Knee Sumo DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000038",
@@ -892,7 +892,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Band-Assisted Conventional Deadlift"
+    "nameEn": "Reverse Band Conv DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000039",
@@ -911,7 +911,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Band-Assisted Sumo Deadlift"
+    "nameEn": "Reverse Band Sumo DL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003a",
@@ -930,7 +930,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Snatch Grip Tempo Deadlift"
+    "nameEn": "Snatch Grip Tempo DL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003b",
@@ -949,7 +949,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Touch-and-Go Sumo Deadlift"
+    "nameEn": "Sumo DL Touch n Go"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003d",
@@ -1006,7 +1006,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Half Deadlift (Below Knee)"
+    "nameEn": "Halting Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000040",
@@ -1025,7 +1025,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sumo Half Deadlift"
+    "nameEn": "Halting Sumo Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000041",
@@ -1044,7 +1044,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Elevated Conventional Deadlift"
+    "nameEn": "High Iso Conv DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000042",
@@ -1063,7 +1063,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Elevated Sumo Deadlift"
+    "nameEn": "High Iso Sumo DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000043",
@@ -1082,7 +1082,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Conventional Bottom Iso Deadlift"
+    "nameEn": "Low Iso Conv DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000044",
@@ -1101,7 +1101,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sumo Bottom Iso Deadlift"
+    "nameEn": "Low Iso Sumo DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000045",
@@ -1120,7 +1120,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Off-Floor Pause Deadlift"
+    "nameEn": "Pause Off Floor"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000046",
@@ -1139,7 +1139,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Knee Pause Deadlift"
+    "nameEn": "Pause at Knee"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000047",
@@ -1158,7 +1158,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Romanian Deadlift"
+    "nameEn": "RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000048",
@@ -1177,7 +1177,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hip-Banded RDL"
+    "nameEn": "RDL w/ Band Around Hips"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000049",
@@ -1215,7 +1215,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "B-Stance Single-Leg RDL"
+    "nameEn": "Staggered Stance RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004b",
@@ -1312,7 +1312,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Tempo Stiff Leg Deadlift"
+    "nameEn": "Tempo Stiff Leg DL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000051",
@@ -1369,7 +1369,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Bench Press"
+    "nameEn": "Banded Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000054",
@@ -1388,7 +1388,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Medium Grip Bench Press"
+    "nameEn": "Banded Medium Grip Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000056",
@@ -1407,7 +1407,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded / Chained Bench Press"
+    "nameEn": "Bench w/ Band/chains"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000057",
@@ -1426,7 +1426,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pause Bench Press"
+    "nameEn": "C Count Pause Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000058",
@@ -1464,7 +1464,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dead Stop Bench Press"
+    "nameEn": "Dead Bench (Pin Press)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005a",
@@ -1483,7 +1483,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Extra-Wide Grip Bench Press"
+    "nameEn": "Extra Wide Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005b",
@@ -1502,7 +1502,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Feet-Up Bench Press"
+    "nameEn": "Feet Up Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005d",
@@ -1540,7 +1540,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Wide Grip Pause Bench Press"
+    "nameEn": "Pause Wide Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005f",
@@ -1559,7 +1559,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pin Bench Press"
+    "nameEn": "Pin Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000061",
@@ -1597,7 +1597,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Slingshot Bench Press"
+    "nameEn": "Slingshot Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000063",
@@ -1616,7 +1616,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Tempo Bench Press"
+    "nameEn": "Tempo Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000064",
@@ -1635,7 +1635,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Wide Grip Tempo Bench Press"
+    "nameEn": "Tempo Wide Grip Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000065",
@@ -1654,7 +1654,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Wide Grip Bench Press"
+    "nameEn": "Wide Grip Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000066",
@@ -1673,7 +1673,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bench Brick Press"
+    "nameEn": "Block Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000067",
@@ -1711,7 +1711,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Decline Bench Press"
+    "nameEn": "Decline Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000069",
@@ -1749,7 +1749,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Incline Bench Press"
+    "nameEn": "Incline Barbell Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000006b",
@@ -1844,7 +1844,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Close Grip Spoto Press"
+    "nameEn": "Close Grip Spoto Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000070",
@@ -1901,7 +1901,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bent-Over Reverse Fly"
+    "nameEn": "Bent Over Rear Delt Flies"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000073",
@@ -1920,7 +1920,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Cuban Press"
+    "nameEn": "DB Cuban Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000074",
@@ -1939,7 +1939,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Face Pull"
+    "nameEn": "Face Pull / Rope Face Pull"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000075",
@@ -1958,7 +1958,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Front Raise"
+    "nameEn": "DB Front Raise"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000076",
@@ -1977,7 +1977,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Plate Front Raise"
+    "nameEn": "Plate Front Raises"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000077",
@@ -2034,7 +2034,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Lateral Raise"
+    "nameEn": "DB Lateral Raise"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007a",
@@ -2072,7 +2072,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Seated Dumbbell Lateral Raise"
+    "nameEn": "Seated DB Lateral Raise"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007c",
@@ -2091,7 +2091,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Machine Shoulder Press"
+    "nameEn": "Machine Military Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007d",
@@ -2110,7 +2110,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Seated Barbell Shoulder Press"
+    "nameEn": "Seated Military Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007e",
@@ -2148,7 +2148,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Overhead Press"
+    "nameEn": "DB OHP"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000080",
@@ -2167,7 +2167,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Half-Kneeling Overhead Press"
+    "nameEn": "Half-Kneeling OHP"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000081",
@@ -2186,7 +2186,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Arm Dumbbell Press"
+    "nameEn": "Single-Arm DB OHP"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000082",
@@ -2224,7 +2224,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Y Raise"
+    "nameEn": "Y-Raise"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000084",
@@ -2243,7 +2243,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Rear-Delt Row"
+    "nameEn": "DB Rear Delt Row"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000085",
@@ -2281,7 +2281,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Seated Dumbbell Press"
+    "nameEn": "Seated DB Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000087",
@@ -2338,7 +2338,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Bench Press"
+    "nameEn": "DB Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000008a",
@@ -2357,7 +2357,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Reverse Grip Bench Press"
+    "nameEn": "DB Reverse Grip Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000008b",
@@ -2395,7 +2395,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Squeeze Press"
+    "nameEn": "Crush Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000008d",
@@ -2414,7 +2414,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Decline Dumbbell Bench Press"
+    "nameEn": "Decline DB Bench Press"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000008e",
@@ -2452,7 +2452,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Cable Reverse Fly"
+    "nameEn": "Cable Rear Delt Fly"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000090",
@@ -2471,7 +2471,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Fly"
+    "nameEn": "DB Fly"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000091",
@@ -2490,7 +2490,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Incline Dumbbell Fly"
+    "nameEn": "Incline DB Fly"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000092",
@@ -2547,7 +2547,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Incline Dumbbell Bench Press"
+    "nameEn": "Incline DB Bench"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000095",
@@ -2718,7 +2718,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Chin-Up"
+    "nameEn": "Chin Up"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000009e",
@@ -2756,7 +2756,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Neutral Grip Pull-Up"
+    "nameEn": "Neutral Grip Chinups"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a0",
@@ -2794,7 +2794,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pull-Up"
+    "nameEn": "Pullups"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a2",
@@ -2813,7 +2813,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Arm Lat Pulldown"
+    "nameEn": "Single Arm Lat Pulldown"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a3",
@@ -2832,7 +2832,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Straight-Arm Pulldown"
+    "nameEn": "Straight Arm Pulldown"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a4",
@@ -2851,7 +2851,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Behind-the-Neck Pulldown"
+    "nameEn": "Behind Neck Pulldown"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a5",
@@ -2889,7 +2889,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Pullover"
+    "nameEn": "DB Pull-Over"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a7",
@@ -2908,7 +2908,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Cable Lying Straight-Arm Pulldown"
+    "nameEn": "Cable Pullover"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a8",
@@ -2946,7 +2946,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Barbell Row"
+    "nameEn": "BB Rows"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000aa",
@@ -2984,7 +2984,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Chest-Supported Row"
+    "nameEn": "Chest Supported Rows"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ac",
@@ -3022,7 +3022,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Row"
+    "nameEn": "DB Row"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ae",
@@ -3060,7 +3060,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Inverted Row"
+    "nameEn": "Inverted Rows"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000b0",
@@ -3136,7 +3136,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Arm Cable Row"
+    "nameEn": "One-Arm Cable Row"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000b4",
@@ -3174,7 +3174,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Plank Dumbbell Row"
+    "nameEn": "Renegade Row"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000b6",
@@ -3193,7 +3193,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Seal Row"
+    "nameEn": "Seal Rows"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000b7",
@@ -3250,7 +3250,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Arm Dumbbell Row"
+    "nameEn": "Single Arm DB Row"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ba",
@@ -3288,7 +3288,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "High Row"
+    "nameEn": "Tall Row"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000bc",
@@ -3345,7 +3345,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Yates Row"
+    "nameEn": "Yates Rows"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000bf",
@@ -3364,7 +3364,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Shrug"
+    "nameEn": "DB Shrugs"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000c0",
@@ -3383,7 +3383,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Shrug"
+    "nameEn": "Shrugs"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000c1",
@@ -3402,7 +3402,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "21s Curl"
+    "nameEn": "21s"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000c2",
@@ -3440,7 +3440,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Barbell Curl"
+    "nameEn": "BB Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000c4",
@@ -3535,7 +3535,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Cross-Body Hammer Curl"
+    "nameEn": "Cross Body Hammer Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000c9",
@@ -3554,7 +3554,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Curl"
+    "nameEn": "DB Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ca",
@@ -3573,7 +3573,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Hammer Curl"
+    "nameEn": "DB Hammer Curls"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000cb",
@@ -3611,7 +3611,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "EZ-Bar Curl"
+    "nameEn": "EZ Bar Curls"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000cd",
@@ -3630,7 +3630,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Incline Dumbbell Curl"
+    "nameEn": "Incline DB Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ce",
@@ -3649,7 +3649,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Preacher Curl"
+    "nameEn": "Preacher Curls"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000cf",
@@ -3668,7 +3668,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Reverse Grip Curl"
+    "nameEn": "Reverse Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000d0",
@@ -3725,7 +3725,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Skull Crusher"
+    "nameEn": "Skullcrusher"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000d3",
@@ -3801,7 +3801,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Triceps Extension"
+    "nameEn": "DB Tricep Extension"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000d7",
@@ -3839,7 +3839,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Reverse Grip Triceps Pushdown"
+    "nameEn": "Reverse Grip Tricep Pushdown"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000d9",
@@ -3858,7 +3858,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Triceps Kickback"
+    "nameEn": "Tricep Kick Back"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000da",
@@ -3877,7 +3877,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Triceps Pushdown"
+    "nameEn": "Tricep Pushdown"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000db",
@@ -3896,7 +3896,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Triceps (Coach Choice)"
+    "nameEn": "Tricep of Choice"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000dc",
@@ -3915,7 +3915,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Cable Overhead Triceps Extension"
+    "nameEn": "Cable Overhead Tricep Extension"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000dd",
@@ -3953,7 +3953,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Overhead Dumbbell Extension"
+    "nameEn": "Overhead DB Extension"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000df",
@@ -3991,7 +3991,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Wrist Extension"
+    "nameEn": "Reverse Wrist Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000e1",
@@ -4048,7 +4048,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell / Belt Squat"
+    "nameEn": "Dumbbell/Twist Belt Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000e4",
@@ -4164,7 +4164,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg Leg Press"
+    "nameEn": "Single Leg Leg Press"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ea",
@@ -4183,7 +4183,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Barbell Lunge"
+    "nameEn": "BB Lunge"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000eb",
@@ -4202,7 +4202,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Barbell Reverse Lunge"
+    "nameEn": "BB Reverse Lunge"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ec",
@@ -4240,7 +4240,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Reverse Lunge"
+    "nameEn": "DB Reverse Lunge"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ee",
@@ -4297,7 +4297,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Walking Lunge"
+    "nameEn": "Walking Lunges"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f1",
@@ -4411,7 +4411,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Bulgarian Split Squat"
+    "nameEn": "DB Bulgarian Split Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f7",
@@ -4430,7 +4430,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Split Squat"
+    "nameEn": "DB Split Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f8",
@@ -4449,7 +4449,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Front-Foot-Elevated Split Squat"
+    "nameEn": "Front Foot Elevated Split Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f9",
@@ -4468,7 +4468,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Rear-Foot-Elevated Split Squat"
+    "nameEn": "Rear Foot Elevated Split Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000fa",
@@ -4487,7 +4487,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Split Squat (Glute Focus)"
+    "nameEn": "Split Squat (Glute)"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000fb",
@@ -4506,7 +4506,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Split Squat (Quad Focus)"
+    "nameEn": "Split Squat (Quad)"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000fc",
@@ -4544,7 +4544,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Step-Up"
+    "nameEn": "Step Ups"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000fe",
@@ -4582,7 +4582,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hamstring Curl"
+    "nameEn": "Hamstring Curls"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000100",
@@ -4620,7 +4620,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Nordic Hamstring Curl"
+    "nameEn": "Nordic Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000102",
@@ -4658,7 +4658,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg Leg Curl"
+    "nameEn": "Single Leg Leg Curl"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000104",
@@ -4677,7 +4677,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg Deadlift"
+    "nameEn": "Single Leg Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000105",
@@ -4696,7 +4696,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Glute-Ham Raise (GHR)"
+    "nameEn": "GHR"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000106",
@@ -4734,7 +4734,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Romanian Deadlift"
+    "nameEn": "DB RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000108",
@@ -4753,7 +4753,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg RDL"
+    "nameEn": "Single Leg RDL"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000109",
@@ -4772,7 +4772,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg RDL (True Unilateral)"
+    "nameEn": "Single Leg RDL (Pure)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000010a",
@@ -4810,7 +4810,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Stiff Leg Deadlift"
+    "nameEn": "Dumbbell Stiff Leg DL"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000010c",
@@ -4867,7 +4867,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg Calf Raise"
+    "nameEn": "Single Calf Raises"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000010f",
@@ -4886,7 +4886,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Tibialis Raise"
+    "nameEn": "Tib Raises"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000110",
@@ -4981,7 +4981,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Back Extension"
+    "nameEn": "Hyper Extensions"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000116",
@@ -5000,7 +5000,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Reverse Hyperextension"
+    "nameEn": "Reverse Hyper"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000117",
@@ -5057,7 +5057,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Heavy Banded Glute Bridge"
+    "nameEn": "Banded Glute Bridge (Heavy)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000011a",
@@ -5095,7 +5095,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Barbell Glute Bridge"
+    "nameEn": "Glute Bridge with Barbell"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000011c",
@@ -5114,7 +5114,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg Glute Bridge"
+    "nameEn": "SL Glute Bridge"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000011d",
@@ -5285,7 +5285,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Barbell Hip Thrust"
+    "nameEn": "Hip Thrust (Barbell)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000126",
@@ -5304,7 +5304,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg Hip Thrust"
+    "nameEn": "Hip Thrust (Single Leg)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000128",
@@ -5323,7 +5323,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg Dumbbell Hip Thrust"
+    "nameEn": "Single Leg Hip Thrust (DB)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000129",
@@ -5344,7 +5344,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Kettlebell Swing"
+    "nameEn": "KB Swing"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012a",
@@ -5363,7 +5363,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Heavy Cable Pull-Through"
+    "nameEn": "Cable Pull-Through (Heavy)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012b",
@@ -5382,7 +5382,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Cable Pull-Through"
+    "nameEn": "Pull Throughs"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012c",
@@ -5420,7 +5420,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Leg RDL (B-Stance)"
+    "nameEn": "Single Leg RDL (B-Stance)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012e",
@@ -5439,7 +5439,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Reverse Hyper"
+    "nameEn": "Reverse Hyper (Banded)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012f",
@@ -5477,7 +5477,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Tall-Kneeling Glute Activation"
+    "nameEn": "Tall Kneeling Glute Activation"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000131",
@@ -5496,7 +5496,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Ab Wheel Rollout"
+    "nameEn": "AB Wheel Rollout"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000132",
@@ -5534,7 +5534,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bird Dog"
+    "nameEn": "Bird Dogs"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000134",
@@ -5610,7 +5610,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Weighted Sit-Up"
+    "nameEn": "Weighted Situps"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000138",
@@ -5629,7 +5629,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dead Bug"
+    "nameEn": "Dead Bugs"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000139",
@@ -5648,7 +5648,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Wall Press Dead Bug"
+    "nameEn": "Wall Press Deadbugs"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000013a",
@@ -5686,7 +5686,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hanging Knee Raise"
+    "nameEn": "Hanging Knee Tuck"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000013c",
@@ -5762,7 +5762,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hanging Leg Raise"
+    "nameEn": "Hanging Leg Raises"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000140",
@@ -5895,7 +5895,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Side Plank with Rotation"
+    "nameEn": "Side Plank w/ Rotation"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000147",
@@ -5914,7 +5914,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Russian Twist (Med Ball)"
+    "nameEn": "MB Russian Twists"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000148",
@@ -5933,7 +5933,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dumbbell Side Bend"
+    "nameEn": "Side Bend (DB)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000149",
@@ -6009,7 +6009,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Toes to Bar"
+    "nameEn": "Toes-to-Bar"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000014d",
@@ -6049,7 +6049,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "V-Up"
+    "nameEn": "V-Ups"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000014f",
@@ -6087,7 +6087,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Kettlebell Windmill"
+    "nameEn": "KB Windmill"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000151",
@@ -6106,7 +6106,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Cable Wood Chop"
+    "nameEn": "Cable Wood Chops"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000152",
@@ -6127,7 +6127,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Husafell Stone"
+    "nameEn": "Hussafelt Stone"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000153",
@@ -6148,7 +6148,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Stone Load"
+    "nameEn": "Stone Loading"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000154",
@@ -6188,7 +6188,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Fat Bar Press"
+    "nameEn": "Axle Press"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000156",
@@ -6207,7 +6207,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Fat Bar Deadlift"
+    "nameEn": "Axle Deadlift"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000157",
@@ -6228,7 +6228,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Farmer's Walk"
+    "nameEn": "Farmers Walk"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000158",
@@ -6249,7 +6249,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bucket Carry"
+    "nameEn": "Keg Carry"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000159",
@@ -6289,7 +6289,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Loaded Step-Up"
+    "nameEn": "Power Stairs"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000015b",
@@ -6331,7 +6331,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sled Pull"
+    "nameEn": "Sled Drag"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000015d",
@@ -6373,7 +6373,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Tray Carry"
+    "nameEn": "Waiter Walk"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000015f",
@@ -6415,7 +6415,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Arm Kettlebell Clean"
+    "nameEn": "1 Arm KB Clean"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000161",
@@ -6436,7 +6436,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Elevated Clean"
+    "nameEn": "Block Clean"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000162",
@@ -6520,7 +6520,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Power Pull"
+    "nameEn": "Clean Pull"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000166",
@@ -6541,7 +6541,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Elevated Jerk"
+    "nameEn": "Block Jerk"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000167",
@@ -6625,7 +6625,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single-Arm Kettlebell Snatch"
+    "nameEn": "1 Arm KB Snatch"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000016b",
@@ -6646,7 +6646,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Elevated Snatch"
+    "nameEn": "Block Snatch"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000016c",
@@ -6688,7 +6688,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hang Snatch (High)"
+    "nameEn": "Power Snatch"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000016e",
@@ -6768,7 +6768,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Pull-Apart"
+    "nameEn": "Band Pull Apart"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000172",
@@ -6787,7 +6787,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Hamstring Curl"
+    "nameEn": "Band Resisted Hamstrings"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000173",
@@ -6806,7 +6806,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bird Dog (Warm-up Variation)"
+    "nameEn": "Bird Dog (Warmup)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000174",
@@ -6920,7 +6920,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bear Crawl Shoulder Tap"
+    "nameEn": "Bear Crawl Shoulder Touches"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000017a",
@@ -6939,7 +6939,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Dead Bug (Warm-up Variation)"
+    "nameEn": "Dead Bug (Warmup)"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000017b",
@@ -6977,7 +6977,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Foam Roll Lats"
+    "nameEn": "Foam Roller Lat Release"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000017d",
@@ -7034,7 +7034,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Goblet Sit-to-Stand Squat"
+    "nameEn": "Goblet Squat to Stand"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000180",
@@ -7053,7 +7053,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hip Controlled Articular Rotation"
+    "nameEn": "Hip CARs"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000181",
@@ -7072,7 +7072,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Kneeling Hip Flexor Stretch"
+    "nameEn": "Hip Flexor Stretch (Kneeling)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000182",
@@ -7091,7 +7091,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Wall Hip Hinge with Ball Squeeze"
+    "nameEn": "Wall Hinge w/ Ball"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000183",
@@ -7150,7 +7150,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Lateral Walk / Crab Walk"
+    "nameEn": "Banded Lateral Walk"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000186",
@@ -7169,7 +7169,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Forward / Backward Leg Swing"
+    "nameEn": "Leg Swing (Front-Back)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000187",
@@ -7188,7 +7188,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Lateral Leg Swing"
+    "nameEn": "Leg Swing (Side-to-Side)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000188",
@@ -7226,7 +7226,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Shoulder Dislocation"
+    "nameEn": "Banded Pass-Through"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000018a",
@@ -7245,7 +7245,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "PVC / Dowel Shoulder Pass-Through"
+    "nameEn": "PVC Pass-Through"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000018b",
@@ -7285,7 +7285,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Plank to Downward Dog"
+    "nameEn": "Plank to Down Dog"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000018d",
@@ -7342,7 +7342,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Reverse Lunge with Overhead Reach"
+    "nameEn": "Reverse Lunge with Reach"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000190",
@@ -7361,7 +7361,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Shoulder Controlled Articular Rotation"
+    "nameEn": "Shoulder CARs"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000191",
@@ -7380,7 +7380,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Spiderman Lunge"
+    "nameEn": "Spider-Man Lunge"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000192",
@@ -7399,7 +7399,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bodyweight Squat"
+    "nameEn": "Air Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000193",
@@ -7418,7 +7418,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Thoracic Extension + Scapular Downward Rotation"
+    "nameEn": "Thoracic Ext + Lower Trap"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000194",
@@ -7437,7 +7437,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Quadruped Thoracic Rotation"
+    "nameEn": "Quadruped T-Spine Rotation"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000195",
@@ -7513,7 +7513,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Battle Ropes"
+    "nameEn": "Battle Rope"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000199",
@@ -7591,7 +7591,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Standing Broad Jump"
+    "nameEn": "Broad Jump"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000019d",
@@ -7671,7 +7671,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "High Knees"
+    "nameEn": "High Knee Run"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001a1",
@@ -7692,7 +7692,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Trap Bar Jump"
+    "nameEn": "Hex Bar Jump"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001a2",
@@ -7711,7 +7711,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Stealth Box Jump"
+    "nameEn": "Ninja Box Jump"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001a3",
@@ -7749,7 +7749,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Loaded Carry"
+    "nameEn": "Loaded Carry (General)"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001a5",
@@ -7768,7 +7768,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Jumping Lunge"
+    "nameEn": "Lunge Jump"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001a6",
@@ -7787,7 +7787,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Military Push-Up"
+    "nameEn": "Military Push-ups"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001a7",
@@ -7825,7 +7825,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Plyometric Push-Up"
+    "nameEn": "Plyo Push-up"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001a9",
@@ -7844,7 +7844,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Weighted Push-Up"
+    "nameEn": "Weighted Push Ups"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001aa",
@@ -7863,7 +7863,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Rowing Machine"
+    "nameEn": "Rower (Concept2)"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001ab",
@@ -7882,7 +7882,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Zone 2 Cardio Run"
+    "nameEn": "Zone 2 Running"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001ac",
@@ -7901,7 +7901,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Skater Jump"
+    "nameEn": "Skater Hop"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001ad",
@@ -7939,7 +7939,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Reverse Sled Pull"
+    "nameEn": "Sled Drag (Backward)"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001af",
@@ -7960,7 +7960,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sled Pull (Forward)"
+    "nameEn": "Sled Drag (Forward)"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001b0",
@@ -7998,7 +7998,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Sprint"
+    "nameEn": "Sprints"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000001b2",
@@ -8038,6 +8038,6 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Chaos Chain"
+    "nameEn": "Close of Chaos"
   }
 ]
