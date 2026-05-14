@@ -9933,5 +9933,207 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:14:43Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000215",
+    "name": "健身球哑铃飞鸟",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000216",
+    "name": "仰卧泡沫轴开胸放松",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "mobility"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000217",
+    "name": "上斜触肩俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000218",
+    "name": "凳上派克式俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000219",
+    "name": "吊环双杠臂屈伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulder"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000021a",
+    "name": "吊环反身俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000021b",
+    "name": "吊环夹胸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000021c",
+    "name": "吊环俯卧撑转侧平板",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000021d",
+    "name": "吊环下斜俯卧撑",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000021e",
+    "name": "椅子双臂臂屈伸",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest",
+      "triceps",
+      "shoulder"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:17:37Z"
   }
 ]
