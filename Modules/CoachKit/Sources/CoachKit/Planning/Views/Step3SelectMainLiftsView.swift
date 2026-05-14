@@ -136,9 +136,10 @@ private struct MainLiftPickerRow: View {
     .sheet(isPresented: $showingPicker) {
       VariantPickerSheet(
         family: family,
-        variants: viewModel.mainLiftCatalog[family] ?? [],
+        variants: viewModel.sortedMainLiftVariants(for: family),
         selectedID: currentSelection?.id,
         onSelect: { exercise in
+          viewModel.recordVariantPick(exercise.id)
           viewModel.selectedVariants[key] = exercise.id
           showingPicker = false
         }

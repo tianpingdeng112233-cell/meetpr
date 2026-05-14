@@ -43,12 +43,37 @@ public final class PlanningViewModel {
 
   @ObservationIgnored private let repository: any PlanRepository
   @ObservationIgnored private let draftStore: DraftStore
+  @ObservationIgnored private let usageTracker: ExerciseUsageTracker
   @ObservationIgnored private var hasBootstrapped = false
   @ObservationIgnored private var intensityValueMemo: [UUID: [IntensityMode: Decimal]] = [:]
 
-  public init(repository: any PlanRepository, draftStore: DraftStore) {
+  public init(
+    repository: any PlanRepository,
+    draftStore: DraftStore,
+    usageTracker: ExerciseUsageTracker = ExerciseUsageTracker()
+  ) {
     self.repository = repository
     self.draftStore = draftStore
+    self.usageTracker = usageTracker
+  }
+
+  /// Variants for a lift family sorted by coach's usage frequency (DESC),
+  /// tie-broken by localized name ASC. Frequently-picked variants float to top.
+  public func sortedMainLiftVariants(for family: LiftFamily) -> [Exercise] {
+    (mainLiftCatalog[family] ?? []).sorted { lhs, rhs in
+      let lhsCount = usageTracker.usageCount(for: lhs.id)
+      let rhsCount = usageTracker.usageCount(for: rhs.id)
+      if lhsCount != rhsCount {
+        return lhsCount > rhsCount
+      }
+      return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+    }
+  }
+
+  /// Record a main lift variant pick so it surfaces higher next time the
+  /// picker opens.
+  public func recordVariantPick(_ exerciseID: UUID) {
+    usageTracker.incrementUsage(for: exerciseID)
   }
 
   public var sortedTrainingDays: [Int] {
