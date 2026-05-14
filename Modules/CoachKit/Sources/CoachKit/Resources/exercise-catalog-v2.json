@@ -535,7 +535,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001f",
-    "name": "安全杆深蹲",
+    "name": "ssb深蹲",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -1143,7 +1143,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000047",
-    "name": "罗马尼亚硬拉",
+    "name": "杠铃罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1278,7 +1278,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004f",
-    "name": "直腿硬拉",
+    "name": "杠铃直腿硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -4052,7 +4052,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000e4",
-    "name": "高脚杯深蹲",
+    "name": "哑铃酒杯深蹲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4111,7 +4111,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000e7",
-    "name": "腿屈伸",
+    "name": "坐姿腿屈伸",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4130,7 +4130,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000e8",
-    "name": "倒蹬机",
+    "name": "腿举",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4168,7 +4168,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ea",
-    "name": "杠铃弓步蹲",
+    "name": "杠铃箭步蹲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4225,7 +4225,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ed",
-    "name": "哑铃反向弓步",
+    "name": "哑铃箭步蹲_反向",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4396,7 +4396,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f6",
-    "name": "哑铃保加利亚分腿蹲",
+    "name": "哑铃保加利亚蹲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4909,7 +4909,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000111",
-    "name": "站姿提踵",
+    "name": "杠铃站姿提踵",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4947,7 +4947,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000113",
-    "name": "侧弓步",
+    "name": "哑铃侧弓步",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13790,5 +13790,25 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:36:47Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000002db",
+    "name": "器械倒蹬",
+    "nameEn": null,
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-14T13:39:43Z"
   }
 ]
