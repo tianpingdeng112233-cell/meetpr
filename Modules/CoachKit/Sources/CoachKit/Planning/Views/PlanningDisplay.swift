@@ -52,7 +52,7 @@ enum PlanningDisplay {
     case .triceps:
       "三头"
     case .forearm:
-      "前臂"
+      "小臂"
     case .core:
       "核心"
     case .quad:
@@ -61,25 +61,29 @@ enum PlanningDisplay {
       "腘绳"
     case .glute:
       "臀"
-    case .hip:
+    case .hip, .hipFlexor:
       "髋"
-    case .hipFlexor:
-      "屈髋"
     case .adductor:
       "内收"
     case .calf:
       "小腿"
-    case .tibialis:
-      "胫前"
-    case .trap:
-      "斜方"
-    case .mobility:
-      "活动度"
-    case .cardio:
-      "心肺"
-    case .grip:
-      "握力"
+    case .tibialis, .trap, .mobility, .cardio, .grip:
+      "其他"
     }
+  }
+
+  /// Deduplicates muscle group display names so an exercise tagged with e.g.
+  /// `[trap, grip]` doesn't render as "其他 + 其他".
+  static func deduplicatedMuscleGroupNames(_ muscleGroups: [MuscleGroup]) -> [String] {
+    var seen = Set<String>()
+    var result: [String] = []
+    for muscleGroup in muscleGroups {
+      let name = muscleGroupName(muscleGroup)
+      if seen.insert(name).inserted {
+        result.append(name)
+      }
+    }
+    return result
   }
 
   static func equipmentName(_ equipment: Equipment) -> String {
@@ -125,7 +129,7 @@ enum PlanningDisplay {
   }
 
   static func facetSummary(for exercise: Exercise) -> String {
-    let muscleGroups = exercise.muscleGroups.map(muscleGroupName).joined(separator: " + ")
+    let muscleGroups = deduplicatedMuscleGroupNames(exercise.muscleGroups).joined(separator: " + ")
     let equipment = exercise.equipment.map(equipmentName).joined(separator: " + ")
     let movementPattern = exercise.movementPattern.map(movementPatternName).joined(separator: " + ")
     return [muscleGroups, equipment, movementPattern]
