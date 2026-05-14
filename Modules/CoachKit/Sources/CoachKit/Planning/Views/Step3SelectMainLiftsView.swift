@@ -20,7 +20,7 @@ public struct Step3SelectMainLiftsView: View {
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Eyebrow("STEP 3")
-          Text("选择主项变式")
+          Text("选择主项及变式")
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
@@ -42,7 +42,7 @@ public struct Step3SelectMainLiftsView: View {
       .padding(MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
-    .navigationTitle("主项变式")
+    .navigationTitle("主项及变式")
   }
 }
 
@@ -117,7 +117,9 @@ private struct MainLiftPickerRow: View {
         }
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityLabel("\(PlanningDisplay.liftName(family)) 变式: \(currentSelectionLabel)")
+        .accessibilityLabel(
+          "\(PlanningDisplay.liftName(family))主项及变式: \(currentSelectionLabel)"
+        )
       }
 
       if currentSelection != nil {
@@ -213,7 +215,7 @@ private struct VariantPickerSheet: View {
       }
       .listStyle(.plain)
       .searchable(text: $searchText, prompt: "搜索 / Search")
-      .navigationTitle("\(PlanningDisplay.liftName(family))变式")
+      .navigationTitle("\(PlanningDisplay.liftName(family))主项及变式")
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("取消") { dismiss() }
