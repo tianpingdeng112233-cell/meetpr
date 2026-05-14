@@ -9,6 +9,8 @@ public struct AccessoryMatchListSection: View {
   private let isLoading: Bool
   private let onAdd: @MainActor (Exercise) -> Void
 
+  @State private var searchText = ""
+
   public init(
     exercises: [Exercise],
     isLoading: Bool,
@@ -22,20 +24,45 @@ public struct AccessoryMatchListSection: View {
   public var body: some View {
     Card(accessibilityLabel: "Accessory matches") {
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-        Text("匹配 \(exercises.count) 个")
+        Text("匹配 \(filteredExercises.count) 个")
           .font(Font.MeetPR.headline)
           .foregroundStyle(Color.MeetPR.fgPrimary)
+
+        HStack(spacing: MeetPRSpacing.sm) {
+          Image(systemName: "magnifyingglass")
+            .font(.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+          TextField("搜索 / Search", text: $searchText)
+            .font(Font.MeetPR.body)
+            .planningNoAutocapitalization()
+            .autocorrectionDisabled(true)
+          if !searchText.isEmpty {
+            Button {
+              searchText = ""
+            } label: {
+              Image(systemName: "xmark.circle.fill")
+                .font(.footnote)
+                .foregroundStyle(Color.MeetPR.fgSecondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("清空搜索")
+          }
+        }
+        .padding(.horizontal, MeetPRSpacing.sm)
+        .padding(.vertical, MeetPRSpacing.xs)
+        .background(Color.MeetPR.surface2)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
 
         if isLoading {
           ProgressView("加载动作中")
             .font(Font.MeetPR.body)
-        } else if exercises.isEmpty {
-          Text("没有匹配动作")
+        } else if filteredExercises.isEmpty {
+          Text(searchText.isEmpty ? "没有匹配动作" : "没有符合搜索的动作")
             .font(Font.MeetPR.body)
             .foregroundStyle(Color.MeetPR.fgSecondary)
         } else {
           LazyVStack(spacing: MeetPRSpacing.sm) {
-            ForEach(exercises) { exercise in
+            ForEach(filteredExercises) { exercise in
               AccessoryMatchRow(exercise: exercise) {
                 onAdd(exercise)
               }
@@ -43,6 +70,15 @@ public struct AccessoryMatchListSection: View {
           }
         }
       }
+    }
+  }
+
+  private var filteredExercises: [Exercise] {
+    let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    if trimmed.isEmpty { return exercises }
+    return exercises.filter { exercise in
+      exercise.name.localizedStandardContains(trimmed)
+        || (exercise.nameEn?.localizedStandardContains(trimmed) ?? false)
     }
   }
 }
@@ -61,9 +97,16 @@ private struct AccessoryMatchRow: View {
             .foregroundStyle(Color.MeetPR.fgPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
 
+          if let nameEn = exercise.nameEn {
+            Text(nameEn)
+              .font(Font.MeetPR.footnote)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .frame(maxWidth: .infinity, alignment: .leading)
+          }
+
           Text(PlanningDisplay.facetSummary(for: exercise))
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
 
@@ -77,5 +120,16 @@ private struct AccessoryMatchRow: View {
     }
     .buttonStyle(.plain)
     .accessibilityLabel("添加 \(exercise.name)")
+  }
+}
+
+extension View {
+  @ViewBuilder
+  fileprivate func planningNoAutocapitalization() -> some View {
+    #if os(iOS)
+      textInputAutocapitalization(.never)
+    #else
+      self
+    #endif
   }
 }
