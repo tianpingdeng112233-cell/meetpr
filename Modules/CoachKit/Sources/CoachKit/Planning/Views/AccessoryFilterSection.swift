@@ -38,13 +38,17 @@ public struct AccessoryFilterSection: View {
         onChange(nextFilters)
       }
 
-      ForEach(MuscleGroup.allCases, id: \.self) { muscleGroup in
+      ForEach(MuscleGroupChip.allCases, id: \.self) { chip in
         FilterChip(
-          title: PlanningDisplay.muscleGroupName(muscleGroup),
-          isSelected: filters.muscleGroups.contains(muscleGroup)
+          title: chip.displayName,
+          isSelected: chip.underlyingMuscleGroups.isSubset(of: filters.muscleGroups)
         ) {
           var nextFilters = filters
-          nextFilters.muscleGroups.toggle(muscleGroup)
+          if chip.underlyingMuscleGroups.isSubset(of: nextFilters.muscleGroups) {
+            nextFilters.muscleGroups.subtract(chip.underlyingMuscleGroups)
+          } else {
+            nextFilters.muscleGroups.formUnion(chip.underlyingMuscleGroups)
+          }
           onChange(nextFilters)
         }
       }
@@ -153,6 +157,64 @@ extension Set {
       remove(member)
     } else {
       insert(member)
+    }
+  }
+}
+
+/// Display-layer grouping for muscle filter chips. Folds `hipFlexor` into `hip`
+/// and the long tail (`tibialis` / `trap` / `mobility` / `cardio` / `grip`) into
+/// a single "其他" chip so the filter strip stays short and meaningful.
+enum MuscleGroupChip: CaseIterable, Hashable {
+  case chest
+  case shoulder
+  case back
+  case biceps
+  case triceps
+  case forearm
+  case core
+  case quad
+  case hamstring
+  case glute
+  case hip
+  case adductor
+  case calf
+  case other
+
+  var displayName: String {
+    switch self {
+    case .chest: "胸"
+    case .shoulder: "肩"
+    case .back: "背"
+    case .biceps: "二头"
+    case .triceps: "三头"
+    case .forearm: "小臂"
+    case .core: "核心"
+    case .quad: "股四"
+    case .hamstring: "腘绳"
+    case .glute: "臀"
+    case .hip: "髋"
+    case .adductor: "内收"
+    case .calf: "小腿"
+    case .other: "其他"
+    }
+  }
+
+  var underlyingMuscleGroups: Set<MuscleGroup> {
+    switch self {
+    case .chest: [.chest]
+    case .shoulder: [.shoulder]
+    case .back: [.back]
+    case .biceps: [.biceps]
+    case .triceps: [.triceps]
+    case .forearm: [.forearm]
+    case .core: [.core]
+    case .quad: [.quad]
+    case .hamstring: [.hamstring]
+    case .glute: [.glute]
+    case .hip: [.hip, .hipFlexor]
+    case .adductor: [.adductor]
+    case .calf: [.calf]
+    case .other: [.tibialis, .trap, .mobility, .cardio, .grip]
     }
   }
 }
