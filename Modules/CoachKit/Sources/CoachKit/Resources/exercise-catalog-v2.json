@@ -10370,8 +10370,8 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000022c",
-    "name": "哑铃上斜仰卧耸肩",
-    "nameEn": null,
+    "name": "哑铃上斜俯卧耸肩",
+    "nameEn": "DB Incline Prone Shrug",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -15677,6 +15677,186 @@
     ],
     "movementPattern": [
       "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000033d",
+    "name": "杠铃耸肩",
+    "nameEn": "Barbell Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000033e",
+    "name": "绳索耸肩",
+    "nameEn": "Cable Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000033f",
+    "name": "杠铃过头耸肩",
+    "nameEn": "Barbell Overhead Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000340",
+    "name": "史密斯耸肩",
+    "nameEn": "Smith Machine Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000341",
+    "name": "史密斯背后耸肩",
+    "nameEn": "Smith Behind-the-Back Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000342",
+    "name": "器械耸肩",
+    "nameEn": "Machine Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000343",
+    "name": "硬拉器耸肩",
+    "nameEn": "Trap Bar Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000344",
+    "name": "耸肩器耸肩",
+    "nameEn": "Shrug Machine Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000345",
+    "name": "弹力带-弹力带耸肩",
+    "nameEn": "Band Shrug",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder",
+      "trap"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-15T00:00:00Z"
