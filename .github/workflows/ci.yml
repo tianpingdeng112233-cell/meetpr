@@ -60,14 +60,6 @@ jobs:
             fi
           done
 
-      - name: Xcode build
-        run: |
-          xcodebuild \
-            -project MeetPR.xcodeproj \
-            -scheme MeetPR \
-            -destination 'generic/platform=iOS Simulator' \
-            build
-
       - name: Select test simulator
         id: simulator
         run: |
