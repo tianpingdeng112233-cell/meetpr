@@ -12223,8 +12223,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
-      "chest",
       "mobility"
     ],
     "equipment": [
