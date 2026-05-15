@@ -61,10 +61,12 @@ private struct SelectedAccessoryRow: View {
           .foregroundStyle(Color.MeetPR.fgPrimary)
           .frame(maxWidth: .infinity, alignment: .leading)
 
-        Text(exercise.map(PlanningDisplay.facetSummary(for:)) ?? "无动作标签")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        if let nameEn = exercise?.nameEn, !nameEn.isEmpty {
+          Text(nameEn)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
       }
 
       Button("删除", systemImage: "trash", action: onDelete)

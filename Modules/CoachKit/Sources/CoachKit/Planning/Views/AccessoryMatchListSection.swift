@@ -6,6 +6,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct AccessoryMatchListSection: View {
   private let exercises: [Exercise]
+  private let selectedExerciseIDs: Set<UUID>
   private let isLoading: Bool
   private let onAdd: @MainActor (Exercise) -> Void
 
@@ -13,10 +14,12 @@ public struct AccessoryMatchListSection: View {
 
   public init(
     exercises: [Exercise],
+    selectedExerciseIDs: Set<UUID>,
     isLoading: Bool,
     onAdd: @escaping @MainActor (Exercise) -> Void
   ) {
     self.exercises = exercises
+    self.selectedExerciseIDs = selectedExerciseIDs
     self.isLoading = isLoading
     self.onAdd = onAdd
   }
@@ -63,7 +66,10 @@ public struct AccessoryMatchListSection: View {
         } else {
           LazyVStack(spacing: MeetPRSpacing.sm) {
             ForEach(filteredExercises) { exercise in
-              AccessoryMatchRow(exercise: exercise) {
+              AccessoryMatchRow(
+                exercise: exercise,
+                isSelected: selectedExerciseIDs.contains(exercise.id)
+              ) {
                 onAdd(exercise)
               }
             }
@@ -86,6 +92,7 @@ public struct AccessoryMatchListSection: View {
 @MainActor
 private struct AccessoryMatchRow: View {
   let exercise: Exercise
+  let isSelected: Bool
   let onAdd: @MainActor () -> Void
 
   var body: some View {
@@ -97,29 +104,25 @@ private struct AccessoryMatchRow: View {
             .foregroundStyle(Color.MeetPR.fgPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
 
-          if let nameEn = exercise.nameEn {
+          if let nameEn = exercise.nameEn, !nameEn.isEmpty {
             Text(nameEn)
               .font(Font.MeetPR.footnote)
               .foregroundStyle(Color.MeetPR.fgSecondary)
               .frame(maxWidth: .infinity, alignment: .leading)
           }
-
-          Text(PlanningDisplay.facetSummary(for: exercise))
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
 
-        Image(systemName: "plus.circle.fill")
+        Image(systemName: isSelected ? "checkmark.circle.fill" : "plus.circle.fill")
           .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(isSelected ? Color.MeetPR.fgTertiary : Color.MeetPR.brandRed)
       }
       .padding(MeetPRSpacing.md)
       .background(Color.MeetPR.surface2)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
     .buttonStyle(.plain)
-    .accessibilityLabel("添加 \(exercise.name)")
+    .disabled(isSelected)
+    .accessibilityLabel(isSelected ? "已添加 \(exercise.name)" : "添加 \(exercise.name)")
   }
 }
 
