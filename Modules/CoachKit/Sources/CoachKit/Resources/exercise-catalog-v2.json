@@ -9923,7 +9923,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "chest",
       "mobility"
     ],
     "equipment": [
@@ -12028,7 +12027,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
       "mobility"
     ],
     "equipment": [
@@ -12048,7 +12046,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
       "mobility"
     ],
     "equipment": [
@@ -12068,7 +12065,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
       "mobility"
     ],
     "equipment": [
@@ -12088,7 +12084,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
       "mobility"
     ],
     "equipment": [
@@ -12108,7 +12103,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
       "mobility"
     ],
     "equipment": [
@@ -12474,7 +12468,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
       "mobility"
     ],
     "equipment": [
@@ -14097,7 +14090,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -14354,7 +14346,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -15412,7 +15403,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -15432,7 +15422,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -15452,7 +15441,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -15472,7 +15460,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -15492,7 +15479,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -15512,7 +15498,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -16551,7 +16536,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "biceps",
       "mobility"
     ],
     "equipment": [
@@ -17563,7 +17547,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "triceps",
       "mobility"
     ],
     "equipment": [
@@ -17773,7 +17756,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17831,7 +17813,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17851,7 +17832,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17871,7 +17851,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17891,7 +17870,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17911,7 +17889,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17950,7 +17927,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17970,7 +17946,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -17990,7 +17965,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -18010,7 +17984,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "calf",
       "mobility"
     ],
     "equipment": [
@@ -18298,7 +18271,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "forearm",
       "mobility"
     ],
     "equipment": [
@@ -20262,7 +20234,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "glute",
       "mobility"
     ],
     "equipment": [
@@ -20641,7 +20612,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad",
       "mobility"
     ],
     "equipment": [
@@ -20741,7 +20711,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -20761,7 +20730,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -20800,7 +20768,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
       "mobility"
     ],
     "equipment": [
@@ -20820,7 +20787,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -20899,7 +20865,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -20919,7 +20884,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -20958,7 +20922,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -20978,7 +20941,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder",
       "mobility"
     ],
     "equipment": [
@@ -21076,7 +21038,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -21559,7 +21520,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "core",
       "mobility"
     ],
     "equipment": [
@@ -21579,7 +21539,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
@@ -21599,7 +21558,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hamstring",
       "mobility"
     ],
     "equipment": [
@@ -21987,7 +21945,6 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "hip",
       "mobility"
     ],
     "equipment": [
