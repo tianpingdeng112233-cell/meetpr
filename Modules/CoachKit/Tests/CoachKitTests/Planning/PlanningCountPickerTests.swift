@@ -57,9 +57,9 @@ import ViewInspector
     step: 1
   ).inspect()
 
-  // Button order: minus (0), plus (1) — only ± buttons in current layout
-  let buttons = inspected.findAll(ViewType.Button.self)
-  try buttons[1].tap()  // plus
+  // Button order: minus (0), value-tap (1), plus (2). Value-tap opens
+  // the wheel sheet; ± do the increment/decrement.
+  try plusButton(in: inspected).tap()
 
   #expect(probe.value == 6)
 }
@@ -75,8 +75,7 @@ import ViewInspector
     step: 1
   ).inspect()
 
-  let buttons = inspected.findAll(ViewType.Button.self)
-  try buttons[0].tap()  // minus
+  try minusButton(in: inspected).tap()
 
   #expect(probe.value == 4)
 }
@@ -92,8 +91,7 @@ import ViewInspector
     step: 1
   ).inspect()
 
-  let buttons = inspected.findAll(ViewType.Button.self)
-  #expect(buttons[1].isDisabled())  // plus disabled
+  #expect(try plusButton(in: inspected).isDisabled())
 }
 
 @MainActor
@@ -107,8 +105,7 @@ import ViewInspector
     step: 1
   ).inspect()
 
-  let buttons = inspected.findAll(ViewType.Button.self)
-  #expect(buttons[0].isDisabled())  // minus disabled
+  #expect(try minusButton(in: inspected).isDisabled())
 }
 
 @MainActor
@@ -123,8 +120,7 @@ import ViewInspector
     step: 0.5
   ).inspect()
 
-  let buttons = inspected.findAll(ViewType.Button.self)
-  try buttons[1].tap()  // plus
+  try plusButton(in: inspected).tap()
 
   #expect(probe.value == 8.0)
 }
@@ -156,4 +152,24 @@ private func planningCountPicker(
     range: range,
     step: step
   )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private func plusButton(in inspected: InspectableView<ViewType.ClassifiedView>) throws
+  -> InspectableView<ViewType.Button>
+{
+  try inspected.find(ViewType.Button.self) { button in
+    (try? button.accessibilityLabel().string()) == "增加"
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private func minusButton(in inspected: InspectableView<ViewType.ClassifiedView>) throws
+  -> InspectableView<ViewType.Button>
+{
+  try inspected.find(ViewType.Button.self) { button in
+    (try? button.accessibilityLabel().string()) == "减少"
+  }
 }

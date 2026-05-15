@@ -12,6 +12,8 @@ struct PlanningCountPicker: View {
   let unitLabel: String?
   let formatStyle: FloatingPointFormatStyle<Double>
 
+  @State private var showWheel = false
+
   init(
     label: String,
     value: Binding<Double>,
@@ -34,14 +36,25 @@ struct PlanningCountPicker: View {
         .font(Font.MeetPR.bodyEmphasis)
         .foregroundStyle(Color.MeetPR.fgPrimary)
 
-      Spacer()
-
       stepButton(systemName: "minus", accessibilityLabel: "减少", action: decrementTapped)
         .disabled(decrementDisabled)
 
-      wheel
-        .frame(width: 72, height: 100)
-        .accessibilityLabel(accessibilityLabel)
+      Button {
+        showWheel = true
+      } label: {
+        Text(formattedDisplay(value))
+          .font(Font.MeetPR.body)
+          .monospacedDigit()
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .frame(minWidth: 44)
+          .padding(.horizontal, MeetPRSpacing.sm)
+          .padding(.vertical, MeetPRSpacing.xs)
+          .background(Color.MeetPR.surface2)
+          .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
+          .contentShape(.rect)
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(accessibilityLabel)
 
       stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
         .disabled(incrementDisabled)
@@ -52,13 +65,35 @@ struct PlanningCountPicker: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
     }
+    .sheet(isPresented: $showWheel) {
+      wheelSheet
+        .planningWheelSheetDetents()
+    }
+  }
+
+  private var wheelSheet: some View {
+    NavigationStack {
+      VStack(spacing: 0) {
+        wheel
+          .frame(maxWidth: .infinity)
+          .padding()
+        Spacer(minLength: 0)
+      }
+      .navigationTitle(label)
+      .planningInlineTitle()
+      .toolbar {
+        ToolbarItem(placement: .confirmationAction) {
+          Button("完成") { showWheel = false }
+        }
+      }
+    }
   }
 
   private var wheel: some View {
     Picker(label, selection: tagBinding) {
       ForEach(Self.tags(for: range, step: step), id: \.self) { tag in
         Text(formattedDisplay(Self.value(forTag: tag, range: range, step: step)))
-          .font(Font.MeetPR.body)
+          .font(Font.MeetPR.bodyEmphasis)
           .monospacedDigit()
           .tag(tag)
       }
@@ -159,6 +194,24 @@ extension View {
   fileprivate func planningWheelPickerStyle() -> some View {
     #if os(iOS)
       pickerStyle(.wheel)
+    #else
+      self
+    #endif
+  }
+
+  @ViewBuilder
+  fileprivate func planningWheelSheetDetents() -> some View {
+    #if os(iOS)
+      presentationDetents([.medium])
+    #else
+      self
+    #endif
+  }
+
+  @ViewBuilder
+  fileprivate func planningInlineTitle() -> some View {
+    #if os(iOS)
+      navigationBarTitleDisplayMode(.inline)
     #else
       self
     #endif
