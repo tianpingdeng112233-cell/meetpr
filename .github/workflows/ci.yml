@@ -156,7 +156,7 @@ jobs:
       - name: swift-format lint
         if: steps.swift.outputs.exists == 'true'
         run: |
-          docker run --rm -v "$(pwd):/work" -w /work swift:6.0-jammy \
+          docker run --rm -v "$(pwd):/work" -w /work swift:6.1-jammy \
             swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
 
   lint-swiftlint:
