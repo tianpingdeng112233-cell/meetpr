@@ -31,40 +31,45 @@ struct PlanningCountPicker: View {
   }
 
   var body: some View {
-    HStack(spacing: MeetPRSpacing.sm) {
-      Text(label)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-
-      stepButton(systemName: "minus", accessibilityLabel: "减少", action: decrementTapped)
-        .disabled(decrementDisabled)
-
-      Button {
-        showWheel = true
-      } label: {
-        Text(formattedDisplay(value))
-          .font(Font.MeetPR.body)
-          .monospacedDigit()
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .frame(minWidth: 44)
-          .padding(.horizontal, MeetPRSpacing.sm)
-          .padding(.vertical, MeetPRSpacing.xs)
-          .background(Color.MeetPR.surface2)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
-          .contentShape(.rect)
-      }
-      .buttonStyle(.plain)
-      .accessibilityLabel(accessibilityLabel)
-
-      stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
-        .disabled(incrementDisabled)
-
-      if let unitLabel {
-        Text(unitLabel)
+    VStack(spacing: MeetPRSpacing.xs) {
+      HStack(spacing: MeetPRSpacing.xs) {
+        Text(label)
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
+
+        if let unitLabel {
+          Text(unitLabel)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
+      }
+
+      HStack(spacing: MeetPRSpacing.sm) {
+        stepButton(systemName: "minus", accessibilityLabel: "减少", action: decrementTapped)
+          .disabled(decrementDisabled)
+
+        Button {
+          showWheel = true
+        } label: {
+          Text(formattedDisplay(value))
+            .font(Font.MeetPR.body)
+            .monospacedDigit()
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .frame(minWidth: 44)
+            .padding(.horizontal, MeetPRSpacing.sm)
+            .padding(.vertical, MeetPRSpacing.xs)
+            .background(Color.MeetPR.surface2)
+            .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+
+        stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
+          .disabled(incrementDisabled)
       }
     }
+    .frame(maxWidth: .infinity)
     .sheet(isPresented: $showWheel) {
       wheelSheet
         .planningWheelSheetDetents()
