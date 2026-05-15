@@ -157,13 +157,10 @@ public struct ProgressionRuleEditorCard: View {
   ) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Eyebrow(title, color: Color.MeetPR.fgTertiary, showsRule: false)
-      ScrollView(.horizontal) {
-        HStack(spacing: MeetPRSpacing.sm) {
-          content()
-        }
-        .padding(.vertical, 1)
+      RuleChipFlow(spacing: MeetPRSpacing.sm) {
+        content()
       }
-      .scrollIndicators(.hidden)
+      .padding(.vertical, 1)
     }
   }
 
@@ -325,6 +322,67 @@ extension ProgressionRuleDimension {
       "组数"
     case .reps:
       "次数"
+    }
+  }
+}
+
+/// A simple wrap layout that flows children left-to-right and wraps to a new
+/// row when the proposed width is exhausted. Used so the 应用动作 / 应用周
+/// chip rows show every option without horizontal scrolling.
+@available(iOS 17.0, macOS 14.0, *)
+private struct RuleChipFlow: Layout {
+  let spacing: CGFloat
+
+  func sizeThatFits(
+    proposal: ProposedViewSize,
+    subviews: Subviews,
+    cache: inout ()
+  ) -> CGSize {
+    let maxWidth = proposal.width ?? .infinity
+    var totalHeight: CGFloat = 0
+    var rowWidth: CGFloat = 0
+    var rowHeight: CGFloat = 0
+
+    for subview in subviews {
+      let size = subview.sizeThatFits(.unspecified)
+      let projected = rowWidth == 0 ? size.width : rowWidth + spacing + size.width
+      if projected > maxWidth, rowWidth > 0 {
+        totalHeight += rowHeight + spacing
+        rowWidth = size.width
+        rowHeight = size.height
+      } else {
+        rowWidth = projected
+        rowHeight = max(rowHeight, size.height)
+      }
+    }
+    totalHeight += rowHeight
+    return CGSize(width: maxWidth.isFinite ? maxWidth : rowWidth, height: totalHeight)
+  }
+
+  func placeSubviews(
+    in bounds: CGRect,
+    proposal: ProposedViewSize,
+    subviews: Subviews,
+    cache: inout ()
+  ) {
+    var x = bounds.minX
+    var y = bounds.minY
+    var rowHeight: CGFloat = 0
+
+    for subview in subviews {
+      let size = subview.sizeThatFits(.unspecified)
+      if x + size.width > bounds.maxX, x > bounds.minX {
+        x = bounds.minX
+        y += rowHeight + spacing
+        rowHeight = 0
+      }
+      subview.place(
+        at: CGPoint(x: x, y: y),
+        anchor: .topLeading,
+        proposal: ProposedViewSize(size)
+      )
+      x += size.width + spacing
+      rowHeight = max(rowHeight, size.height)
     }
   }
 }
