@@ -46,6 +46,9 @@ public struct Step4SelectAccessoriesView: View {
 
           AccessoryMatchListSection(
             exercises: viewModel.availableAccessories(for: selectedDayID),
+            selectedExerciseIDs: Set(
+              viewModel.selectedAccessories(for: selectedDayID).map(\.exerciseID)
+            ),
             isLoading: viewModel.isLoadingAccessories
           ) { exercise in
             Task {

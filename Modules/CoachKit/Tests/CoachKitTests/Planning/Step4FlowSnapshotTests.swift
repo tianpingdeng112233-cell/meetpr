@@ -35,7 +35,11 @@ import ViewInspector
 @Test func accessoryMatchListSectionAddButtonTriggersCallback() throws {
   let exercise = PlanningFixtures.accessoryCatalog()[0]
   var addedExerciseID: UUID?
-  let sut = AccessoryMatchListSection(exercises: [exercise], isLoading: false) { exercise in
+  let sut = AccessoryMatchListSection(
+    exercises: [exercise],
+    selectedExerciseIDs: [],
+    isLoading: false
+  ) { exercise in
     addedExerciseID = exercise.id
   }
   let inspected = try sut.inspect()
