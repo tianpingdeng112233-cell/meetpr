@@ -117,10 +117,6 @@ public struct ExerciseSetEditorCard: View {
             }
           }
         }
-
-        PrimaryButton(didSave ? "更新 W1 设置" : "保存 W1 设置", isFullWidth: true) {
-          persist()
-        }
       }
     }
   }
