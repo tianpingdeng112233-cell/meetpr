@@ -119,6 +119,14 @@ public struct ExerciseSetEditorCard: View {
         }
       }
     }
+    .task {
+      // Persist the default spec the first time the card appears so the
+      // downstream W1 validation doesn't reject exercises the coach never
+      // touched. Subsequent loads short-circuit because setSpec is non-nil.
+      if viewModel.setSpec(for: draftExercise.id) == nil {
+        persist()
+      }
+    }
   }
 
   private var header: some View {
