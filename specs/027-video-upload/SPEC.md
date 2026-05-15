@@ -82,8 +82,8 @@ public struct UploadTask: Codable, Sendable, Identifiable {
     case transcoding  // AVAssetExportSession 运行中
     case uploading
     case completed
-    case failed       // attemptCount >= 5 or 不可恢复错误
-    case cancelled    // 学员主动 cancel
+    case paused       // 单 driver cycle 内重试 5 次失败 → 等网络恢复 / 用户重试 → reset attempt count 后 → uploading
+    case cancelled    // 学员主动 cancel(调 AbortMultipartUpload 清 OSS server-side state)
   }
   public struct UploadedPart: Codable, Sendable {
     public let partNumber: Int
@@ -119,16 +119,22 @@ public actor VideoUploadActor {
 }
 ```
 
-状态机(per ADR-005 §4):
+状态机(per ADR-005 §4 + 2026-05-15 接 PR #115 Codex review non-blocking 修订):
 ```
 pending → transcoding → pending(转码完毕) → uploading → completed
                                               ↓ 失败
-                                          failed → 重试(attemptCount < 5) → uploading
-                                              ↓ attempts >= 5
-                                          terminal failed(UI 显示重试 CTA)
+                                          failed → 重试 → uploading
+                                              ↓ 单 driver cycle 失败 5 次
+                                          paused(等网络恢复 / app 重启 / 用户手动 → 自动 reset attempt count 后 → uploading)
+                                              ↓ 用户取消
+                                          cancelled(主动 abort multipart upload + 清本地)
 ```
 
-启动时 `loadAndResume()`:从 `Documents/upload_queue/` 读所有 .json,把 `status=uploading/failed/pending` 全部塞回 tasks,driver loop 自动接管。
+- **不再设 `terminal failed`**:之前定义 "attemptCount >= 5 永久 terminal" 会让一次地铁/地下健身房短暂网络抖动就把任务判死(PR #115 review non-blocking #3)
+- 改为:**一个 driver cycle 内**重试 5 次 + backoff 1/2/4/8/15s,失败转 `paused` 状态;**网络恢复**(`NWPathMonitor` 监听 satisfied)/ **app 重启** / **用户手动 tap "重试"** 任一触发 → attemptCount 清 0 → 回 `uploading`
+- `paused` UI 显示:"暂停 · 等网络恢复后自动继续 / [立即重试]"
+
+启动时 `loadAndResume()`:从 `Documents/upload_queue/` 读所有 .json,把 `status=uploading/failed/pending/paused` 全部塞回 tasks(此时所有 `failed/paused` 任务 attemptCount 重置为 0),driver loop 自动接管。
 
 ##### 2.3 `OSSMultipartClient`
 
@@ -159,19 +165,22 @@ iOS                                  Backend                   阿里云 OSS
 ```
 
 实装:
-- backend 新加 endpoint `POST /upload/initiate` + `POST /upload/complete`(本 spec backend §4 详)
-- iOS `OSSMultipartClient` 实装 `initiate` / `uploadPart` / `complete`,只与 backend + 直接 PUT 到 presigned URL 交互
+- backend 新加 endpoint `POST /upload/initiate` + `POST /upload/complete` + **`POST /upload/sign-parts`(re-sign,本 spec backend §4 详 — 2026-05-15 接 PR #115 review blocker)**
+- iOS `OSSMultipartClient` 实装 `initiate` / `uploadPart` / `complete` / **`signParts(uploadId, ossKey, partNumbers)` 用于 resume 重签**,只与 backend + 直接 PUT 到 presigned URL 交互
 - chunk size:**5MB**(per OSS multipart 最小 part 限制 100KB,V0.1 选 5MB 平衡 part 数 + 重传粒度)
 - 单视频典型 50MB → 10 part;120s 1Mbps 720p ≈ 15MB → 3 part
+- **presigned part URL 过期处理**(PR #115 Codex review blocker #1):initiate 返的 presigned URL 默认 1h 过期;若 `VideoUploadActor` 启动 resume 时发现 part PUT 收 `403 SignatureDoesNotMatch` 或 `AccessDenied`,即视为过期,自动调 `signParts(uploadId, ossKey, partNumbersRemaining)` 重签未完成 parts,再继续上传。本机超过 1h 后台/强杀恢复场景必走此路径
 
 ##### 2.4 `VideoTranscoder`
 
 ```swift
 public actor VideoTranscoder {
-  /// 转码到 H.264 720p 1Mbps
+  /// 转码到 H.264 720p, **best-effort 1Mbps**(per PR #115 Codex review non-blocking)
+  /// AVAssetExportSession + AVAssetExportPresetMediumQuality 不精确控 bitrate;
+  /// 主方案接受 0.8-2.0 Mbps 范围;验收 step measure 输出码率,若 > 1.5Mbps 才切 AVAssetWriter 路径
   public func transcode(input: URL) async throws -> URL {
     // AVAssetExportSession + AVAssetExportPresetMediumQuality
-    // 自定义 video output settings:H.264, 1280×720, 1Mbps target bitrate, 30fps
+    // 不假装可精确设 1Mbps;PRD §8.10 lean 目标是"现代 iPhone 客户端转码减服务端负担",码率精度是次要约束
     // 输出 Documents/upload_queue/<uuid>.mp4
   }
   /// 用 AVAssetImageGenerator 抽 1 帧做 thumbnail
@@ -181,7 +190,10 @@ public actor VideoTranscoder {
 }
 ```
 
-转码失败 fallback:**不转码直接上传原始**(老 iPhone 上 H.264 转码可能失败;PRD §8.10 lean 优化 vs 老设备健壮性的 tradeoff,本 spec 选 graceful fallback)。
+**转码失败 fallback**(per PR #115 Codex review non-blocking 加强):
+- 老 iPhone 上 H.264 转码失败 → **不转码直接上传原始**(graceful fallback)
+- **但** fallback 原片可能从 ~15MB 膨胀到 ~200-500MB(120s ProRes / HEVC 原始)
+- **UI 必须显式提示**:`VideoCapturePickerSheet` 或 upload row 上显示 ⚠️ "原始视频 ~300MB,蜂窝网络可能耗大量流量,继续上传?[ 仅 Wi-Fi 上传 ] / [ 任意网络上传 ]";学员选"仅 Wi-Fi" → `URLSessionConfiguration.allowsCellularAccess = false`(任务等到 Wi-Fi 才传)
 
 #### 3. `StudentKit` 学员侧视频附件 UI
 
@@ -227,11 +239,14 @@ backend 起 `specs/004-video-upload/SPEC.md`,含:
 
 | Method + Path | Roles | Request | Response |
 |---|---|---|---|
-| `POST /upload/initiate` | student | `{ planExerciseId, setIndex, contentType, fileSizeBytes }` | `200 { uploadId, ossKey, presignedParts: [{partNumber, presignedURL}] }` |
-| `POST /upload/complete` | student | `{ uploadId, ossKey, parts: [{partNumber, etag}], durationSeconds, thumbnailFileSize }` | `201 VideoAttachment` |
+| `POST /upload/initiate` | student | `{ planExerciseId, setIndex, contentType, fileSizeBytes }` | `200 { uploadId, ossKey, presignedParts: [{partNumber, presignedURL}] }`(URL 1h 过期) |
+| **`POST /upload/sign-parts`(新,per PR #115 review blocker #1)** | student | `{ uploadId, ossKey, partNumbers: [Int] }` | `200 { presignedParts: [{partNumber, presignedURL}] }`(re-sign 未完成 parts,URL 1h 过期) |
+| `POST /upload/complete` | student | `{ uploadId, ossKey, parts: [{partNumber, etag}], durationSeconds, thumbnailFileSize }` | `201 VideoAttachment`(含 `videoURL: String` + `thumbnailURL: String` 短期 1h presigned read URL) |
 | `POST /upload/abort` | student | `{ uploadId, ossKey }` | `204` |
 | `POST /privacy/consent` | student | `{ kind: "video_visibility_v1", agreedAt }` | `204` |
-| `GET /students/:id/videos` | student(self) / coach(owner) | — | `200 { items: VideoAttachment[] }` |
+| **`GET /students/:id/videos`(per PR #115 review blocker #2 修订)** | student(self) / coach(owner) | — | `200 { items: VideoAttachmentWithURLs[] }`(每条 `VideoAttachment` 字段 + **`videoURL: String` + `thumbnailURL: String`** 短期 1h presigned read URLs)|
+
+**read URL strategy(per PR #115 review blocker #2)**:私有 OSS bucket 不可公网读;`GET /students/:id/videos` 直接在 response 内为每个视频附**短期 presigned read URL**(1h),iOS 播放器拿到即用。**避免** 单独 `POST /upload/presign-read` round-trip。1h 过期后学员重打开 list 刷新即可拿新 URL — 视频播放器 60-120s 时长内不会过期。
 
 ##### 4.2 OSS bucket 配置
 
@@ -272,7 +287,7 @@ CREATE TABLE privacy_consents (
 
 ##### 4.4 OSS 签名 URL 生成
 
-backend 用 阿里云 OSS Node.js SDK,服务端持 AccessKey/SecretKey(SAE env var)。`POST /upload/initiate` 内:
+backend 用 阿里云 OSS Node.js SDK,服务端持 AccessKey/SecretKey(SAE env var)。所有 presigned URL **统一 1h 过期**(initiate / sign-parts / read 三处均一致)。`POST /upload/initiate` 内:
 - 调 `InitiateMultipartUpload(bucket, ossKey)` → 拿 uploadId
 - 按预估 part 数(`fileSizeBytes / 5MB`)生成 N 个 presigned URL(用 `signatureUrl` 方法,过期 1h)
 - 返 iOS
@@ -444,3 +459,4 @@ V0.1 内测期同意文案 = **占位**(Apple §5.1.1 内测不强制法律 revi
 | 日期 | 版本 | 变更 | 作者 |
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。客户端 H.264 + OSS multipart resumable + 单视频串行 + 隐私同意 V1 内测占位 | Claude |
+| 2026-05-15 | 0.2 | 接 PR #115 Codex review:**blocker 1** — presigned URL 1h × resumable 跨过 1h 后 part URL 全过期,加 backend `POST /upload/sign-parts` re-sign endpoint + iOS resume 时 403 自动重签;**blocker 2** — 私有 bucket 缺 read URL contract,`GET /students/:id/videos` 直接附短期 1h presigned `videoURL` / `thumbnailURL`,本 spec 学员自看入口直接用;non-blocking — `VideoTranscoder` 改 "best-effort 1Mbps" 描述,移除"精确 H.264 1280×720 1Mbps 30fps" 假象;状态机加 `paused` 替 terminal `failed`,网络恢复 / app 重启 / 用户手动 reset attempt count;fallback 原片 UI 提示 "蜂窝可能耗大量流量" + "仅 Wi-Fi 上传" 选项 | Claude |
