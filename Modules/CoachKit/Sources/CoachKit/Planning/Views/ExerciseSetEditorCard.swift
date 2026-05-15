@@ -69,25 +69,27 @@ public struct ExerciseSetEditorCard: View {
           )
         }
 
-        PlanningCountPicker(
-          label: "组数",
-          value: setCountBinding,
-          range: 1...20,
-          step: 1
-        )
-        .onChange(of: setCount) { _, _ in persist() }
+        HStack(spacing: MeetPRSpacing.md) {
+          PlanningCountPicker(
+            label: "组数",
+            value: setCountBinding,
+            range: 1...20,
+            step: 1
+          )
+          .onChange(of: setCount) { _, _ in persist() }
 
-        PlanningCountPicker(
-          label: "次数",
-          value: targetRepsBinding,
-          range: 1...50,
-          step: 1
-        )
-        .onChange(of: targetReps) { _, newReps in
-          if let currentMax = targetRepsMax, currentMax < newReps {
-            targetRepsMax = newReps
+          PlanningCountPicker(
+            label: "次数",
+            value: targetRepsBinding,
+            range: 1...50,
+            step: 1
+          )
+          .onChange(of: targetReps) { _, newReps in
+            if let currentMax = targetRepsMax, currentMax < newReps {
+              targetRepsMax = newReps
+            }
+            persist()
           }
-          persist()
         }
 
         OptionalRepsMaxRow(
