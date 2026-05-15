@@ -54,6 +54,7 @@ public struct Step6ProgressionRulesView: View {
     }
     .background(Color.MeetPR.bg)
     .navigationTitle("递进规则")
+    .scrollDismissesKeyboard(.interactively)
   }
 }
 
