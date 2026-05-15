@@ -50,14 +50,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name: Build and test Swift packages
+      - name: Test Swift packages
         run: |
           for package in Modules/*; do
             if [ -f "$package/Package.swift" ]; then
-              echo "::group::swift build $package"
-              swift build --package-path "$package"
-              echo "::endgroup::"
-
               echo "::group::swift test $package"
               swift test --package-path "$package" --parallel --enable-code-coverage
               echo "::endgroup::"
