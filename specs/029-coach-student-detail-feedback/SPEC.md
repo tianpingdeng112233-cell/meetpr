@@ -70,7 +70,7 @@ CoachKit/Sources/CoachKit/Features/
 ├── StudentRoster/                            # Tab 2 list 入口
 │   ├── StudentRosterView.swift
 │   ├── StudentRosterViewModel.swift
-│   └── StudentRosterRow.swift                # name + 头像 + 本周完成度 mini + 待反馈数
+│   └── StudentRosterRow.swift                # name + 头像 + 本周完成度 mini + 待关注数
 ├── StudentDetail/                            # 单学员详情
 │   ├── StudentDetailView.swift               # 顶部 segmented 5 tab(概览/执行/视频/成长/反馈)
 │   ├── StudentDetailViewModel.swift
@@ -123,7 +123,7 @@ public struct CoachRootView: View {
 - list of `StudentRosterRow`:
   ```
   [ 头像占位 ][ xty                  ][ 本周完成 3/4 训练 ]
-              [ 上次活跃 2026-05-14 ][ 红点 N 待反馈      ]
+              [ 上次活跃 2026-05-14 ][ 红点 N 待关注      ]
   ```
 - tap row → push `StudentDetailView(studentId:)`
 - 顶部 search bar(若学员 ≥ 5;V0.1 仅 1-2 个学员可隐藏)
@@ -179,16 +179,15 @@ struct StudentDetailView: View {
 
 - 3-column grid of `VideoThumbnailCell`(DesignSystem)
 - tap → push `CoachVideoPlayerView`(AVKit `VideoPlayer` + 倍速 0.5/1/1.5/2)
-- 数据:`BackendVideoRepository.fetchStudentVideos(studentId:)`(spec 027 backend `/students/:id/videos` 已 ready)
-- 本 spec 加 iOS-side `BackendVideoRepository` protocol + 实装(spec 027 仅装学员侧自看,教练侧本 spec 加)
+- 数据:`BackendVideoRepository.fetchStudentVideos(studentId:)`(prerequisite — spec 027 amend 后 backend 004 必须实装 `GET /students/:id/videos`,wire shape 含短期 1h presigned `videoURL` / `thumbnailURL`;不在本 spec 范围)
+- iOS-side `BackendVideoRepository` protocol + 实装均由 spec 027 起,本 spec 仅消费(教练端学员视频 grid 复用学员端已建好的 repo,不引入新文件)
 
 ##### 2.7 `StudentGrowthCurveView`
 
 直接 reuse `DesignSystem.E1RMChart`:
 - 同 spec 028 学员侧 `GrowthCurveView` 视觉一致
-- 数据走 `BackendE1RMRepository.fetchHistory(studentId:exerciseId:)`(本 spec 加教练侧入口,实装上仍是本地;V0.1 + V0.1.x 都本地算)
-
-> **跨设备 caveat**:e1RM 是学员设备本地算,教练设备看不到。**本 spec 暂用 fallback**:从学员的 `StudentSetLog`(backend 已存)在教练端**重新算一次** e1RM(用 `E1RMCalculator` 同一公式,因数学纯逻辑,可在 CoachKit 内复制此 enum)。V0.1.x 上 backend e1RM endpoint 后切换。
+- **V0.1 数据流(per 028 持久化口径)**:e1RM 不上 backend(spec 028 + 026 已锁),教练端**完全不**调 `BackendE1RMRepository`(本 spec 也不需要这个 protocol)。教练端从 `BackendStudentTrainingLogRepository.fetchLogs(studentId:in:)` 拉学员 `StudentSetLog[]` → 调 **CoachKit 内复制份的 `E1RMCalculator.calculate(...)`** 反推每组 e1RM → 输入 `DesignSystem.E1RMChart`
+- 两端 calculator 一致由 §技术要求 / `E1RMCalculator` 复制 + golden fixture CI 保证
 
 ##### 2.8 `CoachFeedbackHistoryView` + `FeedbackComposerView`
 
@@ -263,7 +262,7 @@ public init(
 | 同 `Features/StudentDetail/Overview/StudentOverviewViewModelTests.swift`(新) | 三块卡片数据组装 |
 | 同 `Features/StudentDetail/Feedback/FeedbackComposerViewModelTests.swift`(新) | 文本空校验 / 发送成功 / 失败 banner / 关联 chip 状态 |
 | `Modules/Networking/Tests/NetworkingTests/Repositories/BackendVideoRepositoryTests.swift`(新) | fetch + presigned URL |
-| `Modules/CoreModels/Tests/CoreModelsTests/Repository/RepositoryProtocolTests.swift`(新) | protocol 编译 + 抽象方法签名稳定 |
+| `Modules/RepositoryContracts/Tests/RepositoryContractsTests/ProtocolCompileTests.swift`(新) | protocol 编译 + 抽象方法签名稳定;CI 同时跑 grep 检查无 SwiftUI/Combine/IO import 进 contract target |
 
 #### 7. CHECKLIST.md
 
