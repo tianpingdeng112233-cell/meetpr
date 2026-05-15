@@ -94,6 +94,12 @@ public struct ProgressionRuleEditorCard: View {
           seedCustomSequenceFromW1()
         }
       }
+      .onChange(of: rule.exerciseIDs) { _, _ in
+        if rule.ruleType == .custom {
+          seedCustomSequenceFromW1()
+          persistRule()
+        }
+      }
     }
   }
 
