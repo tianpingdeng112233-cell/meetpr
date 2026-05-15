@@ -2461,7 +2461,7 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder"
+      "chest"
     ],
     "equipment": [
       "dumbbell"
@@ -4515,7 +4515,7 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "biceps"
+      "hamstring"
     ],
     "equipment": [
       "barbell"
@@ -4629,7 +4629,8 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "hamstring",
+      "glute"
     ],
     "equipment": [
       "barbell"
@@ -7775,7 +7776,8 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "cardio"
+      "chest",
+      "triceps"
     ],
     "equipment": [
       "bodyweight"
@@ -9278,26 +9280,6 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f7",
     "name": "跪姿俯卧撑",
-    "nameEn": null,
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest",
-      "triceps"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:14:43Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000001f8",
-    "name": "俯卧撑(负重)",
     "nameEn": null,
     "exerciseType": "accessory",
     "mainLiftFamily": null,
@@ -11036,25 +11018,6 @@
     "createdAt": "2026-05-14T13:24:05Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000251",
-    "name": "单手悍马机划船",
-    "nameEn": null,
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back"
-    ],
-    "equipment": [
-      "machine"
-    ],
-    "movementPattern": [
-      "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:24:05Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000252",
     "name": "单手支撑式悍马俯身划船",
     "nameEn": null,
@@ -12677,25 +12640,6 @@
     "createdAt": "2026-05-14T13:36:47Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-0000000002a6",
-    "name": "俯卧哑铃腿弯举",
-    "nameEn": null,
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "dumbbell"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:36:47Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-0000000002a7",
     "name": "哑铃箭步蹲",
     "nameEn": null,
@@ -13461,25 +13405,6 @@
     "muscleGroups": [
       "hip_flexor",
       "core"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:36:47Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000002ce",
-    "name": "弹力带-站姿单腿内收",
-    "nameEn": null,
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "adductor"
     ],
     "equipment": [
       "band"
@@ -15146,25 +15071,6 @@
     "id": "00000000-0000-0000-ca70-000000000324",
     "name": "弹力带-侧拉",
     "nameEn": "Band Side Pull",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "shoulder"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T00:00:00Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000325",
-    "name": "弹力带-俯身后束飞鸟",
-    "nameEn": "Band Bent-Over Rear Delt Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -16970,25 +16876,6 @@
     "id": "00000000-0000-0000-ca70-000000000384",
     "name": "直杆绳索下压",
     "nameEn": "Straight Bar Cable Pushdown",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "triceps"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-15T00:00:00Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000385",
-    "name": "绳索臂屈伸(单)",
-    "nameEn": "Single-Side Cable Tricep Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -19454,25 +19341,6 @@
     "id": "00000000-0000-0000-ca70-000000000405",
     "name": "直腿髋外展",
     "nameEn": "Straight-Leg Hip Abduction",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute"
-    ],
-    "equipment": [
-      "machine"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-15T00:00:00Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000406",
-    "name": "器械后蹬",
-    "nameEn": "Machine Back Push",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
