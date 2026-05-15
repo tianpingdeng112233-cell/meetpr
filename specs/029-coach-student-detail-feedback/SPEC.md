@@ -105,14 +105,16 @@ public struct CoachRootView: View {
     TabView {
       PlanningCoordinatorView(...).tabItem { Label("排计划", systemImage: "calendar.badge.plus") }
       StudentRosterView(...).tabItem { Label("学员", systemImage: "person.2") }
-        .badge(unreadFeedbackCount)
+        .badge(pendingAttentionCount)
       CoachMyProfileView(...).tabItem { Label("我的", systemImage: "person") }
     }
   }
 }
 ```
 
-`unreadFeedbackCount` 来源 = 该教练所有 bound students 中**待教练反馈**的数(粗定义:学员当周已完成训练 + 教练 N 天没反馈,V0.1 简化为"近 3 天有 set log 且无新 feedback");V0.1.x 加更精细规则。
+`pendingAttentionCount` 来源 = 该教练所有 bound students 中**待教练关注**的数(粗定义:学员当周已完成训练 + 教练 N 天没反馈,V0.1 简化为"近 3 天有 set log 且无新 feedback");V0.1.x 加更精细规则。
+
+**文案策略(2026-05-15 接 PR #117 Codex review non-blocking)**:UI 标签用 "**待关注**" 而非 "待反馈"。理由:V0.1 粗规则会误报(学员热身组打勾教练也看到"待反馈"),"待反馈"是强承诺(教练觉得"必须写反馈"心理负担重);"待关注"是轻承诺(教练看一眼即可,不强迫写)— 等 V0.1.x 加精细规则(只针对正式训练动作 + 智能去重)后再用"待反馈"。
 
 ##### 2.2 `StudentRosterView`(Tab 2)
 
@@ -126,7 +128,7 @@ public struct CoachRootView: View {
 - tap row → push `StudentDetailView(studentId:)`
 - 顶部 search bar(若学员 ≥ 5;V0.1 仅 1-2 个学员可隐藏)
 
-数据来源:`StudentBindingService.fetchStudents()` → 走 `BackendPlanRepository.fetchStudents()`(spec 026 已实装,backend 002 `/coach/students` 返 `CoachStudentSummary[]`)
+数据来源:`StudentBindingService.fetchStudents()` → 走 `BackendPlanRepository.fetchStudents()`(spec 026 amend 后实装,**backend 002 `/coach/students` 之前是 501 stub,backend 003 必须实装** — 见 §Backend dependencies hard prerequisites)。wire shape `CoachStudentSummary[]` 见 spec 026 §2.5。
 
 ##### 2.3 `StudentDetailView` 顶部 5 segment
 
@@ -209,20 +211,20 @@ struct StudentDetailView: View {
 
 > 倾向不动 CoreModels,在 CoachKit ViewModel 层 join `CoachStudentSummary` 拿 displayName。
 
-#### 4. iOS `BackendVideoRepository`(spec 027 加学员侧入口,本 spec 加教练侧)
+#### 4. iOS `BackendVideoRepository`(spec 027 加学员侧入口 + read URL contract,本 spec 仅消费,**0 backend 工作**)
 
-位置:`Modules/Networking/Sources/Networking/Repositories/BackendVideoRepository.swift`(新)
+位置:`Modules/RepositoryContracts/Sources/RepositoryContracts/VideoRepository.swift`(protocol;spec 027 起,本 spec 移到 RepositoryContracts per D3)+ `Modules/Networking/Sources/Networking/Repositories/BackendVideoRepository.swift`(impl;spec 027 起,本 spec 仅 reuse)
 
 ```swift
+// In RepositoryContracts (per D3, 移自 spec 027 创建的初版位置)
 public protocol VideoRepository: Sendable {
-  func fetchStudentVideos(studentId: UUID) async throws -> [VideoAttachment]
-  func presignedReadURL(ossKey: String) async throws -> URL
+  /// 返回的每条 VideoAttachment 已带短期 1h presigned videoURL + thumbnailURL
+  /// (per spec 027 §4.1 GET /students/:id/videos 返回 wire shape)
+  func fetchStudentVideos(studentId: UUID) async throws -> [VideoAttachmentWithURLs]
 }
-
-public final class BackendVideoRepository: VideoRepository, Sendable { ... }
 ```
 
-`presignedReadURL` 调 backend `POST /upload/presign-read`(本 spec backend 加,小 endpoint 在 spec 026 / spec 027 backend impl 时一起加;若 backend 已支持公网读则跳过此 endpoint,V0.1 内测可走公网读不签名)
+**架构调整(2026-05-15 接 PR #117 Codex review #2 blocker)**:之前 0.1 spec 写本 spec 新加 `POST /upload/presign-read` endpoint — 与 PR header "本 spec 0 backend 工作" 冲突。**移除** 该 endpoint;read URL contract **完全归属 spec 027 backend 004 spec**(spec 027 修订版 0.2 已加 `GET /students/:id/videos` 返回每条 video 短期 1h presigned `videoURL` / `thumbnailURL`)。本 spec 仅消费 spec 027 提供的 `VideoRepository`,**不**碰 backend OSS 签名逻辑。
 
 #### 5. `CoachKit` 注入 + `MeetPRApp` 入口扩
 
@@ -238,19 +240,19 @@ public init(
 )
 ```
 
-注意:**这些 repo 都是 protocol**,CoachKit 不 import StudentKit;`StudentPlanRepository` 等 protocol 定义在 `StudentKit` 内 — **本 spec 移到 CoreModels 内的 `Repository/` 子模块**(decision below)。
+注意:**这些 repo 都是 protocol**,CoachKit 不 import StudentKit;`StudentPlanRepository` 等 protocol 定义在新建的 SPM target **`Modules/RepositoryContracts/`** 内(D3 决议 b — 见 §技术要求)。
 
-> **架构 decision** — protocol 定义位置:`StudentPlanRepository` / `StudentTrainingLogRepository` / `StudentFeedbackRepository` / `E1RMRepository` / `VideoRepository` 5 个 protocol 目前在 StudentKit 内(spec 024 / 028 / 027)。教练侧本 spec 要用,意味着 CoachKit 需 import StudentKit — **违反 ADR-005 §1**。
+> **架构 decision(2026-05-15 接 PR #117 Codex review #1 blocker D3 b)** — protocol 定义位置:`StudentPlanRepository` / `StudentTrainingLogRepository` / `StudentFeedbackRepository` / `E1RMRepository` / `VideoRepository` 5 个 protocol 移到**新建 SPM target `Modules/RepositoryContracts/`**。CoreModels 保持纯数据。
 >
-> **决议**:把这 5 个 protocol(纯 protocol,无实装)**移到 `CoreModels/Sources/CoreModels/Repository/`** 子文件夹。
+> **影响**:
+> - 新 SPM target `RepositoryContracts`(成为第 7 个 module),仅放 5 个 `protocol`,**不允许** import SwiftUI / Combine / IO / Foundation 之外的东西;依赖 `CoreModels` only
+> - StudentKit / CoachKit / Networking / AppShell 各自加 `RepositoryContracts` SPM dep
+> - 实装(`InMemory*` / `Backend*` / `Local*`)仍在各自 module
+> - **ADR-005 §1 update**:本 spec 触发 ADR docs PR(`~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md`)— "6 个 SPM target" 改 "7 个" + 加 RepositoryContracts target 描述 + "Repository protocol 走 RepositoryContracts,CoreModels 保持纯数据 invariant 不被破坏"
+> - 本 spec impl 时需 mechanical refactor spec 024 / 027 / 028 已合代码 — Codex 第一个 commit 做 refactor + CI 验过,再加 feature commit
 >
-> 影响:
-> - CoreModels 不再"100% 纯数据型",但 ADR-005 §1 说"CoreModels 仅跨 role 的纯数据结构"— protocol 是契约不是 state,可以接受;ADR-005 §1 可在本 spec 内 docs PR 微调
-> - StudentKit / CoachKit 各自 import CoreModels 拿 protocol,实装(InMemory* / Backend*)仍在各自 module
-> - 本 spec impl 时需 refactor spec 024 / 027 / 028 已经合并的代码 — Codex 实装的第一步是 "extract protocol to CoreModels" 的 mechanical refactor
->
-> **替代方案 B**(被否)= 新建 `Modules/RepositoryContracts/` SPM target 仅放 protocol。
-> 理由不选:多一个 module 拉长 build 时间,V1 减依赖原则违反。
+> **替代方案 A**(原 0.1 spec 主方案,被否)= protocol 移到 `CoreModels/Repository/` 子文件夹。
+> 理由不选(2026-05-15 接 Codex 论证):CoreModels 容易从 data model 沦为"跨模块杂物间";"6 个 SPM target" → "7 个" 的 build time tax 实测 +5-10s 可接受;ADR-005 §1 "CoreModels 仅纯数据"的 invariant 应保留作为长期不变量,而非微调。
 
 #### 6. 测试
 
@@ -299,44 +301,102 @@ public init(
 
 ### Protocol 重排(spec 024 / 027 / 028 影响)
 
-本 spec impl PR 第一个 commit = mechanical refactor:
-1. 在 `Modules/CoreModels/Sources/CoreModels/Repository/` 创建文件夹
-2. 移动以下 protocol(不动实装):
-   - `StudentPlanRepository.swift` ← from StudentKit
-   - `StudentTrainingLogRepository.swift` ← from StudentKit
-   - `StudentFeedbackRepository.swift` ← from StudentKit
-   - `E1RMRepository.swift` ← from StudentKit
-   - `VideoRepository.swift` ← from Networking(spec 027 学员侧的)
-3. 更新 StudentKit / Networking / CoachKit 的 import statements
-4. ADR-005 §1 微调一句话 — "CoreModels 内可放跨 role 的 Repository protocol(无状态契约),实装仍在各 role kit 内" — 写入本 spec 内 docs amendment(Brain wiki 单独 docs PR,本 spec 内 link)
+本 spec impl PR 第一个 commit = mechanical refactor(D3 决议 b,2026-05-15):
 
-### `CoachKit` 内 `E1RMCalculator` 复制(临时)
+1. 新建 SPM target `Modules/RepositoryContracts/`:
+   ```
+   Modules/RepositoryContracts/
+   ├── Package.swift                # platforms iOS 17 / macOS 14;deps: CoreModels;StrictConcurrency on
+   ├── Sources/RepositoryContracts/
+   │   ├── StudentPlanRepository.swift          # protocol
+   │   ├── StudentTrainingLogRepository.swift   # protocol
+   │   ├── StudentFeedbackRepository.swift      # protocol
+   │   ├── E1RMRepository.swift                 # protocol
+   │   └── VideoRepository.swift                # protocol
+   └── Tests/RepositoryContractsTests/
+       └── ProtocolCompileTests.swift           # 仅验 protocol 编译 + 签名稳定
+   ```
 
-本 spec 在 `CoachKit/Sources/CoachKit/Domain/E1RMCalculator.swift` 复制一份(与 StudentKit 同 enum,文档显式注明"V0.1.x 后 extract to E1RMDomain shared target")。复制内容必须 1:1 一致;V0.1.x 视情况 extract。
+2. 移动 5 个 protocol from 当前位置 → RepositoryContracts(不动实装):
+   - `StudentPlanRepository.swift` ← from StudentKit/Repository/
+   - `StudentTrainingLogRepository.swift` ← from StudentKit/Repository/
+   - `StudentFeedbackRepository.swift` ← from StudentKit/Repository/
+   - `E1RMRepository.swift` ← from StudentKit/Repository/
+   - `VideoRepository.swift` ← from Networking/Repositories/(spec 027 学员侧)
 
-替代:把 spec 028 的 E1RMCalculator 也提到 CoreModels — 但 enum + 纯逻辑函数放 CoreModels 不那么干净(CoreModels 应是 data type)。
+3. 更新 import statements:
+   - `Modules/StudentKit/Package.swift` 加 `RepositoryContracts` dep + `InMemory*` 文件加 `import RepositoryContracts`
+   - `Modules/Networking/Package.swift` 加 dep(若 `BackendVideoRepository` 装在 Networking)
+   - `Modules/CoachKit/Package.swift` 加 dep + import(用 StudentPlanRepository / E1RMRepository / VideoRepository)
+   - `Modules/AppShell/Package.swift` 加 dep + import(注入路径)
+   - `Modules/CoreModels/Package.swift` **不**加 — RepositoryContracts 依赖 CoreModels,反向依赖会循环
 
-→ 本 spec **复制** + 添 FOLLOWUPS.md 条目 F-030 "extract E1RMCalculator to shared domain target",触发 = Stage 3 EvaluationDomain extract 同期
+4. **ADR-005 §1 docs PR**(`~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md` 更新):
+   - "6 个 SPM target" → "7 个"
+   - 加 `RepositoryContracts` target 描述:"跨 role Repository protocol(无实装,无状态);依赖 CoreModels;**禁止** import SwiftUI / Combine / IO 框架"
+   - CoreModels 描述加一句:"保持纯数据型不变 — Repository protocol 走 RepositoryContracts target,不在此"
+   - **本 docs PR 必须在 029 impl PR 之前合**(prerequisite)
 
-### CoachKit ⊥ StudentKit 强约束自检
+5. RepositoryContracts target 加 CI 健康检查:
+   - `grep -rE "^import (SwiftUI|Combine|Foundation\\.)" Modules/RepositoryContracts/Sources/` → 必须空(除 `Foundation` 自身)
+   - protocol 全部 `Sendable`
 
-```bash
-# impl PR review 时跑
-grep -rE "^import StudentKit" Modules/CoachKit/   # 必须空
-grep -rE "^import CoachKit" Modules/StudentKit/   # 必须空
-```
+### `CoachKit` 内 `E1RMCalculator` 复制 + golden fixture(2026-05-15 接 PR #117 Codex review non-blocking 加强)
 
-### Backend dependencies(spec 026 复用 + 本 spec 不加)
+本 spec 在 `CoachKit/Sources/CoachKit/Domain/E1RMCalculator.swift` 复制 spec 028 `Modules/StudentKit/Sources/StudentKit/Domain/E1RMCalculator.swift`(含 `rtsTable` 12×9 lookup + RPE 线性插值 + Epley fallback,与 StudentKit 1:1 一致)。
 
-本 spec 走 spec 026 已起的 backend endpoint:
-- `GET /coach/students` → CoachKit StudentRoster
-- `GET /students/:id/plans?status=published` → StudentDetail Execution
-- `GET /students/:id/sets` → StudentDetail Execution
-- `GET /students/:id/feedback` → StudentDetail Feedback history
-- `POST /coach/feedback` → FeedbackComposer 发送
-- `GET /students/:id/videos`(spec 027 backend 已 ready)→ StudentDetail Videos
+**两端输出一致性的 CI guardrail**:
+1. 建 **共享 golden fixture** 文件:`Modules/CoreModels/Tests/CoreModelsTests/Fixtures/e1rm_golden.json`(纯数据,无 Swift 代码)
+   - 至少 30 个 input/output triplet:`{weightKg, reps, rpe?, expectedE1RMKg}`(覆盖 RTS 表关键 cells + Epley fallback + 边界)
+2. **CoachKit 单测** 跑 `CoachKit.E1RMCalculator.calculate(...)` 对 golden fixture,assert 浮点差 ≤ 0.001 kg
+3. **StudentKit 单测** 跑 `StudentKit.E1RMCalculator.calculate(...)` 同 golden fixture,assert 一致
+4. CI 同时跑两 module 测试,任一不一致 → fail build
 
-**本 spec backend 工作量 = 0**(若 spec 026 + 027 已 land)
+**FOLLOWUPS.md F-030**:V0.1.x 视情况 extract `E1RMCalculator` 到 shared domain SPM target(触发 = Stage 3 EvaluationDomain extract 同期,或两端数学逻辑漂移导致单测维护成本上升)。
+
+**替代方案 B**(被否):放 CoreModels — 纯逻辑函数 + RTS 数据表与 CoreModels"纯数据型"语义弱不合,且违反 D3 决议(CoreModels 保持纯数据)。
+
+**替代方案 C**(被否):立即建 `E1RMDomain` SPM target — 仅 1 个 calculator 函数,target 颗粒过细;FOLLOWUPS 触发条件成熟再 extract。
+
+### CoachKit ⊥ StudentKit 强约束自检(2026-05-15 接 PR #117 Codex review non-blocking 加强)
+
+CI 检查 **两层**:
+
+1. **Import-level grep**(已有):
+   ```bash
+   grep -rE "^import StudentKit" Modules/CoachKit/   # 必须空
+   grep -rE "^import CoachKit" Modules/StudentKit/   # 必须空
+   ```
+
+2. **Package.swift dependency 图检查**(新加,per Codex review non-blocking):
+   ```bash
+   # 解析 Modules/CoachKit/Package.swift 的 dependencies,验证不含 StudentKit
+   # 反之亦然
+   # 用 swift-syntax 解析或简单 grep:
+   grep -F "\"StudentKit\"" Modules/CoachKit/Package.swift   # 必须空
+   grep -F "\"CoachKit\"" Modules/StudentKit/Package.swift   # 必须空
+   ```
+
+   理由:仅 grep import 不够 — target 依赖可能已加但暂时没 import,后续 Codex 调用一行就破坏不变量。Package.swift 是 declarative source of truth。
+
+两层 CI step 加在 GitHub Actions workflow,任一失败 → fail build。
+
+### Backend dependencies — hard prerequisites(2026-05-15 接 PR #117 Codex review #3 blocker)
+
+本 spec **不引入新 backend endpoint**(0 backend 工作)。**前置条件**(spec 026 / 027 必须先合):
+
+| Endpoint | 谁实装 | 现状 | 本 spec 用于 |
+|---|---|---|---|
+| `GET /coach/students` | **spec 026 / backend 003-student-actions(blocker — backend 002 仍是 501 stub)** | ⚠️ stub,待 spec 026 amend 后(per #114 review)+ backend 003 实装 | StudentRoster Tab 第一屏 |
+| `GET /students/:id/plans?status=published` | backend 002 已合 | ✅ | StudentDetail Execution |
+| `GET /students/:id/sets` | spec 026 / backend 003 | ⚠️ 待 spec 026 amend 实装 | StudentDetail Execution(学员录入回看) |
+| `GET /students/:id/feedback` | spec 026 / backend 003 | ⚠️ 待 spec 026 amend 实装 | StudentDetail Feedback history + Tab 2 unread badge |
+| `POST /coach/feedback` | spec 026 / backend 003 | ⚠️ 待 spec 026 amend 实装 | FeedbackComposer 发送 |
+| `GET /students/:id/videos` (含 short-lived presigned URLs) | spec 027 / backend 004 | ⚠️ 待 spec 027 amend(per #115 review)+ backend 004 实装 | StudentDetail Videos thumbnail + player |
+
+**本 spec impl 启动条件**:spec 026 + spec 027 上述 endpoint 全部 land 在 staging。**否则** 本 spec impl PR review 第一屏空、无视频、写反馈失败,无法验收。**Codex 实装时第一步验证 backend staging 全部 endpoint 返 200**,否则 abort 等。
+
+**本 spec backend 工作量 = 0**(严格定义:不写 backend 代码 / 不动 backend schema / 不动 backend route)。
 
 ### 版本 / 兼容
 
@@ -345,15 +405,18 @@ grep -rE "^import CoachKit" Modules/StudentKit/   # 必须空
 
 ## 验收清单
 
-- [ ] Protocol mechanical refactor 完成,CoachKit ⊥ StudentKit 自检过
+- [ ] **ADR-005 §1 docs PR 先合**(prerequisite)— "6 SPM target → 7 个" + RepositoryContracts target 描述
+- [ ] Protocol mechanical refactor 完成(新建 RepositoryContracts target,5 个 protocol 移入)
+- [ ] CoachKit ⊥ StudentKit 自检过 — **两层 CI step**:`grep import` + `grep Package.swift dependencies`
+- [ ] Backend hard prerequisites 全 land 在 staging:`GET /coach/students` / `GET /students/:id/sets` / `GET /students/:id/feedback` / `POST /coach/feedback` / `GET /students/:id/videos`(curl 验过返 200)
 - [ ] CoachRootView 3 tab,旧 PlanningCoordinatorView 仍可用(spec 005-007 不破坏)
 - [ ] DesignSystem 4 atomic component 加入 + 单测
-- [ ] StudentRoster list + 数据接 backend
+- [ ] StudentRoster list + 数据接 backend(空 list 显示 "暂无学员,等邀请码 V0.1.x")
 - [ ] StudentDetail 5 segment 各自渲染数据
 - [ ] FeedbackComposer 发送成功 + 学员侧红点真亮(联调 2 iPhone)
-- [ ] Coach 端看视频 thumbnail + 播放 + 倍速
-- [ ] Coach 端 e1RM 曲线渲染(数据从 sets 反推)
-- [ ] FOLLOWUPS.md 加 F-030 extract E1RMCalculator
+- [ ] Coach 端看视频 thumbnail + 播放 + 倍速(VideoAttachment 携带 1h presigned `videoURL` from spec 027 backend)
+- [ ] Coach 端 e1RM 曲线渲染(数据从 StudentSetLog 用 CoachKit-local `E1RMCalculator` 反推,与 StudentKit golden fixture 比对 0 差异)
+- [ ] FOLLOWUPS.md 加 F-030 extract `E1RMCalculator` to shared domain target
 - [ ] CHECKLIST 手动跑 + 联调 1 教练 + 1 学员
 - [ ] CI 全过
 
@@ -378,12 +441,17 @@ grep -rE "^import CoachKit" Modules/StudentKit/   # 必须空
 
 ## 风险 / 待 implementer 关注
 
-1. **Protocol refactor 影响面大**:5 个 protocol 移到 CoreModels,会触发 spec 024 / 027 / 028 已合并代码的 import statement 改 — Codex 实装时**第一个 commit 仅做 refactor**,跑 CI 验证 0 业务影响后再加 feature commit;混着改容易引入隐 bug
-2. **e1RM 反推在教练端**:教练端从 StudentSetLog 反推 e1RM,与学员端本地算结果**必须一致**(同公式同输入)。若学员端 e1RM 有缓存,教练端反推可能因浮点精度偏差被认为"两端不一致"— 单测验证 `E1RMCalculator(coach) == E1RMCalculator(student)`,确保数学一致
-3. **CoachKit ⊥ StudentKit 自检 CI**:加 CI step 跑 grep,违反则 fail build。Codex 实装时该 grep 进 GitHub Actions workflow
-4. **教练 unread badge 规则简化**:V0.1 "近 3 天有 set log 且无新 feedback"是粗规则,会误报(学员热身组打勾教练也看到"待反馈"),但 V0.1 接受;V0.1.x 加"教练已看过该日 execution"语义
+1. **Protocol refactor 影响面大**:5 个 protocol 移到新 SPM target `RepositoryContracts`,会触发 spec 024 / 027 / 028 已合并代码的 import statement 改 + Package.swift dep 加 — Codex 实装时**第一个 commit 仅做 refactor**,跑 CI 验证 0 业务影响后再加 feature commit;混着改容易引入隐 bug
+2. **e1RM 反推在教练端**:教练端从 StudentSetLog 反推 e1RM,与学员端本地算结果**必须一致**(同 `rtsTable` + 同 lookup/interpolation 逻辑 + 同输入 → 同输出)。Golden fixture(`Modules/CoreModels/Tests/CoreModelsTests/Fixtures/e1rm_golden.json`)由两 module 测试共同消费,CI 比对 0 差异。两端复制 calculator 的同步成本由 FOLLOWUPS F-030 跟踪
+3. **CoachKit ⊥ StudentKit 自检 CI 两层**:`grep import` + `grep Package.swift dependencies`(per Codex review non-blocking);违反任一 → fail build
+4. **教练 "待关注" badge 规则简化**:V0.1 "近 3 天有 set log 且无新 feedback"粗规则会误报(学员热身组打勾也算);"待关注" 文案弱承诺,接受 V0.1 误报;V0.1.x 加"教练已看过该日 execution / 排除热身组" 语义后再改"待反馈"
 5. **5 段切换数据 fetch 抖动**:每段切换重 fetch 会闪烁;ViewModel 层加 cache + `viewModel.refresh()` 显式触发,自动 fetch 仅 onAppear 一次 + pull-to-refresh
-6. **教练端 V0.1.x 仍要补的功能**:看 §不做什么 V0.1.x defer 一长串 — 邀请码 / 解绑 / evaluation-workflow / 复制上周计划 / cascade 模态 — 都是 V1 公测前的必经,本 spec 仅装 dashboard + feedback editor 闭环,后续 spec 还有 5-8 个
+6. **教练端 V0.1.x 仍要补的功能**:看 §不做什么 V0.1.x defer 一长串 — 邀请码 / 解绑 / evaluation-workflow / 复制上周计划 / cascade 模态 — 都是 V1 公测前的必经,本 spec 仅装 **"教练端 dashboard + feedback editor 闭环"**,**不应** 被描述为"V0.1 教练端完整闭环"(per PR #117 review non-blocking — 措辞防 scope 被读成 V1 P0 已完)。后续 spec 还有 5-8 个 V0.1.x / V0.2 / V1 公测前 dependency
+7. **跨 repo prerequisite 链**(per PR #117 review #3 blocker):本 spec 启动**严格依赖**:
+   - spec 026 amend(per #114 review)+ backend 003 实装(`/coach/students` + set_logs + feedback 三套 endpoint + 3 张 missing tables)
+   - spec 027 amend(per #115 review)+ backend 004 实装(`GET /students/:id/videos` 带短期 presigned URLs)
+   - ADR-005 §1 docs PR 已合
+   缺任何一环本 spec impl 都跑不通,Codex 实装前必须 verify(`curl backend /endpoint` 返 200)
 
 ## Implementation Notes
 
@@ -392,11 +460,11 @@ grep -rE "^import CoachKit" Modules/StudentKit/   # 必须空
 ## 上游 / 下游
 
 **上游**:
-- spec 024(学员端 schema + 5 个 protocol 移到 CoreModels)
-- spec 026(backend endpoint:students / sets / feedback / 已 ready)
-- spec 027(video schema + reader)
-- spec 028(e1RM + GrowthCurve atomic)
-- ADR-005 §1(本 spec 触发微调)
+- spec 024(学员端 schema + 3 个 protocol — refactor 后移到 RepositoryContracts)
+- spec 026 amend(backend endpoint:`/coach/students` 实装 + students / sets / feedback / 3 张 missing tables migration + seed)
+- spec 027 amend(video schema + reader + `GET /students/:id/videos` 带短期 presigned URLs)
+- spec 028(e1RM rtsTable lookup + GrowthCurve atomic)
+- **ADR-005 §1 docs PR**(本 spec 触发):"6 → 7 SPM target",加 RepositoryContracts target 描述
 
 **下游**:
 - V0.1.x 教练端"接收队列 / 评估期 / 邀请码 / 解绑"(per PRD §5 教练端 #2 / #3 / #1)— 独立 spec
@@ -409,3 +477,4 @@ grep -rE "^import CoachKit" Modules/StudentKit/   # 必须空
 | 日期 | 版本 | 变更 | 作者 |
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。CoachKit ⊥ StudentKit 通过把 protocol 提到 CoreModels 实现 reuse;e1RM 反推 + atomic 组件下沉 DesignSystem | Claude |
+| 2026-05-15 | 0.2 | 接 PR #117 Codex review:**blocker 1**(D3 b 决议)— 改方案 B,protocol 移到**新建 `Modules/RepositoryContracts/` SPM target**(原 0.1 方案 A protocol → CoreModels 被否,CoreModels 保持纯数据 invariant 不破),ADR-005 §1 docs PR 升级"6 → 7 SPM target" + 加 contract target 限制(禁 SwiftUI/Combine/IO);**blocker 2** — "0 backend"× read-presign 冲突,read URL contract 完全归 spec 027 amend 后的 backend 004,本 spec 仅消费 `VideoRepository` 不引入 backend endpoint;**blocker 3** — `GET /coach/students` 前置写成 hard prerequisite,Backend dependencies 表显式列 5 个 endpoint + curl 验过返 200 才能启动 impl;non-blocking — e1RM golden fixture(`CoreModels/Tests/Fixtures/e1rm_golden.json`)由两 module 测试共消费 CI 比对;CoachKit ⊥ StudentKit 自检加 Package.swift dep 图检查(第二层);"待反馈" → "**待关注**"防误报承诺过强;措辞 "教练端 dashboard + feedback editor 闭环",不称 V0.1 完整 coach 闭环 | Claude |
