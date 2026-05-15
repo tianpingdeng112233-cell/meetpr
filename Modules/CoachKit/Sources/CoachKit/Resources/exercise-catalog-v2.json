@@ -4224,25 +4224,6 @@
     "nameEn": "Goblet Lunge"
   },
   {
-    "id": "00000000-0000-0000-ca70-0000000000ef",
-    "name": "弓步蹲",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "dumbbell"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Lunge"
-  },
-  {
     "id": "00000000-0000-0000-ca70-0000000000f0",
     "name": "行走弓步蹲",
     "exerciseType": "accessory",
@@ -21511,25 +21492,6 @@
     "createdAt": "2026-05-15T00:00:00Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-00000000046e",
-    "name": "尺蠖式",
-    "nameEn": "Inchworm",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "mobility"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "warm_up"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-15T00:00:00Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-00000000046f",
     "name": "单腿拉伸_屈膝版",
     "nameEn": "Single-Leg Stretch (Bent-Knee)",
@@ -21629,25 +21591,6 @@
     "id": "00000000-0000-0000-ca70-000000000474",
     "name": "古牧卷腹",
     "nameEn": "Hands-Up Crunch",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "core"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-15T00:00:00Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000475",
-    "name": "俄罗斯转体_徒手",
-    "nameEn": "Russian Twist (Bodyweight)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
