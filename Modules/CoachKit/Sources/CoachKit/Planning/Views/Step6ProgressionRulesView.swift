@@ -18,7 +18,7 @@ public struct Step6ProgressionRulesView: View {
         }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-          Eyebrow("STEP 6")
+          Eyebrow("STEP 5")
           Text("递进 / 递减规则")
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
