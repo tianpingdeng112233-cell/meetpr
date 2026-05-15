@@ -89,15 +89,23 @@ public struct ProgressionRuleEditorCard: View {
       }
       .onChange(of: rule.incrementValue) { _, _ in persistRule() }
       .onChange(of: rule.customSequence) { _, _ in persistRule() }
-      .onChange(of: rule.appliedWeeks) { _, _ in
-        if rule.ruleType == .custom {
-          seedCustomSequenceFromW1()
-        }
-      }
       .onChange(of: rule.exerciseIDs) { _, _ in
+        // Don't reseed values here — that overwrites the user's manual edits.
+        // normalizedRule pads/truncates customSequence when appliedWeeks
+        // changes, and the explicit "按 W1 重置" button covers re-snap.
+        // toggleRuleExercise already persisted the new exerciseIDs server-side
+        // before syncFromViewModel rewrote our local state, so no extra
+        // persistRule needed here. We only fix up customDimension when the
+        // new exercise's intensityMode invalidates the current choice (e.g.
+        // selected dim was .rpe but new exercise uses .weight intensity).
         if rule.ruleType == .custom {
-          seedCustomSequenceFromW1()
-          persistRule()
+          let valid = validCustomDimensions
+          if let current = rule.customDimension,
+            !valid.contains(current),
+            let fallback = valid.first
+          {
+            rule.customDimension = fallback  // triggers dimension onChange → reseed + persist
+          }
         }
       }
     }
@@ -154,7 +162,7 @@ public struct ProgressionRuleEditorCard: View {
   private var customControls: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Picker("自定义维度", selection: customDimensionBinding) {
-        ForEach(ProgressionRuleDimension.allCases, id: \.self) { dimension in
+        ForEach(validCustomDimensions, id: \.self) { dimension in
           Text(dimension.title).tag(dimension)
         }
       }
@@ -176,6 +184,34 @@ public struct ProgressionRuleEditorCard: View {
           )
         }
       }
+
+      if !rule.exerciseIDs.isEmpty {
+        Button("按 W1 重置") {
+          seedCustomSequenceFromW1()
+          persistRule()
+        }
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(Color.MeetPR.brandRed)
+        .buttonStyle(.borderless)
+      }
+    }
+  }
+
+  /// Which dimension choices make sense for the currently-selected exercise.
+  /// If the exercise's W1 setSpec uses .weight intensity, an "RPE" rule is
+  /// meaningless (and vice versa), so we hide the invalid option. Sets/reps
+  /// are always valid because they're orthogonal to intensity.
+  private var validCustomDimensions: [ProgressionRuleDimension] {
+    guard let firstID = rule.exerciseIDs.first,
+      let spec = viewModel.setSpec(for: firstID)
+    else {
+      return ProgressionRuleDimension.allCases
+    }
+    switch spec.intensityMode {
+    case .weight:
+      return [.weight, .sets, .reps]
+    case .rpe:
+      return [.rpe, .sets, .reps]
     }
   }
 
