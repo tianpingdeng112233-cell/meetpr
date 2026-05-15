@@ -4,7 +4,10 @@
 - **PR**: TBD(iOS 侧 1 PR;backend 侧 1-2 PR — seed migration + deploy docs;**跨 repo,2 PR/feature 约束按"iOS spec 2 PR + backend ≤2 PR" 拆**)
 - **来源**:
   - [v0_1_pre_plan §候选 3](~/Brain/wiki/projects/MeetPR/v0_1_pre_plan.md) — F-025 RDS 重申 / SAE 部署 / `BackendPlanRepository` 真装 / JWT / offline cache
-  - 上游 [backend spec 001-auth](~/Projects/apps/MeetPR-backend/specs/001-auth/SPEC.md) + [backend spec 002-coach-planning-crud](~/Projects/apps/MeetPR-backend/specs/002-coach-planning-crud/SPEC.md) — 全部 endpoint 已实装合 staging
+  - 上游 [backend spec 001-auth](~/Projects/apps/MeetPR-backend/specs/001-auth/SPEC.md) + [backend spec 002-coach-planning-crud](~/Projects/apps/MeetPR-backend/specs/002-coach-planning-crud/SPEC.md) — 已合 staging,**注意**:
+  - **`GET /coach/students` 仍是 501 stub**(per PR #114 Codex review #1 blocker;Codex 本地核了 `src/routes/coach.ts`):002 只实装 `/plans`、`/exercises`、`/students/:studentId/plans`,不含 `/coach/students`
+  - 本 spec 触发 backend 003-student-actions spec **必须包含** `/coach/students` endpoint(`CoachStudentSummary[]` wire shape) — 详 §2.5
+  - `coach_profiles` / `student_profiles` / `bind_requests` 3 张表 backend migrations 尚未起(per PR #114 Codex review #2 blocker)— backend 003 第一步先补这 3 张表的 migration,再跑 seed
   - [ADR-004 §1 后端选型 + §4 部署 + §6 上线前 blocker](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) — 阿里云 SAE + RDS + OSS + RAM
   - [ADR-005 §3 Repository pattern + §4 横切关注点](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) — Domain Model layer + stale-while-revalidate + 401 typed throw
   - 上游 [spec 025 real auth login + Keychain](../025-real-auth-login-keychain/SPEC.md) — access token 注入路径 ready,本 spec 复用
@@ -63,7 +66,7 @@
   - `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` ≥ 32 chars(阿里云 SAE 配置;不进 git;Bitwarden 备份)
   - `NODE_ENV=staging`
   - `LOG_LEVEL=info`
-- 健康检查:HTTP 200 on `GET /healthz`(backend 已有,per 001-auth `src/server.ts`)
+- 健康检查:HTTP 200 on `GET /health`(per PR #114 Codex review non-blocking — backend 实际 route 是 `/health` 不是 `/healthz`,SAE health check 配置必须对齐,否则误判 unhealthy)
 - 暴露域名:V0.1 用 SAE 默认 `*.alicdn.com` 或临时 IP 直连;V0.1.x 切自有域名 + ICP 备案
 - iOS `BuildConfig.backendBaseURL = "https://<sae-staging-url>"`(spec 025 留口)
 
@@ -133,19 +136,23 @@ VALUES (
 COMMIT;
 ```
 
-> **重要 implementer note**:`REPLACEME_BCRYPT_HASH_FOR_*` 占位**不能** commit 真 hash。Codex 实装时:
-> - 在 migration 文件 head 加 `-- IMPLEMENTATION:在部署前手动 psql 跑 UPDATE 替占位为真 bcrypt hash`,migration 文件本身不留真密码
-> - 或者在 SAE 部署后 manually `psql -h <RDS> -c "UPDATE users SET password_hash=... WHERE id=..."` 一次
-> - **不要** 在 git 留任何真 hash,即便是测试 hash
+> **重要 implementer note**(2026-05-15 接 PR #114 Codex review non-blocking 加强):
+> - `REPLACEME_BCRYPT_HASH_FOR_*` 占位**不能** commit 真 hash。Codex 在部署后 manually `psql -h <RDS> -c "UPDATE users SET password_hash='$2b$10$REAL_HASH' WHERE id='...'"` 一次
+> - migration 文件头加 `-- IMPLEMENTATION: real bcrypt hashes set via psql post-deploy; this migration alone does NOT yield login-capable accounts`
+> - **"seed 已完成"的验收条件 ≠ migration 跑过**:含 placeholder hash 的 migration 跑过只是 schema 占位,**真可登录 credential 由单独 deploy checklist 步骤记录**(in CHECKLIST.md):"deploy 后 psql 跑 2 条 UPDATE 设 David / xty 真 bcrypt password_hash"
+> - **不要** 在 git 留任何真 hash
 
-也要 ensure `bind_requests` table schema 与 [data-model §1.5](~/Brain/wiki/projects/MeetPR/data-model.md) 对齐 — 若 backend 002 尚未建 bind_requests table,本 spec 一起补:
+##### 2.2 backend 003-student-actions 先补 3 张 missing tables migration(2026-05-15 接 PR #114 Codex review #2 blocker)
 
-##### 2.2 检查 backend 002 是否已有 `bind_requests` table
+backend 002 已合 staging 但 `coach_profiles` / `student_profiles` / `bind_requests` 3 张表的 migration 都**尚未起**。seed migration §2.1 引用这 3 张表,所以 backend 003 第一步必须先建表。
 
-- backend repo 跑 `\dt` 看现有 tables
-- 若无 → 本 spec 加 `0003.5-init-bind-requests.sql` migration(参考 data-model §1.5 schema,简化字段:V0.1 不实装 evaluation,故 `evaluation_*` 列 V0.2+ 加)
+| 文件 | 内容 |
+|---|---|
+| `db/migrations/0003.5-init-profile-tables.sql`(新) | `coach_profiles(user_id PK FK→users, display_name, created_at, updated_at)` + `student_profiles(user_id PK FK→users, display_name, created_at, updated_at)`。V0.1 仅 display_name 一字段,V0.2+ evaluation 字段加;`id` 不需要,user_id 作 PK |
+| `db/migrations/0003.6-init-bind-requests.sql`(新) | 参考 [data-model §1.5](~/Brain/wiki/projects/MeetPR/data-model.md);V0.1 最小列:`id, student_id, coach_id, status enum('pending','accepted','rejected','expired','cancelled'), submitted_at, responded_at, expired_at, skip_evaluation bool, rejection_silent bool`。V0.2 evaluation_period 关联列另起 spec |
+| `db/migrations/0004-seed-internal-users.sql`(本 spec §2.1) | seed,**必须在 0003.5 / 0003.6 之后跑** |
 
-> **决策点**:bind_requests schema 起多简洁取决于 backend 002 现状,Codex 实装时确认。最小 V0.1 列:`id, student_id, coach_id, status, submitted_at, responded_at, expired_at, skip_evaluation`。
+> **不再写"决策点 verify"** — 2026-05-15 Codex 已 verify backend 002 未起这 3 张表,本 spec 直接定为"必补"。
 
 ##### 2.3 新 backend endpoint:`POST /sets/log`(学员录 set)
 
@@ -201,6 +208,31 @@ CREATE INDEX idx_feedback_student_unread ON feedback (student_id, posted_at DESC
 
 > 这两个 endpoint 在 backend 应起独立 spec(`backend specs/003-student-actions/SPEC.md`)与本 iOS spec 平行。Codex 实装时:**先开 backend spec PR + impl PR**,后开 iOS impl PR(本 spec)。本 spec 描述 backend contract 是为了对齐双侧 API shape,**不 strip backend spec 的责任**。
 
+##### 2.5 新 backend endpoint:`GET /coach/students`(教练拉学员列表)— 修补 backend 002 stub
+
+per PR #114 Codex review #1 blocker:backend 002 该 endpoint 仍是 501 stub。backend 003-student-actions spec **必须** 实装,本 spec iOS 侧第一屏(StudentRoster)依赖此 endpoint。
+
+| Method + Path | Roles | Request | Response 200 |
+|---|---|---|---|
+| `GET /coach/students` | coach | — | `200 { students: CoachStudentSummary[] }` |
+
+`CoachStudentSummary` wire shape(per iOS `CoreModels.CoachStudentSummary`):
+
+```json
+{
+  "students": [
+    {
+      "id": "uuid",
+      "displayName": "xty",
+      "profile": { /* StudentProfile fields */ },
+      "status": "active" | "evaluating" | "pending" | ...
+    }
+  ]
+}
+```
+
+Backend query:`SELECT u.id, sp.display_name, sp.*, br.status FROM bind_requests br JOIN users u ON br.student_id = u.id JOIN student_profiles sp ON u.id = sp.user_id WHERE br.coach_id = $authUser AND br.status = 'accepted'`(V0.1 简化:仅返 `status='accepted'` 学员;V0.2+ 加 evaluating / pending 状态)
+
 #### 3. iOS 侧改动
 
 ##### 3.1 `BackendPlanRepository`(教练侧)实装
@@ -245,13 +277,11 @@ shape 同 §3.1 pattern;3 个 repo 各调对应 backend endpoint:
 - StudentTrainingLog → `POST /sets/log` + `GET /students/<id>/sets`(本 spec backend §2.3 新加)
 - StudentFeedback → `GET /students/<id>/feedback` + `PATCH /feedback/<id>/read`(本 spec backend §2.4 新加)
 
-##### 3.3 `BackendE1RMRepository`(spec 028 解锁后)
+##### 3.3 e1RM 持久化 — 切 JSON file cache(2026-05-15 接 PR #116 Codex review non-blocking 统一)
 
-位置:`Modules/StudentKit/Sources/StudentKit/Repository/BackendE1RMRepository.swift`(若 spec 028 已落,加;否则 spec 028 内补)
+per spec 028 V0.1 决议:e1RM 是**本地算**(per ADR-002 公式 + spec 028 §2),backend **不存** e1RM points;本 spec 仅做"`InMemoryE1RMRepository` → `LocalE1RMRepository`(JSON file cache)" 的升级,**不引入** backend endpoint,**不引入** `BackendE1RMRepository`。
 
-E1RM 是**本地算**(per spec 028 §1),所以 backend 不存 e1RM points;BackendE1RMRepository 实际仍是**本地 JSON file cache**,**与 backend 无网络交互**。spec 028 内 `InMemoryE1RMRepository` → 本 spec 顺手切到 JSON file cache(per ADR-005 §4)。
-
-→ 决策:**本 spec 不做** `BackendE1RMRepository`;e1RM 仅升级到 JSON file cache(本地);spec 028 改 `InMemoryE1RMRepository` → `LocalE1RMRepository`(JSON file)
+backend e1RM endpoint(若 V0.1.x 需要"换设备保留历史")**另开独立 spec**,**不在本 spec 范围**。spec 028 / 本 spec / spec 029 内统一此口径,避免文档内漂移。
 
 ##### 3.4 `PlanCache` / `StudentPlanCache` / `TrainingLogCache` / `FeedbackCache`(JSON file)
 
@@ -312,10 +342,12 @@ let studentPlans = BackendStudentPlanRepository(api: api, session: session, cach
 ##### 3.9 CHECKLIST.md(本 spec 内)
 
 ```
-[ ] RDS 实例 ready,psql 连上 + 跑完 migrations 0001-0006
-[ ] SAE 部署成功,curl /healthz → 200
-[ ] 0004-seed-internal-users migration 跑过,users 表有 David + xty 两行
+[ ] RDS 实例 ready,psql 连上 + 跑完 migrations(0001-0006 + 0003.5 profile-tables + 0003.6 bind-requests + 0004 seed + 0005 set_logs + 0006 feedback)
+[ ] SAE 部署成功,curl /health → 200(注意:/health 不是 /healthz)
+[ ] 0004-seed-internal-users migration 跑过,users + coach_profiles + student_profiles + bind_requests 4 张表各 1-2 行
+[ ] **deploy 后 manually psql 跑** 2 条 UPDATE 设 David / xty 真 bcrypt password_hash(必须 — placeholder hash 不能登录)
 [ ] iPhone A 安装 build,登入 David → 教练 home
+[ ] 教练 Tab "学员" 看到 xty 列表行(GET /coach/students 返回非空)
 [ ] 排 plan 4 周 → publish → backend DB row plans.status='published' for trainee=xty
 [ ] iPhone B 安装 build,登入 xty → 学员 Tab 今天 → 看到刚 publish 的 plan 当日动作
 [ ] 学员录 1 组 + 打勾 → backend set_logs 表有新 row + 教练 iPhone 切到学员详情(spec 029 后做)能看见
@@ -348,8 +380,14 @@ let studentPlans = BackendStudentPlanRepository(api: api, session: session, cach
 本 iOS spec **不是** backend spec 但描述 backend contract,因为 backend 改动是 iOS happy path 解锁的硬依赖。Codex 实装顺序:
 
 1. **先开 backend repo `staging` 解冻 docs PR**(无代码,纯 CLAUDE.md 改)
-2. **backend repo 起 spec 003-student-actions**(参考本 spec §2.3 + §2.4 描述,自起 SPEC.md 走 backend 2-PR 流程)
-3. **backend repo impl PR**(实装 set_logs + feedback + seed migration)
+2. **backend repo 起 spec 003-student-actions**(参考本 spec §2.2 / §2.3 / §2.4 / §2.5 描述,自起 SPEC.md 走 backend 2-PR 流程)。Scope **强制包含**:
+   - 0003.5-init-profile-tables migration(coach_profiles + student_profiles)
+   - 0003.6-init-bind-requests migration
+   - 0004-seed-internal-users migration(含 placeholder bcrypt hash)
+   - 0005-init-set-logs migration + `POST /sets/log` + `GET /students/:id/sets` endpoints
+   - 0006-init-feedback migration + `POST /coach/feedback` + `GET /students/:id/feedback` + `PATCH /feedback/:id/read`
+   - **`GET /coach/students` endpoint 实装(替 backend 002 stub)**
+3. **backend repo impl PR**(实装上述 4 migrations + 3 套 endpoint)
 4. **iOS 本 spec impl PR**(对接 backend endpoint)
 
 → 4 个 PR 串行(backend 2 + iOS 1 + docs 1)。可能比 1-spec-1-impl 多,接受。
@@ -373,22 +411,24 @@ public actor PlanCache {
 
 public final class BackendPlanRepository: PlanRepository {
   public func fetchPlans() async throws -> [TrainingPlan] {
-    // 1. 同步先返 cache
+    // 1. 有 cache(schema 解析成功)→ 立即返渲染 + 后台 refresh,UI 上方显示 "刷新中" mini indicator,**不闪烁**
     if let cached = await cache.fetch() {
-      Task.detached { try? await self.refreshInBackground() }
+      Task.detached {
+        let fresh = try? await self.refreshInBackground()
+        // 通过 changes AsyncStream 推 diff 给 UI;UI 用 withAnimation(.smooth) 渲染 — 不整体替换 array,是 row-level diff
+      }
       return cached.map { $0.toDomain() }
     }
-    // 2. cache 空 → 强制 fetch
+    // 2. cache 空 OR schema 解析失败 → loading 状态(返 nil 或 throw,ViewModel 显示 spinner)
     return try await refreshAndReturn()
-  }
-
-  private func refreshInBackground() async throws {
-    let fresh = try await api.get(...)
-    await cache.save(fresh)
-    // 通知 UI(AsyncStream / NotificationCenter / @Observable bind)
   }
 }
 ```
+
+**UI contract**(per PR #114 Codex review non-blocking 重写):
+- **有 cache 且 schema 解析成功** → 立即渲染 cached;同时显示 "刷新中" mini indicator(顶部 1px progress / 角标);fresh 到达时用 row-level diff `withAnimation(.smooth)`,**不闪烁 / 不整体替换 array**
+- **cache 空 OR schema 解析失败** → loading 全屏 spinner;fetch 完才渲染
+- 不走"loading 时不渲染 cache" 路径 — 那会牺牲 offline-first 价值
 
 UI 层:`view.task { for await update in repo.changes { ... } }` 订阅刷新。
 
@@ -427,12 +467,13 @@ ViewModel 层不感知 401 — Session 自动登出。其他错误 ViewModel 自
 ## 验收清单
 
 - [ ] RDS 实例 ready + 健康 + 内网连 SAE
-- [ ] SAE staging 部署成功 + `/healthz` 200 + Apple Push 推送测试通过(若用 APNs;V0.1 跳)
+- [ ] SAE staging 部署成功 + `/health` 200(注意:**`/health` 不是 `/healthz`**;SAE health check 配置必须对齐)
 - [ ] backend `staging` 解冻 PR 合并
-- [ ] backend 003-student-actions SPEC + impl PR 合并
-- [ ] 5 个 backend migrations 0001-0006 全跑过,DB schema ready
-- [ ] 0004 seed migration 跑过,david + xty + bind 三行存在
-- [ ] iOS 5 个 Backend* repo 真装,DEMO_MODE 占位仍 fatalError(双路径并存)
+- [ ] backend 003-student-actions SPEC + impl PR 合并(scope 含 `/coach/students` endpoint 实装 + 0003.5 + 0003.6 + 0004 + 0005 + 0006 五个 migrations)
+- [ ] backend migrations 全跑过(0001-0006 含本 spec 触发的 0003.5 profile-tables / 0003.6 bind-requests),DB schema ready
+- [ ] 0004 seed migration 跑过,users + coach_profiles + student_profiles + bind_requests 4 张表 seed 行存在
+- [ ] **Deploy checklist 单独一步**:psql 跑 UPDATE 替 David / xty bcrypt password_hash 占位为真 hash(migration alone 不足以让账户登录;必须有真 hash 才算 seed 完成)
+- [ ] iOS 4 个 Backend* repo 真装(教练 BackendPlanRepository + 3 个学员侧),DEMO_MODE 占位仍 fatalError(双路径并存)。e1RM 不上 backend,仅 InMemory → Local(JSON file)升级
 - [ ] 4 个 JSON file cache 实装 + stale-while-revalidate path 单测
 - [ ] DTO ↔ Domain mapping 全套单测(包括 snake_case / Decimal / ISO)
 - [ ] 401 全局拦截 + Session 自动登出 路径单测
@@ -486,3 +527,4 @@ ViewModel 层不感知 401 — Session 自动登出。其他错误 ViewModel 自
 | 日期 | 版本 | 变更 | 作者 |
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。运营 + backend + iOS 三轴并行;V0.1 内测期 ¥190-290/月 | Claude |
+| 2026-05-15 | 0.2 | 接 PR #114 Codex review:**blocker 1** — `GET /coach/students` 仍是 backend 002 501 stub,backend 003 必须实装(§2.5 新增);**blocker 2** — `coach_profiles` / `student_profiles` / `bind_requests` 3 张表 backend migration 都没起,backend 003 第一步先补 0003.5 + 0003.6 migration,再跑 0004 seed(§2.2 重写);non-blocking — `/healthz` 改 `/health`;bcrypt 真 hash via psql 单独 deploy step;stale-while-revalidate UI contract:cache 渲染 + 顶部 mini indicator + row-level diff 无闪烁;e1RM 不上 backend 统一口径(本 spec 仅 InMemory → Local JSON file 升级,backend e1RM endpoint 另开 spec)| Claude |
