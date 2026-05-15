@@ -5709,7 +5709,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000013f",
-    "name": "悬垂举腿",
+    "name": "悬挂抬腿",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5724,7 +5724,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hanging Leg Raises"
+    "nameEn": "Hanging Leg Raise"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000140",
@@ -22517,6 +22517,1173 @@
     ],
     "equipment": [
       "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a0",
+    "name": "绳索跪姿卷腹",
+    "nameEn": "Cable Kneeling Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a1",
+    "name": "站姿绳索转体",
+    "nameEn": "Standing Cable Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a2",
+    "name": "站姿绳索卷腹",
+    "nameEn": "Standing Cable Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a3",
+    "name": "悍马机卷腹",
+    "nameEn": "Hammer Machine Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a4",
+    "name": "史密斯上踢",
+    "nameEn": "Smith Upward Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "hip_flexor"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a5",
+    "name": "器械卷腹",
+    "nameEn": "Machine Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a6",
+    "name": "器械侧卷腹",
+    "nameEn": "Machine Side Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a7",
+    "name": "滑轮器卷腹",
+    "nameEn": "Pulley Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a8",
+    "name": "坐姿器械卷腹",
+    "nameEn": "Seated Machine Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004a9",
+    "name": "器械卧姿屈膝抬腿",
+    "nameEn": "Machine Lying Bent-Knee Leg Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "hip_flexor"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004aa",
+    "name": "弹力带-跪姿卷腹",
+    "nameEn": "Band Kneeling Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004ab",
+    "name": "弹力带-仰卧卷腹",
+    "nameEn": "Band Supine Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004ac",
+    "name": "弹力带-下上转体",
+    "nameEn": "Band Down-Up Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004ad",
+    "name": "弹力带-上下转体",
+    "nameEn": "Band Up-Down Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004ae",
+    "name": "弹力带-十字转体",
+    "nameEn": "Band Cross Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004af",
+    "name": "弹力带仰卧交替卷腹",
+    "nameEn": "Band Lying Alternating Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b0",
+    "name": "弹力带站姿转体推举",
+    "nameEn": "Band Standing Twist Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b1",
+    "name": "站姿弹力带侧屈",
+    "nameEn": "Standing Band Side Bend",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b2",
+    "name": "弹力带站姿卷腹",
+    "nameEn": "Band Standing Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b3",
+    "name": "3/4仰卧起坐",
+    "nameEn": "3/4 Sit-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b4",
+    "name": "水瓶俄罗斯转体",
+    "nameEn": "Water Bottle Russian Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b5",
+    "name": "抬腿",
+    "nameEn": "Leg Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b6",
+    "name": "蝴蝶收腹",
+    "nameEn": "Butterfly Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b7",
+    "name": "平板蝴蝶收腹",
+    "nameEn": "Flat Butterfly Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b8",
+    "name": "空中单车",
+    "nameEn": "Bicycle Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004b9",
+    "name": "保护式卷腹",
+    "nameEn": "Protected Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004ba",
+    "name": "平躺抬腿",
+    "nameEn": "Lying Leg Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "hip_flexor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004bb",
+    "name": "双头仰卧起",
+    "nameEn": "Double-Head Sit-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004bc",
+    "name": "仰卧交替剪刀腿",
+    "nameEn": "Lying Alternating Scissor Leg",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "hip_flexor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004bd",
+    "name": "屈膝卷腹",
+    "nameEn": "Bent-Knee Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004be",
+    "name": "扭转深蹲",
+    "nameEn": "Twist Squat",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004bf",
+    "name": "斜腹肌仰卧卷腹_地面版",
+    "nameEn": "Oblique Lying Crunch (Floor)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c0",
+    "name": "地板卷腹",
+    "nameEn": "Floor Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c1",
+    "name": "直腿上举卷腹",
+    "nameEn": "Straight-Leg Raise Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c2",
+    "name": "屈膝仰卧扭转",
+    "nameEn": "Bent-Knee Lying Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c3",
+    "name": "交叉登山者_桥式",
+    "nameEn": "Cross Mountain Climber (Bridge)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "hip_flexor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c4",
+    "name": "交替触脚跟",
+    "nameEn": "Alternating Heel Touch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c5",
+    "name": "四分之一仰卧起坐",
+    "nameEn": "Quarter Sit-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c6",
+    "name": "仰卧抱臂卷腹",
+    "nameEn": "Lying Arm-Hug Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c7",
+    "name": "触膝卷腹",
+    "nameEn": "Knee-Touch Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c8",
+    "name": "V字上举",
+    "nameEn": "V-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004c9",
+    "name": "直臂转体卷腹",
+    "nameEn": "Straight-Arm Rotation Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004ca",
+    "name": "悬垂直腿举髋",
+    "nameEn": "Hanging Straight-Leg Hip Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004cb",
+    "name": "俄罗斯转体",
+    "nameEn": "Russian Twist (Bodyweight)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004cc",
+    "name": "仰卧抬腿",
+    "nameEn": "Lying Leg Lift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "hip_flexor"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004cd",
+    "name": "转体抬腿",
+    "nameEn": "Twist Leg Lift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004ce",
+    "name": "平躺跪姿转体",
+    "nameEn": "Lying Kneeling Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004cf",
+    "name": "腹肌轮收",
+    "nameEn": "Ab Wheel",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d0",
+    "name": "负重悬挂抬腿",
+    "nameEn": "Weighted Hanging Leg Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d1",
+    "name": "上斜卷腹转体",
+    "nameEn": "Incline Crunch Twist",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d2",
+    "name": "器械抬腿",
+    "nameEn": "Machine Leg Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core",
+      "hip_flexor"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d3",
+    "name": "负重俄罗斯转体_腿部上抬版",
+    "nameEn": "Weighted Russian Twist (Legs Up)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d4",
+    "name": "站姿健腹轮前推",
+    "nameEn": "Standing Ab Wheel Roll-Out",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d5",
+    "name": "健身球卷腹",
+    "nameEn": "Stability Ball Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d6",
+    "name": "波速球卷腹",
+    "nameEn": "Bosu Ball Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d7",
+    "name": "泡沫轴反向卷腹",
+    "nameEn": "Foam Roller Reverse Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d8",
+    "name": "45度侧屈卷腹",
+    "nameEn": "45° Side Crunch",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004d9",
+    "name": "吊环悬垂举腿提髋",
+    "nameEn": "Ring Hanging Leg Raise Hip Lift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004da",
+    "name": "吊环悬垂直腿提髋",
+    "nameEn": "Ring Hanging Straight-Leg Hip Lift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004db",
+    "name": "吊环悬垂膝碰肘",
+    "nameEn": "Ring Hanging Knee to Elbow",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004dc",
+    "name": "瑞士球卷腹抬腿",
+    "nameEn": "Swiss Ball Crunch Leg Raise",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "core"
+    ],
+    "equipment": [
+      "other"
     ],
     "movementPattern": [
       "other"

@@ -20,11 +20,11 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func previewCatalogTotalCountIsElevenSixtyEight() async throws {
+@Test func previewCatalogTotalCountIsTwelveTwentyNine() async throws {
   let catalog = try await previewCatalog()
 
-  #expect(catalog.count == 1168)
-  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 1164)
+  #expect(catalog.count == 1229)
+  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 1225)
   #expect(InMemoryPlanRepository.syntheticCompetitionLifts().count == 4)
 }
 
@@ -45,7 +45,7 @@ import Testing
   decoder.dateDecodingStrategy = .iso8601
   let decoded = try decoder.decode([Exercise].self, from: exerciseData)
 
-  #expect(decoded.count == 1164)
+  #expect(decoded.count == 1225)
   #expect(decoded.allSatisfy { !$0.muscleGroups.isEmpty })
   #expect(decoded.allSatisfy { !$0.equipment.isEmpty })
   #expect(decoded.allSatisfy { !$0.movementPattern.isEmpty })
