@@ -122,17 +122,8 @@ private struct MainLiftPickerRow: View {
         )
       }
 
-      if currentSelection != nil {
-        TextField(
-          "备注(可选 · 比如暂停 3 秒 / 卧距宽 / 节奏 3-0-1)",
-          text: notesBinding,
-          axis: .vertical
-        )
-        .font(Font.MeetPR.footnote)
-        .lineLimit(1...3)
-        .padding(MeetPRSpacing.sm)
-        .background(Color.MeetPR.surface2)
-        .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
+      if let draftExercise = viewModel.mainLiftDraftExercise(for: key) {
+        ExerciseSetEditorCard(viewModel: viewModel, draftExercise: draftExercise)
       }
     }
     .sheet(isPresented: $showingPicker) {
@@ -141,19 +132,10 @@ private struct MainLiftPickerRow: View {
         variants: viewModel.sortedMainLiftVariants(for: family),
         selectedID: currentSelection?.id,
         onSelect: { exercise in
-          viewModel.recordVariantPick(exercise.id)
-          viewModel.selectedVariants[key] = exercise.id
+          try? viewModel.pickMainLiftVariant(exercise.id, for: key)
           showingPicker = false
         }
       )
-    }
-  }
-
-  private var notesBinding: Binding<String> {
-    Binding {
-      viewModel.selectedVariantNotes[key] ?? ""
-    } set: { newValue in
-      viewModel.selectedVariantNotes[key] = newValue
     }
   }
 

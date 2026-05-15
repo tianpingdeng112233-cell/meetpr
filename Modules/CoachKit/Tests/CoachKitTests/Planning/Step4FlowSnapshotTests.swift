@@ -64,7 +64,7 @@ import ViewInspector
   let sut = Step4SelectAccessoriesView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "添加辅助动作 · 填写强度").string() == "添加辅助动作 · 填写强度")
+  #expect(try inspected.find(text: "添加辅助动作").string() == "添加辅助动作")
   #expect(try inspected.find(text: "周一").string() == "周一")
   #expect(try inspected.find(text: "已选 0 个").string() == "已选 0 个")
   #expect(try inspected.find(text: "+ 添加动作").string() == "+ 添加动作")
