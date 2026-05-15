@@ -588,9 +588,13 @@ public final class PlanningViewModel {
 
     var rule = progressionRules[index]
     if rule.exerciseIDs.contains(draftExerciseID) {
-      rule.exerciseIDs.remove(draftExerciseID)
+      // Tapping the active chip deselects it (rule applies to nothing).
+      rule.exerciseIDs.removeAll()
     } else {
-      rule.exerciseIDs.insert(draftExerciseID)
+      // Single-select: a progression rule binds to exactly one exercise so
+      // coaches can tune weight / RPE / increments per exercise. Picking a
+      // new chip replaces the previous selection.
+      rule.exerciseIDs = [draftExerciseID]
     }
     progressionRules[index] = normalizedRule(rule)
     try persistRules(currentStep: .configureRules)
