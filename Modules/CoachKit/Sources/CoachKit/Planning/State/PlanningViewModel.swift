@@ -479,6 +479,38 @@ public final class PlanningViewModel {
     try? await updateW1SetSpec(spec, for: draftExerciseID)
   }
 
+  /// Snapshot value used to seed custom-rule W2/W3/W4 inputs. Returns the
+  /// median W1 value among the rule's applied exercises for the chosen
+  /// dimension, or a sensible per-dimension default if nothing is set.
+  public func w1Snapshot(
+    for dimension: ProgressionRuleDimension,
+    exerciseIDs: Set<UUID>
+  ) -> Decimal {
+    let specs = exerciseIDs.compactMap { setSpec(for: $0) }
+    let values: [Decimal] = specs.compactMap { spec in
+      switch dimension {
+      case .weight:
+        return spec.intensityMode == .weight ? spec.targetValue : nil
+      case .rpe:
+        return spec.intensityMode == .rpe ? spec.targetValue : nil
+      case .sets:
+        return Decimal(spec.setCount)
+      case .reps:
+        return Decimal(spec.targetReps)
+      }
+    }
+    if values.isEmpty {
+      switch dimension {
+      case .weight: return 100
+      case .rpe: return 8
+      case .sets: return 4
+      case .reps: return 8
+      }
+    }
+    let sorted = values.sorted()
+    return sorted[sorted.count / 2]
+  }
+
   public func proceedToStep6() async throws {
     // Auto-fill defaults for any exercise the coach never opened — e.g. an
     // accessory on a day they added but didn't switch back to. Without this,
