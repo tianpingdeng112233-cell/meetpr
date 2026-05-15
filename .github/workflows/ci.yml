@@ -136,7 +136,7 @@ jobs:
 
   lint-format:
     name: swift-format
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
@@ -153,13 +153,11 @@ jobs:
             echo "::notice::No Swift sources tracked — skipping swift-format."
           fi
 
-      - name: Select Xcode
-        if: steps.swift.outputs.exists == 'true'
-        run: sudo xcode-select -s /Applications/Xcode.app
-
       - name: swift-format lint
         if: steps.swift.outputs.exists == 'true'
-        run: xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
+        run: |
+          docker run --rm -v "$(pwd):/work" -w /work swift:6.0-jammy \
+            swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
 
   lint-swiftlint:
     name: SwiftLint
