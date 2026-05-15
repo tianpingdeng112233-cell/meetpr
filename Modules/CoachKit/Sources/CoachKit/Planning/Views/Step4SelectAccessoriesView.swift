@@ -38,12 +38,18 @@ public struct Step4SelectAccessoriesView: View {
         if let selectedDayID = viewModel.currentDayID {
           SelectedAccessoryListSection(
             accessories: viewModel.selectedAccessories(for: selectedDayID),
-            exerciseProvider: viewModel.accessoryExercise(for:)
-          ) { draftExerciseID in
-            Task {
-              try? await viewModel.deleteAccessory(draftExerciseID, from: selectedDayID)
+            exerciseProvider: viewModel.accessoryExercise(for:),
+            onDelete: { draftExerciseID in
+              Task {
+                try? await viewModel.deleteAccessory(draftExerciseID, from: selectedDayID)
+              }
+            },
+            onNotesChange: { draftExerciseID, notes in
+              Task {
+                try? await viewModel.updateExerciseNotes(notes, for: draftExerciseID)
+              }
             }
-          }
+          )
 
           PrimaryButton(
             "+ 添加动作",
