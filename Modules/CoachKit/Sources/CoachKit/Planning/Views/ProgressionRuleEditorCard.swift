@@ -6,6 +6,7 @@ import SwiftUI
 public struct ProgressionRuleEditorCard: View {
   @Bindable private var viewModel: PlanningViewModel
   @State private var rule: DraftProgressionRule
+  @State private var persistenceRevision = 0
 
   public init(viewModel: PlanningViewModel, rule: DraftProgressionRule) {
     self.viewModel = viewModel
@@ -35,10 +36,7 @@ public struct ProgressionRuleEditorCard: View {
                 isSelected: rule.exerciseIDs.contains(exercise.id),
                 isDisabled: false
               ) {
-                Task {
-                  try? await viewModel.toggleRuleExercise(exercise.id, for: rule.id)
-                  syncFromViewModel()
-                }
+                toggleRuleExerciseSelection(exercise.id)
               }
             }
           }
@@ -52,10 +50,7 @@ public struct ProgressionRuleEditorCard: View {
                 isSelected: rule.exerciseIDs.contains(exercise.id),
                 isDisabled: false
               ) {
-                Task {
-                  try? await viewModel.toggleRuleExercise(exercise.id, for: rule.id)
-                  syncFromViewModel()
-                }
+                toggleRuleExerciseSelection(exercise.id)
               }
             }
           }
@@ -69,10 +64,12 @@ public struct ProgressionRuleEditorCard: View {
               isSelected: rule.appliedWeeks.contains(week),
               isDisabled: (viewModel.planWeeks ?? 4) < week
             ) {
-              Task {
-                try? await viewModel.toggleAppliedWeek(week, for: rule.id)
-                syncFromViewModel()
+              if rule.appliedWeeks.contains(week) {
+                rule.appliedWeeks.remove(week)
+              } else {
+                rule.appliedWeeks.insert(week)
               }
+              persistRule()
             }
           }
         }
@@ -108,6 +105,8 @@ public struct ProgressionRuleEditorCard: View {
             seedCustomSequenceFromW1()
             persistRule()
           }
+        } else {
+          persistRule()
         }
       }
     }
@@ -333,9 +332,23 @@ public struct ProgressionRuleEditorCard: View {
     rule.customSequence = weeks.map { _ in snapshot }
   }
 
+  private func toggleRuleExerciseSelection(_ exerciseID: UUID) {
+    if rule.exerciseIDs.contains(exerciseID) {
+      rule.exerciseIDs.removeAll()
+    } else {
+      rule.exerciseIDs = [exerciseID]
+    }
+  }
+
   private func persistRule() {
-    Task {
-      try? await viewModel.updateRule(rule)
+    persistenceRevision += 1
+    let revision = persistenceRevision
+    let ruleSnapshot = rule
+
+    Task { @MainActor in
+      guard revision == persistenceRevision else { return }
+      try? await viewModel.updateRule(ruleSnapshot)
+      guard revision == persistenceRevision else { return }
       syncFromViewModel()
     }
   }

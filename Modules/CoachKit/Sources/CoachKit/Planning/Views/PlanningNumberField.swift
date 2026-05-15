@@ -52,6 +52,14 @@ struct PlanningNumberField: View {
             normalize()
           }
         }
+        .onChange(of: textInput) { _, newText in
+          guard isFocused else { return }
+          value = Self.editingValue(
+            from: newText,
+            range: range,
+            decimalIncrement: decimalIncrement
+          )
+        }
 
       stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
         .disabled(incrementDisabled)
@@ -167,6 +175,18 @@ struct PlanningNumberField: View {
     let parsed = trimmed.isEmpty ? 0 : Double(trimmed) ?? 0
     let rounded = Decimal.planningRounded(parsed, increment: decimalIncrement).planningDoubleValue
     return clamped(rounded, to: range)
+  }
+
+  static func editingValue(
+    from textInput: String,
+    range: ClosedRange<Double>,
+    decimalIncrement: Decimal
+  ) -> Double {
+    normalizedValue(
+      from: textInput,
+      range: range,
+      decimalIncrement: decimalIncrement
+    )
   }
 
   static func steppedValue(
