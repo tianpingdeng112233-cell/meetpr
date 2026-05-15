@@ -5099,7 +5099,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000011e",
-    "name": "早安屈体",
+    "name": "早安",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5156,7 +5156,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000121",
-    "name": "髋外展机",
+    "name": "坐姿髋外展",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5171,7 +5171,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hip Abduction Machine"
+    "nameEn": "Seated Hip Abduction"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000122",
@@ -5213,7 +5213,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000124",
-    "name": "弹力带臀推",
+    "name": "弹力带臀冲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5232,7 +5232,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000125",
-    "name": "杠铃臀推",
+    "name": "杠铃臀冲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5247,11 +5247,11 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hip Thrust (Barbell)"
+    "nameEn": "Barbell Hip Thrust"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000126",
-    "name": "单腿臀推",
+    "name": "杠铃单腿臀推",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5266,11 +5266,11 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Hip Thrust (Single Leg)"
+    "nameEn": "Barbell Single-Leg Hip Thrust"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000128",
-    "name": "单腿哑铃臀推",
+    "name": "单腿哑铃臀冲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5285,7 +5285,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Single Leg Hip Thrust (DB)"
+    "nameEn": "Single-Leg DB Hip Thrust"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000129",
@@ -6810,7 +6810,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000176",
-    "name": "弹力带蚌式",
+    "name": "弹力带蚌式开合",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7097,7 +7097,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000185",
-    "name": "弹力带侧步走/螃蟹步",
+    "name": "弹力带螃蟹行走",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7112,7 +7112,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Lateral Walk"
+    "nameEn": "Banded Crab Walk"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000186",
@@ -18633,6 +18633,1745 @@
     ],
     "movementPattern": [
       "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003d9",
+    "name": "地雷杆硬拉",
+    "nameEn": "Landmine Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute",
+      "back"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003da",
+    "name": "地雷杆罗马尼亚硬拉",
+    "nameEn": "Landmine RDL",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003db",
+    "name": "杠铃上凳",
+    "nameEn": "Barbell Step-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003dc",
+    "name": "臀冲架臀冲",
+    "nameEn": "Hip Thrust Rack Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003dd",
+    "name": "杠铃侧弓步",
+    "nameEn": "Barbell Side Lunge",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "quad",
+      "adductor"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003de",
+    "name": "杠铃单腿硬拉",
+    "nameEn": "Barbell Single-Leg Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003df",
+    "name": "哑铃臀冲",
+    "nameEn": "DB Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e0",
+    "name": "单腿哑铃硬拉",
+    "nameEn": "Single-Leg DB Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e1",
+    "name": "哑铃上凳",
+    "nameEn": "DB Step-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "quad"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e2",
+    "name": "分腿硬拉",
+    "nameEn": "Split-Stance Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e3",
+    "name": "单手分腿硬拉",
+    "nameEn": "Single-Hand Split-Stance Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e4",
+    "name": "哑铃甩",
+    "nameEn": "DB Swing",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "hamstring"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e5",
+    "name": "哑铃硬拉",
+    "nameEn": "DB Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute",
+      "back"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e6",
+    "name": "哑铃摆荡",
+    "nameEn": "DB Swing (Pendulum)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "hamstring"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e7",
+    "name": "壶铃甩",
+    "nameEn": "Kettlebell Swing",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "hamstring"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e8",
+    "name": "单腿壶铃硬拉",
+    "nameEn": "Single-Leg KB Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "kettlebell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003e9",
+    "name": "绳索直腿硬拉",
+    "nameEn": "Cable Straight-Leg Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003ea",
+    "name": "俯身驴踢",
+    "nameEn": "Bent-Over Donkey Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003eb",
+    "name": "站姿驴踢",
+    "nameEn": "Standing Donkey Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003ec",
+    "name": "绳索侧踢",
+    "nameEn": "Cable Side Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003ed",
+    "name": "绳索内收",
+    "nameEn": "Cable Hip Adduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor",
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003ee",
+    "name": "绳索站姿臀冲",
+    "nameEn": "Cable Standing Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003ef",
+    "name": "绳索窄距椅式起身",
+    "nameEn": "Cable Narrow Chair Stand-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "quad"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f0",
+    "name": "踏板箱绳索直腿硬拉",
+    "nameEn": "Step Box Cable Straight-Leg Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f1",
+    "name": "悍马机臀冲",
+    "nameEn": "Hammer Machine Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f2",
+    "name": "悍马机外展",
+    "nameEn": "Hammer Machine Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f3",
+    "name": "哈克机早安",
+    "nameEn": "Hack Machine Good Morning",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f4",
+    "name": "挂片后摆腿",
+    "nameEn": "Plate-Loaded Back Leg Swing",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f5",
+    "name": "挂片式罗马尼亚硬拉",
+    "nameEn": "Plate-Loaded RDL",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f6",
+    "name": "挂片站姿臀冲",
+    "nameEn": "Plate-Loaded Standing Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f7",
+    "name": "站姿髋外展",
+    "nameEn": "Standing Hip Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f8",
+    "name": "史密斯臀冲",
+    "nameEn": "Smith Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003f9",
+    "name": "史密斯后踢",
+    "nameEn": "Smith Back Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003fa",
+    "name": "史密斯机早安",
+    "nameEn": "Smith Machine Good Morning",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003fb",
+    "name": "史密斯罗马尼亚硬拉",
+    "nameEn": "Smith RDL",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003fc",
+    "name": "史密斯机青蛙后蹬",
+    "nameEn": "Smith Machine Frog Push-Off",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003fd",
+    "name": "坐姿髋内收",
+    "nameEn": "Seated Hip Adduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003fe",
+    "name": "哈克机反向深蹲",
+    "nameEn": "Hack Reverse Squat",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "quad"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003ff",
+    "name": "器械后踢",
+    "nameEn": "Machine Back Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000400",
+    "name": "器械臀冲",
+    "nameEn": "Machine Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000401",
+    "name": "器械驴踢",
+    "nameEn": "Machine Donkey Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000402",
+    "name": "器械侧踢",
+    "nameEn": "Machine Side Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000403",
+    "name": "器械后蹬腿",
+    "nameEn": "Machine Back Press (Leg)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000404",
+    "name": "直腿内收",
+    "nameEn": "Straight-Leg Adduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000405",
+    "name": "直腿髋外展",
+    "nameEn": "Straight-Leg Hip Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000406",
+    "name": "器械后蹬",
+    "nameEn": "Machine Back Push",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000407",
+    "name": "45度斜蹬机单腿腿举",
+    "nameEn": "45° Sled Single-Leg Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000408",
+    "name": "杠杆反向挺身_片式负重",
+    "nameEn": "Lever Reverse Hyper (Plate-Loaded)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000409",
+    "name": "腰带机硬拉_V杆",
+    "nameEn": "Belt Squat Deadlift (V-Bar)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000040a",
+    "name": "腰带机硬拉",
+    "nameEn": "Belt Squat Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000040b",
+    "name": "站姿杠杆髋后伸",
+    "nameEn": "Standing Lever Hip Hyperextension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000040c",
+    "name": "弹力绳-跪姿屈腿",
+    "nameEn": "Band Kneeling Bent-Leg",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000040d",
+    "name": "弹力绳-站姿后踢",
+    "nameEn": "Band Standing Back Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000040e",
+    "name": "弹力绳-直腿硬拉",
+    "nameEn": "Band Straight-Leg Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000040f",
+    "name": "弹力带侧躺腿外展",
+    "nameEn": "Band Side-Lying Leg Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000410",
+    "name": "坐姿弹力带外展",
+    "nameEn": "Seated Band Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000411",
+    "name": "弹力带早安",
+    "nameEn": "Band Good Morning",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000412",
+    "name": "弹力带跪姿臀冲",
+    "nameEn": "Band Kneeling Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000413",
+    "name": "弹力带髋外展",
+    "nameEn": "Band Hip Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000414",
+    "name": "弹力带单腿硬拉",
+    "nameEn": "Band Single-Leg Deadlift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000415",
+    "name": "弹力带单腿站姿髋内收",
+    "nameEn": "Band Single-Leg Standing Hip Adduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor",
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000416",
+    "name": "弹力带单腿髋伸展",
+    "nameEn": "Band Single-Leg Hip Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000417",
+    "name": "弹力带髋内收",
+    "nameEn": "Band Hip Adduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor",
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000418",
+    "name": "弹力带站姿髋外展",
+    "nameEn": "Band Standing Hip Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000419",
+    "name": "弹力带髋部拉动_拉力带穿越",
+    "nameEn": "Band Hip Pull-Through",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000041a",
+    "name": "弹力带俯身单腿后踢",
+    "nameEn": "Band Bent-Over Single-Leg Back Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000041b",
+    "name": "跪姿弹力带髋推",
+    "nameEn": "Kneeling Band Hip Push",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000041c",
+    "name": "弹力带拉穿",
+    "nameEn": "Band Pull-Through",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000041d",
+    "name": "后踢",
+    "nameEn": "Bodyweight Back Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000041e",
+    "name": "水平山羊挺身",
+    "nameEn": "Horizontal Back Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000041f",
+    "name": "垫高自重臀冲",
+    "nameEn": "Elevated Bodyweight Hip Thrust",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000420",
+    "name": "臀桥交替手臂伸",
+    "nameEn": "Glute Bridge with Alternating Arm Reach",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000421",
+    "name": "平板支撑抬腿_单侧",
+    "nameEn": "Plank Single-Side Leg Lift",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000422",
+    "name": "侧桥髋外展",
+    "nameEn": "Side Plank Hip Abduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "core"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000423",
+    "name": "后倾臀桥",
+    "nameEn": "Reverse-Leaning Glute Bridge",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000424",
+    "name": "跪姿屈腿侧踢",
+    "nameEn": "Kneeling Bent-Leg Side Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000425",
+    "name": "深蹲侧踢",
+    "nameEn": "Squat Side Kick",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "quad"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000426",
+    "name": "俯卧地板挺身",
+    "nameEn": "Prone Floor Hyperextension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000427",
+    "name": "泳式踢腿_臀部训练",
+    "nameEn": "Swimming Kicks (Glute Training)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000428",
+    "name": "侧卧髋内收",
+    "nameEn": "Side-Lying Hip Adduction",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "adductor",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000429",
+    "name": "单腿伸展桥式",
+    "nameEn": "Single-Leg Extended Bridge",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000042a",
+    "name": "坐姿哑铃早安",
+    "nameEn": "Seated DB Good Morning",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000042b",
+    "name": "单腿深蹲",
+    "nameEn": "Single-Leg Squat",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000042c",
+    "name": "泡沫轴臀推",
+    "nameEn": "Foam Roller Glute Release",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "mobility"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000042d",
+    "name": "分腿蹲",
+    "nameEn": "Split Squat",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad",
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000042e",
+    "name": "腰带机早安",
+    "nameEn": "Belt Squat Good Morning",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring",
+      "glute"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000042f",
+    "name": "吊环臀桥",
+    "nameEn": "Ring Glute Bridge",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000430",
+    "name": "吊环直腿臀腿弯举",
+    "nameEn": "Ring Straight-Leg Glute Curl",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "hamstring"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000431",
+    "name": "吊环侧蹲",
+    "nameEn": "Ring Side Squat",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute",
+      "quad",
+      "adductor"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "squat"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-15T00:00:00Z"
