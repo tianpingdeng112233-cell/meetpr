@@ -3767,7 +3767,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000d6",
-    "name": "哑铃三头肌伸展",
+    "name": "哑铃臂屈伸",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -3805,7 +3805,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000d8",
-    "name": "反握三头肌下压",
+    "name": "反手三头臂屈伸",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -3820,7 +3820,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Reverse Grip Tricep Pushdown"
+    "nameEn": "Reverse Grip Tricep Extension"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000d9",
@@ -3881,7 +3881,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000dc",
-    "name": "绳索过头三头伸展",
+    "name": "绳索过头臂屈伸",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -3899,27 +3899,8 @@
     "nameEn": "Cable Overhead Tricep Extension"
   },
   {
-    "id": "00000000-0000-0000-ca70-0000000000dd",
-    "name": "过头绳索伸展",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "triceps"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Overhead Cable Extension"
-  },
-  {
     "id": "00000000-0000-0000-ca70-0000000000de",
-    "name": "过头哑铃伸展",
+    "name": "哑铃过头臂屈伸",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -3934,7 +3915,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Overhead DB Extension"
+    "nameEn": "DB Overhead Tricep Extension"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000df",
@@ -16638,6 +16619,998 @@
     ],
     "movementPattern": [
       "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000370",
+    "name": "坐姿杠铃过头臂屈伸",
+    "nameEn": "Seated Barbell Overhead Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000371",
+    "name": "仰卧杠铃臂屈伸",
+    "nameEn": "Lying Barbell Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000372",
+    "name": "窄距卧推(敞开式)",
+    "nameEn": "Close Grip Bench Press (Open)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps",
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000373",
+    "name": "窄距卧推(靠近式)",
+    "nameEn": "Close Grip Bench Press (Tight)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps",
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000374",
+    "name": "仰卧EZ杆臂屈伸",
+    "nameEn": "Lying EZ-Bar Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000375",
+    "name": "哑铃过头臂屈伸(单手)",
+    "nameEn": "Single-Arm DB Overhead Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000376",
+    "name": "地板哑铃碎颅者",
+    "nameEn": "Floor DB Skullcrusher",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000377",
+    "name": "平板哑铃臂屈伸(单)",
+    "nameEn": "Single-Arm Flat Bench DB Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000378",
+    "name": "上斜哑铃三头伸展",
+    "nameEn": "Incline DB Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000379",
+    "name": "仰卧单臂哑铃反握距肱三头肌伸展",
+    "nameEn": "Lying Single-Arm DB Reverse Grip Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000037a",
+    "name": "仰卧哑铃旋前握肱三头肌伸展",
+    "nameEn": "Lying DB Pronated Grip Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000037b",
+    "name": "仰卧哑铃交替臂屈伸",
+    "nameEn": "Lying DB Alternating Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000037c",
+    "name": "坐姿哑铃三头肌伸展",
+    "nameEn": "Seated DB Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000037d",
+    "name": "坐姿单臂哑铃颈后臂屈伸",
+    "nameEn": "Seated Single-Arm DB Behind-the-Neck Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000037e",
+    "name": "仰卧哑铃臂屈伸",
+    "nameEn": "Lying DB Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000037f",
+    "name": "哑铃坐姿臂屈伸",
+    "nameEn": "DB Seated Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "dumbbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000380",
+    "name": "绳索臂屈伸",
+    "nameEn": "Cable Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000381",
+    "name": "跪姿绳索臂屈伸",
+    "nameEn": "Kneeling Cable Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000382",
+    "name": "绳索过头臂屈伸(跪姿)",
+    "nameEn": "Cable Overhead Tricep Extension (Kneeling)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000383",
+    "name": "V-Bar绳索下压",
+    "nameEn": "V-Bar Cable Pushdown",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000384",
+    "name": "直杆绳索下压",
+    "nameEn": "Straight Bar Cable Pushdown",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000385",
+    "name": "绳索臂屈伸(单)",
+    "nameEn": "Single-Side Cable Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000386",
+    "name": "绳索高位前拉",
+    "nameEn": "High Cable Front Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000387",
+    "name": "单手绳索臂屈伸",
+    "nameEn": "Single-Hand Cable Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000388",
+    "name": "绳索低位过头臂屈伸",
+    "nameEn": "Low Cable Overhead Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000389",
+    "name": "绳索高位过顶肱三头肌伸展",
+    "nameEn": "High Cable Overhead Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000038a",
+    "name": "绳索三头下压_SZ杆",
+    "nameEn": "Cable Tricep Pushdown (SZ Bar)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000038b",
+    "name": "绳索俯身过顶三头肌伸展",
+    "nameEn": "Bent-Over Cable Overhead Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000038c",
+    "name": "站姿单臂绳索肱三头肌伸展",
+    "nameEn": "Standing Single-Arm Cable Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000038d",
+    "name": "站姿绳索反握弯举_直杆",
+    "nameEn": "Standing Cable Reverse Grip Curl (Straight Bar)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000038e",
+    "name": "悍马机三头下压",
+    "nameEn": "Hammer Machine Tricep Pushdown",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000038f",
+    "name": "器械三头下压(正向)",
+    "nameEn": "Machine Tricep Pushdown (Forward)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000390",
+    "name": "器械臂屈伸",
+    "nameEn": "Machine Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000391",
+    "name": "坐姿杠杆臂屈伸",
+    "nameEn": "Seated Lever Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000392",
+    "name": "器械过顶三头肌伸展",
+    "nameEn": "Machine Overhead Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000393",
+    "name": "辅助器下压",
+    "nameEn": "Assistance Machine Pushdown",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "machine"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000394",
+    "name": "TRX-三头臂屈伸",
+    "nameEn": "TRX Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000395",
+    "name": "弹力带-碎颅者",
+    "nameEn": "Band Skullcrusher",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000396",
+    "name": "弹力带-过头臂屈伸",
+    "nameEn": "Band Overhead Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000397",
+    "name": "弹力带-单手臂屈伸",
+    "nameEn": "Band Single-Hand Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000398",
+    "name": "弹力带-三头压拉",
+    "nameEn": "Band Tricep Press-Pull",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-000000000399",
+    "name": "弹力带站姿臂屈伸",
+    "nameEn": "Band Standing Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000039a",
+    "name": "弹力带颈后三头肌伸展",
+    "nameEn": "Band Behind-the-Neck Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000039b",
+    "name": "弹力带三头下压",
+    "nameEn": "Band Tricep Pushdown",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "band"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000039c",
+    "name": "窄距俯卧撑",
+    "nameEn": "Close-Grip Push-Up",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps",
+      "chest"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000039d",
+    "name": "平板臂屈伸",
+    "nameEn": "Bench Dip",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000039e",
+    "name": "平板三头推",
+    "nameEn": "Flat Tricep Press",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-00000000039f",
+    "name": "平板臂屈伸(屈腿)",
+    "nameEn": "Bench Dip (Bent Knees)",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "vertical_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003a0",
+    "name": "跪姿肱三头肌伸展",
+    "nameEn": "Kneeling Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003a1",
+    "name": "侧卧泡沫轴肱三头肌放松",
+    "nameEn": "Side-Lying Foam Roller Tricep Release",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps",
+      "mobility"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003a2",
+    "name": "凳上臂屈伸",
+    "nameEn": "Bench Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000003a3",
+    "name": "吊环肱三头肌伸展",
+    "nameEn": "Ring Tricep Extension",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "triceps"
+    ],
+    "equipment": [
+      "other"
+    ],
+    "movementPattern": [
+      "other"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-15T00:00:00Z"
