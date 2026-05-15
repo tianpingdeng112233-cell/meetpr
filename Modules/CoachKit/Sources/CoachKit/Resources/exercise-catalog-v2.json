@@ -1392,7 +1392,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000056",
-    "name": "弹力带/链条卧推",
+    "name": "链条卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1407,7 +1407,7 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bench w/ Band/chains"
+    "nameEn": "Bench w/ Chains"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000057",
