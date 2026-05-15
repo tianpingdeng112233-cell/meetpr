@@ -53,12 +53,21 @@ public final class BackendAuthRepository: AuthRepository, Sendable {
 
   public func login(phone: String, password: String) async throws -> AuthResult { ... }
   public func signup(phone: String, password: String, role: UserRole) async throws -> AuthResult { ... }
-  public func refresh(refreshToken: String) async throws -> AuthResult { ... }
+  /// 注意:不返 AuthResult — backend `/auth/refresh` 不返 user 字段
+  public func refresh(refreshToken: String) async throws -> RefreshResult { ... }
+}
+
+/// New type — refresh 只换 token,不带 user
+public struct RefreshResult: Sendable {
+  public let accessToken: String
+  public let refreshToken: String
+  public init(accessToken: String, refreshToken: String) { ... }
 }
 ```
 
-- `AuthRepository` protocol 来自 spec 011,本 spec 不动 protocol
-- `AuthResult` shape 沿用 spec 011 定义(`accessToken` / `refreshToken` / `user`)
+- `AuthRepository` protocol 来自 spec 011 — **本 spec 改 protocol 一个方法签名**:`refresh(...)` 从 `AuthResult` 改成 `RefreshResult`(per PR #113 Codex review blocker:backend `/auth/refresh` 不返回 user 字段,原签名不可实现)
+- `AuthResult` shape 沿用 spec 011 定义(`accessToken` / `refreshToken` / `user`) — 用于 login / signup
+- `RefreshResult` 新增,仅 access + refresh token,不含 user
 - 三个 endpoint shape 与 backend 001-auth 1:1 对齐(see §技术要求)
 
 #### 2. `Networking` 模块 `APIClient` 真发请求
@@ -117,7 +126,7 @@ public actor KeychainTokenStore: TokenStoring {
 ```
 
 - Keychain 三项分别用 `kSecClassGenericPassword`,account 字段分 `"accessToken"` / `"refreshToken"` / `"cachedUser"`(后者存 User 的 JSON-encoded data)
-- `kSecAttrAccessible = kSecAttrAccessibleAfterFirstUnlock`(开机解锁后可读;avoid `AlwaysThisDeviceOnly` 避免设备恢复丢失)
+- `kSecAttrAccessible = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`(per PR #113 Codex review non-blocking):**`ThisDeviceOnly`** 保证 token 不随设备恢复迁移到新机(安全);**`AfterFirstUnlock`** 保证开机解锁后即可读,为 V0.1.x silent push wake / 后台任务留口。`Always*` 系列是旧语义不使用
 - error 处理:`KeychainError.osStatus(OSStatus)` 透传 + 集中映射 `errSecItemNotFound` → nil(不抛)
 - 单测覆盖:save → read → clear roundtrip;clear 后所有 getter 返 nil;User 编解码 roundtrip
 
@@ -167,16 +176,28 @@ struct MeetPRApp: App {
 
 `Modules/AppShell/Sources/AppShell/Session.swift`(spec 011 已存在,本 spec 改 bootstrap)
 
+**修订(2026-05-15 接 PR #113 Codex review blocker)**:backend `/auth/refresh` 不返 user,Session 用 `KeychainTokenStore.cachedUser()` 组装 authenticated state。cached user 缺失/decode 失败 → 视为 token 无效,清 Keychain 回登录。
+
 ```swift
 public func bootstrap() async {
   state = .authenticating
-  guard let token = await tokens.refreshToken() else {
+  guard let refreshTok = await tokens.refreshToken() else {
+    state = .anonymous; return
+  }
+  guard let cachedUser = await tokens.cachedUser() else {
+    // refresh token 在但 cached user 丢失 → 安全起见清 token 重登
+    try? await tokens.clear()
     state = .anonymous; return
   }
   do {
-    let result = try await auth.refresh(refreshToken: token)
-    try await tokens.save(accessToken: result.accessToken, refreshToken: result.refreshToken, user: result.user)
-    state = .authenticated(result.user)
+    let result: RefreshResult = try await auth.refresh(refreshToken: refreshTok)
+    // 用 cached user 组装新 AuthResult,新 token 落库
+    try await tokens.save(
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      user: cachedUser   // ← refresh 不换 user
+    )
+    state = .authenticated(cachedUser)
   } catch {
     try? await tokens.clear()
     state = .anonymous
@@ -186,7 +207,9 @@ public func bootstrap() async {
 
 - 启动 ≤ 2s loader UI(spec 011 已有 `.authenticating` 分支)
 - refresh 失败 = 清 Keychain + 回登录页,**不重试**(防 retry storm)
+- cached user 缺失 = 等同 refresh 失败处理(降级回登录)
 - backend 001 refresh rotation 行为已验证:每次 refresh 旧 refreshToken 作废,新 refreshToken 进 Keychain
+- login / signup 成功路径不变 — 仍写 `AuthResult.user` 到 Keychain;refresh 路径**只**改 access + refresh token,user 沿用 cached
 
 #### 7. 测试
 
@@ -233,13 +256,19 @@ public func bootstrap() async {
 
 ### Backend endpoint contract(与 backend 001-auth 1:1)
 
-| iOS 调 | backend 路径 | Request | Response 200 |
-|---|---|---|---|
-| `BackendAuthRepository.login(phone:password:)` | `POST /auth/login` | `{ phone, password }` | `{ user, accessToken, refreshToken }` |
-| `BackendAuthRepository.signup(phone:password:role:)` | `POST /auth/register` | `{ phone, password, role }` | `201 { user, accessToken, refreshToken }` |
-| `BackendAuthRepository.refresh(refreshToken:)` | `POST /auth/refresh` | `{ refreshToken }` | `{ accessToken, refreshToken }`(注意:无 `user` 字段) |
+| iOS 调 | backend 路径 | Request | Response 200 | iOS return type |
+|---|---|---|---|---|
+| `BackendAuthRepository.login(phone:password:)` | `POST /auth/login` | `{ phone, password }` | `{ user, accessToken, refreshToken }` | `AuthResult` |
+| `BackendAuthRepository.signup(phone:password:role:)` | `POST /auth/register` | `{ phone, password, role }` | `201 { user, accessToken, refreshToken }` | `AuthResult` |
+| `BackendAuthRepository.refresh(refreshToken:)` | `POST /auth/refresh` | `{ refreshToken }` | `{ accessToken, refreshToken }`(无 `user` 字段)| **`RefreshResult`(本 spec 新增)** |
 
-**refresh response 缺 `user` 字段处理**:沿用 KeychainTokenStore 缓存的 user(因为 refresh 不可能换 user)。这与 backend 001 SPEC §"Refresh flow" 第 6 步语义一致 — refresh 仅换 token。
+**refresh user 处理(spec 011 protocol 改造,2026-05-15 接 PR #113 review)**:
+
+- 改 `AuthRepository.refresh(refreshToken:)` 协议签名从 `-> AuthResult` 改成 `-> RefreshResult`
+- `RefreshResult` 仅含 access + refresh,**无 user** — 与 backend 001 wire shape 一致
+- `Session.bootstrap` 内合成 `.authenticated(cachedUser)`:先 `KeychainTokenStore.cachedUser()` 取 user,refresh 成功后用 cached user 进 state,新 token 写 Keychain
+- cached user 缺失 / decode 失败 → 等同 refresh 失败:清 Keychain + `.anonymous`
+- login / signup 成功路径不变(仍返 `AuthResult`,user 落 Keychain `cachedUser` slot)
 
 **`user` 字段映射**(backend 已用 snake_case + ISO TIMESTAMPTZ,iOS Codable 决定转换策略):
 
@@ -256,9 +285,9 @@ public func bootstrap() async {
 
 | Key (account) | Service | Value | accessible |
 |---|---|---|---|
-| `accessToken` | `app.meetpr.tokens` | UTF-8 string bytes | AfterFirstUnlock |
-| `refreshToken` | `app.meetpr.tokens` | UTF-8 string bytes | AfterFirstUnlock |
-| `cachedUser` | `app.meetpr.tokens` | `JSONEncoder().encode(User)` data | AfterFirstUnlock |
+| `accessToken` | `app.meetpr.tokens` | UTF-8 string bytes | `AfterFirstUnlockThisDeviceOnly` |
+| `refreshToken` | `app.meetpr.tokens` | UTF-8 string bytes | `AfterFirstUnlockThisDeviceOnly` |
+| `cachedUser` | `app.meetpr.tokens` | `JSONEncoder().encode(User)` data | `AfterFirstUnlockThisDeviceOnly` |
 
 **不存** 在 UserDefaults。**不存** access token 在 memory-only — Session 启动 bootstrap 时从 Keychain 取一次,后续 refresh 后写回。
 
@@ -314,7 +343,8 @@ public enum BuildConfig {
 - [ ] `BackendAuthRepository` 三方法接通 backend 001 endpoint,单测 mock URLSession 通过
 - [ ] `KeychainTokenStore` save/read/clear roundtrip 单测过 + 真机/simulator manually verify
 - [ ] `APIClient` 单测覆盖 GET / POST(无 auth + 带 auth)
-- [ ] `Session.bootstrap` 启动时 refresh 路径单测过
+- [ ] `Session.bootstrap` 启动时 refresh 路径单测过(覆盖:有 refresh token + 有 cached user → success;有 token + 缺 cached user → 清 token 回登录;refresh 失败 → 清 token 回登录;无 token → `.anonymous`)
+- [ ] `AuthRepository.refresh(...)` 协议签名改成 `-> RefreshResult`,spec 011 既有调用点同步改
 - [ ] `AuthFlowView` 真机能登入 backend staging,登入后角色路由正确
 - [ ] kill app 重开仍登入态(Keychain 持久)
 - [ ] backend `staging` 分支必须**解冻**(`~/Projects/apps/MeetPR-backend/CLAUDE.md` ❄️ 字样去除)— 实装期 Codex 在 backend repo 提个 docs PR
@@ -338,7 +368,7 @@ public enum BuildConfig {
 
 1. **backend staging 必须先解冻**:CLAUDE.md ❄️ FROZEN callout 是 V0 期决策,本 spec 启动前 Codex 必须先开 backend docs PR 移除 frozen,否则 staging 不接受新提交
 2. **Keychain 在 simulator vs 真机差异**:simulator Keychain 不加密(走 file backed),真机才走硬件 secure enclave。单测在 simulator 跑过不代表真机一定通,manually verify 必须在真机做一次
-3. **`AccessibleAfterFirstUnlock` vs `WhenUnlocked`**:本 spec 选 AfterFirstUnlock 是为了让 silent push wake app 时能拿到 token;V0.1 没真 push 但留口
+3. **`AfterFirstUnlockThisDeviceOnly` vs `WhenUnlockedThisDeviceOnly`**:本 spec 选 `AfterFirstUnlockThisDeviceOnly` — 开机解锁后即可读(为 V0.1.x silent push wake / 后台任务留口)+ `ThisDeviceOnly` 防设备恢复迁移 token 到新机(安全)。若 V0.1 严格只前台登录,改 `WhenUnlockedThisDeviceOnly` 更保守(屏幕锁定时不可读)— 但增加 V0.1.x push 上线时迁移成本,本 spec 选当前值是 conservative-progressive 折中
 4. **xcconfig + DEMO_MODE 组合矩阵**:DEMO_MODE 在 xcodeproj 是 OTHER_SWIFT_FLAGS,xcconfig 是 build setting,两者独立。Codex 实装时确认 `MeetPR-Demo` scheme `DEMO_MODE` 开 + `BACKEND_BASE_URL=demo.invalid`,`MeetPR` (default) scheme `DEMO_MODE` 不开 + `BACKEND_BASE_URL=https://api-staging.meetpr.app`
 5. **timeout 15s 适合健身房**:健身房 wifi/4G 抖动,15s loader 比 5s 通过率高;但 login 路径 15s 仍可能伤体验,user-perceived latency 可由 UI 立即 disable 按钮 + spinner 缓解
 6. **backend rate limit**:001-auth 中间件已有 helmet/cors/rateLimit,本 spec 不动;若 testing 时连续登入触发 rate limit,Codex 反馈 backend rate 调整
@@ -366,3 +396,4 @@ public enum BuildConfig {
 | 日期 | 版本 | 变更 | 作者 |
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。Scope = 候选 2 子集 B(login + Keychain),SMS / 邀请码 / 协议全 defer | Claude |
+| 2026-05-15 | 0.2 | 接 PR #113 Codex review:blocker 1 — `AuthRepository.refresh(...)` 协议签名从 `AuthResult` 改 `RefreshResult` 不含 user;`Session.bootstrap` 用 `KeychainTokenStore.cachedUser()` 组装 authenticated state,cached user 缺失 = 降级清 token 回登录;non-blocking — Keychain accessible 改 `AfterFirstUnlockThisDeviceOnly`,移除 `Always*` 误导对比 | Claude |
