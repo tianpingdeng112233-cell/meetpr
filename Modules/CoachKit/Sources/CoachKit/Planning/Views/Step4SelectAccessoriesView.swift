@@ -82,6 +82,7 @@ public struct Step4SelectAccessoriesView: View {
     }
     .background(Color.MeetPR.bg)
     .navigationTitle("辅助动作")
+    .scrollDismissesKeyboard(.interactively)
     .task {
       await selectInitialDayIfNeeded()
     }

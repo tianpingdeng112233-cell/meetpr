@@ -47,16 +47,6 @@ struct PlanningNumberField: View {
         .background(Color.MeetPR.surface2)
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
         .focused($isFocused)
-        .toolbar {
-          ToolbarItemGroup(placement: .keyboard) {
-            Spacer()
-            Button("完成") {
-              normalize()
-              isFocused = false
-            }
-            .bold()
-          }
-        }
         .onChange(of: isFocused) { _, focused in
           if !focused {
             normalize()

@@ -43,6 +43,7 @@ public struct Step3SelectMainLiftsView: View {
     }
     .background(Color.MeetPR.bg)
     .navigationTitle("主项及变式")
+    .scrollDismissesKeyboard(.interactively)
   }
 }
 
