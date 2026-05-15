@@ -225,7 +225,7 @@ public func bootstrap() async {
 实装 PR 内补 `specs/025-real-auth-login-keychain/CHECKLIST.md`:
 
 ```
-[ ] backend staging 已可访问(curl /healthz 200)
+[ ] backend staging 已可访问(curl /health 200 — 注意是 /health 不是 /healthz,per spec 026 amend 后修正)
 [ ] 手动 curl /auth/register 建 2 个测试账号(若 026 seed migration 还没上)
 [ ] iPhone A 装非 DEMO build,输账号 A → 登入成功,kill app 重开仍登入态
 [ ] iPhone B 装非 DEMO build,输账号 B → 登入成功
