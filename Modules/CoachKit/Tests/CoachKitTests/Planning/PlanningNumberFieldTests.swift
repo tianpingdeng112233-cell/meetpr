@@ -98,15 +98,16 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func planningNumberFieldTextInputSyncsOnExternalBindingChange() throws {
-  let synced = PlanningNumberField.syncedTextInput(
-    currentTextInput: "100",
-    newValue: 200,
-    isFocused: false,
+@Test func planningNumberFieldFormattedDisplayFormatsValue() throws {
+  // PR replacing syncedTextInput: the field now always re-renders the new
+  // value when the bound value changes externally (no focus preservation),
+  // which is what `formattedDisplay` produces.
+  let rendered = PlanningNumberField.formattedDisplay(
+    200,
     formatStyle: .number.precision(.fractionLength(0...1))
   )
 
-  #expect(synced == "200")
+  #expect(rendered == "200")
 }
 
 @MainActor
