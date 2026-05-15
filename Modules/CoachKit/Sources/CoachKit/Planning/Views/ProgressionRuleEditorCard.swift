@@ -7,6 +7,8 @@ public struct ProgressionRuleEditorCard: View {
   @Bindable private var viewModel: PlanningViewModel
   @State private var rule: DraftProgressionRule
   @State private var persistenceRevision = 0
+  @State private var customSequencesByExerciseID: [UUID: [ProgressionRuleDimension: [Decimal]]] =
+    [:]
 
   public init(viewModel: PlanningViewModel, rule: DraftProgressionRule) {
     self.viewModel = viewModel
@@ -19,7 +21,9 @@ public struct ProgressionRuleEditorCard: View {
         header
         typePicker
 
-        if rule.ruleType == .custom {
+        if rule.exerciseIDs.isEmpty {
+          exerciseRequiredHint
+        } else if rule.ruleType == .custom {
           customControls
         } else {
           incrementControl
@@ -81,28 +85,23 @@ public struct ProgressionRuleEditorCard: View {
         persistRule()
       }
       .onChange(of: rule.customDimension) { _, _ in
-        seedCustomSequenceFromW1()
+        restoreOrSeedCustomSequence()
         persistRule()
       }
       .onChange(of: rule.incrementValue) { _, _ in persistRule() }
-      .onChange(of: rule.customSequence) { _, _ in persistRule() }
-      .onChange(of: rule.exerciseIDs) { _, _ in
+      .onChange(of: rule.customSequence) { _, _ in
+        cacheCustomSequence(for: rule.exerciseIDs)
+        persistRule()
+      }
+      .onChange(of: rule.exerciseIDs) { oldIDs, _ in
+        cacheCustomSequence(for: oldIDs)
         // Each custom rule applies to a single exercise (single-select). When
-        // the user redirects the rule to a different exercise, the W2/W3/W4
-        // values should retarget to the new exercise's W1 reference — keeping
-        // the old exercise's numbers would be stale. If the new exercise's
-        // intensityMode invalidates the current dimension, fall back to a
-        // valid dimension; the dimension onChange handler then reseeds.
-        // Otherwise reseed directly here.
+        // the user redirects the rule to a different exercise, restore any
+        // manual values already typed for that exercise. If it has never been
+        // edited, seed once from W1; "按 W1 重置" is the explicit reset action.
         if rule.ruleType == .custom {
-          let valid = validCustomDimensions
-          if let current = rule.customDimension,
-            !valid.contains(current),
-            let fallback = valid.first
-          {
-            rule.customDimension = fallback  // dimension onChange reseeds + persists
-          } else {
-            seedCustomSequenceFromW1()
+          if ensureValidCustomDimension() {
+            restoreOrSeedCustomSequence()
             persistRule()
           }
         } else {
@@ -110,6 +109,18 @@ public struct ProgressionRuleEditorCard: View {
         }
       }
     }
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+extension ProgressionRuleEditorCard {
+  private var exerciseRequiredHint: some View {
+    Text("先选择一个应用动作，再设置该动作的递进规则。")
+      .font(Font.MeetPR.footnote)
+      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .padding(.vertical, MeetPRSpacing.xs)
+      .accessibilityIdentifier("progression.rule.exerciseRequiredHint")
   }
 
   private var header: some View {
@@ -330,6 +341,64 @@ public struct ProgressionRuleEditorCard: View {
     let snapshot = viewModel.w1Snapshot(for: dimension, exerciseIDs: rule.exerciseIDs)
     let weeks = rule.appliedWeeks.sorted()
     rule.customSequence = weeks.map { _ in snapshot }
+  }
+
+  private func restoreOrSeedCustomSequence() {
+    guard let exerciseID = rule.exerciseIDs.first else {
+      rule.customSequence = []
+      return
+    }
+    let dimension = rule.customDimension ?? .weight
+    if let cached = customSequencesByExerciseID[exerciseID]?[dimension] {
+      rule.customSequence = alignedCustomSequence(cached, dimension: dimension)
+    } else {
+      seedCustomSequenceFromW1()
+      cacheCustomSequence(for: rule.exerciseIDs)
+    }
+  }
+
+  @discardableResult
+  private func ensureValidCustomDimension() -> Bool {
+    let valid = validCustomDimensions
+    guard
+      let current = rule.customDimension,
+      !valid.contains(current),
+      let fallback = valid.first
+    else {
+      return true
+    }
+    rule.customDimension = fallback
+    return false
+  }
+
+  private func cacheCustomSequence(for exerciseIDs: Set<UUID>) {
+    guard
+      let exerciseID = exerciseIDs.first,
+      let dimension = rule.customDimension,
+      let sequence = rule.customSequence
+    else {
+      return
+    }
+    var sequences = customSequencesByExerciseID[exerciseID] ?? [:]
+    sequences[dimension] = sequence
+    customSequencesByExerciseID[exerciseID] = sequences
+  }
+
+  private func alignedCustomSequence(
+    _ sequence: [Decimal],
+    dimension: ProgressionRuleDimension
+  ) -> [Decimal] {
+    let weekCount = rule.appliedWeeks.count
+    if sequence.count == weekCount {
+      return sequence
+    }
+    let fillValue =
+      sequence.last
+      ?? viewModel.w1Snapshot(for: dimension, exerciseIDs: rule.exerciseIDs)
+    if sequence.count < weekCount {
+      return sequence + Array(repeating: fillValue, count: weekCount - sequence.count)
+    }
+    return Array(sequence.prefix(weekCount))
   }
 
   private func toggleRuleExerciseSelection(_ exerciseID: UUID) {
