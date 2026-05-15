@@ -480,6 +480,14 @@ public final class PlanningViewModel {
   }
 
   public func proceedToStep6() async throws {
+    // Auto-fill defaults for any exercise the coach never opened — e.g. an
+    // accessory on a day they added but didn't switch back to. Without this,
+    // validateW1SetSpecs below would throw, the error is swallowed by try?
+    // at the call site, and the proceed button would feel broken.
+    for exercise in sortedDraftExercises where setSpec(for: exercise.id) == nil {
+      let spec = defaultSetSpec(for: exercise)
+      try await updateW1SetSpec(spec, for: exercise.id)
+    }
     try validateStep(.fillW1Intensity)
     let nextStep: PlanningStep = planWeeks == 1 ? .previewWeekCards : .configureRules
     if let draftPlan {

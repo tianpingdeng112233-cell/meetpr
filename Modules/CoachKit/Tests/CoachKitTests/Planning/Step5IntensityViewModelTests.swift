@@ -137,12 +137,21 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func step5ProceedRequiresEveryDraftExerciseToHaveSetSpec() async throws {
+@Test func step5ProceedAutoFillsMissingSetSpecsWithDefaults() async throws {
+  // Step 5 was removed; intensity input is inlined into Step 4 editor cards
+  // which auto-persist defaults on appear. To cover the case where a card
+  // never mounted (e.g. coach added an accessory then switched day),
+  // proceedToStep6 backfills defaults for any missing specs.
   let viewModel = try await Spec007Fixtures.configuredViewModelForStep5()
+  #expect(viewModel.w1SetSpecs.isEmpty)
 
-  await #expect(throws: PlanningValidationError.incompleteW1SetSpecs) {
-    try await viewModel.proceedToStep6()
-  }
+  try await viewModel.proceedToStep6()
+
+  #expect(
+    viewModel.sortedDraftExercises.allSatisfy { exercise in
+      viewModel.setSpec(for: exercise.id) != nil
+    }
+  )
 }
 
 @MainActor
