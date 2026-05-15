@@ -24,16 +24,38 @@ public struct ProgressionRuleEditorCard: View {
           incrementControl
         }
 
-        chipSection(title: "应用动作") {
-          ForEach(viewModel.sortedDraftExercises, id: \.id) { exercise in
-            RuleChip(
-              title: viewModel.exerciseName(for: exercise),
-              isSelected: rule.exerciseIDs.contains(exercise.id),
-              isDisabled: false
-            ) {
-              Task {
-                try? await viewModel.toggleRuleExercise(exercise.id, for: rule.id)
-                syncFromViewModel()
+        let mainLifts = viewModel.sortedDraftExercises.filter(\.isMainLift)
+        let accessories = viewModel.sortedDraftExercises.filter { !$0.isMainLift }
+
+        if !mainLifts.isEmpty {
+          chipSection(title: "应用动作 — 主项及变式") {
+            ForEach(mainLifts, id: \.id) { exercise in
+              RuleChip(
+                title: viewModel.exerciseName(for: exercise),
+                isSelected: rule.exerciseIDs.contains(exercise.id),
+                isDisabled: false
+              ) {
+                Task {
+                  try? await viewModel.toggleRuleExercise(exercise.id, for: rule.id)
+                  syncFromViewModel()
+                }
+              }
+            }
+          }
+        }
+
+        if !accessories.isEmpty {
+          chipSection(title: "应用动作 — 辅助项") {
+            ForEach(accessories, id: \.id) { exercise in
+              RuleChip(
+                title: viewModel.exerciseName(for: exercise),
+                isSelected: rule.exerciseIDs.contains(exercise.id),
+                isDisabled: false
+              ) {
+                Task {
+                  try? await viewModel.toggleRuleExercise(exercise.id, for: rule.id)
+                  syncFromViewModel()
+                }
               }
             }
           }
