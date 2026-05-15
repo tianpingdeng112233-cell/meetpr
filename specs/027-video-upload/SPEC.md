@@ -104,7 +104,7 @@ public actor VideoUploadActor {
   private var currentUploadingTaskId: UUID?  // V1 串行
 
   public init(...) async {
-    // 启动时从 UploadStateStore 恢复 pending/uploading/failed 任务
+    // 启动时从 UploadStateStore 恢复 pending / uploading / paused 任务
   }
 
   public func enqueue(localFileURL: URL, attachment: VideoAttachment) async throws -> UploadTask
@@ -113,28 +113,26 @@ public actor VideoUploadActor {
   public func observe() async -> AsyncStream<UploadTask>  // UI 订阅状态
 
   /// 内部 driver loop
-  private func processNext() async { ... }   // 取下一个 pending/failed task → 跑
+  private func processNext() async { ... }   // 取下一个 pending / paused task → 跑
   private func uploadOnePart(...) async throws -> UploadedPart { ... }
-  private func retryWithBackoff(...) async { ... }  // exponential 1/2/4/8s
+  private func retryWithBackoff(...) async { ... }  // exponential 1/2/4/8/15s,单 cycle 内 5 次
 }
 ```
 
-状态机(per ADR-005 §4 + 2026-05-15 接 PR #115 Codex review non-blocking 修订):
+状态机(per ADR-005 §4 + 2026-05-15 接 PR #115 Codex first-pass non-blocking + second-pass blocker 修订):
 ```
 pending → transcoding → pending(转码完毕) → uploading → completed
-                                              ↓ 失败
-                                          failed → 重试 → uploading
-                                              ↓ 单 driver cycle 失败 5 次
-                                          paused(等网络恢复 / app 重启 / 用户手动 → 自动 reset attempt count 后 → uploading)
+                                              ↓ 单 cycle 内重试 5 次(backoff 1/2/4/8/15s)失败
+                                          paused(等网络恢复 / app 重启 / 用户手动 → reset attempt count → uploading)
                                               ↓ 用户取消
                                           cancelled(主动 abort multipart upload + 清本地)
 ```
 
-- **不再设 `terminal failed`**:之前定义 "attemptCount >= 5 永久 terminal" 会让一次地铁/地下健身房短暂网络抖动就把任务判死(PR #115 review non-blocking #3)
-- 改为:**一个 driver cycle 内**重试 5 次 + backoff 1/2/4/8/15s,失败转 `paused` 状态;**网络恢复**(`NWPathMonitor` 监听 satisfied)/ **app 重启** / **用户手动 tap "重试"** 任一触发 → attemptCount 清 0 → 回 `uploading`
+- **没有 terminal `failed` 状态**(per PR #115 second-pass blocker 决议 B):`UploadTask.Status` enum 已删 `failed` case,所有失败路径直接 `uploading → paused`,没有中间瞬时 `failed` 阶段。之前定义 "attemptCount >= 5 永久 terminal" 会让一次地铁/地下健身房短暂网络抖动就把任务判死,故移除
+- 实装:**一个 driver cycle 内**重试 5 次 + backoff 1/2/4/8/15s,5 次仍失败 → 直接转 `paused`;**网络恢复**(`NWPathMonitor` 监听 satisfied)/ **app 重启** / **用户手动 tap "重试"** 任一触发 → attemptCount 清 0 → 回 `uploading`
 - `paused` UI 显示:"暂停 · 等网络恢复后自动继续 / [立即重试]"
 
-启动时 `loadAndResume()`:从 `Documents/upload_queue/` 读所有 .json,把 `status=uploading/failed/pending/paused` 全部塞回 tasks(此时所有 `failed/paused` 任务 attemptCount 重置为 0),driver loop 自动接管。
+启动时 `loadAndResume()`:从 `Documents/upload_queue/` 读所有 .json,把 `status ∈ {pending, uploading, paused}` 全部塞回 tasks(此时所有 `paused / uploading`(异常退出)任务 attemptCount 重置为 0),driver loop 自动接管。读到任何**已删除**的旧 `failed` status JSON(persisted 兼容兜底)→ 当 `paused` 处理 + log warning,不崩。
 
 ##### 2.3 `OSSMultipartClient`
 
@@ -315,7 +313,9 @@ backend 用 阿里云 OSS Node.js SDK,服务端持 AccessKey/SecretKey(SAE env v
 [ ] 飞行模式 → 录视频 enqueue → 飞行模式关 → 自动 resume
 [ ] 同意 dialog 首次弹,二次不弹
 [ ] 录满 120s 自动停
-[ ] 老 iPhone(SE 2nd gen)转码失败 → fallback 原始上传 → 成功
+[ ] 老 iPhone(SE 2nd gen)转码失败 → fallback 原始上传(蜂窝场景提示 ⚠️ + "仅 Wi-Fi 上传" 选项)→ 成功
+[ ] **part URL 过期 → sign-parts 重签**:上传开始后等 65 分钟(超过 backend presigned 1h)→ 强杀 → 重开;Codex tools 或 device 时钟前推模拟;观察 OSSMultipartClient 收 403 后调 sign-parts 重签未完成 parts,上传 resume
+[ ] **MyVideoList → 视频播放**:学员上传完一段 → 进"我的视频" Tab → thumb 渲染(thumbnailURL)→ tap 播放(videoURL 1h presigned)→ AVPlayer 起播,倍速 0.5/1/1.5/2x 可切
 ```
 
 ### 不做什么
@@ -342,19 +342,30 @@ backend 用 阿里云 OSS Node.js SDK,服务端持 AccessKey/SecretKey(SAE env v
 ```swift
 public final class BackgroundURLSessionManager: NSObject, URLSessionDelegate, URLSessionDataDelegate {
   public static let shared = BackgroundURLSessionManager()
-  public lazy var session: URLSession = {
-    let config = URLSessionConfiguration.background(withIdentifier: "app.meetpr.video.upload")
+
+  /// 两个 session — wifi-only(用于 fallback 原片 + 用户选"仅 Wi-Fi 上传")和 any-network(默认转码后小文件)
+  /// 不能在 single session config 上动态切 allowsCellularAccess(background config 是 immutable),
+  /// 故按 task 类型选 session per-PR #115 second-pass non-blocking
+  public lazy var anyNetworkSession: URLSession = {
+    let config = URLSessionConfiguration.background(withIdentifier: "app.meetpr.video.upload.any")
     config.allowsCellularAccess = true
-    config.isDiscretionary = false   // 不让 iOS 智能延迟,用户期望上传发生
+    config.isDiscretionary = false
+    return URLSession(configuration: config, delegate: self, delegateQueue: nil)
+  }()
+  public lazy var wifiOnlySession: URLSession = {
+    let config = URLSessionConfiguration.background(withIdentifier: "app.meetpr.video.upload.wifi")
+    config.allowsCellularAccess = false
+    config.isDiscretionary = false
     return URLSession(configuration: config, delegate: self, delegateQueue: nil)
   }()
 
   /// iOS app 唤醒 callback(per AppDelegate.application(_:handleEventsForBackgroundURLSession:))
-  public func handleBackgroundCompletion(...)
+  /// 两 session 任一完成都进此 callback,需按 identifier 分发
+  public func handleBackgroundCompletion(identifier: String, completionHandler: @escaping () -> Void)
 }
 ```
 
-`MeetPRApp` 的 `@UIApplicationDelegateAdaptor` 转发 `handleEventsForBackgroundURLSession` 到本 manager。
+`MeetPRApp` 的 `@UIApplicationDelegateAdaptor` 转发 `handleEventsForBackgroundURLSession` 到本 manager。`UploadTask` 加 `preferWifiOnly: Bool` 字段(fallback 原片或学员显式选 → true),`VideoUploadActor` 据此选 session;字段持久化到 `tasks.json`,startup resume 后语义保留。
 
 ### chunk size + retry
 
@@ -460,3 +471,4 @@ V0.1 内测期同意文案 = **占位**(Apple §5.1.1 内测不强制法律 revi
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。客户端 H.264 + OSS multipart resumable + 单视频串行 + 隐私同意 V1 内测占位 | Claude |
 | 2026-05-15 | 0.2 | 接 PR #115 Codex review:**blocker 1** — presigned URL 1h × resumable 跨过 1h 后 part URL 全过期,加 backend `POST /upload/sign-parts` re-sign endpoint + iOS resume 时 403 自动重签;**blocker 2** — 私有 bucket 缺 read URL contract,`GET /students/:id/videos` 直接附短期 1h presigned `videoURL` / `thumbnailURL`,本 spec 学员自看入口直接用;non-blocking — `VideoTranscoder` 改 "best-effort 1Mbps" 描述,移除"精确 H.264 1280×720 1Mbps 30fps" 假象;状态机加 `paused` 替 terminal `failed`,网络恢复 / app 重启 / 用户手动 reset attempt count;fallback 原片 UI 提示 "蜂窝可能耗大量流量" + "仅 Wi-Fi 上传" 选项 | Claude |
+| 2026-05-15 | 0.3 | 接 PR #115 Codex **second-pass** review blocker:`UploadTask.Status` enum 已删 `failed`,但 init / driver / 状态图 / resume 注释仍引用 `failed` 字样(自相矛盾)。采纳决议 B 完全移除 `failed`:状态机图删 `failed → 重试` 中间状态,init/processNext 注释改 `pending/uploading/paused`,loadAndResume 接受 `pending/uploading/paused` 且对老 `failed` JSON 做兼容兜底(当 paused 处理 + log)。Non-blocking — CHECKLIST 加 "part URL 过期 → sign-parts" + "MyVideoList 播放" 两条;`BackgroundURLSessionManager` 拆 `anyNetworkSession` + `wifiOnlySession` 两 session(background config immutable,无法 per-task 动态切 allowsCellularAccess),`UploadTask` 加 `preferWifiOnly: Bool` 字段持久化 | Claude |
