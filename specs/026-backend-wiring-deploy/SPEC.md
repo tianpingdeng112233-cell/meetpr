@@ -18,7 +18,7 @@
 把 V0 期挂的 backend 真接通起来:
 
 1. **基础设施 ready** — F-025 RDS 单机版重申(阿里云 RDS PostgreSQL 17, 2c4G + 50GB ESSD PL1) + 阿里云 SAE 部署 backend staging build + `staging` 分支❄️解冻
-2. **iOS Backend* repo 真装** — 替 V0 期 5 个 `BackendXxxRepository` 占位 `fatalError`(`BackendPlanRepository` / `BackendStudentPlanRepository` / `BackendStudentTrainingLogRepository` / `BackendStudentFeedbackRepository` / `BackendE1RMRepository`)
+2. **iOS Backend* repo 真装** — 替 V0 期 **4 个** `BackendXxxRepository` 占位 `fatalError`(`BackendPlanRepository` / `BackendStudentPlanRepository` / `BackendStudentTrainingLogRepository` / `BackendStudentFeedbackRepository`)+ **1 个** `LocalE1RMRepository`(JSON file 本地升级,non-backend;per 028 持久化口径统一)
 3. **offline cache** — stale-while-revalidate(per ADR-005 §4),Documents/ 下 JSON file 持久化 + 网络断开仍可读
 4. **内测用户 seed** — backend 加 `0004-seed-internal-users.sql` migration,直接 insert 你 + xty + `BindRequest{status:'accepted'}` 关系,跳过完整注册 / 邀请码绑定流(per spec 025 走 B 子集决策)
 5. **错误处理** — 401 typed → Session 清 Keychain + 回登录;其他错误 typed throw 由 ViewModel 决定 UI 展示
@@ -500,9 +500,9 @@ ViewModel 层不感知 401 — Session 自动登出。其他错误 ViewModel 自
 2. **SAE 冷启动延迟**:0.5 vCPU + 1GB 实例,免计费空闲后冷启动可能 5-15s,首次请求 timeout 风险。可设置 `min instances >= 1` 持续运行(月费 ~¥40);本 spec 选 `min=1` 避免冷启动
 3. **跨 repo PR 协调**:4 个 PR 串行,Codex worktree 切换 + dependency wait 增加流转时间;建议你或 Codex 优先合 backend `staging` 解冻 + 003 spec,iOS 部分等 backend impl 上线后再跑联调
 4. **seed migration 真 bcrypt hash**:**绝不 git commit**。流程:Codex 写 migration 占位 → 你或 Codex 在部署后 manual `psql` 一次性 UPDATE
-5. **bind_requests schema 可能要新建**:backend 002 是否已起 table 决定本 spec 是否要 0003.5 migration。Codex 实装第一步 verify
+5. **3 张 missing tables(profile + bind_requests)已 verify 必补**:2026-05-15 second-pass 已锁,backend 003 第一步建 0003.5 + 0003.6 migration,不再是"可能"
 6. **e1RM 仍本地**:本 spec 不引入 e1RM backend endpoint,因 V0.1 仅你+xty 不会换设备;V0.1.x 若教练换 iPhone 需要历史 e1RM 不丢,再加 backend
-7. **stale-while-revalidate UI 闪烁风险**:cache 旧数据先渲染 + 网络 fresh 又渲染一次,UI 可能"跳"。建议 UI 加 `withAnimation(.smooth)` 缓和;若问题大,Codex 可改为"loading 状态时不渲染 cache"作 fallback
+7. **stale-while-revalidate UI 闪烁风险**:cache 旧数据先渲染 + 网络 fresh 又渲染一次,UI 可能"跳"。**主 contract** 是 cache 立即渲染 + 顶部 mini indicator + row-level diff `withAnimation(.smooth)`(见 §技术要求 / stale-while-revalidate 实装 pattern)。仅在 cache schema 解析失败或首次空 cache 时走 loading 全屏 spinner
 
 ## Implementation Notes
 
