@@ -7911,7 +7911,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001b4",
     "name": "杠铃卧推",
-    "nameEn": null,
+    "nameEn": "Barbell Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7930,7 +7930,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001b5",
     "name": "杠铃片夹胸",
-    "nameEn": null,
+    "nameEn": "Plate Squeeze Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7949,7 +7949,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001b6",
     "name": "抬腿杠铃卧推",
-    "nameEn": null,
+    "nameEn": "Leg-Up Barbell Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7968,7 +7968,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001b7",
     "name": "平躺哑铃卧推",
-    "nameEn": null,
+    "nameEn": "Flat DB Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7987,7 +7987,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001b8",
     "name": "窄距哑铃卧推",
-    "nameEn": null,
+    "nameEn": "Close-Grip DB Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8007,7 +8007,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001b9",
     "name": "平躺哑铃飞鸟",
-    "nameEn": null,
+    "nameEn": "Flat DB Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8026,7 +8026,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ba",
     "name": "仰卧屈臂上抬",
-    "nameEn": null,
+    "nameEn": "Lying Bent-Arm Pullover",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8045,7 +8045,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001bb",
     "name": "仰卧旋转屈臂上拉",
-    "nameEn": null,
+    "nameEn": "Lying Rotational Pullover",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8064,7 +8064,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001bc",
     "name": "上斜哑铃飞鸟(锤式)",
-    "nameEn": null,
+    "nameEn": "Incline DB Fly (Hammer Grip)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8084,7 +8084,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001bd",
     "name": "反手上斜哑铃卧推",
-    "nameEn": null,
+    "nameEn": "Reverse-Grip Incline DB Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8103,7 +8103,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001be",
     "name": "地板反手哑铃卧推",
-    "nameEn": null,
+    "nameEn": "Floor Reverse-Grip DB Bench",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8122,7 +8122,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001bf",
     "name": "地板哑铃卧推(锤式)",
-    "nameEn": null,
+    "nameEn": "Floor DB Bench (Hammer Grip)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8142,7 +8142,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c0",
     "name": "哑铃卧推(锤式)",
-    "nameEn": null,
+    "nameEn": "DB Bench Press (Hammer Grip)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8162,7 +8162,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c1",
     "name": "上斜哑铃锤式推举",
-    "nameEn": null,
+    "nameEn": "Incline DB Hammer Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8182,7 +8182,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c2",
     "name": "掌心向内上斜哑铃卧推",
-    "nameEn": null,
+    "nameEn": "Neutral-Grip Incline DB Bench",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8201,7 +8201,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c3",
     "name": "深度俯卧撑",
-    "nameEn": null,
+    "nameEn": "Deep Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8220,7 +8220,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c4",
     "name": "健身球上斜哑铃飞鸟",
-    "nameEn": null,
+    "nameEn": "Stability Ball Incline DB Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8239,7 +8239,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c5",
     "name": "仰卧哑铃锤式卧推",
-    "nameEn": null,
+    "nameEn": "Lying DB Hammer Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8259,7 +8259,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c6",
     "name": "哑铃窄距卧推",
-    "nameEn": null,
+    "nameEn": "DB Close-Grip Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8279,7 +8279,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c7",
     "name": "哑铃下斜扭转飞鸟",
-    "nameEn": null,
+    "nameEn": "Decline DB Twist Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8298,7 +8298,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c8",
     "name": "哑铃挤压式卧推",
-    "nameEn": null,
+    "nameEn": "DB Squeeze Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8318,7 +8318,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001c9",
     "name": "哑铃低位飞鸟",
-    "nameEn": null,
+    "nameEn": "Low DB Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8337,7 +8337,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ca",
     "name": "绳索十字夹胸",
-    "nameEn": null,
+    "nameEn": "Cable Crossover",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8356,7 +8356,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001cb",
     "name": "绳索夹胸",
-    "nameEn": null,
+    "nameEn": "Cable Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8375,7 +8375,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001cc",
     "name": "平板绳索夹胸",
-    "nameEn": null,
+    "nameEn": "Flat Cable Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8394,7 +8394,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001cd",
     "name": "上斜绳索夹胸",
-    "nameEn": null,
+    "nameEn": "Incline Cable Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8413,7 +8413,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ce",
     "name": "下斜绳索夹胸",
-    "nameEn": null,
+    "nameEn": "Decline Cable Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8432,7 +8432,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001cf",
     "name": "绳索下斜飞鸟",
-    "nameEn": null,
+    "nameEn": "Cable Decline Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8451,7 +8451,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d0",
     "name": "悍马机推胸",
-    "nameEn": null,
+    "nameEn": "Hammer Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8470,7 +8470,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d1",
     "name": "上斜悍马机推胸",
-    "nameEn": null,
+    "nameEn": "Incline Hammer Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8489,7 +8489,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d2",
     "name": "悍马机卧推",
-    "nameEn": null,
+    "nameEn": "Hammer Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8508,7 +8508,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d3",
     "name": "下斜悍马机推胸",
-    "nameEn": null,
+    "nameEn": "Decline Hammer Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8527,7 +8527,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d4",
     "name": "上斜悍马机飞鸟",
-    "nameEn": null,
+    "nameEn": "Incline Hammer Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8546,7 +8546,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d5",
     "name": "侧身单边悍马机推胸",
-    "nameEn": null,
+    "nameEn": "Lateral Single-Side Hammer Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8565,7 +8565,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d6",
     "name": "单边悍马机推胸",
-    "nameEn": null,
+    "nameEn": "Single-Side Hammer Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8584,7 +8584,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d7",
     "name": "直立器械推胸",
-    "nameEn": null,
+    "nameEn": "Upright Machine Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8603,7 +8603,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d8",
     "name": "塔式平板卧推",
-    "nameEn": null,
+    "nameEn": "Tower Flat Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8622,7 +8622,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001d9",
     "name": "塔式上斜卧推",
-    "nameEn": null,
+    "nameEn": "Tower Incline Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8641,7 +8641,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001da",
     "name": "悍马多连杆卧推",
-    "nameEn": null,
+    "nameEn": "Hammer Multi-Link Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8660,7 +8660,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001db",
     "name": "史密斯机卧推",
-    "nameEn": null,
+    "nameEn": "Smith Machine Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8679,7 +8679,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001dc",
     "name": "下斜史密斯机推胸",
-    "nameEn": null,
+    "nameEn": "Decline Smith Machine Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8698,7 +8698,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001dd",
     "name": "上斜史密斯机卧推",
-    "nameEn": null,
+    "nameEn": "Incline Smith Machine Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8717,7 +8717,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001de",
     "name": "史密斯V-bar卧推",
-    "nameEn": null,
+    "nameEn": "Smith V-Bar Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8736,7 +8736,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001df",
     "name": "器械推胸",
-    "nameEn": null,
+    "nameEn": "Machine Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8756,7 +8756,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e0",
     "name": "把手式蝴蝶机飞鸟",
-    "nameEn": null,
+    "nameEn": "Pec Deck (Handles)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8775,7 +8775,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e1",
     "name": "蝴蝶机飞鸟",
-    "nameEn": null,
+    "nameEn": "Pec Deck Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8794,7 +8794,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e2",
     "name": "双杠臂屈伸(辅助)",
-    "nameEn": null,
+    "nameEn": "Assisted Dip",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8815,7 +8815,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e3",
     "name": "器械坐姿下夹胸",
-    "nameEn": null,
+    "nameEn": "Seated Machine Low Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8834,7 +8834,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e4",
     "name": "站姿器械下夹胸",
-    "nameEn": null,
+    "nameEn": "Standing Machine Low Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8853,7 +8853,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e5",
     "name": "对握式器械推胸",
-    "nameEn": null,
+    "nameEn": "Neutral-Grip Machine Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8873,7 +8873,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e6",
     "name": "上斜器械推胸",
-    "nameEn": null,
+    "nameEn": "Incline Machine Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8893,7 +8893,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e7",
     "name": "器械单臂胸推",
-    "nameEn": null,
+    "nameEn": "Single-Arm Machine Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8913,7 +8913,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e8",
     "name": "器械上斜单臂胸部推举",
-    "nameEn": null,
+    "nameEn": "Incline Single-Arm Machine Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8933,7 +8933,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001e9",
     "name": "器械胸部推举",
-    "nameEn": null,
+    "nameEn": "Machine Chest Press (Plate-Loaded)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8953,7 +8953,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ea",
     "name": "杠杆夹胸",
-    "nameEn": null,
+    "nameEn": "Lever Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8972,7 +8972,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001eb",
     "name": "仰卧杠杆式胸推",
-    "nameEn": null,
+    "nameEn": "Lying Lever Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8992,7 +8992,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ec",
     "name": "弹力绳-高位飞鸟",
-    "nameEn": null,
+    "nameEn": "Band High Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9011,7 +9011,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ed",
     "name": "弹力绳-低位飞鸟",
-    "nameEn": null,
+    "nameEn": "Band Low Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9030,7 +9030,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ee",
     "name": "弹力绳-十字飞鸟",
-    "nameEn": null,
+    "nameEn": "Band Cross Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9049,7 +9049,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ef",
     "name": "弹力绳-阻力俯卧撑",
-    "nameEn": null,
+    "nameEn": "Band Resistance Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9068,7 +9068,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f0",
     "name": "弹力绳-前推",
-    "nameEn": null,
+    "nameEn": "Band Forward Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9087,7 +9087,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f1",
     "name": "弹力绳-上推",
-    "nameEn": null,
+    "nameEn": "Band Upward Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9106,7 +9106,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f2",
     "name": "弹力绳-卧推",
-    "nameEn": null,
+    "nameEn": "Band Bench Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9126,7 +9126,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f3",
     "name": "弹力带-坐姿前推",
-    "nameEn": null,
+    "nameEn": "Band Seated Chest Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9145,7 +9145,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f4",
     "name": "弹力带站姿高位飞鸟",
-    "nameEn": null,
+    "nameEn": "Band Standing High Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9164,7 +9164,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f5",
     "name": "双杠臂屈伸(负重)",
-    "nameEn": null,
+    "nameEn": "Dip (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9185,7 +9185,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f6",
     "name": "上台阶俯卧撑",
-    "nameEn": null,
+    "nameEn": "Step-Up Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9205,7 +9205,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f7",
     "name": "跪姿俯卧撑",
-    "nameEn": null,
+    "nameEn": "Kneeling Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9225,7 +9225,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001f9",
     "name": "反手俯卧撑",
-    "nameEn": null,
+    "nameEn": "Reverse-Grip Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9245,7 +9245,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001fa",
     "name": "反手俯卧撑(负重)",
-    "nameEn": null,
+    "nameEn": "Reverse-Grip Push-Up (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9265,7 +9265,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001fb",
     "name": "臂屈伸式俯卧撑",
-    "nameEn": null,
+    "nameEn": "Tricep Extension Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9285,7 +9285,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001fc",
     "name": "臂屈伸式俯卧撑(负重)",
-    "nameEn": null,
+    "nameEn": "Tricep Extension Push-Up (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9305,7 +9305,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001fd",
     "name": "地板飞鸟",
-    "nameEn": null,
+    "nameEn": "Floor Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9324,7 +9324,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001fe",
     "name": "地板飞鸟(中难度)",
-    "nameEn": null,
+    "nameEn": "Floor Fly (Medium)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9343,7 +9343,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000001ff",
     "name": "地板飞鸟(负重)",
-    "nameEn": null,
+    "nameEn": "Floor Fly (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9362,7 +9362,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000200",
     "name": "派克俯卧撑",
-    "nameEn": null,
+    "nameEn": "Pike Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9383,7 +9383,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000201",
     "name": "俯卧撑-把柄",
-    "nameEn": null,
+    "nameEn": "Push-Up (Handles)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9403,7 +9403,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000202",
     "name": "上斜俯卧撑",
-    "nameEn": null,
+    "nameEn": "Incline Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9423,7 +9423,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000203",
     "name": "下斜俯卧撑",
-    "nameEn": null,
+    "nameEn": "Decline Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9443,7 +9443,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000204",
     "name": "下斜俯卧撑(负重)",
-    "nameEn": null,
+    "nameEn": "Decline Push-Up (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9463,7 +9463,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000205",
     "name": "俯卧撑_支撑球",
-    "nameEn": null,
+    "nameEn": "Push-Up (Stability Ball)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9483,7 +9483,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000206",
     "name": "单手俯卧撑",
-    "nameEn": null,
+    "nameEn": "One-Arm Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9503,7 +9503,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000207",
     "name": "鼓掌俯卧撑",
-    "nameEn": null,
+    "nameEn": "Clap Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9523,7 +9523,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000208",
     "name": "宽距俯卧撑",
-    "nameEn": null,
+    "nameEn": "Wide Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9543,7 +9543,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000209",
     "name": "侧姿俯卧撑",
-    "nameEn": null,
+    "nameEn": "Side-Posture Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9563,7 +9563,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020a",
     "name": "墙式俯卧撑_进阶版",
-    "nameEn": null,
+    "nameEn": "Wall Push-Up (Advanced)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9583,7 +9583,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020b",
     "name": "射手俯卧撑",
-    "nameEn": null,
+    "nameEn": "Archer Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9603,7 +9603,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020c",
     "name": "单侧射手俯卧撑",
-    "nameEn": null,
+    "nameEn": "Archer Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9623,7 +9623,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020d",
     "name": "窄距跪姿俯卧撑",
-    "nameEn": null,
+    "nameEn": "Close-Grip Kneeling Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9643,7 +9643,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020e",
     "name": "跪姿俯卧撑接婴儿式",
-    "nameEn": null,
+    "nameEn": "Kneeling Push-Up to Child's Pose",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9663,7 +9663,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020f",
     "name": "俯卧撑进阶推展",
-    "nameEn": null,
+    "nameEn": "Push-Up Plus",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9683,7 +9683,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000210",
     "name": "派克转眼镜蛇俯卧撑",
-    "nameEn": null,
+    "nameEn": "Pike to Cobra Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9704,7 +9704,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000211",
     "name": "靠墙下斜俯卧撑",
-    "nameEn": null,
+    "nameEn": "Wall Decline Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9724,7 +9724,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000212",
     "name": "跪姿旋转俯卧撑",
-    "nameEn": null,
+    "nameEn": "Kneeling Rotation Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9744,7 +9744,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000213",
     "name": "眼镜蛇俯卧撑",
-    "nameEn": null,
+    "nameEn": "Cobra Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9765,7 +9765,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000214",
     "name": "箱上跪姿下斜俯卧撑",
-    "nameEn": null,
+    "nameEn": "Box Kneeling Decline Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9785,7 +9785,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000215",
     "name": "健身球哑铃飞鸟",
-    "nameEn": null,
+    "nameEn": "Stability Ball DB Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9804,7 +9804,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000216",
     "name": "仰卧泡沫轴开胸放松",
-    "nameEn": null,
+    "nameEn": "Lying Foam Roller Chest Opener",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9823,7 +9823,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000217",
     "name": "上斜触肩俯卧撑",
-    "nameEn": null,
+    "nameEn": "Incline Shoulder Tap Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9844,7 +9844,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000218",
     "name": "凳上派克式俯卧撑",
-    "nameEn": null,
+    "nameEn": "Bench Pike Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9864,7 +9864,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000219",
     "name": "吊环双杠臂屈伸",
-    "nameEn": null,
+    "nameEn": "Ring Dip",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9885,7 +9885,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000021a",
     "name": "吊环反身俯卧撑",
-    "nameEn": null,
+    "nameEn": "Ring Inverted Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9905,7 +9905,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000021b",
     "name": "吊环夹胸",
-    "nameEn": null,
+    "nameEn": "Ring Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9924,7 +9924,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000021c",
     "name": "吊环俯卧撑转侧平板",
-    "nameEn": null,
+    "nameEn": "Ring Push-Up to Side Plank",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9945,7 +9945,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000021d",
     "name": "吊环下斜俯卧撑",
-    "nameEn": null,
+    "nameEn": "Ring Decline Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9965,7 +9965,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000021e",
     "name": "椅子双臂臂屈伸",
-    "nameEn": null,
+    "nameEn": "Chair Dip",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -9986,7 +9986,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000021f",
     "name": "反手杠铃划船",
-    "nameEn": null,
+    "nameEn": "Underhand Barbell Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10006,7 +10006,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000220",
     "name": "地雷杆单手划船",
-    "nameEn": null,
+    "nameEn": "Landmine Single-Arm Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10025,7 +10025,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000221",
     "name": "潘德雷划船",
-    "nameEn": null,
+    "nameEn": "Pendlay Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10044,7 +10044,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000222",
     "name": "俯卧杠铃划船",
-    "nameEn": null,
+    "nameEn": "Prone Barbell Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10063,7 +10063,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000223",
     "name": "T杆划船(窄)",
-    "nameEn": null,
+    "nameEn": "T-Bar Row (Narrow)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10082,7 +10082,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000224",
     "name": "海豹杠铃划船",
-    "nameEn": null,
+    "nameEn": "Seal Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10101,7 +10101,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000225",
     "name": "俯卧杠铃反手划船",
-    "nameEn": null,
+    "nameEn": "Prone Underhand Barbell Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10121,7 +10121,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000226",
     "name": "站姿哑铃划船",
-    "nameEn": null,
+    "nameEn": "Standing DB Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10140,7 +10140,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000227",
     "name": "站姿旋转划船",
-    "nameEn": null,
+    "nameEn": "Standing Rotation Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10159,7 +10159,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000228",
     "name": "平躺哑铃过头拉",
-    "nameEn": null,
+    "nameEn": "Lying DB Pullover",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10178,7 +10178,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000229",
     "name": "俯卧哑铃划船(锤式)",
-    "nameEn": null,
+    "nameEn": "Prone DB Row (Hammer Grip)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10198,7 +10198,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000022a",
     "name": "俯卧哑铃划船",
-    "nameEn": null,
+    "nameEn": "Prone DB Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10217,7 +10217,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000022b",
     "name": "俯卧反手哑铃划船",
-    "nameEn": null,
+    "nameEn": "Prone Underhand DB Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10256,7 +10256,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000022d",
     "name": "哑铃掌心旋转俯身划船",
-    "nameEn": null,
+    "nameEn": "DB Bent-Over Row (Palm Rotation)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10275,7 +10275,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000022e",
     "name": "哑铃反握划船",
-    "nameEn": null,
+    "nameEn": "Reverse-Grip DB Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10295,7 +10295,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000022f",
     "name": "哑铃俯身划船_平板支撑式",
-    "nameEn": null,
+    "nameEn": "DB Bent-Over Row (Plank Position)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10314,7 +10314,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000230",
     "name": "壶铃单臂划船",
-    "nameEn": null,
+    "nameEn": "Single-Arm KB Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10333,7 +10333,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000231",
     "name": "宽距高位下拉",
-    "nameEn": null,
+    "nameEn": "Wide-Grip Lat Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10352,7 +10352,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000232",
     "name": "窄距下拉",
-    "nameEn": null,
+    "nameEn": "Close-Grip Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10371,7 +10371,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000233",
     "name": "绳索直臂下压",
-    "nameEn": null,
+    "nameEn": "Cable Straight-Arm Pushdown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10390,7 +10390,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000234",
     "name": "拉杆坐姿划船(宽握)",
-    "nameEn": null,
+    "nameEn": "Seated Pulldown Row (Wide Grip)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10409,7 +10409,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000235",
     "name": "拉杆坐姿划船(窄握)",
-    "nameEn": null,
+    "nameEn": "Seated Pulldown Row (Close Grip)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10428,7 +10428,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000236",
     "name": "V-bar下拉",
-    "nameEn": null,
+    "nameEn": "V-Bar Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10447,7 +10447,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000237",
     "name": "绳索坐姿划船(单手)",
-    "nameEn": null,
+    "nameEn": "Seated Cable Row (Single-Arm)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10466,7 +10466,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000238",
     "name": "铁杆直臂下压",
-    "nameEn": null,
+    "nameEn": "Iron-Bar Straight-Arm Pushdown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10485,7 +10485,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000239",
     "name": "宽握反手下拉",
-    "nameEn": null,
+    "nameEn": "Wide-Grip Underhand Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10505,7 +10505,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000023a",
     "name": "单手下拉",
-    "nameEn": null,
+    "nameEn": "Single-Arm Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10524,7 +10524,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000023b",
     "name": "坐姿单手划船",
-    "nameEn": null,
+    "nameEn": "Seated Single-Arm Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10543,7 +10543,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000023c",
     "name": "绳索站姿旋转划船",
-    "nameEn": null,
+    "nameEn": "Standing Cable Rotation Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10562,7 +10562,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000023d",
     "name": "V-bar划船",
-    "nameEn": null,
+    "nameEn": "V-Bar Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10581,7 +10581,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000023e",
     "name": "竖直坐姿绳索划船",
-    "nameEn": null,
+    "nameEn": "Upright Seated Cable Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10600,7 +10600,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000023f",
     "name": "坐姿绳索双边下拉",
-    "nameEn": null,
+    "nameEn": "Seated Cable Bilateral Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10619,7 +10619,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000240",
     "name": "窄握把手下拉",
-    "nameEn": null,
+    "nameEn": "Close-Grip Handle Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10638,7 +10638,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000241",
     "name": "绳索单边俯身划船",
-    "nameEn": null,
+    "nameEn": "Single-Side Cable Bent-Over Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10657,7 +10657,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000242",
     "name": "绳索高位下拉",
-    "nameEn": null,
+    "nameEn": "Cable Lat Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10676,7 +10676,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000243",
     "name": "绳索直臂坐姿划船",
-    "nameEn": null,
+    "nameEn": "Straight-Arm Seated Cable Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10695,7 +10695,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000244",
     "name": "绳索直臂下拉",
-    "nameEn": null,
+    "nameEn": "Cable Straight-Arm Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10714,7 +10714,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000245",
     "name": "站姿绳索高位下拉",
-    "nameEn": null,
+    "nameEn": "Standing Cable Lat Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10733,7 +10733,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000246",
     "name": "绳索直背坐姿划船",
-    "nameEn": null,
+    "nameEn": "Straight-Back Seated Cable Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10752,7 +10752,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000247",
     "name": "正手绳索俯身划船",
-    "nameEn": null,
+    "nameEn": "Overhand Cable Bent-Over Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10771,7 +10771,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000248",
     "name": "反手绳索俯身划船",
-    "nameEn": null,
+    "nameEn": "Underhand Cable Bent-Over Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10791,7 +10791,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000249",
     "name": "悍马机划船",
-    "nameEn": null,
+    "nameEn": "Hammer Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10810,7 +10810,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000024a",
     "name": "分动式高位划船",
-    "nameEn": null,
+    "nameEn": "Split-Action High Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10829,7 +10829,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000024b",
     "name": "悍马机正手下拉",
-    "nameEn": null,
+    "nameEn": "Hammer Overhand Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10848,7 +10848,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000024c",
     "name": "悍马机大剪刀",
-    "nameEn": null,
+    "nameEn": "Hammer Power Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10868,7 +10868,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000024d",
     "name": "悍马机-鹦鹉螺",
-    "nameEn": null,
+    "nameEn": "Nautilus Row Machine",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10888,7 +10888,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000024e",
     "name": "轨道划船器划船",
-    "nameEn": null,
+    "nameEn": "Track Row Machine",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10907,7 +10907,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000024f",
     "name": "单手坐姿悍马机划船",
-    "nameEn": null,
+    "nameEn": "Single-Arm Seated Hammer Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10926,7 +10926,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000250",
     "name": "单手悍马机下拉",
-    "nameEn": null,
+    "nameEn": "Single-Arm Hammer Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10945,7 +10945,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000252",
     "name": "单手支撑式悍马俯身划船",
-    "nameEn": null,
+    "nameEn": "Single-Arm Supported Hammer Bent-Over Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10964,7 +10964,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000253",
     "name": "单边大剪刀划船",
-    "nameEn": null,
+    "nameEn": "Single-Side Power Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10984,7 +10984,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000254",
     "name": "反握式悍马划船",
-    "nameEn": null,
+    "nameEn": "Reverse-Grip Hammer Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11004,7 +11004,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000255",
     "name": "悍马机下拉",
-    "nameEn": null,
+    "nameEn": "Hammer Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11023,7 +11023,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000256",
     "name": "悍马俯身划船",
-    "nameEn": null,
+    "nameEn": "Hammer Bent-Over Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11042,7 +11042,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000257",
     "name": "支撑式悍马俯身划船",
-    "nameEn": null,
+    "nameEn": "Supported Hammer Bent-Over Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11061,7 +11061,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000258",
     "name": "挂片器划船",
-    "nameEn": null,
+    "nameEn": "Plate-Loaded Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11080,7 +11080,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000259",
     "name": "史密斯反手划船",
-    "nameEn": null,
+    "nameEn": "Smith Underhand Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11100,7 +11100,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000025a",
     "name": "器械下拉",
-    "nameEn": null,
+    "nameEn": "Machine Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11119,7 +11119,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000025b",
     "name": "T杆划船(宽)",
-    "nameEn": null,
+    "nameEn": "T-Bar Row (Wide)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11138,7 +11138,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000025c",
     "name": "引体向上(辅助)",
-    "nameEn": null,
+    "nameEn": "Assisted Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11157,7 +11157,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000025d",
     "name": "窄距引体向上(辅助)",
-    "nameEn": null,
+    "nameEn": "Assisted Close-Grip Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11176,7 +11176,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000025e",
     "name": "俯卧T-bar划船",
-    "nameEn": null,
+    "nameEn": "Prone T-Bar Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11195,7 +11195,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000025f",
     "name": "坐姿器械背屈伸",
-    "nameEn": null,
+    "nameEn": "Seated Machine Back Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11214,7 +11214,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000260",
     "name": "器械大剪刀",
-    "nameEn": null,
+    "nameEn": "Power Row Machine",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11234,7 +11234,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000261",
     "name": "器械绳索划船",
-    "nameEn": null,
+    "nameEn": "Machine Cable Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11253,7 +11253,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000262",
     "name": "双杠架锤式握法引体向上",
-    "nameEn": null,
+    "nameEn": "Parallel-Grip Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11273,7 +11273,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000263",
     "name": "上斜俯卧划船",
-    "nameEn": null,
+    "nameEn": "Incline Prone Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11292,7 +11292,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000264",
     "name": "器械高位划船",
-    "nameEn": null,
+    "nameEn": "Machine High Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11311,7 +11311,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000265",
     "name": "器械坐姿划船",
-    "nameEn": null,
+    "nameEn": "Seated Machine Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11330,7 +11330,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000266",
     "name": "窄距正手下拉",
-    "nameEn": null,
+    "nameEn": "Close-Grip Overhand Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11349,7 +11349,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000267",
     "name": "反向T杆划船",
-    "nameEn": null,
+    "nameEn": "Reverse T-Bar Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11368,7 +11368,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000268",
     "name": "反握器械高位下拉",
-    "nameEn": null,
+    "nameEn": "Reverse-Grip Machine Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11388,7 +11388,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000269",
     "name": "TRX-坐姿下拉",
-    "nameEn": null,
+    "nameEn": "TRX Seated Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11407,7 +11407,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000026a",
     "name": "TRX-坐姿下拉(负重)",
-    "nameEn": null,
+    "nameEn": "TRX Seated Pulldown (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11426,7 +11426,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000026b",
     "name": "TRX-水平划船",
-    "nameEn": null,
+    "nameEn": "TRX Horizontal Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11445,7 +11445,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000026c",
     "name": "TRX-水平划船(中难度)",
-    "nameEn": null,
+    "nameEn": "TRX Horizontal Row (Medium)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11464,7 +11464,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000026d",
     "name": "TRX-水平划船(负重)",
-    "nameEn": null,
+    "nameEn": "TRX Horizontal Row (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11483,7 +11483,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000026e",
     "name": "悬带反握划船",
-    "nameEn": null,
+    "nameEn": "Suspension Reverse-Grip Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11503,7 +11503,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000026f",
     "name": "弹力绳-俯身划船",
-    "nameEn": null,
+    "nameEn": "Band Bent-Over Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11522,7 +11522,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000270",
     "name": "弹力绳-坐姿划船",
-    "nameEn": null,
+    "nameEn": "Band Seated Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11541,7 +11541,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000271",
     "name": "弹力绳-单手下拉",
-    "nameEn": null,
+    "nameEn": "Band Single-Arm Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11560,7 +11560,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000272",
     "name": "弹力绳-单手划船",
-    "nameEn": null,
+    "nameEn": "Band Single-Arm Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11579,7 +11579,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000273",
     "name": "弹力绳-反向早安",
-    "nameEn": null,
+    "nameEn": "Band Reverse Good Morning",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11600,7 +11600,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000274",
     "name": "弹力绳-跪姿下拉",
-    "nameEn": null,
+    "nameEn": "Band Kneeling Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11619,7 +11619,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000275",
     "name": "弹力绳-直臂下拉",
-    "nameEn": null,
+    "nameEn": "Band Straight-Arm Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11638,7 +11638,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000276",
     "name": "弹力绳-坐姿直立划船",
-    "nameEn": null,
+    "nameEn": "Band Seated Upright Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11657,7 +11657,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000277",
     "name": "弹力绳-站姿直立划船",
-    "nameEn": null,
+    "nameEn": "Band Standing Upright Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11676,7 +11676,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000278",
     "name": "弹力绳-反手下拉",
-    "nameEn": null,
+    "nameEn": "Band Underhand Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11696,7 +11696,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000279",
     "name": "弹力绳-高位下拉",
-    "nameEn": null,
+    "nameEn": "Band Lat Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11715,7 +11715,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000027a",
     "name": "跪姿弹力带划船",
-    "nameEn": null,
+    "nameEn": "Kneeling Band Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11734,7 +11734,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000027b",
     "name": "弹力带坐姿划船",
-    "nameEn": null,
+    "nameEn": "Band Seated Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11753,7 +11753,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000027c",
     "name": "弹力带单臂扭转坐姿划船",
-    "nameEn": null,
+    "nameEn": "Single-Arm Band Twist Seated Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11772,7 +11772,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000027d",
     "name": "弹力带辅助引体向上",
-    "nameEn": null,
+    "nameEn": "Band-Assisted Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11791,7 +11791,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000027e",
     "name": "引体向上(负重)",
-    "nameEn": null,
+    "nameEn": "Pull-Up (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11811,7 +11811,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000027f",
     "name": "反手引体向上(负重)",
-    "nameEn": null,
+    "nameEn": "Chin-Up (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11831,7 +11831,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000280",
     "name": "澳式引体",
-    "nameEn": null,
+    "nameEn": "Australian Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11851,7 +11851,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000281",
     "name": "弹跳引体",
-    "nameEn": null,
+    "nameEn": "Kipping Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11870,7 +11870,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000282",
     "name": "坐姿等长引体",
-    "nameEn": null,
+    "nameEn": "Seated Isometric Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11889,7 +11889,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000283",
     "name": "猫式伸展",
-    "nameEn": null,
+    "nameEn": "Cat Stretch",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11908,7 +11908,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000284",
     "name": "脊柱拉伸",
-    "nameEn": null,
+    "nameEn": "Spinal Stretch",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11927,7 +11927,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000285",
     "name": "跪姿背阔肌拉伸",
-    "nameEn": null,
+    "nameEn": "Kneeling Lat Stretch",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11946,7 +11946,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000286",
     "name": "仰卧下背拉伸",
-    "nameEn": null,
+    "nameEn": "Lying Lower Back Stretch",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11965,7 +11965,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000287",
     "name": "仰卧下背拉伸_屈膝",
-    "nameEn": null,
+    "nameEn": "Lying Lower Back Stretch (Bent Knee)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -11984,7 +11984,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000288",
     "name": "宽握颈后引体向上",
-    "nameEn": null,
+    "nameEn": "Wide-Grip Behind-the-Neck Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12003,7 +12003,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000289",
     "name": "毛巾超人划船",
-    "nameEn": null,
+    "nameEn": "Towel Superman Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12022,7 +12022,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000028a",
     "name": "毛巾滑动地面下拉",
-    "nameEn": null,
+    "nameEn": "Towel Floor Slide Pulldown",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12041,7 +12041,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000028b",
     "name": "屈膝仰卧地板划船",
-    "nameEn": null,
+    "nameEn": "Bent-Knee Floor Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12060,7 +12060,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000028c",
     "name": "肩宽握引体向上_中握距",
-    "nameEn": null,
+    "nameEn": "Shoulder-Width Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12079,7 +12079,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000028d",
     "name": "背部胸肌拉伸",
-    "nameEn": null,
+    "nameEn": "Back and Chest Stretch",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12098,7 +12098,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000028e",
     "name": "窄距引体向上",
-    "nameEn": null,
+    "nameEn": "Close-Grip Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12118,7 +12118,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000028f",
     "name": "肩胛屈伸",
-    "nameEn": null,
+    "nameEn": "Scapular Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12138,7 +12138,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000290",
     "name": "凳上辅助引体向上",
-    "nameEn": null,
+    "nameEn": "Bench-Assisted Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12157,7 +12157,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000291",
     "name": "吊环膝触划船",
-    "nameEn": null,
+    "nameEn": "Ring Knee-Touch Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12176,7 +12176,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000292",
     "name": "吊环高位划船",
-    "nameEn": null,
+    "nameEn": "Ring High Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12195,7 +12195,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000293",
     "name": "吊环反向飞鸟",
-    "nameEn": null,
+    "nameEn": "Ring Reverse Fly",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12215,7 +12215,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000294",
     "name": "吊环引体向上",
-    "nameEn": null,
+    "nameEn": "Ring Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12234,7 +12234,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000295",
     "name": "吊环宽握反身划船",
-    "nameEn": null,
+    "nameEn": "Ring Wide-Grip Inverted Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12253,7 +12253,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000296",
     "name": "反手吊环引体向上",
-    "nameEn": null,
+    "nameEn": "Underhand Ring Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12273,7 +12273,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000297",
     "name": "吊环屈膝反身划船",
-    "nameEn": null,
+    "nameEn": "Ring Bent-Knee Inverted Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12292,7 +12292,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000298",
     "name": "椅子反身划船",
-    "nameEn": null,
+    "nameEn": "Chair Inverted Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12311,7 +12311,7 @@
   {
     "id": "00000000-0000-0000-ca70-000000000299",
     "name": "窄距平行握引体向上_V把",
-    "nameEn": null,
+    "nameEn": "Close-Grip Parallel Pull-Up (V-Handle)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12330,7 +12330,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000029a",
     "name": "自主辅助反向过顶拉伸",
-    "nameEn": null,
+    "nameEn": "Self-Assisted Reverse Overhead Stretch",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12349,7 +12349,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000029b",
     "name": "椅间屈膝反向划船",
-    "nameEn": null,
+    "nameEn": "Chair Bent-Knee Inverted Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12368,7 +12368,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000029c",
     "name": "椅间屈膝窄握反向引体",
-    "nameEn": null,
+    "nameEn": "Chair Bent-Knee Narrow-Grip Inverted Pull-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12387,7 +12387,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000029d",
     "name": "平板手肘撑",
-    "nameEn": null,
+    "nameEn": "Elbow Plank",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12407,7 +12407,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000029e",
     "name": "杠铃深蹲",
-    "nameEn": null,
+    "nameEn": "Barbell Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12427,7 +12427,7 @@
   {
     "id": "00000000-0000-0000-ca70-00000000029f",
     "name": "杰弗森深蹲",
-    "nameEn": null,
+    "nameEn": "Jefferson Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12447,7 +12447,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a0",
     "name": "杠铃火箭推",
-    "nameEn": null,
+    "nameEn": "Barbell Push Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12467,7 +12467,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a1",
     "name": "跪姿杠铃深蹲",
-    "nameEn": null,
+    "nameEn": "Kneeling Barbell Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12487,7 +12487,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a2",
     "name": "杠铃前架弓步蹲",
-    "nameEn": null,
+    "nameEn": "Barbell Front Rack Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12507,7 +12507,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a3",
     "name": "哑铃二头弯举深蹲",
-    "nameEn": null,
+    "nameEn": "DB Curl Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12527,7 +12527,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a4",
     "name": "哑铃深蹲",
-    "nameEn": null,
+    "nameEn": "DB Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12547,7 +12547,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a5",
     "name": "哑铃前蹲",
-    "nameEn": null,
+    "nameEn": "DB Front Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12567,7 +12567,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a7",
     "name": "哑铃箭步蹲",
-    "nameEn": null,
+    "nameEn": "DB Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12587,7 +12587,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a8",
     "name": "哑铃相扑蹲",
-    "nameEn": null,
+    "nameEn": "DB Sumo Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12607,7 +12607,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002a9",
     "name": "哑铃火箭推",
-    "nameEn": null,
+    "nameEn": "DB Push Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12627,7 +12627,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002aa",
     "name": "俯卧哑铃腘绳肌弯举",
-    "nameEn": null,
+    "nameEn": "Prone DB Hamstring Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12648,7 +12648,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ab",
     "name": "哑铃俯卧腿弯举",
-    "nameEn": null,
+    "nameEn": "Prone DB Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12667,7 +12667,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ac",
     "name": "哑铃杠杆握法相扑深蹲",
-    "nameEn": null,
+    "nameEn": "DB Goblet Sumo Squat (Lever Grip)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12687,7 +12687,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ad",
     "name": "原地箭步蹲",
-    "nameEn": null,
+    "nameEn": "Stationary Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12707,7 +12707,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ae",
     "name": "哑铃单腿台阶上步",
-    "nameEn": null,
+    "nameEn": "DB Single-Leg Step-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12727,7 +12727,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002af",
     "name": "哑铃前架箭步蹲",
-    "nameEn": null,
+    "nameEn": "DB Front Rack Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12747,7 +12747,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b0",
     "name": "哑铃单腿深蹲",
-    "nameEn": null,
+    "nameEn": "DB Pistol Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12767,7 +12767,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b1",
     "name": "壶铃前蹲",
-    "nameEn": null,
+    "nameEn": "KB Front Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12787,7 +12787,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b2",
     "name": "壶铃硬拉",
-    "nameEn": null,
+    "nameEn": "KB Deadlift",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12808,7 +12808,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b3",
     "name": "壶铃土耳其起身",
-    "nameEn": null,
+    "nameEn": "KB Turkish Get-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12828,7 +12828,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b4",
     "name": "绳索辅助反向腿弯举",
-    "nameEn": null,
+    "nameEn": "Cable-Assisted Reverse Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12847,7 +12847,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b5",
     "name": "悍马机深蹲",
-    "nameEn": null,
+    "nameEn": "Hammer Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12867,7 +12867,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b6",
     "name": "钟摆深蹲",
-    "nameEn": null,
+    "nameEn": "Pendulum Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12887,7 +12887,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b7",
     "name": "挂片器单腿屈伸",
-    "nameEn": null,
+    "nameEn": "Plate-Loaded Single-Leg Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12906,7 +12906,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b8",
     "name": "史密斯机深蹲",
-    "nameEn": null,
+    "nameEn": "Smith Machine Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12926,7 +12926,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002b9",
     "name": "史密斯机箭步蹲",
-    "nameEn": null,
+    "nameEn": "Smith Machine Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12946,7 +12946,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ba",
     "name": "史密斯机保加利亚蹲",
-    "nameEn": null,
+    "nameEn": "Smith Machine Bulgarian Split Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12966,7 +12966,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002bb",
     "name": "史密斯机坐蹲",
-    "nameEn": null,
+    "nameEn": "Smith Machine Seated Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12986,7 +12986,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002bc",
     "name": "史密斯机直腿硬拉",
-    "nameEn": null,
+    "nameEn": "Smith Machine Stiff-Leg Deadlift",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13007,7 +13007,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002bd",
     "name": "硬拉器硬拉",
-    "nameEn": null,
+    "nameEn": "Deadlift Machine Pull",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13028,7 +13028,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002be",
     "name": "单边腿弯举(器械)",
-    "nameEn": null,
+    "nameEn": "Single-Side Machine Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13047,7 +13047,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002bf",
     "name": "犀牛腰带机深蹲",
-    "nameEn": null,
+    "nameEn": "Rhino Belt Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13067,7 +13067,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c0",
     "name": "器械单腿腿屈伸",
-    "nameEn": null,
+    "nameEn": "Single-Leg Machine Leg Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13086,7 +13086,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c1",
     "name": "器械坐姿深蹲",
-    "nameEn": null,
+    "nameEn": "Seated Machine Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13106,7 +13106,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c2",
     "name": "连动式仰卧腿举",
-    "nameEn": null,
+    "nameEn": "Linked Lying Leg Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13126,7 +13126,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c3",
     "name": "悍马式高位深蹲",
-    "nameEn": null,
+    "nameEn": "Hammer High Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13146,7 +13146,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c4",
     "name": "杠杆式单腿水平腿屈伸",
-    "nameEn": null,
+    "nameEn": "Lever Single-Leg Horizontal Leg Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13165,7 +13165,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c5",
     "name": "杠杆坐姿腿屈伸",
-    "nameEn": null,
+    "nameEn": "Lever Seated Leg Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13184,7 +13184,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c6",
     "name": "窄距腿举",
-    "nameEn": null,
+    "nameEn": "Narrow Leg Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13204,7 +13204,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c7",
     "name": "TRX-手枪深蹲(手辅助)",
-    "nameEn": null,
+    "nameEn": "TRX Pistol Squat (Hand-Assisted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13224,7 +13224,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c8",
     "name": "TRX-手枪深蹲(中难度)",
-    "nameEn": null,
+    "nameEn": "TRX Pistol Squat (Medium)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13244,7 +13244,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002c9",
     "name": "TRX-手枪深蹲(负重)",
-    "nameEn": null,
+    "nameEn": "TRX Pistol Squat (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13264,7 +13264,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ca",
     "name": "弹力带-提腿",
-    "nameEn": null,
+    "nameEn": "Band Leg Raise",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13284,7 +13284,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002cb",
     "name": "弹力带-箭步蹲",
-    "nameEn": null,
+    "nameEn": "Band Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13304,7 +13304,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002cc",
     "name": "弹力带-平躺腿弯举",
-    "nameEn": null,
+    "nameEn": "Band Lying Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13323,7 +13323,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002cd",
     "name": "弹力带-站姿踢腿",
-    "nameEn": null,
+    "nameEn": "Band Standing Kick",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13343,7 +13343,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002cf",
     "name": "弹力带-站姿单腿外展",
-    "nameEn": null,
+    "nameEn": "Band Standing Single-Leg Abduction",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13362,7 +13362,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d0",
     "name": "弹力带-登山者",
-    "nameEn": null,
+    "nameEn": "Band Mountain Climber",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13382,7 +13382,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d1",
     "name": "弹力带-仰卧登山者",
-    "nameEn": null,
+    "nameEn": "Band Lying Mountain Climber",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13402,7 +13402,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d2",
     "name": "弹力带-站姿腿弯举",
-    "nameEn": null,
+    "nameEn": "Band Standing Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13421,7 +13421,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d3",
     "name": "弹力带-箭步走",
-    "nameEn": null,
+    "nameEn": "Band Walking Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13441,7 +13441,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d4",
     "name": "弹力带-深蹲",
-    "nameEn": null,
+    "nameEn": "Band Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13461,7 +13461,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d5",
     "name": "弹力带-单腿深蹲",
-    "nameEn": null,
+    "nameEn": "Band Pistol Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13481,7 +13481,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d6",
     "name": "弹力带-腿外展",
-    "nameEn": null,
+    "nameEn": "Band Hip Abduction",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13500,7 +13500,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d7",
     "name": "弹力带-螃式走",
-    "nameEn": null,
+    "nameEn": "Band Crab Walk",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13519,7 +13519,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d8",
     "name": "弹力带-仰卧外展",
-    "nameEn": null,
+    "nameEn": "Band Lying Abduction",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13538,7 +13538,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002d9",
     "name": "弹力带-鸭式前行",
-    "nameEn": null,
+    "nameEn": "Band Duck Walk",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13557,7 +13557,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002da",
     "name": "坐姿弹力带腿屈伸",
-    "nameEn": null,
+    "nameEn": "Seated Band Leg Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13576,7 +13576,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002db",
     "name": "器械倒蹬",
-    "nameEn": null,
+    "nameEn": "Hack Squat (Reverse)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13596,7 +13596,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002dc",
     "name": "毛巾腿弯举",
-    "nameEn": null,
+    "nameEn": "Towel Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13615,7 +13615,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002dd",
     "name": "毛巾腿弯举(高难度)",
-    "nameEn": null,
+    "nameEn": "Towel Leg Curl (Advanced)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13634,7 +13634,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002de",
     "name": "箭步踢腿",
-    "nameEn": null,
+    "nameEn": "Lunge with Kick",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13654,7 +13654,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002df",
     "name": "保加利亚蹲(负重)",
-    "nameEn": null,
+    "nameEn": "Bulgarian Split Squat (Weighted)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13674,7 +13674,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e0",
     "name": "自重腿弯举",
-    "nameEn": null,
+    "nameEn": "Bodyweight Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13693,7 +13693,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e1",
     "name": "箭步跳",
-    "nameEn": null,
+    "nameEn": "Jumping Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13713,7 +13713,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e2",
     "name": "后弓步踢腿",
-    "nameEn": null,
+    "nameEn": "Reverse Lunge with Kick",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13733,7 +13733,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e3",
     "name": "跳跃深蹲",
-    "nameEn": null,
+    "nameEn": "Jump Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13753,7 +13753,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e4",
     "name": "跳跃式上步",
-    "nameEn": null,
+    "nameEn": "Jumping Step-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13773,7 +13773,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e5",
     "name": "高抬腿深蹲",
-    "nameEn": null,
+    "nameEn": "High-Knee Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13793,7 +13793,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e6",
     "name": "相扑深蹲",
-    "nameEn": null,
+    "nameEn": "Sumo Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13814,7 +13814,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e7",
     "name": "交替抬腿",
-    "nameEn": null,
+    "nameEn": "Alternating Leg Raise",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13834,7 +13834,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e8",
     "name": "单腿四分之一深蹲",
-    "nameEn": null,
+    "nameEn": "Single-Leg Quarter Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13854,7 +13854,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002e9",
     "name": "自重后弓步",
-    "nameEn": null,
+    "nameEn": "Bodyweight Reverse Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13874,7 +13874,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ea",
     "name": "站立提膝",
-    "nameEn": null,
+    "nameEn": "Standing Knee Raise",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13894,7 +13894,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002eb",
     "name": "垫高窄距深蹲",
-    "nameEn": null,
+    "nameEn": "Elevated Narrow Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13914,7 +13914,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ec",
     "name": "髋部屈伸拉伸",
-    "nameEn": null,
+    "nameEn": "Hip Flexion-Extension Stretch",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13933,7 +13933,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ed",
     "name": "单腿触踵深蹲",
-    "nameEn": null,
+    "nameEn": "Single-Leg Heel Touch Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13953,7 +13953,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ee",
     "name": "冲刺弓步",
-    "nameEn": null,
+    "nameEn": "Sprinter Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13973,7 +13973,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002ef",
     "name": "单腿低箱深蹲",
-    "nameEn": null,
+    "nameEn": "Single-Leg Low Box Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13993,7 +13993,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f0",
     "name": "六角杠深蹲",
-    "nameEn": null,
+    "nameEn": "Hex Bar Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -14013,7 +14013,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f1",
     "name": "史密斯单腿箭步蹲",
-    "nameEn": null,
+    "nameEn": "Smith Single-Leg Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -14033,7 +14033,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f2",
     "name": "负重拉伸箭步蹲",
-    "nameEn": null,
+    "nameEn": "Weighted Stretching Lunge",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -14053,7 +14053,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f3",
     "name": "吊环腿弯举",
-    "nameEn": null,
+    "nameEn": "Ring Leg Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -14072,7 +14072,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f4",
     "name": "吊环分腿深蹲",
-    "nameEn": null,
+    "nameEn": "Ring Split Squat",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -14092,7 +14092,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f5",
     "name": "滑地屈膝后蹬",
-    "nameEn": null,
+    "nameEn": "Sliding Bent-Knee Hip Extension",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -14111,7 +14111,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f6",
     "name": "椅子登阶",
-    "nameEn": null,
+    "nameEn": "Chair Step-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -14131,7 +14131,7 @@
   {
     "id": "00000000-0000-0000-ca70-0000000002f7",
     "name": "史密斯机仰卧腿举",
-    "nameEn": null,
+    "nameEn": "Smith Machine Lying Leg Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
