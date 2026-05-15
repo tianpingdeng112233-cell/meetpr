@@ -85,7 +85,8 @@ public struct PRBreakthroughEvent: Codable, Hashable, Sendable, Identifiable {
 public enum E1RMCalculator {
   /// RTS RPE 强度表(% of 1RM),source of truth
   /// rtsTable[reps - 1][rpeIndex],其中 rpeIndex = Int((rpe - 6.0) / 0.5)
-  /// reps 范围 1-12;RPE 范围 6.0-10.0 步 0.5(9 列)
+  /// reps 范围 1-12(>12 saturate 到 12;<1 拒绝返 nil)
+  /// RPE 范围 6.0-10.0 步 0.5(9 列;>10 拒绝返 nil;<6 Epley fallback)
   private static let rtsTable: [[Double]] = [
     // RPE:    6.0   6.5   7.0   7.5   8.0   8.5   9.0   9.5   10.0
     /* 1 */  [0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.98, 1.00],
@@ -109,21 +110,30 @@ public enum E1RMCalculator {
   ) -> Double? {
     guard weightKg > 0, reps >= 1 else { return nil }
 
-    if let rpe = rpe, rpe >= 6.0, rpe <= 10.0 {
-      // RTS lookup,reps 越界 saturate 到 12,RPE 线性插值(0.5 间隔)
-      let safeReps = min(reps, 12)
-      let intensity = rtsIntensity(reps: safeReps, rpe: rpe)
-      guard intensity > 0.5 else { return nil }   // 安全下限
-      return weightKg / intensity
+    if let rpe = rpe {
+      // 显式分段处理 RPE 边界(per PR #116 second-pass blocker 决议 1):
+      // - rpe > 10.0:非法输入(RPE 物理上 ≤ 10)→ nil,不悄默 fallback Epley
+      // - rpe < 6.0:RTS 表 6 以下不可靠 → Epley fallback(下面)
+      // - 6.0 <= rpe <= 10.0:走 RTS lookup
+      if rpe > 10.0 { return nil }
+      if rpe >= 6.0 {
+        // RTS lookup,reps 越界 saturate 到 12,RPE 0.5 间隔之间线性插值
+        let safeReps = min(reps, 12)
+        let intensity = rtsIntensity(reps: safeReps, rpe: rpe)
+        guard intensity > 0.5 else { return nil }   // 安全下限
+        return weightKg / intensity
+      }
+      // rpe < 6.0 → 落到下面 Epley fallback
     }
 
-    // Epley fallback(RPE 缺失或 < 6 越界):e1RM = weight * (1 + reps / 30)
+    // Epley fallback:RPE 缺失 (rpe == nil) OR rpe ∈ [0, 6.0):e1RM = weight * (1 + reps / 30)
     guard reps <= 20 else { return nil }
     return weightKg * (1.0 + Double(reps) / 30.0)
   }
 
-  /// RTS table lookup + RPE bilinear interpolation
-  /// reps 取整数(实装期学员录 reps 是 Int);RPE 0.5 间隔之间用线性插值
+  /// RTS table lookup + RPE linear interpolation (1-D)
+  /// reps 是 Int(学员录 reps 永远整数,不需要 reps 方向插值);RPE 0.5 间隔之间走线性插值
+  /// (per PR #116 second-pass non-blocking — 原"bilinear"措辞误导,reps 无插值)
   private static func rtsIntensity(reps: Int, rpe: Double) -> Double {
     // 找到 rpe 在表内的两个相邻 column index
     let rpeFloat = (rpe - 6.0) / 0.5   // 6.0 → 0, 6.5 → 1, ..., 10.0 → 8
@@ -135,6 +145,17 @@ public enum E1RMCalculator {
   }
 }
 ```
+
+**RPE 边界规则锁定(per PR #116 second-pass blocker)**:
+
+| rpe 输入 | 处理 |
+|---|---|
+| `nil`(教练 / 学员没填)| Epley fallback |
+| `rpe < 0` OR `rpe ∈ [0, 6.0)` | Epley fallback(RTS 表 6 以下不可靠,但用户 RPE 4-5 是合理训练 input,降级而非拒绝)|
+| `rpe ∈ [6.0, 10.0]` | RTS lookup + 0.5 间隔线性插值 |
+| `rpe > 10.0`(e.g. 10.5 / 11)| **返 nil**(RPE 物理上 ≤ 10,>10 是非法输入,绝不悄默 fallback)|
+
+**理由**:`rpe > 10` 是 user 误输 / UI bug,如果悄默 Epley 会让学员看到莫名其妙的 e1RM 数字,**不如直接拒绝让上层 UI 报错**。`rpe < 6` 是合理 sub-maximal 训练(RTS 表覆盖 6+),fallback Epley 是 graceful degrade。
 
 **E1RMCalculator fixture 测试**(本 spec 单测最高优先级,**直接覆盖 RTS 表内每个 cell** — `12 × 9 = 108` 个 fixture point + Epley fallback ≥ 6 个 + 边界(reps=0 / reps=13 / rpe=5.5 / rpe=10.5 / weight=0)≥ 5 个):
 
@@ -158,9 +179,10 @@ public enum E1RMCalculator {
 **实装锁定**(防 Codex 篡改):
 - **不**回退到线性公式(reps 1-4 与 5+ 斜率不同)
 - **不**换 Brzycki / Lombardi / Wathan 公式(数字差 ±3-5%)
-- RPE 中间值(8.25 / 9.25 等)用线性插值
-- reps > 12 → saturate 到 reps=12;rep > 20 + 无 RPE → 返 nil(超出 hypertrophy 上界)
-- RPE < 6 → Epley fallback(RTS 表 6 下不可靠)
+- RPE 中间值(8.25 / 9.25 等)用 RPE 一维线性插值(reps 是 Int 不参与插值)
+- reps > 12 → saturate 到 reps=12;reps > 20 + 无 RPE → 返 nil(超出 hypertrophy 上界)
+- **RPE > 10 → 返 nil**(非法输入)— per second-pass blocker
+- RPE < 6 → Epley fallback(RTS 表 6 下不可靠 + sub-maximal 训练合理 input)
 - intensity ≤ 0.5(reps=12 RPE<6 等极端组合)→ 返 nil(避免 e1RM 估出 > 2x weight 离谱)
 
 #### 3. `StudentKit` 新增 `E1RMRepository`
@@ -273,7 +295,7 @@ List {
 
 | 文件 | 覆盖 |
 |---|---|
-| `Modules/StudentKit/Tests/StudentKitTests/Domain/E1RMCalculatorTests.swift`(新) | **RTS 表全 108 cell**(reps 1-12 × RPE 6.0/6.5/.../10.0 9 列;每个 cell 计算与表内 % 对齐,容差 ±0.5kg);Epley fallback ≥ 6 fixture(无 RPE / RPE < 6);RPE 中间值插值(RPE 7.25 / 8.25 / 9.25 等)≥ 3 fixture;边界(reps=0 → nil / reps=13 saturate to 12 / reps=21 + 无 RPE → nil / rpe=5.5 → Epley / rpe=10.5 → nil / weight=0 → nil);intensity < 0.5 返 nil |
+| `Modules/StudentKit/Tests/StudentKitTests/Domain/E1RMCalculatorTests.swift`(新) | **RTS 表全 108 cell**(reps 1-12 × RPE 6.0/6.5/.../10.0 9 列;每个 cell 计算与表内 % 对齐,容差 ±0.5kg);Epley fallback ≥ 6 fixture(`rpe == nil` ≥ 3 + `rpe ∈ [0, 6.0)` ≥ 3 — 这是 Epley 路径,**不** rpe=10.5);RPE 一维线性插值(RPE 7.25 / 8.25 / 9.25 等)≥ 3 fixture;边界:`reps=0 → nil` / `reps=13` saturate to 12 / `reps=21` + 无 RPE → nil / `rpe=5.5 → Epley` / **`rpe=10.5 → nil`(非法 RPE,不 fallback)** / **`rpe=11 → nil`** / `weight=0 → nil`;intensity < 0.5 返 nil |
 | `Modules/StudentKit/Tests/StudentKitTests/Repository/E1RMRepositoryTests.swift`(新) | record / fetch / maxBefore(空 / 单点 / 多点 / 时间过滤);PR 流(unacknowledged + acknowledge) |
 | `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkoutPRHookTests.swift`(新) | record set 后 hook 触发:已知历史 + 新点 → 是否检 PR / 是否不检(回退);0.5kg buffer 边界 |
 | `Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/GrowthCurveViewModelTests.swift`(新) | 时间轴切换数据过滤;空数据态 |
@@ -403,3 +425,4 @@ Documents/e1rm/
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。本地算 + in-app banner + 5 tab "我的" 入口 + 三大项主项曲线 | Claude |
 | 2026-05-15 | 0.2 | 接 PR #116 Codex review:**blocker** — 公式 / 注释 / RTS 表三者不一致(线性公式 reps≥5 失准 6%),改用 `rtsTable` 12×9 lookup + RPE 线性插值作 source of truth,fixture 覆盖全 108 cell;non-blocking — ADR-002 链接修正到 `002-intelligent-analysis-over-passive-display.md` + 说明 PRD supersede;持久化口径统一(本 spec V0.1 in-memory → spec 026 切 JSON file,backend e1RM endpoint 另开独立 spec,不在 026 内);§4 toggleComplete hook 边沿条件 `!previouslyCompleted && nowCompleted` 上移到主流程伪代码;e1RM 变量重命名 `estimatedOneRepMaxKg` 防遮蔽 | Claude |
+| 2026-05-15 | 0.3 | 接 PR #116 Codex **second-pass** review blocker:`rpe > 10.0` 处理代码 vs 测试要求矛盾(代码走 Epley fallback,测试要求 nil)。采纳决议 1 拍死边界:`rpe > 10` 非法返 nil(不悄默 Epley),`rpe < 6` Epley fallback;`calculate` 函数加显式 `if rpe > 10.0 { return nil }` 分支;测试 fixture 加 `rpe=10.5 → nil` / `rpe=11 → nil` 显式 case;`rpe=5.5 → Epley` 显式分组。Non-blocking — `bilinear interpolation` 文案改 "RPE 一维线性插值"(reps 是 Int 不参与插值)| Claude |
