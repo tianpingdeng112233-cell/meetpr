@@ -15900,25 +15900,6 @@
     "createdAt": "2026-05-15T00:00:00Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000348",
-    "name": "锤式弯举",
-    "nameEn": "Hammer Curl",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "biceps"
-    ],
-    "equipment": [
-      "dumbbell"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-15T00:00:00Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000349",
     "name": "单手牧师凳弯举",
     "nameEn": "Single-Arm Preacher Curl",
