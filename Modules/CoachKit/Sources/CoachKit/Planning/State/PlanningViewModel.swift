@@ -76,6 +76,28 @@ public final class PlanningViewModel {
     usageTracker.incrementUsage(for: exerciseID)
   }
 
+  /// Pick (or change) a main lift variant for a day+family. Re-persists the
+  /// draft so the DraftPlanExercise is materialized eagerly, which lets the
+  /// Step 3 row inline an ExerciseSetEditorCard right after the pick.
+  public func pickMainLiftVariant(_ exerciseID: UUID, for key: DayLiftKey) throws {
+    recordVariantPick(exerciseID)
+    selectedVariants[key] = exerciseID
+    try persistDraft(currentStep: .selectMainLifts)
+  }
+
+  /// Returns the materialized DraftPlanExercise corresponding to a Step 3
+  /// pick, or nil if the variant hasn't been picked yet for this day+family.
+  public func mainLiftDraftExercise(for key: DayLiftKey) -> DraftPlanExercise? {
+    guard let draftPlan else { return nil }
+    return draftPlan.draftDays
+      .first { $0.dayOfWeek == key.dayOfWeek }?
+      .draftExercises
+      .first { exercise in
+        exercise.isMainLift
+          && family(for: exercise.exerciseID) == key.liftFamily
+      }
+  }
+
   public var sortedTrainingDays: [Int] {
     selectedStudent?.profile.trainingDaysOfWeek.sorted() ?? []
   }
@@ -175,6 +197,8 @@ public final class PlanningViewModel {
       path.append(.assignFrequency)
     case .assignFrequency:
       path.append(.selectMainLifts)
+      try persistDraft(currentStep: .selectMainLifts)
+      return
     case .selectMainLifts:
       path.append(.selectAccessories)
       try persistDraft(currentStep: .selectAccessories)

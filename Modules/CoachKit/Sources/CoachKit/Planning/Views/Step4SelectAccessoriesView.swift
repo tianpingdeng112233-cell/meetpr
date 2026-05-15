@@ -20,7 +20,7 @@ public struct Step4SelectAccessoriesView: View {
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Eyebrow("STEP 4")
-          Text("添加辅助动作 · 填写强度")
+          Text("添加辅助动作")
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
@@ -36,20 +36,9 @@ public struct Step4SelectAccessoriesView: View {
         .padding(.horizontal, -MeetPRSpacing.base)
 
         if let selectedDayID = viewModel.currentDayID {
-          let mainLifts = viewModel.mainLiftExercises(for: selectedDayID)
           let accessories = viewModel.selectedAccessories(for: selectedDayID)
 
-          if !mainLifts.isEmpty {
-            VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-              Eyebrow("本日主项", color: Color.MeetPR.fgTertiary)
-              ForEach(mainLifts, id: \.id) { exercise in
-                ExerciseSetEditorCard(viewModel: viewModel, draftExercise: exercise)
-              }
-            }
-          }
-
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-            Eyebrow("辅助动作", color: Color.MeetPR.fgTertiary)
             Text("已选 \(accessories.count) 个")
               .font(Font.MeetPR.footnote)
               .foregroundStyle(Color.MeetPR.fgSecondary)
