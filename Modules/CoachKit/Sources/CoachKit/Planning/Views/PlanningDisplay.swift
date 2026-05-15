@@ -125,6 +125,8 @@ enum PlanningDisplay {
       "垂直拉"
     case .other:
       "其他"
+    case .warmUp:
+      "热身"
     }
   }
 

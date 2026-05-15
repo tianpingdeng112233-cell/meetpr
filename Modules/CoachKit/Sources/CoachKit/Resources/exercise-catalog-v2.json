@@ -7583,15 +7583,13 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "back",
-      "hamstring",
       "glute"
     ],
     "equipment": [
       "bodyweight"
     ],
     "movementPattern": [
-      "other"
+      "warm_up"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",

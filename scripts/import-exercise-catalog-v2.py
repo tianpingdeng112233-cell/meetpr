@@ -65,6 +65,7 @@ MOVEMENT_PATTERN_MAP = {
     "水平拉": ["horizontal_pull"],
     "垂直拉": ["vertical_pull"],
     "其他": ["other"],
+    "热身": ["warm_up"],
 }
 
 MUSCLE_GROUP_MAP = {
