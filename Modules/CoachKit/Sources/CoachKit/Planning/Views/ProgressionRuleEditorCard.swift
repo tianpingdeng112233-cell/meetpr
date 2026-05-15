@@ -90,21 +90,23 @@ public struct ProgressionRuleEditorCard: View {
       .onChange(of: rule.incrementValue) { _, _ in persistRule() }
       .onChange(of: rule.customSequence) { _, _ in persistRule() }
       .onChange(of: rule.exerciseIDs) { _, _ in
-        // Don't reseed values here — that overwrites the user's manual edits.
-        // normalizedRule pads/truncates customSequence when appliedWeeks
-        // changes, and the explicit "按 W1 重置" button covers re-snap.
-        // toggleRuleExercise already persisted the new exerciseIDs server-side
-        // before syncFromViewModel rewrote our local state, so no extra
-        // persistRule needed here. We only fix up customDimension when the
-        // new exercise's intensityMode invalidates the current choice (e.g.
-        // selected dim was .rpe but new exercise uses .weight intensity).
+        // Each custom rule applies to a single exercise (single-select). When
+        // the user redirects the rule to a different exercise, the W2/W3/W4
+        // values should retarget to the new exercise's W1 reference — keeping
+        // the old exercise's numbers would be stale. If the new exercise's
+        // intensityMode invalidates the current dimension, fall back to a
+        // valid dimension; the dimension onChange handler then reseeds.
+        // Otherwise reseed directly here.
         if rule.ruleType == .custom {
           let valid = validCustomDimensions
           if let current = rule.customDimension,
             !valid.contains(current),
             let fallback = valid.first
           {
-            rule.customDimension = fallback  // triggers dimension onChange → reseed + persist
+            rule.customDimension = fallback  // dimension onChange reseeds + persists
+          } else {
+            seedCustomSequenceFromW1()
+            persistRule()
           }
         }
       }
