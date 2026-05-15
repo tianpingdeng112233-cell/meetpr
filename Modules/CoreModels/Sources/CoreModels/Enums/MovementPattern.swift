@@ -8,4 +8,5 @@ public enum MovementPattern: String, Codable, Hashable, Sendable, CaseIterable {
   case horizontalPull = "horizontal_pull"
   case verticalPull = "vertical_pull"
   case other = "other"
+  case warmUp = "warm_up"
 }
