@@ -4414,44 +4414,6 @@
     "nameEn": "Rear Foot Elevated Split Squat"
   },
   {
-    "id": "00000000-0000-0000-ca70-0000000000fa",
-    "name": "分腿蹲(臀部重点)",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "dumbbell"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Split Squat (Glute)"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000000fb",
-    "name": "分腿蹲(股四头重点)",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "dumbbell"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Split Squat (Quad)"
-  },
-  {
     "id": "00000000-0000-0000-ca70-0000000000fc",
     "name": "高脚杯暂停深蹲",
     "exerciseType": "accessory",
@@ -4477,7 +4439,8 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "quad",
+      "glute"
     ],
     "equipment": [
       "dumbbell"
@@ -4488,25 +4451,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Step Ups"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000000fe",
-    "name": "登台(股四头)",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "dumbbell"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Step-Up (Quad Focus)"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000ff",
@@ -5384,25 +5328,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Reverse Hyper (Banded)"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000012f",
-    "name": "登台(臀部)",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute"
-    ],
-    "equipment": [
-      "dumbbell"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Step-Up (Glute Focus)"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000130",
