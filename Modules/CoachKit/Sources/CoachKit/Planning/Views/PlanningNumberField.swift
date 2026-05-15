@@ -73,12 +73,13 @@ struct PlanningNumberField: View {
       }
     }
     .onChange(of: value) { _, newValue in
-      textInput = Self.syncedTextInput(
-        currentTextInput: textInput,
-        newValue: newValue,
-        isFocused: isFocused,
-        formatStyle: formatStyle
-      )
+      // Sync the visible text whenever the bound value changes externally —
+      // even if the field is currently focused. External changes come from
+      // explicit user actions on other controls (chip toggle, dimension
+      // switch, ± buttons elsewhere), never from the user's own typing here
+      // (typing only commits via normalize() on blur). Without this, the
+      // stale typed value "follows" the focused field into a new context.
+      textInput = formattedDisplay(newValue)
     }
     .accessibilityElement(children: .combine)
     .accessibilityValue(accessibilityValue)
@@ -194,19 +195,6 @@ struct PlanningNumberField: View {
       increment: decimalIncrement
     ).planningDoubleValue
     return clamped(stepped, to: range)
-  }
-
-  static func syncedTextInput(
-    currentTextInput: String,
-    newValue: Double,
-    isFocused: Bool,
-    formatStyle: FloatingPointFormatStyle<Double>
-  ) -> String {
-    if isFocused {
-      currentTextInput
-    } else {
-      formattedDisplay(newValue, formatStyle: formatStyle)
-    }
   }
 
   static func formattedDisplay(
