@@ -81,7 +81,7 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func step4ScreenRendersChipFilterMatchAndSelectedSections() async throws {
+@Test func step4ScreenRendersSelectedSectionAndLibraryButton() async throws {
   let viewModel = try await configuredViewModelForStep4()
 
   let sut = Step4SelectAccessoriesView(viewModel: viewModel)
@@ -89,7 +89,22 @@ import ViewInspector
 
   #expect(try inspected.find(text: "添加辅助动作").string() == "添加辅助动作")
   #expect(try inspected.find(text: "周一").string() == "周一")
+  #expect(try inspected.find(text: "已选 0 个").string() == "已选 0 个")
+  #expect(try inspected.find(text: "+ 添加动作").string() == "+ 添加动作")
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func accessoryLibrarySheetRendersFilterAndMatchSections() async throws {
+  let viewModel = try await configuredViewModelForStep4()
+  guard let dayID = viewModel.currentDayID else {
+    Issue.record("expected currentDayID after step 4 setup")
+    return
+  }
+
+  let sut = AccessoryLibrarySheet(viewModel: viewModel, dayID: dayID)
+  let inspected = try sut.inspect()
+
   #expect(try inspected.find(text: "筛选").string() == "筛选")
   #expect(try inspected.find(text: "匹配 5 个").string() == "匹配 5 个")
-  #expect(try inspected.find(text: "已选 0 个").string() == "已选 0 个")
 }

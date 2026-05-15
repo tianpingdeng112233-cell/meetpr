@@ -5,6 +5,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct Step4SelectAccessoriesView: View {
   @Bindable private var viewModel: PlanningViewModel
+  @State private var showLibrary = false
 
   public init(viewModel: PlanningViewModel) {
     self.viewModel = viewModel
@@ -35,27 +36,6 @@ public struct Step4SelectAccessoriesView: View {
         .padding(.horizontal, -MeetPRSpacing.base)
 
         if let selectedDayID = viewModel.currentDayID {
-          AccessoryFilterSection(
-            filters: viewModel.accessoryFilters(for: selectedDayID),
-            onChange: { filters in
-              Task {
-                await viewModel.updateFilters(filters, for: selectedDayID)
-              }
-            }
-          )
-
-          AccessoryMatchListSection(
-            exercises: viewModel.availableAccessories(for: selectedDayID),
-            selectedExerciseIDs: Set(
-              viewModel.selectedAccessories(for: selectedDayID).map(\.exerciseID)
-            ),
-            isLoading: viewModel.isLoadingAccessories
-          ) { exercise in
-            Task {
-              try? await viewModel.addAccessory(exercise, to: selectedDayID)
-            }
-          }
-
           SelectedAccessoryListSection(
             accessories: viewModel.selectedAccessories(for: selectedDayID),
             exerciseProvider: viewModel.accessoryExercise(for:)
@@ -63,6 +43,13 @@ public struct Step4SelectAccessoriesView: View {
             Task {
               try? await viewModel.deleteAccessory(draftExerciseID, from: selectedDayID)
             }
+          }
+
+          PrimaryButton(
+            "+ 添加动作",
+            isFullWidth: true
+          ) {
+            showLibrary = true
           }
 
           PrimaryButton(
@@ -87,6 +74,13 @@ public struct Step4SelectAccessoriesView: View {
     .navigationTitle("辅助动作")
     .task {
       await selectInitialDayIfNeeded()
+    }
+    .sheet(isPresented: $showLibrary) {
+      if let dayID = viewModel.currentDayID {
+        AccessoryLibrarySheet(viewModel: viewModel, dayID: dayID)
+      } else {
+        Color.clear
+      }
     }
   }
 
