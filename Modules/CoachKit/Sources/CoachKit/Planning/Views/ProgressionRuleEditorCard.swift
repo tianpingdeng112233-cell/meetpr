@@ -55,10 +55,23 @@ public struct ProgressionRuleEditorCard: View {
           }
         }
       }
-      .onChange(of: rule.ruleType) { _, _ in persistRule() }
-      .onChange(of: rule.customDimension) { _, _ in persistRule() }
+      .onChange(of: rule.ruleType) { _, newType in
+        if newType == .custom {
+          seedCustomSequenceFromW1()
+        }
+        persistRule()
+      }
+      .onChange(of: rule.customDimension) { _, _ in
+        seedCustomSequenceFromW1()
+        persistRule()
+      }
       .onChange(of: rule.incrementValue) { _, _ in persistRule() }
       .onChange(of: rule.customSequence) { _, _ in persistRule() }
+      .onChange(of: rule.appliedWeeks) { _, _ in
+        if rule.ruleType == .custom {
+          seedCustomSequenceFromW1()
+        }
+      }
     }
   }
 
@@ -244,6 +257,17 @@ public struct ProgressionRuleEditorCard: View {
     case .sets, .reps:
       nil
     }
+  }
+
+  /// Reseed customSequence with W1 reference values for the current dimension
+  /// whenever the dimension switches (or applied weeks change). Without this,
+  /// switching from "weight" with sequence [103, 110] to "RPE" leaves the
+  /// 103/110 values shown next to RPE — nonsense.
+  private func seedCustomSequenceFromW1() {
+    let dimension = rule.customDimension ?? .weight
+    let snapshot = viewModel.w1Snapshot(for: dimension, exerciseIDs: rule.exerciseIDs)
+    let weeks = rule.appliedWeeks.sorted()
+    rule.customSequence = weeks.map { _ in snapshot }
   }
 
   private func persistRule() {
