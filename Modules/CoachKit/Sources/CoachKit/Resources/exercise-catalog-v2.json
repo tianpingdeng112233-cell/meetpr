@@ -2347,7 +2347,7 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder"
+      "chest"
     ],
     "equipment": [
       "cable"
@@ -2404,7 +2404,7 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder"
+      "chest"
     ],
     "equipment": [
       "cable"
@@ -2442,7 +2442,7 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder"
+      "chest"
     ],
     "equipment": [
       "dumbbell"
@@ -2537,7 +2537,7 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder"
+      "chest"
     ],
     "equipment": [
       "machine"
@@ -2556,7 +2556,7 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "shoulder"
+      "chest"
     ],
     "equipment": [
       "machine"
