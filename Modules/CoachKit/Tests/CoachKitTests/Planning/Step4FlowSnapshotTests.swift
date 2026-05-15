@@ -52,33 +52,9 @@ import ViewInspector
   #expect(addedExerciseID == exercise.id)
 }
 
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func selectedAccessoryListSectionDeleteButtonTriggersCallback() throws {
-  let accessory = DraftPlanExercise(
-    id: PlanningFixtures.uuid(55),
-    exerciseID: PlanningFixtures.accessoryID,
-    isMainLift: false,
-    sortOrder: 1
-  )
-  var deletedExerciseID: UUID?
-  let sut = SelectedAccessoryListSection(
-    accessories: [accessory],
-    exerciseProvider: { _ in PlanningFixtures.accessoryCatalog()[0] },
-    onDelete: { draftExerciseID in
-      deletedExerciseID = draftExerciseID
-    },
-    onNotesChange: { _, _ in }
-  )
-  let inspected = try sut.inspect()
-  let button = try inspected.find(ViewType.Button.self) { button in
-    (try? button.labelView().find(text: "删除")) != nil
-  }
-
-  try button.tap()
-
-  #expect(deletedExerciseID == accessory.id)
-}
+// SelectedAccessoryListSection was deleted as part of the Step 5 removal —
+// ExerciseSetEditorCard now hosts both the row content and the delete button
+// via its optional onDelete affordance.
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
@@ -88,7 +64,7 @@ import ViewInspector
   let sut = Step4SelectAccessoriesView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "添加辅助动作").string() == "添加辅助动作")
+  #expect(try inspected.find(text: "添加辅助动作 · 填写强度").string() == "添加辅助动作 · 填写强度")
   #expect(try inspected.find(text: "周一").string() == "周一")
   #expect(try inspected.find(text: "已选 0 个").string() == "已选 0 个")
   #expect(try inspected.find(text: "+ 添加动作").string() == "+ 添加动作")

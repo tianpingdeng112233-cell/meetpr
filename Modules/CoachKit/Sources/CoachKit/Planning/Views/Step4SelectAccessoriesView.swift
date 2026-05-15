@@ -20,7 +20,7 @@ public struct Step4SelectAccessoriesView: View {
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Eyebrow("STEP 4")
-          Text("添加辅助动作")
+          Text("添加辅助动作 · 填写强度")
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
@@ -36,34 +36,49 @@ public struct Step4SelectAccessoriesView: View {
         .padding(.horizontal, -MeetPRSpacing.base)
 
         if let selectedDayID = viewModel.currentDayID {
-          SelectedAccessoryListSection(
-            accessories: viewModel.selectedAccessories(for: selectedDayID),
-            exerciseProvider: viewModel.accessoryExercise(for:),
-            onDelete: { draftExerciseID in
-              Task {
-                try? await viewModel.deleteAccessory(draftExerciseID, from: selectedDayID)
-              }
-            },
-            onNotesChange: { draftExerciseID, notes in
-              Task {
-                try? await viewModel.updateExerciseNotes(notes, for: draftExerciseID)
+          let mainLifts = viewModel.mainLiftExercises(for: selectedDayID)
+          let accessories = viewModel.selectedAccessories(for: selectedDayID)
+
+          if !mainLifts.isEmpty {
+            VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+              Eyebrow("本日主项", color: Color.MeetPR.fgTertiary)
+              ForEach(mainLifts, id: \.id) { exercise in
+                ExerciseSetEditorCard(viewModel: viewModel, draftExercise: exercise)
               }
             }
-          )
+          }
 
-          PrimaryButton(
-            "+ 添加动作",
-            isFullWidth: true
-          ) {
-            showLibrary = true
+          VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+            Eyebrow("辅助动作", color: Color.MeetPR.fgTertiary)
+            Text("已选 \(accessories.count) 个")
+              .font(Font.MeetPR.footnote)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+
+            ForEach(accessories, id: \.id) { exercise in
+              ExerciseSetEditorCard(
+                viewModel: viewModel,
+                draftExercise: exercise
+              ) {
+                Task {
+                  try? await viewModel.deleteAccessory(exercise.id, from: selectedDayID)
+                }
+              }
+            }
+
+            PrimaryButton(
+              "+ 添加动作",
+              isFullWidth: true
+            ) {
+              showLibrary = true
+            }
           }
 
           PrimaryButton(
-            "完成辅助动作 — 填写 W1 强度",
+            "完成 — 进入规则配置",
             isFullWidth: true
           ) {
             Task {
-              try? await viewModel.proceedToStep5()
+              try? await viewModel.proceedToStep6()
             }
           }
         } else {
