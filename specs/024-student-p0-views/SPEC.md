@@ -14,44 +14,44 @@
 
 ## 目标
 
-把 StudentKit 从单文件 `Text("Hello Student 🏋️")` 占位,装到 **"学员侧 4 tab(今天 / 本周 / 历史 / 反馈)完整闭环 UI,使用 seeded 历史 data 自洽验证"**,全程 in-memory mock 不接真 backend。
-
-**Scope clarification(2026-05-15 接 PR #112 Codex review #1 blocker 收窄)**:
-- 本 spec **不承担** "教练 build A publish → 学员 build B 拉到同一份 plan" 的跨身份闭环 — 物理上 in-memory + 切 scheme = 新进程,数据会丢,无法用 manual checklist 验过
-- 跨身份闭环正式 defer 到 **spec 026(backend 真接入)**:两台真手机 + 真 backend 才能验"教练 publish → 学员 fetch"
-- 本 spec 同一 simulator 内 DEMO_MODE 切 scheme 自测时,**学员侧看到的是 `StudentDemoSeed` 预置的 4 周 plan + 历史 logs + feedback**,不依赖刚 publish 的数据;教练侧仍可走 spec 020 既有 happy path 排 plan(不要求被学员侧立刻看到)
+把 StudentKit 从单文件 `Text("Hello Student 🏋️")` 占位,装到 **"教练装 build A 排计划 → 学员装 build B 拉到当周 plan → 学员录每组 reps/RPE 打勾 → 教练看执行结果 → 教练写文字反馈 → 学员看到反馈红点"** 的完整闭环 UI,全程 in-memory mock 不接真 backend,可在 1 台 simulator 内通过 DEMO_MODE 切换"我是教练"/"我是学员" 两份 user seed 自测,也可在 2 台 simulator 用预 seed 数据互相验证。
 
 **为什么这个 scope**:
 - 用户 2026-05-15 dogfood scope 决策:候选 1(学员端) + 候选 2 内的"login + Keychain" 子集 + 候选 3(backend)三路并行,但本 spec 严格只做候选 1。
 - 候选 2 / 候选 3 各起独立 spec,本 spec 写完后 UI + Repository protocol 已 ready,候选 3 直接换 `BackendStudentPlanRepository` 实装替 `InMemoryStudentPlanRepository`,UI 0 改。
-- "教练-学员闭环"= plan publish + plan fetch + log record + feedback view 四件事;V0.1 闭环的真验证在 spec 026 落地后用真 backend + 两台手机做;本 spec 仅保证学员侧 UI / 数据流 / state machine 自洽。
+- "教练-学员闭环"= plan publish + plan fetch + log record + feedback view 四件事,缺一不可;视频 / e1RM / 历史跨 cycle / 资料 4 级权限属于扩展能力,本 spec 全部 defer。
 
-落地后单 simulator 自测 happy path(收窄 scope 后):
+落地后两人小圈测试 happy path:
 
 ```
-[MeetPR-DemoStudent scheme: 学员 seed (DemoUserSeed.coachedStudent,本 spec 新增)]
-打开 → StudentRootView (TabView, 4 tabs)
-  ↓ 启动注入 InMemoryPlanStore 已含 StudentDemoSeed.makePlanView(weekIndex: 1) 预置 projection
-  ↓ Tab 1 "今天" — 看到今日训练动作 + prescribed sets(来自 seed projection)
+[Build A: 教练 seed (DemoUserSeed.coach)]
+打开 MeetPR-Demo → CoachRootView
+  ↓ 排新计划(已有 spec 005-007 实装)
+publishPlan(plan, days, exercises) → InMemoryPlanRepository(教练侧)持久化
+  ↓ (本 spec 加)InMemoryStudentPlanRepository 共享同一 in-memory store 拿到该 plan
+
+[Build B: 学员 seed (DemoUserSeed.student,本 spec 新增)]
+打开 MeetPR-Demo → StudentRootView (TabView, 4 tabs)
+  ↓ Tab 1 "今天" — 看到今日训练动作 + prescribed sets
   ↓ 进每个动作详情 → 每组 [重量 prescribed 不可改 / reps / RPE / ✓]
-  ↓ 录入 + 打勾 → InMemoryStudentTrainingLogRepository.recordSet(...)(内存)
+  ↓ 录入 + 打勾 → InMemoryStudentTrainingLogRepository.recordSet(...)
   ↓ Tab 2 "本周" — 看本周 7 天 plan overview
-  ↓ Tab 3 "历史" — 单 cycle 内按周翻 + 单日详情(含 seed historical logs)
-  ↓ Tab 4 "反馈" — 看 seed 的 3 条 feedback + 未读红点 + markRead 后角标 -1
+  ↓ Tab 3 "历史" — 单 cycle 内按周翻 + 单日详情
+  ↓ Tab 4 "反馈" — 看教练文字反馈 + 未读红点
 
-[可选:同一 simulator 切 MeetPR-Demo scheme(教练)]
-教练 home → 排 plan → publish → InMemoryPlanRepository.publishPlan(...)
-  ↓ 跑教练侧 mapper 一次性产出 StudentPlanView projection → 写入 InMemoryPlanStore
-  ↓ (此处切回学员 scheme = 新进程,store 内存就丢;教练 publish 不会被学员侧看到)
-  ↓ 教练 publish 本身的 demo 价值由 spec 020 既有路径承担,**本 spec 不依赖**
+[切回 Build A: 教练]
+学员详情页 (本 spec 暂不做学员 roster 入口的执行回看; 教练端看学员执行 V0.1.x 单独 spec)
+教练写反馈 (本 spec 暂用 in-memory seed 模拟)
+  ↓ InMemoryStudentFeedbackRepository.postFeedback(...)
+  ↓ Tab 4 学员侧红点亮,展开看到内容
 ```
 
-> **2026-05-15 scope 声明**:本 spec 范围 = 学员侧 4 tab 完整闭环 UI(自洽验证)。同期 V0.1 必做范围内并行 spec:
+> **2026-05-15 scope 声明**:本 spec 范围 = 学员侧 4 tab 完整闭环 UI。同期 V0.1 必做范围内并行 spec:
 > - 教练端看学员执行 + 反馈 editor → spec 029(本 spec 学员反馈来源仍用 seed mock,029 落地后接 029 提供的真 postFeedback API)
 > - 视频上传 → spec 027(本 spec `SetRecordRow` 不画视频附件 UI,留 affordance 给 027 加)
 > - e1RM 折线 → spec 028(本 spec `StudentSetLog` schema 已含 weightKg/reps,028 直接读)
-> - 真实 login + Keychain → spec 025(本 spec 用 `DemoUserSeed.coachedStudent`,025 落地后 user 注入路径不变)
-> - **跨身份"教练 publish → 学员 fetch"真闭环** → spec 026(backend 真接入 + 两台真机互通)
+> - 真实 login + Keychain → spec 025(本 spec 用 DemoUserSeed.student,025 落地后 user 注入路径不变)
+> - backend 真接入 → spec 026(本 spec In-Memory* repo 是 protocol 实装,026 落地后切 Backend* impl,UI 0 改)
 >
 > 跨 cycle 历史 / 按月 history / 资料 4 级权限 / 真 APNs push → V0.1.x
 
@@ -61,20 +61,16 @@
 
 #### 1. StudentKit 真实装 + feature folder 骨架
 
-替 `Modules/StudentKit/Sources/StudentKit/StudentRootView.swift` 占位实现,按 ADR-005 §3 MVVM + Repository 三层 pattern 起 4 个 feature folder。
-
-**架构 update(2026-05-15 接 PR #117 Codex review #1 blocker D3 决议)**:3 个学员侧 Repository protocol(`StudentPlanRepository` / `StudentTrainingLogRepository` / `StudentFeedbackRepository`)**移到新建 SPM target `Modules/RepositoryContracts/`** — 详见 spec 029。本 spec 在 StudentKit 内仅放 In-Memory* 实装(impl),protocol 引用 `RepositoryContracts`。CoreModels 保持纯数据型,不放 protocol。
+替 `Modules/StudentKit/Sources/StudentKit/StudentRootView.swift` 占位实现,按 ADR-005 §3 MVVM + Repository 三层 pattern 起 4 个 feature folder:
 
 ```
-Modules/RepositoryContracts/Sources/RepositoryContracts/        # spec 029 新建,3 个 protocol 在此
-├── StudentPlanRepository.swift                                  # protocol (fetch 本周 plan / fetch 日训练)
-├── StudentTrainingLogRepository.swift                           # protocol (record set / fetch 已录入历史)
-└── StudentFeedbackRepository.swift                              # protocol (fetch 反馈列表 / mark as read)
-
 Modules/StudentKit/Sources/StudentKit/
 ├── StudentRootView.swift                              # TabView 4 tab + Session 注入 currentUser
 ├── Repository/
-│   ├── InMemoryStudentPlanRepository.swift           # actor, 读 InMemoryPlanStore 的 projection
+│   ├── StudentPlanRepository.swift                   # protocol (fetch 本周 plan / fetch 日训练)
+│   ├── StudentTrainingLogRepository.swift            # protocol (record set / fetch 已录入历史)
+│   ├── StudentFeedbackRepository.swift               # protocol (fetch 反馈列表 / mark as read)
+│   ├── InMemoryStudentPlanRepository.swift           # actor, 共享教练侧 publish 的 plan 数据
 │   ├── InMemoryStudentTrainingLogRepository.swift    # actor, 录入存内存
 │   ├── InMemoryStudentFeedbackRepository.swift       # actor, seed 3-5 条 fake 反馈
 │   └── StudentDataDTO.swift                          # 跨 repo 复用的 DTO(StudentPlanView / StudentSetLog / CoachFeedback)
@@ -98,14 +94,13 @@ Modules/StudentKit/Sources/StudentKit/
 │       ├── FeedbackInboxViewModel.swift
 │       └── FeedbackDetailView.swift                  # 单条反馈展开
 └── Demo/
-    └── StudentDemoSeed.swift                         # 4 周 plan projection + 3 条 feedback + 历史 logs seed
+    └── StudentDemoSeed.swift                         # 4 周 plan + 3 条 feedback seed (DEMO_MODE 用)
 ```
 
-**关键不变量** (per ADR-005 §1,spec 029 amend 后):
+**关键不变量** (per ADR-005 §1):
 - `Modules/StudentKit/Package.swift` **不** 加 `CoachKit` 依赖 — 互不 import
-- `Modules/StudentKit/Package.swift` 依赖加 `RepositoryContracts`
 - Repository 内部用 `actor`,UI ViewModel `@Observable @MainActor`
-- 所有 cross-module 类型走 CoreModels(`TrainingPlan` / `PlanDay` / `PlanExercise` / `PlanSet` / `Exercise` / `User` / `StudentProfile`),Repository protocol 走 RepositoryContracts
+- 所有 cross-module 类型走 CoreModels(`TrainingPlan` / `PlanDay` / `PlanExercise` / `PlanSet` / `Exercise` / `User` / `StudentProfile`)
 
 #### 2. CoreModels 新增"学员视角"型 read-only 数据
 
@@ -124,9 +119,7 @@ Modules/StudentKit/Sources/StudentKit/
 
 #### 3. Repository protocol + in-memory 实装
 
-**Protocol 位置(2026-05-15 D3 决议)**:3 个 protocol 在 `Modules/RepositoryContracts/Sources/RepositoryContracts/` 内定义(spec 029 新建 SPM target)。本 spec impl 阶段 Codex 先开 RepositoryContracts target,再装 InMemory* impl。spec 029 内的 mechanical refactor 在 029 impl 时进行;本 spec impl 期 protocol 直接在新位置起。
-
-##### 3.1 `StudentPlanRepository`(`RepositoryContracts/StudentPlanRepository.swift`)
+##### 3.1 `StudentPlanRepository`
 
 ```swift
 import CoreModels
@@ -142,13 +135,12 @@ public protocol StudentPlanRepository: Sendable {
 }
 ```
 
-`InMemoryStudentPlanRepository`(`StudentKit/Repository/InMemoryStudentPlanRepository.swift`):
-- **D2 决议(2026-05-15 接 PR #112 review #2 blocker)**:store 持 **publish-ready `StudentPlanView` projection**,**不持** raw `(TrainingPlan, [PlanDay], [PlanExercise], [PlanSet])` 四件套。教练侧 `InMemoryPlanRepository.publishPlan(...)` 内部跑 mapper 把草稿转 projection,**写入** store;学员侧 `InMemoryStudentPlanRepository.fetchCurrentPlan(...)` 直接读 projection,**不做** mapping。
-- 这一改动解决 PR #112 review #2 blocker:此前 `publishPlan(plan, days, exercises)` 签名缺 `[PlanSet]`,学员侧拿不到 set 级 `weight/reps/repsMax/rpe`。新签名见 §技术要求 / Repository 共享 store 设计
+`InMemoryStudentPlanRepository`:
+- 与 `CoachKit.InMemoryPlanRepository` **共享同一 actor-backed store** —— 教练 publish 写,学员 fetch 读。本 spec 在 AppShell 内注入时把同一实例传给两侧。
+- 因为 mapper 跨 module 不能直接 import CoachKit,store 抽象到 CoreModels 或 AppShell 持有的中间层:**实装策略选 (a)** — 在 AppShell 新建 `InMemoryPlanStore` actor 持有 raw plan 数据,CoachKit 的 `InMemoryPlanRepository` 和 StudentKit 的 `InMemoryStudentPlanRepository` 都注入这个 store;mapper(教练草稿 → 学员视图)放在 StudentKit 内,因为 mapper 只需读 CoreModels 类型。
 - AppShell 的 store 文件:`Modules/AppShell/Sources/AppShell/Demo/InMemoryPlanStore.swift`(新)
-- mapper 位置:**`Modules/CoachKit/Sources/CoachKit/Planning/PublishProjection/PlanToStudentProjection.swift`(新,放教练侧)** — mapper 在教练 publish 路径上跑,不需要 StudentKit import CoachKit;StudentKit 仅读 projection
 
-##### 3.2 `StudentTrainingLogRepository`(`RepositoryContracts/StudentTrainingLogRepository.swift`)
+##### 3.2 `StudentTrainingLogRepository`
 
 ```swift
 public protocol StudentTrainingLogRepository: Sendable {
@@ -163,7 +155,7 @@ public protocol StudentTrainingLogRepository: Sendable {
 - recordSet 幂等:同 `(studentId, planExerciseId, setIndex)` 重复录入直接 overwrite 不抛
 - DEMO_MODE seed:启动时给当前学员塞 1-2 个已完成日的历史 log,验"历史 tab 不空"
 
-##### 3.3 `StudentFeedbackRepository`(`RepositoryContracts/StudentFeedbackRepository.swift`)
+##### 3.3 `StudentFeedbackRepository`
 
 ```swift
 public protocol StudentFeedbackRepository: Sendable {
@@ -268,20 +260,18 @@ public struct StudentRootView: View {
 
 ```swift
 public enum StudentDemoSeed {
-  public static let coachedStudent: User  // role=.coachedStudent, displayName="演示学员", fixed UUID
-  public static let coachId: UUID         // 指向 DemoUserSeed.coach.id
+  public static let student: User  // role=.student, displayName="演示学员", fixed UUID
+  public static let coachId: UUID  // 指向 DemoUserSeed.coach.id
   public static func makePlanView(weekIndex: Int = 1) -> StudentPlanView
   public static func makeHistoricalLogs(studentId: UUID, weekIndex: Int) -> [StudentSetLog]
   public static func makeFeedback(coachId: UUID, studentId: UUID) -> [CoachFeedback]
 }
 ```
 
-> 实际字段名是 `.coachedStudent` / `.selfTrainStudent`(per CoreModels `UserRole` enum,非 `.student`)— 本 spec 全文沿用 `.coachedStudent` 指内测学员身份。
-
-`Modules/AppShell/Sources/AppShell/Auth/Demo/DemoUserSeed.swift` 扩展:加 `public static let coachedStudent: User` 常量(与 coach 并列)。
+`Modules/AppShell/Sources/AppShell/Auth/Demo/DemoUserSeed.swift` 扩展:加 `public static let student: User` 常量(与 coach 并列)。
 
 `Modules/AppShell/Sources/AppShell/Auth/Demo/DemoTokenStore.swift` 扩展:
-- DEMO_MODE 内增加 build-time toggle 选 `coach` / `coachedStudent` user seed,实装方式 = 一个 Swift compile flag `DEMO_USER_STUDENT`(默认未定义 → coach;定义 → coachedStudent)
+- DEMO_MODE 内增加 build-time toggle 选 `coach` / `student` user seed,实装方式 = 一个 Swift compile flag `DEMO_USER_STUDENT`(默认未定义 → coach;定义 → student)
 - 在 xcodeproj 内加第二个 scheme `MeetPR-DemoStudent`(基于 MeetPR-Demo)显式设 `DEMO_USER_STUDENT`,跑 build B 时用这个 scheme
 
 #### 7. MeetPRApp.init 注入 3 个学员 Repository
@@ -362,10 +352,9 @@ UI snapshot 测试 V0.1 不强制(per CoachKit 现状),Codex 实装时可视情�
 | 模块 | 新增内容 | 允许 import |
 |---|---|---|
 | `CoreModels` | `StudentPlanView` / `StudentPlanDay` / `StudentPlanExercise` / `PrescribedSet` / `StudentSetLog` / `CoachFeedback` | Foundation 仅 |
-| **`RepositoryContracts`(spec 029 新 SPM target)** | 3 个 Repository protocol(`StudentPlanRepository` / `StudentTrainingLogRepository` / `StudentFeedbackRepository`) | `CoreModels` / Foundation 仅;**禁止** `SwiftUI` / IO / Combine |
-| `StudentKit` | 4 feature folder + `InMemory*Repository` impl + Demo seed | `CoreModels` / `RepositoryContracts` / `Networking` / `DesignSystem` / `SwiftUI` |
-| `AppShell` | `InMemoryPlanStore` actor + `DemoUserSeed.coachedStudent` + `RootView` 注入 | 既有 + `RepositoryContracts` |
-| `CoachKit` | `InMemoryPlanRepository` 改:接收 `InMemoryPlanStore` 注入(构造器加参数);**新增 publish-side mapper** `Planning/PublishProjection/PlanToStudentProjection.swift`;**不引入 StudentKit 依赖** | 既有 + `RepositoryContracts`(若教练侧也跑反向 publish flow,本 spec impl 阶段 RepositoryContracts 仅 StudentKit / AppShell 引,CoachKit 可不引)|
+| `StudentKit` | 全部本 spec 内容 | `CoreModels` / `Networking` / `DesignSystem` / `SwiftUI` |
+| `AppShell` | `InMemoryPlanStore` actor + `DemoUserSeed.student` + `RootView` 注入 | 既有 |
+| `CoachKit` | InMemoryPlanRepository 改成接收 `InMemoryPlanStore` 注入(构造器加参数);**不引入 StudentKit 依赖** | 既有 |
 
 **关键不变量自检**(impl PR review 时跑):
 ```bash
@@ -373,63 +362,32 @@ grep -rE "^import (CoachKit|StudentKit)" Modules/StudentKit/  # 应为空
 grep -rE "^import StudentKit" Modules/CoachKit/               # 应为空
 ```
 
-### Repository 共享 store 设计(critical · 2026-05-15 D2 重新设计)
+### Repository 共享 store 设计(critical)
 
-**Design** (PR #112 Codex review #2 blocker D2 决议 b):store 持 **publish-ready `StudentPlanView` projection**;教练侧 `InMemoryPlanRepository.publishPlan(...)` 内部跑 mapper 把"教练草稿(plan / days / exercises / sets)"转成 projection 写入 store;学员侧 `InMemoryStudentPlanRepository.fetchCurrentPlan(...)` 直接读 projection。**学员侧 0 mapping**。
+教练 publish 与学员 fetch 必须读同一份内存数据,否则两人测试时学员根本看不到教练发的 plan。三选一:
 
-**为什么是 (b) 不是 (a)** — 选 (a) 把 raw 四件套塞 store + 学员侧 mapper 会拉学员 module 反推 set 级 prescribed,但教练侧的 `[PlanSet]` 真实数据由 `DraftMapping.toDomainSets(_:)` 单独展开,不在现 `PlanRepository.publishPlan(plan, days, exercises)` 签名内,学员侧反推不出 weight/reps/repsMax/rpe。projection 在教练侧 publish 时一次性产出最简单。
+| 策略 | 实现 | 推荐 |
+|---|---|---|
+| **A. AppShell 持有 `InMemoryPlanStore` actor**,双侧 repo 都注入它 | store 暴露 `addPlan / fetchPlans / fetchPlanForStudent` 等 API,CoachKit / StudentKit 各自 wrap | ✅ 推荐 |
+| B. CoreModels 加 store | CoreModels 应保持纯数据,不引入 actor state | ❌ |
+| C. 各 Kit 单例 + NotificationCenter 同步 | 单例不可注入测试;NC 同步弱保证 | ❌ |
 
-**实装结构**:
+**实装 A**:
+- `Modules/AppShell/Sources/AppShell/Demo/InMemoryPlanStore.swift` 新建
+- `actor InMemoryPlanStore` 持有:
+  - `private var publishedPlans: [UUID: (TrainingPlan, [PlanDay], [PlanExercise])]`(key = `studentId`)
+- API:
+  - `addPlan(forStudent:plan:days:exercises:)`(教练 publishPlan 内部调)
+  - `getPublishedPlan(forStudent:)`(学员 fetchCurrentPlan 内部调)
+- 既有 `InMemoryPlanRepository` 改构造器:`init(students:catalog:store: InMemoryPlanStore)`,publishPlan 写 store 而非自身 var
+- `InMemoryStudentPlanRepository.init(store: InMemoryPlanStore, studentId: UUID)`,fetch 走 store
+- **测试**:store 单测覆盖并发 add/get;CoachKit / StudentKit 测试各自 inject mock store
 
-```
-Modules/AppShell/Sources/AppShell/Demo/InMemoryPlanStore.swift            # 新
-  actor InMemoryPlanStore {
-    private var publishedProjections: [UUID: StudentPlanView]              // key = studentId
-    public func savePublishedProjection(_ projection: StudentPlanView, forStudent studentId: UUID) async
-    public func getPublishedProjection(forStudent studentId: UUID) async -> StudentPlanView?
-  }
+### DTO mapping(教练草稿 → 学员视图)
 
-Modules/CoachKit/Sources/CoachKit/Planning/PublishProjection/             # 新文件夹
-├── PlanToStudentProjection.swift                                          # 教练侧 mapper(本 spec 必装)
-│   - input: TrainingPlan + [PlanDay] + [PlanExercise] + [PlanSet] + 当前 weekIndex
-│   - output: StudentPlanView
-└── PlanToStudentProjectionTests.swift                                     # 5+ fixture(在 CoachKit 测试 target,因 mapper 在此)
+Mapper 位置:`Modules/StudentKit/Sources/StudentKit/Repository/PlanProjection.swift`(新)
 
-Modules/CoachKit/Sources/CoachKit/Planning/Repository/InMemoryPlanRepository.swift
-  // 改:加 store 依赖,publishPlan 内跑 mapper 写 projection
-  public actor InMemoryPlanRepository: PlanRepository {
-    private let store: InMemoryPlanStore   // ← 新依赖
-    public init(students:catalog:store:)
-    public func publishPlan(plan: TrainingPlan, days: [PlanDay], exercises: [PlanExercise], sets: [PlanSet]) async throws {
-      let projection = PlanToStudentProjection.project(plan: plan, days: days, exercises: exercises, sets: sets, weekIndex: ...)
-      await store.savePublishedProjection(projection, forStudent: plan.traineeId)
-    }
-  }
-
-Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentPlanRepository.swift
-  public actor InMemoryStudentPlanRepository: StudentPlanRepository {
-    private let store: InMemoryPlanStore   // ← 共享 store
-    private let studentId: UUID            // 当前学员 id
-    public init(store: InMemoryPlanStore, studentId: UUID)
-    public func fetchCurrentPlan(studentId: UUID) async throws -> StudentPlanView? {
-      return await store.getPublishedProjection(forStudent: studentId)
-    }
-    // fetchDay / fetchCycleDays 走 projection slice,纯切片不 map
-  }
-```
-
-**`PlanRepository.publishPlan` 签名扩展**:**加 `sets: [PlanSet]` 参数**(原签名缺,Codex review #2 blocker 直接修复)。改既有 `Modules/CoachKit/Sources/CoachKit/Planning/Repository/PlanRepository.swift` protocol;`PlanningCoordinatorView` 调用点同步改(传 `DraftMapping.toDomainSets(planExercise)` 展开后的 sets)。
-
-**测试**:
-- `InMemoryPlanStore` 单测:并发 save/get;按 studentId 隔离
-- `PlanToStudentProjection` 单测:**≥6 fixture**(per Codex review #112 non-blocking 建议)— 简单单周 / 多周 WeeklyVariation progression / repsMax 范围 / RPE 空 / 主项+辅助混合 / **setCount > 1 多组展开** / **`.rpe` intensity_mode 与 `.rpe` 直接值的区别**
-- `InMemoryStudentPlanRepository` 单测:store 注入 mock projection → fetch 返回相同
-
-### DTO mapping(教练草稿 → 学员视图)— mapper 在教练侧
-
-Mapper 位置:**`Modules/CoachKit/Sources/CoachKit/Planning/PublishProjection/PlanToStudentProjection.swift`**(新,**不在 StudentKit**)— 教练侧的 publish-time 静态函数,纯逻辑无 IO。
-
-输入:`(TrainingPlan, [PlanDay], [PlanExercise], [PlanSet], weekIndex: Int)`
+输入:`(TrainingPlan, [PlanDay], [PlanExercise])`(教练草稿)
 输出:`StudentPlanView`
 
 关键规则:
@@ -437,10 +395,9 @@ Mapper 位置:**`Modules/CoachKit/Sources/CoachKit/Planning/PublishProjection/Pl
 - prescribed weight 计算:若 plan 含 `WeeklyVariation` rule → 按当前 weekIndex 算;若无 → 取教练手填值
 - prescribed reps:同上;`repsMax` 范围保留
 - prescribed RPE:可空,UI 层默认 8.0
-- weekIndex 推断:由调用方传入(`PlanningCoordinatorView` 在 publish 时显式传当前 Week);**不在 mapper 内 implicit 推**(V0.1.x 改 plan.weekStart 显式字段)
-- intensity_mode:`.rpe` 直接落 PrescribedSet.rpe 字段;`.percentageOfOneRM` / `.absoluteWeight` 落 PrescribedSet.weightKg(per 教练 plan)
+- weekIndex 推断:`Calendar.current.dateComponents([.weekOfMonth], from: cycle.startDate, to: Date()).weekOfMonth`(粗糙,V0.1.x 替换为 plan.weekStart 显式字段)
 
-> **mapper 是 V0.1 单元测试覆盖最高优先级**。fixture ≥ 6 个(见上),CI 跑通才算实装合格。
+> 这一步的复杂性提示 Codex:**mapper 是 V0.1 单元测试覆盖最高优先级**。准备至少 5 个 fixture:简单单周 / 多周 progression / repsMax / RPE 空 / 主项+辅助混合。
 
 ### state machine(`TodayWorkoutViewModel`)
 
@@ -488,11 +445,10 @@ public final class TodayWorkoutViewModel {
 - [ ] `StudentRootView` 不再是 `Text("Hello Student 🏋️")`,展开 4 tab
 - [ ] CoreModels 6 个新增类型(StudentPlanView / Day / Exercise / PrescribedSet / StudentSetLog / CoachFeedback)全 `Codable + Hashable + Sendable + Identifiable`,单测过
 - [ ] 3 个 Repository protocol 定义 + 3 个 In-Memory actor 实装,单测覆盖各方法
-- [ ] `InMemoryPlanStore` 在 AppShell 内,持 `StudentPlanView` projection;CoachKit `InMemoryPlanRepository.publishPlan` 跑 `PlanToStudentProjection.project` 写入 store;StudentKit `InMemoryStudentPlanRepository.fetchCurrentPlan` 直接读 projection,**同进程内** 教练 publish → 学员 fetch 验证 ok(集成测试)。注意:**跨身份** (切 scheme = 新进程) 不在本 spec 验证范围,defer 026
-- [ ] `DemoUserSeed.coachedStudent` 加,`MeetPR-DemoStudent` scheme 加,build_run_sim 跑该 scheme 直接进 StudentRootView,并看到 `StudentDemoSeed` 预置 projection(不依赖刚 publish 的)
+- [ ] `InMemoryPlanStore` 在 AppShell 内,CoachKit `InMemoryPlanRepository.publishPlan` 写入 store,StudentKit `InMemoryStudentPlanRepository.fetchCurrentPlan` 读 store,**同进程内教练 publish → 学员 fetch 验证 ok**(集成测试)
+- [ ] `DemoUserSeed.student` 加,`MeetPR-DemoStudent` scheme 加,build_run_sim 跑该 scheme 直接进 StudentRootView
 - [ ] 4 个 tab UI 单测各自 ViewModel state machine
-- [ ] `PlanToStudentProjection`(教练侧 mapper)单测 ≥6 fixture(简单单周 / WeeklyVariation 多周 / repsMax / RPE 空 / 主项+辅助混合 / **setCount > 1** / **`.rpe` intensity_mode**)
-- [ ] `PlanRepository.publishPlan` 签名加 `sets: [PlanSet]` 参数,`PlanningCoordinatorView` 调用点同步改
+- [ ] mapper(TrainingPlan → StudentPlanView)单测 ≥5 fixture
 - [ ] `grep import CoachKit Modules/StudentKit` / `grep import StudentKit Modules/CoachKit` 输出空
 - [ ] CHECKLIST.md 写好 manual happy path,跑一次记结果
 - [ ] DEMO_MODE 不启时 3 个 Backend* repo 占位 `fatalError("TODO: spec 026 backend wiring")`,build pass
@@ -503,27 +459,24 @@ public final class TodayWorkoutViewModel {
 | 块 | 估时(连续工作日) |
 |---|---|
 | 1. CoreModels 6 个新类型 + 单测 | 0.5d |
-| 2. RepositoryContracts SPM target 起 + 3 protocol(可由 spec 029 先建,本 spec 引用)| 0.3d |
-| 3. `InMemoryPlanStore`(持 projection)+ AppShell wiring | 0.4d |
-| 4. CoachKit `PlanRepository.publishPlan` 签名加 `sets`,`PlanningCoordinatorView` 调用点同步 | 0.3d |
-| 5. `PlanToStudentProjection` mapper(教练侧)+ ≥6 fixture 单测 | 1.2d |
-| 6. 3 个 In-Memory* repo impl + 单测 | 1.3d |
-| 7. 4 个 feature folder UI + ViewModel + 单测 | 3.5d |
-| 8. `StudentRootView` + RootView 注入 + `DemoUserSeed.coachedStudent` + `MeetPR-DemoStudent` scheme | 1d |
-| 9. CHECKLIST.md + 手动跑一遍 + 修 bug | 1d |
-| **合计** | **9.5d** |
+| 2. InMemoryPlanStore + CoachKit 注入改造 | 0.5d |
+| 3. 3 个 Repository protocol + In-Memory actor + 单测 | 1.5d |
+| 4. mapper(教练草稿 → 学员视图)+ 单测 | 1d |
+| 5. 4 个 feature folder UI + ViewModel + 单测 | 3.5d |
+| 6. StudentRootView + RootView 注入 + DemoUserSeed.student + MeetPR-DemoStudent scheme | 1d |
+| 7. CHECKLIST.md + 手动跑一遍 + 修 bug | 1d |
+| **合计** | **9d** |
 
-V0.1+ 阶段 ~2 周 Codex impl 时间。pre_plan 原估 8-12d,本 spec scope 收窄(D1)+ 架构改动(D2/D3)+ 0.5d microsoft tax 后取 9.5d。
+V0.1+ 阶段 1.5-2 周 Codex impl 时间。pre_plan 原估 8-12d,本 spec scope-shrink 后取下界。
 
 ## 风险 / 待 implementer 关注
 
-1. **mapper(教练侧 PlanToStudentProjection)复杂度**:weekly progression rule + repsMax + 教练手填值 + setCount + intensity_mode 的混合规则,fixture 必须覆盖 ≥6 种(per Codex review #112 non-blocking),否则学员侧看到的数字错。
+1. **mapper 复杂度被低估**:weekly progression rule + repsMax + 教练手填值的混合规则,fixture 必须覆盖至少 5 种,否则学员侧看到的数字错。
 2. **AppShell 注入参数膨胀**:StudentKit 进来后,`RootView` 构造器从"无参"变"传 3 个 student repo + 既有 coach repo";考虑用一个 `RepositoryBundle` struct 收口(本 spec 内可写也可不写,推荐写,见 §4 第 4 节简化版即可)。
-3. **跨身份测试物理边界(2026-05-15 D1 决议)**:本 spec in-memory store **进程级生命周期**。同 simulator 切 scheme = 新进程 = store 丢。这是 in-memory + DEMO_MODE 的设计决定,**不是 bug**;本 spec 验证范围已收窄到"学员侧 4 tab + seeded data 自洽"。真跨身份"教练 publish → 学员 fetch"闭环 defer 到 spec 026 用真 backend + 两台手机验证。
+3. **两 simulator 同进程问题**:本 spec in-memory store **同一 simulator 内** 教练 publish 后切 scheme 重启 simulator 学员侧 fetch — 数据**会丢**(进程重启)。两 simulator 真互通要 backend(候选 3)。本 spec 验闭环用**同一 simulator 切 scheme**(学员侧 seed 也包含一份 mock plan,验"看到 plan + 录入"行得通,不依赖刚 publish 的)。
 4. **`_seedFeedback` 这种 protocol leak**:protocol 暴露给 Demo 注 seed 不优雅,V0.1.x 可改成 Repository 构造时注入 seed factory。本 spec 接受。
 5. **scheme 复制风险**:`MeetPR-DemoStudent` 基于 `MeetPR-Demo` 复制,xcodeproj 改动易冲突。Codex 实装时用 `xcodebuild -list` 验 scheme 列表,改动后 commit 仔细看 `.xcodeproj/xcshareddata/xcschemes/` diff。
 6. **CHECKLIST.md 不在 SPEC.md**:故意分文件,impl PR 内一起写;减少 SPEC PR 改动面。
-7. **RepositoryContracts SPM target 由谁先起**:spec 029 描述了 SPM target 新建;本 spec impl 顺序 — 若 029 先 impl 则本 spec 直接 import;若本 spec 先 impl,Codex 在 本 impl 内 mechanical 建 target,029 impl 时只 add 2 个剩余 protocol(`E1RMRepository`、`VideoRepository`)。两种顺序都接受。
 
 ## Implementation Notes
 
@@ -545,7 +498,7 @@ V0.1+ 阶段 ~2 周 Codex impl 时间。pre_plan 原估 8-12d,本 spec scope 收
 - spec 011 auth UI flow(RootView 路由 + Session)
 
 **下游 spec(本 spec 解锁)**:
-- 候选 2(真实注册流;现在 sub 'login + Keychain' 子集 SPEC 待起):本 spec 用 `DemoUserSeed.coachedStudent`,候选 2 后真账号填进 Session.cachedUser,UI 0 改
+- 候选 2(真实注册流;现在 sub 'login + Keychain' 子集 SPEC 待起):本 spec 用 `DemoUserSeed.student`,候选 2 后真账号填进 Session.cachedUser,UI 0 改
 - 候选 3(backend 真接入;SPEC 待起):本 spec 留 `BackendStudentPlanRepository` placeholder `fatalError`,候选 3 实装替占位
 - V0.1.x 视频上传 spec:本 spec `SetRecordRow` 末尾留视频附件位(本 spec 不画 UI;impl 时 row 不预留视觉)
 - V0.1.x e1RM 曲线 spec:本 spec 的 `StudentSetLog` schema 已含 weightKg / reps,e1RM 计算可基于此
@@ -556,4 +509,3 @@ V0.1+ 阶段 ~2 周 Codex impl 时间。pre_plan 原估 8-12d,本 spec scope 收
 | 日期 | 版本 | 变更 | 作者 |
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。Scope 基于 v0_1_pre_plan 候选 1,进一步收敛(教练端看学员执行 / 跨 cycle 历史 / 资料页 defer) | Claude |
-| 2026-05-15 | 0.2 | 接 PR #112 Codex review:**D1**(scope 收窄,跨身份闭环 defer 026)+ **D2**(store 持 publish-ready projection,mapper 在教练侧)+ **D3**(3 protocol 移到新 SPM target `RepositoryContracts`,per spec 029)+ `.coachedStudent`/`.selfTrainStudent` 字段名 + mapper fixture ≥6(加 setCount>1 / `.rpe` intensity_mode 覆盖) | Claude |
