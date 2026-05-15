@@ -4,7 +4,7 @@
 - **PR**: TBD
 - **来源**:
   - [PRD §5 #16 成长曲线 + e1RM 推送(v0.7 PR 重塑)](~/Brain/wiki/projects/MeetPR/prd.md) — 1RM 锁定不动 / e1RM 每次训练后自动重算 / 突破历史 → 仅推学员不推教练 / 每动作含 variation 独立 PR 检测
-  - [ADR-002(状态:Superseded by PRD §5)](~/Brain/wiki/projects/MeetPR/decisions/002-rpe-tracking-metrics.md) — RPE 计算公式 reference
+  - [ADR-002(状态:Superseded by PRD §5)](~/Brain/wiki/projects/MeetPR/decisions/002-intelligent-analysis-over-passive-display.md) — RPE 公式 historical reference,**状态被 PRD §5 supersede**;本 spec 的公式权威源是 RTS 表(见 §技术要求)
   - [ADR-005 §1 模块边界](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) — Domain 跨 role 共享 = e1RM 数学(候选 extract,本 spec 仍放 StudentKit,Stage 3 边界再 extract 到 `EvaluationDomain` 之外的纯逻辑 module)
   - 上游 [spec 024 学员端 P0](../024-student-p0-views/SPEC.md) — `StudentSetLog` schema 已含 `weightKg / reps / rpe / completed: Bool`,e1RM 直接读
   - 不依赖 026 backend(全本地算,backend 0 改动)
@@ -79,34 +79,89 @@ public struct PRBreakthroughEvent: Codable, Hashable, Sendable, Identifiable {
 
 位置:`Modules/StudentKit/Sources/StudentKit/Domain/E1RMCalculator.swift`(新)
 
+**Source of truth(2026-05-15 接 PR #116 Codex review #1 blocker)**:RTS(Reactive Training Systems,Mike Tuchscherer)RPE 强度表为权威数据源,**lookup + bilinear interpolation** 实装。**不**用单一线性公式 — 因为 RTS 表在 reps 1-4 与 reps 5+ 是分段斜率(reps 1-4:-4%/rep;reps 5+:-2%/rep),线性公式 `1.0 - 0.02 × ((10 - rpe) + (reps - 1))` 在 reps=5 RPE=10 算出 92% 但 RTS 表 = 86%(差 6%)。
+
 ```swift
 public enum E1RMCalculator {
-  /// RPE-based(优先;来自 ADR-002 / RTS framework)
-  /// e1RM = weight / (1 - 0.02 * (1 - reps + (10 - rpe)))
-  /// 简化:每 reps 增 1 ≈ 2% load 损失,每 RPE 降 1 ≈ 2% load 损失,RPE 10 + 1 rep = 100%
-  /// 边界:reps >= 1,rpe ∈ [4, 10],否则 fallback
-  ///
-  /// Epley fallback(无 RPE 时)
-  /// e1RM = weight * (1 + reps / 30)
+  /// RTS RPE 强度表(% of 1RM),source of truth
+  /// rtsTable[reps - 1][rpeIndex],其中 rpeIndex = Int((rpe - 6.0) / 0.5)
+  /// reps 范围 1-12;RPE 范围 6.0-10.0 步 0.5(9 列)
+  private static let rtsTable: [[Double]] = [
+    // RPE:    6.0   6.5   7.0   7.5   8.0   8.5   9.0   9.5   10.0
+    /* 1 */  [0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96, 0.98, 1.00],
+    /* 2 */  [0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92, 0.94, 0.96],
+    /* 3 */  [0.76, 0.78, 0.80, 0.82, 0.84, 0.86, 0.88, 0.90, 0.92],
+    /* 4 */  [0.72, 0.74, 0.76, 0.78, 0.80, 0.82, 0.84, 0.86, 0.88],
+    /* 5 */  [0.70, 0.72, 0.74, 0.76, 0.78, 0.80, 0.82, 0.84, 0.86],
+    /* 6 */  [0.68, 0.70, 0.72, 0.74, 0.76, 0.78, 0.80, 0.82, 0.84],
+    /* 7 */  [0.66, 0.68, 0.70, 0.72, 0.74, 0.76, 0.78, 0.80, 0.82],
+    /* 8 */  [0.64, 0.66, 0.68, 0.70, 0.72, 0.74, 0.76, 0.78, 0.80],
+    /* 9 */  [0.62, 0.64, 0.66, 0.68, 0.70, 0.72, 0.74, 0.76, 0.78],
+    /* 10 */ [0.60, 0.62, 0.64, 0.66, 0.68, 0.70, 0.72, 0.74, 0.76],
+    /* 11 */ [0.58, 0.60, 0.62, 0.64, 0.66, 0.68, 0.70, 0.72, 0.74],
+    /* 12 */ [0.56, 0.58, 0.60, 0.62, 0.64, 0.66, 0.68, 0.70, 0.72],
+  ]
+
   public static func calculate(
     weightKg: Double,
     reps: Int,
     rpe: Double?
   ) -> Double? {
-    guard weightKg > 0, reps >= 1, reps <= 20 else { return nil }
-    if let rpe = rpe, rpe >= 4.0, rpe <= 10.0 {
-      // RPE-based formula:weight / (1 - 0.02 * (10 - rpe + (reps - 1)))
-      let intensity = 1.0 - 0.02 * ((10.0 - rpe) + Double(reps - 1))
-      guard intensity > 0.5 else { return nil }   // 安全下限(避免 1RM 估出 200% 离谱)
+    guard weightKg > 0, reps >= 1 else { return nil }
+
+    if let rpe = rpe, rpe >= 6.0, rpe <= 10.0 {
+      // RTS lookup,reps 越界 saturate 到 12,RPE 线性插值(0.5 间隔)
+      let safeReps = min(reps, 12)
+      let intensity = rtsIntensity(reps: safeReps, rpe: rpe)
+      guard intensity > 0.5 else { return nil }   // 安全下限
       return weightKg / intensity
     }
-    // Epley fallback
+
+    // Epley fallback(RPE 缺失或 < 6 越界):e1RM = weight * (1 + reps / 30)
+    guard reps <= 20 else { return nil }
     return weightKg * (1.0 + Double(reps) / 30.0)
+  }
+
+  /// RTS table lookup + RPE bilinear interpolation
+  /// reps 取整数(实装期学员录 reps 是 Int);RPE 0.5 间隔之间用线性插值
+  private static func rtsIntensity(reps: Int, rpe: Double) -> Double {
+    // 找到 rpe 在表内的两个相邻 column index
+    let rpeFloat = (rpe - 6.0) / 0.5   // 6.0 → 0, 6.5 → 1, ..., 10.0 → 8
+    let lo = Int(rpeFloat.rounded(.down))
+    let hi = min(lo + 1, 8)
+    let t = rpeFloat - Double(lo)
+    let row = rtsTable[reps - 1]
+    return row[lo] * (1 - t) + row[hi] * t
   }
 }
 ```
 
-**重要 implementer note**:**RPE-based 公式有多个流派**,本 spec 选 RTS framework(Mike Tuchscherer)版本,与 ADR-002 一致。Codex 实装时**不要换公式**(数字会变),fixture 测试以 ADR-002 数据为准。
+**E1RMCalculator fixture 测试**(本 spec 单测最高优先级,**直接覆盖 RTS 表内每个 cell** — `12 × 9 = 108` 个 fixture point + Epley fallback ≥ 6 个 + 边界(reps=0 / reps=13 / rpe=5.5 / rpe=10.5 / weight=0)≥ 5 个):
+
+| reps | RPE 10 | RPE 9.5 | RPE 9 | RPE 8.5 | RPE 8 | RPE 7 | RPE 6 |
+|---|---|---|---|---|---|---|---|
+| 1 | 100% | 98% | 96% | 94% | 92% | 88% | 84% |
+| 2 | 96% | 94% | 92% | 90% | 88% | 84% | 80% |
+| 3 | 92% | 90% | 88% | 86% | 84% | 80% | 76% |
+| 4 | 88% | 86% | 84% | 82% | 80% | 76% | 72% |
+| 5 | 86% | 84% | 82% | 80% | 78% | 74% | 70% |
+| 6 | 84% | 82% | 80% | 78% | 76% | 72% | 68% |
+| 7 | 82% | 80% | 78% | 76% | 74% | 70% | 66% |
+| 8 | 80% | 78% | 76% | 74% | 72% | 68% | 64% |
+| 9 | 78% | 76% | 74% | 72% | 70% | 66% | 62% |
+| 10 | 76% | 74% | 72% | 70% | 68% | 64% | 60% |
+| 11 | 74% | 72% | 70% | 68% | 66% | 62% | 58% |
+| 12 | 72% | 70% | 68% | 66% | 64% | 60% | 56% |
+
+> **fixture 测试 100kg × 5 reps @ RPE 8** → intensity 0.78 → e1RM = 100 / 0.78 ≈ **128.2 kg**(±0.1 浮点容差)
+
+**实装锁定**(防 Codex 篡改):
+- **不**回退到线性公式(reps 1-4 与 5+ 斜率不同)
+- **不**换 Brzycki / Lombardi / Wathan 公式(数字差 ±3-5%)
+- RPE 中间值(8.25 / 9.25 等)用线性插值
+- reps > 12 → saturate 到 reps=12;rep > 20 + 无 RPE → 返 nil(超出 hypertrophy 上界)
+- RPE < 6 → Epley fallback(RTS 表 6 下不可靠)
+- intensity ≤ 0.5(reps=12 RPE<6 等极端组合)→ 返 nil(避免 e1RM 估出 > 2x weight 离谱)
 
 #### 3. `StudentKit` 新增 `E1RMRepository`
 
@@ -132,38 +187,53 @@ public protocol E1RMRepository: Sendable {
 
 #### 4. `TodayWorkoutViewModel.toggleComplete` 拦截 + 算 e1RM + 检 PR
 
-spec 024 `TodayWorkoutViewModel.toggleComplete` 实装 record set。本 spec 在 record set **成功后** 加 hook:
+spec 024 `TodayWorkoutViewModel.toggleComplete` 实装 record set。本 spec 在 record set **成功后** + **completed 边沿翻转**(false → true,不是 true → false 取消勾)时加 hook:
 
 ```swift
 public func toggleComplete(rowIndex: Int) async {
-  // ... spec 024 既有逻辑:recordSet → loggedSetId 回填 → completed = true ...
+  let previouslyCompleted = drafts[rowIndex].completed
+  // ... spec 024 既有逻辑:recordSet → loggedSetId 回填 → toggle completed ...
+  let nowCompleted = drafts[rowIndex].completed
 
-  // 本 spec 新增 hook:
+  // 本 spec hook — 仅在 false → true 边沿触发(防取消勾留 orphan PR)
+  guard !previouslyCompleted, nowCompleted else { return }
+
+  let draft = drafts[rowIndex]
   guard let weight = draft.actualWeight ?? draft.prescribed.weightKg,
         let reps = draft.actualReps,
-        completed else { return }
-
-  let e1rm = E1RMCalculator.calculate(weightKg: weight, reps: reps, rpe: draft.actualRPE) ?? return
+        let estimatedOneRepMaxKg = E1RMCalculator.calculate(
+          weightKg: weight, reps: reps, rpe: draft.actualRPE
+        ) else { return }
 
   let point = E1RMHistoryPoint(
-    id: UUID(), studentId: ..., exerciseId: planExercise.exercise.id,
+    id: UUID(), studentId: studentId, exerciseId: planExercise.exercise.id,
     setLogId: setLog.id, computedAt: Date(),
-    e1RMKg: e1rm, sourceWeightKg: weight, sourceReps: reps, sourceRPE: draft.actualRPE
+    e1RMKg: estimatedOneRepMaxKg,
+    sourceWeightKg: weight, sourceReps: reps, sourceRPE: draft.actualRPE
   )
-  try? await e1rm.recordPoint(point)
+  try? await e1rmRepo.recordPoint(point)
 
-  let previousMax = (try? await e1rm.maxBefore(studentId: ..., exerciseId: ..., before: point.computedAt)) ?? 0
-  if e1rm > previousMax + 0.5 {   // 0.5kg buffer 防浮点抖动重复 PR
+  let previousMax = (try? await e1rmRepo.maxBefore(
+    studentId: studentId, exerciseId: planExercise.exercise.id,
+    before: point.computedAt
+  )) ?? 0
+  if estimatedOneRepMaxKg > previousMax + 0.5 {   // 0.5kg buffer 消化浮点抖动
     let event = PRBreakthroughEvent(
-      id: UUID(), studentId: ..., exerciseId: ..., pointId: point.id,
-      breakthroughE1RMKg: e1rm, previousMaxE1RMKg: previousMax, occurredAt: Date(),
-      acknowledgedAt: nil
+      id: UUID(), studentId: studentId, exerciseId: planExercise.exercise.id,
+      pointId: point.id,
+      breakthroughE1RMKg: estimatedOneRepMaxKg, previousMaxE1RMKg: previousMax,
+      occurredAt: Date(), acknowledgedAt: nil
     )
-    try? await e1rm.recordPR(event)
-    pendingPRBanner = event   // ViewModel 暴露 @Published / @Observable 给 view 弹 banner
+    try? await e1rmRepo.recordPR(event)
+    pendingPRBanner = event   // @Observable 暴露给 view 弹 banner
   }
 }
 ```
+
+**关键 invariants**(per PR #116 Codex review):
+- **边沿触发**(`!previouslyCompleted && nowCompleted`):仅在学员**首次**勾 ✓ 时算 e1RM,**取消勾**(true → false)不影响已落 PR(留 orphan E1RMHistoryPoint 接受 — 学员已看过 banner,撤回不再追回)
+- 局部变量命名 `estimatedOneRepMaxKg` 而非 `e1rm`,避免遮蔽 `e1rmRepo` repo 变量
+- `0.5kg` buffer 消化浮点抖动(127.99 vs 128.01 不算 PR);若内测期发现"PR 弹得太勤",调到 1.0kg(本 spec 接受调整)
 
 #### 5. `PRBanner` UI
 
@@ -203,7 +273,7 @@ List {
 
 | 文件 | 覆盖 |
 |---|---|
-| `Modules/StudentKit/Tests/StudentKitTests/Domain/E1RMCalculatorTests.swift`(新) | RPE-based 8 fixture(weight/reps/rpe → 预期 e1RM 误差 < 0.5kg);Epley fallback 4 fixture;边界(reps=0 / reps=20 / rpe=3.5);intensity < 0.5 返 nil |
+| `Modules/StudentKit/Tests/StudentKitTests/Domain/E1RMCalculatorTests.swift`(新) | **RTS 表全 108 cell**(reps 1-12 × RPE 6.0/6.5/.../10.0 9 列;每个 cell 计算与表内 % 对齐,容差 ±0.5kg);Epley fallback ≥ 6 fixture(无 RPE / RPE < 6);RPE 中间值插值(RPE 7.25 / 8.25 / 9.25 等)≥ 3 fixture;边界(reps=0 → nil / reps=13 saturate to 12 / reps=21 + 无 RPE → nil / rpe=5.5 → Epley / rpe=10.5 → nil / weight=0 → nil);intensity < 0.5 返 nil |
 | `Modules/StudentKit/Tests/StudentKitTests/Repository/E1RMRepositoryTests.swift`(新) | record / fetch / maxBefore(空 / 单点 / 多点 / 时间过滤);PR 流(unacknowledged + acknowledge) |
 | `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkoutPRHookTests.swift`(新) | record set 后 hook 触发:已知历史 + 新点 → 是否检 PR / 是否不检(回退);0.5kg buffer 边界 |
 | `Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/GrowthCurveViewModelTests.swift`(新) | 时间轴切换数据过滤;空数据态 |
@@ -240,9 +310,15 @@ TabView {
 
 ## 技术要求
 
-### 数据持久化策略
+### 数据持久化策略(2026-05-15 接 PR #116 Codex review non-blocking 统一)
 
-V0.1 **in-memory**(per spec 024 `InMemoryStudentTrainingLogRepository` pattern);spec 026 落地后切 JSON file cache(per ADR-005 §4 `Documents/training_log/*.json`)。
+| 阶段 | 实现 | backend 参与 |
+|---|---|---|
+| V0.1 本 spec 落地 | `InMemoryE1RMRepository` actor | ❌ |
+| **spec 026 落地后** | **`LocalE1RMRepository`(JSON file cache,per ADR-005 §4 `Documents/e1rm/<studentId>.json`)** | ❌ 仍本地 |
+| V0.1.x(换设备保留历史触发)| `BackendE1RMRepository` + backend `/students/:id/e1rm` endpoint | ✅ 另开独立 spec |
+
+> **统一口径**:本 spec / spec 026 / spec 029 一致 — V0.1 阶段 e1RM **全本地算**,backend 0 参与。spec 026 仅做"InMemory → JSON file" 的本地升级,**不引入** `BackendE1RMRepository` 也**不加** backend endpoint。删除本 spec 之前对 `BackendE1RMRepository` / stale-while-revalidate / `/students/:id/e1rm` endpoint 的引用。
 
 JSON file schema:
 ```
@@ -251,27 +327,13 @@ Documents/e1rm/
   └── prs-<studentId>.json       # [PRBreakthroughEvent]
 ```
 
-Stale-while-revalidate 模式:启动先读 cache,后台 backend fetch 同步(spec 026 加 `BackendE1RMRepository` 实装)。
+### E1RM 公式来源 — see §2
 
-### E1RM 公式来源(防 implementer 篡改)
-
-本 spec 公式锚定 RTS framework(Mike Tuchscherer / Reactive Training Systems):
-
-| reps | RPE 10 | RPE 9.5 | RPE 9 | RPE 8.5 | RPE 8 | RPE 7 | RPE 6 |
-|---|---|---|---|---|---|---|---|
-| 1 | 100% | 98% | 96% | 94% | 92% | 88% | 84% |
-| 2 | 96% | 94% | 92% | 90% | 88% | 84% | 80% |
-| 3 | 92% | 90% | 88% | 86% | 84% | 80% | 76% |
-| 4 | 88% | 86% | 84% | 82% | 80% | 76% | 72% |
-| 5 | 86% | 84% | 82% | 80% | 78% | 74% | 70% |
-
-**算法等价于** `intensity = 1.0 - 0.02 * ((10 - rpe) + (reps - 1))`,e1RM = weight / intensity。
-
-fixture 测试至少含上表 5 行的 7 列每个组合,误差 ≤ 0.5kg 容忍(浮点)。Epley fallback 仅在 RPE 缺失或越界时使用,fixture 测试覆盖。
+**Source of truth = §2 `E1RMCalculator.rtsTable`**(RTS 12×9 强度表)。**不**用线性公式。完整测试矩阵在 §测试 内。详细论证见 §2 implementer note。
 
 ### PR 检测的 0.5kg buffer
 
-浮点 e1RM 可能因 RPE 输入扰动产生 0.x kg 差异,触发"假 PR"。`buffer = 0.5kg`(per 7e1RM 计算误差经验值),小于该值差异不算 PR。文档 + 单测显式 fix 此常量。
+浮点 e1RM 可能因 RPE 输入扰动产生 0.x kg 差异,触发"假 PR"。`buffer = 0.5kg`(per e1RM 计算误差经验值),小于该值差异不算 PR。文档 + 单测显式 fix 此常量。若内测期发现"PR 弹得太勤",可调到 1.0kg(本 spec 接受调整,需 update 单测 fixture)。
 
 ### 版本 / 兼容
 
@@ -282,7 +344,7 @@ fixture 测试至少含上表 5 行的 7 列每个组合,误差 ≤ 0.5kg 容忍
 ## 验收清单
 
 - [ ] CoreModels 新 2 类型 Codable roundtrip 单测
-- [ ] `E1RMCalculator` RPE-based + Epley 双路径,fixture ≥35 case,边界 ≥ 5 case
+- [ ] `E1RMCalculator` RTS 表全 108 cell fixture + Epley fallback ≥ 6 + RPE 中间值插值 ≥ 3 + 边界(reps=0/13/21/RPE 5.5/10.5/weight=0)≥ 6;无任何 cell 偏差 > 0.5kg
 - [ ] `InMemoryE1RMRepository` actor 单测 + maxBefore PR 检测路径过
 - [ ] `TodayWorkoutViewModel` hook 在 toggleComplete 后调用 + PR 检测落地,单测验证
 - [ ] `PRBanner` UI 在 simulator 真渲染过,3s 自滑出 + tap dismiss + 启动补弹
@@ -309,12 +371,13 @@ fixture 测试至少含上表 5 行的 7 列每个组合,误差 ≤ 0.5kg 容忍
 
 ## 风险 / 待 implementer 关注
 
-1. **公式不要换** — RPE-based RTS 公式 fixture 严格锚定,Codex 若引"更精准"公式(Brzycki / Lombardi / Wathan 等)会破单测;不同流派差异 ±3-5%,在内测期就被你或 xty 察觉数字"漂移"
+1. **公式不要换** — `rtsTable` 是 source of truth,**不**回退线性公式(reps 1-4 vs 5+ 斜率不同);**不**换 Brzycki / Lombardi / Wathan(±3-5% 漂移内测期会被你或 xty 觉察)
 2. **0.5kg PR buffer 来源**:浮点 e1RM 与"称重 0.5kg 增量"是平行轴,buffer 仅消化浮点抖动,真实人脑能感知的 PR 是 +1-2.5kg 级。若内测期发现"PR 弹得太勤",buffer 可调到 1.0kg
 3. **DEMO_MODE seed PR 时机**:启动时若 student seed 含 unacknowledged PR,banner 启动 1.5s 后弹(让 Tab 1 先渲染)→ Codex 实装时用 task delay 0.5-1s 缓冲
 4. **5 tab 拥挤**:iOS HIG 推荐 ≤ 5 tab,本 spec 刚好踩线;V0.1.x 若加更多 tab 必须收 More 抽屉
 5. **教练侧曲线 reuse**:spec 029 实装时直接复用 `GrowthCurveView` + `E1RMRepository.fetchHistory(studentId:)`,本 spec **不画**教练侧入口
-6. **重 set 行为**(学员误点 ✓ 反悔取消勾):spec 024 已设计 "再 tap ✓ 取消 complete";本 spec hook 仅在 `completed: true` 边沿触发 record point;取消 → V0.1 留 orphan E1RMHistoryPoint(不删,因为 setLog 被取消但学员已经看到过 PR);**实装时 hook 加 `completed == true && previously false` 边沿条件**
+6. **重 set 行为**(学员误点 ✓ 反悔取消勾):spec 024 已设计 "再 tap ✓ 取消 complete";本 spec hook 仅在 `!previouslyCompleted && nowCompleted` 边沿触发 record point;取消 → V0.1 留 orphan E1RMHistoryPoint(不删,因为 setLog 被取消但学员已经看到过 PR)。**边沿条件已写入 §4 主流程伪代码**(per PR #116 review non-blocking — 不再仅在风险段提及)
+7. **`estimatedOneRepMaxKg` vs `e1rmRepo` 变量命名**:§4 伪代码 explicitly 命名 e1RM 数值为 `estimatedOneRepMaxKg`,避免与 `e1rmRepo` 同名遮蔽(per PR #116 review non-blocking)
 
 ## Implementation Notes
 
@@ -327,8 +390,9 @@ fixture 测试至少含上表 5 行的 7 列每个组合,误差 ≤ 0.5kg 容忍
 - ADR-002 + PRD §5 #16(公式来源 + 锁 1RM 规则)
 
 **下游**:
-- spec 026 backend 真接入:加 `BackendE1RMRepository` 用 backend `/students/:id/e1rm` endpoint,JSON file cache + stale-while-revalidate
-- spec 029 教练端 review:复用 `GrowthCurveView` 在学员详情页展示
+- spec 026 backend 真接入:仅做 `InMemoryE1RMRepository → LocalE1RMRepository`(JSON file)本地升级,**不**加 backend endpoint(per 2026-05-15 持久化口径统一)
+- spec 029 教练端 review:复用 `GrowthCurveView` + `E1RMCalculator` 复制份在 CoachKit 算 e1RM(因 e1RM 本地数据不上 backend,教练端从 StudentSetLog 反推 — 两端 calculator 单测验证一致)
+- V0.1.x **独立 spec**:`BackendE1RMRepository` + backend `/students/:id/e1rm` endpoint(触发条件 = "换设备保留 e1RM 历史"用户需求)
 - V0.1.x APNs push:`PRBreakthroughEvent.occurredAt` 触发服务端 push
 - V0.1.x 变式 sheet:Exercise.variants 维度独立曲线
 - V1.5 ADR-002 重启:训练量 / 区间分布 / 峰值 vs 平均 RPE
@@ -338,3 +402,4 @@ fixture 测试至少含上表 5 行的 7 列每个组合,误差 ≤ 0.5kg 容忍
 | 日期 | 版本 | 变更 | 作者 |
 |---|---|---|---|
 | 2026-05-15 | 0.1 | 起草。本地算 + in-app banner + 5 tab "我的" 入口 + 三大项主项曲线 | Claude |
+| 2026-05-15 | 0.2 | 接 PR #116 Codex review:**blocker** — 公式 / 注释 / RTS 表三者不一致(线性公式 reps≥5 失准 6%),改用 `rtsTable` 12×9 lookup + RPE 线性插值作 source of truth,fixture 覆盖全 108 cell;non-blocking — ADR-002 链接修正到 `002-intelligent-analysis-over-passive-display.md` + 说明 PRD supersede;持久化口径统一(本 spec V0.1 in-memory → spec 026 切 JSON file,backend e1RM endpoint 另开独立 spec,不在 026 内);§4 toggleComplete hook 边沿条件 `!previouslyCompleted && nowCompleted` 上移到主流程伪代码;e1RM 变量重命名 `estimatedOneRepMaxKg` 防遮蔽 | Claude |
