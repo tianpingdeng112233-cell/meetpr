@@ -9,7 +9,7 @@
   - 上游 [spec 002 CoreModels identity](../002-core-models-identity/SPEC.md) — `User` / `UserRole` / `StudentProfile`
   - 上游 [spec 004 CoreModels training plan](../004-core-models-training-plan/SPEC.md) — `TrainingPlan` / `PlanDay` / `PlanExercise` / `PlanSet` data shape
   - 上游 [spec 020 V0 demo orchestration](../020-v0-demo-orchestration/SPEC.md) — `DemoAuthRepository` / `DemoTokenStore` 沿用 build-time 切换
-  - 上游 [spec 011 auth UI flow](../011-auth-ui-flow/SPEC.md) — `Session` / `RootView` role-routed 已支持 `.student` 分支(目前只指向占位)
+  - 上游 [spec 011 auth UI flow](../011-auth-ui-flow/SPEC.md) — `Session` / `RootView` role-routed 已支持 `.coachedStudent` / `.selfTrainStudent` 分支(目前只指向占位)
   - **不在本 spec 范围**:候选 2(真实注册流)+ 候选 3(backend 真接入)— 本 spec 全程跑 in-memory mock,DEMO_MODE 注入
 
 ## 目标
@@ -207,7 +207,7 @@ public struct StudentRootView: View {
 }
 ```
 
-- `RootView`(AppShell)既有 `.student` 分支当前直接 `StudentRootView()`,改成传入 3 个 repo
+- `RootView`(AppShell)既有 `.coachedStudent` / `.selfTrainStudent` 分支当前直接 `StudentRootView()`,改成传入 3 个 repo
 - 3 个 repo 在 `MeetPRApp.init()` 创建:DEMO_MODE = in-memory mock 共享 store;非 DEMO_MODE 占位 `fatalError("TODO: spec 026 backend wiring")`(类比 BackendPlanRepository pattern)
 
 #### 5. Today / Week / History / Feedback 4 个 View 行为
@@ -300,7 +300,7 @@ let studentPlans = BackendStudentPlanRepository()  // fatalError until spec 026
 #endif
 ```
 
-`RootView` 的 `.authenticated` 分支按 `user.role` 路由,`.student` 传入 3 个 repo。
+`RootView` 的 `.authenticated` 分支按 `user.role` 路由,`.coachedStudent` / `.selfTrainStudent` 传入 3 个 repo。
 
 #### 8. 测试 (`Modules/StudentKit/Tests/StudentKitTests/`)
 
