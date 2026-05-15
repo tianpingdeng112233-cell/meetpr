@@ -183,7 +183,7 @@ public final class PlanningViewModel {
       }
       return
     case .selectAccessories:
-      try await proceedToStep5()
+      try await proceedToStep6()
       return
     case .fillW1Intensity:
       try await proceedToStep6()
@@ -236,6 +236,13 @@ public final class PlanningViewModel {
     draftDay(with: dayID)?
       .draftExercises
       .filter { !$0.isMainLift }
+      .sorted { $0.sortOrder < $1.sortOrder } ?? []
+  }
+
+  public func mainLiftExercises(for dayID: UUID) -> [DraftPlanExercise] {
+    draftDay(with: dayID)?
+      .draftExercises
+      .filter(\.isMainLift)
       .sorted { $0.sortOrder < $1.sortOrder } ?? []
   }
 

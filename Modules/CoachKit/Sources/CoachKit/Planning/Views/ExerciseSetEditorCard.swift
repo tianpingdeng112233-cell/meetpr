@@ -7,6 +7,7 @@ import SwiftUI
 public struct ExerciseSetEditorCard: View {
   @Bindable private var viewModel: PlanningViewModel
   private let draftExercise: DraftPlanExercise
+  private let onDelete: (@MainActor () -> Void)?
 
   @State private var specID: UUID
   @State private var setCount: Int
@@ -17,9 +18,14 @@ public struct ExerciseSetEditorCard: View {
   @State private var notes: String
   @State private var didSave = false
 
-  public init(viewModel: PlanningViewModel, draftExercise: DraftPlanExercise) {
+  public init(
+    viewModel: PlanningViewModel,
+    draftExercise: DraftPlanExercise,
+    onDelete: (@MainActor () -> Void)? = nil
+  ) {
     self.viewModel = viewModel
     self.draftExercise = draftExercise
+    self.onDelete = onDelete
     let spec =
       viewModel.setSpec(for: draftExercise.id) ?? viewModel.defaultSetSpec(for: draftExercise)
     self._specID = State(initialValue: spec.id)
@@ -139,6 +145,16 @@ public struct ExerciseSetEditorCard: View {
 
       if didSave {
         StatusBadge(status: .ready, title: "已填")
+      }
+
+      if let onDelete {
+        Button(action: onDelete) {
+          Image(systemName: "trash")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.brandRed)
+        }
+        .buttonStyle(.borderless)
+        .accessibilityLabel("删除 \(viewModel.exerciseName(for: draftExercise))")
       }
     }
   }

@@ -54,7 +54,9 @@ public struct PlanningCoordinatorView: View {
     case .selectAccessories:
       Step4SelectAccessoriesView(viewModel: viewModel)
     case .fillW1Intensity:
-      Step5SetIntensityView(viewModel: viewModel)
+      // Step 5 removed; intensity input is inlined into Step 4.
+      // Restored drafts pointing at .fillW1Intensity land back on Step 4.
+      Step4SelectAccessoriesView(viewModel: viewModel)
     case .configureRules:
       Step6ProgressionRulesView(viewModel: viewModel)
     case .previewWeekCards:

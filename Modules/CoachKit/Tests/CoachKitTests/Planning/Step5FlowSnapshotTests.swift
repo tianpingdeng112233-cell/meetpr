@@ -7,10 +7,13 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func step5ViewRendersMainLiftAndAccessoryCards() async throws {
+@Test func step4ViewRendersMainLiftAndAccessoryCards() async throws {
+  // Step 5 was removed; intensity input is inlined into Step 4.
+  // Step 4 now shows ExerciseSetEditorCard for both main lifts and
+  // accessories, so we exercise the same configuration on Step 4.
   let viewModel = try await Spec007Fixtures.configuredViewModelForStep5()
 
-  let inspected = try Step5SetIntensityView(viewModel: viewModel).inspect()
+  let inspected = try Step4SelectAccessoriesView(viewModel: viewModel).inspect()
 
   _ = try inspected.find(ViewType.ScrollView.self)
   #expect(viewModel.sortedDraftExercises.contains { viewModel.exerciseName(for: $0) == "比赛式深蹲" })
