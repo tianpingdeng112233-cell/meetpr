@@ -67,7 +67,8 @@ import ViewInspector
     exerciseProvider: { _ in PlanningFixtures.accessoryCatalog()[0] },
     onDelete: { draftExerciseID in
       deletedExerciseID = draftExerciseID
-    }
+    },
+    onNotesChange: { _, _ in }
   )
   let inspected = try sut.inspect()
   let button = try inspected.find(ViewType.Button.self) { button in
