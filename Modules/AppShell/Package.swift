@@ -33,6 +33,9 @@ let package = Package(
       name: "AppShellTests",
       dependencies: [
         "AppShell",
+        .product(name: "CoachKit", package: "CoachKit"),
+        .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "StudentKit", package: "StudentKit"),
         .product(name: "ViewInspector", package: "ViewInspector"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
