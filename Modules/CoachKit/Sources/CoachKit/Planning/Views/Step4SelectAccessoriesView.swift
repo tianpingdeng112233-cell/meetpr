@@ -36,7 +36,10 @@ public struct Step4SelectAccessoriesView: View {
         .padding(.horizontal, -MeetPRSpacing.base)
 
         if let selectedDayID = viewModel.currentDayID {
+          let mainLifts = viewModel.mainLiftExercises(for: selectedDayID)
           let accessories = viewModel.selectedAccessories(for: selectedDayID)
+
+          MainLiftSummarySection(viewModel: viewModel, exercises: mainLifts)
 
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
             Text("已选 \(accessories.count) 个")
@@ -100,6 +103,115 @@ public struct Step4SelectAccessoriesView: View {
       await viewModel.switchToDay(currentDayID)
     } else if let firstDayID = viewModel.sortedDraftDays.first?.id {
       await viewModel.switchToDay(firstDayID)
+    }
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct MainLiftSummarySection: View {
+  @Bindable var viewModel: PlanningViewModel
+  let exercises: [DraftPlanExercise]
+
+  var body: some View {
+    Card(accessibilityLabel: "Selected main lifts") {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+        HStack {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+            Text("本日主项")
+              .font(Font.MeetPR.headline)
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+            Text("上一步选择的主项、变式和 W1 强度")
+              .font(Font.MeetPR.footnote)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+          }
+
+          Spacer()
+
+          StatusBadge(status: .live, title: "\(exercises.count) 项")
+        }
+
+        ForEach(exercises, id: \.id) { exercise in
+          MainLiftSummaryRow(viewModel: viewModel, draftExercise: exercise)
+        }
+      }
+    }
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct MainLiftSummaryRow: View {
+  @Bindable var viewModel: PlanningViewModel
+  let draftExercise: DraftPlanExercise
+
+  var body: some View {
+    HStack(alignment: .center, spacing: MeetPRSpacing.sm) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+        HStack(spacing: MeetPRSpacing.xs) {
+          Text(familyName)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+
+          StatusBadge(status: .live, title: "主项")
+        }
+
+        Text(viewModel.exerciseName(for: draftExercise))
+          .font(Font.MeetPR.bodyEmphasis)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .lineLimit(1)
+          .truncationMode(.tail)
+
+        if let nameEn = viewModel.exerciseNameEn(for: draftExercise) {
+          Text(nameEn)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .lineLimit(1)
+            .truncationMode(.tail)
+        }
+      }
+
+      Spacer(minLength: MeetPRSpacing.sm)
+
+      Text(intensityText)
+        .font(Font.MeetPR.bodyEmphasis)
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .monospacedDigit()
+        .multilineTextAlignment(.trailing)
+        .lineLimit(2)
+    }
+    .padding(MeetPRSpacing.md)
+    .background(Color.MeetPR.surface2)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+  }
+
+  private var familyName: String {
+    guard let family = viewModel.catalogExercise(for: draftExercise)?.mainLiftFamily else {
+      return "主项"
+    }
+    return PlanningDisplay.liftName(family)
+  }
+
+  private var intensityText: String {
+    let spec =
+      viewModel.setSpec(for: draftExercise.id)
+      ?? viewModel.defaultSetSpec(for: draftExercise)
+    let repsText =
+      if let targetRepsMax = spec.targetRepsMax {
+        "\(spec.targetReps)-\(targetRepsMax)"
+      } else {
+        "\(spec.targetReps)"
+      }
+
+    return "\(spec.setCount) 组 x \(repsText) 次 · \(intensityValueText(for: spec))"
+  }
+
+  private func intensityValueText(for spec: DraftSetSpec) -> String {
+    switch spec.intensityMode {
+    case .weight:
+      "\(spec.targetValue.planningFormatted())kg"
+    case .rpe:
+      "@RPE \(spec.targetValue.planningFormatted())"
     }
   }
 }
