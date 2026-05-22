@@ -153,23 +153,17 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 - **禁止**：一次 commit 跨多个无关改动
 - **鼓励**：每写一个新决策（例如"为什么选 TCA 而不是 MVVM"）就沉淀到 `~/Brain/wiki/projects/MeetPR/decisions/` 里
 
-## PR Codex review pass(Claude 写的任何 PR merge 前必经 Codex 一遍)
+## PR Codex review pass(Claude 写的任何 PR merge 前必经 Codex 互审)
 
-**触发**: 任何 PR(doc 或 code,`specs/NN/SPEC.md` / ADR / `CLAUDE.md` / `AGENTS.md` / `FOLLOWUPS.md` / README / 其他 `*.md` / `*.swift` / `Package.swift` / `*.json` / `*.py` / `project.pbxproj` 等)由 Claude 起草后,**merge 前必须先由 Codex review 一遍**。
+**触发**: 任何 PR(doc 或 code,`specs/NN/SPEC.md` / ADR / `CLAUDE.md` / `AGENTS.md` / `FOLLOWUPS.md` / README / 其他 `*.md` / `*.swift` / `Package.swift` / `*.json` / `*.py` / `project.pbxproj` 等)由 Claude 起草后,**开 PR 前必须先经 `/review-loop` 本地 Codex 互审收敛**;PR 上的 Codex review pass 退化为最终 gate。
 
 > **背景**:CLAUDE.md §角色 已规定 Claude 写 Swift 代码(过去 default 走 Codex,Codex 限额触顶 Claude 接管 code 实装)。无论谁写,另一方必 review = 双向 second-pair-of-eyes。本节定义 Claude 写 → Codex review 这一向;反向(Codex 写 → Claude review)是既有流程,无需新规则。
 
 **Claude 的程序**(开任意 PR 时):
-1. 开 PR(同既有流程,用 enforce_admins 套路 / 普通 push)
-2. 在汇报里给 user 一段 **self-contained Codex review prompt**(可直接 paste 到 Codex CLI),包含:
-   - PR # + URL + Files-changed 链接
-   - PR 的 trigger 上下文(为什么写这个)
-   - review 任务说明(按 PR 类型选项,见下表)
-   - 报告 expectation:**always `--comment`**(per Codex review PR #53 finding P1 — same-account `--approve` / `--request-changes` GitHub 拒绝);严重 blocker 在 comment body 显式标 `## ⚠️ BLOCKER`
-3. **不**在 Codex review 完成前催 user merge(让 user 看到 review 结果再决定)
-4. **Claude 修 review finding 后**(per Codex review PR #53 finding P2b):
-   - **非 typo amend**(改 SPEC body / 规则 wording / 任何 finding 涉及内容)→ user 会再 paste review prompt 给 Codex 跑 second pass(Codex 会 read 新 commit + 上次 comments + 看是否真采纳)
-   - **typo / metadata / 紧急 hotfix**:走 §例外 列表免 re-review
+1. **开 PR 前先跑 `/review-loop`**(这是真 gate):对工作区未提交改动发起本地 Claude↔Codex 多轮互审 + 对质,收敛(`VERDICT: CLEAN` 且无悬而未决分歧)后才开 PR。Claude 通过 `codex exec`(read-only)发起,Codex 审未提交 diff 按输出契约逐条回 finding(BLOCKER 用 `## ⚠️ BLOCKER` 起头、末行 `VERDICT: CLEAN|BLOCKERS`),Claude 逐条处置(认同就在工作区改 / BLOCKER 分歧进对质,Codex 回 `CONCEDE|HOLD` / nit 不认同记 transcript 一行理由);最多 3 轮,谈不拢用 AskUserQuestion 升级 David 裁决。**全程 Codex read-only,只有 Claude 改文件**,零手动 paste。完整循环与命令契约见 [`review-loop` skill](~/ClaudeConfig/skills/review-loop/SKILL.md)(机制权威以它为准);设计决策见 [design doc](~/ClaudeConfig/docs/specs/2026-05-22-claude-codex-review-loop-design.md)(设计期文档,其中 `codex review --uncommitted` 等命令细节已被实现期 findings 取代)。
+2. **开一个干净 PR**(同既有流程,用 enforce_admins 套路 / 普通 push):草稿已本地洗过,PR 只含收敛后的最终改动。
+3. **PR body 附「Pre-PR review loop 摘要」**:总轮数 / blocker 找到+解决数 / David 裁决记录 + 全文 transcript 链接(`~/Brain/wiki/projects/MeetPR/reviews/YYYY-MM-DD-<topic>.md`)。
+4. **PR 上的 Codex review pass = 最终 gate**(退化,通常一遍过):因已本地收敛,PR 级复审一般直接 CLEAN。Codex 仍按既有 PR 级流程回(`gh pr review --comment`;same-account 下 `--approve` / `--request-changes` 被 GitHub 拒,详见 §例外 与 [`AGENTS.md` §PR review pass](./AGENTS.md));若最终 gate 仍报 blocker,Claude 在 PR 内修——该修复属 finding 内容,**必须再过一次 gate**(同 [`AGENTS.md`](./AGENTS.md) re-review 规则:非 typo 的 finding 修复需复审);只有纯 typo / metadata / commit message / 不动 body 的小修才按 §例外 免 re-review。
 
 **review 重点 by PR 类型**:
 
