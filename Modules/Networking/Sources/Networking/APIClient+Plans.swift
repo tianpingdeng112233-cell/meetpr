@@ -9,6 +9,42 @@ extension APIClient {
     try await post(path: "/plans", body: request, accessToken: accessToken)
   }
 
+  public func createPlanDay(
+    planID: UUID,
+    _ request: CreatePlanDayRequestDTO,
+    accessToken: String
+  ) async throws -> PlanDayDTO {
+    try await post(
+      path: "/plans/\(planID.uuidString)/days",
+      body: request,
+      accessToken: accessToken
+    )
+  }
+
+  public func createPlanExercise(
+    dayID: UUID,
+    _ request: CreatePlanExerciseRequestDTO,
+    accessToken: String
+  ) async throws -> PlanExerciseDTO {
+    try await post(
+      path: "/plans/days/\(dayID.uuidString)/exercises",
+      body: request,
+      accessToken: accessToken
+    )
+  }
+
+  public func createPlanSet(
+    planExerciseID: UUID,
+    _ request: CreatePlanSetRequestDTO,
+    accessToken: String
+  ) async throws -> PlanSetDTO {
+    try await post(
+      path: "/plans/exercises/\(planExerciseID.uuidString)/sets",
+      body: request,
+      accessToken: accessToken
+    )
+  }
+
   public func publishPlan(id: UUID, accessToken: String) async throws -> PlanDTO {
     try await post(path: "/plans/\(id.uuidString)/publish", accessToken: accessToken)
   }

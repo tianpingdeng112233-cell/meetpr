@@ -137,10 +137,19 @@ import Testing
     dayDate: startDate,
     text: "Nice work."
   )
+  let planSetRequest = CreatePlanSetRequestDTO(
+    setNumber: 1,
+    targetReps: 5,
+    targetRepsMax: 8,
+    intensityMode: .weight,
+    targetValue: Decimal(100.125),
+    setType: .working
+  )
 
   let planJSON = try jsonString(planRequest)
   let setJSON = try jsonString(setRequest)
   let feedbackJSON = try jsonString(feedbackRequest)
+  let planSetJSON = try jsonString(planSetRequest)
 
   #expect(planJSON.contains(#""trainee_id":"00000000-0000-4000-8000-000000000302""#))
   #expect(planJSON.contains(#""start_date":"2026-05-22""#))
@@ -150,6 +159,8 @@ import Testing
   #expect(setJSON.contains(#""rpe":"8""#))
   #expect(feedbackJSON.contains(#""student_id":"00000000-0000-4000-8000-000000000302""#))
   #expect(feedbackJSON.contains(#""day_date":"2026-05-22""#))
+  #expect(planSetJSON.contains(#""target_value":"100.13""#))
+  #expect(planSetJSON.contains(#""target_reps_max":8"#))
 }
 
 @Test func apiClientInjectsBearerTokenOnTypedEndpoint() async throws {
@@ -172,6 +183,8 @@ import Testing
 func typedEndpointsUseWireContractPaths() async throws {
   let log = TypedEndpointRequestLog()
   let planID = try uuid("00000000-0000-4000-8000-000000000501")
+  let dayID = try uuid("00000000-0000-4000-8000-000000000505")
+  let planTreeExerciseID = try uuid("00000000-0000-4000-8000-000000000506")
   let studentID = try uuid("00000000-0000-4000-8000-000000000502")
   let feedbackID = try uuid("00000000-0000-4000-8000-000000000503")
   let planExerciseID = try uuid("00000000-0000-4000-8000-000000000504")
@@ -188,6 +201,31 @@ func typedEndpointsUseWireContractPaths() async throws {
       endDate: "2026-06-18",
       planWeeks: 4,
       source: .coach
+    ),
+    accessToken: "token"
+  )
+  _ = try await client.createPlanDay(
+    planID: planID,
+    CreatePlanDayRequestDTO(dayOfWeek: 1, weekNumber: 1, sortOrder: 0),
+    accessToken: "token"
+  )
+  _ = try await client.createPlanExercise(
+    dayID: dayID,
+    CreatePlanExerciseRequestDTO(
+      exerciseID: planTreeExerciseID,
+      isMainLift: true,
+      sortOrder: 0
+    ),
+    accessToken: "token"
+  )
+  _ = try await client.createPlanSet(
+    planExerciseID: planExerciseID,
+    CreatePlanSetRequestDTO(
+      setNumber: 1,
+      targetReps: 5,
+      intensityMode: .weight,
+      targetValue: Decimal(100),
+      setType: .working
     ),
     accessToken: "token"
   )
@@ -226,6 +264,9 @@ func typedEndpointsUseWireContractPaths() async throws {
   #expect(
     requests.map(\.methodAndPath) == [
       "POST /plans",
+      "POST /plans/\(planID.uuidString)/days",
+      "POST /plans/days/\(dayID.uuidString)/exercises",
+      "POST /plans/exercises/\(planExerciseID.uuidString)/sets",
       "POST /plans/\(planID.uuidString)/publish",
       "GET /students/\(studentID.uuidString)/plans?status=published",
       "GET /plans/\(planID.uuidString)",
@@ -333,6 +374,12 @@ private func responseData(for request: URLRequest) -> Data {
   case ("POST", "/plans"),
     ("POST", _?) where request.url?.path().hasSuffix("/publish") == true:
     Data(planJSON(id: "00000000-0000-4000-8000-000000000501").utf8)
+  case ("POST", _?) where request.url?.path().hasSuffix("/days") == true:
+    Data(planDayJSON(id: "00000000-0000-4000-8000-000000000505").utf8)
+  case ("POST", _?) where request.url?.path().hasSuffix("/exercises") == true:
+    Data(planExerciseJSON(id: "00000000-0000-4000-8000-000000000504").utf8)
+  case ("POST", _?) where request.url?.path().hasSuffix("/sets") == true:
+    Data(planSetJSON(id: "00000000-0000-4000-8000-000000000507").utf8)
   case ("GET", _?) where request.url?.path().hasSuffix("/plans") == true:
     Data(#"{"plans":[]}"#.utf8)
   case ("GET", _?) where request.url?.path() == "/plans/00000000-0000-4000-8000-000000000501":
@@ -379,6 +426,49 @@ private func planJSON(id: String, includesChildren: Bool = false) -> String {
     "status": "published",
     "created_at": "2026-05-22T12:00:00.000Z",
     "updated_at": "2026-05-22T12:00:00.000Z"\(includesChildren ? #","days":[]"# : "")
+  }
+  """
+}
+
+private func planDayJSON(id: String) -> String {
+  """
+  {
+    "id": "\(id)",
+    "plan_id": "00000000-0000-4000-8000-000000000501",
+    "day_of_week": 1,
+    "week_number": 1,
+    "sort_order": 0,
+    "exercises": []
+  }
+  """
+}
+
+private func planExerciseJSON(id: String) -> String {
+  """
+  {
+    "id": "\(id)",
+    "plan_day_id": "00000000-0000-4000-8000-000000000505",
+    "exercise_id": "00000000-0000-4000-8000-000000000506",
+    "is_main_lift": true,
+    "sort_order": 0,
+    "notes": null,
+    "sets": []
+  }
+  """
+}
+
+private func planSetJSON(id: String) -> String {
+  """
+  {
+    "id": "\(id)",
+    "plan_exercise_id": "00000000-0000-4000-8000-000000000504",
+    "set_number": 1,
+    "target_reps": 5,
+    "target_reps_max": null,
+    "intensity_mode": "weight",
+    "target_value": "100.00",
+    "set_type": "working",
+    "created_at": "2026-05-22T12:00:00.000Z"
   }
   """
 }

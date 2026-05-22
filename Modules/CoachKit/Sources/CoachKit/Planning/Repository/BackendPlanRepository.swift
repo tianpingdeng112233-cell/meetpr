@@ -2,6 +2,11 @@ import CoreModels
 import Foundation
 import Networking
 
+public enum BackendPlanRepositoryError: Error, Equatable, Sendable {
+  case missingServerDayID(localDayID: UUID)
+  case missingServerExerciseID(localExerciseID: UUID)
+}
+
 public actor BackendPlanRepository: PlanRepository {
   private let api: APIClient
   private let session: any SessionStateReader
@@ -62,20 +67,73 @@ public actor BackendPlanRepository: PlanRepository {
       ),
       accessToken: token
     )
-    let published = try await api.publishPlan(id: created.id, accessToken: token)
-    let tree = TrainingPlanTree(
-      plan: published.toDomain(),
-      days: days.map { day in
-        PlanDay(
-          id: day.id,
-          planID: published.id,
+
+    var serverDayIDs: [UUID: UUID] = [:]
+    var createdDays: [PlanDayDTO] = []
+    for day in days {
+      let createdDay = try await api.createPlanDay(
+        planID: created.id,
+        CreatePlanDayRequestDTO(
           dayOfWeek: day.dayOfWeek,
           weekNumber: day.weekNumber,
           sortOrder: day.sortOrder
+        ),
+        accessToken: token
+      )
+      serverDayIDs[day.id] = createdDay.id
+      createdDays.append(createdDay)
+    }
+
+    var serverExerciseIDs: [UUID: UUID] = [:]
+    var createdExercises: [PlanExerciseDTO] = []
+    for exercise in exercises {
+      guard let serverDayID = serverDayIDs[exercise.planDayID] else {
+        throw BackendPlanRepositoryError.missingServerDayID(localDayID: exercise.planDayID)
+      }
+
+      let createdExercise = try await api.createPlanExercise(
+        dayID: serverDayID,
+        CreatePlanExerciseRequestDTO(
+          exerciseID: exercise.exerciseID,
+          isMainLift: exercise.isMainLift,
+          sortOrder: exercise.sortOrder,
+          notes: exercise.notes
+        ),
+        accessToken: token
+      )
+      serverExerciseIDs[exercise.id] = createdExercise.id
+      createdExercises.append(createdExercise)
+    }
+
+    var createdSets: [PlanSetDTO] = []
+    for set in sets {
+      guard let serverExerciseID = serverExerciseIDs[set.planExerciseID] else {
+        throw BackendPlanRepositoryError.missingServerExerciseID(
+          localExerciseID: set.planExerciseID
         )
-      },
-      exercises: exercises,
-      sets: sets
+      }
+
+      let createdSet = try await api.createPlanSet(
+        planExerciseID: serverExerciseID,
+        CreatePlanSetRequestDTO(
+          setNumber: set.setNumber,
+          targetReps: set.targetReps,
+          targetRepsMax: set.targetRepsMax,
+          intensityMode: set.intensityMode,
+          targetValue: set.targetValue,
+          setType: set.setType
+        ),
+        accessToken: token
+      )
+      createdSets.append(createdSet)
+    }
+
+    let published = try await api.publishPlan(id: created.id, accessToken: token)
+    let tree = TrainingPlanTree(
+      plan: published.toDomain(),
+      days: createdDays.map { $0.toDomain() },
+      exercises: createdExercises.map { $0.toDomain() },
+      sets: createdSets.map { $0.toDomain() }
     )
     try await cache.save(plan: tree)
   }

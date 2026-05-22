@@ -30,6 +30,7 @@ let package = Package(
       name: "CoachKitTests",
       dependencies: [
         "CoachKit",
+        .product(name: "Networking", package: "Networking"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "ViewInspector", package: "ViewInspector"),
       ],

@@ -57,6 +57,95 @@ public struct CreatePlanRequestDTO: Encodable, Equatable, Sendable {
   }
 }
 
+public struct CreatePlanDayRequestDTO: Encodable, Equatable, Sendable {
+  public let dayOfWeek: Int
+  public let weekNumber: Int
+  public let sortOrder: Int
+
+  public init(dayOfWeek: Int, weekNumber: Int, sortOrder: Int) {
+    self.dayOfWeek = dayOfWeek
+    self.weekNumber = weekNumber
+    self.sortOrder = sortOrder
+  }
+}
+
+public struct CreatePlanExerciseRequestDTO: Encodable, Equatable, Sendable {
+  public let exerciseID: UUID
+  public let isMainLift: Bool
+  public let sortOrder: Int
+  public let notes: String?
+
+  public init(
+    exerciseID: UUID,
+    isMainLift: Bool,
+    sortOrder: Int,
+    notes: String? = nil
+  ) {
+    self.exerciseID = exerciseID
+    self.isMainLift = isMainLift
+    self.sortOrder = sortOrder
+    self.notes = notes
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case exerciseID = "exerciseId"
+    case isMainLift
+    case sortOrder
+    case notes
+  }
+}
+
+public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
+  public let setNumber: Int
+  public let targetReps: Int
+  public let targetRepsMax: Int?
+  public let intensityMode: IntensityMode
+  public let targetValue: Decimal
+  public let setType: SetType
+
+  public init(
+    setNumber: Int,
+    targetReps: Int,
+    targetRepsMax: Int? = nil,
+    intensityMode: IntensityMode,
+    targetValue: Decimal,
+    setType: SetType
+  ) {
+    self.setNumber = setNumber
+    self.targetReps = targetReps
+    self.targetRepsMax = targetRepsMax
+    self.intensityMode = intensityMode
+    self.targetValue = targetValue
+    self.setType = setType
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(setNumber, forKey: .setNumber)
+    try container.encode(targetReps, forKey: .targetReps)
+    try container.encodeIfPresent(targetRepsMax, forKey: .targetRepsMax)
+    try container.encode(intensityMode, forKey: .intensityMode)
+    try container.encode(Self.targetValueString(from: targetValue), forKey: .targetValue)
+    try container.encode(setType, forKey: .setType)
+  }
+
+  private static func targetValueString(from decimal: Decimal) -> String {
+    var value = decimal
+    var rounded = Decimal()
+    NSDecimalRound(&rounded, &value, 2, .plain)
+    return NSDecimalNumber(decimal: rounded).stringValue
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case setNumber
+    case targetReps
+    case targetRepsMax
+    case intensityMode
+    case targetValue
+    case setType
+  }
+}
+
 public struct PlanDTO: Codable, Equatable, Sendable {
   public let id: UUID
   public let coachID: UUID
