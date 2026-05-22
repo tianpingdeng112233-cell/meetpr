@@ -23,7 +23,9 @@ public enum DemoUserSeed {
   /// The build picks coach vs. this in MeetPRApp via `#if DEMO_USER_STUDENT` — the
   /// flag lives on the app target, which (unlike SPM packages) receives it.
   public static let coachedStudent = User(
-    id: UUID(uuidString: "02400000-0000-0000-0000-000000000101")!,
+    // = 02400000-0000-0000-0000-000000000101 (StudentDemoSeed.studentID); tuple form
+    // avoids a production-path force unwrap.
+    id: UUID(uuid: (0x02, 0x40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x01)),
     phone: "+15550102400",
     name: "演示学员",
     unitSystem: .metric,

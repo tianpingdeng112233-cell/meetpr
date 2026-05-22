@@ -221,7 +221,7 @@ import Testing
     plan: ProjFixtures.plan(), days: [dayA], exercises: [exA], sets: [],
     catalog: ProjFixtures.catalog(), weekIndex: 1
   )
-  #expect(viewW1.days.first?.date == ProjFixtures.now)
+  #expect(viewW1.days.first?.date == ProjFixtures.expectedDate(week: 1, dayOfWeek: 1))
 
   let viewW2 = PlanToStudentProjection.project(
     plan: ProjFixtures.plan(), days: [dayB], exercises: [exB], sets: [],
@@ -344,7 +344,12 @@ private enum ProjFixtures {
   static func expectedDate(week: Int, dayOfWeek: Int, from startDate: Date = now) -> Date {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+    calendar.firstWeekday = 2
+    let startOfDay = calendar.startOfDay(for: startDate)
+    let daysFromMonday = (calendar.component(.weekday, from: startOfDay) + 5) % 7
+    let weekStart =
+      calendar.date(byAdding: .day, value: -daysFromMonday, to: startOfDay) ?? startOfDay
     let offset = (week - 1) * 7 + (dayOfWeek - 1)
-    return calendar.date(byAdding: .day, value: offset, to: startDate) ?? startDate
+    return calendar.date(byAdding: .day, value: offset, to: weekStart) ?? weekStart
   }
 }

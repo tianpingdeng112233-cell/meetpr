@@ -97,12 +97,20 @@ public enum PlanToStudentProjection {
   }
 
   /// The plan stores only `(weekNumber, dayOfWeek)`; the student view needs a real
-  /// date, anchored at `startDate` (cycle week 1, dayOfWeek 1). A fixed UTC
-  /// calendar keeps the result deterministic regardless of machine timezone.
+  /// calendar date. `dayOfWeek` is an ISO weekday (1 = Monday), so week 1 / dayOfWeek 1
+  /// anchors to the **Monday of `startDate`'s week** (matching StudentDemoSeed), not to
+  /// `startDate` itself — `startDate` is "today" and may land on any weekday, so
+  /// anchoring there would shift every training day to the wrong calendar date. A fixed
+  /// UTC calendar keeps the result deterministic regardless of machine timezone.
   private static func date(for day: PlanDay, startDate: Date) -> Date {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+    calendar.firstWeekday = 2  // Monday
+    let startOfDay = calendar.startOfDay(for: startDate)
+    let daysFromMonday = (calendar.component(.weekday, from: startOfDay) + 5) % 7
+    let weekStart =
+      calendar.date(byAdding: .day, value: -daysFromMonday, to: startOfDay) ?? startOfDay
     let offset = (day.weekNumber - 1) * 7 + (day.dayOfWeek - 1)
-    return calendar.date(byAdding: .day, value: offset, to: startDate) ?? startDate
+    return calendar.date(byAdding: .day, value: offset, to: weekStart) ?? weekStart
   }
 }
