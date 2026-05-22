@@ -3,7 +3,11 @@ import Foundation
 
 @available(iOS 17.0, macOS 14.0, *)
 public actor DemoTokenStore: TokenStoring {
-  public init() {}
+  private let user: User
+
+  public init(user: User = DemoUserSeed.coach) {
+    self.user = user
+  }
 
   public func save(access: String, refresh: String) async {}
 
@@ -18,7 +22,7 @@ public actor DemoTokenStore: TokenStoring {
   }
 
   public func cachedUser() async -> User? {
-    DemoUserSeed.currentUser
+    user
   }
 
   public func clear() async {}

@@ -20,6 +20,8 @@ public enum DemoUserSeed {
   /// `StudentDemoSeed.studentID` so the logged-in user lines up with the seeded
   /// plan/logs/feedback; StudentRootView seeds independently, so only the
   /// `.coachedStudent` role is load-bearing (it routes RootView to the student UI).
+  /// The build picks coach vs. this in MeetPRApp via `#if DEMO_USER_STUDENT` — the
+  /// flag lives on the app target, which (unlike SPM packages) receives it.
   public static let coachedStudent = User(
     id: UUID(uuidString: "02400000-0000-0000-0000-000000000101")!,
     phone: "+15550102400",
@@ -29,16 +31,6 @@ public enum DemoUserSeed {
     createdAt: timestamp,
     updatedAt: timestamp
   )
-
-  /// The demo user this build logs in as. `DEMO_USER_STUDENT` (defined by the
-  /// MeetPR-DemoStudent scheme) selects the student; otherwise the coach.
-  public static var currentUser: User {
-    #if DEMO_USER_STUDENT
-      coachedStudent
-    #else
-      coach
-    #endif
-  }
 
   private static let timestamp = Date(timeIntervalSince1970: 1_778_371_200)
 }

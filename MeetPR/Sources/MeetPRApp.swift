@@ -15,8 +15,13 @@ struct MeetPRApp: App {
     self.draftStore = draftStore
 
     #if DEMO_MODE
-      let auth: any AuthRepository = DemoAuthRepository()
-      let tokenStore: any TokenStoring = DemoTokenStore()
+      #if DEMO_USER_STUDENT
+        let demoUser = DemoUserSeed.coachedStudent
+      #else
+        let demoUser = DemoUserSeed.coach
+      #endif
+      let auth: any AuthRepository = DemoAuthRepository(user: demoUser)
+      let tokenStore: any TokenStoring = DemoTokenStore(user: demoUser)
     #else
       let api = APIClient.shared
       let auth: any AuthRepository = NetworkingAuthRepository(api: api)
