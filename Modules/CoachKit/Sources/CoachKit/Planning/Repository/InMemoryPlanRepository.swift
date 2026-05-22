@@ -26,6 +26,14 @@ public actor InMemoryPlanRepository: PlanRepository {
     )
   }
 
+  public static func preview(store: (any StudentPlanStore)?) -> InMemoryPlanRepository {
+    InMemoryPlanRepository(
+      students: previewStudents(),
+      catalog: previewCatalog(),
+      store: store
+    )
+  }
+
   public func fetchStudents() async throws -> [CoachStudentSummary] {
     students
   }

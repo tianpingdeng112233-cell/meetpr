@@ -1,6 +1,7 @@
 // swiftlint:disable sorted_imports
 import CoreModels
 import Foundation
+import Networking
 import OSLog
 import Observation
 
@@ -24,6 +25,7 @@ public final class Session {
   @ObservationIgnored private let auth: any AuthRepository
   @ObservationIgnored private let tokenStore: any TokenStoring
   @ObservationIgnored private let onLogout: (@Sendable () async -> Void)?
+  @ObservationIgnored private var errorTask: Task<Void, Never>?
 
   public init(
     auth: any AuthRepository,
@@ -91,8 +93,40 @@ public final class Session {
     state = .anonymous
   }
 
+  public func bindToErrors(_ errorStream: AsyncStream<APIError>) {
+    errorTask?.cancel()
+    errorTask = Task { [weak self] in
+      for await error in errorStream {
+        guard case .authInvalid = error else { continue }
+        await self?.logout()
+      }
+    }
+  }
+
   private func persist(_ result: AuthResult) async {
     await tokenStore.save(access: result.accessToken, refresh: result.refreshToken)
     await tokenStore.saveUser(result.user)
   }
 }
+
+@available(iOS 17.0, macOS 14.0, *)
+extension Session: SessionStateReader {
+  public func accessToken() async throws -> String {
+    guard let accessToken = await tokenStore.accessToken() else {
+      throw SessionStateReaderError.missingAccessToken
+    }
+    return accessToken
+  }
+
+  public func currentUser() async throws -> User {
+    switch state {
+    case .authenticated(let user):
+      return user
+    case .anonymous, .authenticating:
+      throw SessionStateReaderError.missingCurrentUser
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+extension Session: @unchecked Sendable {}
