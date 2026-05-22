@@ -9,6 +9,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../CoreModels"),
+    .package(path: "../RepositoryContracts"),
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
   ],
@@ -17,6 +18,7 @@ let package = Package(
       name: "StudentKit",
       dependencies: [
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
       ],
@@ -24,7 +26,11 @@ let package = Package(
     ),
     .testTarget(
       name: "StudentKitTests",
-      dependencies: ["StudentKit"],
+      dependencies: [
+        "StudentKit",
+        .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+      ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
   ]
