@@ -31,10 +31,10 @@ public struct CreateFeedbackRequestDTO: Encodable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case studentID = "studentId"
-    case dayDate
-    case planExerciseID = "planExerciseId"
-    case text
+    case studentID = "student_id"
+    case dayDate = "day_date"
+    case planExerciseID = "plan_exercise_id"
+    case text = "text"
   }
 }
 
@@ -44,6 +44,12 @@ public struct FeedbackItemsResponseDTO: Codable, Equatable, Sendable {
   public init(items: [FeedbackDTO]) {
     self.items = items
   }
+
+  // swiftlint:disable redundant_string_enum_value
+  private enum CodingKeys: String, CodingKey {
+    case items = "items"
+  }
+  // swiftlint:enable redundant_string_enum_value
 }
 
 public struct FeedbackDTO: Codable, Equatable, Sendable {
@@ -76,14 +82,32 @@ public struct FeedbackDTO: Codable, Equatable, Sendable {
     self.readAt = readAt
   }
 
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(coachID, forKey: .coachID)
+    try container.encode(studentID, forKey: .studentID)
+
+    if let dayDate {
+      try container.encode(WireFormatting.dateOnlyString(from: dayDate), forKey: .dayDate)
+    } else {
+      try container.encodeNil(forKey: .dayDate)
+    }
+
+    try container.encodeIfPresent(planExerciseID, forKey: .planExerciseID)
+    try container.encode(text, forKey: .text)
+    try container.encode(postedAt, forKey: .postedAt)
+    try container.encodeIfPresent(readAt, forKey: .readAt)
+  }
+
   private enum CodingKeys: String, CodingKey {
-    case id
-    case coachID = "coachId"
-    case studentID = "studentId"
-    case dayDate
-    case planExerciseID = "planExerciseId"
-    case text
-    case postedAt
-    case readAt
+    case id = "id"
+    case coachID = "coach_id"
+    case studentID = "student_id"
+    case dayDate = "day_date"
+    case planExerciseID = "plan_exercise_id"
+    case text = "text"
+    case postedAt = "posted_at"
+    case readAt = "read_at"
   }
 }

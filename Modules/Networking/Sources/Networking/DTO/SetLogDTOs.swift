@@ -36,12 +36,12 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case planExerciseID = "planExerciseId"
-    case setIndex
-    case weightKg
-    case reps
-    case rpe
-    case completed
+    case planExerciseID = "plan_exercise_id"
+    case setIndex = "set_index"
+    case weightKg = "weight_kg"
+    case reps = "reps"
+    case rpe = "rpe"
+    case completed = "completed"
   }
 }
 
@@ -55,8 +55,8 @@ public struct CreateSetLogResponseDTO: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
-    case loggedAt
+    case id = "id"
+    case loggedAt = "logged_at"
   }
 }
 
@@ -66,6 +66,12 @@ public struct SetLogsResponseDTO: Codable, Equatable, Sendable {
   public init(logs: [SetLogDTO]) {
     self.logs = logs
   }
+
+  // swiftlint:disable redundant_string_enum_value
+  private enum CodingKeys: String, CodingKey {
+    case logs = "logs"
+  }
+  // swiftlint:enable redundant_string_enum_value
 }
 
 public struct SetLogDTO: Codable, Equatable, Sendable {
@@ -128,14 +134,14 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
-    case studentID = "studentId"
-    case planExerciseID = "planExerciseId"
-    case setIndex
-    case weightKg
-    case reps
-    case rpe
-    case completed
-    case loggedAt
+    case id = "id"
+    case studentID = "student_id"
+    case planExerciseID = "plan_exercise_id"
+    case setIndex = "set_index"
+    case weightKg = "weight_kg"
+    case reps = "reps"
+    case rpe = "rpe"
+    case completed = "completed"
+    case loggedAt = "logged_at"
   }
 }

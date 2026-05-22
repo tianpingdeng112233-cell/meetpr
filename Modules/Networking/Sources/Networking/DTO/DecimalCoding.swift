@@ -40,7 +40,14 @@ extension KeyedDecodingContainer {
 
 extension KeyedEncodingContainer {
   mutating func encodeDecimalString(_ decimal: Decimal, forKey key: Key) throws {
-    try encode(NSDecimalNumber(decimal: decimal).stringValue, forKey: key)
+    let stringValue: String
+    if let scale = wireDecimalScale(for: key.stringValue) {
+      stringValue = fixedScaleDecimalString(decimal, scale: scale)
+    } else {
+      stringValue = NSDecimalNumber(decimal: decimal).stringValue
+    }
+
+    try encode(stringValue, forKey: key)
   }
 
   mutating func encodeDecimalStringIfPresent(_ decimal: Decimal?, forKey key: Key) throws {
@@ -50,4 +57,34 @@ extension KeyedEncodingContainer {
 
     try encodeDecimalString(decimal, forKey: key)
   }
+}
+
+private func wireDecimalScale(for key: String) -> Int? {
+  switch key {
+  case "target_value", "weight_kg":
+    2
+  case "rpe":
+    1
+  default:
+    nil
+  }
+}
+
+private func fixedScaleDecimalString(_ decimal: Decimal, scale: Int) -> String {
+  var value = decimal
+  var rounded = Decimal()
+  NSDecimalRound(&rounded, &value, scale, .plain)
+
+  let rawValue = NSDecimalNumber(decimal: rounded).stringValue
+  let parts = rawValue.split(separator: ".", omittingEmptySubsequences: false)
+  let whole = String(parts.first ?? "0")
+  let fraction = parts.count > 1 ? String(parts[1]) : ""
+
+  guard scale > 0 else {
+    return whole
+  }
+
+  let paddingCount = max(0, scale - fraction.count)
+  let paddedFraction = String(fraction.prefix(scale)) + String(repeating: "0", count: paddingCount)
+  return "\(whole).\(paddedFraction)"
 }

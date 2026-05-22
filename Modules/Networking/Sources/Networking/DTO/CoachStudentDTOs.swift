@@ -6,6 +6,12 @@ public struct CoachStudentsResponseDTO: Codable, Equatable, Sendable {
   public init(students: [CoachStudentSummaryDTO]) {
     self.students = students
   }
+
+  // swiftlint:disable redundant_string_enum_value
+  private enum CodingKeys: String, CodingKey {
+    case students = "students"
+  }
+  // swiftlint:enable redundant_string_enum_value
 }
 
 public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
@@ -27,10 +33,10 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
-    case displayName
-    case profile
-    case status
+    case id = "id"
+    case displayName = "display_name"
+    case profile = "profile"
+    case status = "status"
   }
 }
 
@@ -46,8 +52,8 @@ public struct CoachStudentProfileDTO: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case userID = "userId"
-    case displayName
-    case createdAt
+    case userID = "user_id"
+    case displayName = "display_name"
+    case createdAt = "created_at"
   }
 }

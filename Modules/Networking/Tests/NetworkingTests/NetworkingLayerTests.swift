@@ -55,7 +55,7 @@ import Testing
     }
     """
 
-  let dto = try MeetPRCodec.decoder.decode(PlanWithChildrenDTO.self, from: Data(json.utf8))
+  let dto = try LoopJSONCodec.decoder.decode(PlanWithChildrenDTO.self, from: Data(json.utf8))
   let domain = dto.toDomain()
 
   #expect(domain.plan.name == "Cycle 1")
@@ -80,7 +80,7 @@ import Testing
     }
     """
 
-  let dto = try MeetPRCodec.decoder.decode(SetLogDTO.self, from: Data(json.utf8))
+  let dto = try LoopJSONCodec.decoder.decode(SetLogDTO.self, from: Data(json.utf8))
   let domain = dto.toDomain()
 
   #expect(domain.weightKg == Decimal(100))
@@ -102,7 +102,7 @@ import Testing
     }
     """
 
-  let dto = try MeetPRCodec.decoder.decode(FeedbackDTO.self, from: Data(json.utf8))
+  let dto = try LoopJSONCodec.decoder.decode(FeedbackDTO.self, from: Data(json.utf8))
   let domain = dto.toDomain()
   let postedAt = try isoDate("2026-05-22T12:00:00.000Z")
 
@@ -146,8 +146,8 @@ import Testing
   #expect(planJSON.contains(#""start_date":"2026-05-22""#))
   #expect(planJSON.contains(#""end_date":"2026-06-18""#))
   #expect(setJSON.contains(#""plan_exercise_id":"00000000-0000-4000-8000-000000000301""#))
-  #expect(setJSON.contains(#""weight_kg":"100""#))
-  #expect(setJSON.contains(#""rpe":"8""#))
+  #expect(setJSON.contains(#""weight_kg":"100.00""#))
+  #expect(setJSON.contains(#""rpe":"8.0""#))
   #expect(feedbackJSON.contains(#""student_id":"00000000-0000-4000-8000-000000000302""#))
   #expect(feedbackJSON.contains(#""day_date":"2026-05-22""#))
 }
@@ -272,7 +272,7 @@ func typedEndpointsUseWireContractPaths() async throws {
 }
 
 private func jsonString(_ value: some Encodable) throws -> String {
-  let data = try MeetPRCodec.encoder.encode(value)
+  let data = try LoopJSONCodec.encoder.encode(value)
   return try #require(String(data: data, encoding: .utf8))
 }
 

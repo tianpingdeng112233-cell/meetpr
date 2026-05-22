@@ -47,13 +47,13 @@ public struct CreatePlanRequestDTO: Encodable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case traineeID = "traineeId"
-    case name
-    case startDate
-    case endDate
-    case planWeeks
-    case source
-    case sourceTemplateID = "sourceTemplateId"
+    case traineeID = "trainee_id"
+    case name = "name"
+    case startDate = "start_date"
+    case endDate = "end_date"
+    case planWeeks = "plan_weeks"
+    case source = "source"
+    case sourceTemplateID = "source_template_id"
   }
 }
 
@@ -99,19 +99,35 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     self.updatedAt = updatedAt
   }
 
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(coachID, forKey: .coachID)
+    try container.encode(traineeID, forKey: .traineeID)
+    try container.encode(name, forKey: .name)
+    try container.encode(WireFormatting.dateOnlyString(from: startDate), forKey: .startDate)
+    try container.encode(WireFormatting.dateOnlyString(from: endDate), forKey: .endDate)
+    try container.encode(planWeeks, forKey: .planWeeks)
+    try container.encode(source, forKey: .source)
+    try container.encodeIfPresent(sourceTemplateID, forKey: .sourceTemplateID)
+    try container.encode(status, forKey: .status)
+    try container.encode(createdAt, forKey: .createdAt)
+    try container.encode(updatedAt, forKey: .updatedAt)
+  }
+
   private enum CodingKeys: String, CodingKey {
-    case id
-    case coachID = "coachId"
-    case traineeID = "traineeId"
-    case name
-    case startDate
-    case endDate
-    case planWeeks
-    case source
-    case sourceTemplateID = "sourceTemplateId"
-    case status
-    case createdAt
-    case updatedAt
+    case id = "id"
+    case coachID = "coach_id"
+    case traineeID = "trainee_id"
+    case name = "name"
+    case startDate = "start_date"
+    case endDate = "end_date"
+    case planWeeks = "plan_weeks"
+    case source = "source"
+    case sourceTemplateID = "source_template_id"
+    case status = "status"
+    case createdAt = "created_at"
+    case updatedAt = "updated_at"
   }
 }
 
@@ -121,6 +137,12 @@ public struct PlansResponseDTO: Codable, Equatable, Sendable {
   public init(plans: [PlanDTO]) {
     self.plans = plans
   }
+
+  // swiftlint:disable redundant_string_enum_value
+  private enum CodingKeys: String, CodingKey {
+    case plans = "plans"
+  }
+  // swiftlint:enable redundant_string_enum_value
 }
 
 public struct PlanWithChildrenDTO: Codable, Equatable, Sendable {
@@ -144,9 +166,11 @@ public struct PlanWithChildrenDTO: Codable, Equatable, Sendable {
     try container.encode(days, forKey: .days)
   }
 
+  // swiftlint:disable redundant_string_enum_value
   private enum CodingKeys: String, CodingKey {
-    case days
+    case days = "days"
   }
+  // swiftlint:enable redundant_string_enum_value
 }
 
 public struct PlanDayDTO: Codable, Equatable, Sendable {
@@ -174,12 +198,12 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
-    case planID = "planId"
-    case dayOfWeek
-    case weekNumber
-    case sortOrder
-    case exercises
+    case id = "id"
+    case planID = "plan_id"
+    case dayOfWeek = "day_of_week"
+    case weekNumber = "week_number"
+    case sortOrder = "sort_order"
+    case exercises = "exercises"
   }
 }
 
@@ -211,13 +235,13 @@ public struct PlanExerciseDTO: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
-    case planDayID = "planDayId"
-    case exerciseID = "exerciseId"
-    case isMainLift
-    case sortOrder
-    case notes
-    case sets
+    case id = "id"
+    case planDayID = "plan_day_id"
+    case exerciseID = "exercise_id"
+    case isMainLift = "is_main_lift"
+    case sortOrder = "sort_order"
+    case notes = "notes"
+    case sets = "sets"
   }
 }
 
@@ -281,14 +305,14 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
-    case planExerciseID = "planExerciseId"
-    case setNumber
-    case targetReps
-    case targetRepsMax
-    case intensityMode
-    case targetValue
-    case setType
-    case createdAt
+    case id = "id"
+    case planExerciseID = "plan_exercise_id"
+    case setNumber = "set_number"
+    case targetReps = "target_reps"
+    case targetRepsMax = "target_reps_max"
+    case intensityMode = "intensity_mode"
+    case targetValue = "target_value"
+    case setType = "set_type"
+    case createdAt = "created_at"
   }
 }

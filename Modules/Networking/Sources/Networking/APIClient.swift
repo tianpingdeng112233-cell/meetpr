@@ -83,7 +83,7 @@ public final class APIClient: Sendable {
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
     let data = try await perform(request)
-    return try MeetPRCodec.decoder.decode(responseType, from: data)
+    return try LoopJSONCodec.decoder.decode(responseType, from: data)
   }
 
   public func post<Request: Encodable, Response: Decodable>(
@@ -95,12 +95,12 @@ public final class APIClient: Sendable {
     var request = URLRequest(url: url(path: path))
     request.httpMethod = "POST"
     authorize(&request, accessToken: accessToken)
-    request.httpBody = try MeetPRCodec.encoder.encode(body)
+    request.httpBody = try LoopJSONCodec.encoder.encode(body)
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
     let data = try await perform(request)
-    return try MeetPRCodec.decoder.decode(responseType, from: data)
+    return try LoopJSONCodec.decoder.decode(responseType, from: data)
   }
 
   public func post<Response: Decodable>(
@@ -114,7 +114,7 @@ public final class APIClient: Sendable {
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
     let data = try await perform(request)
-    return try MeetPRCodec.decoder.decode(responseType, from: data)
+    return try LoopJSONCodec.decoder.decode(responseType, from: data)
   }
 
   public func patchNoContent(path: String, accessToken: String) async throws {

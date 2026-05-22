@@ -10,9 +10,16 @@ enum WireFormatting {
       let month = components.month,
       let day = components.day
     else {
-      return ""
+      preconditionFailure("Date could not be converted to YYYY-MM-DD components.")
     }
 
-    return String(format: "%04d-%02d-%02d", year, month, day)
+    return
+      "\(zeroPadded(year, length: 4))-\(zeroPadded(month, length: 2))-\(zeroPadded(day, length: 2))"
+  }
+
+  private static func zeroPadded(_ value: Int, length: Int) -> String {
+    let rawValue = String(value)
+    let paddingCount = max(0, length - rawValue.count)
+    return String(repeating: "0", count: paddingCount) + rawValue
   }
 }
