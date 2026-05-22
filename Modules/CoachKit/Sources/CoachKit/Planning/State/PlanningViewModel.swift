@@ -321,12 +321,11 @@ public final class PlanningViewModel {
   public func proceedToStep5() async throws {
     try validateStep(.selectAccessories)
     if let draftPlan {
-      draftPlan.currentStepRawValue = PlanningStep.fillW1Intensity.rawValue
+      draftPlan.currentStepRawValue = PlanningStep.selectAccessories.rawValue
       try draftStore.saveDraft(draftPlan)
     } else {
-      try persistDraft(currentStep: .fillW1Intensity)
+      try persistDraft(currentStep: .selectAccessories)
     }
-    path.append(.fillW1Intensity)
   }
 
   public var sortedDraftExercises: [DraftPlanExercise] {
@@ -929,14 +928,13 @@ extension PlanningViewModel {
     case .selectAccessories:
       [.selectDuration, .assignFrequency, .selectMainLifts, .selectAccessories]
     case .fillW1Intensity:
-      [.selectDuration, .assignFrequency, .selectMainLifts, .selectAccessories, .fillW1Intensity]
+      [.selectDuration, .assignFrequency, .selectMainLifts, .selectAccessories]
     case .configureRules:
       [
         .selectDuration,
         .assignFrequency,
         .selectMainLifts,
         .selectAccessories,
-        .fillW1Intensity,
         .configureRules,
       ]
     case .previewWeekCards:
@@ -946,7 +944,6 @@ extension PlanningViewModel {
           .assignFrequency,
           .selectMainLifts,
           .selectAccessories,
-          .fillW1Intensity,
           .configureRules,
           .previewWeekCards,
         ]
@@ -956,7 +953,6 @@ extension PlanningViewModel {
           .assignFrequency,
           .selectMainLifts,
           .selectAccessories,
-          .fillW1Intensity,
           .previewWeekCards,
         ]
       }

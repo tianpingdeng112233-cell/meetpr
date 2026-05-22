@@ -36,7 +36,7 @@ import Testing
   let restored = PlanningViewModel(repository: PlanningFixtures.repository(), draftStore: store)
   await restored.bootstrap()
 
-  #expect(restored.currentStep == .fillW1Intensity)
+  #expect(restored.currentStep == .selectAccessories)
   #expect(restored.w1SetSpecs[exercise.id]?.targetValue == 122.5)
 }
 

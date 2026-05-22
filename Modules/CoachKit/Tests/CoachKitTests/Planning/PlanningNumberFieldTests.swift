@@ -54,6 +54,18 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func planningNumberFieldEditingValueCanPersistBeforeBlur() throws {
+  let value = PlanningNumberField.editingValue(
+    from: "85",
+    range: 0...300,
+    decimalIncrement: PlanningDecimalStep.half
+  )
+
+  #expect(value == 85)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func planningNumberFieldIncrementButtonAddsStep() throws {
   let probe = NumberProbe(100)
   let inspected = try planningNumberField(probe: probe, range: 0...200).inspect()
