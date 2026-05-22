@@ -161,14 +161,16 @@ Claude 裁决三种结果:
 
 ## PR review pass(Claude 开的任何 PR 你做 second-pair-of-eyes)
 
-**触发**:User paste 一段 self-contained review prompt(包含 PR # + URL + PR trigger 上下文 + review 任务)。这是 Claude 开 PR 后必经的流程,**不论 doc 还是 code**(Claude 端规定见 [`CLAUDE.md` §PR Codex review pass](./CLAUDE.md))。
+**触发**:Claude 通过 `/review-loop` 用 `codex exec`(read-only)**自动发起**——开 PR 前在工作区未提交改动上跑本地多轮互审 + 对质,无需 User 手动 paste。你在本地循环里审未提交 diff、按输出契约回应、**不改任何文件**;PR 开出后再做一次 PR 级最终 gate。这是 Claude 起草任何产物后必经的流程,**不论 doc 还是 code**(Claude 端规定见 [`CLAUDE.md` §PR Codex review pass](./CLAUDE.md))。
 
 > **背景**:CLAUDE.md §角色 已规定 Claude 也写 Swift 代码(过去 default 走你,你限额触顶 Claude 接管 code 实装)。无论谁写,另一方必 review = 双向 second-pair-of-eyes。本节定义 Claude → 你 review 这一向;反向(你写 code → Claude review)是既有流程。
 
 ### 你做什么
 
-1. **读** PR diff(`gh pr diff NN`)+ 涉及文件全文 + 任何相关上下文(ADR / 上游 spec / xlsx / 现有 view 等)
-2. **不动 PR 内任何文件**(纯 review,不开 commit / 不 push)
+1. **读改动**:
+   - **本地循环**(主):跑 `git status` + `git diff` 看工作区未提交改动(含 untracked 新文件)+ 涉及文件全文 + 相关上下文(ADR / 上游 spec / xlsx / 现有 view 等)
+   - **PR 级最终 gate**:`gh pr diff NN` + 同上下文
+2. **不改任何文件**(纯 review,不 commit / 不 push;本地循环里你是 `-s read-only`,物理上也改不了)——单写者:只有 Claude 改文件
 3. **找问题**(按 PR 类型选 checklist):
 
    **Doc / spec / ADR / *.md PR**(模板 spec 022 Q1):
@@ -191,18 +193,19 @@ Claude 裁决三种结果:
    **`project.pbxproj` / build config / scheme PR**:
    - INFOPLIST_KEY 是否 dead(GENERATE_INFOPLIST_FILE=NO 下的)/ signing setup / scheme 跟 build configuration 一致
 
-4. **回 review** via `gh pr review NN --repo OWNER/REPO --comment --body "..."`(可多次发,每条 finding 一段)
-   - **⚠️ same-account 限制**(per Codex review PR #53 finding P1):你通过 `gh` 用 David 账号 pose,跟 PR author 同账号,GitHub **拒绝自审**(`--approve` / `--request-changes` 都返 `422 Can not approve your own pull request`)。**always use `--comment`**;严重 blocker 在 body 内显式标 `## ⚠️ BLOCKER` 让 user 一眼看到
-   - 即便不能 `--request-changes`,blocker 也必须在 PR body 里明确,user 看到会决定让 Claude 改 PR 后再合
-5. **报告给 user**(简短 ack):列 finding 数 + 严重度分类(P1 BLOCKER / P2 应修 / P3 建议)+ PR comments URL,1-3 行
+4. **回应方式**(两种,按场景):
+   - **本地循环里**(主):按 `/review-loop` 输出契约回 stdout——逐条 finding,BLOCKER 用 `## ⚠️ BLOCKER` 起头、非阻塞用 `## nit`,最后另起一行只输出 `VERDICT: CLEAN` 或 `VERDICT: BLOCKERS`;对质时另起一行只输出 `CONCEDE`(接受反驳/撤销该 finding)或 `HOLD`(坚持)。Claude 据此判定收敛并逐条处置,**不走 GitHub**。
+   - **PR 级最终 gate**:用 `gh pr review NN --repo OWNER/REPO --comment --body "..."`(每条 finding 一段)。
+     - **⚠️ same-account 限制**(per Codex review PR #53 finding P1):你通过 `gh` 用 David 账号 pose,跟 PR author 同账号,GitHub **拒绝自审**(`--approve` / `--request-changes` 都返 `422 Can not approve your own pull request`)。**always use `--comment`**;严重 blocker 在 body 内显式标 `## ⚠️ BLOCKER`。
+     - 因草稿已本地洗过,这步通常一遍 CLEAN;若仍发现 blocker,在 comment 里明确,user 决定让 Claude 改后再合。
+5. **报告给 user**(简短 ack):列 finding 数 + 严重度分类(P1 BLOCKER / P2 应修 / P3 建议),1-3 行;本地循环报轮次进展,PR gate 附 PR comments URL。
 
 ### Claude amend 后是否要你 re-review
 
-(per Codex review PR #53 finding P2b — 之前没说)
+(per Codex review PR #53 finding P2b;2026-05-22 起由 `/review-loop` 自动化)
 
-- **要 re-review**:Claude 在 Codex review 后做的 **非 typo amend**(改了 finding 涉及内容 / 改了 SPEC 实质 / 改了规则 wording)→ user 会再 paste 一次 review prompt 给你跑 second pass
-- **免 re-review**:typo / metadata 字段填值 / 单纯 commit message 改(不动 SPEC body)/ 紧急 hotfix(per CLAUDE.md 例外列表)
-- 你 second pass 时:read 同 PR diff(已 force-push 的新 commit) + 上次 review comments + 看 Claude 是否真采纳;若仍有遗漏 finding,继续 `--comment` 回新 finding
+- **本地循环内**(主):Claude 每改一轮后通过 `codex exec resume --last` 让你**复审当前未提交改动**(recheck)——你记得上一轮的 finding,复述并核对 Claude 是否真采纳,再回一行 `VERDICT`。无需 user 手动重 paste。
+- **PR 级最终 gate 后**:若 Claude 在 PR 上做了 **非 typo amend**(改了 finding 涉及内容 / SPEC 实质 / 规则 wording),需再过一次最终 gate;**typo / metadata 字段填值 / 单纯 commit message 改(不动 SPEC body)/ 紧急 hotfix**(per CLAUDE.md 例外列表)免 re-review。
 
 ### 跟 §文档质疑权 (CHALLENGE.md) 的边界
 
@@ -210,7 +213,7 @@ Claude 裁决三种结果:
 
 | 情境 | 走 PR review pass 还是 CHALLENGE? |
 |---|---|
-| 发现 SPEC 数字 / API name / 路径错(spec 022 Q1 模板) | PR review pass(`gh pr review --comment`) |
+| 发现 SPEC 数字 / API name / 路径错(spec 022 Q1 模板) | PR review pass(本地 `/review-loop`;PR 级最终 gate 才用 `gh pr review --comment`) |
 | 发现 SPEC 缺细节 / 歧义 / 跟现有 ADR contradicts | PR review pass |
 | 发现 SPEC 的**设计决策本身**有 fundamental 问题(e.g., 要求用一个 API 但该 API iOS 17 删了 / 架构方向跟 ADR-005 反向)且 review comment 不够分量 | **CHALLENGE.md**(走 §文档质疑权 协议:停止动手 + 写 CHALLENGE.md + 等 user 裁决) |
 | 发现 SPEC 的接口 / 数据 model 不可实现 | CHALLENGE.md |
@@ -219,7 +222,7 @@ Claude 裁决三种结果:
 
 ### 不做的事
 
-- ❌ 不动 PR 内任何文件(纯 review,不 commit;若需修改 → 在 comment 里说"BLOCKER",让 Claude 改 PR 内容)
+- ❌ 不改任何文件(本地未提交改动或 PR 内皆然;本地循环里你是 read-only,物理上也改不了)——要改 → finding 里标 `## ⚠️ BLOCKER`,让 Claude 改
 - ❌ 不自己 merge(merge 决策仍归 user)
 - ❌ 不质疑 SPEC 的设计决策**用 PR review**(走 §文档质疑权 CHALLENGE.md 协议)
 - ❌ 不开新 spec(本 review 仅给现 PR 反馈)
@@ -227,6 +230,8 @@ Claude 裁决三种结果:
 ### 缘起
 
 2026-05-13 加。spec 022 由 Claude 写,你 impl 时 catch 到 436 vs 435 事实错误 + PlanningDisplay 中文映射 SPEC 漏。**前置你做 review 能省一次 amendment cycle,提高 PR quality 进入 merge 前的成熟度**。同日扩 Claude 也写 code(你限额 fallback)→ scope 包含 code PR(不只 doc)。规则本身也经你 review(meta:PR #53),3 个 findings 全采纳改进了 wording(same-account `--approve` 限制 / re-review 触发条件 / 跟 CHALLENGE 边界)。
+
+2026-05-22:手动 paste 流程(3 处往返)自动化为 `/review-loop`——Claude 用 `codex exec`(read-only)本地发起多轮互审 + 对质,收敛后才开 PR,PR 级 review 退化为最终 gate。设计决策见 design doc(`~/ClaudeConfig/docs/specs/2026-05-22-claude-codex-review-loop-design.md`,设计期文档);**命令契约以 [`review-loop` skill](~/ClaudeConfig/skills/review-loop/SKILL.md) 为准**(design doc 里 `codex review --uncommitted` 等已被实现期 findings 取代)。本次 amendment 即该 skill 的首次实跑(dogfood)。
 
 ---
 
