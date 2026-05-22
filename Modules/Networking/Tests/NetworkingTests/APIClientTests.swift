@@ -32,6 +32,35 @@ import Testing
   #expect(request.httpBody == Data(#"{"phone":"+8613800000001"}"#.utf8))
 }
 
+@Test func legacyEndpointPreserves401BodyAndDoesNotPublishAuthInvalid() async throws {
+  let errorBody = Data(#"{"error":"AUTH_INVALID_CREDENTIALS"}"#.utf8)
+  let client = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { _ in
+    APIResponse(data: errorBody, statusCode: 401)
+  }
+  let recorder = NetworkingErrorEventRecorder()
+  let eventTask = Task {
+    var iterator = client.errorStream.makeAsyncIterator()
+    if let error = await iterator.next() {
+      await recorder.record(error)
+    }
+  }
+  defer {
+    eventTask.cancel()
+  }
+
+  do {
+    _ = try await client.post(.authLogin, body: Data())
+    Issue.record("Expected legacy endpoint to throw APIClientError.httpStatus.")
+  } catch let error as APIClientError {
+    #expect(error == .httpStatus(401, errorBody))
+  } catch {
+    Issue.record("Expected APIClientError.httpStatus, got \(error).")
+  }
+
+  try await Task.sleep(for: .milliseconds(20))
+  #expect(await recorder.error() == nil)
+}
+
 private actor NetworkingRequestCapture {
   private var capturedRequest: URLRequest?
 
@@ -41,5 +70,17 @@ private actor NetworkingRequestCapture {
 
   func request() -> URLRequest? {
     capturedRequest
+  }
+}
+
+private actor NetworkingErrorEventRecorder {
+  private var capturedError: APIError?
+
+  func record(_ error: APIError) {
+    capturedError = error
+  }
+
+  func error() -> APIError? {
+    capturedError
   }
 }
