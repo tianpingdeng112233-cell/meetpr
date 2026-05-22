@@ -239,6 +239,21 @@ enum PlanningFixtures {
     ]
   }
 
+  static func planSets() -> [PlanSet] {
+    [
+      PlanSet(
+        id: uuid(60),
+        planExerciseID: uuid(50),
+        setNumber: 1,
+        targetReps: 5,
+        intensityMode: .weight,
+        targetValue: Decimal(100),
+        setType: .working,
+        createdAt: now
+      )
+    ]
+  }
+
   private static func profile(id: UUID, userID: UUID, days: [Int]) -> StudentProfile {
     StudentProfile(
       id: id,

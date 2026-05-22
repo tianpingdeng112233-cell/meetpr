@@ -1,15 +1,22 @@
 import CoreModels
 import Foundation
+import RepositoryContracts
 
 // swiftlint:disable type_body_length
 public actor InMemoryPlanRepository: PlanRepository {
   private var students: [CoachStudentSummary]
   private var catalog: [Exercise]
   private var publishedPlans: [TrainingPlan] = []
+  private let store: (any StudentPlanStore)?
 
-  public init(students: [CoachStudentSummary], catalog: [Exercise]) {
+  public init(
+    students: [CoachStudentSummary],
+    catalog: [Exercise],
+    store: (any StudentPlanStore)? = nil
+  ) {
     self.students = students
     self.catalog = catalog
+    self.store = store
   }
 
   public static func preview() -> InMemoryPlanRepository {
@@ -59,11 +66,22 @@ public actor InMemoryPlanRepository: PlanRepository {
   public func publishPlan(
     plan: TrainingPlan,
     days: [PlanDay],
-    exercises: [PlanExercise]
+    exercises: [PlanExercise],
+    sets: [PlanSet]
   ) async throws {
-    _ = days
-    _ = exercises
     publishedPlans.append(plan)
+    guard let store else { return }
+    // V0.1 publishes cycle week 1 as the student's current plan; per-date
+    // current-week selection is deferred to backend wiring (spec 026).
+    let projection = PlanToStudentProjection.project(
+      plan: plan,
+      days: days,
+      exercises: exercises,
+      sets: sets,
+      catalog: catalog,
+      weekIndex: 1
+    )
+    await store.savePublishedProjection(projection, forStudent: plan.traineeID)
   }
 
   public func publishedPlansSnapshot() -> [TrainingPlan] {
