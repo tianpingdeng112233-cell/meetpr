@@ -59,7 +59,7 @@ public final class APIClient: Sendable {
   public func get(_ endpoint: Endpoint) async throws -> Data {
     var request = URLRequest(url: url(for: endpoint))
     request.httpMethod = "GET"
-    return try await perform(request)
+    return try await performLegacy(request)
   }
 
   public func post(_ endpoint: Endpoint, body: Data) async throws -> Data {
@@ -68,7 +68,7 @@ public final class APIClient: Sendable {
     request.httpBody = body
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("application/json", forHTTPHeaderField: "accept")
-    return try await perform(request)
+    return try await performLegacy(request)
   }
 
   public func get<Response: Decodable>(
@@ -174,6 +174,18 @@ public final class APIClient: Sendable {
       throw APIError.httpStatus(response.statusCode, response.data)
     }
     return response.data
+  }
+
+  private func performLegacy(_ request: URLRequest) async throws -> Data {
+    do {
+      let response = try await transport(request)
+      guard (200..<300).contains(response.statusCode) else {
+        throw APIClientError.httpStatus(response.statusCode, response.data)
+      }
+      return response.data
+    } catch APIError.invalidResponse {
+      throw APIClientError.invalidResponse
+    }
   }
 
   private static func liveTransport(request: URLRequest) async throws -> APIResponse {
