@@ -10,9 +10,11 @@ import RepositoryContracts
 /// publishes on one device, student fetches on another) is spec 026's backend
 /// wiring, not this in-memory store.
 public actor InMemoryPlanStore: StudentPlanStore {
-  private var projections: [UUID: StudentPlanView] = [:]
+  private var projections: [UUID: StudentPlanView]
 
-  public init() {}
+  public init(seed: [UUID: StudentPlanView] = [:]) {
+    self.projections = seed
+  }
 
   public func savePublishedProjection(
     _ projection: StudentPlanView,

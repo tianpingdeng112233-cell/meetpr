@@ -1,4 +1,5 @@
 import CoreModels
+import DesignSystem
 import Foundation
 import RepositoryContracts
 import SwiftUI
@@ -9,6 +10,7 @@ public struct StudentRootView: View {
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   @State private var feedbackViewModel: FeedbackInboxViewModel
+  @State private var selectedTab: StudentTab = .dashboard
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -40,23 +42,34 @@ public struct StudentRootView: View {
   }
 
   public var body: some View {
-    TabView {
-      TodayWorkoutView(studentID: studentID, plans: plans, logs: logs)
-        .tabItem {
-          Label("今天", systemImage: "figure.strengthtraining.traditional")
-        }
+    TabView(selection: $selectedTab) {
+      DashboardView(
+        studentID: studentID,
+        plans: plans,
+        logs: logs,
+        feedbackViewModel: feedbackViewModel,
+        onStartWorkout: { selectedTab = .workout },
+        onSeeAllFeedback: { selectedTab = .feedback }
+      )
+      .tag(StudentTab.dashboard)
+      .tabItem {
+        Label("仪表盘", systemImage: "square.grid.2x2.fill")
+      }
 
-      WeekOverviewView(studentID: studentID, plans: plans, logs: logs)
+      TodayWorkoutView(studentID: studentID, plans: plans, logs: logs)
+        .tag(StudentTab.workout)
         .tabItem {
-          Label("本周", systemImage: "calendar")
+          Label("锻炼", systemImage: "figure.strengthtraining.traditional")
         }
 
       TrainingHistoryView(studentID: studentID, plans: plans, logs: logs)
+        .tag(StudentTab.history)
         .tabItem {
           Label("历史", systemImage: "clock.arrow.circlepath")
         }
 
       FeedbackInboxView(studentID: studentID, viewModel: feedbackViewModel)
+        .tag(StudentTab.feedback)
         .tabItem {
           Label("反馈", systemImage: "bubble.left")
         }
@@ -67,7 +80,16 @@ public struct StudentRootView: View {
         await feedbackViewModel.load(studentID: studentID)
       }
     }
+    .tint(Color.MeetPR.brandRed)
+    .preferredColorScheme(.dark)
   }
+}
+
+private enum StudentTab: Hashable {
+  case dashboard
+  case workout
+  case history
+  case feedback
 }
 
 private actor StudentRootDemoPlanStore: StudentPlanStore {
