@@ -17,6 +17,9 @@ reporter: xcode
 
 disabled_rules:
   - trailing_comma
+  # brace 位置由 swift-format --strict 主管(多行声明后 { 单独成行);
+  # swiftlint opening_brace 与之互斥,禁用以消除两 formatter 冲突
+  - opening_brace
 
 line_length:
   warning: 100
