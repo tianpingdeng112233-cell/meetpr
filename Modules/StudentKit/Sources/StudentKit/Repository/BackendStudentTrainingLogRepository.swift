@@ -1,0 +1,76 @@
+import CoreModels
+import Foundation
+import Networking
+import RepositoryContracts
+
+public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
+  private let api: APIClient
+  private let session: any SessionStateReader
+  private let cache: TrainingLogCache
+
+  public init(
+    api: APIClient,
+    session: any SessionStateReader,
+    cache: TrainingLogCache = TrainingLogCache()
+  ) {
+    self.api = api
+    self.session = session
+    self.cache = cache
+  }
+
+  public func recordSet(_ log: StudentSetLog) async throws {
+    let token = try await session.accessToken()
+    _ = try await api.logSet(
+      CreateSetLogRequestDTO(
+        planExerciseID: log.planExerciseID,
+        setIndex: log.setIndex,
+        weightKg: log.weightKg,
+        reps: log.reps,
+        rpe: log.rpe,
+        completed: log.completed
+      ),
+      accessToken: token
+    )
+  }
+
+  public func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>
+  ) async throws -> [StudentSetLog] {
+    let from = WireFormatting.dateOnlyString(from: dateRange.lowerBound)
+    let endDate = WireFormatting.dateOnlyString(from: dateRange.upperBound)
+    let token = try await session.accessToken()
+
+    do {
+      let response = try await api.studentSetLogs(
+        studentID: studentID,
+        from: from,
+        endDate: endDate,
+        accessToken: token
+      )
+      let logs = response.logs.map { $0.toDomain() }.sorted { $0.loggedAt < $1.loggedAt }
+      try await cache.save(logs: logs, studentID: studentID, from: from, endDate: endDate)
+      return logs
+    } catch {
+      if let cached = await cache.loadLogs(studentID: studentID, from: from, endDate: endDate) {
+        return cached
+      }
+      throw error
+    }
+  }
+
+  public func fetchLogsForExercise(
+    studentID: UUID,
+    planExerciseID: UUID
+  ) async throws -> [StudentSetLog] {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+    let now = Date()
+    let from = calendar.date(byAdding: .year, value: -5, to: now) ?? now
+    let logs = try await fetchLogs(studentID: studentID, in: from...now)
+    return
+      logs
+      .filter { $0.planExerciseID == planExerciseID }
+      .sorted { $0.setIndex < $1.setIndex }
+  }
+}

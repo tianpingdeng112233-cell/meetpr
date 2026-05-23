@@ -3,9 +3,17 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct CoachRootView: View {
+  private let repository: any PlanRepository
+  private let draftStore: DraftStore
   @State private var showPlanning = false
 
-  public init() {}
+  public init(
+    repository: any PlanRepository = InMemoryPlanRepository.preview(),
+    draftStore: DraftStore = DraftStore.shared
+  ) {
+    self.repository = repository
+    self.draftStore = draftStore
+  }
 
   public var body: some View {
     NavigationStack {
@@ -25,15 +33,15 @@ public struct CoachRootView: View {
       #if os(iOS)
         .fullScreenCover(isPresented: $showPlanning) {
           PlanningCoordinatorView(
-            repository: InMemoryPlanRepository.preview(),
-            draftStore: DraftStore.shared
+            repository: repository,
+            draftStore: draftStore
           )
         }
       #else
         .sheet(isPresented: $showPlanning) {
           PlanningCoordinatorView(
-            repository: InMemoryPlanRepository.preview(),
-            draftStore: DraftStore.shared
+            repository: repository,
+            draftStore: draftStore
           )
         }
       #endif

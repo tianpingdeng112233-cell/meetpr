@@ -22,7 +22,7 @@ public final class DemoAuthRepository: AuthRepository, Sendable {
 
   private func fixedResult() -> AuthResult {
     AuthResult(
-      user: DemoUserSeed.coach,
+      user: DemoUserSeed.currentUser,
       accessToken: DemoUserSeed.accessToken,
       refreshToken: DemoUserSeed.refreshToken
     )

@@ -11,6 +11,7 @@ let package = Package(
     .package(path: "../CoreModels"),
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
+    .package(path: "../RepositoryContracts"),
     .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
   ],
   targets: [
@@ -20,6 +21,7 @@ let package = Package(
         .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
+        .product(name: "RepositoryContracts", package: "RepositoryContracts"),
       ],
       resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
@@ -28,6 +30,8 @@ let package = Package(
       name: "CoachKitTests",
       dependencies: [
         "CoachKit",
+        .product(name: "Networking", package: "Networking"),
+        .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "ViewInspector", package: "ViewInspector"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]

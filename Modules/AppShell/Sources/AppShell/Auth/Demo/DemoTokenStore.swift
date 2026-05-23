@@ -18,7 +18,7 @@ public actor DemoTokenStore: TokenStoring {
   }
 
   public func cachedUser() async -> User? {
-    DemoUserSeed.coach
+    DemoUserSeed.currentUser
   }
 
   public func clear() async {}

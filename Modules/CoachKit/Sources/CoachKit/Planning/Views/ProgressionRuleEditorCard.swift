@@ -1,8 +1,11 @@
 import DesignSystem
 import SwiftUI
 
+// swiftlint:disable file_length
+
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+// swiftlint:disable:next type_body_length
 public struct ProgressionRuleEditorCard: View {
   @Bindable private var viewModel: PlanningViewModel
   @State private var rule: DraftProgressionRule

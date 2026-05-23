@@ -1,3 +1,6 @@
+import CoreModels
+import Foundation
+import RepositoryContracts
 import Testing
 
 @testable import CoachKit
@@ -29,9 +32,47 @@ import Testing
   try await repository.publishPlan(
     plan: PlanningFixtures.plan(),
     days: PlanningFixtures.planDays(),
-    exercises: PlanningFixtures.planExercises()
+    exercises: PlanningFixtures.planExercises(),
+    sets: PlanningFixtures.planSets()
   )
 
   let publishedPlans = await repository.publishedPlansSnapshot()
   #expect(publishedPlans.map(\.id) == [PlanningFixtures.planID])
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func inMemoryRepositoryPublishWritesStudentProjectionToStore() async throws {
+  let store = SpyStudentPlanStore()
+  let repository = InMemoryPlanRepository(
+    students: PlanningFixtures.students(),
+    catalog: PlanningFixtures.catalog(),
+    store: store
+  )
+
+  try await repository.publishPlan(
+    plan: PlanningFixtures.plan(),
+    days: PlanningFixtures.planDays(),
+    exercises: PlanningFixtures.planExercises(),
+    sets: PlanningFixtures.planSets()
+  )
+
+  let projection = try #require(
+    await store.getPublishedProjection(forStudent: PlanningFixtures.activeStudentID)
+  )
+  #expect(projection.cycleID == PlanningFixtures.planID)
+  #expect(projection.weekIndex == 1)
+  #expect(projection.days.first?.exercises.first?.exercise.id == PlanningFixtures.squatID)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private actor SpyStudentPlanStore: StudentPlanStore {
+  private var projections: [UUID: StudentPlanView] = [:]
+
+  func savePublishedProjection(_ projection: StudentPlanView, forStudent studentID: UUID) async {
+    projections[studentID] = projection
+  }
+
+  func getPublishedProjection(forStudent studentID: UUID) async -> StudentPlanView? {
+    projections[studentID]
+  }
 }

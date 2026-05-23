@@ -127,6 +127,10 @@ public struct NetworkingAuthRepository: AuthRepository {
       return authError
     }
 
+    if let apiError = error as? APIError {
+      return map(apiError)
+    }
+
     if let apiError = error as? APIClientError {
       return map(apiError)
     }
@@ -147,24 +151,39 @@ public struct NetworkingAuthRepository: AuthRepository {
     case .invalidResponse:
       return .network
     case .httpStatus(let statusCode, let data):
-      if let envelope = try? JSONDecoder().decode(AuthErrorEnvelopeDTO.self, from: data) {
-        guard let code = AuthErrorCode(rawValue: envelope.error) else {
-          return .network
-        }
-
-        let issues =
-          envelope.issues?.map {
-            AuthValidationIssue(path: $0.path, message: $0.message)
-          } ?? []
-        return .backend(statusCode: statusCode, code: code, issues: issues)
-      }
-
-      if statusCode >= 500 {
-        return .server(statusCode: statusCode)
-      }
-
-      return .network
+      return mapHTTPStatus(statusCode, data: data)
     }
+  }
+
+  private static func map(_ error: APIError) -> AuthRepositoryError {
+    switch error {
+    case .invalidResponse:
+      return .network
+    case .authInvalid:
+      return .backend(statusCode: 401, code: .invalidRefresh, issues: [])
+    case .httpStatus(let statusCode, let data):
+      return mapHTTPStatus(statusCode, data: data)
+    }
+  }
+
+  private static func mapHTTPStatus(_ statusCode: Int, data: Data) -> AuthRepositoryError {
+    if let envelope = try? JSONDecoder().decode(AuthErrorEnvelopeDTO.self, from: data) {
+      guard let code = AuthErrorCode(rawValue: envelope.error) else {
+        return .network
+      }
+
+      let issues =
+        envelope.issues?.map {
+          AuthValidationIssue(path: $0.path, message: $0.message)
+        } ?? []
+      return .backend(statusCode: statusCode, code: code, issues: issues)
+    }
+
+    if statusCode >= 500 {
+      return .server(statusCode: statusCode)
+    }
+
+    return .network
   }
 }
 
