@@ -23,6 +23,24 @@ import Testing
   #expect(decodedProbe == probe)
 }
 
+@Test(
+  arguments: [
+    ("2026-05-22T10:27:16.254Z", 1_779_445_636.254),
+    ("2026-05-22T10:27:16Z", 1_779_445_636),
+    ("2026-05-22", 1_779_408_000),
+  ])
+func codecDecodesBackendDateFormats(rawValue: String, expectedTimeInterval: TimeInterval) throws {
+  let json = """
+    {
+      "timestamp": "\(rawValue)"
+    }
+    """
+
+  let decodedProbe = try MeetPRCodec.decoder.decode(CodecDateProbe.self, from: Data(json.utf8))
+
+  #expect(decodedProbe.timestamp == Date(timeIntervalSince1970: expectedTimeInterval))
+}
+
 @Test func codecDecodesDateOnlyStringsAsUTCStartOfDay() throws {
   let json = """
     {
