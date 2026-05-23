@@ -28,7 +28,10 @@ struct MeetPRApp: App {
 
   #if DEMO_MODE
     private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
-      let planStore = InMemoryPlanStore()
+      // Seed the student projection so the demo shows a real plan (today/week)
+      // without a coach publish round-trip.
+      let planStore = InMemoryPlanStore(
+        seed: [StudentDemoSeed.studentID: StudentDemoSeed.makePlanView()])
       // DEMO_USER_STUDENT is read here in the app target, NOT inside AppShell:
       // Xcode does not propagate the app target's compilation conditions to its
       // SPM package deps, so the chosen user must be injected down.
