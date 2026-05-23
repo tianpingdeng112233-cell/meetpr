@@ -99,7 +99,7 @@ public final class PlanningViewModel {
   }
 
   public var sortedTrainingDays: [Int] {
-    selectedStudent?.profile.trainingDaysOfWeek.sorted() ?? []
+    [1, 2, 3, 4, 5, 6, 7]
   }
 
   public var sortedAssignedDays: [Int] {
@@ -365,26 +365,12 @@ public final class PlanningViewModel {
   public func oneRM(for draftExercise: DraftPlanExercise) -> Decimal? {
     guard
       draftExercise.isMainLift,
-      let family = catalogExercise(for: draftExercise)?.mainLiftFamily,
-      let profile = selectedStudent?.profile
+      catalogExercise(for: draftExercise)?.mainLiftFamily != nil
     else {
       return nil
     }
 
-    let oneRM =
-      switch family {
-      case .squat:
-        profile.currentSquat1RM
-      case .bench:
-        profile.bench1RM
-      case .deadlift:
-        profile.deadlift1RM
-      }
-
-    guard oneRM > 0 else {
-      return nil
-    }
-    return oneRM
+    return nil
   }
 
   public func defaultSetSpec(for draftExercise: DraftPlanExercise) -> DraftSetSpec {

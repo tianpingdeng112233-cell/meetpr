@@ -1,4 +1,3 @@
-import CoreModels
 import Foundation
 
 public struct CoachStudentsResponseDTO: Codable, Equatable, Sendable {
@@ -10,27 +9,35 @@ public struct CoachStudentsResponseDTO: Codable, Equatable, Sendable {
 }
 
 public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
-  public let id: UUID
+  public let userID: UUID
   public let displayName: String
-  public let profile: StudentProfile
+  public let createdAt: Date
   public let status: String
 
   public init(
-    id: UUID,
+    userID: UUID,
     displayName: String,
-    profile: StudentProfile,
+    createdAt: Date,
     status: String
   ) {
-    self.id = id
+    self.userID = userID
     self.displayName = displayName
-    self.profile = profile
+    self.createdAt = createdAt
     self.status = status
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
+    case userID = "userId"
     case displayName
-    case profile
+    case createdAt
     case status
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    userID = try container.decode(UUID.self, forKey: .userID)
+    displayName = try container.decode(String.self, forKey: .displayName)
+    createdAt = try container.decode(Date.self, forKey: .createdAt)
+    status = try container.decodeIfPresent(String.self, forKey: .status) ?? "active"
   }
 }

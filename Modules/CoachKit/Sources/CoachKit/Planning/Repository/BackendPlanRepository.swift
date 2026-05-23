@@ -24,8 +24,7 @@ public actor BackendPlanRepository: PlanRepository {
     let response = try await api.coachStudents(accessToken: token)
     return response.students.map { dto in
       CoachStudentSummary(
-        id: dto.id,
-        profile: dto.profile,
+        id: dto.userID,
         displayName: dto.displayName,
         status: Self.status(from: dto.status)
       )

@@ -50,7 +50,10 @@ import ViewInspector
 
   #expect(try inspected.find(text: "使用模板").string() == "使用模板")
   #expect(try inspected.find(text: "复制上周").string() == "复制上周")
-  #expect(try inspected.find(text: "周一·周三·周五·周六").string() == "周一·周三·周五·周六")
+  #expect(
+    try inspected.find(text: "周一·周二·周三·周四·周五·周六·周日").string()
+      == "周一·周二·周三·周四·周五·周六·周日"
+  )
 }
 
 @MainActor
