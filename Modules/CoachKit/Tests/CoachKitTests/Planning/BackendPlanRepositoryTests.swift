@@ -180,8 +180,8 @@ private actor PublishRequestLog {
       "source": "coach",
       "source_template_id": null,
       "status": "\(status.rawValue)",
-      "created_at": "2026-05-22T12:00:00.000Z",
-      "updated_at": "2026-05-22T12:00:00.000Z"
+      "created_at": "2026-05-22T12:00:00Z",
+      "updated_at": "2026-05-22T12:00:00Z"
     }
     """
   }
@@ -224,7 +224,7 @@ private actor PublishRequestLog {
       "intensity_mode": "weight",
       "target_value": "100.00",
       "set_type": "working",
-      "created_at": "2026-05-22T12:00:00.000Z"
+      "created_at": "2026-05-22T12:00:00Z"
     }
     """
   }

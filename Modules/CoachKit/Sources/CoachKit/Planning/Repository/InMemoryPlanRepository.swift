@@ -275,60 +275,68 @@ public actor InMemoryPlanRepository: PlanRepository {
 
   static func syntheticCompetitionLifts() -> [Exercise] {
     let now = Date()
-    return [
+    return competitionLiftSeeds.map { seed in
       Exercise(
-        id: uuid(20),
-        name: "比赛式深蹲",
-        nameEn: "Competition Squat",
+        id: seed.id,
+        name: seed.name,
+        nameEn: seed.nameEn,
         exerciseType: .mainLift,
-        mainLiftFamily: .squat,
+        mainLiftFamily: seed.mainLiftFamily,
         isCompetitionLift: true,
-        muscleGroups: [.quad, .glute],
+        muscleGroups: seed.muscleGroups,
         equipment: [.barbell],
-        movementPattern: [.squat],
+        movementPattern: seed.movementPattern,
         createdAt: now
-      ),
-      Exercise(
-        id: uuid(21),
-        name: "比赛式卧推",
-        nameEn: "Competition Bench Press",
-        exerciseType: .mainLift,
-        mainLiftFamily: .bench,
-        isCompetitionLift: true,
-        muscleGroups: [.chest, .triceps],
-        equipment: [.barbell],
-        movementPattern: [.horizontalPush],
-        createdAt: now
-      ),
-      Exercise(
-        id: uuid(22),
-        name: "比赛式传统硬拉",
-        nameEn: "Competition Conventional Deadlift",
-        exerciseType: .mainLift,
-        mainLiftFamily: .deadlift,
-        isCompetitionLift: true,
-        muscleGroups: [.back, .hamstring],
-        equipment: [.barbell],
-        movementPattern: [.hipHinge],
-        createdAt: now
-      ),
-      Exercise(
-        id: uuid(23),
-        name: "比赛式相扑硬拉",
-        nameEn: "Competition Sumo Deadlift",
-        exerciseType: .mainLift,
-        mainLiftFamily: .deadlift,
-        isCompetitionLift: true,
-        muscleGroups: [.back, .hamstring, .glute],
-        equipment: [.barbell],
-        movementPattern: [.hipHinge],
-        createdAt: now
-      ),
-    ]
+      )
+    }
   }
 
-  private static func uuid(_ byte: UInt8) -> UUID {
+  fileprivate static func uuid(_ byte: UInt8) -> UUID {
     UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte))
   }
 }
 // swiftlint:enable type_body_length
+
+private struct CompetitionLiftSeed {
+  let id: UUID
+  let name: String
+  let nameEn: String
+  let mainLiftFamily: LiftFamily
+  let muscleGroups: [MuscleGroup]
+  let movementPattern: [MovementPattern]
+}
+
+private let competitionLiftSeeds = [
+  CompetitionLiftSeed(
+    id: InMemoryPlanRepository.uuid(20),
+    name: "比赛式深蹲",
+    nameEn: "Competition Squat",
+    mainLiftFamily: .squat,
+    muscleGroups: [.quad, .glute],
+    movementPattern: [.squat]
+  ),
+  CompetitionLiftSeed(
+    id: InMemoryPlanRepository.uuid(21),
+    name: "比赛式卧推",
+    nameEn: "Competition Bench Press",
+    mainLiftFamily: .bench,
+    muscleGroups: [.chest, .triceps],
+    movementPattern: [.horizontalPush]
+  ),
+  CompetitionLiftSeed(
+    id: InMemoryPlanRepository.uuid(22),
+    name: "比赛式传统硬拉",
+    nameEn: "Competition Conventional Deadlift",
+    mainLiftFamily: .deadlift,
+    muscleGroups: [.back, .hamstring],
+    movementPattern: [.hipHinge]
+  ),
+  CompetitionLiftSeed(
+    id: InMemoryPlanRepository.uuid(23),
+    name: "比赛式相扑硬拉",
+    nameEn: "Competition Sumo Deadlift",
+    mainLiftFamily: .deadlift,
+    muscleGroups: [.back, .hamstring, .glute],
+    movementPattern: [.hipHinge]
+  ),
+]

@@ -68,22 +68,78 @@ public actor BackendPlanRepository: PlanRepository {
       accessToken: token
     )
 
+    let children = try await createPlanChildren(
+      planID: created.id,
+      days: days,
+      exercises: exercises,
+      sets: sets,
+      accessToken: token
+    )
+    let published = try await api.publishPlan(id: created.id, accessToken: token)
+    let tree = TrainingPlanTree(
+      plan: published.toDomain(),
+      days: children.days.map { $0.toDomain() },
+      exercises: children.exercises.map { $0.toDomain() },
+      sets: children.sets.map { $0.toDomain() }
+    )
+    try await cache.save(plan: tree)
+  }
+
+  private func createPlanChildren(
+    planID: UUID,
+    days: [PlanDay],
+    exercises: [PlanExercise],
+    sets: [PlanSet],
+    accessToken: String
+  ) async throws -> CreatedPlanChildren {
+    let daysResult = try await createDays(days, planID: planID, accessToken: accessToken)
+    let exercisesResult = try await createExercises(
+      exercises,
+      serverDayIDs: daysResult.serverIDs,
+      accessToken: accessToken
+    )
+    let createdSets = try await createSets(
+      sets,
+      serverExerciseIDs: exercisesResult.serverIDs,
+      accessToken: accessToken
+    )
+
+    return CreatedPlanChildren(
+      days: daysResult.values,
+      exercises: exercisesResult.values,
+      sets: createdSets
+    )
+  }
+
+  private func createDays(
+    _ days: [PlanDay],
+    planID: UUID,
+    accessToken: String
+  ) async throws -> CreatedPlanDays {
     var serverDayIDs: [UUID: UUID] = [:]
     var createdDays: [PlanDayDTO] = []
     for day in days {
       let createdDay = try await api.createPlanDay(
-        planID: created.id,
+        planID: planID,
         CreatePlanDayRequestDTO(
           dayOfWeek: day.dayOfWeek,
           weekNumber: day.weekNumber,
           sortOrder: day.sortOrder
         ),
-        accessToken: token
+        accessToken: accessToken
       )
       serverDayIDs[day.id] = createdDay.id
       createdDays.append(createdDay)
     }
 
+    return CreatedPlanDays(serverIDs: serverDayIDs, values: createdDays)
+  }
+
+  private func createExercises(
+    _ exercises: [PlanExercise],
+    serverDayIDs: [UUID: UUID],
+    accessToken: String
+  ) async throws -> CreatedPlanExercises {
     var serverExerciseIDs: [UUID: UUID] = [:]
     var createdExercises: [PlanExerciseDTO] = []
     for exercise in exercises {
@@ -99,12 +155,20 @@ public actor BackendPlanRepository: PlanRepository {
           sortOrder: exercise.sortOrder,
           notes: exercise.notes
         ),
-        accessToken: token
+        accessToken: accessToken
       )
       serverExerciseIDs[exercise.id] = createdExercise.id
       createdExercises.append(createdExercise)
     }
 
+    return CreatedPlanExercises(serverIDs: serverExerciseIDs, values: createdExercises)
+  }
+
+  private func createSets(
+    _ sets: [PlanSet],
+    serverExerciseIDs: [UUID: UUID],
+    accessToken: String
+  ) async throws -> [PlanSetDTO] {
     var createdSets: [PlanSetDTO] = []
     for set in sets {
       guard let serverExerciseID = serverExerciseIDs[set.planExerciseID] else {
@@ -123,19 +187,12 @@ public actor BackendPlanRepository: PlanRepository {
           targetValue: set.targetValue,
           setType: set.setType
         ),
-        accessToken: token
+        accessToken: accessToken
       )
       createdSets.append(createdSet)
     }
 
-    let published = try await api.publishPlan(id: created.id, accessToken: token)
-    let tree = TrainingPlanTree(
-      plan: published.toDomain(),
-      days: createdDays.map { $0.toDomain() },
-      exercises: createdExercises.map { $0.toDomain() },
-      sets: createdSets.map { $0.toDomain() }
-    )
-    try await cache.save(plan: tree)
+    return createdSets
   }
 
   private func mergeCatalog(_ exercises: [Exercise]) -> [Exercise] {
@@ -181,4 +238,20 @@ public actor BackendPlanRepository: PlanRepository {
       return .active
     }
   }
+}
+
+private struct CreatedPlanChildren: Sendable {
+  let days: [PlanDayDTO]
+  let exercises: [PlanExerciseDTO]
+  let sets: [PlanSetDTO]
+}
+
+private struct CreatedPlanDays: Sendable {
+  let serverIDs: [UUID: UUID]
+  let values: [PlanDayDTO]
+}
+
+private struct CreatedPlanExercises: Sendable {
+  let serverIDs: [UUID: UUID]
+  let values: [PlanExerciseDTO]
 }
