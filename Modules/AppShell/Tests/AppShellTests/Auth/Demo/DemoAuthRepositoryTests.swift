@@ -29,6 +29,15 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
+@Test func demoLoginReturnsInjectedUser() async throws {
+  let repository = DemoAuthRepository(user: DemoUserSeed.coachedStudent)
+
+  let result = try await repository.login(phone: "13900000000", password: "ignored")
+
+  #expect(result.user == DemoUserSeed.coachedStudent)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
 @Test func demoRefreshReturnsSeededTokenPair() async throws {
   let repository = DemoAuthRepository()
 

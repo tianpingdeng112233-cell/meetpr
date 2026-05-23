@@ -24,6 +24,13 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
+@Test func demoTokenStoreCachesInjectedUser() async {
+  let store = DemoTokenStore(user: DemoUserSeed.coachedStudent)
+
+  #expect(await store.cachedUser() == DemoUserSeed.coachedStudent)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
 @Test func demoTokenStoreSaveDoesNotOverrideSeededValues() async {
   let store = DemoTokenStore()
   await store.save(access: "custom-access", refresh: "custom-refresh")
