@@ -18,7 +18,7 @@ public enum StudentDemoSeed {
   public static let referenceDate = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-12
 
   public static func makePlanView(weekIndex: Int = 1) -> StudentPlanView {
-    let startDate = currentWeekStart().addingTimeInterval(
+    let startDate = demoCycleStart().addingTimeInterval(
       Double(max(0, weekIndex - 1)) * 7 * 86_400)
     let days = (0..<7).map { offset in
       let date = startDate.addingTimeInterval(Double(offset) * 86_400)
@@ -41,9 +41,16 @@ public enum StudentDemoSeed {
     weekIndex: Int = 1
   ) -> [StudentSetLog] {
     let plan = makePlanView(weekIndex: weekIndex)
-    return plan.days.prefix(2).flatMap { day in
-      day.exercises.flatMap { exercise in
-        exercise.prescribedSets.prefix(2).map { set in
+    let calendar = Calendar(identifier: .gregorian)
+    let today = calendar.startOfDay(for: Date())
+    // Past training days are fully logged; today is in progress (first two sets);
+    // future days are never seeded.
+    return plan.days.flatMap { day -> [StudentSetLog] in
+      guard day.date <= today, !day.exercises.isEmpty else { return [] }
+      let isToday = calendar.isDate(day.date, inSameDayAs: today)
+      return day.exercises.flatMap { exercise -> [StudentSetLog] in
+        let sets = isToday ? Array(exercise.prescribedSets.prefix(2)) : exercise.prescribedSets
+        return sets.map { set in
           StudentSetLog(
             id: UUID(),
             studentID: studentID,
@@ -163,13 +170,13 @@ public enum StudentDemoSeed {
     UUID(uuidString: String(format: "02400000-0000-0000-0000-%012d", value))!
   }
 
-  private static func currentWeekStart() -> Date {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.firstWeekday = 2
+  /// The demo cycle is anchored so that "today" is day-offset 3 (深蹲/卧推/休息/**硬拉**…),
+  /// i.e. the week began three days ago. This keeps the 锻炼 tab on a real workout
+  /// whenever the demo is launched, while leaving genuine *past* training days
+  /// (深蹲, 卧推) for 历史/仪表盘 to show — and never seeding future logs.
+  private static func demoCycleStart() -> Date {
+    let calendar = Calendar(identifier: .gregorian)
     let startOfToday = calendar.startOfDay(for: Date())
-    let weekday = calendar.component(.weekday, from: startOfToday)
-    let distanceFromMonday = (weekday + 5) % 7
-    return calendar.date(byAdding: .day, value: -distanceFromMonday, to: startOfToday)
-      ?? startOfToday
+    return calendar.date(byAdding: .day, value: -3, to: startOfToday) ?? startOfToday
   }
 }

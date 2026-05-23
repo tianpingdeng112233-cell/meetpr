@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -5,15 +6,20 @@ struct DayCompletionBanner: View {
   let totalSets: Int
 
   var body: some View {
-    HStack {
+    HStack(spacing: 10) {
       Image(systemName: "checkmark.seal.fill")
-      Text("今日完成 · 总组数 \(totalSets) / 完成 \(totalSets)")
+        .foregroundStyle(Color.MeetPR.green)
+      Text("今日训练完成 · \(totalSets) 组")
+        .font(.headline)
+        .foregroundStyle(Color.MeetPR.fgPrimary)
       Spacer()
     }
-    .font(.headline)
     .padding()
-    .foregroundStyle(.white)
-    .background(Color.green)
-    .clipShape(.rect(cornerRadius: 8))
+    .background(Color.MeetPR.green.opacity(0.14))
+    .overlay {
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(Color.MeetPR.green.opacity(0.4), lineWidth: 1)
+    }
+    .clipShape(.rect(cornerRadius: 12))
   }
 }

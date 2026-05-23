@@ -100,6 +100,10 @@ public final class TodayWorkoutViewModel {
     }
   }
 
+  public func updateWeight(rowIndex: Int, weight: Decimal?) {
+    mutateDraft(rowIndex: rowIndex) { $0.actualWeight = weight }
+  }
+
   public func updateReps(rowIndex: Int, reps: Int?) {
     mutateDraft(rowIndex: rowIndex) { $0.actualReps = reps }
   }
@@ -109,6 +113,20 @@ public final class TodayWorkoutViewModel {
   }
 
   public func toggleComplete(rowIndex: Int) async {
+    guard case .loaded(_, let drafts) = state, drafts.indices.contains(rowIndex) else {
+      return
+    }
+    await persist(rowIndex: rowIndex, completed: !drafts[rowIndex].completed)
+  }
+
+  /// Persists the row's current draft values and marks it complete. Used by the
+  /// set-entry sheet for both first completion and edits to an already-completed
+  /// set (the latter must still hit `recordSet`, or the edit is lost on reload).
+  public func commitSet(rowIndex: Int) async {
+    await persist(rowIndex: rowIndex, completed: true)
+  }
+
+  private func persist(rowIndex: Int, completed: Bool) async {
     guard let studentID = currentStudentID else {
       state = .error("Missing student")
       return
@@ -129,12 +147,12 @@ public final class TodayWorkoutViewModel {
       weightKg: draft.actualWeight ?? draft.prescribed.weightKg ?? 0,
       reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
       rpe: draft.actualRPE,
-      completed: !draft.completed
+      completed: completed
     )
 
     do {
       try await logs.recordSet(log)
-      draft.completed.toggle()
+      draft.completed = completed
       draft.loggedSetID = log.id
       nextDrafts[rowIndex] = draft
       state = .loaded(plan: plan, drafts: nextDrafts)

@@ -1,67 +1,60 @@
+import CoreModels
+import DesignSystem
 import SwiftUI
 
+/// One set, Juggernaut-style: [number] [target weight] … [result pill].
+/// The whole row is a button that opens `SetEntrySheet`; a completed set shows
+/// its logged result as a filled accent pill with a check.
 @available(iOS 17.0, macOS 14.0, *)
 struct SetRecordRow: View {
   let draft: TodayWorkoutViewModel.SetRowDraft
   let rowIndex: Int
-  let viewModel: TodayWorkoutViewModel
+  let onTap: (Int) -> Void
+
+  private var resultText: String {
+    let weight = StudentFormatting.decimal(draft.actualWeight ?? draft.prescribed.weightKg)
+    let reps = draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0
+    let rpe = StudentFormatting.decimal(draft.actualRPE ?? draft.prescribed.rpe)
+    return "\(weight) × \(reps) @ \(rpe)"
+  }
+
+  private var targetWeight: String? {
+    draft.prescribed.weightKg.map { "\(StudentFormatting.decimal($0)) kg" }
+  }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
+    Button {
+      onTap(rowIndex)
+    } label: {
       HStack(spacing: 12) {
         Text("\(draft.prescribed.setIndex + 1)")
-          .font(.headline.monospacedDigit())
-          .frame(width: 28, height: 28)
-          .background(.quaternary)
+          .font(.subheadline.monospacedDigit().bold())
+          .foregroundStyle(draft.completed ? .white : Color.MeetPR.fgSecondary)
+          .frame(width: 30, height: 30)
+          .background(draft.completed ? Color.MeetPR.green : Color.MeetPR.surface2)
           .clipShape(Circle())
 
-        VStack(alignment: .leading, spacing: 2) {
-          Text(StudentFormatting.prescribed(draft.prescribed))
-            .font(.subheadline.monospacedDigit())
-          Text(draft.exerciseName)
-            .font(.caption)
-            .foregroundStyle(.secondary)
+        if let targetWeight {
+          Text(targetWeight)
+            .font(.footnote.monospacedDigit())
+            .foregroundStyle(Color.MeetPR.fgTertiary)
         }
 
         Spacer()
 
-        Button {
-          Task { await viewModel.toggleComplete(rowIndex: rowIndex) }
-        } label: {
-          Image(systemName: draft.completed ? "checkmark.circle.fill" : "checkmark.circle")
-            .font(.title3)
+        HStack(spacing: 6) {
+          Text(resultText)
+            .font(.subheadline.monospacedDigit().bold())
+          Image(systemName: draft.completed ? "checkmark" : "pencil")
+            .font(.caption2.bold())
         }
-        .buttonStyle(.borderless)
-        .foregroundStyle(draft.completed ? .green : .primary)
-        .accessibilityLabel(draft.completed ? "取消完成" : "完成")
-      }
-
-      HStack {
-        TextField(
-          "次数",
-          value: Binding(
-            get: { draft.actualReps },
-            set: { viewModel.updateReps(rowIndex: rowIndex, reps: $0) }
-          ),
-          format: .number
-        )
-        .textFieldStyle(.roundedBorder)
-        .frame(maxWidth: 96)
-
-        Stepper(
-          "RPE \(StudentFormatting.decimal(draft.actualRPE))",
-          value: Binding(
-            get: { NSDecimalNumber(decimal: draft.actualRPE ?? 8).doubleValue },
-            set: { viewModel.updateRPE(rowIndex: rowIndex, rpe: Decimal($0)) }
-          ),
-          in: 5...10,
-          step: 0.5
-        )
-        .font(.subheadline)
+        .foregroundStyle(draft.completed ? Color.MeetPR.green : Color.MeetPR.fgSecondary)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(draft.completed ? Color.MeetPR.greenSoft : Color.MeetPR.surface2)
+        .clipShape(.capsule)
       }
     }
-    .padding(12)
-    .background(draft.completed ? Color.green.opacity(0.12) : Color.secondary.opacity(0.08))
-    .clipShape(.rect(cornerRadius: 8))
+    .buttonStyle(.plain)
   }
 }

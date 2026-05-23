@@ -1,4 +1,5 @@
 import CoreModels
+import DesignSystem
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -12,36 +13,60 @@ public struct DayDetailView: View {
   }
 
   public var body: some View {
-    List {
+    Group {
       if day.exercises.isEmpty {
-        Text("休息日")
-          .foregroundStyle(.secondary)
+        ContentUnavailableView("休息日", systemImage: "bed.double")
       } else {
-        ForEach(day.exercises) { exercise in
-          Section(exercise.exercise.name) {
-            ForEach(exercise.prescribedSets) { set in
-              let log = logs.first {
-                $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
-              }
-              HStack {
-                Text("第 \(set.setIndex + 1) 组")
-                Spacer()
-                if let log {
-                  let weight = StudentFormatting.decimal(log.weightKg)
-                  let rpe = StudentFormatting.decimal(log.rpe)
-                  Text("\(weight)kg x \(log.reps) · RPE \(rpe)")
-                    .monospacedDigit()
-                } else {
-                  Text(StudentFormatting.prescribed(set))
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                }
-              }
+        ScrollView {
+          VStack(alignment: .leading, spacing: 14) {
+            ForEach(day.exercises) { exercise in
+              exerciseCard(exercise)
             }
+          }
+          .padding()
+        }
+        .scrollContentBackground(.hidden)
+      }
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color.MeetPR.bg)
+    .navigationTitle(StudentFormatting.dayMonthFormatter.string(from: day.date))
+  }
+
+  private func exerciseCard(_ exercise: StudentPlanExercise) -> some View {
+    VStack(alignment: .leading, spacing: 10) {
+      Text(exercise.exercise.name)
+        .font(.headline)
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+
+      ForEach(exercise.prescribedSets) { set in
+        let log = logs.first {
+          $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
+        }
+        HStack {
+          Text("第 \(set.setIndex + 1) 组")
+            .font(.subheadline)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+          Spacer()
+          if let log {
+            Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
+              .font(.subheadline.monospacedDigit())
+              .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgPrimary)
+          } else {
+            Text(StudentFormatting.prescribed(set))
+              .font(.subheadline.monospacedDigit())
+              .foregroundStyle(Color.MeetPR.fgTertiary)
           }
         }
       }
     }
-    .navigationTitle(StudentFormatting.dayMonthFormatter.string(from: day.date))
+    .padding(14)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(Color.MeetPR.surface1)
+    .overlay {
+      RoundedRectangle(cornerRadius: 12)
+        .stroke(Color.MeetPR.border, lineWidth: 1)
+    }
+    .clipShape(.rect(cornerRadius: 12))
   }
 }
