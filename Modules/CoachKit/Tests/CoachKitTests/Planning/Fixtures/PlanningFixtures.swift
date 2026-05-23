@@ -3,7 +3,6 @@ import Foundation
 
 @testable import CoachKit
 
-// swiftlint:disable type_body_length
 @available(iOS 17.0, macOS 14.0, *)
 enum PlanningFixtures {
   static let now = Date(timeIntervalSince1970: 1_766_630_400)
@@ -286,4 +285,3 @@ enum PlanningFixtures {
     )
   }
 }
-// swiftlint:enable type_body_length

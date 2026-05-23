@@ -1,7 +1,6 @@
 import CoreModels
 import Foundation
 
-// swiftlint:disable type_body_length
 public actor InMemoryPlanRepository: PlanRepository {
   private var students: [CoachStudentSummary]
   private var catalog: [Exercise]
@@ -305,4 +304,3 @@ public actor InMemoryPlanRepository: PlanRepository {
     UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, byte))
   }
 }
-// swiftlint:enable type_body_length
