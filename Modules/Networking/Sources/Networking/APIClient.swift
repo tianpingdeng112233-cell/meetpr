@@ -37,11 +37,7 @@ public final class APIClient: Sendable {
     environment: [String: String] = ProcessInfo.processInfo.environment,
     transport: Transport? = nil
   ) {
-    if let configuredBaseURL = Self.configuredBaseURL(from: environment) {
-      baseURL = configuredBaseURL
-    } else {
-      baseURL = Self.defaultBaseURL()
-    }
+    baseURL = BuildConfig.backendBaseURL(environment: environment)
 
     self.transport =
       transport ?? { request in
@@ -125,13 +121,6 @@ public final class APIClient: Sendable {
     _ = try await perform(request, emitsAuthInvalidOn401: true)
   }
 
-  private static func configuredBaseURL(from environment: [String: String]) -> URL? {
-    guard let baseURLString = environment["MEETPR_API_BASE_URL"] else {
-      return nil
-    }
-    return URL(string: baseURLString)
-  }
-
   private func url(for endpoint: Endpoint) -> URL {
     let path = endpoint.path.hasPrefix("/") ? String(endpoint.path.dropFirst()) : endpoint.path
     return baseURL.appending(path: path)
@@ -184,13 +173,4 @@ public final class APIClient: Sendable {
     return APIResponse(data: data, statusCode: httpResponse.statusCode)
   }
 
-  private static func defaultBaseURL() -> URL {
-    var components = URLComponents()
-    components.scheme = "https"
-    components.host = "api.meetpr.local"
-    guard let url = components.url else {
-      preconditionFailure("Default API base URL components are invalid.")
-    }
-    return url
-  }
 }

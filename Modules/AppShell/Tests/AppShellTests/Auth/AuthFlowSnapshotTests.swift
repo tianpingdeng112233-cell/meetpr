@@ -5,27 +5,26 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func loginViewRendersPhonePasswordAndSignupLink() throws {
+@Test func loginViewRendersPhonePasswordAndSubmitButton() throws {
   let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
   let sut = LoginView().environment(session)
   let inspected = try sut.inspect()
 
   #expect(try inspected.find(text: "MeetPR").string() == "MeetPR")
+  #expect(try inspected.find(text: "MeetPR(内测版)").string() == "MeetPR(内测版)")
   #expect(try inspected.find(text: "手机号").string() == "手机号")
   #expect(try inspected.find(text: "密码").string() == "密码")
   #expect(try inspected.find(text: "登录").string() == "登录")
-  #expect(try inspected.find(text: "注册").string() == "注册")
 }
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func authFlowStartsAtLoginAndExposesSignupPush() throws {
+@Test func authFlowStartsAtLogin() throws {
   let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
   let sut = AuthFlowView().environment(session)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "登录后进入你的训练工作台").string() == "登录后进入你的训练工作台")
-  #expect(try inspected.find(text: "注册").string() == "注册")
+  #expect(try inspected.find(text: "MeetPR(内测版)").string() == "MeetPR(内测版)")
 }
 
 @MainActor

@@ -18,7 +18,7 @@ public struct LoginView: View {
           Text("MeetPR")
             .font(Font.MeetPR.displayHero)
             .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("登录后进入你的训练工作台")
+          Text("MeetPR(内测版)")
             .font(Font.MeetPR.body)
             .foregroundStyle(Color.MeetPR.fgSecondary)
         }
@@ -63,23 +63,6 @@ public struct LoginView: View {
             .accessibilityIdentifier("login.submit")
           }
         }
-
-        HStack(spacing: MeetPRSpacing.xs) {
-          Text("没账号?")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-
-          NavigationLink {
-            SignupView()
-          } label: {
-            Text("注册")
-              .font(Font.MeetPR.footnote)
-              .bold()
-              .foregroundStyle(Color.MeetPR.brandRed)
-          }
-          .accessibilityIdentifier("login.signup")
-        }
-        .frame(maxWidth: .infinity)
       }
       .padding(MeetPRSpacing.lg)
       .frame(maxWidth: 520, alignment: .leading)

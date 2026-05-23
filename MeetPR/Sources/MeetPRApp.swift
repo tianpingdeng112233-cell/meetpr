@@ -57,7 +57,7 @@ struct MeetPRApp: App {
     private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
       let api = APIClient.shared
       let auth: any AuthRepository = NetworkingAuthRepository(api: api)
-      let tokenStore: any TokenStoring = TokenStore()
+      let tokenStore: any TokenStoring = KeychainTokenStore()
       let session = Session(
         auth: auth,
         tokenStore: tokenStore,
