@@ -58,9 +58,13 @@ jobs:
               swift build --package-path "$package"
               echo "::endgroup::"
 
-              echo "::group::swift test $package"
-              swift test --package-path "$package" --parallel --enable-code-coverage
-              echo "::endgroup::"
+              if [ -d "$package/Tests" ]; then
+                echo "::group::swift test $package"
+                swift test --package-path "$package" --parallel --enable-code-coverage
+                echo "::endgroup::"
+              else
+                echo "$package has no Tests/, skipping swift test"
+              fi
             fi
           done
 
