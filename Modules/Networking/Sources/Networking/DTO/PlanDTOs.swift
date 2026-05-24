@@ -148,7 +148,7 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
 
 public struct PlanDTO: Codable, Equatable, Sendable {
   public let id: UUID
-  public let coachID: UUID
+  public let coachID: UUID?
   public let traineeID: UUID
   public let name: String
   public let startDate: Date
@@ -162,7 +162,7 @@ public struct PlanDTO: Codable, Equatable, Sendable {
 
   public init(
     id: UUID,
-    coachID: UUID,
+    coachID: UUID?,
     traineeID: UUID,
     name: String,
     startDate: Date,

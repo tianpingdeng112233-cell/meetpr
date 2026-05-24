@@ -5,7 +5,7 @@ import Networking
 @testable import AppShell
 
 enum AuthTestSupport {
-  static let createdAtString = "2026-04-29T09:44:22Z"
+  static let createdAt = Date(timeIntervalSince1970: 1_777_448_662)
 
   static func user(role: UserRole = .coach, phone: String = "+8613800000001") -> User {
     let createdAt = Date(timeIntervalSince1970: 1_777_448_662)
@@ -30,14 +30,14 @@ enum AuthTestSupport {
       id: UUID(uuidString: "00000000-0000-0000-0000-000000000011") ?? UUID(),
       phone: phone,
       role: role,
-      createdAt: createdAtString
+      createdAt: createdAt
     )
     let response = AuthResultDTO(
       user: user,
       accessToken: accessToken,
       refreshToken: refreshToken
     )
-    return try JSONEncoder().encode(response)
+    return try MeetPRCodec.encoder.encode(response)
   }
 
   static func refreshData(
@@ -45,7 +45,7 @@ enum AuthTestSupport {
     refreshToken: String = "new-refresh-token"
   ) throws -> Data {
     let response = AuthRefreshResponseDTO(accessToken: accessToken, refreshToken: refreshToken)
-    return try JSONEncoder().encode(response)
+    return try MeetPRCodec.encoder.encode(response)
   }
 
   static func errorData(

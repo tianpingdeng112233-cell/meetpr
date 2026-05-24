@@ -34,25 +34,21 @@ enum PlanningFixtures {
     [
       CoachStudentSummary(
         id: evaluationStudentID,
-        profile: profile(id: uuid(100), userID: evaluationStudentID, days: [2, 4, 6]),
         displayName: "王小明",
         status: .inEvaluation(remainingDays: 4, remainingHours: 13)
       ),
       CoachStudentSummary(
         id: activeStudentID,
-        profile: profile(id: uuid(101), userID: activeStudentID, days: [1, 3, 5, 6]),
         displayName: "张三",
         status: .active
       ),
       CoachStudentSummary(
         id: secondActiveStudentID,
-        profile: profile(id: uuid(102), userID: secondActiveStudentID, days: [1, 2, 4, 6]),
         displayName: "李四",
         status: .active
       ),
       CoachStudentSummary(
         id: abnormalStudentID,
-        profile: profile(id: uuid(103), userID: abnormalStudentID, days: [1, 3, 5]),
         displayName: "钱六",
         status: .abnormal(reason: .noTrainingForDays(3))
       ),
@@ -252,31 +248,6 @@ enum PlanningFixtures {
         createdAt: now
       )
     ]
-  }
-
-  private static func profile(id: UUID, userID: UUID, days: [Int]) -> StudentProfile {
-    StudentProfile(
-      id: id,
-      userID: userID,
-      trainingMode: .coached,
-      trainingYears: 3,
-      squatStance: .lowBar,
-      deadliftStance: .conventional,
-      benchGrip: .standard,
-      currentSquat1RM: Decimal(180),
-      bench1RM: Decimal(120),
-      deadlift1RM: Decimal(220),
-      trainingDaysOfWeek: days,
-      gymTier: .commercial,
-      dailyIntensityLevel: 3,
-      lifeStressLevel: 3,
-      recoverySpeed: 4,
-      sleepHours: 7,
-      musclesToStrengthen: ["股四", "腘绳", "肩"],
-      competitionTargeting: false,
-      createdAt: now,
-      updatedAt: now
-    )
   }
 
   private static func exercise(

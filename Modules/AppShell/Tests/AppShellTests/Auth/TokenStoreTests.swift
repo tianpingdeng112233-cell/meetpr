@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import AppShell
@@ -41,4 +42,34 @@ import Testing
 
   #expect(await store.accessToken() == "new-access")
   #expect(await store.refreshToken() == "new-refresh")
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func keychainTokenStoreSavesReadsAndClearsTokens() async {
+  let store = KeychainTokenStore(serviceName: "app.meetpr.tests.\(UUID().uuidString)")
+  await store.clear()
+
+  await store.save(access: "access-1", refresh: "refresh-1")
+
+  #expect(await store.accessToken() == "access-1")
+  #expect(await store.refreshToken() == "refresh-1")
+
+  await store.clear()
+
+  #expect(await store.accessToken() == nil)
+  #expect(await store.refreshToken() == nil)
+  #expect(await store.cachedUser() == nil)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func keychainTokenStoreRoundTripsCachedUser() async {
+  let store = KeychainTokenStore(serviceName: "app.meetpr.tests.\(UUID().uuidString)")
+  let user = AuthTestSupport.user(role: .coachedStudent)
+  await store.clear()
+
+  await store.saveUser(user)
+
+  #expect(await store.cachedUser() == user)
+
+  await store.clear()
 }

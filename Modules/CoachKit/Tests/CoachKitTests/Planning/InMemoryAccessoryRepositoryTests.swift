@@ -83,5 +83,5 @@ import Testing
   let secondStudents = try await secondRepository.fetchStudents()
 
   #expect(firstStudents.map(\.id) == secondStudents.map(\.id))
-  #expect(firstStudents.map(\.profile.id) == secondStudents.map(\.profile.id))
+  #expect(firstStudents.map(\.displayName) == secondStudents.map(\.displayName))
 }

@@ -38,28 +38,29 @@ public final class Session {
   }
 
   public func bootstrap() async {
-    let accessToken = await tokenStore.accessToken()
+    state = .authenticating
     let refreshToken = await tokenStore.refreshToken()
-    let cachedUser = await tokenStore.cachedUser()
-
-    guard accessToken != nil, let refreshToken, let cachedUser else {
+    guard let refreshToken else {
       await tokenStore.clear()
       state = .anonymous
       return
     }
 
-    state = .authenticated(cachedUser)
+    guard let cachedUser = await tokenStore.cachedUser() else {
+      await tokenStore.clear()
+      state = .anonymous
+      return
+    }
 
     do {
       let tokens = try await auth.refresh(refreshToken: refreshToken)
       await tokenStore.save(access: tokens.accessToken, refresh: tokens.refreshToken)
+      await tokenStore.saveUser(cachedUser)
+      state = .authenticated(cachedUser)
     } catch {
-      if let authError = error as? AuthRepositoryError, authError.clearsBootstrapSession {
-        await tokenStore.clear()
-        state = .anonymous
-      } else {
-        Self.logger.warning("bootstrap_refresh_deferred \(String(describing: error))")
-      }
+      Self.logger.warning("bootstrap_refresh_failed \(String(describing: error))")
+      await tokenStore.clear()
+      state = .anonymous
     }
   }
 

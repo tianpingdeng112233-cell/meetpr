@@ -151,7 +151,7 @@ private struct StudentRow: View {
     case .inEvaluation(let days, let hours):
       "评估期 \(days) 天 \(hours) 时剩"
     case .active:
-      "训练日 \(PlanningDisplay.compactWeekdays(student.profile.trainingDaysOfWeek))"
+      "可创建计划"
     case .abnormal(let reason):
       PlanningDisplay.abnormalReason(reason)
     }

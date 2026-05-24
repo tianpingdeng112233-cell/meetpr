@@ -16,13 +16,8 @@ public enum MeetPRCodec {
       let container = try decoder.singleValueContainer()
       let rawValue = try container.decode(String.self)
 
-      // FormatStyle ISO8601 API requires macOS 12+; the availability check
-      // keeps `swift test` building under SPM's older default macOS deployment.
-      // (iOS minimum is 17 per CLAUDE.md, so on-device the check is always true.)
-      if #available(iOS 15.0, macOS 12.0, *) {
-        if let timestamp = try? Date(rawValue, strategy: .iso8601) {
-          return timestamp
-        }
+      if let timestamp = parseTimestamp(rawValue) {
+        return timestamp
       }
 
       if let dateOnly = parseDateOnly(rawValue) {
@@ -35,6 +30,19 @@ public enum MeetPRCodec {
       )
     }
     return decoder
+  }
+
+  private static func parseTimestamp(_ rawValue: String) -> Date? {
+    let fractionalFormatter = ISO8601DateFormatter()
+    fractionalFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+    if let timestamp = fractionalFormatter.date(from: rawValue) {
+      return timestamp
+    }
+
+    let internetDateTimeFormatter = ISO8601DateFormatter()
+    internetDateTimeFormatter.formatOptions = [.withInternetDateTime]
+    return internetDateTimeFormatter.date(from: rawValue)
   }
 
   private static func parseDateOnly(_ rawValue: String) -> Date? {

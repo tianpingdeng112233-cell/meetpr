@@ -18,7 +18,7 @@ import Testing
       "source": "coach",
       "source_template_id": null,
       "status": "published",
-      "created_at": "2026-05-22T12:00:00Z",
+      "created_at": "2026-05-22T12:00:00.254Z",
       "updated_at": "2026-05-22T13:00:00Z",
       "days": [
         {

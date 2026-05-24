@@ -17,7 +17,7 @@ import Testing
     role: .coach
   )
   let body = try #require(await capture.body())
-  let request = try JSONDecoder().decode(AuthRegisterRequestDTO.self, from: body)
+  let request = try MeetPRCodec.decoder.decode(AuthRegisterRequestDTO.self, from: body)
 
   #expect(request.phone == "+8613800000001")
   #expect(request.role == .coach)
@@ -41,7 +41,7 @@ import Testing
 
   let result = try await repository.login(phone: "13800000001", password: "password123")
   let body = try #require(await capture.body())
-  let request = try JSONDecoder().decode(AuthLoginRequestDTO.self, from: body)
+  let request = try MeetPRCodec.decoder.decode(AuthLoginRequestDTO.self, from: body)
 
   #expect(request.phone == "+8613800000001")
   #expect(request.password == "password123")
@@ -57,7 +57,7 @@ import Testing
 
   let tokens = try await repository.refresh(refreshToken: "old-refresh")
   let body = try #require(await capture.body())
-  let request = try JSONDecoder().decode(AuthRefreshRequestDTO.self, from: body)
+  let request = try MeetPRCodec.decoder.decode(AuthRefreshRequestDTO.self, from: body)
 
   #expect(request.refreshToken == "old-refresh")
   #expect(tokens == TokenPair(accessToken: "new-access-token", refreshToken: "new-refresh-token"))
