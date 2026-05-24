@@ -1,21 +1,81 @@
 import DesignSystem
+import RepositoryContracts
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct CoachRootView: View {
   private let repository: any PlanRepository
+  private let studentPlans: any StudentPlanRepository
+  private let studentLogs: any StudentTrainingLogRepository
+  private let feedback: any StudentFeedbackRepository
   private let draftStore: DraftStore
-  @State private var showPlanning = false
+  @State private var rosterViewModel: StudentRosterViewModel
+  @State private var profileViewModel: CoachMyProfileViewModel
 
+  @MainActor
   public init(
     repository: any PlanRepository = InMemoryPlanRepository.preview(),
+    studentPlans: any StudentPlanRepository = EmptyStudentPlanRepository(),
+    studentLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
+    feedback: any StudentFeedbackRepository = EmptyStudentFeedbackRepository(),
+    onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
     self.repository = repository
+    self.studentPlans = studentPlans
+    self.studentLogs = studentLogs
+    self.feedback = feedback
     self.draftStore = draftStore
+    _rosterViewModel = State(
+      initialValue: StudentRosterViewModel(
+        students: repository,
+        plans: studentPlans,
+        trainingLogs: studentLogs,
+        feedback: feedback
+      )
+    )
+    _profileViewModel = State(
+      initialValue: CoachMyProfileViewModel(logoutAction: onLogout)
+    )
   }
 
   public var body: some View {
+    TabView {
+      CoachPlanningHomeView(repository: repository, draftStore: draftStore)
+        .tabItem {
+          Label("排计划", systemImage: "calendar.badge.plus")
+        }
+
+      StudentRosterView(
+        viewModel: rosterViewModel,
+        plans: studentPlans,
+        trainingLogs: studentLogs,
+        feedback: feedback
+      )
+      .tabItem {
+        Label("学员", systemImage: "person.2")
+      }
+      .badge(rosterViewModel.pendingAttentionCount)
+
+      CoachMyProfileView(viewModel: profileViewModel)
+        .tabItem {
+          Label("我的", systemImage: "person")
+        }
+    }
+    .task {
+      await rosterViewModel.loadIfNeeded()
+    }
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct CoachPlanningHomeView: View {
+  let repository: any PlanRepository
+  let draftStore: DraftStore
+  @State private var showPlanning = false
+
+  var body: some View {
     NavigationStack {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         Text("教练端")
@@ -30,21 +90,21 @@ public struct CoachRootView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
       .background(Color.MeetPR.bg)
       .navigationTitle("MeetPR")
-      #if os(iOS)
-        .fullScreenCover(isPresented: $showPlanning) {
-          PlanningCoordinatorView(
-            repository: repository,
-            draftStore: draftStore
-          )
-        }
-      #else
-        .sheet(isPresented: $showPlanning) {
-          PlanningCoordinatorView(
-            repository: repository,
-            draftStore: draftStore
-          )
-        }
-      #endif
     }
+    #if os(iOS)
+      .fullScreenCover(isPresented: $showPlanning) {
+        PlanningCoordinatorView(
+          repository: repository,
+          draftStore: draftStore
+        )
+      }
+    #else
+      .sheet(isPresented: $showPlanning) {
+        PlanningCoordinatorView(
+          repository: repository,
+          draftStore: draftStore
+        )
+      }
+    #endif
   }
 }

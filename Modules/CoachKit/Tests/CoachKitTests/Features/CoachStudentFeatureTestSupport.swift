@@ -1,0 +1,231 @@
+import CoreModels
+import Foundation
+import RepositoryContracts
+
+@testable import CoachKit
+
+enum CoachStudentFeatureFixtures {
+  static let coachID = UUID(uuidString: "02900000-0000-0000-0000-000000000001")!
+  static let studentID = UUID(uuidString: "02900000-0000-0000-0000-000000000101")!
+  static let secondStudentID = UUID(uuidString: "02900000-0000-0000-0000-000000000102")!
+  static let exerciseID = UUID(uuidString: "02900000-0000-0000-0000-000000000201")!
+  static let planExerciseID = UUID(uuidString: "02900000-0000-0000-0000-000000000301")!
+  static let setID = UUID(uuidString: "02900000-0000-0000-0000-000000000401")!
+  static let startDate = Date(timeIntervalSince1970: 1_769_817_600)  // 2026-01-30
+
+  static func summary(
+    id: UUID = studentID,
+    name: String = "测试学员"
+  ) -> CoachStudentSummary {
+    CoachStudentSummary(id: id, displayName: name, status: .active)
+  }
+
+  static func plan(startDate: Date = startDate) -> StudentPlanView {
+    StudentPlanView(
+      cycleID: UUID(uuidString: "02900000-0000-0000-0000-000000000501")!,
+      weekIndex: 1,
+      startDate: startDate,
+      days: (0..<7).map { offset in
+        let date = startDate.addingTimeInterval(Double(offset) * 86_400)
+        if offset == 1 {
+          return StudentPlanDay(
+            id: UUID(uuidString: "02900000-0000-0000-0000-000000000601")!,
+            date: date,
+            exercises: [exercise()]
+          )
+        }
+        return StudentPlanDay(
+          id: UUID(uuidString: String(format: "02900000-0000-0000-0000-%012d", 700 + offset))!,
+          date: date,
+          exercises: []
+        )
+      }
+    )
+  }
+
+  static func exercise() -> StudentPlanExercise {
+    StudentPlanExercise(
+      id: planExerciseID,
+      exercise: Exercise(
+        id: exerciseID,
+        name: "深蹲",
+        exerciseType: .mainLift,
+        mainLiftFamily: .squat,
+        isCompetitionLift: true,
+        muscleGroups: [.quad, .glute],
+        equipment: [.barbell],
+        movementPattern: [.squat],
+        createdAt: startDate
+      ),
+      sequenceIndex: 0,
+      prescribedSets: [
+        PrescribedSet(
+          id: setID,
+          setIndex: 0,
+          weightKg: 140,
+          reps: 5,
+          rpe: 8
+        )
+      ]
+    )
+  }
+
+  static func log(
+    studentID: UUID = studentID,
+    loggedAt: Date = startDate.addingTimeInterval(86_400 + 3_600)
+  ) -> StudentSetLog {
+    StudentSetLog(
+      id: UUID(),
+      studentID: studentID,
+      planExerciseID: planExerciseID,
+      setIndex: 0,
+      loggedAt: loggedAt,
+      weightKg: 142.5,
+      reps: 5,
+      rpe: 8.5,
+      completed: true
+    )
+  }
+
+  static func feedback(
+    studentID: UUID = studentID,
+    postedAt: Date = startDate.addingTimeInterval(2 * 86_400)
+  ) -> CoachFeedback {
+    CoachFeedback(
+      id: UUID(),
+      coachID: coachID,
+      studentID: studentID,
+      dayDate: startDate.addingTimeInterval(86_400),
+      planExerciseID: planExerciseID,
+      text: "保持这个节奏，下一组不要急。",
+      postedAt: postedAt,
+      readAt: nil
+    )
+  }
+}
+
+struct CoachFeatureTestError: Error, Equatable {}
+
+actor StubCoachPlanRepository: PlanRepository {
+  var students: [CoachStudentSummary]
+  var error: Error?
+
+  init(students: [CoachStudentSummary], error: Error? = nil) {
+    self.students = students
+    self.error = error
+  }
+
+  func fetchStudents() async throws -> [CoachStudentSummary] {
+    if let error { throw error }
+    return students
+  }
+
+  func fetchMainLiftCatalog() async throws -> [Exercise] {
+    []
+  }
+
+  func fetchAccessoryExercises(filters: AccessoryFilters) async throws -> [Exercise] {
+    []
+  }
+
+  func publishPlan(
+    plan: TrainingPlan,
+    days: [PlanDay],
+    exercises: [PlanExercise],
+    sets: [PlanSet]
+  ) async throws {}
+}
+
+actor StubStudentPlanRepository: StudentPlanRepository {
+  var plans: [UUID: StudentPlanView]
+
+  init(plans: [UUID: StudentPlanView]) {
+    self.plans = plans
+  }
+
+  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    plans[studentID]
+  }
+
+  func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? {
+    plans[studentID]?.days.first { CoachFeatureCalendar.isSameDay($0.date, date) }
+  }
+
+  func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
+    plans[studentID]?.days ?? []
+  }
+}
+
+actor StubTrainingLogRepository: StudentTrainingLogRepository {
+  var logs: [StudentSetLog]
+
+  init(logs: [StudentSetLog]) {
+    self.logs = logs
+  }
+
+  func recordSet(_ log: StudentSetLog) async throws {
+    logs.append(log)
+  }
+
+  func fetchLogs(studentID: UUID, in dateRange: ClosedRange<Date>) async throws -> [StudentSetLog] {
+    logs.filter { $0.studentID == studentID && dateRange.contains($0.loggedAt) }
+  }
+
+  func fetchLogsForExercise(
+    studentID: UUID,
+    planExerciseID: UUID
+  ) async throws -> [StudentSetLog] {
+    logs.filter { $0.studentID == studentID && $0.planExerciseID == planExerciseID }
+  }
+}
+
+actor StubFeedbackRepository: StudentFeedbackRepository {
+  private struct PostedFeedbackRequest {
+    let studentID: UUID
+    let dayDate: Date?
+    let planExerciseID: UUID?
+    let text: String
+  }
+
+  var feedback: [CoachFeedback]
+  var postError: Error?
+  private var postedRequests: [PostedFeedbackRequest] = []
+
+  init(feedback: [CoachFeedback] = [], postError: Error? = nil) {
+    self.feedback = feedback
+    self.postError = postError
+  }
+
+  func fetchInbox(studentID: UUID) async throws -> [CoachFeedback] {
+    feedback.filter { $0.studentID == studentID }.sorted { $0.postedAt > $1.postedAt }
+  }
+
+  func postFeedback(
+    studentID: UUID,
+    dayDate: Date?,
+    planExerciseID: UUID?,
+    text: String
+  ) async throws -> CoachFeedback {
+    if let postError { throw postError }
+    postedRequests.append(
+      PostedFeedbackRequest(
+        studentID: studentID,
+        dayDate: dayDate,
+        planExerciseID: planExerciseID,
+        text: text
+      )
+    )
+    let item = CoachStudentFeatureFixtures.feedback(
+      studentID: studentID,
+      postedAt: CoachStudentFeatureFixtures.startDate.addingTimeInterval(4 * 86_400)
+    )
+    feedback.append(item)
+    return item
+  }
+
+  func markRead(feedbackID: UUID) async throws {}
+
+  func postedTexts() -> [String] {
+    postedRequests.map(\.text)
+  }
+}

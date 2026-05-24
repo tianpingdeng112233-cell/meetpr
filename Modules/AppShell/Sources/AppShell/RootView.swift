@@ -47,7 +47,16 @@ public struct RootView: View {
     case .authenticated(let user):
       switch user.role {
       case .coach:
-        CoachRootView(repository: coachPlans, draftStore: draftStore)
+        CoachRootView(
+          repository: coachPlans,
+          studentPlans: studentPlans,
+          studentLogs: studentLogs,
+          feedback: studentFeedback,
+          onLogout: {
+            await session.logout()
+          },
+          draftStore: draftStore
+        )
       case .coachedStudent, .selfTrainStudent:
         StudentRootView(
           studentID: user.id,
