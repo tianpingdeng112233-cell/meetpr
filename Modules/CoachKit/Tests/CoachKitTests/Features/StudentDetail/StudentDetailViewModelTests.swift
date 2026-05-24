@@ -46,10 +46,10 @@ import Testing
   utcPlusEight.timeZone = TimeZone(secondsFromGMT: 8 * 3_600)!
 
   let planDate = try #require(
-    date(in: utc, year: 2026, month: 2, day: 1, hour: 0, minute: 0)
+    date(utc, DateComponents(year: 2026, month: 2, day: 1, hour: 0, minute: 0))
   )
   let earlyMorningLogDate = try #require(
-    date(in: utcPlusEight, year: 2026, month: 2, day: 1, hour: 0, minute: 30)
+    date(utcPlusEight, DateComponents(year: 2026, month: 2, day: 1, hour: 0, minute: 30))
   )
   let planDay = StudentPlanDay(
     id: UUID(uuidString: "02900000-0000-0000-0000-000000000777")!,
@@ -98,21 +98,9 @@ import Testing
   #expect(viewModel.overview.latestFeedback?.id == newer.id)
 }
 
-private func date(
-  in calendar: Calendar,
-  year: Int,
-  month: Int,
-  day: Int,
-  hour: Int,
-  minute: Int
-) -> Date? {
-  var components = DateComponents()
+private func date(_ calendar: Calendar, _ dateComponents: DateComponents) -> Date? {
+  var components = dateComponents
   components.calendar = calendar
   components.timeZone = calendar.timeZone
-  components.year = year
-  components.month = month
-  components.day = day
-  components.hour = hour
-  components.minute = minute
   return calendar.date(from: components)
 }
