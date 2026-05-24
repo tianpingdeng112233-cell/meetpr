@@ -33,6 +33,31 @@ public actor BackendStudentFeedbackRepository: StudentFeedbackRepository {
     }
   }
 
+  public func postFeedback(
+    studentID: UUID,
+    dayDate: Date?,
+    planExerciseID: UUID?,
+    text: String
+  ) async throws -> CoachFeedback {
+    let token = try await session.accessToken()
+    let response = try await api.createFeedback(
+      CreateFeedbackRequestDTO(
+        studentID: studentID,
+        dayDate: dayDate,
+        planExerciseID: planExerciseID,
+        text: text
+      ),
+      accessToken: token
+    )
+    let item = response.toDomain()
+    var cached = await cache.loadFeedback(studentID: studentID) ?? []
+    cached.removeAll { $0.id == item.id }
+    cached.append(item)
+    try await cache.save(
+      feedback: cached.sorted { $0.postedAt > $1.postedAt }, studentID: studentID)
+    return item
+  }
+
   public func markRead(feedbackID: UUID) async throws {
     let token = try await session.accessToken()
     try await api.markFeedbackRead(id: feedbackID, accessToken: token)

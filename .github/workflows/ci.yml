@@ -35,6 +35,25 @@ jobs:
       - name: Swift version
         run: swift --version
 
+      - name: Module boundary checks
+        run: |
+          if grep -rE "^import StudentKit" Modules/CoachKit; then
+            echo "CoachKit must not import StudentKit"
+            exit 1
+          fi
+          if grep -rE "^import CoachKit" Modules/StudentKit; then
+            echo "StudentKit must not import CoachKit"
+            exit 1
+          fi
+          if grep -F '"StudentKit"' Modules/CoachKit/Package.swift; then
+            echo "CoachKit Package.swift must not depend on StudentKit"
+            exit 1
+          fi
+          if grep -F '"CoachKit"' Modules/StudentKit/Package.swift; then
+            echo "StudentKit Package.swift must not depend on CoachKit"
+            exit 1
+          fi
+
       - name: Mark build start time
         id: time-start
         run: echo "value=$(date +%s)" >> "$GITHUB_OUTPUT"

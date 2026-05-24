@@ -17,6 +17,26 @@ public actor InMemoryStudentFeedbackRepository: StudentFeedbackRepository {
       .sorted { $0.postedAt > $1.postedAt }
   }
 
+  public func postFeedback(
+    studentID: UUID,
+    dayDate: Date?,
+    planExerciseID: UUID?,
+    text: String
+  ) async throws -> CoachFeedback {
+    let item = CoachFeedback(
+      id: UUID(),
+      coachID: StudentDemoSeed.coachID,
+      studentID: studentID,
+      dayDate: dayDate,
+      planExerciseID: planExerciseID,
+      text: text,
+      postedAt: now(),
+      readAt: nil
+    )
+    feedback.append(item)
+    return item
+  }
+
   public func markRead(feedbackID: UUID) async throws {
     guard let index = feedback.firstIndex(where: { $0.id == feedbackID }) else {
       return

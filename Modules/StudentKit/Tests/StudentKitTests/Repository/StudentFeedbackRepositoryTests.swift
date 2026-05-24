@@ -27,3 +27,22 @@ import Testing
 
   #expect(otherInbox.isEmpty)
 }
+
+@Test func feedbackRepositoryPostsNewUnreadFeedback() async throws {
+  let repository = InMemoryStudentFeedbackRepository(
+    seed: [],
+    now: { StudentDemoSeed.referenceDate }
+  )
+
+  let item = try await repository.postFeedback(
+    studentID: StudentDemoSeed.studentID,
+    dayDate: StudentDemoSeed.referenceDate,
+    planExerciseID: nil,
+    text: "今天动作很稳。"
+  )
+  let inbox = try await repository.fetchInbox(studentID: StudentDemoSeed.studentID)
+
+  #expect(item.text == "今天动作很稳。")
+  #expect(item.readAt == nil)
+  #expect(inbox.map(\.id) == [item.id])
+}
