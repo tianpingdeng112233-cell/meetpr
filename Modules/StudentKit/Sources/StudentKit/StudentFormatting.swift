@@ -30,6 +30,20 @@ enum StudentFormatting {
     return "\(decimal(set.weightKg))kg x \(reps)"
   }
 
+  /// A logged/achieved set line, e.g. "142.5kg × 5 @ RPE 7.5". Weight and RPE are
+  /// dropped when absent (RPE-only or bodyweight work).
+  static func result(weightKg: Decimal?, reps: Int, rpe: Decimal?) -> String {
+    var line = ""
+    if let weightKg {
+      line += "\(decimal(weightKg))kg × "
+    }
+    line += "\(reps)"
+    if let rpe {
+      line += " @ RPE \(decimal(rpe))"
+    }
+    return line
+  }
+
   static func completedCount(
     for day: StudentPlanDay,
     logs: [StudentSetLog]
