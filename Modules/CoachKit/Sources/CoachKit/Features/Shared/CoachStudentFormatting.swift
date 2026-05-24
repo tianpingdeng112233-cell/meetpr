@@ -61,25 +61,34 @@ enum CoachStudentFormatting {
 enum CoachFeatureCalendar {
   static var calendar: Calendar {
     var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+    calendar.timeZone = .autoupdatingCurrent
     return calendar
   }
 
-  static func startOfDay(_ date: Date) -> Date {
+  /// StudentPlanDay.date is a date-only plan anchor. Backend-decoded anchors may
+  /// be UTC midnight, but set logs must be bucketed by the athlete's device-local
+  /// calendar day so UTC+8 early-morning training stays attached to the visible day.
+  static func startOfDay(_ date: Date, calendar: Calendar = Self.calendar) -> Date {
     calendar.startOfDay(for: date)
   }
 
-  static func endOfDay(_ date: Date) -> Date {
-    calendar.date(byAdding: DateComponents(day: 1, second: -1), to: startOfDay(date)) ?? date
+  static func endOfDay(_ date: Date, calendar: Calendar = Self.calendar) -> Date {
+    calendar.date(
+      byAdding: DateComponents(day: 1, second: -1), to: startOfDay(date, calendar: calendar))
+      ?? date
   }
 
-  static func dateRange(starting startDate: Date, days: Int) -> ClosedRange<Date> {
-    let start = startOfDay(startDate)
+  static func dateRange(
+    starting startDate: Date,
+    days: Int,
+    calendar: Calendar = Self.calendar
+  ) -> ClosedRange<Date> {
+    let start = startOfDay(startDate, calendar: calendar)
     let endDate = calendar.date(byAdding: .day, value: max(0, days - 1), to: start) ?? start
-    return start...endOfDay(endDate)
+    return start...endOfDay(endDate, calendar: calendar)
   }
 
-  static func isSameDay(_ lhs: Date, _ rhs: Date) -> Bool {
+  static func isSameDay(_ lhs: Date, _ rhs: Date, calendar: Calendar = Self.calendar) -> Bool {
     calendar.isDate(lhs, inSameDayAs: rhs)
   }
 }

@@ -1,3 +1,5 @@
+import CoreModels
+import Foundation
 import Testing
 
 @testable import CoachKit
@@ -37,6 +39,43 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() throws {
+  var utc = Calendar(identifier: .gregorian)
+  utc.timeZone = TimeZone(secondsFromGMT: 0)!
+  var utcPlusEight = Calendar(identifier: .gregorian)
+  utcPlusEight.timeZone = TimeZone(secondsFromGMT: 8 * 3_600)!
+
+  let planDate = try #require(
+    date(in: utc, year: 2026, month: 2, day: 1, hour: 0, minute: 0)
+  )
+  let earlyMorningLogDate = try #require(
+    date(in: utcPlusEight, year: 2026, month: 2, day: 1, hour: 0, minute: 30)
+  )
+  let planDay = StudentPlanDay(
+    id: UUID(uuidString: "02900000-0000-0000-0000-000000000777")!,
+    date: planDate,
+    exercises: [CoachStudentFeatureFixtures.exercise()]
+  )
+  let plan = StudentPlanView(
+    cycleID: UUID(uuidString: "02900000-0000-0000-0000-000000000778")!,
+    weekIndex: 1,
+    startDate: planDate,
+    days: [planDay]
+  )
+  let days = StudentDetailViewModel.makeExecutionDays(
+    plan: plan,
+    logs: [CoachStudentFeatureFixtures.log(loggedAt: earlyMorningLogDate)],
+    now: planDate,
+    calendar: utcPlusEight
+  )
+
+  #expect(days[0].planDay?.id == planDay.id)
+  #expect(days[0].logs.count == 1)
+  #expect(days[0].logs[0].loggedAt == earlyMorningLogDate)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func detailAppendPostedFeedbackRefreshesLatestOverview() async {
   let summary = CoachStudentFeatureFixtures.summary()
   let older = CoachStudentFeatureFixtures.feedback(
@@ -57,4 +96,23 @@ import Testing
 
   #expect(viewModel.feedbackItems.first?.id == newer.id)
   #expect(viewModel.overview.latestFeedback?.id == newer.id)
+}
+
+private func date(
+  in calendar: Calendar,
+  year: Int,
+  month: Int,
+  day: Int,
+  hour: Int,
+  minute: Int
+) -> Date? {
+  var components = DateComponents()
+  components.calendar = calendar
+  components.timeZone = calendar.timeZone
+  components.year = year
+  components.month = month
+  components.day = day
+  components.hour = hour
+  components.minute = minute
+  return calendar.date(from: components)
 }

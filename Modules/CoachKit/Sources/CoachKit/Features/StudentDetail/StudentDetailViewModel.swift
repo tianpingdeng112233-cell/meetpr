@@ -149,29 +149,30 @@ final class StudentDetailViewModel {
   static func makeExecutionDays(
     plan: StudentPlanView?,
     logs: [StudentSetLog],
-    now: Date
+    now: Date,
+    calendar: Calendar = CoachFeatureCalendar.calendar
   ) -> [StudentExecutionDay] {
     let startDate =
       plan?.startDate
-      ?? (CoachFeatureCalendar.calendar.date(
+      ?? (calendar.date(
         byAdding: .day,
         value: -6,
         to: now
       ) ?? now)
     let daysByStart = Dictionary(
       uniqueKeysWithValues: (plan?.days ?? []).map {
-        (CoachFeatureCalendar.startOfDay($0.date), $0)
+        (CoachFeatureCalendar.startOfDay($0.date, calendar: calendar), $0)
       }
     )
 
     return (0..<7).map { offset in
       let date =
-        CoachFeatureCalendar.calendar.date(byAdding: .day, value: offset, to: startDate)
+        calendar.date(byAdding: .day, value: offset, to: startDate)
         ?? startDate
-      let dayStart = CoachFeatureCalendar.startOfDay(date)
+      let dayStart = CoachFeatureCalendar.startOfDay(date, calendar: calendar)
       let dayLogs =
         logs
-        .filter { CoachFeatureCalendar.isSameDay($0.loggedAt, date) }
+        .filter { CoachFeatureCalendar.isSameDay($0.loggedAt, date, calendar: calendar) }
         .sorted { lhs, rhs in
           if lhs.planExerciseID == rhs.planExerciseID {
             return lhs.setIndex < rhs.setIndex
