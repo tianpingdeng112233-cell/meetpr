@@ -67,14 +67,14 @@ import Testing
   #expect(
     AuthFormViewModel.toastMessage(
       for: AuthRepositoryError.backend(statusCode: 401, code: .invalidCredentials, issues: [])
-    ) == "手机号或密码不正确"
+    ) == "手机号或密码错误"
   )
   #expect(
     AuthFormViewModel.toastMessage(
       for: AuthRepositoryError.backend(statusCode: 429, code: .rateLimited, issues: [])
     ) == "请求过于频繁,请稍后重试"
   )
-  #expect(AuthFormViewModel.toastMessage(for: AuthRepositoryError.network) == "网络异常,请重试")
+  #expect(AuthFormViewModel.toastMessage(for: AuthRepositoryError.network) == "网络不稳定,重试")
 }
 
 @MainActor
@@ -86,7 +86,7 @@ import Testing
     for: AuthRepositoryError.backend(statusCode: 400, code: .validationError, issues: [issue])
   )
 
-  #expect(message == "Phone must be E.164 format")
+  #expect(message == "手机号格式不对(+86 开头)")
 }
 
 @MainActor

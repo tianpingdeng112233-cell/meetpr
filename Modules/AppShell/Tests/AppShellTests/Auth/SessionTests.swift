@@ -55,7 +55,7 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bootstrapWithNetworkRefreshFailureKeepsCachedSession() async {
+@Test func bootstrapWithNetworkRefreshFailureClearsStoreAndReturnsAnonymous() async {
   let user = AuthTestSupport.user()
   let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
   let repository = InMemoryAuthRepository(forcedError: .network)
@@ -63,10 +63,10 @@ import Testing
 
   await session.bootstrap()
 
-  #expect(session.state == .authenticated(user))
-  #expect(await store.accessToken() == "access")
-  #expect(await store.refreshToken() == "refresh")
-  #expect(await store.cachedUser() == user)
+  #expect(session.state == .anonymous)
+  #expect(await store.accessToken() == nil)
+  #expect(await store.refreshToken() == nil)
+  #expect(await store.cachedUser() == nil)
 }
 
 @MainActor

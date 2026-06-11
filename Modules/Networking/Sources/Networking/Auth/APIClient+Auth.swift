@@ -26,18 +26,8 @@ extension APIClient {
     to endpoint: Endpoint,
     as responseType: Response.Type
   ) async throws -> Response {
-    let body = try AuthWireCodec.encoder.encode(request)
+    let body = try MeetPRCodec.encoder.encode(request)
     let data = try await post(endpoint, body: body)
-    return try AuthWireCodec.decoder.decode(responseType, from: data)
-  }
-}
-
-private enum AuthWireCodec {
-  static var encoder: JSONEncoder {
-    JSONEncoder()
-  }
-
-  static var decoder: JSONDecoder {
-    JSONDecoder()
+    return try MeetPRCodec.decoder.decode(responseType, from: data)
   }
 }

@@ -4,7 +4,13 @@ import Testing
 @testable import Networking
 
 @Test func sharedClientHasDefaultBaseURL() {
-  #expect(APIClient.shared.baseURL.host() == "api.meetpr.local")
+  #expect(APIClient.shared.baseURL.absoluteString == "http://120.27.243.110:3000")
+}
+
+@Test func buildConfigUsesEnvironmentBaseURLWhenPresent() {
+  let url = BuildConfig.backendBaseURL(environment: ["MEETPR_API_BASE_URL": "http://demo.invalid"])
+
+  #expect(url.absoluteString == "http://demo.invalid")
 }
 
 @Test func endpointsExposeExpectedPaths() {

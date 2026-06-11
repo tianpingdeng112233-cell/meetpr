@@ -15,7 +15,7 @@ struct PlanningStudentHeaderView: View {
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(Color.MeetPR.fgPrimary)
 
-          Text(liftsSummary)
+          Text(statusSummary)
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgSecondary)
             .lineLimit(1)
@@ -31,11 +31,8 @@ struct PlanningStudentHeaderView: View {
 
         if isExpanded {
           VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-            Text("训练日：\(PlanningDisplay.compactWeekdays(student.profile.trainingDaysOfWeek))")
-            Text("训练环境：\(student.profile.gymTier.rawValue)")
-            Text("想增强：\(student.profile.musclesToStrengthen.joined(separator: " / "))")
-            Text("伤病：\(student.profile.injuries.joined(separator: " / "))")
-            Text("训练年限：\(student.profile.trainingYears) 年")
+            Text("学员 ID：\(student.id.uuidString)")
+            Text("状态：\(statusSummary)")
           }
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
@@ -44,10 +41,14 @@ struct PlanningStudentHeaderView: View {
     }
   }
 
-  private var liftsSummary: String {
-    let squat = student.profile.currentSquat1RM
-    let bench = student.profile.bench1RM
-    let deadlift = student.profile.deadlift1RM
-    return "S:\(squat) B:\(bench) D:\(deadlift)"
+  private var statusSummary: String {
+    switch student.status {
+    case .inEvaluation(let days, let hours):
+      "评估期 \(days) 天 \(hours) 时剩"
+    case .active:
+      "活跃"
+    case .abnormal(let reason):
+      PlanningDisplay.abnormalReason(reason)
+    }
   }
 }

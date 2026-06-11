@@ -35,9 +35,9 @@ public struct AuthUserDTO: Codable, Equatable, Sendable {
   public let id: UUID
   public let phone: String
   public let role: UserRole
-  public let createdAt: String
+  public let createdAt: Date
 
-  public init(id: UUID, phone: String, role: UserRole, createdAt: String) {
+  public init(id: UUID, phone: String, role: UserRole, createdAt: Date) {
     self.id = id
     self.phone = phone
     self.role = role
@@ -45,15 +45,14 @@ public struct AuthUserDTO: Codable, Equatable, Sendable {
   }
 
   public func toUser() throws -> User {
-    let parsedCreatedAt = try Date(createdAt, strategy: .iso8601)
     return User(
       id: id,
       phone: phone,
       name: nil,
       unitSystem: .metric,
       role: role,
-      createdAt: parsedCreatedAt,
-      updatedAt: parsedCreatedAt
+      createdAt: createdAt,
+      updatedAt: createdAt
     )
   }
 }

@@ -8,6 +8,7 @@ public protocol PlanRepository: Sendable {
   func publishPlan(
     plan: TrainingPlan,
     days: [PlanDay],
-    exercises: [PlanExercise]
+    exercises: [PlanExercise],
+    sets: [PlanSet]
   ) async throws
 }
