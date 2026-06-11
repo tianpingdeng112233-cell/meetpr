@@ -32,15 +32,33 @@ public struct AVFoundationVideoExporter: VideoExporting {
     session.outputFileType = .mp4
     session.shouldOptimizeForNetworkUse = true
 
-    await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
-      session.exportAsynchronously {
-        continuation.resume()
+    // Cooperative cancellation: cancelling the surrounding Task cancels the
+    // export session, and any partial output is removed below (Codex P1/P2).
+    let box = ExportSessionBox(session)
+    await withTaskCancellationHandler {
+      await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+        box.session.exportAsynchronously {
+          continuation.resume()
+        }
       }
+    } onCancel: {
+      box.session.cancelExport()
     }
 
     guard session.status == .completed else {
+      try? FileManager.default.removeItem(at: destinationURL)
+      if session.status == .cancelled || Task.isCancelled {
+        throw CancellationError()
+      }
       let reason = session.error?.localizedDescription ?? "status \(session.status.rawValue)"
       throw VideoUploadError.exportFailed(reason)
     }
   }
+}
+
+/// AVAssetExportSession is thread-safe for cancelExport but not Sendable;
+/// the box scopes the unchecked crossing to this one cancellation hop.
+private final class ExportSessionBox: @unchecked Sendable {
+  let session: AVAssetExportSession
+  init(_ session: AVAssetExportSession) { self.session = session }
 }

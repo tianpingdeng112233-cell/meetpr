@@ -40,7 +40,9 @@ public struct OSSPartUploader: Sendable {
     var request = URLRequest(url: url)
     request.httpMethod = "PUT"
     request.timeoutInterval = Self.partTimeoutSeconds
-    request.setValue("application/octet-stream", forHTTPHeaderField: "content-type")
+    // Deliberately NO Content-Type header: backend presigned part URLs are
+    // signed without one, and OSS folds Content-Type into the signature —
+    // sending it would 403 the real upload (Codex review P1).
 
     let response = try await transport(request, data)
     guard (200..<300).contains(response.statusCode) else {

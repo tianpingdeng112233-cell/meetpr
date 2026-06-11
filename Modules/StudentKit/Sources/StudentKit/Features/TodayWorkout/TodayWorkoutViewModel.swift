@@ -149,9 +149,11 @@ public final class TodayWorkoutViewModel {
 
     do {
       let previouslyCompleted = drafts[rowIndex].completed
-      try await logs.recordSet(log)
+      // The repository returns the canonical (backend-upserted) log: its id
+      // is what video linkage and e1RM points must reference (Codex P1).
+      let persisted = try await logs.recordSet(log)
       draft.completed = completed
-      draft.loggedSetID = log.id
+      draft.loggedSetID = persisted.id
       nextDrafts[rowIndex] = draft
       state = .loaded(plan: plan, drafts: nextDrafts)
 
@@ -159,7 +161,7 @@ public final class TodayWorkoutViewModel {
       // so un-checking and re-checking the same set can't farm PR events.
       // Spec 030 rides the same edge for the rest timer.
       if !previouslyCompleted, completed {
-        await recordE1RMPoint(for: draft, log: log, studentID: studentID)
+        await recordE1RMPoint(for: draft, log: persisted, studentID: studentID)
         startRestTimer(after: draft, drafts: nextDrafts)
       }
     } catch {

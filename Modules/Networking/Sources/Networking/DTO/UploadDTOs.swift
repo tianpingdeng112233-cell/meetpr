@@ -21,22 +21,27 @@ public struct InitiateUploadRequestDTO: Codable, Equatable, Sendable {
   public let contentType: String
   public let sizeBytes: Int64
   public let partCount: Int
-  /// Optional display name. Spec 027 V0.1 packs the setLog UUID in here so a
-  /// future backend increment can reverse-map attachments to set logs.
+  /// Optional display name (human-facing only since set_log_id exists).
   public let filename: String?
+  /// Server-side association for set videos (backend spec 007): the coach
+  /// video wall resolves through this, so it must be the backend's canonical
+  /// set-log id, never a locally generated one.
+  public let setLogID: UUID?
 
   public init(
     kind: AttachmentKindDTO,
     contentType: String,
     sizeBytes: Int64,
     partCount: Int,
-    filename: String? = nil
+    filename: String? = nil,
+    setLogID: UUID? = nil
   ) {
     self.kind = kind
     self.contentType = contentType
     self.sizeBytes = sizeBytes
     self.partCount = partCount
     self.filename = filename
+    self.setLogID = setLogID
   }
 }
 

@@ -33,6 +33,12 @@ extension VideoUploadManager {
     let destination = fileURL(for: record)
     try await exporter.export(from: sourceURL, to: destination)
 
+    try Task.checkCancellation()
+    guard try await repository.fetch(id: record.id) != nil else {
+      // Removed while exporting: don't resurrect, clean the output.
+      try? FileManager.default.removeItem(at: destination)
+      throw CancellationError()
+    }
     var exported = record
     exported.sizeBytes = try Self.fileSize(at: destination)
     try await repository.save(exported)
@@ -54,17 +60,20 @@ extension VideoUploadManager {
     let chunker = VideoFileChunker(partSizeBytes: configuration.partSizeBytes)
     let partCount = try chunker.partCount(totalBytes: uploading.sizeBytes)
 
-    // The filename carries the set-log UUID so a future backend increment can
-    // reverse-map attachments to set logs (spec 027 V0.1 association note).
+    try Task.checkCancellation()
+    // set_log_id is the server-side association (backend spec 007); the
+    // filename stays human-readable only.
     let response = try await service.initiate(
       InitiateUploadRequestDTO(
         kind: .setVideo,
         contentType: uploading.contentType,
         sizeBytes: uploading.sizeBytes,
         partCount: partCount,
-        filename: "setlog-\(uploading.setLogID.uuidString)-\(uploading.id.uuidString).mp4"
+        filename: "setlog-\(uploading.setLogID.uuidString)-\(uploading.id.uuidString).mp4",
+        setLogID: uploading.setLogID
       )
     )
+    try Task.checkCancellation()
     uploading.remoteAttachmentID = response.attachmentID
     try await repository.save(uploading)
     broadcast(.updated(uploading, progress: 0))
@@ -91,10 +100,18 @@ extension VideoUploadManager {
       throw VideoUploadError.completeConflict
     }
 
+    // A concurrent remove() may have deleted the record while we were on the
+    // wire; saving now would resurrect it as a ghost (Codex review P1).
+    guard try await repository.fetch(id: record.id) != nil else { return }
+
     var uploaded = record
     uploaded.status = .uploaded
     uploaded.uploadedAt = now()
+    // The exported file served its purpose; keeping it leaks 15-200MB per
+    // video (Codex review P1). Playback uses the backend presigned URL.
+    uploaded.localFileName = nil
     try await repository.save(uploaded)
+    try? FileManager.default.removeItem(at: fileURL(for: record))
     broadcast(.updated(uploaded, progress: 1))
   }
 
@@ -187,7 +204,7 @@ extension VideoUploadManager {
     broadcast(.updated(record, progress: nil))
   }
 
-  private static func partURLMap(
+  static func partURLMap(
     from dtos: [UploadPartURLDTO],
     expectedCount: Int
   ) throws -> [Int: URL] {
@@ -197,6 +214,11 @@ extension VideoUploadManager {
     var map: [Int: URL] = [:]
     for dto in dtos {
       guard let url = URL(string: dto.url) else {
+        throw VideoUploadError.invalidPartURL(partNumber: dto.partNumber)
+      }
+      // Count alone hides duplicates/out-of-range numbers, which would
+      // silently truncate the upload (Codex review P2).
+      guard (1...expectedCount).contains(dto.partNumber), map[dto.partNumber] == nil else {
         throw VideoUploadError.invalidPartURL(partNumber: dto.partNumber)
       }
       map[dto.partNumber] = url

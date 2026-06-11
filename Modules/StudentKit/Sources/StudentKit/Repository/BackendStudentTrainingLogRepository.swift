@@ -18,9 +18,10 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
     self.cache = cache
   }
 
-  public func recordSet(_ log: StudentSetLog) async throws {
+  @discardableResult
+  public func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
     let token = try await session.accessToken()
-    _ = try await api.logSet(
+    let response = try await api.logSet(
       CreateSetLogRequestDTO(
         planExerciseID: log.planExerciseID,
         setIndex: log.setIndex,
@@ -30,6 +31,19 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
         completed: log.completed
       ),
       accessToken: token
+    )
+    // The backend upserts by slot and owns the canonical id — everything
+    // downstream (video set_log_id, e1RM points) must reference it.
+    return StudentSetLog(
+      id: response.id,
+      studentID: log.studentID,
+      planExerciseID: log.planExerciseID,
+      setIndex: log.setIndex,
+      loggedAt: response.loggedAt,
+      weightKg: log.weightKg,
+      reps: log.reps,
+      rpe: log.rpe,
+      completed: log.completed
     )
   }
 

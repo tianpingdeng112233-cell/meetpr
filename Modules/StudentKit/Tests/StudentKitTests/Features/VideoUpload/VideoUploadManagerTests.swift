@@ -34,8 +34,11 @@ import Testing
   #expect(uploaded.setLogID == setLogID)
   #expect(uploaded.studentID == studentID)
 
+  // Successful uploads release the exported file — keeping it leaks
+  // 15-200MB per video (Codex review P1); playback uses the backend URL.
   let exportedFile = harness.filesDirectory.appendingPathComponent("\(record.id.uuidString).mp4")
-  #expect(FileManager.default.fileExists(atPath: exportedFile.path))
+  #expect(!FileManager.default.fileExists(atPath: exportedFile.path))
+  #expect(uploaded.localFileName == nil)
 }
 
 @Test func uploadManagerRetriesTransientPartFailures() async throws {
@@ -198,4 +201,28 @@ private func makeRecord(
     recordedAt: Date(),
     uploadedAt: status == .uploaded ? Date() : nil
   )
+}
+
+@Test func partURLMapRejectsDuplicateAndOutOfRangeNumbers() throws {
+  let valid = [
+    UploadPartURLDTO(partNumber: 1, url: "https://oss.invalid/p1"),
+    UploadPartURLDTO(partNumber: 2, url: "https://oss.invalid/p2"),
+  ]
+  #expect(try VideoUploadManager.partURLMap(from: valid, expectedCount: 2).count == 2)
+
+  let duplicated = [
+    UploadPartURLDTO(partNumber: 1, url: "https://oss.invalid/p1"),
+    UploadPartURLDTO(partNumber: 1, url: "https://oss.invalid/p1b"),
+  ]
+  #expect(throws: VideoUploadError.self) {
+    try VideoUploadManager.partURLMap(from: duplicated, expectedCount: 2)
+  }
+
+  let outOfRange = [
+    UploadPartURLDTO(partNumber: 1, url: "https://oss.invalid/p1"),
+    UploadPartURLDTO(partNumber: 3, url: "https://oss.invalid/p3"),
+  ]
+  #expect(throws: VideoUploadError.self) {
+    try VideoUploadManager.partURLMap(from: outOfRange, expectedCount: 2)
+  }
 }

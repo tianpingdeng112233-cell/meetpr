@@ -163,8 +163,10 @@ actor StubTrainingLogRepository: StudentTrainingLogRepository {
     self.logs = logs
   }
 
-  func recordSet(_ log: StudentSetLog) async throws {
+  @discardableResult
+  func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
     logs.append(log)
+    return log
   }
 
   func fetchLogs(studentID: UUID, in dateRange: ClosedRange<Date>) async throws -> [StudentSetLog] {

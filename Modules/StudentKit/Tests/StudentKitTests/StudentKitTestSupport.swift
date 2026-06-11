@@ -21,7 +21,8 @@ actor TestStudentPlanStore: StudentPlanStore {
 struct TestError: Error, Equatable {}
 
 actor FailingTrainingLogRepository: StudentTrainingLogRepository {
-  func recordSet(_ log: StudentSetLog) async throws {
+  @discardableResult
+  func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
     throw TestError()
   }
 

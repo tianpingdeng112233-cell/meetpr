@@ -9,18 +9,34 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
     self.logsByStudentID = Dictionary(grouping: seed, by: \.studentID)
   }
 
-  public func recordSet(_ log: StudentSetLog) async throws {
+  @discardableResult
+  public func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
     var logs = logsByStudentID[log.studentID, default: []]
+    let persisted: StudentSetLog
     if let index = logs.firstIndex(where: {
       $0.studentID == log.studentID
         && $0.planExerciseID == log.planExerciseID
         && $0.setIndex == log.setIndex
     }) {
-      logs[index] = log
+      // Same slot keeps its identity across overwrites, like the backend upsert.
+      persisted = StudentSetLog(
+        id: logs[index].id,
+        studentID: log.studentID,
+        planExerciseID: log.planExerciseID,
+        setIndex: log.setIndex,
+        loggedAt: log.loggedAt,
+        weightKg: log.weightKg,
+        reps: log.reps,
+        rpe: log.rpe,
+        completed: log.completed
+      )
+      logs[index] = persisted
     } else {
-      logs.append(log)
+      persisted = log
+      logs.append(persisted)
     }
     logsByStudentID[log.studentID] = logs.sorted { $0.loggedAt < $1.loggedAt }
+    return persisted
   }
 
   public func fetchLogs(
