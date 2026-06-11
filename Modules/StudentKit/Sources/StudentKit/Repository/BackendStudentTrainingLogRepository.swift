@@ -38,7 +38,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
     in dateRange: ClosedRange<Date>
   ) async throws -> [StudentSetLog] {
     let from = WireFormatting.dateOnlyString(from: dateRange.lowerBound)
-    let endDate = WireFormatting.dateOnlyString(from: dateRange.upperBound)
+    let endDate = WireFormatting.exclusiveEndDateOnlyString(closedUpperBound: dateRange.upperBound)
     let token = try await session.accessToken()
 
     do {
