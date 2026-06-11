@@ -10,6 +10,7 @@ public struct StudentRootView: View {
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
+  private let readiness: any ReadinessRepository
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var selectedTab: StudentTab = .dashboard
   @State private var pendingPRCount = 0
@@ -29,6 +30,9 @@ public struct StudentRootView: View {
       e1rm: InMemoryE1RMRepository(
         seedPoints: StudentDemoSeed.makeE1RMHistory(studentID: StudentDemoSeed.studentID),
         seedPRs: StudentDemoSeed.makeUnacknowledgedPR(studentID: StudentDemoSeed.studentID)
+      ),
+      readiness: InMemoryReadinessRepository(
+        seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
       )
     )
   }
@@ -38,12 +42,14 @@ public struct StudentRootView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
-    e1rm: any E1RMRepository = LocalE1RMRepository()
+    e1rm: any E1RMRepository = LocalE1RMRepository(),
+    readiness: any ReadinessRepository = InMemoryReadinessRepository()
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.e1rm = e1rm
+    self.readiness = readiness
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -64,11 +70,13 @@ public struct StudentRootView: View {
         Label("仪表盘", systemImage: "square.grid.2x2.fill")
       }
 
-      TodayWorkoutView(studentID: studentID, plans: plans, logs: logs, e1rm: e1rm)
-        .tag(StudentTab.workout)
-        .tabItem {
-          Label("锻炼", systemImage: "figure.strengthtraining.traditional")
-        }
+      TodayWorkoutView(
+        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness
+      )
+      .tag(StudentTab.workout)
+      .tabItem {
+        Label("锻炼", systemImage: "figure.strengthtraining.traditional")
+      }
 
       TrainingHistoryView(studentID: studentID, plans: plans, logs: logs)
         .tag(StudentTab.history)

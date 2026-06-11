@@ -8,21 +8,26 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let date: Date
   @State private var viewModel: TodayWorkoutViewModel
+  @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
   @State private var plateMathTarget: PlateMathTarget?
+  @State private var showingReadinessSheet = false
 
   public init(
     studentID: UUID,
     date: Date = Date(),
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
-    e1rm: any E1RMRepository = InMemoryE1RMRepository()
+    e1rm: any E1RMRepository = InMemoryE1RMRepository(),
+    readiness: any ReadinessRepository = InMemoryReadinessRepository()
   ) {
     self.studentID = studentID
     self.date = date
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
+    self._readinessViewModel = State(
+      initialValue: ReadinessCheckinViewModel(repo: readiness))
   }
 
   public var body: some View {
@@ -47,6 +52,16 @@ public struct TodayWorkoutView: View {
       .background(Color.MeetPR.bg)
       .navigationTitle("今天")
       .toolbar {
+        Button {
+          showingReadinessSheet = true
+        } label: {
+          Image(
+            systemName: readinessFiled ? "heart.text.square.fill" : "heart.text.square"
+          )
+          .foregroundStyle(readinessFiled ? Color.MeetPR.green : Color.MeetPR.fgSecondary)
+        }
+        .accessibilityLabel(readinessFiled ? "今日状态已填，点按修改" : "填写今日状态")
+
         Button {
           Task { await viewModel.load(date: date, studentID: studentID) }
         } label: {
@@ -83,15 +98,47 @@ public struct TodayWorkoutView: View {
       PlateMathSheet(targetKg: target.weightKg)
         .presentationDetents([.medium])
     }
+    .sheet(isPresented: $showingReadinessSheet) {
+      ReadinessCheckinSheet(
+        studentID: studentID,
+        viewModel: readinessViewModel,
+        prefill: readinessPrefill,
+        onClose: { showingReadinessSheet = false }
+      )
+      .presentationDetents([.large])
+    }
     .task {
       if viewModel.state == .idle {
         await viewModel.load(date: date, studentID: studentID)
+
+        // Readiness gate (spec 030 §C4): auto-present at most once per day,
+        // only for today's view, only when a non-empty workout loaded, only
+        // while neither filed nor skipped. Rest days never prompt.
+        if Calendar.current.isDateInToday(date),
+          case .loaded(_, let drafts) = viewModel.state, !drafts.isEmpty
+        {
+          await readinessViewModel.load(studentId: studentID)
+          if readinessViewModel.gate == .needed {
+            showingReadinessSheet = true
+          }
+        }
+
         // Re-surface a PR banner the student never dismissed (spec 028 §5);
         // delayed so the tab renders first.
         try? await Task.sleep(for: .seconds(1.5))
         await viewModel.surfaceUnacknowledgedPR(studentID: studentID)
       }
     }
+  }
+
+  private var readinessFiled: Bool {
+    if case .done = readinessViewModel.gate { return true }
+    return false
+  }
+
+  private var readinessPrefill: ReadinessCheckin? {
+    if case .done(let checkin) = readinessViewModel.gate { return checkin }
+    return nil
   }
 
   private func workout(
