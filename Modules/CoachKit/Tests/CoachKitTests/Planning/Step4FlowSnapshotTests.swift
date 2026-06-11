@@ -66,6 +66,9 @@ import ViewInspector
 
   #expect(try inspected.find(text: "添加辅助动作").string() == "添加辅助动作")
   #expect(try inspected.find(text: "周一").string() == "周一")
+  #expect(try inspected.find(text: "本日主项").string() == "本日主项")
+  #expect(try inspected.find(text: "比赛式深蹲").string() == "比赛式深蹲")
+  #expect(try inspected.find(text: "4 组 x 5 次 · 0kg").string() == "4 组 x 5 次 · 0kg")
   #expect(try inspected.find(text: "已选 0 个").string() == "已选 0 个")
   #expect(try inspected.find(text: "+ 添加动作").string() == "+ 添加动作")
 }
