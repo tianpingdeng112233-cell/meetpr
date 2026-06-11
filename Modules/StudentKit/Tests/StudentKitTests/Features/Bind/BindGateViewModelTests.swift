@@ -237,3 +237,114 @@ private func makeGate(
   #expect(harness.gate.state == .needsCode(prefillDisplayName: nil, notice: nil))
   #expect(stash.peek(studentId: BindFixtures.studentId) == nil)
 }
+
+// MARK: - Evaluation sub-route (spec 033 §11)
+
+private struct StubMyEvaluations: EvaluationRepository {
+  enum Behavior {
+    case period(EvaluationPeriod?)
+    case failure
+  }
+
+  let behavior: Behavior
+
+  func fetchEvaluation(studentID: UUID) async throws -> EvaluationPeriod? {
+    try resolve()
+  }
+
+  func fetchMyEvaluation() async throws -> EvaluationPeriod? {
+    try resolve()
+  }
+
+  func completeEvaluation(id: UUID) async throws -> EvaluationPeriod {
+    throw EvaluationError.notFound
+  }
+
+  private func resolve() throws -> EvaluationPeriod? {
+    switch behavior {
+    case .period(let period): return period
+    case .failure: throw TransportFailure()
+    }
+  }
+}
+
+private func evaluationPeriod(completedAt: Date? = nil) -> EvaluationPeriod {
+  EvaluationPeriod(
+    id: UUID(uuidString: "0a000000-0000-0000-0000-0000000000e1")!,
+    studentId: BindFixtures.studentId,
+    coachId: BindFixtures.coachId,
+    bindRequestId: UUID(uuidString: "0a000000-0000-0000-0000-00000000000f")!,
+    startedAt: BindFixtures.referenceDate,
+    expectedEndAt: BindFixtures.referenceDate.addingTimeInterval(7 * 86_400),
+    completedAt: completedAt,
+    completionType: completedAt == nil ? nil : "coach_completed",
+    inProgress: completedAt == nil,
+    overdue: false
+  )
+}
+
+@MainActor
+private func makeEvaluationGate(
+  request: BindRequest,
+  evaluations: StubMyEvaluations
+) -> BindGateViewModel {
+  BindGateViewModel(
+    studentId: BindFixtures.studentId,
+    bind: ScriptedBindRepository(mine: [.success(request)]),
+    stash: StashSpy(),
+    isOnboardingComplete: { true },
+    evaluations: evaluations
+  )
+}
+
+@MainActor
+@Test func acceptedWithLiveEvaluationRoutesToEvaluationPage() async {
+  let accepted = BindFixtures.request(status: .accepted)
+  let period = evaluationPeriod()
+  let gate = makeEvaluationGate(
+    request: accepted, evaluations: StubMyEvaluations(behavior: .period(period)))
+  await gate.load()
+  #expect(gate.state == .evaluationActive(accepted, period))
+}
+
+@MainActor
+@Test func acceptedWithCompletedEvaluationGoesToBound() async {
+  let accepted = BindFixtures.request(status: .accepted)
+  let period = evaluationPeriod(
+    completedAt: BindFixtures.referenceDate.addingTimeInterval(86_400))
+  let gate = makeEvaluationGate(
+    request: accepted, evaluations: StubMyEvaluations(behavior: .period(period)))
+  await gate.load()
+  #expect(gate.state == .bound(accepted))
+}
+
+@MainActor
+@Test func acceptedWithoutEvaluationGoesToBound() async {
+  let accepted = BindFixtures.request(status: .accepted)
+  let gate = makeEvaluationGate(
+    request: accepted, evaluations: StubMyEvaluations(behavior: .period(nil)))
+  await gate.load()
+  #expect(gate.state == .bound(accepted))
+}
+
+@MainActor
+@Test func evaluationFetchFailureLandsOnRetryNotBound() async {
+  // A network blip must not let an in-evaluation student through to the
+  // 5 tabs (Codex review P1): the gate shows the full-screen retry instead.
+  let accepted = BindFixtures.request(status: .accepted)
+  let gate = makeEvaluationGate(
+    request: accepted, evaluations: StubMyEvaluations(behavior: .failure))
+  await gate.load()
+  #expect(gate.state == .failed)
+}
+
+@MainActor
+@Test func skipEvaluationAcceptanceBypassesEvaluationRoute() async {
+  // skipEvaluation accepts never consult the evaluation repo — even a
+  // failing one must not block the 5 tabs.
+  let accepted = BindFixtures.request(status: .accepted, skipEvaluation: true)
+  let gate = makeEvaluationGate(
+    request: accepted, evaluations: StubMyEvaluations(behavior: .failure))
+  await gate.load()
+  #expect(gate.state == .bound(accepted))
+}

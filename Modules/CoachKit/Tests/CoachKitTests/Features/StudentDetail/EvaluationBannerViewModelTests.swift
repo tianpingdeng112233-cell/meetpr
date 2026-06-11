@@ -130,3 +130,124 @@ private func makeViewModel(
   #expect(viewModel.completeError != nil)
   #expect(viewModel.isBannerVisible)
 }
+
+// MARK: - Transport failure vs 404 (Codex review P2)
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func transportFailureSurfacesRetryStateInsteadOfHidingBanner() async {
+  let viewModel = makeViewModel(
+    evaluations: StubEvaluationRepository(fetchError: CoachFeatureTestError()))
+
+  await viewModel.load()
+
+  #expect(viewModel.loadFailed)
+  #expect(!viewModel.isBannerVisible)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func noEvaluationIsNotALoadFailure() async {
+  let viewModel = makeViewModel(evaluations: StubEvaluationRepository())
+
+  await viewModel.load()
+
+  #expect(!viewModel.loadFailed)
+  #expect(!viewModel.isBannerVisible)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func retryAfterTransportFailureRecoversBanner() async {
+  let evaluations = StubEvaluationRepository(
+    evaluationsByStudent: [BindQueueFixtures.studentID: BindQueueFixtures.evaluation()],
+    fetchError: CoachFeatureTestError()
+  )
+  let viewModel = makeViewModel(evaluations: evaluations)
+  await viewModel.load()
+  #expect(viewModel.loadFailed)
+
+  await evaluations.setFetchError(nil)
+  await viewModel.load()
+
+  #expect(!viewModel.loadFailed)
+  #expect(viewModel.isBannerVisible)
+}
+
+// MARK: - Roster completion callback (Codex review P1)
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private final class CompletionSpy {
+  private(set) var fireCount = 0
+  func bump() { fireCount += 1 }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private func makeNotifyingViewModel(
+  evaluations: StubEvaluationRepository,
+  spy: CompletionSpy
+) -> EvaluationBannerViewModel {
+  EvaluationBannerViewModel(
+    studentID: BindQueueFixtures.studentID,
+    evaluations: evaluations,
+    summaries: StubEvaluationSummaryRepository(),
+    now: { BindQueueFixtures.now },
+    onCompleted: { spy.bump() }
+  )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func completeNotifiesCompletionCallback() async {
+  let spy = CompletionSpy()
+  let viewModel = makeNotifyingViewModel(
+    evaluations: StubEvaluationRepository(
+      evaluationsByStudent: [BindQueueFixtures.studentID: BindQueueFixtures.evaluation()]),
+    spy: spy
+  )
+  await viewModel.load()
+
+  let completed = await viewModel.complete()
+
+  #expect(completed)
+  #expect(spy.fireCount == 1)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func editorCompletionChainNotifiesCompletionCallback() async {
+  let spy = CompletionSpy()
+  let viewModel = makeNotifyingViewModel(
+    evaluations: StubEvaluationRepository(
+      evaluationsByStudent: [BindQueueFixtures.studentID: BindQueueFixtures.evaluation()]),
+    spy: spy
+  )
+  await viewModel.load()
+
+  viewModel.markEvaluationCompleted(
+    BindQueueFixtures.evaluation(completedAt: BindQueueFixtures.now))
+
+  #expect(spy.fireCount == 1)
+  #expect(!viewModel.isBannerVisible)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func failedCompleteDoesNotNotifyCompletionCallback() async {
+  let spy = CompletionSpy()
+  let viewModel = makeNotifyingViewModel(
+    evaluations: StubEvaluationRepository(
+      evaluationsByStudent: [BindQueueFixtures.studentID: BindQueueFixtures.evaluation()],
+      completeError: CoachFeatureTestError()
+    ),
+    spy: spy
+  )
+  await viewModel.load()
+
+  let completed = await viewModel.complete()
+
+  #expect(!completed)
+  #expect(spy.fireCount == 0)
+}

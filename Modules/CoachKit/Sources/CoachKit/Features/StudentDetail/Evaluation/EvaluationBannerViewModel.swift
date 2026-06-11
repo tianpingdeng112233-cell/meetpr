@@ -13,22 +13,32 @@ final class EvaluationBannerViewModel {
   private(set) var summary: EvaluationSummary?
   /// Recovery banner for a failed [完成评估].
   var completeError: String?
+  /// True when the evaluation/summary fetch failed on transport: the page
+  /// can't tell "no evaluation" from "couldn't read it", so it surfaces a
+  /// retry strip instead of silently hiding a live banner (Codex review P2).
+  private(set) var loadFailed = false
 
   let studentID: UUID
   @ObservationIgnored private let evaluations: any EvaluationRepository
   @ObservationIgnored private let summaries: any EvaluationSummaryRepository
   @ObservationIgnored let now: @Sendable () -> Date
+  /// Fired whenever the evaluation reaches completed via this page (banner
+  /// [完成评估] or the editor chain), so the roster can drop its stale
+  /// "评估中" badge (Codex review P1).
+  @ObservationIgnored private let onCompleted: (@MainActor () -> Void)?
 
   init(
     studentID: UUID,
     evaluations: any EvaluationRepository,
     summaries: any EvaluationSummaryRepository,
-    now: @escaping @Sendable () -> Date = { Date() }
+    now: @escaping @Sendable () -> Date = { Date() },
+    onCompleted: (@MainActor () -> Void)? = nil
   ) {
     self.studentID = studentID
     self.evaluations = evaluations
     self.summaries = summaries
     self.now = now
+    self.onCompleted = onCompleted
   }
 
   /// Banner shows only for a live (uncompleted) evaluation period.
@@ -38,19 +48,30 @@ final class EvaluationBannerViewModel {
   }
 
   func load() async {
-    // Failures degrade to nil: no banner / "not written" card, both safe.
-    evaluation = try? await evaluations.fetchEvaluation(studentID: studentID)
-    summary = try? await summaries.fetchSummary(studentID: studentID)
+    // 404s arrive as nil from the repository (no banner / "not written"
+    // card, both real states); only transport failures set loadFailed.
+    do {
+      evaluation = try await evaluations.fetchEvaluation(studentID: studentID)
+      summary = try await summaries.fetchSummary(studentID: studentID)
+      loadFailed = false
+    } catch {
+      loadFailed = true
+    }
   }
 
   func reloadSummary() async {
-    summary = try? await summaries.fetchSummary(studentID: studentID)
+    do {
+      summary = try await summaries.fetchSummary(studentID: studentID)
+    } catch {
+      // Keep the last-known summary; the overview card tolerates staleness.
+    }
   }
 
   /// Called by the editor's completion chain so the banner hides without a
   /// refetch.
   func markEvaluationCompleted(_ completed: EvaluationPeriod) {
     evaluation = completed
+    onCompleted?()
   }
 
   /// [完成评估]. The concurrent-complete 409 reads as success: refresh and
@@ -60,9 +81,11 @@ final class EvaluationBannerViewModel {
     completeError = nil
     do {
       self.evaluation = try await evaluations.completeEvaluation(id: evaluation.id)
+      onCompleted?()
       return true
     } catch EvaluationError.alreadyCompleted {
       self.evaluation = try? await evaluations.fetchEvaluation(studentID: studentID)
+      onCompleted?()
       return true
     } catch {
       completeError = "完成评估失败,请稍后重试"

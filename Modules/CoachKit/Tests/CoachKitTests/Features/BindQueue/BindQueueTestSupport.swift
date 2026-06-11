@@ -141,6 +141,10 @@ actor StubEvaluationRepository: EvaluationRepository {
     self.completeError = completeError
   }
 
+  func setFetchError(_ error: Error?) {
+    fetchError = error
+  }
+
   func fetchEvaluation(studentID: UUID) async throws -> EvaluationPeriod? {
     if let fetchError { throw fetchError }
     return evaluationsByStudent[studentID]

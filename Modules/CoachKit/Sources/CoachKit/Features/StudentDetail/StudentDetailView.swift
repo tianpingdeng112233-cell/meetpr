@@ -14,7 +14,11 @@ struct StudentDetailView: View {
   @State private var showSummaryEditor = false
   @State private var showAdaptationPlanning = false
 
-  init(summary: CoachStudentSummary, context: CoachStudentDetailContext) {
+  init(
+    summary: CoachStudentSummary,
+    context: CoachStudentDetailContext,
+    onEvaluationCompleted: (@MainActor () -> Void)? = nil
+  ) {
     viewModel = StudentDetailViewModel(
       summary: summary,
       plans: context.plans,
@@ -37,7 +41,8 @@ struct StudentDetailView: View {
       initialValue: EvaluationBannerViewModel(
         studentID: summary.id,
         evaluations: context.evaluations,
-        summaries: context.summaries
+        summaries: context.summaries,
+        onCompleted: onEvaluationCompleted
       )
     )
     self.context = context
@@ -45,7 +50,13 @@ struct StudentDetailView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      if evaluationViewModel.isBannerVisible {
+      if evaluationViewModel.loadFailed {
+        EvaluationLoadFailureStrip {
+          Task { await evaluationViewModel.load() }
+        }
+        .padding(.horizontal, MeetPRSpacing.base)
+        .padding(.top, MeetPRSpacing.sm)
+      } else if evaluationViewModel.isBannerVisible {
         EvaluationStatusBanner(
           viewModel: evaluationViewModel,
           hasPublishedPlan: viewModel.plan != nil,
@@ -192,6 +203,29 @@ struct StudentDetailView: View {
           showComposer = true
         }
       )
+    }
+  }
+}
+
+/// Transport-failure fallback for the evaluation strip (Codex review P2):
+/// without it a network blip silently hides a live evaluation banner and the
+/// page reads as "no evaluation".
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct EvaluationLoadFailureStrip: View {
+  let onRetry: () -> Void
+
+  var body: some View {
+    Card(accessibilityLabel: "评估状态加载失败") {
+      HStack(spacing: MeetPRSpacing.sm) {
+        Text("评估状态加载失败")
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+        Spacer()
+        SecondaryButton("重试") {
+          onRetry()
+        }
+      }
     }
   }
 }

@@ -107,16 +107,22 @@ public final class BindGateViewModel {
   }
 
   /// Accepted → evaluation sub-route (spec 033 §11): a live (uncompleted)
-  /// evaluation period shows the single-page state; nil / completed /
-  /// transport failure fail open to the 5 tabs (mostly-empty tabs are a
-  /// graceful degradation; the next cold load re-checks).
+  /// evaluation period shows the single-page state; no period / completed →
+  /// the 5 tabs. A fetch failure must NOT fold into `.bound` — that would
+  /// let an in-evaluation student through to the 5 tabs on a network blip
+  /// (Codex review P1) — so it lands on the full-screen retry like the
+  /// `mine` fetch above.
   private func boundState(for request: BindRequest) async -> BindGateState {
     guard !request.skipEvaluation, let evaluations else {
       return .bound(request)
     }
-    guard let evaluation = try? await evaluations.fetchMyEvaluation(),
-      evaluation.completedAt == nil
-    else {
+    let evaluation: EvaluationPeriod?
+    do {
+      evaluation = try await evaluations.fetchMyEvaluation()
+    } catch {
+      return .failed
+    }
+    guard let evaluation, evaluation.completedAt == nil else {
       return .bound(request)
     }
     return .evaluationActive(request, evaluation)

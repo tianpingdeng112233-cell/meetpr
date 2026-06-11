@@ -15,9 +15,10 @@ enum CoachStudentFeatureFixtures {
 
   static func summary(
     id: UUID = studentID,
-    name: String = "测试学员"
+    name: String = "测试学员",
+    status: CoachStudentStatus = .active
   ) -> CoachStudentSummary {
-    CoachStudentSummary(id: id, displayName: name, status: .active)
+    CoachStudentSummary(id: id, displayName: name, status: status)
   }
 
   static func plan(startDate: Date = startDate) -> StudentPlanView {

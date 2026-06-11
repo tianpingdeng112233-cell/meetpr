@@ -149,7 +149,16 @@ struct StudentRosterView: View {
       } else {
         ForEach(viewModel.filteredRows) { row in
           NavigationLink {
-            StudentDetailView(summary: row.student, context: context)
+            StudentDetailView(
+              summary: row.student,
+              context: context,
+              // Both completion paths (banner [完成评估] and the summary
+              // editor chain) report back here, so the roster row drops its
+              // "评估中" badge without waiting for the next full refresh.
+              onEvaluationCompleted: { [viewModel] in
+                viewModel.markStudentActive(row.student.id)
+              }
+            )
           } label: {
             StudentRosterRow(row: row)
           }

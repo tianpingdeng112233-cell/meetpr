@@ -69,3 +69,30 @@ import Testing
     return
   }
 }
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func markStudentActiveDropsInEvaluationBadgeInPlace() async {
+  let inEvaluation = CoachStudentFeatureFixtures.summary(
+    status: .inEvaluation(remainingDays: 4, remainingHours: 13))
+  let other = CoachStudentFeatureFixtures.summary(
+    id: CoachStudentFeatureFixtures.secondStudentID,
+    name: "在册学员"
+  )
+  let viewModel = StudentRosterViewModel(
+    students: StubCoachPlanRepository(students: [inEvaluation, other]),
+    plans: StubStudentPlanRepository(plans: [:]),
+    trainingLogs: StubTrainingLogRepository(logs: []),
+    feedback: StubFeedbackRepository(feedback: []),
+    now: { CoachStudentFeatureFixtures.startDate }
+  )
+  await viewModel.refresh()
+  #expect(viewModel.rows[0].student.status != .active)
+
+  viewModel.markStudentActive(inEvaluation.id)
+
+  // Only the completed student's row flips; the rest stay untouched.
+  #expect(viewModel.rows[0].student.status == .active)
+  #expect(viewModel.rows[0].student.displayName == inEvaluation.displayName)
+  #expect(viewModel.rows[1].student == other)
+}
