@@ -12,6 +12,7 @@ public struct StudentRootView: View {
   private let e1rm: any E1RMRepository
   private let readiness: any ReadinessRepository
   private let videoUploads: VideoUploadServices
+  private let onboarding: any OnboardingRepository
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var selectedTab: StudentTab = .dashboard
   @State private var pendingPRCount = 0
@@ -45,7 +46,8 @@ public struct StudentRootView: View {
     feedback: any StudentFeedbackRepository,
     e1rm: any E1RMRepository = LocalE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
-    videoUploads: VideoUploadServices? = nil
+    videoUploads: VideoUploadServices? = nil,
+    onboarding: (any OnboardingRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -53,6 +55,12 @@ public struct StudentRootView: View {
     self.e1rm = e1rm
     self.readiness = readiness
     self.videoUploads = videoUploads ?? .demo()
+    self.onboarding =
+      onboarding
+      ?? InMemoryOnboardingRepository(
+        studentId: studentID,
+        seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
+      )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -95,7 +103,7 @@ public struct StudentRootView: View {
         }
         .badge(feedbackViewModel.unreadCount)
 
-      MyProfileView(studentID: studentID, plans: plans, e1rm: e1rm)
+      MyProfileView(studentID: studentID, plans: plans, e1rm: e1rm, onboarding: onboarding)
         .tag(StudentTab.profile)
         .tabItem {
           Label("我的", systemImage: "person")
