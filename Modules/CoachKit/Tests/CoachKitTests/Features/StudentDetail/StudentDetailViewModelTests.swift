@@ -104,3 +104,87 @@ private func date(_ calendar: Calendar, _ dateComponents: DateComponents) -> Dat
   components.timeZone = calendar.timeZone
   return calendar.date(from: components)
 }
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func detailLoadsVideoWallAndTodayReadiness() async {
+  let summary = CoachStudentFeatureFixtures.summary()
+  let now = CoachStudentFeatureFixtures.startDate.addingTimeInterval(3 * 86_400)
+  let videos = (0..<4).map { offset in
+    CoachStudentFeatureFixtures.video(
+      id: UUID(uuidString: String(format: "02900000-0000-0000-0000-%012d", 3_001 + offset))!,
+      createdAt: CoachStudentFeatureFixtures.startDate.addingTimeInterval(
+        Double(offset) * 86_400)
+    )
+  }
+  let checkin = CoachStudentFeatureFixtures.readinessCheckin(
+    checkinDate: CoachStudentFormatting.localDayString(now)
+  )
+  let viewModel = StudentDetailViewModel(
+    summary: summary,
+    plans: StubStudentPlanRepository(plans: [summary.id: CoachStudentFeatureFixtures.plan()]),
+    trainingLogs: StubTrainingLogRepository(logs: []),
+    feedback: StubFeedbackRepository(),
+    videos: StubCoachStudentVideoRepository(videos: videos),
+    readiness: StubReadinessRepository(checkins: [checkin]),
+    now: { now }
+  )
+
+  await viewModel.refresh()
+
+  #expect(viewModel.state == .loaded)
+  // Wall is newest-first; the overview card shows the newest three.
+  #expect(viewModel.videos.map(\.id) == videos.reversed().map(\.id))
+  #expect(viewModel.recentVideos.count == 3)
+  #expect(viewModel.recentVideos.map(\.id) == videos.reversed().prefix(3).map(\.id))
+  #expect(viewModel.videosUnavailable == false)
+  #expect(viewModel.todayReadiness == .loaded(checkin))
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() async {
+  let summary = CoachStudentFeatureFixtures.summary()
+  let viewModel = StudentDetailViewModel(
+    summary: summary,
+    plans: StubStudentPlanRepository(plans: [summary.id: CoachStudentFeatureFixtures.plan()]),
+    trainingLogs: StubTrainingLogRepository(logs: []),
+    feedback: StubFeedbackRepository(),
+    videos: StubCoachStudentVideoRepository(fetchError: CoachFeatureTestError()),
+    readiness: StubReadinessRepository()
+  )
+
+  await viewModel.refresh()
+
+  #expect(viewModel.state == .loaded)
+  #expect(viewModel.videosUnavailable)
+  #expect(viewModel.videos.isEmpty)
+  #expect(viewModel.recentVideos.isEmpty)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func detailReadinessDistinguishesNotFiledFromFetchFailure() async {
+  let summary = CoachStudentFeatureFixtures.summary()
+
+  func makeViewModel(readiness: StubReadinessRepository) -> StudentDetailViewModel {
+    StudentDetailViewModel(
+      summary: summary,
+      plans: StubStudentPlanRepository(plans: [summary.id: CoachStudentFeatureFixtures.plan()]),
+      trainingLogs: StubTrainingLogRepository(logs: []),
+      feedback: StubFeedbackRepository(),
+      videos: StubCoachStudentVideoRepository(),
+      readiness: readiness
+    )
+  }
+
+  let notFiled = makeViewModel(readiness: StubReadinessRepository())
+  await notFiled.refresh()
+  #expect(notFiled.todayReadiness == .notFiled)
+
+  let unavailable = makeViewModel(
+    readiness: StubReadinessRepository(fetchError: CoachFeatureTestError())
+  )
+  await unavailable.refresh()
+  #expect(unavailable.todayReadiness == .unavailable)
+}

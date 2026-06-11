@@ -87,6 +87,43 @@ enum CoachStudentFeatureFixtures {
     )
   }
 
+  static func video(
+    id: UUID = UUID(),
+    createdAt: Date = startDate.addingTimeInterval(86_400 + 2 * 3_600),
+    loggedAt: Date? = startDate.addingTimeInterval(86_400 + 3_600)
+  ) -> StudentVideo {
+    StudentVideo(
+      id: id,
+      setLogID: setID,
+      planExerciseID: planExerciseID,
+      contentType: "video/mp4",
+      sizeBytes: 15_728_640,
+      filename: "setlog-test.mp4",
+      createdAt: createdAt,
+      loggedAt: loggedAt
+    )
+  }
+
+  static func readinessCheckin(
+    studentID: UUID = studentID,
+    checkinDate: String,
+    muscleFatigue: [MuscleFatigue] = [
+      MuscleFatigue(muscleGroup: .quad, severity: 3),
+      MuscleFatigue(muscleGroup: .core, severity: 1),
+    ]
+  ) -> ReadinessCheckin {
+    ReadinessCheckin(
+      id: UUID(uuidString: "02900000-0000-0000-0000-000000000901")!,
+      studentId: studentID,
+      checkinDate: checkinDate,
+      sleepQuality: 4,
+      mood: 3,
+      stress: 2,
+      muscleFatigue: muscleFatigue,
+      submittedAt: startDate
+    )
+  }
+
   static func feedback(
     studentID: UUID = studentID,
     postedAt: Date = startDate.addingTimeInterval(2 * 86_400)
@@ -229,5 +266,57 @@ actor StubFeedbackRepository: StudentFeedbackRepository {
 
   func postedTexts() -> [String] {
     postedRequests.map(\.text)
+  }
+}
+
+actor StubCoachStudentVideoRepository: CoachStudentVideoRepository {
+  var videos: [StudentVideo]
+  var playbackURLs: [UUID: URL]
+  var fetchError: Error?
+  var playbackError: Error?
+
+  init(
+    videos: [StudentVideo] = [],
+    playbackURLs: [UUID: URL] = [:],
+    fetchError: Error? = nil,
+    playbackError: Error? = nil
+  ) {
+    self.videos = videos
+    self.playbackURLs = playbackURLs
+    self.fetchError = fetchError
+    self.playbackError = playbackError
+  }
+
+  func fetchVideos(studentID: UUID) async throws -> [StudentVideo] {
+    if let fetchError { throw fetchError }
+    return videos.sorted { $0.createdAt > $1.createdAt }
+  }
+
+  func playbackURL(videoID: UUID) async throws -> URL {
+    if let playbackError { throw playbackError }
+    guard let url = playbackURLs[videoID] else { throw CoachFeatureTestError() }
+    return url
+  }
+}
+
+actor StubReadinessRepository: ReadinessRepository {
+  var checkinsByDate: [String: ReadinessCheckin]
+  var fetchError: Error?
+
+  init(checkins: [ReadinessCheckin] = [], fetchError: Error? = nil) {
+    self.checkinsByDate = Dictionary(
+      uniqueKeysWithValues: checkins.map { ($0.checkinDate, $0) }
+    )
+    self.fetchError = fetchError
+  }
+
+  func submit(_ checkin: ReadinessCheckin) async throws {
+    checkinsByDate[checkin.checkinDate] = checkin
+  }
+
+  func fetchCheckin(studentId: UUID, checkinDate: String) async throws -> ReadinessCheckin? {
+    if let fetchError { throw fetchError }
+    let checkin = checkinsByDate[checkinDate]
+    return checkin?.studentId == studentId ? checkin : nil
   }
 }

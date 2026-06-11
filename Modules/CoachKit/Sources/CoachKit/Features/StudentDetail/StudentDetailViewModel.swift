@@ -52,6 +52,15 @@ struct StudentExecutionDay: Hashable, Identifiable, Sendable {
   }
 }
 
+/// Coach-side view of the student's readiness check-in for today (spec 030
+/// §C downstream). Distinguishes "not filed" from "fetch failed" so the
+/// overview row never claims 今日未填 when the request errored.
+enum ReadinessRowState: Equatable, Sendable {
+  case loaded(ReadinessCheckin)
+  case notFiled
+  case unavailable
+}
+
 struct StudentOverviewSummary: Equatable, Sendable {
   let completedTrainingDays: Int
   let plannedTrainingDays: Int
@@ -84,6 +93,14 @@ final class StudentDetailViewModel {
   private(set) var executionDays: [StudentExecutionDay] = []
   private(set) var feedbackItems: [CoachFeedback] = []
   private(set) var overview = StudentOverviewSummary.empty
+  private(set) var videos: [StudentVideo] = []
+  private(set) var videosUnavailable = false
+  private(set) var todayReadiness: ReadinessRowState = .notFiled
+
+  /// Newest three for the overview card; the grid shows the full wall.
+  var recentVideos: [StudentVideo] {
+    Array(videos.prefix(3))
+  }
 
   var plannedDays: [StudentPlanDay] {
     plan?.days ?? []
@@ -96,6 +113,8 @@ final class StudentDetailViewModel {
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let trainingLogs: any StudentTrainingLogRepository
   @ObservationIgnored private let feedback: any StudentFeedbackRepository
+  @ObservationIgnored private let videoWall: any CoachStudentVideoRepository
+  @ObservationIgnored private let readiness: any ReadinessRepository
   @ObservationIgnored private let now: @Sendable () -> Date
 
   init(
@@ -103,12 +122,16 @@ final class StudentDetailViewModel {
     plans: any StudentPlanRepository,
     trainingLogs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
+    videos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
+    readiness: any ReadinessRepository = EmptyReadinessRepository(),
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.summary = summary
     self.plans = plans
     self.trainingLogs = trainingLogs
     self.feedback = feedback
+    self.videoWall = videos
+    self.readiness = readiness
     self.now = now
   }
 
@@ -132,6 +155,33 @@ final class StudentDetailViewModel {
       state = .loaded
     } catch {
       state = .failed("学员详情加载失败，请稍后重试")
+      return
+    }
+    // Auxiliary sections (video wall, today's readiness) degrade in place —
+    // a failed side fetch must not blank the whole detail screen.
+    await refreshVideos()
+    await refreshReadiness()
+  }
+
+  private func refreshVideos() async {
+    do {
+      videos = try await videoWall.fetchVideos(studentID: summary.id)
+      videosUnavailable = false
+    } catch {
+      videos = []
+      videosUnavailable = true
+    }
+  }
+
+  private func refreshReadiness() async {
+    do {
+      let checkin = try await readiness.fetchCheckin(
+        studentId: summary.id,
+        checkinDate: CoachStudentFormatting.localDayString(now())
+      )
+      todayReadiness = checkin.map(ReadinessRowState.loaded) ?? .notFiled
+    } catch {
+      todayReadiness = .unavailable
     }
   }
 

@@ -1,3 +1,4 @@
+import CoreModels
 import DesignSystem
 import SwiftUI
 
@@ -5,6 +6,9 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct StudentOverviewSection: View {
   let summary: StudentOverviewSummary
+  let readiness: ReadinessRowState
+  let recentVideos: [StudentVideo]
+  let videosUnavailable: Bool
   let onSelectSection: (StudentDetailSection) -> Void
 
   var body: some View {
@@ -16,6 +20,8 @@ struct StudentOverviewSection: View {
           completionCard
         }
         .buttonStyle(.plain)
+
+        StudentReadinessCard(readiness: readiness)
 
         Button {
           onSelectSection(.feedback)
@@ -30,6 +36,8 @@ struct StudentOverviewSection: View {
           videoCard
         }
         .buttonStyle(.plain)
+
+        CoachEvaluationEntryRow()
       }
       .padding(MeetPRSpacing.base)
     }
@@ -84,14 +92,110 @@ struct StudentOverviewSection: View {
     Card(accessibilityLabel: "最近视频") {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         Eyebrow("最近视频")
-        Text("即将上线")
-          .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("待 027")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+        if videosUnavailable {
+          Text("视频加载失败")
+            .font(Font.MeetPR.headline)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Text("下拉刷新重试")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        } else if recentVideos.isEmpty {
+          Text("学员还没有上传视频")
+            .font(Font.MeetPR.headline)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+        } else {
+          HStack(spacing: MeetPRSpacing.sm) {
+            ForEach(recentVideos) { video in
+              VStack(spacing: MeetPRSpacing.xs) {
+                Image(systemName: "video.fill")
+                  .font(Font.MeetPR.headline)
+                  .foregroundStyle(Color.MeetPR.brandRed)
+                Text(CoachStudentFormatting.shortDateText(video.displayDate))
+                  .font(Font.MeetPR.footnote)
+                  .foregroundStyle(Color.MeetPR.fgSecondary)
+              }
+              .frame(maxWidth: .infinity)
+              .padding(.vertical, MeetPRSpacing.sm)
+              .background(Color.MeetPR.surface3)
+              .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+            }
+          }
+          Text("查看全部视频")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
       }
     }
+  }
+}
+
+/// "今日状态" — the coach's read of today's readiness check-in (spec 030 §C
+/// downstream, raw values only; no readiness score per ADR-001).
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct StudentReadinessCard: View {
+  let readiness: ReadinessRowState
+
+  var body: some View {
+    Card(accessibilityLabel: "今日状态") {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+        Eyebrow("今日状态")
+        switch readiness {
+        case .loaded(let checkin):
+          Text(CoachStudentFormatting.readinessScalesText(checkin))
+            .font(Font.MeetPR.headline)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Text(CoachStudentFormatting.readinessFatigueText(checkin))
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        case .notFiled:
+          Text("今日未填")
+            .font(Font.MeetPR.headline)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+        case .unavailable:
+          Text("暂时无法获取")
+            .font(Font.MeetPR.headline)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Text("下拉刷新重试")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
+      }
+    }
+  }
+}
+
+/// Spec 033 seam: "教练评估" entry placeholder. Spec 033 (in flight in a
+/// parallel branch) replaces the destination below with the real coach
+/// evaluation summary; keep the NavigationLink row and swap the destination.
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct CoachEvaluationEntryRow: View {
+  var body: some View {
+    NavigationLink {
+      ContentUnavailableView(
+        "评估功能即将开放",
+        systemImage: "checklist",
+        description: Text("教练评估总结将在后续版本上线")
+      )
+      .background(Color.MeetPR.bg)
+    } label: {
+      Card(accessibilityLabel: "教练评估") {
+        HStack {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+            Eyebrow("教练评估")
+            Text("评估功能即将开放")
+              .font(Font.MeetPR.footnote)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+          }
+          Spacer()
+          Image(systemName: "chevron.right")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
+      }
+    }
+    .buttonStyle(.plain)
   }
 }
 

@@ -9,6 +9,8 @@ public struct CoachRootView: View {
   private let studentLogs: any StudentTrainingLogRepository
   private let feedback: any StudentFeedbackRepository
   private let inviteCodes: any InviteCodeRepository
+  private let studentVideos: any CoachStudentVideoRepository
+  private let readiness: any ReadinessRepository
   private let draftStore: DraftStore
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
@@ -20,6 +22,8 @@ public struct CoachRootView: View {
     studentLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
     feedback: any StudentFeedbackRepository = EmptyStudentFeedbackRepository(),
     inviteCodes: (any InviteCodeRepository)? = nil,
+    studentVideos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
+    readiness: any ReadinessRepository = EmptyReadinessRepository(),
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
@@ -28,6 +32,8 @@ public struct CoachRootView: View {
     self.studentLogs = studentLogs
     self.feedback = feedback
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
+    self.studentVideos = studentVideos
+    self.readiness = readiness
     self.draftStore = draftStore
     _rosterViewModel = State(
       initialValue: StudentRosterViewModel(
@@ -53,7 +59,9 @@ public struct CoachRootView: View {
         viewModel: rosterViewModel,
         plans: studentPlans,
         trainingLogs: studentLogs,
-        feedback: feedback
+        feedback: feedback,
+        videos: studentVideos,
+        readiness: readiness
       )
       .tabItem {
         Label("学员", systemImage: "person.2")

@@ -19,6 +19,7 @@ public struct RootView: View {
   private let studentOnboarding: any OnboardingRepository
   private let pendingBindStore: any PendingBindCodeStoring
   private let onboardingDraftStore = LocalOnboardingDraftStore()
+  private let coachStudentVideos: any CoachStudentVideoRepository
   private let draftStore: DraftStore
 
   public init(
@@ -33,6 +34,7 @@ public struct RootView: View {
     studentBind: (any BindRepository)? = nil,
     studentOnboarding: (any OnboardingRepository)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
+    coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
     draftStore: DraftStore = DraftStore.shared
   ) {
     let plan = StudentDemoSeed.makePlanView()
@@ -86,6 +88,9 @@ public struct RootView: View {
         seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
       )
     self.pendingBindStore = pendingBindStore
+    // Demo/preview default: an empty wall — the coach video grid renders its
+    // empty state without a backend.
+    self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
     self.draftStore = draftStore
   }
 
@@ -102,6 +107,8 @@ public struct RootView: View {
           studentLogs: studentLogs,
           feedback: studentFeedback,
           inviteCodes: coachInviteCodes,
+          studentVideos: coachStudentVideos,
+          readiness: studentReadiness,
           onLogout: {
             await session.logout()
           },

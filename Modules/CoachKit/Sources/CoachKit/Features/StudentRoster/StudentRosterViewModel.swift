@@ -77,11 +77,7 @@ final class StudentRosterViewModel {
     state = .loading
     do {
       let summaries = try await students.fetchStudents()
-      var loadedRows: [StudentRosterRowModel] = []
-      for summary in summaries {
-        loadedRows.append(await makeRow(for: summary))
-      }
-      rows = loadedRows
+      rows = await loadRows(for: summaries)
       state = .loaded
     } catch {
       rows = []
@@ -89,17 +85,52 @@ final class StudentRosterViewModel {
     }
   }
 
-  private func makeRow(for summary: CoachStudentSummary) async -> StudentRosterRowModel {
+  /// Per-student fetches fan out concurrently (029 follow-up: the first pass
+  /// pulled plan/logs/feedback serially per row, so the roster's first paint
+  /// degraded linearly with student count). Results keep the summaries' order.
+  private func loadRows(for summaries: [CoachStudentSummary]) async -> [StudentRosterRowModel] {
+    let plans = self.plans
+    let trainingLogs = self.trainingLogs
+    let feedback = self.feedback
+    let now = self.now
+    return await withTaskGroup(of: (Int, StudentRosterRowModel).self) { group in
+      for (index, summary) in summaries.enumerated() {
+        group.addTask {
+          let row = await Self.loadRow(
+            for: summary,
+            plans: plans,
+            trainingLogs: trainingLogs,
+            feedback: feedback,
+            now: now
+          )
+          return (index, row)
+        }
+      }
+      var ordered = [StudentRosterRowModel?](repeating: nil, count: summaries.count)
+      for await (index, row) in group {
+        ordered[index] = row
+      }
+      return ordered.compactMap { $0 }
+    }
+  }
+
+  private static func loadRow(
+    for summary: CoachStudentSummary,
+    plans: any StudentPlanRepository,
+    trainingLogs: any StudentTrainingLogRepository,
+    feedback: any StudentFeedbackRepository,
+    now: @Sendable () -> Date
+  ) async -> StudentRosterRowModel {
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: summary.id)
       let range = Self.weekRange(for: plan, now: now())
-      let logs = try await trainingLogs.fetchLogs(studentID: summary.id, in: range)
-      let feedbackItems = try await feedback.fetchInbox(studentID: summary.id)
+      async let logs = trainingLogs.fetchLogs(studentID: summary.id, in: range)
+      async let feedbackItems = feedback.fetchInbox(studentID: summary.id)
       return Self.makeRow(
         summary: summary,
         plan: plan,
-        logs: logs,
-        feedback: feedbackItems,
+        logs: try await logs,
+        feedback: try await feedbackItems,
         now: now()
       )
     } catch {
