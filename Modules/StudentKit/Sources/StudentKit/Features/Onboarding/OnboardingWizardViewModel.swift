@@ -67,6 +67,16 @@ public final class OnboardingWizardViewModel {
     if let fetched = try? await repo.fetchProfile(studentId: studentId) {
       server = fetched
     }
+    // Already completed server-side (e.g. the gate's completion probe hit a
+    // transient failure and routed here anyway): re-entering edit mode would
+    // end in a fullPatch carrying locked 1RM fields → ONE_RM_LOCKED. Run the
+    // handoff directly instead (Codex P1).
+    if let server, server.completedAt != nil {
+      await draftStore.clear(studentId: studentId)
+      phase = .completing
+      await runHandoff()
+      return
+    }
     let local = await draftStore.load(studentId: studentId)
     draft = OnboardingDraft.merged(server: server, local: local)
     step = draft.resumeStep

@@ -111,6 +111,9 @@ public final class BindGateViewModel {
   public func handleSubmitted(_ outcome: EnterCodeViewModel.SubmitOutcome) async {
     switch outcome {
     case .requestSent(let request):
+      // A 201 ends any stash lifecycle: a stale code left by an earlier
+      // transport failure must never ghost-resubmit later (Codex P1).
+      await stash.clear(studentId: studentId)
       state = .pendingAcceptance(request)
     case .stashedForOnboarding(let pending):
       state = .needsOnboarding(pending)

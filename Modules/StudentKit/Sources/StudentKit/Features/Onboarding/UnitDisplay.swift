@@ -40,19 +40,28 @@ public enum UnitDisplay {
   /// Returns kg rounded to 2 decimals (wire scale); nil for non-numeric.
   public static func parseWeight(_ text: String, unit: UnitPreference) -> Decimal? {
     guard let value = parseDecimal(text) else { return nil }
+    let kilograms: Decimal
     switch unit {
-    case .kg: return rounded(value, scale: 2)
-    case .lb: return rounded(value / lbPerKg, scale: 2)
+    case .kg: kilograms = rounded(value, scale: 2)
+    case .lb: kilograms = rounded(value / lbPerKg, scale: 2)
     }
+    // Backend zod bounds (0, 500) exclusive — never produce an illegal wire
+    // value; nil keeps the step gated (Codex P1).
+    guard kilograms > 0, kilograms < 500 else { return nil }
+    return kilograms
   }
 
   /// Returns cm rounded to 1 decimal (wire scale); nil for non-numeric.
   public static func parseHeight(_ text: String, unit: UnitPreference) -> Decimal? {
     guard let value = parseDecimal(text) else { return nil }
+    let centimeters: Decimal
     switch unit {
-    case .kg: return rounded(value, scale: 1)
-    case .lb: return rounded(value / inchPerCm, scale: 1)
+    case .kg: centimeters = rounded(value, scale: 1)
+    case .lb: centimeters = rounded(value / inchPerCm, scale: 1)
     }
+    // Backend zod bounds (0, 300) exclusive (Codex P1).
+    guard centimeters > 0, centimeters < 300 else { return nil }
+    return centimeters
   }
 
   /// 1RM entry is always kg (0.5 grid handled by the estimator; manual input
