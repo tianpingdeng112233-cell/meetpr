@@ -25,7 +25,7 @@ import Testing
 }
 
 @Test func networkingSmoke() {
-  #expect(APIClient.shared.baseURL.absoluteString == "http://120.27.243.110:3000")
+  #expect(APIClient.shared.baseURL.absoluteString == "http://121.40.160.241:3000")
   #expect(Endpoint.coach.path == "/coach")
 }
 

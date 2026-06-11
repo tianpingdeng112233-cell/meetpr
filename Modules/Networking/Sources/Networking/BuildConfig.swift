@@ -1,7 +1,7 @@
 import Foundation
 
 public enum BuildConfig {
-  public static let productionBackendBaseURL = "http://120.27.243.110:3000"
+  public static let productionBackendBaseURL = "http://121.40.160.241:3000"
 
   public static var backendBaseURL: URL {
     backendBaseURL(environment: ProcessInfo.processInfo.environment)
