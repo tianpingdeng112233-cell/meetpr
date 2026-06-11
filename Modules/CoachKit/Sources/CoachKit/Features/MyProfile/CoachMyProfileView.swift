@@ -1,13 +1,16 @@
 import DesignSystem
+import RepositoryContracts
 import SwiftUI
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct CoachMyProfileView: View {
   @Bindable private var viewModel: CoachMyProfileViewModel
+  private let inviteCodes: any InviteCodeRepository
 
-  init(viewModel: CoachMyProfileViewModel) {
+  init(viewModel: CoachMyProfileViewModel, inviteCodes: any InviteCodeRepository) {
     self.viewModel = viewModel
+    self.inviteCodes = inviteCodes
   }
 
   var body: some View {
@@ -22,6 +25,24 @@ struct CoachMyProfileView: View {
                 .foregroundStyle(Color.MeetPR.fgPrimary)
             }
           }
+
+          // 我的邀请码 entry (spec 031 §8).
+          NavigationLink {
+            InviteCodesView(repository: inviteCodes)
+          } label: {
+            Card(accessibilityLabel: "我的邀请码") {
+              HStack {
+                Label("我的邀请码", systemImage: "person.badge.plus")
+                  .font(Font.MeetPR.body)
+                  .foregroundStyle(Color.MeetPR.fgPrimary)
+                Spacer()
+                Image(systemName: "chevron.right")
+                  .font(.system(size: 13))
+                  .foregroundStyle(Color.MeetPR.fgTertiary)
+              }
+            }
+          }
+          .buttonStyle(.plain)
 
           Card(accessibilityLabel: "版本") {
             HStack {
