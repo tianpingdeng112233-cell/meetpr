@@ -47,17 +47,28 @@ private let specRTSTable: [[Double]] = [
   if let result { #expect(abs(result - 128.2) < 0.1) }
 }
 
+private struct EpleyCase {
+  let weight: Double
+  let reps: Int
+  let expected: Double
+}
+
 @Test func epleyFallbackWhenRPEMissing() {
   // e1RM = w × (1 + reps/30)
-  let cases: [(Double, Int, Double)] = [
-    (100, 5, 116.666_67),
-    (140, 1, 144.666_67),
-    (60, 10, 80.0),
+  let cases: [EpleyCase] = [
+    EpleyCase(weight: 100, reps: 5, expected: 116.666_67),
+    EpleyCase(weight: 140, reps: 1, expected: 144.666_67),
+    EpleyCase(weight: 60, reps: 10, expected: 80.0),
   ]
-  for (weight, reps, expected) in cases {
-    let actual = E1RMCalculator.calculate(weightKg: weight, reps: reps, rpe: nil)
+  for testCase in cases {
+    let actual = E1RMCalculator.calculate(
+      weightKg: testCase.weight, reps: testCase.reps, rpe: nil)
     #expect(actual != nil)
-    if let actual { #expect(abs(actual - expected) < 0.01, "w=\(weight) r=\(reps)") }
+    if let actual {
+      #expect(
+        abs(actual - testCase.expected) < 0.01,
+        "w=\(testCase.weight) r=\(testCase.reps)")
+    }
   }
 }
 
