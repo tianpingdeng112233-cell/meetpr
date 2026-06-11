@@ -1,0 +1,71 @@
+import CoreModels
+import Foundation
+import RepositoryContracts
+
+public actor InMemoryE1RMRepository: E1RMRepository {
+  private struct HistoryKey: Hashable {
+    let studentId: UUID
+    let exerciseId: UUID
+  }
+
+  private var points: [HistoryKey: [E1RMHistoryPoint]]
+  private var prEvents: [PRBreakthroughEvent]
+
+  public init(
+    seedPoints: [E1RMHistoryPoint] = [],
+    seedPRs: [PRBreakthroughEvent] = []
+  ) {
+    var grouped: [HistoryKey: [E1RMHistoryPoint]] = [:]
+    for point in seedPoints {
+      grouped[HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId), default: []]
+        .append(point)
+    }
+    self.points = grouped
+    self.prEvents = seedPRs
+  }
+
+  public func recordPoint(_ point: E1RMHistoryPoint) async throws {
+    points[HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId), default: []]
+      .append(point)
+  }
+
+  public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
+    (points[HistoryKey(studentId: studentId, exerciseId: exerciseId)] ?? [])
+      .sorted { $0.computedAt < $1.computedAt }
+  }
+
+  public func fetchHistory(
+    studentId: UUID,
+    exerciseIds: [UUID]
+  ) async throws -> [UUID: [E1RMHistoryPoint]] {
+    var result: [UUID: [E1RMHistoryPoint]] = [:]
+    for exerciseId in exerciseIds {
+      result[exerciseId] = try await fetchHistory(studentId: studentId, exerciseId: exerciseId)
+    }
+    return result
+  }
+
+  public func maxBefore(
+    studentId: UUID,
+    exerciseId: UUID,
+    before: Date
+  ) async throws -> Double? {
+    let history = points[HistoryKey(studentId: studentId, exerciseId: exerciseId)] ?? []
+    return history.filter { $0.computedAt < before }.map(\.e1RMKg).max()
+  }
+
+  public func recordPR(_ event: PRBreakthroughEvent) async throws {
+    prEvents.append(event)
+  }
+
+  public func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent] {
+    prEvents
+      .filter { $0.studentId == studentId && $0.acknowledgedAt == nil }
+      .sorted { $0.occurredAt < $1.occurredAt }
+  }
+
+  public func acknowledgePR(eventId: UUID) async throws {
+    guard let index = prEvents.firstIndex(where: { $0.id == eventId }) else { return }
+    prEvents[index] = prEvents[index].acknowledged(at: Date())
+  }
+}

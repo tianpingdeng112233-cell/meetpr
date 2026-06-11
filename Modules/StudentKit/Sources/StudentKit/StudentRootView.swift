@@ -9,8 +9,10 @@ public struct StudentRootView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let e1rm: any E1RMRepository
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var selectedTab: StudentTab = .dashboard
+  @State private var pendingPRCount = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -23,6 +25,10 @@ public struct StudentRootView: View {
       ),
       feedback: InMemoryStudentFeedbackRepository(
         seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
+      ),
+      e1rm: InMemoryE1RMRepository(
+        seedPoints: StudentDemoSeed.makeE1RMHistory(studentID: StudentDemoSeed.studentID),
+        seedPRs: StudentDemoSeed.makeUnacknowledgedPR(studentID: StudentDemoSeed.studentID)
       )
     )
   }
@@ -31,11 +37,13 @@ public struct StudentRootView: View {
     studentID: UUID = StudentDemoSeed.studentID,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
-    feedback: any StudentFeedbackRepository
+    feedback: any StudentFeedbackRepository,
+    e1rm: any E1RMRepository = LocalE1RMRepository()
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
+    self.e1rm = e1rm
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -56,7 +64,7 @@ public struct StudentRootView: View {
         Label("仪表盘", systemImage: "square.grid.2x2.fill")
       }
 
-      TodayWorkoutView(studentID: studentID, plans: plans, logs: logs)
+      TodayWorkoutView(studentID: studentID, plans: plans, logs: logs, e1rm: e1rm)
         .tag(StudentTab.workout)
         .tabItem {
           Label("锻炼", systemImage: "figure.strengthtraining.traditional")
@@ -74,11 +82,19 @@ public struct StudentRootView: View {
           Label("反馈", systemImage: "bubble.left")
         }
         .badge(feedbackViewModel.unreadCount)
+
+      MyProfileView(studentID: studentID, plans: plans, e1rm: e1rm)
+        .tag(StudentTab.profile)
+        .tabItem {
+          Label("我的", systemImage: "person")
+        }
+        .badge(pendingPRCount)
     }
     .task {
       if feedbackViewModel.state == .idle {
         await feedbackViewModel.load(studentID: studentID)
       }
+      pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
     }
     .tint(Color.MeetPR.brandRed)
     .preferredColorScheme(.dark)
@@ -90,6 +106,7 @@ private enum StudentTab: Hashable {
   case workout
   case history
   case feedback
+  case profile
 }
 
 private actor StudentRootDemoPlanStore: StudentPlanStore {
