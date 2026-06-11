@@ -9,17 +9,26 @@ struct StudentRosterView: View {
   private let plans: any StudentPlanRepository
   private let trainingLogs: any StudentTrainingLogRepository
   private let feedback: any StudentFeedbackRepository
+  private let videos: any CoachStudentVideoRepository
+  private let familyMapProvider: (any CoachPlanFamilyMapProviding)?
+  private let readiness: any ReadinessRepository
 
   init(
     viewModel: StudentRosterViewModel,
     plans: any StudentPlanRepository,
     trainingLogs: any StudentTrainingLogRepository,
-    feedback: any StudentFeedbackRepository
+    feedback: any StudentFeedbackRepository,
+    videos: any CoachStudentVideoRepository,
+    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
+    readiness: any ReadinessRepository
   ) {
     self.viewModel = viewModel
     self.plans = plans
     self.trainingLogs = trainingLogs
     self.feedback = feedback
+    self.videos = videos
+    self.familyMapProvider = familyMapProvider
+    self.readiness = readiness
   }
 
   var body: some View {
@@ -74,7 +83,10 @@ struct StudentRosterView: View {
                 summary: row.student,
                 plans: plans,
                 trainingLogs: trainingLogs,
-                feedback: feedback
+                feedback: feedback,
+                videos: videos,
+                readiness: readiness,
+                familyMapProvider: familyMapProvider
               )
             } label: {
               StudentRosterRow(row: row)

@@ -6,6 +6,8 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct StudentDetailView: View {
   @Bindable private var viewModel: StudentDetailViewModel
+  @State private var videoGridViewModel: StudentVideoGridViewModel
+  @State private var growthViewModel: StudentGrowthViewModel
   private let feedback: any StudentFeedbackRepository
   @State private var showComposer = false
 
@@ -13,13 +15,23 @@ struct StudentDetailView: View {
     summary: CoachStudentSummary,
     plans: any StudentPlanRepository,
     trainingLogs: any StudentTrainingLogRepository,
-    feedback: any StudentFeedbackRepository
+    feedback: any StudentFeedbackRepository,
+    videos: any CoachStudentVideoRepository,
+    readiness: any ReadinessRepository,
+    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil
   ) {
     viewModel = StudentDetailViewModel(
       summary: summary,
       plans: plans,
       trainingLogs: trainingLogs,
-      feedback: feedback
+      feedback: feedback,
+      videos: videos,
+      readiness: readiness
+    )
+    _videoGridViewModel = State(initialValue: StudentVideoGridViewModel(repository: videos))
+    _growthViewModel = State(
+      initialValue: StudentGrowthViewModel(
+        plans: plans, trainingLogs: trainingLogs, familyMapProvider: familyMapProvider)
     )
     self.feedback = feedback
   }
@@ -36,6 +48,17 @@ struct StudentDetailView: View {
 
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        // Spec 029 §risk 5: auto fetch once on appear + pull-to-refresh as
+        // the explicit retry path (the "下拉刷新重试" copy in the video wall
+        // and readiness row points here). Growth keeps its own cache, so the
+        // pull refreshes whichever data the visible section reads.
+        .refreshable { [viewModel, growthViewModel] in
+          if await viewModel.selectedSection == .growth {
+            await growthViewModel.load(studentID: viewModel.summary.id)
+          } else {
+            await viewModel.refresh()
+          }
+        }
     }
     .navigationTitle(viewModel.summary.displayName)
     .background(Color.MeetPR.bg)
@@ -86,16 +109,24 @@ struct StudentDetailView: View {
   private var sectionContent: some View {
     switch viewModel.selectedSection {
     case .overview:
-      StudentOverviewSection(summary: viewModel.overview) { section in
+      StudentOverviewSection(
+        summary: viewModel.overview,
+        readiness: viewModel.todayReadiness,
+        recentVideos: viewModel.recentVideos,
+        videosUnavailable: viewModel.videosUnavailable
+      ) { section in
         viewModel.select(section)
       }
     case .execution:
       StudentExecutionView(days: viewModel.executionDays)
     case .videos:
-      DeferredStudentSection(title: "即将上线", subtitle: "待 027", systemImage: "video")
+      StudentVideoGridView(
+        videos: viewModel.videos,
+        unavailable: viewModel.videosUnavailable,
+        viewModel: videoGridViewModel
+      )
     case .growth:
-      DeferredStudentSection(
-        title: "即将上线", subtitle: "待 028", systemImage: "chart.line.uptrend.xyaxis")
+      StudentGrowthView(studentID: viewModel.summary.id, viewModel: growthViewModel)
     case .feedback:
       CoachFeedbackHistoryView(
         feedback: viewModel.feedbackItems,
@@ -105,19 +136,5 @@ struct StudentDetailView: View {
         }
       )
     }
-  }
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct DeferredStudentSection: View {
-  let title: String
-  let subtitle: String
-  let systemImage: String
-
-  var body: some View {
-    ContentUnavailableView(title, systemImage: systemImage, description: Text(subtitle))
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
   }
 }

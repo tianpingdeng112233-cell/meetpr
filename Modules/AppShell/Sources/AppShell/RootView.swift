@@ -19,6 +19,8 @@ public struct RootView: View {
   private let studentOnboarding: any OnboardingRepository
   private let pendingBindStore: any PendingBindCodeStoring
   private let onboardingDraftStore = LocalOnboardingDraftStore()
+  private let coachStudentVideos: any CoachStudentVideoRepository
+  private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
 
   public init(
@@ -33,59 +35,23 @@ public struct RootView: View {
     studentBind: (any BindRepository)? = nil,
     studentOnboarding: (any OnboardingRepository)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
+    coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
+    coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
     draftStore: DraftStore = DraftStore.shared
   ) {
-    let plan = StudentDemoSeed.makePlanView()
-    let store = InMemoryPlanStore()
-    Task {
-      await store.savePublishedProjection(plan, forStudent: StudentDemoSeed.studentID)
-    }
     self.coachPlans = coachPlans
-    self.coachInviteCodes =
-      coachInviteCodes
-      ?? InMemoryInviteCodeRepository(
-        coachId: StudentDemoSeed.coachID,
-        seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
-      )
-    self.studentPlans = studentPlans ?? InMemoryStudentPlanRepository(store: store)
-    self.studentLogs =
-      studentLogs
-      ?? InMemoryStudentTrainingLogRepository(
-        seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
-      )
-    self.studentFeedback =
-      studentFeedback
-      ?? InMemoryStudentFeedbackRepository(
-        seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
-      )
-    self.studentE1RM =
-      studentE1RM
-      ?? InMemoryE1RMRepository(
-        seedPoints: StudentDemoSeed.makeE1RMHistory(studentID: StudentDemoSeed.studentID),
-        seedPRs: StudentDemoSeed.makeUnacknowledgedPR(studentID: StudentDemoSeed.studentID)
-      )
-    self.studentReadiness =
-      studentReadiness
-      ?? InMemoryReadinessRepository(
-        seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
-      )
+    self.coachInviteCodes = coachInviteCodes ?? RootViewDemoDefaults.inviteCodes()
+    self.studentPlans = studentPlans ?? RootViewDemoDefaults.plans()
+    self.studentLogs = studentLogs ?? RootViewDemoDefaults.logs()
+    self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
+    self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
+    self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
     self.studentVideoUploads = studentVideoUploads
-    // Demo defaults keep the existing student demo flow untouched: an
-    // accepted bond + a completed profile mean the BindGate falls straight
-    // through to the 5 tabs (spec 031 D10).
-    self.studentBind =
-      studentBind
-      ?? InMemoryBindRepository(
-        studentId: StudentDemoSeed.studentID,
-        seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
-      )
-    self.studentOnboarding =
-      studentOnboarding
-      ?? InMemoryOnboardingRepository(
-        studentId: StudentDemoSeed.studentID,
-        seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
-      )
+    self.studentBind = studentBind ?? RootViewDemoDefaults.bind()
+    self.studentOnboarding = studentOnboarding ?? RootViewDemoDefaults.onboarding()
     self.pendingBindStore = pendingBindStore
+    self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
+    self.coachFamilyMapProvider = coachFamilyMapProvider
     self.draftStore = draftStore
   }
 
@@ -102,6 +68,9 @@ public struct RootView: View {
           studentLogs: studentLogs,
           feedback: studentFeedback,
           inviteCodes: coachInviteCodes,
+          studentVideos: coachStudentVideos,
+          readiness: studentReadiness,
+          familyMapProvider: coachFamilyMapProvider,
           onLogout: {
             await session.logout()
           },
@@ -164,6 +133,67 @@ public struct RootView: View {
       readiness: studentReadiness,
       videoUploads: studentVideoUploads,
       onboarding: studentOnboarding
+    )
+  }
+}
+
+/// Demo/preview fallbacks for RootView's injection points. An accepted bond
+/// plus a completed profile keep the existing student demo flow untouched —
+/// the BindGate falls straight through to the 5 tabs (spec 031 D10).
+@available(iOS 17.0, macOS 14.0, *)
+private enum RootViewDemoDefaults {
+  static func inviteCodes() -> any InviteCodeRepository {
+    InMemoryInviteCodeRepository(
+      coachId: StudentDemoSeed.coachID,
+      seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
+    )
+  }
+
+  static func plans() -> any StudentPlanRepository {
+    let plan = StudentDemoSeed.makePlanView()
+    let store = InMemoryPlanStore()
+    Task {
+      await store.savePublishedProjection(plan, forStudent: StudentDemoSeed.studentID)
+    }
+    return InMemoryStudentPlanRepository(store: store)
+  }
+
+  static func logs() -> any StudentTrainingLogRepository {
+    InMemoryStudentTrainingLogRepository(
+      seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
+    )
+  }
+
+  static func feedback() -> any StudentFeedbackRepository {
+    InMemoryStudentFeedbackRepository(
+      seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
+    )
+  }
+
+  static func e1rm() -> any E1RMRepository {
+    InMemoryE1RMRepository(
+      seedPoints: StudentDemoSeed.makeE1RMHistory(studentID: StudentDemoSeed.studentID),
+      seedPRs: StudentDemoSeed.makeUnacknowledgedPR(studentID: StudentDemoSeed.studentID)
+    )
+  }
+
+  static func readiness() -> any ReadinessRepository {
+    InMemoryReadinessRepository(
+      seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
+    )
+  }
+
+  static func bind() -> any BindRepository {
+    InMemoryBindRepository(
+      studentId: StudentDemoSeed.studentID,
+      seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
+    )
+  }
+
+  static func onboarding() -> any OnboardingRepository {
+    InMemoryOnboardingRepository(
+      studentId: StudentDemoSeed.studentID,
+      seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
     )
   }
 }

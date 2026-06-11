@@ -96,3 +96,55 @@ private func isoDate(_ rawValue: String) throws -> Date {
   formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
   return try #require(formatter.date(from: rawValue))
 }
+
+@Test func studentVideosContractDecodesLinkedAndUnlinkedItems() throws {
+  let json = """
+    {
+      "videos": [
+        {
+          "id": "00000000-0000-4000-8000-000000000601",
+          "set_log_id": "00000000-0000-4000-8000-000000000602",
+          "plan_exercise_id": "00000000-0000-4000-8000-000000000603",
+          "content_type": "video/mp4",
+          "size_bytes": 15728640,
+          "filename": "setlog.mp4",
+          "created_at": "2026-05-22T10:27:16.254Z",
+          "logged_at": "2026-05-22T09:30:00.000Z"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000604",
+          "set_log_id": null,
+          "plan_exercise_id": null,
+          "content_type": "video/quicktime",
+          "size_bytes": 1048576,
+          "filename": null,
+          "created_at": "2026-05-21T08:00:00.000Z",
+          "logged_at": null
+        }
+      ]
+    }
+    """
+
+  let response = try MeetPRCodec.decoder.decode(
+    StudentVideosResponseDTO.self,
+    from: Data(json.utf8)
+  )
+  #expect(response.videos.count == 2)
+
+  let linked = try #require(response.videos.first).toDomain()
+  #expect(linked.id == (try uuid("00000000-0000-4000-8000-000000000601")))
+  #expect(linked.setLogID == (try uuid("00000000-0000-4000-8000-000000000602")))
+  #expect(linked.planExerciseID == (try uuid("00000000-0000-4000-8000-000000000603")))
+  #expect(linked.sizeBytes == 15_728_640)
+  #expect(linked.loggedAt == (try isoDate("2026-05-22T09:30:00.000Z")))
+  // Linked videos group by the training day, not the upload day.
+  #expect(linked.displayDate == (try isoDate("2026-05-22T09:30:00.000Z")))
+
+  let unlinked = try #require(response.videos.last).toDomain()
+  #expect(unlinked.setLogID == nil)
+  #expect(unlinked.planExerciseID == nil)
+  #expect(unlinked.filename == nil)
+  #expect(unlinked.loggedAt == nil)
+  // Unlinked uploads fall back to the upload timestamp.
+  #expect(unlinked.displayDate == (try isoDate("2026-05-21T08:00:00.000Z")))
+}

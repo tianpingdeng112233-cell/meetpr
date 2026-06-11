@@ -26,6 +26,11 @@ struct StudentRosterRowModel: Hashable, Identifiable, Sendable {
 @available(iOS 17.0, macOS 14.0, *)
 final class StudentRosterViewModel {
   enum LoadState: Equatable, Sendable {
+    var isFailure: Bool {
+      if case .failed = self { return true }
+      return false
+    }
+
     case idle
     case loading
     case loaded
@@ -69,7 +74,9 @@ final class StudentRosterViewModel {
   }
 
   func loadIfNeeded() async {
-    guard state != .loaded else { return }
+    // Both CoachRootView and StudentRosterView call this on appear; loading
+    // must not stack a second full refresh (Codex P2).
+    guard state == .idle || state.isFailure else { return }
     await refresh()
   }
 
@@ -77,11 +84,7 @@ final class StudentRosterViewModel {
     state = .loading
     do {
       let summaries = try await students.fetchStudents()
-      var loadedRows: [StudentRosterRowModel] = []
-      for summary in summaries {
-        loadedRows.append(await makeRow(for: summary))
-      }
-      rows = loadedRows
+      rows = await loadRows(for: summaries)
       state = .loaded
     } catch {
       rows = []
@@ -89,17 +92,60 @@ final class StudentRosterViewModel {
     }
   }
 
-  private func makeRow(for summary: CoachStudentSummary) async -> StudentRosterRowModel {
+  /// Per-student fetches fan out concurrently (029 follow-up: the first pass
+  /// pulled plan/logs/feedback serially per row, so the roster's first paint
+  /// degraded linearly with student count). Results keep the summaries' order.
+  private func loadRows(for summaries: [CoachStudentSummary]) async -> [StudentRosterRowModel] {
+    let plans = self.plans
+    let trainingLogs = self.trainingLogs
+    let feedback = self.feedback
+    let now = self.now
+    // Sliding window of 4: still concurrent, but a big roster can't hammer
+    // the plan/log/feedback endpoints with 3N simultaneous calls (Codex P2;
+    // an aggregated roster-summary endpoint is the post-V0.1 fix, FOLLOWUPS).
+    let maxConcurrent = 4
+    return await withTaskGroup(of: (Int, StudentRosterRowModel).self) { group in
+      var iterator = summaries.enumerated().makeIterator()
+      func submitNext() {
+        guard let (index, summary) = iterator.next() else { return }
+        group.addTask {
+          let row = await Self.loadRow(
+            for: summary,
+            plans: plans,
+            trainingLogs: trainingLogs,
+            feedback: feedback,
+            now: now
+          )
+          return (index, row)
+        }
+      }
+      for _ in 0..<maxConcurrent { submitNext() }
+      var ordered = [StudentRosterRowModel?](repeating: nil, count: summaries.count)
+      for await (index, row) in group {
+        ordered[index] = row
+        submitNext()
+      }
+      return ordered.compactMap { $0 }
+    }
+  }
+
+  private static func loadRow(
+    for summary: CoachStudentSummary,
+    plans: any StudentPlanRepository,
+    trainingLogs: any StudentTrainingLogRepository,
+    feedback: any StudentFeedbackRepository,
+    now: @Sendable () -> Date
+  ) async -> StudentRosterRowModel {
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: summary.id)
       let range = Self.weekRange(for: plan, now: now())
-      let logs = try await trainingLogs.fetchLogs(studentID: summary.id, in: range)
-      let feedbackItems = try await feedback.fetchInbox(studentID: summary.id)
+      async let logs = trainingLogs.fetchLogs(studentID: summary.id, in: range)
+      async let feedbackItems = feedback.fetchInbox(studentID: summary.id)
       return Self.makeRow(
         summary: summary,
         plan: plan,
-        logs: logs,
-        feedback: feedbackItems,
+        logs: try await logs,
+        feedback: try await feedbackItems,
         now: now()
       )
     } catch {

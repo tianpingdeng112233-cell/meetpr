@@ -66,3 +66,18 @@ public actor EmptyStudentFeedbackRepository: StudentFeedbackRepository {
 
   public func markRead(feedbackID: UUID) async throws {}
 }
+
+/// Default readiness source for previews and repository-less init paths: the
+/// coach overview row renders the "not filed today" state.
+public actor EmptyReadinessRepository: ReadinessRepository {
+  public init() {}
+
+  public func submit(_ checkin: ReadinessCheckin) async throws {}
+
+  public func fetchCheckin(
+    studentId: UUID,
+    checkinDate: String
+  ) async throws -> ReadinessCheckin? {
+    nil
+  }
+}

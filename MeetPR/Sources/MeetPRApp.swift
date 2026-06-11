@@ -124,6 +124,12 @@ struct MeetPRApp: App {
           // both must read live server state.
           studentBind: BackendBindRepository(api: api, session: session),
           studentOnboarding: BackendOnboardingRepository(api: api, session: session),
+          // Coach-side video wall (spec 029 second pass): server-side
+          // metadata + per-item presigned playback URLs.
+          coachStudentVideos: BackendCoachStudentVideoRepository(api: api, session: session),
+          // Growth-tab family mapping reads the coach-owned full plan tree
+          // (the student projection only carries the current week).
+          coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(api: api, session: session),
           draftStore: draftStore
         ),
         session: session
