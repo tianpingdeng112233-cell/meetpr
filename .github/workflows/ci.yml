@@ -69,31 +69,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name: Build and test Swift packages
+      - name: Test Swift packages
         run: |
           for package in Modules/*; do
             if [ -f "$package/Package.swift" ]; then
-              echo "::group::swift build $package"
-              swift build --package-path "$package"
-              echo "::endgroup::"
-
               if [ -d "$package/Tests" ]; then
                 echo "::group::swift test $package"
                 swift test --package-path "$package" --parallel --enable-code-coverage
                 echo "::endgroup::"
               else
-                echo "$package has no Tests/, skipping swift test"
+                echo "::group::swift build $package (no Tests/)"
+                swift build --package-path "$package"
+                echo "::endgroup::"
               fi
             fi
           done
-
-      - name: Xcode build
-        run: |
-          xcodebuild \
-            -project MeetPR.xcodeproj \
-            -scheme MeetPR \
-            -destination 'generic/platform=iOS Simulator' \
-            build
 
       - name: Select test simulator
         id: simulator
@@ -171,7 +161,7 @@ jobs:
 
   lint-format:
     name: swift-format
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
@@ -188,13 +178,11 @@ jobs:
             echo "::notice::No Swift sources tracked — skipping swift-format."
           fi
 
-      - name: Select Xcode
-        if: steps.swift.outputs.exists == 'true'
-        run: sudo xcode-select -s /Applications/Xcode.app
-
       - name: swift-format lint
         if: steps.swift.outputs.exists == 'true'
-        run: xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
+        run: |
+          docker run --rm -v "$(pwd):/work" -w /work swift:6.1-jammy \
+            swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules
 
   lint-swiftlint:
     name: SwiftLint
