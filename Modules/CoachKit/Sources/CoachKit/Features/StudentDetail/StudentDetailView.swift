@@ -8,36 +8,55 @@ struct StudentDetailView: View {
   @Bindable private var viewModel: StudentDetailViewModel
   @State private var videoGridViewModel: StudentVideoGridViewModel
   @State private var growthViewModel: StudentGrowthViewModel
-  private let feedback: any StudentFeedbackRepository
+  @State private var evaluationViewModel: EvaluationBannerViewModel
+  private let context: CoachStudentDetailContext
   @State private var showComposer = false
+  @State private var showSummaryEditor = false
+  @State private var showAdaptationPlanning = false
 
-  init(
-    summary: CoachStudentSummary,
-    plans: any StudentPlanRepository,
-    trainingLogs: any StudentTrainingLogRepository,
-    feedback: any StudentFeedbackRepository,
-    videos: any CoachStudentVideoRepository,
-    readiness: any ReadinessRepository,
-    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil
-  ) {
+  init(summary: CoachStudentSummary, context: CoachStudentDetailContext) {
     viewModel = StudentDetailViewModel(
       summary: summary,
-      plans: plans,
-      trainingLogs: trainingLogs,
-      feedback: feedback,
-      videos: videos,
-      readiness: readiness
+      plans: context.plans,
+      trainingLogs: context.trainingLogs,
+      feedback: context.feedback,
+      videos: context.videos,
+      readiness: context.readiness
     )
-    _videoGridViewModel = State(initialValue: StudentVideoGridViewModel(repository: videos))
+    _videoGridViewModel = State(
+      initialValue: StudentVideoGridViewModel(repository: context.videos)
+    )
     _growthViewModel = State(
       initialValue: StudentGrowthViewModel(
-        plans: plans, trainingLogs: trainingLogs, familyMapProvider: familyMapProvider)
+        plans: context.plans,
+        trainingLogs: context.trainingLogs,
+        familyMapProvider: context.familyMapProvider
+      )
     )
-    self.feedback = feedback
+    _evaluationViewModel = State(
+      initialValue: EvaluationBannerViewModel(
+        studentID: summary.id,
+        evaluations: context.evaluations,
+        summaries: context.summaries
+      )
+    )
+    self.context = context
   }
 
   var body: some View {
     VStack(spacing: 0) {
+      if evaluationViewModel.isBannerVisible {
+        EvaluationStatusBanner(
+          viewModel: evaluationViewModel,
+          hasPublishedPlan: viewModel.plan != nil,
+          onSendAdaptationWeek: { showAdaptationPlanning = true },
+          onViewAdaptationWeek: { viewModel.select(.execution) },
+          onOpenSummary: { showSummaryEditor = true }
+        )
+        .padding(.horizontal, MeetPRSpacing.base)
+        .padding(.top, MeetPRSpacing.sm)
+      }
+
       Picker("", selection: $viewModel.selectedSection) {
         ForEach(StudentDetailSection.allCases) { section in
           Text(section.title).tag(section)
@@ -79,14 +98,47 @@ struct StudentDetailView: View {
         studentID: viewModel.summary.id,
         studentName: viewModel.summary.displayName,
         days: viewModel.plannedDays,
-        repository: feedback
+        repository: context.feedback
       ) { item in
         viewModel.appendPostedFeedback(item)
       }
     }
+    .navigationDestination(isPresented: $showSummaryEditor) {
+      summaryEditor
+    }
+    .onChange(of: showSummaryEditor) { _, isShowing in
+      if !isShowing {
+        // Returning from the editor: refresh the overview summary card.
+        Task { await evaluationViewModel.reloadSummary() }
+      }
+    }
+    .modifier(
+      AdaptationPlanningPresenter(
+        isPresented: $showAdaptationPlanning,
+        student: viewModel.summary,
+        context: context
+      )
+    )
     .task {
       await viewModel.loadIfNeeded()
+      await evaluationViewModel.load()
     }
+  }
+
+  private var summaryEditor: some View {
+    EvaluationSummaryEditorView(
+      viewModel: EvaluationSummaryEditorViewModel(
+        student: viewModel.summary,
+        evaluation: evaluationViewModel.evaluation,
+        summaries: context.summaries,
+        evaluations: context.evaluations,
+        profiles: context.profiles,
+        onEvaluationCompleted: { completed in
+          evaluationViewModel.markEvaluationCompleted(completed)
+        }
+      ),
+      context: context
+    )
   }
 
   @ViewBuilder
@@ -113,10 +165,15 @@ struct StudentDetailView: View {
         summary: viewModel.overview,
         readiness: viewModel.todayReadiness,
         recentVideos: viewModel.recentVideos,
-        videosUnavailable: viewModel.videosUnavailable
-      ) { section in
-        viewModel.select(section)
-      }
+        videosUnavailable: viewModel.videosUnavailable,
+        evaluationSummary: evaluationViewModel.summary,
+        onSelectSection: { section in
+          viewModel.select(section)
+        },
+        onOpenEvaluationSummary: {
+          showSummaryEditor = true
+        }
+      )
     case .execution:
       StudentExecutionView(days: viewModel.executionDays)
     case .videos:
@@ -136,5 +193,35 @@ struct StudentDetailView: View {
         }
       )
     }
+  }
+}
+
+/// fullScreenCover on iOS / sheet on macOS for the adaptation-week planning
+/// entry (spec 033 §7).
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct AdaptationPlanningPresenter: ViewModifier {
+  @Binding var isPresented: Bool
+  let student: CoachStudentSummary
+  let context: CoachStudentDetailContext
+
+  func body(content: Content) -> some View {
+    #if os(iOS)
+      content.fullScreenCover(isPresented: $isPresented) {
+        planning
+      }
+    #else
+      content.sheet(isPresented: $isPresented) {
+        planning
+      }
+    #endif
+  }
+
+  private var planning: some View {
+    PlanningCoordinatorView(
+      repository: context.planning,
+      draftStore: context.draftStore,
+      intent: .adaptationWeek(student)
+    )
   }
 }

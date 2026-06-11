@@ -7,9 +7,17 @@ public struct PlanningCoordinatorView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var viewModel: PlanningViewModel
 
-  public init(repository: any PlanRepository, draftStore: DraftStore) {
+  public init(
+    repository: any PlanRepository,
+    draftStore: DraftStore,
+    intent: PlanningIntent = .blank
+  ) {
     _viewModel = State(
-      initialValue: PlanningViewModel(repository: repository, draftStore: draftStore)
+      initialValue: PlanningViewModel(
+        repository: repository,
+        draftStore: draftStore,
+        intent: intent
+      )
     )
   }
 

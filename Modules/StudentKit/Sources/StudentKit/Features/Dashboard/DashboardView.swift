@@ -11,6 +11,7 @@ import SwiftUI
 public struct DashboardView: View {
   private let studentID: UUID
   private let feedbackViewModel: FeedbackInboxViewModel
+  private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   private let onStartWorkout: () -> Void
   private let onSeeAllFeedback: () -> Void
   @State private var weekViewModel: WeekOverviewViewModel
@@ -20,11 +21,13 @@ public struct DashboardView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedbackViewModel: FeedbackInboxViewModel,
+    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onStartWorkout: @escaping () -> Void,
     onSeeAllFeedback: @escaping () -> Void
   ) {
     self.studentID = studentID
     self.feedbackViewModel = feedbackViewModel
+    self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onStartWorkout = onStartWorkout
     self.onSeeAllFeedback = onSeeAllFeedback
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
@@ -34,6 +37,10 @@ public struct DashboardView: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: 24) {
+          if let evaluationSummaryViewModel {
+            EvaluationCompletedCard(viewModel: evaluationSummaryViewModel)
+          }
+
           TodayWorkoutCard(today: today, logs: weekData?.logs ?? [], onStart: onStartWorkout)
 
           if let data = weekData, !data.days.isEmpty {
@@ -283,6 +290,53 @@ private struct FeedbackRowCard: View {
         .padding(.top, 2)
     }
     .modifier(DashboardCard())
+  }
+}
+
+/// "评估完成 ✓" summary card (spec 033 §12): excerpts + full-text link;
+/// visible only while unread (D7) — opening the full text collapses it. The
+/// bottom row tracks the first regular plan (wiki §6.2).
+@available(iOS 17.0, macOS 14.0, *)
+private struct EvaluationCompletedCard: View {
+  let viewModel: StudentEvaluationSummaryViewModel
+
+  var body: some View {
+    if viewModel.showsDashboardCard, let summary = viewModel.summary {
+      VStack(alignment: .leading, spacing: 12) {
+        Label("评估完成", systemImage: "checkmark.seal.fill")
+          .font(.headline)
+          .foregroundStyle(Color.MeetPR.green)
+
+        Text(summary.trainingPlanExcerpt)
+          .font(.subheadline)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .lineLimit(2)
+
+        if let words = summary.wordsExcerpt {
+          Text(words)
+            .font(.subheadline)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .lineLimit(2)
+        }
+
+        NavigationLink {
+          EvaluationSummaryView(summary: summary) {
+            viewModel.markRead()
+          }
+        } label: {
+          Text("展开看完整")
+            .font(.subheadline)
+            .foregroundStyle(Color.MeetPR.brandRed)
+        }
+
+        if viewModel.showsAwaitingFirstPlan {
+          Text("教练正在为你排第一份正式计划")
+            .font(.caption)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
+      }
+      .modifier(DashboardCard())
+    }
   }
 }
 

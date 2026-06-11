@@ -27,6 +27,36 @@ struct MeetPRApp: App {
   }
 
   #if DEMO_MODE
+    private struct DemoEvaluationFunnel {
+      let bindQueue: InMemoryCoachBindQueueRepository
+      let evaluations: InMemoryCoachEvaluationRepository
+      let summaries: InMemoryCoachEvaluationSummaryRepository
+      let profiles: InMemoryCoachStudentProfileReader
+    }
+
+    /// Demo evaluation funnel (spec 033): one pending receive-queue card +
+    /// live evaluation periods for the two in-evaluation roster students.
+    /// Queue accepts mint periods into the same shared store.
+    private static func makeDemoEvaluationFunnel() -> DemoEvaluationFunnel {
+      let evaluationStore = InMemoryEvaluationPeriodStore(
+        seed: CoachDemoSeed.evaluationPeriods(coachId: StudentDemoSeed.coachID)
+      )
+      return DemoEvaluationFunnel(
+        bindQueue: InMemoryCoachBindQueueRepository(
+          coachId: StudentDemoSeed.coachID,
+          seed: CoachDemoSeed.pendingBindRequests(),
+          evaluationStore: evaluationStore
+        ),
+        evaluations: InMemoryCoachEvaluationRepository(store: evaluationStore),
+        summaries: InMemoryCoachEvaluationSummaryRepository(coachId: StudentDemoSeed.coachID),
+        profiles: InMemoryCoachStudentProfileReader(
+          profiles: [
+            StudentDemoSeed.makeOnboardingProfile(studentID: CoachDemoSeed.queueStudentID)
+          ]
+        )
+      )
+    }
+
     private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
       // Seed the student projection so the demo shows a real plan (today/week)
       // without a coach publish round-trip.
@@ -49,6 +79,7 @@ struct MeetPRApp: App {
           try? await draftStore.deleteAll()
         }
       )
+      let funnel = makeDemoEvaluationFunnel()
       return RootDependencies(
         rootView: RootView(
           coachPlans: InMemoryPlanRepository.preview(store: planStore),
@@ -58,6 +89,10 @@ struct MeetPRApp: App {
             coachId: StudentDemoSeed.coachID,
             seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
           ),
+          coachBindQueue: funnel.bindQueue,
+          coachEvaluations: funnel.evaluations,
+          coachEvaluationSummaries: funnel.summaries,
+          coachStudentProfiles: funnel.profiles,
           studentPlans: InMemoryStudentPlanRepository(store: planStore),
           studentLogs: InMemoryStudentTrainingLogRepository(
             seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
@@ -98,6 +133,12 @@ struct MeetPRApp: App {
         rootView: RootView(
           coachPlans: BackendPlanRepository(api: api, session: session, cache: PlanCache()),
           coachInviteCodes: BackendInviteCodeRepository(api: api, session: session),
+          // Coach receive queue + evaluation funnel (spec 033).
+          coachBindQueue: BackendCoachBindQueueRepository(api: api, session: session),
+          coachEvaluations: BackendCoachEvaluationRepository(api: api, session: session),
+          coachEvaluationSummaries: BackendCoachEvaluationSummaryRepository(
+            api: api, session: session),
+          coachStudentProfiles: BackendCoachStudentProfileReader(api: api, session: session),
           studentPlans: BackendStudentPlanRepository(
             api: api,
             session: session,
@@ -124,6 +165,11 @@ struct MeetPRApp: App {
           // both must read live server state.
           studentBind: BackendBindRepository(api: api, session: session),
           studentOnboarding: BackendOnboardingRepository(api: api, session: session),
+          // Evaluation funnel (spec 033) — all cache-free by design.
+          studentEvaluations: BackendStudentEvaluationRepository(api: api, session: session),
+          studentEvaluationSummaries: BackendEvaluationSummaryRepository(
+            api: api, session: session),
+          summaryReadStore: UserDefaultsEvaluationSummaryReadStore(),
           // Coach-side video wall (spec 029 second pass): server-side
           // metadata + per-item presigned playback URLs.
           coachStudentVideos: BackendCoachStudentVideoRepository(api: api, session: session),

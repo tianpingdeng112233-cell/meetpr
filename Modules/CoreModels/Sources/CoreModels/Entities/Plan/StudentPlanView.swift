@@ -7,19 +7,40 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
   public let cycleID: UUID
   public let weekIndex: Int
   public let startDate: Date
+  /// `.regular` when absent — pre-033 cached projections carry no kind.
+  /// Drives the student dashboard "教练正在为你排第一份正式计划" row
+  /// (spec 033 §12): an adaptation-week plan is not the first regular plan.
+  public let planKind: PlanKind
   public let days: [StudentPlanDay]
 
-  public init(cycleID: UUID, weekIndex: Int, startDate: Date, days: [StudentPlanDay]) {
+  public init(
+    cycleID: UUID,
+    weekIndex: Int,
+    startDate: Date,
+    planKind: PlanKind = .regular,
+    days: [StudentPlanDay]
+  ) {
     self.cycleID = cycleID
     self.weekIndex = weekIndex
     self.startDate = startDate
+    self.planKind = planKind
     self.days = days
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    cycleID = try container.decode(UUID.self, forKey: .cycleID)
+    weekIndex = try container.decode(Int.self, forKey: .weekIndex)
+    startDate = try container.decode(Date.self, forKey: .startDate)
+    planKind = try container.decodeIfPresent(PlanKind.self, forKey: .planKind) ?? .regular
+    days = try container.decode([StudentPlanDay].self, forKey: .days)
   }
 
   private enum CodingKeys: String, CodingKey {
     case cycleID = "cycleId"
     case weekIndex
     case startDate
+    case planKind
     case days
   }
 }
