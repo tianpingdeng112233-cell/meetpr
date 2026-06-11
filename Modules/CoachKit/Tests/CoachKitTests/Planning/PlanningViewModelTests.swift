@@ -92,6 +92,59 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func restoredConfigureRulesPathDoesNotDuplicateStep4() async throws {
+  let store = try PlanningFixtures.store()
+  let draft = PlanningFixtures.draft()
+  draft.currentStepRawValue = PlanningStep.configureRules.rawValue
+  try store.saveDraft(draft)
+  let viewModel = PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: store
+  )
+
+  await viewModel.bootstrap()
+
+  #expect(viewModel.currentStep == .configureRules)
+  #expect(
+    viewModel.path == [
+      .selectDuration,
+      .assignFrequency,
+      .selectMainLifts,
+      .selectAccessories,
+      .configureRules,
+    ])
+  viewModel.goBack()
+  #expect(viewModel.currentStep == .selectAccessories)
+  viewModel.goBack()
+  #expect(viewModel.currentStep == .selectMainLifts)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func legacyFillW1IntensityDraftRestoresToSingleStep4() async throws {
+  let store = try PlanningFixtures.store()
+  let draft = PlanningFixtures.draft()
+  draft.currentStepRawValue = PlanningStep.fillW1Intensity.rawValue
+  try store.saveDraft(draft)
+  let viewModel = PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: store
+  )
+
+  await viewModel.bootstrap()
+
+  #expect(viewModel.currentStep == .selectAccessories)
+  #expect(
+    viewModel.path == [
+      .selectDuration,
+      .assignFrequency,
+      .selectMainLifts,
+      .selectAccessories,
+    ])
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func bootstrapRestoresSavedDraftStepAndAssignments() async throws {
   let store = try PlanningFixtures.store()
   try store.saveDraft(PlanningFixtures.draft())
