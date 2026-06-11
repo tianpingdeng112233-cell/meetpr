@@ -34,6 +34,11 @@ final class StudentVideoGridViewModel {
     self.repository = repository
   }
 
+  /// Fresh 15-minute URL for in-player retry after expiry (Codex P1).
+  func freshPlaybackURL(videoID: UUID) async throws -> URL {
+    try await repository.playbackURL(videoID: videoID)
+  }
+
   func play(_ video: StudentVideo) async {
     guard loadingVideoID == nil else { return }
     playbackError = nil

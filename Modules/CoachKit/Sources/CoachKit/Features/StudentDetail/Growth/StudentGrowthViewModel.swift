@@ -48,16 +48,19 @@ final class StudentGrowthViewModel {
 
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let trainingLogs: any StudentTrainingLogRepository
+  @ObservationIgnored private let familyMapProvider: (any CoachPlanFamilyMapProviding)?
   @ObservationIgnored private let now: @Sendable () -> Date
   private var pointsByFamily: [LiftFamily: [GrowthPoint]] = [:]
 
   init(
     plans: any StudentPlanRepository,
     trainingLogs: any StudentTrainingLogRepository,
+    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.trainingLogs = trainingLogs
+    self.familyMapProvider = familyMapProvider
     self.now = now
   }
 
@@ -69,9 +72,18 @@ final class StudentGrowthViewModel {
   func load(studentID: UUID) async {
     state = .loading
     do {
-      // Cycle days (not just the current week) so logs against earlier
-      // weeks' plan exercises still resolve to a lift family.
-      let cycleDays = try await plans.fetchCycleDays(studentID: studentID)
+      // The student projection only carries the current week (publish
+      // filters by weekIndex), so the coach-owned full plan tree is the
+      // primary family source; the projection remains a fallback so the tab
+      // degrades instead of blanking when the tree fetch fails (Codex P1).
+      var familyMap: [UUID: LiftFamily] = [:]
+      if let provider = familyMapProvider {
+        familyMap = (try? await provider.familyMap(traineeID: studentID)) ?? [:]
+      }
+      if familyMap.isEmpty {
+        let cycleDays = try await plans.fetchCycleDays(studentID: studentID)
+        familyMap = Self.familyByPlanExerciseID(days: cycleDays)
+      }
       let end = now()
       let start =
         CoachFeatureCalendar.calendar.date(byAdding: .day, value: -Self.fetchDays, to: end)
@@ -79,7 +91,7 @@ final class StudentGrowthViewModel {
       let logs = try await trainingLogs.fetchLogs(studentID: studentID, in: start...end)
       pointsByFamily = Self.makePoints(
         logs: logs,
-        familyByPlanExerciseID: Self.familyByPlanExerciseID(days: cycleDays)
+        familyByPlanExerciseID: familyMap
       )
       state = .loaded
       refreshVisiblePoints()

@@ -11,6 +11,7 @@ public struct CoachRootView: View {
   private let inviteCodes: any InviteCodeRepository
   private let studentVideos: any CoachStudentVideoRepository
   private let readiness: any ReadinessRepository
+  private let familyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
@@ -24,6 +25,7 @@ public struct CoachRootView: View {
     inviteCodes: (any InviteCodeRepository)? = nil,
     studentVideos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
+    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
@@ -34,6 +36,7 @@ public struct CoachRootView: View {
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
     self.studentVideos = studentVideos
     self.readiness = readiness
+    self.familyMapProvider = familyMapProvider
     self.draftStore = draftStore
     _rosterViewModel = State(
       initialValue: StudentRosterViewModel(
@@ -61,6 +64,7 @@ public struct CoachRootView: View {
         trainingLogs: studentLogs,
         feedback: feedback,
         videos: studentVideos,
+        familyMapProvider: familyMapProvider,
         readiness: readiness
       )
       .tabItem {

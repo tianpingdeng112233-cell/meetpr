@@ -13,8 +13,18 @@ struct CoachVideoPlayerView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var player: AVPlayer
   @State private var rate: Float = 1.0
+  @State private var playbackFailed = false
+  @State private var retrying = false
 
-  init(url: URL) {
+  private let videoID: UUID
+  /// Exchanges a fresh 15-minute playback URL — the presigned link can expire
+  /// mid-session, so player-item failure re-exchanges instead of dead-ending
+  /// (Codex review P1).
+  private let refreshURL: (UUID) async throws -> URL
+
+  init(videoID: UUID, url: URL, refreshURL: @escaping (UUID) async throws -> URL) {
+    self.videoID = videoID
+    self.refreshURL = refreshURL
     _player = State(initialValue: AVPlayer(url: url))
   }
 
@@ -50,6 +60,42 @@ struct CoachVideoPlayerView: View {
       .padding(MeetPRSpacing.base)
     }
     .background(Color.black)
+    .overlay {
+      if playbackFailed {
+        VStack(spacing: MeetPRSpacing.sm) {
+          Text("播放失败，链接可能已过期")
+            .font(Font.MeetPR.body)
+            .foregroundStyle(.white)
+          Button(retrying ? "刷新中…" : "重试") {
+            retrying = true
+            Task {
+              defer { retrying = false }
+              guard let fresh = try? await refreshURL(videoID) else { return }
+              playbackFailed = false
+              player.replaceCurrentItem(with: AVPlayerItem(url: fresh))
+              player.defaultRate = rate
+              player.play()
+            }
+          }
+          .buttonStyle(.borderedProminent)
+          .tint(Color.MeetPR.brandRed)
+          .disabled(retrying)
+        }
+        .padding(MeetPRSpacing.lg)
+        .background(.ultraThinMaterial)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      }
+    }
+    .onReceive(
+      NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification)
+    ) { _ in
+      playbackFailed = true
+    }
+    .onReceive(
+      player.publisher(for: \.currentItem?.status).removeDuplicates()
+    ) { status in
+      if status == .failed { playbackFailed = true }
+    }
     .onAppear {
       player.play()
     }

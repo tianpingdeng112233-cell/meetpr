@@ -23,11 +23,19 @@ struct StudentVideoGridView: View {
       .background(Color.MeetPR.bg)
       #if os(iOS)
         .fullScreenCover(item: $viewModel.playbackItem) { item in
-          CoachVideoPlayerView(url: item.url)
+          CoachVideoPlayerView(
+            videoID: item.id,
+            url: item.url,
+            refreshURL: { try await viewModel.freshPlaybackURL(videoID: $0) }
+          )
         }
       #else
         .sheet(item: $viewModel.playbackItem) { item in
-          CoachVideoPlayerView(url: item.url)
+          CoachVideoPlayerView(
+            videoID: item.id,
+            url: item.url,
+            refreshURL: { try await viewModel.freshPlaybackURL(videoID: $0) }
+          )
         }
       #endif
   }

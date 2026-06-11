@@ -140,3 +140,38 @@ private actor FailingStudentPlanRepository: StudentPlanRepository {
     throw CoachFeatureTestError()
   }
 }
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func providerMapBeatsCurrentWeekProjectionForCrossWeekLogs() async throws {
+  // A week-1 plan exercise that the current-week (week-2) projection no
+  // longer carries — only the coach-owned full-tree provider maps it
+  // (Codex review P1: projection-only mapping dropped cross-week points).
+  let weekOnePlanExerciseID = UUID(uuidString: "02900000-0000-0000-0000-000000003001")!
+  let studentID = UUID(uuidString: "02900000-0000-0000-0000-000000003002")!
+  let provider = StaticCoachPlanFamilyMapProvider(map: [weekOnePlanExerciseID: .squat])
+  let logs = StubTrainingLogRepository(logs: [
+    StudentSetLog(
+      id: UUID(uuidString: "02900000-0000-0000-0000-000000003003")!,
+      studentID: studentID,
+      planExerciseID: weekOnePlanExerciseID,
+      setIndex: 0,
+      loggedAt: Date().addingTimeInterval(-86_400),
+      weightKg: 140,
+      reps: 5,
+      rpe: 8,
+      completed: true
+    )
+  ])
+
+  let viewModel = StudentGrowthViewModel(
+    plans: StubStudentPlanRepository(plans: [:]),  // projection yields nothing
+    trainingLogs: logs,
+    familyMapProvider: provider
+  )
+  await viewModel.load(studentID: studentID)
+
+  #expect(viewModel.state == .loaded)
+  viewModel.selectedFamily = .squat
+  viewModel.selectedWindow = .all
+  #expect(!viewModel.visiblePoints.isEmpty, "cross-week log must survive via the tree map")
+}

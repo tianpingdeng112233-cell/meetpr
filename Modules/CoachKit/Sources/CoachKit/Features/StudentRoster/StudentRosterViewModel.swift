@@ -26,6 +26,11 @@ struct StudentRosterRowModel: Hashable, Identifiable, Sendable {
 @available(iOS 17.0, macOS 14.0, *)
 final class StudentRosterViewModel {
   enum LoadState: Equatable, Sendable {
+    var isFailure: Bool {
+      if case .failed = self { return true }
+      return false
+    }
+
     case idle
     case loading
     case loaded
@@ -69,7 +74,9 @@ final class StudentRosterViewModel {
   }
 
   func loadIfNeeded() async {
-    guard state != .loaded else { return }
+    // Both CoachRootView and StudentRosterView call this on appear; loading
+    // must not stack a second full refresh (Codex P2).
+    guard state == .idle || state.isFailure else { return }
     await refresh()
   }
 
@@ -93,8 +100,14 @@ final class StudentRosterViewModel {
     let trainingLogs = self.trainingLogs
     let feedback = self.feedback
     let now = self.now
+    // Sliding window of 4: still concurrent, but a big roster can't hammer
+    // the plan/log/feedback endpoints with 3N simultaneous calls (Codex P2;
+    // an aggregated roster-summary endpoint is the post-V0.1 fix, FOLLOWUPS).
+    let maxConcurrent = 4
     return await withTaskGroup(of: (Int, StudentRosterRowModel).self) { group in
-      for (index, summary) in summaries.enumerated() {
+      var iterator = summaries.enumerated().makeIterator()
+      func submitNext() {
+        guard let (index, summary) = iterator.next() else { return }
         group.addTask {
           let row = await Self.loadRow(
             for: summary,
@@ -106,9 +119,11 @@ final class StudentRosterViewModel {
           return (index, row)
         }
       }
+      for _ in 0..<maxConcurrent { submitNext() }
       var ordered = [StudentRosterRowModel?](repeating: nil, count: summaries.count)
       for await (index, row) in group {
         ordered[index] = row
+        submitNext()
       }
       return ordered.compactMap { $0 }
     }

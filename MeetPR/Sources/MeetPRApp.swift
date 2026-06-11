@@ -127,6 +127,9 @@ struct MeetPRApp: App {
           // Coach-side video wall (spec 029 second pass): server-side
           // metadata + per-item presigned playback URLs.
           coachStudentVideos: BackendCoachStudentVideoRepository(api: api, session: session),
+          // Growth-tab family mapping reads the coach-owned full plan tree
+          // (the student projection only carries the current week).
+          coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(api: api, session: session),
           draftStore: draftStore
         ),
         session: session

@@ -17,7 +17,8 @@ struct StudentDetailView: View {
     trainingLogs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
     videos: any CoachStudentVideoRepository,
-    readiness: any ReadinessRepository
+    readiness: any ReadinessRepository,
+    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil
   ) {
     viewModel = StudentDetailViewModel(
       summary: summary,
@@ -29,7 +30,8 @@ struct StudentDetailView: View {
     )
     _videoGridViewModel = State(initialValue: StudentVideoGridViewModel(repository: videos))
     _growthViewModel = State(
-      initialValue: StudentGrowthViewModel(plans: plans, trainingLogs: trainingLogs)
+      initialValue: StudentGrowthViewModel(
+        plans: plans, trainingLogs: trainingLogs, familyMapProvider: familyMapProvider)
     )
     self.feedback = feedback
   }
