@@ -108,6 +108,12 @@ struct PlateMathSheet: View {
       : loadout.platesPerSideKg.map { Self.denominationText($0) }.joined(separator: "，")
   }
 
+  private struct PlateStyle {
+    let color: Color
+    let height: CGFloat
+    let needsBorder: Bool
+  }
+
   /// Plate denominations need two fraction digits (1.25); totals use the
   /// shared one-digit weight style.
   private static func denominationText(_ value: Double) -> String {
@@ -116,17 +122,19 @@ struct PlateMathSheet: View {
 
   /// IPF standard plate colors; 5kg (white) and 2.5kg (black) get a border so
   /// they stay visible in both color schemes.
-  private static func plateStyle(_ denomination: Double) -> (
-    color: Color, height: CGFloat, needsBorder: Bool
-  ) {
+  private static func plateStyle(_ denomination: Double) -> PlateStyle {
     switch denomination {
-    case 25: (Color(red: 0.85, green: 0.15, blue: 0.15), 64, false)
-    case 20: (Color(red: 0.15, green: 0.3, blue: 0.8), 60, false)
-    case 15: (Color(red: 0.95, green: 0.8, blue: 0.1), 54, false)
-    case 10: (Color(red: 0.15, green: 0.6, blue: 0.3), 46, false)
-    case 5: (Color.white, 36, true)
-    case 2.5: (Color.black, 28, true)
-    default: (Color(white: 0.75), 22, false)  // 1.25 silver
+    case 25:
+      PlateStyle(color: Color(red: 0.85, green: 0.15, blue: 0.15), height: 64, needsBorder: false)
+    case 20:
+      PlateStyle(color: Color(red: 0.15, green: 0.3, blue: 0.8), height: 60, needsBorder: false)
+    case 15:
+      PlateStyle(color: Color(red: 0.95, green: 0.8, blue: 0.1), height: 54, needsBorder: false)
+    case 10:
+      PlateStyle(color: Color(red: 0.15, green: 0.6, blue: 0.3), height: 46, needsBorder: false)
+    case 5: PlateStyle(color: .white, height: 36, needsBorder: true)
+    case 2.5: PlateStyle(color: .black, height: 28, needsBorder: true)
+    default: PlateStyle(color: Color(white: 0.75), height: 22, needsBorder: false)  // 1.25 silver
     }
   }
 }
