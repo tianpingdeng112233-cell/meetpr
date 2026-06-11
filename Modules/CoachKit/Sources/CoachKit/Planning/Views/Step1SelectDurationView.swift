@@ -56,10 +56,9 @@ public struct Step1SelectDurationView: View {
   }
 
   private var isFourWeekDisabled: Bool {
-    if case .inEvaluation = viewModel.selectedStudent?.status {
-      return true
-    }
-    return false
+    // planKind covers both the adaptationWeek intent and the in-evaluation
+    // roster status (spec 033 §7).
+    viewModel.planKind == .adaptation
   }
 
   private var fourWeekSubtitle: String {

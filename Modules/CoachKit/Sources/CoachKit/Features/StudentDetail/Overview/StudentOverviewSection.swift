@@ -9,7 +9,29 @@ struct StudentOverviewSection: View {
   let readiness: ReadinessRowState
   let recentVideos: [StudentVideo]
   let videosUnavailable: Bool
+  /// The coach-authored evaluation summary; the 5th card is its permanent
+  /// entry after the evaluation banner collapses (spec 033 D5).
+  let evaluationSummary: EvaluationSummary?
   let onSelectSection: (StudentDetailSection) -> Void
+  let onOpenEvaluationSummary: () -> Void
+
+  init(
+    summary: StudentOverviewSummary,
+    readiness: ReadinessRowState,
+    recentVideos: [StudentVideo],
+    videosUnavailable: Bool,
+    evaluationSummary: EvaluationSummary? = nil,
+    onSelectSection: @escaping (StudentDetailSection) -> Void,
+    onOpenEvaluationSummary: @escaping () -> Void = {}
+  ) {
+    self.summary = summary
+    self.readiness = readiness
+    self.recentVideos = recentVideos
+    self.videosUnavailable = videosUnavailable
+    self.evaluationSummary = evaluationSummary
+    self.onSelectSection = onSelectSection
+    self.onOpenEvaluationSummary = onOpenEvaluationSummary
+  }
 
   var body: some View {
     ScrollView {
@@ -37,11 +59,40 @@ struct StudentOverviewSection: View {
         }
         .buttonStyle(.plain)
 
-        CoachEvaluationEntryRow()
+        Button {
+          onOpenEvaluationSummary()
+        } label: {
+          evaluationSummaryCard
+        }
+        .buttonStyle(.plain)
       }
       .padding(MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
+  }
+
+  private var evaluationSummaryCard: some View {
+    Card(accessibilityLabel: "评估总结") {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+        Eyebrow("评估总结")
+        if let evaluationSummary {
+          Text(evaluationSummary.trainingPlanExcerpt)
+            .font(Font.MeetPR.body)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .lineLimit(2)
+          Text("更新于 \(CoachStudentFormatting.shortDateText(evaluationSummary.lastUpdatedAt))")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        } else {
+          Text("未填写,去写一份")
+            .font(Font.MeetPR.headline)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Text("评估总结是学员的长期参照")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
+      }
+    }
   }
 
   private var completionCard: some View {
@@ -162,40 +213,6 @@ private struct StudentReadinessCard: View {
         }
       }
     }
-  }
-}
-
-/// Spec 033 seam: "教练评估" entry placeholder. Spec 033 (in flight in a
-/// parallel branch) replaces the destination below with the real coach
-/// evaluation summary; keep the NavigationLink row and swap the destination.
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct CoachEvaluationEntryRow: View {
-  var body: some View {
-    NavigationLink {
-      ContentUnavailableView(
-        "评估功能即将开放",
-        systemImage: "checklist",
-        description: Text("教练评估总结将在后续版本上线")
-      )
-      .background(Color.MeetPR.bg)
-    } label: {
-      Card(accessibilityLabel: "教练评估") {
-        HStack {
-          VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-            Eyebrow("教练评估")
-            Text("评估功能即将开放")
-              .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
-          }
-          Spacer()
-          Image(systemName: "chevron.right")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-        }
-      }
-    }
-    .buttonStyle(.plain)
   }
 }
 

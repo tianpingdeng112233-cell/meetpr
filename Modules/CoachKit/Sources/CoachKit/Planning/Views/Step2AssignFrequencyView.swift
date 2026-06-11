@@ -78,7 +78,7 @@ public struct Step2AssignFrequencyView: View {
             .font(Font.MeetPR.headline)
             .foregroundStyle(Color.MeetPR.fgPrimary)
 
-          ForEach(viewModel.sortedTrainingDays, id: \.self) { day in
+          ForEach(viewModel.assignmentDisplayDays, id: \.self) { day in
             AssignmentDayCard(dayOfWeek: day, viewModel: viewModel)
           }
         }
@@ -177,6 +177,12 @@ private struct AssignmentDayCard: View {
           Text(PlanningDisplay.weekdayName(dayOfWeek))
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(Color.MeetPR.fgPrimary)
+
+          // Onboarding-declared training day: mark only, never auto-assign
+          // (spec 033 D8 — the coach owns the schedule).
+          if viewModel.isPreferredTrainingDay(dayOfWeek) {
+            StatusBadge(status: .ready, title: "学员可练")
+          }
 
           Spacer()
 

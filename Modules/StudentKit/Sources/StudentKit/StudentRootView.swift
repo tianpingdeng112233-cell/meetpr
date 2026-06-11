@@ -14,6 +14,7 @@ public struct StudentRootView: View {
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
   @State private var feedbackViewModel: FeedbackInboxViewModel
+  @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .dashboard
   @State private var pendingPRCount = 0
 
@@ -47,7 +48,9 @@ public struct StudentRootView: View {
     e1rm: any E1RMRepository = LocalE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
-    onboarding: (any OnboardingRepository)? = nil
+    onboarding: (any OnboardingRepository)? = nil,
+    evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
+    summaryReadStore: (any EvaluationSummaryReadStoring)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -64,6 +67,13 @@ public struct StudentRootView: View {
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
+    self._evaluationSummaryViewModel = State(
+      initialValue: StudentEvaluationSummaryViewModel(
+        summaries: evaluationSummaries ?? InMemoryEvaluationSummaryRepository(),
+        plans: plans,
+        readStore: summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
+      )
+    )
   }
 
   public var body: some View {
@@ -73,6 +83,7 @@ public struct StudentRootView: View {
         plans: plans,
         logs: logs,
         feedbackViewModel: feedbackViewModel,
+        evaluationSummaryViewModel: evaluationSummaryViewModel,
         onStartWorkout: { selectedTab = .workout },
         onSeeAllFeedback: { selectedTab = .feedback }
       )
@@ -103,17 +114,25 @@ public struct StudentRootView: View {
         }
         .badge(feedbackViewModel.unreadCount)
 
-      MyProfileView(studentID: studentID, plans: plans, e1rm: e1rm, onboarding: onboarding)
-        .tag(StudentTab.profile)
-        .tabItem {
-          Label("我的", systemImage: "person")
-        }
-        .badge(pendingPRCount)
+      MyProfileView(
+        studentID: studentID,
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding,
+        evaluationSummaryViewModel: evaluationSummaryViewModel
+      )
+      .tag(StudentTab.profile)
+      .tabItem {
+        Label("我的", systemImage: "person")
+      }
+      // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
+      .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
     }
     .task {
       if feedbackViewModel.state == .idle {
         await feedbackViewModel.load(studentID: studentID)
       }
+      await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
     }
     .tint(Color.MeetPR.brandRed)

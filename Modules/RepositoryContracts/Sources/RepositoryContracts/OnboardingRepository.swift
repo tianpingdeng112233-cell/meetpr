@@ -25,14 +25,22 @@ extension OnboardingError {
   }
 }
 
+/// Read side of the onboarding archive (spec 033). The coach's full-profile
+/// page and the planning prefill only ever read — GET /students/:id/onboarding
+/// authorizes self, bonded coach, and live-pending coach (backend spec 005
+/// D16). Split from `OnboardingRepository` so CoachKit never sees the
+/// student-only write surface.
+public protocol OnboardingProfileReading: Sendable {
+  /// GET /students/:id/onboarding. 404 → nil — "never filled in"
+  /// is a normal state, not an error.
+  func fetchProfile(studentId: UUID) async throws -> OnboardingProfile?
+}
+
 /// Student onboarding archive (spec 032). Maps 1:1 onto the backend
 /// /students/me/onboarding endpoints. No cache by design: archive edits must
 /// read back consistently; the wizard's local resilience layer is the
 /// separate `LocalOnboardingDraftStore`.
-public protocol OnboardingRepository: Sendable {
-  /// GET /students/:id/onboarding (self). 404 → nil — "never filled in"
-  /// is a normal state, not an error.
-  func fetchProfile(studentId: UUID) async throws -> OnboardingProfile?
+public protocol OnboardingRepository: OnboardingProfileReading {
   /// PUT /students/me/onboarding — step-by-step re-entrant upsert.
   /// A patch touching any 1RM field after completion throws
   /// `OnboardingError.oneRMLocked`.

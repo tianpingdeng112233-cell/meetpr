@@ -5,11 +5,13 @@ import SwiftUI
 
 /// The nine archive cards (spec 032 §7): scan state = icon + title +
 /// summary line; tap pushes the card's edit page. Card 3 (1RM) is read-only
-/// with the lock note; card 9 (教练评估) is the 033 placeholder.
+/// with the lock note; card 9 (教练评估) goes live once a summary exists
+/// (spec 033 §12).
 @available(iOS 17.0, macOS 14.0, *)
 struct ProfileCardsSection: View {
   let profile: OnboardingProfile
   let viewModel: MyProfileViewModel
+  var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
 
   var body: some View {
     Section("我的资料") {
@@ -35,9 +37,31 @@ struct ProfileCardsSection: View {
       editableRow(.injuries, icon: "bandage", title: "伤病记录") {
         OnboardingSummaryFormatter.injuries(profile)
       }
-      evaluationPlaceholderRow
+      evaluationRow
     }
     .listRowBackground(Color.MeetPR.surface1)
+  }
+
+  /// Card 9: live entry to the coach's evaluation summary once written;
+  /// the pre-033 placeholder otherwise.
+  @ViewBuilder
+  private var evaluationRow: some View {
+    if let evaluationSummaryViewModel,
+      let summary = evaluationSummaryViewModel.summary
+    {
+      NavigationLink {
+        EvaluationSummaryView(summary: summary) {
+          evaluationSummaryViewModel.markRead()
+        }
+      } label: {
+        cardLabel(
+          icon: "doc.text", title: "教练评估",
+          summary: summary.trainingPlanExcerpt, locked: false
+        )
+      }
+    } else {
+      evaluationPlaceholderRow
+    }
   }
 
   private func editableRow(

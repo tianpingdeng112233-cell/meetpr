@@ -11,9 +11,15 @@ import SwiftUI
 ///   the bind handoff outcome so the gate lands on the contract state.
 /// - `content`: the bound main UI (StudentRootView).
 @available(iOS 17.0, macOS 14.0, *)
-public struct BindGateView<MainContent: View, OnboardingContent: View>: View {
+public struct BindGateView<
+  MainContent: View, OnboardingContent: View, EvaluationContent: View
+>: View {
   public typealias OnboardingFlowBuilder =
     (PendingBindCode, @escaping (BindHandoffOutcome) async -> Void) -> OnboardingContent
+  /// 033's evaluation slot: the period plus a completion callback that
+  /// reconverges the gate (→ 5 tabs).
+  public typealias EvaluationFlowBuilder =
+    (EvaluationPeriod, @escaping @MainActor () async -> Void) -> EvaluationContent
 
   @State private var viewModel: BindGateViewModel
   @Environment(\.scenePhase) private var scenePhase
@@ -24,15 +30,18 @@ public struct BindGateView<MainContent: View, OnboardingContent: View>: View {
   private let isOnboardingComplete: @Sendable () async -> Bool
   private let onboardingProfile: @Sendable () async -> OnboardingProfile?
   private let onboardingFlow: OnboardingFlowBuilder
+  private let evaluationFlow: EvaluationFlowBuilder
   private let content: () -> MainContent
 
   public init(
     studentId: UUID,
     bind: any BindRepository,
     stash: any PendingBindCodeStoring,
+    evaluations: (any EvaluationRepository)? = nil,
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
     onboardingProfile: @escaping @Sendable () async -> OnboardingProfile? = { nil },
     @ViewBuilder onboardingFlow: @escaping OnboardingFlowBuilder,
+    @ViewBuilder evaluationFlow: @escaping EvaluationFlowBuilder,
     @ViewBuilder content: @escaping () -> MainContent
   ) {
     self.studentId = studentId
@@ -41,13 +50,15 @@ public struct BindGateView<MainContent: View, OnboardingContent: View>: View {
     self.isOnboardingComplete = isOnboardingComplete
     self.onboardingProfile = onboardingProfile
     self.onboardingFlow = onboardingFlow
+    self.evaluationFlow = evaluationFlow
     self.content = content
     self._viewModel = State(
       initialValue: BindGateViewModel(
         studentId: studentId,
         bind: bind,
         stash: stash,
-        isOnboardingComplete: isOnboardingComplete
+        isOnboardingComplete: isOnboardingComplete,
+        evaluations: evaluations
       )
     )
   }
@@ -101,6 +112,11 @@ public struct BindGateView<MainContent: View, OnboardingContent: View>: View {
         onCancelled: { viewModel.handleCancelled() },
         onStateMayHaveChanged: { await viewModel.refresh() }
       )
+    case .evaluationActive(_, let evaluation):
+      evaluationFlow(evaluation) {
+        // Coach completed the evaluation → reconverge to .bound (5 tabs).
+        await viewModel.load()
+      }
     case .bound:
       content()
     case .failed:

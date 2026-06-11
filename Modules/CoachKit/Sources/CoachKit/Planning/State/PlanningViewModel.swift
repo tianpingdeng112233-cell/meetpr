@@ -46,15 +46,47 @@ public final class PlanningViewModel {
   @ObservationIgnored private let usageTracker: ExerciseUsageTracker
   @ObservationIgnored private var hasBootstrapped = false
   @ObservationIgnored private var intensityValueMemo: [UUID: [IntensityMode: Decimal]] = [:]
+  @ObservationIgnored let intent: PlanningIntent
+  /// Onboarding 1RM conversion bases (spec 033 §9): consumed by
+  /// `oneRM(for:)`; empty outside the firstRegularPlan intent.
+  @ObservationIgnored private(set) var prefilledOneRMs: [LiftFamily: Decimal] = [:]
+  /// Student-preferred weekday ints for Step 2 badge + ordering. Marks only —
+  /// assignment stays the coach's call (spec 033 D8).
+  @ObservationIgnored private(set) var preferredTrainingDays: Set<Int> = []
+  /// Initial Step 4 equipment filter derived from gym_tier +
+  /// equipment_overrides; nil = full catalog.
+  @ObservationIgnored private(set) var prefilledEquipment: Set<Equipment>?
 
   public init(
     repository: any PlanRepository,
     draftStore: DraftStore,
-    usageTracker: ExerciseUsageTracker = ExerciseUsageTracker()
+    usageTracker: ExerciseUsageTracker = ExerciseUsageTracker(),
+    intent: PlanningIntent = .blank
   ) {
     self.repository = repository
     self.draftStore = draftStore
     self.usageTracker = usageTracker
+    self.intent = intent
+    if let profile = intent.prefillProfile {
+      prefilledOneRMs = PlanningPrefill.oneRMs(from: profile)
+      preferredTrainingDays = PlanningPrefill.preferredDays(from: profile.trainingDays)
+      prefilledEquipment = PlanningPrefill.equipmentFilter(from: profile)
+    }
+  }
+
+  /// Wire plan kind (spec 033 §7): the adaptation-week intent and the
+  /// in-evaluation roster status both force `.adaptation`; the soft
+  /// recommendation explicitly schedules a regular plan even if the cached
+  /// roster status is stale.
+  public var planKind: PlanKind {
+    switch intent {
+    case .adaptationWeek:
+      return .adaptation
+    case .firstRegularPlan:
+      return .regular
+    case .blank:
+      return isEvaluationStudent ? .adaptation : .regular
+    }
   }
 
   /// Variants for a lift family sorted by coach's usage frequency (DESC),
@@ -102,6 +134,19 @@ public final class PlanningViewModel {
     [1, 2, 3, 4, 5, 6, 7]
   }
 
+  /// Step 2 display order: student-preferred days float to the top (badge +
+  /// ordering only — never auto-assigned, spec 033 D8).
+  public var assignmentDisplayDays: [Int] {
+    guard !preferredTrainingDays.isEmpty else { return sortedTrainingDays }
+    let preferred = sortedTrainingDays.filter { preferredTrainingDays.contains($0) }
+    let rest = sortedTrainingDays.filter { !preferredTrainingDays.contains($0) }
+    return preferred + rest
+  }
+
+  public func isPreferredTrainingDay(_ dayOfWeek: Int) -> Bool {
+    preferredTrainingDays.contains(dayOfWeek)
+  }
+
   public var sortedAssignedDays: [Int] {
     dayAssignments.keys.sorted()
   }
@@ -141,7 +186,11 @@ public final class PlanningViewModel {
       accessoryCatalogByID = Dictionary(
         uniqueKeysWithValues: accessories.map { ($0.id, $0) }
       )
-      try resumeMostRecentDraft()
+      if let presetStudent = intent.presetStudent {
+        applyIntentPreset(student: presetStudent)
+      } else {
+        try resumeMostRecentDraft()
+      }
       if currentStep == .selectAccessories, let currentDayID {
         await switchToDay(currentDayID)
       }
@@ -151,9 +200,25 @@ public final class PlanningViewModel {
     }
   }
 
+  /// Intent entry (spec 033 §7): preset the student and start at Step 1.
+  /// An existing draft for that student resumes instead of being silently
+  /// overwritten (spec 033 risk 4).
+  private func applyIntentPreset(student: CoachStudentSummary) {
+    let resolvedStudent = availableStudents.first { $0.id == student.id } ?? student
+    if let draft = try? draftStore.loadDraft(traineeID: resolvedStudent.id) {
+      restore(draft: draft, student: resolvedStudent)
+      return
+    }
+    selectedStudent = resolvedStudent
+    if planKind == .adaptation {
+      planWeeks = 1
+    }
+    path = [.selectDuration]
+  }
+
   public func selectStudent(_ student: CoachStudentSummary) {
     selectedStudent = student
-    if isEvaluationStudent, planWeeks == 4 {
+    if planKind == .adaptation, planWeeks == 4 {
       planWeeks = 1
     }
   }
@@ -249,7 +314,15 @@ public final class PlanningViewModel {
   }
 
   public func accessoryFilters(for dayID: UUID) -> AccessoryFilters {
-    accessoryFiltersByDay[dayID] ?? .empty
+    if let filters = accessoryFiltersByDay[dayID] {
+      return filters
+    }
+    // Onboarding equipment prefill seeds the initial filter (spec 033 §9);
+    // the coach can clear or change it per day as usual.
+    if let prefilledEquipment {
+      return AccessoryFilters(equipment: prefilledEquipment)
+    }
+    return .empty
   }
 
   public func availableAccessories(for dayID: UUID) -> [Exercise] {
@@ -364,12 +437,14 @@ public final class PlanningViewModel {
   public func oneRM(for draftExercise: DraftPlanExercise) -> Decimal? {
     guard
       draftExercise.isMainLift,
-      catalogExercise(for: draftExercise)?.mainLiftFamily != nil
+      let family = catalogExercise(for: draftExercise)?.mainLiftFamily
     else {
       return nil
     }
 
-    return nil
+    // Onboarding prefill is the first real source (spec 033 §9); blank
+    // flows keep the pre-033 "no 1RM" rendering.
+    return prefilledOneRMs[family]
   }
 
   public func defaultSetSpec(for draftExercise: DraftPlanExercise) -> DraftSetSpec {
@@ -644,7 +719,10 @@ extension PlanningViewModel {
       guard let planWeeks, [1, 4].contains(planWeeks) else {
         throw PlanningValidationError.invalidDuration
       }
-      if isEvaluationStudent, planWeeks != 1 {
+      // Covers both the adaptationWeek intent and the in-evaluation roster
+      // status (double insurance, spec 033 §7). The backend publish gate
+      // stays the only真 gate.
+      if planKind == .adaptation, planWeeks != 1 {
         throw PlanningValidationError.evaluationStudentRequiresOneWeek
       }
     case .assignFrequency:
@@ -726,11 +804,15 @@ extension PlanningViewModel {
         to: startDate
       ) ?? startDate
 
+    let planName =
+      planKind == .adaptation
+      ? "\(selectedStudent.displayName) 适应周"
+      : "\(selectedStudent.displayName) \(planWeeks) 周计划"
     let draft =
       draftPlan
       ?? DraftTrainingPlan(
         traineeID: selectedStudent.id,
-        name: "\(selectedStudent.displayName) \(planWeeks) 周计划",
+        name: planName,
         startDate: startDate,
         endDate: endDate,
         planWeeks: planWeeks,
@@ -738,7 +820,7 @@ extension PlanningViewModel {
       )
 
     draft.traineeID = selectedStudent.id
-    draft.name = "\(selectedStudent.displayName) \(planWeeks) 周计划"
+    draft.name = planName
     draft.startDate = startDate
     draft.endDate = endDate
     draft.planWeeks = planWeeks

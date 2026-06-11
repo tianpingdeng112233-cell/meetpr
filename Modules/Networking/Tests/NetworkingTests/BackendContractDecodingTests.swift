@@ -5,6 +5,48 @@ import Testing
 @testable import Networking
 
 @Test func coachStudentsContractDecodesBackendSummaryShape() throws {
+  // Real wire shape (handlers/coach-students.ts + backend fix #20):
+  // nested profile + status + evaluation window.
+  let json = """
+    {
+      "students": [
+        {
+          "id": "00000000-0000-4000-8000-000000000301",
+          "display_name": "xty",
+          "profile": {
+            "user_id": "00000000-0000-4000-8000-000000000301",
+            "display_name": "xty",
+            "created_at": "2026-05-22T10:27:16.254Z"
+          },
+          "status": "in_evaluation",
+          "evaluation": {
+            "id": "00000000-0000-4000-8000-000000000302",
+            "expected_end_at": "2026-06-18T10:27:16.254Z",
+            "overdue": false
+          }
+        }
+      ]
+    }
+    """
+
+  let response = try MeetPRCodec.decoder.decode(
+    CoachStudentsResponseDTO.self,
+    from: Data(json.utf8)
+  )
+  let student = try #require(response.students.first)
+  let expectedUserID = try uuid("00000000-0000-4000-8000-000000000301")
+  let expectedCreatedAt = try isoDate("2026-05-22T10:27:16.254Z")
+  let expectedEndAt = try isoDate("2026-06-18T10:27:16.254Z")
+
+  #expect(student.userID == expectedUserID)
+  #expect(student.displayName == "xty")
+  #expect(student.createdAt == expectedCreatedAt)
+  #expect(student.status == "in_evaluation")
+  #expect(student.evaluation?.expectedEndAt == expectedEndAt)
+  #expect(student.evaluation?.overdue == false)
+}
+
+@Test func coachStudentsContractFallsBackToFlatLegacyShape() throws {
   let json = """
     {
       "students": [
@@ -22,13 +64,10 @@ import Testing
     from: Data(json.utf8)
   )
   let student = try #require(response.students.first)
-  let expectedUserID = try uuid("00000000-0000-4000-8000-000000000301")
-  let expectedCreatedAt = try isoDate("2026-05-22T10:27:16.254Z")
 
-  #expect(student.userID == expectedUserID)
-  #expect(student.displayName == "xty")
-  #expect(student.createdAt == expectedCreatedAt)
+  #expect(student.userID == (try uuid("00000000-0000-4000-8000-000000000301")))
   #expect(student.status == "active")
+  #expect(student.evaluation == nil)
 }
 
 @Test func plansContractDecodesNullCoachID() throws {

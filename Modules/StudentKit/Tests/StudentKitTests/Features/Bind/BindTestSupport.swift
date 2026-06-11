@@ -14,7 +14,8 @@ enum BindFixtures {
   static func request(
     status: BindRequestStatus,
     submittedAt: Date = referenceDate,
-    coachDisplayName: String? = "David"
+    coachDisplayName: String? = "David",
+    skipEvaluation: Bool = false
   ) -> BindRequest {
     BindRequest(
       id: UUID(uuidString: "0a000000-0000-0000-0000-00000000000f")!,
@@ -25,7 +26,8 @@ enum BindFixtures {
       status: status,
       submittedAt: submittedAt,
       respondedAt: nil,
-      expiredAt: submittedAt.addingTimeInterval(7 * 86_400)
+      expiredAt: submittedAt.addingTimeInterval(7 * 86_400),
+      skipEvaluation: skipEvaluation
     )
   }
 

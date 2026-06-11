@@ -30,6 +30,7 @@ extension PlanDTO {
       startDate: startDate,
       endDate: endDate,
       planWeeks: planWeeks,
+      kind: kind,
       source: source,
       sourceTemplateID: sourceTemplateID,
       status: status,

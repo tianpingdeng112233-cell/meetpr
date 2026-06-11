@@ -22,11 +22,12 @@ public actor BackendPlanRepository: PlanRepository {
   public func fetchStudents() async throws -> [CoachStudentSummary] {
     let token = try await session.accessToken()
     let response = try await api.coachStudents(accessToken: token)
+    let now = Date()
     return response.students.map { dto in
       CoachStudentSummary(
         id: dto.userID,
         displayName: dto.displayName,
-        status: Self.status(from: dto.status)
+        status: Self.status(from: dto, now: now)
       )
     }
   }
@@ -61,6 +62,8 @@ public actor BackendPlanRepository: PlanRepository {
         startDate: plan.startDate,
         endDate: plan.endDate,
         planWeeks: plan.planWeeks,
+        // Explicit kind on the wire, never the backend default (spec 033 D9).
+        kind: plan.kind,
         source: plan.source,
         sourceTemplateID: plan.sourceTemplateID
       ),
@@ -227,15 +230,19 @@ public actor BackendPlanRepository: PlanRepository {
       .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
   }
 
-  private static func status(from rawValue: String) -> CoachStudentStatus {
-    switch rawValue {
-    case "evaluating", "pending":
-      return .inEvaluation(remainingDays: 0, remainingHours: 0)
-    case "active", "accepted":
-      return .active
-    default:
+  /// Spec 033 D2 (revised): `/coach/students` returns the live status plus
+  /// the evaluation window; remaining time derives from `expected_end_at`
+  /// and a local now — overdue clamps to 0/0 (the detail banner carries the
+  /// overdue copy).
+  static func status(from dto: CoachStudentSummaryDTO, now: Date) -> CoachStudentStatus {
+    guard dto.status == "in_evaluation", let evaluation = dto.evaluation else {
       return .active
     }
+    let totalHours = max(0, Int(evaluation.expectedEndAt.timeIntervalSince(now) / 3_600))
+    return .inEvaluation(
+      remainingDays: totalHours / 24,
+      remainingHours: totalHours % 24
+    )
   }
 }
 

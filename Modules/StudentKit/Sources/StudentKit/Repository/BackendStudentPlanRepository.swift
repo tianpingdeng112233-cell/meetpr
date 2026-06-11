@@ -121,6 +121,7 @@ private enum StudentPlanProjection {
       cycleID: tree.plan.id,
       weekIndex: weekIndex,
       startDate: tree.plan.startDate,
+      planKind: tree.plan.kind,
       days: days
     )
   }

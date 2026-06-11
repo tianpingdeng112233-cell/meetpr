@@ -43,6 +43,7 @@ public enum PlanToStudentProjection {
       cycleID: plan.id,
       weekIndex: weekIndex,
       startDate: plan.startDate,
+      planKind: plan.kind,
       days: studentDays
     )
   }

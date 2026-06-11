@@ -10,17 +10,20 @@ public struct MyProfileView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   @State private var viewModel: MyProfileViewModel
 
   public init(
     studentID: UUID,
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
-    onboarding: any OnboardingRepository
+    onboarding: any OnboardingRepository,
+    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
+    self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -35,6 +38,29 @@ public struct MyProfileView: View {
             .font(Font.MeetPR.body)
         }
         .listRowBackground(Color.MeetPR.surface1)
+
+        // Permanent evaluation-summary entry (spec 033 §12, wiki §5.5):
+        // visible once a summary exists, with the unread red dot.
+        if let evaluationSummaryViewModel,
+          let summary = evaluationSummaryViewModel.summary
+        {
+          NavigationLink {
+            EvaluationSummaryView(summary: summary) {
+              evaluationSummaryViewModel.markRead()
+            }
+          } label: {
+            HStack {
+              Label("评估总结", systemImage: "doc.text")
+                .font(Font.MeetPR.body)
+              if evaluationSummaryViewModel.isUnread {
+                Circle()
+                  .fill(Color.MeetPR.brandRed)
+                  .frame(width: 8, height: 8)
+              }
+            }
+          }
+          .listRowBackground(Color.MeetPR.surface1)
+        }
 
         archiveSection
       }
@@ -64,7 +90,11 @@ public struct MyProfileView: View {
       }
       .listRowBackground(Color.MeetPR.surface1)
     case .loaded(let profile):
-      ProfileCardsSection(profile: profile, viewModel: viewModel)
+      ProfileCardsSection(
+        profile: profile,
+        viewModel: viewModel,
+        evaluationSummaryViewModel: evaluationSummaryViewModel
+      )
     case .empty:
       // 404 — never filled in (self-train path, spec 032 D10).
       Section("我的资料") {

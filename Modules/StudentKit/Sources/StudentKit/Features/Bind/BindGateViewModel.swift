@@ -35,9 +35,11 @@ public enum BindGateState: Equatable, Sendable {
   /// → 032 wizard (rendered through the injected onboarding flow builder).
   case needsOnboarding(PendingBindCode)
   case pendingAcceptance(BindRequest)
-  /// → 5-tab main content. spec 033 extension point: this branch will grow
-  /// an evaluation-period sub-route (skipEvaluation == false && live
-  /// evaluation) — extend here, do not pre-add an empty case.
+  /// Accepted into a live evaluation period (skipEvaluation == false && the
+  /// period is uncompleted) → the single-page EvaluationPeriodView replaces
+  /// the 5 tabs (spec 033 §11, D6).
+  case evaluationActive(BindRequest, EvaluationPeriod)
+  /// → 5-tab main content.
   case bound(BindRequest)
   /// `mine` fetch failed → full-screen retry. Never falls through to the
   /// 5 tabs: an unbound student in the main UI sees misleading empty plans
@@ -66,17 +68,22 @@ public final class BindGateViewModel {
   private let stash: any PendingBindCodeStoring
   private let isOnboardingComplete: @Sendable () async -> Bool
   private let studentId: UUID
+  /// Evaluation routing source (spec 033 §11); nil keeps the pre-033
+  /// behavior (accepted → straight to the 5 tabs).
+  private let evaluations: (any EvaluationRepository)?
 
   public init(
     studentId: UUID,
     bind: any BindRepository,
     stash: any PendingBindCodeStoring,
-    isOnboardingComplete: @escaping @Sendable () async -> Bool
+    isOnboardingComplete: @escaping @Sendable () async -> Bool,
+    evaluations: (any EvaluationRepository)? = nil
   ) {
     self.studentId = studentId
     self.bind = bind
     self.stash = stash
     self.isOnboardingComplete = isOnboardingComplete
+    self.evaluations = evaluations
   }
 
   public func load() async {
@@ -91,12 +98,34 @@ public final class BindGateViewModel {
 
     switch mine?.status {
     case .accepted:
-      if let mine { state = .bound(mine) }
+      if let mine { state = await boundState(for: mine) }
     case .pending:
       if let mine { state = .pendingAcceptance(mine) }
     case .none, .rejected, .expired, .cancelled:
       await resolveUnbound(latest: mine)
     }
+  }
+
+  /// Accepted → evaluation sub-route (spec 033 §11): a live (uncompleted)
+  /// evaluation period shows the single-page state; no period / completed →
+  /// the 5 tabs. A fetch failure must NOT fold into `.bound` — that would
+  /// let an in-evaluation student through to the 5 tabs on a network blip
+  /// (Codex review P1) — so it lands on the full-screen retry like the
+  /// `mine` fetch above.
+  private func boundState(for request: BindRequest) async -> BindGateState {
+    guard !request.skipEvaluation, let evaluations else {
+      return .bound(request)
+    }
+    let evaluation: EvaluationPeriod?
+    do {
+      evaluation = try await evaluations.fetchMyEvaluation()
+    } catch {
+      return .failed
+    }
+    guard let evaluation, evaluation.completedAt == nil else {
+      return .bound(request)
+    }
+    return .evaluationActive(request, evaluation)
   }
 
   /// Soft refresh for the pending page (pull-to-refresh / scenePhase): only
@@ -193,7 +222,7 @@ public final class BindGateViewModel {
     case .accepted:
       if let mine {
         stash.clear(studentId: studentId)
-        state = .bound(mine)
+        state = await boundState(for: mine)
       }
     case .pending:
       if let mine {

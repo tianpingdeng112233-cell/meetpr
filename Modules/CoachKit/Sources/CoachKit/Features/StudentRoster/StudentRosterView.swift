@@ -6,40 +6,39 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct StudentRosterView: View {
   @Bindable private var viewModel: StudentRosterViewModel
-  private let plans: any StudentPlanRepository
-  private let trainingLogs: any StudentTrainingLogRepository
-  private let feedback: any StudentFeedbackRepository
-  private let videos: any CoachStudentVideoRepository
-  private let familyMapProvider: (any CoachPlanFamilyMapProviding)?
-  private let readiness: any ReadinessRepository
+  @Bindable private var queueViewModel: BindQueueViewModel
+  private let context: CoachStudentDetailContext
+  @State private var acceptTarget: CoachBindRequestItem?
+  @State private var rejectTarget: CoachBindRequestItem?
+  @State private var profileTarget: CoachBindRequestItem?
 
   init(
     viewModel: StudentRosterViewModel,
-    plans: any StudentPlanRepository,
-    trainingLogs: any StudentTrainingLogRepository,
-    feedback: any StudentFeedbackRepository,
-    videos: any CoachStudentVideoRepository,
-    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
-    readiness: any ReadinessRepository
+    queueViewModel: BindQueueViewModel,
+    context: CoachStudentDetailContext
   ) {
     self.viewModel = viewModel
-    self.plans = plans
-    self.trainingLogs = trainingLogs
-    self.feedback = feedback
-    self.videos = videos
-    self.familyMapProvider = familyMapProvider
-    self.readiness = readiness
+    self.queueViewModel = queueViewModel
+    self.context = context
   }
 
   var body: some View {
     NavigationStack {
       content
         .navigationTitle("学员")
+        .navigationDestination(item: $profileTarget) { item in
+          StudentOnboardingProfileView(
+            item: item,
+            profiles: context.profiles,
+            onAccept: { acceptTarget = item },
+            onReject: { rejectTarget = item }
+          )
+        }
         .toolbar {
           ToolbarItem(placement: .primaryAction) {
             Button {
               Task {
-                await viewModel.refresh()
+                await refreshAll()
               }
             } label: {
               Image(systemName: "arrow.clockwise")
@@ -48,9 +47,51 @@ struct StudentRosterView: View {
           }
         }
     }
+    .sheet(item: $acceptTarget) { item in
+      AcceptBindRequestSheet(studentName: item.displayName) { skipEvaluation, skipReason in
+        let accepted = await queueViewModel.accept(
+          item, skipEvaluation: skipEvaluation, skipReason: skipReason)
+        if accepted {
+          profileTarget = nil
+          await viewModel.refresh()
+        }
+        return accepted
+      }
+    }
+    .confirmationDialog(
+      "拒绝后学员会看到中性提示(不会显示拒绝原因),确定拒绝?",
+      isPresented: rejectDialogBinding,
+      titleVisibility: .visible
+    ) {
+      Button("拒绝", role: .destructive) {
+        if let item = rejectTarget {
+          Task {
+            if await queueViewModel.reject(item) {
+              profileTarget = nil
+            }
+          }
+        }
+      }
+      Button("取消", role: .cancel) {}
+    }
     .task {
       await viewModel.loadIfNeeded()
+      await queueViewModel.loadIfNeeded()
     }
+  }
+
+  private var rejectDialogBinding: Binding<Bool> {
+    Binding(
+      get: { rejectTarget != nil },
+      set: { isPresented in
+        if !isPresented { rejectTarget = nil }
+      }
+    )
+  }
+
+  private func refreshAll() async {
+    await viewModel.refresh()
+    await queueViewModel.refresh()
   }
 
   @ViewBuilder
@@ -68,39 +109,95 @@ struct StudentRosterView: View {
       )
       .background(Color.MeetPR.bg)
     case .loaded:
-      if viewModel.rows.isEmpty {
+      if viewModel.rows.isEmpty && queueViewModel.pendingCount == 0 {
         ContentUnavailableView(
           "暂无学员",
           systemImage: "person.2",
-          description: Text("等邀请码 V0.1.x")
+          description: Text("接收新学员请求后会出现在这里")
         )
         .background(Color.MeetPR.bg)
       } else {
-        List {
-          ForEach(viewModel.filteredRows) { row in
-            NavigationLink {
-              StudentDetailView(
-                summary: row.student,
-                plans: plans,
-                trainingLogs: trainingLogs,
-                feedback: feedback,
-                videos: videos,
-                readiness: readiness,
-                familyMapProvider: familyMapProvider
-              )
-            } label: {
-              StudentRosterRow(row: row)
-            }
+        rosterList
+      }
+    }
+  }
+
+  private var rosterList: some View {
+    List {
+      if queueViewModel.pendingCount > 0 {
+        queueSection
+      }
+
+      rosterSection
+    }
+    .listStyle(.plain)
+    .scrollContentBackground(.hidden)
+    .background(Color.MeetPR.bg)
+    .refreshable {
+      await refreshAll()
+    }
+    .searchable(text: $viewModel.searchText, prompt: "搜索学员")
+  }
+
+  private var rosterSection: some View {
+    Section {
+      if viewModel.rows.isEmpty {
+        Text("暂无学员,接收新学员请求后会出现在这里")
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .listRowBackground(Color.clear)
+      } else {
+        ForEach(viewModel.filteredRows) { row in
+          NavigationLink {
+            StudentDetailView(
+              summary: row.student,
+              context: context,
+              // Both completion paths (banner [完成评估] and the summary
+              // editor chain) report back here, so the roster row drops its
+              // "评估中" badge without waiting for the next full refresh.
+              onEvaluationCompleted: { [viewModel] in
+                viewModel.markStudentActive(row.student.id)
+              }
+            )
+          } label: {
+            StudentRosterRow(row: row)
           }
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .background(Color.MeetPR.bg)
-        .refreshable {
-          await viewModel.refresh()
-        }
-        .searchable(text: $viewModel.searchText, prompt: "搜索学员")
       }
+    } header: {
+      if queueViewModel.pendingCount > 0 {
+        Text("学员")
+      }
+    }
+  }
+
+  private var queueSection: some View {
+    Section {
+      if let banner = queueViewModel.bannerMessage {
+        Label(banner, systemImage: "exclamationmark.triangle")
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.amber)
+          .listRowBackground(Color.clear)
+      }
+      if let toast = queueViewModel.toastMessage {
+        Label(toast, systemImage: "checkmark.circle")
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.green)
+          .listRowBackground(Color.clear)
+      }
+      ForEach(queueViewModel.items) { item in
+        BindRequestCard(
+          item: item,
+          now: queueViewModel.now(),
+          onViewProfile: { profileTarget = item },
+          onAccept: { acceptTarget = item },
+          onReject: { rejectTarget = item }
+        )
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+      }
+    } header: {
+      Text("新学员请求 (\(queueViewModel.pendingCount))")
     }
   }
 }
