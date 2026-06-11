@@ -57,13 +57,17 @@
 			exceptions = (
 				AA0000000000000000000075 /* Exceptions for "MeetPR" folder in "MeetPR" target */,
 			);
-			explicitFileTypes = {};
-			explicitFolders = ();
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
 			path = MeetPR;
 			sourceTree = "<group>";
 		};
 		AA0000000000000000000068 /* MeetPRTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = MeetPRTests;
 			sourceTree = "<group>";
 		};
@@ -111,14 +115,6 @@
 			);
 			sourceTree = "<group>";
 		};
-		AA0000000000000000000071 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				AA0000000000000000000070 /* AppIntents.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		AA000000000000000000000C /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -126,6 +122,14 @@
 				AA0000000000000000000069 /* MeetPRTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000071 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000070 /* AppIntents.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -218,12 +222,12 @@
 			mainGroup = AA0000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				AA0000000000000000000010 /* XCLocalSwiftPackageReference "Modules/CoreModels" */,
-				AA0000000000000000000011 /* XCLocalSwiftPackageReference "Modules/Networking" */,
-				AA0000000000000000000012 /* XCLocalSwiftPackageReference "Modules/DesignSystem" */,
-				AA0000000000000000000013 /* XCLocalSwiftPackageReference "Modules/AppShell" */,
-				AA0000000000000000000014 /* XCLocalSwiftPackageReference "Modules/CoachKit" */,
-				AA0000000000000000000015 /* XCLocalSwiftPackageReference "Modules/StudentKit" */,
+				AA0000000000000000000010 /* XCLocalSwiftPackageReference "CoreModels" */,
+				AA0000000000000000000011 /* XCLocalSwiftPackageReference "Networking" */,
+				AA0000000000000000000012 /* XCLocalSwiftPackageReference "DesignSystem" */,
+				AA0000000000000000000013 /* XCLocalSwiftPackageReference "AppShell" */,
+				AA0000000000000000000014 /* XCLocalSwiftPackageReference "CoachKit" */,
+				AA0000000000000000000015 /* XCLocalSwiftPackageReference "StudentKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA000000000000000000000C /* Products */;
@@ -279,6 +283,133 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		3694AAD91CF7932396797BD1 /* DemoStudent */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = XV97B4R4RZ;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 MeetPR. All rights reserved.";
+				INFOPLIST_KEY_UILaunchScreen_UIColorName = AccentColor;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D DEMO_MODE -D DEMO_USER_STUDENT";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DEMO_MODE DEMO_USER_STUDENT $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = DemoStudent;
+		};
+		437FAD4BEA81F290FDF77A82 /* DemoStudent */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XV97B4R4RZ;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MeetPR/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LM_FILTER_WARNINGS = YES;
+				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D DEMO_MODE -D DEMO_USER_STUDENT";
+				PRODUCT_BUNDLE_IDENTIFIER = com.meetpr.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DEMO_MODE DEMO_USER_STUDENT $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = DemoStudent;
+		};
+		8C97A77649D9FCF6D09A38BC /* DemoStudent */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = XV97B4R4RZ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LM_FILTER_WARNINGS = YES;
+				MARKETING_VERSION = 1.0;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D DEMO_MODE -D DEMO_USER_STUDENT";
+				PRODUCT_BUNDLE_IDENTIFIER = com.meetpr.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG DEMO_MODE DEMO_USER_STUDENT $(inherited)";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MeetPR.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MeetPR";
+			};
+			name = DemoStudent;
+		};
 		AA0000000000000000000004 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -414,6 +545,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BACKEND_BASE_URL = "http://120.27.243.110:3000";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = XV97B4R4RZ;
@@ -441,6 +573,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BACKEND_BASE_URL = "http://120.27.243.110:3000";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = XV97B4R4RZ;
@@ -590,6 +723,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BACKEND_BASE_URL = "http://demo.invalid";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = XV97B4R4RZ;
@@ -652,6 +786,7 @@
 				AA0000000000000000000004 /* Debug */,
 				AA0000000000000000000072 /* Demo */,
 				AA0000000000000000000005 /* Release */,
+				3694AAD91CF7932396797BD1 /* DemoStudent */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -662,6 +797,7 @@
 				AA000000000000000000000E /* Debug */,
 				AA0000000000000000000073 /* Demo */,
 				AA000000000000000000000F /* Release */,
+				437FAD4BEA81F290FDF77A82 /* DemoStudent */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -672,6 +808,7 @@
 				AA000000000000000000006D /* Debug */,
 				AA0000000000000000000074 /* Demo */,
 				AA000000000000000000006E /* Release */,
+				8C97A77649D9FCF6D09A38BC /* DemoStudent */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -679,27 +816,27 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		AA0000000000000000000010 /* XCLocalSwiftPackageReference "Modules/CoreModels" */ = {
+		AA0000000000000000000010 /* XCLocalSwiftPackageReference "CoreModels" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Modules/CoreModels;
 		};
-		AA0000000000000000000011 /* XCLocalSwiftPackageReference "Modules/Networking" */ = {
+		AA0000000000000000000011 /* XCLocalSwiftPackageReference "Networking" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Modules/Networking;
 		};
-		AA0000000000000000000012 /* XCLocalSwiftPackageReference "Modules/DesignSystem" */ = {
+		AA0000000000000000000012 /* XCLocalSwiftPackageReference "DesignSystem" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Modules/DesignSystem;
 		};
-		AA0000000000000000000013 /* XCLocalSwiftPackageReference "Modules/AppShell" */ = {
+		AA0000000000000000000013 /* XCLocalSwiftPackageReference "AppShell" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Modules/AppShell;
 		};
-		AA0000000000000000000014 /* XCLocalSwiftPackageReference "Modules/CoachKit" */ = {
+		AA0000000000000000000014 /* XCLocalSwiftPackageReference "CoachKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Modules/CoachKit;
 		};
-		AA0000000000000000000015 /* XCLocalSwiftPackageReference "Modules/StudentKit" */ = {
+		AA0000000000000000000015 /* XCLocalSwiftPackageReference "StudentKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Modules/StudentKit;
 		};
@@ -708,32 +845,32 @@
 /* Begin XCSwiftPackageProductDependency section */
 		AA0000000000000000000020 /* CoreModels */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AA0000000000000000000010 /* XCLocalSwiftPackageReference "Modules/CoreModels" */;
+			package = AA0000000000000000000010 /* XCLocalSwiftPackageReference "CoreModels" */;
 			productName = CoreModels;
 		};
 		AA0000000000000000000021 /* Networking */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AA0000000000000000000011 /* XCLocalSwiftPackageReference "Modules/Networking" */;
+			package = AA0000000000000000000011 /* XCLocalSwiftPackageReference "Networking" */;
 			productName = Networking;
 		};
 		AA0000000000000000000022 /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AA0000000000000000000012 /* XCLocalSwiftPackageReference "Modules/DesignSystem" */;
+			package = AA0000000000000000000012 /* XCLocalSwiftPackageReference "DesignSystem" */;
 			productName = DesignSystem;
 		};
 		AA0000000000000000000023 /* AppShell */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AA0000000000000000000013 /* XCLocalSwiftPackageReference "Modules/AppShell" */;
+			package = AA0000000000000000000013 /* XCLocalSwiftPackageReference "AppShell" */;
 			productName = AppShell;
 		};
 		AA0000000000000000000024 /* CoachKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AA0000000000000000000014 /* XCLocalSwiftPackageReference "Modules/CoachKit" */;
+			package = AA0000000000000000000014 /* XCLocalSwiftPackageReference "CoachKit" */;
 			productName = CoachKit;
 		};
 		AA0000000000000000000025 /* StudentKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = AA0000000000000000000015 /* XCLocalSwiftPackageReference "Modules/StudentKit" */;
+			package = AA0000000000000000000015 /* XCLocalSwiftPackageReference "StudentKit" */;
 			productName = StudentKit;
 		};
 /* End XCSwiftPackageProductDependency section */

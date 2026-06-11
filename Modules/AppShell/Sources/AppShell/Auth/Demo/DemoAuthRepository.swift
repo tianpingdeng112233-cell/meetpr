@@ -3,7 +3,11 @@ import Foundation
 
 @available(iOS 17.0, macOS 14.0, *)
 public final class DemoAuthRepository: AuthRepository, Sendable {
-  public init() {}
+  private let user: User
+
+  public init(user: User = DemoUserSeed.coach) {
+    self.user = user
+  }
 
   public func signup(phone: String, password: String, role: UserRole) async throws -> AuthResult {
     fixedResult()
@@ -22,7 +26,7 @@ public final class DemoAuthRepository: AuthRepository, Sendable {
 
   private func fixedResult() -> AuthResult {
     AuthResult(
-      user: DemoUserSeed.coach,
+      user: user,
       accessToken: DemoUserSeed.accessToken,
       refreshToken: DemoUserSeed.refreshToken
     )

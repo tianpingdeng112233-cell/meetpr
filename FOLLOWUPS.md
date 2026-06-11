@@ -282,6 +282,19 @@
 - **关联**:[LAUNCH-CHECKLIST.md](./LAUNCH-CHECKLIST.md) Stage A;[CLAUDE.md ❄️ 硬冻结](./CLAUDE.md)
 - **创建于**:2026-05-12
 
+### F-029 — Coach 学员详情 V0.1.x polish backlog
+
+- **触发条件**:spec 029 第一遍合并后,进入 V0.1.x polish / 性能 / 联调阶段,或教练端学员数 ≥ 5 后 roster/detail 明显变慢
+- **动作**:
+  1. 处理 StudentRoster / StudentDetail 的 N+1 fetch:增加批量 summary 或并发 fan-out + cache 策略,避免学员数上来后每行串行拉 plan/log/feedback
+  2. 精炼"待关注"语义:排除热身/无效组,加"教练已看过该日 execution"或智能去重,再评估是否改文案为"待反馈"
+  3. 补 review 剩余测试洞:空计划/空 feedback/error banner/retry/placeholder navigation 的 ViewModel 或 snapshot 覆盖
+  4. 处理非 blocker nit:日期 formatter 缓存或 FormatStyle 化、细节文案/可访问性/列表空态 polish
+- **验证**:≥5 学员 seed 下 roster 首屏无明显串行等待;待关注误报率在 dogfood 可接受;新增测试覆盖上述边界
+- **为什么等**:PR #150 第一遍目标是打通教练端"看学员 + 写反馈"闭环;这些是 review 通过后的 polish/scale 工作,不阻塞 draft 第一遍合并
+- **关联**:PR #150 review;spec 029
+- **创建于**:2026-05-24(PR #150)
+
 ---
 
 ## 已完成

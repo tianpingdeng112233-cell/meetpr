@@ -11,7 +11,7 @@ public protocol TokenStoring: Sendable {
   func clear() async
 }
 
-public actor TokenStore: TokenStoring {
+public actor KeychainTokenStore: TokenStoring {
   private enum Account {
     static let accessToken = "accessToken"
     static let cachedUser = "cachedUser"
@@ -20,20 +20,20 @@ public actor TokenStore: TokenStoring {
 
   private let serviceName: String
 
-  public init(serviceName: String = "MeetPR") {
+  public init(serviceName: String = "app.meetpr.tokens") {
     self.serviceName = serviceName
   }
 
   public func save(access: String, refresh: String) async {
-    save(Data(access.utf8), account: Account.accessToken)
-    save(Data(refresh.utf8), account: Account.refreshToken)
+    try? save(Data(access.utf8), account: Account.accessToken)
+    try? save(Data(refresh.utf8), account: Account.refreshToken)
   }
 
   public func saveUser(_ user: User) async {
     guard let data = try? MeetPRCodec.encoder.encode(user) else {
       return
     }
-    save(data, account: Account.cachedUser)
+    try? save(data, account: Account.cachedUser)
   }
 
   public func accessToken() async -> String? {
@@ -64,16 +64,31 @@ public actor TokenStore: TokenStoring {
     return String(data: data, encoding: .utf8)
   }
 
-  private func save(_ data: Data, account: String) {
-    delete(account: account)
+  private func save(_ data: Data, account: String) throws {
     let query: [String: Any] = [
       kSecClass as String: kSecClassGenericPassword,
-      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
       kSecAttrAccount as String: account,
       kSecAttrService as String: serviceName,
+    ]
+    let attributes: [String: Any] = [
+      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
       kSecValueData as String: data,
     ]
-    _ = SecItemAdd(query as CFDictionary, nil)
+
+    let updateStatus = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+    switch updateStatus {
+    case errSecSuccess:
+      return
+    case errSecItemNotFound:
+      var addQuery = query
+      addQuery.merge(attributes) { _, new in new }
+      let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+      guard addStatus == errSecSuccess else {
+        throw KeychainTokenStoreError.osStatus(addStatus)
+      }
+    default:
+      throw KeychainTokenStoreError.osStatus(updateStatus)
+    }
   }
 
   private func data(account: String) -> Data? {
@@ -87,6 +102,9 @@ public actor TokenStore: TokenStoring {
 
     var item: CFTypeRef?
     let status = SecItemCopyMatching(query as CFDictionary, &item)
+    guard status != errSecItemNotFound else {
+      return nil
+    }
     guard status == errSecSuccess else {
       return nil
     }
@@ -101,6 +119,12 @@ public actor TokenStore: TokenStoring {
     ]
     _ = SecItemDelete(query as CFDictionary)
   }
+}
+
+public typealias TokenStore = KeychainTokenStore
+
+public enum KeychainTokenStoreError: Error, Sendable, Equatable {
+  case osStatus(OSStatus)
 }
 
 public actor InMemoryTokenStore: TokenStoring {

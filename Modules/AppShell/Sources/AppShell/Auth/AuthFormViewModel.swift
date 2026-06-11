@@ -68,22 +68,22 @@ public final class AuthFormViewModel {
 
   public static func toastMessage(for error: Error) -> String {
     guard let authError = error as? AuthRepositoryError else {
-      return "网络异常,请重试"
+      return "网络不稳定,重试"
     }
 
     switch authError {
     case .backend(_, .phoneTaken, _):
       return "该手机号已注册"
     case .backend(_, .invalidCredentials, _):
-      return "手机号或密码不正确"
-    case .backend(_, .validationError, let issues):
-      return issues.first?.message ?? "请求参数不正确"
+      return "手机号或密码错误"
+    case .backend(_, .validationError, _):
+      return "手机号格式不对(+86 开头)"
     case .backend(_, .rateLimited, _):
       return "请求过于频繁,请稍后重试"
     case .backend, .decoding, .server:
       return "请求失败,请稍后重试"
     case .network:
-      return "网络异常,请重试"
+      return "网络不稳定,重试"
     }
   }
 

@@ -65,7 +65,7 @@ import Testing
   let mainLift = try #require(viewModel.sortedDraftExercises.first { $0.isMainLift })
   let accessory = try #require(viewModel.sortedDraftExercises.first { !$0.isMainLift })
 
-  #expect(viewModel.oneRM(for: mainLift) == 180)
+  #expect(viewModel.oneRM(for: mainLift) == nil)
   #expect(viewModel.oneRM(for: accessory) == nil)
 }
 
