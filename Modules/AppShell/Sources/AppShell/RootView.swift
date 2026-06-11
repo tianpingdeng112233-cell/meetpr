@@ -13,6 +13,7 @@ public struct RootView: View {
   private let studentFeedback: any StudentFeedbackRepository
   private let studentE1RM: any E1RMRepository
   private let studentReadiness: any ReadinessRepository
+  private let studentVideoUploads: VideoUploadServices?
   private let draftStore: DraftStore
 
   public init(
@@ -22,6 +23,7 @@ public struct RootView: View {
     studentFeedback: (any StudentFeedbackRepository)? = nil,
     studentE1RM: (any E1RMRepository)? = nil,
     studentReadiness: (any ReadinessRepository)? = nil,
+    studentVideoUploads: VideoUploadServices? = nil,
     draftStore: DraftStore = DraftStore.shared
   ) {
     let plan = StudentDemoSeed.makePlanView()
@@ -52,6 +54,7 @@ public struct RootView: View {
       ?? InMemoryReadinessRepository(
         seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
       )
+    self.studentVideoUploads = studentVideoUploads
     self.draftStore = draftStore
   }
 
@@ -79,7 +82,8 @@ public struct RootView: View {
           logs: studentLogs,
           feedback: studentFeedback,
           e1rm: studentE1RM,
-          readiness: studentReadiness
+          readiness: studentReadiness,
+          videoUploads: studentVideoUploads
         )
       }
     }

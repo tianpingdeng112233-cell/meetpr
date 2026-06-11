@@ -99,6 +99,9 @@ struct MeetPRApp: App {
           // JSON files under Documents/e1rm/, no backend endpoint.
           studentE1RM: LocalE1RMRepository(),
           studentReadiness: BackendReadinessRepository(api: api, session: session),
+          // Set-video uploads (spec 027): backend /uploads/* pipeline; the
+          // setLog ↔ attachment mapping persists on-device only in V0.1.
+          studentVideoUploads: .backend(api: api, session: session),
           draftStore: draftStore
         ),
         session: session

@@ -11,6 +11,7 @@ public struct StudentRootView: View {
   private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
   private let readiness: any ReadinessRepository
+  private let videoUploads: VideoUploadServices
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var selectedTab: StudentTab = .dashboard
   @State private var pendingPRCount = 0
@@ -43,13 +44,15 @@ public struct StudentRootView: View {
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
     e1rm: any E1RMRepository = LocalE1RMRepository(),
-    readiness: any ReadinessRepository = InMemoryReadinessRepository()
+    readiness: any ReadinessRepository = InMemoryReadinessRepository(),
+    videoUploads: VideoUploadServices? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.e1rm = e1rm
     self.readiness = readiness
+    self.videoUploads = videoUploads ?? .demo()
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -71,7 +74,8 @@ public struct StudentRootView: View {
       }
 
       TodayWorkoutView(
-        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness
+        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
+        videoUploads: videoUploads
       )
       .tag(StudentTab.workout)
       .tabItem {

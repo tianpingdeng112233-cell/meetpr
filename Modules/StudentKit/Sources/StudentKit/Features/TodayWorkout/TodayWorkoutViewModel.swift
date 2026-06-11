@@ -105,6 +105,24 @@ public final class TodayWorkoutViewModel {
     await persist(rowIndex: rowIndex, completed: true)
   }
 
+  /// Returns the row's set-log id, recording the draft first (with its
+  /// current completion state, so attaching a video never marks a set done)
+  /// when it has never been logged. Video attachments need a set-log identity
+  /// before upload (spec 027).
+  public func ensureLoggedSetID(rowIndex: Int) async -> UUID? {
+    guard case .loaded(_, let drafts) = state, drafts.indices.contains(rowIndex) else {
+      return nil
+    }
+    if let loggedSetID = drafts[rowIndex].loggedSetID {
+      return loggedSetID
+    }
+    await persist(rowIndex: rowIndex, completed: drafts[rowIndex].completed)
+    guard case .loaded(_, let updated) = state, updated.indices.contains(rowIndex) else {
+      return nil
+    }
+    return updated[rowIndex].loggedSetID
+  }
+
   private func persist(rowIndex: Int, completed: Bool) async {
     guard let studentID = currentStudentID else {
       state = .error("Missing student")

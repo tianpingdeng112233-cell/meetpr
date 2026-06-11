@@ -9,6 +9,7 @@ public struct TodayWorkoutView: View {
   private let date: Date
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
+  @State private var videoViewModel: VideoAttachmentViewModel
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
   @State private var plateMathTarget: PlateMathTarget?
@@ -20,7 +21,8 @@ public struct TodayWorkoutView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
-    readiness: any ReadinessRepository = InMemoryReadinessRepository()
+    readiness: any ReadinessRepository = InMemoryReadinessRepository(),
+    videoUploads: VideoUploadServices? = nil
   ) {
     self.studentID = studentID
     self.date = date
@@ -28,6 +30,8 @@ public struct TodayWorkoutView: View {
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness))
+    self._videoViewModel = State(
+      initialValue: VideoAttachmentViewModel(manager: (videoUploads ?? .demo()).manager))
   }
 
   public var body: some View {
@@ -110,6 +114,7 @@ public struct TodayWorkoutView: View {
     .task {
       if viewModel.state == .idle {
         await viewModel.load(date: date, studentID: studentID)
+        await videoViewModel.start(studentID: studentID)
 
         // Readiness gate (spec 030 §C4): auto-present at most once per day,
         // only for today's view, only when a non-empty workout loaded, only
@@ -183,7 +188,13 @@ public struct TodayWorkoutView: View {
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bg)
     .sheet(item: $editing) { target in
-      SetEntrySheet(rowIndex: target.rowIndex, draft: target.draft, viewModel: viewModel)
+      SetEntrySheet(
+        rowIndex: target.rowIndex,
+        draft: target.draft,
+        viewModel: viewModel,
+        studentID: studentID,
+        videoViewModel: videoViewModel
+      )
     }
   }
 

@@ -9,16 +9,27 @@ struct SetEntrySheet: View {
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
   let viewModel: TodayWorkoutViewModel
+  /// Video attach context (spec 027); nil hides the video block entirely.
+  let studentID: UUID?
+  let videoViewModel: VideoAttachmentViewModel?
   @Environment(\.dismiss) private var dismiss
 
   @State private var weight: Decimal
   @State private var reps: Int
   @State private var rpe: Decimal
 
-  init(rowIndex: Int, draft: TodayWorkoutViewModel.SetRowDraft, viewModel: TodayWorkoutViewModel) {
+  init(
+    rowIndex: Int,
+    draft: TodayWorkoutViewModel.SetRowDraft,
+    viewModel: TodayWorkoutViewModel,
+    studentID: UUID? = nil,
+    videoViewModel: VideoAttachmentViewModel? = nil
+  ) {
     self.rowIndex = rowIndex
     self.draft = draft
     self.viewModel = viewModel
+    self.studentID = studentID
+    self.videoViewModel = videoViewModel
     _weight = State(initialValue: draft.actualWeight ?? draft.prescribed.weightKg ?? 0)
     _reps = State(
       initialValue: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0)
@@ -50,6 +61,15 @@ struct SetEntrySheet: View {
         "RPE", value: StudentFormatting.decimal(rpe), unit: "",
         onDec: { rpe = max(5, rpe - 0.5) }, onInc: { rpe = min(10, rpe + 0.5) })
 
+      if let videoViewModel, let studentID {
+        VideoAttachmentSection(
+          studentID: studentID,
+          videoViewModel: videoViewModel,
+          initialSetLogID: draft.loggedSetID,
+          resolveSetLogID: { await viewModel.ensureLoggedSetID(rowIndex: rowIndex) }
+        )
+      }
+
       Button {
         save()
       } label: {
@@ -67,7 +87,7 @@ struct SetEntrySheet: View {
     .padding()
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     .background(Color.MeetPR.bg)
-    .presentationDetents([.medium])
+    .presentationDetents([.medium, .large])
   }
 
   private func save() {
