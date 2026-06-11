@@ -136,6 +136,31 @@ public final class APIClient: Sendable {
     _ = try await perform(request, emitsAuthInvalidOn401: true)
   }
 
+  public func put<Request: Encodable, Response: Decodable>(
+    path: String,
+    body: Request,
+    accessToken: String,
+    as responseType: Response.Type = Response.self
+  ) async throws -> Response {
+    var request = URLRequest(url: url(path: path))
+    request.httpMethod = "PUT"
+    authorize(&request, accessToken: accessToken)
+    request.httpBody = try MeetPRCodec.encoder.encode(body)
+    request.setValue("application/json", forHTTPHeaderField: "content-type")
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+
+    let data = try await perform(request, emitsAuthInvalidOn401: true)
+    return try MeetPRCodec.decoder.decode(responseType, from: data)
+  }
+
+  public func deleteNoContent(path: String, accessToken: String) async throws {
+    var request = URLRequest(url: url(path: path))
+    request.httpMethod = "DELETE"
+    authorize(&request, accessToken: accessToken)
+
+    _ = try await perform(request, emitsAuthInvalidOn401: true)
+  }
+
   private func url(for endpoint: Endpoint) -> URL {
     let path = endpoint.path.hasPrefix("/") ? String(endpoint.path.dropFirst()) : endpoint.path
     return baseURL.appending(path: path)

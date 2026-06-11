@@ -8,7 +8,8 @@ let package = Package(
     .library(name: "Networking", targets: ["Networking"])
   ],
   dependencies: [
-    .package(path: "../CoreModels")
+    .package(path: "../CoreModels"),
+    .package(path: "../RepositoryContracts"),
   ],
   targets: [
     .target(
@@ -20,7 +21,13 @@ let package = Package(
     ),
     .testTarget(
       name: "NetworkingTests",
-      dependencies: ["Networking"],
+      dependencies: [
+        "Networking",
+        // Test-only: asserts the machine-code → typed-error mapping against
+        // wire envelopes (spec 031/032). The Networking library itself stays
+        // contracts-free.
+        .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+      ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
   ]

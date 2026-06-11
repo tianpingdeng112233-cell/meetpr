@@ -43,16 +43,16 @@ import Testing
 @Test func bindRequestCodableRoundTripPreservesStatusAndDates() throws {
   let request = BindRequest(
     id: try fixtureUUID("30000000-0000-0000-0000-000000000001"),
-    studentID: try fixtureUUID("30000000-0000-0000-0000-000000000002"),
-    coachID: try fixtureUUID("30000000-0000-0000-0000-000000000003"),
-    inviteCodeID: try fixtureUUID("30000000-0000-0000-0000-000000000004"),
+    studentId: try fixtureUUID("30000000-0000-0000-0000-000000000002"),
+    coachId: try fixtureUUID("30000000-0000-0000-0000-000000000003"),
+    coachDisplayName: "David",
+    inviteCodeId: try fixtureUUID("30000000-0000-0000-0000-000000000004"),
     status: .accepted,
     submittedAt: createdAt(),
     respondedAt: updatedAt(),
-    expiredAt: nil,
+    expiredAt: updatedAt(),
     skipEvaluation: true,
-    skipReason: "Existing coach assessment",
-    rejectionSilent: true
+    skipReason: "Existing coach assessment"
   )
 
   let json = try encodedJSONString(request)
@@ -66,8 +66,8 @@ import Testing
 @Test func inviteCodeCodableRoundTripPreservesTypeRawValue() throws {
   let inviteCode = InviteCode(
     id: try fixtureUUID("40000000-0000-0000-0000-000000000001"),
-    coachID: try fixtureUUID("40000000-0000-0000-0000-000000000002"),
-    code: "ABCD123456",
+    coachId: try fixtureUUID("40000000-0000-0000-0000-000000000002"),
+    code: "ABCDJ23456",
     type: .personalPermanent,
     maxUses: nil,
     usedCount: 0,
