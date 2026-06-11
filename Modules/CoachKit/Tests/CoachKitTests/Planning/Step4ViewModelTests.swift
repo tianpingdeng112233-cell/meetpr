@@ -92,7 +92,8 @@ import Testing
 
   try await viewModel.proceedToStep5()
 
-  #expect(viewModel.draftPlan?.currentStepRawValue == PlanningStep.fillW1Intensity.rawValue)
+  #expect(viewModel.currentStep == .selectAccessories)
+  #expect(viewModel.draftPlan?.currentStepRawValue == PlanningStep.selectAccessories.rawValue)
 }
 
 @MainActor

@@ -52,6 +52,14 @@ struct PlanningNumberField: View {
             normalize()
           }
         }
+        .onChange(of: textInput) { _, newText in
+          guard isFocused else { return }
+          value = Self.editingValue(
+            from: newText,
+            range: range,
+            decimalIncrement: decimalIncrement
+          )
+        }
 
       stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
         .disabled(incrementDisabled)
@@ -63,12 +71,10 @@ struct PlanningNumberField: View {
       }
     }
     .onChange(of: value) { _, newValue in
-      // Sync the visible text whenever the bound value changes externally —
-      // even if the field is currently focused. External changes come from
-      // explicit user actions on other controls (chip toggle, dimension
-      // switch, ± buttons elsewhere), never from the user's own typing here
-      // (typing only commits via normalize() on blur). Without this, the
-      // stale typed value "follows" the focused field into a new context.
+      // Keep the visible text in sync when the bound value changes — including
+      // external changes from other controls (chip toggle, dimension switch,
+      // ± buttons) that swap in a new context. Without this, a previously
+      // typed value would "follow" the focused field into the new context.
       textInput = formattedDisplay(newValue)
     }
     .accessibilityElement(children: .combine)
@@ -167,6 +173,18 @@ struct PlanningNumberField: View {
     let parsed = trimmed.isEmpty ? 0 : Double(trimmed) ?? 0
     let rounded = Decimal.planningRounded(parsed, increment: decimalIncrement).planningDoubleValue
     return clamped(rounded, to: range)
+  }
+
+  static func editingValue(
+    from textInput: String,
+    range: ClosedRange<Double>,
+    decimalIncrement: Decimal
+  ) -> Double {
+    normalizedValue(
+      from: textInput,
+      range: range,
+      decimalIncrement: decimalIncrement
+    )
   }
 
   static func steppedValue(
