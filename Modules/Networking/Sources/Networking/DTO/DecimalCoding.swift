@@ -36,6 +36,15 @@ extension KeyedDecodingContainer {
 
     return try decode(Decimal.self, forKey: key)
   }
+
+  /// Nullable wire arrays read as empty arrays (missing key / JSON null /
+  /// [] are all "nothing selected" to the client).
+  func decodeArrayIfPresent<Element: Decodable>(
+    _ type: [Element].Type,
+    forKey key: Key
+  ) throws -> [Element] {
+    try decodeIfPresent(type, forKey: key) ?? []
+  }
 }
 
 extension KeyedEncodingContainer {

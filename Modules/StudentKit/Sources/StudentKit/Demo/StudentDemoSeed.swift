@@ -248,3 +248,66 @@ public enum StudentDemoSeed {
     return calendar.date(byAdding: .day, value: -3, to: startOfToday) ?? startOfToday
   }
 }
+
+// MARK: - Spec 031/032 demo seeds (extension keeps the enum body within
+// the type-body-length budget)
+
+extension StudentDemoSeed {
+  /// Fully completed 29-field profile so the nine archive cards demo with
+  /// real-looking data (spec 032 D10 / spec 031 D10: the demo student is
+  /// past onboarding — the wizard itself demos on a fresh staging account).
+  public static func makeOnboardingProfile(studentID: UUID) -> OnboardingProfile {
+    OnboardingProfile(
+      userId: studentID,
+      unitPreference: .kg,
+      gender: .male,
+      birthDate: "2001-03-15",
+      heightCm: 178,
+      weightKg: 83,
+      trainingYears: 3,
+      squatStance: .lowBar,
+      deadliftStyle: .conventional,
+      benchGrip: .standard,
+      squat1RMKg: 180,
+      bench1RMKg: 120,
+      deadlift1RMKg: 220,
+      trainingDays: [.mon, .wed, .fri, .sat],
+      gymTier: .commercial,
+      equipmentOverrides: EquipmentCatalog.prefill(for: .commercial),
+      dailyLifeIntensity: 3,
+      lifeStress: 4,
+      recoverySpeed: 3,
+      sleepHours: 3,
+      muscleGroupsToStrengthen: [.quad, .hamstring, .shoulder],
+      uploadAttachmentIds: [],
+      injuryNotes: "左肩撞击综合征",
+      injuryAreas: [.shoulder],
+      isCompeting: true,
+      competitionDate: "2026-07-25",
+      targetWeightClass: "IPF 83kg",
+      noteToCoach: "想冲全国赛,请多关注深蹲底部速度",
+      completedAt: referenceDate,
+      createdAt: referenceDate,
+      updatedAt: referenceDate
+    )
+  }
+
+  /// Accepted bond — the demo student goes straight through the BindGate
+  /// into the 5 tabs (spec 031 D10: zero regression for the existing demo).
+  public static func makeAcceptedBindRequest(
+    studentID: UUID,
+    coachID: UUID = StudentDemoSeed.coachID
+  ) -> BindRequest {
+    BindRequest(
+      id: uuid(8_000),
+      studentId: studentID,
+      coachId: coachID,
+      coachDisplayName: "演示教练",
+      inviteCodeId: uuid(8_001),
+      status: .accepted,
+      submittedAt: referenceDate,
+      respondedAt: referenceDate.addingTimeInterval(3_600),
+      expiredAt: referenceDate.addingTimeInterval(7 * 86_400)
+    )
+  }
+}

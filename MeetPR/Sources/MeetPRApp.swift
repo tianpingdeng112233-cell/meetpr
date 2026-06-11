@@ -52,12 +52,29 @@ struct MeetPRApp: App {
       return RootDependencies(
         rootView: RootView(
           coachPlans: InMemoryPlanRepository.preview(store: planStore),
+          // Demo coach: personal (used 23) + unused single-use + 6-day
+          // time-limited seed codes (spec 031 D10).
+          coachInviteCodes: InMemoryInviteCodeRepository(
+            coachId: StudentDemoSeed.coachID,
+            seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
+          ),
           studentPlans: InMemoryStudentPlanRepository(store: planStore),
           studentLogs: InMemoryStudentTrainingLogRepository(
             seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
           ),
           studentFeedback: InMemoryStudentFeedbackRepository(
             seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
+          ),
+          // Demo student: accepted bond + completed profile → the BindGate
+          // falls straight through to the 5 tabs; no wizard, no enter-code
+          // (spec 031 D10 — the DEMO_USER_STUDENT path stays gate-free).
+          studentBind: InMemoryBindRepository(
+            studentId: StudentDemoSeed.studentID,
+            seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
+          ),
+          studentOnboarding: InMemoryOnboardingRepository(
+            studentId: StudentDemoSeed.studentID,
+            seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
           ),
           draftStore: draftStore
         ),
@@ -80,6 +97,7 @@ struct MeetPRApp: App {
       return RootDependencies(
         rootView: RootView(
           coachPlans: BackendPlanRepository(api: api, session: session, cache: PlanCache()),
+          coachInviteCodes: BackendInviteCodeRepository(api: api, session: session),
           studentPlans: BackendStudentPlanRepository(
             api: api,
             session: session,
@@ -102,6 +120,10 @@ struct MeetPRApp: App {
           // Set-video uploads (spec 027): backend /uploads/* pipeline; the
           // setLog ↔ attachment mapping persists on-device only in V0.1.
           studentVideoUploads: .backend(api: api, session: session),
+          // Bind + onboarding are cache-free by design (spec 031/032 §9):
+          // both must read live server state.
+          studentBind: BackendBindRepository(api: api, session: session),
+          studentOnboarding: BackendOnboardingRepository(api: api, session: session),
           draftStore: draftStore
         ),
         session: session

@@ -11,7 +11,7 @@ import Testing
 }
 
 @Test func genderEncodesBackendRawValue() throws {
-  try expectEncoded(Gender.female, contains: #""F""#)
+  try expectEncoded(Gender.female, contains: #""female""#)
 }
 
 @Test func unitSystemEncodesRawValue() throws {
