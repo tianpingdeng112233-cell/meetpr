@@ -51,7 +51,7 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   }
   do {
     _ = try await repo.complete()
-  } catch let OnboardingError.incomplete(missing) {
+  } catch OnboardingError.incomplete(let missing) {
     #expect(missing.count == 18)
     #expect(missing.contains("unit_preference"))
     #expect(missing.contains("is_competing"))
@@ -70,7 +70,7 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   do {
     _ = try await repo.complete()
     Issue.record("expected incomplete")
-  } catch let OnboardingError.incomplete(missing) {
+  } catch OnboardingError.incomplete(let missing) {
     #expect(Set(missing) == ["sleep_hours", "gym_tier"])
   }
 }
@@ -85,7 +85,7 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   do {
     _ = try await repo.complete()
     Issue.record("expected incomplete")
-  } catch let OnboardingError.incomplete(missing) {
+  } catch OnboardingError.incomplete(let missing) {
     #expect(missing == ["competition_date"])
   }
 }
