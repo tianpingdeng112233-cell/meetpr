@@ -129,3 +129,15 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
   #expect(history.count == 1)
   #expect(history.first?.e1RMKg == 128)
 }
+
+@Test func localRepositoryThrowsOnCorruptFileInsteadOfErasing() async throws {
+  let tempDir = FileManager.default.temporaryDirectory
+    .appendingPathComponent("e1rm-corrupt-\(UUID().uuidString)", isDirectory: true)
+  try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
+  try Data("not json".utf8).write(to: tempDir.appendingPathComponent("points.json"))
+
+  let repo = LocalE1RMRepository(directory: tempDir)
+  await #expect(throws: (any Error).self) {
+    _ = try await repo.fetchHistory(studentId: UUID(), exerciseId: UUID())
+  }
+}

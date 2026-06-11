@@ -10,6 +10,7 @@ public struct TodayWorkoutView: View {
   @State private var viewModel: TodayWorkoutViewModel
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
+  @State private var plateMathTarget: PlateMathTarget?
 
   public init(
     studentID: UUID,
@@ -67,6 +68,21 @@ public struct TodayWorkoutView: View {
       }
     }
     .animation(.spring(duration: 0.35), value: viewModel.pendingPRBanner)
+    .safeAreaInset(edge: .bottom) {
+      if let timer = viewModel.restTimer {
+        RestTimerOverlay(
+          timer: timer,
+          now: { Date() },
+          onAdjust: { viewModel.adjustRestTimer(bySeconds: $0) },
+          onSkip: { viewModel.skipRestTimer() }
+        )
+      }
+    }
+    .animation(.spring(duration: 0.3), value: viewModel.restTimer)
+    .sheet(item: $plateMathTarget) { target in
+      PlateMathSheet(targetKg: target.weightKg)
+        .presentationDetents([.medium])
+    }
     .task {
       if viewModel.state == .idle {
         await viewModel.load(date: date, studentID: studentID)
@@ -96,6 +112,9 @@ public struct TodayWorkoutView: View {
                 editing = EditingTarget(
                   id: drafts[index].id, rowIndex: index, draft: drafts[index])
               }
+            },
+            onPlateMath: { weightKg in
+              plateMathTarget = PlateMathTarget(weightKg: weightKg)
             }
           )
         }
@@ -146,4 +165,10 @@ private struct EditingTarget: Identifiable {
   let id: UUID
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct PlateMathTarget: Identifiable {
+  let weightKg: Double
+  var id: Double { weightKg }
 }

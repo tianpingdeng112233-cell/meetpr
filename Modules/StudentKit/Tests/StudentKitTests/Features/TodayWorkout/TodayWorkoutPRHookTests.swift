@@ -115,3 +115,30 @@ private struct TestFailure: Error, CustomStringConvertible {
   await viewModel.surfaceUnacknowledgedPR(studentID: studentID)
   #expect(viewModel.pendingPRBanner == nil, "acknowledged PR must not re-surface")
 }
+
+@MainActor
+@Test func sameTimestampCompletionsDoNotDoubleFirePRs() async throws {
+  // Frozen clock: both completions get identical computedAt. The baseline is
+  // taken over the full history before insertion (Codex review P1), so the
+  // second identical-e1RM set must not break the 0.5kg buffer.
+  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
+  let e1rm = InMemoryE1RMRepository()
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: InMemoryStudentTrainingLogRepository(),
+    e1rm: e1rm,
+    now: { frozenNow }
+  )
+  await viewModel.load(date: Date(), studentID: studentID)
+
+  await viewModel.toggleComplete(rowIndex: 0)
+  await viewModel.acknowledgePendingPR()
+  await viewModel.toggleComplete(rowIndex: 1)  // same prescription, same instant
+
+  #expect(viewModel.pendingPRBanner == nil, "identical e1RM at the same instant is not a PR")
+  let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
+  #expect(pending.isEmpty)
+}

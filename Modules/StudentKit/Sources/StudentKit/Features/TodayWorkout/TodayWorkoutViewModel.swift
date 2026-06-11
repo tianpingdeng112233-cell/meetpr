@@ -15,49 +15,16 @@ public final class TodayWorkoutViewModel {
     case error(String)
   }
 
-  public struct SetRowDraft: Equatable, Sendable, Identifiable {
-    public let id: UUID
-    public let planExerciseID: UUID
-    /// Catalog exercise identity (variation-level) — spec 028 keys e1RM
-    /// history and PR detection per exercise+variation, not per plan slot.
-    public let exerciseID: UUID
-    public let exerciseName: String
-    public var prescribed: PrescribedSet
-    public var actualWeight: Decimal?
-    public var actualReps: Int?
-    public var actualRPE: Decimal?
-    public var completed: Bool
-    public var loggedSetID: UUID?
+  public typealias SetRowDraft = TodayWorkoutSetRowDraft
 
-    public init(
-      id: UUID,
-      planExerciseID: UUID,
-      exerciseID: UUID,
-      exerciseName: String,
-      prescribed: PrescribedSet,
-      actualWeight: Decimal? = nil,
-      actualReps: Int? = nil,
-      actualRPE: Decimal? = nil,
-      completed: Bool = false,
-      loggedSetID: UUID? = nil
-    ) {
-      self.id = id
-      self.planExerciseID = planExerciseID
-      self.exerciseID = exerciseID
-      self.exerciseName = exerciseName
-      self.prescribed = prescribed
-      self.actualWeight = actualWeight
-      self.actualReps = actualReps
-      self.actualRPE = actualRPE
-      self.completed = completed
-      self.loggedSetID = loggedSetID
-    }
-  }
+  public typealias RestTimerState = TodayWorkoutRestTimerState
 
   public private(set) var state: State = .idle
   /// Set when a completed set breaks the exercise's e1RM record; the view
   /// presents PRBanner and calls `acknowledgePR` on dismiss (spec 028).
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
+  /// Inter-set rest countdown (spec 030 §B). Purely local, never persisted.
+  public private(set) var restTimer: RestTimerState?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -172,12 +139,37 @@ public final class TodayWorkoutViewModel {
 
       // Spec 028 hook: compute e1RM + detect PR only on the false→true edge,
       // so un-checking and re-checking the same set can't farm PR events.
+      // Spec 030 rides the same edge for the rest timer.
       if !previouslyCompleted, completed {
         await recordE1RMPoint(for: draft, log: log, studentID: studentID)
+        startRestTimer(after: draft, drafts: nextDrafts)
       }
     } catch {
       state = .error(error.localizedDescription)
     }
+  }
+
+  public func adjustRestTimer(bySeconds delta: Int) {
+    guard let timer = restTimer else { return }
+    let remaining = timer.endsAt.timeIntervalSince(now()) + TimeInterval(delta)
+    let clamped = min(max(remaining, 0), 900)
+    restTimer = RestTimerState(
+      endsAt: now().addingTimeInterval(clamped), totalSeconds: timer.totalSeconds)
+  }
+
+  public func skipRestTimer() {
+    restTimer = nil
+  }
+
+  private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
+    // Last set of the day: the completion banner takes over, a countdown is noise.
+    guard !drafts.allSatisfy(\.completed) else {
+      restTimer = nil
+      return
+    }
+    let seconds = RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
+    restTimer = RestTimerState(
+      endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
   }
 
   public func exerciseName(for exerciseId: UUID) -> String? {
@@ -228,27 +220,35 @@ public final class TodayWorkoutViewModel {
       sourceReps: log.reps,
       sourceRPE: rpe
     )
-    try? await e1rmRepo.recordPoint(point)
-
-    let previousMax = try? await e1rmRepo.maxBefore(
-      studentId: studentID,
-      exerciseId: draft.exerciseID,
-      before: point.computedAt
-    )
-    // 0.5kg buffer absorbs float jitter; tune to 1.0 if PRs fire too often.
-    if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
-      let event = PRBreakthroughEvent(
-        id: UUID(),
+    do {
+      // Baseline BEFORE inserting the new point, over the full history
+      // (.distantFuture): a strictly-earlier filter at point.computedAt would
+      // miss a same-timestamp sibling and double-fire PRs (Codex review P1).
+      let previousMax = try await e1rmRepo.maxBefore(
         studentId: studentID,
         exerciseId: draft.exerciseID,
-        pointId: point.id,
-        breakthroughE1RMKg: estimatedOneRepMaxKg,
-        previousMaxE1RMKg: previousMax ?? 0,
-        occurredAt: point.computedAt,
-        acknowledgedAt: nil
+        before: .distantFuture
       )
-      try? await e1rmRepo.recordPR(event)
-      pendingPRBanner = event
+      try await e1rmRepo.recordPoint(point)
+
+      // 0.5kg buffer absorbs float jitter; tune to 1.0 if PRs fire too often.
+      if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
+        let event = PRBreakthroughEvent(
+          id: UUID(),
+          studentId: studentID,
+          exerciseId: draft.exerciseID,
+          pointId: point.id,
+          breakthroughE1RMKg: estimatedOneRepMaxKg,
+          previousMaxE1RMKg: previousMax ?? 0,
+          occurredAt: point.computedAt,
+          acknowledgedAt: nil
+        )
+        try await e1rmRepo.recordPR(event)
+        pendingPRBanner = event
+      }
+    } catch {
+      // e1RM persistence is best-effort and must never block set logging,
+      // but a banner only celebrates durably recorded history.
     }
   }
 

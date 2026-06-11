@@ -62,16 +62,10 @@ struct PRBanner: View {
   }
 
   private var detail: String {
-    let new = Self.kg(event.breakthroughE1RMKg)
+    let new = StudentFormatting.kilograms(event.breakthroughE1RMKg)
     if event.previousMaxE1RMKg > 0 {
-      return "\(new) kg（此前 \(Self.kg(event.previousMaxE1RMKg)) kg）"
+      return "\(new) kg（此前 \(StudentFormatting.kilograms(event.previousMaxE1RMKg)) kg）"
     }
     return "\(new) kg，第一个纪录点"
-  }
-
-  private static func kg(_ value: Double) -> String {
-    value.truncatingRemainder(dividingBy: 1) == 0
-      ? String(Int(value))
-      : String(format: "%.1f", value)
   }
 }

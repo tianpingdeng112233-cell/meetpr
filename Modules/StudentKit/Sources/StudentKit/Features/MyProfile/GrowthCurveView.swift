@@ -94,15 +94,15 @@ public struct GrowthCurveView: View {
         .font(Font.MeetPR.headline)
         .foregroundStyle(Color.MeetPR.fgPrimary)
       HStack(spacing: MeetPRSpacing.lg) {
-        metric("重量", "\(Self.kg(point.sourceWeightKg)) kg")
+        metric("重量", "\(StudentFormatting.kilograms(point.sourceWeightKg)) kg")
         metric("次数", "\(point.sourceReps)")
-        metric("RPE", point.sourceRPE.map { Self.kg($0) } ?? "—")
+        metric("RPE", point.sourceRPE.map { StudentFormatting.kilograms($0) } ?? "—")
       }
       HStack {
         Text("e1RM")
           .font(Font.MeetPR.monoLabel)
           .foregroundStyle(Color.MeetPR.fgSecondary)
-        Text("\(Self.kg(point.e1RMKg)) kg")
+        Text("\(StudentFormatting.kilograms(point.e1RMKg)) kg")
           .font(Font.MeetPR.title2)
           .foregroundStyle(Color.MeetPR.brandRed)
       }
@@ -122,11 +122,5 @@ public struct GrowthCurveView: View {
         .font(Font.MeetPR.bodyEmphasis)
         .foregroundStyle(Color.MeetPR.fgPrimary)
     }
-  }
-
-  private static func kg(_ value: Double) -> String {
-    value.truncatingRemainder(dividingBy: 1) == 0
-      ? String(Int(value))
-      : String(format: "%.1f", value)
   }
 }
