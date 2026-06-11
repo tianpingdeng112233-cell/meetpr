@@ -1,0 +1,127 @@
+import CoreModels
+import Foundation
+import RepositoryContracts
+
+/// File-backed e1RM store (spec 028 + 026 persistence ladder: in-memory →
+/// JSON file under Documents/e1rm/). Backend stays uninvolved in V0.1; the
+/// history survives relaunches but not device changes.
+public actor LocalE1RMRepository: E1RMRepository {
+  private let directory: URL
+  private var cachedPoints: [E1RMHistoryPoint]?
+  private var cachedPRs: [PRBreakthroughEvent]?
+
+  private let encoder: JSONEncoder
+  private let decoder: JSONDecoder
+
+  public init(directory: URL? = nil) {
+    let base =
+      directory
+      ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+      .appendingPathComponent("e1rm", isDirectory: true)
+    self.directory = base
+    let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
+    encoder.outputFormatting = [.sortedKeys]
+    self.encoder = encoder
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    self.decoder = decoder
+  }
+
+  // MARK: - E1RMRepository
+
+  public func recordPoint(_ point: E1RMHistoryPoint) async throws {
+    var all = loadPoints()
+    all.append(point)
+    try save(points: all)
+  }
+
+  public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
+    loadPoints()
+      .filter { $0.studentId == studentId && $0.exerciseId == exerciseId }
+      .sorted { $0.computedAt < $1.computedAt }
+  }
+
+  public func fetchHistory(
+    studentId: UUID,
+    exerciseIds: [UUID]
+  ) async throws -> [UUID: [E1RMHistoryPoint]] {
+    var result: [UUID: [E1RMHistoryPoint]] = [:]
+    for exerciseId in exerciseIds {
+      result[exerciseId] = try await fetchHistory(studentId: studentId, exerciseId: exerciseId)
+    }
+    return result
+  }
+
+  public func maxBefore(
+    studentId: UUID,
+    exerciseId: UUID,
+    before: Date
+  ) async throws -> Double? {
+    loadPoints()
+      .filter {
+        $0.studentId == studentId && $0.exerciseId == exerciseId && $0.computedAt < before
+      }
+      .map(\.e1RMKg).max()
+  }
+
+  public func recordPR(_ event: PRBreakthroughEvent) async throws {
+    var all = loadPRs()
+    all.append(event)
+    try save(prs: all)
+  }
+
+  public func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent] {
+    loadPRs()
+      .filter { $0.studentId == studentId && $0.acknowledgedAt == nil }
+      .sorted { $0.occurredAt < $1.occurredAt }
+  }
+
+  public func acknowledgePR(eventId: UUID) async throws {
+    var all = loadPRs()
+    guard let index = all.firstIndex(where: { $0.id == eventId }) else { return }
+    all[index] = all[index].acknowledged(at: Date())
+    try save(prs: all)
+  }
+
+  // MARK: - File IO
+
+  private var pointsURL: URL { directory.appendingPathComponent("points.json") }
+  private var prsURL: URL { directory.appendingPathComponent("prs.json") }
+
+  private func loadPoints() -> [E1RMHistoryPoint] {
+    if let cachedPoints { return cachedPoints }
+    let loaded: [E1RMHistoryPoint] =
+      (try? Data(contentsOf: pointsURL)).flatMap {
+        try? decoder.decode([E1RMHistoryPoint].self, from: $0)
+      } ?? []
+    cachedPoints = loaded
+    return loaded
+  }
+
+  private func loadPRs() -> [PRBreakthroughEvent] {
+    if let cachedPRs { return cachedPRs }
+    let loaded: [PRBreakthroughEvent] =
+      (try? Data(contentsOf: prsURL)).flatMap {
+        try? decoder.decode([PRBreakthroughEvent].self, from: $0)
+      } ?? []
+    cachedPRs = loaded
+    return loaded
+  }
+
+  private func save(points: [E1RMHistoryPoint]) throws {
+    cachedPoints = points
+    try ensureDirectory()
+    try encoder.encode(points).write(to: pointsURL, options: .atomic)
+  }
+
+  private func save(prs: [PRBreakthroughEvent]) throws {
+    cachedPRs = prs
+    try ensureDirectory()
+    try encoder.encode(prs).write(to: prsURL, options: .atomic)
+  }
+
+  private func ensureDirectory() throws {
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  }
+}

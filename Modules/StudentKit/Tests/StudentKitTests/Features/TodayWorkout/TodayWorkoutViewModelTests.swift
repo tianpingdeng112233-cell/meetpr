@@ -12,7 +12,7 @@ import Testing
     weight: Decimal, reps: Int, rpe: Decimal, completed: Bool
   ) -> TodayWorkoutViewModel.SetRowDraft {
     TodayWorkoutViewModel.SetRowDraft(
-      id: UUID(), planExerciseID: UUID(), exerciseName: "深蹲",
+      id: UUID(), planExerciseID: UUID(), exerciseID: UUID(), exerciseName: "深蹲",
       prescribed: prescribed, actualWeight: weight, actualReps: reps,
       actualRPE: rpe, completed: completed)
   }
@@ -42,7 +42,7 @@ import Testing
     setIndex: Int, weight: Decimal, reps: Int, rpe: Decimal, completed: Bool
   ) -> TodayWorkoutViewModel.SetRowDraft {
     TodayWorkoutViewModel.SetRowDraft(
-      id: UUID(), planExerciseID: squatID, exerciseName: "深蹲",
+      id: UUID(), planExerciseID: squatID, exerciseID: UUID(), exerciseName: "深蹲",
       prescribed: PrescribedSet(
         id: UUID(), setIndex: setIndex, weightKg: weight, reps: reps, repsMax: nil, rpe: rpe),
       actualWeight: weight, actualReps: reps, actualRPE: rpe, completed: completed)

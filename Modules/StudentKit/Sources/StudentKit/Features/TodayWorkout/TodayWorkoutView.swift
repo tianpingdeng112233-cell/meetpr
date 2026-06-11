@@ -15,11 +15,13 @@ public struct TodayWorkoutView: View {
     studentID: UUID,
     date: Date = Date(),
     plans: any StudentPlanRepository,
-    logs: any StudentTrainingLogRepository
+    logs: any StudentTrainingLogRepository,
+    e1rm: any E1RMRepository = InMemoryE1RMRepository()
   ) {
     self.studentID = studentID
     self.date = date
-    self._viewModel = State(initialValue: TodayWorkoutViewModel(plans: plans, logs: logs))
+    self._viewModel = State(
+      initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
   }
 
   public var body: some View {
@@ -52,9 +54,26 @@ public struct TodayWorkoutView: View {
         .accessibilityLabel("刷新")
       }
     }
+    .overlay(alignment: .top) {
+      if let event = viewModel.pendingPRBanner {
+        PRBanner(
+          event: event,
+          exerciseName: viewModel.exerciseName(for: event.exerciseId),
+          onDismiss: {
+            Task { await viewModel.acknowledgePendingPR() }
+          }
+        )
+        .padding(.top, MeetPRSpacing.sm)
+      }
+    }
+    .animation(.spring(duration: 0.35), value: viewModel.pendingPRBanner)
     .task {
       if viewModel.state == .idle {
         await viewModel.load(date: date, studentID: studentID)
+        // Re-surface a PR banner the student never dismissed (spec 028 §5);
+        // delayed so the tab renders first.
+        try? await Task.sleep(for: .seconds(1.5))
+        await viewModel.surfaceUnacknowledgedPR(studentID: studentID)
       }
     }
   }
