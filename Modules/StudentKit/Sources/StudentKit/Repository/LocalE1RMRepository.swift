@@ -31,13 +31,13 @@ public actor LocalE1RMRepository: E1RMRepository {
   // MARK: - E1RMRepository
 
   public func recordPoint(_ point: E1RMHistoryPoint) async throws {
-    var all = loadPoints()
+    var all = try loadPoints()
     all.append(point)
     try save(points: all)
   }
 
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
-    loadPoints()
+    try loadPoints()
       .filter { $0.studentId == studentId && $0.exerciseId == exerciseId }
       .sorted { $0.computedAt < $1.computedAt }
   }
@@ -58,7 +58,7 @@ public actor LocalE1RMRepository: E1RMRepository {
     exerciseId: UUID,
     before: Date
   ) async throws -> Double? {
-    loadPoints()
+    try loadPoints()
       .filter {
         $0.studentId == studentId && $0.exerciseId == exerciseId && $0.computedAt < before
       }
@@ -66,19 +66,19 @@ public actor LocalE1RMRepository: E1RMRepository {
   }
 
   public func recordPR(_ event: PRBreakthroughEvent) async throws {
-    var all = loadPRs()
+    var all = try loadPRs()
     all.append(event)
     try save(prs: all)
   }
 
   public func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent] {
-    loadPRs()
+    try loadPRs()
       .filter { $0.studentId == studentId && $0.acknowledgedAt == nil }
       .sorted { $0.occurredAt < $1.occurredAt }
   }
 
   public func acknowledgePR(eventId: UUID) async throws {
-    var all = loadPRs()
+    var all = try loadPRs()
     guard let index = all.firstIndex(where: { $0.id == eventId }) else { return }
     all[index] = all[index].acknowledged(at: Date())
     try save(prs: all)
@@ -89,22 +89,27 @@ public actor LocalE1RMRepository: E1RMRepository {
   private var pointsURL: URL { directory.appendingPathComponent("points.json") }
   private var prsURL: URL { directory.appendingPathComponent("prs.json") }
 
-  private func loadPoints() -> [E1RMHistoryPoint] {
+  // Missing file = genuinely empty history. Read/decode failures must throw:
+  // mapping them to [] silently erases history and fakes first-PR detection,
+  // and the next save would overwrite the real data (Codex review P1).
+  private func loadPoints() throws -> [E1RMHistoryPoint] {
     if let cachedPoints { return cachedPoints }
-    let loaded: [E1RMHistoryPoint] =
-      (try? Data(contentsOf: pointsURL)).flatMap {
-        try? decoder.decode([E1RMHistoryPoint].self, from: $0)
-      } ?? []
+    guard FileManager.default.fileExists(atPath: pointsURL.path) else {
+      cachedPoints = []
+      return []
+    }
+    let loaded = try decoder.decode([E1RMHistoryPoint].self, from: Data(contentsOf: pointsURL))
     cachedPoints = loaded
     return loaded
   }
 
-  private func loadPRs() -> [PRBreakthroughEvent] {
+  private func loadPRs() throws -> [PRBreakthroughEvent] {
     if let cachedPRs { return cachedPRs }
-    let loaded: [PRBreakthroughEvent] =
-      (try? Data(contentsOf: prsURL)).flatMap {
-        try? decoder.decode([PRBreakthroughEvent].self, from: $0)
-      } ?? []
+    guard FileManager.default.fileExists(atPath: prsURL.path) else {
+      cachedPRs = []
+      return []
+    }
+    let loaded = try decoder.decode([PRBreakthroughEvent].self, from: Data(contentsOf: prsURL))
     cachedPRs = loaded
     return loaded
   }

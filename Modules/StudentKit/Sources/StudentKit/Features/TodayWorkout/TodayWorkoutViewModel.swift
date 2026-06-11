@@ -262,27 +262,35 @@ public final class TodayWorkoutViewModel {
       sourceReps: log.reps,
       sourceRPE: rpe
     )
-    try? await e1rmRepo.recordPoint(point)
-
-    let previousMax = try? await e1rmRepo.maxBefore(
-      studentId: studentID,
-      exerciseId: draft.exerciseID,
-      before: point.computedAt
-    )
-    // 0.5kg buffer absorbs float jitter; tune to 1.0 if PRs fire too often.
-    if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
-      let event = PRBreakthroughEvent(
-        id: UUID(),
+    do {
+      // Baseline BEFORE inserting the new point, over the full history
+      // (.distantFuture): a strictly-earlier filter at point.computedAt would
+      // miss a same-timestamp sibling and double-fire PRs (Codex review P1).
+      let previousMax = try await e1rmRepo.maxBefore(
         studentId: studentID,
         exerciseId: draft.exerciseID,
-        pointId: point.id,
-        breakthroughE1RMKg: estimatedOneRepMaxKg,
-        previousMaxE1RMKg: previousMax ?? 0,
-        occurredAt: point.computedAt,
-        acknowledgedAt: nil
+        before: .distantFuture
       )
-      try? await e1rmRepo.recordPR(event)
-      pendingPRBanner = event
+      try await e1rmRepo.recordPoint(point)
+
+      // 0.5kg buffer absorbs float jitter; tune to 1.0 if PRs fire too often.
+      if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
+        let event = PRBreakthroughEvent(
+          id: UUID(),
+          studentId: studentID,
+          exerciseId: draft.exerciseID,
+          pointId: point.id,
+          breakthroughE1RMKg: estimatedOneRepMaxKg,
+          previousMaxE1RMKg: previousMax ?? 0,
+          occurredAt: point.computedAt,
+          acknowledgedAt: nil
+        )
+        try await e1rmRepo.recordPR(event)
+        pendingPRBanner = event
+      }
+    } catch {
+      // e1RM persistence is best-effort and must never block set logging,
+      // but a banner only celebrates durably recorded history.
     }
   }
 

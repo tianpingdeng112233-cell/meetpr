@@ -72,8 +72,8 @@ public struct E1RMChart: View {
           .fill(Color.clear)
           .contentShape(Rectangle())
           .onTapGesture { location in
-            guard let onSelect else { return }
-            let plotOrigin = geometry[proxy.plotFrame!].origin
+            guard let onSelect, let plotFrame = proxy.plotFrame else { return }
+            let plotOrigin = geometry[plotFrame].origin
             let xInPlot = location.x - plotOrigin.x
             guard let tappedDate: Date = proxy.value(atX: xInPlot) else { return }
             guard

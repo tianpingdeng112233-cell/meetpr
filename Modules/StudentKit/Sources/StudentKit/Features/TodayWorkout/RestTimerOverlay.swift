@@ -16,8 +16,6 @@ struct RestTimerOverlay: View {
   let onAdjust: (Int) -> Void
   let onSkip: () -> Void
 
-  @State private var firedCompletionHaptic = false
-
   var body: some View {
     TimelineView(.periodic(from: .now, by: 1)) { context in
       let remaining = max(0, timer.endsAt.timeIntervalSince(context.date))
@@ -36,17 +34,20 @@ struct RestTimerOverlay: View {
       .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
       .padding(.horizontal, MeetPRSpacing.md)
       .padding(.bottom, MeetPRSpacing.xs)
-      .onChange(of: remaining <= 0) { _, isDone in
-        guard isDone, !firedCompletionHaptic else { return }
-        firedCompletionHaptic = true
-        #if canImport(UIKit)
-          UINotificationFeedbackGenerator().notificationOccurred(.success)
-        #endif
-        Task {
-          try? await Task.sleep(for: .seconds(3))
-          onSkip()
-        }
-      }
+    }
+    // Keyed to endsAt: starting/adjusting a timer cancels the stale
+    // completion task, so an old 3s dismiss can't clear a fresh timer
+    // (Codex review P1).
+    .task(id: timer.endsAt) {
+      let remaining = max(0, timer.endsAt.timeIntervalSince(now()))
+      try? await Task.sleep(for: .seconds(remaining))
+      guard !Task.isCancelled else { return }
+      #if canImport(UIKit)
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+      #endif
+      try? await Task.sleep(for: .seconds(3))
+      guard !Task.isCancelled else { return }
+      onSkip()
     }
     .transition(.move(edge: .bottom).combined(with: .opacity))
   }
@@ -90,7 +91,7 @@ struct RestTimerOverlay: View {
   }
 
   private static func minutesSeconds(_ interval: TimeInterval) -> String {
-    let total = Int(interval.rounded())
-    return String(format: "%d:%02d", total / 60, total % 60)
+    Duration.seconds(Int(interval.rounded()))
+      .formatted(.time(pattern: .minuteSecond))
   }
 }

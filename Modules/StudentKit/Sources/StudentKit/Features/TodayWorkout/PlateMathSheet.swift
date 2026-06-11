@@ -38,10 +38,10 @@ struct PlateMathSheet: View {
 
   private func header(_ loadout: PlateMathCalculator.Loadout) -> some View {
     HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
-      Text("\(Self.kg(loadout.achievedKg)) kg")
+      Text("\(StudentFormatting.kilograms(loadout.achievedKg)) kg")
         .font(Font.MeetPR.title2)
         .foregroundStyle(Color.MeetPR.fgPrimary)
-      Text("杠 \(Self.kg(PlateMathCalculator.barWeightKg)) kg")
+      Text("杠 \(StudentFormatting.kilograms(PlateMathCalculator.barWeightKg)) kg")
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
     }
@@ -83,15 +83,19 @@ struct PlateMathSheet: View {
 
   private func plateList(_ loadout: PlateMathCalculator.Loadout) -> some View {
     let counts = loadout.platesPerSideKg.reduce(into: [Double: Int]()) { $0[$1, default: 0] += 1 }
-    let parts = counts.keys.sorted(by: >).map { "\(Self.kg($0)) ×\(counts[$0] ?? 0)" }
+    let parts = counts.keys.sorted(by: >).map { denomination in
+      "\(Self.denominationText(denomination)) ×\(counts[denomination] ?? 0)"
+    }
     return Text(parts.isEmpty ? "每边：无（空杠）" : "每边：\(parts.joined(separator: " · "))")
       .font(Font.MeetPR.body)
       .foregroundStyle(Color.MeetPR.fgPrimary)
   }
 
   private func roundingNotice(_ loadout: PlateMathCalculator.Loadout) -> some View {
-    Label(
-      "目标 \(Self.kg(loadout.requestedKg)) kg → 实际 \(Self.kg(loadout.achievedKg)) kg（最小增量 2.5 kg）",
+    let requested = StudentFormatting.kilograms(loadout.requestedKg)
+    let achieved = StudentFormatting.kilograms(loadout.achievedKg)
+    return Label(
+      "目标 \(requested) kg → 实际 \(achieved) kg（最小增量 2.5 kg）",
       systemImage: "info.circle"
     )
     .font(Font.MeetPR.footnote)
@@ -101,7 +105,13 @@ struct PlateMathSheet: View {
   private func accessibilitySummary(_ loadout: PlateMathCalculator.Loadout) -> String {
     loadout.platesPerSideKg.isEmpty
       ? "空杠"
-      : loadout.platesPerSideKg.map { Self.kg($0) }.joined(separator: "，")
+      : loadout.platesPerSideKg.map { Self.denominationText($0) }.joined(separator: "，")
+  }
+
+  /// Plate denominations need two fraction digits (1.25); totals use the
+  /// shared one-digit weight style.
+  private static func denominationText(_ value: Double) -> String {
+    value.formatted(.number.precision(.fractionLength(0...2)))
   }
 
   /// IPF standard plate colors; 5kg (white) and 2.5kg (black) get a border so
@@ -118,12 +128,5 @@ struct PlateMathSheet: View {
     case 2.5: (Color.black, 28, true)
     default: (Color(white: 0.75), 22, false)  // 1.25 silver
     }
-  }
-
-  private static func kg(_ value: Double) -> String {
-    value.truncatingRemainder(dividingBy: 1) == 0
-      ? String(Int(value))
-      : String(format: "%.2f", value).replacingOccurrences(of: ".50", with: ".5")
-        .replacingOccurrences(of: ".00", with: "")
   }
 }

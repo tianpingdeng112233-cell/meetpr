@@ -16,6 +16,11 @@ enum StudentFormatting {
     return formatter
   }()
 
+  /// Double weights (e1RM math output) formatted like `decimal(_:)`.
+  static func kilograms(_ value: Double) -> String {
+    value.formatted(.number.precision(.fractionLength(0...1)))
+  }
+
   static func decimal(_ value: Decimal?) -> String {
     guard let value else {
       return "-"
