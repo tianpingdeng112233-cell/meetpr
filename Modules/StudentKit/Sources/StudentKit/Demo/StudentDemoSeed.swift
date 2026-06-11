@@ -166,6 +166,47 @@ public enum StudentDemoSeed {
     )
   }
 
+  /// 9 squat e1RM points over ~4 weeks with a gentle upward trend, plus one
+  /// unacknowledged PR on the newest point so the launch re-surface path is
+  /// exercised in DEMO_MODE (spec 028 §9).
+  public static func makeE1RMHistory(studentID: UUID) -> [E1RMHistoryPoint] {
+    let squatID = uuid(2_000)
+    let baseline = Calendar(identifier: .gregorian).startOfDay(for: Date())
+    let e1rms: [Double] = [128.0, 129.5, 128.8, 131.0, 132.4, 131.8, 134.0, 135.2, 137.6]
+    return e1rms.enumerated().map { offset, value in
+      E1RMHistoryPoint(
+        id: uuid(5_000 + offset),
+        studentId: studentID,
+        exerciseId: squatID,
+        setLogId: uuid(5_100 + offset),
+        computedAt: baseline.addingTimeInterval(Double(offset - 26) * 86_400 * 3),
+        e1RMKg: value,
+        sourceWeightKg: 120 + Double(offset) * 2.5,
+        sourceReps: 5,
+        sourceRPE: 8.0
+      )
+    }
+  }
+
+  public static func makeUnacknowledgedPR(studentID: UUID) -> [PRBreakthroughEvent] {
+    let points = makeE1RMHistory(studentID: studentID)
+    guard let latest = points.last,
+      let previousMax = points.dropLast().map(\.e1RMKg).max()
+    else { return [] }
+    return [
+      PRBreakthroughEvent(
+        id: uuid(6_000),
+        studentId: studentID,
+        exerciseId: latest.exerciseId,
+        pointId: latest.id,
+        breakthroughE1RMKg: latest.e1RMKg,
+        previousMaxE1RMKg: previousMax,
+        occurredAt: latest.computedAt,
+        acknowledgedAt: nil
+      )
+    ]
+  }
+
   private static func uuid(_ value: Int) -> UUID {
     UUID(uuidString: String(format: "02400000-0000-0000-0000-%012d", value))!
   }

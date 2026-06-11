@@ -95,6 +95,9 @@ struct MeetPRApp: App {
             session: session,
             cache: FeedbackCache()
           ),
+          // e1RM stays fully on-device in V0.1 (spec 028 persistence ladder):
+          // JSON files under Documents/e1rm/, no backend endpoint.
+          studentE1RM: LocalE1RMRepository(),
           draftStore: draftStore
         ),
         session: session

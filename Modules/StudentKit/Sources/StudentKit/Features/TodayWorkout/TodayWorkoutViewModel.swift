@@ -18,6 +18,9 @@ public final class TodayWorkoutViewModel {
   public struct SetRowDraft: Equatable, Sendable, Identifiable {
     public let id: UUID
     public let planExerciseID: UUID
+    /// Catalog exercise identity (variation-level) — spec 028 keys e1RM
+    /// history and PR detection per exercise+variation, not per plan slot.
+    public let exerciseID: UUID
     public let exerciseName: String
     public var prescribed: PrescribedSet
     public var actualWeight: Decimal?
@@ -29,6 +32,7 @@ public final class TodayWorkoutViewModel {
     public init(
       id: UUID,
       planExerciseID: UUID,
+      exerciseID: UUID,
       exerciseName: String,
       prescribed: PrescribedSet,
       actualWeight: Decimal? = nil,
@@ -39,6 +43,7 @@ public final class TodayWorkoutViewModel {
     ) {
       self.id = id
       self.planExerciseID = planExerciseID
+      self.exerciseID = exerciseID
       self.exerciseName = exerciseName
       self.prescribed = prescribed
       self.actualWeight = actualWeight
@@ -50,19 +55,25 @@ public final class TodayWorkoutViewModel {
   }
 
   public private(set) var state: State = .idle
+  /// Set when a completed set breaks the exercise's e1RM record; the view
+  /// presents PRBanner and calls `acknowledgePR` on dismiss (spec 028).
+  public private(set) var pendingPRBanner: PRBreakthroughEvent?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let e1rmRepo: any E1RMRepository
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
 
   public init(
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
+    e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.logs = logs
+    self.e1rmRepo = e1rm
     self.now = now
   }
 
@@ -84,6 +95,7 @@ public final class TodayWorkoutViewModel {
           return SetRowDraft(
             id: set.id,
             planExerciseID: exercise.id,
+            exerciseID: exercise.exercise.id,
             exerciseName: exercise.exercise.name,
             prescribed: set,
             actualWeight: existingLog?.weightKg ?? set.weightKg,
@@ -151,13 +163,92 @@ public final class TodayWorkoutViewModel {
     )
 
     do {
+      let previouslyCompleted = drafts[rowIndex].completed
       try await logs.recordSet(log)
       draft.completed = completed
       draft.loggedSetID = log.id
       nextDrafts[rowIndex] = draft
       state = .loaded(plan: plan, drafts: nextDrafts)
+
+      // Spec 028 hook: compute e1RM + detect PR only on the false→true edge,
+      // so un-checking and re-checking the same set can't farm PR events.
+      if !previouslyCompleted, completed {
+        await recordE1RMPoint(for: draft, log: log, studentID: studentID)
+      }
     } catch {
       state = .error(error.localizedDescription)
+    }
+  }
+
+  public func exerciseName(for exerciseId: UUID) -> String? {
+    switch state {
+    case .loaded(_, let drafts), .recording(_, let drafts, _):
+      drafts.first { $0.exerciseID == exerciseId }?.exerciseName
+    default:
+      nil
+    }
+  }
+
+  public func acknowledgePendingPR() async {
+    guard let event = pendingPRBanner else { return }
+    pendingPRBanner = nil
+    try? await e1rmRepo.acknowledgePR(eventId: event.id)
+  }
+
+  /// Surfaces the oldest unacknowledged PR on launch so a banner the student
+  /// missed (e.g. app killed mid-session) re-appears once (spec 028 §5).
+  public func surfaceUnacknowledgedPR(studentID: UUID) async {
+    guard pendingPRBanner == nil else { return }
+    pendingPRBanner = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID))?.first
+  }
+
+  private func recordE1RMPoint(
+    for draft: SetRowDraft,
+    log: StudentSetLog,
+    studentID: UUID
+  ) async {
+    let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
+    let rpe = draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
+    guard
+      let estimatedOneRepMaxKg = E1RMCalculator.calculate(
+        weightKg: weight,
+        reps: log.reps,
+        rpe: rpe
+      )
+    else { return }
+
+    let point = E1RMHistoryPoint(
+      id: UUID(),
+      studentId: studentID,
+      exerciseId: draft.exerciseID,
+      setLogId: log.id,
+      computedAt: now(),
+      e1RMKg: estimatedOneRepMaxKg,
+      sourceWeightKg: weight,
+      sourceReps: log.reps,
+      sourceRPE: rpe
+    )
+    try? await e1rmRepo.recordPoint(point)
+
+    let previousMax = try? await e1rmRepo.maxBefore(
+      studentId: studentID,
+      exerciseId: draft.exerciseID,
+      before: point.computedAt
+    )
+    // 0.5kg buffer absorbs float jitter; tune to 1.0 if PRs fire too often.
+    if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
+      let event = PRBreakthroughEvent(
+        id: UUID(),
+        studentId: studentID,
+        exerciseId: draft.exerciseID,
+        pointId: point.id,
+        breakthroughE1RMKg: estimatedOneRepMaxKg,
+        previousMaxE1RMKg: previousMax ?? 0,
+        occurredAt: point.computedAt,
+        acknowledgedAt: nil
+      )
+      try? await e1rmRepo.recordPR(event)
+      pendingPRBanner = event
     }
   }
 
