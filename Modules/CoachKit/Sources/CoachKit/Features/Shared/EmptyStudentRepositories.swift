@@ -21,7 +21,8 @@ public actor EmptyStudentPlanRepository: StudentPlanRepository {
 public actor EmptyStudentTrainingLogRepository: StudentTrainingLogRepository {
   public init() {}
 
-  public func recordSet(_ log: StudentSetLog) async throws {}
+  @discardableResult
+  public func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog { log }
 
   public func fetchLogs(
     studentID: UUID,

@@ -449,7 +449,17 @@ V0.1 内测期同意文案 = **占位**(Apple §5.1.1 内测不强制法律 revi
 
 ## Implementation Notes
 
-无(spec PR 阶段)。
+**2026-06-11 V0.1 实装(feat/027-video-upload)— backend 接口对齐 + scope 裁剪**:
+
+本 spec §2.3/§4 的 backend 接口段写于 backend 004 重设计之前,**已过时**。实际 backend 落地为通用附件管线(`MeetPR-backend/specs/004-attachment-upload/SPEC.md`,PR #17 已合 staging),iOS 按真实 wire 实装:
+
+- **真实端点**:`POST /uploads/initiate`(`{kind:'set_video', content_type, size_bytes, part_count, filename?}` → 201 `{attachment_id, upload_id, part_urls}`)→ 客户端逐片 PUT presigned URL(收 ETag,去引号)→ `POST /uploads/:id/complete`(`{parts:[{part_number, etag}]}`,409 = 终态)/ `POST /uploads/:id/abort`(空对象 body,204)/ `GET /uploads/:id/url`(播放用短期 presigned GET)。原 spec 的 `/upload/initiate`、`/upload/sign-parts`、`/upload/complete`、`GET /students/:id/videos`、`POST /privacy/consent` 均不存在。
+- **sign-parts 重签不存在**:backend 004 把 part URL 过期场景定为"client 重新 initiate"(旧 uploading 行成 stale,服务端清理 job out of scope)。iOS 实装一致:重试 = 清 `remoteAttachmentID` 全新 initiate。
+- **set_log ↔ attachment 关联是 V0.1 本地限制**:backend `attachments` 表无关联列(004 显式留给消费方)。iOS 侧 `setLogId → attachmentId` 映射存本地 JSON(`Documents/video_attachments/attachments.json`,LocalE1RMRepository 先例),同时 initiate 的 `filename` 带 `setlog-<setLogId>-<localId>.mp4` 供将来服务端反查。**后果:教练端跨设备视频墙(spec 029 消费)需要服务端关联增量才能做**,placeholder 到 029 二遍 / 后续 backend spec。
+- **无 BackgroundURLSession / 断点续传(V0.1 裁剪)**:前台上传,5MB 切片并发 PUT(单片失败重试 2 次);app 杀掉后启动时把 `pending/uploading` 记录标 `failed` 可重试(整体重传)。原 spec 的 `VideoUploadActor`/`UploadStateStore`/`paused` 状态机/BackgroundURLSession 双 session 设计随 resumable 一起 defer。
+- **隐私同意 V0.1 本地化**:backend 004 把 `privacy_consents` ledger 移交消费方 spec 且尚未实装,故首次上传同意 dialog 只落 `UserDefaults`(key `video_upload_consent_v1`),**无服务端审计**;文案集中在 `VideoPrivacyCopy.swift`(PLACEHOLDER,公测前法律 review)。
+- **同样裁剪**:缩略图管线(backend 无 thumbnail kind)、`MyVideoList`/`VideoPlayerView` 学员自看入口、`SetRecordRow` 📹 第 5 元素(入口改在 `SetEntrySheet` 内"视频"区块)、转码失败原片 fallback + 仅 Wi-Fi 选项。转码用 `AVAssetExportSession` 1080p preset(H.264 .mp4,码率 best-effort),≤120s 在 export 前校验。
+- **实装件**:CoreModels `VideoAttachment`(本地实体,含 setLogID 关联 + status 状态机 pending/uploading/uploaded/failed);Networking `UploadDTOs`/`APIClient+Uploads`(4 typed 端点)/`OSSPartUploader`(绕过 base URL 直传 OSS,ETag 去引号);RepositoryContracts `VideoAttachmentRepository` + InMemory/Backend 双实现;StudentKit `VideoUploadManager`(actor 状态机)+ `VideoAttachmentViewModel` + `SetEntrySheet` 视频区块(拍摄/相册/进度/重试/删除)+ 首次同意 dialog;Info.plist 相机/麦克风/相册权限文案 + PrivacyInfo 收集声明(PhotosorVideos, linked, AppFunctionality)。
 
 ## 上游 / 下游
 
@@ -472,3 +482,4 @@ V0.1 内测期同意文案 = **占位**(Apple §5.1.1 内测不强制法律 revi
 | 2026-05-15 | 0.1 | 起草。客户端 H.264 + OSS multipart resumable + 单视频串行 + 隐私同意 V1 内测占位 | Claude |
 | 2026-05-15 | 0.2 | 接 PR #115 Codex review:**blocker 1** — presigned URL 1h × resumable 跨过 1h 后 part URL 全过期,加 backend `POST /upload/sign-parts` re-sign endpoint + iOS resume 时 403 自动重签;**blocker 2** — 私有 bucket 缺 read URL contract,`GET /students/:id/videos` 直接附短期 1h presigned `videoURL` / `thumbnailURL`,本 spec 学员自看入口直接用;non-blocking — `VideoTranscoder` 改 "best-effort 1Mbps" 描述,移除"精确 H.264 1280×720 1Mbps 30fps" 假象;状态机加 `paused` 替 terminal `failed`,网络恢复 / app 重启 / 用户手动 reset attempt count;fallback 原片 UI 提示 "蜂窝可能耗大量流量" + "仅 Wi-Fi 上传" 选项 | Claude |
 | 2026-05-15 | 0.3 | 接 PR #115 Codex **second-pass** review blocker:`UploadTask.Status` enum 已删 `failed`,但 init / driver / 状态图 / resume 注释仍引用 `failed` 字样(自相矛盾)。采纳决议 B 完全移除 `failed`:状态机图删 `failed → 重试` 中间状态,init/processNext 注释改 `pending/uploading/paused`,loadAndResume 接受 `pending/uploading/paused` 且对老 `failed` JSON 做兼容兜底(当 paused 处理 + log)。Non-blocking — CHECKLIST 加 "part URL 过期 → sign-parts" + "MyVideoList 播放" 两条;`BackgroundURLSessionManager` 拆 `anyNetworkSession` + `wifiOnlySession` 两 session(background config immutable,无法 per-task 动态切 allowsCellularAccess),`UploadTask` 加 `preferWifiOnly: Bool` 字段持久化 | Claude |
+| 2026-06-11 | 0.4 | **V0.1 实装对齐 backend 004 通用附件管线**:本 spec §2.3/§4 backend 接口段过时,真实 wire = `/uploads/{initiate,:id/complete,:id/abort,:id/url}`(snake_case,presigned multipart,无 sign-parts / 无 `GET /students/:id/videos` / 无 `POST /privacy/consent`);set_log↔attachment 关联 V0.1 仅 iOS 本地 JSON + filename 反查 hint(教练端跨设备视频墙待服务端关联增量,placeholder 029 二遍);BackgroundURLSession 断点续传/缩略图/MyVideoList/原片 fallback 裁剪出 V0.1,杀进程恢复 = 标 failed 可整体重试;隐私同意本地 UserDefaults 无服务端审计。详见 Implementation Notes | Claude |
