@@ -54,10 +54,19 @@ public final class TodayWorkoutViewModel {
     }
   }
 
+  public struct RestTimerState: Equatable, Sendable {
+    /// Wall-clock end; remaining time stays correct across background trips.
+    public let endsAt: Date
+    /// Progress-bar denominator.
+    public let totalSeconds: Int
+  }
+
   public private(set) var state: State = .idle
   /// Set when a completed set breaks the exercise's e1RM record; the view
   /// presents PRBanner and calls `acknowledgePR` on dismiss (spec 028).
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
+  /// Inter-set rest countdown (spec 030 §B). Purely local, never persisted.
+  public private(set) var restTimer: RestTimerState?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -172,12 +181,37 @@ public final class TodayWorkoutViewModel {
 
       // Spec 028 hook: compute e1RM + detect PR only on the false→true edge,
       // so un-checking and re-checking the same set can't farm PR events.
+      // Spec 030 rides the same edge for the rest timer.
       if !previouslyCompleted, completed {
         await recordE1RMPoint(for: draft, log: log, studentID: studentID)
+        startRestTimer(after: draft, drafts: nextDrafts)
       }
     } catch {
       state = .error(error.localizedDescription)
     }
+  }
+
+  public func adjustRestTimer(bySeconds delta: Int) {
+    guard let timer = restTimer else { return }
+    let remaining = timer.endsAt.timeIntervalSince(now()) + TimeInterval(delta)
+    let clamped = min(max(remaining, 0), 900)
+    restTimer = RestTimerState(
+      endsAt: now().addingTimeInterval(clamped), totalSeconds: timer.totalSeconds)
+  }
+
+  public func skipRestTimer() {
+    restTimer = nil
+  }
+
+  private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
+    // Last set of the day: the completion banner takes over, a countdown is noise.
+    guard !drafts.allSatisfy(\.completed) else {
+      restTimer = nil
+      return
+    }
+    let seconds = RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
+    restTimer = RestTimerState(
+      endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
   }
 
   public func exerciseName(for exerciseId: UUID) -> String? {

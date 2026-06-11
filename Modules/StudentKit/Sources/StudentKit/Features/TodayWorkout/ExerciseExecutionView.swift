@@ -8,6 +8,7 @@ struct ExerciseExecutionView: View {
   let rows: [TodayWorkoutViewModel.SetRowDraft]
   let rowIndex: (TodayWorkoutViewModel.SetRowDraft) -> Int?
   let onTapSet: (Int) -> Void
+  var onPlateMath: ((Double) -> Void)?
 
   private var allCompleted: Bool {
     !rows.isEmpty && rows.allSatisfy(\.completed)
@@ -32,7 +33,7 @@ struct ExerciseExecutionView: View {
 
       ForEach(rows) { row in
         if let index = rowIndex(row) {
-          SetRecordRow(draft: row, rowIndex: index, onTap: onTapSet)
+          SetRecordRow(draft: row, rowIndex: index, onTap: onTapSet, onPlateMath: onPlateMath)
         }
       }
     }
