@@ -207,6 +207,33 @@ public enum StudentDemoSeed {
     ]
   }
 
+  /// Yesterday filed, today empty — exercises both the "already filed"
+  /// toolbar state (yesterday, for coach-side demo in 029) and the auto
+  /// prompt (today) in DEMO_MODE (spec 030 §C3).
+  public static func makeReadinessHistory(studentID: UUID) -> [ReadinessCheckin] {
+    let calendar = Calendar(identifier: .iso8601)
+    let yesterday = calendar.date(byAdding: .day, value: -1, to: Date()) ?? Date()
+    let formatter = DateFormatter()
+    formatter.calendar = calendar
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+    formatter.dateFormat = "yyyy-MM-dd"
+    return [
+      ReadinessCheckin(
+        id: uuid(7_000),
+        studentId: studentID,
+        checkinDate: formatter.string(from: yesterday),
+        sleepQuality: 4,
+        mood: 3,
+        stress: 2,
+        muscleFatigue: [
+          MuscleFatigue(muscleGroup: .quad, severity: 3),
+          MuscleFatigue(muscleGroup: .core, severity: 1),
+        ],
+        submittedAt: yesterday
+      )
+    ]
+  }
+
   private static func uuid(_ value: Int) -> UUID {
     UUID(uuidString: String(format: "02400000-0000-0000-0000-%012d", value))!
   }
