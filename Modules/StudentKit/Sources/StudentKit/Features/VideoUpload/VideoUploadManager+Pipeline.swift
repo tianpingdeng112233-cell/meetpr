@@ -96,7 +96,7 @@ extension VideoUploadManager {
   ) async throws {
     do {
       _ = try await service.complete(attachmentID: remoteID, parts: etags)
-    } catch let APIError.httpStatus(statusCode, _) where statusCode == 409 {
+    } catch APIError.httpStatus(let statusCode, _) where statusCode == 409 {
       throw VideoUploadError.completeConflict
     }
 
