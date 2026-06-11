@@ -4,7 +4,7 @@ import Testing
 @testable import Networking
 
 @Test func sharedClientHasDefaultBaseURL() {
-  #expect(APIClient.shared.baseURL.absoluteString == "http://120.27.243.110:3000")
+  #expect(APIClient.shared.baseURL.absoluteString == "http://121.40.160.241:3000")
 }
 
 @Test func buildConfigUsesEnvironmentBaseURLWhenPresent() {
