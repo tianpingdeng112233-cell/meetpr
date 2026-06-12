@@ -141,6 +141,11 @@ public struct RootView: View {
       onboardingProfile: {
         try? await onboarding.fetchProfile(studentId: studentId)
       },
+      // Pre-bind pages live outside the 5 tabs — without this the account
+      // has no way back to the login screen.
+      onLogout: {
+        await session.logout()
+      },
       onboardingFlow: { _, onCompleted in
         OnboardingWizardFlow(
           studentId: studentId,
@@ -163,6 +168,9 @@ public struct RootView: View {
             e1rm: studentE1RM,
             readiness: studentReadiness
           ),
+          onLogout: {
+            await session.logout()
+          },
           onCompleted: onCompleted
         )
       },
@@ -183,7 +191,10 @@ public struct RootView: View {
       videoUploads: studentVideoUploads,
       onboarding: studentOnboarding,
       evaluationSummaries: studentEvaluationSummaries,
-      summaryReadStore: summaryReadStore
+      summaryReadStore: summaryReadStore,
+      onLogout: {
+        await session.logout()
+      }
     )
   }
 }

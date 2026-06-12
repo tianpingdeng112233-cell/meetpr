@@ -56,3 +56,6 @@ GoogleService-Info.plist
 
 # Claude Code
 .claude/cache/
+
+# Xcode per-user state
+xcuserdata/

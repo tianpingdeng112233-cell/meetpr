@@ -40,15 +40,20 @@ public struct EvaluationPeriodView: View {
   @State private var feedbackViewModel: FeedbackInboxViewModel
   private let studentID: UUID
   private let dependencies: EvaluationPeriodDependencies
+  /// The page replaces the 5 tabs for the whole evaluation window, so it
+  /// needs its own way back to login. nil hides the affordance (demo).
+  private let onLogout: (@MainActor () async -> Void)?
   @Environment(\.scenePhase) private var scenePhase
 
   public init(
     studentID: UUID,
     dependencies: EvaluationPeriodDependencies,
+    onLogout: (@MainActor () async -> Void)? = nil,
     onCompleted: @escaping @MainActor () async -> Void
   ) {
     self.studentID = studentID
     self.dependencies = dependencies
+    self.onLogout = onLogout
     _viewModel = State(
       initialValue: EvaluationPeriodViewModel(
         studentID: studentID,
@@ -68,6 +73,18 @@ public struct EvaluationPeriodView: View {
       content
         .background(Color.MeetPR.bg)
         .navigationTitle("评估进行中")
+        .toolbar {
+          if let onLogout {
+            ToolbarItem(placement: .primaryAction) {
+              Button {
+                Task { await onLogout() }
+              } label: {
+                Image(systemName: "rectangle.portrait.and.arrow.right")
+              }
+              .accessibilityLabel("退出登录")
+            }
+          }
+        }
     }
     .task {
       await viewModel.refresh()

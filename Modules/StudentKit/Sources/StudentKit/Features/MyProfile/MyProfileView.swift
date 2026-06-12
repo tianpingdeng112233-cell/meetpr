@@ -11,6 +11,8 @@ public struct MyProfileView: View {
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
+  /// nil hides the row (demo/previews); live wiring passes Session.logout.
+  private let onLogout: (@MainActor () async -> Void)?
   @State private var viewModel: MyProfileViewModel
 
   public init(
@@ -18,12 +20,14 @@ public struct MyProfileView: View {
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
     onboarding: any OnboardingRepository,
-    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil
+    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
+    onLogout: (@MainActor () async -> Void)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
+    self.onLogout = onLogout
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -63,6 +67,10 @@ public struct MyProfileView: View {
         }
 
         archiveSection
+
+        if let onLogout {
+          LogoutSection(onLogout: onLogout)
+        }
       }
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bg)
@@ -115,5 +123,32 @@ public struct MyProfileView: View {
       }
       .listRowBackground(Color.MeetPR.surface1)
     }
+  }
+}
+
+/// "退出登录" — mirrors the coach side's destructive logout treatment
+/// (CoachMyProfileView), adapted to the List context.
+@available(iOS 17.0, macOS 14.0, *)
+private struct LogoutSection: View {
+  let onLogout: @MainActor () async -> Void
+  @State private var isLoggingOut = false
+
+  var body: some View {
+    Section {
+      Button {
+        isLoggingOut = true
+        Task { await onLogout() }
+      } label: {
+        Label(
+          isLoggingOut ? "退出中" : "退出登录",
+          systemImage: "rectangle.portrait.and.arrow.right"
+        )
+        .font(Font.MeetPR.bodyEmphasis)
+        .frame(maxWidth: .infinity)
+      }
+      .foregroundStyle(Color.MeetPR.brandRed)
+      .disabled(isLoggingOut)
+    }
+    .listRowBackground(Color.MeetPR.brandRedSoft)
   }
 }
