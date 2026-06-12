@@ -29,6 +29,9 @@ public struct BindGateView<
   private let stash: any PendingBindCodeStoring
   private let isOnboardingComplete: @Sendable () async -> Bool
   private let onboardingProfile: @Sendable () async -> OnboardingProfile?
+  /// Pre-bind pages are outside the 5 tabs, so without this the account is
+  /// trapped (no way back to login). nil hides the affordance (demo).
+  private let onLogout: (@MainActor () async -> Void)?
   private let onboardingFlow: OnboardingFlowBuilder
   private let evaluationFlow: EvaluationFlowBuilder
   private let content: () -> MainContent
@@ -40,6 +43,7 @@ public struct BindGateView<
     evaluations: (any EvaluationRepository)? = nil,
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
     onboardingProfile: @escaping @Sendable () async -> OnboardingProfile? = { nil },
+    onLogout: (@MainActor () async -> Void)? = nil,
     @ViewBuilder onboardingFlow: @escaping OnboardingFlowBuilder,
     @ViewBuilder evaluationFlow: @escaping EvaluationFlowBuilder,
     @ViewBuilder content: @escaping () -> MainContent
@@ -49,6 +53,7 @@ public struct BindGateView<
     self.stash = stash
     self.isOnboardingComplete = isOnboardingComplete
     self.onboardingProfile = onboardingProfile
+    self.onLogout = onLogout
     self.onboardingFlow = onboardingFlow
     self.evaluationFlow = evaluationFlow
     self.content = content
@@ -87,30 +92,34 @@ public struct BindGateView<
       // accepted student lands in the 5 tabs (spec 031 risk 3).
       loadingView
     case .needsCode(let prefill, let notice):
-      EnterCodeView(
-        viewModel: EnterCodeViewModel(
-          studentId: studentId,
-          bind: bind,
-          stash: stash,
-          isOnboardingComplete: isOnboardingComplete,
-          prefillDisplayName: prefill
-        ),
-        notice: notice
-      ) { outcome in
-        await viewModel.handleSubmitted(outcome)
-      }
-      .id(EnterCodeIdentity(prefill: prefill, notice: notice))
+      withLogoutCorner(
+        EnterCodeView(
+          viewModel: EnterCodeViewModel(
+            studentId: studentId,
+            bind: bind,
+            stash: stash,
+            isOnboardingComplete: isOnboardingComplete,
+            prefillDisplayName: prefill
+          ),
+          notice: notice
+        ) { outcome in
+          await viewModel.handleSubmitted(outcome)
+        }
+        .id(EnterCodeIdentity(prefill: prefill, notice: notice))
+      )
     case .needsOnboarding(let pending):
       onboardingFlow(pending) { outcome in
         await viewModel.handleHandoff(outcome)
       }
     case .pendingAcceptance(let request):
-      PendingBindStateView(
-        request: request,
-        bind: bind,
-        onboardingProfile: onboardingProfile,
-        onCancelled: { viewModel.handleCancelled() },
-        onStateMayHaveChanged: { await viewModel.refresh() }
+      withLogoutCorner(
+        PendingBindStateView(
+          request: request,
+          bind: bind,
+          onboardingProfile: onboardingProfile,
+          onCancelled: { viewModel.handleCancelled() },
+          onStateMayHaveChanged: { await viewModel.refresh() }
+        )
       )
     case .evaluationActive(_, let evaluation):
       evaluationFlow(evaluation) {
@@ -120,7 +129,17 @@ public struct BindGateView<
     case .bound:
       content()
     case .failed:
-      failedView
+      withLogoutCorner(failedView)
+    }
+  }
+
+  /// Top-trailing 登出 on the gate-owned full screens (enter-code / pending
+  /// / failed); the wizard and evaluation flows carry their own affordance.
+  private func withLogoutCorner<Wrapped: View>(_ wrapped: Wrapped) -> some View {
+    wrapped.overlay(alignment: .topTrailing) {
+      if let onLogout {
+        GateLogoutButton(onLogout: onLogout)
+      }
     }
   }
 
@@ -158,6 +177,30 @@ public struct BindGateView<
 private struct EnterCodeIdentity: Hashable {
   let prefill: String?
   let notice: BindNotice?
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct GateLogoutButton: View {
+  let onLogout: @MainActor () async -> Void
+  @State private var isLoggingOut = false
+
+  var body: some View {
+    Button {
+      isLoggingOut = true
+      Task { await onLogout() }
+    } label: {
+      Label(
+        isLoggingOut ? "退出中" : "登出",
+        systemImage: "rectangle.portrait.and.arrow.right"
+      )
+      .font(Font.MeetPR.footnote)
+    }
+    .foregroundStyle(Color.MeetPR.fgSecondary)
+    .disabled(isLoggingOut)
+    .padding(.horizontal, MeetPRSpacing.base)
+    .padding(.top, MeetPRSpacing.sm)
+    .accessibilityLabel("退出登录")
+  }
 }
 
 /// Wraps PendingBindView with the async materials lookup (separate type so
