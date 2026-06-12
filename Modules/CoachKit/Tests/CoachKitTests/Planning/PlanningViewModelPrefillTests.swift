@@ -293,7 +293,7 @@ private func activeStudent() -> CoachStudentSummary {
   #expect(viewModel.assignmentDisplayDays == [1, 2, 3, 4, 5, 6, 7])
 
   viewModel.selectStudent(activeStudent())
-  await viewModel.loadPreferredTrainingDays(for: activeStudent().id)
+  await viewModel.loadStudentProfilePrefill(for: activeStudent().id)
 
   #expect(viewModel.assignmentDisplayDays == [1, 3, 5, 6])
   #expect(viewModel.dayLabel(5) == "DAY 3")
@@ -327,14 +327,38 @@ private func activeStudent() -> CoachStudentSummary {
   await viewModel.bootstrap()
 
   viewModel.selectStudent(activeStudent())
-  await viewModel.loadPreferredTrainingDays(for: activeStudent().id)
+  await viewModel.loadStudentProfilePrefill(for: activeStudent().id)
   #expect(viewModel.assignmentDisplayDays == [1, 3, 5, 6])
 
   // The other student has no profile in the reader → slots reset to the
   // 7-day fallback instead of keeping the first student's days (Codex).
   let other = PlanningFixtures.students()[0]
   viewModel.selectStudent(other)
-  await viewModel.loadPreferredTrainingDays(for: other.id)
+  await viewModel.loadStudentProfilePrefill(for: other.id)
 
   #expect(viewModel.assignmentDisplayDays == [1, 2, 3, 4, 5, 6, 7])
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func blankFlowLoadsOneRMAndEquipmentFromProfile() async throws {
+  // %1RM in Step 5 said 未设 1RM even though onboarding filled it (David
+  // 2026-06-12): the blank flow must load the full profile prefill, not
+  // just the DAY slots.
+  let viewModel = try PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: PlanningFixtures.store(),
+    intent: .blank,
+    profiles: InMemoryCoachStudentProfileReader(profiles: [makeProfile()])
+  )
+  await viewModel.bootstrap()
+  #expect(viewModel.prefilledOneRMs.isEmpty)
+
+  viewModel.selectStudent(activeStudent())
+  await viewModel.loadStudentProfilePrefill(for: activeStudent().id)
+
+  #expect(viewModel.prefilledOneRMs[.squat] == 180)
+  #expect(viewModel.prefilledOneRMs[.bench] == 120)
+  #expect(viewModel.prefilledOneRMs[.deadlift] == 220)
+  #expect(viewModel.prefilledEquipment == [.barbell, .dumbbell, .bodyweight, .band])
 }
