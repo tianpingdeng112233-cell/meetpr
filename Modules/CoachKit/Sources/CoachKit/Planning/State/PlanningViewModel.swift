@@ -134,17 +134,23 @@ public final class PlanningViewModel {
     [1, 2, 3, 4, 5, 6, 7]
   }
 
-  /// Step 2 display order: student-preferred days float to the top (badge +
-  /// ordering only — never auto-assigned, spec 033 D8).
+  /// Step 2 slots (David 2026-06-12, supersedes 033 D8's float-to-top):
+  /// the coach no longer picks weekdays — the student's onboarding-chosen
+  /// training days ARE the slots, shown as DAY 1..N. Without profile data
+  /// all 7 slots remain. Stale assignments on hidden slots stay visible so
+  /// they can never become un-editable ghost data.
   public var assignmentDisplayDays: [Int] {
     guard !preferredTrainingDays.isEmpty else { return sortedTrainingDays }
-    let preferred = sortedTrainingDays.filter { preferredTrainingDays.contains($0) }
-    let rest = sortedTrainingDays.filter { !preferredTrainingDays.contains($0) }
-    return preferred + rest
+    return preferredTrainingDays.union(dayAssignments.keys).sorted()
   }
 
-  public func isPreferredTrainingDay(_ dayOfWeek: Int) -> Bool {
-    preferredTrainingDays.contains(dayOfWeek)
+  /// "DAY n" — the slot's rank within the displayed training days. All
+  /// planning surfaces label days through this (no weekday wording).
+  public func dayLabel(_ dayOfWeek: Int) -> String {
+    if let rank = assignmentDisplayDays.firstIndex(of: dayOfWeek) {
+      return "DAY \(rank + 1)"
+    }
+    return "DAY \(dayOfWeek)"
   }
 
   public var sortedAssignedDays: [Int] {

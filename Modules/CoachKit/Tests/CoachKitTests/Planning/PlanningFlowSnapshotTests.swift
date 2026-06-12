@@ -51,8 +51,8 @@ import ViewInspector
   #expect(try inspected.find(text: "使用模板").string() == "使用模板")
   #expect(try inspected.find(text: "复制上周").string() == "复制上周")
   #expect(
-    try inspected.find(text: "周一·周二·周三·周四·周五·周六·周日").string()
-      == "周一·周二·周三·周四·周五·周六·周日"
+    try inspected.find(text: "每周 7 个训练日").string()
+      == "每周 7 个训练日"
   )
 }
 
@@ -69,7 +69,7 @@ import ViewInspector
   let sut = Step3SelectMainLiftsView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "周一 — 深蹲").string() == "周一 — 深蹲")
+  #expect(try inspected.find(text: "DAY 1 — 深蹲").string() == "DAY 1 — 深蹲")
   #expect(try inspected.find(text: "深蹲:").string() == "深蹲:")
   // Variant picker uses a Button + sheet pattern; the variant list itself is in
   // the sheet (not in the inline view tree). Unselected row shows "请选择".

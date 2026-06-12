@@ -11,11 +11,16 @@ import ViewInspector
   let extraDay = DraftPlanDay(id: PlanningFixtures.uuid(44), dayOfWeek: 3, sortOrder: 1)
   draft.draftDays.append(extraDay)
 
-  let sut = DayChipBar(days: draft.draftDays, currentDayID: draft.draftDays.first?.id) { _ in }
+  let sut = DayChipBar(
+    days: draft.draftDays,
+    currentDayID: draft.draftDays.first?.id,
+    dayTitle: { "DAY \($0)" },
+    onSelect: { _ in }
+  )
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "周一").string() == "周一")
-  #expect(try inspected.find(text: "周三").string() == "周三")
+  #expect(try inspected.find(text: "DAY 1").string() == "DAY 1")
+  #expect(try inspected.find(text: "DAY 3").string() == "DAY 3")
 }
 
 @MainActor
@@ -65,7 +70,7 @@ import ViewInspector
   let inspected = try sut.inspect()
 
   #expect(try inspected.find(text: "添加辅助动作").string() == "添加辅助动作")
-  #expect(try inspected.find(text: "周一").string() == "周一")
+  #expect(try inspected.find(text: "DAY 1").string() == "DAY 1")
   #expect(try inspected.find(text: "本日主项").string() == "本日主项")
   #expect(try inspected.find(text: "比赛式深蹲").string() == "比赛式深蹲")
   #expect(try inspected.find(text: "4 组 x 5 次 · 0kg").string() == "4 组 x 5 次 · 0kg")

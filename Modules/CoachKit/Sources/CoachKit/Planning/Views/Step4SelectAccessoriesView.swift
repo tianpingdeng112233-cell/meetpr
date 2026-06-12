@@ -27,12 +27,14 @@ public struct Step4SelectAccessoriesView: View {
 
         DayChipBar(
           days: viewModel.sortedDraftDays,
-          currentDayID: viewModel.currentDayID
-        ) { dayID in
-          Task {
-            await viewModel.switchToDay(dayID)
+          currentDayID: viewModel.currentDayID,
+          dayTitle: { viewModel.dayLabel($0) },
+          onSelect: { dayID in
+            Task {
+              await viewModel.switchToDay(dayID)
+            }
           }
-        }
+        )
         .padding(.horizontal, -MeetPRSpacing.base)
 
         if let selectedDayID = viewModel.currentDayID {

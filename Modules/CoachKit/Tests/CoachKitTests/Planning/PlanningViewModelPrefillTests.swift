@@ -172,7 +172,7 @@ private func activeStudent() -> CoachStudentSummary {
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func preferredDaysFloatToTopWithBadgeFlag() async throws {
+@Test func preferredDaysBecomeTheOnlySlotsLabeledByRank() async throws {
   let viewModel = try PlanningViewModel(
     repository: PlanningFixtures.repository(),
     draftStore: PlanningFixtures.store(),
@@ -180,21 +180,43 @@ private func activeStudent() -> CoachStudentSummary {
   )
   await viewModel.bootstrap()
 
-  // mon/wed/fri/sat preferred → [1,3,5,6] first, rest after.
-  #expect(viewModel.assignmentDisplayDays == [1, 3, 5, 6, 2, 4, 7])
-  #expect(viewModel.isPreferredTrainingDay(1))
-  #expect(!viewModel.isPreferredTrainingDay(2))
+  // mon/wed/fri/sat preferred → exactly four slots, labeled DAY 1..4
+  // (David 2026-06-12: coach no longer picks weekdays).
+  #expect(viewModel.assignmentDisplayDays == [1, 3, 5, 6])
+  #expect(viewModel.dayLabel(1) == "DAY 1")
+  #expect(viewModel.dayLabel(3) == "DAY 2")
+  #expect(viewModel.dayLabel(6) == "DAY 4")
   // Marks only — nothing auto-assigned (D8).
   #expect(viewModel.dayAssignments.isEmpty)
 }
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func blankFlowKeepsNaturalDayOrder() async throws {
+@Test func staleAssignmentOutsidePreferredSlotsStaysVisible() async throws {
+  let viewModel = try PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: PlanningFixtures.store(),
+    intent: .firstRegularPlan(activeStudent(), makeProfile())
+  )
+  await viewModel.bootstrap()
+
+  // A draft made before the slot change may hold an assignment on a hidden
+  // weekday — it must surface so it can be unassigned, not become ghost data.
+  viewModel.toggleAssignment(dayOfWeek: 2, liftFamily: .squat)
+
+  #expect(viewModel.assignmentDisplayDays == [1, 2, 3, 5, 6])
+  #expect(viewModel.dayLabel(2) == "DAY 2")
+  #expect(viewModel.dayLabel(3) == "DAY 3")
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func blankFlowKeepsAllSevenSlots() async throws {
   let viewModel = try PlanningFixtures.viewModel()
   await viewModel.bootstrap()
 
   #expect(viewModel.assignmentDisplayDays == [1, 2, 3, 4, 5, 6, 7])
+  #expect(viewModel.dayLabel(5) == "DAY 5")
 }
 
 @MainActor

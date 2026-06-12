@@ -7,15 +7,18 @@ import SwiftUI
 public struct DayChipBar: View {
   private let days: [DraftPlanDay]
   private let currentDayID: UUID?
+  private let dayTitle: @MainActor (Int) -> String
   private let onSelect: @MainActor (UUID) -> Void
 
   public init(
     days: [DraftPlanDay],
     currentDayID: UUID?,
+    dayTitle: @escaping @MainActor (Int) -> String,
     onSelect: @escaping @MainActor (UUID) -> Void
   ) {
     self.days = days
     self.currentDayID = currentDayID
+    self.dayTitle = dayTitle
     self.onSelect = onSelect
   }
 
@@ -24,7 +27,7 @@ public struct DayChipBar: View {
       HStack(spacing: MeetPRSpacing.sm) {
         ForEach(days, id: \.id) { day in
           DayChip(
-            title: PlanningDisplay.weekdayName(day.dayOfWeek),
+            title: dayTitle(day.dayOfWeek),
             isSelected: day.id == currentDayID
           ) {
             onSelect(day.id)

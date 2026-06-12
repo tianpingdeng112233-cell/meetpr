@@ -74,7 +74,7 @@ private struct MainLiftDaySection: View {
     let liftNames = viewModel.sortedLiftFamilies(in: dayOfWeek)
       .map(PlanningDisplay.liftName)
       .joined(separator: " + ")
-    return "\(PlanningDisplay.weekdayName(dayOfWeek)) — \(liftNames)"
+    return "\(viewModel.dayLabel(dayOfWeek)) — \(liftNames)"
   }
 }
 
