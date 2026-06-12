@@ -49,18 +49,20 @@ public final class PlanningViewModel {
   @ObservationIgnored private var intensityValueMemo: [UUID: [IntensityMode: Decimal]] = [:]
   @ObservationIgnored let intent: PlanningIntent
   /// Onboarding 1RM conversion bases (spec 033 §9): consumed by
-  /// `oneRM(for:)`; empty outside the firstRegularPlan intent.
-  @ObservationIgnored private(set) var prefilledOneRMs: [LiftFamily: Decimal] = [:]
+  /// `oneRM(for:)`. Observed — the blank/adaptation entries load it
+  /// asynchronously and Step 5's %1RM affordance must unlock when it lands
+  /// (David 2026-06-12: onboarding 1RM is filled, planning must see it).
+  private(set) var prefilledOneRMs: [LiftFamily: Decimal] = [:]
   /// Student-preferred weekday ints for Step 2 badge + ordering. Marks only —
   /// assignment stays the coach's call (spec 033 D8).
   /// Observed (not @ObservationIgnored): the blank/adaptation entries load
   /// this asynchronously after Step 2 may already be on screen — the slot
   /// cards must re-render when it lands (Codex review).
   private(set) var preferredTrainingDays: Set<Int> = []
-  /// Which student the loaded days belong to — re-picking a different
-  /// student in Step 0 must reload instead of keeping the first student's
-  /// days sticky (Codex review).
-  @ObservationIgnored private var preferredDaysStudentID: UUID?
+  /// Which student the loaded profile prefill (days + 1RMs + equipment)
+  /// belongs to — re-picking a different student in Step 0 must reload
+  /// instead of keeping the first student's data sticky (Codex review).
+  @ObservationIgnored private var profilePrefillStudentID: UUID?
   /// Profile reader for the blank / adaptation entries, where the intent
   /// carries no prefill — Step 2's DAY slots come from the selected
   /// student's training days (David 2026-06-12). nil keeps the 7-slot
@@ -85,7 +87,7 @@ public final class PlanningViewModel {
     if let profile = intent.prefillProfile {
       prefilledOneRMs = PlanningPrefill.oneRMs(from: profile)
       preferredTrainingDays = PlanningPrefill.preferredDays(from: profile.trainingDays)
-      preferredDaysStudentID = intent.presetStudent?.id
+      profilePrefillStudentID = intent.presetStudent?.id
       prefilledEquipment = PlanningPrefill.equipmentFilter(from: profile)
     }
   }
@@ -214,9 +216,10 @@ public final class PlanningViewModel {
         try resumeMostRecentDraft()
       }
       // Adaptation-week intent and draft resume carry a student but no
-      // prefill profile — the DAY slots still need their training days.
+      // prefill profile — the DAY slots / 1RM bases / equipment filter
+      // still need the student's onboarding data.
       if let selectedStudent {
-        await loadPreferredTrainingDays(for: selectedStudent.id)
+        await loadStudentProfilePrefill(for: selectedStudent.id)
       }
       if currentStep == .selectAccessories, let currentDayID {
         await switchToDay(currentDayID)
@@ -248,24 +251,29 @@ public final class PlanningViewModel {
     if planKind == .adaptation, planWeeks == 4 {
       planWeeks = 1
     }
-    if preferredDaysStudentID != student.id {
-      // Re-picking a different student: drop the old slots immediately
-      // (7-slot fallback) rather than showing the previous student's days.
+    if profilePrefillStudentID != student.id {
+      // Re-picking a different student: drop the old profile data
+      // immediately rather than showing the previous student's.
       preferredTrainingDays = []
-      preferredDaysStudentID = nil
-      Task { await loadPreferredTrainingDays(for: student.id) }
+      prefilledOneRMs = [:]
+      prefilledEquipment = nil
+      profilePrefillStudentID = nil
+      Task { await loadStudentProfilePrefill(for: student.id) }
     }
   }
 
-  /// Blank / adaptation entries carry no prefill profile, so the slots load
-  /// here. A fetch failure (or no profile) keeps the 7-slot fallback.
-  public func loadPreferredTrainingDays(for studentID: UUID) async {
-    guard preferredDaysStudentID != studentID, let profiles else { return }
+  /// Blank / adaptation entries carry no prefill profile, so the student's
+  /// onboarding data (DAY slots, 1RM bases, equipment filter) loads here.
+  /// A fetch failure (or no profile) keeps the unfilled fallbacks.
+  public func loadStudentProfilePrefill(for studentID: UUID) async {
+    guard profilePrefillStudentID != studentID, let profiles else { return }
     guard let profile = try? await profiles.fetchProfile(studentId: studentID) else { return }
     // Drop a stale in-flight result if the coach re-picked meanwhile.
     guard selectedStudent?.id == studentID else { return }
     preferredTrainingDays = PlanningPrefill.preferredDays(from: profile.trainingDays)
-    preferredDaysStudentID = studentID
+    prefilledOneRMs = PlanningPrefill.oneRMs(from: profile)
+    prefilledEquipment = PlanningPrefill.equipmentFilter(from: profile)
+    profilePrefillStudentID = studentID
   }
 
   public func selectDuration(_ weeks: Int) {
