@@ -1,4 +1,5 @@
 import DesignSystem
+import RepositoryContracts
 import SwiftUI
 
 @MainActor
@@ -10,13 +11,15 @@ public struct PlanningCoordinatorView: View {
   public init(
     repository: any PlanRepository,
     draftStore: DraftStore,
-    intent: PlanningIntent = .blank
+    intent: PlanningIntent = .blank,
+    profiles: (any OnboardingProfileReading)? = nil
   ) {
     _viewModel = State(
       initialValue: PlanningViewModel(
         repository: repository,
         draftStore: draftStore,
-        intent: intent
+        intent: intent,
+        profiles: profiles
       )
     )
   }

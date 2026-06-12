@@ -255,7 +255,8 @@ private struct AdaptationPlanningPresenter: ViewModifier {
     PlanningCoordinatorView(
       repository: context.planning,
       draftStore: context.draftStore,
-      intent: .adaptationWeek(student)
+      intent: .adaptationWeek(student),
+      profiles: context.profiles
     )
   }
 }

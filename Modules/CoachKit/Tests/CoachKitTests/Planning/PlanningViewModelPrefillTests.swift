@@ -277,3 +277,64 @@ private func activeStudent() -> CoachStudentSummary {
 
   #expect(viewModel.oneRM(for: draftExercise) == nil)
 }
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func blankFlowLoadsSlotsFromSelectedStudentProfile() async throws {
+  // 排新计划 entry: no prefill intent — the slots load when the coach picks
+  // the student in Step 0 (David 2026-06-12).
+  let viewModel = try PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: PlanningFixtures.store(),
+    intent: .blank,
+    profiles: InMemoryCoachStudentProfileReader(profiles: [makeProfile()])
+  )
+  await viewModel.bootstrap()
+  #expect(viewModel.assignmentDisplayDays == [1, 2, 3, 4, 5, 6, 7])
+
+  viewModel.selectStudent(activeStudent())
+  await viewModel.loadPreferredTrainingDays(for: activeStudent().id)
+
+  #expect(viewModel.assignmentDisplayDays == [1, 3, 5, 6])
+  #expect(viewModel.dayLabel(5) == "DAY 3")
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func adaptationIntentLoadsSlotsOnBootstrap() async throws {
+  // .adaptationWeek carries the student but no prefill profile — bootstrap
+  // must still resolve the DAY slots.
+  let viewModel = try PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: PlanningFixtures.store(),
+    intent: .adaptationWeek(activeStudent()),
+    profiles: InMemoryCoachStudentProfileReader(profiles: [makeProfile()])
+  )
+  await viewModel.bootstrap()
+
+  #expect(viewModel.assignmentDisplayDays == [1, 3, 5, 6])
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func repickingAnotherStudentDropsPreviousStudentSlots() async throws {
+  let viewModel = try PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: PlanningFixtures.store(),
+    intent: .blank,
+    profiles: InMemoryCoachStudentProfileReader(profiles: [makeProfile()])
+  )
+  await viewModel.bootstrap()
+
+  viewModel.selectStudent(activeStudent())
+  await viewModel.loadPreferredTrainingDays(for: activeStudent().id)
+  #expect(viewModel.assignmentDisplayDays == [1, 3, 5, 6])
+
+  // The other student has no profile in the reader → slots reset to the
+  // 7-day fallback instead of keeping the first student's days (Codex).
+  let other = PlanningFixtures.students()[0]
+  viewModel.selectStudent(other)
+  await viewModel.loadPreferredTrainingDays(for: other.id)
+
+  #expect(viewModel.assignmentDisplayDays == [1, 2, 3, 4, 5, 6, 7])
+}
