@@ -42,10 +42,14 @@ struct Step1BasicsSection: View {
     }
     .onAppear {
       syncTexts()
-      // Wheel default 2000-01-01 (wiki v2.4): the visible default counts as
-      // the selection.
+      // Visible defaults count as the selection (wiki v2.4): the wheel
+      // shows 2000-01-01 and the segmented control shows 公斤·厘米, so
+      // both must land in the draft or step 1 never unlocks 下一步.
       if draft.birthDate == nil {
         draft.birthDate = "2000-01-01"
+      }
+      if draft.unitPreference == nil {
+        draft.unitPreference = .kg
       }
     }
   }
