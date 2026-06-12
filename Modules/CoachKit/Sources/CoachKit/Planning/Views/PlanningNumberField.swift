@@ -12,8 +12,11 @@ struct PlanningNumberField: View {
   let unitLabel: String?
   let formatStyle: FloatingPointFormatStyle<Double>
 
+  let weightPanelTitle: String?
+
   @State private var textInput: String
   @FocusState private var isFocused: Bool
+  @State private var showWeightPanel = false
 
   init(
     value: Binding<Double>,
@@ -21,6 +24,7 @@ struct PlanningNumberField: View {
     step: Double,
     decimalIncrement: Decimal,
     unitLabel: String? = nil,
+    weightPanelTitle: String? = nil,
     formatStyle: FloatingPointFormatStyle<Double> = .number.precision(.fractionLength(0...1))
   ) {
     self._value = value
@@ -28,6 +32,7 @@ struct PlanningNumberField: View {
     self.step = step
     self.decimalIncrement = decimalIncrement
     self.unitLabel = unitLabel
+    self.weightPanelTitle = weightPanelTitle
     self.formatStyle = formatStyle
     self._textInput = State(initialValue: value.wrappedValue.formatted(formatStyle))
   }
@@ -68,6 +73,26 @@ struct PlanningNumberField: View {
         Text(unitLabel)
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
+
+      // 弹出重量面板入口 (David 2026-06-12): weight dimensions only — the
+      // caller decides via weightPanelTitle.
+      if let weightPanelTitle {
+        stepButton(systemName: "plus.forwardslash.minus", accessibilityLabel: "打开重量面板") {
+          showWeightPanel = true
+        }
+        .sheet(isPresented: $showWeightPanel) {
+          WeightEntryPanel(
+            title: weightPanelTitle,
+            initialValue: Decimal(value)
+          ) { kilograms in
+            let rounded = kilograms.roundedToPlanningIncrement(decimalIncrement)
+              .planningDoubleValue
+            value = min(max(rounded, range.lowerBound), range.upperBound)
+            textInput = formattedDisplay(value)
+          }
+          .presentationDetents([.fraction(0.75), .large])
+        }
       }
     }
     .onChange(of: value) { _, newValue in
