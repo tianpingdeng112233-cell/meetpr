@@ -75,10 +75,14 @@ public struct CoachRootView: View {
 
   public var body: some View {
     TabView {
-      CoachPlanningHomeView(repository: repository, draftStore: draftStore)
-        .tabItem {
-          Label("排计划", systemImage: "calendar.badge.plus")
-        }
+      CoachPlanningHomeView(
+        repository: repository,
+        draftStore: draftStore,
+        profiles: detailContext.profiles
+      )
+      .tabItem {
+        Label("排计划", systemImage: "calendar.badge.plus")
+      }
 
       StudentRosterView(
         viewModel: rosterViewModel,
@@ -108,6 +112,7 @@ public struct CoachRootView: View {
 private struct CoachPlanningHomeView: View {
   let repository: any PlanRepository
   let draftStore: DraftStore
+  let profiles: any OnboardingProfileReading
   @State private var showPlanning = false
 
   var body: some View {
@@ -130,14 +135,16 @@ private struct CoachPlanningHomeView: View {
       .fullScreenCover(isPresented: $showPlanning) {
         PlanningCoordinatorView(
           repository: repository,
-          draftStore: draftStore
+          draftStore: draftStore,
+          profiles: profiles
         )
       }
     #else
       .sheet(isPresented: $showPlanning) {
         PlanningCoordinatorView(
           repository: repository,
-          draftStore: draftStore
+          draftStore: draftStore,
+          profiles: profiles
         )
       }
     #endif

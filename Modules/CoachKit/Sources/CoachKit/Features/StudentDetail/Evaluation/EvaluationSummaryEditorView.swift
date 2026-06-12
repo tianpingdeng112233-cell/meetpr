@@ -58,7 +58,8 @@ struct EvaluationSummaryEditorView: View {
         PlanningCoordinatorView(
           repository: context.planning,
           draftStore: context.draftStore,
-          intent: box.intent
+          intent: box.intent,
+          profiles: context.profiles
         )
       }
     #else
@@ -66,7 +67,8 @@ struct EvaluationSummaryEditorView: View {
         PlanningCoordinatorView(
           repository: context.planning,
           draftStore: context.draftStore,
-          intent: box.intent
+          intent: box.intent,
+          profiles: context.profiles
         )
       }
     #endif

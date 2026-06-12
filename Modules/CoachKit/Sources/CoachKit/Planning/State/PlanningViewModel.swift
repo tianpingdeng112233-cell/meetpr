@@ -3,6 +3,7 @@ import CoreModels
 import Foundation
 import OSLog
 import Observation
+import RepositoryContracts
 
 // swiftlint:enable sorted_imports
 
@@ -52,7 +53,19 @@ public final class PlanningViewModel {
   @ObservationIgnored private(set) var prefilledOneRMs: [LiftFamily: Decimal] = [:]
   /// Student-preferred weekday ints for Step 2 badge + ordering. Marks only —
   /// assignment stays the coach's call (spec 033 D8).
-  @ObservationIgnored private(set) var preferredTrainingDays: Set<Int> = []
+  /// Observed (not @ObservationIgnored): the blank/adaptation entries load
+  /// this asynchronously after Step 2 may already be on screen — the slot
+  /// cards must re-render when it lands (Codex review).
+  private(set) var preferredTrainingDays: Set<Int> = []
+  /// Which student the loaded days belong to — re-picking a different
+  /// student in Step 0 must reload instead of keeping the first student's
+  /// days sticky (Codex review).
+  @ObservationIgnored private var preferredDaysStudentID: UUID?
+  /// Profile reader for the blank / adaptation entries, where the intent
+  /// carries no prefill — Step 2's DAY slots come from the selected
+  /// student's training days (David 2026-06-12). nil keeps the 7-slot
+  /// fallback (demo / previews).
+  @ObservationIgnored private let profiles: (any OnboardingProfileReading)?
   /// Initial Step 4 equipment filter derived from gym_tier +
   /// equipment_overrides; nil = full catalog.
   @ObservationIgnored private(set) var prefilledEquipment: Set<Equipment>?
@@ -61,15 +74,18 @@ public final class PlanningViewModel {
     repository: any PlanRepository,
     draftStore: DraftStore,
     usageTracker: ExerciseUsageTracker = ExerciseUsageTracker(),
-    intent: PlanningIntent = .blank
+    intent: PlanningIntent = .blank,
+    profiles: (any OnboardingProfileReading)? = nil
   ) {
     self.repository = repository
     self.draftStore = draftStore
     self.usageTracker = usageTracker
     self.intent = intent
+    self.profiles = profiles
     if let profile = intent.prefillProfile {
       prefilledOneRMs = PlanningPrefill.oneRMs(from: profile)
       preferredTrainingDays = PlanningPrefill.preferredDays(from: profile.trainingDays)
+      preferredDaysStudentID = intent.presetStudent?.id
       prefilledEquipment = PlanningPrefill.equipmentFilter(from: profile)
     }
   }
@@ -197,6 +213,11 @@ public final class PlanningViewModel {
       } else {
         try resumeMostRecentDraft()
       }
+      // Adaptation-week intent and draft resume carry a student but no
+      // prefill profile — the DAY slots still need their training days.
+      if let selectedStudent {
+        await loadPreferredTrainingDays(for: selectedStudent.id)
+      }
       if currentStep == .selectAccessories, let currentDayID {
         await switchToDay(currentDayID)
       }
@@ -227,6 +248,24 @@ public final class PlanningViewModel {
     if planKind == .adaptation, planWeeks == 4 {
       planWeeks = 1
     }
+    if preferredDaysStudentID != student.id {
+      // Re-picking a different student: drop the old slots immediately
+      // (7-slot fallback) rather than showing the previous student's days.
+      preferredTrainingDays = []
+      preferredDaysStudentID = nil
+      Task { await loadPreferredTrainingDays(for: student.id) }
+    }
+  }
+
+  /// Blank / adaptation entries carry no prefill profile, so the slots load
+  /// here. A fetch failure (or no profile) keeps the 7-slot fallback.
+  public func loadPreferredTrainingDays(for studentID: UUID) async {
+    guard preferredDaysStudentID != studentID, let profiles else { return }
+    guard let profile = try? await profiles.fetchProfile(studentId: studentID) else { return }
+    // Drop a stale in-flight result if the coach re-picked meanwhile.
+    guard selectedStudent?.id == studentID else { return }
+    preferredTrainingDays = PlanningPrefill.preferredDays(from: profile.trainingDays)
+    preferredDaysStudentID = studentID
   }
 
   public func selectDuration(_ weeks: Int) {
