@@ -55,6 +55,7 @@ public struct ExerciseSetEditorCard: View {
           WeightInputField(
             value: targetValue,
             oneRM: viewModel.oneRM(for: draftExercise),
+            bases: viewModel.weightEntryBases(for: draftExercise),
             onChange: { value in
               targetValue = value
               persist()

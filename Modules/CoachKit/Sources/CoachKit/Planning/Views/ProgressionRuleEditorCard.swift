@@ -168,7 +168,8 @@ extension ProgressionRuleEditorCard {
         range: 0...100,
         step: incrementStep,
         decimalIncrement: incrementDecimalStep,
-        unitLabel: incrementUnitLabel
+        unitLabel: incrementUnitLabel,
+        weightPanelTitle: incrementUnitLabel == "kg" ? "每周增减量" : nil
       )
     }
   }
@@ -194,7 +195,8 @@ extension ProgressionRuleEditorCard {
             range: 0...300,
             step: customStep,
             decimalIncrement: customDecimalStep,
-            unitLabel: customUnitLabel
+            unitLabel: customUnitLabel,
+            weightPanelTitle: customUnitLabel == "kg" ? "W\(week) 值" : nil
           )
         }
       }

@@ -6,17 +6,21 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct WeightInputField: View {
   private let oneRM: Decimal?
+  private let bases: [WeightEntryBase]
   private let onChange: @MainActor (Decimal) -> Void
 
   @State private var inputUnit: WeightInputUnit
   @State private var inputValue: Double
+  @State private var showPanel = false
 
   public init(
     value: Decimal,
     oneRM: Decimal?,
+    bases: [WeightEntryBase] = [],
     onChange: @escaping @MainActor (Decimal) -> Void
   ) {
     self.oneRM = oneRM
+    self.bases = bases
     self.onChange = onChange
     self._inputUnit = State(initialValue: .kg)
     self._inputValue = State(initialValue: value.planningDoubleValue)
@@ -34,20 +38,40 @@ public struct WeightInputField: View {
         convertInput(from: oldValue, to: newValue)
       }
 
-      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
-        TextField(inputUnit.title, value: $inputValue, format: .number)
-          .planningDecimalKeyboard()
+      // Tap-to-edit (David 2026-06-12, B 形态): the value opens the weight
+      // panel instead of the system keyboard.
+      Button {
+        showPanel = true
+      } label: {
+        HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
+          Text(
+            Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half)
+              .planningFormatted()
+          )
           .monospacedDigit()
+          .font(Font.MeetPR.body)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .frame(maxWidth: .infinity, alignment: .leading)
           .padding(MeetPRSpacing.sm)
           .background(Color.MeetPR.surface2)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
-          .onChange(of: inputValue) { _, _ in
-            publishValue()
-          }
 
-        Text(inputUnit.title)
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          Text(inputUnit.title)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel("编辑重量")
+      .sheet(isPresented: $showPanel) {
+        WeightEntryPanel(
+          title: "目标重量",
+          initialValue: currentKgValue,
+          bases: bases
+        ) { kilograms in
+          applyPanelValue(kilograms)
+        }
+        .presentationDetents([.fraction(0.75), .large])
       }
 
       if inputUnit == .percent, let oneRM {
@@ -58,6 +82,37 @@ public struct WeightInputField: View {
         Eyebrow("未设 1RM，无法换算 %1RM", color: Color.MeetPR.fgTertiary, showsRule: false)
       }
     }
+  }
+
+  /// The panel always edits kg; mirror the current display unit on commit.
+  private var currentKgValue: Decimal {
+    switch inputUnit {
+    case .kg:
+      Decimal.planningRounded(inputValue, increment: PlanningDecimalStep.half)
+    case .percent:
+      oneRM.map { Self.percentToKg(inputValue, oneRM: $0) } ?? 0
+    }
+  }
+
+  private func applyPanelValue(_ kilograms: Decimal) {
+    // Publish the entered kg verbatim — the %-mode conversion below is
+    // display-only, otherwise the kg→%→kg round-trip's double rounding
+    // drifts the persisted weight (Codex review).
+    let rounded = kilograms.roundedToPlanningIncrement(PlanningDecimalStep.half)
+    switch inputUnit {
+    case .kg:
+      inputValue = rounded.planningDoubleValue
+    case .percent:
+      guard let oneRM, oneRM > 0 else {
+        inputUnit = .kg
+        inputValue = rounded.planningDoubleValue
+        break
+      }
+      inputValue =
+        Self.kgToPercent(rounded.planningDoubleValue, oneRM: oneRM)
+        .planningDoubleValue
+    }
+    onChange(rounded)
   }
 
   private func convertInput(from oldUnit: WeightInputUnit, to newUnit: WeightInputUnit) {
@@ -119,16 +174,5 @@ private enum WeightInputUnit: Hashable {
     case .percent:
       "%1RM"
     }
-  }
-}
-
-extension View {
-  @ViewBuilder
-  fileprivate func planningDecimalKeyboard() -> some View {
-    #if os(iOS)
-      keyboardType(.decimalPad)
-    #else
-      self
-    #endif
   }
 }

@@ -3,6 +3,8 @@ import Foundation
 enum PlanningDecimalStep {
   static let half = Decimal(5) / Decimal(10)
   static let whole = Decimal(1)
+  /// Plate-realistic grid for %-of-base results (smallest pair = 1.25kg×2).
+  static let plate = Decimal(25) / Decimal(10)
 }
 
 extension Decimal {

@@ -500,6 +500,46 @@ public final class PlanningViewModel {
     return prefilledOneRMs[family]
   }
 
+  /// Percentage bases for the weight panel (David 2026-06-12): the
+  /// student's 1RM for this family, plus every OTHER same-day main lift's
+  /// target weight — 变式/回组按主项 top 组重量算 %. RPE-mode and zero
+  /// weights are skipped (nothing to compute from).
+  public func weightEntryBases(for draftExercise: DraftPlanExercise) -> [WeightEntryBase] {
+    var bases: [WeightEntryBase] = []
+    let family = catalogExercise(for: draftExercise)?.mainLiftFamily
+    if let oneRM = oneRM(for: draftExercise), let family {
+      bases.append(
+        WeightEntryBase(
+          id: "onerm-\(family.rawValue)",
+          label: "1RM·\(PlanningDisplay.liftName(family))",
+          amount: oneRM
+        )
+      )
+    }
+    guard
+      let day = draftPlan?.draftDays.first(where: { day in
+        day.draftExercises.contains { $0.id == draftExercise.id }
+      })
+    else { return bases }
+
+    for exercise in day.draftExercises
+    where exercise.id != draftExercise.id && exercise.isMainLift {
+      guard
+        let spec = setSpec(for: exercise.id),
+        spec.intensityMode == .weight,
+        spec.targetValue > 0
+      else { continue }
+      bases.append(
+        WeightEntryBase(
+          id: "main-\(exercise.id.uuidString)",
+          label: "主项·\(exerciseName(for: exercise))",
+          amount: spec.targetValue
+        )
+      )
+    }
+    return bases
+  }
+
   public func defaultSetSpec(for draftExercise: DraftPlanExercise) -> DraftSetSpec {
     DraftSetSpec(
       setCount: draftExercise.isMainLift ? 4 : 3,
