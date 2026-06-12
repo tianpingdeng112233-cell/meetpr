@@ -102,7 +102,6 @@ struct OnboardingWizardView: View {
       }
     }
     .interactiveDismissDisabled()
-    .preferredColorScheme(.dark)
   }
 
   @ViewBuilder

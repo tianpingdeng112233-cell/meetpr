@@ -140,7 +140,6 @@ public struct StudentRootView: View {
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
     }
     .tint(Color.MeetPR.brandRed)
-    .preferredColorScheme(.dark)
   }
 }
 

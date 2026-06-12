@@ -95,7 +95,6 @@ public struct EvaluationPeriodView: View {
       guard newPhase == .active else { return }
       Task { await viewModel.refresh() }
     }
-    .preferredColorScheme(.dark)
   }
 
   @ViewBuilder
