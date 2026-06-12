@@ -2,9 +2,9 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
-/// A percentage base offered by the weight panel: the student's 1RM or a
-/// same-day main lift's target weight (变式/回组按主项 top 组算,
-/// David 2026-06-12).
+/// A reference value offered by the weight panel: the student's 1RM or a
+/// same-day main lift's target weight (变式/回组常按主项 top 组算,
+/// David 2026-06-12). Tapping a chip drops the value into the expression.
 public struct WeightEntryBase: Identifiable, Equatable, Sendable {
   public let id: String
   public let label: String
@@ -17,57 +17,8 @@ public struct WeightEntryBase: Identifiable, Equatable, Sendable {
   }
 }
 
-/// Editing state for the panel, kept off the view so the pad/stepper/percent
-/// rules test in isolation. Values are kg on a 0.5 grid; %-of-base results
-/// land on the plate-realistic 2.5 grid.
-struct WeightEntryDraft: Equatable {
-  private(set) var text: String
-
-  init(initialValue: Decimal) {
-    text = initialValue > 0 ? initialValue.planningFormatted() : ""
-  }
-
-  var displayText: String { text.isEmpty ? "0" : text }
-
-  var value: Decimal {
-    Decimal(string: text, locale: Locale(identifier: "en_US_POSIX")) ?? 0
-  }
-
-  mutating func tapDigit(_ digit: Int) {
-    guard (0...9).contains(digit) else { return }
-    // One decimal place max — planning weights live on a 0.5 grid.
-    if let dotIndex = text.firstIndex(of: "."), text.index(after: dotIndex) < text.endIndex {
-      return
-    }
-    if text == "0" { text = "" }
-    guard text.count < 6 else { return }
-    text.append(String(digit))
-  }
-
-  mutating func tapDot() {
-    guard !text.contains(".") else { return }
-    text = text.isEmpty ? "0." : text + "."
-  }
-
-  mutating func tapBackspace() {
-    guard !text.isEmpty else { return }
-    text.removeLast()
-  }
-
-  mutating func step(by delta: Decimal) {
-    let next = max(0, value + delta)
-    text = next.roundedToPlanningIncrement(PlanningDecimalStep.half).planningFormatted()
-  }
-
-  mutating func apply(percent: Int, of base: Decimal) {
-    guard base > 0, percent > 0 else { return }
-    let raw = base * Decimal(percent) / 100
-    text = raw.roundedToPlanningIncrement(PlanningDecimalStep.plate).planningFormatted()
-  }
-}
-
-/// 自绘重量输入面板(David 2026-06-12,B 形态):大号数字键 + ±2.5/±5 步进
-/// + 按基数 % 换算。纯 UI——基数(1RM / 同日主项)由调用方传入。
+/// 自绘重量计算器面板(David 2026-06-12):数字键 + 加减乘除 + ±2.5/±5
+/// 步进 + 基数(1RM / 同日主项)插入与 % 快捷键。纯 UI——基数由调用方传入。
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 public struct WeightEntryPanel: View {
@@ -108,16 +59,24 @@ public struct WeightEntryPanel: View {
     VStack(spacing: MeetPRSpacing.base) {
       Eyebrow(title)
 
-      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
-        Text(draft.displayText)
-          .font(.system(size: 44, weight: .semibold, design: .rounded))
+      VStack(spacing: MeetPRSpacing.xs) {
+        Text(draft.expressionText.isEmpty ? " " : draft.expressionText)
+          .font(Font.MeetPR.footnote)
           .monospacedDigit()
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("kg")
-          .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+
+        HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
+          Text(draft.displayText)
+            .font(.system(size: 44, weight: .semibold, design: .rounded))
+            .monospacedDigit()
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Text("kg")
+            .font(Font.MeetPR.headline)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
       }
       .frame(maxWidth: .infinity)
+      .accessibilityElement(children: .combine)
       .accessibilityLabel("当前重量 \(draft.displayText) kg")
 
       if !bases.isEmpty {
@@ -145,7 +104,10 @@ public struct WeightEntryPanel: View {
               title: "\(base.label) \(base.amount.planningFormatted())kg",
               isSelected: selectedBaseID == base.id
             ) {
-              selectedBaseID = selectedBaseID == base.id ? nil : base.id
+              // Tap = drop the value into the expression (so 185 × 0.85
+              // style math works) and aim the % quick keys at it.
+              selectedBaseID = base.id
+              draft.insert(amount: base.amount)
             }
           }
         }
@@ -190,20 +152,47 @@ public struct WeightEntryPanel: View {
 
   private var padGrid: some View {
     Grid(horizontalSpacing: MeetPRSpacing.sm, verticalSpacing: MeetPRSpacing.sm) {
-      ForEach([[1, 2, 3], [4, 5, 6], [7, 8, 9]], id: \.self) { row in
-        GridRow {
-          ForEach(row, id: \.self) { digit in
-            padButton("\(digit)") { draft.tapDigit(digit) }
-          }
-        }
+      GridRow {
+        padButton("7") { draft.tapDigit(7) }
+        padButton("8") { draft.tapDigit(8) }
+        padButton("9") { draft.tapDigit(9) }
+        operationButton(.divide)
+      }
+      GridRow {
+        padButton("4") { draft.tapDigit(4) }
+        padButton("5") { draft.tapDigit(5) }
+        padButton("6") { draft.tapDigit(6) }
+        operationButton(.multiply)
+      }
+      GridRow {
+        padButton("1") { draft.tapDigit(1) }
+        padButton("2") { draft.tapDigit(2) }
+        padButton("3") { draft.tapDigit(3) }
+        operationButton(.subtract)
       }
       GridRow {
         padButton(".") { draft.tapDot() }
         padButton("0") { draft.tapDigit(0) }
         padButton("⌫") { draft.tapBackspace() }
           .accessibilityLabel("删除")
+        operationButton(.add)
       }
     }
+  }
+
+  private func operationButton(_ operation: WeightEntryDraft.Operation) -> some View {
+    Button {
+      draft.tapOperation(operation)
+    } label: {
+      Text(operation.rawValue)
+        .font(Font.MeetPR.title2)
+        .frame(maxWidth: .infinity, minHeight: 52)
+    }
+    .buttonStyle(.plain)
+    .foregroundStyle(Color.MeetPR.brandRed)
+    .background(Color.MeetPR.brandRedSoft)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+    .accessibilityLabel("运算 \(operation.rawValue)")
   }
 
   private func padButton(_ label: String, action: @escaping @MainActor () -> Void) -> some View {

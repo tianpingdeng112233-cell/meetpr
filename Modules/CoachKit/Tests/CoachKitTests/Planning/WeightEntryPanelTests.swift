@@ -4,7 +4,7 @@ import Testing
 
 @testable import CoachKit
 
-// MARK: - WeightEntryDraft pad/stepper/percent state machine
+// MARK: - WeightEntryDraft calculator state machine
 
 @available(iOS 17.0, macOS 14.0, *)
 @Test func draftStartsEmptyForZeroAndFormattedOtherwise() {
@@ -13,7 +13,78 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func padDigitsAppendWithSingleDecimalPlace() {
+@Test func operationsEvaluateWithMultiplicationPrecedence() {
+  // 2 + 3 × 4 = 14, not 20.
+  var draft = WeightEntryDraft(initialValue: 0)
+  draft.tapDigit(2)
+  draft.tapOperation(.add)
+  draft.tapDigit(3)
+  draft.tapOperation(.multiply)
+  draft.tapDigit(4)
+  #expect(draft.value == 14)
+  #expect(draft.expressionText == "2 + 3 × 4")
+  #expect(draft.displayText == "14")
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func percentStyleMathViaMultiply() {
+  // The David case: 185 × 0.85 = 157.25 (raw — commit rounding is the
+  // caller's business).
+  var draft = WeightEntryDraft(initialValue: 185)
+  draft.tapOperation(.multiply)
+  draft.tapDigit(0)
+  draft.tapDot()
+  draft.tapDigit(8)
+  draft.tapDigit(5)
+  #expect(draft.value == Decimal(157.25))
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func trailingAndRepeatedOperatorsAreForgiving() {
+  var draft = WeightEntryDraft(initialValue: 100)
+  draft.tapOperation(.add)
+  // Trailing operator: result is still the left side.
+  #expect(draft.value == 100)
+  // Re-picking the operator replaces it.
+  draft.tapOperation(.subtract)
+  draft.tapDigit(5)
+  #expect(draft.value == 95)
+  // Backspacing the operand then the operator restores the single number.
+  draft.tapBackspace()
+  draft.tapBackspace()
+  #expect(draft.value == 100)
+  #expect(draft.expressionText.isEmpty)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func divideByZeroShowsPlaceholderAndCommitsZero() {
+  var draft = WeightEntryDraft(initialValue: 100)
+  draft.tapOperation(.divide)
+  draft.tapDigit(0)
+  #expect(draft.displayText == "—")
+  #expect(draft.value == 0)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func insertingBaseReplacesCurrentOperand() {
+  var draft = WeightEntryDraft(initialValue: 0)
+  draft.insert(amount: 185)
+  draft.tapOperation(.multiply)
+  draft.tapDigit(0)
+  draft.tapDot()
+  draft.tapDigit(9)
+  #expect(draft.value == Decimal(166.5))
+
+  // Inserting mid-expression replaces only the in-progress operand.
+  var second = WeightEntryDraft(initialValue: 100)
+  second.tapOperation(.subtract)
+  second.tapDigit(7)
+  second.insert(amount: 20)
+  #expect(second.value == 80)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func padDigitsAppendWithTwoDecimalPlaces() {
   var draft = WeightEntryDraft(initialValue: 0)
   draft.tapDigit(1)
   draft.tapDigit(4)
@@ -22,11 +93,15 @@ import Testing
   draft.tapDigit(5)
   #expect(draft.value == Decimal(142.5))
 
-  // Second decimal digit and second dot are ignored.
+  // A second decimal digit is allowed (×0.85-style multipliers); the
+  // third — and a second dot — are ignored.
   draft.tapDigit(7)
+  #expect(draft.displayText == "142.57")
+  draft.tapDigit(9)
   draft.tapDot()
-  #expect(draft.displayText == "142.5")
+  #expect(draft.displayText == "142.57")
 
+  draft.tapBackspace()
   draft.tapBackspace()
   draft.tapBackspace()
   #expect(draft.value == 142)
