@@ -13,31 +13,6 @@ enum PlanningDisplay {
     }
   }
 
-  static func weekdayName(_ dayOfWeek: Int) -> String {
-    switch dayOfWeek {
-    case 1:
-      "周一"
-    case 2:
-      "周二"
-    case 3:
-      "周三"
-    case 4:
-      "周四"
-    case 5:
-      "周五"
-    case 6:
-      "周六"
-    case 7:
-      "周日"
-    default:
-      "第 \(dayOfWeek) 天"
-    }
-  }
-
-  static func compactWeekdays(_ days: [Int]) -> String {
-    days.sorted().map(weekdayName).joined(separator: "·")
-  }
-
   // swiftlint:disable:next cyclomatic_complexity
   static func muscleGroupName(_ muscleGroup: MuscleGroup) -> String {
     switch muscleGroup {

@@ -74,7 +74,7 @@ private struct WeekCardDaySection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Eyebrow(PlanningDisplay.weekdayName(day.dayOfWeek), color: Color.MeetPR.fgTertiary)
+      Eyebrow(viewModel.dayLabel(day.dayOfWeek), color: Color.MeetPR.fgTertiary)
 
       ForEach(viewModel.sortedExercises(in: day), id: \.id) { exercise in
         if let spec = viewModel.derivedSetSpec(forWeek: weekNumber, draftExercise: exercise) {

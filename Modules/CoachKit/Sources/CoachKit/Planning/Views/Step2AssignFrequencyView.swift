@@ -37,7 +37,7 @@ public struct Step2AssignFrequencyView: View {
             Text("训练日")
               .font(Font.MeetPR.bodyEmphasis)
               .foregroundStyle(Color.MeetPR.fgPrimary)
-            Text(PlanningDisplay.compactWeekdays(viewModel.sortedTrainingDays))
+            Text(trainingDaySummary)
               .font(Font.MeetPR.body)
               .foregroundStyle(Color.MeetPR.fgSecondary)
           }
@@ -99,6 +99,14 @@ public struct Step2AssignFrequencyView: View {
     .navigationTitle("频率分配")
   }
 
+  private var trainingDaySummary: String {
+    let count = viewModel.assignmentDisplayDays.count
+    guard viewModel.preferredTrainingDays.isEmpty else {
+      return "每周 \(count) 个训练日 · 来自学员资料"
+    }
+    return "每周 \(count) 个训练日"
+  }
+
   private func adjust(_ family: LiftFamily, by delta: Int) {
     var frequency = viewModel.sbdFrequency
     switch family {
@@ -117,7 +125,10 @@ public struct Step2AssignFrequencyView: View {
   }
 
   private var maxFrequency: Int {
-    viewModel.sortedTrainingDays.count
+    // Capped by the assignable slots (the student's training days), not 7 —
+    // a frequency above the slot count could never be fully assigned and
+    // would deadlock 下一步 (Codex review).
+    viewModel.assignmentDisplayDays.count
   }
 }
 
@@ -171,18 +182,12 @@ private struct AssignmentDayCard: View {
   @Bindable var viewModel: PlanningViewModel
 
   var body: some View {
-    Card(accessibilityLabel: PlanningDisplay.weekdayName(dayOfWeek)) {
+    Card(accessibilityLabel: viewModel.dayLabel(dayOfWeek)) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
         HStack {
-          Text(PlanningDisplay.weekdayName(dayOfWeek))
+          Text(viewModel.dayLabel(dayOfWeek))
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(Color.MeetPR.fgPrimary)
-
-          // Onboarding-declared training day: mark only, never auto-assign
-          // (spec 033 D8 — the coach owns the schedule).
-          if viewModel.isPreferredTrainingDay(dayOfWeek) {
-            StatusBadge(status: .ready, title: "学员可练")
-          }
 
           Spacer()
 

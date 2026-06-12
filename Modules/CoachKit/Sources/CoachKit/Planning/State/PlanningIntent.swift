@@ -36,8 +36,9 @@ extension PlanningIntent {
 /// Pure prefill mapping (spec 033 §9 table) — kept off the view model so the
 /// token → domain rules test in isolation.
 enum PlanningPrefill {
-  /// Wire training-day tokens → planning day-of-week ints (mon=1 … sun=7,
-  /// aligned with PlanningDisplay.weekdayName).
+  /// Wire training-day tokens → planning day slots (mon=1 … sun=7). Slot
+  /// keys stay weekday-shaped on the wire; the UI labels them DAY 1..N by
+  /// rank (PlanningViewModel.dayLabel).
   static func preferredDays(from days: [TrainingDay]) -> Set<Int> {
     Set(
       days.map { day in
