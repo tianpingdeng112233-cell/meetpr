@@ -166,32 +166,41 @@ public enum StudentDemoSeed {
     )
   }
 
-  /// 9 squat e1RM points over ~4 weeks with a gentle upward trend, plus one
-  /// unacknowledged PR on the newest point so the launch re-surface path is
-  /// exercised in DEMO_MODE (spec 028 §9).
+  /// Three main-lift e1RM lines over ~4 weeks, plus one unacknowledged PR on
+  /// the newest point so the launch re-surface path is exercised in DEMO_MODE.
   public static func makeE1RMHistory(studentID: UUID) -> [E1RMHistoryPoint] {
-    let squatID = uuid(2_000)
     let baseline = Calendar(identifier: .gregorian).startOfDay(for: Date())
-    let e1rms: [Double] = [128.0, 129.5, 128.8, 131.0, 132.4, 131.8, 134.0, 135.2, 137.6]
-    return e1rms.enumerated().map { offset, value in
-      E1RMHistoryPoint(
-        id: uuid(5_000 + offset),
-        studentId: studentID,
-        exerciseId: squatID,
-        setLogId: uuid(5_100 + offset),
-        computedAt: baseline.addingTimeInterval(Double(offset - 26) * 86_400 * 3),
-        e1RMKg: value,
-        sourceWeightKg: 120 + Double(offset) * 2.5,
-        sourceReps: 5,
-        sourceRPE: 8.0
+    return makeE1RMHistory(
+      studentID: studentID,
+      exerciseID: uuid(2_000),
+      idOffset: 5_000,
+      baseline: baseline,
+      values: [128.0, 129.5, 128.8, 131.0, 132.4, 131.8, 134.0, 135.2, 137.6]
+    )
+      + makeE1RMHistory(
+        studentID: studentID,
+        exerciseID: uuid(2_001),
+        idOffset: 5_100,
+        baseline: baseline,
+        values: [86.0, 87.2, 88.0, 88.5, 89.4, 90.1, 91.0]
       )
-    }
+      + makeE1RMHistory(
+        studentID: studentID,
+        exerciseID: uuid(2_002),
+        idOffset: 5_200,
+        baseline: baseline,
+        values: [168.0, 170.0, 171.5, 173.0, 174.2, 176.0, 178.5]
+      )
   }
 
   public static func makeUnacknowledgedPR(studentID: UUID) -> [PRBreakthroughEvent] {
     let points = makeE1RMHistory(studentID: studentID)
-    guard let latest = points.last,
-      let previousMax = points.dropLast().map(\.e1RMKg).max()
+    guard let latest = points.max(by: { $0.computedAt < $1.computedAt }),
+      let previousMax =
+        points
+        .filter({ $0.exerciseId == latest.exerciseId && $0.id != latest.id })
+        .map(\.e1RMKg)
+        .max()
     else { return [] }
     return [
       PRBreakthroughEvent(
@@ -246,6 +255,33 @@ public enum StudentDemoSeed {
     let calendar = Calendar(identifier: .gregorian)
     let startOfToday = calendar.startOfDay(for: Date())
     return calendar.date(byAdding: .day, value: -3, to: startOfToday) ?? startOfToday
+  }
+}
+
+// MARK: - e1RM demo helpers (extension keeps the enum body within the
+// type-body-length budget)
+
+extension StudentDemoSeed {
+  private static func makeE1RMHistory(
+    studentID: UUID,
+    exerciseID: UUID,
+    idOffset: Int,
+    baseline: Date,
+    values: [Double]
+  ) -> [E1RMHistoryPoint] {
+    values.enumerated().map { offset, value in
+      E1RMHistoryPoint(
+        id: uuid(idOffset + offset),
+        studentId: studentID,
+        exerciseId: exerciseID,
+        setLogId: uuid(idOffset + 50 + offset),
+        computedAt: baseline.addingTimeInterval(Double(offset - 26) * 86_400 * 3),
+        e1RMKg: value,
+        sourceWeightKg: value * 0.88,
+        sourceReps: 5,
+        sourceRPE: 8.0
+      )
+    }
   }
 }
 

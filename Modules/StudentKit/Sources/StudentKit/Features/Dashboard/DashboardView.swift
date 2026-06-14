@@ -10,27 +10,47 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct DashboardView: View {
   private let studentID: UUID
+  private let plans: any StudentPlanRepository
+  private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   private let onStartWorkout: () -> Void
   private let onSeeAllFeedback: () -> Void
   @State private var weekViewModel: WeekOverviewViewModel
+  @State private var notificationsViewModel: DashboardNotificationsViewModel
+  @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
+  @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
+  @State private var showsNotifications = false
+  @State private var showsEvaluationSummary = false
 
   public init(
     studentID: UUID,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
+    onboarding: any OnboardingProfileReading,
+    e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onStartWorkout: @escaping () -> Void,
     onSeeAllFeedback: @escaping () -> Void
   ) {
     self.studentID = studentID
+    self.plans = plans
+    self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onStartWorkout = onStartWorkout
     self.onSeeAllFeedback = onSeeAllFeedback
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
+    self._notificationsViewModel = State(
+      initialValue: DashboardNotificationsViewModel(plans: plans)
+    )
+    self._e1rmTrendViewModel = State(
+      initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
+    )
+    self._profileMetricsViewModel = State(
+      initialValue: DashboardProfileMetricsViewModel(onboarding: onboarding)
+    )
   }
 
   public var body: some View {
@@ -49,6 +69,16 @@ public struct DashboardView: View {
             }
           }
 
+          NavigationLink(
+            destination: GrowthCurveView(studentID: studentID, plans: plans, e1rm: e1rm),
+            label: { E1RMMiniTrendCard(state: e1rmTrendViewModel.state) }
+          )
+          .buttonStyle(.plain)
+
+          if let metrics = profileMetricsViewModel.metrics {
+            DashboardProfileMetricsView(metrics: metrics)
+          }
+
           DashboardSection(title: "教练反馈", action: ("查看全部", onSeeAllFeedback)) {
             RecentFeedback(viewModel: feedbackViewModel)
           }
@@ -58,12 +88,81 @@ public struct DashboardView: View {
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bg)
       .navigationTitle("仪表盘")
-    }
-    .task {
-      if weekViewModel.state == .idle {
-        await weekViewModel.load(studentID: studentID)
+      .toolbar {
+        ToolbarItem(placement: .primaryAction) {
+          notificationButton
+        }
+      }
+      .navigationDestination(isPresented: $showsEvaluationSummary) {
+        if let summary = evaluationSummaryViewModel?.summary {
+          EvaluationSummaryView(summary: summary) {
+            evaluationSummaryViewModel?.markRead()
+          }
+        }
+      }
+      .sheet(isPresented: $showsNotifications) {
+        NotificationCenterSheet(
+          planNotice: notificationsViewModel.planNotice,
+          feedbackUnreadCount: feedbackViewModel.unreadCount,
+          evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0,
+          onOpenPlan: openPlanNotification,
+          onOpenFeedback: onSeeAllFeedback,
+          onOpenEvaluation: { showsEvaluationSummary = true }
+        )
+        .presentationDetents([.medium])
+      }
+      .refreshable {
+        await reload()
       }
     }
+    .task {
+      await loadIfNeeded()
+    }
+  }
+
+  private var notificationButton: some View {
+    Button(
+      action: { showsNotifications = true },
+      label: {
+        ZStack(alignment: .topTrailing) {
+          Image(systemName: hasUnreadNotifications ? "bell.badge" : "bell")
+          if hasUnreadNotifications {
+            Circle()
+              .fill(Color.MeetPR.brandRed)
+              .frame(width: 8, height: 8)
+              .offset(x: 3, y: -3)
+          }
+        }
+      }
+    )
+    .accessibilityLabel(hasUnreadNotifications ? "通知,有未读" : "通知")
+  }
+
+  private var hasUnreadNotifications: Bool {
+    notificationsViewModel.hasUnread(
+      feedbackUnreadCount: feedbackViewModel.unreadCount,
+      evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0
+    )
+  }
+
+  private func loadIfNeeded() async {
+    if weekViewModel.state == .idle {
+      await reload()
+    }
+  }
+
+  private func reload() async {
+    await weekViewModel.load(studentID: studentID)
+    await feedbackViewModel.load(studentID: studentID)
+    await evaluationSummaryViewModel?.load(studentID: studentID)
+    await notificationsViewModel.load(studentID: studentID)
+    await e1rmTrendViewModel.load(studentID: studentID)
+    await profileMetricsViewModel.load(studentID: studentID)
+  }
+
+  private func openPlanNotification() {
+    notificationsViewModel.markCurrentPlanSeen()
+    onStartWorkout()
   }
 
   private var weekData: (days: [StudentPlanDay], logs: [StudentSetLog])? {
@@ -75,40 +174,6 @@ public struct DashboardView: View {
 
   private var today: StudentPlanDay? {
     weekData?.days.first { Calendar.current.isDate($0.date, inSameDayAs: Date()) }
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct DashboardSection<Content: View>: View {
-  let title: String
-  var action: (label: String, handler: () -> Void)?
-  @ViewBuilder let content: Content
-
-  init(
-    title: String,
-    action: (label: String, handler: () -> Void)? = nil,
-    @ViewBuilder content: () -> Content
-  ) {
-    self.title = title
-    self.action = action
-    self.content = content()
-  }
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
-      HStack {
-        Text(title)
-          .font(.title3.bold())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        if let action {
-          Spacer()
-          Button(action.label, action: action.handler)
-            .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.brandRed)
-        }
-      }
-      content
-    }
   }
 }
 
@@ -283,67 +348,5 @@ private struct FeedbackRowCard: View {
         .padding(.top, 2)
     }
     .modifier(DashboardCard())
-  }
-}
-
-/// "评估完成 ✓" summary card (spec 033 §12): excerpts + full-text link;
-/// visible only while unread (D7) — opening the full text collapses it. The
-/// bottom row tracks the first regular plan (wiki §6.2).
-@available(iOS 17.0, macOS 14.0, *)
-private struct EvaluationCompletedCard: View {
-  let viewModel: StudentEvaluationSummaryViewModel
-
-  var body: some View {
-    if viewModel.showsDashboardCard, let summary = viewModel.summary {
-      VStack(alignment: .leading, spacing: 12) {
-        Label("评估完成", systemImage: "checkmark.seal.fill")
-          .font(.headline)
-          .foregroundStyle(Color.MeetPR.green)
-
-        Text(summary.trainingPlanExcerpt)
-          .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .lineLimit(2)
-
-        if let words = summary.wordsExcerpt {
-          Text(words)
-            .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-            .lineLimit(2)
-        }
-
-        NavigationLink {
-          EvaluationSummaryView(summary: summary) {
-            viewModel.markRead()
-          }
-        } label: {
-          Text("展开看完整")
-            .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.brandRed)
-        }
-
-        if viewModel.showsAwaitingFirstPlan {
-          Text("教练正在为你排第一份正式计划")
-            .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-        }
-      }
-      .modifier(DashboardCard())
-    }
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct DashboardCard: ViewModifier {
-  func body(content: Content) -> some View {
-    content
-      .padding(14)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
-      .overlay {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
-      }
-      .clipShape(.rect(cornerRadius: 12))
   }
 }
