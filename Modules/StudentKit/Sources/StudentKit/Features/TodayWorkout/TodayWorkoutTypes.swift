@@ -50,3 +50,52 @@ public struct TodayWorkoutRestTimerState: Equatable, Sendable {
   /// Progress-bar denominator.
   public let totalSeconds: Int
 }
+
+public struct ExerciseReference: Equatable, Sendable {
+  public let last: ExerciseReferenceSet?
+  public let best: ExerciseReferenceSet?
+
+  public init(last: ExerciseReferenceSet?, best: ExerciseReferenceSet?) {
+    self.last = last
+    self.best = best
+  }
+
+  public var hasValue: Bool {
+    last != nil || best != nil
+  }
+}
+
+public struct ExerciseReferenceSet: Equatable, Sendable {
+  public let reps: Int
+  public let weightKg: Double
+
+  public init(reps: Int, weightKg: Double) {
+    self.reps = reps
+    self.weightKg = weightKg
+  }
+
+  init(point: E1RMHistoryPoint) {
+    self.reps = point.sourceReps
+    self.weightKg = point.sourceWeightKg
+  }
+}
+
+public struct TodayWorkoutPlanContext: Equatable, Sendable {
+  public let planKind: PlanKind
+  public let weekIndex: Int
+  public let startDate: Date
+
+  public init(planKind: PlanKind, weekIndex: Int, startDate: Date) {
+    self.planKind = planKind
+    self.weekIndex = weekIndex
+    self.startDate = startDate
+  }
+}
+
+func lastAndBest(
+  from points: [E1RMHistoryPoint]
+) -> (last: E1RMHistoryPoint?, best: E1RMHistoryPoint?) {
+  let last = points.max { $0.computedAt < $1.computedAt }
+  let best = points.max { $0.e1RMKg < $1.e1RMKg }
+  return (last, best)
+}

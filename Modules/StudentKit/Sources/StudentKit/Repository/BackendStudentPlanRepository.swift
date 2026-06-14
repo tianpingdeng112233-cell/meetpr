@@ -100,9 +100,12 @@ private enum StudentPlanProjection {
     let exerciseByID = Dictionary(catalog.map { ($0.id, $0) }, uniquingKeysWith: { _, new in new })
     let exercisesByDay = Dictionary(grouping: tree.exercises, by: \.planDayID)
     let setsByExercise = Dictionary(grouping: tree.sets, by: \.planExerciseID)
+    // Project the WHOLE cycle (all weeks), not just the current week: the
+    // training-tab calendar and history both navigate across weeks, and
+    // fetchDay(date:) must resolve any cycle day. Consumers that want only the
+    // current week (e.g. the dashboard week strip) filter by date themselves.
     let days =
       tree.days
-      .filter { $0.weekNumber == weekIndex }
       .sorted { lhs, rhs in
         if lhs.dayOfWeek == rhs.dayOfWeek { return lhs.sortOrder < rhs.sortOrder }
         return lhs.dayOfWeek < rhs.dayOfWeek

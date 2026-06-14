@@ -6,6 +6,7 @@ import SwiftUI
 struct ExerciseExecutionView: View {
   let exercise: StudentPlanExercise
   let rows: [TodayWorkoutViewModel.SetRowDraft]
+  let reference: ExerciseReference?
   let rowIndex: (TodayWorkoutViewModel.SetRowDraft) -> Int?
   let onTapSet: (Int) -> Void
   var onPlateMath: ((Double) -> Void)?
@@ -33,7 +34,13 @@ struct ExerciseExecutionView: View {
 
       ForEach(rows) { row in
         if let index = rowIndex(row) {
-          SetRecordRow(draft: row, rowIndex: index, onTap: onTapSet, onPlateMath: onPlateMath)
+          VStack(alignment: .leading, spacing: 4) {
+            SetRecordRow(draft: row, rowIndex: index, onTap: onTapSet, onPlateMath: onPlateMath)
+            if !row.completed, let reference, reference.hasValue {
+              ExerciseReferenceRow(reference: reference)
+                .padding(.leading, 42)
+            }
+          }
         }
       }
     }
@@ -59,5 +66,28 @@ struct ExerciseExecutionView: View {
       summary += " @ RPE\(StudentFormatting.decimal(rpe))"
     }
     return summary
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct ExerciseReferenceRow: View {
+  let reference: ExerciseReference
+
+  var body: some View {
+    Text(parts.joined(separator: " · "))
+      .font(.caption)
+      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  private var parts: [String] {
+    [
+      reference.last.map { "上次 \(Self.format($0))" },
+      reference.best.map { "最佳 \(Self.format($0))" },
+    ].compactMap(\.self)
+  }
+
+  private static func format(_ set: ExerciseReferenceSet) -> String {
+    "\(set.reps)×\(StudentFormatting.kilograms(set.weightKg))kg"
   }
 }
