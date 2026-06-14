@@ -32,10 +32,12 @@ struct ExerciseExecutionView: View {
           .foregroundStyle(allCompleted ? Color.MeetPR.green : Color.MeetPR.fgTertiary)
       }
 
-      ForEach(rows) { row in
+      ForEach(Array(rows.enumerated()), id: \.element.id) { offset, row in
         if let index = rowIndex(row) {
           VStack(alignment: .leading, spacing: 4) {
-            SetRecordRow(draft: row, rowIndex: index, onTap: onTapSet, onPlateMath: onPlateMath)
+            SetRecordRow(
+              draft: row, setNumber: offset + 1, rowIndex: index,
+              onTap: onTapSet, onPlateMath: onPlateMath)
             if !row.completed, let reference, reference.hasValue {
               ExerciseReferenceRow(reference: reference)
                 .padding(.leading, 42)
