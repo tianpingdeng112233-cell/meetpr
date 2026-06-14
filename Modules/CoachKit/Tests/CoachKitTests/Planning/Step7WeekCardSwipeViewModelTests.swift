@@ -44,13 +44,19 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func step7ProceedToStep8IsPlaceholderAndDoesNotFinish() async throws {
+@Test func step7PublishOfCompletePlanFinishesWithoutIssues() async throws {
   let viewModel = try await configuredStep7ViewModel()
 
-  try await viewModel.proceedToStep8()
+  await viewModel.publish()
 
-  #expect(viewModel.didFinish == false)
-  #expect(viewModel.currentStep == .previewWeekCards)
+  #expect(viewModel.publishIssues.isEmpty)
+  #expect(viewModel.publishError == nil)
+  #expect(viewModel.didFinish)
+
+  // Re-publish after success is a guarded no-op (no duplicate plan).
+  await viewModel.publish()
+  #expect(viewModel.didFinish)
+  #expect(viewModel.publishError == nil)
 }
 
 @MainActor
