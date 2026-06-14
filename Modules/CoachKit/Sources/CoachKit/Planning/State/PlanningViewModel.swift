@@ -71,6 +71,11 @@ public final class PlanningViewModel {
   /// Initial Step 4 equipment filter derived from gym_tier +
   /// equipment_overrides; nil = full catalog.
   @ObservationIgnored private(set) var prefilledEquipment: Set<Equipment>?
+  /// Full onboarding profile of the selected student — drives the expandable
+  /// header (David 2026-06-14: the bar must show the student's real info,
+  /// not just id + status). Observed so the header fills in when the async
+  /// load lands; nil keeps the header to name + status only.
+  private(set) var loadedProfile: OnboardingProfile?
 
   public init(
     repository: any PlanRepository,
@@ -89,6 +94,7 @@ public final class PlanningViewModel {
       preferredTrainingDays = PlanningPrefill.preferredDays(from: profile.trainingDays)
       profilePrefillStudentID = intent.presetStudent?.id
       prefilledEquipment = PlanningPrefill.equipmentFilter(from: profile)
+      loadedProfile = profile
     }
   }
 
@@ -257,6 +263,7 @@ public final class PlanningViewModel {
       preferredTrainingDays = []
       prefilledOneRMs = [:]
       prefilledEquipment = nil
+      loadedProfile = nil
       profilePrefillStudentID = nil
       Task { await loadStudentProfilePrefill(for: student.id) }
     }
@@ -273,6 +280,7 @@ public final class PlanningViewModel {
     preferredTrainingDays = PlanningPrefill.preferredDays(from: profile.trainingDays)
     prefilledOneRMs = PlanningPrefill.oneRMs(from: profile)
     prefilledEquipment = PlanningPrefill.equipmentFilter(from: profile)
+    loadedProfile = profile
     profilePrefillStudentID = studentID
   }
 
@@ -423,6 +431,12 @@ public final class PlanningViewModel {
     guard let draftPlan, let day = draftDay(with: dayID) else { return }
     accessoryCatalogByID[exercise.id] = exercise
 
+    // Idempotent: the same catalog exercise can't sit twice on a day, so
+    // removeAccessory(catalogID:) always resolves an unambiguous row
+    // (Codex review nit).
+    guard !day.draftExercises.contains(where: { !$0.isMainLift && $0.exerciseID == exercise.id })
+    else { return }
+
     let nextSortOrder = (day.draftExercises.map(\.sortOrder).max() ?? -1) + 1
     let draftExercise = DraftPlanExercise(
       exerciseID: exercise.id,
@@ -433,6 +447,40 @@ public final class PlanningViewModel {
     day.draftExercises.append(draftExercise)
     draftPlan.currentStepRawValue = PlanningStep.selectAccessories.rawValue
     try draftStore.saveDraft(draftPlan)
+  }
+
+  /// Pre-advance completeness check (David 2026-06-14): every training day
+  /// needs a main lift, and every exercise needs a real load (isCoachComplete
+  /// — weight > 0, not the weight-0 that `isValidSetSpec` tolerates). Drives
+  /// the Step 4 完成 reminder and the 发布 gate. Empty = ready.
+  public func planCompletionIssues() -> [String] {
+    var issues: [String] = []
+    for day in sortedDraftDays {
+      let label = dayLabel(day.dayOfWeek)
+      let mains = day.draftExercises.filter(\.isMainLift)
+      if mains.isEmpty {
+        issues.append("\(label):未选主项")
+      }
+      for exercise in sortedExercises(in: day) {
+        guard let spec = w1SetSpecs[exercise.id], spec.isCoachComplete else {
+          issues.append("\(label) · \(exerciseName(for: exercise)):未设重量/强度")
+          continue
+        }
+      }
+    }
+    return issues
+  }
+
+  /// Library deselect (David 2026-06-14): the picker passes a catalog
+  /// exercise id; resolve it to this day's draft accessory and remove it so
+  /// a wrong pick is reversible from inside the library sheet.
+  public func removeAccessory(catalogID: UUID, from dayID: UUID) async throws {
+    guard
+      let target = draftDay(with: dayID)?.draftExercises.first(where: {
+        !$0.isMainLift && $0.exerciseID == catalogID
+      })
+    else { return }
+    try await deleteAccessory(target.id, from: dayID)
   }
 
   public func deleteAccessory(_ draftExerciseID: UUID, from dayID: UUID) async throws {

@@ -35,7 +35,13 @@ public struct AccessoryLibrarySheet: View {
             isLoading: viewModel.isLoadingAccessories
           ) { exercise in
             Task {
-              try? await viewModel.addAccessory(exercise, to: dayID)
+              let isSelected = viewModel.selectedAccessories(for: dayID)
+                .contains { $0.exerciseID == exercise.id }
+              if isSelected {
+                try? await viewModel.removeAccessory(catalogID: exercise.id, from: dayID)
+              } else {
+                try? await viewModel.addAccessory(exercise, to: dayID)
+              }
             }
           }
         }

@@ -13,7 +13,7 @@ public struct Step1SelectDurationView: View {
   public var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       if let student = viewModel.selectedStudent {
-        PlanningStudentHeaderView(student: student)
+        PlanningStudentHeaderView(student: student, profile: viewModel.loadedProfile)
       }
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {

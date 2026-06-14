@@ -16,7 +16,6 @@ public struct ExerciseSetEditorCard: View {
   @State private var intensityMode: IntensityMode
   @State private var targetValue: Decimal
   @State private var notes: String
-  @State private var didSave = false
 
   public init(
     viewModel: PlanningViewModel,
@@ -35,7 +34,6 @@ public struct ExerciseSetEditorCard: View {
     self._intensityMode = State(initialValue: spec.intensityMode)
     self._targetValue = State(initialValue: spec.targetValue)
     self._notes = State(initialValue: draftExercise.notes ?? "")
-    self._didSave = State(initialValue: viewModel.setSpec(for: draftExercise.id) != nil)
   }
 
   public var body: some View {
@@ -150,7 +148,10 @@ public struct ExerciseSetEditorCard: View {
 
       Spacer()
 
-      if didSave {
+      // 已填 reflects a real load now, not just that a default spec exists
+      // (David 2026-06-14). Computed from live edit state so it flips the
+      // moment the coach enters a weight / RPE.
+      if currentSpec().isCoachComplete {
         StatusBadge(status: .ready, title: "已填")
       }
 
@@ -204,7 +205,6 @@ public struct ExerciseSetEditorCard: View {
   private func persist() {
     Task {
       try? await viewModel.updateW1SetSpec(currentSpec(), for: draftExercise.id)
-      didSave = viewModel.setSpec(for: draftExercise.id) != nil
     }
   }
 
@@ -217,7 +217,6 @@ public struct ExerciseSetEditorCard: View {
     intensityMode = spec.intensityMode
     targetValue = spec.targetValue
     notes = draftExercise.notes ?? ""
-    didSave = true
   }
 }
 

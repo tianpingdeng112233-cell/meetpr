@@ -6,6 +6,7 @@ import SwiftUI
 public struct Step4SelectAccessoriesView: View {
   @Bindable private var viewModel: PlanningViewModel
   @State private var showLibrary = false
+  @State private var completionIssues: [String] = []
 
   public init(viewModel: PlanningViewModel) {
     self.viewModel = viewModel
@@ -15,7 +16,7 @@ public struct Step4SelectAccessoriesView: View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         if let student = viewModel.selectedStudent {
-          PlanningStudentHeaderView(student: student)
+          PlanningStudentHeaderView(student: student, profile: viewModel.loadedProfile)
         }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
@@ -71,8 +72,14 @@ public struct Step4SelectAccessoriesView: View {
             "完成 — 进入规则配置",
             isFullWidth: true
           ) {
-            Task {
-              try? await viewModel.proceedToStep6()
+            // Remind instead of silently no-op'ing (David 2026-06-14): if a
+            // day lacks a main lift or any exercise has no load set, list
+            // the gaps rather than swallowing the validation error.
+            let issues = viewModel.planCompletionIssues()
+            if issues.isEmpty {
+              Task { try? await viewModel.proceedToStep6() }
+            } else {
+              completionIssues = issues
             }
           }
         } else {
@@ -98,6 +105,20 @@ public struct Step4SelectAccessoriesView: View {
         Color.clear
       }
     }
+    .alert("还差一点", isPresented: completionAlertBinding) {
+      Button("知道了", role: .cancel) {}
+    } message: {
+      Text("以下项目需要补全后才能进入下一步：\n\n" + completionIssues.joined(separator: "\n"))
+    }
+  }
+
+  private var completionAlertBinding: Binding<Bool> {
+    Binding(
+      get: { !completionIssues.isEmpty },
+      set: { isPresented in
+        if !isPresented { completionIssues = [] }
+      }
+    )
   }
 
   private func selectInitialDayIfNeeded() async {

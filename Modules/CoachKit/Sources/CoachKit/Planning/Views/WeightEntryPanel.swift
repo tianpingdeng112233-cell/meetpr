@@ -30,8 +30,6 @@ public struct WeightEntryPanel: View {
   @State private var draft: WeightEntryDraft
   @State private var selectedBaseID: String?
 
-  private static let percents = [60, 70, 75, 80, 85, 90]
-
   public init(
     title: String,
     initialValue: Decimal,
@@ -115,19 +113,9 @@ public struct WeightEntryPanel: View {
       .scrollIndicators(.hidden)
 
       if let base = bases.first(where: { $0.id == selectedBaseID }) {
-        ScrollView(.horizontal) {
-          HStack(spacing: MeetPRSpacing.sm) {
-            ForEach(Self.percents, id: \.self) { percent in
-              Button("\(percent)%") {
-                draft.apply(percent: percent, of: base.amount)
-              }
-              .buttonStyle(.bordered)
-              .font(Font.MeetPR.footnote)
-              .tint(Color.MeetPR.brandRed)
-            }
-          }
+        WeightPercentSection { percent in
+          draft.apply(percent: percent, of: base.amount)
         }
-        .scrollIndicators(.hidden)
       }
     }
   }
