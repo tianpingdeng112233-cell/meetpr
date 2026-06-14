@@ -41,6 +41,16 @@ public final class PlanningViewModel {
   public var progressionRules: [DraftProgressionRule] = []
   public var currentPreviewWeek = 1
   public var didFinish = false
+  /// 发布 state (David 2026-06-14): drives the Step 7 button + reminder.
+  public private(set) var isPublishing = false
+  public private(set) var publishError: String?
+  public private(set) var publishIssues: [String] = []
+
+  /// Clears the publish reminder/error once the coach has read it.
+  public func clearPublishFeedback() {
+    publishError = nil
+    publishIssues = []
+  }
 
   @ObservationIgnored private let repository: any PlanRepository
   @ObservationIgnored private let draftStore: DraftStore
@@ -342,7 +352,7 @@ public final class PlanningViewModel {
       try await proceedToStep7()
       return
     case .previewWeekCards:
-      try await proceedToStep8()
+      await publish()
       return
     }
 
@@ -830,12 +840,49 @@ public final class PlanningViewModel {
     currentPreviewWeek = min(upperBound, max(1, week))
   }
 
-  public func proceedToStep8() async throws {
-    if let draftPlan {
-      draftPlan.currentStepRawValue = PlanningStep.previewWeekCards.rawValue
-      try draftStore.saveDraft(draftPlan)
+  /// 发布 (David 2026-06-14, supersedes the spec-008 stub): gate on
+  /// completeness, materialize the W1 draft into the full N-week tree, push
+  /// it through the repository (which the student then reads), clear the
+  /// draft, and let the coordinator dismiss via `didFinish`. Surfaces the
+  /// evaluation真 gate / weeks-overflow copy on failure.
+  public func publish() async {
+    // Block re-entry AND re-publish after a success: once didFinish is set
+    // the draft is already deleted server- and store-side, so a second call
+    // would create a duplicate backend plan (Codex review).
+    guard !isPublishing, !didFinish else { return }
+    publishError = nil
+    publishIssues = []
+    let issues = planCompletionIssues()
+    guard issues.isEmpty else {
+      publishIssues = issues
+      return
     }
-    Self.logger.warning("step8_pending")
+    guard let draftPlan, let student = selectedStudent else {
+      publishError = "缺少计划或学员信息,无法发布"
+      return
+    }
+    isPublishing = true
+    defer { isPublishing = false }
+
+    let assembled = PlanPublishAssembler.assemble(
+      draft: draftPlan,
+      w1Specs: w1SetSpecs,
+      rules: progressionRules,
+      kind: planKind
+    )
+    do {
+      try await repository.publishPlan(
+        plan: assembled.plan,
+        days: assembled.days,
+        exercises: assembled.exercises,
+        sets: assembled.sets
+      )
+      // Published plans leave no resumable draft behind.
+      try? draftStore.deleteDraft(traineeID: student.id)
+      didFinish = true
+    } catch {
+      publishError = PlanPublishErrorMapping.bannerMessage(for: error) ?? "发布失败,请稍后重试"
+    }
   }
 }
 

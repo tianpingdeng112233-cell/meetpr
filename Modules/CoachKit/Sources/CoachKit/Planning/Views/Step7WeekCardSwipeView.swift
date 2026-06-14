@@ -23,16 +23,42 @@ public struct Step7WeekCardSwipeView: View {
         leadingEdgeBackSwipe
       }
 
-      PrimaryButton("进入发布 (TODO spec 008)", isFullWidth: true) {
-        Task {
-          try? await viewModel.proceedToStep8()
-        }
+      PrimaryButton(
+        viewModel.isPublishing ? "发布中…" : "发布给学员",
+        isDisabled: viewModel.isPublishing,
+        isFullWidth: true
+      ) {
+        Task { await viewModel.publish() }
       }
       .padding(.horizontal, MeetPRSpacing.base)
       .padding(.bottom, MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
     .navigationTitle("周卡片")
+    .alert("还差一点", isPresented: incompleteAlertBinding) {
+      Button("知道了", role: .cancel) { viewModel.clearPublishFeedback() }
+    } message: {
+      Text("以下项目需要补全后才能发布：\n\n" + viewModel.publishIssues.joined(separator: "\n"))
+    }
+    .alert("发布失败", isPresented: errorAlertBinding) {
+      Button("知道了", role: .cancel) { viewModel.clearPublishFeedback() }
+    } message: {
+      Text(viewModel.publishError ?? "请稍后重试")
+    }
+  }
+
+  private var incompleteAlertBinding: Binding<Bool> {
+    Binding(
+      get: { !viewModel.publishIssues.isEmpty },
+      set: { if !$0 { viewModel.clearPublishFeedback() } }
+    )
+  }
+
+  private var errorAlertBinding: Binding<Bool> {
+    Binding(
+      get: { viewModel.publishError != nil },
+      set: { if !$0 { viewModel.clearPublishFeedback() } }
+    )
   }
 
   private var weekCount: Int {
