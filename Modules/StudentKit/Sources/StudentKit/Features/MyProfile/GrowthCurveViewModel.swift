@@ -47,19 +47,8 @@ public final class GrowthCurveViewModel {
   public func load(studentID: UUID) async {
     state = .loading
     do {
-      // V0.1: the exercise→family map comes from the current plan; the curve
-      // shows main-lift points per family (variation curves are V0.1.x).
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      var idsByFamily: [LiftFamily: Set<UUID>] = [:]
-      for day in plan?.days ?? [] {
-        for slot in day.exercises {
-          let exercise = slot.exercise
-          guard exercise.exerciseType == .mainLift, let family = exercise.mainLiftFamily else {
-            continue
-          }
-          idsByFamily[family, default: []].insert(exercise.id)
-        }
-      }
+      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(in: plan)
 
       var grouped: [LiftFamily: [E1RMHistoryPoint]] = [:]
       for (family, ids) in idsByFamily {

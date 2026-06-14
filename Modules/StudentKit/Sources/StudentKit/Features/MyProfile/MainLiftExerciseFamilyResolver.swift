@@ -1,0 +1,41 @@
+import CoreModels
+import Foundation
+
+/// Resolves squat/bench/deadlift families from the current plan's main-lift
+/// slots. V0.1: the exercise→family map is plan-derived (not a static catalog;
+/// variation curves are V0.1.x). Shared by the growth curve and the dashboard
+/// e1RM trend card so the two never drift.
+enum MainLiftExerciseFamilyResolver {
+  static let dashboardFamilies: [LiftFamily] = [.squat, .bench, .deadlift]
+
+  static func exerciseIDsByFamily(in plan: StudentPlanView?) -> [LiftFamily: Set<UUID>] {
+    var idsByFamily: [LiftFamily: Set<UUID>] = [:]
+    for day in plan?.days ?? [] {
+      for slot in day.exercises {
+        let exercise = slot.exercise
+        guard exercise.exerciseType == .mainLift, let family = exercise.mainLiftFamily else {
+          continue
+        }
+        idsByFamily[family, default: []].insert(exercise.id)
+      }
+    }
+    return idsByFamily
+  }
+
+  static func family(
+    for exerciseID: UUID,
+    in idsByFamily: [LiftFamily: Set<UUID>]
+  ) -> LiftFamily? {
+    idsByFamily.first { $0.value.contains(exerciseID) }?.key
+  }
+}
+
+extension LiftFamily {
+  var studentDisplayName: String {
+    switch self {
+    case .squat: "深蹲"
+    case .bench: "卧推"
+    case .deadlift: "硬拉"
+    }
+  }
+}
