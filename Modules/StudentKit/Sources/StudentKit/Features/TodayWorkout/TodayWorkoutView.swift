@@ -6,10 +6,12 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct TodayWorkoutView: View {
   private let studentID: UUID
-  private let date: Date
+  private let plans: any StudentPlanRepository
+  private let logs: any StudentTrainingLogRepository
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
+  @State private var selectedDate: Date
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
   @State private var plateMathTarget: PlateMathTarget?
@@ -25,7 +27,9 @@ public struct TodayWorkoutView: View {
     videoUploads: VideoUploadServices? = nil
   ) {
     self.studentID = studentID
-    self.date = date
+    self.plans = plans
+    self.logs = logs
+    self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
     self._readinessViewModel = State(
@@ -36,25 +40,36 @@ public struct TodayWorkoutView: View {
 
   public var body: some View {
     NavigationStack {
-      Group {
-        switch viewModel.state {
-        case .idle, .loading:
-          ProgressView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        case .loaded(let day, let drafts):
-          workout(day: day, drafts: drafts)
-        case .recording(let day, let drafts, _):
-          workout(day: day, drafts: drafts)
-        case .rest:
-          ContentUnavailableView("今日休息", systemImage: "bed.double", description: Text("看本周计划"))
-        case .error(let message):
-          ContentUnavailableView(
-            "加载失败", systemImage: "exclamationmark.triangle", description: Text(message))
+      VStack(spacing: 0) {
+        TrainingCalendarView(
+          studentID: studentID,
+          selectedDate: $selectedDate,
+          plans: plans,
+          logs: logs
+        )
+        .padding(.horizontal)
+        .padding(.top)
+
+        Group {
+          switch viewModel.state {
+          case .idle, .loading:
+            ProgressView()
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+          case .loaded(let day, let drafts):
+            workout(day: day, drafts: drafts)
+          case .recording(let day, let drafts, _):
+            workout(day: day, drafts: drafts)
+          case .rest:
+            ContentUnavailableView(restTitle, systemImage: "bed.double", description: Text("看本周计划"))
+          case .error(let message):
+            ContentUnavailableView(
+              "加载失败", systemImage: "exclamationmark.triangle", description: Text(message))
+          }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
-      .navigationTitle("今天")
+      .navigationTitle("锻炼")
       .toolbar {
         Button {
           showingReadinessSheet = true
@@ -67,7 +82,7 @@ public struct TodayWorkoutView: View {
         .accessibilityLabel(readinessFiled ? "今日状态已填，点按修改" : "填写今日状态")
 
         Button {
-          Task { await viewModel.load(date: date, studentID: studentID) }
+          Task { await loadWorkout(for: selectedDate) }
         } label: {
           Image(systemName: "arrow.clockwise")
         }
@@ -113,20 +128,8 @@ public struct TodayWorkoutView: View {
     }
     .task {
       if viewModel.state == .idle {
-        await viewModel.load(date: date, studentID: studentID)
+        await loadWorkout(for: selectedDate)
         await videoViewModel.start(studentID: studentID)
-
-        // Readiness gate (spec 030 §C4): auto-present at most once per day,
-        // only for today's view, only when a non-empty workout loaded, only
-        // while neither filed nor skipped. Rest days never prompt.
-        if Calendar.current.isDateInToday(date),
-          case .loaded(_, let drafts) = viewModel.state, !drafts.isEmpty
-        {
-          await readinessViewModel.load(studentId: studentID)
-          if readinessViewModel.gate == .needed {
-            showingReadinessSheet = true
-          }
-        }
 
         // Re-surface a PR banner the student never dismissed (spec 028 §5);
         // delayed so the tab renders first.
@@ -134,6 +137,13 @@ public struct TodayWorkoutView: View {
         await viewModel.surfaceUnacknowledgedPR(studentID: studentID)
       }
     }
+    .onChange(of: selectedDate) { _, newDate in
+      Task { await loadWorkout(for: newDate) }
+    }
+  }
+
+  private var restTitle: String {
+    Calendar.current.isDateInToday(selectedDate) ? "今日休息" : "这天休息"
   }
 
   private var readinessFiled: Bool {
@@ -158,6 +168,7 @@ public struct TodayWorkoutView: View {
           ExerciseExecutionView(
             exercise: exercise,
             rows: rows(for: exercise, drafts: drafts),
+            reference: viewModel.exerciseReferences[exercise.exercise.id],
             rowIndex: { draft in drafts.firstIndex(where: { $0.id == draft.id }) },
             onTapSet: { index in
               if drafts.indices.contains(index) {
@@ -199,15 +210,7 @@ public struct TodayWorkoutView: View {
   }
 
   private func header(for day: StudentPlanDay) -> some View {
-    VStack(alignment: .leading, spacing: 2) {
-      Text(StudentFormatting.weekdayFormatter.string(from: day.date))
-        .font(.title2.bold())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      Text(StudentFormatting.dayMonthFormatter.string(from: day.date))
-        .font(.subheadline)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
+    WorkoutDayHeader(day: day, context: viewModel.planContext, readinessFiled: readinessFiled)
   }
 
   private func rows(
@@ -215,6 +218,22 @@ public struct TodayWorkoutView: View {
     drafts: [TodayWorkoutViewModel.SetRowDraft]
   ) -> [TodayWorkoutViewModel.SetRowDraft] {
     drafts.filter { $0.planExerciseID == exercise.id }
+  }
+
+  private func loadWorkout(for date: Date) async {
+    await viewModel.load(date: date, studentID: studentID)
+    await presentReadinessIfNeeded(for: date)
+  }
+
+  private func presentReadinessIfNeeded(for date: Date) async {
+    guard Calendar.current.isDateInToday(date),
+      case .loaded(_, let drafts) = viewModel.state,
+      !drafts.isEmpty
+    else { return }
+    await readinessViewModel.load(studentId: studentID)
+    if readinessViewModel.gate == .needed {
+      showingReadinessSheet = true
+    }
   }
 }
 
