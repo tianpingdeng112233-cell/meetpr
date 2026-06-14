@@ -106,7 +106,7 @@ public struct StudentRootView: View {
         Label("锻炼", systemImage: "figure.strengthtraining.traditional")
       }
 
-      TrainingHistoryView(studentID: studentID, plans: plans, logs: logs)
+      TrainingHistoryView(studentID: studentID, plans: plans, logs: logs, e1rm: e1rm)
         .tag(StudentTab.history)
         .tabItem {
           Label("历史", systemImage: "clock.arrow.circlepath")
