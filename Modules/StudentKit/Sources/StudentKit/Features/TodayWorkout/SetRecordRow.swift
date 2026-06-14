@@ -10,6 +10,10 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct SetRecordRow: View {
   let draft: TodayWorkoutViewModel.SetRowDraft
+  /// 1-based position within the exercise. Decoupled from the stored setIndex,
+  /// which is 0-based in demo seeds but 1-based from the backend — deriving the
+  /// label from setIndex showed real plans as 2,3,4,5 instead of 1,2,3,4.
+  let setNumber: Int
   let rowIndex: Int
   let onTap: (Int) -> Void
   var onPlateMath: ((Double) -> Void)?
@@ -36,7 +40,7 @@ struct SetRecordRow: View {
         onTap(rowIndex)
       } label: {
         HStack(spacing: 12) {
-          Text("\(draft.prescribed.setIndex + 1)")
+          Text("\(setNumber)")
             .font(.subheadline.monospacedDigit().bold())
             .foregroundStyle(draft.completed ? .white : Color.MeetPR.fgSecondary)
             .frame(width: 30, height: 30)
@@ -77,11 +81,16 @@ struct SetRecordRow: View {
             Image(systemName: draft.completed ? "checkmark" : "pencil")
               .font(.caption2.bold())
           }
-          .foregroundStyle(draft.completed ? Color.MeetPR.green : Color.MeetPR.fgSecondary)
+          .foregroundStyle(draft.completed ? Color.MeetPR.green : Color.MeetPR.brandRed)
           .padding(.horizontal, 12)
           .padding(.vertical, 8)
-          .background(draft.completed ? Color.MeetPR.greenSoft : Color.MeetPR.surface2)
+          .background(draft.completed ? Color.MeetPR.greenSoft : Color.MeetPR.brandRedSoft)
           .clipShape(.capsule)
+          .overlay {
+            if !draft.completed {
+              Capsule().stroke(Color.MeetPR.brandRed, lineWidth: 1)
+            }
+          }
         }
       }
       .buttonStyle(.plain)
