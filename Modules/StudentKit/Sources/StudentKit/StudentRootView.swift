@@ -85,6 +85,8 @@ public struct StudentRootView: View {
         studentID: studentID,
         plans: plans,
         logs: logs,
+        onboarding: onboarding,
+        e1rm: e1rm,
         feedbackViewModel: feedbackViewModel,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onStartWorkout: { selectedTab = .workout },
