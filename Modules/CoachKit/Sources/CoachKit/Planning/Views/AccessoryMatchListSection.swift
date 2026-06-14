@@ -8,7 +8,7 @@ public struct AccessoryMatchListSection: View {
   private let exercises: [Exercise]
   private let selectedExerciseIDs: Set<UUID>
   private let isLoading: Bool
-  private let onAdd: @MainActor (Exercise) -> Void
+  private let onToggle: @MainActor (Exercise) -> Void
 
   @State private var searchText = ""
 
@@ -16,12 +16,12 @@ public struct AccessoryMatchListSection: View {
     exercises: [Exercise],
     selectedExerciseIDs: Set<UUID>,
     isLoading: Bool,
-    onAdd: @escaping @MainActor (Exercise) -> Void
+    onToggle: @escaping @MainActor (Exercise) -> Void
   ) {
     self.exercises = exercises
     self.selectedExerciseIDs = selectedExerciseIDs
     self.isLoading = isLoading
-    self.onAdd = onAdd
+    self.onToggle = onToggle
   }
 
   public var body: some View {
@@ -70,7 +70,7 @@ public struct AccessoryMatchListSection: View {
                 exercise: exercise,
                 isSelected: selectedExerciseIDs.contains(exercise.id)
               ) {
-                onAdd(exercise)
+                onToggle(exercise)
               }
             }
           }
@@ -93,10 +93,12 @@ public struct AccessoryMatchListSection: View {
 private struct AccessoryMatchRow: View {
   let exercise: Exercise
   let isSelected: Bool
-  let onAdd: @MainActor () -> Void
+  /// Toggles: adds when unselected, removes when selected (David 2026-06-14
+  /// — a wrong pick must be reversible from inside the library).
+  let onToggle: @MainActor () -> Void
 
   var body: some View {
-    Button(action: onAdd) {
+    Button(action: onToggle) {
       HStack(alignment: .center, spacing: MeetPRSpacing.md) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text(exercise.name)
@@ -112,7 +114,8 @@ private struct AccessoryMatchRow: View {
           }
         }
 
-        Image(systemName: isSelected ? "checkmark.circle.fill" : "plus.circle.fill")
+        // Selected → tappable minus so it reads as "added, tap to remove".
+        Image(systemName: isSelected ? "minus.circle.fill" : "plus.circle.fill")
           .font(Font.MeetPR.headline)
           .foregroundStyle(isSelected ? Color.MeetPR.fgTertiary : Color.MeetPR.brandRed)
       }
@@ -121,8 +124,7 @@ private struct AccessoryMatchRow: View {
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
     .buttonStyle(.plain)
-    .disabled(isSelected)
-    .accessibilityLabel(isSelected ? "已添加 \(exercise.name)" : "添加 \(exercise.name)")
+    .accessibilityLabel(isSelected ? "移除 \(exercise.name)" : "添加 \(exercise.name)")
   }
 }
 

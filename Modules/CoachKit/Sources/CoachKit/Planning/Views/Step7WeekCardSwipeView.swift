@@ -13,7 +13,7 @@ public struct Step7WeekCardSwipeView: View {
   public var body: some View {
     VStack(spacing: MeetPRSpacing.base) {
       if let student = viewModel.selectedStudent {
-        PlanningStudentHeaderView(student: student)
+        PlanningStudentHeaderView(student: student, profile: viewModel.loadedProfile)
           .padding(.horizontal, MeetPRSpacing.base)
           .padding(.top, MeetPRSpacing.base)
       }
