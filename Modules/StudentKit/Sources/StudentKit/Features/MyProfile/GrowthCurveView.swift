@@ -8,10 +8,37 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct GrowthCurveView: View {
   private let studentID: UUID
+  private let plans: any StudentPlanRepository
+  private let e1rm: any E1RMRepository
+
+  public init(
+    studentID: UUID,
+    plans: any StudentPlanRepository,
+    e1rm: any E1RMRepository
+  ) {
+    self.studentID = studentID
+    self.plans = plans
+    self.e1rm = e1rm
+  }
+
+  public var body: some View {
+    ScrollView {
+      GrowthCurvePanelView(studentID: studentID, plans: plans, e1rm: e1rm)
+        .padding(MeetPRSpacing.md)
+    }
+    .background(Color.MeetPR.bg)
+    .navigationTitle("成长曲线")
+  }
+}
+
+/// Embeddable e1RM growth panel without scroll view, navigation title, or page background.
+@available(iOS 17.0, macOS 14.0, *)
+struct GrowthCurvePanelView: View {
+  private let studentID: UUID
   @State private var viewModel: GrowthCurveViewModel
   @State private var selectedPoint: E1RMHistoryPoint?
 
-  public init(
+  init(
     studentID: UUID,
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository
@@ -20,29 +47,24 @@ public struct GrowthCurveView: View {
     self._viewModel = State(initialValue: GrowthCurveViewModel(plans: plans, e1rm: e1rm))
   }
 
-  public var body: some View {
-    ScrollView {
-      VStack(spacing: MeetPRSpacing.md) {
-        Picker("主项", selection: $viewModel.selectedFamily) {
-          Text("深蹲").tag(LiftFamily.squat)
-          Text("卧推").tag(LiftFamily.bench)
-          Text("硬拉").tag(LiftFamily.deadlift)
-        }
-        .pickerStyle(.segmented)
-
-        Picker("时间", selection: $viewModel.selectedWindow) {
-          ForEach(GrowthCurveViewModel.TimeWindow.allCases, id: \.self) { window in
-            Text(window.rawValue).tag(window)
-          }
-        }
-        .pickerStyle(.segmented)
-
-        chartSection
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.md) {
+      Picker("主项", selection: $viewModel.selectedFamily) {
+        Text("深蹲").tag(LiftFamily.squat)
+        Text("卧推").tag(LiftFamily.bench)
+        Text("硬拉").tag(LiftFamily.deadlift)
       }
-      .padding(MeetPRSpacing.md)
+      .pickerStyle(.segmented)
+
+      Picker("时间", selection: $viewModel.selectedWindow) {
+        ForEach(GrowthCurveViewModel.TimeWindow.allCases, id: \.self) { window in
+          Text(window.rawValue).tag(window)
+        }
+      }
+      .pickerStyle(.segmented)
+
+      chartSection()
     }
-    .background(Color.MeetPR.bg)
-    .navigationTitle("成长曲线")
     .task {
       if viewModel.state == .idle {
         await viewModel.load(studentID: studentID)
@@ -55,7 +77,7 @@ public struct GrowthCurveView: View {
   }
 
   @ViewBuilder
-  private var chartSection: some View {
+  private func chartSection() -> some View {
     switch viewModel.state {
     case .idle, .loading:
       ProgressView()
