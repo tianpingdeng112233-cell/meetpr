@@ -193,7 +193,7 @@ private struct DayChip: View {
 
   var body: some View {
     let isToday = Calendar.current.isDate(day.date, inSameDayAs: Date())
-    let progress = StudentFormatting.completedCount(for: day, logs: logs)
+    let progress = TrainingDayProgress(day: day, logs: logs)
 
     VStack(spacing: 6) {
       Text(Self.shortWeekday.string(from: day.date))
@@ -203,7 +203,7 @@ private struct DayChip: View {
         .font(.headline.monospacedDigit())
         .foregroundStyle(Color.MeetPR.fgPrimary)
       Circle()
-        .fill(dotColor(progress: progress))
+        .fill(progress.state.dotColor)
         .frame(width: 7, height: 7)
     }
     .frame(width: 52)
@@ -214,13 +214,6 @@ private struct DayChip: View {
         .stroke(isToday ? Color.MeetPR.green : Color.MeetPR.border, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: 12))
-  }
-
-  private func dotColor(progress: (completed: Int, total: Int)) -> Color {
-    if day.exercises.isEmpty { return Color.MeetPR.fgTertiary.opacity(0.4) }
-    if progress.total > 0 && progress.completed == progress.total { return Color.MeetPR.green }
-    if progress.completed > 0 { return Color.MeetPR.amber }
-    return Color.MeetPR.fgTertiary
   }
 
   private static let shortWeekday: DateFormatter = {

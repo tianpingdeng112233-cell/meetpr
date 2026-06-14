@@ -27,17 +27,39 @@ public final class WeekOverviewViewModel {
     state = .loading
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      let days = try await plans.fetchCycleDays(studentID: studentID)
+      let weekIndex = plan?.weekIndex ?? 1
+      // fetchCycleDays now returns the whole cycle; the dashboard strip only
+      // wants this week, so filter to the current plan-week window by date.
+      let allDays = try await plans.fetchCycleDays(studentID: studentID)
+      let days = Self.currentWeekDays(
+        from: allDays, startDate: plan?.startDate, weekIndex: weekIndex)
       let fetchedLogs: [StudentSetLog]
       if let dateRange = Self.dateRange(for: days) {
         fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
       } else {
         fetchedLogs = []
       }
-      state = .loaded(days: days, logs: fetchedLogs, weekIndex: plan?.weekIndex ?? 1)
+      state = .loaded(days: days, logs: fetchedLogs, weekIndex: weekIndex)
     } catch {
       state = .error(error.localizedDescription)
     }
+  }
+
+  /// The plan-week window `[startDate + (weekIndex-1)*7, +7)` narrows the full
+  /// cycle down to "this week" for the dashboard strip. UTC to match the
+  /// projection's date computation.
+  private static func currentWeekDays(
+    from days: [StudentPlanDay], startDate: Date?, weekIndex: Int
+  ) -> [StudentPlanDay] {
+    guard let startDate else { return days }
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+    let base = calendar.startOfDay(for: startDate)
+    guard
+      let weekStart = calendar.date(byAdding: .day, value: (weekIndex - 1) * 7, to: base),
+      let weekEnd = calendar.date(byAdding: .day, value: 7, to: weekStart)
+    else { return days }
+    return days.filter { $0.date >= weekStart && $0.date < weekEnd }
   }
 
   private static func dateRange(for days: [StudentPlanDay]) -> ClosedRange<Date>? {

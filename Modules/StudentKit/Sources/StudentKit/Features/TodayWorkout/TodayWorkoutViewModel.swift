@@ -25,12 +25,15 @@ public final class TodayWorkoutViewModel {
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
   /// Inter-set rest countdown (spec 030 §B). Purely local, never persisted.
   public private(set) var restTimer: RestTimerState?
+  public private(set) var planContext: TodayWorkoutPlanContext?
+  public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rmRepo: any E1RMRepository
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
+  private var loadGeneration = 0
 
   public init(
     plans: any StudentPlanRepository,
@@ -46,37 +49,43 @@ public final class TodayWorkoutViewModel {
 
   public func load(date: Date, studentID: UUID) async {
     currentStudentID = studentID
+    loadGeneration += 1
+    let generation = loadGeneration
     state = .loading
     do {
-      guard let day = try await plans.fetchDay(studentID: studentID, date: date) else {
+      let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+      guard isCurrentLoad(generation) else { return }
+      planContext = Self.planContext(from: plan, selectedDate: date)
+
+      guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
+        guard isCurrentLoad(generation) else { return }
+        exerciseReferences = [:]
         state = .rest
         return
       }
       let dayRange = Self.dayRange(containing: day.date)
       let existingLogs = try await logs.fetchLogs(studentID: studentID, in: dayRange)
-      let drafts = day.exercises.flatMap { exercise in
-        exercise.prescribedSets.map { set in
-          let existingLog = existingLogs.first {
-            $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
-          }
-          return SetRowDraft(
-            id: set.id,
-            planExerciseID: exercise.id,
-            exerciseID: exercise.exercise.id,
-            exerciseName: exercise.exercise.name,
-            prescribed: set,
-            actualWeight: existingLog?.weightKg ?? set.weightKg,
-            actualReps: existingLog?.reps ?? set.reps,
-            actualRPE: existingLog?.rpe ?? set.rpe ?? 8,
-            completed: existingLog?.completed ?? false,
-            loggedSetID: existingLog?.id
-          )
-        }
-      }
+      let drafts = Self.makeDrafts(for: day, existingLogs: existingLogs)
+      let references = try await exerciseReferences(for: day, studentID: studentID)
+      guard isCurrentLoad(generation) else { return }
+      exerciseReferences = references
       state = .loaded(plan: day, drafts: drafts)
     } catch {
-      state = .error(error.localizedDescription)
+      if isCurrentLoad(generation) {
+        state = .error(error.localizedDescription)
+      }
     }
+  }
+
+  private func loadDay(
+    from plan: StudentPlanView?,
+    date: Date,
+    studentID: UUID
+  ) async throws -> StudentPlanDay? {
+    if let day = plan?.days.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
+      return day
+    }
+    return try await plans.fetchDay(studentID: studentID, date: date)
   }
 
   public func updateWeight(rowIndex: Int, weight: Decimal?) {
@@ -214,7 +223,119 @@ public final class TodayWorkoutViewModel {
     pendingPRBanner = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID))?.first
   }
 
-  private func recordE1RMPoint(
+  private func mutateDraft(rowIndex: Int, update: (inout SetRowDraft) -> Void) {
+    switch state {
+    case .loaded(let plan, let drafts), .recording(let plan, let drafts, _):
+      guard drafts.indices.contains(rowIndex) else {
+        return
+      }
+      var nextDrafts = drafts
+      update(&nextDrafts[rowIndex])
+      state = .loaded(plan: plan, drafts: nextDrafts)
+    default:
+      return
+    }
+  }
+
+  private func isCurrentLoad(_ generation: Int) -> Bool {
+    generation == loadGeneration
+  }
+
+  private static func planContext(
+    from plan: StudentPlanView?,
+    selectedDate: Date
+  ) -> TodayWorkoutPlanContext? {
+    guard let plan else { return nil }
+    return TodayWorkoutPlanContext(
+      planKind: plan.planKind,
+      weekIndex: weekIndex(for: selectedDate, startDate: plan.startDate, fallback: plan.weekIndex),
+      startDate: plan.startDate
+    )
+  }
+
+  private static func weekIndex(for date: Date, startDate: Date, fallback: Int) -> Int {
+    let calendar = Calendar.current
+    let start = calendar.startOfDay(for: startDate)
+    let selected = calendar.startOfDay(for: date)
+    guard let elapsedDays = calendar.dateComponents([.day], from: start, to: selected).day else {
+      return fallback
+    }
+    return max(1, elapsedDays / 7 + 1)
+  }
+
+  private static func dayRange(containing date: Date) -> ClosedRange<Date> {
+    let start = Calendar.current.startOfDay(for: date)
+    return start...start.addingTimeInterval(86_400 - 1)
+  }
+}
+
+// MARK: - Draft building & e1RM/PR side effects
+
+@available(iOS 17.0, macOS 14.0, *)
+extension TodayWorkoutViewModel {
+  func exerciseReferences(
+    for day: StudentPlanDay,
+    studentID: UUID
+  ) async throws -> [UUID: ExerciseReference] {
+    let exerciseIDs = Set(day.exercises.map(\.exercise.id))
+    let e1rmRepo = self.e1rmRepo
+    return try await withThrowingTaskGroup(of: (UUID, ExerciseReference?).self) { group in
+      for exerciseID in exerciseIDs {
+        group.addTask {
+          let points = try await e1rmRepo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
+          let selected = lastAndBest(from: points)
+          let reference = ExerciseReference(
+            last: selected.last.map(ExerciseReferenceSet.init(point:)),
+            best: selected.best.map(ExerciseReferenceSet.init(point:))
+          )
+          return (exerciseID, reference.hasValue ? reference : nil)
+        }
+      }
+
+      var references: [UUID: ExerciseReference] = [:]
+      for try await (exerciseID, reference) in group {
+        if let reference {
+          references[exerciseID] = reference
+        }
+      }
+      return references
+    }
+  }
+
+  static func makeDrafts(
+    for day: StudentPlanDay,
+    existingLogs: [StudentSetLog]
+  ) -> [SetRowDraft] {
+    day.exercises.flatMap { exercise in
+      exercise.prescribedSets.map { set in
+        makeDraft(exercise: exercise, set: set, existingLogs: existingLogs)
+      }
+    }
+  }
+
+  static func makeDraft(
+    exercise: StudentPlanExercise,
+    set: PrescribedSet,
+    existingLogs: [StudentSetLog]
+  ) -> SetRowDraft {
+    let existingLog = existingLogs.first {
+      $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
+    }
+    return SetRowDraft(
+      id: set.id,
+      planExerciseID: exercise.id,
+      exerciseID: exercise.exercise.id,
+      exerciseName: exercise.exercise.name,
+      prescribed: set,
+      actualWeight: existingLog?.weightKg ?? set.weightKg,
+      actualReps: existingLog?.reps ?? set.reps,
+      actualRPE: existingLog?.rpe ?? set.rpe ?? 8,
+      completed: existingLog?.completed ?? false,
+      loggedSetID: existingLog?.id
+    )
+  }
+
+  func recordE1RMPoint(
     for draft: SetRowDraft,
     log: StudentSetLog,
     studentID: UUID
@@ -270,24 +391,5 @@ public final class TodayWorkoutViewModel {
       // e1RM persistence is best-effort and must never block set logging,
       // but a banner only celebrates durably recorded history.
     }
-  }
-
-  private func mutateDraft(rowIndex: Int, update: (inout SetRowDraft) -> Void) {
-    switch state {
-    case .loaded(let plan, let drafts), .recording(let plan, let drafts, _):
-      guard drafts.indices.contains(rowIndex) else {
-        return
-      }
-      var nextDrafts = drafts
-      update(&nextDrafts[rowIndex])
-      state = .loaded(plan: plan, drafts: nextDrafts)
-    default:
-      return
-    }
-  }
-
-  private static func dayRange(containing date: Date) -> ClosedRange<Date> {
-    let start = Calendar.current.startOfDay(for: date)
-    return start...start.addingTimeInterval(86_400 - 1)
   }
 }
