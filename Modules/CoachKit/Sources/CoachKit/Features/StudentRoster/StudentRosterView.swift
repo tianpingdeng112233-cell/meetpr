@@ -128,6 +128,16 @@ struct StudentRosterView: View {
         queueSection
       }
 
+      if viewModel.pendingAttentionCount > 0 {
+        TriageStripSection(
+          rows: viewModel.triageRows,
+          context: context,
+          onEvaluationCompleted: { [viewModel] studentID in
+            viewModel.markStudentActive(studentID)
+          }
+        )
+      }
+
       rosterSection
     }
     .listStyle(.plain)

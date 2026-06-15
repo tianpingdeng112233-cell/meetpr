@@ -21,16 +21,19 @@ enum CoachStudentFeatureFixtures {
     CoachStudentSummary(id: id, displayName: name, status: status)
   }
 
-  static func plan(startDate: Date = startDate) -> StudentPlanView {
+  static func plan(
+    startDate: Date = startDate,
+    trainingOffsets: Set<Int> = [1]
+  ) -> StudentPlanView {
     StudentPlanView(
       cycleID: UUID(uuidString: "02900000-0000-0000-0000-000000000501")!,
       weekIndex: 1,
       startDate: startDate,
       days: (0..<7).map { offset in
         let date = startDate.addingTimeInterval(Double(offset) * 86_400)
-        if offset == 1 {
+        if trainingOffsets.contains(offset) {
           return StudentPlanDay(
-            id: UUID(uuidString: "02900000-0000-0000-0000-000000000601")!,
+            id: UUID(uuidString: String(format: "02900000-0000-0000-0000-%012d", 600 + offset))!,
             date: date,
             exercises: [exercise()]
           )
