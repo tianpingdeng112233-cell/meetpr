@@ -25,6 +25,9 @@ struct ExerciseExecutionView: View {
           Text(prescriptionSummary)
             .font(.caption)
             .foregroundStyle(Color.MeetPR.fgSecondary)
+          if let reference, reference.hasValue {
+            ExerciseReferenceRow(reference: reference)
+          }
         }
         Spacer()
         Image(systemName: allCompleted ? "checkmark.circle.fill" : "circle")
@@ -34,15 +37,9 @@ struct ExerciseExecutionView: View {
 
       ForEach(Array(rows.enumerated()), id: \.element.id) { offset, row in
         if let index = rowIndex(row) {
-          VStack(alignment: .leading, spacing: 4) {
-            SetRecordRow(
-              draft: row, setNumber: offset + 1, rowIndex: index,
-              onTap: onTapSet, onPlateMath: onPlateMath)
-            if !row.completed, let reference, reference.hasValue {
-              ExerciseReferenceRow(reference: reference)
-                .padding(.leading, 42)
-            }
-          }
+          SetRecordRow(
+            draft: row, setNumber: offset + 1, rowIndex: index,
+            onTap: onTapSet, onPlateMath: onPlateMath)
         }
       }
     }
