@@ -8,9 +8,13 @@ struct StudentRosterRowModel: Hashable, Identifiable, Sendable {
   let plannedTrainingDays: Int
   let completedTrainingDays: Int
   let lastActiveAt: Date?
-  let needsAttention: Bool
+  let triageSignals: [TriageSignal]
 
   var id: UUID { student.id }
+
+  var needsAttention: Bool {
+    !triageSignals.isEmpty
+  }
 
   var completionText: String {
     "本周完成 \(completedTrainingDays)/\(plannedTrainingDays) 训练"
@@ -42,7 +46,11 @@ final class StudentRosterViewModel {
   var searchText = ""
 
   var pendingAttentionCount: Int {
-    rows.filter(\.needsAttention).count
+    triageRows.count
+  }
+
+  var triageRows: [StudentRosterRowModel] {
+    rows.filter(\.needsAttention)
   }
 
   var filteredRows: [StudentRosterRowModel] {
@@ -96,7 +104,7 @@ final class StudentRosterViewModel {
         plannedTrainingDays: row.plannedTrainingDays,
         completedTrainingDays: row.completedTrainingDays,
         lastActiveAt: row.lastActiveAt,
-        needsAttention: row.needsAttention
+        triageSignals: row.triageSignals
       )
     }
   }
@@ -158,8 +166,9 @@ final class StudentRosterViewModel {
     now: @Sendable () -> Date
   ) async -> StudentRosterRowModel {
     do {
+      let timestamp = now()
       let plan = try await plans.fetchCurrentPlan(studentID: summary.id)
-      let range = Self.weekRange(for: plan, now: now())
+      let range = Self.logFetchRange(for: plan, now: timestamp)
       async let logs = trainingLogs.fetchLogs(studentID: summary.id, in: range)
       async let feedbackItems = feedback.fetchInbox(studentID: summary.id)
       return Self.makeRow(
@@ -167,7 +176,7 @@ final class StudentRosterViewModel {
         plan: plan,
         logs: try await logs,
         feedback: try await feedbackItems,
-        now: now()
+        now: timestamp
       )
     } catch {
       return StudentRosterRowModel(
@@ -175,7 +184,7 @@ final class StudentRosterViewModel {
         plannedTrainingDays: 0,
         completedTrainingDays: 0,
         lastActiveAt: nil,
-        needsAttention: false
+        triageSignals: []
       )
     }
   }
@@ -194,27 +203,35 @@ final class StudentRosterViewModel {
       }
     }
     let latestLog = logs.filter(\.completed).map(\.loggedAt).max()
-    let latestFeedback = feedback.map(\.postedAt).max()
-    let threeDaysAgo =
-      CoachFeatureCalendar.calendar.date(byAdding: .day, value: -3, to: now) ?? now
-    let hasRecentLog = latestLog.map { $0 >= threeDaysAgo && $0 <= now } ?? false
-    let hasNewFeedback =
-      latestLog.flatMap { logDate in latestFeedback.map { $0 >= logDate } } ?? false
+    let triageSignals = StudentTriageSignalCalculator.signals(
+      studentID: summary.id,
+      plan: plan,
+      logs: logs,
+      feedback: feedback,
+      now: now
+    )
 
     return StudentRosterRowModel(
       student: summary,
       plannedTrainingDays: plannedDays.count,
       completedTrainingDays: completedDays.count,
       lastActiveAt: latestLog,
-      needsAttention: hasRecentLog && !hasNewFeedback
+      triageSignals: triageSignals
     )
   }
 
-  private static func weekRange(for plan: StudentPlanView?, now: Date) -> ClosedRange<Date> {
-    guard let plan else {
-      let start = CoachFeatureCalendar.calendar.date(byAdding: .day, value: -6, to: now) ?? now
-      return CoachFeatureCalendar.dateRange(starting: start, days: 7)
-    }
-    return CoachFeatureCalendar.dateRange(starting: plan.startDate, days: 7)
+  private static func logFetchRange(for plan: StudentPlanView?, now: Date) -> ClosedRange<Date> {
+    let calendar = CoachFeatureCalendar.calendar
+    let today = CoachFeatureCalendar.startOfDay(now, calendar: calendar)
+    let lookbackStart =
+      calendar.date(
+        byAdding: .day,
+        value: -StudentTriageSignalCalculator.notTrainedLookbackDays,
+        to: today
+      ) ?? today
+    let planStart = plan.map { CoachFeatureCalendar.startOfDay($0.startDate, calendar: calendar) }
+    let start = min(planStart ?? lookbackStart, lookbackStart)
+    let end = CoachFeatureCalendar.endOfDay(now, calendar: calendar)
+    return start...max(start, end)
   }
 }

@@ -75,14 +75,10 @@ public struct CoachRootView: View {
 
   public var body: some View {
     TabView {
-      CoachPlanningHomeView(
-        repository: repository,
-        draftStore: draftStore,
-        profiles: detailContext.profiles
-      )
-      .tabItem {
-        Label("排计划", systemImage: "calendar.badge.plus")
-      }
+      CoachPlanningHomeView(context: detailContext)
+        .tabItem {
+          Label("排计划", systemImage: "calendar.badge.plus")
+        }
 
       StudentRosterView(
         viewModel: rosterViewModel,
@@ -104,49 +100,5 @@ public struct CoachRootView: View {
       await rosterViewModel.loadIfNeeded()
       await queueViewModel.loadIfNeeded()
     }
-  }
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct CoachPlanningHomeView: View {
-  let repository: any PlanRepository
-  let draftStore: DraftStore
-  let profiles: any OnboardingProfileReading
-  @State private var showPlanning = false
-
-  var body: some View {
-    NavigationStack {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-        Text("教练端")
-          .font(Font.MeetPR.title1)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-
-        PrimaryButton("排新计划", isFullWidth: true) {
-          showPlanning = true
-        }
-      }
-      .padding(MeetPRSpacing.base)
-      .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-      .background(Color.MeetPR.bg)
-      .navigationTitle("MeetPR")
-    }
-    #if os(iOS)
-      .fullScreenCover(isPresented: $showPlanning) {
-        PlanningCoordinatorView(
-          repository: repository,
-          draftStore: draftStore,
-          profiles: profiles
-        )
-      }
-    #else
-      .sheet(isPresented: $showPlanning) {
-        PlanningCoordinatorView(
-          repository: repository,
-          draftStore: draftStore,
-          profiles: profiles
-        )
-      }
-    #endif
   }
 }
