@@ -70,18 +70,33 @@ struct SetEntrySheet: View {
         )
       }
 
-      Button {
-        save()
-      } label: {
-        Text(draft.completed ? "保存修改" : "完成本组")
-          .font(.headline)
-          .foregroundStyle(.white)
-          .frame(maxWidth: .infinity)
-          .padding()
-          .background(Color.MeetPR.brandRed)
-          .clipShape(.rect(cornerRadius: 12))
+      VStack(spacing: 10) {
+        Button {
+          save(failed: false)
+        } label: {
+          Label("完成本组", systemImage: "checkmark")
+            .font(.headline)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.MeetPR.green)
+            .clipShape(.rect(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+
+        Button {
+          save(failed: true)
+        } label: {
+          Label("未完成 / 失败", systemImage: "xmark")
+            .font(.headline)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.MeetPR.amber)
+            .clipShape(.rect(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
       }
-      .buttonStyle(.plain)
       .padding(.top, 4)
     }
     .padding()
@@ -90,11 +105,11 @@ struct SetEntrySheet: View {
     .presentationDetents([.medium, .large])
   }
 
-  private func save() {
+  private func save(failed: Bool) {
     viewModel.updateWeight(rowIndex: rowIndex, weight: weight)
     viewModel.updateReps(rowIndex: rowIndex, reps: reps)
     viewModel.updateRPE(rowIndex: rowIndex, rpe: rpe)
-    Task { await viewModel.commitSet(rowIndex: rowIndex) }
+    Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
     dismiss()
   }
 

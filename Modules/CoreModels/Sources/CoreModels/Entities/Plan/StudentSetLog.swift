@@ -12,6 +12,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
   public let reps: Int
   public let rpe: Decimal?
   public let completed: Bool
+  public let failed: Bool
 
   public init(
     id: UUID,
@@ -22,7 +23,8 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
-    completed: Bool
+    completed: Bool,
+    failed: Bool = false
   ) {
     self.id = id
     self.studentID = studentID
@@ -33,6 +35,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     self.reps = reps
     self.rpe = rpe
     self.completed = completed
+    self.failed = failed
   }
 
   public init(from decoder: Decoder) throws {
@@ -46,6 +49,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
     completed = try container.decode(Bool.self, forKey: .completed)
+    failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -59,6 +63,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encode(completed, forKey: .completed)
+    try container.encode(failed, forKey: .failed)
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -71,5 +76,6 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     case reps
     case rpe
     case completed
+    case failed
   }
 }

@@ -2,6 +2,65 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
+enum SetRecordResultState: Equatable, Sendable {
+  case completed
+  case failed
+  case unlogged
+
+  static func resolve(for draft: TodayWorkoutViewModel.SetRowDraft) -> SetRecordResultState {
+    guard draft.completed else { return .unlogged }
+    return draft.failed ? .failed : .completed
+  }
+
+  var iconName: String {
+    switch self {
+    case .completed:
+      "checkmark"
+    case .failed:
+      "xmark"
+    case .unlogged:
+      "pencil"
+    }
+  }
+
+  var accentColor: Color {
+    switch self {
+    case .completed:
+      Color.MeetPR.green
+    case .failed:
+      Color.MeetPR.amber
+    case .unlogged:
+      Color.MeetPR.fgSecondary
+    }
+  }
+
+  var softBackgroundColor: Color {
+    switch self {
+    case .completed:
+      Color.MeetPR.greenSoft
+    case .failed:
+      Color.MeetPR.amberSoft
+    case .unlogged:
+      Color.MeetPR.surface2
+    }
+  }
+
+  var numberBackgroundColor: Color {
+    switch self {
+    case .completed:
+      Color.MeetPR.green
+    case .failed:
+      Color.MeetPR.amber
+    case .unlogged:
+      Color.MeetPR.surface2
+    }
+  }
+
+  var numberForegroundColor: Color {
+    self == .unlogged ? Color.MeetPR.fgSecondary : .white
+  }
+}
+
 /// One set, Juggernaut-style: [number] [target weight] [⚖] … [result pill].
 /// Two side-by-side buttons (spec 030 §A2): the row body opens
 /// `SetEntrySheet`; the scalemass icon next to the target weight opens the
@@ -34,6 +93,10 @@ struct SetRecordRow: View {
       .map { NSDecimalNumber(decimal: $0).doubleValue }
   }
 
+  private var resultState: SetRecordResultState {
+    SetRecordResultState.resolve(for: draft)
+  }
+
   var body: some View {
     HStack(spacing: 12) {
       Button {
@@ -42,9 +105,9 @@ struct SetRecordRow: View {
         HStack(spacing: 12) {
           Text("\(setNumber)")
             .font(.subheadline.monospacedDigit().bold())
-            .foregroundStyle(draft.completed ? .white : Color.MeetPR.fgSecondary)
+            .foregroundStyle(resultState.numberForegroundColor)
             .frame(width: 30, height: 30)
-            .background(draft.completed ? Color.MeetPR.green : Color.MeetPR.surface2)
+            .background(resultState.numberBackgroundColor)
             .clipShape(Circle())
 
           if let targetWeight {
@@ -78,17 +141,17 @@ struct SetRecordRow: View {
           HStack(spacing: 6) {
             Text(resultText)
               .font(.subheadline.monospacedDigit().bold())
-            Image(systemName: draft.completed ? "checkmark" : "pencil")
+            Image(systemName: resultState.iconName)
               .font(.caption2.bold())
           }
-          .foregroundStyle(draft.completed ? Color.MeetPR.green : Color.MeetPR.brandRed)
+          .foregroundStyle(resultState.accentColor)
           .padding(.horizontal, 12)
           .padding(.vertical, 8)
-          .background(draft.completed ? Color.MeetPR.greenSoft : Color.MeetPR.brandRedSoft)
+          .background(resultState.softBackgroundColor)
           .clipShape(.capsule)
           .overlay {
-            if !draft.completed {
-              Capsule().stroke(Color.MeetPR.brandRed, lineWidth: 1)
+            if resultState == .unlogged {
+              Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
             }
           }
         }
