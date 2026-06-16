@@ -100,5 +100,6 @@ public struct CoachRootView: View {
       await rosterViewModel.loadIfNeeded()
       await queueViewModel.loadIfNeeded()
     }
+    .tint(Color.MeetPR.brandRed)
   }
 }

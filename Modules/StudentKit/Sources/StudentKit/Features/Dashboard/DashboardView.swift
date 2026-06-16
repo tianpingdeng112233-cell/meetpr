@@ -201,16 +201,11 @@ private struct TodayWorkoutCard: View {
           Text("\(today.exercises.count) 个动作 · \(progress.completed)/\(progress.total) 组完成")
             .font(.subheadline.monospacedDigit())
             .foregroundStyle(Color.MeetPR.fgSecondary)
-          Button(action: onStart) {
-            Text(progress.completed == 0 ? "开始训练" : "继续训练")
-              .font(.headline)
-              .foregroundStyle(.white)
-              .frame(maxWidth: .infinity)
-              .padding()
-              .background(Color.MeetPR.brandRed)
-              .clipShape(.rect(cornerRadius: 12))
-          }
-          .buttonStyle(.plain)
+          BrandPrimaryButton(
+            progress.completed == 0 ? "开始训练" : "继续训练",
+            isFullWidth: true,
+            action: onStart
+          )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .modifier(DashboardCard())

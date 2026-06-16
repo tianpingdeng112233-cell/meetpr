@@ -172,6 +172,9 @@ struct StudentRosterView: View {
           } label: {
             StudentRosterRow(row: row)
           }
+          .buttonStyle(.plain)
+          .listRowSeparator(.hidden)
+          .listRowBackground(Color.clear)
         }
       }
     } header: {

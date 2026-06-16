@@ -11,6 +11,11 @@ struct ComponentsSmokeTests {
     _ = PrimaryButton("Save Mesocycle") {}
   }
 
+  @Test("BrandPrimaryButton instantiates")
+  func brandPrimaryButtonInstantiates() {
+    _ = BrandPrimaryButton("Start Training", isFullWidth: true) {}
+  }
+
   @Test("SecondaryButton instantiates")
   func secondaryButtonInstantiates() {
     _ = SecondaryButton("Discard") {}
@@ -31,6 +36,11 @@ struct ComponentsSmokeTests {
     _ = Card {
       Text("Card")
     }
+  }
+
+  @Test("InitialAvatar instantiates")
+  func initialAvatarInstantiates() {
+    _ = InitialAvatar("Chen Lei")
   }
 
   @Test("ElevatedCard instantiates")
