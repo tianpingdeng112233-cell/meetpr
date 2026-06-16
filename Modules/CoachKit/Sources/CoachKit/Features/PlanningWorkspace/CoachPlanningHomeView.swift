@@ -36,7 +36,7 @@ struct CoachPlanningHomeView: View {
             .font(Font.MeetPR.title1)
             .foregroundStyle(Color.MeetPR.fgPrimary)
 
-          PrimaryButton("排新计划", isFullWidth: true) {
+          BrandPrimaryButton("排新计划", isFullWidth: true) {
             presentPlanning(intent: .blank)
           }
 

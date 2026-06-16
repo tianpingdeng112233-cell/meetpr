@@ -13,8 +13,9 @@ struct PlanningDraftSection: View {
         PlanningWorkspaceActionRow(
           title: row.student.displayName,
           summary: row.summary,
+          badge: PlanningWorkspaceBadge(status: .pending, title: "编到一半"),
           actionTitle: "继续",
-          systemImage: "arrow.right.circle.fill"
+          avatarSize: 42
         ) {
           onContinue(row)
         }
@@ -35,8 +36,9 @@ struct PlanningNeedsSection: View {
         PlanningWorkspaceActionRow(
           title: row.student.displayName,
           summary: row.summary,
+          badge: PlanningWorkspaceBadge.needsPlanning(row.reason),
           actionTitle: "排",
-          systemImage: "calendar.badge.plus"
+          avatarSize: 42
         ) {
           onPlan(row)
         }
@@ -81,10 +83,24 @@ private struct PlanningWorkspaceSection<Content: View>: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Text(title)
-        .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+      Eyebrow(title)
       content
+    }
+  }
+}
+
+private struct PlanningWorkspaceBadge {
+  let status: StatusBadge.Status
+  let title: String
+
+  static func needsPlanning(_ reason: PlanningPlanNeedReason) -> PlanningWorkspaceBadge {
+    switch reason {
+    case .noCurrentPlan:
+      PlanningWorkspaceBadge(status: .pending, title: "暂无计划")
+    case .ended:
+      PlanningWorkspaceBadge(status: .overdue, title: "已结束")
+    case .endsThisWeek:
+      PlanningWorkspaceBadge(status: .overdue, title: "本周结束")
     }
   }
 }
@@ -94,13 +110,15 @@ private struct PlanningWorkspaceSection<Content: View>: View {
 private struct PlanningWorkspaceActionRow: View {
   let title: String
   let summary: String
+  let badge: PlanningWorkspaceBadge
   let actionTitle: String
-  let systemImage: String
+  let avatarSize: CGFloat
   let action: () -> Void
 
   var body: some View {
     Card(accessibilityLabel: title) {
       HStack(alignment: .center, spacing: MeetPRSpacing.base) {
+        InitialAvatar(title, size: avatarSize)
         rowText
         Spacer(minLength: MeetPRSpacing.sm)
         actionButton
@@ -110,25 +128,25 @@ private struct PlanningWorkspaceActionRow: View {
 
   private var rowText: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-      Text(title)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .lineLimit(1)
+      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
+        Text(title)
+          .font(Font.MeetPR.bodyEmphasis)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .lineLimit(1)
+
+        StatusBadge(status: badge.status, title: badge.title)
+      }
+
       Text(summary)
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
         .lineLimit(2)
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   private var actionButton: some View {
-    Button(action: action) {
-      Label(actionTitle, systemImage: systemImage)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-    }
-    .buttonStyle(.plain)
-    .accessibilityLabel(actionTitle)
+    BrandPrimaryButton(actionTitle, action: action)
   }
 }
 
@@ -140,28 +158,51 @@ private struct PlanningWorkspacePublishedRow: View {
   var body: some View {
     Card(accessibilityLabel: row.student.displayName) {
       HStack(alignment: .center, spacing: MeetPRSpacing.base) {
+        InitialAvatar(row.student.displayName, size: 42)
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-          Text(row.student.displayName)
-            .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-            .lineLimit(1)
-          Text(row.summary)
+          HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
+            Text(row.student.displayName)
+              .font(Font.MeetPR.bodyEmphasis)
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .lineLimit(1)
+
+            StatusBadge(status: .completed, title: "已发布")
+          }
+
+          Text("\(row.summary) · \(dateText)发")
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgSecondary)
             .lineLimit(1)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+
         Spacer(minLength: MeetPRSpacing.sm)
-        Text(dateText)
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-        Image(systemName: "chevron.right")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+        PlanningWorkspaceActionPill(title: "查看")
       }
     }
   }
 
   private var dateText: String {
     "\(PlanningWorkspaceSummary.proxyDateText(row.proxyPublishedAt))发"
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private struct PlanningWorkspaceActionPill: View {
+  let title: String
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.xs) {
+      Text(title)
+      Image(systemName: "chevron.right")
+        .font(.system(size: 12, weight: .semibold))
+    }
+    .font(Font.MeetPR.bodyEmphasis)
+    .foregroundStyle(.white)
+    .padding(.horizontal, MeetPRSpacing.base)
+    .padding(.vertical, MeetPRSpacing.sm)
+    .background(Color.MeetPR.brandRed)
+    .clipShape(.capsule)
   }
 }

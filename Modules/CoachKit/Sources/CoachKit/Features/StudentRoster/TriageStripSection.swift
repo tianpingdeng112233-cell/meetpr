@@ -11,24 +11,40 @@ struct TriageStripSection: View {
 
   var body: some View {
     Section {
-      ForEach(rows) { row in
-        NavigationLink(
-          destination: {
-            StudentDetailView(
-              summary: row.student,
-              context: context,
-              onEvaluationCompleted: {
-                onEvaluationCompleted(row.student.id)
+      ElevatedCard(accessibilityLabel: "今天 \(rows.count) 个需要你") {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
+          Eyebrow("今天 \(rows.count) 个需要你")
+
+          VStack(spacing: 0) {
+            ForEach(rows) { row in
+              NavigationLink(
+                destination: {
+                  StudentDetailView(
+                    summary: row.student,
+                    context: context,
+                    onEvaluationCompleted: {
+                      onEvaluationCompleted(row.student.id)
+                    }
+                  )
+                },
+                label: {
+                  TriageStripRow(row: row)
+                }
+              )
+              .buttonStyle(.plain)
+
+              if row.id != rows.last?.id {
+                Divider()
+                  .background(Color.MeetPR.border)
               }
-            )
-          },
-          label: {
-            TriageStripRow(row: row)
+            }
           }
-        )
+        }
       }
+      .listRowSeparator(.hidden)
+      .listRowBackground(Color.clear)
     } header: {
-      Text("今天 \(rows.count) 个需要你")
+      EmptyView()
     }
   }
 }
@@ -39,9 +55,9 @@ private struct TriageStripRow: View {
   let row: StudentRosterRowModel
 
   var body: some View {
-    HStack(spacing: MeetPRSpacing.sm) {
+    HStack(spacing: MeetPRSpacing.base) {
       Circle()
-        .fill(Color.MeetPR.amber)
+        .fill(signalColor)
         .frame(width: 8, height: 8)
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
@@ -55,9 +71,21 @@ private struct TriageStripRow: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
           .lineLimit(1)
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
+
+      Image(systemName: "chevron.right")
+        .font(.system(size: 14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.fgTertiary)
     }
-    .padding(.vertical, MeetPRSpacing.xs)
+    .padding(.vertical, MeetPRSpacing.sm)
     .accessibilityElement(children: .combine)
+  }
+
+  private var signalColor: Color {
+    row.triageSignals.contains { signal in
+      if case .notTrained = signal { return true }
+      return false
+    } ? Color.MeetPR.brandRed : Color.MeetPR.amber
   }
 }
 
