@@ -121,6 +121,40 @@ import Testing
   #expect(!json.contains(#""target_reps_max":"#))
 }
 
+@Test func studentSetLogMissingFailedDecodesFalseAndEncodesFailed() throws {
+  let json = """
+    {
+      "id": "91000000-0000-0000-0000-000000000001",
+      "student_id": "91000000-0000-0000-0000-000000000002",
+      "plan_exercise_id": "91000000-0000-0000-0000-000000000003",
+      "set_index": 0,
+      "logged_at": "2026-05-22T12:00:00Z",
+      "weight_kg": "140",
+      "reps": 3,
+      "rpe": "9",
+      "completed": true
+    }
+    """
+
+  let decoded = try MeetPRCodec.decoder.decode(StudentSetLog.self, from: Data(json.utf8))
+  let failedLog = StudentSetLog(
+    id: decoded.id,
+    studentID: decoded.studentID,
+    planExerciseID: decoded.planExerciseID,
+    setIndex: decoded.setIndex,
+    loggedAt: decoded.loggedAt,
+    weightKg: decoded.weightKg,
+    reps: decoded.reps,
+    rpe: decoded.rpe,
+    completed: decoded.completed,
+    failed: true
+  )
+  let encoded = try encodedJSONString(failedLog)
+
+  #expect(!decoded.failed)
+  #expect(encoded.contains(#""failed":true"#))
+}
+
 @Test func exerciseFacetMultiSelectEncodesArrays() throws {
   let exercise = try makeExercise()
 

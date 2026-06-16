@@ -28,7 +28,8 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
         weightKg: log.weightKg,
         reps: log.reps,
         rpe: log.rpe,
-        completed: log.completed
+        completed: log.completed,
+        failed: log.failed
       ),
       accessToken: token
     )
@@ -43,7 +44,8 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       weightKg: log.weightKg,
       reps: log.reps,
       rpe: log.rpe,
-      completed: log.completed
+      completed: log.completed,
+      failed: log.failed
     )
   }
 

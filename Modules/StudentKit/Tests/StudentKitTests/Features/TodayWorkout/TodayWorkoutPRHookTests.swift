@@ -52,6 +52,28 @@ private struct TestFailure: Error, CustomStringConvertible {
 }
 
 @MainActor
+@Test func failedCompletionDoesNotRecordPointOrDetectPR() async throws {
+  let e1rm = InMemoryE1RMRepository()
+  let (viewModel, studentID) = try await makeLoadedViewModel(e1rm: e1rm)
+  guard case .loaded(_, let drafts) = viewModel.state, let first = drafts.first else {
+    throw TestFailure("no drafts")
+  }
+
+  await viewModel.commitSet(rowIndex: 0, failed: true)
+
+  guard case .loaded(_, let updated) = viewModel.state else {
+    throw TestFailure("expected loaded state after failed commit")
+  }
+  #expect(updated[0].completed)
+  #expect(updated[0].failed)
+  let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: first.exerciseID)
+  #expect(history.isEmpty)
+  #expect(viewModel.pendingPRBanner == nil)
+  let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
+  #expect(pending.isEmpty)
+}
+
+@MainActor
 @Test func uncheckingThenRecheckingDoesNotFarmDuplicatePRs() async throws {
   let e1rm = InMemoryE1RMRepository()
   let (viewModel, studentID) = try await makeLoadedViewModel(e1rm: e1rm)

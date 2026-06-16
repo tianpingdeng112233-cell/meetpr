@@ -28,7 +28,8 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         weightKg: log.weightKg,
         reps: log.reps,
         rpe: log.rpe,
-        completed: log.completed
+        completed: log.completed,
+        failed: log.failed
       )
       logs[index] = persisted
     } else {

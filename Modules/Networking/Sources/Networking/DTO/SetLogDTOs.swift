@@ -8,6 +8,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
   public let reps: Int
   public let rpe: Decimal?
   public let completed: Bool
+  public let failed: Bool
 
   public init(
     planExerciseID: UUID,
@@ -15,7 +16,8 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
-    completed: Bool
+    completed: Bool,
+    failed: Bool = false
   ) {
     self.planExerciseID = planExerciseID
     self.setIndex = setIndex
@@ -23,6 +25,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     self.reps = reps
     self.rpe = rpe
     self.completed = completed
+    self.failed = failed
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -33,6 +36,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encode(completed, forKey: .completed)
+    try container.encode(failed, forKey: .failed)
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -42,6 +46,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     case reps
     case rpe
     case completed
+    case failed
   }
 }
 
@@ -77,6 +82,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   public let reps: Int
   public let rpe: Decimal?
   public let completed: Bool
+  public let failed: Bool
   public let loggedAt: Date
 
   public init(
@@ -88,6 +94,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     reps: Int,
     rpe: Decimal? = nil,
     completed: Bool,
+    failed: Bool = false,
     loggedAt: Date
   ) {
     self.id = id
@@ -98,6 +105,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.reps = reps
     self.rpe = rpe
     self.completed = completed
+    self.failed = failed
     self.loggedAt = loggedAt
   }
 
@@ -111,6 +119,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
     completed = try container.decode(Bool.self, forKey: .completed)
+    failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
     loggedAt = try container.decode(Date.self, forKey: .loggedAt)
   }
 
@@ -124,6 +133,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encode(completed, forKey: .completed)
+    try container.encode(failed, forKey: .failed)
     try container.encode(loggedAt, forKey: .loggedAt)
   }
 
@@ -136,6 +146,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case reps
     case rpe
     case completed
+    case failed
     case loggedAt
   }
 }

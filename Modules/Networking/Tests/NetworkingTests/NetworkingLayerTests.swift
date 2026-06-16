@@ -86,6 +86,31 @@ import Testing
   #expect(domain.weightKg == Decimal(100))
   #expect(domain.rpe == Decimal(8))
   #expect(domain.completed)
+  #expect(!domain.failed)
+}
+
+@Test func setLogDTODecodesFailedTrueAndMapsToDomain() throws {
+  let json = """
+    {
+      "id": "00000000-0000-4000-8000-000000000101",
+      "student_id": "00000000-0000-4000-8000-000000000102",
+      "plan_exercise_id": "00000000-0000-4000-8000-000000000103",
+      "set_index": 1,
+      "weight_kg": "100.00",
+      "reps": 3,
+      "rpe": "9.0",
+      "completed": true,
+      "failed": true,
+      "logged_at": "2026-05-22T12:00:00Z"
+    }
+    """
+
+  let dto = try MeetPRCodec.decoder.decode(SetLogDTO.self, from: Data(json.utf8))
+  let domain = dto.toDomain()
+
+  #expect(dto.failed)
+  #expect(domain.completed)
+  #expect(domain.failed)
 }
 
 @Test func feedbackDTODecodesDateOnlyAndISOTimestamps() throws {
@@ -157,6 +182,7 @@ import Testing
   #expect(setJSON.contains(#""plan_exercise_id":"00000000-0000-4000-8000-000000000301""#))
   #expect(setJSON.contains(#""weight_kg":"100""#))
   #expect(setJSON.contains(#""rpe":"8""#))
+  #expect(setJSON.contains(#""failed":false"#))
   #expect(feedbackJSON.contains(#""student_id":"00000000-0000-4000-8000-000000000302""#))
   #expect(feedbackJSON.contains(#""day_date":"2026-05-22""#))
   #expect(planSetJSON.contains(#""target_value":"100.13""#))

@@ -107,11 +107,9 @@ public final class TodayWorkoutViewModel {
     await persist(rowIndex: rowIndex, completed: !drafts[rowIndex].completed)
   }
 
-  /// Persists the row's current draft values and marks it complete. Used by the
-  /// set-entry sheet for both first completion and edits to an already-completed
-  /// set (the latter must still hit `recordSet`, or the edit is lost on reload).
-  public func commitSet(rowIndex: Int) async {
-    await persist(rowIndex: rowIndex, completed: true)
+  /// Persists current draft values and marks the row complete; edits still hit `recordSet`.
+  public func commitSet(rowIndex: Int, failed: Bool = false) async {
+    await persist(rowIndex: rowIndex, completed: true, failed: failed)
   }
 
   /// Returns the row's set-log id, recording the draft first (with its
@@ -125,14 +123,15 @@ public final class TodayWorkoutViewModel {
     if let loggedSetID = drafts[rowIndex].loggedSetID {
       return loggedSetID
     }
-    await persist(rowIndex: rowIndex, completed: drafts[rowIndex].completed)
+    let draft = drafts[rowIndex]
+    await persist(rowIndex: rowIndex, completed: draft.completed, failed: draft.failed)
     guard case .loaded(_, let updated) = state, updated.indices.contains(rowIndex) else {
       return nil
     }
     return updated[rowIndex].loggedSetID
   }
 
-  private func persist(rowIndex: Int, completed: Bool) async {
+  private func persist(rowIndex: Int, completed: Bool, failed: Bool = false) async {
     guard let studentID = currentStudentID else {
       state = .error("Missing student")
       return
@@ -153,7 +152,8 @@ public final class TodayWorkoutViewModel {
       weightKg: draft.actualWeight ?? draft.prescribed.weightKg ?? 0,
       reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
       rpe: draft.actualRPE,
-      completed: completed
+      completed: completed,
+      failed: failed
     )
 
     do {
@@ -162,6 +162,7 @@ public final class TodayWorkoutViewModel {
       // is what video linkage and e1RM points must reference (Codex P1).
       let persisted = try await logs.recordSet(log)
       draft.completed = completed
+      draft.failed = failed
       draft.loggedSetID = persisted.id
       nextDrafts[rowIndex] = draft
       state = .loaded(plan: plan, drafts: nextDrafts)
@@ -331,6 +332,7 @@ extension TodayWorkoutViewModel {
       actualReps: existingLog?.reps ?? set.reps,
       actualRPE: existingLog?.rpe ?? set.rpe ?? 8,
       completed: existingLog?.completed ?? false,
+      failed: existingLog?.failed ?? false,
       loggedSetID: existingLog?.id
     )
   }
@@ -340,6 +342,8 @@ extension TodayWorkoutViewModel {
     log: StudentSetLog,
     studentID: UUID
   ) async {
+    // Failed attempts are history-only; e1RM/PR ignores incomplete outcomes.
+    guard !log.failed else { return }
     let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
     let rpe = draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
     guard

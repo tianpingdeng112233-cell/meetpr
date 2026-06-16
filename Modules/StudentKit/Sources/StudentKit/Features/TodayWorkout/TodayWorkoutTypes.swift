@@ -17,6 +17,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   public var actualReps: Int?
   public var actualRPE: Decimal?
   public var completed: Bool
+  public var failed: Bool
   public var loggedSetID: UUID?
 
   public init(
@@ -29,6 +30,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     actualReps: Int? = nil,
     actualRPE: Decimal? = nil,
     completed: Bool = false,
+    failed: Bool = false,
     loggedSetID: UUID? = nil
   ) {
     self.id = id
@@ -40,6 +42,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.actualReps = actualReps
     self.actualRPE = actualRPE
     self.completed = completed
+    self.failed = failed
     self.loggedSetID = loggedSetID
   }
 }
