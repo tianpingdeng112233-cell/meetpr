@@ -123,6 +123,48 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func step5RestSecondsPerSetClampsToSetCount() async throws {
+  let viewModel = try await Spec007Fixtures.configuredViewModelForStep5()
+  let exercise = try #require(viewModel.sortedDraftExercises.first)
+
+  try await viewModel.updateW1SetSpec(
+    Spec007Fixtures.setSpec(
+      setCount: 2,
+      intensityMode: .rpe,
+      targetValue: 8,
+      restSeconds: 150,
+      restSecondsPerSet: [90, 120, 180]
+    ),
+    for: exercise.id
+  )
+  #expect(viewModel.w1SetSpecs[exercise.id]?.restSecondsPerSet == [90, 120])
+
+  try await viewModel.updateW1SetSpec(
+    Spec007Fixtures.setSpec(
+      setCount: 4,
+      intensityMode: .rpe,
+      targetValue: 8,
+      restSeconds: 150,
+      restSecondsPerSet: [90]
+    ),
+    for: exercise.id
+  )
+  #expect(viewModel.w1SetSpecs[exercise.id]?.restSecondsPerSet == [90, 150, 150, 150])
+
+  try await viewModel.updateW1SetSpec(
+    Spec007Fixtures.setSpec(
+      setCount: 3,
+      intensityMode: .rpe,
+      targetValue: 9,
+      restSecondsPerSet: [90]
+    ),
+    for: exercise.id
+  )
+  #expect(viewModel.w1SetSpecs[exercise.id]?.restSecondsPerSet == [90, 240, 240])
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func step5TargetRepsIsClampedToAtLeastOne() async throws {
   let viewModel = try await Spec007Fixtures.configuredViewModelForStep5()
   let exercise = try #require(viewModel.sortedDraftExercises.first)

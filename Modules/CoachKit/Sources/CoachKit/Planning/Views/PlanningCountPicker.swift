@@ -10,7 +10,7 @@ struct PlanningCountPicker: View {
   let range: ClosedRange<Double>
   let step: Double
   let unitLabel: String?
-  let formatStyle: FloatingPointFormatStyle<Double>
+  let displayText: (Double) -> String
 
   @State private var showWheel = false
 
@@ -20,14 +20,18 @@ struct PlanningCountPicker: View {
     range: ClosedRange<Double>,
     step: Double,
     unitLabel: String? = nil,
-    formatStyle: FloatingPointFormatStyle<Double> = .number.precision(.fractionLength(0...1))
+    formatStyle: FloatingPointFormatStyle<Double> = .number.precision(.fractionLength(0...1)),
+    displayText: ((Double) -> String)? = nil
   ) {
     self.label = label
     self._value = value
     self.range = range
     self.step = step
     self.unitLabel = unitLabel
-    self.formatStyle = formatStyle
+    self.displayText =
+      displayText ?? { number in
+        number.formatted(formatStyle)
+      }
   }
 
   var body: some View {
@@ -125,7 +129,7 @@ struct PlanningCountPicker: View {
   }
 
   private func formattedDisplay(_ number: Double) -> String {
-    number.formatted(formatStyle)
+    displayText(number)
   }
 
   private func stepButton(

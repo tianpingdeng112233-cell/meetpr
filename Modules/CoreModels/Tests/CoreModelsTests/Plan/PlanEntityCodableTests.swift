@@ -106,6 +106,48 @@ import Testing
   #expect(json.contains(#""target_reps_max":12"#))
 }
 
+@Test func planSetRestSecondsEncodesPlainIntAndDecodesMissingAsNil() throws {
+  let set = try makePlanSet(
+    targetReps: 5,
+    targetRepsMax: nil,
+    intensityMode: .rpe,
+    targetValue: "8",
+    setType: .working,
+    restSeconds: 195
+  )
+
+  let json = try encodedJSONString(set)
+  let decodedSet = try MeetPRCodec.decoder.decode(PlanSet.self, from: Data(json.utf8))
+  let legacySet = try MeetPRCodec.decoder.decode(PlanSet.self, from: Data(legacyPlanSetJSON.utf8))
+
+  #expect(decodedSet.restSeconds == 195)
+  #expect(json.contains(#""rest_seconds":195"#))
+  #expect(legacySet.restSeconds == nil)
+}
+
+@Test func prescribedSetRestSecondsEncodesPlainIntAndDecodesMissingAsNil() throws {
+  let set = PrescribedSet(
+    id: try fixtureUUID("90000000-0000-0000-0000-000000000011"),
+    setIndex: 1,
+    weightKg: nil,
+    reps: 5,
+    repsMax: nil,
+    rpe: 8,
+    restSeconds: 210
+  )
+
+  let json = try encodedJSONString(set)
+  let decodedSet = try MeetPRCodec.decoder.decode(PrescribedSet.self, from: Data(json.utf8))
+  let legacySet = try MeetPRCodec.decoder.decode(
+    PrescribedSet.self,
+    from: Data(legacyPrescribedSetJSON.utf8)
+  )
+
+  #expect(decodedSet.restSeconds == 210)
+  #expect(json.contains(#""rest_seconds":210"#))
+  #expect(legacySet.restSeconds == nil)
+}
+
 @Test func planSetTargetRepsExactOmitsMax() throws {
   let set = try makePlanSet(
     targetReps: 5,
@@ -223,7 +265,8 @@ private func makePlanSet(
   targetRepsMax: Int?,
   intensityMode: IntensityMode,
   targetValue: String,
-  setType: SetType
+  setType: SetType,
+  restSeconds: Int? = nil
 ) throws -> PlanSet {
   PlanSet(
     id: try fixtureUUID("90000000-0000-0000-0000-000000000001"),
@@ -234,6 +277,32 @@ private func makePlanSet(
     intensityMode: intensityMode,
     targetValue: try fixtureDecimal(targetValue),
     setType: setType,
+    restSeconds: restSeconds,
     createdAt: createdAt()
   )
 }
+
+private let legacyPlanSetJSON = """
+  {
+    "id": "90000000-0000-0000-0000-000000000001",
+    "plan_exercise_id": "80000000-0000-0000-0000-000000000001",
+    "set_number": 1,
+    "target_reps": 5,
+    "target_reps_max": null,
+    "intensity_mode": "rpe",
+    "target_value": "8",
+    "set_type": "working",
+    "created_at": "2026-04-25T12:00:00Z"
+  }
+  """
+
+private let legacyPrescribedSetJSON = """
+  {
+    "id": "90000000-0000-0000-0000-000000000011",
+    "set_index": 1,
+    "weight_kg": null,
+    "reps": 5,
+    "reps_max": null,
+    "rpe": "8"
+  }
+  """

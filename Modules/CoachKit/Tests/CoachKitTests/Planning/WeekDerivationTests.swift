@@ -184,6 +184,25 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
+@Test func weekDerivationCarriesRestFieldsUnchanged() {
+  let derived = WeekDerivation.deriveSetSpec(
+    forWeek: 2,
+    exerciseID: Spec007Fixtures.exerciseID,
+    w1: Spec007Fixtures.setSpec(
+      setCount: 3,
+      targetValue: 100,
+      restSeconds: 180,
+      restSecondsPerSet: [120, 180, 240]
+    ),
+    rules: [Spec007Fixtures.rule(.weightInc, increment: 5)]
+  )
+
+  #expect(derived.targetValue == 105)
+  #expect(derived.restSeconds == 180)
+  #expect(derived.restSecondsPerSet == [120, 180, 240])
+}
+
+@available(iOS 17.0, macOS 14.0, *)
 @Test func weekDerivationIgnoresRulesForOtherExercises() {
   let derived = WeekDerivation.deriveSetSpec(
     forWeek: 2,

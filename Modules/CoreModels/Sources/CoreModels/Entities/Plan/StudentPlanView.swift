@@ -87,6 +87,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public let reps: Int?
   public let repsMax: Int?
   public let rpe: Decimal?
+  public let restSeconds: Int?
 
   public init(
     id: UUID,
@@ -94,7 +95,8 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     weightKg: Decimal? = nil,
     reps: Int? = nil,
     repsMax: Int? = nil,
-    rpe: Decimal? = nil
+    rpe: Decimal? = nil,
+    restSeconds: Int? = nil
   ) {
     self.id = id
     self.setIndex = setIndex
@@ -102,6 +104,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     self.reps = reps
     self.repsMax = repsMax
     self.rpe = rpe
+    self.restSeconds = restSeconds
   }
 
   public init(from decoder: Decoder) throws {
@@ -112,6 +115,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     reps = try container.decodeIfPresent(Int.self, forKey: .reps)
     repsMax = try container.decodeIfPresent(Int.self, forKey: .repsMax)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
+    restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -122,6 +126,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeIfPresent(reps, forKey: .reps)
     try container.encodeIfPresent(repsMax, forKey: .repsMax)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
+    try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -131,5 +136,6 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     case reps
     case repsMax
     case rpe
+    case restSeconds
   }
 }

@@ -91,6 +91,7 @@ extension PlanSetDTO {
       intensityMode: intensityMode,
       targetValue: targetValue,
       setType: setType,
+      restSeconds: restSeconds,
       createdAt: createdAt
     )
   }

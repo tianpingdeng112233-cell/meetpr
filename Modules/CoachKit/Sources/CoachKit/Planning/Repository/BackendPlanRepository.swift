@@ -187,7 +187,8 @@ public actor BackendPlanRepository: PlanRepository {
           targetRepsMax: set.targetRepsMax,
           intensityMode: set.intensityMode,
           targetValue: set.targetValue,
-          setType: set.setType
+          setType: set.setType,
+          restSeconds: set.restSeconds
         ),
         accessToken: accessToken
       )

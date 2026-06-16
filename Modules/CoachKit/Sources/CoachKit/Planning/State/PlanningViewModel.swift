@@ -1256,7 +1256,26 @@ extension PlanningViewModel {
       normalized.targetValue = min(Decimal(10), max(Decimal(1), normalized.targetValue))
         .roundedToPlanningIncrement(PlanningDecimalStep.half)
     }
+    normalized.restSecondsPerSet = normalizedRestSecondsPerSet(for: normalized)
     return normalized
+  }
+
+  private func normalizedRestSecondsPerSet(for spec: DraftSetSpec) -> [Int]? {
+    guard var values = spec.restSecondsPerSet else { return nil }
+    let desiredCount = max(1, spec.setCount)
+    if values.count > desiredCount {
+      values.removeLast(values.count - desiredCount)
+    } else if values.count < desiredCount {
+      values.append(
+        contentsOf: repeatElement(defaultRestSeconds(for: spec), count: desiredCount - values.count)
+      )
+    }
+    return values
+  }
+
+  private func defaultRestSeconds(for spec: DraftSetSpec) -> Int {
+    spec.restSeconds
+      ?? RestDefaults.seconds(forRPE: spec.intensityMode == .rpe ? spec.targetValue : nil)
   }
 
   private func defaultTargetValue(for mode: IntensityMode) -> Decimal {

@@ -197,7 +197,8 @@ public final class TodayWorkoutViewModel {
       restTimer = nil
       return
     }
-    let seconds = RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
+    let seconds =
+      draft.prescribed.restSeconds ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
     restTimer = RestTimerState(
       endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
   }

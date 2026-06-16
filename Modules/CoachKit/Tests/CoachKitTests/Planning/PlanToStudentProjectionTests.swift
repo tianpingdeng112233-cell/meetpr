@@ -14,7 +14,8 @@ import Testing
     isMain: true,
     sortOrder: 0
   )
-  let set = ProjFixtures.set(exID: exercise.id, number: 1, reps: 5, value: Decimal(100))
+  let set = ProjFixtures.set(
+    exID: exercise.id, number: 1, reps: 5, value: Decimal(100), restSeconds: 180)
 
   let view = PlanToStudentProjection.project(
     plan: ProjFixtures.plan(),
@@ -43,6 +44,7 @@ import Testing
   #expect(outSet.reps == 5)
   #expect(outSet.repsMax == nil)
   #expect(outSet.rpe == nil)
+  #expect(outSet.restSeconds == 180)
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -326,7 +328,8 @@ private enum ProjFixtures {
     repsMax: Int? = nil,
     mode: IntensityMode = .weight,
     value: Decimal,
-    type: SetType = .working
+    type: SetType = .working,
+    restSeconds: Int? = nil
   ) -> PlanSet {
     PlanSet(
       id: id,
@@ -337,6 +340,7 @@ private enum ProjFixtures {
       intensityMode: mode,
       targetValue: value,
       setType: type,
+      restSeconds: restSeconds,
       createdAt: now
     )
   }

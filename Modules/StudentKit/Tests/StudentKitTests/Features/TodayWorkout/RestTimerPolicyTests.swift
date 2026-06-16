@@ -3,7 +3,7 @@ import Testing
 
 @testable import StudentKit
 
-/// Spec 030 §B1: nil→3min, ≤6.5→2min, 7–8.5→3min, 9+→4min.
+/// StudentKit API forwards to CoreModels.RestDefaults.
 @Test func restTimerPolicyMapsRPEPerSpecTable() {
   #expect(RestTimerPolicy.restSeconds(forRPE: nil) == 180)
   #expect(RestTimerPolicy.restSeconds(forRPE: 5) == 120)

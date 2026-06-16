@@ -196,6 +196,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
   public let intensityMode: IntensityMode
   public let targetValue: Decimal
   public let setType: SetType
+  public let restSeconds: Int?
   public let createdAt: Date
 
   public init(
@@ -207,6 +208,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     intensityMode: IntensityMode,
     targetValue: Decimal,
     setType: SetType,
+    restSeconds: Int? = nil,
     createdAt: Date
   ) {
     self.id = id
@@ -217,6 +219,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     self.intensityMode = intensityMode
     self.targetValue = targetValue
     self.setType = setType
+    self.restSeconds = restSeconds
     self.createdAt = createdAt
   }
 
@@ -230,6 +233,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     intensityMode = try container.decode(IntensityMode.self, forKey: .intensityMode)
     targetValue = try container.decodeDecimal(forKey: .targetValue)
     setType = try container.decode(SetType.self, forKey: .setType)
+    restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
   }
 
@@ -243,6 +247,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     try container.encode(intensityMode, forKey: .intensityMode)
     try container.encodeDecimalString(targetValue, forKey: .targetValue)
     try container.encode(setType, forKey: .setType)
+    try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
     try container.encode(createdAt, forKey: .createdAt)
   }
 
@@ -255,6 +260,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     case intensityMode
     case targetValue
     case setType
+    case restSeconds
     case createdAt
   }
 }
