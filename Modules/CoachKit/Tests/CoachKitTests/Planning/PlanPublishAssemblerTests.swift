@@ -99,3 +99,57 @@ import Testing
   #expect(assembled.exercises.count == 4)
   #expect(assembled.sets.isEmpty)
 }
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() {
+  let perSetThenSingle = assembledRestSeconds(
+    for: DraftSetSpec(
+      setCount: 2,
+      targetReps: 5,
+      intensityMode: .rpe,
+      targetValue: 9,
+      restSeconds: 180,
+      restSecondsPerSet: [90]
+    )
+  )
+  let single = assembledRestSeconds(
+    for: DraftSetSpec(
+      setCount: 1,
+      targetReps: 5,
+      intensityMode: .rpe,
+      targetValue: 9,
+      restSeconds: 165
+    )
+  )
+  let automatic = assembledRestSeconds(
+    for: DraftSetSpec(setCount: 1, targetReps: 5, intensityMode: .rpe, targetValue: 9)
+  )
+
+  #expect(perSetThenSingle == [90, 180])
+  #expect(single.first == 165)
+  #expect(automatic.first == 240)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private func assembledRestSeconds(for spec: DraftSetSpec) -> [Int?] {
+  let assembled = PlanPublishAssembler.assemble(
+    draft: PlanningFixtures.draft(),
+    w1Specs: [PlanningFixtures.uuid(50): spec],
+    rules: [],
+    kind: .regular
+  )
+  let exerciseByID = Dictionary(uniqueKeysWithValues: assembled.exercises.map { ($0.id, $0) })
+  let dayByID = Dictionary(uniqueKeysWithValues: assembled.days.map { ($0.id, $0) })
+  return assembled.sets
+    .filter { set in
+      guard
+        let exercise = exerciseByID[set.planExerciseID],
+        let day = dayByID[exercise.planDayID]
+      else { return false }
+      return day.weekNumber == 1
+    }
+    .sorted { $0.setNumber < $1.setNumber }
+    .map(\.restSeconds)
+}

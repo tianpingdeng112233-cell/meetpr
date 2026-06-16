@@ -12,13 +12,17 @@ enum Spec007Fixtures {
     setCount: Int = 4,
     targetReps: Int = 5,
     intensityMode: IntensityMode = .weight,
-    targetValue: Decimal = Decimal(100)
+    targetValue: Decimal = Decimal(100),
+    restSeconds: Int? = nil,
+    restSecondsPerSet: [Int]? = nil
   ) -> DraftSetSpec {
     DraftSetSpec(
       setCount: setCount,
       targetReps: targetReps,
       intensityMode: intensityMode,
-      targetValue: targetValue
+      targetValue: targetValue,
+      restSeconds: restSeconds,
+      restSecondsPerSet: restSecondsPerSet
     )
   }
 

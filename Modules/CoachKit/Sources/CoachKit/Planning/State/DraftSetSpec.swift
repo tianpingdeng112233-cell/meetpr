@@ -9,6 +9,8 @@ public struct DraftSetSpec: Codable, Hashable, Identifiable, Sendable {
   public var intensityMode: IntensityMode
   public var targetValue: Decimal
   public var setType: SetType
+  public var restSeconds: Int?
+  public var restSecondsPerSet: [Int]?
   public var notes: String?
 
   public init(
@@ -19,6 +21,8 @@ public struct DraftSetSpec: Codable, Hashable, Identifiable, Sendable {
     intensityMode: IntensityMode,
     targetValue: Decimal,
     setType: SetType = .working,
+    restSeconds: Int? = nil,
+    restSecondsPerSet: [Int]? = nil,
     notes: String? = nil
   ) {
     self.id = id
@@ -28,6 +32,8 @@ public struct DraftSetSpec: Codable, Hashable, Identifiable, Sendable {
     self.intensityMode = intensityMode
     self.targetValue = targetValue
     self.setType = setType
+    self.restSeconds = restSeconds
+    self.restSecondsPerSet = restSecondsPerSet
     self.notes = notes
   }
 
@@ -41,6 +47,8 @@ public struct DraftSetSpec: Codable, Hashable, Identifiable, Sendable {
     intensityMode = try container.decode(IntensityMode.self, forKey: .intensityMode)
     targetValue = try container.decodeDecimalString(forKey: .targetValue)
     setType = try container.decode(SetType.self, forKey: .setType)
+    restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
+    restSecondsPerSet = try container.decodeIfPresent([Int].self, forKey: .restSecondsPerSet)
     notes = try container.decodeIfPresent(String.self, forKey: .notes)
   }
 
@@ -54,6 +62,8 @@ public struct DraftSetSpec: Codable, Hashable, Identifiable, Sendable {
     try container.encode(intensityMode, forKey: .intensityMode)
     try container.encodeDecimalString(targetValue, forKey: .targetValue)
     try container.encode(setType, forKey: .setType)
+    try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
+    try container.encodeIfPresent(restSecondsPerSet, forKey: .restSecondsPerSet)
     try container.encodeIfPresent(notes, forKey: .notes)
   }
 
@@ -65,6 +75,8 @@ public struct DraftSetSpec: Codable, Hashable, Identifiable, Sendable {
     case intensityMode
     case targetValue
     case setType
+    case restSeconds
+    case restSecondsPerSet
     case notes
   }
 }

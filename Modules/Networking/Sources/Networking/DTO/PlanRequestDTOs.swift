@@ -110,6 +110,7 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
   public let intensityMode: IntensityMode
   public let targetValue: Decimal
   public let setType: SetType
+  public let restSeconds: Int?
 
   public init(
     setNumber: Int,
@@ -117,7 +118,8 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     targetRepsMax: Int? = nil,
     intensityMode: IntensityMode,
     targetValue: Decimal,
-    setType: SetType
+    setType: SetType,
+    restSeconds: Int? = nil
   ) {
     self.setNumber = setNumber
     self.targetReps = targetReps
@@ -125,6 +127,7 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     self.intensityMode = intensityMode
     self.targetValue = targetValue
     self.setType = setType
+    self.restSeconds = restSeconds
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -135,6 +138,7 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     try container.encode(intensityMode, forKey: .intensityMode)
     try container.encode(Self.targetValueString(from: targetValue), forKey: .targetValue)
     try container.encode(setType, forKey: .setType)
+    try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
   }
 
   private static func targetValueString(from decimal: Decimal) -> String {
@@ -151,5 +155,6 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     case intensityMode
     case targetValue
     case setType
+    case restSeconds
   }
 }

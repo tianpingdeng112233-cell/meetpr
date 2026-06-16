@@ -47,3 +47,20 @@ import Testing
 
   #expect(decoded.targetRepsMax == 12)
 }
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func draftSetSpecRoundTripsRestFields() throws {
+  let spec = DraftSetSpec(
+    setCount: 3,
+    targetReps: 5,
+    intensityMode: .rpe,
+    targetValue: 8,
+    restSeconds: 180,
+    restSecondsPerSet: [150, 180, 210]
+  )
+
+  let decoded = try MeetPRCodec.decoder.decode(DraftSetSpec.self, from: encodeSetSpec(spec))
+
+  #expect(decoded.restSeconds == 180)
+  #expect(decoded.restSecondsPerSet == [150, 180, 210])
+}

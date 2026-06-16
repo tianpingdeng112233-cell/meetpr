@@ -15,6 +15,8 @@ public struct ExerciseSetEditorCard: View {
   @State private var targetRepsMax: Int?
   @State private var intensityMode: IntensityMode
   @State private var targetValue: Decimal
+  @State private var restSeconds: Int?
+  @State private var restSecondsPerSet: [Int]?
   @State private var notes: String
 
   public init(
@@ -33,6 +35,8 @@ public struct ExerciseSetEditorCard: View {
     self._targetRepsMax = State(initialValue: spec.targetRepsMax)
     self._intensityMode = State(initialValue: spec.intensityMode)
     self._targetValue = State(initialValue: spec.targetValue)
+    self._restSeconds = State(initialValue: spec.restSeconds)
+    self._restSecondsPerSet = State(initialValue: spec.restSecondsPerSet)
     self._notes = State(initialValue: draftExercise.notes ?? "")
   }
 
@@ -75,7 +79,10 @@ public struct ExerciseSetEditorCard: View {
             range: 1...20,
             step: 1
           )
-          .onChange(of: setCount) { _, _ in persist() }
+          .onChange(of: setCount) { _, _ in
+            clampRestSecondsPerSet()
+            persist()
+          }
 
           PlanningCountPicker(
             label: "次数",
@@ -96,6 +103,16 @@ public struct ExerciseSetEditorCard: View {
           minimum: targetReps
         )
         .onChange(of: targetRepsMax) { _, _ in persist() }
+
+        ExerciseRestEditorSection(
+          setCount: setCount,
+          intensityMode: intensityMode,
+          targetValue: targetValue,
+          restSeconds: $restSeconds,
+          restSecondsPerSet: $restSecondsPerSet
+        )
+        .onChange(of: restSeconds) { _, _ in persist() }
+        .onChange(of: restSecondsPerSet) { _, _ in persist() }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text("备注")
@@ -198,8 +215,26 @@ public struct ExerciseSetEditorCard: View {
       targetReps: targetReps,
       targetRepsMax: targetRepsMax,
       intensityMode: intensityMode,
-      targetValue: targetValue
+      targetValue: targetValue,
+      restSeconds: restSeconds,
+      restSecondsPerSet: restSecondsPerSet
     )
+  }
+
+  private func clampRestSecondsPerSet() {
+    guard var values = restSecondsPerSet else { return }
+    let desiredCount = max(1, setCount)
+    if values.count > desiredCount {
+      values.removeLast(values.count - desiredCount)
+    } else if values.count < desiredCount {
+      values.append(
+        contentsOf: repeatElement(currentRestSeconds, count: desiredCount - values.count))
+    }
+    restSecondsPerSet = values
+  }
+
+  private var currentRestSeconds: Int {
+    restSeconds ?? RestDefaults.seconds(forRPE: intensityMode == .rpe ? targetValue : nil)
   }
 
   private func persist() {
@@ -216,6 +251,8 @@ public struct ExerciseSetEditorCard: View {
     targetRepsMax = spec.targetRepsMax
     intensityMode = spec.intensityMode
     targetValue = spec.targetValue
+    restSeconds = spec.restSeconds
+    restSecondsPerSet = spec.restSecondsPerSet
     notes = draftExercise.notes ?? ""
   }
 }

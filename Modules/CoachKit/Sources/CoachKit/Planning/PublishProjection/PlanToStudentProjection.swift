@@ -93,7 +93,8 @@ public enum PlanToStudentProjection {
       weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
       reps: isRange ? nil : planSet.targetReps,
       repsMax: planSet.targetRepsMax,
-      rpe: planSet.intensityMode == .rpe ? planSet.targetValue : nil
+      rpe: planSet.intensityMode == .rpe ? planSet.targetValue : nil,
+      restSeconds: planSet.restSeconds
     )
   }
 

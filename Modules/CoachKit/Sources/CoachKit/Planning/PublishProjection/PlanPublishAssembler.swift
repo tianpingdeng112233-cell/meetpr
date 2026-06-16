@@ -122,6 +122,7 @@ enum PlanPublishAssembler {
         rules: context.rules
       )
       for setNumber in 1...max(1, spec.setCount) {
+        let restSeconds = restSeconds(for: spec, setNumber: setNumber)
         sets.append(
           PlanSet(
             id: UUID(),
@@ -132,6 +133,7 @@ enum PlanPublishAssembler {
             intensityMode: spec.intensityMode,
             targetValue: spec.targetValue,
             setType: spec.setType,
+            restSeconds: restSeconds,
             createdAt: context.createdAt
           )
         )
@@ -139,5 +141,18 @@ enum PlanPublishAssembler {
     }
 
     return MaterializedDay(day: day, exercises: exercises, sets: sets)
+  }
+
+  private static func restSeconds(for spec: DraftSetSpec, setNumber: Int) -> Int {
+    let perSetIndex = setNumber - 1
+    if let restSecondsPerSet = spec.restSecondsPerSet,
+      restSecondsPerSet.indices.contains(perSetIndex)
+    {
+      return restSecondsPerSet[perSetIndex]
+    }
+    if let restSeconds = spec.restSeconds {
+      return restSeconds
+    }
+    return RestDefaults.seconds(forRPE: spec.intensityMode == .rpe ? spec.targetValue : nil)
   }
 }

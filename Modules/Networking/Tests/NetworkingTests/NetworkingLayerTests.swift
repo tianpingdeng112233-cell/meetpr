@@ -45,6 +45,7 @@ import Testing
                   "intensity_mode": "weight",
                   "target_value": "100.00",
                   "set_type": "working",
+                  "rest_seconds": 210,
                   "created_at": "2026-05-22T12:00:00Z"
                 }
               ]
@@ -63,6 +64,7 @@ import Testing
   #expect(domain.exercises.count == 1)
   #expect(domain.sets.count == 1)
   #expect(domain.sets[0].targetValue == Decimal(100))
+  #expect(domain.sets[0].restSeconds == 210)
 }
 
 @Test func setLogDTODecodesDecimalStringsAndMapsToDomain() throws {
@@ -168,7 +170,8 @@ import Testing
     targetRepsMax: 8,
     intensityMode: .weight,
     targetValue: Decimal(100.125),
-    setType: .working
+    setType: .working,
+    restSeconds: 195
   )
 
   let planJSON = try jsonString(planRequest)
@@ -187,6 +190,7 @@ import Testing
   #expect(feedbackJSON.contains(#""day_date":"2026-05-22""#))
   #expect(planSetJSON.contains(#""target_value":"100.13""#))
   #expect(planSetJSON.contains(#""target_reps_max":8"#))
+  #expect(planSetJSON.contains(#""rest_seconds":195"#))
 }
 
 @Test func apiClientInjectsBearerTokenOnTypedEndpoint() async throws {
