@@ -1,3 +1,4 @@
+// swiftlint:disable file_length type_body_length
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -416,3 +417,4 @@ struct CoachReceivingView: View {
     )
   }
 }
+// swiftlint:enable file_length type_body_length

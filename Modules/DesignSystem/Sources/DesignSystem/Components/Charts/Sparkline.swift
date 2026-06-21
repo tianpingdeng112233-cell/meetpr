@@ -27,12 +27,12 @@ public struct Sparkline: View {
 
   public var body: some View {
     GeometryReader { geo in
-      let sx = geo.size.width / max(viewBox.width, 1)
-      let sy = geo.size.height / max(viewBox.height, 1)
+      let scaleX = geo.size.width / max(viewBox.width, 1)
+      let scaleY = geo.size.height / max(viewBox.height, 1)
       ZStack {
         Path { path in
           for (index, point) in points.enumerated() {
-            let scaled = CGPoint(x: point.x * sx, y: point.y * sy)
+            let scaled = CGPoint(x: point.x * scaleX, y: point.y * scaleY)
             if index == 0 { path.move(to: scaled) } else { path.addLine(to: scaled) }
           }
         }
@@ -42,7 +42,7 @@ public struct Sparkline: View {
           Circle()
             .fill(Color.MeetPR.brandRed)
             .frame(width: 8, height: 8)
-            .position(x: last.x * sx, y: last.y * sy)
+            .position(x: last.x * scaleX, y: last.y * scaleY)
         }
       }
     }
@@ -52,8 +52,9 @@ public struct Sparkline: View {
   /// Parse "0,90 60,76 120,70" style point strings (matches design source).
   public static func parse(_ raw: String) -> [CGPoint] {
     raw.split(separator: " ").compactMap { pair in
-      let xy = pair.split(separator: ",")
-      guard xy.count == 2, let x = Double(xy[0]), let y = Double(xy[1]) else { return nil }
+      let components = pair.split(separator: ",")
+      guard components.count == 2, let x = Double(components[0]), let y = Double(components[1])
+      else { return nil }
       return CGPoint(x: x, y: y)
     }
   }

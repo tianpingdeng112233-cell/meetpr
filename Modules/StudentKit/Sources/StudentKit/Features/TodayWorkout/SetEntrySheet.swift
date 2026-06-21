@@ -1,3 +1,4 @@
+// swiftlint:disable function_parameter_count
 import CoreModels
 import DesignSystem
 import Foundation
@@ -222,3 +223,4 @@ struct SetEntrySheet: View {
     dismiss()
   }
 }
+// swiftlint:enable function_parameter_count

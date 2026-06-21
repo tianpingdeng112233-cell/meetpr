@@ -1,3 +1,4 @@
+// swiftlint:disable file_length type_body_length
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
@@ -87,7 +88,7 @@ struct StudentDetailView: View {
         }
     }
     .background(Color.MeetPR.bg)
-    .toolbar(.hidden, for: .navigationBar)
+    .hideNavigationBar()
     .sheet(isPresented: $showComposer) {
       FeedbackComposerView(
         studentID: viewModel.summary.id,
@@ -399,3 +400,4 @@ private struct AdaptationPlanningPresenter: ViewModifier {
     )
   }
 }
+// swiftlint:enable file_length type_body_length

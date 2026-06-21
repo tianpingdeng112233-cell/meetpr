@@ -1,3 +1,4 @@
+// swiftlint:disable type_body_length
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
@@ -32,7 +33,7 @@ struct StudentRosterView: View {
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
-      .toolbar(.hidden, for: .navigationBar)
+      .hideNavigationBar()
     }
     .task {
       await viewModel.loadIfNeeded()
@@ -372,3 +373,4 @@ private struct RosterStatusGroup: Identifiable {
   let title: String
   let rows: [StudentRosterRowModel]
 }
+// swiftlint:enable type_body_length

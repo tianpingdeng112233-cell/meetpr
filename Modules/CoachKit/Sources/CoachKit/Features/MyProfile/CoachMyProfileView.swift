@@ -53,7 +53,7 @@ struct CoachMyProfileView: View {
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
-      .toolbar(.hidden, for: .navigationBar)
+      .hideNavigationBar()
     }
     .task { await codesViewModel.loadIfNeeded() }
   }

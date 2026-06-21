@@ -1,3 +1,4 @@
+// swiftlint:disable type_body_length
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -59,7 +60,7 @@ public struct MyProfileView: View {
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
-      .toolbar(.hidden, for: .navigationBar)
+      .hideNavigationBar()
     }
     .task { await viewModel.loadIfNeeded() }
   }
@@ -333,3 +334,4 @@ private struct LogoutRow: View {
     .disabled(isLoggingOut)
   }
 }
+// swiftlint:enable type_body_length

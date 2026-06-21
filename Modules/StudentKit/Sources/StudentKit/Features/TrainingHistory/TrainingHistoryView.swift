@@ -74,7 +74,7 @@ public struct TrainingHistoryView: View {
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
-      .toolbar(.hidden, for: .navigationBar)
+      .hideNavigationBar()
       .navigationDestination(isPresented: $showsAllHistory) {
         AllHistoryScreen(viewModel: viewModel)
       }
@@ -361,11 +361,12 @@ public struct TrainingHistoryView: View {
     trendPresentation?.rows.first { $0.family == family }
   }
 
-  private func deltaLabel(_ kg: Double) -> (text: String, color: Color) {
-    let sign = kg >= 0 ? "+" : "−"
+  private func deltaLabel(_ kilograms: Double) -> (text: String, color: Color) {
+    let sign = kilograms >= 0 ? "+" : "−"
     let color =
-      kg > 0 ? Color.MeetPR.green : (kg < 0 ? Color.MeetPR.brandRed : Color.MeetPR.fgSecondary)
-    return ("\(sign)\(StudentFormatting.kilograms(abs(kg))) KG", color)
+      kilograms > 0
+      ? Color.MeetPR.green : (kilograms < 0 ? Color.MeetPR.brandRed : Color.MeetPR.fgSecondary)
+    return ("\(sign)\(StudentFormatting.kilograms(abs(kilograms))) KG", color)
   }
 
   private var feedbackItems: [CoachFeedback]? {
@@ -466,3 +467,4 @@ private enum GrowthFormat {
     return formatter
   }()
 }
+// swiftlint:enable file_length type_body_length

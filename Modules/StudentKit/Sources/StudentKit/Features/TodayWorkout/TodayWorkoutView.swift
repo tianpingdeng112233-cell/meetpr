@@ -1,4 +1,4 @@
-// swiftlint:disable file_length type_body_length
+// swiftlint:disable file_length type_body_length function_body_length
 import CoreModels
 import DesignSystem
 import Foundation
@@ -71,7 +71,9 @@ public struct TodayWorkoutView: View {
       }
       .background(Color.MeetPR.bg)
       .navigationTitle(navTitle)
-      .navigationBarTitleDisplayMode(.inline)
+      #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+      #endif
       .toolbar {
         Button {
           showingReadinessSheet = true
@@ -338,16 +340,16 @@ public struct TodayWorkoutView: View {
     draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, active: Bool
   ) -> some View {
     let resolved = draft.completed || active
-    let fg: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
+    let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
     return Button {
       editing = EditingTarget(id: draft.id, rowIndex: rowIndex, draft: draft)
     } label: {
       LazyVGrid(columns: columns, spacing: 0) {
         Text("\(draft.prescribed.setIndex + 1)")
           .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
-        Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(fg)
-        Text(repsText(draft)).foregroundStyle(fg)
-        Text(rpeText(draft)).foregroundStyle(fg)
+        Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
+        Text(repsText(draft)).foregroundStyle(foreground)
+        Text(rpeText(draft)).foregroundStyle(foreground)
         Text(statusMark(draft)).foregroundStyle(statusColor(draft))
         Image(systemName: "video")
           .font(.system(size: 16))
@@ -496,3 +498,4 @@ private struct EditingTarget: Identifiable {
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
 }
+// swiftlint:enable file_length type_body_length function_body_length

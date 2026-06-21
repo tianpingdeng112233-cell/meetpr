@@ -53,7 +53,7 @@ struct CoachPlanningHomeView: View {
       }
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bg)
-      .toolbar(.hidden, for: .navigationBar)
+      .hideNavigationBar()
       .refreshable {
         await viewModel.refresh()
       }

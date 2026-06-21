@@ -95,7 +95,7 @@ public struct LoginView: View {
       .scrollBounceBehavior(.basedOnSize)
     }
     .background(Color.MeetPR.bg)
-    .toolbar(.hidden, for: .navigationBar)
+    .hideNavigationBar()
   }
 
   // Apple Sign-In is deferred (V1.5+); shown as an inert, clearly-flagged placeholder.

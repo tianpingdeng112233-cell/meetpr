@@ -89,7 +89,7 @@ public struct SignupView: View {
       .frame(maxWidth: .infinity)
     }
     .background(Color.MeetPR.bg)
-    .toolbar(.hidden, for: .navigationBar)
+    .hideNavigationBar()
   }
 }
 
