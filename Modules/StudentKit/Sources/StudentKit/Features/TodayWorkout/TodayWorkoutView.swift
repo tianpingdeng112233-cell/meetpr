@@ -1,5 +1,7 @@
+// swiftlint:disable file_length type_body_length function_body_length
 import CoreModels
 import DesignSystem
+import Foundation
 import RepositoryContracts
 import SwiftUI
 
@@ -14,7 +16,6 @@ public struct TodayWorkoutView: View {
   @State private var selectedDate: Date
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
-  @State private var plateMathTarget: PlateMathTarget?
   @State private var showingReadinessSheet = false
 
   public init(
@@ -69,7 +70,10 @@ public struct TodayWorkoutView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
       .background(Color.MeetPR.bg)
-      .navigationTitle("锻炼")
+      .navigationTitle(navTitle)
+      #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+      #endif
       .toolbar {
         Button {
           showingReadinessSheet = true
@@ -113,10 +117,6 @@ public struct TodayWorkoutView: View {
       }
     }
     .animation(.spring(duration: 0.3), value: viewModel.restTimer)
-    .sheet(item: $plateMathTarget) { target in
-      PlateMathSheet(targetKg: target.weightKg)
-        .presentationDetents([.medium])
-    }
     .sheet(isPresented: $showingReadinessSheet) {
       ReadinessCheckinSheet(
         studentID: studentID,
@@ -142,44 +142,28 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private var restTitle: String {
-    Calendar.current.isDateInToday(selectedDate) ? "今日休息" : "这天休息"
-  }
-
-  private var readinessFiled: Bool {
-    if case .done = readinessViewModel.gate { return true }
-    return false
-  }
-
-  private var readinessPrefill: ReadinessCheckin? {
-    if case .done(let checkin) = readinessViewModel.gate { return checkin }
-    return nil
-  }
+  // MARK: - Workout body
 
   private func workout(
     day: StudentPlanDay,
     drafts: [TodayWorkoutViewModel.SetRowDraft]
   ) -> some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: 14) {
-        header(for: day)
+    let activeIndex = drafts.firstIndex { !$0.completed }
+    return ScrollView {
+      VStack(alignment: .leading, spacing: 16) {
+        if let activeIndex {
+          activeSetHero(
+            draft: drafts[activeIndex],
+            rowIndex: activeIndex,
+            totalSets: totalSets(for: drafts[activeIndex].planExerciseID, in: drafts))
+        }
 
         ForEach(day.exercises) { exercise in
-          ExerciseExecutionView(
+          exerciseTableCard(
             exercise: exercise,
             rows: rows(for: exercise, drafts: drafts),
-            reference: viewModel.exerciseReferences[exercise.exercise.id],
-            rowIndex: { draft in drafts.firstIndex(where: { $0.id == draft.id }) },
-            onTapSet: { index in
-              if drafts.indices.contains(index) {
-                editing = EditingTarget(
-                  id: drafts[index].id, rowIndex: index, draft: drafts[index])
-              }
-            },
-            onPlateMath: { weightKg in
-              plateMathTarget = PlateMathTarget(weightKg: weightKg)
-            }
-          )
+            allDrafts: drafts,
+            activeIndex: activeIndex)
         }
 
         if !drafts.isEmpty && drafts.allSatisfy(\.completed) {
@@ -194,7 +178,7 @@ public struct TodayWorkoutView: View {
           SessionSummaryView(summary: StudentSessionSummary(drafts: drafts), date: day.date)
         }
       }
-      .padding()
+      .padding(16)
     }
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bg)
@@ -209,8 +193,279 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private func header(for day: StudentPlanDay) -> some View {
-    WorkoutDayHeader(day: day, context: viewModel.planContext, readinessFiled: readinessFiled)
+  // MARK: - Active set hero
+
+  private func activeSetHero(
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, totalSets: Int
+  ) -> some View {
+    VStack(alignment: .leading, spacing: 0) {
+      Eyebrow(
+        "第 \(twoDigit(draft.prescribed.setIndex + 1)) / \(twoDigit(totalSets)) 组")
+
+      HStack(alignment: .lastTextBaseline, spacing: 6) {
+        Text(weightText(draft))
+          .font(.system(size: 72, weight: .heavy).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Text("KG")
+          .font(.system(size: 22, weight: .heavy))
+          .foregroundStyle(Color.MeetPR.brandRed)
+        Spacer()
+        Text(targetText(draft))
+          .font(.system(size: 14, design: .monospaced))
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
+      .padding(.top, 12)
+
+      Text("RPE")
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.brandRed)
+        .padding(.top, 16)
+      HStack(alignment: .lastTextBaseline, spacing: 8) {
+        Text(StudentFormatting.decimal(currentRPE(draft)))
+          .font(.system(size: 36, weight: .heavy).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Text("/ 10").font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+      Slider(value: rpeBinding(rowIndex: rowIndex, draft: draft), in: 5...10, step: 0.5)
+        .tint(Color.MeetPR.fgPrimary)
+        .padding(.top, 8)
+
+      HStack(spacing: 8) {
+        Button {
+          Task { await viewModel.commitSet(rowIndex: rowIndex) }
+        } label: {
+          Text("记录此组")
+            .font(Font.MeetPR.bodyEmphasis)
+            .foregroundStyle(Color.MeetPR.bg)
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+            .background(Color.MeetPR.fgPrimary)
+            .clipShape(.rect(cornerRadius: 12))
+        }
+        .buttonStyle(.plain)
+
+        Button {
+          editing = EditingTarget(id: draft.id, rowIndex: rowIndex, draft: draft)
+        } label: {
+          Image(systemName: "video")
+            .font(.system(size: 20))
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .frame(width: 56, height: 48)
+            .overlay {
+              RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
+      }
+      .padding(.top, 16)
+    }
+    .padding(16)
+    .background(Color.MeetPR.surface2)
+    .clipShape(.rect(cornerRadius: 12))
+    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
+  private func rpeBinding(rowIndex: Int, draft: TodayWorkoutViewModel.SetRowDraft) -> Binding<
+    Double
+  > {
+    Binding(
+      get: { NSDecimalNumber(decimal: currentRPE(draft)).doubleValue },
+      set: { viewModel.updateRPE(rowIndex: rowIndex, rpe: Decimal($0)) }
+    )
+  }
+
+  // MARK: - Per-exercise set table
+
+  private let columns: [GridItem] = [
+    GridItem(.fixed(28), alignment: .leading),
+    GridItem(.flexible(), alignment: .trailing),
+    GridItem(.flexible(), alignment: .trailing),
+    GridItem(.flexible(), alignment: .trailing),
+    GridItem(.fixed(36), alignment: .trailing),
+    GridItem(.fixed(28), alignment: .trailing),
+  ]
+
+  private func exerciseTableCard(
+    exercise: StudentPlanExercise,
+    rows: [TodayWorkoutViewModel.SetRowDraft],
+    allDrafts: [TodayWorkoutViewModel.SetRowDraft],
+    activeIndex: Int?
+  ) -> some View {
+    VStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: 2) {
+        Text(exercise.exercise.name)
+          .font(Font.MeetPR.bodyEmphasis)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        if let reference = viewModel.exerciseReferences[exercise.exercise.id], reference.hasValue {
+          Text(referenceText(reference))
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
+      }
+
+      VStack(spacing: 0) {
+        LazyVGrid(columns: columns, spacing: 0) {
+          tableHeaderCell("#", leading: true)
+          tableHeaderCell("重量")
+          tableHeaderCell("次数")
+          tableHeaderCell("RPE")
+          Text("")
+          Text("")
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
+
+        ForEach(rows) { draft in
+          let index = allDrafts.firstIndex { $0.id == draft.id } ?? 0
+          setRow(draft: draft, rowIndex: index, active: activeIndex == index)
+        }
+      }
+      .background(Color.MeetPR.surface1)
+      .clipShape(.rect(cornerRadius: 12))
+      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+    }
+  }
+
+  private func tableHeaderCell(_ text: String, leading: Bool = false) -> some View {
+    Text(text)
+      .font(.system(size: 10, weight: .medium, design: .monospaced))
+      .tracking(0.8)
+      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .frame(maxWidth: .infinity, alignment: leading ? .leading : .trailing)
+  }
+
+  private func setRow(
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, active: Bool
+  ) -> some View {
+    let resolved = draft.completed || active
+    let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
+    return Button {
+      editing = EditingTarget(id: draft.id, rowIndex: rowIndex, draft: draft)
+    } label: {
+      LazyVGrid(columns: columns, spacing: 0) {
+        Text("\(draft.prescribed.setIndex + 1)")
+          .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+        Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
+        Text(repsText(draft)).foregroundStyle(foreground)
+        Text(rpeText(draft)).foregroundStyle(foreground)
+        Text(statusMark(draft)).foregroundStyle(statusColor(draft))
+        Image(systemName: "video")
+          .font(.system(size: 16))
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .frame(maxWidth: .infinity, alignment: .trailing)
+      }
+      .font(.system(size: 16, design: .monospaced))
+      .padding(.horizontal, 16)
+      .padding(.vertical, 14)
+      .background(active ? Color.MeetPR.surface2 : Color.clear)
+      .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+  }
+
+  // MARK: - Value formatting
+
+  private func weightText(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
+    guard let weight = draft.actualWeight ?? draft.prescribed.weightKg else { return "—" }
+    return StudentFormatting.decimal(weight)
+  }
+
+  private func targetText(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
+    let reps = draft.prescribed.reps ?? draft.prescribed.repsMax
+    let repsText = reps.map { "×\($0)" } ?? ""
+    let rpeText = draft.prescribed.rpe.map { " @ RPE \(StudentFormatting.decimal($0))" } ?? ""
+    return repsText + rpeText
+  }
+
+  private func repsText(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
+    guard let reps = draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax else {
+      return "—"
+    }
+    return "\(reps)"
+  }
+
+  private func rpeText(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
+    guard let rpe = draft.actualRPE else { return "—" }
+    return StudentFormatting.decimal(rpe)
+  }
+
+  private func currentRPE(_ draft: TodayWorkoutViewModel.SetRowDraft) -> Decimal {
+    draft.actualRPE ?? draft.prescribed.rpe ?? 8
+  }
+
+  private func statusMark(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
+    if draft.failed { return "✗" }
+    return draft.completed ? "✓" : "○"
+  }
+
+  private func statusColor(_ draft: TodayWorkoutViewModel.SetRowDraft) -> Color {
+    if draft.failed { return Color.MeetPR.amber }
+    return draft.completed ? Color.MeetPR.green : Color.MeetPR.fgTertiary
+  }
+
+  private func referenceText(_ reference: ExerciseReference) -> String {
+    var parts: [String] = []
+    if let last = reference.last {
+      parts.append("上次 \(StudentFormatting.kilograms(last.weightKg))kg×\(last.reps)")
+    }
+    if let best = reference.best {
+      parts.append("最佳 \(StudentFormatting.kilograms(best.weightKg))kg×\(best.reps)")
+    }
+    return parts.joined(separator: " · ")
+  }
+
+  private func twoDigit(_ value: Int) -> String { String(format: "%02d", value) }
+
+  // MARK: - Derived
+
+  private var navTitle: String {
+    guard let day = currentDay else { return "锻炼" }
+    let dayNumber = mondayOffset(day.date) + 1
+    let weekday = viewModel.planContext.map { "W\($0.weekIndex)D\(dayNumber)" } ?? "今日"
+    guard let lift = mainLift(day)?.studentDisplayName else { return weekday }
+    return "\(weekday) · \(lift)"
+  }
+
+  private var currentDay: StudentPlanDay? {
+    switch viewModel.state {
+    case .loaded(let day, _): return day
+    case .recording(let day, _, _): return day
+    default: return nil
+    }
+  }
+
+  private func mainLift(_ day: StudentPlanDay) -> LiftFamily? {
+    day.exercises.first {
+      $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily != nil
+    }?.exercise.mainLiftFamily
+  }
+
+  private func mondayOffset(_ date: Date) -> Int {
+    let weekday = Calendar.current.component(.weekday, from: date)  // 1=Sun…7=Sat
+    return (weekday + 5) % 7
+  }
+
+  private func totalSets(
+    for planExerciseID: UUID, in drafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> Int {
+    drafts.filter { $0.planExerciseID == planExerciseID }.count
+  }
+
+  private var restTitle: String {
+    Calendar.current.isDateInToday(selectedDate) ? "今日休息" : "这天休息"
+  }
+
+  private var readinessFiled: Bool {
+    if case .done = readinessViewModel.gate { return true }
+    return false
+  }
+
+  private var readinessPrefill: ReadinessCheckin? {
+    if case .done(let checkin) = readinessViewModel.gate { return checkin }
+    return nil
   }
 
   private func rows(
@@ -243,9 +498,4 @@ private struct EditingTarget: Identifiable {
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
 }
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct PlateMathTarget: Identifiable {
-  let weightKg: Double
-  var id: Double { weightKg }
-}
+// swiftlint:enable file_length type_body_length function_body_length

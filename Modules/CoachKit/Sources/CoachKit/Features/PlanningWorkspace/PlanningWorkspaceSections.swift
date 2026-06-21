@@ -146,7 +146,7 @@ private struct PlanningWorkspaceActionRow: View {
   }
 
   private var actionButton: some View {
-    BrandPrimaryButton(actionTitle, action: action)
+    PrimaryButton(actionTitle, action: action)
   }
 }
 
