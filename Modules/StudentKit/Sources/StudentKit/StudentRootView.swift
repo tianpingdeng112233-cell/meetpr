@@ -16,7 +16,7 @@ public struct StudentRootView: View {
   private let onLogout: (@MainActor () async -> Void)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
-  @State private var selectedTab: StudentTab = .dashboard
+  @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
 
   public init() {
@@ -81,6 +81,8 @@ public struct StudentRootView: View {
 
   public var body: some View {
     TabView(selection: $selectedTab) {
+      // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
+      // here + full history under 成长, so there is no separate 反馈 tab).
       DashboardView(
         studentID: studentID,
         plans: plans,
@@ -89,35 +91,33 @@ public struct StudentRootView: View {
         e1rm: e1rm,
         feedbackViewModel: feedbackViewModel,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
-        onStartWorkout: { selectedTab = .workout },
-        onSeeAllFeedback: { selectedTab = .feedback }
+        onStartWorkout: { selectedTab = .training },
+        onSeeAllFeedback: { selectedTab = .growth }
       )
-      .tag(StudentTab.dashboard)
+      .tag(StudentTab.today)
       .tabItem {
-        Label("仪表盘", systemImage: "square.grid.2x2.fill")
+        Label("今日", systemImage: "house")
       }
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
         videoUploads: videoUploads
       )
-      .tag(StudentTab.workout)
+      .tag(StudentTab.training)
       .tabItem {
-        Label("锻炼", systemImage: "figure.strengthtraining.traditional")
+        Label("训练", systemImage: "dumbbell.fill")
       }
 
-      TrainingHistoryView(studentID: studentID, plans: plans, logs: logs, e1rm: e1rm)
-        .tag(StudentTab.history)
-        .tabItem {
-          Label("历史", systemImage: "clock.arrow.circlepath")
-        }
-
-      FeedbackInboxView(studentID: studentID, viewModel: feedbackViewModel)
-        .tag(StudentTab.feedback)
-        .tabItem {
-          Label("反馈", systemImage: "bubble.left")
-        }
-        .badge(feedbackViewModel.unreadCount)
+      // 成长 — e1RM growth + full training history + coach-feedback history all
+      // live here (the 历史 tab folds in; assembled fully in a later slice).
+      TrainingHistoryView(
+        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+        feedbackViewModel: feedbackViewModel
+      )
+      .tag(StudentTab.growth)
+      .tabItem {
+        Label("成长", systemImage: "chart.line.uptrend.xyaxis")
+      }
 
       MyProfileView(
         studentID: studentID,
@@ -132,6 +132,7 @@ public struct StudentRootView: View {
         Label("我的", systemImage: "person")
       }
       // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
+      // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
       .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
     }
     .task {
@@ -146,10 +147,9 @@ public struct StudentRootView: View {
 }
 
 private enum StudentTab: Hashable {
-  case dashboard
-  case workout
-  case history
-  case feedback
+  case today
+  case training
+  case growth
   case profile
 }
 

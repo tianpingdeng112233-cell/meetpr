@@ -1,12 +1,15 @@
+// swiftlint:disable file_length type_body_length
 import CoreModels
 import DesignSystem
 import Foundation
 import RepositoryContracts
 import SwiftUI
 
-/// Student home, modeled on Juggernaut/MSB dashboards: today's workout entry,
-/// a this-week progress strip, and the latest coach feedback. Composes the
-/// existing week + feedback view models — no new persistence.
+/// Student home (今日), reskinned to the design's `StudentPlanView` layout:
+/// a `WxDy` large title, this-week progress bar, the latest coach feedback,
+/// a Mon–Sun S/B/D week grid (tap to select a day), the selected day's e1RM
+/// growth curve, and the start-today CTA. Composes the existing week / feedback
+/// / e1RM / profile-metrics view models — no new persistence.
 @available(iOS 17.0, macOS 14.0, *)
 public struct DashboardView: View {
   private let studentID: UUID
@@ -22,6 +25,8 @@ public struct DashboardView: View {
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
   @State private var showsNotifications = false
   @State private var showsEvaluationSummary = false
+  /// Day whose growth curve is shown. `nil` ⇒ today (the default selection).
+  @State private var selectedDate: Date?
 
   public init(
     studentID: UUID,
@@ -56,43 +61,43 @@ public struct DashboardView: View {
   public var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: 0) {
+          header
+
           if let evaluationSummaryViewModel {
             EvaluationCompletedCard(viewModel: evaluationSummaryViewModel)
+              .padding(.top, 16)
           }
 
-          TodayWorkoutCard(today: today, logs: weekData?.logs ?? [], onStart: onStartWorkout)
+          weekProgressBar
+            .padding(.top, 16)
 
-          if let data = weekData, !data.days.isEmpty {
-            DashboardSection(title: "本周") {
-              WeekStrip(days: data.days, logs: data.logs)
-            }
+          if let feedback = latestFeedback {
+            todayFeedbackCard(feedback)
+              .padding(.top, 16)
           }
 
-          NavigationLink(
-            destination: GrowthCurveView(studentID: studentID, plans: plans, e1rm: e1rm),
-            label: { E1RMMiniTrendCard(state: e1rmTrendViewModel.state) }
-          )
-          .buttonStyle(.plain)
+          weekToggle
+            .padding(.top, 20)
+          weekGrid
+            .padding(.top, 8)
+
+          liftCard
+            .padding(.top, 20)
+
+          startButton
+            .padding(.top, 16)
 
           if let metrics = profileMetricsViewModel.metrics {
             DashboardProfileMetricsView(metrics: metrics)
-          }
-
-          DashboardSection(title: "教练反馈", action: ("查看全部", onSeeAllFeedback)) {
-            RecentFeedback(viewModel: feedbackViewModel)
+              .padding(.top, 20)
           }
         }
-        .padding()
+        .padding(16)
       }
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bg)
-      .navigationTitle("仪表盘")
-      .toolbar {
-        ToolbarItem(placement: .primaryAction) {
-          notificationButton
-        }
-      }
+      .toolbar(.hidden, for: .navigationBar)
       .navigationDestination(isPresented: $showsEvaluationSummary) {
         if let summary = evaluationSummaryViewModel?.summary {
           EvaluationSummaryView(summary: summary) {
@@ -120,12 +125,26 @@ public struct DashboardView: View {
     }
   }
 
+  // MARK: - Header
+
+  private var header: some View {
+    HStack(alignment: .firstTextBaseline) {
+      Text(titleLabel)
+        .font(.system(size: 36, weight: .heavy))
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+      Spacer()
+      notificationButton
+    }
+  }
+
   private var notificationButton: some View {
     Button(
       action: { showsNotifications = true },
       label: {
         ZStack(alignment: .topTrailing) {
           Image(systemName: hasUnreadNotifications ? "bell.badge" : "bell")
+            .font(.system(size: 18))
+            .foregroundStyle(Color.MeetPR.fgSecondary)
           if hasUnreadNotifications {
             Circle()
               .fill(Color.MeetPR.brandRed)
@@ -138,12 +157,346 @@ public struct DashboardView: View {
     .accessibilityLabel(hasUnreadNotifications ? "通知,有未读" : "通知")
   }
 
+  // MARK: - Week progress bar
+
+  private var weekProgressBar: some View {
+    ProgressSegments(values: weekProgressValues, spacing: 6)
+  }
+
+  /// One segment per training day in the week (rest days excluded), each filled
+  /// by that day's set-completion fraction. Falls back to a single empty segment.
+  private var weekProgressValues: [Double] {
+    guard let data = weekData else { return [0] }
+    let logs = data.logs
+    let values = data.days
+      .filter { !$0.exercises.isEmpty }
+      .map { day -> Double in
+        let progress = TrainingDayProgress(day: day, logs: logs)
+        guard progress.total > 0 else { return 0 }
+        return Double(progress.completed) / Double(progress.total)
+      }
+    return values.isEmpty ? [0] : values
+  }
+
+  // MARK: - Today feedback card
+
+  private func todayFeedbackCard(_ item: CoachFeedback) -> some View {
+    Button(action: onSeeAllFeedback) {
+      VStack(alignment: .leading, spacing: 0) {
+        HStack(spacing: 8) {
+          if item.readAt == nil {
+            Circle().fill(Color.MeetPR.brandRed).frame(width: 7, height: 7)
+          }
+          Text(feedbackEyebrow(item))
+            .font(Font.MeetPR.monoLabel)
+            .tracking(Font.MeetPR.monoLabelTracking)
+            .foregroundStyle(Color.MeetPR.brandRed)
+        }
+        Text(item.text)
+          .font(.system(size: 14))
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .multilineTextAlignment(.leading)
+          .lineLimit(3)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.top, 10)
+        Text(feedbackFooter(item))
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .padding(.top, 8)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(16)
+      .background(Color.MeetPR.surface2)
+      .clipShape(.rect(cornerRadius: 12))
+      .overlay {
+        RoundedRectangle(cornerRadius: 12)
+          .stroke(Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1)
+      }
+    }
+    .buttonStyle(.plain)
+  }
+
+  private func feedbackEyebrow(_ item: CoachFeedback) -> String {
+    guard let day = item.dayDate else { return "教练反馈" }
+    return "教练反馈 · " + TodayFormat.shortWeekday.string(from: day)
+  }
+
+  private func feedbackFooter(_ item: CoachFeedback) -> String {
+    "教练 · " + TodayFormat.time.string(from: item.postedAt) + " · 在「成长」查看全部反馈 →"
+  }
+
+  // MARK: - Week grid (Mon–Sun, S/B/D)
+
+  private var weekToggle: some View {
+    HStack(spacing: 6) {
+      Text("本周")
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+    }
+  }
+
+  private var weekGrid: some View {
+    HStack(spacing: 6) {
+      ForEach(0..<7, id: \.self) { offset in
+        let date = weekday(offset)
+        dayCell(offset: offset, date: date, day: planDay(on: date))
+      }
+    }
+  }
+
+  private func dayCell(offset: Int, date: Date, day: StudentPlanDay?) -> some View {
+    let active = Calendar.current.isDate(date, inSameDayAs: effectiveSelectedDate)
+    let family = day.flatMap(mainFamily)
+    let isPast = date < Calendar.current.startOfDay(for: Date())
+    let done =
+      isPast && day != nil
+      && TrainingDayProgress(day: day, logs: weekData?.logs ?? []).state == .complete
+    let liftText = family.map(liftLetter) ?? "—"
+
+    return Button {
+      selectedDate = date
+    } label: {
+      VStack(alignment: .leading) {
+        Text(TodayFormat.weekdayLetter(offset))
+          .font(.system(size: 11))
+          .foregroundStyle(active ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary)
+        Spacer(minLength: 0)
+        Text(liftText)
+          .font(.system(size: 18, weight: .bold, design: .monospaced))
+          .foregroundStyle(family == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .aspectRatio(1, contentMode: .fit)
+      .padding(8)
+      .background(active ? Color.MeetPR.surface2 : Color.MeetPR.surface1)
+      .clipShape(.rect(cornerRadius: 8))
+      .overlay {
+        RoundedRectangle(cornerRadius: 8)
+          .stroke(active ? Color.MeetPR.fgPrimary : Color.MeetPR.border, lineWidth: 1)
+      }
+      .overlay(alignment: .topTrailing) {
+        if done {
+          CornerTriangle().fill(Color.MeetPR.brandRed).frame(width: 10, height: 10)
+        }
+      }
+    }
+    .buttonStyle(.plain)
+  }
+
+  // MARK: - Selected-day lift card
+
+  private var liftCard: some View {
+    NavigationLink {
+      GrowthCurveView(studentID: studentID, plans: plans, e1rm: e1rm)
+    } label: {
+      VStack(alignment: .leading, spacing: 0) {
+        liftCardContent
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(16)
+      .background(Color.MeetPR.surface1)
+      .clipShape(.rect(cornerRadius: 12))
+      .overlay {
+        RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+      }
+    }
+    .buttonStyle(.plain)
+  }
+
+  @ViewBuilder
+  private var liftCardContent: some View {
+    if let family = selectedFamily, let row = trendRow(for: family), !row.points.isEmpty {
+      HStack(alignment: .bottom) {
+        VStack(alignment: .leading, spacing: 0) {
+          Text("\(family.studentDisplayName) E1RM · 90 天")
+            .font(Font.MeetPR.monoLabel)
+            .tracking(Font.MeetPR.monoLabelTracking)
+            .foregroundStyle(Color.MeetPR.brandRed)
+          HStack(alignment: .lastTextBaseline, spacing: 6) {
+            Text(StudentFormatting.kilograms(row.latestPoint?.e1RMKg ?? 0))
+              .font(.system(size: 44, weight: .heavy).monospacedDigit())
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+            Text("KG")
+              .font(.system(size: 16, weight: .heavy))
+              .foregroundStyle(Color.MeetPR.brandRed)
+          }
+          .padding(.top, 4)
+        }
+        Spacer()
+        if let deltaKg = row.trendDeltaKg {
+          let delta = deltaLabel(deltaKg)
+          Text(delta.text)
+            .font(.system(size: 13, design: .monospaced))
+            .foregroundStyle(delta.color)
+        }
+      }
+      Sparkline(points: row.sparklinePoints(), viewBox: CGSize(width: 600, height: 120))
+        .frame(height: 110)
+        .padding(.top, 12)
+      Text(liftCardFooter(family))
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .padding(.top, 8)
+    } else {
+      VStack(alignment: .leading, spacing: 8) {
+        Text("成长曲线")
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.brandRed)
+        Text(selectedFamily == nil ? "选中训练日查看对应成长曲线" : "练几次就有趋势了")
+          .font(.system(size: 14))
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .frame(maxWidth: .infinity, minHeight: 96, alignment: .leading)
+      }
+    }
+  }
+
+  private func liftCardFooter(_ family: LiftFamily) -> String {
+    "选中 " + TodayFormat.shortWeekday.string(from: effectiveSelectedDate)
+      + " · \(family.studentDisplayName)日 — 显示对应成长曲线"
+  }
+
+  // MARK: - Start CTA
+
+  @ViewBuilder
+  private var startButton: some View {
+    let progress = TrainingDayProgress(day: todayDay, logs: weekData?.logs ?? [])
+    switch progress.state {
+    case .noPlan:
+      HStack(spacing: 10) {
+        Image(systemName: "bed.double.fill").foregroundStyle(Color.MeetPR.fgSecondary)
+        Text("今日休息").font(Font.MeetPR.bodyEmphasis).foregroundStyle(Color.MeetPR.fgPrimary)
+        Spacer()
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(16)
+      .background(Color.MeetPR.surface1)
+      .clipShape(.rect(cornerRadius: 12))
+      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+    default:
+      Button(action: onStartWorkout) {
+        Text(startButtonLabel(progress))
+          .font(Font.MeetPR.bodyEmphasis)
+          .foregroundStyle(Color.MeetPR.bg)
+          .frame(maxWidth: .infinity)
+          .frame(height: 50)
+          .background(Color.MeetPR.fgPrimary)
+          .clipShape(.rect(cornerRadius: 12))
+      }
+      .buttonStyle(.plain)
+    }
+  }
+
+  private func startButtonLabel(_ progress: TrainingDayProgress) -> String {
+    let lift = todayDay.flatMap(mainFamily)?.studentDisplayName ?? "训练"
+    let label = todayLabel
+    switch progress.state {
+    case .complete: return "今日已完成 · 查看"
+    case .partial: return "继续 \(label) · \(lift)"
+    default: return "开始 \(label) · \(lift)"
+    }
+  }
+
+  // MARK: - Derived data
+
+  private var weekData: (days: [StudentPlanDay], logs: [StudentSetLog], weekIndex: Int)? {
+    if case .loaded(let days, let logs, let weekIndex) = weekViewModel.state {
+      return (days, logs, weekIndex)
+    }
+    return nil
+  }
+
+  /// Monday of the week containing today (Mon-based offset 0…6).
+  private func weekday(_ offset: Int) -> Date {
+    let calendar = Calendar.current
+    let today = calendar.startOfDay(for: Date())
+    let weekday = calendar.component(.weekday, from: today)  // 1=Sun…7=Sat
+    let mondayOffset = (weekday + 5) % 7  // days since Monday
+    let monday = calendar.date(byAdding: .day, value: -mondayOffset, to: today) ?? today
+    return calendar.date(byAdding: .day, value: offset, to: monday) ?? monday
+  }
+
+  private func planDay(on date: Date) -> StudentPlanDay? {
+    weekData?.days.first { Calendar.current.isDate($0.date, inSameDayAs: date) }
+  }
+
+  private func mainFamily(_ day: StudentPlanDay) -> LiftFamily? {
+    day.exercises.first {
+      $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily != nil
+    }?
+    .exercise.mainLiftFamily
+  }
+
+  private func liftLetter(_ family: LiftFamily) -> String {
+    switch family {
+    case .squat: "S"
+    case .bench: "B"
+    case .deadlift: "D"
+    }
+  }
+
+  private var effectiveSelectedDate: Date {
+    selectedDate ?? Date()
+  }
+
+  private var selectedFamily: LiftFamily? {
+    planDay(on: effectiveSelectedDate).flatMap(mainFamily)
+  }
+
+  private var todayDay: StudentPlanDay? {
+    planDay(on: Date())
+  }
+
+  private var titleLabel: String {
+    guard let weekIndex = weekData?.weekIndex else { return "今日" }
+    let offset = mondayOffset(for: effectiveSelectedDate)
+    return "W\(weekIndex)D\(offset + 1)"
+  }
+
+  private var todayLabel: String {
+    guard let weekIndex = weekData?.weekIndex else { return "今日训练" }
+    return "W\(weekIndex)D\(mondayOffset(for: Date()) + 1)"
+  }
+
+  private func mondayOffset(for date: Date) -> Int {
+    let weekday = Calendar.current.component(.weekday, from: date)  // 1=Sun…7=Sat
+    return (weekday + 5) % 7
+  }
+
+  private var trendPresentation: DashboardE1RMTrendPresentation? {
+    if case .loaded(let presentation) = e1rmTrendViewModel.state { return presentation }
+    return nil
+  }
+
+  private func trendRow(for family: LiftFamily) -> DashboardE1RMTrendRow? {
+    trendPresentation?.rows.first { $0.family == family }
+  }
+
+  private func deltaLabel(_ kg: Double) -> (text: String, color: Color) {
+    let sign = kg >= 0 ? "+" : "−"
+    let color =
+      kg > 0 ? Color.MeetPR.green : (kg < 0 ? Color.MeetPR.brandRed : Color.MeetPR.fgSecondary)
+    return ("\(sign)\(StudentFormatting.kilograms(abs(kg))) KG", color)
+  }
+
+  private var latestFeedback: CoachFeedback? {
+    if case .loaded(let items) = feedbackViewModel.state {
+      return items.max { $0.postedAt < $1.postedAt }
+    }
+    return nil
+  }
+
   private var hasUnreadNotifications: Bool {
     notificationsViewModel.hasUnread(
       feedbackUnreadCount: feedbackViewModel.unreadCount,
       evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0
     )
   }
+
+  // MARK: - Loading
 
   private func loadIfNeeded() async {
     if weekViewModel.state == .idle {
@@ -164,184 +517,39 @@ public struct DashboardView: View {
     notificationsViewModel.markCurrentPlanSeen()
     onStartWorkout()
   }
+}
 
-  private var weekData: (days: [StudentPlanDay], logs: [StudentSetLog])? {
-    if case .loaded(let days, let logs, _) = weekViewModel.state {
-      return (days, logs)
-    }
-    return nil
-  }
+// MARK: - Local helpers
 
-  private var today: StudentPlanDay? {
-    weekData?.days.first { Calendar.current.isDate($0.date, inSameDayAs: Date()) }
+/// Small right-triangle filling the top-right corner (done-day marker).
+private struct CornerTriangle: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.move(to: CGPoint(x: rect.maxX, y: rect.minY))
+    path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+    path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+    path.closeSubpath()
+    return path
   }
 }
 
-@available(iOS 17.0, macOS 14.0, *)
-private struct TodayWorkoutCard: View {
-  let today: StudentPlanDay?
-  let logs: [StudentSetLog]
-  let onStart: () -> Void
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
-      Text(
-        StudentFormatting.weekdayFormatter.string(from: Date()) + " · "
-          + StudentFormatting.dayMonthFormatter.string(from: Date())
-      )
-      .font(.subheadline)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
-
-      if let today, !today.exercises.isEmpty {
-        let progress = StudentFormatting.completedCount(for: today, logs: logs)
-        VStack(alignment: .leading, spacing: 12) {
-          Text("今日训练")
-            .font(.title2.bold())
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("\(today.exercises.count) 个动作 · \(progress.completed)/\(progress.total) 组完成")
-            .font(.subheadline.monospacedDigit())
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-          BrandPrimaryButton(
-            progress.completed == 0 ? "开始训练" : "继续训练",
-            isFullWidth: true,
-            action: onStart
-          )
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .modifier(DashboardCard())
-      } else {
-        HStack(spacing: 10) {
-          Image(systemName: "bed.double.fill")
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-          Text("今日休息")
-            .font(.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Spacer()
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .modifier(DashboardCard())
-      }
-    }
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct WeekStrip: View {
-  let days: [StudentPlanDay]
-  let logs: [StudentSetLog]
-
-  var body: some View {
-    ScrollView(.horizontal, showsIndicators: false) {
-      HStack(spacing: 10) {
-        ForEach(days) { day in
-          NavigationLink {
-            DayDetailView(day: day, logs: logs)
-          } label: {
-            DayChip(day: day, logs: logs)
-          }
-          .buttonStyle(.plain)
-        }
-      }
-    }
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct DayChip: View {
-  let day: StudentPlanDay
-  let logs: [StudentSetLog]
-
-  var body: some View {
-    let isToday = Calendar.current.isDate(day.date, inSameDayAs: Date())
-    let progress = TrainingDayProgress(day: day, logs: logs)
-
-    VStack(spacing: 6) {
-      Text(Self.shortWeekday.string(from: day.date))
-        .font(.caption2)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-      Text(Self.dayNumber.string(from: day.date))
-        .font(.headline.monospacedDigit())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      Circle()
-        .fill(progress.state.dotColor)
-        .frame(width: 7, height: 7)
-    }
-    .frame(width: 52)
-    .padding(.vertical, 12)
-    .background(isToday ? Color.MeetPR.surface3 : Color.MeetPR.surface1)
-    .overlay {
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(isToday ? Color.MeetPR.green : Color.MeetPR.border, lineWidth: 1)
-    }
-    .clipShape(.rect(cornerRadius: 12))
+private enum TodayFormat {
+  /// Mon-based offset (0…6) → 一/二/三/四/五/六/日.
+  static func weekdayLetter(_ offset: Int) -> String {
+    ["一", "二", "三", "四", "五", "六", "日"][min(max(offset, 0), 6)]
   }
 
-  private static let shortWeekday: DateFormatter = {
+  static let shortWeekday: DateFormatter = {
     let formatter = DateFormatter()
     formatter.locale = Locale(identifier: "zh_CN")
     formatter.setLocalizedDateFormatFromTemplate("EEE")
     return formatter
   }()
 
-  private static let dayNumber: DateFormatter = {
+  static let time: DateFormatter = {
     let formatter = DateFormatter()
     formatter.locale = Locale(identifier: "zh_CN")
-    formatter.setLocalizedDateFormatFromTemplate("d")
+    formatter.dateFormat = "HH:mm"
     return formatter
   }()
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct RecentFeedback: View {
-  let viewModel: FeedbackInboxViewModel
-
-  var body: some View {
-    if case .loaded(let items) = viewModel.state, !items.isEmpty {
-      VStack(spacing: 12) {
-        ForEach(items.prefix(2)) { item in
-          NavigationLink {
-            FeedbackDetailView(item: item)
-              .task { await viewModel.markRead(item) }
-          } label: {
-            FeedbackRowCard(item: item)
-          }
-          .buttonStyle(.plain)
-        }
-      }
-    } else {
-      Text("暂无反馈")
-        .font(.subheadline)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct FeedbackRowCard: View {
-  let item: CoachFeedback
-
-  var body: some View {
-    HStack(alignment: .top, spacing: 12) {
-      Circle()
-        .fill(item.readAt == nil ? Color.MeetPR.brandRed : Color.clear)
-        .frame(width: 8, height: 8)
-        .padding(.top, 6)
-      VStack(alignment: .leading, spacing: 6) {
-        Text(item.text)
-          .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .lineLimit(2)
-          .frame(maxWidth: .infinity, alignment: .leading)
-        Text(StudentFormatting.dayMonthFormatter.string(from: item.postedAt))
-          .font(.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-      }
-      Image(systemName: "chevron.right")
-        .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-        .padding(.top, 2)
-    }
-    .modifier(DashboardCard())
-  }
 }

@@ -100,6 +100,16 @@ public enum OnboardingSummaryFormatter {
     return parts.isEmpty ? "未上传资料" : parts.joined(separator: " · ")
   }
 
+  /// "股四头 / 腘绳肌 / 肩" — just the strengthen targets (no upload count),
+  /// for the profile's "想增强肌群" row.
+  public static func muscleGroups(_ profile: OnboardingProfile) -> String {
+    guard !profile.muscleGroupsToStrengthen.isEmpty else { return placeholder }
+    let names = profile.muscleGroupsToStrengthen.map { group in
+      group == .back ? "背" : OnboardingLabels.strengthenLabel(group)
+    }
+    return names.joined(separator: " / ")
+  }
+
   /// "备赛: 2026-07-25 · IPF 83kg" / "暂不备赛"
   public static func competition(_ profile: OnboardingProfile) -> String {
     guard profile.isCompeting == true else {
