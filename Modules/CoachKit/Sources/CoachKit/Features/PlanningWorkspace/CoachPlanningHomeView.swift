@@ -4,6 +4,12 @@ import Foundation
 import RepositoryContracts
 import SwiftUI
 
+/// Coach 编排 tab landing, reskinned to the house style (custom heavy large title
+/// + hidden nav bar, brand-red CTA, mono-labelled sections). The `DKCoachPlanningEditor`
+/// mock it descends from depicts the *in-wizard* cycle editor (a separate, later task);
+/// this screen is the planning home that launches that wizard. It binds verbatim to
+/// `PlanningWorkspaceViewModel` (drafts / needs-planning / recent-published) and keeps
+/// the fullScreenCover-driven `PlanningCoordinatorView` wizard + draft-resume behavior.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct CoachPlanningHomeView: View {
@@ -31,25 +37,26 @@ struct CoachPlanningHomeView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-          Text("教练端")
-            .font(Font.MeetPR.title1)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+        VStack(alignment: .leading, spacing: 0) {
+          header
 
-          BrandPrimaryButton("排新计划", isFullWidth: true) {
+          PrimaryButton("排新计划", isFullWidth: true) {
             presentPlanning(intent: .blank)
           }
+          .padding(.top, 20)
 
           workspaceContent
+            .padding(.top, 20)
         }
-        .padding(MeetPRSpacing.base)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .topLeading)
       }
+      .scrollContentBackground(.hidden)
+      .background(Color.MeetPR.bg)
+      .toolbar(.hidden, for: .navigationBar)
       .refreshable {
         await viewModel.refresh()
       }
-      .background(Color.MeetPR.bg)
-      .navigationTitle("MeetPR")
     }
     .task {
       await viewModel.loadIfNeeded()
@@ -69,12 +76,30 @@ struct CoachPlanningHomeView: View {
       })
   }
 
+  // MARK: - Header
+
+  private var header: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+      Eyebrow("计划编排")
+      Text("编排")
+        .font(.system(size: 36, weight: .heavy))
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+      Text("为学员排周期 · 续编草稿 · 回看已发布")
+        .font(.system(size: 14))
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  // MARK: - Workspace body
+
   @ViewBuilder
   private var workspaceContent: some View {
     switch viewModel.state {
     case .idle, .loading:
       ProgressView()
         .frame(maxWidth: .infinity)
+        .padding(.top, MeetPRSpacing.lg)
     case .failed(let message):
       PlanningWorkspaceFailure(message: message) {
         Task { await viewModel.refresh() }
@@ -82,6 +107,8 @@ struct CoachPlanningHomeView: View {
     case .loaded:
       if viewModel.hasWorkspaceContent {
         loadedSections
+      } else {
+        emptyState
       }
     }
   }
@@ -103,6 +130,29 @@ struct CoachPlanningHomeView: View {
       if !viewModel.recentPublishedRows.isEmpty {
         PlanningRecentPublishedSection(rows: viewModel.recentPublishedRows, context: context)
       }
+    }
+  }
+
+  // MARK: - Empty state
+
+  private var emptyState: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+      Text("暂无待排计划")
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.brandRed)
+      Text("所有学员都有在跑计划。需要新建周期时，点上方「排新计划」。")
+        .font(.system(size: 14))
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(16)
+    .background(Color.MeetPR.surface1)
+    .clipShape(.rect(cornerRadius: 12))
+    .overlay {
+      RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
     }
   }
 

@@ -1,8 +1,28 @@
+import CoreModels
 import DesignSystem
+import RepositoryContracts
 import SwiftUI
 
 /// The 3-field evaluation summary editor (spec 033 §8) plus the soft
-/// recommendation → planning prefill handoff (§9).
+/// recommendation → planning prefill handoff (§9), reskinned 1:1 to the
+/// `DKCoachEvalSummary` mock: brandRed mono field labels over bordered
+/// surface1 text-entry cards, the notify row + a high-contrast primary
+/// "完成并通知学员" action pinned under the fields, and the 保存草稿 / 保存
+/// path kept exactly.
+///
+/// ALL behavior is preserved verbatim: the load/failed/ready state switch,
+/// the `.task` load, every field binding + char-limit clamp, the
+/// `noticeMessage` / `prefillNotice` surfaces, `canSave` / `isSaving`
+/// disabled logic, `lastSavedAt`, the `isEditMode` branch (notify toggle +
+/// 保存 vs 保存草稿 + 完成并通知学员), the `save()` / `completeAndNotify()`
+/// VM calls, and the soft-recommendation alert → `fetchPrefillProfile()` →
+/// `PlanningCoordinatorView` handoff. Only presentation changed.
+///
+/// HONEST DEGRADE: the mock's amber "评估期还剩 4 天 13 小时" countdown chip
+/// has no backing field on the view model (the live `EvaluationPeriod` is
+/// `@ObservationIgnored` and exposes no remaining-time read-model), so it is
+/// omitted rather than fabricated — the navigation title already carries the
+/// evaluation context. See honestDegrades.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct EvaluationSummaryEditorView: View {
@@ -31,6 +51,7 @@ struct EvaluationSummaryEditorView: View {
         editorForm
       }
     }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bg)
     .navigationTitle("评估总结 · \(viewModel.student.displayName)")
     .task {
@@ -74,57 +95,58 @@ struct EvaluationSummaryEditorView: View {
     #endif
   }
 
+  // MARK: - Form
+
   private var editorForm: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         if let notice = viewModel.noticeMessage {
-          noticeCard(notice, color: Color.MeetPR.amber)
+          noticeCard(notice, color: Color.MeetPR.amber, systemImage: "exclamationmark.triangle")
         }
         if let prefillNotice = viewModel.prefillNotice {
-          noticeCard(prefillNotice, color: Color.MeetPR.fgSecondary)
+          noticeCard(prefillNotice, color: Color.MeetPR.fgSecondary, systemImage: "info.circle")
         }
 
         fieldCard(
-          title: "整体评估(必填)",
-          text: Bindable(viewModel).overallAssessment
+          title: "整体评估 · 必填",
+          text: Bindable(viewModel).overallAssessment,
+          minHeight: 104
         )
         fieldCard(
-          title: "训练规划(必填)",
-          text: Bindable(viewModel).trainingPlanText
+          title: "训练规划 · 必填",
+          text: Bindable(viewModel).trainingPlanText,
+          minHeight: 104
         )
         fieldCard(
-          title: "给学员的话(选填)",
-          text: Bindable(viewModel).wordsToStudent
+          title: "给学员的话 · 选填",
+          text: Bindable(viewModel).wordsToStudent,
+          minHeight: 84
         )
 
         actionArea
       }
       .padding(MeetPRSpacing.base)
     }
+    .scrollContentBackground(.hidden)
   }
+
+  // MARK: - Bottom action area
 
   @ViewBuilder
   private var actionArea: some View {
-    if viewModel.isEditMode {
-      Toggle("同时通知学员", isOn: Bindable(viewModel).notifyOnSave)
-        .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      PrimaryButton(
-        "保存",
-        isDisabled: !viewModel.canSave || viewModel.isSaving,
-        isFullWidth: true
-      ) {
-        Task { _ = await viewModel.save() }
-      }
-    } else {
-      HStack(spacing: MeetPRSpacing.sm) {
-        SecondaryButton(
-          "保存草稿",
+    VStack(spacing: 0) {
+      if viewModel.isEditMode {
+        notifyToggleRow
+        PrimaryButton(
+          "保存",
           isDisabled: !viewModel.canSave || viewModel.isSaving,
           isFullWidth: true
         ) {
           Task { _ = await viewModel.save() }
         }
+      } else {
+        // Mock: a single high-contrast "完成 + 通知学员" primary, with
+        // "保存草稿" demoted to a tertiary text action below it.
         PrimaryButton(
           "完成并通知学员",
           isDisabled: !viewModel.canSave || viewModel.isSaving,
@@ -132,25 +154,80 @@ struct EvaluationSummaryEditorView: View {
         ) {
           Task { _ = await viewModel.completeAndNotify() }
         }
+
+        Button {
+          Task { _ = await viewModel.save() }
+        } label: {
+          Text("保存草稿")
+            .font(.system(size: 14))
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .frame(maxWidth: .infinity)
+            .padding(.top, 14)
+            .padding(.bottom, 4)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(!viewModel.canSave || viewModel.isSaving)
       }
     }
+    .padding(.top, MeetPRSpacing.sm)
 
     if let savedAt = viewModel.lastSavedAt {
       Text("已保存 \(CoachStudentFormatting.relativeText(savedAt))")
         .font(Font.MeetPR.caption)
         .foregroundStyle(Color.MeetPR.fgTertiary)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
   }
 
-  private func fieldCard(title: String, text: Binding<String>) -> some View {
+  /// Edit-mode "同时通知学员" opt-in (D4), restyled as the mock's checkbox row.
+  private var notifyToggleRow: some View {
+    Button {
+      viewModel.notifyOnSave.toggle()
+    } label: {
+      HStack(spacing: 10) {
+        Image(systemName: viewModel.notifyOnSave ? "checkmark" : "")
+          .font(.system(size: 13, weight: .bold))
+          .foregroundStyle(Color.white)
+          .frame(width: 22, height: 22)
+          .background(viewModel.notifyOnSave ? Color.MeetPR.brandRed : Color.MeetPR.surface2)
+          .clipShape(.rect(cornerRadius: 5))
+          .overlay {
+            RoundedRectangle(cornerRadius: 5)
+              .stroke(Color.MeetPR.border, lineWidth: viewModel.notifyOnSave ? 0 : 1)
+          }
+        Text("同时通知学员")
+          .font(.system(size: 15))
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Spacer()
+      }
+      .padding(.bottom, 14)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel("同时通知学员")
+    .accessibilityValue(viewModel.notifyOnSave ? "已选中" : "未选中")
+  }
+
+  // MARK: - Building blocks
+
+  private func fieldCard(title: String, text: Binding<String>, minHeight: CGFloat) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Eyebrow(title)
+      Text(title)
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.brandRed)
+
       TextEditor(text: text)
-        .frame(minHeight: 96)
+        .frame(minHeight: minHeight)
         .scrollContentBackground(.hidden)
-        .padding(MeetPRSpacing.sm)
+        .padding(MeetPRSpacing.md)
         .background(Color.MeetPR.surface1)
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+        .overlay {
+          RoundedRectangle(cornerRadius: MeetPRRadius.md)
+            .stroke(Color.MeetPR.border, lineWidth: 1)
+        }
         .font(Font.MeetPR.body)
         .foregroundStyle(Color.MeetPR.fgPrimary)
         .onChange(of: text.wrappedValue) { _, newValue in
@@ -162,10 +239,24 @@ struct EvaluationSummaryEditorView: View {
     }
   }
 
-  private func noticeCard(_ message: String, color: Color) -> some View {
-    Label(message, systemImage: "info.circle")
-      .font(Font.MeetPR.footnote)
-      .foregroundStyle(color)
+  private func noticeCard(_ message: String, color: Color, systemImage: String) -> some View {
+    HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
+      Image(systemName: systemImage)
+        .font(.system(size: 14))
+        .foregroundStyle(color)
+      Text(message)
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(color)
+      Spacer(minLength: 0)
+    }
+    .padding(MeetPRSpacing.md)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(Color.MeetPR.surface1)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.md)
+        .stroke(color.opacity(0.4), lineWidth: 1)
+    }
   }
 }
 

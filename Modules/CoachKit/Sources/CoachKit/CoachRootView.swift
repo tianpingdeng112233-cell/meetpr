@@ -14,6 +14,7 @@ public struct CoachRootView: View {
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var queueViewModel: BindQueueViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
+  @State private var selectedTab: CoachTab = .today
 
   @MainActor
   public init(
@@ -74,24 +75,51 @@ public struct CoachRootView: View {
   }
 
   public var body: some View {
-    TabView {
-      CoachPlanningHomeView(context: detailContext)
-        .tabItem {
-          Label("排计划", systemImage: "calendar.badge.plus")
-        }
+    TabView(selection: $selectedTab) {
+      CoachDashboardView(
+        attentionCount: rosterViewModel.pendingAttentionCount,
+        pendingCount: queueViewModel.pendingCount,
+        rows: rosterViewModel.rows,
+        onOpenReceiving: { selectedTab = .receiving },
+        onOpenRoster: { selectedTab = .students }
+      )
+      .tag(CoachTab.today)
+      .tabItem {
+        Label("今日", systemImage: "house")
+      }
 
       StudentRosterView(
         viewModel: rosterViewModel,
-        queueViewModel: queueViewModel,
         context: detailContext
       )
+      .tag(CoachTab.students)
       .tabItem {
         Label("学员", systemImage: "person.2")
       }
-      // 待关注学员 + pending 请求合并计数 (spec 033 D1).
-      .badge(rosterViewModel.pendingAttentionCount + queueViewModel.pendingCount)
+      // 待关注学员 (新学员 pending 计数已拆到「接收」tab, spec 033 D1).
+      .badge(rosterViewModel.pendingAttentionCount)
+
+      CoachPlanningHomeView(context: detailContext)
+        .tag(CoachTab.planning)
+        .tabItem {
+          Label("编排", systemImage: "calendar.badge.plus")
+        }
+
+      CoachReceivingView(
+        pendingCount: queueViewModel.pendingCount,
+        videoCount: 0,
+        queueViewModel: queueViewModel,
+        profiles: detailContext.profiles,
+        onAccepted: { await rosterViewModel.refresh() }
+      )
+      .tag(CoachTab.receiving)
+      .tabItem {
+        Label("接收", systemImage: "tray")
+      }
+      .badge(queueViewModel.pendingCount)
 
       CoachMyProfileView(viewModel: profileViewModel, inviteCodes: inviteCodes)
+        .tag(CoachTab.profile)
         .tabItem {
           Label("我的", systemImage: "person")
         }
@@ -102,4 +130,12 @@ public struct CoachRootView: View {
     }
     .tint(Color.MeetPR.brandRed)
   }
+}
+
+private enum CoachTab: Hashable {
+  case today
+  case students
+  case planning
+  case receiving
+  case profile
 }
