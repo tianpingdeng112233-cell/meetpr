@@ -248,12 +248,14 @@ public struct DashboardView: View {
 
   private func dayCell(offset: Int, date: Date, day: StudentPlanDay?) -> some View {
     let active = Calendar.current.isDate(date, inSameDayAs: effectiveSelectedDate)
-    let family = day.flatMap(mainFamily)
+    // All SBD families trained that day (main lifts + variations), ordered S→B→D
+    // so the badge reads "SB" / "SBD" rather than a single lift.
+    let families = day.map(dayFamilies) ?? []
     let isPast = date < Calendar.current.startOfDay(for: Date())
     let done =
       isPast && day != nil
       && TrainingDayProgress(day: day, logs: weekData?.logs ?? []).state == .complete
-    let liftText = family.map(liftLetter) ?? "—"
+    let liftText = families.isEmpty ? "—" : families.map(liftLetter).joined()
 
     return Button {
       selectedDate = date
@@ -265,7 +267,9 @@ public struct DashboardView: View {
         Spacer(minLength: 0)
         Text(liftText)
           .font(.system(size: 18, weight: .bold, design: .monospaced))
-          .foregroundStyle(family == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary)
+          .lineLimit(1)
+          .minimumScaleFactor(0.6)
+          .foregroundStyle(families.isEmpty ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .aspectRatio(1, contentMode: .fit)
@@ -423,11 +427,16 @@ public struct DashboardView: View {
     weekData?.days.first { Calendar.current.isDate($0.date, inSameDayAs: date) }
   }
 
+  /// Ordered S→B→D families on a day (main lifts + variations, deduped) — the
+  /// week-grid badge source.
+  private func dayFamilies(_ day: StudentPlanDay) -> [LiftFamily] {
+    MainLiftExerciseFamilyResolver.families(in: day)
+  }
+
+  /// The day's primary family (first in S→B→D order) — drives the selected-day
+  /// growth curve and the start-CTA label, which are single-lift by design.
   private func mainFamily(_ day: StudentPlanDay) -> LiftFamily? {
-    day.exercises.first {
-      $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily != nil
-    }?
-    .exercise.mainLiftFamily
+    dayFamilies(day).first
   }
 
   private func liftLetter(_ family: LiftFamily) -> String {

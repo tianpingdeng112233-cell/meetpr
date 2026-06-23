@@ -119,8 +119,14 @@ public enum StudentDemoSeed {
         exercise(.init(index: 2, name: "硬拉", family: .deadlift, weight: 175, reps: 3, rpe: 8.5))
       ]
     case 4:
+      // 深蹲主项 + 窄握卧推变式(+ 坐姿划船辅助)→ 角标 "SB"(演示组合日 + S 在 B 前排序 +
+      // 辅助动作不计入)。
       return [
-        exercise(.init(index: 3, name: "窄握卧推", family: .bench, weight: 75, reps: 6, rpe: nil)),
+        exercise(.init(index: 6, name: "深蹲", family: .squat, weight: 130, reps: 5, rpe: 7)),
+        exercise(
+          .init(
+            index: 3, name: "窄握卧推", family: .bench, weight: 75, reps: 6, rpe: nil,
+            type: .mainLiftVariation)),
         exercise(.init(index: 4, name: "坐姿划船", family: nil, weight: 55, reps: 10, rpe: 8)),
       ]
     default:
@@ -135,18 +141,22 @@ public enum StudentDemoSeed {
     let weight: Decimal
     let reps: Int
     let rpe: Decimal?
+    /// Explicit role; defaults to .accessory when `family` is nil, else .mainLift.
+    /// Set `.mainLiftVariation` for 变式 (暂停深蹲 / 窄握卧推 等).
+    var type: ExerciseType?
   }
 
   private static func exercise(_ spec: ExerciseSpec) -> StudentPlanExercise {
     let exerciseID = uuid(2_000 + spec.index)
+    let exerciseType = spec.type ?? (spec.family == nil ? .accessory : .mainLift)
     return StudentPlanExercise(
       id: uuid(3_000 + spec.index),
       exercise: Exercise(
         id: exerciseID,
         name: spec.name,
-        exerciseType: spec.family == nil ? .accessory : .mainLift,
+        exerciseType: exerciseType,
         mainLiftFamily: spec.family,
-        isCompetitionLift: spec.family != nil && !spec.name.contains("窄握"),
+        isCompetitionLift: exerciseType == .mainLift,
         muscleGroups: spec.family == .bench ? [.chest, .triceps] : [.quad, .glute, .back],
         equipment: spec.family == nil ? [.machine] : [.barbell],
         movementPattern: spec.family == .bench ? [.horizontalPush] : [.squat],

@@ -28,6 +28,23 @@ enum MainLiftExerciseFamilyResolver {
   ) -> LiftFamily? {
     idsByFamily.first { $0.value.contains(exerciseID) }?.key
   }
+
+  /// Every squat/bench/deadlift family trained on one day — main lifts **and**
+  /// their variations (暂停深蹲 / 窄握卧推 等变式计入对应家族;辅助动作不计,
+  /// 它们没有 `mainLiftFamily`)。去重后按 S→B→D 固定顺序返回,驱动仪表盘周历
+  /// 的多字母角标(深蹲+卧推日 → `[.squat, .bench]` → "SB")。
+  static func families(in day: StudentPlanDay) -> [LiftFamily] {
+    var present: Set<LiftFamily> = []
+    for slot in day.exercises {
+      let exercise = slot.exercise
+      guard
+        exercise.exerciseType == .mainLift || exercise.exerciseType == .mainLiftVariation,
+        let family = exercise.mainLiftFamily
+      else { continue }
+      present.insert(family)
+    }
+    return dashboardFamilies.filter(present.contains)
+  }
 }
 
 extension LiftFamily {
