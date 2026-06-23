@@ -111,6 +111,9 @@ struct MeetPRApp: App {
             studentId: StudentDemoSeed.studentID,
             seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
           ),
+          // 训练视频 inbox: boot straight into a populated queue (spec 042).
+          coachVideoQueue: InMemoryCoachVideoQueueRepository(
+            seed: CoachDemoSeed.pendingVideos()),
           draftStore: draftStore
         ),
         session: session

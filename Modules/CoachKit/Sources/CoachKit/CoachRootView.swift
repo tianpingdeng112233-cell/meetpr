@@ -13,6 +13,7 @@ public struct CoachRootView: View {
   private let draftStore: DraftStore
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var queueViewModel: BindQueueViewModel
+  @State private var videoQueueViewModel: CoachVideoQueueViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
   @State private var selectedTab: CoachTab = .today
 
@@ -30,6 +31,7 @@ public struct CoachRootView: View {
     evaluations: (any EvaluationRepository)? = nil,
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     studentProfiles: (any OnboardingProfileReading)? = nil,
+    videoQueue: (any CoachVideoQueueRepository)? = nil,
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
@@ -69,6 +71,15 @@ public struct CoachRootView: View {
     _queueViewModel = State(
       initialValue: BindQueueViewModel(repository: resolvedQueue)
     )
+    // Live default: aggregate the existing per-student video + feedback repos
+    // (no new backend endpoint, spec 042). Demo injects an in-memory seed.
+    let resolvedVideoQueue =
+      videoQueue
+      ?? AggregatingCoachVideoQueueRepository(
+        roster: repository, videos: studentVideos, feedback: feedback, plans: studentPlans)
+    _videoQueueViewModel = State(
+      initialValue: CoachVideoQueueViewModel(repository: resolvedVideoQueue)
+    )
     _profileViewModel = State(
       initialValue: CoachMyProfileViewModel(logoutAction: onLogout)
     )
@@ -107,8 +118,9 @@ public struct CoachRootView: View {
 
       CoachReceivingView(
         pendingCount: queueViewModel.pendingCount,
-        videoCount: 0,
+        videoCount: videoQueueViewModel.pendingCount,
         queueViewModel: queueViewModel,
+        videoQueueViewModel: videoQueueViewModel,
         profiles: detailContext.profiles,
         onAccepted: { await rosterViewModel.refresh() }
       )
@@ -116,7 +128,8 @@ public struct CoachRootView: View {
       .tabItem {
         Label("接收", systemImage: "tray")
       }
-      .badge(queueViewModel.pendingCount)
+      // 收件箱红点 = 新学员 + 待反馈视频(spec 042).
+      .badge(queueViewModel.pendingCount + videoQueueViewModel.pendingCount)
 
       CoachMyProfileView(viewModel: profileViewModel, inviteCodes: inviteCodes)
         .tag(CoachTab.profile)
@@ -127,6 +140,7 @@ public struct CoachRootView: View {
     .task {
       await rosterViewModel.loadIfNeeded()
       await queueViewModel.loadIfNeeded()
+      await videoQueueViewModel.loadIfNeeded()
     }
     .tint(Color.MeetPR.brandRed)
   }

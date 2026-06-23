@@ -65,4 +65,66 @@ public enum CoachDemoSeed {
       period(studentByte: 10, bindByte: 10, remaining: (6 * 24 + 2) * 3_600),
     ]
   }
+
+  /// Video-id demo namespace (`…0003ßß`), distinct from roster / bind / eval ids.
+  private static func videoID(_ byte: UInt8) -> UUID {
+    UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, byte))
+  }
+
+  /// Six pending 训练视频 inbox clips (spec 042) across three preview-roster
+  /// students, keyed to the roster ids. Exercise names are the coach-programmed
+  /// **主项 (比赛式…) + 变式** (spec 042 D2), and each multi-clip student's day
+  /// pairs a main lift with its variation so the day-grouped detail shows the
+  /// 主项/变式 structure. No playback URLs — metadata-only, matching the
+  /// per-student video wall demo (spec 029); list / count / 写反馈 demo fully,
+  /// playback degrades gracefully.
+  public static func pendingVideos(now: Date = Date()) -> [PendingVideoItem] {
+    [
+      // 王晨曦: 深蹲日 —— 主项 + 变式, 外加卧推主项(同一天).
+      PendingVideoItem(
+        id: videoID(1),
+        studentID: previewStudentID(4),
+        studentDisplayName: "王晨曦",
+        exerciseName: "比赛式深蹲",
+        uploadedAt: now.addingTimeInterval(-2 * 3_600),
+        sizeBytes: 24_500_000),
+      PendingVideoItem(
+        id: videoID(2),
+        studentID: previewStudentID(4),
+        studentDisplayName: "王晨曦",
+        exerciseName: "暂停深蹲",
+        uploadedAt: now.addingTimeInterval(-3 * 3_600),
+        sizeBytes: 19_800_000),
+      PendingVideoItem(
+        id: videoID(3),
+        studentID: previewStudentID(4),
+        studentDisplayName: "王晨曦",
+        exerciseName: "比赛式卧推",
+        uploadedAt: now.addingTimeInterval(-4 * 3_600),
+        sizeBytes: 18_200_000),
+      // 李嘉宁: 卧推日 —— 主项 + 变式.
+      PendingVideoItem(
+        id: videoID(4),
+        studentID: previewStudentID(8),
+        studentDisplayName: "李嘉宁",
+        exerciseName: "比赛式卧推",
+        uploadedAt: now.addingTimeInterval(-5 * 3_600),
+        sizeBytes: 21_300_000),
+      PendingVideoItem(
+        id: videoID(5),
+        studentID: previewStudentID(8),
+        studentDisplayName: "李嘉宁",
+        exerciseName: "窄握卧推",
+        uploadedAt: now.addingTimeInterval(-6 * 3_600),
+        sizeBytes: 15_700_000),
+      // 张以恒: 硬拉日 —— 主项(昨天).
+      PendingVideoItem(
+        id: videoID(6),
+        studentID: previewStudentID(2),
+        studentDisplayName: "张以恒",
+        exerciseName: "比赛式传统硬拉",
+        uploadedAt: now.addingTimeInterval(-26 * 3_600),
+        sizeBytes: 31_000_000),
+    ]
+  }
 }

@@ -258,9 +258,18 @@ actor StubFeedbackRepository: StudentFeedbackRepository {
         text: text
       )
     )
-    let item = CoachStudentFeatureFixtures.feedback(
+    // Reflect the requested scope (not a canned fixture) so consumers that
+    // refetch — e.g. the video-inbox de-queue — actually exercise the scope
+    // the caller posted (Codex review nit, 2026-06-23).
+    let item = CoachFeedback(
+      id: UUID(),
+      coachID: CoachStudentFeatureFixtures.coachID,
       studentID: studentID,
-      postedAt: CoachStudentFeatureFixtures.startDate.addingTimeInterval(4 * 86_400)
+      dayDate: dayDate,
+      planExerciseID: planExerciseID,
+      text: text,
+      postedAt: CoachStudentFeatureFixtures.startDate.addingTimeInterval(4 * 86_400),
+      readAt: nil
     )
     feedback.append(item)
     return item
