@@ -19,8 +19,9 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct CoachReceivingView: View {
   private let fallbackPendingCount: Int
-  private let videoCount: Int
+  private let fallbackVideoCount: Int
   private let queueViewModel: BindQueueViewModel?
+  private let videoQueueViewModel: CoachVideoQueueViewModel?
   private let profiles: any OnboardingProfileReading
   /// Called after a request is accepted so the caller can refresh the roster —
   /// `BindQueueViewModel` does not own the roster (spec 033 D1).
@@ -30,27 +31,35 @@ struct CoachReceivingView: View {
   @State private var acceptTarget: CoachBindRequestItem?
   @State private var rejectTarget: CoachBindRequestItem?
   @State private var profileTarget: CoachBindRequestItem?
+  @State private var videoStudentTarget: PendingVideoStudentGroup?
 
   enum Segment: Hashable { case students, videos }
 
-  /// `queueViewModel` defaults to nil so existing callers/tests that pass only
-  /// counts keep compiling; supply it (and `profiles`) to bind live rows.
+  /// `queueViewModel` / `videoQueueViewModel` default to nil so existing
+  /// callers/tests that pass only counts keep compiling; supply them (and
+  /// `profiles`) to bind live rows.
   init(
     pendingCount: Int,
     videoCount: Int,
     queueViewModel: BindQueueViewModel? = nil,
+    videoQueueViewModel: CoachVideoQueueViewModel? = nil,
     profiles: any OnboardingProfileReading = InMemoryCoachStudentProfileReader(),
     onAccepted: @escaping () async -> Void = {}
   ) {
     self.fallbackPendingCount = pendingCount
-    self.videoCount = videoCount
+    self.fallbackVideoCount = videoCount
     self.queueViewModel = queueViewModel
+    self.videoQueueViewModel = videoQueueViewModel
     self.profiles = profiles
     self.onAccepted = onAccepted
   }
 
   private var pendingCount: Int {
     queueViewModel?.pendingCount ?? fallbackPendingCount
+  }
+
+  private var videoCount: Int {
+    videoQueueViewModel?.pendingCount ?? fallbackVideoCount
   }
 
   var body: some View {
@@ -77,6 +86,15 @@ struct CoachReceivingView: View {
           onAccept: { acceptTarget = item },
           onReject: { rejectTarget = item }
         )
+      }
+      .navigationDestination(item: $videoStudentTarget) { group in
+        if let videoQueueViewModel {
+          StudentPendingVideosView(
+            studentID: group.studentID,
+            studentName: group.studentName,
+            viewModel: videoQueueViewModel
+          )
+        }
       }
     }
     .sheet(item: $acceptTarget) { item in
@@ -109,6 +127,7 @@ struct CoachReceivingView: View {
     }
     .task {
       await queueViewModel?.loadIfNeeded()
+      await videoQueueViewModel?.loadIfNeeded()
     }
   }
 
@@ -388,13 +407,86 @@ struct CoachReceivingView: View {
     .buttonStyle(.plain)
   }
 
-  // MARK: - 训练视频 segment (honest empty-state — no cross-student video VM yet)
+  // MARK: - 训练视频 segment (cross-student pending-video queue, spec 042)
 
+  @ViewBuilder
   private var videosSegment: some View {
+    if let videoQueueViewModel {
+      videoQueue(videoQueueViewModel)
+    } else {
+      videosEmptyState
+    }
+  }
+
+  @ViewBuilder
+  private func videoQueue(_ viewModel: CoachVideoQueueViewModel) -> some View {
+    if viewModel.items.isEmpty {
+      videosEmptyState
+    } else {
+      ScrollView {
+        VStack(spacing: MeetPRSpacing.base) {
+          if let toast = viewModel.toastMessage {
+            statusBanner(toast, systemImage: "checkmark.circle", color: Color.MeetPR.green)
+          }
+          if let banner = viewModel.bannerMessage {
+            statusBanner(banner, systemImage: "exclamationmark.triangle", color: Color.MeetPR.amber)
+          }
+          ForEach(viewModel.studentGroups) { group in
+            studentRow(group)
+          }
+        }
+        .padding(MeetPRSpacing.base)
+      }
+      .scrollContentBackground(.hidden)
+      .refreshable { await viewModel.refresh() }
+    }
+  }
+
+  private var videosEmptyState: some View {
     emptyState(
       icon: "video",
       title: "学员训练视频会出现在这里",
       subtitle: "学员打卡上传的待反馈视频汇总在这里,逐条给文本反馈。")
+  }
+
+  /// One pending-video row, aggregated per student (spec 042 D1): name + 待反馈
+  /// 段数 + 最近上传相对时间. Tapping opens that student's day-grouped videos.
+  private func studentRow(_ group: PendingVideoStudentGroup) -> some View {
+    Button {
+      videoStudentTarget = group
+    } label: {
+      HStack(spacing: MeetPRSpacing.base) {
+        ZStack {
+          RoundedRectangle(cornerRadius: MeetPRRadius.md)
+            .fill(Color.MeetPR.surface2)
+            .frame(width: 56, height: 56)
+          Image(systemName: "play.rectangle.fill")
+            .font(.system(size: 22))
+            .foregroundStyle(Color.MeetPR.brandRed)
+        }
+        VStack(alignment: .leading, spacing: 4) {
+          Text(group.studentName)
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          monoLabel(
+            "\(group.count) 段待反馈 · \(CoachStudentFormatting.relativeText(group.latestUploadedAt))",
+            size: 11)
+        }
+        Spacer(minLength: MeetPRSpacing.sm)
+        Image(systemName: "chevron.right")
+          .font(.system(size: 13))
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+      .padding(MeetPRSpacing.base)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background(Color.MeetPR.surface1)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(Color.MeetPR.border, lineWidth: 1)
+      }
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel("\(group.studentName),\(group.count) 段待反馈,点按查看")
   }
 
   private func emptyState(icon: String, title: String, subtitle: String) -> some View {

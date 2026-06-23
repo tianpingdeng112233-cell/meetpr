@@ -27,6 +27,7 @@ public struct RootView: View {
   private let pendingBindStore: any PendingBindCodeStoring
   private let onboardingDraftStore = LocalOnboardingDraftStore()
   private let coachStudentVideos: any CoachStudentVideoRepository
+  private let coachVideoQueue: (any CoachVideoQueueRepository)?
   private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
 
@@ -50,6 +51,7 @@ public struct RootView: View {
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
+    coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
     coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
     draftStore: DraftStore = DraftStore.shared
   ) {
@@ -80,6 +82,7 @@ public struct RootView: View {
     self.summaryReadStore = summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
     self.pendingBindStore = pendingBindStore
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
+    self.coachVideoQueue = coachVideoQueue
     self.coachFamilyMapProvider = coachFamilyMapProvider
     self.draftStore = draftStore
   }
@@ -104,6 +107,7 @@ public struct RootView: View {
           evaluations: coachEvaluations,
           evaluationSummaries: coachEvaluationSummaries,
           studentProfiles: coachStudentProfiles,
+          videoQueue: coachVideoQueue,
           onLogout: {
             await session.logout()
           },
