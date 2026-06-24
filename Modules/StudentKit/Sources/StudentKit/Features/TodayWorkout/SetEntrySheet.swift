@@ -17,6 +17,9 @@ struct SetEntrySheet: View {
   /// Video attach context (spec 027); nil hides the video block entirely.
   let studentID: UUID?
   let videoViewModel: VideoAttachmentViewModel?
+  /// When true the sheet opens scrolled to the bottom (video attach + actions),
+  /// e.g. when launched from the camera affordance.
+  let scrollToVideo: Bool
   @Environment(\.dismiss) private var dismiss
 
   @State private var weight: Decimal
@@ -31,13 +34,15 @@ struct SetEntrySheet: View {
     draft: TodayWorkoutViewModel.SetRowDraft,
     viewModel: TodayWorkoutViewModel,
     studentID: UUID? = nil,
-    videoViewModel: VideoAttachmentViewModel? = nil
+    videoViewModel: VideoAttachmentViewModel? = nil,
+    scrollToVideo: Bool = false
   ) {
     self.rowIndex = rowIndex
     self.draft = draft
     self.viewModel = viewModel
     self.studentID = studentID
     self.videoViewModel = videoViewModel
+    self.scrollToVideo = scrollToVideo
     _weight = State(initialValue: draft.actualWeight ?? draft.prescribed.weightKg ?? 0)
     _reps = State(
       initialValue: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0)
@@ -80,6 +85,7 @@ struct SetEntrySheet: View {
         }
         .padding(16)
       }
+      .defaultScrollAnchor(scrollToVideo ? .bottom : .top)
       footer
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
