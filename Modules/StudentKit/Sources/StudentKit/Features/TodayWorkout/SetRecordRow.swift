@@ -88,6 +88,21 @@ struct SetRecordRow: View {
     draft.prescribed.weightKg.map { "\(StudentFormatting.decimal($0)) kg" }
   }
 
+  /// Coach shorthand the parser kept verbatim (spec 043 §G): shown as a small
+  /// cue beside the target so the student sees 「70%top」「节奏3-1-0」「力竭」.
+  private var coachNote: String? {
+    Self.displayCoachNote(draft.prescribed.coachNote)
+  }
+
+  /// Normalises the stored cue for display: trims whitespace and drops
+  /// blank/whitespace-only notes so the row never shows an empty chip.
+  static func displayCoachNote(_ raw: String?) -> String? {
+    guard let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines),
+      !trimmed.isEmpty
+    else { return nil }
+    return trimmed
+  }
+
   private var plateMathWeightKg: Double? {
     (draft.actualWeight ?? draft.prescribed.weightKg)
       .map { NSDecimalNumber(decimal: $0).doubleValue }
@@ -114,6 +129,18 @@ struct SetRecordRow: View {
             Text(targetWeight)
               .font(.footnote.monospacedDigit())
               .foregroundStyle(Color.MeetPR.fgTertiary)
+          }
+
+          if let coachNote {
+            Text(coachNote)
+              .font(.caption2.weight(.medium))
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .lineLimit(1)
+              .padding(.horizontal, 6)
+              .padding(.vertical, 2)
+              .background(Color.MeetPR.surface2)
+              .clipShape(.capsule)
+              .accessibilityLabel("教练备注 \(coachNote)")
           }
         }
       }

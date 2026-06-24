@@ -188,7 +188,8 @@ public actor BackendPlanRepository: PlanRepository {
           intensityMode: set.intensityMode,
           targetValue: set.targetValue,
           setType: set.setType,
-          restSeconds: set.restSeconds
+          restSeconds: set.restSeconds,
+          coachNote: set.coachNote
         ),
         accessToken: accessToken
       )

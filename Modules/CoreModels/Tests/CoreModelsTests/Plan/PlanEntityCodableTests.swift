@@ -197,6 +197,68 @@ import Testing
   #expect(encoded.contains(#""failed":true"#))
 }
 
+@Test func planSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() throws {
+  let set = PlanSet(
+    id: try fixtureUUID("90000000-0000-0000-0000-000000000001"),
+    planExerciseID: try fixtureUUID("80000000-0000-0000-0000-000000000001"),
+    setNumber: 1,
+    targetReps: 5,
+    intensityMode: .weight,
+    targetValue: try fixtureDecimal("100"),
+    setType: .working,
+    coachNote: "节奏3-1-0",
+    createdAt: createdAt()
+  )
+
+  let json = try encodedJSONString(set)
+  let decodedSet = try MeetPRCodec.decoder.decode(PlanSet.self, from: Data(json.utf8))
+  let legacySet = try MeetPRCodec.decoder.decode(PlanSet.self, from: Data(legacyPlanSetJSON.utf8))
+
+  #expect(decodedSet == set)
+  #expect(decodedSet.coachNote == "节奏3-1-0")
+  #expect(json.contains(#""coach_note":"节奏3-1-0""#))
+  #expect(legacySet.coachNote == nil)
+}
+
+@Test func planSetCoachNoteOmittedWhenNil() throws {
+  let set = try makePlanSet(
+    targetReps: 5,
+    targetRepsMax: nil,
+    intensityMode: .weight,
+    targetValue: "140",
+    setType: .working
+  )
+
+  let json = try encodedJSONString(set)
+
+  #expect(set.coachNote == nil)
+  #expect(!json.contains("coach_note"))
+}
+
+@Test func prescribedSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() throws {
+  let set = PrescribedSet(
+    id: try fixtureUUID("90000000-0000-0000-0000-000000000011"),
+    setIndex: 1,
+    weightKg: nil,
+    reps: 5,
+    repsMax: nil,
+    rpe: 8,
+    coachNote: "70%top"
+  )
+
+  let json = try encodedJSONString(set)
+  let decodedSet = try MeetPRCodec.decoder.decode(PrescribedSet.self, from: Data(json.utf8))
+  let legacySet = try MeetPRCodec.decoder.decode(
+    PrescribedSet.self,
+    from: Data(legacyPrescribedSetJSON.utf8)
+  )
+
+  #expect(decodedSet == set)
+  #expect(decodedSet.coachNote == "70%top")
+  #expect(json.contains(#""coach_note":"70%top""#))
+  #expect(legacySet.coachNote == nil)
+}
+
 @Test func exerciseFacetMultiSelectEncodesArrays() throws {
   let exercise = try makeExercise()
 
