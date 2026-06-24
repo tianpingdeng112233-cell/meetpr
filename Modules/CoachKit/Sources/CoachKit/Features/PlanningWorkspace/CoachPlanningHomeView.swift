@@ -14,6 +14,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct CoachPlanningHomeView: View {
   private let context: CoachStudentDetailContext
+  private let now: @Sendable () -> Date
   @State private var viewModel: PlanningWorkspaceViewModel
   @State private var showPlanning = false
   @State private var activeIntent: PlanningIntent = .blank
@@ -23,6 +24,7 @@ struct CoachPlanningHomeView: View {
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.context = context
+    self.now = now
     _viewModel = State(
       initialValue: PlanningWorkspaceViewModel(
         repository: context.planning,
@@ -44,6 +46,9 @@ struct CoachPlanningHomeView: View {
             presentPlanning(intent: .blank)
           }
           .padding(.top, 20)
+
+          importEntry
+            .padding(.top, 12)
 
           workspaceContent
             .padding(.top, 20)
@@ -89,6 +94,17 @@ struct CoachPlanningHomeView: View {
         .foregroundStyle(Color.MeetPR.fgSecondary)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  // MARK: - Import entry (spec 043 — gated to backend capability)
+
+  @ViewBuilder
+  private var importEntry: some View {
+    ImportEntryButton(
+      repository: context.planning,
+      now: now,
+      onPublished: { Task { await viewModel.refresh() } }
+    )
   }
 
   // MARK: - Workspace body

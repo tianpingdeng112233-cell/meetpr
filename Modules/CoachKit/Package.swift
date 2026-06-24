@@ -13,6 +13,9 @@ let package = Package(
     .package(path: "../DesignSystem"),
     .package(path: "../RepositoryContracts"),
     .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
+    // Read-only XLSX parsing for coach plan import (spec 043). Apache-2.0,
+    // pure Swift. Pinned exact — the importer depends on its cell-addressing.
+    .package(url: "https://github.com/CoreOffice/CoreXLSX", exact: "0.14.2"),
   ],
   targets: [
     .target(
@@ -22,6 +25,7 @@ let package = Package(
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+        .product(name: "CoreXLSX", package: "CoreXLSX"),
       ],
       resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
