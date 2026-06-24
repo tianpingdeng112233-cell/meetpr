@@ -198,6 +198,10 @@ private final class TrainingCalendarViewModel {
       }
       state = .loaded(days: days, logs: fetchedLogs)
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

@@ -509,8 +509,27 @@ public struct DashboardView: View {
   // MARK: - Loading
 
   private func loadIfNeeded() async {
+    // Each dependency retries independently. A `.task` cancelled mid-load
+    // resets the in-flight VM to `.idle` (see Error.isTaskCancellation);
+    // gating the whole reload on the week VM alone would strand any later VM
+    // at `.idle` with no retry. Mirrors TrainingHistoryView.loadIfNeeded.
+    // (StudentEvaluationSummaryViewModel has no `.idle` state, so it rides the
+    // week VM's first-load.)
     if weekViewModel.state == .idle {
-      await reload()
+      await weekViewModel.load(studentID: studentID)
+      await evaluationSummaryViewModel?.load(studentID: studentID)
+    }
+    if feedbackViewModel.state == .idle {
+      await feedbackViewModel.load(studentID: studentID)
+    }
+    if notificationsViewModel.state == .idle {
+      await notificationsViewModel.load(studentID: studentID)
+    }
+    if e1rmTrendViewModel.state == .idle {
+      await e1rmTrendViewModel.load(studentID: studentID)
+    }
+    if profileMetricsViewModel.state == .idle {
+      await profileMetricsViewModel.load(studentID: studentID)
     }
   }
 

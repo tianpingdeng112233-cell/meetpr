@@ -76,6 +76,10 @@ final class DashboardE1RMTrendViewModel {
         )
       )
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

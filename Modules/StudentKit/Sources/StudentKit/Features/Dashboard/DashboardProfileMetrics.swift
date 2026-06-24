@@ -123,6 +123,10 @@ final class DashboardProfileMetricsViewModel {
         )
       )
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

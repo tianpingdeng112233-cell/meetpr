@@ -71,9 +71,12 @@ public final class TodayWorkoutViewModel {
       exerciseReferences = references
       state = .loaded(plan: day, drafts: drafts)
     } catch {
-      if isCurrentLoad(generation) {
-        state = .error(error.localizedDescription)
+      guard isCurrentLoad(generation) else { return }
+      if error.isTaskCancellation {
+        state = .idle
+        return
       }
+      state = .error(error.localizedDescription)
     }
   }
 
@@ -175,6 +178,13 @@ public final class TodayWorkoutViewModel {
         startRestTimer(after: draft, drafts: nextDrafts)
       }
     } catch {
+      // `persist` flips to `.recording` before awaiting `recordSet`, so a
+      // cancelled set-logging task must restore the prior `.loaded` snapshot
+      // rather than stranding the UI in `.recording`.
+      if error.isTaskCancellation {
+        state = .loaded(plan: plan, drafts: drafts)
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

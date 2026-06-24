@@ -47,6 +47,10 @@ public final class TrainingHistoryViewModel {
       }
       state = .loaded(weeks: weeks, logs: fetchedLogs)
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }
