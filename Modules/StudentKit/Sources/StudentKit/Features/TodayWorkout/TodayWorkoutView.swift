@@ -188,7 +188,8 @@ public struct TodayWorkoutView: View {
         draft: target.draft,
         viewModel: viewModel,
         studentID: studentID,
-        videoViewModel: videoViewModel
+        videoViewModel: videoViewModel,
+        scrollToVideo: target.scrollToVideo
       )
     }
   }
@@ -210,9 +211,17 @@ public struct TodayWorkoutView: View {
           .font(.system(size: 22, weight: .heavy))
           .foregroundStyle(Color.MeetPR.brandRed)
         Spacer()
-        Text(targetText(draft))
-          .font(.system(size: 14, design: .monospaced))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+        HStack(alignment: .lastTextBaseline, spacing: 2) {
+          Text("×")
+            .font(.system(size: 24, weight: .bold))
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+          Text(targetRepsText(draft))
+            .font(.system(size: 36, weight: .heavy).monospacedDigit())
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Text("次")
+            .font(.system(size: 14, weight: .bold))
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
       }
       .padding(.top, 12)
 
@@ -227,13 +236,11 @@ public struct TodayWorkoutView: View {
           .foregroundStyle(Color.MeetPR.fgPrimary)
         Text("/ 10").font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
       }
-      Slider(value: rpeBinding(rowIndex: rowIndex, draft: draft), in: 5...10, step: 0.5)
-        .tint(Color.MeetPR.fgPrimary)
-        .padding(.top, 8)
 
       HStack(spacing: 8) {
         Button {
-          Task { await viewModel.commitSet(rowIndex: rowIndex) }
+          editing = EditingTarget(
+            id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
         } label: {
           Text("记录此组")
             .font(Font.MeetPR.bodyEmphasis)
@@ -246,7 +253,8 @@ public struct TodayWorkoutView: View {
         .buttonStyle(.plain)
 
         Button {
-          editing = EditingTarget(id: draft.id, rowIndex: rowIndex, draft: draft)
+          editing = EditingTarget(
+            id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: true)
         } label: {
           Image(systemName: "video")
             .font(.system(size: 20))
@@ -264,15 +272,6 @@ public struct TodayWorkoutView: View {
     .background(Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: 12))
     .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
-  }
-
-  private func rpeBinding(rowIndex: Int, draft: TodayWorkoutViewModel.SetRowDraft) -> Binding<
-    Double
-  > {
-    Binding(
-      get: { NSDecimalNumber(decimal: currentRPE(draft)).doubleValue },
-      set: { viewModel.updateRPE(rowIndex: rowIndex, rpe: Decimal($0)) }
-    )
   }
 
   // MARK: - Per-exercise set table
@@ -342,7 +341,8 @@ public struct TodayWorkoutView: View {
     let resolved = draft.completed || active
     let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
     return Button {
-      editing = EditingTarget(id: draft.id, rowIndex: rowIndex, draft: draft)
+      editing = EditingTarget(
+        id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
     } label: {
       LazyVGrid(columns: columns, spacing: 0) {
         Text("\(draft.prescribed.setIndex + 1)")
@@ -373,11 +373,9 @@ public struct TodayWorkoutView: View {
     return StudentFormatting.decimal(weight)
   }
 
-  private func targetText(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
-    let reps = draft.prescribed.reps ?? draft.prescribed.repsMax
-    let repsText = reps.map { "×\($0)" } ?? ""
-    let rpeText = draft.prescribed.rpe.map { " @ RPE \(StudentFormatting.decimal($0))" } ?? ""
-    return repsText + rpeText
+  private func targetRepsText(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
+    guard let reps = draft.prescribed.reps ?? draft.prescribed.repsMax else { return "—" }
+    return "\(reps)"
   }
 
   private func repsText(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
@@ -497,5 +495,6 @@ private struct EditingTarget: Identifiable {
   let id: UUID
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
+  let scrollToVideo: Bool
 }
 // swiftlint:enable file_length type_body_length function_body_length
