@@ -191,7 +191,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000000b",
-    "name": "架上深蹲",
+    "name": "架上(PIN)深蹲",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -535,7 +535,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000001f",
-    "name": "ssb深蹲",
+    "name": "SSB(安全杆)深蹲",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
@@ -972,7 +972,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000003e",
-    "name": "节奏硬拉",
+    "name": "传统节奏硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1544,7 +1544,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000005f",
-    "name": "插销卧推（架上卧推）",
+    "name": "架上(PIN)卧推",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "bench",
     "isCompetitionLift": false,
@@ -1905,7 +1905,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000074",
-    "name": "面拉",
+    "name": "绳索面拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4320,7 +4320,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f5",
-    "name": "保加利亚分腿蹲",
+    "name": "保加利亚分腿蹲(自重)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4328,18 +4328,18 @@
       "quad"
     ],
     "equipment": [
-      "dumbbell"
+      "bodyweight"
     ],
     "movementPattern": [
       "other"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bulgarian Split Squat"
+    "nameEn": "Bodyweight Bulgarian Split Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f6",
-    "name": "哑铃保加利亚蹲",
+    "name": "哑铃保加利亚深蹲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -6773,25 +6773,6 @@
     "nameEn": "Couch Stretch"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000179",
-    "name": "熊爬肩部触摸",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "mobility"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "warm_up"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Bear Crawl Shoulder Touches"
-  },
-  {
     "id": "00000000-0000-0000-ca70-00000000017a",
     "name": "死虫(热身变式)",
     "exerciseType": "accessory",
@@ -7004,7 +6985,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000185",
-    "name": "弹力带螃蟹行走",
+    "name": "弹力带螃蟹步",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7386,7 +7367,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000199",
-    "name": "熊爬",
+    "name": "熊爬交替换手",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -7482,25 +7463,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Burpee"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000019e",
-    "name": "螃蟹步",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "warm_up"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Crab Walk"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000019f",
@@ -10561,7 +10523,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000023d",
-    "name": "V-bar划船",
+    "name": "坐姿 v 把划船",
     "nameEn": "V-Bar Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
@@ -11425,7 +11387,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000026b",
-    "name": "TRX-水平划船",
+    "name": "水平划船",
     "nameEn": "TRX Horizontal Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
@@ -14188,7 +14150,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000002fa",
-    "name": "站姿杠铃推举",
+    "name": "实力推",
     "nameEn": "Standing Barbell Press",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
@@ -16894,7 +16856,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000038a",
-    "name": "绳索三头下压_SZ杆",
+    "name": "绳索三头下压",
     "nameEn": "Cable Tricep Pushdown (SZ Bar)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
@@ -23379,5 +23341,290 @@
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-15T00:00:00Z"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000001",
+    "name": "低杠位深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Low Bar Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000002",
+    "name": "噩梦硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Nightmare Deadlift"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000003",
+    "name": "大猩猩蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "warm_up"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Gorilla Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000004",
+    "name": "髋部飞机",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "warm_up"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Hip Airplane"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000005",
+    "name": "低杆位早安式",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Low Bar Good Morning"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000006",
+    "name": "安全杆早安式",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Safety Bar Good Morning"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000007",
+    "name": "无腰带低杆位早安式",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Beltless Low Bar Good Morning"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000008",
+    "name": "PIN低杆位早安式",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Pin Low Bar Good Morning"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000009",
+    "name": "杠铃保加利亚深蹲",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Barbell Bulgarian Split Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-00000000000a",
+    "name": "spoto 暂停卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Spoto Paused Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-00000000000b",
+    "name": "超程(赤字)相扑",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Deficit Sumo Deadlift"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-00000000000c",
+    "name": "相扑节奏硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Tempo Sumo Deadlift"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-00000000000d",
+    "name": "澳大利亚引体",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "bodyweight"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Australian Pull-up"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-00000000000e",
+    "name": "臀推",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "glute"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Barbell Hip Thrust"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-00000000000f",
+    "name": "曲杆上提",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "shoulder"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "other"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "EZ-Bar Upright Row"
   }
 ]
