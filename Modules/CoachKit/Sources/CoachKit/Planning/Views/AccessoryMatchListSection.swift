@@ -82,10 +82,7 @@ public struct AccessoryMatchListSection: View {
   private var filteredExercises: [Exercise] {
     let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
     if trimmed.isEmpty { return exercises }
-    return exercises.filter { exercise in
-      exercise.name.localizedStandardContains(trimmed)
-        || (exercise.nameEn?.localizedStandardContains(trimmed) ?? false)
-    }
+    return exercises.filter { ExerciseSearch.matches($0, query: trimmed) }
   }
 }
 
