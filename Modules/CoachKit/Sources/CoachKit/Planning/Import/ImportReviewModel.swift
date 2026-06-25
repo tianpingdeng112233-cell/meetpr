@@ -72,6 +72,7 @@ enum ImportReviewBuilder {
   static func build(
     from plan: ParsedPlan,
     catalog: [Exercise],
+    aliases: ExerciseAliasTable = .bundled(),
     makeID: () -> UUID = { UUID() }
   ) -> [ImportReviewWeek] {
     plan.weeks.map { week in
@@ -84,7 +85,7 @@ enum ImportReviewBuilder {
             id: makeID(),
             dayOfWeek: day.dayOfWeek,
             exercises: day.exercises.map { exercise in
-              buildExercise(exercise, catalog: catalog, makeID: makeID)
+              buildExercise(exercise, catalog: catalog, aliases: aliases, makeID: makeID)
             }
           )
         }
@@ -95,9 +96,10 @@ enum ImportReviewBuilder {
   private static func buildExercise(
     _ parsed: ParsedExercise,
     catalog: [Exercise],
+    aliases: ExerciseAliasTable,
     makeID: () -> UUID
   ) -> ImportReviewExercise {
-    let match = ExerciseMatcher.exactMatch(rawName: parsed.rawName, catalog: catalog)
+    let match = ExerciseMatcher.resolve(rawName: parsed.rawName, catalog: catalog, aliases: aliases)
     return ImportReviewExercise(
       id: makeID(),
       rawName: parsed.rawName,

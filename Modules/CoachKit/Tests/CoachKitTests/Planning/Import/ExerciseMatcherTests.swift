@@ -36,3 +36,27 @@ private func exercise(_ name: String, family: LiftFamily? = nil) -> Exercise {
   let catalog = [exercise("常规硬拉", family: .deadlift)]
   #expect(ExerciseMatcher.exactMatch(rawName: "噩梦硬拉", catalog: catalog) == nil)
 }
+
+// spec 043 §E — layer ② alias table never overrides a library exact-name hit.
+@Test func exactMatchWinsOverAlias() {
+  let exact = exercise("卧推")  // library happens to carry the bare 裸名
+  let aliasTarget = exercise("杠铃卧推")
+  let catalog = [exact, aliasTarget]
+  let aliases = ExerciseAliasTable(
+    version: 1,
+    aliases: [ExerciseAlias(alias: "卧推", canonical: "杠铃卧推")]
+  )
+  let match = ExerciseMatcher.resolve(rawName: "卧推", catalog: catalog, aliases: aliases)
+  #expect(match?.id == exact.id)
+}
+
+@Test func aliasBindsWhenNoExactMatch() {
+  let target = exercise("杠铃卧推")
+  let catalog = [target, exercise("常规硬拉", family: .deadlift)]
+  let aliases = ExerciseAliasTable(
+    version: 1,
+    aliases: [ExerciseAlias(alias: "卧推", canonical: "杠铃卧推")]
+  )
+  let match = ExerciseMatcher.resolve(rawName: "卧推", catalog: catalog, aliases: aliases)
+  #expect(match?.id == target.id)
+}
