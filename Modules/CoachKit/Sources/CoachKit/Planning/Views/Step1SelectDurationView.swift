@@ -23,28 +23,12 @@ public struct Step1SelectDurationView: View {
           .foregroundStyle(Color.MeetPR.fgPrimary)
       }
 
-      HStack(spacing: MeetPRSpacing.base) {
-        DurationChoiceCard(
-          title: "1 周",
-          subtitle: "适应周或单周计划",
-          isSelected: viewModel.planWeeks == 1,
-          isDisabled: false
-        ) {
-          choose(weeks: 1)
-        }
-
-        DurationChoiceCard(
-          title: "4 周",
-          subtitle: fourWeekSubtitle,
-          isSelected: viewModel.planWeeks == 4,
-          isDisabled: isFourWeekDisabled
-        ) {
-          choose(weeks: 4)
-        }
-      }
-
-      if isFourWeekDisabled {
-        StatusBadge(status: .overdue, title: "评估期内仅 1 周")
+      DurationChoiceCard(
+        title: durationTitle,
+        subtitle: durationSubtitle,
+        isSelected: viewModel.planWeeks == durationWeeks
+      ) {
+        choose(weeks: durationWeeks)
       }
 
       Spacer()
@@ -55,14 +39,19 @@ public struct Step1SelectDurationView: View {
     .navigationTitle("选计划长度")
   }
 
-  private var isFourWeekDisabled: Bool {
-    // planKind covers both the adaptationWeek intent and the in-evaluation
-    // roster status (spec 033 §7).
-    viewModel.planKind == .adaptation
+  /// Regular plans are always a full 4-week block; the single week is the
+  /// adaptation-week exception (spec 033 §7). Each context offers only its one
+  /// valid length, so the step shows a single card.
+  private var durationWeeks: Int {
+    viewModel.planKind == .adaptation ? 1 : 4
   }
 
-  private var fourWeekSubtitle: String {
-    isFourWeekDisabled ? "评估期结束后可用" : "完整训练周期"
+  private var durationTitle: String {
+    "\(durationWeeks) 周"
+  }
+
+  private var durationSubtitle: String {
+    viewModel.planKind == .adaptation ? "适应周" : "完整训练周期"
   }
 
   private func choose(weeks: Int) {
@@ -78,7 +67,6 @@ private struct DurationChoiceCard: View {
   let title: String
   let subtitle: String
   let isSelected: Bool
-  let isDisabled: Bool
   let action: @MainActor () -> Void
 
   var body: some View {
@@ -87,7 +75,7 @@ private struct DurationChoiceCard: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Text(title)
             .font(Font.MeetPR.title2)
-            .foregroundStyle(isDisabled ? Color.MeetPR.fgDisabled : Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.fgPrimary)
 
           Text(subtitle)
             .font(Font.MeetPR.footnote)
@@ -103,10 +91,8 @@ private struct DurationChoiceCard: View {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
           .stroke(isSelected ? Color.MeetPR.brandRed : .clear, lineWidth: 2)
       }
-      .opacity(isDisabled ? 0.45 : 1)
     }
     .buttonStyle(.plain)
-    .disabled(isDisabled)
   }
 }
 
