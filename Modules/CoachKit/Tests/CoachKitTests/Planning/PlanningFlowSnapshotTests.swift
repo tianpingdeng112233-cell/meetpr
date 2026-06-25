@@ -21,7 +21,7 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func step1DisablesFourWeekChoiceForEvaluationStudent() async throws {
+@Test func step1ShowsOnlyOneWeekCardForEvaluationStudent() async throws {
   let viewModel = try PlanningFixtures.viewModel()
   await viewModel.bootstrap()
   viewModel.selectStudent(PlanningFixtures.students()[0])
@@ -29,12 +29,38 @@ import ViewInspector
   let sut = Step1SelectDurationView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  let fourWeekButton = try inspected.find(ViewType.Button.self) { button in
+  // Adaptation week (spec 033 §7) is the single-week exception, so the step
+  // offers only the 1-week card — no 4-week choice.
+  _ = try inspected.find(ViewType.Button.self) { button in
+    (try? button.labelView().find(text: "1 周")) != nil
+  }
+  #expect(throws: (any Error).self) {
+    try inspected.find(ViewType.Button.self) { button in
+      (try? button.labelView().find(text: "4 周")) != nil
+    }
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func step1ShowsOnlyFourWeekCardForRegularStudent() async throws {
+  let viewModel = try PlanningFixtures.viewModel()
+  await viewModel.bootstrap()
+  viewModel.selectStudent(PlanningFixtures.students()[1])
+
+  let sut = Step1SelectDurationView(viewModel: viewModel)
+  let inspected = try sut.inspect()
+
+  // Regular plans are always a full 4-week block, so the step offers only the
+  // 4-week card — the single-week option is gone.
+  _ = try inspected.find(ViewType.Button.self) { button in
     (try? button.labelView().find(text: "4 周")) != nil
   }
-
-  #expect(fourWeekButton.isDisabled())
-  #expect(try inspected.find(text: "评估期内仅 1 周").string() == "评估期内仅 1 周")
+  #expect(throws: (any Error).self) {
+    try inspected.find(ViewType.Button.self) { button in
+      (try? button.labelView().find(text: "1 周")) != nil
+    }
+  }
 }
 
 @MainActor

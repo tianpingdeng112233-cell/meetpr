@@ -100,7 +100,7 @@ public actor InMemoryPlanRepository: PlanRepository {
       CoachStudentSummary(
         id: uuid(4),
         displayName: "王晨曦",
-        status: .inEvaluation(remainingDays: 4, remainingHours: 13)
+        status: .active
       ),
       CoachStudentSummary(
         id: uuid(2),
@@ -115,7 +115,7 @@ public actor InMemoryPlanRepository: PlanRepository {
       CoachStudentSummary(
         id: uuid(10),
         displayName: "赵安然",
-        status: .inEvaluation(remainingDays: 6, remainingHours: 2)
+        status: .active
       ),
       CoachStudentSummary(
         id: uuid(6),

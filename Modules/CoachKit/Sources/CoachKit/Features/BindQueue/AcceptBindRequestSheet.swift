@@ -1,9 +1,10 @@
 import DesignSystem
 import SwiftUI
 
-/// The accept two-choice modal (spec 033 §5, wiki §3.3): default into a
-/// 7-day evaluation period, or skip it for a known student with an optional
-/// reason (≤500 chars; only sent on the skip branch).
+/// The accept two-choice modal (spec 033 §5, wiki §3.3): defaults to skipping
+/// the evaluation period for a known student (beta onboards only known
+/// students), or opt into a 7-day evaluation. The optional skip reason
+/// (≤500 chars) only sends on the skip branch.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct AcceptBindRequestSheet: View {
@@ -11,7 +12,9 @@ struct AcceptBindRequestSheet: View {
   /// Returns true on success → the sheet dismisses itself.
   let onConfirm: (_ skipEvaluation: Bool, _ skipReason: String?) async -> Bool
 
-  @State private var skipEvaluation = false
+  // Beta onboards only known students with no evaluation period, so default to
+  // skipping it; the coach can still opt into the 7-day evaluation.
+  @State private var skipEvaluation = true
   @State private var skipReason = ""
   @State private var isSubmitting = false
   @Environment(\.dismiss) private var dismiss
