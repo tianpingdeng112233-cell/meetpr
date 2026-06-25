@@ -9,6 +9,7 @@
     - r1:原"复用草稿 + `PlanPublishAssembler`、0 backend"被否——草稿每动作仅单个 `DraftSetSpec`、assembler 是 W1 模板克隆,装不下手调多周/逐组内容 → 改为**专用导入管线直接构造已发布实体树**,调既有 `publishPlan`。
     - r2:后端硬约束比预期多——① `plan_weeks ∈ {1,4}` / `week_number 1..4`(`schemas.ts:14,18`、`0003-init-plans.sql:22,44`)→ **放宽为任意周**(David 决策);② `target_value` 处处必填且 weight>0 / rpe1-10(`schemas.ts:159-188`、`PlanRequestDTOs.swift:106-123`、`PlanSet.swift:9`)→ **不做 note-only,教练补真实数字**;③ 学员真实读取走 `BackendStudentPlanRepository.StudentPlanProjection`(非 `PlanToStudentProjection`)→ coachNote 走**完整 wire 链路**。
   - **学员可见备注(David 2026-06-24)**:无法结构化的强度暗号要让学员看到 → 新增 `coachNote` 附加字段(跨 CoreModels / Networking / StudentKit / 后端)。
+  - **动作别名表(David 2026-06-24)**:拿吕子豪表 77 个动作名实跑 1224 库,仅 23 精确绑(主项 `低杆深蹲`/`卧推`/`传统硬拉` 因「位」/裸名/词序全 miss)→ 引入显式可维护别名表 `exercise-aliases.json`(库内精确未命中后查表,第②层 fallback)+ 补 3 个真缺动作。见 §动作别名表附录。
   - [ADR-005 §1 模块边界](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md);上游 [spec 038](../038-planning-workspace/SPEC.md)(`publishPlan`)/ [004](../004-core-models-training-plan/SPEC.md) / [022](../022-exercise-library-v2-import/SPEC.md)。
 
 ## 目标
@@ -23,7 +24,7 @@
 导入审阅 sheet (本 spec 新增,独立于规划工作台编辑器)
   ↓ "共解析出 12 周 · 48 训练日 · 31 动作"
   ↓ ① 勾要导入的周(剩两周→勾最后两周) ② 选开始日(默认下周一,旧日期作废)
-  ↓ ③ 动作匹配(精确折叠相等→自动绑;未命中→选库 / 暂跳过)
+  ↓ ③ 动作匹配(库内精确折叠→自动绑;否则查别名表→自动绑;否则选库 / 暂跳过)
   ↓ ④ 强度复核:能结构化的已填好;无法结构化的标"待你定"——
         教练填真实重量/RPE(他本就知道),原暗号留成 coachNote 给学员看
   ↓ [ 发布给学员 ] (直接构造已发布实体树 → publishPlan)
@@ -100,7 +101,7 @@ struct ParsedExercise { var rawName: String; var isMainLift: Bool; var sets: [Pa
 1. 工作台「导入计划」入口(选学员后可见)→ `fileImporter`。
 2. **选周**:全部解析 → 勾要导入的周。
 3. **开始日**:默认下周一。
-4. **动作匹配**:`rawName` 与库**精确折叠相等**(`ExerciseSearch.fold` 后字符串 `==`)→ 自动绑;否则 `ExerciseSearch.matches`(折叠子串)给候选,选库内 / 暂跳过。**V1 不建自定义。**
+4. **动作匹配**(四层,见 §动作别名表附录):① `rawName` 归一化(trim + `ExerciseSearch.fold` 杆/杠折叠)→ 与「完整动作集」**精确折叠相等** → 自动绑;② 否则**查别名表**(`exercise-aliases.json`:alias 折叠相等 → 绑其 canonical)→ 自动绑;③ 否则 `ExerciseSearch.matches`(折叠子串)给候选,教练选库内;④ 否则暂跳过(不导该动作)。**V1 不建自定义。**「完整动作集」= `syntheticCompetitionLifts()`(4 个「比赛式X」)+ `loadBundledCatalogV2()`。
 5. **强度复核**:`reps==nil`、`weightKg`/`rpe` 均空、或动作未绑 → 标"待你定";教练补真实重量/RPE(`力竭`默认建议 rpe10);coachNote 默认带上原暗号,可改。
 
 #### F. 组装 + 发布 — `ImportPlanAssembler`
@@ -168,6 +169,51 @@ struct ParsedExercise { var rawName: String; var isMainLift: Bool; var sets: [Pa
 ### 动作名(col1)
 非空非日期非组次 → 动作名(名尾粘连数字如 `节奏深蹲310` 剥离为 tempo coachNote 再匹配);`休息`→休息日;空 col1+有组次→续行;多行格→逐行拆辅助。
 
+## 动作别名表附录(`exercise-aliases.json`)
+
+教练私有写法(简写 / 词序 / 缺字 / 裸名)与库内规范名常对不上。靠模糊匹配易误绑,故引入**显式、可维护、可审、可增长**的别名表。**顺序权威以 §E 四层为准**:别名表是**第②层 fallback**——仅当第①层「库内精确折叠相等」未命中时才查表,**别名永不覆盖库内精确同名**。(未来网页端「教练计划 DSL 编辑器」可复用同一张表;其跨端消费/同步方式 V2 再定,不在本 spec 范围。)
+
+**位置 / 形态**:`Modules/CoachKit/Sources/CoachKit/Resources/exercise-aliases.json`,声明为 CoachKit bundle resource:
+```json
+{ "version": 1, "aliases": [ { "alias": "低杆深蹲", "canonical": "低杠位深蹲" }, … ] }
+```
+- `alias` = 教练原写法;`canonical` = 「完整动作集」里的规范 `name`。
+- 解析:`alias` 与 canonical 两边都经 `fold`(杆/杠)归一后比较;`canonical` 对**完整动作集**(合成「比赛式X」+ bundled catalog)解析成 `exerciseID`。
+
+**护栏(加载期校验测试)**:每条 `canonical` 必须在完整动作集里**折叠唯一命中**,否则 build/test 红——防止 catalog 改名后别名悬空(authoritative source,不靠 race 后修)。
+
+**自增长(V2)**:教练在审阅里给未匹配名挑了库内动作 → `{alias, canonical}` 追加到运行时持久层(本地 file / `UserDefaults`,叠在 bundled 表上)。V1 只用手维护的 bundled 表;长尾辅助动作走第③层审阅挑 → 顺势喂大此表。
+
+**V1 seed(26 条,来自吕子豪表覆盖审计 2026-06-24)**:
+
+```json
+{ "version": 1, "aliases": [
+  {"alias":"低杆深蹲","canonical":"低杠位深蹲"}, {"alias":"高杆深蹲","canonical":"高杠位深蹲"},
+  {"alias":"低杆位早安","canonical":"低杆位早安式"}, {"alias":"卧推","canonical":"杠铃卧推"},
+  {"alias":"深蹲","canonical":"比赛式深蹲"}, {"alias":"硬拉","canonical":"比赛式传统硬拉"},
+  {"alias":"传统硬拉","canonical":"比赛式传统硬拉"}, {"alias":"相扑硬拉","canonical":"比赛式相扑硬拉"},
+  {"alias":"窄推","canonical":"窄握卧推"}, {"alias":"杠铃上斜卧推","canonical":"上斜杠铃卧推"},
+  {"alias":"长暂停卧推","canonical":"暂停卧推"}, {"alias":"长暂停深蹲","canonical":"暂停深蹲"},
+  {"alias":"腘绳弯举","canonical":"腘绳肌弯举"}, {"alias":"三头下压","canonical":"三头肌下压"},
+  {"alias":"绳索过顶臂屈伸","canonical":"绳索过头臂屈伸"}, {"alias":"坐姿v把划船","canonical":"坐姿 v 把划船"},
+  {"alias":"罗马尼亚硬拉","canonical":"杠铃罗马尼亚硬拉"}, {"alias":"单腿罗马尼亚硬拉","canonical":"单腿硬拉"},
+  {"alias":"单臂哑铃划船","canonical":"哑铃划船"}, {"alias":"哈克","canonical":"哈克深蹲"},
+  {"alias":"哥本哈根支撑","canonical":"哥本哈根侧平板支撑"}, {"alias":"俯身反向飞鸟","canonical":"俯身飞鸟"},
+  {"alias":"坐姿俯身飞鸟","canonical":"俯身飞鸟"}, {"alias":"哑铃俯身飞鸟","canonical":"俯身飞鸟"},
+  {"alias":"附身哑铃飞鸟","canonical":"哑铃飞鸟"}, {"alias":"安全杆深蹲","canonical":"扶手安全杆深蹲"}
+] }
+```
+
+**配套 catalog 补 3 条**(真缺失,见覆盖审计;追加到 `exercise-catalog-v2.json`,id 取 `ca70` 命名空间当前 max `0x4dc` 之后的 `04dd/04de/04df`,完整字段如下(3 个 entry,逗号分隔,splice 进 catalog 顶层数组,非独立 JSON 文档):
+
+```json
+{ "id": "00000000-0000-0000-ca70-0000000004dd", "name": "离心卧推", "nameEn": "Eccentric Bench Press", "exerciseType": "main_lift_variation", "mainLiftFamily": "bench", "isCompetitionLift": false, "muscleGroups": ["chest"], "equipment": ["barbell"], "movementPattern": ["horizontal_push"], "createdByCoachId": null, "createdAt": "2026-06-24T00:00:00Z" },
+{ "id": "00000000-0000-0000-ca70-0000000004de", "name": "弹力带窄推", "nameEn": "Banded Close-Grip Bench Press", "exerciseType": "main_lift_variation", "mainLiftFamily": "bench", "isCompetitionLift": false, "muscleGroups": ["chest"], "equipment": ["barbell", "band"], "movementPattern": ["horizontal_push"], "createdByCoachId": null, "createdAt": "2026-06-24T00:00:00Z" },
+{ "id": "00000000-0000-0000-ca70-0000000004df", "name": "安全杠节奏深蹲", "nameEn": "Safety Bar Tempo Squat", "exerciseType": "main_lift_variation", "mainLiftFamily": "squat", "isCompetitionLift": false, "muscleGroups": ["quad"], "equipment": ["specialty_bar"], "movementPattern": ["squat"], "createdByCoachId": null, "createdAt": "2026-06-24T00:00:00Z" }
+```
+
+catalog 计数 1224→1227(含 4 合成 = 1228→**1231**),`PreviewCatalogV2Tests` 断言同步改。enum raw value(`main_lift_variation`/`band`/`specialty_bar`/`horizontal_push`/`squat`)均已核对合法。
+
 ## 数据与隐私
 - **不提交真实学员文件**(PII);测试用脱敏精简 fixture(假学员/2 周/覆盖每规则)。
 - 解析全程本地;xlsx 不上传/不进后端/不进日志。`coach_note` 写库的是教练对学员的处方文本(本就在 app 内流转)。
@@ -175,7 +221,7 @@ struct ParsedExercise { var rawName: String; var isMainLift: Bool; var sets: [Pa
 ## 测试
 - **解析器单测**(脱敏 fixture)goldens:`D100/L110 递增5kg`(4组)→`[100,105,110,110]`;`D62.5/L70 递增2.5kg`→`[62.5,65,67.5,70]`;`6789`(4组 rpe)→`[6,7,8,9]`;`120/125/130/135`→逐组;`310`(节奏)→coachNote「节奏3-1-0」;`70%top`→weightKg 空+coachNote;`减10kg*2`→.backoff+coachNote;`4组力竭`→.amrap+reps 待补;续行/多行/休息/坏日期行各 1。
 - **几何 / 组装单测**:stride 寻址、日期行识别、周块切分;选周→weekNumber 重排;逐组不同 targetValue;开始日重排期;`publishPlan` 入参形状。
-- **匹配单测**:`低杆深蹲` 精确折叠绑、`噩梦硬拉` 未命中、杆/杠 折叠。
+- **匹配 / 别名单测**:`噩梦硬拉` 精确折叠绑;别名 seed 行正确绑(`低杆深蹲`→低杠位深蹲、`卧推`→杠铃卧推、`传统硬拉`/`相扑硬拉`→比赛式、`窄推`→窄握卧推、`长暂停卧推`→暂停卧推);3 个新动作可命中;**每条 canonical 在完整动作集折叠唯一命中**(防悬空);真未匹配名进候选/跳过。
 - **coachNote 全链路单测**:`PlanSet`/`PrescribedSet` 带 coachNote 的 Codable round-trip(缺省→nil);`CreatePlanSetRequestDTO`/`PlanSetDTO`/`DomainMapping` 透传;`BackendStudentPlanRepository.StudentPlanProjection` 投到 `PrescribedSet.coachNote`;StudentKit 组行渲染 coachNote。
 - **后端测试**:`plan_weeks=2`/`week_number>4` 现在被接受;`coach_note` create→读取 round-trip;放宽迁移不破坏既有 {1,4} 计划。
 - **完成度单测**:reps<1 / 无合法 target / 未绑动作 → 阻止发布。
@@ -205,6 +251,7 @@ struct ParsedExercise { var rawName: String; var isMainLift: Bool; var sets: [Pa
 | `TrainingPlan`/`PlanDay`(weekNumber)/`PlanExercise`(notes)/`PlanSet` | CoreModels(004)| 导入直接构造的发布实体 |
 | `PlanSet.coachNote` + `PrescribedSet.coachNote` + 全 wire 链路(**新增**)| CoreModels/Networking/StudentKit/backend(本 spec)| 暗号直达学员 |
 | 放宽 `plan_weeks`/`week_number` 约束(**新增**)| MeetPR-backend(本 spec)| 支持任意剩余周数 |
-| 1228 动作库(`Exercise`,`mainLiftFamily`)| CoreModels/CoachKit(022)| 动作匹配 / 主项判定 |
+| 动作库(`Exercise` 1228 → **本 spec +3 = 1231**,`mainLiftFamily` 判主项)| CoreModels/CoachKit(022 + 本 spec)| 动作匹配 / 主项判定 |
+| **别名表 `exercise-aliases.json`(新增)** | CoachKit(本 spec)| 教练写法 → 规范名归一(见 §动作别名表附录)|
 | `ExerciseSearch.fold`/`.matches` | CoachKit | 精确折叠绑定 + 候选建议 |
 | `PrescribedSet`(weightKg/rpe 可空)| CoreModels(033)| 学员端逐组呈现,支持无目标重量打卡 |
