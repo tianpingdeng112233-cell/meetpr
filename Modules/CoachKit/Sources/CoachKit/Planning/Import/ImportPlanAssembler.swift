@@ -32,6 +32,7 @@ struct ImportPlanAssembler {
     let sets: [PlanSet]
   }
 
+  // swiftlint:disable:next function_body_length
   func assemble(
     traineeID: UUID,
     coachID: UUID?,

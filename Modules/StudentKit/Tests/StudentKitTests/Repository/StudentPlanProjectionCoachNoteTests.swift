@@ -8,6 +8,7 @@ import Testing
 // spec 043 §G — the student read path projects PlanSet.coachNote onto
 // PrescribedSet.coachNote so the cue reaches the student dashboard.
 
+// swiftlint:disable:next function_body_length
 @Test func projectionCarriesCoachNoteOntoPrescribedSet() throws {
   let planID = UUID()
   let dayID = UUID()

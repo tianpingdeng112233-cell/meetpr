@@ -70,6 +70,7 @@ struct XLSXReader {
   private func grid(at path: String, file: XLSXFile) throws -> CellGrid {
     let worksheet = try file.parseWorksheet(at: path)
     let sharedStrings = try? file.parseSharedStrings()
+    // swiftlint:disable:next large_tuple
     var triples: [(row: Int, col: Int, value: CellValue)] = []
     for row in worksheet.data?.rows ?? [] {
       let rowIndex = Int(row.reference)

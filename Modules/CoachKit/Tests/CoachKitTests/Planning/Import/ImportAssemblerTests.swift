@@ -81,9 +81,11 @@ private func week(
   let assembler = ImportPlanAssembler(now: { fixedNow }, makeID: { makeID(&counter) })
   let weeks = [
     week(
-      blockIndex: 0, selected: false, exercise: reviewExercise(sets: [reviewSet(1, weight: "100")])),
+      blockIndex: 0, selected: false,
+      exercise: reviewExercise(sets: [reviewSet(1, weight: "100")])),
     week(
-      blockIndex: 1, selected: true, exercise: reviewExercise(sets: [reviewSet(1, weight: "110")])),
+      blockIndex: 1, selected: true,
+      exercise: reviewExercise(sets: [reviewSet(1, weight: "110")])),
   ]
 
   let assembled = try assembler.assemble(

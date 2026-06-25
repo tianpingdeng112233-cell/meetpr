@@ -47,7 +47,7 @@ struct CellGrid: Equatable, Sendable {
   }
 
   /// Convenience for tests/fixtures: build from `(row, col, value)` triples.
-  init(_ triples: [(row: Int, col: Int, value: CellValue)]) {
+  init(_ triples: [(row: Int, col: Int, value: CellValue)]) {  // swiftlint:disable:this large_tuple
     var dict: [Coordinate: CellValue] = [:]
     for triple in triples {
       dict[Coordinate(row: triple.row, col: triple.col)] = triple.value

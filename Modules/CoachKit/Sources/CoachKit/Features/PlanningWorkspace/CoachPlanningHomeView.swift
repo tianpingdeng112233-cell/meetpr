@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import CoreModels
 import DesignSystem
 import Foundation

@@ -8,6 +8,7 @@ import Testing
 // 坏日期行 and full week→day→exercise→set structuring.
 
 private struct GridBuilder {
+  // swiftlint:disable:next large_tuple
   var triples: [(row: Int, col: Int, value: CellValue)] = []
 
   mutating func dateRow(_ row: Int, serialBase: Double) {

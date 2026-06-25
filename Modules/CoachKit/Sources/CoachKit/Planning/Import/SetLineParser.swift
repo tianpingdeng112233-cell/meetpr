@@ -72,6 +72,7 @@ enum SetLineParser {
 
   // MARK: - 强度 (col3)
 
+  // swiftlint:disable:next cyclomatic_complexity
   private static func applyIntensity(_ sets: inout [ParsedSet], raw: String, exerciseName: String) {
     let original = raw.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !original.isEmpty else { return }

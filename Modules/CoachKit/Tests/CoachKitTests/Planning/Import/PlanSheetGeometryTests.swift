@@ -16,6 +16,7 @@ import Testing
   #expect((day6.nameCol, day6.float2Col) == (31, 35))
 }
 
+// swiftlint:disable:next large_tuple
 private func dateRow(_ row: Int, serialBase: Double) -> [(row: Int, col: Int, value: CellValue)] {
   (0..<7).map { day in
     (
@@ -26,6 +27,7 @@ private func dateRow(_ row: Int, serialBase: Double) -> [(row: Int, col: Int, va
 }
 
 @Test func detectsDateRowsAndSplitsBlocks() {
+  // swiftlint:disable:next large_tuple
   var triples: [(row: Int, col: Int, value: CellValue)] = []
   // Week 1 header at row 1, content at row 2; blank row 3; week 2 header row 4.
   triples += dateRow(1, serialBase: 45_000)

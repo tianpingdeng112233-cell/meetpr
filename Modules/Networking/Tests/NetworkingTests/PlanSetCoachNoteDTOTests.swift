@@ -16,7 +16,7 @@ import Testing
     coachNote: "70%top"
   )
 
-  let json = String(decoding: try MeetPRCodec.encoder.encode(request), as: UTF8.self)
+  let json = try #require(String(bytes: MeetPRCodec.encoder.encode(request), encoding: .utf8))
 
   #expect(json.contains(#""coach_note":"70%top""#))
 }
@@ -30,7 +30,7 @@ import Testing
     setType: .working
   )
 
-  let json = String(decoding: try MeetPRCodec.encoder.encode(request), as: UTF8.self)
+  let json = try #require(String(bytes: MeetPRCodec.encoder.encode(request), encoding: .utf8))
 
   #expect(!json.contains("coach_note"))
 }
