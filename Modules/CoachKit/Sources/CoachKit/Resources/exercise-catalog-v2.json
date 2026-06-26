@@ -23626,5 +23626,63 @@
     "createdByCoachId": null,
     "createdAt": "2026-06-24T00:00:00Z",
     "nameEn": "EZ-Bar Upright Row"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004dd",
+    "name": "离心卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Eccentric Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004de",
+    "name": "弹力带窄推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell",
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Banded Close-Grip Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004df",
+    "name": "安全杠节奏深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Safety Bar Tempo Squat"
   }
 ]

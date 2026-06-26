@@ -88,6 +88,10 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public let repsMax: Int?
   public let rpe: Decimal?
   public let restSeconds: Int?
+  /// Student-visible coach cue for this set (spec 043 §G): the original
+  /// shorthand the coach kept as context next to the structured target.
+  /// `nil` for pre-043 data.
+  public let coachNote: String?
 
   public init(
     id: UUID,
@@ -96,7 +100,8 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     reps: Int? = nil,
     repsMax: Int? = nil,
     rpe: Decimal? = nil,
-    restSeconds: Int? = nil
+    restSeconds: Int? = nil,
+    coachNote: String? = nil
   ) {
     self.id = id
     self.setIndex = setIndex
@@ -105,6 +110,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     self.repsMax = repsMax
     self.rpe = rpe
     self.restSeconds = restSeconds
+    self.coachNote = coachNote
   }
 
   public init(from decoder: Decoder) throws {
@@ -116,6 +122,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     repsMax = try container.decodeIfPresent(Int.self, forKey: .repsMax)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
+    coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -127,6 +134,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeIfPresent(repsMax, forKey: .repsMax)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
+    try container.encodeIfPresent(coachNote, forKey: .coachNote)
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -137,5 +145,6 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     case repsMax
     case rpe
     case restSeconds
+    case coachNote
   }
 }

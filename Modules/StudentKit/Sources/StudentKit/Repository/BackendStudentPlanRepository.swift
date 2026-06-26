@@ -91,7 +91,9 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
   }
 }
 
-private enum StudentPlanProjection {
+/// `internal` (not `private`) so `@testable` unit tests can exercise the
+/// projection directly — notably the coachNote passthrough (spec 043 §G).
+enum StudentPlanProjection {
   static func project(
     tree: TrainingPlanTree,
     catalog: [Exercise],
@@ -166,7 +168,8 @@ private enum StudentPlanProjection {
       reps: isRange ? nil : planSet.targetReps,
       repsMax: planSet.targetRepsMax,
       rpe: planSet.intensityMode == .rpe ? planSet.targetValue : nil,
-      restSeconds: planSet.restSeconds
+      restSeconds: planSet.restSeconds,
+      coachNote: planSet.coachNote
     )
   }
 

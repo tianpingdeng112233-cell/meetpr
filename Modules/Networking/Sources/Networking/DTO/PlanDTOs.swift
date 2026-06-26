@@ -197,6 +197,8 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
   public let targetValue: Decimal
   public let setType: SetType
   public let restSeconds: Int?
+  /// Student-visible coach cue (spec 043 §G); `nil` from pre-043 backends.
+  public let coachNote: String?
   public let createdAt: Date
 
   public init(
@@ -209,6 +211,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     targetValue: Decimal,
     setType: SetType,
     restSeconds: Int? = nil,
+    coachNote: String? = nil,
     createdAt: Date
   ) {
     self.id = id
@@ -220,6 +223,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     self.targetValue = targetValue
     self.setType = setType
     self.restSeconds = restSeconds
+    self.coachNote = coachNote
     self.createdAt = createdAt
   }
 
@@ -234,6 +238,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     targetValue = try container.decodeDecimal(forKey: .targetValue)
     setType = try container.decode(SetType.self, forKey: .setType)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
+    coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
   }
 
@@ -248,6 +253,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     try container.encodeDecimalString(targetValue, forKey: .targetValue)
     try container.encode(setType, forKey: .setType)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
+    try container.encodeIfPresent(coachNote, forKey: .coachNote)
     try container.encode(createdAt, forKey: .createdAt)
   }
 
@@ -261,6 +267,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     case targetValue
     case setType
     case restSeconds
+    case coachNote
     case createdAt
   }
 }

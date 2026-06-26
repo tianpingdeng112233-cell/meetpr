@@ -92,6 +92,7 @@ extension PlanSetDTO {
       targetValue: targetValue,
       setType: setType,
       restSeconds: restSeconds,
+      coachNote: coachNote,
       createdAt: createdAt
     )
   }
