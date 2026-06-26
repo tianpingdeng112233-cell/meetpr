@@ -1162,7 +1162,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000048",
-    "name": "弹力带绕髋RDL",
+    "name": "弹力带绕髋罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1181,7 +1181,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000049",
-    "name": "抓举握距RDL",
+    "name": "抓举握距罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1200,7 +1200,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004a",
-    "name": "前后站单腿罗拉",
+    "name": "前后站单腿罗马尼亚硬拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -1219,7 +1219,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004b",
-    "name": "相扑RDL",
+    "name": "相扑罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1238,7 +1238,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004d",
-    "name": "节奏RDL",
+    "name": "节奏罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -4626,7 +4626,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000108",
-    "name": "单腿RDL",
+    "name": "单腿罗马尼亚硬拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4645,7 +4645,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000109",
-    "name": "单腿 RDL(纯单腿)",
+    "name": "单腿罗马尼亚硬拉(纯单腿)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5274,7 +5274,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012c",
-    "name": "B 站距 RDL",
+    "name": "B 站距罗马尼亚硬拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5293,7 +5293,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012d",
-    "name": "单腿 RDL(B 站距)",
+    "name": "单腿罗马尼亚硬拉(B 站距)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -23684,5 +23684,43 @@
     "createdByCoachId": null,
     "createdAt": "2026-06-24T00:00:00Z",
     "nameEn": "Safety Bar Tempo Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000010",
+    "name": "低杠位暂停深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-26T00:00:00Z",
+    "nameEn": "Low Bar Paused Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000011",
+    "name": "低杠位节奏深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-26T00:00:00Z",
+    "nameEn": "Low Bar Tempo Squat"
   }
 ]
