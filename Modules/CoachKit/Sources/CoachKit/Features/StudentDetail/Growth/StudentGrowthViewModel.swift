@@ -46,6 +46,18 @@ final class StudentGrowthViewModel {
   /// Points for the selected family within the selected window, ascending.
   private(set) var visiblePoints: [GrowthPoint] = []
 
+  /// Plateau read for the selected family (coach-analytics-v1 §2, A-group #4).
+  /// Computed over ALL points for the family — not the chart's selected window
+  /// — so a multi-week stall is detectable regardless of the visible range.
+  /// Soft signal only (a banner cue), never a gate. UI/UX is the designer's;
+  /// this exposes `isPlateau` / `weeksStalled` for the view to render.
+  var plateau: E1RMPlateauDetector.Result {
+    let points = (pointsByFamily[selectedFamily] ?? []).map {
+      E1RMPlateauDetector.Point(date: $0.date, e1RMKg: $0.e1RMKg)
+    }
+    return E1RMPlateauDetector.detect(points: points)
+  }
+
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let trainingLogs: any StudentTrainingLogRepository
   @ObservationIgnored private let familyMapProvider: (any CoachPlanFamilyMapProviding)?
