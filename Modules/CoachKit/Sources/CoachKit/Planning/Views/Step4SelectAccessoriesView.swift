@@ -184,14 +184,6 @@ private struct MainLiftSummaryRow: View {
           .foregroundStyle(Color.MeetPR.fgPrimary)
           .lineLimit(1)
           .truncationMode(.tail)
-
-        if let nameEn = viewModel.exerciseNameEn(for: draftExercise) {
-          Text(nameEn)
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-            .lineLimit(1)
-            .truncationMode(.tail)
-        }
       }
 
       Spacer(minLength: MeetPRSpacing.sm)

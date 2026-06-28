@@ -151,12 +151,6 @@ public struct ExerciseSetEditorCard: View {
         Text(viewModel.exerciseName(for: draftExercise))
           .font(Font.MeetPR.bodyEmphasis)
           .foregroundStyle(Color.MeetPR.fgPrimary)
-
-        if let nameEn = viewModel.exerciseNameEn(for: draftExercise) {
-          Text(nameEn)
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-        }
       }
 
       if draftExercise.isMainLift {
