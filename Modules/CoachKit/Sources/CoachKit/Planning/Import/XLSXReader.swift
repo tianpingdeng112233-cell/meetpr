@@ -48,6 +48,18 @@ struct XLSXReader {
 
   // MARK: - security-scoped access
 
+  /// Runs `body` against a reader bound to a CoreXLSX-readable workbook: the original
+  /// if already standard, otherwise a temp copy with WPS-private relationships
+  /// stripped (spec 043 hardening), removed afterwards. Wrap a whole read session
+  /// (sheetNames + every sheet) in this so the rewrite happens once, not per call.
+  func withSanitizedWorkbook<T>(_ body: (XLSXReader) throws -> T) throws -> T {
+    let scoped = fileURL.startAccessingSecurityScopedResource()
+    let sanitized = WPSWorkbookSanitizer.sanitizedWorkbookURL(for: fileURL)
+    if scoped { fileURL.stopAccessingSecurityScopedResource() }
+    defer { if let sanitized { try? FileManager.default.removeItem(at: sanitized) } }
+    return try body(XLSXReader(fileURL: sanitized ?? fileURL))
+  }
+
   private func withFile<T>(_ body: (XLSXFile) throws -> T) throws -> T {
     let scoped = fileURL.startAccessingSecurityScopedResource()
     defer { if scoped { fileURL.stopAccessingSecurityScopedResource() } }

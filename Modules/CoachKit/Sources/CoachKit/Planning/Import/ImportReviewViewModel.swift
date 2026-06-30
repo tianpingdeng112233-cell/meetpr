@@ -18,9 +18,6 @@ final class ImportReviewViewModel {
     case failed(String)
   }
 
-  /// Sheets that are never plan pages (spec 043 §A 不解析).
-  static let ignoredSheetNames: Set<String> = ["注意事项", "2026"]
-
   private let repository: any PlanRepository
   private let now: @Sendable () -> Date
   private let assembler: ImportPlanAssembler
@@ -73,7 +70,7 @@ final class ImportReviewViewModel {
     if case .failed = phase { return }
     do {
       let reader = XLSXReader(fileURL: fileURL)
-      let grid = try Self.planGrid(from: reader)
+      let grid = try reader.withSanitizedWorkbook { try Self.planGrid(from: $0) }
       let parsed = PlanSheetParser.parse(grid)
       guard !parsed.weeks.isEmpty else {
         phase = .failed("没能在表里识别出训练周——请确认选择的是计划页。")
@@ -180,10 +177,15 @@ final class ImportReviewViewModel {
 
   static func planGrid(from reader: XLSXReader) throws -> CellGrid {
     let names = (try? reader.sheetNames()) ?? []
-    let planSheets = names.filter { !ignoredSheetNames.contains($0) }
-    if planSheets.count == 1 {
-      return try reader.cells(inSheetNamed: planSheets[0])
+    let candidates: [(name: String, grid: CellGrid)] = names.compactMap { name in
+      guard let grid = try? reader.cells(inSheetNamed: name) else { return nil }
+      return (name, grid)
     }
+    if let selected = PlanSheetSelector.selectPlanSheet(from: candidates) {
+      return selected
+    }
+    // No sheet parsed into week blocks — fall back to the first worksheet so the
+    // caller still surfaces the "no training weeks" message against real cells.
     return try reader.firstSheetGrid()
   }
 

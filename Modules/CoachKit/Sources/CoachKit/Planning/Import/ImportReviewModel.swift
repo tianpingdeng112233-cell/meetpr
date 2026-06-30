@@ -66,30 +66,29 @@ enum ImportCompleteness {
 }
 
 enum ImportReviewBuilder {
-  /// Builds review weeks from a parsed plan, auto-binding exact catalog matches
-  /// and seeding each set with the parser's structured values. All weeks start
-  /// selected; the coach unticks the ones they don't want.
+  /// Builds review weeks from a parsed plan, auto-binding exact catalog matches and
+  /// seeding each set with the parser's structured values. Weeks with no exercises
+  /// are dropped (a year-long date skeleton must not flood review with empty weeks);
+  /// the rest start selected so the coach unticks the ones they don't want.
   static func build(
     from plan: ParsedPlan,
     catalog: [Exercise],
     aliases: ExerciseAliasTable = .bundled(),
     makeID: () -> UUID = { UUID() }
   ) -> [ImportReviewWeek] {
-    plan.weeks.map { week in
-      ImportReviewWeek(
-        id: makeID(),
-        blockIndex: week.blockIndex,
-        isSelected: true,
-        days: week.days.filter { !$0.isRest && !$0.exercises.isEmpty }.map { day in
-          ImportReviewDay(
-            id: makeID(),
-            dayOfWeek: day.dayOfWeek,
-            exercises: day.exercises.map { exercise in
-              buildExercise(exercise, catalog: catalog, aliases: aliases, makeID: makeID)
-            }
-          )
-        }
-      )
+    plan.weeks.compactMap { week -> ImportReviewWeek? in
+      let days = week.days.filter { !$0.isRest && !$0.exercises.isEmpty }.map { day in
+        ImportReviewDay(
+          id: makeID(),
+          dayOfWeek: day.dayOfWeek,
+          exercises: day.exercises.map { exercise in
+            buildExercise(exercise, catalog: catalog, aliases: aliases, makeID: makeID)
+          }
+        )
+      }
+      guard !days.isEmpty else { return nil }
+      return ImportReviewWeek(
+        id: makeID(), blockIndex: week.blockIndex, isSelected: true, days: days)
     }
   }
 

@@ -10,21 +10,24 @@ enum PlanSheetParser {
   static let restMarker = "休息"
 
   static func parse(_ grid: CellGrid) -> ParsedPlan {
-    let blocks = PlanSheetGeometry.weekBlocks(in: grid)
+    let offset = PlanSheetGeometry.detectDayOffset(in: grid)
+    let blocks = PlanSheetGeometry.weekBlocks(in: grid, offset: offset)
     let weeks = blocks.map { block in
       ParsedWeek(
         blockIndex: block.blockIndex,
         dateSerials: block.dateSerials,
         days: (0..<PlanSheetGeometry.daysPerWeek).map { day in
-          parseDay(dayIndex: day, block: block, grid: grid)
+          parseDay(dayIndex: day, offset: offset, block: block, grid: grid)
         }
       )
     }
     return ParsedPlan(weeks: weeks)
   }
 
-  private static func parseDay(dayIndex: Int, block: WeekBlock, grid: CellGrid) -> ParsedDay {
-    let columns = PlanSheetGeometry.dayColumns(dayIndex)
+  private static func parseDay(
+    dayIndex: Int, offset: Int, block: WeekBlock, grid: CellGrid
+  ) -> ParsedDay {
+    let columns = PlanSheetGeometry.dayColumns(dayIndex, offset: offset)
     var exercises: [ParsedExercise] = []
     var isRest = false
 

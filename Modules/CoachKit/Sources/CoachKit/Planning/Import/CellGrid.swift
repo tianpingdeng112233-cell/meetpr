@@ -27,12 +27,24 @@ enum CellValue: Equatable, Sendable {
       return true
     }
   }
+
+  /// Numeric value parsed from the string content, regardless of how the source
+  /// typed the cell. WPS Office stores numbers (including date serials) as strings,
+  /// so type-based `isNumeric` misses them; this reads the value either way and is
+  /// nil only for genuinely non-numeric text (`传统硬拉`, `2*10`, `rpe`).
+  var numericValue: Double? {
+    Double(stringValue)
+  }
 }
 
 /// A 1-based sparse grid of cells read from one worksheet.
 struct CellGrid: Equatable, Sendable {
   let maxRow: Int
   let maxCol: Int
+  /// Sorted, unique row indexes holding at least one cell. Geometry scans these
+  /// instead of `1...maxRow` so a sparse far-down cell can't force a huge empty scan
+  /// on every sheet.
+  let occupiedRows: [Int]
   private let cells: [Coordinate: CellValue]
 
   struct Coordinate: Hashable, Sendable {
@@ -44,6 +56,7 @@ struct CellGrid: Equatable, Sendable {
     self.cells = cells
     maxRow = cells.keys.map(\.row).max() ?? 0
     maxCol = cells.keys.map(\.col).max() ?? 0
+    occupiedRows = Set(cells.keys.map(\.row)).sorted()
   }
 
   /// Convenience for tests/fixtures: build from `(row, col, value)` triples.
@@ -67,5 +80,11 @@ struct CellGrid: Equatable, Sendable {
 
   func isNumeric(row: Int, col: Int) -> Bool {
     value(row: row, col: col)?.isNumeric ?? false
+  }
+
+  /// Numeric value at the cell parsed from its string content (WPS-tolerant); nil
+  /// for empty or non-numeric cells.
+  func numericValue(row: Int, col: Int) -> Double? {
+    value(row: row, col: col)?.numericValue
   }
 }

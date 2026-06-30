@@ -58,6 +58,7 @@ CoachKit/Planning/Import/                      (新增子树)
 
 - **发布**:`ImportPlanAssembler` 构造已发布实体树 → 既有 `PlanRepository.publishPlan(plan:days:exercises:sets:)`(`BackendPlanRepository.swift:51-130`,逐周 `PlanDay.weekNumber`、逐组 `PlanSet`、`PlanExercise.notes` 都已透传)。**不经 `DraftStore` / `PlanPublishAssembler`。**
 - **新增依赖**:[`CoreXLSX`](https://github.com/CoreOffice/CoreXLSX)(**Apache-2.0**,纯 Swift 只读;Package iOS9+,iOS17 兼容)**钉 `0.14.2`**,挂 `Modules/CoachKit/Package.swift`。
+  - **硬化增订(2026-06-26)**:新增 [`ZIPFoundation`](https://github.com/weichsel/ZIPFoundation)(**MIT**),`.upToNextMinor(from: "0.9.11")`(与 CoreXLSX 传递约束对齐,resolved `0.9.20`)。**它已是 CoreXLSX 的传递依赖**(应用二进制零新增),声明为直接依赖仅为可 `import`。用途:`WPSWorkbookSanitizer` 在导入前剥掉 WPS Office 工作簿 `.rels` 里 CoreXLSX `SchemaType` 不识别的私有 relationship(`wps.cn/…`)——否则 WPS 生成的 xlsx(国内普遍)会让 CoreXLSX 直接抛 `dataCorrupted` 打不开。只保留 CoreXLSX `0.14.2` `SchemaType` **精确**支持的 relationship `Type`(完整字符串匹配,非命名空间前缀),其余一律删除——包括 WPS 私有类型,以及同命名空间下 CoreXLSX 不支持的(如 `schemas.microsoft.com/.../threadedComment`);删掉的关系都非读取 cell 所需(worksheet/sharedStrings/styles 等保留)。已是标准的工作簿(无不支持类型)不改写。
 - **跨仓改动**:见 §范围 G(后端放宽周数约束 + coachNote 全链路)。
 
 ## 范围

@@ -60,3 +60,63 @@ private func dateRow(_ row: Int, serialBase: Double) -> [(row: Int, col: Int, va
   #expect(PlanSheetGeometry.isDateRow(grid, row: 1))
   #expect(PlanSheetGeometry.weekBlocks(in: grid).count == 1)
 }
+
+// spec 043 hardening — day-column offset is detected, not locked to 吕子豪's layout.
+// 邓天平.xlsx starts every day one column right (B/G/L/Q/V/AA/AF = offset 2).
+
+// swiftlint:disable:next large_tuple
+private func offsetDateRow(_ row: Int, serialBase: Double, offset: Int)
+  -> [(row: Int, col: Int, value: CellValue)]
+{
+  (0..<7).map { day in
+    (
+      row: row, col: offset + day * PlanSheetGeometry.columnsPerDay,
+      value: CellValue.number(serialBase + Double(day))
+    )
+  }
+}
+
+@Test func detectsDefaultOffsetOneForLockedLayout() {
+  let grid = CellGrid(offsetDateRow(1, serialBase: 45_000, offset: 1))
+  #expect(PlanSheetGeometry.detectDayOffset(in: grid) == 1)
+}
+
+// WPS Office delivers numeric cells as text — date detection must read the serial
+// from the string content, not rely on the CellValue being typed numeric.
+
+@Test func detectsDateRowFromTextTypedSerials() {
+  // swiftlint:disable:next large_tuple
+  var triples: [(row: Int, col: Int, value: CellValue)] = []
+  for day in 0..<7 {
+    triples.append((row: 1, col: 1 + day * 5, value: .text("\(45_000 + day)")))
+  }
+  let grid = CellGrid(triples)
+  #expect(PlanSheetGeometry.isDateRow(grid, row: 1))
+}
+
+@Test func smallNumbersAreNotADateRow() {
+  // Under WPS, reps/weights parse as numbers too; only large date serials mark a
+  // header, so a row of small training numbers must not open a week block.
+  // swiftlint:disable:next large_tuple
+  var triples: [(row: Int, col: Int, value: CellValue)] = []
+  for day in 0..<7 {
+    triples.append((row: 1, col: 1 + day * 5, value: .text("\(5 + day)")))  // 5,6,7…
+  }
+  #expect(!PlanSheetGeometry.isDateRow(CellGrid(triples), row: 1))
+}
+
+@Test func weekBlocksReadTextTypedSerials() {
+  // swiftlint:disable:next large_tuple
+  var triples: [(row: Int, col: Int, value: CellValue)] = []
+  for day in 0..<7 {
+    triples.append((row: 1, col: 1 + day * 5, value: .text("\(46_020 + day)")))
+  }
+  triples.append((row: 2, col: 1, value: .text("深蹲")))
+  let blocks = PlanSheetGeometry.weekBlocks(in: CellGrid(triples))
+  #expect(blocks.first?.dateSerials.first == 46_020)
+}
+
+@Test func detectsShiftedOffsetTwoForDengTianpingLayout() {
+  let grid = CellGrid(offsetDateRow(1, serialBase: 46_020, offset: 2))
+  #expect(PlanSheetGeometry.detectDayOffset(in: grid) == 2)
+}

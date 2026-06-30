@@ -16,6 +16,10 @@ let package = Package(
     // Read-only XLSX parsing for coach plan import (spec 043). Apache-2.0,
     // pure Swift. Pinned exact — the importer depends on its cell-addressing.
     .package(url: "https://github.com/CoreOffice/CoreXLSX", exact: "0.14.2"),
+    // Zip read/write for the WPS pre-sanitize pass (spec 043 hardening): CoreXLSX
+    // rejects WPS's private relationship types, so we strip them before parsing.
+    // Already a transitive dep of CoreXLSX — declared here to import directly.
+    .package(url: "https://github.com/weichsel/ZIPFoundation", .upToNextMinor(from: "0.9.11")),
   ],
   targets: [
     .target(
@@ -26,6 +30,7 @@ let package = Package(
         .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "CoreXLSX", package: "CoreXLSX"),
+        .product(name: "ZIPFoundation", package: "ZIPFoundation"),
       ],
       resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
@@ -37,6 +42,7 @@ let package = Package(
         .product(name: "Networking", package: "Networking"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "ViewInspector", package: "ViewInspector"),
+        .product(name: "ZIPFoundation", package: "ZIPFoundation"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),

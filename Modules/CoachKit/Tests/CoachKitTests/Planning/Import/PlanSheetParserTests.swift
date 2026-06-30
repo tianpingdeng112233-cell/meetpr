@@ -8,6 +8,7 @@ import Testing
 // 坏日期行 and full week→day→exercise→set structuring.
 
 private struct GridBuilder {
+  var offset = 1
   // swiftlint:disable:next large_tuple
   var triples: [(row: Int, col: Int, value: CellValue)] = []
 
@@ -15,7 +16,7 @@ private struct GridBuilder {
     for day in 0..<7 {
       triples.append(
         (
-          row: row, col: PlanSheetGeometry.dayColumns(day).nameCol,
+          row: row, col: PlanSheetGeometry.dayColumns(day, offset: offset).nameCol,
           value: .number(serialBase + Double(day))
         ))
     }
@@ -25,7 +26,7 @@ private struct GridBuilder {
     row: Int, day: Int, name: String? = nil, sets: String? = nil, intensity: String? = nil,
     float1: String? = nil
   ) {
-    let columns = PlanSheetGeometry.dayColumns(day)
+    let columns = PlanSheetGeometry.dayColumns(day, offset: offset)
     if let name { triples.append((row: row, col: columns.nameCol, value: .text(name))) }
     if let sets { triples.append((row: row, col: columns.setsCol, value: .text(sets))) }
     if let intensity {
@@ -89,4 +90,19 @@ private func makeFixtureGrid() -> CellGrid {
   let week2Day0 = plan.weeks[1].days[0]
   #expect(week2Day0.exercises.first?.rawName == "卧推")
   #expect(week2Day0.exercises.first?.sets.count == 5)
+}
+
+@Test func parsesRightShiftedSheetAtDetectedOffset() {
+  // 邓天平.xlsx: the whole day grid is one column to the right (offset 2). The
+  // locked offset-1 geometry saw 0 weeks here; detection must pick offset 2.
+  var builder = GridBuilder(offset: 2)
+  builder.dateRow(1, serialBase: 46_020)
+  builder.cell(row: 2, day: 0, name: "传统硬拉", sets: "3*5")
+  builder.cell(row: 2, day: 3, name: "深蹲", sets: "1*5", intensity: "150")
+  let plan = PlanSheetParser.parse(CellGrid(builder.triples))
+
+  #expect(plan.weeks.count == 1)
+  #expect(plan.weeks[0].days[0].exercises.map(\.rawName) == ["传统硬拉"])
+  #expect(plan.weeks[0].days[0].exercises.first?.sets.count == 3)
+  #expect(plan.weeks[0].days[3].exercises.first?.rawName == "深蹲")
 }
