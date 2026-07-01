@@ -1,8 +1,11 @@
 import Foundation
+import OSLog
 import SwiftData
 
 @MainActor
 public final class DraftStore {
+  private static let logger = Logger(subsystem: "com.meetpr.app.coachkit", category: "drafts")
+
   public let modelContainer: ModelContainer
   private let context: ModelContext
   private let stateDefaults: UserDefaults?
@@ -34,7 +37,16 @@ public final class DraftStore {
     do {
       return try DraftStore(modelContainer: makeModelContainer(isStoredInMemoryOnly: false))
     } catch {
-      fatalError("Unable to create persistent draft store: \(error)")
+      // A schema mismatch (models changed across an app update) or a corrupt store must not
+      // crash-loop the app on every launch. Drafts are in-progress and recoverable, so degrade
+      // to an in-memory store — planning still works this session — and log loudly. A durable
+      // VersionedSchema + MigrationPlan is the real fix (tracked separately).
+      logger.error("persistent draft store unavailable, using in-memory fallback: \(error)")
+      do {
+        return try DraftStore(modelContainer: makeModelContainer(isStoredInMemoryOnly: true))
+      } catch {
+        fatalError("Unable to create even an in-memory draft store: \(error)")
+      }
     }
   }()
 
