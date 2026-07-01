@@ -59,8 +59,15 @@ public final class Session {
       state = .authenticated(cachedUser)
     } catch {
       Self.logger.warning("bootstrap_refresh_failed \(String(describing: error))")
-      await tokenStore.clear()
-      state = .anonymous
+      // Only a server-confirmed invalid/expired refresh token should force logout. Transient
+      // failures (offline, timeout, 5xx) must not: keep the stored credentials and stay signed
+      // in on the cached user, so a flaky connection at launch doesn't boot the user to login.
+      if (error as? AuthRepositoryError)?.clearsBootstrapSession ?? false {
+        await tokenStore.clear()
+        state = .anonymous
+      } else {
+        state = .authenticated(cachedUser)
+      }
     }
   }
 

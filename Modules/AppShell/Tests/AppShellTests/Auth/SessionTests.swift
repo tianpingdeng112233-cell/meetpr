@@ -55,7 +55,7 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bootstrapWithNetworkRefreshFailureClearsStoreAndReturnsAnonymous() async {
+@Test func bootstrapWithNetworkRefreshFailureKeepsSessionAndCredentials() async {
   let user = AuthTestSupport.user()
   let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
   let repository = InMemoryAuthRepository(forcedError: .network)
@@ -63,8 +63,41 @@ import Testing
 
   await session.bootstrap()
 
+  // A transient network failure must not force logout — stay signed in on the cached user
+  // and keep the stored credentials so the next launch/refresh can recover.
+  #expect(session.state == .authenticated(user))
+  #expect(await store.refreshToken() == "refresh")
+  #expect(await store.cachedUser() == user)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func bootstrapWithServerErrorKeepsSessionAndCredentials() async {
+  let user = AuthTestSupport.user()
+  let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
+  let repository = InMemoryAuthRepository(forcedError: .server(statusCode: 503))
+  let session = Session(auth: repository, tokenStore: store)
+
+  await session.bootstrap()
+
+  // A 5xx is transient too — do not evict the user.
+  #expect(session.state == .authenticated(user))
+  #expect(await store.refreshToken() == "refresh")
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func bootstrapWithExpiredRefreshClearsStoreAndReturnsAnonymous() async {
+  let user = AuthTestSupport.user()
+  let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
+  let repository = InMemoryAuthRepository(
+    forcedError: .backend(statusCode: 401, code: .refreshExpired, issues: []))
+  let session = Session(auth: repository, tokenStore: store)
+
+  await session.bootstrap()
+
+  // A server-confirmed expired refresh token is the one case that should force logout.
   #expect(session.state == .anonymous)
-  #expect(await store.accessToken() == nil)
   #expect(await store.refreshToken() == nil)
   #expect(await store.cachedUser() == nil)
 }
