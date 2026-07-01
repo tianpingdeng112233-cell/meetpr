@@ -55,12 +55,17 @@ jobs:
         id: time-start
         run: echo "value=$(date +%s)" >> "$GITHUB_OUTPUT"
 
-      - name: Cache SPM build artifacts
+      - name: Cache SPM + Xcode dependency artifacts
         uses: actions/cache@v4
         with:
+          # Safe-to-reuse artifacts only: resolved/checked-out SPM dependencies (for both
+          # `swift test` and the fixed-path xcodebuild DerivedData) + the compiler module
+          # cache. Deliberately NOT caching DerivedData/Build products — that's the bigger
+          # time win but risks stale builds and is GB-sized; opt into it separately once measured.
           path: |
             Modules/*/.build
-            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
+            DerivedData/SourcePackages
+            ~/Library/Developer/Xcode/DerivedData/ModuleCache.noindex
             ~/Library/Caches/org.swift.swiftpm
           key: ${{ runner.os }}-spm-${{ hashFiles('Modules/*/Package.swift', 'MeetPR.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: |
@@ -85,9 +90,13 @@ jobs:
       - name: Select test simulator
         id: simulator
         run: |
-          simulator_name="iPhone 15"
-          if ! xcrun simctl list devices available | grep -q "$simulator_name"; then
-            simulator_name=$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ { gsub(/^[ \t]+|[ \t]+$/, "", $1); print $1; exit }')
+          # Pick the first available iPhone on the runner image. Hard-coding "iPhone 15"
+          # missed on macos-15 (Xcode 16 ships iPhone 16), forcing a failed grep + this
+          # same awk fallback every run — so do the awk directly and fail loudly if none.
+          simulator_name=$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ { gsub(/^[ \t]+|[ \t]+$/, "", $1); print $1; exit }')
+          if [ -z "$simulator_name" ]; then
+            echo "::error::No available iPhone simulator on this runner image"
+            exit 1
           fi
           echo "name=$simulator_name" >> "$GITHUB_OUTPUT"
           echo "Using simulator: $simulator_name"
@@ -98,6 +107,7 @@ jobs:
             -project MeetPR.xcodeproj \
             -scheme MeetPR \
             -destination "platform=iOS Simulator,name=${{ steps.simulator.outputs.name }}" \
+            -derivedDataPath DerivedData \
             -enableCodeCoverage YES \
             -resultBundlePath TestResults.xcresult \
             test
