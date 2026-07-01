@@ -13,70 +13,31 @@
 
 跳过第 2 步 = FOLLOWUPS 变黑洞。
 
-## ⚠️ Recent design changes (2026-04-28)
+## 项目阶段(2026-07 · TestFlight 内测中)
 
-Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach planning 相关 spec 必须按新方向写**：
+**双端 app 已实装并上 TestFlight 内测。** 学员端 + 教练端全套功能落地,backend 在阿里云 SAE 运行,1.0 系列 build 持续迭代。旧的 V0 节奏(「教练 demo only、不接 backend、不开学员端」)已完全走完 —— **别再按它裁剪 spec**。
 
-- iPhone 7b = **周卡片横滑** (`TabView(.page)`，4 张卡片 W1↔W2↔W3↔W4)，**不是** v4.3 设计的 4 周扫视态
-- iPhone 7c = **学员历史 cycle 列表入口**（数据回查），**不是** drill-down 编辑态
-- iPhone **不做** 4 周宏观视图、跨 cycle 视觉对比、多学员 dashboard——全部在网页端
-- **网页端教练后台**（V1.x defer，[PD-007](~/Brain/wiki/projects/MeetPR/product-decisions/007-web-companion-macro-analytics.md)）承担所有宏观能力，hard gate 在 lifecycle Stage 4 Week 22-24
+- **发布状态**:1.0(5) 已 archive + 上传 App Store Connect,待内测组生效([PR #197](https://github.com/tianpingdeng112233-cell/meetpr/pull/197));1.0(6) 在备。App id `6783772277`,内测组 **Neice**(内部组免审)/ **Ceshi**(外部组需审)。发布史见 ship 分支 [RELEASES.md](./RELEASES.md),进行中版本见 [NEXT-RELEASE.md](./NEXT-RELEASE.md)。
+- **已实装(两端全套)**:
+  - **学员端**:仪表盘 / 锻炼周月日历 / 进度中心 / 逐组记录(弹窗录入 + 杠铃配重图)/ e1RM 成长曲线 / 训练视频反馈(spec 034-039、042)
+  - **教练端**:分诊 strip + 规划工作区(spec 037/038)/ 训练视频反馈 inbox(042)/ 卧推配重计算器 / 每组休息计时(040)/ 失败·未完成组记录(039)/ Excel 存量计划导入(043)
+  - 全 UI 按设计包 **1:1 重做**(#180),系统中文动作名(#198)
+- **backend**:auth + 教练规划 CRUD + spec 043 导入 + analytics 数据层,跑在阿里云 SAE staging(**非 frozen**,随 iOS spec 演进;当前固定入口 `http://121.40.160.241:3000`,TLS/域名收敛见 backend `FOLLOWUPS.md`)
+- **核心 ADR**:双端架构 / 后端选型 / iOS 架构 / macro API / 网页框架 / SwiftData 例外 —— 全在 `~/Brain/wiki/projects/MeetPR/decisions/`
 
-**权威源**（按这个顺序读）：
-1. `~/Brain/wiki/projects/MeetPR/coach-planning.md` §7b/7c/7d **v4.4**
-2. `~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md`（iPhone 不再消费 macro endpoint，但 API 设计仍 valid）
-3. `~/Brain/wiki/projects/MeetPR/meetings/2026-04-28-office-hours-iphone-macro-pivot.md`（pivot 完整记录 + 7 议题处置表）
+> **发版铁律**:archive + 上传 App Store Connect 始终 **David 手动**,从含改动的 **ship worktree** 出包(build 号 `CURRENT_PROJECT_VERSION` 必须严格递增,否则 Apple 拒)。别从落后 `origin/main` 的 worktree 打包。每完成一个改动主动问 David 要不要进下一个内测包。
 
-**已废弃**（不要参考）：
-- v4.3 §7b 4 周扫视态设计（波形 + 变式矩阵 + 密度条）
-- v4.2 §7b Excel grid 仅作为 web V1.0 layout reference 保留，**不是** iPhone 实装目标
+## iPhone vs 网页端边界(仍有效的架构约束)
 
-**对昨天 (2026-04-27) 已合并代码的影响**：零冲突。bootstrap (#14) / CoreModels identity (#17) / DesignSystem 14 atomic 组件 (#18) 全部基础设施级，与 coach planning UI 无交集。可放心继续基于这些写下游 spec。
+- iPhone **不做** 4 周宏观视图、跨 cycle 视觉对比、多学员 dashboard —— 这些全在网页端教练后台([PD-007](~/Brain/wiki/projects/MeetPR/product-decisions/007-web-companion-macro-analytics.md),V1.x defer,hard gate 在后期)
+- iPhone 侧聚焦单学员规划(周卡片横滑 + 历史 cycle 回查)+ 执行;教练宏观分析能力 defer 到网页端
+- 完整设计 pivot 记录见 `~/Brain/wiki/projects/MeetPR/meetings/2026-04-28-office-hours-iphone-macro-pivot.md`
 
-## 项目阶段
+### 仍在 defer(动工前先回规划 session 确认,别擅自开)
 
-**Stage 2 Engineering Build 进行中**(详见 [[lifecycle-stages|lifecycle-stages.md]] §3,Week 0-12)。
-
-### 🎯 V0 TestFlight north star — hard deadline **2026-06-20** / soft target **2026-05-20**
-
-- **Hard 6/20**:真 ship deadline,40 天 buffer 不变,W23-25 release engineering 周表是这条路径的节奏(详见下表)
-- **Soft 5/20**(2026-05-11 加):内部努力把 W23-25 压到 9 天加速窗口里跑完;Apple 审核 24-48h~7d 不可控,达不到则回 hard deadline 节奏,**不是 ship gate**
-
-**所有 spec 决策按"是否在 V0 路径上"裁剪。** V0 路径 = `启动 → 登录 → 教练规划 Step 0-7(周卡片横滑) → 本机 DraftStore 保存`,**不接 backend,不开学员端**。详见 [[~/Brain/wiki/projects/MeetPR/roadmap|roadmap.md]]。
-
-### 当前完成态(2026-05-13)
-
-- **8 SPM module + 14 atomic 组件** foundation 就位
-- **已完整实装 + 合并 spec**(12 个):
-  - [001 bootstrap](./specs/001-bootstrap) / [002 CoreModels identity](./specs/002-core-models-identity) / [003 design system](./specs/003-design-system-foundation) / [004 training plan domain](./specs/004-core-models-training-plan)
-  - [005 coach planning step 0-3](./specs/005-coach-planning-step-0-3) / [006 step 4 accessories](./specs/006-coach-planning-step-4-accessories) / [**007 step 5-7 week-card-swipe**](./specs/007-coach-planning-step-5-7-week-card-swipe) — coach 规划 UI **0-7 步全可点**(close-out 2026-05-10,impl PR #37)
-  - [011 auth UI flow](./specs/011-auth-ui-flow) — 登录 / 注册 / role-routed root
-  - [**020 V0 demo orchestration**](./specs/020-v0-demo-orchestration) — SPEC + impl 全合 main 2026-05-10(spec PR #39 + impl PR #41);DemoAuthRepository / DemoTokenStore / DEMO_MODE build config 全就位
-  - [**021 Apple readiness assets + signing**](./specs/021-apple-readiness-assets-and-signing) — AppIcon / LaunchScreen / PrivacyInfo.xcprivacy / signing build settings / archive 前置物就位
-  - [**022 exercise library v2 import**](./specs/022-exercise-library-v2-import) — 动作库 v2 catalog 已导入(435 imported + 3 synthetic = 438),CoachKit bundle resource + enum schema 已同步
-  - [**023 planning numeric input**](./specs/023-planning-numeric-input) — Step 5 内 4 处数字栏(组数/次数/次数上限/RPE)换为 `PlanningCountPicker` iOS 转盘 + inline 展开;Step 6 内 2 处(weekly increment / custom 周值)换为 `PlanningNumberField` `[-][TextField][+]` sandwich(impl PR #54)
-- **Backend**: auth + coach planning CRUD 已合 staging(❄️ **FROZEN**,详见 [`MeetPR-backend/CLAUDE.md`](~/Projects/apps/MeetPR-backend/CLAUDE.md) 顶部 callout)
-- **核心 ADR**(8 个):[ADR-003](~/Brain/wiki/projects/MeetPR/decisions/003-dual-end-native-architecture.md) 双端架构 / [ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型 / [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构 / [ADR-006](~/Brain/wiki/projects/MeetPR/decisions/006-macro-aggregation-api.md) macro API / [ADR-007](~/Brain/wiki/projects/MeetPR/decisions/007-web-framework-selection.md) 网页框架 / [ADR-009](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md) SwiftData 例外
-
-## 下一步(按 V0 roadmap 严格执行)
-
-权威源:[[~/Brain/wiki/projects/MeetPR/roadmap|roadmap.md]] §V0 周计划。
-
-| 周 | 关键路径 | Status |
-|---|---|---|
-| W20(5/11-5/17,提前 5/9-5/10 完成)| spec 007 implementation(W1 强度 + 周卡片横滑)| ✅ DONE(impl PR #37 + finalize PR #38)|
-| W21(5/18-5/24,实际 5/10 起步并完成)| spec 020 V0 demo orchestration | ✅ DONE(spec PR #39 + impl PR #41,Demo build 启动直接 CoachRootView)|
-| **W22**(5/25-5/31,提前 5/10 完成)| spec 021 Apple readiness assets + signing | ✅ DONE(AppIcon / LaunchScreen / PrivacyInfo / automatic signing / archive path ready) |
-| W23-25(6/1-6/20)| Release engineering: archive export → App Store Connect upload → TestFlight → Apple 审核 → ship | ⏭ NEXT |
-
-### ❄️ 硬冻结(本 session 不要尝试)
-
-- ❌ **新 backend feature**:除非 iOS 有具体 spec 必须调某 endpoint。详见 [`MeetPR-backend/CLAUDE.md`](~/Projects/apps/MeetPR-backend/CLAUDE.md) 顶部
-- ❌ **meetcard 新功能**:V1 已 ship xty,post-V1 仅修 P0 bug,等 iOS V0 ship 再启动。详见 `~/Projects/apps/meetcard/README.md` 顶部
-- ❌ **网页端教练后台**:Stage 4 hard gate,V0 完全无关
-- ❌ **学员端 view**:V0.1 起;V0 = 教练 demo only
-- ❌ **不在 V0 路径上的 refactor / cleanup**:V0 ship 后再清
-- ❌ **Apple Developer membership / Stage A-I release engineering**:User 2026-05-12 决策"还剩一周再开",自动提醒走 [F-026](./FOLLOWUPS.md);本 session 不要主动 propose Stage A 任何环节
+- **网页端教练宏观后台**:PD-007,后期 hard gate
+- **教练驾驶舱净增量**:V0.2 defer(今日分诊 + 聪明信号 + 助理层),权威在 wiki `coach-cockpit.md`(教练地板 + 今日 tab 已 ship,别重做)
+- **meetcard 新功能**:V1 已 ship xty,post-V1 仅修 P0 bug
 
 ## 角色
 
@@ -135,7 +96,7 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 - `swift-package`
 - `ui-automation`
 
-规划阶段暂无 scheme / project 默认值。一旦 Xcode 项目生成，典型流程：
+项目已就位(scheme `MeetPR`;另有 `Demo` configuration 带 `-D DEMO_MODE`,跑 Demo build 时 XcodeBuildMCP 必须**显式** `configuration=Demo`,否则默认 Debug 无 DEMO_MODE 会撞真 backend)。典型流程：
 
 1. `session_set_defaults` 记住 project + scheme + simulator
 2. `build_run_sim` 构建并在模拟器跑起来
