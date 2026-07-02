@@ -47,7 +47,7 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
 
 @Test func recoverySummaryUsesWikiScaleLabels() {
   #expect(
-    OnboardingSummaryFormatter.recovery(fullProfile()) == "强度:中等 压力:较高 恢复:正常 睡眠:7h")
+    OnboardingSummaryFormatter.recovery(fullProfile()) == "强度:中等 压力:较高 恢复:约2天 睡眠:7h")
 }
 
 @Test func materialsSummaryHidesZeroUploads() {

@@ -15,10 +15,10 @@ private func fullCatalog() -> [Exercise] {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bundledAliasSeedHasThirtyFiveEntries() {
+@Test func bundledAliasSeedHasThirtyFourEntries() {
   let table = ExerciseAliasTable.bundled()
   #expect(table.version == 1)
-  #expect(table.aliases.count == 35)
+  #expect(table.aliases.count == 34)
 }
 
 // Guardrail: every canonical must fold-resolve to exactly one exercise in the full
@@ -75,6 +75,22 @@ func newCatalogExercisesBindExactly(name: String) {
     aliases: ExerciseAliasTable.bundled()
   )
   #expect(match?.name == name)
+}
+
+// David 2026-07-02 拍板: 单腿硬拉 and 单腿RDL(现名 单腿罗马尼亚硬拉) are two distinct
+// exercises — do not merge or re-alias one onto the other.
+@available(iOS 17.0, macOS 14.0, *)
+@Test func singleLegDeadliftAndSingleLegRDLStayDistinct() {
+  let catalog = fullCatalog()
+  let aliases = ExerciseAliasTable.bundled()
+  let deadlift = ExerciseMatcher.resolve(rawName: "单腿硬拉", catalog: catalog, aliases: aliases)
+  let rdl = ExerciseMatcher.resolve(rawName: "单腿罗马尼亚硬拉", catalog: catalog, aliases: aliases)
+  #expect(deadlift?.name == "单腿硬拉")
+  #expect(rdl?.name == "单腿罗马尼亚硬拉")
+  #expect(deadlift?.id != rdl?.id)
+  // The old cross-wiring alias must stay deleted (it would be shadowed by the
+  // exact catalog name anyway, but its presence would re-encode the wrong ontology).
+  #expect(!aliases.aliases.contains { $0.alias == "单腿罗马尼亚硬拉" })
 }
 
 // A genuinely unknown name binds to nothing (①②) yet still surfaces folded-substring

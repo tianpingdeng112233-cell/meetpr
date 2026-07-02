@@ -22,11 +22,7 @@ struct Step4EnvironmentSection: View {
       )
       tierPicker
       if draft.gymTier != nil {
-        OnboardingChipGrid(
-          title: "器械微调(按场馆预填,可调整)",
-          options: EquipmentCatalog.items.map { ($0.token, $0.label) },
-          selection: $draft.equipmentOverrides
-        )
+        equipmentSection
       }
     }
     .confirmationDialog(
@@ -75,9 +71,15 @@ struct Step4EnvironmentSection: View {
       selectTier(tier)
     } label: {
       HStack {
-        Text(OnboardingLabels.label(tier))
-          .font(Font.MeetPR.body)
-          .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+        VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+          Text(OnboardingLabels.label(tier))
+            .font(Font.MeetPR.body)
+            .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+          Text(Self.tierSubtitle(tier))
+            .font(Font.MeetPR.caption)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .multilineTextAlignment(.leading)
+        }
         Spacer()
         if isSelected {
           Image(systemName: "checkmark.circle.fill")
@@ -93,6 +95,63 @@ struct Step4EnvironmentSection: View {
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
     .buttonStyle(.plain)
+  }
+
+  /// One-line "你能做什么" summary per tier (research: 让学员一眼自判;
+  /// wiki domain/gym-tier-equipment-research.md §4b).
+  private static func tierSubtitle(_ tier: GymTier) -> String {
+    switch tier {
+    case .homeWithRack: "家里有深蹲架和杠铃,自己安排训练"
+    case .commercial: "连锁 / 综合健身房 — 有架有杠,力量举专项器械通常没有"
+    case .professional: "力量举专项馆 — 专项杆、微增片、专项机齐全,可做全部变式"
+    }
+  }
+
+  // MARK: - Equipment checklist (grouped, spec 032 D3 v2 vocabulary)
+
+  private var equipmentSection: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+        OnboardingFieldLabel(title: "器械微调")
+        Text("按场馆预填 — 勾掉没有的、补上有的,不确定就保持默认")
+          .font(Font.MeetPR.caption)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+      equipmentChipGrid("基础", .basics)
+      OnboardingChoiceCards(
+        title: "哑铃最大重量",
+        options: EquipmentCatalog.items(in: .dumbbellMax).map {
+          ($0.token, $0.label.replacingOccurrences(of: "哑铃 ", with: ""))
+        },
+        selection: dumbbellMaxSelection
+      )
+      equipmentChipGrid("固定器械", .machines)
+      equipmentChipGrid("力量举专项", .powerlifting)
+    }
+  }
+
+  private func equipmentChipGrid(_ title: String, _ group: EquipmentItem.Group) -> some View {
+    OnboardingChipGrid(
+      title: title,
+      options: EquipmentCatalog.items(in: group).map { ($0.token, $0.label) },
+      selection: $draft.equipmentOverrides
+    )
+  }
+
+  /// The dumbbell cap is a bucket, not independent switches: picking one
+  /// replaces whichever bucket token is currently in the overrides.
+  private var dumbbellMaxSelection: Binding<String?> {
+    Binding(
+      get: {
+        draft.equipmentOverrides.first { EquipmentCatalog.dumbbellMaxTokens.contains($0) }
+      },
+      set: { newValue in
+        draft.equipmentOverrides.removeAll { EquipmentCatalog.dumbbellMaxTokens.contains($0) }
+        if let newValue {
+          draft.equipmentOverrides.append(newValue)
+        }
+      }
+    )
   }
 
   private func selectTier(_ tier: GymTier) {

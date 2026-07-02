@@ -11,7 +11,7 @@ struct Step5RecoverySection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       OnboardingScalePicker(
-        title: "日常生活强度",
+        title: "学习/工作强度",
         labels: OnboardingLabels.dailyLifeIntensityLabels,
         notch: $draft.dailyLifeIntensity,
         isHighlighted: highlighted.contains("daily_life_intensity"),
@@ -24,10 +24,11 @@ struct Step5RecoverySection: View {
         isHighlighted: highlighted.contains("life_stress")
       )
       OnboardingScalePicker(
-        title: "恢复速度",
+        title: "练后恢复时长",
         labels: OnboardingLabels.recoverySpeedLabels,
         notch: $draft.recoverySpeed,
-        isHighlighted: highlighted.contains("recovery_speed")
+        isHighlighted: highlighted.contains("recovery_speed"),
+        footnote: "回想大强度练腿或爬山后,酸痛疲惫多久消退到能再练 — 拿不准就选 3"
       )
       OnboardingScalePicker(
         title: "睡眠时长",
