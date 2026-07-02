@@ -2114,7 +2114,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007f",
-    "name": "哑铃推肩",
+    "name": "哑铃坐姿推肩",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2817,7 +2817,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a4",
-    "name": "颈后下拉",
+    "name": "颈后高位下拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -10288,25 +10288,6 @@
     ],
     "movementPattern": [
       "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:24:05Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000231",
-    "name": "宽距高位下拉",
-    "nameEn": "Wide-Grip Lat Pulldown",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "vertical_pull"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:24:05Z"
@@ -23684,5 +23665,82 @@
     "createdByCoachId": null,
     "createdAt": "2026-06-24T00:00:00Z",
     "nameEn": "Safety Bar Tempo Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000012",
+    "name": "坐姿宽握距划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-07-02T00:00:00Z",
+    "nameEn": "Seated Wide Grip Row"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000013",
+    "name": "节奏窄握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-07-02T00:00:00Z",
+    "nameEn": "Tempo Close Grip Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000014",
+    "name": "弹力带卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell",
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-07-02T00:00:00Z",
+    "nameEn": "Banded Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000015",
+    "name": "宽握距罗马尼亚硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-07-02T00:00:00Z",
+    "nameEn": "Wide Grip RDL"
   }
 ]
