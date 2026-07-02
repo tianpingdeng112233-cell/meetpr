@@ -743,25 +743,6 @@
     "nameEn": "Deficit Conv. Deadlift"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000031",
-    "name": "相扑站高 (下陷)硬拉",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Deficit Sumo Deadlift"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000032",
     "name": "Jefferson 硬拉",
     "exerciseType": "main_lift_variation",
@@ -2531,25 +2512,6 @@
     "nameEn": "Incline DB Bench"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000095",
-    "name": "器械胸推",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "machine"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Machine Chest Press"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000096",
     "name": "蝴蝶机夹胸",
     "exerciseType": "accessory",
@@ -3118,25 +3080,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "One-Arm Cable Row"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000000b4",
-    "name": "彭德雷划船（潘德雷）",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back"
-    ],
-    "equipment": [
-      "other"
-    ],
-    "movementPattern": [
-      "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pendlay Row"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000b5",
@@ -4241,25 +4184,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Walking Lunges"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000000f1",
-    "name": "摆锤深蹲",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "machine"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pendulum Squat"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000f2",
@@ -8297,44 +8221,6 @@
     "createdAt": "2026-05-14T12:52:23Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-0000000001ca",
-    "name": "绳索十字夹胸",
-    "nameEn": "Cable Crossover",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T12:52:23Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000001cb",
-    "name": "绳索夹胸",
-    "nameEn": "Cable Fly",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T12:52:23Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-0000000001cc",
     "name": "平板绳索夹胸",
     "nameEn": "Flat Cable Fly",
@@ -9545,26 +9431,6 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020b",
     "name": "射手俯卧撑",
-    "nameEn": "Archer Push-Up",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest",
-      "triceps"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:14:43Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000020c",
-    "name": "单侧射手俯卧撑",
     "nameEn": "Archer Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
@@ -11466,25 +11332,6 @@
     "id": "00000000-0000-0000-ca70-00000000026f",
     "name": "弹力绳-俯身划船",
     "nameEn": "Band Bent-Over Row",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:24:05Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000270",
-    "name": "弹力绳-坐姿划船",
-    "nameEn": "Band Seated Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13436,25 +13283,6 @@
     ],
     "movementPattern": [
       "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:36:47Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000002d6",
-    "name": "弹力带-腿外展",
-    "nameEn": "Band Hip Abduction",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hip"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "other"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:36:47Z"
@@ -23588,25 +23416,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-06-24T00:00:00Z",
     "nameEn": "Australian Pull-up"
-  },
-  {
-    "id": "00000000-0000-0000-ca71-00000000000e",
-    "name": "臀推",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-06-24T00:00:00Z",
-    "nameEn": "Barbell Hip Thrust"
   },
   {
     "id": "00000000-0000-0000-ca71-00000000000f",
