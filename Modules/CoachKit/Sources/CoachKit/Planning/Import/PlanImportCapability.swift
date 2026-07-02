@@ -1,15 +1,16 @@
 import Foundation
 
-// Gates the plan-import entry point (spec 043 §G deployment note). Import depends
-// on the backend PR that widens `plan_weeks`/`week_number` and persists
-// `coach_note`; until that ships, a pre-043 backend rejects `plan_weeks != {1,4}`
-// and silently drops the cue. So the entry stays hidden by default and is flipped
-// on only once the backend capability is known live.
+// Gates the plan-import entry point (spec 043 §E1/§G). In-app xlsx import is
+// frozen (2026-07-02): the web plan editor is the single import path, so xlsx
+// parsing lives in one place instead of two (SheetJS there vs CoreXLSX here —
+// every coach-workbook quirk would need fixing twice). The parser plus its
+// hardening (`feat/043-import-format-hardening`, pushed) stay dormant, not
+// deleted, mirroring the evaluation-period defer.
 //
 // This is a real gate, not advisory: when `false`, `ImportEntryButton` renders
-// nothing, so the feature cannot be reached.
+// greyed-out and inert, so the flow cannot be reached.
 enum PlanImportCapability {
-  /// `true` once the backend that supports arbitrary weeks + `coach_note` is
-  /// deployed. Kept `false` until then; override in previews/tests as needed.
+  /// `false` while in-app import is frozen in favour of the web editor. Flip to
+  /// `true` to re-enable the full flow; override in previews/tests as needed.
   static var isEnabled: Bool = false
 }

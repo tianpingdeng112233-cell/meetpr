@@ -2,10 +2,10 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
-/// Workbench entry for plan import (spec 043 §E1). Hidden entirely until the
-/// backend capability is live (`PlanImportCapability.isEnabled`) so the feature
-/// cannot be reached before the widening migration ships. Tapping it opens the
-/// flow: pick a student, then the import-review sheet for that student.
+/// Workbench entry for plan import (spec 043 §E1). Shown greyed-out and inert
+/// while `PlanImportCapability.isEnabled` is false — in-app import is frozen in
+/// favour of the web plan editor, which owns xlsx parsing. When enabled, tapping
+/// opens the flow: pick a student, then the import-review sheet for that student.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct ImportEntryButton: View {
@@ -16,21 +16,19 @@ struct ImportEntryButton: View {
   @State private var isPresenting = false
 
   var body: some View {
-    if PlanImportCapability.isEnabled {
-      SecondaryButton("导入计划", isFullWidth: true) {
-        isPresenting = true
-      }
-      .sheet(isPresented: $isPresenting) {
-        ImportFlowView(
-          repository: repository,
-          now: now,
-          onPublished: {
-            isPresenting = false
-            onPublished()
-          },
-          onCancel: { isPresenting = false }
-        )
-      }
+    SecondaryButton("导入计划", isDisabled: !PlanImportCapability.isEnabled, isFullWidth: true) {
+      isPresenting = true
+    }
+    .sheet(isPresented: $isPresenting) {
+      ImportFlowView(
+        repository: repository,
+        now: now,
+        onPublished: {
+          isPresenting = false
+          onPublished()
+        },
+        onCancel: { isPresenting = false }
+      )
     }
   }
 }
