@@ -135,11 +135,15 @@ private struct OnboardingProfileGroups: View {
     groupCard("训练环境") {
       row("训练日", trainingDaysText)
       row("训练环境", profile.gymTier.map(CoachOnboardingDisplay.gymTierText))
-      // Raw iOS-owned tokens (vocab owned by 031's EquipmentCatalog).
+      // iOS-owned tokens (vocab owned by 031's EquipmentCatalog) rendered
+      // through the CoachKit label mirror; unknown tokens fall through raw.
       row(
         "器械备注",
         profile.equipmentOverrides.isEmpty
-          ? nil : profile.equipmentOverrides.joined(separator: ", "))
+          ? nil
+          : profile.equipmentOverrides
+            .map(CoachOnboardingDisplay.equipmentLabel)
+            .joined(separator: "、"))
     }
   }
 
