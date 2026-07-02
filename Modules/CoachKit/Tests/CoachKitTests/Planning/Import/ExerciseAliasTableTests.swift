@@ -15,10 +15,10 @@ private func fullCatalog() -> [Exercise] {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bundledAliasSeedHasTwentySixEntries() {
+@Test func bundledAliasSeedHasThirtyFiveEntries() {
   let table = ExerciseAliasTable.bundled()
   #expect(table.version == 1)
-  #expect(table.aliases.count == 26)
+  #expect(table.aliases.count == 35)
 }
 
 // Guardrail: every canonical must fold-resolve to exactly one exercise in the full
@@ -45,6 +45,16 @@ private func fullCatalog() -> [Exercise] {
   ("相扑硬拉", "比赛式相扑硬拉"),  // → synthetic competition lift
   ("窄推", "窄握卧推"),  // 缺字
   ("长暂停卧推", "暂停卧推"),  // 词序 / 修饰
+  // Pre-rename RDL/罗拉 spellings keep binding after the 罗马尼亚硬拉 catalog rename.
+  ("弹力带绕髋RDL", "弹力带绕髋罗马尼亚硬拉"),
+  ("抓举握距RDL", "抓举握距罗马尼亚硬拉"),
+  ("前后站单腿罗拉", "前后站单腿罗马尼亚硬拉"),
+  ("相扑RDL", "相扑罗马尼亚硬拉"),
+  ("节奏RDL", "节奏罗马尼亚硬拉"),
+  ("单腿RDL", "单腿罗马尼亚硬拉"),
+  ("单腿 RDL(纯单腿)", "单腿罗马尼亚硬拉(纯单腿)"),
+  ("B 站距 RDL", "B 站距罗马尼亚硬拉"),
+  ("单腿 RDL(B 站距)", "单腿罗马尼亚硬拉(B 站距)"),
 ])
 func aliasSeedRowsBindToCanonical(rawName: String, canonical: String) {
   let catalog = fullCatalog()
@@ -54,7 +64,10 @@ func aliasSeedRowsBindToCanonical(rawName: String, canonical: String) {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test(arguments: ["离心卧推", "弹力带窄推", "安全杠节奏深蹲"])
+@Test(arguments: [
+  "离心卧推", "弹力带窄推", "安全杠节奏深蹲",  // spec 043
+  "低杠位暂停深蹲", "低杠位节奏深蹲",  // catalog fix (ca71-…0010/0011)
+])
 func newCatalogExercisesBindExactly(name: String) {
   let match = ExerciseMatcher.resolve(
     rawName: name,
