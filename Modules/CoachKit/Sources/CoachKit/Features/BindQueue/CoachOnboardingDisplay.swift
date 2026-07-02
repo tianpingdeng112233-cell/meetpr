@@ -167,9 +167,9 @@ enum CoachOnboardingDisplay {
     "rack_pins_blocks": "架上销 / 垫块",
     "chains_bands": "链条 / 弹力带(变阻)",
     "ghr": "GHR(臀腿举)",
-    "reverse_hyper": "反向过伸机",
     "belt_squat": "腰带深蹲机",
-    // Retired v1 tokens (pre-2026-07 profiles).
+    // Retired tokens (pre-change profiles): v1 set + reverse_hyper (v2).
+    "reverse_hyper": "反向过伸机",
     "heavy_dumbbells": "哑铃区(>30kg)",
     "blocks_chains_bands": "块铃 / 链子 / 弹力带",
   ]
