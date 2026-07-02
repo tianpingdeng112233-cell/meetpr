@@ -4,10 +4,10 @@ import Testing
 
 @testable import StudentKit
 
-@Test func catalogHasTwentyFourUniqueTokensWithinZodBounds() {
+@Test func catalogHasTwentyThreeUniqueTokensWithinZodBounds() {
   let tokens = EquipmentCatalog.items.map(\.token)
-  #expect(tokens.count == 24)
-  #expect(Set(tokens).count == 24)  // zod uniqueItems
+  #expect(tokens.count == 23)
+  #expect(Set(tokens).count == 23)  // zod uniqueItems
   for token in tokens {
     #expect(!token.isEmpty)
     #expect(token.count <= 50)  // zod per-item max(50)
@@ -44,9 +44,9 @@ import Testing
   #expect(!prefill.contains("seal_row"))
 }
 
-@Test func professionalTierPrefillsTwentyOneItems() {
+@Test func professionalTierPrefillsTwentyItems() {
   let prefill = EquipmentCatalog.prefill(for: .professional)
-  #expect(prefill.count == 21)
+  #expect(prefill.count == 20)
   #expect(prefill.contains("power_bar_stiff"))
   #expect(prefill.contains("deadlift_bar"))
   #expect(prefill.contains("seal_row"))
@@ -65,6 +65,8 @@ import Testing
   #expect(!tokens.contains("calibrated_plates"))
   #expect(!tokens.contains("chalk_allowed"))
   #expect(!tokens.contains("combo_rack"))
+  // v2.2: dropped per David — 国内几乎没有,教练不会排进计划.
+  #expect(!tokens.contains("reverse_hyper"))
 }
 
 @Test func everyTierPrefillsExactlyOneDumbbellBucket() {
@@ -88,4 +90,5 @@ import Testing
   // overrides store the checked set verbatim, no migration on read).
   #expect(EquipmentCatalog.label(for: "heavy_dumbbells") == "哑铃区(>30kg)")
   #expect(EquipmentCatalog.label(for: "blocks_chains_bands") == "块铃 / 链子 / 弹力带")
+  #expect(EquipmentCatalog.label(for: "reverse_hyper") == "反向过伸机")
 }

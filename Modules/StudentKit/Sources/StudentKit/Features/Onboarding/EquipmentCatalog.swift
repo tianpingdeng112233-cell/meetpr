@@ -104,16 +104,16 @@ public enum EquipmentCatalog {
     EquipmentItem(
       token: "ghr", label: "GHR(臀腿举)", group: .powerlifting, tiers: [.professional]),
     EquipmentItem(
-      token: "reverse_hyper", label: "反向过伸机", group: .powerlifting, tiers: [.professional]),
-    EquipmentItem(
       token: "belt_squat", label: "腰带深蹲机", group: .powerlifting, tiers: [.professional]),
   ]
 
-  /// v1 tokens (13-item vocabulary) that were replaced in v2 — kept
-  /// label-resolvable so profiles saved before the change still render.
+  /// Retired tokens kept label-resolvable so profiles saved before a
+  /// vocabulary change still render: the v1 13-item set, plus
+  /// `reverse_hyper` (v2, dropped 2026-07-02 — David: 国内太罕见,教练不会排).
   private static let legacyLabels: [String: String] = [
     "heavy_dumbbells": "哑铃区(>30kg)",
     "blocks_chains_bands": "块铃 / 链子 / 弹力带",
+    "reverse_hyper": "反向过伸机",
   ]
 
   public static func items(in group: EquipmentItem.Group) -> [EquipmentItem] {
