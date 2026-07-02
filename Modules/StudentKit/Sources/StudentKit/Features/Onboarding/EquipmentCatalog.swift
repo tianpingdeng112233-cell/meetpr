@@ -60,7 +60,10 @@ public enum EquipmentCatalog {
     EquipmentItem(
       token: "smith_machine", label: "史密斯架", group: .machines, tiers: [.commercial]),
     EquipmentItem(
-      token: "cable_lat_pulldown", label: "拉力机 / 高位下拉", group: .machines,
+      token: "cable_crossover", label: "龙门架(大飞鸟)", group: .machines,
+      tiers: [.commercial, .professional]),
+    EquipmentItem(
+      token: "lat_pulldown", label: "高位下拉", group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
       token: "leg_press_machine", label: "倒蹬机 / 蹲举机", group: .machines,
@@ -108,12 +111,14 @@ public enum EquipmentCatalog {
   ]
 
   /// Retired tokens kept label-resolvable so profiles saved before a
-  /// vocabulary change still render: the v1 13-item set, plus
-  /// `reverse_hyper` (v2, dropped 2026-07-02 — David: 国内太罕见,教练不会排).
+  /// vocabulary change still render: the v1 13-item set, `reverse_hyper`
+  /// (dropped 2026-07-02), and `cable_lat_pulldown` (2026-07-02 split into
+  /// `cable_crossover` + `lat_pulldown`, relabeled 拉力机 → 龙门架).
   private static let legacyLabels: [String: String] = [
     "heavy_dumbbells": "哑铃区(>30kg)",
     "blocks_chains_bands": "块铃 / 链子 / 弹力带",
     "reverse_hyper": "反向过伸机",
+    "cable_lat_pulldown": "拉力机 / 高位下拉",
   ]
 
   public static func items(in group: EquipmentItem.Group) -> [EquipmentItem] {

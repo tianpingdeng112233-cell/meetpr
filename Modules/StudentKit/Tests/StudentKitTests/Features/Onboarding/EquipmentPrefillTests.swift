@@ -4,10 +4,10 @@ import Testing
 
 @testable import StudentKit
 
-@Test func catalogHasTwentyThreeUniqueTokensWithinZodBounds() {
+@Test func catalogHasTwentyFourUniqueTokensWithinZodBounds() {
   let tokens = EquipmentCatalog.items.map(\.token)
-  #expect(tokens.count == 23)
-  #expect(Set(tokens).count == 23)  // zod uniqueItems
+  #expect(tokens.count == 24)
+  #expect(Set(tokens).count == 24)  // zod uniqueItems
   for token in tokens {
     #expect(!token.isEmpty)
     #expect(token.count <= 50)  // zod per-item max(50)
@@ -32,21 +32,26 @@ import Testing
     ])
 }
 
-@Test func commercialTierPrefillsTenItems() {
+@Test func commercialTierPrefillsElevenItems() {
   let prefill = EquipmentCatalog.prefill(for: .commercial)
-  #expect(prefill.count == 10)
+  #expect(prefill.count == 11)
   #expect(prefill.contains("smith_machine"))
   #expect(prefill.contains("db_max_40"))
   #expect(prefill.contains("landmine"))
+  // Cable station + lat pulldown are separate tokens, both commercial.
+  #expect(prefill.contains("cable_crossover"))
+  #expect(prefill.contains("lat_pulldown"))
   // Research: 商业房无专项杆 / 微增片 / 海豹划船凳 → not prefilled.
   #expect(!prefill.contains("power_bar_stiff"))
   #expect(!prefill.contains("fractional_plates"))
   #expect(!prefill.contains("seal_row"))
 }
 
-@Test func professionalTierPrefillsTwentyItems() {
+@Test func professionalTierPrefillsTwentyOneItems() {
   let prefill = EquipmentCatalog.prefill(for: .professional)
-  #expect(prefill.count == 20)
+  #expect(prefill.count == 21)
+  #expect(prefill.contains("cable_crossover"))
+  #expect(prefill.contains("lat_pulldown"))
   #expect(prefill.contains("power_bar_stiff"))
   #expect(prefill.contains("deadlift_bar"))
   #expect(prefill.contains("seal_row"))
@@ -91,4 +96,6 @@ import Testing
   #expect(EquipmentCatalog.label(for: "heavy_dumbbells") == "哑铃区(>30kg)")
   #expect(EquipmentCatalog.label(for: "blocks_chains_bands") == "块铃 / 链子 / 弹力带")
   #expect(EquipmentCatalog.label(for: "reverse_hyper") == "反向过伸机")
+  // Split into cable_crossover + lat_pulldown 2026-07-02; old label kept.
+  #expect(EquipmentCatalog.label(for: "cable_lat_pulldown") == "拉力机 / 高位下拉")
 }
