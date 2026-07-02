@@ -97,7 +97,7 @@ struct CoachPlanningHomeView: View {
     .frame(maxWidth: .infinity, alignment: .leading)
   }
 
-  // MARK: - Import entry (spec 043 — gated to backend capability)
+  // MARK: - Import entry (spec 043 — frozen, greyed out; see PlanImportCapability)
 
   @ViewBuilder
   private var importEntry: some View {
