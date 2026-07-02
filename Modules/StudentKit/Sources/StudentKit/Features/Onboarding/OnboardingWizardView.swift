@@ -73,7 +73,7 @@ struct OnboardingWizardView: View {
   @Environment(\.dismiss) private var dismiss
 
   private static let stepTitles = [
-    "基础信息", "训练背景", "你有多强?", "训练环境", "恢复能力", "训练资料", "补充信息",
+    "基础信息", "训练背景", "你的三大项极限是多少?", "训练环境", "恢复能力", "训练资料", "补充信息",
   ]
 
   var body: some View {

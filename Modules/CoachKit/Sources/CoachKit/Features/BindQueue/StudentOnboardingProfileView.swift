@@ -157,7 +157,7 @@ private struct OnboardingProfileGroups: View {
         labels: CoachOnboardingDisplay.dailyLifeIntensityLabels)
       scaleRow("生活压力", profile.lifeStress, labels: CoachOnboardingDisplay.lifeStressLabels)
       scaleRow(
-        "恢复速度", profile.recoverySpeed, labels: CoachOnboardingDisplay.recoverySpeedLabels)
+        "练后恢复", profile.recoverySpeed, labels: CoachOnboardingDisplay.recoverySpeedLabels)
       scaleRow("睡眠", profile.sleepHours, labels: CoachOnboardingDisplay.sleepHoursLabels)
     }
   }

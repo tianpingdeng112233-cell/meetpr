@@ -138,7 +138,7 @@ enum CoachOnboardingDisplay {
 
   static let dailyLifeIntensityLabels = ["很低", "较低", "中等", "较高", "极高"]
   static let lifeStressLabels = ["几乎无", "较低", "中等", "较高", "极高"]
-  static let recoverySpeedLabels = ["很慢 (>72h)", "较慢", "正常", "较快", "很快 (<12h)"]
+  static let recoverySpeedLabels = ["3天以上", "约3天", "约2天", "约1天", "半天内"]
   static let sleepHoursLabels = ["≤5h", "6h", "7h", "8h", "9h+"]
 
   /// "●●●○○" dot strip for a 1-5 notch.
