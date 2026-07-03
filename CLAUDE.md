@@ -153,6 +153,12 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 - **禁止**：一次 commit 跨多个无关改动
 - **鼓励**：每写一个新决策（例如"为什么选 TCA 而不是 MVVM"）就沉淀到 `~/Brain/wiki/projects/MeetPR/decisions/` 里
 
+### 动作库(exercise catalog)维护策略
+
+- **唯一权威源 = `Modules/CoachKit/Sources/CoachKit/Resources/exercise-catalog-v2.json`**。增删动作 / 改名 / 改标签 / 去重,一律**直接手改这个 json + 开 PR**(catalog 是数据资产,走 JSON/fixture review:schema 对齐 Codable / id namespace 不冲突 / encode round-trip 不变)。
+- **`scripts/import-exercise-catalog-v2.py` 及其源 xlsx 是停更的一次性种子**,只用于最初导入。**别再动、别再跑重导**——现状 json 已在种子之上手工修了几十个 PR(命名 / 去重 / 标签),重跑导入会覆盖这些修正。
+- 别在 CI / 构建里加「从 xlsx 重新生成 json」的步骤;json 就是手维护的 source of truth。
+
 ## PR Codex review pass(Claude 写的任何 PR merge 前必经 Codex 互审)
 
 **触发**: 任何 PR(doc 或 code,`specs/NN/SPEC.md` / ADR / `CLAUDE.md` / `AGENTS.md` / `FOLLOWUPS.md` / README / 其他 `*.md` / `*.swift` / `Package.swift` / `*.json` / `*.py` / `project.pbxproj` 等)由 Claude 起草后,**开 PR 前必须先经 `/review-loop` 本地 Codex 互审收敛**(这就是真 gate);loop 收敛后 PR 级 Codex review pass **默认免跑**(见下方程序第 4 步)。
