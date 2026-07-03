@@ -165,6 +165,8 @@
 
 ### F-013 — Logo SVG / wordmark 真实资产落地
 
+> **🔄 进行中(2026-07-03 批注)**:PR [#184](https://github.com/tianpingdeng112233-cell/meetpr/pull/184) "Adopt Stacked Lockup logo for app icon and in-app mark" 正在推进 app icon + in-app mark 的真实 logo 落地,覆盖本条部分动作(占位资产替换)。触发条件视为已部分满足;#184 合并后复核剩余项(tinted AppIcon dark/light 渲染验证、onboarding splash)再决定整体关闭。
+
 - **触发条件**:真实 MeetPR wordmark / app mark 设计定稿,或首个 onboarding / marketing / App Store 截图 spec 进入 Ready
 - **动作**:
   1. 用真实 `meetpr-wordmark.svg` / `meetpr-mark.svg` 替换 design-bundle 占位资产
@@ -176,48 +178,6 @@
 - **创建于**:2026-04-27
 - **最后修订**:2026-05-11(并入 spec 021 P3-1 tinted AppIcon `#999` 占位)
 
-### F-025 — V0.1+ backend 启动前重新申请 RDS 单机版
-
-- **触发条件**:V0.1+ 阶段任一个 spec 需要 backend 真持久化(具体场景:学员端 spec 启动 / 真注册流程 spec / 教练 publish 计划 spec / 视频上传 spec 任一)
-- **背景**:试用版高可用系列 ¥580/月在 V0 阶段 overkill,2026-05-11 主动退订,实例 `pgm-bp1s6zj71e62vn01` 已释放
-- **动作**:
-  1. https://rdsnext.console.aliyun.com → 创建实例
-  2. 引擎 **PostgreSQL 17**,**基础版 / 单机版**(不是高可用),华东 1(杭州),专有网络 VPC
-  3. 规格 `pg.n2.2c.2m`(2 核 4G,跟原实例同款,V0.1+ 量级够)
-  4. 存储 50GB ESSD PL1(高性能)
-  5. **包年包月 1 年,开自动续费**(避免再次到期)
-  6. 创建后:
-     - 数据库名 `meetpr`(同原惯例)
-     - 高权限账号 `meetpr`,密码 Bitwarden generator 生成 24 位字母数字(避开阿里云不允许的特殊符号 `! " ' / \ @ : space`)
-     - 白名单先 `0.0.0.0/0` 开发用,**上线前收敛**
-     - SSL ❌ 关(开发);上线前必开
-  7. 更新 `~/Brain/wiki/projects/MeetPR/secrets-pointer.md` §3 用新实例 ID / 新 endpoint / 新创建日期 / 新到期日 替换被划掉的历史值,移除"已退订"banner
-  8. 更新 Bitwarden `MeetPR RDS meetpr` 条目密码(从 Bitwarden 把新生成的密码 paste 进阿里云重置密码表单)
-  9. 更新 backend `.env.example` 占位 + 提示 ops 设 backend `.env` `DATABASE_URL` 新 endpoint
-- **预算**:单机版 2c4G + 50GB ESSD PL1 ≈ **¥150-200/月** ≈ **¥1800-2400/年**(比退订的高可用版 ¥6960/年 省 ~70%)
-- **验证**:新实例运行中;backend `swift test` / `npm test` 用新 `DATABASE_URL` 通过;secrets-pointer.md §3 已无"已退订"banner,字段全用新值
-- **为什么等**:V0 demo 完全不用 RDS,提前买 = 浪费
-- **不要做的事**:
-  - ❌ 再买高可用系列(V0.1+ 仍不需要,等 Stage 4+ 多教练用上再考虑)
-  - ❌ 跨地域(数据库延迟,坚持 cn-hangzhou)
-  - ❌ Serverless(V0.1+ 量级用包年包月稳定 + 计费可预期)
-- **关联**:[secrets-pointer.md §3](~/Brain/wiki/projects/MeetPR/secrets-pointer.md);ADR-004 后端选型
-- **创建于**:2026-05-11(RDS 试用退订同日)
-
-### F-015 — 首个 coach planning spec 必须按 v4.4 设计写(防 v4.3/v4.2 误引用)
-
-- **触发条件**:写第一个 coach planning UI 相关的 spec(很可能是 spec 004 或之后,任何涉及"教练排计划 / 4 周 / 周卡片 / cycle 历史 / Excel 预览"等关键字的 spec)
-- **动作**:
-  1. 阅读 `~/Brain/wiki/projects/MeetPR/coach-planning.md` §7b/7c/7d **v4.4**(2026-04-28 pivot 后版本)
-  2. 阅读 `~/Brain/wiki/projects/MeetPR/meetings/2026-04-28-office-hours-iphone-macro-pivot.md` 了解决策原委
-  3. spec SPEC.md 的"参考"段落显式引用 coach-planning v4.4 + 注明已废弃版本(v4.3 4 周扫视态 / v4.2 Excel grid)
-  4. iPhone 实装的是 **周卡片横滑**(`TabView(.page)`),**不是** 4 周宏观视图
-  5. spec 范围**不要**包含波形图 / 变式矩阵 / 密度条等组件——那些去网页端([PD-007](~/Brain/wiki/projects/MeetPR/product-decisions/007-web-companion-macro-analytics.md) V1.x defer)
-- **验证**:spec SPEC.md 显式列出 v4.4 引用;扫一遍 spec 不出现"4 周扫视态" / "Excel grid" / "波形图" / "变式矩阵" / "密度条" 字眼
-- **为什么记**:CLAUDE.md "Recent design changes (2026-04-28)" 已提示同样信息,但 spec 工作可能跨多个 session / 不同 implementer,FOLLOWUP 是双保险
-- **关联**:CLAUDE.md "Recent design changes (2026-04-28)" 节
-- **创建于**:2026-04-28
-
 ### F-021 — 候选:Step 7 row tap 直跳 Step 5 该 exercise 上下文
 
 - **触发条件**:教练 dogfood 中 ≥3 次反馈"预览卡片里发现某动作强度要改, 但返回 Step 5 再找动作太慢"
@@ -228,6 +188,7 @@
 - **验证**:从 W2/W3/W4 任一动作行 tap 后进入 Step 5 对应卡片;edge swipe back 与 card swipe 仍正常
 - **为什么等**:V1 Step 7 行只读, 避免本 spec 扩大编辑状态与定位逻辑
 - **创建于**:2026-05-09(spec 007)
+- **⚠️ 坐标已过时(2026-07-03)**:本条 UI 坐标基于 spec 007 的 Step 5/7 界面;planning 界面已被 spec 038(planning-workspace)+ PR [#180](https://github.com/tianpingdeng112233-cell/meetpr/pull/180)(1:1 redesign)重构。触发时先对照 spec 038 + #180 现界面再定位改动点,勿照搬 007 的 Step 编号。
 
 ### F-022 — 候选:Step 7 per-cell W2-W4 单格手覆盖
 
@@ -239,6 +200,7 @@
 - **验证**:有 override 的格子优先显示手填值;无 override 的格子仍由 W1 + rules derive
 - **为什么等**:V1 先保持 W2-W4 全 derive, 降低状态空间和发布 payload 复杂度
 - **创建于**:2026-05-09(spec 007)
+- **⚠️ 坐标已过时(2026-07-03)**:本条 UI 坐标基于 spec 007 的 Step 7 界面;planning 界面已被 spec 038(planning-workspace)+ PR [#180](https://github.com/tianpingdeng112233-cell/meetpr/pull/180)(1:1 redesign)重构。触发时先对照 spec 038 + #180 现界面再定位改动点,勿照搬 007 的 Step 编号。
 
 ### F-023 — 候选:Step 5 per-set 变化
 
@@ -250,6 +212,7 @@
 - **验证**:同一动作可保存不同 set type / reps / intensity;旧 uniform draft 可迁移为 N 个 working set
 - **为什么等**:V1 只需要完整 W1 基线, uniform working sets 足够支撑 TestFlight happy path
 - **创建于**:2026-05-09(spec 007)
+- **⚠️ 坐标已过时(2026-07-03)**:本条 UI 坐标基于 spec 007 的 Step 5 界面;planning 界面已被 spec 038(planning-workspace)+ PR [#180](https://github.com/tianpingdeng112233-cell/meetpr/pull/180)(1:1 redesign)重构。触发时先对照 spec 038 + #180 现界面再定位改动点,勿照搬 007 的 Step 编号。
 
 ### F-024 — 候选:custom rule 复合多维度
 
@@ -261,26 +224,6 @@
 - **验证**:一个 custom rule 可在同一周同时产生 e.g. +5kg 与 -1 rep;Codable round-trip 保持稳定
 - **为什么等**:V1 custom = 1 维度 / 规则, 需要时可用多条规则表达复合效果
 - **创建于**:2026-05-09(spec 007)
-
-### F-026 — Apple Developer membership 开通(V0 ship 前置)
-
-- **触发条件**:满足以下任一
-  - 距 V0 hard deadline(currently 2026-06-20)≤ 7 天 → trigger 日 = **2026-06-13**(若 deadline 改, 按新值 -7 天)
-  - User 主动说"准备 ship" / "下周要给 xty / 肖天宇 / 里欧 装机" / "TestFlight 上传" / 任何 explicit ship intent
-- **动作**:
-  1. 提醒 user:"F-026 触发 — Apple Developer membership 该开了。$99/年,Stage A-I 全要前置。账号 verify(身份/信用卡)偶尔卡 24-48h,1 周 buffer 偏紧"
-  2. 走 [LAUNCH-CHECKLIST.md](./LAUNCH-CHECKLIST.md) Stage A 流程:Apple Developer enroll → Bundle ID `com.meetpr.app` register → App Store Connect 创建 App record(Name=MeetPR, Primary Lang=简体中文, SKU=meetpr-ios-v0)
-  3. 把 Team ID / Apple ID 关键值记进 LAUNCH-CHECKLIST.md Stage A 对应 checkbox
-- **验证**:LAUNCH-CHECKLIST.md Stage A 全部 ☑;Bundle ID 在 Developer Portal 可见;App record 在 App Store Connect 可见
-- **为什么等**:
-  - User 2026-05-12 决策:"放到我还剩一周就需要上线的时候再提醒,目前先注重产品建设"
-  - $99 年费,早开晚开都是这个钱,但开了空窗期不用就是浪费
-  - V0 product 已"差不多了"(教练规划 Step 0-7 全可点),ship 时机 user 定,Claude 不主动催
-- **不要做的事**:
-  - ❌ trigger 触发前主动 propose Stage A / 任何 release engineering 流程
-  - ❌ 跟 [F-012](./FOLLOWUPS.md) 混淆 — F-012 是 personal → 公司账号迁移(V0.1+,gated on F-011 公司注册);F-026 是初次开 personal account(V0 前置)
-- **关联**:[LAUNCH-CHECKLIST.md](./LAUNCH-CHECKLIST.md) Stage A;[CLAUDE.md ❄️ 硬冻结](./CLAUDE.md)
-- **创建于**:2026-05-12
 
 ### F-029 — Coach 学员详情 V0.1.x polish backlog
 
@@ -295,11 +238,77 @@
 - **关联**:PR #150 review;spec 029
 - **创建于**:2026-05-24(PR #150)
 
+### F-027 — Stage 2 公测前收敛 RDS 白名单 + 关外网 + 开 SSL
+
+> **补建于 2026-07-03**:[secrets-pointer.md §3](~/Brain/wiki/projects/MeetPR/secrets-pointer.md) 与 §4 backend 多处引用 "F-027" 作为上线前待办,但本条从未写入 FOLLOWUPS,属**悬空引用**。此次落地。
+
+- **触发条件**:MeetPR 进入 Stage 2 公测前(内测 → 公测切换),或 RDS 开始承载非测试者的真实用户数据前(任一先到)
+- **背景**:V0.1 内测期 RDS(`pgm-bp1h7t65b7if01rq`,单机版 2c2G)为开发便利,白名单 `0.0.0.0/0` + `172.16.0.0/12` 全开、外网地址开放(UK 本地开发用)、SSL 关。这三项在公测承载真实用户数据前是安全 blocker(per ADR-004 §6)。
+- **动作**:
+  1. **白名单收敛**:RDS 控制台 → 数据安全性 → 白名单,删 `0.0.0.0/0`,只留 VPC 网段 `172.16.0.0/12`(SAE 内网访问)+ 明确的运维出口 IP(如需)
+  2. **关外网地址**:RDS 控制台 → 数据库连接 → 释放外网地址(`pgm-bp1h7t65b7if01rqxo...`);此后开发改走跳板 / VPN,不再直连
+  3. **开 SSL**:RDS 控制台 → 数据安全性 → SSL → 开启;更新 backend `DATABASE_URL` 加 `?sslmode=require`(或等价),验证连接
+  4. 更新 [secrets-pointer.md §3](~/Brain/wiki/projects/MeetPR/secrets-pointer.md) 三行状态(白名单 / 外网 / SSL)+ §4 backend「上线前待办(F-027)」勾除
+- **验证**:白名单不含 `0.0.0.0/0`;外网地址已释放(公网 psql 直连超时);backend 用 `sslmode=require` 连通;secrets-pointer §3/§4 对应项已更新
+- **为什么等**:内测期只有已知测试者 + 开发需要公网直连调试;过早收敛会阻塞 UK 本地开发。公测承载陌生用户数据才是真 gate。
+- **不要做的事**:
+  - ❌ 内测期就关外网(会阻塞 David 本地开发直连)
+  - ❌ 只做白名单不开 SSL(明文传输仍是 blocker)
+- **关联**:[secrets-pointer.md §3/§4](~/Brain/wiki/projects/MeetPR/secrets-pointer.md);ADR-004 §6 后端选型;[F-025 已完成](#f-025--v01-backend-启动前重新申请-rds-单机版--关闭于-2026-05-15)(RDS 重建时留下的收敛债)
+- **创建于**:2026-07-03(补悬空引用)
+
+### F-028 — build 号自动递增(agvtool / CI)
+
+> **正式化于 2026-07-03**:此前散落在记忆与 ship 流程口头约定里(per [[meetpr_testflight_live]] "build号 per-branch 乱待 agvtool 根治"),从未落成 FOLLOWUPS 正式条目。此次立条。
+
+- **触发条件**:下次备 ship 分支(archive + 传 ASC)时;或 build 号在多分支间再次出现冲突/倒退导致 ASC 上传被拒
+- **背景**:当前 `CFBundleVersion`(build 号)手维护,per-branch 各自增,ship 分支之间容易乱(1.0(5) 线上、1.0(6) ship 分支待 archive)。ASC 要求同一 version 下 build 号单调递增,手维护迟早撞。
+- **动作**:
+  1. 评估 `agvtool next-version -all`(读 `CURRENT_PROJECT_VERSION`)在多 SPM module + app-target 结构下是否干净;或改用 CI 步骤按 `github.run_number` / ASC 最新 build +1 派生
+  2. 选一种:**本地 agvtool 手动 bump**(ship 分支 archive 前跑)/ **CI 自动 bump**(archive workflow 里派生并回写);记进 CLAUDE.md §常用操作 或 ship SOP
+  3. 若走 CI 自动:确保 build 号来源单一(ASC 查询或 run_number),避免再 per-branch 分叉
+  4. 关掉「开着 Xcode 会回写 pbxproj build 号 churn」的噪声(per [[meetpr_ios_signing]]):bump 只在 ship 分支发生,日常分支不动
+- **验证**:连续两次 ship 的 build 号严格递增且无需手数;ASC 上传不再因 build 号冲突/倒退被拒
+- **为什么等**:内测期发版频次低,手 bump 尚可;真正痛点在 ship 分支多起来后。绑「下次备 ship 分支」触发,避免空转。
+- **关联**:[[meetpr_testflight_live]];[[meetpr_ios_signing]](Xcode 回写 pbxproj);[[meetpr_ask_beta_inclusion]](备 ship 分支流程)
+- **创建于**:2026-07-03(正式化口头约定)
+
 ---
 
 ## 已完成
 
 _(执行完的触发条目移到这里,保留作历史。格式:日期 + 原触发条件 + 执行结果链接)_
+
+### F-026 — Apple Developer membership 开通(V0 ship 前置)— **关闭于 2026-06-24**
+
+- **原触发条件**:距 V0 hard deadline ≤ 7 天(2026-06-13)或 User 主动 ship intent
+- **执行结果**:Apple Developer personal membership 已开通并投入使用;MeetPR 已上 TestFlight 内测(App id **6783772277**),首个 TestFlight build 上传**不晚于 2026-06-24**——membership、Bundle ID `com.meetpr.app`、App Store Connect App record 均已就位(否则 build 无法上传)。签名 team = **28JW4SA779**(tianpingdeng@126.com;旧 team `XV97B4R4RZ` 作废,per [[meetpr_ios_signing]])。
+- **满足说明**:LAUNCH-CHECKLIST.md Stage A 环境前置全部实质满足(账号 active / Bundle ID register / App record 创建);TestFlight 已在分发内测包。
+- **关联**:[LAUNCH-CHECKLIST.md](./LAUNCH-CHECKLIST.md) Stage A(已被 banner 标注为「现实取代」);[[meetpr_testflight_live]];[[meetpr_ios_signing]]
+- **关闭决定**:Claude 2026-07-03 回填(实际完成不晚于 2026-06-24 首个 TestFlight build)
+
+### F-025 — V0.1+ backend 启动前重新申请 RDS 单机版 — **关闭于 2026-05-15**
+
+- **原触发条件**:V0.1+ 阶段任一 spec 需要 backend 真持久化(学员端 / 真注册 / 教练 publish / 视频上传 任一)
+- **执行结果**:2026-05-15 重建单机版 RDS 实例 `pgm-bp1h7t65b7if01rq`(`meetpr-rds-v01-staging`),运行中;backend staging 已接入。详见 [secrets-pointer.md §3](~/Brain/wiki/projects/MeetPR/secrets-pointer.md)。
+- **⚠️ 与原 F-025 文本的刻意偏差**(实建 ≠ 原条目规划,已确认为有意为之):
+  | 项 | F-025 原文规划 | 2026-05-15 实建 |
+  |---|---|---|
+  | 引擎 | PostgreSQL **17** | PostgreSQL **18.0** |
+  | 规格 | `pg.n2.2c.2m`(2c**4G**)| `pg.n1e.2c.1m`(2c**2G**;V0.2+ 公测前升 4G)|
+  | 计费 | 包**年**包月 1 年 + **开**自动续费 | 包**月** 1 个月 ¥86 + **未开**自动续费(2 周稳定后切包年)|
+  | 存储 | 50GB ESSD PL1 | 50GB 高性能云盘(V0.2+ 切 ESSD PL1)|
+- **遗留债**:白名单 `0.0.0.0/0` + 外网开放 + SSL 关,均为开发便利,公测前需收敛 → 已立 [F-027](#f-027--stage-2-公测前收敛-rds-白名单--关外网--开-ssl)。
+- **关联**:[secrets-pointer.md §3](~/Brain/wiki/projects/MeetPR/secrets-pointer.md);ADR-004 后端选型;[[meetpr_aliyun_arrears]] 网络拓扑
+- **关闭决定**:Claude 2026-07-03 回填(实例 2026-05-15 建成运行至今)
+
+### F-015 — 首个 coach planning spec 必须按 v4.4 设计写 — **关闭于 2026-07-03**
+
+- **原触发条件**:写第一个 coach planning UI 相关 spec(涉及"教练排计划 / 4 周 / 周卡片 / cycle 历史 / Excel 预览")
+- **执行结果**:specs **005 / 006 / 007** 已按 v4.4 设计实装并合并(周卡片横滑 `TabView(.page)`,非 4 周宏观视图);三者均已 ship 进 TestFlight。防误引用目的达成——V0 coach planning 未出现 v4.3 4 周扫视态 / v4.2 Excel grid / 波形图 / 变式矩阵 / 密度条。
+- **满足说明**:触发条件在 spec 005 起草时即命中并正确执行;宏观分析能力按计划全部 defer 至网页端(PD-007)。
+- **关联**:`~/Brain/wiki/projects/MeetPR/coach-planning.md` §7b/7c/7d v4.4;CLAUDE.md "Recent design changes (2026-04-28)";specs 005/006/007
+- **关闭决定**:Claude 2026-07-03(v4.4 已被三个 coach planning spec 消费,防误引用使命完成)
 
 ### F-002 — 生产发布 checklist 适配 iOS — **关闭于 2026-05-10**
 
