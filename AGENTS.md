@@ -62,6 +62,12 @@
 
 ---
 
+## 改动分级与路由矩阵(镜像指针)
+
+> **权威在 [`CLAUDE.md` §改动分级与路由矩阵](./CLAUDE.md),以它为准。** 那张表按改动类型(UI 微调 / spec 修订 / 治理文档 / 单功能 spec / 多-spec wave)一次性决定 5 件事:谁写、要不要 SPEC PR、要不要 brainstorm+ceo-review、要不要 `/review-loop`、怎么合。**你(implementer)相关的两行**:单功能 spec(Class 4)= 你 xhigh 写码 + Claude 跑 `/review-loop`,spec PR + impl PR 上限 2 PR,CI 绿普通合并;多-spec / 跨 repo / 新 SPM target wave(Class 5)= 同上但 **brainstorm 必跑**。合并门禁 = **CI 绿即普通合并**,只有 docs-only PR 才需 enforce_admins toggle。
+
+---
+
 ## Spec 生命周期(2026-05-09 精简流程)
 
 > **背景**:之前每个 spec 走 5 个 PR(spec / impl / review / review-followup digest / spec finalize),solo 模式下 process tax 太高(spec 005 一个功能开了 16 PR)。**新流程上限 2 PR/feature**。
