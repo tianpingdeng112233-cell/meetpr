@@ -66,10 +66,10 @@ public enum EquipmentCatalog {
       token: "lat_pulldown", label: "高位下拉", group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "leg_press_machine", label: "倒蹬机 / 蹲举机", group: .machines,
+      token: "leg_press_machine", label: "倒蹬机 / 腿举机", group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "leg_curl_extension", label: "腿弯机 / 腿伸机", group: .machines,
+      token: "leg_curl_extension", label: "腿弯举 / 腿屈伸", group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
       token: "seated_row", label: "坐姿划船", group: .machines,
@@ -80,7 +80,7 @@ public enum EquipmentCatalog {
     EquipmentItem(
       token: "seal_row", label: "海豹划船凳", group: .machines, tiers: [.professional]),
     EquipmentItem(
-      token: "hack_squat", label: "哈克深蹲架", group: .machines, tiers: [.professional]),
+      token: "hack_squat", label: "哈克深蹲机", group: .machines, tiers: [.professional]),
 
     // 力量举专项 — 变式解锁与加载粒度(教练编排的直接输入)。
     EquipmentItem(
