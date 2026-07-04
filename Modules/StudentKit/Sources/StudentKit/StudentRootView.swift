@@ -18,6 +18,7 @@ public struct StudentRootView: View {
   private let soloCatalog: [Exercise]
   private let pendingSetLogCount: @Sendable (UUID) async -> Int
   private let sessionReviews: (any SessionReviewRepository)?
+  private let account: (any AccountRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
@@ -61,7 +62,8 @@ public struct StudentRootView: View {
     trainingMode: TrainingMode = .coached,
     soloCatalog: [Exercise] = [],
     pendingSetLogCount: (@Sendable (UUID) async -> Int)? = nil,
-    sessionReviews: (any SessionReviewRepository)? = nil
+    sessionReviews: (any SessionReviewRepository)? = nil,
+    account: (any AccountRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -74,6 +76,7 @@ public struct StudentRootView: View {
     self.soloCatalog = soloCatalog
     self.pendingSetLogCount = pendingSetLogCount ?? { _ in 0 }
     self.sessionReviews = sessionReviews
+    self.account = account
     self.onboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
@@ -185,7 +188,9 @@ public struct StudentRootView: View {
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
         trainingMode: trainingMode,
-        soloCatalog: soloCatalog
+        soloCatalog: soloCatalog,
+        account: account,
+        logs: logs
       )
       .tag(StudentTab.profile)
       .tabItem {

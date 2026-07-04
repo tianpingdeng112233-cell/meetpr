@@ -2,6 +2,85 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
+/// 训练基线卡片 (spec 046 §4 / 050 §4): the three-lift baseline. Coached shows
+/// the lock chrome + 联系教练; solo owns its baseline and gets a 补记/修改 entry.
+@available(iOS 17.0, macOS 14.0, *)
+struct OneRMBaselineCard: View {
+  let profile: OnboardingProfile
+  let trainingMode: TrainingMode
+  let onEdit: () -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      HStack {
+        Text("当前 1RM")
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.brandRed)
+        Spacer()
+        if trainingMode != .selfTrain {
+          Image(systemName: "lock").font(.system(size: 14))
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
+      }
+      HStack(spacing: 12) {
+        oneRMValue("深蹲", profile.squat1RMKg)
+        oneRMValue("卧推", profile.bench1RMKg)
+        oneRMValue("硬拉", profile.deadlift1RMKg)
+      }
+      .padding(.top, 12)
+      if trainingMode == .selfTrain {
+        // 后补入口 (spec 046 §2): solo's baseline belongs to the student.
+        Button(action: onEdit) {
+          HStack(spacing: 6) {
+            Image(systemName: "square.and.pencil").font(.system(size: 12))
+            Text(hasBaseline ? "修改入门基线" : "补记入门基线")
+              .font(Font.MeetPR.monoLabel)
+              .tracking(Font.MeetPR.monoLabelTracking)
+          }
+          .foregroundStyle(Color.MeetPR.brandRed)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 14)
+        .accessibilityIdentifier("profile.baseline.edit")
+      } else {
+        HStack(spacing: 6) {
+          Image(systemName: "lock").font(.system(size: 12))
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+          Text("训练周期中无法修改 · 联系教练")
+            .font(Font.MeetPR.monoLabel)
+            .tracking(Font.MeetPR.monoLabelTracking)
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+        }
+        .padding(.top, 14)
+      }
+    }
+    .padding(18)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(Color.MeetPR.surface1)
+    .clipShape(.rect(cornerRadius: 12))
+    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
+  private var hasBaseline: Bool {
+    profile.squat1RMKg != nil || profile.bench1RMKg != nil || profile.deadlift1RMKg != nil
+  }
+
+  private func oneRMValue(_ label: String, _ value: Decimal?) -> some View {
+    VStack(alignment: .leading, spacing: 2) {
+      Text(label).font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
+      HStack(alignment: .lastTextBaseline, spacing: 3) {
+        Text(value.map { UnitDisplay.plainString($0) } ?? "—")
+          .font(.system(size: 30, weight: .heavy).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Text("kg").font(.system(size: 12, design: .monospaced))
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+}
+
 /// 补记/修改入门基线 (spec 046 §2 后补入口): solo's baseline belongs to the
 /// student (backend spec 013), so the coached lock chrome never appears and
 /// the three fields stay editable after onboarding completes.
