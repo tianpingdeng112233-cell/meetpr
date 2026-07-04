@@ -59,3 +59,44 @@ import Testing
   #expect(acked.id == event.id)
   #expect(acked.breakthroughE1RMKg == event.breakthroughE1RMKg)
 }
+
+/// Spec 050 §5: points persisted before the anomaly guard have no `confidence`
+/// key; they must decode as `.normal` (back-compat, no backend/data migration).
+@Test func e1rmHistoryPointDecodesLegacyJSONWithoutConfidenceAsNormal() throws {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 128.2,
+    sourceWeightKg: 100,
+    sourceReps: 5,
+    sourceRPE: 8.0
+  )
+  let data = try JSONEncoder().encode(point)
+  var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+  object.removeValue(forKey: "confidence")  // simulate a pre-§5 persisted point
+  let legacy = try JSONSerialization.data(withJSONObject: object)
+  let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: legacy)
+  #expect(decoded.confidence == .normal)
+}
+
+@Test func e1rmHistoryPointPreservesLowConfidenceAcrossRoundTrip() throws {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 327,
+    sourceWeightKg: 275,
+    sourceReps: 3,
+    sourceRPE: 8.5,
+    confidence: .low
+  )
+  let data = try JSONEncoder().encode(point)
+  let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: data)
+  #expect(decoded.confidence == .low)
+  #expect(decoded == point)
+}
