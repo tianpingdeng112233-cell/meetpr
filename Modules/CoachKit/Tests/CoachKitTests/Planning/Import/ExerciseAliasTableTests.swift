@@ -15,10 +15,10 @@ private func fullCatalog() -> [Exercise] {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bundledAliasSeedHasThirtyFourEntries() {
+@Test func bundledAliasSeedHasFortyFourEntries() {
   let table = ExerciseAliasTable.bundled()
   #expect(table.version == 1)
-  #expect(table.aliases.count == 34)
+  #expect(table.aliases.count == 44)
 }
 
 // Guardrail: every canonical must fold-resolve to exactly one exercise in the full
@@ -55,6 +55,12 @@ private func fullCatalog() -> [Exercise] {
   ("单腿 RDL(纯单腿)", "单腿罗马尼亚硬拉(纯单腿)"),
   ("B 站距 RDL", "B 站距罗马尼亚硬拉"),
   ("单腿 RDL(B 站距)", "单腿罗马尼亚硬拉(B 站距)"),
+  // Duplicate-nameEn dedup: the merged-away spelling still binds to the survivor.
+  ("臀推", "杠铃臀冲"),  // 过泛裸名 → barbell hip thrust
+  ("器械胸推", "器械推胸"),  // 胸推/推胸 词序
+  ("绳索夹胸", "绳索飞鸟"),  // deleted Cable Fly spelling → survivor
+  ("弹力带-腿外展", "弹力带髋外展"),  // hip 误标写法 → glute survivor
+  ("单侧射手俯卧撑", "射手俯卧撑"),  // redundant Archer 变式 merged
 ])
 func aliasSeedRowsBindToCanonical(rawName: String, canonical: String) {
   let catalog = fullCatalog()
