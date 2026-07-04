@@ -168,7 +168,8 @@ public struct StudentRootView: View {
         e1rm: e1rm,
         onboarding: onboarding,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
-        onLogout: onLogout
+        onLogout: onLogout,
+        trainingMode: trainingMode
       )
       .tag(StudentTab.profile)
       .tabItem {

@@ -10,15 +10,20 @@ public actor InMemoryOnboardingRepository: OnboardingRepository {
   private let studentId: UUID
   private var profile: OnboardingProfile?
   private let now: @Sendable () -> Date
+  /// Mirrors backend spec 013: self-train students skip the 1RM lock and
+  /// complete with the unit alone.
+  private let role: UserRole
 
   public init(
     studentId: UUID,
     seed: OnboardingProfile? = nil,
-    now: @escaping @Sendable () -> Date = { Date() }
+    now: @escaping @Sendable () -> Date = { Date() },
+    role: UserRole = .coachedStudent
   ) {
     self.studentId = studentId
     self.profile = seed
     self.now = now
+    self.role = role
   }
 
   public func fetchProfile(studentId: UUID) async throws -> OnboardingProfile? {
@@ -32,7 +37,7 @@ public actor InMemoryOnboardingRepository: OnboardingRepository {
       profile
       ?? OnboardingProfile(userId: studentId, createdAt: timestamp, updatedAt: timestamp)
 
-    if current.completedAt != nil, patch.touchesOneRM {
+    if role != .selfTrainStudent, current.completedAt != nil, patch.touchesOneRM {
       throw OnboardingError.oneRMLocked
     }
 
@@ -42,11 +47,15 @@ public actor InMemoryOnboardingRepository: OnboardingRepository {
   }
 
   public func complete() async throws -> OnboardingProfile {
+    let required = role == .selfTrainStudent ? Self.selfTrainRequiredFields : Self.requiredFields
     guard let current = profile else {
-      throw OnboardingError.incomplete(missingFields: Self.requiredFields)
+      throw OnboardingError.incomplete(missingFields: required)
     }
 
-    let missing = Self.missingFields(of: current)
+    let missing =
+      role == .selfTrainStudent
+      ? Self.selfTrainMissingFields(of: current)
+      : Self.missingFields(of: current)
     guard missing.isEmpty else {
       throw OnboardingError.incomplete(missingFields: missing)
     }
@@ -71,6 +80,13 @@ public actor InMemoryOnboardingRepository: OnboardingRepository {
     "daily_life_intensity", "life_stress", "recovery_speed", "sleep_hours",
     "is_competing",
   ]
+
+  /// Solo completes with the unit alone (backend spec 013).
+  static let selfTrainRequiredFields: [String] = ["unit_preference"]
+
+  static func selfTrainMissingFields(of profile: OnboardingProfile) -> [String] {
+    profile.unitPreference == nil ? selfTrainRequiredFields : []
+  }
 
   static func missingFields(of profile: OnboardingProfile) -> [String] {
     var missing: [String] = []

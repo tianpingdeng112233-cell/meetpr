@@ -131,8 +131,11 @@ public struct RootView: View {
         bindGatedStudentRoot(for: user)
       case .selfTrainStudent:
         // Self-train students never bind (backend requireRole gate) and
-        // skip the BindGate entirely (spec 031 D4).
-        studentRoot(for: user)
+        // skip the BindGate entirely (spec 031 D4). Their gate is the
+        // 2-screen light onboarding instead (spec 046).
+        SoloOnboardingGateView(studentId: user.id, onboarding: studentOnboarding) {
+          studentRoot(for: user)
+        }
       }
     }
   }
