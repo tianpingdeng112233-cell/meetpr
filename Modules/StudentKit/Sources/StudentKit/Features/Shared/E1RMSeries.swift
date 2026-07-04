@@ -45,6 +45,39 @@ struct E1RMSeries: Equatable, Sendable {
 
   static let rollingWindow: TimeInterval = 28 * 86_400  // 4 weeks (工程常量)
 
+  /// The smoothed series re-expressed as history points (ids preserved from
+  /// the underlying samples) so existing polyline/sparkline consumers switch
+  /// data sources without reshaping (spec 050 §2). Raw-scatter overlay is a
+  /// follow-up (F-030 家族).
+  static func smoothedHistory(points: [E1RMHistoryPoint], family: LiftFamily?)
+    -> [E1RMHistoryPoint]
+  {
+    let byID = Dictionary(uniqueKeysWithValues: points.map { ($0.id, $0) })
+    return build(points: points, family: family).smoothed.compactMap { sample in
+      guard let original = byID[sample.pointID] else { return nil }
+      return E1RMHistoryPoint(
+        id: original.id,
+        studentId: original.studentId,
+        exerciseId: original.exerciseId,
+        setLogId: original.setLogId,
+        computedAt: sample.date,
+        e1RMKg: sample.valueKg,
+        sourceWeightKg: original.sourceWeightKg,
+        sourceReps: original.sourceReps,
+        sourceRPE: original.sourceRPE
+      )
+    }
+  }
+
+  /// Eligibility-filtered raw points (Best/Last keep honest raw semantics).
+  static func eligibleRaw(points: [E1RMHistoryPoint], family: LiftFamily?)
+    -> [E1RMHistoryPoint]
+  {
+    points
+      .filter { E1RMEligibility.isEligible(point: $0, family: family) }
+      .sorted { $0.computedAt < $1.computedAt }
+  }
+
   static func build(points: [E1RMHistoryPoint], family: LiftFamily?) -> E1RMSeries {
     let eligible =
       points

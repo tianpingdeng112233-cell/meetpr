@@ -53,7 +53,11 @@ public final class GrowthCurveViewModel {
       var grouped: [LiftFamily: [E1RMHistoryPoint]] = [:]
       for (family, ids) in idsByFamily {
         let histories = try await e1rm.fetchHistory(studentId: studentID, exerciseIds: Array(ids))
-        grouped[family] = histories.values.flatMap { $0 }.sorted { $0.computedAt < $1.computedAt }
+        // Single aggregation (spec 050 §2): the growth curve draws the
+        // eligibility-gated rolling-max line, so one anomalous set no longer
+        // tops the chart by 25 kg.
+        grouped[family] = E1RMSeries.smoothedHistory(
+          points: histories.values.flatMap { $0 }, family: family)
       }
       historyByFamily = grouped
       state = .loaded

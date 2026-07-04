@@ -100,10 +100,13 @@ final class DashboardE1RMTrendViewModel {
     idsByFamily: [LiftFamily: Set<UUID>]
   ) -> [DashboardE1RMTrendRow] {
     MainLiftExerciseFamilyResolver.dashboardFamilies.map { family in
-      let points = (idsByFamily[family] ?? [])
+      let raw = (idsByFamily[family] ?? [])
         .flatMap { histories[$0] ?? [] }
-        .sorted { $0.computedAt < $1.computedAt }
-      return DashboardE1RMTrendRow(family: family, points: points)
+      // Single aggregation (spec 050 §2): the sparkline and headline read
+      // the eligibility-gated rolling-max series, not raw points.
+      return DashboardE1RMTrendRow(
+        family: family,
+        points: E1RMSeries.smoothedHistory(points: raw, family: family))
     }
   }
 

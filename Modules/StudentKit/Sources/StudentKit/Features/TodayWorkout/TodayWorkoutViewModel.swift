@@ -263,13 +263,20 @@ extension TodayWorkoutViewModel {
     for day: StudentPlanDay,
     studentID: UUID
   ) async throws -> [UUID: ExerciseReference] {
+    let familyByExercise = Dictionary(
+      day.exercises.map { ($0.exercise.id, $0.exercise.mainLiftFamily) },
+      uniquingKeysWith: { first, _ in first })
     let exerciseIDs = Set(day.exercises.map(\.exercise.id))
     let e1rmRepo = self.e1rmRepo
     return try await withThrowingTaskGroup(of: (UUID, ExerciseReference?).self) { group in
       for exerciseID in exerciseIDs {
+        let family = familyByExercise[exerciseID] ?? nil
         group.addTask {
           let points = try await e1rmRepo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
-          let selected = lastAndBest(from: points)
+          // Last/Best keep raw semantics but only over eligible sets
+          // (spec 050 §2) — an RPE-6 warm-up is no reference.
+          let selected = lastAndBest(
+            from: E1RMSeries.eligibleRaw(points: points, family: family))
           let reference = ExerciseReference(
             last: selected.last.map(ExerciseReferenceSet.init(point:)),
             best: selected.best.map(ExerciseReferenceSet.init(point:))
