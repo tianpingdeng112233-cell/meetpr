@@ -1,0 +1,46 @@
+import Foundation
+import Testing
+
+@testable import StudentKit
+
+/// The set-entry fields bind to text and parse on commit; these lock in the
+/// "type a value then save" contract (the focus-loss parse race the value:format:
+/// binding had) plus the range clamps.
+@Suite struct SetEntryValueTests {
+  @Test func parsesMultiDigitAndDecimal() {
+    #expect(SetEntryValue.weight(from: "150") == 150)
+    #expect(SetEntryValue.weight(from: "172.5") == Decimal(string: "172.5"))
+    #expect(SetEntryValue.reps(from: "10") == 10)
+    #expect(SetEntryValue.rpe(from: "9.5") == Decimal(string: "9.5"))
+  }
+
+  @Test func rpeTenIsNotTruncated() {
+    // The multi-digit case the reviewer flagged: "10" must not clamp to 5 or 1.
+    #expect(SetEntryValue.rpe(from: "10") == 10)
+  }
+
+  @Test func clampsOutOfRangeOnCommit() {
+    #expect(SetEntryValue.rpe(from: "108.5") == 10)  // fat-fingered high
+    #expect(SetEntryValue.rpe(from: "3") == 5)  // below floor
+    #expect(SetEntryValue.weight(from: "-20") == 0)  // never negative
+    #expect(SetEntryValue.reps(from: "-4") == 0)
+  }
+
+  @Test func commaDecimalIsNormalized() {
+    // `.decimalPad` enters "," in some locales; must not save 172 for 172,5.
+    #expect(SetEntryValue.weight(from: "172,5") == Decimal(string: "172.5"))
+    #expect(SetEntryValue.rpe(from: "8,5") == Decimal(string: "8.5"))
+  }
+
+  @Test func emptyOrGarbageFallsBackSafely() {
+    #expect(SetEntryValue.weight(from: "") == 0)
+    #expect(SetEntryValue.reps(from: "") == 0)
+    #expect(SetEntryValue.rpe(from: "") == 5)  // clamps up to the floor
+    #expect(SetEntryValue.weight(from: "abc") == 0)
+  }
+
+  @Test func textRoundTripsWithoutTrailingZeros() {
+    #expect(SetEntryValue.weight(from: SetEntryValue.text(175)) == 175)
+    #expect(SetEntryValue.text(175) == "175")
+  }
+}
