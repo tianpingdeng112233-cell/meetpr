@@ -111,3 +111,19 @@ private func point(
   #expect(series.rawEligible.count == 3)  // honest scatter still shows all three
   #expect(series.rawEligible.contains { $0.valueKg == 320 })
 }
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func smoothedHistoryExcludesLowConfidencePoints() {
+  // The chart consumers (Dashboard / Growth) read smoothedHistory — it must
+  // drop the quarantined spike too, not just E1RMSeries.currentKg.
+  let history = E1RMSeries.smoothedHistory(
+    points: [
+      point(daysAgo: 10, e1RM: 180),
+      point(daysAgo: 1, e1RM: 320, reps: 3, rpe: 8.5, confidence: .low),
+    ],
+    family: .squat
+  )
+
+  #expect(history.count == 1)
+  #expect(history.first?.e1RMKg == 180)
+}
