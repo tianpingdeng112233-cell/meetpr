@@ -51,7 +51,20 @@ actor ThrowingTrainingLogRepository: StudentTrainingLogRepository {
     throw makeError()
   }
 
+  @discardableResult
+  func recordAdhocSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    throw makeError()
+  }
+
   func fetchLogs(studentID: UUID, in dateRange: ClosedRange<Date>) async throws -> [StudentSetLog] {
+    []
+  }
+
+  func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>,
+    scope: TrainingLogScope
+  ) async throws -> [StudentSetLog] {
     []
   }
 
