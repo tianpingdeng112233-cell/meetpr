@@ -1,8 +1,7 @@
+import CatalogKit
 import CoreModels
 import Foundation
 import Testing
-
-@testable import CoachKit
 
 @available(iOS 17.0, macOS 14.0, *)
 @Test func accessorySearchFoldsBarCharacterAcrossSpellings() {

@@ -96,7 +96,10 @@ public enum CompletionHistory {
     var completedSetsByWeek: [Int: Int] = [:]
     var completedDaysByWeek: [Int: Set<UUID>] = [:]
     for log in logs where log.completed {
-      guard let dayID = dayForExercise[log.planExerciseID],
+      // Adhoc/orphaned logs carry no plan link and cannot attribute to a
+      // plan week (spec 045); they still count in exercise-keyed views.
+      guard let planExerciseID = log.planExerciseID,
+        let dayID = dayForExercise[planExerciseID],
         let week = weekForDay[dayID]
       else { continue }
       completedSetsByWeek[week, default: 0] += 1
