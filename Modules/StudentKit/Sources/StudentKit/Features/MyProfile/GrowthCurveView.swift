@@ -10,21 +10,29 @@ public struct GrowthCurveView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let mode: TrainingMode
+  private let catalog: [Exercise]
 
   public init(
     studentID: UUID,
     plans: any StudentPlanRepository,
-    e1rm: any E1RMRepository
+    e1rm: any E1RMRepository,
+    mode: TrainingMode = .coached,
+    catalog: [Exercise] = []
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
+    self.mode = mode
+    self.catalog = catalog
   }
 
   public var body: some View {
     ScrollView {
-      GrowthCurvePanelView(studentID: studentID, plans: plans, e1rm: e1rm)
-        .padding(MeetPRSpacing.md)
+      GrowthCurvePanelView(
+        studentID: studentID, plans: plans, e1rm: e1rm, mode: mode, catalog: catalog
+      )
+      .padding(MeetPRSpacing.md)
     }
     .background(Color.MeetPR.bg)
     .navigationTitle("成长曲线")
@@ -41,10 +49,13 @@ struct GrowthCurvePanelView: View {
   init(
     studentID: UUID,
     plans: any StudentPlanRepository,
-    e1rm: any E1RMRepository
+    e1rm: any E1RMRepository,
+    mode: TrainingMode = .coached,
+    catalog: [Exercise] = []
   ) {
     self.studentID = studentID
-    self._viewModel = State(initialValue: GrowthCurveViewModel(plans: plans, e1rm: e1rm))
+    self._viewModel = State(
+      initialValue: GrowthCurveViewModel(plans: plans, e1rm: e1rm, mode: mode, catalog: catalog))
   }
 
   var body: some View {

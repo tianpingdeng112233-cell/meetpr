@@ -141,21 +141,36 @@ public struct StudentRootView: View {
         Label(trainingMode == .selfTrain ? "今天" : "今日", systemImage: "house")
       }
 
-      TodayWorkoutView(
-        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse,
-        sessionReviews: sessionReviews
-      )
+      // 训练 tab. Solo (spec 047 §3): the read-only month-grouped history —
+      // there is no plan calendar to show; editing stays on 今天.
+      Group {
+        if trainingMode == .selfTrain {
+          SoloHistoryView(
+            studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+            sessionReviews: sessionReviews, catalog: soloCatalog
+          )
+        } else {
+          TodayWorkoutView(
+            studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
+            videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse,
+            sessionReviews: sessionReviews
+          )
+        }
+      }
       .tag(StudentTab.training)
       .tabItem {
-        Label("训练", systemImage: "dumbbell.fill")
+        Label(
+          trainingMode == .selfTrain ? "历史" : "训练",
+          systemImage: trainingMode == .selfTrain ? "clock" : "dumbbell.fill"
+        )
       }
 
       // 成长 — e1RM growth + full training history + coach-feedback history all
       // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
-        feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews
+        feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews,
+        trainingMode: trainingMode, soloCatalog: soloCatalog
       )
       .tag(StudentTab.growth)
       .tabItem {
@@ -169,7 +184,8 @@ public struct StudentRootView: View {
         onboarding: onboarding,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
-        trainingMode: trainingMode
+        trainingMode: trainingMode,
+        soloCatalog: soloCatalog
       )
       .tag(StudentTab.profile)
       .tabItem {

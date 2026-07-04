@@ -48,11 +48,7 @@ public final class SoloSessionViewModel {
     self.e1rmRepo = e1rm
     self.exerciseNames = Dictionary(
       catalog.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
-    self.exerciseFamilies = Dictionary(
-      catalog.compactMap { exercise in
-        exercise.mainLiftFamily.map { (exercise.id, $0) }
-      },
-      uniquingKeysWith: { first, _ in first })
+    self.exerciseFamilies = MainLiftExerciseFamilyResolver.recorderFamilies(catalog: catalog)
     self.pendingCount = pendingCount
     self.now = now
     self.calendar = calendar

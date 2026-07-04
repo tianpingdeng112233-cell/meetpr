@@ -29,6 +29,42 @@ enum MainLiftExerciseFamilyResolver {
     idsByFamily.first { $0.value.contains(exerciseID) }?.key
   }
 
+  /// Catalog bucketing for planless (solo) students — comp lifts only, same
+  /// rule as the plan path: variations carry different leverages and would
+  /// pollute the trend line (variation curves are V0.1.x).
+  static func exerciseIDsByFamily(catalog: [Exercise]) -> [LiftFamily: Set<UUID>] {
+    var idsByFamily: [LiftFamily: Set<UUID>] = [:]
+    for exercise in catalog {
+      guard exercise.exerciseType == .mainLift, let family = exercise.mainLiftFamily else {
+        continue
+      }
+      idsByFamily[family, default: []].insert(exercise.id)
+    }
+    return idsByFamily
+  }
+
+  /// Union of the plan and catalog universes (spec 047 §1): coached keeps its
+  /// plan tree (custom exercises included), solo brings the bundled catalog.
+  static func exerciseIDsByFamily(
+    in plan: StudentPlanView?,
+    catalog: [Exercise]
+  ) -> [LiftFamily: Set<UUID>] {
+    let planBuckets = exerciseIDsByFamily(in: plan)
+    guard !catalog.isEmpty else { return planBuckets }
+    return planBuckets.merging(exerciseIDsByFamily(catalog: catalog)) { $0.union($1) }
+  }
+
+  /// Recorder-side family map — deliberately broader than the chart buckets:
+  /// variations keep their family so the per-family eligibility rules
+  /// (deadlift rep cap etc., spec 050) apply to them too.
+  static func recorderFamilies(catalog: [Exercise]) -> [UUID: LiftFamily] {
+    Dictionary(
+      catalog.compactMap { exercise in
+        exercise.mainLiftFamily.map { (exercise.id, $0) }
+      },
+      uniquingKeysWith: { first, _ in first })
+  }
+
   /// Every squat/bench/deadlift family trained on one day — main lifts **and**
   /// their variations (暂停深蹲 / 窄握卧推 等变式计入对应家族;辅助动作不计,
   /// 它们没有 `mainLiftFamily`)。去重后按 S→B→D 固定顺序返回,驱动仪表盘周历

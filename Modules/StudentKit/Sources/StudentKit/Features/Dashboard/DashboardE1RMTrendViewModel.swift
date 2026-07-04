@@ -55,17 +55,30 @@ final class DashboardE1RMTrendViewModel {
 
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let e1rm: any E1RMRepository
+  @ObservationIgnored private let mode: TrainingMode
+  @ObservationIgnored private let catalog: [Exercise]
 
-  init(plans: any StudentPlanRepository, e1rm: any E1RMRepository) {
+  init(
+    plans: any StudentPlanRepository,
+    e1rm: any E1RMRepository,
+    mode: TrainingMode = .coached,
+    catalog: [Exercise] = []
+  ) {
     self.plans = plans
     self.e1rm = e1rm
+    self.mode = mode
+    self.catalog = catalog
   }
 
   func load(studentID: UUID) async {
     state = .loading
     do {
-      let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(in: plan)
+      // Solo never asks for a plan (spec 047 §1) — the catalog is its
+      // bucketing universe; coached keeps the plan tree.
+      let plan =
+        mode == .selfTrain ? nil : try await plans.fetchCurrentPlan(studentID: studentID)
+      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
+        in: plan, catalog: catalog)
       let histories = try await fetchHistories(studentID: studentID, idsByFamily: idsByFamily)
       let rows = Self.rows(from: histories, idsByFamily: idsByFamily)
       let prs = try await e1rm.unacknowledgedPRs(studentId: studentID)

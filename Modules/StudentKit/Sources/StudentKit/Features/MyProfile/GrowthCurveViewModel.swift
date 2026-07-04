@@ -32,23 +32,32 @@ public final class GrowthCurveViewModel {
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let now: @Sendable () -> Date
+  private let mode: TrainingMode
+  private let catalog: [Exercise]
   private var historyByFamily: [LiftFamily: [E1RMHistoryPoint]] = [:]
 
   public init(
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
-    now: @escaping @Sendable () -> Date = { Date() }
+    now: @escaping @Sendable () -> Date = { Date() },
+    mode: TrainingMode = .coached,
+    catalog: [Exercise] = []
   ) {
     self.plans = plans
     self.e1rm = e1rm
     self.now = now
+    self.mode = mode
+    self.catalog = catalog
   }
 
   public func load(studentID: UUID) async {
     state = .loading
     do {
-      let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(in: plan)
+      // Solo never asks for a plan (spec 047 §1) — catalog buckets instead.
+      let plan =
+        mode == .selfTrain ? nil : try await plans.fetchCurrentPlan(studentID: studentID)
+      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
+        in: plan, catalog: catalog)
 
       var grouped: [LiftFamily: [E1RMHistoryPoint]] = [:]
       for (family, ids) in idsByFamily {
