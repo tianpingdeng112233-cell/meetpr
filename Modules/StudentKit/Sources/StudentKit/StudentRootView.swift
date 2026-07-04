@@ -155,7 +155,8 @@ public struct StudentRootView: View {
       // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
-        feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews
+        feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews,
+        trainingMode: trainingMode, soloCatalog: soloCatalog
       )
       .tag(StudentTab.growth)
       .tabItem {
@@ -169,7 +170,8 @@ public struct StudentRootView: View {
         onboarding: onboarding,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
-        trainingMode: trainingMode
+        trainingMode: trainingMode,
+        soloCatalog: soloCatalog
       )
       .tag(StudentTab.profile)
       .tabItem {

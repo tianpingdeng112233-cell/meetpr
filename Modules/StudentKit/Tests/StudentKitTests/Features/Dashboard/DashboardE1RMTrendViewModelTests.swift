@@ -91,6 +91,51 @@ import Testing
   #expect(presentation.headline?.valueKg == 101)
 }
 
+/// spec 047 §1: solo has no plan — the catalog buckets the rows, and the
+/// plans repository is never asked (a throwing repo proves it).
+@MainActor
+@Test func trendSoloBucketsByCatalogWithoutTouchingPlans() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let squat = soloCatalogExercise(family: .squat, name: "低杠位深蹲")
+  let bench = soloCatalogExercise(family: .bench, name: "竞技卧推")
+  let variation = soloCatalogExercise(
+    family: .squat, name: "暂停深蹲", exerciseType: .mainLiftVariation)
+  let now = try Date("2026-06-14T12:00:00Z", strategy: .iso8601)
+  let points = [
+    point(studentID: studentID, exerciseID: squat.id, e1RM: 150, daysAgo: 4, now: now),
+    point(studentID: studentID, exerciseID: bench.id, e1RM: 100, daysAgo: 2, now: now),
+    // Variation points must NOT enter the chart buckets (comp lifts only).
+    point(studentID: studentID, exerciseID: variation.id, e1RM: 170, daysAgo: 1, now: now),
+  ]
+
+  let viewModel = DashboardE1RMTrendViewModel(
+    plans: ThrowingStudentPlanRepository { URLError(.badServerResponse) },
+    e1rm: InMemoryE1RMRepository(seedPoints: points, seedPRs: []),
+    mode: .selfTrain,
+    catalog: [squat, bench, variation]
+  )
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  #expect(presentation.rows.first { $0.family == .squat }?.points.isEmpty == false)
+  #expect(presentation.rows.first { $0.family == .bench }?.points.isEmpty == false)
+  #expect(presentation.headline?.kind == .best)
+  #expect(presentation.headline?.family == .squat)
+  #expect(presentation.headline?.valueKg == 150)
+}
+
+private func soloCatalogExercise(
+  family: LiftFamily,
+  name: String,
+  exerciseType: ExerciseType = .mainLift
+) -> Exercise {
+  Exercise(
+    id: UUID(), name: name, nameEn: name, exerciseType: exerciseType,
+    mainLiftFamily: family, isCompetitionLift: exerciseType == .mainLift,
+    muscleGroups: [.quad], equipment: [.barbell],
+    createdAt: Date(timeIntervalSince1970: 0))
+}
+
 @MainActor
 private func makeViewModel(
   studentID: UUID,

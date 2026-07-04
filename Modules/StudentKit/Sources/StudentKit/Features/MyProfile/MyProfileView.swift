@@ -19,6 +19,7 @@ public struct MyProfileView: View {
   /// nil hides the row (demo/previews); live wiring passes Session.logout.
   private let onLogout: (@MainActor () async -> Void)?
   private let trainingMode: TrainingMode
+  private let soloCatalog: [Exercise]
   @State private var viewModel: MyProfileViewModel
   @State private var editingBaseline = false
 
@@ -29,7 +30,8 @@ public struct MyProfileView: View {
     onboarding: any OnboardingRepository,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
-    trainingMode: TrainingMode = .coached
+    trainingMode: TrainingMode = .coached,
+    soloCatalog: [Exercise] = []
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -37,6 +39,7 @@ public struct MyProfileView: View {
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onLogout = onLogout
     self.trainingMode = trainingMode
+    self.soloCatalog = soloCatalog
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -278,7 +281,10 @@ public struct MyProfileView: View {
   private var moreCard: some View {
     card {
       NavigationLink {
-        GrowthCurveView(studentID: studentID, plans: plans, e1rm: e1rm)
+        GrowthCurveView(
+          studentID: studentID, plans: plans, e1rm: e1rm,
+          mode: trainingMode, catalog: soloCatalog
+        )
       } label: {
         moreRow(icon: "chart.xyaxis.line", title: "成长曲线")
       }

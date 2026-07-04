@@ -28,7 +28,9 @@ public struct TrainingHistoryView: View {
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel? = nil,
-    sessionReviews: (any SessionReviewRepository)? = nil
+    sessionReviews: (any SessionReviewRepository)? = nil,
+    trainingMode: TrainingMode = .coached,
+    soloCatalog: [Exercise] = []
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -37,7 +39,8 @@ public struct TrainingHistoryView: View {
     self._viewModel = State(
       initialValue: TrainingHistoryViewModel(plans: plans, logs: logs, reviews: sessionReviews))
     self._trendViewModel = State(
-      initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
+      initialValue: DashboardE1RMTrendViewModel(
+        plans: plans, e1rm: e1rm, mode: trainingMode, catalog: soloCatalog)
     )
   }
 
