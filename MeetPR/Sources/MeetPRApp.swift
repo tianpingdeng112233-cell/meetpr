@@ -157,7 +157,6 @@ struct MeetPRApp: App {
             session: session,
             cache: TrainingLogCache()
           ),
-          studentSessionReviews: BackendSessionReviewRepository(api: api, session: session),
           studentFeedback: BackendStudentFeedbackRepository(
             api: api,
             session: session,
@@ -178,6 +177,7 @@ struct MeetPRApp: App {
           studentEvaluations: BackendStudentEvaluationRepository(api: api, session: session),
           studentEvaluationSummaries: BackendEvaluationSummaryRepository(
             api: api, session: session),
+          studentSessionReviews: BackendSessionReviewRepository(api: api, session: session),
           summaryReadStore: UserDefaultsEvaluationSummaryReadStore(),
           // Coach-side video wall (spec 029 second pass): server-side
           // metadata + per-item presigned playback URLs.
