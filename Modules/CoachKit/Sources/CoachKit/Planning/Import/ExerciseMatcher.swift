@@ -1,3 +1,4 @@
+import CatalogKit
 import CoreModels
 import Foundation
 

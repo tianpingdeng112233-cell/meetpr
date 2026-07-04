@@ -9,6 +9,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../CoreModels"),
+    .package(path: "../CatalogKit"),
     .package(path: "../RepositoryContracts"),
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
@@ -18,6 +19,7 @@ let package = Package(
       name: "StudentKit",
       dependencies: [
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "CatalogKit", package: "CatalogKit"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),

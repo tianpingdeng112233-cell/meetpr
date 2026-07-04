@@ -9,6 +9,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../CoreModels"),
+    .package(path: "../CatalogKit"),
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
     .package(path: "../RepositoryContracts"),
@@ -22,12 +23,12 @@ let package = Package(
       name: "CoachKit",
       dependencies: [
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "CatalogKit", package: "CatalogKit"),
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "CoreXLSX", package: "CoreXLSX"),
       ],
-      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(

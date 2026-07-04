@@ -7,17 +7,27 @@ import Foundation
 // 完整动作集 (synthetic 比赛式X + bundled catalog) and must fold to a unique name —
 // enforced by a load-time guardrail test so a catalog rename can't leave it dangling.
 
-struct ExerciseAlias: Decodable, Equatable {
-  let alias: String
-  let canonical: String
+public struct ExerciseAlias: Decodable, Equatable, Sendable {
+  public let alias: String
+  public let canonical: String
+
+  public init(alias: String, canonical: String) {
+    self.alias = alias
+    self.canonical = canonical
+  }
 }
 
-struct ExerciseAliasTable: Decodable {
-  let version: Int
-  let aliases: [ExerciseAlias]
+public struct ExerciseAliasTable: Decodable, Sendable {
+  public let version: Int
+  public let aliases: [ExerciseAlias]
+
+  public init(version: Int, aliases: [ExerciseAlias]) {
+    self.version = version
+    self.aliases = aliases
+  }
 
   /// The bundled, hand-maintained V1 seed table.
-  static func bundled() -> ExerciseAliasTable {
+  public static func bundled() -> ExerciseAliasTable {
     guard let url = Bundle.module.url(forResource: "exercise-aliases", withExtension: "json") else {
       assertionFailure("Bundled alias table missing. Check Package.swift resources declaration.")
       return ExerciseAliasTable(version: 0, aliases: [])
