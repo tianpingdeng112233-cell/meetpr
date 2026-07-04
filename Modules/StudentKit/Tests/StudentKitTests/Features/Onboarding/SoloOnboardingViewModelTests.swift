@@ -85,6 +85,29 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   #expect(profile.squat1RMKg == 150)
 }
 
+/// 补记 sheet path: MyProfileViewModel.save with a 1RM patch succeeds for
+/// solo after completion and the reloaded profile carries the new value.
+@MainActor
+@Test func profileSaveBackfillsSoloBaseline() async throws {
+  let repo = makeRepo()
+  var unitOnly = OnboardingPatch()
+  unitOnly.unitPreference = .value(.kg)
+  _ = try await repo.upsert(unitOnly)
+  _ = try await repo.complete()
+
+  let viewModel = MyProfileViewModel(studentId: soloID, repo: repo)
+  await viewModel.reload()
+
+  var patch = OnboardingPatch()
+  patch.squat1RMKg = .value(155)
+  #expect(await viewModel.save(patch))
+  guard case .loaded(let profile) = viewModel.state else {
+    Issue.record("Expected loaded state after save")
+    return
+  }
+  #expect(profile.squat1RMKg == 155)
+}
+
 /// Coached semantics unchanged: the lock still throws after completion.
 @Test func inMemoryCoachedRepoKeepsOneRMLock() async throws {
   let repo = InMemoryOnboardingRepository(

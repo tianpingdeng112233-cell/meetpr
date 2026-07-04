@@ -18,7 +18,9 @@ public struct MyProfileView: View {
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   /// nil hides the row (demo/previews); live wiring passes Session.logout.
   private let onLogout: (@MainActor () async -> Void)?
+  private let trainingMode: TrainingMode
   @State private var viewModel: MyProfileViewModel
+  @State private var editingBaseline = false
 
   public init(
     studentID: UUID,
@@ -26,13 +28,15 @@ public struct MyProfileView: View {
     e1rm: any E1RMRepository,
     onboarding: any OnboardingRepository,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
-    onLogout: (@MainActor () async -> Void)? = nil
+    onLogout: (@MainActor () async -> Void)? = nil,
+    trainingMode: TrainingMode = .coached
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onLogout = onLogout
+    self.trainingMode = trainingMode
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -63,6 +67,14 @@ public struct MyProfileView: View {
       .hideNavigationBar()
     }
     .task { await viewModel.loadIfNeeded() }
+    .sheet(isPresented: $editingBaseline) {
+      if case .loaded(let profile) = viewModel.state {
+        SoloBaselineEditSheet(profile: profile) { patch in
+          await viewModel.save(patch)
+        }
+        .presentationDetents([.large])
+      }
+    }
   }
 
   @ViewBuilder
@@ -90,7 +102,9 @@ public struct MyProfileView: View {
 
   @ViewBuilder
   private func sections(_ profile: OnboardingProfile) -> some View {
-    sectionLabel("训练基线 · 教练管理")
+    // Solo owns its baseline (backend spec 013) — no 教练 words anywhere
+    // on the solo profile (spec 046 验收 3).
+    sectionLabel(trainingMode == .selfTrain ? "训练基线" : "训练基线 · 教练管理")
     oneRMCard(profile).padding(.top, 8)
     // 基线是入门锚点,不是第三个「我的实力」(spec 050 §4)——实测走势
     // 归成长曲线,两个数字各安其位。
@@ -100,7 +114,8 @@ public struct MyProfileView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(.top, 4)
 
-    sectionLabel("恢复与伤病 · 改动通知教练").padding(.top, 18)
+    sectionLabel(trainingMode == .selfTrain ? "恢复与伤病" : "恢复与伤病 · 改动通知教练")
+      .padding(.top, 18)
     card {
       profileRow(
         "恢复评估", OnboardingSummaryFormatter.recovery(profile),
@@ -155,7 +170,10 @@ public struct MyProfileView: View {
             .tracking(Font.MeetPR.monoLabelTracking)
             .foregroundStyle(Color.MeetPR.brandRed)
           Spacer()
-          Image(systemName: "lock").font(.system(size: 14)).foregroundStyle(Color.MeetPR.fgTertiary)
+          if trainingMode != .selfTrain {
+            Image(systemName: "lock").font(.system(size: 14))
+              .foregroundStyle(Color.MeetPR.fgTertiary)
+          }
         }
         HStack(spacing: 12) {
           oneRMValue("深蹲", profile.squat1RMKg)
@@ -163,16 +181,39 @@ public struct MyProfileView: View {
           oneRMValue("硬拉", profile.deadlift1RMKg)
         }
         .padding(.top, 12)
-        HStack(spacing: 6) {
-          Image(systemName: "lock").font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
-          Text("训练周期中无法修改 · 联系教练")
-            .font(Font.MeetPR.monoLabel)
-            .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+        if trainingMode == .selfTrain {
+          // 后补入口 (spec 046 §2): solo's baseline belongs to the student.
+          Button {
+            editingBaseline = true
+          } label: {
+            HStack(spacing: 6) {
+              Image(systemName: "square.and.pencil").font(.system(size: 12))
+              Text(hasBaseline(profile) ? "修改入门基线" : "补记入门基线")
+                .font(Font.MeetPR.monoLabel)
+                .tracking(Font.MeetPR.monoLabelTracking)
+            }
+            .foregroundStyle(Color.MeetPR.brandRed)
+          }
+          .buttonStyle(.plain)
+          .padding(.top, 14)
+          .accessibilityIdentifier("profile.baseline.edit")
+        } else {
+          HStack(spacing: 6) {
+            Image(systemName: "lock").font(.system(size: 12))
+              .foregroundStyle(Color.MeetPR.fgTertiary)
+            Text("训练周期中无法修改 · 联系教练")
+              .font(Font.MeetPR.monoLabel)
+              .tracking(Font.MeetPR.monoLabelTracking)
+              .foregroundStyle(Color.MeetPR.fgTertiary)
+          }
+          .padding(.top, 14)
         }
-        .padding(.top, 14)
       }
     }
+  }
+
+  private func hasBaseline(_ profile: OnboardingProfile) -> Bool {
+    profile.squat1RMKg != nil || profile.bench1RMKg != nil || profile.deadlift1RMKg != nil
   }
 
   private func oneRMValue(_ label: String, _ value: Decimal?) -> some View {
