@@ -107,7 +107,17 @@ public struct StudentRootView: View {
               catalog: soloCatalog,
               pendingCount: pendingSetLogCount
             ),
-            catalog: soloCatalog
+            catalog: soloCatalog,
+            makeReviewViewModel: sessionReviews.map { repo in
+              let studentID = self.studentID
+              return {
+                SessionReviewSubmitViewModel(
+                  repository: repo,
+                  studentID: studentID,
+                  reviewDate: SoloSessionViewModel.dayString(Date(), calendar: .current)
+                )
+              }
+            }
           )
         } else {
           DashboardView(
@@ -167,6 +177,13 @@ public struct StudentRootView: View {
       // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
       // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
       .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
+    }
+    // Acking PRs on the growth tab must clear the profile badge when the
+    // student switches away (spec 051 §2 — same staleness family as U6).
+    .onChange(of: selectedTab) { _, _ in
+      Task {
+        pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+      }
     }
     .task {
       if feedbackViewModel.state == .idle {

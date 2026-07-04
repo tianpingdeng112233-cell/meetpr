@@ -66,6 +66,10 @@ struct ReadinessCheckinSheet: View {
 
   private var stepOne: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
+      // 动机文案 (spec 051 §3): 走查 P1-4 — 学员不知道填这个给谁看。
+      Text("教练会据此调整你的计划")
+        .font(.footnote)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
       scaleRow(
         title: "昨晚睡得怎么样？",
         lowAnchor: "很差",
