@@ -46,6 +46,36 @@ import Testing
   }
 }
 
+/// spec 051 §1 回显: a saved one-liner shows up keyed to its day after load.
+@MainActor
+@Test func trainingHistoryViewModelIndexesReviewsByDay() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let reviews = InMemorySessionReviewRepository()
+  let viewModel = TrainingHistoryViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: InMemoryStudentTrainingLogRepository(
+      seed: StudentDemoSeed.makeHistoricalLogs(studentID: studentID)
+    ),
+    reviews: reviews
+  )
+
+  await viewModel.load(studentID: studentID)
+  guard case .loaded(let weeks, _) = viewModel.state, let day = weeks.first?.days.first else {
+    Issue.record("Expected loaded state with at least one day")
+    return
+  }
+
+  let key = SoloSessionViewModel.dayString(day.date, calendar: .current)
+  _ = try await reviews.submitReview(
+    studentID: studentID, reviewDate: key, feeling: "推得顺", sessionRPE: 8)
+  await viewModel.load(studentID: studentID)
+
+  #expect(viewModel.reviewsByDay[key]?.feeling == "推得顺")
+  #expect(viewModel.reviewsByDay[key]?.sessionRPE == 8)
+}
+
 @MainActor
 @Test func trainingHistoryViewModelGroupsCycleDaysIntoWeeks() async {
   let studentID = StudentDemoSeed.studentID

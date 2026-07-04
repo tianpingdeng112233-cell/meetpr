@@ -8,17 +8,18 @@
 
 - 走查建议采纳:SessionSummaryView 的三条自由反思**收敛为一条**「一句话感受」+ 可选整场 RPE(0-10 步进 0.5);减输入负担,能坚持写才有价值。
 - 提交走 `SessionReviewRepository`(新协议,Backend 实现打 `PUT /students/:id/reviews/:date`,date=会话日与 set_logs.logged_date 同口径;InMemory 同步实现)。
-- **学员自看**:成长 tab 历史(TrainingHistory 的日详情)展示当日回顾;coached 文案标注「教练会看到」,**solo 文案「记录你的状态,曲线之外的另一半」**(solo 没教练,不撒谎)。
+- **学员自看**:成长 tab 历史(TrainingHistory 的日详情)展示当日回顾(实现:TrainingHistoryViewModel.reviewsByDay 按日索引,HistoryEntriesView 日头下一行「感受」·整场 RPE;取失败只隐藏该行不打翻历史页);coached 文案标注「教练会看到」,**solo 文案「记录你的状态,曲线之外的另一半」**(solo 没教练,不撒谎)。
 - 断网:V1 直接失败提示重试(回顾非训练组,不入重发队列;若走查复检仍痛再升级)。
 
 ## 2. 深链与 PR 红点(P0-7)
 
-- 通知面板各项落点核对:计划通知→计划页、反馈→成长反馈区(修实测偏航的路由)。
-- **PR 红点消费面**:我的 tab 徽标现计 pendingPRCount 但无处查看/确认——成长 tab 增「未确认 PR」小节(列表:动作/数值/日期 + 逐条确认=ack),确认后徽标即刻减;PRBanner 既有即时流不变。
+- 通知面板各项落点核对(2026-07-04 实施期核实):**三条路由在 5-tab IA 下均已正确**——计划通知→训练 tab(计划的唯一住所,无独立计划页)+ markCurrentPlanSeen 清红点、反馈→成长 tab 反馈区、评估→总结页;走查时的偏航已被 1:1 改版(#180)+U6 今日 tab 分叉修复吸收,本 spec 无需改路由。
+- **PR 红点消费面**:我的 tab 徽标现计 pendingPRCount 但无处查看/确认——成长 tab 增「未确认 PR」小节(列表:动作/数值/日期 + 逐条确认=ack),确认后徽标即刻减(tab 切换重数);PRBanner 既有即时流不变。
 
 ## 3. 问卷动机文案(P1-4)
 
-- ReadinessCheckinSheet 顶部一句:coached =「教练会据此调整你的计划」;solo =「用于你的疲劳走势与休息建议」。回显已有(心形 filled),不动。
+- ReadinessCheckinSheet 顶部一句(coached):「教练会据此调整你的计划」。回显已有(心形 filled),不动。
+- solo 版文案条款作废(2026-07-04 核实):solo 模式没有 readiness 入口——今日状态问卷长在 coached TodayWorkoutView 工具栏,SoloTodayView 不含。solo 疲劳自评是否值得做记 FOLLOWUPS F-030 族,不在本 spec。
 
 ## 非目标
 

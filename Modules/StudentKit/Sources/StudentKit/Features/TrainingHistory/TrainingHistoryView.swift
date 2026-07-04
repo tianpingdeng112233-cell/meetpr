@@ -27,13 +27,15 @@ public struct TrainingHistoryView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
-    feedbackViewModel: FeedbackInboxViewModel? = nil
+    feedbackViewModel: FeedbackInboxViewModel? = nil,
+    sessionReviews: (any SessionReviewRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
-    self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
+    self._viewModel = State(
+      initialValue: TrainingHistoryViewModel(plans: plans, logs: logs, reviews: sessionReviews))
     self._trendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
     )
@@ -499,7 +501,9 @@ private struct AllHistoryScreen: View {
   var body: some View {
     Group {
       if case .loaded(let weeks, let logs) = viewModel.state {
-        HistoryEntriesView(weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName)
+        HistoryEntriesView(
+          weeks: weeks, logs: logs, reviews: viewModel.reviewsByDay,
+          selectedExerciseName: $selectedExerciseName)
       } else {
         ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
       }
