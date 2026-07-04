@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 import Testing
 
@@ -44,6 +45,55 @@ import Testing
     Issue.record("Expected a non-cancellation error to surface as .error")
     return
   }
+}
+
+/// spec 047 §2: solo history fetches scope=all (the seeded rows are adhoc —
+/// a plan-scoped fetch would drop them), never asks for a plan (throwing
+/// plans repo proves it), and groups 日即会话 by calendar month.
+@MainActor
+@Test func trainingHistorySoloGroupsAdhocLogsByMonth() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let squat = Exercise(
+    id: UUID(), name: "低杠位深蹲", nameEn: "Low-Bar Squat", exerciseType: .mainLift,
+    mainLiftFamily: .squat, isCompetitionLift: true, muscleGroups: [.quad],
+    equipment: [.barbell], createdAt: Date(timeIntervalSince1970: 0))
+  let now = try Date("2026-07-04T10:00:00Z", strategy: .iso8601)
+  func adhocLog(daysAgo: Int, setIndex: Int) -> StudentSetLog {
+    let loggedAt = now.addingTimeInterval(Double(-daysAgo) * 86_400)
+    return StudentSetLog(
+      id: UUID(), studentID: studentID, planExerciseID: nil, exerciseID: squat.id,
+      loggedDate: SoloSessionViewModel.dayString(loggedAt, calendar: .current),
+      adhoc: true, setIndex: setIndex, loggedAt: loggedAt,
+      weightKg: 140, reps: 5, rpe: 8, completed: true)
+  }
+  let viewModel = TrainingHistoryViewModel(
+    plans: ThrowingStudentPlanRepository { URLError(.badServerResponse) },
+    logs: InMemoryStudentTrainingLogRepository(
+      seed: [adhocLog(daysAgo: 1, setIndex: 1), adhocLog(daysAgo: 40, setIndex: 1)]
+    ),
+    mode: .selfTrain,
+    catalog: [squat],
+    now: { now }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  guard case .loaded(let weeks, let fetched) = viewModel.state else {
+    Issue.record("Expected loaded state, got \(viewModel.state)")
+    return
+  }
+  #expect(weeks.isEmpty)
+  #expect(fetched.count == 2)
+  #expect(viewModel.soloMonths.count == 2)
+  let newest = try #require(viewModel.soloMonths.first?.days.first)
+  #expect(newest.exerciseNames == ["低杠位深蹲"])
+  #expect(newest.setCount == 1)
+}
+
+@MainActor
+@Test func soloMonthTitlesReadAsChineseYearMonth() {
+  #expect(TrainingHistoryViewModel.monthTitle(for: "2026-07") == "2026 年 7 月")
+  #expect(TrainingHistoryViewModel.monthTitle(for: "junk") == "junk")
 }
 
 /// spec 051 §1 回显: a saved one-liner shows up keyed to its day after load.

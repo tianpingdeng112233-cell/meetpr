@@ -37,7 +37,9 @@ public struct TrainingHistoryView: View {
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self._viewModel = State(
-      initialValue: TrainingHistoryViewModel(plans: plans, logs: logs, reviews: sessionReviews))
+      initialValue: TrainingHistoryViewModel(
+        plans: plans, logs: logs, reviews: sessionReviews,
+        e1rm: e1rm, mode: trainingMode, catalog: soloCatalog))
     self._trendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(
         plans: plans, e1rm: e1rm, mode: trainingMode, catalog: soloCatalog)
