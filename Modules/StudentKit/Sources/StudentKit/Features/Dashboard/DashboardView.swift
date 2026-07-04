@@ -25,6 +25,7 @@ public struct DashboardView: View {
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
   @State private var showsNotifications = false
   @State private var showsEvaluationSummary = false
+  @State private var dayChangeTick = 0
   /// Day whose growth curve is shown. `nil` ⇒ today (the default selection).
   @State private var selectedDate: Date?
 
@@ -91,6 +92,8 @@ public struct DashboardView: View {
           if let metrics = profileMetricsViewModel.metrics {
             DashboardProfileMetricsView(metrics: metrics)
               .padding(.top, 20)
+              // Re-derives the countdown when the day flips (spec 049 §4).
+              .id(dayChangeTick)
           }
         }
         .padding(16)
@@ -132,6 +135,14 @@ public struct DashboardView: View {
     }
     // 完成庆祝时刻: the day's only achievement feedback (spec 049 §1).
     .sensoryFeedback(.success, trigger: todayIsComplete) { _, newValue in newValue }
+    // Countdown/date-derived rows recompute when the calendar day flips
+    // (spec 049 §4) — the notification bumps a token the body reads.
+    .onReceive(
+      NotificationCenter.default.publisher(for: .NSCalendarDayChanged)
+        .receive(on: RunLoop.main)
+    ) { _ in
+      dayChangeTick += 1
+    }
   }
 
   private var todayIsComplete: Bool {
