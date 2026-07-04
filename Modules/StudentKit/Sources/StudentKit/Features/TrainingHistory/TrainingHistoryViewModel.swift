@@ -186,6 +186,12 @@ public final class TrainingHistoryViewModel {
     }
   }
 
+  /// 本月次数 for the solo stats row (replaces the plan-week count).
+  public var currentMonthSessionCount: Int {
+    let key = Self.monthKey(for: now(), calendar: .current)
+    return soloMonths.first { $0.id == key }?.days.count ?? 0
+  }
+
   static func monthKey(for date: Date, calendar: Calendar) -> String {
     let parts = calendar.dateComponents([.year, .month], from: date)
     return String(format: "%04d-%02d", parts.year ?? 0, parts.month ?? 0)

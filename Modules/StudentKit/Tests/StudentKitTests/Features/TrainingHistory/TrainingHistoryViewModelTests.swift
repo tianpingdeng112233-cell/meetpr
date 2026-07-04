@@ -88,6 +88,8 @@ import Testing
   let newest = try #require(viewModel.soloMonths.first?.days.first)
   #expect(newest.exerciseNames == ["低杠位深蹲"])
   #expect(newest.setCount == 1)
+  // 本月次数 (stats row): only the day inside the current month counts.
+  #expect(viewModel.currentMonthSessionCount == 1)
 }
 
 @MainActor

@@ -15,6 +15,7 @@ public struct TrainingHistoryView: View {
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel?
+  private let trainingMode: TrainingMode
   @State private var viewModel: TrainingHistoryViewModel
   @State private var trendViewModel: DashboardE1RMTrendViewModel
   @State private var prEvent: PRBreakthroughEvent?
@@ -36,6 +37,7 @@ public struct TrainingHistoryView: View {
     self.plans = plans
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
+    self.trainingMode = trainingMode
     self._viewModel = State(
       initialValue: TrainingHistoryViewModel(
         plans: plans, logs: logs, reviews: sessionReviews,
@@ -85,7 +87,7 @@ public struct TrainingHistoryView: View {
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
       .navigationDestination(isPresented: $showsAllHistory) {
-        AllHistoryScreen(viewModel: viewModel)
+        AllHistoryScreen(viewModel: viewModel, mode: trainingMode)
       }
     }
     .task { await loadIfNeeded() }
@@ -256,7 +258,12 @@ public struct TrainingHistoryView: View {
       sectionLabel("全部历史")
       HStack {
         stat("训练次数", value: sessionCountText)
-        stat("训练周", value: "\(weekCount)")
+        if trainingMode == .selfTrain {
+          // 没有计划周的概念 (spec 047 §2) — 自然历月替代。
+          stat("本月次数", value: "\(viewModel.currentMonthSessionCount)")
+        } else {
+          stat("训练周", value: "\(weekCount)")
+        }
         stat("三大项合计", value: sbdTotalText)
       }
       .padding(16)
@@ -501,14 +508,20 @@ public struct TrainingHistoryView: View {
 @available(iOS 17.0, macOS 14.0, *)
 private struct AllHistoryScreen: View {
   let viewModel: TrainingHistoryViewModel
+  var mode: TrainingMode = .coached
   @State private var selectedExerciseName: String?
 
   var body: some View {
     Group {
       if case .loaded(let weeks, let logs) = viewModel.state {
-        HistoryEntriesView(
-          weeks: weeks, logs: logs, reviews: viewModel.reviewsByDay,
-          selectedExerciseName: $selectedExerciseName)
+        if mode == .selfTrain {
+          // 无计划周可分组 (spec 047 §2) — 月分组日卡片替代。
+          SoloHistoryListView(months: viewModel.soloMonths, reviews: viewModel.reviewsByDay)
+        } else {
+          HistoryEntriesView(
+            weeks: weeks, logs: logs, reviews: viewModel.reviewsByDay,
+            selectedExerciseName: $selectedExerciseName)
+        }
       } else {
         ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
       }
