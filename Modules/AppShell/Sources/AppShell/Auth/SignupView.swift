@@ -171,7 +171,7 @@ extension UserRole {
     switch self {
     case .coach: "编排周期 · 审阅学员 · 反馈视频"
     case .coachedStudent: "接收计划 · 记录训练 · 上传视频"
-    case .selfTrainStudent: "选择训练模板 · 自主跟练"
+    case .selfTrainStudent: "随手记训练 · 看见成长"
     }
   }
 }
