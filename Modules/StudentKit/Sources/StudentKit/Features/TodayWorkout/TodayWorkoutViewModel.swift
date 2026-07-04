@@ -71,9 +71,12 @@ public final class TodayWorkoutViewModel {
       exerciseReferences = references
       state = .loaded(plan: day, drafts: drafts)
     } catch {
-      if isCurrentLoad(generation) {
-        state = .error(error.localizedDescription)
+      guard isCurrentLoad(generation) else { return }
+      if error.isTaskCancellation {
+        state = .idle
+        return
       }
+      state = .error(error.localizedDescription)
     }
   }
 
@@ -175,6 +178,13 @@ public final class TodayWorkoutViewModel {
         startRestTimer(after: draft, drafts: nextDrafts)
       }
     } catch {
+      // `persist` flips to `.recording` before awaiting `recordSet`, so a
+      // cancelled set-logging task must restore the prior `.loaded` snapshot
+      // rather than stranding the UI in `.recording`.
+      if error.isTaskCancellation {
+        state = .loaded(plan: plan, drafts: drafts)
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }
@@ -243,32 +253,6 @@ public final class TodayWorkoutViewModel {
     generation == loadGeneration
   }
 
-  private static func planContext(
-    from plan: StudentPlanView?,
-    selectedDate: Date
-  ) -> TodayWorkoutPlanContext? {
-    guard let plan else { return nil }
-    return TodayWorkoutPlanContext(
-      planKind: plan.planKind,
-      weekIndex: weekIndex(for: selectedDate, startDate: plan.startDate, fallback: plan.weekIndex),
-      startDate: plan.startDate
-    )
-  }
-
-  private static func weekIndex(for date: Date, startDate: Date, fallback: Int) -> Int {
-    let calendar = Calendar.current
-    let start = calendar.startOfDay(for: startDate)
-    let selected = calendar.startOfDay(for: date)
-    guard let elapsedDays = calendar.dateComponents([.day], from: start, to: selected).day else {
-      return fallback
-    }
-    return max(1, elapsedDays / 7 + 1)
-  }
-
-  private static func dayRange(containing date: Date) -> ClosedRange<Date> {
-    let start = Calendar.current.startOfDay(for: date)
-    return start...start.addingTimeInterval(86_400 - 1)
-  }
 }
 
 // MARK: - Draft building & e1RM/PR side effects

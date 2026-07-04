@@ -41,6 +41,10 @@ public final class WeekOverviewViewModel {
       }
       state = .loaded(days: days, logs: fetchedLogs, weekIndex: weekIndex)
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }
