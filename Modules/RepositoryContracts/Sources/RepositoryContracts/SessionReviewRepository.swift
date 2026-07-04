@@ -18,5 +18,5 @@ public protocol SessionReviewRepository: Sendable {
     sessionRPE: Decimal?
   ) async throws -> SessionReview
   /// Reviews in [from, to] (YYYY-MM-DD, inclusive), newest first.
-  func fetchReviews(studentID: UUID, from: String, to: String) async throws -> [SessionReview]
+  func fetchReviews(studentID: UUID, from: String, to toDay: String) async throws -> [SessionReview]
 }

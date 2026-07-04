@@ -17,7 +17,9 @@ private actor FailingReviews: SessionReviewRepository {
     throw URLError(.notConnectedToInternet)
   }
 
-  func fetchReviews(studentID: UUID, from: String, to: String) async throws -> [SessionReview] {
+  func fetchReviews(
+    studentID: UUID, from: String, to toDay: String
+  ) async throws -> [SessionReview] {
     []
   }
 }

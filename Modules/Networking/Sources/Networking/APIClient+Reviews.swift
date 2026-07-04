@@ -13,14 +13,14 @@ extension APIClient {
   public func studentSessionReviews(
     studentID: UUID,
     from: String,
-    to: String,
+    to toDay: String,
     accessToken: String
   ) async throws -> SessionReviewsResponseDTO {
     try await get(
       path: "/students/\(studentID.uuidString)/reviews",
       queryItems: [
         URLQueryItem(name: "from", value: from),
-        URLQueryItem(name: "to", value: to),
+        URLQueryItem(name: "to", value: toDay),
       ],
       accessToken: accessToken
     )

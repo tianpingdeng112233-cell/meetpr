@@ -31,11 +31,11 @@ public actor BackendSessionReviewRepository: SessionReviewRepository {
   }
 
   public func fetchReviews(
-    studentID: UUID, from: String, to: String
+    studentID: UUID, from: String, to toDay: String
   ) async throws -> [SessionReview] {
     let token = try await session.accessToken()
     let response = try await api.studentSessionReviews(
-      studentID: studentID, from: from, to: to, accessToken: token)
+      studentID: studentID, from: from, to: toDay, accessToken: token)
     return response.reviews.map { $0.toDomain() }
   }
 }
@@ -88,10 +88,10 @@ public actor InMemorySessionReviewRepository: SessionReviewRepository {
   }
 
   public func fetchReviews(
-    studentID: UUID, from: String, to: String
+    studentID: UUID, from: String, to toDay: String
   ) async throws -> [SessionReview] {
     (reviewsByStudent[studentID] ?? [:]).values
-      .filter { $0.reviewDate >= from && $0.reviewDate <= to }
+      .filter { $0.reviewDate >= from && $0.reviewDate <= toDay }
       .sorted { $0.reviewDate > $1.reviewDate }
   }
 }

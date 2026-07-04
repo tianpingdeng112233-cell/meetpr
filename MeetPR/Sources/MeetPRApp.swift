@@ -120,8 +120,7 @@ struct MeetPRApp: App {
       )
     }
   #else
-    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
-      let api = APIClient.shared
+    private static func makeSession(api: APIClient, draftStore: DraftStore) -> Session {
       let auth: any AuthRepository = NetworkingAuthRepository(api: api)
       let tokenStore: any TokenStoring = KeychainTokenStore()
       let session = Session(
@@ -132,6 +131,12 @@ struct MeetPRApp: App {
         }
       )
       session.bindToErrors(api.errorStream)
+      return session
+    }
+
+    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
+      let api = APIClient.shared
+      let session = makeSession(api: api, draftStore: draftStore)
       return RootDependencies(
         rootView: RootView(
           coachPlans: BackendPlanRepository(api: api, session: session, cache: PlanCache()),
