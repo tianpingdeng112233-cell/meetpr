@@ -120,13 +120,13 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
     case .all:
       // Training-day semantics: every row, windowed on the client-local
       // logged date (mirrors backend spec 010's scope=all).
-      let from = Self.dayString(dateRange.lowerBound)
-      let to = Self.dayString(dateRange.upperBound)
+      let fromDay = Self.dayString(dateRange.lowerBound)
+      let toDay = Self.dayString(dateRange.upperBound)
       return
         logs
         .filter { log in
           let day = log.loggedDate ?? Self.dayString(log.loggedAt)
-          return day >= from && day <= to
+          return day >= fromDay && day <= toDay
         }
         .sorted { $0.loggedAt < $1.loggedAt }
     }
