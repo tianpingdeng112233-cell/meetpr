@@ -6,6 +6,7 @@ import SwiftUI
 struct HistoryEntriesView: View {
   let weeks: [TrainingHistoryViewModel.HistoryWeek]
   let logs: [StudentSetLog]
+  var reviews: [String: SessionReview] = [:]
   @Binding var selectedExerciseName: String?
 
   var body: some View {
@@ -60,6 +61,13 @@ struct HistoryEntriesView: View {
     return VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
       HistoryDayHeader(day: day, progress: progress)
 
+      // 当日一句话回顾 (spec 051 §1): 写下的东西必须能被自己看回来。
+      if let review = reviews[SoloSessionViewModel.dayString(day.date, calendar: .current)] {
+        Text(reviewLine(review))
+          .font(Font.MeetPR.caption)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
+
       if !day.exercises.isEmpty {
         ForEach(day.exercises) { exercise in
           exerciseBlock(exercise, logs: logs)
@@ -74,6 +82,14 @@ struct HistoryEntriesView: View {
         .stroke(Color.MeetPR.border, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+  }
+
+  private func reviewLine(_ review: SessionReview) -> String {
+    var line = "「\(review.feeling)」"
+    if let rpe = review.sessionRPE {
+      line += " · 整场 RPE \(rpe)"
+    }
+    return line
   }
 
   private func exerciseBlock(_ exercise: StudentPlanExercise, logs: [StudentSetLog]) -> some View {

@@ -17,6 +17,7 @@ public struct StudentRootView: View {
   private let trainingMode: TrainingMode
   private let soloCatalog: [Exercise]
   private let pendingSetLogCount: @Sendable (UUID) async -> Int
+  private let sessionReviews: (any SessionReviewRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
@@ -59,7 +60,8 @@ public struct StudentRootView: View {
     onLogout: (@MainActor () async -> Void)? = nil,
     trainingMode: TrainingMode = .coached,
     soloCatalog: [Exercise] = [],
-    pendingSetLogCount: (@Sendable (UUID) async -> Int)? = nil
+    pendingSetLogCount: (@Sendable (UUID) async -> Int)? = nil,
+    sessionReviews: (any SessionReviewRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -71,6 +73,7 @@ public struct StudentRootView: View {
     self.trainingMode = trainingMode
     self.soloCatalog = soloCatalog
     self.pendingSetLogCount = pendingSetLogCount ?? { _ in 0 }
+    self.sessionReviews = sessionReviews
     self.onboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
@@ -104,7 +107,17 @@ public struct StudentRootView: View {
               catalog: soloCatalog,
               pendingCount: pendingSetLogCount
             ),
-            catalog: soloCatalog
+            catalog: soloCatalog,
+            makeReviewViewModel: sessionReviews.map { repo in
+              let studentID = self.studentID
+              return {
+                SessionReviewSubmitViewModel(
+                  repository: repo,
+                  studentID: studentID,
+                  reviewDate: SoloSessionViewModel.dayString(Date(), calendar: .current)
+                )
+              }
+            }
           )
         } else {
           DashboardView(
@@ -130,7 +143,8 @@ public struct StudentRootView: View {
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse
+        videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse,
+        sessionReviews: sessionReviews
       )
       .tag(StudentTab.training)
       .tabItem {
@@ -141,7 +155,7 @@ public struct StudentRootView: View {
       // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
-        feedbackViewModel: feedbackViewModel
+        feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews
       )
       .tag(StudentTab.growth)
       .tabItem {
@@ -163,6 +177,13 @@ public struct StudentRootView: View {
       // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
       // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
       .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
+    }
+    // Acking PRs on the growth tab must clear the profile badge when the
+    // student switches away (spec 051 §2 — same staleness family as U6).
+    .onChange(of: selectedTab) { _, _ in
+      Task {
+        pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+      }
     }
     .task {
       if feedbackViewModel.state == .idle {

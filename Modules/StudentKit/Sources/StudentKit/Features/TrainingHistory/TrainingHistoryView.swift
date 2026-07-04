@@ -19,6 +19,7 @@ public struct TrainingHistoryView: View {
   @State private var trendViewModel: DashboardE1RMTrendViewModel
   @State private var prEvent: PRBreakthroughEvent?
   @State private var prFamily: LiftFamily?
+  @State private var pendingPRs: [PRBreakthroughEvent] = []
   @State private var showsAllHistory = false
 
   public init(
@@ -26,13 +27,15 @@ public struct TrainingHistoryView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
-    feedbackViewModel: FeedbackInboxViewModel? = nil
+    feedbackViewModel: FeedbackInboxViewModel? = nil,
+    sessionReviews: (any SessionReviewRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
-    self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
+    self._viewModel = State(
+      initialValue: TrainingHistoryViewModel(plans: plans, logs: logs, reviews: sessionReviews))
     self._trendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
     )
@@ -53,6 +56,7 @@ public struct TrainingHistoryView: View {
         ScrollView {
           VStack(alignment: .leading, spacing: 16) {
             if let prEvent { prBanner(prEvent) }
+            if !pendingPRs.isEmpty { unacknowledgedPRSection }
 
             switch viewModel.state {
             case .idle, .loading:
@@ -433,8 +437,57 @@ public struct TrainingHistoryView: View {
       await feedbackViewModel.load(studentID: studentID)
     }
     let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
-    prEvent = prs.max { $0.occurredAt < $1.occurredAt }
+    pendingPRs = prs.sorted { $0.occurredAt > $1.occurredAt }
+    prEvent = pendingPRs.first
     prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+  }
+
+  /// 红点终于有地方消费 (spec 051 §2): acknowledging removes the row, the
+  /// banner, and (via the tab-switch recount) the profile badge.
+  private func acknowledge(_ event: PRBreakthroughEvent) async {
+    try? await e1rm.acknowledgePR(eventId: event.id)
+    pendingPRs.removeAll { $0.id == event.id }
+    prEvent = pendingPRs.first
+    prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+  }
+
+  private var unacknowledgedPRSection: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text("未确认 PR")
+        .font(.headline)
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+      ForEach(pendingPRs, id: \.id) { event in
+        HStack(spacing: 10) {
+          Text("🎉")
+          VStack(alignment: .leading, spacing: 2) {
+            Text(prRowTitle(event))
+              .font(.subheadline.bold())
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+            Text(StudentFormatting.dayMonthFormatter.string(from: event.occurredAt))
+              .font(.caption)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+          }
+          Spacer()
+          Button("确认") {
+            Task { await acknowledge(event) }
+          }
+          .font(.footnote.bold())
+          .buttonStyle(.bordered)
+          .accessibilityIdentifier("growth.pr.ack.\(event.id.uuidString)")
+        }
+        .padding(12)
+        .background(Color.MeetPR.surface1)
+        .clipShape(.rect(cornerRadius: 10))
+      }
+    }
+  }
+
+  private func prRowTitle(_ event: PRBreakthroughEvent) -> String {
+    let value = StudentFormatting.kilograms(event.breakthroughE1RMKg)
+    if let family = familyForExercise(event.exerciseId) {
+      return "\(family.studentDisplayName) e1RM 突破 · \(value) kg"
+    }
+    return "e1RM 突破 · \(value) kg"
   }
 }
 
@@ -448,7 +501,9 @@ private struct AllHistoryScreen: View {
   var body: some View {
     Group {
       if case .loaded(let weeks, let logs) = viewModel.state {
-        HistoryEntriesView(weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName)
+        HistoryEntriesView(
+          weeks: weeks, logs: logs, reviews: viewModel.reviewsByDay,
+          selectedExerciseName: $selectedExerciseName)
       } else {
         ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
       }

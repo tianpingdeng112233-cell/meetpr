@@ -24,13 +24,22 @@ public final class TrainingHistoryViewModel {
   }
 
   public private(set) var state: State = .idle
+  /// Day (YYYY-MM-DD, local calendar) → that day's session review (spec 051
+  /// §1 回显). Decoration on the day cards: empty when no repository is wired.
+  public private(set) var reviewsByDay: [String: SessionReview] = [:]
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let reviews: (any SessionReviewRepository)?
 
-  public init(plans: any StudentPlanRepository, logs: any StudentTrainingLogRepository) {
+  public init(
+    plans: any StudentPlanRepository,
+    logs: any StudentTrainingLogRepository,
+    reviews: (any SessionReviewRepository)? = nil
+  ) {
     self.plans = plans
     self.logs = logs
+    self.reviews = reviews
   }
 
   public func load(studentID: UUID) async {
@@ -45,6 +54,7 @@ public final class TrainingHistoryViewModel {
       } else {
         fetchedLogs = []
       }
+      reviewsByDay = await fetchReviewIndex(studentID: studentID, days: days, logs: fetchedLogs)
       state = .loaded(weeks: weeks, logs: fetchedLogs)
     } catch {
       if error.isTaskCancellation {
@@ -53,6 +63,23 @@ public final class TrainingHistoryViewModel {
       }
       state = .error(error.localizedDescription)
     }
+  }
+
+  /// Reviews are decoration on the day cards — a failed fetch hides the line
+  /// instead of failing the whole history load.
+  private func fetchReviewIndex(
+    studentID: UUID, days: [StudentPlanDay], logs: [StudentSetLog]
+  ) async -> [String: SessionReview] {
+    guard let reviews else { return [:] }
+    let dates = days.map(\.date) + logs.map(\.loggedAt)
+    guard let first = dates.min(), let last = dates.max() else { return [:] }
+    let fetched =
+      (try? await reviews.fetchReviews(
+        studentID: studentID,
+        from: SoloSessionViewModel.dayString(first, calendar: .current),
+        to: SoloSessionViewModel.dayString(last, calendar: .current)
+      )) ?? []
+    return Dictionary(fetched.map { ($0.reviewDate, $0) }) { first, _ in first }
   }
 
   /// Groups cycle days into plan weeks by date offset from the plan start.

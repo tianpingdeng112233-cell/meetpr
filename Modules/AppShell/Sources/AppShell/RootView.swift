@@ -19,6 +19,7 @@ public struct RootView: View {
   /// Offline-parking wrapper for solo (adhoc) writes, built once around
   /// studentLogs (spec 045); coached flows keep the direct path.
   private let soloLogs: QueuedTrainingLogRepository
+  private let studentSessionReviews: any SessionReviewRepository
   /// Decoding 1211 catalog entries is not free — load once per process.
   private static let soloCatalog = ExerciseCatalog.loadBundled()
   private let studentFeedback: any StudentFeedbackRepository
@@ -54,6 +55,7 @@ public struct RootView: View {
     studentOnboarding: (any OnboardingRepository)? = nil,
     studentEvaluations: (any EvaluationRepository)? = nil,
     studentEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
+    studentSessionReviews: (any SessionReviewRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
@@ -68,6 +70,7 @@ public struct RootView: View {
     self.studentLogs = resolvedLogs
     self.soloLogs = QueuedTrainingLogRepository(
       upstream: resolvedLogs, store: PendingSetLogStore())
+    self.studentSessionReviews = studentSessionReviews ?? InMemorySessionReviewRepository()
     self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
@@ -221,7 +224,8 @@ public struct RootView: View {
       },
       trainingMode: trainingMode,
       soloCatalog: catalog,
-      pendingSetLogCount: pendingCount
+      pendingSetLogCount: pendingCount,
+      sessionReviews: studentSessionReviews
     )
   }
 }

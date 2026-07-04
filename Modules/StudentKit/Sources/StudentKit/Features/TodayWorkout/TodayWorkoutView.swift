@@ -16,6 +16,7 @@ public struct TodayWorkoutView: View {
   @State private var selectedDate: Date
   @State private var backfillUnlocked = false
   private let resetToTodayPulse: Int
+  private let sessionReviews: (any SessionReviewRepository)?
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
   @State private var showingReadinessSheet = false
@@ -28,12 +29,14 @@ public struct TodayWorkoutView: View {
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
-    resetToTodayPulse: Int = 0
+    resetToTodayPulse: Int = 0,
+    sessionReviews: (any SessionReviewRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.resetToTodayPulse = resetToTodayPulse
+    self.sessionReviews = sessionReviews
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
@@ -213,7 +216,17 @@ public struct TodayWorkoutView: View {
         }
         .padding(.top, 4)
         .sheet(isPresented: $showingSummary) {
-          SessionSummaryView(summary: StudentSessionSummary(drafts: drafts), date: day.date)
+          SessionSummaryView(
+            summary: StudentSessionSummary(drafts: drafts),
+            date: day.date,
+            reviewViewModel: sessionReviews.map { repo in
+              SessionReviewSubmitViewModel(
+                repository: repo,
+                studentID: studentID,
+                reviewDate: SoloSessionViewModel.dayString(day.date, calendar: .current)
+              )
+            }
+          )
         }
       }
       .padding(16)
