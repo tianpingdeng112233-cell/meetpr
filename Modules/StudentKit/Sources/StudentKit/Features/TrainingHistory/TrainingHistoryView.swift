@@ -175,12 +175,8 @@ public struct TrainingHistoryView: View {
         }
       }
       if let row, !row.points.isEmpty {
-        Sparkline(
-          points: row.sparklinePoints(top: 5, usableHeight: 80),
-          viewBox: CGSize(width: 600, height: 90)
-        )
-        .frame(height: 90)
-        .padding(.top, 12)
+        sparklineWithAxis(row)
+          .padding(.top, 12)
       } else {
         Text("练几次就有趋势了")
           .font(.system(size: 13))
@@ -194,6 +190,36 @@ public struct TrainingHistoryView: View {
     .background(Color.MeetPR.surface1)
     .clipShape(.rect(cornerRadius: 12))
     .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
+  /// e1RM sparkline with a min/max kg anchor on the left (P2-8: 无轴无点标).
+  /// The kg values live here, not inside the normalized Sparkline — max maps
+  /// to the top of the plot (y=5) and min to the bottom (y=85), matching
+  /// `sparklinePoints(top: 5, usableHeight: 80)`.
+  private func sparklineWithAxis(_ row: DashboardE1RMTrendRow) -> some View {
+    let values = row.points.map(\.e1RMKg)
+    let maxKg = values.max() ?? 0
+    let minKg = values.min() ?? 0
+    return HStack(alignment: .center, spacing: 8) {
+      VStack(alignment: .trailing, spacing: 0) {
+        axisLabel(maxKg)
+        Spacer(minLength: 0)
+        if maxKg != minKg { axisLabel(minKg) }
+      }
+      .frame(height: 90)
+      Sparkline(
+        points: row.sparklinePoints(top: 5, usableHeight: 80),
+        viewBox: CGSize(width: 600, height: 90),
+        showsPointDots: true
+      )
+      .frame(height: 90)
+    }
+  }
+
+  private func axisLabel(_ kilograms: Double) -> some View {
+    Text(StudentFormatting.kilograms(kilograms))
+      .font(.system(size: 10, design: .monospaced))
+      .foregroundStyle(Color.MeetPR.fgTertiary)
   }
 
   // MARK: - Coach feedback history
