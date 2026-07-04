@@ -92,6 +92,17 @@ public final class SoloSessionViewModel {
     unsyncedCount = await pendingCount(studentID)
   }
 
+  /// Re-lock the session day after a calendar-day rollover (P0-2 跨午夜):
+  /// only when idle — an in-progress session (any uncommitted draft) stays on
+  /// its start day, preserving 「23:50 起练 / 00:10 记 = 同一场训练」. Called from
+  /// the view on `NSCalendarDayChanged` (fires live and on foreground-after-
+  /// midnight).
+  public func refreshForDayChangeIfIdle() async {
+    guard sessionDate != Self.dayString(now(), calendar: calendar) else { return }
+    guard drafts.allSatisfy(\.completed) else { return }
+    await load()
+  }
+
   public func addExercise(_ exerciseID: UUID) {
     drafts.append(
       SoloSetDraft(exerciseID: exerciseID, exerciseName: name(of: exerciseID)))
