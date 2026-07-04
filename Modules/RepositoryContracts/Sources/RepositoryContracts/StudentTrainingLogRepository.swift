@@ -1,6 +1,12 @@
 import CoreModels
 import Foundation
 
+public enum StudentTrainingLogRepositoryError: Error, Equatable {
+  /// `recordSet` was handed a log without a plan link. Coached writes
+  /// require one; adhoc sets (spec 045) go through the adhoc write path.
+  case missingPlanLink
+}
+
 /// Records and reads back the student's actual logged sets.
 public protocol StudentTrainingLogRepository: Sendable {
   /// Idempotent on `(studentID, planExerciseID, setIndex)`: re-recording overwrites.

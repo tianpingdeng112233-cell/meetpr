@@ -55,8 +55,11 @@ enum StudentFormatting {
   ) -> (completed: Int, total: Int) {
     let total = day.exercises.reduce(0) { $0 + $1.prescribedSets.count }
     let planExerciseIDs = Set(day.exercises.map(\.id))
-    let completed = logs.filter {
-      planExerciseIDs.contains($0.planExerciseID) && $0.completed
+    let completed = logs.filter { log in
+      // Adhoc/orphaned logs carry no plan link and never count toward a
+      // plan day's completion (spec 045).
+      guard let planExerciseID = log.planExerciseID else { return false }
+      return planExerciseIDs.contains(planExerciseID) && log.completed
     }.count
     return (completed, total)
   }

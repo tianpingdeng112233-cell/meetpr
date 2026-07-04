@@ -20,10 +20,15 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
 
   @discardableResult
   public func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    // This is the coached write path: a set recorded against a plan slot.
+    // Adhoc sets (no plan link) go through the spec-045 adhoc path instead.
+    guard let planExerciseID = log.planExerciseID else {
+      throw StudentTrainingLogRepositoryError.missingPlanLink
+    }
     let token = try await session.accessToken()
     let response = try await api.logSet(
       CreateSetLogRequestDTO(
-        planExerciseID: log.planExerciseID,
+        planExerciseID: planExerciseID,
         setIndex: log.setIndex,
         weightKg: log.weightKg,
         reps: log.reps,
@@ -38,7 +43,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
     return StudentSetLog(
       id: response.id,
       studentID: log.studentID,
-      planExerciseID: log.planExerciseID,
+      planExerciseID: planExerciseID,
       setIndex: log.setIndex,
       loggedAt: response.loggedAt,
       weightKg: log.weightKg,
