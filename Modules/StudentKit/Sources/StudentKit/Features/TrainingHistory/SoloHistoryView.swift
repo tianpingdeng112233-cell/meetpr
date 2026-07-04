@@ -147,7 +147,10 @@ struct SoloHistoryListView: View {
               .font(Font.MeetPR.caption)
               .foregroundStyle(Color.MeetPR.fgSecondary)
             if let best = day.bestE1RMKg {
-              Text("最佳 e1RM \(StudentFormatting.kilograms(best)) kg")
+              // 「当日峰值」not「最佳」— this is this session's raw peak e1RM, a
+              // per-day figure distinct from the growth tab's smoothed rolling
+              // trend (P0-5 消歧: 两处口径不同,各安其位).
+              Text("当日峰值 e1RM \(StudentFormatting.kilograms(best)) kg")
                 .font(Font.MeetPR.caption)
                 .foregroundStyle(Color.MeetPR.brandRed)
             }

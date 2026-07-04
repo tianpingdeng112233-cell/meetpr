@@ -91,6 +91,12 @@ struct SoloTodayView: View {
       .refreshable {
         await viewModel.load()
       }
+      // 跨午夜日期锁 (P0-2): re-lock 「今天」when the day rolls over while the
+      // app sits on this tab — but only if the home is idle, so a session
+      // spanning midnight keeps recording into its start day.
+      .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+        Task { await viewModel.refreshForDayChangeIfIdle() }
+      }
     }
   }
 }

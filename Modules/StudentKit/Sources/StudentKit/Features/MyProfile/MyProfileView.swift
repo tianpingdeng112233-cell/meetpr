@@ -208,7 +208,7 @@ public struct MyProfileView: View {
         VStack(alignment: .leading, spacing: 4) {
           HStack(spacing: 6) {
             Text(label).font(.system(size: 14)).foregroundStyle(Color.MeetPR.fgTertiary)
-            if push { notifyBadge }
+            if Self.showsNotifyBadge(push: push, trainingMode: trainingMode) { notifyBadge }
           }
           Text(value)
             .font(.system(size: 17))
@@ -224,6 +224,12 @@ public struct MyProfileView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
+  }
+
+  /// 「通知教练」badge only makes sense when a coach exists (spec 046 §3 零教
+  /// 练字样): solo Free-tier profiles never show it, even on the push rows.
+  static func showsNotifyBadge(push: Bool, trainingMode: TrainingMode) -> Bool {
+    push && trainingMode != .selfTrain
   }
 
   private var notifyBadge: some View {

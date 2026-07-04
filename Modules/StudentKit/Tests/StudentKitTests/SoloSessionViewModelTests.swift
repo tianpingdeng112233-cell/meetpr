@@ -109,6 +109,36 @@ private func makeViewModel(
 
 @available(iOS 17.0, macOS 14.0, *)
 @MainActor
+@Test func dayChangeRefreshRollsToTodayWhenIdle() async throws {
+  // Idle home sits on the tab at 23:30 Jul 4; the day rolls to Jul 5.
+  let clock = Clock(shanghaiDate("2026-07-04T15:30:00Z"))
+  let (viewModel, _) = makeViewModel(clock: clock)
+  await viewModel.load()
+  #expect(viewModel.sessionDate == "2026-07-04")
+
+  clock.current = shanghaiDate("2026-07-04T16:10:00Z")  // 00:10 Jul 5 Beijing
+  await viewModel.refreshForDayChangeIfIdle()
+  #expect(viewModel.sessionDate == "2026-07-05")
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@MainActor
+@Test func dayChangeRefreshKeepsStartDayMidSession() async throws {
+  // A session in progress across midnight must stay on its start day.
+  let clock = Clock(shanghaiDate("2026-07-04T15:30:00Z"))
+  let (viewModel, _) = makeViewModel(clock: clock)
+  await viewModel.load()
+
+  viewModel.addExercise(squatID)  // uncommitted in-progress draft
+  #expect(viewModel.drafts.contains { !$0.completed })
+
+  clock.current = shanghaiDate("2026-07-04T16:10:00Z")  // 00:10 Jul 5 Beijing
+  await viewModel.refreshForDayChangeIfIdle()
+  #expect(viewModel.sessionDate == "2026-07-04")
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@MainActor
 @Test func setIndexContinuesFromTodayExistingRows() async throws {
   let clock = Clock(shanghaiDate("2026-07-04T10:00:00Z"))
   let seed = [
