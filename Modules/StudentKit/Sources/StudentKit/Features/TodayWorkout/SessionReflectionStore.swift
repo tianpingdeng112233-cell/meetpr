@@ -28,7 +28,9 @@ public protocol SessionReflectionStore: Sendable {
 }
 
 public struct UserDefaultsSessionReflectionStore: SessionReflectionStore {
-  private let defaults: UserDefaults
+  // UserDefaults is documented thread-safe but not yet Sendable-annotated;
+  // the store needs to stay Sendable (it crosses into SwiftUI/actor contexts).
+  nonisolated(unsafe) private let defaults: UserDefaults
 
   public init(defaults: UserDefaults = .standard) {
     self.defaults = defaults
@@ -52,8 +54,10 @@ public struct UserDefaultsSessionReflectionStore: SessionReflectionStore {
     defaults.set(data, forKey: key)
   }
 
-  /// Day-granular key from calendar components (timezone-stable, no shared
-  /// DateFormatter to keep the store `Sendable`).
+  /// Key granular to the local calendar day. Built from calendar components
+  /// (not a shared `DateFormatter`) so the store stays `Sendable`; the day is
+  /// resolved in the device's current calendar/timezone, matching how the
+  /// summary presents "today".
   private static func key(_ studentId: UUID, _ date: Date) -> String {
     let parts = Calendar.current.dateComponents([.year, .month, .day], from: date)
     let day = "\(parts.year ?? 0)-\(parts.month ?? 0)-\(parts.day ?? 0)"

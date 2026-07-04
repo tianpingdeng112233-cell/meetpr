@@ -163,7 +163,7 @@ public struct TodayWorkoutView: View {
     // Only today's session is writable. Past days are a read-only record and
     // future days a preview, so logging/completing can't be triggered by
     // mistake (previously any browsed day accepted set records + completion).
-    let isEditable = Calendar.current.isDateInToday(day.date)
+    let isEditable = WorkoutDatePolicy.isEditable(day.date)
     return ScrollView {
       VStack(alignment: .leading, spacing: 16) {
         if !isEditable {
@@ -221,7 +221,7 @@ public struct TodayWorkoutView: View {
   // MARK: - Read-only notice
 
   private func readOnlyNotice(for date: Date) -> some View {
-    let isPast = date < Calendar.current.startOfDay(for: Date())
+    let isPast = WorkoutDatePolicy.isPast(date)
     return HStack(spacing: 8) {
       Image(systemName: isPast ? "clock.arrow.circlepath" : "eye")
         .foregroundStyle(Color.MeetPR.fgSecondary)
