@@ -14,6 +14,9 @@ public struct StudentRootView: View {
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
   private let onLogout: (@MainActor () async -> Void)?
+  private let trainingMode: TrainingMode
+  private let soloCatalog: [Exercise]
+  private let pendingSetLogCount: @Sendable (UUID) async -> Int
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
@@ -52,7 +55,10 @@ public struct StudentRootView: View {
     onboarding: (any OnboardingRepository)? = nil,
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
-    onLogout: (@MainActor () async -> Void)? = nil
+    onLogout: (@MainActor () async -> Void)? = nil,
+    trainingMode: TrainingMode = .coached,
+    soloCatalog: [Exercise] = [],
+    pendingSetLogCount: (@Sendable (UUID) async -> Int)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -61,6 +67,9 @@ public struct StudentRootView: View {
     self.readiness = readiness
     self.videoUploads = videoUploads ?? .demo()
     self.onLogout = onLogout
+    self.trainingMode = trainingMode
+    self.soloCatalog = soloCatalog
+    self.pendingSetLogCount = pendingSetLogCount ?? { _ in 0 }
     self.onboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
@@ -81,22 +90,38 @@ public struct StudentRootView: View {
 
   public var body: some View {
     TabView(selection: $selectedTab) {
-      // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
-      // here + full history under 成长, so there is no separate 反馈 tab).
-      DashboardView(
-        studentID: studentID,
-        plans: plans,
-        logs: logs,
-        onboarding: onboarding,
-        e1rm: e1rm,
-        feedbackViewModel: feedbackViewModel,
-        evaluationSummaryViewModel: evaluationSummaryViewModel,
-        onStartWorkout: { selectedTab = .training },
-        onSeeAllFeedback: { selectedTab = .growth }
-      )
+      // 今日 — student home. Coached: the plan-driven dashboard (merges the
+      // old 仪表盘 + 计划). Solo (spec 045): the adhoc session home — no plan
+      // concepts anywhere on it.
+      Group {
+        if trainingMode == .selfTrain {
+          SoloTodayView(
+            viewModel: SoloSessionViewModel(
+              studentID: studentID,
+              logs: logs,
+              e1rm: e1rm,
+              catalog: soloCatalog,
+              pendingCount: pendingSetLogCount
+            ),
+            catalog: soloCatalog
+          )
+        } else {
+          DashboardView(
+            studentID: studentID,
+            plans: plans,
+            logs: logs,
+            onboarding: onboarding,
+            e1rm: e1rm,
+            feedbackViewModel: feedbackViewModel,
+            evaluationSummaryViewModel: evaluationSummaryViewModel,
+            onStartWorkout: { selectedTab = .training },
+            onSeeAllFeedback: { selectedTab = .growth }
+          )
+        }
+      }
       .tag(StudentTab.today)
       .tabItem {
-        Label("今日", systemImage: "house")
+        Label(trainingMode == .selfTrain ? "今天" : "今日", systemImage: "house")
       }
 
       TodayWorkoutView(
