@@ -35,7 +35,9 @@ public final class WeekOverviewViewModel {
         from: allDays, startDate: plan?.startDate, weekIndex: weekIndex)
       let fetchedLogs: [StudentSetLog]
       if let dateRange = Self.dateRange(for: days) {
-        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
+        // scope=all: training-day (loggedDate) windows — an evening set no
+        // longer falls off the week at the UTC day edge (spec 049 §1 / 010).
+        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange, scope: .all)
       } else {
         fetchedLogs = []
       }

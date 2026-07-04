@@ -52,6 +52,16 @@ enum TrainingCalendarLayout {
     return calendar.date(byAdding: component, value: value, to: date) ?? date
   }
 
+  /// Snapshot-sourced variant (spec 049 §1): the calendar derives its dots
+  /// from the same TrainingWeekSnapshot the dashboard consumes.
+  static func makeDays(
+    period: TrainingCalendarPeriod,
+    snapshot: TrainingWeekSnapshot,
+    calendar: Calendar
+  ) -> [TrainingCalendarDay] {
+    makeDays(period: period, cycleDays: snapshot.days, logs: snapshot.logs, calendar: calendar)
+  }
+
   static func makeDays(
     period: TrainingCalendarPeriod,
     cycleDays: [StudentPlanDay],

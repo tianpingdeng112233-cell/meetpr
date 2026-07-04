@@ -21,6 +21,7 @@ public struct StudentRootView: View {
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
+  @State private var trainingTodayPulse = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -114,7 +115,10 @@ public struct StudentRootView: View {
             e1rm: e1rm,
             feedbackViewModel: feedbackViewModel,
             evaluationSummaryViewModel: evaluationSummaryViewModel,
-            onStartWorkout: { selectedTab = .training },
+            onStartWorkout: {
+              trainingTodayPulse += 1
+              selectedTab = .training
+            },
             onSeeAllFeedback: { selectedTab = .growth }
           )
         }
@@ -126,7 +130,7 @@ public struct StudentRootView: View {
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads
+        videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse
       )
       .tag(StudentTab.training)
       .tabItem {
