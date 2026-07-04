@@ -25,6 +25,9 @@ struct SetEntrySheet: View {
   @State private var weight: Decimal
   @State private var reps: Int
   @State private var rpe: Decimal
+  @FocusState private var focusedField: NumberField?
+
+  private enum NumberField { case weight, reps, rpe }
 
   private let bar = 20.0
   private let collar = 2.5  // per-side locking collar — counts toward the load
@@ -63,14 +66,32 @@ struct SetEntrySheet: View {
 
           VStack(spacing: 18) {
             plateStepper(
-              "重量", value: StudentFormatting.decimal(weight), unit: "KG", sub: "± 2.5",
-              onDec: { weight = max(0, weight - 2.5) }, onInc: { weight += 2.5 })
+              "重量", unit: "KG", sub: "点数字可直接输入 · ± 2.5",
+              onDec: { weight = max(0, weight - 2.5) }, onInc: { weight += 2.5 }
+            ) {
+              TextField("", value: $weight, format: .number.precision(.fractionLength(0...1)))
+                .keyboardType(.decimalPad)
+                .focused($focusedField, equals: .weight)
+                .modifier(EntryFieldStyle())
+            }
             plateStepper(
-              "次数", value: "\(reps)", unit: "次", sub: "± 1",
-              onDec: { reps = max(0, reps - 1) }, onInc: { reps += 1 })
+              "次数", unit: "次", sub: "± 1",
+              onDec: { reps = max(0, reps - 1) }, onInc: { reps += 1 }
+            ) {
+              TextField("", value: $reps, format: .number)
+                .keyboardType(.numberPad)
+                .focused($focusedField, equals: .reps)
+                .modifier(EntryFieldStyle())
+            }
             plateStepper(
-              "RPE", value: StudentFormatting.decimal(rpe), unit: nil, sub: "± 0.5 · 5–10",
-              onDec: { rpe = max(5, rpe - 0.5) }, onInc: { rpe = min(10, rpe + 0.5) })
+              "RPE", unit: nil, sub: "± 0.5 · 5–10",
+              onDec: { rpe = max(5, rpe - 0.5) }, onInc: { rpe = min(10, rpe + 0.5) }
+            ) {
+              TextField("", value: $rpe, format: .number.precision(.fractionLength(0...1)))
+                .keyboardType(.decimalPad)
+                .focused($focusedField, equals: .rpe)
+                .modifier(EntryFieldStyle())
+            }
 
             if let videoViewModel, let studentID {
               VideoAttachmentSection(
@@ -86,11 +107,19 @@ struct SetEntrySheet: View {
         .padding(16)
       }
       .defaultScrollAnchor(scrollToVideo ? .bottom : .top)
+      .scrollDismissesKeyboard(.interactively)
       footer
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bg)
     .presentationDetents([.large])
+    .toolbar {
+      ToolbarItemGroup(placement: .keyboard) {
+        Spacer()
+        Button("完成") { focusedField = nil }
+          .foregroundStyle(Color.MeetPR.brandRed)
+      }
+    }
   }
 
   // MARK: - Plate loadout
@@ -177,9 +206,10 @@ struct SetEntrySheet: View {
 
   // MARK: - Steppers
 
-  private func plateStepper(
-    _ label: String, value: String, unit: String?, sub: String,
-    onDec: @escaping () -> Void, onInc: @escaping () -> Void
+  private func plateStepper<Field: View>(
+    _ label: String, unit: String?, sub: String,
+    onDec: @escaping () -> Void, onInc: @escaping () -> Void,
+    @ViewBuilder field: () -> Field
   ) -> some View {
     VStack(spacing: 8) {
       HStack {
@@ -194,9 +224,7 @@ struct SetEntrySheet: View {
       HStack(spacing: 12) {
         stepButton("minus", action: onDec)
         HStack(alignment: .lastTextBaseline, spacing: 6) {
-          Text(value)
-            .font(.system(size: 40, weight: .heavy, design: .monospaced))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+          field()
           if let unit {
             Text(unit).font(.system(size: 14, weight: .bold)).foregroundStyle(
               Color.MeetPR.fgTertiary)
@@ -205,6 +233,18 @@ struct SetEntrySheet: View {
         .frame(maxWidth: .infinity)
         stepButton("plus", action: onInc)
       }
+    }
+  }
+
+  /// Shared styling so the editable number keeps the big heavy-mono look of the
+  /// old display Text.
+  private struct EntryFieldStyle: ViewModifier {
+    func body(content: Content) -> some View {
+      content
+        .font(.system(size: 40, weight: .heavy, design: .monospaced))
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
     }
   }
 
@@ -222,9 +262,12 @@ struct SetEntrySheet: View {
   }
 
   private func save(failed: Bool) {
-    viewModel.updateWeight(rowIndex: rowIndex, weight: weight)
-    viewModel.updateReps(rowIndex: rowIndex, reps: reps)
-    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpe)
+    // Clamp on commit rather than while typing, so keyboard entry of a
+    // multi-digit value (e.g. "10" RPE) is never truncated mid-keystroke.
+    focusedField = nil
+    viewModel.updateWeight(rowIndex: rowIndex, weight: max(0, weight))
+    viewModel.updateReps(rowIndex: rowIndex, reps: max(0, reps))
+    viewModel.updateRPE(rowIndex: rowIndex, rpe: min(10, max(5, rpe)))
     Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
     dismiss()
   }
