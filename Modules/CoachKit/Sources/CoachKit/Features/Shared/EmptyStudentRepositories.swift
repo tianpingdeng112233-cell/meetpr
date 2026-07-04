@@ -24,9 +24,22 @@ public actor EmptyStudentTrainingLogRepository: StudentTrainingLogRepository {
   @discardableResult
   public func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog { log }
 
+  @discardableResult
+  public func recordAdhocSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    throw StudentTrainingLogRepositoryError.adhocUnsupported
+  }
+
   public func fetchLogs(
     studentID: UUID,
     in dateRange: ClosedRange<Date>
+  ) async throws -> [StudentSetLog] {
+    []
+  }
+
+  public func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>,
+    scope: TrainingLogScope
   ) async throws -> [StudentSetLog] {
     []
   }

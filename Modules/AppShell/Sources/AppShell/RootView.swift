@@ -1,3 +1,4 @@
+import CatalogKit
 import CoachKit
 import CoreModels
 import RepositoryContracts
@@ -15,6 +16,11 @@ public struct RootView: View {
   private let coachStudentProfiles: any OnboardingProfileReading
   private let studentPlans: any StudentPlanRepository
   private let studentLogs: any StudentTrainingLogRepository
+  /// Offline-parking wrapper for solo (adhoc) writes, built once around
+  /// studentLogs (spec 045); coached flows keep the direct path.
+  private let soloLogs: QueuedTrainingLogRepository
+  /// Decoding 1211 catalog entries is not free — load once per process.
+  private static let soloCatalog = ExerciseCatalog.loadBundled()
   private let studentFeedback: any StudentFeedbackRepository
   private let studentE1RM: any E1RMRepository
   private let studentReadiness: any ReadinessRepository
@@ -58,7 +64,10 @@ public struct RootView: View {
     self.coachPlans = coachPlans
     self.coachInviteCodes = coachInviteCodes ?? RootViewDemoDefaults.inviteCodes()
     self.studentPlans = studentPlans ?? RootViewDemoDefaults.plans()
-    self.studentLogs = studentLogs ?? RootViewDemoDefaults.logs()
+    let resolvedLogs = studentLogs ?? RootViewDemoDefaults.logs()
+    self.studentLogs = resolvedLogs
+    self.soloLogs = QueuedTrainingLogRepository(
+      upstream: resolvedLogs, store: PendingSetLogStore())
     self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
@@ -185,10 +194,21 @@ public struct RootView: View {
   }
 
   private func studentRoot(for user: User) -> some View {
-    StudentRootView(
+    let isSolo = user.role == .selfTrainStudent
+    let soloLogs = self.soloLogs
+    let logsForUser: any StudentTrainingLogRepository = isSolo ? soloLogs : studentLogs
+    let trainingMode: TrainingMode = isSolo ? .selfTrain : .coached
+    let catalog: [Exercise] = isSolo ? Self.soloCatalog : []
+    let pendingCount: (@Sendable (UUID) async -> Int)?
+    if isSolo {
+      pendingCount = { studentID in await soloLogs.pendingCount(studentID: studentID) }
+    } else {
+      pendingCount = nil
+    }
+    return StudentRootView(
       studentID: user.id,
       plans: studentPlans,
-      logs: studentLogs,
+      logs: logsForUser,
       feedback: studentFeedback,
       e1rm: studentE1RM,
       readiness: studentReadiness,
@@ -198,7 +218,10 @@ public struct RootView: View {
       summaryReadStore: summaryReadStore,
       onLogout: {
         await session.logout()
-      }
+      },
+      trainingMode: trainingMode,
+      soloCatalog: catalog,
+      pendingSetLogCount: pendingCount
     )
   }
 }

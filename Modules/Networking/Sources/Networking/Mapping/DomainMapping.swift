@@ -92,6 +92,7 @@ extension PlanSetDTO {
       targetValue: targetValue,
       setType: setType,
       restSeconds: restSeconds,
+      coachNote: coachNote,
       createdAt: createdAt
     )
   }
@@ -103,6 +104,9 @@ extension SetLogDTO {
       id: id,
       studentID: studentID,
       planExerciseID: planExerciseID,
+      exerciseID: exerciseID,
+      loggedDate: loggedDate,
+      adhoc: adhoc,
       setIndex: setIndex,
       loggedAt: loggedAt,
       weightKg: weightKg,

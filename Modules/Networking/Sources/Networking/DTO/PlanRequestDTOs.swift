@@ -111,6 +111,8 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
   public let targetValue: Decimal
   public let setType: SetType
   public let restSeconds: Int?
+  /// Student-visible coach cue carried with the set (spec 043 §G).
+  public let coachNote: String?
 
   public init(
     setNumber: Int,
@@ -119,7 +121,8 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     intensityMode: IntensityMode,
     targetValue: Decimal,
     setType: SetType,
-    restSeconds: Int? = nil
+    restSeconds: Int? = nil,
+    coachNote: String? = nil
   ) {
     self.setNumber = setNumber
     self.targetReps = targetReps
@@ -128,6 +131,7 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     self.targetValue = targetValue
     self.setType = setType
     self.restSeconds = restSeconds
+    self.coachNote = coachNote
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -139,6 +143,7 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     try container.encode(Self.targetValueString(from: targetValue), forKey: .targetValue)
     try container.encode(setType, forKey: .setType)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
+    try container.encodeIfPresent(coachNote, forKey: .coachNote)
   }
 
   private static func targetValueString(from decimal: Decimal) -> String {
@@ -156,5 +161,6 @@ public struct CreatePlanSetRequestDTO: Encodable, Equatable, Sendable {
     case targetValue
     case setType
     case restSeconds
+    case coachNote
   }
 }

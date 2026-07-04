@@ -743,25 +743,6 @@
     "nameEn": "Deficit Conv. Deadlift"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000031",
-    "name": "相扑站高 (下陷)硬拉",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "deadlift",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hamstring"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Deficit Sumo Deadlift"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000032",
     "name": "Jefferson 硬拉",
     "exerciseType": "main_lift_variation",
@@ -1162,7 +1143,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000048",
-    "name": "弹力带绕髋RDL",
+    "name": "弹力带绕髋罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1181,7 +1162,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000049",
-    "name": "抓举握距RDL",
+    "name": "抓举握距罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1200,7 +1181,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004a",
-    "name": "前后站单腿罗拉",
+    "name": "前后站单腿罗马尼亚硬拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -1219,7 +1200,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004b",
-    "name": "相扑RDL",
+    "name": "相扑罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1238,7 +1219,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000004d",
-    "name": "节奏RDL",
+    "name": "节奏罗马尼亚硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -2531,25 +2512,6 @@
     "nameEn": "Incline DB Bench"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000095",
-    "name": "器械胸推",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "machine"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Machine Chest Press"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000096",
     "name": "蝴蝶机夹胸",
     "exerciseType": "accessory",
@@ -3118,25 +3080,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "One-Arm Cable Row"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000000b4",
-    "name": "彭德雷划船（潘德雷）",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back"
-    ],
-    "equipment": [
-      "other"
-    ],
-    "movementPattern": [
-      "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pendlay Row"
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000b5",
@@ -4243,25 +4186,6 @@
     "nameEn": "Walking Lunges"
   },
   {
-    "id": "00000000-0000-0000-ca70-0000000000f1",
-    "name": "摆锤深蹲",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "machine"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Pendulum Squat"
-  },
-  {
     "id": "00000000-0000-0000-ca70-0000000000f2",
     "name": "手枪蹲（单腿）",
     "exerciseType": "accessory",
@@ -4626,12 +4550,12 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000108",
-    "name": "单腿RDL",
+    "name": "单腿罗马尼亚硬拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "hamstring"
     ],
     "equipment": [
       "barbell"
@@ -4645,7 +4569,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000109",
-    "name": "单腿 RDL(纯单腿)",
+    "name": "单腿罗马尼亚硬拉(纯单腿)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5274,7 +5198,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012c",
-    "name": "B 站距 RDL",
+    "name": "B 站距罗马尼亚硬拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -5293,7 +5217,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000012d",
-    "name": "单腿 RDL(B 站距)",
+    "name": "单腿罗马尼亚硬拉(B 站距)",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -8297,44 +8221,6 @@
     "createdAt": "2026-05-14T12:52:23Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-0000000001ca",
-    "name": "绳索十字夹胸",
-    "nameEn": "Cable Crossover",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T12:52:23Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000001cb",
-    "name": "绳索夹胸",
-    "nameEn": "Cable Fly",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T12:52:23Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-0000000001cc",
     "name": "平板绳索夹胸",
     "nameEn": "Flat Cable Fly",
@@ -9545,26 +9431,6 @@
   {
     "id": "00000000-0000-0000-ca70-00000000020b",
     "name": "射手俯卧撑",
-    "nameEn": "Archer Push-Up",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest",
-      "triceps"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:14:43Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000020c",
-    "name": "单侧射手俯卧撑",
     "nameEn": "Archer Push-Up",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
@@ -11466,25 +11332,6 @@
     "id": "00000000-0000-0000-ca70-00000000026f",
     "name": "弹力绳-俯身划船",
     "nameEn": "Band Bent-Over Row",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:24:05Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000270",
-    "name": "弹力绳-坐姿划船",
-    "nameEn": "Band Seated Row",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -13436,25 +13283,6 @@
     ],
     "movementPattern": [
       "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:36:47Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000002d6",
-    "name": "弹力带-腿外展",
-    "nameEn": "Band Hip Abduction",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "hip"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "other"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:36:47Z"
@@ -23590,25 +23418,6 @@
     "nameEn": "Australian Pull-up"
   },
   {
-    "id": "00000000-0000-0000-ca71-00000000000e",
-    "name": "臀推",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-06-24T00:00:00Z",
-    "nameEn": "Barbell Hip Thrust"
-  },
-  {
     "id": "00000000-0000-0000-ca71-00000000000f",
     "name": "曲杆上提",
     "exerciseType": "accessory",
@@ -23626,5 +23435,101 @@
     "createdByCoachId": null,
     "createdAt": "2026-06-24T00:00:00Z",
     "nameEn": "EZ-Bar Upright Row"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004dd",
+    "name": "离心卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Eccentric Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004de",
+    "name": "弹力带窄推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell",
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Banded Close-Grip Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca70-0000000004df",
+    "name": "安全杠节奏深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "specialty_bar"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-24T00:00:00Z",
+    "nameEn": "Safety Bar Tempo Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000010",
+    "name": "低杠位暂停深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-26T00:00:00Z",
+    "nameEn": "Low Bar Paused Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000011",
+    "name": "低杠位节奏深蹲",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "quad"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "squat"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-26T00:00:00Z",
+    "nameEn": "Low Bar Tempo Squat"
   }
 ]

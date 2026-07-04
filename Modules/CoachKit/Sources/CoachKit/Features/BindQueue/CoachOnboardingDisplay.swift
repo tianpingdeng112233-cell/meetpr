@@ -134,11 +134,54 @@ enum CoachOnboardingDisplay {
     PlanningDisplay.deduplicatedMuscleGroupNames(groups).joined(separator: "·")
   }
 
+  // MARK: - Equipment tokens (v2 vocabulary, 2026-07-02)
+
+  /// StudentKit-owned token → coach-facing label. Deliberately a copied
+  /// mirror (CoachKit ⊥ StudentKit, ADR-005 §1) of `EquipmentCatalog` plus
+  /// the two retired v1 tokens still present in older profiles; unknown
+  /// tokens pass through raw so nothing is silently dropped.
+  static func equipmentLabel(_ token: String) -> String {
+    equipmentLabels[token] ?? token
+  }
+
+  private static let equipmentLabels: [String: String] = [
+    "barbell_dumbbell": "杠铃 + 哑铃",
+    "squat_bench_rack": "深蹲架 + 卧推架",
+    "pullup_bar": "引体向上杆",
+    "db_max_20": "哑铃 ≤20kg",
+    "db_max_40": "哑铃 ≤40kg",
+    "db_max_40_plus": "哑铃 >40kg",
+    "smith_machine": "史密斯架",
+    "cable_crossover": "龙门架(大飞鸟)",
+    "lat_pulldown": "高位下拉",
+    "leg_press_machine": "倒蹬机 / 腿举机",
+    "leg_curl_extension": "腿弯举 / 腿屈伸",
+    "seated_row": "坐姿划船",
+    "landmine": "地雷架(含 T 杆划船)",
+    "seal_row": "海豹划船凳",
+    "hack_squat": "哈克深蹲机",
+    "power_bar_stiff": "力量举专项杆(硬杆)",
+    "deadlift_bar": "硬拉专项杆(软杆)",
+    "safety_bar": "特种杠(SSB / 六角等)",
+    "fractional_plates": "微增片(0.25kg 起)",
+    "lifting_platform": "举重台 / 硬拉台",
+    "rack_pins_blocks": "架上销 / 垫块",
+    "chains_bands": "链条 / 弹力带(变阻)",
+    "ghr": "GHR(臀腿举)",
+    "belt_squat": "腰带深蹲机",
+    // Retired tokens (pre-change profiles): reverse_hyper + v1-set +
+    // cable_lat_pulldown (split into cable_crossover + lat_pulldown).
+    "reverse_hyper": "反向过伸机",
+    "heavy_dumbbells": "哑铃区(>30kg)",
+    "blocks_chains_bands": "块铃 / 链子 / 弹力带",
+    "cable_lat_pulldown": "拉力机 / 高位下拉",
+  ]
+
   // MARK: - Recovery 1-5 scales (wiki v2.1 tables)
 
   static let dailyLifeIntensityLabels = ["很低", "较低", "中等", "较高", "极高"]
   static let lifeStressLabels = ["几乎无", "较低", "中等", "较高", "极高"]
-  static let recoverySpeedLabels = ["很慢 (>72h)", "较慢", "正常", "较快", "很快 (<12h)"]
+  static let recoverySpeedLabels = ["3天以上", "约3天", "约2天", "约1天", "半天内"]
   static let sleepHoursLabels = ["≤5h", "6h", "7h", "8h", "9h+"]
 
   /// "●●●○○" dot strip for a 1-5 notch.

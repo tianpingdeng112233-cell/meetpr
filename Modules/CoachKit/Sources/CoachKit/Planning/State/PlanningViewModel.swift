@@ -541,10 +541,6 @@ public final class PlanningViewModel {
     catalogExercise(for: draftExercise)?.name ?? "未知动作"
   }
 
-  public func exerciseNameEn(for draftExercise: DraftPlanExercise) -> String? {
-    catalogExercise(for: draftExercise)?.nameEn
-  }
-
   public func oneRM(for draftExercise: DraftPlanExercise) -> Decimal? {
     guard
       draftExercise.isMainLift,

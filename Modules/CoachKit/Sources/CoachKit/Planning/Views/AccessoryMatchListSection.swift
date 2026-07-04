@@ -1,3 +1,4 @@
+import CatalogKit
 import CoreModels
 import DesignSystem
 import SwiftUI
@@ -102,13 +103,6 @@ private struct AccessoryMatchRow: View {
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(Color.MeetPR.fgPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
-
-          if let nameEn = exercise.nameEn, !nameEn.isEmpty {
-            Text(nameEn)
-              .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
-              .frame(maxWidth: .infinity, alignment: .leading)
-          }
         }
 
         // Selected → tappable minus so it reads as "added, tap to remove".

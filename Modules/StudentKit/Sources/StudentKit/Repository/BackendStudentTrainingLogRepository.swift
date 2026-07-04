@@ -20,10 +20,15 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
 
   @discardableResult
   public func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    // This is the coached write path: a set recorded against a plan slot.
+    // Adhoc sets (no plan link) go through the spec-045 adhoc path instead.
+    guard let planExerciseID = log.planExerciseID else {
+      throw StudentTrainingLogRepositoryError.missingPlanLink
+    }
     let token = try await session.accessToken()
     let response = try await api.logSet(
       CreateSetLogRequestDTO(
-        planExerciseID: log.planExerciseID,
+        planExerciseID: planExerciseID,
         setIndex: log.setIndex,
         weightKg: log.weightKg,
         reps: log.reps,
@@ -38,7 +43,43 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
     return StudentSetLog(
       id: response.id,
       studentID: log.studentID,
-      planExerciseID: log.planExerciseID,
+      planExerciseID: planExerciseID,
+      setIndex: log.setIndex,
+      loggedAt: response.loggedAt,
+      weightKg: log.weightKg,
+      reps: log.reps,
+      rpe: log.rpe,
+      completed: log.completed,
+      failed: log.failed
+    )
+  }
+
+  @discardableResult
+  public func recordAdhocSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    guard let exerciseID = log.exerciseID, let loggedDate = log.loggedDate else {
+      throw StudentTrainingLogRepositoryError.missingExerciseIdentity
+    }
+    let token = try await session.accessToken()
+    let response = try await api.logAdhocSet(
+      CreateAdhocSetLogRequestDTO(
+        exerciseID: exerciseID,
+        loggedDate: loggedDate,
+        setIndex: log.setIndex,
+        weightKg: log.weightKg,
+        reps: log.reps,
+        rpe: log.rpe,
+        completed: log.completed,
+        failed: log.failed
+      ),
+      accessToken: token
+    )
+    return StudentSetLog(
+      id: response.id,
+      studentID: log.studentID,
+      planExerciseID: nil,
+      exerciseID: exerciseID,
+      loggedDate: loggedDate,
+      adhoc: true,
       setIndex: log.setIndex,
       loggedAt: response.loggedAt,
       weightKg: log.weightKg,
@@ -53,22 +94,37 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
     studentID: UUID,
     in dateRange: ClosedRange<Date>
   ) async throws -> [StudentSetLog] {
+    try await fetchLogs(studentID: studentID, in: dateRange, scope: .plan)
+  }
+
+  public func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>,
+    scope: TrainingLogScope
+  ) async throws -> [StudentSetLog] {
     let from = WireFormatting.dateOnlyString(from: dateRange.lowerBound)
     let endDate = WireFormatting.exclusiveEndDateOnlyString(closedUpperBound: dateRange.upperBound)
     let token = try await session.accessToken()
+    // .plan omits the query param — byte-for-byte the pre-spec-045 request,
+    // and the server default matches (backend spec 010).
+    let wireScope: SetLogFetchScope? = scope == .all ? .all : nil
 
     do {
       let response = try await api.studentSetLogs(
         studentID: studentID,
         from: from,
         endDate: endDate,
+        scope: wireScope,
         accessToken: token
       )
       let logs = response.logs.map { $0.toDomain() }.sorted { $0.loggedAt < $1.loggedAt }
-      try await cache.save(logs: logs, studentID: studentID, from: from, endDate: endDate)
+      try await cache.save(
+        logs: logs, studentID: studentID, from: from, endDate: endDate, scope: scope.rawValue)
       return logs
     } catch {
-      if let cached = await cache.loadLogs(studentID: studentID, from: from, endDate: endDate) {
+      if let cached = await cache.loadLogs(
+        studentID: studentID, from: from, endDate: endDate, scope: scope.rawValue)
+      {
         return cached
       }
       throw error

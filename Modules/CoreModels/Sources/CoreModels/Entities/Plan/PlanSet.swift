@@ -10,6 +10,10 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
   public let targetValue: Decimal
   public let setType: SetType
   public let restSeconds: Int?
+  /// Student-visible coach cue carried alongside the set (spec 043 §G).
+  /// Holds the original shorthand the parser could not structure into a number
+  /// (e.g. 「70%top」「节奏3-1-0」「力竭」). `nil` for pre-043 data.
+  public let coachNote: String?
   public let createdAt: Date
 
   public init(
@@ -22,6 +26,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     targetValue: Decimal,
     setType: SetType,
     restSeconds: Int? = nil,
+    coachNote: String? = nil,
     createdAt: Date
   ) {
     self.id = id
@@ -33,6 +38,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     self.targetValue = targetValue
     self.setType = setType
     self.restSeconds = restSeconds
+    self.coachNote = coachNote
     self.createdAt = createdAt
   }
 
@@ -48,6 +54,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     targetValue = try container.decodeDecimal(forKey: .targetValue)
     setType = try container.decode(SetType.self, forKey: .setType)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
+    coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
   }
 
@@ -63,6 +70,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeDecimalString(targetValue, forKey: .targetValue)
     try container.encode(setType, forKey: .setType)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
+    try container.encodeIfPresent(coachNote, forKey: .coachNote)
     try container.encode(createdAt, forKey: .createdAt)
   }
 
@@ -76,6 +84,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     case targetValue
     case setType
     case restSeconds
+    case coachNote
     case createdAt
   }
 }

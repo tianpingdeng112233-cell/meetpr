@@ -1,3 +1,4 @@
+import CatalogKit
 import CoreModels
 import Foundation
 import RepositoryContracts
@@ -100,7 +101,7 @@ public actor InMemoryPlanRepository: PlanRepository {
       CoachStudentSummary(
         id: uuid(4),
         displayName: "王晨曦",
-        status: .inEvaluation(remainingDays: 4, remainingHours: 13)
+        status: .active
       ),
       CoachStudentSummary(
         id: uuid(2),
@@ -115,7 +116,7 @@ public actor InMemoryPlanRepository: PlanRepository {
       CoachStudentSummary(
         id: uuid(10),
         displayName: "赵安然",
-        status: .inEvaluation(remainingDays: 6, remainingHours: 2)
+        status: .active
       ),
       CoachStudentSummary(
         id: uuid(6),
@@ -130,25 +131,9 @@ public actor InMemoryPlanRepository: PlanRepository {
   }
 
   static func loadBundledCatalogV2() -> [Exercise] {
-    guard
-      let url = Bundle.module.url(
-        forResource: "exercise-catalog-v2",
-        withExtension: "json"
-      )
-    else {
-      assertionFailure("Bundled catalog v2 missing. Check Package.swift resources declaration.")
-      return []
-    }
-
-    do {
-      let data = try Data(contentsOf: url)
-      let decoder = JSONDecoder()
-      decoder.dateDecodingStrategy = .iso8601
-      return try decoder.decode([Exercise].self, from: data)
-    } catch {
-      assertionFailure("Bundled catalog v2 decode failed: \(error)")
-      return []
-    }
+    // Catalog resource and loader live in CatalogKit since spec 045 (shared
+    // with the student-side picker); this shim keeps CoachKit callers stable.
+    ExerciseCatalog.loadBundled()
   }
 
   static func syntheticCompetitionLifts() -> [Exercise] {

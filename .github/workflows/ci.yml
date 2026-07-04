@@ -1,14 +1,11 @@
 name: CI
 
 on:
+  # PR-only by design. `main` branch protection requires strict up-to-date
+  # branches, so every PR is built against the exact `main` it merges into —
+  # a post-merge `push: [main]` run would only re-test already-verified code.
+  # Dropping it cuts ~1/3 of the (costly macOS) CI minutes. PRs stay the gate.
   pull_request:
-    paths-ignore:
-      - "**/*.md"
-      - "specs/**"
-      - ".github/ISSUE_TEMPLATE/**"
-      - "LICENSE"
-  push:
-    branches: [main]
     paths-ignore:
       - "**/*.md"
       - "specs/**"

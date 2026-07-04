@@ -311,10 +311,41 @@ public struct DashboardView: View {
 
   @ViewBuilder
   private var liftCardContent: some View {
-    if let family = selectedFamily, let row = trendRow(for: family), !row.points.isEmpty {
+    let rows = selectedTrendRows
+    if !rows.isEmpty {
+      VStack(alignment: .leading, spacing: 24) {
+        ForEach(rows) { row in
+          liftTrendBlock(row)
+        }
+      }
+      Text(liftCardFooter())
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .padding(.top, 12)
+    } else {
+      VStack(alignment: .leading, spacing: 8) {
+        Text("成长曲线")
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.brandRed)
+        Text(selectedFamilies.isEmpty ? "选中训练日查看对应成长曲线" : "练几次就有趋势了")
+          .font(.system(size: 14))
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .frame(maxWidth: .infinity, minHeight: 96, alignment: .leading)
+      }
+    }
+  }
+
+  /// One hero block (label + big e1RM + 90-day delta + sparkline) for a single
+  /// lift family. Stacked one per family trained on the selected day, so an SB
+  /// day shows a squat curve above a bench curve.
+  @ViewBuilder
+  private func liftTrendBlock(_ row: DashboardE1RMTrendRow) -> some View {
+    VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .bottom) {
         VStack(alignment: .leading, spacing: 0) {
-          Text("\(family.studentDisplayName) E1RM · 90 天")
+          Text("\(row.family.studentDisplayName) E1RM · 90 天")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
             .foregroundStyle(Color.MeetPR.brandRed)
@@ -339,28 +370,13 @@ public struct DashboardView: View {
       Sparkline(points: row.sparklinePoints(), viewBox: CGSize(width: 600, height: 120))
         .frame(height: 110)
         .padding(.top, 12)
-      Text(liftCardFooter(family))
-        .font(Font.MeetPR.monoLabel)
-        .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-        .padding(.top, 8)
-    } else {
-      VStack(alignment: .leading, spacing: 8) {
-        Text("成长曲线")
-          .font(Font.MeetPR.monoLabel)
-          .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.brandRed)
-        Text(selectedFamily == nil ? "选中训练日查看对应成长曲线" : "练几次就有趋势了")
-          .font(.system(size: 14))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-          .frame(maxWidth: .infinity, minHeight: 96, alignment: .leading)
-      }
     }
   }
 
-  private func liftCardFooter(_ family: LiftFamily) -> String {
-    "选中 " + TodayFormat.shortWeekday.string(from: effectiveSelectedDate)
-      + " · \(family.studentDisplayName)日 — 显示对应成长曲线"
+  private func liftCardFooter() -> String {
+    let names = selectedTrendRows.map(\.family.studentDisplayName).joined(separator: "、")
+    return "选中 " + TodayFormat.shortWeekday.string(from: effectiveSelectedDate)
+      + " · \(names)日"
   }
 
   // MARK: - Start CTA
@@ -451,8 +467,18 @@ public struct DashboardView: View {
     selectedDate ?? Date()
   }
 
-  private var selectedFamily: LiftFamily? {
-    planDay(on: effectiveSelectedDate).flatMap(mainFamily)
+  /// All main-lift families trained on the selected day, in S→B→D order.
+  private var selectedFamilies: [LiftFamily] {
+    planDay(on: effectiveSelectedDate).map(dayFamilies) ?? []
+  }
+
+  /// Selected-day families that actually have e1RM history to plot, in S→B→D
+  /// order — the lift card renders one curve block per row.
+  private var selectedTrendRows: [DashboardE1RMTrendRow] {
+    selectedFamilies.compactMap { family in
+      guard let row = trendRow(for: family), !row.points.isEmpty else { return nil }
+      return row
+    }
   }
 
   private var todayDay: StudentPlanDay? {

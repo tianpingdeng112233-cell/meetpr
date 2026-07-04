@@ -2,8 +2,8 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
-/// Step 3 你有多强?: the three 1RMs + estimator sheet (spec 032 D7 —
-/// reuses the spec-028 E1RMCalculator). 1RM entry is always kg.
+/// Step 3 你的三大项极限是多少?: the three 1RMs + estimator sheet (spec 032
+/// D7 — reuses the spec-028 E1RMCalculator). 1RM entry is always kg.
 @available(iOS 17.0, macOS 14.0, *)
 struct Step3StrengthSection: View {
   @Binding var draft: OnboardingDraft
@@ -141,6 +141,9 @@ struct OneRMEstimatorSheet: View {
         OnboardingFieldLabel(title: "RPE: \(String(format: "%.1f", rpe))")
         Slider(value: $rpe, in: 6...10, step: 0.5)
           .tint(Color.MeetPR.brandRed)
+        Text("RPE = 这组做完有多吃力:10=力竭、9=还能多做 1 次、8=还能多做 2 次。")
+          .font(Font.MeetPR.caption)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
       }
 
       if let estimate {

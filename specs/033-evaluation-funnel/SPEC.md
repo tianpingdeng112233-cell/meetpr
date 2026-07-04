@@ -10,6 +10,13 @@
   - 并行 **spec 031 / 032(起草中)** — 学员端 onboarding 7 步 + 绑定请求 / BindGate 路由;接口依赖见 §与 031/032 的接口契约
   - [ADR-005 §1 模块边界](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) — CoachKit ⊥ StudentKit;跨端 Repository protocol 走 `RepositoryContracts`,跨端纯数据型走 `CoreModels`
 
+> **⚠️ 内测调整(2026-06-25,PR #190 `d756a30`,已合 main)— 评估期 defer**
+>
+> 内测阶段学员均为熟人、不走 onboarding,**评估期整套功能内测期停用(defer)**。背景与重新启用条件见 [PD-005 §内测调整](~/Brain/wiki/projects/MeetPR/product-decisions/005-evaluation-period.md) 与 [evaluation-workflow §内测调整](~/Brain/wiki/projects/MeetPR/evaluation-workflow.md)。
+> - **本 spec 描述的仍是评估期的完整设计**,作为重新启用时的蓝本——**defer ≠ delete**。评估期代码**保留休眠、未删除**(`Features/Evaluation/`、学员详情评估期条 `EvaluationStatusBanner`、驾驶舱「评估期 N」指标、花名册评估期分组),仅因后端无 `in_evaluation` 数据而不渲染。彻底拆除是另一条会改动本 spec 语义的活,不在内测范围。
+> - **运行期差异(已落地三处,均在 CoachKit)**:① §5 接收模态默认翻为「跳过评估期(熟人)」(`AcceptBindRequestSheet.skipEvaluation = true`);② §7 普通学员编排 Step 1 只剩「4 周」单卡;③ Demo 花名册种子(`InMemoryPlanRepository.previewStudents`)去掉所有 `.inEvaluation`。其余各节(队列 / 完整资料页 / 评估总结 / 学员评估期页)代码在位但当前无数据驱动。
+> - **重新启用条件(任一)**:① 后端开始对绑定关系下发 `in_evaluation`(`BackendPlanRepository.status` 透传——真后端只在下发时才点亮评估期 UI);② 教练在接收模态手动选「进入 7 天评估期」(入口完整保留)。
+
 ## 目标
 
 把 evaluation-workflow funnel 的 [4]→[9] 段落地成双端 UI:教练从"只能管已绑学员"扩到"能接新学员、能跑评估期、能交付评估总结";学员从"被接收后直接进 5 tab"细化出"评估期中间态"。
@@ -194,14 +201,15 @@ null 字段显示 "—";`404 ONBOARDING_NOT_FOUND` → `ContentUnavailableView("
 
 ```
 接收 张三 进入:
- ● 进入 7 天评估期         ← 默认选中
+ ○ 进入 7 天评估期
    推荐:陌生 / 不熟悉的学员
- ○ 跳过评估期(熟人)
+ ● 跳过评估期(熟人)         ← 内测默认选中(2026-06-25 PR #190)
    适合:已带过的 / 朋友介绍
    [原因(选填)__________]   ← 仅选中"跳过"时显示,≤500 字
 [取消]              [确认接收]
 ```
 
+- **内测默认(2026-06-25 PR #190 `d756a30`)**:`AcceptBindRequestSheet` 的 `@State skipEvaluation = true` → 打开时默认选中「跳过评估期(熟人)」。原设计默认「进入 7 天评估期」,内测期反转(熟人不 onboard,见顶部内测调整)。教练仍可手动切到「进入 7 天评估期」——该分支 UI 与 accept(skipEvaluation:false) 链路完整保留,只是不再是默认。恢复为默认的条件:退出内测默认 / 后端开始下发 `in_evaluation`。
 - 确认 → `accept(requestID:, skipEvaluation:, skipReason:)`;skipReason 仅在跳过分支传值(否则 nil — zod superRefine 真 gate 兜底)
 - 成功(进评估期)→ toast "已接收,评估期 7 天开始" + 队列移除该卡 + roster 刷新(新学员出现,状态 = 评估期)
 - 成功(跳过)→ toast "已接收" + 同上(状态 = 活跃)
@@ -243,7 +251,7 @@ public enum PlanningIntent: Sendable {
 
 - `.adaptationWeek` / `.firstRegularPlan` → `PlanningViewModel` 预设 `selectedStudent` + 初始 `path = [.selectDuration]`(跳过 Step 0,导航栏仍可返回改人 — 返回即退化为 blank 流程)
 - `PlanningViewModel` 加 `planKind: PlanKind`(blank/firstRegular → `.regular`;adaptationWeek → `.adaptation`)
-- **Step 1 锁定**:`planKind == .adaptation` → 仅"1 周"可选,"4 周"disabled + 已有 `StatusBadge("评估期内仅 1 周")` 复用;`selectDuration` / `validateStep(.selectDuration)` 的既有 `isEvaluationStudent ⇒ planWeeks==1` 校验保留(双保险:状态驱动 + intent 驱动)
+- **Step 1 单卡(2026-06-25 PR #190 `d756a30` 已落地,取代原"锁定"设计)**:`Step1SelectDurationView` 按 `planKind` **只渲染一张** `DurationChoiceCard`——`planKind == .adaptation` → 「1 周 / 适应周」;否则(普通学员)→ **「4 周 / 完整训练周期」唯一一档**(`durationWeeks = planKind == .adaptation ? 1 : 4`)。原设计的双卡(1 周 + 「4 周」disabled 灰态)与 `StatusBadge("评估期内仅 1 周")` 徽章**已删**:每种 intent 只暴露其唯一合法长度,不再需要禁用态。内测停用评估期后,普通编排只有 4 周这一档;1 周仅经 `.adaptationWeek` intent 进入。`selectDuration` / `validateStep(.selectDuration)` 的 `planWeeks` 约束仍作 UI 之外兜底保留
 - 计划名默认 "\(displayName) 适应周"(现 "\(displayName) 1 周计划" 模板分支)
 - **wire**:`CreatePlanRequestDTO` 加 `kind: String`(**显式发送** `"regular"` / `"adaptation"`,不靠缺省 — 裁量 D9);`BackendPlanRepository.publishPlan` 从 `TrainingPlan.kind` 透传;`PlanDTO` 解析响应 `kind`
 - **UI 锁不是 gate**:publish 时 backend 真 gate(`403 EVALUATION_IN_PROGRESS` / `422 PLAN_DAYS_EXCEED_WEEKS`)是唯一权威,错误映射见 §10
@@ -453,3 +461,4 @@ publish 失败 catch `APIError.httpStatus` → `BackendErrorEnvelope` 解机器�
 |---|---|---|---|
 | 2026-06-11 | 0.1 | 起草(对照 backend 005 实装 wire + evaluation-workflow v1.1 + CoachKit/StudentKit 现状) | Claude |
 | 2026-06-11 | 0.2 | 实装期修订:① **D2 作废 fan-out** — backend fix #20 已合 staging,`GET /coach/students` 直接回 `status` + `evaluation` 对象,roster 零额外请求;② Backend repository 实装位置从 Networking 改进各 Kit(031 已定 Networking contracts-free);③ `OnboardingProfile` 实体 031/032 已建,033 复用 + 拆 `OnboardingProfileReading` 读侧 protocol;④ §10 publish 调用点尚不存在(spec 008 TODO),映射落成 `PlanPublishErrorMapping` 待接入;⑤ 加 `StudentPlanView.planKind`(学员端"等待首份正式计划"行判定);⑥ accept/reject 4xx 用独立 `CoachBindQueueError` | Claude |
+| 2026-06-25 | 0.3 | **内测停用评估期**(PR #190 `d756a30`,已合 main):① 顶部加内测调整 callout(defer ≠ delete + 重新启用条件);② §5 接收模态默认翻为「跳过评估期」(`AcceptBindRequestSheet.skipEvaluation = true`);③ §7 Step 1 改单卡——普通学员只「4 周」,删双卡 / disabled 灰态 /「评估期内仅 1 周」徽章。评估期完整设计与代码保留休眠未删,本 spec 仍是重新启用蓝本。文档对齐归 [PD-005](~/Brain/wiki/projects/MeetPR/product-decisions/005-evaluation-period.md) + [evaluation-workflow.md](~/Brain/wiki/projects/MeetPR/evaluation-workflow.md) | Claude |

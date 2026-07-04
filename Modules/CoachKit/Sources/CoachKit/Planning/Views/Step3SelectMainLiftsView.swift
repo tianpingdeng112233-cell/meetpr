@@ -147,9 +147,6 @@ private struct MainLiftPickerRow: View {
 
   private var currentSelectionLabel: String {
     guard let exercise = currentSelection else { return "请选择" }
-    if let nameEn = exercise.nameEn {
-      return "\(exercise.name)  ·  \(nameEn)"
-    }
     return exercise.name
   }
 
@@ -180,11 +177,6 @@ private struct VariantPickerSheet: View {
               Text(exercise.name)
                 .font(Font.MeetPR.body)
                 .foregroundStyle(Color.MeetPR.fgPrimary)
-              if let nameEn = exercise.nameEn {
-                Text(nameEn)
-                  .font(Font.MeetPR.footnote)
-                  .foregroundStyle(Color.MeetPR.fgSecondary)
-              }
             }
             Spacer()
             if exercise.id == selectedID {
