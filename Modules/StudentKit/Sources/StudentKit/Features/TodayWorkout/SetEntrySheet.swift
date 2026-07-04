@@ -77,33 +77,36 @@ struct SetEntrySheet: View {
             plateStepper(
               "重量", unit: "KG", sub: "点数字可直接输入 · ± 2.5",
               onDec: { weightText = SetEntryValue.text(max(0, weightValue - 2.5)) },
-              onInc: { weightText = SetEntryValue.text(weightValue + 2.5) }
-            ) {
-              TextField("", text: $weightText)
-                .decimalKeyboard()
-                .focused($focusedField, equals: .weight)
-                .modifier(EntryFieldStyle())
-            }
+              onInc: { weightText = SetEntryValue.text(weightValue + 2.5) },
+              field: {
+                TextField("", text: $weightText)
+                  .decimalKeyboard()
+                  .focused($focusedField, equals: .weight)
+                  .modifier(EntryFieldStyle())
+              }
+            )
             plateStepper(
               "次数", unit: "次", sub: "± 1",
               onDec: { repsText = "\(max(0, repsValue - 1))" },
-              onInc: { repsText = "\(repsValue + 1)" }
-            ) {
-              TextField("", text: $repsText)
-                .numberPadKeyboard()
-                .focused($focusedField, equals: .reps)
-                .modifier(EntryFieldStyle())
-            }
+              onInc: { repsText = "\(repsValue + 1)" },
+              field: {
+                TextField("", text: $repsText)
+                  .numberPadKeyboard()
+                  .focused($focusedField, equals: .reps)
+                  .modifier(EntryFieldStyle())
+              }
+            )
             plateStepper(
               "RPE", unit: nil, sub: "± 0.5 · 5–10",
               onDec: { rpeText = SetEntryValue.text(max(5, rpeValue - 0.5)) },
-              onInc: { rpeText = SetEntryValue.text(min(10, rpeValue + 0.5)) }
-            ) {
-              TextField("", text: $rpeText)
-                .decimalKeyboard()
-                .focused($focusedField, equals: .rpe)
-                .modifier(EntryFieldStyle())
-            }
+              onInc: { rpeText = SetEntryValue.text(min(10, rpeValue + 0.5)) },
+              field: {
+                TextField("", text: $rpeText)
+                  .decimalKeyboard()
+                  .focused($focusedField, equals: .rpe)
+                  .modifier(EntryFieldStyle())
+              }
+            )
 
             if let videoViewModel, let studentID {
               VideoAttachmentSection(

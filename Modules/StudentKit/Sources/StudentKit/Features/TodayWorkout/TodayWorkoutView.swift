@@ -1,4 +1,4 @@
-// swiftlint:disable file_length type_body_length function_body_length
+// swiftlint:disable file_length type_body_length
 import CoreModels
 import DesignSystem
 import Foundation
@@ -561,4 +561,4 @@ private struct EditingTarget: Identifiable {
   let draft: TodayWorkoutViewModel.SetRowDraft
   let scrollToVideo: Bool
 }
-// swiftlint:enable file_length type_body_length function_body_length
+// swiftlint:enable file_length type_body_length
