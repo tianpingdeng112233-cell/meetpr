@@ -186,7 +186,8 @@ public struct TodayWorkoutView: View {
         }
         .padding(.top, 4)
         .sheet(isPresented: $showingSummary) {
-          SessionSummaryView(summary: StudentSessionSummary(drafts: drafts), date: day.date)
+          SessionSummaryView(
+            summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID)
         }
       }
       .padding(16)
