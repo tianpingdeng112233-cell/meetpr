@@ -18,6 +18,9 @@ public struct StudentRootView: View {
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
+  /// Bumped whenever 今日 becomes active so the home screen reloads data logged
+  /// in other tabs (see DashboardView.todayReloadToken).
+  @State private var todayReloadToken = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -92,7 +95,8 @@ public struct StudentRootView: View {
         feedbackViewModel: feedbackViewModel,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onStartWorkout: { selectedTab = .training },
-        onSeeAllFeedback: { selectedTab = .growth }
+        onSeeAllFeedback: { selectedTab = .growth },
+        todayReloadToken: todayReloadToken
       )
       .tag(StudentTab.today)
       .tabItem {
@@ -141,6 +145,9 @@ public struct StudentRootView: View {
       }
       await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+    }
+    .onChange(of: selectedTab) { _, newTab in
+      if newTab == .today { todayReloadToken += 1 }
     }
     .tint(Color.MeetPR.brandRed)
   }
