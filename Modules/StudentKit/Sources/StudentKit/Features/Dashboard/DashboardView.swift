@@ -123,6 +123,19 @@ public struct DashboardView: View {
     .task {
       await loadIfNeeded()
     }
+    // Coming back from the workout tab must show what was just logged —
+    // the week slice reloads on every reappearance (spec 049 P0-1; the
+    // stale `loadIfNeeded` gate was why a finished day still said 「继续」).
+    .onAppear {
+      guard weekViewModel.state != .idle else { return }
+      Task { await weekViewModel.load(studentID: studentID) }
+    }
+    // 完成庆祝时刻: the day's only achievement feedback (spec 049 §1).
+    .sensoryFeedback(.success, trigger: todayIsComplete) { _, newValue in newValue }
+  }
+
+  private var todayIsComplete: Bool {
+    weekSnapshot?.progress(on: Date()).state == .complete
   }
 
   // MARK: - Header
@@ -166,16 +179,7 @@ public struct DashboardView: View {
   /// One segment per training day in the week (rest days excluded), each filled
   /// by that day's set-completion fraction. Falls back to a single empty segment.
   private var weekProgressValues: [Double] {
-    guard let data = weekData else { return [0] }
-    let logs = data.logs
-    let values = data.days
-      .filter { !$0.exercises.isEmpty }
-      .map { day -> Double in
-        let progress = TrainingDayProgress(day: day, logs: logs)
-        guard progress.total > 0 else { return 0 }
-        return Double(progress.completed) / Double(progress.total)
-      }
-    return values.isEmpty ? [0] : values
+    weekSnapshot?.weekSegments() ?? [0]
   }
 
   // MARK: - Today feedback card
@@ -254,7 +258,7 @@ public struct DashboardView: View {
     let isPast = date < Calendar.current.startOfDay(for: Date())
     let done =
       isPast && day != nil
-      && TrainingDayProgress(day: day, logs: weekData?.logs ?? []).state == .complete
+      && weekSnapshot?.progress(for: day).state == .complete
     let liftText = families.isEmpty ? "—" : families.map(liftLetter).joined()
 
     return Button {
@@ -383,7 +387,9 @@ public struct DashboardView: View {
 
   @ViewBuilder
   private var startButton: some View {
-    let progress = TrainingDayProgress(day: todayDay, logs: weekData?.logs ?? [])
+    let progress =
+      weekSnapshot?.progress(for: todayDay)
+      ?? TrainingDayProgress(day: todayDay, logs: [])
     switch progress.state {
     case .noPlan:
       HStack(spacing: 10) {
@@ -427,6 +433,12 @@ public struct DashboardView: View {
       return (days, logs, weekIndex)
     }
     return nil
+  }
+
+  /// Single completion source (spec 049 §1) — every progress consumer on
+  /// this screen derives from this snapshot, never from a private slice.
+  private var weekSnapshot: TrainingWeekSnapshot? {
+    weekData.map { TrainingWeekSnapshot(days: $0.days, logs: $0.logs) }
   }
 
   /// Monday of the week containing today (Mon-based offset 0…6).
