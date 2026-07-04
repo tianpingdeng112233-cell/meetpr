@@ -418,10 +418,18 @@ public struct TrainingHistoryView: View {
   }
 
   private var feedbackItems: [CoachFeedback]? {
+    // 成长 tab 反馈段仅 coached (spec 047 AC#3 solo 零教练字样): a solo account
+    // structurally has no coach in V1, so 「教练反馈记录」 must never render —
+    // gate at the source so it can't leak even if a feedbackViewModel is injected.
+    guard Self.showsCoachFeedback(trainingMode: trainingMode) else { return nil }
     guard let feedbackViewModel, case .loaded(let items) = feedbackViewModel.state else {
       return nil
     }
     return items.sorted { $0.postedAt > $1.postedAt }
+  }
+
+  static func showsCoachFeedback(trainingMode: TrainingMode) -> Bool {
+    trainingMode == .coached
   }
 
   /// Distinct calendar days on which at least one set was completed.

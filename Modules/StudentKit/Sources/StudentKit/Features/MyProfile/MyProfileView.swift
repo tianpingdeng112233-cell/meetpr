@@ -232,6 +232,11 @@ public struct MyProfileView: View {
     push && trainingMode != .selfTrain
   }
 
+  /// 评估总结 is a coach deliverable — solo profiles never surface it (spec 046 §3).
+  static func showsEvaluationSummary(trainingMode: TrainingMode) -> Bool {
+    trainingMode == .coached
+  }
+
   private var notifyBadge: some View {
     Text("通知教练")
       .font(.system(size: 10, design: .monospaced))
@@ -258,7 +263,11 @@ public struct MyProfileView: View {
       }
       .buttonStyle(.plain)
 
-      if let evaluationSummaryViewModel, let summary = evaluationSummaryViewModel.summary {
+      // 评估总结 is a coach deliverable (spec 046 §3 solo 零教练字样): a solo
+      // profile never shows it, even if an evaluation VM were injected.
+      if Self.showsEvaluationSummary(trainingMode: trainingMode),
+        let evaluationSummaryViewModel, let summary = evaluationSummaryViewModel.summary
+      {
         divider
         NavigationLink {
           EvaluationSummaryView(summary: summary) { evaluationSummaryViewModel.markRead() }
