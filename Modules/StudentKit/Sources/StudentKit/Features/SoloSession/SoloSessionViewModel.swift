@@ -255,15 +255,16 @@ public final class SoloSessionViewModel {
     let capturedNow = now()
     let recorder = E1RMRecorder(e1rm: e1rmRepo, now: { capturedNow })
     let event = await recorder.record(
-      studentID: studentID,
-      exerciseID: draft.exerciseID,
-      family: exerciseFamilies[draft.exerciseID],
-      setLogID: log.id,
-      weightKg: log.weightKg,
-      reps: log.reps,
-      rpe: draft.rpe,
-      failed: log.failed
-    )
+      E1RMRecorder.Input(
+        studentID: studentID,
+        exerciseID: draft.exerciseID,
+        family: exerciseFamilies[draft.exerciseID],
+        setLogID: log.id,
+        weightKg: log.weightKg,
+        reps: log.reps,
+        rpe: draft.rpe,
+        failed: log.failed
+      ))
     if let event {
       pendingPRBanner = event
     }

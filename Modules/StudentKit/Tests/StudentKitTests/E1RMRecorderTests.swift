@@ -38,8 +38,9 @@ private func seededPoint(e1RM: Double) -> E1RMHistoryPoint {
   // E1RMCalculator (RTS 扩展表): 5reps@RPE8 ≈ 78% → 158 kg ≈ 202.6 e1RM —
   // clears the 200 best but stays inside the 206 band edge.
   let event = await recorder.record(
-    studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
-    weightKg: 158, reps: 5, rpe: 8, failed: false)
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 158, reps: 5, rpe: 8, failed: false))
 
   #expect(event == nil)
   // The point itself still records (history is honest; only the PR is gated).
@@ -53,8 +54,9 @@ private func seededPoint(e1RM: Double) -> E1RMHistoryPoint {
 
   // A big jump (well past 206) fires.
   let event = await recorder.record(
-    studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
-    weightKg: 190, reps: 5, rpe: 9, failed: false)
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 190, reps: 5, rpe: 9, failed: false))
 
   #expect(event != nil)
   #expect((event?.previousMaxE1RMKg ?? 0) == 200)
@@ -65,14 +67,17 @@ private func seededPoint(e1RM: Double) -> E1RMHistoryPoint {
   let (recorder, repo) = makeRecorder()
 
   let lowRPE = await recorder.record(
-    studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
-    weightKg: 100, reps: 5, rpe: 6, failed: false)
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 100, reps: 5, rpe: 6, failed: false))
   let highRepDeadlift = await recorder.record(
-    studentID: student, exerciseID: squat, family: .deadlift, setLogID: UUID(),
-    weightKg: 180, reps: 8, rpe: 9, failed: false)
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .deadlift, setLogID: UUID(),
+      weightKg: 180, reps: 8, rpe: 9, failed: false))
   let failedSet = await recorder.record(
-    studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
-    weightKg: 200, reps: 1, rpe: 10, failed: true)
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 200, reps: 1, rpe: 10, failed: true))
 
   #expect(lowRPE == nil)
   #expect(highRepDeadlift == nil)
@@ -86,8 +91,9 @@ private func seededPoint(e1RM: Double) -> E1RMHistoryPoint {
   let (recorder, _) = makeRecorder()
 
   let event = await recorder.record(
-    studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
-    weightKg: 100, reps: 5, rpe: 8, failed: false)
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 100, reps: 5, rpe: 8, failed: false))
 
   #expect(event != nil)
 }

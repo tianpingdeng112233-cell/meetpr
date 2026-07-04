@@ -270,7 +270,7 @@ extension TodayWorkoutViewModel {
     let e1rmRepo = self.e1rmRepo
     return try await withThrowingTaskGroup(of: (UUID, ExerciseReference?).self) { group in
       for exerciseID in exerciseIDs {
-        let family = familyByExercise[exerciseID] ?? nil
+        let family = familyByExercise[exerciseID].flatMap { $0 }
         group.addTask {
           let points = try await e1rmRepo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
           // Last/Best keep raw semantics but only over eligible sets
@@ -337,15 +337,16 @@ extension TodayWorkoutViewModel {
     // Shared pipeline (spec 050 §3): eligibility gate + noise-banded PR.
     let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
     let event = await recorder.record(
-      studentID: studentID,
-      exerciseID: draft.exerciseID,
-      family: exerciseFamily(planExerciseID: draft.planExerciseID),
-      setLogID: log.id,
-      weightKg: log.weightKg,
-      reps: log.reps,
-      rpe: draft.actualRPE,
-      failed: log.failed
-    )
+      E1RMRecorder.Input(
+        studentID: studentID,
+        exerciseID: draft.exerciseID,
+        family: exerciseFamily(planExerciseID: draft.planExerciseID),
+        setLogID: log.id,
+        weightKg: log.weightKg,
+        reps: log.reps,
+        rpe: draft.actualRPE,
+        failed: log.failed
+      ))
     if let event {
       pendingPRBanner = event
     }

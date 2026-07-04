@@ -9,41 +9,47 @@ struct E1RMRecorder: Sendable {
   let e1rm: any E1RMRepository
   let now: @Sendable () -> Date
 
+  /// One completed set, exactly what the recorder needs to judge it.
+  struct Input: Sendable {
+    let studentID: UUID
+    let exerciseID: UUID
+    let family: LiftFamily?
+    let setLogID: UUID
+    let weightKg: Decimal
+    let reps: Int
+    let rpe: Decimal?
+    let failed: Bool
+  }
+
   /// Records the point when the set is eligible (spec 050 §1) and returns a
   /// PR event when the estimate clears the noise band over the prior best:
   /// max(0.5 kg, best × 3%) — a same-condition wobble is not a record.
   /// e1RM persistence stays best-effort: failures return nil and never block
   /// set logging; a banner only celebrates durably recorded history.
-  func record(
-    studentID: UUID,
-    exerciseID: UUID,
-    family: LiftFamily?,
-    setLogID: UUID,
-    weightKg: Decimal,
-    reps: Int,
-    rpe: Decimal?,
-    failed: Bool
-  ) async -> PRBreakthroughEvent? {
-    guard !failed else { return nil }
-    let weight = NSDecimalNumber(decimal: weightKg).doubleValue
-    let rpeValue = rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
-    guard E1RMEligibility.isEligible(reps: reps, rpe: rpeValue, family: family) else {
+  func record(_ input: Input) async -> PRBreakthroughEvent? {
+    let studentID = input.studentID
+    let exerciseID = input.exerciseID
+    guard !input.failed else { return nil }
+    let weight = NSDecimalNumber(decimal: input.weightKg).doubleValue
+    let rpeValue = input.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
+    guard E1RMEligibility.isEligible(reps: input.reps, rpe: rpeValue, family: input.family)
+    else {
       return nil
     }
     guard
       let estimatedOneRepMaxKg = E1RMCalculator.calculate(
-        weightKg: weight, reps: reps, rpe: rpeValue)
+        weightKg: weight, reps: input.reps, rpe: rpeValue)
     else { return nil }
 
     let point = E1RMHistoryPoint(
       id: UUID(),
       studentId: studentID,
       exerciseId: exerciseID,
-      setLogId: setLogID,
+      setLogId: input.setLogID,
       computedAt: now(),
       e1RMKg: estimatedOneRepMaxKg,
       sourceWeightKg: weight,
-      sourceReps: reps,
+      sourceReps: input.reps,
       sourceRPE: rpeValue
     )
     do {
