@@ -27,6 +27,7 @@ public final class SoloSessionViewModel {
   @ObservationIgnored private let logs: any StudentTrainingLogRepository
   @ObservationIgnored private let e1rmRepo: any E1RMRepository
   @ObservationIgnored private let exerciseNames: [UUID: String]
+  @ObservationIgnored private let exerciseFamilies: [UUID: LiftFamily]
   @ObservationIgnored private let pendingCount: @Sendable (UUID) async -> Int
   @ObservationIgnored private let now: () -> Date
   @ObservationIgnored private let calendar: Calendar
@@ -47,6 +48,11 @@ public final class SoloSessionViewModel {
     self.e1rmRepo = e1rm
     self.exerciseNames = Dictionary(
       catalog.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
+    self.exerciseFamilies = Dictionary(
+      catalog.compactMap { exercise in
+        exercise.mainLiftFamily.map { (exercise.id, $0) }
+      },
+      uniquingKeysWith: { first, _ in first })
     self.pendingCount = pendingCount
     self.now = now
     self.calendar = calendar
@@ -244,48 +250,22 @@ public final class SoloSessionViewModel {
     return date.formatted(formatStyle)
   }
 
-  /// Same sequence as TodayWorkoutViewModel.recordE1RMPoint — deliberately
-  /// duplicated until spec 050 consolidates the single e1RM pipeline (U7).
+  /// Shared pipeline (spec 050 §3): eligibility gate + noise-banded PR.
   private func recordE1RMPoint(for draft: SoloSetDraft, log: StudentSetLog) async {
-    guard !log.failed else { return }
-    let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
-    let rpe = draft.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
-    guard
-      let estimatedOneRepMaxKg = E1RMCalculator.calculate(
-        weightKg: weight, reps: log.reps, rpe: rpe)
-    else { return }
-
-    let point = E1RMHistoryPoint(
-      id: UUID(),
-      studentId: studentID,
-      exerciseId: draft.exerciseID,
-      setLogId: log.id,
-      computedAt: now(),
-      e1RMKg: estimatedOneRepMaxKg,
-      sourceWeightKg: weight,
-      sourceReps: log.reps,
-      sourceRPE: rpe
+    let capturedNow = now()
+    let recorder = E1RMRecorder(e1rm: e1rmRepo, now: { capturedNow })
+    let event = await recorder.record(
+      studentID: studentID,
+      exerciseID: draft.exerciseID,
+      family: exerciseFamilies[draft.exerciseID],
+      setLogID: log.id,
+      weightKg: log.weightKg,
+      reps: log.reps,
+      rpe: draft.rpe,
+      failed: log.failed
     )
-    do {
-      let previousMax = try await e1rmRepo.maxBefore(
-        studentId: studentID, exerciseId: draft.exerciseID, before: .distantFuture)
-      try await e1rmRepo.recordPoint(point)
-      if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
-        let event = PRBreakthroughEvent(
-          id: UUID(),
-          studentId: studentID,
-          exerciseId: draft.exerciseID,
-          pointId: point.id,
-          breakthroughE1RMKg: estimatedOneRepMaxKg,
-          previousMaxE1RMKg: previousMax ?? 0,
-          occurredAt: point.computedAt,
-          acknowledgedAt: nil
-        )
-        try await e1rmRepo.recordPR(event)
-        pendingPRBanner = event
-      }
-    } catch {
-      // Best-effort: e1RM persistence must never block set logging.
+    if let event {
+      pendingPRBanner = event
     }
   }
 }

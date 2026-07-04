@@ -327,58 +327,33 @@ extension TodayWorkoutViewModel {
     log: StudentSetLog,
     studentID: UUID
   ) async {
-    // Failed attempts are history-only; e1RM/PR ignores incomplete outcomes.
-    guard !log.failed else { return }
-    let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
-    let rpe = draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
-    guard
-      let estimatedOneRepMaxKg = E1RMCalculator.calculate(
-        weightKg: weight,
-        reps: log.reps,
-        rpe: rpe
-      )
-    else { return }
-
-    let point = E1RMHistoryPoint(
-      id: UUID(),
-      studentId: studentID,
-      exerciseId: draft.exerciseID,
-      setLogId: log.id,
-      computedAt: now(),
-      e1RMKg: estimatedOneRepMaxKg,
-      sourceWeightKg: weight,
-      sourceReps: log.reps,
-      sourceRPE: rpe
+    // Shared pipeline (spec 050 §3): eligibility gate + noise-banded PR.
+    let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
+    let event = await recorder.record(
+      studentID: studentID,
+      exerciseID: draft.exerciseID,
+      family: exerciseFamily(planExerciseID: draft.planExerciseID),
+      setLogID: log.id,
+      weightKg: log.weightKg,
+      reps: log.reps,
+      rpe: draft.actualRPE,
+      failed: log.failed
     )
-    do {
-      // Baseline BEFORE inserting the new point, over the full history
-      // (.distantFuture): a strictly-earlier filter at point.computedAt would
-      // miss a same-timestamp sibling and double-fire PRs (Codex review P1).
-      let previousMax = try await e1rmRepo.maxBefore(
-        studentId: studentID,
-        exerciseId: draft.exerciseID,
-        before: .distantFuture
-      )
-      try await e1rmRepo.recordPoint(point)
-
-      // 0.5kg buffer absorbs float jitter; tune to 1.0 if PRs fire too often.
-      if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
-        let event = PRBreakthroughEvent(
-          id: UUID(),
-          studentId: studentID,
-          exerciseId: draft.exerciseID,
-          pointId: point.id,
-          breakthroughE1RMKg: estimatedOneRepMaxKg,
-          previousMaxE1RMKg: previousMax ?? 0,
-          occurredAt: point.computedAt,
-          acknowledgedAt: nil
-        )
-        try await e1rmRepo.recordPR(event)
-        pendingPRBanner = event
-      }
-    } catch {
-      // e1RM persistence is best-effort and must never block set logging,
-      // but a banner only celebrates durably recorded history.
+    if let event {
+      pendingPRBanner = event
     }
+  }
+
+  private func exerciseFamily(planExerciseID: UUID) -> LiftFamily? {
+    let day: StudentPlanDay?
+    switch state {
+    case .loaded(let plan, _), .recording(let plan, _, _):
+      day = plan
+    default:
+      day = nil
+    }
+    return day?.exercises
+      .first { $0.id == planExerciseID }?
+      .exercise.mainLiftFamily
   }
 }
