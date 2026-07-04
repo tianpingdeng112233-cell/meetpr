@@ -92,6 +92,13 @@ public struct MyProfileView: View {
   private func sections(_ profile: OnboardingProfile) -> some View {
     sectionLabel("训练基线 · 教练管理")
     oneRMCard(profile).padding(.top, 8)
+    // 基线是入门锚点,不是第三个「我的实力」(spec 050 §4)——实测走势
+    // 归成长曲线,两个数字各安其位。
+    Text("入门基线 · 实测走势见「成长」")
+      .font(.caption)
+      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.top, 4)
 
     sectionLabel("恢复与伤病 · 改动通知教练").padding(.top, 18)
     card {
