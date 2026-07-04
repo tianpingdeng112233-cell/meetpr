@@ -180,6 +180,10 @@ public final class SoloSessionViewModel {
 
   // MARK: - Derivations
 
+  public func exerciseName(for exerciseID: UUID) -> String? {
+    exerciseNames[exerciseID]
+  }
+
   private func name(of exerciseID: UUID) -> String {
     exerciseNames[exerciseID] ?? "动作"
   }

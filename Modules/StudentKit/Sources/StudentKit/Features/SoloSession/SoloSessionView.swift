@@ -11,6 +11,7 @@ struct SoloSessionView: View {
   let catalog: [Exercise]
   @State private var pickerPresented = false
   @State private var editingDraftID: UUID?
+  @State private var plateMathWeightKg: Double?
 
   private var exerciseOrder: [UUID] {
     var seen: Set<UUID> = []
@@ -84,6 +85,34 @@ struct SoloSessionView: View {
         }
       )
     }
+    .sheet(item: plateMathTarget) { target in
+      PlateMathSheet(targetKg: target.weightKg)
+        .presentationDetents([.medium])
+    }
+    .overlay(alignment: .top) {
+      if let banner = viewModel.pendingPRBanner {
+        PRBanner(
+          event: banner,
+          exerciseName: viewModel.exerciseName(for: banner.exerciseId),
+          onDismiss: {
+            Task { await viewModel.acknowledgePendingPR() }
+          }
+        )
+        .padding(.horizontal)
+      }
+    }
+  }
+
+  private struct PlateMathTarget: Identifiable {
+    let weightKg: Double
+    var id: Double { weightKg }
+  }
+
+  private var plateMathTarget: Binding<PlateMathTarget?> {
+    Binding(
+      get: { plateMathWeightKg.map(PlateMathTarget.init(weightKg:)) },
+      set: { plateMathWeightKg = $0?.weightKg }
+    )
   }
 
   private var lastSessionSummary: String {
@@ -114,6 +143,9 @@ struct SoloSessionView: View {
           rowIndex: indexed.offset,
           onTap: { _ in
             editingDraftID = indexed.element.id
+          },
+          onPlateMath: { weight in
+            plateMathWeightKg = weight
           }
         )
       }
