@@ -20,6 +20,7 @@ public struct RootView: View {
   /// studentLogs (spec 045); coached flows keep the direct path.
   private let soloLogs: QueuedTrainingLogRepository
   private let studentSessionReviews: any SessionReviewRepository
+  private let studentAccount: any AccountRepository
   /// Decoding 1211 catalog entries is not free — load once per process.
   private static let soloCatalog = ExerciseCatalog.loadBundled()
   private let studentFeedback: any StudentFeedbackRepository
@@ -56,6 +57,7 @@ public struct RootView: View {
     studentEvaluations: (any EvaluationRepository)? = nil,
     studentEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     studentSessionReviews: (any SessionReviewRepository)? = nil,
+    studentAccount: (any AccountRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
@@ -71,6 +73,7 @@ public struct RootView: View {
     self.soloLogs = QueuedTrainingLogRepository(
       upstream: resolvedLogs, store: PendingSetLogStore())
     self.studentSessionReviews = studentSessionReviews ?? InMemorySessionReviewRepository()
+    self.studentAccount = studentAccount ?? InMemoryAccountRepository()
     self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
@@ -204,7 +207,10 @@ public struct RootView: View {
     let soloLogs = self.soloLogs
     let logsForUser: any StudentTrainingLogRepository = isSolo ? soloLogs : studentLogs
     let trainingMode: TrainingMode = isSolo ? .selfTrain : .coached
-    let catalog: [Exercise] = isSolo ? Self.soloCatalog : []
+    // Both modes get the bundled catalog (spec 048): CSV export resolves
+    // names through it, and coached chart buckets treat the extra ids as a
+    // harmless union (no e1RM points live on unplanned catalog ids).
+    let catalog: [Exercise] = Self.soloCatalog
     let pendingCount: (@Sendable (UUID) async -> Int)?
     if isSolo {
       pendingCount = { studentID in await soloLogs.pendingCount(studentID: studentID) }
@@ -228,7 +234,8 @@ public struct RootView: View {
       trainingMode: trainingMode,
       soloCatalog: catalog,
       pendingSetLogCount: pendingCount,
-      sessionReviews: studentSessionReviews
+      sessionReviews: studentSessionReviews,
+      account: studentAccount
     )
   }
 }
