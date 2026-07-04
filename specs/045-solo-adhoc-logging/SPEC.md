@@ -56,6 +56,12 @@
 - CatalogKit 搬移:CoachKit 既有搜索测试全绿(行为零变化回归)。
 - UI 冒烟(XcodeBuildMCP 模拟器):solo 账号 开始训练→选深蹲→记 3 组→结束→摘要出现;Demo 构建记得 `configuration=Demo`。
 
+## 交付状态(2026-07-04 首轮实装)
+
+已交付:线契约/模型加宽、CatalogKit 下沉、repo 协议+断网队列、SoloSessionViewModel(会话日锁定/续 set_index/重复上次/建议)、扫视态+编辑态+选择器+记录 sheet、配重可视化与 PR 横幅接入、StudentRootView/AppShell 装配。六包 842 测试全绿。
+
+**本轮明示缓交(FOLLOWUPS F-030,U9 polish 或后续切片收)**:①选择器分类浏览段(主项/辅助,现为 最近/常用/全部+搜索)②solo 会话 RPE 驱动休息计时器(RestTimer 深耦合 TodayWorkout VM)③行级「未同步」角标(现为会话级横幅,产品语义等价)④埋点事件挂点注释(埋点 wave 实装时一并)。
+
 ## 验收
 
 1. solo 新账号(staging)全程:开始训练 → 选动作 → 逐组记录(亮点组件全部在场)→ 结束 → 今日摘要正确;重启 app 数据仍在(后端拉回)。

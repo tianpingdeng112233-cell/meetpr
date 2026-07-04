@@ -13,6 +13,13 @@
 
 ## 待触发
 
+### F-030 — spec 045 solo 首轮明示缓交四项
+
+- **触发条件**:U9 polish 批次动工,**或** U10 终验走查发现 solo 体验缺口时优先核对本条
+- **动作**:①ExercisePickerSheet 加分类浏览段(主项/辅助,按 `main_lift_family`/`exercise_type`)②solo 会话接 RPE 驱动休息计时器(需把 RestTimerPolicy/Overlay 从 TodayWorkout VM 解耦或镜像)③会话级「未同步」横幅升级为行级角标(需 QueuedTrainingLogRepository 暴露 pending 键集)④solo 链路埋点挂点(`workout_log_start{source:adhoc}` / `set_logged` / `workout_log_save`,埋点 wave 实装时)
+- **上下文**:spec 045 §交付状态;缓交理由 = 首轮以主链路闭环优先,四项均不破坏可用性
+- **创建于**:2026-07-04
+
 ### F-001 — log4brains 站点化
 
 - **触发条件**:`~/Brain/wiki/projects/MeetPR/decisions/` 下 **ADR 数 ≥ 10**(不含 TEMPLATE.md 和 README.md)
