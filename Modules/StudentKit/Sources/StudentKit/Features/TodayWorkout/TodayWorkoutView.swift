@@ -14,6 +14,8 @@ public struct TodayWorkoutView: View {
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
   @State private var selectedDate: Date
+  @State private var backfillUnlocked = false
+  private let resetToTodayPulse: Int
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
   @State private var showingReadinessSheet = false
@@ -25,11 +27,13 @@ public struct TodayWorkoutView: View {
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
-    videoUploads: VideoUploadServices? = nil
+    videoUploads: VideoUploadServices? = nil,
+    resetToTodayPulse: Int = 0
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
+    self.resetToTodayPulse = resetToTodayPulse
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
@@ -51,6 +55,28 @@ public struct TodayWorkoutView: View {
         .padding(.horizontal)
         .padding(.top)
 
+        // 写入只留给今天 (spec 049 §2): future days never unlock; past days
+        // read-only until the explicit backfill step below.
+        if let banner = dateLock.bannerText {
+          HStack(spacing: 12) {
+            Image(systemName: dateLock == .pastBackfilling ? "pencil.circle" : "lock")
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+            Text(banner)
+              .font(.footnote)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+            Spacer()
+            if dateLock == .pastLocked {
+              Button("补录这一天") {
+                backfillUnlocked = true
+              }
+              .font(.footnote.bold())
+              .accessibilityIdentifier("today.backfill")
+            }
+          }
+          .padding(.horizontal)
+          .padding(.vertical, 8)
+        }
+
         Group {
           switch viewModel.state {
           case .idle, .loading:
@@ -68,6 +94,7 @@ public struct TodayWorkoutView: View {
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .disabled(!dateLock.allowsWrites)
       }
       .background(Color.MeetPR.bg)
       .navigationTitle(navTitle)
@@ -138,8 +165,19 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: selectedDate) { _, newDate in
+      backfillUnlocked = false
       Task { await loadWorkout(for: newDate) }
     }
+    // 「开始今天训练」 must land on the real today, not the last browsed
+    // date (spec 049 §2 / walkthrough P0-5).
+    .onChange(of: resetToTodayPulse) { _, _ in
+      selectedDate = Date()
+    }
+  }
+
+  private var dateLock: TodayWorkoutDateLock {
+    TodayWorkoutDateLock.mode(
+      selected: selectedDate, today: Date(), backfillUnlocked: backfillUnlocked)
   }
 
   // MARK: - Workout body
