@@ -160,13 +160,22 @@ public struct TodayWorkoutView: View {
     drafts: [TodayWorkoutViewModel.SetRowDraft]
   ) -> some View {
     let activeIndex = drafts.firstIndex { !$0.completed }
+    // Only today's session is writable. Past days are a read-only record and
+    // future days a preview, so logging/completing can't be triggered by
+    // mistake (previously any browsed day accepted set records + completion).
+    let isEditable = Calendar.current.isDateInToday(day.date)
     return ScrollView {
       VStack(alignment: .leading, spacing: 16) {
+        if !isEditable {
+          readOnlyNotice(for: day.date)
+        }
+
         if let activeIndex {
           activeSetHero(
             draft: drafts[activeIndex],
             rowIndex: activeIndex,
-            totalSets: totalSets(for: drafts[activeIndex].planExerciseID, in: drafts))
+            totalSets: totalSets(for: drafts[activeIndex].planExerciseID, in: drafts),
+            isEditable: isEditable)
         }
 
         ForEach(day.exercises) { exercise in
@@ -174,20 +183,23 @@ public struct TodayWorkoutView: View {
             exercise: exercise,
             rows: rows(for: exercise, drafts: drafts),
             allDrafts: drafts,
-            activeIndex: activeIndex)
+            activeIndex: activeIndex,
+            isEditable: isEditable)
         }
 
         if !drafts.isEmpty && drafts.allSatisfy(\.completed) {
           DayCompletionBanner(totalSets: drafts.count)
         }
 
-        SlideToCompleteButton(title: "滑动完成今日训练") {
-          showingSummary = true
-        }
-        .padding(.top, 4)
-        .sheet(isPresented: $showingSummary) {
-          SessionSummaryView(
-            summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID)
+        if isEditable {
+          SlideToCompleteButton(title: "滑动完成今日训练") {
+            showingSummary = true
+          }
+          .padding(.top, 4)
+          .sheet(isPresented: $showingSummary) {
+            SessionSummaryView(
+              summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID)
+          }
         }
       }
       .padding(16)
@@ -206,10 +218,29 @@ public struct TodayWorkoutView: View {
     }
   }
 
+  // MARK: - Read-only notice
+
+  private func readOnlyNotice(for date: Date) -> some View {
+    let isPast = date < Calendar.current.startOfDay(for: Date())
+    return HStack(spacing: 8) {
+      Image(systemName: isPast ? "clock.arrow.circlepath" : "eye")
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+      Text(isPast ? "历史记录 · 不可修改" : "未到训练日 · 仅预览")
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+      Spacer()
+    }
+    .padding(12)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(Color.MeetPR.surface1)
+    .clipShape(.rect(cornerRadius: 12))
+    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
   // MARK: - Active set hero
 
   private func activeSetHero(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, totalSets: Int
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, totalSets: Int, isEditable: Bool
   ) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       Eyebrow(
@@ -249,41 +280,49 @@ public struct TodayWorkoutView: View {
         Text("/ 10").font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
       }
 
-      HStack(spacing: 8) {
-        Button {
-          editing = EditingTarget(
-            id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
-        } label: {
-          Text("记录此组")
-            .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.bg)
-            .frame(maxWidth: .infinity)
-            .frame(height: 48)
-            .background(Color.MeetPR.fgPrimary)
-            .clipShape(.rect(cornerRadius: 12))
-        }
-        .buttonStyle(.plain)
-
-        Button {
-          editing = EditingTarget(
-            id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: true)
-        } label: {
-          Image(systemName: "video")
-            .font(.system(size: 20))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-            .frame(width: 56, height: 48)
-            .overlay {
-              RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
-            }
-        }
-        .buttonStyle(.plain)
+      if isEditable {
+        recordActions(draft: draft, rowIndex: rowIndex)
+          .padding(.top, 16)
       }
-      .padding(.top, 16)
     }
     .padding(16)
     .background(Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: 12))
     .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
+  private func recordActions(
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int
+  ) -> some View {
+    HStack(spacing: 8) {
+      Button {
+        editing = EditingTarget(
+          id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
+      } label: {
+        Text("记录此组")
+          .font(Font.MeetPR.bodyEmphasis)
+          .foregroundStyle(Color.MeetPR.bg)
+          .frame(maxWidth: .infinity)
+          .frame(height: 48)
+          .background(Color.MeetPR.fgPrimary)
+          .clipShape(.rect(cornerRadius: 12))
+      }
+      .buttonStyle(.plain)
+
+      Button {
+        editing = EditingTarget(
+          id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: true)
+      } label: {
+        Image(systemName: "video")
+          .font(.system(size: 20))
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .frame(width: 56, height: 48)
+          .overlay {
+            RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+          }
+      }
+      .buttonStyle(.plain)
+    }
   }
 
   // MARK: - Per-exercise set table
@@ -301,7 +340,8 @@ public struct TodayWorkoutView: View {
     exercise: StudentPlanExercise,
     rows: [TodayWorkoutViewModel.SetRowDraft],
     allDrafts: [TodayWorkoutViewModel.SetRowDraft],
-    activeIndex: Int?
+    activeIndex: Int?,
+    isEditable: Bool
   ) -> some View {
     VStack(alignment: .leading, spacing: 8) {
       VStack(alignment: .leading, spacing: 2) {
@@ -330,7 +370,8 @@ public struct TodayWorkoutView: View {
 
         ForEach(rows) { draft in
           let index = allDrafts.firstIndex { $0.id == draft.id } ?? 0
-          setRow(draft: draft, rowIndex: index, active: activeIndex == index)
+          setRow(
+            draft: draft, rowIndex: index, active: activeIndex == index, isEditable: isEditable)
         }
       }
       .background(Color.MeetPR.surface1)
@@ -347,35 +388,46 @@ public struct TodayWorkoutView: View {
       .frame(maxWidth: .infinity, alignment: leading ? .leading : .trailing)
   }
 
+  @ViewBuilder
   private func setRow(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, active: Bool
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, active: Bool, isEditable: Bool
+  ) -> some View {
+    if isEditable {
+      Button {
+        editing = EditingTarget(
+          id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
+      } label: {
+        setRowGrid(draft: draft, active: active)
+      }
+      .buttonStyle(.plain)
+    } else {
+      setRowGrid(draft: draft, active: active)
+    }
+  }
+
+  private func setRowGrid(
+    draft: TodayWorkoutViewModel.SetRowDraft, active: Bool
   ) -> some View {
     let resolved = draft.completed || active
     let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
-    return Button {
-      editing = EditingTarget(
-        id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
-    } label: {
-      LazyVGrid(columns: columns, spacing: 0) {
-        Text("\(draft.prescribed.setIndex + 1)")
-          .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
-        Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
-        Text(repsText(draft)).foregroundStyle(foreground)
-        Text(rpeText(draft)).foregroundStyle(foreground)
-        Text(statusMark(draft)).foregroundStyle(statusColor(draft))
-        Image(systemName: "video")
-          .font(.system(size: 16))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .frame(maxWidth: .infinity, alignment: .trailing)
-      }
-      .font(.system(size: 16, design: .monospaced))
-      .padding(.horizontal, 16)
-      .padding(.vertical, 14)
-      .background(active ? Color.MeetPR.surface2 : Color.clear)
-      .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
-      .contentShape(Rectangle())
+    return LazyVGrid(columns: columns, spacing: 0) {
+      Text("\(draft.prescribed.setIndex + 1)")
+        .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+      Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
+      Text(repsText(draft)).foregroundStyle(foreground)
+      Text(rpeText(draft)).foregroundStyle(foreground)
+      Text(statusMark(draft)).foregroundStyle(statusColor(draft))
+      Image(systemName: "video")
+        .font(.system(size: 16))
+        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .frame(maxWidth: .infinity, alignment: .trailing)
     }
-    .buttonStyle(.plain)
+    .font(.system(size: 16, design: .monospaced))
+    .padding(.horizontal, 16)
+    .padding(.vertical, 14)
+    .background(active ? Color.MeetPR.surface2 : Color.clear)
+    .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
+    .contentShape(Rectangle())
   }
 
   // MARK: - Value formatting
