@@ -1,6 +1,6 @@
 # SPEC 048 — 账号台账:注销/改密/CSV 导出(iOS 半,wave A6)
 
-- **状态**: Draft
+- **状态**: Accepted(2026-07-04,与实现同 PR)
 - **来源**: 自己练 Free 档 wave A6 商业化台账;backend 半 = spec 011(注销/改密端点)。
 - **侦察(2026-07-04)**:APIClient 动词全齐(`deleteNoContent`/`put`);`Session.logout()` 已清 keychain+本地态+回登录页,注销成功后直接复用;我的页「更多」区现有 成长曲线/评估总结/退出登录 三行,新增「账号与安全」区自然落位;CSV 数据源 = `fetchLogs(scope: .all)` 宽窗。
 
