@@ -70,7 +70,7 @@ struct SetEntrySheet: View {
               onDec: { weight = max(0, weight - 2.5) }, onInc: { weight += 2.5 }
             ) {
               TextField("", value: $weight, format: .number.precision(.fractionLength(0...1)))
-                .keyboardType(.decimalPad)
+                .decimalKeyboard()
                 .focused($focusedField, equals: .weight)
                 .modifier(EntryFieldStyle())
             }
@@ -79,7 +79,7 @@ struct SetEntrySheet: View {
               onDec: { reps = max(0, reps - 1) }, onInc: { reps += 1 }
             ) {
               TextField("", value: $reps, format: .number)
-                .keyboardType(.numberPad)
+                .numberPadKeyboard()
                 .focused($focusedField, equals: .reps)
                 .modifier(EntryFieldStyle())
             }
@@ -88,7 +88,7 @@ struct SetEntrySheet: View {
               onDec: { rpe = max(5, rpe - 0.5) }, onInc: { rpe = min(10, rpe + 0.5) }
             ) {
               TextField("", value: $rpe, format: .number.precision(.fractionLength(0...1)))
-                .keyboardType(.decimalPad)
+                .decimalKeyboard()
                 .focused($focusedField, equals: .rpe)
                 .modifier(EntryFieldStyle())
             }
@@ -113,13 +113,15 @@ struct SetEntrySheet: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bg)
     .presentationDetents([.large])
-    .toolbar {
-      ToolbarItemGroup(placement: .keyboard) {
-        Spacer()
-        Button("完成") { focusedField = nil }
+    #if os(iOS)
+      .toolbar {
+        ToolbarItemGroup(placement: .keyboard) {
+          Spacer()
+          Button("完成") { focusedField = nil }
           .foregroundStyle(Color.MeetPR.brandRed)
+        }
       }
-    }
+    #endif
   }
 
   // MARK: - Plate loadout
@@ -270,6 +272,29 @@ struct SetEntrySheet: View {
     viewModel.updateRPE(rowIndex: rowIndex, rpe: min(10, max(5, rpe)))
     Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
     dismiss()
+  }
+}
+
+/// `keyboardType` is iOS-only; the StudentKit package also builds for macOS
+/// (test target), so wrap it platform-guarded no-ops.
+@available(iOS 17.0, macOS 14.0, *)
+extension View {
+  @ViewBuilder
+  fileprivate func decimalKeyboard() -> some View {
+    #if os(iOS)
+      keyboardType(.decimalPad)
+    #else
+      self
+    #endif
+  }
+
+  @ViewBuilder
+  fileprivate func numberPadKeyboard() -> some View {
+    #if os(iOS)
+      keyboardType(.numberPad)
+    #else
+      self
+    #endif
   }
 }
 // swiftlint:enable function_parameter_count
