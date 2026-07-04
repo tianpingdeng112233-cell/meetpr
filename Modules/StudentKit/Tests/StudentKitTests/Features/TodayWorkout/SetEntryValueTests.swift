@@ -26,6 +26,12 @@ import Testing
     #expect(SetEntryValue.reps(from: "-4") == 0)
   }
 
+  @Test func commaDecimalIsNormalized() {
+    // `.decimalPad` enters "," in some locales; must not save 172 for 172,5.
+    #expect(SetEntryValue.weight(from: "172,5") == Decimal(string: "172.5"))
+    #expect(SetEntryValue.rpe(from: "8,5") == Decimal(string: "8.5"))
+  }
+
   @Test func emptyOrGarbageFallsBackSafely() {
     #expect(SetEntryValue.weight(from: "") == 0)
     #expect(SetEntryValue.reps(from: "") == 0)

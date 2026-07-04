@@ -24,6 +24,11 @@ enum SetEntryValue {
   }
 
   private static func decimal(_ text: String) -> Decimal {
-    Decimal(string: text.trimmingCharacters(in: .whitespaces)) ?? 0
+    // Normalize comma decimals and pin the separator to POSIX, matching
+    // UnitDisplay.parseDecimal — otherwise a `.decimalPad` comma in some locales
+    // parses "172,5" as 172 and silently saves the wrong load.
+    let normalized = text.replacingOccurrences(of: ",", with: ".")
+      .trimmingCharacters(in: .whitespaces)
+    return Decimal(string: normalized, locale: Locale(identifier: "en_US_POSIX")) ?? 0
   }
 }
