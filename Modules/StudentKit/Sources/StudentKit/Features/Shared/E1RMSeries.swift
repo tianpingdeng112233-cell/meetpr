@@ -79,16 +79,27 @@ struct E1RMSeries: Equatable, Sendable {
   }
 
   static func build(points: [E1RMHistoryPoint], family: LiftFamily?) -> E1RMSeries {
-    let eligible =
+    let eligiblePoints =
       points
       .filter { E1RMEligibility.isEligible(point: $0, family: family) }
       .sorted { $0.computedAt < $1.computedAt }
+    let rawEligible = eligiblePoints.map {
+      Sample(pointID: $0.id, date: $0.computedAt, valueKg: $0.e1RMKg)
+    }
+
+    // Anomaly guard (spec 050 §5): current/best/last trust only `.normal`
+    // points; `.low` (quarantined) points stay in rawEligible as honest scatter
+    // but never become the headline — a rolling max can't dampen an upward
+    // spike, this exclusion can.
+    let trusted =
+      eligiblePoints
+      .filter { $0.confidence == .normal }
       .map { Sample(pointID: $0.id, date: $0.computedAt, valueKg: $0.e1RMKg) }
 
-    let smoothed = eligible.map { sample in
+    let smoothed = trusted.map { sample in
       let windowStart = sample.date.addingTimeInterval(-rollingWindow)
       let windowMax =
-        eligible
+        trusted
         .filter { $0.date > windowStart && $0.date <= sample.date }
         .map(\.valueKg)
         .max() ?? sample.valueKg
@@ -97,9 +108,9 @@ struct E1RMSeries: Equatable, Sendable {
 
     return E1RMSeries(
       smoothed: smoothed,
-      rawEligible: eligible,
-      best: eligible.max { $0.valueKg < $1.valueKg },
-      last: eligible.last
+      rawEligible: rawEligible,
+      best: trusted.max { $0.valueKg < $1.valueKg },
+      last: trusted.last
     )
   }
 }
