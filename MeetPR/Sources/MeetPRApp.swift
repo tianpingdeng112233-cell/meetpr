@@ -152,6 +152,7 @@ struct MeetPRApp: App {
             session: session,
             cache: TrainingLogCache()
           ),
+          studentSessionReviews: BackendSessionReviewRepository(api: api, session: session),
           studentFeedback: BackendStudentFeedbackRepository(
             api: api,
             session: session,
