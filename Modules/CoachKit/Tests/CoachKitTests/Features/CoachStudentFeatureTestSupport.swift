@@ -210,8 +210,21 @@ actor StubTrainingLogRepository: StudentTrainingLogRepository {
     return log
   }
 
+  @discardableResult
+  func recordAdhocSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    throw StudentTrainingLogRepositoryError.adhocUnsupported
+  }
+
   func fetchLogs(studentID: UUID, in dateRange: ClosedRange<Date>) async throws -> [StudentSetLog] {
     logs.filter { $0.studentID == studentID && dateRange.contains($0.loggedAt) }
+  }
+
+  func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>,
+    scope: TrainingLogScope
+  ) async throws -> [StudentSetLog] {
+    try await fetchLogs(studentID: studentID, in: dateRange)
   }
 
   func fetchLogsForExercise(
