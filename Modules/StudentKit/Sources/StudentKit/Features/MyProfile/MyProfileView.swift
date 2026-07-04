@@ -150,6 +150,10 @@ public struct MyProfileView: View {
           Spacer()
           Image(systemName: "lock").font(.system(size: 14)).foregroundStyle(Color.MeetPR.fgTertiary)
         }
+        Text("教练设定的训练基准 · 与「成长」里按训练自动估算的 E1RM 不是同一个值")
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .padding(.top, 6)
         HStack(spacing: 12) {
           oneRMValue("深蹲", profile.squat1RMKg)
           oneRMValue("卧推", profile.bench1RMKg)

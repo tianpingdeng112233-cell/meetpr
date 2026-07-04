@@ -19,6 +19,11 @@ public struct DashboardView: View {
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   private let onStartWorkout: () -> Void
   private let onSeeAllFeedback: () -> Void
+  /// Bumped by the parent tab container each time 今日 becomes the active tab, so
+  /// the home screen re-reads week/e1RM data logged in the 训练 tab (the view
+  /// models cache a one-shot snapshot; without this, a completed workout keeps
+  /// showing 继续 on return).
+  private let todayReloadToken: Int
   @State private var weekViewModel: WeekOverviewViewModel
   @State private var notificationsViewModel: DashboardNotificationsViewModel
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
@@ -37,7 +42,8 @@ public struct DashboardView: View {
     feedbackViewModel: FeedbackInboxViewModel,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onStartWorkout: @escaping () -> Void,
-    onSeeAllFeedback: @escaping () -> Void
+    onSeeAllFeedback: @escaping () -> Void,
+    todayReloadToken: Int = 0
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -46,6 +52,7 @@ public struct DashboardView: View {
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onStartWorkout = onStartWorkout
     self.onSeeAllFeedback = onSeeAllFeedback
+    self.todayReloadToken = todayReloadToken
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
     self._notificationsViewModel = State(
       initialValue: DashboardNotificationsViewModel(plans: plans)
@@ -122,6 +129,9 @@ public struct DashboardView: View {
     }
     .task {
       await loadIfNeeded()
+    }
+    .onChange(of: todayReloadToken) { _, _ in
+      Task { await reload() }
     }
   }
 

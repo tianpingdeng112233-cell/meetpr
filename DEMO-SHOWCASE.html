@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetPR 演示 · 可交互原型</title>
+<style>
+  :root{
+    /* ---- EXACT MeetPR dark-mode palette (Colors.swift) ---- */
+    --bg:#000000;
+    --surface1:#0E0E0E;
+    --surface2:#161616;
+    --surface3:#1F1F1F;
+    --border:#262626;
+    --borderStrong:#3A3A3A;
+    --brandRed:#E5221E;
+    --brandRedPress:#B81A17;
+    --brandRedSoft:rgba(229,34,30,0.12);   /* dark variant */
+    --green:#1FB358;                        /* rgb(31,179,88) */
+    --greenSoft:rgba(31,179,88,0.14);
+    --amber:#E0A810;                        /* rgb(224,168,16) */
+    --amberSoft:rgba(224,168,16,0.14);
+    --fgPrimary:#FFFFFF;
+    --fgSecondary:#B5B5B5;
+    --fgTertiary:#737373;
+    --fgDisabled:rgba(255,255,255,0.35);
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  }
+  *{box-sizing:border-box; -webkit-font-smoothing:antialiased;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #121212 0%, #000 60%),
+      var(--bg);
+    color:var(--fgPrimary);
+    font-family:-apple-system, "PingFang SC", system-ui, "Helvetica Neue", sans-serif;
+    line-height:1.4;
+    min-height:100vh;
+    padding:30px 16px 60px;
+    display:flex; flex-direction:column; align-items:center;
+  }
+
+  /* ---------- page header ---------- */
+  .page-head{text-align:center; max-width:560px;}
+  .page-head h1{font-size:28px; font-weight:800; margin:0; letter-spacing:-0.5px;}
+  .page-head .sub{color:var(--fgSecondary); font-size:13px; margin:8px 0 0;}
+  .pill{
+    display:inline-block; margin-top:13px; padding:5px 12px; border-radius:999px;
+    background:var(--surface2); border:1px solid var(--border);
+    color:var(--fgSecondary); font-family:var(--mono); font-size:11px; letter-spacing:0.6px;
+  }
+  .pill .pdot{display:inline-block; width:7px; height:7px; border-radius:50%; background:var(--brandRed); margin-right:7px; vertical-align:middle;}
+
+  /* ---------- side (student / coach) toggle above the phone ---------- */
+  .sidetoggle{
+    display:inline-flex; gap:4px; padding:4px; margin:22px 0 18px;
+    background:var(--surface1); border:1px solid var(--border); border-radius:12px;
+  }
+  .sidetoggle button{
+    border:none; background:transparent; color:var(--fgTertiary);
+    font-family:inherit; font-size:14px; font-weight:600; letter-spacing:0.3px;
+    padding:8px 22px; border-radius:9px; cursor:pointer; transition:all .2s ease;
+  }
+  .sidetoggle button.on{background:var(--brandRed); color:#fff;}
+
+  /* ---------- phone frame ---------- */
+  .phone{
+    width:322px; height:690px; border-radius:46px; background:#000;
+    border:1px solid var(--borderStrong);
+    box-shadow:0 0 0 10px #0a0a0a, 0 26px 60px rgba(0,0,0,0.75);
+    padding:10px; position:relative; flex:0 0 auto;
+  }
+  .screen{
+    width:100%; height:100%; background:var(--bg); border-radius:36px;
+    overflow:hidden; position:relative; display:flex; flex-direction:column;
+  }
+  /* dynamic-island-ish notch */
+  .notch{
+    position:absolute; top:9px; left:50%; transform:translateX(-50%);
+    width:108px; height:26px; background:#000; border-radius:14px; z-index:40;
+  }
+  /* status bar */
+  .statusbar{
+    height:34px; flex:0 0 34px; display:flex; align-items:center; justify-content:space-between;
+    padding:2px 22px 0 24px; font-size:13px; font-weight:600; color:var(--fgPrimary);
+    position:relative; z-index:5;
+  }
+  .statusbar .time{font-variant-numeric:tabular-nums; letter-spacing:0.3px;}
+  .statusbar .glyphs{display:flex; align-items:flex-end; gap:5px;}
+  .sig{display:flex; align-items:flex-end; gap:1.5px; height:11px;}
+  .sig i{width:2.5px; background:var(--fgPrimary); border-radius:1px; display:block;}
+  .sig i:nth-child(1){height:4px;} .sig i:nth-child(2){height:6px;}
+  .sig i:nth-child(3){height:8px;} .sig i:nth-child(4){height:11px;}
+  .wifi{width:15px; height:11px; position:relative;}
+  .wifi::before{content:""; position:absolute; inset:0; border:2px solid var(--fgPrimary);
+    border-bottom:none; border-radius:50% 50% 0 0 / 100% 100% 0 0; clip-path:inset(0 0 50% 0);}
+  .wifi::after{content:""; position:absolute; left:50%; bottom:0; width:3px; height:3px;
+    border-radius:50%; background:var(--fgPrimary); transform:translateX(-50%);}
+  .batt{width:24px; height:12px; border:1px solid var(--fgPrimary); border-radius:3px; position:relative; padding:1.5px;}
+  .batt::after{content:""; position:absolute; right:-3px; top:3.5px; width:2px; height:5px; background:var(--fgPrimary); border-radius:0 1px 1px 0;}
+  .batt i{display:block; height:100%; width:78%; background:var(--fgPrimary); border-radius:1px;}
+
+  /* body scroll region */
+  .body{flex:1 1 auto; overflow-y:auto; overflow-x:hidden; position:relative; -webkit-overflow-scrolling:touch;}
+  .body-pad{padding:0 16px 18px;}
+  .body::-webkit-scrollbar{display:none;}
+  .body{scrollbar-width:none;}
+
+  /* screen container: only the active one shows */
+  .screenview{display:none; flex:1 1 auto; min-height:0; flex-direction:column;}
+  .screenview.on{display:flex;}
+
+  /* tab bar */
+  .tabbar{
+    flex:0 0 auto; display:flex; border-top:1px solid var(--border);
+    background:rgba(8,8,8,0.96); padding:8px 2px 12px;
+  }
+  .tab{flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; color:var(--fgTertiary);
+    cursor:pointer; -webkit-tap-highlight-color:transparent; transition:color .15s ease;}
+  .tab .ic{width:22px; height:22px; display:block;}
+  .tab span{font-size:10px; letter-spacing:0.2px;}
+  .tab.active{color:var(--brandRed);}
+
+  /* ---------- generic in-screen building blocks ---------- */
+  .nav-inline{
+    height:44px; flex:0 0 44px; display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:600; color:var(--fgPrimary); position:relative;
+  }
+  .nav-inline.bb{border-bottom:1px solid var(--border);}
+  .nav-inline .lead{position:absolute; left:14px; color:var(--fgPrimary); font-size:14px; display:flex; align-items:center; gap:3px; cursor:pointer;}
+  .nav-inline .trail{position:absolute; right:14px; display:flex; gap:14px; color:var(--fgSecondary); font-size:17px;}
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:0.96px; color:var(--brandRed); text-transform:uppercase; display:inline-flex; align-items:center; gap:8px;}
+  .eyebrow.rule::after{content:""; width:32px; height:1px; background:currentColor; display:inline-block;}
+  .mono{font-family:var(--mono);}
+  .tnum{font-variant-numeric:tabular-nums;}
+  .muted{color:var(--fgSecondary);} .tert{color:var(--fgTertiary);}
+  .card{background:var(--surface1); border:1px solid var(--border); border-radius:12px;}
+  .card2{background:var(--surface2); border:1px solid var(--border); border-radius:12px;}
+  .seg{display:flex; gap:3px; padding:3px; background:var(--surface1); border:1px solid var(--border); border-radius:8px;}
+  .seg button{flex:1; border:none; background:transparent; color:var(--fgTertiary); font-size:14px; font-weight:600;
+    padding:9px 4px; border-radius:8px; font-family:inherit; cursor:pointer; transition:all .18s ease;
+    display:flex; align-items:center; justify-content:center; gap:6px;}
+  .seg button.on{background:var(--surface3); color:var(--fgPrimary);}
+  .badge{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:11px; font-weight:600;
+    letter-spacing:0.88px; padding:5px 10px; border-radius:999px; border:1px solid var(--border); color:var(--fgTertiary); white-space:nowrap;}
+  .badge.ready{color:var(--green); background:var(--greenSoft); border-color:rgba(31,179,88,0.3);}
+  .badge.overdue{color:var(--amber); background:var(--amberSoft); border-color:rgba(224,168,16,0.3);}
+  .badge.live{color:var(--brandRed); background:var(--brandRedSoft); border-color:rgba(229,34,30,0.3);}
+  .badge.pending{color:var(--fgTertiary); background:transparent; border-color:var(--border);}
+  .dot{width:9px; height:9px; border-radius:50%; flex:0 0 auto;}
+  .chev{color:var(--fgTertiary); font-size:17px; line-height:1;}
+  .btn-white{background:var(--fgPrimary); color:var(--bg); border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:600; cursor:pointer; border:none; font-family:inherit; transition:opacity .15s ease;}
+  .btn-white:active{opacity:.82;}
+  .btn-red{background:var(--brandRed); color:#fff; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; border:none; font-family:inherit;}
+
+  /* calendar / week strip */
+  .daycell{flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:8px 0 7px;
+    font-size:10px; color:var(--fgPrimary); background:var(--surface2); border:1px solid var(--border); border-radius:10px; min-height:60px; justify-content:center; cursor:pointer;}
+  .daycell b{font-size:15px; font-weight:700; font-variant-numeric:tabular-nums;}
+  .daycell i{width:6px; height:6px; border-radius:50%; display:block;}
+  .daycell.off{opacity:0.5;}
+  .daycell.sel{background:var(--brandRedSoft); border-color:var(--brandRed); color:var(--brandRed);}
+  .daycell.sel i{background:var(--brandRed) !important;}
+
+  .wcell{flex:1; aspect-ratio:1; padding:8px; display:flex; flex-direction:column; justify-content:space-between;
+    background:var(--surface1); border:1px solid var(--border); border-radius:8px; position:relative; cursor:pointer;}
+  .wcell span{font-size:11px; color:var(--fgTertiary);}
+  .wcell b{font-family:var(--mono); font-size:18px; font-weight:700;}
+  .wcell.on{background:var(--surface2); border-color:var(--fgPrimary);}
+  .wcell.on span{color:var(--fgPrimary);}
+  .wcell.off b{color:var(--fgTertiary);}
+  .wcell .corner{position:absolute; top:0; right:0; width:0; height:0; border-top:10px solid var(--brandRed); border-left:10px solid transparent;}
+
+  .seg-fill{flex:1; height:6px; border-radius:3px; background:var(--surface3); overflow:hidden;}
+  .seg-fill i{display:block; height:100%; background:var(--brandRed);}
+
+  /* set table */
+  .trow{display:grid; grid-template-columns:24px 1fr 1fr 1fr 32px 24px; align-items:center;
+    padding:13px 16px; font-family:var(--mono); font-size:16px; border-bottom:1px solid var(--border); cursor:pointer;}
+  .trow > span:nth-child(n+2){text-align:right;}
+  .trow.nb{border-bottom:none;}
+  .trow.active{background:var(--surface2);}
+  .trow.thead{padding:10px 16px; font-size:10px; letter-spacing:0.8px; color:var(--fgTertiary); font-weight:500; cursor:default;}
+  .trow .vid{color:var(--fgTertiary); font-size:14px;}
+
+  .rtbtn{font-size:12px; font-weight:600; color:var(--fgSecondary); padding:5px 9px;
+    border:1px solid var(--borderStrong); border-radius:7px; cursor:pointer; background:transparent; font-family:inherit;}
+  .rtbtn.red{color:var(--brandRed); border-color:rgba(229,34,30,0.4);}
+
+  .srow{display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--surface1); cursor:pointer;}
+  .srow.nb{border-top:1px solid var(--border);}
+  .srow.sel{background:var(--brandRedSoft);}
+  .srow .ic{width:24px; text-align:center; font-size:15px;}
+
+  .arow{display:flex; align-items:center; gap:12px; padding:14px 16px; min-height:64px; position:relative; cursor:pointer;}
+  .arow.nb{border-top:1px solid var(--border);}
+
+  .icr{width:36px; height:36px; border-radius:50%; background:var(--surface1); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; color:var(--fgPrimary); font-size:17px; cursor:pointer;}
+
+  /* ====================================================================== */
+  /* ============== HERO: SetEntrySheet (slide-up overlay) ================ */
+  /* ====================================================================== */
+  .sheet-scrim{
+    position:absolute; inset:0; background:rgba(0,0,0,0.5); z-index:50;
+    opacity:0; pointer-events:none; transition:opacity .28s ease;
+  }
+  .sheet-scrim.open{opacity:1; pointer-events:auto;}
+  .sheet{
+    position:absolute; left:0; right:0; bottom:0; top:0;
+    background:var(--bg); z-index:51; display:flex; flex-direction:column;
+    transform:translateY(100%); transition:transform .32s cubic-bezier(.22,.61,.36,1);
+    border-radius:36px;
+  }
+  .sheet.open{transform:translateY(0);}
+
+  .sheet-nav{
+    flex:0 0 auto; height:50px; display:flex; align-items:center; justify-content:center;
+    position:relative; border-bottom:1px solid var(--border); padding:0 16px;
+  }
+  .sheet-nav .title{font-size:17px; font-weight:600; color:var(--fgPrimary);}
+  .sheet-nav .back{position:absolute; left:14px; display:flex; align-items:center; gap:3px;
+    font-size:17px; color:var(--fgPrimary); cursor:pointer; background:none; border:none; font-family:inherit;}
+  .sheet-body{flex:1 1 auto; overflow-y:auto; padding:16px; min-height:0;}
+  .sheet-body::-webkit-scrollbar{display:none;}
+
+  /* ---- loaded-barbell (PlateLoadout) rebuilt with divs ---- */
+  .barbell{
+    position:relative; height:166px; margin-top:8px;
+    display:flex; align-items:center; justify-content:flex-start;
+  }
+  /* the steel bar runs behind everything, full width */
+  .bar-rod{
+    position:absolute; left:0; right:0; top:50%; transform:translateY(-50%);
+    height:11px; border-radius:6px;
+    background:linear-gradient(to bottom,#6B7280,#E5E7EB,#6B7280);
+    box-shadow:0 4px 4px rgba(0,0,0,0.5);
+    z-index:1;
+  }
+  /* far-right sleeve end cap */
+  .sleeve-end{
+    position:absolute; right:3px; top:50%; transform:translateY(-50%);
+    width:10px; height:13px; border-radius:6px; background:#6B7280; z-index:1;
+  }
+  /* the loaded stack sits left, offset from the inner sleeve */
+  .loadout{
+    position:relative; z-index:2; display:flex; align-items:center; gap:1px;
+    padding-left:46px;
+  }
+  /* inner stopper just inboard of the plates */
+  .stopper{
+    width:10px; height:40px; border-radius:3px; background:#9CA3AF;
+    border-right:1px solid #4B5563; flex:0 0 auto;
+  }
+  .plate{
+    flex:0 0 auto; border-radius:4px; border:1px solid rgba(0,0,0,0.25);
+    position:relative;
+  }
+  /* right-side darkening overlay on every plate */
+  .plate::after{
+    content:""; position:absolute; inset:0; border-radius:4px;
+    background:linear-gradient(to right, transparent 50%, rgba(0,0,0,0.30));
+  }
+  .collar{
+    flex:0 0 auto; width:13px; height:40px; border-radius:3px; margin-left:3px;
+    background:linear-gradient(to bottom,#9CA3AF,#E5E7EB,#6B7280);
+    border:1px solid rgba(0,0,0,0.4); position:relative;
+  }
+  .collar::after{
+    content:""; position:absolute; inset:0; border-radius:3px;
+    background:linear-gradient(to right, transparent 50%, rgba(0,0,0,0.30));
+  }
+  /* the collar lever hanging below */
+  .collar .lever{
+    position:absolute; left:50%; bottom:-19px; transform:translateX(-50%);
+    width:4px; height:20px; border-radius:2px; background:#9CA3AF;
+  }
+  .collar .lever::after{
+    content:""; position:absolute; left:50%; bottom:-5px; transform:translateX(-50%);
+    width:7px; height:7px; border-radius:50%; background:#4B5563;
+  }
+
+  .breakdown{
+    text-align:center; font-family:var(--mono); font-size:14px; font-weight:600;
+    color:var(--fgPrimary); margin-top:6px; min-height:18px; letter-spacing:0.2px;
+  }
+
+  /* steppers */
+  .steppers{margin-top:28px; display:flex; flex-direction:column; gap:18px;}
+  .stepper .row1{display:flex; justify-content:space-between; align-items:baseline;}
+  .stepper .lab{font-family:var(--mono); font-size:12px; letter-spacing:0.96px; color:var(--fgTertiary); text-transform:uppercase;}
+  .stepper .sub{font-family:var(--mono); font-size:10px; color:var(--fgTertiary);}
+  .stepper .row2{display:flex; align-items:center; gap:12px; margin-top:8px;}
+  .stepbtn{
+    width:52px; height:52px; flex:0 0 auto; border-radius:50%;
+    background:var(--brandRedSoft); border:1px solid rgba(229,34,30,0.3);
+    color:var(--brandRed); font-size:24px; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    -webkit-user-select:none; user-select:none; transition:background .12s ease, transform .05s ease;
+  }
+  .stepbtn:active{background:rgba(229,34,30,0.22); transform:scale(0.94);}
+  .stepval{flex:1; text-align:center; display:flex; align-items:baseline; justify-content:center; gap:6px;}
+  .stepval .num{font-family:var(--mono); font-size:40px; font-weight:800; font-variant-numeric:tabular-nums; color:var(--fgPrimary); line-height:1;}
+  .stepval .unit{font-size:14px; font-weight:700; color:var(--fgTertiary);}
+
+  /* video attach block (lightweight, honest) */
+  .video-block{
+    margin-top:6px; border:1px dashed var(--border); border-radius:12px;
+    padding:18px 16px; display:flex; align-items:center; gap:12px; color:var(--fgSecondary);
+  }
+  .video-block .vic{width:40px; height:40px; border-radius:10px; background:var(--surface2);
+    display:flex; align-items:center; justify-content:center; color:var(--brandRed); flex:0 0 auto;}
+
+  /* footer */
+  .sheet-foot{
+    flex:0 0 auto; border-top:1px solid var(--border); background:var(--bg);
+    padding:12px 16px 24px; display:flex; flex-direction:column; gap:10px;
+  }
+  .actbtn{
+    height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+    gap:8px; font-size:16px; font-weight:600; cursor:pointer; border:none; font-family:inherit;
+  }
+  .actbtn.done{background:var(--green); color:#fff;}
+  .actbtn.fail{background:var(--amber); color:var(--fgPrimary);}
+
+  /* rest timer (safe-area inset bottom) */
+  .resttimer{padding:0 12px 8px; flex:0 0 auto;}
+
+  /* growth chart axis text */
+  .axislab{fill:var(--fgTertiary); font-size:9px; font-family:var(--mono);}
+
+  /* toast for placeholder taps */
+  .toast{
+    position:absolute; left:50%; bottom:96px; transform:translateX(-50%) translateY(8px);
+    background:var(--surface3); border:1px solid var(--borderStrong); color:var(--fgPrimary);
+    font-size:12px; padding:8px 14px; border-radius:999px; z-index:60;
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .hint{color:var(--fgTertiary); font-size:11px; text-align:center; margin-top:18px; max-width:322px; line-height:1.6;}
+  .hint b{color:var(--fgSecondary); font-weight:600;}
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <h1>MeetPR 演示</h1>
+  <p class="sub">力量举学员 + 教练双端 iOS app · 可交互原型 · 按 ship 分支 SwiftUI 源码复刻（纯 CSS / SVG 重绘）</p>
+  <span class="pill"><span class="pdot"></span>1.0 (5) · 深色界面 · 点 tab 切屏 · 点「记录此组」开录入弹窗</span>
+</header>
+
+<div class="sidetoggle">
+  <button id="sideStudent" class="on" onclick="switchSide('student')">学员端</button>
+  <button id="sideCoach" onclick="switchSide('coach')">教练端</button>
+</div>
+
+<div class="phone"><div class="screen">
+  <div class="notch"></div>
+  <div class="statusbar">
+    <span class="time">15:06</span>
+    <span class="glyphs"><span class="sig"><i></i><i></i><i></i><i></i></span><span class="wifi"></span><span class="batt"><i></i></span></span>
+  </div>
+
+  <!-- ================= STUDENT SIDE ================= -->
+  <div id="studentSide" style="flex:1 1 auto; display:flex; flex-direction:column; min-height:0;">
+
+    <!-- ---- 今日 / Dashboard ---- -->
+    <div class="screenview on" data-screen="s-today">
+      <div class="body"><div class="body-pad" style="padding-top:8px;">
+        <div style="display:flex; align-items:baseline;">
+          <span style="font-size:36px; font-weight:800;">W1D4</span>
+          <span style="flex:1;"></span>
+          <span style="position:relative; color:var(--fgSecondary); font-size:19px; cursor:pointer;" onclick="toast('通知中心')">&#9837;
+            <span style="position:absolute; top:-1px; right:-2px; width:7px; height:7px; border-radius:50%; background:var(--brandRed);"></span>
+          </span>
+        </div>
+
+        <!-- week progress bar -->
+        <div style="display:flex; gap:6px; margin-top:16px;">
+          <div class="seg-fill"><i style="width:100%"></i></div>
+          <div class="seg-fill"><i style="width:100%"></i></div>
+          <div class="seg-fill"><i style="width:33%"></i></div>
+          <div class="seg-fill"><i style="width:0%"></i></div>
+        </div>
+
+        <!-- coach feedback -->
+        <div class="card2" style="padding:16px; margin-top:16px; border-color:rgba(229,34,30,0.3); cursor:pointer;" onclick="go('s-growth')">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:var(--brandRed);"></span>
+            <span class="eyebrow">教练反馈 · 周一</span>
+          </div>
+          <div style="font-size:14px; margin-top:10px;">深蹲第一组速度很好，下一次保持同样节奏，最后一组不要急着起杠。</div>
+          <div class="eyebrow" style="color:var(--fgTertiary); margin-top:8px;">教练 · 09:12 · 在「成长」查看全部反馈 →</div>
+        </div>
+
+        <!-- week grid S/B/D -->
+        <div class="eyebrow" style="color:var(--fgSecondary); margin-top:20px;">本周</div>
+        <div style="display:flex; gap:6px; margin-top:8px;">
+          <div class="wcell"><span>一</span><b>S</b><div class="corner"></div></div>
+          <div class="wcell"><span>二</span><b>B</b><div class="corner"></div></div>
+          <div class="wcell off"><span>三</span><b>&mdash;</b></div>
+          <div class="wcell on"><span>四</span><b>D</b></div>
+          <div class="wcell off"><span>五</span><b>&mdash;</b></div>
+          <div class="wcell"><span>六</span><b>SB</b></div>
+          <div class="wcell off"><span>日</span><b>&mdash;</b></div>
+        </div>
+
+        <!-- selected-day E1RM card -->
+        <div class="card" style="padding:16px; margin-top:20px; cursor:pointer;" onclick="go('s-growth')">
+          <div style="display:flex; align-items:flex-end;">
+            <div>
+              <div class="eyebrow">硬拉 E1RM · 90 天</div>
+              <div style="display:flex; align-items:flex-end; gap:6px; margin-top:4px;">
+                <span class="mono tnum" style="font-size:44px; font-weight:800; line-height:0.9;">178.5</span>
+                <span style="font-size:16px; font-weight:800; color:var(--brandRed); margin-bottom:6px;">KG</span>
+              </div>
+            </div>
+            <span style="flex:1;"></span>
+            <span class="mono" style="font-size:13px; color:var(--green);">+10.5 KG</span>
+          </div>
+          <svg width="100%" height="92" viewBox="0 0 280 92" preserveAspectRatio="none" style="margin-top:12px;">
+            <polyline fill="none" stroke="#E5221E" stroke-width="2" stroke-linejoin="round"
+              points="0,80 35,74 70,68 105,58 140,50 175,40 210,30 245,18 280,8"/>
+            <circle cx="280" cy="8" r="3" fill="#E5221E"/>
+          </svg>
+          <div class="eyebrow" style="color:var(--fgTertiary); margin-top:8px;">选中 周四 · 硬拉日 — 显示对应成长曲线</div>
+        </div>
+
+        <!-- continue CTA: jumps to 训练 tab -->
+        <div class="btn-white" style="height:50px; font-size:15px; margin-top:16px;" onclick="go('s-train')">继续 W1D4 · 硬拉</div>
+
+        <!-- profile metrics -->
+        <div style="display:flex; gap:12px; margin-top:20px;">
+          <div class="card" style="flex:1; padding:14px;">
+            <div style="display:flex; align-items:center; gap:7px; color:var(--fgSecondary); font-size:12px;"><span style="color:var(--brandRed)">&#9878;</span>体重</div>
+            <div class="mono tnum" style="font-size:20px; font-weight:700; margin-top:6px;">83.0 kg</div>
+            <div class="tert" style="font-size:11px; margin-top:4px;">资料档案</div>
+          </div>
+          <div class="card" style="flex:1; padding:14px;">
+            <div style="display:flex; align-items:center; gap:7px; color:var(--fgSecondary); font-size:12px;"><span style="color:var(--brandRed)">&#9873;</span>距比赛</div>
+            <div class="mono tnum" style="font-size:20px; font-weight:700; margin-top:6px;">25 天</div>
+            <div class="tert" style="font-size:11px; margin-top:4px;">2026-07-25</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ---- 训练 / TodayWorkout ---- -->
+    <div class="screenview" data-screen="s-train">
+      <div class="nav-inline">
+        W1D4 · 硬拉
+        <span class="trail"><span style="color:var(--green)">&#9829;</span><span style="cursor:pointer;" onclick="toast('刷新今日训练')">&#8635;</span></span>
+      </div>
+      <div class="body"><div class="body-pad">
+        <!-- calendar strip -->
+        <div class="card" style="border-radius:14px; padding:12px;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:11px; color:var(--fgSecondary);">
+            <span style="cursor:pointer;" onclick="toast('上一周')">&#8249;</span>
+            <span style="flex:1; font-size:14px; font-weight:700; color:var(--fgPrimary);">6月 22 – 28</span>
+            <span class="seg" style="width:92px; padding:2px;">
+              <button class="on" style="padding:4px;">周</button><button style="padding:4px;" onclick="toast('月视图')">月</button>
+            </span>
+            <span style="cursor:pointer;" onclick="toast('下一周')">&#8250;</span>
+          </div>
+          <div style="display:flex; gap:5px;">
+            <div class="daycell" onclick="toast('周一 · 深蹲日')">一<b>22</b><i style="background:var(--green)"></i></div>
+            <div class="daycell" onclick="toast('周二 · 卧推日')">二<b>23</b><i style="background:var(--green)"></i></div>
+            <div class="daycell off" onclick="toast('周三 · 休息')">三<b>24</b><i style="background:var(--fgTertiary)"></i></div>
+            <div class="daycell sel">四<b>25</b><i></i></div>
+            <div class="daycell" onclick="toast('周五 · 休息')">五<b>26</b><i style="background:var(--fgTertiary)"></i></div>
+            <div class="daycell off" onclick="toast('周六 · 深蹲+卧推')">六<b>27</b><i style="background:var(--fgTertiary)"></i></div>
+            <div class="daycell off" onclick="toast('周日 · 休息')">日<b>28</b><i style="background:var(--fgTertiary)"></i></div>
+          </div>
+        </div>
+
+        <!-- ACTIVE SET HERO -->
+        <div class="card2" style="padding:16px; margin-top:16px;">
+          <span class="eyebrow">第 01 / 03 组</span>
+          <div style="display:flex; align-items:flex-end; margin-top:12px;">
+            <span class="mono tnum" style="font-size:72px; font-weight:800; line-height:0.85;">175</span>
+            <span style="font-size:22px; font-weight:800; color:var(--brandRed); margin-left:6px; margin-bottom:8px;">KG</span>
+            <span style="flex:1;"></span>
+            <span style="display:flex; align-items:flex-end;">
+              <span style="font-size:24px; font-weight:700; color:var(--fgSecondary); margin-bottom:6px;">&times;</span>
+              <span class="mono tnum" style="font-size:36px; font-weight:800; line-height:0.85; margin-left:2px;">3</span>
+              <span style="font-size:14px; font-weight:700; color:var(--fgTertiary); margin-left:3px; margin-bottom:6px;">次</span>
+            </span>
+          </div>
+          <div class="eyebrow" style="margin-top:16px;">RPE</div>
+          <div style="display:flex; align-items:flex-end; gap:8px; margin-top:2px;">
+            <span class="mono tnum" style="font-size:36px; font-weight:800; line-height:1;">8.5</span>
+            <span style="font-size:12px; color:var(--fgTertiary); margin-bottom:5px;">/ 10</span>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:16px;">
+            <div class="btn-white" style="flex:1; height:48px; font-size:15px;" onclick="openSheet()">记录此组</div>
+            <div style="width:56px; height:48px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="openSheet(true)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="13" height="12" rx="2.5" stroke="#fff" stroke-width="1.7"/><path d="M16 10l5-3v10l-5-3z" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- per-exercise set table -->
+        <div style="margin-top:16px;">
+          <div style="font-size:15px; font-weight:700;">杠铃硬拉</div>
+          <div class="tert" style="font-size:11px; margin-top:2px;">上次 170kg&times;3 · 最佳 178.5kg&times;3</div>
+          <div class="card" style="margin-top:8px; overflow:hidden;">
+            <div class="trow thead">
+              <span style="text-align:left;">#</span><span>重量</span><span>次数</span><span>RPE</span><span></span><span></span>
+            </div>
+            <div class="trow active" onclick="openSheet()">
+              <span style="color:var(--brandRed); text-align:left;">1</span><span style="font-weight:700">175</span><span>3</span><span>8.5</span>
+              <span style="color:var(--fgTertiary)">&#9675;</span><span class="vid">&#9658;</span>
+            </div>
+            <div class="trow" onclick="openSheet()">
+              <span class="tert" style="text-align:left;">2</span><span class="tert">175</span><span class="tert">3</span><span class="tert">&mdash;</span>
+              <span class="tert">&#9675;</span><span class="vid">&#9658;</span>
+            </div>
+            <div class="trow nb" onclick="openSheet()">
+              <span class="tert" style="text-align:left;">3</span><span class="tert">175</span><span class="tert">3</span><span class="tert">&mdash;</span>
+              <span class="tert">&#9675;</span><span class="vid">&#9658;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- slide to complete -->
+        <div class="card" style="margin-top:16px; padding:6px; display:flex; align-items:center;">
+          <div style="width:44px; height:36px; border-radius:9px; background:var(--brandRed); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px;">&#8250;</div>
+          <span class="tert" style="flex:1; text-align:center; font-size:13px;">滑动完成今日训练</span>
+        </div>
+      </div></div>
+
+      <!-- rest timer (safeAreaInset bottom) -->
+      <div class="resttimer">
+        <div class="card" style="padding:10px 12px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="color:var(--brandRed); font-size:16px;">&#9201;</span>
+            <span class="mono tnum" style="font-size:20px; font-weight:700;" id="restClock">2:04</span>
+            <span style="flex:1;"></span>
+            <button class="rtbtn" onclick="adjustRest(-30)">-30S</button>
+            <button class="rtbtn red" onclick="skipRest()">跳过</button>
+            <button class="rtbtn" onclick="adjustRest(30)">+30S</button>
+          </div>
+          <div style="height:3px; border-radius:2px; background:var(--surface3); margin-top:9px; overflow:hidden;">
+            <div id="restBar" style="height:100%; width:62%; background:var(--brandRed);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- 成长 / GrowthCurve ---- -->
+    <div class="screenview" data-screen="s-growth">
+      <div class="nav-inline">成长曲线</div>
+      <div class="body"><div class="body-pad" style="padding-top:6px;">
+        <div class="seg" id="growthLift">
+          <button onclick="pickGrowthLift(this,'深蹲')">深蹲</button>
+          <button onclick="pickGrowthLift(this,'卧推')">卧推</button>
+          <button class="on" onclick="pickGrowthLift(this,'硬拉')">硬拉</button>
+        </div>
+        <div class="seg" style="margin-top:10px;" id="growthRange">
+          <button onclick="pickGrowthRange(this)">1月</button>
+          <button class="on" onclick="pickGrowthRange(this)">3月</button>
+          <button onclick="pickGrowthRange(this)">6月</button>
+          <button onclick="pickGrowthRange(this)">全部</button>
+        </div>
+
+        <div class="card" style="padding:12px 10px; margin-top:12px;">
+          <svg width="100%" height="240" viewBox="0 0 280 240">
+            <line x1="34" y1="20"  x2="270" y2="20"  stroke="#1F1F1F" stroke-width="1"/>
+            <line x1="34" y1="70"  x2="270" y2="70"  stroke="#1F1F1F" stroke-width="1"/>
+            <line x1="34" y1="120" x2="270" y2="120" stroke="#1F1F1F" stroke-width="1"/>
+            <line x1="34" y1="170" x2="270" y2="170" stroke="#1F1F1F" stroke-width="1"/>
+            <line x1="34" y1="200" x2="270" y2="200" stroke="#262626" stroke-width="1"/>
+            <text x="28" y="24"  class="axislab" text-anchor="end">180</text>
+            <text x="28" y="74"  class="axislab" text-anchor="end">175</text>
+            <text x="28" y="124" class="axislab" text-anchor="end">170</text>
+            <text x="28" y="174" class="axislab" text-anchor="end">165</text>
+            <polyline fill="none" stroke="#E5221E" stroke-width="2.2" stroke-linejoin="round"
+              points="40,156 76,136 112,121 148,106 184,94 220,76 258,55"/>
+            <circle cx="40"  cy="156" r="3" fill="#0E0E0E" stroke="#E5221E" stroke-width="2"/>
+            <circle cx="76"  cy="136" r="3" fill="#0E0E0E" stroke="#E5221E" stroke-width="2"/>
+            <circle cx="112" cy="121" r="3" fill="#0E0E0E" stroke="#E5221E" stroke-width="2"/>
+            <circle cx="148" cy="106" r="3" fill="#0E0E0E" stroke="#E5221E" stroke-width="2"/>
+            <circle cx="184" cy="94"  r="3" fill="#0E0E0E" stroke="#E5221E" stroke-width="2"/>
+            <circle cx="220" cy="76"  r="3" fill="#0E0E0E" stroke="#E5221E" stroke-width="2"/>
+            <circle cx="258" cy="55"  r="4" fill="#E5221E"/>
+            <text x="40"  y="222" class="axislab" text-anchor="middle">3月</text>
+            <text x="148" y="222" class="axislab" text-anchor="middle">5月</text>
+            <text x="258" y="222" class="axislab" text-anchor="middle">6月</text>
+          </svg>
+        </div>
+
+        <div class="card2" style="padding:16px; margin-top:12px;">
+          <div style="font-size:14px; font-weight:700;">6月25日 周四</div>
+          <div style="display:flex; gap:24px; margin-top:12px;">
+            <div><div class="eyebrow" style="color:var(--fgSecondary);">重量</div><div style="font-weight:600; margin-top:4px;">157 kg</div></div>
+            <div><div class="eyebrow" style="color:var(--fgSecondary);">次数</div><div style="font-weight:600; margin-top:4px;">5</div></div>
+            <div><div class="eyebrow" style="color:var(--fgSecondary);">RPE</div><div style="font-weight:600; margin-top:4px;">8.0</div></div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:14px;">
+            <span class="mono muted" style="font-size:11px;">e1RM</span>
+            <span class="mono" style="font-size:20px; font-weight:700; color:var(--brandRed);">178.5 kg</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ---- 我的 / Profile ---- -->
+    <div class="screenview" data-screen="s-me">
+      <div class="body"><div class="body-pad" style="padding-top:8px;">
+        <div style="font-size:36px; font-weight:800;">我的</div>
+        <div class="card" style="padding:18px; margin-top:16px; display:flex; align-items:center; gap:14px;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--surface3); display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--fgSecondary);">吕</div>
+          <div>
+            <div style="font-size:19px; font-weight:700;">吕子豪</div>
+            <div class="tert" style="font-size:13px; margin-top:3px;">学员 · 教练：邓天平</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px; overflow:hidden;">
+          <div class="srow" onclick="toast('个人资料')"><span class="ic">&#128100;</span><div style="flex:1;">个人资料</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('体测 / 1RM')"><span class="ic">&#9878;</span><div style="flex:1;">体测 / 1RM</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('训练偏好')"><span class="ic">&#9881;</span><div style="flex:1;">训练偏好</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('通知设置')"><span class="ic">&#9788;</span><div style="flex:1;">通知设置</div><span class="chev">&#8250;</span></div>
+        </div>
+        <div class="card" style="margin-top:16px; overflow:hidden;">
+          <div class="srow" onclick="toast('帮助与反馈')"><span class="ic">&#9072;</span><div style="flex:1;">帮助与反馈</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('关于 MeetPR')"><span class="ic">&#9432;</span><div style="flex:1;">关于 MeetPR</div><span class="tert mono" style="font-size:12px;">1.0 (5)</span></div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- STUDENT tab bar -->
+    <div class="tabbar" data-tabs="student">
+      <div class="tab active" data-target="s-today" onclick="go('s-today')"><svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>今日</span></div>
+      <div class="tab" data-target="s-train" onclick="go('s-train')"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 12h3l2-5 4 12 3-9 2 4h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>训练</span></div>
+      <div class="tab" data-target="s-growth" onclick="go('s-growth')"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M4 19V5M4 19h16M8 16l4-6 3 3 4-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>成长</span></div>
+      <div class="tab" data-target="s-me" onclick="go('s-me')"><svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================= COACH SIDE ================= -->
+  <div id="coachSide" style="flex:1 1 auto; display:none; flex-direction:column; min-height:0;">
+
+    <!-- ---- 今日 / CoachDashboard ---- -->
+    <div class="screenview on" data-screen="c-today">
+      <div style="padding:8px 16px 12px; flex:0 0 auto;">
+        <div class="eyebrow rule">6月30日 星期二</div>
+        <div style="font-size:36px; font-weight:800; margin-top:4px;">今日</div>
+      </div>
+      <div class="body"><div class="body-pad" style="padding-top:0;">
+        <div class="card2" style="padding:16px; border-color:rgba(229,34,30,0.3); cursor:pointer;" onclick="go('c-receive')">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--brandRed);"></span>
+            <span class="eyebrow">新学员请求 // 01</span>
+          </div>
+          <div style="font-size:17px; font-weight:600; margin-top:8px;">1 名新学员等待你接收</div>
+          <div class="muted" style="font-size:14px; margin-top:6px;">查看接收队列 →</div>
+        </div>
+
+        <div class="card" style="padding:16px; margin-top:16px; display:flex;">
+          <div style="flex:1;">
+            <div class="eyebrow">学员</div>
+            <div style="display:flex; align-items:baseline; gap:4px; margin-top:6px;"><span class="mono tnum" style="font-size:36px; font-weight:800;">4</span><span class="tert" style="font-size:13px;">活跃</span></div>
+          </div>
+          <div style="width:1px; background:var(--border); margin:0 12px; align-self:center; height:48px;"></div>
+          <div style="flex:1;">
+            <div class="eyebrow">评估期</div>
+            <div style="display:flex; align-items:baseline; gap:4px; margin-top:6px;"><span class="mono tnum" style="font-size:36px; font-weight:800; color:var(--amber);">2</span><span class="tert" style="font-size:13px;">进行中</span></div>
+          </div>
+          <div style="width:1px; background:var(--border); margin:0 12px; align-self:center; height:48px;"></div>
+          <div style="flex:1; cursor:pointer;" onclick="go('c-roster')">
+            <div class="eyebrow">待关注</div>
+            <div style="display:flex; align-items:baseline; gap:4px; margin-top:6px;"><span class="mono tnum" style="font-size:36px; font-weight:800; color:var(--brandRed);">1</span><span class="tert" style="font-size:13px;">学员</span></div>
+          </div>
+        </div>
+
+        <div class="eyebrow" style="color:var(--fgSecondary); margin-top:20px;">学员 — 今日</div>
+        <div class="card" style="margin-top:8px; overflow:hidden;">
+          <div class="arow" onclick="go('c-roster')">
+            <span class="dot" style="background:var(--brandRed)"></span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; font-weight:600;">钱骁</div>
+              <div class="tert" style="font-size:13px;">本周 1/4 · 3 天未训练</div>
+            </div>
+            <span class="badge overdue">逾期</span><span class="chev">&#8250;</span>
+          </div>
+          <div class="arow nb" onclick="go('c-roster')">
+            <span class="dot" style="background:var(--amber)"></span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; font-weight:600;">王晨曦</div>
+              <div class="tert" style="font-size:13px;">本周 1/4 · 评估期 4 天 13 时剩</div>
+            </div>
+            <span class="badge pending">评估中</span><span class="chev">&#8250;</span>
+          </div>
+          <div class="arow nb" onclick="go('c-roster')">
+            <span class="dot" style="background:var(--green)"></span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; font-weight:600;">张以恒</div>
+              <div class="tert" style="font-size:13px;">本周 4/4 已完成</div>
+            </div>
+            <span class="chev">&#8250;</span>
+          </div>
+          <div class="arow nb" onclick="go('c-roster')">
+            <span class="dot" style="background:var(--green)"></span>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; font-weight:600;">李嘉宁</div>
+              <div class="tert" style="font-size:13px;">本周 3/4</div>
+            </div>
+            <span class="chev">&#8250;</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ---- 学员 / StudentRoster ---- -->
+    <div class="screenview" data-screen="c-roster">
+      <div style="padding:8px 16px 4px; display:flex; align-items:center; flex:0 0 auto;">
+        <span style="font-size:36px; font-weight:800;">学员</span>
+        <span style="flex:1;"></span>
+        <span class="icr" onclick="toast('刷新学员')">&#8635;</span>
+      </div>
+      <div class="body"><div class="body-pad" style="padding-top:8px;">
+        <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; background:var(--surface1); border:1px solid var(--border); border-radius:10px; color:var(--fgTertiary); cursor:pointer;" onclick="toast('搜索学员')">
+          <span>&#9906;</span><span style="font-size:14px;">搜索学员</span>
+        </div>
+
+        <div class="eyebrow" style="color:var(--fgSecondary); margin-top:20px;">今天 1 个需要你</div>
+        <div class="card" style="margin-top:8px;">
+          <div class="arow" onclick="toast('钱骁 · 学员详情')">
+            <span class="dot" style="background:var(--brandRed)"></span>
+            <div style="flex:1; min-width:0;"><div style="font-size:17px; font-weight:600;">钱骁</div><div class="tert" style="font-size:13px;">3 天未训练</div></div>
+            <span class="badge live">待关注</span><span class="chev">&#8250;</span>
+          </div>
+        </div>
+
+        <div class="eyebrow" style="color:var(--fgSecondary); margin-top:20px;">评估期内 · 2</div>
+        <div class="card" style="margin-top:8px; overflow:hidden;">
+          <div class="arow" onclick="toast('王晨曦 · 学员详情')">
+            <span class="dot" style="background:var(--amber)"></span>
+            <div style="flex:1; min-width:0;"><div style="font-size:17px; font-weight:600;">王晨曦</div><div class="tert" style="font-size:13px;">评估期 4 天 13 时剩</div></div>
+            <span class="badge pending">评估期</span><span class="chev">&#8250;</span>
+          </div>
+          <div class="arow nb" onclick="toast('赵安然 · 学员详情')">
+            <span class="dot" style="background:var(--amber)"></span>
+            <div style="flex:1; min-width:0;"><div style="font-size:17px; font-weight:600;">赵安然</div><div class="tert" style="font-size:13px;">评估期 6 天 2 时剩</div></div>
+            <span class="badge pending">评估期</span><span class="chev">&#8250;</span>
+          </div>
+        </div>
+
+        <div class="eyebrow" style="color:var(--fgSecondary); margin-top:20px;">活跃 · 2</div>
+        <div class="card" style="margin-top:8px; overflow:hidden;">
+          <div class="arow" onclick="toast('张以恒 · 学员详情')">
+            <span class="dot" style="background:var(--green)"></span>
+            <div style="flex:1; min-width:0;"><div style="font-size:17px; font-weight:600;">张以恒</div><div class="tert" style="font-size:13px;">本周 4/4 · 上次活跃 2 小时前</div></div>
+            <span class="badge ready">本周 4/4</span><span class="chev">&#8250;</span>
+          </div>
+          <div class="arow nb" onclick="toast('李嘉宁 · 学员详情')">
+            <span class="dot" style="background:var(--fgPrimary)"></span>
+            <div style="flex:1; min-width:0;"><div style="font-size:17px; font-weight:600;">李嘉宁</div><div class="tert" style="font-size:13px;">本周 3/4 · 上次活跃 5 小时前</div></div>
+            <span class="badge pending">本周 3/4</span><span class="chev">&#8250;</span>
+          </div>
+        </div>
+
+        <div class="eyebrow" style="color:var(--fgSecondary); margin-top:20px;">异常 · 1</div>
+        <div class="card" style="margin-top:8px;">
+          <div class="arow" onclick="toast('钱骁 · 学员详情')">
+            <span class="dot" style="background:var(--amber)"></span>
+            <div style="flex:1; min-width:0;"><div style="font-size:17px; font-weight:600;">钱骁</div><div class="tert" style="font-size:13px;">3 天未训练</div></div>
+            <span class="badge overdue">3 天未训练</span><span class="chev">&#8250;</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ---- 编排 / Step0SelectStudent ---- -->
+    <div class="screenview" data-screen="c-plan">
+      <div class="nav-inline">新建计划</div>
+      <div class="body"><div class="body-pad" style="padding-top:10px;">
+        <div class="eyebrow rule">STEP 0</div>
+        <div style="font-size:28px; font-weight:700; margin-top:8px;">为谁创建计划？</div>
+
+        <div class="eyebrow" style="color:var(--fgTertiary); margin-top:24px;">评估期内 (2)</div>
+        <div class="card" style="margin-top:8px; overflow:hidden;">
+          <div class="srow" onclick="pickPlanStudent(this)"><span class="ic">&#9888;&#65039;</span><div style="flex:1;"><div style="font-weight:600;">王晨曦</div><div class="tert" style="font-size:12px; margin-top:2px;">评估期 4 天 13 时剩</div></div></div>
+          <div class="srow nb" onclick="pickPlanStudent(this)"><span class="ic">&#9888;&#65039;</span><div style="flex:1;"><div style="font-weight:600;">赵安然</div><div class="tert" style="font-size:12px; margin-top:2px;">评估期 6 天 2 时剩</div></div></div>
+        </div>
+
+        <div class="eyebrow" style="color:var(--fgTertiary); margin-top:20px;">活跃 (2)</div>
+        <div class="card" style="margin-top:8px; overflow:hidden;">
+          <div class="srow sel" onclick="pickPlanStudent(this)"><span class="ic">&#8226;</span><div style="flex:1;"><div style="font-weight:600;">张以恒</div><div class="tert" style="font-size:12px; margin-top:2px;">可创建计划</div></div><span class="sel-check" style="color:var(--green); font-size:18px;">&#10003;</span></div>
+          <div class="srow nb" onclick="pickPlanStudent(this)"><span class="ic">&#8226;</span><div style="flex:1;"><div style="font-weight:600;">李嘉宁</div><div class="tert" style="font-size:12px; margin-top:2px;">可创建计划</div></div></div>
+        </div>
+
+        <div class="eyebrow" style="color:var(--fgTertiary); margin-top:20px;">异常 (1)</div>
+        <div class="card" style="margin-top:8px;">
+          <div class="srow" onclick="pickPlanStudent(this)"><span class="ic">&#128993;</span><div style="flex:1;"><div style="font-weight:600;">钱骁</div><div class="tert" style="font-size:12px; margin-top:2px;">3 天未训练</div></div></div>
+        </div>
+
+        <div class="btn-red" style="height:50px; font-size:15px; margin-top:24px;" onclick="toast('开始编排 · Step 1 →')">开始编排</div>
+      </div></div>
+    </div>
+
+    <!-- ---- 接收 / CoachReceiving ---- -->
+    <div class="screenview" data-screen="c-receive">
+      <div style="padding:8px 16px 12px; flex:0 0 auto;">
+        <div class="eyebrow rule">收件箱</div>
+        <div style="font-size:34px; font-weight:800; margin-top:4px;">接收</div>
+        <div class="seg" style="margin-top:12px;" id="receiveSeg">
+          <button class="on" onclick="pickReceiveSeg(this,'students')">新学员 <span class="mono" style="font-size:10px; color:var(--brandRed); background:var(--brandRedSoft); padding:1px 7px; border-radius:999px;">1</span></button>
+          <button onclick="pickReceiveSeg(this,'videos')">训练视频 <span class="mono" style="font-size:10px; color:var(--fgTertiary); padding:1px 7px;">6</span></button>
+        </div>
+      </div>
+      <div class="body"><div class="body-pad" style="padding-top:0;">
+        <!-- 新学员 segment -->
+        <div id="recv-students">
+          <div class="card" style="padding:16px;">
+            <div style="display:flex; align-items:baseline;">
+              <span style="font-size:20px; font-weight:700;">陈一鸣</span>
+              <span style="flex:1;"></span>
+              <span class="mono tert" style="font-size:10px;">已等待 2 小时</span>
+            </div>
+            <div class="muted" style="font-size:13px; margin-top:6px;">男 · 25 岁 · 83 kg · 训练 3 年</div>
+            <div class="mono" style="font-size:14px; margin-top:10px;">S 180 · B 120 · D 220</div>
+            <div class="muted" style="font-size:13px; margin-top:10px;">想增强：股四头 · 腘绳肌 · 肩</div>
+            <div class="muted" style="font-size:13px; margin-top:3px;">训练环境：商业健身房</div>
+            <div class="muted" style="font-size:13px; margin-top:3px;">备赛：2026-07-25</div>
+            <div style="font-size:13px; margin-top:3px;">“想突破 200kg 深蹲”</div>
+            <div style="display:flex; align-items:center; gap:6px; margin-top:14px; color:var(--fgTertiary);">
+              <span>&#128196;</span><span class="mono" style="font-size:11px;">4 份资料</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:14px;">
+              <div class="btn-white" style="flex:1; height:40px; font-size:14px;" onclick="toast('接收 陈一鸣 · 评估设置')">接收</div>
+              <div style="flex:1; height:40px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:14px; cursor:pointer;" onclick="toast('查看资料')">查看资料</div>
+              <div style="width:48px; height:40px; border:1px solid var(--border); border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--fgTertiary); cursor:pointer;" onclick="toast('拒绝 陈一鸣')">&#10005;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 训练视频 segment -->
+        <div id="recv-videos" style="display:none;">
+          <div class="card" style="padding:14px; display:flex; align-items:center; gap:14px; cursor:pointer;" onclick="toast('王晨曦 · 3 段待反馈')">
+            <div style="width:56px; height:56px; border-radius:8px; background:var(--surface2); display:flex; align-items:center; justify-content:center; color:var(--brandRed); font-size:22px;">&#9654;</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; font-weight:600;">王晨曦</div>
+              <div class="mono tert" style="font-size:11px; margin-top:3px;">3 段待反馈 · 2 小时前</div>
+            </div>
+            <span class="chev">&#8250;</span>
+          </div>
+          <div class="card" style="padding:14px; display:flex; align-items:center; gap:14px; margin-top:12px; cursor:pointer;" onclick="toast('张以恒 · 2 段待反馈')">
+            <div style="width:56px; height:56px; border-radius:8px; background:var(--surface2); display:flex; align-items:center; justify-content:center; color:var(--brandRed); font-size:22px;">&#9654;</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; font-weight:600;">张以恒</div>
+              <div class="mono tert" style="font-size:11px; margin-top:3px;">2 段待反馈 · 5 小时前</div>
+            </div>
+            <span class="chev">&#8250;</span>
+          </div>
+          <div class="card" style="padding:14px; display:flex; align-items:center; gap:14px; margin-top:12px; cursor:pointer;" onclick="toast('李嘉宁 · 1 段待反馈')">
+            <div style="width:56px; height:56px; border-radius:8px; background:var(--surface2); display:flex; align-items:center; justify-content:center; color:var(--brandRed); font-size:22px;">&#9654;</div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:17px; font-weight:600;">李嘉宁</div>
+              <div class="mono tert" style="font-size:11px; margin-top:3px;">1 段待反馈 · 昨天</div>
+            </div>
+            <span class="chev">&#8250;</span>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ---- 我的 / Coach Profile ---- -->
+    <div class="screenview" data-screen="c-me">
+      <div class="body"><div class="body-pad" style="padding-top:8px;">
+        <div style="font-size:36px; font-weight:800;">我的</div>
+        <div class="card" style="padding:18px; margin-top:16px; display:flex; align-items:center; gap:14px;">
+          <div style="width:56px; height:56px; border-radius:50%; background:var(--surface3); display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--fgSecondary);">邓</div>
+          <div>
+            <div style="font-size:19px; font-weight:700;">邓天平</div>
+            <div class="tert" style="font-size:13px; margin-top:3px;">教练 · 5 名学员</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:16px; overflow:hidden;">
+          <div class="srow" onclick="toast('教练资料')"><span class="ic">&#128100;</span><div style="flex:1;">教练资料</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('我的二维码')"><span class="ic">&#9783;</span><div style="flex:1;">我的二维码 / 邀请码</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('动作库')"><span class="ic">&#9776;</span><div style="flex:1;">动作库</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('通知设置')"><span class="ic">&#9788;</span><div style="flex:1;">通知设置</div><span class="chev">&#8250;</span></div>
+        </div>
+        <div class="card" style="margin-top:16px; overflow:hidden;">
+          <div class="srow" onclick="toast('帮助与反馈')"><span class="ic">&#9072;</span><div style="flex:1;">帮助与反馈</div><span class="chev">&#8250;</span></div>
+          <div class="srow nb" onclick="toast('关于 MeetPR')"><span class="ic">&#9432;</span><div style="flex:1;">关于 MeetPR</div><span class="tert mono" style="font-size:12px;">1.0 (5)</span></div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- COACH tab bar -->
+    <div class="tabbar" data-tabs="coach">
+      <div class="tab active" data-target="c-today" onclick="go('c-today')"><svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>今日</span></div>
+      <div class="tab" data-target="c-roster" onclick="go('c-roster')"><svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="9" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M3 19c0-3 3-4.5 6-4.5s6 1.5 6 4.5M15 18c0-2 2-3 4-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>学员</span></div>
+      <div class="tab" data-target="c-plan" onclick="go('c-plan')"><svg class="ic" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M4 9h16M9 3v4M15 3v4M8 13h3M8 16h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>编排</span></div>
+      <div class="tab" data-target="c-receive" onclick="go('c-receive')"><svg class="ic" viewBox="0 0 24 24" fill="none"><path d="M3 7l9 6 9-6M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7a2 2 0 012-2h14a2 2 0 012 2" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span>接收</span></div>
+      <div class="tab" data-target="c-me" onclick="go('c-me')"><svg class="ic" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>我的</span></div>
+    </div>
+  </div>
+
+  <!-- ================= HERO: SetEntrySheet overlay ================= -->
+  <div class="sheet-scrim" id="sheetScrim" onclick="closeSheet()"></div>
+  <div class="sheet" id="setSheet">
+    <div class="sheet-nav">
+      <button class="back" onclick="closeSheet()">&#8249; 返回</button>
+      <span class="title">杠铃深蹲 · 第 2 组</span>
+    </div>
+    <div class="sheet-body" id="sheetBody">
+      <!-- loaded barbell -->
+      <div class="barbell">
+        <div class="bar-rod"></div>
+        <div class="sleeve-end"></div>
+        <div class="loadout" id="loadout"><!-- plates injected by JS --></div>
+      </div>
+      <div class="breakdown" id="breakdown"></div>
+
+      <div class="steppers">
+        <!-- 重量 -->
+        <div class="stepper">
+          <div class="row1"><span class="lab">重量</span><span class="sub">± 2.5</span></div>
+          <div class="row2">
+            <div class="stepbtn" onclick="step('weight',-1)">&minus;</div>
+            <div class="stepval"><span class="num" id="valWeight">85</span><span class="unit">KG</span></div>
+            <div class="stepbtn" onclick="step('weight',1)">+</div>
+          </div>
+        </div>
+        <!-- 次数 -->
+        <div class="stepper">
+          <div class="row1"><span class="lab">次数</span><span class="sub">± 1</span></div>
+          <div class="row2">
+            <div class="stepbtn" onclick="step('reps',-1)">&minus;</div>
+            <div class="stepval"><span class="num" id="valReps">5</span><span class="unit">次</span></div>
+            <div class="stepbtn" onclick="step('reps',1)">+</div>
+          </div>
+        </div>
+        <!-- RPE -->
+        <div class="stepper">
+          <div class="row1"><span class="lab">RPE</span><span class="sub">± 0.5 · 5–10</span></div>
+          <div class="row2">
+            <div class="stepbtn" onclick="step('rpe',-1)">&minus;</div>
+            <div class="stepval"><span class="num" id="valRpe">8.5</span></div>
+            <div class="stepbtn" onclick="step('rpe',1)">+</div>
+          </div>
+        </div>
+
+        <!-- video attach (honest, optional) -->
+        <div class="video-block">
+          <div class="vic">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="13" height="12" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M16 10l5-3v10l-5-3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:14px; color:var(--fgPrimary); font-weight:600;">附上动作视频</div>
+            <div style="font-size:12px; color:var(--fgTertiary); margin-top:2px;">录制或选取本组视频，发给教练复盘</div>
+          </div>
+          <span class="chev">&#43;</span>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="actbtn done" onclick="commitSet(false)">&#10003; 完成本组</button>
+      <button class="actbtn fail" onclick="commitSet(true)">&#10005; 未完成 / 失败</button>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div class="toast" id="toast"></div>
+
+</div></div>
+
+<p class="hint">
+  <b>互动提示：</b>上方切「学员端 / 教练端」 · 底部 tab 切屏 · 训练页点「记录此组 / 任意组行 / 摄像」打开<b>重量记录页</b> · 弹窗里 +/- 实时改大数字、配重明细和杠铃配片。
+</p>
+
+<script>
+/* ====================================================================== */
+/* ===================== SetEntrySheet plate engine ===================== */
+/* ====================================================================== */
+var BAR = 20;          // kg
+var COLLAR = 2.5;      // kg per side, counts toward the load
+var DENOM = [25,20,15,10,5,2.5,1.25];
+
+// IPF plate visual spec (fill + size px) — scaled ~0.8 from native, proportions kept.
+// native: 25/20=24x192, 15/10=16x160, 5=12x128, 2.5=8x96, 1.25=6x80
+var PLATE_SPEC = {
+  25:   {w:20, h:154, fill:'#BA1A20'},
+  20:   {w:20, h:154, fill:'#006EC9'},
+  15:   {w:14, h:128, fill:'#F8BD2A'},
+  10:   {w:14, h:128, fill:'#16A34A'},
+  5:    {w:11, h:102, fill:'#FFFFFF'},
+  2.5:  {w:8,  h:77,  fill:'linear-gradient(to right,#111827,#1F2937,#111827)'},
+  1.25: {w:7,  h:64,  fill:'#D1D5DB'}
+};
+
+// state (start values per spec: weight 85, reps 5, rpe 8 — display shows dialed 8.5 in hero,
+// but the sheet's own start values are 85 / 5 / 8 per the SetEntrySheet contract)
+var S = { weight:85, reps:5, rpe:8 };
+
+function loadPerSide(perSide){
+  var r = perSide, out = [];
+  for (var i=0;i<DENOM.length;i++){
+    var d = DENOM[i];
+    while (r + 1e-6 >= d){ out.push(d); r -= d; }
+  }
+  return out;
+}
+function fmtPlate(v){ return v === Math.round(v) ? String(Math.round(v)) : String(v); }
+function breakdownText(plates){
+  var groups = [];
+  for (var i=0;i<plates.length;i++){
+    var p = plates[i];
+    var idx = -1;
+    for (var j=0;j<groups.length;j++){ if (groups[j].plate === p){ idx = j; break; } }
+    if (idx >= 0) groups[idx].count++; else groups.push({plate:p, count:1});
+  }
+  return groups.map(function(g){ return fmtPlate(g.plate) + 'kg × ' + g.count; }).join(' · ');
+}
+// full line under the barbell (exact SetEntrySheet logic)
+function breakdownLine(weight){
+  if (weight < 25) return '空杠 20kg';
+  var perSide = (weight - BAR)/2 - COLLAR;
+  var plates = perSide > 1e-6 ? loadPerSide(perSide) : [];
+  var base = breakdownText(plates);
+  return base === '' ? '仅 2.5kg 卡扣' : base + ' + 2.5kg 卡扣';
+}
+function platesForWeight(weight){
+  var perSide = (weight - BAR)/2 - COLLAR;
+  return perSide > 1e-6 ? loadPerSide(perSide) : [];
+}
+
+// trim trailing .0 -> "85", keep "8.5"
+function fmtNum(v){
+  var r = Math.round(v*10)/10;
+  return (r === Math.round(r)) ? String(Math.round(r)) : String(r);
+}
+
+function renderBarbell(){
+  var weight = S.weight;
+  var plates = platesForWeight(weight);
+  var html = '<div class="stopper"></div>';
+  for (var i=0;i<plates.length;i++){
+    var spec = PLATE_SPEC[plates[i]];
+    var bg = spec.fill.indexOf('gradient') >= 0
+      ? 'background:' + spec.fill + ';'
+      : 'background:' + spec.fill + ';';
+    html += '<div class="plate" style="width:'+spec.w+'px; height:'+spec.h+'px; '+bg+'"></div>';
+  }
+  // collar always present once we're loading (>= bar) — but when below 25 it's just empty bar;
+  // show the collar whenever total >= bar (a real loaded bar always has the locking collar on).
+  if (weight >= BAR){
+    html += '<div class="collar"><div class="lever"></div></div>';
+  }
+  document.getElementById('loadout').innerHTML = html;
+}
+
+function renderSheet(){
+  document.getElementById('valWeight').textContent = fmtNum(S.weight);
+  document.getElementById('valReps').textContent  = fmtNum(S.reps);
+  document.getElementById('valRpe').textContent   = fmtNum(S.rpe);
+  document.getElementById('breakdown').textContent = breakdownLine(S.weight);
+  renderBarbell();
+}
+
+// +/- mutate state, then live re-render number + breakdown + barbell
+function step(field, dir){
+  if (field === 'weight'){
+    S.weight = dir > 0 ? S.weight + 2.5 : Math.max(0, S.weight - 2.5);
+  } else if (field === 'reps'){
+    S.reps = dir > 0 ? S.reps + 1 : Math.max(0, S.reps - 1);
+  } else if (field === 'rpe'){
+    S.rpe = dir > 0 ? Math.min(10, S.rpe + 0.5) : Math.max(5, S.rpe - 0.5);
+  }
+  renderSheet();
+}
+
+/* ====================================================================== */
+/* ============================ sheet open/close ======================== */
+/* ====================================================================== */
+function openSheet(scrollToVideo){
+  // reset to the contract's start values each open
+  S = { weight:85, reps:5, rpe:8 };
+  renderSheet();
+  document.getElementById('sheetScrim').classList.add('open');
+  document.getElementById('setSheet').classList.add('open');
+  var body = document.getElementById('sheetBody');
+  // honor scrollToVideo (camera affordance opens scrolled to the video block + actions)
+  setTimeout(function(){ body.scrollTop = scrollToVideo === true ? body.scrollHeight : 0; }, 60);
+}
+function closeSheet(){
+  document.getElementById('sheetScrim').classList.remove('open');
+  document.getElementById('setSheet').classList.remove('open');
+}
+function commitSet(failed){
+  closeSheet();
+  toast(failed ? '本组记为 未完成 / 失败' : ('已完成 ' + fmtNum(S.weight) + 'kg × ' + fmtNum(S.reps) + ' @ RPE ' + fmtNum(S.rpe)));
+}
+
+/* ====================================================================== */
+/* ============================ navigation ============================== */
+/* ====================================================================== */
+function go(screen){
+  var side = screen.charAt(0) === 's' ? 'student' : 'coach';
+  switchSide(side, true);
+  var container = side === 'student' ? document.getElementById('studentSide') : document.getElementById('coachSide');
+  // show the right screenview
+  var views = container.querySelectorAll('.screenview');
+  views.forEach(function(v){ v.classList.toggle('on', v.getAttribute('data-screen') === screen); });
+  // highlight the right tab
+  var tabbar = container.querySelector('.tabbar');
+  var tabs = tabbar.querySelectorAll('.tab');
+  tabs.forEach(function(t){ t.classList.toggle('active', t.getAttribute('data-target') === screen); });
+  // reset scroll of the now-active body
+  var activeBody = container.querySelector('.screenview.on .body');
+  if (activeBody) activeBody.scrollTop = 0;
+}
+
+function switchSide(side, silent){
+  var isStudent = side === 'student';
+  document.getElementById('studentSide').style.display = isStudent ? 'flex' : 'none';
+  document.getElementById('coachSide').style.display  = isStudent ? 'none' : 'flex';
+  document.getElementById('sideStudent').classList.toggle('on', isStudent);
+  document.getElementById('sideCoach').classList.toggle('on', !isStudent);
+  if (!silent){
+    // default landing screen for each side
+    go(isStudent ? 's-today' : 'c-today');
+  }
+}
+
+/* ====================================================================== */
+/* ============================ small interactions ====================== */
+/* ====================================================================== */
+var toastTimer = null;
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ el.classList.remove('show'); }, 1600);
+}
+
+function pickGrowthLift(btn, name){
+  var seg = document.getElementById('growthLift');
+  seg.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  toast(name + ' · 成长曲线');
+}
+function pickGrowthRange(btn){
+  var seg = document.getElementById('growthRange');
+  seg.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+}
+function pickReceiveSeg(btn, which){
+  var seg = document.getElementById('receiveSeg');
+  seg.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('recv-students').style.display = which === 'students' ? 'block' : 'none';
+  document.getElementById('recv-videos').style.display   = which === 'videos'   ? 'block' : 'none';
+}
+function pickPlanStudent(row){
+  // single-select within the whole 编排 screen
+  var screen = document.querySelector('[data-screen="c-plan"]');
+  screen.querySelectorAll('.srow').forEach(function(r){
+    r.classList.remove('sel');
+    var chk = r.querySelector('.sel-check');
+    if (chk) chk.remove();
+  });
+  row.classList.add('sel');
+  if (!row.querySelector('.sel-check')){
+    var chk = document.createElement('span');
+    chk.className = 'sel-check';
+    chk.style.cssText = 'color:var(--green); font-size:18px;';
+    chk.innerHTML = '&#10003;';
+    row.appendChild(chk);
+  }
+}
+
+/* rest timer (cosmetic but live) */
+var restSeconds = 124; // 2:04
+function paintRest(){
+  var m = Math.floor(restSeconds/60), s = restSeconds%60;
+  document.getElementById('restClock').textContent = m + ':' + (s<10?'0':'') + s;
+  var pct = Math.max(0, Math.min(100, (restSeconds/200)*100));
+  document.getElementById('restBar').style.width = pct + '%';
+}
+function adjustRest(d){ restSeconds = Math.max(0, restSeconds + d); paintRest(); }
+function skipRest(){ restSeconds = 0; paintRest(); toast('已跳过组间休息'); }
+
+/* init */
+renderSheet();
+paintRest();
+</script>
+</body>
+</html>

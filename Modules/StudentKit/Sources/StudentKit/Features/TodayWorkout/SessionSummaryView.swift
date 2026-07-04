@@ -4,14 +4,29 @@ import SwiftUI
 
 /// Post-session review, modeled on Juggernaut's workout summary: a completion
 /// header, an Overview stat grid, a per-exercise Performance breakdown, and
-/// free-text reflection prompts. Reflections are session-local for now (no
-/// persistence yet).
+/// free-text reflection prompts. Reflections persist locally per day
+/// (`SessionReflectionStore`) and are labeled student-only until the backend
+/// carries them to the coach.
 @available(iOS 17.0, macOS 14.0, *)
 struct SessionSummaryView: View {
   let summary: StudentSessionSummary
   let date: Date
+  let studentID: UUID
+  let reflectionStore: any SessionReflectionStore
 
   @Environment(\.dismiss) private var dismiss
+
+  init(
+    summary: StudentSessionSummary,
+    date: Date,
+    studentID: UUID,
+    reflectionStore: any SessionReflectionStore = UserDefaultsSessionReflectionStore()
+  ) {
+    self.summary = summary
+    self.date = date
+    self.studentID = studentID
+    self.reflectionStore = reflectionStore
+  }
 
   var body: some View {
     NavigationStack {
@@ -27,7 +42,7 @@ struct SessionSummaryView: View {
             }
           }
           SummarySection(title: "训练反思") {
-            SummaryReflections()
+            SummaryReflections(studentID: studentID, date: date, store: reflectionStore)
           }
         }
         .padding()
@@ -147,16 +162,38 @@ private struct SummaryPerformanceList: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct SummaryReflections: View {
+  let studentID: UUID
+  let date: Date
+  let store: any SessionReflectionStore
+
   @State private var mindset = ""
   @State private var achievements = ""
   @State private var improvements = ""
 
   var body: some View {
-    VStack(spacing: 12) {
+    VStack(alignment: .leading, spacing: 12) {
+      Label("仅自己可见的训练笔记，保存在本机", systemImage: "lock.fill")
+        .font(.caption)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
       ReflectionField(title: "本次目标", prompt: "这次训练你想达成什么?", text: $mindset)
       ReflectionField(title: "做到了什么", prompt: "这次训练有哪些收获?", text: $achievements)
       ReflectionField(title: "可以更好", prompt: "哪里还能做得更好?", text: $improvements)
     }
+    .onAppear {
+      let saved = store.reflection(studentId: studentID, date: date)
+      mindset = saved.mindset
+      achievements = saved.achievements
+      improvements = saved.improvements
+    }
+    .onChange(of: mindset) { _, _ in persist() }
+    .onChange(of: achievements) { _, _ in persist() }
+    .onChange(of: improvements) { _, _ in persist() }
+  }
+
+  private func persist() {
+    store.save(
+      SessionReflection(mindset: mindset, achievements: achievements, improvements: improvements),
+      studentId: studentID, date: date)
   }
 }
 
