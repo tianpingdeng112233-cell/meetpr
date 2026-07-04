@@ -152,13 +152,14 @@ enum CoachOnboardingDisplay {
     "db_max_40": "哑铃 ≤40kg",
     "db_max_40_plus": "哑铃 >40kg",
     "smith_machine": "史密斯架",
-    "cable_lat_pulldown": "拉力机 / 高位下拉",
-    "leg_press_machine": "倒蹬机 / 蹲举机",
-    "leg_curl_extension": "腿弯机 / 腿伸机",
+    "cable_crossover": "龙门架(大飞鸟)",
+    "lat_pulldown": "高位下拉",
+    "leg_press_machine": "倒蹬机 / 腿举机",
+    "leg_curl_extension": "腿弯举 / 腿屈伸",
     "seated_row": "坐姿划船",
     "landmine": "地雷架(含 T 杆划船)",
     "seal_row": "海豹划船凳",
-    "hack_squat": "哈克深蹲架",
+    "hack_squat": "哈克深蹲机",
     "power_bar_stiff": "力量举专项杆(硬杆)",
     "deadlift_bar": "硬拉专项杆(软杆)",
     "safety_bar": "特种杠(SSB / 六角等)",
@@ -168,10 +169,12 @@ enum CoachOnboardingDisplay {
     "chains_bands": "链条 / 弹力带(变阻)",
     "ghr": "GHR(臀腿举)",
     "belt_squat": "腰带深蹲机",
-    // Retired tokens (pre-change profiles): v1 set + reverse_hyper (v2).
+    // Retired tokens (pre-change profiles): reverse_hyper + v1-set +
+    // cable_lat_pulldown (split into cable_crossover + lat_pulldown).
     "reverse_hyper": "反向过伸机",
     "heavy_dumbbells": "哑铃区(>30kg)",
     "blocks_chains_bands": "块铃 / 链子 / 弹力带",
+    "cable_lat_pulldown": "拉力机 / 高位下拉",
   ]
 
   // MARK: - Recovery 1-5 scales (wiki v2.1 tables)

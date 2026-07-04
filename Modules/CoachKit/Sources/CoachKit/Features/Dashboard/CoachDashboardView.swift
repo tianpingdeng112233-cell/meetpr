@@ -1,3 +1,4 @@
+// swiftlint:disable file_length type_body_length
 import DesignSystem
 import Foundation
 import SwiftUI
@@ -11,36 +12,46 @@ import SwiftUI
 /// degrades honestly to the real triage signal / student status instead of
 /// fabricating it.
 ///
-/// `init` stays backward-compatible: `rows` defaults to `[]`, so existing
-/// call-sites that only pass the two counts + the two open closures still
-/// compile. `CoachRootView` is expected to pass `rosterViewModel.rows` so the
-/// triage list paints with live data (see crossFileWiring).
+/// `CoachRootView` passes `rosterViewModel.rows` so the triage list paints with
+/// live data, plus the shared `CoachStudentDetailContext` so tapping a today-row
+/// pushes `StudentDetailView` in this tab's own `NavigationStack` — the same
+/// destination the 学员 tab's 今日分诊 strip uses (see crossFileWiring).
+@MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct CoachDashboardView: View {
   let attentionCount: Int
   let pendingCount: Int
-  /// Live roster snapshot from `StudentRosterViewModel.rows`. Empty by default
-  /// to keep the init backward-compatible; the today-list and the overview
-  /// counts derive from it when supplied.
+  /// Shared detail dependencies (the same bundle the 学员 tab threads) so a
+  /// today-row tap opens `StudentDetailView` without a second network fetch.
+  let context: CoachStudentDetailContext
+  /// Live roster snapshot from `StudentRosterViewModel.rows`. Empty by default;
+  /// the today-list and the overview counts derive from it when supplied.
   var rows: [StudentRosterRowModel] = []
   var onOpenReceiving: @MainActor () -> Void = {}
   var onOpenRoster: @MainActor () -> Void = {}
+  /// Forwards an evaluation completion to `StudentRosterViewModel` so the row
+  /// sheds its 评估中 status without waiting for the next refresh — mirrors the
+  /// 学员 tab's triage rows.
+  var onEvaluationCompleted: @MainActor (UUID) -> Void = { _ in }
 
   var body: some View {
-    VStack(spacing: 0) {
-      header
-      ScrollView {
-        VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-          if pendingCount > 0 { newStudentCard }
-          statsCard
-          todaySection
+    NavigationStack {
+      VStack(spacing: 0) {
+        header
+        ScrollView {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
+            if pendingCount > 0 { newStudentCard }
+            statsCard
+            todaySection
+          }
+          .padding(MeetPRSpacing.base)
         }
-        .padding(MeetPRSpacing.base)
+        .scrollContentBackground(.hidden)
       }
-      .scrollContentBackground(.hidden)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background(Color.MeetPR.bg)
+      .hideNavigationBar()
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
   }
 
   // MARK: - Header
@@ -159,10 +170,10 @@ struct CoachDashboardView: View {
 
   // MARK: - 今日 — 学员 (triage list)
 
-  /// Mock label is "学员 — 今日"; the rows below are the live triage list. The
-  /// dashboard only receives the roster snapshot + open closures (no detail
-  /// context / navigation stack), so tapping a row keeps the existing behavior
-  /// contract: it opens the 学员 tab where the row is actionable.
+  /// Mock label is "学员 — 今日"; the rows below are the live triage list. Tapping
+  /// a row pushes `StudentDetailView` inside this tab's `NavigationStack` — the
+  /// same destination as the 学员 tab's 今日分诊 strip, so the coach reaches a
+  /// student's detail in one tap instead of bouncing through the roster.
   private var todaySection: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Text("学员 — 今日")
@@ -180,7 +191,13 @@ struct CoachDashboardView: View {
     } else {
       VStack(spacing: 0) {
         ForEach(Array(todayRows.enumerated()), id: \.element.id) { index, row in
-          Button(action: onOpenRoster) {
+          NavigationLink {
+            StudentDetailView(
+              summary: row.student,
+              context: context,
+              onEvaluationCompleted: { onEvaluationCompleted(row.student.id) }
+            )
+          } label: {
             athleteRow(row, showsTopBorder: index > 0)
           }
           .buttonStyle(.plain)
@@ -327,6 +344,7 @@ struct CoachDashboardView: View {
 }
 
 #if DEBUG
+  @MainActor
   @available(iOS 17.0, macOS 14.0, *)
   private enum CoachDashboardPreview {
     static func uuid(_ byte: UInt8) -> UUID {
@@ -369,6 +387,24 @@ struct CoachDashboardView: View {
         ),
       ]
     }
+
+    /// In-memory detail dependencies so the preview exercises the row → detail
+    /// push; mirrors `TriageStripSection`'s preview context.
+    static var context: CoachStudentDetailContext {
+      CoachStudentDetailContext(
+        plans: EmptyStudentPlanRepository(),
+        trainingLogs: EmptyStudentTrainingLogRepository(),
+        feedback: EmptyStudentFeedbackRepository(),
+        evaluations: InMemoryCoachEvaluationRepository(),
+        summaries: InMemoryCoachEvaluationSummaryRepository(coachId: uuid(30)),
+        profiles: InMemoryCoachStudentProfileReader(),
+        videos: InMemoryCoachStudentVideoRepository(),
+        readiness: EmptyReadinessRepository(),
+        familyMapProvider: nil,
+        planning: InMemoryPlanRepository(students: [], catalog: []),
+        draftStore: (try? DraftStore.inMemory()) ?? DraftStore.shared
+      )
+    }
   }
 
   @available(iOS 17.0, macOS 14.0, *)
@@ -376,8 +412,10 @@ struct CoachDashboardView: View {
     CoachDashboardView(
       attentionCount: 2,
       pendingCount: 2,
+      context: CoachDashboardPreview.context,
       rows: CoachDashboardPreview.rows
     )
     .preferredColorScheme(.dark)
   }
 #endif
+// swiftlint:enable file_length type_body_length
