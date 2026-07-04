@@ -10,6 +10,10 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  /// Bumped by the parent when the student taps the home 开始/继续 CTA, so the
+  /// training tab jumps back to today instead of whatever past/future day was
+  /// last browsed here.
+  private let jumpToTodayToken: Int
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -25,11 +29,13 @@ public struct TodayWorkoutView: View {
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
-    videoUploads: VideoUploadServices? = nil
+    videoUploads: VideoUploadServices? = nil,
+    jumpToTodayToken: Int = 0
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
+    self.jumpToTodayToken = jumpToTodayToken
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
@@ -139,6 +145,11 @@ public struct TodayWorkoutView: View {
     }
     .onChange(of: selectedDate) { _, newDate in
       Task { await loadWorkout(for: newDate) }
+    }
+    .onChange(of: jumpToTodayToken) { _, _ in
+      if !Calendar.current.isDateInToday(selectedDate) {
+        selectedDate = Date()
+      }
     }
   }
 

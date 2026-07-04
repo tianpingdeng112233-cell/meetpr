@@ -21,6 +21,9 @@ public struct StudentRootView: View {
   /// Bumped whenever 今日 becomes active so the home screen reloads data logged
   /// in other tabs (see DashboardView.todayReloadToken).
   @State private var todayReloadToken = 0
+  /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
+  /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
+  @State private var trainingJumpToken = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -94,7 +97,10 @@ public struct StudentRootView: View {
         e1rm: e1rm,
         feedbackViewModel: feedbackViewModel,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
-        onStartWorkout: { selectedTab = .training },
+        onStartWorkout: {
+          trainingJumpToken += 1
+          selectedTab = .training
+        },
         onSeeAllFeedback: { selectedTab = .growth },
         todayReloadToken: todayReloadToken
       )
@@ -105,7 +111,7 @@ public struct StudentRootView: View {
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads
+        videoUploads: videoUploads, jumpToTodayToken: trainingJumpToken
       )
       .tag(StudentTab.training)
       .tabItem {
