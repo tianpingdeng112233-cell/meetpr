@@ -22,12 +22,19 @@ struct SetEntrySheet: View {
   let scrollToVideo: Bool
   @Environment(\.dismiss) private var dismiss
 
-  @State private var weight: Decimal
-  @State private var reps: Int
-  @State private var rpe: Decimal
+  // Bound to editable text (not TextField(value:format:)) so the value read in
+  // save() is always the current text — the numeric mirror is derived, never
+  // waiting on a focus-loss parse. See SetEntryValue.
+  @State private var weightText: String
+  @State private var repsText: String
+  @State private var rpeText: String
   @FocusState private var focusedField: NumberField?
 
   private enum NumberField { case weight, reps, rpe }
+
+  private var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
+  private var repsValue: Int { SetEntryValue.reps(from: repsText) }
+  private var rpeValue: Decimal { SetEntryValue.rpe(from: rpeText) }
 
   private let bar = 20.0
   private let collar = 2.5  // per-side locking collar — counts toward the load
@@ -46,10 +53,12 @@ struct SetEntrySheet: View {
     self.studentID = studentID
     self.videoViewModel = videoViewModel
     self.scrollToVideo = scrollToVideo
-    _weight = State(initialValue: draft.actualWeight ?? draft.prescribed.weightKg ?? 0)
-    _reps = State(
-      initialValue: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0)
-    _rpe = State(initialValue: draft.actualRPE ?? draft.prescribed.rpe ?? 8)
+    let weight = draft.actualWeight ?? draft.prescribed.weightKg ?? 0
+    let reps = draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0
+    let rpe = draft.actualRPE ?? draft.prescribed.rpe ?? 8
+    _weightText = State(initialValue: SetEntryValue.text(weight))
+    _repsText = State(initialValue: "\(reps)")
+    _rpeText = State(initialValue: SetEntryValue.text(rpe))
   }
 
   var body: some View {
@@ -67,27 +76,30 @@ struct SetEntrySheet: View {
           VStack(spacing: 18) {
             plateStepper(
               "重量", unit: "KG", sub: "点数字可直接输入 · ± 2.5",
-              onDec: { weight = max(0, weight - 2.5) }, onInc: { weight += 2.5 }
+              onDec: { weightText = SetEntryValue.text(max(0, weightValue - 2.5)) },
+              onInc: { weightText = SetEntryValue.text(weightValue + 2.5) }
             ) {
-              TextField("", value: $weight, format: .number.precision(.fractionLength(0...1)))
+              TextField("", text: $weightText)
                 .decimalKeyboard()
                 .focused($focusedField, equals: .weight)
                 .modifier(EntryFieldStyle())
             }
             plateStepper(
               "次数", unit: "次", sub: "± 1",
-              onDec: { reps = max(0, reps - 1) }, onInc: { reps += 1 }
+              onDec: { repsText = "\(max(0, repsValue - 1))" },
+              onInc: { repsText = "\(repsValue + 1)" }
             ) {
-              TextField("", value: $reps, format: .number)
+              TextField("", text: $repsText)
                 .numberPadKeyboard()
                 .focused($focusedField, equals: .reps)
                 .modifier(EntryFieldStyle())
             }
             plateStepper(
               "RPE", unit: nil, sub: "± 0.5 · 5–10",
-              onDec: { rpe = max(5, rpe - 0.5) }, onInc: { rpe = min(10, rpe + 0.5) }
+              onDec: { rpeText = SetEntryValue.text(max(5, rpeValue - 0.5)) },
+              onInc: { rpeText = SetEntryValue.text(min(10, rpeValue + 0.5)) }
             ) {
-              TextField("", value: $rpe, format: .number.precision(.fractionLength(0...1)))
+              TextField("", text: $rpeText)
                 .decimalKeyboard()
                 .focused($focusedField, equals: .rpe)
                 .modifier(EntryFieldStyle())
@@ -127,7 +139,7 @@ struct SetEntrySheet: View {
   // MARK: - Plate loadout
 
   private var perSide: Double {
-    (NSDecimalNumber(decimal: weight).doubleValue - bar) / 2 - collar
+    (NSDecimalNumber(decimal: weightValue).doubleValue - bar) / 2 - collar
   }
 
   private var plates: [Double] {
@@ -135,7 +147,7 @@ struct SetEntrySheet: View {
   }
 
   private var breakdownLine: String {
-    let total = NSDecimalNumber(decimal: weight).doubleValue
+    let total = NSDecimalNumber(decimal: weightValue).doubleValue
     guard total >= bar + collar * 2 else { return "空杠 20kg" }
     let base = PlateLoadout.breakdownText(plates)
     return base.isEmpty ? "仅 2.5kg 卡扣" : base + " + 2.5kg 卡扣"
@@ -264,12 +276,13 @@ struct SetEntrySheet: View {
   }
 
   private func save(failed: Bool) {
-    // Clamp on commit rather than while typing, so keyboard entry of a
-    // multi-digit value (e.g. "10" RPE) is never truncated mid-keystroke.
+    // Parse + clamp the current field text here (not while typing), so a
+    // multi-digit value like "10" RPE is never truncated mid-keystroke and the
+    // saved value is always what the field currently shows.
     focusedField = nil
-    viewModel.updateWeight(rowIndex: rowIndex, weight: max(0, weight))
-    viewModel.updateReps(rowIndex: rowIndex, reps: max(0, reps))
-    viewModel.updateRPE(rowIndex: rowIndex, rpe: min(10, max(5, rpe)))
+    viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
+    viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
+    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpeValue)
     Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
     dismiss()
   }
