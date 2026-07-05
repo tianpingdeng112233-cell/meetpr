@@ -44,6 +44,10 @@ public enum PlanToStudentProjection {
       weekIndex: weekIndex,
       startDate: plan.startDate,
       planKind: plan.kind,
+      blockType: plan.blockType,
+      mesocyclePhase: plan.mesocyclePhase,
+      trainingMax: plan.trainingMax,
+      tmSetAt: plan.tmSetAt,
       days: studentDays
     )
   }

@@ -34,6 +34,10 @@ extension PlanDTO {
       source: source,
       sourceTemplateID: sourceTemplateID,
       status: status,
+      blockType: blockType,
+      mesocyclePhase: mesocyclePhase,
+      trainingMax: trainingMax,
+      tmSetAt: tmSetAt,
       createdAt: createdAt,
       updatedAt: updatedAt
     )
