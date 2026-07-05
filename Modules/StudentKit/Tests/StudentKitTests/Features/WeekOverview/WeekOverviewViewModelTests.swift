@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 import Testing
 
@@ -25,6 +26,7 @@ import Testing
   #expect(days.count == 7)
   #expect(!fetchedLogs.isEmpty)
   #expect(weekIndex == plan.weekIndex)
+  #expect(viewModel.algorithmMetadata?.isEmpty == true)
 }
 
 @MainActor
@@ -42,4 +44,29 @@ import Testing
   }
   #expect(days.isEmpty)
   #expect(logs.isEmpty)
+  #expect(viewModel.algorithmMetadata == nil)
+}
+
+@MainActor
+@Test func weekOverviewViewModelExposesAlgorithmMetadata() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentPlanView(
+    cycleID: UUID(),
+    weekIndex: 1,
+    startDate: Date(timeIntervalSince1970: 1_783_036_800),
+    blockType: "strength",
+    mesocyclePhase: "intensification",
+    trainingMax: Decimal(92.5),
+    tmSetAt: Date(timeIntervalSince1970: 1_783_036_800),
+    days: []
+  )
+  let viewModel = WeekOverviewViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  let badges = try #require(viewModel.algorithmMetadata?.badges(now: plan.startDate))
+  #expect(badges.map(\.title) == ["力量块", "强化", "训练最大值 ≈ 0.9×1RM 92.5kg"])
 }

@@ -73,6 +73,9 @@ public struct DashboardView: View {
           weekProgressBar
             .padding(.top, 16)
 
+          planMetadataStrip
+            .padding(.top, 12)
+
           if let feedback = latestFeedback {
             todayFeedbackCard(feedback)
               .padding(.top, 16)
@@ -191,6 +194,36 @@ public struct DashboardView: View {
   /// by that day's set-completion fraction. Falls back to a single empty segment.
   private var weekProgressValues: [Double] {
     weekSnapshot?.weekSegments() ?? [0]
+  }
+
+  // MARK: - Plan metadata
+
+  @ViewBuilder
+  private var planMetadataStrip: some View {
+    let badges = weekViewModel.algorithmMetadata?.badges() ?? []
+    if !badges.isEmpty {
+      LazyVGrid(columns: metadataBadgeColumns, alignment: .leading, spacing: 6) {
+        ForEach(badges) { badge in
+          metadataBadge(badge)
+        }
+      }
+    }
+  }
+
+  private var metadataBadgeColumns: [GridItem] {
+    [GridItem(.adaptive(minimum: 112), spacing: 6, alignment: .leading)]
+  }
+
+  private func metadataBadge(_ badge: PlanAlgorithmMetadata.Badge) -> some View {
+    Text(badge.title)
+      .font(.caption2)
+      .foregroundStyle(badge.tone == .stale ? Color.MeetPR.fgTertiary : Color.MeetPR.fgSecondary)
+      .lineLimit(2)
+      .multilineTextAlignment(.leading)
+      .padding(.horizontal, 8)
+      .padding(.vertical, 5)
+      .background(badge.tone == .stale ? Color.MeetPR.surface2 : Color.MeetPR.greenSoft)
+      .clipShape(.capsule)
   }
 
   // MARK: - Today feedback card

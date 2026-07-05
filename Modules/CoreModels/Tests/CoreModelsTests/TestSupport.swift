@@ -3,6 +3,7 @@ import Foundation
 
 enum FixtureError: Error {
   case invalidDecimal(String)
+  case invalidDate(String)
   case invalidURL(String)
   case invalidUUID(String)
   case invalidUTF8
@@ -39,6 +40,16 @@ func fixtureUUID(_ rawValue: String) throws -> UUID {
   }
 
   return uuid
+}
+
+func isoDate(_ rawValue: String) throws -> Date {
+  let formatter = ISO8601DateFormatter()
+  formatter.formatOptions = [.withInternetDateTime]
+  guard let date = formatter.date(from: rawValue) else {
+    throw FixtureError.invalidDate(rawValue)
+  }
+
+  return date
 }
 
 func createdAt() -> Date {

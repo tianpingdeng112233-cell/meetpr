@@ -14,6 +14,10 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
   public let source: PlanSource
   public let sourceTemplateID: UUID?
   public let status: PlanStatus
+  public let blockType: String?
+  public let mesocyclePhase: String?
+  public let trainingMax: Decimal?
+  public let tmSetAt: Date?
   public let createdAt: Date
   public let updatedAt: Date
 
@@ -29,6 +33,10 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     source: PlanSource,
     sourceTemplateID: UUID? = nil,
     status: PlanStatus,
+    blockType: String? = nil,
+    mesocyclePhase: String? = nil,
+    trainingMax: Decimal? = nil,
+    tmSetAt: Date? = nil,
     createdAt: Date,
     updatedAt: Date
   ) {
@@ -43,6 +51,10 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     self.source = source
     self.sourceTemplateID = sourceTemplateID
     self.status = status
+    self.blockType = blockType
+    self.mesocyclePhase = mesocyclePhase
+    self.trainingMax = trainingMax
+    self.tmSetAt = tmSetAt
     self.createdAt = createdAt
     self.updatedAt = updatedAt
   }
@@ -60,6 +72,10 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     source = try container.decode(PlanSource.self, forKey: .source)
     sourceTemplateID = try container.decodeIfPresent(UUID.self, forKey: .sourceTemplateID)
     status = try container.decode(PlanStatus.self, forKey: .status)
+    blockType = try container.decodeIfPresent(String.self, forKey: .blockType)
+    mesocyclePhase = try container.decodeIfPresent(String.self, forKey: .mesocyclePhase)
+    trainingMax = try container.decodeDecimalIfPresent(forKey: .trainingMax)
+    tmSetAt = try container.decodeIfPresent(Date.self, forKey: .tmSetAt)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
     updatedAt = try container.decode(Date.self, forKey: .updatedAt)
   }
@@ -76,6 +92,10 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     case source
     case sourceTemplateID = "sourceTemplateId"
     case status
+    case blockType
+    case mesocyclePhase
+    case trainingMax
+    case tmSetAt
     case createdAt
     case updatedAt
   }

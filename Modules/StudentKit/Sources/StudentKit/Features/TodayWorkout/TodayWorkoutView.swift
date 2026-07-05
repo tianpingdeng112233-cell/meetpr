@@ -192,6 +192,8 @@ public struct TodayWorkoutView: View {
     let activeIndex = drafts.firstIndex { !$0.completed }
     return ScrollView {
       VStack(alignment: .leading, spacing: 16) {
+        WorkoutDayHeader(day: day, context: viewModel.planContext, readinessFiled: readinessFiled)
+
         if let activeIndex {
           activeSetHero(
             draft: drafts[activeIndex],
