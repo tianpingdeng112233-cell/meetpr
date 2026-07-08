@@ -1,4 +1,5 @@
 import CoreModels
+import Foundation
 import Testing
 
 @testable import AppShell
@@ -55,7 +56,7 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bootstrapWithNetworkRefreshFailureClearsStoreAndReturnsAnonymous() async {
+@Test func bootstrapWithNetworkRefreshFailureKeepsCachedSession() async {
   let user = AuthTestSupport.user()
   let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
   let repository = InMemoryAuthRepository(forcedError: .network)
@@ -63,10 +64,10 @@ import Testing
 
   await session.bootstrap()
 
-  #expect(session.state == .anonymous)
-  #expect(await store.accessToken() == nil)
-  #expect(await store.refreshToken() == nil)
-  #expect(await store.cachedUser() == nil)
+  #expect(session.state == .authenticated(user))
+  #expect(await store.accessToken() == "access")
+  #expect(await store.refreshToken() == "refresh")
+  #expect(await store.cachedUser() == user)
 }
 
 @MainActor
@@ -129,6 +130,59 @@ import Testing
   #expect(await spy.count() == 1)
 }
 
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func accessTokenRefreshesExpiredJWTBeforeReturningIt() async throws {
+  let repository = InMemoryAuthRepository()
+  let signup = try await repository.signup(
+    phone: "13800000001", password: "password123", role: .coach)
+  let expiredAccess = jwt(exp: Date().addingTimeInterval(-60))
+  let store = InMemoryTokenStore(
+    access: expiredAccess,
+    refresh: signup.refreshToken,
+    user: signup.user
+  )
+  let session = Session(auth: repository, tokenStore: store)
+
+  await session.bootstrap()
+  let bootstrapToken = try await session.accessToken()
+  await store.save(access: expiredAccess, refresh: await store.refreshToken() ?? "")
+
+  let token = try await session.accessToken()
+
+  #expect(token != expiredAccess)
+  #expect(token != bootstrapToken)
+  #expect(await store.accessToken() == token)
+  #expect(session.state == .authenticated(signup.user))
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func accessTokenRefreshNetworkFailureKeepsAuthenticatedSession() async throws {
+  let repository = InMemoryAuthRepository()
+  let signup = try await repository.signup(
+    phone: "13800000001", password: "password123", role: .coach)
+  let expiredAccess = jwt(exp: Date().addingTimeInterval(-60))
+  let store = InMemoryTokenStore(
+    access: signup.accessToken,
+    refresh: signup.refreshToken,
+    user: signup.user
+  )
+  let session = Session(auth: repository, tokenStore: store)
+  await session.bootstrap()
+  let refresh = await store.refreshToken() ?? ""
+  await store.save(access: expiredAccess, refresh: refresh)
+  await repository.setForcedError(.network)
+
+  await #expect(throws: AuthRepositoryError.network) {
+    _ = try await session.accessToken()
+  }
+
+  #expect(session.state == .authenticated(signup.user))
+  #expect(await store.accessToken() == expiredAccess)
+  #expect(await store.refreshToken() == refresh)
+}
+
 private actor LogoutSpy {
   private var logoutCount = 0
 
@@ -139,4 +193,16 @@ private actor LogoutSpy {
   func count() -> Int {
     logoutCount
   }
+}
+
+private func jwt(exp: Date) -> String {
+  let payload = #"{"exp":\#(Int(exp.timeIntervalSince1970))}"#
+  return "e30.\(base64URL(Data(payload.utf8))).sig"
+}
+
+private func base64URL(_ data: Data) -> String {
+  data.base64EncodedString()
+    .replacingOccurrences(of: "+", with: "-")
+    .replacingOccurrences(of: "/", with: "_")
+    .replacingOccurrences(of: "=", with: "")
 }
