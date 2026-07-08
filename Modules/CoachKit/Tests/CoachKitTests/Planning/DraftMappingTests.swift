@@ -94,3 +94,30 @@ import Testing
   #expect(sets.map(\.setNumber) == [1, 2, 3, 4])
   #expect(sets.allSatisfy { $0.planExerciseID == exercise.id })
 }
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func draftMappingExpandsPerSetTargetsToPlanSets() throws {
+  let draft = PlanningFixtures.draft()
+  let exercise = try #require(draft.draftDays.first?.draftExercises.first)
+  exercise.setsData = try encodeSetSpec(
+    DraftSetSpec(
+      setCount: 5,
+      targetReps: 5,
+      intensityMode: .weight,
+      targetValue: 210,
+      perSetTargets: [
+        DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 210),
+        DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+        DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+        DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+        DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+      ]
+    ))
+
+  let sets = toDomainSets(draft)
+
+  #expect(sets.map(\.setNumber) == [1, 2, 3, 4, 5])
+  #expect(sets.map(\.targetValue) == [210, 175, 175, 175, 175])
+  #expect(sets.map(\.targetReps) == [5, 5, 5, 5, 5])
+}

@@ -64,3 +64,22 @@ import Testing
   #expect(decoded.restSeconds == 180)
   #expect(decoded.restSecondsPerSet == [150, 180, 210])
 }
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func draftSetSpecRoundTripsPerSetTargets() throws {
+  let spec = DraftSetSpec(
+    setCount: 2,
+    targetReps: 5,
+    intensityMode: .weight,
+    targetValue: 210,
+    perSetTargets: [
+      DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 210),
+      DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+    ]
+  )
+
+  let decoded = try MeetPRCodec.decoder.decode(DraftSetSpec.self, from: encodeSetSpec(spec))
+
+  #expect(decoded.perSetTargets?.map(\.targetValue) == [210, 175])
+  #expect(decoded.perSetTargets?.map(\.targetReps) == [5, 5])
+}

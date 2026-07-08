@@ -69,16 +69,17 @@ public func toDomainSets(_ draft: DraftTrainingPlan) -> [PlanSet] {
         .flatMap { exercise -> [PlanSet] in
           guard let setSpec = decodeSetSpec(exercise.setsData) else { return [] }
           return (1...setSpec.setCount).map { setNumber in
+            let target = setSpec.target(forSetNumber: setNumber)
             let restSeconds = restSeconds(for: setSpec, setNumber: setNumber)
             return PlanSet(
               id: UUID(),
               planExerciseID: exercise.id,
               setNumber: setNumber,
-              targetReps: setSpec.targetReps,
-              targetRepsMax: setSpec.targetRepsMax,
-              intensityMode: setSpec.intensityMode,
-              targetValue: setSpec.targetValue,
-              setType: setSpec.setType,
+              targetReps: target.targetReps,
+              targetRepsMax: target.targetRepsMax,
+              intensityMode: target.intensityMode,
+              targetValue: target.targetValue,
+              setType: target.setType,
               restSeconds: restSeconds,
               createdAt: draft.lastSavedAt
             )
@@ -97,7 +98,9 @@ private func restSeconds(for spec: DraftSetSpec, setNumber: Int) -> Int {
   if let restSeconds = spec.restSeconds {
     return restSeconds
   }
-  return RestDefaults.seconds(forRPE: spec.intensityMode == .rpe ? spec.targetValue : nil)
+  let target = spec.target(forSetNumber: setNumber)
+  return RestDefaults.seconds(
+    forRPE: target.intensityMode == .rpe ? target.targetValue : nil)
 }
 
 public func encodeSetSpec(_ spec: DraftSetSpec) throws -> Data {

@@ -42,7 +42,7 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   #expect(profile.heightCm == 165)
 }
 
-// MARK: - Completion gate mirror (18 + 1 conditional)
+// MARK: - Completion gate mirror (17 + 1 conditional)
 
 @Test func completeWithoutRowReportsAllRequiredFields() async {
   let repo = makeRepo()
@@ -52,7 +52,7 @@ private func makeRepo(seed: OnboardingProfile? = nil) -> InMemoryOnboardingRepos
   do {
     _ = try await repo.complete()
   } catch OnboardingError.incomplete(let missing) {
-    #expect(missing.count == 18)
+    #expect(missing.count == 17)
     #expect(missing.contains("unit_preference"))
     #expect(missing.contains("is_competing"))
   } catch {
