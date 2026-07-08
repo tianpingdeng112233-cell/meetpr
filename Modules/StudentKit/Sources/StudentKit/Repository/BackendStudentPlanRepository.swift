@@ -20,13 +20,14 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
   }
 
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
-    if let cached = await cache.loadPlan(studentID: studentID) {
-      Task { [weak self] in
-        try? await self?.refreshCurrentPlan(studentID: studentID)
+    do {
+      return try await refreshCurrentPlan(studentID: studentID)
+    } catch {
+      if let cached = await cache.loadPlan(studentID: studentID) {
+        return cached
       }
-      return cached
+      throw error
     }
-    return try await refreshCurrentPlan(studentID: studentID)
   }
 
   public func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? {
@@ -53,9 +54,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
       status: [.published],
       accessToken: token
     )
-    guard
-      let plan = response.plans.sorted(by: { $0.startDate > $1.startDate }).first
-    else {
+    guard let plan = Self.selectCurrentPlan(from: response.plans) else {
       return nil
     }
 
@@ -71,13 +70,43 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
   }
 
   private func exerciseCatalog(accessToken: String) async throws -> [Exercise] {
-    if !catalog.isEmpty {
-      return Array(catalog.values)
-    }
     let response = try await api.exercises(accessToken: accessToken)
     catalog = Dictionary(
       response.exercises.map { ($0.id, $0) }, uniquingKeysWith: { _, new in new })
     return response.exercises
+  }
+
+  static func selectCurrentPlan(from plans: [PlanDTO], today: Date = Date()) -> PlanDTO? {
+    guard !plans.isEmpty else { return nil }
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+    let currentDay = calendar.startOfDay(for: today)
+    let active = plans.filter { plan in
+      calendar.startOfDay(for: plan.startDate) <= currentDay
+        && currentDay <= calendar.startOfDay(for: plan.endDate)
+    }
+    if let plan = active.sorted(by: latestStartThenUpdate).first {
+      return plan
+    }
+    let upcoming = plans.filter { calendar.startOfDay(for: $0.startDate) > currentDay }
+    if let plan = upcoming.sorted(by: earliestStartThenLatestUpdate).first {
+      return plan
+    }
+    return plans.sorted(by: latestStartThenUpdate).first
+  }
+
+  private static func latestStartThenUpdate(_ lhs: PlanDTO, _ rhs: PlanDTO) -> Bool {
+    if lhs.startDate == rhs.startDate {
+      return lhs.updatedAt > rhs.updatedAt
+    }
+    return lhs.startDate > rhs.startDate
+  }
+
+  private static func earliestStartThenLatestUpdate(_ lhs: PlanDTO, _ rhs: PlanDTO) -> Bool {
+    if lhs.startDate == rhs.startDate {
+      return lhs.updatedAt > rhs.updatedAt
+    }
+    return lhs.startDate < rhs.startDate
   }
 
   private static func currentWeekIndex(for plan: TrainingPlan) -> Int {
