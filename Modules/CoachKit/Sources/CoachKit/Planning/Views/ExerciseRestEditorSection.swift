@@ -15,7 +15,7 @@ struct ExerciseRestEditorSection: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       RestSecondsPicker(label: "组间休息", value: singleRestBinding)
 
-      Toggle("逐组单独设", isOn: perSetEnabledBinding)
+      Toggle("逐组休息", isOn: perSetEnabledBinding)
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
 

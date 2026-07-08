@@ -679,8 +679,17 @@ public final class PlanningViewModel {
 
     var memo = intensityValueMemo[draftExerciseID] ?? [:]
     memo[spec.intensityMode] = spec.targetValue
-    spec.targetValue = memo[newMode] ?? defaultTargetValue(for: newMode)
+    let nextValue = memo[newMode] ?? defaultTargetValue(for: newMode)
+    spec.targetValue = nextValue
     spec.intensityMode = newMode
+    if spec.perSetTargets != nil {
+      spec.perSetTargets = normalizedPerSetTargets(for: spec).map { target in
+        var next = target
+        next.intensityMode = newMode
+        next.targetValue = nextValue
+        return next
+      }
+    }
     intensityValueMemo[draftExerciseID] = memo
 
     try? await updateW1SetSpec(spec, for: draftExerciseID)
@@ -947,6 +956,11 @@ extension PlanningViewModel {
   }
 
   private func isValidSetSpec(_ spec: DraftSetSpec) -> Bool {
+    if let targets = spec.perSetTargets {
+      guard !targets.isEmpty, targets.count == max(1, spec.setCount) else { return false }
+      return spec.setCount >= 1 && targets.allSatisfy(isValidSetTarget)
+    }
+
     let hasValidRepsMax = spec.targetRepsMax.map { $0 >= spec.targetReps } ?? true
     let hasValidIntensity: Bool
     switch spec.intensityMode {
@@ -959,6 +973,18 @@ extension PlanningViewModel {
       && spec.targetReps >= 1
       && hasValidRepsMax
       && hasValidIntensity
+  }
+
+  private func isValidSetTarget(_ target: DraftSetTarget) -> Bool {
+    let hasValidRepsMax = target.targetRepsMax.map { $0 >= target.targetReps } ?? true
+    let hasValidIntensity: Bool
+    switch target.intensityMode {
+    case .weight:
+      hasValidIntensity = target.targetValue >= Decimal(0)
+    case .rpe:
+      hasValidIntensity = target.targetValue >= Decimal(1) && target.targetValue <= Decimal(10)
+    }
+    return target.targetReps >= 1 && hasValidRepsMax && hasValidIntensity
   }
 
   private func validateAssignments() throws {
@@ -1252,7 +1278,48 @@ extension PlanningViewModel {
       normalized.targetValue = min(Decimal(10), max(Decimal(1), normalized.targetValue))
         .roundedToPlanningIncrement(PlanningDecimalStep.half)
     }
+    if normalized.perSetTargets != nil {
+      let targets = normalizedPerSetTargets(for: normalized).map(normalizedSetTarget)
+      normalized.perSetTargets = targets
+      if let first = targets.first {
+        normalized.targetReps = first.targetReps
+        normalized.targetRepsMax = first.targetRepsMax
+        normalized.intensityMode = first.intensityMode
+        normalized.targetValue = first.targetValue
+        normalized.setType = first.setType
+      }
+      normalized.setCount = max(1, targets.count)
+    }
     normalized.restSecondsPerSet = normalizedRestSecondsPerSet(for: normalized)
+    return normalized
+  }
+
+  private func normalizedPerSetTargets(for spec: DraftSetSpec) -> [DraftSetTarget] {
+    var values = spec.perSetTargets ?? []
+    let desiredCount = max(1, spec.setCount)
+    if values.count > desiredCount {
+      values.removeLast(values.count - desiredCount)
+    } else if values.count < desiredCount {
+      let fill = values.last ?? spec.baseTarget
+      values.append(contentsOf: repeatElement(fill, count: desiredCount - values.count))
+    }
+    return values
+  }
+
+  private func normalizedSetTarget(_ target: DraftSetTarget) -> DraftSetTarget {
+    var normalized = target
+    normalized.targetReps = max(1, normalized.targetReps)
+    if let targetRepsMax = normalized.targetRepsMax {
+      normalized.targetRepsMax = max(normalized.targetReps, targetRepsMax)
+    }
+    switch normalized.intensityMode {
+    case .weight:
+      normalized.targetValue = max(Decimal(0), normalized.targetValue)
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
+    case .rpe:
+      normalized.targetValue = min(Decimal(10), max(Decimal(1), normalized.targetValue))
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
+    }
     return normalized
   }
 

@@ -11,7 +11,7 @@ import Foundation
 /// Wire guards baked in (spec 032 risks 2/4 + zod nullability):
 /// - decimals round to the column scale before encoding (height 1, weight /
 ///   1RM 2) — the backend regex rejects longer fractions;
-/// - `.null` is only encodable for the 8 nullable columns; on required
+/// - `.null` is only encodable for nullable columns; on required
 ///   columns it is a programmer error (debug assert, key skipped);
 /// - `upload_attachment_ids` is full-replace and not nullable: `.null` is
 ///   refused the same way.
@@ -40,7 +40,7 @@ public struct OnboardingPatchDTO: Encodable, Equatable, Sendable {
     try encodeDecimal(patch.bench1RMKg, scale: 2, key: .bench1RMKg, into: &container)
     try encodeDecimal(patch.deadlift1RMKg, scale: 2, key: .deadlift1RMKg, into: &container)
     // Step 4
-    try encodeRequired(patch.trainingDays, key: .trainingDays, into: &container)
+    try encodeNullable(patch.trainingDays, key: .trainingDays, into: &container)
     try encodeRequired(patch.gymTier, key: .gymTier, into: &container)
     try encodeNullable(patch.equipmentOverrides, key: .equipmentOverrides, into: &container)
     // Step 5

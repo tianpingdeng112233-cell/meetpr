@@ -102,6 +102,35 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func assemblerPublishesPerSetTargetsForSameExercise() {
+  let spec = DraftSetSpec(
+    setCount: 5,
+    targetReps: 5,
+    intensityMode: .weight,
+    targetValue: 210,
+    perSetTargets: [
+      DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 210),
+      DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+      DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+      DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+      DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+    ]
+  )
+
+  let assembled = PlanPublishAssembler.assemble(
+    draft: PlanningFixtures.draft(),
+    w1Specs: [PlanningFixtures.uuid(50): spec],
+    rules: [],
+    kind: .regular
+  )
+
+  let weekOneSets = sets(inWeek: 1, assembled: assembled)
+  #expect(weekOneSets.map(\.targetValue) == [210, 175, 175, 175, 175])
+  #expect(weekOneSets.map(\.targetReps) == [5, 5, 5, 5, 5])
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() {
   let perSetThenSingle = assembledRestSeconds(
     for: DraftSetSpec(
@@ -142,14 +171,28 @@ private func assembledRestSeconds(for spec: DraftSetSpec) -> [Int?] {
   )
   let exerciseByID = Dictionary(uniqueKeysWithValues: assembled.exercises.map { ($0.id, $0) })
   let dayByID = Dictionary(uniqueKeysWithValues: assembled.days.map { ($0.id, $0) })
+  return sets(inWeek: 1, assembled: assembled, exerciseByID: exerciseByID, dayByID: dayByID)
+    .map(\.restSeconds)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private func sets(
+  inWeek week: Int,
+  assembled: PlanPublishAssembler.Assembled,
+  exerciseByID: [UUID: PlanExercise]? = nil,
+  dayByID: [UUID: PlanDay]? = nil
+) -> [PlanSet] {
+  let exerciseByID =
+    exerciseByID ?? Dictionary(uniqueKeysWithValues: assembled.exercises.map { ($0.id, $0) })
+  let dayByID = dayByID ?? Dictionary(uniqueKeysWithValues: assembled.days.map { ($0.id, $0) })
   return assembled.sets
     .filter { set in
       guard
         let exercise = exerciseByID[set.planExerciseID],
         let day = dayByID[exercise.planDayID]
       else { return false }
-      return day.weekNumber == 1
+      return day.weekNumber == week
     }
     .sorted { $0.setNumber < $1.setNumber }
-    .map(\.restSeconds)
 }

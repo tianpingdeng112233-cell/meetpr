@@ -31,6 +31,26 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
+@Test func weekDerivationAppliesWeightIncreaseToPerSetTargets() {
+  let derived = WeekDerivation.deriveSetSpec(
+    forWeek: 2,
+    exerciseID: Spec007Fixtures.exerciseID,
+    w1: Spec007Fixtures.setSpec(
+      setCount: 2,
+      targetValue: 210,
+      perSetTargets: [
+        DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 210),
+        DraftSetTarget(targetReps: 5, intensityMode: .weight, targetValue: 175),
+      ]
+    ),
+    rules: [Spec007Fixtures.rule(.weightInc, increment: 5)]
+  )
+
+  #expect(derived.perSetTargets?.map(\.targetValue) == [215, 180])
+  #expect(derived.targetValue == 215)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
 @Test func weekDerivationAppliesWeightDecrease() {
   let derived = WeekDerivation.deriveSetSpec(
     forWeek: 2,

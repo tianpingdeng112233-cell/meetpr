@@ -15,11 +15,12 @@ struct Step4EnvironmentSection: View {
       OnboardingChipGrid(
         title: "每周哪几天能练?",
         options: TrainingDay.allCases.map { ($0, OnboardingLabels.label($0)) },
-        selection: $draft.trainingDays,
+        selection: trainingDaysBinding,
         maxSelection: 6,
         isHighlighted: highlighted.contains("training_days"),
         footer: daysFooter
       )
+      uncertainTrainingDaysButton
       tierPicker
       if draft.gymTier != nil {
         equipmentSection
@@ -46,11 +47,53 @@ struct Step4EnvironmentSection: View {
   }
 
   private var daysFooter: String {
+    if draft.trainingDaysUncertain == true {
+      return "已选：不确定"
+    }
     let count = draft.trainingDays.count
     if count < 2 {
       return "已选 \(count) 天/周 — 至少选 2 天"
     }
     return "已选 \(count) 天/周"
+  }
+
+  private var trainingDaysBinding: Binding<[TrainingDay]> {
+    Binding(
+      get: { draft.trainingDays },
+      set: { days in
+        draft.trainingDays = days
+        if !days.isEmpty {
+          draft.trainingDaysUncertain = nil
+        }
+      }
+    )
+  }
+
+  private var uncertainTrainingDaysButton: some View {
+    let isSelected = draft.trainingDaysUncertain == true
+    return Button {
+      draft.trainingDays = []
+      draft.trainingDaysUncertain = true
+    } label: {
+      HStack {
+        Text("不确定")
+          .font(Font.MeetPR.body)
+          .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+        Spacer()
+        if isSelected {
+          Image(systemName: "checkmark.circle.fill")
+            .foregroundStyle(Color.MeetPR.brandRed)
+        }
+      }
+      .padding(MeetPRSpacing.md)
+      .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.md)
+          .stroke(isSelected ? Color.MeetPR.brandRed : Color.MeetPR.border, lineWidth: 1)
+      }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+    }
+    .buttonStyle(.plain)
   }
 
   private var tierPicker: some View {

@@ -122,17 +122,18 @@ enum PlanPublishAssembler {
         rules: context.rules
       )
       for setNumber in 1...max(1, spec.setCount) {
+        let target = spec.target(forSetNumber: setNumber)
         let restSeconds = restSeconds(for: spec, setNumber: setNumber)
         sets.append(
           PlanSet(
             id: UUID(),
             planExerciseID: exerciseID,
             setNumber: setNumber,
-            targetReps: spec.targetReps,
-            targetRepsMax: spec.targetRepsMax,
-            intensityMode: spec.intensityMode,
-            targetValue: spec.targetValue,
-            setType: spec.setType,
+            targetReps: target.targetReps,
+            targetRepsMax: target.targetRepsMax,
+            intensityMode: target.intensityMode,
+            targetValue: target.targetValue,
+            setType: target.setType,
             restSeconds: restSeconds,
             createdAt: context.createdAt
           )
@@ -153,6 +154,8 @@ enum PlanPublishAssembler {
     if let restSeconds = spec.restSeconds {
       return restSeconds
     }
-    return RestDefaults.seconds(forRPE: spec.intensityMode == .rpe ? spec.targetValue : nil)
+    let target = spec.target(forSetNumber: setNumber)
+    return RestDefaults.seconds(
+      forRPE: target.intensityMode == .rpe ? target.targetValue : nil)
   }
 }
