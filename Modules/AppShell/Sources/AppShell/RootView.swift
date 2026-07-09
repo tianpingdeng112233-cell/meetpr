@@ -104,8 +104,14 @@ public struct RootView: View {
 
   public var body: some View {
     switch session.state {
-    case .anonymous, .authenticating:
+    case .anonymous:
       AuthFlowView()
+    case .authenticating:
+      VStack(spacing: 12) {
+        ProgressView()
+        Text("正在验证会话…")
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
     case .authenticated(let user):
       switch user.role {
       case .coach:

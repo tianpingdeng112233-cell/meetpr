@@ -24,6 +24,8 @@ public enum APIClientError: Error, Equatable, Sendable {
 
 public final class APIClient: Sendable {
   public typealias Transport = @Sendable (URLRequest) async throws -> APIResponse
+  public typealias UnauthorizedRecovery =
+    @Sendable (_ rejectedAccessToken: String) async throws -> String
 
   public static let shared = APIClient()
 
@@ -32,6 +34,7 @@ public final class APIClient: Sendable {
 
   private let transport: Transport
   private let errorContinuation: AsyncStream<APIError>.Continuation
+  private let unauthorizedRecoveryStore = UnauthorizedRecoveryStore()
 
   public init(
     environment: [String: String] = ProcessInfo.processInfo.environment,
@@ -52,10 +55,14 @@ public final class APIClient: Sendable {
     errorContinuation = stream.continuation
   }
 
+  public func bindUnauthorizedRecovery(_ recovery: @escaping UnauthorizedRecovery) {
+    unauthorizedRecoveryStore.set(recovery)
+  }
+
   public func get(_ endpoint: Endpoint) async throws -> Data {
     var request = URLRequest(url: url(for: endpoint))
     request.httpMethod = "GET"
-    return try await perform(request, emitsAuthInvalidOn401: false)
+    return try await perform(request)
   }
 
   public func post(_ endpoint: Endpoint, body: Data) async throws -> Data {
@@ -64,7 +71,7 @@ public final class APIClient: Sendable {
     request.httpBody = body
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("application/json", forHTTPHeaderField: "accept")
-    return try await perform(request, emitsAuthInvalidOn401: false)
+    return try await perform(request)
   }
 
   public func get<Response: Decodable>(
@@ -78,7 +85,7 @@ public final class APIClient: Sendable {
     authorize(&request, accessToken: accessToken)
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
-    let data = try await perform(request, emitsAuthInvalidOn401: true)
+    let data = try await perform(request, unauthorizedAccessToken: accessToken)
     return try MeetPRCodec.decoder.decode(responseType, from: data)
   }
 
@@ -95,7 +102,7 @@ public final class APIClient: Sendable {
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
-    let data = try await perform(request, emitsAuthInvalidOn401: true)
+    let data = try await perform(request, unauthorizedAccessToken: accessToken)
     return try MeetPRCodec.decoder.decode(responseType, from: data)
   }
 
@@ -109,7 +116,7 @@ public final class APIClient: Sendable {
     authorize(&request, accessToken: accessToken)
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
-    let data = try await perform(request, emitsAuthInvalidOn401: true)
+    let data = try await perform(request, unauthorizedAccessToken: accessToken)
     return try MeetPRCodec.decoder.decode(responseType, from: data)
   }
 
@@ -125,7 +132,7 @@ public final class APIClient: Sendable {
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
-    _ = try await perform(request, emitsAuthInvalidOn401: true)
+    _ = try await perform(request, unauthorizedAccessToken: accessToken)
   }
 
   public func patchNoContent(path: String, accessToken: String) async throws {
@@ -133,7 +140,7 @@ public final class APIClient: Sendable {
     request.httpMethod = "PATCH"
     authorize(&request, accessToken: accessToken)
 
-    _ = try await perform(request, emitsAuthInvalidOn401: true)
+    _ = try await perform(request, unauthorizedAccessToken: accessToken)
   }
 
   public func put<Request: Encodable, Response: Decodable>(
@@ -149,7 +156,7 @@ public final class APIClient: Sendable {
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
-    let data = try await perform(request, emitsAuthInvalidOn401: true)
+    let data = try await perform(request, unauthorizedAccessToken: accessToken)
     return try MeetPRCodec.decoder.decode(responseType, from: data)
   }
 
@@ -165,7 +172,7 @@ public final class APIClient: Sendable {
     request.setValue("application/json", forHTTPHeaderField: "content-type")
     request.setValue("application/json", forHTTPHeaderField: "accept")
 
-    _ = try await perform(request, emitsAuthInvalidOn401: true)
+    _ = try await perform(request, unauthorizedAccessToken: accessToken)
   }
 
   public func deleteNoContent(path: String, accessToken: String) async throws {
@@ -173,7 +180,7 @@ public final class APIClient: Sendable {
     request.httpMethod = "DELETE"
     authorize(&request, accessToken: accessToken)
 
-    _ = try await perform(request, emitsAuthInvalidOn401: true)
+    _ = try await perform(request, unauthorizedAccessToken: accessToken)
   }
 
   private func url(for endpoint: Endpoint) -> URL {
@@ -207,9 +214,23 @@ public final class APIClient: Sendable {
     request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "authorization")
   }
 
-  private func perform(_ request: URLRequest, emitsAuthInvalidOn401: Bool) async throws -> Data {
-    let response = try await transport(request)
-    guard !(emitsAuthInvalidOn401 && response.statusCode == 401) else {
+  private func perform(
+    _ request: URLRequest,
+    unauthorizedAccessToken: String? = nil
+  ) async throws -> Data {
+    var response = try await transport(request)
+
+    if response.statusCode == 401,
+      let rejectedAccessToken = unauthorizedAccessToken,
+      let recover = unauthorizedRecoveryStore.recovery()
+    {
+      let recoveredAccessToken = try await recover(rejectedAccessToken)
+      var retryRequest = request
+      authorize(&retryRequest, accessToken: recoveredAccessToken)
+      response = try await transport(retryRequest)
+    }
+
+    guard !(unauthorizedAccessToken != nil && response.statusCode == 401) else {
       errorContinuation.yield(.authInvalid)
       throw APIError.authInvalid
     }
@@ -228,4 +249,22 @@ public final class APIClient: Sendable {
     return APIResponse(data: data, statusCode: httpResponse.statusCode)
   }
 
+}
+
+private final class UnauthorizedRecoveryStore: @unchecked Sendable {
+  private let lock = NSLock()
+  private var handler: APIClient.UnauthorizedRecovery?
+
+  func set(_ handler: @escaping APIClient.UnauthorizedRecovery) {
+    lock.lock()
+    self.handler = handler
+    lock.unlock()
+  }
+
+  func recovery() -> APIClient.UnauthorizedRecovery? {
+    lock.lock()
+    let handler = handler
+    lock.unlock()
+    return handler
+  }
 }

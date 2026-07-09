@@ -243,6 +243,79 @@ import Testing
   #expect(await store.refreshToken() == refresh)
 }
 
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func rejectedAccessTokenRefreshesWithoutLoggingOut() async throws {
+  let repository = InMemoryAuthRepository()
+  let signup = try await repository.signup(
+    phone: "13800000001", password: "password123", role: .coach)
+  let store = InMemoryTokenStore(
+    access: signup.accessToken,
+    refresh: signup.refreshToken,
+    user: signup.user
+  )
+  let session = Session(auth: repository, tokenStore: store)
+  await session.bootstrap()
+  let rejectedAccessToken = try #require(await store.accessToken())
+
+  let recoveredAccessToken = try await session.recoverAccessToken(
+    rejectedAccessToken: rejectedAccessToken)
+
+  #expect(recoveredAccessToken != rejectedAccessToken)
+  #expect(await store.accessToken() == recoveredAccessToken)
+  #expect(session.state == .authenticated(signup.user))
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func staleUnauthorizedResponseReusesAlreadyRotatedAccessToken() async throws {
+  let repository = InMemoryAuthRepository()
+  let signup = try await repository.signup(
+    phone: "13800000001", password: "password123", role: .coach)
+  let store = InMemoryTokenStore(
+    access: signup.accessToken,
+    refresh: signup.refreshToken,
+    user: signup.user
+  )
+  let session = Session(auth: repository, tokenStore: store)
+  await session.bootstrap()
+  let staleAccessToken = try #require(await store.accessToken())
+  let currentAccessToken = try await session.recoverAccessToken(
+    rejectedAccessToken: staleAccessToken)
+  await repository.setForcedError(.network)
+
+  let reusedAccessToken = try await session.recoverAccessToken(
+    rejectedAccessToken: staleAccessToken)
+
+  #expect(reusedAccessToken == currentAccessToken)
+  #expect(session.state == .authenticated(signup.user))
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func rejectedAccessTokenWithInvalidRefreshLogsOut() async throws {
+  let repository = InMemoryAuthRepository()
+  let signup = try await repository.signup(
+    phone: "13800000001", password: "password123", role: .coach)
+  let store = InMemoryTokenStore(
+    access: signup.accessToken,
+    refresh: signup.refreshToken,
+    user: signup.user
+  )
+  let session = Session(auth: repository, tokenStore: store)
+  await session.bootstrap()
+  let rejectedAccessToken = try #require(await store.accessToken())
+  await store.save(access: rejectedAccessToken, refresh: "invalid-refresh")
+
+  await #expect(throws: AuthRepositoryError.self) {
+    _ = try await session.recoverAccessToken(rejectedAccessToken: rejectedAccessToken)
+  }
+
+  #expect(session.state == .anonymous)
+  #expect(await store.accessToken() == nil)
+  #expect(await store.refreshToken() == nil)
+}
+
 private actor LogoutSpy {
   private var logoutCount = 0
 
