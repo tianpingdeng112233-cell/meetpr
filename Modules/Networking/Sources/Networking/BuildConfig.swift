@@ -1,7 +1,9 @@
 import Foundation
 
 public enum BuildConfig {
-  public static let productionBackendBaseURL = "http://121.40.160.241:3000"
+  /// Release defaults to the public TLS endpoint. Deploy-time DNS/certificate
+  /// provisioning must point this hostname at the API load balancer.
+  public static let productionBackendBaseURL = "https://api.meetpr.app"
 
   public static var backendBaseURL: URL {
     backendBaseURL(environment: ProcessInfo.processInfo.environment)
@@ -9,13 +11,13 @@ public enum BuildConfig {
 
   public static func backendBaseURL(environment: [String: String]) -> URL {
     if let url = configuredBaseURL(environment: environment) {
-      return url
+      return validatedHTTPSURL(url)
     }
 
     guard let url = URL(string: productionBackendBaseURL) else {
       preconditionFailure("Production backend base URL is invalid.")
     }
-    return url
+    return validatedHTTPSURL(url)
   }
 
   static func configuredBaseURL(environment: [String: String]) -> URL? {
@@ -32,5 +34,15 @@ public enum BuildConfig {
       return nil
     }
     return URL(string: baseURLString)
+  }
+
+  private static func validatedHTTPSURL(_ url: URL) -> URL {
+    guard
+      url.scheme?.lowercased() == "https",
+      url.host?.isEmpty == false
+    else {
+      preconditionFailure("MeetPR backend must use a valid HTTPS URL.")
+    }
+    return url
   }
 }
