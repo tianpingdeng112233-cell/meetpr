@@ -14,6 +14,7 @@ private func point(
   e1RM: Double,
   reps: Int = 5,
   rpe: Double? = 8,
+  confidence: E1RMConfidence = .normal,
   base: Date = Date(timeIntervalSince1970: 1_782_000_000)
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
@@ -25,7 +26,8 @@ private func point(
     e1RMKg: e1RM,
     sourceWeightKg: e1RM * 0.85,
     sourceReps: reps,
-    sourceRPE: rpe
+    sourceRPE: rpe,
+    confidence: confidence
   )
 }
 
@@ -88,4 +90,40 @@ private func point(
   )
 
   #expect(series.currentKg == 190)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func lowConfidenceSpikeIsQuarantinedFromBestCurrentAndLast() {
+  // Spec 050 §5: a flagged (.low) typo set stays visible as scatter but never
+  // becomes the headline — rolling max can't dampen an upward spike, the guard does.
+  let series = E1RMSeries.build(
+    points: [
+      point(daysAgo: 10, e1RM: 180),
+      point(daysAgo: 5, e1RM: 178),
+      point(daysAgo: 1, e1RM: 320, reps: 3, rpe: 8.5, confidence: .low),
+    ],
+    family: .squat
+  )
+
+  #expect(series.currentKg == 180)  // .low 320 excluded from rolling max
+  #expect(series.best?.valueKg == 180)  // historical best ignores the spike
+  #expect(series.last?.valueKg == 178)  // most-recent *trusted* point, not the spike
+  #expect(series.rawEligible.count == 3)  // honest scatter still shows all three
+  #expect(series.rawEligible.contains { $0.valueKg == 320 })
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func smoothedHistoryExcludesLowConfidencePoints() {
+  // The chart consumers (Dashboard / Growth) read smoothedHistory — it must
+  // drop the quarantined spike too, not just E1RMSeries.currentKg.
+  let history = E1RMSeries.smoothedHistory(
+    points: [
+      point(daysAgo: 10, e1RM: 180),
+      point(daysAgo: 1, e1RM: 320, reps: 3, rpe: 8.5, confidence: .low),
+    ],
+    family: .squat
+  )
+
+  #expect(history.count == 1)
+  #expect(history.first?.e1RMKg == 180)
 }

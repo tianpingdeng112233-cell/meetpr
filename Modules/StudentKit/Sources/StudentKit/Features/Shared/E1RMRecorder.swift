@@ -41,43 +41,62 @@ struct E1RMRecorder: Sendable {
         weightKg: weight, reps: input.reps, rpe: rpeValue)
     else { return nil }
 
-    let point = E1RMHistoryPoint(
-      id: UUID(),
-      studentId: studentID,
-      exerciseId: exerciseID,
-      setLogId: input.setLogID,
-      computedAt: now(),
-      e1RMKg: estimatedOneRepMaxKg,
-      sourceWeightKg: weight,
-      sourceReps: input.reps,
-      sourceRPE: rpeValue
-    )
     do {
-      // Baseline BEFORE inserting the new point, over the full history
-      // (.distantFuture): a strictly-earlier filter at point.computedAt would
-      // miss a same-timestamp sibling and double-fire PRs (Codex review P1).
-      let previousMax = try await e1rm.maxBefore(
+      // Baseline over prior *trusted* points (maxBefore filters `.normal`): a
+      // quarantined spike must not become the bar the next PR has to clear.
+      // Full history (.distantFuture) — a strictly-earlier filter at
+      // point.computedAt would miss a same-timestamp sibling and double-fire
+      // PRs (Codex review P1).
+      let previousNormalMax = try await e1rm.maxBefore(
         studentId: studentID, exerciseId: exerciseID, before: .distantFuture)
+
+      // Graded anomaly guard (spec 050 §5): a single mis-logged set (175→275
+      // fat-finger) is quarantined as `.low` — kept for honest scatter, kept
+      // out of current/best/PR. Phase 2 will interrupt to confirm suspect
+      // entries; Phase 1 stores them silently.
+      let verdict = E1RMAnomalyClassifier.classify(
+        newE1RMKg: estimatedOneRepMaxKg, priorNormalBestKg: previousNormalMax)
+      let point = E1RMHistoryPoint(
+        id: UUID(),
+        studentId: studentID,
+        exerciseId: exerciseID,
+        setLogId: input.setLogID,
+        computedAt: now(),
+        e1RMKg: estimatedOneRepMaxKg,
+        sourceWeightKg: weight,
+        sourceReps: input.reps,
+        sourceRPE: rpeValue,
+        confidence: verdict == .normal ? .normal : .low
+      )
       try await e1rm.recordPoint(point)
 
-      let band = max(0.5, (previousMax ?? 0) * 0.03)
-      if estimatedOneRepMaxKg > (previousMax ?? 0) + band {
-        let event = PRBreakthroughEvent(
-          id: UUID(),
-          studentId: studentID,
-          exerciseId: exerciseID,
-          pointId: point.id,
-          breakthroughE1RMKg: estimatedOneRepMaxKg,
-          previousMaxE1RMKg: previousMax ?? 0,
-          occurredAt: point.computedAt,
-          acknowledgedAt: nil
-        )
-        try await e1rm.recordPR(event)
-        return event
-      }
+      // Only a trusted point that clears the noise band is a PR.
+      guard verdict == .normal else { return nil }
+      return try await recordPRIfCleared(point: point, previousNormalMax: previousNormalMax)
     } catch {
       return nil
     }
-    return nil
+  }
+
+  /// Fires a PR event when the point clears the noise band over the prior
+  /// trusted best: max(0.5 kg, best × 3%) — a same-condition wobble is not
+  /// a record.
+  private func recordPRIfCleared(
+    point: E1RMHistoryPoint, previousNormalMax: Double?
+  ) async throws -> PRBreakthroughEvent? {
+    let band = max(0.5, (previousNormalMax ?? 0) * 0.03)
+    guard point.e1RMKg > (previousNormalMax ?? 0) + band else { return nil }
+    let event = PRBreakthroughEvent(
+      id: UUID(),
+      studentId: point.studentId,
+      exerciseId: point.exerciseId,
+      pointId: point.id,
+      breakthroughE1RMKg: point.e1RMKg,
+      previousMaxE1RMKg: previousNormalMax ?? 0,
+      occurredAt: point.computedAt,
+      acknowledgedAt: nil
+    )
+    try await e1rm.recordPR(event)
+    return event
   }
 }

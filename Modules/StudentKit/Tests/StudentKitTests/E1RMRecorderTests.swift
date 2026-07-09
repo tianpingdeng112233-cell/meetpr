@@ -52,11 +52,12 @@ private func seededPoint(e1RM: Double) -> E1RMHistoryPoint {
 @Test func clearingTheNoiseBandFiresAPR() async {
   let (recorder, _) = makeRecorder(seed: [seededPoint(e1RM: 200)])
 
-  // A big jump (well past 206) fires.
+  // A clean +6% PR (165kg×5@8 ≈ 211 e1RM) clears the 206 band and fires. §5
+  // leaves sub-anomaly PRs alone; a 190×5@9 (~232, +16%) would now be quarantined.
   let event = await recorder.record(
     E1RMRecorder.Input(
       studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
-      weightKg: 190, reps: 5, rpe: 9, failed: false))
+      weightKg: 165, reps: 5, rpe: 8, failed: false))
 
   #expect(event != nil)
   #expect((event?.previousMaxE1RMKg ?? 0) == 200)
@@ -96,4 +97,56 @@ private func seededPoint(e1RM: Double) -> E1RMHistoryPoint {
       weightKg: 100, reps: 5, rpe: 8, failed: false))
 
   #expect(event != nil)
+}
+
+// Spec 050 §5: graded anomaly guard.
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func suspectSpikeIsQuarantinedNotCelebrated() async throws {
+  // Best 200; a 275kg×3@8.5 fat-finger (should be 175) estimates ~320 e1RM (+60%).
+  let (recorder, repo) = makeRecorder(seed: [seededPoint(e1RM: 200)])
+
+  let event = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 275, reps: 3, rpe: 8.5, failed: false))
+
+  #expect(event == nil)  // no fake PR celebration
+  let history = try await repo.fetchHistory(studentId: student, exerciseId: squat)
+  let recorded = try #require(history.last)
+  #expect(recorded.confidence == .low)  // quarantined, kept for honest scatter
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func softAnomalyIsLowConfidenceAndNoPR() async throws {
+  // Best 200; +12% (175kg×5@8 ≈ 224 e1RM) is unusual for one session → downweight.
+  let (recorder, repo) = makeRecorder(seed: [seededPoint(e1RM: 200)])
+
+  let event = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 175, reps: 5, rpe: 8, failed: false))
+
+  #expect(event == nil)
+  let history = try await repo.fetchHistory(studentId: student, exerciseId: squat)
+  #expect(try #require(history.last).confidence == .low)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+@Test func quarantinedSpikeDoesNotPoisonThePRBaseline() async {
+  // The core P0-5 fix: a quarantined +60% spike must not freeze the PR system.
+  // A later legit +5% PR still fires against the real 200, not the phantom 320.
+  let (recorder, _) = makeRecorder(seed: [seededPoint(e1RM: 200)])
+
+  _ = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 275, reps: 3, rpe: 8.5, failed: false))
+  let realPR = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: student, exerciseID: squat, family: .squat, setLogID: UUID(),
+      weightKg: 164, reps: 5, rpe: 8, failed: false))
+
+  #expect(realPR != nil)
+  #expect((realPR?.previousMaxE1RMKg ?? 0) == 200)  // baseline used 200, not 320
 }
