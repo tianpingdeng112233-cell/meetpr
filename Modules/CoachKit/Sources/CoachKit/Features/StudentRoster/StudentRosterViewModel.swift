@@ -109,6 +109,19 @@ final class StudentRosterViewModel {
     }
   }
 
+  func applyRenamedStudent(_ renamed: CoachStudentSummary) {
+    rows = rows.map { row in
+      guard row.student.id == renamed.id else { return row }
+      return StudentRosterRowModel(
+        student: renamed,
+        plannedTrainingDays: row.plannedTrainingDays,
+        completedTrainingDays: row.completedTrainingDays,
+        lastActiveAt: row.lastActiveAt,
+        triageSignals: row.triageSignals
+      )
+    }
+  }
+
   func refresh() async {
     state = .loading
     do {

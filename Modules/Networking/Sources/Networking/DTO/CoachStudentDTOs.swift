@@ -8,6 +8,14 @@ public struct CoachStudentsResponseDTO: Codable, Equatable, Sendable {
   }
 }
 
+public struct RenameCoachStudentRequestDTO: Codable, Equatable, Sendable {
+  public let displayName: String
+
+  public init(displayName: String) {
+    self.displayName = displayName
+  }
+}
+
 /// The roster row's active-evaluation window (backend fix #20, spec 033 D2
 /// revision): present exactly while the pair has an uncompleted evaluation
 /// period. iOS derives the remaining-time badge from `expectedEndAt` plus a
