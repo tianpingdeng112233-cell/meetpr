@@ -225,6 +225,7 @@ public struct RootView: View {
     }
     return StudentRootView(
       studentID: user.id,
+      canShiftPlanDays: user.role == .coachedStudent,
       plans: studentPlans,
       logs: logsForUser,
       feedback: studentFeedback,

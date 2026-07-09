@@ -52,6 +52,37 @@ import Testing
   #expect(signals.isEmpty)
 }
 
+@Test func notTrainedSignalDoesNotCountShiftedOriginalDates() {
+  let plan = StudentPlanView(
+    cycleID: stableTriageUUID(80),
+    weekIndex: 1,
+    startDate: triageDate(offset: 0),
+    days: [
+      StudentPlanDay(
+        id: stableTriageUUID(81),
+        date: triageDate(offset: 0),
+        shiftedToDate: triageDate(offset: 4),
+        exercises: [CoachStudentFeatureFixtures.exercise()]
+      ),
+      StudentPlanDay(
+        id: stableTriageUUID(82),
+        date: triageDate(offset: 1),
+        shiftedToDate: triageDate(offset: 5),
+        exercises: [CoachStudentFeatureFixtures.exercise()]
+      ),
+    ]
+  )
+
+  let signals = StudentTriageSignalCalculator.signals(
+    plan: plan,
+    logs: [],
+    feedback: [],
+    now: triageDate(offset: 3)
+  )
+
+  #expect(signals.isEmpty)
+}
+
 @Test func awaitingReplySignalReusesRecentLogWithoutFeedbackRule() {
   let recentLog = CoachStudentFeatureFixtures.log(loggedAt: triageDate(offset: 2, hour: 1))
   let signals = StudentTriageSignalCalculator.signals(
