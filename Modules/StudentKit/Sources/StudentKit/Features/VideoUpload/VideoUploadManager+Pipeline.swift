@@ -193,13 +193,17 @@ extension VideoUploadManager {
       return
     }
 
-    // complete-409 means the backend row is terminal; abort would just 409 too.
-    if let remoteID = record.remoteAttachmentID,
-      (error as? VideoUploadError) != .completeConflict
-    {
-      try? await service.abort(attachmentID: remoteID)
+    // Failure can occur after the backend accepted an attachment. Delete it,
+    // rather than only aborting multipart work, so no orphaned private object
+    // remains. Preserve the id if the deletion itself cannot be confirmed.
+    if let remoteID = record.remoteAttachmentID {
+      do {
+        try await service.delete(attachmentID: remoteID)
+        record.remoteAttachmentID = nil
+      } catch {
+        // A later retry/remove will attempt the same remote deletion again.
+      }
     }
-    record.remoteAttachmentID = nil
     record.status = .failed
     try? await repository.save(record)
     broadcast(.updated(record, progress: nil))

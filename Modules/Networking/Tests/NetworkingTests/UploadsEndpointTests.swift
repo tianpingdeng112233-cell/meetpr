@@ -44,6 +44,8 @@ private let ownerID = UUID(uuidString: "00000000-0000-4000-8000-000000000602")!
   #expect(completed.filename == nil)
 
   try await client.abortUpload(attachmentID: attachmentID, accessToken: "token")
+  try await client.deleteUpload(attachmentID: attachmentID, accessToken: "token")
+  try await client.reconcileUpload(attachmentID: attachmentID, accessToken: "token")
 
   let playback = try await client.attachmentURL(attachmentID: attachmentID, accessToken: "token")
   #expect(playback.url == "https://bucket.oss.test/key?signature=abc")
@@ -55,6 +57,8 @@ private let ownerID = UUID(uuidString: "00000000-0000-4000-8000-000000000602")!
       "POST /uploads/initiate",
       "POST /uploads/\(attachmentID.uuidString)/complete",
       "POST /uploads/\(attachmentID.uuidString)/abort",
+      "DELETE /uploads/\(attachmentID.uuidString)",
+      "POST /uploads/\(attachmentID.uuidString)/reconcile",
       "GET /uploads/\(attachmentID.uuidString)/url",
     ]
   )
@@ -175,6 +179,12 @@ private enum UploadResponseStub {
       return APIResponse(data: attachmentBody, statusCode: 200)
     }
     if path.hasSuffix("/abort") {
+      return APIResponse(data: Data(), statusCode: 204)
+    }
+    if request.httpMethod == "DELETE" {
+      return APIResponse(data: Data(), statusCode: 204)
+    }
+    if path.hasSuffix("/reconcile") {
       return APIResponse(data: Data(), statusCode: 204)
     }
     if path.hasSuffix("/url") {
