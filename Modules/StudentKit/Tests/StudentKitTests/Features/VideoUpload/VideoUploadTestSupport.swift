@@ -8,6 +8,7 @@ import RepositoryContracts
 enum MockServiceError: Error, Equatable {
   case partFailed
   case initiateFailed
+  case deleteFailed
 }
 
 struct TimeoutError: Error {}
@@ -35,9 +36,11 @@ actor MockVideoUploadService: VideoUploadService {
   private(set) var calls: [String] = []
   private(set) var partAttempts: [Int: Int] = [:]
   private(set) var abortCount = 0
+  private(set) var deleteCount = 0
 
   private var partFailuresRemaining: [Int: Int] = [:]
   private var completeError: Error?
+  private var deleteError: Error?
   private var hangOnParts = false
 
   func setPartFailures(_ failures: [Int: Int]) {
@@ -46,6 +49,10 @@ actor MockVideoUploadService: VideoUploadService {
 
   func setCompleteError(_ error: Error?) {
     completeError = error
+  }
+
+  func setDeleteError(_ error: Error?) {
+    deleteError = error
   }
 
   func setHangOnParts(_ hang: Bool) {
@@ -101,6 +108,14 @@ actor MockVideoUploadService: VideoUploadService {
   func abort(attachmentID: UUID) async throws {
     calls.append("abort")
     abortCount += 1
+  }
+
+  func delete(attachmentID: UUID) async throws {
+    calls.append("delete")
+    deleteCount += 1
+    if let deleteError {
+      throw deleteError
+    }
   }
 }
 

@@ -35,6 +35,26 @@ extension APIClient {
     )
   }
 
+  /// Permanently removes an owner-owned attachment and its OSS object.
+  /// The client only clears its local record after this succeeds.
+  public func deleteUpload(attachmentID: UUID, accessToken: String) async throws {
+    try await deleteNoContent(
+      path: "/uploads/\(attachmentID.uuidString)",
+      accessToken: accessToken
+    )
+  }
+
+  /// Recovers a server-side deletion left in its durable deleting state by
+  /// an interrupted process. Normal clients call this only after DELETE reports
+  /// that exact state.
+  public func reconcileUpload(attachmentID: UUID, accessToken: String) async throws {
+    try await postNoContent(
+      path: "/uploads/\(attachmentID.uuidString)/reconcile",
+      body: EmptyWireBody(),
+      accessToken: accessToken
+    )
+  }
+
   /// `GET /uploads/:id/url` → short-lived presigned GET URL for playback.
   public func attachmentURL(
     attachmentID: UUID,

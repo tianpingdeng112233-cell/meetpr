@@ -61,7 +61,9 @@ public actor VideoUploadManager {
     }
 
     for existing in (try? await repository.fetch(setLogID: setLogID)) ?? [] {
-      await remove(attachmentID: existing.id)
+      guard await remove(attachmentID: existing.id) else {
+        throw VideoUploadError.remoteDeleteFailed
+      }
     }
 
     let id = UUID()
@@ -82,9 +84,8 @@ public actor VideoUploadManager {
     return record
   }
 
-  /// Re-runs a `failed` upload from scratch: the stale backend row (if any)
-  /// stays `uploading` server-side per backend spec 004; a fresh initiate
-  /// produces a new attachment row.
+  /// Re-runs a failed upload from scratch. If a remote row survived the
+  /// previous failure, it must be deleted before a fresh initiate starts.
   public func retry(attachmentID: UUID) async {
     guard activeUploads[attachmentID] == nil,
       var record = try? await repository.fetch(id: attachmentID),
@@ -96,6 +97,15 @@ public actor VideoUploadManager {
       return
     }
 
+    if let remoteID = record.remoteAttachmentID {
+      do {
+        try await service.delete(attachmentID: remoteID)
+      } catch {
+        // Keep the stale remote id so retry can attempt its deletion again.
+        broadcast(.updated(record, progress: nil))
+        return
+      }
+    }
     record.remoteAttachmentID = nil
     record.status = .pending
     try? await repository.save(record)
@@ -103,22 +113,28 @@ public actor VideoUploadManager {
     startUploadTask(recordID: attachmentID, sourceURL: nil)
   }
 
-  /// Cancels any in-flight upload, best-effort aborts the backend upload, and
-  /// deletes the local record + file. An `uploaded` attachment only loses its
-  /// local record — V0.1 has no backend DELETE endpoint.
-  public func remove(attachmentID: UUID) async {
+  /// Cancels any in-flight upload, then confirms remote deletion before
+  /// clearing its local record and exported file.
+  @discardableResult
+  public func remove(attachmentID: UUID) async -> Bool {
     if let task = activeUploads[attachmentID] {
       task.cancel()
       activeUploads[attachmentID] = nil
     }
-    guard let record = try? await repository.fetch(id: attachmentID) else { return }
+    guard let record = try? await repository.fetch(id: attachmentID) else { return true }
 
-    if let remoteID = record.remoteAttachmentID, record.status != .uploaded {
-      try? await service.abort(attachmentID: remoteID)
+    if let remoteID = record.remoteAttachmentID {
+      do {
+        try await service.delete(attachmentID: remoteID)
+      } catch {
+        broadcast(.updated(record, progress: record.status == .uploaded ? 1 : nil))
+        return false
+      }
     }
     try? FileManager.default.removeItem(at: fileURL(for: record))
     try? await repository.delete(id: attachmentID)
     broadcast(.removed(setLogID: record.setLogID, attachmentID: attachmentID))
+    return true
   }
 
   /// App-launch recovery: anything still `pending`/`uploading` was interrupted
@@ -129,8 +145,15 @@ public actor VideoUploadManager {
     where record.status != .uploaded && record.status != .failed
       && activeUploads[record.id] == nil
     {
+      if let remoteID = record.remoteAttachmentID {
+        do {
+          try await service.delete(attachmentID: remoteID)
+          record.remoteAttachmentID = nil
+        } catch {
+          // Retain the id: retry or explicit removal can try again later.
+        }
+      }
       record.status = .failed
-      record.remoteAttachmentID = nil
       try? await repository.save(record)
       broadcast(.updated(record, progress: nil))
     }
