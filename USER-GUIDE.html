@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetPR 使用教程 · 教练 + 学员</title>
+<style>
+  :root{
+    --bg:#000;--s1:#0e0e0e;--s2:#161616;--s3:#1f1f1f;--line:#262626;--line2:#3a3a3a;
+    --red:#e5221e;--redsoft:rgba(229,34,30,.14);--ink:#fff;--mut:#b5b5b5;--dim:#737373;
+    --green:#22b24c;--amber:#e0a82e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,"PingFang SC",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px}
+  header{text-align:center;padding:54px 22px 30px;border-bottom:1px solid var(--line)}
+  header h1{margin:0 0 8px;font-size:30px;letter-spacing:.5px}
+  header .sub{color:var(--mut);font-size:14px}
+  header .badge{display:inline-block;margin-top:14px;padding:4px 12px;border-radius:999px;
+    background:var(--redsoft);color:var(--red);font-size:13px;font-weight:600}
+  .role{padding:44px 0 8px}
+  .role>h2{font-size:23px;margin:0 0 6px;padding-left:13px;border-left:4px solid var(--red)}
+  .role>.lead{color:var(--mut);font-size:14px;margin:0 0 22px;padding-left:13px}
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px;padding:14px;border:1px solid var(--line);
+    border-radius:14px;background:var(--s1)}
+  .tabs .t{font-size:13px;color:var(--mut);background:var(--s3);border-radius:9px;padding:6px 11px}
+  .tabs .t b{color:var(--ink)}
+  .step{display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+  .step:first-of-type{border-top:none}
+  .num{flex:none;width:34px;height:34px;border-radius:10px;background:var(--redsoft);color:var(--red);
+    font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(229,34,30,.3)}
+  .step .body{flex:1}
+  .step h3{margin:3px 0 5px;font-size:16px}
+  .step p{margin:0 0 8px;color:var(--mut);font-size:14px}
+  .step .k{color:var(--ink);font-weight:600}
+  .chip{display:inline-block;background:var(--s2);border:1px solid var(--line);border-radius:7px;
+    padding:1px 7px;font-size:12.5px;color:var(--ink);margin:0 2px;white-space:nowrap}
+  ul.mini{margin:6px 0 0;padding-left:18px;color:var(--mut);font-size:13.5px}
+  ul.mini li{margin:3px 0}
+  .tip{margin-top:10px;background:var(--s1);border:1px solid var(--line);border-left:3px solid var(--amber);
+    border-radius:8px;padding:9px 12px;font-size:13px;color:var(--mut)}
+  .tip b{color:var(--ink)}
+  footer{text-align:center;color:var(--dim);font-size:12.5px;padding:36px 22px 56px;border-top:1px solid var(--line);margin-top:30px}
+  footer a{color:var(--red);text-decoration:none}
+</style></head><body>
+<header>
+  <h1>MeetPR 使用教程</h1>
+  <div class="sub">力量举 · 教练 + 学员双端 · 配合交互演示 <code>DEMO-SHOWCASE.html</code> 边点边看</div>
+  <div class="badge">1.0 (5)</div>
+</header>
+
+<div class="wrap">
+
+<!-- ============================ 教练 ============================ -->
+<section class="role">
+  <h2>一、教练使用教程</h2>
+  <p class="lead">招募学员 → 编排计划 → 日常盯练 → 给反馈。</p>
+
+  <div class="tabs">
+    <span class="t"><b>今日</b> 分诊:谁逾期/待关注</span>
+    <span class="t"><b>学员</b> 花名册 + 详情</span>
+    <span class="t"><b>编排</b> 给学员写计划</span>
+    <span class="t"><b>接收</b> 新学员 + 训练视频</span>
+    <span class="t"><b>我的</b> 邀请码 + 资料</span>
+  </div>
+
+  <div class="step"><div class="num">1</div><div class="body">
+    <h3>招募学员:发邀请码</h3>
+    <p>进 <span class="chip">我的</span> → <span class="k">我的邀请码</span>,生成一张<b>永久码</b>分发给学员(学员注册后输入它来绑定你)。</p>
+    <ul class="mini">
+      <li>一张永久码可被多名学员重复使用,显示「已使用 N 次」。</li>
+      <li>需要作废时「重新生成」或「撤销」—— 旧码立即失效。</li>
+    </ul>
+  </div></div>
+
+  <div class="step"><div class="num">2</div><div class="body">
+    <h3>接收新学员</h3>
+    <p>学员用你的码发来请求后,到 <span class="chip">接收</span> → <span class="k">新学员</span> 查看其资料(备赛日期、训练目标、想突破的点、附带资料),确认后 <span class="k">接收</span>,或 <span class="k">拒绝</span>。</p>
+    <div class="tip">资料没填全会标「资料未填写完成」,可先让学员补齐再接收。</div>
+  </div></div>
+
+  <div class="step"><div class="num">3</div><div class="body">
+    <h3>编排训练计划(核心)</h3>
+    <p>进 <span class="chip">编排</span>,按步骤向导走完即发布给学员:</p>
+    <ul class="mini">
+      <li><b>STEP 0</b> 为谁创建计划?— 选学员</li>
+      <li><b>STEP 1</b> 这次写几周?— 选周期</li>
+      <li><b>STEP 2</b> 定 SBD 频率 — 三大项每周各练几次、排训练日</li>
+      <li><b>STEP 3</b> 选择主项及变式 — 深蹲/卧推/硬拉及其变式</li>
+      <li><b>STEP 4</b> 添加辅助动作 — 从动作库选(支持搜索)</li>
+      <li><b>STEP 5</b> 递进 / 递减规则 — 每周怎么加/减,未覆盖的周默认同上周</li>
+      <li><b>周卡片</b> 逐周强度 — 左右滑切周,逐组填重量/次数/RPE,确认后发布</li>
+    </ul>
+    <div class="tip">已有 Excel 存量计划?教练端支持<b>导入 Excel</b>,自动解析成已发布计划,省去重输。</div>
+  </div></div>
+
+  <div class="step"><div class="num">4</div><div class="body">
+    <h3>日常盯练:今日分诊</h3>
+    <p><span class="chip">今日</span> 一眼看出谁需要关注:<span class="k">新学员请求</span>、<span class="k">待关注</span>(如「3 天未训练」)、以及<span class="k">学员 · 今日</span>训练概览。点任一学员进详情。</p>
+  </div></div>
+
+  <div class="step"><div class="num">5</div><div class="body">
+    <h3>学员花名册 + 详情</h3>
+    <p><span class="chip">学员</span> 按 <span class="k">活跃 / 异常</span> 分组,每人显示本周完成度与计划状态。点进去看该学员的执行记录、e1RM 成长、历史与档案。</p>
+  </div></div>
+
+  <div class="step"><div class="num">6</div><div class="body">
+    <h3>看训练视频、给反馈</h3>
+    <p><span class="chip">接收</span> → <span class="k">训练视频</span>:学员上传的组视频汇总在这里,逐条查看并回复文字反馈,学员会在「今日 / 成长」看到。</p>
+  </div></div>
+</section>
+
+<!-- ============================ 学员 ============================ -->
+<section class="role">
+  <h2>二、学员使用教程</h2>
+  <p class="lead">绑定教练 → 看今日安排 → 执行并逐组记录 → 看成长与反馈。</p>
+
+  <div class="tabs">
+    <span class="t"><b>今日</b> 总览 + 教练反馈 + 倒计时</span>
+    <span class="t"><b>训练</b> 执行 + 逐组记录</span>
+    <span class="t"><b>成长</b> e1RM 曲线 + 历史</span>
+    <span class="t"><b>我的</b> 资料 + 设置</span>
+  </div>
+
+  <div class="step"><div class="num">1</div><div class="body">
+    <h3>加入教练</h3>
+    <p>首次进入会让你 <span class="k">输入教练邀请码</span> —— 向你的教练索取后填入,点发送,显示 <span class="k">已发送绑定请求</span>;教练在他那端「接收」后即绑定成功。</p>
+    <div class="tip">「没有教练?」也能先自己用,后续拿到码再绑定。</div>
+  </div></div>
+
+  <div class="step"><div class="num">2</div><div class="body">
+    <h3>今日:今天练什么</h3>
+    <p><span class="chip">今日</span> 顶部是本周进度与今天的训练日(如 <span class="chip">W1D4</span>),还有 <span class="k">教练反馈</span>、<span class="k">硬拉 E1RM 90 天</span>曲线、<span class="k">距比赛</span>倒计时、体重。点 <span class="k">继续训练</span> 直接进入今天的训练。</p>
+  </div></div>
+
+  <div class="step"><div class="num">3</div><div class="body">
+    <h3>执行训练 + 逐组记录(核心)</h3>
+    <p>进 <span class="chip">训练</span>,顶部日历选日子,卡片显示当前组的<b>目标重量 × 次数 @ RPE</b>。每完成一组点 <span class="k">记录此组</span>,弹出录入页:</p>
+    <ul class="mini">
+      <li><b>杠铃配重图自动算</b> —— 按空杠 20kg + 每侧 2.5kg 卡扣换算该上哪些片(如 85kg = 25 + 5 + 卡扣)。</li>
+      <li>用大圆形 <span class="chip">−</span> / <span class="chip">+</span> 微调:重量 ±2.5、次数 ±1、RPE ±0.5(5–10)。</li>
+      <li>可<b>附本组训练视频</b>发给教练复盘。</li>
+      <li>完成点绿色 <span class="k">完成本组</span>;没推起来点黄色 <span class="k">未完成 / 失败</span>(失败组也要如实记)。</li>
+    </ul>
+    <div class="tip">组间有<b>休息计时</b>(<span class="chip">−30s</span> / <span class="chip">跳过</span> / <span class="chip">+30s</span>);动作名下方的 <b>上次 / 最佳</b> 是你的参考线。</div>
+  </div></div>
+
+  <div class="step"><div class="num">4</div><div class="body">
+    <h3>看成长</h3>
+    <p><span class="chip">成长</span> 看三大项 <span class="k">e1RM 估算 1RM</span> 曲线(可切 1月/3月/6月/全部)、每周容量与强度,以及历史训练回看。</p>
+  </div></div>
+
+  <div class="step"><div class="num">5</div><div class="body">
+    <h3>收教练反馈</h3>
+    <p>教练的文字 / 视频反馈会出现在 <span class="chip">今日</span> 的反馈卡和通知里,点进去看完整复盘。</p>
+  </div></div>
+</section>
+
+</div>
+<footer>
+  配套交互演示:<a href="./DEMO-SHOWCASE.html">DEMO-SHOWCASE.html</a> · 截图历史:DEMO-SHOWCASE / RELEASES.md · MeetPR 1.0 (5)
+</footer>
+</body></html>

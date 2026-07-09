@@ -85,7 +85,10 @@ public final class VideoAttachmentViewModel {
 
   public func remove(setLogID: UUID) async {
     guard let state = rowStates[setLogID] else { return }
-    await manager.remove(attachmentID: state.attachment.id)
+    lastErrorMessage = nil
+    if !(await manager.remove(attachmentID: state.attachment.id)) {
+      lastErrorMessage = "视频删除失败，未移除。请检查网络后重试"
+    }
   }
 
   // MARK: - Internals
@@ -114,6 +117,8 @@ public final class VideoAttachmentViewModel {
       "视频超过 \(Int(maxSeconds)) 秒上限,请截短后再上传"
     case .exportFailed:
       "视频转码失败,请重试"
+    case .remoteDeleteFailed:
+      "旧视频删除失败，未开始新上传。请检查网络后重试"
     default:
       "视频处理失败,请重试"
     }

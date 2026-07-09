@@ -42,6 +42,39 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func changingStudentNeverRetargetsTheCurrentDraft() async throws {
+  let store = try PlanningFixtures.store()
+  let viewModel = PlanningViewModel(
+    repository: PlanningFixtures.repository(),
+    draftStore: store
+  )
+  let students = PlanningFixtures.students()
+  let first = students[1]
+  let second = students[2]
+  await viewModel.bootstrap()
+
+  viewModel.selectStudent(first)
+  try await viewModel.goNext()
+  viewModel.selectDuration(4)
+  try await viewModel.goNext()
+  viewModel.sbdFrequency = SBDFrequency(squat: 1, bench: 1, deadlift: 1)
+  viewModel.toggleAssignment(dayOfWeek: 1, liftFamily: .squat)
+  viewModel.toggleAssignment(dayOfWeek: 3, liftFamily: .bench)
+  viewModel.toggleAssignment(dayOfWeek: 5, liftFamily: .deadlift)
+  try await viewModel.goNext() // persists the first student's draft
+  let originalDraft = try #require(try store.loadDraft(traineeID: first.id))
+
+  viewModel.selectStudent(second)
+
+  let persistedFirst = try store.loadDraft(traineeID: first.id)
+  #expect(originalDraft.traineeID == first.id)
+  #expect(persistedFirst?.traineeID == first.id)
+  #expect(viewModel.selectedStudent?.id == second.id)
+  #expect(viewModel.draftPlan?.traineeID != first.id)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func evaluationStudentCannotSelectFourWeeks() async throws {
   let viewModel = try PlanningFixtures.viewModel()
   await viewModel.bootstrap()

@@ -20,12 +20,13 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func previewCatalogTotalCountIsTwelveThirtyOne() async throws {
+@Test func previewCatalogTotalCountIsTwelveThirtyFour() async throws {
   let catalog = try await previewCatalog()
 
-  // spec 043 added 3 catalog exercises (离心卧推 / 弹力带窄推 / 安全杠节奏深蹲): 1224→1227.
-  #expect(catalog.count == 1231)
-  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 1227)
+  // The bundled export contains 1230 rows, plus four synthetic competition
+  // lifts required by the planning catalog.
+  #expect(catalog.count == 1234)
+  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 1230)
   #expect(InMemoryPlanRepository.syntheticCompetitionLifts().count == 4)
 }
 
@@ -46,7 +47,7 @@ import Testing
   decoder.dateDecodingStrategy = .iso8601
   let decoded = try decoder.decode([Exercise].self, from: exerciseData)
 
-  #expect(decoded.count == 1227)
+  #expect(decoded.count == 1230)
   #expect(decoded.allSatisfy { !$0.muscleGroups.isEmpty })
   #expect(decoded.allSatisfy { !$0.equipment.isEmpty })
   #expect(decoded.allSatisfy { !$0.movementPattern.isEmpty })

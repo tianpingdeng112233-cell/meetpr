@@ -225,6 +225,24 @@ import Testing
   #expect(streamedError == .authInvalid)
 }
 
+@Test func apiClientRefreshesAndRetriesAuthenticatedRequestAfter401() async throws {
+  let transport = UnauthorizedRetryTransport()
+  let recovery = UnauthorizedRecoverySpy()
+  let client = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
+    await transport.response(for: request)
+  }
+  client.bindUnauthorizedRecovery { rejectedAccessToken in
+    await recovery.recover(rejectedAccessToken)
+  }
+
+  let response = try await client.coachStudents(accessToken: "expired-token")
+  let authorizationHeaders = await transport.authorizationHeaders()
+
+  #expect(response.students.isEmpty)
+  #expect(authorizationHeaders == ["Bearer expired-token", "Bearer refreshed-token"])
+  #expect(await recovery.rejectedTokens() == ["expired-token"])
+}
+
 @Test func feedbackCacheDropsInvalidJSON() async throws {
   let directory = FileManager.default.temporaryDirectory
     .appending(path: "NetworkingTests-\(UUID().uuidString)", directoryHint: .isDirectory)
@@ -268,5 +286,35 @@ private actor TypedEndpointRequestCapture {
 
   func request() -> URLRequest? {
     capturedRequest
+  }
+}
+
+private actor UnauthorizedRetryTransport {
+  private var headers: [String] = []
+
+  func response(for request: URLRequest) -> APIResponse {
+    let authorization = request.value(forHTTPHeaderField: "authorization") ?? ""
+    headers.append(authorization)
+    if authorization == "Bearer expired-token" {
+      return APIResponse(data: Data(), statusCode: 401)
+    }
+    return APIResponse(data: Data(#"{"students":[]}"#.utf8), statusCode: 200)
+  }
+
+  func authorizationHeaders() -> [String] {
+    headers
+  }
+}
+
+private actor UnauthorizedRecoverySpy {
+  private var tokens: [String] = []
+
+  func recover(_ rejectedAccessToken: String) -> String {
+    tokens.append(rejectedAccessToken)
+    return "refreshed-token"
+  }
+
+  func rejectedTokens() -> [String] {
+    tokens
   }
 }

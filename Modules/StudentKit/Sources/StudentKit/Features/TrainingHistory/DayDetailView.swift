@@ -39,19 +39,34 @@ public struct DayDetailView: View {
         .font(.headline)
         .foregroundStyle(Color.MeetPR.fgPrimary)
 
-      ForEach(exercise.prescribedSets) { set in
+      ForEach(Array(exercise.prescribedSets.enumerated()), id: \.element.id) { offset, set in
         let log = logs.first {
           $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
         }
         HStack {
-          Text("第 \(set.setIndex + 1) 组")
-            .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+          VStack(alignment: .leading, spacing: 2) {
+            Text("第 \(SetDisplayNumber.number(atOffset: offset)) 组")
+              .font(.subheadline)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+            if let coachNote = CoachNoteDisplay.text(set.coachNote) {
+              Text("备注 \(coachNote)")
+                .font(.caption)
+                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .lineLimit(2)
+            }
+          }
           Spacer()
           if let log {
-            Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
-              .font(.subheadline.monospacedDigit())
-              .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgPrimary)
+            VStack(alignment: .trailing, spacing: 2) {
+              if log.assumed {
+                Text("按计划推定")
+                  .font(.caption)
+                  .foregroundStyle(Color.MeetPR.amber)
+              }
+              Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgPrimary)
+            }
           } else {
             Text(StudentFormatting.prescribed(set))
               .font(.subheadline.monospacedDigit())

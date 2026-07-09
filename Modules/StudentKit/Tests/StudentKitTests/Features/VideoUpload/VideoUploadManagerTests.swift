@@ -57,7 +57,7 @@ import Testing
   #expect(await harness.service.abortCount == 0)
 }
 
-@Test func uploadManagerMarksFailedAndAbortsAfterRetryExhaustion() async throws {
+@Test func uploadManagerDeletesRemoteAttachmentAfterRetryExhaustion() async throws {
   let harness = VideoUploadHarness()
   // Part 1 fails more times than 1 initial attempt + 2 retries can absorb.
   await harness.service.setPartFailures([1: 5])
@@ -70,12 +70,12 @@ import Testing
   let failed = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
 
   #expect(await harness.service.partAttempts[1] == 3)
-  #expect(await harness.service.abortCount == 1)
+  #expect(await harness.service.deleteCount == 1)
   // The stale backend row is dead; a retry must re-initiate from scratch.
   #expect(failed.remoteAttachmentID == nil)
 }
 
-@Test func uploadManagerTreatsComplete409AsTerminalWithoutAbort() async throws {
+@Test func uploadManagerDeletesACompleteConflictAttachment() async throws {
   let harness = VideoUploadHarness()
   await harness.service.setCompleteError(APIError.httpStatus(409, Data()))
 
@@ -86,7 +86,9 @@ import Testing
   )
   _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
 
-  // The backend row already left `uploading`; aborting it would just 409 too.
+  // A completion race may have produced a ready object; delete it rather than
+  // leaving an orphaned private video.
+  #expect(await harness.service.deleteCount == 1)
   #expect(await harness.service.abortCount == 0)
 }
 
@@ -106,7 +108,7 @@ import Testing
   #expect(try await harness.repository.fetchAll(studentID: studentID).isEmpty)
 }
 
-@Test func removeCancelsInFlightUploadAndAborts() async throws {
+@Test func removeCancelsInFlightUploadAndDeletesRemoteAttachment() async throws {
   let harness = VideoUploadHarness()
   await harness.service.setHangOnParts(true)
 
@@ -123,7 +125,7 @@ import Testing
   await harness.manager.remove(attachmentID: record.id)
 
   #expect(try await harness.repository.fetch(id: record.id) == nil)
-  #expect(await harness.service.abortCount == 1)
+  #expect(await harness.service.deleteCount == 1)
   let exportedFile = harness.filesDirectory.appendingPathComponent("\(record.id.uuidString).mp4")
   #expect(!FileManager.default.fileExists(atPath: exportedFile.path))
 }
@@ -182,6 +184,22 @@ import Testing
   let forSet = try await harness.repository.fetch(setLogID: setLogID)
   #expect(forSet.map(\.id) == [second.id])
   #expect(try await harness.repository.fetch(id: first.id) == nil)
+  #expect(await harness.service.deleteCount == 1)
+}
+
+@Test func removeKeepsUploadedRecordWhenRemoteDeletionFails() async throws {
+  let harness = VideoUploadHarness()
+  let record = try await harness.manager.enqueue(
+    sourceURL: harness.sourceURL,
+    setLogID: UUID(),
+    studentID: UUID()
+  )
+  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
+  await harness.service.setDeleteError(MockServiceError.deleteFailed)
+
+  #expect(!(await harness.manager.remove(attachmentID: record.id)))
+  #expect(try await harness.repository.fetch(id: record.id)?.status == .uploaded)
+  #expect(await harness.service.deleteCount == 1)
 }
 
 private func makeRecord(

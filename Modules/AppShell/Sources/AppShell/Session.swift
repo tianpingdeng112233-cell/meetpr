@@ -26,7 +26,10 @@ public final class Session {
   @ObservationIgnored private let tokenStore: any TokenStoring
   @ObservationIgnored private let onLogout: (@Sendable () async -> Void)?
   @ObservationIgnored private var errorTask: Task<Void, Never>?
-  @ObservationIgnored private var refreshTask: Task<String, Error>?
+  @ObservationIgnored private var refreshTask: Task<TokenPair, Error>?
+  /// Every login/bootstrap/logout gets a new generation. Completion handlers
+  /// must match it before they are allowed to write credentials or UI state.
+  @ObservationIgnored private var sessionGeneration: UInt = 0
 
   public init(
     auth: any AuthRepository,
@@ -39,29 +42,38 @@ public final class Session {
   }
 
   public func bootstrap() async {
+    let generation = beginSessionTransition()
     state = .authenticating
     let refreshToken = await tokenStore.refreshToken()
+    guard isCurrentSession(generation) else { return }
     guard let refreshToken else {
       await tokenStore.clear()
+      guard isCurrentSession(generation) else { return }
       state = .anonymous
       return
     }
 
     guard let cachedUser = await tokenStore.cachedUser() else {
       await tokenStore.clear()
+      guard isCurrentSession(generation) else { return }
       state = .anonymous
       return
     }
 
     do {
       let tokens = try await auth.refresh(refreshToken: refreshToken)
+      guard isCurrentSession(generation) else { return }
       await tokenStore.save(access: tokens.accessToken, refresh: tokens.refreshToken)
+      guard isCurrentSession(generation) else { return }
       await tokenStore.saveUser(cachedUser)
+      guard isCurrentSession(generation) else { return }
       state = .authenticated(cachedUser)
     } catch {
+      guard isCurrentSession(generation) else { return }
       Self.logger.warning("bootstrap_refresh_failed \(String(describing: error))")
       if Self.shouldClearSession(afterRefreshError: error) {
         await tokenStore.clear()
+        guard isCurrentSession(generation) else { return }
         state = .anonymous
       } else {
         state = .authenticated(cachedUser)
@@ -70,32 +82,49 @@ public final class Session {
   }
 
   public func signup(phone: String, password: String, role: UserRole) async throws {
+    let generation = beginSessionTransition()
     state = .authenticating
+    await tokenStore.clear()
+    guard isCurrentSession(generation) else { throw CancellationError() }
     do {
       let result = try await auth.signup(phone: phone, password: password, role: role)
-      await persist(result)
+      guard isCurrentSession(generation) else { throw CancellationError() }
+      guard await persist(result, generation: generation) else { throw CancellationError() }
       state = .authenticated(result.user)
     } catch {
+      guard isCurrentSession(generation) else { throw error }
+      await tokenStore.clear()
+      guard isCurrentSession(generation) else { throw error }
       state = .anonymous
       throw error
     }
   }
 
   public func login(phone: String, password: String) async throws {
+    let generation = beginSessionTransition()
     state = .authenticating
+    await tokenStore.clear()
+    guard isCurrentSession(generation) else { throw CancellationError() }
     do {
       let result = try await auth.login(phone: phone, password: password)
-      await persist(result)
+      guard isCurrentSession(generation) else { throw CancellationError() }
+      guard await persist(result, generation: generation) else { throw CancellationError() }
       state = .authenticated(result.user)
     } catch {
+      guard isCurrentSession(generation) else { throw error }
+      await tokenStore.clear()
+      guard isCurrentSession(generation) else { throw error }
       state = .anonymous
       throw error
     }
   }
 
   public func logout() async {
+    let generation = beginSessionTransition()
     await tokenStore.clear()
+    guard isCurrentSession(generation) else { return }
     await onLogout?()
+    guard isCurrentSession(generation) else { return }
     state = .anonymous
   }
 
@@ -109,38 +138,81 @@ public final class Session {
     }
   }
 
-  private func persist(_ result: AuthResult) async {
-    await tokenStore.save(access: result.accessToken, refresh: result.refreshToken)
-    await tokenStore.saveUser(result.user)
-  }
-
-  private func refreshAccessToken() async throws -> String {
-    if let refreshTask {
-      return try await refreshTask.value
+  public func recoverAccessToken(rejectedAccessToken: String) async throws -> String {
+    let generation = sessionGeneration
+    guard case .authenticated = state else {
+      throw SessionStateReaderError.missingAccessToken
     }
-
-    guard let refreshToken = await tokenStore.refreshToken() else {
+    guard let currentAccessToken = await tokenStore.accessToken() else {
+      guard isCurrentSession(generation) else {
+        throw SessionStateReaderError.missingAccessToken
+      }
+      await logout()
+      throw SessionStateReaderError.missingAccessToken
+    }
+    guard isCurrentSession(generation) else {
       throw SessionStateReaderError.missingAccessToken
     }
 
-    let task = Task { [auth, tokenStore] in
-      let tokens = try await auth.refresh(refreshToken: refreshToken)
-      await tokenStore.save(access: tokens.accessToken, refresh: tokens.refreshToken)
-      return tokens.accessToken
+    // A concurrent request may already have rotated the token after this
+    // request was sent. Reuse that token instead of rotating refresh tokens again.
+    if currentAccessToken != rejectedAccessToken {
+      return currentAccessToken
     }
-    refreshTask = task
+    return try await refreshAccessToken()
+  }
+
+  private func persist(_ result: AuthResult, generation: UInt) async -> Bool {
+    guard isCurrentSession(generation) else { return false }
+    await tokenStore.save(access: result.accessToken, refresh: result.refreshToken)
+    guard isCurrentSession(generation) else { return false }
+    await tokenStore.saveUser(result.user)
+    return isCurrentSession(generation)
+  }
+
+  private func refreshAccessToken() async throws -> String {
+    let generation = sessionGeneration
+    let task: Task<TokenPair, Error>
+    if let refreshTask {
+      task = refreshTask
+    } else {
+      guard let refreshToken = await tokenStore.refreshToken() else {
+        throw SessionStateReaderError.missingAccessToken
+      }
+      guard isCurrentSession(generation) else { throw CancellationError() }
+
+      task = Task { [auth] in
+        try await auth.refresh(refreshToken: refreshToken)
+      }
+      refreshTask = task
+    }
 
     do {
-      let token = try await task.value
+      let tokens = try await task.value
+      guard isCurrentSession(generation) else { throw CancellationError() }
+      await tokenStore.save(access: tokens.accessToken, refresh: tokens.refreshToken)
+      guard isCurrentSession(generation) else { throw CancellationError() }
       refreshTask = nil
-      return token
+      return tokens.accessToken
     } catch {
+      guard isCurrentSession(generation) else { throw error }
       refreshTask = nil
       if Self.shouldClearSession(afterRefreshError: error) {
         await logout()
       }
       throw error
     }
+  }
+
+  private func beginSessionTransition() -> UInt {
+    sessionGeneration &+= 1
+    refreshTask?.cancel()
+    refreshTask = nil
+    return sessionGeneration
+  }
+
+  private func isCurrentSession(_ generation: UInt) -> Bool {
+    generation == sessionGeneration
   }
 
   private static func shouldClearSession(afterRefreshError error: Error) -> Bool {
@@ -186,7 +258,14 @@ public final class Session {
 @available(iOS 17.0, macOS 14.0, *)
 extension Session: SessionStateReader {
   public func accessToken() async throws -> String {
+    let generation = sessionGeneration
+    guard case .authenticated = state else {
+      throw SessionStateReaderError.missingAccessToken
+    }
     guard let accessToken = await tokenStore.accessToken() else {
+      throw SessionStateReaderError.missingAccessToken
+    }
+    guard isCurrentSession(generation) else {
       throw SessionStateReaderError.missingAccessToken
     }
     if Self.shouldRefresh(accessToken: accessToken) {

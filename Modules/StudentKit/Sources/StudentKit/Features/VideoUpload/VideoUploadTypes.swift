@@ -14,6 +14,9 @@ public enum VideoUploadError: Error, Equatable, Sendable {
   /// already left the `uploading` state, so this upload session is dead.
   /// Retry goes through a fresh initiate, never through abort.
   case completeConflict
+  /// A remote attachment could not be confirmed deleted, so the app retained
+  /// its local record instead of falsely presenting the video as removed.
+  case remoteDeleteFailed
 }
 
 /// Tuning knobs for `VideoUploadManager` (spec 027 §chunk size + retry,
@@ -67,4 +70,6 @@ public protocol VideoUploadService: Sendable {
   func uploadPart(to url: URL, data: Data) async throws -> String
   func complete(attachmentID: UUID, parts: [UploadPartETagDTO]) async throws -> AttachmentDTO
   func abort(attachmentID: UUID) async throws
+  /// Removes the remote attachment (including an already uploaded video).
+  func delete(attachmentID: UUID) async throws
 }

@@ -10,3 +10,7 @@
 - Info.plist readiness: portrait-only iPhone, fitness category, copyright, and export-compliance keys are configured.
 
 Next: W23 release engineering covers archive export, upload, TestFlight setup, App Store Connect metadata, and Apple review submission.
+
+## Next Test Build
+
+- Version `1.0` build `8`: includes student workout fixes for set numbers starting at `1`, visible coach notes in workout/history surfaces, default-completed past plan days that seed local e1RM history for the Today growth curve, and automatic token refresh/retry after returning to an idle app.

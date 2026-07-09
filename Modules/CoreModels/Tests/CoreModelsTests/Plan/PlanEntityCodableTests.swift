@@ -163,7 +163,7 @@ import Testing
   #expect(!json.contains(#""target_reps_max":"#))
 }
 
-@Test func studentSetLogMissingFailedDecodesFalseAndEncodesFailed() throws {
+@Test func studentSetLogMissingFlagsDecodeFalseAndAssumedRoundTrips() throws {
   let json = """
     {
       "id": "91000000-0000-0000-0000-000000000001",
@@ -179,7 +179,7 @@ import Testing
     """
 
   let decoded = try MeetPRCodec.decoder.decode(StudentSetLog.self, from: Data(json.utf8))
-  let failedLog = StudentSetLog(
+  let assumedLog = StudentSetLog(
     id: decoded.id,
     studentID: decoded.studentID,
     planExerciseID: decoded.planExerciseID,
@@ -189,12 +189,15 @@ import Testing
     reps: decoded.reps,
     rpe: decoded.rpe,
     completed: decoded.completed,
-    failed: true
+    failed: true,
+    assumed: true
   )
-  let encoded = try encodedJSONString(failedLog)
+  let encoded = try encodedJSONString(assumedLog)
 
   #expect(!decoded.failed)
+  #expect(!decoded.assumed)
   #expect(encoded.contains(#""failed":true"#))
+  #expect(encoded.contains(#""assumed":true"#))
 }
 
 @Test func planSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() throws {

@@ -83,6 +83,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   public let rpe: Decimal?
   public let completed: Bool
   public let failed: Bool
+  public let assumed: Bool
   public let loggedAt: Date
 
   public init(
@@ -95,6 +96,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     rpe: Decimal? = nil,
     completed: Bool,
     failed: Bool = false,
+    assumed: Bool = false,
     loggedAt: Date
   ) {
     self.id = id
@@ -106,6 +108,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.rpe = rpe
     self.completed = completed
     self.failed = failed
+    self.assumed = assumed
     self.loggedAt = loggedAt
   }
 
@@ -120,6 +123,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
+    assumed = try container.decodeIfPresent(Bool.self, forKey: .assumed) ?? false
     loggedAt = try container.decode(Date.self, forKey: .loggedAt)
   }
 
@@ -134,6 +138,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
+    try container.encode(assumed, forKey: .assumed)
     try container.encode(loggedAt, forKey: .loggedAt)
   }
 
@@ -147,6 +152,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case rpe
     case completed
     case failed
+    case assumed
     case loggedAt
   }
 }

@@ -83,8 +83,9 @@ struct HistoryEntriesView: View {
         .font(Font.MeetPR.footnote.bold())
         .foregroundStyle(Color.MeetPR.fgPrimary)
 
-      ForEach(exercise.prescribedSets) { set in
+      ForEach(Array(exercise.prescribedSets.enumerated()), id: \.element.id) { offset, set in
         HistorySetRow(
+          setNumber: SetDisplayNumber.number(atOffset: offset),
           set: set,
           log: logs.first { $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex }
         )
@@ -161,24 +162,44 @@ private struct HistoryDayHeader: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct HistorySetRow: View {
+  let setNumber: Int
   let set: PrescribedSet
   let log: StudentSetLog?
 
   var body: some View {
     HStack {
-      Text("第 \(set.setIndex + 1) 组")
-        .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+      VStack(alignment: .leading, spacing: 2) {
+        Text("第 \(setNumber) 组")
+          .font(Font.MeetPR.caption)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+        if let coachNote {
+          Text("备注 \(coachNote)")
+            .font(Font.MeetPR.caption)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .lineLimit(2)
+        }
+      }
       Spacer()
       if let log {
-        Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
-          .font(Font.MeetPR.caption.monospacedDigit().bold())
-          .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgSecondary)
+        VStack(alignment: .trailing, spacing: 2) {
+          if log.assumed {
+            Text("按计划推定")
+              .font(Font.MeetPR.caption)
+              .foregroundStyle(Color.MeetPR.amber)
+          }
+          Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
+            .font(Font.MeetPR.caption.monospacedDigit().bold())
+            .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgSecondary)
+        }
       } else {
         Text(StudentFormatting.prescribed(set))
           .font(Font.MeetPR.caption.monospacedDigit())
           .foregroundStyle(Color.MeetPR.fgTertiary)
       }
     }
+  }
+
+  private var coachNote: String? {
+    CoachNoteDisplay.text(set.coachNote)
   }
 }

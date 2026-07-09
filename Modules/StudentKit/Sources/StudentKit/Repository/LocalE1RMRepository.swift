@@ -3,7 +3,7 @@ import Foundation
 import RepositoryContracts
 
 /// File-backed e1RM store (spec 028 + 026 persistence ladder: in-memory →
-/// JSON file under Documents/e1rm/). Backend stays uninvolved in V0.1; the
+/// JSON file under Application Support/MeetPR/e1rm/). Backend stays uninvolved in V0.1; the
 /// history survives relaunches but not device changes.
 public actor LocalE1RMRepository: E1RMRepository {
   private let directory: URL
@@ -14,10 +14,7 @@ public actor LocalE1RMRepository: E1RMRepository {
   private let decoder: JSONDecoder
 
   public init(directory: URL? = nil) {
-    let base =
-      directory
-      ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      .appendingPathComponent("e1rm", isDirectory: true)
+    let base = directory ?? SecureLocalStorage.directory(relativePath: "e1rm")
     self.directory = base
     let encoder = JSONEncoder()
     encoder.dateEncodingStrategy = .iso8601
@@ -118,15 +115,18 @@ public actor LocalE1RMRepository: E1RMRepository {
     cachedPoints = points
     try ensureDirectory()
     try encoder.encode(points).write(to: pointsURL, options: .atomic)
+    SecureLocalStorage.harden(pointsURL)
   }
 
   private func save(prs: [PRBreakthroughEvent]) throws {
     cachedPRs = prs
     try ensureDirectory()
     try encoder.encode(prs).write(to: prsURL, options: .atomic)
+    SecureLocalStorage.harden(prsURL)
   }
 
   private func ensureDirectory() throws {
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    SecureLocalStorage.harden(directory)
   }
 }
