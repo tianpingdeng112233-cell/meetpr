@@ -37,9 +37,7 @@ public actor VideoUploadManager {
     self.configuration = configuration
     self.filesDirectory =
       filesDirectory
-      ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      .appendingPathComponent("video_uploads", isDirectory: true)
-      .appendingPathComponent("files", isDirectory: true)
+      ?? SecureLocalStorage.directory(relativePath: "video_uploads/files")
     self.now = now
   }
 
