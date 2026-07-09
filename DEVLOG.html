@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeetPR · 每日进展日志</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1c1f24;
+    --muted: #6b7280;
+    --line: #e6e8eb;
+    --accent: #e23b3b;
+    --accent-ink: #fff;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.05);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --card: #1d2025; --ink: #e9eaec; --muted: #9aa1ab;
+      --line: #2c3037; --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.4);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 18px 80px; }
+  header.top { margin-bottom: 20px; }
+  header.top h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: .2px; }
+  header.top h1 .dot { color: var(--accent); }
+  header.top p { margin: 0; color: var(--muted); font-size: 13px; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px;
+  }
+  .compose { margin-bottom: 18px; }
+  .compose .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+  .compose label.fld { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  input[type="date"], input[type="text"], select, textarea {
+    font: inherit; color: var(--ink); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px;
+  }
+  textarea { width: 100%; resize: vertical; min-height: 46px; }
+  input[type="text"].link { flex: 1; min-width: 180px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    cursor: pointer; user-select: none; border: 1px solid var(--line);
+    background: var(--bg); color: var(--muted); text-transform: none;
+    padding: 4px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+    transition: all .12s ease;
+  }
+  .chip[data-on="1"] { color: #fff; border-color: transparent; }
+  .btn {
+    cursor: pointer; border: none; border-radius: 10px; font: inherit; font-weight: 600;
+    padding: 9px 16px; background: var(--accent); color: var(--accent-ink);
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+
+  .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 18px 0 14px; }
+  .toolbar .spacer { flex: 1; }
+  .toolbar .filterlbl { font-size: 12px; color: var(--muted); margin-right: 2px; }
+
+  .day { margin-top: 22px; }
+  .day h2 {
+    font-size: 14px; margin: 0 0 10px; color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .day h2 .date { font-variant-numeric: tabular-nums; }
+  .day h2 .cnt { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .day hr { border: none; border-top: 1px solid var(--line); margin: 0 0 12px; }
+
+  .entry {
+    display: flex; gap: 10px; align-items: flex-start; padding: 9px 4px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry .icon { font-size: 16px; line-height: 1.4; flex: none; width: 20px; text-align: center; }
+  .entry .body { flex: 1; min-width: 0; }
+  .entry .tags { display: inline-flex; gap: 5px; margin-right: 7px; vertical-align: middle; }
+  .tag {
+    font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 6px; color: #fff;
+    letter-spacing: .2px;
+  }
+  .entry .text { word-break: break-word; }
+  .entry .text a { color: var(--accent); text-decoration: none; }
+  .entry .text a:hover { text-decoration: underline; }
+  .entry .del {
+    flex: none; cursor: pointer; border: none; background: transparent; color: var(--muted);
+    font-size: 16px; line-height: 1; padding: 2px 6px; border-radius: 6px; opacity: 0;
+  }
+  .entry:hover .del { opacity: 1; }
+  .entry .del:hover { color: var(--accent); background: var(--bg); }
+
+  .empty { text-align: center; color: var(--muted); padding: 50px 20px; font-size: 14px; }
+  .empty .big { font-size: 30px; margin-bottom: 8px; }
+  footer.note { margin-top: 40px; color: var(--muted); font-size: 11.5px; line-height: 1.7; }
+  footer.note code { background: var(--bg); padding: 1px 5px; border-radius: 5px; border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>MeetPR <span class="dot">·</span> 每日进展日志</h1>
+    <p>逐日记录 bug 修复、功能进展与决策 · 范围:iOS + backend + 配套网页(meetcard / plan-web)</p>
+  </header>
+
+  <!-- 录入 -->
+  <div class="card compose">
+    <div class="row">
+      <label class="fld">日期
+        <input type="date" id="f-date">
+      </label>
+      <label class="fld">类型
+        <select id="f-type">
+          <option value="feature">✨ 功能</option>
+          <option value="bug">🐛 Bug</option>
+          <option value="other">🔧 其他 / 决策 / 待办</option>
+        </select>
+      </label>
+      <label class="fld" style="flex:1;">组件标签(可多选)
+        <div class="chips" id="f-comps"></div>
+      </label>
+    </div>
+    <div class="row">
+      <textarea id="f-text" placeholder="这条进展是什么?动词开头,例:修复登录在 Demo 配置下撞真 backend 报网络异常"></textarea>
+    </div>
+    <div class="row">
+      <input type="text" class="link" id="f-link" placeholder="链接(选填):PR / spec / 文件路径,如 https://github.com/.../pull/190">
+      <button class="btn" id="f-add">+ 添加</button>
+    </div>
+  </div>
+
+  <!-- 工具条 / 筛选 -->
+  <div class="toolbar">
+    <span class="filterlbl">筛选</span>
+    <div class="chips" id="filter-comps"></div>
+    <div class="chips" id="filter-types"></div>
+    <span class="spacer"></span>
+    <button class="btn ghost" id="b-md">⧉ 复制为 Markdown</button>
+    <button class="btn ghost" id="b-export">↓ 导出 JSON</button>
+    <button class="btn ghost" id="b-import">↑ 导入</button>
+    <input type="file" id="file-import" accept="application/json" hidden>
+  </div>
+
+  <!-- 日志 -->
+  <div id="log"></div>
+
+  <footer class="note">
+    数据存在本浏览器 <code>localStorage</code>,不进 git。想留版本历史时点「复制为 Markdown」贴进仓库提交,或「导出 JSON」做备份。
+    组件标签:<code>iOS</code>=主 app · <code>backend</code>=后端 · <code>meetcard</code>=赛前/赛中网页 · <code>plan-web</code>=教练计划编辑器。
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const KEY = "meetpr_devlog_v1";
+  const COMPONENTS = [
+    { key: "iOS",      color: "#0a84ff" },
+    { key: "backend",  color: "#30a14e" },
+    { key: "meetcard", color: "#e8870a" },
+    { key: "plan-web", color: "#9a4dd6" },
+  ];
+  const TYPES = [
+    { key: "feature", icon: "✨", label: "功能" },
+    { key: "bug",     icon: "🐛", label: "Bug" },
+    { key: "other",   icon: "🔧", label: "其他" },
+  ];
+  const compColor = k => (COMPONENTS.find(c => c.key === k) || {}).color || "#888";
+  const typeMeta  = k => TYPES.find(t => t.key === k) || TYPES[2];
+  const typeOrder = k => TYPES.findIndex(t => t.key === k);
+
+  // ---- state ----
+  let entries = load();
+  const filterComps = new Set();   // empty = all
+  let filterType = null;           // null = all
+  const composeComps = new Set();
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function save() { localStorage.setItem(KEY, JSON.stringify(entries)); }
+  function todayStr() {
+    const d = new Date();
+    const p = n => String(n).padStart(2, "0");
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c])); }
+  function isUrl(s) { return /^https?:\/\//i.test(s); }
+
+  // ---- compose chips ----
+  const fComps = document.getElementById("f-comps");
+  COMPONENTS.forEach(c => {
+    const el = document.createElement("span");
+    el.className = "chip"; el.textContent = c.key; el.dataset.on = "0";
+    el.onclick = () => {
+      const on = el.dataset.on === "1";
+      el.dataset.on = on ? "0" : "1";
+      el.style.background = on ? "" : c.color;
+      if (on) composeComps.delete(c.key); else composeComps.add(c.key);
+    };
+    fComps.appendChild(el);
+  });
+
+  // ---- filter chips ----
+  const filComps = document.getElementById("filter-comps");
+  COMPONENTS.forEach(c => {
+    const el = document.createElement("span");
+    el.className = "chip"; el.textContent = c.key; el.dataset.on = "0";
+    el.onclick = () => {
+      const on = el.dataset.on === "1";
+      el.dataset.on = on ? "0" : "1";
+      el.style.background = on ? "" : c.color;
+      if (on) filterComps.delete(c.key); else filterComps.add(c.key);
+      render();
+    };
+    filComps.appendChild(el);
+  });
+  const filTypes = document.getElementById("filter-types");
+  TYPES.forEach(t => {
+    const el = document.createElement("span");
+    el.className = "chip"; el.textContent = t.icon + " " + t.label; el.dataset.on = "0";
+    el.onclick = () => {
+      const on = el.dataset.on === "1";
+      filTypes.querySelectorAll(".chip").forEach(x => { x.dataset.on = "0"; x.style.background = ""; x.style.color = ""; });
+      if (!on) { el.dataset.on = "1"; el.style.background = "#555"; el.style.color = "#fff"; filterType = t.key; }
+      else filterType = null;
+      render();
+    };
+    filTypes.appendChild(el);
+  });
+
+  // ---- add ----
+  const fDate = document.getElementById("f-date");
+  const fType = document.getElementById("f-type");
+  const fText = document.getElementById("f-text");
+  const fLink = document.getElementById("f-link");
+  fDate.value = todayStr();
+
+  function addEntry() {
+    const text = fText.value.trim();
+    if (!text) { fText.focus(); return; }
+    entries.push({
+      id: uid(),
+      date: fDate.value || todayStr(),
+      type: fType.value,
+      components: [...composeComps],
+      text: text,
+      link: fLink.value.trim(),
+    });
+    save();
+    fText.value = ""; fLink.value = "";
+    composeComps.clear();
+    fComps.querySelectorAll(".chip").forEach(x => { x.dataset.on = "0"; x.style.background = ""; });
+    render();
+    fText.focus();
+  }
+  document.getElementById("f-add").onclick = addEntry;
+  fText.addEventListener("keydown", e => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") addEntry(); });
+
+  function delEntry(id) {
+    entries = entries.filter(e => e.id !== id);
+    save(); render();
+  }
+
+  // ---- render ----
+  const logEl = document.getElementById("log");
+  function visible() {
+    return entries.filter(e => {
+      if (filterType && e.type !== filterType) return false;
+      if (filterComps.size && !e.components.some(c => filterComps.has(c))) return false;
+      return true;
+    });
+  }
+  function render() {
+    const list = visible();
+    if (!list.length) {
+      logEl.innerHTML = '<div class="empty"><div class="big">📝</div>' +
+        (entries.length ? "没有符合筛选的条目。" : "还没有记录。上面填一条,开始今天的进展。") + "</div>";
+      return;
+    }
+    const byDate = {};
+    list.forEach(e => { (byDate[e.date] = byDate[e.date] || []).push(e); });
+    const dates = Object.keys(byDate).sort().reverse();
+    let html = "";
+    dates.forEach(d => {
+      const items = byDate[d].slice().sort((a, b) => typeOrder(a.type) - typeOrder(b.type));
+      html += '<div class="day"><h2><span class="date">' + esc(d) + '</span>' +
+              '<span class="cnt">' + items.length + ' 条</span></h2><hr>';
+      items.forEach(e => {
+        const tm = typeMeta(e.type);
+        const tags = e.components.map(c =>
+          '<span class="tag" style="background:' + compColor(c) + '">' + esc(c) + "</span>").join("");
+        let textHtml = esc(e.text);
+        if (e.link) {
+          const label = isUrl(e.link) ? "↗ 链接" : esc(e.link);
+          const href = isUrl(e.link) ? esc(e.link) : "";
+          textHtml += href
+            ? ' <a href="' + href + '" target="_blank" rel="noopener">' + label + "</a>"
+            : ' <span style="color:var(--muted)">— ' + label + "</span>";
+        }
+        html += '<div class="entry"><span class="icon">' + tm.icon + '</span>' +
+                '<span class="body">' + (tags ? '<span class="tags">' + tags + "</span>" : "") +
+                '<span class="text">' + textHtml + "</span></span>" +
+                '<button class="del" title="删除" data-id="' + e.id + '">×</button></div>';
+      });
+      html += "</div>";
+    });
+    logEl.innerHTML = html;
+    logEl.querySelectorAll(".del").forEach(b => b.onclick = () => delEntry(b.dataset.id));
+  }
+
+  // ---- export / import ----
+  function toMarkdown() {
+    const byDate = {};
+    entries.forEach(e => { (byDate[e.date] = byDate[e.date] || []).push(e); });
+    const dates = Object.keys(byDate).sort().reverse();
+    let md = "# MeetPR 每日进展日志\n";
+    dates.forEach(d => {
+      md += "\n## " + d + "\n";
+      TYPES.forEach(t => {
+        const items = byDate[d].filter(e => e.type === t.key);
+        if (!items.length) return;
+        md += "\n### " + t.icon + " " + t.label + "\n";
+        items.forEach(e => {
+          const tags = e.components.map(c => "[" + c + "]").join("");
+          md += "- " + (tags ? tags + " " : "") + e.text + (e.link ? " — " + e.link : "") + "\n";
+        });
+      });
+    });
+    return md;
+  }
+  document.getElementById("b-md").onclick = () => {
+    const md = toMarkdown();
+    navigator.clipboard.writeText(md).then(
+      () => flash(document.getElementById("b-md"), "已复制 ✓"),
+      () => { prompt("复制下面内容:", md); }
+    );
+  };
+  document.getElementById("b-export").onclick = () => {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "meetpr-devlog-" + todayStr() + ".json";
+    a.click(); URL.revokeObjectURL(a.href);
+  };
+  const fileInput = document.getElementById("file-import");
+  document.getElementById("b-import").onclick = () => fileInput.click();
+  fileInput.onchange = () => {
+    const file = fileInput.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const data = JSON.parse(r.result);
+        if (!Array.isArray(data)) throw new Error("格式不对");
+        const ids = new Set(entries.map(e => e.id));
+        let added = 0;
+        data.forEach(e => { if (e && e.id && !ids.has(e.id)) { entries.push(e); added++; } });
+        save(); render();
+        alert("导入完成,新增 " + added + " 条。");
+      } catch (err) { alert("导入失败:" + err.message); }
+      fileInput.value = "";
+    };
+    r.readAsText(file);
+  };
+  function flash(btn, msg) {
+    const old = btn.textContent; btn.textContent = msg;
+    setTimeout(() => { btn.textContent = old; }, 1200);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
