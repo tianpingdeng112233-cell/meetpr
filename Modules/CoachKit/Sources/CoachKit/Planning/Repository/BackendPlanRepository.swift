@@ -32,6 +32,20 @@ public actor BackendPlanRepository: PlanRepository {
     }
   }
 
+  public func renameStudent(id: UUID, displayName: String) async throws -> CoachStudentSummary {
+    let token = try await session.accessToken()
+    let dto = try await api.renameCoachStudent(
+      id: id,
+      displayName: displayName,
+      accessToken: token
+    )
+    return CoachStudentSummary(
+      id: dto.userID,
+      displayName: dto.displayName,
+      status: Self.status(from: dto, now: Date())
+    )
+  }
+
   public func fetchMainLiftCatalog() async throws -> [Exercise] {
     let token = try await session.accessToken()
     async let mainLifts = api.exercises(type: .mainLift, accessToken: token).exercises
