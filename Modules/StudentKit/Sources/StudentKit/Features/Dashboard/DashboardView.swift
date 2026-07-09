@@ -14,6 +14,7 @@ import SwiftUI
 public struct DashboardView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
+  private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
@@ -41,6 +42,7 @@ public struct DashboardView: View {
   ) {
     self.studentID = studentID
     self.plans = plans
+    self.logs = logs
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.evaluationSummaryViewModel = evaluationSummaryViewModel

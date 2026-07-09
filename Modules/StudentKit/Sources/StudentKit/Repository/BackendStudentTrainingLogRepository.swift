@@ -45,7 +45,10 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       reps: log.reps,
       rpe: log.rpe,
       completed: log.completed,
-      failed: log.failed
+      failed: log.failed,
+      // A student edit is an observed log. The backend also enforces this on
+      // upsert so it replaces any earlier imported assumed completion.
+      assumed: false
     )
   }
 

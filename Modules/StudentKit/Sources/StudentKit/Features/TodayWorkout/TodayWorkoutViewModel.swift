@@ -343,8 +343,9 @@ extension TodayWorkoutViewModel {
     log: StudentSetLog,
     studentID: UUID
   ) async {
-    // Failed attempts are history-only; e1RM/PR ignores incomplete outcomes.
-    guard !log.failed else { return }
+    // Failed attempts and coach-confirmed imported history are display-only;
+    // neither is a real performance datapoint for e1RM/PR.
+    guard !log.failed, !log.assumed else { return }
     let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
     let rpe = draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
     guard

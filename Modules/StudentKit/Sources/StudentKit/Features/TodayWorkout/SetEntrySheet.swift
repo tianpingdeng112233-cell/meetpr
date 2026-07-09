@@ -13,6 +13,7 @@ import SwiftUI
 struct SetEntrySheet: View {
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
+  let setNumber: Int
   let viewModel: TodayWorkoutViewModel
   /// Video attach context (spec 027); nil hides the video block entirely.
   let studentID: UUID?
@@ -29,12 +30,14 @@ struct SetEntrySheet: View {
   init(
     rowIndex: Int,
     draft: TodayWorkoutViewModel.SetRowDraft,
+    setNumber: Int,
     viewModel: TodayWorkoutViewModel,
     studentID: UUID? = nil,
     videoViewModel: VideoAttachmentViewModel? = nil
   ) {
     self.rowIndex = rowIndex
     self.draft = draft
+    self.setNumber = setNumber
     self.viewModel = viewModel
     self.studentID = studentID
     self.videoViewModel = videoViewModel
@@ -55,6 +58,21 @@ struct SetEntrySheet: View {
             .foregroundStyle(Color.MeetPR.fgPrimary)
             .frame(maxWidth: .infinity)
             .padding(.top, 4)
+
+          if let coachNote {
+            Text("教练备注 \(coachNote)")
+              .font(.system(size: 13, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .lineLimit(3)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .padding(10)
+              .background(Color.MeetPR.surface1)
+              .clipShape(.rect(cornerRadius: 8))
+              .overlay {
+                RoundedRectangle(cornerRadius: 8).stroke(Color.MeetPR.border, lineWidth: 1)
+              }
+              .padding(.top, 12)
+          }
 
           VStack(spacing: 18) {
             plateStepper(
@@ -104,11 +122,15 @@ struct SetEntrySheet: View {
     return base.isEmpty ? "仅 2.5kg 卡扣" : base + " + 2.5kg 卡扣"
   }
 
+  private var coachNote: String? {
+    CoachNoteDisplay.text(draft.prescribed.coachNote)
+  }
+
   // MARK: - Chrome
 
   private var navBar: some View {
     ZStack {
-      Text("\(draft.exerciseName) · 第 \(draft.prescribed.setIndex + 1) 组")
+      Text("\(draft.exerciseName) · 第 \(setNumber) 组")
         .font(Font.MeetPR.body.weight(.semibold))
         .foregroundStyle(Color.MeetPR.fgPrimary)
       HStack {

@@ -97,10 +97,7 @@ struct SetRecordRow: View {
   /// Normalises the stored cue for display: trims whitespace and drops
   /// blank/whitespace-only notes so the row never shows an empty chip.
   static func displayCoachNote(_ raw: String?) -> String? {
-    guard let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines),
-      !trimmed.isEmpty
-    else { return nil }
-    return trimmed
+    CoachNoteDisplay.text(raw)
   }
 
   private var plateMathWeightKg: Double? {
