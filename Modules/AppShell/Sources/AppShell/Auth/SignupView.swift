@@ -4,6 +4,11 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct SignupView: View {
+  /// 内测注册开放的角色。solo(自练)线 2026-07-10 拍板暂不进 TestFlight 内测包:
+  /// 注册入口隐藏、代码休眠(defer≠delete,先例 spec 033 评估期停用)。
+  /// 恢复 solo 注册 = 改回 `UserRole.allCases`。
+  static let offeredRoles: [UserRole] = UserRole.allCases.filter { $0 != .selfTrainStudent }
+
   @Environment(Session.self) private var session
   @State private var viewModel = AuthFormViewModel(mode: .signup)
 
@@ -53,7 +58,7 @@ public struct SignupView: View {
 
         // ── Role cards (design `AuthFlow` step 1, big cards) ──────────
         VStack(spacing: 12) {
-          ForEach(UserRole.allCases, id: \.self) { role in
+          ForEach(Self.offeredRoles, id: \.self) { role in
             RoleCard(role: role, selectedRole: $viewModel.selectedRole)
           }
         }
