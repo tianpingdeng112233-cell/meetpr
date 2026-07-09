@@ -263,11 +263,33 @@ public final class PlanningViewModel {
   }
 
   public func selectStudent(_ student: CoachStudentSummary) {
-    selectedStudent = student
-    if planKind == .adaptation, planWeeks == 4 {
-      planWeeks = 1
+    let resolvedStudent = availableStudents.first { $0.id == student.id } ?? student
+    let previousStudentID = selectedStudent?.id
+    guard previousStudentID != resolvedStudent.id else { return }
+
+    // Persist the current student's progress before changing identity, then
+    // either restore the newly-selected student's own draft or start clean.
+    // Never retarget one DraftTrainingPlan by rewriting traineeID: that moves
+    // A's exercises, intensity, and progression rules into B's plan.
+    if selectedStudent != nil {
+      try? persistDraft(currentStep: currentStep)
     }
-    if profilePrefillStudentID != student.id {
+    resetDraftScopedState()
+
+    if let savedDraft = try? draftStore.loadDraft(traineeID: resolvedStudent.id) {
+      restore(draft: savedDraft, student: resolvedStudent)
+    } else {
+      selectedStudent = resolvedStudent
+      if planKind == .adaptation {
+        planWeeks = 1
+      }
+      // Stay on Step 0 until the coach explicitly advances. This preserves the
+      // normal selection flow while the newly chosen student gets a clean,
+      // separately-owned draft state.
+      path = []
+    }
+
+    if profilePrefillStudentID != resolvedStudent.id {
       // Re-picking a different student: drop the old profile data
       // immediately rather than showing the previous student's.
       preferredTrainingDays = []
@@ -275,7 +297,7 @@ public final class PlanningViewModel {
       prefilledEquipment = nil
       loadedProfile = nil
       profilePrefillStudentID = nil
-      Task { await loadStudentProfilePrefill(for: student.id) }
+      Task { await loadStudentProfilePrefill(for: resolvedStudent.id) }
     }
   }
 
@@ -1018,8 +1040,11 @@ extension PlanningViewModel {
       planKind == .adaptation
       ? "\(selectedStudent.displayName) 适应周"
       : "\(selectedStudent.displayName) \(planWeeks) 周计划"
+    // A draft belongs permanently to its trainee. The selection flow normally
+    // restores/creates the correct one, and this guard is a second line of
+    // defense for any future caller that persists while selection changes.
     let draft =
-      draftPlan
+      (draftPlan?.traineeID == selectedStudent.id ? draftPlan : nil)
       ?? DraftTrainingPlan(
         traineeID: selectedStudent.id,
         name: planName,
@@ -1029,7 +1054,6 @@ extension PlanningViewModel {
         currentStepRawValue: currentStep.rawValue
       )
 
-    draft.traineeID = selectedStudent.id
     draft.name = planName
     draft.startDate = startDate
     draft.endDate = endDate
@@ -1039,6 +1063,27 @@ extension PlanningViewModel {
 
     try draftStore.saveDraft(draft)
     draftPlan = draft
+  }
+
+  private func resetDraftScopedState() {
+    draftPlan = nil
+    planWeeks = nil
+    sbdFrequency = .empty
+    dayAssignments = [:]
+    selectedVariants = [:]
+    selectedVariantNotes = [:]
+    currentDayID = nil
+    accessoryFiltersByDay = [:]
+    availableAccessoriesCache = [:]
+    isLoadingAccessories = false
+    w1SetSpecs = [:]
+    lastIntensityModeMemo = [:]
+    intensityValueMemo = [:]
+    progressionRules = []
+    currentPreviewWeek = 1
+    didFinish = false
+    isPublishing = false
+    clearPublishFeedback()
   }
 
   private func makeDraftDays(for draft: DraftTrainingPlan) -> [DraftPlanDay] {
