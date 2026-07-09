@@ -8,6 +8,14 @@ public enum E1RMConfidence: String, Codable, Hashable, Sendable {
   case low
 }
 
+/// Where an e1RM point came from. Imported history participates in the
+/// trusted baseline when its confidence is `.normal`, but it is never a PR
+/// event subject (spec 053).
+public enum E1RMPointOrigin: String, Codable, Hashable, Sendable {
+  case logged
+  case imported
+}
+
 /// One estimated-1RM data point, computed locally each time the student
 /// completes a set (spec 028). Distinct from the locked 1RM profile field:
 /// e1RM is a per-set estimate and never writes back to 1RM (PRD §5 #16).
@@ -26,6 +34,9 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
   /// Anomaly-guard tier (spec 050 §5). Points persisted before the guard have
   /// no `confidence` key and decode as `.normal` — no backend/data migration.
   public let confidence: E1RMConfidence
+  /// Persisted points created before imported-history support have no `origin`
+  /// key and decode as `.logged` for backward compatibility.
+  public let origin: E1RMPointOrigin
 
   public init(
     id: UUID,
@@ -37,7 +48,8 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
     sourceWeightKg: Double,
     sourceReps: Int,
     sourceRPE: Double?,
-    confidence: E1RMConfidence = .normal
+    confidence: E1RMConfidence = .normal,
+    origin: E1RMPointOrigin = .logged
   ) {
     self.id = id
     self.studentId = studentId
@@ -49,6 +61,7 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
     self.sourceReps = sourceReps
     self.sourceRPE = sourceRPE
     self.confidence = confidence
+    self.origin = origin
   }
 
   public init(from decoder: any Decoder) throws {
@@ -63,5 +76,43 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
     sourceReps = try container.decode(Int.self, forKey: .sourceReps)
     sourceRPE = try container.decodeIfPresent(Double.self, forKey: .sourceRPE)
     confidence = try container.decodeIfPresent(E1RMConfidence.self, forKey: .confidence) ?? .normal
+    origin = try container.decodeIfPresent(E1RMPointOrigin.self, forKey: .origin) ?? .logged
+  }
+}
+
+extension E1RMHistoryPoint {
+  /// Keeps the original stable point identity while replacing the set-log
+  /// payload (for example when an assumed row becomes a real logged row).
+  public func replacing(id: UUID) -> E1RMHistoryPoint {
+    E1RMHistoryPoint(
+      id: id,
+      studentId: studentId,
+      exerciseId: exerciseId,
+      setLogId: setLogId,
+      computedAt: computedAt,
+      e1RMKg: e1RMKg,
+      sourceWeightKg: sourceWeightKg,
+      sourceReps: sourceReps,
+      sourceRPE: sourceRPE,
+      confidence: confidence,
+      origin: origin
+    )
+  }
+
+  /// Changes only the trust tier after the student reviews an imported batch.
+  public func replacing(confidence: E1RMConfidence) -> E1RMHistoryPoint {
+    E1RMHistoryPoint(
+      id: id,
+      studentId: studentId,
+      exerciseId: exerciseId,
+      setLogId: setLogId,
+      computedAt: computedAt,
+      e1RMKg: e1RMKg,
+      sourceWeightKg: sourceWeightKg,
+      sourceReps: sourceReps,
+      sourceRPE: sourceRPE,
+      confidence: confidence,
+      origin: origin
+    )
   }
 }

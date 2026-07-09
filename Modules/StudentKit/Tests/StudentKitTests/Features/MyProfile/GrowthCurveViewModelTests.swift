@@ -31,11 +31,11 @@ private func makeViewModel(
 }
 
 @MainActor
-@Test func defaultWindowShowsOnlyLastFourWeeks() async {
+@Test func defaultWindowExpandsToAllWhenHistoryPredatesFourWeeks() async {
   let viewModel = await makeViewModel(pointsDaysAgo: [60, 35, 20, 5, 1])
   #expect(viewModel.selectedFamily == .squat)
-  #expect(viewModel.selectedWindow == .fourWeeks)
-  #expect(viewModel.visiblePoints.count == 3)  // 20, 5, 1 days ago
+  #expect(viewModel.selectedWindow == .all)
+  #expect(viewModel.visiblePoints.count == 5)
 }
 
 @MainActor

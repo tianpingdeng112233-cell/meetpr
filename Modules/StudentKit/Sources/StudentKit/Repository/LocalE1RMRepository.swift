@@ -36,6 +36,41 @@ public actor LocalE1RMRepository: E1RMRepository {
     try save(points: all)
   }
 
+  @discardableResult
+  public func upsertPoint(_ point: E1RMHistoryPoint) async throws -> E1RMHistoryPoint {
+    var all = try loadPoints()
+    if let index = all.firstIndex(where: {
+      $0.studentId == point.studentId && $0.setLogId == point.setLogId
+    }) {
+      let replacement = point.replacing(id: all[index].id)
+      all[index] = replacement
+      try save(points: all)
+      return replacement
+    }
+    all.append(point)
+    try save(points: all)
+    return point
+  }
+
+  public func updatePointConfidence(
+    studentId: UUID,
+    pointIDs: Set<UUID>,
+    confidence: E1RMConfidence
+  ) async throws {
+    guard !pointIDs.isEmpty else { return }
+    var all = try loadPoints()
+    var didChange = false
+    for index in all.indices
+    where all[index].studentId == studentId && pointIDs.contains(all[index].id) {
+      guard all[index].origin == .imported, all[index].confidence != confidence else { continue }
+      all[index] = all[index].replacing(confidence: confidence)
+      didChange = true
+    }
+    if didChange {
+      try save(points: all)
+    }
+  }
+
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
     try loadPoints()
       .filter { $0.studentId == studentId && $0.exerciseId == exerciseId }
@@ -56,14 +91,19 @@ public actor LocalE1RMRepository: E1RMRepository {
   public func maxBefore(
     studentId: UUID,
     exerciseId: UUID,
-    before: Date
+    before: Date,
+    excludingSetLogId: UUID?
   ) async throws -> Double? {
     // Spec 050 §5: the PR baseline is the prior *trusted* best — a quarantined
     // (.low) spike must not become the bar the next real PR has to clear.
+    // Spec 053 §3: an *imported* point being replaced must not gate its own
+    // real-log replacement; a prior logged point under the same set-log
+    // identity still gates, so re-checking a set cannot farm duplicate PRs.
     try loadPoints()
       .filter {
         $0.studentId == studentId && $0.exerciseId == exerciseId
           && $0.computedAt < before && $0.confidence == .normal
+          && !($0.setLogId == excludingSetLogId && $0.origin == .imported)
       }
       .map(\.e1RMKg).max()
   }

@@ -90,6 +90,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   public let completed: Bool
   public let failed: Bool
   public let adhoc: Bool
+  public let assumed: Bool
   public let loggedAt: Date
 
   public init(
@@ -105,6 +106,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     completed: Bool,
     failed: Bool = false,
     adhoc: Bool = false,
+    assumed: Bool = false,
     loggedAt: Date
   ) {
     self.id = id
@@ -119,6 +121,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.completed = completed
     self.failed = failed
     self.adhoc = adhoc
+    self.assumed = assumed
     self.loggedAt = loggedAt
   }
 
@@ -136,6 +139,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
     adhoc = try container.decodeIfPresent(Bool.self, forKey: .adhoc) ?? false
+    assumed = try container.decodeIfPresent(Bool.self, forKey: .assumed) ?? false
     loggedAt = try container.decode(Date.self, forKey: .loggedAt)
   }
 
@@ -153,6 +157,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
     try container.encode(adhoc, forKey: .adhoc)
+    try container.encode(assumed, forKey: .assumed)
     try container.encode(loggedAt, forKey: .loggedAt)
   }
 
@@ -169,6 +174,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case completed
     case failed
     case adhoc
+    case assumed
     case loggedAt
   }
 }

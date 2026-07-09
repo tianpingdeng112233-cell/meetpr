@@ -95,7 +95,7 @@ public enum CompletionHistory {
     // Completed work attributed to weeks via plan-exercise (date-agnostic).
     var completedSetsByWeek: [Int: Int] = [:]
     var completedDaysByWeek: [Int: Set<UUID>] = [:]
-    for log in logs where log.completed {
+    for log in logs where log.completed && !log.assumed {
       // Adhoc/orphaned logs carry no plan link and cannot attribute to a
       // plan week (spec 045); they still count in exercise-keyed views.
       guard let planExerciseID = log.planExerciseID,

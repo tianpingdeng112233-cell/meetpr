@@ -59,7 +59,7 @@ enum StudentFormatting {
       // Adhoc/orphaned logs carry no plan link and never count toward a
       // plan day's completion (spec 045).
       guard let planExerciseID = log.planExerciseID else { return false }
-      return planExerciseIDs.contains(planExerciseID) && log.completed
+      return planExerciseIDs.contains(planExerciseID) && log.completed && !log.assumed
     }.count
     return (completed, total)
   }

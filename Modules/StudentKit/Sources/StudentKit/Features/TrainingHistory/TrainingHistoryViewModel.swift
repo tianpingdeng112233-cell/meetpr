@@ -47,6 +47,8 @@ public final class TrainingHistoryViewModel {
   public private(set) var reviewsByDay: [String: SessionReview] = [:]
   /// Month-grouped solo sessions (spec 047 §2); empty in coached mode.
   public private(set) var soloMonths: [SoloHistoryMonth] = []
+  /// Month key → distinct non-assumed training days; feeds 本月次数 (spec 053 §7).
+  private(set) var realSessionDayCountByMonth: [String: Int] = [:]
 
   /// Rolling fetch window for planless history (>180 天分页记 F-030 族).
   static let soloWindowDays = 180
@@ -122,6 +124,8 @@ public final class TrainingHistoryViewModel {
         bestByDay: await soloBestByDay(studentID: studentID),
         calendar: .current
       )
+      realSessionDayCountByMonth = Self.sessionDayCountByMonth(
+        logs: fetched.filter { !$0.assumed }, calendar: .current)
       state = .loaded(weeks: [], logs: fetched)
     } catch {
       if error.isTaskCancellation {
@@ -158,7 +162,9 @@ public final class TrainingHistoryViewModel {
     bestByDay: [String: Double],
     calendar: Calendar
   ) -> [SoloHistoryMonth] {
-    let completed = logs.filter(\.completed)
+    // Spec 053 §7: assumed (imported) records stay visible in history lists —
+    // only statistics exclude them (see `currentMonthSessionCount`).
+    let completed = logs.filter { $0.completed }
     let byDay = Dictionary(grouping: completed) { calendar.startOfDay(for: $0.loggedAt) }
     let sessions = byDay.map { day, dayLogs -> HistoryDaySession in
       var seen: Set<String> = []
@@ -187,9 +193,26 @@ public final class TrainingHistoryViewModel {
   }
 
   /// 本月次数 for the solo stats row (replaces the plan-week count).
+  /// Statistics exclude assumed (imported) records (spec 053 §7), so a day
+  /// whose only completed sets are imported does not count as a session.
   public var currentMonthSessionCount: Int {
     let key = Self.monthKey(for: now(), calendar: .current)
-    return soloMonths.first { $0.id == key }?.days.count ?? 0
+    return realSessionDayCountByMonth[key] ?? 0
+  }
+
+  /// Distinct training days per month over completed non-assumed logs — the
+  /// statistics counterpart of `soloMonths` (spec 053 §7).
+  static func sessionDayCountByMonth(
+    logs: [StudentSetLog], calendar: Calendar
+  ) -> [String: Int] {
+    let byDay = Dictionary(grouping: logs.filter(\.completed)) {
+      calendar.startOfDay(for: $0.loggedAt)
+    }
+    var counts: [String: Int] = [:]
+    for day in byDay.keys {
+      counts[monthKey(for: day, calendar: calendar), default: 0] += 1
+    }
+    return counts
   }
 
   static func monthKey(for date: Date, calendar: Calendar) -> String {

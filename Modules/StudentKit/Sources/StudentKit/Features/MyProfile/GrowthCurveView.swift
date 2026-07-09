@@ -106,11 +106,27 @@ struct GrowthCurvePanelView: View {
         .frame(minHeight: 240)
       } else {
         E1RMChart(
-          points: viewModel.visiblePoints.map {
-            E1RMChartPoint(id: $0.id, date: $0.computedAt, e1RMKg: $0.e1RMKg)
+          smoothed: viewModel.visibleSmoothedSamples.map {
+            E1RMChartPoint(
+              id: $0.sampleID,
+              date: $0.date,
+              e1RMKg: $0.valueKg,
+              origin: chartOrigin($0.winnerOrigin),
+              confidence: chartConfidence($0.winnerConfidence),
+              winnerPointID: $0.winnerPointID
+            )
+          },
+          rawEligible: viewModel.visibleRawEligiblePoints.map {
+            E1RMChartPoint(
+              id: $0.id,
+              date: $0.computedAt,
+              e1RMKg: $0.e1RMKg,
+              origin: chartOrigin($0.origin),
+              confidence: chartConfidence($0.confidence)
+            )
           },
           onSelect: { chartPoint in
-            selectedPoint = viewModel.visiblePoints.first { $0.id == chartPoint.id }
+            selectedPoint = viewModel.winnerPoint(forSampleID: chartPoint.id)
           }
         )
         .frame(height: 280)
@@ -154,6 +170,20 @@ struct GrowthCurvePanelView: View {
       Text(value)
         .font(Font.MeetPR.bodyEmphasis)
         .foregroundStyle(Color.MeetPR.fgPrimary)
+    }
+  }
+
+  private func chartOrigin(_ origin: E1RMPointOrigin) -> E1RMChartPointOrigin {
+    switch origin {
+    case .logged: .logged
+    case .imported: .imported
+    }
+  }
+
+  private func chartConfidence(_ confidence: E1RMConfidence) -> E1RMChartPointConfidence {
+    switch confidence {
+    case .normal: .normal
+    case .low: .low
     }
   }
 }
