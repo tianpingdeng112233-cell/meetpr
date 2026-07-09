@@ -6,7 +6,7 @@ import RepositoryContracts
 /// File-backed attachment store + backend playback URLs (spec 027).
 ///
 /// Records (including the setLog ↔ attachment association) persist to a JSON
-/// file under `Documents/video_attachments/` — the LocalE1RMRepository
+/// file under Application Support/MeetPR/video_attachments/ — the LocalE1RMRepository
 /// precedent — because backend spec 004 keeps attachments association-free.
 /// Only `playbackURL` talks to the backend (`GET /uploads/:id/url`).
 public actor BackendVideoAttachmentRepository: VideoAttachmentRepository {
@@ -21,10 +21,7 @@ public actor BackendVideoAttachmentRepository: VideoAttachmentRepository {
   public init(api: APIClient, session: any SessionStateReader, directory: URL? = nil) {
     self.api = api
     self.session = session
-    self.directory =
-      directory
-      ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-      .appendingPathComponent("video_attachments", isDirectory: true)
+    self.directory = directory ?? SecureLocalStorage.directory(relativePath: "video_attachments")
     let encoder = JSONEncoder()
     encoder.dateEncodingStrategy = .iso8601
     encoder.outputFormatting = [.sortedKeys]
@@ -98,5 +95,7 @@ public actor BackendVideoAttachmentRepository: VideoAttachmentRepository {
     cached = attachments
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     try encoder.encode(attachments).write(to: fileURL, options: .atomic)
+    SecureLocalStorage.harden(directory)
+    SecureLocalStorage.harden(fileURL)
   }
 }

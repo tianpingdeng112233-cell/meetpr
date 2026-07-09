@@ -32,6 +32,7 @@ extension VideoUploadManager {
     try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true)
     let destination = fileURL(for: record)
     try await exporter.export(from: sourceURL, to: destination)
+    SecureLocalStorage.harden(destination)
 
     try Task.checkCancellation()
     guard try await repository.fetch(id: record.id) != nil else {
