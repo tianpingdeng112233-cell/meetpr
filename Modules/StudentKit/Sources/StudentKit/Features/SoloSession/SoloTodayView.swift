@@ -8,10 +8,16 @@ import SwiftUI
 struct SoloTodayView: View {
   @State private var viewModel: SoloSessionViewModel
   private let catalog: [Exercise]
+  private let makeReviewViewModel: (() -> SessionReviewSubmitViewModel)?
 
-  init(viewModel: SoloSessionViewModel, catalog: [Exercise]) {
+  init(
+    viewModel: SoloSessionViewModel,
+    catalog: [Exercise],
+    makeReviewViewModel: (() -> SessionReviewSubmitViewModel)? = nil
+  ) {
     self._viewModel = State(initialValue: viewModel)
     self.catalog = catalog
+    self.makeReviewViewModel = makeReviewViewModel
   }
 
   private var committedCount: Int {
@@ -63,7 +69,8 @@ struct SoloTodayView: View {
           }
 
           NavigationLink {
-            SoloSessionView(viewModel: viewModel, catalog: catalog)
+            SoloSessionView(
+              viewModel: viewModel, catalog: catalog, makeReviewViewModel: makeReviewViewModel)
           } label: {
             Text(committedCount > 0 ? "继续训练" : "开始训练")
               .font(.headline)
@@ -83,6 +90,12 @@ struct SoloTodayView: View {
       }
       .refreshable {
         await viewModel.load()
+      }
+      // 跨午夜日期锁 (P0-2): re-lock 「今天」when the day rolls over while the
+      // app sits on this tab — but only if the home is idle, so a session
+      // spanning midnight keeps recording into its start day.
+      .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
+        Task { await viewModel.refreshForDayChangeIfIdle() }
       }
     }
   }

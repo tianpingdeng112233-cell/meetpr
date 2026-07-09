@@ -21,8 +21,25 @@ struct WorkoutDayHeader: View {
       Text(subtitle)
         .font(.subheadline)
         .foregroundStyle(Color.MeetPR.fgSecondary)
+
+      if !metadataBadges.isEmpty {
+        LazyVGrid(columns: badgeColumns, alignment: .leading, spacing: 6) {
+          ForEach(metadataBadges) { badge in
+            metadataBadge(badge)
+          }
+        }
+        .padding(.top, 2)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  private var badgeColumns: [GridItem] {
+    [GridItem(.adaptive(minimum: 112), spacing: 6, alignment: .leading)]
+  }
+
+  private var metadataBadges: [PlanAlgorithmMetadata.Badge] {
+    context?.algorithmMetadata.badges() ?? []
   }
 
   private var title: String {
@@ -55,6 +72,18 @@ struct WorkoutDayHeader: View {
       .padding(.horizontal, 8)
       .padding(.vertical, 5)
       .background(readinessFiled ? Color.MeetPR.greenSoft : Color.MeetPR.surface2)
+      .clipShape(.capsule)
+  }
+
+  private func metadataBadge(_ badge: PlanAlgorithmMetadata.Badge) -> some View {
+    Text(badge.title)
+      .font(.caption2)
+      .foregroundStyle(badge.tone == .stale ? Color.MeetPR.fgTertiary : Color.MeetPR.fgSecondary)
+      .lineLimit(2)
+      .multilineTextAlignment(.leading)
+      .padding(.horizontal, 8)
+      .padding(.vertical, 5)
+      .background(badge.tone == .stale ? Color.MeetPR.surface2 : Color.MeetPR.greenSoft)
       .clipShape(.capsule)
   }
 

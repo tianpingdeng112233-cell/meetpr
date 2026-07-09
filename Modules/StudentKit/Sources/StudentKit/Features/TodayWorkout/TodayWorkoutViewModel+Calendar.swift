@@ -15,7 +15,11 @@ extension TodayWorkoutViewModel {
     return TodayWorkoutPlanContext(
       planKind: plan.planKind,
       weekIndex: weekIndex(for: selectedDate, startDate: plan.startDate, fallback: plan.weekIndex),
-      startDate: plan.startDate
+      startDate: plan.startDate,
+      blockType: plan.blockType,
+      mesocyclePhase: plan.mesocyclePhase,
+      trainingMax: plan.trainingMax,
+      tmSetAt: plan.tmSetAt
     )
   }
 

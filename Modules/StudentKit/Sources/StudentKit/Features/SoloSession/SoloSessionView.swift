@@ -9,9 +9,11 @@ import SwiftUI
 struct SoloSessionView: View {
   @Bindable var viewModel: SoloSessionViewModel
   let catalog: [Exercise]
+  var makeReviewViewModel: (() -> SessionReviewSubmitViewModel)?
   @State private var pickerPresented = false
   @State private var editingDraftID: UUID?
   @State private var plateMathWeightKg: Double?
+  @State private var reviewPresented = false
 
   private var exerciseOrder: [UUID] {
     var seen: Set<UUID> = []
@@ -60,6 +62,18 @@ struct SoloSessionView: View {
         }
         .accessibilityIdentifier("solo.addExercise")
       }
+
+      if makeReviewViewModel != nil, viewModel.drafts.contains(where: \.completed) {
+        Section {
+          Button {
+            reviewPresented = true
+          } label: {
+            Label("写一句今天的感受", systemImage: "square.and.pencil")
+              .font(.subheadline)
+          }
+          .accessibilityIdentifier("solo.review")
+        }
+      }
     }
     .navigationTitle("今天 · \(viewModel.sessionDate)")
     #if os(iOS)
@@ -88,6 +102,12 @@ struct SoloSessionView: View {
     .sheet(item: plateMathTarget) { target in
       PlateMathSheet(targetKg: target.weightKg)
         .presentationDetents([.medium])
+    }
+    .sheet(isPresented: $reviewPresented) {
+      if let makeReviewViewModel {
+        SoloReviewSheet(viewModel: makeReviewViewModel())
+          .presentationDetents([.medium])
+      }
     }
     .overlay(alignment: .top) {
       if let banner = viewModel.pendingPRBanner {

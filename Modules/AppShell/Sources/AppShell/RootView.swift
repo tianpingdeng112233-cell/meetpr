@@ -19,6 +19,8 @@ public struct RootView: View {
   /// Offline-parking wrapper for solo (adhoc) writes, built once around
   /// studentLogs (spec 045); coached flows keep the direct path.
   private let soloLogs: QueuedTrainingLogRepository
+  private let studentSessionReviews: any SessionReviewRepository
+  private let studentAccount: any AccountRepository
   /// Decoding 1211 catalog entries is not free — load once per process.
   private static let soloCatalog = ExerciseCatalog.loadBundled()
   private let studentFeedback: any StudentFeedbackRepository
@@ -54,6 +56,8 @@ public struct RootView: View {
     studentOnboarding: (any OnboardingRepository)? = nil,
     studentEvaluations: (any EvaluationRepository)? = nil,
     studentEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
+    studentSessionReviews: (any SessionReviewRepository)? = nil,
+    studentAccount: (any AccountRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
@@ -68,6 +72,8 @@ public struct RootView: View {
     self.studentLogs = resolvedLogs
     self.soloLogs = QueuedTrainingLogRepository(
       upstream: resolvedLogs, store: PendingSetLogStore())
+    self.studentSessionReviews = studentSessionReviews ?? InMemorySessionReviewRepository()
+    self.studentAccount = studentAccount ?? InMemoryAccountRepository()
     self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
@@ -128,8 +134,11 @@ public struct RootView: View {
         bindGatedStudentRoot(for: user)
       case .selfTrainStudent:
         // Self-train students never bind (backend requireRole gate) and
-        // skip the BindGate entirely (spec 031 D4).
-        studentRoot(for: user)
+        // skip the BindGate entirely (spec 031 D4). Their gate is the
+        // 2-screen light onboarding instead (spec 046).
+        SoloOnboardingGateView(studentId: user.id, onboarding: studentOnboarding) {
+          studentRoot(for: user)
+        }
       }
     }
   }
@@ -198,7 +207,10 @@ public struct RootView: View {
     let soloLogs = self.soloLogs
     let logsForUser: any StudentTrainingLogRepository = isSolo ? soloLogs : studentLogs
     let trainingMode: TrainingMode = isSolo ? .selfTrain : .coached
-    let catalog: [Exercise] = isSolo ? Self.soloCatalog : []
+    // Both modes get the bundled catalog (spec 048): CSV export resolves
+    // names through it, and coached chart buckets treat the extra ids as a
+    // harmless union (no e1RM points live on unplanned catalog ids).
+    let catalog: [Exercise] = Self.soloCatalog
     let pendingCount: (@Sendable (UUID) async -> Int)?
     if isSolo {
       pendingCount = { studentID in await soloLogs.pendingCount(studentID: studentID) }
@@ -221,7 +233,9 @@ public struct RootView: View {
       },
       trainingMode: trainingMode,
       soloCatalog: catalog,
-      pendingSetLogCount: pendingCount
+      pendingSetLogCount: pendingCount,
+      sessionReviews: studentSessionReviews,
+      account: studentAccount
     )
   }
 }

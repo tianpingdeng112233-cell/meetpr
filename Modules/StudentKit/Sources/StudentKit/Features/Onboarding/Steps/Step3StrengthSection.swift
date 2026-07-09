@@ -8,6 +8,9 @@ import SwiftUI
 struct Step3StrengthSection: View {
   @Binding var draft: OnboardingDraft
   var highlighted: Set<String> = []
+  /// Coached-only warning (spec 005 E lock). Solo reuse passes nil — no
+  /// coach exists and backend spec 013 keeps solo 1RMs editable.
+  var lockWarning: String? = "⚠️ 1RM 一旦填写,完成后只有教练能改"
   @State private var squatText = ""
   @State private var benchText = ""
   @State private var deadliftText = ""
@@ -15,9 +18,11 @@ struct Step3StrengthSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-      Text("⚠️ 1RM 一旦填写,完成后只有教练能改")
-        .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+      if let lockWarning {
+        Text(lockWarning)
+          .font(Font.MeetPR.caption)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
 
       oneRMField(
         lift: .squat, title: "深蹲 1RM", text: $squatText,
