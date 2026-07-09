@@ -76,6 +76,38 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func detailExecutionDayDescribesShiftFromOriginalToEffectiveDate() throws {
+  let scheduledDate = CoachStudentFeatureFixtures.startDate.addingTimeInterval(86_400)
+  let shiftedDate = scheduledDate.addingTimeInterval(86_400)
+  let planDay = StudentPlanDay(
+    id: UUID(),
+    date: scheduledDate,
+    shiftedToDate: shiftedDate,
+    exercises: [CoachStudentFeatureFixtures.exercise()]
+  )
+  let plan = StudentPlanView(
+    cycleID: UUID(),
+    weekIndex: 1,
+    startDate: CoachStudentFeatureFixtures.startDate,
+    days: [planDay]
+  )
+
+  let executionDays = StudentDetailViewModel.makeExecutionDays(
+    plan: plan,
+    logs: [],
+    now: shiftedDate
+  )
+  let shiftedDay = try #require(executionDays.first { $0.planDay?.id == planDay.id })
+
+  #expect(
+    shiftedDay.shiftDescription
+      == "已顺延 \(CoachStudentFormatting.shortDateText(scheduledDate))"
+      + "→\(CoachStudentFormatting.shortDateText(shiftedDate))"
+  )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func detailAppendPostedFeedbackRefreshesLatestOverview() async {
   let summary = CoachStudentFeatureFixtures.summary()
   let older = CoachStudentFeatureFixtures.feedback(

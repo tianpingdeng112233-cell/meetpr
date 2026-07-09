@@ -14,6 +14,7 @@ public final class WeekOverviewViewModel {
   }
 
   public private(set) var state: State = .idle
+  public private(set) var planStartDate: Date?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -27,6 +28,7 @@ public final class WeekOverviewViewModel {
     state = .loading
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+      planStartDate = plan?.startDate
       let weekIndex = plan?.weekIndex ?? 1
       // fetchCycleDays now returns the whole cycle; the dashboard strip only
       // wants this week, so filter to the current plan-week window by date.

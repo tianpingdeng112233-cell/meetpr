@@ -10,6 +10,7 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let planRevision: Int
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -25,11 +26,13 @@ public struct TodayWorkoutView: View {
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
-    videoUploads: VideoUploadServices? = nil
+    videoUploads: VideoUploadServices? = nil,
+    planRevision: Int = 0
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
+    self.planRevision = planRevision
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
@@ -46,7 +49,8 @@ public struct TodayWorkoutView: View {
           studentID: studentID,
           selectedDate: $selectedDate,
           plans: plans,
-          logs: logs
+          logs: logs,
+          planRevision: planRevision
         )
         .padding(.horizontal)
         .padding(.top)
@@ -139,6 +143,9 @@ public struct TodayWorkoutView: View {
     }
     .onChange(of: selectedDate) { _, newDate in
       Task { await loadWorkout(for: newDate) }
+    }
+    .onChange(of: planRevision) { _, _ in
+      Task { await loadWorkout(for: selectedDate) }
     }
   }
 

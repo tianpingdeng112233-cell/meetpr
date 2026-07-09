@@ -193,6 +193,7 @@ public struct RootView: View {
   private func studentRoot(for user: User) -> some View {
     StudentRootView(
       studentID: user.id,
+      canShiftPlanDays: user.role == .coachedStudent,
       plans: studentPlans,
       logs: studentLogs,
       feedback: studentFeedback,

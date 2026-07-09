@@ -62,7 +62,8 @@ extension PlanDayDTO {
       planID: planID,
       dayOfWeek: dayOfWeek,
       weekNumber: weekNumber,
-      sortOrder: sortOrder
+      sortOrder: sortOrder,
+      shiftedToDate: shiftedToDate
     )
   }
 }
