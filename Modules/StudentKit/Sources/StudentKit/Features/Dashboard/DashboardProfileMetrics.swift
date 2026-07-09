@@ -84,7 +84,7 @@ final class DashboardProfileMetricsViewModel {
   enum State: Equatable, Sendable {
     case idle
     case loading
-    case loaded(DashboardProfileMetrics)
+    case loaded(OnboardingProfile?)
     case error(String)
   }
 
@@ -104,25 +104,29 @@ final class DashboardProfileMetricsViewModel {
     self.calendar = calendar
   }
 
+  /// Derived at access time from the stored profile, so the countdown days
+  /// are computed against the current clock — a dashboard rendered after
+  /// midnight shows the new day's count (spec 049 §4), not the number frozen
+  /// at load.
   var metrics: DashboardProfileMetrics? {
-    guard case .loaded(let metrics) = state, !metrics.isEmpty else {
+    guard case .loaded(let profile) = state else {
       return nil
     }
-    return metrics
+    let metrics = CompetitionCountdownPresenter.metrics(
+      from: profile, now: now(), calendar: calendar)
+    return metrics.isEmpty ? nil : metrics
   }
 
   func load(studentID: UUID) async {
     state = .loading
     do {
       let profile = try await onboarding.fetchProfile(studentId: studentID)
-      state = .loaded(
-        CompetitionCountdownPresenter.metrics(
-          from: profile,
-          now: now(),
-          calendar: calendar
-        )
-      )
+      state = .loaded(profile)
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

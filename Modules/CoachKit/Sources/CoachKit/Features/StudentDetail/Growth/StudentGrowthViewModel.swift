@@ -135,7 +135,9 @@ final class StudentGrowthViewModel {
   ) -> [LiftFamily: [GrowthPoint]] {
     var grouped: [LiftFamily: [GrowthPoint]] = [:]
     for log in logs where log.completed {
-      guard let family = familyByPlanExerciseID[log.planExerciseID] else { continue }
+      guard let planExerciseID = log.planExerciseID,
+        let family = familyByPlanExerciseID[planExerciseID]
+      else { continue }
       let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
       let rpe = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
       guard

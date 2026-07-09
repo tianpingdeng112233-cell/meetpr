@@ -34,6 +34,10 @@ extension PlanDTO {
       source: source,
       sourceTemplateID: sourceTemplateID,
       status: status,
+      blockType: blockType,
+      mesocyclePhase: mesocyclePhase,
+      trainingMax: trainingMax,
+      tmSetAt: tmSetAt,
       createdAt: createdAt,
       updatedAt: updatedAt
     )
@@ -104,6 +108,10 @@ extension SetLogDTO {
       id: id,
       studentID: studentID,
       planExerciseID: planExerciseID,
+      exerciseID: exerciseID,
+      loggedDate: loggedDate,
+      adhoc: adhoc,
+      assumed: assumed,
       setIndex: setIndex,
       loggedAt: loggedAt,
       weightKg: weightKg,

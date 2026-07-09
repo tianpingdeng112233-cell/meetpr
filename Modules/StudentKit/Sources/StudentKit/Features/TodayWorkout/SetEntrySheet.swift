@@ -22,6 +22,8 @@ struct SetEntrySheet: View {
   @State private var weight: Decimal
   @State private var reps: Int
   @State private var rpe: Decimal
+  @State private var editingWeight = false
+  @FocusState private var weightFieldFocused: Bool
 
   private let bar = 20.0
   private let collar = 2.5  // per-side locking collar — counts toward the load
@@ -57,9 +59,7 @@ struct SetEntrySheet: View {
             .padding(.top, 4)
 
           VStack(spacing: 18) {
-            plateStepper(
-              "重量", value: StudentFormatting.decimal(weight), unit: "KG", sub: "± 2.5",
-              onDec: { weight = max(0, weight - 2.5) }, onInc: { weight += 2.5 })
+            weightStepper()
             plateStepper(
               "次数", value: "\(reps)", unit: "次", sub: "± 1",
               onDec: { reps = max(0, reps - 1) }, onInc: { reps += 1 })
@@ -170,6 +170,65 @@ struct SetEntrySheet: View {
   }
 
   // MARK: - Steppers
+
+  /// The weight row: ±2.5 keeps the plate-jump muscle memory, and tapping
+  /// the big number opens direct entry — an RPE plan that floats 175→150
+  /// is one keyboard away instead of ten taps (spec 049 §3 / P1-1).
+  private func weightStepper() -> some View {
+    VStack(spacing: 8) {
+      HStack {
+        Text("重量")
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+        Spacer()
+        Text("± 2.5 · 点数字直输")
+          .font(.system(size: 10, design: .monospaced))
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+      HStack(spacing: 12) {
+        stepButton("minus") { weight = max(0, weight - 2.5) }
+        Group {
+          if editingWeight {
+            TextField("重量", value: $weight, format: .number)
+              .font(.system(size: 40, weight: .heavy, design: .monospaced))
+              .multilineTextAlignment(.center)
+              .focused($weightFieldFocused)
+              #if os(iOS)
+                .keyboardType(.decimalPad)
+              #endif
+              .onSubmit { commitWeightEdit() }
+              .onChange(of: weightFieldFocused) { _, focused in
+                if !focused { commitWeightEdit() }
+              }
+          } else {
+            Button {
+              editingWeight = true
+              weightFieldFocused = true
+            } label: {
+              HStack(alignment: .lastTextBaseline, spacing: 6) {
+                Text(StudentFormatting.decimal(weight))
+                  .font(.system(size: 40, weight: .heavy, design: .monospaced))
+                  .foregroundStyle(Color.MeetPR.fgPrimary)
+                Text("KG")
+                  .font(.system(size: 14, weight: .bold))
+                  .foregroundStyle(Color.MeetPR.fgTertiary)
+              }
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("setEntry.weightDirect")
+          }
+        }
+        .frame(maxWidth: .infinity)
+        stepButton("plus") { weight += 2.5 }
+      }
+    }
+  }
+
+  private func commitWeightEdit() {
+    editingWeight = false
+    weight = min(max(weight, 0), Decimal(string: "9999.99") ?? weight)
+  }
 
   private func plateStepper(
     _ label: String, value: String, unit: String?, sub: String,

@@ -20,12 +20,14 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func previewCatalogTotalCountIsTwelveThirtyOne() async throws {
+@Test func previewCatalogTotalCountIsTwelveTwentyThree() async throws {
   let catalog = try await previewCatalog()
 
   // spec 043 added 3 catalog exercises (离心卧推 / 弹力带窄推 / 安全杠节奏深蹲): 1224→1227.
-  #expect(catalog.count == 1231)
-  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 1227)
+  // The catalog fix added 2 low-bar squat variations (低杠位暂停深蹲 / 低杠位节奏深蹲): 1227→1229.
+  // Duplicate-nameEn dedup merged 10 entries into their canonical spelling: 1229→1219.
+  #expect(catalog.count == 1223)
+  #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 1219)
   #expect(InMemoryPlanRepository.syntheticCompetitionLifts().count == 4)
 }
 
@@ -34,6 +36,15 @@ import Testing
   let catalog = try await previewCatalog()
 
   #expect(Set(catalog.map(\.id)).count == catalog.count)
+}
+
+// 规范名 is the ExerciseMatcher/alias-canonical resolution key, so a duplicate
+// Chinese name would make bindings ambiguous — guard it at the data level.
+@available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogHasNoDuplicateChineseNames() async throws {
+  let catalog = try await previewCatalog()
+
+  #expect(Set(catalog.map(\.name)).count == catalog.count)
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -46,7 +57,7 @@ import Testing
   decoder.dateDecodingStrategy = .iso8601
   let decoded = try decoder.decode([Exercise].self, from: exerciseData)
 
-  #expect(decoded.count == 1227)
+  #expect(decoded.count == 1219)
   #expect(decoded.allSatisfy { !$0.muscleGroups.isEmpty })
   #expect(decoded.allSatisfy { !$0.equipment.isEmpty })
   #expect(decoded.allSatisfy { !$0.movementPattern.isEmpty })

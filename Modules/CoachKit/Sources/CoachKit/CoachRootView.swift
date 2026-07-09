@@ -90,9 +90,11 @@ public struct CoachRootView: View {
       CoachDashboardView(
         attentionCount: rosterViewModel.pendingAttentionCount,
         pendingCount: queueViewModel.pendingCount,
+        context: detailContext,
         rows: rosterViewModel.rows,
         onOpenReceiving: { selectedTab = .receiving },
-        onOpenRoster: { selectedTab = .students }
+        onOpenRoster: { selectedTab = .students },
+        onEvaluationCompleted: { rosterViewModel.markStudentActive($0) }
       )
       .tag(CoachTab.today)
       .tabItem {

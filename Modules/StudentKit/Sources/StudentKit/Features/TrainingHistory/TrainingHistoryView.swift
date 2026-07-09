@@ -15,10 +15,14 @@ public struct TrainingHistoryView: View {
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel?
+  private let trainingMode: TrainingMode
+  private let importedHistoryRefreshToken: Int
+  private let onImportedHistoryRefresh: (@MainActor () async -> Void)?
   @State private var viewModel: TrainingHistoryViewModel
   @State private var trendViewModel: DashboardE1RMTrendViewModel
   @State private var prEvent: PRBreakthroughEvent?
   @State private var prFamily: LiftFamily?
+  @State private var pendingPRs: [PRBreakthroughEvent] = []
   @State private var showsAllHistory = false
 
   public init(
@@ -26,15 +30,27 @@ public struct TrainingHistoryView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
-    feedbackViewModel: FeedbackInboxViewModel? = nil
+    feedbackViewModel: FeedbackInboxViewModel? = nil,
+    sessionReviews: (any SessionReviewRepository)? = nil,
+    trainingMode: TrainingMode = .coached,
+    soloCatalog: [Exercise] = [],
+    importedHistoryRefreshToken: Int = 0,
+    onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
-    self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
+    self.trainingMode = trainingMode
+    self.importedHistoryRefreshToken = importedHistoryRefreshToken
+    self.onImportedHistoryRefresh = onImportedHistoryRefresh
+    self._viewModel = State(
+      initialValue: TrainingHistoryViewModel(
+        plans: plans, logs: logs, reviews: sessionReviews,
+        e1rm: e1rm, mode: trainingMode, catalog: soloCatalog))
     self._trendViewModel = State(
-      initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
+      initialValue: DashboardE1RMTrendViewModel(
+        plans: plans, e1rm: e1rm, mode: trainingMode, catalog: soloCatalog)
     )
   }
 
@@ -53,6 +69,7 @@ public struct TrainingHistoryView: View {
         ScrollView {
           VStack(alignment: .leading, spacing: 16) {
             if let prEvent { prBanner(prEvent) }
+            if !pendingPRs.isEmpty { unacknowledgedPRSection }
 
             switch viewModel.state {
             case .idle, .loading:
@@ -76,10 +93,18 @@ public struct TrainingHistoryView: View {
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
       .navigationDestination(isPresented: $showsAllHistory) {
-        AllHistoryScreen(viewModel: viewModel)
+        AllHistoryScreen(viewModel: viewModel, mode: trainingMode)
       }
     }
     .task { await loadIfNeeded() }
+    .task(id: importedHistoryRefreshToken) {
+      guard importedHistoryRefreshToken > 0 else { return }
+      await reloadAfterImportedHistoryChange()
+    }
+    .refreshable {
+      await onImportedHistoryRefresh?()
+      await reloadAfterImportedHistoryChange()
+    }
   }
 
   // MARK: - PR banner
@@ -123,7 +148,13 @@ public struct TrainingHistoryView: View {
   // MARK: - e1RM lift charts
 
   private var liftCharts: some View {
-    VStack(spacing: 16) {
+    VStack(alignment: .leading, spacing: 16) {
+      // 首屏黑话有解释 (P2-1): E1RM 是全 app 最高频的专业词,给一句白话锚点,
+      // 别让新手对着首字母缩写猜。放段首出现一次,不逐卡重复。
+      Text("E1RM = 用你完成的组数估算的单次最大重量,越高越强")
+        .font(.system(size: 12))
+        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .frame(maxWidth: .infinity, alignment: .leading)
       ForEach(MainLiftExerciseFamilyResolver.dashboardFamilies, id: \.self) { family in
         liftChartCard(family)
       }
@@ -132,15 +163,16 @@ public struct TrainingHistoryView: View {
 
   private func liftChartCard(_ family: LiftFamily) -> some View {
     let row = trendRow(for: family)
+    let displayPoint = row?.displayPoint()
     return VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .bottom) {
         VStack(alignment: .leading, spacing: 0) {
-          Text("\(family.studentDisplayName) E1RM · 90 天")
+          Text("\(family.studentDisplayName) E1RM · \(chartPeriodLabel(for: row))")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
             .foregroundStyle(Color.MeetPR.brandRed)
           HStack(alignment: .lastTextBaseline, spacing: 6) {
-            Text(row?.latestPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
+            Text(displayPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
               .font(.system(size: 40, weight: .heavy).monospacedDigit())
               .foregroundStyle(Color.MeetPR.fgPrimary)
             Text("KG")
@@ -158,12 +190,8 @@ public struct TrainingHistoryView: View {
         }
       }
       if let row, !row.points.isEmpty {
-        Sparkline(
-          points: row.sparklinePoints(top: 5, usableHeight: 80),
-          viewBox: CGSize(width: 600, height: 90)
-        )
-        .frame(height: 90)
-        .padding(.top, 12)
+        sparklineWithAxis(row)
+          .padding(.top, 12)
       } else {
         Text("练几次就有趋势了")
           .font(.system(size: 13))
@@ -177,6 +205,40 @@ public struct TrainingHistoryView: View {
     .background(Color.MeetPR.surface1)
     .clipShape(.rect(cornerRadius: 12))
     .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
+  /// e1RM sparkline with a min/max kg anchor on the left (P2-8: 无轴无点标).
+  /// The kg values live here, not inside the normalized Sparkline — max maps
+  /// to the top of the plot (y=5) and min to the bottom (y=85), matching
+  /// `sparklinePoints(top: 5, usableHeight: 80)`.
+  private func sparklineWithAxis(_ row: DashboardE1RMTrendRow) -> some View {
+    let values = row.points.map(\.e1RMKg)
+    let maxKg = values.max() ?? 0
+    let minKg = values.min() ?? 0
+    return HStack(alignment: .center, spacing: 8) {
+      VStack(alignment: .trailing, spacing: 0) {
+        axisLabel(maxKg)
+        Spacer(minLength: 0)
+        if maxKg != minKg { axisLabel(minKg) }
+      }
+      .frame(height: 90)
+      Sparkline(
+        points: row.sparklinePoints(top: 5, usableHeight: 80),
+        viewBox: CGSize(width: 600, height: 90),
+        showsPointDots: true
+      )
+      .frame(height: 90)
+    }
+  }
+
+  private func axisLabel(_ kilograms: Double) -> some View {
+    Text(StudentFormatting.kilograms(kilograms))
+      .font(.system(size: 10, design: .monospaced))
+      .foregroundStyle(Color.MeetPR.fgTertiary)
+  }
+
+  private func chartPeriodLabel(for row: DashboardE1RMTrendRow?) -> String {
+    row?.displaysHistoricalBest() == true ? "历史最佳" : "90 天"
   }
 
   // MARK: - Coach feedback history
@@ -247,7 +309,12 @@ public struct TrainingHistoryView: View {
       sectionLabel("全部历史")
       HStack {
         stat("训练次数", value: sessionCountText)
-        stat("训练周", value: "\(weekCount)")
+        if trainingMode == .selfTrain {
+          // 没有计划周的概念 (spec 047 §2) — 自然历月替代。
+          stat("本月次数", value: "\(viewModel.currentMonthSessionCount)")
+        } else {
+          stat("训练周", value: "\(weekCount)")
+        }
         stat("三大项合计", value: sbdTotalText)
       }
       .padding(16)
@@ -370,18 +437,34 @@ public struct TrainingHistoryView: View {
   }
 
   private var feedbackItems: [CoachFeedback]? {
+    // 成长 tab 反馈段仅 coached (spec 047 AC#3 solo 零教练字样): a solo account
+    // structurally has no coach in V1, so 「教练反馈记录」 must never render —
+    // gate at the source so it can't leak even if a feedbackViewModel is injected.
+    guard Self.showsCoachFeedback(trainingMode: trainingMode) else { return nil }
     guard let feedbackViewModel, case .loaded(let items) = feedbackViewModel.state else {
       return nil
     }
     return items.sorted { $0.postedAt > $1.postedAt }
   }
 
+  static func showsCoachFeedback(trainingMode: TrainingMode) -> Bool {
+    trainingMode == .coached
+  }
+
   /// Distinct calendar days on which at least one set was completed.
   private var sessionCountText: String {
-    let days = Set(
-      loadedLogs.filter(\.completed).map { Calendar.current.startOfDay(for: $0.loggedAt) }
+    "\(Self.completedSessionCount(logs: loadedLogs))"
+  }
+
+  static func completedSessionCount(
+    logs: [StudentSetLog],
+    calendar: Calendar = .current
+  ) -> Int {
+    Set(
+      logs.filter { $0.completed && !$0.assumed }
+        .map { calendar.startOfDay(for: $0.loggedAt) }
     )
-    return "\(days.count)"
+    .count
   }
 
   private var weekCount: Int { loadedWeeks.count }
@@ -392,7 +475,7 @@ public struct TrainingHistoryView: View {
   private var sbdTotalText: String {
     guard let rows = trendPresentation?.rows else { return "—" }
     let values = MainLiftExerciseFamilyResolver.dashboardFamilies.compactMap { family in
-      rows.first { $0.family == family }?.latestPoint?.e1RMKg
+      rows.first { $0.family == family }?.displayPoint()?.e1RMKg
     }
     guard values.count == 3 else { return "—" }
     return StudentFormatting.kilograms(values.reduce(0, +))
@@ -433,8 +516,66 @@ public struct TrainingHistoryView: View {
       await feedbackViewModel.load(studentID: studentID)
     }
     let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
-    prEvent = prs.max { $0.occurredAt < $1.occurredAt }
+    pendingPRs = prs.sorted { $0.occurredAt > $1.occurredAt }
+    prEvent = pendingPRs.first
     prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+  }
+
+  private func reloadAfterImportedHistoryChange() async {
+    await viewModel.load(studentID: studentID)
+    await trendViewModel.load(studentID: studentID)
+    let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
+    pendingPRs = prs.sorted { $0.occurredAt > $1.occurredAt }
+    prEvent = pendingPRs.first
+    prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+  }
+
+  /// 红点终于有地方消费 (spec 051 §2): acknowledging removes the row, the
+  /// banner, and (via the tab-switch recount) the profile badge.
+  private func acknowledge(_ event: PRBreakthroughEvent) async {
+    try? await e1rm.acknowledgePR(eventId: event.id)
+    pendingPRs.removeAll { $0.id == event.id }
+    prEvent = pendingPRs.first
+    prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+  }
+
+  private var unacknowledgedPRSection: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text("未确认 PR")
+        .font(.headline)
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+      ForEach(pendingPRs, id: \.id) { event in
+        HStack(spacing: 10) {
+          Text("🎉")
+          VStack(alignment: .leading, spacing: 2) {
+            Text(prRowTitle(event))
+              .font(.subheadline.bold())
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+            Text(StudentFormatting.dayMonthFormatter.string(from: event.occurredAt))
+              .font(.caption)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+          }
+          Spacer()
+          Button("确认") {
+            Task { await acknowledge(event) }
+          }
+          .font(.footnote.bold())
+          .buttonStyle(.bordered)
+          .accessibilityIdentifier("growth.pr.ack.\(event.id.uuidString)")
+        }
+        .padding(12)
+        .background(Color.MeetPR.surface1)
+        .clipShape(.rect(cornerRadius: 10))
+      }
+    }
+  }
+
+  private func prRowTitle(_ event: PRBreakthroughEvent) -> String {
+    let value = StudentFormatting.kilograms(event.breakthroughE1RMKg)
+    if let family = familyForExercise(event.exerciseId) {
+      return "\(family.studentDisplayName) e1RM 突破 · \(value) kg"
+    }
+    return "e1RM 突破 · \(value) kg"
   }
 }
 
@@ -443,12 +584,20 @@ public struct TrainingHistoryView: View {
 @available(iOS 17.0, macOS 14.0, *)
 private struct AllHistoryScreen: View {
   let viewModel: TrainingHistoryViewModel
+  var mode: TrainingMode = .coached
   @State private var selectedExerciseName: String?
 
   var body: some View {
     Group {
       if case .loaded(let weeks, let logs) = viewModel.state {
-        HistoryEntriesView(weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName)
+        if mode == .selfTrain {
+          // 无计划周可分组 (spec 047 §2) — 月分组日卡片替代。
+          SoloHistoryListView(months: viewModel.soloMonths, reviews: viewModel.reviewsByDay)
+        } else {
+          HistoryEntriesView(
+            weeks: weeks, logs: logs, reviews: viewModel.reviewsByDay,
+            selectedExerciseName: $selectedExerciseName)
+        }
       } else {
         ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
       }

@@ -18,7 +18,12 @@ public struct MyProfileView: View {
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   /// nil hides the row (demo/previews); live wiring passes Session.logout.
   private let onLogout: (@MainActor () async -> Void)?
+  private let trainingMode: TrainingMode
+  private let soloCatalog: [Exercise]
+  private let account: (any AccountRepository)?
+  private let logs: (any StudentTrainingLogRepository)?
   @State private var viewModel: MyProfileViewModel
+  @State private var editingBaseline = false
 
   public init(
     studentID: UUID,
@@ -26,13 +31,21 @@ public struct MyProfileView: View {
     e1rm: any E1RMRepository,
     onboarding: any OnboardingRepository,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
-    onLogout: (@MainActor () async -> Void)? = nil
+    onLogout: (@MainActor () async -> Void)? = nil,
+    trainingMode: TrainingMode = .coached,
+    soloCatalog: [Exercise] = [],
+    account: (any AccountRepository)? = nil,
+    logs: (any StudentTrainingLogRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onLogout = onLogout
+    self.trainingMode = trainingMode
+    self.soloCatalog = soloCatalog
+    self.account = account
+    self.logs = logs
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -63,6 +76,31 @@ public struct MyProfileView: View {
       .hideNavigationBar()
     }
     .task { await viewModel.loadIfNeeded() }
+    .sheet(isPresented: $editingBaseline) {
+      if case .loaded(let profile) = viewModel.state {
+        SoloBaselineEditSheet(profile: profile) { patch in
+          await viewModel.save(patch)
+        }
+        .presentationDetents([.large])
+      }
+    }
+  }
+
+  // MARK: - 账号与安全 (spec 048)
+
+  @ViewBuilder
+  private var accountSecuritySection: some View {
+    if let account {
+      sectionLabel("账号与安全").padding(.top, 18)
+      AccountSecuritySection(
+        studentID: studentID,
+        account: account,
+        logs: logs,
+        catalog: soloCatalog,
+        onLogout: onLogout
+      )
+      .padding(.top, 8)
+    }
   }
 
   @ViewBuilder
@@ -90,10 +128,23 @@ public struct MyProfileView: View {
 
   @ViewBuilder
   private func sections(_ profile: OnboardingProfile) -> some View {
-    sectionLabel("训练基线 · 教练管理")
-    oneRMCard(profile).padding(.top, 8)
+    // Solo owns its baseline (backend spec 013) — no 教练 words anywhere
+    // on the solo profile (spec 046 验收 3).
+    sectionLabel(trainingMode == .selfTrain ? "训练基线" : "训练基线 · 教练管理")
+    OneRMBaselineCard(profile: profile, trainingMode: trainingMode) {
+      editingBaseline = true
+    }
+    .padding(.top, 8)
+    // 基线是入门锚点,不是第三个「我的实力」(spec 050 §4)——实测走势
+    // 归成长曲线,两个数字各安其位。
+    Text("入门基线 · 实测走势见「成长」")
+      .font(.caption)
+      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.top, 4)
 
-    sectionLabel("恢复与伤病 · 改动通知教练").padding(.top, 18)
+    sectionLabel(trainingMode == .selfTrain ? "恢复与伤病" : "恢复与伤病 · 改动通知教练")
+      .padding(.top, 18)
     card {
       profileRow(
         "恢复评估", OnboardingSummaryFormatter.recovery(profile),
@@ -121,6 +172,11 @@ public struct MyProfileView: View {
     }
     .padding(.top, 8)
 
+    trailingSections(profile)
+  }
+
+  @ViewBuilder
+  private func trailingSections(_ profile: OnboardingProfile) -> some View {
     sectionLabel("训练背景 · 环境").padding(.top, 18)
     card {
       profileRow(
@@ -135,51 +191,8 @@ public struct MyProfileView: View {
 
     sectionLabel("更多").padding(.top, 18)
     moreCard.padding(.top, 8)
-  }
 
-  // MARK: - 1RM baseline card (locked)
-
-  private func oneRMCard(_ profile: OnboardingProfile) -> some View {
-    card(padding: 18) {
-      VStack(alignment: .leading, spacing: 0) {
-        HStack {
-          Text("当前 1RM")
-            .font(Font.MeetPR.monoLabel)
-            .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
-          Spacer()
-          Image(systemName: "lock").font(.system(size: 14)).foregroundStyle(Color.MeetPR.fgTertiary)
-        }
-        HStack(spacing: 12) {
-          oneRMValue("深蹲", profile.squat1RMKg)
-          oneRMValue("卧推", profile.bench1RMKg)
-          oneRMValue("硬拉", profile.deadlift1RMKg)
-        }
-        .padding(.top, 12)
-        HStack(spacing: 6) {
-          Image(systemName: "lock").font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
-          Text("训练周期中无法修改 · 联系教练")
-            .font(Font.MeetPR.monoLabel)
-            .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-        }
-        .padding(.top, 14)
-      }
-    }
-  }
-
-  private func oneRMValue(_ label: String, _ value: Decimal?) -> some View {
-    VStack(alignment: .leading, spacing: 2) {
-      Text(label).font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
-      HStack(alignment: .lastTextBaseline, spacing: 3) {
-        Text(value.map { UnitDisplay.plainString($0) } ?? "—")
-          .font(.system(size: 30, weight: .heavy).monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("kg").font(.system(size: 12, design: .monospaced)).foregroundStyle(
-          Color.MeetPR.fgTertiary)
-      }
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
+    accountSecuritySection
   }
 
   // MARK: - Rows
@@ -195,7 +208,7 @@ public struct MyProfileView: View {
         VStack(alignment: .leading, spacing: 4) {
           HStack(spacing: 6) {
             Text(label).font(.system(size: 14)).foregroundStyle(Color.MeetPR.fgTertiary)
-            if push { notifyBadge }
+            if Self.showsNotifyBadge(push: push, trainingMode: trainingMode) { notifyBadge }
           }
           Text(value)
             .font(.system(size: 17))
@@ -211,6 +224,17 @@ public struct MyProfileView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
+  }
+
+  /// 「通知教练」badge only makes sense when a coach exists (spec 046 §3 零教
+  /// 练字样): solo Free-tier profiles never show it, even on the push rows.
+  static func showsNotifyBadge(push: Bool, trainingMode: TrainingMode) -> Bool {
+    push && trainingMode != .selfTrain
+  }
+
+  /// 评估总结 is a coach deliverable — solo profiles never surface it (spec 046 §3).
+  static func showsEvaluationSummary(trainingMode: TrainingMode) -> Bool {
+    trainingMode == .coached
   }
 
   private var notifyBadge: some View {
@@ -230,13 +254,20 @@ public struct MyProfileView: View {
   private var moreCard: some View {
     card {
       NavigationLink {
-        GrowthCurveView(studentID: studentID, plans: plans, e1rm: e1rm)
+        GrowthCurveView(
+          studentID: studentID, plans: plans, e1rm: e1rm,
+          mode: trainingMode, catalog: soloCatalog
+        )
       } label: {
         moreRow(icon: "chart.xyaxis.line", title: "成长曲线")
       }
       .buttonStyle(.plain)
 
-      if let evaluationSummaryViewModel, let summary = evaluationSummaryViewModel.summary {
+      // 评估总结 is a coach deliverable (spec 046 §3 solo 零教练字样): a solo
+      // profile never shows it, even if an evaluation VM were injected.
+      if Self.showsEvaluationSummary(trainingMode: trainingMode),
+        let evaluationSummaryViewModel, let summary = evaluationSummaryViewModel.summary
+      {
         divider
         NavigationLink {
           EvaluationSummaryView(summary: summary) { evaluationSummaryViewModel.markRead() }

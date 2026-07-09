@@ -1,3 +1,4 @@
+import CatalogKit
 import CoachKit
 import CoreModels
 import RepositoryContracts
@@ -15,6 +16,13 @@ public struct RootView: View {
   private let coachStudentProfiles: any OnboardingProfileReading
   private let studentPlans: any StudentPlanRepository
   private let studentLogs: any StudentTrainingLogRepository
+  /// Offline-parking wrapper for solo (adhoc) writes, built once around
+  /// studentLogs (spec 045); coached flows keep the direct path.
+  private let soloLogs: QueuedTrainingLogRepository
+  private let studentSessionReviews: any SessionReviewRepository
+  private let studentAccount: any AccountRepository
+  /// Decoding 1211 catalog entries is not free — load once per process.
+  private static let soloCatalog = ExerciseCatalog.loadBundled()
   private let studentFeedback: any StudentFeedbackRepository
   private let studentE1RM: any E1RMRepository
   private let studentReadiness: any ReadinessRepository
@@ -48,6 +56,8 @@ public struct RootView: View {
     studentOnboarding: (any OnboardingRepository)? = nil,
     studentEvaluations: (any EvaluationRepository)? = nil,
     studentEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
+    studentSessionReviews: (any SessionReviewRepository)? = nil,
+    studentAccount: (any AccountRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
@@ -58,7 +68,12 @@ public struct RootView: View {
     self.coachPlans = coachPlans
     self.coachInviteCodes = coachInviteCodes ?? RootViewDemoDefaults.inviteCodes()
     self.studentPlans = studentPlans ?? RootViewDemoDefaults.plans()
-    self.studentLogs = studentLogs ?? RootViewDemoDefaults.logs()
+    let resolvedLogs = studentLogs ?? RootViewDemoDefaults.logs()
+    self.studentLogs = resolvedLogs
+    self.soloLogs = QueuedTrainingLogRepository(
+      upstream: resolvedLogs, store: PendingSetLogStore())
+    self.studentSessionReviews = studentSessionReviews ?? InMemorySessionReviewRepository()
+    self.studentAccount = studentAccount ?? InMemoryAccountRepository()
     self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
@@ -119,8 +134,11 @@ public struct RootView: View {
         bindGatedStudentRoot(for: user)
       case .selfTrainStudent:
         // Self-train students never bind (backend requireRole gate) and
-        // skip the BindGate entirely (spec 031 D4).
-        studentRoot(for: user)
+        // skip the BindGate entirely (spec 031 D4). Their gate is the
+        // 2-screen light onboarding instead (spec 046).
+        SoloOnboardingGateView(studentId: user.id, onboarding: studentOnboarding) {
+          studentRoot(for: user)
+        }
       }
     }
   }
@@ -185,10 +203,24 @@ public struct RootView: View {
   }
 
   private func studentRoot(for user: User) -> some View {
-    StudentRootView(
+    let isSolo = user.role == .selfTrainStudent
+    let soloLogs = self.soloLogs
+    let logsForUser: any StudentTrainingLogRepository = isSolo ? soloLogs : studentLogs
+    let trainingMode: TrainingMode = isSolo ? .selfTrain : .coached
+    // Both modes get the bundled catalog (spec 048): CSV export resolves
+    // names through it, and coached chart buckets treat the extra ids as a
+    // harmless union (no e1RM points live on unplanned catalog ids).
+    let catalog: [Exercise] = Self.soloCatalog
+    let pendingCount: (@Sendable (UUID) async -> Int)?
+    if isSolo {
+      pendingCount = { studentID in await soloLogs.pendingCount(studentID: studentID) }
+    } else {
+      pendingCount = nil
+    }
+    return StudentRootView(
       studentID: user.id,
       plans: studentPlans,
-      logs: studentLogs,
+      logs: logsForUser,
       feedback: studentFeedback,
       e1rm: studentE1RM,
       readiness: studentReadiness,
@@ -198,7 +230,12 @@ public struct RootView: View {
       summaryReadStore: summaryReadStore,
       onLogout: {
         await session.logout()
-      }
+      },
+      trainingMode: trainingMode,
+      soloCatalog: catalog,
+      pendingSetLogCount: pendingCount,
+      sessionReviews: studentSessionReviews,
+      account: studentAccount
     )
   }
 }

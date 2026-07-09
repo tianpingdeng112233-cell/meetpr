@@ -61,6 +61,19 @@ import Testing
   #expect(abs(averageRPE - 8.0) < 0.0001)
 }
 
+@Test func weeklyMetricsExcludeAssumedImportedSets() {
+  let calendar = fixedCalendar()
+  let actual = makeLog(date: date(2026, 6, 1, calendar: calendar), weight: "100", reps: 5)
+  let assumed = StudentSetLog(
+    id: UUID(), studentID: actual.studentID, planExerciseID: actual.planExerciseID,
+    assumed: true, setIndex: 1, loggedAt: actual.loggedAt,
+    weightKg: 200, reps: 5, rpe: 9, completed: true)
+
+  let buckets = ProgressMetrics.weeklyVolumeIntensity(from: [actual, assumed], calendar: calendar)
+  #expect(buckets.map(\.volumeKg) == [decimal("500")])
+  #expect(buckets.first?.avgRPE == 8)
+}
+
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func emptyMetricsReturnEmptyAndChartCanInitialize() {

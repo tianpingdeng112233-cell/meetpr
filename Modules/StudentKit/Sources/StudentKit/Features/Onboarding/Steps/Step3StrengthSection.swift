@@ -2,12 +2,15 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
-/// Step 3 你有多强?: the three 1RMs + estimator sheet (spec 032 D7 —
-/// reuses the spec-028 E1RMCalculator). 1RM entry is always kg.
+/// Step 3 你的三大项极限是多少?: the three 1RMs + estimator sheet (spec 032
+/// D7 — reuses the spec-028 E1RMCalculator). 1RM entry is always kg.
 @available(iOS 17.0, macOS 14.0, *)
 struct Step3StrengthSection: View {
   @Binding var draft: OnboardingDraft
   var highlighted: Set<String> = []
+  /// Coached-only warning (spec 005 E lock). Solo reuse passes nil — no
+  /// coach exists and backend spec 013 keeps solo 1RMs editable.
+  var lockWarning: String? = "⚠️ 1RM 一旦填写,完成后只有教练能改"
   @State private var squatText = ""
   @State private var benchText = ""
   @State private var deadliftText = ""
@@ -15,9 +18,11 @@ struct Step3StrengthSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-      Text("⚠️ 1RM 一旦填写,完成后只有教练能改")
-        .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+      if let lockWarning {
+        Text(lockWarning)
+          .font(Font.MeetPR.caption)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
 
       oneRMField(
         lift: .squat, title: "深蹲 1RM", text: $squatText,
@@ -141,6 +146,9 @@ struct OneRMEstimatorSheet: View {
         OnboardingFieldLabel(title: "RPE: \(String(format: "%.1f", rpe))")
         Slider(value: $rpe, in: 6...10, step: 0.5)
           .tint(Color.MeetPR.brandRed)
+        Text("RPE = 这组做完有多吃力:10=力竭、9=还能多做 1 次、8=还能多做 2 次。")
+          .font(Font.MeetPR.caption)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
       }
 
       if let estimate {

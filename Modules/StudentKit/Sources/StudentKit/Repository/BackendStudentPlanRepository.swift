@@ -127,6 +127,10 @@ enum StudentPlanProjection {
       weekIndex: weekIndex,
       startDate: tree.plan.startDate,
       planKind: tree.plan.kind,
+      blockType: tree.plan.blockType,
+      mesocyclePhase: tree.plan.mesocyclePhase,
+      trainingMax: tree.plan.trainingMax,
+      tmSetAt: tree.plan.tmSetAt,
       days: days
     )
   }

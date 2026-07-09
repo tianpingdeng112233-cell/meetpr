@@ -71,9 +71,12 @@ public final class TodayWorkoutViewModel {
       exerciseReferences = references
       state = .loaded(plan: day, drafts: drafts)
     } catch {
-      if isCurrentLoad(generation) {
-        state = .error(error.localizedDescription)
+      guard isCurrentLoad(generation) else { return }
+      if error.isTaskCancellation {
+        state = .idle
+        return
       }
+      state = .error(error.localizedDescription)
     }
   }
 
@@ -175,6 +178,13 @@ public final class TodayWorkoutViewModel {
         startRestTimer(after: draft, drafts: nextDrafts)
       }
     } catch {
+      // `persist` flips to `.recording` before awaiting `recordSet`, so a
+      // cancelled set-logging task must restore the prior `.loaded` snapshot
+      // rather than stranding the UI in `.recording`.
+      if error.isTaskCancellation {
+        state = .loaded(plan: plan, drafts: drafts)
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }
@@ -243,32 +253,6 @@ public final class TodayWorkoutViewModel {
     generation == loadGeneration
   }
 
-  private static func planContext(
-    from plan: StudentPlanView?,
-    selectedDate: Date
-  ) -> TodayWorkoutPlanContext? {
-    guard let plan else { return nil }
-    return TodayWorkoutPlanContext(
-      planKind: plan.planKind,
-      weekIndex: weekIndex(for: selectedDate, startDate: plan.startDate, fallback: plan.weekIndex),
-      startDate: plan.startDate
-    )
-  }
-
-  private static func weekIndex(for date: Date, startDate: Date, fallback: Int) -> Int {
-    let calendar = Calendar.current
-    let start = calendar.startOfDay(for: startDate)
-    let selected = calendar.startOfDay(for: date)
-    guard let elapsedDays = calendar.dateComponents([.day], from: start, to: selected).day else {
-      return fallback
-    }
-    return max(1, elapsedDays / 7 + 1)
-  }
-
-  private static func dayRange(containing date: Date) -> ClosedRange<Date> {
-    let start = Calendar.current.startOfDay(for: date)
-    return start...start.addingTimeInterval(86_400 - 1)
-  }
 }
 
 // MARK: - Draft building & e1RM/PR side effects
@@ -279,13 +263,20 @@ extension TodayWorkoutViewModel {
     for day: StudentPlanDay,
     studentID: UUID
   ) async throws -> [UUID: ExerciseReference] {
+    let familyByExercise = Dictionary(
+      day.exercises.map { ($0.exercise.id, $0.exercise.mainLiftFamily) },
+      uniquingKeysWith: { first, _ in first })
     let exerciseIDs = Set(day.exercises.map(\.exercise.id))
     let e1rmRepo = self.e1rmRepo
     return try await withThrowingTaskGroup(of: (UUID, ExerciseReference?).self) { group in
       for exerciseID in exerciseIDs {
+        let family = familyByExercise[exerciseID].flatMap { $0 }
         group.addTask {
           let points = try await e1rmRepo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
-          let selected = lastAndBest(from: points)
+          // Last/Best keep raw semantics but only over eligible sets
+          // (spec 050 §2) — an RPE-6 warm-up is no reference.
+          let selected = lastAndBest(
+            from: E1RMSeries.eligibleRaw(points: points, family: family))
           let reference = ExerciseReference(
             last: selected.last.map(ExerciseReferenceSet.init(point:)),
             best: selected.best.map(ExerciseReferenceSet.init(point:))
@@ -343,58 +334,34 @@ extension TodayWorkoutViewModel {
     log: StudentSetLog,
     studentID: UUID
   ) async {
-    // Failed attempts are history-only; e1RM/PR ignores incomplete outcomes.
-    guard !log.failed else { return }
-    let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
-    let rpe = draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
-    guard
-      let estimatedOneRepMaxKg = E1RMCalculator.calculate(
-        weightKg: weight,
+    // Shared pipeline (spec 050 §3): eligibility gate + noise-banded PR.
+    let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
+    let event = await recorder.record(
+      E1RMRecorder.Input(
+        studentID: studentID,
+        exerciseID: draft.exerciseID,
+        family: exerciseFamily(planExerciseID: draft.planExerciseID),
+        setLogID: log.id,
+        weightKg: log.weightKg,
         reps: log.reps,
-        rpe: rpe
-      )
-    else { return }
-
-    let point = E1RMHistoryPoint(
-      id: UUID(),
-      studentId: studentID,
-      exerciseId: draft.exerciseID,
-      setLogId: log.id,
-      computedAt: now(),
-      e1RMKg: estimatedOneRepMaxKg,
-      sourceWeightKg: weight,
-      sourceReps: log.reps,
-      sourceRPE: rpe
-    )
-    do {
-      // Baseline BEFORE inserting the new point, over the full history
-      // (.distantFuture): a strictly-earlier filter at point.computedAt would
-      // miss a same-timestamp sibling and double-fire PRs (Codex review P1).
-      let previousMax = try await e1rmRepo.maxBefore(
-        studentId: studentID,
-        exerciseId: draft.exerciseID,
-        before: .distantFuture
-      )
-      try await e1rmRepo.recordPoint(point)
-
-      // 0.5kg buffer absorbs float jitter; tune to 1.0 if PRs fire too often.
-      if estimatedOneRepMaxKg > (previousMax ?? 0) + 0.5 {
-        let event = PRBreakthroughEvent(
-          id: UUID(),
-          studentId: studentID,
-          exerciseId: draft.exerciseID,
-          pointId: point.id,
-          breakthroughE1RMKg: estimatedOneRepMaxKg,
-          previousMaxE1RMKg: previousMax ?? 0,
-          occurredAt: point.computedAt,
-          acknowledgedAt: nil
-        )
-        try await e1rmRepo.recordPR(event)
-        pendingPRBanner = event
-      }
-    } catch {
-      // e1RM persistence is best-effort and must never block set logging,
-      // but a banner only celebrates durably recorded history.
+        rpe: draft.actualRPE,
+        failed: log.failed
+      ))
+    if let event {
+      pendingPRBanner = event
     }
+  }
+
+  private func exerciseFamily(planExerciseID: UUID) -> LiftFamily? {
+    let day: StudentPlanDay?
+    switch state {
+    case .loaded(let plan, _), .recording(let plan, _, _):
+      day = plan
+    default:
+      day = nil
+    }
+    return day?.exercises
+      .first { $0.id == planExerciseID }?
+      .exercise.mainLiftFamily
   }
 }

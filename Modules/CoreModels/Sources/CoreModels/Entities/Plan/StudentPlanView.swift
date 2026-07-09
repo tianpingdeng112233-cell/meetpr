@@ -11,6 +11,10 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
   /// Drives the student dashboard "教练正在为你排第一份正式计划" row
   /// (spec 033 §12): an adaptation-week plan is not the first regular plan.
   public let planKind: PlanKind
+  public let blockType: String?
+  public let mesocyclePhase: String?
+  public let trainingMax: Decimal?
+  public let tmSetAt: Date?
   public let days: [StudentPlanDay]
 
   public init(
@@ -18,12 +22,20 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
     weekIndex: Int,
     startDate: Date,
     planKind: PlanKind = .regular,
+    blockType: String? = nil,
+    mesocyclePhase: String? = nil,
+    trainingMax: Decimal? = nil,
+    tmSetAt: Date? = nil,
     days: [StudentPlanDay]
   ) {
     self.cycleID = cycleID
     self.weekIndex = weekIndex
     self.startDate = startDate
     self.planKind = planKind
+    self.blockType = blockType
+    self.mesocyclePhase = mesocyclePhase
+    self.trainingMax = trainingMax
+    self.tmSetAt = tmSetAt
     self.days = days
   }
 
@@ -33,6 +45,10 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
     weekIndex = try container.decode(Int.self, forKey: .weekIndex)
     startDate = try container.decode(Date.self, forKey: .startDate)
     planKind = try container.decodeIfPresent(PlanKind.self, forKey: .planKind) ?? .regular
+    blockType = try container.decodeIfPresent(String.self, forKey: .blockType)
+    mesocyclePhase = try container.decodeIfPresent(String.self, forKey: .mesocyclePhase)
+    trainingMax = try container.decodeDecimalIfPresent(forKey: .trainingMax)
+    tmSetAt = try container.decodeIfPresent(Date.self, forKey: .tmSetAt)
     days = try container.decode([StudentPlanDay].self, forKey: .days)
   }
 
@@ -41,6 +57,10 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
     case weekIndex
     case startDate
     case planKind
+    case blockType
+    case mesocyclePhase
+    case trainingMax
+    case tmSetAt
     case days
   }
 }

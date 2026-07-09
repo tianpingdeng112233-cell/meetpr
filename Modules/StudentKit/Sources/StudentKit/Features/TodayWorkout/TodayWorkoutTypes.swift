@@ -87,11 +87,26 @@ public struct TodayWorkoutPlanContext: Equatable, Sendable {
   public let planKind: PlanKind
   public let weekIndex: Int
   public let startDate: Date
+  let algorithmMetadata: PlanAlgorithmMetadata
 
-  public init(planKind: PlanKind, weekIndex: Int, startDate: Date) {
+  public init(
+    planKind: PlanKind,
+    weekIndex: Int,
+    startDate: Date,
+    blockType: String? = nil,
+    mesocyclePhase: String? = nil,
+    trainingMax: Decimal? = nil,
+    tmSetAt: Date? = nil
+  ) {
     self.planKind = planKind
     self.weekIndex = weekIndex
     self.startDate = startDate
+    self.algorithmMetadata = PlanAlgorithmMetadata(
+      blockType: blockType,
+      mesocyclePhase: mesocyclePhase,
+      trainingMax: trainingMax,
+      tmSetAt: tmSetAt
+    )
   }
 }
 

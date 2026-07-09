@@ -13,11 +13,21 @@ public struct StudentRootView: View {
   private let readiness: any ReadinessRepository
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
+  private let importedHistoryBackfill: ImportedHistoryBackfill
   private let onLogout: (@MainActor () async -> Void)?
+  private let trainingMode: TrainingMode
+  private let soloCatalog: [Exercise]
+  private let pendingSetLogCount: @Sendable (UUID) async -> Int
+  private let sessionReviews: (any SessionReviewRepository)?
+  private let account: (any AccountRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
+  @State private var trainingTodayPulse = 0
+  @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
+  @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
+  @State private var importedHistoryRefreshToken = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -52,7 +62,12 @@ public struct StudentRootView: View {
     onboarding: (any OnboardingRepository)? = nil,
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
-    onLogout: (@MainActor () async -> Void)? = nil
+    onLogout: (@MainActor () async -> Void)? = nil,
+    trainingMode: TrainingMode = .coached,
+    soloCatalog: [Exercise] = [],
+    pendingSetLogCount: (@Sendable (UUID) async -> Int)? = nil,
+    sessionReviews: (any SessionReviewRepository)? = nil,
+    account: (any AccountRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -61,12 +76,24 @@ public struct StudentRootView: View {
     self.readiness = readiness
     self.videoUploads = videoUploads ?? .demo()
     self.onLogout = onLogout
-    self.onboarding =
+    self.trainingMode = trainingMode
+    self.soloCatalog = soloCatalog
+    self.pendingSetLogCount = pendingSetLogCount ?? { _ in 0 }
+    self.sessionReviews = sessionReviews
+    self.account = account
+    let resolvedOnboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
         studentId: studentID,
         seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
       )
+    self.onboarding = resolvedOnboarding
+    self.importedHistoryBackfill = ImportedHistoryBackfill(
+      logs: logs,
+      onboarding: resolvedOnboarding,
+      e1rm: e1rm,
+      catalog: soloCatalog
+    )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -81,38 +108,85 @@ public struct StudentRootView: View {
 
   public var body: some View {
     TabView(selection: $selectedTab) {
-      // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
-      // here + full history under 成长, so there is no separate 反馈 tab).
-      DashboardView(
-        studentID: studentID,
-        plans: plans,
-        logs: logs,
-        onboarding: onboarding,
-        e1rm: e1rm,
-        feedbackViewModel: feedbackViewModel,
-        evaluationSummaryViewModel: evaluationSummaryViewModel,
-        onStartWorkout: { selectedTab = .training },
-        onSeeAllFeedback: { selectedTab = .growth }
-      )
+      // 今日 — student home. Coached: the plan-driven dashboard (merges the
+      // old 仪表盘 + 计划). Solo (spec 045): the adhoc session home — no plan
+      // concepts anywhere on it.
+      Group {
+        if trainingMode == .selfTrain {
+          SoloTodayView(
+            viewModel: SoloSessionViewModel(
+              studentID: studentID,
+              logs: logs,
+              e1rm: e1rm,
+              catalog: soloCatalog,
+              pendingCount: pendingSetLogCount
+            ),
+            catalog: soloCatalog,
+            makeReviewViewModel: sessionReviews.map { repo in
+              let studentID = self.studentID
+              return {
+                SessionReviewSubmitViewModel(
+                  repository: repo,
+                  studentID: studentID,
+                  reviewDate: SoloSessionViewModel.dayString(Date(), calendar: .current)
+                )
+              }
+            }
+          )
+        } else {
+          DashboardView(
+            studentID: studentID,
+            plans: plans,
+            logs: logs,
+            onboarding: onboarding,
+            e1rm: e1rm,
+            feedbackViewModel: feedbackViewModel,
+            evaluationSummaryViewModel: evaluationSummaryViewModel,
+            onStartWorkout: {
+              trainingTodayPulse += 1
+              selectedTab = .training
+            },
+            onSeeAllFeedback: { selectedTab = .growth }
+          )
+        }
+      }
       .tag(StudentTab.today)
       .tabItem {
-        Label("今日", systemImage: "house")
+        Label(trainingMode == .selfTrain ? "今天" : "今日", systemImage: "house")
       }
 
-      TodayWorkoutView(
-        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads
-      )
+      // 训练 tab. Solo (spec 047 §3): the read-only month-grouped history —
+      // there is no plan calendar to show; editing stays on 今天.
+      Group {
+        if trainingMode == .selfTrain {
+          SoloHistoryView(
+            studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+            sessionReviews: sessionReviews, catalog: soloCatalog
+          )
+        } else {
+          TodayWorkoutView(
+            studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
+            videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse,
+            sessionReviews: sessionReviews
+          )
+        }
+      }
       .tag(StudentTab.training)
       .tabItem {
-        Label("训练", systemImage: "dumbbell.fill")
+        Label(
+          trainingMode == .selfTrain ? "历史" : "训练",
+          systemImage: trainingMode == .selfTrain ? "clock" : "dumbbell.fill"
+        )
       }
 
       // 成长 — e1RM growth + full training history + coach-feedback history all
       // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
-        feedbackViewModel: feedbackViewModel
+        feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews,
+        trainingMode: trainingMode, soloCatalog: soloCatalog,
+        importedHistoryRefreshToken: importedHistoryRefreshToken,
+        onImportedHistoryRefresh: { await runImportedHistoryBackfill() }
       )
       .tag(StudentTab.growth)
       .tabItem {
@@ -125,7 +199,11 @@ public struct StudentRootView: View {
         e1rm: e1rm,
         onboarding: onboarding,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
-        onLogout: onLogout
+        onLogout: onLogout,
+        trainingMode: trainingMode,
+        soloCatalog: soloCatalog,
+        account: account,
+        logs: logs
       )
       .tag(StudentTab.profile)
       .tabItem {
@@ -135,14 +213,93 @@ public struct StudentRootView: View {
       // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
       .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
     }
+    // Acking PRs on the growth tab must clear the profile badge when the
+    // student switches away (spec 051 §2 — same staleness family as U6).
+    .onChange(of: selectedTab) { _, tab in
+      Task {
+        if tab == .growth {
+          await runImportedHistoryBackfill()
+        }
+        pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+      }
+    }
     .task {
       if feedbackViewModel.state == .idle {
         await feedbackViewModel.load(studentID: studentID)
       }
       await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+      await runImportedHistoryBackfill()
     }
+    .importedHistoryReviewAlert(
+      review: $pendingImportedHistoryReview,
+      onAnswer: answerImportedHistoryReview
+    )
     .tint(Color.MeetPR.brandRed)
+  }
+
+  @MainActor
+  private func runImportedHistoryBackfill() async {
+    guard let result = try? await importedHistoryBackfill.backfill(studentID: studentID) else {
+      return
+    }
+    // Queue every pending family and present the prompts one after another —
+    // a multi-family import must not lose its second prompt (spec 053 §5).
+    importedHistoryReviewQueue = result.pendingReviews
+    if pendingImportedHistoryReview == nil {
+      pendingImportedHistoryReview = importedHistoryReviewQueue.first
+    }
+    if result.importedPointCount > 0 {
+      importedHistoryRefreshToken += 1
+    }
+  }
+
+  @MainActor
+  private func answerImportedHistoryReview(
+    _ review: PendingImportedHistoryReview,
+    decision: ImportedHistoryReviewDecision
+  ) async {
+    try? await importedHistoryBackfill.answer(review, decision: decision)
+    importedHistoryReviewQueue.removeAll { $0.id == review.id }
+    if pendingImportedHistoryReview?.id == review.id {
+      pendingImportedHistoryReview = importedHistoryReviewQueue.first
+    }
+    importedHistoryRefreshToken += 1
+  }
+}
+
+extension View {
+  fileprivate func importedHistoryReviewAlert(
+    review: Binding<PendingImportedHistoryReview?>,
+    onAnswer:
+      @escaping @MainActor (
+        PendingImportedHistoryReview,
+        ImportedHistoryReviewDecision
+      ) async -> Void
+  ) -> some View {
+    alert(
+      "确认导入历史",
+      isPresented: Binding(
+        get: { review.wrappedValue != nil },
+        set: { if !$0 { review.wrappedValue = nil } }
+      ),
+      presenting: review.wrappedValue
+    ) { pending in
+      Button("确实") {
+        Task { await onAnswer(pending, .confirmed) }
+      }
+      Button("没有", role: .destructive) {
+        Task { await onAnswer(pending, .rejected) }
+      }
+    } message: { pending in
+      Text(importedHistoryReviewMessage(pending))
+    }
+  }
+
+  private func importedHistoryReviewMessage(_ review: PendingImportedHistoryReview) -> String {
+    "导入的历史记录里有 \(StudentFormatting.kilograms(review.sourceWeightKg))kg × "
+      + "\(review.sourceReps)(约 e1RM \(StudentFormatting.kilograms(review.sourceE1RMKg))kg),"
+      + "超过你填写的 1RM \(StudentFormatting.kilograms(review.baseline1RMKg))kg——当时确实完成了吗?"
   }
 }
 

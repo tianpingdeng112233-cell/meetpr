@@ -15,11 +15,21 @@ struct DashboardE1RMTrendPresentation: Equatable, Sendable {
 struct DashboardE1RMTrendRow: Equatable, Identifiable, Sendable {
   let family: LiftFamily
   let points: [E1RMHistoryPoint]
+  let bestPoint: E1RMHistoryPoint?
 
   var id: LiftFamily { family }
 
   var latestPoint: E1RMHistoryPoint? {
     points.max { $0.computedAt < $1.computedAt }
+  }
+
+  func displaysHistoricalBest(now: Date = Date()) -> Bool {
+    guard let latestPoint else { return false }
+    return latestPoint.computedAt < now.addingTimeInterval(-E1RMSeries.rollingWindow)
+  }
+
+  func displayPoint(now: Date = Date()) -> E1RMHistoryPoint? {
+    displaysHistoricalBest(now: now) ? bestPoint : latestPoint
   }
 }
 
@@ -27,6 +37,7 @@ struct DashboardE1RMHeadline: Equatable, Sendable {
   enum Kind: Equatable, Sendable {
     case latestPR
     case best
+    case historicalBest
   }
 
   let kind: Kind
@@ -37,6 +48,7 @@ struct DashboardE1RMHeadline: Equatable, Sendable {
     switch kind {
     case .latestPR: "最新 PR"
     case .best: "最佳"
+    case .historicalBest: "历史最佳"
     }
   }
 }
@@ -55,27 +67,47 @@ final class DashboardE1RMTrendViewModel {
 
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let e1rm: any E1RMRepository
+  @ObservationIgnored private let mode: TrainingMode
+  @ObservationIgnored private let catalog: [Exercise]
+  @ObservationIgnored private let now: @Sendable () -> Date
 
-  init(plans: any StudentPlanRepository, e1rm: any E1RMRepository) {
+  init(
+    plans: any StudentPlanRepository,
+    e1rm: any E1RMRepository,
+    mode: TrainingMode = .coached,
+    catalog: [Exercise] = [],
+    now: @escaping @Sendable () -> Date = { Date() }
+  ) {
     self.plans = plans
     self.e1rm = e1rm
+    self.mode = mode
+    self.catalog = catalog
+    self.now = now
   }
 
   func load(studentID: UUID) async {
     state = .loading
     do {
-      let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(in: plan)
+      // Solo never asks for a plan (spec 047 §1) — the catalog is its
+      // bucketing universe; coached keeps the plan tree.
+      let plan =
+        mode == .selfTrain ? nil : try await plans.fetchCurrentPlan(studentID: studentID)
+      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
+        in: plan, catalog: catalog)
       let histories = try await fetchHistories(studentID: studentID, idsByFamily: idsByFamily)
       let rows = Self.rows(from: histories, idsByFamily: idsByFamily)
       let prs = try await e1rm.unacknowledgedPRs(studentId: studentID)
       state = .loaded(
         DashboardE1RMTrendPresentation(
           rows: rows,
-          headline: Self.headline(prs: prs, rows: rows, idsByFamily: idsByFamily)
+          headline: Self.headline(prs: prs, rows: rows, idsByFamily: idsByFamily, now: now())
         )
       )
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }
@@ -96,22 +128,30 @@ final class DashboardE1RMTrendViewModel {
     idsByFamily: [LiftFamily: Set<UUID>]
   ) -> [DashboardE1RMTrendRow] {
     MainLiftExerciseFamilyResolver.dashboardFamilies.map { family in
-      let points = (idsByFamily[family] ?? [])
+      let raw = (idsByFamily[family] ?? [])
         .flatMap { histories[$0] ?? [] }
-        .sorted { $0.computedAt < $1.computedAt }
-      return DashboardE1RMTrendRow(family: family, points: points)
+      // Single aggregation (spec 050 §2): the sparkline and headline read
+      // the eligibility-gated rolling-max series, not raw points.
+      let series = E1RMSeries.build(points: raw, family: family)
+      let rawByID = Dictionary(uniqueKeysWithValues: raw.map { ($0.id, $0) })
+      return DashboardE1RMTrendRow(
+        family: family,
+        points: E1RMSeries.smoothedHistory(points: raw, family: family),
+        bestPoint: series.best.flatMap { rawByID[$0.winnerPointID] }
+      )
     }
   }
 
   private static func headline(
     prs: [PRBreakthroughEvent],
     rows: [DashboardE1RMTrendRow],
-    idsByFamily: [LiftFamily: Set<UUID>]
+    idsByFamily: [LiftFamily: Set<UUID>],
+    now: Date
   ) -> DashboardE1RMHeadline? {
     if let latestPRHeadline = latestPR(prs, idsByFamily: idsByFamily) {
       return latestPRHeadline
     }
-    return bestCurrentE1RM(rows)
+    return bestCurrentE1RM(rows, now: now)
   }
 
   /// The most recent PR whose exercise still resolves to a dashboard main-lift
@@ -141,13 +181,17 @@ final class DashboardE1RMTrendViewModel {
   }
 
   private static func bestCurrentE1RM(
-    _ rows: [DashboardE1RMTrendRow]
+    _ rows: [DashboardE1RMTrendRow], now: Date
   ) -> DashboardE1RMHeadline? {
     rows.compactMap { row -> DashboardE1RMHeadline? in
-      guard let latest = row.latestPoint else {
+      guard let point = row.displayPoint(now: now) else {
         return nil
       }
-      return DashboardE1RMHeadline(kind: .best, family: row.family, valueKg: latest.e1RMKg)
+      return DashboardE1RMHeadline(
+        kind: row.displaysHistoricalBest(now: now) ? .historicalBest : .best,
+        family: row.family,
+        valueKg: point.e1RMKg
+      )
     }
     .max { $0.valueKg < $1.valueKg }
   }

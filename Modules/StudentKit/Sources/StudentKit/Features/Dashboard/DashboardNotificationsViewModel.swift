@@ -118,6 +118,10 @@ final class DashboardNotificationsViewModel {
         : DashboardPlanNotice(signature: signature, weekIndex: plan.weekIndex)
       state = .loaded(notice)
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

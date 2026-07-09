@@ -18,6 +18,10 @@ import Testing
       "source": "coach",
       "source_template_id": null,
       "status": "published",
+      "block_type": "strength",
+      "mesocycle_phase": "intensification",
+      "training_max": "92.50",
+      "tm_set_at": "2026-07-01T12:00:00Z",
       "created_at": "2026-05-22T12:00:00.254Z",
       "updated_at": "2026-05-22T13:00:00Z",
       "days": [
@@ -58,8 +62,13 @@ import Testing
 
   let dto = try MeetPRCodec.decoder.decode(PlanWithChildrenDTO.self, from: Data(json.utf8))
   let domain = dto.toDomain()
+  let expectedTMSetAt = try isoDate("2026-07-01T12:00:00Z")
 
   #expect(domain.plan.name == "Cycle 1")
+  #expect(domain.plan.blockType == "strength")
+  #expect(domain.plan.mesocyclePhase == "intensification")
+  #expect(domain.plan.trainingMax == Decimal(string: "92.50"))
+  #expect(domain.plan.tmSetAt == expectedTMSetAt)
   #expect(domain.days.count == 1)
   #expect(domain.exercises.count == 1)
   #expect(domain.sets.count == 1)

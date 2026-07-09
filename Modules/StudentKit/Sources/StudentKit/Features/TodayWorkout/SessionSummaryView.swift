@@ -10,6 +10,9 @@ import SwiftUI
 struct SessionSummaryView: View {
   let summary: StudentSessionSummary
   let date: Date
+  /// nil hides the review submit (demo/previews keep the old read-only shell).
+  var reviewViewModel: SessionReviewSubmitViewModel?
+  var isSolo = false
 
   @Environment(\.dismiss) private var dismiss
 
@@ -26,8 +29,12 @@ struct SessionSummaryView: View {
               SummaryPerformanceList(exercises: summary.exercises)
             }
           }
-          SummarySection(title: "训练反思") {
-            SummaryReflections()
+          SummarySection(title: "训练回顾") {
+            if let reviewViewModel {
+              SessionReviewSection(viewModel: reviewViewModel, isSolo: isSolo)
+            } else {
+              SummaryReflections()
+            }
           }
         }
         .padding()
@@ -142,6 +149,85 @@ private struct SummaryPerformanceList: View {
         .modifier(SummaryCard())
       }
     }
+  }
+}
+
+/// The one-line review that actually persists (spec 051 §1): the three
+/// throwaway prompts collapsed into a single feeling + optional session RPE.
+@available(iOS 17.0, macOS 14.0, *)
+private struct SessionReviewSection: View {
+  @Bindable var viewModel: SessionReviewSubmitViewModel
+  let isSolo: Bool
+  @State private var wantsRPE = false
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: 8) {
+        Label("一句话感受", systemImage: "square.and.pencil")
+          .font(.subheadline.bold())
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        TextField("今天练得怎么样?", text: $viewModel.feeling, axis: .vertical)
+          .font(.subheadline)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .lineLimit(2...5)
+        Text(isSolo ? "记录你的状态,曲线之外的另一半" : "教练会看到")
+          .font(.caption)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .modifier(SummaryCard())
+
+      VStack(alignment: .leading, spacing: 8) {
+        Toggle("记一下整场 RPE", isOn: $wantsRPE)
+          .font(.subheadline)
+        if wantsRPE {
+          Stepper(value: rpeBinding, in: 5...10, step: 0.5) {
+            Text("整场 RPE \(StudentFormatting.decimal(viewModel.sessionRPE ?? 7))")
+              .font(.subheadline.monospacedDigit())
+          }
+        }
+      }
+      .modifier(SummaryCard())
+
+      switch viewModel.state {
+      case .saved:
+        Label("已保存", systemImage: "checkmark.circle.fill")
+          .font(.subheadline)
+          .foregroundStyle(Color.MeetPR.green)
+      case .failed(let message):
+        Label(message, systemImage: "exclamationmark.triangle")
+          .font(.subheadline)
+          .foregroundStyle(Color.MeetPR.brandRed)
+      case .idle, .submitting:
+        EmptyView()
+      }
+
+      Button {
+        Task { await viewModel.submit() }
+      } label: {
+        Text(viewModel.state == .submitting ? "保存中…" : "保存回顾")
+          .font(.headline)
+          .frame(maxWidth: .infinity)
+      }
+      .buttonStyle(.borderedProminent)
+      .tint(Color.MeetPR.brandRed)
+      .disabled(!viewModel.canSubmit)
+      .accessibilityIdentifier("summary.review.submit")
+    }
+    .task {
+      await viewModel.load()
+      wantsRPE = viewModel.sessionRPE != nil
+    }
+    .onChange(of: wantsRPE) { _, wants in
+      if !wants { viewModel.sessionRPE = nil }
+    }
+  }
+
+  private var rpeBinding: Binding<Decimal> {
+    Binding(
+      get: { viewModel.sessionRPE ?? 7 },
+      set: { viewModel.sessionRPE = $0 }
+    )
   }
 }
 

@@ -163,7 +163,7 @@ import Testing
   #expect(!json.contains(#""target_reps_max":"#))
 }
 
-@Test func studentSetLogMissingFailedDecodesFalseAndEncodesFailed() throws {
+@Test func studentSetLogMissingAssumedAndFailedDecodeFalseAndEncode() throws {
   let json = """
     {
       "id": "91000000-0000-0000-0000-000000000001",
@@ -194,7 +194,9 @@ import Testing
   let encoded = try encodedJSONString(failedLog)
 
   #expect(!decoded.failed)
+  #expect(!decoded.assumed)
   #expect(encoded.contains(#""failed":true"#))
+  #expect(encoded.contains(#""assumed":false"#))
 }
 
 @Test func planSetCoachNoteCodableRoundTripsAndDecodesMissingAsNil() throws {

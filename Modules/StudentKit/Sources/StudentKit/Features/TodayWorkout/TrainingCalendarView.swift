@@ -192,12 +192,19 @@ private final class TrainingCalendarViewModel {
       let days = try await plans.fetchCycleDays(studentID: studentID)
       let fetchedLogs: [StudentSetLog]
       if let range = Self.dateRange(for: days) {
-        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: range)
+        // scope=all keeps week and month dots on the same training-day
+        // windows as the dashboard (spec 049 §1: 周绿/月黄 came from UTC
+        // day-edge slicing on loggedAt).
+        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: range, scope: .all)
       } else {
         fetchedLogs = []
       }
       state = .loaded(days: days, logs: fetchedLogs)
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

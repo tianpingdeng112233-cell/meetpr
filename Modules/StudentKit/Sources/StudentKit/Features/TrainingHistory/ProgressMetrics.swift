@@ -22,7 +22,7 @@ enum ProgressMetrics {
   ) -> [WeeklyProgressMetric] {
     var buckets: [Date: ProgressMetricAccumulator] = [:]
 
-    for log in logs where log.completed {
+    for log in logs where log.completed && !log.assumed {
       guard let weekStart = weekStart(for: log.loggedAt, calendar: calendar) else { continue }
       buckets[weekStart, default: ProgressMetricAccumulator()].add(log)
     }

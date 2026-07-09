@@ -10,19 +10,22 @@ public struct Sparkline: View {
   private let lineColor: Color
   private let lineWidth: CGFloat
   private let showsEndDot: Bool
+  private let showsPointDots: Bool
 
   public init(
     points: [CGPoint],
     viewBox: CGSize = CGSize(width: 600, height: 90),
     lineColor: Color = Color.MeetPR.fgPrimary,
     lineWidth: CGFloat = 1.5,
-    showsEndDot: Bool = true
+    showsEndDot: Bool = true,
+    showsPointDots: Bool = false
   ) {
     self.points = points
     self.viewBox = viewBox
     self.lineColor = lineColor
     self.lineWidth = lineWidth
     self.showsEndDot = showsEndDot
+    self.showsPointDots = showsPointDots
   }
 
   public var body: some View {
@@ -37,6 +40,18 @@ public struct Sparkline: View {
           }
         }
         .stroke(lineColor, style: StrokeStyle(lineWidth: lineWidth, lineJoin: .round))
+
+        // Per-point markers (P2-8): a bare polyline reads as "no data points";
+        // muted dots make each logged session legible without competing with
+        // the red end dot.
+        if showsPointDots {
+          ForEach(Array(points.enumerated()), id: \.offset) { _, point in
+            Circle()
+              .fill(lineColor.opacity(0.55))
+              .frame(width: 4, height: 4)
+              .position(x: point.x * scaleX, y: point.y * scaleY)
+          }
+        }
 
         if showsEndDot, let last = points.last {
           Circle()

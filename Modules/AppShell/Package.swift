@@ -9,6 +9,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../CoreModels"),
+    .package(path: "../CatalogKit"),
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
     .package(path: "../CoachKit"),
@@ -21,6 +22,7 @@ let package = Package(
       name: "AppShell",
       dependencies: [
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "CatalogKit", package: "CatalogKit"),
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "CoachKit", package: "CoachKit"),

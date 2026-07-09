@@ -38,6 +38,13 @@ public final class Session {
   }
 
   public func bootstrap() async {
+    // The root `.task` calls bootstrap() unconditionally. Once an interactive
+    // login/signup has settled the session, never re-run the silent-refresh
+    // flow: driving an authenticated session back through `.authenticating`
+    // tears down the signed-in subtree and cancels the student tabs' in-flight
+    // first-load `.task`s, which then surface as a spurious "cancelled" error
+    // on high-latency networks. Bootstrap only ever runs from a cold start.
+    guard case .anonymous = state else { return }
     state = .authenticating
     let refreshToken = await tokenStore.refreshToken()
     guard let refreshToken else {

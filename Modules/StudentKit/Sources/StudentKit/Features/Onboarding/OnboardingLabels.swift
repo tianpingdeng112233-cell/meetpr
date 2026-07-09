@@ -112,7 +112,7 @@ public enum OnboardingLabels {
 
   public static let dailyLifeIntensityLabels = ["很低", "较低", "中等", "较高", "极高"]
   public static let lifeStressLabels = ["几乎无", "较低", "中等", "较高", "极高"]
-  public static let recoverySpeedLabels = ["很慢 (>72h)", "较慢", "正常", "较快", "很快 (<12h)"]
+  public static let recoverySpeedLabels = ["3天以上", "约3天", "约2天", "约1天", "半天内"]
   public static let sleepHoursLabels = ["≤5h", "6h", "7h", "8h", "9h+"]
 
   /// 1-based notch → label, clamped.

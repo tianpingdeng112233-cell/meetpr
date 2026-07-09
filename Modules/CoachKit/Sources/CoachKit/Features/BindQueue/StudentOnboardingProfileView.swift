@@ -135,11 +135,15 @@ private struct OnboardingProfileGroups: View {
     groupCard("训练环境") {
       row("训练日", trainingDaysText)
       row("训练环境", profile.gymTier.map(CoachOnboardingDisplay.gymTierText))
-      // Raw iOS-owned tokens (vocab owned by 031's EquipmentCatalog).
+      // iOS-owned tokens (vocab owned by 031's EquipmentCatalog) rendered
+      // through the CoachKit label mirror; unknown tokens fall through raw.
       row(
         "器械备注",
         profile.equipmentOverrides.isEmpty
-          ? nil : profile.equipmentOverrides.joined(separator: ", "))
+          ? nil
+          : profile.equipmentOverrides
+            .map(CoachOnboardingDisplay.equipmentLabel)
+            .joined(separator: "、"))
     }
   }
 
@@ -157,7 +161,7 @@ private struct OnboardingProfileGroups: View {
         labels: CoachOnboardingDisplay.dailyLifeIntensityLabels)
       scaleRow("生活压力", profile.lifeStress, labels: CoachOnboardingDisplay.lifeStressLabels)
       scaleRow(
-        "恢复速度", profile.recoverySpeed, labels: CoachOnboardingDisplay.recoverySpeedLabels)
+        "练后恢复", profile.recoverySpeed, labels: CoachOnboardingDisplay.recoverySpeedLabels)
       scaleRow("睡眠", profile.sleepHours, labels: CoachOnboardingDisplay.sleepHoursLabels)
     }
   }

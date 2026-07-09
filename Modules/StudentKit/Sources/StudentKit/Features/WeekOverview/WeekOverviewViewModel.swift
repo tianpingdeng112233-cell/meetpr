@@ -14,6 +14,7 @@ public final class WeekOverviewViewModel {
   }
 
   public private(set) var state: State = .idle
+  private(set) var algorithmMetadata: PlanAlgorithmMetadata?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -27,6 +28,7 @@ public final class WeekOverviewViewModel {
     state = .loading
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
+      algorithmMetadata = plan.map(PlanAlgorithmMetadata.init(plan:))
       let weekIndex = plan?.weekIndex ?? 1
       // fetchCycleDays now returns the whole cycle; the dashboard strip only
       // wants this week, so filter to the current plan-week window by date.
@@ -35,12 +37,19 @@ public final class WeekOverviewViewModel {
         from: allDays, startDate: plan?.startDate, weekIndex: weekIndex)
       let fetchedLogs: [StudentSetLog]
       if let dateRange = Self.dateRange(for: days) {
-        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
+        // scope=all: training-day (loggedDate) windows — an evening set no
+        // longer falls off the week at the UTC day edge (spec 049 §1 / 010).
+        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange, scope: .all)
       } else {
         fetchedLogs = []
       }
       state = .loaded(days: days, logs: fetchedLogs, weekIndex: weekIndex)
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
+      algorithmMetadata = nil
       state = .error(error.localizedDescription)
     }
   }
