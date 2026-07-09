@@ -72,24 +72,31 @@ struct E1RMRecorder: Sendable {
 
       // Only a trusted point that clears the noise band is a PR.
       guard verdict == .normal else { return nil }
-      let band = max(0.5, (previousNormalMax ?? 0) * 0.03)
-      if estimatedOneRepMaxKg > (previousNormalMax ?? 0) + band {
-        let event = PRBreakthroughEvent(
-          id: UUID(),
-          studentId: studentID,
-          exerciseId: exerciseID,
-          pointId: point.id,
-          breakthroughE1RMKg: estimatedOneRepMaxKg,
-          previousMaxE1RMKg: previousNormalMax ?? 0,
-          occurredAt: point.computedAt,
-          acknowledgedAt: nil
-        )
-        try await e1rm.recordPR(event)
-        return event
-      }
+      return try await recordPRIfCleared(point: point, previousNormalMax: previousNormalMax)
     } catch {
       return nil
     }
-    return nil
+  }
+
+  /// Fires a PR event when the point clears the noise band over the prior
+  /// trusted best: max(0.5 kg, best × 3%) — a same-condition wobble is not
+  /// a record.
+  private func recordPRIfCleared(
+    point: E1RMHistoryPoint, previousNormalMax: Double?
+  ) async throws -> PRBreakthroughEvent? {
+    let band = max(0.5, (previousNormalMax ?? 0) * 0.03)
+    guard point.e1RMKg > (previousNormalMax ?? 0) + band else { return nil }
+    let event = PRBreakthroughEvent(
+      id: UUID(),
+      studentId: point.studentId,
+      exerciseId: point.exerciseId,
+      pointId: point.id,
+      breakthroughE1RMKg: point.e1RMKg,
+      previousMaxE1RMKg: previousNormalMax ?? 0,
+      occurredAt: point.computedAt,
+      acknowledgedAt: nil
+    )
+    try await e1rm.recordPR(event)
+    return event
   }
 }
