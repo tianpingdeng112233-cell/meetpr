@@ -110,3 +110,14 @@ private func log(planExerciseID: UUID, at date: Date, completed: Bool = true) ->
   #expect(week.completedSets == 2)
   #expect(abs(week.setCompletionRate - 0.25) < 1e-9)
 }
+
+@Test func completionExcludesAssumedImportedLogs() {
+  let dayPlan = planDay(date: day(0), exerciseSetCounts: [1])
+  let assumed = StudentSetLog(
+    id: UUID(), studentID: studentID, planExerciseID: dayPlan.exercises[0].id,
+    assumed: true, setIndex: 0, loggedAt: day(0), weightKg: 100, reps: 5, completed: true)
+
+  let week = CompletionHistory.weekly(planDays: [dayPlan], logs: [assumed], calendar: utc)[0]
+  #expect(week.completedSets == 0)
+  #expect(week.completedTrainingDays == 0)
+}

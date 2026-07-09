@@ -15,6 +15,7 @@ private func point(
   reps: Int = 5,
   rpe: Double? = 8,
   confidence: E1RMConfidence = .normal,
+  origin: E1RMPointOrigin = .logged,
   base: Date = Date(timeIntervalSince1970: 1_782_000_000)
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
@@ -27,7 +28,8 @@ private func point(
     sourceWeightKg: e1RM * 0.85,
     sourceReps: reps,
     sourceRPE: rpe,
-    confidence: confidence
+    confidence: confidence,
+    origin: origin
   )
 }
 
@@ -126,4 +128,24 @@ private func point(
 
   #expect(history.count == 1)
   #expect(history.first?.e1RMKg == 180)
+}
+
+/// Spec 053 §6: each day keeps its own sample identity while the rolling max
+/// exposes the imported winner's provenance and source set for chart details.
+@available(iOS 17.0, macOS 14.0, *)
+@Test func smoothedSamplesPreserveWinnerOriginWithoutReusingSampleIdentity() {
+  let imported = point(daysAgo: 5, e1RM: 165, origin: .imported)
+  let logged = point(daysAgo: 1, e1RM: 160, origin: .logged)
+  let series = E1RMSeries.build(points: [imported, logged], family: .squat)
+  guard let latest = series.smoothed.last else {
+    Issue.record("Expected a rolling sample")
+    return
+  }
+
+  #expect(latest.sampleID == logged.id)
+  #expect(latest.sampleID != latest.winnerPointID)
+  #expect(latest.winnerPointID == imported.id)
+  #expect(latest.winnerOrigin == .imported)
+  #expect(latest.winnerConfidence == .normal)
+  #expect(series.rawEligible.count == 2)
 }

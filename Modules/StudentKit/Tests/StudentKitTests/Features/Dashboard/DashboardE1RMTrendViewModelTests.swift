@@ -53,6 +53,29 @@ import Testing
 }
 
 @MainActor
+@Test func trendHeadlineUsesHistoricalBestWhenRollingWindowHasExpired() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftID(for: .squat))
+  let now = try Date("2026-07-09T12:00:00Z", strategy: .iso8601)
+  let oldImported = E1RMHistoryPoint(
+    id: UUID(), studentId: studentID, exerciseId: squatID, setLogId: UUID(),
+    computedAt: now.addingTimeInterval(-84 * 86_400), e1RMKg: 165,
+    sourceWeightKg: 140, sourceReps: 5, sourceRPE: 8, origin: .imported)
+  let viewModel = DashboardE1RMTrendViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    e1rm: InMemoryE1RMRepository(seedPoints: [oldImported]),
+    now: { now }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  #expect(presentation.headline?.kind == .historicalBest)
+  #expect(presentation.headline?.valueKg == 165)
+}
+
+@MainActor
 @Test func trendEmptyHistoryKeepsThreeRowsWithoutHeadline() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
@@ -112,7 +135,8 @@ import Testing
     plans: ThrowingStudentPlanRepository { URLError(.badServerResponse) },
     e1rm: InMemoryE1RMRepository(seedPoints: points, seedPRs: []),
     mode: .selfTrain,
-    catalog: [squat, bench, variation]
+    catalog: [squat, bench, variation],
+    now: { now }
   )
   await viewModel.load(studentID: studentID)
 

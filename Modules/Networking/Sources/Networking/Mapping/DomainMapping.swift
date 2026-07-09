@@ -111,6 +111,7 @@ extension SetLogDTO {
       exerciseID: exerciseID,
       loggedDate: loggedDate,
       adhoc: adhoc,
+      assumed: assumed,
       setIndex: setIndex,
       loggedAt: loggedAt,
       weightKg: weightKg,
