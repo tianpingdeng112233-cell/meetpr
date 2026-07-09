@@ -3,6 +3,7 @@ import Foundation
 
 public protocol PlanRepository: Sendable {
   func fetchStudents() async throws -> [CoachStudentSummary]
+  func renameStudent(id: UUID, displayName: String) async throws -> CoachStudentSummary
   func fetchMainLiftCatalog() async throws -> [Exercise]
   func fetchAccessoryExercises(filters: AccessoryFilters) async throws -> [Exercise]
   func publishPlan(

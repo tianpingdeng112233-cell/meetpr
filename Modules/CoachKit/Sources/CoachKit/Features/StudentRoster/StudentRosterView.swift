@@ -161,6 +161,9 @@ struct StudentRosterView: View {
               context: context,
               onEvaluationCompleted: { [viewModel] in
                 viewModel.markStudentActive(row.student.id)
+              },
+              onStudentRenamed: { [viewModel] renamed in
+                viewModel.applyRenamedStudent(renamed)
               }
             )
           } label: {
@@ -201,6 +204,9 @@ struct StudentRosterView: View {
                   // 评估中 status without waiting for the next full refresh.
                   onEvaluationCompleted: { [viewModel] in
                     viewModel.markStudentActive(row.student.id)
+                  },
+                  onStudentRenamed: { [viewModel] renamed in
+                    viewModel.applyRenamedStudent(renamed)
                   }
                 )
               } label: {

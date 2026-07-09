@@ -86,7 +86,7 @@ final class StudentDetailViewModel {
     case failed(String)
   }
 
-  let summary: CoachStudentSummary
+  private(set) var summary: CoachStudentSummary
   var selectedSection: StudentDetailSection = .overview
   var state: LoadState = .idle
   private(set) var plan: StudentPlanView?
@@ -187,6 +187,11 @@ final class StudentDetailViewModel {
 
   func select(_ section: StudentDetailSection) {
     selectedSection = section
+  }
+
+  func applyRenamedStudent(_ renamed: CoachStudentSummary) {
+    guard renamed.id == summary.id else { return }
+    summary = renamed
   }
 
   func appendPostedFeedback(_ item: CoachFeedback) {
