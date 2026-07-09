@@ -46,9 +46,12 @@ struct E1RMRecorder: Sendable {
       // quarantined spike must not become the bar the next PR has to clear.
       // Full history (.distantFuture) — a strictly-earlier filter at
       // point.computedAt would miss a same-timestamp sibling and double-fire
-      // PRs (Codex review P1).
+      // PRs (Codex review P1). The same set-log identity is excluded so a
+      // stale assumed value never gates its own real-log replacement
+      // (spec 053 §3).
       let previousNormalMax = try await e1rm.maxBefore(
-        studentId: studentID, exerciseId: exerciseID, before: .distantFuture)
+        studentId: studentID, exerciseId: exerciseID, before: .distantFuture,
+        excludingSetLogId: input.setLogID)
 
       // Graded anomaly guard (spec 050 §5): a single mis-logged set (175→275
       // fat-finger) is quarantined as `.low` — kept for honest scatter, kept
@@ -66,13 +69,14 @@ struct E1RMRecorder: Sendable {
         sourceWeightKg: weight,
         sourceReps: input.reps,
         sourceRPE: rpeValue,
-        confidence: verdict == .normal ? .normal : .low
+        confidence: verdict == .normal ? .normal : .low,
+        origin: .logged
       )
-      try await e1rm.recordPoint(point)
+      let storedPoint = try await e1rm.upsertPoint(point)
 
       // Only a trusted point that clears the noise band is a PR.
       guard verdict == .normal else { return nil }
-      return try await recordPRIfCleared(point: point, previousNormalMax: previousNormalMax)
+      return try await recordPRIfCleared(point: storedPoint, previousNormalMax: previousNormalMax)
     } catch {
       return nil
     }

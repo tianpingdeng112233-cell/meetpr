@@ -90,4 +90,31 @@ import Testing
   #expect(row.exerciseID == nil)
   #expect(row.loggedDate == nil)
   #expect(row.adhoc == false)
+  #expect(row.assumed == false)
+}
+
+/// Backend's imported-history rows add `assumed`; the DTO must not lose the
+/// bit before StudentKit decides whether to backfill e1RM points (spec 053).
+@Test func setLogDTODecodesAssumedImportedHistoryRow() throws {
+  let json = """
+    {
+      "logs": [{
+        "id": "11111111-0000-4000-8000-000000000003",
+        "student_id": "10000000-0000-4000-8000-000000000003",
+        "plan_exercise_id": "50000000-0000-4000-8000-000000000001",
+        "exercise_id": "20000000-0000-4000-8000-000000000001",
+        "set_index": 1,
+        "weight_kg": "140.00",
+        "reps": 5,
+        "rpe": "8",
+        "completed": true,
+        "assumed": true,
+        "logged_at": "2026-05-15T12:00:00.000Z"
+      }]
+    }
+    """
+
+  let response = try MeetPRCodec.decoder.decode(
+    SetLogsResponseDTO.self, from: Data(json.utf8))
+  #expect(response.logs.first?.assumed == true)
 }

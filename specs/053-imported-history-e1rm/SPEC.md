@@ -1,6 +1,6 @@
 # SPEC 053 — 导入历史进 e1RM 基线(imported-history → e1RM)
 
-- **状态**: Draft
+- **状态**: InReview
 - **来源**: David 2026-07-09 两拍板,产品锚 `~/Brain/wiki/projects/MeetPR/domain/e1rm-headline-and-anomaly-guard.md` §④⑤:「④导入的完成记录计入 running best / PR 基线,导入成绩超自填 1RM 时问询一次;⑤完成率统计排除 imported」。
 - **现状诊断**(2026-07-09 三路侦察 + review-loop 核):plan-web 导入过去日期计划时已问「是否推定完成」,确认后 backend `POST /plans/:id/imported-history` 为过去组合成 `set_logs` 行(`completed:true, assumed:true`,migration 0023,`logged_at` 回填计划日);学员真实录入永远强制 `assumed:false`,且**允许对同一条 assumed 行原地覆盖**(同 set log 身份)。backend 分支的 `sets-fetch.ts` 已在响应中返回 `assumed`(缺省 false)。**但 iOS 的 e1RM 点只在 app 内录组瞬间由 `E1RMRecorder` 生成**(TodayWorkout / SoloSession 两 VM 调用),assumed 日志从不经过这条路——导入历史对曲线、头条、PR 基线全部不可见。后果:老手新用户头几周在 app 里举早已举过的重量会连环触发假 PR;spec 050 §5 冷启动 `B == nil` 不设防的洞也没人填。
 - **依赖**: `feat/050-anomaly-guard`(confidence 分级门)先合;本 spec 的 `origin` 轴与 confidence 轴**正交**(已核:该分支 `maxBefore`/best/current 只按 `confidence == .normal` 过滤,imported 点必须以 `.normal` 计入基线,故不能复用 `.low` 当来源标记)。本 spec 需要 repository 具备**按点改写 confidence / upsert** 的能力(现状 `recordPoint` 只 append),归本 spec 交付。
@@ -48,7 +48,7 @@
 
 ## 7. 统计排除(拍板⑤)
 
-- 过滤在**消费/reducer 层**,逐个落:`CompletionHistory`、`ProgressMetrics`、`StudentFormatting.completedCount`、成长页 session 计数、solo 月分组——一律排除 `assumed == true`;**禁止在 fetch 层全局过滤**(回填依赖 fetch 拿到 assumed)。
+- 过滤在**消费/reducer 层**,逐个落:`CompletionHistory`、`ProgressMetrics`、`StudentFormatting.completedCount`、成长页 session 计数、solo 本月次数计数——一律排除 `assumed == true`;**禁止在 fetch 层全局过滤**(回填依赖 fetch 拿到 assumed)。注:solo 月分组**列表条目**属归档展示、仍显示 assumed 日(见下条),排除的只是它旁边的次数统计。
 - 历史列表/训练详情**仍显示** assumed 记录(归档语义,导入的历史本来就该能翻);只有统计口径排除。
 - CoachKit 教练侧 reducer(roster/detail/triage)本 spec 不改,follow-up 教练 wave。
 

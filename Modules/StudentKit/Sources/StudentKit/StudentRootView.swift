@@ -13,6 +13,7 @@ public struct StudentRootView: View {
   private let readiness: any ReadinessRepository
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
+  private let importedHistoryBackfill: ImportedHistoryBackfill
   private let onLogout: (@MainActor () async -> Void)?
   private let trainingMode: TrainingMode
   private let soloCatalog: [Exercise]
@@ -24,6 +25,9 @@ public struct StudentRootView: View {
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
   @State private var trainingTodayPulse = 0
+  @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
+  @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
+  @State private var importedHistoryRefreshToken = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -77,12 +81,19 @@ public struct StudentRootView: View {
     self.pendingSetLogCount = pendingSetLogCount ?? { _ in 0 }
     self.sessionReviews = sessionReviews
     self.account = account
-    self.onboarding =
+    let resolvedOnboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
         studentId: studentID,
         seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
       )
+    self.onboarding = resolvedOnboarding
+    self.importedHistoryBackfill = ImportedHistoryBackfill(
+      logs: logs,
+      onboarding: resolvedOnboarding,
+      e1rm: e1rm,
+      catalog: soloCatalog
+    )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -173,7 +184,9 @@ public struct StudentRootView: View {
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews,
-        trainingMode: trainingMode, soloCatalog: soloCatalog
+        trainingMode: trainingMode, soloCatalog: soloCatalog,
+        importedHistoryRefreshToken: importedHistoryRefreshToken,
+        onImportedHistoryRefresh: { await runImportedHistoryBackfill() }
       )
       .tag(StudentTab.growth)
       .tabItem {
@@ -202,8 +215,11 @@ public struct StudentRootView: View {
     }
     // Acking PRs on the growth tab must clear the profile badge when the
     // student switches away (spec 051 §2 — same staleness family as U6).
-    .onChange(of: selectedTab) { _, _ in
+    .onChange(of: selectedTab) { _, tab in
       Task {
+        if tab == .growth {
+          await runImportedHistoryBackfill()
+        }
         pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
       }
     }
@@ -213,8 +229,77 @@ public struct StudentRootView: View {
       }
       await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+      await runImportedHistoryBackfill()
     }
+    .importedHistoryReviewAlert(
+      review: $pendingImportedHistoryReview,
+      onAnswer: answerImportedHistoryReview
+    )
     .tint(Color.MeetPR.brandRed)
+  }
+
+  @MainActor
+  private func runImportedHistoryBackfill() async {
+    guard let result = try? await importedHistoryBackfill.backfill(studentID: studentID) else {
+      return
+    }
+    // Queue every pending family and present the prompts one after another —
+    // a multi-family import must not lose its second prompt (spec 053 §5).
+    importedHistoryReviewQueue = result.pendingReviews
+    if pendingImportedHistoryReview == nil {
+      pendingImportedHistoryReview = importedHistoryReviewQueue.first
+    }
+    if result.importedPointCount > 0 {
+      importedHistoryRefreshToken += 1
+    }
+  }
+
+  @MainActor
+  private func answerImportedHistoryReview(
+    _ review: PendingImportedHistoryReview,
+    decision: ImportedHistoryReviewDecision
+  ) async {
+    try? await importedHistoryBackfill.answer(review, decision: decision)
+    importedHistoryReviewQueue.removeAll { $0.id == review.id }
+    if pendingImportedHistoryReview?.id == review.id {
+      pendingImportedHistoryReview = importedHistoryReviewQueue.first
+    }
+    importedHistoryRefreshToken += 1
+  }
+}
+
+extension View {
+  fileprivate func importedHistoryReviewAlert(
+    review: Binding<PendingImportedHistoryReview?>,
+    onAnswer:
+      @escaping @MainActor (
+        PendingImportedHistoryReview,
+        ImportedHistoryReviewDecision
+      ) async -> Void
+  ) -> some View {
+    alert(
+      "确认导入历史",
+      isPresented: Binding(
+        get: { review.wrappedValue != nil },
+        set: { if !$0 { review.wrappedValue = nil } }
+      ),
+      presenting: review.wrappedValue
+    ) { pending in
+      Button("确实") {
+        Task { await onAnswer(pending, .confirmed) }
+      }
+      Button("没有", role: .destructive) {
+        Task { await onAnswer(pending, .rejected) }
+      }
+    } message: { pending in
+      Text(importedHistoryReviewMessage(pending))
+    }
+  }
+
+  private func importedHistoryReviewMessage(_ review: PendingImportedHistoryReview) -> String {
+    "导入的历史记录里有 \(StudentFormatting.kilograms(review.sourceWeightKg))kg × "
+      + "\(review.sourceReps)(约 e1RM \(StudentFormatting.kilograms(review.sourceE1RMKg))kg),"
+      + "超过你填写的 1RM \(StudentFormatting.kilograms(review.baseline1RMKg))kg——当时确实完成了吗?"
   }
 }
 

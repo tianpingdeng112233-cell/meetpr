@@ -16,6 +16,8 @@ public struct TrainingHistoryView: View {
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel?
   private let trainingMode: TrainingMode
+  private let importedHistoryRefreshToken: Int
+  private let onImportedHistoryRefresh: (@MainActor () async -> Void)?
   @State private var viewModel: TrainingHistoryViewModel
   @State private var trendViewModel: DashboardE1RMTrendViewModel
   @State private var prEvent: PRBreakthroughEvent?
@@ -31,13 +33,17 @@ public struct TrainingHistoryView: View {
     feedbackViewModel: FeedbackInboxViewModel? = nil,
     sessionReviews: (any SessionReviewRepository)? = nil,
     trainingMode: TrainingMode = .coached,
-    soloCatalog: [Exercise] = []
+    soloCatalog: [Exercise] = [],
+    importedHistoryRefreshToken: Int = 0,
+    onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.trainingMode = trainingMode
+    self.importedHistoryRefreshToken = importedHistoryRefreshToken
+    self.onImportedHistoryRefresh = onImportedHistoryRefresh
     self._viewModel = State(
       initialValue: TrainingHistoryViewModel(
         plans: plans, logs: logs, reviews: sessionReviews,
@@ -91,6 +97,14 @@ public struct TrainingHistoryView: View {
       }
     }
     .task { await loadIfNeeded() }
+    .task(id: importedHistoryRefreshToken) {
+      guard importedHistoryRefreshToken > 0 else { return }
+      await reloadAfterImportedHistoryChange()
+    }
+    .refreshable {
+      await onImportedHistoryRefresh?()
+      await reloadAfterImportedHistoryChange()
+    }
   }
 
   // MARK: - PR banner
@@ -149,15 +163,16 @@ public struct TrainingHistoryView: View {
 
   private func liftChartCard(_ family: LiftFamily) -> some View {
     let row = trendRow(for: family)
+    let displayPoint = row?.displayPoint()
     return VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .bottom) {
         VStack(alignment: .leading, spacing: 0) {
-          Text("\(family.studentDisplayName) E1RM · 90 天")
+          Text("\(family.studentDisplayName) E1RM · \(chartPeriodLabel(for: row))")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
             .foregroundStyle(Color.MeetPR.brandRed)
           HStack(alignment: .lastTextBaseline, spacing: 6) {
-            Text(row?.latestPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
+            Text(displayPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
               .font(.system(size: 40, weight: .heavy).monospacedDigit())
               .foregroundStyle(Color.MeetPR.fgPrimary)
             Text("KG")
@@ -220,6 +235,10 @@ public struct TrainingHistoryView: View {
     Text(StudentFormatting.kilograms(kilograms))
       .font(.system(size: 10, design: .monospaced))
       .foregroundStyle(Color.MeetPR.fgTertiary)
+  }
+
+  private func chartPeriodLabel(for row: DashboardE1RMTrendRow?) -> String {
+    row?.displaysHistoricalBest() == true ? "历史最佳" : "90 天"
   }
 
   // MARK: - Coach feedback history
@@ -434,10 +453,18 @@ public struct TrainingHistoryView: View {
 
   /// Distinct calendar days on which at least one set was completed.
   private var sessionCountText: String {
-    let days = Set(
-      loadedLogs.filter(\.completed).map { Calendar.current.startOfDay(for: $0.loggedAt) }
+    "\(Self.completedSessionCount(logs: loadedLogs))"
+  }
+
+  static func completedSessionCount(
+    logs: [StudentSetLog],
+    calendar: Calendar = .current
+  ) -> Int {
+    Set(
+      logs.filter { $0.completed && !$0.assumed }
+        .map { calendar.startOfDay(for: $0.loggedAt) }
     )
-    return "\(days.count)"
+    .count
   }
 
   private var weekCount: Int { loadedWeeks.count }
@@ -448,7 +475,7 @@ public struct TrainingHistoryView: View {
   private var sbdTotalText: String {
     guard let rows = trendPresentation?.rows else { return "—" }
     let values = MainLiftExerciseFamilyResolver.dashboardFamilies.compactMap { family in
-      rows.first { $0.family == family }?.latestPoint?.e1RMKg
+      rows.first { $0.family == family }?.displayPoint()?.e1RMKg
     }
     guard values.count == 3 else { return "—" }
     return StudentFormatting.kilograms(values.reduce(0, +))
@@ -488,6 +515,15 @@ public struct TrainingHistoryView: View {
     if let feedbackViewModel, feedbackViewModel.state == .idle {
       await feedbackViewModel.load(studentID: studentID)
     }
+    let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
+    pendingPRs = prs.sorted { $0.occurredAt > $1.occurredAt }
+    prEvent = pendingPRs.first
+    prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+  }
+
+  private func reloadAfterImportedHistoryChange() async {
+    await viewModel.load(studentID: studentID)
+    await trendViewModel.load(studentID: studentID)
     let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
     pendingPRs = prs.sorted { $0.occurredAt > $1.occurredAt }
     prEvent = pendingPRs.first

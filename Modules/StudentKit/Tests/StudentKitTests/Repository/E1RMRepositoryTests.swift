@@ -141,3 +141,73 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
     _ = try await repo.fetchHistory(studentId: UUID(), exerciseId: UUID())
   }
 }
+
+/// Spec 053 §3: replaying assumed history must not inflate the curve, and a
+/// later real set on the same backend set-log identity replaces the imported
+/// value instead of producing two points.
+@Test func upsertUsesStudentAndSetLogIdentityAcrossOrigins() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let squat = UUID()
+    let setLogID = UUID()
+    let imported = E1RMHistoryPoint(
+      id: UUID(), studentId: student, exerciseId: squat, setLogId: setLogID,
+      computedAt: Date(timeIntervalSince1970: 1_768_262_400), e1RMKg: 165,
+      sourceWeightKg: 140, sourceReps: 5, sourceRPE: 8, origin: .imported)
+    let first = try await repo.upsertPoint(imported)
+    let replay = try await repo.upsertPoint(imported)
+    #expect(first.id == replay.id, "\(label): replay keeps stable point identity")
+
+    let logged = E1RMHistoryPoint(
+      id: UUID(), studentId: student, exerciseId: squat, setLogId: setLogID,
+      computedAt: Date(timeIntervalSince1970: 1_768_348_800), e1RMKg: 172,
+      sourceWeightKg: 145, sourceReps: 5, sourceRPE: 9,
+      confidence: .normal, origin: .logged)
+    let replacement = try await repo.upsertPoint(logged)
+    let history = try await repo.fetchHistory(studentId: student, exerciseId: squat)
+
+    #expect(history.count == 1, "\(label): same set log never creates a double point")
+    #expect(replacement.id == first.id, "\(label): replacing keeps selection identity stable")
+    #expect(history.first?.origin == .logged)
+    #expect(history.first?.e1RMKg == 172)
+  }
+}
+
+@Test func maxBeforeExcludesOnlyTheReplacedImportedSetLog() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let squat = UUID()
+    let bench = UUID()
+    let anchor = Date(timeIntervalSince1970: 1_768_262_400)
+
+    // Scenario 1 — replacing an *imported* set: its stale value must not gate
+    // its own real-log replacement (spec 053 §3).
+    let importedSetLog = UUID()
+    try await repo.recordPoint(
+      E1RMHistoryPoint(
+        id: UUID(), studentId: student, exerciseId: squat, setLogId: importedSetLog,
+        computedAt: anchor.addingTimeInterval(-86_400), e1RMKg: 200,
+        sourceWeightKg: 170, sourceReps: 5, sourceRPE: nil,
+        confidence: .normal, origin: .imported))
+    try await repo.recordPoint(
+      point(studentId: student, exerciseId: squat, daysAgo: 2, e1RM: 190, anchor: anchor))
+    let excludingImported = try await repo.maxBefore(
+      studentId: student, exerciseId: squat, before: .distantFuture,
+      excludingSetLogId: importedSetLog)
+    #expect(excludingImported == 190, "\(label): stale imported value must not gate")
+
+    // Scenario 2 — re-recording a *logged* set keeps its prior value as the
+    // bar, so unchecking + rechecking cannot farm a duplicate PR.
+    let loggedSetLog = UUID()
+    try await repo.recordPoint(
+      E1RMHistoryPoint(
+        id: UUID(), studentId: student, exerciseId: bench, setLogId: loggedSetLog,
+        computedAt: anchor.addingTimeInterval(-86_400), e1RMKg: 120,
+        sourceWeightKg: 100, sourceReps: 5, sourceRPE: 8,
+        confidence: .normal, origin: .logged))
+    let excludingLogged = try await repo.maxBefore(
+      studentId: student, exerciseId: bench, before: .distantFuture,
+      excludingSetLogId: loggedSetLog)
+    #expect(excludingLogged == 120, "\(label): prior logged value still gates")
+  }
+}

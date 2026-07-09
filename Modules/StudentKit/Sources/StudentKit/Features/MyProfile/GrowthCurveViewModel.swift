@@ -28,13 +28,18 @@ public final class GrowthCurveViewModel {
   }
   /// Points for the selected family within the selected window, ascending by date.
   public private(set) var visiblePoints: [E1RMHistoryPoint] = []
+  /// Two-layer chart inputs preserve the rolling winner's provenance instead
+  /// of reconstructing it as a default logged point (spec 053 §6).
+  private(set) var visibleSmoothedSamples: [E1RMSeries.Sample] = []
+  private(set) var visibleRawEligiblePoints: [E1RMHistoryPoint] = []
 
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let now: @Sendable () -> Date
   private let mode: TrainingMode
   private let catalog: [Exercise]
-  private var historyByFamily: [LiftFamily: [E1RMHistoryPoint]] = [:]
+  private var seriesByFamily: [LiftFamily: E1RMSeries] = [:]
+  private var rawPointsByID: [UUID: E1RMHistoryPoint] = [:]
 
   public init(
     plans: any StudentPlanRepository,
@@ -59,17 +64,31 @@ public final class GrowthCurveViewModel {
       let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
         in: plan, catalog: catalog)
 
-      var grouped: [LiftFamily: [E1RMHistoryPoint]] = [:]
+      var grouped: [LiftFamily: E1RMSeries] = [:]
+      var pointsByID: [UUID: E1RMHistoryPoint] = [:]
       for (family, ids) in idsByFamily {
         let histories = try await e1rm.fetchHistory(studentId: studentID, exerciseIds: Array(ids))
         // Single aggregation (spec 050 §2): the growth curve draws the
         // eligibility-gated rolling-max line, so one anomalous set no longer
         // tops the chart by 25 kg.
-        grouped[family] = E1RMSeries.smoothedHistory(
-          points: histories.values.flatMap { $0 }, family: family)
+        let points = histories.values.flatMap { $0 }
+        grouped[family] = E1RMSeries.build(points: points, family: family)
+        for point in points {
+          pointsByID[point.id] = point
+        }
       }
-      historyByFamily = grouped
+      seriesByFamily = grouped
+      rawPointsByID = pointsByID
       state = .loaded
+      if selectedWindow == .fourWeeks,
+        grouped.values.flatMap(\.smoothed).contains(where: {
+          $0.date < now().addingTimeInterval(-28 * 86_400)
+        })
+      {
+        // An imported timeline is history first: do not make its first visible
+        // chart silently empty just because the default picker said 4 weeks.
+        selectedWindow = .all
+      }
       refreshVisiblePoints()
     } catch {
       if error.isTaskCancellation {
@@ -81,12 +100,39 @@ public final class GrowthCurveViewModel {
   }
 
   private func refreshVisiblePoints() {
-    let all = historyByFamily[selectedFamily] ?? []
-    guard let cutoff = windowCutoff else {
-      visiblePoints = all
-      return
+    let series =
+      seriesByFamily[selectedFamily] ?? E1RMSeries.build(points: [], family: selectedFamily)
+    let cutoff = windowCutoff
+    visibleSmoothedSamples = series.smoothed.filter { sample in
+      cutoff.map { sample.date >= $0 } ?? true
     }
-    visiblePoints = all.filter { $0.computedAt >= cutoff }
+    visibleRawEligiblePoints = series.rawEligible.compactMap { sample in
+      guard cutoff.map({ sample.date >= $0 }) ?? true else { return nil }
+      return rawPointsByID[sample.winnerPointID]
+    }
+    visiblePoints = visibleSmoothedSamples.compactMap { sample in
+      guard let winner = rawPointsByID[sample.winnerPointID] else { return nil }
+      return E1RMHistoryPoint(
+        id: sample.sampleID,
+        studentId: winner.studentId,
+        exerciseId: winner.exerciseId,
+        setLogId: winner.setLogId,
+        computedAt: sample.date,
+        e1RMKg: sample.valueKg,
+        sourceWeightKg: winner.sourceWeightKg,
+        sourceReps: winner.sourceReps,
+        sourceRPE: winner.sourceRPE,
+        confidence: sample.winnerConfidence,
+        origin: sample.winnerOrigin
+      )
+    }
+  }
+
+  func winnerPoint(forSampleID sampleID: UUID) -> E1RMHistoryPoint? {
+    guard let sample = visibleSmoothedSamples.first(where: { $0.sampleID == sampleID }) else {
+      return nil
+    }
+    return rawPointsByID[sample.winnerPointID]
   }
 
   private var windowCutoff: Date? {

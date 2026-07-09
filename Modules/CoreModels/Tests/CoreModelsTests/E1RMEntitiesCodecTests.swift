@@ -100,3 +100,29 @@ import Testing
   #expect(decoded.confidence == .low)
   #expect(decoded == point)
 }
+
+/// Spec 053 §1/§2: existing local e1RM JSON predates `origin`; it must read
+/// as a logged point, while the imported value survives a new round-trip.
+@Test func e1rmHistoryPointOriginDefaultsToLoggedAndRoundTripsImported() throws {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 165,
+    sourceWeightKg: 140,
+    sourceReps: 5,
+    sourceRPE: 8,
+    origin: .imported
+  )
+  let data = try JSONEncoder().encode(point)
+  let imported = try JSONDecoder().decode(E1RMHistoryPoint.self, from: data)
+  #expect(imported.origin == .imported)
+
+  var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+  object.removeValue(forKey: "origin")
+  let legacy = try JSONSerialization.data(withJSONObject: object)
+  let decodedLegacy = try JSONDecoder().decode(E1RMHistoryPoint.self, from: legacy)
+  #expect(decodedLegacy.origin == .logged)
+}
