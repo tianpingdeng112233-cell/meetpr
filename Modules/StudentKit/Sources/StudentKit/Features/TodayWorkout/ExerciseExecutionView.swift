@@ -38,7 +38,7 @@ struct ExerciseExecutionView: View {
       ForEach(Array(rows.enumerated()), id: \.element.id) { offset, row in
         if let index = rowIndex(row) {
           SetRecordRow(
-            draft: row, setNumber: offset + 1, rowIndex: index,
+            draft: row, setNumber: SetDisplayNumber.number(atOffset: offset), rowIndex: index,
             onTap: onTapSet, onPlateMath: onPlateMath)
         }
       }

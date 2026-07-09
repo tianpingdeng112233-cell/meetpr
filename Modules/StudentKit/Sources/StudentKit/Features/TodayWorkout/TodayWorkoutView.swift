@@ -198,6 +198,7 @@ public struct TodayWorkoutView: View {
           activeSetHero(
             draft: drafts[activeIndex],
             rowIndex: activeIndex,
+            setNumber: setNumber(for: drafts[activeIndex], in: drafts),
             totalSets: totalSets(for: drafts[activeIndex].planExerciseID, in: drafts))
         }
 
@@ -239,6 +240,7 @@ public struct TodayWorkoutView: View {
       SetEntrySheet(
         rowIndex: target.rowIndex,
         draft: target.draft,
+        setNumber: target.setNumber,
         viewModel: viewModel,
         studentID: studentID,
         videoViewModel: videoViewModel
@@ -249,11 +251,11 @@ public struct TodayWorkoutView: View {
   // MARK: - Active set hero
 
   private func activeSetHero(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, totalSets: Int
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, setNumber: Int, totalSets: Int
   ) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       Eyebrow(
-        "第 \(twoDigit(draft.prescribed.setIndex + 1)) / \(twoDigit(totalSets)) 组")
+        "第 \(twoDigit(setNumber)) / \(twoDigit(totalSets)) 组")
 
       HStack(alignment: .lastTextBaseline, spacing: 6) {
         Text(weightText(draft))
@@ -268,6 +270,11 @@ public struct TodayWorkoutView: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
       .padding(.top, 12)
+
+      if let coachNote = coachNote(draft) {
+        coachNotePill(coachNote)
+          .padding(.top, 10)
+      }
 
       Text("RPE")
         .font(Font.MeetPR.monoLabel)
@@ -299,7 +306,8 @@ public struct TodayWorkoutView: View {
         .buttonStyle(.plain)
 
         Button {
-          editing = EditingTarget(id: draft.id, rowIndex: rowIndex, draft: draft)
+          editing = EditingTarget(
+            id: draft.id, rowIndex: rowIndex, draft: draft, setNumber: setNumber)
         } label: {
           Image(systemName: "video")
             .font(.system(size: 20))
@@ -370,9 +378,13 @@ public struct TodayWorkoutView: View {
         .padding(.vertical, 10)
         .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
 
-        ForEach(rows) { draft in
+        ForEach(Array(rows.enumerated()), id: \.element.id) { offset, draft in
           let index = allDrafts.firstIndex { $0.id == draft.id } ?? 0
-          setRow(draft: draft, rowIndex: index, active: activeIndex == index)
+          setRow(
+            draft: draft,
+            rowIndex: index,
+            setNumber: SetDisplayNumber.number(atOffset: offset),
+            active: activeIndex == index)
         }
       }
       .background(Color.MeetPR.surface1)
@@ -390,28 +402,43 @@ public struct TodayWorkoutView: View {
   }
 
   private func setRow(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, active: Bool
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, setNumber: Int, active: Bool
   ) -> some View {
     let resolved = draft.completed || active
     let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
+    let note = coachNote(draft)
     return Button {
-      editing = EditingTarget(id: draft.id, rowIndex: rowIndex, draft: draft)
+      editing = EditingTarget(
+        id: draft.id, rowIndex: rowIndex, draft: draft, setNumber: setNumber)
     } label: {
-      LazyVGrid(columns: columns, spacing: 0) {
-        Text("\(draft.prescribed.setIndex + 1)")
-          .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
-        Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
-        Text(repsText(draft)).foregroundStyle(foreground)
-        Text(rpeText(draft)).foregroundStyle(foreground)
-        Text(statusMark(draft)).foregroundStyle(statusColor(draft))
-        Image(systemName: "video")
-          .font(.system(size: 16))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .frame(maxWidth: .infinity, alignment: .trailing)
+      VStack(alignment: .leading, spacing: 0) {
+        LazyVGrid(columns: columns, spacing: 0) {
+          Text("\(setNumber)")
+            .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+          Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
+          Text(repsText(draft)).foregroundStyle(foreground)
+          Text(rpeText(draft)).foregroundStyle(foreground)
+          Text(statusMark(draft)).foregroundStyle(statusColor(draft))
+          Image(systemName: "video")
+            .font(.system(size: 16))
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .font(.system(size: 16, design: .monospaced))
+        .padding(.horizontal, 16)
+        .padding(.top, 14)
+        .padding(.bottom, note == nil ? 14 : 6)
+
+        if let note {
+          Text("备注 \(note)")
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(active ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+            .lineLimit(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
+        }
       }
-      .font(.system(size: 16, design: .monospaced))
-      .padding(.horizontal, 16)
-      .padding(.vertical, 14)
       .background(active ? Color.MeetPR.surface2 : Color.clear)
       .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
       .contentShape(Rectangle())
@@ -447,6 +474,26 @@ public struct TodayWorkoutView: View {
 
   private func currentRPE(_ draft: TodayWorkoutViewModel.SetRowDraft) -> Decimal {
     draft.actualRPE ?? draft.prescribed.rpe ?? 8
+  }
+
+  private func coachNote(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String? {
+    CoachNoteDisplay.text(draft.prescribed.coachNote)
+  }
+
+  private func coachNotePill(_ note: String) -> some View {
+    Text("教练备注 \(note)")
+      .font(.system(size: 13, weight: .semibold))
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .lineLimit(2)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 10)
+      .padding(.vertical, 7)
+      .background(Color.MeetPR.surface1)
+      .clipShape(.rect(cornerRadius: 8))
+      .overlay {
+        RoundedRectangle(cornerRadius: 8)
+          .stroke(Color.MeetPR.border, lineWidth: 1)
+      }
   }
 
   private func statusMark(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {
@@ -507,6 +554,14 @@ public struct TodayWorkoutView: View {
     drafts.filter { $0.planExerciseID == planExerciseID }.count
   }
 
+  private func setNumber(
+    for draft: TodayWorkoutViewModel.SetRowDraft,
+    in drafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> Int {
+    let exerciseRows = drafts.filter { $0.planExerciseID == draft.planExerciseID }
+    return SetDisplayNumber.number(for: draft, in: exerciseRows)
+  }
+
   private var restTitle: String {
     Calendar.current.isDateInToday(selectedDate) ? "今日休息" : "这天休息"
   }
@@ -550,5 +605,6 @@ private struct EditingTarget: Identifiable {
   let id: UUID
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
+  let setNumber: Int
 }
 // swiftlint:enable file_length type_body_length function_body_length
