@@ -67,6 +67,13 @@ public final class Session {
       return
     }
 
+    await settleBootstrapRefresh(
+      refreshToken: refreshToken, cachedUser: cachedUser, generation: generation)
+  }
+
+  private func settleBootstrapRefresh(
+    refreshToken: String, cachedUser: User, generation: UInt
+  ) async {
     do {
       let tokens = try await auth.refresh(refreshToken: refreshToken)
       guard isCurrentSession(generation) else { return }
