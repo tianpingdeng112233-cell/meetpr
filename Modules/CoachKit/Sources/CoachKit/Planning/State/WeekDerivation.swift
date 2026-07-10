@@ -66,33 +66,13 @@ public enum WeekDerivation {
     let delta = rule.incrementValue ?? 0
     switch rule.ruleType {
     case .weightInc:
-      spec.intensityMode = .weight
-      spec.targetValue += delta
-      applyToPerSetTargets(&spec) { target in
-        target.intensityMode = .weight
-        target.targetValue += delta
-      }
+      applyIntensityDelta(&spec, mode: .weight, delta: delta)
     case .weightDec:
-      spec.intensityMode = .weight
-      spec.targetValue -= delta
-      applyToPerSetTargets(&spec) { target in
-        target.intensityMode = .weight
-        target.targetValue -= delta
-      }
+      applyIntensityDelta(&spec, mode: .weight, delta: -delta)
     case .rpeInc:
-      spec.intensityMode = .rpe
-      spec.targetValue += delta
-      applyToPerSetTargets(&spec) { target in
-        target.intensityMode = .rpe
-        target.targetValue += delta
-      }
+      applyIntensityDelta(&spec, mode: .rpe, delta: delta)
     case .rpeDec:
-      spec.intensityMode = .rpe
-      spec.targetValue -= delta
-      applyToPerSetTargets(&spec) { target in
-        target.intensityMode = .rpe
-        target.targetValue -= delta
-      }
+      applyIntensityDelta(&spec, mode: .rpe, delta: -delta)
     case .setsInc:
       spec.setCount += intValue(delta)
     case .setsDec:
@@ -109,6 +89,19 @@ public enum WeekDerivation {
       }
     case .custom:
       break
+    }
+  }
+
+  private static func applyIntensityDelta(
+    _ spec: inout DraftSetSpec,
+    mode: IntensityMode,
+    delta: Decimal
+  ) {
+    spec.intensityMode = mode
+    spec.targetValue += delta
+    applyToPerSetTargets(&spec) { target in
+      target.intensityMode = mode
+      target.targetValue += delta
     }
   }
 

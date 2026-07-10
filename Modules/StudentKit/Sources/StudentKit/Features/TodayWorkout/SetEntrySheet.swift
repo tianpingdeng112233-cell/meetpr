@@ -191,8 +191,18 @@ struct SetEntrySheet: View {
     .buttonStyle(.plain)
   }
 
-  // MARK: - Steppers
+  private func save(failed: Bool) {
+    viewModel.updateWeight(rowIndex: rowIndex, weight: weight)
+    viewModel.updateReps(rowIndex: rowIndex, reps: reps)
+    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpe)
+    Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
+    dismiss()
+  }
+}
 
+// MARK: - Steppers
+
+extension SetEntrySheet {
   /// The weight row: ±2.5 keeps the plate-jump muscle memory, and tapping
   /// the big number opens direct entry — an RPE plan that floats 175→150
   /// is one keyboard away instead of ten taps (spec 049 §3 / P1-1).
@@ -296,12 +306,5 @@ struct SetEntrySheet: View {
     .buttonStyle(.plain)
   }
 
-  private func save(failed: Bool) {
-    viewModel.updateWeight(rowIndex: rowIndex, weight: weight)
-    viewModel.updateReps(rowIndex: rowIndex, reps: reps)
-    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpe)
-    Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
-    dismiss()
-  }
 }
 // swiftlint:enable function_parameter_count
