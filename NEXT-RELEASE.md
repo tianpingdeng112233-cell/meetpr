@@ -43,7 +43,7 @@
 - [x] 三修合入 release/1.0(2026-07-10 merge,待 CI 绿)
 - [x] #228/#229 port(死 INFOPLIST_KEY 清理 + build 号 apple-generic 单源)
 - [ ] main 库存分诊捞回队列(10 项,序 1-10,依赖关系见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表)
-- [ ] build 号 bump 8 + 打 tag `beta/1.0-8`(prep-beta)
+- [x] build 号 bump 8 + 打 tag `beta/1.0-8`(prep-beta,2026-07-10)
 - [ ] David:Archive → Upload → 分配 Neice
 
 ## 收尾约定
