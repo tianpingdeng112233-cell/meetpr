@@ -188,20 +188,7 @@ public struct TodayWorkoutView: View {
             isEditable: isEditable)
         }
 
-        if !drafts.isEmpty && drafts.allSatisfy(\.completed) {
-          DayCompletionBanner(totalSets: drafts.count)
-        }
-
-        if isEditable {
-          SlideToCompleteButton(title: "滑动完成今日训练") {
-            showingSummary = true
-          }
-          .padding(.top, 4)
-          .sheet(isPresented: $showingSummary) {
-            SessionSummaryView(
-              summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID)
-          }
-        }
+        completionControls(drafts: drafts, day: day, isEditable: isEditable)
       }
       .padding(16)
     }
@@ -217,6 +204,28 @@ public struct TodayWorkoutView: View {
         videoViewModel: videoViewModel,
         scrollToVideo: target.scrollToVideo
       )
+    }
+  }
+
+  @ViewBuilder
+  private func completionControls(
+    drafts: [TodayWorkoutViewModel.SetRowDraft],
+    day: StudentPlanDay,
+    isEditable: Bool
+  ) -> some View {
+    if !drafts.isEmpty && drafts.allSatisfy(\.completed) {
+      DayCompletionBanner(totalSets: drafts.count)
+    }
+
+    if isEditable {
+      SlideToCompleteButton(title: "滑动完成今日训练") {
+        showingSummary = true
+      }
+      .padding(.top, 4)
+      .sheet(isPresented: $showingSummary) {
+        SessionSummaryView(
+          summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID)
+      }
     }
   }
 
