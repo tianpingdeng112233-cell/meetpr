@@ -479,7 +479,7 @@ David 在本分支直驱小修/小功能时,你(Codex)必须遵守:
 2. **改完必验**:改动文件过 `swiftlint lint --strict`;受影响 SPM 模块 `swift test` 绿;UI 改动用模拟器亲眼确认(DemoStudent=学员端,Demo=教练端)。
 3. **每笔 commit 后,立刻在 `docs/CODEX-JOURNAL.md` 顶部追加一行**(格式见该文件)。这是 Claude/David 之间唯一同步台账——**漏写=改动隐身,视为未完成**。
 4. 用户可见的 iOS 改动,同步在 `NEXT-RELEASE.md`「本版将包含」追加一行。
-5. push 到 `origin/release/1.0` 即算进包候选;等 CI,红了自己修。
+5. push 到 `origin/release/1.0` 即算进包候选。⚠️ **本仓 CI 是 PR-only 设计,直推本分支不触发任何 CI**——第 2 条的本地验证(lint/test/模拟器)就是唯一闸门,不要等一个不存在的 CI。
 6. **不确定某个 main commit 算不算"已批准捞回"** → 查上表,不在表里的一律当"冻结",不要因为"看起来是小修"就顺手带。
 
 ### P0–P2 发布优先级(每张任务/每笔直驱修复都带一档)
