@@ -17,14 +17,21 @@
 ⚠️ 注意:main **不是** `ship@0ef0169`(build 7)的后继——ship 独有 #213(学员端走查六项修复)
 在 main 上由 spec 049/050/051 重新落地,对应关系与复验门见下节。
 
-**自练(solo)wave 全量**
-- 自练核心循环:adhoc 记录 + 离线队列 + CatalogKit(spec 045,#214)
-- solo 注册/onboarding 收口:轻 onboarding 2 屏 + 基线补记(spec 046,#218)
-- solo 成长/训练页适配:catalog 归桶 + 月分组历史(spec 047,#219)
-- 账号台账:注销/改密/CSV 导出(Apple 5.1.1(v))(spec 048,#221)
+**学员端(有教练线,对内测员生效)**
+- 账号台账:注销/改密/CSV 导出(Apple 5.1.1(v))(spec 048,#221)— 不分 trainingMode,所有学员生效
 - 训练页信任包:完成态真值 / 今日锁 / 重量录入 / 倒计时(spec 049,#215)
 - 上行信号:回顾持久化 + PR 红点消费面(spec 051,#217)
-- solo honesty 修复 U11/U12(#223/#224)、U9 polish(#222)
+- U9 polish 中的共享面:E1RM 说明 / 配重换行 / e1RM 曲线轴点标(#222)
+
+**🚪 solo(自练)线——随包休眠,本版不启用(David 2026-07-10 拍板)**
+
+> solo 代码已合 main 且与 e1RM 等交错,不 revert(defer≠delete,先例 spec 033 评估期停用)。
+> 门 = 注册页隐藏「学员 · 自己练」角色卡(`SignupView.offeredRoles`),无入口即不可达;
+> 恢复 solo = 该常量改回 `UserRole.allCases`。**prep-beta 圈选时勿把下列条目当上新写**:
+- 自练核心循环:adhoc 记录 + 离线队列 + CatalogKit(spec 045,#214)— CatalogKit 仍被 e1RM/成长页共享使用
+- solo 注册/onboarding 收口(spec 046,#218)— 入口已门
+- solo 成长/训练页适配(spec 047,#219)
+- solo honesty 修复 U11/U12(#223/#224)
 
 **e1RM / 算法**
 - e1RM 单一真源:资格门 + 滚动 max 序列 + 降噪 PR(spec 050,#216)
@@ -67,6 +74,7 @@ main 候选基线。
 
 ## 📋 进度:离 archive 推 TestFlight 还差几步
 - [ ] 候选改动全部合 main(见上)
+- [ ] solo 注册入口门合 main(`chore/gate-solo-signup-beta`,拍板 2026-07-10)——**在此之前不打 tag**
 - [ ] #213 六项对应关系逐项复验通过(上表打勾)
 - [ ] build 号复核(规则见顶部「目标」节)
 - [ ] main 目标 commit 打 tag `beta/1.0-8` 并推远端
