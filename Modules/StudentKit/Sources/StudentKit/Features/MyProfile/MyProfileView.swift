@@ -18,6 +18,8 @@ public struct MyProfileView: View {
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   /// nil hides the row (demo/previews); live wiring passes Session.logout.
   private let onLogout: (@MainActor () async -> Void)?
+  private let account: (any AccountRepository)?
+  private let logs: (any StudentTrainingLogRepository)?
   @State private var viewModel: MyProfileViewModel
 
   public init(
@@ -26,13 +28,17 @@ public struct MyProfileView: View {
     e1rm: any E1RMRepository,
     onboarding: any OnboardingRepository,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
-    onLogout: (@MainActor () async -> Void)? = nil
+    onLogout: (@MainActor () async -> Void)? = nil,
+    account: (any AccountRepository)? = nil,
+    logs: (any StudentTrainingLogRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onLogout = onLogout
+    self.account = account
+    self.logs = logs
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -135,6 +141,23 @@ public struct MyProfileView: View {
 
     sectionLabel("更多").padding(.top, 18)
     moreCard.padding(.top, 8)
+
+    accountSecuritySection
+  }
+
+  @ViewBuilder
+  private var accountSecuritySection: some View {
+    if let account, let logs {
+      sectionLabel("账号与安全").padding(.top, 18)
+      AccountSecuritySection(
+        studentID: studentID,
+        account: account,
+        logs: logs,
+        plans: plans,
+        onLogout: onLogout
+      )
+      .padding(.top, 8)
+    }
   }
 
   // MARK: - 1RM baseline card (locked)

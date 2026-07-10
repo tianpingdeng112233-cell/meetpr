@@ -23,6 +23,7 @@ public struct RootView: View {
   private let studentOnboarding: any OnboardingRepository
   private let studentEvaluations: any EvaluationRepository
   private let studentEvaluationSummaries: any EvaluationSummaryRepository
+  private let studentAccount: any AccountRepository
   private let summaryReadStore: any EvaluationSummaryReadStoring
   private let pendingBindStore: any PendingBindCodeStoring
   private let onboardingDraftStore = LocalOnboardingDraftStore()
@@ -48,6 +49,7 @@ public struct RootView: View {
     studentOnboarding: (any OnboardingRepository)? = nil,
     studentEvaluations: (any EvaluationRepository)? = nil,
     studentEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
+    studentAccount: (any AccountRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
@@ -79,6 +81,7 @@ public struct RootView: View {
     self.studentEvaluations = studentEvaluations ?? InMemoryStudentEvaluationRepository()
     self.studentEvaluationSummaries =
       studentEvaluationSummaries ?? InMemoryEvaluationSummaryRepository()
+    self.studentAccount = studentAccount ?? InMemoryAccountRepository()
     self.summaryReadStore = summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
     self.pendingBindStore = pendingBindStore
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
@@ -204,7 +207,8 @@ public struct RootView: View {
       summaryReadStore: summaryReadStore,
       onLogout: {
         await session.logout()
-      }
+      },
+      account: studentAccount
     )
   }
 }

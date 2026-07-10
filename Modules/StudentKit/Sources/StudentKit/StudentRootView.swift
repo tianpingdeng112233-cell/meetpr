@@ -14,6 +14,7 @@ public struct StudentRootView: View {
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
   private let onLogout: (@MainActor () async -> Void)?
+  private let account: (any AccountRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
@@ -58,7 +59,8 @@ public struct StudentRootView: View {
     onboarding: (any OnboardingRepository)? = nil,
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
-    onLogout: (@MainActor () async -> Void)? = nil
+    onLogout: (@MainActor () async -> Void)? = nil,
+    account: (any AccountRepository)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -67,6 +69,7 @@ public struct StudentRootView: View {
     self.readiness = readiness
     self.videoUploads = videoUploads ?? .demo()
     self.onLogout = onLogout
+    self.account = account
     self.onboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
@@ -135,7 +138,9 @@ public struct StudentRootView: View {
         e1rm: e1rm,
         onboarding: onboarding,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
-        onLogout: onLogout
+        onLogout: onLogout,
+        account: account,
+        logs: logs
       )
       .tag(StudentTab.profile)
       .tabItem {
