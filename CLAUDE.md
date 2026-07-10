@@ -2,6 +2,16 @@
 
 力量举学员 + 教练双端 iOS app。这个目录是代码仓库。读这个文件你就知道是在什么项目里、遵守什么规则。
 
+## ⛔ 发版路标(2026-07-10 拍板,凡涉发包先读这段)
+
+- **发版线 = `release/1.0`**(1.0(7) 基底小步直推),worktree 在 `~/Projects/apps/MeetPR-release`;
+  规则权威 = 该分支 `AGENTS.md` §发版直推流(P0–P2 尺/捞回队列/失效保护)。
+- **main 不是发版线**:严禁在 main 打 `beta/*` tag、切包、跑 prep-beta。`beta/1.0-8` 已打在
+  release/1.0(build 8 已占用)。main = 下个大包的**待分诊库存**(coached 学员端形态正典 = 1.0(7),
+  main 的形态批次被否;已批准项按捞回队列在 7 基底重做,不 cherry-pick)。
+- 本文件下方的 V0 时代内容(deadline/冻结清单等)多数已过时,待 neat-freak 整体重写;
+  与本路标或 release 线 AGENTS.md 冲突时,以后者为准。
+
 ## 🚨 Session 启动必读顺序
 
 **每次新开 session,按顺序做**:
