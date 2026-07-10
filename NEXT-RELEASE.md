@@ -4,7 +4,8 @@
 > 上一个版本:**1.0 (5)** — 已 archive + 上传,待内测组生效(见 RELEASES.md)。
 
 ## 🎯 目标:1.0 (7)
-- **承载 worktree / 分支**:复用 `MeetPR-ship`(`ship/today-entry-video-scroll`,同 PR #197)
+- **承载 worktree / 分支**:`MeetPR-1.0.7-plus-three-fixes`
+  (`ship/1.0-7-plus-three-fixes`,以 `ship/today-entry-video-scroll @ 0ef0169` 为基线)
 - build 号:**7**(已 bump;6 从未 archive/上传 → 被 7 取代,连带并入学员端走查修复 #213)
 
 ## 本版将包含
@@ -16,12 +17,16 @@
 - **学员 onboarding 小白化**(#205)— 生日中文轮盘(zh_CN locale)/ Step 3 标题「你的三大项极限是多少?」/ 1RM 估算器 RPE 白话解释 / Step 5「学习/工作强度」+「练后恢复时长」天数阶梯
 - **器械词表 v2**(#206 + #207 + #208 + #211)— Step 4 器械区 13→24 token 分 4 组(基础/哑铃上限单选桶/固定器械/力量举专项),按「影响教练编排」原则筛选;海豹划船凳、地雷架、专项杆硬/软拆分入列;反向过伸机撤除(#207);龙门架 / 高位下拉拆开 + 「拉力机」正名龙门架(#208);label 对齐中国健身房叫法——哈克深蹲机 / 倒蹬机·腿举机 / 腿弯举·腿屈伸(#211);场馆卡加一行副标题;教练端器械备注改中文 label
 - **学员端走查 P0/P1 修复**(#213)— 全流程走查(实机复验 1.0(6))6 项:①练完后今日 tab 完成态做实(CTA/进度条/日历点反映已完成,回 tab 重载);②「开始/继续」CTA 跳回今天(不再掉进旧浏览日期);③训练回顾三问本地持久化 + 「仅自己可见」诚实标签(原来 dismiss 即弃);④录入 sheet 数值可点数字键盘直接输(原只 ± 步进);⑤未来/过去训练日只读保护(记录/完成只对今天开放);⑥资料页基线 1RM vs 训练估算 E1RM 澄清标签。3 轮 review-loop 收敛(1 blocker + 4 nit)。**遗留 David 拍板**:E1RM 平滑/异常口径(算法决策,任务卡已开)。
+- **内测前点名三项修复**(#231/#232/#233)— ①教练端学员执行页默认锚定当前计划周;
+  ②学员训练页的当前组、组表和录入弹窗统一从第 1 组开始;
+  ③access token 过期前主动刷新,401 自动换 token 重试,瞬时网络失败不再把用户踢回登录页。
 
 ## 📋 进度:离 archive 推 TestFlight 还差几步
 - [x] 改动合到 ship 分支(#196/#198/#199/#203/#193 + #204/#205/#206/#207/#208 + #213 全部已合入)
 - [x] build 号设到 7(> App Store Connect 现有最高号 5;6 从未上传)
-- [ ] 编译 + 运行验证
-- [ ] Xcode 打开 ship worktree → Product → Archive → Upload
+- [x] 编译 + 运行验证(2026-07-10:`MeetPR-DemoStudent / DemoStudent / iPhone 17` build+run;
+  app smoke 6/6;本周锚定 3/3;组号 3/3;会话恢复 14/14;Networking 全量通过)
+- [ ] Xcode 打开 `MeetPR-1.0.7-plus-three-fixes` worktree → Product → Archive → Upload
 - [ ] 等 Apple 处理 → 分配内测组 Neice → 手机点更新
 
 > 核心 3 步:Archive → Upload → 等处理。
