@@ -69,9 +69,8 @@ public final class TodayWorkoutViewModel {
       exerciseReferences = references
       state = .loaded(plan: day, drafts: drafts)
     } catch {
-      if isCurrentLoad(generation) {
-        state = .error(error.localizedDescription)
-      }
+      guard isCurrentLoad(generation) else { return }
+      state = error.isTaskCancellation ? .idle : .error(error.localizedDescription)
     }
   }
 
@@ -173,7 +172,7 @@ public final class TodayWorkoutViewModel {
       return true
     } catch {
       state = .loaded(plan: plan, drafts: drafts)
-      if !(error is CancellationError) && (error as? URLError)?.code != .cancelled {
+      if !error.isTaskCancellation {
         actionErrorMessage = Self.recordingErrorMessage(for: error)
       }
       return false

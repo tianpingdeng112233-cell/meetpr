@@ -39,6 +39,10 @@ public final class FeedbackInboxViewModel {
     do {
       state = .loaded(try await repository.fetchInbox(studentID: studentID))
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }
@@ -50,6 +54,8 @@ public final class FeedbackInboxViewModel {
         state = .loaded(try await repository.fetchInbox(studentID: studentID))
       }
     } catch {
+      // A cancelled mark-read task must leave the loaded inbox intact.
+      if error.isTaskCancellation { return }
       state = .error(error.localizedDescription)
     }
   }

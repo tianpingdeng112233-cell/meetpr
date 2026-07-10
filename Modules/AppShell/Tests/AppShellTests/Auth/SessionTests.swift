@@ -107,6 +107,27 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func bootstrapIsNoOpWhenSessionAlreadyAuthenticated() async throws {
+  let repository = InMemoryAuthRepository()
+  _ = try await repository.signup(
+    phone: "13800000002", password: "password123", role: .coachedStudent)
+  let store = InMemoryTokenStore()
+  let session = Session(auth: repository, tokenStore: store)
+  try await session.login(phone: "13800000002", password: "password123")
+  guard case .authenticated(let user) = session.state else {
+    Issue.record("Precondition: expected authenticated session after login")
+    return
+  }
+  let tokenAfterLogin = await store.accessToken()
+
+  await session.bootstrap()
+
+  #expect(session.state == .authenticated(user))
+  #expect(await store.accessToken() == tokenAfterLogin)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func signupAuthenticatesAndPersistsTokens() async throws {
   let store = InMemoryTokenStore()
   let session = Session(auth: InMemoryAuthRepository(), tokenStore: store)

@@ -242,3 +242,43 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
     []
   }
 }
+
+@MainActor
+@Test func todayWorkoutViewModelRestoresLoadedWhenRecordingURLCancelled() async {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: ThrowingTrainingLogRepository { URLError(.cancelled) }
+  )
+
+  await viewModel.load(date: plan.days[0].date, studentID: studentID)
+  await viewModel.toggleComplete(rowIndex: 0)
+
+  guard case .loaded = viewModel.state else {
+    Issue.record("Expected loaded state restored, got \(viewModel.state)")
+    return
+  }
+  #expect(viewModel.actionErrorMessage == nil)
+}
+
+@MainActor
+@Test func todayWorkoutViewModelRestoresLoadedWhenRecordingCancellationError() async {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: ThrowingTrainingLogRepository { CancellationError() }
+  )
+
+  await viewModel.load(date: plan.days[0].date, studentID: studentID)
+  await viewModel.toggleComplete(rowIndex: 0)
+
+  guard case .loaded = viewModel.state else {
+    Issue.record("Expected loaded state restored, got \(viewModel.state)")
+    return
+  }
+  #expect(viewModel.actionErrorMessage == nil)
+}

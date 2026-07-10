@@ -4,6 +4,45 @@ import Testing
 @testable import StudentKit
 
 @MainActor
+@Test func trainingHistoryViewModelIgnoresURLCancellation() async {
+  let viewModel = TrainingHistoryViewModel(
+    plans: ThrowingStudentPlanRepository { URLError(.cancelled) },
+    logs: FailingTrainingLogRepository()
+  )
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+
+  #expect(viewModel.state == .idle)
+}
+
+@MainActor
+@Test func trainingHistoryViewModelIgnoresCancellationError() async {
+  let viewModel = TrainingHistoryViewModel(
+    plans: ThrowingStudentPlanRepository { CancellationError() },
+    logs: FailingTrainingLogRepository()
+  )
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+
+  #expect(viewModel.state == .idle)
+}
+
+@MainActor
+@Test func trainingHistoryViewModelSurfacesRealError() async {
+  let viewModel = TrainingHistoryViewModel(
+    plans: ThrowingStudentPlanRepository { URLError(.timedOut) },
+    logs: FailingTrainingLogRepository()
+  )
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+
+  guard case .error = viewModel.state else {
+    Issue.record("Expected a non-cancellation error to surface as .error")
+    return
+  }
+}
+
+@MainActor
 @Test func trainingHistoryViewModelGroupsCycleDaysIntoWeeks() async {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()

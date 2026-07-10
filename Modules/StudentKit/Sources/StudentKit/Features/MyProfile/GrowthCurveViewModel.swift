@@ -59,6 +59,10 @@ public final class GrowthCurveViewModel {
       state = .loaded
       refreshVisiblePoints()
     } catch {
+      if error.isTaskCancellation {
+        state = .idle
+        return
+      }
       state = .error(error.localizedDescription)
     }
   }

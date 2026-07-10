@@ -545,8 +545,24 @@ public struct DashboardView: View {
   // MARK: - Loading
 
   private func loadIfNeeded() async {
+    // Retry each dependency independently: cancellation resets only the
+    // in-flight view model to `.idle`, so gating everything on the week model
+    // would strand a later dependency without another retry.
     if weekViewModel.state == .idle {
-      await reload()
+      await weekViewModel.load(studentID: studentID)
+      await evaluationSummaryViewModel?.load(studentID: studentID)
+    }
+    if feedbackViewModel.state == .idle {
+      await feedbackViewModel.load(studentID: studentID)
+    }
+    if notificationsViewModel.state == .idle {
+      await notificationsViewModel.load(studentID: studentID)
+    }
+    if e1rmTrendViewModel.state == .idle {
+      await e1rmTrendViewModel.load(studentID: studentID)
+    }
+    if profileMetricsViewModel.state == .idle {
+      await profileMetricsViewModel.load(studentID: studentID)
     }
   }
 
