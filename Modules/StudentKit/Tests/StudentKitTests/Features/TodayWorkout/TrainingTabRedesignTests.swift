@@ -105,4 +105,32 @@ import Testing
     let nonTraining = days.first { !calendar.isDate($0.date, inSameDayAs: trainingDate) }
     #expect(nonTraining?.planDay == nil)
   }
+
+  @Test func makeDaysPlacesShiftedTrainingOnlyOnEffectiveDate() {
+    let calendar = utcCalendar(firstWeekday: 2)
+    let scheduledDate = day(2026, 6, 17)
+    let shiftedDate = day(2026, 6, 19)
+    let planDay = StudentPlanDay(
+      id: UUID(),
+      date: scheduledDate,
+      shiftedToDate: shiftedDate,
+      exercises: []
+    )
+    let days = TrainingCalendarLayout.makeDays(
+      period: TrainingCalendarPeriod(
+        displayedDate: scheduledDate,
+        selectedDate: scheduledDate,
+        today: scheduledDate,
+        mode: .week
+      ),
+      cycleDays: [planDay],
+      logs: [],
+      calendar: calendar
+    )
+
+    let original = days.first { calendar.isDate($0.date, inSameDayAs: scheduledDate) }
+    let target = days.first { calendar.isDate($0.date, inSameDayAs: shiftedDate) }
+    #expect(original?.planDay == nil)
+    #expect(target?.planDay?.id == planDay.id)
+  }
 }

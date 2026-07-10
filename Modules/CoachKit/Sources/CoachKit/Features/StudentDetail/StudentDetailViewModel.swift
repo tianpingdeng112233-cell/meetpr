@@ -50,6 +50,13 @@ struct StudentExecutionDay: Hashable, Identifiable, Sendable {
     }
     return "\(completedSetCount)/\(plannedSetCount) 组"
   }
+
+  var shiftDescription: String? {
+    guard let planDay, planDay.shiftedToDate != nil else { return nil }
+    return
+      "已顺延 \(CoachStudentFormatting.shortDateText(planDay.scheduledDate))"
+      + "→\(CoachStudentFormatting.shortDateText(planDay.date))"
+  }
 }
 
 /// Coach-side view of the student's readiness check-in for today (spec 030
