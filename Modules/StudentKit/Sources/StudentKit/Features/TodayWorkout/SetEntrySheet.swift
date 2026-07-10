@@ -131,6 +131,7 @@ struct SetEntrySheet: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bg)
     .presentationDetents([.large])
+    .modifier(SetEntryErrorAlert(viewModel: viewModel))
     #if os(iOS)
       .toolbar {
         ToolbarItemGroup(placement: .keyboard) {
@@ -289,8 +290,31 @@ struct SetEntrySheet: View {
     viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
     viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
     viewModel.updateRPE(rowIndex: rowIndex, rpe: rpeValue)
-    Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
-    dismiss()
+    Task {
+      if await viewModel.commitSet(rowIndex: rowIndex, failed: failed) {
+        dismiss()
+      }
+    }
+  }
+
+}
+
+private struct SetEntryErrorAlert: ViewModifier {
+  let viewModel: TodayWorkoutViewModel
+
+  private var isPresented: Binding<Bool> {
+    Binding(
+      get: { viewModel.actionErrorMessage != nil },
+      set: { if !$0 { viewModel.clearActionError() } }
+    )
+  }
+
+  func body(content: Content) -> some View {
+    content.alert("保存失败", isPresented: isPresented) {
+      Button("知道了", role: .cancel) { viewModel.clearActionError() }
+    } message: {
+      Text(viewModel.actionErrorMessage ?? "")
+    }
   }
 }
 

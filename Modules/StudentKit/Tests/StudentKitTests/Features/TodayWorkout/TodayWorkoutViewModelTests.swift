@@ -1,5 +1,7 @@
 import CoreModels
 import Foundation
+import Networking
+import RepositoryContracts
 import Testing
 
 @testable import StudentKit
@@ -175,7 +177,7 @@ import Testing
 }
 
 @MainActor
-@Test func todayWorkoutViewModelMovesToErrorWhenRecordingFails() async throws {
+@Test func todayWorkoutViewModelKeepsWorkoutAndDraftWhenRecordingFails() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
   let store = TestStudentPlanStore(seed: [studentID: plan])
@@ -185,10 +187,58 @@ import Testing
   )
 
   await viewModel.load(date: plan.days[0].date, studentID: studentID)
-  await viewModel.toggleComplete(rowIndex: 0)
+  viewModel.updateWeight(rowIndex: 0, weight: 142.5)
+  let saved = await viewModel.commitSet(rowIndex: 0)
 
-  guard case .error = viewModel.state else {
-    Issue.record("Expected error state")
+  guard case .loaded(_, let drafts) = viewModel.state else {
+    Issue.record("Expected loaded workout to remain visible")
     return
+  }
+  #expect(!saved)
+  #expect(drafts[0].actualWeight == 142.5)
+  #expect(!drafts[0].completed)
+  #expect(viewModel.actionErrorMessage == "记录没有保存，请重试。你的输入仍保留在本页。")
+}
+
+@MainActor
+@Test func todayWorkoutViewModelExplainsServerRecordingFailure() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: ServerFailingTrainingLogRepository()
+  )
+
+  await viewModel.load(date: plan.days[0].date, studentID: studentID)
+  let setLogID = await viewModel.ensureLoggedSetID(rowIndex: 0)
+
+  #expect(setLogID == nil)
+  guard case .loaded = viewModel.state else {
+    Issue.record("Expected loaded workout to remain visible")
+    return
+  }
+  #expect(
+    viewModel.actionErrorMessage
+      == "服务器暂时无法保存（500），请稍后重试。你的输入仍保留在本页。")
+}
+
+private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
+  func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    throw APIError.httpStatus(500, Data(#"{"error":"internal_error"}"#.utf8))
+  }
+
+  func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>
+  ) async throws -> [StudentSetLog] {
+    []
+  }
+
+  func fetchLogsForExercise(
+    studentID: UUID,
+    planExerciseID: UUID
+  ) async throws -> [StudentSetLog] {
+    []
   }
 }

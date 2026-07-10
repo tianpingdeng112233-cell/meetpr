@@ -132,6 +132,11 @@ public struct TodayWorkoutView: View {
       )
       .presentationDetents([.large])
     }
+    .alert("保存失败", isPresented: actionErrorPresented) {
+      Button("知道了", role: .cancel) { viewModel.clearActionError() }
+    } message: {
+      Text(viewModel.actionErrorMessage ?? "")
+    }
     .task {
       if viewModel.state == .idle {
         await loadWorkout(for: selectedDate)
@@ -151,6 +156,13 @@ public struct TodayWorkoutView: View {
         selectedDate = Date()
       }
     }
+  }
+
+  private var actionErrorPresented: Binding<Bool> {
+    Binding(
+      get: { viewModel.actionErrorMessage != nil },
+      set: { if !$0 { viewModel.clearActionError() } }
+    )
   }
 
   // MARK: - Workout body

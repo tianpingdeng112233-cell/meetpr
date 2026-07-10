@@ -20,13 +20,11 @@ public final class TodayWorkoutViewModel {
   public typealias RestTimerState = TodayWorkoutRestTimerState
 
   public private(set) var state: State = .idle
-  /// Set when a completed set breaks the exercise's e1RM record; the view
-  /// presents PRBanner and calls `acknowledgePR` on dismiss (spec 028).
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
-  /// Inter-set rest countdown (spec 030 §B). Purely local, never persisted.
   public private(set) var restTimer: RestTimerState?
   public private(set) var planContext: TodayWorkoutPlanContext?
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
+  public private(set) var actionErrorMessage: String?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -104,18 +102,14 @@ public final class TodayWorkoutViewModel {
     guard case .loaded(_, let drafts) = state, drafts.indices.contains(rowIndex) else {
       return
     }
-    await persist(rowIndex: rowIndex, completed: !drafts[rowIndex].completed)
+    _ = await persist(rowIndex: rowIndex, completed: !drafts[rowIndex].completed)
   }
 
-  /// Persists current draft values and marks the row complete; edits still hit `recordSet`.
-  public func commitSet(rowIndex: Int, failed: Bool = false) async {
+  @discardableResult
+  public func commitSet(rowIndex: Int, failed: Bool = false) async -> Bool {
     await persist(rowIndex: rowIndex, completed: true, failed: failed)
   }
 
-  /// Returns the row's set-log id, recording the draft first (with its
-  /// current completion state, so attaching a video never marks a set done)
-  /// when it has never been logged. Video attachments need a set-log identity
-  /// before upload (spec 027).
   public func ensureLoggedSetID(rowIndex: Int) async -> UUID? {
     guard case .loaded(_, let drafts) = state, drafts.indices.contains(rowIndex) else {
       return nil
@@ -124,21 +118,28 @@ public final class TodayWorkoutViewModel {
       return loggedSetID
     }
     let draft = drafts[rowIndex]
-    await persist(rowIndex: rowIndex, completed: draft.completed, failed: draft.failed)
+    guard await persist(rowIndex: rowIndex, completed: draft.completed, failed: draft.failed) else {
+      return nil
+    }
     guard case .loaded(_, let updated) = state, updated.indices.contains(rowIndex) else {
       return nil
     }
     return updated[rowIndex].loggedSetID
   }
 
-  private func persist(rowIndex: Int, completed: Bool, failed: Bool = false) async {
+  public func clearActionError() {
+    actionErrorMessage = nil
+  }
+
+  private func persist(rowIndex: Int, completed: Bool, failed: Bool = false) async -> Bool {
     guard let studentID = currentStudentID else {
-      state = .error("Missing student")
-      return
+      actionErrorMessage = "无法确认当前学员，请重新进入训练页后重试。"
+      return false
     }
     guard case .loaded(let plan, let drafts) = state, drafts.indices.contains(rowIndex) else {
-      return
+      return false
     }
+    actionErrorMessage = nil
     var nextDrafts = drafts
     var draft = nextDrafts[rowIndex]
     state = .recording(plan: plan, drafts: nextDrafts, rowIndex: rowIndex)
@@ -158,8 +159,6 @@ public final class TodayWorkoutViewModel {
 
     do {
       let previouslyCompleted = drafts[rowIndex].completed
-      // The repository returns the canonical (backend-upserted) log: its id
-      // is what video linkage and e1RM points must reference (Codex P1).
       let persisted = try await logs.recordSet(log)
       draft.completed = completed
       draft.failed = failed
@@ -167,15 +166,17 @@ public final class TodayWorkoutViewModel {
       nextDrafts[rowIndex] = draft
       state = .loaded(plan: plan, drafts: nextDrafts)
 
-      // Spec 028 hook: compute e1RM + detect PR only on the false→true edge,
-      // so un-checking and re-checking the same set can't farm PR events.
-      // Spec 030 rides the same edge for the rest timer.
       if !previouslyCompleted, completed {
         await recordE1RMPoint(for: draft, log: persisted, studentID: studentID)
         startRestTimer(after: draft, drafts: nextDrafts)
       }
+      return true
     } catch {
-      state = .error(error.localizedDescription)
+      state = .loaded(plan: plan, drafts: drafts)
+      if !(error is CancellationError) && (error as? URLError)?.code != .cancelled {
+        actionErrorMessage = Self.recordingErrorMessage(for: error)
+      }
+      return false
     }
   }
 
@@ -192,7 +193,6 @@ public final class TodayWorkoutViewModel {
   }
 
   private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
-    // Last set of the day: the completion banner takes over, a countdown is noise.
     guard !drafts.allSatisfy(\.completed) else {
       restTimer = nil
       return
@@ -218,8 +218,6 @@ public final class TodayWorkoutViewModel {
     try? await e1rmRepo.acknowledgePR(eventId: event.id)
   }
 
-  /// Surfaces the oldest unacknowledged PR on launch so a banner the student
-  /// missed (e.g. app killed mid-session) re-appears once (spec 028 §5).
   public func surfaceUnacknowledgedPR(studentID: UUID) async {
     guard pendingPRBanner == nil else { return }
     pendingPRBanner = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID))?.first
