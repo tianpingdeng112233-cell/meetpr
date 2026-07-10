@@ -174,6 +174,7 @@ public struct TodayWorkoutView: View {
           activeSetHero(
             draft: drafts[activeIndex],
             rowIndex: activeIndex,
+            setNumber: setNumber(for: drafts[activeIndex], in: drafts),
             totalSets: totalSets(for: drafts[activeIndex].planExerciseID, in: drafts),
             isEditable: isEditable)
         }
@@ -210,6 +211,7 @@ public struct TodayWorkoutView: View {
       SetEntrySheet(
         rowIndex: target.rowIndex,
         draft: target.draft,
+        setNumber: target.setNumber,
         viewModel: viewModel,
         studentID: studentID,
         videoViewModel: videoViewModel,
@@ -240,11 +242,15 @@ public struct TodayWorkoutView: View {
   // MARK: - Active set hero
 
   private func activeSetHero(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, totalSets: Int, isEditable: Bool
+    draft: TodayWorkoutViewModel.SetRowDraft,
+    rowIndex: Int,
+    setNumber: Int,
+    totalSets: Int,
+    isEditable: Bool
   ) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       Eyebrow(
-        "第 \(twoDigit(draft.prescribed.setIndex + 1)) / \(twoDigit(totalSets)) 组")
+        "第 \(twoDigit(setNumber)) / \(twoDigit(totalSets)) 组")
 
       HStack(alignment: .lastTextBaseline, spacing: 6) {
         Text(weightText(draft))
@@ -281,7 +287,7 @@ public struct TodayWorkoutView: View {
       }
 
       if isEditable {
-        recordActions(draft: draft, rowIndex: rowIndex)
+        recordActions(draft: draft, rowIndex: rowIndex, setNumber: setNumber)
           .padding(.top, 16)
       }
     }
@@ -292,12 +298,16 @@ public struct TodayWorkoutView: View {
   }
 
   private func recordActions(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, setNumber: Int
   ) -> some View {
     HStack(spacing: 8) {
       Button {
         editing = EditingTarget(
-          id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
+          id: draft.id,
+          rowIndex: rowIndex,
+          draft: draft,
+          setNumber: setNumber,
+          scrollToVideo: false)
       } label: {
         Text("记录此组")
           .font(Font.MeetPR.bodyEmphasis)
@@ -311,7 +321,11 @@ public struct TodayWorkoutView: View {
 
       Button {
         editing = EditingTarget(
-          id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: true)
+          id: draft.id,
+          rowIndex: rowIndex,
+          draft: draft,
+          setNumber: setNumber,
+          scrollToVideo: true)
       } label: {
         Image(systemName: "video")
           .font(.system(size: 20))
@@ -368,10 +382,14 @@ public struct TodayWorkoutView: View {
         .padding(.vertical, 10)
         .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
 
-        ForEach(rows) { draft in
+        ForEach(Array(rows.enumerated()), id: \.element.id) { offset, draft in
           let index = allDrafts.firstIndex { $0.id == draft.id } ?? 0
           setRow(
-            draft: draft, rowIndex: index, active: activeIndex == index, isEditable: isEditable)
+            draft: draft,
+            rowIndex: index,
+            setNumber: SetDisplayNumber.number(atOffset: offset),
+            active: activeIndex == index,
+            isEditable: isEditable)
         }
       }
       .background(Color.MeetPR.surface1)
@@ -390,28 +408,36 @@ public struct TodayWorkoutView: View {
 
   @ViewBuilder
   private func setRow(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, active: Bool, isEditable: Bool
+    draft: TodayWorkoutViewModel.SetRowDraft,
+    rowIndex: Int,
+    setNumber: Int,
+    active: Bool,
+    isEditable: Bool
   ) -> some View {
     if isEditable {
       Button {
         editing = EditingTarget(
-          id: draft.id, rowIndex: rowIndex, draft: draft, scrollToVideo: false)
+          id: draft.id,
+          rowIndex: rowIndex,
+          draft: draft,
+          setNumber: setNumber,
+          scrollToVideo: false)
       } label: {
-        setRowGrid(draft: draft, active: active)
+        setRowGrid(draft: draft, setNumber: setNumber, active: active)
       }
       .buttonStyle(.plain)
     } else {
-      setRowGrid(draft: draft, active: active)
+      setRowGrid(draft: draft, setNumber: setNumber, active: active)
     }
   }
 
   private func setRowGrid(
-    draft: TodayWorkoutViewModel.SetRowDraft, active: Bool
+    draft: TodayWorkoutViewModel.SetRowDraft, setNumber: Int, active: Bool
   ) -> some View {
     let resolved = draft.completed || active
     let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
     return LazyVGrid(columns: columns, spacing: 0) {
-      Text("\(draft.prescribed.setIndex + 1)")
+      Text("\(setNumber)")
         .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
       Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
       Text(repsText(draft)).foregroundStyle(foreground)
@@ -516,6 +542,14 @@ public struct TodayWorkoutView: View {
     drafts.filter { $0.planExerciseID == planExerciseID }.count
   }
 
+  private func setNumber(
+    for draft: TodayWorkoutViewModel.SetRowDraft,
+    in drafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> Int {
+    let exerciseRows = drafts.filter { $0.planExerciseID == draft.planExerciseID }
+    return SetDisplayNumber.number(for: draft, in: exerciseRows)
+  }
+
   private var restTitle: String {
     Calendar.current.isDateInToday(selectedDate) ? "今日休息" : "这天休息"
   }
@@ -559,6 +593,7 @@ private struct EditingTarget: Identifiable {
   let id: UUID
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
+  let setNumber: Int
   let scrollToVideo: Bool
 }
 // swiftlint:enable file_length type_body_length
