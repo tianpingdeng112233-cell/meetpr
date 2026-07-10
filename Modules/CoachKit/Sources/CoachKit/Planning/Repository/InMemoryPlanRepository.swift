@@ -38,6 +38,19 @@ public actor InMemoryPlanRepository: PlanRepository {
     students
   }
 
+  public func renameStudent(id: UUID, displayName: String) async throws -> CoachStudentSummary {
+    guard let index = students.firstIndex(where: { $0.id == id }) else {
+      throw CocoaError(.fileNoSuchFile)
+    }
+    let renamed = CoachStudentSummary(
+      id: students[index].id,
+      displayName: displayName,
+      status: students[index].status
+    )
+    students[index] = renamed
+    return renamed
+  }
+
   public func fetchMainLiftCatalog() async throws -> [Exercise] {
     catalog.filter {
       $0.exerciseType == .mainLift || $0.exerciseType == .mainLiftVariation

@@ -11,14 +11,19 @@ struct StudentDetailView: View {
   @State private var growthViewModel: StudentGrowthViewModel
   @State private var evaluationViewModel: EvaluationBannerViewModel
   private let context: CoachStudentDetailContext
+  private let onStudentRenamed: (@MainActor (CoachStudentSummary) -> Void)?
   @State private var showComposer = false
   @State private var showSummaryEditor = false
   @State private var showAdaptationPlanning = false
+  @State private var showRenamePrompt = false
+  @State private var renameText = ""
+  @State private var renameFailureMessage: String?
 
   init(
     summary: CoachStudentSummary,
     context: CoachStudentDetailContext,
-    onEvaluationCompleted: (@MainActor () -> Void)? = nil
+    onEvaluationCompleted: (@MainActor () -> Void)? = nil,
+    onStudentRenamed: (@MainActor (CoachStudentSummary) -> Void)? = nil
   ) {
     viewModel = StudentDetailViewModel(
       summary: summary,
@@ -47,6 +52,7 @@ struct StudentDetailView: View {
       )
     )
     self.context = context
+    self.onStudentRenamed = onStudentRenamed
   }
 
   var body: some View {
@@ -115,6 +121,27 @@ struct StudentDetailView: View {
         context: context
       )
     )
+    .alert("修改学员姓名", isPresented: $showRenamePrompt) {
+      TextField("学员姓名", text: $renameText)
+      Button("取消", role: .cancel) {}
+      Button("保存") {
+        Task { await renameStudent() }
+      }
+      .disabled(renameText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    } message: {
+      Text("修改后会同步到网页端和学员列表")
+    }
+    .alert(
+      "修改失败",
+      isPresented: Binding(
+        get: { renameFailureMessage != nil },
+        set: { if !$0 { renameFailureMessage = nil } }
+      )
+    ) {
+      Button("确定", role: .cancel) {}
+    } message: {
+      Text(renameFailureMessage ?? "请稍后重试")
+    }
     .task {
       await viewModel.loadIfNeeded()
       await evaluationViewModel.load()
@@ -173,6 +200,21 @@ struct StudentDetailView: View {
 
       Spacer()
 
+      Button {
+        renameText = viewModel.summary.displayName
+        showRenamePrompt = true
+      } label: {
+        Image(systemName: "pencil")
+          .font(.system(size: 17, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .frame(width: 36, height: 36)
+          .background(Color.MeetPR.surface1)
+          .clipShape(Circle())
+          .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel("修改学员姓名")
+
       if viewModel.selectedSection == .feedback {
         Button {
           showComposer = true
@@ -188,6 +230,21 @@ struct StudentDetailView: View {
         .buttonStyle(.plain)
         .accessibilityLabel("写反馈")
       }
+    }
+  }
+
+  private func renameStudent() async {
+    let name = renameText.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !name.isEmpty, name.count <= 100, name != viewModel.summary.displayName else { return }
+    do {
+      let renamed = try await context.planning.renameStudent(
+        id: viewModel.summary.id,
+        displayName: name
+      )
+      viewModel.applyRenamedStudent(renamed)
+      onStudentRenamed?(renamed)
+    } catch {
+      renameFailureMessage = "无法修改学员姓名，请检查网络后重试"
     }
   }
 

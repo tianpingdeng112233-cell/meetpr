@@ -50,6 +50,13 @@ struct StudentExecutionDay: Hashable, Identifiable, Sendable {
     }
     return "\(completedSetCount)/\(plannedSetCount) 组"
   }
+
+  var shiftDescription: String? {
+    guard let planDay, planDay.shiftedToDate != nil else { return nil }
+    return
+      "已顺延 \(CoachStudentFormatting.shortDateText(planDay.scheduledDate))"
+      + "→\(CoachStudentFormatting.shortDateText(planDay.date))"
+  }
 }
 
 /// Coach-side view of the student's readiness check-in for today (spec 030
@@ -86,7 +93,7 @@ final class StudentDetailViewModel {
     case failed(String)
   }
 
-  let summary: CoachStudentSummary
+  private(set) var summary: CoachStudentSummary
   var selectedSection: StudentDetailSection = .overview
   var state: LoadState = .idle
   private(set) var plan: StudentPlanView?
@@ -187,6 +194,11 @@ final class StudentDetailViewModel {
 
   func select(_ section: StudentDetailSection) {
     selectedSection = section
+  }
+
+  func applyRenamedStudent(_ renamed: CoachStudentSummary) {
+    guard renamed.id == summary.id else { return }
+    summary = renamed
   }
 
   func appendPostedFeedback(_ item: CoachFeedback) {

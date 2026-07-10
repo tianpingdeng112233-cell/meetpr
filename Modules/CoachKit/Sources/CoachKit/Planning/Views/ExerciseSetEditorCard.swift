@@ -17,6 +17,7 @@ public struct ExerciseSetEditorCard: View {
   @State private var targetValue: Decimal
   @State private var restSeconds: Int?
   @State private var restSecondsPerSet: [Int]?
+  @State private var perSetTargets: [DraftSetTarget]?
   @State private var notes: String
 
   public init(
@@ -37,6 +38,7 @@ public struct ExerciseSetEditorCard: View {
     self._targetValue = State(initialValue: spec.targetValue)
     self._restSeconds = State(initialValue: spec.restSeconds)
     self._restSecondsPerSet = State(initialValue: spec.restSecondsPerSet)
+    self._perSetTargets = State(initialValue: spec.perSetTargets)
     self._notes = State(initialValue: draftExercise.notes ?? "")
   }
 
@@ -53,56 +55,19 @@ public struct ExerciseSetEditorCard: View {
             }
           }
 
-        if intensityMode == .weight {
-          WeightInputField(
-            value: targetValue,
-            oneRM: viewModel.oneRM(for: draftExercise),
-            bases: viewModel.weightEntryBases(for: draftExercise),
-            onChange: { value in
-              targetValue = value
-              persist()
-            }
-          )
+        if perSetTargets == nil {
+          commonPrescriptionEditor
         } else {
-          PlanningCountPicker(
-            label: "RPE",
-            value: rpeBinding,
-            range: 1...10,
-            step: 0.5
-          )
+          setCountPicker
         }
 
-        HStack(spacing: MeetPRSpacing.md) {
-          PlanningCountPicker(
-            label: "组数",
-            value: setCountBinding,
-            range: 1...20,
-            step: 1
-          )
-          .onChange(of: setCount) { _, _ in
-            clampRestSecondsPerSet()
-            persist()
-          }
+        Toggle("逐组单独设", isOn: perSetTargetsEnabledBinding)
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
 
-          PlanningCountPicker(
-            label: "次数",
-            value: targetRepsBinding,
-            range: 1...50,
-            step: 1
-          )
-          .onChange(of: targetReps) { _, newReps in
-            if let currentMax = targetRepsMax, currentMax < newReps {
-              targetRepsMax = newReps
-            }
-            persist()
-          }
+        if perSetTargets != nil {
+          perSetTargetsEditor
         }
-
-        OptionalRepsMaxRow(
-          value: $targetRepsMax,
-          minimum: targetReps
-        )
-        .onChange(of: targetRepsMax) { _, _ in persist() }
 
         ExerciseRestEditorSection(
           setCount: setCount,
@@ -178,6 +143,85 @@ public struct ExerciseSetEditorCard: View {
     }
   }
 
+  @ViewBuilder
+  private var commonPrescriptionEditor: some View {
+    intensityValueEditor
+
+    HStack(spacing: MeetPRSpacing.md) {
+      setCountPicker
+
+      PlanningCountPicker(
+        label: "次数",
+        value: targetRepsBinding,
+        range: 1...50,
+        step: 1
+      )
+      .onChange(of: targetReps) { _, newReps in
+        if let currentMax = targetRepsMax, currentMax < newReps {
+          targetRepsMax = newReps
+        }
+        persist()
+      }
+    }
+
+    OptionalRepsMaxRow(
+      value: $targetRepsMax,
+      minimum: targetReps
+    )
+    .onChange(of: targetRepsMax) { _, _ in persist() }
+  }
+
+  @ViewBuilder
+  private var intensityValueEditor: some View {
+    if intensityMode == .weight {
+      WeightInputField(
+        value: targetValue,
+        oneRM: viewModel.oneRM(for: draftExercise),
+        bases: viewModel.weightEntryBases(for: draftExercise),
+        onChange: { value in
+          targetValue = value
+          persist()
+        }
+      )
+    } else {
+      PlanningCountPicker(
+        label: "RPE",
+        value: rpeBinding,
+        range: 1...10,
+        step: 0.5
+      )
+    }
+  }
+
+  private var setCountPicker: some View {
+    PlanningCountPicker(
+      label: "组数",
+      value: setCountBinding,
+      range: 1...20,
+      step: 1
+    )
+    .onChange(of: setCount) { _, _ in
+      clampRestSecondsPerSet()
+      clampPerSetTargets()
+      syncSummaryFromPerSetTargets()
+      persist()
+    }
+  }
+
+  private var perSetTargetsEditor: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+      ForEach(0..<max(1, setCount), id: \.self) { index in
+        PerSetTargetRow(
+          index: index,
+          target: perSetTargetBinding(at: index),
+          intensityMode: intensityMode,
+          bases: viewModel.weightEntryBases(for: draftExercise)
+        )
+      }
+    }
+    .padding(.top, MeetPRSpacing.xs)
+  }
+
   private var rpeBinding: Binding<Double> {
     Binding(
       get: { targetValue.planningDoubleValue },
@@ -202,6 +246,43 @@ public struct ExerciseSetEditorCard: View {
     )
   }
 
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+extension ExerciseSetEditorCard {
+  private var perSetTargetsEnabledBinding: Binding<Bool> {
+    Binding(
+      get: { perSetTargets != nil },
+      set: { isEnabled in
+        if isEnabled {
+          perSetTargets = normalizedPerSetTargets()
+        } else {
+          syncSummaryFromPerSetTargets()
+          perSetTargets = nil
+        }
+        persist()
+      }
+    )
+  }
+
+  private func perSetTargetBinding(at index: Int) -> Binding<DraftSetTarget> {
+    Binding(
+      get: {
+        let targets = normalizedPerSetTargets()
+        guard targets.indices.contains(index) else { return defaultSetTarget }
+        return targets[index]
+      },
+      set: { newValue in
+        var targets = normalizedPerSetTargets()
+        guard targets.indices.contains(index) else { return }
+        targets[index] = normalizedTargetForCurrentMode(newValue)
+        perSetTargets = targets
+        syncSummaryFromPerSetTargets()
+        persist()
+      }
+    )
+  }
+
   private func currentSpec() -> DraftSetSpec {
     DraftSetSpec(
       id: specID,
@@ -211,8 +292,65 @@ public struct ExerciseSetEditorCard: View {
       intensityMode: intensityMode,
       targetValue: targetValue,
       restSeconds: restSeconds,
-      restSecondsPerSet: restSecondsPerSet
+      restSecondsPerSet: restSecondsPerSet,
+      perSetTargets: normalizedPerSetTargetsIfNeeded()
     )
+  }
+
+  private var defaultSetTarget: DraftSetTarget {
+    DraftSetTarget(
+      targetReps: targetReps,
+      targetRepsMax: targetRepsMax,
+      intensityMode: intensityMode,
+      targetValue: targetValue
+    )
+  }
+
+  private func normalizedPerSetTargetsIfNeeded() -> [DraftSetTarget]? {
+    perSetTargets == nil ? nil : normalizedPerSetTargets()
+  }
+
+  private func normalizedPerSetTargets() -> [DraftSetTarget] {
+    var targets = perSetTargets ?? []
+    let desiredCount = max(1, setCount)
+    if targets.count > desiredCount {
+      targets.removeLast(targets.count - desiredCount)
+    } else if targets.count < desiredCount {
+      let fill = targets.last ?? defaultSetTarget
+      targets.append(contentsOf: repeatElement(fill, count: desiredCount - targets.count))
+    }
+    return targets.map(normalizedTargetForCurrentMode)
+  }
+
+  private func normalizedTargetForCurrentMode(_ target: DraftSetTarget) -> DraftSetTarget {
+    var next = target
+    next.intensityMode = intensityMode
+    next.targetReps = max(1, next.targetReps)
+    if let targetRepsMax = next.targetRepsMax {
+      next.targetRepsMax = max(next.targetReps, targetRepsMax)
+    }
+    switch intensityMode {
+    case .weight:
+      next.targetValue = max(Decimal(0), next.targetValue)
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
+    case .rpe:
+      next.targetValue = min(Decimal(10), max(Decimal(1), next.targetValue))
+        .roundedToPlanningIncrement(PlanningDecimalStep.half)
+    }
+    return next
+  }
+
+  private func clampPerSetTargets() {
+    guard perSetTargets != nil else { return }
+    perSetTargets = normalizedPerSetTargets()
+  }
+
+  private func syncSummaryFromPerSetTargets() {
+    guard let first = normalizedPerSetTargetsIfNeeded()?.first else { return }
+    targetReps = first.targetReps
+    targetRepsMax = first.targetRepsMax
+    intensityMode = first.intensityMode
+    targetValue = first.targetValue
   }
 
   private func clampRestSecondsPerSet() {
@@ -228,7 +366,10 @@ public struct ExerciseSetEditorCard: View {
   }
 
   private var currentRestSeconds: Int {
-    restSeconds ?? RestDefaults.seconds(forRPE: intensityMode == .rpe ? targetValue : nil)
+    let target = normalizedPerSetTargetsIfNeeded()?.first ?? defaultSetTarget
+    return restSeconds
+      ?? RestDefaults.seconds(
+        forRPE: target.intensityMode == .rpe ? target.targetValue : nil)
   }
 
   private func persist() {
@@ -247,48 +388,7 @@ public struct ExerciseSetEditorCard: View {
     targetValue = spec.targetValue
     restSeconds = spec.restSeconds
     restSecondsPerSet = spec.restSecondsPerSet
+    perSetTargets = spec.perSetTargets
     notes = draftExercise.notes ?? ""
-  }
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct OptionalRepsMaxRow: View {
-  @Binding var value: Int?
-  let minimum: Int
-
-  var body: some View {
-    if value == nil {
-      Button("添加次数上限", systemImage: "plus") {
-        value = minimum
-      }
-      .font(Font.MeetPR.footnote)
-      .buttonStyle(.borderless)
-    } else {
-      HStack(spacing: MeetPRSpacing.sm) {
-        PlanningCountPicker(
-          label: "次数上限",
-          value: repsMaxBinding,
-          range: Double(minimum)...60,
-          step: 1
-        )
-
-        Button(role: .destructive) {
-          value = nil
-        } label: {
-          Image(systemName: "xmark.circle.fill")
-            .font(.body)
-        }
-        .buttonStyle(.borderless)
-        .accessibilityLabel("删除次数上限")
-      }
-    }
-  }
-
-  private var repsMaxBinding: Binding<Double> {
-    Binding(
-      get: { Double(value ?? minimum) },
-      set: { value = max(minimum, Int($0)) }
-    )
   }
 }

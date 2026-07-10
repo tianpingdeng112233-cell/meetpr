@@ -12,6 +12,22 @@ extension DraftSetSpec {
   /// exercise doesn't block step navigation): this drives the 已填 badge and
   /// the pre-publish completeness check (Step 4 完成 + 发布).
   var isCoachComplete: Bool {
+    if let perSetTargets {
+      guard setCount >= 1, perSetTargets.count == setCount else { return false }
+      return perSetTargets.allSatisfy { target in
+        guard target.targetReps >= 1 else { return false }
+        if let targetRepsMax = target.targetRepsMax, targetRepsMax < target.targetReps {
+          return false
+        }
+        switch target.intensityMode {
+        case .weight:
+          return target.targetValue > 0
+        case .rpe:
+          return target.targetValue >= 1 && target.targetValue <= 10
+        }
+      }
+    }
+
     guard setCount >= 1, targetReps >= 1 else { return false }
     if let targetRepsMax, targetRepsMax < targetReps { return false }
     switch intensityMode {

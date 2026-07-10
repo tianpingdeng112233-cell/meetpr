@@ -51,6 +51,11 @@ private struct StudentExecutionDayRow: View {
         Text(day.completionText)
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
+        if let shiftDescription = day.shiftDescription {
+          Text(shiftDescription)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.amber)
+        }
       }
 
       Spacer()

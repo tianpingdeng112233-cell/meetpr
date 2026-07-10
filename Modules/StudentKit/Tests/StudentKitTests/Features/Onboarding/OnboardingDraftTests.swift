@@ -45,6 +45,9 @@ import Testing
   #expect(draft.isStepComplete(4))
   draft.trainingDays = TrainingDay.allCases
   #expect(!draft.isStepComplete(4))  // 7 days exceeds zod max(6)
+  draft.trainingDays = []
+  draft.trainingDaysUncertain = true
+  #expect(draft.isStepComplete(4))
 }
 
 @Test func step6IsAlwaysComplete() {
@@ -94,6 +97,17 @@ import Testing
   let patch = draft.patch(forStep: 4)
   // zod min(2): never ship a 1-element array (spec 032 risk 3).
   #expect(patch.trainingDays == .absent)
+  #expect(patch.gymTier == .value(.commercial))
+}
+
+@Test func uncertainTrainingDaysPatchAsNull() {
+  var draft = OnboardingFixtures.completeDraft()
+  draft.trainingDays = []
+  draft.trainingDaysUncertain = true
+
+  let patch = draft.patch(forStep: 4)
+
+  #expect(patch.trainingDays == .null)
   #expect(patch.gymTier == .value(.commercial))
 }
 

@@ -43,6 +43,35 @@ public struct BackendVideoUploadService: VideoUploadService {
   public func abort(attachmentID: UUID) async throws {
     try await api.abortUpload(attachmentID: attachmentID, accessToken: session.accessToken())
   }
+
+  public func delete(attachmentID: UUID) async throws {
+    let token = try await session.accessToken()
+    do {
+      try await api.deleteUpload(attachmentID: attachmentID, accessToken: token)
+    } catch APIError.httpStatus(409, let data) where Self.isDeletingState(data) {
+      // If a prior DELETE was interrupted after claiming the durable state,
+      // reconcile completes the same deletion rather than leaving a retry loop.
+      try await api.reconcileUpload(attachmentID: attachmentID, accessToken: token)
+    } catch APIError.httpStatus(404, let data) where Self.isAttachmentAlreadyGone(data) {
+      // The requested object was already removed, but the app did not get the
+      // earlier response. It is safe to clear the matching local record.
+    }
+  }
+
+  private static func isDeletingState(_ data: Data) -> Bool {
+    let body = try? JSONDecoder().decode(UploadErrorBody.self, from: data)
+    return body?.error == "UPLOAD_INVALID_STATE" && body?.status == "deleting"
+  }
+
+  private static func isAttachmentAlreadyGone(_ data: Data) -> Bool {
+    let body = try? JSONDecoder().decode(UploadErrorBody.self, from: data)
+    return body?.error == "ATTACHMENT_NOT_FOUND"
+  }
+
+  private struct UploadErrorBody: Decodable {
+    let error: String
+    let status: String?
+  }
 }
 
 /// Offline stand-in for demo builds and previews: every call succeeds
@@ -86,4 +115,6 @@ public struct LoopbackVideoUploadService: VideoUploadService {
   }
 
   public func abort(attachmentID: UUID) async throws {}
+
+  public func delete(attachmentID: UUID) async throws {}
 }

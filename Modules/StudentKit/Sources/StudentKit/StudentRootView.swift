@@ -7,6 +7,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
   private let studentID: UUID
+  private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
@@ -28,12 +29,14 @@ public struct StudentRootView: View {
   @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
   @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
   @State private var importedHistoryRefreshToken = 0
+  @State private var planRevision = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
     let store = StudentRootDemoPlanStore(studentID: StudentDemoSeed.studentID, plan: plan)
     self.init(
       studentID: StudentDemoSeed.studentID,
+      canShiftPlanDays: true,
       plans: InMemoryStudentPlanRepository(store: store),
       logs: InMemoryStudentTrainingLogRepository(
         seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
@@ -53,6 +56,7 @@ public struct StudentRootView: View {
 
   public init(
     studentID: UUID = StudentDemoSeed.studentID,
+    canShiftPlanDays: Bool = false,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
@@ -70,6 +74,7 @@ public struct StudentRootView: View {
     account: (any AccountRepository)? = nil
   ) {
     self.studentID = studentID
+    self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
     self.logs = logs
     self.e1rm = e1rm
@@ -136,6 +141,7 @@ public struct StudentRootView: View {
         } else {
           DashboardView(
             studentID: studentID,
+            canShiftPlanDays: canShiftPlanDays,
             plans: plans,
             logs: logs,
             onboarding: onboarding,
@@ -146,7 +152,8 @@ public struct StudentRootView: View {
               trainingTodayPulse += 1
               selectedTab = .training
             },
-            onSeeAllFeedback: { selectedTab = .growth }
+            onSeeAllFeedback: { selectedTab = .growth },
+            onPlanChanged: { planRevision += 1 }
           )
         }
       }
@@ -167,7 +174,7 @@ public struct StudentRootView: View {
           TodayWorkoutView(
             studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
             videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse,
-            sessionReviews: sessionReviews
+            sessionReviews: sessionReviews, planRevision: planRevision
           )
         }
       }

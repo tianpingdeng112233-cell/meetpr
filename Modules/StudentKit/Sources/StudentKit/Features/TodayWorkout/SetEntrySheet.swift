@@ -61,6 +61,21 @@ struct SetEntrySheet: View {
             .frame(maxWidth: .infinity)
             .padding(.top, 4)
 
+          if let coachNote {
+            Text("教练备注 \(coachNote)")
+              .font(.system(size: 13, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .lineLimit(3)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .padding(10)
+              .background(Color.MeetPR.surface1)
+              .clipShape(.rect(cornerRadius: 8))
+              .overlay {
+                RoundedRectangle(cornerRadius: 8).stroke(Color.MeetPR.border, lineWidth: 1)
+              }
+              .padding(.top, 12)
+          }
+
           VStack(spacing: 18) {
             weightStepper()
             plateStepper(
@@ -105,6 +120,10 @@ struct SetEntrySheet: View {
     guard total >= bar + collar * 2 else { return "空杠 20kg" }
     let base = PlateLoadout.breakdownText(plates)
     return base.isEmpty ? "仅 2.5kg 卡扣" : base + " + 2.5kg 卡扣"
+  }
+
+  private var coachNote: String? {
+    CoachNoteDisplay.text(draft.prescribed.coachNote)
   }
 
   // MARK: - Chrome
@@ -172,8 +191,18 @@ struct SetEntrySheet: View {
     .buttonStyle(.plain)
   }
 
-  // MARK: - Steppers
+  private func save(failed: Bool) {
+    viewModel.updateWeight(rowIndex: rowIndex, weight: weight)
+    viewModel.updateReps(rowIndex: rowIndex, reps: reps)
+    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpe)
+    Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
+    dismiss()
+  }
+}
 
+// MARK: - Steppers
+
+extension SetEntrySheet {
   /// The weight row: ±2.5 keeps the plate-jump muscle memory, and tapping
   /// the big number opens direct entry — an RPE plan that floats 175→150
   /// is one keyboard away instead of ten taps (spec 049 §3 / P1-1).
@@ -277,12 +306,5 @@ struct SetEntrySheet: View {
     .buttonStyle(.plain)
   }
 
-  private func save(failed: Bool) {
-    viewModel.updateWeight(rowIndex: rowIndex, weight: weight)
-    viewModel.updateReps(rowIndex: rowIndex, reps: reps)
-    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpe)
-    Task { await viewModel.commitSet(rowIndex: rowIndex, failed: failed) }
-    dismiss()
-  }
 }
 // swiftlint:enable function_parameter_count

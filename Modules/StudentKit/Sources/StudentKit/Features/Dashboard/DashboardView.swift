@@ -13,12 +13,15 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct DashboardView: View {
   private let studentID: UUID
+  private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
+  private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   private let onStartWorkout: () -> Void
   private let onSeeAllFeedback: () -> Void
+  private let onPlanChanged: () -> Void
   @State private var weekViewModel: WeekOverviewViewModel
   @State private var notificationsViewModel: DashboardNotificationsViewModel
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
@@ -26,11 +29,14 @@ public struct DashboardView: View {
   @State private var showsNotifications = false
   @State private var showsEvaluationSummary = false
   @State private var dayChangeTick = 0
+  @State private var dayShiftAlert: DashboardDayShiftAlert?
+  @State private var isUpdatingDayShift = false
   /// Day whose growth curve is shown. `nil` ⇒ today (the default selection).
   @State private var selectedDate: Date?
 
   public init(
     studentID: UUID,
+    canShiftPlanDays: Bool,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     onboarding: any OnboardingProfileReading,
@@ -38,15 +44,19 @@ public struct DashboardView: View {
     feedbackViewModel: FeedbackInboxViewModel,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onStartWorkout: @escaping () -> Void,
-    onSeeAllFeedback: @escaping () -> Void
+    onSeeAllFeedback: @escaping () -> Void,
+    onPlanChanged: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
+    self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
+    self.logs = logs
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onStartWorkout = onStartWorkout
     self.onSeeAllFeedback = onSeeAllFeedback
+    self.onPlanChanged = onPlanChanged
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
     self._notificationsViewModel = State(
       initialValue: DashboardNotificationsViewModel(plans: plans)
@@ -145,6 +155,34 @@ public struct DashboardView: View {
         .receive(on: RunLoop.main)
     ) { _ in
       dayChangeTick += 1
+    }
+    .alert(item: $dayShiftAlert) { alert in
+      switch alert {
+      case .confirmShift(let proposal):
+        Alert(
+          title: Text("顺延今天的训练？"),
+          message: Text("\(proposal.targetLabel)，原日期会显示为休息日。"),
+          primaryButton: .default(Text(proposal.targetLabel)) {
+            Task { await shiftToday(proposal) }
+          },
+          secondaryButton: .cancel(Text("取消"))
+        )
+      case .confirmCancel(let day):
+        Alert(
+          title: Text("撤销顺延？"),
+          message: Text("课程会回到\(dayShiftDateText(day.scheduledDate))。"),
+          primaryButton: .destructive(Text("撤销顺延")) {
+            Task { await cancelShift(day) }
+          },
+          secondaryButton: .cancel(Text("保留顺延"))
+        )
+      case .message(let title, let message):
+        Alert(
+          title: Text(title),
+          message: Text(message),
+          dismissButton: .default(Text("知道了"))
+        )
+      }
     }
   }
 
@@ -434,6 +472,48 @@ public struct DashboardView: View {
     let progress =
       weekSnapshot?.progress(for: todayDay)
       ?? TrainingDayProgress(day: todayDay, logs: [])
+    VStack(spacing: 8) {
+      startButtonPrimary(progress)
+
+      if canShiftPlanDays,
+        progress.state == .notStarted,
+        let todayDay,
+        todayDay.shiftedToDate == nil,
+        // Backend judges "today" in UTC; only offer the action when local today == UTC today,
+        // otherwise the request is guaranteed to fail with SHIFT_ONLY_TODAY (e.g. 00:00-08:00 Beijing).
+        dayShiftCalendar.isDate(todayDay.date, inSameDayAs: Date()),
+        !hasAnyLog(for: todayDay, in: weekData?.logs ?? [])
+      {
+        Button("今天有事") {
+          proposeShiftToday()
+        }
+        .font(Font.MeetPR.bodyEmphasis)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .frame(maxWidth: .infinity)
+        .frame(height: 44)
+        .background(Color.MeetPR.surface1)
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+        .disabled(isUpdatingDayShift)
+      }
+
+      if let shiftedDay = cancellableShiftedDay {
+        Button("撤销顺延") {
+          dayShiftAlert = .confirmCancel(shiftedDay)
+        }
+        .font(Font.MeetPR.bodyEmphasis)
+        .foregroundStyle(Color.MeetPR.brandRed)
+        .frame(maxWidth: .infinity)
+        .frame(height: 44)
+        .background(Color.MeetPR.brandRedSoft)
+        .clipShape(.rect(cornerRadius: 12))
+        .disabled(isUpdatingDayShift)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func startButtonPrimary(_ progress: TrainingDayProgress) -> some View {
     switch progress.state {
     case .noPlan:
       HStack(spacing: 10) {
@@ -541,6 +621,23 @@ public struct DashboardView: View {
     planDay(on: Date())
   }
 
+  private var cancellableShiftedDay: StudentPlanDay? {
+    guard canShiftPlanDays else { return nil }
+    guard let data = weekData else { return nil }
+    let calendar = dayShiftCalendar
+    let today = calendar.startOfDay(for: Date())
+    return data.days
+      .filter { day in
+        guard day.shiftedToDate != nil else { return false }
+        let scheduled = calendar.startOfDay(for: day.scheduledDate)
+        let target = calendar.startOfDay(for: day.date)
+        return scheduled <= today
+          && target >= today
+          && !hasAnyLog(for: day, in: data.logs)
+      }
+      .min { $0.date < $1.date }
+  }
+
   private var titleLabel: String {
     guard let weekIndex = weekData?.weekIndex else { return "今日" }
     let offset = mondayOffset(for: effectiveSelectedDate)
@@ -624,9 +721,114 @@ public struct DashboardView: View {
     await profileMetricsViewModel.load(studentID: studentID)
   }
 
+  private func proposeShiftToday() {
+    guard let day = todayDay,
+      day.shiftedToDate == nil,
+      let planStartDate = weekViewModel.planStartDate,
+      let data = weekData
+    else { return }
+    guard
+      let target = PlanDayShiftLogic.nextRestDate(
+        after: Date(),
+        occupiedBy: data.days,
+        planStartDate: planStartDate,
+        weekIndex: data.weekIndex
+      )
+    else {
+      dayShiftAlert = .message(
+        title: "无法顺延",
+        text: "本周训练已排满，建议联系教练调整"
+      )
+      return
+    }
+    dayShiftAlert = .confirmShift(
+      DashboardDayShiftProposal(
+        dayID: day.id,
+        targetDate: target,
+        targetLabel: PlanDayShiftLogic.targetLabel(target: target, after: Date())
+      )
+    )
+  }
+
+  @MainActor
+  private func shiftToday(_ proposal: DashboardDayShiftProposal) async {
+    isUpdatingDayShift = true
+    defer { isUpdatingDayShift = false }
+    do {
+      try await plans.shiftDay(
+        id: proposal.dayID,
+        to: proposal.targetDate,
+        studentID: studentID
+      )
+      await weekViewModel.load(studentID: studentID)
+      onPlanChanged()
+    } catch {
+      dayShiftAlert = .message(
+        title: "无法顺延",
+        text: PlanDayShiftLogic.errorMessage(for: error, operation: .shift)
+      )
+    }
+  }
+
+  @MainActor
+  private func cancelShift(_ day: StudentPlanDay) async {
+    isUpdatingDayShift = true
+    defer { isUpdatingDayShift = false }
+    do {
+      try await plans.cancelShift(dayID: day.id, studentID: studentID)
+      await weekViewModel.load(studentID: studentID)
+      onPlanChanged()
+    } catch {
+      dayShiftAlert = .message(
+        title: "无法撤销",
+        text: PlanDayShiftLogic.errorMessage(for: error, operation: .cancel)
+      )
+    }
+  }
+
+  private func hasAnyLog(for day: StudentPlanDay, in logs: [StudentSetLog]) -> Bool {
+    let exerciseIDs = Set(day.exercises.map(\.id))
+    return logs.contains { log in
+      guard let planExerciseID = log.planExerciseID else { return false }
+      return exerciseIDs.contains(planExerciseID)
+    }
+  }
+
+  private func dayShiftDateText(_ date: Date) -> String {
+    date.formatted(.dateTime.month().day().locale(Locale(identifier: "zh_CN")))
+  }
+
+  private var dayShiftCalendar: Calendar {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
+    return calendar
+  }
+
   private func openPlanNotification() {
     notificationsViewModel.markCurrentPlanSeen()
     onStartWorkout()
+  }
+}
+
+private struct DashboardDayShiftProposal: Identifiable, Equatable, Sendable {
+  let dayID: UUID
+  let targetDate: Date
+  let targetLabel: String
+
+  var id: UUID { dayID }
+}
+
+private enum DashboardDayShiftAlert: Identifiable {
+  case confirmShift(DashboardDayShiftProposal)
+  case confirmCancel(StudentPlanDay)
+  case message(title: String, text: String)
+
+  var id: String {
+    switch self {
+    case .confirmShift(let proposal): "shift-\(proposal.dayID.uuidString)"
+    case .confirmCancel(let day): "cancel-\(day.id.uuidString)"
+    case .message(let title, let text): "message-\(title)-\(text)"
+    }
   }
 }
 

@@ -10,6 +10,7 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let planRevision: Int
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -30,13 +31,15 @@ public struct TodayWorkoutView: View {
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
     resetToTodayPulse: Int = 0,
-    sessionReviews: (any SessionReviewRepository)? = nil
+    sessionReviews: (any SessionReviewRepository)? = nil,
+    planRevision: Int = 0
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.resetToTodayPulse = resetToTodayPulse
     self.sessionReviews = sessionReviews
+    self.planRevision = planRevision
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
@@ -53,7 +56,8 @@ public struct TodayWorkoutView: View {
           studentID: studentID,
           selectedDate: $selectedDate,
           plans: plans,
-          logs: logs
+          logs: logs,
+          planRevision: planRevision
         )
         .padding(.horizontal)
         .padding(.top)
@@ -176,6 +180,9 @@ public struct TodayWorkoutView: View {
     .onChange(of: resetToTodayPulse) { _, _ in
       selectedDate = Date()
     }
+    .onChange(of: planRevision) { _, _ in
+      Task { await loadWorkout(for: selectedDate) }
+    }
   }
 
   private var dateLock: TodayWorkoutDateLock {
@@ -270,6 +277,11 @@ public struct TodayWorkoutView: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
       .padding(.top, 12)
+
+      if let coachNote = coachNote(draft) {
+        coachNotePill(coachNote)
+          .padding(.top, 10)
+      }
 
       Text("RPE")
         .font(Font.MeetPR.monoLabel)
@@ -401,25 +413,39 @@ public struct TodayWorkoutView: View {
   ) -> some View {
     let resolved = draft.completed || active
     let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
+    let note = coachNote(draft)
     return Button {
       editing = EditingTarget(
         id: draft.id, rowIndex: rowIndex, draft: draft, setNumber: setNumber)
     } label: {
-      LazyVGrid(columns: columns, spacing: 0) {
-        Text("\(setNumber)")
-          .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
-        Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
-        Text(repsText(draft)).foregroundStyle(foreground)
-        Text(rpeText(draft)).foregroundStyle(foreground)
-        Text(statusMark(draft)).foregroundStyle(statusColor(draft))
-        Image(systemName: "video")
-          .font(.system(size: 16))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .frame(maxWidth: .infinity, alignment: .trailing)
+      VStack(alignment: .leading, spacing: 0) {
+        LazyVGrid(columns: columns, spacing: 0) {
+          Text("\(setNumber)")
+            .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+          Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
+          Text(repsText(draft)).foregroundStyle(foreground)
+          Text(rpeText(draft)).foregroundStyle(foreground)
+          Text(statusMark(draft)).foregroundStyle(statusColor(draft))
+          Image(systemName: "video")
+            .font(.system(size: 16))
+            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .font(.system(size: 16, design: .monospaced))
+        .padding(.horizontal, 16)
+        .padding(.top, 14)
+        .padding(.bottom, note == nil ? 14 : 6)
+
+        if let note {
+          Text("备注 \(note)")
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(active ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+            .lineLimit(2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
+        }
       }
-      .font(.system(size: 16, design: .monospaced))
-      .padding(.horizontal, 16)
-      .padding(.vertical, 14)
       .background(active ? Color.MeetPR.surface2 : Color.clear)
       .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
       .contentShape(Rectangle())
@@ -455,6 +481,26 @@ public struct TodayWorkoutView: View {
 
   private func currentRPE(_ draft: TodayWorkoutViewModel.SetRowDraft) -> Decimal {
     draft.actualRPE ?? draft.prescribed.rpe ?? 8
+  }
+
+  private func coachNote(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String? {
+    CoachNoteDisplay.text(draft.prescribed.coachNote)
+  }
+
+  private func coachNotePill(_ note: String) -> some View {
+    Text("教练备注 \(note)")
+      .font(.system(size: 13, weight: .semibold))
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .lineLimit(2)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(.horizontal, 10)
+      .padding(.vertical, 7)
+      .background(Color.MeetPR.surface1)
+      .clipShape(.rect(cornerRadius: 8))
+      .overlay {
+        RoundedRectangle(cornerRadius: 8)
+          .stroke(Color.MeetPR.border, lineWidth: 1)
+      }
   }
 
   private func statusMark(_ draft: TodayWorkoutViewModel.SetRowDraft) -> String {

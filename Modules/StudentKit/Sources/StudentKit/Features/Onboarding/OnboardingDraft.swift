@@ -23,6 +23,7 @@ public struct OnboardingDraft: Codable, Equatable, Sendable {
   public var deadlift1RMKg: Decimal?
   // Step 4
   public var trainingDays: [TrainingDay] = []
+  public var trainingDaysUncertain: Bool?
   public var gymTier: GymTier?
   public var equipmentOverrides: [String] = []
   // Step 5
@@ -65,6 +66,8 @@ extension OnboardingDraft {
     draft.bench1RMKg = profile.bench1RMKg
     draft.deadlift1RMKg = profile.deadlift1RMKg
     draft.trainingDays = profile.trainingDays
+    draft.trainingDaysUncertain =
+      profile.trainingDays.isEmpty && profile.gymTier != nil ? true : nil
     draft.gymTier = profile.gymTier
     draft.equipmentOverrides = profile.equipmentOverrides
     draft.dailyLifeIntensity = profile.dailyLifeIntensity
@@ -113,7 +116,16 @@ extension OnboardingDraft {
     merged.squat1RMKg = local.squat1RMKg ?? squat1RMKg
     merged.bench1RMKg = local.bench1RMKg ?? bench1RMKg
     merged.deadlift1RMKg = local.deadlift1RMKg ?? deadlift1RMKg
-    merged.trainingDays = local.trainingDays.isEmpty ? trainingDays : local.trainingDays
+    if local.trainingDaysUncertain == true {
+      merged.trainingDays = []
+      merged.trainingDaysUncertain = true
+    } else if !local.trainingDays.isEmpty {
+      merged.trainingDays = local.trainingDays
+      merged.trainingDaysUncertain = nil
+    } else {
+      merged.trainingDays = trainingDays
+      merged.trainingDaysUncertain = trainingDaysUncertain
+    }
     merged.gymTier = local.gymTier ?? gymTier
     merged.equipmentOverrides =
       local.equipmentOverrides.isEmpty ? equipmentOverrides : local.equipmentOverrides
@@ -152,7 +164,8 @@ extension OnboardingDraft {
     case 3:
       return squat1RMKg != nil && bench1RMKg != nil && deadlift1RMKg != nil
     case 4:
-      return (2...6).contains(trainingDays.count) && gymTier != nil
+      return ((2...6).contains(trainingDays.count) || trainingDaysUncertain == true)
+        && gymTier != nil
     case 5:
       return dailyLifeIntensity != nil && lifeStress != nil
         && recoverySpeed != nil && sleepHours != nil
@@ -197,10 +210,14 @@ extension OnboardingDraft {
       patch.bench1RMKg = Self.ifSet(bench1RMKg)
       patch.deadlift1RMKg = Self.ifSet(deadlift1RMKg)
     case 4:
-      // zod min(2): an undersized selection stays absent — never ship an
-      // invalid array that would 400 the whole PUT (risk 3).
-      patch.trainingDays =
-        (2...6).contains(trainingDays.count) ? .value(trainingDays) : .absent
+      if trainingDaysUncertain == true {
+        patch.trainingDays = .null
+      } else {
+        // zod min(2): an undersized selection stays absent — never ship an
+        // invalid array that would 400 the whole PUT (risk 3).
+        patch.trainingDays =
+          (2...6).contains(trainingDays.count) ? .value(trainingDays) : .absent
+      }
       patch.gymTier = Self.ifSet(gymTier)
       patch.equipmentOverrides =
         equipmentOverrides.isEmpty ? .null : .value(equipmentOverrides)

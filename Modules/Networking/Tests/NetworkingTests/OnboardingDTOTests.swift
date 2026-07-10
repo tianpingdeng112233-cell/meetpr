@@ -161,12 +161,14 @@ private func encodedDictionary(_ patch: OnboardingPatch) throws -> [String: Any]
 @Test func nullEncodesJSONNullForNullableColumns() throws {
   var patch = OnboardingPatch()
   patch.benchGrip = .null
+  patch.trainingDays = .null
   patch.injuryNotes = .null
   patch.competitionDate = .null
   let dictionary = try encodedDictionary(patch)
 
-  #expect(dictionary.count == 3)
+  #expect(dictionary.count == 4)
   #expect(dictionary["bench_grip"] is NSNull)
+  #expect(dictionary["training_days"] is NSNull)
   #expect(dictionary["injury_notes"] is NSNull)
   #expect(dictionary["competition_date"] is NSNull)
 }

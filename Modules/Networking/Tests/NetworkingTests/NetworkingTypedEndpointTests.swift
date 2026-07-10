@@ -64,6 +64,11 @@ func typedEndpointsUseWireContractPaths() async throws {
   )
   _ = try await client.plan(id: planID, accessToken: "token")
   _ = try await client.coachStudents(accessToken: "token")
+  _ = try await client.renameCoachStudent(
+    id: studentID,
+    displayName: "王馨伟",
+    accessToken: "token"
+  )
   _ = try await client.logSet(
     CreateSetLogRequestDTO(
       planExerciseID: planExerciseID,
@@ -98,6 +103,7 @@ func typedEndpointsUseWireContractPaths() async throws {
       "GET /students/\(studentID.uuidString)/plans?status=published",
       "GET /plans/\(planID.uuidString)",
       "GET /coach/students",
+      "PATCH /coach/students/\(studentID.uuidString)",
       "POST /sets/log",
       "GET /students/\(studentID.uuidString)/sets?from=2026-05-22&to=2026-05-23",
       "POST /coach/feedback",
@@ -152,6 +158,22 @@ private struct TypedEndpointResponseStub: Sendable {
     if method == "POST" {
       return postData(for: path)
     }
+    if method == "PATCH", path.hasPrefix("/coach/students/") {
+      let studentJSON = #"""
+        {
+          "id": "00000000-0000-4000-8000-000000000502",
+          "display_name": "王馨伟",
+          "profile": {
+            "user_id": "00000000-0000-4000-8000-000000000502",
+            "display_name": "王馨伟",
+            "created_at": "2026-05-22T12:00:00Z"
+          },
+          "status": "active",
+          "evaluation": null
+        }
+        """#
+      return Data(studentJSON.utf8)
+    }
     return Data("{}".utf8)
   }
 
@@ -200,7 +222,7 @@ private struct TypedEndpointResponseStub: Sendable {
 
   private func statusCode(for request: URLRequest) -> Int {
     if request.httpMethod == "PATCH" {
-      return 204
+      return request.url?.path().hasPrefix("/coach/students/") == true ? 200 : 204
     }
     return request.httpMethod == "POST" ? 201 : 200
   }
