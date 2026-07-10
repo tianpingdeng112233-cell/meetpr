@@ -616,7 +616,12 @@ public struct TodayWorkoutView: View {
 
   private func loadWorkout(for date: Date) async {
     await viewModel.load(date: date, studentID: studentID)
-    reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
+    // Rapid date switches can finish loads out of order; only the load for the
+    // still-selected day may set the flag, or a stale day's review state leaks
+    // onto the visible one.
+    if Calendar.current.isDate(date, inSameDayAs: selectedDate) {
+      reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
+    }
     await presentReadinessIfNeeded(for: date)
   }
 
