@@ -17,14 +17,21 @@
 ⚠️ 注意:main **不是** `ship@0ef0169`(build 7)的后继——ship 独有 #213(学员端走查六项修复)
 在 main 上由 spec 049/050/051 重新落地,对应关系与复验门见下节。
 
-**自练(solo)wave 全量**
-- 自练核心循环:adhoc 记录 + 离线队列 + CatalogKit(spec 045,#214)
-- solo 注册/onboarding 收口:轻 onboarding 2 屏 + 基线补记(spec 046,#218)
-- solo 成长/训练页适配:catalog 归桶 + 月分组历史(spec 047,#219)
-- 账号台账:注销/改密/CSV 导出(Apple 5.1.1(v))(spec 048,#221)
+**学员端(有教练线,对内测员生效)**
+- 账号台账:注销/改密/CSV 导出(Apple 5.1.1(v))(spec 048,#221)— 不分 trainingMode,所有学员生效
 - 训练页信任包:完成态真值 / 今日锁 / 重量录入 / 倒计时(spec 049,#215)
 - 上行信号:回顾持久化 + PR 红点消费面(spec 051,#217)
-- solo honesty 修复 U11/U12(#223/#224)、U9 polish(#222)
+- U9 polish 中的共享面:E1RM 说明 / 配重换行 / e1RM 曲线轴点标(#222)
+
+**🚪 solo(自练)线——随包休眠,本版不启用(David 2026-07-10 拍板)**
+
+> solo 代码已合 main 且与 e1RM 等交错,不 revert(defer≠delete,先例 spec 033 评估期停用)。
+> 门 = 注册页隐藏「学员 · 自己练」角色卡(`SignupView.offeredRoles`),无入口即不可达;
+> 恢复 solo = 该常量改回 `UserRole.allCases`。**prep-beta 圈选时勿把下列条目当上新写**:
+- 自练核心循环:adhoc 记录 + 离线队列 + CatalogKit(spec 045,#214)— CatalogKit 仍被 e1RM/成长页共享使用
+- solo 注册/onboarding 收口(spec 046,#218)— 入口已门
+- solo 成长/训练页适配(spec 047,#219)
+- solo honesty 修复 U11/U12(#223/#224)
 
 **e1RM / 算法**
 - e1RM 单一真源:资格门 + 滚动 max 序列 + 降噪 PR(spec 050,#216)
@@ -36,6 +43,12 @@
 - 教练今日分诊行直达 StudentDetailView(#212)
 - 动作库 10 条重名去重(#209)
 - 学员 tab 误报取消加载为错误修复(#186)
+
+**发布前直修(2026-07-10,David 点名三项 + 顺入)**
+- 教练看学员执行页锚定**本周**(原永远显示 cycle 第 1 周)(#231)
+- 学员训练界面组数 1-based:录入 sheet 标题 / 当前组 hero / 组表序号(port 自 shift-day 栈 9188915 组号切片)(#232)
+- 闪退至登录修复:token 过期前主动刷新 + 401 自动换 token 重试 + generation 竞态防护(port 自栈 d8cc8d0+00eb004)(#233)
+- 启动加固顺入:瞬时刷新失败不清会话 + DraftStore 崩溃循环降级(#202)
 
 ## ⚠️ #213 六项修复 → main 对应关系(首个 main tag 前逐项复验,勿跳)
 
@@ -66,7 +79,8 @@ main 候选基线。
 | ⑥ | 基线 1RM vs E1RM 澄清标签 | spec 050(#216) | **改写** | 资料页数字明确标为「入门基线」并指向成长页;Dashboard/成长的当前 e1RM 不与基线混称 | [ ] |
 
 ## 📋 进度:离 archive 推 TestFlight 还差几步
-- [ ] 候选改动全部合 main(见上)
+- [x] 候选改动全部合 main(见上;含 2026-07-10 直修 #231/#232/#233/#202)
+- [x] solo 注册入口门合 main(#230,拍板 2026-07-10)
 - [ ] #213 六项对应关系逐项复验通过(上表打勾)
 - [ ] build 号复核(规则见顶部「目标」节)
 - [ ] main 目标 commit 打 tag `beta/1.0-8` 并推远端

@@ -137,6 +137,94 @@ private func date(_ calendar: Calendar, _ dateComponents: DateComponents) -> Dat
   return calendar.date(from: components)
 }
 
+// MARK: - weekStart(执行页锚定本周,不是 cycle 第 1 周)
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func weekStartAnchorsToPlanWeekContainingToday() throws {
+  var utc = Calendar(identifier: .gregorian)
+  utc.timeZone = TimeZone(secondsFromGMT: 0)!
+  let cycleStart = try #require(date(utc, DateComponents(year: 2026, month: 6, day: 1)))
+  let plan = fourWeekPlan(startDate: cycleStart, calendar: utc)
+
+  // 第 2 周中段(start+10d)→ 锚到 start+7d,不再是 start。
+  let midWeekTwo = cycleStart.addingTimeInterval(10 * 86_400)
+  #expect(
+    StudentDetailViewModel.weekStart(for: plan, now: midWeekTwo, calendar: utc)
+      == cycleStart.addingTimeInterval(7 * 86_400)
+  )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func weekStartClampsToCycleBounds() throws {
+  var utc = Calendar(identifier: .gregorian)
+  utc.timeZone = TimeZone(secondsFromGMT: 0)!
+  let cycleStart = try #require(date(utc, DateComponents(year: 2026, month: 6, day: 1)))
+  let plan = fourWeekPlan(startDate: cycleStart, calendar: utc)
+
+  // 计划开始前 → 第 1 周;cycle 结束很久之后 → 停在最后一周(start+21d)。
+  let beforeStart = cycleStart.addingTimeInterval(-3 * 86_400)
+  #expect(
+    StudentDetailViewModel.weekStart(for: plan, now: beforeStart, calendar: utc) == cycleStart)
+
+  let longAfterEnd = cycleStart.addingTimeInterval(60 * 86_400)
+  #expect(
+    StudentDetailViewModel.weekStart(for: plan, now: longAfterEnd, calendar: utc)
+      == cycleStart.addingTimeInterval(21 * 86_400)
+  )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func weekStartWithoutPlanKeepsTrailingSevenDayWindow() throws {
+  var utc = Calendar(identifier: .gregorian)
+  utc.timeZone = TimeZone(secondsFromGMT: 0)!
+  let now = try #require(date(utc, DateComponents(year: 2026, month: 6, day: 15)))
+  #expect(
+    StudentDetailViewModel.weekStart(for: nil, now: now, calendar: utc)
+      == now.addingTimeInterval(-6 * 86_400)
+  )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func executionDaysShowCurrentPlanWeekRows() throws {
+  var utc = Calendar(identifier: .gregorian)
+  utc.timeZone = TimeZone(secondsFromGMT: 0)!
+  let cycleStart = try #require(date(utc, DateComponents(year: 2026, month: 6, day: 1)))
+  let plan = fourWeekPlan(startDate: cycleStart, calendar: utc)
+
+  let midWeekTwo = cycleStart.addingTimeInterval(10 * 86_400)
+  let days = StudentDetailViewModel.makeExecutionDays(
+    plan: plan, logs: [], now: midWeekTwo, calendar: utc
+  )
+
+  #expect(days.count == 7)
+  #expect(days[0].date == cycleStart.addingTimeInterval(7 * 86_400))
+  // 第 2 周的计划日(start+7d)落在第 1 行,而不是超出窗口被丢掉。
+  #expect(days[0].planDay != nil)
+}
+
+/// 4 周 cycle:每周第 1 天各有一个计划日(day 0/7/14/21)。
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private func fourWeekPlan(startDate: Date, calendar: Calendar) -> StudentPlanView {
+  let days = (0..<4).map { week in
+    StudentPlanDay(
+      id: UUID(uuidString: String(format: "02900000-0000-0000-0000-%012d", 8_001 + week))!,
+      date: startDate.addingTimeInterval(Double(week) * 7 * 86_400),
+      exercises: [CoachStudentFeatureFixtures.exercise()]
+    )
+  }
+  return StudentPlanView(
+    cycleID: UUID(uuidString: "02900000-0000-0000-0000-000000008000")!,
+    weekIndex: 1,
+    startDate: startDate,
+    days: days
+  )
+}
+
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func detailLoadsVideoWallAndTodayReadiness() async {
