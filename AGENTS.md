@@ -436,3 +436,17 @@ commits: N 个
 | 技术 ADR | `~/Brain/wiki/projects/MeetPR/decisions/` | Claude |
 | 领域知识 / 用户研究 / 竞品 | `~/Brain/wiki/projects/MeetPR/` | Claude |
 | 会议纪要 | `~/Brain/wiki/projects/MeetPR/meetings/` | Claude(和用户) |
+
+## §发版直推流(David 直驱 Codex,2026-07-10 起生效)
+
+**下一个测试包 = 1.0 (8)。累积线 = 分支 `release/1.0`(基于 1.0(7) @ 0ef0169)。你现在就在这条线上。**
+`main` 是大版本线(solo/e1RM wave 等),**本包不带**;严禁擅自 merge main 进本分支(两线合并只由 David/Claude 决策)。
+
+David 在本分支直驱小修/小功能时,你(Codex)必须遵守:
+
+1. **原子 commit**:一改一 commit,verb-first 英文短句(`Fix …` / `Add …`)。
+2. **改完必验**:改动文件过 `swiftlint lint --strict`;受影响 SPM 模块 `swift test` 绿;UI 改动用模拟器亲眼确认(DemoStudent=学员端,Demo=教练端)。
+3. **每笔 commit 后,立刻在 `docs/CODEX-JOURNAL.md` 顶部追加一行**(格式见该文件)。这是 Claude/David 之间唯一同步台账——**漏写=改动隐身,视为未完成**。
+4. 用户可见的 iOS 改动,同步在 `NEXT-RELEASE.md`「本版将包含」追加一行。
+5. push 到 `origin/release/1.0` 即算进包候选;等 CI,红了自己修。
+6. **不许动**:build 号 / tag / archive(prep-beta 统一做)、pbxproj 结构、签名、新增依赖、跨模块大重构、merge main——这些回 Claude 流程。
