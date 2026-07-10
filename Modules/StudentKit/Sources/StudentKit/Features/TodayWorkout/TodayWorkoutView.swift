@@ -21,6 +21,11 @@ public struct TodayWorkoutView: View {
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
   @State private var showingReadinessSheet = false
+  /// Whether the slide-to-complete → 训练回顾 → 完成 flow has been finished for
+  /// the loaded day; loaded from `SessionReviewStore` so the slide control does
+  /// not re-arm after the review sheet closes (or the app restarts).
+  @State private var reviewCompleted = false
+  private let reviewStore: any SessionReviewStore = UserDefaultsSessionReviewStore()
 
   public init(
     studentID: UUID,
@@ -217,6 +222,14 @@ public struct TodayWorkoutView: View {
         scrollToVideo: target.scrollToVideo
       )
     }
+    // Anchored here (not on the slide control) so the review stays reachable
+    // from the completion banner after the slide control is gone.
+    .sheet(isPresented: $showingSummary) {
+      SessionSummaryView(
+        summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID,
+        onComplete: { markReviewCompleted(for: day.date) }
+      )
+    }
   }
 
   @ViewBuilder
@@ -225,20 +238,29 @@ public struct TodayWorkoutView: View {
     day: StudentPlanDay,
     isEditable: Bool
   ) -> some View {
-    if !drafts.isEmpty && drafts.allSatisfy(\.completed) {
-      DayCompletionBanner(totalSets: drafts.count)
+    let dayComplete = !drafts.isEmpty && drafts.allSatisfy(\.completed)
+
+    if dayComplete {
+      DayCompletionBanner(totalSets: drafts.count) {
+        showingSummary = true
+      }
     }
 
-    if isEditable {
+    // Hidden only once the day is fully closed (all sets done AND the review
+    // finished with 完成) — the banner then carries the 查看回顾 entry. If a set
+    // is later un-checked the banner disappears, so the slide control must
+    // return or the review becomes unreachable.
+    if isEditable && !(dayComplete && reviewCompleted) {
       SlideToCompleteButton(title: "滑动完成今日训练") {
         showingSummary = true
       }
       .padding(.top, 4)
-      .sheet(isPresented: $showingSummary) {
-        SessionSummaryView(
-          summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID)
-      }
     }
+  }
+
+  private func markReviewCompleted(for date: Date) {
+    reviewStore.markReviewCompleted(studentId: studentID, date: date)
+    reviewCompleted = true
   }
 
   // MARK: - Read-only notice
@@ -594,6 +616,7 @@ public struct TodayWorkoutView: View {
 
   private func loadWorkout(for date: Date) async {
     await viewModel.load(date: date, studentID: studentID)
+    reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
     await presentReadinessIfNeeded(for: date)
   }
 

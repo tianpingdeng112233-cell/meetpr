@@ -13,6 +13,7 @@ struct SessionSummaryView: View {
   let date: Date
   let studentID: UUID
   let reflectionStore: any SessionReflectionStore
+  let onComplete: (() -> Void)?
 
   @Environment(\.dismiss) private var dismiss
 
@@ -20,12 +21,14 @@ struct SessionSummaryView: View {
     summary: StudentSessionSummary,
     date: Date,
     studentID: UUID,
-    reflectionStore: any SessionReflectionStore = UserDefaultsSessionReflectionStore()
+    reflectionStore: any SessionReflectionStore = UserDefaultsSessionReflectionStore(),
+    onComplete: (() -> Void)? = nil
   ) {
     self.summary = summary
     self.date = date
     self.studentID = studentID
     self.reflectionStore = reflectionStore
+    self.onComplete = onComplete
   }
 
   var body: some View {
@@ -54,8 +57,11 @@ struct SessionSummaryView: View {
         .navigationBarTitleDisplayMode(.inline)
       #endif
       .toolbar {
-        Button("完成") { dismiss() }
-          .foregroundStyle(Color.MeetPR.brandRed)
+        Button("完成") {
+          onComplete?()
+          dismiss()
+        }
+        .foregroundStyle(Color.MeetPR.brandRed)
       }
     }
   }
