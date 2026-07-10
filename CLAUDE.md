@@ -78,6 +78,28 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 - ❌ **不在 V0 路径上的 refactor / cleanup**:V0 ship 后再清
 - ❌ **Apple Developer membership / Stage A-I release engineering**:User 2026-05-12 决策"还剩一周再开",自动提醒走 [F-026](./FOLLOWUPS.md);本 session 不要主动 propose Stage A 任何环节
 
+## 改动分级与路由矩阵
+
+> **⚠️ 本节涉及协作规则,改动需 David 逐条确认后才生效(见 §Review 授权矩阵 / AGENTS.md 授权矩阵)。** 目的:任何改动一进来,先归类,再照这张表决定 5 件事 —— **谁写 / 要不要 SPEC PR / 要不要 brainstorm+ceo-review / 要不要 `/review-loop` / 怎么合**。内容抄拢自四条既有约定并消歧(见每行「依据」)。
+
+| 改动类型 | 谁写 | SPEC PR? | brainstorm + ceo-review? | `/review-loop`? | 怎么合 |
+|---|---|---|---|---|---|
+| **1. UI 微调 / 控件替换 / 微交互**(Class 1)| **Claude 直写** | ❌ | ❌ | ❌(可选轻量自查)| **1 PR,CI 绿普通合并** |
+| **2. Spec 修订(David 已定方向)** | **Claude 直写** | **amendment PR**(改原 `NNN-slug/SPEC.md`,**不建 NNN+1**)| ❌ | ❌(David 已驱动方向,跳 Codex review cycle)| **self-merge**;纯 docs PR 需 enforce_admins toggle |
+| **3. 规则 / 治理文档**(CLAUDE.md / AGENTS.md / ADR / prd)| Claude | ❌(docs PR)| ❌ | ✅(实质文档过 loop)| docs-only PR + enforce_admins toggle + **David 最终确认** |
+| **4. 单功能 spec**(1 功能 / 单 repo / 无新 SPM target)| **Codex xhigh**(workspace-write)写码 + Claude 跑 `/review-loop` | ✅ **spec PR + impl PR**(上限 2 PR/feature)| brainstorm 视复杂度可选;ceo-review ❌ | ✅ 多轮互审 | CI 绿普通合并 |
+| **5. 多 spec / 跨 repo / 引入新 SPM target 的 wave** | **Codex xhigh** 写码 + Claude 跑 `/review-loop` + 收尾 build/PR | ✅ 每 spec 各 spec PR + impl PR | **brainstorm 必跑**;ceo-review **视 scope 选跑** | ✅ | CI 绿普通合并 |
+
+**关键消歧(否则四条来源相互打架)**:
+
+- **合并门禁 = CI 绿即可普通合并**。**只有 docs-only PR**(required status checks 不上报、卡在 pending)才需要 enforce_admins toggle 套路(`gh api` 关 → 合 → 开)。**纠正旧「所有 PR 都必须 toggle」的说法** —— 有 CI 上报的 code PR 直接普通合并。
+- **Class 1 vs Class 4 的边界**:能一句话说清「改哪个控件 / 哪个交互」且不动数据模型 / 不加接口 → Class 1(Claude 直写 1 PR)。一旦涉及新数据流 / 新接口 / 新 UseCase → Class 4(走 spec)。**案例**:spec 023(planning numeric input)当年走了 5-PR / 2-3 天的重流程,**本应是 Class 1 的 1-PR / 半天 Claude 直写**。
+- **Class 2 vs Class 3**:纯 `SPEC.md` 内容修订(David 已定方向)= Class 2,self-merge、免 review。改到 **CLAUDE.md / AGENTS.md / ADR / prd 这类规则源** = Class 3,**必须 David 最终确认**(规则不能被执行者单方改)。
+- **Class 5 为什么强制 brainstorm**:**案例** —— V0.1 wave 跳过 brainstorm 直接写 SPEC,结果 600 行 amend + 2 轮 Codex review 的隐性返工成本。多 spec / 跨 repo / 新 SPM target 的 wave,前置 brainstorm(+ 视 scope 的 ceo-review)比事后 amend 便宜。
+- **`/review-loop` 与 PR 级 gate**:表中「✅ `/review-loop`」指**开 PR 前跑本地 Claude↔Codex 多轮互审**,收敛(`VERDICT: CLEAN`)即真 gate;PR 级 Codex gate 默认免跑(见 §PR Codex review pass 与 [PR #148](https://github.com/tianpingdeng112233-cell/meetpr/pull/148))。
+
+**依据**(四条既有约定,本表是它们的合并去重视图):Class 1 = 「Class 1 fast path」;Class 2 = 「spec chore PR 后 self-merge」;Class 5 的 brainstorm 强制 = 「brainstorm before multi-spec wave」;Class 4/5 的 Codex↔Claude 分工与合并门禁 = 「Claude/Codex 协作流水线」。
+
 ## 角色
 
 你在这个目录里扮演 **iOS 工程师**：
@@ -152,6 +174,12 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 - **禁止**：在没有对应 PRD 条目的情况下实现新功能 — 产品决策先行
 - **禁止**：一次 commit 跨多个无关改动
 - **鼓励**：每写一个新决策（例如"为什么选 TCA 而不是 MVVM"）就沉淀到 `~/Brain/wiki/projects/MeetPR/decisions/` 里
+
+### 动作库(exercise catalog)维护策略
+
+- **唯一权威源 = `Modules/CoachKit/Sources/CoachKit/Resources/exercise-catalog-v2.json`**。增删动作 / 改名 / 改标签 / 去重,一律**直接手改这个 json + 开 PR**(catalog 是数据资产,走 JSON/fixture review:schema 对齐 Codable / id namespace 不冲突 / encode round-trip 不变)。
+- **`scripts/import-exercise-catalog-v2.py` 及其源 xlsx 是停更的一次性种子**,只用于最初导入。**别再动、别再跑重导**——现状 json 已在种子之上手工修了几十个 PR(命名 / 去重 / 标签),重跑导入会覆盖这些修正。
+- 别在 CI / 构建里加「从 xlsx 重新生成 json」的步骤;json 就是手维护的 source of truth。
 
 ## PR Codex review pass(Claude 写的任何 PR merge 前必经 Codex 互审)
 

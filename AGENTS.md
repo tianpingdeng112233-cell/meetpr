@@ -62,6 +62,12 @@
 
 ---
 
+## 改动分级与路由矩阵(镜像指针)
+
+> **权威在 [`CLAUDE.md` §改动分级与路由矩阵](./CLAUDE.md),以它为准。** 那张表按改动类型(UI 微调 / spec 修订 / 治理文档 / 单功能 spec / 多-spec wave)一次性决定 5 件事:谁写、要不要 SPEC PR、要不要 brainstorm+ceo-review、要不要 `/review-loop`、怎么合。**你(implementer)相关的两行**:单功能 spec(Class 4)= 你 xhigh 写码 + Claude 跑 `/review-loop`,spec PR + impl PR 上限 2 PR,CI 绿普通合并;多-spec / 跨 repo / 新 SPM target wave(Class 5)= 同上但 **brainstorm 必跑**。合并门禁 = **CI 绿即普通合并**,只有 docs-only PR 才需 enforce_admins toggle。
+
+---
+
 ## Spec 生命周期(2026-05-09 精简流程)
 
 > **背景**:之前每个 spec 走 5 个 PR(spec / impl / review / review-followup digest / spec finalize),solo 模式下 process tax 太高(spec 005 一个功能开了 16 PR)。**新流程上限 2 PR/feature**。
@@ -161,7 +167,14 @@ Claude 裁决三种结果:
 
 ## PR review pass(Claude 开的任何 PR 你做 second-pair-of-eyes)
 
-**触发**:Claude 通过 `/review-loop` 用 `codex exec`(read-only)**自动发起**——开 PR 前在工作区未提交改动上跑本地多轮互审 + 对质,无需 User 手动 paste。你在本地循环里审未提交 diff、按输出契约回应、**不改任何文件**;PR 开出后再做一次 PR 级最终 gate。这是 Claude 起草任何产物后必经的流程,**不论 doc 还是 code**(Claude 端规定见 [`CLAUDE.md` §PR Codex review pass](./CLAUDE.md))。
+**触发**:Claude 通过 `/review-loop` 用 `codex exec`(read-only)**自动发起**——开 PR 前在工作区未提交改动上跑本地多轮互审 + 对质,无需 User 手动 paste。你在本地循环里审未提交 diff、按输出契约回应、**不改任何文件**。这是 Claude 起草任何产物后必经的流程,**不论 doc 还是 code**(Claude 端规定见 [`CLAUDE.md` §PR Codex review pass](./CLAUDE.md))。
+
+> **⚠️ 口径对齐(per [PR #148](https://github.com/tianpingdeng112233-cell/meetpr/pull/148),2026-07-03 同步进本文件)**:**`/review-loop` 本地收敛(`VERDICT: CLEAN` 且无悬而未决分歧)才是真 gate。** 它对**进 PR 的同一份代码**审到了 CLEAN(过程中还复跑 test + build),所以 **PR 级最终 gate 默认免跑**——下面「PR 级最终 gate」的操作步骤**保留**,但**仅在以下三种情况才跑**:
+> 1. **`/review-loop` 没跑**(走了 §例外 里的免 loop 情形,如 Codex 起草的 PR / 紧急 hotfix)
+> 2. **loop 收敛后 PR 里有语义改动**(改了逻辑 / 接口 / 行为,非纯 swift-format / lint / commit message ——这部分没被 loop 审过)
+> 3. **想在 GitHub PR 上额外留一条 Codex review comment 作审计留痕**
+>
+> 三种情况都不成立时,loop 的 transcript 链接即审查留痕,直接进合并流程,**不必**再让同一个 Codex 审一遍同样代码(那是冗余的纸面 gate)。
 
 > **背景**:CLAUDE.md §角色 已规定 Claude 也写 Swift 代码(过去 default 走你,你限额触顶 Claude 接管 code 实装)。无论谁写,另一方必 review = 双向 second-pair-of-eyes。本节定义 Claude → 你 review 这一向;反向(你写 code → Claude review)是既有流程。
 
@@ -235,17 +248,11 @@ Claude 裁决三种结果:
 
 ---
 
-## 技术栈(跟随 CLAUDE.md,此处简述)
+## 技术栈
 
-- **平台**:iOS 17+
-- **UI**:SwiftUI
-- **架构**:待定(MVVM / TCA / Observable — 见 ADR)
-- **数据层**:待定
-- **后端**:待定
-- **测试**:Swift Testing
-- **包管理**:SPM
-
-> 以上"待定"条目在对应 ADR 写入前,**不要自行选型**。Spec 里会指定。
+> **同 [`CLAUDE.md` §技术栈](./CLAUDE.md),以它为准。** 核心 ADR:[ADR-004](~/Brain/wiki/projects/MeetPR/decisions/004-backend-selection.md) 后端选型(自建 Node.js + Aliyun RDS PostgreSQL)/ [ADR-005](~/Brain/wiki/projects/MeetPR/decisions/005-ios-architecture.md) iOS 架构(MVVM + Repository,`@Observable`)/ [ADR-009](~/Brain/wiki/projects/MeetPR/decisions/009-swiftdata-exception-for-planning-draft.md) SwiftData 例外(仅 CoachKit planning draft)。
+>
+>(原「架构/数据层/后端 待定 + 不要自行选型」脚注已废 —— 选型早已由上述 ADR 锁定,不再是待定项。)
 
 ---
 
@@ -333,10 +340,10 @@ Claude 裁决三种结果:
 
 ## 工具接入
 
-- XcodeBuildMCP 已接入 Codex MCP。涉及 iOS/macOS/watchOS/tvOS/visionOS 的 build / run / test / debug / log / UI automation 时,先使用已安装的 `xcodebuildmcp` skill,再调用 XcodeBuildMCP 工具。
-- 项目级 XcodeBuildMCP 配置在 `.xcodebuildmcp/config.yaml`。当前只启用 `simulator`、`swift-package`、`ui-automation`,不写 scheme / project 默认值,等 Xcode/SPM 骨架生成后再补。
-- Swift 格式化使用 Xcode 工具链内置 `swift-format`,配置文件为 `.swift-format`。
-- Swift 静态检查使用 SwiftLint,配置文件为 `.swiftlint.yml`。
+- XcodeBuildMCP 已接入。涉及 iOS 的 build / run / test / debug / log / UI automation 时,先用已安装的 `xcodebuildmcp` skill,再调 XcodeBuildMCP 工具。
+- 项目级配置在 `.xcodebuildmcp/config.yaml`,**已写入默认值**:`project: MeetPR.xcodeproj` / `scheme: MeetPR` / `simulator: iPhone 17`;启用 workflow = `simulator` / `swift-package` / `ui-automation`。(原「不写默认值,等骨架生成后再补」已过时 —— Xcode/SPM 骨架早已就位。)
+- ⚠️ **Demo 构建必须显式 `configuration=Demo`**:`build_run_sim` / archive 跑 `MeetPR-Demo` 时若不显式设 `configuration=Demo`,会 fallback 到默认 `Debug` —— Debug 没有 `DEMO_MODE` 编译标志,登录会撞真 backend 报网络异常。session 里先 `session_set_defaults` 固定,或每次调用显式带 `configuration=Demo`。
+- Swift 格式化用 Xcode 工具链内置 `swift-format`(配置 `.swift-format`);静态检查用 SwiftLint(配置 `.swiftlint.yml`)。
 
 ---
 
@@ -429,7 +436,8 @@ commits: N 个
 | 工程上下文 | `./CLAUDE.md` | Claude |
 | Codex 规范 | `./AGENTS.md`(本文件) | Claude |
 | 功能规格 | `./specs/NNN-slug/SPEC.md` | Claude |
-| 代码 | `./Sources/`、`./Tests/` | **Codex** |
+| 代码(SPM 模块) | `Modules/<X>/Sources/`、`Modules/<X>/Tests/`(X ∈ AppShell / CoachKit / CoreModels / DesignSystem / Networking / RepositoryContracts / StudentKit) | **implementer** |
+| 代码(app target) | `MeetPR/`(app 入口 / 组装)、`MeetPRTests/` | **implementer** |
 | PRD | `~/Brain/wiki/projects/MeetPR/prd.md` | Claude(和用户) |
 | 团队治理 | `~/Brain/wiki/projects/MeetPR/team-governance.md` | Claude(和用户) |
 | 产品 PD | `~/Brain/wiki/projects/MeetPR/product-decisions/` | Claude(和用户) |

@@ -4,7 +4,9 @@
 
 ## 本仓库
 
-代码仓库。规划阶段，暂无 Xcode 项目。
+iOS 代码仓库。单一 Xcode 工程（`MeetPR.xcodeproj`）+ `Modules/` 下 SPM 多模块（AppShell / CoachKit / CoreModels / DesignSystem / Networking / RepositoryContracts / StudentKit）。app-target 代码在 `MeetPR/`，测试在 `MeetPRTests/` 与各 `Modules/<X>/Tests/`。
+
+**已上 TestFlight 内测**（App id 6783772277）。日常发版流程与发布史另见仓库根 `RELEASES.md`（发布史）/ `NEXT-RELEASE.md`（进行中版本）——⚠️ 这两个文件随 PR #197 进 main，在 #197 合并前本仓库根尚无此二文件，故此处不加链接。
 
 ## 本地开发前置
 
