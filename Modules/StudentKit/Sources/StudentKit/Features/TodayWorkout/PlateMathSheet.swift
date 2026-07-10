@@ -89,6 +89,9 @@ struct PlateMathSheet: View {
     return Text(parts.isEmpty ? "每边：无（空杠）" : "每边：\(parts.joined(separator: " · "))")
       .font(Font.MeetPR.body)
       .foregroundStyle(Color.MeetPR.fgPrimary)
+      // 多片组合排版不乱 (P2-10): 片数多时让文案纵向换行,别横向截断。
+      .fixedSize(horizontal: false, vertical: true)
+      .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   private func roundingNotice(_ loadout: PlateMathCalculator.Loadout) -> some View {
