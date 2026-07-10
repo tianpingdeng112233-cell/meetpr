@@ -3,6 +3,18 @@
 > 这个文件是给 **Codex CLI**(或其他 implementer agent)读的。
 > Claude Code 读同目录的 [CLAUDE.md](./CLAUDE.md) — 两份文件规则必须同步。
 
+## ⛔ 发版路标(2026-07-10 拍板,先读这段再干活)
+
+- **你现在在 main 血脉的 worktree 里,main 不是发版线**。发版线 = `release/1.0`
+  (1.0(7) 基底小步直推,worktree `~/Projects/apps/MeetPR-release`),行为规则权威 =
+  该分支 `AGENTS.md` §发版直推流(P0–P2 优先级尺/捞回队列/失效保护)。
+- **严禁**:在 main 打 `beta/*` tag、切包、跑 prep-beta 类操作;把 main 当"下一个内测包"。
+  `beta/1.0-8` 已打在 release/1.0,build 号 8 已占用。
+- **main 的现役身份 = 下个大包的待分诊库存**:coached 学员端形态正典 = 1.0(7),main 的形态
+  批次被否;已批准项按捞回队列在 7 基底**重做**进 release 线(不 cherry-pick、不整体回归)。
+- 发包/修 bug 进内测类任务 → 去 release/1.0 worktree;本 worktree 只做 David 明确指定的
+  main 侧工作。拿不准 → 停下来问。
+
 ---
 
 ## 你的角色
