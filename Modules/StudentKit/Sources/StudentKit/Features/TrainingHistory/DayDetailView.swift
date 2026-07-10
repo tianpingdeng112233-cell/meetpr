@@ -44,9 +44,17 @@ public struct DayDetailView: View {
           $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
         }
         HStack {
-          Text("第 \(set.setIndex + 1) 组")
-            .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+          VStack(alignment: .leading, spacing: 2) {
+            Text("第 \(set.setIndex + 1) 组")
+              .font(.subheadline)
+              .foregroundStyle(Color.MeetPR.fgSecondary)
+            if let coachNote = CoachNoteDisplay.text(set.coachNote) {
+              Text("备注 \(coachNote)")
+                .font(.caption)
+                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .lineLimit(2)
+            }
+          }
           Spacer()
           if let log {
             Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))

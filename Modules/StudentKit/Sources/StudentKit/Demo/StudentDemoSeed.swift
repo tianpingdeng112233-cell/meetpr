@@ -170,7 +170,8 @@ public enum StudentDemoSeed {
           weightKg: spec.weight,
           reps: spec.reps,
           repsMax: nil,
-          rpe: spec.rpe
+          rpe: spec.rpe,
+          coachNote: setIndex == 0 ? "下放控制 3 秒" : nil
         )
       }
     )
