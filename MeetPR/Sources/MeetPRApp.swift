@@ -130,6 +130,12 @@ struct MeetPRApp: App {
           try? await draftStore.deleteAll()
         }
       )
+      api.bindUnauthorizedRecovery { [weak session] rejectedAccessToken in
+        guard let session else {
+          throw SessionStateReaderError.missingAccessToken
+        }
+        return try await session.recoverAccessToken(rejectedAccessToken: rejectedAccessToken)
+      }
       session.bindToErrors(api.errorStream)
       return session
     }
