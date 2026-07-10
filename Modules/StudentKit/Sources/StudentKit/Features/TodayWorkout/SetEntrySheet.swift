@@ -13,6 +13,7 @@ import SwiftUI
 struct SetEntrySheet: View {
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
+  let setNumber: Int
   let viewModel: TodayWorkoutViewModel
   /// Video attach context (spec 027); nil hides the video block entirely.
   let studentID: UUID?
@@ -42,6 +43,7 @@ struct SetEntrySheet: View {
   init(
     rowIndex: Int,
     draft: TodayWorkoutViewModel.SetRowDraft,
+    setNumber: Int,
     viewModel: TodayWorkoutViewModel,
     studentID: UUID? = nil,
     videoViewModel: VideoAttachmentViewModel? = nil,
@@ -49,6 +51,7 @@ struct SetEntrySheet: View {
   ) {
     self.rowIndex = rowIndex
     self.draft = draft
+    self.setNumber = setNumber
     self.viewModel = viewModel
     self.studentID = studentID
     self.videoViewModel = videoViewModel
@@ -160,7 +163,7 @@ struct SetEntrySheet: View {
 
   private var navBar: some View {
     ZStack {
-      Text("\(draft.exerciseName) · 第 \(draft.prescribed.setIndex + 1) 组")
+      Text("\(draft.exerciseName) · 第 \(setNumber) 组")
         .font(Font.MeetPR.body.weight(.semibold))
         .foregroundStyle(Color.MeetPR.fgPrimary)
       HStack {
