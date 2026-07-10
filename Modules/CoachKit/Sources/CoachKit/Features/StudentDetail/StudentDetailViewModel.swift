@@ -202,13 +202,7 @@ final class StudentDetailViewModel {
     now: Date,
     calendar: Calendar = CoachFeatureCalendar.calendar
   ) -> [StudentExecutionDay] {
-    let startDate =
-      plan?.startDate
-      ?? (calendar.date(
-        byAdding: .day,
-        value: -6,
-        to: now
-      ) ?? now)
+    let startDate = weekStart(for: plan, now: now, calendar: calendar)
     let daysByStart = Dictionary(
       uniqueKeysWithValues: (plan?.days ?? []).map {
         (CoachFeatureCalendar.startOfDay($0.date, calendar: calendar), $0)
@@ -252,10 +246,32 @@ final class StudentDetailViewModel {
   }
 
   private static func weekRange(for plan: StudentPlanView?, now: Date) -> ClosedRange<Date> {
+    CoachFeatureCalendar.dateRange(starting: weekStart(for: plan, now: now), days: 7)
+  }
+
+  /// Start of the plan week containing `now`, clamped to the plan's span, so the
+  /// coach lands on 本周. The current-plan projection carries the WHOLE cycle
+  /// (all weeks) with `startDate` = cycle start — anchoring rows at `startDate`
+  /// directly always showed the cycle's first week, however far along it is.
+  /// Before the cycle starts this yields week 1; after the last plan day it
+  /// stays on the final week. Without a plan: the trailing 7 days ending today.
+  static func weekStart(
+    for plan: StudentPlanView?,
+    now: Date,
+    calendar: Calendar = CoachFeatureCalendar.calendar
+  ) -> Date {
     guard let plan else {
-      let start = CoachFeatureCalendar.calendar.date(byAdding: .day, value: -6, to: now) ?? now
-      return CoachFeatureCalendar.dateRange(starting: start, days: 7)
+      return calendar.date(byAdding: .day, value: -6, to: now) ?? now
     }
-    return CoachFeatureCalendar.dateRange(starting: plan.startDate, days: 7)
+    let cycleStart = CoachFeatureCalendar.startOfDay(plan.startDate, calendar: calendar)
+    let today = CoachFeatureCalendar.startOfDay(now, calendar: calendar)
+    let elapsedDays = calendar.dateComponents([.day], from: cycleStart, to: today).day ?? 0
+    let lastPlanDay =
+      plan.days.map(\.date).max()
+      .map { CoachFeatureCalendar.startOfDay($0, calendar: calendar) } ?? cycleStart
+    let spanDays = max(
+      0, calendar.dateComponents([.day], from: cycleStart, to: lastPlanDay).day ?? 0)
+    let weekOffset = min(max(0, elapsedDays / 7), spanDays / 7)
+    return calendar.date(byAdding: .day, value: weekOffset * 7, to: cycleStart) ?? cycleStart
   }
 }
