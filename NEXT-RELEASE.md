@@ -1,17 +1,16 @@
-# 下个 TestFlight 版本 — 进行中
+# ⛔ 本文件已过时 — main 不是发版线(2026-07-10 David 拍板,读到这里就停)
 
-> 这份只记**还没 archive** 的东西 + 进度。**archive 上传后**:把「本版将包含」整段挪进
-> [RELEASES.md](./RELEASES.md) 作为该 build 一节,然后清空本文件、目标 build 号 +1。
-> 发版模型:**main 打 tag 切包**(`beta/<版本>-<build>`),规则见 RELEASES.md 顶部;不再并 ship 分支。
+> **发版线 = `release/1.0`**(1.0(7) @ 0ef0169 基底 + 小步直推)。`beta/1.0-8` **已经打在
+> release/1.0 上**(4e2a0d6,tag CI 绿,待 archive)。**严禁在 main 打任何 `beta/*` tag、
+> 严禁从 main 切包/跑 prep-beta、严禁把 main 当"下一个内测包"**——build 号 8 已被 release 线占用。
+> 权威规则:release/1.0 分支的 `AGENTS.md` §发版直推流(含 P0–P2 优先级尺、捞回队列、失效保护);
+> 发包相关工作一律去 `~/Projects/apps/MeetPR-release` worktree 做。
+>
+> **main 的现役身份 = 下个大包的待分诊库存**:David 三包同屏对比后裁决 coached 学员端形态正典
+> = 1.0(7),main 独有 commit(solo 波/e1RM wave/页面重做)降级待分诊;已批准部分按捞回队列
+> 在 7 基底**重做**进 release 线,不 cherry-pick、不整体回归。
 
-## 🎯 目标:1.0 (8) — 第一个从 main tag 切的包
-- **前置**:1.0 (7) 仍压在 `ship/today-entry-video-scroll @ 0ef0169` 待 David archive(ship 模式尾包,
-  内容见 RELEASES.md 1.0(7) 节);7 上传后本包才有意义。
-- build 号:**8**(pbxproj project 级已设)。切包前复核规则:**本地号 > ASC 已有最高号 → 直接用本地号
-  不 bump;否则取 `ASC 最高号 + 1`**(`xcrun agvtool new-version <N>` + commit 后再打 tag);
-  tag 名与下方清单以最终实际 N 为准。
-
-## 本版将包含(iOS 改动合 main 后追加到这里,prep-beta 时 David 一次圈选)
+## 以下为历史存档:main 侧库存清单(仅作分诊参考,不是发包清单)
 
 以下为**自 main/ship 共同祖先起,main 侧新增**的全部 16 个 first-parent commit。
 ⚠️ 注意:main **不是** `ship@0ef0169`(build 7)的后继——ship 独有 #213(学员端走查六项修复)
