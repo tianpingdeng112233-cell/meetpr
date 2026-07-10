@@ -11,6 +11,12 @@ on:
       - "specs/**"
       - ".github/ISSUE_TEMPLATE/**"
       - "LICENSE"
+  # Tag-cut safety net (2026-07-10, David 拍板): release lanes take direct
+  # pushes with no PR gate, so every beta/* tag gets exactly one machine-green
+  # run before the build is archived. Day-to-day pushes stay CI-free.
+  push:
+    tags:
+      - "beta/*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
