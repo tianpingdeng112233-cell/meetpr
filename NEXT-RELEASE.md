@@ -25,6 +25,13 @@
     本条 iOS 修复保留为后端故障时的防御层。
   - 验证留痕(2026-07-10):StudentKit 265 tests 全绿;受影响文件 strict lint 0;
     `MeetPR-DemoStudent` / DemoStudent / iPhone 17 build+run 并目视保持 1.0(7) 形态。
+- **[P0] 滑动完成后滑块不再复位**(a9d69d2):滑动完成 → 训练回顾 → 完成 回来后,
+  滑动条不再回弹到左边诱导重滑;当日回顾完成标记本机持久化(`SessionReviewStore`,
+  仿 reflections 模式),完成横幅新增「查看回顾」入口保证回顾可达;若事后取消勾选
+  某组,滑动条恢复出现。
+  - 验证留痕(2026-07-10):StudentKit 281 tests 全绿(含新 store 4 项);strict lint 0;
+    DemoStudent / iPhone 17 模拟器全流程亲眼验证(未完成日/完成未回顾/回顾后/跨重启
+    重装持久四态);main 侧同源 bug 另行适配(那边回顾走后端 repo,不宜硬移植)。
 - **内测前点名三项修复**(#231'/#232'/#233',已合入)
   - ①教练端学员执行页默认锚定当前计划周(原永远显示 cycle 第 1 周)
   - ②学员训练界面组数 1-based(录入 sheet 标题 / 当前组 hero / 组表序号)
