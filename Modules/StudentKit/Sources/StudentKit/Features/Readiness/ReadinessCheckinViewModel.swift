@@ -36,8 +36,10 @@ public struct ReadinessDraft: Equatable, Sendable {
   }
 }
 
-/// Per-day "skipped" marker so the sheet auto-presents at most once a day.
-/// UserDefaults-backed in production; injectable for tests.
+/// Per-day "skipped" marker. Historically capped the sheet's auto-present to
+/// once a day; since check-in went opt-in (2026-07-11) it only feeds the
+/// `skippedToday` gate state. UserDefaults-backed in production; injectable
+/// for tests.
 public protocol ReadinessSkipStore: Sendable {
   func isSkipped(studentId: UUID, checkinDate: String) -> Bool
   func markSkipped(studentId: UUID, checkinDate: String)
@@ -64,11 +66,13 @@ public struct UserDefaultsReadinessSkipStore: ReadinessSkipStore {
 public final class ReadinessCheckinViewModel {
   public enum Gate: Equatable, Sendable {
     case unknown
-    /// Not filed today, not skipped → the view auto-presents the sheet once.
+    /// Not filed today, not skipped. The toolbar heart shows the unfilled
+    /// state; the sheet only opens from that manual entry point (check-in is
+    /// opt-in since 2026-07-11 — no view may auto-present it).
     case needed
     /// Filed today; toolbar icon shows "done", tap re-opens prefilled.
     case done(ReadinessCheckin)
-    /// Skipped today; no more auto-presents, toolbar icon allows manual entry.
+    /// Skipped today via the sheet's 跳过 button; toolbar icon allows manual entry.
     case skippedToday
   }
 
