@@ -21,7 +21,8 @@ import Testing
     pr(studentID: studentID, exerciseID: benchID, e1RM: 101, daysAgo: 1, now: now),
   ]
 
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: prs)
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: prs, now: now)
   await viewModel.load(studentID: studentID)
 
   let presentation = try #require(viewModel.presentation)
@@ -43,7 +44,8 @@ import Testing
     point(studentID: studentID, exerciseID: deadliftID, e1RM: 190, daysAgo: 2, now: now),
   ]
 
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: [])
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: [], now: now)
   await viewModel.load(studentID: studentID)
 
   let presentation = try #require(viewModel.presentation)
@@ -79,7 +81,8 @@ import Testing
 @Test func trendEmptyHistoryKeepsThreeRowsWithoutHeadline() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: [], prs: [])
+  let now = try Date("2026-06-14T12:00:00Z", strategy: .iso8601)
+  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: [], prs: [], now: now)
 
   await viewModel.load(studentID: studentID)
 
@@ -105,7 +108,8 @@ import Testing
     pr(studentID: studentID, exerciseID: benchID, e1RM: 101, daysAgo: 3, now: now),
   ]
 
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: prs)
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: prs, now: now)
   await viewModel.load(studentID: studentID)
 
   let presentation = try #require(viewModel.presentation)
@@ -165,13 +169,15 @@ private func makeViewModel(
   studentID: UUID,
   plan: StudentPlanView,
   points: [E1RMHistoryPoint],
-  prs: [PRBreakthroughEvent]
+  prs: [PRBreakthroughEvent],
+  now: Date
 ) -> DashboardE1RMTrendViewModel {
   DashboardE1RMTrendViewModel(
     plans: InMemoryStudentPlanRepository(
       store: TestStudentPlanStore(seed: [studentID: plan])
     ),
-    e1rm: InMemoryE1RMRepository(seedPoints: points, seedPRs: prs)
+    e1rm: InMemoryE1RMRepository(seedPoints: points, seedPRs: prs),
+    now: { now }
   )
 }
 
