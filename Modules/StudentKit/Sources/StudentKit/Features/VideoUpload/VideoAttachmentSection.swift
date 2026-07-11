@@ -27,11 +27,6 @@ struct VideoAttachmentSection: View {
   @State private var showingCamera = false
   @State private var pickedItem: PhotosPickerItem?
   @State private var pendingSource: PendingSource?
-  /// True from the moment a video is chosen until the upload manager owns a
-  /// row for it. Covers the otherwise feedback-less window where the picked
-  /// file is copied out of the picker sandbox (or saved to the library) before
-  /// `enqueue` broadcasts its first `.pending` event.
-  @State private var isPreparing = false
 
   private enum PendingSource {
     case camera
@@ -97,18 +92,11 @@ struct VideoAttachmentSection: View {
     .onChange(of: pickedItem) { _, newItem in
       guard let newItem else { return }
       pickedItem = nil
-      isPreparing = true
       Task { await importPicked(newItem) }
-    }
-    .onChange(of: rowState?.attachment.status) { _, status in
-      // Once the manager owns a row, its status drives the UI; drop the
-      // local placeholder so error/cancel paths can restore the pick buttons.
-      if status != nil { isPreparing = false }
     }
     #if os(iOS)
       .fullScreenCover(isPresented: $showingCamera) {
         CameraVideoPicker(maxDurationSeconds: 120, isPresented: $showingCamera) { url in
-          isPreparing = true
           Task {
             // 相册留底先于上传:这一组已经练掉了,上传怎么失败素材都不能丢。
             await VideoLibrarySaver.save(url)
@@ -122,25 +110,17 @@ struct VideoAttachmentSection: View {
 
   @ViewBuilder
   private var content: some View {
-    // The manager's row wins as soon as it exists; until then, a freshly
-    // picked video shows "准备中…" so the copy/save window isn't a dead screen.
-    if let status = rowState?.attachment.status {
-      switch status {
-      case .pending:
-        statusRow(text: "处理中…", showsSpinner: true)
-      case .uploading:
-        uploadingRow
-      case .uploaded:
-        uploadedRow
-      case .failed:
-        failedRow
-      }
-    } else if isPreparing {
-      // No manager row exists yet, so there's nothing to cancel; the spinner
-      // alone tells the user the pick registered.
-      statusRow(text: "准备中…", showsSpinner: true, showsCancel: false)
-    } else {
+    switch rowState?.attachment.status {
+    case .none:
       pickButtons
+    case .pending:
+      statusRow(text: "处理中…", showsSpinner: true)
+    case .uploading:
+      uploadingRow
+    case .uploaded:
+      uploadedRow
+    case .failed:
+      failedRow
     }
   }
 
@@ -189,7 +169,7 @@ struct VideoAttachmentSection: View {
     }
   }
 
-  private func statusRow(text: String, showsSpinner: Bool, showsCancel: Bool = true) -> some View {
+  private func statusRow(text: String, showsSpinner: Bool) -> some View {
     HStack(spacing: 10) {
       if showsSpinner {
         ProgressView()
@@ -198,9 +178,7 @@ struct VideoAttachmentSection: View {
       Text(text)
         .font(.caption)
         .foregroundStyle(Color.MeetPR.fgSecondary)
-      if showsCancel {
-        cancelButton
-      }
+      cancelButton
     }
   }
 
@@ -248,26 +226,14 @@ struct VideoAttachmentSection: View {
 
   private func importPicked(_ item: PhotosPickerItem) async {
     guard let movie = try? await item.loadTransferable(type: PickedVideo.self) else {
-      // Load failed or the user backed out: no row will arrive, so clear the
-      // placeholder to bring the pick buttons back.
-      isPreparing = false
       return
     }
     await attach(sourceURL: movie.url)
   }
 
   private func attach(sourceURL: URL) async {
-    guard let setLogID = await ensureSetLogID() else {
-      isPreparing = false
-      return
-    }
+    guard let setLogID = await ensureSetLogID() else { return }
     await videoViewModel.attach(sourceURL: sourceURL, setLogID: setLogID, studentID: studentID)
-    // `enqueue` sets `lastErrorMessage` synchronously on failure (e.g. the
-    // clip exceeds the duration limit) and never broadcasts a row, so the
-    // status onChange won't fire — restore the buttons here instead.
-    if videoViewModel.lastErrorMessage != nil {
-      isPreparing = false
-    }
   }
 
   private func ensureSetLogID() async -> UUID? {
