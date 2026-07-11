@@ -38,16 +38,18 @@ public enum StudentDemoSeed {
 
   public static func makeHistoricalLogs(
     studentID: UUID = Self.studentID,
-    weekIndex: Int = 1
+    weekIndex: Int = 1,
+    includeToday: Bool = true
   ) -> [StudentSetLog] {
     let plan = makePlanView(weekIndex: weekIndex)
-    let calendar = Calendar(identifier: .gregorian)
+    let calendar = utcCalendar
     let today = calendar.startOfDay(for: Date())
     // Past training days are fully logged; today is in progress (first two sets);
     // future days are never seeded.
     return plan.days.flatMap { day -> [StudentSetLog] in
       guard day.date <= today, !day.exercises.isEmpty else { return [] }
       let isToday = calendar.isDate(day.date, inSameDayAs: today)
+      guard includeToday || !isToday else { return [] }
       return day.exercises.flatMap { exercise -> [StudentSetLog] in
         let sets = isToday ? Array(exercise.prescribedSets.prefix(2)) : exercise.prescribedSets
         return sets.map { set in
@@ -263,9 +265,18 @@ public enum StudentDemoSeed {
   /// whenever the demo is launched, while leaving genuine *past* training days
   /// (深蹲, 卧推) for 历史/仪表盘 to show — and never seeding future logs.
   private static func demoCycleStart() -> Date {
-    let calendar = Calendar(identifier: .gregorian)
+    let calendar = utcCalendar
     let startOfToday = calendar.startOfDay(for: Date())
     return calendar.date(byAdding: .day, value: -3, to: startOfToday) ?? startOfToday
+  }
+
+  /// Backend plan-day dates decode as UTC-midnight anchors; the demo seed must
+  /// match that shape or UTC-gated features (e.g. 今天有事 shift entry) behave
+  /// differently in DEMO_MODE than against the real backend.
+  static var utcCalendar: Calendar {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
+    return calendar
   }
 }
 

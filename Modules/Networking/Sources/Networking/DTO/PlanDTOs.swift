@@ -121,6 +121,7 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
   public let dayOfWeek: Int
   public let weekNumber: Int
   public let sortOrder: Int
+  public let shiftedToDate: Date?
   public let exercises: [PlanExerciseDTO]
 
   public init(
@@ -129,6 +130,7 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
     dayOfWeek: Int,
     weekNumber: Int,
     sortOrder: Int,
+    shiftedToDate: Date? = nil,
     exercises: [PlanExerciseDTO] = []
   ) {
     self.id = id
@@ -136,6 +138,7 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
     self.dayOfWeek = dayOfWeek
     self.weekNumber = weekNumber
     self.sortOrder = sortOrder
+    self.shiftedToDate = shiftedToDate
     self.exercises = exercises
   }
 
@@ -145,6 +148,7 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
     case dayOfWeek
     case weekNumber
     case sortOrder
+    case shiftedToDate
     case exercises
   }
 }

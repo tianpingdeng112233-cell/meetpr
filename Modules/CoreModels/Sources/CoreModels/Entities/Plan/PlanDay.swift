@@ -6,19 +6,22 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
   public let dayOfWeek: Int
   public let weekNumber: Int
   public let sortOrder: Int
+  public let shiftedToDate: Date?
 
   public init(
     id: UUID,
     planID: UUID,
     dayOfWeek: Int,
     weekNumber: Int,
-    sortOrder: Int
+    sortOrder: Int,
+    shiftedToDate: Date? = nil
   ) {
     self.id = id
     self.planID = planID
     self.dayOfWeek = dayOfWeek
     self.weekNumber = weekNumber
     self.sortOrder = sortOrder
+    self.shiftedToDate = shiftedToDate
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -27,5 +30,6 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
     case dayOfWeek
     case weekNumber
     case sortOrder
+    case shiftedToDate
   }
 }

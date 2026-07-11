@@ -10,6 +10,7 @@ struct TrainingCalendarView: View {
   private let studentID: UUID
   private let calendar: Calendar
   private let today: @Sendable () -> Date
+  private let planRevision: Int
 
   @Binding private var selectedDate: Date
   @State private var displayedDate: Date
@@ -22,11 +23,13 @@ struct TrainingCalendarView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     calendar: Calendar = .current,
-    today: @escaping @Sendable () -> Date = { Date() }
+    today: @escaping @Sendable () -> Date = { Date() },
+    planRevision: Int = 0
   ) {
     self.studentID = studentID
     self.calendar = calendar
     self.today = today
+    self.planRevision = planRevision
     self._selectedDate = selectedDate
     self._displayedDate = State(initialValue: selectedDate.wrappedValue)
     self._viewModel = State(initialValue: TrainingCalendarViewModel(plans: plans, logs: logs))
@@ -44,10 +47,8 @@ struct TrainingCalendarView: View {
         .stroke(Color.MeetPR.border, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: 14))
-    .task {
-      if case .idle = viewModel.state {
-        await viewModel.load(studentID: studentID)
-      }
+    .task(id: planRevision) {
+      await viewModel.load(studentID: studentID)
     }
     .onChange(of: selectedDate) { _, newValue in
       displayedDate = newValue

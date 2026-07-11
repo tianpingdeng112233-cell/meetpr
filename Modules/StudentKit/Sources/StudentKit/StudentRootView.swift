@@ -7,6 +7,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
   private let studentID: UUID
+  private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
@@ -25,12 +26,14 @@ public struct StudentRootView: View {
   /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
+  @State private var planRevision = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
     let store = StudentRootDemoPlanStore(studentID: StudentDemoSeed.studentID, plan: plan)
     self.init(
       studentID: StudentDemoSeed.studentID,
+      canShiftPlanDays: true,
       plans: InMemoryStudentPlanRepository(store: store),
       logs: InMemoryStudentTrainingLogRepository(
         seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
@@ -50,6 +53,7 @@ public struct StudentRootView: View {
 
   public init(
     studentID: UUID = StudentDemoSeed.studentID,
+    canShiftPlanDays: Bool = false,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
@@ -63,6 +67,7 @@ public struct StudentRootView: View {
     account: (any AccountRepository)? = nil
   ) {
     self.studentID = studentID
+    self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
     self.logs = logs
     self.e1rm = e1rm
@@ -94,6 +99,7 @@ public struct StudentRootView: View {
       // here + full history under 成长, so there is no separate 反馈 tab).
       DashboardView(
         studentID: studentID,
+        canShiftPlanDays: canShiftPlanDays,
         plans: plans,
         logs: logs,
         onboarding: onboarding,
@@ -105,7 +111,8 @@ public struct StudentRootView: View {
           selectedTab = .training
         },
         onSeeAllFeedback: { selectedTab = .growth },
-        todayReloadToken: todayReloadToken
+        todayReloadToken: todayReloadToken,
+        onPlanChanged: { planRevision += 1 }
       )
       .tag(StudentTab.today)
       .tabItem {
@@ -114,7 +121,8 @@ public struct StudentRootView: View {
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads, jumpToTodayToken: trainingJumpToken
+        videoUploads: videoUploads, jumpToTodayToken: trainingJumpToken,
+        planRevision: planRevision
       )
       .tag(StudentTab.training)
       .tabItem {

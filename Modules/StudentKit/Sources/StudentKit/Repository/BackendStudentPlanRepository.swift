@@ -45,6 +45,26 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
     return plan.days.sorted { $0.date < $1.date }
   }
 
+  public func shiftDay(id: UUID, to date: Date, studentID: UUID) async throws {
+    let token = try await session.accessToken()
+    do {
+      let shift = try await api.shiftPlanDay(id: id, to: date, accessToken: token)
+      await updateCachedDay(id: id, shiftedToDate: shift.shiftedToDate, studentID: studentID)
+    } catch {
+      throw Self.shiftError(from: error)
+    }
+  }
+
+  public func cancelShift(dayID: UUID, studentID: UUID) async throws {
+    let token = try await session.accessToken()
+    do {
+      try await api.cancelPlanDayShift(id: dayID, accessToken: token)
+      await updateCachedDay(id: dayID, shiftedToDate: nil, studentID: studentID)
+    } catch {
+      throw Self.shiftError(from: error)
+    }
+  }
+
   @discardableResult
   private func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
     let token = try await session.accessToken()
@@ -78,6 +98,35 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
     catalog = Dictionary(
       response.exercises.map { ($0.id, $0) }, uniquingKeysWith: { _, new in new })
     return response.exercises
+  }
+
+  private func updateCachedDay(
+    id: UUID,
+    shiftedToDate: Date?,
+    studentID: UUID
+  ) async {
+    guard let plan = await cache.loadPlan(studentID: studentID) else { return }
+    let updatedDays = plan.days.map { day in
+      guard day.id == id else { return day }
+      return StudentPlanDay(
+        id: day.id,
+        date: day.scheduledDate,
+        shiftedToDate: shiftedToDate,
+        exercises: day.exercises
+      )
+    }
+    let updated = StudentPlanView(
+      cycleID: plan.cycleID,
+      weekIndex: plan.weekIndex,
+      startDate: plan.startDate,
+      planKind: plan.planKind,
+      days: updatedDays
+    )
+    try? await cache.save(plan: updated, studentID: studentID)
+  }
+
+  private static func shiftError(from error: any Error) -> any Error {
+    PlanDayShiftError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
   }
 
   private static func currentWeekIndex(for plan: TrainingPlan) -> Int {
@@ -154,7 +203,8 @@ enum StudentPlanProjection {
       }
     return StudentPlanDay(
       id: day.id,
-      date: date(for: day, startDate: startDate),
+      date: scheduledDate(for: day, startDate: startDate),
+      shiftedToDate: day.shiftedToDate,
       exercises: exercises
     )
   }
@@ -173,7 +223,7 @@ enum StudentPlanProjection {
     )
   }
 
-  private static func date(for day: PlanDay, startDate: Date) -> Date {
+  private static func scheduledDate(for day: PlanDay, startDate: Date) -> Date {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
     let offset = (day.weekNumber - 1) * 7 + (day.dayOfWeek - 1)

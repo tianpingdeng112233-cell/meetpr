@@ -14,6 +14,7 @@ public struct TodayWorkoutView: View {
   /// training tab jumps back to today instead of whatever past/future day was
   /// last browsed here.
   private let jumpToTodayToken: Int
+  private let planRevision: Int
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -35,12 +36,14 @@ public struct TodayWorkoutView: View {
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
-    jumpToTodayToken: Int = 0
+    jumpToTodayToken: Int = 0,
+    planRevision: Int = 0
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.jumpToTodayToken = jumpToTodayToken
+    self.planRevision = planRevision
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
@@ -57,7 +60,8 @@ public struct TodayWorkoutView: View {
           studentID: studentID,
           selectedDate: $selectedDate,
           plans: plans,
-          logs: logs
+          logs: logs,
+          planRevision: planRevision
         )
         .padding(.horizontal)
         .padding(.top)
@@ -160,6 +164,9 @@ public struct TodayWorkoutView: View {
       if !Calendar.current.isDateInToday(selectedDate) {
         selectedDate = Date()
       }
+    }
+    .onChange(of: planRevision) { _, _ in
+      Task { await loadWorkout(for: selectedDate) }
     }
   }
 

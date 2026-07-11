@@ -57,6 +57,17 @@ struct MeetPRApp: App {
       )
     }
 
+    private static func makeDemoStudentLogs(
+      includeToday: Bool
+    ) -> InMemoryStudentTrainingLogRepository {
+      InMemoryStudentTrainingLogRepository(
+        seed: StudentDemoSeed.makeHistoricalLogs(
+          studentID: StudentDemoSeed.studentID,
+          includeToday: includeToday
+        )
+      )
+    }
+
     private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
       // Seed the student projection so the demo shows a real plan (today/week)
       // without a coach publish round-trip.
@@ -94,9 +105,7 @@ struct MeetPRApp: App {
           coachEvaluationSummaries: funnel.summaries,
           coachStudentProfiles: funnel.profiles,
           studentPlans: InMemoryStudentPlanRepository(store: planStore),
-          studentLogs: InMemoryStudentTrainingLogRepository(
-            seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
-          ),
+          studentLogs: makeDemoStudentLogs(includeToday: demoUser.role != .coachedStudent),
           studentFeedback: InMemoryStudentFeedbackRepository(
             seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
           ),

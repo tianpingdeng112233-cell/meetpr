@@ -47,13 +47,51 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
 
 public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
   public let id: UUID
-  public let date: Date
+  /// The coach-authored slot date before a one-day shift.
+  public let scheduledDate: Date
+  /// Backend override for this slot. Consumers use `date`, never this value,
+  /// for calendar placement and today checks.
+  public let shiftedToDate: Date?
   public let exercises: [StudentPlanExercise]
 
-  public init(id: UUID, date: Date, exercises: [StudentPlanExercise]) {
+  /// The single effective date used throughout the student and coach apps.
+  public var date: Date {
+    shiftedToDate ?? scheduledDate
+  }
+
+  public init(
+    id: UUID,
+    date: Date,
+    shiftedToDate: Date? = nil,
+    exercises: [StudentPlanExercise]
+  ) {
     self.id = id
-    self.date = date
+    self.scheduledDate = date
+    self.shiftedToDate = shiftedToDate
     self.exercises = exercises
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    id = try container.decode(UUID.self, forKey: .id)
+    scheduledDate = try container.decode(Date.self, forKey: .date)
+    shiftedToDate = try container.decodeIfPresent(Date.self, forKey: .shiftedToDate)
+    exercises = try container.decode([StudentPlanExercise].self, forKey: .exercises)
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(id, forKey: .id)
+    try container.encode(scheduledDate, forKey: .date)
+    try container.encodeIfPresent(shiftedToDate, forKey: .shiftedToDate)
+    try container.encode(exercises, forKey: .exercises)
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case id
+    case date
+    case shiftedToDate
+    case exercises
   }
 }
 
