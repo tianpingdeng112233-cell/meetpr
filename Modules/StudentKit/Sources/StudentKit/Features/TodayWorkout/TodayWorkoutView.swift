@@ -622,18 +622,16 @@ public struct TodayWorkoutView: View {
     if Calendar.current.isDate(date, inSameDayAs: selectedDate) {
       reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
     }
-    await presentReadinessIfNeeded(for: date)
+    await refreshReadinessStatus(for: date)
   }
 
-  private func presentReadinessIfNeeded(for date: Date) async {
-    guard Calendar.current.isDateInToday(date),
-      case .loaded(_, let drafts) = viewModel.state,
-      !drafts.isEmpty
-    else { return }
+  // Check-in is opt-in via the toolbar heart; the sheet must never
+  // auto-present (product call 2026-07-11 — coaches don't consume the data
+  // yet, and the every-session interruption outweighed it). Still load the
+  // gate so the heart reflects today's filed state.
+  private func refreshReadinessStatus(for date: Date) async {
+    guard Calendar.current.isDateInToday(date) else { return }
     await readinessViewModel.load(studentId: studentID)
-    if readinessViewModel.gate == .needed {
-      showingReadinessSheet = true
-    }
   }
 }
 
