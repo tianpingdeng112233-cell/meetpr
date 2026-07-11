@@ -8,14 +8,17 @@ import Testing
 @MainActor
 private func makeViewModel(
   now: Date = Date(timeIntervalSince1970: 1_768_262_400),
-  plan: StudentPlanView = StudentDemoSeed.makePlanView()
+  plan: StudentPlanView = StudentDemoSeed.makePlanView(),
+  restTimerSettings: (any StudentRestTimerSettingsStoring)? = nil
 ) async throws -> TodayWorkoutViewModel {
   let studentID = StudentDemoSeed.studentID
   let store = TestStudentPlanStore(seed: [studentID: plan])
+  let settings = try restTimerSettings ?? testRestTimerSettingsStore().store
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
     logs: InMemoryStudentTrainingLogRepository(),
     e1rm: InMemoryE1RMRepository(),
+    restTimerSettings: settings,
     now: { now }
   )
   await viewModel.load(date: Date(), studentID: studentID)
@@ -44,10 +47,13 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 }
 
 @MainActor
-@Test func completionEdgePrefersPrescribedRestSecondsOverAutoPolicy() async throws {
+@Test func completionEdgePrefersPrescribedRestSecondsOverStudentPreference() async throws {
   let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
   let plan = planReplacingFirstSet(restSeconds: 75)
-  let viewModel = try await makeViewModel(now: frozenNow, plan: plan)
+  let settings = try testRestTimerSettingsStore()
+  settings.store.setPreference(.fixed(seconds: 150), for: StudentDemoSeed.studentID)
+  let viewModel = try await makeViewModel(
+    now: frozenNow, plan: plan, restTimerSettings: settings.store)
 
   viewModel.updateRPE(rowIndex: 0, rpe: 10)
   await viewModel.toggleComplete(rowIndex: 0)
@@ -55,6 +61,37 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
   let timer = try #require(viewModel.restTimer)
   #expect(timer.totalSeconds == 75)
   #expect(timer.endsAt == frozenNow.addingTimeInterval(75))
+}
+
+@MainActor
+@Test func completionEdgeUsesStudentFixedPreferenceBeforeAutoPolicy() async throws {
+  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
+  let settings = try testRestTimerSettingsStore()
+  settings.store.setPreference(.fixed(seconds: 150), for: StudentDemoSeed.studentID)
+  let viewModel = try await makeViewModel(
+    now: frozenNow, restTimerSettings: settings.store)
+
+  viewModel.updateRPE(rowIndex: 0, rpe: 10)
+  await viewModel.toggleComplete(rowIndex: 0)
+
+  let timer = try #require(viewModel.restTimer)
+  #expect(timer.totalSeconds == 150)
+  #expect(timer.endsAt == frozenNow.addingTimeInterval(150))
+}
+
+@MainActor
+@Test func explanationIsAcknowledgedOnceAcrossViewModels() async throws {
+  let settings = try testRestTimerSettingsStore()
+  let firstViewModel = try await makeViewModel(restTimerSettings: settings.store)
+
+  await firstViewModel.toggleComplete(rowIndex: 0)
+  #expect(firstViewModel.showsRestTimerExplanation)
+  firstViewModel.acknowledgeRestTimerExplanation()
+  #expect(!firstViewModel.showsRestTimerExplanation)
+
+  let nextViewModel = try await makeViewModel(restTimerSettings: settings.store)
+  await nextViewModel.toggleComplete(rowIndex: 0)
+  #expect(!nextViewModel.showsRestTimerExplanation)
 }
 
 @MainActor
@@ -156,4 +193,13 @@ private func planReplacingFirstSet(restSeconds: Int?) -> StudentPlanView {
     planKind: plan.planKind,
     days: days
   )
+}
+
+private func testRestTimerSettingsStore() throws -> (
+  store: UserDefaultsRestTimerSettingsStore, defaults: UserDefaults
+) {
+  let suiteName = "test.student-rest-timer.\(UUID().uuidString)"
+  let defaults = try #require(UserDefaults(suiteName: suiteName))
+  defaults.removePersistentDomain(forName: suiteName)
+  return (UserDefaultsRestTimerSettingsStore(defaults: defaults), defaults)
 }

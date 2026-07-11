@@ -22,6 +22,7 @@ public final class TodayWorkoutViewModel {
   public private(set) var state: State = .idle
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
   public private(set) var restTimer: RestTimerState?
+  public private(set) var showsRestTimerExplanation = false
   public private(set) var planContext: TodayWorkoutPlanContext?
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
   public private(set) var actionErrorMessage: String?
@@ -29,6 +30,7 @@ public final class TodayWorkoutViewModel {
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rmRepo: any E1RMRepository
+  private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
@@ -37,11 +39,14 @@ public final class TodayWorkoutViewModel {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
+    restTimerSettings: any StudentRestTimerSettingsStoring =
+      UserDefaultsRestTimerSettingsStore(),
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.logs = logs
     self.e1rmRepo = e1rm
+    self.restTimerSettings = restTimerSettings
     self.now = now
   }
 
@@ -191,15 +196,28 @@ public final class TodayWorkoutViewModel {
     restTimer = nil
   }
 
+  public func acknowledgeRestTimerExplanation() {
+    guard let currentStudentID else { return }
+    restTimerSettings.markExplanationAcknowledged(for: currentStudentID)
+    showsRestTimerExplanation = false
+  }
+
   private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
     guard !drafts.allSatisfy(\.completed) else {
       restTimer = nil
       return
     }
     let seconds =
-      draft.prescribed.restSeconds ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
+      draft.prescribed.restSeconds
+      ?? currentStudentID.flatMap { restTimerSettings.preference(for: $0).fixedSeconds }
+      ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
     restTimer = RestTimerState(
       endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
+    if let currentStudentID,
+      !restTimerSettings.hasAcknowledgedExplanation(for: currentStudentID)
+    {
+      showsRestTimerExplanation = true
+    }
   }
 
   public func exerciseName(for exerciseId: UUID) -> String? {

@@ -16,6 +16,7 @@ public struct StudentRootView: View {
   private let onboarding: any OnboardingRepository
   private let onLogout: (@MainActor () async -> Void)?
   private let account: (any AccountRepository)?
+  private let restTimerSettings: any StudentRestTimerSettingsStoring
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
@@ -64,7 +65,9 @@ public struct StudentRootView: View {
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
-    account: (any AccountRepository)? = nil
+    account: (any AccountRepository)? = nil,
+    restTimerSettings: any StudentRestTimerSettingsStoring =
+      UserDefaultsRestTimerSettingsStore()
   ) {
     self.studentID = studentID
     self.canShiftPlanDays = canShiftPlanDays
@@ -75,6 +78,7 @@ public struct StudentRootView: View {
     self.videoUploads = videoUploads ?? .demo()
     self.onLogout = onLogout
     self.account = account
+    self.restTimerSettings = restTimerSettings
     self.onboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
@@ -121,7 +125,8 @@ public struct StudentRootView: View {
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads, jumpToTodayToken: trainingJumpToken,
+        restTimerSettings: restTimerSettings, videoUploads: videoUploads,
+        jumpToTodayToken: trainingJumpToken,
         planRevision: planRevision
       )
       .tag(StudentTab.training)
@@ -148,7 +153,8 @@ public struct StudentRootView: View {
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
         account: account,
-        logs: logs
+        logs: logs,
+        restTimerSettings: restTimerSettings
       )
       .tag(StudentTab.profile)
       .tabItem {
