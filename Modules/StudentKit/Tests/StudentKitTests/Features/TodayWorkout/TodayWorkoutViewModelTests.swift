@@ -282,3 +282,43 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
   }
   #expect(viewModel.actionErrorMessage == nil)
 }
+
+@MainActor
+@Test func todayWorkoutViewModelMapsExpiredSessionDuringLoadToLoginMessage() async {
+  let viewModel = TodayWorkoutViewModel(
+    plans: ThrowingStudentPlanRepository { SessionStateReaderError.authenticationExpired },
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(date: Date(), studentID: UUID())
+
+  #expect(viewModel.state == .error("登录已过期，请重新登录"))
+}
+
+@MainActor
+@Test func todayWorkoutViewModelMapsGenericLoadFailureToRetryMessage() async {
+  let viewModel = TodayWorkoutViewModel(
+    plans: ThrowingStudentPlanRepository { APIError.httpStatus(500, Data()) },
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(date: Date(), studentID: UUID())
+
+  #expect(viewModel.state == .error("操作失败，请稍后重试"))
+}
+
+@MainActor
+@Test func todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage() async {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: ThrowingTrainingLogRepository { SessionStateReaderError.authenticationExpired }
+  )
+
+  await viewModel.load(date: plan.days[0].date, studentID: studentID)
+  await viewModel.toggleComplete(rowIndex: 0)
+
+  #expect(viewModel.actionErrorMessage == "登录已过期，请重新登录")
+}

@@ -51,7 +51,7 @@ public enum AuthRepositoryError: Error, Sendable, Equatable {
 
   public var clearsBootstrapSession: Bool {
     switch self {
-    case .backend(401, .invalidRefresh, _), .backend(401, .refreshExpired, _):
+    case .backend(401, _, _):
       true
     case .backend, .decoding, .network, .server:
       false

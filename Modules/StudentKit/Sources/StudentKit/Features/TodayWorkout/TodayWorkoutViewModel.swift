@@ -70,7 +70,7 @@ public final class TodayWorkoutViewModel {
       state = .loaded(plan: day, drafts: drafts)
     } catch {
       guard isCurrentLoad(generation) else { return }
-      state = error.isTaskCancellation ? .idle : .error(error.localizedDescription)
+      state = error.isTaskCancellation ? .idle : .error(Self.loadErrorMessage(for: error))
     }
   }
 
