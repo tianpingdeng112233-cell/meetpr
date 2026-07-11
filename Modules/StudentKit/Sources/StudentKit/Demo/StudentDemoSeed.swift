@@ -15,10 +15,10 @@ public enum StudentDemoSeed {
     updatedAt: referenceDate
   )
 
-  public static let referenceDate = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-12
+  public static let referenceDate = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-13
 
-  public static func makePlanView(weekIndex: Int = 1) -> StudentPlanView {
-    let startDate = demoCycleStart().addingTimeInterval(
+  public static func makePlanView(weekIndex: Int = 1, today: Date = Date()) -> StudentPlanView {
+    let startDate = demoCycleStart(today: today).addingTimeInterval(
       Double(max(0, weekIndex - 1)) * 7 * 86_400)
     let days = (0..<7).map { offset in
       let date = startDate.addingTimeInterval(Double(offset) * 86_400)
@@ -265,9 +265,9 @@ public enum StudentDemoSeed {
   /// i.e. the week began three days ago. This keeps the 锻炼 tab on a real workout
   /// whenever the demo is launched, while leaving genuine *past* training days
   /// (深蹲, 卧推) for 历史/仪表盘 to show — and never seeding future logs.
-  private static func demoCycleStart() -> Date {
+  private static func demoCycleStart(today: Date) -> Date {
     let calendar = utcCalendar
-    let startOfToday = calendar.startOfDay(for: Date())
+    let startOfToday = calendar.startOfDay(for: today)
     return calendar.date(byAdding: .day, value: -3, to: startOfToday) ?? startOfToday
   }
 
