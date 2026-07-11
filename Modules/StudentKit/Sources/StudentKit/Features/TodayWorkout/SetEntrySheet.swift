@@ -116,7 +116,13 @@ struct SetEntrySheet: View {
                 studentID: studentID,
                 videoViewModel: videoViewModel,
                 initialSetLogID: draft.loggedSetID,
-                resolveSetLogID: { await viewModel.ensureLoggedSetID(rowIndex: rowIndex) }
+                resolveSetLogID: {
+                  // Attaching to an unlogged set persists it to mint a set-log
+                  // id — flush the typed numbers first, or the stale draft
+                  // wipes them and logs prescribed values (beta 2026-07-11).
+                  syncDraftEdits()
+                  return await viewModel.ensureLoggedSetID(rowIndex: rowIndex)
+                }
               )
             }
           }
@@ -282,21 +288,30 @@ struct SetEntrySheet: View {
     .buttonStyle(.plain)
   }
 
-  private func save(failed: Bool) {
+}
+
+// MARK: - Draft persistence
+extension SetEntrySheet {
+  /// Push the sheet's current field values into the view model draft; both
+  /// save() and the video-attach path need the draft current before persist.
+  fileprivate func syncDraftEdits() {
+    viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
+    viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
+    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpeValue)
+  }
+
+  fileprivate func save(failed: Bool) {
     // Parse + clamp the current field text here (not while typing), so a
     // multi-digit value like "10" RPE is never truncated mid-keystroke and the
     // saved value is always what the field currently shows.
     focusedField = nil
-    viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
-    viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
-    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpeValue)
+    syncDraftEdits()
     Task {
       if await viewModel.commitSet(rowIndex: rowIndex, failed: failed) {
         dismiss()
       }
     }
   }
-
 }
 
 private struct SetEntryErrorAlert: ViewModifier {
