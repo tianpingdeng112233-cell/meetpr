@@ -161,6 +161,9 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: selectedDate) { _, newDate in
+      // The open editor belongs to the day being left — a stale rowIndex
+      // against reloaded drafts would edit the wrong set.
+      editing = nil
       Task { await loadWorkout(for: newDate) }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
@@ -169,6 +172,7 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: planRevision) { _, _ in
+      editing = nil
       Task { await loadWorkout(for: selectedDate) }
     }
   }

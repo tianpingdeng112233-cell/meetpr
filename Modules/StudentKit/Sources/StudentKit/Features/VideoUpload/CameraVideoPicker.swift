@@ -5,11 +5,15 @@
 
   /// UIImagePickerController wrapper for in-app video capture (spec 027).
   /// Caps recording at `maxDurationSeconds` — the picker stops automatically.
+  ///
+  /// Closes by flipping the presenting binding, NOT `@Environment(\.dismiss)`:
+  /// this cover is hosted by the set-entry sheet, and an environment dismiss
+  /// racing the picker's own teardown can pop the sheet itself — the sheet
+  /// then re-presents with reset fields (beta 2026-07-11, 拍摄 path).
   struct CameraVideoPicker: UIViewControllerRepresentable {
     let maxDurationSeconds: TimeInterval
+    @Binding var isPresented: Bool
     let onPicked: (URL) -> Void
-
-    @Environment(\.dismiss) private var dismiss
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
       let picker = UIImagePickerController()
@@ -25,18 +29,18 @@
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-      Coordinator(onPicked: onPicked, dismiss: { dismiss() })
+      Coordinator(onPicked: onPicked, close: { isPresented = false })
     }
 
     final class Coordinator: NSObject, UIImagePickerControllerDelegate,
       UINavigationControllerDelegate
     {
       private let onPicked: (URL) -> Void
-      private let dismiss: () -> Void
+      private let close: () -> Void
 
-      init(onPicked: @escaping (URL) -> Void, dismiss: @escaping () -> Void) {
+      init(onPicked: @escaping (URL) -> Void, close: @escaping () -> Void) {
         self.onPicked = onPicked
-        self.dismiss = dismiss
+        self.close = close
       }
 
       func imagePickerController(
@@ -46,11 +50,11 @@
         if let url = info[.mediaURL] as? URL {
           onPicked(url)
         }
-        dismiss()
+        close()
       }
 
       func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss()
+        close()
       }
     }
   }

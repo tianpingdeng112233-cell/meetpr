@@ -56,9 +56,15 @@ struct SetEntrySheet: View {
     self.studentID = studentID
     self.videoViewModel = videoViewModel
     self.scrollToVideo = scrollToVideo
-    let weight = draft.actualWeight ?? draft.prescribed.weightKg ?? 0
-    let reps = draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0
-    let rpe = draft.actualRPE ?? draft.prescribed.rpe ?? 8
+    // Seed from the live draft, not the open-time snapshot: if presentation
+    // churn (e.g. the camera cover) recreates this sheet, flushed edits must
+    // reappear instead of the stale prescribed values (beta 2026-07-11).
+    // Matched by stable id, never by index — after a day switch the same
+    // index can belong to a different set entirely.
+    let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
+    let weight = seed.actualWeight ?? seed.prescribed.weightKg ?? 0
+    let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
+    let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
     _weightText = State(initialValue: SetEntryValue.text(weight))
     _repsText = State(initialValue: "\(reps)")
     _rpeText = State(initialValue: SetEntryValue.text(rpe))
@@ -115,14 +121,18 @@ struct SetEntrySheet: View {
               VideoAttachmentSection(
                 studentID: studentID,
                 videoViewModel: videoViewModel,
-                initialSetLogID: draft.loggedSetID,
+                initialSetLogID: liveDraft.loggedSetID,
                 resolveSetLogID: {
                   // Attaching to an unlogged set persists it to mint a set-log
                   // id — flush the typed numbers first, or the stale draft
                   // wipes them and logs prescribed values (beta 2026-07-11).
                   syncDraftEdits()
                   return await viewModel.ensureLoggedSetID(rowIndex: rowIndex)
-                }
+                },
+                // Flush on 拍摄/相册 tap too: the camera cover's dismissal can
+                // recreate this sheet, and the reseed above only helps if the
+                // values are already in the draft by then.
+                onWillPick: { syncDraftEdits() }
               )
             }
           }
@@ -292,6 +302,12 @@ struct SetEntrySheet: View {
 
 // MARK: - Draft persistence
 extension SetEntrySheet {
+  /// The current view-model draft for this set, matched by stable id; falls
+  /// back to the open-time snapshot when the set is no longer on screen.
+  fileprivate var liveDraft: TodayWorkoutViewModel.SetRowDraft {
+    viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
+  }
+
   /// Push the sheet's current field values into the view model draft; both
   /// save() and the video-attach path need the draft current before persist.
   fileprivate func syncDraftEdits() {
