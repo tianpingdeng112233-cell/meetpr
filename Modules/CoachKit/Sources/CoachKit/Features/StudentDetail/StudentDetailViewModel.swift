@@ -51,12 +51,6 @@ struct StudentExecutionDay: Hashable, Identifiable, Sendable {
     return "\(completedSetCount)/\(plannedSetCount) 组"
   }
 
-  var shiftDescription: String? {
-    guard let planDay, planDay.shiftedToDate != nil else { return nil }
-    return
-      "已顺延 \(CoachStudentFormatting.shortDateText(planDay.scheduledDate))"
-      + "→\(CoachStudentFormatting.shortDateText(planDay.date))"
-  }
 }
 
 /// Coach-side view of the student's readiness check-in for today (spec 030
@@ -115,6 +109,11 @@ final class StudentDetailViewModel {
 
   var allPlanExercises: [StudentPlanExercise] {
     plannedDays.flatMap(\.exercises)
+  }
+
+  var planShiftBadgeText: String? {
+    guard let totalShiftDays = plan?.totalShiftDays, totalShiftDays > 0 else { return nil }
+    return "已顺延 \(totalShiftDays) 天"
   }
 
   @ObservationIgnored private let plans: any StudentPlanRepository

@@ -32,6 +32,7 @@ public final class TodayWorkoutViewModel {
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
+  private var pendingPersist: Task<Bool, Never>?
 
   public init(
     plans: any StudentPlanRepository,
@@ -70,7 +71,7 @@ public final class TodayWorkoutViewModel {
       state = .loaded(plan: day, drafts: drafts)
     } catch {
       guard isCurrentLoad(generation) else { return }
-      state = error.isTaskCancellation ? .idle : .error(error.localizedDescription)
+      state = error.isTaskCancellation ? .idle : .error(Self.loadErrorMessage(for: error))
     }
   }
 
@@ -120,7 +121,9 @@ public final class TodayWorkoutViewModel {
     guard await persist(rowIndex: rowIndex, completed: draft.completed, failed: draft.failed) else {
       return nil
     }
-    guard case .loaded(_, let updated) = state, updated.indices.contains(rowIndex) else {
+    // currentDrafts, not `case .loaded`: a chained follow-up persist may have
+    // already flipped state to .recording by the time this continuation runs.
+    guard let updated = currentDrafts, updated.indices.contains(rowIndex) else {
       return nil
     }
     return updated[rowIndex].loggedSetID
@@ -130,7 +133,9 @@ public final class TodayWorkoutViewModel {
     actionErrorMessage = nil
   }
 
-  private func persist(rowIndex: Int, completed: Bool, failed: Bool = false) async -> Bool {
+  private func performPersist(
+    rowIndex: Int, completed: Bool, failed: Bool, generation: Int
+  ) async -> Bool {
     guard let studentID = currentStudentID else {
       actionErrorMessage = "无法确认当前学员，请重新进入训练页后重试。"
       return false
@@ -159,19 +164,31 @@ public final class TodayWorkoutViewModel {
     do {
       let previouslyCompleted = drafts[rowIndex].completed
       let persisted = try await logs.recordSet(log)
+      // The page moved to another day while recordSet was in flight: the log
+      // is safely on the server and the reload owns state — don't merge a
+      // stale day's flags into the new day's drafts.
+      guard isCurrentLoad(generation) else { return true }
+      // Merge into the latest drafts: field syncs may have landed while
+      // recordSet was in flight; restoring the captured array would drop them.
+      var latestDrafts = currentDrafts ?? nextDrafts
+      draft = latestDrafts.indices.contains(rowIndex) ? latestDrafts[rowIndex] : draft
       draft.completed = completed
       draft.failed = failed
       draft.loggedSetID = persisted.id
-      nextDrafts[rowIndex] = draft
-      state = .loaded(plan: plan, drafts: nextDrafts)
+      if latestDrafts.indices.contains(rowIndex) {
+        latestDrafts[rowIndex] = draft
+      }
+      state = .loaded(plan: plan, drafts: latestDrafts)
 
       if !previouslyCompleted, completed {
         await recordE1RMPoint(for: draft, log: persisted, studentID: studentID)
-        startRestTimer(after: draft, drafts: nextDrafts)
+        startRestTimer(after: draft, drafts: latestDrafts)
       }
       return true
     } catch {
-      state = .loaded(plan: plan, drafts: drafts)
+      if isCurrentLoad(generation) {
+        state = .loaded(plan: plan, drafts: currentDrafts ?? drafts)
+      }
       if !error.isTaskCancellation {
         actionErrorMessage = Self.recordingErrorMessage(for: error)
       }
@@ -308,40 +325,6 @@ extension TodayWorkoutViewModel {
     }
   }
 
-  static func makeDrafts(
-    for day: StudentPlanDay,
-    existingLogs: [StudentSetLog]
-  ) -> [SetRowDraft] {
-    day.exercises.flatMap { exercise in
-      exercise.prescribedSets.map { set in
-        makeDraft(exercise: exercise, set: set, existingLogs: existingLogs)
-      }
-    }
-  }
-
-  static func makeDraft(
-    exercise: StudentPlanExercise,
-    set: PrescribedSet,
-    existingLogs: [StudentSetLog]
-  ) -> SetRowDraft {
-    let existingLog = existingLogs.first {
-      $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
-    }
-    return SetRowDraft(
-      id: set.id,
-      planExerciseID: exercise.id,
-      exerciseID: exercise.exercise.id,
-      exerciseName: exercise.exercise.name,
-      prescribed: set,
-      actualWeight: existingLog?.weightKg ?? set.weightKg,
-      actualReps: existingLog?.reps ?? set.reps,
-      actualRPE: existingLog?.rpe ?? set.rpe ?? 8,
-      completed: existingLog?.completed ?? false,
-      failed: existingLog?.failed ?? false,
-      loggedSetID: existingLog?.id
-    )
-  }
-
   func recordE1RMPoint(
     for draft: SetRowDraft,
     log: StudentSetLog,
@@ -377,5 +360,33 @@ extension TodayWorkoutViewModel {
     return day?.exercises
       .first { $0.id == planExerciseID }?
       .exercise.mainLiftFamily
+  }
+}
+
+// MARK: - Persist serialization
+extension TodayWorkoutViewModel {
+  /// The entry sheet stays alive across persists (single render branch), so a
+  /// video attach and 完成本组 can overlap — chain persists so completions
+  /// apply in submission order instead of racing.
+  fileprivate func persist(rowIndex: Int, completed: Bool, failed: Bool = false) async -> Bool {
+    let previous = pendingPersist
+    // Queued work is only valid for the day it was submitted against: a day
+    // switch reloads drafts and rowIndex would address the wrong set.
+    let generation = loadGeneration
+    let task = Task { [weak self] in
+      _ = await previous?.value
+      guard let self, self.isCurrentLoad(generation) else { return false }
+      return await self.performPersist(
+        rowIndex: rowIndex, completed: completed, failed: failed, generation: generation)
+    }
+    pendingPersist = task
+    return await task.value
+  }
+
+  var currentDrafts: [SetRowDraft]? {
+    switch state {
+    case .loaded(_, let drafts), .recording(_, let drafts, _): drafts
+    default: nil
+    }
   }
 }

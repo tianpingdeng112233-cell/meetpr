@@ -7,23 +7,33 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
   public let cycleID: UUID
   public let weekIndex: Int
   public let startDate: Date
+  /// Coach-authored cycle end before plan-level shifts are applied.
+  public let endDate: Date?
   /// `.regular` when absent — pre-033 cached projections carry no kind.
   /// Drives the student dashboard "教练正在为你排第一份正式计划" row
   /// (spec 033 §12): an adaptation-week plan is not the first regular plan.
   public let planKind: PlanKind
+  public let totalShiftDays: Int
+  public let latestShiftCreatedAt: Date?
   public let days: [StudentPlanDay]
 
   public init(
     cycleID: UUID,
     weekIndex: Int,
     startDate: Date,
+    endDate: Date? = nil,
     planKind: PlanKind = .regular,
+    totalShiftDays: Int = 0,
+    latestShiftCreatedAt: Date? = nil,
     days: [StudentPlanDay]
   ) {
     self.cycleID = cycleID
     self.weekIndex = weekIndex
     self.startDate = startDate
+    self.endDate = endDate
     self.planKind = planKind
+    self.totalShiftDays = totalShiftDays
+    self.latestShiftCreatedAt = latestShiftCreatedAt
     self.days = days
   }
 
@@ -32,7 +42,10 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
     cycleID = try container.decode(UUID.self, forKey: .cycleID)
     weekIndex = try container.decode(Int.self, forKey: .weekIndex)
     startDate = try container.decode(Date.self, forKey: .startDate)
+    endDate = try container.decodeIfPresent(Date.self, forKey: .endDate)
     planKind = try container.decodeIfPresent(PlanKind.self, forKey: .planKind) ?? .regular
+    totalShiftDays = try container.decodeIfPresent(Int.self, forKey: .totalShiftDays) ?? 0
+    latestShiftCreatedAt = try container.decodeIfPresent(Date.self, forKey: .latestShiftCreatedAt)
     days = try container.decode([StudentPlanDay].self, forKey: .days)
   }
 
@@ -40,7 +53,10 @@ public struct StudentPlanView: Codable, Hashable, Sendable {
     case cycleID = "cycleId"
     case weekIndex
     case startDate
+    case endDate
     case planKind
+    case totalShiftDays
+    case latestShiftCreatedAt
     case days
   }
 }

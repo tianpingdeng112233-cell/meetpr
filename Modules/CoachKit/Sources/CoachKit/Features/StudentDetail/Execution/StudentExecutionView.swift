@@ -5,24 +5,36 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct StudentExecutionView: View {
   let days: [StudentExecutionDay]
+  let shiftBadgeText: String?
 
   var body: some View {
-    if days.isEmpty {
-      ContentUnavailableView("暂无执行记录", systemImage: "list.bullet.rectangle")
-        .background(Color.MeetPR.bg)
-    } else {
-      List {
-        ForEach(days) { day in
-          NavigationLink {
-            CoachDayDetailView(day: day)
-          } label: {
-            StudentExecutionDayRow(day: day)
+    VStack(spacing: 0) {
+      if let shiftBadgeText {
+        HStack {
+          StatusBadge(status: .pending, title: shiftBadgeText)
+          Spacer()
+        }
+        .padding(.horizontal, MeetPRSpacing.base)
+        .padding(.bottom, MeetPRSpacing.sm)
+      }
+
+      if days.isEmpty {
+        ContentUnavailableView("暂无执行记录", systemImage: "list.bullet.rectangle")
+          .background(Color.MeetPR.bg)
+      } else {
+        List {
+          ForEach(days) { day in
+            NavigationLink {
+              CoachDayDetailView(day: day)
+            } label: {
+              StudentExecutionDayRow(day: day)
+            }
           }
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.MeetPR.bg)
       }
-      .listStyle(.plain)
-      .scrollContentBackground(.hidden)
-      .background(Color.MeetPR.bg)
     }
   }
 }
@@ -51,11 +63,6 @@ private struct StudentExecutionDayRow: View {
         Text(day.completionText)
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
-        if let shiftDescription = day.shiftDescription {
-          Text(shiftDescription)
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.amber)
-        }
       }
 
       Spacer()

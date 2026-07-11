@@ -32,6 +32,7 @@ public enum StudentDemoSeed {
       cycleID: uuid(301),
       weekIndex: weekIndex,
       startDate: startDate,
+      endDate: startDate.addingTimeInterval(6 * 86_400),
       days: days
     )
   }
