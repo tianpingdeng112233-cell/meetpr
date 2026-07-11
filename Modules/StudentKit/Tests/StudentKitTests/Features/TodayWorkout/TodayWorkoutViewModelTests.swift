@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Testing
 
 @testable import StudentKit
@@ -187,10 +188,55 @@ import Testing
   await viewModel.load(date: plan.days[0].date, studentID: studentID)
   await viewModel.toggleComplete(rowIndex: 0)
 
-  guard case .error = viewModel.state else {
-    Issue.record("Expected error state")
-    return
-  }
+  #expect(viewModel.state == .error("操作失败,请稍后重试"))
+}
+
+@MainActor
+@Test(
+  arguments: [
+    SessionStateReaderError.authenticationExpired,
+    .missingAccessToken,
+    .missingCurrentUser,
+  ])
+func todayWorkoutViewModelMapsSessionErrorsDuringLoadToLoginMessage(
+  error: SessionStateReaderError
+) async {
+  let viewModel = TodayWorkoutViewModel(
+    plans: ThrowingStudentPlanRepository { error },
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(date: Date(), studentID: UUID())
+
+  #expect(viewModel.state == .error("登录已过期,请重新登录"))
+}
+
+@MainActor
+@Test func todayWorkoutViewModelMapsUnauthorizedAPIResponseToLoginMessage() async {
+  let viewModel = TodayWorkoutViewModel(
+    plans: ThrowingStudentPlanRepository { APIError.authInvalid },
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(date: Date(), studentID: UUID())
+
+  #expect(viewModel.state == .error("登录已过期,请重新登录"))
+}
+
+@MainActor
+@Test func todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage() async {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: ThrowingTrainingLogRepository { SessionStateReaderError.authenticationExpired }
+  )
+
+  await viewModel.load(date: plan.days[0].date, studentID: studentID)
+  await viewModel.toggleComplete(rowIndex: 0)
+
+  #expect(viewModel.state == .error("登录已过期,请重新登录"))
 }
 
 /// Regression for the "cancelled" bug on the mutation path: `persist` flips to
