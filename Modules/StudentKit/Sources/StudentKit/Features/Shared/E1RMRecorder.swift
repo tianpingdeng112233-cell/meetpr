@@ -43,35 +43,27 @@ struct E1RMRecorder: Sendable {
       return nil
     }
 
-    let point = makePoint(
-      input: input,
-      estimatedOneRepMaxKg: estimatedOneRepMaxKg,
-      sourceWeightKg: weight,
-      sourceRPE: rpe
-    )
-
     do {
-      // Read the baseline before insertion. Reapplying eligibility prevents
-      // legacy low-RPE/high-rep points from permanently raising the PR bar.
-      let previousMax = try await previousEligibleMax(for: input)
+      // Read the baseline before insertion. Reapplying eligibility and trust
+      // filters prevents legacy-invalid or quarantined points raising the bar.
+      let previousMax = try await previousTrustedMax(for: input)
+      let verdict = E1RMPolicy.anomalyVerdict(
+        newE1RMKg: estimatedOneRepMaxKg,
+        previousBestKg: previousMax
+      )
+      let point = makePoint(
+        input: input,
+        estimatedOneRepMaxKg: estimatedOneRepMaxKg,
+        sourceWeightKg: weight,
+        sourceRPE: rpe,
+        confidence: verdict == .normal ? .normal : .low
+      )
       try await e1rm.recordPoint(point)
 
-      let baseline = previousMax ?? 0
-      let noiseBand = E1RMPolicy.prNoiseBand(previousBestKg: baseline)
-      guard estimatedOneRepMaxKg > baseline + noiseBand else { return nil }
-
-      let event = PRBreakthroughEvent(
-        id: UUID(),
-        studentId: input.studentID,
-        exerciseId: input.exerciseID,
-        pointId: point.id,
-        breakthroughE1RMKg: estimatedOneRepMaxKg,
-        previousMaxE1RMKg: baseline,
-        occurredAt: point.computedAt,
-        acknowledgedAt: nil
-      )
-      try await e1rm.recordPR(event)
-      return event
+      // Phase 1 persists both anomaly bands as `.low`; Phase 2 will confirm
+      // hard suspects before they can become trusted.
+      guard verdict == .normal else { return nil }
+      return try await recordPRIfCleared(point: point, previousMax: previousMax)
     } catch {
       return nil
     }
@@ -81,7 +73,8 @@ struct E1RMRecorder: Sendable {
     input: Input,
     estimatedOneRepMaxKg: Double,
     sourceWeightKg: Double,
-    sourceRPE: Double?
+    sourceRPE: Double?,
+    confidence: E1RMConfidence
   ) -> E1RMHistoryPoint {
     E1RMHistoryPoint(
       id: UUID(),
@@ -92,17 +85,40 @@ struct E1RMRecorder: Sendable {
       e1RMKg: estimatedOneRepMaxKg,
       sourceWeightKg: sourceWeightKg,
       sourceReps: input.reps,
-      sourceRPE: sourceRPE
+      sourceRPE: sourceRPE,
+      confidence: confidence
     )
   }
 
-  private func previousEligibleMax(for input: Input) async throws -> Double? {
+  private func previousTrustedMax(for input: Input) async throws -> Double? {
     let history = try await e1rm.fetchHistory(
       studentId: input.studentID,
       exerciseId: input.exerciseID
     )
-    return E1RMSeries.eligibleRaw(points: history, family: input.family)
+    return E1RMSeries.trustedEligibleRaw(points: history, family: input.family)
       .map(\.e1RMKg)
       .max()
+  }
+
+  private func recordPRIfCleared(
+    point: E1RMHistoryPoint,
+    previousMax: Double?
+  ) async throws -> PRBreakthroughEvent? {
+    let baseline = previousMax ?? 0
+    let noiseBand = E1RMPolicy.prNoiseBand(previousBestKg: baseline)
+    guard point.e1RMKg > baseline + noiseBand else { return nil }
+
+    let event = PRBreakthroughEvent(
+      id: UUID(),
+      studentId: point.studentId,
+      exerciseId: point.exerciseId,
+      pointId: point.id,
+      breakthroughE1RMKg: point.e1RMKg,
+      previousMaxE1RMKg: baseline,
+      occurredAt: point.computedAt,
+      acknowledgedAt: nil
+    )
+    try await e1rm.recordPR(event)
+    return event
   }
 }

@@ -9,7 +9,8 @@ public protocol E1RMRepository: Sendable {
   func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint]
   func fetchHistory(studentId: UUID, exerciseIds: [UUID]) async throws -> [UUID:
     [E1RMHistoryPoint]]
-  /// Maximum e1RM strictly before `before` — the PR-detection baseline.
+  /// Maximum e1RM over prior `.normal` points strictly before `before`.
+  /// Quarantined points must never raise the PR-detection baseline.
   func maxBefore(studentId: UUID, exerciseId: UUID, before: Date) async throws -> Double?
 
   func recordPR(_ event: PRBreakthroughEvent) async throws

@@ -10,7 +10,8 @@ private func point(
   exerciseId: UUID,
   daysAgo: Double,
   e1RM: Double,
-  anchor: Date = Date(timeIntervalSince1970: 1_768_262_400)
+  anchor: Date = Date(timeIntervalSince1970: 1_768_262_400),
+  confidence: E1RMConfidence = .normal
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
     id: UUID(),
@@ -21,7 +22,8 @@ private func point(
     e1RMKg: e1RM,
     sourceWeightKg: 100,
     sourceReps: 5,
-    sourceRPE: 8
+    sourceRPE: 8,
+    confidence: confidence
   )
 }
 
@@ -88,6 +90,41 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
     let max = try await repo.maxBefore(
       studentId: student, exerciseId: squat, before: atAnchor.computedAt)
     #expect(max == 132, "\(label)")
+  }
+}
+
+@Test func maxBeforeExcludesQuarantinedPointsWithoutDeletingThem() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let squat = UUID()
+    let anchor = Date(timeIntervalSince1970: 1_768_262_400)
+    let trusted = point(
+      studentId: student,
+      exerciseId: squat,
+      daysAgo: 2,
+      e1RM: 200,
+      anchor: anchor
+    )
+    let quarantined = point(
+      studentId: student,
+      exerciseId: squat,
+      daysAgo: 1,
+      e1RM: 350,
+      anchor: anchor,
+      confidence: .low
+    )
+    try await repo.recordPoint(trusted)
+    try await repo.recordPoint(quarantined)
+
+    let max = try await repo.maxBefore(
+      studentId: student,
+      exerciseId: squat,
+      before: anchor
+    )
+    let history = try await repo.fetchHistory(studentId: student, exerciseId: squat)
+
+    #expect(max == 200, "\(label): quarantined point is not a baseline")
+    #expect(history.map(\.id).contains(quarantined.id), "\(label): quarantined data remains stored")
   }
 }
 

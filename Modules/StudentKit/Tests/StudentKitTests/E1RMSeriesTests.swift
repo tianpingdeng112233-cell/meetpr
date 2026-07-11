@@ -12,7 +12,8 @@ private func seriesPoint(
   daysAgo: Int,
   e1RM: Double,
   reps: Int = 5,
-  rpe: Double? = 8
+  rpe: Double? = 8,
+  confidence: E1RMConfidence = .normal
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
     id: UUID(),
@@ -23,7 +24,8 @@ private func seriesPoint(
     e1RMKg: e1RM,
     sourceWeightKg: e1RM * 0.85,
     sourceReps: reps,
-    sourceRPE: rpe
+    sourceRPE: rpe,
+    confidence: confidence
   )
 }
 
@@ -89,4 +91,34 @@ private func seriesPoint(
   )
 
   #expect(series.currentKg == 190)
+}
+
+@Test func lowConfidenceSpikeIsOnlyKeptAsRawScatter() {
+  let series = E1RMSeries.build(
+    points: [
+      seriesPoint(daysAgo: 10, e1RM: 180),
+      seriesPoint(daysAgo: 5, e1RM: 178),
+      seriesPoint(daysAgo: 1, e1RM: 320, reps: 3, rpe: 8.5, confidence: .low),
+    ],
+    family: .squat
+  )
+
+  #expect(series.currentKg == 180)
+  #expect(series.best?.valueKg == 180)
+  #expect(series.last?.valueKg == 178)
+  #expect(series.rawEligible.count == 3)
+  #expect(series.rawEligible.contains { $0.valueKg == 320 })
+}
+
+@Test func smoothedHistoryExcludesLowConfidenceSpike() {
+  let history = E1RMSeries.smoothedHistory(
+    points: [
+      seriesPoint(daysAgo: 10, e1RM: 180),
+      seriesPoint(daysAgo: 1, e1RM: 320, reps: 3, rpe: 8.5, confidence: .low),
+    ],
+    family: .squat
+  )
+
+  #expect(history.count == 1)
+  #expect(history.first?.e1RMKg == 180)
 }

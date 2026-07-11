@@ -60,7 +60,8 @@ public actor LocalE1RMRepository: E1RMRepository {
   ) async throws -> Double? {
     try loadPoints()
       .filter {
-        $0.studentId == studentId && $0.exerciseId == exerciseId && $0.computedAt < before
+        $0.studentId == studentId && $0.exerciseId == exerciseId
+          && $0.computedAt < before && $0.confidence == .normal
       }
       .map(\.e1RMKg).max()
   }

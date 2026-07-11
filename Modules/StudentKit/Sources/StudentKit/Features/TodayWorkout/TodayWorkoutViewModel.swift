@@ -288,7 +288,7 @@ extension TodayWorkoutViewModel {
         group.addTask {
           let points = try await e1rmRepo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
           let selected = lastAndBest(
-            from: E1RMSeries.eligibleRaw(points: points, family: family)
+            from: E1RMSeries.trustedEligibleRaw(points: points, family: family)
           )
           let reference = ExerciseReference(
             last: selected.last.map(ExerciseReferenceSet.init(point:)),

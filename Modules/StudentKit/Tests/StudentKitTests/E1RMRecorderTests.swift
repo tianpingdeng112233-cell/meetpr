@@ -19,7 +19,8 @@ private func makeRecorder(
 private func recorderPoint(
   e1RM: Double,
   reps: Int = 1,
-  rpe: Double? = 10
+  rpe: Double? = 10,
+  confidence: E1RMConfidence = .normal
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
     id: UUID(),
@@ -30,7 +31,8 @@ private func recorderPoint(
     e1RMKg: e1RM,
     sourceWeightKg: e1RM,
     sourceReps: reps,
-    sourceRPE: rpe
+    sourceRPE: rpe,
+    confidence: confidence
   )
 }
 
@@ -113,4 +115,44 @@ private func recorderInput(
 
   #expect(event != nil)
   #expect(event?.previousMaxE1RMKg == 0)
+}
+
+@Test func normalImprovementBelowAnomalyThresholdStillFiresPR() async {
+  let (recorder, _) = makeRecorder(seed: [recorderPoint(e1RM: 200)])
+
+  let event = await recorder.record(recorderInput(weightKg: 216))
+
+  #expect(event != nil)
+  #expect(event?.previousMaxE1RMKg == 200)
+  #expect(event?.breakthroughE1RMKg == 216)
+}
+
+@Test func suspectSpikeIsPersistedAsLowConfidenceWithoutPR() async throws {
+  let (recorder, repository) = makeRecorder(seed: [recorderPoint(e1RM: 200)])
+
+  let event = await recorder.record(recorderInput(weightKg: 350))
+
+  #expect(event == nil)
+  let history = try await repository.fetchHistory(
+    studentId: recorderStudentID,
+    exerciseId: recorderExerciseID
+  )
+  #expect(history.count == 2)
+  #expect(history.last?.e1RMKg == 350)
+  #expect(history.last?.confidence == .low)
+}
+
+@Test func quarantinedSpikeDoesNotPoisonNextPRBaseline() async {
+  let (recorder, _) = makeRecorder(seed: [recorderPoint(e1RM: 200)])
+
+  _ = await recorder.record(recorderInput(weightKg: 350))
+  let realPR = await recorder.record(recorderInput(weightKg: 208))
+
+  #expect(realPR != nil)
+  #expect(realPR?.previousMaxE1RMKg == 200)
+}
+
+@Test func anomalyThresholdsMatchSpec050() {
+  #expect(E1RMPolicy.softJump == 0.10)
+  #expect(E1RMPolicy.hardJump == 0.18)
 }

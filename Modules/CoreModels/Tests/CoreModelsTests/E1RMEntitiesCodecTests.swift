@@ -59,3 +59,46 @@ import Testing
   #expect(acked.id == event.id)
   #expect(acked.breakthroughE1RMKg == event.breakthroughE1RMKg)
 }
+
+@Test func e1rmHistoryPointDecodesLegacyJSONWithoutConfidenceAsNormal() throws {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 128.2,
+    sourceWeightKg: 100,
+    sourceReps: 5,
+    sourceRPE: 8.0
+  )
+  let data = try JSONEncoder().encode(point)
+  var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+  object.removeValue(forKey: "confidence")
+  let legacyData = try JSONSerialization.data(withJSONObject: object)
+
+  let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: legacyData)
+
+  #expect(decoded.confidence == .normal)
+}
+
+@Test func e1rmHistoryPointPreservesLowConfidenceAcrossRoundTrip() throws {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 327,
+    sourceWeightKg: 275,
+    sourceReps: 3,
+    sourceRPE: 8.5,
+    confidence: .low
+  )
+
+  let data = try JSONEncoder().encode(point)
+  let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: data)
+
+  #expect(decoded == point)
+  #expect(decoded.confidence == .low)
+}

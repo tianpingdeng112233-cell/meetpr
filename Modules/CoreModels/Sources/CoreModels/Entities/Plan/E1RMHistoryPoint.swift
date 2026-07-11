@@ -1,5 +1,12 @@
 import Foundation
 
+/// Trust tier for an e1RM point (spec 050 §5). Low-confidence points remain
+/// persisted for honest scatter but do not participate in strength summaries.
+public enum E1RMConfidence: String, Codable, Hashable, Sendable {
+  case normal
+  case low
+}
+
 /// One estimated-1RM data point, computed locally each time the student
 /// completes a set (spec 028). Distinct from the locked 1RM profile field:
 /// e1RM is a per-set estimate and never writes back to 1RM (PRD §5 #16).
@@ -15,6 +22,8 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
   public let sourceWeightKg: Double
   public let sourceReps: Int
   public let sourceRPE: Double?
+  /// Points written before anomaly quarantine decode as `.normal`.
+  public let confidence: E1RMConfidence
 
   public init(
     id: UUID,
@@ -25,7 +34,8 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
     e1RMKg: Double,
     sourceWeightKg: Double,
     sourceReps: Int,
-    sourceRPE: Double?
+    sourceRPE: Double?,
+    confidence: E1RMConfidence = .normal
   ) {
     self.id = id
     self.studentId = studentId
@@ -36,5 +46,20 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
     self.sourceWeightKg = sourceWeightKg
     self.sourceReps = sourceReps
     self.sourceRPE = sourceRPE
+    self.confidence = confidence
+  }
+
+  public init(from decoder: any Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    id = try container.decode(UUID.self, forKey: .id)
+    studentId = try container.decode(UUID.self, forKey: .studentId)
+    exerciseId = try container.decode(UUID.self, forKey: .exerciseId)
+    setLogId = try container.decode(UUID.self, forKey: .setLogId)
+    computedAt = try container.decode(Date.self, forKey: .computedAt)
+    e1RMKg = try container.decode(Double.self, forKey: .e1RMKg)
+    sourceWeightKg = try container.decode(Double.self, forKey: .sourceWeightKg)
+    sourceReps = try container.decode(Int.self, forKey: .sourceReps)
+    sourceRPE = try container.decodeIfPresent(Double.self, forKey: .sourceRPE)
+    confidence = try container.decodeIfPresent(E1RMConfidence.self, forKey: .confidence) ?? .normal
   }
 }

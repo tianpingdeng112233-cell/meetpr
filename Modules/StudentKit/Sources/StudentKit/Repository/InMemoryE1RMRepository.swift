@@ -51,7 +51,11 @@ public actor InMemoryE1RMRepository: E1RMRepository {
     before: Date
   ) async throws -> Double? {
     let history = points[HistoryKey(studentId: studentId, exerciseId: exerciseId)] ?? []
-    return history.filter { $0.computedAt < before }.map(\.e1RMKg).max()
+    return
+      history
+      .filter { $0.computedAt < before && $0.confidence == .normal }
+      .map(\.e1RMKg)
+      .max()
   }
 
   public func recordPR(_ event: PRBreakthroughEvent) async throws {

@@ -2,8 +2,8 @@ import CoreModels
 import Foundation
 
 /// The single aggregation every strength-number consumer reads (spec 050 §2).
-/// Current is the trailing four-week max over eligible points; Best and Last
-/// preserve their raw meanings over that same eligible history.
+/// Current is the trailing four-week max over trusted eligible points; Best
+/// and Last use that same history. Quarantined points remain raw scatter only.
 struct E1RMSeries: Equatable, Sendable {
   struct Sample: Equatable, Sendable {
     let pointID: UUID
@@ -42,12 +42,13 @@ struct E1RMSeries: Equatable, Sendable {
         e1RMKg: sample.valueKg,
         sourceWeightKg: original.sourceWeightKg,
         sourceReps: original.sourceReps,
-        sourceRPE: original.sourceRPE
+        sourceRPE: original.sourceRPE,
+        confidence: original.confidence
       )
     }
   }
 
-  /// Eligible raw points used by Last/Best references and PR baselines.
+  /// All eligible raw points, including quarantined honest-scatter samples.
   static func eligibleRaw(
     points: [E1RMHistoryPoint],
     family: LiftFamily?
@@ -57,15 +58,28 @@ struct E1RMSeries: Equatable, Sendable {
       .sorted { $0.computedAt < $1.computedAt }
   }
 
+  /// Eligible points trusted for current, Best, Last, and PR baselines.
+  static func trustedEligibleRaw(
+    points: [E1RMHistoryPoint],
+    family: LiftFamily?
+  ) -> [E1RMHistoryPoint] {
+    eligibleRaw(points: points, family: family)
+      .filter { $0.confidence == .normal }
+  }
+
   static func build(points: [E1RMHistoryPoint], family: LiftFamily?) -> E1RMSeries {
-    let eligible = eligibleRaw(points: points, family: family).map {
+    let eligiblePoints = eligibleRaw(points: points, family: family)
+    let rawEligible = eligiblePoints.map {
+      Sample(pointID: $0.id, date: $0.computedAt, valueKg: $0.e1RMKg)
+    }
+    let trusted = eligiblePoints.filter { $0.confidence == .normal }.map {
       Sample(pointID: $0.id, date: $0.computedAt, valueKg: $0.e1RMKg)
     }
 
-    let smoothed = eligible.map { sample in
+    let smoothed = trusted.map { sample in
       let windowStart = sample.date.addingTimeInterval(-rollingWindow)
       let windowMax =
-        eligible
+        trusted
         .filter { $0.date > windowStart && $0.date <= sample.date }
         .map(\.valueKg)
         .max() ?? sample.valueKg
@@ -74,9 +88,9 @@ struct E1RMSeries: Equatable, Sendable {
 
     return E1RMSeries(
       smoothed: smoothed,
-      rawEligible: eligible,
-      best: eligible.max { $0.valueKg < $1.valueKg },
-      last: eligible.last
+      rawEligible: rawEligible,
+      best: trusted.max { $0.valueKg < $1.valueKg },
+      last: trusted.last
     )
   }
 }
