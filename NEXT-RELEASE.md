@@ -57,6 +57,15 @@
   (add-only 授权,拒绝静默降级不阻断上传)
   - 验证留痕:真机 iPhone/iOS 26.5 David 亲验「没问题」(颜色四态 + 拍摄不重弹 + 数值不重置)+ Codex 直驱
     复核;CI 三绿;StudentKit 测试绿
+- **[P1] 选片即出「准备中…」占位 + 消除上传前无反馈盲窗(#248,spec 027 修缮)**:相册/相机选中视频后,
+  `loadTransferable` 全量拷贝(相机路径 `VideoLibrarySaver.save`)在 `enqueue` 首个 `.pending` 事件之前
+  同步跑数秒,期间界面停在「拍摄/相册」按钮零反馈——用户感知"点了卡 3-5s 才出进度条"。新增 `isPreparing`
+  @State:选中瞬间(两路径一致)置真,渲染 spinner「准备中…」直到 manager 拥有 row;rowState 优先渲染保证
+  `准备中…→处理中…→进度条`无闪回,占位在状态到达/load 失败/setLogID 空/enqueue 同步报错四路径清除;
+  准备中无 row 可 remove 故不显示取消
+  - 验证留痕:review-loop 1 轮 CLEAN(0 blocker);Codex iOS Simulator 真编译(StrictConcurrency 过)+
+    swiftlint --strict 0 violation + StudentKit 测试绿;CI 三绿。⚠️ 3-5s 时序模拟器复现不了(本地拷贝太快),
+    未附时序截图,价值在状态机正确性已由 loop 覆盖
 
 ## 📋 进度:离 archive 还差几步
 - [ ] **⛔ 切包硬门:backend 0038 迁移(DMS)+ SAE 滚新镜像必须先部署**——iOS 顺延已是 V2
