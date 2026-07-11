@@ -45,33 +45,65 @@ import Testing
   #expect(missingDTO.shiftedToDate == nil)
 }
 
-@Test func planDayShiftRequestAndResponseUseDateOnlyContract() throws {
-  let request = ShiftPlanDayRequestDTO(shiftedToDate: utcDate(2026, 7, 10))
-  let requestData = try MeetPRCodec.encoder.encode(request)
-  let requestJSON = try #require(
-    String(data: requestData, encoding: .utf8)
-  )
-  #expect(requestJSON == #"{"shifted_to_date":"2026-07-10"}"#)
+@Test func planDTOParsesPlanLevelShiftMetadata() throws {
+  let json = """
+    {
+      "id": "80000000-0000-0000-0000-000000000001",
+      "coach_id": "80000000-0000-0000-0000-000000000002",
+      "trainee_id": "80000000-0000-0000-0000-000000000003",
+      "name": "比赛周期",
+      "start_date": "2026-07-01",
+      "end_date": "2026-07-28",
+      "plan_weeks": 4,
+      "kind": "regular",
+      "source": "coach",
+      "status": "published",
+      "total_shift_days": 3,
+      "latest_shift_created_at": "2026-07-11T12:00:00Z",
+      "created_at": "2026-06-30T12:00:00Z",
+      "updated_at": "2026-07-11T12:00:00Z"
+    }
+    """
 
+  let dto = try MeetPRCodec.decoder.decode(PlanDTO.self, from: Data(json.utf8))
+  let domain = dto.toDomain()
+
+  #expect(dto.totalShiftDays == 3)
+  #expect(dto.latestShiftCreatedAt == isoDate("2026-07-11T12:00:00Z"))
+  #expect(domain.totalShiftDays == 3)
+  #expect(domain.latestShiftCreatedAt == dto.latestShiftCreatedAt)
+}
+
+@Test func planShiftResponseDecodesBatchAndAllShiftedDays() throws {
   let responseJSON = """
     {
-      "id": "70000000-0000-0000-0000-000000000001",
-      "plan_day_id": "90000000-0000-0000-0000-000000000001",
-      "shifted_to_date": "2026-07-10",
-      "created_at": "2026-07-09T12:00:00Z"
+      "batch_id": "70000000-0000-0000-0000-000000000001",
+      "shifted_days": [
+        {
+          "day_id": "90000000-0000-0000-0000-000000000001",
+          "shifted_to_date": "2026-07-12"
+        },
+        {
+          "day_id": "90000000-0000-0000-0000-000000000002",
+          "shifted_to_date": "2026-07-14"
+        }
+      ],
+      "total_offset_days": 2
     }
     """
   let response = try MeetPRCodec.decoder.decode(
-    PlanDayShiftDTO.self,
+    PlanShiftDTO.self,
     from: Data(responseJSON.utf8)
   )
-  #expect(response.shiftedToDate == utcDate(2026, 7, 10))
-  #expect(response.planDayID.uuidString == "90000000-0000-0000-0000-000000000001")
+
+  #expect(response.shiftedDays.count == 2)
+  #expect(response.shiftedDays[0].shiftedToDate == utcDate(2026, 7, 12))
+  #expect(response.totalOffsetDays == 2)
 }
 
-@Test func planDayShiftEndpointsUseFixedPathsAndMethods() async throws {
-  let dayID = try #require(UUID(uuidString: "90000000-0000-0000-0000-000000000001"))
-  let log = PlanDayShiftRequestLog()
+@Test func planShiftEndpointsUsePlanPathAndNoRequestBody() async throws {
+  let planID = try #require(UUID(uuidString: "80000000-0000-0000-0000-000000000001"))
+  let log = PlanShiftRequestLog()
   let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
     await log.record(request)
     if request.httpMethod == "DELETE" {
@@ -79,37 +111,32 @@ import Testing
     }
     let response = """
       {
-        "id": "70000000-0000-0000-0000-000000000001",
-        "plan_day_id": "\(dayID.uuidString)",
-        "shifted_to_date": "2026-07-10",
-        "created_at": "2026-07-09T12:00:00Z"
+        "batch_id": "70000000-0000-0000-0000-000000000001",
+        "shifted_days": [],
+        "total_offset_days": 1
       }
       """
     return APIResponse(data: Data(response.utf8), statusCode: 201)
   }
 
-  _ = try await api.shiftPlanDay(
-    id: dayID,
-    to: utcDate(2026, 7, 10),
-    accessToken: "token"
-  )
-  try await api.cancelPlanDayShift(id: dayID, accessToken: "token")
+  _ = try await api.shiftPlan(id: planID, accessToken: "token")
+  try await api.cancelPlanShift(id: planID, accessToken: "token")
 
   let requests = await log.values
   #expect(
     requests.map(\.methodAndPath) == [
-      "POST /plans/days/\(dayID.uuidString)/shift",
-      "DELETE /plans/days/\(dayID.uuidString)/shift",
+      "POST /plans/\(planID.uuidString)/shift",
+      "DELETE /plans/\(planID.uuidString)/shift",
     ])
-  #expect(requests.first?.body == #"{"shifted_to_date":"2026-07-10"}"#)
+  #expect(requests.allSatisfy { $0.body == nil })
 }
 
-private actor PlanDayShiftRequestLog {
-  private(set) var values: [PlanDayShiftRecordedRequest] = []
+private actor PlanShiftRequestLog {
+  private(set) var values: [PlanShiftRecordedRequest] = []
 
   func record(_ request: URLRequest) {
     values.append(
-      PlanDayShiftRecordedRequest(
+      PlanShiftRecordedRequest(
         methodAndPath: "\(request.httpMethod ?? "") \(request.url?.path() ?? "")",
         body: request.httpBody.flatMap { String(data: $0, encoding: .utf8) }
       )
@@ -117,7 +144,7 @@ private actor PlanDayShiftRequestLog {
   }
 }
 
-private struct PlanDayShiftRecordedRequest: Sendable {
+private struct PlanShiftRecordedRequest: Sendable {
   let methodAndPath: String
   let body: String?
 }
@@ -125,5 +152,9 @@ private struct PlanDayShiftRecordedRequest: Sendable {
 private func utcDate(_ year: Int, _ month: Int, _ day: Int) -> Date {
   var calendar = Calendar(identifier: .gregorian)
   calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
-  return calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? Date.distantPast
+  return calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? .distantPast
+}
+
+private func isoDate(_ value: String) -> Date? {
+  try? Date(value, strategy: .iso8601)
 }

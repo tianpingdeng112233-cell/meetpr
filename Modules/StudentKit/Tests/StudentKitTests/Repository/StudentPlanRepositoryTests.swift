@@ -34,40 +34,74 @@ import Testing
   #expect(try await repository.fetchCycleDays(studentID: studentID).isEmpty)
 }
 
-@Test func inMemoryStudentPlanRepositoryShiftsAndCancelsOneDay() async throws {
+@Test func inMemoryStudentPlanRepositoryStacksAcrossDaysAndUndoesLatestBatch() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
-  let original = try #require(plan.days.first)
-  let target = original.date.addingTimeInterval(2 * 86_400)
+  let today = StudentDemoSeed.utcCalendar.startOfDay(for: Date())
+  let clock = ShiftTestClock(today.addingTimeInterval(12 * 3_600))
+  let repository = InMemoryStudentPlanRepository(
+    store: TestStudentPlanStore(seed: [studentID: plan]),
+    now: { clock.now }
+  )
+
+  let first = try await repository.shiftPlan(id: plan.cycleID, studentID: studentID)
+  let afterFirst = try #require(
+    try await repository.fetchCurrentPlan(studentID: studentID)
+  )
+  #expect(first.totalShiftDays == 1)
+  #expect(afterFirst.totalShiftDays == 1)
+  let originalDaysThroughToday = plan.days.filter { $0.date <= today }.count
+  let shiftedDaysThroughToday = afterFirst.days.filter { $0.date <= today }.count
+  #expect(shiftedDaysThroughToday == originalDaysThroughToday - 1)
+
+  clock.advance(days: 1)
+  let second = try await repository.shiftPlan(id: plan.cycleID, studentID: studentID)
+  let afterSecond = try #require(
+    try await repository.fetchCurrentPlan(studentID: studentID)
+  )
+  #expect(second.totalShiftDays == 2)
+  #expect(afterSecond.totalShiftDays == 2)
+
+  try await repository.cancelPlanShift(id: plan.cycleID, studentID: studentID)
+  let restoredLatest = try #require(
+    try await repository.fetchCurrentPlan(studentID: studentID)
+  )
+  #expect(restoredLatest == afterFirst)
+
+  do {
+    try await repository.cancelPlanShift(id: plan.cycleID, studentID: studentID)
+    Issue.record("Expected the previous day's batch to be outside the undo window")
+  } catch let error as PlanShiftError {
+    #expect(error == .undoWindowPassed)
+  }
+}
+
+@Test func inMemoryStudentPlanRepositoryRejectsUndoWithoutABatch() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
   let repository = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: plan])
   )
 
-  try await repository.shiftDay(id: original.id, to: target, studentID: studentID)
-  let shifted = try #require(
-    try await repository.fetchCurrentPlan(studentID: studentID)?.days.first { $0.id == original.id }
-  )
-  #expect(shifted.scheduledDate == original.date)
-  #expect(shifted.shiftedToDate == target)
-  #expect(shifted.date == target)
-
-  try await repository.cancelShift(dayID: original.id, studentID: studentID)
-  let restored = try #require(
-    try await repository.fetchCurrentPlan(studentID: studentID)?.days.first { $0.id == original.id }
-  )
-  #expect(restored.shiftedToDate == nil)
-  #expect(restored.date == original.date)
+  do {
+    try await repository.cancelPlanShift(id: plan.cycleID, studentID: studentID)
+    Issue.record("Expected NO_ACTIVE_SHIFT")
+  } catch let error as PlanShiftError {
+    #expect(error == .noActiveShift)
+  }
 }
 
 @Test(arguments: [
-  ("PLAN_NOT_ACTIVE", PlanDayShiftError.planNotActive),
-  ("SHIFT_ONLY_TODAY", PlanDayShiftError.onlyToday),
-  ("SHIFT_DAY_HAS_LOGS", PlanDayShiftError.dayHasLogs),
-  ("SHIFT_TARGET_NOT_REST_DAY", PlanDayShiftError.targetNotRestDay),
+  ("PLAN_NOT_ACTIVE", PlanShiftError.planNotActive),
+  ("SHIFT_ONLY_TODAY", PlanShiftError.onlyToday),
+  ("ALREADY_STARTED", PlanShiftError.alreadyStarted),
+  ("NOT_PLAN_STUDENT", PlanShiftError.notPlanStudent),
+  ("NO_ACTIVE_SHIFT", PlanShiftError.noActiveShift),
+  ("UNDO_WINDOW_PASSED", PlanShiftError.undoWindowPassed),
 ])
 func backendStudentPlanRepositoryMapsShiftMachineCodes(
   machineCode: String,
-  expected: PlanDayShiftError
+  expected: PlanShiftError
 ) async throws {
   let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { _ in
     APIResponse(
@@ -81,12 +115,31 @@ func backendStudentPlanRepositoryMapsShiftMachineCodes(
   )
 
   do {
-    try await repository.shiftDay(id: UUID(), to: Date(), studentID: UUID())
+    _ = try await repository.shiftPlan(id: UUID(), studentID: UUID())
     Issue.record("Expected \(machineCode) to throw")
-  } catch let error as PlanDayShiftError {
+  } catch let error as PlanShiftError {
     #expect(error == expected)
   } catch {
     Issue.record("Unexpected error: \(error)")
+  }
+}
+
+private final class ShiftTestClock: @unchecked Sendable {
+  private let lock = NSLock()
+  private var value: Date
+
+  init(_ value: Date) {
+    self.value = value
+  }
+
+  var now: Date {
+    lock.withLock { value }
+  }
+
+  func advance(days: Int) {
+    lock.withLock {
+      value = value.addingTimeInterval(Double(days) * 86_400)
+    }
   }
 }
 

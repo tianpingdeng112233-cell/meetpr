@@ -5,81 +5,117 @@ import Testing
 
 @testable import StudentKit
 
-@Test func nextRestDateFindsTomorrowWithinPlanWeek() throws {
-  let start = utcDate(2026, 7, 8)
-  let today = start
-  let occupied = [
-    StudentPlanDay(id: UUID(), date: today, exercises: []),
-    StudentPlanDay(id: UUID(), date: utcDate(2026, 7, 10), exercises: []),
-  ]
-
-  let target = PlanDayShiftLogic.nextRestDate(
-    after: today,
-    occupiedBy: occupied,
-    planStartDate: start,
-    weekIndex: 1,
-    calendar: utcCalendar()
+@Test func proposalCarriesCourseAndCurrentAndShiftedCycleEndDates() throws {
+  let today = utcDate(2026, 7, 11)
+  let endDate = utcDate(2026, 7, 28)
+  let plan = StudentPlanView(
+    cycleID: UUID(),
+    weekIndex: 2,
+    startDate: utcDate(2026, 7, 1),
+    endDate: endDate,
+    totalShiftDays: 2,
+    days: [
+      StudentPlanDay(
+        id: UUID(),
+        date: today,
+        exercises: [testExercise(name: "深蹲")]
+      )
+    ]
   )
 
-  #expect(target == utcDate(2026, 7, 9))
+  let proposal = try #require(
+    PlanDayShiftLogic.proposal(plan: plan, today: today, calendar: utcCalendar())
+  )
+
+  #expect(proposal.courseName == "深蹲")
+  #expect(proposal.currentEndDate == utcDate(2026, 7, 30))
+  #expect(proposal.shiftedEndDate == utcDate(2026, 7, 31))
   #expect(
-    PlanDayShiftLogic.targetLabel(
-      target: try #require(target),
-      after: today,
+    PlanDayShiftLogic.confirmationMessage(for: proposal)
+      == "今天的深蹲课改到明天，之后的课依次顺延，本周期结束日变为7月31日"
+  )
+}
+
+@Test func proposalRequiresTodayToBeATrainingDay() {
+  let today = utcDate(2026, 7, 11)
+  let plan = StudentPlanView(
+    cycleID: UUID(),
+    weekIndex: 1,
+    startDate: today,
+    endDate: utcDate(2026, 7, 31),
+    days: [StudentPlanDay(id: UUID(), date: today, exercises: [])]
+  )
+
+  #expect(PlanDayShiftLogic.proposal(plan: plan, today: today) == nil)
+}
+
+@Test func undoWindowUsesUTCCalendarDay() {
+  let createdAt = isoDate("2026-07-11T23:30:00Z")
+
+  #expect(
+    PlanDayShiftLogic.canUndo(
+      latestShiftCreatedAt: createdAt,
+      now: isoDate("2026-07-11T00:01:00Z"),
       calendar: utcCalendar()
-    ) == "延到明天"
-  )
-}
-
-@Test func nextRestDateStopsAtPlanWeekBoundary() {
-  let start = utcDate(2026, 7, 8)
-  let occupied = (0..<7).map { offset in
-    StudentPlanDay(
-      id: UUID(),
-      date: start.addingTimeInterval(Double(offset) * 86_400),
-      exercises: []
     )
-  }
-
-  let target = PlanDayShiftLogic.nextRestDate(
-    after: start,
-    occupiedBy: occupied,
-    planStartDate: start,
-    weekIndex: 1,
-    calendar: utcCalendar()
   )
-
-  #expect(target == nil)
+  #expect(
+    !PlanDayShiftLogic.canUndo(
+      latestShiftCreatedAt: createdAt,
+      now: isoDate("2026-07-12T00:00:00Z"),
+      calendar: utcCalendar()
+    )
+  )
+  #expect(
+    !PlanDayShiftLogic.canUndo(
+      latestShiftCreatedAt: nil,
+      now: createdAt,
+      calendar: utcCalendar()
+    )
+  )
 }
 
-@Test func nextRestDateUsesEffectiveShiftedDatesAsOccupied() {
-  let start = utcDate(2026, 7, 8)
-  let shifted = StudentPlanDay(
-    id: UUID(),
-    date: utcDate(2026, 7, 9),
-    shiftedToDate: utcDate(2026, 7, 10),
-    exercises: []
+@Test func cumulativeShiftAdviceStartsAtThreeDays() {
+  #expect(PlanDayShiftLogic.cumulativeShiftMessage(totalShiftDays: 2) == nil)
+  #expect(
+    PlanDayShiftLogic.cumulativeShiftMessage(totalShiftDays: 3)
+      == "已累计顺延 3 天，建议联系教练调整计划"
   )
-
-  let target = PlanDayShiftLogic.nextRestDate(
-    after: start,
-    occupiedBy: [shifted],
-    planStartDate: start,
-    weekIndex: 1,
-    calendar: utcCalendar()
+  #expect(
+    PlanDayShiftLogic.cumulativeShiftMessage(totalShiftDays: 8)
+      == "已累计顺延 8 天，建议联系教练调整计划"
   )
-
-  #expect(target == utcDate(2026, 7, 9))
 }
 
 @Test(arguments: [
-  (PlanDayShiftError.planNotActive, "当前计划未生效，暂时不能顺延"),
-  (PlanDayShiftError.onlyToday, "只能顺延今天的训练；顺延后如需调整，请先撤销"),
-  (PlanDayShiftError.dayHasLogs, "这天已有训练记录，不能顺延或撤销"),
-  (PlanDayShiftError.targetNotRestDay, "目标日期已不是本周休息日，请刷新计划后重试"),
+  (PlanShiftError.planNotActive, "当前计划未生效，暂时不能顺延"),
+  (PlanShiftError.onlyToday, "只能顺延今天的训练"),
+  (PlanShiftError.alreadyStarted, "今天的训练已经开始，不能顺延或撤销"),
+  (PlanShiftError.notPlanStudent, "只有计划所属学员可以顺延"),
+  (PlanShiftError.noActiveShift, "当前没有可撤销的顺延"),
+  (PlanShiftError.undoWindowPassed, "只能在顺延当天撤销，请联系教练调整计划"),
 ])
-func shiftMachineCodeErrorsHaveSpecificChineseCopy(error: PlanDayShiftError, message: String) {
+func shiftMachineCodeErrorsHaveSpecificChineseCopy(error: PlanShiftError, message: String) {
   #expect(PlanDayShiftLogic.errorMessage(for: error, operation: .shift) == message)
+}
+
+private func testExercise(name: String) -> StudentPlanExercise {
+  StudentPlanExercise(
+    id: UUID(),
+    exercise: Exercise(
+      id: UUID(),
+      name: name,
+      exerciseType: .mainLift,
+      mainLiftFamily: .squat,
+      isCompetitionLift: true,
+      muscleGroups: [.quad],
+      equipment: [.barbell],
+      movementPattern: [.squat],
+      createdAt: .distantPast
+    ),
+    sequenceIndex: 0,
+    prescribedSets: []
+  )
 }
 
 private func utcCalendar() -> Calendar {
@@ -90,4 +126,8 @@ private func utcCalendar() -> Calendar {
 
 private func utcDate(_ year: Int, _ month: Int, _ day: Int) -> Date {
   utcCalendar().date(from: DateComponents(year: year, month: month, day: day)) ?? .distantPast
+}
+
+private func isoDate(_ value: String) -> Date {
+  (try? Date(value, strategy: .iso8601)) ?? .distantPast
 }

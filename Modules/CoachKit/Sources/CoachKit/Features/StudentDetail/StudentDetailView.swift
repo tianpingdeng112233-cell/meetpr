@@ -326,7 +326,10 @@ struct StudentDetailView: View {
         }
       )
     case .execution:
-      StudentExecutionView(days: viewModel.executionDays)
+      StudentExecutionView(
+        days: viewModel.executionDays,
+        shiftBadgeText: viewModel.planShiftBadgeText
+      )
     case .videos:
       StudentVideoGridView(
         videos: viewModel.videos,
