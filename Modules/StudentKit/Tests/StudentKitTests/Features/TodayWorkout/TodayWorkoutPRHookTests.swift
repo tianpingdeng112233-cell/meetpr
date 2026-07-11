@@ -74,6 +74,26 @@ private struct TestFailure: Error, CustomStringConvertible {
 }
 
 @MainActor
+@Test func lowRPECompletionStaysInLogButDoesNotRecordE1RM() async throws {
+  let e1rm = InMemoryE1RMRepository()
+  let (viewModel, studentID) = try await makeLoadedViewModel(e1rm: e1rm)
+  guard case .loaded(_, let drafts) = viewModel.state, let first = drafts.first else {
+    throw TestFailure("no drafts")
+  }
+
+  viewModel.updateRPE(rowIndex: 0, rpe: 6)
+  await viewModel.toggleComplete(rowIndex: 0)
+
+  guard case .loaded(_, let updated) = viewModel.state else {
+    throw TestFailure("expected loaded state after completion")
+  }
+  #expect(updated[0].completed)
+  let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: first.exerciseID)
+  #expect(history.isEmpty)
+  #expect(viewModel.pendingPRBanner == nil)
+}
+
+@MainActor
 @Test func uncheckingThenRecheckingDoesNotFarmDuplicatePRs() async throws {
   let e1rm = InMemoryE1RMRepository()
   let (viewModel, studentID) = try await makeLoadedViewModel(e1rm: e1rm)

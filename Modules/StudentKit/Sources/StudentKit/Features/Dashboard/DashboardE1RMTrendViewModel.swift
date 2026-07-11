@@ -100,10 +100,12 @@ final class DashboardE1RMTrendViewModel {
     idsByFamily: [LiftFamily: Set<UUID>]
   ) -> [DashboardE1RMTrendRow] {
     MainLiftExerciseFamilyResolver.dashboardFamilies.map { family in
-      let points = (idsByFamily[family] ?? [])
+      let rawPoints = (idsByFamily[family] ?? [])
         .flatMap { histories[$0] ?? [] }
-        .sorted { $0.computedAt < $1.computedAt }
-      return DashboardE1RMTrendRow(family: family, points: points)
+      return DashboardE1RMTrendRow(
+        family: family,
+        points: E1RMSeries.smoothedHistory(points: rawPoints, family: family)
+      )
     }
   }
 

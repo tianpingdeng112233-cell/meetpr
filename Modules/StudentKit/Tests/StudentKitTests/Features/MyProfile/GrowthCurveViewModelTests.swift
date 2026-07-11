@@ -62,3 +62,52 @@ private func makeViewModel(
   let dates = viewModel.visiblePoints.map(\.computedAt)
   #expect(dates == dates.sorted())
 }
+
+@MainActor
+@Test func visibleCurveUsesRollingWindowMaximum() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftIDForGrowthTests(for: .squat))
+  let now = Date(timeIntervalSince1970: 1_768_262_400)
+  let seed = [
+    growthPoint(studentID: studentID, exerciseID: squatID, daysAgo: 10, e1RM: 150, now: now),
+    growthPoint(studentID: studentID, exerciseID: squatID, daysAgo: 1, e1RM: 145, now: now),
+  ]
+  let viewModel = GrowthCurveViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    e1rm: InMemoryE1RMRepository(seedPoints: seed),
+    now: { now }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  #expect(viewModel.visiblePoints.map(\.e1RMKg) == [150, 150])
+}
+
+private func growthPoint(
+  studentID: UUID,
+  exerciseID: UUID,
+  daysAgo: Int,
+  e1RM: Double,
+  now: Date
+) -> E1RMHistoryPoint {
+  E1RMHistoryPoint(
+    id: UUID(),
+    studentId: studentID,
+    exerciseId: exerciseID,
+    setLogId: UUID(),
+    computedAt: now.addingTimeInterval(TimeInterval(-daysAgo) * 86_400),
+    e1RMKg: e1RM,
+    sourceWeightKg: e1RM * 0.85,
+    sourceReps: 5,
+    sourceRPE: 8
+  )
+}
+
+extension StudentPlanView {
+  fileprivate func mainLiftIDForGrowthTests(for family: LiftFamily) -> UUID? {
+    days.flatMap(\.exercises).first {
+      $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily == family
+    }?.exercise.id
+  }
+}

@@ -53,7 +53,10 @@ public final class GrowthCurveViewModel {
       var grouped: [LiftFamily: [E1RMHistoryPoint]] = [:]
       for (family, ids) in idsByFamily {
         let histories = try await e1rm.fetchHistory(studentId: studentID, exerciseIds: Array(ids))
-        grouped[family] = histories.values.flatMap { $0 }.sorted { $0.computedAt < $1.computedAt }
+        grouped[family] = E1RMSeries.smoothedHistory(
+          points: histories.values.flatMap { $0 },
+          family: family
+        )
       }
       historyByFamily = grouped
       state = .loaded
@@ -78,7 +81,7 @@ public final class GrowthCurveViewModel {
 
   private var windowCutoff: Date? {
     switch selectedWindow {
-    case .fourWeeks: now().addingTimeInterval(-28 * 86_400)
+    case .fourWeeks: now().addingTimeInterval(-E1RMPolicy.rollingWindow)
     case .threeMonths: now().addingTimeInterval(-90 * 86_400)
     case .all: nil
     }

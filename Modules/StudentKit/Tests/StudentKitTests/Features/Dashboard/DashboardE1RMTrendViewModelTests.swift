@@ -53,6 +53,27 @@ import Testing
 }
 
 @MainActor
+@Test func trendHeadlineAndRowsUseRollingWindowMaximum() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftID(for: .squat))
+  let now = try Date("2026-06-14T12:00:00Z", strategy: .iso8601)
+  let points = [
+    point(studentID: studentID, exerciseID: squatID, e1RM: 180, daysAgo: 10, now: now),
+    point(studentID: studentID, exerciseID: squatID, e1RM: 175, daysAgo: 1, now: now),
+  ]
+
+  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: [])
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  let squat = try #require(presentation.rows.first { $0.family == .squat })
+  #expect(squat.points.map(\.e1RMKg) == [180, 180])
+  #expect(squat.latestPoint?.e1RMKg == 180)
+  #expect(presentation.headline?.valueKg == 180)
+}
+
+@MainActor
 @Test func trendEmptyHistoryKeepsThreeRowsWithoutHeadline() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
