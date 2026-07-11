@@ -42,6 +42,15 @@
   .loaded/.recording 合并渲染分支保持弹层身份;persist 串行化 + 最新草稿合并 + 跨日 generation 护栏
   - 验证留痕:review-loop 6 轮 5 BLOCKER 全收敛;StudentKit 316 tests 绿;真机 iPhone 12/iOS 26.5
     「22.5×5@9 → 拍摄 → Use Video」亲测不重弹不重置(David 手测 + Codex 直驱复核)
+- **[P1] 测试基建:StudentKit 跨午夜时区 flake 根治(#247,无 runtime 行为变化)**:demo seed 用
+  UTC 日历锚定 plan-day、VM 用本地日历匹配,live `Date()` 在本地/UTC 日期错位窗口把"今天"解析成
+  day[4],`TodayWorkoutPRHookTests.bufferSuppresses…` 稳定失败;`makePlanView(today:)` 注入锚点
+  (默认参数,demo 路径不变),PRHook + RestTimer(同病潜伏,UTC 以西机器必发)两文件时钟冻结到
+  seed 自身 UTC 午夜锚点,任意时区免疫
+  - 验证留痕:失败窗口内(23:07 UTC)复现→修复后同窗口绿;`--filter` 10/10 连跑;五时区矩阵
+    (UTC/上海/UTC+14/UTC-11/伦敦)全绿;全套件 316 绿;review-loop 2 轮 CLEAN(2 nit 均采纳)
+  - 附带发现:同一日历错位对 UTC 以西时区是**产品级**风险(美洲用户白天"今天"解析成明天),
+    中国/UK 因正偏移安全——已记海外 wave 记忆时区险 ④,本 PR 不动 runtime
 
 ## 📋 进度:离 archive 还差几步
 - [ ] **⛔ 切包硬门:backend 0038 迁移(DMS)+ SAE 滚新镜像必须先部署**——iOS 顺延已是 V2
