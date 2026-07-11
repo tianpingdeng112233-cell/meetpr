@@ -80,6 +80,7 @@ public struct MyProfileView: View {
       sections(profile)
     case .empty:
       stateMessage("完成资料填写后解锁")
+      fallbackLogoutSection
     case .failed:
       Button {
         Task { await viewModel.reload() }
@@ -89,6 +90,19 @@ public struct MyProfileView: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
       .frame(maxWidth: .infinity, minHeight: 200)
+      fallbackLogoutSection
+    }
+  }
+
+  /// Escape hatch: 退出登录 must stay reachable even when the profile is empty
+  /// or fails to load — an account without onboarding data would otherwise be
+  /// trapped signed-in with the logout row hidden behind the profile gate
+  /// (P0, found via staging debug account 2026-07-11).
+  @ViewBuilder
+  private var fallbackLogoutSection: some View {
+    if let onLogout {
+      sectionLabel("更多").padding(.top, 18)
+      card { LogoutRow(onLogout: onLogout) }.padding(.top, 8)
     }
   }
 
