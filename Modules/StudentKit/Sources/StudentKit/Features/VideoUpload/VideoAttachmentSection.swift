@@ -97,7 +97,11 @@ struct VideoAttachmentSection: View {
     #if os(iOS)
       .fullScreenCover(isPresented: $showingCamera) {
         CameraVideoPicker(maxDurationSeconds: 120, isPresented: $showingCamera) { url in
-          Task { await attach(sourceURL: url) }
+          Task {
+            // 相册留底先于上传:这一组已经练掉了,上传怎么失败素材都不能丢。
+            await VideoLibrarySaver.save(url)
+            await attach(sourceURL: url)
+          }
         }
         .ignoresSafeArea()
       }
