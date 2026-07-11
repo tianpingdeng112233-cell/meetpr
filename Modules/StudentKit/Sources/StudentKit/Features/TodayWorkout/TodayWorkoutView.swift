@@ -147,10 +147,15 @@ public struct TodayWorkoutView: View {
       Text(viewModel.actionErrorMessage ?? "")
     }
     .task {
-      if viewModel.state == .idle {
+      let isFirstLoad = viewModel.state == .idle
+      if isFirstLoad {
         await loadWorkout(for: selectedDate)
-        await videoViewModel.start(studentID: studentID)
-
+      }
+      // Outside the idle guard: a cancelled first .task can strand state in
+      // .loading, and row video indicators need the backfill + event stream
+      // regardless. start() is idempotent.
+      await videoViewModel.start(studentID: studentID)
+      if isFirstLoad {
         // Re-surface a PR banner the student never dismissed (spec 028 §5);
         // delayed so the tab renders first.
         try? await Task.sleep(for: .seconds(1.5))
@@ -377,13 +382,13 @@ public struct TodayWorkoutView: View {
           setNumber: setNumber,
           scrollToVideo: true)
       } label: {
-        Image(systemName: "video")
-          .font(.system(size: 20))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .frame(width: 56, height: 48)
-          .overlay {
-            RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
-          }
+        SetVideoUploadIndicator(
+          status: videoStatus(for: draft), size: 20, unattachedColor: Color.MeetPR.fgPrimary
+        )
+        .frame(width: 56, height: 48)
+        .overlay {
+          RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+        }
       }
       .buttonStyle(.plain)
     }
@@ -493,9 +498,7 @@ public struct TodayWorkoutView: View {
       Text(repsText(draft)).foregroundStyle(foreground)
       Text(rpeText(draft)).foregroundStyle(foreground)
       Text(statusMark(draft)).foregroundStyle(statusColor(draft))
-      Image(systemName: "video")
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+      SetVideoUploadIndicator(status: videoStatus(for: draft), size: 16)
         .frame(maxWidth: .infinity, alignment: .trailing)
     }
     .font(.system(size: 16, design: .monospaced))
@@ -542,6 +545,13 @@ public struct TodayWorkoutView: View {
   private func statusColor(_ draft: TodayWorkoutViewModel.SetRowDraft) -> Color {
     if draft.failed { return Color.MeetPR.amber }
     return draft.completed ? Color.MeetPR.green : Color.MeetPR.fgTertiary
+  }
+
+  private func videoStatus(
+    for draft: TodayWorkoutViewModel.SetRowDraft
+  ) -> VideoAttachment.Status? {
+    guard let setLogID = draft.loggedSetID else { return nil }
+    return videoViewModel.rowStates[setLogID]?.attachment.status
   }
 
   private func referenceText(_ reference: ExerciseReference) -> String {
