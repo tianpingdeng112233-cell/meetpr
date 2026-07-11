@@ -383,7 +383,9 @@ public struct TodayWorkoutView: View {
           scrollToVideo: true)
       } label: {
         SetVideoUploadIndicator(
-          status: videoStatus(for: draft), size: 20, unattachedColor: Color.MeetPR.fgPrimary
+          status: videoRowState(for: draft)?.attachment.status,
+          progress: videoRowState(for: draft)?.progress ?? 0,
+          size: 20
         )
         .frame(width: 56, height: 48)
         .overlay {
@@ -498,8 +500,12 @@ public struct TodayWorkoutView: View {
       Text(repsText(draft)).foregroundStyle(foreground)
       Text(rpeText(draft)).foregroundStyle(foreground)
       Text(statusMark(draft)).foregroundStyle(statusColor(draft))
-      SetVideoUploadIndicator(status: videoStatus(for: draft), size: 16)
-        .frame(maxWidth: .infinity, alignment: .trailing)
+      SetVideoUploadIndicator(
+        status: videoRowState(for: draft)?.attachment.status,
+        progress: videoRowState(for: draft)?.progress ?? 0,
+        size: 16
+      )
+      .frame(maxWidth: .infinity, alignment: .trailing)
     }
     .font(.system(size: 16, design: .monospaced))
     .padding(.horizontal, 16)
@@ -547,11 +553,11 @@ public struct TodayWorkoutView: View {
     return draft.completed ? Color.MeetPR.green : Color.MeetPR.fgTertiary
   }
 
-  private func videoStatus(
+  private func videoRowState(
     for draft: TodayWorkoutViewModel.SetRowDraft
-  ) -> VideoAttachment.Status? {
+  ) -> VideoAttachmentViewModel.RowState? {
     guard let setLogID = draft.loggedSetID else { return nil }
-    return videoViewModel.rowStates[setLogID]?.attachment.status
+    return videoViewModel.rowStates[setLogID]
   }
 
   private func referenceText(_ reference: ExerciseReference) -> String {

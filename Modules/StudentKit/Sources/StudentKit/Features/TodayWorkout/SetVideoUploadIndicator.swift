@@ -2,21 +2,25 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
+/// Visual language (David 2026-07-11): always the same camera glyph, only the
+/// stroke color changes — gray when no video, a progress-proportional
+/// foreground sweep while uploading, green on success, red on failure.
 enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
   case unattached
-  case pending
-  case uploading
+  case uploading(progress: Double)
   case uploaded
   case failed
 
-  static func resolve(for status: VideoAttachment.Status?) -> SetVideoUploadIndicatorStyle {
+  static func resolve(
+    for status: VideoAttachment.Status?, progress: Double
+  ) -> SetVideoUploadIndicatorStyle {
     switch status {
     case .none:
       .unattached
     case .pending:
-      .pending
+      .uploading(progress: 0)
     case .uploading:
-      .uploading
+      .uploading(progress: min(max(progress, 0), 1))
     case .uploaded:
       .uploaded
     case .failed:
@@ -24,18 +28,17 @@ enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
     }
   }
 
-  var systemImage: String {
+  /// Single stroke color; nil for `.uploading`, which renders two-tone.
+  var strokeColor: Color? {
     switch self {
     case .unattached:
-      "video"
-    case .pending:
-      "clock.arrow.circlepath"
+      Color.MeetPR.fgTertiary
     case .uploading:
-      "arrow.up.circle.fill"
+      nil
     case .uploaded:
-      "checkmark.circle.fill"
+      Color.MeetPR.green
     case .failed:
-      "exclamationmark.triangle.fill"
+      Color.MeetPR.brandRed
     }
   }
 
@@ -43,53 +46,50 @@ enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
     switch self {
     case .unattached:
       "未附视频"
-    case .pending:
-      "视频等待上传"
-    case .uploading:
-      "视频上传中"
+    case .uploading(let progress):
+      "视频上传中 \(Int((progress * 100).rounded()))%"
     case .uploaded:
       "视频已上传"
     case .failed:
       "视频上传失败"
     }
   }
-
-  var accentColor: Color {
-    switch self {
-    case .unattached:
-      Color.MeetPR.fgTertiary
-    case .pending, .uploading:
-      Color.MeetPR.brandRed
-    case .uploaded:
-      Color.MeetPR.green
-    case .failed:
-      Color.MeetPR.amber
-    }
-  }
-
-  /// The override only applies to `.unattached`; status states keep their accent.
-  func color(unattached unattachedColor: Color) -> Color {
-    self == .unattached ? unattachedColor : accentColor
-  }
 }
 
 @available(iOS 17.0, macOS 14.0, *)
 struct SetVideoUploadIndicator: View {
   let status: VideoAttachment.Status?
+  let progress: Double
   let size: CGFloat
-  /// Color for the `.unattached` glyph only; status states keep the style's
-  /// accent. The expanded action button preserves its pre-existing primary
-  /// tint while the compact row stays tertiary.
-  var unattachedColor: Color = Color.MeetPR.fgTertiary
 
   private var style: SetVideoUploadIndicatorStyle {
-    .resolve(for: status)
+    .resolve(for: status, progress: progress)
   }
 
   var body: some View {
-    Image(systemName: style.systemImage)
+    Group {
+      if case .uploading(let progress) = style {
+        glyph(Color.MeetPR.fgTertiary)
+          .overlay {
+            // Left-to-right sweep: the fgPrimary glyph is revealed across the
+            // real part-upload fraction from VideoAttachmentViewModel.
+            glyph(Color.MeetPR.fgPrimary)
+              .mask(alignment: .leading) {
+                GeometryReader { geo in
+                  Rectangle().frame(width: geo.size.width * progress)
+                }
+              }
+          }
+      } else {
+        glyph(style.strokeColor ?? Color.MeetPR.fgTertiary)
+      }
+    }
+    .accessibilityLabel(style.accessibilityLabel)
+  }
+
+  private func glyph(_ color: Color) -> some View {
+    Image(systemName: "video")
       .font(.system(size: size))
-      .foregroundStyle(style.color(unattached: unattachedColor))
-      .accessibilityLabel(style.accessibilityLabel)
+      .foregroundStyle(color)
   }
 }

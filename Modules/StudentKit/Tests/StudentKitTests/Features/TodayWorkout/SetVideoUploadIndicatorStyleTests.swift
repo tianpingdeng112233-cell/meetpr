@@ -6,36 +6,37 @@ import Testing
 @testable import StudentKit
 
 @Test func setVideoUploadIndicatorStyleMapsEveryUploadStatus() {
-  #expect(SetVideoUploadIndicatorStyle.resolve(for: nil) == .unattached)
-  #expect(SetVideoUploadIndicatorStyle.resolve(for: .pending) == .pending)
-  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploading) == .uploading)
-  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploaded) == .uploaded)
-  #expect(SetVideoUploadIndicatorStyle.resolve(for: .failed) == .failed)
-}
-
-@Test func setVideoUploadIndicatorStyleUsesDistinctStatusSymbols() {
-  #expect(SetVideoUploadIndicatorStyle.unattached.systemImage == "video")
-  #expect(SetVideoUploadIndicatorStyle.pending.systemImage == "clock.arrow.circlepath")
-  #expect(SetVideoUploadIndicatorStyle.uploading.systemImage == "arrow.up.circle.fill")
-  #expect(SetVideoUploadIndicatorStyle.uploaded.systemImage == "checkmark.circle.fill")
-  #expect(SetVideoUploadIndicatorStyle.failed.systemImage == "exclamationmark.triangle.fill")
-}
-
-@Test func setVideoUploadIndicatorUnattachedOverrideOnlyAffectsUnattached() {
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: nil, progress: 0) == .unattached)
   #expect(
-    SetVideoUploadIndicatorStyle.unattached.color(unattached: Color.MeetPR.fgPrimary)
-      == Color.MeetPR.fgPrimary)
+    SetVideoUploadIndicatorStyle.resolve(for: .pending, progress: 0.4)
+      == .uploading(progress: 0))
   #expect(
-    SetVideoUploadIndicatorStyle.unattached.color(unattached: Color.MeetPR.fgTertiary)
-      == Color.MeetPR.fgTertiary)
-  for style: SetVideoUploadIndicatorStyle in [.pending, .uploading, .uploaded, .failed] {
-    #expect(style.color(unattached: Color.MeetPR.fgPrimary) == style.accentColor)
-  }
+    SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: 0.42)
+      == .uploading(progress: 0.42))
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploaded, progress: 1) == .uploaded)
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: .failed, progress: 0.7) == .failed)
 }
 
-@Test func setVideoUploadIndicatorStatusAccentsMatchDesignTokens() {
-  #expect(SetVideoUploadIndicatorStyle.uploaded.accentColor == Color.MeetPR.green)
-  #expect(SetVideoUploadIndicatorStyle.failed.accentColor == Color.MeetPR.amber)
-  #expect(SetVideoUploadIndicatorStyle.pending.accentColor == Color.MeetPR.brandRed)
-  #expect(SetVideoUploadIndicatorStyle.uploading.accentColor == Color.MeetPR.brandRed)
+@Test func setVideoUploadIndicatorClampsUploadProgress() {
+  #expect(
+    SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: -0.3)
+      == .uploading(progress: 0))
+  #expect(
+    SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: 1.7)
+      == .uploading(progress: 1))
+}
+
+@Test func setVideoUploadIndicatorStrokeColorsMatchDesignTokens() {
+  #expect(SetVideoUploadIndicatorStyle.unattached.strokeColor == Color.MeetPR.fgTertiary)
+  #expect(SetVideoUploadIndicatorStyle.uploaded.strokeColor == Color.MeetPR.green)
+  #expect(SetVideoUploadIndicatorStyle.failed.strokeColor == Color.MeetPR.brandRed)
+  #expect(SetVideoUploadIndicatorStyle.uploading(progress: 0.5).strokeColor == nil)
+}
+
+@Test func setVideoUploadIndicatorAccessibilityLabelsAreDistinct() {
+  #expect(SetVideoUploadIndicatorStyle.unattached.accessibilityLabel == "未附视频")
+  #expect(
+    SetVideoUploadIndicatorStyle.uploading(progress: 0.65).accessibilityLabel == "视频上传中 65%")
+  #expect(SetVideoUploadIndicatorStyle.uploaded.accessibilityLabel == "视频已上传")
+  #expect(SetVideoUploadIndicatorStyle.failed.accessibilityLabel == "视频上传失败")
 }
