@@ -28,6 +28,15 @@
   - 姊妹修复(不随本包,已上线):backend#52 POST readiness 返回完整行,随 2026-07-11
     SAE 滚镜像生效——提交假失败(030 §C 上线以来 100% 复现)对 1.0(7)/(8) 老包直接痊愈
 
+- **[P1] 凭证失效不再天书报错(bcf8826,port of #245)**:很久没开 app/别端登录导致凭证失效时,
+  冷启动直接干净回登录页,不再带死 token 进 app 后在训练页糊出
+  「AppShell.AuthRepositoryError error 0」;训练页/周历/组记录错误文案中文化
+  (「登录已过期,请重新登录」)
+  - 验证留痕:review-loop 2 轮 CLEAN(main 侧同改动);AppShell 52/Networking 70/StudentKit 313 绿;
+    Debug(真 staging)模拟器双形态(solo/带教)E2E 亲验:服务端轮换凭证→冷启动→干净回登录页
+  - 姊妹修复(不随本包):backend#59 多设备会话(未合)——教练双端并行不互踢 + 刷新丢包宽限,
+    合并部署后此类被动登出本身也大幅减少
+
 ## 📋 进度:离 archive 还差几步
 - [ ] **⛔ 切包硬门:backend 0038 迁移(DMS)+ SAE 滚新镜像必须先部署**——iOS 顺延已是 V2
       计划级端点(backend PR #57 已合 staging),线上镜像还是 V1 端点,先发 iOS 会 404
