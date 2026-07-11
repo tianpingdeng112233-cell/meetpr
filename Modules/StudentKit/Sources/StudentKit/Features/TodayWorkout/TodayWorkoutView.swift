@@ -21,6 +21,7 @@ public struct TodayWorkoutView: View {
   @State private var selectedDate: Date
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
+  @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
   /// Whether the slide-to-complete → 训练回顾 → 完成 flow has been finished for
   /// the loaded day; loaded from `SessionReviewStore` so the slide control does
@@ -148,6 +149,23 @@ public struct TodayWorkoutView: View {
       Button("知道了", role: .cancel) { viewModel.clearActionError() }
     } message: {
       Text(viewModel.actionErrorMessage ?? "")
+    }
+    .confirmationDialog(
+      "视频上传失败", isPresented: retryDialogPresented, titleVisibility: .visible
+    ) {
+      Button("重试上传") {
+        if let setLogID = retryTargetSetLogID {
+          Task { await videoViewModel.retry(setLogID: setLogID) }
+        }
+      }
+      Button("删除视频", role: .destructive) {
+        if let setLogID = retryTargetSetLogID {
+          Task { await videoViewModel.remove(setLogID: setLogID) }
+        }
+      }
+      Button("取消", role: .cancel) {}
+    } message: {
+      Text("视频仍保存在本机,可直接重试上传。")
     }
     .task {
       let isFirstLoad = viewModel.state == .idle
@@ -382,12 +400,19 @@ public struct TodayWorkoutView: View {
       .buttonStyle(.plain)
 
       Button {
-        editing = EditingTarget(
-          id: draft.id,
-          rowIndex: rowIndex,
-          draft: draft,
-          setNumber: setNumber,
-          scrollToVideo: true)
+        // A failed upload routes straight to retry: the set already cost the
+        // student real fatigue and can't be re-done, so the recording must
+        // never be one buried menu away (David, beta 2026-07-11).
+        if let failedSetLogID = failedVideoSetLogID(for: draft) {
+          retryTargetSetLogID = failedSetLogID
+        } else {
+          editing = EditingTarget(
+            id: draft.id,
+            rowIndex: rowIndex,
+            draft: draft,
+            setNumber: setNumber,
+            scrollToVideo: true)
+        }
       } label: {
         SetVideoUploadIndicator(
           status: videoRowState(for: draft)?.attachment.status,
@@ -507,12 +532,20 @@ public struct TodayWorkoutView: View {
       Text(repsText(draft)).foregroundStyle(foreground)
       Text(rpeText(draft)).foregroundStyle(foreground)
       Text(statusMark(draft)).foregroundStyle(statusColor(draft))
-      SetVideoUploadIndicator(
-        status: videoRowState(for: draft)?.attachment.status,
-        progress: videoRowState(for: draft)?.progress ?? 0,
-        size: 16
-      )
-      .frame(maxWidth: .infinity, alignment: .trailing)
+      // A failed upload intercepts the icon tap and goes straight to retry
+      // (the row itself still opens the editor); other states fall through.
+      if let failedSetLogID = failedVideoSetLogID(for: draft) {
+        SetVideoUploadIndicator(status: .failed, progress: 0, size: 16)
+          .frame(maxWidth: .infinity, alignment: .trailing)
+          .onTapGesture { retryTargetSetLogID = failedSetLogID }
+      } else {
+        SetVideoUploadIndicator(
+          status: videoRowState(for: draft)?.attachment.status,
+          progress: videoRowState(for: draft)?.progress ?? 0,
+          size: 16
+        )
+        .frame(maxWidth: .infinity, alignment: .trailing)
+      }
     }
     .font(.system(size: 16, design: .monospaced))
     .padding(.horizontal, 16)
@@ -565,6 +598,18 @@ public struct TodayWorkoutView: View {
   ) -> VideoAttachmentViewModel.RowState? {
     guard let setLogID = draft.loggedSetID else { return nil }
     return videoViewModel.rowStates[setLogID]
+  }
+
+  private func failedVideoSetLogID(for draft: TodayWorkoutViewModel.SetRowDraft) -> UUID? {
+    guard videoRowState(for: draft)?.attachment.status == .failed else { return nil }
+    return draft.loggedSetID
+  }
+
+  private var retryDialogPresented: Binding<Bool> {
+    Binding(
+      get: { retryTargetSetLogID != nil },
+      set: { if !$0 { retryTargetSetLogID = nil } }
+    )
   }
 
   private func referenceText(_ reference: ExerciseReference) -> String {
