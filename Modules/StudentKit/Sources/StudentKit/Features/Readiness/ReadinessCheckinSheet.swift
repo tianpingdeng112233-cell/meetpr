@@ -110,12 +110,12 @@ struct ReadinessCheckinSheet: View {
             Circle()
               .fill(
                 (value.wrappedValue ?? 0) >= level
-                  ? Color.MeetPR.brandRed : Color.MeetPR.surface3
+                  ? Color.MeetPR.fgPrimary : Color.MeetPR.surface3
               )
               .frame(width: 30, height: 30)
               .overlay(
                 Circle().strokeBorder(
-                  value.wrappedValue == level ? Color.MeetPR.fgPrimary : .clear, lineWidth: 2)
+                  value.wrappedValue == level ? Color.MeetPR.bg : .clear, lineWidth: 2)
               )
           }
           .buttonStyle(.plain)
@@ -214,13 +214,13 @@ private struct FlowChips: View {
           .padding(.horizontal, MeetPRSpacing.sm)
           .padding(.vertical, 8)
           .frame(maxWidth: .infinity)
-          .background(level == nil ? Color.MeetPR.surface2 : Color.MeetPR.brandRedSoft)
-          .foregroundStyle(level == nil ? Color.MeetPR.fgSecondary : Color.MeetPR.brandRed)
+          .background(level == nil ? Color.MeetPR.surface2 : Color.MeetPR.surface3)
+          .foregroundStyle(level == nil ? Color.MeetPR.fgSecondary : Color.MeetPR.fgPrimary)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
           .overlay(
             RoundedRectangle(cornerRadius: MeetPRRadius.md)
               .strokeBorder(
-                level == nil ? Color.MeetPR.border : Color.MeetPR.brandRed, lineWidth: 1)
+                level == nil ? Color.MeetPR.border : Color.MeetPR.fgPrimary, lineWidth: 1)
           )
         }
         .buttonStyle(.plain)
