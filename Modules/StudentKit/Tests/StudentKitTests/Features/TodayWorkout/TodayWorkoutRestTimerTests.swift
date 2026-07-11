@@ -5,10 +5,16 @@ import Testing
 @testable import StudentKit
 
 /// Spec 030 §B2 invariants, run against a frozen injected clock.
+///
+/// Frozen at the seed's own UTC-midnight anchor so `day[3].date == frozenNow`
+/// and "today" resolves to day-offset 3 in every timezone at every hour
+/// (mechanism documented in TodayWorkoutPRHookTests).
+private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-13 00:00:00 UTC
+
 @MainActor
 private func makeViewModel(
-  now: Date = Date(timeIntervalSince1970: 1_768_262_400),
-  plan: StudentPlanView = StudentDemoSeed.makePlanView()
+  now: Date = frozenNow,
+  plan: StudentPlanView = StudentDemoSeed.makePlanView(today: frozenNow)
 ) async throws -> TodayWorkoutViewModel {
   let studentID = StudentDemoSeed.studentID
   let store = TestStudentPlanStore(seed: [studentID: plan])
@@ -18,7 +24,7 @@ private func makeViewModel(
     e1rm: InMemoryE1RMRepository(),
     now: { now }
   )
-  await viewModel.load(date: Date(), studentID: studentID)
+  await viewModel.load(date: frozenNow, studentID: studentID)
   guard case .loaded = viewModel.state else {
     throw RestTimerTestFailure("expected loaded, got \(viewModel.state)")
   }
@@ -32,7 +38,6 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 
 @MainActor
 @Test func completionEdgeStartsTimerWithRPEDuration() async throws {
-  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
   let viewModel = try await makeViewModel(now: frozenNow)
 
   // Demo "today" is the 硬拉 day: 3 sets @ RPE 8.5 → 180s per the policy.
@@ -45,7 +50,6 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 
 @MainActor
 @Test func completionEdgePrefersPrescribedRestSecondsOverAutoPolicy() async throws {
-  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
   let plan = planReplacingFirstSet(restSeconds: 75)
   let viewModel = try await makeViewModel(now: frozenNow, plan: plan)
 
@@ -72,7 +76,6 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 
 @MainActor
 @Test func consecutiveCompletionsReplaceTheTimer() async throws {
-  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
   let viewModel = try await makeViewModel(now: frozenNow)
 
   await viewModel.toggleComplete(rowIndex: 0)
@@ -98,7 +101,6 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 
 @MainActor
 @Test func adjustClampsRemainingBetweenZeroAnd900() async throws {
-  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
   let viewModel = try await makeViewModel(now: frozenNow)
   await viewModel.toggleComplete(rowIndex: 0)
 
@@ -119,9 +121,13 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 }
 
 private func planReplacingFirstSet(restSeconds: Int?) -> StudentPlanView {
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentDemoSeed.makePlanView(today: frozenNow)
   let calendar = Calendar.current
-  guard let dayIndex = plan.days.firstIndex(where: { calendar.isDateInToday($0.date) }) else {
+  guard
+    let dayIndex = plan.days.firstIndex(where: {
+      calendar.isDate($0.date, inSameDayAs: frozenNow)
+    })
+  else {
     return plan
   }
   let day = plan.days[dayIndex]
