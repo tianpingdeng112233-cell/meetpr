@@ -71,9 +71,12 @@ public struct TodayWorkoutView: View {
           case .idle, .loading:
             ProgressView()
               .frame(maxWidth: .infinity, maxHeight: .infinity)
-          case .loaded(let day, let drafts):
-            workout(day: day, drafts: drafts)
-          case .recording(let day, let drafts, _):
+          // One pattern, one branch: .loaded → .recording → .loaded round-trips
+          // during every persist, and separate cases are separate structural
+          // identities — SwiftUI tore down the subtree, which dismissed and
+          // re-presented the set-entry sheet with reset fields whenever a
+          // video attach minted a set log (beta 2026-07-11).
+          case .loaded(let day, let drafts), .recording(let day, let drafts, _):
             workout(day: day, drafts: drafts)
           case .rest:
             ContentUnavailableView(restTitle, systemImage: "bed.double", description: Text("看本周计划"))
@@ -158,6 +161,9 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: selectedDate) { _, newDate in
+      // The open editor belongs to the day being left — a stale rowIndex
+      // against reloaded drafts would edit the wrong set.
+      editing = nil
       Task { await loadWorkout(for: newDate) }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
@@ -166,6 +172,7 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: planRevision) { _, _ in
+      editing = nil
       Task { await loadWorkout(for: selectedDate) }
     }
   }

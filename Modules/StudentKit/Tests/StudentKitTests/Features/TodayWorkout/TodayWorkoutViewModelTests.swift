@@ -322,3 +322,35 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
 
   #expect(viewModel.actionErrorMessage == "登录已过期，请重新登录")
 }
+
+@MainActor
+@Test func ensureLoggedSetIDKeepsFlushedEditsWithoutCompleting() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: InMemoryStudentTrainingLogRepository(),
+    now: { plan.days[0].date.addingTimeInterval(3_600) }
+  )
+  await viewModel.load(date: plan.days[0].date, studentID: studentID)
+
+  // Video-before-complete flow (beta 2026-07-11): the entry sheet flushes the
+  // typed numbers, then mints a set-log id for the attachment. The minted log
+  // must carry the flushed values, stay incomplete, and survive the rebuild.
+  viewModel.updateWeight(rowIndex: 0, weight: 100)
+  viewModel.updateReps(rowIndex: 0, reps: 4)
+  viewModel.updateRPE(rowIndex: 0, rpe: 9)
+  let setLogID = await viewModel.ensureLoggedSetID(rowIndex: 0)
+
+  #expect(setLogID != nil)
+  guard case .loaded(_, let drafts) = viewModel.state else {
+    Issue.record("Expected loaded state after ensureLoggedSetID")
+    return
+  }
+  #expect(drafts[0].actualWeight == 100)
+  #expect(drafts[0].actualReps == 4)
+  #expect(drafts[0].actualRPE == 9)
+  #expect(!drafts[0].completed)
+  #expect(drafts[0].loggedSetID == setLogID)
+}
