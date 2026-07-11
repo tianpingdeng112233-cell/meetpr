@@ -64,7 +64,7 @@
 - [ ] 捞回队列余项逐个落线(e1RM #227 / per-set / rename / #215'/#217' 裁剪卡 / #234a×3,
       依赖与状态见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表;#216/#220/#234b 已落)
 - [ ] fadbc3a 的 review-loop 补审
-- [ ] build 号 bump 9 + 打 tag `beta/1.0-9`(prep-beta)
+- [x] build 号 bump 9(prep-beta,agvtool 单源)+ 打 tag `beta/1.0-9`
 - [ ] David:Archive → Upload → 分配 Neice
 
 ## 收尾约定
