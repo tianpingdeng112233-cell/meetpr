@@ -15,6 +15,7 @@ public struct StudentRootView: View {
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
   private let importedHistoryBackfill: ImportedHistoryBackfill
+  private let e1rmMigration: E1RMCompetitionLiftMigration
   private let onLogout: (@MainActor () async -> Void)?
   private let trainingMode: TrainingMode
   private let soloCatalog: [Exercise]
@@ -30,6 +31,7 @@ public struct StudentRootView: View {
   @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
   @State private var importedHistoryRefreshToken = 0
   @State private var planRevision = 0
+  @State private var isE1RMHistoryReady = false
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -99,6 +101,14 @@ public struct StudentRootView: View {
       e1rm: e1rm,
       catalog: soloCatalog
     )
+    self.e1rmMigration = E1RMCompetitionLiftMigration(
+      logs: logs,
+      onboarding: resolvedOnboarding,
+      plans: plans,
+      catalogReader: plans as? any ExerciseCatalogReading,
+      fallbackCatalog: soloCatalog,
+      e1rm: e1rm
+    )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -112,6 +122,22 @@ public struct StudentRootView: View {
   }
 
   public var body: some View {
+    Group {
+      if isE1RMHistoryReady {
+        studentTabs
+      } else {
+        ProgressView("正在校准实力记录…")
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+      }
+    }
+    .task {
+      guard !isE1RMHistoryReady else { return }
+      _ = try? await e1rmMigration.runIfNeeded(studentID: studentID)
+      isE1RMHistoryReady = true
+    }
+  }
+
+  private var studentTabs: some View {
     TabView(selection: $selectedTab) {
       // 今日 — student home. Coached: the plan-driven dashboard (merges the
       // old 仪表盘 + 计划). Solo (spec 045): the adhoc session home — no plan
@@ -248,8 +274,11 @@ public struct StudentRootView: View {
     .tint(Color.MeetPR.brandRed)
   }
 
+}
+
+extension StudentRootView {
   @MainActor
-  private func runImportedHistoryBackfill() async {
+  fileprivate func runImportedHistoryBackfill() async {
     guard let result = try? await importedHistoryBackfill.backfill(studentID: studentID) else {
       return
     }
@@ -265,7 +294,7 @@ public struct StudentRootView: View {
   }
 
   @MainActor
-  private func answerImportedHistoryReview(
+  fileprivate func answerImportedHistoryReview(
     _ review: PendingImportedHistoryReview,
     decision: ImportedHistoryReviewDecision
   ) async {

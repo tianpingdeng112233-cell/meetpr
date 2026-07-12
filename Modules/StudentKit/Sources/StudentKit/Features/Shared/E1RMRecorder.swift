@@ -19,6 +19,32 @@ struct E1RMRecorder: Sendable {
     let reps: Int
     let rpe: Decimal?
     let failed: Bool
+    let origin: E1RMPointOrigin
+    let priorConfidence: E1RMConfidence?
+
+    init(
+      studentID: UUID,
+      exerciseID: UUID,
+      family: LiftFamily?,
+      setLogID: UUID,
+      weightKg: Decimal,
+      reps: Int,
+      rpe: Decimal?,
+      failed: Bool,
+      origin: E1RMPointOrigin = .logged,
+      priorConfidence: E1RMConfidence? = nil
+    ) {
+      self.studentID = studentID
+      self.exerciseID = exerciseID
+      self.family = family
+      self.setLogID = setLogID
+      self.weightKg = weightKg
+      self.reps = reps
+      self.rpe = rpe
+      self.failed = failed
+      self.origin = origin
+      self.priorConfidence = priorConfidence
+    }
   }
 
   /// Records the point when the set is eligible (spec 050 §1) and returns a
@@ -59,6 +85,8 @@ struct E1RMRecorder: Sendable {
       // entries; Phase 1 stores them silently.
       let verdict = E1RMAnomalyClassifier.classify(
         newE1RMKg: estimatedOneRepMaxKg, priorNormalBestKg: previousNormalMax)
+      let confidence: E1RMConfidence =
+        verdict == .normal ? input.priorConfidence ?? .normal : .low
       let point = E1RMHistoryPoint(
         id: UUID(),
         studentId: studentID,
@@ -69,13 +97,13 @@ struct E1RMRecorder: Sendable {
         sourceWeightKg: weight,
         sourceReps: input.reps,
         sourceRPE: rpeValue,
-        confidence: verdict == .normal ? .normal : .low,
-        origin: .logged
+        confidence: confidence,
+        origin: input.origin
       )
       let storedPoint = try await e1rm.upsertPoint(point)
 
       // Only a trusted point that clears the noise band is a PR.
-      guard verdict == .normal else { return nil }
+      guard confidence == .normal else { return nil }
       return try await recordPRIfCleared(point: storedPoint, previousNormalMax: previousNormalMax)
     } catch {
       return nil
