@@ -6,6 +6,9 @@ import Foundation
 /// implementation arrives with the cross-device-history spec.
 public protocol E1RMRepository: Sendable {
   func recordPoint(_ point: E1RMHistoryPoint) async throws
+  /// Replaces one student's local history and clears their stored PR events.
+  /// Other students sharing the device are retained.
+  func replaceHistory(studentId: UUID, with points: [E1RMHistoryPoint]) async throws
   func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint]
   func fetchHistory(studentId: UUID, exerciseIds: [UUID]) async throws -> [UUID:
     [E1RMHistoryPoint]]

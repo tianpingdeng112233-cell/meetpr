@@ -14,6 +14,7 @@ public struct StudentRootView: View {
   private let readiness: any ReadinessRepository
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
+  private let e1rmMigration: E1RMCompetitionLiftMigration
   private let onLogout: (@MainActor () async -> Void)?
   private let account: (any AccountRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
@@ -27,6 +28,7 @@ public struct StudentRootView: View {
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
   @State private var planRevision = 0
+  @State private var isE1RMHistoryReady = false
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -75,12 +77,20 @@ public struct StudentRootView: View {
     self.videoUploads = videoUploads ?? .demo()
     self.onLogout = onLogout
     self.account = account
-    self.onboarding =
+    let resolvedOnboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
         studentId: studentID,
         seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
       )
+    self.onboarding = resolvedOnboarding
+    self.e1rmMigration = E1RMCompetitionLiftMigration(
+      logs: logs,
+      onboarding: resolvedOnboarding,
+      plans: plans,
+      catalogReader: plans as? any ExerciseCatalogReading,
+      e1rm: e1rm
+    )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -94,6 +104,22 @@ public struct StudentRootView: View {
   }
 
   public var body: some View {
+    Group {
+      if isE1RMHistoryReady {
+        studentTabs
+      } else {
+        ProgressView("正在校准实力记录…")
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+      }
+    }
+    .task {
+      guard !isE1RMHistoryReady else { return }
+      _ = try? await e1rmMigration.runIfNeeded(studentID: studentID)
+      isE1RMHistoryReady = true
+    }
+  }
+
+  private var studentTabs: some View {
     TabView(selection: $selectedTab) {
       // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
       // here + full history under 成长, so there is no separate 反馈 tab).
@@ -120,8 +146,9 @@ public struct StudentRootView: View {
       }
 
       TodayWorkoutView(
-        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-        videoUploads: videoUploads, jumpToTodayToken: trainingJumpToken,
+        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+        onboarding: onboarding, readiness: readiness, videoUploads: videoUploads,
+        jumpToTodayToken: trainingJumpToken,
         planRevision: planRevision
       )
       .tag(StudentTab.training)
@@ -133,6 +160,7 @@ public struct StudentRootView: View {
       // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+        onboarding: onboarding,
         feedbackViewModel: feedbackViewModel
       )
       .tag(StudentTab.growth)
