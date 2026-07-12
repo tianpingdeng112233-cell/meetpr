@@ -33,7 +33,7 @@ actor ImportedHistoryBackfill {
   private let onboarding: any OnboardingRepository
   private let e1rm: any E1RMRepository
   private let reviews: any ImportedHistoryReviewStoring
-  private let familyByExerciseID: [UUID: LiftFamily]
+  private let catalogByExerciseID: [UUID: Exercise]
   private let now: @Sendable () -> Date
   private var calendar: Calendar
 
@@ -50,7 +50,10 @@ actor ImportedHistoryBackfill {
     self.onboarding = onboarding
     self.e1rm = e1rm
     self.reviews = reviews
-    familyByExerciseID = MainLiftExerciseFamilyResolver.recorderFamilies(catalog: catalog)
+    catalogByExerciseID = Dictionary(
+      catalog.map { ($0.id, $0) },
+      uniquingKeysWith: { first, _ in first }
+    )
     self.now = now
     self.calendar = calendar
   }
@@ -60,7 +63,7 @@ actor ImportedHistoryBackfill {
   func backfill(studentID: UUID) async throws -> Result {
     let profile = try await onboarding.fetchProfile(studentId: studentID)
     let baselines = Self.baselines(from: profile)
-    let candidates = try await eligibleCandidates(studentID: studentID)
+    let candidates = try await eligibleCandidates(studentID: studentID, onboarding: profile)
     let existingBySetLogID = try await existingImportedPoints(
       studentID: studentID,
       exerciseIDs: Set(candidates.map(\.exerciseID))
@@ -210,13 +213,18 @@ actor ImportedHistoryBackfill {
 }
 
 extension ImportedHistoryBackfill {
-  private func eligibleCandidates(studentID: UUID) async throws -> [Candidate] {
+  private func eligibleCandidates(
+    studentID: UUID,
+    onboarding: OnboardingProfile?
+  ) async throws -> [Candidate] {
     let allLogs = try await fetchWindow(studentID: studentID)
     return allLogs.compactMap { log in
       guard log.assumed, log.completed, !log.failed, let exerciseID = log.exerciseID else {
         return nil
       }
-      let family = familyByExerciseID[exerciseID]
+      guard let exercise = catalogByExerciseID[exerciseID],
+        let family = resolveCompetitionFamily(exercise: exercise, onboarding: onboarding)
+      else { return nil }
       let sourceWeightKg = NSDecimalNumber(decimal: log.weightKg).doubleValue
       let sourceRPE = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
       guard E1RMEligibility.isEligible(reps: log.reps, rpe: sourceRPE, family: family),

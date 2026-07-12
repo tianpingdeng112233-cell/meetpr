@@ -37,6 +37,32 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func growthFamilyMapResolvesStanceForTheSelectedStudent() {
+  let lowBar = growthPlanExercise(stance: .lowBar)
+  let highBar = growthPlanExercise(stance: .highBar)
+  let rdl = growthPlanExercise(family: .deadlift, stance: nil)
+  let day = StudentPlanDay(
+    id: UUID(),
+    date: CoachStudentFeatureFixtures.startDate,
+    exercises: [lowBar, highBar, rdl]
+  )
+  let profile = OnboardingProfile(
+    userId: CoachStudentFeatureFixtures.studentID,
+    squatStance: .lowBar,
+    createdAt: CoachStudentFeatureFixtures.startDate,
+    updatedAt: CoachStudentFeatureFixtures.startDate
+  )
+
+  let families = StudentGrowthViewModel.familyByPlanExerciseID(
+    days: [day],
+    onboarding: profile
+  )
+
+  #expect(families == [lowBar.id: .squat])
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func growthPointsRecomputeE1RMAndDropIneligibleLogs() {
   let base = CoachStudentFeatureFixtures.startDate
   let newer = growthLog(loggedAt: base.addingTimeInterval(3 * 86_400))
@@ -124,6 +150,28 @@ private func growthLog(
     reps: 5,
     rpe: rpe,
     completed: completed
+  )
+}
+
+private func growthPlanExercise(
+  family: LiftFamily = .squat,
+  stance: CompetitionStance?
+) -> StudentPlanExercise {
+  StudentPlanExercise(
+    id: UUID(),
+    exercise: Exercise(
+      id: UUID(),
+      name: "测试动作",
+      exerciseType: .mainLiftVariation,
+      mainLiftFamily: family,
+      isCompetitionLift: false,
+      competitionStance: stance,
+      muscleGroups: [],
+      equipment: [],
+      createdAt: CoachStudentFeatureFixtures.startDate
+    ),
+    sequenceIndex: 0,
+    prescribedSets: []
   )
 }
 

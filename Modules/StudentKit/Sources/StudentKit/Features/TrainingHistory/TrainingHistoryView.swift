@@ -30,6 +30,7 @@ public struct TrainingHistoryView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
+    onboarding: any OnboardingProfileReading,
     feedbackViewModel: FeedbackInboxViewModel? = nil,
     sessionReviews: (any SessionReviewRepository)? = nil,
     trainingMode: TrainingMode = .coached,
@@ -46,11 +47,12 @@ public struct TrainingHistoryView: View {
     self.onImportedHistoryRefresh = onImportedHistoryRefresh
     self._viewModel = State(
       initialValue: TrainingHistoryViewModel(
-        plans: plans, logs: logs, reviews: sessionReviews,
-        e1rm: e1rm, mode: trainingMode, catalog: soloCatalog))
+        plans: plans, logs: logs, onboarding: onboarding,
+        reviews: sessionReviews, e1rm: e1rm, mode: trainingMode, catalog: soloCatalog))
     self._trendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(
-        plans: plans, e1rm: e1rm, mode: trainingMode, catalog: soloCatalog)
+        plans: plans, e1rm: e1rm, onboarding: onboarding,
+        mode: trainingMode, catalog: soloCatalog)
     )
   }
 

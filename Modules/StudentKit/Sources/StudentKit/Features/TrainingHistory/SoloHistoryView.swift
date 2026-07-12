@@ -18,6 +18,7 @@ public struct SoloHistoryView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
+    onboarding: any OnboardingProfileReading,
     sessionReviews: (any SessionReviewRepository)? = nil,
     catalog: [Exercise] = []
   ) {
@@ -26,8 +27,8 @@ public struct SoloHistoryView: View {
       catalog.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
     self._viewModel = State(
       initialValue: TrainingHistoryViewModel(
-        plans: plans, logs: logs, reviews: sessionReviews,
-        e1rm: e1rm, mode: .selfTrain, catalog: catalog))
+        plans: plans, logs: logs, onboarding: onboarding,
+        reviews: sessionReviews, e1rm: e1rm, mode: .selfTrain, catalog: catalog))
   }
 
   public var body: some View {

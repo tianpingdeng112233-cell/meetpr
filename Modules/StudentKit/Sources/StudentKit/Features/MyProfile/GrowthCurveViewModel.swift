@@ -35,6 +35,7 @@ public final class GrowthCurveViewModel {
 
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let onboarding: any OnboardingProfileReading
   private let now: @Sendable () -> Date
   private let mode: TrainingMode
   private let catalog: [Exercise]
@@ -44,12 +45,14 @@ public final class GrowthCurveViewModel {
   public init(
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
+    onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID()),
     now: @escaping @Sendable () -> Date = { Date() },
     mode: TrainingMode = .coached,
     catalog: [Exercise] = []
   ) {
     self.plans = plans
     self.e1rm = e1rm
+    self.onboarding = onboarding
     self.now = now
     self.mode = mode
     self.catalog = catalog
@@ -61,8 +64,9 @@ public final class GrowthCurveViewModel {
       // Solo never asks for a plan (spec 047 §1) — catalog buckets instead.
       let plan =
         mode == .selfTrain ? nil : try await plans.fetchCurrentPlan(studentID: studentID)
+      let profile = try await onboarding.fetchProfile(studentId: studentID)
       let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
-        in: plan, catalog: catalog)
+        in: plan, catalog: catalog, onboarding: profile)
 
       var grouped: [LiftFamily: E1RMSeries] = [:]
       var pointsByID: [UUID: E1RMHistoryPoint] = [:]

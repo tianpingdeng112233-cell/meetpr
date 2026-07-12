@@ -29,6 +29,10 @@ import Testing
   #expect(catalog.count == 1223)
   #expect(InMemoryPlanRepository.loadBundledCatalogV2().count == 1219)
   #expect(InMemoryPlanRepository.syntheticCompetitionLifts().count == 4)
+  let deadlifts = InMemoryPlanRepository.syntheticCompetitionLifts().filter {
+    $0.mainLiftFamily == .deadlift
+  }
+  #expect(Set(deadlifts.compactMap(\.competitionStance)) == [.conventional, .sumo])
 }
 
 @available(iOS 17.0, macOS 14.0, *)

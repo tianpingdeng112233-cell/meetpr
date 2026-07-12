@@ -124,6 +124,7 @@ public struct StudentRootView: View {
               logs: logs,
               e1rm: e1rm,
               catalog: soloCatalog,
+              onboarding: onboarding,
               pendingCount: pendingSetLogCount
             ),
             catalog: soloCatalog,
@@ -168,12 +169,13 @@ public struct StudentRootView: View {
         if trainingMode == .selfTrain {
           SoloHistoryView(
             studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
-            sessionReviews: sessionReviews, catalog: soloCatalog
+            onboarding: onboarding, sessionReviews: sessionReviews, catalog: soloCatalog
           )
         } else {
           TodayWorkoutView(
-            studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
-            videoUploads: videoUploads, resetToTodayPulse: trainingTodayPulse,
+            studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+            onboarding: onboarding, readiness: readiness, videoUploads: videoUploads,
+            resetToTodayPulse: trainingTodayPulse,
             sessionReviews: sessionReviews, planRevision: planRevision
           )
         }
@@ -190,6 +192,7 @@ public struct StudentRootView: View {
       // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+        onboarding: onboarding,
         feedbackViewModel: feedbackViewModel, sessionReviews: sessionReviews,
         trainingMode: trainingMode, soloCatalog: soloCatalog,
         importedHistoryRefreshToken: importedHistoryRefreshToken,

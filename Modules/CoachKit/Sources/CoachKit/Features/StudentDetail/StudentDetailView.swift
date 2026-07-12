@@ -40,6 +40,7 @@ struct StudentDetailView: View {
       initialValue: StudentGrowthViewModel(
         plans: context.plans,
         trainingLogs: context.trainingLogs,
+        profiles: context.profiles,
         familyMapProvider: context.familyMapProvider
       )
     )

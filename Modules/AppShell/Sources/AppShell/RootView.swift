@@ -194,7 +194,8 @@ public struct RootView: View {
             logs: studentLogs,
             feedback: studentFeedback,
             e1rm: studentE1RM,
-            readiness: studentReadiness
+            readiness: studentReadiness,
+            onboarding: studentOnboarding
           ),
           onLogout: {
             await session.logout()

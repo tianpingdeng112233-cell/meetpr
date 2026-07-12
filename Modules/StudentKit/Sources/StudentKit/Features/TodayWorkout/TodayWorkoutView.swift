@@ -28,6 +28,7 @@ public struct TodayWorkoutView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
+    onboarding: any OnboardingProfileReading,
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
     resetToTodayPulse: Int = 0,
@@ -42,7 +43,12 @@ public struct TodayWorkoutView: View {
     self.planRevision = planRevision
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
-      initialValue: TodayWorkoutViewModel(plans: plans, logs: logs, e1rm: e1rm))
+      initialValue: TodayWorkoutViewModel(
+        plans: plans,
+        logs: logs,
+        e1rm: e1rm,
+        onboarding: onboarding
+      ))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness))
     self._videoViewModel = State(

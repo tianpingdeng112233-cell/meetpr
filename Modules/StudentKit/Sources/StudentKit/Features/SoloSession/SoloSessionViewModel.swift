@@ -26,8 +26,10 @@ public final class SoloSessionViewModel {
   @ObservationIgnored private let studentID: UUID
   @ObservationIgnored private let logs: any StudentTrainingLogRepository
   @ObservationIgnored private let e1rmRepo: any E1RMRepository
+  @ObservationIgnored private let onboarding: any OnboardingProfileReading
+  @ObservationIgnored private let catalog: [Exercise]
   @ObservationIgnored private let exerciseNames: [UUID: String]
-  @ObservationIgnored private let exerciseFamilies: [UUID: LiftFamily]
+  @ObservationIgnored private var exerciseFamilies: [UUID: LiftFamily] = [:]
   @ObservationIgnored private let pendingCount: @Sendable (UUID) async -> Int
   @ObservationIgnored private let now: () -> Date
   @ObservationIgnored private let calendar: Calendar
@@ -39,6 +41,7 @@ public final class SoloSessionViewModel {
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
     catalog: [Exercise],
+    onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID()),
     pendingCount: @escaping @Sendable (UUID) async -> Int = { _ in 0 },
     now: @escaping () -> Date = Date.init,
     calendar: Calendar = .current
@@ -46,9 +49,10 @@ public final class SoloSessionViewModel {
     self.studentID = studentID
     self.logs = logs
     self.e1rmRepo = e1rm
+    self.onboarding = onboarding
+    self.catalog = catalog
     self.exerciseNames = Dictionary(
       catalog.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
-    self.exerciseFamilies = MainLiftExerciseFamilyResolver.recorderFamilies(catalog: catalog)
     self.pendingCount = pendingCount
     self.now = now
     self.calendar = calendar
@@ -59,6 +63,11 @@ public final class SoloSessionViewModel {
   /// for 「重复上次」, and picker suggestions. Locks the session day.
   public func load() async {
     sessionDate = Self.dayString(now(), calendar: calendar)
+    let profile = try? await onboarding.fetchProfile(studentId: studentID)
+    exerciseFamilies = MainLiftExerciseFamilyResolver.recorderFamilies(
+      catalog: catalog,
+      onboarding: profile
+    )
     let today = now()
     guard let windowStart = calendar.date(byAdding: .day, value: -90, to: today) else { return }
 

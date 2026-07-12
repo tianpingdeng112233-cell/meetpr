@@ -15,6 +15,17 @@
 
 不合规的组照常记录训练日志(入选门只管 e1RM/PR,不管日志)。
 
+### 主项门(动作是否算该学员的比赛主项)
+
+动作必须先通过共享纯函数 `resolveCompetitionFamily(exercise, onboarding)`，才进入上面的组配入选门。后端与 iOS 镜像以下同一裁决，并读取同一 catalog `competition_stance` 字段(`low_bar|high_bar|conventional|sumo|null`)：
+
+1. `main_lift_family == null` → 不算主项。
+2. `competition_stance == null` → 仅 `is_competition_lift == true` 的泛项竞技动作算其 `main_lift_family`；普通变式不算。
+3. 有 `competition_stance` 时，深蹲对照学员 `squat_stance`，硬拉对照 `deadlift_style`；卧推没有站位分档。
+4. 对应 onboarding 未填 → 宽松算该 family；硬拉 `deadlift_style == both` → 传统与相扑都算；其余只在 `competition_stance` 与 onboarding 值相等时算。
+
+因此：竞技深蹲/竞技卧推恒算；低杠/高杠深蹲按个人杆位二选一；传统/相扑硬拉按个人 style 选择(`both` 时全算)；暂停深蹲、RDL、早安式等无 `competition_stance` 且非泛项竞技的变式永不产生 e1RM 点。后端 TypeScript 与 iOS Swift 两个解析器必须逐字保持同一分支顺序和宽松兜底。
+
 ## 2. 展示口径(三个数变一个事实)
 
 新聚合层 `E1RMSeries`(纯函数,输入原始 `E1RMHistoryPoint`,输出展示序列):

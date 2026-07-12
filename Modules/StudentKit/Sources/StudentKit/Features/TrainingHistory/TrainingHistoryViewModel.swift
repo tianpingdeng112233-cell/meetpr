@@ -55,16 +55,19 @@ public final class TrainingHistoryViewModel {
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let onboarding: any OnboardingProfileReading
   private let reviews: (any SessionReviewRepository)?
   private let e1rm: (any E1RMRepository)?
   private let mode: TrainingMode
   private let catalogNames: [UUID: String]
-  private let catalogBuckets: [LiftFamily: Set<UUID>]
+  private let catalog: [Exercise]
+  private var catalogBuckets: [LiftFamily: Set<UUID>] = [:]
   private let now: @Sendable () -> Date
 
   public init(
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
+    onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID()),
     reviews: (any SessionReviewRepository)? = nil,
     e1rm: (any E1RMRepository)? = nil,
     mode: TrainingMode = .coached,
@@ -73,16 +76,22 @@ public final class TrainingHistoryViewModel {
   ) {
     self.plans = plans
     self.logs = logs
+    self.onboarding = onboarding
     self.reviews = reviews
     self.e1rm = e1rm
     self.mode = mode
     self.catalogNames = Dictionary(
       catalog.map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
-    self.catalogBuckets = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(catalog: catalog)
+    self.catalog = catalog
     self.now = now
   }
 
   public func load(studentID: UUID) async {
+    let profile = try? await onboarding.fetchProfile(studentId: studentID)
+    catalogBuckets = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
+      catalog: catalog,
+      onboarding: profile
+    )
     if mode == .selfTrain {
       await loadSolo(studentID: studentID)
       return

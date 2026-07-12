@@ -15,6 +15,7 @@ public struct MyProfileView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let onboarding: any OnboardingRepository
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   /// nil hides the row (demo/previews); live wiring passes Session.logout.
   private let onLogout: (@MainActor () async -> Void)?
@@ -40,6 +41,7 @@ public struct MyProfileView: View {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
+    self.onboarding = onboarding
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onLogout = onLogout
     self.trainingMode = trainingMode
@@ -256,6 +258,7 @@ public struct MyProfileView: View {
       NavigationLink {
         GrowthCurveView(
           studentID: studentID, plans: plans, e1rm: e1rm,
+          onboarding: onboarding,
           mode: trainingMode, catalog: soloCatalog
         )
       } label: {
