@@ -67,6 +67,7 @@ final class DashboardE1RMTrendViewModel {
 
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let e1rm: any E1RMRepository
+  @ObservationIgnored private let onboarding: any OnboardingProfileReading
   @ObservationIgnored private let mode: TrainingMode
   @ObservationIgnored private let catalog: [Exercise]
   @ObservationIgnored private let now: @Sendable () -> Date
@@ -74,12 +75,14 @@ final class DashboardE1RMTrendViewModel {
   init(
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
+    onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID()),
     mode: TrainingMode = .coached,
     catalog: [Exercise] = [],
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.e1rm = e1rm
+    self.onboarding = onboarding
     self.mode = mode
     self.catalog = catalog
     self.now = now
@@ -92,8 +95,9 @@ final class DashboardE1RMTrendViewModel {
       // bucketing universe; coached keeps the plan tree.
       let plan =
         mode == .selfTrain ? nil : try await plans.fetchCurrentPlan(studentID: studentID)
+      let profile = try await onboarding.fetchProfile(studentId: studentID)
       let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
-        in: plan, catalog: catalog)
+        in: plan, catalog: catalog, onboarding: profile)
       let histories = try await fetchHistories(studentID: studentID, idsByFamily: idsByFamily)
       let rows = Self.rows(from: histories, idsByFamily: idsByFamily)
       let prs = try await e1rm.unacknowledgedPRs(studentId: studentID)

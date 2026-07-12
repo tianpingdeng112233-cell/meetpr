@@ -8,12 +8,16 @@ import Foundation
 enum MainLiftExerciseFamilyResolver {
   static let dashboardFamilies: [LiftFamily] = [.squat, .bench, .deadlift]
 
-  static func exerciseIDsByFamily(in plan: StudentPlanView?) -> [LiftFamily: Set<UUID>] {
+  static func exerciseIDsByFamily(
+    in plan: StudentPlanView?,
+    onboarding: OnboardingProfile?
+  ) -> [LiftFamily: Set<UUID>] {
     var idsByFamily: [LiftFamily: Set<UUID>] = [:]
     for day in plan?.days ?? [] {
       for slot in day.exercises {
         let exercise = slot.exercise
-        guard exercise.exerciseType == .mainLift, let family = exercise.mainLiftFamily else {
+        guard let family = resolveCompetitionFamily(exercise: exercise, onboarding: onboarding)
+        else {
           continue
         }
         idsByFamily[family, default: []].insert(exercise.id)
@@ -32,10 +36,14 @@ enum MainLiftExerciseFamilyResolver {
   /// Catalog bucketing for planless (solo) students — comp lifts only, same
   /// rule as the plan path: variations carry different leverages and would
   /// pollute the trend line (variation curves are V0.1.x).
-  static func exerciseIDsByFamily(catalog: [Exercise]) -> [LiftFamily: Set<UUID>] {
+  static func exerciseIDsByFamily(
+    catalog: [Exercise],
+    onboarding: OnboardingProfile?
+  ) -> [LiftFamily: Set<UUID>] {
     var idsByFamily: [LiftFamily: Set<UUID>] = [:]
     for exercise in catalog {
-      guard exercise.exerciseType == .mainLift, let family = exercise.mainLiftFamily else {
+      guard let family = resolveCompetitionFamily(exercise: exercise, onboarding: onboarding)
+      else {
         continue
       }
       idsByFamily[family, default: []].insert(exercise.id)
@@ -47,20 +55,26 @@ enum MainLiftExerciseFamilyResolver {
   /// plan tree (custom exercises included), solo brings the bundled catalog.
   static func exerciseIDsByFamily(
     in plan: StudentPlanView?,
-    catalog: [Exercise]
+    catalog: [Exercise],
+    onboarding: OnboardingProfile?
   ) -> [LiftFamily: Set<UUID>] {
-    let planBuckets = exerciseIDsByFamily(in: plan)
+    let planBuckets = exerciseIDsByFamily(in: plan, onboarding: onboarding)
     guard !catalog.isEmpty else { return planBuckets }
-    return planBuckets.merging(exerciseIDsByFamily(catalog: catalog)) { $0.union($1) }
+    return planBuckets.merging(
+      exerciseIDsByFamily(catalog: catalog, onboarding: onboarding)
+    ) { $0.union($1) }
   }
 
-  /// Recorder-side family map — deliberately broader than the chart buckets:
-  /// variations keep their family so the per-family eligibility rules
-  /// (deadlift rep cap etc., spec 050) apply to them too.
-  static func recorderFamilies(catalog: [Exercise]) -> [UUID: LiftFamily] {
+  /// Recorder-side family map. It uses the same per-student competition gate
+  /// as chart bucketing so a variation can never create a hidden e1RM point.
+  static func recorderFamilies(
+    catalog: [Exercise],
+    onboarding: OnboardingProfile?
+  ) -> [UUID: LiftFamily] {
     Dictionary(
       catalog.compactMap { exercise in
-        exercise.mainLiftFamily.map { (exercise.id, $0) }
+        resolveCompetitionFamily(exercise: exercise, onboarding: onboarding)
+          .map { (exercise.id, $0) }
       },
       uniquingKeysWith: { first, _ in first })
   }

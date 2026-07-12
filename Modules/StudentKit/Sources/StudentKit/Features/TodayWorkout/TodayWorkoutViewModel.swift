@@ -31,19 +31,23 @@ public final class TodayWorkoutViewModel {
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rmRepo: any E1RMRepository
+  private let onboarding: any OnboardingProfileReading
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
+  private var currentOnboarding: OnboardingProfile?
   private var loadGeneration = 0
 
   public init(
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
+    onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID()),
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.logs = logs
     self.e1rmRepo = e1rm
+    self.onboarding = onboarding
     self.now = now
   }
 
@@ -53,6 +57,7 @@ public final class TodayWorkoutViewModel {
     let generation = loadGeneration
     state = .loading
     do {
+      currentOnboarding = try? await onboarding.fetchProfile(studentId: studentID)
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       guard isCurrentLoad(generation) else { return }
       planContext = Self.planContext(from: plan, selectedDate: date)
@@ -264,7 +269,12 @@ extension TodayWorkoutViewModel {
     studentID: UUID
   ) async throws -> [UUID: ExerciseReference] {
     let familyByExercise = Dictionary(
-      day.exercises.map { ($0.exercise.id, $0.exercise.mainLiftFamily) },
+      day.exercises.map {
+        (
+          $0.exercise.id,
+          resolveCompetitionFamily(exercise: $0.exercise, onboarding: currentOnboarding)
+        )
+      },
       uniquingKeysWith: { first, _ in first })
     let exerciseIDs = Set(day.exercises.map(\.exercise.id))
     let e1rmRepo = self.e1rmRepo
@@ -360,8 +370,8 @@ extension TodayWorkoutViewModel {
     default:
       day = nil
     }
-    return day?.exercises
-      .first { $0.id == planExerciseID }?
-      .exercise.mainLiftFamily
+    guard let exercise = day?.exercises.first(where: { $0.id == planExerciseID })?.exercise
+    else { return nil }
+    return resolveCompetitionFamily(exercise: exercise, onboarding: currentOnboarding)
   }
 }

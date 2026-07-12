@@ -188,14 +188,7 @@ public struct RootView: View {
         // Single-page evaluation state replaces the 5 tabs (spec 033 D6).
         EvaluationPeriodView(
           studentID: studentId,
-          dependencies: EvaluationPeriodDependencies(
-            evaluations: studentEvaluations,
-            plans: studentPlans,
-            logs: studentLogs,
-            feedback: studentFeedback,
-            e1rm: studentE1RM,
-            readiness: studentReadiness
-          ),
+          dependencies: evaluationPeriodDependencies,
           onLogout: {
             await session.logout()
           },
@@ -205,6 +198,18 @@ public struct RootView: View {
       content: {
         studentRoot(for: user)
       }
+    )
+  }
+
+  private var evaluationPeriodDependencies: EvaluationPeriodDependencies {
+    EvaluationPeriodDependencies(
+      evaluations: studentEvaluations,
+      plans: studentPlans,
+      logs: studentLogs,
+      feedback: studentFeedback,
+      e1rm: studentE1RM,
+      readiness: studentReadiness,
+      onboarding: studentOnboarding
     )
   }
 

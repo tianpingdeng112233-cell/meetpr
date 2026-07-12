@@ -3,7 +3,7 @@ import Foundation
 import Networking
 import RepositoryContracts
 
-public actor BackendStudentPlanRepository: StudentPlanRepository {
+public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalogReading {
   private let api: APIClient
   private let session: any SessionStateReader
   private let cache: StudentPlanCache
@@ -44,6 +44,11 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
       return []
     }
     return plan.days.sorted { $0.date < $1.date }
+  }
+
+  public func fetchExerciseCatalog() async throws -> [Exercise] {
+    let accessToken = try await session.accessToken()
+    return try await exerciseCatalog(accessToken: accessToken)
   }
 
   public func shiftDay(id: UUID, to date: Date, studentID: UUID) async throws {

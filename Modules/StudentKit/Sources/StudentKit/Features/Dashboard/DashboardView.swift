@@ -16,6 +16,7 @@ public struct DashboardView: View {
   private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let onboarding: any OnboardingProfileReading
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
@@ -51,6 +52,7 @@ public struct DashboardView: View {
     self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
     self.logs = logs
+    self.onboarding = onboarding
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
@@ -62,7 +64,11 @@ public struct DashboardView: View {
       initialValue: DashboardNotificationsViewModel(plans: plans)
     )
     self._e1rmTrendViewModel = State(
-      initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
+      initialValue: DashboardE1RMTrendViewModel(
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding
+      )
     )
     self._profileMetricsViewModel = State(
       initialValue: DashboardProfileMetricsViewModel(onboarding: onboarding)
@@ -379,7 +385,12 @@ public struct DashboardView: View {
 
   private var liftCard: some View {
     NavigationLink {
-      GrowthCurveView(studentID: studentID, plans: plans, e1rm: e1rm)
+      GrowthCurveView(
+        studentID: studentID,
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding
+      )
     } label: {
       VStack(alignment: .leading, spacing: 0) {
         liftCardContent

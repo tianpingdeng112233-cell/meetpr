@@ -60,6 +60,7 @@ final class StudentGrowthViewModel {
 
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let trainingLogs: any StudentTrainingLogRepository
+  @ObservationIgnored private let profiles: any OnboardingProfileReading
   @ObservationIgnored private let familyMapProvider: (any CoachPlanFamilyMapProviding)?
   @ObservationIgnored private let now: @Sendable () -> Date
   private var pointsByFamily: [LiftFamily: [GrowthPoint]] = [:]
@@ -67,11 +68,13 @@ final class StudentGrowthViewModel {
   init(
     plans: any StudentPlanRepository,
     trainingLogs: any StudentTrainingLogRepository,
+    profiles: any OnboardingProfileReading = InMemoryCoachStudentProfileReader(),
     familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.trainingLogs = trainingLogs
+    self.profiles = profiles
     self.familyMapProvider = familyMapProvider
     self.now = now
   }
@@ -88,13 +91,15 @@ final class StudentGrowthViewModel {
       // filters by weekIndex), so the coach-owned full plan tree is the
       // primary family source; the projection remains a fallback so the tab
       // degrades instead of blanking when the tree fetch fails (Codex P1).
+      let onboarding = try await profiles.fetchProfile(studentId: studentID)
       var familyMap: [UUID: LiftFamily] = [:]
       if let provider = familyMapProvider {
-        familyMap = (try? await provider.familyMap(traineeID: studentID)) ?? [:]
+        familyMap =
+          (try? await provider.familyMap(traineeID: studentID, onboarding: onboarding)) ?? [:]
       }
       if familyMap.isEmpty {
         let cycleDays = try await plans.fetchCycleDays(studentID: studentID)
-        familyMap = Self.familyByPlanExerciseID(days: cycleDays)
+        familyMap = Self.familyByPlanExerciseID(days: cycleDays, onboarding: onboarding)
       }
       let end = now()
       let start =
@@ -113,12 +118,18 @@ final class StudentGrowthViewModel {
   }
 
   /// Main-lift plan exercises only — accessories carry no lift family.
-  static func familyByPlanExerciseID(days: [StudentPlanDay]) -> [UUID: LiftFamily] {
+  static func familyByPlanExerciseID(
+    days: [StudentPlanDay],
+    onboarding: OnboardingProfile? = nil
+  ) -> [UUID: LiftFamily] {
     var families: [UUID: LiftFamily] = [:]
     for day in days {
       for slot in day.exercises {
-        guard slot.exercise.exerciseType == .mainLift,
-          let family = slot.exercise.mainLiftFamily
+        guard
+          let family = resolveCompetitionFamily(
+            exercise: slot.exercise,
+            onboarding: onboarding
+          )
         else { continue }
         families[slot.id] = family
       }

@@ -20,6 +20,10 @@ public protocol E1RMRepository: Sendable {
     pointIDs: Set<UUID>,
     confidence: E1RMConfidence
   ) async throws
+  /// Replaces one student's local history and clears their stored PR events.
+  /// Used by one-shot client migrations that replay canonical set logs through
+  /// the recorder; other students sharing the device are kept.
+  func replaceHistory(studentId: UUID, with points: [E1RMHistoryPoint]) async throws
   func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint]
   func fetchHistory(studentId: UUID, exerciseIds: [UUID]) async throws -> [UUID:
     [E1RMHistoryPoint]]

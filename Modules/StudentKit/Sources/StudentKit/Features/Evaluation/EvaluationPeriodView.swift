@@ -13,6 +13,7 @@ public struct EvaluationPeriodDependencies {
   public let feedback: any StudentFeedbackRepository
   public let e1rm: any E1RMRepository
   public let readiness: any ReadinessRepository
+  public let onboarding: any OnboardingProfileReading
 
   public init(
     evaluations: any EvaluationRepository,
@@ -20,7 +21,8 @@ public struct EvaluationPeriodDependencies {
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
     e1rm: any E1RMRepository,
-    readiness: any ReadinessRepository
+    readiness: any ReadinessRepository,
+    onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID())
   ) {
     self.evaluations = evaluations
     self.plans = plans
@@ -28,6 +30,7 @@ public struct EvaluationPeriodDependencies {
     self.feedback = feedback
     self.e1rm = e1rm
     self.readiness = readiness
+    self.onboarding = onboarding
   }
 }
 
@@ -189,6 +192,7 @@ public struct EvaluationPeriodView: View {
               plans: dependencies.plans,
               logs: dependencies.logs,
               e1rm: dependencies.e1rm,
+              onboarding: dependencies.onboarding,
               readiness: dependencies.readiness
             )
           } label: {

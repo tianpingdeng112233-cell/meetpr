@@ -10,6 +10,7 @@ public struct GrowthCurveView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let onboarding: any OnboardingProfileReading
   private let mode: TrainingMode
   private let catalog: [Exercise]
 
@@ -17,12 +18,14 @@ public struct GrowthCurveView: View {
     studentID: UUID,
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
+    onboarding: any OnboardingProfileReading,
     mode: TrainingMode = .coached,
     catalog: [Exercise] = []
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
+    self.onboarding = onboarding
     self.mode = mode
     self.catalog = catalog
   }
@@ -30,7 +33,12 @@ public struct GrowthCurveView: View {
   public var body: some View {
     ScrollView {
       GrowthCurvePanelView(
-        studentID: studentID, plans: plans, e1rm: e1rm, mode: mode, catalog: catalog
+        studentID: studentID,
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding,
+        mode: mode,
+        catalog: catalog
       )
       .padding(MeetPRSpacing.md)
     }
@@ -50,12 +58,19 @@ struct GrowthCurvePanelView: View {
     studentID: UUID,
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
+    onboarding: any OnboardingProfileReading,
     mode: TrainingMode = .coached,
     catalog: [Exercise] = []
   ) {
     self.studentID = studentID
     self._viewModel = State(
-      initialValue: GrowthCurveViewModel(plans: plans, e1rm: e1rm, mode: mode, catalog: catalog))
+      initialValue: GrowthCurveViewModel(
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding,
+        mode: mode,
+        catalog: catalog
+      ))
   }
 
   var body: some View {

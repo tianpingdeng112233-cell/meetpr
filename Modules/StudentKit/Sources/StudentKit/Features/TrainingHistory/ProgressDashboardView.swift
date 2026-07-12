@@ -9,13 +9,19 @@ struct ProgressDashboardView: View {
   let studentID: UUID
   let plans: any StudentPlanRepository
   let e1rm: any E1RMRepository
+  let onboarding: any OnboardingProfileReading
   let logs: [StudentSetLog]
 
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         ProgressSectionHeader(title: "e1RM 趋势")
-        GrowthCurvePanelView(studentID: studentID, plans: plans, e1rm: e1rm)
+        GrowthCurvePanelView(
+          studentID: studentID,
+          plans: plans,
+          e1rm: e1rm,
+          onboarding: onboarding
+        )
 
         ProgressSectionHeader(title: "容量 / 强度")
         VolumeIntensityChart(buckets: metrics)

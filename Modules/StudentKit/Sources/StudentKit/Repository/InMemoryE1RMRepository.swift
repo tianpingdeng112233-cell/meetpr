@@ -68,6 +68,15 @@ public actor InMemoryE1RMRepository: E1RMRepository {
     }
   }
 
+  public func replaceHistory(studentId: UUID, with replacement: [E1RMHistoryPoint]) async throws {
+    points = points.filter { $0.key.studentId != studentId }
+    for point in replacement where point.studentId == studentId {
+      points[HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId), default: []]
+        .append(point)
+    }
+    prEvents.removeAll { $0.studentId == studentId }
+  }
+
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
     (points[HistoryKey(studentId: studentId, exerciseId: exerciseId)] ?? [])
       .sorted { $0.computedAt < $1.computedAt }

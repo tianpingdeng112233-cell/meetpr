@@ -17,7 +17,7 @@ import Testing
 }
 
 @Test func deadliftStyleVocabularyMatchesBackendVerbatim() {
-  #expect(DeadliftStance.allCases.map(\.rawValue) == ["conventional", "sumo"])
+  #expect(DeadliftStance.allCases.map(\.rawValue) == ["conventional", "sumo", "both"])
 }
 
 @Test func benchGripVocabularyMatchesBackendVerbatim() {
