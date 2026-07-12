@@ -33,4 +33,4 @@
 
 ## 3. 端上重算
 
-升级后按学员执行一次 `E1RMCompetitionLiftMigration`：按时间顺序重放 canonical `set_logs`，每组仍走 release/1.0 的 `E1RMRecorder`，再全量替换该学员历史并清空旧 PR。迁移标记按 student ID 存储；只有替换成功后才写入，确保失败可重试、成功不重复。旧版仅含 `planExerciseID` 的日志通过计划槽位或既有 `setLogId → exerciseId` 关联解析。
+升级后按学员执行一次 `E1RMCompetitionLiftMigration`：按时间顺序重放 canonical `set_logs`，每组仍走 release/1.0 的 `E1RMRecorder`，再全量替换该学员历史并清空旧 PR。迁移标记按 student ID 存储；只有替换成功后才写入，确保失败可重试、成功不重复。旧版仅含 `planExerciseID` 的日志通过计划槽位或既有 `setLogId → exerciseId` 关联解析；既有点的 confidence 按 `setLogId` 原样保留，兼容 imported/assumed 点的人工复核结果。完整 catalog 中仍存在的旧动作可以重放；catalog 也无法识别的孤儿点因无法证明通过新主项门而有意丢弃。评估期与正常 tabs 必须位于同一个迁移 gate 下，失败时阻塞并允许重试，不得静默消费旧历史。

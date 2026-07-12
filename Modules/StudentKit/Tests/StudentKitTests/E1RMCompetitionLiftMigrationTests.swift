@@ -22,6 +22,7 @@ import Testing
 
   #expect(first == .init(didRun: true, pointCount: 2))
   #expect(Set(points.map(\.exerciseId)) == [fixture.genericSquat.id, fixture.lowBar.id])
+  #expect(rebuilt[fixture.genericSquat.id]?.first?.confidence == .low)
   #expect(rebuilt[fixture.highBar.id]?.isEmpty == true)
   #expect(rebuilt[fixture.rdl.id]?.isEmpty == true)
   #expect(rebuiltSeries.rawEligible.count == 2)
@@ -31,6 +32,45 @@ import Testing
 
   let second = try await fixture.migration.runIfNeeded(studentID: fixture.studentID)
   #expect(second == .init(didRun: false, pointCount: 0))
+}
+
+@Test func migrationPreservesImportedConfidenceAndDropsUnknownCatalogOrphan() async throws {
+  let studentID = UUID()
+  let oldCompetitionLift = migrationExercise(family: .bench, isCompetitionLift: true)
+  let missingCatalogExerciseID = UUID()
+  let anchor = Date(timeIntervalSince1970: 1_780_000_000)
+  let retainedLog = migrationLog(
+    studentID: studentID, planExerciseID: UUID(), weightKg: 100, date: anchor)
+  let orphanLog = migrationLog(
+    studentID: studentID, planExerciseID: UUID(), weightKg: 110,
+    date: anchor.addingTimeInterval(86_400))
+  let retainedImportedPoint = migrationPoint(
+    studentID: studentID, exerciseID: oldCompetitionLift.id, setLogID: retainedLog.id,
+    date: retainedLog.loggedAt, value: 120, confidence: .low)
+  let orphanPoint = migrationPoint(
+    studentID: studentID, exerciseID: missingCatalogExerciseID, setLogID: orphanLog.id,
+    date: orphanLog.loggedAt, value: 140, confidence: .low)
+  let e1rm = InMemoryE1RMRepository(seedPoints: [retainedImportedPoint, orphanPoint])
+  let migration = E1RMCompetitionLiftMigration(
+    logs: InMemoryStudentTrainingLogRepository(seed: [retainedLog, orphanLog]),
+    onboarding: InMemoryOnboardingRepository(studentId: studentID),
+    plans: MigrationPlanRepository(),
+    catalogReader: MigrationCatalogReader(exercises: [oldCompetitionLift]),
+    e1rm: e1rm,
+    marker: InMemoryE1RMMigrationStore(),
+    now: { anchor.addingTimeInterval(2 * 86_400) }
+  )
+
+  let result = try await migration.runIfNeeded(studentID: studentID)
+  let retained = try await e1rm.fetchHistory(
+    studentId: studentID, exerciseId: oldCompetitionLift.id)
+  let orphan = try await e1rm.fetchHistory(
+    studentId: studentID, exerciseId: missingCatalogExerciseID)
+
+  #expect(result.pointCount == 1)
+  #expect(retained.first?.setLogId == retainedLog.id)
+  #expect(retained.first?.confidence == .low)
+  #expect(orphan.isEmpty)
 }
 
 @Test func migrationResolvesLegacyPlanExerciseOnlyLog() async throws {
@@ -138,7 +178,8 @@ private func makeMigrationFixture() -> MigrationFixture {
   let oldPoints = zip(logs, zip(catalog, [160.0, 150.0, 230.0, 250.0])).map { log, pair in
     migrationPoint(
       studentID: studentID, exerciseID: pair.0.id, setLogID: log.id,
-      date: log.loggedAt, value: pair.1)
+      date: log.loggedAt, value: pair.1,
+      confidence: pair.0.id == genericSquat.id ? .low : .normal)
   }
   let oldPR = PRBreakthroughEvent(
     id: UUID(), studentId: studentID, exerciseId: rdl.id, pointId: oldPoints[3].id,
@@ -194,12 +235,13 @@ private func migrationPoint(
   exerciseID: UUID,
   setLogID: UUID,
   date: Date,
-  value: Double
+  value: Double,
+  confidence: E1RMConfidence = .normal
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
     id: UUID(), studentId: studentID, exerciseId: exerciseID, setLogId: setLogID,
     computedAt: date, e1RMKg: value, sourceWeightKg: value * 0.88,
-    sourceReps: 5, sourceRPE: 8)
+    sourceReps: 5, sourceRPE: 8, confidence: confidence)
 }
 
 private struct MigrationCatalogReader: ExerciseCatalogReading {

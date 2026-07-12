@@ -18,6 +18,33 @@ struct E1RMRecorder: Sendable {
     let rpe: Decimal?
     let completed: Bool
     let failed: Bool
+    /// Migration/import paths may preserve an already-reviewed trust tier.
+    /// Normal set recording leaves this nil and still runs the release anomaly gate.
+    let priorConfidence: E1RMConfidence?
+
+    init(
+      studentID: UUID,
+      exerciseID: UUID,
+      family: LiftFamily?,
+      setLogID: UUID,
+      weightKg: Decimal,
+      reps: Int,
+      rpe: Decimal?,
+      completed: Bool,
+      failed: Bool,
+      priorConfidence: E1RMConfidence? = nil
+    ) {
+      self.studentID = studentID
+      self.exerciseID = exerciseID
+      self.family = family
+      self.setLogID = setLogID
+      self.weightKg = weightKg
+      self.reps = reps
+      self.rpe = rpe
+      self.completed = completed
+      self.failed = failed
+      self.priorConfidence = priorConfidence
+    }
   }
 
   /// Eligible points are always recorded. A PR is emitted only when the new
@@ -51,18 +78,19 @@ struct E1RMRecorder: Sendable {
         newE1RMKg: estimatedOneRepMaxKg,
         previousBestKg: previousMax
       )
+      let confidence = input.priorConfidence ?? (verdict == .normal ? .normal : .low)
       let point = makePoint(
         input: input,
         estimatedOneRepMaxKg: estimatedOneRepMaxKg,
         sourceWeightKg: weight,
         sourceRPE: rpe,
-        confidence: verdict == .normal ? .normal : .low
+        confidence: confidence
       )
       try await e1rm.recordPoint(point)
 
       // Phase 1 persists both anomaly bands as `.low`; Phase 2 will confirm
       // hard suspects before they can become trusted.
-      guard verdict == .normal else { return nil }
+      guard confidence == .normal else { return nil }
       return try await recordPRIfCleared(point: point, previousMax: previousMax)
     } catch {
       return nil

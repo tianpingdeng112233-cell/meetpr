@@ -634,11 +634,11 @@ public struct TodayWorkoutView: View {
   // MARK: - Derived
 
   private var navTitle: String {
-    guard let day = currentDay else { return "锻炼" }
-    let dayNumber = mondayOffset(day.date) + 1
-    let weekday = viewModel.planContext.map { "W\($0.weekIndex)D\(dayNumber)" } ?? "今日"
-    guard let lift = mainLift(day)?.studentDisplayName else { return weekday }
-    return "\(weekday) · \(lift)"
+    TodayWorkoutTitleResolver.title(
+      day: currentDay,
+      planContext: viewModel.planContext,
+      onboarding: viewModel.onboardingProfile
+    )
   }
 
   private var currentDay: StudentPlanDay? {
@@ -647,17 +647,6 @@ public struct TodayWorkoutView: View {
     case .recording(let day, _, _): return day
     default: return nil
     }
-  }
-
-  private func mainLift(_ day: StudentPlanDay) -> LiftFamily? {
-    day.exercises.first {
-      $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily != nil
-    }?.exercise.mainLiftFamily
-  }
-
-  private func mondayOffset(_ date: Date) -> Int {
-    let weekday = Calendar.current.component(.weekday, from: date)  // 1=Sun…7=Sat
-    return (weekday + 5) % 7
   }
 
   private func totalSets(
@@ -713,6 +702,28 @@ public struct TodayWorkoutView: View {
   private func refreshReadinessStatus(for date: Date) async {
     guard Calendar.current.isDateInToday(date) else { return }
     await readinessViewModel.load(studentId: studentID)
+  }
+}
+
+enum TodayWorkoutTitleResolver {
+  static func title(
+    day: StudentPlanDay?,
+    planContext: TodayWorkoutPlanContext?,
+    onboarding: OnboardingProfile?
+  ) -> String {
+    guard let day else { return "锻炼" }
+    let dayNumber = mondayOffset(day.date) + 1
+    let weekday = planContext.map { "W\($0.weekIndex)D\(dayNumber)" } ?? "今日"
+    let family = day.exercises.lazy.compactMap {
+      resolveCompetitionFamily(exercise: $0.exercise, onboarding: onboarding)
+    }.first
+    guard let lift = family?.studentDisplayName else { return weekday }
+    return "\(weekday) · \(lift)"
+  }
+
+  private static func mondayOffset(_ date: Date) -> Int {
+    let weekday = Calendar.current.component(.weekday, from: date)  // 1=Sun…7=Sat
+    return (weekday + 5) % 7
   }
 }
 

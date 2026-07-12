@@ -33,7 +33,7 @@ actor UserDefaultsE1RMMigrationStore: E1RMMigrationStoring {
 /// recorder, then replace this student's local history in one repository
 /// operation. Historical PR events are discarded so removed variations cannot
 /// remain a PR baseline.
-actor E1RMCompetitionLiftMigration {
+actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
   private struct CatalogContext: Sendable {
     let exercises: [Exercise]
     let exerciseIDByPlanExerciseID: [UUID: UUID]
@@ -44,6 +44,7 @@ actor E1RMCompetitionLiftMigration {
     let exerciseByID: [UUID: Exercise]
     let exerciseIDByPlanExerciseID: [UUID: UUID]
     let oldExerciseIDBySetLogID: [UUID: UUID]
+    let priorConfidenceBySetLogID: [UUID: E1RMConfidence]
   }
 
   struct Result: Equatable, Sendable {
@@ -96,6 +97,10 @@ actor E1RMCompetitionLiftMigration {
       oldHistory.values.flatMap { $0 }.map { ($0.setLogId, $0.exerciseId) },
       uniquingKeysWith: { _, new in new }
     )
+    let priorConfidenceBySetLogID = Dictionary(
+      oldHistory.values.flatMap { $0 }.map { ($0.setLogId, $0.confidence) },
+      uniquingKeysWith: { _, new in new }
+    )
     let setLogs = try await logs.fetchLogs(
       studentID: studentID,
       in: Date(timeIntervalSince1970: 0)...now()
@@ -106,7 +111,8 @@ actor E1RMCompetitionLiftMigration {
         profile: profile,
         exerciseByID: exerciseByID,
         exerciseIDByPlanExerciseID: catalog.exerciseIDByPlanExerciseID,
-        oldExerciseIDBySetLogID: oldExerciseIDBySetLogID
+        oldExerciseIDBySetLogID: oldExerciseIDBySetLogID,
+        priorConfidenceBySetLogID: priorConfidenceBySetLogID
       ),
       setLogs: setLogs
     )
@@ -143,7 +149,8 @@ actor E1RMCompetitionLiftMigration {
           reps: log.reps,
           rpe: log.rpe,
           completed: log.completed,
-          failed: log.failed
+          failed: log.failed,
+          priorConfidence: context.priorConfidenceBySetLogID[log.id]
         )
       )
     }
