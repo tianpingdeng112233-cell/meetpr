@@ -240,6 +240,25 @@ private func makeGate(
 
 // MARK: - Evaluation sub-route (spec 033 §11)
 
+/// Lock-protected counter so the sealed-gate tests can assert the repo is
+/// never even consulted (not just that the final state is `.bound`).
+private final class CallCounter: @unchecked Sendable {
+  private let lock = NSLock()
+  private var value = 0
+
+  var callCount: Int {
+    lock.lock()
+    defer { lock.unlock() }
+    return value
+  }
+
+  func increment() {
+    lock.lock()
+    defer { lock.unlock() }
+    value += 1
+  }
+}
+
 private struct StubMyEvaluations: EvaluationRepository {
   enum Behavior {
     case period(EvaluationPeriod?)
@@ -247,13 +266,15 @@ private struct StubMyEvaluations: EvaluationRepository {
   }
 
   let behavior: Behavior
+  let fetchMyEvaluationCalls = CallCounter()
 
   func fetchEvaluation(studentID: UUID) async throws -> EvaluationPeriod? {
     try resolve()
   }
 
   func fetchMyEvaluation() async throws -> EvaluationPeriod? {
-    try resolve()
+    fetchMyEvaluationCalls.increment()
+    return try resolve()
   }
 
   func completeEvaluation(id: UUID) async throws -> EvaluationPeriod {
@@ -298,13 +319,16 @@ private func makeEvaluationGate(
 }
 
 @MainActor
-@Test func acceptedWithLiveEvaluationRoutesToEvaluationPage() async {
+@Test func acceptedWithLiveEvaluationStillGoesToBoundWhileSealed() async {
+  // Evaluation sealed for beta (2026-07-13): even a legacy uncompleted
+  // period must NOT lock the student on the evaluation page — accepted
+  // routes straight to the 5 tabs.
   let accepted = BindFixtures.request(status: .accepted)
   let period = evaluationPeriod()
   let gate = makeEvaluationGate(
     request: accepted, evaluations: StubMyEvaluations(behavior: .period(period)))
   await gate.load()
-  #expect(gate.state == .evaluationActive(accepted, period))
+  #expect(gate.state == .bound(accepted))
 }
 
 @MainActor
@@ -328,14 +352,16 @@ private func makeEvaluationGate(
 }
 
 @MainActor
-@Test func evaluationFetchFailureLandsOnRetryNotBound() async {
-  // A network blip must not let an in-evaluation student through to the
-  // 5 tabs (Codex review P1): the gate shows the full-screen retry instead.
+@Test func sealedGateNeverConsultsEvaluationRepo() async {
+  // While sealed the gate must not even fetch the evaluation — a failing
+  // repo cannot block the 5 tabs. (Pre-seal this landed on .failed per
+  // Codex review P1; restore that assertion when the seal lifts.)
   let accepted = BindFixtures.request(status: .accepted)
-  let gate = makeEvaluationGate(
-    request: accepted, evaluations: StubMyEvaluations(behavior: .failure))
+  let evaluations = StubMyEvaluations(behavior: .failure)
+  let gate = makeEvaluationGate(request: accepted, evaluations: evaluations)
   await gate.load()
-  #expect(gate.state == .failed)
+  #expect(gate.state == .bound(accepted))
+  #expect(evaluations.fetchMyEvaluationCalls.callCount == 0)
 }
 
 @MainActor
