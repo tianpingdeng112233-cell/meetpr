@@ -1,4 +1,4 @@
-// swiftlint:disable function_parameter_count file_length type_body_length
+// swiftlint:disable function_parameter_count file_length
 import CoreModels
 import DesignSystem
 import Foundation
@@ -11,6 +11,7 @@ import SwiftUI
 /// RPE, optional video attach, and the complete / fail actions. Commit + video
 /// logic unchanged.
 @available(iOS 17.0, macOS 14.0, *)
+// swiftlint:disable:next type_body_length
 struct SetEntrySheet: View {
   let rowIndex: Int
   let draft: TodayWorkoutViewModel.SetRowDraft
