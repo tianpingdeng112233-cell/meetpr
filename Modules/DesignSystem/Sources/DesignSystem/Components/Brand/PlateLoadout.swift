@@ -1,8 +1,9 @@
 import SwiftUI
 
 /// A loaded-barbell visualization: full-width steel bar + sleeve stopper +
-/// IPF-colored plate stack (heavy → light from the inside) + a detailed 2.5kg
-/// locking collar + sleeve end. Reproduces the user's plate-calculator reference.
+/// IPF-colored plate stack (heavy → light from the inside) + an optional 2.5kg
+/// locking collar (shown when `showCollar`) + sleeve end. Reproduces the user's
+/// plate-calculator reference.
 ///
 /// `plates` is one side's load, heaviest first (e.g. `[25, 25, 25, 5, 1.25]`).
 /// Plate colors are **IPF domain constants**, intentionally not theme tokens.
@@ -10,9 +11,11 @@ import SwiftUI
 @MainActor
 public struct PlateLoadout: View {
   private let plates: [Double]
+  private let showCollar: Bool
 
-  public init(plates: [Double]) {
+  public init(plates: [Double], showCollar: Bool = true) {
     self.plates = plates
+    self.showCollar = showCollar
   }
 
   private static let steel = [
@@ -35,7 +38,9 @@ public struct PlateLoadout: View {
             Rectangle().fill(Color(plateHex: 0x4B5563)).frame(width: 1)
           }
         ForEach(Array(plates.enumerated()), id: \.offset) { _, plate in PlateView(value: plate) }
-        CollarView().padding(.leading, 4)
+        if showCollar {
+          CollarView().padding(.leading, 4)
+        }
         Spacer(minLength: 0)
       }
       .padding(.leading, 56)
