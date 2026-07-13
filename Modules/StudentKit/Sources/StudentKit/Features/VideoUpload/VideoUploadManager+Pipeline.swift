@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import Foundation
 import Networking
@@ -56,6 +57,8 @@ extension VideoUploadManager {
     uploading.status = .uploading
     try await repository.save(uploading)
     broadcast(.updated(uploading, progress: 0))
+    Analytics.shared.mediaUpload(
+      .started, context: .setLog, bytes: Int(clamping: uploading.sizeBytes))
 
     let chunker = VideoFileChunker(partSizeBytes: configuration.partSizeBytes)
     let partCount = try chunker.partCount(totalBytes: uploading.sizeBytes)
@@ -113,6 +116,8 @@ extension VideoUploadManager {
     try await repository.save(uploaded)
     try? FileManager.default.removeItem(at: fileURL(for: record))
     broadcast(.updated(uploaded, progress: 1))
+    Analytics.shared.mediaUpload(
+      .succeeded, context: .setLog, bytes: Int(clamping: record.sizeBytes))
   }
 
   private func uploadParts(
@@ -202,6 +207,8 @@ extension VideoUploadManager {
     record.status = .failed
     try? await repository.save(record)
     broadcast(.updated(record, progress: nil))
+    Analytics.shared.mediaUpload(
+      .failed, context: .setLog, bytes: Int(clamping: record.sizeBytes))
   }
 
   static func partURLMap(

@@ -123,7 +123,8 @@ struct MeetPRApp: App {
           // 训练视频 inbox: boot straight into a populated queue (spec 042).
           coachVideoQueue: InMemoryCoachVideoQueueRepository(
             seed: CoachDemoSeed.pendingVideos()),
-          draftStore: draftStore
+          draftStore: draftStore,
+          analyticsMode: .disabled
         ),
         session: session
       )
@@ -200,7 +201,8 @@ struct MeetPRApp: App {
           // Growth-tab family mapping reads the coach-owned full plan tree
           // (the student projection only carries the current week).
           coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(api: api, session: session),
-          draftStore: draftStore
+          draftStore: draftStore,
+          analyticsMode: .live
         ),
         session: session
       )

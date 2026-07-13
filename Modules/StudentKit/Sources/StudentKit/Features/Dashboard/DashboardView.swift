@@ -1,4 +1,5 @@
 // swiftlint:disable file_length type_body_length large_tuple
+import Analytics
 import CoreModels
 import DesignSystem
 import Foundation
@@ -143,6 +144,9 @@ public struct DashboardView: View {
     }
     .task {
       await loadIfNeeded()
+      if let planID = weekViewModel.plan?.cycleID {
+        Analytics.shared.planViewed(planID: planID)
+      }
     }
     .onChange(of: todayReloadToken) { _, _ in
       Task { await reload() }

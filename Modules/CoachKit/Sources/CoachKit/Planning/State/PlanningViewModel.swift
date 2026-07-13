@@ -1,4 +1,5 @@
 // swiftlint:disable sorted_imports
+import Analytics
 import CoreModels
 import Foundation
 import OSLog
@@ -851,6 +852,7 @@ public final class PlanningViewModel {
     let issues = planCompletionIssues()
     guard issues.isEmpty else {
       publishIssues = issues
+      Analytics.shared.validationError(flow: .planning, field: .setCount)
       return
     }
     guard let draftPlan, let student = selectedStudent else {
@@ -876,6 +878,7 @@ public final class PlanningViewModel {
       // Published plans leave no resumable draft behind.
       try? draftStore.deleteDraft(traineeID: student.id)
       didFinish = true
+      Analytics.shared.coachPlanAssigned(studentID: student.id)
     } catch {
       publishError = PlanPublishErrorMapping.bannerMessage(for: error) ?? "发布失败,请稍后重试"
     }

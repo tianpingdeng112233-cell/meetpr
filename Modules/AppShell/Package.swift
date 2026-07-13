@@ -14,6 +14,7 @@ let package = Package(
     .package(path: "../CoachKit"),
     .package(path: "../StudentKit"),
     .package(path: "../RepositoryContracts"),
+    .package(path: "../Analytics"),
     .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
   ],
   targets: [
@@ -26,6 +27,7 @@ let package = Package(
         .product(name: "CoachKit", package: "CoachKit"),
         .product(name: "StudentKit", package: "StudentKit"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+        .product(name: "Analytics", package: "Analytics"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),

@@ -1,4 +1,5 @@
 // swiftlint:disable file_length type_body_length
+import Analytics
 import CoreModels
 import DesignSystem
 import Foundation
@@ -15,6 +16,7 @@ public struct TodayWorkoutView: View {
   /// last browsed here.
   private let jumpToTodayToken: Int
   private let planRevision: Int
+  private var workoutStartedAt: Binding<Date?>
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -39,13 +41,15 @@ public struct TodayWorkoutView: View {
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
     jumpToTodayToken: Int = 0,
-    planRevision: Int = 0
+    planRevision: Int = 0,
+    workoutStartedAt: Binding<Date?> = .constant(nil)
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.jumpToTodayToken = jumpToTodayToken
     self.planRevision = planRevision
+    self.workoutStartedAt = workoutStartedAt
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
@@ -270,7 +274,7 @@ public struct TodayWorkoutView: View {
     .sheet(isPresented: $showingSummary) {
       SessionSummaryView(
         summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID,
-        onComplete: { markReviewCompleted(for: day.date) }
+        onComplete: { markReviewCompleted(for: day.date, setCount: drafts.count) }
       )
     }
   }
@@ -301,9 +305,14 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private func markReviewCompleted(for date: Date) {
+  private func markReviewCompleted(for date: Date, setCount: Int) {
     reviewStore.markReviewCompleted(studentId: studentID, date: date)
     reviewCompleted = true
+    guard let startedAt = workoutStartedAt.wrappedValue else { return }
+    Analytics.shared.workoutLogSaved(
+      setCount: setCount,
+      durationMilliseconds: max(0, Int(Date().timeIntervalSince(startedAt) * 1_000)))
+    workoutStartedAt.wrappedValue = nil
   }
 
   // MARK: - Read-only notice
