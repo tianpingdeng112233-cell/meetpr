@@ -84,13 +84,16 @@ struct SetEntrySheet: View {
 
           VStack(spacing: 18) {
             plateStepper(
-              "重量", unit: "KG", sub: "点数字可直接输入 · ± 2.5",
+              "重量", unit: "KG", sub: "± 2.5",
               onDec: { weightText = SetEntryValue.text(max(0, weightValue - 2.5)) },
               onInc: { weightText = SetEntryValue.text(weightValue + 2.5) },
+              focus: { focusedField = .weight },
               field: {
                 TextField("", text: $weightText)
                   .decimalKeyboard()
                   .focused($focusedField, equals: .weight)
+                  .accessibilityLabel("重量")
+                  .maxInputLength($weightText, 6)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -98,10 +101,13 @@ struct SetEntrySheet: View {
               "次数", unit: "次", sub: "± 1",
               onDec: { repsText = "\(max(0, repsValue - 1))" },
               onInc: { repsText = "\(repsValue + 1)" },
+              focus: { focusedField = .reps },
               field: {
                 TextField("", text: $repsText)
                   .numberPadKeyboard()
                   .focused($focusedField, equals: .reps)
+                  .accessibilityLabel("次数")
+                  .maxInputLength($repsText, 4)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -109,10 +115,13 @@ struct SetEntrySheet: View {
               "RPE", unit: nil, sub: "± 0.5 · 5–10",
               onDec: { rpeText = SetEntryValue.text(max(5, rpeValue - 0.5)) },
               onInc: { rpeText = SetEntryValue.text(min(10, rpeValue + 0.5)) },
+              focus: { focusedField = .rpe },
               field: {
                 TextField("", text: $rpeText)
                   .decimalKeyboard()
                   .focused($focusedField, equals: .rpe)
+                  .accessibilityLabel("RPE")
+                  .maxInputLength($rpeText, 4)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -246,6 +255,7 @@ struct SetEntrySheet: View {
   private func plateStepper<Field: View>(
     _ label: String, unit: String?, sub: String,
     onDec: @escaping () -> Void, onInc: @escaping () -> Void,
+    focus: @escaping () -> Void,
     @ViewBuilder field: () -> Field
   ) -> some View {
     VStack(spacing: 8) {
@@ -260,6 +270,8 @@ struct SetEntrySheet: View {
       }
       HStack(spacing: 12) {
         stepButton("minus", action: onDec)
+        // Filled slot marks the value as a tap-to-type input (students missed the
+        // bare-label number); tapping anywhere in the slot focuses the field.
         HStack(alignment: .lastTextBaseline, spacing: 6) {
           field()
           if let unit {
@@ -268,20 +280,12 @@ struct SetEntrySheet: View {
           }
         }
         .frame(maxWidth: .infinity)
+        .frame(height: 64)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color.MeetPR.surface2))
+        .contentShape(RoundedRectangle(cornerRadius: 16))
+        .onTapGesture(perform: focus)
         stepButton("plus", action: onInc)
       }
-    }
-  }
-
-  /// Shared styling so the editable number keeps the big heavy-mono look of the
-  /// old display Text.
-  private struct EntryFieldStyle: ViewModifier {
-    func body(content: Content) -> some View {
-      content
-        .font(.system(size: 40, weight: .heavy, design: .monospaced))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
     }
   }
 
@@ -349,6 +353,18 @@ private struct SetEntryErrorAlert: ViewModifier {
   }
 }
 
+/// Typography for the editable number inside the slot; the tap-to-type affordance
+/// comes from the filled slot in plateStepper, not from the text itself.
+private struct EntryFieldStyle: ViewModifier {
+  func body(content: Content) -> some View {
+    content
+      .font(.system(size: 40, weight: .heavy, design: .monospaced))
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .multilineTextAlignment(.center)
+      .fixedSize(horizontal: true, vertical: false)
+  }
+}
+
 /// `keyboardType` is iOS-only; the StudentKit package also builds for macOS
 /// (test target), so wrap it platform-guarded no-ops.
 @available(iOS 17.0, macOS 14.0, *)
@@ -369,6 +385,14 @@ extension View {
     #else
       self
     #endif
+  }
+
+  /// Cap the entered text so a runaway value (paste, hardware keyboard) can't
+  /// widen the `fixedSize` field past its slot and shove the buttons off-screen.
+  fileprivate func maxInputLength(_ text: Binding<String>, _ limit: Int) -> some View {
+    onChange(of: text.wrappedValue) { _, newValue in
+      if newValue.count > limit { text.wrappedValue = String(newValue.prefix(limit)) }
+    }
   }
 }
 // swiftlint:enable function_parameter_count
