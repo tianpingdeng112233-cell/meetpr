@@ -78,7 +78,8 @@ struct E1RMRecorder: Sendable {
         newE1RMKg: estimatedOneRepMaxKg,
         previousBestKg: previousMax
       )
-      let confidence = input.priorConfidence ?? (verdict == .normal ? .normal : .low)
+      let confidence: E1RMConfidence =
+        input.priorConfidence != .low && verdict == .normal ? .normal : .low
       let point = makePoint(
         input: input,
         estimatedOneRepMaxKg: estimatedOneRepMaxKg,
