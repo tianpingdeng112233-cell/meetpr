@@ -1,3 +1,4 @@
+import Analytics
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
@@ -140,9 +141,19 @@ public struct CoachRootView: View {
         }
     }
     .task {
+      Analytics.shared.screen(.dashboard)
       await rosterViewModel.loadIfNeeded()
       await queueViewModel.loadIfNeeded()
       await videoQueueViewModel.loadIfNeeded()
+    }
+    .onChange(of: selectedTab) { _, tab in
+      switch tab {
+      case .today: Analytics.shared.screen(.dashboard)
+      case .students: Analytics.shared.screen(.coachRoster)
+      case .planning: Analytics.shared.screen(.coachPlanning)
+      case .receiving: Analytics.shared.screen(.coachReceiving)
+      case .profile: Analytics.shared.screen(.account)
+      }
     }
     .tint(Color.MeetPR.brandRed)
   }

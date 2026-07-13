@@ -12,6 +12,7 @@ let package = Package(
     .package(path: "../RepositoryContracts"),
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
+    .package(path: "../Analytics"),
   ],
   targets: [
     .target(
@@ -21,6 +22,7 @@ let package = Package(
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
+        .product(name: "Analytics", package: "Analytics"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),

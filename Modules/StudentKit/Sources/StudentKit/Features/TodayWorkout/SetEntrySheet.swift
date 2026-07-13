@@ -29,16 +29,14 @@ struct SetEntrySheet: View {
   @State private var weightText: String
   @State private var repsText: String
   @State private var rpeText: String
-  @FocusState private var focusedField: NumberField?
+  @FocusState private var focusedField: SetEntryNumberField?
 
-  private enum NumberField { case weight, reps, rpe }
-
-  private var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
+  var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
   private var repsValue: Int { SetEntryValue.reps(from: repsText) }
   private var rpeValue: Decimal { SetEntryValue.rpe(from: rpeText) }
 
-  private let bar = 20.0
-  private let collar = 2.5  // per-side locking collar — counts toward the load
+  let bar = 20.0
+  let collar = 2.5  // per-side locking collar — counts toward the load
 
   init(
     rowIndex: Int,
@@ -157,6 +155,13 @@ struct SetEntrySheet: View {
     .background(Color.MeetPR.bg)
     .presentationDetents([.large])
     .modifier(SetEntryErrorAlert(viewModel: viewModel))
+    .modifier(
+      SetEntryAnalyticsModifier(
+        weightText: weightText,
+        repsText: repsText,
+        rpeText: rpeText,
+        focusedField: focusedField)
+    )
     #if os(iOS)
       .toolbar {
         ToolbarItemGroup(placement: .keyboard) {
@@ -168,23 +173,6 @@ struct SetEntrySheet: View {
     #endif
   }
 
-  // MARK: - Plate loadout
-
-  private var perSide: Double {
-    (NSDecimalNumber(decimal: weightValue).doubleValue - bar) / 2 - collar
-  }
-
-  private var plates: [Double] {
-    perSide > 1e-6 ? PlateLoadout.load(perSide: perSide) : []
-  }
-
-  private var breakdownLine: String {
-    let total = NSDecimalNumber(decimal: weightValue).doubleValue
-    guard total >= bar + collar * 2 else { return "空杠 20kg" }
-    let base = PlateLoadout.breakdownText(plates)
-    return base.isEmpty ? "仅 2.5kg 卡扣" : base + " + 2.5kg 卡扣"
-  }
-
   // MARK: - Chrome
 
   private var navBar: some View {
@@ -194,6 +182,7 @@ struct SetEntrySheet: View {
         .foregroundStyle(Color.MeetPR.fgPrimary)
       HStack {
         Button {
+          SetEntryAnalytics.trackCancel()
           dismiss()
         } label: {
           HStack(spacing: 4) {
@@ -304,6 +293,12 @@ struct SetEntrySheet: View {
 
 }
 
+enum SetEntryNumberField: Sendable {
+  case weight
+  case reps
+  case rpe
+}
+
 // MARK: - Draft persistence
 extension SetEntrySheet {
   /// The current view-model draft for this set, matched by stable id; falls
@@ -328,6 +323,8 @@ extension SetEntrySheet {
     syncDraftEdits()
     Task {
       if await viewModel.commitSet(rowIndex: rowIndex, failed: failed) {
+        SetEntryAnalytics.trackCommit(
+          draft: liveDraft, videoViewModel: videoViewModel, failed: failed)
         dismiss()
       }
     }

@@ -42,6 +42,7 @@ private func makeGate(
   let harness = makeGate(mine: .success(accepted))
   await harness.gate.load()
   #expect(harness.gate.state == .bound(accepted))
+  #expect(harness.gate.acceptanceRevision == 0)
 }
 
 @MainActor
@@ -50,6 +51,20 @@ private func makeGate(
   let harness = makeGate(mine: .success(pending))
   await harness.gate.load()
   #expect(harness.gate.state == .pendingAcceptance(pending))
+}
+
+@MainActor
+@Test func pendingToAcceptedAdvancesAcceptanceRevisionOnce() async {
+  let pending = BindFixtures.request(status: .pending)
+  let accepted = BindFixtures.request(status: .accepted)
+  let harness = makeGate(mine: .success(pending), extraMine: [.success(accepted)])
+  await harness.gate.load()
+  #expect(harness.gate.acceptanceRevision == 0)
+
+  await harness.gate.refresh()
+
+  #expect(harness.gate.state == .bound(accepted))
+  #expect(harness.gate.acceptanceRevision == 1)
 }
 
 @MainActor

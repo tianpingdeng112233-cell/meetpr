@@ -12,6 +12,7 @@ let package = Package(
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
     .package(path: "../RepositoryContracts"),
+    .package(path: "../Analytics"),
     .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
     // Read-only XLSX parsing for coach plan import (spec 043). Apache-2.0,
     // pure Swift. Pinned exact — the importer depends on its cell-addressing.
@@ -25,6 +26,7 @@ let package = Package(
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+        .product(name: "Analytics", package: "Analytics"),
         .product(name: "CoreXLSX", package: "CoreXLSX"),
       ],
       resources: [.process("Resources")],

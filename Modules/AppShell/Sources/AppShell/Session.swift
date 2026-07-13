@@ -71,6 +71,10 @@ public final class Session {
       refreshToken: refreshToken, cachedUser: cachedUser, generation: generation)
   }
 
+  public func analyticsAccessToken() async -> String? {
+    await tokenStore.accessToken()
+  }
+
   private func settleBootstrapRefresh(
     refreshToken: String, cachedUser: User, generation: UInt
   ) async {

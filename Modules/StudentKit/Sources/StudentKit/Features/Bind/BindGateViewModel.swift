@@ -64,6 +64,10 @@ public enum BindHandoffOutcome: Equatable, Sendable {
 @MainActor
 public final class BindGateViewModel {
   public private(set) var state: BindGateState = .loading
+  /// Advances only when a request observed as pending becomes accepted during
+  /// this gate lifetime. Cold-start restoration of an already accepted bond
+  /// deliberately leaves this at zero.
+  public private(set) var acceptanceRevision = 0
 
   private let bind: any BindRepository
   private let stash: any PendingBindCodeStoring
@@ -88,6 +92,12 @@ public final class BindGateViewModel {
   }
 
   public func load() async {
+    let wasPending: Bool
+    if case .pendingAcceptance = state {
+      wasPending = true
+    } else {
+      wasPending = false
+    }
     state = .loading
     let mine: BindRequest?
     do {
@@ -99,7 +109,10 @@ public final class BindGateViewModel {
 
     switch mine?.status {
     case .accepted:
-      if let mine { state = await boundState(for: mine) }
+      if let mine {
+        state = await boundState(for: mine)
+        if wasPending { acceptanceRevision += 1 }
+      }
     case .pending:
       if let mine { state = .pendingAcceptance(mine) }
     case .none, .rejected, .expired, .cancelled:

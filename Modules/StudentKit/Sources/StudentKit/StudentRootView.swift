@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import DesignSystem
 import Foundation
@@ -28,6 +29,8 @@ public struct StudentRootView: View {
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
   @State private var planRevision = 0
+  @State private var nextWorkoutSource: WorkoutSource?
+  @State private var workoutStartedAt: Date?
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -116,6 +119,7 @@ public struct StudentRootView: View {
         feedbackViewModel: feedbackViewModel,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onStartWorkout: {
+          nextWorkoutSource = .dashboard
           trainingJumpToken += 1
           selectedTab = .training
         },
@@ -133,7 +137,8 @@ public struct StudentRootView: View {
         onboarding: onboarding, readiness: readiness,
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
         jumpToTodayToken: trainingJumpToken,
-        planRevision: planRevision
+        planRevision: planRevision,
+        workoutStartedAt: $workoutStartedAt
       )
       .tag(StudentTab.training)
       .tabItem {
@@ -172,6 +177,7 @@ public struct StudentRootView: View {
       .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
     }
     .task {
+      Analytics.shared.screen(.dashboard)
       if feedbackViewModel.state == .idle {
         await feedbackViewModel.load(studentID: studentID)
       }
@@ -180,6 +186,19 @@ public struct StudentRootView: View {
     }
     .onChange(of: selectedTab) { _, newTab in
       if newTab == .today { todayReloadToken += 1 }
+      switch newTab {
+      case .today:
+        Analytics.shared.screen(.dashboard)
+      case .training:
+        workoutStartedAt = Date()
+        Analytics.shared.screen(.todayWorkout)
+        Analytics.shared.workoutLogStarted(source: nextWorkoutSource ?? .calendar)
+        nextWorkoutSource = nil
+      case .growth:
+        Analytics.shared.screen(.progressHistory)
+      case .profile:
+        Analytics.shared.screen(.account)
+      }
     }
     .tint(Color.MeetPR.brandRed)
   }

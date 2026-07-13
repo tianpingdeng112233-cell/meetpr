@@ -1,4 +1,5 @@
 // swiftlint:disable file_length type_body_length
+import Analytics
 import CoreModels
 import DesignSystem
 import Foundation
@@ -87,7 +88,11 @@ public struct TrainingHistoryView: View {
         AllHistoryScreen(viewModel: viewModel)
       }
     }
-    .task { await loadIfNeeded() }
+    .task {
+      await loadIfNeeded()
+      Analytics.shared.progressViewed(.e1rm)
+      Analytics.shared.progressViewed(.volume)
+    }
   }
 
   // MARK: - PR banner
@@ -311,6 +316,7 @@ public struct TrainingHistoryView: View {
 
   private var detailedHistoryButton: some View {
     Button {
+      Analytics.shared.progressViewed(.history)
       showsAllHistory = true
     } label: {
       HStack(spacing: 12) {

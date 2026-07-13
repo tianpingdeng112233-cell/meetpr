@@ -1,6 +1,6 @@
 # 043 — Analytics instrumentation(自建一等公民埋点:`Analytics` 叶子模块 + 离线磁盘队列 + ~18 事件接进各 feature 模块)
 
-- **状态**: Draft
+- **状态**: InReview
 - **PR**: TBD(iOS spec PR + iOS impl PR;backend `POST /events` / `events` 表 / `GET /events/config` 由 **backend spec 008-analytics-events** 实装,本 spec 0 backend 工作 — 仅消费 008 提供的端点)
 - **来源**:
   - [埋点 wave(brainstorm 定稿 + CEO review 决策)](~/Brain/wiki/projects/MeetPR/analytics-instrumentation-wave.md) — 方案 A(自建 first-party 事件)/ 4 个 founder 分叉 / 5 CRITICAL / 事件收敛 ~18
@@ -193,7 +193,7 @@ public typealias EventTransport = @Sendable (URLRequest, Data) async throws -> (
 |---|---|---|---|
 | **A 用量广度** ||||
 | 1 | `app_open` | `cold`(bool) | `AppShell` MeetPRApp / RootView 启动 |
-| 2 | `screen_view` | `screen` | `AppShell` 路由层统一打(或各根 view `.onAppear`);覆盖 Student + Coach 主屏 |
+| 2 | `screen_view` | `screen` | `AppShell` 路由层统一打(或各根 view `.onAppear`);覆盖 Student + Coach 主屏。`selfTrainStudent`(solo)在发版线复用同一套 `StudentRootView` 裸形态,因此学员端埋点自动搭车覆盖 solo;无需显式排除,也无独立 solo 面 |
 | **B 录训练闭环(最细)** ||||
 | 3 | `workout_log_start` | `plan_id?`, `source`(dashboard/calendar) | StudentKit `TodayWorkout/TodayWorkoutView`(入口) |
 | 4 | `set_logged` | `exercise_id`, `set_index`, `has_video`, `outcome`(completed/failed) | StudentKit `TodayWorkout/ExerciseExecutionView`(`outcome` 复用 spec 039) |
@@ -208,8 +208,8 @@ public typealias EventTransport = @Sendable (URLRequest, Data) async throws -> (
 | 11 | `coach_open_student` | `student_id` | CoachKit `StudentDetail/StudentDetailView`(spec 029) |
 | 12 | `coach_feedback_sent` | `student_id`, `kind`(text/video) | CoachKit `StudentDetail` 文本反馈 + `Receiving/VideoFeedbackDetailView`(spec 029/042) |
 | 13 | `coach_plan_assigned` | `student_id` | CoachKit `PlanningWorkspace` 下发 |
-| 14 | `coach_intake_action` | `stage`(request_seen/accepted_eval/accepted_skip/rejected), `student_id` | CoachKit `Receiving/CoachReceivingView`(spec 033 教练侧) |
-| 15 | `eval_summary_action` | `stage`(draft_saved/delivered), `student_id` | CoachKit `Evaluation`(spec 033 评估总结) |
+| 14 | `coach_intake_action` | `stage`(request_seen/accepted_eval/accepted_skip/rejected), `student_id` | CoachKit `Receiving/CoachReceivingView`(spec 033 教练侧)。`accepted_eval` 内测罕见(`AcceptBindRequestSheet` 默认 `skipEvaluation=true`),其余 `request_seen` / `accepted_skip` / `rejected` 照常接线 |
+| 15 | `eval_summary_action` | `stage`(draft_saved/delivered), `student_id` | **deferred,本波不接**:评估期已被 spec 033 / PR #190 内测停用,载体 `CoachKit/Evaluation` 休眠、后端不下发 `in_evaluation`;当前接线会成为内测期永不触发的死事件 |
 | **E 摩擦/放弃(横切,卡点金矿)** ||||
 | 16 | `validation_error` | `flow`, `field` | 各表单校验失败点(onboarding / record_set / bind / planning) |
 | 17 | `field_re_edit` | `flow`, `field`, `count`(≥2) | 同字段反复改的 view(record_set 重量 / onboarding 字段) |
@@ -224,7 +224,7 @@ public typealias EventTransport = @Sendable (URLRequest, Data) async throws -> (
 
 > **放弃信号口径(auto-decided)**:放弃 = **显式 `flow_cancel`** + **后端派生兜底**(有 start 无 save)。abandonment **不另埋**事件——纯派生太噪(混淆切后台/崩溃/续录),显式 `flow_cancel` 是去噪后的强信号。
 >
-> 表里 **1–22 全部内测必接**:#21 `friction_feedback` 是 David 加选(enum 信号 + 文本走 /events/feedback),#22 `media_upload` 已确认 IN(027 在内测构建);onboarding_complete/coach_intake/eval_summary/flow_cancel/client_error 是 CEO review 新增。核心「~18」是 CEO review 收敛口径,叠加 David/codex 后实为 **22** 个。**事件名 + props 与 backend 008 §8 registry 逐字一致**。
+> 表里 **净接线 21 个**(22 减 #15 deferred):#21 `friction_feedback` 是 David 加选(enum 信号 + 文本走 /events/feedback),#22 `media_upload` 已确认 IN(027 在内测构建);`onboarding_complete` / `coach_intake_action` / `flow_cancel` / `client_error` 是 CEO review 新增。核心「~18」是 CEO review 收敛口径,叠加 David/codex 后 registry 实为 **22** 个,本波接其中 21 个。**事件名 + props 与 backend 008 §8 registry 逐字一致**。
 
 #### 5.1 接线辅助(避免散落 magic string)
 

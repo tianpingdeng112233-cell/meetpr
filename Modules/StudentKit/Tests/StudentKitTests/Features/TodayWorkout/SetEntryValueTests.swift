@@ -44,3 +44,14 @@ import Testing
     #expect(SetEntryValue.text(175) == "175")
   }
 }
+
+@Test func fieldReEditCountsCompletedEditSessionsNotKeystrokes() {
+  var tracker = SetEntryFieldEditTracker()
+
+  tracker.begin(value: "")
+  #expect(tracker.finish(value: "100") == nil)
+  tracker.begin(value: "100")
+  #expect(tracker.finish(value: "105") == 2)
+  tracker.begin(value: "105")
+  #expect(tracker.finish(value: "105") == nil)
+}

@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import Foundation
 import Observation
@@ -95,6 +96,7 @@ final class CoachVideoQueueViewModel {
       _ = try await repository.sendFeedback(for: item, text: trimmed)
       items.removeAll { $0.id == item.id }
       toastMessage = "已发送反馈"
+      Analytics.shared.coachFeedbackSent(studentID: item.studentID, kind: .video)
       return true
     } catch {
       bannerMessage = "发送失败,请稍后重试"

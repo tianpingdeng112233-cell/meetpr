@@ -1,5 +1,7 @@
+import Analytics
 import CoachKit
 import CoreModels
+import Foundation
 import RepositoryContracts
 import StudentKit
 import SwiftUI
@@ -36,6 +38,7 @@ public struct RootView: View {
   private let coachVideoQueue: (any CoachVideoQueueRepository)?
   private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
+  private let analyticsMode: AnalyticsMode
 
   public init(
     coachPlans: any PlanRepository = InMemoryPlanRepository.preview(),
@@ -60,7 +63,8 @@ public struct RootView: View {
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
     coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
     coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
-    draftStore: DraftStore = DraftStore.shared
+    draftStore: DraftStore = DraftStore.shared,
+    analyticsMode: AnalyticsMode = .disabled
   ) {
     self.coachPlans = coachPlans
     self.coachInviteCodes = coachInviteCodes ?? RootViewDemoDefaults.inviteCodes()
@@ -93,9 +97,18 @@ public struct RootView: View {
     self.coachVideoQueue = coachVideoQueue
     self.coachFamilyMapProvider = coachFamilyMapProvider
     self.draftStore = draftStore
+    self.analyticsMode = analyticsMode
+    Analytics.shared.prepare(mode: analyticsMode)
   }
 
   public var body: some View {
+    routedContent
+      .analyticsFrictionFeedbackPrompt()
+      .modifier(AnalyticsRootModifier(session: session, mode: analyticsMode))
+  }
+
+  @ViewBuilder
+  private var routedContent: some View {
     switch session.state {
     case .anonymous:
       AuthFlowView()
@@ -106,30 +119,35 @@ public struct RootView: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
     case .authenticated(let user):
-      switch Self.authenticatedDestination(for: user.role) {
-      case .coach:
-        CoachRootView(
-          repository: coachPlans,
-          studentPlans: studentPlans,
-          studentLogs: studentLogs,
-          feedback: studentFeedback,
-          inviteCodes: coachInviteCodes,
-          studentVideos: coachStudentVideos,
-          readiness: studentReadiness,
-          familyMapProvider: coachFamilyMapProvider,
-          bindQueue: coachBindQueue,
-          evaluations: coachEvaluations,
-          evaluationSummaries: coachEvaluationSummaries,
-          studentProfiles: coachStudentProfiles,
-          videoQueue: coachVideoQueue,
-          onLogout: {
-            await session.logout()
-          },
-          draftStore: draftStore
-        )
-      case .studentBehindE1RMGate:
-        studentEntry(for: user)
-      }
+      authenticatedContent(for: user)
+    }
+  }
+
+  @ViewBuilder
+  private func authenticatedContent(for user: User) -> some View {
+    switch Self.authenticatedDestination(for: user.role) {
+    case .coach:
+      CoachRootView(
+        repository: coachPlans,
+        studentPlans: studentPlans,
+        studentLogs: studentLogs,
+        feedback: studentFeedback,
+        inviteCodes: coachInviteCodes,
+        studentVideos: coachStudentVideos,
+        readiness: studentReadiness,
+        familyMapProvider: coachFamilyMapProvider,
+        bindQueue: coachBindQueue,
+        evaluations: coachEvaluations,
+        evaluationSummaries: coachEvaluationSummaries,
+        studentProfiles: coachStudentProfiles,
+        videoQueue: coachVideoQueue,
+        onLogout: {
+          await session.logout()
+        },
+        draftStore: draftStore
+      )
+    case .studentBehindE1RMGate:
+      studentEntry(for: user)
     }
   }
 

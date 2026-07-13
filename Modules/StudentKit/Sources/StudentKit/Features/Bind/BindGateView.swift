@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -80,6 +81,11 @@ public struct BindGateView<
         guard newPhase == .active else { return }
         if case .pendingAcceptance = viewModel.state {
           Task { await viewModel.refresh() }
+        }
+      }
+      .onChange(of: viewModel.acceptanceRevision) { oldRevision, newRevision in
+        if newRevision > oldRevision {
+          Analytics.shared.bindCoachAction(.accepted)
         }
       }
   }

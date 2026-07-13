@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -70,6 +71,10 @@ struct EnterCodeView: View {
     }
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bg)
+    .onAppear {
+      Analytics.shared.screen(.bindEnterCode)
+      Analytics.shared.bindCoachAction(.inviteOpen)
+    }
   }
 
   private var codeField: some View {
