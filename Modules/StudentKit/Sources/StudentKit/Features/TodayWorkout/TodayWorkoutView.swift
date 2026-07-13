@@ -37,6 +37,8 @@ public struct TodayWorkoutView: View {
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     onboarding: (any OnboardingProfileReading)? = nil,
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
+    restTimerSettings: any StudentRestTimerSettingsStoring =
+      UserDefaultsRestTimerSettingsStore(),
     videoUploads: VideoUploadServices? = nil,
     jumpToTodayToken: Int = 0,
     planRevision: Int = 0
@@ -52,7 +54,8 @@ public struct TodayWorkoutView: View {
         plans: plans,
         logs: logs,
         e1rm: e1rm,
-        onboarding: onboarding
+        onboarding: onboarding,
+        restTimerSettings: restTimerSettings
       ))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness))
@@ -142,6 +145,13 @@ public struct TodayWorkoutView: View {
       }
     }
     .animation(.spring(duration: 0.3), value: viewModel.restTimer)
+    .sheet(isPresented: restTimerExplanationPresented) {
+      RestTimerExplanationView {
+        viewModel.acknowledgeRestTimerExplanation()
+      }
+      .presentationDetents([.medium])
+      .interactiveDismissDisabled()
+    }
     .sheet(isPresented: $showingReadinessSheet) {
       ReadinessCheckinSheet(
         studentID: studentID,
@@ -210,6 +220,17 @@ public struct TodayWorkoutView: View {
     Binding(
       get: { viewModel.actionErrorMessage != nil },
       set: { if !$0 { viewModel.clearActionError() } }
+    )
+  }
+
+  private var restTimerExplanationPresented: Binding<Bool> {
+    Binding(
+      // Gated on `editing == nil`: the first completed set is recorded inside
+      // SetEntrySheet, and racing a second sheet against it has no documented
+      // ordering. The flag only clears on 知道了, so the card presents right
+      // after the editor dismisses.
+      get: { viewModel.showsRestTimerExplanation && editing == nil },
+      set: { _ in }
     )
   }
 

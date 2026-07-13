@@ -1,4 +1,4 @@
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -21,6 +21,7 @@ public struct MyProfileView: View {
   private let onLogout: (@MainActor () async -> Void)?
   private let account: (any AccountRepository)?
   private let logs: (any StudentTrainingLogRepository)?
+  private let restTimerSettings: any StudentRestTimerSettingsStoring
   @State private var viewModel: MyProfileViewModel
 
   public init(
@@ -31,7 +32,9 @@ public struct MyProfileView: View {
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
     account: (any AccountRepository)? = nil,
-    logs: (any StudentTrainingLogRepository)? = nil
+    logs: (any StudentTrainingLogRepository)? = nil,
+    restTimerSettings: any StudentRestTimerSettingsStoring =
+      UserDefaultsRestTimerSettingsStore()
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -41,6 +44,7 @@ public struct MyProfileView: View {
     self.onLogout = onLogout
     self.account = account
     self.logs = logs
+    self.restTimerSettings = restTimerSettings
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -82,6 +86,7 @@ public struct MyProfileView: View {
       sections(profile)
     case .empty:
       stateMessage("完成资料填写后解锁")
+      fallbackPreferencesSection
       fallbackLogoutSection
     case .failed:
       Button {
@@ -92,8 +97,19 @@ public struct MyProfileView: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
       .frame(maxWidth: .infinity, minHeight: 200)
+      fallbackPreferencesSection
       fallbackLogoutSection
     }
+  }
+
+  /// The rest-timer preference is device-local and independent of the
+  /// onboarding profile, so it must stay reachable when the profile is empty
+  /// or fails to load (spec 055 acceptance 2).
+  @ViewBuilder
+  private var fallbackPreferencesSection: some View {
+    sectionLabel("偏好").padding(.top, 18)
+    card { RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings) }
+      .padding(.top, 8)
   }
 
   /// Escape hatch: 退出登录 must stay reachable even when the profile is empty
@@ -132,6 +148,8 @@ public struct MyProfileView: View {
       profileRow(
         "想增强肌群", OnboardingSummaryFormatter.muscleGroups(profile),
         push: false, kind: .materials, profile: profile)
+      divider
+      RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
       divider
       profileRow(
         "比赛日期", OnboardingSummaryFormatter.competition(profile),
