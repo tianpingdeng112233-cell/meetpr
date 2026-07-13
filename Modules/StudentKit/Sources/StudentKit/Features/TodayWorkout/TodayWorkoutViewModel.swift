@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import CoreModels
 import Foundation
 import Observation
@@ -5,6 +6,7 @@ import RepositoryContracts
 
 @Observable
 @MainActor
+// swiftlint:disable:next type_body_length
 public final class TodayWorkoutViewModel {
   public enum State: Equatable, Sendable {
     case idle
