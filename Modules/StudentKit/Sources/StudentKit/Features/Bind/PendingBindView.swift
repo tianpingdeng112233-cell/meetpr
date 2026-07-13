@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -67,6 +68,7 @@ struct PendingBindView: View {
     }
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bg)
+    .onAppear { Analytics.shared.screen(.pendingBind) }
     .refreshable {
       await onStateMayHaveChanged()
     }

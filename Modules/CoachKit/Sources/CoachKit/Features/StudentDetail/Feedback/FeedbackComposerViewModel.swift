@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import Foundation
 import Observation
@@ -74,6 +75,7 @@ final class FeedbackComposerViewModel {
       )
       text = ""
       state = .sent
+      Analytics.shared.coachFeedbackSent(studentID: studentID, kind: .text)
       return item
     } catch {
       state = .failed("发送失败，请稍后重试")

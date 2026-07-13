@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import DesignSystem
 import Foundation
@@ -16,6 +17,7 @@ public struct StudentRootView: View {
   private let onboarding: any OnboardingRepository
   private let onLogout: (@MainActor () async -> Void)?
   private let account: (any AccountRepository)?
+  private let restTimerSettings: any StudentRestTimerSettingsStoring
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
@@ -27,6 +29,8 @@ public struct StudentRootView: View {
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
   @State private var planRevision = 0
+  @State private var nextWorkoutSource: WorkoutSource?
+  @State private var workoutStartedAt: Date?
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -64,7 +68,9 @@ public struct StudentRootView: View {
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
-    account: (any AccountRepository)? = nil
+    account: (any AccountRepository)? = nil,
+    restTimerSettings: any StudentRestTimerSettingsStoring =
+      UserDefaultsRestTimerSettingsStore()
   ) {
     self.studentID = studentID
     self.canShiftPlanDays = canShiftPlanDays
@@ -75,6 +81,7 @@ public struct StudentRootView: View {
     self.videoUploads = videoUploads ?? .demo()
     self.onLogout = onLogout
     self.account = account
+    self.restTimerSettings = restTimerSettings
     let resolvedOnboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
@@ -112,6 +119,7 @@ public struct StudentRootView: View {
         feedbackViewModel: feedbackViewModel,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onStartWorkout: {
+          nextWorkoutSource = .dashboard
           trainingJumpToken += 1
           selectedTab = .training
         },
@@ -126,9 +134,11 @@ public struct StudentRootView: View {
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
-        onboarding: onboarding, readiness: readiness, videoUploads: videoUploads,
+        onboarding: onboarding, readiness: readiness,
+        restTimerSettings: restTimerSettings, videoUploads: videoUploads,
         jumpToTodayToken: trainingJumpToken,
-        planRevision: planRevision
+        planRevision: planRevision,
+        workoutStartedAt: $workoutStartedAt
       )
       .tag(StudentTab.training)
       .tabItem {
@@ -155,7 +165,8 @@ public struct StudentRootView: View {
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
         account: account,
-        logs: logs
+        logs: logs,
+        restTimerSettings: restTimerSettings
       )
       .tag(StudentTab.profile)
       .tabItem {
@@ -166,6 +177,7 @@ public struct StudentRootView: View {
       .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
     }
     .task {
+      Analytics.shared.screen(.dashboard)
       if feedbackViewModel.state == .idle {
         await feedbackViewModel.load(studentID: studentID)
       }
@@ -174,6 +186,19 @@ public struct StudentRootView: View {
     }
     .onChange(of: selectedTab) { _, newTab in
       if newTab == .today { todayReloadToken += 1 }
+      switch newTab {
+      case .today:
+        Analytics.shared.screen(.dashboard)
+      case .training:
+        workoutStartedAt = Date()
+        Analytics.shared.screen(.todayWorkout)
+        Analytics.shared.workoutLogStarted(source: nextWorkoutSource ?? .calendar)
+        nextWorkoutSource = nil
+      case .growth:
+        Analytics.shared.screen(.progressHistory)
+      case .profile:
+        Analytics.shared.screen(.account)
+      }
     }
     .tint(Color.MeetPR.brandRed)
   }

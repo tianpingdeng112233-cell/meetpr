@@ -1,4 +1,5 @@
 // swiftlint:disable file_length type_body_length
+import Analytics
 import CoreModels
 import DesignSystem
 import Foundation
@@ -15,6 +16,7 @@ public struct TodayWorkoutView: View {
   /// last browsed here.
   private let jumpToTodayToken: Int
   private let planRevision: Int
+  private var workoutStartedAt: Binding<Date?>
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -37,22 +39,27 @@ public struct TodayWorkoutView: View {
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     onboarding: (any OnboardingProfileReading)? = nil,
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
+    restTimerSettings: any StudentRestTimerSettingsStoring =
+      UserDefaultsRestTimerSettingsStore(),
     videoUploads: VideoUploadServices? = nil,
     jumpToTodayToken: Int = 0,
-    planRevision: Int = 0
+    planRevision: Int = 0,
+    workoutStartedAt: Binding<Date?> = .constant(nil)
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.jumpToTodayToken = jumpToTodayToken
     self.planRevision = planRevision
+    self.workoutStartedAt = workoutStartedAt
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
         plans: plans,
         logs: logs,
         e1rm: e1rm,
-        onboarding: onboarding
+        onboarding: onboarding,
+        restTimerSettings: restTimerSettings
       ))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness))
@@ -142,6 +149,13 @@ public struct TodayWorkoutView: View {
       }
     }
     .animation(.spring(duration: 0.3), value: viewModel.restTimer)
+    .sheet(isPresented: restTimerExplanationPresented) {
+      RestTimerExplanationView {
+        viewModel.acknowledgeRestTimerExplanation()
+      }
+      .presentationDetents([.medium])
+      .interactiveDismissDisabled()
+    }
     .sheet(isPresented: $showingReadinessSheet) {
       ReadinessCheckinSheet(
         studentID: studentID,
@@ -213,6 +227,17 @@ public struct TodayWorkoutView: View {
     )
   }
 
+  private var restTimerExplanationPresented: Binding<Bool> {
+    Binding(
+      // Gated on `editing == nil`: the first completed set is recorded inside
+      // SetEntrySheet, and racing a second sheet against it has no documented
+      // ordering. The flag only clears on 知道了, so the card presents right
+      // after the editor dismisses.
+      get: { viewModel.showsRestTimerExplanation && editing == nil },
+      set: { _ in }
+    )
+  }
+
   // MARK: - Workout body
 
   private func workout(
@@ -270,7 +295,7 @@ public struct TodayWorkoutView: View {
     .sheet(isPresented: $showingSummary) {
       SessionSummaryView(
         summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID,
-        onComplete: { markReviewCompleted(for: day.date) }
+        onComplete: { markReviewCompleted(for: day.date, setCount: drafts.count) }
       )
     }
   }
@@ -301,9 +326,14 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private func markReviewCompleted(for date: Date) {
+  private func markReviewCompleted(for date: Date, setCount: Int) {
     reviewStore.markReviewCompleted(studentId: studentID, date: date)
     reviewCompleted = true
+    guard let startedAt = workoutStartedAt.wrappedValue else { return }
+    Analytics.shared.workoutLogSaved(
+      setCount: setCount,
+      durationMilliseconds: max(0, Int(Date().timeIntervalSince(startedAt) * 1_000)))
+    workoutStartedAt.wrappedValue = nil
   }
 
   // MARK: - Read-only notice

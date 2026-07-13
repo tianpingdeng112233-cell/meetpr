@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import Foundation
 import Observation
@@ -28,6 +29,7 @@ public final class OnboardingWizardViewModel {
   /// snake_case wire names from the 422 envelope; step views highlight
   /// their own fields (D12).
   public private(set) var highlightedFields: Set<String> = []
+  public private(set) var usedDraftResume = false
 
   private let repo: any OnboardingRepository
   private let draftStore: LocalOnboardingDraftStore
@@ -78,6 +80,7 @@ public final class OnboardingWizardViewModel {
       return
     }
     let local = await draftStore.load(studentId: studentId)
+    usedDraftResume = local != nil
     draft = OnboardingDraft.merged(server: server, local: local)
     step = draft.resumeStep
     phase = .editing
@@ -128,6 +131,9 @@ public final class OnboardingWizardViewModel {
       _ = try await repo.complete()
     } catch OnboardingError.incomplete(let missingFields) {
       highlightedFields = Set(missingFields)
+      if let field = Self.analyticsField(for: missingFields.first) {
+        Analytics.shared.validationError(flow: .onboarding, field: field)
+      }
       if let target = OnboardingDraft.earliestStep(forMissingFields: missingFields) {
         step = target
       }
@@ -138,6 +144,9 @@ public final class OnboardingWizardViewModel {
     }
 
     await draftStore.clear(studentId: studentId)
+    Analytics.shared.onboardingCompleted(
+      filledStepCount: (1...OnboardingDraft.stepCount).filter { draft.isStepComplete($0) }.count,
+      usedDraftResume: usedDraftResume)
     await runHandoff()
   }
 
@@ -188,5 +197,14 @@ public final class OnboardingWizardViewModel {
   private func saveDraftLocally() async {
     draft.savedAt = now()
     try? await draftStore.save(draft, studentId: studentId)
+  }
+
+  private static func analyticsField(for wireName: String?) -> AnalyticsField? {
+    guard let wireName else { return nil }
+    if wireName.contains("weight") { return .bodyweight }
+    if wireName.contains("competition") { return .competitionDate }
+    if wireName.contains("goal") || wireName.contains("muscle") { return .goal }
+    if wireName.contains("training") || wireName.contains("experience") { return .experience }
+    return nil
   }
 }

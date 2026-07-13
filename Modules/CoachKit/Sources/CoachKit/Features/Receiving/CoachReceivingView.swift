@@ -1,4 +1,5 @@
 // swiftlint:disable file_length type_body_length
+import Analytics
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -287,6 +288,9 @@ struct CoachReceivingView: View {
         .stroke(
           expiringSoon ? Color.MeetPR.brandRed.opacity(0.3) : Color.MeetPR.border,
           lineWidth: 1)
+    }
+    .onAppear {
+      Analytics.shared.coachIntakeAction(.requestSeen, studentID: item.studentId)
     }
   }
 

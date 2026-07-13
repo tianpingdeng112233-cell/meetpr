@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import Foundation
 import Observation
@@ -71,6 +72,9 @@ final class BindQueueViewModel {
       items.removeAll { $0.id == item.id }
       toastMessage =
         outcome.evaluation == nil ? "已接收" : "已接收,评估期 7 天开始"
+      Analytics.shared.coachIntakeAction(
+        skipEvaluation ? .acceptedSkip : .acceptedEvaluation,
+        studentID: item.studentId)
       return true
     } catch let error as CoachBindQueueError {
       bannerMessage = Self.bannerText(for: error)
@@ -88,6 +92,7 @@ final class BindQueueViewModel {
     do {
       try await repository.reject(requestID: item.id)
       items.removeAll { $0.id == item.id }
+      Analytics.shared.coachIntakeAction(.rejected, studentID: item.studentId)
       return true
     } catch let error as CoachBindQueueError {
       bannerMessage = Self.bannerText(for: error)

@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import Foundation
 import Observation
@@ -94,6 +95,7 @@ public final class EnterCodeViewModel {
 
     guard await isOnboardingComplete() else {
       stash.stash(pending, studentId: studentId)
+      Analytics.shared.bindCoachAction(.submitted)
       return .stashedForOnboarding(pending)
     }
 
@@ -102,9 +104,11 @@ public final class EnterCodeViewModel {
     do {
       let request = try await bind.submitBindRequest(
         code: pending.code, displayName: pending.displayName)
+      Analytics.shared.bindCoachAction(.submitted)
       return .requestSent(request)
     } catch BindRequestError.invalidCode {
       fieldError = .invalidCode
+      Analytics.shared.validationError(flow: .bind, field: .inviteCode)
       return nil
     } catch BindRequestError.alreadyPending, BindRequestError.alreadyBound {
       return .needsReload

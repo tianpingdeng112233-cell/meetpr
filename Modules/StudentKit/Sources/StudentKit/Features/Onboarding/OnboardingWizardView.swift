@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -91,6 +92,9 @@ struct OnboardingWizardView: View {
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
             Button("保存并退出") {
+              Analytics.shared.navigationBack(from: .onboardingWizard, in: .onboarding)
+              FrictionFeedbackController.shared.recordFlowCancel(
+                flow: .onboarding, fromScreen: .onboardingWizard)
               Task {
                 await viewModel.saveAndExit()
                 dismiss()
@@ -104,7 +108,10 @@ struct OnboardingWizardView: View {
       if viewModel.phase == .loading {
         await viewModel.load()
       }
+      Analytics.shared.screen(.onboardingWizard)
+      trackCurrentStep()
     }
+    .onChange(of: viewModel.step) { _, _ in trackCurrentStep() }
     .interactiveDismissDisabled()
   }
 
@@ -187,6 +194,7 @@ struct OnboardingWizardView: View {
     HStack(spacing: MeetPRSpacing.md) {
       if viewModel.step > 1 {
         SecondaryButton("上一步") {
+          Analytics.shared.navigationBack(from: .onboardingWizard, in: .onboarding)
           viewModel.back()
         }
       }
@@ -207,6 +215,14 @@ struct OnboardingWizardView: View {
     }
     .padding(MeetPRSpacing.base)
     .background(Color.MeetPR.bg)
+  }
+
+  private func trackCurrentStep() {
+    let names: [OnboardingStepName] = [
+      .goal, .experience, .lifts, .schedule, .competition, .equipment, .review,
+    ]
+    guard names.indices.contains(viewModel.step - 1) else { return }
+    Analytics.shared.onboardingStep(index: viewModel.step, name: names[viewModel.step - 1])
   }
 }
 

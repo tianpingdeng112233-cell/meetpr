@@ -31,21 +31,20 @@ struct SetEntrySheet: View {
   @State private var weightText: String
   @State private var repsText: String
   @State private var rpeText: String
-  @FocusState private var focusedField: NumberField?
+  @FocusState private var focusedField: SetEntryNumberField?
   /// Whether the 2.5kg competition collar (赛扣) is loaded. When on it counts
   /// toward the dialed weight, so the plates drop 2.5kg per side; the barbell
   /// graphic and breakdown follow. Persisted so the choice sticks across sets
-  /// and launches; defaults off (bare plates).
-  @AppStorage("setEntry.collarOn") private var collarOn = false
+  /// and launches; defaults off (bare plates). Internal so the plate-math
+  /// extension (SetEntryPlateLoadout.swift) can read it.
+  @AppStorage("setEntry.collarOn") var collarOn = false
 
-  private enum NumberField { case weight, reps, rpe }
-
-  private var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
+  var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
   private var repsValue: Int { SetEntryValue.reps(from: repsText) }
   private var rpeValue: Decimal { SetEntryValue.rpe(from: rpeText) }
 
-  private let bar = 20.0
-  private let collar = 2.5  // per-side competition collar (赛扣) — counted only when collarOn
+  let bar = 20.0
+  let collar = 2.5  // per-side competition collar (赛扣) — counted only when collarOn
 
   init(
     rowIndex: Int,
@@ -92,13 +91,16 @@ struct SetEntrySheet: View {
 
           VStack(spacing: 18) {
             plateStepper(
-              "重量", unit: "KG", sub: "点数字可直接输入 · ± 2.5",
+              "重量", unit: "KG", sub: "± 2.5",
               onDec: { weightText = SetEntryValue.text(max(0, weightValue - 2.5)) },
               onInc: { weightText = SetEntryValue.text(weightValue + 2.5) },
+              focus: { focusedField = .weight },
               field: {
                 TextField("", text: $weightText)
                   .decimalKeyboard()
                   .focused($focusedField, equals: .weight)
+                  .accessibilityLabel("重量")
+                  .maxInputLength($weightText, 6)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -106,10 +108,13 @@ struct SetEntrySheet: View {
               "次数", unit: "次", sub: "± 1",
               onDec: { repsText = "\(max(0, repsValue - 1))" },
               onInc: { repsText = "\(repsValue + 1)" },
+              focus: { focusedField = .reps },
               field: {
                 TextField("", text: $repsText)
                   .numberPadKeyboard()
                   .focused($focusedField, equals: .reps)
+                  .accessibilityLabel("次数")
+                  .maxInputLength($repsText, 4)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -117,10 +122,13 @@ struct SetEntrySheet: View {
               "RPE", unit: nil, sub: "± 0.5 · 5–10",
               onDec: { rpeText = SetEntryValue.text(max(5, rpeValue - 0.5)) },
               onInc: { rpeText = SetEntryValue.text(min(10, rpeValue + 0.5)) },
+              focus: { focusedField = .rpe },
               field: {
                 TextField("", text: $rpeText)
                   .decimalKeyboard()
                   .focused($focusedField, equals: .rpe)
+                  .accessibilityLabel("RPE")
+                  .maxInputLength($rpeText, 4)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -156,6 +164,13 @@ struct SetEntrySheet: View {
     .background(Color.MeetPR.bg)
     .presentationDetents([.large])
     .modifier(SetEntryErrorAlert(viewModel: viewModel))
+    .modifier(
+      SetEntryAnalyticsModifier(
+        weightText: weightText,
+        repsText: repsText,
+        rpeText: rpeText,
+        focusedField: focusedField)
+    )
     #if os(iOS)
       .toolbar {
         ToolbarItemGroup(placement: .keyboard) {
@@ -165,29 +180,6 @@ struct SetEntrySheet: View {
         }
       }
     #endif
-  }
-
-  // MARK: - Plate loadout
-
-  private var perSide: Double {
-    (NSDecimalNumber(decimal: weightValue).doubleValue - bar) / 2 - (collarOn ? collar : 0)
-  }
-
-  private var plates: [Double] {
-    perSide > 1e-6 ? PlateLoadout.load(perSide: perSide) : []
-  }
-
-  private var breakdownLine: String {
-    let total = NSDecimalNumber(decimal: weightValue).doubleValue
-    if collarOn {
-      guard total >= bar + collar * 2 else { return "空杠 20kg" }
-      let base = PlateLoadout.breakdownText(plates)
-      return base.isEmpty ? "仅 2.5kg 赛扣" : base + " + 2.5kg 赛扣"
-    } else {
-      guard total > bar + 1e-6 else { return "空杠 20kg" }
-      let base = PlateLoadout.breakdownText(plates)
-      return base.isEmpty ? "空杠 20kg" : base
-    }
   }
 
   // MARK: - Collar toggle (赛扣)
@@ -230,6 +222,7 @@ struct SetEntrySheet: View {
         .foregroundStyle(Color.MeetPR.fgPrimary)
       HStack {
         Button {
+          SetEntryAnalytics.trackCancel()
           dismiss()
         } label: {
           HStack(spacing: 4) {
@@ -291,6 +284,7 @@ struct SetEntrySheet: View {
   private func plateStepper<Field: View>(
     _ label: String, unit: String?, sub: String,
     onDec: @escaping () -> Void, onInc: @escaping () -> Void,
+    focus: @escaping () -> Void,
     @ViewBuilder field: () -> Field
   ) -> some View {
     VStack(spacing: 8) {
@@ -305,6 +299,8 @@ struct SetEntrySheet: View {
       }
       HStack(spacing: 12) {
         stepButton("minus", action: onDec)
+        // Filled slot marks the value as a tap-to-type input (students missed the
+        // bare-label number); tapping anywhere in the slot focuses the field.
         HStack(alignment: .lastTextBaseline, spacing: 6) {
           field()
           if let unit {
@@ -313,20 +309,12 @@ struct SetEntrySheet: View {
           }
         }
         .frame(maxWidth: .infinity)
+        .frame(height: 64)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color.MeetPR.surface2))
+        .contentShape(RoundedRectangle(cornerRadius: 16))
+        .onTapGesture(perform: focus)
         stepButton("plus", action: onInc)
       }
-    }
-  }
-
-  /// Shared styling so the editable number keeps the big heavy-mono look of the
-  /// old display Text.
-  private struct EntryFieldStyle: ViewModifier {
-    func body(content: Content) -> some View {
-      content
-        .font(.system(size: 40, weight: .heavy, design: .monospaced))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
     }
   }
 
@@ -343,6 +331,12 @@ struct SetEntrySheet: View {
     .buttonStyle(.plain)
   }
 
+}
+
+enum SetEntryNumberField: Sendable {
+  case weight
+  case reps
+  case rpe
 }
 
 // MARK: - Draft persistence
@@ -369,6 +363,8 @@ extension SetEntrySheet {
     syncDraftEdits()
     Task {
       if await viewModel.commitSet(rowIndex: rowIndex, failed: failed) {
+        SetEntryAnalytics.trackCommit(
+          draft: liveDraft, videoViewModel: videoViewModel, failed: failed)
         dismiss()
       }
     }
@@ -394,6 +390,18 @@ private struct SetEntryErrorAlert: ViewModifier {
   }
 }
 
+/// Typography for the editable number inside the slot; the tap-to-type affordance
+/// comes from the filled slot in plateStepper, not from the text itself.
+private struct EntryFieldStyle: ViewModifier {
+  func body(content: Content) -> some View {
+    content
+      .font(.system(size: 40, weight: .heavy, design: .monospaced))
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .multilineTextAlignment(.center)
+      .fixedSize(horizontal: true, vertical: false)
+  }
+}
+
 /// `keyboardType` is iOS-only; the StudentKit package also builds for macOS
 /// (test target), so wrap it platform-guarded no-ops.
 @available(iOS 17.0, macOS 14.0, *)
@@ -414,6 +422,14 @@ extension View {
     #else
       self
     #endif
+  }
+
+  /// Cap the entered text so a runaway value (paste, hardware keyboard) can't
+  /// widen the `fixedSize` field past its slot and shove the buttons off-screen.
+  fileprivate func maxInputLength(_ text: Binding<String>, _ limit: Int) -> some View {
+    onChange(of: text.wrappedValue) { _, newValue in
+      if newValue.count > limit { text.wrappedValue = String(newValue.prefix(limit)) }
+    }
   }
 }
 // swiftlint:enable function_parameter_count

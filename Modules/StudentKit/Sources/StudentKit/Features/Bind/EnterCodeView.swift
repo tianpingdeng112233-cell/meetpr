@@ -1,3 +1,4 @@
+import Analytics
 import CoreModels
 import DesignSystem
 import RepositoryContracts
@@ -41,9 +42,10 @@ struct EnterCodeView: View {
         codeField
 
         MeetPRTextField(
-          "你的姓名(教练将看到)",
+          "你的姓名",
           text: $viewModel.displayName,
-          placeholder: "姓名"
+          placeholder: "填你自己的名字",
+          helperText: "教练会在学员列表里看到这个名字"
         )
 
         if viewModel.showsNetworkBanner {
@@ -69,6 +71,10 @@ struct EnterCodeView: View {
     }
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bg)
+    .onAppear {
+      Analytics.shared.screen(.bindEnterCode)
+      Analytics.shared.bindCoachAction(.inviteOpen)
+    }
   }
 
   private var codeField: some View {

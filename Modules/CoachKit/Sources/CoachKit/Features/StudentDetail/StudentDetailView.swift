@@ -1,4 +1,5 @@
 // swiftlint:disable file_length type_body_length
+import Analytics
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
@@ -117,6 +118,8 @@ struct StudentDetailView: View {
       )
     )
     .task {
+      Analytics.shared.screen(.coachStudentDetail)
+      Analytics.shared.coachOpenedStudent(id: viewModel.summary.id)
       await viewModel.loadIfNeeded()
       await evaluationViewModel.load()
     }
