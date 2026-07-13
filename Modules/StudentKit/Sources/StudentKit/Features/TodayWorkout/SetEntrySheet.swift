@@ -1,4 +1,4 @@
-// swiftlint:disable function_parameter_count
+// swiftlint:disable function_parameter_count file_length type_body_length
 import CoreModels
 import DesignSystem
 import Foundation
@@ -6,9 +6,10 @@ import SwiftUI
 
 /// Set-entry sheet with the loaded-barbell plate calculator (design
 /// `SetEntryPlate`): a live `PlateLoadout` barbell for the dialed weight, the
-/// big-plates-first breakdown (the 2.5 kg locking collar counts toward the
-/// load), big +/- steppers for weight / reps / RPE, optional video attach, and
-/// the complete / fail actions. Commit + video logic unchanged.
+/// big-plates-first breakdown (the 2.5 kg competition collar 赛扣 counts toward
+/// the load only when 上赛扣 is toggled on), big +/- steppers for weight / reps /
+/// RPE, optional video attach, and the complete / fail actions. Commit + video
+/// logic unchanged.
 @available(iOS 17.0, macOS 14.0, *)
 struct SetEntrySheet: View {
   let rowIndex: Int
@@ -30,6 +31,11 @@ struct SetEntrySheet: View {
   @State private var repsText: String
   @State private var rpeText: String
   @FocusState private var focusedField: NumberField?
+  /// Whether the 2.5kg competition collar (赛扣) is loaded. When on it counts
+  /// toward the dialed weight, so the plates drop 2.5kg per side; the barbell
+  /// graphic and breakdown follow. Persisted so the choice sticks across sets
+  /// and launches; defaults off (bare plates).
+  @AppStorage("setEntry.collarOn") private var collarOn = false
 
   private enum NumberField { case weight, reps, rpe }
 
@@ -38,7 +44,7 @@ struct SetEntrySheet: View {
   private var rpeValue: Decimal { SetEntryValue.rpe(from: rpeText) }
 
   private let bar = 20.0
-  private let collar = 2.5  // per-side locking collar — counts toward the load
+  private let collar = 2.5  // per-side competition collar (赛扣) — counted only when collarOn
 
   init(
     rowIndex: Int,
@@ -75,12 +81,13 @@ struct SetEntrySheet: View {
       navBar
       ScrollView {
         VStack(spacing: 0) {
-          PlateLoadout(plates: plates).padding(.top, 8)
+          PlateLoadout(plates: plates, showCollar: collarOn).padding(.top, 8)
           Text(breakdownLine)
             .font(.system(size: 14, weight: .semibold, design: .monospaced))
             .foregroundStyle(Color.MeetPR.fgPrimary)
             .frame(maxWidth: .infinity)
             .padding(.top, 4)
+          collarToggle.padding(.top, 10)
 
           VStack(spacing: 18) {
             plateStepper(
@@ -162,7 +169,7 @@ struct SetEntrySheet: View {
   // MARK: - Plate loadout
 
   private var perSide: Double {
-    (NSDecimalNumber(decimal: weightValue).doubleValue - bar) / 2 - collar
+    (NSDecimalNumber(decimal: weightValue).doubleValue - bar) / 2 - (collarOn ? collar : 0)
   }
 
   private var plates: [Double] {
@@ -171,9 +178,46 @@ struct SetEntrySheet: View {
 
   private var breakdownLine: String {
     let total = NSDecimalNumber(decimal: weightValue).doubleValue
-    guard total >= bar + collar * 2 else { return "空杠 20kg" }
-    let base = PlateLoadout.breakdownText(plates)
-    return base.isEmpty ? "仅 2.5kg 卡扣" : base + " + 2.5kg 卡扣"
+    if collarOn {
+      guard total >= bar + collar * 2 else { return "空杠 20kg" }
+      let base = PlateLoadout.breakdownText(plates)
+      return base.isEmpty ? "仅 2.5kg 赛扣" : base + " + 2.5kg 赛扣"
+    } else {
+      guard total > bar + 1e-6 else { return "空杠 20kg" }
+      let base = PlateLoadout.breakdownText(plates)
+      return base.isEmpty ? "空杠 20kg" : base
+    }
+  }
+
+  // MARK: - Collar toggle (赛扣)
+
+  /// 贴右的小圆勾选：是否上赛扣。图示 + 明细随之联动，选择记忆到下次。
+  private var collarToggle: some View {
+    HStack {
+      Spacer()
+      Button {
+        collarOn.toggle()
+      } label: {
+        HStack(spacing: 8) {
+          Image(systemName: collarOn ? "checkmark.circle.fill" : "circle")
+            .font(.system(size: 18))
+            .foregroundStyle(collarOn ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+          Text("上赛扣")
+            .font(.system(size: 14, weight: .medium))
+            .foregroundStyle(collarOn ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(Color.MeetPR.surface1)
+        .clipShape(Capsule())
+        .overlay {
+          Capsule().stroke(
+            collarOn ? Color.MeetPR.brandRed.opacity(0.4) : Color.MeetPR.border, lineWidth: 1)
+        }
+      }
+      .buttonStyle(.plain)
+      .accessibilityIdentifier("setEntry.collarToggle")
+    }
   }
 
   // MARK: - Chrome
