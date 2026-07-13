@@ -7,6 +7,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
   public let exerciseType: ExerciseType
   public let mainLiftFamily: LiftFamily?
   public let isCompetitionLift: Bool
+  public let competitionStance: CompetitionStance?
   public let muscleGroups: [MuscleGroup]
   public let equipment: [Equipment]
   public let movementPattern: [MovementPattern]
@@ -20,6 +21,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
     exerciseType: ExerciseType,
     mainLiftFamily: LiftFamily? = nil,
     isCompetitionLift: Bool,
+    competitionStance: CompetitionStance? = nil,
     muscleGroups: [MuscleGroup],
     equipment: [Equipment],
     movementPattern: [MovementPattern] = [],
@@ -32,6 +34,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
     self.exerciseType = exerciseType
     self.mainLiftFamily = mainLiftFamily
     self.isCompetitionLift = isCompetitionLift
+    self.competitionStance = competitionStance
     self.muscleGroups = muscleGroups
     self.equipment = equipment
     self.movementPattern = movementPattern
@@ -48,6 +51,10 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
     exerciseType = try container.decode(ExerciseType.self, forKey: .exerciseType)
     mainLiftFamily = try container.decodeIfPresent(LiftFamily.self, forKey: .mainLiftFamily)
     isCompetitionLift = try container.decode(Bool.self, forKey: .isCompetitionLift)
+    competitionStance = try container.decodeIfPresent(
+      CompetitionStance.self,
+      forKey: .competitionStance
+    )
     muscleGroups = try container.decodeArrayIfPresent([MuscleGroup].self, forKey: .muscleGroups)
     equipment = try container.decodeArrayIfPresent([Equipment].self, forKey: .equipment)
     movementPattern = try container.decodeArrayIfPresent(
@@ -67,6 +74,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
     try container.encode(exerciseType, forKey: .exerciseType)
     try container.encodeIfPresent(mainLiftFamily, forKey: .mainLiftFamily)
     try container.encode(isCompetitionLift, forKey: .isCompetitionLift)
+    try container.encodeIfPresent(competitionStance, forKey: .competitionStance)
     try container.encode(muscleGroups, forKey: .muscleGroups)
     try container.encode(equipment, forKey: .equipment)
     try container.encode(movementPattern, forKey: .movementPattern)
@@ -81,6 +89,7 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
     case exerciseType
     case mainLiftFamily
     case isCompetitionLift
+    case competitionStance
     case muscleGroups
     case equipment
     case movementPattern

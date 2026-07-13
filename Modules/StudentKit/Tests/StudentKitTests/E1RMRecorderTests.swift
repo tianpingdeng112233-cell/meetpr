@@ -42,7 +42,8 @@ private func recorderInput(
   rpe: Decimal? = 10,
   family: LiftFamily = .squat,
   completed: Bool = true,
-  failed: Bool = false
+  failed: Bool = false,
+  priorConfidence: E1RMConfidence? = nil
 ) -> E1RMRecorder.Input {
   E1RMRecorder.Input(
     studentID: recorderStudentID,
@@ -53,7 +54,8 @@ private func recorderInput(
     reps: reps,
     rpe: rpe,
     completed: completed,
-    failed: failed
+    failed: failed,
+    priorConfidence: priorConfidence
   )
 }
 
@@ -139,6 +141,23 @@ private func recorderInput(
   )
   #expect(history.count == 2)
   #expect(history.last?.e1RMKg == 350)
+  #expect(history.last?.confidence == .low)
+}
+
+@Test func priorNormalConfidenceDoesNotOverrideReplayAnomalyVerdict() async throws {
+  let (recorder, repository) = makeRecorder(seed: [recorderPoint(e1RM: 200)])
+
+  let event = await recorder.record(
+    recorderInput(weightKg: 225, priorConfidence: .normal)
+  )
+
+  #expect(event == nil)
+  let history = try await repository.fetchHistory(
+    studentId: recorderStudentID,
+    exerciseId: recorderExerciseID
+  )
+  #expect(history.count == 2)
+  #expect(history.last?.e1RMKg == 225)
   #expect(history.last?.confidence == .low)
 }
 

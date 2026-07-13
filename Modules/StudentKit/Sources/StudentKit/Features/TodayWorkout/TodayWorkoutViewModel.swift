@@ -14,21 +14,20 @@ public final class TodayWorkoutViewModel {
     case rest
     case error(String)
   }
-
   public typealias SetRowDraft = TodayWorkoutSetRowDraft
-
   public typealias RestTimerState = TodayWorkoutRestTimerState
-
   public private(set) var state: State = .idle
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
   public private(set) var restTimer: RestTimerState?
   public private(set) var planContext: TodayWorkoutPlanContext?
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
   public private(set) var actionErrorMessage: String?
+  public private(set) var onboardingProfile: OnboardingProfile?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rmRepo: any E1RMRepository
+  private let onboarding: (any OnboardingProfileReading)?
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
@@ -38,11 +37,13 @@ public final class TodayWorkoutViewModel {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
+    onboarding: (any OnboardingProfileReading)? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.logs = logs
     self.e1rmRepo = e1rm
+    self.onboarding = onboarding
     self.now = now
   }
 
@@ -52,6 +53,7 @@ public final class TodayWorkoutViewModel {
     let generation = loadGeneration
     state = .loading
     do {
+      onboardingProfile = try? await onboarding?.fetchProfile(studentId: studentID)
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       guard isCurrentLoad(generation) else { return }
       planContext = Self.planContext(from: plan, selectedDate: date)
@@ -294,7 +296,12 @@ extension TodayWorkoutViewModel {
     studentID: UUID
   ) async throws -> [UUID: ExerciseReference] {
     let familyByExercise = Dictionary(
-      day.exercises.map { ($0.exercise.id, $0.exercise.mainLiftFamily) },
+      day.exercises.map {
+        (
+          $0.exercise.id,
+          resolveCompetitionFamily(exercise: $0.exercise, onboarding: onboardingProfile)
+        )
+      },
       uniquingKeysWith: { first, _ in first }
     )
     let exerciseIDs = Set(day.exercises.map(\.exercise.id))
@@ -357,9 +364,9 @@ extension TodayWorkoutViewModel {
     default:
       day = nil
     }
-    return day?.exercises
-      .first { $0.id == planExerciseID }?
-      .exercise.mainLiftFamily
+    guard let exercise = day?.exercises.first(where: { $0.id == planExerciseID })?.exercise
+    else { return nil }
+    return resolveCompetitionFamily(exercise: exercise, onboarding: onboardingProfile)
   }
 }
 

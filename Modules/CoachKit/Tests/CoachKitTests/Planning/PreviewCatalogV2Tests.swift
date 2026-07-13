@@ -32,6 +32,19 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
+@Test func previewCatalogCompetitionStancesMatchBackendMetadata() async throws {
+  let catalog = try await previewCatalog()
+  let byName = Dictionary(uniqueKeysWithValues: catalog.map { ($0.name, $0) })
+
+  #expect(byName["高杠位深蹲"]?.competitionStance == .highBar)
+  #expect(byName["低杠位深蹲"]?.competitionStance == .lowBar)
+  #expect(byName["比赛式深蹲"]?.isCompetitionLift == true)
+  #expect(byName["比赛式卧推"]?.isCompetitionLift == true)
+  #expect(byName["比赛式传统硬拉"]?.competitionStance == .conventional)
+  #expect(byName["比赛式相扑硬拉"]?.competitionStance == .sumo)
+}
+
+@available(iOS 17.0, macOS 14.0, *)
 @Test func previewCatalogHasNoDuplicateIDs() async throws {
   let catalog = try await previewCatalog()
 

@@ -161,6 +161,7 @@ public actor InMemoryPlanRepository: PlanRepository {
         exerciseType: .mainLift,
         mainLiftFamily: seed.mainLiftFamily,
         isCompetitionLift: true,
+        competitionStance: seed.competitionStance,
         muscleGroups: seed.muscleGroups,
         equipment: [.barbell],
         movementPattern: seed.movementPattern,
@@ -179,6 +180,7 @@ private struct CompetitionLiftSeed {
   let name: String
   let nameEn: String
   let mainLiftFamily: LiftFamily
+  let competitionStance: CompetitionStance?
   let muscleGroups: [MuscleGroup]
   let movementPattern: [MovementPattern]
 }
@@ -189,6 +191,7 @@ private let competitionLiftSeeds = [
     name: "比赛式深蹲",
     nameEn: "Competition Squat",
     mainLiftFamily: .squat,
+    competitionStance: nil,
     muscleGroups: [.quad, .glute],
     movementPattern: [.squat]
   ),
@@ -197,6 +200,7 @@ private let competitionLiftSeeds = [
     name: "比赛式卧推",
     nameEn: "Competition Bench Press",
     mainLiftFamily: .bench,
+    competitionStance: nil,
     muscleGroups: [.chest, .triceps],
     movementPattern: [.horizontalPush]
   ),
@@ -205,6 +209,7 @@ private let competitionLiftSeeds = [
     name: "比赛式传统硬拉",
     nameEn: "Competition Conventional Deadlift",
     mainLiftFamily: .deadlift,
+    competitionStance: .conventional,
     muscleGroups: [.back, .hamstring],
     movementPattern: [.hipHinge]
   ),
@@ -213,6 +218,7 @@ private let competitionLiftSeeds = [
     name: "比赛式相扑硬拉",
     nameEn: "Competition Sumo Deadlift",
     mainLiftFamily: .deadlift,
+    competitionStance: .sumo,
     muscleGroups: [.back, .hamstring, .glute],
     movementPattern: [.hipHinge]
   ),

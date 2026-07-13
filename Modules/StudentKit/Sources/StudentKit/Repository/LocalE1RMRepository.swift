@@ -36,6 +36,13 @@ public actor LocalE1RMRepository: E1RMRepository {
     try save(points: all)
   }
 
+  public func replaceHistory(studentId: UUID, with replacement: [E1RMHistoryPoint]) async throws {
+    let retainedPoints = try loadPoints().filter { $0.studentId != studentId }
+    let retainedPRs = try loadPRs().filter { $0.studentId != studentId }
+    try save(points: retainedPoints + replacement.filter { $0.studentId == studentId })
+    try save(prs: retainedPRs)
+  }
+
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
     try loadPoints()
       .filter { $0.studentId == studentId && $0.exerciseId == exerciseId }
