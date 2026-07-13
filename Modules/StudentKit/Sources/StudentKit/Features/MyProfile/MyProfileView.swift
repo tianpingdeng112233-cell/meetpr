@@ -1,4 +1,4 @@
-// swiftlint:disable type_body_length
+// swiftlint:disable type_body_length file_length
 import CoreModels
 import DesignSystem
 import RepositoryContracts
