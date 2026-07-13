@@ -35,6 +35,7 @@ struct StudentDetailView: View {
       initialValue: StudentGrowthViewModel(
         plans: context.plans,
         trainingLogs: context.trainingLogs,
+        profiles: context.profiles,
         familyMapProvider: context.familyMapProvider
       )
     )
@@ -326,7 +327,10 @@ struct StudentDetailView: View {
         }
       )
     case .execution:
-      StudentExecutionView(days: viewModel.executionDays)
+      StudentExecutionView(
+        days: viewModel.executionDays,
+        shiftBadgeText: viewModel.planShiftBadgeText
+      )
     case .videos:
       StudentVideoGridView(
         videos: viewModel.videos,

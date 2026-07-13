@@ -56,9 +56,15 @@ struct SetEntrySheet: View {
     self.studentID = studentID
     self.videoViewModel = videoViewModel
     self.scrollToVideo = scrollToVideo
-    let weight = draft.actualWeight ?? draft.prescribed.weightKg ?? 0
-    let reps = draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0
-    let rpe = draft.actualRPE ?? draft.prescribed.rpe ?? 8
+    // Seed from the live draft, not the open-time snapshot: if presentation
+    // churn (e.g. the camera cover) recreates this sheet, flushed edits must
+    // reappear instead of the stale prescribed values (beta 2026-07-11).
+    // Matched by stable id, never by index — after a day switch the same
+    // index can belong to a different set entirely.
+    let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
+    let weight = seed.actualWeight ?? seed.prescribed.weightKg ?? 0
+    let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
+    let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
     _weightText = State(initialValue: SetEntryValue.text(weight))
     _repsText = State(initialValue: "\(reps)")
     _rpeText = State(initialValue: SetEntryValue.text(rpe))
@@ -78,13 +84,16 @@ struct SetEntrySheet: View {
 
           VStack(spacing: 18) {
             plateStepper(
-              "重量", unit: "KG", sub: "点数字可直接输入 · ± 2.5",
+              "重量", unit: "KG", sub: "± 2.5",
               onDec: { weightText = SetEntryValue.text(max(0, weightValue - 2.5)) },
               onInc: { weightText = SetEntryValue.text(weightValue + 2.5) },
+              focus: { focusedField = .weight },
               field: {
                 TextField("", text: $weightText)
                   .decimalKeyboard()
                   .focused($focusedField, equals: .weight)
+                  .accessibilityLabel("重量")
+                  .maxInputLength($weightText, 6)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -92,10 +101,13 @@ struct SetEntrySheet: View {
               "次数", unit: "次", sub: "± 1",
               onDec: { repsText = "\(max(0, repsValue - 1))" },
               onInc: { repsText = "\(repsValue + 1)" },
+              focus: { focusedField = .reps },
               field: {
                 TextField("", text: $repsText)
                   .numberPadKeyboard()
                   .focused($focusedField, equals: .reps)
+                  .accessibilityLabel("次数")
+                  .maxInputLength($repsText, 4)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -103,10 +115,13 @@ struct SetEntrySheet: View {
               "RPE", unit: nil, sub: "± 0.5 · 5–10",
               onDec: { rpeText = SetEntryValue.text(max(5, rpeValue - 0.5)) },
               onInc: { rpeText = SetEntryValue.text(min(10, rpeValue + 0.5)) },
+              focus: { focusedField = .rpe },
               field: {
                 TextField("", text: $rpeText)
                   .decimalKeyboard()
                   .focused($focusedField, equals: .rpe)
+                  .accessibilityLabel("RPE")
+                  .maxInputLength($rpeText, 4)
                   .modifier(EntryFieldStyle())
               }
             )
@@ -115,8 +130,18 @@ struct SetEntrySheet: View {
               VideoAttachmentSection(
                 studentID: studentID,
                 videoViewModel: videoViewModel,
-                initialSetLogID: draft.loggedSetID,
-                resolveSetLogID: { await viewModel.ensureLoggedSetID(rowIndex: rowIndex) }
+                initialSetLogID: liveDraft.loggedSetID,
+                resolveSetLogID: {
+                  // Attaching to an unlogged set persists it to mint a set-log
+                  // id — flush the typed numbers first, or the stale draft
+                  // wipes them and logs prescribed values (beta 2026-07-11).
+                  syncDraftEdits()
+                  return await viewModel.ensureLoggedSetID(rowIndex: rowIndex)
+                },
+                // Flush on 拍摄/相册 tap too: the camera cover's dismissal can
+                // recreate this sheet, and the reseed above only helps if the
+                // values are already in the draft by then.
+                onWillPick: { syncDraftEdits() }
               )
             }
           }
@@ -230,6 +255,7 @@ struct SetEntrySheet: View {
   private func plateStepper<Field: View>(
     _ label: String, unit: String?, sub: String,
     onDec: @escaping () -> Void, onInc: @escaping () -> Void,
+    focus: @escaping () -> Void,
     @ViewBuilder field: () -> Field
   ) -> some View {
     VStack(spacing: 8) {
@@ -244,6 +270,8 @@ struct SetEntrySheet: View {
       }
       HStack(spacing: 12) {
         stepButton("minus", action: onDec)
+        // Filled slot marks the value as a tap-to-type input (students missed the
+        // bare-label number); tapping anywhere in the slot focuses the field.
         HStack(alignment: .lastTextBaseline, spacing: 6) {
           field()
           if let unit {
@@ -252,20 +280,12 @@ struct SetEntrySheet: View {
           }
         }
         .frame(maxWidth: .infinity)
+        .frame(height: 64)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color.MeetPR.surface2))
+        .contentShape(RoundedRectangle(cornerRadius: 16))
+        .onTapGesture(perform: focus)
         stepButton("plus", action: onInc)
       }
-    }
-  }
-
-  /// Shared styling so the editable number keeps the big heavy-mono look of the
-  /// old display Text.
-  private struct EntryFieldStyle: ViewModifier {
-    func body(content: Content) -> some View {
-      content
-        .font(.system(size: 40, weight: .heavy, design: .monospaced))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .multilineTextAlignment(.center)
-        .frame(maxWidth: .infinity)
     }
   }
 
@@ -282,21 +302,36 @@ struct SetEntrySheet: View {
     .buttonStyle(.plain)
   }
 
-  private func save(failed: Bool) {
+}
+
+// MARK: - Draft persistence
+extension SetEntrySheet {
+  /// The current view-model draft for this set, matched by stable id; falls
+  /// back to the open-time snapshot when the set is no longer on screen.
+  fileprivate var liveDraft: TodayWorkoutViewModel.SetRowDraft {
+    viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
+  }
+
+  /// Push the sheet's current field values into the view model draft; both
+  /// save() and the video-attach path need the draft current before persist.
+  fileprivate func syncDraftEdits() {
+    viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
+    viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
+    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpeValue)
+  }
+
+  fileprivate func save(failed: Bool) {
     // Parse + clamp the current field text here (not while typing), so a
     // multi-digit value like "10" RPE is never truncated mid-keystroke and the
     // saved value is always what the field currently shows.
     focusedField = nil
-    viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
-    viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
-    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpeValue)
+    syncDraftEdits()
     Task {
       if await viewModel.commitSet(rowIndex: rowIndex, failed: failed) {
         dismiss()
       }
     }
   }
-
 }
 
 private struct SetEntryErrorAlert: ViewModifier {
@@ -315,6 +350,18 @@ private struct SetEntryErrorAlert: ViewModifier {
     } message: {
       Text(viewModel.actionErrorMessage ?? "")
     }
+  }
+}
+
+/// Typography for the editable number inside the slot; the tap-to-type affordance
+/// comes from the filled slot in plateStepper, not from the text itself.
+private struct EntryFieldStyle: ViewModifier {
+  func body(content: Content) -> some View {
+    content
+      .font(.system(size: 40, weight: .heavy, design: .monospaced))
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .multilineTextAlignment(.center)
+      .fixedSize(horizontal: true, vertical: false)
   }
 }
 
@@ -338,6 +385,14 @@ extension View {
     #else
       self
     #endif
+  }
+
+  /// Cap the entered text so a runaway value (paste, hardware keyboard) can't
+  /// widen the `fixedSize` field past its slot and shove the buttons off-screen.
+  fileprivate func maxInputLength(_ text: Binding<String>, _ limit: Int) -> some View {
+    onChange(of: text.wrappedValue) { _, newValue in
+      if newValue.count > limit { text.wrappedValue = String(newValue.prefix(limit)) }
+    }
   }
 }
 // swiftlint:enable function_parameter_count

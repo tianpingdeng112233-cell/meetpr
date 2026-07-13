@@ -7,20 +7,31 @@ import Testing
 
 /// Spec 028 §4: the e1RM/PR hook fires inside the persist path on the
 /// false→true completion edge only.
+///
+/// All clocks in this file are frozen to a UTC midnight. The demo seed
+/// anchors plan-day dates at UTC midnights while the view model matches
+/// "today" with `Calendar.current`, so a live `Date()` resolves the wrong
+/// day whenever the local calendar day differs from the UTC one (e.g.
+/// 00:00–08:00 Beijing). Freezing to the seed's own anchor makes
+/// `day[3].date == frozenNow` — the same absolute instant is same-day with
+/// itself in any calendar, so day-offset 3 (硬拉 day) resolves everywhere.
+private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-13 00:00:00 UTC
+
 @MainActor
 private func makeLoadedViewModel(
   e1rm: InMemoryE1RMRepository
 ) async throws -> (TodayWorkoutViewModel, UUID) {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentDemoSeed.makePlanView(today: frozenNow)
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
     logs: InMemoryStudentTrainingLogRepository(),
-    e1rm: e1rm
+    e1rm: e1rm,
+    now: { frozenNow }
   )
   // Demo cycle anchors "today" at day-offset 3 (硬拉 day).
-  await viewModel.load(date: Date(), studentID: studentID)
+  await viewModel.load(date: frozenNow, studentID: studentID)
   guard case .loaded = viewModel.state else {
     throw TestFailure("expected loaded state, got \(viewModel.state)")
   }
@@ -118,7 +129,7 @@ private struct TestFailure: Error, CustomStringConvertible {
 @Test func bufferSuppressesSubHalfKiloImprovements() async throws {
   let e1rm = InMemoryE1RMRepository()
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentDemoSeed.makePlanView(today: frozenNow)
   guard let deadlift = plan.days[3].exercises.first?.exercise else {
     throw TestFailure("seed shape changed")
   }
@@ -127,7 +138,7 @@ private struct TestFailure: Error, CustomStringConvertible {
   try await e1rm.recordPoint(
     E1RMHistoryPoint(
       id: UUID(), studentId: studentID, exerciseId: deadlift.id, setLogId: UUID(),
-      computedAt: Date().addingTimeInterval(-86_400),
+      computedAt: frozenNow.addingTimeInterval(-86_400),
       e1RMKg: 203.3, sourceWeightKg: 172.5, sourceReps: 3, sourceRPE: 8.5
     ))
 
@@ -163,10 +174,9 @@ private struct TestFailure: Error, CustomStringConvertible {
   // Frozen clock: both completions get identical computedAt. The baseline is
   // taken over the full history before insertion (Codex review P1), so the
   // second identical-e1RM set must not break the 0.5kg buffer.
-  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
   let e1rm = InMemoryE1RMRepository()
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentDemoSeed.makePlanView(today: frozenNow)
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
@@ -174,7 +184,7 @@ private struct TestFailure: Error, CustomStringConvertible {
     e1rm: e1rm,
     now: { frozenNow }
   )
-  await viewModel.load(date: Date(), studentID: studentID)
+  await viewModel.load(date: frozenNow, studentID: studentID)
 
   await viewModel.toggleComplete(rowIndex: 0)
   await viewModel.acknowledgePendingPR()

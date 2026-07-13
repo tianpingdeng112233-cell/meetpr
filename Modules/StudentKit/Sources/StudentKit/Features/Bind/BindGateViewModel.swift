@@ -37,7 +37,8 @@ public enum BindGateState: Equatable, Sendable {
   case pendingAcceptance(BindRequest)
   /// Accepted into a live evaluation period (skipEvaluation == false && the
   /// period is uncompleted) → the single-page EvaluationPeriodView replaces
-  /// the 5 tabs (spec 033 §11, D6).
+  /// the 5 tabs (spec 033 §11, D6). Unreachable while
+  /// `BindGateViewModel.evaluationSealed` is true (2026-07-13 beta seal).
   case evaluationActive(BindRequest, EvaluationPeriod)
   /// → 5-tab main content.
   case bound(BindRequest)
@@ -106,13 +107,22 @@ public final class BindGateViewModel {
     }
   }
 
-  /// Accepted → evaluation sub-route (spec 033 §11): a live (uncompleted)
-  /// evaluation period shows the single-page state; no period / completed →
-  /// the 5 tabs. A fetch failure must NOT fold into `.bound` — that would
-  /// let an in-evaluation student through to the 5 tabs on a network blip
-  /// (Codex review P1) — so it lands on the full-screen retry like the
-  /// `mine` fetch above.
+  /// 2026-07-13 (David): the evaluation period is sealed for beta — accepted
+  /// students route straight to the 5 tabs even when a legacy uncompleted
+  /// period exists (defer ≠ delete; spec 033 code stays dormant). Flip to
+  /// false to restore the spec 033 §11 evaluation sub-route below.
+  private static let evaluationSealed = true
+
+  /// Accepted → `.bound` while sealed (above). Unsealed behavior
+  /// (spec 033 §11): a live (uncompleted) evaluation period shows the
+  /// single-page state; no period / completed → the 5 tabs. A fetch failure
+  /// must NOT fold into `.bound` — that would let an in-evaluation student
+  /// through to the 5 tabs on a network blip (Codex review P1) — so it
+  /// lands on the full-screen retry like the `mine` fetch above.
   private func boundState(for request: BindRequest) async -> BindGateState {
+    if Self.evaluationSealed {
+      return .bound(request)
+    }
     guard !request.skipEvaluation, let evaluations else {
       return .bound(request)
     }

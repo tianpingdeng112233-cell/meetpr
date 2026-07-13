@@ -1,39 +1,38 @@
 import Foundation
 
-public struct ShiftPlanDayRequestDTO: Encodable, Equatable, Sendable {
-  public let shiftedToDate: String
-
-  public init(shiftedToDate: Date) {
-    self.shiftedToDate = WireFormatting.dateOnlyString(from: shiftedToDate)
-  }
-
-  public init(shiftedToDate: String) {
-    self.shiftedToDate = shiftedToDate
-  }
-}
-
-public struct PlanDayShiftDTO: Decodable, Equatable, Sendable {
-  public let id: UUID
-  public let planDayID: UUID
+public struct ShiftedPlanDayDTO: Decodable, Equatable, Sendable {
+  public let dayID: UUID
   public let shiftedToDate: Date
-  public let createdAt: Date
 
-  public init(
-    id: UUID,
-    planDayID: UUID,
-    shiftedToDate: Date,
-    createdAt: Date
-  ) {
-    self.id = id
-    self.planDayID = planDayID
+  public init(dayID: UUID, shiftedToDate: Date) {
+    self.dayID = dayID
     self.shiftedToDate = shiftedToDate
-    self.createdAt = createdAt
   }
 
   private enum CodingKeys: String, CodingKey {
-    case id
-    case planDayID = "planDayId"
+    case dayID = "dayId"
     case shiftedToDate
-    case createdAt
+  }
+}
+
+public struct PlanShiftDTO: Decodable, Equatable, Sendable {
+  public let batchID: UUID
+  public let shiftedDays: [ShiftedPlanDayDTO]
+  public let totalOffsetDays: Int
+
+  public init(
+    batchID: UUID,
+    shiftedDays: [ShiftedPlanDayDTO],
+    totalOffsetDays: Int
+  ) {
+    self.batchID = batchID
+    self.shiftedDays = shiftedDays
+    self.totalOffsetDays = totalOffsetDays
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case batchID = "batchId"
+    case shiftedDays
+    case totalOffsetDays
   }
 }

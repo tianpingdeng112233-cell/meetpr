@@ -85,15 +85,14 @@ public final class Session {
     } catch {
       guard isCurrentSession(generation) else { return }
       Self.logger.warning("bootstrap_refresh_failed \(String(describing: error))")
-      // Only a server-confirmed invalid/expired refresh token should force logout. Transient
-      // failures (offline, timeout, 5xx) must not: keep the stored credentials and stay signed
-      // in on the cached user, so a flaky connection at launch doesn't boot the user to login.
-      if Self.shouldClearSession(afterRefreshError: error) {
+      // Transient failures keep the cached session so a flaky launch does not force login.
+      // Every other refresh failure is fail-closed: clear stale credentials and return to auth.
+      if Self.shouldKeepCachedSession(afterBootstrapRefreshError: error) {
+        state = .authenticated(cachedUser)
+      } else {
         await tokenStore.clear()
         guard isCurrentSession(generation) else { return }
         state = .anonymous
-      } else {
-        state = .authenticated(cachedUser)
       }
     }
   }
@@ -216,6 +215,7 @@ public final class Session {
       refreshTask = nil
       if Self.shouldClearSession(afterRefreshError: error) {
         await logout()
+        throw SessionStateReaderError.authenticationExpired
       }
       throw error
     }
@@ -237,6 +237,21 @@ public final class Session {
       return false
     }
     return authError.clearsBootstrapSession
+  }
+
+  private static func shouldKeepCachedSession(afterBootstrapRefreshError error: Error) -> Bool {
+    guard let authError = error as? AuthRepositoryError else {
+      return false
+    }
+    switch authError {
+    case .decoding, .network, .server:
+      return true
+    case .backend(429, _, _):
+      // 429 is throttling, not a credential verdict: keep the cached session.
+      return true
+    case .backend:
+      return false
+    }
   }
 
   private static func shouldRefresh(accessToken: String, now: Date = Date()) -> Bool {

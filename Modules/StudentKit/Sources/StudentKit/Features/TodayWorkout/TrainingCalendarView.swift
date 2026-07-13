@@ -203,7 +203,7 @@ private final class TrainingCalendarViewModel {
         state = .idle
         return
       }
-      state = .error(error.localizedDescription)
+      state = .error(TodayWorkoutViewModel.loadErrorMessage(for: error))
     }
   }
 

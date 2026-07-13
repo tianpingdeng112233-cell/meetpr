@@ -31,16 +31,19 @@ public final class GrowthCurveViewModel {
 
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let onboarding: (any OnboardingProfileReading)?
   private let now: @Sendable () -> Date
   private var historyByFamily: [LiftFamily: [E1RMHistoryPoint]] = [:]
 
   public init(
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
+    onboarding: (any OnboardingProfileReading)? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.e1rm = e1rm
+    self.onboarding = onboarding
     self.now = now
   }
 
@@ -48,7 +51,11 @@ public final class GrowthCurveViewModel {
     state = .loading
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(in: plan)
+      let profile = try await onboarding?.fetchProfile(studentId: studentID)
+      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
+        in: plan,
+        onboarding: profile
+      )
 
       var grouped: [LiftFamily: [E1RMHistoryPoint]] = [:]
       for (family, ids) in idsByFamily {

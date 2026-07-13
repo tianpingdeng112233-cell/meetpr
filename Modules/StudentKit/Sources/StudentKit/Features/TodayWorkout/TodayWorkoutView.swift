@@ -21,6 +21,7 @@ public struct TodayWorkoutView: View {
   @State private var selectedDate: Date
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
+  @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
   /// Whether the slide-to-complete → 训练回顾 → 完成 flow has been finished for
   /// the loaded day; loaded from `SessionReviewStore` so the slide control does
@@ -34,6 +35,7 @@ public struct TodayWorkoutView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
+    onboarding: (any OnboardingProfileReading)? = nil,
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
@@ -49,7 +51,12 @@ public struct TodayWorkoutView: View {
     self._selectedDate = State(initialValue: date)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
-        plans: plans, logs: logs, e1rm: e1rm, restTimerSettings: restTimerSettings))
+        plans: plans,
+        logs: logs,
+        e1rm: e1rm,
+        onboarding: onboarding,
+        restTimerSettings: restTimerSettings
+      ))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness))
     self._videoViewModel = State(
@@ -74,9 +81,12 @@ public struct TodayWorkoutView: View {
           case .idle, .loading:
             ProgressView()
               .frame(maxWidth: .infinity, maxHeight: .infinity)
-          case .loaded(let day, let drafts):
-            workout(day: day, drafts: drafts)
-          case .recording(let day, let drafts, _):
+          // One pattern, one branch: .loaded → .recording → .loaded round-trips
+          // during every persist, and separate cases are separate structural
+          // identities — SwiftUI tore down the subtree, which dismissed and
+          // re-presented the set-entry sheet with reset fields whenever a
+          // video attach minted a set log (beta 2026-07-11).
+          case .loaded(let day, let drafts), .recording(let day, let drafts, _):
             workout(day: day, drafts: drafts)
           case .rest:
             ContentUnavailableView(restTitle, systemImage: "bed.double", description: Text("看本周计划"))
@@ -156,11 +166,33 @@ public struct TodayWorkoutView: View {
     } message: {
       Text(viewModel.actionErrorMessage ?? "")
     }
+    .confirmationDialog(
+      "视频上传失败", isPresented: retryDialogPresented, titleVisibility: .visible
+    ) {
+      Button("重试上传") {
+        if let setLogID = retryTargetSetLogID {
+          Task { await videoViewModel.retry(setLogID: setLogID) }
+        }
+      }
+      Button("删除视频", role: .destructive) {
+        if let setLogID = retryTargetSetLogID {
+          Task { await videoViewModel.remove(setLogID: setLogID) }
+        }
+      }
+      Button("取消", role: .cancel) {}
+    } message: {
+      Text("视频仍保存在本机,可直接重试上传。")
+    }
     .task {
-      if viewModel.state == .idle {
+      let isFirstLoad = viewModel.state == .idle
+      if isFirstLoad {
         await loadWorkout(for: selectedDate)
-        await videoViewModel.start(studentID: studentID)
-
+      }
+      // Outside the idle guard: a cancelled first .task can strand state in
+      // .loading, and row video indicators need the backfill + event stream
+      // regardless. start() is idempotent.
+      await videoViewModel.start(studentID: studentID)
+      if isFirstLoad {
         // Re-surface a PR banner the student never dismissed (spec 028 §5);
         // delayed so the tab renders first.
         try? await Task.sleep(for: .seconds(1.5))
@@ -168,6 +200,9 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: selectedDate) { _, newDate in
+      // The open editor belongs to the day being left — a stale rowIndex
+      // against reloaded drafts would edit the wrong set.
+      editing = nil
       Task { await loadWorkout(for: newDate) }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
@@ -176,6 +211,7 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: planRevision) { _, _ in
+      editing = nil
       Task { await loadWorkout(for: selectedDate) }
     }
   }
@@ -391,20 +427,29 @@ public struct TodayWorkoutView: View {
       .buttonStyle(.plain)
 
       Button {
-        editing = EditingTarget(
-          id: draft.id,
-          rowIndex: rowIndex,
-          draft: draft,
-          setNumber: setNumber,
-          scrollToVideo: true)
+        // A failed upload routes straight to retry: the set already cost the
+        // student real fatigue and can't be re-done, so the recording must
+        // never be one buried menu away (David, beta 2026-07-11).
+        if let failedSetLogID = failedVideoSetLogID(for: draft) {
+          retryTargetSetLogID = failedSetLogID
+        } else {
+          editing = EditingTarget(
+            id: draft.id,
+            rowIndex: rowIndex,
+            draft: draft,
+            setNumber: setNumber,
+            scrollToVideo: true)
+        }
       } label: {
-        Image(systemName: "video")
-          .font(.system(size: 20))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .frame(width: 56, height: 48)
-          .overlay {
-            RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
-          }
+        SetVideoUploadIndicator(
+          status: videoRowState(for: draft)?.attachment.status,
+          progress: videoRowState(for: draft)?.progress ?? 0,
+          size: 20
+        )
+        .frame(width: 56, height: 48)
+        .overlay {
+          RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+        }
       }
       .buttonStyle(.plain)
     }
@@ -514,10 +559,20 @@ public struct TodayWorkoutView: View {
       Text(repsText(draft)).foregroundStyle(foreground)
       Text(rpeText(draft)).foregroundStyle(foreground)
       Text(statusMark(draft)).foregroundStyle(statusColor(draft))
-      Image(systemName: "video")
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+      // A failed upload intercepts the icon tap and goes straight to retry
+      // (the row itself still opens the editor); other states fall through.
+      if let failedSetLogID = failedVideoSetLogID(for: draft) {
+        SetVideoUploadIndicator(status: .failed, progress: 0, size: 16)
+          .frame(maxWidth: .infinity, alignment: .trailing)
+          .onTapGesture { retryTargetSetLogID = failedSetLogID }
+      } else {
+        SetVideoUploadIndicator(
+          status: videoRowState(for: draft)?.attachment.status,
+          progress: videoRowState(for: draft)?.progress ?? 0,
+          size: 16
+        )
         .frame(maxWidth: .infinity, alignment: .trailing)
+      }
     }
     .font(.system(size: 16, design: .monospaced))
     .padding(.horizontal, 16)
@@ -565,6 +620,25 @@ public struct TodayWorkoutView: View {
     return draft.completed ? Color.MeetPR.green : Color.MeetPR.fgTertiary
   }
 
+  private func videoRowState(
+    for draft: TodayWorkoutViewModel.SetRowDraft
+  ) -> VideoAttachmentViewModel.RowState? {
+    guard let setLogID = draft.loggedSetID else { return nil }
+    return videoViewModel.rowStates[setLogID]
+  }
+
+  private func failedVideoSetLogID(for draft: TodayWorkoutViewModel.SetRowDraft) -> UUID? {
+    guard videoRowState(for: draft)?.attachment.status == .failed else { return nil }
+    return draft.loggedSetID
+  }
+
+  private var retryDialogPresented: Binding<Bool> {
+    Binding(
+      get: { retryTargetSetLogID != nil },
+      set: { if !$0 { retryTargetSetLogID = nil } }
+    )
+  }
+
   private func referenceText(_ reference: ExerciseReference) -> String {
     var parts: [String] = []
     if let last = reference.last {
@@ -581,11 +655,11 @@ public struct TodayWorkoutView: View {
   // MARK: - Derived
 
   private var navTitle: String {
-    guard let day = currentDay else { return "锻炼" }
-    let dayNumber = mondayOffset(day.date) + 1
-    let weekday = viewModel.planContext.map { "W\($0.weekIndex)D\(dayNumber)" } ?? "今日"
-    guard let lift = mainLift(day)?.studentDisplayName else { return weekday }
-    return "\(weekday) · \(lift)"
+    TodayWorkoutTitleResolver.title(
+      day: currentDay,
+      planContext: viewModel.planContext,
+      onboarding: viewModel.onboardingProfile
+    )
   }
 
   private var currentDay: StudentPlanDay? {
@@ -594,17 +668,6 @@ public struct TodayWorkoutView: View {
     case .recording(let day, _, _): return day
     default: return nil
     }
-  }
-
-  private func mainLift(_ day: StudentPlanDay) -> LiftFamily? {
-    day.exercises.first {
-      $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily != nil
-    }?.exercise.mainLiftFamily
-  }
-
-  private func mondayOffset(_ date: Date) -> Int {
-    let weekday = Calendar.current.component(.weekday, from: date)  // 1=Sun…7=Sat
-    return (weekday + 5) % 7
   }
 
   private func totalSets(
@@ -660,6 +723,28 @@ public struct TodayWorkoutView: View {
   private func refreshReadinessStatus(for date: Date) async {
     guard Calendar.current.isDateInToday(date) else { return }
     await readinessViewModel.load(studentId: studentID)
+  }
+}
+
+enum TodayWorkoutTitleResolver {
+  static func title(
+    day: StudentPlanDay?,
+    planContext: TodayWorkoutPlanContext?,
+    onboarding: OnboardingProfile?
+  ) -> String {
+    guard let day else { return "锻炼" }
+    let dayNumber = mondayOffset(day.date) + 1
+    let weekday = planContext.map { "W\($0.weekIndex)D\(dayNumber)" } ?? "今日"
+    let family = day.exercises.lazy.compactMap {
+      resolveCompetitionFamily(exercise: $0.exercise, onboarding: onboarding)
+    }.first
+    guard let lift = family?.studentDisplayName else { return weekday }
+    return "\(weekday) · \(lift)"
+  }
+
+  private static func mondayOffset(_ date: Date) -> Int {
+    let weekday = Calendar.current.component(.weekday, from: date)  // 1=Sun…7=Sat
+    return (weekday + 5) % 7
   }
 }
 

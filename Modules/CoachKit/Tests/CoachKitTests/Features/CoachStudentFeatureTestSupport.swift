@@ -23,12 +23,14 @@ enum CoachStudentFeatureFixtures {
 
   static func plan(
     startDate: Date = startDate,
-    trainingOffsets: Set<Int> = [1]
+    trainingOffsets: Set<Int> = [1],
+    totalShiftDays: Int = 0
   ) -> StudentPlanView {
     StudentPlanView(
       cycleID: UUID(uuidString: "02900000-0000-0000-0000-000000000501")!,
       weekIndex: 1,
       startDate: startDate,
+      totalShiftDays: totalShiftDays,
       days: (0..<7).map { offset in
         let date = startDate.addingTimeInterval(Double(offset) * 86_400)
         if trainingOffsets.contains(offset) {

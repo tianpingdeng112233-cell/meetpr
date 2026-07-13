@@ -34,6 +34,8 @@ extension PlanDTO {
       source: source,
       sourceTemplateID: sourceTemplateID,
       status: status,
+      totalShiftDays: totalShiftDays,
+      latestShiftCreatedAt: latestShiftCreatedAt,
       createdAt: createdAt,
       updatedAt: updatedAt
     )

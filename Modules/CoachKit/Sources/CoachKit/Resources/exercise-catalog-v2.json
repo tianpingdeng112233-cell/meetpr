@@ -387,6 +387,7 @@
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
+    "competitionStance": "high_bar",
     "muscleGroups": [
       "quad"
     ],
@@ -23176,6 +23177,7 @@
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
+    "competitionStance": "low_bar",
     "muscleGroups": [
       "quad"
     ],

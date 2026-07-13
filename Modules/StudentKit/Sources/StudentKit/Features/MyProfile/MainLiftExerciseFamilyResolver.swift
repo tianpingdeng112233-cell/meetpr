@@ -8,12 +8,16 @@ import Foundation
 enum MainLiftExerciseFamilyResolver {
   static let dashboardFamilies: [LiftFamily] = [.squat, .bench, .deadlift]
 
-  static func exerciseIDsByFamily(in plan: StudentPlanView?) -> [LiftFamily: Set<UUID>] {
+  static func exerciseIDsByFamily(
+    in plan: StudentPlanView?,
+    onboarding: OnboardingProfile? = nil
+  ) -> [LiftFamily: Set<UUID>] {
     var idsByFamily: [LiftFamily: Set<UUID>] = [:]
     for day in plan?.days ?? [] {
       for slot in day.exercises {
         let exercise = slot.exercise
-        guard exercise.exerciseType == .mainLift, let family = exercise.mainLiftFamily else {
+        guard let family = resolveCompetitionFamily(exercise: exercise, onboarding: onboarding)
+        else {
           continue
         }
         idsByFamily[family, default: []].insert(exercise.id)

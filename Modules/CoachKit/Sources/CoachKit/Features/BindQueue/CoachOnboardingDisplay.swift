@@ -93,6 +93,7 @@ enum CoachOnboardingDisplay {
     switch style {
     case .conventional: "传统"
     case .sumo: "相扑"
+    case .both: "两种都练"
     }
   }
 

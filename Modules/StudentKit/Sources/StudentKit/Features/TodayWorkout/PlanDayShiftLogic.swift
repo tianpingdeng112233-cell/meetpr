@@ -2,68 +2,70 @@ import CoreModels
 import Foundation
 import RepositoryContracts
 
-enum PlanDayShiftOperation: Sendable {
+enum PlanShiftOperation: Sendable {
   case shift
   case cancel
 }
 
+struct PlanShiftProposal: Equatable, Sendable {
+  let planID: UUID
+  let courseName: String
+  let currentEndDate: Date
+  let shiftedEndDate: Date
+}
+
 enum PlanDayShiftLogic {
-  static func nextRestDate(
-    after date: Date,
-    occupiedBy days: [StudentPlanDay],
-    planStartDate: Date,
-    weekIndex: Int,
+  static func proposal(
+    plan: StudentPlanView,
+    today: Date,
     calendar suppliedCalendar: Calendar? = nil
-  ) -> Date? {
+  ) -> PlanShiftProposal? {
     let calendar = suppliedCalendar ?? utcCalendar
-    let planStart = calendar.startOfDay(for: planStartDate)
-    let today = calendar.startOfDay(for: date)
     guard
-      let weekStart = calendar.date(
+      let todayDay = plan.days.first(where: { calendar.isDate($0.date, inSameDayAs: today) }),
+      let courseName = todayDay.exercises.first?.exercise.name,
+      let authoredEndDate = plan.endDate ?? plan.days.map(\.scheduledDate).max(),
+      let currentEndDate = calendar.date(
         byAdding: .day,
-        value: max(0, weekIndex - 1) * 7,
-        to: planStart
+        value: plan.totalShiftDays,
+        to: authoredEndDate
       ),
-      let weekEnd = calendar.date(byAdding: .day, value: 6, to: weekStart),
-      var candidate = calendar.date(byAdding: .day, value: 1, to: today)
+      let shiftedEndDate = calendar.date(byAdding: .day, value: 1, to: currentEndDate)
     else { return nil }
 
-    // swiftlint:disable:next todo
-    // TODO: Constrain shifts against the meet date once the plan model exposes it.
-    while candidate <= weekEnd {
-      let occupied = days.contains { calendar.isDate($0.date, inSameDayAs: candidate) }
-      if !occupied {
-        return candidate
-      }
-      guard let next = calendar.date(byAdding: .day, value: 1, to: candidate) else {
-        return nil
-      }
-      candidate = next
-    }
-    return nil
+    return PlanShiftProposal(
+      planID: plan.cycleID,
+      courseName: courseName,
+      currentEndDate: currentEndDate,
+      shiftedEndDate: shiftedEndDate
+    )
   }
 
-  static func targetLabel(
-    target: Date,
-    after date: Date,
+  static func confirmationMessage(for proposal: PlanShiftProposal) -> String {
+    "今天的\(proposal.courseName)课改到明天，之后的课依次顺延，本周期结束日变为"
+      + dateText(proposal.shiftedEndDate)
+  }
+
+  static func canUndo(
+    latestShiftCreatedAt: Date?,
+    now: Date,
     calendar suppliedCalendar: Calendar? = nil
-  ) -> String {
+  ) -> Bool {
+    guard let latestShiftCreatedAt else { return false }
     let calendar = suppliedCalendar ?? utcCalendar
-    if let tomorrow = calendar.date(byAdding: .day, value: 1, to: date),
-      calendar.isDate(target, inSameDayAs: tomorrow)
-    {
-      return "延到明天"
-    }
-    let targetText = target.formatted(
-      .dateTime.month().day().weekday(.short).locale(Locale(identifier: "zh_CN")))
-    return "延到\(targetText)"
+    return calendar.isDate(latestShiftCreatedAt, inSameDayAs: now)
+  }
+
+  static func cumulativeShiftMessage(totalShiftDays: Int) -> String? {
+    guard totalShiftDays >= 3 else { return nil }
+    return "已累计顺延 \(totalShiftDays) 天，建议联系教练调整计划"
   }
 
   static func errorMessage(
     for error: any Error,
-    operation: PlanDayShiftOperation
+    operation: PlanShiftOperation
   ) -> String {
-    guard let shiftError = error as? PlanDayShiftError else {
+    guard let shiftError = error as? PlanShiftError else {
       return operation == .shift
         ? "顺延失败，请检查网络后重试"
         : "撤销顺延失败，请检查网络后重试"
@@ -72,14 +74,22 @@ enum PlanDayShiftLogic {
     case .planNotActive:
       return "当前计划未生效，暂时不能顺延"
     case .onlyToday:
-      return "只能顺延今天的训练；顺延后如需调整，请先撤销"
-    case .dayHasLogs:
-      return "这天已有训练记录，不能顺延或撤销"
-    case .targetNotRestDay:
-      return "目标日期已不是本周休息日，请刷新计划后重试"
+      return "只能顺延今天的训练"
+    case .alreadyStarted:
+      return "今天的训练已经开始，不能顺延或撤销"
+    case .notPlanStudent:
+      return "只有计划所属学员可以顺延"
+    case .noActiveShift:
+      return "当前没有可撤销的顺延"
+    case .undoWindowPassed:
+      return "只能在顺延当天撤销，请联系教练调整计划"
     case .unavailable:
       return "当前计划暂不支持顺延"
     }
+  }
+
+  private static func dateText(_ date: Date) -> String {
+    date.formatted(.dateTime.month().day().locale(Locale(identifier: "zh_CN")))
   }
 
   private static var utcCalendar: Calendar {

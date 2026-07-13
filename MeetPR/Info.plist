@@ -39,6 +39,8 @@
 	<string>© 2026 MeetPR. All rights reserved.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>拍摄训练视频时需要录制声音(例如杠铃落地与口令),用于教练回看。</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。</string>
 	<key>UIApplicationSceneManifest</key>

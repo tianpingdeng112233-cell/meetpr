@@ -14,27 +14,35 @@ public struct TrainingHistoryView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let onboarding: (any OnboardingProfileReading)?
   private let feedbackViewModel: FeedbackInboxViewModel?
   @State private var viewModel: TrainingHistoryViewModel
   @State private var trendViewModel: DashboardE1RMTrendViewModel
   @State private var prEvent: PRBreakthroughEvent?
   @State private var prFamily: LiftFamily?
   @State private var showsAllHistory = false
+  @State private var currentOnboarding: OnboardingProfile?
 
   public init(
     studentID: UUID,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
+    onboarding: (any OnboardingProfileReading)? = nil,
     feedbackViewModel: FeedbackInboxViewModel? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
+    self.onboarding = onboarding
     self.feedbackViewModel = feedbackViewModel
     self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
     self._trendViewModel = State(
-      initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
+      initialValue: DashboardE1RMTrendViewModel(
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding
+      )
     )
   }
 
@@ -433,9 +441,9 @@ public struct TrainingHistoryView: View {
   private func planFamily(on date: Date) -> LiftFamily? {
     for week in loadedWeeks {
       if let day = week.days.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-        return day.exercises.first {
-          $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily != nil
-        }?.exercise.mainLiftFamily
+        return day.exercises.compactMap {
+          resolveCompetitionFamily(exercise: $0.exercise, onboarding: currentOnboarding)
+        }.first
       }
     }
     return nil
@@ -445,7 +453,10 @@ public struct TrainingHistoryView: View {
     for week in loadedWeeks {
       for day in week.days {
         for slot in day.exercises where slot.exercise.id == exerciseId {
-          return slot.exercise.mainLiftFamily
+          return resolveCompetitionFamily(
+            exercise: slot.exercise,
+            onboarding: currentOnboarding
+          )
         }
       }
     }
@@ -455,6 +466,7 @@ public struct TrainingHistoryView: View {
   // MARK: - Loading
 
   private func loadIfNeeded() async {
+    currentOnboarding = try? await onboarding?.fetchProfile(studentId: studentID)
     if viewModel.state == .idle {
       await viewModel.load(studentID: studentID)
     }

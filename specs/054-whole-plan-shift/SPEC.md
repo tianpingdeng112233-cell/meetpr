@@ -1,6 +1,6 @@
 # spec 054 — 学员单日顺延 V2:整体计划后移(取代 V1"挪到休息日")
 
-状态:Approved(David 2026-07-11 四拍板,见 §拍板记录)。V1(#234b 落线未发布)原地演进,用户永远只见 V2 语义。
+状态:InProgress(David 2026-07-11 四拍板即 Approved,同日开工;见 §拍板记录)。V1(#234b 落线未发布)原地演进,用户永远只见 V2 语义。
 
 ## 语义(一句话)
 
@@ -36,14 +36,16 @@ V1 死穴(本周无休息日→无法顺延)在 V2 不存在。
 - `DELETE /plans/:planId/shift` → 204(撤最新 batch)
   - 门:存在 batch;最新 batch 创建于 UTC 今天;被撤回到今天的课未开始
   - 错误码:`NO_ACTIVE_SHIFT` / `UNDO_WINDOW_PASSED` / `ALREADY_STARTED`
-- GET 计划序列化:不变(逐日 `shifted_to_date`),另加计划级 `total_shift_days`(Σ batch,供教练徽标)。
+- GET 计划序列化:不变(逐日 `shifted_to_date`),另加计划级 `total_shift_days`(Σ batch,供教练徽标)
+  与 `latest_shift_created_at`(最新 batch 的创建时间,nullable——iOS 撤销窗口判断"是否 UTC 今天
+  创建"依赖它;无 batch 时为 null)。(此字段为实施期发现的契约缺口,2026-07-11 补)
 
 ## iOS 行为
 
 - 入口五门不变(coached/今天/未开练/UTC 凌晨门/…);V1"找休息日"逻辑删除。
 - 确认弹窗:「把整份计划往后顺延一天?今天的◯◯课改到明天,之后的课依次顺延,
   本周期结束日变为 X月X日」;确认调 POST。
-- 顺延后:今日卡休息态 + 红字「撤销顺延」(仅当最新 batch 为 UTC 今天创建时显示);
+- 顺延后:今日卡休息态 + 红字「撤销顺延」(仅当 `latest_shift_created_at` 为 UTC 今天时显示);
   撤销二次确认文案不变。
 - 累计 ≥3 天(total_shift_days ≥ 3):顺延成功后追加提示「已累计顺延 N 天,建议联系教练调整计划」。
 - 教练端:逐日"已顺延"标记**替换为**计划级徽标「已顺延 N 天」(执行页头部);

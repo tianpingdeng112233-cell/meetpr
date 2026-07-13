@@ -15,6 +15,7 @@ public struct DashboardView: View {
   private let studentID: UUID
   private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
+  private let onboarding: any OnboardingProfileReading
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
@@ -54,6 +55,7 @@ public struct DashboardView: View {
     self.studentID = studentID
     self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
+    self.onboarding = onboarding
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
@@ -66,7 +68,11 @@ public struct DashboardView: View {
       initialValue: DashboardNotificationsViewModel(plans: plans)
     )
     self._e1rmTrendViewModel = State(
-      initialValue: DashboardE1RMTrendViewModel(plans: plans, e1rm: e1rm)
+      initialValue: DashboardE1RMTrendViewModel(
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding
+      )
     )
     self._profileMetricsViewModel = State(
       initialValue: DashboardProfileMetricsViewModel(onboarding: onboarding)
@@ -145,19 +151,19 @@ public struct DashboardView: View {
       switch alert {
       case .confirmShift(let proposal):
         Alert(
-          title: Text("顺延今天的训练？"),
-          message: Text("\(proposal.targetLabel)，原日期会显示为休息日。"),
-          primaryButton: .default(Text(proposal.targetLabel)) {
+          title: Text("把整份计划往后顺延一天？"),
+          message: Text(PlanDayShiftLogic.confirmationMessage(for: proposal)),
+          primaryButton: .default(Text("确认顺延")) {
             Task { await shiftToday(proposal) }
           },
           secondaryButton: .cancel(Text("取消"))
         )
-      case .confirmCancel(let day):
+      case .confirmCancel(let returnDate):
         Alert(
           title: Text("撤销顺延？"),
-          message: Text("课程会回到\(dayShiftDateText(day.scheduledDate))。"),
+          message: Text("课程会回到\(dayShiftDateText(returnDate))。"),
           primaryButton: .destructive(Text("撤销顺延")) {
-            Task { await cancelShift(day) }
+            Task { await cancelShift() }
           },
           secondaryButton: .cancel(Text("保留顺延"))
         )
@@ -339,7 +345,12 @@ public struct DashboardView: View {
 
   private var liftCard: some View {
     NavigationLink {
-      GrowthCurveView(studentID: studentID, plans: plans, e1rm: e1rm)
+      GrowthCurveView(
+        studentID: studentID,
+        plans: plans,
+        e1rm: e1rm,
+        onboarding: onboarding
+      )
     } label: {
       VStack(alignment: .leading, spacing: 0) {
         liftCardContent
@@ -436,7 +447,6 @@ public struct DashboardView: View {
       if canShiftPlanDays,
         progress.state == .notStarted,
         let todayDay,
-        todayDay.shiftedToDate == nil,
         dayShiftCalendar.isDate(todayDay.date, inSameDayAs: Date()),
         !hasAnyLog(for: todayDay, in: weekData?.logs ?? [])
       {
@@ -453,9 +463,9 @@ public struct DashboardView: View {
         .disabled(isUpdatingDayShift)
       }
 
-      if let shiftedDay = cancellableShiftedDay {
+      if canUndoPlanShift {
         Button("撤销顺延") {
-          dayShiftAlert = .confirmCancel(shiftedDay)
+          dayShiftAlert = .confirmCancel(Date())
         }
         .font(Font.MeetPR.bodyEmphasis)
         .foregroundStyle(Color.MeetPR.brandRed)
@@ -571,21 +581,12 @@ public struct DashboardView: View {
     planDay(on: Date())
   }
 
-  private var cancellableShiftedDay: StudentPlanDay? {
-    guard canShiftPlanDays else { return nil }
-    guard let data = weekData else { return nil }
-    let calendar = dayShiftCalendar
-    let today = calendar.startOfDay(for: Date())
-    return data.days
-      .filter { day in
-        guard day.shiftedToDate != nil else { return false }
-        let scheduled = calendar.startOfDay(for: day.scheduledDate)
-        let target = calendar.startOfDay(for: day.date)
-        return scheduled <= today
-          && target >= today
-          && !hasAnyLog(for: day, in: data.logs)
-      }
-      .min { $0.date < $1.date }
+  private var canUndoPlanShift: Bool {
+    guard canShiftPlanDays, let plan = weekViewModel.plan else { return false }
+    return PlanDayShiftLogic.canUndo(
+      latestShiftCreatedAt: plan.latestShiftCreatedAt,
+      now: Date()
+    )
   }
 
   private var titleLabel: String {
@@ -669,46 +670,25 @@ public struct DashboardView: View {
   }
 
   private func proposeShiftToday() {
-    guard let day = todayDay,
-      day.shiftedToDate == nil,
-      let planStartDate = weekViewModel.planStartDate,
-      let data = weekData
+    guard let plan = weekViewModel.plan,
+      let proposal = PlanDayShiftLogic.proposal(plan: plan, today: Date())
     else { return }
-    guard
-      let target = PlanDayShiftLogic.nextRestDate(
-        after: Date(),
-        occupiedBy: data.days,
-        planStartDate: planStartDate,
-        weekIndex: data.weekIndex
-      )
-    else {
-      dayShiftAlert = .message(
-        title: "无法顺延",
-        text: "本周训练已排满，建议联系教练调整"
-      )
-      return
-    }
-    dayShiftAlert = .confirmShift(
-      DashboardDayShiftProposal(
-        dayID: day.id,
-        targetDate: target,
-        targetLabel: PlanDayShiftLogic.targetLabel(target: target, after: Date())
-      )
-    )
+    dayShiftAlert = .confirmShift(proposal)
   }
 
   @MainActor
-  private func shiftToday(_ proposal: DashboardDayShiftProposal) async {
+  private func shiftToday(_ proposal: PlanShiftProposal) async {
     isUpdatingDayShift = true
     defer { isUpdatingDayShift = false }
     do {
-      try await plans.shiftDay(
-        id: proposal.dayID,
-        to: proposal.targetDate,
-        studentID: studentID
-      )
+      let result = try await plans.shiftPlan(id: proposal.planID, studentID: studentID)
       await weekViewModel.load(studentID: studentID)
       onPlanChanged()
+      if let message = PlanDayShiftLogic.cumulativeShiftMessage(
+        totalShiftDays: result.totalShiftDays
+      ) {
+        dayShiftAlert = .message(title: "顺延成功", text: message)
+      }
     } catch {
       dayShiftAlert = .message(
         title: "无法顺延",
@@ -718,11 +698,12 @@ public struct DashboardView: View {
   }
 
   @MainActor
-  private func cancelShift(_ day: StudentPlanDay) async {
+  private func cancelShift() async {
     isUpdatingDayShift = true
     defer { isUpdatingDayShift = false }
     do {
-      try await plans.cancelShift(dayID: day.id, studentID: studentID)
+      guard let planID = weekViewModel.plan?.cycleID else { return }
+      try await plans.cancelPlanShift(id: planID, studentID: studentID)
       await weekViewModel.load(studentID: studentID)
       onPlanChanged()
     } catch {
@@ -757,23 +738,15 @@ public struct DashboardView: View {
   }
 }
 
-private struct DashboardDayShiftProposal: Identifiable, Equatable, Sendable {
-  let dayID: UUID
-  let targetDate: Date
-  let targetLabel: String
-
-  var id: UUID { dayID }
-}
-
 private enum DashboardDayShiftAlert: Identifiable {
-  case confirmShift(DashboardDayShiftProposal)
-  case confirmCancel(StudentPlanDay)
+  case confirmShift(PlanShiftProposal)
+  case confirmCancel(Date)
   case message(title: String, text: String)
 
   var id: String {
     switch self {
-    case .confirmShift(let proposal): "shift-\(proposal.dayID.uuidString)"
-    case .confirmCancel(let day): "cancel-\(day.id.uuidString)"
+    case .confirmShift(let proposal): "shift-\(proposal.planID.uuidString)"
+    case .confirmCancel(let date): "cancel-\(date.timeIntervalSince1970)"
     case .message(let title, let text): "message-\(title)-\(text)"
     }
   }

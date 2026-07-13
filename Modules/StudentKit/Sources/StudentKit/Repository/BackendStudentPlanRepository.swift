@@ -3,7 +3,7 @@ import Foundation
 import Networking
 import RepositoryContracts
 
-public actor BackendStudentPlanRepository: StudentPlanRepository {
+public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalogReading {
   private let api: APIClient
   private let session: any SessionStateReader
   private let cache: StudentPlanCache
@@ -45,21 +45,39 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
     return plan.days.sorted { $0.date < $1.date }
   }
 
-  public func shiftDay(id: UUID, to date: Date, studentID: UUID) async throws {
+  public func fetchExerciseCatalog() async throws -> [Exercise] {
+    let accessToken = try await session.accessToken()
+    return try await exerciseCatalog(accessToken: accessToken)
+  }
+
+  public func shiftPlan(id: UUID, studentID: UUID) async throws -> PlanShiftResult {
     let token = try await session.accessToken()
     do {
-      let shift = try await api.shiftPlanDay(id: id, to: date, accessToken: token)
-      await updateCachedDay(id: id, shiftedToDate: shift.shiftedToDate, studentID: studentID)
+      let shift = try await api.shiftPlan(id: id, accessToken: token)
+      let shiftedDays = shift.shiftedDays.map {
+        ShiftedPlanDay(dayID: $0.dayID, shiftedToDate: $0.shiftedToDate)
+      }
+      await updateCachedPlan(
+        shiftedDays: shiftedDays,
+        totalShiftDays: shift.totalOffsetDays,
+        latestShiftCreatedAt: Date(),
+        studentID: studentID
+      )
+      return PlanShiftResult(
+        batchID: shift.batchID,
+        shiftedDays: shiftedDays,
+        totalShiftDays: shift.totalOffsetDays
+      )
     } catch {
       throw Self.shiftError(from: error)
     }
   }
 
-  public func cancelShift(dayID: UUID, studentID: UUID) async throws {
+  public func cancelPlanShift(id: UUID, studentID: UUID) async throws {
     let token = try await session.accessToken()
     do {
-      try await api.cancelPlanDayShift(id: dayID, accessToken: token)
-      await updateCachedDay(id: dayID, shiftedToDate: nil, studentID: studentID)
+      try await api.cancelPlanShift(id: id, accessToken: token)
+      _ = try await refreshCurrentPlan(studentID: studentID)
     } catch {
       throw Self.shiftError(from: error)
     }
@@ -100,14 +118,18 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
     return response.exercises
   }
 
-  private func updateCachedDay(
-    id: UUID,
-    shiftedToDate: Date?,
+  private func updateCachedPlan(
+    shiftedDays: [ShiftedPlanDay],
+    totalShiftDays: Int,
+    latestShiftCreatedAt: Date,
     studentID: UUID
   ) async {
     guard let plan = await cache.loadPlan(studentID: studentID) else { return }
+    let shiftedDateByDayID = Dictionary(
+      uniqueKeysWithValues: shiftedDays.map { ($0.dayID, $0.shiftedToDate) }
+    )
     let updatedDays = plan.days.map { day in
-      guard day.id == id else { return day }
+      guard let shiftedToDate = shiftedDateByDayID[day.id] else { return day }
       return StudentPlanDay(
         id: day.id,
         date: day.scheduledDate,
@@ -119,14 +141,17 @@ public actor BackendStudentPlanRepository: StudentPlanRepository {
       cycleID: plan.cycleID,
       weekIndex: plan.weekIndex,
       startDate: plan.startDate,
+      endDate: plan.endDate,
       planKind: plan.planKind,
+      totalShiftDays: totalShiftDays,
+      latestShiftCreatedAt: latestShiftCreatedAt,
       days: updatedDays
     )
     try? await cache.save(plan: updated, studentID: studentID)
   }
 
   private static func shiftError(from error: any Error) -> any Error {
-    PlanDayShiftError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
+    PlanShiftError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
   }
 
   private static func currentWeekIndex(for plan: TrainingPlan) -> Int {
@@ -175,7 +200,10 @@ enum StudentPlanProjection {
       cycleID: tree.plan.id,
       weekIndex: weekIndex,
       startDate: tree.plan.startDate,
+      endDate: tree.plan.endDate,
       planKind: tree.plan.kind,
+      totalShiftDays: tree.plan.totalShiftDays,
+      latestShiftCreatedAt: tree.plan.latestShiftCreatedAt,
       days: days
     )
   }

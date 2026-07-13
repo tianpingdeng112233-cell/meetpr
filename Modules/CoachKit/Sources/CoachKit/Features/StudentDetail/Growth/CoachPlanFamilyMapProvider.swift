@@ -7,7 +7,10 @@ import Networking
 /// by weekIndex), so growth points from other weeks would drop without this
 /// (Codex review P1): the coach owns the full plan tree, so map from there.
 public protocol CoachPlanFamilyMapProviding: Sendable {
-  func familyMap(traineeID: UUID) async throws -> [UUID: LiftFamily]
+  func familyMap(
+    traineeID: UUID,
+    onboarding: OnboardingProfile?
+  ) async throws -> [UUID: LiftFamily]
 }
 
 public struct BackendCoachPlanFamilyMapProvider: CoachPlanFamilyMapProviding {
@@ -19,7 +22,10 @@ public struct BackendCoachPlanFamilyMapProvider: CoachPlanFamilyMapProviding {
     self.session = session
   }
 
-  public func familyMap(traineeID: UUID) async throws -> [UUID: LiftFamily] {
+  public func familyMap(
+    traineeID: UUID,
+    onboarding: OnboardingProfile?
+  ) async throws -> [UUID: LiftFamily] {
     let token = try await session.accessToken()
     let plans = try await api.studentPlans(
       studentID: traineeID,
@@ -38,7 +44,8 @@ public struct BackendCoachPlanFamilyMapProvider: CoachPlanFamilyMapProviding {
     let catalog = try await mains.exercises + variations.exercises
     let families = Dictionary(
       catalog.compactMap { exercise -> (UUID, LiftFamily)? in
-        guard let family = exercise.mainLiftFamily else { return nil }
+        guard let family = resolveCompetitionFamily(exercise: exercise, onboarding: onboarding)
+        else { return nil }
         return (exercise.id, family)
       },
       uniquingKeysWith: { first, _ in first }
@@ -60,5 +67,8 @@ public struct BackendCoachPlanFamilyMapProvider: CoachPlanFamilyMapProviding {
 struct StaticCoachPlanFamilyMapProvider: CoachPlanFamilyMapProviding {
   let map: [UUID: LiftFamily]
 
-  func familyMap(traineeID: UUID) async throws -> [UUID: LiftFamily] { map }
+  func familyMap(
+    traineeID: UUID,
+    onboarding: OnboardingProfile?
+  ) async throws -> [UUID: LiftFamily] { map }
 }

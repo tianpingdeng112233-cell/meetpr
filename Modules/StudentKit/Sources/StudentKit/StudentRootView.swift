@@ -79,12 +79,13 @@ public struct StudentRootView: View {
     self.onLogout = onLogout
     self.account = account
     self.restTimerSettings = restTimerSettings
-    self.onboarding =
+    let resolvedOnboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
         studentId: studentID,
         seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
       )
+    self.onboarding = resolvedOnboarding
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -98,6 +99,10 @@ public struct StudentRootView: View {
   }
 
   public var body: some View {
+    studentTabs
+  }
+
+  private var studentTabs: some View {
     TabView(selection: $selectedTab) {
       // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
       // here + full history under 成长, so there is no separate 反馈 tab).
@@ -124,7 +129,8 @@ public struct StudentRootView: View {
       }
 
       TodayWorkoutView(
-        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm, readiness: readiness,
+        studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+        onboarding: onboarding, readiness: readiness,
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
         jumpToTodayToken: trainingJumpToken,
         planRevision: planRevision
@@ -138,6 +144,7 @@ public struct StudentRootView: View {
       // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+        onboarding: onboarding,
         feedbackViewModel: feedbackViewModel
       )
       .tag(StudentTab.growth)

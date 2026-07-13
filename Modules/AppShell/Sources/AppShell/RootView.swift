@@ -6,6 +6,11 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct RootView: View {
+  enum AuthenticatedDestination: Equatable {
+    case coach
+    case studentBehindE1RMGate
+  }
+
   @Environment(Session.self) private var session
   private let coachPlans: any PlanRepository
   private let coachInviteCodes: any InviteCodeRepository
@@ -101,7 +106,7 @@ public struct RootView: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
     case .authenticated(let user):
-      switch user.role {
+      switch Self.authenticatedDestination(for: user.role) {
       case .coach:
         CoachRootView(
           repository: coachPlans,
@@ -122,13 +127,32 @@ public struct RootView: View {
           },
           draftStore: draftStore
         )
-      case .coachedStudent:
-        // BindGate wraps coached students only (spec 031 D4); the wizard
-        // slot + completion-probe closures are 032's real implementations.
+      case .studentBehindE1RMGate:
+        studentEntry(for: user)
+      }
+    }
+  }
+
+  static func authenticatedDestination(for role: UserRole) -> AuthenticatedDestination {
+    switch role {
+    case .coach: .coach
+    case .coachedStudent, .selfTrainStudent: .studentBehindE1RMGate
+    }
+  }
+
+  private func studentEntry(for user: User) -> some View {
+    E1RMCompetitionLiftGate(
+      studentID: user.id,
+      plans: studentPlans,
+      logs: studentLogs,
+      onboarding: studentOnboarding,
+      e1rm: studentE1RM
+    ) {
+      if user.role == .coachedStudent {
+        // EvaluationPeriodView and the bound five-tab root both live below
+        // the same migration gate, so neither can consume stale e1RM history.
         bindGatedStudentRoot(for: user)
-      case .selfTrainStudent:
-        // Self-train students never bind (backend requireRole gate) and
-        // skip the BindGate entirely (spec 031 D4).
+      } else {
         studentRoot(for: user)
       }
     }
@@ -173,14 +197,7 @@ public struct RootView: View {
         // Single-page evaluation state replaces the 5 tabs (spec 033 D6).
         EvaluationPeriodView(
           studentID: studentId,
-          dependencies: EvaluationPeriodDependencies(
-            evaluations: studentEvaluations,
-            plans: studentPlans,
-            logs: studentLogs,
-            feedback: studentFeedback,
-            e1rm: studentE1RM,
-            readiness: studentReadiness
-          ),
+          dependencies: evaluationPeriodDependencies,
           onLogout: {
             await session.logout()
           },
@@ -190,6 +207,18 @@ public struct RootView: View {
       content: {
         studentRoot(for: user)
       }
+    )
+  }
+
+  private var evaluationPeriodDependencies: EvaluationPeriodDependencies {
+    EvaluationPeriodDependencies(
+      evaluations: studentEvaluations,
+      plans: studentPlans,
+      logs: studentLogs,
+      feedback: studentFeedback,
+      e1rm: studentE1RM,
+      readiness: studentReadiness,
+      onboarding: studentOnboarding
     )
   }
 

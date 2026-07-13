@@ -17,6 +17,9 @@ struct VideoAttachmentSection: View {
   /// Lazily creates the set log (preserving completion state) so a video can
   /// attach to a not-yet-completed set.
   let resolveSetLogID: @MainActor () async -> UUID?
+  /// Runs before presenting the camera/library picker so the host can flush
+  /// unsaved entry state that must survive any presentation churn.
+  let onWillPick: (() -> Void)?
 
   @State private var resolvedSetLogID: UUID?
   @State private var showingConsent = false
@@ -34,12 +37,14 @@ struct VideoAttachmentSection: View {
     studentID: UUID,
     videoViewModel: VideoAttachmentViewModel,
     initialSetLogID: UUID?,
-    resolveSetLogID: @escaping @MainActor () async -> UUID?
+    resolveSetLogID: @escaping @MainActor () async -> UUID?,
+    onWillPick: (() -> Void)? = nil
   ) {
     self.studentID = studentID
     self.videoViewModel = videoViewModel
     self.initialSetLogID = initialSetLogID
     self.resolveSetLogID = resolveSetLogID
+    self.onWillPick = onWillPick
     _resolvedSetLogID = State(initialValue: initialSetLogID)
   }
 
@@ -91,8 +96,12 @@ struct VideoAttachmentSection: View {
     }
     #if os(iOS)
       .fullScreenCover(isPresented: $showingCamera) {
-        CameraVideoPicker(maxDurationSeconds: 120) { url in
-          Task { await attach(sourceURL: url) }
+        CameraVideoPicker(maxDurationSeconds: 120, isPresented: $showingCamera) { url in
+          Task {
+            // 相册留底先于上传:这一组已经练掉了,上传怎么失败素材都不能丢。
+            await VideoLibrarySaver.save(url)
+            await attach(sourceURL: url)
+          }
         }
         .ignoresSafeArea()
       }
@@ -197,6 +206,7 @@ struct VideoAttachmentSection: View {
   // MARK: - Actions
 
   private func requestPick(_ source: PendingSource) {
+    onWillPick?()
     if videoViewModel.hasConsented {
       present(source)
     } else {

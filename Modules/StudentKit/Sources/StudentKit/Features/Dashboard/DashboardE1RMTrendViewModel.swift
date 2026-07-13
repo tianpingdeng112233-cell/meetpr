@@ -55,17 +55,27 @@ final class DashboardE1RMTrendViewModel {
 
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let e1rm: any E1RMRepository
+  @ObservationIgnored private let onboarding: (any OnboardingProfileReading)?
 
-  init(plans: any StudentPlanRepository, e1rm: any E1RMRepository) {
+  init(
+    plans: any StudentPlanRepository,
+    e1rm: any E1RMRepository,
+    onboarding: (any OnboardingProfileReading)? = nil
+  ) {
     self.plans = plans
     self.e1rm = e1rm
+    self.onboarding = onboarding
   }
 
   func load(studentID: UUID) async {
     state = .loading
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(in: plan)
+      let profile = try await onboarding?.fetchProfile(studentId: studentID)
+      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
+        in: plan,
+        onboarding: profile
+      )
       let histories = try await fetchHistories(studentID: studentID, idsByFamily: idsByFamily)
       let rows = Self.rows(from: histories, idsByFamily: idsByFamily)
       let prs = try await e1rm.unacknowledgedPRs(studentId: studentID)

@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Testing
 
 @testable import AppShell
@@ -41,10 +42,23 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bootstrapWithInvalidRefreshClearsStoreAndReturnsAnonymous() async {
+@Test(
+  arguments: [
+    AuthErrorCode.invalidCredentials,
+    .invalidRefresh,
+    .phoneTaken,
+    .rateLimited,
+    .refreshExpired,
+    .validationError,
+  ])
+func bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(
+  code: AuthErrorCode
+) async {
   let store = InMemoryTokenStore(
-    access: "access", refresh: "invalid-refresh", user: AuthTestSupport.user())
-  let session = Session(auth: InMemoryAuthRepository(), tokenStore: store)
+    access: "access", refresh: "refresh", user: AuthTestSupport.user())
+  let repository = InMemoryAuthRepository(
+    forcedError: .backend(statusCode: 401, code: code, issues: []))
+  let session = Session(auth: repository, tokenStore: store)
 
   await session.bootstrap()
 
@@ -56,16 +70,23 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bootstrapWithNetworkRefreshFailureKeepsSessionAndCredentials() async {
+@Test(
+  arguments: [
+    AuthRepositoryError.network,
+    .server(statusCode: 503),
+    .decoding,
+    .backend(statusCode: 429, code: .rateLimited, issues: []),
+  ])
+func bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(
+  error: AuthRepositoryError
+) async {
   let user = AuthTestSupport.user()
   let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
-  let repository = InMemoryAuthRepository(forcedError: .network)
+  let repository = InMemoryAuthRepository(forcedError: error)
   let session = Session(auth: repository, tokenStore: store)
 
   await session.bootstrap()
 
-  // A transient network failure must not force logout — stay signed in on the cached user
-  // and keep the stored credentials so the next launch/refresh can recover.
   #expect(session.state == .authenticated(user))
   #expect(await store.accessToken() == "access")
   #expect(await store.refreshToken() == "refresh")
@@ -74,31 +95,13 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bootstrapWithServerErrorKeepsSessionAndCredentials() async {
+@Test func bootstrapWithUnknownRefreshFailureClearsStoreAndReturnsAnonymous() async {
   let user = AuthTestSupport.user()
   let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
-  let repository = InMemoryAuthRepository(forcedError: .server(statusCode: 503))
-  let session = Session(auth: repository, tokenStore: store)
+  let session = Session(auth: UnknownFailureAuthRepository(), tokenStore: store)
 
   await session.bootstrap()
 
-  // A 5xx is transient too — do not evict the user.
-  #expect(session.state == .authenticated(user))
-  #expect(await store.refreshToken() == "refresh")
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func bootstrapWithExpiredRefreshClearsStoreAndReturnsAnonymous() async {
-  let user = AuthTestSupport.user()
-  let store = InMemoryTokenStore(access: "access", refresh: "refresh", user: user)
-  let repository = InMemoryAuthRepository(
-    forcedError: .backend(statusCode: 401, code: .refreshExpired, issues: []))
-  let session = Session(auth: repository, tokenStore: store)
-
-  await session.bootstrap()
-
-  // A server-confirmed expired refresh token is the one case that should force logout.
   #expect(session.state == .anonymous)
   #expect(await store.accessToken() == nil)
   #expect(await store.refreshToken() == nil)
@@ -108,6 +111,10 @@ import Testing
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func bootstrapIsNoOpWhenSessionAlreadyAuthenticated() async throws {
+  // The root `.task` runs bootstrap() unconditionally. Once an interactive
+  // login has settled the session to .authenticated, a (re-)entered bootstrap
+  // must not re-stir it through .authenticating — that teardown is what
+  // cancels the student tabs' first-load .task on high-latency networks.
   let repository = InMemoryAuthRepository()
   _ = try await repository.signup(
     phone: "13800000002", password: "password123", role: .coachedStudent)
@@ -122,6 +129,7 @@ import Testing
 
   await session.bootstrap()
 
+  // No-op: state unchanged and no token rotation (refresh never ran).
   #expect(session.state == .authenticated(user))
   #expect(await store.accessToken() == tokenAfterLogin)
 }
@@ -214,7 +222,16 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func accessTokenRefreshNetworkFailureKeepsAuthenticatedSession() async throws {
+@Test(
+  arguments: [
+    AuthRepositoryError.network,
+    .server(statusCode: 503),
+    .decoding,
+    .backend(statusCode: 400, code: .validationError, issues: []),
+  ])
+func accessTokenTransientRefreshFailureKeepsAuthenticatedSession(
+  error: AuthRepositoryError
+) async throws {
   let repository = InMemoryAuthRepository()
   let signup = try await repository.signup(
     phone: "13800000001", password: "password123", role: .coach)
@@ -228,9 +245,9 @@ import Testing
   await session.bootstrap()
   let refresh = await store.refreshToken() ?? ""
   await store.save(access: expiredAccess, refresh: refresh)
-  await repository.setForcedError(.network)
+  await repository.setForcedError(error)
 
-  await #expect(throws: AuthRepositoryError.network) {
+  await #expect(throws: error) {
     _ = try await session.accessToken()
   }
 
@@ -289,7 +306,18 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func rejectedAccessTokenWithInvalidRefreshLogsOut() async throws {
+@Test(
+  arguments: [
+    AuthErrorCode.invalidCredentials,
+    .invalidRefresh,
+    .phoneTaken,
+    .rateLimited,
+    .refreshExpired,
+    .validationError,
+  ])
+func rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(
+  code: AuthErrorCode
+) async throws {
   let repository = InMemoryAuthRepository()
   let signup = try await repository.signup(
     phone: "13800000001", password: "password123", role: .coach)
@@ -301,9 +329,9 @@ import Testing
   let session = Session(auth: repository, tokenStore: store)
   await session.bootstrap()
   let rejectedAccessToken = try #require(await store.accessToken())
-  await store.save(access: rejectedAccessToken, refresh: "invalid-refresh")
+  await repository.setForcedError(.backend(statusCode: 401, code: code, issues: []))
 
-  await #expect(throws: AuthRepositoryError.self) {
+  await #expect(throws: SessionStateReaderError.authenticationExpired) {
     _ = try await session.recoverAccessToken(rejectedAccessToken: rejectedAccessToken)
   }
 
@@ -321,6 +349,22 @@ private actor LogoutSpy {
 
   func count() -> Int {
     logoutCount
+  }
+}
+
+private struct UnknownRefreshError: Error {}
+
+private struct UnknownFailureAuthRepository: AuthRepository {
+  func signup(phone: String, password: String, role: UserRole) async throws -> AuthResult {
+    throw UnknownRefreshError()
+  }
+
+  func login(phone: String, password: String) async throws -> AuthResult {
+    throw UnknownRefreshError()
+  }
+
+  func refresh(refreshToken: String) async throws -> TokenPair {
+    throw UnknownRefreshError()
   }
 }
 

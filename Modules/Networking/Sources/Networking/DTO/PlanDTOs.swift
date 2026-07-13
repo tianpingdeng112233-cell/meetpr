@@ -14,6 +14,8 @@ public struct PlanDTO: Codable, Equatable, Sendable {
   public let source: PlanSource
   public let sourceTemplateID: UUID?
   public let status: PlanStatus
+  public let totalShiftDays: Int
+  public let latestShiftCreatedAt: Date?
   public let createdAt: Date
   public let updatedAt: Date
 
@@ -29,6 +31,8 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     source: PlanSource,
     sourceTemplateID: UUID? = nil,
     status: PlanStatus,
+    totalShiftDays: Int = 0,
+    latestShiftCreatedAt: Date? = nil,
     createdAt: Date,
     updatedAt: Date
   ) {
@@ -43,6 +47,8 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     self.source = source
     self.sourceTemplateID = sourceTemplateID
     self.status = status
+    self.totalShiftDays = totalShiftDays
+    self.latestShiftCreatedAt = latestShiftCreatedAt
     self.createdAt = createdAt
     self.updatedAt = updatedAt
   }
@@ -60,6 +66,8 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     source = try container.decode(PlanSource.self, forKey: .source)
     sourceTemplateID = try container.decodeIfPresent(UUID.self, forKey: .sourceTemplateID)
     status = try container.decode(PlanStatus.self, forKey: .status)
+    totalShiftDays = try container.decodeIfPresent(Int.self, forKey: .totalShiftDays) ?? 0
+    latestShiftCreatedAt = try container.decodeIfPresent(Date.self, forKey: .latestShiftCreatedAt)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
     updatedAt = try container.decode(Date.self, forKey: .updatedAt)
   }
@@ -76,6 +84,8 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     case source
     case sourceTemplateID = "sourceTemplateId"
     case status
+    case totalShiftDays
+    case latestShiftCreatedAt
     case createdAt
     case updatedAt
   }

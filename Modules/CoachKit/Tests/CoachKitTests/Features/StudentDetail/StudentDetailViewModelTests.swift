@@ -14,7 +14,7 @@ import Testing
 @available(iOS 17.0, macOS 14.0, *)
 @Test func detailLoadsExecutionAndFeedbackSummaries() async {
   let summary = CoachStudentFeatureFixtures.summary()
-  let plan = CoachStudentFeatureFixtures.plan()
+  let plan = CoachStudentFeatureFixtures.plan(totalShiftDays: 2)
   let log = CoachStudentFeatureFixtures.log()
   let feedback = CoachStudentFeatureFixtures.feedback()
   let viewModel = StudentDetailViewModel(
@@ -32,6 +32,7 @@ import Testing
   #expect(viewModel.overview.completedTrainingDays == 1)
   #expect(viewModel.feedbackItems.first?.id == feedback.id)
   #expect(viewModel.allPlanExercises.map(\.id) == [CoachStudentFeatureFixtures.planExerciseID])
+  #expect(viewModel.planShiftBadgeText == "已顺延 2 天")
 
   viewModel.select(.feedback)
   #expect(viewModel.selectedSection == .feedback)
@@ -76,7 +77,7 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func detailExecutionDayDescribesShiftFromOriginalToEffectiveDate() throws {
+@Test func detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() throws {
   let scheduledDate = CoachStudentFeatureFixtures.startDate.addingTimeInterval(86_400)
   let shiftedDate = scheduledDate.addingTimeInterval(86_400)
   let planDay = StudentPlanDay(
@@ -89,6 +90,7 @@ import Testing
     cycleID: UUID(),
     weekIndex: 1,
     startDate: CoachStudentFeatureFixtures.startDate,
+    totalShiftDays: 2,
     days: [planDay]
   )
 
@@ -98,12 +100,8 @@ import Testing
     now: shiftedDate
   )
   let shiftedDay = try #require(executionDays.first { $0.planDay?.id == planDay.id })
-
-  #expect(
-    shiftedDay.shiftDescription
-      == "已顺延 \(CoachStudentFormatting.shortDateText(scheduledDate))"
-      + "→\(CoachStudentFormatting.shortDateText(shiftedDate))"
-  )
+  #expect(shiftedDay.date == shiftedDate)
+  #expect(plan.totalShiftDays == 2)
 }
 
 @MainActor
