@@ -33,7 +33,7 @@ public struct TodayWorkoutView: View {
 
   public init(
     studentID: UUID,
-    date: Date = Date(),
+    date: Date? = nil,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
@@ -52,7 +52,9 @@ public struct TodayWorkoutView: View {
     self.jumpToTodayToken = jumpToTodayToken
     self.planRevision = planRevision
     self.workoutStartedAt = workoutStartedAt
-    self._selectedDate = State(initialValue: date)
+    // nil = open on "today", which is the gym-day (04:00 cutoff) — a cold
+    // start at 00:30 lands on the still-editable previous calendar day.
+    self._selectedDate = State(initialValue: date ?? WorkoutDatePolicy.gymDayToday())
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
         plans: plans,
@@ -210,8 +212,10 @@ public struct TodayWorkoutView: View {
       Task { await loadWorkout(for: newDate) }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
-      if !Calendar.current.isDateInToday(selectedDate) {
-        selectedDate = Date()
+      // "Today" is the gym-day (04:00 cutoff), so jumping never leaves the
+      // editable day during the 00:00–03:59 window.
+      if !WorkoutDatePolicy.isEditable(selectedDate) {
+        selectedDate = WorkoutDatePolicy.gymDayToday()
       }
     }
     .onChange(of: planRevision) { _, _ in
@@ -694,7 +698,7 @@ public struct TodayWorkoutView: View {
   }
 
   private var restTitle: String {
-    Calendar.current.isDateInToday(selectedDate) ? "今日休息" : "这天休息"
+    WorkoutDatePolicy.isEditable(selectedDate) ? "今日休息" : "这天休息"
   }
 
   private var readinessFiled: Bool {
@@ -730,7 +734,7 @@ public struct TodayWorkoutView: View {
   // yet, and the every-session interruption outweighed it). Still load the
   // gate so the heart reflects today's filed state.
   private func refreshReadinessStatus(for date: Date) async {
-    guard Calendar.current.isDateInToday(date) else { return }
+    guard WorkoutDatePolicy.isEditable(date) else { return }
     await readinessViewModel.load(studentId: studentID)
   }
 }
