@@ -102,3 +102,105 @@ import Testing
   #expect(decoded == point)
   #expect(decoded.confidence == .low)
 }
+
+@Test func e1rmHistoryPointDecodesLegacyJSONWithoutOriginAsLogged() throws {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 128.2,
+    sourceWeightKg: 100,
+    sourceReps: 5,
+    sourceRPE: 8.0
+  )
+  let data = try JSONEncoder().encode(point)
+  var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+  object.removeValue(forKey: "origin")
+  let legacyData = try JSONSerialization.data(withJSONObject: object)
+
+  let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: legacyData)
+
+  #expect(decoded.origin == .logged)
+}
+
+@Test func e1rmHistoryPointPreservesImportedOriginAcrossRoundTrip() throws {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 128.2,
+    sourceWeightKg: 100,
+    sourceReps: 5,
+    sourceRPE: 8.0,
+    origin: .imported
+  )
+
+  let data = try JSONEncoder().encode(point)
+  let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: data)
+
+  #expect(decoded == point)
+  #expect(decoded.origin == .imported)
+}
+
+@Test func e1rmHistoryPointReplacingIDPreservesPayload() {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 128.2,
+    sourceWeightKg: 100,
+    sourceReps: 5,
+    sourceRPE: 8.0,
+    origin: .imported
+  )
+  let replacementID = UUID()
+
+  let replaced = point.replacing(id: replacementID)
+
+  #expect(replaced.id == replacementID)
+  #expect(replaced.studentId == point.studentId)
+  #expect(replaced.exerciseId == point.exerciseId)
+  #expect(replaced.setLogId == point.setLogId)
+  #expect(replaced.computedAt == point.computedAt)
+  #expect(replaced.e1RMKg == point.e1RMKg)
+  #expect(replaced.sourceWeightKg == point.sourceWeightKg)
+  #expect(replaced.sourceReps == point.sourceReps)
+  #expect(replaced.sourceRPE == point.sourceRPE)
+  #expect(replaced.confidence == point.confidence)
+  #expect(replaced.origin == point.origin)
+}
+
+@Test func e1rmHistoryPointReplacingConfidencePreservesPayloadAndID() {
+  let point = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    computedAt: Date(timeIntervalSince1970: 1_768_262_400),
+    e1RMKg: 128.2,
+    sourceWeightKg: 100,
+    sourceReps: 5,
+    sourceRPE: 8.0,
+    origin: .imported
+  )
+
+  let replaced = point.replacing(confidence: .low)
+
+  #expect(replaced.id == point.id)
+  #expect(replaced.studentId == point.studentId)
+  #expect(replaced.exerciseId == point.exerciseId)
+  #expect(replaced.setLogId == point.setLogId)
+  #expect(replaced.computedAt == point.computedAt)
+  #expect(replaced.e1RMKg == point.e1RMKg)
+  #expect(replaced.sourceWeightKg == point.sourceWeightKg)
+  #expect(replaced.sourceReps == point.sourceReps)
+  #expect(replaced.sourceRPE == point.sourceRPE)
+  #expect(replaced.confidence == .low)
+  #expect(replaced.origin == point.origin)
+}

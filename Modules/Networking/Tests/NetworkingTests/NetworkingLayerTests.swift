@@ -89,6 +89,8 @@ import Testing
   #expect(domain.rpe == Decimal(8))
   #expect(domain.completed)
   #expect(!domain.failed)
+  #expect(!dto.assumed)
+  #expect(!domain.assumed)
 }
 
 @Test func setLogDTODecodesFailedTrueAndMapsToDomain() throws {
@@ -113,6 +115,33 @@ import Testing
   #expect(dto.failed)
   #expect(domain.completed)
   #expect(domain.failed)
+}
+
+@Test func setLogDTOPreservesAssumedTrueAndMapsToDomain() throws {
+  let json = """
+    {
+      "id": "00000000-0000-4000-8000-000000000101",
+      "student_id": "00000000-0000-4000-8000-000000000102",
+      "plan_exercise_id": "00000000-0000-4000-8000-000000000103",
+      "set_index": 1,
+      "weight_kg": "100.00",
+      "reps": 5,
+      "rpe": "8.0",
+      "completed": true,
+      "failed": false,
+      "assumed": true,
+      "logged_at": "2026-05-22T12:00:00Z"
+    }
+    """
+
+  let dto = try MeetPRCodec.decoder.decode(SetLogDTO.self, from: Data(json.utf8))
+  let encoded = try MeetPRCodec.encoder.encode(dto)
+  let encodedJSON = try #require(String(data: encoded, encoding: .utf8))
+  let domain = dto.toDomain()
+
+  #expect(dto.assumed)
+  #expect(domain.assumed)
+  #expect(encodedJSON.contains(#""assumed":true"#))
 }
 
 @Test func feedbackDTODecodesDateOnlyAndISOTimestamps() throws {

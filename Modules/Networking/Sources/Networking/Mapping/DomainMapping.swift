@@ -113,7 +113,8 @@ extension SetLogDTO {
       reps: reps,
       rpe: rpe,
       completed: completed,
-      failed: failed
+      failed: failed,
+      assumed: assumed
     )
   }
 }

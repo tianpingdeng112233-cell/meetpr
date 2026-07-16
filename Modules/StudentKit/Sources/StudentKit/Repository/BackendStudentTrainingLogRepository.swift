@@ -45,7 +45,8 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       reps: log.reps,
       rpe: log.rpe,
       completed: log.completed,
-      failed: log.failed
+      failed: log.failed,
+      assumed: false
     )
   }
 

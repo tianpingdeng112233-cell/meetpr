@@ -29,11 +29,24 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         reps: log.reps,
         rpe: log.rpe,
         completed: log.completed,
-        failed: log.failed
+        failed: log.failed,
+        assumed: false
       )
       logs[index] = persisted
     } else {
-      persisted = log
+      persisted = StudentSetLog(
+        id: log.id,
+        studentID: log.studentID,
+        planExerciseID: log.planExerciseID,
+        setIndex: log.setIndex,
+        loggedAt: log.loggedAt,
+        weightKg: log.weightKg,
+        reps: log.reps,
+        rpe: log.rpe,
+        completed: log.completed,
+        failed: log.failed,
+        assumed: false
+      )
       logs.append(persisted)
     }
     logsByStudentID[log.studentID] = logs.sorted { $0.loggedAt < $1.loggedAt }
