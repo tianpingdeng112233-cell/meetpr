@@ -14,6 +14,12 @@ public enum E1RMChartPointConfidence: Hashable, Sendable {
   case low
 }
 
+/// Shape used to connect the chart's main-line samples.
+public enum E1RMChartLineInterpolation: Hashable, Sendable {
+  case curve
+  case step
+}
+
 /// Atomic e1RM line chart (spec 028, reused by CoachKit in spec 029).
 /// DesignSystem stays model-free: callers map their domain history into
 /// `E1RMChartPoint` values.
@@ -46,22 +52,30 @@ public struct E1RMChartPoint: Hashable, Sendable, Identifiable {
 public struct E1RMChart: View {
   private let smoothed: [E1RMChartPoint]
   private let rawEligible: [E1RMChartPoint]
+  private let lineInterpolation: E1RMChartLineInterpolation
   private let onSelect: ((E1RMChartPoint) -> Void)?
 
-  public init(points: [E1RMChartPoint], onSelect: ((E1RMChartPoint) -> Void)? = nil) {
+  public init(
+    points: [E1RMChartPoint],
+    lineInterpolation: E1RMChartLineInterpolation = .curve,
+    onSelect: ((E1RMChartPoint) -> Void)? = nil
+  ) {
     let sorted = points.sorted { $0.date < $1.date }
     smoothed = sorted
     rawEligible = sorted
+    self.lineInterpolation = lineInterpolation
     self.onSelect = onSelect
   }
 
   public init(
     smoothed: [E1RMChartPoint],
     rawEligible: [E1RMChartPoint],
+    lineInterpolation: E1RMChartLineInterpolation = .curve,
     onSelect: ((E1RMChartPoint) -> Void)? = nil
   ) {
     self.smoothed = smoothed.sorted { $0.date < $1.date }
     self.rawEligible = rawEligible.sorted { $0.date < $1.date }
+    self.lineInterpolation = lineInterpolation
     self.onSelect = onSelect
   }
 
@@ -144,7 +158,7 @@ public struct E1RMChart: View {
         )
         .foregroundStyle(lineColor(for: segment.origin))
         .lineStyle(lineStyle(for: segment.origin))
-        .interpolationMethod(.monotone)
+        .interpolationMethod(interpolationMethod)
       }
     }
   }
@@ -185,6 +199,13 @@ public struct E1RMChart: View {
     switch origin {
     case .logged: StrokeStyle()
     case .imported: StrokeStyle(dash: [5, 3])
+    }
+  }
+
+  private var interpolationMethod: InterpolationMethod {
+    switch lineInterpolation {
+    case .curve: .monotone
+    case .step: .stepEnd
     }
   }
 

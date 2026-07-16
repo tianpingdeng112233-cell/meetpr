@@ -78,7 +78,7 @@ private struct E1RMMiniTrendRowView: View {
         .font(.caption)
         .foregroundStyle(Color.MeetPR.fgSecondary)
         .frame(width: 34, alignment: .leading)
-      MiniSparkline(points: row.points)
+      MiniSparkline(row: row)
         .frame(height: 28)
       Text(valueText)
         .font(.caption.monospacedDigit())
@@ -97,7 +97,7 @@ private struct E1RMMiniTrendRowView: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct MiniSparkline: View {
-  let points: [E1RMHistoryPoint]
+  let row: DashboardE1RMTrendRow
 
   var body: some View {
     GeometryReader { proxy in
@@ -107,7 +107,7 @@ private struct MiniSparkline: View {
           .frame(height: 1)
         path(in: proxy.size)
           .stroke(
-            points.isEmpty ? Color.MeetPR.fgTertiary.opacity(0.35) : Color.MeetPR.brandRed,
+            row.points.isEmpty ? Color.MeetPR.fgTertiary.opacity(0.35) : Color.MeetPR.brandRed,
             style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
           )
       }
@@ -116,46 +116,22 @@ private struct MiniSparkline: View {
   }
 
   private func path(in size: CGSize) -> Path {
-    let sortedPoints = points.sorted { $0.computedAt < $1.computedAt }
-    guard !sortedPoints.isEmpty else {
+    let points = row.sparklinePoints(
+      width: size.width,
+      top: 0,
+      usableHeight: size.height
+    )
+    guard !points.isEmpty else {
       return Path()
     }
-    let values = sortedPoints.map(\.e1RMKg)
-    let minValue = values.min() ?? 0
-    let maxValue = values.max() ?? minValue
-    let span = Swift.max(maxValue - minValue, 1)
-    let layout = SparklineLayout(
-      count: sortedPoints.count, minValue: minValue, span: span, size: size)
     return Path { path in
-      for (index, point) in sortedPoints.enumerated() {
-        let location = location(for: point, index: index, layout: layout)
+      for (index, point) in points.enumerated() {
         if index == 0 {
-          path.move(to: location)
+          path.move(to: point)
         } else {
-          path.addLine(to: location)
+          path.addLine(to: point)
         }
       }
     }
   }
-
-  private func location(
-    for point: E1RMHistoryPoint,
-    index: Int,
-    layout: SparklineLayout
-  ) -> CGPoint {
-    let xPosition =
-      layout.count == 1
-      ? layout.size.width / 2
-      : CGFloat(index) * layout.size.width / CGFloat(layout.count - 1)
-    let normalized = (point.e1RMKg - layout.minValue) / layout.span
-    let yPosition = layout.size.height - CGFloat(normalized) * layout.size.height
-    return CGPoint(x: xPosition, y: yPosition)
-  }
-}
-
-private struct SparklineLayout {
-  let count: Int
-  let minValue: Double
-  let span: Double
-  let size: CGSize
 }

@@ -120,8 +120,9 @@ struct GrowthCurvePanelView: View {
               winnerPointID: sample.winnerPointID
             )
           },
-          rawEligible: viewModel.visibleRawEligiblePoints.map { point in
-            E1RMChartPoint(
+          rawEligible: viewModel.visibleRawEligiblePoints.compactMap { point in
+            guard point.confidence == .low else { return nil }
+            return E1RMChartPoint(
               id: point.id,
               date: point.computedAt,
               e1RMKg: point.e1RMKg,
@@ -129,6 +130,7 @@ struct GrowthCurvePanelView: View {
               confidence: chartConfidence(point.confidence)
             )
           },
+          lineInterpolation: .step,
           onSelect: { chartPoint in
             selectedPoint = viewModel.winnerPoint(forSampleID: chartPoint.id)
           }

@@ -223,3 +223,155 @@ private func seriesPoint(
   #expect(series.smoothed.last?.winnerPointID == earlier.id)
   #expect(series.smoothed.last?.winnerOrigin == .imported)
 }
+
+@Test func recordsStartAtTheFirstTrustedPointAndOnlyAdvanceOnStrictImprovement() {
+  let first = seriesPoint(daysAgo: 8, e1RM: 150)
+  let equal = seriesPoint(daysAgo: 6, e1RM: 150)
+  let valley = seriesPoint(daysAgo: 4, e1RM: 145)
+  let improvement = seriesPoint(daysAgo: 2, e1RM: 152)
+
+  let records = E1RMSeries.build(
+    points: [first, equal, valley, improvement],
+    family: .squat
+  ).records
+
+  #expect(records.map(\.valueKg) == [150, 152])
+  #expect(records.map(\.winnerPointID) == [first.id, improvement.id])
+  #expect(records.first?.sampleID == first.id)
+}
+
+@Test func importedTrustedPointCanOwnARecordButLowSpikeCannot() {
+  let logged = seriesPoint(daysAgo: 8, e1RM: 150)
+  let imported = seriesPoint(daysAgo: 6, e1RM: 160, origin: .imported)
+  let quarantined = seriesPoint(
+    daysAgo: 2,
+    e1RM: 200,
+    confidence: .low,
+    origin: .imported
+  )
+
+  let records = E1RMSeries.build(
+    points: [logged, imported, quarantined],
+    family: .squat
+  ).records
+
+  #expect(records.map(\.valueKg) == [150, 160])
+  #expect(records.last?.winnerPointID == imported.id)
+  #expect(records.last?.winnerOrigin == .imported)
+  #expect(records.contains { $0.winnerPointID == quarantined.id } == false)
+}
+
+@Test func recordTrajectoryCarriesEstablishedRecordAcrossWindowAndTail() throws {
+  let established = seriesPoint(daysAgo: 60, e1RM: 140, origin: .imported)
+  let inWindow = seriesPoint(daysAgo: 20, e1RM: 150)
+  let records = E1RMSeries.build(
+    points: [established, inWindow],
+    family: .squat
+  ).records
+  let windowStart = seriesNow.addingTimeInterval(-E1RMPolicy.rollingWindow)
+
+  let trajectory = E1RMSeries.recordTrajectory(
+    records: records,
+    from: windowStart,
+    extendedTo: seriesNow
+  )
+
+  let head = try #require(trajectory.first)
+  let tail = try #require(trajectory.last)
+  #expect(trajectory.map(\.valueKg) == [140, 150, 150])
+  #expect(head.date == windowStart)
+  #expect(head.winnerPointID == established.id)
+  #expect(head.winnerOrigin == .imported)
+  #expect(head.winnerConfidence == .normal)
+  #expect(tail.date == seriesNow)
+  #expect(tail.winnerPointID == inWindow.id)
+  #expect(tail.winnerOrigin == .logged)
+  #expect(tail.winnerConfidence == .normal)
+  #expect(Set(trajectory.map(\.sampleID)).count == trajectory.count)
+  #expect(records.contains { $0.sampleID == head.sampleID } == false)
+  #expect(records.contains { $0.sampleID == tail.sampleID } == false)
+}
+
+@Test func recordTrajectoryRemainsVisibleWhenWindowContainsNoNewRecord() {
+  let oldRecord = seriesPoint(daysAgo: 60, e1RM: 150, origin: .imported)
+  let records = E1RMSeries.build(points: [oldRecord], family: .squat).records
+  let windowStart = seriesNow.addingTimeInterval(-E1RMPolicy.rollingWindow)
+
+  let trajectory = E1RMSeries.recordTrajectory(
+    records: records,
+    from: windowStart,
+    extendedTo: seriesNow
+  )
+
+  #expect(trajectory.map(\.date) == [windowStart, seriesNow])
+  #expect(trajectory.allSatisfy { $0.valueKg == oldRecord.e1RMKg })
+  #expect(trajectory.allSatisfy { $0.winnerPointID == oldRecord.id })
+}
+
+@Test func recordTrajectoryIncludesRecordExactlyAtWindowStartWithoutCarry() throws {
+  let windowStart = seriesNow.addingTimeInterval(-90 * 86_400)
+  let boundaryRecord = seriesPoint(daysAgo: 90, e1RM: 150)
+  let records = E1RMSeries.build(points: [boundaryRecord], family: .squat).records
+
+  let trajectory = E1RMSeries.recordTrajectory(
+    records: records,
+    from: windowStart,
+    extendedTo: seriesNow
+  )
+
+  let first = try #require(trajectory.first)
+  #expect(trajectory.count == 2)
+  #expect(first.sampleID == boundaryRecord.id)
+  #expect(first.date == windowStart)
+}
+
+@Test func recordTrajectoryReturnsEmptyForEmptyRecords() {
+  let trajectory = E1RMSeries.recordTrajectory(
+    records: [],
+    from: seriesNow.addingTimeInterval(-90 * 86_400),
+    extendedTo: seriesNow
+  )
+
+  #expect(trajectory.isEmpty)
+}
+
+@Test func recordTrajectoryDoesNotAppendTailOnLatestRecordDate() {
+  let latestRecord = seriesPoint(daysAgo: 0, e1RM: 150)
+  let records = E1RMSeries.build(points: [latestRecord], family: .squat).records
+
+  let trajectory = E1RMSeries.recordTrajectory(
+    records: records,
+    extendedTo: latestRecord.computedAt
+  )
+
+  #expect(trajectory.count == 1)
+  #expect(trajectory.first?.sampleID == latestRecord.id)
+}
+
+@Test func mixedImportedAndLoggedRecordsPreserveEachSegmentOwner() {
+  let firstLogged = seriesPoint(daysAgo: 12, e1RM: 140)
+  let importedRecord = seriesPoint(daysAgo: 10, e1RM: 150, origin: .imported)
+  let loggedValley = seriesPoint(daysAgo: 8, e1RM: 145)
+  let secondLoggedRecord = seriesPoint(daysAgo: 6, e1RM: 160)
+  let importedValley = seriesPoint(daysAgo: 4, e1RM: 158, origin: .imported)
+  let finalImportedRecord = seriesPoint(daysAgo: 2, e1RM: 170, origin: .imported)
+
+  let records = E1RMSeries.build(
+    points: [
+      firstLogged,
+      importedRecord,
+      loggedValley,
+      secondLoggedRecord,
+      importedValley,
+      finalImportedRecord,
+    ],
+    family: .squat
+  ).records
+
+  #expect(records.map(\.valueKg) == [140, 150, 160, 170])
+  #expect(records.map(\.winnerOrigin) == [.logged, .imported, .logged, .imported])
+  #expect(
+    records.map(\.winnerPointID)
+      == [firstLogged.id, importedRecord.id, secondLoggedRecord.id, finalImportedRecord.id]
+  )
+}

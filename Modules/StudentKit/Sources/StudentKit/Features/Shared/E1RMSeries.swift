@@ -1,7 +1,7 @@
 import CoreModels
 import Foundation
 
-/// The single aggregation every strength-number consumer reads (spec 050 §2).
+/// Spec 050 aggregation plus the student-only all-time record projection.
 /// Current is the trailing four-week max over trusted eligible points; Best
 /// and Last use that same history. Quarantined points remain raw scatter only.
 struct E1RMSeries: Equatable, Sendable {
@@ -21,6 +21,8 @@ struct E1RMSeries: Equatable, Sendable {
   let smoothed: [Sample]
   /// Eligible raw points, chronological, available for honest scatter views.
   let rawEligible: [Sample]
+  /// Trusted all-time records, chronological and strictly increasing by value.
+  let records: [Sample]
   /// Highest eligible raw point across all history.
   let best: Sample?
   /// Most recent eligible raw point.
@@ -74,10 +76,87 @@ struct E1RMSeries: Equatable, Sendable {
       .filter { $0.confidence == .normal }
   }
 
+  /// Extends an all-time record series across a chart window. A record already
+  /// established before `windowStart` is carried to the leading edge, and the
+  /// latest record is carried to `extensionDate` so sparse histories remain
+  /// visible. Continuation samples preserve winner provenance but use fresh
+  /// timeline identities.
+  static func recordTrajectory(
+    records: [Sample],
+    from windowStart: Date? = nil,
+    extendedTo extensionDate: Date
+  ) -> [Sample] {
+    let sortedRecords = records.sorted { $0.date < $1.date }
+    guard let latestRecord = sortedRecords.last else { return [] }
+
+    var usedSampleIDs = Set(sortedRecords.map(\.sampleID))
+    var trajectory: [Sample]
+    if let windowStart {
+      trajectory = sortedRecords.filter { $0.date >= windowStart }
+      if let establishedRecord = sortedRecords.last(where: { $0.date <= windowStart }),
+        establishedRecord.date < windowStart
+      {
+        trajectory.insert(
+          continuationSample(
+            from: establishedRecord,
+            date: windowStart,
+            usedSampleIDs: &usedSampleIDs
+          ),
+          at: 0
+        )
+      }
+    } else {
+      trajectory = sortedRecords
+    }
+
+    if latestRecord.date < extensionDate, trajectory.last?.date != extensionDate {
+      trajectory.append(
+        continuationSample(
+          from: latestRecord,
+          date: extensionDate,
+          usedSampleIDs: &usedSampleIDs
+        )
+      )
+    }
+    return trajectory
+  }
+
+  /// Re-expresses samples as history points while retaining their winner's
+  /// original set payload and provenance.
+  static func historyPoints(
+    for samples: [Sample],
+    sourcePoints: [E1RMHistoryPoint]
+  ) -> [E1RMHistoryPoint] {
+    let byID = Dictionary(uniqueKeysWithValues: sourcePoints.map { ($0.id, $0) })
+    return samples.compactMap { sample in
+      guard let winner = byID[sample.winnerPointID] else { return nil }
+      return E1RMHistoryPoint(
+        id: sample.sampleID,
+        studentId: winner.studentId,
+        exerciseId: winner.exerciseId,
+        setLogId: winner.setLogId,
+        computedAt: sample.date,
+        e1RMKg: sample.valueKg,
+        sourceWeightKg: winner.sourceWeightKg,
+        sourceReps: winner.sourceReps,
+        sourceRPE: winner.sourceRPE,
+        confidence: sample.winnerConfidence,
+        origin: sample.winnerOrigin
+      )
+    }
+  }
+
   static func build(points: [E1RMHistoryPoint], family: LiftFamily?) -> E1RMSeries {
     let eligiblePoints = eligibleRaw(points: points, family: family)
     let rawEligible = eligiblePoints.map(Sample.init(point:))
     let trusted = eligiblePoints.filter { $0.confidence == .normal }
+
+    var recordValue = -Double.infinity
+    let records = trusted.compactMap { point -> Sample? in
+      guard point.e1RMKg > recordValue else { return nil }
+      recordValue = point.e1RMKg
+      return Sample(point: point)
+    }
 
     let smoothed = trusted.map { samplePoint in
       let windowStart = samplePoint.computedAt.addingTimeInterval(-rollingWindow)
@@ -110,8 +189,29 @@ struct E1RMSeries: Equatable, Sendable {
     return E1RMSeries(
       smoothed: smoothed,
       rawEligible: rawEligible,
+      records: records,
       best: trusted.max { $0.e1RMKg < $1.e1RMKg }.map(Sample.init(point:)),
       last: trusted.last.map(Sample.init(point:))
+    )
+  }
+
+  private static func continuationSample(
+    from record: Sample,
+    date: Date,
+    usedSampleIDs: inout Set<UUID>
+  ) -> Sample {
+    var sampleID = UUID()
+    while usedSampleIDs.contains(sampleID) {
+      sampleID = UUID()
+    }
+    usedSampleIDs.insert(sampleID)
+    return Sample(
+      sampleID: sampleID,
+      date: date,
+      valueKg: record.valueKg,
+      winnerPointID: record.winnerPointID,
+      winnerOrigin: record.winnerOrigin,
+      winnerConfidence: record.winnerConfidence
     )
   }
 }

@@ -96,29 +96,22 @@ public final class GrowthCurveViewModel {
       seriesByFamily[selectedFamily]
       ?? E1RMSeries.build(points: [], family: selectedFamily)
     let cutoff = windowCutoff
-    visibleSmoothedSamples = series.smoothed.filter { sample in
-      cutoff.map { sample.date >= $0 } ?? true
-    }
+    let currentDate = now()
+    let extensionDate = max(series.rawEligible.last?.date ?? currentDate, currentDate)
+    visibleSmoothedSamples = E1RMSeries.recordTrajectory(
+      records: series.records,
+      from: cutoff,
+      extendedTo: extensionDate
+    )
     visibleRawEligiblePoints = series.rawEligible.compactMap { sample in
+      guard sample.winnerConfidence == .low else { return nil }
       guard cutoff.map({ sample.date >= $0 }) ?? true else { return nil }
       return rawPointsByID[sample.winnerPointID]
     }
-    visiblePoints = visibleSmoothedSamples.compactMap { sample in
-      guard let winner = rawPointsByID[sample.winnerPointID] else { return nil }
-      return E1RMHistoryPoint(
-        id: sample.sampleID,
-        studentId: winner.studentId,
-        exerciseId: winner.exerciseId,
-        setLogId: winner.setLogId,
-        computedAt: sample.date,
-        e1RMKg: sample.valueKg,
-        sourceWeightKg: winner.sourceWeightKg,
-        sourceReps: winner.sourceReps,
-        sourceRPE: winner.sourceRPE,
-        confidence: sample.winnerConfidence,
-        origin: sample.winnerOrigin
-      )
-    }
+    visiblePoints = E1RMSeries.historyPoints(
+      for: visibleSmoothedSamples,
+      sourcePoints: Array(rawPointsByID.values)
+    )
   }
 
   func winnerPoint(forSampleID sampleID: UUID) -> E1RMHistoryPoint? {

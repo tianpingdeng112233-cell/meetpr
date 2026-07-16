@@ -222,21 +222,24 @@ public struct TrainingHistoryView: View {
           winnerPointID: sample.winnerPointID
         )
       },
-      rawEligible: row.rawEligiblePoints.map { point in
-        E1RMChartPoint(
+      rawEligible: row.rawEligiblePoints.compactMap { point in
+        guard point.confidence == .low else { return nil }
+        return E1RMChartPoint(
           id: point.id,
           date: point.computedAt,
           e1RMKg: point.e1RMKg,
           origin: chartOrigin(point.origin),
           confidence: chartConfidence(point.confidence)
         )
-      }
+      },
+      lineInterpolation: .step
     )
     .frame(height: 140)
   }
 
   private func chartPeriodLabel(for row: DashboardE1RMTrendRow?, now: Date) -> String {
-    row?.displaysHistoricalBest(now: now) == true ? "历史最佳" : "90 天"
+    row?.displaysHistoricalBest(now: now) == true
+      ? "历史最佳" : "\(DashboardE1RMTrendViewModel.chartWindowDays) 天"
   }
 
   private func chartOrigin(_ origin: E1RMPointOrigin) -> E1RMChartPointOrigin {

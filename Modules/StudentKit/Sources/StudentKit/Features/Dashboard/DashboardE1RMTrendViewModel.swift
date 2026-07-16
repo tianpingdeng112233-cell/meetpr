@@ -17,12 +17,12 @@ struct DashboardE1RMTrendRow: Equatable, Identifiable, Sendable {
   let points: [E1RMHistoryPoint]
   let smoothedSamples: [E1RMSeries.Sample]
   let rawEligiblePoints: [E1RMHistoryPoint]
-  let bestPoint: E1RMHistoryPoint?
+  let latestRecordPoint: E1RMHistoryPoint?
 
   var id: LiftFamily { family }
 
   var latestPoint: E1RMHistoryPoint? {
-    points.max { $0.computedAt < $1.computedAt }
+    latestRecordPoint
   }
 
   func displaysHistoricalBest(now: Date) -> Bool {
@@ -30,8 +30,8 @@ struct DashboardE1RMTrendRow: Equatable, Identifiable, Sendable {
     return latestPoint.computedAt < now.addingTimeInterval(-E1RMPolicy.rollingWindow)
   }
 
-  func displayPoint(now: Date) -> E1RMHistoryPoint? {
-    displaysHistoricalBest(now: now) ? bestPoint : latestPoint
+  func displayPoint(now _: Date) -> E1RMHistoryPoint? {
+    latestRecordPoint
   }
 }
 
@@ -58,6 +58,8 @@ struct DashboardE1RMHeadline: Equatable, Sendable {
 @Observable
 @MainActor
 final class DashboardE1RMTrendViewModel {
+  static let chartWindowDays = 90
+
   enum State: Equatable, Sendable {
     case idle
     case loading
@@ -94,7 +96,7 @@ final class DashboardE1RMTrendViewModel {
         onboarding: profile
       )
       let histories = try await fetchHistories(studentID: studentID, idsByFamily: idsByFamily)
-      let rows = Self.rows(from: histories, idsByFamily: idsByFamily)
+      let rows = Self.rows(from: histories, idsByFamily: idsByFamily, now: now())
       let prs = try await e1rm.unacknowledgedPRs(studentId: studentID)
       state = .loaded(
         DashboardE1RMTrendPresentation(
@@ -129,19 +131,28 @@ final class DashboardE1RMTrendViewModel {
 
   private static func rows(
     from histories: [UUID: [E1RMHistoryPoint]],
-    idsByFamily: [LiftFamily: Set<UUID>]
+    idsByFamily: [LiftFamily: Set<UUID>],
+    now: Date
   ) -> [DashboardE1RMTrendRow] {
     MainLiftExerciseFamilyResolver.dashboardFamilies.map { family in
       let rawPoints = (idsByFamily[family] ?? [])
         .flatMap { histories[$0] ?? [] }
       let series = E1RMSeries.build(points: rawPoints, family: family)
       let rawByID = Dictionary(uniqueKeysWithValues: rawPoints.map { ($0.id, $0) })
+      let extensionDate = max(series.rawEligible.last?.date ?? now, now)
+      let windowStart = now.addingTimeInterval(-TimeInterval(chartWindowDays) * 86_400)
+      let recordTrajectory = E1RMSeries.recordTrajectory(
+        records: series.records,
+        from: windowStart,
+        extendedTo: extensionDate
+      )
       return DashboardE1RMTrendRow(
         family: family,
-        points: E1RMSeries.smoothedHistory(points: rawPoints, family: family),
-        smoothedSamples: series.smoothed,
-        rawEligiblePoints: E1RMSeries.eligibleRaw(points: rawPoints, family: family),
-        bestPoint: series.best.flatMap { rawByID[$0.winnerPointID] }
+        points: E1RMSeries.historyPoints(for: recordTrajectory, sourcePoints: rawPoints),
+        smoothedSamples: recordTrajectory,
+        rawEligiblePoints: E1RMSeries.eligibleRaw(points: rawPoints, family: family)
+          .filter { $0.confidence == .low },
+        latestRecordPoint: series.records.last.flatMap { rawByID[$0.winnerPointID] }
       )
     }
   }

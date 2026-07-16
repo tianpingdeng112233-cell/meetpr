@@ -85,7 +85,7 @@ import Testing
 }
 
 @MainActor
-@Test func trendHeadlineAndRowsUseRollingWindowMaximum() async throws {
+@Test func trendHeadlineAndRowsUseRecordTrajectory() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
   let squatID = try #require(plan.mainLiftID(for: .squat))
@@ -101,10 +101,137 @@ import Testing
 
   let presentation = try #require(viewModel.presentation)
   let squat = try #require(presentation.rows.first { $0.family == .squat })
+  // Product amendment: the lower recent training point is no longer drawn;
+  // the real record is carried forward to today instead.
   #expect(squat.points.map(\.e1RMKg) == [180, 180])
   #expect(squat.latestPoint?.e1RMKg == 180)
   #expect(presentation.headline?.kind == .best)
   #expect(presentation.headline?.valueKg == 180)
+}
+
+@MainActor
+@Test func recentTrainingWithoutARecordStillDisplaysHistoricalBest() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftID(for: .squat))
+  let now = try Date("2026-07-09T12:00:00Z", strategy: .iso8601)
+  let oldRecord = point(
+    studentID: studentID, exerciseID: squatID, e1RM: 180, daysAgo: 60, now: now)
+  let recentTraining = point(
+    studentID: studentID, exerciseID: squatID, e1RM: 175, daysAgo: 1, now: now)
+  let viewModel = makeViewModel(
+    studentID: studentID,
+    plan: plan,
+    points: [oldRecord, recentTraining],
+    prs: [],
+    now: now
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  let squat = try #require(presentation.rows.first { $0.family == .squat })
+  #expect(squat.displaysHistoricalBest(now: now))
+  #expect(squat.displayPoint(now: now)?.id == oldRecord.id)
+  #expect(squat.displayPoint(now: now)?.e1RMKg == 180)
+  #expect(squat.trendDeltaKg == 0)
+  #expect(presentation.headline?.kind == .historicalBest)
+}
+
+@MainActor
+@Test func recordWithinFourWeeksDisplaysBestAndCurrentRecordValue() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftID(for: .squat))
+  let now = try Date("2026-07-09T12:00:00Z", strategy: .iso8601)
+  let points = [
+    point(studentID: studentID, exerciseID: squatID, e1RM: 170, daysAgo: 60, now: now),
+    point(studentID: studentID, exerciseID: squatID, e1RM: 180, daysAgo: 10, now: now),
+    point(studentID: studentID, exerciseID: squatID, e1RM: 175, daysAgo: 1, now: now),
+  ]
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: [], now: now)
+
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  let squat = try #require(presentation.rows.first { $0.family == .squat })
+  #expect(!squat.displaysHistoricalBest(now: now))
+  #expect(squat.displayPoint(now: now)?.e1RMKg == 180)
+  #expect(squat.points.map(\.e1RMKg) == [170, 180, 180])
+  #expect(presentation.headline?.kind == .best)
+  #expect(presentation.headline?.valueKg == 180)
+}
+
+@MainActor
+@Test func trendRawLayerOnlyContainsLowConfidencePoints() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftID(for: .squat))
+  let now = try Date("2026-07-09T12:00:00Z", strategy: .iso8601)
+  let trusted = point(
+    studentID: studentID, exerciseID: squatID, e1RM: 170, daysAgo: 10, now: now)
+  let low = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: studentID,
+    exerciseId: squatID,
+    setLogId: UUID(),
+    computedAt: now.addingTimeInterval(-86_400),
+    e1RMKg: 200,
+    sourceWeightKg: 180,
+    sourceReps: 3,
+    sourceRPE: 8,
+    confidence: .low,
+    origin: .imported
+  )
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: [trusted, low], prs: [], now: now)
+
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  let squat = try #require(presentation.rows.first { $0.family == .squat })
+  #expect(squat.rawEligiblePoints.map(\.id) == [low.id])
+}
+
+@MainActor
+@Test func trendUsesNinetyDayCarryAsDeltaBaseline() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftID(for: .squat))
+  let now = try Date("2026-07-09T12:00:00Z", strategy: .iso8601)
+  let allTimeRecord = point(
+    studentID: studentID, exerciseID: squatID, e1RM: 100, daysAgo: 200, now: now)
+  let preWindowRecord = point(
+    studentID: studentID, exerciseID: squatID, e1RM: 140, daysAgo: 100, now: now)
+  let inWindowRecord = point(
+    studentID: studentID, exerciseID: squatID, e1RM: 150, daysAgo: 10, now: now)
+  let viewModel = makeViewModel(
+    studentID: studentID,
+    plan: plan,
+    points: [allTimeRecord, preWindowRecord, inWindowRecord],
+    prs: [],
+    now: now
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  let squat = try #require(presentation.rows.first { $0.family == .squat })
+  let windowStart = now.addingTimeInterval(
+    -TimeInterval(DashboardE1RMTrendViewModel.chartWindowDays) * 86_400
+  )
+  #expect(squat.smoothedSamples.map(\.valueKg) == [140, 150, 150])
+  #expect(squat.smoothedSamples.first?.date == windowStart)
+  #expect(squat.smoothedSamples.first?.winnerPointID == preWindowRecord.id)
+  #expect(squat.points.map(\.e1RMKg) == [140, 150, 150])
+  #expect(squat.trendDeltaKg == 10)
+  #expect(squat.latestRecordPoint?.id == inWindowRecord.id)
+
+  let sparkline = squat.sparklinePoints()
+  #expect(sparkline.count == 4)
+  #expect(sparkline[1].x == sparkline[2].x)
+  #expect(sparkline[1].y != sparkline[2].y)
 }
 
 @MainActor

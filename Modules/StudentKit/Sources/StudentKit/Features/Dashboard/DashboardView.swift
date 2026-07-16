@@ -442,7 +442,8 @@ public struct DashboardView: View {
   }
 
   private func trendPeriodLabel(_ row: DashboardE1RMTrendRow, now: Date) -> String {
-    row.displaysHistoricalBest(now: now) ? "历史最佳" : "90 天"
+    row.displaysHistoricalBest(now: now)
+      ? "历史最佳" : "\(DashboardE1RMTrendViewModel.chartWindowDays) 天"
   }
 
   // MARK: - Start CTA
