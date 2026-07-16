@@ -73,7 +73,8 @@ struct SetEntrySheet: View {
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
     _weightText = State(initialValue: SetEntryValue.text(weight))
     _repsText = State(initialValue: "\(reps)")
-    _rpeText = State(initialValue: SetEntryValue.text(rpe))
+    // Snap the seed so a non-0.5 prescribed/legacy RPE lands on a tick.
+    _rpeText = State(initialValue: SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
   }
 
   var body: some View {
@@ -118,20 +119,7 @@ struct SetEntrySheet: View {
                   .modifier(EntryFieldStyle())
               }
             )
-            plateStepper(
-              "RPE", unit: nil, sub: "± 0.5 · 5–10",
-              onDec: { rpeText = SetEntryValue.text(max(5, rpeValue - 0.5)) },
-              onInc: { rpeText = SetEntryValue.text(min(10, rpeValue + 0.5)) },
-              focus: { focusedField = .rpe },
-              field: {
-                TextField("", text: $rpeText)
-                  .decimalKeyboard()
-                  .focused($focusedField, equals: .rpe)
-                  .accessibilityLabel("RPE")
-                  .maxInputLength($rpeText, 4)
-                  .modifier(EntryFieldStyle())
-              }
-            )
+            rpeSection
 
             if let videoViewModel, let studentID {
               VideoAttachmentSection(
@@ -213,6 +201,37 @@ struct SetEntrySheet: View {
     }
   }
 
+  // MARK: - RPE tick-scale
+
+  /// RPE band: the same mono label row as the steppers, then the drag-to-pick
+  /// tick scale (SetEntryRPEScale) in place of the old +/- box.
+  private var rpeSection: some View {
+    VStack(spacing: 8) {
+      HStack {
+        Text("RPE")
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+        Spacer()
+        Text("5–10 · 0.5")
+          .font(.system(size: 10, design: .monospaced))
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+      SetEntryRPEScale(value: rpeBinding)
+    }
+  }
+
+  /// Bridges the scale's `Double` to the shared `rpeText` state so save() and
+  /// analytics keep reading one source of truth. `rpeValue` is already snapped to
+  /// 0.5, so the scale always lands on a tick; the setter snaps with exact
+  /// integer math rather than a `String(format:)` round-trip.
+  private var rpeBinding: Binding<Double> {
+    Binding(
+      get: { NSDecimalNumber(decimal: rpeValue).doubleValue },
+      set: { rpeText = SetEntryValue.rpeText($0) }
+    )
+  }
+
   // MARK: - Chrome
 
   private var navBar: some View {
@@ -243,12 +262,17 @@ struct SetEntrySheet: View {
 
   private var footer: some View {
     VStack(spacing: 10) {
-      actionButton("完成本组", icon: "checkmark", background: Color.MeetPR.green, foreground: .white) {
+      // Primary = inverted fill (white-on-dark in the dark sheet), secondary =
+      // ghost with a hairline border, per the record-v2 mockup.
+      actionButton(
+        "完成本组", icon: "checkmark",
+        background: Color.MeetPR.fgPrimary, foreground: Color.MeetPR.bg
+      ) {
         save(failed: false)
       }
       actionButton(
-        "未完成 / 失败", icon: "xmark", background: Color.MeetPR.amber,
-        foreground: Color.MeetPR.fgPrimary
+        "未完成 / 失败", icon: "xmark", background: Color.MeetPR.surface1,
+        foreground: Color.MeetPR.fgSecondary, border: Color.MeetPR.border
       ) {
         save(failed: true)
       }
@@ -262,6 +286,7 @@ struct SetEntrySheet: View {
 
   private func actionButton(
     _ title: String, icon: String, background: Color, foreground: Color,
+    border: Color? = nil,
     action: @escaping () -> Void
   ) -> some View {
     Button(action: action) {
@@ -275,6 +300,11 @@ struct SetEntrySheet: View {
       .frame(height: 52)
       .background(background)
       .clipShape(.rect(cornerRadius: 12))
+      .overlay {
+        if let border {
+          RoundedRectangle(cornerRadius: 12).stroke(border, lineWidth: 1)
+        }
+      }
     }
     .buttonStyle(.plain)
   }
