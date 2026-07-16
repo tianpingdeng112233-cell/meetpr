@@ -39,6 +39,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       id: response.id,
       studentID: log.studentID,
       planExerciseID: log.planExerciseID,
+      exerciseID: log.exerciseID,
       setIndex: log.setIndex,
       loggedAt: response.loggedAt,
       weightKg: log.weightKg,

@@ -87,12 +87,12 @@ struct E1RMRecorder: Sendable {
         sourceRPE: rpe,
         confidence: confidence
       )
-      try await e1rm.recordPoint(point)
+      let storedPoint = try await e1rm.upsertPoint(point)
 
       // Phase 1 persists both anomaly bands as `.low`; Phase 2 will confirm
       // hard suspects before they can become trusted.
       guard confidence == .normal else { return nil }
-      return try await recordPRIfCleared(point: point, previousMax: previousMax)
+      return try await recordPRIfCleared(point: storedPoint, previousMax: previousMax)
     } catch {
       return nil
     }
@@ -115,7 +115,8 @@ struct E1RMRecorder: Sendable {
       sourceWeightKg: sourceWeightKg,
       sourceReps: input.reps,
       sourceRPE: sourceRPE,
-      confidence: confidence
+      confidence: confidence,
+      origin: .logged
     )
   }
 
@@ -124,9 +125,14 @@ struct E1RMRecorder: Sendable {
       studentId: input.studentID,
       exerciseId: input.exerciseID
     )
-    return E1RMSeries.trustedEligibleRaw(points: history, family: input.family)
-      .map(\.e1RMKg)
-      .max()
+    return E1RMSeries.trustedEligibleRaw(
+      points: history.filter {
+        !($0.setLogId == input.setLogID && $0.origin == .imported)
+      },
+      family: input.family
+    )
+    .map(\.e1RMKg)
+    .max()
   }
 
   private func recordPRIfCleared(

@@ -89,6 +89,8 @@ import Testing
   #expect(domain.rpe == Decimal(8))
   #expect(domain.completed)
   #expect(!domain.failed)
+  #expect(dto.exerciseID == nil)
+  #expect(domain.exerciseID == nil)
   #expect(!dto.assumed)
   #expect(!domain.assumed)
 }
@@ -123,6 +125,7 @@ import Testing
       "id": "00000000-0000-4000-8000-000000000101",
       "student_id": "00000000-0000-4000-8000-000000000102",
       "plan_exercise_id": "00000000-0000-4000-8000-000000000103",
+      "exercise_id": "00000000-0000-4000-8000-000000000104",
       "set_index": 1,
       "weight_kg": "100.00",
       "reps": 5,
@@ -136,11 +139,16 @@ import Testing
 
   let dto = try MeetPRCodec.decoder.decode(SetLogDTO.self, from: Data(json.utf8))
   let encoded = try MeetPRCodec.encoder.encode(dto)
+  let roundTripped = try MeetPRCodec.decoder.decode(SetLogDTO.self, from: encoded)
   let encodedJSON = try #require(String(data: encoded, encoding: .utf8))
   let domain = dto.toDomain()
 
+  #expect(dto.exerciseID?.uuidString == "00000000-0000-4000-8000-000000000104")
+  #expect(domain.exerciseID == dto.exerciseID)
   #expect(dto.assumed)
   #expect(domain.assumed)
+  #expect(roundTripped == dto)
+  #expect(encodedJSON.contains(#""exercise_id":"00000000-0000-4000-8000-000000000104""#))
   #expect(encodedJSON.contains(#""assumed":true"#))
 }
 

@@ -184,6 +184,7 @@ import Testing
     id: decoded.id,
     studentID: decoded.studentID,
     planExerciseID: decoded.planExerciseID,
+    exerciseID: try fixtureUUID("91000000-0000-0000-0000-000000000004"),
     setIndex: decoded.setIndex,
     loggedAt: decoded.loggedAt,
     weightKg: decoded.weightKg,
@@ -198,10 +199,14 @@ import Testing
 
   #expect(!decoded.failed)
   #expect(!decoded.assumed)
+  #expect(decoded.exerciseID == nil)
   #expect(legacyEncoded.contains(#""assumed":false"#))
+  #expect(!legacyEncoded.contains(#""exercise_id""#))
   #expect(encoded.contains(#""failed":true"#))
   #expect(encoded.contains(#""assumed":true"#))
+  #expect(encoded.contains(#""exercise_id":"91000000-0000-0000-0000-000000000004""#))
   #expect(roundTripped == failedLog)
+  #expect(roundTripped.exerciseID == failedLog.exerciseID)
   #expect(roundTripped.assumed)
 }
 

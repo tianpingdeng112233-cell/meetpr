@@ -118,8 +118,9 @@ private struct TestFailure: Error, CustomStringConvertible {
   await viewModel.toggleComplete(rowIndex: 0)  // false → true again: hook fires
 
   let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: first.exerciseID)
-  #expect(history.count == 2)
-  // Second completion has identical e1RM → inside the 0.5kg buffer → no new PR.
+  #expect(history.count == 1)
+  // Rechecking upserts the same set-log point; the identical e1RM remains
+  // inside the 0.5kg buffer and does not create another PR.
   let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
   #expect(pending.isEmpty)
   #expect(viewModel.pendingPRBanner == nil)

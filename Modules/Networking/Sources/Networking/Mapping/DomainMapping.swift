@@ -107,6 +107,7 @@ extension SetLogDTO {
       id: id,
       studentID: studentID,
       planExerciseID: planExerciseID,
+      exerciseID: exerciseID,
       setIndex: setIndex,
       loggedAt: loggedAt,
       weightKg: weightKg,

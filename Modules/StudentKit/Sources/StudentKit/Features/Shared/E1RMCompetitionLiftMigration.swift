@@ -128,7 +128,10 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
   ) async throws -> [E1RMHistoryPoint] {
     let rebuilt = InMemoryE1RMRepository()
     var includedExerciseIDs: Set<UUID> = []
-    for log in setLogs.sorted(by: { $0.loggedAt < $1.loggedAt }) where log.completed {
+    for log in setLogs.sorted(by: { $0.loggedAt < $1.loggedAt })
+    where log.completed && !log.assumed {
+      // Assumed imported history belongs exclusively to ImportedHistoryBackfill;
+      // replaying it here would mislabel the point as a real `.logged` set.
       let exerciseID =
         context.oldExerciseIDBySetLogID[log.id]
         ?? context.exerciseIDByPlanExerciseID[log.planExerciseID]

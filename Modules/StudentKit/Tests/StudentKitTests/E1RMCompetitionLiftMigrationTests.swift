@@ -107,6 +107,49 @@ import Testing
   #expect(points.first?.setLogId == log.id)
 }
 
+@Test func migrationSkipsAssumedImportedLogs() async throws {
+  let studentID = UUID()
+  let exercise = migrationExercise(family: .bench, isCompetitionLift: true)
+  let slot = StudentPlanExercise(
+    id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: [])
+  let plan = StudentPlanView(
+    cycleID: UUID(), weekIndex: 1, startDate: Date(timeIntervalSince1970: 1_780_000_000),
+    days: [
+      StudentPlanDay(
+        id: UUID(), date: Date(timeIntervalSince1970: 1_780_000_000), exercises: [slot])
+    ])
+  let imported = migrationLog(
+    studentID: studentID,
+    planExerciseID: slot.id,
+    weightKg: 100,
+    date: Date(timeIntervalSince1970: 1_780_000_000),
+    assumed: true
+  )
+  let logged = migrationLog(
+    studentID: studentID,
+    planExerciseID: slot.id,
+    weightKg: 105,
+    date: Date(timeIntervalSince1970: 1_780_086_400)
+  )
+  let e1rm = InMemoryE1RMRepository()
+  let migration = E1RMCompetitionLiftMigration(
+    logs: InMemoryStudentTrainingLogRepository(seed: [imported, logged]),
+    onboarding: InMemoryOnboardingRepository(studentId: studentID),
+    plans: MigrationPlanRepository(plan: plan),
+    catalogReader: nil,
+    e1rm: e1rm,
+    marker: InMemoryE1RMMigrationStore(),
+    now: { Date(timeIntervalSince1970: 1_780_172_800) }
+  )
+
+  let result = try await migration.runIfNeeded(studentID: studentID)
+  let points = try await e1rm.fetchHistory(studentId: studentID, exerciseId: exercise.id)
+
+  #expect(result.pointCount == 1)
+  #expect(points.map(\.setLogId) == [logged.id])
+  #expect(points.first?.origin == .logged)
+}
+
 @Test func replacingHistoryPreservesOtherStudentsForBothRepositories() async throws {
   let otherStudentID = UUID()
   let migratedStudentID = UUID()
@@ -222,12 +265,13 @@ private func migrationLog(
   studentID: UUID,
   planExerciseID: UUID,
   weightKg: Decimal,
-  date: Date
+  date: Date,
+  assumed: Bool = false
 ) -> StudentSetLog {
   StudentSetLog(
     id: UUID(), studentID: studentID, planExerciseID: planExerciseID,
     setIndex: 0, loggedAt: date, weightKg: weightKg, reps: 5, rpe: 8,
-    completed: true)
+    completed: true, assumed: assumed)
 }
 
 private func migrationPoint(

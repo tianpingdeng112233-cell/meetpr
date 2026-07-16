@@ -20,19 +20,22 @@ private func recorderPoint(
   e1RM: Double,
   reps: Int = 1,
   rpe: Double? = 10,
-  confidence: E1RMConfidence = .normal
+  confidence: E1RMConfidence = .normal,
+  setLogID: UUID = UUID(),
+  origin: E1RMPointOrigin = .logged
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
     id: UUID(),
     studentId: recorderStudentID,
     exerciseId: recorderExerciseID,
-    setLogId: UUID(),
+    setLogId: setLogID,
     computedAt: recorderNow.addingTimeInterval(-86_400),
     e1RMKg: e1RM,
     sourceWeightKg: e1RM,
     sourceReps: reps,
     sourceRPE: rpe,
-    confidence: confidence
+    confidence: confidence,
+    origin: origin
   )
 }
 
@@ -43,13 +46,14 @@ private func recorderInput(
   family: LiftFamily = .squat,
   completed: Bool = true,
   failed: Bool = false,
-  priorConfidence: E1RMConfidence? = nil
+  priorConfidence: E1RMConfidence? = nil,
+  setLogID: UUID = UUID()
 ) -> E1RMRecorder.Input {
   E1RMRecorder.Input(
     studentID: recorderStudentID,
     exerciseID: recorderExerciseID,
     family: family,
-    setLogID: UUID(),
+    setLogID: setLogID,
     weightKg: weightKg,
     reps: reps,
     rpe: rpe,
@@ -169,6 +173,49 @@ private func recorderInput(
 
   #expect(realPR != nil)
   #expect(realPR?.previousMaxE1RMKg == 200)
+}
+
+@Test func importedNormalPointSetsPRBaselineWithoutCreatingImportedPR() async throws {
+  let imported = recorderPoint(e1RM: 165, origin: .imported)
+  let (recorder, repository) = makeRecorder(seed: [imported])
+
+  let below = await recorder.record(recorderInput(weightKg: 160))
+  let above = await recorder.record(recorderInput(weightKg: 172))
+
+  #expect(below == nil)
+  #expect(above != nil)
+  #expect(above?.previousMaxE1RMKg == 165)
+  let events = try await repository.unacknowledgedPRs(studentId: recorderStudentID)
+  #expect(events.count == 1)
+  #expect(events.first?.pointId == above?.pointId)
+}
+
+@Test func realLogReplacesImportedIdentityWithoutStaleValueGatingIt() async throws {
+  let sharedSetLogID = UUID()
+  let baseline = recorderPoint(e1RM: 160)
+  let imported = recorderPoint(
+    e1RM: 200,
+    setLogID: sharedSetLogID,
+    origin: .imported
+  )
+  let (recorder, repository) = makeRecorder(seed: [baseline, imported])
+
+  let event = await recorder.record(
+    recorderInput(weightKg: 172, setLogID: sharedSetLogID)
+  )
+  let history = try await repository.fetchHistory(
+    studentId: recorderStudentID,
+    exerciseId: recorderExerciseID
+  )
+  let replacement = history.filter { $0.setLogId == sharedSetLogID }
+
+  #expect(history.count == 2)
+  #expect(replacement.count == 1)
+  #expect(replacement.first?.id == imported.id)
+  #expect(replacement.first?.origin == .logged)
+  #expect(replacement.first?.confidence == .normal)
+  #expect(replacement.first?.e1RMKg == 172)
+  #expect(event?.previousMaxE1RMKg == 160)
 }
 
 @Test func anomalyThresholdsMatchSpec050() {
