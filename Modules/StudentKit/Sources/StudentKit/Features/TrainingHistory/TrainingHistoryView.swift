@@ -424,10 +424,17 @@ public struct TrainingHistoryView: View {
 
   /// Distinct calendar days on which at least one set was completed.
   private var sessionCountText: String {
-    let days = Set(
-      loadedLogs.filter(\.completed).map { Calendar.current.startOfDay(for: $0.loggedAt) }
-    )
-    return "\(days.count)"
+    "\(Self.completedSessionCount(logs: loadedLogs, calendar: .current))"
+  }
+
+  static func completedSessionCount(
+    logs: [StudentSetLog],
+    calendar: Calendar
+  ) -> Int {
+    Set(
+      logs.filter { $0.completed && !$0.assumed }
+        .map { calendar.startOfDay(for: $0.loggedAt) }
+    ).count
   }
 
   private var weekCount: Int { loadedWeeks.count }

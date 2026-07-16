@@ -56,7 +56,7 @@ enum StudentFormatting {
     let total = day.exercises.reduce(0) { $0 + $1.prescribedSets.count }
     let planExerciseIDs = Set(day.exercises.map(\.id))
     let completed = logs.filter {
-      planExerciseIDs.contains($0.planExerciseID) && $0.completed
+      planExerciseIDs.contains($0.planExerciseID) && $0.completed && !$0.assumed
     }.count
     return (completed, total)
   }

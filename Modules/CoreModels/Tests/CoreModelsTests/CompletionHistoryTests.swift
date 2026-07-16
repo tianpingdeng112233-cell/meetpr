@@ -27,10 +27,15 @@ private func planDay(date: Date, exerciseSetCounts: [Int]) -> StudentPlanDay {
   return StudentPlanDay(id: UUID(), date: date, exercises: exercises)
 }
 
-private func log(planExerciseID: UUID, at date: Date, completed: Bool = true) -> StudentSetLog {
+private func log(
+  planExerciseID: UUID,
+  at date: Date,
+  completed: Bool = true,
+  assumed: Bool = false
+) -> StudentSetLog {
   StudentSetLog(
     id: UUID(), studentID: studentID, planExerciseID: planExerciseID, setIndex: 0,
-    loggedAt: date, weightKg: 100, reps: 5, completed: completed)
+    loggedAt: date, weightKg: 100, reps: 5, completed: completed, assumed: assumed)
 }
 
 @Test func completionAggregatesTwoCycleAlignedWeeks() {
@@ -89,6 +94,20 @@ private func log(planExerciseID: UUID, at date: Date, completed: Bool = true) ->
     log(planExerciseID: UUID(), at: day(0)),
   ]
   let weeks = CompletionHistory.weekly(planDays: [dayPlan], logs: logs, calendar: utc)
+  #expect(weeks.count == 1)
+  #expect(weeks[0].completedSets == 0)
+  #expect(weeks[0].completedTrainingDays == 0)
+}
+
+@Test func completionAssumedLogsExcludedFromSetsAndTrainingDays() {
+  let dayPlan = planDay(date: day(0), exerciseSetCounts: [2])
+  let weeks = CompletionHistory.weekly(
+    planDays: [dayPlan],
+    logs: [
+      log(planExerciseID: dayPlan.exercises[0].id, at: day(0), assumed: true)
+    ],
+    calendar: utc)
+
   #expect(weeks.count == 1)
   #expect(weeks[0].completedSets == 0)
   #expect(weeks[0].completedTrainingDays == 0)

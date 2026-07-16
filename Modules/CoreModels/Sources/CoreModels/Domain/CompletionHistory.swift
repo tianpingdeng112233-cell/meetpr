@@ -95,7 +95,7 @@ public enum CompletionHistory {
     // Completed work attributed to weeks via plan-exercise (date-agnostic).
     var completedSetsByWeek: [Int: Int] = [:]
     var completedDaysByWeek: [Int: Set<UUID>] = [:]
-    for log in logs where log.completed {
+    for log in logs where log.completed && !log.assumed {
       guard let dayID = dayForExercise[log.planExerciseID],
         let week = weekForDay[dayID]
       else { continue }
