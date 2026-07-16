@@ -14,7 +14,9 @@ actor ImportedHistoryBackfill {
 
   struct Result: Sendable {
     let pendingReviews: [PendingImportedHistoryReview]
-    let importedPointCount: Int
+    /// Points inserted for a set-log identity that had no imported point yet.
+    /// Idempotent replays report zero so callers skip needless reloads.
+    let newImportedPointCount: Int
   }
 
   fileprivate struct Candidate: Sendable {
@@ -45,6 +47,8 @@ actor ImportedHistoryBackfill {
   private let reviews: any ImportedHistoryReviewStoring
   private let now: @Sendable () -> Date
   private var calendar: Calendar
+  private var inFlightBackfills: [UUID: Task<Result, any Error>] = [:]
+  private var exclusiveTails: [UUID: Task<Void, Never>] = [:]
 
   init(
     logs: any StudentTrainingLogRepository,
@@ -66,9 +70,50 @@ actor ImportedHistoryBackfill {
     self.calendar = calendar
   }
 
+  /// Serializes concurrent triggers (root task, tab switch, pull-to-refresh):
+  /// overlapping calls join the in-flight run instead of racing pending-review
+  /// creation, which would mint duplicate review IDs and orphan the first
+  /// alert's answer (spec 053 §5 one-shot semantics).
+  func backfill(studentID: UUID) async throws -> Result {
+    if let inFlight = inFlightBackfills[studentID] {
+      return try await inFlight.value
+    }
+    let task = Task { [self] in
+      try await runExclusively(studentID: studentID) {
+        try await self.performBackfill(studentID: studentID)
+      }
+    }
+    inFlightBackfills[studentID] = task
+    do {
+      let result = try await task.value
+      inFlightBackfills[studentID] = nil
+      return result
+    } catch {
+      inFlightBackfills[studentID] = nil
+      throw error
+    }
+  }
+
+  /// Chains one student's backfill and answer operations onto a single serial
+  /// tail. The actor is reentrant across repository awaits, so without this an
+  /// answer landing mid-backfill would be overwritten by the run's stale
+  /// pending/confidence snapshot (resurrecting the review it just resolved).
+  private func runExclusively<T: Sendable>(
+    studentID: UUID,
+    _ operation: @escaping @Sendable () async throws -> T
+  ) async throws -> T {
+    let previousTail = exclusiveTails[studentID]
+    let work = Task<T, any Error> {
+      await previousTail?.value
+      return try await operation()
+    }
+    exclusiveTails[studentID] = Task { _ = try? await work.value }
+    return try await work.value
+  }
+
   /// Fetches the complete bounded window in API-range slices. Repeating this
   /// operation is safe because repository writes are upserts by set-log ID.
-  func backfill(studentID: UUID) async throws -> Result {
+  private func performBackfill(studentID: UUID) async throws -> Result {
     let profile = try await onboarding.fetchProfile(studentId: studentID)
     let baselines = Self.baselines(from: profile)
     let exerciseContext = try await resolvedExercises(studentID: studentID)
@@ -99,7 +144,7 @@ actor ImportedHistoryBackfill {
     )
     return Result(
       pendingReviews: pendingReviews.sorted { $0.family.rawValue < $1.family.rawValue },
-      importedPointCount: candidates.count
+      newImportedPointCount: candidates.count { existingBySetLogID[$0.log.id] == nil }
     )
   }
 
@@ -107,6 +152,15 @@ actor ImportedHistoryBackfill {
   /// A later higher batch creates a fresh pending review, so this cannot
   /// rewrite an older rejected batch (spec 053 §5).
   func answer(
+    _ review: PendingImportedHistoryReview,
+    decision: ImportedHistoryReviewDecision
+  ) async throws {
+    try await runExclusively(studentID: review.studentID) {
+      try await self.performAnswer(review, decision: decision)
+    }
+  }
+
+  private func performAnswer(
     _ review: PendingImportedHistoryReview,
     decision: ImportedHistoryReviewDecision
   ) async throws {

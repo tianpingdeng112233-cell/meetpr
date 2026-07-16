@@ -51,8 +51,8 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
     exerciseId: squat.exercise.id
   )
 
-  #expect(first.importedPointCount == 1)
-  #expect(second.importedPointCount == 1)
+  #expect(first.newImportedPointCount == 1)
+  #expect(second.newImportedPointCount == 0)
   #expect(history.count == 1)
   #expect(history.first?.origin == .imported)
   #expect(history.first?.computedAt == eligible.loggedAt)
@@ -76,7 +76,7 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
     exerciseId: exerciseID
   )
 
-  #expect(result.importedPointCount == 1)
+  #expect(result.newImportedPointCount == 1)
   #expect(history.count == 1)
   #expect(history.first?.setLogId == log.id)
   #expect(result.pendingReviews.isEmpty)
@@ -95,7 +95,7 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
   )
 
   #expect(log.exerciseID == nil)
-  #expect(result.importedPointCount == 1)
+  #expect(result.newImportedPointCount == 1)
   #expect(history.first?.setLogId == log.id)
 }
 
@@ -111,7 +111,7 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
 
   let result = try await service.backfill(studentID: backfillStudentID)
 
-  #expect(result.importedPointCount == 0)
+  #expect(result.newImportedPointCount == 0)
   #expect(
     try await e1rm.fetchHistory(
       studentId: backfillStudentID,
@@ -324,6 +324,148 @@ private struct BackfillSlot: Sendable {
   let exercise: Exercise
 }
 
+@Test func concurrentBackfillsShareOneRunAndOnePendingReview() async throws {
+  let squat = backfillSlot(family: .squat)
+  let aboveBaseline = backfillLog(slot: squat, weightKg: 140, daysAgo: 70)
+  let e1rm = InMemoryE1RMRepository()
+  let reviews = InMemoryImportedHistoryReviewStore()
+  let service = makeBackfill(
+    logs: [aboveBaseline],
+    slots: [squat],
+    e1rm: e1rm,
+    reviews: reviews,
+    squatBaseline: 150
+  )
+
+  async let first = service.backfill(studentID: backfillStudentID)
+  async let second = service.backfill(studentID: backfillStudentID)
+  let results = try await [first, second]
+
+  let reviewIDs = Set(results.compactMap { $0.pendingReviews.first?.id })
+  #expect(reviewIDs.count == 1)
+  let stored = try await reviews.pendingReview(studentID: backfillStudentID, family: .squat)
+  #expect(stored?.id == reviewIDs.first)
+  let history = try await e1rm.fetchHistory(
+    studentId: backfillStudentID,
+    exerciseId: squat.exercise.id
+  )
+  #expect(history.count == 1)
+}
+
+@Test func overlappingBackfillsExecuteThePipelineOnlyOnce() async throws {
+  let squat = backfillSlot(family: .squat)
+  let log = backfillLog(slot: squat, weightKg: 140, daysAgo: 70)
+  let gated = GatedLogRepository(wrapping: InMemoryStudentTrainingLogRepository(seed: [log]))
+  let e1rm = InMemoryE1RMRepository()
+  let service = makeBackfill(logs: gated, slots: [squat], e1rm: e1rm)
+
+  await gated.holdNextFetch()
+  async let first = service.backfill(studentID: backfillStudentID)
+  async let second = service.backfill(studentID: backfillStudentID)
+  await gated.waitUntilHeld()
+  await gated.releaseHeldFetch()
+  _ = try await [first, second]
+
+  // One 120-day window at 28-day slices = 5 fetches; a second pipeline run
+  // would double this.
+  #expect(await gated.fetchCallCount == 5)
+}
+
+@Test func answerDuringBackfillIsNotOverwrittenByStaleSnapshot() async throws {
+  let squat = backfillSlot(family: .squat)
+  let aboveBaseline = backfillLog(slot: squat, weightKg: 140, daysAgo: 70)
+  let inMemoryLogs = InMemoryStudentTrainingLogRepository(seed: [aboveBaseline])
+  let gated = GatedLogRepository(wrapping: inMemoryLogs)
+  let e1rm = InMemoryE1RMRepository()
+  let reviews = InMemoryImportedHistoryReviewStore()
+  let service = makeBackfill(
+    logs: gated,
+    slots: [squat],
+    e1rm: e1rm,
+    reviews: reviews,
+    squatBaseline: 150
+  )
+
+  let review = try #require(
+    try await service.backfill(studentID: backfillStudentID).pendingReviews.first
+  )
+
+  await gated.holdNextFetch()
+  async let replay = service.backfill(studentID: backfillStudentID)
+  await gated.waitUntilHeld()
+  async let answered: Void = service.answer(review, decision: .confirmed)
+  await gated.releaseHeldFetch()
+  _ = try await replay
+  try await answered
+
+  let history = try await e1rm.fetchHistory(
+    studentId: backfillStudentID,
+    exerciseId: squat.exercise.id
+  )
+  #expect(history.first(where: { $0.setLogId == aboveBaseline.id })?.confidence == .normal)
+  #expect(try await reviews.pendingReview(studentID: backfillStudentID, family: .squat) == nil)
+  let record = try await reviews.review(studentID: backfillStudentID, family: .squat)
+  #expect(record?.decision == .confirmed)
+}
+
+/// Wraps a real repository and can hold the next `fetchLogs` on a gate so
+/// tests can force overlap while counting pipeline executions.
+private actor GatedLogRepository: StudentTrainingLogRepository {
+  private let wrapped: any StudentTrainingLogRepository
+  private(set) var fetchCallCount = 0
+  private var holdArmed = false
+  private var heldContinuation: CheckedContinuation<Void, Never>?
+  private var heldObservers: [CheckedContinuation<Void, Never>] = []
+
+  init(wrapping wrapped: any StudentTrainingLogRepository) {
+    self.wrapped = wrapped
+  }
+
+  func holdNextFetch() {
+    holdArmed = true
+  }
+
+  func waitUntilHeld() async {
+    guard heldContinuation == nil else { return }
+    await withCheckedContinuation { heldObservers.append($0) }
+  }
+
+  func releaseHeldFetch() {
+    heldContinuation?.resume()
+    heldContinuation = nil
+  }
+
+  @discardableResult
+  func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    try await wrapped.recordSet(log)
+  }
+
+  func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>
+  ) async throws -> [StudentSetLog] {
+    fetchCallCount += 1
+    if holdArmed {
+      holdArmed = false
+      await withCheckedContinuation { continuation in
+        heldContinuation = continuation
+        for observer in heldObservers {
+          observer.resume()
+        }
+        heldObservers = []
+      }
+    }
+    return try await wrapped.fetchLogs(studentID: studentID, in: dateRange)
+  }
+
+  func fetchLogsForExercise(
+    studentID: UUID,
+    planExerciseID: UUID
+  ) async throws -> [StudentSetLog] {
+    try await wrapped.fetchLogsForExercise(studentID: studentID, planExerciseID: planExerciseID)
+  }
+}
+
 private func backfillSlot(family: LiftFamily?) -> BackfillSlot {
   BackfillSlot(
     planExerciseID: UUID(),
@@ -404,6 +546,28 @@ private func makeBackfill(
   benchBaseline: Decimal? = nil,
   deadliftBaseline: Decimal? = nil
 ) -> ImportedHistoryBackfill {
+  makeBackfill(
+    logs: InMemoryStudentTrainingLogRepository(seed: logs),
+    slots: slots,
+    planSlots: planSlots,
+    e1rm: e1rm,
+    reviews: reviews,
+    squatBaseline: squatBaseline,
+    benchBaseline: benchBaseline,
+    deadliftBaseline: deadliftBaseline
+  )
+}
+
+private func makeBackfill(
+  logs: any StudentTrainingLogRepository,
+  slots: [BackfillSlot],
+  planSlots: [BackfillSlot]? = nil,
+  e1rm: any E1RMRepository,
+  reviews: any ImportedHistoryReviewStoring = InMemoryImportedHistoryReviewStore(),
+  squatBaseline: Decimal? = nil,
+  benchBaseline: Decimal? = nil,
+  deadliftBaseline: Decimal? = nil
+) -> ImportedHistoryBackfill {
   let resolvedPlanSlots = planSlots ?? slots
   let profile = OnboardingProfile(
     userId: backfillStudentID,
@@ -437,7 +601,7 @@ private func makeBackfill(
   var calendar = Calendar(identifier: .gregorian)
   calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .current
   return ImportedHistoryBackfill(
-    logs: InMemoryStudentTrainingLogRepository(seed: logs),
+    logs: logs,
     onboarding: InMemoryOnboardingRepository(studentId: backfillStudentID, seed: profile),
     plans: BackfillPlanRepository(plan: plan),
     catalogReader: BackfillCatalogReader(exercises: slots.map(\.exercise)),

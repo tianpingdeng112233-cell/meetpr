@@ -244,7 +244,7 @@ public struct StudentRootView: View {
       waiting: importedHistoryReviewQueue
     )
     presentNextImportedHistoryReview()
-    if result.importedPointCount > 0 {
+    if result.newImportedPointCount > 0 {
       importedHistoryRefreshToken += 1
     }
   }

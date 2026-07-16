@@ -74,8 +74,10 @@ public final class GrowthCurveViewModel {
       rawPointsByID = pointsByID
       state = .loaded
       let rollingWindowStart = now().addingTimeInterval(-E1RMPolicy.rollingWindow)
+      // Expansion keys off rawEligible: low-confidence imported points stay out
+      // of smoothed but must remain visible as weakened scatter (spec 053 §6).
       if selectedWindow == .fourWeeks,
-        grouped.values.flatMap(\.smoothed).contains(where: { $0.date < rollingWindowStart })
+        grouped.values.flatMap(\.rawEligible).contains(where: { $0.date < rollingWindowStart })
       {
         selectedWindow = .all
       }

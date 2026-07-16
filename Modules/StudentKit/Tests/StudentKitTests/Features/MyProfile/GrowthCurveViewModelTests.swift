@@ -8,6 +8,7 @@ import Testing
 @MainActor
 private func makeViewModel(
   pointsDaysAgo: [Double],
+  lowConfidenceImportedDaysAgo: Set<Double> = [],
   now: Date = Date(timeIntervalSince1970: 1_768_262_400)
 ) async -> GrowthCurveViewModel {
   let studentID = StudentDemoSeed.studentID
@@ -18,7 +19,9 @@ private func makeViewModel(
     E1RMHistoryPoint(
       id: UUID(), studentId: studentID, exerciseId: squatID, setLogId: UUID(),
       computedAt: now.addingTimeInterval(-daysAgo * 86_400),
-      e1RMKg: 120 + Double(offset), sourceWeightKg: 100, sourceReps: 5, sourceRPE: 8
+      e1RMKg: 120 + Double(offset), sourceWeightKg: 100, sourceReps: 5, sourceRPE: 8,
+      confidence: lowConfidenceImportedDaysAgo.contains(daysAgo) ? .low : .normal,
+      origin: lowConfidenceImportedDaysAgo.contains(daysAgo) ? .imported : .logged
     )
   }
   let viewModel = GrowthCurveViewModel(
@@ -36,6 +39,16 @@ private func makeViewModel(
   #expect(viewModel.selectedFamily == .squat)
   #expect(viewModel.selectedWindow == .all)
   #expect(viewModel.visiblePoints.count == 5)
+}
+
+@MainActor
+@Test func defaultWindowExpandsForOlderLowConfidenceImportedScatter() async {
+  let viewModel = await makeViewModel(
+    pointsDaysAgo: [35, 5],
+    lowConfidenceImportedDaysAgo: [35]
+  )
+  #expect(viewModel.selectedWindow == .all)
+  #expect(viewModel.visibleRawEligiblePoints.contains { $0.confidence == .low })
 }
 
 @MainActor
