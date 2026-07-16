@@ -1,12 +1,16 @@
 import SwiftUI
 
 /// A loaded-barbell visualization: full-width steel bar + sleeve stopper +
-/// IPF-colored plate stack (heavy → light from the inside) + an optional 2.5kg
-/// locking collar (shown when `showCollar`) + sleeve end. Reproduces the user's
-/// plate-calculator reference.
+/// IPF-colored plate stack (heavy → light from the inside) + an optional
+/// competition collar (赛扣, shown when `showCollar`) + sleeve end.
+///
+/// Plate diameters (height) and thicknesses (width) are drawn to the real IPF
+/// side-view proportions the user specified (`杠铃片规格`): Φ450/450/400/325/228/
+/// 190/160 mm and 27/22/22/22/26/19/12 mm, so 15 kg and 10 kg no longer share a
+/// height. Plate colours + the cylinder shading gradients are **IPF domain
+/// constants**, intentionally not theme tokens.
 ///
 /// `plates` is one side's load, heaviest first (e.g. `[25, 25, 25, 5, 1.25]`).
-/// Plate colors are **IPF domain constants**, intentionally not theme tokens.
 @available(iOS 17.0, macOS 14.0, *)
 @MainActor
 public struct PlateLoadout: View {
@@ -18,45 +22,67 @@ public struct PlateLoadout: View {
     self.showCollar = showCollar
   }
 
-  private static let steel = [
-    Color(plateHex: 0x6B7280), Color(plateHex: 0xE5E7EB), Color(plateHex: 0x6B7280),
-  ]
-
+  // The bar is drawn as two visible segments (the plates cover the span
+  // between them): a thin shaft stub on the inside and a thicker sleeve end
+  // outboard of the collar. The whole assembly is centered so both ends inset
+  // from the edges — the sleeve "truncates" a little short on the right.
   public var body: some View {
-    ZStack {
-      RoundedRectangle(cornerRadius: 8)
-        .fill(LinearGradient(colors: Self.steel, startPoint: .top, endPoint: .bottom))
-        .frame(height: 16)
-        .frame(maxWidth: .infinity)
-        .shadow(color: .black.opacity(0.5), radius: 4, y: 4)
-
-      HStack(alignment: .center, spacing: 1) {
-        RoundedRectangle(cornerRadius: 4)
-          .fill(Color(plateHex: 0x9CA3AF))
-          .frame(width: 12, height: 48)
-          .overlay(alignment: .trailing) {
-            Rectangle().fill(Color(plateHex: 0x4B5563)).frame(width: 1)
-          }
-        ForEach(Array(plates.enumerated()), id: \.offset) { _, plate in PlateView(value: plate) }
-        if showCollar {
-          CollarView().padding(.leading, 4)
+    HStack(spacing: 0) {
+      barSegment(width: 64, height: 7, radius: 4, roundLeading: true, gradient: Self.shaft)
+      // Sleeve shoulder / stopper the plates seat against.
+      RoundedRectangle(cornerRadius: 3)
+        .fill(Self.shoulder)
+        .frame(width: 10, height: 36)
+        .overlay(alignment: .trailing) {
+          Rectangle().fill(Color(plateHex: 0x4B5563)).frame(width: 1)
         }
-        Spacer(minLength: 0)
+      HStack(spacing: 2) {
+        ForEach(Array(plates.enumerated()), id: \.offset) { _, plate in PlateView(value: plate) }
       }
-      .padding(.leading, 56)
-
-      HStack {
-        Spacer()
-        Capsule().fill(Color(plateHex: 0x6B7280)).frame(width: 12, height: 16)
+      .padding(.leading, 2)
+      if showCollar {
+        CollarView().padding(.leading, 2)
       }
-      .padding(.trailing, 4)
+      barSegment(width: 110, height: 15, radius: 7, roundLeading: false, gradient: Self.sleeve)
+        .padding(.leading, 2)
     }
+    .frame(maxWidth: .infinity)
     .frame(height: 208)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(Self.accessibilityText(plates))
   }
 
-  // MARK: - Plate math (biggest-first). The 2.5kg locking collar is counted by callers.
+  /// One end of the steel bar; rounded on the outward end only.
+  private func barSegment(
+    width: CGFloat, height: CGFloat, radius: CGFloat, roundLeading: Bool, gradient: LinearGradient
+  ) -> some View {
+    UnevenRoundedRectangle(
+      topLeadingRadius: roundLeading ? radius : 0,
+      bottomLeadingRadius: roundLeading ? radius : 0,
+      bottomTrailingRadius: roundLeading ? 0 : radius,
+      topTrailingRadius: roundLeading ? 0 : radius
+    )
+    .fill(gradient)
+    .frame(width: width, height: height)
+  }
+
+  private static let shaft = steelGradient([
+    (0x9DA0A5, 0), (0xE6E8EC, 0.35), (0xC4C8CE, 0.65), (0x83878E, 1),
+  ])
+  private static let shoulder = steelGradient([
+    (0x9DA0A5, 0), (0xEDEFF2, 0.30), (0xC9CDD3, 0.70), (0x888C93, 1),
+  ])
+  private static let sleeve = steelGradient([
+    (0x8C8F94, 0), (0xEAECEF, 0.35), (0xC2C6CC, 0.65), (0x7F838A, 1),
+  ])
+
+  private static func steelGradient(_ stops: [(UInt32, Double)]) -> LinearGradient {
+    LinearGradient(
+      stops: stops.map { .init(color: Color(plateHex: $0.0), location: $0.1) },
+      startPoint: .top, endPoint: .bottom)
+  }
+
+  // MARK: - Plate math (biggest-first). The 2.5kg competition collar is counted by callers.
 
   /// Greedily loads one side from standard IPF denominations, heaviest first.
   public static func load(perSide: Double) -> [Double] {
@@ -99,72 +125,154 @@ public struct PlateLoadout: View {
   }
 }
 
+// MARK: - Single plate (real Φ / thickness proportions + cylinder shading)
+
 @available(iOS 17.0, macOS 14.0, *)
 private struct PlateView: View {
   let value: Double
   var body: some View {
-    RoundedRectangle(cornerRadius: 4)
-      .fill(fill)
-      .frame(width: size.w, height: size.h)
-      .overlay {
-        RoundedRectangle(cornerRadius: 4)
-          .fill(
-            LinearGradient(
-              colors: [.clear, .black.opacity(0.3)], startPoint: .center, endPoint: .trailing))
-      }
-      .overlay { RoundedRectangle(cornerRadius: 4).stroke(.black.opacity(0.2), lineWidth: 1) }
+    // Radius 5 + no outline: the plate is just the gradient bar, exactly as the
+    // 杠铃片规格 cards draw it; the 2pt inter-plate gap gives the separation.
+    RoundedRectangle(cornerRadius: 5)
+      .fill(gradient)
+      .frame(width: spec.w, height: spec.h)
   }
-  private var size: (w: CGFloat, h: CGFloat) {
+
+  /// (width = thickness, height = diameter), in points, to the `杠铃片规格` scale.
+  private var spec: (w: CGFloat, h: CGFloat) {
     switch value {
-    case 25, 20: return (24, 192)
-    case 15, 10: return (16, 160)
-    case 5: return (12, 128)
-    case 2.5: return (8, 96)
-    default: return (6, 80)
+    case 25: return (10, 170)  // Φ450 · 27mm
+    case 20: return (8, 170)  // Φ450 · 22mm
+    case 15: return (8, 151)  // Φ400 · 22mm
+    case 10: return (8, 123)  // Φ325 · 22mm
+    case 5: return (8, 86)  // Φ228 · 26mm
+    case 2.5: return (7, 72)  // Φ190 · 19mm
+    default: return (5, 60)  // 1.25 — Φ160 · 12mm
     }
   }
-  private var fill: AnyShapeStyle {
+
+  /// Vertical 4-stop gradient: rim shadow → highlight → body → base shadow.
+  private var gradient: LinearGradient {
+    let stops: [(UInt32, Double)]
     switch value {
-    case 25: return AnyShapeStyle(Color(plateHex: 0xBA1A20))
-    case 20: return AnyShapeStyle(Color(plateHex: 0x006EC9))
-    case 15: return AnyShapeStyle(Color(plateHex: 0xF8BD2A))
-    case 10: return AnyShapeStyle(Color(plateHex: 0x16A34A))
-    case 5: return AnyShapeStyle(Color.white)
-    case 2.5:
-      return AnyShapeStyle(
-        LinearGradient(
-          colors: [
-            Color(plateHex: 0x111827), Color(plateHex: 0x1F2937), Color(plateHex: 0x111827),
-          ], startPoint: .leading, endPoint: .trailing))
-    default: return AnyShapeStyle(Color(plateHex: 0xD1D5DB))
+    case 25: stops = [(0x6E2A26, 0), (0xBE5049, 0.12), (0xA6423C, 0.55), (0x5E241F, 1)]
+    case 20: stops = [(0x182E52, 0), (0x3E6BB5, 0.12), (0x33599B, 0.55), (0x142644, 1)]
+    case 15: stops = [(0x77621A, 0), (0xD3B446, 0.12), (0xB99A31, 0.55), (0x63500F, 1)]
+    case 10: stops = [(0x173F24, 0), (0x3FA05C, 0.12), (0x2F8449, 0.55), (0x123420, 1)]
+    case 5: stops = [(0x7A7A7A, 0), (0xF5F5F5, 0.14), (0xDCDCDC, 0.55), (0x6E6E6E, 1)]
+    case 2.5: stops = [(0x1C1C1E, 0), (0x6B6B70, 0.14), (0x3A3A3E, 0.55), (0x141416, 1)]
+    default: stops = [(0x6F7379, 0), (0xF0F2F5, 0.14), (0xB9BDC4, 0.55), (0x565A60, 1)]
     }
+    return LinearGradient(
+      stops: stops.map { .init(color: Color(plateHex: $0.0), location: $0.1) },
+      startPoint: .top, endPoint: .bottom)
   }
 }
 
+// MARK: - Competition collar (赛扣): octagonal knurled body + nut + lever
+
 @available(iOS 17.0, macOS 14.0, *)
 private struct CollarView: View {
+  private static let body = [
+    Color(plateHex: 0x565A60), Color(plateHex: 0x9A9EA4), Color(plateHex: 0xF2F4F6),
+    Color(plateHex: 0xD9DCE0), Color(plateHex: 0xAEB2B8), Color(plateHex: 0x84888E),
+    Color(plateHex: 0x4A4E54),
+  ]
+
   var body: some View {
-    RoundedRectangle(cornerRadius: 4)
+    HStack(spacing: 1) {
+      octagon
+      nut
+    }
+    .overlay(alignment: .bottomLeading) { lever }
+  }
+
+  private var octagon: some View {
+    OctagonShape()
+      .fill(
+        LinearGradient(
+          stops: [
+            .init(color: Self.body[0], location: 0), .init(color: Self.body[1], location: 0.16),
+            .init(color: Self.body[2], location: 0.34), .init(color: Self.body[3], location: 0.50),
+            .init(color: Self.body[4], location: 0.66), .init(color: Self.body[5], location: 0.84),
+            .init(color: Self.body[6], location: 1),
+          ], startPoint: .top, endPoint: .bottom)
+      )
+      .frame(width: 14, height: 44)
+      .overlay {
+        // Knurl rings.
+        VStack(spacing: 0) {
+          knurlLine(0.16, .black.opacity(0.35))
+          knurlLine(0.18, .white.opacity(0.6))
+          Spacer()
+          knurlLine(0.32, .black.opacity(0.3))
+          knurlLine(0.18, .black.opacity(0.4))
+        }
+        .frame(width: 14, height: 44)
+      }
+  }
+
+  private func knurlLine(_ topFraction: CGFloat, _ color: Color) -> some View {
+    Rectangle().fill(color).frame(height: 1).padding(.top, 44 * topFraction)
+  }
+
+  private var nut: some View {
+    RoundedRectangle(cornerRadius: 2)
       .fill(
         LinearGradient(
           colors: [
-            Color(plateHex: 0x9CA3AF), Color(plateHex: 0xE5E7EB), Color(plateHex: 0x6B7280),
+            Color(plateHex: 0x7F838A), Color(plateHex: 0xC9CDD3), Color(plateHex: 0x8F9399),
+            Color(plateHex: 0x5E6268),
           ], startPoint: .top, endPoint: .bottom)
       )
-      .frame(width: 16, height: 48)
+      .frame(width: 15, height: 34)
       .overlay {
-        RoundedRectangle(cornerRadius: 4)
-          .fill(
-            LinearGradient(
-              colors: [.clear, .black.opacity(0.3)], startPoint: .center, endPoint: .trailing))
-      }
-      .overlay { RoundedRectangle(cornerRadius: 4).stroke(.black.opacity(0.4), lineWidth: 1) }
-      .overlay(alignment: .bottom) {
-        ZStack(alignment: .bottom) {
-          Capsule().fill(Color(plateHex: 0x9CA3AF)).frame(width: 4, height: 24).offset(y: 16)
-          Circle().fill(Color(plateHex: 0x4B5563)).frame(width: 8, height: 8).offset(y: 20)
+        HStack(spacing: 1.5) {
+          ForEach(0..<4, id: \.self) { _ in
+            Rectangle().fill(.white.opacity(0.25)).frame(width: 0.5)
+            Rectangle().fill(.black.opacity(0.25)).frame(width: 0.5)
+          }
         }
       }
+  }
+
+  /// The clamp lever, hinged near the nut and swung down-left.
+  private var lever: some View {
+    RoundedRectangle(cornerRadius: 1.5)
+      .fill(
+        LinearGradient(
+          colors: [Color(plateHex: 0xD9DCE0), Color(plateHex: 0x84888F)],
+          startPoint: .leading, endPoint: .trailing)
+      )
+      .frame(width: 3, height: 30)
+      .overlay(alignment: .bottom) {
+        RoundedRectangle(cornerRadius: 1)
+          .fill(
+            LinearGradient(
+              colors: [Color(plateHex: 0xB9BDC4), Color(plateHex: 0x6F7379)],
+              startPoint: .leading, endPoint: .trailing)
+          )
+          .frame(width: 5, height: 7)
+      }
+      .rotationEffect(.degrees(-32), anchor: .top)
+      .offset(x: 6, y: 22)
+  }
+}
+
+private struct OctagonShape: Shape {
+  func path(in rect: CGRect) -> Path {
+    let inset = CGSize(width: rect.width * 0.2, height: rect.height * 0.16)
+    var path = Path()
+    path.move(to: CGPoint(x: inset.width, y: 0))
+    path.addLine(to: CGPoint(x: rect.width - inset.width, y: 0))
+    path.addLine(to: CGPoint(x: rect.width, y: inset.height))
+    path.addLine(to: CGPoint(x: rect.width, y: rect.height - inset.height))
+    path.addLine(to: CGPoint(x: rect.width - inset.width, y: rect.height))
+    path.addLine(to: CGPoint(x: inset.width, y: rect.height))
+    path.addLine(to: CGPoint(x: 0, y: rect.height - inset.height))
+    path.addLine(to: CGPoint(x: 0, y: inset.height))
+    path.closeSubpath()
+    return path
   }
 }
 
@@ -181,8 +289,8 @@ extension Color {
 
 #Preview("PlateLoadout") {
   VStack(spacing: 24) {
-    PlateLoadout(plates: PlateLoadout.load(perSide: 78.75))
-    Text(PlateLoadout.breakdownText(PlateLoadout.load(perSide: 78.75)))
+    PlateLoadout(plates: PlateLoadout.load(perSide: 72.5))
+    Text(PlateLoadout.breakdownText(PlateLoadout.load(perSide: 72.5)))
       .font(.system(size: 14, weight: .semibold, design: .monospaced))
       .foregroundStyle(Color.MeetPR.fgPrimary)
   }
