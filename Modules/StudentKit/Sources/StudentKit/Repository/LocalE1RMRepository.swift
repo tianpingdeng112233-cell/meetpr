@@ -36,6 +36,42 @@ public actor LocalE1RMRepository: E1RMRepository {
     try save(points: all)
   }
 
+  @discardableResult
+  public func upsertPoint(_ point: E1RMHistoryPoint) async throws -> E1RMHistoryPoint {
+    var all = try loadPoints()
+    if let index = all.firstIndex(where: {
+      $0.studentId == point.studentId && $0.setLogId == point.setLogId
+    }) {
+      let replacement = point.replacing(id: all[index].id)
+      all[index] = replacement
+      try save(points: all)
+      return replacement
+    }
+
+    all.append(point)
+    try save(points: all)
+    return point
+  }
+
+  public func updatePointConfidence(
+    studentId: UUID,
+    pointIDs: Set<UUID>,
+    confidence: E1RMConfidence
+  ) async throws {
+    guard !pointIDs.isEmpty else { return }
+    var all = try loadPoints()
+    var didChange = false
+    for index in all.indices
+    where all[index].studentId == studentId && pointIDs.contains(all[index].id) {
+      guard all[index].origin == .imported, all[index].confidence != confidence else { continue }
+      all[index] = all[index].replacing(confidence: confidence)
+      didChange = true
+    }
+    if didChange {
+      try save(points: all)
+    }
+  }
+
   public func replaceHistory(studentId: UUID, with replacement: [E1RMHistoryPoint]) async throws {
     let retainedPoints = try loadPoints().filter { $0.studentId != studentId }
     let retainedPRs = try loadPRs().filter { $0.studentId != studentId }
@@ -63,12 +99,14 @@ public actor LocalE1RMRepository: E1RMRepository {
   public func maxBefore(
     studentId: UUID,
     exerciseId: UUID,
-    before: Date
+    before: Date,
+    excludingSetLogId: UUID?
   ) async throws -> Double? {
     try loadPoints()
       .filter {
         $0.studentId == studentId && $0.exerciseId == exerciseId
           && $0.computedAt < before && $0.confidence == .normal
+          && !($0.setLogId == excludingSetLogId && $0.origin == .imported)
       }
       .map(\.e1RMKg).max()
   }

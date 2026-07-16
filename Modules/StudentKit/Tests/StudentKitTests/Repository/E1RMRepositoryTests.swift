@@ -6,24 +6,28 @@ import Testing
 @testable import StudentKit
 
 private func point(
+  id: UUID = UUID(),
   studentId: UUID,
   exerciseId: UUID,
+  setLogId: UUID = UUID(),
   daysAgo: Double,
   e1RM: Double,
   anchor: Date = Date(timeIntervalSince1970: 1_768_262_400),
-  confidence: E1RMConfidence = .normal
+  confidence: E1RMConfidence = .normal,
+  origin: E1RMPointOrigin = .logged
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
-    id: UUID(),
+    id: id,
     studentId: studentId,
     exerciseId: exerciseId,
-    setLogId: UUID(),
+    setLogId: setLogId,
     computedAt: anchor.addingTimeInterval(-daysAgo * 86_400),
     e1RMKg: e1RM,
     sourceWeightKg: 100,
     sourceReps: 5,
     sourceRPE: 8,
-    confidence: confidence
+    confidence: confidence,
+    origin: origin
   )
 }
 
@@ -176,5 +180,148 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
   let repo = LocalE1RMRepository(directory: tempDir)
   await #expect(throws: (any Error).self) {
     _ = try await repo.fetchHistory(studentId: UUID(), exerciseId: UUID())
+  }
+}
+
+@Test func upsertInsertsThenReplacesAcrossExerciseBucketsWithStablePointID() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let squat = UUID()
+    let bench = UUID()
+    let setLogID = UUID()
+    let imported = point(
+      studentId: student,
+      exerciseId: squat,
+      setLogId: setLogID,
+      daysAgo: 2,
+      e1RM: 165,
+      confidence: .low,
+      origin: .imported
+    )
+
+    let inserted = try await repo.upsertPoint(imported)
+    #expect(inserted == imported, "\(label): a missing identity inserts unchanged")
+
+    let logged = E1RMHistoryPoint(
+      id: UUID(),
+      studentId: student,
+      exerciseId: bench,
+      setLogId: setLogID,
+      computedAt: imported.computedAt.addingTimeInterval(86_400),
+      e1RMKg: 172,
+      sourceWeightKg: 145,
+      sourceReps: 5,
+      sourceRPE: 9,
+      confidence: .normal,
+      origin: .logged
+    )
+    let replaced = try await repo.upsertPoint(logged)
+    let oldBucket = try await repo.fetchHistory(studentId: student, exerciseId: squat)
+    let newBucket = try await repo.fetchHistory(studentId: student, exerciseId: bench)
+
+    #expect(oldBucket.isEmpty, "\(label): replacement moves out of the old exercise bucket")
+    #expect(newBucket.count == 1, "\(label): one set-log identity produces one point")
+    #expect(replaced.id == inserted.id, "\(label): replacement preserves point identity")
+    #expect(newBucket.first == replaced, "\(label): replacement persists the new payload")
+    #expect(replaced.origin == .logged, "\(label): a real log replaces imported origin")
+    #expect(replaced.confidence == .normal, "\(label): replacement takes new confidence")
+  }
+}
+
+@Test func updatePointConfidenceChangesOnlyImportedPointsForStudent() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let otherStudent = UUID()
+    let squat = UUID()
+    let imported = point(
+      studentId: student,
+      exerciseId: squat,
+      daysAgo: 3,
+      e1RM: 160,
+      confidence: .low,
+      origin: .imported
+    )
+    let logged = point(
+      studentId: student,
+      exerciseId: squat,
+      daysAgo: 2,
+      e1RM: 165,
+      confidence: .low
+    )
+    let otherImported = point(
+      studentId: otherStudent,
+      exerciseId: squat,
+      daysAgo: 1,
+      e1RM: 170,
+      confidence: .low,
+      origin: .imported
+    )
+    try await repo.recordPoint(imported)
+    try await repo.recordPoint(logged)
+    try await repo.recordPoint(otherImported)
+
+    try await repo.updatePointConfidence(
+      studentId: student,
+      pointIDs: [imported.id, logged.id, otherImported.id],
+      confidence: .normal
+    )
+
+    let history = try await repo.fetchHistory(studentId: student, exerciseId: squat)
+    let otherHistory = try await repo.fetchHistory(studentId: otherStudent, exerciseId: squat)
+    #expect(history.first(where: { $0.id == imported.id })?.confidence == .normal, "\(label)")
+    #expect(history.first(where: { $0.id == logged.id })?.confidence == .low, "\(label)")
+    #expect(otherHistory.first?.confidence == .low, "\(label)")
+  }
+}
+
+@Test func maxBeforeExclusionDropsOnlyImportedPointWithMatchingSetLog() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let squat = UUID()
+    let setLogID = UUID()
+    let anchor = Date(timeIntervalSince1970: 1_768_262_400)
+    try await repo.recordPoint(
+      point(
+        studentId: student,
+        exerciseId: squat,
+        setLogId: setLogID,
+        daysAgo: 3,
+        e1RM: 200,
+        anchor: anchor,
+        origin: .imported
+      ))
+    try await repo.recordPoint(
+      point(
+        studentId: student,
+        exerciseId: squat,
+        setLogId: setLogID,
+        daysAgo: 2,
+        e1RM: 195,
+        anchor: anchor
+      ))
+    try await repo.recordPoint(
+      point(studentId: student, exerciseId: squat, daysAgo: 1, e1RM: 190, anchor: anchor))
+
+    let excludingImported = try await repo.maxBefore(
+      studentId: student,
+      exerciseId: squat,
+      before: anchor,
+      excludingSetLogId: setLogID
+    )
+    let explicitNil = try await repo.maxBefore(
+      studentId: student,
+      exerciseId: squat,
+      before: anchor,
+      excludingSetLogId: nil
+    )
+    let convenience = try await repo.maxBefore(
+      studentId: student,
+      exerciseId: squat,
+      before: anchor
+    )
+
+    #expect(excludingImported == 195, "\(label): logged point with the same identity still gates")
+    #expect(explicitNil == 200, "\(label): nil excludes nothing")
+    #expect(convenience == explicitNil, "\(label): convenience overload forwards nil")
   }
 }

@@ -29,6 +29,42 @@ public actor InMemoryE1RMRepository: E1RMRepository {
       .append(point)
   }
 
+  @discardableResult
+  public func upsertPoint(_ point: E1RMHistoryPoint) async throws -> E1RMHistoryPoint {
+    let destinationKey = HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId)
+    for key in Array(points.keys) where key.studentId == point.studentId {
+      guard let index = points[key]?.firstIndex(where: { $0.setLogId == point.setLogId }),
+        let existing = points[key]?[index]
+      else { continue }
+
+      let replacement = point.replacing(id: existing.id)
+      if key == destinationKey {
+        points[key]?[index] = replacement
+      } else {
+        points[key]?.remove(at: index)
+        points[destinationKey, default: []].append(replacement)
+      }
+      return replacement
+    }
+
+    points[destinationKey, default: []].append(point)
+    return point
+  }
+
+  public func updatePointConfidence(
+    studentId: UUID,
+    pointIDs: Set<UUID>,
+    confidence: E1RMConfidence
+  ) async throws {
+    guard !pointIDs.isEmpty else { return }
+    for key in Array(points.keys) where key.studentId == studentId {
+      points[key] = points[key]?.map { point in
+        guard pointIDs.contains(point.id), point.origin == .imported else { return point }
+        return point.replacing(confidence: confidence)
+      }
+    }
+  }
+
   public func replaceHistory(studentId: UUID, with replacement: [E1RMHistoryPoint]) async throws {
     points = points.filter { $0.key.studentId != studentId }
     for point in replacement where point.studentId == studentId {
@@ -57,12 +93,16 @@ public actor InMemoryE1RMRepository: E1RMRepository {
   public func maxBefore(
     studentId: UUID,
     exerciseId: UUID,
-    before: Date
+    before: Date,
+    excludingSetLogId: UUID?
   ) async throws -> Double? {
     let history = points[HistoryKey(studentId: studentId, exerciseId: exerciseId)] ?? []
     return
       history
-      .filter { $0.computedAt < before && $0.confidence == .normal }
+      .filter {
+        $0.computedAt < before && $0.confidence == .normal
+          && !($0.setLogId == excludingSetLogId && $0.origin == .imported)
+      }
       .map(\.e1RMKg)
       .max()
   }

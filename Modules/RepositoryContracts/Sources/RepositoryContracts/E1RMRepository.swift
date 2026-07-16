@@ -6,6 +6,16 @@ import Foundation
 /// implementation arrives with the cross-device-history spec.
 public protocol E1RMRepository: Sendable {
   func recordPoint(_ point: E1RMHistoryPoint) async throws
+  /// Replaces the point for `(studentId, setLogId)` when one exists, preserving
+  /// its point ID; otherwise inserts it.
+  @discardableResult
+  func upsertPoint(_ point: E1RMHistoryPoint) async throws -> E1RMHistoryPoint
+  /// Rewrites confidence only for imported points in the specified batch.
+  func updatePointConfidence(
+    studentId: UUID,
+    pointIDs: Set<UUID>,
+    confidence: E1RMConfidence
+  ) async throws
   /// Replaces one student's local history and clears their stored PR events.
   /// Other students sharing the device are retained.
   func replaceHistory(studentId: UUID, with points: [E1RMHistoryPoint]) async throws
@@ -13,10 +23,32 @@ public protocol E1RMRepository: Sendable {
   func fetchHistory(studentId: UUID, exerciseIds: [UUID]) async throws -> [UUID:
     [E1RMHistoryPoint]]
   /// Maximum e1RM over prior `.normal` points strictly before `before`.
-  /// Quarantined points must never raise the PR-detection baseline.
-  func maxBefore(studentId: UUID, exerciseId: UUID, before: Date) async throws -> Double?
+  /// Quarantined points must never raise the PR-detection baseline. When an
+  /// imported point is being replaced by its real log, it can be excluded by
+  /// set-log identity; a logged point with that identity still participates.
+  func maxBefore(
+    studentId: UUID,
+    exerciseId: UUID,
+    before: Date,
+    excludingSetLogId: UUID?
+  ) async throws -> Double?
 
   func recordPR(_ event: PRBreakthroughEvent) async throws
   func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent]
   func acknowledgePR(eventId: UUID) async throws
+}
+
+extension E1RMRepository {
+  public func maxBefore(
+    studentId: UUID,
+    exerciseId: UUID,
+    before: Date
+  ) async throws -> Double? {
+    try await maxBefore(
+      studentId: studentId,
+      exerciseId: exerciseId,
+      before: before,
+      excludingSetLogId: nil
+    )
+  }
 }
