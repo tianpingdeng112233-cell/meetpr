@@ -153,7 +153,7 @@ public struct TrainingHistoryView: View {
     VStack(alignment: .leading, spacing: 16) {
       // 首屏黑话有解释 (P2-1): E1RM 是全 app 最高频的专业词,给一句白话锚点,
       // 别让新手对着首字母缩写猜。放段首出现一次,不逐卡重复。
-      Text("E1RM = 用你完成的组数估算的单次最大重量,越高越强")
+      Text("E1RM = 用你完成的组数估算的单次最大重量")
         .font(.system(size: 12))
         .foregroundStyle(Color.MeetPR.fgTertiary)
         .frame(maxWidth: .infinity, alignment: .leading)

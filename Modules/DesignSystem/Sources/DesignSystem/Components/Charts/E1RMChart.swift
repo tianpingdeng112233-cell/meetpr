@@ -118,9 +118,17 @@ public struct E1RMChart: View {
       .accessibilityLabel("e1RM 成长曲线，共 \(smoothed.count) 个主线数据点")
 
       if containsImportedPoint {
-        Text("浅色 = 导入的历史计划")
-          .font(Font.MeetPR.monoLabel)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+        HStack(spacing: 6) {
+          ImportedLegendDash()
+            .stroke(
+              Color.MeetPR.fgSecondary,
+              style: StrokeStyle(lineWidth: 1.5, dash: [5, 3])
+            )
+            .frame(width: 22, height: 1.5)
+          Text("虚线 = 导入的历史记录")
+            .font(Font.MeetPR.monoLabel)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
       }
     }
   }
@@ -208,4 +216,15 @@ private struct LineSegment: Identifiable {
   let origin: E1RMChartPointOrigin
 
   var points: [E1RMChartPoint] { [start, end] }
+}
+
+/// Tiny dashed-line swatch so the imported-history legend shows the actual
+/// stroke it refers to instead of describing a color in prose.
+private struct ImportedLegendDash: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+    path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+    return path
+  }
 }
