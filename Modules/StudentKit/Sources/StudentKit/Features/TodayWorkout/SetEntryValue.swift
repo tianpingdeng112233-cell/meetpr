@@ -16,7 +16,25 @@ enum SetEntryValue {
   }
 
   static func rpe(from text: String) -> Decimal {
-    min(10, max(5, decimal(text)))
+    snapRPE(decimal(text))
+  }
+
+  /// Clamp to 5…10 and snap to the nearest 0.5 — RPE is half-point-grained, so
+  /// the value the scale shows and the value we save stay on a tick even when a
+  /// prescribed/legacy value (e.g. 8.2) isn't already aligned.
+  static func snapRPE(_ value: Decimal) -> Decimal {
+    var source = value * 2
+    var rounded = Decimal()
+    NSDecimalRound(&rounded, &source, 0, .plain)
+    return min(10, max(5, rounded / 2))
+  }
+
+  /// Canonical text for an RPE `Double` coming off the tick scale: snap to the
+  /// half-step lattice with exact integer math (no `String(format:)` round-trip)
+  /// so 8.5 stays 8.5 and out-of-range values clamp.
+  static func rpeText(_ value: Double) -> String {
+    let halfSteps = Int((value * 2).rounded())
+    return text(min(10, max(5, Decimal(halfSteps) / 2)))
   }
 
   static func text(_ value: Decimal) -> String {
