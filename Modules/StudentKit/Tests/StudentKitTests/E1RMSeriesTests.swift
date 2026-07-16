@@ -13,19 +13,23 @@ private func seriesPoint(
   e1RM: Double,
   reps: Int = 5,
   rpe: Double? = 8,
-  confidence: E1RMConfidence = .normal
+  confidence: E1RMConfidence = .normal,
+  origin: E1RMPointOrigin = .logged,
+  sourceWeightKg: Double? = nil,
+  setLogID: UUID = UUID()
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
     id: UUID(),
     studentId: seriesStudentID,
     exerciseId: seriesExerciseID,
-    setLogId: UUID(),
+    setLogId: setLogID,
     computedAt: seriesNow.addingTimeInterval(TimeInterval(-daysAgo) * 86_400),
     e1RMKg: e1RM,
-    sourceWeightKg: e1RM * 0.85,
+    sourceWeightKg: sourceWeightKg ?? e1RM * 0.85,
     sourceReps: reps,
     sourceRPE: rpe,
-    confidence: confidence
+    confidence: confidence,
+    origin: origin
   )
 }
 
@@ -121,4 +125,101 @@ private func seriesPoint(
 
   #expect(history.count == 1)
   #expect(history.first?.e1RMKg == 180)
+}
+
+@Test func consecutiveSamplesKeepUniqueIdentityWhileOneWinnerCarries() {
+  let winner = seriesPoint(daysAgo: 5, e1RM: 165, origin: .imported)
+  let next = seriesPoint(daysAgo: 3, e1RM: 160)
+  let latest = seriesPoint(daysAgo: 1, e1RM: 158)
+  let series = E1RMSeries.build(points: [winner, next, latest], family: .squat)
+
+  #expect(Set(series.smoothed.map(\.sampleID)).count == 3)
+  #expect(series.smoothed.map(\.winnerPointID) == [winner.id, winner.id, winner.id])
+}
+
+@Test func mixedWindowUsesTheWholeImportedWinnerPoint() {
+  let winnerSetLogID = UUID()
+  let imported = seriesPoint(
+    daysAgo: 5,
+    e1RM: 165,
+    reps: 3,
+    rpe: 9,
+    origin: .imported,
+    sourceWeightKg: 150,
+    setLogID: winnerSetLogID
+  )
+  let logged = seriesPoint(daysAgo: 1, e1RM: 160, sourceWeightKg: 140)
+  let series = E1RMSeries.build(points: [imported, logged], family: .squat)
+  let latest = series.smoothed.last
+
+  #expect(latest?.sampleID == logged.id)
+  #expect(latest?.winnerPointID == imported.id)
+  #expect(latest?.winnerOrigin == .imported)
+  #expect(latest?.winnerConfidence == .normal)
+  #expect(latest?.valueKg == 165)
+
+  let history = E1RMSeries.smoothedHistory(points: [imported, logged], family: .squat)
+  let projected = history.last
+  #expect(projected?.id == logged.id)
+  #expect(projected?.computedAt == logged.computedAt)
+  #expect(projected?.e1RMKg == imported.e1RMKg)
+  #expect(projected?.origin == imported.origin)
+  #expect(projected?.confidence == imported.confidence)
+  #expect(projected?.sourceWeightKg == imported.sourceWeightKg)
+  #expect(projected?.sourceReps == imported.sourceReps)
+  #expect(projected?.sourceRPE == imported.sourceRPE)
+  #expect(projected?.setLogId == winnerSetLogID)
+}
+
+@Test func lowConfidencePointStaysRawAndCannotBecomeBest() {
+  let trusted = seriesPoint(daysAgo: 5, e1RM: 165, origin: .imported)
+  let low = seriesPoint(
+    daysAgo: 1,
+    e1RM: 190,
+    confidence: .low,
+    origin: .imported
+  )
+  let series = E1RMSeries.build(points: [trusted, low], family: .squat)
+
+  #expect(series.rawEligible.map(\.sampleID).contains(low.id))
+  #expect(series.smoothed.map(\.sampleID).contains(low.id) == false)
+  #expect(series.best?.winnerPointID == trusted.id)
+}
+
+@Test func smoothedHistoryUsesUniqueSampleIDsAndWinnerPayload() {
+  let winnerSetLogID = UUID()
+  let winner = seriesPoint(
+    daysAgo: 5,
+    e1RM: 165,
+    reps: 2,
+    rpe: 9.5,
+    origin: .imported,
+    sourceWeightKg: 155,
+    setLogID: winnerSetLogID
+  )
+  let next = seriesPoint(daysAgo: 3, e1RM: 160)
+  let latest = seriesPoint(daysAgo: 1, e1RM: 158)
+  let history = E1RMSeries.smoothedHistory(
+    points: [winner, next, latest],
+    family: .squat
+  )
+
+  #expect(Set(history.map(\.id)).count == 3)
+  #expect(history.map(\.id) == [winner.id, next.id, latest.id])
+  #expect(history.allSatisfy { $0.e1RMKg == winner.e1RMKg })
+  #expect(history.allSatisfy { $0.origin == winner.origin })
+  #expect(history.allSatisfy { $0.confidence == winner.confidence })
+  #expect(history.allSatisfy { $0.sourceWeightKg == winner.sourceWeightKg })
+  #expect(history.allSatisfy { $0.sourceReps == winner.sourceReps })
+  #expect(history.allSatisfy { $0.sourceRPE == winner.sourceRPE })
+  #expect(history.allSatisfy { $0.setLogId == winnerSetLogID })
+}
+
+@Test func equalRollingMaximumKeepsTheEarlierPoint() {
+  let earlier = seriesPoint(daysAgo: 5, e1RM: 165, origin: .imported)
+  let later = seriesPoint(daysAgo: 1, e1RM: 165)
+  let series = E1RMSeries.build(points: [earlier, later], family: .squat)
+
+  #expect(series.smoothed.last?.winnerPointID == earlier.id)
+  #expect(series.smoothed.last?.winnerOrigin == .imported)
 }

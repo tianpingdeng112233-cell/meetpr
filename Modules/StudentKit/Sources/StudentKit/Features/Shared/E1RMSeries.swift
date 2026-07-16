@@ -6,9 +6,15 @@ import Foundation
 /// and Last use that same history. Quarantined points remain raw scatter only.
 struct E1RMSeries: Equatable, Sendable {
   struct Sample: Equatable, Sendable {
-    let pointID: UUID
+    /// Timeline identity for this sample. It remains unique while one raw
+    /// point wins several consecutive rolling windows.
+    let sampleID: UUID
     let date: Date
     let valueKg: Double
+    /// Provenance of the raw point that won this sample's rolling window.
+    let winnerPointID: UUID
+    let winnerOrigin: E1RMPointOrigin
+    let winnerConfidence: E1RMConfidence
   }
 
   /// Rolling-max value at every eligible point's date, chronological.
@@ -32,18 +38,19 @@ struct E1RMSeries: Equatable, Sendable {
   ) -> [E1RMHistoryPoint] {
     let byID = Dictionary(uniqueKeysWithValues: points.map { ($0.id, $0) })
     return build(points: points, family: family).smoothed.compactMap { sample in
-      guard let original = byID[sample.pointID] else { return nil }
+      guard let winner = byID[sample.winnerPointID] else { return nil }
       return E1RMHistoryPoint(
-        id: original.id,
-        studentId: original.studentId,
-        exerciseId: original.exerciseId,
-        setLogId: original.setLogId,
+        id: sample.sampleID,
+        studentId: winner.studentId,
+        exerciseId: winner.exerciseId,
+        setLogId: winner.setLogId,
         computedAt: sample.date,
         e1RMKg: sample.valueKg,
-        sourceWeightKg: original.sourceWeightKg,
-        sourceReps: original.sourceReps,
-        sourceRPE: original.sourceRPE,
-        confidence: original.confidence
+        sourceWeightKg: winner.sourceWeightKg,
+        sourceReps: winner.sourceReps,
+        sourceRPE: winner.sourceRPE,
+        confidence: sample.winnerConfidence,
+        origin: sample.winnerOrigin
       )
     }
   }
@@ -69,28 +76,55 @@ struct E1RMSeries: Equatable, Sendable {
 
   static func build(points: [E1RMHistoryPoint], family: LiftFamily?) -> E1RMSeries {
     let eligiblePoints = eligibleRaw(points: points, family: family)
-    let rawEligible = eligiblePoints.map {
-      Sample(pointID: $0.id, date: $0.computedAt, valueKg: $0.e1RMKg)
-    }
-    let trusted = eligiblePoints.filter { $0.confidence == .normal }.map {
-      Sample(pointID: $0.id, date: $0.computedAt, valueKg: $0.e1RMKg)
-    }
+    let rawEligible = eligiblePoints.map(Sample.init(point:))
+    let trusted = eligiblePoints.filter { $0.confidence == .normal }
 
-    let smoothed = trusted.map { sample in
-      let windowStart = sample.date.addingTimeInterval(-rollingWindow)
-      let windowMax =
+    let smoothed = trusted.map { samplePoint in
+      let windowStart = samplePoint.computedAt.addingTimeInterval(-rollingWindow)
+      let winner =
         trusted
-        .filter { $0.date > windowStart && $0.date <= sample.date }
-        .map(\.valueKg)
-        .max() ?? sample.valueKg
-      return Sample(pointID: sample.pointID, date: sample.date, valueKg: windowMax)
+        .filter {
+          $0.computedAt > windowStart && $0.computedAt <= samplePoint.computedAt
+        }
+        .reduce(samplePoint) { winner, candidate in
+          if candidate.e1RMKg > winner.e1RMKg {
+            return candidate
+          }
+          if candidate.e1RMKg == winner.e1RMKg,
+            candidate.computedAt < winner.computedAt
+          {
+            return candidate
+          }
+          return winner
+        }
+      return Sample(
+        sampleID: samplePoint.id,
+        date: samplePoint.computedAt,
+        valueKg: winner.e1RMKg,
+        winnerPointID: winner.id,
+        winnerOrigin: winner.origin,
+        winnerConfidence: winner.confidence
+      )
     }
 
     return E1RMSeries(
       smoothed: smoothed,
       rawEligible: rawEligible,
-      best: trusted.max { $0.valueKg < $1.valueKg },
-      last: trusted.last
+      best: trusted.max { $0.e1RMKg < $1.e1RMKg }.map(Sample.init(point:)),
+      last: trusted.last.map(Sample.init(point:))
+    )
+  }
+}
+
+extension E1RMSeries.Sample {
+  fileprivate init(point: E1RMHistoryPoint) {
+    self.init(
+      sampleID: point.id,
+      date: point.computedAt,
+      valueKg: point.e1RMKg,
+      winnerPointID: point.id,
+      winnerOrigin: point.origin,
+      winnerConfidence: point.confidence
     )
   }
 }
