@@ -88,10 +88,10 @@ private struct E1RMMiniTrendRowView: View {
   }
 
   private var valueText: String {
-    guard let latest = row.latestPoint else {
+    guard let point = row.displayPoint(now: Date()) else {
       return "暂无"
     }
-    return "\(StudentFormatting.kilograms(latest.e1RMKg))kg"
+    return "\(StudentFormatting.kilograms(point.e1RMKg))kg"
   }
 }
 

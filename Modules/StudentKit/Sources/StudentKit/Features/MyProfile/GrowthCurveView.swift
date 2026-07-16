@@ -101,7 +101,7 @@ struct GrowthCurvePanelView: View {
       ContentUnavailableView(
         "加载失败", systemImage: "exclamationmark.triangle", description: Text(message))
     case .loaded:
-      if viewModel.visiblePoints.isEmpty {
+      if viewModel.visibleSmoothedSamples.isEmpty && viewModel.visibleRawEligiblePoints.isEmpty {
         ContentUnavailableView(
           "还没有数据点",
           systemImage: "chart.xyaxis.line",
@@ -110,11 +110,27 @@ struct GrowthCurvePanelView: View {
         .frame(minHeight: 240)
       } else {
         E1RMChart(
-          points: viewModel.visiblePoints.map {
-            E1RMChartPoint(id: $0.id, date: $0.computedAt, e1RMKg: $0.e1RMKg)
+          smoothed: viewModel.visibleSmoothedSamples.map { sample in
+            E1RMChartPoint(
+              id: sample.sampleID,
+              date: sample.date,
+              e1RMKg: sample.valueKg,
+              origin: chartOrigin(sample.winnerOrigin),
+              confidence: chartConfidence(sample.winnerConfidence),
+              winnerPointID: sample.winnerPointID
+            )
+          },
+          rawEligible: viewModel.visibleRawEligiblePoints.map { point in
+            E1RMChartPoint(
+              id: point.id,
+              date: point.computedAt,
+              e1RMKg: point.e1RMKg,
+              origin: chartOrigin(point.origin),
+              confidence: chartConfidence(point.confidence)
+            )
           },
           onSelect: { chartPoint in
-            selectedPoint = viewModel.visiblePoints.first { $0.id == chartPoint.id }
+            selectedPoint = viewModel.winnerPoint(forSampleID: chartPoint.id)
           }
         )
         .frame(height: 280)
@@ -158,6 +174,20 @@ struct GrowthCurvePanelView: View {
       Text(value)
         .font(Font.MeetPR.bodyEmphasis)
         .foregroundStyle(Color.MeetPR.fgPrimary)
+    }
+  }
+
+  private func chartOrigin(_ origin: E1RMPointOrigin) -> E1RMChartPointOrigin {
+    switch origin {
+    case .logged: .logged
+    case .imported: .imported
+    }
+  }
+
+  private func chartConfidence(_ confidence: E1RMConfidence) -> E1RMChartPointConfidence {
+    switch confidence {
+    case .normal: .normal
+    case .low: .low
     }
   }
 }

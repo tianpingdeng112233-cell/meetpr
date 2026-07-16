@@ -15,11 +15,23 @@ struct DashboardE1RMTrendPresentation: Equatable, Sendable {
 struct DashboardE1RMTrendRow: Equatable, Identifiable, Sendable {
   let family: LiftFamily
   let points: [E1RMHistoryPoint]
+  let smoothedSamples: [E1RMSeries.Sample]
+  let rawEligiblePoints: [E1RMHistoryPoint]
+  let bestPoint: E1RMHistoryPoint?
 
   var id: LiftFamily { family }
 
   var latestPoint: E1RMHistoryPoint? {
     points.max { $0.computedAt < $1.computedAt }
+  }
+
+  func displaysHistoricalBest(now: Date) -> Bool {
+    guard let latestPoint else { return false }
+    return latestPoint.computedAt < now.addingTimeInterval(-E1RMPolicy.rollingWindow)
+  }
+
+  func displayPoint(now: Date) -> E1RMHistoryPoint? {
+    displaysHistoricalBest(now: now) ? bestPoint : latestPoint
   }
 }
 
@@ -27,6 +39,7 @@ struct DashboardE1RMHeadline: Equatable, Sendable {
   enum Kind: Equatable, Sendable {
     case latestPR
     case best
+    case historicalBest
   }
 
   let kind: Kind
@@ -37,6 +50,7 @@ struct DashboardE1RMHeadline: Equatable, Sendable {
     switch kind {
     case .latestPR: "最新 PR"
     case .best: "最佳"
+    case .historicalBest: "历史最佳"
     }
   }
 }
@@ -56,15 +70,18 @@ final class DashboardE1RMTrendViewModel {
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let e1rm: any E1RMRepository
   @ObservationIgnored private let onboarding: (any OnboardingProfileReading)?
+  @ObservationIgnored private let now: @Sendable () -> Date
 
   init(
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
-    onboarding: (any OnboardingProfileReading)? = nil
+    onboarding: (any OnboardingProfileReading)? = nil,
+    now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.e1rm = e1rm
     self.onboarding = onboarding
+    self.now = now
   }
 
   func load(studentID: UUID) async {
@@ -82,7 +99,12 @@ final class DashboardE1RMTrendViewModel {
       state = .loaded(
         DashboardE1RMTrendPresentation(
           rows: rows,
-          headline: Self.headline(prs: prs, rows: rows, idsByFamily: idsByFamily)
+          headline: Self.headline(
+            prs: prs,
+            rows: rows,
+            idsByFamily: idsByFamily,
+            now: now()
+          )
         )
       )
     } catch {
@@ -112,9 +134,14 @@ final class DashboardE1RMTrendViewModel {
     MainLiftExerciseFamilyResolver.dashboardFamilies.map { family in
       let rawPoints = (idsByFamily[family] ?? [])
         .flatMap { histories[$0] ?? [] }
+      let series = E1RMSeries.build(points: rawPoints, family: family)
+      let rawByID = Dictionary(uniqueKeysWithValues: rawPoints.map { ($0.id, $0) })
       return DashboardE1RMTrendRow(
         family: family,
-        points: E1RMSeries.smoothedHistory(points: rawPoints, family: family)
+        points: E1RMSeries.smoothedHistory(points: rawPoints, family: family),
+        smoothedSamples: series.smoothed,
+        rawEligiblePoints: E1RMSeries.eligibleRaw(points: rawPoints, family: family),
+        bestPoint: series.best.flatMap { rawByID[$0.winnerPointID] }
       )
     }
   }
@@ -122,12 +149,13 @@ final class DashboardE1RMTrendViewModel {
   private static func headline(
     prs: [PRBreakthroughEvent],
     rows: [DashboardE1RMTrendRow],
-    idsByFamily: [LiftFamily: Set<UUID>]
+    idsByFamily: [LiftFamily: Set<UUID>],
+    now: Date
   ) -> DashboardE1RMHeadline? {
     if let latestPRHeadline = latestPR(prs, idsByFamily: idsByFamily) {
       return latestPRHeadline
     }
-    return bestCurrentE1RM(rows)
+    return bestCurrentE1RM(rows, now: now)
   }
 
   /// The most recent PR whose exercise still resolves to a dashboard main-lift
@@ -157,13 +185,18 @@ final class DashboardE1RMTrendViewModel {
   }
 
   private static func bestCurrentE1RM(
-    _ rows: [DashboardE1RMTrendRow]
+    _ rows: [DashboardE1RMTrendRow],
+    now: Date
   ) -> DashboardE1RMHeadline? {
     rows.compactMap { row -> DashboardE1RMHeadline? in
-      guard let latest = row.latestPoint else {
+      guard let point = row.displayPoint(now: now) else {
         return nil
       }
-      return DashboardE1RMHeadline(kind: .best, family: row.family, valueKg: latest.e1RMKg)
+      return DashboardE1RMHeadline(
+        kind: row.displaysHistoricalBest(now: now) ? .historicalBest : .best,
+        family: row.family,
+        valueKg: point.e1RMKg
+      )
     }
     .max { $0.valueKg < $1.valueKg }
   }

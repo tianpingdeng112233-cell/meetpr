@@ -21,7 +21,8 @@ import Testing
     pr(studentID: studentID, exerciseID: benchID, e1RM: 101, daysAgo: 1, now: now),
   ]
 
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: prs)
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: prs, now: now)
   await viewModel.load(studentID: studentID)
 
   let presentation = try #require(viewModel.presentation)
@@ -43,13 +44,44 @@ import Testing
     point(studentID: studentID, exerciseID: deadliftID, e1RM: 190, daysAgo: 2, now: now),
   ]
 
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: [])
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: [], now: now)
   await viewModel.load(studentID: studentID)
 
   let presentation = try #require(viewModel.presentation)
   #expect(presentation.headline?.kind == .best)
   #expect(presentation.headline?.family == .deadlift)
   #expect(presentation.headline?.valueKg == 190)
+}
+
+@MainActor
+@Test func trendHeadlineUsesHistoricalBestWhenRollingWindowHasExpired() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftID(for: .squat))
+  let now = try Date("2026-07-09T12:00:00Z", strategy: .iso8601)
+  let imported = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: studentID,
+    exerciseId: squatID,
+    setLogId: UUID(),
+    computedAt: now.addingTimeInterval(-84 * 86_400),
+    e1RMKg: 165,
+    sourceWeightKg: 140,
+    sourceReps: 5,
+    sourceRPE: 8,
+    origin: .imported
+  )
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: [imported], prs: [], now: now)
+
+  await viewModel.load(studentID: studentID)
+
+  let presentation = try #require(viewModel.presentation)
+  let squatRow = try #require(presentation.rows.first { $0.family == .squat })
+  #expect(presentation.headline?.kind == .historicalBest)
+  #expect(presentation.headline?.valueKg == 165)
+  #expect(squatRow.displayPoint(now: now)?.id == imported.id)
 }
 
 @MainActor
@@ -63,13 +95,15 @@ import Testing
     point(studentID: studentID, exerciseID: squatID, e1RM: 175, daysAgo: 1, now: now),
   ]
 
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: [])
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: [], now: now)
   await viewModel.load(studentID: studentID)
 
   let presentation = try #require(viewModel.presentation)
   let squat = try #require(presentation.rows.first { $0.family == .squat })
   #expect(squat.points.map(\.e1RMKg) == [180, 180])
   #expect(squat.latestPoint?.e1RMKg == 180)
+  #expect(presentation.headline?.kind == .best)
   #expect(presentation.headline?.valueKg == 180)
 }
 
@@ -77,7 +111,9 @@ import Testing
 @Test func trendEmptyHistoryKeepsThreeRowsWithoutHeadline() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: [], prs: [])
+  let now = try Date("2026-06-14T12:00:00Z", strategy: .iso8601)
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: [], prs: [], now: now)
 
   await viewModel.load(studentID: studentID)
 
@@ -103,7 +139,8 @@ import Testing
     pr(studentID: studentID, exerciseID: benchID, e1RM: 101, daysAgo: 3, now: now),
   ]
 
-  let viewModel = makeViewModel(studentID: studentID, plan: plan, points: points, prs: prs)
+  let viewModel = makeViewModel(
+    studentID: studentID, plan: plan, points: points, prs: prs, now: now)
   await viewModel.load(studentID: studentID)
 
   let presentation = try #require(viewModel.presentation)
@@ -117,13 +154,15 @@ private func makeViewModel(
   studentID: UUID,
   plan: StudentPlanView,
   points: [E1RMHistoryPoint],
-  prs: [PRBreakthroughEvent]
+  prs: [PRBreakthroughEvent],
+  now: Date
 ) -> DashboardE1RMTrendViewModel {
   DashboardE1RMTrendViewModel(
     plans: InMemoryStudentPlanRepository(
       store: TestStudentPlanStore(seed: [studentID: plan])
     ),
-    e1rm: InMemoryE1RMRepository(seedPoints: points, seedPRs: prs)
+    e1rm: InMemoryE1RMRepository(seedPoints: points, seedPRs: prs),
+    now: { now }
   )
 }
 

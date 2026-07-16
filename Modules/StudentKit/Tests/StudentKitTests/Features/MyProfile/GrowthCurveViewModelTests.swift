@@ -31,11 +31,18 @@ private func makeViewModel(
 }
 
 @MainActor
-@Test func defaultWindowShowsOnlyLastFourWeeks() async {
+@Test func defaultWindowExpandsToAllWhenHistoryPredatesFourWeeks() async {
   let viewModel = await makeViewModel(pointsDaysAgo: [60, 35, 20, 5, 1])
   #expect(viewModel.selectedFamily == .squat)
+  #expect(viewModel.selectedWindow == .all)
+  #expect(viewModel.visiblePoints.count == 5)
+}
+
+@MainActor
+@Test func defaultWindowStaysAtFourWeeksWithoutEarlierHistory() async {
+  let viewModel = await makeViewModel(pointsDaysAgo: [20, 5, 1])
   #expect(viewModel.selectedWindow == .fourWeeks)
-  #expect(viewModel.visiblePoints.count == 3)  // 20, 5, 1 days ago
+  #expect(viewModel.visiblePoints.count == 3)
 }
 
 @MainActor
@@ -82,6 +89,63 @@ private func makeViewModel(
   await viewModel.load(studentID: studentID)
 
   #expect(viewModel.visiblePoints.map(\.e1RMKg) == [150, 150])
+}
+
+@MainActor
+@Test func selectedSampleResolvesToWinningRawPoint() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftIDForGrowthTests(for: .squat))
+  let now = Date(timeIntervalSince1970: 1_768_262_400)
+  let winner = growthPoint(
+    studentID: studentID, exerciseID: squatID, daysAgo: 10, e1RM: 150, now: now)
+  let latest = growthPoint(
+    studentID: studentID, exerciseID: squatID, daysAgo: 1, e1RM: 145, now: now)
+  let viewModel = GrowthCurveViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    e1rm: InMemoryE1RMRepository(seedPoints: [winner, latest]),
+    now: { now }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  let latestSample = try #require(viewModel.visibleSmoothedSamples.last)
+  #expect(latestSample.sampleID == latest.id)
+  #expect(latestSample.winnerPointID == winner.id)
+  #expect(viewModel.winnerPoint(forSampleID: latestSample.sampleID)?.id == winner.id)
+}
+
+@MainActor
+@Test func lowConfidencePointStaysInRawLayerOnly() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftIDForGrowthTests(for: .squat))
+  let now = Date(timeIntervalSince1970: 1_768_262_400)
+  let trusted = growthPoint(
+    studentID: studentID, exerciseID: squatID, daysAgo: 10, e1RM: 150, now: now)
+  let quarantined = E1RMHistoryPoint(
+    id: UUID(),
+    studentId: studentID,
+    exerciseId: squatID,
+    setLogId: UUID(),
+    computedAt: now.addingTimeInterval(-86_400),
+    e1RMKg: 190,
+    sourceWeightKg: 170,
+    sourceReps: 3,
+    sourceRPE: 8,
+    confidence: .low,
+    origin: .imported
+  )
+  let viewModel = GrowthCurveViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    e1rm: InMemoryE1RMRepository(seedPoints: [trusted, quarantined]),
+    now: { now }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  #expect(viewModel.visibleSmoothedSamples.map(\.winnerPointID) == [trusted.id])
+  #expect(viewModel.visibleRawEligiblePoints.map(\.id) == [trusted.id, quarantined.id])
 }
 
 private func growthPoint(

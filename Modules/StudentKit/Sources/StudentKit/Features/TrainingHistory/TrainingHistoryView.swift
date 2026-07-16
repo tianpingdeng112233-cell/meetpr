@@ -17,6 +17,8 @@ public struct TrainingHistoryView: View {
   private let e1rm: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
   private let feedbackViewModel: FeedbackInboxViewModel?
+  private let importedHistoryRefreshToken: Int
+  private let onImportedHistoryRefresh: (@MainActor () async -> Void)?
   @State private var viewModel: TrainingHistoryViewModel
   @State private var trendViewModel: DashboardE1RMTrendViewModel
   @State private var prEvent: PRBreakthroughEvent?
@@ -30,13 +32,17 @@ public struct TrainingHistoryView: View {
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository,
     onboarding: (any OnboardingProfileReading)? = nil,
-    feedbackViewModel: FeedbackInboxViewModel? = nil
+    feedbackViewModel: FeedbackInboxViewModel? = nil,
+    importedHistoryRefreshToken: Int = 0,
+    onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil
   ) {
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
     self.onboarding = onboarding
     self.feedbackViewModel = feedbackViewModel
+    self.importedHistoryRefreshToken = importedHistoryRefreshToken
+    self.onImportedHistoryRefresh = onImportedHistoryRefresh
     self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
     self._trendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(
@@ -80,6 +86,10 @@ public struct TrainingHistoryView: View {
           .padding(16)
         }
         .scrollContentBackground(.hidden)
+        .refreshable {
+          await onImportedHistoryRefresh?()
+          await reloadAfterImportedHistoryChange()
+        }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
@@ -92,6 +102,10 @@ public struct TrainingHistoryView: View {
       await loadIfNeeded()
       Analytics.shared.progressViewed(.e1rm)
       Analytics.shared.progressViewed(.volume)
+    }
+    .task(id: importedHistoryRefreshToken) {
+      guard importedHistoryRefreshToken > 0 else { return }
+      await reloadAfterImportedHistoryChange()
     }
   }
 
@@ -151,15 +165,17 @@ public struct TrainingHistoryView: View {
 
   private func liftChartCard(_ family: LiftFamily) -> some View {
     let row = trendRow(for: family)
+    let now = Date()
+    let displayPoint = row?.displayPoint(now: now)
     return VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .bottom) {
         VStack(alignment: .leading, spacing: 0) {
-          Text("\(family.studentDisplayName) E1RM · 90 天")
+          Text("\(family.studentDisplayName) E1RM · \(chartPeriodLabel(for: row, now: now))")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
             .foregroundStyle(Color.MeetPR.brandRed)
           HStack(alignment: .lastTextBaseline, spacing: 6) {
-            Text(row?.latestPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
+            Text(displayPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
               .font(.system(size: 40, weight: .heavy).monospacedDigit())
               .foregroundStyle(Color.MeetPR.fgPrimary)
             Text("KG")
@@ -176,8 +192,8 @@ public struct TrainingHistoryView: View {
             .foregroundStyle(delta.color)
         }
       }
-      if let row, !row.points.isEmpty {
-        sparklineWithAxis(row)
+      if let row, !row.points.isEmpty || !row.rawEligiblePoints.isEmpty {
+        e1rmChart(row)
           .padding(.top, 12)
       } else {
         Text("练几次就有趋势了")
@@ -194,34 +210,47 @@ public struct TrainingHistoryView: View {
     .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
   }
 
-  /// e1RM sparkline with a min/max kg anchor on the left (P2-8: 无轴无点标).
-  /// The kg values live here, not inside the normalized Sparkline — max maps
-  /// to the top of the plot (y=5) and min to the bottom (y=85), matching
-  /// `sparklinePoints(top: 5, usableHeight: 80)`.
-  private func sparklineWithAxis(_ row: DashboardE1RMTrendRow) -> some View {
-    let values = row.points.map(\.e1RMKg)
-    let maxKg = values.max() ?? 0
-    let minKg = values.min() ?? 0
-    return HStack(alignment: .center, spacing: 8) {
-      VStack(alignment: .trailing, spacing: 0) {
-        axisLabel(maxKg)
-        Spacer(minLength: 0)
-        if maxKg != minKg { axisLabel(minKg) }
+  private func e1rmChart(_ row: DashboardE1RMTrendRow) -> some View {
+    E1RMChart(
+      smoothed: row.smoothedSamples.map { sample in
+        E1RMChartPoint(
+          id: sample.sampleID,
+          date: sample.date,
+          e1RMKg: sample.valueKg,
+          origin: chartOrigin(sample.winnerOrigin),
+          confidence: chartConfidence(sample.winnerConfidence),
+          winnerPointID: sample.winnerPointID
+        )
+      },
+      rawEligible: row.rawEligiblePoints.map { point in
+        E1RMChartPoint(
+          id: point.id,
+          date: point.computedAt,
+          e1RMKg: point.e1RMKg,
+          origin: chartOrigin(point.origin),
+          confidence: chartConfidence(point.confidence)
+        )
       }
-      .frame(height: 90)
-      Sparkline(
-        points: row.sparklinePoints(top: 5, usableHeight: 80),
-        viewBox: CGSize(width: 600, height: 90),
-        showsPointDots: true
-      )
-      .frame(height: 90)
+    )
+    .frame(height: 140)
+  }
+
+  private func chartPeriodLabel(for row: DashboardE1RMTrendRow?, now: Date) -> String {
+    row?.displaysHistoricalBest(now: now) == true ? "历史最佳" : "90 天"
+  }
+
+  private func chartOrigin(_ origin: E1RMPointOrigin) -> E1RMChartPointOrigin {
+    switch origin {
+    case .logged: .logged
+    case .imported: .imported
     }
   }
 
-  private func axisLabel(_ kilograms: Double) -> some View {
-    Text(StudentFormatting.kilograms(kilograms))
-      .font(.system(size: 10, design: .monospaced))
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+  private func chartConfidence(_ confidence: E1RMConfidence) -> E1RMChartPointConfidence {
+    switch confidence {
+    case .normal: .normal
+    case .low: .low
+    }
   }
 
   // MARK: - Coach feedback history
@@ -445,7 +474,7 @@ public struct TrainingHistoryView: View {
   private var sbdTotalText: String {
     guard let rows = trendPresentation?.rows else { return "—" }
     let values = MainLiftExerciseFamilyResolver.dashboardFamilies.compactMap { family in
-      rows.first { $0.family == family }?.latestPoint?.e1RMKg
+      rows.first { $0.family == family }?.displayPoint(now: Date())?.e1RMKg
     }
     guard values.count == 3 else { return "—" }
     return StudentFormatting.kilograms(values.reduce(0, +))
@@ -489,6 +518,15 @@ public struct TrainingHistoryView: View {
     if let feedbackViewModel, feedbackViewModel.state == .idle {
       await feedbackViewModel.load(studentID: studentID)
     }
+    let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
+    prEvent = prs.max { $0.occurredAt < $1.occurredAt }
+    prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+  }
+
+  private func reloadAfterImportedHistoryChange() async {
+    currentOnboarding = try? await onboarding?.fetchProfile(studentId: studentID)
+    await viewModel.load(studentID: studentID)
+    await trendViewModel.load(studentID: studentID)
     let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
     prEvent = prs.max { $0.occurredAt < $1.occurredAt }
     prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }

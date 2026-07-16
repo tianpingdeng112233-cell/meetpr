@@ -15,6 +15,7 @@ public struct StudentRootView: View {
   private let readiness: any ReadinessRepository
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
+  private let importedHistoryBackfill: ImportedHistoryBackfill
   private let onLogout: (@MainActor () async -> Void)?
   private let account: (any AccountRepository)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
@@ -31,6 +32,9 @@ public struct StudentRootView: View {
   @State private var planRevision = 0
   @State private var nextWorkoutSource: WorkoutSource?
   @State private var workoutStartedAt: Date?
+  @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
+  @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
+  @State private var importedHistoryRefreshToken = 0
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -51,7 +55,8 @@ public struct StudentRootView: View {
       ),
       readiness: InMemoryReadinessRepository(
         seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
-      )
+      ),
+      importedHistoryReviews: InMemoryImportedHistoryReviewStore()
     )
   }
 
@@ -69,6 +74,7 @@ public struct StudentRootView: View {
     summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
     account: (any AccountRepository)? = nil,
+    importedHistoryReviews: (any ImportedHistoryReviewStoring)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore()
   ) {
@@ -89,6 +95,22 @@ public struct StudentRootView: View {
         seed: StudentDemoSeed.makeOnboardingProfile(studentID: studentID)
       )
     self.onboarding = resolvedOnboarding
+    let resolvedImportedHistoryReviews: any ImportedHistoryReviewStoring
+    if let importedHistoryReviews {
+      resolvedImportedHistoryReviews = importedHistoryReviews
+    } else if plans is InMemoryStudentPlanRepository {
+      resolvedImportedHistoryReviews = InMemoryImportedHistoryReviewStore()
+    } else {
+      resolvedImportedHistoryReviews = LocalImportedHistoryReviewStore()
+    }
+    self.importedHistoryBackfill = ImportedHistoryBackfill(
+      logs: logs,
+      onboarding: resolvedOnboarding,
+      plans: plans,
+      catalogReader: plans as? any ExerciseCatalogReading,
+      e1rm: e1rm,
+      reviews: resolvedImportedHistoryReviews
+    )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
     )
@@ -124,7 +146,7 @@ public struct StudentRootView: View {
           selectedTab = .training
         },
         onSeeAllFeedback: { selectedTab = .growth },
-        todayReloadToken: todayReloadToken,
+        todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         onPlanChanged: { planRevision += 1 }
       )
       .tag(StudentTab.today)
@@ -150,7 +172,9 @@ public struct StudentRootView: View {
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding,
-        feedbackViewModel: feedbackViewModel
+        feedbackViewModel: feedbackViewModel,
+        importedHistoryRefreshToken: importedHistoryRefreshToken,
+        onImportedHistoryRefresh: { await runImportedHistoryBackfill() }
       )
       .tag(StudentTab.growth)
       .tabItem {
@@ -183,6 +207,7 @@ public struct StudentRootView: View {
       }
       await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+      await runImportedHistoryBackfill()
     }
     .onChange(of: selectedTab) { _, newTab in
       if newTab == .today { todayReloadToken += 1 }
@@ -196,11 +221,89 @@ public struct StudentRootView: View {
         nextWorkoutSource = nil
       case .growth:
         Analytics.shared.screen(.progressHistory)
+        Task { await runImportedHistoryBackfill() }
       case .profile:
         Analytics.shared.screen(.account)
       }
     }
+    .importedHistoryReviewAlert(
+      review: $pendingImportedHistoryReview,
+      onAnswer: answerImportedHistoryReview
+    )
     .tint(Color.MeetPR.brandRed)
+  }
+
+  @MainActor
+  private func runImportedHistoryBackfill() async {
+    guard let result = try? await importedHistoryBackfill.backfill(studentID: studentID) else {
+      return
+    }
+    importedHistoryReviewQueue = ImportedHistoryReviewQueue.appendingUnique(
+      result.pendingReviews,
+      current: pendingImportedHistoryReview,
+      waiting: importedHistoryReviewQueue
+    )
+    presentNextImportedHistoryReview()
+    if result.importedPointCount > 0 {
+      importedHistoryRefreshToken += 1
+    }
+  }
+
+  @MainActor
+  private func answerImportedHistoryReview(
+    _ review: PendingImportedHistoryReview,
+    decision: ImportedHistoryReviewDecision
+  ) async {
+    try? await importedHistoryBackfill.answer(review, decision: decision)
+    importedHistoryReviewQueue.removeAll { $0.id == review.id }
+    if pendingImportedHistoryReview?.id == review.id {
+      pendingImportedHistoryReview = nil
+    }
+    presentNextImportedHistoryReview()
+    importedHistoryRefreshToken += 1
+  }
+
+  private func presentNextImportedHistoryReview() {
+    guard pendingImportedHistoryReview == nil else { return }
+    let next = ImportedHistoryReviewQueue.takingNext(from: importedHistoryReviewQueue)
+    pendingImportedHistoryReview = next.current
+    importedHistoryReviewQueue = next.waiting
+  }
+}
+
+extension View {
+  fileprivate func importedHistoryReviewAlert(
+    review: Binding<PendingImportedHistoryReview?>,
+    onAnswer:
+      @escaping @MainActor (
+        PendingImportedHistoryReview,
+        ImportedHistoryReviewDecision
+      ) async -> Void
+  ) -> some View {
+    alert(
+      "确认导入历史",
+      isPresented: Binding(
+        get: { review.wrappedValue != nil },
+        set: { if !$0 { review.wrappedValue = nil } }
+      ),
+      presenting: review.wrappedValue
+    ) { pending in
+      Button("确实") {
+        Task { await onAnswer(pending, .confirmed) }
+      }
+      Button("没有", role: .destructive) {
+        Task { await onAnswer(pending, .rejected) }
+      }
+    } message: { pending in
+      Text(importedHistoryReviewMessage(pending))
+    }
+  }
+
+  private func importedHistoryReviewMessage(_ review: PendingImportedHistoryReview) -> String {
+    "导入的历史记录里有 \(StudentFormatting.kilograms(review.sourceWeightKg))kg×"
+      + "\(review.sourceReps)(约 e1RM "
+      + "\(StudentFormatting.kilograms(review.sourceE1RMKg))kg),超过你填写的 1RM "
+      + "\(StudentFormatting.kilograms(review.baseline1RMKg))kg——当时确实完成了吗?"
   }
 }
 

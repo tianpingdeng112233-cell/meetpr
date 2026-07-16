@@ -403,15 +403,16 @@ public struct DashboardView: View {
   /// day shows a squat curve above a bench curve.
   @ViewBuilder
   private func liftTrendBlock(_ row: DashboardE1RMTrendRow) -> some View {
+    let now = Date()
     VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .bottom) {
         VStack(alignment: .leading, spacing: 0) {
-          Text("\(row.family.studentDisplayName) E1RM · 90 天")
+          Text("\(row.family.studentDisplayName) E1RM · \(trendPeriodLabel(row, now: now))")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
             .foregroundStyle(Color.MeetPR.brandRed)
           HStack(alignment: .lastTextBaseline, spacing: 6) {
-            Text(StudentFormatting.kilograms(row.latestPoint?.e1RMKg ?? 0))
+            Text(StudentFormatting.kilograms(row.displayPoint(now: now)?.e1RMKg ?? 0))
               .font(.system(size: 44, weight: .heavy).monospacedDigit())
               .foregroundStyle(Color.MeetPR.fgPrimary)
             Text("KG")
@@ -438,6 +439,10 @@ public struct DashboardView: View {
     let names = selectedTrendRows.map(\.family.studentDisplayName).joined(separator: "、")
     return "选中 " + TodayFormat.shortWeekday.string(from: effectiveSelectedDate)
       + " · \(names)日"
+  }
+
+  private func trendPeriodLabel(_ row: DashboardE1RMTrendRow, now: Date) -> String {
+    row.displaysHistoricalBest(now: now) ? "历史最佳" : "90 天"
   }
 
   // MARK: - Start CTA
