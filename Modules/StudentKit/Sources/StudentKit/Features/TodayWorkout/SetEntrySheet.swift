@@ -5,10 +5,11 @@ import Foundation
 import SwiftUI
 
 /// Set-entry sheet with the loaded-barbell plate calculator (design
-/// `SetEntryPlate`): a live `PlateLoadout` barbell for the dialed weight, the
-/// big-plates-first breakdown (the 2.5 kg competition collar 赛扣 counts toward
-/// the load only when 上赛扣 is toggled on), big +/- steppers for weight / reps /
-/// RPE, optional video attach, and the complete / fail actions. Commit + video
+/// `SetEntryPlate`): main lifts show a live `PlateLoadout` barbell for the
+/// dialed weight, the big-plates-first breakdown (the 2.5 kg competition collar
+/// 赛扣 counts toward the load only when 上赛扣 is toggled on), big +/- steppers
+/// for weight / reps / RPE, optional video attach, and the complete / fail
+/// actions. Accessory exercises omit the plate-loading guidance. Commit + video
 /// logic unchanged.
 @available(iOS 17.0, macOS 14.0, *)
 // swiftlint:disable:next type_body_length
@@ -83,13 +84,15 @@ struct SetEntrySheet: View {
       navBar
       ScrollView {
         VStack(spacing: 0) {
-          PlateLoadout(plates: plates, showCollar: collarOn).padding(.top, 8)
-          Text(breakdownLine)
-            .font(.system(size: 14, weight: .semibold, design: .monospaced))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-            .frame(maxWidth: .infinity)
-            .padding(.top, 4)
-          collarToggle.padding(.top, 10)
+          if draft.allowsPlateLoadingGuidance {
+            PlateLoadout(plates: plates, showCollar: collarOn).padding(.top, 8)
+            Text(breakdownLine)
+              .font(.system(size: 14, weight: .semibold, design: .monospaced))
+              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .frame(maxWidth: .infinity)
+              .padding(.top, 4)
+            collarToggle.padding(.top, 10)
+          }
 
           VStack(spacing: 18) {
             plateStepper(
@@ -141,7 +144,7 @@ struct SetEntrySheet: View {
               )
             }
           }
-          .padding(.top, 28)
+          .padding(.top, draft.allowsPlateLoadingGuidance ? 28 : 0)
         }
         .padding(16)
       }

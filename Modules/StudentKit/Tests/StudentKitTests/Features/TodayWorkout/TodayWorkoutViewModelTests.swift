@@ -15,6 +15,7 @@ import Testing
   ) -> TodayWorkoutViewModel.SetRowDraft {
     TodayWorkoutViewModel.SetRowDraft(
       id: UUID(), planExerciseID: UUID(), exerciseID: UUID(), exerciseName: "深蹲",
+      isAccessory: false,
       prescribed: prescribed, actualWeight: weight, actualReps: reps,
       actualRPE: rpe, completed: completed)
   }
@@ -45,6 +46,7 @@ import Testing
   ) -> TodayWorkoutViewModel.SetRowDraft {
     TodayWorkoutViewModel.SetRowDraft(
       id: UUID(), planExerciseID: squatID, exerciseID: UUID(), exerciseName: "深蹲",
+      isAccessory: false,
       prescribed: PrescribedSet(
         id: UUID(), setIndex: setIndex, weightKg: weight, reps: reps, repsMax: nil, rpe: rpe),
       actualWeight: weight, actualReps: reps, actualRPE: rpe, completed: completed)

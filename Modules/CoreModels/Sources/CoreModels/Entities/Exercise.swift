@@ -97,3 +97,13 @@ public struct Exercise: Codable, Hashable, Sendable, Identifiable {
     case createdAt
   }
 }
+
+extension Exercise {
+  public var isMainLiftOrVariation: Bool {
+    exerciseType == .mainLift || exerciseType == .mainLiftVariation
+  }
+
+  public var isAccessory: Bool {
+    exerciseType == .accessory
+  }
+}

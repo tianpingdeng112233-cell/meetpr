@@ -28,6 +28,7 @@ private func setDraft(
     planExerciseID: UUID(),
     exerciseID: UUID(),
     exerciseName: "深蹲",
+    isAccessory: false,
     prescribed: PrescribedSet(id: UUID(), setIndex: 0, weightKg: 140, reps: 5, rpe: 8),
     actualWeight: 140,
     actualReps: failed ? 3 : 5,
