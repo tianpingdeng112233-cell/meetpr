@@ -249,14 +249,8 @@ struct CoachDashboardView: View {
   /// Triage-first ordering (the mock's list leads with the students that need
   /// the coach today): rows with signals on top, then the rest.
   private var todayRows: [StudentRosterRowModel] {
-    let visibleRows = rows.filter { row in
-      switch row.student.status {
-      case .active, .abnormal: true
-      default: false
-      }
-    }
-    let triage = visibleRows.filter(\.needsAttention)
-    let rest = visibleRows.filter { !$0.needsAttention }
+    let triage = rows.filter(\.needsAttention)
+    let rest = rows.filter { !$0.needsAttention }
     return triage + rest
   }
 

@@ -50,14 +50,13 @@ final class StudentRosterViewModel {
   }
 
   var triageRows: [StudentRosterRowModel] {
-    rows.filter { $0.needsAttention && Self.isVisible($0.student.status) }
+    rows.filter(\.needsAttention)
   }
 
   var filteredRows: [StudentRosterRowModel] {
     let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-    let visibleRows = rows.filter { Self.isVisible($0.student.status) }
-    guard !query.isEmpty else { return visibleRows }
-    return visibleRows.filter {
+    guard !query.isEmpty else { return rows }
+    return rows.filter {
       $0.student.displayName.localizedCaseInsensitiveContains(query)
     }
   }
@@ -226,12 +225,5 @@ final class StudentRosterViewModel {
     let start = min(planStart ?? lookbackStart, lookbackStart)
     let end = CoachFeatureCalendar.endOfDay(now, calendar: calendar)
     return start...max(start, end)
-  }
-
-  private static func isVisible(_ status: CoachStudentStatus) -> Bool {
-    switch status {
-    case .active, .abnormal: true
-    default: false
-    }
   }
 }

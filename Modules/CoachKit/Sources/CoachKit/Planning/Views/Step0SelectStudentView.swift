@@ -133,8 +133,6 @@ private struct StudentRow: View {
       "•"
     case .abnormal:
       "🟡"
-    default:
-      "•"
     }
   }
 
@@ -144,8 +142,6 @@ private struct StudentRow: View {
       "可创建计划"
     case .abnormal(let reason):
       PlanningDisplay.abnormalReason(reason)
-    default:
-      "可创建计划"
     }
   }
 }

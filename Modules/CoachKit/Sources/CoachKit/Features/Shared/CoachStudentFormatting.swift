@@ -6,11 +6,6 @@ enum CoachStudentFormatting {
     switch status {
     case .active:
       return "活跃"
-    case .inEvaluation(let remainingDays, let remainingHours):
-      if remainingDays > 0 {
-        return "评估期 \(remainingDays) 天"
-      }
-      return "评估期 \(remainingHours) 小时"
     case .abnormal(let reason):
       return abnormalText(reason)
     }

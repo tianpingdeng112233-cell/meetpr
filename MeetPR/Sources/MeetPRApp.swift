@@ -34,10 +34,7 @@ struct MeetPRApp: App {
 
     private static func makeDemoCoachDependencies() -> DemoCoachDependencies {
       DemoCoachDependencies(
-        bindQueue: InMemoryCoachBindQueueRepository(
-          coachId: StudentDemoSeed.coachID,
-          seed: CoachDemoSeed.pendingBindRequests()
-        ),
+        bindQueue: InMemoryCoachBindQueueRepository(seed: CoachDemoSeed.pendingBindRequests()),
         profiles: InMemoryCoachStudentProfileReader(
           profiles: [
             StudentDemoSeed.makeOnboardingProfile(studentID: CoachDemoSeed.queueStudentID)

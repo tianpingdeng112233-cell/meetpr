@@ -64,7 +64,6 @@ public final class BindGateViewModel {
   private let stash: any PendingBindCodeStoring
   private let isOnboardingComplete: @Sendable () async -> Bool
   private let studentId: UUID
-  private static let evaluationSealed = true
 
   public init(
     studentId: UUID,

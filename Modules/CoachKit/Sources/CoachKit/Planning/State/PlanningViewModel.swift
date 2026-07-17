@@ -869,7 +869,7 @@ public final class PlanningViewModel {
   /// completeness, materialize the W1 draft into the full N-week tree, push
   /// it through the repository (which the student then reads), clear the
   /// draft, and let the coordinator dismiss via `didFinish`. Surfaces the
-  /// evaluation真 gate / weeks-overflow copy on failure.
+  /// server-side kind / weeks-overflow copy on failure.
   public func publish() async {
     // Block re-entry AND re-publish after a success: once didFinish is set
     // the draft is already deleted server- and store-side, so a second call

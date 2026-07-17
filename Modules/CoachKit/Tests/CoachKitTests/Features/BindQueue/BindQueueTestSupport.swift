@@ -6,7 +6,6 @@ import RepositoryContracts
 
 enum BindQueueFixtures {
   static let now = Date(timeIntervalSince1970: 1_781_000_000)
-  static let coachID = UUID(uuidString: "03300000-0000-0000-0000-000000000001")!
   static let studentID = UUID(uuidString: "03300000-0000-0000-0000-000000000101")!
   static let requestID = UUID(uuidString: "03300000-0000-0000-0000-000000000201")!
 
@@ -50,31 +49,6 @@ enum BindQueueFixtures {
     )
   }
 
-  static func evaluation(
-    studentId: UUID = studentID,
-    startedAt: Date = now.addingTimeInterval(-2 * 86_400),
-    expectedEndAt: Date = now.addingTimeInterval(5 * 86_400),
-    completedAt: Date? = nil
-  ) -> EvaluationPeriod {
-    EvaluationPeriod(
-      id: UUID(uuidString: "03300000-0000-0000-0000-000000000301")!,
-      studentId: studentId,
-      coachId: coachID,
-      bindRequestId: requestID,
-      startedAt: startedAt,
-      expectedEndAt: expectedEndAt,
-      completedAt: completedAt,
-      completionType: completedAt == nil ? nil : "coach_completed",
-      inProgress: completedAt == nil,
-      overdue: false
-    )
-  }
-}
-
-struct RecordedAccept: Equatable {
-  let id: UUID
-  let skip: Bool
-  let reason: String?
 }
 
 /// Scripted queue repository: counts calls, throws per-action errors.
@@ -82,21 +56,18 @@ actor StubBindQueueRepository: CoachBindQueueRepository {
   var queue: [CoachBindRequestItem]
   var acceptError: Error?
   var rejectError: Error?
-  private(set) var acceptedRequests: [RecordedAccept] = []
+  private(set) var acceptedRequestIDs: [UUID] = []
   private(set) var rejectedRequestIDs: [UUID] = []
   private(set) var fetchCount = 0
-  private let evaluationOnAccept: EvaluationPeriod?
 
   init(
     queue: [CoachBindRequestItem] = [BindQueueFixtures.item()],
     acceptError: Error? = nil,
-    rejectError: Error? = nil,
-    evaluationOnAccept: EvaluationPeriod? = nil
+    rejectError: Error? = nil
   ) {
     self.queue = queue
     self.acceptError = acceptError
     self.rejectError = rejectError
-    self.evaluationOnAccept = evaluationOnAccept
   }
 
   func fetchQueue() async throws -> [CoachBindRequestItem] {
@@ -104,18 +75,10 @@ actor StubBindQueueRepository: CoachBindQueueRepository {
     return queue
   }
 
-  func accept(
-    requestID: UUID,
-    skipEvaluation: Bool,
-    skipReason: String?
-  ) async throws -> (request: BindRequestDecision, evaluation: EvaluationPeriod?) {
+  func accept(requestID: UUID) async throws {
     if let acceptError { throw acceptError }
-    acceptedRequests.append(
-      RecordedAccept(id: requestID, skip: skipEvaluation, reason: skipReason))
+    acceptedRequestIDs.append(requestID)
     queue.removeAll { $0.id == requestID }
-    let decision = BindRequestDecision(
-      id: requestID, status: .accepted, skipEvaluation: skipEvaluation, skipReason: skipReason)
-    return (request: decision, evaluation: skipEvaluation ? nil : evaluationOnAccept)
   }
 
   func reject(requestID: UUID) async throws {

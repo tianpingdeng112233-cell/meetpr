@@ -98,8 +98,6 @@ struct PlanningStudentHeaderView: View {
       "活跃"
     case .abnormal(let reason):
       PlanningDisplay.abnormalReason(reason)
-    default:
-      "活跃"
     }
   }
 }

@@ -112,37 +112,6 @@ private func activeStudent() -> CoachStudentSummary {
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() async throws {
-  // The roster snapshot can still say in-evaluation right after the
-  // completion chain — the soft recommendation explicitly schedules a
-  // regular plan (spec 033 §9).
-  let staleStudent = PlanningFixtures.students()[0]
-  let viewModel = try PlanningViewModel(
-    repository: PlanningFixtures.repository(),
-    draftStore: PlanningFixtures.store(),
-    intent: .firstRegularPlan(staleStudent, makeProfile())
-  )
-
-  await viewModel.bootstrap()
-
-  #expect(viewModel.planKind == .regular)
-  viewModel.selectDuration(4)
-  #expect(viewModel.isCurrentStepValid)
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func blankFlowIgnoresLegacyEvaluationStatus() async throws {
-  let viewModel = try PlanningFixtures.viewModel()
-  await viewModel.bootstrap()
-
-  viewModel.selectStudent(PlanningFixtures.students()[0])
-
-  #expect(viewModel.planKind == .regular)
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
 @Test func intentResumesExistingDraftInsteadOfOverwriting() async throws {
   let store = try PlanningFixtures.store()
   let first = PlanningViewModel(

@@ -8,25 +8,25 @@ import ViewInspector
 /// so the record must be Sendable-safe.
 private final class ConfirmCapture: @unchecked Sendable {
   private let lock = NSLock()
-  private var _invocation: (skip: Bool, reason: String?)?
+  private var _wasInvoked = false
 
-  var invocation: (skip: Bool, reason: String?)? {
+  var wasInvoked: Bool {
     lock.lock()
     defer { lock.unlock() }
-    return _invocation
+    return _wasInvoked
   }
 
-  func record(skip: Bool, reason: String?) {
+  func recordInvocation() {
     lock.lock()
     defer { lock.unlock() }
-    _invocation = (skip, reason)
+    _wasInvoked = true
   }
 }
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func acceptSheetShowsPlainConfirmation() throws {
-  let sut = AcceptBindRequestSheet(studentName: "李四") { _, _ in true }
+  let sut = AcceptBindRequestSheet(studentName: "李四") { true }
   let inspected = try sut.inspect()
 
   #expect(throws: (any Error).self) {
@@ -37,21 +37,18 @@ private final class ConfirmCapture: @unchecked Sendable {
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func acceptSheetConfirmAlwaysSendsSkipWithNoReason() async throws {
-  // The sheet keeps the wire-compatible skip branch with no reason.
+@Test func acceptSheetConfirmInvokesAction() async throws {
   let capture = ConfirmCapture()
-  let sut = AcceptBindRequestSheet(studentName: "李四") { skip, reason in
-    capture.record(skip: skip, reason: reason)
+  let sut = AcceptBindRequestSheet(studentName: "李四") {
+    capture.recordInvocation()
     return true
   }
 
   try sut.inspect().find(button: "确认接收").tap()
 
   // submit() hops through a Task — poll briefly for the closure to land.
-  for _ in 0..<200 where capture.invocation == nil {
+  for _ in 0..<200 where !capture.wasInvoked {
     try await Task.sleep(for: .milliseconds(5))
   }
-  let invocation = try #require(capture.invocation)
-  #expect(invocation.skip == true)
-  #expect(invocation.reason == nil)
+  #expect(capture.wasInvoked)
 }

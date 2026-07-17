@@ -98,10 +98,9 @@ struct CoachReceivingView: View {
       }
     }
     .sheet(item: $acceptTarget) { item in
-      AcceptBindRequestSheet(studentName: item.displayName) { skipEvaluation, skipReason in
+      AcceptBindRequestSheet(studentName: item.displayName) {
         guard let queueViewModel else { return false }
-        let accepted = await queueViewModel.accept(
-          item, skipEvaluation: skipEvaluation, skipReason: skipReason)
+        let accepted = await queueViewModel.accept(item)
         if accepted {
           profileTarget = nil
           await onAccepted()

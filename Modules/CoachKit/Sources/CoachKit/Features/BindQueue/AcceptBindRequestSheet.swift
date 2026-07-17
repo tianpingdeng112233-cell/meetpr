@@ -1,14 +1,13 @@
 import DesignSystem
 import SwiftUI
 
-/// The accept confirm modal. Every accept sends `skipEvaluation: true` to
-/// preserve the existing wire contract.
+/// The accept confirm modal.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct AcceptBindRequestSheet: View {
   let studentName: String
   /// Returns true on success → the sheet dismisses itself.
-  let onConfirm: (_ skipEvaluation: Bool, _ skipReason: String?) async -> Bool
+  let onConfirm: () async -> Bool
 
   @State private var isSubmitting = false
   @Environment(\.dismiss) private var dismiss
@@ -52,8 +51,7 @@ struct AcceptBindRequestSheet: View {
     guard !isSubmitting else { return }
     isSubmitting = true
     Task {
-      // The wire contract keeps the skip branch and carries no reason.
-      let succeeded = await onConfirm(true, nil)
+      let succeeded = await onConfirm()
       isSubmitting = false
       if succeeded {
         dismiss()

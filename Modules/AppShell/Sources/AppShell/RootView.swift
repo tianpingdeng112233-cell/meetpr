@@ -72,7 +72,7 @@ public struct RootView: View {
     self.studentOnboarding = studentOnboarding ?? RootViewDemoDefaults.onboarding()
     self.coachBindQueue =
       coachBindQueue
-      ?? InMemoryCoachBindQueueRepository(coachId: StudentDemoSeed.coachID)
+      ?? InMemoryCoachBindQueueRepository()
     self.coachStudentProfiles =
       coachStudentProfiles ?? RootViewDemoDefaults.coachStudentProfiles()
     self.pendingBindStore = pendingBindStore

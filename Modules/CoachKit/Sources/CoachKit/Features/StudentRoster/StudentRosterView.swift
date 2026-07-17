@@ -222,7 +222,6 @@ struct StudentRosterView: View {
       switch row.student.status {
       case .active: active.append(row)
       case .abnormal: abnormal.append(row)
-      default: continue
       }
     }
     return [
@@ -289,8 +288,6 @@ struct StudentRosterView: View {
       return Color.MeetPR.fgPrimary
     case .abnormal:
       return Color.MeetPR.amber
-    default:
-      return Color.MeetPR.fgPrimary
     }
   }
 
@@ -308,8 +305,6 @@ struct StudentRosterView: View {
       return row.completionText + " · " + lastActiveText(row)
     case .abnormal:
       return row.statusText
-    default:
-      return row.completionText
     }
   }
 
@@ -338,8 +333,6 @@ struct StudentRosterView: View {
       return (.pending, "本周 \(row.completedTrainingDays)/\(row.plannedTrainingDays)")
     case .abnormal:
       return (.overdue, row.statusText)
-    default:
-      return (.pending, "暂无计划")
     }
   }
 

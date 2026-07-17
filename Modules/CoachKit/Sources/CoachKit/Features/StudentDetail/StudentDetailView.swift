@@ -209,8 +209,6 @@ struct StudentDetailView: View {
       return "学员 · 活跃"
     case .abnormal:
       return "学员 · 异常"
-    default:
-      return "学员 · 活跃"
     }
   }
 
@@ -221,8 +219,6 @@ struct StudentDetailView: View {
       return (.ready, "活跃")
     case .abnormal:
       return (.overdue, "异常")
-    default:
-      return (.ready, "活跃")
     }
   }
 

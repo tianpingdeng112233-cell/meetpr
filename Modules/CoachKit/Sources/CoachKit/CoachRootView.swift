@@ -40,7 +40,7 @@ public struct CoachRootView: View {
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
     self.draftStore = draftStore
     let resolvedQueue =
-      bindQueue ?? InMemoryCoachBindQueueRepository(coachId: UUID())
+      bindQueue ?? InMemoryCoachBindQueueRepository()
     let resolvedProfiles = studentProfiles ?? InMemoryCoachStudentProfileReader()
     detailContext = CoachStudentDetailContext(
       plans: studentPlans,

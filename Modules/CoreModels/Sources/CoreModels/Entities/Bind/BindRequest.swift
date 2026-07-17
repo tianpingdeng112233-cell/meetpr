@@ -3,9 +3,8 @@ import Foundation
 /// Student→coach bind request (spec 031). Field-for-field mirror of the
 /// backend bind_requests wire shape (backend spec 005 §endpoint B).
 ///
-/// spec 033 extension point: the coach receive queue reuses this entity, and
-/// the student BindGate's `.bound` branch will grow an evaluation-period
-/// sub-route keyed on `skipEvaluation` — both consume these fields as-is.
+/// The backend response retains `skipEvaluation` as a compatibility field;
+/// clients consume the wire value without branching on it.
 public struct BindRequest: Codable, Hashable, Sendable, Identifiable {
   public let id: UUID
   public let studentId: UUID
