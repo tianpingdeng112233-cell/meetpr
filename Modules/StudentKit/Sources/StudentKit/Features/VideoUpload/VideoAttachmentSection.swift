@@ -23,6 +23,7 @@ struct VideoAttachmentSection: View {
   @State private var showingPhotosPicker = false
   @State private var showingCamera = false
   @State private var pickedItem: PhotosPickerItem?
+  @State private var libraryVideoToTrim: PickedVideo?
   @State private var pendingSource: PendingSource?
 
   private enum PendingSource {
@@ -91,9 +92,27 @@ struct VideoAttachmentSection: View {
     }
     #if os(iOS)
       .fullScreenCover(isPresented: $showingCamera) {
-        CameraVideoPicker(maxDurationSeconds: 120) { url in
+        CameraVideoPicker(maxDurationSeconds: videoViewModel.maxDurationSeconds) { url in
           Task { await attach(sourceURL: url) }
         }
+        .ignoresSafeArea()
+      }
+      .fullScreenCover(item: $libraryVideoToTrim) { movie in
+        VideoTrimmerView(
+          sourceURL: movie.url,
+          maxDurationSeconds: videoViewModel.maxDurationSeconds,
+          onSave: { editedURL in
+            libraryVideoToTrim = nil
+            Task { await attach(sourceURL: editedURL) }
+          },
+          onCancel: {
+            libraryVideoToTrim = nil
+          },
+          onFailure: {
+            libraryVideoToTrim = nil
+            videoViewModel.reportVideoProcessingFailure()
+          }
+        )
         .ignoresSafeArea()
       }
     #endif
@@ -216,8 +235,15 @@ struct VideoAttachmentSection: View {
 
   private func importPicked(_ item: PhotosPickerItem) async {
     guard let movie = try? await item.loadTransferable(type: PickedVideo.self) else {
+      videoViewModel.reportVideoProcessingFailure()
       return
     }
+    #if os(iOS)
+      if UIVideoEditorController.canEditVideo(atPath: movie.url.path) {
+        libraryVideoToTrim = movie
+        return
+      }
+    #endif
     await attach(sourceURL: movie.url)
   }
 
@@ -246,7 +272,8 @@ struct VideoAttachmentSection: View {
 
 /// File-URL transferable for PhotosPicker video items; the received file is
 /// copied into tmp so it outlives the picker session.
-struct PickedVideo: Transferable {
+struct PickedVideo: Identifiable, Transferable {
+  let id = UUID()
   let url: URL
 
   static var transferRepresentation: some TransferRepresentation {
