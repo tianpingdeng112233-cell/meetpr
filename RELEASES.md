@@ -18,6 +18,42 @@
 
 ---
 
+## 1.0 (12) — 2026-07-17 — 🟢 已上传(Neice 免审生效;外测 Ceshi 已提交 Beta App Review)
+- 打包来源:tag `beta/1.0-12` @ 29f407b(`release/1.0`,1.0(11) 基底小步直推)
+- tag CI 绿(SwiftLint/swift-format/Build & Test);真机走查 David 2026-07-17 亲验
+  (含 #243/#249 1.0(10) 遗留项 + 1.0(11) 新项运行态)
+- 两端 demo(模拟器)已从本 tag 现建同步(CFBundleVersion=12)
+### 本版包含
+- **[P1] 「查看回顾」入口押后到滑动完成之后**(9551a98,源自 David 1.0(10) 截图反馈):所有组打勾后
+  不再同屏出现「今日训练完成 · 查看回顾」banner 和「滑动完成今日训练」滑条——banner 只在滑动确认+
+  回顾页点「完成」后出现;历史只读日无滑条,banner 保留作回顾唯一入口。DemoStudent 模拟器亲验;
+  review-loop 1 轮 CLEAN(transcript `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-review-entry-gating.md`)
+- **[P1] refresh 400 视同硬失效干净回登录页 + wire key 契约测试**(c329981 + a15e158,backend #76
+  键名事故的 iOS 侧姊妹修复):前台 token 刷新遇 400 不再困在重试死胡同,与 401 同走清会话回登录;
+  编码契约测试钉死 `refresh_token` 键名防复刻。AppShell 测试全绿;review-loop 1 轮 CLEAN
+  (transcript `…/2026-07-17-refresh-400-hard-failure.md`)
+- **[P1] 视频上传源临时文件泄漏修复**(e9ab0d8,port of #263):相册/相机选完视频后,输入源 tmp 拷贝
+  在导出成功/失败/超时长被拒三路都会被删除,不再每条视频在沙盒多留一份 15–200MB 拷贝
+  (VideoUploadManager 明确 source ownership)。3 例新单测;review-loop 1 轮 CLEAN
+  (transcript `…/2026-07-17-video-upload-source-cleanup.md`)
+- **[P1] 赛扣偏好按学员隔离 + 配重数学补测试 + 赛扣 VoiceOver**(56bf338,#256 补审产出):同设备
+  切换学员账号不再继承上一账号的「上赛扣」选择(key 按学员 UUID 分区,已有测试员的勾选一次性重置为
+  默认关);配重数学抽纯函数 SetEntryPlateMath 补 8 测;开赛扣时 VoiceOver 同步播报
+- **[P1] 训练 tab 按「主项及变式」/「辅助项」分段**(3753764,#264,David 拍板按 exerciseType gate):
+  保持计划原序;辅助项记录弹窗不再显示杠铃配片图、配片明细和赛扣开关,重量输入与完成/失败流程不变。
+  源自 David 教练端截图反馈(蝴蝶机夹胸配杠铃图);review-loop 2 轮 CLEAN
+  (transcript `…/2026-07-17-training-tab-accessory-split.md`)
+- **[P1] 学员端视频上传前时长裁剪**(dff484c,port of #260,David 拍板方案 A 系统裁剪 UI):超长视频
+  从「整段拒绝重选」改为进系统裁剪屏截到 120s 内(拍摄路 allowsEditing 直进裁剪、相册路
+  UIVideoEditorController);不可编辑视频降级走原路径;结束语义抽 VideoTrimCompletion/SingleShot
+  (exactly-once + tmp 清理,与 e9ab0d8 的 enqueue 所有权互补)。review-loop main 侧 3 轮+1 对质、
+  port 侧 1 轮 CLEAN(transcripts `…/2026-07-17-video-trim.md` 与 `…-video-trim-port.md`)
+### 已知问题 / 局限
+- gym-day 残留:今日 tab 头条/周历高亮仍午夜翻篇(纯视觉),待全量对齐 spec
+- 捞回队列余项未上车:per-set 逐组目标 / rename-student / #215'/#217' 裁剪卡 / #234a 非 UI 拆包
+### 测试反馈
+- (待收集)
+
 ## 1.0 (11) — 2026-07-17 — 🟢 已上传(Neice 免审生效;外测 Ceshi 已过审在 Testing)
 - 打包来源:tag `beta/1.0-11` @ b5ffc0f(`release/1.0`,1.0(10) 基底小步直推)
 - 外测组 Ceshi(9 testers)本包已在 **Testing**(ASC 2026-07-17 确认),外测与 Neice 首次同版在测
