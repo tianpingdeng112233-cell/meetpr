@@ -40,6 +40,15 @@
   配片/主项照旧);review-loop 已收敛(2 轮 CLEAN,transcript:
   `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-training-tab-accessory-split.md`)。
 
+- 学员端视频上传前时长裁剪(dff484c,port of #260,David 拍板方案 A 系统裁剪 UI,源自 David
+  截图反馈「教练看着累+存储成本」):拍摄路录完直接进系统裁剪屏(allowsEditing),相册路选片后
+  先弹 UIVideoEditorController 裁到 120s 上限内——超长视频从「整段拒绝重选」改为「进裁剪屏
+  截短」,不可编辑视频降级走原路径;结束语义抽平台无关 VideoTrimCompletion/SingleShot
+  (exactly-once + tmp 清理,与上方 e9ab0d8 的 enqueue 所有权互补:裁剪器管原始拷贝、enqueue
+  管最终文件)。P1,StudentKit 417 测试绿 + 模拟器 build 零警告;review-loop main 侧 3 轮+
+  1 次对质、port 侧 1 轮 CLEAN(transcripts:`~/Brain/wiki/projects/MeetPR/reviews/
+  2026-07-17-video-trim.md` 与 `…-video-trim-port.md`)。
+
 ## 📋 进度:离 archive 还差几步
 - [ ] 捞回队列余项逐个落线:per-set 逐组目标 / rename-student / #215'/#217' 裁剪卡(等 Claude)/
       #234a 非 UI 拆包(等 Claude),状态见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表
