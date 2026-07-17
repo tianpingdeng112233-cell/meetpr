@@ -312,7 +312,10 @@ public struct TodayWorkoutView: View {
   ) -> some View {
     let dayComplete = !drafts.isEmpty && drafts.allSatisfy(\.completed)
 
-    if dayComplete {
+    // On an editable day the banner (with its 查看回顾 entry) must not appear
+    // until the slide confirmation closes the day. Read-only days have no slide
+    // control, so the banner stays as the only entry to the review there.
+    if dayComplete && (reviewCompleted || !isEditable) {
       DayCompletionBanner(totalSets: drafts.count) {
         showingSummary = true
       }
