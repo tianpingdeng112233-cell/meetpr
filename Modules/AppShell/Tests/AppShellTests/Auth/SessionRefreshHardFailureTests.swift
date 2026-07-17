@@ -1,6 +1,5 @@
 import CoreModels
 import Foundation
-import Networking
 import Testing
 
 @testable import AppShell
@@ -23,9 +22,11 @@ import Testing
   let session = Session(auth: repository, tokenStore: store)
   await session.bootstrap()
   let rejectedAccessToken = try #require(await store.accessToken())
-  await repository.setForcedError(.backend(statusCode: 400, code: .validationError, issues: []))
+  let forcedError = AuthRepositoryError.backend(
+    statusCode: 400, code: .validationError, issues: [])
+  await repository.setForcedError(forcedError)
 
-  await #expect(throws: SessionStateReaderError.authenticationExpired) {
+  await #expect(throws: forcedError) {
     _ = try await session.recoverAccessToken(rejectedAccessToken: rejectedAccessToken)
   }
 
