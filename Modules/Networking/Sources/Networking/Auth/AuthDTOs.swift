@@ -23,6 +23,11 @@ public struct AuthLoginRequestDTO: Codable, Equatable, Sendable {
   }
 }
 
+/// Wire contract: `MeetPRCodec.encoder` (`.convertToSnakeCase`) serializes this as
+/// `{"refresh_token": …}` — the canonical key for every backend request schema.
+/// The backend also tolerates `refreshToken` (PR #76), but snake_case is what we pin
+/// in `AuthRefreshRequestEncodingTests`; changing the encoder or this property name
+/// silently breaks token refresh for every shipped client (2026-07-17 incident).
 public struct AuthRefreshRequestDTO: Codable, Equatable, Sendable {
   public let refreshToken: String
 
