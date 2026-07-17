@@ -15,6 +15,7 @@ public final class VideoAttachmentViewModel {
 
   public static let consentDefaultsKey = "video_upload_consent_v1"
 
+  let maxDurationSeconds: Double
   public private(set) var rowStates: [UUID: RowState] = [:]
   public private(set) var lastErrorMessage: String?
 
@@ -27,6 +28,7 @@ public final class VideoAttachmentViewModel {
   public init(manager: VideoUploadManager, consentDefaults: UserDefaults = .standard) {
     self.manager = manager
     self.consentDefaults = consentDefaults
+    self.maxDurationSeconds = manager.configuration.maxDurationSeconds
   }
 
   deinit {
@@ -76,6 +78,10 @@ public final class VideoAttachmentViewModel {
     } catch {
       lastErrorMessage = "视频处理失败,请重试"
     }
+  }
+
+  public func reportVideoProcessingFailure() {
+    lastErrorMessage = "视频处理失败,请重试"
   }
 
   public func retry(setLogID: UUID) async {
