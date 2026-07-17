@@ -29,10 +29,18 @@
   review-loop 已收敛(1 轮 CLEAN,transcript:
   `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-refresh-400-hard-failure.md`)。
 
+- 赛扣偏好按学员隔离 + 配重数学补测试 + 赛扣 VoiceOver(56bf338,#256 补审产出):同设备切换
+  学员账号不再继承上一账号的「上赛扣」选择(key 按学员 UUID 分区,已有测试员的勾选一次性重置为
+  默认关);配重数学抽纯函数 SetEntryPlateMath 并补 8 测锁定开/关算术与边界;开赛扣时 VoiceOver
+  同步播报赛扣。P1,StudentKit 407 + DesignSystem 29 测试绿,DemoStudent Demo 构建绿。
+
 ## 📋 进度:离 archive 还差几步
 - [ ] 捞回队列余项逐个落线:per-set 逐组目标 / rename-student / #215'/#217' 裁剪卡(等 Claude)/
       #234a 非 UI 拆包(等 Claude),状态见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表
-- [ ] review-loop 补审欠账:fadbc3a(1.0(9) 遗留)+ #256(1.0(10) 遗留,Claude 已亲审 diff)
+- [x] ✅ review-loop 补审欠账已清(2026-07-17):fadbc3a 1 轮 1 BLOCKER 对质 CONCEDE 收敛零改动
+      (transcript `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-review-fadbc3a-logout-escape.md`);
+      #256 2 轮收敛(4 BLOCKER+1 nit:2 条对质 CONCEDE 为存量另立 follow-up,3 条采纳修复=56bf338)
+      (transcript `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-review-256-collar-toggle.md`)
 - [ ] 真机走查亲验:#243 说明卡/设置页 + #249 视频占位(1.0(10) 遗留)+ 1.0(11) 新项
       (导入历史虚线段/阶梯线/gym-day 4点/记录 v2)运行态顺带一并验
 - [ ] gym-day 残留对齐:今日 tab 头条/周历高亮仍午夜翻篇(纯视觉),待全量对齐 spec
