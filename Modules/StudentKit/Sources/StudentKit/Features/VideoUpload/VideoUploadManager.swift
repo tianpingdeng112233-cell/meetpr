@@ -16,7 +16,7 @@ public actor VideoUploadManager {
   let service: any VideoUploadService
   let exporter: any VideoExporting
   let repository: any VideoAttachmentRepository
-  let configuration: VideoUploadConfiguration
+  nonisolated let configuration: VideoUploadConfiguration
   let filesDirectory: URL
   let now: @Sendable () -> Date
 

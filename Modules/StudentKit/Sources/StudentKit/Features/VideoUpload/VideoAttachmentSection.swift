@@ -26,6 +26,7 @@ struct VideoAttachmentSection: View {
   @State private var showingPhotosPicker = false
   @State private var showingCamera = false
   @State private var pickedItem: PhotosPickerItem?
+  @State private var libraryVideoToTrim: PickedVideo?
   @State private var pendingSource: PendingSource?
   /// True from the moment a video is chosen until the upload manager owns a
   /// row for it. Covers the otherwise feedback-less window where the picked
@@ -107,7 +108,10 @@ struct VideoAttachmentSection: View {
     }
     #if os(iOS)
       .fullScreenCover(isPresented: $showingCamera) {
-        CameraVideoPicker(maxDurationSeconds: 120, isPresented: $showingCamera) { url in
+        CameraVideoPicker(
+          maxDurationSeconds: videoViewModel.maxDurationSeconds,
+          isPresented: $showingCamera
+        ) { url in
           isPreparing = true
           Task {
             // 相册留底先于上传:这一组已经练掉了,上传怎么失败素材都不能丢。
@@ -115,6 +119,25 @@ struct VideoAttachmentSection: View {
             await attach(sourceURL: url)
           }
         }
+        .ignoresSafeArea()
+      }
+      .fullScreenCover(item: $libraryVideoToTrim) { movie in
+        VideoTrimmerView(
+          sourceURL: movie.url,
+          maxDurationSeconds: videoViewModel.maxDurationSeconds,
+          onSave: { editedURL in
+            libraryVideoToTrim = nil
+            isPreparing = true
+            Task { await attach(sourceURL: editedURL) }
+          },
+          onCancel: {
+            libraryVideoToTrim = nil
+          },
+          onFailure: {
+            libraryVideoToTrim = nil
+            videoViewModel.reportVideoProcessingFailure()
+          }
+        )
         .ignoresSafeArea()
       }
     #endif
@@ -225,8 +248,11 @@ struct VideoAttachmentSection: View {
     .buttonStyle(.plain)
   }
 
-  // MARK: - Actions
+}
 
+// MARK: - Actions
+
+extension VideoAttachmentSection {
   private func requestPick(_ source: PendingSource) {
     onWillPick?()
     if videoViewModel.hasConsented {
@@ -253,6 +279,15 @@ struct VideoAttachmentSection: View {
       isPreparing = false
       return
     }
+    #if os(iOS)
+      if UIVideoEditorController.canEditVideo(atPath: movie.url.path) {
+        // Trim before upload; the spinner yields to the editor, and the
+        // save/cancel/failure callbacks own the next state.
+        isPreparing = false
+        libraryVideoToTrim = movie
+        return
+      }
+    #endif
     await attach(sourceURL: movie.url)
   }
 
@@ -290,7 +325,8 @@ struct VideoAttachmentSection: View {
 
 /// File-URL transferable for PhotosPicker video items; the received file is
 /// copied into tmp so it outlives the picker session.
-struct PickedVideo: Transferable {
+struct PickedVideo: Identifiable, Transferable {
+  let id = UUID()
   let url: URL
 
   static var transferRepresentation: some TransferRepresentation {

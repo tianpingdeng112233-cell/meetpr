@@ -76,6 +76,20 @@ import Testing
 }
 
 @MainActor
+@Test func viewModelExposesUploadDurationLimitAndProcessingErrors() {
+  let configuration = VideoUploadConfiguration(maxDurationSeconds: 75)
+  let harness = VideoUploadHarness(configuration: configuration)
+  let viewModel = VideoAttachmentViewModel(
+    manager: harness.manager,
+    consentDefaults: makeDefaults()
+  )
+
+  #expect(viewModel.maxDurationSeconds == 75)
+  viewModel.reportVideoProcessingFailure()
+  #expect(viewModel.lastErrorMessage == "视频处理失败,请重试")
+}
+
+@MainActor
 private func makeDefaults() -> UserDefaults {
   let suiteName = "video-vm-tests-\(UUID().uuidString)"
   let defaults = UserDefaults(suiteName: suiteName) ?? .standard

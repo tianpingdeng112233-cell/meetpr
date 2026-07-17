@@ -22,6 +22,7 @@
       picker.cameraCaptureMode = .video
       picker.videoMaximumDuration = maxDurationSeconds
       picker.videoQuality = .typeHigh
+      picker.allowsEditing = true
       picker.delegate = context.coordinator
       return picker
     }
@@ -37,6 +38,7 @@
     {
       private let onPicked: (URL) -> Void
       private let close: () -> Void
+      private let singleShot = SingleShot()
 
       init(onPicked: @escaping (URL) -> Void, close: @escaping () -> Void) {
         self.onPicked = onPicked
@@ -47,14 +49,17 @@
         _ picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
       ) {
-        if let url = info[.mediaURL] as? URL {
-          onPicked(url)
+        singleShot.run {
+          // With `allowsEditing`, `.mediaURL` is the trimmed movie.
+          if let url = info[.mediaURL] as? URL {
+            onPicked(url)
+          }
+          close()
         }
-        close()
       }
 
       func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        close()
+        singleShot.run { close() }
       }
     }
   }
