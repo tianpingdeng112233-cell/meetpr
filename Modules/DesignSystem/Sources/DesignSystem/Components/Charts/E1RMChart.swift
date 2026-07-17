@@ -251,7 +251,7 @@ public struct E1RMChart: View {
 
   private func lineColor(for origin: E1RMChartPointOrigin) -> Color {
     switch origin {
-    case .logged: Color.MeetPR.brandRed
+    case .logged: Color.MeetPR.fgPrimary
     case .imported: Color.MeetPR.fgSecondary
     }
   }

@@ -107,7 +107,7 @@ private struct MiniSparkline: View {
           .frame(height: 1)
         path(in: proxy.size)
           .stroke(
-            row.points.isEmpty ? Color.MeetPR.fgTertiary.opacity(0.35) : Color.MeetPR.brandRed,
+            row.points.isEmpty ? Color.MeetPR.fgTertiary.opacity(0.35) : Color.MeetPR.fgPrimary,
             style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
           )
       }
