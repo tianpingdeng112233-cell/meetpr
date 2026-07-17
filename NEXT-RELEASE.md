@@ -11,6 +11,12 @@
 
 ## 本版将包含(落线后追加到这里)
 
+- 视频上传源临时文件泄漏修复:相册/相机选完视频后,输入源 tmp 拷贝在导出成功/失败/超时长被拒
+  三路都会被删除,不再每条视频在沙盒里多留一份 15–200MB 拷贝(VideoUploadManager 明确 source
+  ownership)。P1,StudentKit 401 测试绿 + 3 例新单测;review-loop 已收敛(1 轮 CLEAN,transcript:
+  `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-video-upload-source-cleanup.md`);
+  main 侧同修复走 PR #263。
+
 - 「查看回顾」入口押后到滑动完成之后(9551a98,源自 David 1.0(10) 截图反馈,落线晚于 11 的 tag):
   所有组打勾后不再同屏出现「今日训练完成 · 查看回顾」banner 和「滑动完成今日训练」滑条——banner
   只在滑动确认+回顾页点「完成」后出现;历史只读日无滑条,banner 保留作回顾唯一入口。P1,
