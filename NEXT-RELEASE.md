@@ -17,6 +17,12 @@
   DemoStudent 模拟器亲验全流程;review-loop 已收敛(1 轮 CLEAN,transcript:
   `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-review-entry-gating.md`)。
 
+- refresh 400 视同硬失效干净回登录页 + `/auth/refresh` 请求体 wire key 契约测试(c329981 + a15e158,
+  backend #76 键名事故的 iOS 侧姊妹修复):前台 token 刷新遇 400 不再困在重试死胡同,与 401 同走
+  清会话回登录;新增编码契约测试钉死 `refresh_token` 键名防复刻。P1,AppShell 54/72 测试全绿,
+  review-loop 已收敛(1 轮 CLEAN,transcript:
+  `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-refresh-400-hard-failure.md`)。
+
 ## 📋 进度:离 archive 还差几步
 - [ ] 捞回队列余项逐个落线:per-set 逐组目标 / rename-student / #215'/#217' 裁剪卡(等 Claude)/
       #234a 非 UI 拆包(等 Claude),状态见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表
