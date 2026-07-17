@@ -50,7 +50,7 @@ public struct OnboardingWizardFlow: View {
       Image(systemName: "list.clipboard")
         .font(.system(size: 40))
         .foregroundStyle(Color.MeetPR.fgTertiary)
-      Text("完成资料填写,教练才能开始评估")
+      Text("完成后教练即可为你排课")
         .font(Font.MeetPR.title2)
         .foregroundStyle(Color.MeetPR.fgPrimary)
         .multilineTextAlignment(.center)

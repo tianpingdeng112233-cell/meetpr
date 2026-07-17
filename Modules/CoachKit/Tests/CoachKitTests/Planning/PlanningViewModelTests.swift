@@ -75,7 +75,7 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func evaluationStudentCannotSelectFourWeeks() async throws {
+@Test func legacyEvaluationStatusDoesNotRestrictPlanDuration() async throws {
   let viewModel = try PlanningFixtures.viewModel()
   await viewModel.bootstrap()
 
@@ -83,9 +83,7 @@ import Testing
   try await viewModel.goNext()
   viewModel.selectDuration(4)
 
-  #expect(throws: PlanningValidationError.evaluationStudentRequiresOneWeek) {
-    try viewModel.validateCurrentStep()
-  }
+  #expect(viewModel.isCurrentStepValid)
 }
 
 @MainActor

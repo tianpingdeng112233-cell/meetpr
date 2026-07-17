@@ -63,14 +63,13 @@ final class BindQueueViewModel {
     let trimmedReason = skipReason?.trimmingCharacters(in: .whitespacesAndNewlines)
     let reason = (skipEvaluation && trimmedReason?.isEmpty == false) ? trimmedReason : nil
     do {
-      let outcome = try await repository.accept(
+      _ = try await repository.accept(
         requestID: item.id,
         skipEvaluation: skipEvaluation,
         skipReason: reason
       )
       items.removeAll { $0.id == item.id }
-      toastMessage =
-        outcome.evaluation == nil ? "已接收" : "已接收,评估期 7 天开始"
+      toastMessage = "已接收"
       return true
     } catch let error as CoachBindQueueError {
       bannerMessage = Self.bannerText(for: error)

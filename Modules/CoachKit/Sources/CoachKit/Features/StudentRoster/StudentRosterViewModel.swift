@@ -50,13 +50,14 @@ final class StudentRosterViewModel {
   }
 
   var triageRows: [StudentRosterRowModel] {
-    rows.filter(\.needsAttention)
+    rows.filter { $0.needsAttention && Self.isVisible($0.student.status) }
   }
 
   var filteredRows: [StudentRosterRowModel] {
     let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !query.isEmpty else { return rows }
-    return rows.filter {
+    let visibleRows = rows.filter { Self.isVisible($0.student.status) }
+    guard !query.isEmpty else { return visibleRows }
+    return visibleRows.filter {
       $0.student.displayName.localizedCaseInsensitiveContains(query)
     }
   }
@@ -86,27 +87,6 @@ final class StudentRosterViewModel {
     // must not stack a second full refresh (Codex P2).
     guard state == .idle || state.isFailure else { return }
     await refresh()
-  }
-
-  /// Evaluation completed from the detail page (Codex review P1): flip the
-  /// row to active in place — a full refresh would flash `.loading` over the
-  /// whole roster for a one-field change. The next pull-to-refresh converges
-  /// with the server anyway.
-  func markStudentActive(_ studentID: UUID) {
-    rows = rows.map { row in
-      guard row.student.id == studentID else { return row }
-      return StudentRosterRowModel(
-        student: CoachStudentSummary(
-          id: row.student.id,
-          displayName: row.student.displayName,
-          status: .active
-        ),
-        plannedTrainingDays: row.plannedTrainingDays,
-        completedTrainingDays: row.completedTrainingDays,
-        lastActiveAt: row.lastActiveAt,
-        triageSignals: row.triageSignals
-      )
-    }
   }
 
   func applyRenamedStudent(_ renamed: CoachStudentSummary) {
@@ -246,5 +226,12 @@ final class StudentRosterViewModel {
     let start = min(planStart ?? lookbackStart, lookbackStart)
     let end = CoachFeatureCalendar.endOfDay(now, calendar: calendar)
     return start...max(start, end)
+  }
+
+  private static func isVisible(_ status: CoachStudentStatus) -> Bool {
+    switch status {
+    case .active, .abnormal: true
+    default: false
+    }
   }
 }

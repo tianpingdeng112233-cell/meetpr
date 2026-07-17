@@ -108,10 +108,8 @@ public final class PlanningViewModel {
     }
   }
 
-  /// Wire plan kind (spec 033 §7): the adaptation-week intent and the
-  /// in-evaluation roster status both force `.adaptation`; the soft
-  /// recommendation explicitly schedules a regular plan even if the cached
-  /// roster status is stale.
+  /// Wire plan kind. Only an explicit adaptation-week intent selects
+  /// `.adaptation`; roster status no longer changes the planning flow.
   public var planKind: PlanKind {
     switch intent {
     case .adaptationWeek:
@@ -119,7 +117,7 @@ public final class PlanningViewModel {
     case .firstRegularPlan:
       return .regular
     case .blank:
-      return isEvaluationStudent ? .adaptation : .regular
+      return .regular
     }
   }
 
@@ -915,14 +913,6 @@ public final class PlanningViewModel {
 
 @available(iOS 17.0, macOS 14.0, *)
 extension PlanningViewModel {
-  private var isEvaluationStudent: Bool {
-    guard let selectedStudent else { return false }
-    if case .inEvaluation = selectedStudent.status {
-      return true
-    }
-    return false
-  }
-
   // swiftlint:disable:next cyclomatic_complexity
   private func validateStep(_ step: PlanningStep) throws {
     switch step {
@@ -934,11 +924,8 @@ extension PlanningViewModel {
       guard let planWeeks, [1, 4].contains(planWeeks) else {
         throw PlanningValidationError.invalidDuration
       }
-      // Covers both the adaptationWeek intent and the in-evaluation roster
-      // status (double insurance, spec 033 §7). The backend publish gate
-      // stays the only真 gate.
       if planKind == .adaptation, planWeeks != 1 {
-        throw PlanningValidationError.evaluationStudentRequiresOneWeek
+        throw PlanningValidationError.invalidDuration
       }
     case .assignFrequency:
       try validateAssignments()

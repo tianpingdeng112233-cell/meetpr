@@ -28,8 +28,6 @@ public struct CoachRootView: View {
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
     familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
     bindQueue: (any CoachBindQueueRepository)? = nil,
-    evaluations: (any EvaluationRepository)? = nil,
-    evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     studentProfiles: (any OnboardingProfileReading)? = nil,
     videoQueue: (any CoachVideoQueueRepository)? = nil,
     onLogout: @escaping @MainActor () async -> Void = {},
@@ -43,16 +41,11 @@ public struct CoachRootView: View {
     self.draftStore = draftStore
     let resolvedQueue =
       bindQueue ?? InMemoryCoachBindQueueRepository(coachId: UUID())
-    let resolvedEvaluations = evaluations ?? InMemoryCoachEvaluationRepository()
-    let resolvedSummaries =
-      evaluationSummaries ?? InMemoryCoachEvaluationSummaryRepository(coachId: UUID())
     let resolvedProfiles = studentProfiles ?? InMemoryCoachStudentProfileReader()
     detailContext = CoachStudentDetailContext(
       plans: studentPlans,
       trainingLogs: studentLogs,
       feedback: feedback,
-      evaluations: resolvedEvaluations,
-      summaries: resolvedSummaries,
       profiles: resolvedProfiles,
       videos: studentVideos,
       readiness: readiness,
@@ -93,8 +86,7 @@ public struct CoachRootView: View {
         context: detailContext,
         rows: rosterViewModel.rows,
         onOpenReceiving: { selectedTab = .receiving },
-        onOpenRoster: { selectedTab = .students },
-        onEvaluationCompleted: { rosterViewModel.markStudentActive($0) }
+        onOpenRoster: { selectedTab = .students }
       )
       .tag(CoachTab.today)
       .tabItem {

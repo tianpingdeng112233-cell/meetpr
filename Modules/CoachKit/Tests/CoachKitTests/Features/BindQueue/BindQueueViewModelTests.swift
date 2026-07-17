@@ -24,7 +24,7 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() async {
+@Test func acceptRemovesItemAndReportsGenericToast() async {
   let repository = StubBindQueueRepository(
     evaluationOnAccept: BindQueueFixtures.evaluation())
   let viewModel = BindQueueViewModel(repository: repository, now: { BindQueueFixtures.now })
@@ -35,7 +35,7 @@ import Testing
 
   #expect(accepted)
   #expect(viewModel.items.isEmpty)
-  #expect(viewModel.toastMessage == "已接收,评估期 7 天开始")
+  #expect(viewModel.toastMessage == "已接收")
   let recorded = await repository.acceptedRequests
   #expect(recorded.count == 1)
   #expect(recorded[0].skip == false)

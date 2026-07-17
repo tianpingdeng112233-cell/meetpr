@@ -88,7 +88,7 @@ private func activeStudent() -> CoachStudentSummary {
   #expect(viewModel.planKind == .adaptation)
   #expect(viewModel.planWeeks == 1)
   viewModel.selectDuration(4)
-  #expect(throws: PlanningValidationError.evaluationStudentRequiresOneWeek) {
+  #expect(throws: PlanningValidationError.invalidDuration) {
     try viewModel.validateCurrentStep()
   }
 }
@@ -132,13 +132,13 @@ private func activeStudent() -> CoachStudentSummary {
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func blankFlowWithEvaluationStudentForcesAdaptationKind() async throws {
+@Test func blankFlowIgnoresLegacyEvaluationStatus() async throws {
   let viewModel = try PlanningFixtures.viewModel()
   await viewModel.bootstrap()
 
   viewModel.selectStudent(PlanningFixtures.students()[0])
 
-  #expect(viewModel.planKind == .adaptation)
+  #expect(viewModel.planKind == .regular)
 }
 
 @MainActor

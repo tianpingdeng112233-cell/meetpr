@@ -35,11 +35,6 @@ public enum BindGateState: Equatable, Sendable {
   /// → 032 wizard (rendered through the injected onboarding flow builder).
   case needsOnboarding(PendingBindCode)
   case pendingAcceptance(BindRequest)
-  /// Accepted into a live evaluation period (skipEvaluation == false && the
-  /// period is uncompleted) → the single-page EvaluationPeriodView replaces
-  /// the 5 tabs (spec 033 §11, D6). Unreachable while
-  /// `BindGateViewModel.evaluationSealed` is true (2026-07-13 beta seal).
-  case evaluationActive(BindRequest, EvaluationPeriod)
   /// → 5-tab main content.
   case bound(BindRequest)
   /// `mine` fetch failed → full-screen retry. Never falls through to the
@@ -69,22 +64,18 @@ public final class BindGateViewModel {
   private let stash: any PendingBindCodeStoring
   private let isOnboardingComplete: @Sendable () async -> Bool
   private let studentId: UUID
-  /// Evaluation routing source (spec 033 §11); nil keeps the pre-033
-  /// behavior (accepted → straight to the 5 tabs).
-  private let evaluations: (any EvaluationRepository)?
+  private static let evaluationSealed = true
 
   public init(
     studentId: UUID,
     bind: any BindRepository,
     stash: any PendingBindCodeStoring,
-    isOnboardingComplete: @escaping @Sendable () async -> Bool,
-    evaluations: (any EvaluationRepository)? = nil
+    isOnboardingComplete: @escaping @Sendable () async -> Bool
   ) {
     self.studentId = studentId
     self.bind = bind
     self.stash = stash
     self.isOnboardingComplete = isOnboardingComplete
-    self.evaluations = evaluations
   }
 
   public func load() async {
@@ -99,43 +90,12 @@ public final class BindGateViewModel {
 
     switch mine?.status {
     case .accepted:
-      if let mine { state = await boundState(for: mine) }
+      if let mine { state = .bound(mine) }
     case .pending:
       if let mine { state = .pendingAcceptance(mine) }
     case .none, .rejected, .expired, .cancelled:
       await resolveUnbound(latest: mine)
     }
-  }
-
-  /// 2026-07-13 (David): the evaluation period is sealed for beta — accepted
-  /// students route straight to the 5 tabs even when a legacy uncompleted
-  /// period exists (defer ≠ delete; spec 033 code stays dormant). Flip to
-  /// false to restore the spec 033 §11 evaluation sub-route below.
-  private static let evaluationSealed = true
-
-  /// Accepted → `.bound` while sealed (above). Unsealed behavior
-  /// (spec 033 §11): a live (uncompleted) evaluation period shows the
-  /// single-page state; no period / completed → the 5 tabs. A fetch failure
-  /// must NOT fold into `.bound` — that would let an in-evaluation student
-  /// through to the 5 tabs on a network blip (Codex review P1) — so it
-  /// lands on the full-screen retry like the `mine` fetch above.
-  private func boundState(for request: BindRequest) async -> BindGateState {
-    if Self.evaluationSealed {
-      return .bound(request)
-    }
-    guard !request.skipEvaluation, let evaluations else {
-      return .bound(request)
-    }
-    let evaluation: EvaluationPeriod?
-    do {
-      evaluation = try await evaluations.fetchMyEvaluation()
-    } catch {
-      return .failed
-    }
-    guard let evaluation, evaluation.completedAt == nil else {
-      return .bound(request)
-    }
-    return .evaluationActive(request, evaluation)
   }
 
   /// Soft refresh for the pending page (pull-to-refresh / scenePhase): only
@@ -152,7 +112,7 @@ public final class BindGateViewModel {
     case .requestSent(let request):
       // A 201 ends any stash lifecycle: a stale code left by an earlier
       // transport failure must never ghost-resubmit later (Codex P1).
-      await stash.clear(studentId: studentId)
+      stash.clear(studentId: studentId)
       state = .pendingAcceptance(request)
     case .stashedForOnboarding(let pending):
       state = .needsOnboarding(pending)
@@ -232,7 +192,7 @@ public final class BindGateViewModel {
     case .accepted:
       if let mine {
         stash.clear(studentId: studentId)
-        state = await boundState(for: mine)
+        state = .bound(mine)
       }
     case .pending:
       if let mine {
