@@ -130,7 +130,6 @@ struct GrowthCurvePanelView: View {
               confidence: chartConfidence(point.confidence)
             )
           },
-          lineInterpolation: .step,
           onSelect: { chartPoint in
             selectedPoint = viewModel.winnerPoint(forSampleID: chartPoint.id)
           }

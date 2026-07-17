@@ -231,8 +231,7 @@ public struct TrainingHistoryView: View {
           origin: chartOrigin(point.origin),
           confidence: chartConfidence(point.confidence)
         )
-      },
-      lineInterpolation: .step
+      }
     )
     .frame(height: 140)
   }

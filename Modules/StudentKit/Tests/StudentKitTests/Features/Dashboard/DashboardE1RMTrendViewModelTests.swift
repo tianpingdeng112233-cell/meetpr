@@ -228,10 +228,12 @@ import Testing
   #expect(squat.trendDeltaKg == 10)
   #expect(squat.latestRecordPoint?.id == inWindowRecord.id)
 
+  // Rising-line rendering (David 2026-07-17): records connect directly,
+  // no inserted step corners; the carry sample keeps the flat tail.
   let sparkline = squat.sparklinePoints()
-  #expect(sparkline.count == 4)
-  #expect(sparkline[1].x == sparkline[2].x)
-  #expect(sparkline[1].y != sparkline[2].y)
+  #expect(sparkline.count == 3)
+  #expect(sparkline[0].y > sparkline[1].y)
+  #expect(sparkline[1].y == sparkline[2].y)
 }
 
 @MainActor

@@ -30,16 +30,12 @@ extension DashboardE1RMTrendRow {
     let minValue = values.min() ?? 0
     let maxValue = values.max() ?? minValue
     let span = Swift.max(maxValue - minValue, 1)
-    let recordPoints = sorted.enumerated().map { index, point in
+    // Records connect with plain rising segments (David 2026-07-17: smooth
+    // ascent, no staircase); carry samples keep the flat tail to today.
+    return sorted.enumerated().map { index, point in
       let x = sorted.count == 1 ? width / 2 : Double(index) * width / Double(sorted.count - 1)
       let normalized = (point.e1RMKg - minValue) / span
       return CGPoint(x: x, y: top + (1 - normalized) * usableHeight)
-    }
-    return recordPoints.enumerated().flatMap { index, point in
-      guard index > 0 else { return [point] }
-      let previous = recordPoints[index - 1]
-      guard previous.y != point.y else { return [point] }
-      return [CGPoint(x: point.x, y: previous.y), point]
     }
   }
 }
