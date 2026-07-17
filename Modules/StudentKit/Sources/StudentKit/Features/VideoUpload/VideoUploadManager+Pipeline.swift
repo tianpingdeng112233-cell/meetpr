@@ -10,6 +10,12 @@ extension VideoUploadManager {
   /// Entry point of the per-attachment upload task. `sourceURL` is non-nil on
   /// first run (export still needed) and nil on retries (exported file kept).
   func run(recordID: UUID, sourceURL: URL?) async {
+    defer {
+      if let sourceURL {
+        try? FileManager.default.removeItem(at: sourceURL)
+      }
+    }
+
     guard var record = try? await repository.fetch(id: recordID) else {
       return
     }
@@ -19,7 +25,7 @@ extension VideoUploadManager {
       }
       try await upload(record)
     } catch is CancellationError {
-      // remove() owns cleanup for cancelled uploads.
+      // remove() owns exported-file cleanup; this method owns source cleanup.
     } catch {
       await markFailed(recordID: recordID, error: error)
     }
