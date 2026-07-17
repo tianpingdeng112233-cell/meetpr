@@ -227,7 +227,7 @@ func bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(
     AuthRepositoryError.network,
     .server(statusCode: 503),
     .decoding,
-    .backend(statusCode: 400, code: .validationError, issues: []),
+    .backend(statusCode: 429, code: .rateLimited, issues: []),
   ])
 func accessTokenTransientRefreshFailureKeepsAuthenticatedSession(
   error: AuthRepositoryError
