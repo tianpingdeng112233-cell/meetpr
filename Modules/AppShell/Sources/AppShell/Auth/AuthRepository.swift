@@ -53,6 +53,11 @@ public enum AuthRepositoryError: Error, Sendable, Equatable {
     switch self {
     case .backend(401, _, _):
       true
+    case .backend(400, _, _):
+      // A 400 on /auth/refresh means the request itself is malformed — retrying the
+      // same stored token can never succeed, so keeping the session strands the user
+      // on an endless retry dead-end (2026-07-17 BindGate incident). Fail closed.
+      true
     case .backend, .decoding, .network, .server:
       false
     }
