@@ -35,8 +35,9 @@
 - [ ] 捞回队列余项逐个落线:#227 导入历史 e1RM 回填(已解锁,体量大拆子卡)/ per-set 逐组目标 /
       rename-student / #215'/#217' 裁剪卡(等 Claude)/ #234a 非 UI 拆包(等 Claude),
       状态见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表
-- [ ] review-loop 补审欠账:fadbc3a(1.0(9) 遗留)+ #256(1.0(10) 遗留,Claude 已亲审 diff)
-      + 9551a98(查看回顾押后,5 行条件改动,已模拟器亲验)
+- [ ] review-loop 补审欠账:fadbc3a(1.0(9) 遗留)+ #256(1.0(10) 遗留,Claude 已亲审 diff);
+      ✅ 9551a98 已补审收敛(1 轮 CLEAN,transcript:
+      `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-review-entry-gating.md`)
 - [ ] 1.0(10) 真机走查亲验:#243 说明卡/设置页 + #249 视频「准备中…」占位的运行态视觉
 - [ ] build 号 bump 11(prep-beta,agvtool 单源)+ 打 tag `beta/1.0-11`
 - [ ] David:Archive → Upload → 分配 Neice
