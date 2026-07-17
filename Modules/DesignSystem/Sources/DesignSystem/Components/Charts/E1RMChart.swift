@@ -58,6 +58,7 @@ public struct E1RMChart: View {
   private let rawEligible: [E1RMChartPoint]
   private let lineInterpolation: E1RMChartLineInterpolation
   private let onSelect: ((E1RMChartPoint) -> Void)?
+  @State private var calloutPointID: UUID?
 
   public init(
     points: [E1RMChartPoint],
@@ -120,17 +121,27 @@ public struct E1RMChart: View {
             .fill(Color.clear)
             .contentShape(Rectangle())
             .onTapGesture { location in
-              guard let onSelect, let plotFrame = proxy.plotFrame else { return }
+              guard let plotFrame = proxy.plotFrame else { return }
               let plotOrigin = geometry[plotFrame].origin
               let xInPlot = location.x - plotOrigin.x
               guard let tappedDate: Date = proxy.value(atX: xInPlot) else { return }
+              if let onSelect {
+                guard
+                  let nearest = smoothed.min(by: {
+                    abs($0.date.timeIntervalSince(tappedDate))
+                      < abs($1.date.timeIntervalSince(tappedDate))
+                  })
+                else { return }
+                onSelect(nearest)
+                return
+              }
               guard
-                let nearest = smoothed.min(by: {
+                let nearestRecord = recordPoints.min(by: {
                   abs($0.date.timeIntervalSince(tappedDate))
                     < abs($1.date.timeIntervalSince(tappedDate))
                 })
               else { return }
-              onSelect(nearest)
+              calloutPointID = calloutPointID == nearestRecord.id ? nil : nearestRecord.id
             }
         }
       }
@@ -161,7 +172,7 @@ public struct E1RMChart: View {
           y: .value("e1RM", point.e1RMKg),
           series: .value("线段", segment.id)
         )
-        .foregroundStyle(lineColor(for: segment.origin))
+        .foregroundStyle(lineColor(for: segment.origin).opacity(0.8))
         .lineStyle(lineStyle(for: segment.origin))
         .interpolationMethod(interpolationMethod)
       }
@@ -170,15 +181,47 @@ public struct E1RMChart: View {
 
   @ChartContentBuilder
   private var recordDots: some ChartContent {
-    ForEach(smoothed.filter(\.marksRecord)) { point in
+    ForEach(recordPoints) { point in
       PointMark(
         x: .value("日期", point.date),
         y: .value("e1RM", point.e1RMKg)
       )
       .foregroundStyle(lineColor(for: point.origin))
       .symbol(.circle)
-      .symbolSize(36)
+      .symbolSize(20)
+      .annotation(position: .top, spacing: 4) {
+        recordAnnotation(for: point)
+      }
     }
+  }
+
+  private var recordPoints: [E1RMChartPoint] {
+    smoothed.filter(\.marksRecord)
+  }
+
+  /// The latest breakthrough always shows its date; tapping any record dot
+  /// swaps in a date-and-value callout for that dot instead.
+  @ViewBuilder
+  private func recordAnnotation(for point: E1RMChartPoint) -> some View {
+    if point.id == calloutPointID {
+      Text("\(Self.chineseMonthDay(point.date)) · \(Self.kilograms(point.e1RMKg))kg")
+        .font(Font.MeetPR.monoLabel)
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(Color.MeetPR.surface3, in: RoundedRectangle(cornerRadius: 5))
+        .fixedSize()
+    } else if calloutPointID == nil, point.id == recordPoints.last?.id {
+      Text(Self.chineseMonthDay(point.date))
+        .font(Font.MeetPR.monoLabel)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .fixedSize()
+    }
+  }
+
+  private static func kilograms(_ value: Double) -> String {
+    value.truncatingRemainder(dividingBy: 1) == 0
+      ? String(Int(value)) : String(format: "%.1f", value)
   }
 
   @ChartContentBuilder
@@ -215,8 +258,8 @@ public struct E1RMChart: View {
 
   private func lineStyle(for origin: E1RMChartPointOrigin) -> StrokeStyle {
     switch origin {
-    case .logged: StrokeStyle()
-    case .imported: StrokeStyle(dash: [5, 3])
+    case .logged: StrokeStyle(lineWidth: 1.5)
+    case .imported: StrokeStyle(lineWidth: 1.5, dash: [5, 3])
     }
   }
 
