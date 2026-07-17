@@ -29,6 +29,7 @@ extension TodayWorkoutViewModel {
       planExerciseID: exercise.id,
       exerciseID: exercise.exercise.id,
       exerciseName: exercise.exercise.name,
+      isAccessory: exercise.exercise.isAccessory,
       prescribed: set,
       actualWeight: existingLog?.weightKg ?? set.weightKg,
       actualReps: existingLog?.reps ?? set.reps,

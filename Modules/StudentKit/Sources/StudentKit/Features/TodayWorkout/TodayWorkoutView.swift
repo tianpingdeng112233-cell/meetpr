@@ -268,14 +268,8 @@ public struct TodayWorkoutView: View {
             isEditable: isEditable)
         }
 
-        ForEach(day.exercises) { exercise in
-          exerciseTableCard(
-            exercise: exercise,
-            rows: rows(for: exercise, drafts: drafts),
-            allDrafts: drafts,
-            activeIndex: activeIndex,
-            isEditable: isEditable)
-        }
+        exerciseSections(
+          day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable)
 
         completionControls(drafts: drafts, day: day, isEditable: isEditable)
       }
@@ -301,6 +295,29 @@ public struct TodayWorkoutView: View {
         summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID,
         onComplete: { markReviewCompleted(for: day.date, setCount: drafts.count) }
       )
+    }
+  }
+
+  private func exerciseSections(
+    day: StudentPlanDay,
+    drafts: [TodayWorkoutViewModel.SetRowDraft],
+    activeIndex: Int?,
+    isEditable: Bool
+  ) -> some View {
+    ForEach(TodayWorkoutExerciseSection.sections(for: day.exercises)) { section in
+      Text(section.title)
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
+
+      ForEach(section.exercises) { exercise in
+        exerciseTableCard(
+          exercise: exercise,
+          rows: rows(for: exercise, drafts: drafts),
+          allDrafts: drafts,
+          activeIndex: activeIndex,
+          isEditable: isEditable)
+      }
     }
   }
 

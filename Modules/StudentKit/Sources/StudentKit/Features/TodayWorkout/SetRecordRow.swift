@@ -143,7 +143,7 @@ struct SetRecordRow: View {
       }
       .buttonStyle(.plain)
 
-      if let onPlateMath, let weight = plateMathWeightKg {
+      if draft.allowsPlateLoadingGuidance, let onPlateMath, let weight = plateMathWeightKg {
         Button {
           onPlateMath(weight)
         } label: {

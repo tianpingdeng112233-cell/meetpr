@@ -12,6 +12,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   /// history and PR detection per exercise+variation, not per plan slot.
   public let exerciseID: UUID
   public let exerciseName: String
+  public let isAccessory: Bool
   public var prescribed: PrescribedSet
   public var actualWeight: Decimal?
   public var actualReps: Int?
@@ -25,6 +26,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     planExerciseID: UUID,
     exerciseID: UUID,
     exerciseName: String,
+    isAccessory: Bool,
     prescribed: PrescribedSet,
     actualWeight: Decimal? = nil,
     actualReps: Int? = nil,
@@ -37,6 +39,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.planExerciseID = planExerciseID
     self.exerciseID = exerciseID
     self.exerciseName = exerciseName
+    self.isAccessory = isAccessory
     self.prescribed = prescribed
     self.actualWeight = actualWeight
     self.actualReps = actualReps
@@ -44,6 +47,10 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.completed = completed
     self.failed = failed
     self.loggedSetID = loggedSetID
+  }
+
+  public var allowsPlateLoadingGuidance: Bool {
+    !isAccessory
   }
 }
 

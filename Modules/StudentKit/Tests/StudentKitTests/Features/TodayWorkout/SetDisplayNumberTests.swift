@@ -26,6 +26,7 @@ import Testing
       planExerciseID: planExerciseID,
       exerciseID: UUID(),
       exerciseName: "深蹲",
+      isAccessory: false,
       prescribed: set
     )
   }

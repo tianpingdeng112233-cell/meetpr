@@ -34,6 +34,12 @@
   默认关);配重数学抽纯函数 SetEntryPlateMath 并补 8 测锁定开/关算术与边界;开赛扣时 VoiceOver
   同步播报赛扣。P1,StudentKit 407 + DesignSystem 29 测试绿,DemoStudent Demo 构建绿。
 
+- 训练 tab 按「主项及变式」/「辅助项」分段并保持计划原序;辅助项记录弹窗不再显示杠铃配片图、
+  配片明细和赛扣开关(exerciseType 按分类 gate,David 拍板),重量输入与完成/失败流程不变。
+  源自 David 教练端截图反馈(蝴蝶机夹胸配杠铃图)。P1,DemoStudent 模拟器亲验双向(辅助项无
+  配片/主项照旧);review-loop 已收敛(2 轮 CLEAN,transcript:
+  `~/Brain/wiki/projects/MeetPR/reviews/2026-07-17-training-tab-accessory-split.md`)。
+
 ## 📋 进度:离 archive 还差几步
 - [ ] 捞回队列余项逐个落线:per-set 逐组目标 / rename-student / #215'/#217' 裁剪卡(等 Claude)/
       #234a 非 UI 拆包(等 Claude),状态见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表
