@@ -49,7 +49,7 @@ public struct PlateLoadout: View {
     .frame(maxWidth: .infinity)
     .frame(height: 208)
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel(Self.accessibilityText(plates))
+    .accessibilityLabel(Self.accessibilityText(plates, showCollar: showCollar))
   }
 
   /// One end of the steel bar; rounded on the outward end only.
@@ -120,8 +120,11 @@ public struct PlateLoadout: View {
     value == value.rounded() ? String(Int(value)) : String(value)
   }
 
-  private static func accessibilityText(_ plates: [Double]) -> String {
-    "Loaded barbell, per side: " + breakdownText(plates)
+  // Internal (not private) so the collar branch is unit-testable; mirrors the
+  // visual state — VoiceOver must announce the collar the graphic draws.
+  static func accessibilityText(_ plates: [Double], showCollar: Bool) -> String {
+    let base = "Loaded barbell, per side: " + breakdownText(plates)
+    return showCollar ? base + " + 2.5kg collar" : base
   }
 }
 

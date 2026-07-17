@@ -34,17 +34,16 @@ struct SetEntrySheet: View {
   @FocusState private var focusedField: SetEntryNumberField?
   /// Whether the 2.5kg competition collar (赛扣) is loaded. When on it counts
   /// toward the dialed weight, so the plates drop 2.5kg per side; the barbell
-  /// graphic and breakdown follow. Persisted so the choice sticks across sets
-  /// and launches; defaults off (bare plates). Internal so the plate-math
+  /// graphic and breakdown follow. Persisted under a per-student key (review
+  /// finding 2026-07-17: a global key leaked one account's choice into the
+  /// next login on a shared device) so the choice sticks across sets and
+  /// launches; defaults off (bare plates). Internal so the plate-math
   /// extension (SetEntryPlateLoadout.swift) can read it.
-  @AppStorage("setEntry.collarOn") var collarOn = false
+  @AppStorage var collarOn: Bool
 
   var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
   private var repsValue: Int { SetEntryValue.reps(from: repsText) }
   private var rpeValue: Decimal { SetEntryValue.rpe(from: rpeText) }
-
-  let bar = 20.0
-  let collar = 2.5  // per-side competition collar (赛扣) — counted only when collarOn
 
   init(
     rowIndex: Int,
@@ -62,6 +61,8 @@ struct SetEntrySheet: View {
     self.studentID = studentID
     self.videoViewModel = videoViewModel
     self.scrollToVideo = scrollToVideo
+    _collarOn = AppStorage(
+      wrappedValue: false, SetEntryPlateMath.collarDefaultsKey(for: studentID))
     // Seed from the live draft, not the open-time snapshot: if presentation
     // churn (e.g. the camera cover) recreates this sheet, flushed edits must
     // reappear instead of the stale prescribed values (beta 2026-07-11).
