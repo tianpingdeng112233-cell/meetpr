@@ -48,12 +48,23 @@ public actor VideoUploadManager {
   /// Validates duration, persists a `pending` record, and starts the
   /// export-and-upload task. Replaces any earlier video on the same set log
   /// (V0.1: one video per set).
+  ///
+  /// Ownership of `sourceURL` transfers to the manager when this method is
+  /// called. The manager removes the file on every outcome; the caller must
+  /// not use it after `enqueue` returns, whether the call succeeds or throws.
   public func enqueue(
     sourceURL: URL,
     setLogID: UUID,
     studentID: UUID,
     recordedAt: Date? = nil
   ) async throws -> VideoAttachment {
+    var uploadTaskOwnsSource = false
+    defer {
+      if !uploadTaskOwnsSource {
+        try? FileManager.default.removeItem(at: sourceURL)
+      }
+    }
+
     let duration = try await exporter.durationSeconds(of: sourceURL)
     guard duration <= configuration.maxDurationSeconds else {
       throw VideoUploadError.durationExceedsLimit(
@@ -81,6 +92,7 @@ public actor VideoUploadManager {
     try await repository.save(record)
     broadcast(.updated(record, progress: 0))
     startUploadTask(recordID: id, sourceURL: sourceURL)
+    uploadTaskOwnsSource = true
     return record
   }
 

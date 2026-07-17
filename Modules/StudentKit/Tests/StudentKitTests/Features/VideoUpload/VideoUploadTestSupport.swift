@@ -8,6 +8,7 @@ import RepositoryContracts
 enum MockServiceError: Error, Equatable {
   case partFailed
   case initiateFailed
+  case exportFailed
 }
 
 struct TimeoutError: Error {}
@@ -24,6 +25,16 @@ struct MockVideoExporter: VideoExporting {
 
   func export(from sourceURL: URL, to destinationURL: URL) async throws {
     try Data(repeating: 0xAB, count: exportedBytes).write(to: destinationURL)
+  }
+}
+
+struct FailingVideoExporter: VideoExporting {
+  func durationSeconds(of sourceURL: URL) async throws -> Double {
+    30
+  }
+
+  func export(from sourceURL: URL, to destinationURL: URL) async throws {
+    throw MockServiceError.exportFailed
   }
 }
 
@@ -114,7 +125,7 @@ struct VideoUploadHarness {
   let sourceURL = URL(fileURLWithPath: "/tmp/ignored-source.mov")
 
   init(
-    exporter: MockVideoExporter = MockVideoExporter(),
+    exporter: any VideoExporting = MockVideoExporter(),
     configuration: VideoUploadConfiguration = VideoUploadHarness.testConfiguration()
   ) {
     let service = MockVideoUploadService()
@@ -146,6 +157,13 @@ struct VideoUploadHarness {
       partRetryDelay: .zero
     )
   }
+}
+
+func makeTemporaryVideoSource() throws -> URL {
+  let sourceURL = FileManager.default.temporaryDirectory
+    .appending(path: "video-upload-source-\(UUID().uuidString).mov")
+  try Data([0x01]).write(to: sourceURL)
+  return sourceURL
 }
 
 func waitForStatus(

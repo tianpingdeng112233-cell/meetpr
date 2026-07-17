@@ -41,6 +41,40 @@ import Testing
   #expect(uploaded.localFileName == nil)
 }
 
+@Test func uploadManagerDeletesOwnedSourceAfterSuccessfulExport() async throws {
+  let harness = VideoUploadHarness()
+  let sourceURL = try makeTemporaryVideoSource()
+
+  let record = try await harness.manager.enqueue(
+    sourceURL: sourceURL,
+    setLogID: UUID(),
+    studentID: UUID()
+  )
+  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
+  try await waitUntil {
+    !FileManager.default.fileExists(atPath: sourceURL.path)
+  }
+
+  #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
+}
+
+@Test func uploadManagerDeletesOwnedSourceAfterExportFailure() async throws {
+  let harness = VideoUploadHarness(exporter: FailingVideoExporter())
+  let sourceURL = try makeTemporaryVideoSource()
+
+  let record = try await harness.manager.enqueue(
+    sourceURL: sourceURL,
+    setLogID: UUID(),
+    studentID: UUID()
+  )
+  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
+  try await waitUntil {
+    !FileManager.default.fileExists(atPath: sourceURL.path)
+  }
+
+  #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
+}
+
 @Test func uploadManagerRetriesTransientPartFailures() async throws {
   let harness = VideoUploadHarness()
   // Part 2 fails twice; the third attempt (2 retries allowed) succeeds.
@@ -93,15 +127,17 @@ import Testing
 @Test func uploadManagerRejectsVideosOverTheDurationLimit() async throws {
   let harness = VideoUploadHarness(exporter: MockVideoExporter(duration: 121))
   let studentID = UUID()
+  let sourceURL = try makeTemporaryVideoSource()
 
   await #expect(throws: VideoUploadError.durationExceedsLimit(seconds: 121, maxSeconds: 120)) {
     try await harness.manager.enqueue(
-      sourceURL: harness.sourceURL,
+      sourceURL: sourceURL,
       setLogID: UUID(),
       studentID: studentID
     )
   }
 
+  #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
   #expect(await harness.service.calls.isEmpty)
   #expect(try await harness.repository.fetchAll(studentID: studentID).isEmpty)
 }
