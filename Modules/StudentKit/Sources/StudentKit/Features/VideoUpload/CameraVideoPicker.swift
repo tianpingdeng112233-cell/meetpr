@@ -18,6 +18,7 @@
       picker.cameraCaptureMode = .video
       picker.videoMaximumDuration = maxDurationSeconds
       picker.videoQuality = .typeHigh
+      picker.allowsEditing = true
       picker.delegate = context.coordinator
       return picker
     }
@@ -33,6 +34,7 @@
     {
       private let onPicked: (URL) -> Void
       private let dismiss: () -> Void
+      private let singleShot = SingleShot()
 
       init(onPicked: @escaping (URL) -> Void, dismiss: @escaping () -> Void) {
         self.onPicked = onPicked
@@ -43,14 +45,16 @@
         _ picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
       ) {
-        if let url = info[.mediaURL] as? URL {
-          onPicked(url)
+        singleShot.run {
+          if let url = info[.mediaURL] as? URL {
+            onPicked(url)
+          }
+          dismiss()
         }
-        dismiss()
       }
 
       func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss()
+        singleShot.run { dismiss() }
       }
     }
   }
