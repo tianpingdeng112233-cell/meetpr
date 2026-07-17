@@ -30,6 +30,8 @@ public struct E1RMChartPoint: Hashable, Sendable, Identifiable {
   public let origin: E1RMChartPointOrigin
   public let confidence: E1RMChartPointConfidence
   public let winnerPointID: UUID
+  /// Draws a solid dot on the main line — callers flag record-break samples.
+  public let marksRecord: Bool
 
   public init(
     id: UUID,
@@ -37,7 +39,8 @@ public struct E1RMChartPoint: Hashable, Sendable, Identifiable {
     e1RMKg: Double,
     origin: E1RMChartPointOrigin = .logged,
     confidence: E1RMChartPointConfidence = .normal,
-    winnerPointID: UUID? = nil
+    winnerPointID: UUID? = nil,
+    marksRecord: Bool = false
   ) {
     self.id = id
     self.date = date
@@ -45,6 +48,7 @@ public struct E1RMChartPoint: Hashable, Sendable, Identifiable {
     self.origin = origin
     self.confidence = confidence
     self.winnerPointID = winnerPointID ?? id
+    self.marksRecord = marksRecord
   }
 }
 
@@ -83,6 +87,7 @@ public struct E1RMChart: View {
     VStack(alignment: .leading, spacing: 4) {
       Chart {
         smoothedLine
+        recordDots
         rawScatter
       }
       .chartYScale(domain: yDomain)
@@ -102,7 +107,7 @@ public struct E1RMChart: View {
         AxisMarks(values: .automatic(desiredCount: 4)) { value in
           AxisValueLabel {
             if let date = value.as(Date.self) {
-              Text(date, format: .dateTime.month(.defaultDigits).day())
+              Text(Self.chineseMonthDay(date))
                 .font(Font.MeetPR.monoLabel)
                 .foregroundStyle(Color.MeetPR.fgSecondary)
             }
@@ -164,6 +169,19 @@ public struct E1RMChart: View {
   }
 
   @ChartContentBuilder
+  private var recordDots: some ChartContent {
+    ForEach(smoothed.filter(\.marksRecord)) { point in
+      PointMark(
+        x: .value("日期", point.date),
+        y: .value("e1RM", point.e1RMKg)
+      )
+      .foregroundStyle(lineColor(for: point.origin))
+      .symbol(.circle)
+      .symbolSize(36)
+    }
+  }
+
+  @ChartContentBuilder
   private var rawScatter: some ChartContent {
     ForEach(rawEligible) { point in
       PointMark(
@@ -215,6 +233,11 @@ public struct E1RMChart: View {
       return base.opacity(0.35)
     }
     return point.origin == .imported ? base.opacity(0.65) : base
+  }
+
+  private static func chineseMonthDay(_ date: Date) -> String {
+    let parts = Calendar.current.dateComponents([.month, .day], from: date)
+    return "\(parts.month ?? 0)月\(parts.day ?? 0)日"
   }
 
   private var containsImportedPoint: Bool {

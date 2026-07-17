@@ -429,9 +429,13 @@ public struct DashboardView: View {
             .foregroundStyle(delta.color)
         }
       }
-      Sparkline(points: row.sparklinePoints(), viewBox: CGSize(width: 600, height: 120))
-        .frame(height: 110)
-        .padding(.top, 12)
+      Sparkline(
+        points: row.sparklinePoints(),
+        viewBox: CGSize(width: 600, height: 120),
+        showsPointDots: true
+      )
+      .frame(height: 110)
+      .padding(.top, 12)
     }
   }
 

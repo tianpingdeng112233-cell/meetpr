@@ -117,7 +117,8 @@ struct GrowthCurvePanelView: View {
               e1RMKg: sample.valueKg,
               origin: chartOrigin(sample.winnerOrigin),
               confidence: chartConfidence(sample.winnerConfidence),
-              winnerPointID: sample.winnerPointID
+              winnerPointID: sample.winnerPointID,
+              marksRecord: sample.sampleID == sample.winnerPointID
             )
           },
           rawEligible: viewModel.visibleRawEligiblePoints.compactMap { point in
