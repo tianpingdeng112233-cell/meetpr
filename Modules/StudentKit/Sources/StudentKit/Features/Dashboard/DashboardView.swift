@@ -329,7 +329,10 @@ public struct DashboardView: View {
     let done =
       isPast && day != nil
       && weekSnapshot?.progress(for: day).state == .complete
-    let liftText = families.isEmpty ? "—" : families.map(liftLetter).joined()
+    let liftText =
+      MainLiftExerciseFamilyResolver.shorthand(in: day).flatMap {
+        $0.isEmpty ? nil : $0
+      } ?? "—"
 
     return Button {
       selectedDate = date
@@ -582,14 +585,6 @@ public struct DashboardView: View {
   /// growth curve and the start-CTA label, which are single-lift by design.
   private func mainFamily(_ day: StudentPlanDay) -> LiftFamily? {
     dayFamilies(day).first
-  }
-
-  private func liftLetter(_ family: LiftFamily) -> String {
-    switch family {
-    case .squat: "S"
-    case .bench: "B"
-    case .deadlift: "D"
-    }
   }
 
   private var effectiveSelectedDate: Date {
