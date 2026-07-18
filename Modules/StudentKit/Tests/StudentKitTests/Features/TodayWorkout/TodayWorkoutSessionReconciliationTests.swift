@@ -89,8 +89,50 @@ import Testing
     #expect(await repository.startCallCount == 0)
   }
 
+  @Test func blindOptimisticStartAdoptsLaterGymDayWithoutNullRegression() async {
+    let gymDay = "2026-01-13"
+    let activityCenter = TrainingSessionActivityCenter()
+    let repository = StubTrainingSessionRepository(
+      fetchOutcomes: [
+        .failure,
+        .success(snapshot(gymDay: gymDay, session: nil)),
+      ],
+      startOutcomes: [.failure, .failure]
+    )
+    let viewModel = await makeViewModel(
+      sessions: repository,
+      sessionActivityCenter: activityCenter
+    )
+
+    await viewModel.startSession()
+    await viewModel.load(date: Date(), studentID: StudentDemoSeed.studentID)
+
+    guard case .inProgress(let localSession) = viewModel.sessionPage else {
+      Issue.record("Expected training page to preserve the optimistic session")
+      return
+    }
+    #expect(viewModel.localSessionOverride?.gymDay == gymDay)
+    #expect(viewModel.localSessionOverride?.session == localSession)
+
+    let dashboard = DashboardTrainingStatusViewModel(
+      sessions: repository,
+      sessionActivityCenter: activityCenter,
+      now: { now },
+      onOpenTraining: {}
+    )
+    await dashboard.reload()
+
+    #expect(
+      dashboard.status(for: StudentPlanDay(id: UUID(), date: now, exercises: []))
+        == .inProgress(elapsedSeconds: 0)
+    )
+    #expect(activityCenter.snapshot?.gymDay == gymDay)
+    #expect(await repository.fetchCallCount == 3)
+  }
+
   private func makeViewModel(
-    sessions: any TrainingSessionRepository
+    sessions: any TrainingSessionRepository,
+    sessionActivityCenter: TrainingSessionActivityCenter = TrainingSessionActivityCenter()
   ) async -> TodayWorkoutViewModel {
     let studentID = StudentDemoSeed.studentID
     let plan = StudentDemoSeed.makePlanView()
@@ -99,6 +141,7 @@ import Testing
       plans: InMemoryStudentPlanRepository(store: store),
       logs: InMemoryStudentTrainingLogRepository(),
       sessions: sessions,
+      sessionActivityCenter: sessionActivityCenter,
       recentCompletedDurationStore: DiscardingSessionDurationStore(),
       now: { now }
     )

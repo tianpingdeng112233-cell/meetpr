@@ -49,11 +49,15 @@ import Testing
   }
 
   @Test func startFailureKeepsLocalWorkoutAndRetriesOnce() async {
+    let activityCenter = TrainingSessionActivityCenter()
     let repository = StubTrainingSessionRepository(
       fetched: nil,
       startOutcomes: [.failure, .failure]
     )
-    let viewModel = await makeViewModel(sessions: repository)
+    let viewModel = await makeViewModel(
+      sessions: repository,
+      sessionActivityCenter: activityCenter
+    )
 
     await viewModel.startSession()
 
@@ -63,6 +67,19 @@ import Testing
     }
     #expect(session.startedAt == now)
     #expect(await repository.startCallCount == 2)
+
+    let dashboard = DashboardTrainingStatusViewModel(
+      sessions: repository,
+      sessionActivityCenter: activityCenter,
+      now: { now },
+      onOpenTraining: {}
+    )
+    await dashboard.reload()
+    #expect(
+      dashboard.status(for: dashboardSessionPlanDay(date: now))
+        == .inProgress(elapsedSeconds: 0)
+    )
+    #expect(await repository.fetchCallCount == 2)
   }
 
   @Test func immediateReloadWithNullGetKeepsLocalPendingSession() async {
@@ -182,6 +199,7 @@ import Testing
 
   private func makeViewModel(
     sessions: any TrainingSessionRepository,
+    sessionActivityCenter: TrainingSessionActivityCenter = TrainingSessionActivityCenter(),
     recentCompletedDurationStore: any RecentCompletedSessionDurationStoring =
       DiscardingSessionDurationStore()
   ) async -> TodayWorkoutViewModel {
@@ -192,6 +210,7 @@ import Testing
       plans: InMemoryStudentPlanRepository(store: store),
       logs: InMemoryStudentTrainingLogRepository(),
       sessions: sessions,
+      sessionActivityCenter: sessionActivityCenter,
       recentCompletedDurationStore: recentCompletedDurationStore,
       now: { now }
     )
@@ -226,6 +245,7 @@ actor StubTrainingSessionRepository: TrainingSessionRepository {
   private var fetchOutcomes: [FetchOutcome]
   private var startOutcomes: [StartOutcome]
   private(set) var startCallCount = 0
+  private(set) var fetchCallCount = 0
   private(set) var markedCompleted: (date: Date, duration: Int)?
   private var suspendedStartReleased = false
 
@@ -266,6 +286,7 @@ actor StubTrainingSessionRepository: TrainingSessionRepository {
   }
 
   func fetchSession(on date: Date?) async throws -> TrainingSessionSnapshot {
+    fetchCallCount += 1
     guard !fetchOutcomes.isEmpty else { return snapshot(session: nil) }
     let outcome: FetchOutcome
     if fetchOutcomes.count == 1 {
@@ -308,6 +329,10 @@ actor StubTrainingSessionRepository: TrainingSessionRepository {
   func releaseSuspendedStart() {
     suspendedStartReleased = true
   }
+}
+
+private func dashboardSessionPlanDay(date: Date) -> StudentPlanDay {
+  StudentPlanDay(id: UUID(), date: date, exercises: [])
 }
 
 struct StubSessionError: Error {}

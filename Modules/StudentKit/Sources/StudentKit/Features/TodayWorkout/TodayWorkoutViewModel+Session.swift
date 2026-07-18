@@ -19,6 +19,9 @@ extension TodayWorkoutViewModel {
       durationSeconds: 0
     )
     localSessionOverride = LocalSessionOverride(gymDay: currentGymDay, session: localSession)
+    sessionActivityCenter.storeOptimisticInProgress(
+      TrainingSessionSnapshot(gymDay: currentGymDay, session: localSession)
+    )
     sessionPage = .inProgress(localSession)
     scheduleSessionStartCoordination()
     await sessionStartTask?.value
@@ -48,6 +51,7 @@ extension TodayWorkoutViewModel {
 
     guard let localSessionOverride else {
       currentGymDay = fetchedSnapshot?.gymDay
+      sessionActivityCenter.storeAuthoritative(fetchedSnapshot)
       sessionPage = Self.resolveSessionPage(for: fetchedSnapshot?.session)
       return
     }
@@ -61,27 +65,52 @@ extension TodayWorkoutViewModel {
     }
 
     guard let fetchedSession = fetchedSnapshot.session else {
-      currentGymDay = fetchedSnapshot.gymDay
-      guard
-        let fetchedGymDay = fetchedSnapshot.gymDay,
-        let overrideGymDay = localSessionOverride.gymDay,
-        fetchedGymDay == overrideGymDay
-      else {
-        self.localSessionOverride = nil
-        sessionStartTask?.cancel()
-        sessionStartTask = nil
-        sessionPage = .overview
-        return
-      }
-
-      sessionPage = Self.resolveSessionPage(for: localSessionOverride.session)
-      if localSessionOverride.session.status == .inProgress {
-        scheduleSessionStartCoordination()
-      }
+      applyFetchedNullSession(fetchedSnapshot, over: localSessionOverride)
       return
     }
 
     applyAuthoritativeSession(fetchedSession, gymDay: fetchedSnapshot.gymDay)
+  }
+
+  private func applyFetchedNullSession(
+    _ fetchedSnapshot: TrainingSessionSnapshot,
+    over localSessionOverride: LocalSessionOverride
+  ) {
+    currentGymDay = fetchedSnapshot.gymDay
+    if localSessionOverride.gymDay == nil,
+      let fetchedGymDay = fetchedSnapshot.gymDay
+    {
+      let adoptedOverride = LocalSessionOverride(
+        gymDay: fetchedGymDay,
+        session: localSessionOverride.session
+      )
+      self.localSessionOverride = adoptedOverride
+      sessionActivityCenter.storeOptimisticInProgress(
+        TrainingSessionSnapshot(gymDay: fetchedGymDay, session: adoptedOverride.session)
+      )
+      preserveLocalSession(adoptedOverride.session)
+      return
+    }
+    guard
+      let fetchedGymDay = fetchedSnapshot.gymDay,
+      let overrideGymDay = localSessionOverride.gymDay,
+      fetchedGymDay == overrideGymDay
+    else {
+      self.localSessionOverride = nil
+      sessionActivityCenter.storeAuthoritative(fetchedSnapshot)
+      sessionStartTask?.cancel()
+      sessionStartTask = nil
+      sessionPage = .overview
+      return
+    }
+    preserveLocalSession(localSessionOverride.session)
+  }
+
+  private func preserveLocalSession(_ session: TrainingSession) {
+    sessionPage = Self.resolveSessionPage(for: session)
+    if session.status == .inProgress {
+      scheduleSessionStartCoordination()
+    }
   }
 
   // Reached only past the top-of-function generation gate (GET) or from a
@@ -89,6 +118,9 @@ extension TodayWorkoutViewModel {
   private func applyAuthoritativeSession(_ session: TrainingSession, gymDay: String?) {
     currentGymDay = gymDay
     localSessionOverride = nil
+    sessionActivityCenter.storeAuthoritative(
+      TrainingSessionSnapshot(gymDay: gymDay, session: session)
+    )
     sessionPage = Self.resolveSessionPage(for: session)
   }
 
@@ -148,6 +180,9 @@ extension TodayWorkoutViewModel {
       durationSeconds: duration
     )
     localSessionOverride = LocalSessionOverride(gymDay: currentGymDay, session: completed)
+    sessionActivityCenter.storeAuthoritative(
+      TrainingSessionSnapshot(gymDay: currentGymDay, session: completed)
+    )
     sessionPage = .completed(completed)
     if let currentStudentID {
       recentCompletedDurationStore.record(

@@ -35,6 +35,7 @@ public struct TodayWorkoutView: View {
     resetToTodayPulse: Int = 0,
     sessionReviews: (any SessionReviewRepository)? = nil,
     trainingSessions: any TrainingSessionRepository = InMemoryTrainingSessionRepository(),
+    sessionActivityCenter: TrainingSessionActivityCenter = TrainingSessionActivityCenter(),
     tabEntryPulse: Int = 0,
     planRevision: Int = 0
   ) {
@@ -52,7 +53,8 @@ public struct TodayWorkoutView: View {
         logs: logs,
         e1rm: e1rm,
         onboarding: onboarding,
-        sessions: trainingSessions
+        sessions: trainingSessions,
+        sessionActivityCenter: sessionActivityCenter
       ))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness))

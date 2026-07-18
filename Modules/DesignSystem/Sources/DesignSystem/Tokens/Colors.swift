@@ -40,6 +40,7 @@ extension Color {
 
     public static let green = rgb(31, 179, 88)
     public static let greenSoft = rgb(31, 179, 88, opacity: 0.14)
+    public static let signalYellow = rgb(245, 197, 24)
     public static let amber = rgb(224, 168, 16)
     public static let amberSoft = rgb(224, 168, 16, opacity: 0.14)
 

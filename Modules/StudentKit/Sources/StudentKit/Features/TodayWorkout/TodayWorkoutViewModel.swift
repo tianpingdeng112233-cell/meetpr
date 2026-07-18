@@ -37,6 +37,7 @@ public final class TodayWorkoutViewModel {
   let sessions: any TrainingSessionRepository
   let now: @Sendable () -> Date
   let recentCompletedDurationStore: any RecentCompletedSessionDurationStoring
+  let sessionActivityCenter: TrainingSessionActivityCenter
   var currentStudentID: UUID?
   var currentOnboarding: OnboardingProfile?
   var loadGeneration = 0
@@ -52,6 +53,7 @@ public final class TodayWorkoutViewModel {
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID()),
     sessions: any TrainingSessionRepository = InMemoryTrainingSessionRepository(),
+    sessionActivityCenter: TrainingSessionActivityCenter = TrainingSessionActivityCenter(),
     recentCompletedDurationStore: any RecentCompletedSessionDurationStoring =
       UserDefaultsSessionDurationStore(),
     now: @escaping @Sendable () -> Date = { Date() }
@@ -61,6 +63,7 @@ public final class TodayWorkoutViewModel {
     self.e1rmRepo = e1rm
     self.onboarding = onboarding
     self.sessions = sessions
+    self.sessionActivityCenter = sessionActivityCenter
     self.recentCompletedDurationStore = recentCompletedDurationStore
     self.now = now
   }

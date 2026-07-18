@@ -29,12 +29,17 @@ struct MeetPRApp: App {
   #if DEMO_MODE
     private struct DemoCoachDependencies {
       let bindQueue: InMemoryCoachBindQueueRepository
+      let dashboard: InMemoryCoachDashboardRepository
       let profiles: InMemoryCoachStudentProfileReader
     }
 
     private static func makeDemoCoachDependencies() -> DemoCoachDependencies {
       DemoCoachDependencies(
         bindQueue: InMemoryCoachBindQueueRepository(seed: CoachDemoSeed.pendingBindRequests()),
+        dashboard: InMemoryCoachDashboardRepository(
+          signals: CoachDemoSeed.dashboardSignals(),
+          dailyDigestBody: CoachDemoSeed.dailyDigestBody
+        ),
         profiles: InMemoryCoachStudentProfileReader(
           profiles: [
             StudentDemoSeed.makeOnboardingProfile(studentID: CoachDemoSeed.queueStudentID)
@@ -76,6 +81,7 @@ struct MeetPRApp: App {
             seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
           ),
           coachBindQueue: coachDependencies.bindQueue,
+          coachDashboard: coachDependencies.dashboard,
           coachStudentProfiles: coachDependencies.profiles,
           studentPlans: InMemoryStudentPlanRepository(store: planStore),
           studentLogs: InMemoryStudentTrainingLogRepository(
@@ -132,6 +138,7 @@ struct MeetPRApp: App {
           coachPlans: BackendPlanRepository(api: api, session: session, cache: PlanCache()),
           coachInviteCodes: BackendInviteCodeRepository(api: api, session: session),
           coachBindQueue: BackendCoachBindQueueRepository(api: api, session: session),
+          coachDashboard: BackendCoachDashboardRepository(api: api, session: session),
           coachStudentProfiles: BackendCoachStudentProfileReader(api: api, session: session),
           studentPlans: BackendStudentPlanRepository(
             api: api,

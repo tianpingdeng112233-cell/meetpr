@@ -24,6 +24,7 @@ public struct StudentRootView: View {
   private let trainingSessions: any TrainingSessionRepository
   private let account: (any AccountRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
+  @State private var sessionActivityCenter = TrainingSessionActivityCenter()
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
   @State private var trainingTodayPulse = 0
@@ -171,6 +172,7 @@ public struct StudentRootView: View {
             onboarding: onboarding,
             e1rm: e1rm,
             feedbackViewModel: feedbackViewModel,
+            trainingSessions: trainingSessions, sessionActivityCenter: sessionActivityCenter,
             onStartWorkout: {
               trainingTodayPulse += 1
               selectedTab = .training
@@ -199,8 +201,8 @@ public struct StudentRootView: View {
             onboarding: onboarding, readiness: readiness, videoUploads: videoUploads,
             resetToTodayPulse: trainingTodayPulse,
             sessionReviews: sessionReviews, trainingSessions: trainingSessions,
-            tabEntryPulse: trainingTabEntryPulse,
-            planRevision: planRevision
+            sessionActivityCenter: sessionActivityCenter,
+            tabEntryPulse: trainingTabEntryPulse, planRevision: planRevision
           )
         }
       }

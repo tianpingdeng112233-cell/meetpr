@@ -13,6 +13,44 @@ public enum CoachDemoSeed {
   public static let queueStudentID = UUID(
     uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x42))
 
+  public static func dashboardSignals(now: Date = Date()) -> [CoachSignal] {
+    [
+      CoachSignal(
+        id: signalID(1),
+        studentID: previewStudentID(4),
+        studentName: "王晨曦",
+        type: .missedTraining,
+        severity: .red,
+        reason: "周一至周三无打卡（已连续 3 个训练日）",
+        openedAt: now.addingTimeInterval(-1_800)
+      ),
+      CoachSignal(
+        id: signalID(2),
+        studentID: previewStudentID(2),
+        studentName: "张以恒",
+        type: .weightFailed,
+        severity: .yellow,
+        reason: "比赛式传统硬拉 210kg 被压，今天已出现 2 次失败组",
+        openedAt: now.addingTimeInterval(-3_600)
+      ),
+      CoachSignal(
+        id: signalID(3),
+        studentID: previewStudentID(8),
+        studentName: "李嘉宁",
+        type: .personalRecord,
+        severity: .green,
+        reason: "卧推 e1RM 提升至 102.5kg，刷新近 28 天最佳",
+        openedAt: now.addingTimeInterval(-7_200)
+      ),
+    ]
+  }
+
+  public static let dailyDigestBody = "昨天 · 3 练完 · 1 缺练 · 1 被压 · 1 破 PR"
+
+  private static func signalID(_ byte: UInt8) -> UUID {
+    UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, byte))
+  }
+
   /// One pending request with the full 9-item summary (submitted 2h ago).
   public static func pendingBindRequests(now: Date = Date()) -> [CoachBindRequestItem] {
     [

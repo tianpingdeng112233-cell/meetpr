@@ -14,6 +14,7 @@ public struct CoachRootView: View {
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var queueViewModel: BindQueueViewModel
   @State private var videoQueueViewModel: CoachVideoQueueViewModel
+  @State private var dashboardViewModel: CoachDashboardViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
   @State private var selectedTab: CoachTab = .today
 
@@ -30,6 +31,7 @@ public struct CoachRootView: View {
     bindQueue: (any CoachBindQueueRepository)? = nil,
     studentProfiles: (any OnboardingProfileReading)? = nil,
     videoQueue: (any CoachVideoQueueRepository)? = nil,
+    dashboard: (any CoachDashboardRepository)? = nil,
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
@@ -73,6 +75,15 @@ public struct CoachRootView: View {
     _videoQueueViewModel = State(
       initialValue: CoachVideoQueueViewModel(repository: resolvedVideoQueue)
     )
+    let resolvedDashboard =
+      dashboard
+      ?? InMemoryCoachDashboardRepository(
+        signals: CoachDemoSeed.dashboardSignals(),
+        dailyDigestBody: CoachDemoSeed.dailyDigestBody
+      )
+    _dashboardViewModel = State(
+      initialValue: CoachDashboardViewModel(repository: resolvedDashboard)
+    )
     _profileViewModel = State(
       initialValue: CoachMyProfileViewModel(logoutAction: onLogout)
     )
@@ -86,7 +97,8 @@ public struct CoachRootView: View {
         context: detailContext,
         rows: rosterViewModel.rows,
         onOpenReceiving: { selectedTab = .receiving },
-        onOpenRoster: { selectedTab = .students }
+        onOpenRoster: { selectedTab = .students },
+        viewModel: dashboardViewModel
       )
       .tag(CoachTab.today)
       .tabItem {
@@ -135,6 +147,7 @@ public struct CoachRootView: View {
       await rosterViewModel.loadIfNeeded()
       await queueViewModel.loadIfNeeded()
       await videoQueueViewModel.loadIfNeeded()
+      await dashboardViewModel.loadIfNeeded()
     }
     .tint(Color.MeetPR.brandRed)
   }

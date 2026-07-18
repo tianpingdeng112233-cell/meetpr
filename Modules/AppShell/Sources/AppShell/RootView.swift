@@ -11,6 +11,7 @@ public struct RootView: View {
   private let coachPlans: any PlanRepository
   private let coachInviteCodes: any InviteCodeRepository
   private let coachBindQueue: any CoachBindQueueRepository
+  private let coachDashboard: any CoachDashboardRepository
   private let coachStudentProfiles: any OnboardingProfileReading
   private let studentPlans: any StudentPlanRepository
   private let studentLogs: any StudentTrainingLogRepository
@@ -38,6 +39,7 @@ public struct RootView: View {
     coachPlans: any PlanRepository = InMemoryPlanRepository.preview(),
     coachInviteCodes: (any InviteCodeRepository)? = nil,
     coachBindQueue: (any CoachBindQueueRepository)? = nil,
+    coachDashboard: (any CoachDashboardRepository)? = nil,
     coachStudentProfiles: (any OnboardingProfileReading)? = nil,
     studentPlans: (any StudentPlanRepository)? = nil,
     studentLogs: (any StudentTrainingLogRepository)? = nil,
@@ -73,6 +75,12 @@ public struct RootView: View {
     self.coachBindQueue =
       coachBindQueue
       ?? InMemoryCoachBindQueueRepository()
+    self.coachDashboard =
+      coachDashboard
+      ?? InMemoryCoachDashboardRepository(
+        signals: CoachDemoSeed.dashboardSignals(),
+        dailyDigestBody: CoachDemoSeed.dailyDigestBody
+      )
     self.coachStudentProfiles =
       coachStudentProfiles ?? RootViewDemoDefaults.coachStudentProfiles()
     self.pendingBindStore = pendingBindStore
@@ -107,6 +115,7 @@ public struct RootView: View {
           bindQueue: coachBindQueue,
           studentProfiles: coachStudentProfiles,
           videoQueue: coachVideoQueue,
+          dashboard: coachDashboard,
           onLogout: {
             await session.logout()
           },
