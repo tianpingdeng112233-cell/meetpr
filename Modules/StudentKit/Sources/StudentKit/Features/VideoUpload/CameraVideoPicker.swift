@@ -59,7 +59,7 @@ enum CameraCaptureHandoff: Equatable {
       picker.cameraCaptureMode = .video
       picker.cameraFlashMode = .off
       picker.videoMaximumDuration = maxDurationSeconds
-      picker.videoQuality = .typeIFrame1280x720
+      picker.videoQuality = .typeHigh
       picker.allowsEditing = true
       picker.delegate = context.coordinator
       return picker
