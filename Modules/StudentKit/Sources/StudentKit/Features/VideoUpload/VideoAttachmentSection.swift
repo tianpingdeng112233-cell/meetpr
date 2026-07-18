@@ -92,9 +92,15 @@ struct VideoAttachmentSection: View {
     }
     #if os(iOS)
       .fullScreenCover(isPresented: $showingCamera) {
-        CameraVideoPicker(maxDurationSeconds: videoViewModel.maxDurationSeconds) { url in
-          Task { await attach(sourceURL: url) }
-        }
+        CameraVideoPicker(
+          maxDurationSeconds: videoViewModel.maxDurationSeconds,
+          onPicked: { url in
+            Task { await attach(sourceURL: url) }
+          },
+          onFailure: {
+            videoViewModel.reportVideoProcessingFailure()
+          }
+        )
         .ignoresSafeArea()
       }
       .fullScreenCover(item: $libraryVideoToTrim) { movie in
@@ -248,7 +254,13 @@ struct VideoAttachmentSection: View {
   }
 
   private func attach(sourceURL: URL) async {
-    guard let setLogID = await ensureSetLogID() else { return }
+    guard let setLogID = await ensureSetLogID() else {
+      // Ownership never transfers to the upload manager on this path: both the
+      // camera copy and the library import live in tmp and would leak here.
+      try? FileManager.default.removeItem(at: sourceURL)
+      videoViewModel.reportVideoProcessingFailure()
+      return
+    }
     await videoViewModel.attach(sourceURL: sourceURL, setLogID: setLogID, studentID: studentID)
   }
 
