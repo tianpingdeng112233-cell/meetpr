@@ -114,11 +114,12 @@ struct StudentDetailView: View {
       backRow
 
       HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.md) {
-        Text(viewModel.summary.displayName)
-          .font(.system(size: 34, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .lineLimit(1)
-          .minimumScaleFactor(0.7)
+        StudentNameWithCompetitionPill(
+          displayName: viewModel.summary.displayName,
+          competitionCountdownText: viewModel.competitionCountdownText,
+          font: .system(size: 34, weight: .heavy),
+          minimumScaleFactor: 0.7
+        )
         Spacer(minLength: MeetPRSpacing.sm)
         let badge = statusBadge
         StatusBadge(status: badge.status, title: badge.title)

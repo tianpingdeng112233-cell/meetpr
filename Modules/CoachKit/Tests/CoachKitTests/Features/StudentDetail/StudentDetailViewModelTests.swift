@@ -12,6 +12,37 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func detailHeaderMapsCompetitionCountdownPresentAndAbsentStates() throws {
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+  let now = try #require(
+    calendar.date(from: DateComponents(year: 2026, month: 7, day: 18, hour: 15))
+  )
+
+  func makeViewModel(competitionDate: String?) -> StudentDetailViewModel {
+    let summary = CoachStudentSummary(
+      id: UUID(),
+      displayName: "测试学员",
+      status: .active,
+      competitionDate: competitionDate
+    )
+    return StudentDetailViewModel(
+      summary: summary,
+      plans: StubStudentPlanRepository(plans: [:]),
+      trainingLogs: StubTrainingLogRepository(logs: []),
+      feedback: StubFeedbackRepository(),
+      now: { now },
+      timeZone: calendar.timeZone
+    )
+  }
+
+  #expect(makeViewModel(competitionDate: "2026-07-21").competitionCountdownText == "D-3")
+  #expect(makeViewModel(competitionDate: nil).competitionCountdownText == nil)
+  #expect(makeViewModel(competitionDate: "2026-07-17").competitionCountdownText == nil)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func detailLoadsExecutionAndFeedbackSummaries() async {
   let summary = CoachStudentFeatureFixtures.summary()
   let plan = CoachStudentFeatureFixtures.plan()

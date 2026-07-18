@@ -239,10 +239,12 @@ struct StudentRosterView: View {
         .frame(width: 9, height: 9)
 
       VStack(alignment: .leading, spacing: 3) {
-        Text(row.student.displayName)
-          .font(.system(size: 17, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .lineLimit(1)
+        StudentNameWithCompetitionPill(
+          displayName: row.student.displayName,
+          competitionCountdownText: row.competitionCountdownText,
+          font: .system(size: 17, weight: .semibold),
+          minimumScaleFactor: 1
+        )
         Text(subtitle(for: row))
           .font(.system(size: 13))
           .foregroundStyle(Color.MeetPR.fgTertiary)
@@ -251,7 +253,12 @@ struct StudentRosterView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
 
       let badge = badge(for: row)
-      StatusBadge(status: badge.status, title: badge.title)
+      VStack(alignment: .trailing, spacing: 4) {
+        StatusBadge(status: badge.status, title: badge.title)
+        if let attendanceBarTones = row.attendanceBarTones {
+          StudentAttendanceMiniBars(tones: attendanceBarTones)
+        }
+      }
 
       Image(systemName: "chevron.right")
         .font(.system(size: 15))

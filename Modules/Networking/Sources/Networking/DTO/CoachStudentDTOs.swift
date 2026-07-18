@@ -16,6 +16,16 @@ public struct RenameCoachStudentRequestDTO: Codable, Equatable, Sendable {
   }
 }
 
+public struct CoachStudentRecentWeekDTO: Codable, Equatable, Sendable {
+  public let trainedDays: Int
+  public let plannedDays: Int
+
+  public init(trainedDays: Int, plannedDays: Int) {
+    self.trainedDays = trainedDays
+    self.plannedDays = plannedDays
+  }
+}
+
 /// GET /coach/students item. Real wire (handlers/coach-students.ts since
 /// backend #9): `{ id, display_name, profile: { user_id, display_name,
 /// created_at }, status, ... }` — the previous flat
@@ -27,17 +37,23 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
   public let displayName: String
   public let createdAt: Date
   public let status: String
+  public let competitionDate: String?
+  public let recentFourWeeks: [CoachStudentRecentWeekDTO]?
 
   public init(
     userID: UUID,
     displayName: String,
     createdAt: Date,
-    status: String
+    status: String,
+    competitionDate: String? = nil,
+    recentFourWeeks: [CoachStudentRecentWeekDTO]? = nil
   ) {
     self.userID = userID
     self.displayName = displayName
     self.createdAt = createdAt
     self.status = status
+    self.competitionDate = competitionDate
+    self.recentFourWeeks = recentFourWeeks
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -47,6 +63,8 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
     case createdAt
     case profile
     case status
+    case competitionDate
+    case recent4W
   }
 
   private struct ProfileDTO: Codable, Equatable, Sendable {
@@ -78,6 +96,11 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
       )
     }
     status = try container.decodeIfPresent(String.self, forKey: .status) ?? "active"
+    competitionDate = try container.decodeIfPresent(String.self, forKey: .competitionDate)
+    recentFourWeeks = try container.decodeIfPresent(
+      [CoachStudentRecentWeekDTO].self,
+      forKey: .recent4W
+    )
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -89,5 +112,7 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
       forKey: .profile
     )
     try container.encode(status, forKey: .status)
+    try container.encodeIfPresent(competitionDate, forKey: .competitionDate)
+    try container.encodeIfPresent(recentFourWeeks, forKey: .recent4W)
   }
 }

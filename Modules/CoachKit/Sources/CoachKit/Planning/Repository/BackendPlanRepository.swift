@@ -26,7 +26,11 @@ public actor BackendPlanRepository: PlanRepository {
       CoachStudentSummary(
         id: dto.userID,
         displayName: dto.displayName,
-        status: Self.status(from: dto)
+        status: Self.status(from: dto),
+        competitionDate: dto.competitionDate,
+        recentFourWeeks: dto.recentFourWeeks?.map {
+          CoachStudentRecentWeek(trainedDays: $0.trainedDays, plannedDays: $0.plannedDays)
+        }
       )
     }
   }
@@ -41,7 +45,11 @@ public actor BackendPlanRepository: PlanRepository {
     return CoachStudentSummary(
       id: dto.userID,
       displayName: dto.displayName,
-      status: Self.status(from: dto)
+      status: Self.status(from: dto),
+      competitionDate: dto.competitionDate,
+      recentFourWeeks: dto.recentFourWeeks?.map {
+        CoachStudentRecentWeek(trainedDays: $0.trainedDays, plannedDays: $0.plannedDays)
+      }
     )
   }
 
