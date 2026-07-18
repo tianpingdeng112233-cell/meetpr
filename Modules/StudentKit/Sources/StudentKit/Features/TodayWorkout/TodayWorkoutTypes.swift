@@ -13,6 +13,10 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   public let exerciseID: UUID
   public let exerciseName: String
   public let isAccessory: Bool
+  /// Coach-assigned plan role (`ExerciseType.mainLift`) — gates the e1RM-based
+  /// weight suggestion; variations and accessories fill last logged weight
+  /// instead.
+  public let isMainLift: Bool
   public var prescribed: PrescribedSet
   public var actualWeight: Decimal?
   public var actualReps: Int?
@@ -27,6 +31,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     exerciseID: UUID,
     exerciseName: String,
     isAccessory: Bool,
+    isMainLift: Bool = false,
     prescribed: PrescribedSet,
     actualWeight: Decimal? = nil,
     actualReps: Int? = nil,
@@ -40,6 +45,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.exerciseID = exerciseID
     self.exerciseName = exerciseName
     self.isAccessory = isAccessory
+    self.isMainLift = isMainLift
     self.prescribed = prescribed
     self.actualWeight = actualWeight
     self.actualReps = actualReps
@@ -79,6 +85,9 @@ struct SetWeightSuggestion: Equatable, Sendable {
   enum Basis: Equatable, Sendable {
     case previousSet
     case e1RM(Double)
+    /// Most recent logged weight for this exercise from an earlier session
+    /// (variation / accessory path).
+    case lastLogged
   }
 
   let weightKg: Decimal

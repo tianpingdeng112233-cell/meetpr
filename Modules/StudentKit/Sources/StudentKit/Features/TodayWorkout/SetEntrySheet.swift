@@ -268,6 +268,8 @@ struct SetEntrySheet: View {
       "建议 · 同上组"
     case .e1RM(let value):
       "建议 · 基于 e1RM \(StudentFormatting.kilograms(value))"
+    case .lastLogged:
+      "建议 · 上次重量"
     }
   }
 
