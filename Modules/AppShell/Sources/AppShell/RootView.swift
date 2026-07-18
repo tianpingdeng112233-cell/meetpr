@@ -34,6 +34,7 @@ public struct RootView: View {
   private let coachVideoQueue: (any CoachVideoQueueRepository)?
   private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
+  private let appNavigation: AppNavigationModel
 
   public init(
     coachPlans: any PlanRepository = InMemoryPlanRepository.preview(),
@@ -55,6 +56,7 @@ public struct RootView: View {
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
     coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
     coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
+    appNavigation: AppNavigationModel = AppNavigationModel(),
     draftStore: DraftStore = DraftStore.shared
   ) {
     self.coachPlans = coachPlans
@@ -87,6 +89,7 @@ public struct RootView: View {
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
     self.coachVideoQueue = coachVideoQueue
     self.coachFamilyMapProvider = coachFamilyMapProvider
+    self.appNavigation = appNavigation
     self.draftStore = draftStore
   }
 
@@ -116,6 +119,7 @@ public struct RootView: View {
           studentProfiles: coachStudentProfiles,
           videoQueue: coachVideoQueue,
           dashboard: coachDashboard,
+          tabSelection: appNavigation.coachTabSelection,
           onLogout: {
             await session.logout()
           },

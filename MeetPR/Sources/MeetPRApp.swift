@@ -1,5 +1,6 @@
 import AppShell
 import CoachKit
+import CoreModels
 import Networking
 import StudentKit
 import SwiftData
@@ -8,17 +9,38 @@ import SwiftUI
 @main
 @MainActor
 struct MeetPRApp: App {
+  @Environment(\.scenePhase) private var scenePhase
+  #if !DEMO_MODE
+    @UIApplicationDelegateAdaptor(MeetPRAppDelegate.self) private var appDelegate
+  #endif
+
   private let draftStore: DraftStore
   private let rootView: RootView
+  private let appNavigation: AppNavigationModel
+  #if !DEMO_MODE
+    private let pushRegistration: PushRegistrationCoordinator
+  #endif
   @State private var session: Session
 
   init() {
     let draftStore = DraftStore.shared
     self.draftStore = draftStore
+    let appNavigation = AppNavigationModel()
+    self.appNavigation = appNavigation
 
-    let dependencies = Self.makeRootDependencies(draftStore: draftStore)
+    let dependencies = Self.makeRootDependencies(
+      draftStore: draftStore,
+      appNavigation: appNavigation
+    )
     rootView = dependencies.rootView
     _session = State(initialValue: dependencies.session)
+    #if !DEMO_MODE
+      let api = APIClient.shared
+      pushRegistration = PushRegistrationCoordinator { token, _ in
+        let accessToken = try await dependencies.session.accessToken()
+        try await api.registerDeviceToken(token, accessToken: accessToken)
+      }
+    #endif
   }
 
   private struct RootDependencies {
@@ -48,7 +70,10 @@ struct MeetPRApp: App {
       )
     }
 
-    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
+    private static func makeRootDependencies(
+      draftStore: DraftStore,
+      appNavigation: AppNavigationModel
+    ) -> RootDependencies {
       // Seed the student projection so the demo shows a real plan (today/week)
       // without a coach publish round-trip.
       let planStore = InMemoryPlanStore(
@@ -104,6 +129,7 @@ struct MeetPRApp: App {
           // 训练视频 inbox: boot straight into a populated queue (spec 042).
           coachVideoQueue: InMemoryCoachVideoQueueRepository(
             seed: CoachDemoSeed.pendingVideos()),
+          appNavigation: appNavigation,
           draftStore: draftStore
         ),
         session: session
@@ -130,7 +156,10 @@ struct MeetPRApp: App {
       return session
     }
 
-    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
+    private static func makeRootDependencies(
+      draftStore: DraftStore,
+      appNavigation: AppNavigationModel
+    ) -> RootDependencies {
       let api = APIClient.shared
       let session = makeSession(api: api, draftStore: draftStore)
       return RootDependencies(
@@ -174,6 +203,7 @@ struct MeetPRApp: App {
           // Growth-tab family mapping reads the coach-owned full plan tree
           // (the student projection only carries the current week).
           coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(api: api, session: session),
+          appNavigation: appNavigation,
           draftStore: draftStore
         ),
         session: session
@@ -183,18 +213,62 @@ struct MeetPRApp: App {
 
   var body: some Scene {
     WindowGroup {
-      rootView
-        .environment(session)
+      appContent
+    }
+  }
+
+  @ViewBuilder
+  private var appContent: some View {
+    #if DEMO_MODE
+      configuredRootView
         .task {
           await session.bootstrap()
         }
-        .modelContainer(
-          draftStore.modelContainer
-        )
-        // MeetPR is dark-only in V0.1 (David 2026-06-12: 学员向导的深色为
-        // 全 app 标准): one root-level force instead of per-view sprinkles,
-        // so auth + coach + student render the same palette.
-        .preferredColorScheme(.dark)
-    }
+    #else
+      configuredRootView
+        .task {
+          appDelegate.configure(
+            routeHandler: { route in
+              appNavigation.open(route)
+            },
+            deviceTokenHandler: { token in
+              pushRegistration.receiveDeviceToken(token)
+            }
+          )
+          await session.bootstrap()
+        }
+        .task(id: authenticatedCoach?.id) {
+          guard let coach = authenticatedCoach else {
+            pushRegistration.deactivate()
+            return
+          }
+          pushRegistration.activate(for: coach)
+        }
+        .onChange(of: scenePhase) { _, phase in
+          guard phase == .active, let coach = authenticatedCoach else { return }
+          pushRegistration.activate(for: coach)
+        }
+    #endif
   }
+
+  private var configuredRootView: some View {
+    rootView
+      .environment(session)
+      .modelContainer(
+        draftStore.modelContainer
+      )
+      // MeetPR is dark-only in V0.1 (David 2026-06-12: 学员向导的深色为
+      // 全 app 标准): one root-level force instead of per-view sprinkles,
+      // so auth + coach + student render the same palette.
+      .preferredColorScheme(.dark)
+  }
+
+  #if !DEMO_MODE
+    private var authenticatedCoach: User? {
+      guard case .authenticated(let user) = session.state, user.role == .coach else {
+        return nil
+      }
+      return user
+    }
+  #endif
 }

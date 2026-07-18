@@ -11,12 +11,12 @@ public struct CoachRootView: View {
   private let inviteCodes: any InviteCodeRepository
   private let detailContext: CoachStudentDetailContext
   private let draftStore: DraftStore
+  @State private var tabSelection: CoachTabSelection
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var queueViewModel: BindQueueViewModel
   @State private var videoQueueViewModel: CoachVideoQueueViewModel
   @State private var dashboardViewModel: CoachDashboardViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
-  @State private var selectedTab: CoachTab = .today
 
   @MainActor
   public init(
@@ -32,15 +32,16 @@ public struct CoachRootView: View {
     studentProfiles: (any OnboardingProfileReading)? = nil,
     videoQueue: (any CoachVideoQueueRepository)? = nil,
     dashboard: (any CoachDashboardRepository)? = nil,
+    tabSelection: CoachTabSelection = CoachTabSelection(),
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
-    self.repository = repository
-    self.studentPlans = studentPlans
+    (self.repository, self.studentPlans) = (repository, studentPlans)
     self.studentLogs = studentLogs
     self.feedback = feedback
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
     self.draftStore = draftStore
+    _tabSelection = State(initialValue: tabSelection)
     let resolvedQueue =
       bindQueue ?? InMemoryCoachBindQueueRepository()
     let resolvedProfiles = studentProfiles ?? InMemoryCoachStudentProfileReader()
@@ -90,14 +91,15 @@ public struct CoachRootView: View {
   }
 
   public var body: some View {
-    TabView(selection: $selectedTab) {
+    @Bindable var tabSelection = tabSelection
+    TabView(selection: $tabSelection.selectedTab) {
       CoachDashboardView(
         attentionCount: rosterViewModel.pendingAttentionCount,
         pendingCount: queueViewModel.pendingCount,
         context: detailContext,
         rows: rosterViewModel.rows,
-        onOpenReceiving: { selectedTab = .receiving },
-        onOpenRoster: { selectedTab = .students },
+        onOpenReceiving: { tabSelection.select(.receiving) },
+        onOpenRoster: { tabSelection.select(.students) },
         viewModel: dashboardViewModel
       )
       .tag(CoachTab.today)
@@ -151,12 +153,4 @@ public struct CoachRootView: View {
     }
     .tint(Color.MeetPR.brandRed)
   }
-}
-
-private enum CoachTab: Hashable {
-  case today
-  case students
-  case planning
-  case receiving
-  case profile
 }
