@@ -1,12 +1,16 @@
 import AVFoundation
+import CoreMedia
 import Foundation
 
 /// Live `VideoExporting` backed by `AVAssetExportSession`.
 ///
-/// Spec 027 wants client-side H.264: the 1080p preset re-encodes camera/photo
-/// library footage (typically HEVC) to H.264 .mp4 at a medium bitrate.
-/// Bitrate is best-effort — `AVAssetExportSession` exposes no explicit rate
-/// control (spec 027 §VideoTranscoder note).
+/// H.264 sources at or below 1080p are remuxed into MP4 without re-encoding.
+/// Other sources retain spec 027's 1080p H.264 re-encoding path.
+///
+/// Deliberate trade-off (David 2026-07-18): remuxed uploads keep the source
+/// bitrate (camera captures ≈15 Mbps vs ≈10 Mbps re-encoded), spending some
+/// extra upload bytes to skip a transcode that ran at roughly clip duration
+/// and to preserve quality bit-for-bit.
 public struct AVFoundationVideoExporter: VideoExporting {
   public init() {}
 
@@ -18,16 +22,78 @@ public struct AVFoundationVideoExporter: VideoExporting {
 
   public func export(from sourceURL: URL, to destinationURL: URL) async throws {
     let asset = AVURLAsset(url: sourceURL)
+
+    try await VideoExportStrategy.run(
+      passthroughEligible: try await isPassthroughEligible(asset),
+      passthroughPreset: AVAssetExportPresetPassthrough,
+      transcodePreset: AVAssetExportPreset1920x1080,
+      export: { preset in
+        try await self.export(asset, presetName: preset, destinationURL: destinationURL)
+      }
+    )
+  }
+
+  private func isPassthroughEligible(_ asset: AVAsset) async throws -> Bool {
+    do {
+      let videoTracks = try await asset.loadTracks(withMediaType: .video)
+      guard videoTracks.count == 1, let track = videoTracks.first else {
+        return false
+      }
+      let formatDescriptions = try await track.load(.formatDescriptions)
+      guard let formatDescription = formatDescriptions.first else { return false }
+      let codecFourCC = CMFormatDescriptionGetMediaSubType(formatDescription)
+      guard
+        formatDescriptions.allSatisfy({
+          CMFormatDescriptionGetMediaSubType($0) == codecFourCC
+        })
+      else { return false }
+
+      let naturalSize = try await track.load(.naturalSize)
+      let preferredTransform = try await track.load(.preferredTransform)
+      return VideoPassthroughEligibility.shouldPassthrough(
+        codecFourCC: codecFourCC,
+        naturalSize: VideoDimensions(
+          width: naturalSize.width,
+          height: naturalSize.height
+        ),
+        preferredTransform: VideoTransform(
+          horizontalScale: preferredTransform.a,
+          verticalShear: preferredTransform.b,
+          horizontalShear: preferredTransform.c,
+          verticalScale: preferredTransform.d
+        )
+      )
+    } catch is CancellationError {
+      throw CancellationError()
+    } catch {
+      return false
+    }
+  }
+
+  private func export(
+    _ asset: AVAsset,
+    presetName: String,
+    destinationURL: URL
+  ) async throws {
+    // Every path through this helper — early cancellation, session-unavailable,
+    // export failure — must leave no stale/partial file at the destination.
+    try? FileManager.default.removeItem(at: destinationURL)
+    var succeeded = false
+    defer {
+      if !succeeded { try? FileManager.default.removeItem(at: destinationURL) }
+    }
+
+    try Task.checkCancellation()
     guard
       let session = AVAssetExportSession(
         asset: asset,
-        presetName: AVAssetExportPreset1920x1080
+        presetName: presetName
       )
     else {
-      throw VideoUploadError.exportFailed("AVAssetExportSession unavailable for preset 1080p")
+      throw VideoUploadError.exportFailed(
+        "AVAssetExportSession unavailable for preset \(presetName)")
     }
 
-    try? FileManager.default.removeItem(at: destinationURL)
     session.outputURL = destinationURL
     session.outputFileType = .mp4
     session.shouldOptimizeForNetworkUse = true
@@ -46,13 +112,13 @@ public struct AVFoundationVideoExporter: VideoExporting {
     }
 
     guard session.status == .completed else {
-      try? FileManager.default.removeItem(at: destinationURL)
       if session.status == .cancelled || Task.isCancelled {
         throw CancellationError()
       }
       let reason = session.error?.localizedDescription ?? "status \(session.status.rawValue)"
       throw VideoUploadError.exportFailed(reason)
     }
+    succeeded = true
   }
 }
 
