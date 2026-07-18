@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>MeetPR 更新 · 信号环</title>
+<style>
+  /* MeetPR 设计语言：深底、红仅点睛、mono 标签、灰白亮度分层。
+     本页有意单主题（应用本身的世界即深色）。 */
+  :root, :root[data-theme="light"], :root[data-theme="dark"] {
+    --bg: #0a0a0a;
+    --surface: #161616;
+    --surface-2: #1f1f1f;
+    --border: #2a2a2a;
+    --border-strong: #3a3a3a;
+    --fg: #f5f5f5;
+    --fg-2: #a8a8a8;
+    --fg-3: #6b6b6b;
+    --red: #e02020;
+    --yellow: #f5c518;
+    --green: #1fb358;
+    color-scheme: dark;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    line-height: 1.75;
+    font-size: 16px;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 96px; }
+
+  /* ── 页眉 ─────────────────────────── */
+  header { padding: 72px 0 40px; }
+  .eyebrow {
+    display: flex; align-items: center; gap: 12px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px; letter-spacing: 0.12em;
+    color: var(--fg-2);
+  }
+  .eyebrow::after {
+    content: ""; width: 32px; height: 1px; background: var(--red);
+  }
+  h1 {
+    font-size: clamp(34px, 7vw, 46px);
+    font-weight: 800; letter-spacing: 0.01em;
+    line-height: 1.25; margin-top: 10px;
+    text-wrap: balance;
+  }
+  .lede {
+    margin-top: 18px; color: var(--fg-2); font-size: 17px;
+    max-width: 34em;
+  }
+  .lede strong { color: var(--fg); font-weight: 600; }
+
+  /* ── 章节 ─────────────────────────── */
+  section { margin-top: 64px; }
+  .sec-label {
+    display: flex; align-items: baseline; gap: 12px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px; letter-spacing: 0.14em; color: var(--fg-3);
+  }
+  h2 {
+    font-size: 24px; font-weight: 700; margin-top: 8px;
+    letter-spacing: 0.01em; text-wrap: balance;
+  }
+  section > p { margin-top: 14px; color: var(--fg-2); max-width: 36em; }
+  section > p strong, li strong { color: var(--fg); font-weight: 600; }
+
+  /* ── 模拟界面卡片 ─────────────────── */
+  .demo {
+    margin-top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .demo-cap {
+    padding: 10px 18px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px; letter-spacing: 0.12em;
+    color: var(--fg-3);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .digest {
+    padding: 12px 18px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 13px; color: var(--fg-2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sig { display: flex; gap: 14px; padding: 16px 18px; align-items: flex-start; }
+  .sig + .sig { border-top: 1px solid var(--border); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; margin-top: 9px; }
+  .dot.r { background: var(--red); }
+  .dot.y { background: var(--yellow); }
+  .dot.g { background: var(--green); }
+  .sig-name { font-size: 17px; font-weight: 600; }
+  .sig-tag {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px; letter-spacing: 0.1em;
+    color: var(--fg-3); margin-left: 8px;
+  }
+  .sig-why { font-size: 13.5px; color: var(--fg-3); margin-top: 2px; }
+  .sig-chev { margin-left: auto; color: var(--fg-3); align-self: center; font-size: 15px; }
+
+  /* 学员状态条三态 */
+  .strip {
+    display: flex; align-items: center; gap: 10px;
+    padding: 15px 18px; font-size: 15px;
+  }
+  .strip + .strip { border-top: 1px solid var(--border); }
+  .strip .mono { font-size: 14px; }
+  .strip-hint { margin-left: auto; color: var(--fg-3); font-size: 13.5px; }
+  .rec { width: 8px; height: 8px; border-radius: 50%; background: var(--red); flex: none; }
+  .strip .done { color: var(--green); }
+
+  /* 花名册行 */
+  .roster { display: flex; align-items: center; gap: 12px; padding: 16px 18px; }
+  .roster + .roster { border-top: 1px solid var(--border); }
+  .pill {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--fg-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px; padding: 1px 8px 2px;
+    flex: none;
+  }
+  .bars { display: flex; gap: 3px; align-items: flex-end; margin-left: auto; }
+  .bars i { width: 4px; height: 12px; border-radius: 1px; display: block; }
+  .b0 { background: transparent; }
+  .b1 { background: var(--fg-3); opacity: .55; }
+  .b2 { background: var(--fg-2); }
+  .b3 { background: var(--fg); }
+  .roster-meta {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px; color: var(--fg-3); margin-left: 14px;
+  }
+
+  /* 口径表 */
+  .rules { margin-top: 24px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .rule { display: flex; gap: 14px; padding: 16px 18px; align-items: flex-start; background: var(--surface); }
+  .rule + .rule { border-top: 1px solid var(--border); }
+  .rule .dot { margin-top: 8px; }
+  .rule-name { font-weight: 600; font-size: 15.5px; }
+  .rule-def { font-size: 14px; color: var(--fg-2); margin-top: 2px; max-width: 34em; }
+
+  ul.plain { margin-top: 14px; list-style: none; }
+  ul.plain li {
+    color: var(--fg-2); padding-left: 20px; position: relative; margin-top: 8px;
+  }
+  ul.plain li::before {
+    content: ""; position: absolute; left: 2px; top: 0.72em;
+    width: 8px; height: 1px; background: var(--red);
+  }
+
+  footer {
+    margin-top: 80px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11.5px; letter-spacing: 0.08em;
+    color: var(--fg-3); line-height: 2;
+  }
+
+  @media (max-width: 520px) {
+    .sig-why { max-width: 100%; }
+    .roster-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">MEETPR · 产品更新 · 2026-07</div>
+    <h1>信号环：学员的每一次训练，<br>当天到你眼前</h1>
+    <p class="lede">这一轮更新解决一件事：<strong>不用翻，不用问，打开 app 就知道今天该管谁。</strong>学员端记录训练，系统当天判读，教练端只看结论。</p>
+  </header>
+
+  <section>
+    <div class="sec-label">01 / 教练端</div>
+    <h2>今日看板 —— 打开第一屏就是「今天谁需要你」</h2>
+    <p>每天一行昨日小结，下面按轻重排好今天值得看一眼的学员。每行一句<strong>人话留因</strong>：为什么这个人今天出现在这里。看完点进去就是学员详情，不用任何额外操作——事情过了会自己消失。</p>
+
+    <div class="demo" role="img" aria-label="教练今日看板示意">
+      <div class="demo-cap">今日 TAB · 示意</div>
+      <div class="digest">昨天 · 3 练完 · 1 缺练 · 1 被压 · 1 破 PR</div>
+      <div class="sig">
+        <span class="dot r"></span>
+        <div>
+          <span class="sig-name">王晨曦</span><span class="sig-tag">缺练</span>
+          <div class="sig-why">周一至周三无打卡（已连续 3 个训练日）</div>
+        </div>
+        <span class="sig-chev">›</span>
+      </div>
+      <div class="sig">
+        <span class="dot y"></span>
+        <div>
+          <span class="sig-name">张以恒</span><span class="sig-tag">被压</span>
+          <div class="sig-why">比赛式传统硬拉 210kg 被压，今天已出现 2 次失败组</div>
+        </div>
+        <span class="sig-chev">›</span>
+      </div>
+      <div class="sig">
+        <span class="dot g"></span>
+        <div>
+          <span class="sig-name">李嘉宁</span><span class="sig-tag">PR</span>
+          <div class="sig-why">卧推 e1RM 提升至 102.5kg，刷新近 28 天最佳</div>
+        </div>
+        <span class="sig-chev">›</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">02 / 推送</div>
+    <h2>每天早上一条汇总，点开直达看板</h2>
+    <p>不逐条打扰：全天的事收进<strong>每天一条</strong>「昨日小结」推送。点它直接落在今日看板上，冷启动也一样。首次登录询问一次通知权限，拒绝后不再纠缠。</p>
+  </section>
+
+  <section>
+    <div class="sec-label">03 / 学员端</div>
+    <h2>「开始训练」——信号的源头更准了</h2>
+    <p>学员的训练 tab 现在先看到一页<strong>训练总览</strong>（今天练什么、几组、上次成绩参照），点「开始训练」才进入逐组记录，同时开始计时。今日页顶部常驻一条状态：</p>
+
+    <div class="demo" role="img" aria-label="学员今日状态条三态示意">
+      <div class="demo-cap">学员今日 TAB · 状态条三态</div>
+      <div class="strip">
+        <span>今日 · D 日 · 12 组</span>
+        <span class="strip-hint">› 开始训练</span>
+      </div>
+      <div class="strip">
+        <span class="rec"></span>
+        <span class="mono">训练中 · 24:37</span>
+        <span class="strip-hint">›</span>
+      </div>
+      <div class="strip">
+        <span class="done">✓ 今日已完成 · 61 分钟</span>
+        <span class="strip-hint">›</span>
+      </div>
+    </div>
+
+    <p>训练是否完成、练了多久，从此有明确的起点和终点——你在看板上看到的「练完 / 部分完成 / 缺练」，就是从这里来的。深夜训练按<strong>凌晨 4 点</strong>为界归属「今天」，夜猫子学员不会被误判缺练。</p>
+  </section>
+
+  <section>
+    <div class="sec-label">04 / 花名册</div>
+    <h2>比赛倒计时 + 近四周出勤，一眼扫完</h2>
+    <p>报了名的学员，姓名旁多一枚 <span class="pill">D-17</span> 倒计时；每行右侧四根小条是<strong>近四周出勤</strong>——越亮完成度越高，空位表示当周无计划。灰阶显示，不抢信号的颜色。</p>
+
+    <div class="demo" role="img" aria-label="花名册行示意">
+      <div class="demo-cap">学员花名册 · 示意</div>
+      <div class="roster">
+        <span class="sig-name">张以恒</span><span class="pill">D-17</span>
+        <span class="bars"><i class="b3"></i><i class="b3"></i><i class="b2"></i><i class="b3"></i></span>
+        <span class="roster-meta">4W</span>
+      </div>
+      <div class="roster">
+        <span class="sig-name">王晨曦</span>
+        <span class="bars"><i class="b2"></i><i class="b1"></i><i class="b1"></i><i class="b0"></i></span>
+        <span class="roster-meta">4W</span>
+      </div>
+      <div class="roster">
+        <span class="sig-name">李嘉宁</span><span class="pill">D-38</span>
+        <span class="bars"><i class="b3"></i><i class="b3"></i><i class="b3"></i><i class="b3"></i></span>
+        <span class="roster-meta">4W</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-label">05 / 口径</div>
+    <h2>三种信号，怎么算数</h2>
+    <p>宁可少报，不误报。每条信号都能在学员的训练记录里找到出处：</p>
+    <div class="rules">
+      <div class="rule">
+        <span class="dot r"></span>
+        <div>
+          <div class="rule-name">缺练</div>
+          <div class="rule-def">连续 3 个计划训练日没有打卡才亮起。补录旧数据会让它自动消失，不用你动手。</div>
+        </div>
+      </div>
+      <div class="rule">
+        <span class="dot y"></span>
+        <div>
+          <div class="rule-name">被压</div>
+          <div class="rule-def">当天主项（深蹲 / 卧推 / 硬拉）出现失败组。留因里写清动作、重量、失败几次。</div>
+        </div>
+      </div>
+      <div class="rule">
+        <span class="dot g"></span>
+        <div>
+          <div class="rule-name">破 PR</div>
+          <div class="rule-def">e1RM 刷新近 28 天最佳。看板上留给你知情，庆祝交给学员端。</div>
+        </div>
+      </div>
+    </div>
+    <ul class="plain">
+      <li>信号 <strong>7 天自动过期</strong>，看板不会积压旧账。</li>
+      <li>没有「处理 / 划掉」按钮——它是雷达，不是待办清单。</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="sec-label">06 / 上线节奏</div>
+    <h2>什么时候能用上</h2>
+    <ul class="plain">
+      <li>以上功能已开发完毕，随<strong>下一个内测包</strong>发布。</li>
+      <li>昨日小结推送与出勤小条依赖服务端同步升级，同批次生效。</li>
+      <li>试用中发现任何判读不准的信号，直接把学员名和日期发给 David——每条都可回溯。</li>
+    </ul>
+  </section>
+
+  <footer>
+    MEETPR · 教练驾驶舱 V0.2「信号环」 · 内测预告<br>
+    本页界面为示意图，以实际 app 为准
+  </footer>
+
+</div>
+
+</body>
+</html>
