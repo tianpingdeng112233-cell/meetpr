@@ -389,8 +389,14 @@ public struct TodayWorkoutView: View {
     isEditable: Bool
   ) -> some View {
     VStack(alignment: .leading, spacing: 0) {
-      Eyebrow(
-        "\(draft.exerciseName) \(setNumber)/\(totalSets)")
+      HStack(alignment: .lastTextBaseline, spacing: 8) {
+        Text(draft.exerciseName)
+          .font(.system(size: 20, weight: .heavy))
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Text("\(setNumber)/\(totalSets)")
+          .font(.system(size: 15, weight: .bold).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
 
       HStack(alignment: .lastTextBaseline, spacing: 6) {
         Text(weightText(draft))
