@@ -390,7 +390,7 @@ public struct TodayWorkoutView: View {
   ) -> some View {
     VStack(alignment: .leading, spacing: 0) {
       Eyebrow(
-        "第 \(twoDigit(setNumber)) / \(twoDigit(totalSets)) 组")
+        "\(draft.exerciseName) \(setNumber)/\(totalSets)")
 
       HStack(alignment: .lastTextBaseline, spacing: 6) {
         Text(weightText(draft))
@@ -682,8 +682,6 @@ public struct TodayWorkoutView: View {
     }
     return parts.joined(separator: " · ")
   }
-
-  private func twoDigit(_ value: Int) -> String { String(format: "%02d", value) }
 
   // MARK: - Derived
 
