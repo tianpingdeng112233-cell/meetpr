@@ -39,6 +39,10 @@ public struct DayDetailView: View {
         .font(.headline)
         .foregroundStyle(Color.MeetPR.fgPrimary)
 
+      if let note = CoachNoteDisplay.text(exercise.notes) {
+        CoachNotePill(note: note, background: Color.MeetPR.surface2)
+      }
+
       ForEach(exercise.prescribedSets) { set in
         let log = logs.first {
           $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex

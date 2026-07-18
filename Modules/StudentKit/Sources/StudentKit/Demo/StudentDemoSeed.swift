@@ -111,7 +111,10 @@ public enum StudentDemoSeed {
     switch offset {
     case 0:
       return [
-        exercise(.init(index: 0, name: "深蹲", family: .squat, weight: 142.5, reps: 5, rpe: 7.5))
+        exercise(
+          .init(
+            index: 0, name: "深蹲", family: .squat, weight: 142.5, reps: 5, rpe: 7.5,
+            note: "节奏310,底部不停顿"))
       ]
     case 1:
       return [exercise(.init(index: 1, name: "卧推", family: .bench, weight: 92.5, reps: 5, rpe: 8))]
@@ -138,20 +141,6 @@ public enum StudentDemoSeed {
     default:
       return []
     }
-  }
-
-  private struct ExerciseSpec {
-    let index: Int
-    let name: String
-    let family: LiftFamily?
-    let weight: Decimal
-    let reps: Int
-    let rpe: Decimal?
-    /// Explicit role; defaults to .accessory when `family` is nil, else .mainLift.
-    /// Set `.mainLiftVariation` for 变式 (暂停深蹲 / 窄握卧推 等).
-    var type: ExerciseType?
-    /// Exercise-level coach note (web 备注 column passthrough).
-    var note: String?
   }
 
   private static func exercise(_ spec: ExerciseSpec) -> StudentPlanExercise {
@@ -285,6 +274,22 @@ public enum StudentDemoSeed {
     calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
     return calendar
   }
+}
+
+/// Demo exercise recipe consumed by `StudentDemoSeed.exercise(_:)`; lives at
+/// file scope to keep the enum body within the type-body-length budget.
+private struct ExerciseSpec {
+  let index: Int
+  let name: String
+  let family: LiftFamily?
+  let weight: Decimal
+  let reps: Int
+  let rpe: Decimal?
+  /// Explicit role; defaults to .accessory when `family` is nil, else .mainLift.
+  /// Set `.mainLiftVariation` for 变式 (暂停深蹲 / 窄握卧推 等).
+  var type: ExerciseType?
+  /// Exercise-level coach note (web 备注 column passthrough).
+  var note: String?
 }
 
 // MARK: - e1RM demo helpers (extension keeps the enum body within the

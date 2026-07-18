@@ -401,7 +401,7 @@ public struct TodayWorkoutView: View {
         .padding(.top, 12)
 
       if let exerciseNote {
-        coachNotePill(exerciseNote)
+        CoachNotePill(note: exerciseNote)
           .padding(.top, 10)
       }
 
@@ -532,6 +532,12 @@ public struct TodayWorkoutView: View {
         }
       }
 
+      // Review path: with no active set there is no hero card, so a finished
+      // (or browsed read-only) day surfaces each exercise's note here instead.
+      if let note = CoachNoteDisplay.reviewNote(activeIndex: activeIndex, notes: exercise.notes) {
+        CoachNotePill(note: note)
+      }
+
       VStack(spacing: 0) {
         LazyVGrid(columns: columns, spacing: 0) {
           tableHeaderCell("#", leading: true)
@@ -563,29 +569,6 @@ public struct TodayWorkoutView: View {
 
   private func exerciseNote(for planExerciseID: UUID, in day: StudentPlanDay) -> String? {
     CoachNoteDisplay.text(day.exercises.first { $0.id == planExerciseID }?.notes)
-  }
-
-  private func coachNotePill(_ note: String) -> some View {
-    VStack(alignment: .leading, spacing: 4) {
-      Text("教练备注")
-        .font(.system(size: 10, weight: .medium, design: .monospaced))
-        .tracking(0.8)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-      Text(note)
-        .font(.system(size: 13, weight: .medium))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, 10)
-    .padding(.vertical, 8)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 8))
-    .overlay {
-      RoundedRectangle(cornerRadius: 8)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
-    }
-    .accessibilityElement(children: .combine)
-    .accessibilityLabel("教练备注 \(note)")
   }
 
   private func tableHeaderCell(_ text: String, leading: Bool = false) -> some View {

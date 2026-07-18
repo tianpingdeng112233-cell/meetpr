@@ -83,6 +83,10 @@ struct HistoryEntriesView: View {
         .font(Font.MeetPR.footnote.bold())
         .foregroundStyle(Color.MeetPR.fgPrimary)
 
+      if let note = CoachNoteDisplay.text(exercise.notes) {
+        CoachNotePill(note: note, background: Color.MeetPR.surface2)
+      }
+
       ForEach(exercise.prescribedSets) { set in
         HistorySetRow(
           set: set,
