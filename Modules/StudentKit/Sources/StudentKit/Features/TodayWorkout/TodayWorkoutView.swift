@@ -260,12 +260,7 @@ public struct TodayWorkoutView: View {
         }
 
         if let activeIndex {
-          activeSetHero(
-            draft: drafts[activeIndex],
-            rowIndex: activeIndex,
-            setNumber: setNumber(for: drafts[activeIndex], in: drafts),
-            totalSets: totalSets(for: drafts[activeIndex].planExerciseID, in: drafts),
-            isEditable: isEditable)
+          activeSetHero(day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable)
         }
 
         exerciseSections(
@@ -382,13 +377,17 @@ public struct TodayWorkoutView: View {
   // MARK: - Active set hero
 
   private func activeSetHero(
-    draft: TodayWorkoutViewModel.SetRowDraft,
-    rowIndex: Int,
-    setNumber: Int,
-    totalSets: Int,
+    day: StudentPlanDay,
+    drafts: [TodayWorkoutViewModel.SetRowDraft],
+    activeIndex: Int,
     isEditable: Bool
   ) -> some View {
-    VStack(alignment: .leading, spacing: 0) {
+    let draft = drafts[activeIndex]
+    let rowIndex = activeIndex
+    let setNumber = setNumber(for: draft, in: drafts)
+    let totalSets = totalSets(for: draft.planExerciseID, in: drafts)
+    let exerciseNote = exerciseNote(for: draft.planExerciseID, in: day)
+    return VStack(alignment: .leading, spacing: 0) {
       HStack(alignment: .lastTextBaseline, spacing: 8) {
         Text(draft.exerciseName)
           .font(.system(size: 20, weight: .heavy))
@@ -398,27 +397,13 @@ public struct TodayWorkoutView: View {
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
 
-      HStack(alignment: .lastTextBaseline, spacing: 6) {
-        Text(weightText(draft))
-          .font(.system(size: 72, weight: .heavy).monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("KG")
-          .font(.system(size: 22, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.brandRed)
-        Spacer()
-        HStack(alignment: .lastTextBaseline, spacing: 2) {
-          Text("×")
-            .font(.system(size: 24, weight: .bold))
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-          Text(targetRepsText(draft))
-            .font(.system(size: 36, weight: .heavy).monospacedDigit())
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("次")
-            .font(.system(size: 14, weight: .bold))
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-        }
+      heroTargetRow(draft: draft)
+        .padding(.top, 12)
+
+      if let exerciseNote {
+        coachNotePill(exerciseNote)
+          .padding(.top, 10)
       }
-      .padding(.top, 12)
 
       Text("RPE")
         .font(Font.MeetPR.monoLabel)
@@ -441,6 +426,29 @@ public struct TodayWorkoutView: View {
     .background(Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: 12))
     .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
+  private func heroTargetRow(draft: TodayWorkoutViewModel.SetRowDraft) -> some View {
+    HStack(alignment: .lastTextBaseline, spacing: 6) {
+      Text(weightText(draft))
+        .font(.system(size: 72, weight: .heavy).monospacedDigit())
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+      Text("KG")
+        .font(.system(size: 22, weight: .heavy))
+        .foregroundStyle(Color.MeetPR.brandRed)
+      Spacer()
+      HStack(alignment: .lastTextBaseline, spacing: 2) {
+        Text("×")
+          .font(.system(size: 24, weight: .bold))
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+        Text(targetRepsText(draft))
+          .font(.system(size: 36, weight: .heavy).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Text("次")
+          .font(.system(size: 14, weight: .bold))
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+    }
   }
 
   private func recordActions(
@@ -551,6 +559,33 @@ public struct TodayWorkoutView: View {
       .clipShape(.rect(cornerRadius: 12))
       .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
     }
+  }
+
+  private func exerciseNote(for planExerciseID: UUID, in day: StudentPlanDay) -> String? {
+    CoachNoteDisplay.text(day.exercises.first { $0.id == planExerciseID }?.notes)
+  }
+
+  private func coachNotePill(_ note: String) -> some View {
+    VStack(alignment: .leading, spacing: 4) {
+      Text("教练备注")
+        .font(.system(size: 10, weight: .medium, design: .monospaced))
+        .tracking(0.8)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
+      Text(note)
+        .font(.system(size: 13, weight: .medium))
+        .foregroundStyle(Color.MeetPR.fgPrimary)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.horizontal, 10)
+    .padding(.vertical, 8)
+    .background(Color.MeetPR.surface1)
+    .clipShape(.rect(cornerRadius: 8))
+    .overlay {
+      RoundedRectangle(cornerRadius: 8)
+        .stroke(Color.MeetPR.border, lineWidth: 1)
+    }
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("教练备注 \(note)")
   }
 
   private func tableHeaderCell(_ text: String, leading: Bool = false) -> some View {

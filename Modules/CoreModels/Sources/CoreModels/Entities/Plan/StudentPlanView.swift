@@ -116,17 +116,23 @@ public struct StudentPlanExercise: Codable, Hashable, Sendable, Identifiable {
   public let exercise: Exercise
   public let sequenceIndex: Int
   public let prescribedSets: [PrescribedSet]
+  /// Exercise-level coach note (backend `plan_exercises.notes`) — the free-text
+  /// 备注 the coach writes in the web plan editor. `nil` for pre-existing
+  /// cached projections and unannotated exercises.
+  public let notes: String?
 
   public init(
     id: UUID,
     exercise: Exercise,
     sequenceIndex: Int,
-    prescribedSets: [PrescribedSet]
+    prescribedSets: [PrescribedSet],
+    notes: String? = nil
   ) {
     self.id = id
     self.exercise = exercise
     self.sequenceIndex = sequenceIndex
     self.prescribedSets = prescribedSets
+    self.notes = notes
   }
 }
 

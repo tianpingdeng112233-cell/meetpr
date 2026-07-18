@@ -7,6 +7,8 @@ import Testing
 
 // spec 043 §G — the student read path projects PlanSet.coachNote onto
 // PrescribedSet.coachNote so the cue reaches the student dashboard.
+// The exercise-level note (PlanExercise.notes, the web 备注 column) must
+// survive the same projection onto StudentPlanExercise.notes.
 
 // swiftlint:disable:next function_body_length
 @Test func projectionCarriesCoachNoteOntoPrescribedSet() throws {
@@ -35,7 +37,7 @@ import Testing
     exerciseID: catalogID,
     isMainLift: true,
     sortOrder: 0,
-    notes: nil
+    notes: "D170/L190 递增5kg,顶组留一"
   )
   let setWithNote = PlanSet(
     id: UUID(),
@@ -80,7 +82,10 @@ import Testing
 
   let view = StudentPlanProjection.project(tree: tree, catalog: [catalogExercise], weekIndex: 1)
 
-  let prescribed = try #require(view.days.first?.exercises.first?.prescribedSets)
+  let projectedExercise = try #require(view.days.first?.exercises.first)
+  #expect(projectedExercise.notes == "D170/L190 递增5kg,顶组留一")
+
+  let prescribed = projectedExercise.prescribedSets
   #expect(prescribed.count == 2)
   #expect(prescribed[0].coachNote == "70%top")
   #expect(prescribed[1].coachNote == nil)

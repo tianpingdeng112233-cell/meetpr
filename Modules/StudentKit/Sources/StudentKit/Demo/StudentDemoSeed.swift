@@ -119,7 +119,10 @@ public enum StudentDemoSeed {
       return []
     case 3:
       return [
-        exercise(.init(index: 2, name: "硬拉", family: .deadlift, weight: 175, reps: 3, rpe: 8.5))
+        exercise(
+          .init(
+            index: 2, name: "硬拉", family: .deadlift, weight: 175, reps: 3, rpe: 8.5,
+            note: "D170/L190 递增5kg,顶组留一,腰部有感觉就停"))
       ]
     case 4:
       // 深蹲主项 + 窄握卧推变式(+ 坐姿划船辅助)→ 角标 "SB"(演示组合日 + S 在 B 前排序 +
@@ -147,6 +150,8 @@ public enum StudentDemoSeed {
     /// Explicit role; defaults to .accessory when `family` is nil, else .mainLift.
     /// Set `.mainLiftVariation` for 变式 (暂停深蹲 / 窄握卧推 等).
     var type: ExerciseType?
+    /// Exercise-level coach note (web 备注 column passthrough).
+    var note: String?
   }
 
   private static func exercise(_ spec: ExerciseSpec) -> StudentPlanExercise {
@@ -176,7 +181,8 @@ public enum StudentDemoSeed {
           rpe: spec.rpe,
           coachNote: setIndex == 0 ? "下放控制 3 秒" : nil
         )
-      }
+      },
+      notes: spec.note
     )
   }
 

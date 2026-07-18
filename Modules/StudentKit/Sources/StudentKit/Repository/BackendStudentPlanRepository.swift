@@ -226,7 +226,8 @@ enum StudentPlanProjection {
           sequenceIndex: planExercise.sortOrder,
           prescribedSets: (setsByExercise[planExercise.id] ?? [])
             .sorted { $0.setNumber < $1.setNumber }
-            .map(prescribedSet)
+            .map(prescribedSet),
+          notes: planExercise.notes
         )
       }
     return StudentPlanDay(
