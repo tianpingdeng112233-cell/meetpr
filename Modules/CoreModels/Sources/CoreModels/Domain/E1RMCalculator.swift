@@ -53,14 +53,37 @@ public enum E1RMCalculator {
     return weightKg * (1.0 + Double(reps) / 30.0)
   }
 
+  /// Reverses the RTS table to suggest a working weight for an RPE-based
+  /// prescription. RPE 5.0...5.5 extends the table's 0.5-step slope below
+  /// the first column; values below 5 are outside the app's input range.
+  public static func suggestedWeight(
+    e1RM: Double,
+    reps: Int,
+    rpe: Double
+  ) -> Double? {
+    guard e1RM.isFinite, e1RM > 0, rpe.isFinite, (1...12).contains(reps),
+      (5.0...10.0).contains(rpe)
+    else {
+      return nil
+    }
+
+    let result = e1RM * rtsIntensity(reps: reps, rpe: rpe)
+    return result.isFinite && result > 0 ? result : nil
+  }
+
   /// 1-D linear interpolation along the RPE axis only — reps are integral
   /// (students log whole reps), so no interpolation across rows.
   private static func rtsIntensity(reps: Int, rpe: Double) -> Double {
+    let row = rtsTable[reps - 1]
+    if rpe < 6.0 {
+      let halfStepSlope = row[1] - row[0]
+      return row[0] + ((rpe - 6.0) / 0.5) * halfStepSlope
+    }
+
     let rpeFloat = (rpe - 6.0) / 0.5
     let lower = Int(rpeFloat.rounded(.down))
     let upper = min(lower + 1, 8)
     let fraction = rpeFloat - Double(lower)
-    let row = rtsTable[reps - 1]
     return row[lower] * (1 - fraction) + row[upper] * fraction
   }
 }

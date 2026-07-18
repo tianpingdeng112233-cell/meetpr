@@ -32,6 +32,7 @@ struct SetEntrySheet: View {
   @State private var weightText: String
   @State private var repsText: String
   @State private var rpeText: String
+  @State private var weightSuggestion: SetWeightSuggestion?
   @FocusState private var focusedField: SetEntryNumberField?
   /// Whether the 2.5kg competition collar (赛扣) is loaded. When on it counts
   /// toward the dialed weight, so the plates drop 2.5kg per side; the barbell
@@ -70,13 +71,15 @@ struct SetEntrySheet: View {
     // Matched by stable id, never by index — after a day switch the same
     // index can belong to a different set entirely.
     let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
-    let weight = seed.actualWeight ?? seed.prescribed.weightKg ?? 0
+    let suggestion = viewModel.weightSuggestion(forSetID: seed.id)
+    let weight = seed.actualWeight ?? seed.prescribed.weightKg ?? suggestion?.weightKg ?? 0
     let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
     _weightText = State(initialValue: SetEntryValue.text(weight))
     _repsText = State(initialValue: "\(reps)")
     // Snap the seed so a non-0.5 prescribed/legacy RPE lands on a tick.
     _rpeText = State(initialValue: SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
+    _weightSuggestion = State(initialValue: suggestion)
   }
 
   var body: some View {
@@ -95,20 +98,28 @@ struct SetEntrySheet: View {
           }
 
           VStack(spacing: 18) {
-            plateStepper(
-              "重量", unit: "KG", sub: "± 2.5",
-              onDec: { weightText = SetEntryValue.text(max(0, weightValue - 2.5)) },
-              onInc: { weightText = SetEntryValue.text(weightValue + 2.5) },
-              focus: { focusedField = .weight },
-              field: {
-                TextField("", text: $weightText)
-                  .decimalKeyboard()
-                  .focused($focusedField, equals: .weight)
-                  .accessibilityLabel("重量")
-                  .maxInputLength($weightText, 6)
-                  .modifier(EntryFieldStyle())
+            VStack(spacing: 6) {
+              plateStepper(
+                "重量", unit: "KG", sub: "± 2.5",
+                onDec: { updateWeightText(max(0, weightValue - 2.5)) },
+                onInc: { updateWeightText(weightValue + 2.5) },
+                focus: { focusedField = .weight },
+                field: {
+                  TextField("", text: weightTextBinding)
+                    .decimalKeyboard()
+                    .focused($focusedField, equals: .weight)
+                    .accessibilityLabel("重量")
+                    .maxInputLength($weightText, 6)
+                    .modifier(EntryFieldStyle())
+                }
+              )
+              if let weightSuggestion {
+                Text(suggestionLabel(weightSuggestion))
+                  .font(Font.MeetPR.footnote)
+                  .foregroundStyle(Color.MeetPR.fgTertiary)
+                  .frame(maxWidth: .infinity, alignment: .leading)
               }
-            )
+            }
             plateStepper(
               "次数", unit: "次", sub: "± 1",
               onDec: { repsText = "\(max(0, repsValue - 1))" },
@@ -234,6 +245,32 @@ struct SetEntrySheet: View {
       get: { NSDecimalNumber(decimal: rpeValue).doubleValue },
       set: { rpeText = SetEntryValue.rpeText($0) }
     )
+  }
+
+  private var weightTextBinding: Binding<String> {
+    Binding(
+      get: { weightText },
+      set: {
+        weightText = $0
+        weightSuggestion = nil
+      }
+    )
+  }
+
+  private func updateWeightText(_ weight: Decimal) {
+    weightText = SetEntryValue.text(weight)
+    weightSuggestion = nil
+  }
+
+  private func suggestionLabel(_ suggestion: SetWeightSuggestion) -> String {
+    switch suggestion.basis {
+    case .previousSet:
+      "建议 · 同上组"
+    case .e1RM(let value):
+      "建议 · 基于 e1RM \(StudentFormatting.kilograms(value))"
+    case .lastLogged:
+      "建议 · 上次重量"
+    }
   }
 
   // MARK: - Chrome

@@ -5,6 +5,160 @@ import Foundation
 // Split from TodayWorkoutViewModel.swift to keep that file inside the lint
 // file_length budget (see specs/055 NOTES.md).
 extension TodayWorkoutViewModel {
+  func weightSuggestion(forSetID setID: UUID) -> SetWeightSuggestion? {
+    guard let drafts = currentDrafts,
+      let draft = drafts.first(where: { $0.id == setID })
+    else {
+      return nil
+    }
+    return Self.weightSuggestion(
+      forSetID: setID,
+      in: drafts,
+      currentE1RMKg: exerciseReferences[draft.exerciseID]?.best?.e1RMKg,
+      lastLoggedWeightKg: lastWeightByExercise[draft.exerciseID]
+    )
+  }
+
+  nonisolated static func weightSuggestion(
+    forSetID setID: UUID,
+    in drafts: [SetRowDraft],
+    currentE1RMKg: Double?,
+    lastLoggedWeightKg: Decimal? = nil
+  ) -> SetWeightSuggestion? {
+    guard let targetIndex = drafts.firstIndex(where: { $0.id == setID }) else {
+      return nil
+    }
+    let target = drafts[targetIndex]
+    guard target.prescribed.weightKg == nil,
+      let targetRPE = target.prescribed.rpe,
+      let targetReps = target.prescribed.reps ?? target.prescribed.repsMax
+    else {
+      return nil
+    }
+
+    let suggestion: SetWeightSuggestion? =
+      target.isMainLift
+      ? mainLiftSuggestion(
+        target: target, targetReps: targetReps, targetRPE: targetRPE,
+        priorDrafts: drafts[..<targetIndex], currentE1RMKg: currentE1RMKg)
+      : fallbackSuggestion(
+        target: target, priorDrafts: drafts[..<targetIndex],
+        lastLoggedWeightKg: lastLoggedWeightKg)
+    guard let suggestion else { return nil }
+
+    // Seed case: nothing logged yet. Rebuild case: the camera flow persists the
+    // untouched seed into actualWeight (SetEntrySheet onWillPick) and the sheet
+    // re-inits, so an incomplete set whose actual still equals the suggestion
+    // is still in the suggested state; any other actual means the student took
+    // over and the annotation must not resurface.
+    if target.actualWeight == nil { return suggestion }
+    if !target.completed, target.actualWeight == suggestion.weightKg { return suggestion }
+    return nil
+  }
+
+  /// Main lifts: same-day set with the identical prescription continues,
+  /// otherwise reverse the RTS table from the current e1RM.
+  private nonisolated static func mainLiftSuggestion(
+    target: SetRowDraft,
+    targetReps: Int,
+    targetRPE: Decimal,
+    priorDrafts: ArraySlice<SetRowDraft>,
+    currentE1RMKg: Double?
+  ) -> SetWeightSuggestion? {
+    let previous = priorDrafts.reversed().first { candidate in
+      candidate.exerciseID == target.exerciseID
+        && candidate.completed
+        && candidate.actualWeight.map { $0 > 0 } == true
+        && (candidate.prescribed.reps ?? candidate.prescribed.repsMax) == targetReps
+        && candidate.prescribed.rpe == targetRPE
+    }
+    if let previousWeight = previous?.actualWeight {
+      return SetWeightSuggestion(weightKg: previousWeight, basis: .previousSet)
+    }
+    guard let currentE1RMKg,
+      let rawWeight = E1RMCalculator.suggestedWeight(
+        e1RM: currentE1RMKg,
+        reps: targetReps,
+        rpe: NSDecimalNumber(decimal: targetRPE).doubleValue
+      )
+    else { return nil }
+    // Forward e1RMs are quotients (weight / intensity), so reversing can land
+    // a hair under the exact multiple (49.999…); nudge before flooring or the
+    // suggestion drops a whole 2.5 step.
+    let steps = (rawWeight / 2.5 + 1e-6).rounded(.down)
+    let roundedWeight = steps * 2.5
+    guard roundedWeight > 0 else { return nil }
+    return SetWeightSuggestion(weightKg: Decimal(roundedWeight), basis: .e1RM(currentE1RMKg))
+  }
+
+  /// Variations / accessories never get e1RM math: today's most recent
+  /// completed set of the exercise (any prescription) continues, otherwise
+  /// the last logged weight from an earlier session.
+  private nonisolated static func fallbackSuggestion(
+    target: SetRowDraft,
+    priorDrafts: ArraySlice<SetRowDraft>,
+    lastLoggedWeightKg: Decimal?
+  ) -> SetWeightSuggestion? {
+    let previous = priorDrafts.reversed().first { candidate in
+      candidate.exerciseID == target.exerciseID
+        && candidate.completed
+        && candidate.actualWeight.map { $0 > 0 } == true
+    }
+    if let previousWeight = previous?.actualWeight {
+      return SetWeightSuggestion(weightKg: previousWeight, basis: .previousSet)
+    }
+    guard let lastLoggedWeightKg, lastLoggedWeightKg > 0 else { return nil }
+    return SetWeightSuggestion(weightKg: lastLoggedWeightKg, basis: .lastLogged)
+  }
+
+  /// Lookback window for the variation/accessory "last logged weight" fill.
+  /// Ends one second BEFORE the viewed day's start — the range is inclusive
+  /// (and the backend widens the end to a full day), so ending at 00:00 would
+  /// leak the viewed day's own logs in; that day is covered by drafts instead.
+  /// Bounds follow the device-local day; exact UTC wire-day alignment rides
+  /// the gym-day day-boundary spec (harmless here — lastWeights takes the
+  /// latest log, and same-day leaks lose to the drafts path anyway).
+  nonisolated static func lastWeightHistoryRange(before dayDate: Date) -> ClosedRange<Date> {
+    let dayStart = dayRange(containing: dayDate).lowerBound
+    let lowerBound = dayStart.addingTimeInterval(-Double(lastWeightLookbackDays) * 86_400)
+    return lowerBound...dayStart.addingTimeInterval(-1)
+  }
+
+  nonisolated static var lastWeightLookbackDays: Int { 84 }
+
+  /// planExerciseID → catalog exerciseID for logs that predate the
+  /// `StudentSetLog.exerciseID` field (legacy/demo rows).
+  nonisolated static func planExerciseMap(
+    plan: StudentPlanView?, day: StudentPlanDay
+  ) -> [UUID: UUID] {
+    var map: [UUID: UUID] = [:]
+    for exercise in (plan?.days.flatMap(\.exercises) ?? []) + day.exercises {
+      map[exercise.id] = exercise.exercise.id
+    }
+    return map
+  }
+
+  /// Most recent completed, non-failed logged weight per catalog exercise.
+  nonisolated static func lastWeights(
+    from logs: [StudentSetLog],
+    planExerciseToExercise: [UUID: UUID]
+  ) -> [UUID: Decimal] {
+    var latest: [UUID: StudentSetLog] = [:]
+    for log in logs where log.completed && !log.failed && log.weightKg > 0 {
+      guard let exerciseID = log.exerciseID ?? planExerciseToExercise[log.planExerciseID] else {
+        continue
+      }
+      if let current = latest[exerciseID],
+        current.loggedAt > log.loggedAt
+          || (current.loggedAt == log.loggedAt && current.setIndex > log.setIndex)
+      {
+        continue
+      }
+      latest[exerciseID] = log
+    }
+    return latest.mapValues(\.weightKg)
+  }
+
   static func makeDrafts(
     for day: StudentPlanDay,
     existingLogs: [StudentSetLog]
@@ -30,6 +184,7 @@ extension TodayWorkoutViewModel {
       exerciseID: exercise.exercise.id,
       exerciseName: exercise.exercise.name,
       isAccessory: exercise.exercise.isAccessory,
+      isMainLift: exercise.exercise.exerciseType == .mainLift,
       prescribed: set,
       actualWeight: existingLog?.weightKg ?? set.weightKg,
       actualReps: existingLog?.reps ?? set.reps,

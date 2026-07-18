@@ -24,6 +24,8 @@ public final class TodayWorkoutViewModel {
   public private(set) var showsRestTimerExplanation = false
   public private(set) var planContext: TodayWorkoutPlanContext?
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
+  /// Latest logged weight per catalog exercise (variation/accessory fill).
+  public private(set) var lastWeightByExercise: [UUID: Decimal] = [:]
   public private(set) var actionErrorMessage: String?
   public private(set) var onboardingProfile: OnboardingProfile?
 
@@ -75,8 +77,16 @@ public final class TodayWorkoutViewModel {
       let existingLogs = try await logs.fetchLogs(studentID: studentID, in: dayRange)
       let drafts = Self.makeDrafts(for: day, existingLogs: existingLogs)
       let references = try await exerciseReferences(for: day, studentID: studentID)
+      // Best-effort: the last-weight fill must never fail the day load.
+      let historyLogs =
+        (try? await logs.fetchLogs(
+          studentID: studentID, in: Self.lastWeightHistoryRange(before: day.date))) ?? []
       guard isCurrentLoad(generation) else { return }
       exerciseReferences = references
+      lastWeightByExercise = Self.lastWeights(
+        from: historyLogs,
+        planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day)
+      )
       state = .loaded(plan: day, drafts: drafts)
     } catch {
       guard isCurrentLoad(generation) else { return }
@@ -301,7 +311,9 @@ public final class TodayWorkoutViewModel {
     return max(1, elapsedDays / 7 + 1)
   }
 
-  private static func dayRange(containing date: Date) -> ClosedRange<Date> {
+  // Internal + nonisolated (not private): the DraftBuilding extension derives
+  // the last-weight lookback window from it in a separate file, off-actor.
+  nonisolated static func dayRange(containing date: Date) -> ClosedRange<Date> {
     let start = Calendar.current.startOfDay(for: date)
     return start...start.addingTimeInterval(86_400 - 1)
   }

@@ -111,3 +111,34 @@ private struct EpleyCase {
   #expect(E1RMCalculator.calculate(weightKg: 100, reps: 5, rpe: 10.5) == nil)
   #expect(E1RMCalculator.calculate(weightKg: 100, reps: 5, rpe: 11) == nil)
 }
+
+@Test func suggestedWeightReversesRTSTable() throws {
+  let suggested = try #require(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 10))
+  #expect(abs(suggested - 86.0) < 0.001)
+
+  let roundTrip = E1RMCalculator.calculate(weightKg: suggested, reps: 5, rpe: 10)
+  #expect(roundTrip != nil)
+  if let roundTrip {
+    #expect(abs(roundTrip - 100) < 0.001)
+  }
+}
+
+@Test func suggestedWeightExtrapolatesToRPEFive() throws {
+  let rpeFivePointFive = try #require(
+    E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 5.5))
+  let rpeFive = try #require(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 5))
+
+  #expect(abs(rpeFivePointFive - 68) < 0.001)
+  #expect(abs(rpeFive - 66) < 0.001)
+}
+
+@Test func suggestedWeightRejectsInputsOutsideReverseTable() {
+  #expect(E1RMCalculator.suggestedWeight(e1RM: 0, reps: 5, rpe: 8) == nil)
+  #expect(E1RMCalculator.suggestedWeight(e1RM: -100, reps: 5, rpe: 8) == nil)
+  #expect(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 0, rpe: 8) == nil)
+  #expect(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 13, rpe: 8) == nil)
+  #expect(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 4.5) == nil)
+  #expect(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: 10.5) == nil)
+  #expect(E1RMCalculator.suggestedWeight(e1RM: .infinity, reps: 5, rpe: 8) == nil)
+  #expect(E1RMCalculator.suggestedWeight(e1RM: 100, reps: 5, rpe: .nan) == nil)
+}
