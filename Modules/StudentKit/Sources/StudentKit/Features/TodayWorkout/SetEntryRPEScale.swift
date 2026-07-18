@@ -2,8 +2,8 @@ import DesignSystem
 import Foundation
 import SwiftUI
 
-/// Pure, testable RPE-scale math (bucket / snap / band / display), kept out of
-/// the view so the boundaries are unit-covered.
+/// Pure, testable RPE-scale math (bucket / snap / describe / display), kept out
+/// of the view so the boundaries are unit-covered.
 enum SetEntryRPE {
   static let minValue = 5.0
   static let maxValue = 10.0
@@ -24,14 +24,27 @@ enum SetEntryRPE {
     return minValue + Double(index) * step
   }
 
-  /// Intensity band of the committed value.
-  static func band(_ value: Double) -> String {
-    switch value {
-    case 9.5...: return "接近极限"
-    case 8.5...: return "高强度"
-    case 7...: return "中高强度"
-    default: return "留有余力"
-    }
+  /// Per-half-step RIR copy, index 0…10 → 5.0…10.0 (Tuchscherer–Zourdos scale:
+  /// RPE n = 还能多做 10−n 次), phrased like the onboarding copy so the student
+  /// reads what the exact score means, not a vague intensity band.
+  private static let descriptions = [
+    "还能多做 5 次",  // 5.0
+    "还能多做 4-5 次",  // 5.5
+    "还能多做 4 次",  // 6.0
+    "还能多做 3-4 次",  // 6.5
+    "还能多做 3 次",  // 7.0
+    "还能多做 2-3 次",  // 7.5
+    "还能多做 2 次",  // 8.0
+    "还能多做 1-2 次",  // 8.5
+    "还能多做 1 次",  // 9.0
+    "或许还能多做 1 次",  // 9.5
+    "力竭，无保留",  // 10.0
+  ]
+
+  /// RIR-based explanation of the value; `snap` clamps to 5…10 in 0.5 steps, so
+  /// the index always lands inside `descriptions`.
+  static func description(_ value: Double) -> String {
+    descriptions[Int(((snap(value) - minValue) * 2).rounded())]
   }
 
   /// Display text, one fraction digit, locale-formatted (project FormatStyle).
@@ -41,14 +54,14 @@ enum SetEntryRPE {
 }
 
 /// RPE tick-scale selector for the set-entry sheet (design `SetEntryRPE`): a big
-/// value + intensity word over an 11-tick strip (5.0…10.0 in 0.5 steps). Drag
+/// value + RIR explanation over an 11-tick strip (5.0…10.0 in 0.5 steps). Drag
 /// horizontally (or tap) to preview; release to commit. While the finger is down
 /// the word reads 松开确认 and the big number tracks the finger; on release the
-/// word snaps to the intensity band of the committed value. A vertical drag is
+/// word snaps to the RIR explanation of the committed value. A vertical drag is
 /// treated as a scroll and left to the enclosing ScrollView.
 ///
-/// Bar heights (40 selected / 26 whole / 16 half), lit `#8A8A8E` / unlit
-/// `#2C2C2E`, and the band thresholds are reproduced 1:1 from the reference.
+/// Bar heights (40 selected / 26 whole / 16 half) and lit `#8A8A8E` / unlit
+/// `#2C2C2E` are reproduced 1:1 from the reference.
 @available(iOS 17.0, macOS 14.0, *)
 struct SetEntryRPEScale: View {
   /// Committed RPE, clamped to 5…10 in 0.5 steps. Written on release / a11y step.
@@ -97,9 +110,9 @@ struct SetEntryRPEScale: View {
     }
   }
 
-  /// Intensity band of the *committed* value; 松开确认 while a drag is in flight.
+  /// RIR explanation of the *committed* value; 松开确认 while a drag is in flight.
   private var hint: String {
-    previewValue != nil ? "松开确认" : SetEntryRPE.band(value)
+    previewValue != nil ? "松开确认" : SetEntryRPE.description(value)
   }
 
   // MARK: - Tick strip

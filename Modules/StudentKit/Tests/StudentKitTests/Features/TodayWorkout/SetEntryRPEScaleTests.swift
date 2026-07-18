@@ -4,8 +4,8 @@ import Testing
 @testable import StudentKit
 
 /// The RPE tick-scale replaced the +/- stepper; these lock in the pure bucket /
-/// snap / band math and the Double↔text bridge the view leans on, including the
-/// boundaries the review flagged (non-0.5 seed, end clamps, zero width).
+/// snap / describe math and the Double↔text bridge the view leans on, including
+/// the boundaries the review flagged (non-0.5 seed, end clamps, zero width).
 @Suite struct SetEntryRPEScaleTests {
   @Test func snapClampsAndRoundsToHalfSteps() {
     #expect(SetEntryRPE.snap(8.2) == 8.0)
@@ -24,15 +24,21 @@ import Testing
     #expect(SetEntryRPE.value(atX: 55, width: 0) == 5.0)  // zero-width guard
   }
 
-  @Test func bandMatchesThresholds() {
-    #expect(SetEntryRPE.band(5.0) == "留有余力")
-    #expect(SetEntryRPE.band(6.5) == "留有余力")
-    #expect(SetEntryRPE.band(7.0) == "中高强度")
-    #expect(SetEntryRPE.band(8.0) == "中高强度")
-    #expect(SetEntryRPE.band(8.5) == "高强度")
-    #expect(SetEntryRPE.band(9.0) == "高强度")
-    #expect(SetEntryRPE.band(9.5) == "接近极限")
-    #expect(SetEntryRPE.band(10.0) == "接近极限")
+  @Test func descriptionMapsEveryHalfStepToRIRCopy() {
+    #expect(SetEntryRPE.description(5.0) == "还能多做 5 次")
+    #expect(SetEntryRPE.description(5.5) == "还能多做 4-5 次")
+    #expect(SetEntryRPE.description(6.0) == "还能多做 4 次")
+    #expect(SetEntryRPE.description(6.5) == "还能多做 3-4 次")
+    #expect(SetEntryRPE.description(7.0) == "还能多做 3 次")
+    #expect(SetEntryRPE.description(7.5) == "还能多做 2-3 次")
+    #expect(SetEntryRPE.description(8.0) == "还能多做 2 次")
+    #expect(SetEntryRPE.description(8.5) == "还能多做 1-2 次")
+    #expect(SetEntryRPE.description(9.0) == "还能多做 1 次")
+    #expect(SetEntryRPE.description(9.5) == "或许还能多做 1 次")
+    #expect(SetEntryRPE.description(10.0) == "力竭，无保留")
+    #expect(SetEntryRPE.description(8.2) == "还能多做 2 次")  // snaps before describing
+    #expect(SetEntryRPE.description(4.0) == "还能多做 5 次")  // clamp low
+    #expect(SetEntryRPE.description(11.0) == "力竭，无保留")  // clamp high
   }
 
   @Test func rpeTextBridgeSnapsClampsAndRoundTrips() {
