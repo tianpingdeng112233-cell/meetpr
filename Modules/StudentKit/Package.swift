@@ -31,6 +31,7 @@ let package = Package(
       dependencies: [
         "StudentKit",
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "NetworkingTestSupport", package: "Networking"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
