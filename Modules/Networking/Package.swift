@@ -5,7 +5,8 @@ let package = Package(
   name: "Networking",
   platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
-    .library(name: "Networking", targets: ["Networking"])
+    .library(name: "Networking", targets: ["Networking"]),
+    .library(name: "NetworkingTestSupport", targets: ["NetworkingTestSupport"]),
   ],
   dependencies: [
     .package(path: "../CoreModels"),
@@ -19,10 +20,16 @@ let package = Package(
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
+    .target(
+      name: "NetworkingTestSupport",
+      dependencies: ["Networking"],
+      swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
+    ),
     .testTarget(
       name: "NetworkingTests",
       dependencies: [
         "Networking",
+        "NetworkingTestSupport",
         // Test-only: asserts the machine-code → typed-error mapping against
         // wire envelopes (spec 031/032). The Networking library itself stays
         // contracts-free.
