@@ -110,15 +110,19 @@ struct VideoAttachmentSection: View {
       .fullScreenCover(isPresented: $showingCamera) {
         CameraVideoPicker(
           maxDurationSeconds: videoViewModel.maxDurationSeconds,
-          isPresented: $showingCamera
-        ) { url in
-          isPreparing = true
-          Task {
-            // 相册留底先于上传:这一组已经练掉了,上传怎么失败素材都不能丢。
-            await VideoLibrarySaver.save(url)
-            await attach(sourceURL: url)
+          isPresented: $showingCamera,
+          onPicked: { url in
+            isPreparing = true
+            Task {
+              // 相册留底先于上传:这一组已经练掉了,上传怎么失败素材都不能丢。
+              await VideoLibrarySaver.save(url)
+              await attach(sourceURL: url)
+            }
+          },
+          onFailure: {
+            videoViewModel.reportVideoProcessingFailure()
           }
-        }
+        )
         .ignoresSafeArea()
       }
       .fullScreenCover(item: $libraryVideoToTrim) { movie in
@@ -293,6 +297,10 @@ extension VideoAttachmentSection {
 
   private func attach(sourceURL: URL) async {
     guard let setLogID = await ensureSetLogID() else {
+      // Ownership never transfers to the upload manager on this path: both the
+      // camera copy and the library import live in tmp and would leak here.
+      try? FileManager.default.removeItem(at: sourceURL)
+      videoViewModel.reportVideoProcessingFailure()
       isPreparing = false
       return
     }
