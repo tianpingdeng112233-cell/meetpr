@@ -1,3 +1,39 @@
+import Foundation
+
+enum CameraVideoFileCopy {
+  static func copyToTemporaryDirectory(
+    sourceURL: URL,
+    temporaryDirectory: URL = FileManager.default.temporaryDirectory,
+    fileManager: FileManager = .default
+  ) throws -> URL {
+    let destination =
+      temporaryDirectory
+      .appending(path: "\(UUID().uuidString).\(sourceURL.pathExtension)")
+    try fileManager.copyItem(at: sourceURL, to: destination)
+    return destination
+  }
+}
+
+/// Platform-neutral capture handoff decision so the host test suite can lock
+/// the picker's semantics (the UIKit Coordinator is `#if os(iOS)`-only and its
+/// tests would silently not run on the macOS host).
+enum CameraCaptureHandoff: Equatable {
+  case picked(URL)
+  case failed
+
+  /// The captured tmp file must be secured (copied) BEFORE the picker is
+  /// dismissed — the system may reclaim `mediaURL` on dismissal. Callers run
+  /// this first and dismiss only after acting on the outcome.
+  static func process(mediaURL: URL?, copy: (URL) throws -> URL) -> CameraCaptureHandoff {
+    guard let mediaURL else { return .failed }
+    do {
+      return .picked(try copy(mediaURL))
+    } catch {
+      return .failed
+    }
+  }
+}
+
 #if os(iOS)
   import SwiftUI
   import UIKit
@@ -8,6 +44,7 @@
   struct CameraVideoPicker: UIViewControllerRepresentable {
     let maxDurationSeconds: TimeInterval
     let onPicked: (URL) -> Void
+    let onFailure: () -> Void
 
     @Environment(\.dismiss) private var dismiss
 
@@ -16,8 +53,9 @@
       picker.sourceType = .camera
       picker.mediaTypes = [UTType.movie.identifier]
       picker.cameraCaptureMode = .video
+      picker.cameraFlashMode = .off
       picker.videoMaximumDuration = maxDurationSeconds
-      picker.videoQuality = .typeHigh
+      picker.videoQuality = .typeIFrame1280x720
       picker.allowsEditing = true
       picker.delegate = context.coordinator
       return picker
@@ -26,18 +64,24 @@
     func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-      Coordinator(onPicked: onPicked, dismiss: { dismiss() })
+      Coordinator(onPicked: onPicked, onFailure: onFailure, dismiss: { dismiss() })
     }
 
     final class Coordinator: NSObject, UIImagePickerControllerDelegate,
       UINavigationControllerDelegate
     {
       private let onPicked: (URL) -> Void
+      private let onFailure: () -> Void
       private let dismiss: () -> Void
       private let singleShot = SingleShot()
 
-      init(onPicked: @escaping (URL) -> Void, dismiss: @escaping () -> Void) {
+      init(
+        onPicked: @escaping (URL) -> Void,
+        onFailure: @escaping () -> Void,
+        dismiss: @escaping () -> Void
+      ) {
         self.onPicked = onPicked
+        self.onFailure = onFailure
         self.dismiss = dismiss
       }
 
@@ -46,8 +90,13 @@
         didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
       ) {
         singleShot.run {
-          if let url = info[.mediaURL] as? URL {
-            onPicked(url)
+          let outcome = CameraCaptureHandoff.process(
+            mediaURL: info[.mediaURL] as? URL,
+            copy: { try CameraVideoFileCopy.copyToTemporaryDirectory(sourceURL: $0) }
+          )
+          switch outcome {
+          case .picked(let copiedURL): onPicked(copiedURL)
+          case .failed: onFailure()
           }
           dismiss()
         }
