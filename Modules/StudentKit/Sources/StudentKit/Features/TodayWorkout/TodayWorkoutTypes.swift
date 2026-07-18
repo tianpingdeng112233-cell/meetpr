@@ -75,18 +75,31 @@ public struct ExerciseReference: Equatable, Sendable {
   }
 }
 
+struct SetWeightSuggestion: Equatable, Sendable {
+  enum Basis: Equatable, Sendable {
+    case previousSet
+    case e1RM(Double)
+  }
+
+  let weightKg: Decimal
+  let basis: Basis
+}
+
 public struct ExerciseReferenceSet: Equatable, Sendable {
   public let reps: Int
   public let weightKg: Double
+  public let e1RMKg: Double?
 
-  public init(reps: Int, weightKg: Double) {
+  public init(reps: Int, weightKg: Double, e1RMKg: Double? = nil) {
     self.reps = reps
     self.weightKg = weightKg
+    self.e1RMKg = e1RMKg
   }
 
   init(point: E1RMHistoryPoint) {
     self.reps = point.sourceReps
     self.weightKg = point.sourceWeightKg
+    self.e1RMKg = point.e1RMKg
   }
 }
 
