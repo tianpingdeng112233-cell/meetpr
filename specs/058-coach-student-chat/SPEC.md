@@ -160,6 +160,7 @@ public enum ChatRepositoryError: Error, Sendable {
   case bindRequired          // 403 CHAT_BIND_REQUIRED
   case conversationNotFound  // 404
   case invalidAttachment     // 400 CHAT_INVALID_ATTACHMENT
+  case invalidCursor         // 400 CHAT_INVALID_CURSOR(实装期补:024 有此错误码,本 spec 原先漏列)
 }
 
 public protocol ChatRepository: Sendable {

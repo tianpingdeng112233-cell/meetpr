@@ -13,6 +13,7 @@ let package = Package(
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
     .package(path: "../Analytics"),
+    .package(path: "../ChatUI"),
   ],
   targets: [
     .target(
@@ -23,6 +24,7 @@ let package = Package(
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "Analytics", package: "Analytics"),
+        .product(name: "ChatUI", package: "ChatUI"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),

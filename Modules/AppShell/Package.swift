@@ -15,6 +15,7 @@ let package = Package(
     .package(path: "../StudentKit"),
     .package(path: "../RepositoryContracts"),
     .package(path: "../Analytics"),
+    .package(path: "../ChatUI"),
     .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
   ],
   targets: [
@@ -28,6 +29,7 @@ let package = Package(
         .product(name: "StudentKit", package: "StudentKit"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "Analytics", package: "Analytics"),
+        .product(name: "ChatUI", package: "ChatUI"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),

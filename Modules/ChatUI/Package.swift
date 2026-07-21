@@ -2,28 +2,32 @@
 import PackageDescription
 
 let package = Package(
-  name: "Networking",
+  name: "ChatUI",
   platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
-    .library(name: "Networking", targets: ["Networking"])
+    .library(name: "ChatUI", targets: ["ChatUI"])
   ],
   dependencies: [
     .package(path: "../CoreModels"),
     .package(path: "../RepositoryContracts"),
+    .package(path: "../DesignSystem"),
   ],
   targets: [
     .target(
-      name: "Networking",
+      name: "ChatUI",
       dependencies: [
         .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+        .product(name: "DesignSystem", package: "DesignSystem"),
       ],
+      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(
-      name: "NetworkingTests",
+      name: "ChatUITests",
       dependencies: [
-        "Networking",
+        "ChatUI",
+        .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
