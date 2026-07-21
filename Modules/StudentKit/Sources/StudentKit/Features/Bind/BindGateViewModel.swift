@@ -175,6 +175,9 @@ public final class BindGateViewModel {
   // MARK: - Enter-code page callbacks
 
   public func handleSubmitted(_ outcome: EnterCodeViewModel.SubmitOutcome) async {
+    // Authoritative local transitions must also invalidate fetches in flight,
+    // or a pending snapshot taken before this can land afterwards and undo it.
+    fetchGeneration &+= 1
     switch outcome {
     case .requestSent(let request):
       // A 201 ends any stash lifecycle: a stale code left by an earlier
@@ -191,6 +194,7 @@ public final class BindGateViewModel {
   // MARK: - Wizard handoff callback (032 → 031 contract)
 
   public func handleHandoff(_ outcome: BindHandoffOutcome) async {
+    fetchGeneration &+= 1
     switch outcome {
     case .requestSent(let request):
       state = .pendingAcceptance(request)
@@ -204,6 +208,7 @@ public final class BindGateViewModel {
   // MARK: - Pending page callbacks
 
   public func handleCancelled() {
+    fetchGeneration &+= 1
     stash.clear(studentId: studentId)
     state = .needsCode(prefillDisplayName: nil, notice: nil)
   }

@@ -72,6 +72,13 @@ public final class ChatSendCoordinator {
   }
 
   public func retry(in conversationID: UUID, clientID: String) {
+    // Same gate as `enqueue`: a retry during the drain would re-stamp the item
+    // with the surviving generation, so the sweep would leave it behind — stuck
+    // in `.sending` if the retry then cancels cooperatively.
+    guard !isDraining else {
+      return
+    }
+
     guard
       let item = outboxesByConversationID[conversationID]?.first(where: {
         $0.clientID == clientID

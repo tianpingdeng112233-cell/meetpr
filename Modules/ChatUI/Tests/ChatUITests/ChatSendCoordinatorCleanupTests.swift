@@ -77,6 +77,50 @@ import Testing
     #expect(await repository.pendingTextClientIDs().contains("mid-drain") == false)
   }
 
+  @Test func retryDuringCleanupDoesNotOutliveIt() async {
+    // `retry` re-stamps an item with the current generation, so gating only
+    // `enqueue` left a second way to smuggle work past the sweep: a failed
+    // bubble retried mid-drain would survive as a permanent `.sending`.
+    let repository = TestChatRepository()
+    await repository.suspendTextSends()
+    let coordinator = ChatSendCoordinator(
+      repository: repository,
+      currentUserID: currentUserID
+    )
+
+    coordinator.sendText(in: conversationID, text: "会失败", clientID: "will-fail")
+    _ = await chatEventually { await repository.pendingTextClientIDs().contains("will-fail") }
+    await repository.resolveText(clientID: "will-fail", with: .failure(ChatTestError.failed))
+    _ = await chatEventually {
+      if case .failed = coordinator.outbox(in: conversationID).first?.state { return true }
+      return false
+    }
+
+    coordinator.sendText(in: conversationID, text: "占住清理", clientID: "blocker")
+    _ = await chatEventually { await repository.pendingTextClientIDs().contains("blocker") }
+    let cleanup = Task { @MainActor in
+      await coordinator.cancelAllAndWaitForCleanup()
+    }
+    _ = await chatEventually { await repository.cancelledTextIDs().contains("blocker") }
+
+    coordinator.retry(in: conversationID, clientID: "will-fail")
+
+    await repository.resolveText(
+      clientID: "blocker",
+      with: .success(
+        chatTestMessage(
+          conversationID: conversationID,
+          seq: 1,
+          senderID: currentUserID,
+          clientID: "blocker"
+        )
+      )
+    )
+    await cleanup.value
+
+    #expect(coordinator.outbox(in: conversationID).isEmpty)
+  }
+
   @Test func cancelAllWaitsForImageCleanup() async {
     let repository = CleanupChatRepository()
     let coordinator = ChatSendCoordinator(
