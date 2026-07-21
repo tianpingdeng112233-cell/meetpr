@@ -187,60 +187,6 @@ private actor SuspendedBindingRefreshProbe {
   }
 }
 
-/// A repository whose `fetchConversations` parks until released, so a test can
-/// hold an activation inside its awaits and interleave a logout with it.
-private actor GatedChatRepository: ChatRepository {
-  private var gate: CheckedContinuation<Void, Never>?
-  private var isWaiting = false
-
-  func waitingAtGate() -> Bool { isWaiting }
-
-  func openGate() {
-    gate?.resume()
-    gate = nil
-    isWaiting = false
-  }
-
-  func fetchConversations() async throws -> [ChatConversation] {
-    isWaiting = true
-    await withCheckedContinuation { continuation in
-      gate = continuation
-    }
-    return []
-  }
-
-  func openConversation(withOtherParty otherPartyID: UUID) async throws -> ChatConversation {
-    throw ChatRepositoryError.conversationNotFound
-  }
-
-  func fetchMessages(
-    in conversationID: UUID,
-    query: ChatMessageQuery
-  ) async throws -> ChatMessagePage {
-    ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
-  }
-
-  func sendText(
-    in conversationID: UUID,
-    text: String,
-    clientID: String
-  ) async throws -> ChatMessage {
-    throw ChatRepositoryError.conversationNotFound
-  }
-
-  func sendImage(
-    in conversationID: UUID,
-    imageData: Data,
-    clientID: String
-  ) async throws -> ChatMessage {
-    throw ChatRepositoryError.conversationNotFound
-  }
-
-  func markRead(in conversationID: UUID, upTo messageID: UUID) async throws -> ChatReadState {
-    throw ChatRepositoryError.conversationNotFound
-  }
-}
-
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func lateStudentActivationCannotPublishAfterLogout() async {
@@ -275,12 +221,18 @@ private actor GatedChatRepository: ChatRepository {
       refreshBinding: {}
     )
   }
-  try? await Task.sleep(for: .milliseconds(50))
+  // Observable signal rather than a fixed delay: the send is only cancelled once
+  // a caller has entered the drain, so this proves the activation is parked there.
+  #expect(await blocking.waitUntilCancelled())
 
   // Logout must run concurrently: it awaits the same drain the activation is
-  // parked on, so releasing the send is what lets both finish.
+  // parked on, so releasing the send is what lets both finish. It advances the
+  // generation in its first synchronous statement, so yielding until it has been
+  // scheduled is enough; there is no observable signal for "generation bumped",
+  // and a second caller joins the existing teardown without cancelling again.
   let logout = Task { @MainActor in await controller.cancelAllAndWaitForCleanup() }
-  try? await Task.sleep(for: .milliseconds(50))
+  for _ in 0..<10 { await Task.yield() }
+
   await blocking.release()
   await logout.value
   await activation.value
@@ -294,6 +246,20 @@ private actor GatedChatRepository: ChatRepository {
 private actor BlockingSendRepository: ChatRepository {
   private var continuation: CheckedContinuation<Void, Never>?
   private var sending = false
+
+  /// Set when the send task is cancelled, which only happens once a caller has
+  /// entered the drain — a real signal instead of guessing with a fixed delay.
+  private var cancelled = false
+
+  func noteCancelled() { cancelled = true }
+
+  func waitUntilCancelled() async -> Bool {
+    for _ in 0..<400 {
+      if cancelled { return true }
+      try? await Task.sleep(for: .milliseconds(5))
+    }
+    return false
+  }
 
   func waitUntilSending() async -> Bool {
     for _ in 0..<200 {
@@ -327,7 +293,11 @@ private actor BlockingSendRepository: ChatRepository {
     clientID: String
   ) async throws -> ChatMessage {
     sending = true
-    await withCheckedContinuation { self.continuation = $0 }
+    await withTaskCancellationHandler {
+      await withCheckedContinuation { self.continuation = $0 }
+    } onCancel: {
+      Task { await self.noteCancelled() }
+    }
     throw ChatRepositoryError.conversationNotFound
   }
 
