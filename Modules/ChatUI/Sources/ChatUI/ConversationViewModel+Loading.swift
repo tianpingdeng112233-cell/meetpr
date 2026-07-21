@@ -123,6 +123,9 @@ extension ConversationViewModel {
 
   private func pollTick() async throws {
     var query: ChatMessageQuery
+    // A tick with nothing local has to bootstrap from the newest page; only
+    // after that does polling mean "everything newer than what I hold".
+    let isBootstrappingFromLatest = messages.last?.seq == nil
     if let maximumSequence = messages.last?.seq {
       query = try .after(seq: maximumSequence, limit: pageLimit)
     } else {
@@ -137,6 +140,15 @@ extension ConversationViewModel {
       merge(page.messages, obtainedAt: now())
       updateOtherLastRead(page.otherLastRead)
       synchronizeOutbox()
+
+      if isBootstrappingFromLatest {
+        // On a latest page `hasMore` means older history exists — the opposite
+        // direction from this loop. Record it so loadOlder stays available (an
+        // initial load that failed would otherwise leave history unpageable),
+        // and let the next tick poll forward from the max seq just learned.
+        hasMoreHistory = page.hasMore
+        break
+      }
 
       guard page.hasMore else {
         break

@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import OSLog
 import RepositoryContracts
 
 public actor NetworkChatRepository: ChatRepository {
@@ -239,6 +240,14 @@ public actor NetworkChatRepository: ChatRepository {
 
 }
 
+/// Best-effort orphan cleanup. Failures are logged rather than swallowed: if
+/// auth has already been torn down or the network is gone, the attachment is
+/// left for server-side reclamation and we want that visible (spec 058 §3).
+private let chatCleanupLogger = Logger(
+  subsystem: "com.meetpr.app.networking",
+  category: "chat-cleanup"
+)
+
 private func cleanupChatAttachment(
   _ attachmentID: UUID,
   completed: Bool,
@@ -256,6 +265,12 @@ private func cleanupChatAttachment(
       } catch {
         // Completion may have won a response race. Fall through to DELETE,
         // which safely refuses an attachment already referenced by a message.
+        chatCleanupLogger.debug(
+          """
+          chat attachment abort failed, falling through to delete: \
+          \(attachmentID, privacy: .public)
+          """
+        )
       }
     }
 
@@ -268,14 +283,29 @@ private func cleanupChatAttachment(
       let machineCode = BackendErrorEnvelope.machineCode(from: error)
       guard machineCode == "UPLOAD_INVALID_STATE" else {
         // ATTACHMENT_IN_USE means the POST committed and the attachment is
-        // no longer orphaned. Other failures remain best-effort cleanup.
+        // no longer orphaned — expected, not worth logging. Anything else is a
+        // genuine leak we could not clean up.
+        if machineCode != "ATTACHMENT_IN_USE" {
+          chatCleanupLogger.warning(
+            """
+            chat attachment left orphaned, server-side reclamation required: \
+            \(attachmentID, privacy: .public) code=\(machineCode ?? "none", privacy: .public)
+            """
+          )
+        }
         return
       }
-      try? await apiClient.postNoContent(
-        path: "/uploads/\(attachmentID.uuidString)/reconcile",
-        body: EmptyWireBody(),
-        accessToken: accessToken
-      )
+      do {
+        try await apiClient.postNoContent(
+          path: "/uploads/\(attachmentID.uuidString)/reconcile",
+          body: EmptyWireBody(),
+          accessToken: accessToken
+        )
+      } catch {
+        chatCleanupLogger.warning(
+          "chat attachment reconcile failed, may remain orphaned: \(attachmentID, privacy: .public)"
+        )
+      }
     }
   }.value
 }

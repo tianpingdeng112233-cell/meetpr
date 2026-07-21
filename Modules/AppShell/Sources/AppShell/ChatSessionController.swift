@@ -37,7 +37,10 @@ public final class ChatSessionController {
 
   @ObservationIgnored private let invalidationRouter: ChatBindingInvalidationRouter
   @ObservationIgnored private var pendingStudentCoachID: UUID?
-  @ObservationIgnored private var activeStudentCoachID: UUID?
+  /// Which coach the live student context was built for. Observed, because
+  /// the root view gates on it: a context is only reusable for the same
+  /// (user, coach) pair.
+  public private(set) var activeStudentCoachID: UUID?
 
   public init() {
     invalidationRouter = ChatBindingInvalidationRouter()
@@ -103,6 +106,13 @@ public final class ChatSessionController {
     await invalidationRouter.useStudentHandler {
       await refreshBinding()
     }
+
+    // Both awaits above suspend, and a later binding change can be prepared
+    // while we are parked in them. Publishing unconditionally would attach the
+    // UI to a coach the user has already switched away from, so re-check that
+    // this activation is still the one wanted before building the graph.
+    guard canActivateStudent(for: activeCoachID) else { return }
+
     let onBindingInvalidated: @Sendable () async -> Void = { [invalidationRouter] in
       await invalidationRouter.route()
     }

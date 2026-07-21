@@ -79,6 +79,35 @@ import Testing
     #expect(viewModel.totalUnread == 1)
     #expect(viewModel.conversations.first?.unreadCount == 1)
   }
+  @Test func refreshLandingAfterMarkReadCannotResurrectTheBadge() async {
+    // The refresh generation only orders refresh against refresh. A refresh that
+    // sampled the unread count *before* a mark-read would otherwise return
+    // afterwards and write the stale count back, bringing a cleared badge back.
+    let repository = StaleInboxRepository()
+    let viewModel = ChatInboxViewModel(
+      repository: repository,
+      currentUserID: currentUserID
+    )
+    let unread = chatTestConversation(id: conversationID, unreadCount: 5)
+
+    let inFlight = Task { @MainActor in await viewModel.refresh() }
+    let waiting = await chatEventually { await repository.pendingRequestIDs() == [1] }
+    #expect(waiting)
+
+    viewModel.apply(
+      ChatReadState(
+        myLastRead: ChatCursor(messageID: chatTestUUID(90), seq: 9),
+        unreadCount: 0
+      ),
+      for: conversationID
+    )
+
+    // The pre-mark-read snapshot arrives last and must be discarded.
+    await repository.resolve(requestID: 1, conversations: [unread])
+    await inFlight.value
+
+    #expect(viewModel.totalUnread == 0)
+  }
 }
 
 private actor StaleInboxRepository: ChatRepository {

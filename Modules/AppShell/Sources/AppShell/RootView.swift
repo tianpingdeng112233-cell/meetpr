@@ -168,7 +168,11 @@ public struct RootView: View {
   @ViewBuilder
   private func coachRoot(for user: User) -> some View {
     if let chatRepository {
-      if let chat = chatSession.context, chat.currentUserID == user.id {
+      // A student context carries a bound coach; the coach root must never
+      // inherit one, so require the neutral (nil) binding as well as the user.
+      if let chat = chatSession.context, chat.currentUserID == user.id,
+        chatSession.activeStudentCoachID == nil
+      {
         coachContent(chat: chat)
       } else {
         ProgressView()
@@ -295,7 +299,12 @@ extension RootView {
     refreshBinding: @escaping @MainActor @Sendable () async -> Void
   ) -> some View {
     if let chatRepository {
-      if let chat = chatSession.context, chat.currentUserID == user.id {
+      // Match the coach too: after a switch, a context built for the previous
+      // coach still has the right user id and would otherwise be handed to the
+      // new coach's UI.
+      if let chat = chatSession.context, chat.currentUserID == user.id,
+        chatSession.activeStudentCoachID == activeCoach.coachID
+      {
         studentRoot(for: user, activeCoach: activeCoach, chat: chat, allowsChat: true)
       } else if chatSession.canActivateStudent(for: activeCoach.coachID) {
         ProgressView()

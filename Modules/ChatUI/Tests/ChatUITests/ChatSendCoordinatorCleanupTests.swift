@@ -38,6 +38,45 @@ import Testing
     #expect(coordinator.outbox(in: conversationID).isEmpty)
   }
 
+  @Test func sendEnqueuedDuringCleanupDoesNotOutliveIt() async {
+    // The drain suspends, and the MainActor is re-entrant across those
+    // suspensions, so work can arrive mid-cleanup — an image-preparation task
+    // finishing during logout is the realistic case. Such a send must not
+    // survive the cleanup that was meant to remove it.
+    let repository = TestChatRepository()
+    await repository.suspendTextSends()
+    let coordinator = ChatSendCoordinator(
+      repository: repository,
+      currentUserID: currentUserID
+    )
+    coordinator.sendText(in: conversationID, text: "第一条", clientID: "in-flight")
+    _ = await chatEventually { await repository.pendingTextClientIDs().contains("in-flight") }
+
+    let cleanup = Task { @MainActor in
+      await coordinator.cancelAllAndWaitForCleanup()
+    }
+    _ = await chatEventually { await repository.cancelledTextIDs().contains("in-flight") }
+
+    // Lands while the drain is parked awaiting the cancelled task.
+    coordinator.sendText(in: conversationID, text: "清理途中", clientID: "mid-drain")
+
+    await repository.resolveText(
+      clientID: "in-flight",
+      with: .success(
+        chatTestMessage(
+          conversationID: conversationID,
+          seq: 1,
+          senderID: currentUserID,
+          clientID: "in-flight"
+        )
+      )
+    )
+    await cleanup.value
+
+    #expect(coordinator.outbox(in: conversationID).isEmpty)
+    #expect(await repository.pendingTextClientIDs().contains("mid-drain") == false)
+  }
+
   @Test func cancelAllWaitsForImageCleanup() async {
     let repository = CleanupChatRepository()
     let coordinator = ChatSendCoordinator(

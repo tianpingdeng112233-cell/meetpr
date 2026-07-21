@@ -57,6 +57,13 @@ public final class ChatInboxViewModel {
   }
 
   public func apply(_ readState: ChatReadState, for conversationID: UUID) {
+    // Invalidate refreshes already in flight. Their generation only protects
+    // against an older *refresh* landing after a newer one; a refresh that
+    // sampled the unread count before this mark-read would otherwise return
+    // afterwards and write the stale count back, resurrecting a badge the user
+    // just cleared.
+    refreshRequest &+= 1
+
     guard let index = conversations.firstIndex(where: { $0.id == conversationID }) else {
       return
     }

@@ -43,38 +43,6 @@ import Testing
     #expect(viewModel.isPolling == false)
   }
 
-  @Test func oneTickCatchesUpMoreThanTwoPages() async {
-    let repository = TestChatRepository()
-    for sequence in 1...4 {
-      await repository.enqueuePage(
-        ChatMessagePage(
-          messages: [
-            chatTestMessage(
-              conversationID: conversationID,
-              seq: sequence,
-              senderID: currentUserID,
-              clientID: "page-\(sequence)"
-            )
-          ],
-          otherLastRead: nil,
-          hasMore: sequence < 4
-        )
-      )
-    }
-    let viewModel = makeViewModel(repository: repository)
-
-    await viewModel.pollOnce()
-
-    #expect(viewModel.messages.map(\.seq) == [1, 2, 3, 4])
-    #expect(
-      await repository.queries.map(\.mode) == [
-        .latest,
-        .after(seq: 1),
-        .after(seq: 2),
-        .after(seq: 3),
-      ])
-  }
-
   @Test func catchUpStopsWhenSequenceDoesNotAdvance() async {
     let repository = TestChatRepository()
     let message = chatTestMessage(
@@ -106,6 +74,8 @@ import Testing
       senderID: currentUserID,
       clientID: "first"
     )
+    // hasMore on the latest page means *older* history exists; it must not be
+    // mistaken for more to catch up forward within the same tick.
     await repository.enqueuePage(
       ChatMessagePage(messages: [first], otherLastRead: nil, hasMore: true)
     )
@@ -115,7 +85,10 @@ import Testing
     let viewModel = makeViewModel(repository: repository)
 
     await viewModel.pollOnce()
+    #expect(await repository.queries.map(\.mode) == [.latest])
+    #expect(viewModel.hasMoreHistory)
 
+    await viewModel.pollOnce()
     #expect(await repository.queries.map(\.mode) == [.latest, .after(seq: 1)])
   }
 

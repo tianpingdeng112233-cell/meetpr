@@ -25,6 +25,9 @@ public final class ChatSendCoordinator {
   @ObservationIgnored private var settledClientIDs: [UUID: Set<String>] = [:]
   @ObservationIgnored private var generation: UInt64 = 0
   @ObservationIgnored private var invalidationGeneration: UInt64?
+  /// True while `cancelAllAndWaitForCleanup()` is draining; `enqueue` refuses
+  /// new work for the duration so nothing outlives the cleanup.
+  @ObservationIgnored private var isDraining = false
 
   public init(
     repository: any ChatRepository,
@@ -115,18 +118,31 @@ public final class ChatSendCoordinator {
     invalidationGeneration = nil
     let survivingGeneration = generation
     let callerKey = ChatSendTaskContext.operationKey
-    let tasksToCancel = tasks.filter { key, _ in key != callerKey }
 
-    for task in tasksToCancel.values {
-      task.cancel()
-    }
-    for task in tasksToCancel.values {
-      await task.value
+    // Closed for new work until the drain finishes; see `enqueue`.
+    isDraining = true
+    defer { isDraining = false }
+
+    // Drain in a loop rather than from one snapshot. Awaiting a task lets the
+    // MainActor run other work, which can register further tasks; a single pass
+    // would return while those are still live, leaving a logged-out session
+    // still sending.
+    while true {
+      let pending = tasks.filter { key, _ in key != callerKey }
+      if pending.isEmpty {
+        break
+      }
+      for task in pending.values {
+        task.cancel()
+      }
+      for task in pending.values {
+        await task.value
+      }
+      for key in pending.keys {
+        tasks[key] = nil
+      }
     }
 
-    for key in tasksToCancel.keys {
-      tasks[key] = nil
-    }
     removeItems(olderThan: survivingGeneration)
     settledClientIDs.removeAll()
   }
@@ -147,6 +163,15 @@ public final class ChatSendCoordinator {
     in conversationID: UUID,
     clientID: String
   ) -> String {
+    // A drain is not a moment, it is an interval: `cancelAllAndWaitForCleanup`
+    // suspends, and the MainActor is re-entrant across those suspensions. Work
+    // that lands mid-drain — most easily an image-preparation task finishing
+    // during logout or a re-bind — would otherwise enqueue with the surviving
+    // generation and outlive the very cleanup that was meant to remove it.
+    guard !isDraining else {
+      return clientID
+    }
+
     let key = ChatSendOperationKey(conversationID: conversationID, clientID: clientID)
     if outboxesByConversationID[conversationID]?.contains(where: {
       $0.clientID == clientID

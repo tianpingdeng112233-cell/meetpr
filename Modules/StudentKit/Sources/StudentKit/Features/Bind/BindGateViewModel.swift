@@ -78,6 +78,9 @@ public final class BindGateViewModel {
   private let evaluations: (any EvaluationRepository)?
   private let willApplyBindingChange:
     @MainActor @Sendable (_ oldCoachID: UUID?, _ newCoachID: UUID?) async -> Void
+  /// Orders overlapping `load()` / `refresh()` fetches so the newest wins,
+  /// rather than whichever happens to return last.
+  private var fetchGeneration: UInt64 = 0
 
   public init(
     studentId: UUID,
@@ -99,7 +102,10 @@ public final class BindGateViewModel {
   }
 
   public func load() async {
-    await apply(await fetchCandidateState())
+    fetchGeneration &+= 1
+    let generation = fetchGeneration
+    let candidate = await fetchCandidateState()
+    await apply(candidate, generation: generation)
   }
 
   private func fetchCandidateState() async -> BindGateState {
@@ -156,7 +162,14 @@ public final class BindGateViewModel {
   /// reloads when the gate is already past `.loading`.
   public func refresh() async {
     guard state != .loading else { return }
-    await apply(await fetchCandidateState())
+    // Single-flight by generation: a foreground refresh, a 403-triggered
+    // refresh and a pull-to-refresh can overlap, and without this the slowest
+    // fetch wins simply by returning last — republishing a coach the user has
+    // already moved away from.
+    fetchGeneration &+= 1
+    let generation = fetchGeneration
+    let candidate = await fetchCandidateState()
+    await apply(candidate, generation: generation)
   }
 
   // MARK: - Enter-code page callbacks
@@ -256,12 +269,20 @@ public final class BindGateViewModel {
     return .failed
   }
 
-  private func apply(_ candidate: BindGateState) async {
+  private func apply(_ candidate: BindGateState, generation: UInt64) async {
+    guard generation == fetchGeneration else {
+      return
+    }
     let oldState = state
     let oldCoachID = Self.activeCoachID(in: oldState)
     let newCoachID = Self.activeCoachID(in: candidate)
     if oldCoachID != newCoachID {
       await willApplyBindingChange(oldCoachID, newCoachID)
+      // Cleanup suspended us; a newer fetch may have landed meanwhile and this
+      // candidate is now stale.
+      guard generation == fetchGeneration else {
+        return
+      }
     }
     state = candidate
     if case .pendingAcceptance = oldState, case .bound = candidate {
