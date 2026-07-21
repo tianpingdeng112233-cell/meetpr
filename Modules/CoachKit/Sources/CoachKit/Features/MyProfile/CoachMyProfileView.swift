@@ -18,13 +18,21 @@ import SwiftUI
 struct CoachMyProfileView: View {
   @Bindable private var viewModel: CoachMyProfileViewModel
   private let inviteCodes: any InviteCodeRepository
+  private let account: any AccountRepository
   /// Local read-model so the permanent code + scan count can be previewed on
   /// this screen; the full mutate/list UI still lives in `InviteCodesView`.
   @State private var codesViewModel: InviteCodesViewModel
+  @State private var changePasswordPresentation: CoachChangePasswordPresentation?
+  @State private var showsPasswordUpdated = false
 
-  init(viewModel: CoachMyProfileViewModel, inviteCodes: any InviteCodeRepository) {
+  init(
+    viewModel: CoachMyProfileViewModel,
+    inviteCodes: any InviteCodeRepository,
+    account: any AccountRepository
+  ) {
     self.viewModel = viewModel
     self.inviteCodes = inviteCodes
+    self.account = account
     self._codesViewModel = State(initialValue: InviteCodesViewModel(repository: inviteCodes))
   }
 
@@ -56,6 +64,20 @@ struct CoachMyProfileView: View {
       .hideNavigationBar()
     }
     .task { await codesViewModel.loadIfNeeded() }
+    .sheet(item: $changePasswordPresentation) { presentation in
+      CoachChangePasswordSheet(viewModel: presentation.viewModel) {
+        changePasswordPresentation = nil
+        showPasswordUpdatedToast()
+      }
+      .presentationDetents([.medium, .large])
+    }
+    .overlay(alignment: .bottom) {
+      if showsPasswordUpdated {
+        passwordUpdatedToast
+          .padding()
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+      }
+    }
   }
 
   // MARK: - Identity
@@ -149,6 +171,8 @@ struct CoachMyProfileView: View {
   // rather than shown as dead rows.
   private var rowsCard: some View {
     VStack(spacing: 0) {
+      changePasswordRow
+      divider
       versionRow
       divider
       logoutRow
@@ -157,6 +181,34 @@ struct CoachMyProfileView: View {
     .background(Color.MeetPR.surface1)
     .clipShape(.rect(cornerRadius: 12))
     .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  }
+
+  private var changePasswordRow: some View {
+    Button {
+      changePasswordPresentation = CoachChangePasswordPresentation(
+        viewModel: CoachChangePasswordViewModel(account: account)
+      )
+    } label: {
+      HStack(spacing: 14) {
+        Image(systemName: "key")
+          .font(Font.MeetPR.headline)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .frame(width: 22)
+        Text("改密码")
+          .font(Font.MeetPR.body)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Spacer()
+        Image(systemName: "chevron.right")
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgTertiary)
+      }
+      .padding(.horizontal, 16)
+      .padding(.vertical, 14)
+      .frame(minHeight: 56)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .accessibilityIdentifier("account.changePassword")
   }
 
   private var versionRow: some View {
@@ -217,4 +269,30 @@ struct CoachMyProfileView: View {
   private var divider: some View {
     Rectangle().fill(Color.MeetPR.border).frame(height: 1)
   }
+
+  private var passwordUpdatedToast: some View {
+    Label("密码已更新,其他设备将退出登录", systemImage: "checkmark.circle.fill")
+      .font(Font.MeetPR.caption)
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .padding(.horizontal, MeetPRSpacing.base)
+      .padding(.vertical, MeetPRSpacing.sm)
+      .background(Color.MeetPR.surface2)
+      .clipShape(.capsule)
+      .shadow(radius: 8)
+      .accessibilityIdentifier("account.password.updated")
+  }
+
+  private func showPasswordUpdatedToast() {
+    withAnimation { showsPasswordUpdated = true }
+    Task {
+      try? await Task.sleep(for: .seconds(2))
+      withAnimation { showsPasswordUpdated = false }
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct CoachChangePasswordPresentation: Identifiable {
+  let id = UUID()
+  let viewModel: CoachChangePasswordViewModel
 }

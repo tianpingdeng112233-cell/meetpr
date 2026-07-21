@@ -10,6 +10,7 @@ public struct CoachRootView: View {
   private let studentLogs: any StudentTrainingLogRepository
   private let feedback: any StudentFeedbackRepository
   private let inviteCodes: any InviteCodeRepository
+  private let account: any AccountRepository
   private let detailContext: CoachStudentDetailContext
   private let draftStore: DraftStore
   @State private var rosterViewModel: StudentRosterViewModel
@@ -25,6 +26,7 @@ public struct CoachRootView: View {
     studentLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
     feedback: any StudentFeedbackRepository = EmptyStudentFeedbackRepository(),
     inviteCodes: (any InviteCodeRepository)? = nil,
+    account: any AccountRepository = InMemoryCoachAccountRepository(),
     studentVideos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
     familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
@@ -41,6 +43,7 @@ public struct CoachRootView: View {
     self.studentLogs = studentLogs
     self.feedback = feedback
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
+    self.account = account
     self.draftStore = draftStore
     let resolvedQueue =
       bindQueue ?? InMemoryCoachBindQueueRepository(coachId: UUID())
@@ -134,11 +137,15 @@ public struct CoachRootView: View {
       // 收件箱红点 = 新学员 + 待反馈视频(spec 042).
       .badge(queueViewModel.pendingCount + videoQueueViewModel.pendingCount)
 
-      CoachMyProfileView(viewModel: profileViewModel, inviteCodes: inviteCodes)
-        .tag(CoachTab.profile)
-        .tabItem {
-          Label("我的", systemImage: "person")
-        }
+      CoachMyProfileView(
+        viewModel: profileViewModel,
+        inviteCodes: inviteCodes,
+        account: account
+      )
+      .tag(CoachTab.profile)
+      .tabItem {
+        Label("我的", systemImage: "person")
+      }
     }
     .task {
       Analytics.shared.screen(.dashboard)

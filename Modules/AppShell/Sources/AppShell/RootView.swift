@@ -20,6 +20,7 @@ public struct RootView: View {
   private let coachEvaluations: any EvaluationRepository
   private let coachEvaluationSummaries: any EvaluationSummaryRepository
   private let coachStudentProfiles: any OnboardingProfileReading
+  private let coachAccount: any AccountRepository
   private let studentPlans: any StudentPlanRepository
   private let studentLogs: any StudentTrainingLogRepository
   private let studentFeedback: any StudentFeedbackRepository
@@ -47,6 +48,7 @@ public struct RootView: View {
     coachEvaluations: (any EvaluationRepository)? = nil,
     coachEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     coachStudentProfiles: (any OnboardingProfileReading)? = nil,
+    coachAccount: (any AccountRepository)? = nil,
     studentPlans: (any StudentPlanRepository)? = nil,
     studentLogs: (any StudentTrainingLogRepository)? = nil,
     studentFeedback: (any StudentFeedbackRepository)? = nil,
@@ -91,6 +93,10 @@ public struct RootView: View {
     self.studentEvaluationSummaries =
       studentEvaluationSummaries ?? InMemoryEvaluationSummaryRepository()
     self.studentAccount = studentAccount ?? InMemoryAccountRepository()
+    // Falls back to CoachKit's own in-memory ledger, not the student one: the
+    // two tabs are independent, and sharing the fallback would silently paper
+    // over a caller that forgot to inject the live coach repository.
+    self.coachAccount = coachAccount ?? InMemoryCoachAccountRepository()
     self.summaryReadStore = summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
     self.pendingBindStore = pendingBindStore
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
@@ -133,6 +139,7 @@ public struct RootView: View {
         studentLogs: studentLogs,
         feedback: studentFeedback,
         inviteCodes: coachInviteCodes,
+        account: coachAccount,
         studentVideos: coachStudentVideos,
         readiness: studentReadiness,
         familyMapProvider: coachFamilyMapProvider,
