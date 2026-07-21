@@ -1,16 +1,15 @@
 // swiftlint:disable file_length type_body_length
 import Analytics
+import ChatUI
 import CoreModels
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// Coach 接收 tab — a two-segment container (新学员 requests · 训练视频 feedback),
-/// reskinned 1:1 to `DKCoachReceiving`. The 新学员 segment now renders the live
-/// receive queue from `BindQueueViewModel` (name + onboarding summary + accept /
-/// view-profile / reject), wired identically to the roster's queue section
-/// (spec 033). The 训练视频 segment stays an honest empty-state until a
-/// cross-student video queue VM exists.
+/// Coach 接收 tab — a three-segment container (新学员 · 训练视频 · 消息),
+/// reskinned to `DKCoachReceiving`. The 新学员 segment renders the live receive
+/// queue from `BindQueueViewModel`; the 消息 segment reads the shared session
+/// inbox so its rows and unread counts stay aligned with every header entry.
 ///
 /// Backward compatible: the original `pendingCount` / `videoCount` initializer
 /// still compiles. When the live `queueViewModel` + `profiles` are supplied
@@ -24,6 +23,7 @@ struct CoachReceivingView: View {
   private let queueViewModel: BindQueueViewModel?
   private let videoQueueViewModel: CoachVideoQueueViewModel?
   private let profiles: any OnboardingProfileReading
+  private let chat: CoachChatContext?
   /// Called after a request is accepted so the caller can refresh the roster —
   /// `BindQueueViewModel` does not own the roster (spec 033 D1).
   private let onAccepted: () async -> Void
@@ -33,8 +33,10 @@ struct CoachReceivingView: View {
   @State private var rejectTarget: CoachBindRequestItem?
   @State private var profileTarget: CoachBindRequestItem?
   @State private var videoStudentTarget: PendingVideoStudentGroup?
+  @State private var selectedConversation: ChatConversation?
+  @State private var isConversationListPresented = false
 
-  enum Segment: Hashable { case students, videos }
+  enum Segment: Hashable { case students, videos, messages }
 
   /// `queueViewModel` / `videoQueueViewModel` default to nil so existing
   /// callers/tests that pass only counts keep compiling; supply them (and
@@ -45,7 +47,8 @@ struct CoachReceivingView: View {
     queueViewModel: BindQueueViewModel? = nil,
     videoQueueViewModel: CoachVideoQueueViewModel? = nil,
     profiles: any OnboardingProfileReading = InMemoryCoachStudentProfileReader(),
-    onAccepted: @escaping () async -> Void = {}
+    onAccepted: @escaping () async -> Void = {},
+    chat: CoachChatContext? = nil
   ) {
     self.fallbackPendingCount = pendingCount
     self.fallbackVideoCount = videoCount
@@ -53,6 +56,7 @@ struct CoachReceivingView: View {
     self.videoQueueViewModel = videoQueueViewModel
     self.profiles = profiles
     self.onAccepted = onAccepted
+    self.chat = chat
   }
 
   private var pendingCount: Int {
@@ -61,6 +65,10 @@ struct CoachReceivingView: View {
 
   private var videoCount: Int {
     videoQueueViewModel?.pendingCount ?? fallbackVideoCount
+  }
+
+  private var chatUnreadCount: Int {
+    chat?.inbox.totalUnread ?? 0
   }
 
   var body: some View {
@@ -74,6 +82,8 @@ struct CoachReceivingView: View {
             studentsSegment
           case .videos:
             videosSegment
+          case .messages:
+            messagesSegment
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -94,6 +104,19 @@ struct CoachReceivingView: View {
             studentID: group.studentID,
             studentName: group.studentName,
             viewModel: videoQueueViewModel
+          )
+        }
+      }
+      .navigationDestination(isPresented: $isConversationListPresented) {
+        if let chat {
+          ConversationListView(chat: chat)
+        }
+      }
+      .navigationDestination(item: $selectedConversation) { conversation in
+        if let chat {
+          CoachConversationDestination(
+            conversationID: conversation.id,
+            chat: chat
           )
         }
       }
@@ -136,11 +159,18 @@ struct CoachReceivingView: View {
 
   private var header: some View {
     VStack(alignment: .leading, spacing: 0) {
-      Eyebrow("收件箱")
-      Text("接收")
-        .font(.system(size: 34, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .padding(.top, MeetPRSpacing.xs)
+      HStack(alignment: .top, spacing: MeetPRSpacing.md) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+          Eyebrow("收件箱")
+          Text("接收")
+            .font(.system(size: 34, weight: .heavy))
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+        }
+        Spacer(minLength: MeetPRSpacing.sm)
+        CoachChatHeaderButton(chat: chat) {
+          isConversationListPresented = true
+        }
+      }
       segmentedControl
         .padding(.top, MeetPRSpacing.md)
     }
@@ -154,6 +184,9 @@ struct CoachReceivingView: View {
     HStack(spacing: 3) {
       segButton(.students, label: "新学员", count: pendingCount)
       segButton(.videos, label: "训练视频", count: videoCount)
+      if chat != nil {
+        segButton(.messages, label: CoachStrings.messages, count: chatUnreadCount)
+      }
     }
     .padding(3)
     .background(Color.MeetPR.surface1)
@@ -184,6 +217,19 @@ struct CoachReceivingView: View {
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
     .buttonStyle(.plain)
+  }
+
+  @ViewBuilder
+  private var messagesSegment: some View {
+    if let chat {
+      ScrollView {
+        ConversationListSection(inbox: chat.inbox) { conversation in
+          selectedConversation = conversation
+        }
+        .padding(MeetPRSpacing.base)
+      }
+      .scrollIndicators(.hidden)
+    }
   }
 
   // MARK: - 新学员 segment (reproduces DKCoachReceiving request cards)

@@ -38,7 +38,9 @@ let package = Package(
       dependencies: [
         "AppShell",
         .product(name: "CoachKit", package: "CoachKit"),
+        .product(name: "ChatUI", package: "ChatUI"),
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "StudentKit", package: "StudentKit"),
         .product(name: "ViewInspector", package: "ViewInspector"),
       ],

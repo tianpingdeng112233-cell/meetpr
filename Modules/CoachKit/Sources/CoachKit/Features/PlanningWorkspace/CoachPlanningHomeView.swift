@@ -16,15 +16,19 @@ import SwiftUI
 struct CoachPlanningHomeView: View {
   private let context: CoachStudentDetailContext
   private let now: @Sendable () -> Date
+  private let chat: CoachChatContext?
   @State private var viewModel: PlanningWorkspaceViewModel
   @State private var showPlanning = false
   @State private var activeIntent: PlanningIntent = .blank
+  @State private var isConversationListPresented = false
 
   init(
     context: CoachStudentDetailContext,
+    chat: CoachChatContext? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.context = context
+    self.chat = chat
     self.now = now
     _viewModel = State(
       initialValue: PlanningWorkspaceViewModel(
@@ -60,6 +64,11 @@ struct CoachPlanningHomeView: View {
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
+      .navigationDestination(isPresented: $isConversationListPresented) {
+        if let chat {
+          ConversationListView(chat: chat)
+        }
+      }
       .refreshable {
         await viewModel.refresh()
       }
@@ -85,14 +94,20 @@ struct CoachPlanningHomeView: View {
   // MARK: - Header
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-      Eyebrow("计划编排")
-      Text("编排")
-        .font(.system(size: 36, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      Text("为学员排周期 · 续编草稿 · 回看已发布")
-        .font(.system(size: 14))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+    HStack(alignment: .top, spacing: MeetPRSpacing.md) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+        Eyebrow("计划编排")
+        Text("编排")
+          .font(.system(size: 36, weight: .heavy))
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Text("为学员排周期 · 续编草稿 · 回看已发布")
+          .font(.system(size: 14))
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+      }
+      Spacer(minLength: MeetPRSpacing.sm)
+      CoachChatHeaderButton(chat: chat) {
+        isConversationListPresented = true
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }

@@ -15,13 +15,17 @@ import SwiftUI
 struct StudentRosterView: View {
   @Bindable private var viewModel: StudentRosterViewModel
   private let context: CoachStudentDetailContext
+  private let chat: CoachChatContext?
+  @State private var isConversationListPresented = false
 
   init(
     viewModel: StudentRosterViewModel,
-    context: CoachStudentDetailContext
+    context: CoachStudentDetailContext,
+    chat: CoachChatContext? = nil
   ) {
     self.viewModel = viewModel
     self.context = context
+    self.chat = chat
   }
 
   var body: some View {
@@ -34,6 +38,11 @@ struct StudentRosterView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
+      .navigationDestination(isPresented: $isConversationListPresented) {
+        if let chat {
+          ConversationListView(chat: chat)
+        }
+      }
     }
     .task {
       await viewModel.loadIfNeeded()
@@ -60,6 +69,9 @@ struct StudentRosterView: View {
           .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
       }
       .accessibilityLabel("刷新学员")
+      CoachChatHeaderButton(chat: chat) {
+        isConversationListPresented = true
+      }
     }
     .padding(.horizontal, 16)
     .padding(.top, 8)

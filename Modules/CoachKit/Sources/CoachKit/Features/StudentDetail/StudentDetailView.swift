@@ -1,5 +1,6 @@
 // swiftlint:disable file_length type_body_length
 import Analytics
+import CoreModels
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
@@ -11,6 +12,7 @@ struct StudentDetailView: View {
   @State private var videoGridViewModel: StudentVideoGridViewModel
   @State private var growthViewModel: StudentGrowthViewModel
   @State private var evaluationViewModel: EvaluationBannerViewModel
+  @State private var conversationOpener: CoachConversationOpener
   private let context: CoachStudentDetailContext
   @State private var showComposer = false
   @State private var showSummaryEditor = false
@@ -47,6 +49,9 @@ struct StudentDetailView: View {
         summaries: context.summaries,
         onCompleted: onEvaluationCompleted
       )
+    )
+    _conversationOpener = State(
+      initialValue: CoachConversationOpener(chat: context.chat)
     )
     self.context = context
   }
@@ -104,6 +109,14 @@ struct StudentDetailView: View {
     .navigationDestination(isPresented: $showSummaryEditor) {
       summaryEditor
     }
+    .navigationDestination(item: conversationDestinationBinding) { conversation in
+      if let chat = context.chat {
+        CoachConversationDestination(
+          conversationID: conversation.id,
+          chat: chat
+        )
+      }
+    }
     .onChange(of: showSummaryEditor) { _, isShowing in
       if !isShowing {
         // Returning from the editor: refresh the overview summary card.
@@ -117,6 +130,14 @@ struct StudentDetailView: View {
         context: context
       )
     )
+    .alert(
+      CoachStrings.unableToOpenConversation,
+      isPresented: conversationErrorBinding
+    ) {
+      Button(CoachStrings.confirmation, role: .cancel) {
+        conversationOpener.dismissError()
+      }
+    }
     .task {
       Analytics.shared.screen(.coachStudentDetail)
       Analytics.shared.coachOpenedStudent(id: viewModel.summary.id)
@@ -177,6 +198,27 @@ struct StudentDetailView: View {
 
       Spacer()
 
+      if context.chat != nil {
+        Button {
+          Task {
+            await conversationOpener.openConversation(
+              withOtherParty: viewModel.summary.id
+            )
+          }
+        } label: {
+          Image(systemName: "message")
+            .font(.system(size: 17, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .frame(width: 36, height: 36)
+            .background(Color.MeetPR.surface1)
+            .clipShape(Circle())
+            .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
+        }
+        .buttonStyle(.plain)
+        .disabled(conversationOpener.isOpening)
+        .accessibilityLabel(CoachStrings.sendMessage)
+      }
+
       if viewModel.selectedSection == .feedback {
         Button {
           showComposer = true
@@ -193,6 +235,28 @@ struct StudentDetailView: View {
         .accessibilityLabel("写反馈")
       }
     }
+  }
+
+  private var conversationDestinationBinding: Binding<ChatConversation?> {
+    Binding(
+      get: { conversationOpener.destination },
+      set: { destination in
+        if destination == nil {
+          conversationOpener.dismissDestination()
+        }
+      }
+    )
+  }
+
+  private var conversationErrorBinding: Binding<Bool> {
+    Binding(
+      get: { conversationOpener.errorMessage != nil },
+      set: { isPresented in
+        if !isPresented {
+          conversationOpener.dismissError()
+        }
+      }
+    )
   }
 
   /// Status line beneath the name. Mirrors the mock's "教练 · 学员" identity

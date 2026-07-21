@@ -3,6 +3,9 @@ import PackageDescription
 
 let package = Package(
   name: "CoachKit",
+  // The app ships Chinese only; without this an en-locale device fails to
+  // resolve the zh-Hans strings and renders raw keys like "chat.messages".
+  defaultLocalization: "zh-Hans",
   platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
     .library(name: "CoachKit", targets: ["CoachKit"])
@@ -40,6 +43,7 @@ let package = Package(
         "CoachKit",
         .product(name: "Networking", package: "Networking"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+        .product(name: "ChatUI", package: "ChatUI"),
         .product(name: "ViewInspector", package: "ViewInspector"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]

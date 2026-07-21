@@ -141,9 +141,13 @@ public final class Session {
 
   public func logout() async {
     let generation = beginSessionTransition()
-    await tokenStore.clear()
-    guard isCurrentSession(generation) else { return }
+    // Remove the authenticated role subtree before session cleanup mutates its
+    // dependencies. The logout hook still has access to the current token, so
+    // chat can finish orphan-attachment cleanup before credentials disappear.
+    state = .authenticating
     await onLogout?()
+    guard isCurrentSession(generation) else { return }
+    await tokenStore.clear()
     guard isCurrentSession(generation) else { return }
     state = .anonymous
   }

@@ -18,13 +18,20 @@ import SwiftUI
 struct CoachMyProfileView: View {
   @Bindable private var viewModel: CoachMyProfileViewModel
   private let inviteCodes: any InviteCodeRepository
+  private let chat: CoachChatContext?
   /// Local read-model so the permanent code + scan count can be previewed on
   /// this screen; the full mutate/list UI still lives in `InviteCodesView`.
   @State private var codesViewModel: InviteCodesViewModel
+  @State private var isConversationListPresented = false
 
-  init(viewModel: CoachMyProfileViewModel, inviteCodes: any InviteCodeRepository) {
+  init(
+    viewModel: CoachMyProfileViewModel,
+    inviteCodes: any InviteCodeRepository,
+    chat: CoachChatContext? = nil
+  ) {
     self.viewModel = viewModel
     self.inviteCodes = inviteCodes
+    self.chat = chat
     self._codesViewModel = State(initialValue: InviteCodesViewModel(repository: inviteCodes))
   }
 
@@ -36,6 +43,9 @@ struct CoachMyProfileView: View {
             .font(.system(size: 36, weight: .heavy))
             .foregroundStyle(Color.MeetPR.fgPrimary)
           Spacer()
+          CoachChatHeaderButton(chat: chat) {
+            isConversationListPresented = true
+          }
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -54,6 +64,11 @@ struct CoachMyProfileView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
+      .navigationDestination(isPresented: $isConversationListPresented) {
+        if let chat {
+          ConversationListView(chat: chat)
+        }
+      }
     }
     .task { await codesViewModel.loadIfNeeded() }
   }

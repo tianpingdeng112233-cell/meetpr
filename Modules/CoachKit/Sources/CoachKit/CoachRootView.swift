@@ -1,5 +1,7 @@
 import Analytics
+import ChatUI
 import DesignSystem
+import Foundation
 import RepositoryContracts
 import SwiftUI
 
@@ -11,6 +13,7 @@ public struct CoachRootView: View {
   private let feedback: any StudentFeedbackRepository
   private let inviteCodes: any InviteCodeRepository
   private let detailContext: CoachStudentDetailContext
+  private let chat: CoachChatContext?
   private let draftStore: DraftStore
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var queueViewModel: BindQueueViewModel
@@ -19,6 +22,7 @@ public struct CoachRootView: View {
   @State private var selectedTab: CoachTab = .today
 
   @MainActor
+  // swiftlint:disable:next function_body_length
   public init(
     repository: any PlanRepository = InMemoryPlanRepository.preview(),
     studentPlans: any StudentPlanRepository = EmptyStudentPlanRepository(),
@@ -33,6 +37,10 @@ public struct CoachRootView: View {
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     studentProfiles: (any OnboardingProfileReading)? = nil,
     videoQueue: (any CoachVideoQueueRepository)? = nil,
+    chat: (any ChatRepository)? = nil,
+    currentUserID: UUID? = nil,
+    inbox: ChatInboxViewModel? = nil,
+    sendCoordinator: ChatSendCoordinator? = nil,
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
@@ -48,6 +56,13 @@ public struct CoachRootView: View {
     let resolvedSummaries =
       evaluationSummaries ?? InMemoryCoachEvaluationSummaryRepository(coachId: UUID())
     let resolvedProfiles = studentProfiles ?? InMemoryCoachStudentProfileReader()
+    let resolvedChat = Self.chatContext(
+      repository: chat,
+      currentUserID: currentUserID,
+      inbox: inbox,
+      sendCoordinator: sendCoordinator
+    )
+    self.chat = resolvedChat
     detailContext = CoachStudentDetailContext(
       plans: studentPlans,
       trainingLogs: studentLogs,
@@ -59,7 +74,8 @@ public struct CoachRootView: View {
       readiness: readiness,
       familyMapProvider: familyMapProvider,
       planning: repository,
-      draftStore: draftStore
+      draftStore: draftStore,
+      chat: resolvedChat
     )
     _rosterViewModel = State(
       initialValue: StudentRosterViewModel(
@@ -86,6 +102,23 @@ public struct CoachRootView: View {
     )
   }
 
+  private static func chatContext(
+    repository: (any ChatRepository)?,
+    currentUserID: UUID?,
+    inbox: ChatInboxViewModel?,
+    sendCoordinator: ChatSendCoordinator?
+  ) -> CoachChatContext? {
+    guard let repository, let currentUserID, let inbox, let sendCoordinator else {
+      return nil
+    }
+    return CoachChatContext(
+      repository: repository,
+      currentUserID: currentUserID,
+      inbox: inbox,
+      sendCoordinator: sendCoordinator
+    )
+  }
+
   public var body: some View {
     TabView(selection: $selectedTab) {
       CoachDashboardView(
@@ -95,7 +128,8 @@ public struct CoachRootView: View {
         rows: rosterViewModel.rows,
         onOpenReceiving: { selectedTab = .receiving },
         onOpenRoster: { selectedTab = .students },
-        onEvaluationCompleted: { rosterViewModel.markStudentActive($0) }
+        onEvaluationCompleted: { rosterViewModel.markStudentActive($0) },
+        chat: chat
       )
       .tag(CoachTab.today)
       .tabItem {
@@ -104,7 +138,8 @@ public struct CoachRootView: View {
 
       StudentRosterView(
         viewModel: rosterViewModel,
-        context: detailContext
+        context: detailContext,
+        chat: chat
       )
       .tag(CoachTab.students)
       .tabItem {
@@ -113,7 +148,7 @@ public struct CoachRootView: View {
       // 待关注学员 (新学员 pending 计数已拆到「接收」tab, spec 033 D1).
       .badge(rosterViewModel.pendingAttentionCount)
 
-      CoachPlanningHomeView(context: detailContext)
+      CoachPlanningHomeView(context: detailContext, chat: chat)
         .tag(CoachTab.planning)
         .tabItem {
           Label("编排", systemImage: "calendar.badge.plus")
@@ -125,26 +160,44 @@ public struct CoachRootView: View {
         queueViewModel: queueViewModel,
         videoQueueViewModel: videoQueueViewModel,
         profiles: detailContext.profiles,
-        onAccepted: { await rosterViewModel.refresh() }
+        onAccepted: { await rosterViewModel.refresh() },
+        chat: chat
       )
       .tag(CoachTab.receiving)
       .tabItem {
         Label("接收", systemImage: "tray")
       }
-      // 收件箱红点 = 新学员 + 待反馈视频(spec 042).
-      .badge(queueViewModel.pendingCount + videoQueueViewModel.pendingCount)
+      // 收件箱红点 = 新学员 + 待反馈视频 + 聊天未读(spec 058).
+      .badge(
+        CoachReceivingBadge.total(
+          newStudents: queueViewModel.pendingCount,
+          videos: videoQueueViewModel.pendingCount,
+          chatUnread: chat?.inbox.totalUnread ?? 0
+        )
+      )
 
-      CoachMyProfileView(viewModel: profileViewModel, inviteCodes: inviteCodes)
-        .tag(CoachTab.profile)
-        .tabItem {
-          Label("我的", systemImage: "person")
-        }
+      CoachMyProfileView(
+        viewModel: profileViewModel,
+        inviteCodes: inviteCodes,
+        chat: chat
+      )
+      .tag(CoachTab.profile)
+      .tabItem {
+        Label("我的", systemImage: "person")
+      }
     }
     .task {
       Analytics.shared.screen(.dashboard)
       await rosterViewModel.loadIfNeeded()
       await queueViewModel.loadIfNeeded()
       await videoQueueViewModel.loadIfNeeded()
+      if let chat {
+        await chat.inbox.refresh()
+        chat.inbox.startPolling()
+      }
+    }
+    .onDisappear {
+      chat?.inbox.stopPolling()
     }
     .onChange(of: selectedTab) { _, tab in
       switch tab {
@@ -156,6 +209,12 @@ public struct CoachRootView: View {
       }
     }
     .tint(Color.MeetPR.brandRed)
+  }
+}
+
+enum CoachReceivingBadge {
+  static func total(newStudents: Int, videos: Int, chatUnread: Int) -> Int {
+    newStudents + videos + chatUnread
   }
 }
 

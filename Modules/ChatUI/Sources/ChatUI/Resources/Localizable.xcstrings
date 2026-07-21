@@ -1,125 +1,193 @@
 {
-  "sourceLanguage" : "zh-Hans",
-  "strings" : {
-    "chat.choosePhoto" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose photo" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择图片" } }
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "chat.choosePhoto": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择图片"
+          }
+        }
       }
     },
-    "chat.close" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Close" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "关闭" } }
+    "chat.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
       }
     },
-    "chat.composerPlaceholder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Message" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "输入消息" } }
+    "chat.composerPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入消息"
+          }
+        }
       }
     },
-    "chat.delivered" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delivered" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已送达" } }
+    "chat.delivered": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已送达"
+          }
+        }
       }
     },
-    "chat.image" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "[Image]" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "[图片]" } }
+    "chat.image": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[图片]"
+          }
+        }
       }
     },
-    "chat.imagePreparationFailed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Could not prepare this image" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "图片处理失败" } }
+    "chat.imagePreparationFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "图片处理失败"
+          }
+        }
       }
     },
-    "chat.imageUnavailable" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Image unavailable" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "图片暂不可用" } }
+    "chat.imageUnavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "图片暂不可用"
+          }
+        }
       }
     },
-    "chat.loadOlder" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Load earlier messages" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "加载更早消息" } }
+    "chat.loadOlder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载更早消息"
+          }
+        }
       }
     },
-    "chat.messages" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Messages" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "消息" } }
+    "chat.messages": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "消息"
+          }
+        }
       }
     },
-    "chat.noConversations" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "No conversations yet" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂无会话" } }
+    "chat.noConversations": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无会话"
+          }
+        }
       }
     },
-    "chat.preparingImage" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Preparing image" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "正在处理图片" } }
+    "chat.preparingImage": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在处理图片"
+          }
+        }
       }
     },
-    "chat.read" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Read" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "已读" } }
+    "chat.read": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已读"
+          }
+        }
       }
     },
-    "chat.retry" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Retry" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "重试" } }
+    "chat.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
+          }
+        }
       }
     },
-    "chat.send" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "发送" } }
+    "chat.send": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送"
+          }
+        }
       }
     },
-    "chat.sendFailed" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Send failed" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "发送失败" } }
+    "chat.sendFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送失败"
+          }
+        }
       }
     },
-    "chat.sending" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sending" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "发送中" } }
+    "chat.sending": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送中"
+          }
+        }
       }
     },
-    "chat.unread" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "unread" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "条未读" } }
+    "chat.unread": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "条未读"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

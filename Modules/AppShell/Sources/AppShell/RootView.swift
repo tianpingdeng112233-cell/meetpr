@@ -1,4 +1,6 @@
 import Analytics
+import CatalogKit
+import ChatUI
 import CoachKit
 import CoreModels
 import Foundation
@@ -39,6 +41,8 @@ public struct RootView: View {
   private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
   private let analyticsMode: AnalyticsMode
+  @State private var chatSession: ChatSessionController
+  private let chatRepository: (any ChatRepository)?
 
   public init(
     coachPlans: any PlanRepository = InMemoryPlanRepository.preview(),
@@ -63,6 +67,8 @@ public struct RootView: View {
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
     coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
     coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
+    chatSession: ChatSessionController = ChatSessionController(),
+    chatRepository: (any ChatRepository)? = nil,
     draftStore: DraftStore = DraftStore.shared,
     analyticsMode: AnalyticsMode = .disabled
   ) {
@@ -96,6 +102,8 @@ public struct RootView: View {
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
     self.coachVideoQueue = coachVideoQueue
     self.coachFamilyMapProvider = coachFamilyMapProvider
+    _chatSession = State(initialValue: chatSession)
+    self.chatRepository = chatRepository
     self.draftStore = draftStore
     self.analyticsMode = analyticsMode
     Analytics.shared.prepare(mode: analyticsMode)
@@ -127,25 +135,7 @@ public struct RootView: View {
   private func authenticatedContent(for user: User) -> some View {
     switch Self.authenticatedDestination(for: user.role) {
     case .coach:
-      CoachRootView(
-        repository: coachPlans,
-        studentPlans: studentPlans,
-        studentLogs: studentLogs,
-        feedback: studentFeedback,
-        inviteCodes: coachInviteCodes,
-        studentVideos: coachStudentVideos,
-        readiness: studentReadiness,
-        familyMapProvider: coachFamilyMapProvider,
-        bindQueue: coachBindQueue,
-        evaluations: coachEvaluations,
-        evaluationSummaries: coachEvaluationSummaries,
-        studentProfiles: coachStudentProfiles,
-        videoQueue: coachVideoQueue,
-        onLogout: {
-          await session.logout()
-        },
-        draftStore: draftStore
-      )
+      coachRoot(for: user)
     case .studentBehindE1RMGate:
       studentEntry(for: user)
     }
@@ -174,6 +164,51 @@ public struct RootView: View {
         studentRoot(for: user)
       }
     }
+  }
+
+  @ViewBuilder
+  private func coachRoot(for user: User) -> some View {
+    if let chatRepository {
+      if let chat = chatSession.context, chat.currentUserID == user.id {
+        coachContent(chat: chat)
+      } else {
+        ProgressView()
+          .task(id: user.id) {
+            await chatSession.activateCoach(
+              repository: chatRepository,
+              currentUserID: user.id
+            )
+          }
+      }
+    } else {
+      coachContent(chat: nil)
+    }
+  }
+
+  private func coachContent(chat: ChatSessionContext?) -> some View {
+    CoachRootView(
+      repository: coachPlans,
+      studentPlans: studentPlans,
+      studentLogs: studentLogs,
+      feedback: studentFeedback,
+      inviteCodes: coachInviteCodes,
+      studentVideos: coachStudentVideos,
+      readiness: studentReadiness,
+      familyMapProvider: coachFamilyMapProvider,
+      bindQueue: coachBindQueue,
+      evaluations: coachEvaluations,
+      evaluationSummaries: coachEvaluationSummaries,
+      studentProfiles: coachStudentProfiles,
+      videoQueue: coachVideoQueue,
+      chat: chat?.repository,
+      currentUserID: chat?.currentUserID,
+      inbox: chat?.inbox,
+      sendCoordinator: chat?.sendCoordinator,
+      onLogout: {
+        await session.logout()
+      },
+      draftStore: draftStore
+    )
   }
 
   private func bindGatedStudentRoot(for user: User) -> some View {

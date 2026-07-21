@@ -67,7 +67,10 @@ private struct ConversationListRow: View {
             .lineLimit(1)
           Spacer(minLength: MeetPRSpacing.sm)
           if let date = conversation.lastMessageAt {
-            Text(date, style: .relative)
+            // Not `style: .relative` — that follows the device locale and renders
+            // "7 min, 39 secs" inside an otherwise Chinese UI. The app ships
+            // Chinese only, matching CoachKit's CoachStudentFormatting.
+            Text(ChatRelativeTime.text(date))
               .font(.caption)
               .foregroundStyle(Color.MeetPR.fgTertiary)
           }
