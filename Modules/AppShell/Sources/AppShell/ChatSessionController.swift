@@ -71,11 +71,12 @@ public final class ChatSessionController {
       return
     }
 
-    await cancelAllAndWaitForCleanup()
+    // Tear down without advancing the generation: only a real session turnover
+    // (logout) may invalidate other activations. Routing an activation through
+    // `cancelAllAndWaitForCleanup` made the entry generation unmatchable, so the
+    // guard below compared the post-logout value against itself and passed.
+    await resetForActivation()
     await invalidationRouter.useCoachNoOp()
-    // cancelAllAndWaitForCleanup bumps the generation itself, so compare
-    // against that instead of the value captured on entry.
-    let survivingGeneration = activationGeneration
     let onBindingInvalidated: @Sendable () async -> Void = { [invalidationRouter] in
       await invalidationRouter.route()
     }
@@ -89,7 +90,7 @@ public final class ChatSessionController {
       currentUserID: currentUserID,
       onBindingInvalidated: onBindingInvalidated
     )
-    guard survivingGeneration == activationGeneration else { return }
+    guard generation == activationGeneration else { return }
     context = ChatSessionContext(
       repository: repository,
       currentUserID: currentUserID,
@@ -113,12 +114,20 @@ public final class ChatSessionController {
       await invalidationRouter.useStudentHandler {
         await refreshBinding()
       }
+      // A rebind can be prepared while this fast path is parked in the await
+      // above. Clearing the gate unconditionally would hand it back to the coach
+      // the user just left, mid-cleanup.
+      guard generation == activationGeneration,
+        canActivateStudent(for: activeCoachID),
+        context?.currentUserID == currentUserID,
+        activeStudentCoachID == activeCoachID
+      else { return }
       isChangingStudentBinding = false
       pendingStudentCoachID = nil
       return
     }
 
-    await tearDownContext()
+    await resetForActivation()
     await invalidationRouter.useStudentHandler {
       await refreshBinding()
     }
@@ -179,6 +188,12 @@ public final class ChatSessionController {
     await tearDownContext()
     isChangingStudentBinding = false
     pendingStudentCoachID = nil
+  }
+
+  /// Teardown for an activation: drains the previous graph without advancing
+  /// the session generation, which only logout may do.
+  private func resetForActivation() async {
+    await tearDownContext()
   }
 
   private func tearDownContext() async {

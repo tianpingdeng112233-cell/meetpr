@@ -1,5 +1,7 @@
 import ChatUI
+import CoreModels
 import Foundation
+import RepositoryContracts
 import Testing
 
 @testable import AppShell
@@ -182,5 +184,162 @@ private actor SuspendedBindingRefreshProbe {
     for continuation in continuations {
       continuation.resume()
     }
+  }
+}
+
+/// A repository whose `fetchConversations` parks until released, so a test can
+/// hold an activation inside its awaits and interleave a logout with it.
+private actor GatedChatRepository: ChatRepository {
+  private var gate: CheckedContinuation<Void, Never>?
+  private var isWaiting = false
+
+  func waitingAtGate() -> Bool { isWaiting }
+
+  func openGate() {
+    gate?.resume()
+    gate = nil
+    isWaiting = false
+  }
+
+  func fetchConversations() async throws -> [ChatConversation] {
+    isWaiting = true
+    await withCheckedContinuation { continuation in
+      gate = continuation
+    }
+    return []
+  }
+
+  func openConversation(withOtherParty otherPartyID: UUID) async throws -> ChatConversation {
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func fetchMessages(
+    in conversationID: UUID,
+    query: ChatMessageQuery
+  ) async throws -> ChatMessagePage {
+    ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
+  }
+
+  func sendText(
+    in conversationID: UUID,
+    text: String,
+    clientID: String
+  ) async throws -> ChatMessage {
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func sendImage(
+    in conversationID: UUID,
+    imageData: Data,
+    clientID: String
+  ) async throws -> ChatMessage {
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func markRead(in conversationID: UUID, upTo messageID: UUID) async throws -> ChatReadState {
+    throw ChatRepositoryError.conversationNotFound
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func lateStudentActivationCannotPublishAfterLogout() async {
+  // Logout resets the per-binding flags, so those alone would let a parked
+  // activation conclude it is still wanted. Only a session generation survives
+  // that reset. The activation is parked inside its own teardown, which waits
+  // on the previous coordinator's in-flight send.
+  let userID = UUID()
+  let coachA = UUID()
+  let coachB = UUID()
+  let controller = ChatSessionController()
+  let blocking = BlockingSendRepository()
+
+  await controller.activateStudent(
+    repository: blocking,
+    currentUserID: userID,
+    activeCoachID: coachA,
+    refreshBinding: {}
+  )
+  let coordinator = controller.context?.sendCoordinator
+  #expect(coordinator != nil)
+  coordinator?.sendText(in: UUID(), text: "占住清理", clientID: "blocker")
+  #expect(await blocking.waitUntilSending())
+
+  // Deliberately not awaiting `prepareForStudentBindingChange` here: it drains
+  // too, so awaiting it inline would block on the very send this test parks.
+  let activation = Task { @MainActor in
+    await controller.activateStudent(
+      repository: blocking,
+      currentUserID: userID,
+      activeCoachID: coachB,
+      refreshBinding: {}
+    )
+  }
+  try? await Task.sleep(for: .milliseconds(50))
+
+  // Logout must run concurrently: it awaits the same drain the activation is
+  // parked on, so releasing the send is what lets both finish.
+  let logout = Task { @MainActor in await controller.cancelAllAndWaitForCleanup() }
+  try? await Task.sleep(for: .milliseconds(50))
+  await blocking.release()
+  await logout.value
+  await activation.value
+
+  #expect(controller.context == nil)
+  #expect(controller.activeStudentCoachID == nil)
+}
+
+/// Parks `sendText` so a coordinator has genuinely in-flight work, which makes
+/// teardown — and therefore any activation that awaits it — suspend.
+private actor BlockingSendRepository: ChatRepository {
+  private var continuation: CheckedContinuation<Void, Never>?
+  private var sending = false
+
+  func waitUntilSending() async -> Bool {
+    for _ in 0..<200 {
+      if sending { return true }
+      try? await Task.sleep(for: .milliseconds(5))
+    }
+    return false
+  }
+
+  func release() {
+    continuation?.resume()
+    continuation = nil
+  }
+
+  func fetchConversations() async throws -> [ChatConversation] { [] }
+
+  func openConversation(withOtherParty otherPartyID: UUID) async throws -> ChatConversation {
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func fetchMessages(
+    in conversationID: UUID,
+    query: ChatMessageQuery
+  ) async throws -> ChatMessagePage {
+    ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
+  }
+
+  func sendText(
+    in conversationID: UUID,
+    text: String,
+    clientID: String
+  ) async throws -> ChatMessage {
+    sending = true
+    await withCheckedContinuation { self.continuation = $0 }
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func sendImage(
+    in conversationID: UUID,
+    imageData: Data,
+    clientID: String
+  ) async throws -> ChatMessage {
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func markRead(in conversationID: UUID, upTo messageID: UUID) async throws -> ChatReadState {
+    throw ChatRepositoryError.conversationNotFound
   }
 }
