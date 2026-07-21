@@ -83,6 +83,9 @@ public enum StudentDemoSeed {
         studentID: studentID,
         dayDate: plan.days[0].date,
         planExerciseID: linkedExerciseID,
+        videoID: uuid(411),
+        video: demoFeedbackVideo(
+          id: uuid(411), loggedAt: referenceDate.addingTimeInterval(4 * 86_400)),
         text: "深蹲第一组速度很好，下一次保持同样节奏，最后一组不要急着起杠。",
         postedAt: referenceDate.addingTimeInterval(4 * 86_400),
         readAt: nil

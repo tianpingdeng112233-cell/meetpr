@@ -4,17 +4,20 @@ public struct CreateFeedbackRequestDTO: Encodable, Equatable, Sendable {
   public let studentID: UUID
   public let dayDate: String?
   public let planExerciseID: UUID?
+  public let videoID: UUID?
   public let text: String
 
   public init(
     studentID: UUID,
     dayDate: Date? = nil,
     planExerciseID: UUID? = nil,
+    videoID: UUID? = nil,
     text: String
   ) {
     self.studentID = studentID
     self.dayDate = dayDate.map(WireFormatting.dateOnlyString(from:))
     self.planExerciseID = planExerciseID
+    self.videoID = videoID
     self.text = text
   }
 
@@ -22,11 +25,13 @@ public struct CreateFeedbackRequestDTO: Encodable, Equatable, Sendable {
     studentID: UUID,
     dayDate: String?,
     planExerciseID: UUID? = nil,
+    videoID: UUID? = nil,
     text: String
   ) {
     self.studentID = studentID
     self.dayDate = dayDate
     self.planExerciseID = planExerciseID
+    self.videoID = videoID
     self.text = text
   }
 
@@ -34,7 +39,35 @@ public struct CreateFeedbackRequestDTO: Encodable, Equatable, Sendable {
     case studentID = "studentId"
     case dayDate
     case planExerciseID = "planExerciseId"
+    case videoID = "videoId"
     case text
+  }
+}
+
+/// Wire shape of spec 025's nested `video` object. Every field but `id` arrives
+/// from a left join and can legitimately be null — see `CoachFeedbackVideo`.
+public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
+  public let id: UUID
+  public let exerciseName: String?
+  public let setIndex: Int?
+  public let weightKg: String?
+  public let reps: Int?
+  public let loggedAt: Date?
+
+  public init(
+    id: UUID,
+    exerciseName: String? = nil,
+    setIndex: Int? = nil,
+    weightKg: String? = nil,
+    reps: Int? = nil,
+    loggedAt: Date? = nil
+  ) {
+    self.id = id
+    self.exerciseName = exerciseName
+    self.setIndex = setIndex
+    self.weightKg = weightKg
+    self.reps = reps
+    self.loggedAt = loggedAt
   }
 }
 
@@ -52,6 +85,8 @@ public struct FeedbackDTO: Codable, Equatable, Sendable {
   public let studentID: UUID
   public let dayDate: Date?
   public let planExerciseID: UUID?
+  public let videoID: UUID?
+  public let video: FeedbackVideoDTO?
   public let text: String
   public let postedAt: Date
   public let readAt: Date?
@@ -62,6 +97,8 @@ public struct FeedbackDTO: Codable, Equatable, Sendable {
     studentID: UUID,
     dayDate: Date? = nil,
     planExerciseID: UUID? = nil,
+    videoID: UUID? = nil,
+    video: FeedbackVideoDTO? = nil,
     text: String,
     postedAt: Date,
     readAt: Date? = nil
@@ -71,6 +108,8 @@ public struct FeedbackDTO: Codable, Equatable, Sendable {
     self.studentID = studentID
     self.dayDate = dayDate
     self.planExerciseID = planExerciseID
+    self.videoID = videoID
+    self.video = video
     self.text = text
     self.postedAt = postedAt
     self.readAt = readAt
@@ -82,6 +121,8 @@ public struct FeedbackDTO: Codable, Equatable, Sendable {
     case studentID = "studentId"
     case dayDate
     case planExerciseID = "planExerciseId"
+    case videoID = "videoId"
+    case video
     case text
     case postedAt
     case readAt

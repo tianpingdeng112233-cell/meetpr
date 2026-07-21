@@ -269,7 +269,7 @@ public struct TrainingHistoryView: View {
               Rectangle().fill(Color.MeetPR.border).frame(height: 1)
             }
             NavigationLink {
-              FeedbackDetailView(item: item)
+              FeedbackDetailView(item: item, viewModel: feedbackViewModel)
                 .task { await feedbackViewModel?.markRead(item) }
             } label: {
               feedbackRow(item)

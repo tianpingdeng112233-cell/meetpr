@@ -128,9 +128,24 @@ extension FeedbackDTO {
       studentID: studentID,
       dayDate: dayDate,
       planExerciseID: planExerciseID,
+      videoID: videoID,
+      video: video?.toDomain(),
       text: text,
       postedAt: postedAt,
       readAt: readAt
+    )
+  }
+}
+
+extension FeedbackVideoDTO {
+  public func toDomain() -> CoachFeedbackVideo {
+    CoachFeedbackVideo(
+      id: id,
+      exerciseName: exerciseName,
+      setIndex: setIndex,
+      weightKg: weightKg,
+      reps: reps,
+      loggedAt: loggedAt
     )
   }
 }

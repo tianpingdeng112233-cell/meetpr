@@ -27,6 +27,7 @@ import Testing
 
   #expect(saved.studentID == target.studentID)
   #expect(saved.planExerciseID == exercise)
+  #expect(saved.videoID == target.id)
   #expect(saved.text == "起杠别急")
   let after = try await repo.fetchPendingVideos()
   #expect(after.map(\.id) == [other.id])
@@ -137,6 +138,44 @@ import Testing
   _ = try await repo.sendFeedback(for: item, text: "深度不够")
 
   #expect(await feedback.postedTexts() == ["深度不够"])
+  #expect(await feedback.postedVideoIDs() == [item.id])
+}
+
+@Test func aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() async throws {
+  let student = CoachStudentFeatureFixtures.studentID
+  let exerciseID = UUID()
+  let first = VideoInboxFixtures.video(
+    planExerciseID: exerciseID,
+    createdAt: VideoInboxFixtures.base
+  )
+  let second = VideoInboxFixtures.video(
+    planExerciseID: exerciseID,
+    createdAt: VideoInboxFixtures.base.addingTimeInterval(60)
+  )
+  let feedback = StubFeedbackRepository()
+  let repo = AggregatingCoachVideoQueueRepository(
+    roster: StubCoachPlanRepository(students: [
+      CoachStudentFeatureFixtures.summary(id: student, name: "甲")
+    ]),
+    videos: PerStudentVideoRepo([student: [first, second]]),
+    feedback: feedback,
+    plans: StubStudentPlanRepository(plans: [:])
+  )
+
+  _ = try await repo.sendFeedback(
+    for: PendingVideoItem(
+      id: first.id,
+      studentID: student,
+      studentDisplayName: "甲",
+      planExerciseID: exerciseID,
+      uploadedAt: first.displayDate,
+      sizeBytes: first.sizeBytes
+    ),
+    text: "第一条已看"
+  )
+  let pending = try await repo.fetchPendingVideos()
+
+  #expect(pending.map(\.id) == [second.id])
 }
 
 @Test func aggregatorResolvesExerciseNameFromPlan() async throws {
@@ -171,4 +210,35 @@ import Testing
   // 王晨曦's day pairs a main lift with its variation (3 clips).
   let topStudent = Dictionary(grouping: videos, by: \.studentID).values.map(\.count).max()
   #expect(topStudent == 3)
+}
+
+/// The upgrade invariant. Feedback written before spec 060 carries no `videoID`,
+/// so it can only be matched by exercise. Every clip on that exercise must stay
+/// hidden — otherwise shipping this release republishes months of already-
+/// answered videos into every coach's queue.
+@Test func aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() async throws {
+  let student = CoachStudentFeatureFixtures.studentID
+  let exerciseID = UUID()
+  let first = VideoInboxFixtures.video(
+    planExerciseID: exerciseID,
+    createdAt: VideoInboxFixtures.base
+  )
+  let second = VideoInboxFixtures.video(
+    planExerciseID: exerciseID,
+    createdAt: VideoInboxFixtures.base.addingTimeInterval(60)
+  )
+  let repo = AggregatingCoachVideoQueueRepository(
+    roster: StubCoachPlanRepository(students: [
+      CoachStudentFeatureFixtures.summary(id: student, name: "甲")
+    ]),
+    videos: PerStudentVideoRepo([student: [first, second]]),
+    feedback: StubFeedbackRepository(feedback: [
+      CoachFeedback(
+        id: UUID(), coachID: UUID(), studentID: student,
+        planExerciseID: exerciseID, text: "升级前回复的", postedAt: VideoInboxFixtures.base)
+    ]),
+    plans: StubStudentPlanRepository(plans: [:])
+  )
+
+  #expect(try await repo.fetchPendingVideos().isEmpty)
 }

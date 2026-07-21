@@ -6,13 +6,8 @@ import RepositoryContracts
 /// endpoints — **no new backend endpoint**, mirroring spec 029's "compute on the
 /// client from per-student data" approach. For each bound student it pulls the
 /// video wall + feedback inbox and surfaces the videos that have no coach
-/// feedback scoped to their plan exercise yet.
-///
-/// "Answered" is matched coarsely by `planExerciseID` (the backend feedback
-/// shape has no `video_id`); two videos on the same exercise can't be told
-/// apart. Acceptable for V0.2 — precise per-video provenance is deferred (spec
-/// 042 §不做). The demo path uses `InMemoryCoachVideoQueueRepository`,
-/// which drops the exact video id and is unaffected.
+/// feedback scoped to that exact video yet. Feedback created before spec 060
+/// has no `videoID`, so those legacy entries still fall back to exercise scope.
 public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
   private let roster: any PlanRepository
   private let videos: any CoachStudentVideoRepository
@@ -37,8 +32,10 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
     for student in students {
       let studentVideos = try await videos.fetchVideos(studentID: student.id)
       guard !studentVideos.isEmpty else { continue }
-      let answeredExerciseIDs = Set(
-        try await feedback.fetchInbox(studentID: student.id).compactMap(\.planExerciseID)
+      let existingFeedback = try await feedback.fetchInbox(studentID: student.id)
+      let answeredVideoIDs = Set(existingFeedback.compactMap(\.videoID))
+      let legacyAnsweredExerciseIDs = Set(
+        existingFeedback.filter { $0.videoID == nil }.compactMap(\.planExerciseID)
       )
       // The video's exercise name comes from the coach's authored plan (the main
       // lift / variation the set was logged against), not a free-form string.
@@ -49,7 +46,8 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
         // after the coach replies. Live queue carries plan-linked clips only
         // (spec 042 §不做); the demo's InMemory repo drops by exact video id.
         guard let exerciseID = video.planExerciseID else { continue }
-        guard !answeredExerciseIDs.contains(exerciseID) else { continue }
+        guard !answeredVideoIDs.contains(video.id) else { continue }
+        guard !legacyAnsweredExerciseIDs.contains(exerciseID) else { continue }
         items.append(
           PendingVideoItem(
             id: video.id,
@@ -87,6 +85,7 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
       studentID: item.studentID,
       dayDate: item.dayDate,
       planExerciseID: item.planExerciseID,
+      videoID: item.id,
       text: text
     )
   }

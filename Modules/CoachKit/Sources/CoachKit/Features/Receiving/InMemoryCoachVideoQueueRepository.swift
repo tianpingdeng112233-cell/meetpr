@@ -44,6 +44,7 @@ public actor InMemoryCoachVideoQueueRepository: CoachVideoQueueRepository {
       studentID: item.studentID,
       dayDate: item.dayDate,
       planExerciseID: item.planExerciseID,
+      videoID: item.id,
       text: text,
       postedAt: Date(),
       readAt: nil

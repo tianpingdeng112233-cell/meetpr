@@ -9,6 +9,8 @@ public struct CoachFeedback: Codable, Hashable, Sendable, Identifiable {
   public let studentID: UUID
   public let dayDate: Date?
   public let planExerciseID: UUID?
+  public let videoID: UUID?
+  public let video: CoachFeedbackVideo?
   public let text: String
   public let postedAt: Date
   public let readAt: Date?
@@ -19,6 +21,8 @@ public struct CoachFeedback: Codable, Hashable, Sendable, Identifiable {
     studentID: UUID,
     dayDate: Date? = nil,
     planExerciseID: UUID? = nil,
+    videoID: UUID? = nil,
+    video: CoachFeedbackVideo? = nil,
     text: String,
     postedAt: Date,
     readAt: Date? = nil
@@ -28,6 +32,8 @@ public struct CoachFeedback: Codable, Hashable, Sendable, Identifiable {
     self.studentID = studentID
     self.dayDate = dayDate
     self.planExerciseID = planExerciseID
+    self.videoID = videoID
+    self.video = video
     self.text = text
     self.postedAt = postedAt
     self.readAt = readAt
@@ -39,6 +45,8 @@ public struct CoachFeedback: Codable, Hashable, Sendable, Identifiable {
     case studentID = "studentId"
     case dayDate
     case planExerciseID = "planExerciseId"
+    case videoID = "videoId"
+    case video
     case text
     case postedAt
     case readAt
