@@ -50,12 +50,20 @@ private struct ChatMessageBubble: View {
     Group {
       switch message.kind {
       case .text:
+        // Text hugs its content; the row's Spacer keeps the gutter, so a short
+        // reply stays a small bubble. Neither `containerRelativeFrame` nor
+        // `frame(maxWidth:)` belongs here — both fix the width and stretch a
+        // two-character reply into a full-width bar, since the background is
+        // applied after the frame.
         Text(message.text ?? "")
           .font(.body)
           .foregroundStyle(isCurrentUser ? .white : Color.MeetPR.fgPrimary)
+          .multilineTextAlignment(isCurrentUser ? .trailing : .leading)
+          .fixedSize(horizontal: false, vertical: true)
           .padding(.horizontal, MeetPRSpacing.md)
           .padding(.vertical, MeetPRSpacing.sm)
       case .image:
+        // Images keep the fixed three-quarter width so the 4:3 frame is stable.
         Button(action: openImage) {
           ChatRemoteImage(
             url: message.imageURL,
@@ -66,17 +74,18 @@ private struct ChatMessageBubble: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(ChatStrings.image)
+        .containerRelativeFrame(
+          .horizontal,
+          count: 4,
+          span: 3,
+          spacing: MeetPRSpacing.sm
+        )
       }
     }
-    .containerRelativeFrame(
-      .horizontal,
-      count: 4,
-      span: 3,
-      spacing: MeetPRSpacing.sm
-    )
     .background(isCurrentUser ? Color.MeetPR.brandRed : Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
   }
+
 }
 
 private struct ChatRemoteImage: View {
@@ -149,14 +158,13 @@ struct PendingChatMessageRow: View {
           }
         }
         .foregroundStyle(.white)
+        .multilineTextAlignment(.trailing)
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, MeetPRSpacing.md)
         .padding(.vertical, MeetPRSpacing.sm)
-        .containerRelativeFrame(
-          .horizontal,
-          count: 4,
-          span: 3,
-          spacing: MeetPRSpacing.sm
-        )
+        // Hugs its content, same as a confirmed bubble — otherwise a short
+        // message in flight is a full-width bar that then snaps narrow on
+        // confirmation.
         .background(Color.MeetPR.brandRed.opacity(0.72))
         .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
 

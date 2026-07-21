@@ -219,11 +219,12 @@
 			};
 			buildConfigurationList = AA0000000000000000000003 /* Build configuration list for PBXProject "MeetPR" */;
 			compatibilityVersion = "Xcode 16.0";
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = AA0000000000000000000001;
 			minimizedProjectReferenceProxies = 1;

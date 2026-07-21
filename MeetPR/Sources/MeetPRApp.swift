@@ -94,7 +94,7 @@ struct MeetPRApp: App {
         controller: controller,
         repository: InMemoryChatRepository(
           currentUserID: user.id,
-          seed: ChatDemoSeed.coach()
+          seed: DemoChatSeed.make(for: user)
         )
       )
     }
