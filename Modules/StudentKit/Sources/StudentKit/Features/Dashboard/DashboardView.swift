@@ -20,8 +20,11 @@ public struct DashboardView: View {
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
+  private let notifications: StudentNotificationsCoordinator?
+  private let evaluationNavigationPulse: Int
   private let onStartWorkout: () -> Void
   private let onSeeAllFeedback: () -> Void
+  private let onOpenEvaluation: () -> Void
   private let onPlanChanged: () -> Void
   /// Bumped by the parent tab container each time 今日 becomes the active tab, so
   /// the home screen re-reads week/e1RM data logged in the 训练 tab (the view
@@ -29,11 +32,11 @@ public struct DashboardView: View {
   /// showing 继续 on return).
   private let todayReloadToken: Int
   @State private var weekViewModel: WeekOverviewViewModel
-  @State private var notificationsViewModel: DashboardNotificationsViewModel
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
   @State private var showsNotifications = false
   @State private var showsEvaluationSummary = false
+  @State private var conversationID: UUID?
   @State private var dayShiftAlert: DashboardDayShiftAlert?
   @State private var isUpdatingDayShift = false
   /// Day whose growth curve is shown. `nil` ⇒ today (the default selection).
@@ -48,8 +51,11 @@ public struct DashboardView: View {
     e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel,
     evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
+    notifications: StudentNotificationsCoordinator? = nil,
+    evaluationNavigationPulse: Int = 0,
     onStartWorkout: @escaping () -> Void,
     onSeeAllFeedback: @escaping () -> Void,
+    onOpenEvaluation: @escaping () -> Void = {},
     todayReloadToken: Int = 0,
     onPlanChanged: @escaping () -> Void = {}
   ) {
@@ -60,14 +66,14 @@ public struct DashboardView: View {
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.evaluationSummaryViewModel = evaluationSummaryViewModel
+    self.notifications = notifications
+    self.evaluationNavigationPulse = evaluationNavigationPulse
     self.onStartWorkout = onStartWorkout
     self.onSeeAllFeedback = onSeeAllFeedback
+    self.onOpenEvaluation = onOpenEvaluation
     self.todayReloadToken = todayReloadToken
     self.onPlanChanged = onPlanChanged
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
-    self._notificationsViewModel = State(
-      initialValue: DashboardNotificationsViewModel(plans: plans)
-    )
     self._e1rmTrendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(
         plans: plans,
@@ -127,17 +133,7 @@ public struct DashboardView: View {
           }
         }
       }
-      .sheet(isPresented: $showsNotifications) {
-        NotificationCenterSheet(
-          planNotice: notificationsViewModel.planNotice,
-          feedbackUnreadCount: feedbackViewModel.unreadCount,
-          evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0,
-          onOpenPlan: openPlanNotification,
-          onOpenFeedback: onSeeAllFeedback,
-          onOpenEvaluation: { showsEvaluationSummary = true }
-        )
-        .presentationDetents([.medium])
-      }
+      .modifier(notificationHost)
       .refreshable {
         await reload()
       }
@@ -150,6 +146,10 @@ public struct DashboardView: View {
     }
     .onChange(of: todayReloadToken) { _, _ in
       Task { await reload() }
+    }
+    .task(id: evaluationNavigationPulse) {
+      guard evaluationNavigationPulse > 0 else { return }
+      showsEvaluationSummary = true
     }
     .alert(item: $dayShiftAlert) { alert in
       switch alert {
@@ -189,28 +189,12 @@ public struct DashboardView: View {
         .font(.system(size: 36, weight: .heavy))
         .foregroundStyle(Color.MeetPR.fgPrimary)
       Spacer()
-      notificationButton
-    }
-  }
-
-  private var notificationButton: some View {
-    Button(
-      action: { showsNotifications = true },
-      label: {
-        ZStack(alignment: .topTrailing) {
-          Image(systemName: hasUnreadNotifications ? "bell.badge" : "bell")
-            .font(.system(size: 18))
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-          if hasUnreadNotifications {
-            Circle()
-              .fill(Color.MeetPR.brandRed)
-              .frame(width: 8, height: 8)
-              .offset(x: 3, y: -3)
-          }
+      if let notifications {
+        StudentNotificationBell(coordinator: notifications) {
+          showsNotifications = true
         }
       }
-    )
-    .accessibilityLabel(hasUnreadNotifications ? "通知,有未读" : "通知")
+    }
   }
 
   // MARK: - Week progress bar
@@ -643,13 +627,6 @@ public struct DashboardView: View {
     return nil
   }
 
-  private var hasUnreadNotifications: Bool {
-    notificationsViewModel.hasUnread(
-      feedbackUnreadCount: feedbackViewModel.unreadCount,
-      evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0
-    )
-  }
-
   // MARK: - Loading
 
   private func loadIfNeeded() async {
@@ -658,13 +635,12 @@ public struct DashboardView: View {
     // would strand a later dependency without another retry.
     if weekViewModel.state == .idle {
       await weekViewModel.load(studentID: studentID)
-      await evaluationSummaryViewModel?.load(studentID: studentID)
+      if notifications == nil {
+        await evaluationSummaryViewModel?.load(studentID: studentID)
+      }
     }
-    if feedbackViewModel.state == .idle {
+    if notifications == nil, feedbackViewModel.state == .idle {
       await feedbackViewModel.load(studentID: studentID)
-    }
-    if notificationsViewModel.state == .idle {
-      await notificationsViewModel.load(studentID: studentID)
     }
     if e1rmTrendViewModel.state == .idle {
       await e1rmTrendViewModel.load(studentID: studentID)
@@ -676,9 +652,12 @@ public struct DashboardView: View {
 
   private func reload() async {
     await weekViewModel.load(studentID: studentID)
-    await feedbackViewModel.load(studentID: studentID)
-    await evaluationSummaryViewModel?.load(studentID: studentID)
-    await notificationsViewModel.load(studentID: studentID)
+    if let notifications {
+      await notifications.reload(studentID: studentID)
+    } else {
+      await feedbackViewModel.load(studentID: studentID)
+      await evaluationSummaryViewModel?.load(studentID: studentID)
+    }
     await e1rmTrendViewModel.load(studentID: studentID)
     await profileMetricsViewModel.load(studentID: studentID)
   }
@@ -746,9 +725,15 @@ public struct DashboardView: View {
     return calendar
   }
 
-  private func openPlanNotification() {
-    notificationsViewModel.markCurrentPlanSeen()
-    onStartWorkout()
+  private var notificationHost: some ViewModifier {
+    OptionalStudentNotificationHostModifier(
+      coordinator: notifications,
+      showsNotifications: $showsNotifications,
+      conversationID: $conversationID,
+      onOpenPlan: onStartWorkout,
+      onOpenFeedback: onSeeAllFeedback,
+      onOpenEvaluation: onOpenEvaluation
+    )
   }
 }
 

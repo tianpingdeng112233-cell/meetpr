@@ -17,6 +17,11 @@ let package = Package(
         .product(name: "CoreModels", package: "CoreModels")
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
-    )
+    ),
+    .testTarget(
+      name: "RepositoryContractsTests",
+      dependencies: ["RepositoryContracts"],
+      swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
+    ),
   ]
 )

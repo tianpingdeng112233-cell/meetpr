@@ -14,6 +14,7 @@
 		AA0000000000000000000034 /* CoachKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000024 /* CoachKit */; };
 		AA0000000000000000000035 /* StudentKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000025 /* StudentKit */; };
 		AA0000000000000000000036 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000070 /* AppIntents.framework */; };
+		AA0000000000000000000037 /* ChatUI in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000026 /* ChatUI */; };
 		AA0000000000000000000040 /* CoreModels in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000020 /* CoreModels */; };
 		AA0000000000000000000041 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000021 /* Networking */; };
 		AA0000000000000000000042 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000022 /* DesignSystem */; };
@@ -21,6 +22,7 @@
 		AA0000000000000000000044 /* CoachKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000024 /* CoachKit */; };
 		AA0000000000000000000045 /* StudentKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000025 /* StudentKit */; };
 		AA0000000000000000000046 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000070 /* AppIntents.framework */; };
+		AA0000000000000000000047 /* ChatUI in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000026 /* ChatUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +87,7 @@
 				AA0000000000000000000034 /* CoachKit in Frameworks */,
 				AA0000000000000000000035 /* StudentKit in Frameworks */,
 				AA0000000000000000000036 /* AppIntents.framework in Frameworks */,
+				AA0000000000000000000037 /* ChatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +102,7 @@
 				AA0000000000000000000044 /* CoachKit in Frameworks */,
 				AA0000000000000000000045 /* StudentKit in Frameworks */,
 				AA0000000000000000000046 /* AppIntents.framework in Frameworks */,
+				AA0000000000000000000047 /* ChatUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +162,7 @@
 				AA0000000000000000000023 /* AppShell */,
 				AA0000000000000000000024 /* CoachKit */,
 				AA0000000000000000000025 /* StudentKit */,
+				AA0000000000000000000026 /* ChatUI */,
 			);
 			productName = MeetPR;
 			productReference = AA000000000000000000000A /* MeetPR.app */;
@@ -187,6 +192,7 @@
 				AA0000000000000000000023 /* AppShell */,
 				AA0000000000000000000024 /* CoachKit */,
 				AA0000000000000000000025 /* StudentKit */,
+				AA0000000000000000000026 /* ChatUI */,
 			);
 			productName = MeetPRTests;
 			productReference = AA0000000000000000000069 /* MeetPRTests.xctest */;
@@ -213,11 +219,12 @@
 			};
 			buildConfigurationList = AA0000000000000000000003 /* Build configuration list for PBXProject "MeetPR" */;
 			compatibilityVersion = "Xcode 16.0";
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = AA0000000000000000000001;
 			minimizedProjectReferenceProxies = 1;
@@ -228,6 +235,7 @@
 				AA0000000000000000000013 /* XCLocalSwiftPackageReference "AppShell" */,
 				AA0000000000000000000014 /* XCLocalSwiftPackageReference "CoachKit" */,
 				AA0000000000000000000015 /* XCLocalSwiftPackageReference "StudentKit" */,
+				AA0000000000000000000016 /* XCLocalSwiftPackageReference "ChatUI" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AA000000000000000000000C /* Products */;
@@ -816,6 +824,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Modules/StudentKit;
 		};
+		AA0000000000000000000016 /* XCLocalSwiftPackageReference "ChatUI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Modules/ChatUI;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -848,6 +860,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AA0000000000000000000015 /* XCLocalSwiftPackageReference "StudentKit" */;
 			productName = StudentKit;
+		};
+		AA0000000000000000000026 /* ChatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA0000000000000000000016 /* XCLocalSwiftPackageReference "ChatUI" */;
+			productName = ChatUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

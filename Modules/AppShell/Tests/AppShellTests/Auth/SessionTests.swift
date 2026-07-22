@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import CoreModels
 import Foundation
 import Networking
@@ -196,6 +197,22 @@ func bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func logoutRunsCleanupBeforeClearingAccessToken() async throws {
+  let store = InMemoryTokenStore()
+  let spy = LogoutTokenOrderSpy()
+  let session = Session(auth: InMemoryAuthRepository(), tokenStore: store) {
+    await spy.record(accessTokenWasAvailable: await store.accessToken() != nil)
+  }
+
+  try await session.signup(phone: "13800000001", password: "password123", role: .coach)
+  await session.logout()
+
+  #expect(await spy.accessTokenWasAvailableDuringCleanup == true)
+  #expect(await store.accessToken() == nil)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func accessTokenRefreshesExpiredJWTBeforeReturningIt() async throws {
   let repository = InMemoryAuthRepository()
   let signup = try await repository.signup(
@@ -365,6 +382,14 @@ private struct UnknownFailureAuthRepository: AuthRepository {
 
   func refresh(refreshToken: String) async throws -> TokenPair {
     throw UnknownRefreshError()
+  }
+}
+
+private actor LogoutTokenOrderSpy {
+  private(set) var accessTokenWasAvailableDuringCleanup = false
+
+  func record(accessTokenWasAvailable: Bool) {
+    self.accessTokenWasAvailableDuringCleanup = accessTokenWasAvailable
   }
 }
 

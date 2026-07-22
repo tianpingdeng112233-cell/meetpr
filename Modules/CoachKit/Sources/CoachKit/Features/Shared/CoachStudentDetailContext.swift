@@ -19,4 +19,33 @@ struct CoachStudentDetailContext {
   /// Planning entry (适应周 / 软推荐立即排) dependencies.
   let planning: any PlanRepository
   let draftStore: DraftStore
+  let chat: CoachChatContext?
+
+  init(
+    plans: any StudentPlanRepository,
+    trainingLogs: any StudentTrainingLogRepository,
+    feedback: any StudentFeedbackRepository,
+    evaluations: any EvaluationRepository,
+    summaries: any EvaluationSummaryRepository,
+    profiles: any OnboardingProfileReading,
+    videos: any CoachStudentVideoRepository,
+    readiness: any ReadinessRepository,
+    familyMapProvider: (any CoachPlanFamilyMapProviding)?,
+    planning: any PlanRepository,
+    draftStore: DraftStore,
+    chat: CoachChatContext? = nil
+  ) {
+    self.plans = plans
+    self.trainingLogs = trainingLogs
+    self.feedback = feedback
+    self.evaluations = evaluations
+    self.summaries = summaries
+    self.profiles = profiles
+    self.videos = videos
+    self.readiness = readiness
+    self.familyMapProvider = familyMapProvider
+    self.planning = planning
+    self.draftStore = draftStore
+    self.chat = chat
+  }
 }

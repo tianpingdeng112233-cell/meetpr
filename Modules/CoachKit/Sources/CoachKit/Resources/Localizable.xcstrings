@@ -1,0 +1,50 @@
+{
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "coach.chat.messages": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "消息"
+          }
+        }
+      }
+    },
+    "coach.chat.ok": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好"
+          }
+        }
+      }
+    },
+    "coach.chat.sendMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发消息"
+          }
+        }
+      }
+    },
+    "coach.chat.unableToOpenConversation": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法打开会话，请重试"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

@@ -1,0 +1,72 @@
+{
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "student.coachMessages": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练消息"
+          }
+        }
+      }
+    },
+    "student.myCoach": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的教练"
+          }
+        }
+      }
+    },
+    "student.notifications": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通知"
+          }
+        }
+      }
+    },
+    "student.notificationsUnread": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有未读通知"
+          }
+        }
+      }
+    },
+    "student.startCoachConversation": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有消息，点按开始对话"
+          }
+        }
+      }
+    },
+    "student.unreadSuffix": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "条未读"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

@@ -17,6 +17,10 @@ public struct TodayWorkoutView: View {
   private let jumpToTodayToken: Int
   private let planRevision: Int
   private var workoutStartedAt: Binding<Date?>
+  private let notifications: StudentNotificationsCoordinator?
+  private let onOpenPlanNotification: () -> Void
+  private let onOpenFeedbackNotification: () -> Void
+  private let onOpenEvaluationNotification: () -> Void
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -25,6 +29,8 @@ public struct TodayWorkoutView: View {
   @State private var editing: EditingTarget?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
+  @State private var showingNotifications = false
+  @State private var conversationID: UUID?
   /// Whether the slide-to-complete → 训练回顾 → 完成 flow has been finished for
   /// the loaded day; loaded from `SessionReviewStore` so the slide control does
   /// not re-arm after the review sheet closes (or the app restarts).
@@ -44,7 +50,11 @@ public struct TodayWorkoutView: View {
     videoUploads: VideoUploadServices? = nil,
     jumpToTodayToken: Int = 0,
     planRevision: Int = 0,
-    workoutStartedAt: Binding<Date?> = .constant(nil)
+    workoutStartedAt: Binding<Date?> = .constant(nil),
+    notifications: StudentNotificationsCoordinator? = nil,
+    onOpenPlanNotification: @escaping () -> Void = {},
+    onOpenFeedbackNotification: @escaping () -> Void = {},
+    onOpenEvaluationNotification: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -52,6 +62,10 @@ public struct TodayWorkoutView: View {
     self.jumpToTodayToken = jumpToTodayToken
     self.planRevision = planRevision
     self.workoutStartedAt = workoutStartedAt
+    self.notifications = notifications
+    self.onOpenPlanNotification = onOpenPlanNotification
+    self.onOpenFeedbackNotification = onOpenFeedbackNotification
+    self.onOpenEvaluationNotification = onOpenEvaluationNotification
     // nil = open on "today", which is the gym-day (04:00 cutoff) — a cold
     // start at 00:30 lands on the still-editable previous calendar day.
     self._selectedDate = State(initialValue: date ?? WorkoutDatePolicy.gymDayToday())
@@ -125,7 +139,23 @@ public struct TodayWorkoutView: View {
           Image(systemName: "arrow.clockwise")
         }
         .accessibilityLabel("刷新")
+
+        if let notifications {
+          StudentNotificationBell(coordinator: notifications) {
+            showingNotifications = true
+          }
+        }
       }
+      .modifier(
+        OptionalStudentNotificationHostModifier(
+          coordinator: notifications,
+          showsNotifications: $showingNotifications,
+          conversationID: $conversationID,
+          onOpenPlan: onOpenPlanNotification,
+          onOpenFeedback: onOpenFeedbackNotification,
+          onOpenEvaluation: onOpenEvaluationNotification
+        )
+      )
     }
     .overlay(alignment: .top) {
       if let event = viewModel.pendingPRBanner {

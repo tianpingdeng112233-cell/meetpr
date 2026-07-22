@@ -33,6 +33,8 @@ struct CoachDashboardView: View {
   /// sheds its 评估中 status without waiting for the next refresh — mirrors the
   /// 学员 tab's triage rows.
   var onEvaluationCompleted: @MainActor (UUID) -> Void = { _ in }
+  var chat: CoachChatContext?
+  @State private var isConversationListPresented = false
 
   var body: some View {
     NavigationStack {
@@ -51,6 +53,11 @@ struct CoachDashboardView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
+      .navigationDestination(isPresented: $isConversationListPresented) {
+        if let chat {
+          ConversationListView(chat: chat)
+        }
+      }
     }
   }
 
@@ -68,6 +75,9 @@ struct CoachDashboardView: View {
           .foregroundStyle(Color.MeetPR.fgPrimary)
       }
       Spacer()
+      CoachChatHeaderButton(chat: chat) {
+        isConversationListPresented = true
+      }
     }
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.top, MeetPRSpacing.xs)
@@ -413,7 +423,8 @@ struct CoachDashboardView: View {
       attentionCount: 2,
       pendingCount: 2,
       context: CoachDashboardPreview.context,
-      rows: CoachDashboardPreview.rows
+      rows: CoachDashboardPreview.rows,
+      chat: nil
     )
     .preferredColorScheme(.dark)
   }

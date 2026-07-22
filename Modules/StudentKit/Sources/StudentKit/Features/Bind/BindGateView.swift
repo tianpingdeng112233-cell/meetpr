@@ -21,6 +21,8 @@ public struct BindGateView<
   /// reconverges the gate (→ 5 tabs).
   public typealias EvaluationFlowBuilder =
     (EvaluationPeriod, @escaping @MainActor () async -> Void) -> EvaluationContent
+  public typealias MainContentBuilder =
+    (ActiveCoachContext, @escaping @MainActor @Sendable () async -> Void) -> MainContent
 
   @State private var viewModel: BindGateViewModel
   @Environment(\.scenePhase) private var scenePhase
@@ -35,7 +37,7 @@ public struct BindGateView<
   private let onLogout: (@MainActor () async -> Void)?
   private let onboardingFlow: OnboardingFlowBuilder
   private let evaluationFlow: EvaluationFlowBuilder
-  private let content: () -> MainContent
+  private let content: MainContentBuilder
 
   public init(
     studentId: UUID,
@@ -45,9 +47,13 @@ public struct BindGateView<
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
     onboardingProfile: @escaping @Sendable () async -> OnboardingProfile? = { nil },
     onLogout: (@MainActor () async -> Void)? = nil,
+    willApplyBindingChange:
+      @escaping @MainActor @Sendable (
+        _ oldCoachID: UUID?, _ newCoachID: UUID?
+      ) async -> Void = { _, _ in },
     @ViewBuilder onboardingFlow: @escaping OnboardingFlowBuilder,
     @ViewBuilder evaluationFlow: @escaping EvaluationFlowBuilder,
-    @ViewBuilder content: @escaping () -> MainContent
+    @ViewBuilder content: @escaping MainContentBuilder
   ) {
     self.studentId = studentId
     self.bind = bind
@@ -64,7 +70,8 @@ public struct BindGateView<
         bind: bind,
         stash: stash,
         isOnboardingComplete: isOnboardingComplete,
-        evaluations: evaluations
+        evaluations: evaluations,
+        willApplyBindingChange: willApplyBindingChange
       )
     )
   }
@@ -77,10 +84,14 @@ public struct BindGateView<
         }
       }
       .onChange(of: scenePhase) { _, newPhase in
-        // Foreground return refreshes the waiting state (spec 031 D9).
+        // Foreground return refreshes both pending and bound states. The
+        // latter is how server-side unbinds and coach changes are discovered.
         guard newPhase == .active else { return }
-        if case .pendingAcceptance = viewModel.state {
+        switch viewModel.state {
+        case .pendingAcceptance, .bound:
           Task { await viewModel.refresh() }
+        case .loading, .needsCode, .needsOnboarding, .evaluationActive, .failed:
+          break
         }
       }
       .onChange(of: viewModel.acceptanceRevision) { oldRevision, newRevision in
@@ -132,8 +143,11 @@ public struct BindGateView<
         // Coach completed the evaluation → reconverge to .bound (5 tabs).
         await viewModel.load()
       }
-    case .bound:
-      content()
+    case .bound(let request):
+      content(
+        ActiveCoachContext(bindRequest: request),
+        { await viewModel.refresh() }
+      )
     case .failed:
       withLogoutCorner(failedView)
     }
@@ -175,6 +189,15 @@ public struct BindGateView<
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .padding(MeetPRSpacing.base)
     .background(Color.MeetPR.bg)
+  }
+}
+
+extension ActiveCoachContext {
+  init(bindRequest request: BindRequest) {
+    self.init(
+      coachID: request.coachId,
+      coachDisplayName: request.coachDisplayName ?? "教练"
+    )
   }
 }
 

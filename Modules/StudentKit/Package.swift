@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "StudentKit",
+  defaultLocalization: "zh-Hans",
   platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
     .library(name: "StudentKit", targets: ["StudentKit"])
@@ -13,6 +14,7 @@ let package = Package(
     .package(path: "../Networking"),
     .package(path: "../DesignSystem"),
     .package(path: "../Analytics"),
+    .package(path: "../ChatUI"),
   ],
   targets: [
     .target(
@@ -23,7 +25,9 @@ let package = Package(
         .product(name: "Networking", package: "Networking"),
         .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "Analytics", package: "Analytics"),
+        .product(name: "ChatUI", package: "ChatUI"),
       ],
+      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(
@@ -32,6 +36,7 @@ let package = Package(
         "StudentKit",
         .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+        .product(name: "ChatUI", package: "ChatUI"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),

@@ -33,3 +33,43 @@ import Testing
   #expect(await store.accessToken() == nil)
   #expect(await store.refreshToken() == nil)
 }
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func automaticRefreshFailureRunsLogoutCleanupBeforeTokenClear() async throws {
+  let repository = InMemoryAuthRepository()
+  let signup = try await repository.signup(
+    phone: "13800000001", password: "password123", role: .coach)
+  let store = InMemoryTokenStore(
+    access: signup.accessToken,
+    refresh: signup.refreshToken,
+    user: signup.user
+  )
+  let spy = AutomaticLogoutCleanupSpy()
+  let session = Session(auth: repository, tokenStore: store) {
+    await spy.record(tokenWasAvailable: await store.accessToken() != nil)
+  }
+  await session.bootstrap()
+  let rejectedAccessToken = try #require(await store.accessToken())
+  let forcedError = AuthRepositoryError.backend(
+    statusCode: 400, code: .validationError, issues: [])
+  await repository.setForcedError(forcedError)
+
+  await #expect(throws: SessionStateReaderError.authenticationExpired) {
+    _ = try await session.recoverAccessToken(rejectedAccessToken: rejectedAccessToken)
+  }
+
+  #expect(await spy.callCount == 1)
+  #expect(await spy.tokenWasAvailable == true)
+  #expect(await store.accessToken() == nil)
+}
+
+private actor AutomaticLogoutCleanupSpy {
+  private(set) var callCount = 0
+  private(set) var tokenWasAvailable = false
+
+  func record(tokenWasAvailable: Bool) {
+    callCount += 1
+    self.tokenWasAvailable = tokenWasAvailable
+  }
+}

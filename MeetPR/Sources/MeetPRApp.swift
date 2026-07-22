@@ -1,5 +1,7 @@
 import AppShell
+import ChatUI
 import CoachKit
+import CoreModels
 import Networking
 import StudentKit
 import SwiftData
@@ -32,6 +34,12 @@ struct MeetPRApp: App {
       let evaluations: InMemoryCoachEvaluationRepository
       let summaries: InMemoryCoachEvaluationSummaryRepository
       let profiles: InMemoryCoachStudentProfileReader
+    }
+
+    private struct DemoChatDependencies {
+      let session: Session
+      let controller: ChatSessionController
+      let repository: InMemoryChatRepository
     }
 
     /// Demo evaluation funnel (spec 033): one pending receive-queue card +
@@ -68,6 +76,29 @@ struct MeetPRApp: App {
       )
     }
 
+    private static func makeDemoChatDependencies(
+      user: User,
+      draftStore: DraftStore
+    ) -> DemoChatDependencies {
+      let controller = ChatSessionController()
+      let session = Session(
+        auth: DemoAuthRepository(user: user),
+        tokenStore: DemoTokenStore(user: user),
+        onLogout: {
+          await controller.cancelAllAndWaitForCleanup()
+          try? await draftStore.deleteAll()
+        }
+      )
+      return DemoChatDependencies(
+        session: session,
+        controller: controller,
+        repository: InMemoryChatRepository(
+          currentUserID: user.id,
+          seed: DemoChatSeed.make(for: user)
+        )
+      )
+    }
+
     private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
       // Seed the student projection so the demo shows a real plan (today/week)
       // without a coach publish round-trip.
@@ -81,15 +112,7 @@ struct MeetPRApp: App {
       #else
         let demoUser = DemoUserSeed.coach
       #endif
-      let auth: any AuthRepository = DemoAuthRepository(user: demoUser)
-      let tokenStore: any TokenStoring = DemoTokenStore(user: demoUser)
-      let session = Session(
-        auth: auth,
-        tokenStore: tokenStore,
-        onLogout: {
-          try? await draftStore.deleteAll()
-        }
-      )
+      let chat = makeDemoChatDependencies(user: demoUser, draftStore: draftStore)
       let funnel = makeDemoEvaluationFunnel()
       return RootDependencies(
         rootView: RootView(
@@ -123,20 +146,33 @@ struct MeetPRApp: App {
           // 训练视频 inbox: boot straight into a populated queue (spec 042).
           coachVideoQueue: InMemoryCoachVideoQueueRepository(
             seed: CoachDemoSeed.pendingVideos()),
+          chatSession: chat.controller,
+          chatRepository: chat.repository,
           draftStore: draftStore,
           analyticsMode: .disabled
         ),
-        session: session
+        session: chat.session
       )
     }
   #else
-    private static func makeSession(api: APIClient, draftStore: DraftStore) -> Session {
+    private struct LiveChatDependencies {
+      let session: Session
+      let controller: ChatSessionController
+      let repository: NetworkChatRepository
+    }
+
+    private static func makeSession(
+      api: APIClient,
+      draftStore: DraftStore,
+      chatSession: ChatSessionController
+    ) -> Session {
       let auth: any AuthRepository = NetworkingAuthRepository(api: api)
       let tokenStore: any TokenStoring = KeychainTokenStore()
       let session = Session(
         auth: auth,
         tokenStore: tokenStore,
         onLogout: {
+          await chatSession.cancelAllAndWaitForCleanup()
           try? await draftStore.deleteAll()
         }
       )
@@ -150,61 +186,86 @@ struct MeetPRApp: App {
       return session
     }
 
+    private static func makeLiveChatDependencies(
+      api: APIClient,
+      draftStore: DraftStore
+    ) -> LiveChatDependencies {
+      let controller = ChatSessionController()
+      let session = makeSession(
+        api: api,
+        draftStore: draftStore,
+        chatSession: controller
+      )
+      return LiveChatDependencies(
+        session: session,
+        controller: controller,
+        repository: NetworkChatRepository(
+          apiClient: api,
+          session: session,
+          uploader: OSSPartUploader()
+        )
+      )
+    }
+
     private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
       let api = APIClient.shared
-      let session = makeSession(api: api, draftStore: draftStore)
+      let chat = makeLiveChatDependencies(api: api, draftStore: draftStore)
       return RootDependencies(
         rootView: RootView(
-          coachPlans: BackendPlanRepository(api: api, session: session, cache: PlanCache()),
-          coachInviteCodes: BackendInviteCodeRepository(api: api, session: session),
+          coachPlans: BackendPlanRepository(
+            api: api, session: chat.session, cache: PlanCache()),
+          coachInviteCodes: BackendInviteCodeRepository(api: api, session: chat.session),
           // Coach receive queue + evaluation funnel (spec 033).
-          coachBindQueue: BackendCoachBindQueueRepository(api: api, session: session),
-          coachEvaluations: BackendCoachEvaluationRepository(api: api, session: session),
+          coachBindQueue: BackendCoachBindQueueRepository(api: api, session: chat.session),
+          coachEvaluations: BackendCoachEvaluationRepository(api: api, session: chat.session),
           coachEvaluationSummaries: BackendCoachEvaluationSummaryRepository(
-            api: api, session: session),
-          coachStudentProfiles: BackendCoachStudentProfileReader(api: api, session: session),
+            api: api, session: chat.session),
+          coachStudentProfiles: BackendCoachStudentProfileReader(api: api, session: chat.session),
           studentPlans: BackendStudentPlanRepository(
             api: api,
-            session: session,
+            session: chat.session,
             cache: StudentPlanCache()
           ),
           studentLogs: BackendStudentTrainingLogRepository(
             api: api,
-            session: session,
+            session: chat.session,
             cache: TrainingLogCache()
           ),
           studentFeedback: BackendStudentFeedbackRepository(
             api: api,
-            session: session,
+            session: chat.session,
             cache: FeedbackCache()
           ),
           // e1RM stays fully on-device in V0.1 (spec 028 persistence ladder):
           // JSON files under Documents/e1rm/, no backend endpoint.
           studentE1RM: LocalE1RMRepository(),
-          studentReadiness: BackendReadinessRepository(api: api, session: session),
+          studentReadiness: BackendReadinessRepository(api: api, session: chat.session),
           // Set-video uploads (spec 027): backend /uploads/* pipeline; the
           // setLog ↔ attachment mapping persists on-device only in V0.1.
-          studentVideoUploads: .backend(api: api, session: session),
+          studentVideoUploads: .backend(api: api, session: chat.session),
           // Bind + onboarding are cache-free by design (spec 031/032 §9):
           // both must read live server state.
-          studentBind: BackendBindRepository(api: api, session: session),
-          studentOnboarding: BackendOnboardingRepository(api: api, session: session),
+          studentBind: BackendBindRepository(api: api, session: chat.session),
+          studentOnboarding: BackendOnboardingRepository(api: api, session: chat.session),
           // Evaluation funnel (spec 033) — all cache-free by design.
-          studentEvaluations: BackendStudentEvaluationRepository(api: api, session: session),
+          studentEvaluations: BackendStudentEvaluationRepository(api: api, session: chat.session),
           studentEvaluationSummaries: BackendEvaluationSummaryRepository(
-            api: api, session: session),
-          studentAccount: BackendAccountRepository(api: api, session: session),
+            api: api, session: chat.session),
+          studentAccount: BackendAccountRepository(api: api, session: chat.session),
           summaryReadStore: UserDefaultsEvaluationSummaryReadStore(),
           // Coach-side video wall (spec 029 second pass): server-side
           // metadata + per-item presigned playback URLs.
-          coachStudentVideos: BackendCoachStudentVideoRepository(api: api, session: session),
+          coachStudentVideos: BackendCoachStudentVideoRepository(api: api, session: chat.session),
           // Growth-tab family mapping reads the coach-owned full plan tree
           // (the student projection only carries the current week).
-          coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(api: api, session: session),
+          coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(
+            api: api, session: chat.session),
+          chatSession: chat.controller,
+          chatRepository: chat.repository,
           draftStore: draftStore,
           analyticsMode: .live
         ),
-        session: session
+        session: chat.session
       )
     }
   #endif

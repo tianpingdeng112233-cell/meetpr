@@ -1,4 +1,5 @@
 import Analytics
+import ChatUI
 import CoachKit
 import CoreModels
 import Foundation
@@ -39,6 +40,8 @@ public struct RootView: View {
   private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
   private let analyticsMode: AnalyticsMode
+  @State private var chatSession: ChatSessionController
+  private let chatRepository: (any ChatRepository)?
 
   public init(
     coachPlans: any PlanRepository = InMemoryPlanRepository.preview(),
@@ -63,6 +66,8 @@ public struct RootView: View {
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
     coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
     coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
+    chatSession: ChatSessionController = ChatSessionController(),
+    chatRepository: (any ChatRepository)? = nil,
     draftStore: DraftStore = DraftStore.shared,
     analyticsMode: AnalyticsMode = .disabled
   ) {
@@ -96,6 +101,8 @@ public struct RootView: View {
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
     self.coachVideoQueue = coachVideoQueue
     self.coachFamilyMapProvider = coachFamilyMapProvider
+    _chatSession = State(initialValue: chatSession)
+    self.chatRepository = chatRepository
     self.draftStore = draftStore
     self.analyticsMode = analyticsMode
     Analytics.shared.prepare(mode: analyticsMode)
@@ -127,25 +134,7 @@ public struct RootView: View {
   private func authenticatedContent(for user: User) -> some View {
     switch Self.authenticatedDestination(for: user.role) {
     case .coach:
-      CoachRootView(
-        repository: coachPlans,
-        studentPlans: studentPlans,
-        studentLogs: studentLogs,
-        feedback: studentFeedback,
-        inviteCodes: coachInviteCodes,
-        studentVideos: coachStudentVideos,
-        readiness: studentReadiness,
-        familyMapProvider: coachFamilyMapProvider,
-        bindQueue: coachBindQueue,
-        evaluations: coachEvaluations,
-        evaluationSummaries: coachEvaluationSummaries,
-        studentProfiles: coachStudentProfiles,
-        videoQueue: coachVideoQueue,
-        onLogout: {
-          await session.logout()
-        },
-        draftStore: draftStore
-      )
+      coachRoot(for: user)
     case .studentBehindE1RMGate:
       studentEntry(for: user)
     }
@@ -171,11 +160,64 @@ public struct RootView: View {
         // the same migration gate, so neither can consume stale e1RM history.
         bindGatedStudentRoot(for: user)
       } else {
-        studentRoot(for: user)
+        studentRoot(for: user, activeCoach: nil, chat: nil, allowsChat: false)
       }
     }
   }
 
+  @ViewBuilder
+  private func coachRoot(for user: User) -> some View {
+    if let chatRepository {
+      // A student context carries a bound coach; the coach root must never
+      // inherit one, so require the neutral (nil) binding as well as the user.
+      if let chat = chatSession.context, chat.currentUserID == user.id,
+        chatSession.activeStudentCoachID == nil
+      {
+        coachContent(chat: chat)
+      } else {
+        ProgressView()
+          .task(id: user.id) {
+            await chatSession.activateCoach(
+              repository: chatRepository,
+              currentUserID: user.id
+            )
+          }
+      }
+    } else {
+      coachContent(chat: nil)
+    }
+  }
+
+  private func coachContent(chat: ChatSessionContext?) -> some View {
+    CoachRootView(
+      repository: coachPlans,
+      studentPlans: studentPlans,
+      studentLogs: studentLogs,
+      feedback: studentFeedback,
+      inviteCodes: coachInviteCodes,
+      studentVideos: coachStudentVideos,
+      readiness: studentReadiness,
+      familyMapProvider: coachFamilyMapProvider,
+      bindQueue: coachBindQueue,
+      evaluations: coachEvaluations,
+      evaluationSummaries: coachEvaluationSummaries,
+      studentProfiles: coachStudentProfiles,
+      videoQueue: coachVideoQueue,
+      chat: chat?.repository,
+      currentUserID: chat?.currentUserID,
+      inbox: chat?.inbox,
+      sendCoordinator: chat?.sendCoordinator,
+      onLogout: {
+        await session.logout()
+      },
+      draftStore: draftStore
+    )
+  }
+
+}
+
+extension RootView {
+  // swiftlint:disable:next function_body_length
   private func bindGatedStudentRoot(for user: User) -> some View {
     let onboarding = studentOnboarding
     let studentId = user.id
@@ -201,6 +243,12 @@ public struct RootView: View {
       onLogout: {
         await session.logout()
       },
+      willApplyBindingChange: { oldCoachID, newCoachID in
+        await chatSession.prepareForStudentBindingChange(
+          from: oldCoachID,
+          to: newCoachID
+        )
+      },
       onboardingFlow: { _, onCompleted in
         OnboardingWizardFlow(
           studentId: studentId,
@@ -222,8 +270,12 @@ public struct RootView: View {
           onCompleted: onCompleted
         )
       },
-      content: {
-        studentRoot(for: user)
+      content: { activeCoach, refreshBinding in
+        studentChatRoot(
+          for: user,
+          activeCoach: activeCoach,
+          refreshBinding: refreshBinding
+        )
       }
     )
   }
@@ -240,7 +292,44 @@ public struct RootView: View {
     )
   }
 
-  private func studentRoot(for user: User) -> some View {
+  @ViewBuilder
+  private func studentChatRoot(
+    for user: User,
+    activeCoach: ActiveCoachContext,
+    refreshBinding: @escaping @MainActor @Sendable () async -> Void
+  ) -> some View {
+    if let chatRepository {
+      // Match the coach too: after a switch, a context built for the previous
+      // coach still has the right user id and would otherwise be handed to the
+      // new coach's UI.
+      if let chat = chatSession.context, chat.currentUserID == user.id,
+        chatSession.activeStudentCoachID == activeCoach.coachID
+      {
+        studentRoot(for: user, activeCoach: activeCoach, chat: chat, allowsChat: true)
+      } else if chatSession.canActivateStudent(for: activeCoach.coachID) {
+        ProgressView()
+          .task(id: activeCoach.coachID) {
+            await chatSession.activateStudent(
+              repository: chatRepository,
+              currentUserID: user.id,
+              activeCoachID: activeCoach.coachID,
+              refreshBinding: refreshBinding
+            )
+          }
+      } else {
+        ProgressView()
+      }
+    } else {
+      studentRoot(for: user, activeCoach: activeCoach, chat: nil, allowsChat: true)
+    }
+  }
+
+  private func studentRoot(
+    for user: User,
+    activeCoach: ActiveCoachContext?,
+    chat: ChatSessionContext?,
+    allowsChat: Bool
+  ) -> some View {
     StudentRootView(
       studentID: user.id,
       canShiftPlanDays: user.role == .coachedStudent,
@@ -256,74 +345,16 @@ public struct RootView: View {
       onLogout: {
         await session.logout()
       },
-      account: studentAccount
-    )
-  }
-}
-
-/// Demo/preview fallbacks for RootView's injection points. An accepted bond
-/// plus a completed profile keep the existing student demo flow untouched —
-/// the BindGate falls straight through to the 5 tabs (spec 031 D10).
-@available(iOS 17.0, macOS 14.0, *)
-private enum RootViewDemoDefaults {
-  static func inviteCodes() -> any InviteCodeRepository {
-    InMemoryInviteCodeRepository(
-      coachId: StudentDemoSeed.coachID,
-      seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
-    )
-  }
-
-  static func plans() -> any StudentPlanRepository {
-    let plan = StudentDemoSeed.makePlanView()
-    let store = InMemoryPlanStore()
-    Task {
-      await store.savePublishedProjection(plan, forStudent: StudentDemoSeed.studentID)
-    }
-    return InMemoryStudentPlanRepository(store: store)
-  }
-
-  static func logs() -> any StudentTrainingLogRepository {
-    InMemoryStudentTrainingLogRepository(
-      seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
-    )
-  }
-
-  static func feedback() -> any StudentFeedbackRepository {
-    InMemoryStudentFeedbackRepository(
-      seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
-    )
-  }
-
-  static func e1rm() -> any E1RMRepository {
-    InMemoryE1RMRepository(
-      seedPoints: StudentDemoSeed.makeE1RMHistory(studentID: StudentDemoSeed.studentID),
-      seedPRs: StudentDemoSeed.makeUnacknowledgedPR(studentID: StudentDemoSeed.studentID)
-    )
-  }
-
-  static func readiness() -> any ReadinessRepository {
-    InMemoryReadinessRepository(
-      seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
-    )
-  }
-
-  static func bind() -> any BindRepository {
-    InMemoryBindRepository(
-      studentId: StudentDemoSeed.studentID,
-      seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
-    )
-  }
-
-  static func onboarding() -> any OnboardingRepository {
-    InMemoryOnboardingRepository(
-      studentId: StudentDemoSeed.studentID,
-      seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
-    )
-  }
-
-  static func coachStudentProfiles() -> any OnboardingProfileReading {
-    InMemoryCoachStudentProfileReader(
-      profiles: [StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)]
+      account: studentAccount,
+      allowsChat: allowsChat,
+      chat: chat?.repository,
+      currentUserID: chat?.currentUserID,
+      inbox: chat?.inbox,
+      sendCoordinator: chat?.sendCoordinator,
+      activeCoach: activeCoach,
+      onBindingInvalidated: {
+        await chatSession.reportBindingInvalidation()
+      }
     )
   }
 }
