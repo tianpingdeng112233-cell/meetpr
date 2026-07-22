@@ -260,8 +260,8 @@ private func cleanupChatAttachment(
     }
 
     do {
-      try await apiClient.deleteUpload(
-        attachmentID: attachmentID,
+      try await apiClient.deleteNoContent(
+        path: "/uploads/\(attachmentID.uuidString)",
         accessToken: accessToken
       )
     } catch {
@@ -271,8 +271,9 @@ private func cleanupChatAttachment(
         // no longer orphaned. Other failures remain best-effort cleanup.
         return
       }
-      try? await apiClient.reconcileUpload(
-        attachmentID: attachmentID,
+      try? await apiClient.postNoContent(
+        path: "/uploads/\(attachmentID.uuidString)/reconcile",
+        body: EmptyWireBody(),
         accessToken: accessToken
       )
     }

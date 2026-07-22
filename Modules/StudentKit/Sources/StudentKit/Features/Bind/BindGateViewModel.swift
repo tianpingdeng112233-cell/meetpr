@@ -76,48 +76,49 @@ public final class BindGateViewModel {
   /// Evaluation routing source (spec 033 §11); nil keeps the pre-033
   /// behavior (accepted → straight to the 5 tabs).
   private let evaluations: (any EvaluationRepository)?
+  private let willApplyBindingChange:
+    @MainActor @Sendable (_ oldCoachID: UUID?, _ newCoachID: UUID?) async -> Void
 
   public init(
     studentId: UUID,
     bind: any BindRepository,
     stash: any PendingBindCodeStoring,
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
-    evaluations: (any EvaluationRepository)? = nil
+    evaluations: (any EvaluationRepository)? = nil,
+    willApplyBindingChange:
+      @escaping @MainActor @Sendable (
+        _ oldCoachID: UUID?, _ newCoachID: UUID?
+      ) async -> Void = { _, _ in }
   ) {
     self.studentId = studentId
     self.bind = bind
     self.stash = stash
     self.isOnboardingComplete = isOnboardingComplete
     self.evaluations = evaluations
+    self.willApplyBindingChange = willApplyBindingChange
   }
 
   public func load() async {
-    let wasPending: Bool
-    if case .pendingAcceptance = state {
-      wasPending = true
-    } else {
-      wasPending = false
-    }
-    state = .loading
+    await apply(await fetchCandidateState())
+  }
+
+  private func fetchCandidateState() async -> BindGateState {
     let mine: BindRequest?
     do {
       mine = try await bind.myBindRequest()
     } catch {
-      state = .failed
-      return
+      return .failed
     }
 
     switch mine?.status {
     case .accepted:
-      if let mine {
-        state = await boundState(for: mine)
-        if wasPending { acceptanceRevision += 1 }
-      }
+      if let mine { return await boundState(for: mine) }
     case .pending:
-      if let mine { state = .pendingAcceptance(mine) }
+      if let mine { return .pendingAcceptance(mine) }
     case .none, .rejected, .expired, .cancelled:
-      await resolveUnbound(latest: mine)
+      return await resolveUnbound(latest: mine)
     }
+    return .failed
   }
 
   /// 2026-07-13 (David): the evaluation period is sealed for beta — accepted
@@ -155,7 +156,7 @@ public final class BindGateViewModel {
   /// reloads when the gate is already past `.loading`.
   public func refresh() async {
     guard state != .loading else { return }
-    await load()
+    await apply(await fetchCandidateState())
   }
 
   // MARK: - Enter-code page callbacks
@@ -165,7 +166,7 @@ public final class BindGateViewModel {
     case .requestSent(let request):
       // A 201 ends any stash lifecycle: a stale code left by an earlier
       // transport failure must never ghost-resubmit later (Codex P1).
-      await stash.clear(studentId: studentId)
+      stash.clear(studentId: studentId)
       state = .pendingAcceptance(request)
     case .stashedForOnboarding(let pending):
       state = .needsOnboarding(pending)
@@ -196,15 +197,13 @@ public final class BindGateViewModel {
 
   // MARK: - Unbound resolution (cold-start resume included, spec 031 §6)
 
-  private func resolveUnbound(latest: BindRequest?) async {
+  private func resolveUnbound(latest: BindRequest?) async -> BindGateState {
     guard let pending = stash.peek(studentId: studentId) else {
-      state = .needsCode(prefillDisplayName: nil, notice: Self.notice(for: latest?.status))
-      return
+      return .needsCode(prefillDisplayName: nil, notice: Self.notice(for: latest?.status))
     }
 
     guard await isOnboardingComplete() else {
-      state = .needsOnboarding(pending)
-      return
+      return .needsOnboarding(pending)
     }
 
     // Stash + onboarding complete → auto-resubmit (the 032 handoff's
@@ -213,47 +212,69 @@ public final class BindGateViewModel {
       let request = try await bind.submitBindRequest(
         code: pending.code, displayName: pending.displayName)
       stash.clear(studentId: studentId)
-      state = .pendingAcceptance(request)
+      return .pendingAcceptance(request)
     } catch BindRequestError.invalidCode {
       stash.clear(studentId: studentId)
-      state = .needsCode(prefillDisplayName: pending.displayName, notice: .invalidCode)
+      return .needsCode(prefillDisplayName: pending.displayName, notice: .invalidCode)
     } catch BindRequestError.alreadyPending, BindRequestError.alreadyBound {
       // Server already advanced; one re-read converges. The stash survives,
       // but the next resolveUnbound only runs after the bond dissolves —
       // and an invalid stale code then resolves through `.invalidCode`.
-      await reloadAfterConflict()
+      return await candidateAfterConflict()
     } catch {
       // Transport failure: keep the stash, surface a neutral notice; the
       // next load retries automatically.
-      state = .needsCode(prefillDisplayName: pending.displayName, notice: .network)
+      return .needsCode(prefillDisplayName: pending.displayName, notice: .network)
     }
   }
 
   /// One non-recursive re-read after already-pending / already-bound: maps
   /// the now-authoritative server state directly (avoids load() → resolve →
   /// submit ping-pong).
-  private func reloadAfterConflict() async {
+  private func candidateAfterConflict() async -> BindGateState {
     let mine: BindRequest?
     do {
       mine = try await bind.myBindRequest()
     } catch {
-      state = .failed
-      return
+      return .failed
     }
 
     switch mine?.status {
     case .accepted:
       if let mine {
         stash.clear(studentId: studentId)
-        state = await boundState(for: mine)
+        return await boundState(for: mine)
       }
     case .pending:
       if let mine {
         stash.clear(studentId: studentId)
-        state = .pendingAcceptance(mine)
+        return .pendingAcceptance(mine)
       }
     case .none, .rejected, .expired, .cancelled:
-      state = .needsCode(prefillDisplayName: nil, notice: Self.notice(for: mine?.status))
+      return .needsCode(prefillDisplayName: nil, notice: Self.notice(for: mine?.status))
+    }
+    return .failed
+  }
+
+  private func apply(_ candidate: BindGateState) async {
+    let oldState = state
+    let oldCoachID = Self.activeCoachID(in: oldState)
+    let newCoachID = Self.activeCoachID(in: candidate)
+    if oldCoachID != newCoachID {
+      await willApplyBindingChange(oldCoachID, newCoachID)
+    }
+    state = candidate
+    if case .pendingAcceptance = oldState, case .bound = candidate {
+      acceptanceRevision += 1
+    }
+  }
+
+  private static func activeCoachID(in state: BindGateState) -> UUID? {
+    switch state {
+    case .bound(let request): request.coachId
+    case .loading, .needsCode, .needsOnboarding, .pendingAcceptance,
+      .evaluationActive, .failed:
+      nil
     }
   }
 

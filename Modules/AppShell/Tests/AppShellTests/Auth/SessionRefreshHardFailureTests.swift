@@ -55,7 +55,7 @@ import Testing
     statusCode: 400, code: .validationError, issues: [])
   await repository.setForcedError(forcedError)
 
-  await #expect(throws: forcedError) {
+  await #expect(throws: SessionStateReaderError.authenticationExpired) {
     _ = try await session.recoverAccessToken(rejectedAccessToken: rejectedAccessToken)
   }
 

@@ -22,7 +22,13 @@ public struct MyProfileView: View {
   private let account: (any AccountRepository)?
   private let logs: (any StudentTrainingLogRepository)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  private let notifications: StudentNotificationsCoordinator?
+  private let onOpenPlanNotification: () -> Void
+  private let onOpenFeedbackNotification: () -> Void
+  private let onOpenEvaluationNotification: () -> Void
   @State private var viewModel: MyProfileViewModel
+  @State private var showingNotifications = false
+  @State private var conversationID: UUID?
 
   public init(
     studentID: UUID,
@@ -34,7 +40,11 @@ public struct MyProfileView: View {
     account: (any AccountRepository)? = nil,
     logs: (any StudentTrainingLogRepository)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
-      UserDefaultsRestTimerSettingsStore()
+      UserDefaultsRestTimerSettingsStore(),
+    notifications: StudentNotificationsCoordinator? = nil,
+    onOpenPlanNotification: @escaping () -> Void = {},
+    onOpenFeedbackNotification: @escaping () -> Void = {},
+    onOpenEvaluationNotification: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -45,6 +55,10 @@ public struct MyProfileView: View {
     self.account = account
     self.logs = logs
     self.restTimerSettings = restTimerSettings
+    self.notifications = notifications
+    self.onOpenPlanNotification = onOpenPlanNotification
+    self.onOpenFeedbackNotification = onOpenFeedbackNotification
+    self.onOpenEvaluationNotification = onOpenEvaluationNotification
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding))
   }
@@ -57,6 +71,11 @@ public struct MyProfileView: View {
             .font(.system(size: 36, weight: .heavy))
             .foregroundStyle(Color.MeetPR.fgPrimary)
           Spacer()
+          if let notifications {
+            StudentNotificationBell(coordinator: notifications) {
+              showingNotifications = true
+            }
+          }
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -73,6 +92,16 @@ public struct MyProfileView: View {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
+      .modifier(
+        OptionalStudentNotificationHostModifier(
+          coordinator: notifications,
+          showsNotifications: $showingNotifications,
+          conversationID: $conversationID,
+          onOpenPlan: onOpenPlanNotification,
+          onOpenFeedback: onOpenFeedbackNotification,
+          onOpenEvaluation: onOpenEvaluationNotification
+        )
+      )
     }
     .task { await viewModel.loadIfNeeded() }
   }
@@ -127,7 +156,17 @@ public struct MyProfileView: View {
   // MARK: - Sections
 
   @ViewBuilder
+  // swiftlint:disable:next function_body_length
   private func sections(_ profile: OnboardingProfile) -> some View {
+    if let notifications, notifications.hasActiveCoach {
+      MyCoachCard(coordinator: notifications) {
+        Task {
+          conversationID = await notifications.openCoachConversation()
+        }
+      }
+      .padding(.bottom, 18)
+    }
+
     sectionLabel("训练基线 · 教练管理")
     oneRMCard(profile).padding(.top, 8)
 

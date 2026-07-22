@@ -33,8 +33,11 @@ public struct ChatSessionContext {
 @available(iOS 17.0, macOS 14.0, *)
 public final class ChatSessionController {
   public private(set) var context: ChatSessionContext?
+  public private(set) var isChangingStudentBinding = false
 
   @ObservationIgnored private let invalidationRouter: ChatBindingInvalidationRouter
+  @ObservationIgnored private var pendingStudentCoachID: UUID?
+  @ObservationIgnored private var activeStudentCoachID: UUID?
 
   public init() {
     invalidationRouter = ChatBindingInvalidationRouter()
@@ -49,6 +52,8 @@ public final class ChatSessionController {
     currentUserID: UUID
   ) async {
     if context?.currentUserID == currentUserID {
+      activeStudentCoachID = nil
+      await invalidationRouter.useCoachNoOp()
       return
     }
 
@@ -73,16 +78,89 @@ public final class ChatSessionController {
       inbox: inbox,
       sendCoordinator: sendCoordinator
     )
+    activeStudentCoachID = nil
+  }
+
+  public func activateStudent(
+    repository: any ChatRepository,
+    currentUserID: UUID,
+    activeCoachID: UUID,
+    refreshBinding: @escaping @MainActor @Sendable () async -> Void
+  ) async {
+    guard canActivateStudent(for: activeCoachID) else { return }
+    if context?.currentUserID == currentUserID,
+      activeStudentCoachID == activeCoachID
+    {
+      await invalidationRouter.useStudentHandler {
+        await refreshBinding()
+      }
+      isChangingStudentBinding = false
+      pendingStudentCoachID = nil
+      return
+    }
+
+    await tearDownContext()
+    await invalidationRouter.useStudentHandler {
+      await refreshBinding()
+    }
+    let onBindingInvalidated: @Sendable () async -> Void = { [invalidationRouter] in
+      await invalidationRouter.route()
+    }
+    let inbox = ChatInboxViewModel(
+      repository: repository,
+      currentUserID: currentUserID,
+      onBindingInvalidated: onBindingInvalidated
+    )
+    let sendCoordinator = ChatSendCoordinator(
+      repository: repository,
+      currentUserID: currentUserID,
+      onBindingInvalidated: onBindingInvalidated
+    )
+    context = ChatSessionContext(
+      repository: repository,
+      currentUserID: currentUserID,
+      inbox: inbox,
+      sendCoordinator: sendCoordinator
+    )
+    activeStudentCoachID = activeCoachID
+    isChangingStudentBinding = false
+    pendingStudentCoachID = nil
+  }
+
+  public func prepareForStudentBindingChange(
+    from oldCoachID: UUID?,
+    to newCoachID: UUID?
+  ) async {
+    guard oldCoachID != newCoachID else { return }
+    isChangingStudentBinding = true
+    pendingStudentCoachID = newCoachID
+    await tearDownContext()
+  }
+
+  public func canActivateStudent(for coachID: UUID) -> Bool {
+    !isChangingStudentBinding || pendingStudentCoachID == coachID
+  }
+
+  public func reportBindingInvalidation() async {
+    await invalidationRouter.route()
   }
 
   public func cancelAllAndWaitForCleanup() async {
+    await tearDownContext()
+    isChangingStudentBinding = false
+    pendingStudentCoachID = nil
+  }
+
+  private func tearDownContext() async {
     guard let context else {
+      activeStudentCoachID = nil
       return
     }
+    self.context = nil
+    activeStudentCoachID = nil
     context.inbox.stopPolling()
     await context.sendCoordinator.cancelAllAndWaitForCleanup()
     context.inbox.clear()
-    self.context = nil
   }
 }
 

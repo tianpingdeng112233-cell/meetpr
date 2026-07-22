@@ -19,12 +19,18 @@ public struct TrainingHistoryView: View {
   private let feedbackViewModel: FeedbackInboxViewModel?
   private let importedHistoryRefreshToken: Int
   private let onImportedHistoryRefresh: (@MainActor () async -> Void)?
+  private let notifications: StudentNotificationsCoordinator?
+  private let onOpenPlanNotification: () -> Void
+  private let onOpenFeedbackNotification: () -> Void
+  private let onOpenEvaluationNotification: () -> Void
   @State private var viewModel: TrainingHistoryViewModel
   @State private var trendViewModel: DashboardE1RMTrendViewModel
   @State private var prEvent: PRBreakthroughEvent?
   @State private var prFamily: LiftFamily?
   @State private var showsAllHistory = false
   @State private var currentOnboarding: OnboardingProfile?
+  @State private var showsNotifications = false
+  @State private var conversationID: UUID?
 
   public init(
     studentID: UUID,
@@ -34,7 +40,11 @@ public struct TrainingHistoryView: View {
     onboarding: (any OnboardingProfileReading)? = nil,
     feedbackViewModel: FeedbackInboxViewModel? = nil,
     importedHistoryRefreshToken: Int = 0,
-    onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil
+    onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil,
+    notifications: StudentNotificationsCoordinator? = nil,
+    onOpenPlanNotification: @escaping () -> Void = {},
+    onOpenFeedbackNotification: @escaping () -> Void = {},
+    onOpenEvaluationNotification: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -43,6 +53,10 @@ public struct TrainingHistoryView: View {
     self.feedbackViewModel = feedbackViewModel
     self.importedHistoryRefreshToken = importedHistoryRefreshToken
     self.onImportedHistoryRefresh = onImportedHistoryRefresh
+    self.notifications = notifications
+    self.onOpenPlanNotification = onOpenPlanNotification
+    self.onOpenFeedbackNotification = onOpenFeedbackNotification
+    self.onOpenEvaluationNotification = onOpenEvaluationNotification
     self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
     self._trendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(
@@ -61,6 +75,11 @@ public struct TrainingHistoryView: View {
             .font(.system(size: 36, weight: .heavy))
             .foregroundStyle(Color.MeetPR.fgPrimary)
           Spacer()
+          if let notifications {
+            StudentNotificationBell(coordinator: notifications) {
+              showsNotifications = true
+            }
+          }
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
@@ -97,6 +116,16 @@ public struct TrainingHistoryView: View {
       .navigationDestination(isPresented: $showsAllHistory) {
         AllHistoryScreen(viewModel: viewModel)
       }
+      .modifier(
+        OptionalStudentNotificationHostModifier(
+          coordinator: notifications,
+          showsNotifications: $showsNotifications,
+          conversationID: $conversationID,
+          onOpenPlan: onOpenPlanNotification,
+          onOpenFeedback: onOpenFeedbackNotification,
+          onOpenEvaluation: onOpenEvaluationNotification
+        )
+      )
     }
     .task {
       await loadIfNeeded()

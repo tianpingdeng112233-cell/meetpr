@@ -251,7 +251,6 @@ struct MeetPRApp: App {
           studentEvaluations: BackendStudentEvaluationRepository(api: api, session: chat.session),
           studentEvaluationSummaries: BackendEvaluationSummaryRepository(
             api: api, session: chat.session),
-          studentSessionReviews: BackendSessionReviewRepository(api: api, session: chat.session),
           studentAccount: BackendAccountRepository(api: api, session: chat.session),
           summaryReadStore: UserDefaultsEvaluationSummaryReadStore(),
           // Coach-side video wall (spec 029 second pass): server-side

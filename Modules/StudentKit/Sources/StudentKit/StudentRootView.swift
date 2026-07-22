@@ -1,4 +1,5 @@
 import Analytics
+import ChatUI
 import CoreModels
 import DesignSystem
 import Foundation
@@ -21,6 +22,7 @@ public struct StudentRootView: View {
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
+  @State private var notifications: StudentNotificationsCoordinator?
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
   /// Bumped whenever 今日 becomes active so the home screen reloads data logged
@@ -35,6 +37,8 @@ public struct StudentRootView: View {
   @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
   @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
   @State private var importedHistoryRefreshToken = 0
+  @State private var evaluationNavigationPulse = 0
+  @Environment(\.scenePhase) private var scenePhase
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -60,6 +64,7 @@ public struct StudentRootView: View {
     )
   }
 
+  // swiftlint:disable:next function_body_length
   public init(
     studentID: UUID = StudentDemoSeed.studentID,
     canShiftPlanDays: Bool = false,
@@ -76,7 +81,14 @@ public struct StudentRootView: View {
     account: (any AccountRepository)? = nil,
     importedHistoryReviews: (any ImportedHistoryReviewStoring)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
-      UserDefaultsRestTimerSettingsStore()
+      UserDefaultsRestTimerSettingsStore(),
+    allowsChat: Bool = false,
+    chat: (any ChatRepository)? = nil,
+    currentUserID: UUID? = nil,
+    inbox: ChatInboxViewModel? = nil,
+    sendCoordinator: ChatSendCoordinator? = nil,
+    activeCoach: ActiveCoachContext? = nil,
+    onBindingInvalidated: @escaping @Sendable () async -> Void = {}
   ) {
     self.studentID = studentID
     self.canShiftPlanDays = canShiftPlanDays
@@ -111,22 +123,55 @@ public struct StudentRootView: View {
       e1rm: e1rm,
       reviews: resolvedImportedHistoryReviews
     )
-    self._feedbackViewModel = State(
-      initialValue: FeedbackInboxViewModel(repository: feedback)
+    let feedbackViewModel = FeedbackInboxViewModel(repository: feedback)
+    let evaluationSummaryViewModel = StudentEvaluationSummaryViewModel(
+      summaries: evaluationSummaries ?? InMemoryEvaluationSummaryRepository(),
+      plans: plans,
+      readStore: summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
     )
-    self._evaluationSummaryViewModel = State(
-      initialValue: StudentEvaluationSummaryViewModel(
-        summaries: evaluationSummaries ?? InMemoryEvaluationSummaryRepository(),
-        plans: plans,
-        readStore: summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
+    self._feedbackViewModel = State(initialValue: feedbackViewModel)
+    self._evaluationSummaryViewModel = State(initialValue: evaluationSummaryViewModel)
+
+    let chatContext: StudentChatContext?
+    if allowsChat,
+      let chat,
+      let currentUserID,
+      let inbox,
+      let sendCoordinator
+    {
+      chatContext = StudentChatContext(
+        repository: chat,
+        currentUserID: currentUserID,
+        inbox: inbox,
+        sendCoordinator: sendCoordinator
       )
-    )
+    } else {
+      chatContext = nil
+    }
+
+    if allowsChat {
+      self._notifications = State(
+        initialValue: StudentNotificationsCoordinator(
+          plans: plans,
+          feedback: feedbackViewModel,
+          evaluation: evaluationSummaryViewModel,
+          activeCoach: activeCoach,
+          chatContext: chatContext,
+          onBindingInvalidated: onBindingInvalidated
+        )
+      )
+    } else {
+      self._notifications = State(initialValue: nil)
+    }
   }
 
   public var body: some View {
     studentTabs
   }
 
+}
+
+extension StudentRootView {
   private var studentTabs: some View {
     TabView(selection: $selectedTab) {
       // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
@@ -140,12 +185,15 @@ public struct StudentRootView: View {
         e1rm: e1rm,
         feedbackViewModel: feedbackViewModel,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
+        notifications: notifications,
+        evaluationNavigationPulse: evaluationNavigationPulse,
         onStartWorkout: {
           nextWorkoutSource = .dashboard
           trainingJumpToken += 1
           selectedTab = .training
         },
         onSeeAllFeedback: { selectedTab = .growth },
+        onOpenEvaluation: openEvaluationNotification,
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         onPlanChanged: { planRevision += 1 }
       )
@@ -160,7 +208,11 @@ public struct StudentRootView: View {
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
         jumpToTodayToken: trainingJumpToken,
         planRevision: planRevision,
-        workoutStartedAt: $workoutStartedAt
+        workoutStartedAt: $workoutStartedAt,
+        notifications: notifications,
+        onOpenPlanNotification: openPlanNotification,
+        onOpenFeedbackNotification: openFeedbackNotification,
+        onOpenEvaluationNotification: openEvaluationNotification
       )
       .tag(StudentTab.training)
       .tabItem {
@@ -174,7 +226,11 @@ public struct StudentRootView: View {
         onboarding: onboarding,
         feedbackViewModel: feedbackViewModel,
         importedHistoryRefreshToken: importedHistoryRefreshToken,
-        onImportedHistoryRefresh: { await runImportedHistoryBackfill() }
+        onImportedHistoryRefresh: { await runImportedHistoryBackfill() },
+        notifications: notifications,
+        onOpenPlanNotification: openPlanNotification,
+        onOpenFeedbackNotification: openFeedbackNotification,
+        onOpenEvaluationNotification: openEvaluationNotification
       )
       .tag(StudentTab.growth)
       .tabItem {
@@ -190,7 +246,11 @@ public struct StudentRootView: View {
         onLogout: onLogout,
         account: account,
         logs: logs,
-        restTimerSettings: restTimerSettings
+        restTimerSettings: restTimerSettings,
+        notifications: notifications,
+        onOpenPlanNotification: openPlanNotification,
+        onOpenFeedbackNotification: openFeedbackNotification,
+        onOpenEvaluationNotification: openEvaluationNotification
       )
       .tag(StudentTab.profile)
       .tabItem {
@@ -202,10 +262,17 @@ public struct StudentRootView: View {
     }
     .task {
       Analytics.shared.screen(.dashboard)
-      if feedbackViewModel.state == .idle {
-        await feedbackViewModel.load(studentID: studentID)
+      if let notifications {
+        await notifications.loadIfNeeded(studentID: studentID)
+        if scenePhase == .active {
+          notifications.startChatPolling()
+        }
+      } else {
+        if feedbackViewModel.state == .idle {
+          await feedbackViewModel.load(studentID: studentID)
+        }
+        await evaluationSummaryViewModel.load(studentID: studentID)
       }
-      await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
       await runImportedHistoryBackfill()
     }
@@ -226,11 +293,41 @@ public struct StudentRootView: View {
         Analytics.shared.screen(.account)
       }
     }
+    .onChange(of: scenePhase) { _, phase in
+      guard let notifications else { return }
+      if phase == .active {
+        notifications.startChatPolling()
+        Task { await notifications.reload(studentID: studentID) }
+      } else {
+        notifications.stopChatPolling()
+      }
+    }
+    .onDisappear {
+      notifications?.stopChatPolling()
+    }
     .importedHistoryReviewAlert(
       review: $pendingImportedHistoryReview,
       onAnswer: answerImportedHistoryReview
     )
     .tint(Color.MeetPR.brandRed)
+  }
+
+  var hasNotificationCoordinator: Bool {
+    notifications != nil
+  }
+
+  private func openPlanNotification() {
+    trainingJumpToken += 1
+    selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
+  }
+
+  private func openFeedbackNotification() {
+    selectedTab = StudentNotificationRoute.feedback.targetTab(from: selectedTab)
+  }
+
+  private func openEvaluationNotification() {
+    selectedTab = StudentNotificationRoute.evaluation.targetTab(from: selectedTab)
+    evaluationNavigationPulse += 1
   }
 
   @MainActor
@@ -268,64 +365,5 @@ public struct StudentRootView: View {
     let next = ImportedHistoryReviewQueue.takingNext(from: importedHistoryReviewQueue)
     pendingImportedHistoryReview = next.current
     importedHistoryReviewQueue = next.waiting
-  }
-}
-
-extension View {
-  fileprivate func importedHistoryReviewAlert(
-    review: Binding<PendingImportedHistoryReview?>,
-    onAnswer:
-      @escaping @MainActor (
-        PendingImportedHistoryReview,
-        ImportedHistoryReviewDecision
-      ) async -> Void
-  ) -> some View {
-    alert(
-      "确认导入历史",
-      isPresented: Binding(
-        get: { review.wrappedValue != nil },
-        set: { if !$0 { review.wrappedValue = nil } }
-      ),
-      presenting: review.wrappedValue
-    ) { pending in
-      Button("确实") {
-        Task { await onAnswer(pending, .confirmed) }
-      }
-      Button("没有", role: .destructive) {
-        Task { await onAnswer(pending, .rejected) }
-      }
-    } message: { pending in
-      Text(importedHistoryReviewMessage(pending))
-    }
-  }
-
-  private func importedHistoryReviewMessage(_ review: PendingImportedHistoryReview) -> String {
-    "导入的历史记录里有 \(StudentFormatting.kilograms(review.sourceWeightKg))kg×"
-      + "\(review.sourceReps)(约 e1RM "
-      + "\(StudentFormatting.kilograms(review.sourceE1RMKg))kg),超过你填写的 1RM "
-      + "\(StudentFormatting.kilograms(review.baseline1RMKg))kg——当时确实完成了吗?"
-  }
-}
-
-private enum StudentTab: Hashable {
-  case today
-  case training
-  case growth
-  case profile
-}
-
-private actor StudentRootDemoPlanStore: StudentPlanStore {
-  private let studentID: UUID
-  private let plan: StudentPlanView
-
-  init(studentID: UUID, plan: StudentPlanView) {
-    self.studentID = studentID
-    self.plan = plan
-  }
-
-  func savePublishedProjection(_ projection: StudentPlanView, forStudent studentID: UUID) async {}
-
-  func getPublishedProjection(forStudent studentID: UUID) async -> StudentPlanView? {
-    studentID == self.studentID ? plan : nil
   }
 }

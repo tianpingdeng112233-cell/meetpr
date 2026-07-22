@@ -1,5 +1,7 @@
+import ChatUI
 import CoreModels
 import Foundation
+import RepositoryContracts
 import Testing
 
 @testable import StudentKit
@@ -21,6 +23,68 @@ import Testing
     logs: InMemoryStudentTrainingLogRepository(),
     feedback: InMemoryStudentFeedbackRepository()
   )
+}
+
+@MainActor
+@Test func selfTrainRoleGateBuildsNoChatCoordinatorAndMakesZeroRequests() async {
+  let chat = ChatRequestCountingRepository()
+  let inbox = ChatInboxViewModel(repository: chat, currentUserID: StudentDemoSeed.studentID)
+  let root = StudentRootView(
+    studentID: StudentDemoSeed.studentID,
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore()),
+    logs: InMemoryStudentTrainingLogRepository(),
+    feedback: InMemoryStudentFeedbackRepository(),
+    allowsChat: false,
+    chat: chat,
+    currentUserID: StudentDemoSeed.studentID,
+    inbox: inbox,
+    sendCoordinator: ChatSendCoordinator(
+      repository: chat,
+      currentUserID: StudentDemoSeed.studentID
+    ),
+    activeCoach: ActiveCoachContext(
+      coachID: StudentDemoSeed.coachID,
+      coachDisplayName: "不应显示"
+    )
+  )
+
+  #expect(!root.hasNotificationCoordinator)
+  #expect(await chat.requestCount == 0)
+}
+
+@MainActor
+@Test func coachedRoleGateBuildsSharedNotificationCoordinator() {
+  let chat = ChatRequestCountingRepository()
+  let inbox = ChatInboxViewModel(repository: chat, currentUserID: StudentDemoSeed.studentID)
+  let root = StudentRootView(
+    studentID: StudentDemoSeed.studentID,
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore()),
+    logs: InMemoryStudentTrainingLogRepository(),
+    feedback: InMemoryStudentFeedbackRepository(),
+    allowsChat: true,
+    chat: chat,
+    currentUserID: StudentDemoSeed.studentID,
+    inbox: inbox,
+    sendCoordinator: ChatSendCoordinator(
+      repository: chat,
+      currentUserID: StudentDemoSeed.studentID
+    ),
+    activeCoach: ActiveCoachContext(
+      coachID: StudentDemoSeed.coachID,
+      coachDisplayName: "周教练"
+    )
+  )
+
+  #expect(root.hasNotificationCoordinator)
+}
+
+@Test func notificationRoutesAreIdenticalFromEveryTab() {
+  for source in StudentTab.allCases {
+    #expect(StudentNotificationRoute.plan.targetTab(from: source) == .training)
+    #expect(StudentNotificationRoute.feedback.targetTab(from: source) == .growth)
+    #expect(StudentNotificationRoute.evaluation.targetTab(from: source) == .today)
+    #expect(StudentNotificationRoute.coachMessages.targetTab(from: source) == source)
+  }
 }
 
 @Test func importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() {
@@ -56,4 +120,61 @@ private func pendingReview(family: LiftFamily) -> PendingImportedHistoryReview {
     sourceReps: 5,
     sourceE1RMKg: 150
   )
+}
+
+private actor ChatRequestCountingRepository: ChatRepository {
+  private(set) var requestCount = 0
+
+  func fetchConversations() async throws -> [ChatConversation] {
+    requestCount += 1
+    return []
+  }
+
+  func openConversation(withOtherParty otherPartyID: UUID) async throws -> ChatConversation {
+    requestCount += 1
+    return ChatConversation(
+      id: UUID(),
+      otherPartyID: otherPartyID,
+      otherPartyName: "",
+      lastMessagePreview: nil,
+      lastMessageAt: nil,
+      unreadCount: 0,
+      myLastRead: nil,
+      otherLastRead: nil
+    )
+  }
+
+  func fetchMessages(
+    in conversationID: UUID,
+    query: ChatMessageQuery
+  ) async throws -> ChatMessagePage {
+    requestCount += 1
+    return ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
+  }
+
+  func sendText(
+    in conversationID: UUID,
+    text: String,
+    clientID: String
+  ) async throws -> ChatMessage {
+    requestCount += 1
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func sendImage(
+    in conversationID: UUID,
+    imageData: Data,
+    clientID: String
+  ) async throws -> ChatMessage {
+    requestCount += 1
+    throw ChatRepositoryError.conversationNotFound
+  }
+
+  func markRead(
+    in conversationID: UUID,
+    upTo messageID: UUID
+  ) async throws -> ChatReadState {
+    requestCount += 1
+    throw ChatRepositoryError.conversationNotFound
+  }
 }
