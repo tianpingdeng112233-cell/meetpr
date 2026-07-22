@@ -1,10 +1,11 @@
 import Foundation
 
-/// One muscle group the student marks as still fatigued, with a 1-3 severity
-/// (轻/中/重). Only `ReadinessCheckin.allowedMuscleGroups` are legal.
+/// One muscle group the student marks as sore, with a 1-4 severity
+/// (轻微/中等/明显酸痛/严重酸痛). Only
+/// `ReadinessCheckin.allowedMuscleGroups` are legal.
 public struct MuscleFatigue: Codable, Hashable, Sendable {
   public let muscleGroup: MuscleGroup
-  /// 1 轻 / 2 中 / 3 重
+  /// 1 轻微 / 2 中等 / 3 明显酸痛 / 4 严重酸痛
   public let severity: Int
 
   public init(muscleGroup: MuscleGroup, severity: Int) {
@@ -24,9 +25,12 @@ public struct ReadinessCheckin: Codable, Hashable, Sendable, Identifiable {
   public let checkinDate: String
   /// 1-5, 5 = best.
   public let sleepQuality: Int
+  /// 1-5, 5 = most energetic. Optional for records submitted before energy
+  /// was added to the readiness check-in.
+  public let energy: Int?
   /// 1-5, 5 = best.
   public let mood: Int
-  /// 1-5, 5 = most relaxed — all three scales point the same way so the coach
+  /// 1-5, 5 = most relaxed — all four scales point the same way so the coach
   /// never mentally inverts one. The stress UI inverts its anchor copy only.
   public let stress: Int
   public let muscleFatigue: [MuscleFatigue]
@@ -37,6 +41,7 @@ public struct ReadinessCheckin: Codable, Hashable, Sendable, Identifiable {
     studentId: UUID,
     checkinDate: String,
     sleepQuality: Int,
+    energy: Int? = nil,
     mood: Int,
     stress: Int,
     muscleFatigue: [MuscleFatigue],
@@ -46,6 +51,7 @@ public struct ReadinessCheckin: Codable, Hashable, Sendable, Identifiable {
     self.studentId = studentId
     self.checkinDate = checkinDate
     self.sleepQuality = sleepQuality
+    self.energy = energy
     self.mood = mood
     self.stress = stress
     self.muscleFatigue = muscleFatigue

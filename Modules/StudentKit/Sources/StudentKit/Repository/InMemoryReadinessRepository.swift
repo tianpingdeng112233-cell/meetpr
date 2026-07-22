@@ -3,6 +3,8 @@ import Foundation
 import RepositoryContracts
 
 public actor InMemoryReadinessRepository: ReadinessRepository {
+  /// Stores the complete domain value without projecting optional fields such
+  /// as energy, matching the backend repository's round-trip behavior.
   private var checkins: [String: ReadinessCheckin]
 
   public init(seed: [ReadinessCheckin] = []) {

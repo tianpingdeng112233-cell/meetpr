@@ -14,6 +14,7 @@ public struct MuscleFatigueDTO: Codable, Equatable, Sendable {
 public struct SubmitReadinessRequestDTO: Encodable, Equatable, Sendable {
   public let checkinDate: String
   public let sleepQuality: Int
+  public let energy: Int?
   public let mood: Int
   public let stress: Int
   public let muscleFatigue: [MuscleFatigueDTO]
@@ -21,12 +22,14 @@ public struct SubmitReadinessRequestDTO: Encodable, Equatable, Sendable {
   public init(
     checkinDate: String,
     sleepQuality: Int,
+    energy: Int? = nil,
     mood: Int,
     stress: Int,
     muscleFatigue: [MuscleFatigueDTO]
   ) {
     self.checkinDate = checkinDate
     self.sleepQuality = sleepQuality
+    self.energy = energy
     self.mood = mood
     self.stress = stress
     self.muscleFatigue = muscleFatigue
@@ -38,6 +41,7 @@ public struct ReadinessCheckinDTO: Codable, Equatable, Sendable {
   public let studentId: UUID
   public let checkinDate: String
   public let sleepQuality: Int
+  public let energy: Int?
   public let mood: Int
   public let stress: Int
   public let muscleFatigue: [MuscleFatigueDTO]
@@ -54,6 +58,7 @@ public struct ReadinessCheckinDTO: Codable, Equatable, Sendable {
       studentId: studentId,
       checkinDate: checkinDate,
       sleepQuality: sleepQuality,
+      energy: energy,
       mood: mood,
       stress: stress,
       muscleFatigue: fatigue,
