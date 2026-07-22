@@ -6,18 +6,21 @@ import RepositoryContracts
 /// Mutable working copy the 2-step sheet edits before submitting.
 public struct ReadinessDraft: Equatable, Sendable {
   public var sleepQuality: Int?
+  public var energy: Int?
   public var mood: Int?
   public var stress: Int?
-  /// muscleGroup → severity (1-3). Absent key = not fatigued.
+  /// muscleGroup → soreness severity (1-4). Absent key = completely not sore.
   public var fatigue: [MuscleGroup: Int]
 
   public init(
     sleepQuality: Int? = nil,
+    energy: Int? = nil,
     mood: Int? = nil,
     stress: Int? = nil,
     fatigue: [MuscleGroup: Int] = [:]
   ) {
     self.sleepQuality = sleepQuality
+    self.energy = energy
     self.mood = mood
     self.stress = stress
     self.fatigue = fatigue
@@ -25,6 +28,7 @@ public struct ReadinessDraft: Equatable, Sendable {
 
   public init(from checkin: ReadinessCheckin) {
     sleepQuality = checkin.sleepQuality
+    energy = checkin.energy
     mood = checkin.mood
     stress = checkin.stress
     fatigue = Dictionary(
@@ -32,7 +36,7 @@ public struct ReadinessDraft: Equatable, Sendable {
   }
 
   public var stepOneComplete: Bool {
-    sleepQuality != nil && mood != nil && stress != nil
+    sleepQuality != nil && energy != nil && mood != nil && stress != nil
   }
 }
 
@@ -109,8 +113,13 @@ public final class ReadinessCheckinViewModel {
   /// Returns true on success (the sheet dismisses); failure keeps the sheet
   /// up with an inline error.
   public func submit(_ draft: ReadinessDraft, studentId: UUID) async -> Bool {
-    guard let sleep = draft.sleepQuality, let mood = draft.mood, let stress = draft.stress else {
-      submitError = "请先完成三项状态评分"
+    guard
+      let sleep = draft.sleepQuality,
+      let energy = draft.energy,
+      let mood = draft.mood,
+      let stress = draft.stress
+    else {
+      submitError = "请先完成四项状态评分"
       return false
     }
     let checkin = ReadinessCheckin(
@@ -118,6 +127,7 @@ public final class ReadinessCheckinViewModel {
       studentId: studentId,
       checkinDate: todayString,
       sleepQuality: sleep,
+      energy: energy,
       mood: mood,
       stress: stress,
       muscleFatigue: ReadinessCheckin.allowedMuscleGroups.compactMap { group in

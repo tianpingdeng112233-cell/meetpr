@@ -47,7 +47,7 @@ private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-1
     now: { frozenNow }
   )
   let submitted = await viewModel.submit(
-    ReadinessDraft(sleepQuality: 4, mood: 3, stress: 2, fatigue: [.quad: 3]),
+    ReadinessDraft(sleepQuality: 4, energy: 5, mood: 3, stress: 2, fatigue: [.quad: 3]),
     studentId: studentId
   )
   #expect(submitted)
@@ -56,6 +56,7 @@ private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-1
     return
   }
   #expect(checkin.checkinDate == viewModel.todayString)
+  #expect(checkin.energy == 5)
   #expect(checkin.muscleFatigue == [MuscleFatigue(muscleGroup: .quad, severity: 3)])
 
   // A fresh VM over the same repo lands on .done straight from load.
@@ -97,14 +98,15 @@ private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-1
     repo: repo, skipStore: FakeSkipStore(), now: { frozenNow })
 
   _ = await viewModel.submit(
-    ReadinessDraft(sleepQuality: 2, mood: 2, stress: 2), studentId: studentId)
+    ReadinessDraft(sleepQuality: 2, energy: 2, mood: 2, stress: 2), studentId: studentId)
   _ = await viewModel.submit(
-    ReadinessDraft(sleepQuality: 5, mood: 5, stress: 5, fatigue: [.back: 2]),
+    ReadinessDraft(sleepQuality: 5, energy: 4, mood: 5, stress: 5, fatigue: [.back: 2]),
     studentId: studentId)
 
   let stored = try? await repo.fetchCheckin(
     studentId: studentId, checkinDate: viewModel.todayString)
   #expect(stored?.sleepQuality == 5)
+  #expect(stored?.energy == 4)
   #expect(stored?.muscleFatigue == [MuscleFatigue(muscleGroup: .back, severity: 2)])
 }
 
@@ -117,7 +119,7 @@ private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-1
   )
   await viewModel.load(studentId: UUID())
   let success = await viewModel.submit(
-    ReadinessDraft(sleepQuality: 3, mood: 3, stress: 3), studentId: UUID())
+    ReadinessDraft(sleepQuality: 3, energy: 3, mood: 3, stress: 3), studentId: UUID())
   #expect(!success)
   #expect(viewModel.submitError != nil)
   #expect(viewModel.gate == .needed, "failure must not flip the gate")
@@ -131,7 +133,7 @@ private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-1
     now: { frozenNow }
   )
   let success = await viewModel.submit(
-    ReadinessDraft(sleepQuality: 4, mood: nil, stress: 2), studentId: UUID())
+    ReadinessDraft(sleepQuality: 4, energy: nil, mood: 3, stress: 2), studentId: UUID())
   #expect(!success)
   #expect(viewModel.submitError != nil)
 }

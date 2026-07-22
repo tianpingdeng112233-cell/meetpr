@@ -20,6 +20,7 @@ public actor BackendReadinessRepository: ReadinessRepository {
       SubmitReadinessRequestDTO(
         checkinDate: checkin.checkinDate,
         sleepQuality: checkin.sleepQuality,
+        energy: checkin.energy,
         mood: checkin.mood,
         stress: checkin.stress,
         muscleFatigue: checkin.muscleFatigue.map {

@@ -244,6 +244,7 @@ public enum StudentDemoSeed {
         studentId: studentID,
         checkinDate: formatter.string(from: yesterday),
         sleepQuality: 4,
+        energy: 4,
         mood: 3,
         stress: 2,
         muscleFatigue: [

@@ -9,6 +9,7 @@ import Testing
     studentId: UUID(),
     checkinDate: "2026-06-11",
     sleepQuality: 4,
+    energy: 5,
     mood: 3,
     stress: 2,
     muscleFatigue: [
@@ -21,6 +22,7 @@ import Testing
   let decoded = try JSONDecoder().decode(ReadinessCheckin.self, from: data)
   #expect(decoded == checkin)
   #expect(decoded.checkinDate == "2026-06-11")
+  #expect(decoded.energy == 5)
 }
 
 @Test func allowedMuscleGroupsAreExactlyEightUniqueCases() {

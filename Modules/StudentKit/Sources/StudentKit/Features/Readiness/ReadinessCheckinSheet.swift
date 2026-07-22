@@ -2,9 +2,9 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
-/// Two-step pre-workout check-in (spec 030 §C5). Step 1: three 5-dot scales
-/// (all must be picked). Step 2: fatigued muscle chips with a tap-to-cycle
-/// severity (轻→中→重→off); none selected is a legal answer.
+/// Two-step pre-workout check-in (spec 030 §C5). Step 1: four 5-dot scales
+/// (all must be picked). Step 2: sore muscle chips with a tap-to-cycle
+/// severity (轻微→中等→明显酸痛→严重酸痛→完全无酸痛); none selected is legal.
 @available(iOS 17.0, macOS 14.0, *)
 struct ReadinessCheckinSheet: View {
   let studentID: UUID
@@ -67,42 +67,33 @@ struct ReadinessCheckinSheet: View {
   private var stepOne: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       scaleRow(
-        title: "昨晚睡得怎么样？",
-        lowAnchor: "很差",
-        highAnchor: "很好",
+        scale: .sleepQuality,
         value: $draft.sleepQuality
       )
       scaleRow(
-        title: "今天状态如何？",
-        lowAnchor: "很糟",
-        highAnchor: "很棒",
-        value: $draft.mood
+        scale: .energy,
+        value: $draft.energy
       )
-      // Data stays 5 = most relaxed; only the anchor copy inverts.
       scaleRow(
-        title: "今天压力大吗？",
-        lowAnchor: "压力爆表",
-        highAnchor: "很轻松",
+        scale: .stress,
         value: $draft.stress
+      )
+      scaleRow(
+        scale: .mood,
+        value: $draft.mood
       )
     }
   }
 
   private func scaleRow(
-    title: String,
-    lowAnchor: String,
-    highAnchor: String,
+    scale: ReadinessScale,
     value: Binding<Int?>
   ) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-      Text(title)
+      Text(scale.title)
         .font(Font.MeetPR.bodyEmphasis)
         .foregroundStyle(Color.MeetPR.fgPrimary)
       HStack(spacing: MeetPRSpacing.sm) {
-        Text(lowAnchor)
-          .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .frame(width: 56, alignment: .leading)
         ForEach(1...5, id: \.self) { level in
           Button {
             value.wrappedValue = level
@@ -119,24 +110,33 @@ struct ReadinessCheckinSheet: View {
               )
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("\(title) \(level) 分")
+          .accessibilityLabel("\(scale.title)，\(scale.label(for: level) ?? "\(level) 分")")
         }
-        Text(highAnchor)
-          .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .frame(width: 56, alignment: .trailing)
       }
+      // Dots and the picked-tier copy stay leading-aligned with the question.
+      // They were centred while the row still had the 56pt anchor labels on
+      // both ends; without those, centring leaves a dead gutter on the left
+      // and reads as misaligned against the title.
+      Text(value.wrappedValue.flatMap(scale.label(for:)) ?? "请选择一档")
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(
+          value.wrappedValue == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary
+        )
     }
+    // The row must still claim the full width — otherwise the step collapses
+    // to the widest child (the 5 dots) and the sheet renders as a narrow
+    // column. Width comes from the frame, alignment keeps the content leading.
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   // MARK: - Step 2
 
   private var stepTwo: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-      Text("今天哪些肌群还累？")
+      Text("今天哪些肌群酸痛？")
         .font(Font.MeetPR.bodyEmphasis)
         .foregroundStyle(Color.MeetPR.fgPrimary)
-      Text("点一下：轻 → 中 → 重 → 取消。不累可以直接完成。")
+      Text("点按肌群：轻微 → 中等 → 明显酸痛 → 严重酸痛 → 完全无酸痛。不点就是完全无酸痛。")
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
 
@@ -144,8 +144,9 @@ struct ReadinessCheckinSheet: View {
         groups: ReadinessCheckin.allowedMuscleGroups,
         severity: { draft.fatigue[$0] },
         onTap: { group in
-          let next = ((draft.fatigue[group] ?? 0) + 1) % 4
-          draft.fatigue[group] = next == 0 ? nil : next
+          draft.fatigue[group] = ReadinessMuscleSoreness.nextSeverity(
+            after: draft.fatigue[group]
+          )
         }
       )
 
@@ -189,7 +190,8 @@ struct ReadinessCheckinSheet: View {
   }
 }
 
-/// Wrapping chip grid for the 8 whitelisted groups; severity shown as dots.
+/// Wrapping chip grid for the 8 whitelisted groups; severity uses the exact
+/// student-facing soreness copy instead of an unlabeled number.
 @available(iOS 17.0, macOS 14.0, *)
 private struct FlowChips: View {
   let groups: [MuscleGroup]
@@ -208,8 +210,8 @@ private struct FlowChips: View {
           VStack(spacing: 2) {
             Text(Self.displayName(group))
               .font(Font.MeetPR.footnote)
-            Text(level.map { String(repeating: "·", count: $0) } ?? " ")
-              .font(Font.MeetPR.monoLabel)
+            Text(ReadinessMuscleSoreness.label(for: level))
+              .font(Font.MeetPR.caption)
           }
           .padding(.horizontal, MeetPRSpacing.sm)
           .padding(.vertical, 8)
@@ -224,7 +226,9 @@ private struct FlowChips: View {
           )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(Self.displayName(group))，疲劳度 \(level ?? 0)")
+        .accessibilityLabel(
+          "\(Self.displayName(group))，\(ReadinessMuscleSoreness.label(for: level))"
+        )
       }
     }
   }
