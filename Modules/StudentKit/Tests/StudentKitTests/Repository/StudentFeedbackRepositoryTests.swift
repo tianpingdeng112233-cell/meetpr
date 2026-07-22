@@ -46,3 +46,20 @@ import Testing
   #expect(item.readAt == nil)
   #expect(inbox.map(\.id) == [item.id])
 }
+
+@Test func feedbackRepositoryPreservesVideoIDAndResolvesPlaybackURL() async throws {
+  let videoID = UUID()
+  let url = try #require(URL(string: "https://oss.example.com/video.mp4"))
+  let repository = InMemoryStudentFeedbackRepository(playbackURLs: [videoID: url])
+
+  let item = try await repository.postFeedback(
+    studentID: StudentDemoSeed.studentID,
+    dayDate: nil,
+    planExerciseID: nil,
+    videoID: videoID,
+    text: "视频反馈"
+  )
+
+  #expect(item.videoID == videoID)
+  #expect(try await repository.playbackURL(videoID: videoID) == url)
+}

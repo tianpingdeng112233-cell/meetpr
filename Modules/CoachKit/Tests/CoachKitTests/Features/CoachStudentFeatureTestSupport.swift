@@ -229,6 +229,7 @@ actor StubFeedbackRepository: StudentFeedbackRepository {
     let studentID: UUID
     let dayDate: Date?
     let planExerciseID: UUID?
+    let videoID: UUID?
     let text: String
   }
 
@@ -251,12 +252,29 @@ actor StubFeedbackRepository: StudentFeedbackRepository {
     planExerciseID: UUID?,
     text: String
   ) async throws -> CoachFeedback {
+    try await postFeedback(
+      studentID: studentID,
+      dayDate: dayDate,
+      planExerciseID: planExerciseID,
+      videoID: nil,
+      text: text
+    )
+  }
+
+  func postFeedback(
+    studentID: UUID,
+    dayDate: Date?,
+    planExerciseID: UUID?,
+    videoID: UUID?,
+    text: String
+  ) async throws -> CoachFeedback {
     if let postError { throw postError }
     postedRequests.append(
       PostedFeedbackRequest(
         studentID: studentID,
         dayDate: dayDate,
         planExerciseID: planExerciseID,
+        videoID: videoID,
         text: text
       )
     )
@@ -269,6 +287,7 @@ actor StubFeedbackRepository: StudentFeedbackRepository {
       studentID: studentID,
       dayDate: dayDate,
       planExerciseID: planExerciseID,
+      videoID: videoID,
       text: text,
       postedAt: CoachStudentFeatureFixtures.startDate.addingTimeInterval(4 * 86_400),
       readAt: nil
@@ -281,6 +300,10 @@ actor StubFeedbackRepository: StudentFeedbackRepository {
 
   func postedTexts() -> [String] {
     postedRequests.map(\.text)
+  }
+
+  func postedVideoIDs() -> [UUID?] {
+    postedRequests.map(\.videoID)
   }
 }
 

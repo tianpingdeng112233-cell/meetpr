@@ -39,12 +39,29 @@ public actor BackendStudentFeedbackRepository: StudentFeedbackRepository {
     planExerciseID: UUID?,
     text: String
   ) async throws -> CoachFeedback {
+    try await postFeedback(
+      studentID: studentID,
+      dayDate: dayDate,
+      planExerciseID: planExerciseID,
+      videoID: nil,
+      text: text
+    )
+  }
+
+  public func postFeedback(
+    studentID: UUID,
+    dayDate: Date?,
+    planExerciseID: UUID?,
+    videoID: UUID?,
+    text: String
+  ) async throws -> CoachFeedback {
     let token = try await session.accessToken()
     let response = try await api.createFeedback(
       CreateFeedbackRequestDTO(
         studentID: studentID,
         dayDate: dayDate,
         planExerciseID: planExerciseID,
+        videoID: videoID,
         text: text
       ),
       accessToken: token
@@ -56,6 +73,15 @@ public actor BackendStudentFeedbackRepository: StudentFeedbackRepository {
     try await cache.save(
       feedback: cached.sorted { $0.postedAt > $1.postedAt }, studentID: studentID)
     return item
+  }
+
+  public func playbackURL(videoID: UUID) async throws -> URL {
+    let token = try await session.accessToken()
+    let response = try await api.attachmentURL(attachmentID: videoID, accessToken: token)
+    guard let url = URL(string: response.url) else {
+      throw StudentFeedbackRepositoryError.videoPlaybackUnavailable
+    }
+    return url
   }
 
   public func markRead(feedbackID: UUID) async throws {

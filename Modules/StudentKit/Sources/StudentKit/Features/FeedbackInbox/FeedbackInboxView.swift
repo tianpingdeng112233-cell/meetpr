@@ -27,7 +27,7 @@ public struct FeedbackInboxView: View {
               VStack(spacing: 12) {
                 ForEach(items) { item in
                   NavigationLink {
-                    FeedbackDetailView(item: item)
+                    FeedbackDetailView(item: item, viewModel: viewModel)
                       .task { await viewModel.markRead(item) }
                   } label: {
                     FeedbackCard(item: item)

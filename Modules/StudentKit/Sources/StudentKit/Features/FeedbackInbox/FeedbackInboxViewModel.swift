@@ -59,4 +59,9 @@ public final class FeedbackInboxViewModel {
       state = .error(error.localizedDescription)
     }
   }
+
+  /// Exchanges a fresh URL both for the initial tap and for in-player expiry retry.
+  public func playbackURL(videoID: UUID) async throws -> URL {
+    try await repository.playbackURL(videoID: videoID)
+  }
 }
