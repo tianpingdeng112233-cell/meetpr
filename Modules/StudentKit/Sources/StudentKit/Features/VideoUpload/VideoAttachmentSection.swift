@@ -174,7 +174,7 @@ struct VideoAttachmentSection: View {
   private var pickButtons: some View {
     HStack(spacing: 10) {
       #if os(iOS)
-        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+        if CameraVideoPicker.isAvailable {
           actionChip("拍摄", systemImage: "video") { requestPick(.camera) }
         }
       #endif

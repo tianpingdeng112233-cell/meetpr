@@ -27,6 +27,10 @@ public struct TodayWorkoutView: View {
   @State private var selectedDate: Date
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
+  @State private var directCameraTarget: DirectCameraTarget?
+  @State private var showingDirectCameraConsent = false
+  @State private var showingDirectCamera = false
+  @State private var preparingVideoSetID: UUID?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
   @State private var showingNotifications = false
@@ -202,6 +206,17 @@ public struct TodayWorkoutView: View {
     } message: {
       Text(viewModel.actionErrorMessage ?? "")
     }
+    .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingDirectCameraConsent) {
+      Button(VideoPrivacyCopy.consentAgree) {
+        videoViewModel.recordConsent()
+        showingDirectCamera = directCameraTarget != nil
+      }
+      Button(VideoPrivacyCopy.consentDecline, role: .cancel) {
+        directCameraTarget = nil
+      }
+    } message: {
+      Text(VideoPrivacyCopy.consentBody)
+    }
     .confirmationDialog(
       "视频上传失败", isPresented: retryDialogPresented, titleVisibility: .visible
     ) {
@@ -219,6 +234,34 @@ public struct TodayWorkoutView: View {
     } message: {
       Text("视频仍保存在本机,可直接重试上传。")
     }
+    #if os(iOS)
+      .fullScreenCover(
+        isPresented: $showingDirectCamera,
+        onDismiss: { directCameraTarget = nil },
+        content: {
+          CameraVideoPicker(
+            maxDurationSeconds: videoViewModel.maxDurationSeconds,
+            isPresented: $showingDirectCamera,
+            onPicked: { url in
+              guard let target = directCameraTarget else {
+                try? FileManager.default.removeItem(at: url)
+                videoViewModel.reportVideoProcessingFailure()
+                return
+              }
+              preparingVideoSetID = target.id
+              Task {
+                await VideoLibrarySaver.save(url)
+                await attachDirectCameraVideo(sourceURL: url, target: target)
+              }
+            },
+            onFailure: {
+              videoViewModel.reportVideoProcessingFailure()
+            }
+          )
+          .ignoresSafeArea()
+        }
+      )
+    #endif
     .task {
       let isFirstLoad = viewModel.state == .idle
       if isFirstLoad {
@@ -504,22 +547,28 @@ public struct TodayWorkoutView: View {
       .buttonStyle(.plain)
 
       Button {
-        // A failed upload routes straight to retry: the set already cost the
-        // student real fatigue and can't be re-done, so the recording must
-        // never be one buried menu away (David, beta 2026-07-11).
-        if let failedSetLogID = failedVideoSetLogID(for: draft) {
-          retryTargetSetLogID = failedSetLogID
-        } else {
+        switch SetVideoButtonDestination.resolve(
+          for: videoRowState(for: draft)?.attachment.status,
+          cameraAvailable: cameraAvailable
+        ) {
+        case .camera:
+          beginDirectCamera(for: draft)
+        case .details:
           editing = EditingTarget(
             id: draft.id,
             rowIndex: rowIndex,
             draft: draft,
             setNumber: setNumber,
             scrollToVideo: true)
+        case .retry:
+          // A failed upload routes straight to retry: the set already cost the
+          // student real fatigue and can't be re-done, so the recording must
+          // never be one buried menu away (David, beta 2026-07-11).
+          retryTargetSetLogID = draft.loggedSetID
         }
       } label: {
         SetVideoUploadIndicator(
-          status: videoRowState(for: draft)?.attachment.status,
+          status: videoIndicatorStatus(for: draft),
           progress: videoRowState(for: draft)?.progress ?? 0,
           size: 20
         )
@@ -529,6 +578,7 @@ public struct TodayWorkoutView: View {
         }
       }
       .buttonStyle(.plain)
+      .disabled(preparingVideoSetID == draft.id)
     }
   }
 
@@ -654,7 +704,7 @@ public struct TodayWorkoutView: View {
           .onTapGesture { retryTargetSetLogID = failedSetLogID }
       } else {
         SetVideoUploadIndicator(
-          status: videoRowState(for: draft)?.attachment.status,
+          status: videoIndicatorStatus(for: draft),
           progress: videoRowState(for: draft)?.progress ?? 0,
           size: 16
         )
@@ -714,9 +764,62 @@ public struct TodayWorkoutView: View {
     return videoViewModel.rowStates[setLogID]
   }
 
+  private func videoIndicatorStatus(
+    for draft: TodayWorkoutViewModel.SetRowDraft
+  ) -> VideoAttachment.Status? {
+    if preparingVideoSetID == draft.id { return .pending }
+    return videoRowState(for: draft)?.attachment.status
+  }
+
   private func failedVideoSetLogID(for draft: TodayWorkoutViewModel.SetRowDraft) -> UUID? {
     guard videoRowState(for: draft)?.attachment.status == .failed else { return nil }
     return draft.loggedSetID
+  }
+
+  private var cameraAvailable: Bool {
+    #if os(iOS)
+      CameraVideoPicker.isAvailable
+    #else
+      false
+    #endif
+  }
+
+  private func beginDirectCamera(for draft: TodayWorkoutViewModel.SetRowDraft) {
+    directCameraTarget = DirectCameraTarget(id: draft.id)
+    if videoViewModel.hasConsented {
+      showingDirectCamera = true
+    } else {
+      showingDirectCameraConsent = true
+    }
+  }
+
+  private func attachDirectCameraVideo(
+    sourceURL: URL,
+    target: DirectCameraTarget
+  ) async {
+    let rowIndex = viewModel.currentDrafts?.firstIndex { $0.id == target.id }
+    let liveDraft = rowIndex.flatMap { viewModel.currentDrafts?[$0] }
+    let setLogID: UUID?
+    if let loggedSetID = liveDraft?.loggedSetID {
+      setLogID = loggedSetID
+    } else if let rowIndex {
+      setLogID = await viewModel.ensureLoggedSetID(rowIndex: rowIndex)
+    } else {
+      setLogID = nil
+    }
+
+    guard let setLogID else {
+      try? FileManager.default.removeItem(at: sourceURL)
+      videoViewModel.reportVideoProcessingFailure()
+      preparingVideoSetID = nil
+      return
+    }
+    await videoViewModel.attach(
+      sourceURL: sourceURL,
+      setLogID: setLogID,
+      studentID: studentID
+    )
+    preparingVideoSetID = nil
   }
 
   private var retryDialogPresented: Binding<Bool> {
@@ -840,5 +943,9 @@ private struct EditingTarget: Identifiable {
   let draft: TodayWorkoutViewModel.SetRowDraft
   let setNumber: Int
   let scrollToVideo: Bool
+}
+
+private struct DirectCameraTarget {
+  let id: UUID
 }
 // swiftlint:enable file_length type_body_length

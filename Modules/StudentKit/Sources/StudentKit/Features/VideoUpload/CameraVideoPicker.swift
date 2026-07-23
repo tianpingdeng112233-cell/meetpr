@@ -52,6 +52,12 @@ enum CameraCaptureHandoff: Equatable {
     let onPicked: (URL) -> Void
     let onFailure: () -> Void
 
+    static var isAvailable: Bool {
+      UIImagePickerController.isSourceTypeAvailable(.camera)
+        && (UIImagePickerController.availableMediaTypes(for: .camera)?
+          .contains(UTType.movie.identifier) == true)
+    }
+
     func makeUIViewController(context: Context) -> UIImagePickerController {
       let picker = UIImagePickerController()
       picker.sourceType = .camera

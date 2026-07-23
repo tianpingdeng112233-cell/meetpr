@@ -5,6 +5,18 @@ import Testing
 
 @testable import StudentKit
 
+@Test func setVideoButtonOpensCameraOnlyForAnUnattachedSetOnCameraDevices() {
+  #expect(SetVideoButtonDestination.resolve(for: nil, cameraAvailable: true) == .camera)
+  #expect(SetVideoButtonDestination.resolve(for: nil, cameraAvailable: false) == .details)
+}
+
+@Test func setVideoButtonPreservesExistingUploadManagementRoutes() {
+  #expect(SetVideoButtonDestination.resolve(for: .pending, cameraAvailable: true) == .details)
+  #expect(SetVideoButtonDestination.resolve(for: .uploading, cameraAvailable: true) == .details)
+  #expect(SetVideoButtonDestination.resolve(for: .uploaded, cameraAvailable: true) == .details)
+  #expect(SetVideoButtonDestination.resolve(for: .failed, cameraAvailable: true) == .retry)
+}
+
 @Test func setVideoUploadIndicatorStyleMapsEveryUploadStatus() {
   #expect(SetVideoUploadIndicatorStyle.resolve(for: nil, progress: 0) == .unattached)
   #expect(

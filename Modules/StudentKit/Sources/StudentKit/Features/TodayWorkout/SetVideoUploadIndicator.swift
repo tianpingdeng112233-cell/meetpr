@@ -2,6 +2,26 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
+enum SetVideoButtonDestination: Equatable, Sendable {
+  case camera
+  case details
+  case retry
+
+  static func resolve(
+    for status: VideoAttachment.Status?,
+    cameraAvailable: Bool
+  ) -> SetVideoButtonDestination {
+    switch status {
+    case .none:
+      cameraAvailable ? .camera : .details
+    case .failed:
+      .retry
+    case .pending, .uploading, .uploaded:
+      .details
+    }
+  }
+}
+
 /// Visual language (David 2026-07-11): always the same camera glyph, only the
 /// stroke color changes — gray when no video, a progress-proportional
 /// foreground sweep while uploading, green on success, red on failure.
