@@ -18,7 +18,7 @@
 
 ---
 
-## 1.0 (14) — 2026-07-24 — 🟢 已上传(Neice 免审生效;外测 Ceshi 已提交 Beta App Review)
+## 1.0 (14) — 2026-07-24 — 🟢 已上传(Neice 免审生效;**外测 Ceshi 同日已过 Beta App Review,在 Testing**)
 - 打包来源:tag `beta/1.0-14` @ 7125a21(`release/1.0`,1.0(13) 基底小步直推;tag = 发版线 tip,零落差)
 - tag CI 绿(run 30101801797)
 - 两端 demo(模拟器)已从本 tag 现建同步(CFBundleVersion=14,教练 iPhone 17 / 学员 iPhone 17 Pro 各截图留证)
