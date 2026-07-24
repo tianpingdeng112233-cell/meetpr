@@ -7,16 +7,22 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   private let api: APIClient
   private let session: any SessionStateReader
   private let cache: StudentPlanCache
+  private let calendar: Calendar
+  private let now: @Sendable () -> Date
   private var catalog: [UUID: Exercise] = [:]
 
   public init(
     api: APIClient,
     session: any SessionStateReader,
-    cache: StudentPlanCache = StudentPlanCache()
+    cache: StudentPlanCache = StudentPlanCache(),
+    calendar: Calendar = .current,
+    now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.api = api
     self.session = session
     self.cache = cache
+    self.calendar = calendar
+    self.now = now
   }
 
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
@@ -33,9 +39,13 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
       return nil
     }
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
-    return plan.days.first { calendar.isDate($0.date, inSameDayAs: date) }
+    return plan.days.first {
+      PlanCalendarDayIdentity.matches(
+        planDate: $0.date,
+        selectedDate: date,
+        selectedCalendar: calendar
+      )
+    }
   }
 
   public func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
@@ -102,7 +112,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     let projection = StudentPlanProjection.project(
       tree: tree,
       catalog: exercises,
-      weekIndex: Self.currentWeekIndex(for: tree.plan)
+      weekIndex: currentWeekIndex(for: tree.plan)
     )
     try await cache.save(plan: projection, studentID: studentID)
     return projection
@@ -154,12 +164,13 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     PlanShiftError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
   }
 
-  private static func currentWeekIndex(for plan: TrainingPlan) -> Int {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
-    let start = calendar.startOfDay(for: plan.startDate)
-    let today = calendar.startOfDay(for: Date())
-    let elapsedDays = calendar.dateComponents([.day], from: start, to: today).day ?? 0
+  func currentWeekIndex(for plan: TrainingPlan) -> Int {
+    let elapsedDays =
+      PlanCalendarDayIdentity.dayOffset(
+        fromPlanDate: plan.startDate,
+        toSelectedDate: now(),
+        selectedCalendar: calendar
+      ) ?? 0
     let week = max(1, elapsedDays / 7 + 1)
     return min(week, plan.planWeeks)
   }
