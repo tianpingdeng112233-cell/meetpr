@@ -34,6 +34,7 @@ public final class TodayWorkoutViewModel {
   private let e1rmRepo: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  private let calendar: Calendar
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
@@ -46,6 +47,7 @@ public final class TodayWorkoutViewModel {
     onboarding: (any OnboardingProfileReading)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
+    calendar: Calendar = .current,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
@@ -53,6 +55,7 @@ public final class TodayWorkoutViewModel {
     self.e1rmRepo = e1rm
     self.onboarding = onboarding
     self.restTimerSettings = restTimerSettings
+    self.calendar = calendar
     self.now = now
   }
 
@@ -65,7 +68,7 @@ public final class TodayWorkoutViewModel {
       onboardingProfile = try? await onboarding?.fetchProfile(studentId: studentID)
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       guard isCurrentLoad(generation) else { return }
-      planContext = Self.planContext(from: plan, selectedDate: date)
+      planContext = Self.planContext(from: plan, selectedDate: date, calendar: calendar)
 
       guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
         guard isCurrentLoad(generation) else { return }
@@ -99,7 +102,13 @@ public final class TodayWorkoutViewModel {
     date: Date,
     studentID: UUID
   ) async throws -> StudentPlanDay? {
-    if let day = plan?.days.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
+    if let day = plan?.days.first(where: {
+      PlanCalendarDayIdentity.matches(
+        planDate: $0.date,
+        selectedDate: date,
+        selectedCalendar: calendar
+      )
+    }) {
       return day
     }
     return try await plans.fetchDay(studentID: studentID, date: date)
@@ -291,21 +300,35 @@ public final class TodayWorkoutViewModel {
 
   private static func planContext(
     from plan: StudentPlanView?,
-    selectedDate: Date
+    selectedDate: Date,
+    calendar: Calendar
   ) -> TodayWorkoutPlanContext? {
     guard let plan else { return nil }
     return TodayWorkoutPlanContext(
       planKind: plan.planKind,
-      weekIndex: weekIndex(for: selectedDate, startDate: plan.startDate, fallback: plan.weekIndex),
+      weekIndex: weekIndex(
+        for: selectedDate,
+        startDate: plan.startDate,
+        fallback: plan.weekIndex,
+        calendar: calendar
+      ),
       startDate: plan.startDate
     )
   }
 
-  private static func weekIndex(for date: Date, startDate: Date, fallback: Int) -> Int {
-    let calendar = Calendar.current
-    let start = calendar.startOfDay(for: startDate)
-    let selected = calendar.startOfDay(for: date)
-    guard let elapsedDays = calendar.dateComponents([.day], from: start, to: selected).day else {
+  private static func weekIndex(
+    for date: Date,
+    startDate: Date,
+    fallback: Int,
+    calendar: Calendar
+  ) -> Int {
+    guard
+      let elapsedDays = PlanCalendarDayIdentity.dayOffset(
+        fromPlanDate: startDate,
+        toSelectedDate: date,
+        selectedCalendar: calendar
+      )
+    else {
       return fallback
     }
     return max(1, elapsedDays / 7 + 1)
