@@ -47,7 +47,7 @@
 - [ ] 捞回队列余项逐个落线:per-set 逐组目标 / rename-student / #215'/#217' 裁剪卡(等 Claude)/
       #234a 非 UI 拆包(等 Claude),状态见 [AGENTS.md §发版直推流](./AGENTS.md) 捞回队列表
 - [ ] gym-day 残留对齐:今日 tab 头条/周历高亮仍午夜翻篇(纯视觉),待全量对齐 spec
-- [ ] build 号 bump 14(prep-beta,agvtool 单源)+ 打 tag `beta/1.0-14`
+- [x] build 号 bump 14(prep-beta,agvtool 单源)+ 打 tag `beta/1.0-14`(2026-07-24 切包)
 - [ ] David:Archive → Upload → 分配 Neice(+外测 Ceshi 视审核情况)
 
 ## 收尾约定
