@@ -33,6 +33,10 @@ import SwiftUI
   public static let sparkStagger = 0.018
   public static let riseInitialDelay = 0.02
   public static let riseStagger = 0.04
+  /// State A → B reveal on the training screen (§4.2): cards fan in after the
+  /// hero settles.
+  public static let recordingRevealDelay = 0.36
+  public static let recordingRevealStagger = 0.09
 
   public static let press = Animation.easeInOut(duration: durationPress)
   public static let screen = Animation.timingCurve(

@@ -27,6 +27,8 @@ public struct TodayWorkoutView: View {
   @State private var videoViewModel: VideoAttachmentViewModel
   @State private var selectedDate: Date
   @State private var showingSummary = false
+  /// Two-state flow (§4.2): false = overview (state A), true = recording (B).
+  @State private var sessionStarted = false
   @State private var editing: EditingTarget?
   @State private var directCameraTarget: DirectCameraTarget?
   @State private var showingDirectCameraConsent = false
@@ -105,17 +107,9 @@ public struct TodayWorkoutView: View {
         .padding(.top, MeetPRSpacing.point6)
         .meetPRRiseIn(index: 0)
 
-        TrainingCalendarView(
-          studentID: studentID,
-          selectedDate: $selectedDate,
-          plans: plans,
-          logs: logs,
-          planRevision: planRevision
-        )
-        .padding(.horizontal)
-        .padding(.top)
-        .meetPRRiseIn(index: 1)
-
+        // The handoff spec's training screen has no calendar (David
+        // 2026-07-26): day browsing lives on 今日's week strip, this tab is
+        // the overview → recording flow only.
         Group {
           switch viewModel.state {
           case .idle, .loading:
@@ -342,24 +336,46 @@ public struct TodayWorkoutView: View {
     // future days a preview, so logging/completing can't be triggered by
     // mistake (previously any browsed day accepted set records + completion).
     let isEditable = WorkoutDatePolicy.isEditable(day.date)
+    // Handoff §4.2 two-state flow: state A is a pure overview (no set rows),
+    // state B is the recording surface. Any logged set re-enters B directly.
+    let isOverview =
+      isEditable && !sessionStarted && activeIndex != nil && !drafts.contains(where: \.completed)
     return ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
         if !isEditable {
           readOnlyNotice(for: day.date)
         }
 
-        if let activeIndex {
-          activeSetHero(day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable)
+        if isOverview {
+          overviewHero(day: day, drafts: drafts)
             .meetPRRiseIn(index: 2)
+        } else {
+          if let activeIndex {
+            activeSetHero(
+              day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
+            )
+            .meetPRRiseIn(index: 2)
+          }
+
+          exerciseSections(
+            day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
+          )
+          .meetPRRiseIn(
+            index: 3,
+            initialDelay: sessionStarted
+              ? MeetPRMotion.recordingRevealDelay : MeetPRMotion.riseInitialDelay,
+            stagger: sessionStarted ? MeetPRMotion.recordingRevealStagger : MeetPRMotion.riseStagger
+          )
+
+          completionControls(drafts: drafts, day: day, isEditable: isEditable)
+            .meetPRRiseIn(
+              index: 4,
+              initialDelay: sessionStarted
+                ? MeetPRMotion.recordingRevealDelay : MeetPRMotion.riseInitialDelay,
+              stagger: sessionStarted
+                ? MeetPRMotion.recordingRevealStagger : MeetPRMotion.riseStagger
+            )
         }
-
-        exerciseSections(
-          day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
-        )
-        .meetPRRiseIn(index: 3)
-
-        completionControls(drafts: drafts, day: day, isEditable: isEditable)
-          .meetPRRiseIn(index: 4)
       }
       .padding(MeetPRSpacing.space4)
     }
@@ -447,6 +463,80 @@ public struct TodayWorkoutView: View {
       setCount: setCount,
       durationMilliseconds: max(0, Int(Date().timeIntervalSince(startedAt) * 1_000)))
     workoutStartedAt.wrappedValue = nil
+  }
+
+  // MARK: - Overview (state A)
+
+  /// Handoff §4.2 state A: hero summary plus exercise preview rows, no set
+  /// tables, closed by the big start button. Estimated length assumes ~4
+  /// minutes per set including rest.
+  private func overviewHero(
+    day: StudentPlanDay,
+    drafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> some View {
+    let exerciseCount = day.exercises.count
+    let estMinutes = max(10, drafts.count * 4)
+    return VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+        Text(navTitle)
+          .font(.MeetPR.display(size: 22, weight: .extraBold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text("共 \(exerciseCount) 个动作 · 约 \(estMinutes) 分钟")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+      }
+
+      VStack(spacing: MeetPRSpacing.space2) {
+        ForEach(Array(day.exercises.enumerated()), id: \.element.id) { pair in
+          overviewPreviewRow(number: pair.offset + 1, exercise: pair.element)
+        }
+      }
+
+      BrandPrimaryButton(
+        "开始第一组",
+        systemImage: "play.fill",
+        showsShimmer: true,
+        isFullWidth: true
+      ) {
+        withAnimation(MeetPRMotion.screen) { sessionStarted = true }
+      }
+    }
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceFocus)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+    .overlay(alignment: .leading) {
+      LinearGradient(
+        colors: [Color.MeetPR.gold300, Color.MeetPR.gold400, Color.MeetPR.gold500],
+        startPoint: .top,
+        endPoint: .bottom
+      )
+      .frame(width: 3)
+    }
+    .meetPRGoldGlow()
+  }
+
+  private func overviewPreviewRow(number: Int, exercise: StudentPlanExercise) -> some View {
+    HStack(spacing: MeetPRSpacing.space3) {
+      Text("\(number)")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+        .foregroundStyle(Color.MeetPR.gold500)
+        .frame(width: 22, height: 22)
+        .background(Color.MeetPR.goldSoft)
+        .clipShape(.rect(cornerRadius: 7))
+      Text(exercise.exercise.name)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .lineLimit(1)
+      Spacer(minLength: MeetPRSpacing.space2)
+      Text("\(exercise.prescribedSets.count) 组")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+        .lineLimit(1)
+    }
+    .padding(.horizontal, MeetPRSpacing.point13)
+    .padding(.vertical, MeetPRSpacing.point11)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .meetPRCardSurface(.inset)
   }
 
   // MARK: - Read-only notice
