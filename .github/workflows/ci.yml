@@ -25,15 +25,17 @@ concurrency:
 jobs:
   swift:
     name: Swift Build & Test
-    runs-on: macos-15
+    # Self-hosted (2026-07-25, David 拍板): hosted macOS minutes were ~85% of
+    # the monthly Actions bill. Runs on David's Mac via the launchd-managed
+    # runner in ~/actions-runner-meetpr — uses the machine's own Xcode (no
+    # xcode-select step: sudo would hang, and the local install is canonical).
+    # If the runner is offline (Mac asleep), jobs queue until it reconnects.
+    runs-on: [self-hosted, macOS, ARM64]
     timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
 
       - name: Swift version
         run: swift --version
@@ -61,16 +63,9 @@ jobs:
         id: time-start
         run: echo "value=$(date +%s)" >> "$GITHUB_OUTPUT"
 
-      - name: Cache SPM build artifacts
-        uses: actions/cache@v4
-        with:
-          path: |
-            Modules/*/.build
-            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages
-            ~/Library/Caches/org.swift.swiftpm
-          key: ${{ runner.os }}-spm-${{ hashFiles('Modules/*/Package.swift', 'MeetPR.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
+      # No actions/cache here: on the self-hosted runner the _work checkout and
+      # the machine's SwiftPM caches persist between runs, and restoring a
+      # GitHub-side cache would overwrite the real ~/Library paths it targeted.
 
       - name: Test Swift packages
         run: |
@@ -91,7 +86,9 @@ jobs:
       - name: Select test simulator
         id: simulator
         run: |
-          simulator_name="iPhone 15"
+          # Dedicated CI simulator on the self-hosted Mac, so test runs never
+          # touch the booted simulator David is using for manual walkthroughs.
+          simulator_name="MeetPR-CI"
           if ! xcrun simctl list devices available | grep -q "$simulator_name"; then
             simulator_name=$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ { gsub(/^[ \t]+|[ \t]+$/, "", $1); print $1; exit }')
           fi
