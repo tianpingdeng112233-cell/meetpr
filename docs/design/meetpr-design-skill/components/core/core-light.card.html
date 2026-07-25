@@ -1,0 +1,40 @@
+<!-- @dsCard group="Components" viewport="700x420" subtitle="亮色主题：同一组件在 .theme-light 下的形态" name="Core Components (Light)" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<style>
+body{margin:0}
+.theme-light{font-family:var(--font-body);background:var(--bg-base);color:var(--text-primary);padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-height:100vh;box-sizing:border-box}
+.row{display:flex;gap:10px;align-items:center}
+.cta{background:var(--cta-bg);color:var(--cta-text);border-radius:999px;padding:12px 26px;font-weight:800;font-size:15px}
+.sec{background:var(--surface-card);box-shadow:var(--shadow-card-light);border:1px solid var(--border-subtle);color:var(--text-primary);border-radius:999px;padding:12px 26px;font-weight:700;font-size:14px}
+.ghost{color:var(--text-tertiary);font-size:13px}
+.badge{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.05em;padding:4px 12px;border-radius:999px}
+.chip{position:relative;border-radius:12px;height:44px;width:52px;background:var(--surface-card);box-shadow:var(--shadow-card-light);display:flex;flex-direction:column;align-items:center;padding-top:5px;box-sizing:border-box}
+.chip .l{font-size:10px;color:var(--text-tertiary)}.chip .d{font-size:13px;font-weight:700;font-family:var(--font-mono);margin-top:auto;margin-bottom:5px}
+.dot{position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%}
+.tr{display:flex;align-items:center;padding:10px 14px;border-top:1px solid var(--border-hairline);font-family:var(--font-mono);font-size:14px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;width:60px;font-size:10px}
+</style></head><body>
+<div class="theme-light">
+<div class="row"><div class="cta">开始训练</div><div class="sec">今天有事 · 顺延</div><span class="ghost">撤销顺延</span>
+<span class="badge" style="background:rgba(217,119,6,.12);color:var(--gold-500)">当前</span>
+<span class="badge" style="background:rgba(21,128,61,.12);color:var(--success)">已通知教练</span></div>
+<div class="row">
+<div class="chip"><span class="dot" style="background:var(--success)"></span><span class="l">周一</span><span class="d">20</span></div>
+<div class="chip" style="color:var(--text-faint)"><span class="l" style="color:var(--text-faint)">周二</span><span class="d">21</span></div>
+<div class="chip" style="background:#111827;color:#fff;border:1.5px solid var(--gold-500);box-shadow:none"><span class="dot" style="background:var(--gold-400)"></span><span class="l" style="color:#fff">周三</span><span class="d">22</span></div>
+<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-faint)">DayChip：完成 / 休息(降灰无点) / 选中</span>
+</div>
+<div style="background:var(--surface-card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow-card-light)">
+<div style="display:flex;padding:8px 14px;font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:.04em"><span style="width:22px">#</span><span style="flex:1">重量</span><span style="flex:1;text-align:center">次数</span><span style="flex:1;text-align:center">RPE</span><span style="width:64px"></span></div>
+<div class="tr"><span style="width:22px;font-weight:700">1</span><span style="flex:1;font-weight:700">175</span><span style="flex:1;text-align:center">3</span><span style="flex:1;text-align:center">8.5</span><span style="width:64px;display:flex;justify-content:flex-end;gap:11px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="12.5" height="10" rx="2.5"/><path d="M15 10.5l6-3v9l-6-3z"/></svg></span></div>
+<div class="tr"><span style="width:22px;font-weight:700">2</span><span style="flex:1;font-weight:700">175</span><span style="flex:1;text-align:center">3</span><span style="flex:1;text-align:center">8.5</span><span style="width:64px;display:flex;justify-content:flex-end;gap:11px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="12.5" height="10" rx="2.5"/><path d="M15 10.5l6-3v9l-6-3z"/></svg></span></div>
+<div class="tr" style="color:var(--text-faint)"><span style="width:22px;font-weight:700">3</span><span style="flex:1;font-weight:700">175</span><span style="flex:1;text-align:center">3</span><span style="flex:1;text-align:center">8.5</span><span style="width:64px;display:flex;justify-content:flex-end;gap:11px"><span style="width:14px;height:14px;border-radius:50%;border:1.5px solid #D1D5DB"></span><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="12.5" height="10" rx="2.5"/><path d="M15 10.5l6-3v9l-6-3z"/></svg></span></div>
+</div>
+<div style="display:flex;justify-content:space-around;border-top:1px solid var(--border-subtle);padding-top:8px;background:#fff;border-radius:0 0 12px 12px">
+<div class="tab" style="color:var(--gold-500)"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--gold-500)"><circle cx="12" cy="12" r="4"/></svg>今日</div>
+<div class="tab" style="color:var(--text-faint)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>训练</div>
+<div class="tab" style="color:var(--text-faint)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>成长</div>
+<div class="tab" style="color:var(--text-faint)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 9a7 7 0 0114 0"/></svg>我的</div>
+</div>
+</div>
+</body></html>

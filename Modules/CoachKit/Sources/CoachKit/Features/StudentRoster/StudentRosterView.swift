@@ -30,13 +30,13 @@ struct StudentRosterView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         header
 
         content
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $isConversationListPresented) {
         if let chat {
@@ -54,28 +54,30 @@ struct StudentRosterView: View {
   private var header: some View {
     HStack(alignment: .firstTextBaseline) {
       Text("学员")
-        .font(.system(size: 36, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: 34, weight: .extraBold))
+        .tracking(-0.7)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()
       Button {
         Task { await viewModel.refresh() }
       } label: {
         Image(systemName: "arrow.clockwise")
-          .font(.system(size: 18))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size18))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(width: 36, height: 36)
-          .background(Color.MeetPR.surface1)
+          .background(Color.MeetPR.surfaceCard)
           .clipShape(Circle())
-          .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
+          .overlay { Circle().stroke(Color.MeetPR.borderDefault, lineWidth: 1) }
       }
       .accessibilityLabel("刷新学员")
       CoachChatHeaderButton(chat: chat) {
         isConversationListPresented = true
       }
     }
-    .padding(.horizontal, 16)
-    .padding(.top, 8)
-    .padding(.bottom, 4)
+    .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+    .padding(.top, MeetPRSpacing.space2)
+    .padding(.bottom, MeetPRSpacing.space1)
+    .meetPRRiseIn(index: 0)
   }
 
   // MARK: - Content states
@@ -109,7 +111,7 @@ struct StudentRosterView: View {
 
   private var rosterScroll: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: 20) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space5) {
         searchField
 
         if viewModel.pendingAttentionCount > 0 {
@@ -118,7 +120,8 @@ struct StudentRosterView: View {
 
         rosterGroups
       }
-      .padding(16)
+      .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+      .padding(.vertical, MeetPRSpacing.point14)
     }
     .scrollContentBackground(.hidden)
     .refreshable {
@@ -130,38 +133,41 @@ struct StudentRosterView: View {
   /// `.searchable`) because the nav bar is hidden, so the system search field
   /// would never render — leaving search disconnected from the UI.
   private var searchField: some View {
-    HStack(spacing: 8) {
+    HStack(spacing: MeetPRSpacing.space2) {
       Image(systemName: "magnifyingglass")
-        .font(.system(size: 15))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+        .foregroundStyle(Color.MeetPR.textTertiary)
       TextField("搜索学员", text: $viewModel.searchText)
         .textFieldStyle(.plain)
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .submitLabel(.search)
       if !viewModel.searchText.isEmpty {
         Button {
           viewModel.searchText = ""
         } label: {
           Image(systemName: "xmark.circle.fill")
-            .font(.system(size: 15))
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel("清除搜索")
       }
     }
-    .padding(.horizontal, 12)
-    .padding(.vertical, 10)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 10))
-    .overlay { RoundedRectangle(cornerRadius: 10).stroke(Color.MeetPR.border, lineWidth: 1) }
+    .padding(.horizontal, MeetPRSpacing.space3)
+    .padding(.vertical, MeetPRSpacing.point10)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.chip))
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.chip).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
+    }
   }
 
   // MARK: - 今日分诊 strip
 
   private var triageSection: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
       sectionLabel("今天 \(viewModel.pendingAttentionCount) 个需要你")
 
       groupCard {
@@ -178,7 +184,7 @@ struct StudentRosterView: View {
           } label: {
             rosterRow(row, showsTopBorder: index > 0)
           }
-          .buttonStyle(.plain)
+          .buttonStyle(PressScaleButtonStyle())
         }
       }
     }
@@ -197,10 +203,10 @@ struct StudentRosterView: View {
           : "未找到匹配「\(viewModel.searchText)」的学员"
       )
       .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .foregroundStyle(Color.MeetPR.textTertiary)
     } else {
       ForEach(groups) { group in
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
           sectionLabel("\(group.title) · \(group.rows.count)")
           groupCard {
             ForEach(Array(group.rows.enumerated()), id: \.element.id) { index, row in
@@ -218,7 +224,7 @@ struct StudentRosterView: View {
               } label: {
                 rosterRow(row, showsTopBorder: index > 0)
               }
-              .buttonStyle(.plain)
+              .buttonStyle(PressScaleButtonStyle())
             }
           }
         }
@@ -251,19 +257,19 @@ struct StudentRosterView: View {
   // MARK: - Row (dot · name/sub · badge · chevron)
 
   private func rosterRow(_ row: StudentRosterRowModel, showsTopBorder: Bool) -> some View {
-    HStack(spacing: 12) {
+    HStack(spacing: MeetPRSpacing.space3) {
       Circle()
         .fill(dotColor(for: row))
         .frame(width: 9, height: 9)
 
-      VStack(alignment: .leading, spacing: 3) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
         Text(row.student.displayName)
-          .font(.system(size: 17, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
         Text(subtitle(for: row))
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .lineLimit(1)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -272,16 +278,16 @@ struct StudentRosterView: View {
       StatusBadge(status: badge.status, title: badge.title)
 
       Image(systemName: "chevron.right")
-        .font(.system(size: 15))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 14)
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.vertical, MeetPRSpacing.point14)
     .frame(minHeight: 64)
     .contentShape(Rectangle())
     .overlay(alignment: .top) {
       if showsTopBorder {
-        Rectangle().fill(Color.MeetPR.border).frame(height: 1)
+        Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
       }
     }
     .accessibilityElement(children: .combine)
@@ -292,24 +298,7 @@ struct StudentRosterView: View {
   /// rows go red/amber by signal, evaluation amber, active green when this week
   /// is met else fgPrimary, abnormal amber.
   private func dotColor(for row: StudentRosterRowModel) -> Color {
-    if row.needsAttention {
-      let notTrained = row.triageSignals.contains { signal in
-        if case .notTrained = signal { return true }
-        return false
-      }
-      return notTrained ? Color.MeetPR.brandRed : Color.MeetPR.amber
-    }
-    switch row.student.status {
-    case .inEvaluation:
-      return Color.MeetPR.amber
-    case .active:
-      if row.plannedTrainingDays > 0 && row.completedTrainingDays >= row.plannedTrainingDays {
-        return Color.MeetPR.green
-      }
-      return Color.MeetPR.fgPrimary
-    case .abnormal:
-      return Color.MeetPR.amber
-    }
+    row.statusTone.color
   }
 
   /// Real second line: completion + last-active for active rows; the status text
@@ -365,16 +354,19 @@ struct StudentRosterView: View {
     Text(text)
       .font(Font.MeetPR.monoLabel)
       .tracking(Font.MeetPR.monoLabelTracking)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   private func groupCard<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-    VStack(spacing: 0) { content() }
+    VStack(spacing: MeetPRSpacing.zero) { content() }
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
+      }
   }
 }
 

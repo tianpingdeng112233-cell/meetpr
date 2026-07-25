@@ -9,6 +9,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../CoreModels"),
+    .package(path: "../DesignSystem"),
     .package(path: "../Networking"),
   ],
   targets: [
@@ -16,6 +17,7 @@ let package = Package(
       name: "Analytics",
       dependencies: [
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "DesignSystem", package: "DesignSystem"),
         .product(name: "Networking", package: "Networking"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]

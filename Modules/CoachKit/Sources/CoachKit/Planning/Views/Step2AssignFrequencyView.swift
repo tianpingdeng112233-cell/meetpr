@@ -22,7 +22,7 @@ public struct Step2AssignFrequencyView: View {
           Eyebrow("STEP 2")
           Text("定 SBD 频率")
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
 
         HStack(spacing: MeetPRSpacing.sm) {
@@ -36,17 +36,17 @@ public struct Step2AssignFrequencyView: View {
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
             Text("训练日")
               .font(Font.MeetPR.bodyEmphasis)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text(trainingDaySummary)
               .font(Font.MeetPR.body)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
         }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
           Text("三大项每周各练几次？")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           FrequencyControl(
             title: "深蹲",
@@ -76,7 +76,7 @@ public struct Step2AssignFrequencyView: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
           Text("分配到训练日")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           ForEach(viewModel.assignmentDisplayDays, id: \.self) { day in
             AssignmentDayCard(dayOfWeek: day, viewModel: viewModel)
@@ -95,7 +95,7 @@ public struct Step2AssignFrequencyView: View {
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("频率分配")
   }
 
@@ -144,7 +144,7 @@ private struct FrequencyControl: View {
       HStack(spacing: MeetPRSpacing.base) {
         Text(title)
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
 
         Spacer()
 
@@ -160,7 +160,7 @@ private struct FrequencyControl: View {
         Text("\(value) 次/周")
           .font(Font.MeetPR.bodyEmphasis)
           .monospacedDigit()
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(minWidth: 72)
 
         Button {
@@ -187,7 +187,7 @@ private struct AssignmentDayCard: View {
         HStack {
           Text(viewModel.dayLabel(dayOfWeek))
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           Spacer()
 
@@ -219,13 +219,13 @@ private struct LiftChip: View {
     Button(action: action) {
       Text(title)
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(isSelected ? Color.MeetPR.bg : Color.MeetPR.fgPrimary)
+        .foregroundStyle(isSelected ? Color.MeetPR.bgBase : Color.MeetPR.textPrimary)
         .padding(.horizontal, MeetPRSpacing.md)
         .padding(.vertical, MeetPRSpacing.sm)
-        .background(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
+        .background(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.surfaceElevated)
         .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 }
 

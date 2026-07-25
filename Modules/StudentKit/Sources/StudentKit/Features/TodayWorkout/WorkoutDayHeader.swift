@@ -9,18 +9,18 @@ struct WorkoutDayHeader: View {
   let readinessFiled: Bool
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 6) {
-      HStack(alignment: .firstTextBaseline, spacing: 8) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point6) {
+      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
         Text(title)
           .font(.title2.bold())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
         readinessBadge
       }
 
       Text(subtitle)
         .font(.subheadline)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }
@@ -51,10 +51,10 @@ struct WorkoutDayHeader: View {
   private var readinessBadge: some View {
     Label(readinessFiled ? "已签到" : "未签到", systemImage: readinessFiled ? "checkmark" : "heart")
       .font(.caption)
-      .foregroundStyle(readinessFiled ? Color.MeetPR.green : Color.MeetPR.fgTertiary)
-      .padding(.horizontal, 8)
-      .padding(.vertical, 5)
-      .background(readinessFiled ? Color.MeetPR.greenSoft : Color.MeetPR.surface2)
+      .foregroundStyle(readinessFiled ? Color.MeetPR.success : Color.MeetPR.textTertiary)
+      .padding(.horizontal, MeetPRSpacing.space2)
+      .padding(.vertical, MeetPRSpacing.point5)
+      .background(readinessFiled ? Color.MeetPR.successSoft : Color.MeetPR.surfaceElevated)
       .clipShape(.capsule)
   }
 

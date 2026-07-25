@@ -50,7 +50,7 @@ public struct WeightEntryPanel: View {
       panelContent
     }
     .scrollBounceBehavior(.basedOnSize)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private var panelContent: some View {
@@ -61,16 +61,18 @@ public struct WeightEntryPanel: View {
         Text(draft.expressionText.isEmpty ? " " : draft.expressionText)
           .font(Font.MeetPR.footnote)
           .monospacedDigit()
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
 
         HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
           Text(draft.displayText)
-            .font(.system(size: 44, weight: .semibold, design: .rounded))
+            .font(
+              .MeetPR.system(size: MeetPRFontMetrics.size44, weight: .semibold, design: .rounded)
+            )
             .monospacedDigit()
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("kg")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
       .frame(maxWidth: .infinity)
@@ -90,7 +92,7 @@ public struct WeightEntryPanel: View {
       }
     }
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private var baseSection: some View {
@@ -176,9 +178,9 @@ public struct WeightEntryPanel: View {
         .font(Font.MeetPR.title2)
         .frame(maxWidth: .infinity, minHeight: 52)
     }
-    .buttonStyle(.plain)
-    .foregroundStyle(Color.MeetPR.brandRed)
-    .background(Color.MeetPR.brandRedSoft)
+    .buttonStyle(PressScaleButtonStyle())
+    .foregroundStyle(Color.MeetPR.gold500)
+    .background(Color.MeetPR.goldSoft)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .accessibilityLabel("运算 \(operation.rawValue)")
   }
@@ -190,8 +192,8 @@ public struct WeightEntryPanel: View {
         .monospacedDigit()
         .frame(maxWidth: .infinity, minHeight: 52)
     }
-    .buttonStyle(.plain)
-    .background(Color.MeetPR.surface2)
+    .buttonStyle(PressScaleButtonStyle())
+    .background(Color.MeetPR.surfaceElevated)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
 }
@@ -210,9 +212,9 @@ private struct SelectableChip: View {
         .padding(.horizontal, MeetPRSpacing.md)
         .padding(.vertical, MeetPRSpacing.sm)
     }
-    .buttonStyle(.plain)
-    .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
-    .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface2)
+    .buttonStyle(PressScaleButtonStyle())
+    .foregroundStyle(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.textSecondary)
+    .background(isSelected ? Color.MeetPR.goldSoft : Color.MeetPR.surfaceElevated)
     .clipShape(Capsule())
   }
 }

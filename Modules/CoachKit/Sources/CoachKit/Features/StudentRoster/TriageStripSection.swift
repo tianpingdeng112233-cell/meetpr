@@ -15,7 +15,7 @@ struct TriageStripSection: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
           Eyebrow("今天 \(rows.count) 个需要你")
 
-          VStack(spacing: 0) {
+          VStack(spacing: MeetPRSpacing.zero) {
             ForEach(rows) { row in
               NavigationLink(
                 destination: {
@@ -31,11 +31,11 @@ struct TriageStripSection: View {
                   TriageStripRow(row: row)
                 }
               )
-              .buttonStyle(.plain)
+              .buttonStyle(PressScaleButtonStyle())
 
               if row.id != rows.last?.id {
                 Divider()
-                  .background(Color.MeetPR.border)
+                  .background(Color.MeetPR.borderDefault)
               }
             }
           }
@@ -63,29 +63,26 @@ private struct TriageStripRow: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
         Text(row.student.displayName)
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
 
         Text(StudentTriageSignalCalculator.summaryText(for: row.triageSignals))
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .lineLimit(1)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
 
       Image(systemName: "chevron.right")
-        .font(.system(size: 14, weight: .semibold))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
     .padding(.vertical, MeetPRSpacing.sm)
     .accessibilityElement(children: .combine)
   }
 
   private var signalColor: Color {
-    row.triageSignals.contains { signal in
-      if case .notTrained = signal { return true }
-      return false
-    } ? Color.MeetPR.brandRed : Color.MeetPR.amber
+    row.statusTone.color
   }
 }
 
@@ -160,7 +157,7 @@ private struct TriageStripRow: View {
       }
       .listStyle(.plain)
       .scrollContentBackground(.hidden)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
     }
   }
 #endif

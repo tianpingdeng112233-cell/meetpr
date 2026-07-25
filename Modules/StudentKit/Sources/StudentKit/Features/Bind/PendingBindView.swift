@@ -37,10 +37,10 @@ struct PendingBindView: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Text("已发送绑定请求")
             .font(Font.MeetPR.title1)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("等待教练 \(request.coachDisplayName ?? "教练") 接收")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
 
         waitingCard
@@ -51,12 +51,12 @@ struct PendingBindView: View {
 
         Text("教练通常在 24-48 小时内响应;7 天未响应自动过期,可重新输码。")
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
 
         if let cancelError = viewModel.cancelError {
           Text(cancelError)
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
 
         SecondaryButton("取消请求", isFullWidth: true) {
@@ -67,7 +67,7 @@ struct PendingBindView: View {
       .padding(MeetPRSpacing.base)
     }
     .scrollContentBackground(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .onAppear { Analytics.shared.screen(.pendingBind) }
     .refreshable {
       await onStateMayHaveChanged()
@@ -93,10 +93,10 @@ struct PendingBindView: View {
           since: request.submittedAt, now: context.date)
         HStack(spacing: MeetPRSpacing.sm) {
           Image(systemName: "clock")
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           Text("已等待: \(waited)")
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
       }
     }
@@ -109,12 +109,12 @@ struct PendingBindView: View {
         if summary.onboardingCompleted {
           Label("onboarding 完整资料", systemImage: "checkmark.circle")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
         if summary.uploadCount > 0 {
           Label("\(summary.uploadCount) 份上传资料", systemImage: "doc.on.doc")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
       }
     }

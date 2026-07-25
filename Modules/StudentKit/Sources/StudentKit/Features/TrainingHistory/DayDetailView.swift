@@ -18,7 +18,7 @@ public struct DayDetailView: View {
         ContentUnavailableView("休息日", systemImage: "bed.double")
       } else {
         ScrollView {
-          VStack(alignment: .leading, spacing: 14) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
             ForEach(day.exercises) { exercise in
               exerciseCard(exercise)
             }
@@ -29,18 +29,18 @@ public struct DayDetailView: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle(StudentFormatting.dayMonthFormatter.string(from: day.date))
   }
 
   private func exerciseCard(_ exercise: StudentPlanExercise) -> some View {
-    VStack(alignment: .leading, spacing: 10) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point10) {
       Text(exercise.exercise.name)
         .font(.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       if let note = CoachNoteDisplay.text(exercise.notes) {
-        CoachNotePill(note: note, background: Color.MeetPR.surface2)
+        CoachNotePill(note: note, background: Color.MeetPR.surfaceElevated)
       }
 
       ForEach(exercise.prescribedSets) { set in
@@ -48,14 +48,14 @@ public struct DayDetailView: View {
           $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
         }
         HStack {
-          VStack(alignment: .leading, spacing: 2) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
             Text("第 \(set.setIndex + 1) 组")
               .font(.subheadline)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
             if let coachNote = CoachNoteDisplay.text(set.coachNote) {
               Text("备注 \(coachNote)")
                 .font(.caption)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .foregroundStyle(Color.MeetPR.textSecondary)
                 .lineLimit(2)
             }
           }
@@ -63,22 +63,22 @@ public struct DayDetailView: View {
           if let log {
             Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
               .font(.subheadline.monospacedDigit())
-              .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgPrimary)
+              .foregroundStyle(log.completed ? Color.MeetPR.success : Color.MeetPR.textPrimary)
           } else {
             Text(StudentFormatting.prescribed(set))
               .font(.subheadline.monospacedDigit())
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .foregroundStyle(Color.MeetPR.textTertiary)
           }
         }
       }
     }
-    .padding(14)
+    .padding(MeetPRSpacing.point14)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.control)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
-    .clipShape(.rect(cornerRadius: 12))
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
 }

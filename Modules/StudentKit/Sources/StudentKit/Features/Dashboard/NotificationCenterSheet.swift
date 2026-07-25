@@ -13,7 +13,7 @@ struct NotificationCenterSheet: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(spacing: 12) {
+        VStack(spacing: MeetPRSpacing.space3) {
           if let planNotice = coordinator.planNotice {
             NotificationActionRow(
               systemImage: "calendar.badge.clock",
@@ -58,7 +58,7 @@ struct NotificationCenterSheet: View {
         }
         .padding()
       }
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("通知")
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
@@ -108,34 +108,34 @@ private struct NotificationActionRow: View {
 
   var body: some View {
     Button(action: action) {
-      HStack(spacing: 12) {
+      HStack(spacing: MeetPRSpacing.space3) {
         Image(systemName: systemImage)
           .font(.headline)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
           .frame(width: 28, height: 28)
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           Text(title)
             .font(.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text(subtitle)
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
         Spacer()
         if unreadCount > 0 {
           Text(unreadCount > 99 ? "99+" : unreadCount.formatted())
             .font(.caption2.bold())
             .foregroundStyle(.white)
-            .padding(.horizontal, 5)
+            .padding(.horizontal, MeetPRSpacing.point5)
             .frame(minWidth: 18, minHeight: 18)
-            .background(Color.MeetPR.brandRed, in: .capsule)
+            .background(MeetPRSemanticTone.unread.color, in: .capsule)
         }
         Image(systemName: "chevron.right")
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .modifier(DashboardCard())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 }

@@ -36,17 +36,17 @@ struct TrainingCalendarView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
       toolbar
       content
     }
-    .padding(12)
-    .background(Color.MeetPR.surface1)
+    .padding(MeetPRSpacing.space3)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
-      RoundedRectangle(cornerRadius: 14)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.control)
+        .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
     }
-    .clipShape(.rect(cornerRadius: 14))
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     .task(id: planRevision) {
       await viewModel.load(studentID: studentID)
     }
@@ -59,7 +59,7 @@ struct TrainingCalendarView: View {
   }
 
   private var toolbar: some View {
-    HStack(spacing: 8) {
+    HStack(spacing: MeetPRSpacing.space2) {
       Button(
         action: { movePeriod(by: -1) },
         label: {
@@ -67,12 +67,12 @@ struct TrainingCalendarView: View {
             .frame(width: 32, height: 32)
         }
       )
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel(mode == .week ? "上一周" : "上一月")
 
       Text(TrainingCalendarLayout.periodTitle(for: displayedDate, mode: mode, calendar: calendar))
         .font(.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .frame(maxWidth: .infinity, alignment: .leading)
 
       Picker("日历模式", selection: $mode) {
@@ -89,10 +89,10 @@ struct TrainingCalendarView: View {
             .frame(width: 32, height: 32)
         }
       )
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel(mode == .week ? "下一周" : "下一月")
     }
-    .foregroundStyle(Color.MeetPR.fgSecondary)
+    .foregroundStyle(Color.MeetPR.textSecondary)
   }
 
   @ViewBuilder private var content: some View {
@@ -125,7 +125,7 @@ struct TrainingCalendarView: View {
   }
 
   private func weekStrip(_ days: [TrainingCalendarDay]) -> some View {
-    HStack(spacing: 8) {
+    HStack(spacing: MeetPRSpacing.space2) {
       ForEach(days) { day in
         TrainingCalendarDayButton(day: day, mode: .week) {
           select(day.date)
@@ -135,12 +135,12 @@ struct TrainingCalendarView: View {
   }
 
   private func monthGrid(_ days: [TrainingCalendarDay]) -> some View {
-    let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 7)
-    return LazyVGrid(columns: columns, spacing: 8) {
+    let columns = Array(repeating: GridItem(.flexible(), spacing: MeetPRSpacing.point6), count: 7)
+    return LazyVGrid(columns: columns, spacing: MeetPRSpacing.space2) {
       ForEach(TrainingCalendarLayout.weekdayLabels(calendar: calendar), id: \.self) { label in
         Text(label)
           .font(.caption2)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .frame(maxWidth: .infinity)
       }
 
@@ -225,7 +225,7 @@ private struct TrainingCalendarDayButton: View {
 
   var body: some View {
     Button(action: onSelect) {
-      VStack(spacing: 5) {
+      VStack(spacing: MeetPRSpacing.point5) {
         if mode == .week {
           Text(
             day.date.formatted(
@@ -239,28 +239,28 @@ private struct TrainingCalendarDayButton: View {
           .fill(day.progress.state.dotColor)
           .frame(width: 6, height: 6)
       }
-      .foregroundStyle(day.isSelected ? Color.MeetPR.brandRed : Color.MeetPR.fgPrimary)
-      .frame(maxWidth: .infinity, minHeight: mode == .week ? 62 : 44)
+      .foregroundStyle(day.isSelected ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary)
+      .frame(maxWidth: .infinity, minHeight: mode == .week ? 44 : 46)
       .background(backgroundColor)
       .opacity(contentOpacity)
       .overlay {
-        RoundedRectangle(cornerRadius: 10)
+        RoundedRectangle(cornerRadius: MeetPRRadius.chip)
           .strokeBorder(strokeColor, lineWidth: day.isSelected ? 1.5 : 1)
       }
-      .clipShape(.rect(cornerRadius: 10))
+      .clipShape(.rect(cornerRadius: MeetPRRadius.chip))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel(accessibilityLabel)
   }
 
   private var backgroundColor: Color {
-    if day.isSelected { return Color.MeetPR.brandRedSoft }
-    return day.isToday ? Color.MeetPR.surface3 : Color.MeetPR.surface2
+    if day.isSelected { return Color.MeetPR.goldSoft }
+    return day.isToday ? Color.MeetPR.surfaceKey : Color.MeetPR.surfaceElevated
   }
 
   private var strokeColor: Color {
-    if day.isSelected { return Color.MeetPR.brandRed }
-    return day.isToday ? Color.MeetPR.green : Color.MeetPR.border
+    if day.isSelected { return Color.MeetPR.gold500 }
+    return day.isToday ? Color.MeetPR.success : Color.MeetPR.borderDefault
   }
 
   private var contentOpacity: Double {
@@ -281,7 +281,7 @@ private struct CalendarLoadError: View {
   let retry: () -> Void
 
   var body: some View {
-    HStack(spacing: 8) {
+    HStack(spacing: MeetPRSpacing.space2) {
       Image(systemName: "exclamationmark.triangle")
       Text(message)
         .lineLimit(1)
@@ -290,7 +290,7 @@ private struct CalendarLoadError: View {
         .font(.caption)
     }
     .font(.footnote)
-    .foregroundStyle(Color.MeetPR.fgSecondary)
-    .padding(.vertical, 10)
+    .foregroundStyle(Color.MeetPR.textSecondary)
+    .padding(.vertical, MeetPRSpacing.point10)
   }
 }

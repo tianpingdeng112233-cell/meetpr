@@ -44,25 +44,30 @@ struct CoachPlanningHomeView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
           header
 
-          PrimaryButton("排新计划", isFullWidth: true) {
+          BrandPrimaryButton(
+            "＋ 排新计划",
+            showsShimmer: true,
+            isFullWidth: true
+          ) {
             presentPlanning(intent: .blank)
           }
-          .padding(.top, 20)
+          .padding(.top, MeetPRSpacing.space5)
 
           importEntry
-            .padding(.top, 12)
+            .padding(.top, MeetPRSpacing.space3)
 
           workspaceContent
-            .padding(.top, 20)
+            .padding(.top, MeetPRSpacing.space5)
         }
-        .padding(16)
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.vertical, MeetPRSpacing.point14)
         .frame(maxWidth: .infinity, alignment: .topLeading)
       }
       .scrollContentBackground(.hidden)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $isConversationListPresented) {
         if let chat {
@@ -98,11 +103,12 @@ struct CoachPlanningHomeView: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
         Eyebrow("计划编排")
         Text("编排")
-          .font(.system(size: 36, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: 34, weight: .extraBold))
+          .tracking(-0.7)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("为学员排周期 · 续编草稿 · 回看已发布")
-          .font(.system(size: 14))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       Spacer(minLength: MeetPRSpacing.sm)
       CoachChatHeaderButton(chat: chat) {
@@ -110,6 +116,7 @@ struct CoachPlanningHomeView: View {
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+    .meetPRRiseIn(index: 0)
   }
 
   // MARK: - Import entry (spec 043 — frozen, greyed out; see PlanImportCapability)
@@ -172,19 +179,20 @@ struct CoachPlanningHomeView: View {
       Text("暂无待排计划")
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
       Text("所有学员都有在跑计划。需要新建周期时，点上方「排新计划」。")
-        .font(.system(size: 14))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     .overlay {
-      RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
     }
   }
 
@@ -205,7 +213,7 @@ private struct PlanningWorkspaceFailure: View {
       HStack(spacing: MeetPRSpacing.base) {
         Label(message, systemImage: "exclamationmark.triangle")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.amber)
+          .foregroundStyle(Color.MeetPR.gold500)
         Spacer()
         SecondaryButton("重试") {
           onRetry()

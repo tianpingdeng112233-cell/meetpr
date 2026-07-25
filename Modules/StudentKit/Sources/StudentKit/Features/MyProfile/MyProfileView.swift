@@ -65,11 +65,12 @@ public struct MyProfileView: View {
 
   public var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         HStack {
           Text("我的资料")
-            .font(.system(size: 36, weight: .heavy))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.display(size: 34, weight: .extraBold))
+            .tracking(-0.7)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Spacer()
           if let notifications {
             StudentNotificationBell(coordinator: notifications) {
@@ -77,20 +78,23 @@ public struct MyProfileView: View {
             }
           }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.top, MeetPRSpacing.space2)
+        .meetPRRiseIn(index: 0)
 
         ScrollView {
-          VStack(alignment: .leading, spacing: 0) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
             content
+              .meetPRRiseIn(index: 1)
           }
-          .padding(16)
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+          .padding(.vertical, MeetPRSpacing.point14)
         }
         .scrollContentBackground(.hidden)
         .refreshable { await viewModel.reload() }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .modifier(
         OptionalStudentNotificationHostModifier(
@@ -123,7 +127,7 @@ public struct MyProfileView: View {
       } label: {
         Label("加载失败,点击重试", systemImage: "arrow.clockwise")
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       .frame(maxWidth: .infinity, minHeight: 200)
       fallbackPreferencesSection
@@ -136,9 +140,9 @@ public struct MyProfileView: View {
   /// or fails to load (spec 055 acceptance 2).
   @ViewBuilder
   private var fallbackPreferencesSection: some View {
-    sectionLabel("偏好").padding(.top, 18)
+    sectionLabel("偏好").padding(.top, MeetPRSpacing.point18)
     card { RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings) }
-      .padding(.top, 8)
+      .padding(.top, MeetPRSpacing.space2)
   }
 
   /// Escape hatch: 退出登录 must stay reachable even when the profile is empty
@@ -148,8 +152,8 @@ public struct MyProfileView: View {
   @ViewBuilder
   private var fallbackLogoutSection: some View {
     if let onLogout {
-      sectionLabel("更多").padding(.top, 18)
-      card { LogoutRow(onLogout: onLogout) }.padding(.top, 8)
+      sectionLabel("更多").padding(.top, MeetPRSpacing.point18)
+      card { LogoutRow(onLogout: onLogout) }.padding(.top, MeetPRSpacing.space2)
     }
   }
 
@@ -164,13 +168,13 @@ public struct MyProfileView: View {
           conversationID = await notifications.openCoachConversation()
         }
       }
-      .padding(.bottom, 18)
+      .padding(.bottom, MeetPRSpacing.point18)
     }
 
     sectionLabel("训练基线 · 教练管理")
-    oneRMCard(profile).padding(.top, 8)
+    oneRMCard(profile).padding(.top, MeetPRSpacing.space2)
 
-    sectionLabel("恢复与伤病 · 改动通知教练").padding(.top, 18)
+    sectionLabel("恢复与伤病 · 改动通知教练").padding(.top, MeetPRSpacing.point18)
     card {
       profileRow(
         "恢复评估", OnboardingSummaryFormatter.recovery(profile),
@@ -180,15 +184,17 @@ public struct MyProfileView: View {
         "伤病记录", OnboardingSummaryFormatter.injuries(profile),
         push: true, kind: .injuries, profile: profile)
     }
-    .padding(.top, 8)
+    .padding(.top, MeetPRSpacing.space2)
 
-    sectionLabel("偏好与基础信息").padding(.top, 18)
+    sectionLabel("偏好与基础信息").padding(.top, MeetPRSpacing.point18)
     card {
       profileRow(
         "想增强肌群", OnboardingSummaryFormatter.muscleGroups(profile),
         push: false, kind: .materials, profile: profile)
       divider
       RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
+      divider
+      AppearancePreferenceRow()
       divider
       profileRow(
         "比赛日期", OnboardingSummaryFormatter.competition(profile),
@@ -198,9 +204,9 @@ public struct MyProfileView: View {
         "身高 / 体重", heightWeightText(profile),
         push: false, kind: .basics, profile: profile)
     }
-    .padding(.top, 8)
+    .padding(.top, MeetPRSpacing.space2)
 
-    sectionLabel("训练背景 · 环境").padding(.top, 18)
+    sectionLabel("训练背景 · 环境").padding(.top, MeetPRSpacing.point18)
     card {
       profileRow(
         "训练背景", OnboardingSummaryFormatter.background(profile),
@@ -210,10 +216,10 @@ public struct MyProfileView: View {
         "训练环境", OnboardingSummaryFormatter.environment(profile),
         push: false, kind: .environment, profile: profile)
     }
-    .padding(.top, 8)
+    .padding(.top, MeetPRSpacing.space2)
 
-    sectionLabel("更多").padding(.top, 18)
-    moreCard.padding(.top, 8)
+    sectionLabel("更多").padding(.top, MeetPRSpacing.point18)
+    moreCard.padding(.top, MeetPRSpacing.space2)
 
     accountSecuritySection
   }
@@ -221,7 +227,7 @@ public struct MyProfileView: View {
   @ViewBuilder
   private var accountSecuritySection: some View {
     if let account, let logs {
-      sectionLabel("账号与安全").padding(.top, 18)
+      sectionLabel("账号与安全").padding(.top, MeetPRSpacing.point18)
       AccountSecuritySection(
         studentID: studentID,
         account: account,
@@ -229,7 +235,7 @@ public struct MyProfileView: View {
         plans: plans,
         onLogout: onLogout
       )
-      .padding(.top, 8)
+      .padding(.top, MeetPRSpacing.space2)
     }
   }
 
@@ -237,46 +243,52 @@ public struct MyProfileView: View {
 
   private func oneRMCard(_ profile: OnboardingProfile) -> some View {
     card(padding: 18) {
-      VStack(alignment: .leading, spacing: 0) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
         HStack {
           Text("当前 1RM")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
           Spacer()
-          Image(systemName: "lock").font(.system(size: 14)).foregroundStyle(Color.MeetPR.fgTertiary)
+          Image(systemName: "lock").font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+            .foregroundStyle(
+              Color.MeetPR.textTertiary)
         }
         Text("教练设定的训练基准 · 与「成长」里按训练自动估算的 E1RM 不是同一个值")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .padding(.top, 6)
-        HStack(spacing: 12) {
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .padding(.top, MeetPRSpacing.point6)
+        HStack(spacing: MeetPRSpacing.space3) {
           oneRMValue("深蹲", profile.squat1RMKg)
           oneRMValue("卧推", profile.bench1RMKg)
           oneRMValue("硬拉", profile.deadlift1RMKg)
         }
-        .padding(.top, 12)
-        HStack(spacing: 6) {
-          Image(systemName: "lock").font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
+        .padding(.top, MeetPRSpacing.space3)
+        HStack(spacing: MeetPRSpacing.point6) {
+          Image(systemName: "lock").font(.MeetPR.system(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(
+              Color.MeetPR.textTertiary)
           Text("训练周期中无法修改 · 联系教练")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
-        .padding(.top, 14)
+        .padding(.top, MeetPRSpacing.point14)
       }
     }
   }
 
   private func oneRMValue(_ label: String, _ value: Decimal?) -> some View {
-    VStack(alignment: .leading, spacing: 2) {
-      Text(label).font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
-      HStack(alignment: .lastTextBaseline, spacing: 3) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+      Text(label).font(.MeetPR.system(size: MeetPRFontMetrics.size12)).foregroundStyle(
+        Color.MeetPR.textTertiary)
+      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point3) {
         Text(value.map { UnitDisplay.plainString($0) } ?? "—")
-          .font(.system(size: 30, weight: .heavy).monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("kg").font(.system(size: 12, design: .monospaced)).foregroundStyle(
-          Color.MeetPR.fgTertiary)
+          .font(.MeetPR.display(size: 26, weight: .extraBold).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text("kg").font(.MeetPR.system(size: MeetPRFontMetrics.size12, design: .monospaced))
+          .foregroundStyle(
+            Color.MeetPR.textTertiary)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -291,37 +303,40 @@ public struct MyProfileView: View {
     NavigationLink {
       ProfileCardEditView(kind: kind, profile: profile, viewModel: viewModel)
     } label: {
-      HStack(spacing: 12) {
-        VStack(alignment: .leading, spacing: 4) {
-          HStack(spacing: 6) {
-            Text(label).font(.system(size: 14)).foregroundStyle(Color.MeetPR.fgTertiary)
+      HStack(spacing: MeetPRSpacing.space3) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+          HStack(spacing: MeetPRSpacing.point6) {
+            Text(label).font(.MeetPR.system(size: MeetPRFontMetrics.size14)).foregroundStyle(
+              Color.MeetPR.textTertiary)
             if push { notifyBadge }
           }
           Text(value)
-            .font(.system(size: 17))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size17))
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .lineLimit(1)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        Image(systemName: "chevron.right").font(.system(size: 15)).foregroundStyle(
-          Color.MeetPR.fgTertiary)
+        Image(systemName: "chevron.right").font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+          .foregroundStyle(
+            Color.MeetPR.textTertiary)
       }
-      .padding(16)
+      .padding(MeetPRSpacing.space4)
       .frame(minHeight: 64)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private var notifyBadge: some View {
     Text("通知教练")
-      .font(.system(size: 10, design: .monospaced))
+      .font(.MeetPR.system(size: MeetPRFontMetrics.size10, design: .monospaced))
       .tracking(0.5)
-      .foregroundStyle(Color.MeetPR.brandRed)
-      .padding(.horizontal, 6)
-      .padding(.vertical, 2)
+      .foregroundStyle(Color.MeetPR.gold500)
+      .padding(.horizontal, MeetPRSpacing.point6)
+      .padding(.vertical, MeetPRSpacing.point2)
       .overlay {
-        RoundedRectangle(cornerRadius: 3).stroke(Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.point3).stroke(
+          Color.MeetPR.gold500.opacity(0.3), lineWidth: 1)
       }
   }
 
@@ -339,7 +354,7 @@ public struct MyProfileView: View {
       } label: {
         moreRow(icon: "chart.xyaxis.line", title: "成长曲线")
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
 
       if let evaluationSummaryViewModel, let summary = evaluationSummaryViewModel.summary {
         divider
@@ -348,7 +363,7 @@ public struct MyProfileView: View {
         } label: {
           moreRow(icon: "doc.text", title: "评估总结", showsDot: evaluationSummaryViewModel.isUnread)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
       }
 
       if let onLogout {
@@ -359,18 +374,21 @@ public struct MyProfileView: View {
   }
 
   private func moreRow(icon: String, title: String, showsDot: Bool = false) -> some View {
-    HStack(spacing: 12) {
-      Image(systemName: icon).font(.system(size: 16)).frame(width: 24).foregroundStyle(
-        Color.MeetPR.fgSecondary)
-      Text(title).font(.system(size: 15)).foregroundStyle(Color.MeetPR.fgPrimary)
+    HStack(spacing: MeetPRSpacing.space3) {
+      Image(systemName: icon).font(.MeetPR.system(size: MeetPRFontMetrics.size16)).frame(width: 24)
+        .foregroundStyle(
+          Color.MeetPR.textSecondary)
+      Text(title).font(.MeetPR.system(size: MeetPRFontMetrics.size15)).foregroundStyle(
+        Color.MeetPR.textPrimary)
       if showsDot {
-        Circle().fill(Color.MeetPR.brandRed).frame(width: 8, height: 8)
+        Circle().fill(Color.MeetPR.gold500).frame(width: 8, height: 8)
       }
       Spacer()
-      Image(systemName: "chevron.right").font(.system(size: 14)).foregroundStyle(
-        Color.MeetPR.fgTertiary)
+      Image(systemName: "chevron.right").font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+        .foregroundStyle(
+          Color.MeetPR.textTertiary)
     }
-    .padding(16)
+    .padding(MeetPRSpacing.space4)
     .contentShape(Rectangle())
   }
 
@@ -380,29 +398,32 @@ public struct MyProfileView: View {
     Text(text)
       .font(Font.MeetPR.monoLabel)
       .tracking(Font.MeetPR.monoLabelTracking)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   private func card<Content: View>(
     padding: CGFloat = 0, @ViewBuilder _ content: () -> Content
   ) -> some View {
-    VStack(spacing: 0) { content() }
+    VStack(spacing: MeetPRSpacing.zero) { content() }
       .padding(padding)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
+      }
   }
 
   private var divider: some View {
-    Rectangle().fill(Color.MeetPR.border).frame(height: 1)
+    Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
   }
 
   private func stateMessage(_ text: String) -> some View {
     Text(text)
       .font(Font.MeetPR.body)
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .foregroundStyle(Color.MeetPR.textTertiary)
       .frame(maxWidth: .infinity, minHeight: 200)
   }
 
@@ -425,17 +446,18 @@ private struct LogoutRow: View {
       isLoggingOut = true
       Task { await onLogout() }
     } label: {
-      HStack(spacing: 12) {
+      HStack(spacing: MeetPRSpacing.space3) {
         Image(systemName: "rectangle.portrait.and.arrow.right")
-          .font(.system(size: 16)).frame(width: 24)
-        Text(isLoggingOut ? "退出中" : "退出登录").font(.system(size: 15, weight: .semibold))
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size16)).frame(width: 24)
+        Text(isLoggingOut ? "退出中" : "退出登录").font(
+          .MeetPR.system(size: MeetPRFontMetrics.size15, weight: .semibold))
         Spacer()
       }
-      .foregroundStyle(Color.MeetPR.brandRed)
-      .padding(16)
+      .foregroundStyle(Color.MeetPR.gold500)
+      .padding(MeetPRSpacing.space4)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(isLoggingOut)
   }
 }

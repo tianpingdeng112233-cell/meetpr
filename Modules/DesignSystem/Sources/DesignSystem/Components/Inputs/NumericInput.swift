@@ -39,15 +39,15 @@ public struct NumericInput: View {
 
         HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
           Text(formattedValue)
-            .font(Font.MeetPR.displayNumeral)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.display(size: 54, weight: .black))
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .monospacedDigit()
             .minimumScaleFactor(0.7)
 
           Text(unit.title)
-            .font(Font.MeetPR.displayUnit)
+            .font(.MeetPR.mono(size: 12, weight: .bold))
             .tracking(Font.MeetPR.displayUnitTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
@@ -59,10 +59,10 @@ public struct NumericInput: View {
         }
       }
       .padding(MeetPRSpacing.base)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
 
@@ -116,19 +116,19 @@ private struct NumericQuickAdjustButton: View {
   var body: some View {
     Button(action: action) {
       Text(label)
-        .font(.system(size: MeetPRFontMetrics.captionSize, weight: .medium, design: .monospaced))
+        .font(.MeetPR.mono(size: 11, weight: .semibold))
         .tracking(0.66)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .frame(maxWidth: .infinity)
         .padding(.vertical, MeetPRSpacing.sm)
-        .background(Color.MeetPR.surface2)
+        .background(Color.MeetPR.surfaceElevated)
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: false))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: false))
     .accessibilityLabel("Adjust weight by \(label)")
     .accessibilityHint("Changes the numeric weight value.")
   }
@@ -141,15 +141,15 @@ private struct NumericUnitToggleButton: View {
   var body: some View {
     Button(action: action) {
       Text("KG <-> LB")
-        .font(.system(size: MeetPRFontMetrics.captionSize, weight: .semibold, design: .monospaced))
+        .font(.MeetPR.mono(size: 11, weight: .bold))
         .tracking(0.66)
-        .foregroundStyle(Color.MeetPR.bg)
+        .foregroundStyle(Color.MeetPR.ctaText)
         .frame(maxWidth: .infinity)
         .padding(.vertical, MeetPRSpacing.sm)
-        .background(Color.MeetPR.fgPrimary)
+        .background(Color.MeetPR.ctaBackground)
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: false))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: false))
     .accessibilityLabel("Toggle unit")
     .accessibilityHint("Switches between kilograms and pounds.")
   }
@@ -164,17 +164,17 @@ private struct NumericInputButton: View {
   var body: some View {
     Button(action: action) {
       Text(label)
-        .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .frame(width: 44, height: 44)
-        .background(Color.MeetPR.surface2)
+        .font(.MeetPR.display(size: 22, weight: .extraBold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .frame(width: 48, height: 48)
+        .background(Color.MeetPR.surfaceElevated)
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
-        .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+        .clipShape(.circle)
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: false))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: false))
     .accessibilityLabel(accessibilityLabel)
     .accessibilityHint("Changes the numeric weight value.")
   }
@@ -186,7 +186,7 @@ private struct NumericInputButton: View {
 
   NumericInput(value: $value, unit: $unit)
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.dark)
 }
 
@@ -196,6 +196,6 @@ private struct NumericInputButton: View {
 
   NumericInput(value: $value, unit: $unit)
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

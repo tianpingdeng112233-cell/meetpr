@@ -16,9 +16,9 @@ struct CoachFeedbackHistoryView: View {
           Label("写反馈", systemImage: "square.and.pencil")
             .font(Font.MeetPR.bodyEmphasis)
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 13)
-            .foregroundStyle(Color.MeetPR.bg)
-            .background(Color.MeetPR.fgPrimary)
+            .padding(.vertical, MeetPRSpacing.point13)
+            .foregroundStyle(Color.MeetPR.bgBase)
+            .background(Color.MeetPR.textPrimary)
             .clipShape(.rect(cornerRadius: MeetPRRadius.md))
         }
 
@@ -34,7 +34,7 @@ struct CoachFeedbackHistoryView: View {
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private func exerciseName(for id: UUID?) -> String? {
@@ -54,7 +54,7 @@ private struct FeedbackHistoryRow: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         Text(item.text)
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(4)
 
         HStack(spacing: MeetPRSpacing.sm) {
@@ -67,12 +67,12 @@ private struct FeedbackHistoryRow: View {
           Spacer(minLength: MeetPRSpacing.sm)
           Text(CoachStudentFormatting.relativeText(item.postedAt))
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
 
         Text(item.readAt == nil ? "未读" : "已读")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(item.readAt == nil ? Color.MeetPR.amber : Color.MeetPR.fgSecondary)
+          .foregroundStyle(item.readAt == nil ? Color.MeetPR.danger : Color.MeetPR.textSecondary)
       }
     }
   }
@@ -80,11 +80,11 @@ private struct FeedbackHistoryRow: View {
   private func chip(_ title: String, systemImage: String) -> some View {
     Label(title, systemImage: systemImage)
       .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       .lineLimit(1)
       .padding(.horizontal, MeetPRSpacing.sm)
-      .padding(.vertical, 5)
-      .background(Color.MeetPR.surface2)
+      .padding(.vertical, MeetPRSpacing.point5)
+      .background(Color.MeetPR.surfaceElevated)
       .clipShape(.capsule)
   }
 }

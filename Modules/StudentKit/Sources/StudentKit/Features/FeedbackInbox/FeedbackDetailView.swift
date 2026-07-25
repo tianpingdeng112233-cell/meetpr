@@ -18,18 +18,18 @@ public struct FeedbackDetailView: View {
 
   public var body: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: 16) {
-        HStack(spacing: 10) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
+        HStack(spacing: MeetPRSpacing.point10) {
           Image(systemName: "person.crop.circle.fill")
             .font(.title2)
-            .foregroundStyle(Color.MeetPR.brandRed)
-          VStack(alignment: .leading, spacing: 2) {
+            .foregroundStyle(Color.MeetPR.gold500)
+          VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
             Text("教练反馈")
               .font(.headline)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text(StudentFormatting.dayMonthFormatter.string(from: item.postedAt))
               .font(.caption)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
         }
 
@@ -39,7 +39,7 @@ public struct FeedbackDetailView: View {
             systemImage: "calendar"
           )
           .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         }
 
         switch FeedbackVideoPresentation.association(videoID: item.videoID, video: item.video) {
@@ -62,25 +62,25 @@ public struct FeedbackDetailView: View {
         if let playbackError {
           Label(playbackError, systemImage: "exclamationmark.triangle")
             .font(.footnote)
-            .foregroundStyle(Color.MeetPR.amber)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
 
         Text(item.text)
           .font(.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(14)
-          .background(Color.MeetPR.surface1)
+          .padding(MeetPRSpacing.point14)
+          .background(Color.MeetPR.surfaceCard)
           .overlay {
-            RoundedRectangle(cornerRadius: 12)
-              .stroke(Color.MeetPR.border, lineWidth: 1)
+            RoundedRectangle(cornerRadius: MeetPRRadius.control)
+              .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
           }
-          .clipShape(.rect(cornerRadius: 12))
+          .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       }
       .padding()
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("反馈")
     #if os(iOS)
       .fullScreenCover(item: $playbackItem) { playback in
@@ -146,40 +146,40 @@ private struct FeedbackVideoCard: View {
 
   var body: some View {
     Button(action: action ?? {}) {
-      HStack(spacing: 12) {
+      HStack(spacing: MeetPRSpacing.space3) {
         if isLoading {
           ProgressView()
         } else {
           Image(systemName: "play.rectangle.fill")
             .font(.title2)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           Text("关联视频")
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           Text(displaySummary)
             .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .multilineTextAlignment(.leading)
         }
         Spacer()
         if action != nil {
           Image(systemName: "chevron.right")
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(14)
-      .background(Color.MeetPR.surface1)
+      .padding(MeetPRSpacing.point14)
+      .background(Color.MeetPR.surfaceCard)
       .overlay {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
-      .clipShape(.rect(cornerRadius: 12))
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(isLoading || action == nil)
     .accessibilityLabel(accessibilityText)
   }
@@ -189,15 +189,15 @@ private struct FeedbackVideoUnavailableCard: View {
   var body: some View {
     Label("关联视频已不可用", systemImage: "video.slash")
       .font(.subheadline)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(14)
-      .background(Color.MeetPR.surface1)
+      .padding(MeetPRSpacing.point14)
+      .background(Color.MeetPR.surfaceCard)
       .overlay {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
-      .clipShape(.rect(cornerRadius: 12))
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
 }
 

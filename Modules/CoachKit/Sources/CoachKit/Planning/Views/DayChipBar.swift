@@ -51,18 +51,19 @@ private struct DayChip: View {
     Button(action: action) {
       Text(title)
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(isSelected ? Color.MeetPR.bg : Color.MeetPR.fgPrimary)
+        .foregroundStyle(isSelected ? Color.MeetPR.bgBase : Color.MeetPR.textPrimary)
         .lineLimit(1)
         .padding(.horizontal, MeetPRSpacing.base)
         .padding(.vertical, MeetPRSpacing.sm)
-        .background(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
+        .background(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.surfaceElevated)
         .overlay {
           Capsule()
-            .stroke(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.border, lineWidth: 1)
+            .stroke(
+              isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(.capsule)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel(title)
   }
 }

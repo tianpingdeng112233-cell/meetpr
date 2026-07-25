@@ -1,0 +1,83 @@
+/* MeetPR color tokens — dark is the default theme; scope .theme-light for light mode */
+:root {
+  /* Brand gold */
+  --gold-cta: #FFB800;          /* solid CTA fill (dark theme) */
+  --gold-500: #F5A623;          /* primary accent: icons, active states, glow */
+  --gold-400: #FBBF3E;
+  --gold-300: #FFD27A;
+  --gold-200: #FFE28E;
+  --gold-700: #B87814;
+  --gold-gradient: linear-gradient(90deg, #E08F0F, #FFC93C); /* progress bars: orange→yellow, L→R */
+
+  /* Dark surfaces (base < inset < stack < card < elevated) */
+  --bg-base: #0A0A0C;
+  --bg-inset: #101014;
+  --bg-stack: #121217;
+  --surface-card: #141416;
+  --surface-elevated: #161618;
+  --surface-key: #1C1C20;
+
+  /* Dark borders */
+  --border-hairline: #17171A;
+  --border-subtle: #1E1E22;
+  --border-default: #262629;
+  --border-strong: #2E2E32;
+
+  /* Dark text */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B8B8BE;
+  --text-tertiary: #A1A1A6;
+  --text-muted: #8A8A90;
+  --text-faint: #7A7A80;
+  --text-disabled: #55555C;
+
+  /* Semantic */
+  --success: #5E9E78;
+  --danger: #E5484D;
+  --chart-line: #DCE3EA;
+
+  /* On-gold ink */
+  --ink-on-gold: #141414;
+
+  /* Semantic aliases */
+  --text-body: var(--text-secondary);
+  --text-heading: var(--text-primary);
+  --accent: var(--gold-500);
+  --cta-bg: var(--gold-cta);
+  --cta-text: var(--ink-on-gold);
+}
+
+.theme-light {
+  --gold-cta: #FFB800;
+  --gold-500: #D97706;          /* deepened amber for light bg (contrast) */
+  --gold-400: #F59E0B;
+  --gold-200: #FEF3C7;
+  --gold-gradient: linear-gradient(90deg, #D97706, #F5B93C);
+
+  --bg-base: #F5F6F8;
+  --bg-inset: #F3F4F6;
+  --bg-stack: #EEF0F3;
+  --surface-card: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+  --surface-key: #F3F4F6;
+
+  --border-hairline: #E9EBEE;
+  --border-subtle: #E5E7EB;
+  --border-default: #E5E7EB;
+  --border-strong: #D1D5DB;
+
+  --text-primary: #111827;      /* also the "deep blue-black" fill for dark CTAs */
+  --text-secondary: #4B5563;
+  --text-tertiary: #6B7280;
+  --text-muted: #6B7280;
+  --text-faint: #9CA3AF;
+  --text-disabled: #9CA3AF;
+
+  --success: #15803D;
+  --danger: #E5484D;
+  --chart-line: #9AA4B0;
+
+  --ink-on-gold: #141414;
+  --cta-bg: #111827;            /* light-theme primary CTA: deep blue-black, white text */
+  --cta-text: #FFFFFF;
+}

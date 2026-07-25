@@ -57,7 +57,7 @@ struct StudentDetailView: View {
   }
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: MeetPRSpacing.zero) {
       header
 
       if evaluationViewModel.loadFailed {
@@ -87,14 +87,14 @@ struct StudentDetailView: View {
         // and readiness row points here). Growth keeps its own cache, so the
         // pull refreshes whichever data the visible section reads.
         .refreshable { [viewModel, growthViewModel] in
-          if await viewModel.selectedSection == .growth {
+          if viewModel.selectedSection == .growth {
             await growthViewModel.load(studentID: viewModel.summary.id)
           } else {
             await viewModel.refresh()
           }
         }
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .hideNavigationBar()
     .sheet(isPresented: $showComposer) {
       FeedbackComposerView(
@@ -159,8 +159,9 @@ struct StudentDetailView: View {
 
       HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.md) {
         Text(viewModel.summary.displayName)
-          .font(.system(size: 34, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: 32, weight: .extraBold))
+          .tracking(-0.7)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
           .minimumScaleFactor(0.7)
         Spacer(minLength: MeetPRSpacing.sm)
@@ -171,7 +172,7 @@ struct StudentDetailView: View {
       Text(statusLine)
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.top, MeetPRSpacing.sm)
@@ -186,14 +187,14 @@ struct StudentDetailView: View {
       Button {
         dismiss()
       } label: {
-        HStack(spacing: 4) {
+        HStack(spacing: MeetPRSpacing.space1) {
           Image(systemName: "chevron.left")
           Text("学员")
         }
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel("返回学员列表")
 
       Spacer()
@@ -207,14 +208,14 @@ struct StudentDetailView: View {
           }
         } label: {
           Image(systemName: "message")
-            .font(.system(size: 17, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .frame(width: 36, height: 36)
-            .background(Color.MeetPR.surface1)
+            .background(Color.MeetPR.surfaceCard)
             .clipShape(Circle())
-            .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
+            .overlay { Circle().stroke(Color.MeetPR.borderDefault, lineWidth: 1) }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .disabled(conversationOpener.isOpening)
         .accessibilityLabel(CoachStrings.sendMessage)
       }
@@ -224,14 +225,14 @@ struct StudentDetailView: View {
           showComposer = true
         } label: {
           Image(systemName: "square.and.pencil")
-            .font(.system(size: 18))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size18))
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .frame(width: 36, height: 36)
-            .background(Color.MeetPR.surface1)
+            .background(Color.MeetPR.surfaceCard)
             .clipShape(Circle())
-            .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
+            .overlay { Circle().stroke(Color.MeetPR.borderDefault, lineWidth: 1) }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel("写反馈")
       }
     }
@@ -333,11 +334,11 @@ struct StudentDetailView: View {
       VStack(spacing: MeetPRSpacing.md) {
         Spacer()
         ProgressView()
-          .tint(Color.MeetPR.brandRed)
+          .tint(Color.MeetPR.gold500)
         Text("加载学员详情…")
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
         Spacer()
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -354,21 +355,21 @@ struct StudentDetailView: View {
     VStack {
       Spacer()
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("加载失败", color: Color.MeetPR.brandRed)
+        Eyebrow("加载失败", color: Color.MeetPR.danger)
         Text(message)
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("下拉刷新重试")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       .padding(MeetPRSpacing.base)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
       .padding(.horizontal, MeetPRSpacing.base)
       Spacer()
@@ -431,7 +432,7 @@ private struct EvaluationLoadFailureStrip: View {
       HStack(spacing: MeetPRSpacing.sm) {
         Text("评估状态加载失败")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Spacer()
         SecondaryButton("重试") {
           onRetry()

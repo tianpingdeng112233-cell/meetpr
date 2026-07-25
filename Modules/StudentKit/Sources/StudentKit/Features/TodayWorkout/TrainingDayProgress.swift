@@ -38,16 +38,20 @@ struct TrainingDayProgress: Equatable, Sendable {
 
 @available(iOS 17.0, macOS 14.0, *)
 extension TrainingDayCompletionState {
-  var dotColor: Color {
+  var semanticTone: MeetPRSemanticTone {
     switch self {
     case .noPlan:
-      Color.MeetPR.fgTertiary.opacity(0.4)
+      .neutral
     case .notStarted:
-      Color.MeetPR.brandRed
+      .notCompleted
     case .partial:
-      Color.MeetPR.amber
+      .inProgress
     case .complete:
-      Color.MeetPR.green
+      .completed
     }
+  }
+
+  var dotColor: Color {
+    self == .noPlan ? semanticTone.color.opacity(0.4) : semanticTone.color
   }
 }

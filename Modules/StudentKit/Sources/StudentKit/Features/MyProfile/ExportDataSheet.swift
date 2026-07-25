@@ -85,30 +85,30 @@ struct ExportDataSheet: View {
         case .failed(let message):
           Label(message, systemImage: "exclamationmark.triangle")
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
           Button("重试") {
             Task { await viewModel.export(studentID: studentID) }
           }
         case .ready(let url):
           Label("CSV 已生成", systemImage: "checkmark.circle.fill")
-            .foregroundStyle(Color.MeetPR.green)
+            .foregroundStyle(Color.MeetPR.success)
           Text("包含全部训练组:日期/动作/重量/次数/RPE。")
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           ShareLink(item: url) {
             Label("分享 / 存储", systemImage: "square.and.arrow.up")
               .font(.headline)
               .frame(maxWidth: .infinity)
-              .padding(.vertical, 6)
+              .padding(.vertical, MeetPRSpacing.point6)
           }
           .buttonStyle(.borderedProminent)
-          .tint(Color.MeetPR.brandRed)
+          .tint(Color.MeetPR.gold500)
           .accessibilityIdentifier("account.export.share")
         }
       }
       .padding(MeetPRSpacing.base)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("导出训练数据")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

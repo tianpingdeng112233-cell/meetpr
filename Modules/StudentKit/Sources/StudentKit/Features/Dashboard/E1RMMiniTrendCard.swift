@@ -7,7 +7,7 @@ struct E1RMMiniTrendCard: View {
   let state: DashboardE1RMTrendViewModel.State
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 14) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
       header
       content
     }
@@ -19,7 +19,7 @@ struct E1RMMiniTrendCard: View {
     HStack(alignment: .firstTextBaseline) {
       Text("三大项 e1RM")
         .font(.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()
       if let headline {
         Text(
@@ -27,7 +27,7 @@ struct E1RMMiniTrendCard: View {
             + "\(StudentFormatting.kilograms(headline.valueKg))kg"
         )
         .font(.caption)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
         .lineLimit(1)
       }
     }
@@ -42,11 +42,11 @@ struct E1RMMiniTrendCard: View {
     case .error:
       Text("趋势加载失败")
         .font(.subheadline)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
         .frame(maxWidth: .infinity, alignment: .leading)
     case .loaded(let presentation):
       if presentation.hasHistory {
-        VStack(spacing: 10) {
+        VStack(spacing: MeetPRSpacing.point10) {
           ForEach(presentation.rows) { row in
             E1RMMiniTrendRowView(row: row)
           }
@@ -54,7 +54,7 @@ struct E1RMMiniTrendCard: View {
       } else {
         Text("练几次就有趋势了")
           .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .frame(maxWidth: .infinity, minHeight: 96, alignment: .center)
       }
     }
@@ -73,16 +73,16 @@ private struct E1RMMiniTrendRowView: View {
   let row: DashboardE1RMTrendRow
 
   var body: some View {
-    HStack(spacing: 10) {
+    HStack(spacing: MeetPRSpacing.point10) {
       Text(row.family.studentDisplayName)
         .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .frame(width: 34, alignment: .leading)
       MiniSparkline(row: row)
         .frame(height: 28)
       Text(valueText)
         .font(.caption.monospacedDigit())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .frame(width: 52, alignment: .trailing)
     }
   }
@@ -103,11 +103,11 @@ private struct MiniSparkline: View {
     GeometryReader { proxy in
       ZStack {
         Rectangle()
-          .fill(Color.MeetPR.surface3)
+          .fill(Color.MeetPR.surfaceKey)
           .frame(height: 1)
         path(in: proxy.size)
           .stroke(
-            row.points.isEmpty ? Color.MeetPR.fgTertiary.opacity(0.35) : Color.MeetPR.fgPrimary,
+            row.points.isEmpty ? Color.MeetPR.textTertiary.opacity(0.35) : Color.MeetPR.textPrimary,
             style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
           )
       }

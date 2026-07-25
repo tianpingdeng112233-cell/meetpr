@@ -39,7 +39,7 @@ struct StudentPendingVideosView: View {
       .padding(MeetPRSpacing.base)
     }
     .scrollContentBackground(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle(studentName)
     #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
@@ -58,7 +58,7 @@ struct StudentPendingVideosView: View {
       Text(CoachStudentFormatting.fullDateText(section.day))
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       ForEach(section.items) { item in
         videoRow(item)
       }
@@ -72,35 +72,38 @@ struct StudentPendingVideosView: View {
       HStack(spacing: MeetPRSpacing.base) {
         ZStack {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .fill(Color.MeetPR.surface2)
+            .fill(Color.MeetPR.surfaceElevated)
             .frame(width: 52, height: 52)
           Image(systemName: "play.rectangle.fill")
-            .font(.system(size: 20))
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size20))
+            .foregroundStyle(Color.MeetPR.gold500)
         }
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           Text(item.exerciseName ?? "训练视频")
-            .font(.system(size: 16, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text(rowMeta(item))
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .font(
+              .MeetPR.system(size: MeetPRFontMetrics.size11, weight: .medium, design: .monospaced)
+            )
             .tracking(0.8)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
         Spacer(minLength: MeetPRSpacing.sm)
         Image(systemName: "chevron.right")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .padding(MeetPRSpacing.base)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel("\(item.exerciseName ?? "训练视频")，点按写反馈")
   }
 

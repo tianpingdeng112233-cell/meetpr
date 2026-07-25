@@ -59,27 +59,27 @@ struct VideoAttachmentSection: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack(spacing: 12) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      HStack(spacing: MeetPRSpacing.space3) {
         Text("视频")
           .font(.body)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Spacer()
         content
       }
       if let message = videoViewModel.lastErrorMessage {
         Text(message)
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
     }
-    .padding(14)
-    .background(Color.MeetPR.surface1)
+    .padding(MeetPRSpacing.point14)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.control)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
-    .clipShape(.rect(cornerRadius: 12))
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingConsent) {
       Button(VideoPrivacyCopy.consentAgree) {
         videoViewModel.recordConsent()
@@ -172,7 +172,7 @@ struct VideoAttachmentSection: View {
   }
 
   private var pickButtons: some View {
-    HStack(spacing: 10) {
+    HStack(spacing: MeetPRSpacing.point10) {
       #if os(iOS)
         if CameraVideoPicker.isAvailable {
           actionChip("拍摄", systemImage: "video") { requestPick(.camera) }
@@ -183,48 +183,48 @@ struct VideoAttachmentSection: View {
   }
 
   private var uploadingRow: some View {
-    HStack(spacing: 10) {
+    HStack(spacing: MeetPRSpacing.point10) {
       ProgressView(value: rowState?.progress ?? 0)
         .frame(width: 90)
       Text("\(Int((rowState?.progress ?? 0) * 100))%")
         .font(.caption.monospacedDigit())
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       cancelButton
     }
   }
 
   private var uploadedRow: some View {
-    HStack(spacing: 10) {
+    HStack(spacing: MeetPRSpacing.point10) {
       Image(systemName: "checkmark.circle.fill")
-        .foregroundStyle(Color.MeetPR.green)
+        .foregroundStyle(Color.MeetPR.success)
       Text("已上传")
         .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       actionChip("删除", systemImage: "trash") { removeAttachment() }
     }
   }
 
   private var failedRow: some View {
-    HStack(spacing: 10) {
+    HStack(spacing: MeetPRSpacing.point10) {
       Image(systemName: "exclamationmark.triangle.fill")
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
       Text("上传失败")
         .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       actionChip("重试", systemImage: "arrow.clockwise") { retryAttachment() }
       actionChip("删除", systemImage: "trash") { removeAttachment() }
     }
   }
 
   private func statusRow(text: String, showsSpinner: Bool, showsCancel: Bool = true) -> some View {
-    HStack(spacing: 10) {
+    HStack(spacing: MeetPRSpacing.point10) {
       if showsSpinner {
         ProgressView()
           .controlSize(.small)
       }
       Text(text)
         .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       if showsCancel {
         cancelButton
       }
@@ -243,13 +243,13 @@ struct VideoAttachmentSection: View {
     Button(action: action) {
       Label(title, systemImage: systemImage)
         .font(.caption.bold())
-        .foregroundStyle(Color.MeetPR.brandRed)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(Color.MeetPR.brandRedSoft)
+        .foregroundStyle(Color.MeetPR.gold500)
+        .padding(.horizontal, MeetPRSpacing.point10)
+        .padding(.vertical, MeetPRSpacing.point6)
+        .background(Color.MeetPR.goldSoft)
         .clipShape(.capsule)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
 }

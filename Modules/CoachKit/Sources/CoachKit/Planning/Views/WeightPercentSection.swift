@@ -30,13 +30,13 @@ struct WeightPercentSection: View {
       HStack {
         Text(isEditing ? "编辑常用百分比" : "常用百分比")
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
         Spacer()
         Button(isEditing ? "完成" : "编辑") {
           isEditing.toggle()
         }
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
       }
 
       if isEditing {
@@ -56,7 +56,7 @@ struct WeightPercentSection: View {
           }
           .buttonStyle(.bordered)
           .font(Font.MeetPR.footnote)
-          .tint(Color.MeetPR.brandRed)
+          .tint(Color.MeetPR.gold500)
         }
       }
     }
@@ -78,7 +78,7 @@ struct WeightPercentSection: View {
               .font(Font.MeetPR.footnote)
             }
             .buttonStyle(.bordered)
-            .tint(Color.MeetPR.fgSecondary)
+            .tint(Color.MeetPR.textSecondary)
             .accessibilityLabel("移除 \(percent)%")
           }
         }
@@ -92,19 +92,19 @@ struct WeightPercentSection: View {
           .frame(width: 64)
           .padding(.horizontal, MeetPRSpacing.sm)
           .padding(.vertical, MeetPRSpacing.xs)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
         Button("添加") { addNewPercent() }
           .font(Font.MeetPR.footnote)
           .buttonStyle(.bordered)
-          .tint(Color.MeetPR.brandRed)
+          .tint(Color.MeetPR.gold500)
           .disabled(Int(newPercentText) == nil)
         Spacer()
         Button("恢复默认") {
           update(WeightPercentPresets.fallback)
         }
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       }
     }
   }

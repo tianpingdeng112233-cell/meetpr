@@ -117,7 +117,7 @@ public struct ExerciseSetEditorCard: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text("备注")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           TextField(
             "可选 · 比如暂停 3 秒 / 节奏 3-0-1 / 卧距宽",
             text: $notes,
@@ -125,7 +125,7 @@ public struct ExerciseSetEditorCard: View {
           )
           .lineLimit(1...3)
           .padding(MeetPRSpacing.sm)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
           .onChange(of: notes) { _, newValue in
             Task {
@@ -147,10 +147,10 @@ public struct ExerciseSetEditorCard: View {
 
   private var header: some View {
     HStack(alignment: .top, spacing: MeetPRSpacing.sm) {
-      VStack(alignment: .leading, spacing: 2) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
         Text(viewModel.exerciseName(for: draftExercise))
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
       }
 
       if draftExercise.isMainLift {
@@ -170,7 +170,7 @@ public struct ExerciseSetEditorCard: View {
         Button(action: onDelete) {
           Image(systemName: "trash")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
         .buttonStyle(.borderless)
         .accessibilityLabel("删除 \(viewModel.exerciseName(for: draftExercise))")

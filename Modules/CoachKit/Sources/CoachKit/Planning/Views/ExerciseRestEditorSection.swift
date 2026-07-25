@@ -17,7 +17,7 @@ struct ExerciseRestEditorSection: View {
 
       Toggle("逐组单独设", isOn: perSetEnabledBinding)
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
 
       if restSecondsPerSet != nil {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
@@ -25,7 +25,7 @@ struct ExerciseRestEditorSection: View {
             HStack(spacing: MeetPRSpacing.sm) {
               Text("第\(index + 1)组")
                 .font(Font.MeetPR.footnote)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .foregroundStyle(Color.MeetPR.textSecondary)
                 .frame(width: 48, alignment: .leading)
 
               RestSecondsPicker(label: "休息", value: perSetBinding(at: index))

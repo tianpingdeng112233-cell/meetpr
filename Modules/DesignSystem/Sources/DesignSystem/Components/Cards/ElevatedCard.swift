@@ -17,12 +17,7 @@ public struct ElevatedCard<Content: View>: View {
     content
       .padding(MeetPRSpacing.base)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface2)
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
-      }
-      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
+      .meetPRCardSurface(.card, fill: Color.MeetPR.surfaceElevated)
       .accessibilityElement(children: .contain)
       .accessibilityLabel(accessibilityLabelText)
   }
@@ -34,14 +29,14 @@ public struct ElevatedCard<Content: View>: View {
       Eyebrow("SYSTEM //")
       Text("Detected RPE 10 across 3 sessions.")
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Text("Reduce W4 backoff by 5%?")
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
@@ -49,9 +44,9 @@ public struct ElevatedCard<Content: View>: View {
   ElevatedCard {
     Text("Light mode elevated card")
       .font(Font.MeetPR.body)
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .foregroundStyle(Color.MeetPR.textPrimary)
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.light)
 }

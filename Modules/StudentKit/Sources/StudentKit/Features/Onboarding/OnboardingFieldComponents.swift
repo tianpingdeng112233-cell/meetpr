@@ -15,7 +15,7 @@ struct OnboardingFieldLabel: View {
   var body: some View {
     Text(title)
       .font(Font.MeetPR.bodyEmphasis)
-      .foregroundStyle(isHighlighted ? Color.MeetPR.brandRed : Color.MeetPR.fgPrimary)
+      .foregroundStyle(isHighlighted ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary)
   }
 }
 
@@ -34,7 +34,7 @@ struct OnboardingChoiceCards<Value: Hashable>: View {
       if let subtitle {
         Text(subtitle)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       HStack(spacing: MeetPRSpacing.sm) {
         ForEach(options, id: \.value) { option in
@@ -51,18 +51,18 @@ struct OnboardingChoiceCards<Value: Hashable>: View {
     } label: {
       Text(label)
         .font(Font.MeetPR.body)
-        .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+        .foregroundStyle(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.textSecondary)
         .frame(maxWidth: .infinity)
         .padding(.vertical, MeetPRSpacing.md)
-        .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+        .background(isSelected ? Color.MeetPR.goldSoft : Color.MeetPR.surfaceCard)
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
             .stroke(
-              isSelected ? Color.MeetPR.brandRed : Color.MeetPR.border, lineWidth: 1)
+              isSelected ? Color.MeetPR.gold500 : Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 }
 
@@ -90,7 +90,7 @@ struct OnboardingChipGrid<Value: Hashable>: View {
       if let footer {
         Text(footer)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
   }
@@ -107,19 +107,19 @@ struct OnboardingChipGrid<Value: Hashable>: View {
     } label: {
       Text(label)
         .font(Font.MeetPR.caption)
-        .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+        .foregroundStyle(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.textSecondary)
         .padding(.horizontal, MeetPRSpacing.md)
         .padding(.vertical, MeetPRSpacing.sm)
         .frame(maxWidth: .infinity)
-        .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+        .background(isSelected ? Color.MeetPR.goldSoft : Color.MeetPR.surfaceCard)
         .overlay {
           Capsule().stroke(
-            isSelected ? Color.MeetPR.brandRed : Color.MeetPR.border, lineWidth: 1)
+            isSelected ? Color.MeetPR.gold500 : Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(Capsule())
         .opacity(!isSelected && isAtLimit ? 0.4 : 1)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 }
 
@@ -143,11 +143,11 @@ struct OnboardingScalePicker: View {
       }
       Text(currentLabel)
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       if let footnote {
         Text(footnote)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
   }
@@ -164,17 +164,17 @@ struct OnboardingScalePicker: View {
     } label: {
       Text("\(value)")
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+        .foregroundStyle(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.textSecondary)
         .frame(maxWidth: .infinity, minHeight: 40)
-        .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+        .background(isSelected ? Color.MeetPR.goldSoft : Color.MeetPR.surfaceCard)
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.sm)
             .stroke(
-              isSelected ? Color.MeetPR.brandRed : Color.MeetPR.border, lineWidth: 1)
+              isSelected ? Color.MeetPR.gold500 : Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 }
 
@@ -195,14 +195,14 @@ struct OnboardingNumberField: View {
       HStack(spacing: MeetPRSpacing.sm) {
         TextField(placeholder, text: $text)
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .padding(MeetPRSpacing.md)
           .frame(minHeight: 44)
-          .background(Color.MeetPR.surface1)
+          .background(Color.MeetPR.surfaceCard)
           .overlay {
             RoundedRectangle(cornerRadius: MeetPRRadius.md)
               .stroke(
-                isHighlighted ? Color.MeetPR.brandRed : Color.MeetPR.border, lineWidth: 1)
+                isHighlighted ? Color.MeetPR.gold500 : Color.MeetPR.borderDefault, lineWidth: 1)
           }
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
           #if os(iOS)
@@ -213,7 +213,7 @@ struct OnboardingNumberField: View {
           }
         Text(unitSuffix)
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
     }
   }
@@ -231,21 +231,21 @@ struct OnboardingTextEditor: View {
       OnboardingFieldLabel(title: title)
       TextEditor(text: $text)
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .scrollContentBackground(.hidden)
         .padding(MeetPRSpacing.sm)
         .frame(minHeight: 88)
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.surfaceCard)
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
         .overlay(alignment: .topLeading) {
           if text.isEmpty {
             Text(placeholder)
               .font(Font.MeetPR.body)
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .foregroundStyle(Color.MeetPR.textTertiary)
               .padding(MeetPRSpacing.md)
               .allowsHitTesting(false)
           }

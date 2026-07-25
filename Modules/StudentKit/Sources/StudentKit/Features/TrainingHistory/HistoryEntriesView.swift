@@ -20,7 +20,7 @@ struct HistoryEntriesView: View {
           VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
             Text("第 \(week.id) 周")
               .font(Font.MeetPR.headline)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
 
             ForEach(week.days) { day in
               dayCard(day, logs: logs)
@@ -68,23 +68,23 @@ struct HistoryEntriesView: View {
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(MeetPRSpacing.md)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.md)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
 
   private func exerciseBlock(_ exercise: StudentPlanExercise, logs: [StudentSetLog]) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Divider().overlay(Color.MeetPR.border)
+      Divider().overlay(Color.MeetPR.borderDefault)
       Text(exercise.exercise.name)
         .font(Font.MeetPR.footnote.bold())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       if let note = CoachNoteDisplay.text(exercise.notes) {
-        CoachNotePill(note: note, background: Color.MeetPR.surface2)
+        CoachNotePill(note: note, background: Color.MeetPR.surfaceElevated)
       }
 
       ForEach(exercise.prescribedSets) { set in
@@ -106,7 +106,7 @@ private struct ExerciseFilterPicker: View {
     HStack {
       Text("按动作筛选")
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       Spacer()
       Picker("按动作筛选", selection: $selectedExerciseName) {
         Text("全部动作").tag(nil as String?)
@@ -115,14 +115,14 @@ private struct ExerciseFilterPicker: View {
         }
       }
       .pickerStyle(.menu)
-      .tint(Color.MeetPR.brandRed)
+      .tint(Color.MeetPR.gold500)
     }
     .padding(.horizontal, MeetPRSpacing.md)
     .padding(.vertical, MeetPRSpacing.sm)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.md)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
@@ -135,19 +135,19 @@ private struct HistoryDayHeader: View {
 
   var body: some View {
     HStack(alignment: .firstTextBaseline) {
-      VStack(alignment: .leading, spacing: 2) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
         Text(StudentFormatting.dayMonthFormatter.string(from: day.date))
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text(StudentFormatting.weekdayFormatter.string(from: day.date))
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       Spacer()
       if day.exercises.isEmpty {
         Text("休息日")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       } else {
         Text("\(progress.completed)/\(progress.total) 组")
           .font(Font.MeetPR.footnote.monospacedDigit())
@@ -157,9 +157,10 @@ private struct HistoryDayHeader: View {
   }
 
   private var progressColor: Color {
-    progress.total > 0 && progress.completed == progress.total
-      ? Color.MeetPR.green
-      : Color.MeetPR.amber
+    if progress.total > 0, progress.completed == progress.total {
+      return Color.MeetPR.success
+    }
+    return progress.completed > 0 ? Color.MeetPR.gold500 : Color.MeetPR.danger
   }
 }
 
@@ -172,16 +173,16 @@ private struct HistorySetRow: View {
     HStack {
       Text("第 \(set.setIndex + 1) 组")
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
       Spacer()
       if let log {
         Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
           .font(Font.MeetPR.caption.monospacedDigit().bold())
-          .foregroundStyle(log.completed ? Color.MeetPR.green : Color.MeetPR.fgSecondary)
+          .foregroundStyle(log.completed ? Color.MeetPR.success : Color.MeetPR.textSecondary)
       } else {
         Text(StudentFormatting.prescribed(set))
           .font(Font.MeetPR.caption.monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
   }

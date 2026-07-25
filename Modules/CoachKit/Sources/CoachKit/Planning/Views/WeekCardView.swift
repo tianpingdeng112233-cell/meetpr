@@ -23,7 +23,7 @@ public struct WeekCardView: View {
             WeekCardDaySection(viewModel: viewModel, day: day, weekNumber: weekNumber)
           }
 
-          Eyebrow(footerText, color: Color.MeetPR.fgTertiary, showsRule: false)
+          Eyebrow(footerText, color: Color.MeetPR.textTertiary, showsRule: false)
 
           HStack {
             if weekNumber > 1 {
@@ -35,7 +35,7 @@ public struct WeekCardView: View {
             }
           }
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
       .scrollIndicators(.hidden)
@@ -46,7 +46,7 @@ public struct WeekCardView: View {
     HStack(alignment: .firstTextBaseline) {
       Text("Week \(weekNumber) / \(weekCount)")
         .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()
       StatusBadge(
         status: weekNumber == 1 ? .completed : .pending, title: weekNumber == 1 ? "基线" : "推导")
@@ -74,7 +74,7 @@ private struct WeekCardDaySection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Eyebrow(viewModel.dayLabel(day.dayOfWeek), color: Color.MeetPR.fgTertiary)
+      Eyebrow(viewModel.dayLabel(day.dayOfWeek), color: Color.MeetPR.textTertiary)
 
       ForEach(viewModel.sortedExercises(in: day), id: \.id) { exercise in
         if let spec = viewModel.derivedSetSpec(forWeek: weekNumber, draftExercise: exercise) {
@@ -101,25 +101,25 @@ private struct WeekExerciseRow: View {
         HStack(spacing: MeetPRSpacing.xs) {
           Text(title)
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           if isMainLift {
             StatusBadge(status: .live, title: "主项")
           }
         }
         Text("\(spec.setCount) 组 × \(spec.targetReps) 次")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
 
       Spacer()
 
       Text(intensityText)
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .monospacedDigit()
     }
     .padding(MeetPRSpacing.md)
-    .background(Color.MeetPR.surface2)
+    .background(Color.MeetPR.surfaceElevated)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .contextMenu {
       Button("查看详情", systemImage: "info.circle") {}
@@ -148,19 +148,19 @@ private struct ExercisePeekView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Text(title)
         .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Text("\(spec.setCount) 组 × \(spec.targetReps) 次")
       Text(detail)
       if let notes = spec.notes, !notes.isEmpty {
         Text(notes)
       }
       Text("PR / e1RM：TODO spec NNN backend wiring")
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
     .font(Font.MeetPR.footnote)
-    .foregroundStyle(Color.MeetPR.fgSecondary)
+    .foregroundStyle(Color.MeetPR.textSecondary)
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
   }
 
   private var detail: String {

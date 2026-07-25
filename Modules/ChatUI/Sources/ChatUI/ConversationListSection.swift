@@ -21,26 +21,26 @@ public struct ConversationListSection: View {
       if inbox.conversations.isEmpty {
         Text(ChatStrings.noConversations)
           .font(.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(MeetPRSpacing.base)
       } else {
-        LazyVStack(spacing: 0) {
+        LazyVStack(spacing: MeetPRSpacing.zero) {
           ForEach(inbox.conversations) { conversation in
             Button {
               onSelect(conversation)
             } label: {
               ConversationListRow(conversation: conversation)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressScaleButtonStyle())
 
             if conversation.id != inbox.conversations.last?.id {
               Divider()
-                .overlay(Color.MeetPR.border)
+                .overlay(Color.MeetPR.borderDefault)
             }
           }
         }
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.surfaceCard)
         .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       }
     }
@@ -63,7 +63,7 @@ private struct ConversationListRow: View {
         HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
           Text(conversation.otherPartyName)
             .font(.body.bold())
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .lineLimit(1)
           Spacer(minLength: MeetPRSpacing.sm)
           if let date = conversation.lastMessageAt {
@@ -72,19 +72,19 @@ private struct ConversationListRow: View {
             // Chinese only, matching CoachKit's CoachStudentFormatting.
             Text(ChatRelativeTime.text(date))
               .font(.caption)
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .foregroundStyle(Color.MeetPR.textTertiary)
           }
         }
 
         HStack(spacing: MeetPRSpacing.sm) {
           Text(preview)
             .font(.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .lineLimit(1)
           Spacer(minLength: MeetPRSpacing.sm)
           if conversation.unreadCount > 0 {
             Circle()
-              .fill(Color.MeetPR.brandRed)
+              .fill(MeetPRSemanticTone.unread.color)
               .frame(width: 8, height: 8)
               .accessibilityLabel("\(conversation.unreadCount) \(ChatStrings.unread)")
           }
@@ -93,7 +93,7 @@ private struct ConversationListRow: View {
 
       Image(systemName: "chevron.right")
         .font(.footnote.bold())
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
         .accessibilityHidden(true)
     }
     .padding(MeetPRSpacing.base)

@@ -49,22 +49,22 @@ public struct OnboardingWizardFlow: View {
   private var interstitial: some View {
     VStack(spacing: MeetPRSpacing.lg) {
       Image(systemName: "list.clipboard")
-        .font(.system(size: 40))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size40))
+        .foregroundStyle(Color.MeetPR.textTertiary)
       Text("完成资料填写,教练才能开始评估")
         .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .multilineTextAlignment(.center)
       Text("已填的内容都已保存,可随时继续")
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       PrimaryButton("继续填写", isFullWidth: true) {
         isPresented = true
       }
     }
     .padding(MeetPRSpacing.base)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 }
 
@@ -84,7 +84,7 @@ struct OnboardingWizardView: View {
         // honor a locale inherited from an ancestor — setting it on the
         // picker itself leaves the wheel in the device language (iOS 26).
         .environment(\.locale, Locale(identifier: "zh_CN"))
-        .background(Color.MeetPR.bg)
+        .background(Color.MeetPR.bgBase)
         .navigationTitle("Step \(viewModel.step) of \(OnboardingDraft.stepCount)")
         #if os(iOS)
           .navigationBarTitleDisplayMode(.inline)
@@ -129,23 +129,23 @@ struct OnboardingWizardView: View {
   }
 
   private var editor: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: MeetPRSpacing.zero) {
       progressBar
       ScrollView {
         VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
           Text(Self.stepTitles[viewModel.step - 1])
             .font(Font.MeetPR.title1)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           stepBody
 
           if let banner = viewModel.saveBanner {
             Text(banner)
               .font(Font.MeetPR.caption)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
               .padding(MeetPRSpacing.sm)
               .frame(maxWidth: .infinity, alignment: .leading)
-              .background(Color.MeetPR.surface2)
+              .background(Color.MeetPR.surfaceElevated)
               .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
           }
         }
@@ -178,10 +178,10 @@ struct OnboardingWizardView: View {
   private var progressBar: some View {
     GeometryReader { proxy in
       Rectangle()
-        .fill(Color.MeetPR.surface2)
+        .fill(Color.MeetPR.surfaceElevated)
         .overlay(alignment: .leading) {
           Rectangle()
-            .fill(Color.MeetPR.brandRed)
+            .fill(Color.MeetPR.gold500)
             .frame(
               width: proxy.size.width * CGFloat(viewModel.step)
                 / CGFloat(OnboardingDraft.stepCount))
@@ -198,8 +198,9 @@ struct OnboardingWizardView: View {
           viewModel.back()
         }
       }
-      PrimaryButton(
+      BrandPrimaryButton(
         viewModel.isLastStep ? "完成,开始训练!" : "下一步",
+        showsShimmer: viewModel.isLastStep,
         isDisabled: !viewModel.canAdvance,
         isLoading: viewModel.isCompleting,
         isFullWidth: true
@@ -214,7 +215,7 @@ struct OnboardingWizardView: View {
       }
     }
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private func trackCurrentStep() {
@@ -235,16 +236,16 @@ private struct CompletionHandoffView: View {
   var body: some View {
     VStack(spacing: MeetPRSpacing.lg) {
       Image(systemName: "checkmark.circle.fill")
-        .font(.system(size: 44))
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size44))
+        .foregroundStyle(Color.MeetPR.gold500)
       Text("资料已提交")
         .font(Font.MeetPR.title1)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       if viewModel.phase == .handoffFailed {
         Text("绑定请求发送失败,请检查网络后重试")
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         PrimaryButton("重试发送", isFullWidth: true) {
           Task { await viewModel.retryHandoff() }
         }
@@ -252,11 +253,11 @@ private struct CompletionHandoffView: View {
         ProgressView()
         Text("正在发送绑定请求")
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
     .padding(MeetPRSpacing.base)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 }

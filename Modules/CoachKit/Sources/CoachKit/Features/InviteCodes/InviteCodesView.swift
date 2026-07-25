@@ -25,7 +25,7 @@ struct InviteCodesView: View {
       }
     }
     .scrollContentBackground(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("我的邀请码")
     .task {
       await viewModel.loadIfNeeded()
@@ -85,11 +85,13 @@ struct InviteCodesView: View {
       if let code = viewModel.activePersonalCode {
         VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
           Text(InviteCodeFormat.grouped(code.code))
-            .font(.system(size: 28, weight: .bold, design: .monospaced))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(
+              .MeetPR.system(size: MeetPRFontMetrics.size28, weight: .bold, design: .monospaced)
+            )
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("已使用 \(code.usedCount) 次")
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           HStack(spacing: MeetPRSpacing.md) {
             SecondaryButton(viewModel.copiedCodeID == code.id ? "已复制" : "复制") {
               copy(code)
@@ -104,7 +106,7 @@ struct InviteCodesView: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
           Text("还没有永久码 — 生成一张,随时分发给新学员。")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           // Explicit button, never auto-generated on load (spec 031 D6).
           PrimaryButton("生成我的永久码", isLoading: viewModel.isMutating) {
             Task { await viewModel.generatePersonalCode() }
@@ -115,10 +117,10 @@ struct InviteCodesView: View {
       if let actionError = viewModel.actionError {
         Text(actionError)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
     }
-    .listRowBackground(Color.MeetPR.surface1)
+    .listRowBackground(Color.MeetPR.surfaceCard)
   }
 
   // MARK: - Single-use / time-limited
@@ -144,7 +146,7 @@ struct InviteCodesView: View {
           }
       }
     }
-    .listRowBackground(Color.MeetPR.surface1)
+    .listRowBackground(Color.MeetPR.surfaceCard)
   }
 
   private var defunctSection: some View {
@@ -154,7 +156,7 @@ struct InviteCodesView: View {
           .opacity(0.5)
       }
     }
-    .listRowBackground(Color.MeetPR.surface1)
+    .listRowBackground(Color.MeetPR.surfaceCard)
   }
 
   private func codeRow(_ code: InviteCode) -> some View {
@@ -164,18 +166,18 @@ struct InviteCodesView: View {
       copy(code)
     } label: {
       HStack(spacing: MeetPRSpacing.md) {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
           Text(InviteCodeFormat.grouped(code.code))
             .font(Font.MeetPR.monoLabel)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           HStack(spacing: MeetPRSpacing.xs) {
             Text(code.type == .singleUse ? "一次性" : "限时")
               .font(Font.MeetPR.caption)
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .foregroundStyle(Color.MeetPR.textTertiary)
             if let label = code.label {
               Text("· \(label)")
                 .font(Font.MeetPR.caption)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .foregroundStyle(Color.MeetPR.textSecondary)
             }
           }
         }
@@ -183,15 +185,15 @@ struct InviteCodesView: View {
         if viewModel.copiedCodeID == code.id {
           Text("已复制")
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         } else {
           Text(status.label)
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   /// Clipboard always gets the raw ungrouped 10 chars (spec 031 D11).
@@ -236,7 +238,7 @@ private struct CreateCodeSheet: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       Text(kind == .singleUse ? "生成一次性码" : "生成限时码")
         .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       MeetPRTextField("备注(选填,如学员姓名)", text: $label, placeholder: "给小明")
 
@@ -253,14 +255,14 @@ private struct CreateCodeSheet: View {
       Spacer()
     }
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private var expiryPicker: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Text("有效期")
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Picker("有效期", selection: $expiryChoice) {
         Text("7 天").tag(ExpiryChoice.week)
         Text("30 天").tag(ExpiryChoice.month)
@@ -271,7 +273,7 @@ private struct CreateCodeSheet: View {
         Stepper(value: $customDays, in: 1...365) {
           Text("\(customDays) 天")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
       }
     }

@@ -74,27 +74,27 @@ struct Step4EnvironmentSection: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text(OnboardingLabels.label(tier))
             .font(Font.MeetPR.body)
-            .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+            .foregroundStyle(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.textSecondary)
           Text(Self.tierSubtitle(tier))
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
             .multilineTextAlignment(.leading)
         }
         Spacer()
         if isSelected {
           Image(systemName: "checkmark.circle.fill")
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
       }
       .padding(MeetPRSpacing.md)
-      .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+      .background(isSelected ? Color.MeetPR.goldSoft : Color.MeetPR.surfaceCard)
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.md)
-          .stroke(isSelected ? Color.MeetPR.brandRed : Color.MeetPR.border, lineWidth: 1)
+          .stroke(isSelected ? Color.MeetPR.gold500 : Color.MeetPR.borderDefault, lineWidth: 1)
       }
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   /// One-line "你能做什么" summary per tier (research: 让学员一眼自判;
@@ -115,7 +115,7 @@ struct Step4EnvironmentSection: View {
         OnboardingFieldLabel(title: "器械微调")
         Text("按场馆预填 — 勾掉没有的、补上有的,不确定就保持默认")
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       equipmentChipGrid("基础", .basics)
       OnboardingChoiceCards(

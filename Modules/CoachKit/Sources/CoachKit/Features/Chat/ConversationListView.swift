@@ -16,7 +16,7 @@ struct ConversationListView: View {
       .padding(MeetPRSpacing.base)
     }
     .scrollIndicators(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle(CoachStrings.messages)
     .modifier(CoachChatNavigationBarModifier())
     .navigationDestination(item: $selectedConversation) { conversation in

@@ -16,7 +16,7 @@ struct VolumeIntensityChart: View {
       )
       .frame(maxWidth: .infinity, minHeight: 240)
       .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     } else {
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
@@ -26,7 +26,13 @@ struct VolumeIntensityChart: View {
               x: .value("周", bucket.weekStart, unit: .weekOfYear),
               y: .value("训练容量", volumeValue(for: bucket))
             )
-            .foregroundStyle(Color.MeetPR.brandRed.opacity(0.32))
+            .foregroundStyle(
+              LinearGradient(
+                colors: [Color.MeetPR.gold400, Color.MeetPR.gold700.opacity(0.28)],
+                startPoint: .top,
+                endPoint: .bottom
+              )
+            )
           }
 
           ForEach(rpeBuckets) { bucket in
@@ -35,27 +41,36 @@ struct VolumeIntensityChart: View {
                 x: .value("周", bucket.weekStart, unit: .weekOfYear),
                 y: .value("平均 RPE", normalizedRPE(avgRPE))
               )
-              .foregroundStyle(Color.MeetPR.green)
+              .foregroundStyle(Color.MeetPR.bgBase)
+              .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+              .interpolationMethod(.catmullRom)
+
+              LineMark(
+                x: .value("周", bucket.weekStart, unit: .weekOfYear),
+                y: .value("平均 RPE", normalizedRPE(avgRPE))
+              )
+              .foregroundStyle(Color.MeetPR.chartLine)
+              .lineStyle(StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round))
               .interpolationMethod(.catmullRom)
 
               PointMark(
                 x: .value("周", bucket.weekStart, unit: .weekOfYear),
                 y: .value("平均 RPE", normalizedRPE(avgRPE))
               )
-              .foregroundStyle(Color.MeetPR.green)
-              .symbolSize(34)
+              .foregroundStyle(Color.MeetPR.chartLine)
+              .symbolSize(22)
             }
           }
         }
         .chartYScale(domain: 0...volumeScale)
         .chartYAxis {
           AxisMarks(position: .leading) { value in
-            AxisGridLine().foregroundStyle(Color.MeetPR.fgTertiary.opacity(0.2))
+            AxisGridLine().foregroundStyle(Color.MeetPR.borderDefault)
             AxisValueLabel {
               if let kilograms = value.as(Double.self) {
                 Text(kilograms, format: .number.precision(.fractionLength(0)))
-                  .font(Font.MeetPR.monoLabel)
-                  .foregroundStyle(Color.MeetPR.fgSecondary)
+                  .font(.MeetPR.mono(size: 9, weight: .medium))
+                  .foregroundStyle(Color.MeetPR.textMuted)
               }
             }
           }
@@ -64,8 +79,8 @@ struct VolumeIntensityChart: View {
             AxisValueLabel {
               if let scaled = value.as(Double.self) {
                 Text(rpeAxisLabel(for: scaled))
-                  .font(Font.MeetPR.monoLabel)
-                  .foregroundStyle(Color.MeetPR.green)
+                  .font(.MeetPR.mono(size: 9, weight: .medium))
+                  .foregroundStyle(Color.MeetPR.chartLine)
               }
             }
           }
@@ -75,19 +90,19 @@ struct VolumeIntensityChart: View {
             AxisValueLabel {
               if let date = value.as(Date.self) {
                 Text(date, format: .dateTime.month(.defaultDigits).day())
-                  .font(Font.MeetPR.monoLabel)
-                  .foregroundStyle(Color.MeetPR.fgSecondary)
+                  .font(.MeetPR.mono(size: 9, weight: .medium))
+                  .foregroundStyle(Color.MeetPR.textMuted)
               }
             }
           }
         }
-        .frame(height: 260)
+        .frame(height: 172)
 
         VolumeIntensityLegend()
       }
       .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.card))
       .accessibilityLabel("容量和平均 RPE 趋势图")
     }
   }
@@ -124,8 +139,8 @@ struct VolumeIntensityChart: View {
 private struct VolumeIntensityLegend: View {
   var body: some View {
     HStack(spacing: MeetPRSpacing.base) {
-      LegendSwatch(color: Color.MeetPR.brandRed.opacity(0.32), label: "训练容量 kg")
-      LegendSwatch(color: Color.MeetPR.green, label: "平均 RPE")
+      LegendSwatch(color: Color.MeetPR.gold500, label: "训练容量 kg")
+      LegendSwatch(color: Color.MeetPR.chartLine, label: "平均 RPE")
     }
   }
 }
@@ -137,12 +152,12 @@ private struct LegendSwatch: View {
 
   var body: some View {
     HStack(spacing: MeetPRSpacing.xs) {
-      RoundedRectangle(cornerRadius: 2)
+      RoundedRectangle(cornerRadius: MeetPRRadius.point2)
         .fill(color)
         .frame(width: 12, height: 8)
       Text(label)
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
   }
 }

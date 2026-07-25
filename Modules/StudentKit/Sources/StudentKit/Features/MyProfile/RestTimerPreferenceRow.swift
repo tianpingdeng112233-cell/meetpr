@@ -20,25 +20,25 @@ struct RestTimerPreferenceRow: View {
     NavigationLink {
       RestTimerSettingsView(preference: preferenceBinding)
     } label: {
-      HStack(spacing: 12) {
-        VStack(alignment: .leading, spacing: 4) {
+      HStack(spacing: MeetPRSpacing.space3) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           Text("组间休息")
-            .font(.system(size: 14))
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+            .foregroundStyle(Color.MeetPR.textTertiary)
           Text(summary)
-            .font(.system(size: 17))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size17))
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
         Spacer()
         Image(systemName: "chevron.right")
-          .font(.system(size: 15))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
-      .padding(16)
+      .padding(MeetPRSpacing.space4)
       .frame(minHeight: 64)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private var preferenceBinding: Binding<StudentRestTimerPreference> {

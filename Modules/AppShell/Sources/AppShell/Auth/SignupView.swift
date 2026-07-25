@@ -13,20 +13,20 @@ public struct SignupView: View {
     @Bindable var viewModel = viewModel
 
     ScrollView {
-      VStack(alignment: .leading, spacing: 0) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
         // ── Brand hero ───────────────────────────────────────────────
         MeetPRMark(size: 56)
           .padding(.bottom, MeetPRSpacing.lg)
 
         Eyebrow("注册 · 角色")
         Text("选择你的角色")
-          .font(.system(size: 40, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .padding(.top, 8)
-        (Text("注册后角色将锁定。").foregroundStyle(Color.MeetPR.fgSecondary)
-          + Text("多角色支持在 V1.5 评估。").foregroundStyle(Color.MeetPR.fgTertiary))
-          .font(.system(size: 14))
-          .padding(.top, 12)
+          .font(.MeetPR.display(size: 40, weight: .extraBold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .padding(.top, MeetPRSpacing.space2)
+        (Text("注册后角色将锁定。").foregroundStyle(Color.MeetPR.textSecondary)
+          + Text("多角色支持在 V1.5 评估。").foregroundStyle(Color.MeetPR.textTertiary))
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size40, weight: .heavy))
+          .padding(.top, MeetPRSpacing.space3)
 
         // ── Credentials ──────────────────────────────────────────────
         VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
@@ -52,25 +52,26 @@ public struct SignupView: View {
         .padding(.top, MeetPRSpacing.xl)
 
         // ── Role cards (design `AuthFlow` step 1, big cards) ──────────
-        VStack(spacing: 12) {
+        VStack(spacing: MeetPRSpacing.space3) {
           ForEach(UserRole.allCases, id: \.self) { role in
             RoleCard(role: role, selectedRole: $viewModel.selectedRole)
           }
         }
         .accessibilityIdentifier("signup.role")
-        .padding(.top, 26)
+        .padding(.top, MeetPRSpacing.point26)
 
         if let toastMessage = viewModel.toastMessage {
           Text(toastMessage)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
             .accessibilityIdentifier("signup.toast")
             .padding(.top, MeetPRSpacing.md)
         }
 
         // ── Submit ───────────────────────────────────────────────────
-        PrimaryButton(
+        BrandPrimaryButton(
           "注册",
+          showsShimmer: true,
           isDisabled: !viewModel.canSubmit,
           isLoading: viewModel.isSubmitting,
           isFullWidth: true
@@ -80,15 +81,15 @@ public struct SignupView: View {
           }
         }
         .accessibilityIdentifier("signup.submit")
-        .padding(.top, 26)
+        .padding(.top, MeetPRSpacing.point26)
       }
-      .padding(.horizontal, 24)
-      .padding(.top, 32)
-      .padding(.bottom, 24)
+      .padding(.horizontal, MeetPRSpacing.space6)
+      .padding(.top, MeetPRSpacing.point32)
+      .padding(.bottom, MeetPRSpacing.space6)
       .frame(maxWidth: 520, alignment: .leading)
       .frame(maxWidth: .infinity)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .hideNavigationBar()
   }
 }
@@ -106,46 +107,46 @@ private struct RoleCard: View {
     Button {
       selectedRole = role
     } label: {
-      HStack(spacing: 14) {
+      HStack(spacing: MeetPRSpacing.point14) {
         Circle()
           .stroke(
-            active ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary,
+            active ? Color.MeetPR.gold500 : Color.MeetPR.textTertiary,
             lineWidth: active ? 7 : 2
           )
           .frame(width: 26, height: 26)
-        VStack(alignment: .leading, spacing: 5) {
-          HStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point5) {
+          HStack(spacing: MeetPRSpacing.space2) {
             Text(role.authTitle)
-              .font(.system(size: 20, weight: .bold))
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size20, weight: .bold))
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text(role.authTag)
-              .font(.system(size: 10, design: .monospaced))
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size10, design: .monospaced))
               .tracking(0.6)
-              .foregroundStyle(Color.MeetPR.brandRed)
-              .padding(.horizontal, 7)
-              .padding(.vertical, 2)
+              .foregroundStyle(Color.MeetPR.gold500)
+              .padding(.horizontal, MeetPRSpacing.point7)
+              .padding(.vertical, MeetPRSpacing.point2)
               .overlay {
-                RoundedRectangle(cornerRadius: 4).stroke(
-                  Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1)
+                RoundedRectangle(cornerRadius: MeetPRRadius.point4).stroke(
+                  Color.MeetPR.gold500.opacity(0.3), lineWidth: 1)
               }
           }
           Text(role.authSubtitle)
-            .font(.system(size: 14))
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         Spacer(minLength: 0)
       }
-      .padding(20)
-      .background(active ? Color.MeetPR.surface2 : Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
+      .padding(MeetPRSpacing.space5)
+      .background(active ? Color.MeetPR.surfaceElevated : Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       .overlay {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(active ? Color.MeetPR.fgPrimary : Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(active ? Color.MeetPR.gold500 : Color.MeetPR.borderDefault, lineWidth: 1)
       }
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityIdentifier("signup.role.\(role.rawValue)")
   }
 }

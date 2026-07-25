@@ -19,7 +19,7 @@ public struct EvaluationSummaryView: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
         Text("更新于 \(StudentFormatting.dayMonthFormatter.string(from: summary.lastUpdatedAt))")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
 
         sectionCard("整体评估", text: summary.overallAssessment)
         sectionCard("训练规划", text: summary.trainingPlan)
@@ -29,7 +29,7 @@ public struct EvaluationSummaryView: View {
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("评估总结")
     .onAppear {
       onRead()
@@ -42,7 +42,7 @@ public struct EvaluationSummaryView: View {
         Eyebrow(title)
         Text(text)
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
     }

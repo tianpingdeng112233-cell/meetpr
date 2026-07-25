@@ -4,7 +4,7 @@ import Testing
 @testable import StudentKit
 
 /// The review-completed flag must survive sheet dismissal and app restarts
-/// (the bug: the slide control re-armed after 训练回顾 → 完成) and stay scoped
+/// (the bug: the completion control re-armed after 训练回顾 → 完成) and stay scoped
 /// per student + per day.
 @Suite struct SessionReviewStoreTests {
   private func makeStore() throws -> UserDefaultsSessionReviewStore {

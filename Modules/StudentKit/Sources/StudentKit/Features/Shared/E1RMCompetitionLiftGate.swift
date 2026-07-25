@@ -80,7 +80,7 @@ public struct E1RMCompetitionLiftGate<Content: View>: View {
             .font(Font.MeetPR.headline)
           Text("请重试，校准完成前不会使用旧的 e1RM 或 PR 基线。")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .multilineTextAlignment(.center)
           PrimaryButton("重试") {
             Task { await viewModel.migrate(studentID: studentID) }

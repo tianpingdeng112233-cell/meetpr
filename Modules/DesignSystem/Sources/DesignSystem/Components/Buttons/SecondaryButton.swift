@@ -24,22 +24,22 @@ public struct SecondaryButton: View {
   public var body: some View {
     Button(action: handleTap) {
       Text(title)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(Font.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .lineLimit(2)
         .multilineTextAlignment(.center)
         .padding(.horizontal, MeetPRSpacing.lg)
-        .padding(.vertical, 14)
+        .padding(.vertical, MeetPRSpacing.point14)
         .frame(maxWidth: isFullWidth ? .infinity : nil)
         .frame(minHeight: 44)
-        .background(.clear)
+        .background(Color.MeetPR.surfaceCard)
         .overlay {
-          RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-            .stroke(Color.MeetPR.fgPrimary, lineWidth: 1)
+          RoundedRectangle(cornerRadius: MeetPRRadius.pill)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
-        .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
+        .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: isDisabled))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled))
     .disabled(isDisabled)
     .sensoryFeedback(.impact(weight: .light), trigger: feedbackTrigger)
     .accessibilityLabel(title)
@@ -58,13 +58,13 @@ public struct SecondaryButton: View {
     SecondaryButton("Disabled", isDisabled: true) {}
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("SecondaryButton Light") {
   SecondaryButton("Discard") {}
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

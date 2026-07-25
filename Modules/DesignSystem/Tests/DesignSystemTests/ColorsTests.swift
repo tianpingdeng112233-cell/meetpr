@@ -17,7 +17,7 @@ private struct ColorComponents: Sendable {
   let blue: Double
   let alpha: Double
 
-  init(red: Double, green: Double, blue: Double, alpha: Double = 1) {
+  init(_ red: Double, _ green: Double, _ blue: Double, alpha: Double = 1) {
     self.red = red > 1 ? red / 255 : red
     self.green = green > 1 ? green / 255 : green
     self.blue = blue > 1 ? blue / 255 : blue
@@ -30,141 +30,139 @@ private enum ColorTestError: Error {
   case unresolvedColor
 }
 
-@Suite("MeetPR color tokens")
+@Suite("MeetPR black-gold color tokens")
 struct ColorsTests {
-  @Test("brand colors match CSS root")
-  func brandColorsMatchCSSRoot() throws {
-    try assertColor(Color.MeetPR.brandRed, equals: .init(red: 229, green: 34, blue: 30))
-    try assertColor(Color.MeetPR.brandRedPress, equals: .init(red: 184, green: 26, blue: 23))
-    try assertColor(
-      Color.MeetPR.brandRedSoft,
-      equals: .init(red: 229, green: 34, blue: 30, alpha: 0.12),
-      scheme: .dark
+  @Test("gold tokens match dark and light baselines")
+  func goldTokensMatchBaselines() throws {
+    try assertColor(.MeetPR.goldCTA, equals: .init(255, 184, 0))
+    try assertDynamicColor(.MeetPR.gold500, dark: .init(245, 166, 35), light: .init(217, 119, 6))
+    try assertDynamicColor(.MeetPR.gold400, dark: .init(251, 191, 62), light: .init(245, 158, 11))
+    try assertDynamicColor(.MeetPR.gold300, dark: .init(255, 212, 112), light: .init(252, 211, 77))
+    try assertDynamicColor(.MeetPR.gold200, dark: .init(255, 226, 142), light: .init(254, 243, 199))
+    try assertDynamicColor(.MeetPR.gold700, dark: .init(184, 120, 20), light: .init(180, 83, 9))
+    try assertDynamicColor(
+      .MeetPR.goldGradientStart,
+      dark: .init(224, 143, 15),
+      light: .init(217, 119, 6)
     )
-    try assertColor(
-      Color.MeetPR.brandRedSoft,
-      equals: .init(red: 229, green: 34, blue: 30, alpha: 0.08),
-      scheme: .light
-    )
-  }
-
-  @Test("semantic colors match CSS root")
-  func semanticColorsMatchCSSRoot() throws {
-    try assertColor(Color.MeetPR.green, equals: .init(red: 31, green: 179, blue: 88))
-    try assertColor(
-      Color.MeetPR.greenSoft,
-      equals: .init(red: 31, green: 179, blue: 88, alpha: 0.14)
-    )
-    try assertColor(Color.MeetPR.amber, equals: .init(red: 224, green: 168, blue: 16))
-    try assertColor(
-      Color.MeetPR.amberSoft,
-      equals: .init(red: 224, green: 168, blue: 16, alpha: 0.14)
+    try assertDynamicColor(
+      .MeetPR.goldGradientEnd,
+      dark: .init(255, 201, 60),
+      light: .init(245, 185, 60)
     )
   }
 
-  @Test("dark dynamic colors match CSS root")
-  func darkDynamicColorsMatchCSSRoot() throws {
-    try assertColor(Color.MeetPR.bg, equals: .init(red: 0, green: 0, blue: 0), scheme: .dark)
-    try assertColor(
-      Color.MeetPR.surface1,
-      equals: .init(red: 14, green: 14, blue: 14),
-      scheme: .dark
+  @Test("surface tokens match dark and light baselines")
+  func surfaceTokensMatchBaselines() throws {
+    try assertDynamicColor(.MeetPR.bgBase, dark: .init(10, 10, 12), light: .init(245, 246, 248))
+    try assertDynamicColor(.MeetPR.bgInset, dark: .init(16, 16, 20), light: .init(250, 250, 251))
+    try assertDynamicColor(.MeetPR.bgStack, dark: .init(18, 18, 23), light: .init(238, 240, 243))
+    try assertDynamicColor(
+      .MeetPR.surfaceCard,
+      dark: .init(20, 20, 22),
+      light: .init(255, 255, 255)
     )
-    try assertColor(
-      Color.MeetPR.surface2,
-      equals: .init(red: 22, green: 22, blue: 22),
-      scheme: .dark
+    try assertDynamicColor(
+      .MeetPR.surfaceElevated,
+      dark: .init(22, 22, 24),
+      light: .init(255, 255, 255)
     )
-    try assertColor(
-      Color.MeetPR.surface3,
-      equals: .init(red: 31, green: 31, blue: 31),
-      scheme: .dark
-    )
-    try assertColor(
-      Color.MeetPR.border,
-      equals: .init(red: 38, green: 38, blue: 38),
-      scheme: .dark
-    )
-    try assertColor(
-      Color.MeetPR.borderStrong,
-      equals: .init(red: 58, green: 58, blue: 58),
-      scheme: .dark
-    )
-    try assertColor(
-      Color.MeetPR.fgPrimary,
-      equals: .init(red: 255, green: 255, blue: 255),
-      scheme: .dark
-    )
-    try assertColor(
-      Color.MeetPR.fgSecondary,
-      equals: .init(red: 181, green: 181, blue: 181),
-      scheme: .dark
-    )
-    try assertColor(
-      Color.MeetPR.fgTertiary,
-      equals: .init(red: 115, green: 115, blue: 115),
-      scheme: .dark
-    )
-    try assertColor(
-      Color.MeetPR.fgDisabled,
-      equals: .init(red: 255, green: 255, blue: 255, alpha: 0.35),
-      scheme: .dark
+    try assertDynamicColor(
+      .MeetPR.surfaceKey,
+      dark: .init(28, 28, 32),
+      light: .init(243, 244, 246)
     )
   }
 
-  @Test("light dynamic colors match CSS light override")
-  func lightDynamicColorsMatchCSSLightOverride() throws {
-    try assertColor(
-      Color.MeetPR.bg,
-      equals: .init(red: 250, green: 250, blue: 250),
-      scheme: .light
+  @Test("border tokens match dark and light baselines")
+  func borderTokensMatchBaselines() throws {
+    try assertDynamicColor(
+      .MeetPR.borderHairline,
+      dark: .init(23, 23, 26),
+      light: .init(233, 235, 238)
     )
-    try assertColor(
-      Color.MeetPR.surface1,
-      equals: .init(red: 255, green: 255, blue: 255),
-      scheme: .light
+    try assertDynamicColor(
+      .MeetPR.borderSubtle,
+      dark: .init(30, 30, 34),
+      light: .init(229, 231, 235)
     )
-    try assertColor(
-      Color.MeetPR.surface2,
-      equals: .init(red: 244, green: 244, blue: 245),
-      scheme: .light
+    try assertDynamicColor(
+      .MeetPR.borderDefault,
+      dark: .init(38, 38, 41),
+      light: .init(229, 231, 235)
     )
-    try assertColor(
-      Color.MeetPR.surface3,
-      equals: .init(red: 233, green: 233, blue: 235),
-      scheme: .light
-    )
-    try assertColor(
-      Color.MeetPR.border,
-      equals: .init(red: 229, green: 229, blue: 229),
-      scheme: .light
-    )
-    try assertColor(
-      Color.MeetPR.borderStrong,
-      equals: .init(red: 201, green: 201, blue: 201),
-      scheme: .light
-    )
-    try assertColor(
-      Color.MeetPR.fgPrimary,
-      equals: .init(red: 10, green: 10, blue: 10),
-      scheme: .light
-    )
-    try assertColor(
-      Color.MeetPR.fgSecondary,
-      equals: .init(red: 82, green: 82, blue: 82),
-      scheme: .light
-    )
-    try assertColor(
-      Color.MeetPR.fgTertiary,
-      equals: .init(red: 163, green: 163, blue: 163),
-      scheme: .light
-    )
-    try assertColor(
-      Color.MeetPR.fgDisabled,
-      equals: .init(red: 10, green: 10, blue: 10, alpha: 0.35),
-      scheme: .light
+    try assertDynamicColor(
+      .MeetPR.borderStrong,
+      dark: .init(46, 46, 50),
+      light: .init(209, 213, 219)
     )
   }
+
+  @Test("text tokens match dark and light baselines")
+  func textTokensMatchBaselines() throws {
+    try assertDynamicColor(
+      .MeetPR.textPrimary,
+      dark: .init(237, 237, 237),
+      light: .init(17, 24, 39)
+    )
+    try assertDynamicColor(
+      .MeetPR.textSecondary,
+      dark: .init(200, 200, 204),
+      light: .init(75, 85, 99)
+    )
+    try assertDynamicColor(
+      .MeetPR.textTertiary,
+      dark: .init(161, 161, 166),
+      light: .init(107, 114, 128)
+    )
+    try assertDynamicColor(
+      .MeetPR.textMuted,
+      dark: .init(138, 138, 144),
+      light: .init(107, 114, 128)
+    )
+    try assertDynamicColor(
+      .MeetPR.textFaint,
+      dark: .init(122, 122, 128),
+      light: .init(156, 163, 175)
+    )
+    try assertDynamicColor(
+      .MeetPR.textDisabled,
+      dark: .init(85, 85, 92),
+      light: .init(156, 163, 175)
+    )
+  }
+
+  @Test("semantic and CTA tokens match dark and light baselines")
+  func semanticAndCTATokensMatchBaselines() throws {
+    try assertDynamicColor(.MeetPR.success, dark: .init(94, 158, 120), light: .init(21, 128, 61))
+    try assertColor(.MeetPR.danger, equals: .init(229, 72, 77))
+    try assertDynamicColor(
+      .MeetPR.chartLine,
+      dark: .init(220, 227, 234),
+      light: .init(154, 164, 176)
+    )
+    try assertColor(.MeetPR.inkOnGold, equals: .init(20, 20, 20))
+    try assertDynamicColor(
+      .MeetPR.ctaBackground,
+      dark: .init(255, 184, 0),
+      light: .init(17, 24, 39)
+    )
+    try assertDynamicColor(
+      .MeetPR.ctaText,
+      dark: .init(20, 20, 20),
+      light: .init(255, 255, 255)
+    )
+  }
+}
+
+private func assertDynamicColor(
+  _ color: Color,
+  dark: ColorComponents,
+  light: ColorComponents,
+  sourceLocation: SourceLocation = #_sourceLocation
+) throws {
+  try assertColor(color, equals: dark, scheme: .dark, sourceLocation: sourceLocation)
+  try assertColor(color, equals: light, scheme: .light, sourceLocation: sourceLocation)
 }
 
 private func assertColor(
@@ -191,7 +189,7 @@ private func resolvedComponents(for color: Color, scheme: ColorScheme) throws ->
     var blue: CGFloat = 0
     var alpha: CGFloat = 0
     resolved.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-    return ColorComponents(red: red, green: green, blue: blue, alpha: alpha)
+    return ColorComponents(red, green, blue, alpha: alpha)
   #elseif canImport(AppKit)
     let appearanceName: NSAppearance.Name = scheme == .dark ? .darkAqua : .aqua
     guard let appearance = NSAppearance(named: appearanceName) else {
@@ -200,16 +198,16 @@ private func resolvedComponents(for color: Color, scheme: ColorScheme) throws ->
 
     var resolved: NSColor?
     appearance.performAsCurrentDrawingAppearance {
-      resolved = NSColor(color).usingColorSpace(NSColorSpace.deviceRGB)
+      resolved = NSColor(color).usingColorSpace(.deviceRGB)
     }
     guard let rgb = resolved else {
       throw ColorTestError.unresolvedColor
     }
 
     return ColorComponents(
-      red: rgb.redComponent,
-      green: rgb.greenComponent,
-      blue: rgb.blueComponent,
+      rgb.redComponent,
+      rgb.greenComponent,
+      rgb.blueComponent,
       alpha: rgb.alphaComponent
     )
   #else

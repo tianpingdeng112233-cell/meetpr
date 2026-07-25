@@ -52,7 +52,7 @@ struct EvaluationSummaryEditorView: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("评估总结 · \(viewModel.student.displayName)")
     .task {
       if viewModel.state == .loading {
@@ -101,10 +101,10 @@ struct EvaluationSummaryEditorView: View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         if let notice = viewModel.noticeMessage {
-          noticeCard(notice, color: Color.MeetPR.amber, systemImage: "exclamationmark.triangle")
+          noticeCard(notice, color: Color.MeetPR.danger, systemImage: "exclamationmark.triangle")
         }
         if let prefillNotice = viewModel.prefillNotice {
-          noticeCard(prefillNotice, color: Color.MeetPR.fgSecondary, systemImage: "info.circle")
+          noticeCard(prefillNotice, color: Color.MeetPR.textSecondary, systemImage: "info.circle")
         }
 
         fieldCard(
@@ -134,7 +134,7 @@ struct EvaluationSummaryEditorView: View {
 
   @ViewBuilder
   private var actionArea: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: MeetPRSpacing.zero) {
       if viewModel.isEditMode {
         notifyToggleRow
         PrimaryButton(
@@ -159,14 +159,14 @@ struct EvaluationSummaryEditorView: View {
           Task { _ = await viewModel.save() }
         } label: {
           Text("保存草稿")
-            .font(.system(size: 14))
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+            .foregroundStyle(Color.MeetPR.textTertiary)
             .frame(maxWidth: .infinity)
-            .padding(.top, 14)
-            .padding(.bottom, 4)
+            .padding(.top, MeetPRSpacing.point14)
+            .padding(.bottom, MeetPRSpacing.space1)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .disabled(!viewModel.canSave || viewModel.isSaving)
       }
     }
@@ -175,7 +175,7 @@ struct EvaluationSummaryEditorView: View {
     if let savedAt = viewModel.lastSavedAt {
       Text("已保存 \(CoachStudentFormatting.relativeText(savedAt))")
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
         .frame(maxWidth: .infinity, alignment: .center)
     }
   }
@@ -185,26 +185,26 @@ struct EvaluationSummaryEditorView: View {
     Button {
       viewModel.notifyOnSave.toggle()
     } label: {
-      HStack(spacing: 10) {
+      HStack(spacing: MeetPRSpacing.point10) {
         Image(systemName: viewModel.notifyOnSave ? "checkmark" : "")
-          .font(.system(size: 13, weight: .bold))
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13, weight: .bold))
           .foregroundStyle(Color.white)
           .frame(width: 22, height: 22)
-          .background(viewModel.notifyOnSave ? Color.MeetPR.brandRed : Color.MeetPR.surface2)
-          .clipShape(.rect(cornerRadius: 5))
+          .background(viewModel.notifyOnSave ? Color.MeetPR.gold500 : Color.MeetPR.surfaceElevated)
+          .clipShape(.rect(cornerRadius: MeetPRRadius.point5))
           .overlay {
-            RoundedRectangle(cornerRadius: 5)
-              .stroke(Color.MeetPR.border, lineWidth: viewModel.notifyOnSave ? 0 : 1)
+            RoundedRectangle(cornerRadius: MeetPRRadius.point5)
+              .stroke(Color.MeetPR.borderDefault, lineWidth: viewModel.notifyOnSave ? 0 : 1)
           }
         Text("同时通知学员")
-          .font(.system(size: 15))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
       }
-      .padding(.bottom, 14)
+      .padding(.bottom, MeetPRSpacing.point14)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel("同时通知学员")
     .accessibilityValue(viewModel.notifyOnSave ? "已选中" : "未选中")
   }
@@ -216,20 +216,20 @@ struct EvaluationSummaryEditorView: View {
       Text(title)
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
 
       TextEditor(text: text)
         .frame(minHeight: minHeight)
         .scrollContentBackground(.hidden)
         .padding(MeetPRSpacing.md)
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.surfaceCard)
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .onChange(of: text.wrappedValue) { _, newValue in
           if newValue.count > EvaluationSummaryEditorViewModel.maxFieldLength {
             text.wrappedValue = String(
@@ -242,7 +242,7 @@ struct EvaluationSummaryEditorView: View {
   private func noticeCard(_ message: String, color: Color, systemImage: String) -> some View {
     HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
       Image(systemName: systemImage)
-        .font(.system(size: 14))
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
         .foregroundStyle(color)
       Text(message)
         .font(Font.MeetPR.footnote)
@@ -251,7 +251,7 @@ struct EvaluationSummaryEditorView: View {
     }
     .padding(MeetPRSpacing.md)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.md)

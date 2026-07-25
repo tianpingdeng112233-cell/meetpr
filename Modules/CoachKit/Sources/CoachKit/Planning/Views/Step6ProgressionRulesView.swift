@@ -21,14 +21,14 @@ public struct Step6ProgressionRulesView: View {
           Eyebrow("STEP 5")
           Text("递进 / 递减规则")
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
 
         if viewModel.progressionRules.isEmpty {
           Card(accessibilityLabel: "Empty rules") {
             Text("还没有规则；未覆盖的周会默认同上周。")
               .font(Font.MeetPR.body)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
         }
 
@@ -52,7 +52,7 @@ public struct Step6ProgressionRulesView: View {
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("递进规则")
     .scrollDismissesKeyboard(.interactively)
   }
@@ -65,13 +65,13 @@ private struct UncoveredRuleSummary: View {
   var body: some View {
     Card(accessibilityLabel: "Uncovered progression summary") {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("未被任何规则覆盖", color: Color.MeetPR.fgTertiary, showsRule: false)
+        Eyebrow("未被任何规则覆盖", color: Color.MeetPR.textTertiary, showsRule: false)
         ForEach([2, 3, 4], id: \.self) { week in
           let uncovered = viewModel.uncoveredExercises(for: week)
           if !uncovered.isEmpty {
             Text("W\(week): \(uncovered.map(viewModel.exerciseName(for:)).joined(separator: "、"))")
               .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
         }
       }

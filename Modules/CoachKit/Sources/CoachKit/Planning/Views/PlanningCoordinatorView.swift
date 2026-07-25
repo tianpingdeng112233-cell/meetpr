@@ -82,6 +82,6 @@ public struct PlanningCoordinatorView: View {
       repository: InMemoryPlanRepository.preview(),
       draftStore: PlanningPreviewFactory.makeStore()
     )
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 #endif

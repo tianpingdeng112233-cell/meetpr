@@ -26,38 +26,38 @@ enum SetRecordResultState: Equatable, Sendable {
   var accentColor: Color {
     switch self {
     case .completed:
-      Color.MeetPR.green
+      Color.MeetPR.success
     case .failed:
-      Color.MeetPR.amber
+      Color.MeetPR.danger
     case .unlogged:
-      Color.MeetPR.fgSecondary
+      Color.MeetPR.textSecondary
     }
   }
 
   var softBackgroundColor: Color {
     switch self {
     case .completed:
-      Color.MeetPR.greenSoft
+      Color.MeetPR.successSoft
     case .failed:
-      Color.MeetPR.amberSoft
+      Color.MeetPR.dangerSoft
     case .unlogged:
-      Color.MeetPR.surface2
+      Color.MeetPR.surfaceElevated
     }
   }
 
   var numberBackgroundColor: Color {
     switch self {
     case .completed:
-      Color.MeetPR.green
+      Color.MeetPR.success
     case .failed:
-      Color.MeetPR.amber
+      Color.MeetPR.danger
     case .unlogged:
-      Color.MeetPR.surface2
+      Color.MeetPR.surfaceElevated
     }
   }
 
   var numberForegroundColor: Color {
-    self == .unlogged ? Color.MeetPR.fgSecondary : .white
+    self == .unlogged ? Color.MeetPR.textSecondary : .white
   }
 }
 
@@ -110,11 +110,11 @@ struct SetRecordRow: View {
   }
 
   var body: some View {
-    HStack(spacing: 12) {
+    HStack(spacing: MeetPRSpacing.space3) {
       Button {
         onTap(rowIndex)
       } label: {
-        HStack(spacing: 12) {
+        HStack(spacing: MeetPRSpacing.space3) {
           Text("\(setNumber)")
             .font(.subheadline.monospacedDigit().bold())
             .foregroundStyle(resultState.numberForegroundColor)
@@ -125,23 +125,23 @@ struct SetRecordRow: View {
           if let targetWeight {
             Text(targetWeight)
               .font(.footnote.monospacedDigit())
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .foregroundStyle(Color.MeetPR.textTertiary)
           }
 
           if let coachNote {
             Text(coachNote)
               .font(.caption2.weight(.medium))
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
               .lineLimit(1)
-              .padding(.horizontal, 6)
-              .padding(.vertical, 2)
-              .background(Color.MeetPR.surface2)
+              .padding(.horizontal, MeetPRSpacing.point6)
+              .padding(.vertical, MeetPRSpacing.point2)
+              .background(Color.MeetPR.surfaceElevated)
               .clipShape(.capsule)
               .accessibilityLabel("教练备注 \(coachNote)")
           }
         }
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
 
       if draft.allowsPlateLoadingGuidance, let onPlateMath, let weight = plateMathWeightKg {
         Button {
@@ -149,28 +149,28 @@ struct SetRecordRow: View {
         } label: {
           Image(systemName: "scalemass")
             .font(.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
             .frame(width: 40, height: 40)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel("配片计算")
       }
 
       Button {
         onTap(rowIndex)
       } label: {
-        HStack(spacing: 6) {
+        HStack(spacing: MeetPRSpacing.point6) {
           Spacer(minLength: 0)
-          HStack(spacing: 6) {
+          HStack(spacing: MeetPRSpacing.point6) {
             Text(resultText)
               .font(.subheadline.monospacedDigit().bold())
             Image(systemName: resultState.iconName)
               .font(.caption2.bold())
           }
           .foregroundStyle(resultState.accentColor)
-          .padding(.horizontal, 12)
-          .padding(.vertical, 8)
+          .padding(.horizontal, MeetPRSpacing.space3)
+          .padding(.vertical, MeetPRSpacing.space2)
           .background(resultState.softBackgroundColor)
           .clipShape(.capsule)
           .overlay {
@@ -180,7 +180,7 @@ struct SetRecordRow: View {
           }
         }
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
     }
   }
 }

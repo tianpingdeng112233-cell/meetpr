@@ -25,7 +25,7 @@ struct BindRequestCard: View {
         } else {
           Text("资料未填写完成")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
 
         waitingRow
@@ -38,7 +38,7 @@ struct BindRequestCard: View {
     HStack(alignment: .firstTextBaseline) {
       Text(headlineText)
         .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .lineLimit(1)
       Spacer(minLength: MeetPRSpacing.sm)
       if CoachOnboardingDisplay.isExpiringSoon(expiredAt: item.expiredAt, now: now) {
@@ -90,7 +90,7 @@ struct BindRequestCard: View {
       if let note = onboarding.noteToCoach {
         Text("备注: \(note)")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .lineLimit(2)
       }
       summaryText(
@@ -101,13 +101,13 @@ struct BindRequestCard: View {
   private func summaryText(_ text: String) -> some View {
     Text(text)
       .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
   }
 
   private var waitingRow: some View {
     Text(CoachOnboardingDisplay.waitingText(since: item.submittedAt, now: now))
       .font(Font.MeetPR.caption)
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .foregroundStyle(Color.MeetPR.textTertiary)
   }
 
   private var buttonRow: some View {

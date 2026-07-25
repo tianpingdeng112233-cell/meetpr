@@ -47,7 +47,7 @@ public struct AccessoryLibrarySheet: View {
         }
         .padding(MeetPRSpacing.base)
       }
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("动作库")
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {

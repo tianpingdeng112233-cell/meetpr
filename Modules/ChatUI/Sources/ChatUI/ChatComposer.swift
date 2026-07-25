@@ -25,7 +25,7 @@ public struct ChatComposer: View {
       if let imageErrorMessage {
         Text(imageErrorMessage)
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
 
       HStack(alignment: .bottom, spacing: MeetPRSpacing.sm) {
@@ -37,7 +37,7 @@ public struct ChatComposer: View {
           } else {
             Image(systemName: "photo")
               .font(.body)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
               .frame(width: 44, height: 44)
           }
         }
@@ -45,12 +45,17 @@ public struct ChatComposer: View {
         .accessibilityLabel(ChatStrings.choosePhoto)
 
         TextField(ChatStrings.composerPlaceholder, text: $text, axis: .vertical)
+          .font(.MeetPR.body(size: 14))
           .lineLimit(1...5)
           .textFieldStyle(.plain)
           .padding(.horizontal, MeetPRSpacing.md)
           .padding(.vertical, MeetPRSpacing.sm)
-          .background(Color.MeetPR.surface2)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
+          .background(Color.MeetPR.surfaceCard)
+          .overlay {
+            RoundedRectangle(cornerRadius: MeetPRRadius.modal)
+              .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+          }
+          .clipShape(.rect(cornerRadius: MeetPRRadius.modal))
           .onChange(of: text) { _, newValue in
             if newValue.count > ConversationViewModel.maximumTextLength {
               text = String(newValue.prefix(ConversationViewModel.maximumTextLength))
@@ -59,9 +64,16 @@ public struct ChatComposer: View {
 
         Button(action: sendText) {
           Image(systemName: "arrow.up.circle.fill")
-            .font(.title)
-            .foregroundStyle(canSendText ? Color.MeetPR.brandRed : Color.MeetPR.fgDisabled)
-            .frame(width: 44, height: 44)
+            .font(
+              .MeetPR.system(
+                size: MeetPRFontMetrics.size18,
+                weight: .semibold
+              )
+            )
+            .foregroundStyle(canSendText ? Color.MeetPR.inkOnGold : Color.MeetPR.textDisabled)
+            .frame(width: 34, height: 34)
+            .background(canSendText ? Color.MeetPR.goldCTA : Color.MeetPR.surfaceKey)
+            .clipShape(.circle)
             .overlay(alignment: .topTrailing) {
               if viewModel.hasSendingMessages {
                 ProgressView()
@@ -70,14 +82,14 @@ public struct ChatComposer: View {
               }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .disabled(!canSendText)
         .accessibilityLabel(ChatStrings.send)
       }
     }
     .padding(.horizontal, MeetPRSpacing.md)
     .padding(.vertical, MeetPRSpacing.sm)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .onChange(of: selectedPhoto) { _, newItem in
       guard let newItem else {
         return

@@ -14,32 +14,47 @@ struct PRBanner: View {
   @State private var autoDismissTask: Task<Void, Never>?
 
   var body: some View {
-    HStack(spacing: MeetPRSpacing.sm) {
-      Text("🎉")
-        .font(.system(size: 24))
-      VStack(alignment: .leading, spacing: 2) {
-        Text(headline)
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(.white)
-        Text(detail)
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(.white.opacity(0.85))
-      }
-      Spacer(minLength: 0)
-      Image(systemName: "xmark")
-        .font(.system(size: 13, weight: .bold))
-        .foregroundStyle(.white.opacity(0.7))
-    }
-    .padding(.horizontal, MeetPRSpacing.md)
-    .padding(.vertical, MeetPRSpacing.sm)
-    .background(Color.MeetPR.green)
-    .clipShape(.rect(cornerRadius: MeetPRRadius.md))
-    .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
-    .padding(.horizontal, MeetPRSpacing.md)
-    .onTapGesture {
+    Button {
       autoDismissTask?.cancel()
       onDismiss()
+    } label: {
+      HStack(spacing: MeetPRSpacing.sm) {
+        Image(systemName: "crown.fill")
+          .font(
+            .MeetPR.system(
+              size: MeetPRFontMetrics.size20
+            )
+          )
+          .foregroundStyle(Color.MeetPR.gold500)
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+          Text(headline)
+            .font(Font.MeetPR.bodyEmphasis)
+            .foregroundStyle(Color.MeetPR.gold500)
+          Text(detail)
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.textSecondary)
+        }
+        Spacer(minLength: 0)
+        Image(systemName: "xmark")
+          .font(
+            .MeetPR.system(
+              size: MeetPRFontMetrics.size13,
+              weight: .bold
+            )
+          )
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
+      .padding(.horizontal, MeetPRSpacing.md)
+      .padding(.vertical, MeetPRSpacing.sm)
+      .background(Color.MeetPR.goldSoft)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.gold500.opacity(0.35), lineWidth: 1)
+      }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
+    .buttonStyle(PressScaleButtonStyle())
+    .padding(.horizontal, MeetPRSpacing.md)
     .onAppear {
       autoDismissTask = Task {
         try? await Task.sleep(for: .seconds(3))

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Remembers that the student finished the post-session review flow
-/// (slide-to-complete → 训练回顾 → 完成) for a given day, so the slide control
+/// (hold-to-complete → 训练回顾 → 完成) for a given day, so the hold control
 /// does not re-arm after the summary is dismissed. Local-only, mirroring
 /// `SessionReflectionStore`: the backend has no session-close concept —
 /// completion is tracked per set.

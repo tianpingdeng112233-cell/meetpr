@@ -42,8 +42,8 @@ struct AccountSecuritySection: View {
   }
 
   private var accountRows: some View {
-    VStack(spacing: 0) {
-      row(icon: "key", title: "改密码", tint: Color.MeetPR.fgPrimary) {
+    VStack(spacing: MeetPRSpacing.zero) {
+      row(icon: "key", title: "改密码", tint: Color.MeetPR.textPrimary) {
         changePasswordPresentation = ChangePasswordPresentation(
           viewModel: ChangePasswordViewModel(account: account)
         )
@@ -51,7 +51,7 @@ struct AccountSecuritySection: View {
       .accessibilityIdentifier("account.changePassword")
 
       separator
-      row(icon: "square.and.arrow.up", title: "导出训练数据", tint: Color.MeetPR.fgPrimary) {
+      row(icon: "square.and.arrow.up", title: "导出训练数据", tint: Color.MeetPR.textPrimary) {
         let viewModel = ExportDataViewModel(logs: logs, plans: plans)
         exportCleanupViewModel = viewModel
         exportPresentation = ExportPresentation(viewModel: viewModel)
@@ -59,7 +59,11 @@ struct AccountSecuritySection: View {
       .accessibilityIdentifier("account.export")
 
       separator
-      row(icon: "trash", title: "注销账号", tint: Color.MeetPR.brandRed) {
+      row(
+        icon: "trash",
+        title: "注销账号",
+        tint: StudentVisualSemantics.destructiveAction.color
+      ) {
         deleteAccountPresentation = DeleteAccountPresentation(
           viewModel: DeleteAccountViewModel(account: account) {
             await onLogout?()
@@ -68,11 +72,11 @@ struct AccountSecuritySection: View {
       }
       .accessibilityIdentifier("account.delete")
     }
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     .overlay {
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.control)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         .allowsHitTesting(false)
     }
   }
@@ -104,17 +108,17 @@ struct AccountSecuritySection: View {
   private var passwordUpdatedToast: some View {
     Label("密码已更新,其他设备将退出登录", systemImage: "checkmark.circle.fill")
       .font(Font.MeetPR.caption)
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .foregroundStyle(Color.MeetPR.textPrimary)
       .padding(.horizontal, MeetPRSpacing.base)
       .padding(.vertical, MeetPRSpacing.sm)
-      .background(Color.MeetPR.surface2)
+      .background(Color.MeetPR.surfaceElevated)
       .clipShape(.capsule)
       .shadow(radius: 8)
       .accessibilityIdentifier("account.password.updated")
   }
 
   private var separator: some View {
-    Rectangle().fill(Color.MeetPR.border).frame(height: 1)
+    Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
   }
 
   private func row(
@@ -124,18 +128,19 @@ struct AccountSecuritySection: View {
     action: @escaping () -> Void
   ) -> some View {
     Button(action: action) {
-      HStack(spacing: 12) {
-        Image(systemName: icon).font(.system(size: 16)).frame(width: 24)
-        Text(title).font(.system(size: 15))
+      HStack(spacing: MeetPRSpacing.space3) {
+        Image(systemName: icon).font(.MeetPR.system(size: MeetPRFontMetrics.size16)).frame(
+          width: 24)
+        Text(title).font(.MeetPR.system(size: MeetPRFontMetrics.size15))
         Spacer()
         Image(systemName: "chevron.right")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .foregroundStyle(tint)
-      .padding(14)
+      .padding(MeetPRSpacing.point14)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private func showPasswordUpdatedToast() {
@@ -196,9 +201,9 @@ struct DeleteAccountSheet: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
           Text("账号与全部训练数据将永久删除,无法恢复。")
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
-          VStack(alignment: .leading, spacing: 6) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.point6) {
             bullet("全部训练记录与组数据")
             bullet("e1RM 历史与 PR")
             bullet("训练回顾与状态问卷")
@@ -208,7 +213,7 @@ struct DeleteAccountSheet: View {
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
             Text("输入「\(DeleteAccountViewModel.requiredWord)」以确认")
               .font(Font.MeetPR.caption)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
             TextField(DeleteAccountViewModel.requiredWord, text: $viewModel.confirmationText)
               .textFieldStyle(.roundedBorder)
               .accessibilityIdentifier("account.delete.confirmField")
@@ -217,7 +222,7 @@ struct DeleteAccountSheet: View {
           if case .failed(let message) = viewModel.state {
             Label(message, systemImage: "exclamationmark.triangle")
               .font(Font.MeetPR.caption)
-              .foregroundStyle(Color.MeetPR.brandRed)
+              .foregroundStyle(StudentVisualSemantics.destructiveAction.color)
           }
 
           Button {
@@ -226,16 +231,16 @@ struct DeleteAccountSheet: View {
             Text(viewModel.state == .deleting ? "删除中…" : "永久删除我的账号")
               .font(.headline)
               .frame(maxWidth: .infinity)
-              .padding(.vertical, 6)
+              .padding(.vertical, MeetPRSpacing.point6)
           }
           .buttonStyle(.borderedProminent)
-          .tint(Color.MeetPR.brandRed)
+          .tint(StudentVisualSemantics.destructiveAction.color)
           .disabled(!viewModel.canSubmit)
           .accessibilityIdentifier("account.delete.submit")
         }
         .padding(MeetPRSpacing.base)
       }
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("注销账号")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -250,9 +255,9 @@ struct DeleteAccountSheet: View {
   }
 
   private func bullet(_ text: String) -> some View {
-    HStack(spacing: 6) {
-      Circle().fill(Color.MeetPR.fgTertiary).frame(width: 4, height: 4)
-      Text(text).font(Font.MeetPR.caption).foregroundStyle(Color.MeetPR.fgSecondary)
+    HStack(spacing: MeetPRSpacing.point6) {
+      Circle().fill(Color.MeetPR.textTertiary).frame(width: 4, height: 4)
+      Text(text).font(Font.MeetPR.caption).foregroundStyle(Color.MeetPR.textSecondary)
     }
   }
 }
@@ -275,7 +280,7 @@ struct ChangePasswordSheet: View {
             .accessibilityIdentifier("account.password.confirm")
         } footer: {
           if let message = viewModel.localValidationMessage {
-            Text(message).foregroundStyle(Color.MeetPR.brandRed)
+            Text(message).foregroundStyle(StudentVisualSemantics.destructiveAction.color)
           } else {
             Text("新密码至少 8 位")
           }
@@ -283,7 +288,7 @@ struct ChangePasswordSheet: View {
 
         if case .failed(let message) = viewModel.state {
           Label(message, systemImage: "exclamationmark.triangle")
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(StudentVisualSemantics.destructiveAction.color)
         }
 
         Button {
@@ -299,7 +304,7 @@ struct ChangePasswordSheet: View {
             .font(.headline)
         }
         .buttonStyle(.borderedProminent)
-        .tint(Color.MeetPR.brandRed)
+        .tint(Color.MeetPR.gold500)
         .disabled(!viewModel.canSubmit)
         .accessibilityIdentifier("account.password.submit")
       }

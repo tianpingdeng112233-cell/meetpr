@@ -13,11 +13,11 @@ struct ExerciseMatchSection: View {
   let boundName: String?
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack(spacing: 8) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      HStack(spacing: MeetPRSpacing.space2) {
         Text(exercise.rawName)
           .font(.subheadline.bold())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
         statusBadge
       }
@@ -25,17 +25,17 @@ struct ExerciseMatchSection: View {
       if let boundName {
         Text("已绑定：\(boundName)")
           .font(.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
 
       if exercise.boundExerciseID == nil {
         if candidates.isEmpty {
           Text("库里没有相近动作——本组导入需要先在库里有它。")
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         } else {
           ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: MeetPRSpacing.space2) {
               ForEach(candidates) { candidate in
                 Button {
                   exercise.boundExerciseID = candidate.id
@@ -43,12 +43,12 @@ struct ExerciseMatchSection: View {
                 } label: {
                   Text(candidate.name)
                     .font(.caption.bold())
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.MeetPR.surface2)
+                    .padding(.horizontal, MeetPRSpacing.point10)
+                    .padding(.vertical, MeetPRSpacing.point6)
+                    .background(Color.MeetPR.surfaceElevated)
                     .clipShape(.capsule)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(PressScaleButtonStyle())
               }
             }
           }
@@ -61,11 +61,11 @@ struct ExerciseMatchSection: View {
   private var statusBadge: some View {
     Group {
       if ImportCompleteness.isComplete(exercise) {
-        badge("可发布", color: Color.MeetPR.green, soft: Color.MeetPR.greenSoft)
+        badge("可发布", color: Color.MeetPR.success, soft: Color.MeetPR.successSoft)
       } else if exercise.boundExerciseID == nil {
-        badge("待绑定", color: Color.MeetPR.amber, soft: Color.MeetPR.amberSoft)
+        badge("待绑定", color: Color.MeetPR.gold500, soft: Color.MeetPR.goldSoft)
       } else {
-        badge("待补值", color: Color.MeetPR.amber, soft: Color.MeetPR.amberSoft)
+        badge("待补值", color: Color.MeetPR.gold500, soft: Color.MeetPR.goldSoft)
       }
     }
   }
@@ -74,8 +74,8 @@ struct ExerciseMatchSection: View {
     Text(text)
       .font(.caption2.bold())
       .foregroundStyle(color)
-      .padding(.horizontal, 6)
-      .padding(.vertical, 2)
+      .padding(.horizontal, MeetPRSpacing.point6)
+      .padding(.vertical, MeetPRSpacing.point2)
       .background(soft)
       .clipShape(.capsule)
   }

@@ -24,17 +24,13 @@ public struct IconButton: View {
   public var body: some View {
     Button(action: handleTap) {
       Image(systemName: systemName)
-        .font(.system(size: 18, weight: .medium))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size18, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .frame(width: 44, height: 44)
-        .background(Color.MeetPR.surface2)
-        .overlay {
-          RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
-        }
-        .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.circle)
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: isDisabled))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled))
     .disabled(isDisabled)
     .sensoryFeedback(.impact(weight: .light), trigger: feedbackTrigger)
     .accessibilityLabel(accessibilityLabelText)
@@ -54,13 +50,13 @@ public struct IconButton: View {
     IconButton(isDisabled: true) {}
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("IconButton Light") {
   IconButton {}
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

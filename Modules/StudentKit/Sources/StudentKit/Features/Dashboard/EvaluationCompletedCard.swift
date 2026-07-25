@@ -10,20 +10,20 @@ struct EvaluationCompletedCard: View {
 
   var body: some View {
     if viewModel.showsDashboardCard, let summary = viewModel.summary {
-      VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
         Label("评估完成", systemImage: "checkmark.seal.fill")
           .font(.headline)
-          .foregroundStyle(Color.MeetPR.green)
+          .foregroundStyle(Color.MeetPR.success)
 
         Text(summary.trainingPlanExcerpt)
           .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(2)
 
         if let words = summary.wordsExcerpt {
           Text(words)
             .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .lineLimit(2)
         }
 
@@ -34,13 +34,13 @@ struct EvaluationCompletedCard: View {
         } label: {
           Text("展开看完整")
             .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
 
         if viewModel.showsAwaitingFirstPlan {
           Text("教练正在为你排第一份正式计划")
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
       .modifier(DashboardCard())

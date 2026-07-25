@@ -39,12 +39,12 @@ struct PlanningCountPicker: View {
       HStack(spacing: MeetPRSpacing.xs) {
         Text(label)
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
 
         if let unitLabel {
           Text(unitLabel)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
 
@@ -58,15 +58,15 @@ struct PlanningCountPicker: View {
           Text(formattedDisplay(value))
             .font(Font.MeetPR.body)
             .monospacedDigit()
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .frame(minWidth: 44)
             .padding(.horizontal, MeetPRSpacing.sm)
             .padding(.vertical, MeetPRSpacing.xs)
-            .background(Color.MeetPR.surface2)
+            .background(Color.MeetPR.surfaceElevated)
             .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
             .contentShape(.rect)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel(accessibilityLabel)
 
         stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
@@ -82,7 +82,7 @@ struct PlanningCountPicker: View {
 
   private var wheelSheet: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         wheel
           .frame(maxWidth: .infinity)
           .padding()
@@ -141,12 +141,12 @@ struct PlanningCountPicker: View {
       Image(systemName: systemName)
         .font(.footnote)
         .frame(width: 28, height: 28)
-        .background(Color.MeetPR.surface2)
+        .background(Color.MeetPR.surfaceElevated)
         .clipShape(.circle)
         .contentShape(.rect)
     }
-    .buttonStyle(.plain)
-    .foregroundStyle(Color.MeetPR.fgPrimary)
+    .buttonStyle(PressScaleButtonStyle())
+    .foregroundStyle(Color.MeetPR.textPrimary)
     .accessibilityLabel(accessibilityLabel)
   }
 

@@ -29,7 +29,7 @@ public struct DesignSystemDemo: View {
       .padding(MeetPRSpacing.base)
     }
     .scrollIndicators(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(selectedScheme.colorScheme)
   }
 }
@@ -62,7 +62,7 @@ private struct DemoHeader: View {
       Eyebrow("DESIGN SYSTEM")
       Text("MeetPR Foundation")
         .font(Font.MeetPR.title1)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       Picker("Color scheme", selection: $selectedScheme) {
         ForEach(DemoScheme.allCases) { scheme in
@@ -81,23 +81,24 @@ private struct ColorTokenCatalog: View {
   var body: some View {
     DemoSection(title: "COLOR TOKENS") {
       LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: MeetPRSpacing.sm)]) {
-        DemoColorSwatch(name: "brandRed", color: Color.MeetPR.brandRed, value: "#E5221E")
-        DemoColorSwatch(name: "brandRedPress", color: Color.MeetPR.brandRedPress, value: "#B81A17")
-        DemoColorSwatch(name: "brandRedSoft", color: Color.MeetPR.brandRedSoft, value: "12/8%")
-        DemoColorSwatch(name: "green", color: Color.MeetPR.green, value: "#1FB358")
-        DemoColorSwatch(name: "greenSoft", color: Color.MeetPR.greenSoft, value: "14%")
-        DemoColorSwatch(name: "amber", color: Color.MeetPR.amber, value: "#E0A810")
-        DemoColorSwatch(name: "amberSoft", color: Color.MeetPR.amberSoft, value: "14%")
-        DemoColorSwatch(name: "bg", color: Color.MeetPR.bg, value: "dynamic")
-        DemoColorSwatch(name: "surface1", color: Color.MeetPR.surface1, value: "dynamic")
-        DemoColorSwatch(name: "surface2", color: Color.MeetPR.surface2, value: "dynamic")
-        DemoColorSwatch(name: "surface3", color: Color.MeetPR.surface3, value: "dynamic")
-        DemoColorSwatch(name: "border", color: Color.MeetPR.border, value: "dynamic")
+        DemoColorSwatch(name: "goldCTA", color: Color.MeetPR.goldCTA, value: "#FFB800")
+        DemoColorSwatch(name: "gold500", color: Color.MeetPR.gold500, value: "dynamic")
+        DemoColorSwatch(name: "gold400", color: Color.MeetPR.gold400, value: "dynamic")
+        DemoColorSwatch(name: "goldSoft", color: Color.MeetPR.goldSoft, value: "14%")
+        DemoColorSwatch(name: "success", color: Color.MeetPR.success, value: "dynamic")
+        DemoColorSwatch(name: "successSoft", color: Color.MeetPR.successSoft, value: "14%")
+        DemoColorSwatch(name: "danger", color: Color.MeetPR.danger, value: "#E5484D")
+        DemoColorSwatch(name: "bgBase", color: Color.MeetPR.bgBase, value: "dynamic")
+        DemoColorSwatch(name: "surfaceCard", color: Color.MeetPR.surfaceCard, value: "dynamic")
+        DemoColorSwatch(
+          name: "surfaceElevated", color: Color.MeetPR.surfaceElevated, value: "dynamic")
+        DemoColorSwatch(name: "surfaceKey", color: Color.MeetPR.surfaceKey, value: "dynamic")
+        DemoColorSwatch(name: "borderDefault", color: Color.MeetPR.borderDefault, value: "dynamic")
         DemoColorSwatch(name: "borderStrong", color: Color.MeetPR.borderStrong, value: "dynamic")
-        DemoColorSwatch(name: "fgPrimary", color: Color.MeetPR.fgPrimary, value: "dynamic")
-        DemoColorSwatch(name: "fgSecondary", color: Color.MeetPR.fgSecondary, value: "dynamic")
-        DemoColorSwatch(name: "fgTertiary", color: Color.MeetPR.fgTertiary, value: "dynamic")
-        DemoColorSwatch(name: "fgDisabled", color: Color.MeetPR.fgDisabled, value: "35%")
+        DemoColorSwatch(name: "textPrimary", color: Color.MeetPR.textPrimary, value: "dynamic")
+        DemoColorSwatch(name: "textSecondary", color: Color.MeetPR.textSecondary, value: "dynamic")
+        DemoColorSwatch(name: "textMuted", color: Color.MeetPR.textMuted, value: "dynamic")
+        DemoColorSwatch(name: "textDisabled", color: Color.MeetPR.textDisabled, value: "dynamic")
       }
     }
   }
@@ -115,26 +116,26 @@ private struct DemoColorSwatch: View {
         .fill(color)
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .frame(height: 56)
 
       Text(name.uppercased())
         .font(Font.MeetPR.caption)
         .tracking(0.66)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .lineLimit(1)
         .minimumScaleFactor(0.75)
 
       Text(value)
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textMuted)
     }
     .padding(MeetPRSpacing.sm)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.md)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
@@ -147,29 +148,29 @@ private struct TypographyCatalog: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
         Text("Train under tension.")
           .font(Font.MeetPR.displayHero)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("Coach Dashboard")
           .font(Font.MeetPR.title1)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("This Week")
           .font(Font.MeetPR.title2)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("Squat - Top Set")
           .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("Squat W3D1 published. Notify Chen Lei?")
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("Synced 3 minutes ago - 2 athletes overdue")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Text("14:23 - session 4 of 16")
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textMuted)
         Text("SQUAT STANDARD")
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
         StatBlock(label: "Squat 1RM", value: "200", unit: "KG")
       }
     }
@@ -201,7 +202,7 @@ private struct GeometryTokenCatalog: View {
         Text("EASE IOS - 0.32, 0.72, 0, 1 - 240MS")
           .font(Font.MeetPR.caption)
           .tracking(0.66)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textMuted)
       }
     }
   }
@@ -215,11 +216,11 @@ private struct DemoBlock: View {
   var body: some View {
     VStack(spacing: MeetPRSpacing.xs) {
       Rectangle()
-        .fill(label == "XS" ? Color.MeetPR.brandRed : Color.MeetPR.fgPrimary)
+        .fill(label == "XS" ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary)
         .frame(width: size, height: size)
       Text(label)
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textMuted)
     }
   }
 }
@@ -232,15 +233,15 @@ private struct DemoRadius: View {
   var body: some View {
     VStack(spacing: MeetPRSpacing.xs) {
       RoundedRectangle(cornerRadius: radius)
-        .fill(Color.MeetPR.surface2)
+        .fill(Color.MeetPR.surfaceElevated)
         .overlay {
           RoundedRectangle(cornerRadius: radius)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .frame(width: label == "PILL" ? 72 : 44, height: 44)
       Text(label)
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textMuted)
     }
   }
 }
@@ -273,10 +274,10 @@ private struct CardCatalog: View {
             Eyebrow("SQUAT W3D1")
             Text("Top Set + 3 Backoff")
               .font(Font.MeetPR.headline)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text("4 sets - about 28 min")
               .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
         }
         ElevatedCard(accessibilityLabel: "System suggestion card") {
@@ -284,10 +285,10 @@ private struct CardCatalog: View {
             Eyebrow("SYSTEM //")
             Text("Detected RPE 10 across 3 sessions.")
               .font(Font.MeetPR.bodyEmphasis)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text("Reduce W4 backoff by 5%?")
               .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
         }
       }
@@ -368,22 +369,22 @@ private struct ListRowCatalog: View {
     DemoSection(title: "LIST ROW") {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
         DemoComponentCaption("COMP-LISTROW.HTML")
-        VStack(spacing: 0) {
+        VStack(spacing: MeetPRSpacing.zero) {
           MeetPRListRow(
             title: "Chen Lei",
             subtitle: "W3D1 - last logged 2h ago",
             status: .ready,
             showsPRBadge: true
           ) {}
-          Divider().background(Color.MeetPR.border)
+          Divider().background(Color.MeetPR.borderDefault)
           MeetPRListRow(title: "Ma Wei", subtitle: "W3D1 - queued", status: .pending) {}
-          Divider().background(Color.MeetPR.border)
+          Divider().background(Color.MeetPR.borderDefault)
           MeetPRListRow(title: "Yan Bo", subtitle: "W2D3 - 5 days behind", status: .overdue) {}
         }
         .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
       }
     }
@@ -405,7 +406,7 @@ private struct DemoSection<Content: View>: View {
       Text(title)
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
       content
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -424,7 +425,7 @@ private struct DemoComponentCaption: View {
     Text(text)
       .font(Font.MeetPR.caption)
       .tracking(0.66)
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .foregroundStyle(Color.MeetPR.textMuted)
   }
 }
 

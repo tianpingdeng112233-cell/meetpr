@@ -9,7 +9,7 @@ struct DashboardProfileMetricsView: View {
     if let bodyWeightText = metrics.bodyWeightText,
       let competition = metrics.competition
     {
-      HStack(alignment: .top, spacing: 12) {
+      HStack(alignment: .top, spacing: MeetPRSpacing.space3) {
         DashboardMetricCard(
           systemImage: "scalemass",
           title: "体重",
@@ -49,21 +49,21 @@ private struct DashboardMetricCard: View {
   let caption: String
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack(spacing: 8) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      HStack(spacing: MeetPRSpacing.space2) {
         Image(systemName: systemImage)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
         Text(title)
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       Text(value)
         .font(.title3.bold())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .monospacedDigit()
       Text(caption)
         .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
     .modifier(DashboardCard())
   }

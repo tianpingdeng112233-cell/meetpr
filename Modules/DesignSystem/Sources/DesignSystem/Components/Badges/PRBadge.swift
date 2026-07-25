@@ -27,14 +27,16 @@ public struct PRBadge: View {
     Group {
       if isVisible {
         Text(style.title)
-          .font(
-            .system(size: MeetPRFontMetrics.captionSize, weight: .semibold, design: .monospaced)
-          )
-          .tracking(0.88)
-          .foregroundStyle(.white)
-          .padding(.horizontal, 10)
-          .padding(.vertical, 5)
-          .background(Color.MeetPR.brandRed)
+          .font(.MeetPR.mono(size: 10, weight: .bold))
+          .tracking(0.8)
+          .foregroundStyle(Color.MeetPR.gold500)
+          .padding(.horizontal, MeetPRSpacing.sm)
+          .padding(.vertical, MeetPRSpacing.xs)
+          .background(Color.MeetPR.goldSoft)
+          .overlay {
+            Capsule()
+              .stroke(Color.MeetPR.gold500.opacity(0.44), lineWidth: 1)
+          }
           .clipShape(.capsule)
           .accessibilityLabel(style.title)
           .accessibilityHint("Indicates a personal record.")
@@ -51,13 +53,13 @@ public struct PRBadge: View {
     PRBadge(.newPR, isVisible: false)
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("PRBadge Light") {
   PRBadge(.newPR)
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

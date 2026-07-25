@@ -36,6 +36,7 @@ let package = Package(
         "StudentKit",
         .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
+        .product(name: "Networking", package: "Networking"),
         .product(name: "ChatUI", package: "ChatUI"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]

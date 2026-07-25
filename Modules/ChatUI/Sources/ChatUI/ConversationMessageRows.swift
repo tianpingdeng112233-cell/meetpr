@@ -28,7 +28,7 @@ struct ChatMessageRow: View {
         if let deliveryStatus {
           Text(deliveryStatus == .read ? ChatStrings.read : ChatStrings.delivered)
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
 
@@ -56,8 +56,8 @@ private struct ChatMessageBubble: View {
         // two-character reply into a full-width bar, since the background is
         // applied after the frame.
         Text(message.text ?? "")
-          .font(.body)
-          .foregroundStyle(isCurrentUser ? .white : Color.MeetPR.fgPrimary)
+          .font(.MeetPR.body(size: 14, weight: isCurrentUser ? .medium : .regular))
+          .foregroundStyle(isCurrentUser ? Color.MeetPR.inkOnGold : Color.MeetPR.textPrimary)
           .multilineTextAlignment(isCurrentUser ? .trailing : .leading)
           .fixedSize(horizontal: false, vertical: true)
           .padding(.horizontal, MeetPRSpacing.md)
@@ -72,7 +72,7 @@ private struct ChatMessageBubble: View {
           )
           .aspectRatio(4 / 3, contentMode: .fit)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel(ChatStrings.image)
         .containerRelativeFrame(
           .horizontal,
@@ -82,8 +82,19 @@ private struct ChatMessageBubble: View {
         )
       }
     }
-    .background(isCurrentUser ? Color.MeetPR.brandRed : Color.MeetPR.surface2)
-    .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
+    .background(
+      isCurrentUser
+        ? Color.MeetPR.chatBubbleOutgoing
+        : Color.MeetPR.chatBubbleIncoming
+    )
+    .clipShape(
+      .rect(
+        topLeadingRadius: MeetPRRadius.card,
+        bottomLeadingRadius: isCurrentUser ? MeetPRRadius.card : MeetPRRadius.point5,
+        bottomTrailingRadius: isCurrentUser ? MeetPRRadius.point5 : MeetPRRadius.card,
+        topTrailingRadius: MeetPRRadius.card
+      )
+    )
   }
 
 }
@@ -124,7 +135,7 @@ private struct ChatImagePlaceholder: View {
 
   var body: some View {
     ZStack {
-      Color.MeetPR.surface2
+      Color.MeetPR.surfaceElevated
       if showsProgress {
         ProgressView()
       } else {
@@ -133,7 +144,7 @@ private struct ChatImagePlaceholder: View {
           Text(ChatStrings.imageUnavailable)
             .font(.caption)
         }
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
   }
@@ -157,7 +168,7 @@ struct PendingChatMessageRow: View {
               .font(.body)
           }
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(Color.MeetPR.inkOnGold)
         .multilineTextAlignment(.trailing)
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, MeetPRSpacing.md)
@@ -165,21 +176,28 @@ struct PendingChatMessageRow: View {
         // Hugs its content, same as a confirmed bubble — otherwise a short
         // message in flight is a full-width bar that then snaps narrow on
         // confirmation.
-        .background(Color.MeetPR.brandRed.opacity(0.72))
-        .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
+        .background(Color.MeetPR.chatBubbleOutgoing.opacity(0.72))
+        .clipShape(
+          .rect(
+            topLeadingRadius: MeetPRRadius.card,
+            bottomLeadingRadius: MeetPRRadius.card,
+            bottomTrailingRadius: MeetPRRadius.point5,
+            topTrailingRadius: MeetPRRadius.card
+          )
+        )
 
         switch item.state {
         case .sending:
           Label(ChatStrings.sending, systemImage: "clock")
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         case .failed:
           Button(action: retry) {
             Label(ChatStrings.retry, systemImage: "arrow.clockwise")
               .font(.caption.bold())
-              .foregroundStyle(Color.MeetPR.brandRed)
+              .foregroundStyle(Color.MeetPR.gold500)
           }
-          .buttonStyle(.plain)
+          .buttonStyle(PressScaleButtonStyle())
           .accessibilityHint(ChatStrings.sendFailed)
         case .confirmed:
           EmptyView()
@@ -218,7 +236,7 @@ struct ChatFullScreenImage: View {
           .foregroundStyle(.white)
           .padding(MeetPRSpacing.base)
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel(ChatStrings.close)
     }
     .task {

@@ -27,18 +27,18 @@ struct EvaluationStatusBanner: View {
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(
               viewModel.isOverdue(now: context.date)
-                ? Color.MeetPR.brandRed : Color.MeetPR.fgPrimary
+                ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary
             )
 
           ProgressView(value: viewModel.progress(now: context.date))
             .tint(
               viewModel.isOverdue(now: context.date)
-                ? Color.MeetPR.brandRed : Color.MeetPR.green)
+                ? Color.MeetPR.gold500 : Color.MeetPR.success)
 
           if let error = viewModel.completeError {
             Text(error)
               .font(Font.MeetPR.caption)
-              .foregroundStyle(Color.MeetPR.amber)
+              .foregroundStyle(Color.MeetPR.gold500)
           }
 
           actionRow

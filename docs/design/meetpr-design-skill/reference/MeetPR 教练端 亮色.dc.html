@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+img{display:block}
+::-webkit-scrollbar{width:0;height:0}
+@keyframes scr{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.scrn{animation:scr .28s cubic-bezier(.2,.7,.2,1)}
+.ov{animation:fade .2s ease}
+.sh{animation:sheet .34s cubic-bezier(.2,.8,.2,1)}
+.pb{transition:transform .12s ease,opacity .12s ease}
+.pb:active{transform:scale(.97);opacity:.9}
+.tb:active{transform:scale(.9)}
+</style>
+</helmet>
+<div style="min-height:100vh;background:radial-gradient(130% 80% at 50% -10%,#E9E9EE,#D2D2D9);display:flex;align-items:center;justify-content:center;padding:clamp(8px,3vw,32px);font-family:'IBM Plex Sans','Noto Sans SC',sans-serif">
+<div ref="{{ bezelRef }}" style="width:414px;flex:none;background:#1c1c1e;border-radius:58px;padding:12px;box-shadow:0 50px 100px rgba(0,0,0,.55),inset 0 0 0 1px #2a2a2d">
+<div style="position:relative;width:390px;height:844px;background:#F5F6F8;border-radius:46px;overflow:hidden;display:flex;flex-direction:column;color:#111827">
+
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">21:35<span style="display:flex;align-items:center;gap:6px"><svg width="17" height="12" viewBox="0 0 17 12" fill="#111827"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity=".35"/></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#111827" opacity=".5"/><rect x="3" y="3" width="15" height="6" rx="1.5" fill="#111827"/><rect x="22" y="4" width="1.6" height="4" rx="1" fill="#111827" opacity=".6"/></svg></span></div>
+
+<div style="flex:1;overflow-y:auto;overflow-x:hidden;position:relative">
+
+<sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:15px">
+<div style="display:flex;align-items:flex-start;justify-content:space-between">
+<div><div style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;letter-spacing:.06em;color:#6B7280">7月22日 · 星期三</div><div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:38px;line-height:.95;margin-top:3px">今日</div></div>
+<div class="pb" onclick="{{ openChat }}" style="position:relative;width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span style="position:absolute;top:-1px;right:-1px;min-width:18px;height:18px;padding:0 4px;border-radius:10px;background:#E5484D;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace">2</span></div>
+</div>
+<sc-if value="{{ newPending }}">
+<div class="pb" onclick="{{ goInboxNew }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border:1px solid rgba(217,119,6,.35);border-radius:16px;padding:15px 17px;cursor:pointer">
+<div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#E5484D"></span><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:.06em;color:#D97706;font-weight:600">新学员请求 // 01</span></div>
+<div style="font-size:17px;font-weight:700;margin-top:8px">1 名新学员等待你接收</div>
+<div style="font-size:13px;color:#6B7280;margin-top:4px">查看接收队列 →</div>
+</div>
+</sc-if>
+<sc-if value="{{ accepted }}">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border:1px solid rgba(21,128,61,.3);border-radius:16px;padding:15px 17px;display:flex;align-items:center;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><div style="font-size:14px;color:#15803D">新学员 陈一鸣 已接收 · 进入评估期</div></div>
+</sc-if>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:16px;display:flex">
+<div style="flex:1;text-align:left"><div style="font-size:11px;color:#D97706;font-weight:600">活跃</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1">{{ activeCount }}<span style="font-size:12px;color:#6B7280;font-weight:600"> 学员</span></div></div>
+<div style="width:1px;background:#E5E7EB"></div>
+<div style="flex:1;text-align:left;padding-left:16px"><div style="font-size:11px;color:#6B7280;font-weight:600">评估期</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1">1<span style="font-size:12px;color:#6B7280;font-weight:600"> 进行中</span></div></div>
+<div style="width:1px;background:#E5E7EB"></div>
+<div style="flex:1;text-align:left;padding-left:16px"><div style="font-size:11px;color:#E5484D;font-weight:600">待关注</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1">1<span style="font-size:12px;color:#6B7280;font-weight:600"> 学员</span></div></div>
+</div>
+<div style="font-size:12px;color:#6B7280;font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:2px">学员 — 今日</div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;overflow:hidden">
+<sc-for list="{{ todayList }}" as="st" hint-placeholder-count="5">
+<div class="pb" onclick="{{ st.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-top:1px solid #E9EBEE;cursor:pointer"><span style="width:9px;height:9px;border-radius:50%;background:{{ st.dot }};flex:none"></span><div style="flex:1"><div style="font-size:16px;font-weight:700">{{ st.name }}</div><div style="font-size:12px;color:#6B7280;margin-top:2px">{{ st.sub }}</div></div><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStudents }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;justify-content:space-between"><div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:34px">学员</div><div class="pb" onclick="{{ openChat }}" style="position:relative;width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div></div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border:1px solid #E5E7EB;border-radius:12px;display:flex;align-items:center;gap:9px;padding:0 14px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input value="{{ search }}" oninput="{{ onSearch }}" placeholder="搜索学员" style="flex:1;background:transparent;border:none;outline:none;color:#111827;font-size:14px;padding:12px 0;font-family:inherit"></div>
+<div style="font-size:12px;color:#6B7280;font-family:'IBM Plex Mono','Noto Sans SC',monospace">活跃 · {{ activeCount }}</div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;overflow:hidden">
+<sc-for list="{{ activeList }}" as="st" hint-placeholder-count="4">
+<div class="pb" onclick="{{ st.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-top:1px solid #E9EBEE;cursor:pointer"><span style="width:9px;height:9px;border-radius:50%;background:{{ st.dot }};flex:none"></span><div style="flex:1"><div style="font-size:16px;font-weight:700">{{ st.name }}</div><div style="font-size:12px;color:#6B7280;margin-top:2px">{{ st.sub }}</div></div><span style="font-size:11px;color:#6B7280;border:1px solid #E5E7EB;border-radius:999px;padding:3px 9px">{{ st.plan }}</span></div>
+</sc-for>
+</div>
+<sc-if value="{{ hasWarn }}">
+<div style="font-size:12px;color:#E5484D;font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:2px">异常 · {{ warnCount }}</div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;overflow:hidden">
+<sc-for list="{{ warnList }}" as="st" hint-placeholder-count="1">
+<div class="pb" onclick="{{ st.open }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer"><span style="width:9px;height:9px;border-radius:50%;background:#E5484D;flex:none"></span><div style="flex:1"><div style="font-size:16px;font-weight:700">{{ st.name }}</div><div style="font-size:12px;color:#6B7280;margin-top:2px">{{ st.sub }}</div></div><span style="font-size:11px;color:#E5484D;background:rgba(229,72,77,.12);border-radius:999px;padding:3px 9px;font-weight:600">3 天未训练</span></div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSchedule }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:14px">
+<div><div style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:.06em;color:#D97706;font-weight:600">计划编排</div><div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:34px;line-height:1;margin-top:3px">编排</div><div style="font-size:13px;color:#6B7280;margin-top:6px">为学员排周期 · 续编草稿 · 回看已发布</div></div>
+<div class="pb" onclick="{{ toastNew }}" style="background:#111827;color:#FFFFFF;border-radius:999px;padding:16px;text-align:center;font-weight:800;font-size:16px;cursor:pointer">＋ 排新计划</div>
+<div class="pb" onclick="{{ toastImport }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border:1px solid #E5E7EB;border-radius:999px;padding:15px;text-align:center;font-weight:600;font-size:15px;color:#4B5563;cursor:pointer">导入计划 (.xlsx)</div>
+<div style="font-size:12px;color:#6B7280;font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:4px">谁需要排计划 · {{ needCount }}</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ needList }}" as="st" hint-placeholder-count="3">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#4B5563">{{ st.initial }}</div><div style="flex:1"><div style="font-size:15px;font-weight:700">{{ st.name }}</div><div style="font-size:12px;color:#6B7280;margin-top:2px">暂无在跑计划</div></div><div class="pb" onclick="{{ st.arrange }}" style="border:1px solid #D1D5DB;border-radius:12px;padding:8px 16px;font-size:14px;font-weight:600;color:#111827;cursor:pointer">排</div></div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isInbox }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:.06em;color:#D97706;font-weight:600">收件箱</div><div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:34px;line-height:1;margin-top:3px">接收</div></div></div>
+<div style="display:flex;background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:12px;padding:4px;gap:4px">
+<div class="pb" onclick="{{ tabNew }}" style="flex:1;text-align:center;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;background:{{ segNew }};color:{{ segNewC }}">新学员 <span style="font-family:'IBM Plex Mono',monospace">{{ newCount }}</span></div>
+<div class="pb" onclick="{{ tabVideos }}" style="flex:1;text-align:center;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;background:{{ segVid }};color:{{ segVidC }}">训练视频 <span style="font-family:'IBM Plex Mono',monospace">6</span></div>
+<div class="pb" onclick="{{ tabMsgs }}" style="flex:1;text-align:center;padding:9px 0;border-radius:10px;font-size:13px;font-weight:600;background:{{ segMsg }};color:{{ segMsgC }}">消息 <span style="font-family:'IBM Plex Mono',monospace">2</span></div>
+</div>
+
+<sc-if value="{{ tabIsNew }}">
+<sc-if value="{{ newPending }}">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border:1px solid #E5E7EB;border-radius:16px;padding:18px">
+<div style="display:flex;align-items:flex-start;justify-content:space-between"><div style="font-size:20px;font-weight:800;font-family:'Archivo','Noto Sans SC',sans-serif">陈一鸣</div><span style="font-size:11px;color:#6B7280">已等待 2 小时 6 分</span></div>
+<div style="font-size:13px;color:#4B5563;margin-top:6px">男 · 25 岁 · 83 kg · 训练 3 年</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;margin-top:8px;letter-spacing:.02em">S:180　B:120　D:220 <span style="color:#6B7280;font-weight:400;font-size:12px">(kg)</span></div>
+<div style="height:1px;background:#E5E7EB;margin:12px 0"></div>
+<div style="font-size:13px;color:#6B7280;line-height:1.7">想增强：股四 · 腘绳 · 肩<br>训练环境：商业健身房 · 备赛：2026-07-25<br>「想突破 200kg 深蹲」</div>
+<div style="display:flex;gap:9px;margin-top:15px"><div class="pb" onclick="{{ accept }}" style="flex:1;background:#111827;color:#FFFFFF;border-radius:999px;padding:13px;text-align:center;font-weight:800;font-size:14px;cursor:pointer">接收</div><div class="pb" onclick="{{ toastProfile }}" style="flex:1;border:1px solid #D1D5DB;border-radius:12px;padding:13px;text-align:center;font-weight:600;font-size:14px;color:#111827;cursor:pointer">查看资料</div><div class="pb" onclick="{{ dismiss }}" style="width:48px;border:1px solid #E5E7EB;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
+</div>
+</sc-if>
+<sc-if value="{{ noNew }}">
+<div style="padding:60px 0;text-align:center"><div style="width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div><div style="font-size:15px;font-weight:600">没有待接收的请求</div><div style="font-size:12px;color:#9CA3AF;margin-top:5px">新学员通过邀请码申请后会出现在这里</div></div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ tabIsVideos }}">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="pb" onclick="{{ toastVideo }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:12px;display:flex;align-items:center;gap:13px;cursor:pointer"><div style="width:72px;height:56px;border-radius:10px;background:#F3F4F6;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="#4B5563"><path d="M8 5v14l11-7z"/></svg></div><div style="flex:1"><div style="font-size:15px;font-weight:700">王晨曦</div><div style="font-size:12px;color:#6B7280;margin-top:3px">3 段待反馈 · 2 小时前</div></div><span style="font-size:11px;color:#E5484D;background:rgba(229,72,77,.12);border-radius:999px;padding:3px 9px;font-weight:600">3</span></div>
+<div class="pb" onclick="{{ toastVideo }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:12px;display:flex;align-items:center;gap:13px;cursor:pointer"><div style="width:72px;height:56px;border-radius:10px;background:#F3F4F6;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="#4B5563"><path d="M8 5v14l11-7z"/></svg></div><div style="flex:1"><div style="font-size:15px;font-weight:700">李嘉宁</div><div style="font-size:12px;color:#6B7280;margin-top:3px">2 段待反馈 · 5 小时前</div></div><span style="font-size:11px;color:#E5484D;background:rgba(229,72,77,.12);border-radius:999px;padding:3px 9px;font-weight:600">2</span></div>
+<div class="pb" onclick="{{ toastVideo }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:12px;display:flex;align-items:center;gap:13px;cursor:pointer"><div style="width:72px;height:56px;border-radius:10px;background:#F3F4F6;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="#4B5563"><path d="M8 5v14l11-7z"/></svg></div><div style="flex:1"><div style="font-size:15px;font-weight:700">张以恒</div><div style="font-size:12px;color:#6B7280;margin-top:3px">1 段待反馈 · 1 天前</div></div><span style="font-size:11px;color:#6B7280;border:1px solid #E5E7EB;border-radius:999px;padding:3px 9px;font-weight:600">1</span></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabIsMsgs }}">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;overflow:hidden">
+<div class="pb" onclick="{{ openChat }}" style="display:flex;align-items:center;padding:14px 16px;cursor:pointer"><div style="flex:1"><div style="font-size:15px;font-weight:700">林舟</div><div style="font-size:12px;color:#6B7280;margin-top:3px">[图片]</div></div><div style="text-align:right"><div style="font-size:11px;color:#6B7280">今天</div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E5484D;margin-top:6px"></span></div></div>
+<div class="pb" onclick="{{ openChat }}" style="display:flex;align-items:center;padding:14px 16px;border-top:1px solid #E9EBEE;cursor:pointer"><div style="flex:1"><div style="font-size:15px;font-weight:700">王晨曦</div><div style="font-size:12px;color:#6B7280;margin-top:3px">教练，今天最后一组完成了。</div></div><div style="text-align:right"><div style="font-size:11px;color:#6B7280">今天</div><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E5484D;margin-top:6px"></span></div></div>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ isMe }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:14px">
+<div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:34px">我的</div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:16px;display:flex;align-items:center;gap:13px"><div style="width:48px;height:48px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0113 0"/></svg></div><div><div style="font-size:17px;font-weight:700">教练</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#D97706;margin-top:2px">MeetPR · V0.1 内测</div></div></div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:16px">
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:12px;color:#D97706;font-weight:600">永久邀请码</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;letter-spacing:.14em;margin-top:8px">DEMO2COACH</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><span style="font-size:12px;color:#6B7280">已使用 23 次</span><div class="pb" onclick="{{ toastCopy }}" style="border:1px solid #D1D5DB;border-radius:10px;padding:6px 14px;font-size:12px;font-weight:600;color:#111827;cursor:pointer">复制</div></div>
+</div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:15px 16px;display:flex;align-items:center;justify-content:space-between"><span style="font-size:14px">App 版本</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6B7280">1.0</span></div>
+<div style="height:8px"></div>
+<div class="pb" onclick="{{ openLogout }}" style="border:1px solid rgba(229,72,77,.35);border-radius:999px;padding:15px;text-align:center;font-size:14px;font-weight:600;color:#E5484D;cursor:pointer">退出登录</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDetail }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div class="pb" onclick="{{ backStudents }}" style="display:flex;align-items:center;gap:5px;color:#4B5563;font-size:14px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>学员</div>
+<div class="pb" onclick="{{ openChat }}" style="width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+</div>
+<div style="display:flex;align-items:center;gap:10px"><div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:32px">{{ detailName }}</div><span style="font-size:11px;color:#15803D;border:1px solid rgba(21,128,61,.35);border-radius:999px;padding:3px 10px;font-weight:600">活跃</span></div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:16px">
+<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:700">评估期</span><span style="font-size:12px;color:#6B7280">· 还剩 4 天</span></div>
+<div style="height:6px;border-radius:3px;background:#E5E7EB;margin:11px 0;overflow:hidden"><span style="display:block;width:42%;height:100%;background:#15803D"></span></div>
+<div style="display:flex;gap:9px"><div class="pb" onclick="{{ toastAdapt }}" style="flex:1;border:1px solid #D1D5DB;border-radius:999px;padding:11px;text-align:center;font-size:13px;font-weight:600;color:#111827;cursor:pointer">发适应周</div><div class="pb" onclick="{{ toastSummary }}" style="flex:1;border:1px solid #D1D5DB;border-radius:999px;padding:11px;text-align:center;font-size:13px;font-weight:600;color:#111827;cursor:pointer">评估总结</div><div class="pb" onclick="{{ toastFinish }}" style="flex:1;background:#111827;color:#FFFFFF;border-radius:999px;padding:11px;text-align:center;font-size:13px;font-weight:800;cursor:pointer">完成评估</div></div>
+</div>
+<div style="display:flex;gap:6px;overflow-x:auto">
+<div class="pb" onclick="{{ dt0 }}" style="padding:8px 15px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ dtb0 }};color:{{ dtc0 }}">概览</div>
+<div class="pb" onclick="{{ dt1 }}" style="padding:8px 15px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ dtb1 }};color:{{ dtc1 }}">执行</div>
+<div class="pb" onclick="{{ dt2 }}" style="padding:8px 15px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ dtb2 }};color:{{ dtc2 }}">视频</div>
+<div class="pb" onclick="{{ dt3 }}" style="padding:8px 15px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ dtb3 }};color:{{ dtc3 }}">成长</div>
+<div class="pb" onclick="{{ dt4 }}" style="padding:8px 15px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ dtb4 }};color:{{ dtc4 }}">反馈</div>
+</div>
+<sc-if value="{{ dtIs0 }}">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:15px"><div style="font-size:11px;color:#D97706;font-weight:600">本周完成度</div><div style="font-size:16px;font-weight:700;margin-top:5px">本周 0 / 3 训练日</div><div style="height:6px;border-radius:3px;background:#E5E7EB;margin-top:9px"></div></div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:15px;margin-top:10px"><div style="font-size:11px;color:#6B7280;font-weight:600">今日状态</div><div style="font-size:16px;font-weight:700;margin-top:5px">今日未填</div></div>
+<div class="pb" onclick="{{ dt4 }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:15px;margin-top:10px;cursor:pointer"><div style="font-size:11px;color:#6B7280;font-weight:600">最近反馈</div><div style="font-size:15px;font-weight:700;margin-top:5px">去反馈段写一条 →</div></div>
+</sc-if>
+<sc-if value="{{ dtIs1 }}">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;overflow:hidden">
+<div style="display:flex;align-items:center;padding:14px 16px"><div style="flex:1"><div style="font-size:14px;font-weight:700">W1D1 · 深蹲</div><div style="font-size:12px;color:#6B7280;margin-top:2px">周一 7/20</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+<div style="display:flex;align-items:center;padding:14px 16px;border-top:1px solid #E9EBEE"><div style="flex:1"><div style="font-size:14px;font-weight:700">W1D2 · 卧推</div><div style="font-size:12px;color:#6B7280;margin-top:2px">周二 7/21</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+<div style="display:flex;align-items:center;padding:14px 16px;border-top:1px solid #E9EBEE"><div style="flex:1"><div style="font-size:14px;font-weight:700">W1D3 · 硬拉</div><div style="font-size:12px;color:#6B7280;margin-top:2px">今天 7/22</div></div><span style="width:16px;height:16px;border-radius:50%;border:1.5px solid #D1D5DB"></span></div>
+</div>
+</sc-if>
+<sc-if value="{{ dtIs2 }}">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="pb" onclick="{{ toastVideo }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:12px;display:flex;align-items:center;gap:13px;cursor:pointer"><div style="width:72px;height:56px;border-radius:10px;background:#F3F4F6;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="#4B5563"><path d="M8 5v14l11-7z"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:700">深蹲 顶组 · 152.5kg</div><div style="font-size:12px;color:#6B7280;margin-top:2px">待反馈 · 2 小时前</div></div></div>
+<div class="pb" onclick="{{ toastVideo }}" style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:12px;display:flex;align-items:center;gap:13px;cursor:pointer"><div style="width:72px;height:56px;border-radius:10px;background:#F3F4F6;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="#4B5563"><path d="M8 5v14l11-7z"/></svg></div><div style="flex:1"><div style="font-size:14px;font-weight:700">卧推 · 100kg×3</div><div style="font-size:12px;color:#6B7280;margin-top:2px">已反馈 · 昨天</div></div></div>
+</div>
+</sc-if>
+<sc-if value="{{ dtIs3 }}">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:15px"><div style="font-size:12px;color:#6B7280;font-family:'IBM Plex Mono','Noto Sans SC',monospace"><span style="color:#4B5563;font-weight:600">深蹲</span> E1RM</div><div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:3px"><span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px">152.5<span style="font-size:13px;color:#6B7280"> kg</span></span><span style="font-size:12px;color:#15803D;font-family:'IBM Plex Mono',monospace">+2.5</span></div><svg viewBox="0 0 300 50" style="width:100%;height:44px;margin-top:6px" preserveAspectRatio="none"><polyline points="0,40 75,36 150,30 225,24 300,14" fill="none" stroke="#F0362A" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:15px;margin-top:10px"><div style="font-size:12px;color:#6B7280;font-family:'IBM Plex Mono','Noto Sans SC',monospace"><span style="color:#4B5563;font-weight:600">硬拉</span> E1RM</div><div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:3px"><span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px">190.0<span style="font-size:13px;color:#6B7280"> kg</span></span><span style="font-size:12px;color:#15803D;font-family:'IBM Plex Mono',monospace">+5.0</span></div><svg viewBox="0 0 300 50" style="width:100%;height:44px;margin-top:6px" preserveAspectRatio="none"><polyline points="0,42 75,38 150,28 225,22 300,12" fill="none" stroke="#F0362A" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+</sc-if>
+<sc-if value="{{ dtIs4 }}">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border:1px solid #E5E7EB;border-radius:16px;padding:6px 6px 6px 14px;display:flex;align-items:center;gap:8px"><input value="{{ fb }}" oninput="{{ onFb }}" placeholder="给 学员 写一条反馈" style="flex:1;background:transparent;border:none;outline:none;color:#111827;font-size:14px;padding:11px 0;font-family:inherit"><div class="pb" onclick="{{ sendFb }}" style="background:#111827;color:#FFFFFF;border-radius:12px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer">发送</div></div>
+<sc-for list="{{ fbList }}" as="f" hint-placeholder-count="1">
+<div style="background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);border-radius:16px;padding:14px;margin-top:10px"><div style="font-size:11px;color:#6B7280">{{ f.time }}</div><div style="font-size:14px;line-height:1.5;margin-top:4px">{{ f.t }}</div></div>
+</sc-for>
+</sc-if>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{ showTabs }}">
+<div style="flex:none;height:83px;border-top:1px solid #E5E7EB;display:flex;justify-content:space-around;align-items:flex-start;padding-top:9px;background:#fff">
+<div class="tb pb" onclick="{{ goToday }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:60px"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="{{ cTodayI }}" stroke-width="2" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span style="font-size:10px;color:{{ cTodayI }}">今日</span></div>
+<div class="tb pb" onclick="{{ goStudents }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:60px"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="{{ cStuI }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0111 0"/><path d="M16 6a3 3 0 010 6M15.5 19a5.5 5.5 0 016-5"/></svg><span style="font-size:10px;color:{{ cStuI }}">学员</span></div>
+<div class="tb pb" onclick="{{ goSchedule }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:60px"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="{{ cSchI }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M12 13v4M10 15h4"/></svg><span style="font-size:10px;color:{{ cSchI }}">编排</span></div>
+<div class="tb pb" onclick="{{ goInbox }}" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:60px"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="{{ cInbI }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l2 3h4l2-3h5"/><path d="M4 13l2-8h12l2 8v6H4z"/></svg><span style="font-size:10px;color:{{ cInbI }}">接收</span><span style="position:absolute;top:-4px;right:8px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:#E5484D;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace">{{ inboxBadge }}</span></div>
+<div class="tb pb" onclick="{{ goMe }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:60px"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="{{ cMeI }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20a6.5 6.5 0 0113 0"/></svg><span style="font-size:10px;color:{{ cMeI }}">我的</span></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showChat }}">
+<div class="ov" style="position:absolute;inset:0;background:#F5F6F8;display:flex;flex-direction:column;z-index:30">
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">21:41<span style="display:flex;align-items:center;gap:6px"><svg width="17" height="12" viewBox="0 0 17 12" fill="#111827"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"/><rect x="9" y="2" width="3" height="10" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1" opacity=".35"/></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#111827" opacity=".5"/><rect x="3" y="3" width="15" height="6" rx="1.5" fill="#111827"/></svg></span></div>
+<div style="flex:none;display:flex;align-items:center;gap:12px;padding:4px 18px 14px;border-bottom:1px solid #E5E7EB"><div class="pb" onclick="{{ closeOverlay }}" style="width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 4px 18px rgba(17,24,39,.06);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></div><div><div style="font-size:16px;font-weight:700">王晨曦</div><div style="font-size:11px;color:#15803D">● 学员 · 活跃</div></div></div>
+<div style="flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px">
+<div style="text-align:center;font-size:11px;color:#A4A4AC">今天</div>
+<sc-for list="{{ chat }}" as="m" hint-placeholder-count="2">
+<sc-if value="{{ m.other }}"><div style="align-self:flex-start;max-width:76%;background:#E9EBEE;border-radius:16px 16px 16px 5px;padding:11px 14px;font-size:14px;line-height:1.45">{{ m.t }}</div></sc-if>
+<sc-if value="{{ m.mine }}"><div style="align-self:flex-end;max-width:76%;background:#111827;color:#FFFFFF;border-radius:16px 16px 5px 16px;padding:11px 14px;font-size:14px;line-height:1.45;font-weight:500">{{ m.t }}</div></sc-if>
+</sc-for>
+</div>
+<div style="flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px 26px;border-top:1px solid #E5E7EB"><div style="flex:1;background:#fff;border:1px solid #E5E7EB;border-radius:999px;display:flex;align-items:center;padding:0 6px 0 16px"><input value="{{ draft }}" oninput="{{ onDraft }}" placeholder="输入消息" style="flex:1;background:transparent;border:none;outline:none;color:#111827;font-size:14px;padding:11px 0;font-family:inherit"><div class="pb" onclick="{{ send }}" style="width:34px;height:34px;border-radius:50%;background:#DADAE0;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111827" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></div></div></div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showLogout }}">
+<div class="ov" onclick="{{ closeOverlay }}" style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:28px;z-index:35">
+<div onclick="{{ stopProp }}" style="background:#fff;border:1px solid #E5E7EB;border-radius:20px;padding:22px;width:100%;box-shadow:0 30px 60px rgba(17,24,39,.18)">
+<div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:21px">退出登录？</div>
+<div style="font-size:14px;color:#6B7280;line-height:1.6;margin-top:10px">退出后需重新用手机号登录，草稿计划已自动保存。</div>
+<div style="display:flex;gap:10px;margin-top:20px"><div class="pb" onclick="{{ closeOverlay }}" style="flex:1;border:1px solid #E5E7EB;border-radius:999px;padding:14px;text-align:center;font-size:14px;font-weight:600;color:#4B5563;cursor:pointer">取消</div><div class="pb" onclick="{{ closeOverlay }}" style="flex:1;background:rgba(229,72,77,.1);color:#E5484D;border:1px solid rgba(229,72,77,.4);border-radius:999px;padding:14px;text-align:center;font-size:14px;font-weight:700;cursor:pointer">退出</div></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ toast }}">
+<div class="ov" style="position:absolute;left:0;right:0;bottom:104px;display:flex;justify-content:center;z-index:40;pointer-events:none"><div style="background:#111827;color:#FFFFFF;font-size:13px;font-weight:600;padding:11px 18px;border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.45);max-width:82%;text-align:center">{{ toast }}</div></div>
+</sc-if>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:470,&quot;height&quot;:940}}">
+class Component extends DCLogic {
+  state = {
+    screen:'today', inboxTab:'new', detailTab:'概览', detailName:'王晨曦',
+    overlay:null, toast:'', accepted:false, search:'',
+    chat:[{f:'other',t:'教练，今天最后一组完成了。'},{f:'me',t:'收到，明天深蹲加到 140。'}],
+    draft:'', fb:'', fbList:[{time:'今天 21:42',t:'深蹲第一组速度很好，最后一组不要急着起杠。'}]
+  };
+  students = [
+    {name:'王晨曦',dot:'#15803D',sub:'评估期 · 还剩 4 天',plan:'评估期',warn:false},
+    {name:'张以恒',dot:'#15803D',sub:'活跃 · 本周 0/3 训练日',plan:'暂无计划',warn:false},
+    {name:'李嘉宁',dot:'#15803D',sub:'活跃 · 本周 1/3 训练日',plan:'在跑',warn:false},
+    {name:'赵安然',dot:'#15803D',sub:'活跃 · 本周 0/3 训练日',plan:'暂无计划',warn:false},
+    {name:'钱骁',dot:'#E5484D',sub:'3 天未训练',plan:'暂无计划',warn:true}
+  ];
+  componentDidMount(){
+    this._fit=()=>{ const el=this.bezelEl; if(!el) return; const k=Math.min(1,(window.innerWidth-12)/438,(window.innerHeight-12)/892); el.style.transform=k<1?`scale(${k.toFixed(3)})`:''; el.style.transformOrigin='50% 50%'; const m=k<1?`${Math.round(-868*(1-k)/2)}px`:''; el.style.marginTop=m; el.style.marginBottom=m; };
+    window.addEventListener('resize',this._fit); this._fit();
+  }
+  componentWillUnmount(){ window.removeEventListener('resize',this._fit); }
+  go(s){ this.setState({screen:s, overlay:null}); }
+  toastMsg(m){ this.setState({toast:m}); clearTimeout(this._t); this._t=setTimeout(()=>this.setState({toast:''}),1900); }
+  openDetail(n){ this.setState({screen:'detail', detailName:n, detailTab:'概览', overlay:null}); }
+  send(){ const t=(this.state.draft||'').trim(); if(!t) return; this.setState(st=>({chat:[...st.chat,{f:'me',t}], draft:''})); }
+  sendFb(){ const t=(this.state.fb||'').trim(); if(!t) return; this.setState(st=>({fbList:[{time:'刚刚',t},...st.fbList], fb:''})); this.toastMsg('反馈已发送'); }
+  renderVals(){
+    const s=this.state;
+    const q=(s.search||'').trim();
+    const match=(x)=> !q || x.name.indexOf(q)>=0;
+    const mkRow=(x)=>({name:x.name,dot:x.dot,sub:x.sub,plan:x.plan,open:()=>this.openDetail(x.name)});
+    const active=this.students.filter(x=>!x.warn);
+    const warn=this.students.filter(x=>x.warn);
+    const need=[this.students[1],this.students[3],this.students[4]];
+    const seg=(on)=>on?'#111827':'transparent';
+    const segc=(on)=>on?'#FFFFFF':'#6B7280';
+    const dtb=(n)=>s.detailTab===n?'#111827':'#FFFFFF';
+    const dtc=(n)=>s.detailTab===n?'#FFFFFF':'#6B7280';
+    const inboxBadge=(s.accepted?0:1)+6+2;
+    return {
+      bezelRef:(el)=>{this.bezelEl=el; if(el&&this._fit) this._fit();},
+      isToday:s.screen==='today', isStudents:s.screen==='students', isSchedule:s.screen==='schedule', isInbox:s.screen==='inbox', isMe:s.screen==='me', isDetail:s.screen==='detail',
+      showTabs:s.screen!=='detail',
+      newPending:!s.accepted, accepted:s.accepted, noNew:s.accepted,
+      activeCount:active.length, warnCount:warn.length, hasWarn:warn.filter(match).length>0, needCount:need.length,
+      todayList:this.students.filter(match).map(mkRow),
+      activeList:active.filter(match).map(mkRow),
+      warnList:warn.filter(match).map(mkRow),
+      needList:need.map(x=>({name:x.name,initial:x.name.charAt(0),arrange:()=>this.toastMsg('已为 '+x.name+' 新建计划草稿')})),
+      search:s.search, onSearch:(e)=>this.setState({search:e.target.value}),
+      tabIsNew:s.inboxTab==='new', tabIsVideos:s.inboxTab==='videos', tabIsMsgs:s.inboxTab==='msgs',
+      segNew:seg(s.inboxTab==='new'), segNewC:segc(s.inboxTab==='new'), segVid:seg(s.inboxTab==='videos'), segVidC:segc(s.inboxTab==='videos'), segMsg:seg(s.inboxTab==='msgs'), segMsgC:segc(s.inboxTab==='msgs'),
+      newCount:s.accepted?0:1, inboxBadge,
+      detailName:s.detailName,
+      dtIs0:s.detailTab==='概览', dtIs1:s.detailTab==='执行', dtIs2:s.detailTab==='视频', dtIs3:s.detailTab==='成长', dtIs4:s.detailTab==='反馈',
+      dtb0:dtb('概览'),dtc0:dtc('概览'),dtb1:dtb('执行'),dtc1:dtc('执行'),dtb2:dtb('视频'),dtc2:dtc('视频'),dtb3:dtb('成长'),dtc3:dtc('成长'),dtb4:dtb('反馈'),dtc4:dtc('反馈'),
+      dt0:()=>this.setState({detailTab:'概览'}), dt1:()=>this.setState({detailTab:'执行'}), dt2:()=>this.setState({detailTab:'视频'}), dt3:()=>this.setState({detailTab:'成长'}), dt4:()=>this.setState({detailTab:'反馈'}),
+      cTodayI:s.screen==='today'?'#D97706':'#9CA3AF', cStuI:(s.screen==='students'||s.screen==='detail')?'#D97706':'#9CA3AF', cSchI:s.screen==='schedule'?'#D97706':'#9CA3AF', cInbI:s.screen==='inbox'?'#D97706':'#9CA3AF', cMeI:s.screen==='me'?'#D97706':'#9CA3AF',
+      goToday:()=>this.go('today'), goStudents:()=>this.go('students'), goSchedule:()=>this.go('schedule'), goInbox:()=>this.go('inbox'), goMe:()=>this.go('me'),
+      goInboxNew:()=>this.setState({screen:'inbox', inboxTab:'new', overlay:null}), backStudents:()=>this.go('students'),
+      tabNew:()=>this.setState({inboxTab:'new'}), tabVideos:()=>this.setState({inboxTab:'videos'}), tabMsgs:()=>this.setState({inboxTab:'msgs'}),
+      accept:()=>{ this.setState({accepted:true}); this.toastMsg('已接收 陈一鸣 · 进入评估期'); },
+      dismiss:()=>this.toastMsg('已忽略该请求'),
+      toastProfile:()=>this.toastMsg('打开学员申请资料（4 份）'), toastVideo:()=>this.toastMsg('打开视频逐段反馈'),
+      toastNew:()=>this.toastMsg('新建计划：请选择学员'), toastImport:()=>this.toastMsg('从 .xlsx 导入计划'),
+      toastCopy:()=>this.toastMsg('邀请码已复制'), toastAdapt:()=>this.toastMsg('已发送适应周'), toastSummary:()=>this.toastMsg('打开评估总结'), toastFinish:()=>this.toastMsg('评估已完成 · 学员转为正式周期'),
+      openChat:()=>this.setState({overlay:'chat'}), openLogout:()=>this.setState({overlay:'logout'}), closeOverlay:()=>this.setState({overlay:null}),
+      showChat:s.overlay==='chat', showLogout:s.overlay==='logout',
+      chat:s.chat.map(m=>({t:m.t,mine:m.f==='me',other:m.f!=='me'})), draft:s.draft, onDraft:(e)=>this.setState({draft:e.target.value}), send:()=>this.send(),
+      fb:s.fb, onFb:(e)=>this.setState({fb:e.target.value}), sendFb:()=>this.sendFb(), fbList:s.fbList,
+      toast:s.toast, stopProp:(e)=>e.stopPropagation()
+    };
+  }
+}
+</script>
+</body>
+</html>

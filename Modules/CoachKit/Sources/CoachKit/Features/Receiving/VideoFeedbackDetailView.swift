@@ -33,7 +33,7 @@ struct VideoFeedbackDetailView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         header
 
         ScrollView {
@@ -52,7 +52,7 @@ struct VideoFeedbackDetailView: View {
         .scrollContentBackground(.hidden)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .safeAreaInset(edge: .bottom) { sendBar }
     }
@@ -78,17 +78,17 @@ struct VideoFeedbackDetailView: View {
   // MARK: - Header (cancel · student name)
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: 4) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
       HStack {
         Eyebrow("视频反馈 //")
         Spacer()
         Button("取消") { dismiss() }
-          .font(.system(size: 16))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       Text("给 \(item.studentDisplayName) 写反馈")
-        .font(.system(size: 28, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size28, weight: .heavy))
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
     }
@@ -105,40 +105,40 @@ struct VideoFeedbackDetailView: View {
       sectionLabel("训练视频")
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
         Text(metaLine)
-          .font(.system(size: 14, design: .monospaced))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14, design: .monospaced))
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Button(action: play) {
           HStack(spacing: MeetPRSpacing.sm) {
             if resolvingPlayback {
               ProgressView()
             } else {
               Image(systemName: "play.rectangle.fill")
-                .foregroundStyle(Color.MeetPR.brandRed)
+                .foregroundStyle(Color.MeetPR.gold500)
             }
             Text(resolvingPlayback ? "加载中…" : "播放视频")
-              .font(.system(size: 15, weight: .semibold))
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Spacer()
             Image(systemName: "chevron.right")
-              .font(.system(size: 13))
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+              .foregroundStyle(Color.MeetPR.textTertiary)
           }
           .frame(maxWidth: .infinity)
           .padding(.vertical, MeetPRSpacing.md)
           .padding(.horizontal, MeetPRSpacing.base)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .disabled(resolvingPlayback)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
   }
@@ -160,22 +160,22 @@ struct VideoFeedbackDetailView: View {
         if text.isEmpty {
           Text("给 \(item.studentDisplayName) 写反馈...")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-            .padding(.top, 8)
-            .padding(.leading, 5)
+            .foregroundStyle(Color.MeetPR.textTertiary)
+            .padding(.top, MeetPRSpacing.space2)
+            .padding(.leading, MeetPRSpacing.point5)
         }
         TextEditor(text: $text)
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .scrollContentBackground(.hidden)
       }
       .frame(minHeight: 160)
       .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
   }
@@ -183,10 +183,10 @@ struct VideoFeedbackDetailView: View {
   private func banner(_ message: String) -> some View {
     Label(message, systemImage: "exclamationmark.triangle")
       .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.amber)
+      .foregroundStyle(Color.MeetPR.gold500)
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.amberSoft)
+      .background(Color.MeetPR.goldSoft)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
 
@@ -198,14 +198,14 @@ struct VideoFeedbackDetailView: View {
         Image(systemName: "paperplane.fill")
         Text("发送")
       }
-      .font(.system(size: 16, weight: .semibold))
-      .foregroundStyle(canSend ? Color.MeetPR.bg : Color.MeetPR.fgTertiary)
+      .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
+      .foregroundStyle(canSend ? Color.MeetPR.bgBase : Color.MeetPR.textTertiary)
       .frame(maxWidth: .infinity)
       .frame(height: 50)
-      .background(canSend ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
+      .background(canSend ? Color.MeetPR.textPrimary : Color.MeetPR.surfaceElevated)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(!canSend)
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.vertical, MeetPRSpacing.sm)
@@ -252,7 +252,7 @@ struct VideoFeedbackDetailView: View {
     Text(text)
       .font(Font.MeetPR.monoLabel)
       .tracking(Font.MeetPR.monoLabelTracking)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       .frame(maxWidth: .infinity, alignment: .leading)
   }
 

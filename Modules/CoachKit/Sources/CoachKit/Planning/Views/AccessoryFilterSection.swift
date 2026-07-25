@@ -21,7 +21,7 @@ public struct AccessoryFilterSection: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
         Text("筛选")
           .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
 
         muscleGroupRow
         equipmentRow
@@ -112,13 +112,13 @@ private struct FilterRow<Content: View>: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Text(title)
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
 
       ScrollView(.horizontal) {
         HStack(spacing: MeetPRSpacing.sm) {
           content
         }
-        .padding(.vertical, 1)
+        .padding(.vertical, MeetPRSpacing.point1)
       }
       .scrollIndicators(.hidden)
     }
@@ -135,18 +135,19 @@ private struct FilterChip: View {
     Button(action: action) {
       Text(title)
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(isSelected ? Color.MeetPR.bg : Color.MeetPR.fgPrimary)
+        .foregroundStyle(isSelected ? Color.MeetPR.bgBase : Color.MeetPR.textPrimary)
         .lineLimit(1)
         .padding(.horizontal, MeetPRSpacing.md)
         .padding(.vertical, MeetPRSpacing.sm)
-        .background(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
+        .background(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.surfaceElevated)
         .overlay {
           Capsule()
-            .stroke(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.border, lineWidth: 1)
+            .stroke(
+              isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(.capsule)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel(title)
   }
 }

@@ -33,7 +33,7 @@ public struct Step7WeekCardSwipeView: View {
       .padding(.horizontal, MeetPRSpacing.base)
       .padding(.bottom, MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("周卡片")
     .alert("还差一点", isPresented: incompleteAlertBinding) {
       Button("知道了", role: .cancel) { viewModel.clearPublishFeedback() }

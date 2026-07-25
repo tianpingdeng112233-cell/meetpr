@@ -11,6 +11,7 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let streak: any StudentStreakRepository
   /// Bumped by the parent when the student taps the home 开始/继续 CTA, so the
   /// training tab jumps back to today instead of whatever past/future day was
   /// last browsed here.
@@ -35,8 +36,9 @@ public struct TodayWorkoutView: View {
   @State private var showingReadinessSheet = false
   @State private var showingNotifications = false
   @State private var conversationID: UUID?
-  /// Whether the slide-to-complete → 训练回顾 → 完成 flow has been finished for
-  /// the loaded day; loaded from `SessionReviewStore` so the slide control does
+  @State private var collapsedExerciseIDs: Set<UUID> = []
+  /// Whether the hold-to-complete → 训练回顾 → 完成 flow has been finished for
+  /// the loaded day; loaded from `SessionReviewStore` so the hold control does
   /// not re-arm after the review sheet closes (or the app restarts).
   @State private var reviewCompleted = false
   private let reviewStore: any SessionReviewStore = UserDefaultsSessionReviewStore()
@@ -49,6 +51,7 @@ public struct TodayWorkoutView: View {
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     onboarding: (any OnboardingProfileReading)? = nil,
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
+    streak: any StudentStreakRepository = InMemoryStudentStreakRepository(current: 12),
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
     videoUploads: VideoUploadServices? = nil,
@@ -63,6 +66,7 @@ public struct TodayWorkoutView: View {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
+    self.streak = streak
     self.jumpToTodayToken = jumpToTodayToken
     self.planRevision = planRevision
     self.workoutStartedAt = workoutStartedAt
@@ -89,7 +93,18 @@ public struct TodayWorkoutView: View {
 
   public var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
+        HStack(spacing: MeetPRSpacing.sm) {
+          MeetPRMark(size: 30)
+          Text(navTitle)
+            .font(.MeetPR.display(size: 20, weight: .extraBold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+          Spacer()
+        }
+        .padding(.horizontal, MeetPRSpacing.base)
+        .padding(.top, MeetPRSpacing.point6)
+        .meetPRRiseIn(index: 0)
+
         TrainingCalendarView(
           studentID: studentID,
           selectedDate: $selectedDate,
@@ -99,6 +114,7 @@ public struct TodayWorkoutView: View {
         )
         .padding(.horizontal)
         .padding(.top)
+        .meetPRRiseIn(index: 1)
 
         Group {
           switch viewModel.state {
@@ -121,8 +137,8 @@ public struct TodayWorkoutView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
-      .background(Color.MeetPR.bg)
-      .navigationTitle(navTitle)
+      .background(Color.MeetPR.bgBase)
+      .navigationTitle("")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif
@@ -133,7 +149,7 @@ public struct TodayWorkoutView: View {
           Image(
             systemName: readinessFiled ? "heart.text.square.fill" : "heart.text.square"
           )
-          .foregroundStyle(readinessFiled ? Color.MeetPR.green : Color.MeetPR.fgSecondary)
+          .foregroundStyle(readinessFiled ? Color.MeetPR.success : Color.MeetPR.textSecondary)
         }
         .accessibilityLabel(readinessFiled ? "今日状态已填，点按修改" : "填写今日状态")
 
@@ -327,24 +343,28 @@ public struct TodayWorkoutView: View {
     // mistake (previously any browsed day accepted set records + completion).
     let isEditable = WorkoutDatePolicy.isEditable(day.date)
     return ScrollView {
-      VStack(alignment: .leading, spacing: 16) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
         if !isEditable {
           readOnlyNotice(for: day.date)
         }
 
         if let activeIndex {
           activeSetHero(day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable)
+            .meetPRRiseIn(index: 2)
         }
 
         exerciseSections(
-          day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable)
+          day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
+        )
+        .meetPRRiseIn(index: 3)
 
         completionControls(drafts: drafts, day: day, isEditable: isEditable)
+          .meetPRRiseIn(index: 4)
       }
-      .padding(16)
+      .padding(MeetPRSpacing.space4)
     }
     .scrollContentBackground(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .sheet(item: $editing) { target in
       SetEntrySheet(
         rowIndex: target.rowIndex,
@@ -356,11 +376,12 @@ public struct TodayWorkoutView: View {
         scrollToVideo: target.scrollToVideo
       )
     }
-    // Anchored here (not on the slide control) so the review stays reachable
-    // from the completion banner after the slide control is gone.
+    // Anchored here (not on the hold control) so the review stays reachable
+    // from the completion banner after the hold control is gone.
     .sheet(isPresented: $showingSummary) {
       SessionSummaryView(
         summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID,
+        streak: streak,
         onComplete: { markReviewCompleted(for: day.date, setCount: drafts.count) }
       )
     }
@@ -376,7 +397,7 @@ public struct TodayWorkoutView: View {
       Text(section.title)
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
 
       ForEach(section.exercises) { exercise in
         exerciseTableCard(
@@ -408,13 +429,13 @@ public struct TodayWorkoutView: View {
 
     // Hidden only once the day is fully closed (all sets done AND the review
     // finished with 完成) — the banner then carries the 查看回顾 entry. If a set
-    // is later un-checked the banner disappears, so the slide control must
+    // is later un-checked the banner disappears, so the hold control must
     // return or the review becomes unreachable.
     if isEditable && !(dayComplete && reviewCompleted) {
-      SlideToCompleteButton(title: "滑动完成今日训练") {
+      HoldToCompleteButton(title: "长按 · 完成今日训练") {
         showingSummary = true
       }
-      .padding(.top, 4)
+      .padding(.top, MeetPRSpacing.space1)
     }
   }
 
@@ -432,19 +453,22 @@ public struct TodayWorkoutView: View {
 
   private func readOnlyNotice(for date: Date) -> some View {
     let isPast = WorkoutDatePolicy.isPast(date)
-    return HStack(spacing: 8) {
+    return HStack(spacing: MeetPRSpacing.space2) {
       Image(systemName: isPast ? "clock.arrow.circlepath" : "eye")
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       Text(isPast ? "历史记录 · 不可修改" : "未到训练日 · 仅预览")
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       Spacer()
     }
-    .padding(12)
+    .padding(MeetPRSpacing.space3)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
+    }
   }
 
   // MARK: - Active set hero
@@ -460,66 +484,75 @@ public struct TodayWorkoutView: View {
     let setNumber = setNumber(for: draft, in: drafts)
     let totalSets = totalSets(for: draft.planExerciseID, in: drafts)
     let exerciseNote = exerciseNote(for: draft.planExerciseID, in: day)
-    return VStack(alignment: .leading, spacing: 0) {
-      HStack(alignment: .lastTextBaseline, spacing: 8) {
+    return VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.space2) {
         Text(draft.exerciseName)
-          .font(.system(size: 20, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: 22, weight: .extraBold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("\(setNumber)/\(totalSets)")
-          .font(.system(size: 15, weight: .bold).monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .bold).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
 
       heroTargetRow(draft: draft)
-        .padding(.top, 12)
+        .padding(.top, MeetPRSpacing.space3)
 
       if let exerciseNote {
         CoachNotePill(note: exerciseNote)
-          .padding(.top, 10)
+          .padding(.top, MeetPRSpacing.point10)
       }
 
       Text("RPE")
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.brandRed)
-        .padding(.top, 16)
-      HStack(alignment: .lastTextBaseline, spacing: 8) {
+        .foregroundStyle(Color.MeetPR.gold500)
+        .padding(.top, MeetPRSpacing.space4)
+      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.space2) {
         Text(StudentFormatting.decimal(currentRPE(draft)))
-          .font(.system(size: 36, weight: .heavy).monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("/ 10").font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.display(size: 20, weight: .extraBold).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text("/ 10").font(.MeetPR.system(size: MeetPRFontMetrics.size12)).foregroundStyle(
+          Color.MeetPR.textTertiary)
       }
 
       if isEditable {
         recordActions(draft: draft, rowIndex: rowIndex, setNumber: setNumber)
-          .padding(.top, 16)
+          .padding(.top, MeetPRSpacing.space4)
       }
     }
-    .padding(16)
-    .background(Color.MeetPR.surface2)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceFocus)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+    .overlay(alignment: .leading) {
+      LinearGradient(
+        colors: [Color.MeetPR.gold300, Color.MeetPR.gold400, Color.MeetPR.gold500],
+        startPoint: .top,
+        endPoint: .bottom
+      )
+      .frame(width: 3)
+    }
+    .meetPRGoldGlow()
   }
 
   private func heroTargetRow(draft: TodayWorkoutViewModel.SetRowDraft) -> some View {
-    HStack(alignment: .lastTextBaseline, spacing: 6) {
+    HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
       Text(weightText(draft))
-        .font(.system(size: 72, weight: .heavy).monospacedDigit())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: 54, weight: .extraBold).monospacedDigit())
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Text("KG")
-        .font(.system(size: 22, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size22, weight: .heavy))
+        .foregroundStyle(Color.MeetPR.gold500)
       Spacer()
-      HStack(alignment: .lastTextBaseline, spacing: 2) {
+      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point2) {
         Text("×")
-          .font(.system(size: 24, weight: .bold))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size24, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Text(targetRepsText(draft))
-          .font(.system(size: 36, weight: .heavy).monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size36, weight: .heavy).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text("次")
-          .font(.system(size: 14, weight: .bold))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
   }
@@ -527,7 +560,7 @@ public struct TodayWorkoutView: View {
   private func recordActions(
     draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, setNumber: Int
   ) -> some View {
-    HStack(spacing: 8) {
+    HStack(spacing: MeetPRSpacing.space2) {
       Button {
         editing = EditingTarget(
           id: draft.id,
@@ -537,14 +570,14 @@ public struct TodayWorkoutView: View {
           scrollToVideo: false)
       } label: {
         Text("记录此组")
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.bg)
+          .font(.MeetPR.body(size: 15, weight: .bold))
+          .foregroundStyle(Color.MeetPR.ctaText)
           .frame(maxWidth: .infinity)
           .frame(height: 48)
-          .background(Color.MeetPR.fgPrimary)
-          .clipShape(.rect(cornerRadius: 12))
+          .background(Color.MeetPR.ctaBackground)
+          .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
 
       Button {
         switch SetVideoButtonDestination.resolve(
@@ -574,10 +607,11 @@ public struct TodayWorkoutView: View {
         )
         .frame(width: 56, height: 48)
         .overlay {
-          RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+          RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+            Color.MeetPR.borderDefault, lineWidth: 1)
         }
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .disabled(preparingVideoSetID == draft.id)
     }
   }
@@ -593,6 +627,7 @@ public struct TodayWorkoutView: View {
     GridItem(.fixed(28), alignment: .trailing),
   ]
 
+  // swiftlint:disable:next function_body_length
   private func exerciseTableCard(
     exercise: StudentPlanExercise,
     rows: [TodayWorkoutViewModel.SetRowDraft],
@@ -600,51 +635,149 @@ public struct TodayWorkoutView: View {
     activeIndex: Int?,
     isEditable: Bool
   ) -> some View {
-    VStack(alignment: .leading, spacing: 8) {
-      VStack(alignment: .leading, spacing: 2) {
-        Text(exercise.exercise.name)
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        if let reference = viewModel.exerciseReferences[exercise.exercise.id], reference.hasValue {
-          Text(referenceText(reference))
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+    let allCompleted = !rows.isEmpty && rows.allSatisfy(\.completed)
+    let isCollapsed = collapsedExerciseIDs.contains(exercise.id)
+
+    return ZStack(alignment: .top) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+        HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+            Text(exercise.exercise.name)
+              .font(Font.MeetPR.bodyEmphasis)
+              .foregroundStyle(Color.MeetPR.textPrimary)
+            if let reference = viewModel.exerciseReferences[exercise.exercise.id],
+              reference.hasValue
+            {
+              Text(referenceText(reference))
+                .font(Font.MeetPR.footnote)
+                .foregroundStyle(Color.MeetPR.textTertiary)
+            }
+          }
+
+          Spacer()
+
+          if allCompleted {
+            Button {
+              collapsedExerciseIDs.insert(exercise.id)
+            } label: {
+              HStack(spacing: MeetPRSpacing.space1) {
+                Image(systemName: "checkmark.circle.fill")
+                  .foregroundStyle(Color.MeetPR.success)
+                Image(systemName: "chevron.up")
+                  .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+                  .foregroundStyle(Color.MeetPR.textFaint)
+              }
+              .font(.title3)
+              .frame(
+                minWidth: MeetPRSpacing.minimumHitTarget, minHeight: MeetPRSpacing.minimumHitTarget)
+            }
+            .buttonStyle(PressScaleButtonStyle())
+            .accessibilityLabel("收起 \(exercise.exercise.name)")
+          }
+        }
+
+        // Review path: with no active set there is no hero card, so a finished
+        // (or browsed read-only) day surfaces each exercise's note here instead.
+        if let note = CoachNoteDisplay.reviewNote(activeIndex: activeIndex, notes: exercise.notes) {
+          CoachNotePill(note: note)
+        }
+
+        VStack(spacing: MeetPRSpacing.zero) {
+          LazyVGrid(columns: columns, spacing: MeetPRSpacing.zero) {
+            tableHeaderCell("#", leading: true)
+            tableHeaderCell("重量")
+            tableHeaderCell("次数")
+            tableHeaderCell("RPE")
+            Text("")
+            Text("")
+          }
+          .padding(.horizontal, MeetPRSpacing.space4)
+          .padding(.vertical, MeetPRSpacing.point10)
+          .overlay(alignment: .bottom) {
+            Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
+          }
+
+          ForEach(Array(rows.enumerated()), id: \.element.id) { offset, draft in
+            let index = allDrafts.firstIndex { $0.id == draft.id } ?? 0
+            setRow(
+              draft: draft,
+              rowIndex: index,
+              setNumber: SetDisplayNumber.number(atOffset: offset),
+              active: activeIndex == index,
+              isEditable: isEditable)
+          }
+        }
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+        .overlay {
+          RoundedRectangle(cornerRadius: MeetPRRadius.control)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
       }
+      .meetPRRollUp(isCollapsed: isCollapsed)
+      .allowsHitTesting(!isCollapsed)
 
-      // Review path: with no active set there is no hero card, so a finished
-      // (or browsed read-only) day surfaces each exercise's note here instead.
-      if let note = CoachNoteDisplay.reviewNote(activeIndex: activeIndex, notes: exercise.notes) {
-        CoachNotePill(note: note)
+      if isCollapsed {
+        collapsedExercisePill(exercise: exercise, completedSetCount: rows.count)
+          .meetPRPillRiseIn()
       }
-
-      VStack(spacing: 0) {
-        LazyVGrid(columns: columns, spacing: 0) {
-          tableHeaderCell("#", leading: true)
-          tableHeaderCell("重量")
-          tableHeaderCell("次数")
-          tableHeaderCell("RPE")
-          Text("")
-          Text("")
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
-        .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
-
-        ForEach(Array(rows.enumerated()), id: \.element.id) { offset, draft in
-          let index = allDrafts.firstIndex { $0.id == draft.id } ?? 0
-          setRow(
-            draft: draft,
-            rowIndex: index,
-            setNumber: SetDisplayNumber.number(atOffset: offset),
-            active: activeIndex == index,
-            isEditable: isEditable)
-        }
-      }
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
     }
+    .frame(maxHeight: isCollapsed ? 48 : nil, alignment: .top)
+    .clipped()
+    .onAppear {
+      if allCompleted {
+        collapsedExerciseIDs.insert(exercise.id)
+      }
+    }
+    .onChange(of: allCompleted) { wasCompleted, isCompleted in
+      if isCompleted, !wasCompleted {
+        collapsedExerciseIDs.insert(exercise.id)
+      } else if !isCompleted {
+        collapsedExerciseIDs.remove(exercise.id)
+      }
+    }
+  }
+
+  private func collapsedExercisePill(
+    exercise: StudentPlanExercise,
+    completedSetCount: Int
+  ) -> some View {
+    Button {
+      collapsedExerciseIDs.remove(exercise.id)
+    } label: {
+      HStack(spacing: MeetPRSpacing.space3) {
+        Image(systemName: "checkmark")
+          .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
+          .foregroundStyle(Color.MeetPR.success)
+          .frame(width: 22, height: 22)
+          .background(Color.MeetPR.successSoft)
+          .clipShape(.circle)
+
+        Text(exercise.exercise.name)
+          .font(Font.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+
+        Spacer(minLength: MeetPRSpacing.space2)
+
+        Text("\(completedSetCount) 组完成")
+          .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textFaint)
+
+        Image(systemName: "chevron.down")
+          .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textDisabled)
+      }
+      .padding(.horizontal, MeetPRSpacing.space4)
+      .frame(minHeight: 48)
+      .background(Color.MeetPR.bgInset)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
+      }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    }
+    .buttonStyle(PressScaleButtonStyle())
+    .accessibilityLabel("展开 \(exercise.exercise.name)，\(completedSetCount) 组完成")
   }
 
   private func exerciseNote(for planExerciseID: UUID, in day: StudentPlanDay) -> String? {
@@ -653,9 +786,9 @@ public struct TodayWorkoutView: View {
 
   private func tableHeaderCell(_ text: String, leading: Bool = false) -> some View {
     Text(text)
-      .font(.system(size: 10, weight: .medium, design: .monospaced))
+      .font(.MeetPR.system(size: MeetPRFontMetrics.size10, weight: .medium, design: .monospaced))
       .tracking(0.8)
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .foregroundStyle(Color.MeetPR.textTertiary)
       .frame(maxWidth: .infinity, alignment: leading ? .leading : .trailing)
   }
 
@@ -678,7 +811,7 @@ public struct TodayWorkoutView: View {
       } label: {
         setRowGrid(draft: draft, setNumber: setNumber, active: active)
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
     } else {
       setRowGrid(draft: draft, setNumber: setNumber, active: active)
     }
@@ -688,10 +821,10 @@ public struct TodayWorkoutView: View {
     draft: TodayWorkoutViewModel.SetRowDraft, setNumber: Int, active: Bool
   ) -> some View {
     let resolved = draft.completed || active
-    let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
-    return LazyVGrid(columns: columns, spacing: 0) {
+    let foreground: Color = resolved ? Color.MeetPR.textPrimary : Color.MeetPR.textTertiary
+    return LazyVGrid(columns: columns, spacing: MeetPRSpacing.zero) {
       Text("\(setNumber)")
-        .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+        .foregroundStyle(active ? Color.MeetPR.gold500 : Color.MeetPR.textTertiary)
       Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
       Text(repsText(draft)).foregroundStyle(foreground)
       Text(rpeText(draft)).foregroundStyle(foreground)
@@ -711,11 +844,11 @@ public struct TodayWorkoutView: View {
         .frame(maxWidth: .infinity, alignment: .trailing)
       }
     }
-    .font(.system(size: 16, design: .monospaced))
-    .padding(.horizontal, 16)
-    .padding(.vertical, 14)
-    .background(active ? Color.MeetPR.surface2 : Color.clear)
-    .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
+    .font(.MeetPR.system(size: MeetPRFontMetrics.size16, design: .monospaced))
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.vertical, MeetPRSpacing.point14)
+    .background(active ? Color.MeetPR.surfaceElevated : Color.clear)
+    .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1) }
     .contentShape(Rectangle())
   }
 
@@ -753,8 +886,8 @@ public struct TodayWorkoutView: View {
   }
 
   private func statusColor(_ draft: TodayWorkoutViewModel.SetRowDraft) -> Color {
-    if draft.failed { return Color.MeetPR.amber }
-    return draft.completed ? Color.MeetPR.green : Color.MeetPR.fgTertiary
+    if draft.failed { return Color.MeetPR.danger }
+    return draft.completed ? Color.MeetPR.success : Color.MeetPR.textTertiary
   }
 
   private func videoRowState(

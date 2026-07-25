@@ -17,7 +17,7 @@ public struct Step0SelectStudentView: View {
           Eyebrow("STEP 0")
           Text("为谁创建计划？")
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
 
         studentSection(
@@ -56,7 +56,7 @@ public struct Step0SelectStudentView: View {
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   @ViewBuilder
@@ -67,7 +67,7 @@ public struct Step0SelectStudentView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Eyebrow("\(title) (\(students.count))", showsRule: false)
 
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         ForEach(students) { student in
           StudentRow(
             student: student,
@@ -81,14 +81,14 @@ public struct Step0SelectStudentView: View {
 
           if student.id != students.last?.id {
             Divider()
-              .background(Color.MeetPR.border)
+              .background(Color.MeetPR.borderDefault)
           }
         }
       }
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
   }
@@ -116,23 +116,23 @@ private struct StudentRow: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text(student.displayName)
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           Text(subtitle)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
 
         if isSelected {
           Image(systemName: "checkmark.circle.fill")
-            .foregroundStyle(Color.MeetPR.green)
+            .foregroundStyle(Color.MeetPR.success)
         }
       }
       .padding(MeetPRSpacing.base)
-      .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+      .background(isSelected ? Color.MeetPR.goldSoft : Color.MeetPR.surfaceCard)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private var leadingIcon: String {

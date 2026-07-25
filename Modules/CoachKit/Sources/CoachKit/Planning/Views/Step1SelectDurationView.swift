@@ -20,7 +20,7 @@ public struct Step1SelectDurationView: View {
         Eyebrow("STEP 1")
         Text("这次写几周？")
           .font(Font.MeetPR.title2)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
       }
 
       DurationChoiceCard(
@@ -35,7 +35,7 @@ public struct Step1SelectDurationView: View {
     }
     .padding(MeetPRSpacing.base)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("选计划长度")
   }
 
@@ -75,11 +75,11 @@ private struct DurationChoiceCard: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Text(title)
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           Text(subtitle)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
 
           if isSelected {
             StatusBadge(status: .ready, title: "已选择")
@@ -89,10 +89,10 @@ private struct DurationChoiceCard: View {
       }
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(isSelected ? Color.MeetPR.brandRed : .clear, lineWidth: 2)
+          .stroke(isSelected ? Color.MeetPR.gold500 : .clear, lineWidth: 2)
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 }
 

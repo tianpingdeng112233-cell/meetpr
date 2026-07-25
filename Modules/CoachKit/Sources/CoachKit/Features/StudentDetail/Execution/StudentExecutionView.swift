@@ -8,7 +8,7 @@ struct StudentExecutionView: View {
   let shiftBadgeText: String?
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: MeetPRSpacing.zero) {
       if let shiftBadgeText {
         HStack {
           StatusBadge(status: .pending, title: shiftBadgeText)
@@ -20,7 +20,7 @@ struct StudentExecutionView: View {
 
       if days.isEmpty {
         ContentUnavailableView("暂无执行记录", systemImage: "list.bullet.rectangle")
-          .background(Color.MeetPR.bg)
+          .background(Color.MeetPR.bgBase)
       } else {
         List {
           ForEach(days) { day in
@@ -33,7 +33,7 @@ struct StudentExecutionView: View {
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .background(Color.MeetPR.bg)
+        .background(Color.MeetPR.bgBase)
       }
     }
   }
@@ -46,23 +46,23 @@ private struct StudentExecutionDayRow: View {
 
   var body: some View {
     HStack(spacing: MeetPRSpacing.base) {
-      VStack(alignment: .leading, spacing: 2) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
         Text(CoachStudentFormatting.weekdayText(day.date))
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text(CoachStudentFormatting.shortDateText(day.date))
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .frame(width: 58, alignment: .leading)
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
         Text(title)
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text(day.completionText)
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
 
       Spacer()

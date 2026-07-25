@@ -34,7 +34,7 @@ public struct GrowthCurveView: View {
       )
       .padding(MeetPRSpacing.md)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("成长曲线")
   }
 }
@@ -137,7 +137,7 @@ struct GrowthCurvePanelView: View {
         )
         .frame(height: 280)
         .padding(MeetPRSpacing.sm)
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.surfaceCard)
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
     }
@@ -147,7 +147,7 @@ struct GrowthCurvePanelView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Text(point.computedAt, format: .dateTime.year().month().day().weekday())
         .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       HStack(spacing: MeetPRSpacing.lg) {
         metric("重量", "\(StudentFormatting.kilograms(point.sourceWeightKg)) kg")
         metric("次数", "\(point.sourceReps)")
@@ -156,26 +156,26 @@ struct GrowthCurvePanelView: View {
       HStack {
         Text("e1RM")
           .font(Font.MeetPR.monoLabel)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Text("\(StudentFormatting.kilograms(point.e1RMKg)) kg")
           .font(Font.MeetPR.title2)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
       Spacer(minLength: 0)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(MeetPRSpacing.md)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private func metric(_ title: String, _ value: String) -> some View {
-    VStack(alignment: .leading, spacing: 2) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
       Text(title)
         .font(Font.MeetPR.monoLabel)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       Text(value)
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
     }
   }
 

@@ -15,7 +15,7 @@ struct StudentRosterRow: View {
           HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
             Text(row.student.displayName)
               .font(Font.MeetPR.headline)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
               .lineLimit(1)
 
             Spacer(minLength: MeetPRSpacing.sm)
@@ -25,19 +25,19 @@ struct StudentRosterRow: View {
 
           Text(row.completionText)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .lineLimit(1)
 
           Text(lastActiveText)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
             .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
 
         Image(systemName: "chevron.right")
-          .font(.system(size: 14, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
     .accessibilityElement(children: .combine)

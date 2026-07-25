@@ -208,7 +208,57 @@ public struct CoachRootView: View {
       case .profile: Analytics.shared.screen(.account)
       }
     }
-    .tint(Color.MeetPR.brandRed)
+    .meetPRCoachTabBar(
+      selection: $selectedTab,
+      studentsBadge: rosterViewModel.pendingAttentionCount,
+      receivingBadge: CoachReceivingBadge.total(
+        newStudents: queueViewModel.pendingCount,
+        videos: videoQueueViewModel.pendingCount,
+        chatUnread: chat?.inbox.totalUnread ?? 0
+      )
+    )
+    .tint(Color.MeetPR.gold500)
+  }
+}
+
+extension View {
+  @ViewBuilder
+  fileprivate func meetPRCoachTabBar(
+    selection: Binding<CoachTab>,
+    studentsBadge: Int,
+    receivingBadge: Int
+  ) -> some View {
+    #if os(iOS)
+      toolbar(.hidden, for: .tabBar)
+        .safeAreaInset(edge: .bottom, spacing: MeetPRSpacing.zero) {
+          MeetPRTabBar(
+            selection: selection,
+            items: [
+              MeetPRTabBarItem(id: .today, title: "今日", systemImage: "house"),
+              MeetPRTabBarItem(
+                id: .students,
+                title: "学员",
+                systemImage: "person.2",
+                badge: studentsBadge
+              ),
+              MeetPRTabBarItem(
+                id: .planning,
+                title: "编排",
+                systemImage: "calendar.badge.plus"
+              ),
+              MeetPRTabBarItem(
+                id: .receiving,
+                title: "接收",
+                systemImage: "tray",
+                badge: receivingBadge
+              ),
+              MeetPRTabBarItem(id: .profile, title: "我的", systemImage: "person"),
+            ]
+          )
+        }
+    #else
+      self
+    #endif
   }
 }
 

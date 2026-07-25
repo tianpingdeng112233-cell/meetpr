@@ -26,26 +26,26 @@ struct CoachNotePill: View {
   let note: String
   /// Surface behind the pill — bump to `surface2` when the pill itself sits on
   /// a `surface1` card (e.g. history day detail) so it stays visible.
-  var background: Color = Color.MeetPR.surface1
+  var background: Color = Color.MeetPR.bgInset
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 4) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
       Text("教练备注")
-        .font(.system(size: 10, weight: .medium, design: .monospaced))
+        .font(.MeetPR.mono(size: 11, weight: .medium))
         .tracking(0.8)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
       Text(note)
-        .font(.system(size: 13, weight: .medium))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.body(size: 12, weight: .medium))
+        .foregroundStyle(Color.MeetPR.coachNoteText)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, 10)
-    .padding(.vertical, 8)
+    .padding(.horizontal, MeetPRSpacing.point10)
+    .padding(.vertical, MeetPRSpacing.space2)
     .background(background)
-    .clipShape(.rect(cornerRadius: 8))
+    .clipShape(.rect(cornerRadius: MeetPRRadius.chip))
     .overlay {
-      RoundedRectangle(cornerRadius: 8)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.chip)
+        .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
     }
     .accessibilityElement(children: .combine)
     .accessibilityLabel("教练备注 \(note)")

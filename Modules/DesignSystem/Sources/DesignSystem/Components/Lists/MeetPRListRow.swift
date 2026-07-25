@@ -46,7 +46,7 @@ public struct MeetPRListRow: View {
             showsTrailingChevron: showsTrailingChevron
           )
         }
-        .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: false))
+        .buttonStyle(PressScaleButtonStyle(isDisabled: false))
       } else {
         MeetPRListRowContent(
           title: title,
@@ -78,24 +78,24 @@ private struct MeetPRListRowContent: View {
     HStack(spacing: MeetPRSpacing.md) {
       if let leadingSystemName {
         Image(systemName: leadingSystemName)
-          .font(.system(size: 20, weight: .medium))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .frame(width: 24, height: 24)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size20, weight: .medium))
+          .foregroundStyle(Color.MeetPR.gold500)
+          .frame(width: 20, height: 20)
       } else {
         Circle()
-          .stroke(Color.MeetPR.fgPrimary, lineWidth: 1.75)
-          .frame(width: 24, height: 24)
+          .stroke(Color.MeetPR.borderStrong, lineWidth: 1.5)
+          .frame(width: 20, height: 20)
       }
 
-      VStack(alignment: .leading, spacing: 3) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
         Text(title)
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.body(size: 14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
 
         Text(subtitle)
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.body(size: 12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .lineLimit(1)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -110,43 +110,43 @@ private struct MeetPRListRowContent: View {
 
       if showsTrailingChevron {
         Image(systemName: "chevron.right")
-          .font(.system(size: 14, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textMuted)
       }
     }
-    .padding(.horizontal, MeetPRSpacing.base)
-    .padding(.vertical, MeetPRSpacing.md)
-    .frame(minHeight: 56)
-    .background(Color.MeetPR.surface1)
+    .padding(.horizontal, MeetPRSpacing.md)
+    .padding(.vertical, MeetPRSpacing.sm)
+    .frame(minHeight: 52)
+    .background(Color.MeetPR.surfaceCard)
   }
 }
 
 #Preview("MeetPRListRow") {
-  VStack(spacing: 0) {
+  VStack(spacing: MeetPRSpacing.zero) {
     MeetPRListRow(
       title: "Chen Lei",
       subtitle: "W3D1 - last logged 2h ago",
       status: .ready,
       showsPRBadge: true
     ) {}
-    Divider().background(Color.MeetPR.border)
+    Divider().background(Color.MeetPR.borderDefault)
     MeetPRListRow(title: "Ma Wei", subtitle: "W3D1 - queued", status: .pending) {}
-    Divider().background(Color.MeetPR.border)
+    Divider().background(Color.MeetPR.borderDefault)
     MeetPRListRow(title: "Yan Bo", subtitle: "W2D3 - 5 days behind", status: .overdue) {}
   }
   .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
   .overlay {
     RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-      .stroke(Color.MeetPR.border, lineWidth: 1)
+      .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("MeetPRListRow Light") {
   MeetPRListRow(title: "Chen Lei", subtitle: "W3D1 - last logged 2h ago", status: .ready) {}
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

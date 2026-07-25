@@ -24,7 +24,7 @@ public struct FeedbackInboxView: View {
             ContentUnavailableView("暂无反馈", systemImage: "bubble.left")
           } else {
             ScrollView {
-              VStack(spacing: 12) {
+              VStack(spacing: MeetPRSpacing.space3) {
                 ForEach(items) { item in
                   NavigationLink {
                     FeedbackDetailView(item: item, viewModel: viewModel)
@@ -32,7 +32,7 @@ public struct FeedbackInboxView: View {
                   } label: {
                     FeedbackCard(item: item)
                   }
-                  .buttonStyle(.plain)
+                  .buttonStyle(PressScaleButtonStyle())
                 }
               }
               .padding()
@@ -45,7 +45,7 @@ public struct FeedbackInboxView: View {
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("反馈")
     }
     .task {
@@ -61,32 +61,32 @@ private struct FeedbackCard: View {
   let item: CoachFeedback
 
   var body: some View {
-    HStack(alignment: .top, spacing: 12) {
+    HStack(alignment: .top, spacing: MeetPRSpacing.space3) {
       Circle()
-        .fill(item.readAt == nil ? Color.MeetPR.brandRed : Color.clear)
+        .fill(item.readAt == nil ? StudentVisualSemantics.unread.color : Color.clear)
         .frame(width: 8, height: 8)
-        .padding(.top, 6)
-      VStack(alignment: .leading, spacing: 6) {
+        .padding(.top, MeetPRSpacing.point6)
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point6) {
         Text(item.text)
           .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(2)
           .frame(maxWidth: .infinity, alignment: .leading)
         Text(StudentFormatting.dayMonthFormatter.string(from: item.postedAt))
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       Image(systemName: "chevron.right")
         .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-        .padding(.top, 2)
+        .foregroundStyle(Color.MeetPR.textTertiary)
+        .padding(.top, MeetPRSpacing.point2)
     }
-    .padding(14)
-    .background(Color.MeetPR.surface1)
+    .padding(MeetPRSpacing.point14)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.control)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
-    .clipShape(.rect(cornerRadius: 12))
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
 }

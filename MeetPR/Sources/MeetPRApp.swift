@@ -240,6 +240,7 @@ struct MeetPRApp: App {
           // JSON files under Documents/e1rm/, no backend endpoint.
           studentE1RM: LocalE1RMRepository(),
           studentReadiness: BackendReadinessRepository(api: api, session: chat.session),
+          studentStreak: BackendStudentStreakRepository(api: api, session: chat.session),
           // Set-video uploads (spec 027): backend /uploads/* pipeline; the
           // setLog ↔ attachment mapping persists on-device only in V0.1.
           studentVideoUploads: .backend(api: api, session: chat.session),
@@ -280,10 +281,10 @@ struct MeetPRApp: App {
         .modelContainer(
           draftStore.modelContainer
         )
-        // MeetPR is dark-only in V0.1 (David 2026-06-12: 学员向导的深色为
-        // 全 app 标准): one root-level force instead of per-view sprinkles,
-        // so auth + coach + student render the same palette.
-        .preferredColorScheme(.dark)
+      // The colour scheme is decided per branch inside `RootView`: the student
+      // experience ships both themes and follows the stored appearance
+      // preference, while auth and the coach side stay dark. Forcing it on the
+      // window instead would override the student's choice.
     }
   }
 }

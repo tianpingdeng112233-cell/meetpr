@@ -40,19 +40,19 @@ struct Step2BackgroundSection: View {
       OnboardingFieldLabel(
         title: "训练年限", isHighlighted: highlighted.contains("training_years"))
       Slider(value: yearsBinding, in: 0...10, step: 1)
-        .tint(Color.MeetPR.brandRed)
+        .tint(Color.MeetPR.gold500)
       HStack {
         Text("<1 年")
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
         Spacer()
         Text(OnboardingLabels.trainingYearsLabel(draft.trainingYears ?? 0))
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
         Text("10+ 年")
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
   }
@@ -76,7 +76,7 @@ struct Step2BackgroundSection: View {
           draft.benchGrip = nil
         }
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       }
     }
   }

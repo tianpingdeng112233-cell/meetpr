@@ -17,11 +17,11 @@ struct PlanningStudentHeaderView: View {
         HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
           Text(student.displayName)
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           Text(statusSummary)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .lineLimit(1)
 
           Spacer()
@@ -30,7 +30,7 @@ struct PlanningStudentHeaderView: View {
             isExpanded.toggle()
           }
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
         }
 
         if isExpanded {
@@ -47,10 +47,10 @@ struct PlanningStudentHeaderView: View {
         ForEach(detailRows(profile), id: \.label) { row in
           HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
             Text(row.label)
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .foregroundStyle(Color.MeetPR.textTertiary)
               .frame(width: 72, alignment: .leading)
             Text(row.value)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
               .frame(maxWidth: .infinity, alignment: .leading)
           }
         }
@@ -59,7 +59,7 @@ struct PlanningStudentHeaderView: View {
     } else {
       Text("学员资料加载中或暂未填写")
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
   }
 

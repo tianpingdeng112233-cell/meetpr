@@ -73,7 +73,7 @@ struct CoachReceivingView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         header
 
         Group {
@@ -89,7 +89,7 @@ struct CoachReceivingView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationDestination(item: $profileTarget) { item in
         StudentOnboardingProfileView(
           item: item,
@@ -158,13 +158,14 @@ struct CoachReceivingView: View {
   // MARK: - Header (reproduces DKCoachReceiving.header)
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: 0) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
       HStack(alignment: .top, spacing: MeetPRSpacing.md) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Eyebrow("收件箱")
           Text("接收")
-            .font(.system(size: 34, weight: .heavy))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.display(size: 34, weight: .extraBold))
+            .tracking(-0.7)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
         Spacer(minLength: MeetPRSpacing.sm)
         CoachChatHeaderButton(chat: chat) {
@@ -175,24 +176,26 @@ struct CoachReceivingView: View {
         .padding(.top, MeetPRSpacing.md)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, MeetPRSpacing.base)
+    .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.xs)
     .padding(.bottom, MeetPRSpacing.md)
+    .meetPRRiseIn(index: 0)
   }
 
   private var segmentedControl: some View {
-    HStack(spacing: 3) {
+    HStack(spacing: MeetPRSpacing.point3) {
       segButton(.students, label: "新学员", count: pendingCount)
       segButton(.videos, label: "训练视频", count: videoCount)
       if chat != nil {
         segButton(.messages, label: CoachStrings.messages, count: chatUnreadCount)
       }
     }
-    .padding(3)
-    .background(Color.MeetPR.surface1)
+    .padding(MeetPRSpacing.point3)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.md).stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.md).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
     }
   }
 
@@ -201,22 +204,22 @@ struct CoachReceivingView: View {
     return Button {
       segment = value
     } label: {
-      HStack(spacing: 6) {
-        Text(label).font(.system(size: 14, weight: .semibold))
+      HStack(spacing: MeetPRSpacing.point6) {
+        Text(label).font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
         Text("\(count)")
-          .font(.system(size: 10, design: .monospaced))
-          .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
-          .padding(.horizontal, 6).padding(.vertical, 1)
-          .background(active ? Color.MeetPR.brandRedSoft : .clear)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size10, design: .monospaced))
+          .foregroundStyle(active ? Color.MeetPR.gold500 : Color.MeetPR.textTertiary)
+          .padding(.horizontal, MeetPRSpacing.point6).padding(.vertical, MeetPRSpacing.point1)
+          .background(active ? Color.MeetPR.goldSoft : .clear)
           .clipShape(.capsule)
       }
-      .foregroundStyle(active ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary)
+      .foregroundStyle(active ? Color.MeetPR.textPrimary : Color.MeetPR.textTertiary)
       .frame(maxWidth: .infinity)
-      .padding(.vertical, 9)
-      .background(active ? Color.MeetPR.surface3 : .clear)
+      .padding(.vertical, MeetPRSpacing.point9)
+      .background(active ? Color.MeetPR.surfaceKey : .clear)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   @ViewBuilder
@@ -259,10 +262,11 @@ struct CoachReceivingView: View {
       ScrollView {
         VStack(spacing: MeetPRSpacing.base) {
           if let banner = viewModel.bannerMessage {
-            statusBanner(banner, systemImage: "exclamationmark.triangle", color: Color.MeetPR.amber)
+            statusBanner(
+              banner, systemImage: "exclamationmark.triangle", color: Color.MeetPR.danger)
           }
           if let toast = viewModel.toastMessage {
-            statusBanner(toast, systemImage: "checkmark.circle", color: Color.MeetPR.green)
+            statusBanner(toast, systemImage: "checkmark.circle", color: Color.MeetPR.success)
           }
           ForEach(viewModel.items) { item in
             requestCard(item, now: viewModel.now())
@@ -288,11 +292,11 @@ struct CoachReceivingView: View {
   private func requestCard(_ item: CoachBindRequestItem, now: Date) -> some View {
     let onboarding = item.onboarding
     let expiringSoon = CoachOnboardingDisplay.isExpiringSoon(expiredAt: item.expiredAt, now: now)
-    return VStack(alignment: .leading, spacing: 0) {
+    return VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
       HStack(alignment: .firstTextBaseline) {
         Text(item.displayName)
-          .font(.system(size: 20, weight: .bold))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size20, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer(minLength: MeetPRSpacing.sm)
         if expiringSoon {
           StatusBadge(status: .overdue, title: "即将过期")
@@ -306,16 +310,16 @@ struct CoachReceivingView: View {
         completedBody(onboarding)
       } else {
         Text("资料未填写完成")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .padding(.top, MeetPRSpacing.xs)
       }
 
       // Assets row (mock "3 视频 + 1 计划" → real upload count, no breakdown).
-      HStack(spacing: 6) {
+      HStack(spacing: MeetPRSpacing.point6) {
         Image(systemName: "doc")
-          .font(.system(size: 14))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textTertiary)
         monoLabel(
           onboarding.uploadCount > 0 ? "\(onboarding.uploadCount) 份资料" : "无上传资料",
           size: 11)
@@ -323,16 +327,16 @@ struct CoachReceivingView: View {
       .padding(.top, MeetPRSpacing.md)
 
       actionRow(item)
-        .padding(.top, 14)
+        .padding(.top, MeetPRSpacing.point14)
     }
     .padding(MeetPRSpacing.base)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.lg)
         .stroke(
-          expiringSoon ? Color.MeetPR.brandRed.opacity(0.3) : Color.MeetPR.border,
+          expiringSoon ? Color.MeetPR.gold500.opacity(0.3) : Color.MeetPR.borderDefault,
           lineWidth: 1)
     }
     .onAppear {
@@ -344,9 +348,9 @@ struct CoachReceivingView: View {
   /// AppShell — the dependency runs AppShell → CoachKit, not the reverse).
   private func monoLabel(_ text: String, size: CGFloat) -> some View {
     Text(text)
-      .font(.system(size: size, weight: .medium, design: .monospaced))
+      .font(.MeetPR.system(size: size, weight: .medium, design: .monospaced))
       .tracking(0.8)
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .foregroundStyle(Color.MeetPR.textTertiary)
   }
 
   @ViewBuilder
@@ -354,8 +358,8 @@ struct CoachReceivingView: View {
     // Meta line: 性别 · 年龄 · 体重 · 训练年限 (each part omitted when absent).
     if let meta = metaLine(onboarding) {
       Text(meta)
-        .font(.system(size: 13))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .padding(.top, MeetPRSpacing.xs)
     }
 
@@ -366,30 +370,30 @@ struct CoachReceivingView: View {
         bench: onboarding.bench1RMKg,
         deadlift: onboarding.deadlift1RMKg)
     )
-    .font(.system(size: 14, design: .monospaced))
-    .foregroundStyle(Color.MeetPR.fgPrimary)
+    .font(.MeetPR.system(size: MeetPRFontMetrics.size14, design: .monospaced))
+    .foregroundStyle(Color.MeetPR.textPrimary)
     .padding(.top, MeetPRSpacing.md)
 
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       if !onboarding.muscleGroupsToStrengthen.isEmpty {
         Text("想增强:" + CoachOnboardingDisplay.muscleGroupList(onboarding.muscleGroupsToStrengthen))
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       if let tier = onboarding.gymTier {
         Text("训练环境:" + CoachOnboardingDisplay.gymTierText(tier))
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       if onboarding.isCompeting == true, let competitionDate = onboarding.competitionDate {
         Text("备赛:\(competitionDate)")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       if let note = onboarding.noteToCoach {
         Text("“\(note)”")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(2)
       }
     }
@@ -423,15 +427,15 @@ struct CoachReceivingView: View {
         rejectTarget = item
       } label: {
         Image(systemName: "xmark")
-          .font(.system(size: 15, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .frame(width: 48, height: 40)
           .overlay {
             RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
-              Color.MeetPR.border, lineWidth: 1)
+              Color.MeetPR.borderDefault, lineWidth: 1)
           }
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel("拒绝 \(item.displayName)")
     }
   }
@@ -441,20 +445,20 @@ struct CoachReceivingView: View {
   ) -> some View {
     Button(action: action) {
       Text(title)
-        .font(.system(size: 14, weight: .semibold))
-        .foregroundStyle(filled ? Color.MeetPR.bg : Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(filled ? Color.MeetPR.bgBase : Color.MeetPR.textPrimary)
         .frame(maxWidth: .infinity)
         .frame(height: 40)
-        .background(filled ? Color.MeetPR.fgPrimary : Color.clear)
+        .background(filled ? Color.MeetPR.textPrimary : Color.clear)
         .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
         .overlay {
           if !filled {
             RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
-              Color.MeetPR.border, lineWidth: 1)
+              Color.MeetPR.borderDefault, lineWidth: 1)
           }
         }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   // MARK: - 训练视频 segment (cross-student pending-video queue, spec 042)
@@ -476,10 +480,11 @@ struct CoachReceivingView: View {
       ScrollView {
         VStack(spacing: MeetPRSpacing.base) {
           if let toast = viewModel.toastMessage {
-            statusBanner(toast, systemImage: "checkmark.circle", color: Color.MeetPR.green)
+            statusBanner(toast, systemImage: "checkmark.circle", color: Color.MeetPR.success)
           }
           if let banner = viewModel.bannerMessage {
-            statusBanner(banner, systemImage: "exclamationmark.triangle", color: Color.MeetPR.amber)
+            statusBanner(
+              banner, systemImage: "exclamationmark.triangle", color: Color.MeetPR.danger)
           }
           ForEach(viewModel.studentGroups) { group in
             studentRow(group)
@@ -508,43 +513,45 @@ struct CoachReceivingView: View {
       HStack(spacing: MeetPRSpacing.base) {
         ZStack {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
-            .fill(Color.MeetPR.surface2)
+            .fill(Color.MeetPR.surfaceElevated)
             .frame(width: 56, height: 56)
           Image(systemName: "play.rectangle.fill")
-            .font(.system(size: 22))
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size22))
+            .foregroundStyle(Color.MeetPR.gold500)
         }
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           Text(group.studentName)
-            .font(.system(size: 17, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
           monoLabel(
             "\(group.count) 段待反馈 · \(CoachStudentFormatting.relativeText(group.latestUploadedAt))",
             size: 11)
         }
         Spacer(minLength: MeetPRSpacing.sm)
         Image(systemName: "chevron.right")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .padding(MeetPRSpacing.base)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel("\(group.studentName),\(group.count) 段待反馈,点按查看")
   }
 
   private func emptyState(icon: String, title: String, subtitle: String) -> some View {
     VStack(spacing: MeetPRSpacing.md) {
-      Image(systemName: icon).font(.system(size: 30)).foregroundStyle(Color.MeetPR.fgTertiary)
-      Text(title).font(Font.MeetPR.bodyEmphasis).foregroundStyle(Color.MeetPR.fgPrimary)
+      Image(systemName: icon).font(.MeetPR.system(size: MeetPRFontMetrics.size30)).foregroundStyle(
+        Color.MeetPR.textTertiary)
+      Text(title).font(Font.MeetPR.bodyEmphasis).foregroundStyle(Color.MeetPR.textPrimary)
       Text(subtitle)
-        .font(Font.MeetPR.footnote).foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(Font.MeetPR.footnote).foregroundStyle(Color.MeetPR.textSecondary)
         .multilineTextAlignment(.center).frame(maxWidth: 260)
     }
     .padding(MeetPRSpacing.xl)

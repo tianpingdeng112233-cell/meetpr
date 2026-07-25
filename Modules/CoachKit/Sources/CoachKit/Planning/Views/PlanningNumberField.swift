@@ -49,7 +49,7 @@ struct PlanningNumberField: View {
         .padding(.horizontal, MeetPRSpacing.sm)
         .padding(.vertical, MeetPRSpacing.xs)
         .frame(width: 76)
-        .background(Color.MeetPR.surface2)
+        .background(Color.MeetPR.surfaceElevated)
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
         .focused($isFocused)
         .onChange(of: isFocused) { _, focused in
@@ -72,7 +72,7 @@ struct PlanningNumberField: View {
       if let unitLabel {
         Text(unitLabel)
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
 
       // 弹出重量面板入口 (David 2026-06-12): weight dimensions only — the
@@ -140,12 +140,12 @@ struct PlanningNumberField: View {
       Image(systemName: systemName)
         .font(.footnote)
         .frame(width: 28, height: 28)
-        .background(Color.MeetPR.surface2)
+        .background(Color.MeetPR.surfaceElevated)
         .clipShape(.circle)
         .contentShape(.rect)
     }
-    .buttonStyle(.plain)
-    .foregroundStyle(Color.MeetPR.fgPrimary)
+    .buttonStyle(PressScaleButtonStyle())
+    .foregroundStyle(Color.MeetPR.textPrimary)
     .accessibilityLabel(accessibilityLabel)
   }
 

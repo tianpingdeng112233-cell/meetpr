@@ -1,15 +1,5 @@
 import SwiftUI
 
-struct MeetPRPressOpacityButtonStyle: ButtonStyle {
-  let isDisabled: Bool
-
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.label
-      .opacity(isDisabled ? 0.35 : (configuration.isPressed ? 0.6 : 1))
-      .animation(MeetPRMotion.easeIOS, value: configuration.isPressed)
-  }
-}
-
 @MainActor
 public struct PrimaryButton: View {
   private let title: String
@@ -36,27 +26,31 @@ public struct PrimaryButton: View {
 
   public var body: some View {
     Button(action: handleTap) {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         if isLoading {
           Rectangle()
-            .fill(Color.MeetPR.brandRed)
+            .fill(Color.MeetPR.gold500)
             .frame(height: 1)
         }
 
         Text(title)
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.bg)
+          .font(Font.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .lineLimit(2)
           .multilineTextAlignment(.center)
           .padding(.horizontal, MeetPRSpacing.lg)
-          .padding(.vertical, 14)
+          .padding(.vertical, MeetPRSpacing.point14)
           .frame(maxWidth: isFullWidth ? .infinity : nil)
           .frame(minHeight: 44)
       }
-      .background(Color.MeetPR.fgPrimary)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
+      .background(Color.MeetPR.surfaceCard)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.pill)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
+      }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: isDisabled || isLoading))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled || isLoading))
     .disabled(isDisabled || isLoading)
     .sensoryFeedback(.impact(weight: .light), trigger: feedbackTrigger)
     .accessibilityLabel(title)
@@ -76,13 +70,13 @@ public struct PrimaryButton: View {
     PrimaryButton("Disabled", isDisabled: true) {}
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("PrimaryButton Light") {
   PrimaryButton("Save Mesocycle") {}
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

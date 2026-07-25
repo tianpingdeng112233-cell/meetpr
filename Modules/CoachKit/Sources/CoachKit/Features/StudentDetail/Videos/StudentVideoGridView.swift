@@ -20,7 +20,7 @@ struct StudentVideoGridView: View {
 
   var body: some View {
     content
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       #if os(iOS)
         .fullScreenCover(item: $viewModel.playbackItem) { item in
           CoachVideoPlayerView(
@@ -86,7 +86,7 @@ struct StudentVideoGridView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Text(CoachStudentFormatting.fullDateText(section.day))
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       LazyVGrid(
         columns: Array(repeating: GridItem(.flexible(), spacing: MeetPRSpacing.sm), count: 3),
         spacing: MeetPRSpacing.sm
@@ -111,9 +111,9 @@ struct StudentVideoGridView: View {
       }
       .font(Font.MeetPR.footnote)
     }
-    .foregroundStyle(Color.MeetPR.brandRed)
+    .foregroundStyle(Color.MeetPR.gold500)
     .padding(MeetPRSpacing.sm)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
 }
@@ -133,7 +133,7 @@ private struct StudentVideoTile: View {
         ZStack {
           Image(systemName: "play.rectangle.fill")
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
             .opacity(isLoading ? 0 : 1)
           if isLoading {
             ProgressView()
@@ -141,17 +141,17 @@ private struct StudentVideoTile: View {
         }
         Text(CoachStudentFormatting.timeText(video.displayDate))
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text(Self.sizeText(video.sizeBytes))
           .font(Font.MeetPR.monoLabel)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .frame(maxWidth: .infinity)
       .padding(.vertical, MeetPRSpacing.base)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(isLoading)
     .accessibilityLabel(
       "视频 \(CoachStudentFormatting.timeText(video.displayDate))，点按播放"

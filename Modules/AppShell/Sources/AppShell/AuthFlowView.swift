@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -8,5 +9,7 @@ public struct AuthFlowView: View {
     NavigationStack {
       LoginView()
     }
+    .tint(Color.MeetPR.gold500)
+    .background(Color.MeetPR.bgBase)
   }
 }

@@ -74,7 +74,7 @@ public struct EvaluationPeriodView: View {
   public var body: some View {
     NavigationStack {
       content
-        .background(Color.MeetPR.bg)
+        .background(Color.MeetPR.bgBase)
         .navigationTitle("评估进行中")
         .toolbar {
           if let onLogout {
@@ -110,7 +110,7 @@ public struct EvaluationPeriodView: View {
       VStack(spacing: MeetPRSpacing.lg) {
         Text("无法获取评估状态")
           .font(Font.MeetPR.title2)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         PrimaryButton("重试") {
           Task { await viewModel.refresh() }
         }
@@ -142,12 +142,12 @@ public struct EvaluationPeriodView: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Text("教练正在评估你")
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text(viewModel.countdownText(now: context.date))
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           ProgressView(value: viewModel.progress(now: context.date))
-            .tint(Color.MeetPR.green)
+            .tint(Color.MeetPR.success)
         }
       }
     }
@@ -160,12 +160,12 @@ public struct EvaluationPeriodView: View {
         if viewModel.latestMessages.isEmpty {
           Text("教练暂时没有留言")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         } else {
           ForEach(viewModel.latestMessages) { message in
             Text(message.text)
               .font(Font.MeetPR.body)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
               .lineLimit(2)
           }
           NavigationLink {
@@ -173,7 +173,7 @@ public struct EvaluationPeriodView: View {
           } label: {
             Text("查看全部留言")
               .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.brandRed)
+              .foregroundStyle(Color.MeetPR.gold500)
           }
         }
       }
@@ -201,13 +201,13 @@ public struct EvaluationPeriodView: View {
               .foregroundStyle(.white)
               .frame(maxWidth: .infinity)
               .padding()
-              .background(Color.MeetPR.brandRed)
-              .clipShape(.rect(cornerRadius: 12))
+              .background(Color.MeetPR.gold500)
+              .clipShape(.rect(cornerRadius: MeetPRRadius.control))
           }
         } else {
           Text("教练正在为你准备适应周训练")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
     }
@@ -220,7 +220,7 @@ public struct EvaluationPeriodView: View {
       ForEach(trainingDays.prefix(4)) { day in
         Text(daySummary(day))
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
     }
   }

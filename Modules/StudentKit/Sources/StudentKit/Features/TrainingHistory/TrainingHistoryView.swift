@@ -69,11 +69,12 @@ public struct TrainingHistoryView: View {
 
   public var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         HStack {
           Text("成长")
-            .font(.system(size: 36, weight: .heavy))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.display(size: 34, weight: .extraBold))
+            .tracking(-0.7)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Spacer()
           if let notifications {
             StudentNotificationBell(coordinator: notifications) {
@@ -81,11 +82,12 @@ public struct TrainingHistoryView: View {
             }
           }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.top, MeetPRSpacing.space2)
+        .meetPRRiseIn(index: 0)
 
         ScrollView {
-          VStack(alignment: .leading, spacing: 16) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
             if let prEvent { prBanner(prEvent) }
 
             switch viewModel.state {
@@ -96,13 +98,19 @@ public struct TrainingHistoryView: View {
               failureCard(message)
             case .loaded:
               liftCharts
+                .meetPRRiseIn(index: 1)
               feedbackSection
+                .meetPRRiseIn(index: 2)
               allHistorySection
+                .meetPRRiseIn(index: 3)
               detailedHistoryButton
+                .meetPRRiseIn(index: 4)
               volumeIntensitySection
+                .meetPRRiseIn(index: 5)
             }
           }
-          .padding(16)
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+          .padding(.vertical, MeetPRSpacing.point14)
         }
         .scrollContentBackground(.hidden)
         .refreshable {
@@ -111,7 +119,7 @@ public struct TrainingHistoryView: View {
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $showsAllHistory) {
         AllHistoryScreen(viewModel: viewModel)
@@ -141,33 +149,34 @@ public struct TrainingHistoryView: View {
   // MARK: - PR banner
 
   private func prBanner(_ event: PRBreakthroughEvent) -> some View {
-    HStack(spacing: 14) {
+    HStack(spacing: MeetPRSpacing.point14) {
       Image(systemName: "trophy.fill")
-        .font(.system(size: 18))
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size18))
+        .foregroundStyle(Color.MeetPR.gold500)
         .frame(width: 40, height: 40)
-        .background(Color.MeetPR.brandRed.opacity(0.15))
+        .background(Color.MeetPR.gold500.opacity(0.15))
         .clipShape(Circle())
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
         Text("新 e1RM PR · \(prWhen(event.occurredAt))")
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
         Text(
           "\(prFamily?.studentDisplayName ?? "三大项") e1RM 突破 "
             + "\(StudentFormatting.kilograms(event.breakthroughE1RMKg)) KG"
         )
-        .font(.system(size: 17, weight: .bold))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
       }
       Spacer(minLength: 0)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.MeetPR.brandRedSoft)
-    .clipShape(.rect(cornerRadius: 12))
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.goldSoft)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     .overlay {
-      RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+        Color.MeetPR.gold500.opacity(0.3), lineWidth: 1)
     }
   }
 
@@ -179,12 +188,12 @@ public struct TrainingHistoryView: View {
   // MARK: - e1RM lift charts
 
   private var liftCharts: some View {
-    VStack(alignment: .leading, spacing: 16) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
       // 首屏黑话有解释 (P2-1): E1RM 是全 app 最高频的专业词,给一句白话锚点,
       // 别让新手对着首字母缩写猜。放段首出现一次,不逐卡重复。
       Text("E1RM = 用你完成的组数估算的单次最大重量")
-        .font(.system(size: 12))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
         .frame(maxWidth: .infinity, alignment: .leading)
       ForEach(MainLiftExerciseFamilyResolver.dashboardFamilies, id: \.self) { family in
         liftChartCard(family)
@@ -196,47 +205,50 @@ public struct TrainingHistoryView: View {
     let row = trendRow(for: family)
     let now = Date()
     let displayPoint = row?.displayPoint(now: now)
-    return VStack(alignment: .leading, spacing: 0) {
+    return VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
       HStack(alignment: .bottom) {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
           Text("\(family.studentDisplayName) E1RM · \(chartPeriodLabel(for: row, now: now))")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
-          HStack(alignment: .lastTextBaseline, spacing: 6) {
+            .foregroundStyle(Color.MeetPR.gold500)
+          HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
             Text(displayPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
-              .font(.system(size: 40, weight: .heavy).monospacedDigit())
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .font(.MeetPR.display(size: 38, weight: .extraBold).monospacedDigit())
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text("KG")
-              .font(.system(size: 15, weight: .heavy))
-              .foregroundStyle(Color.MeetPR.brandRed)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .heavy))
+              .foregroundStyle(Color.MeetPR.gold500)
           }
-          .padding(.top, 4)
+          .padding(.top, MeetPRSpacing.space1)
         }
         Spacer()
         if let row, let deltaKg = row.trendDeltaKg {
           let delta = deltaLabel(deltaKg)
           Text(delta.text)
-            .font(.system(size: 13, design: .monospaced))
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size13, design: .monospaced))
             .foregroundStyle(delta.color)
         }
       }
       if let row, !row.points.isEmpty || !row.rawEligiblePoints.isEmpty {
         e1rmChart(row)
-          .padding(.top, 12)
+          .padding(.top, MeetPRSpacing.space3)
       } else {
         Text("练几次就有趋势了")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
-          .padding(.top, 12)
+          .padding(.top, MeetPRSpacing.space3)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.card)
+        .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
+    }
   }
 
   private func e1rmChart(_ row: DashboardE1RMTrendRow) -> some View {
@@ -290,12 +302,12 @@ public struct TrainingHistoryView: View {
   @ViewBuilder
   private var feedbackSection: some View {
     if let items = feedbackItems, !items.isEmpty {
-      VStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
         sectionLabel("教练反馈记录")
-        VStack(spacing: 0) {
+        VStack(spacing: MeetPRSpacing.zero) {
           ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
             if index > 0 {
-              Rectangle().fill(Color.MeetPR.border).frame(height: 1)
+              Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
             }
             NavigationLink {
               FeedbackDetailView(item: item, viewModel: feedbackViewModel)
@@ -303,38 +315,42 @@ public struct TrainingHistoryView: View {
             } label: {
               feedbackRow(item)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressScaleButtonStyle())
           }
         }
-        .background(Color.MeetPR.surface1)
-        .clipShape(.rect(cornerRadius: 12))
-        .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+        .overlay {
+          RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+            Color.MeetPR.borderDefault, lineWidth: 1)
+        }
       }
     }
   }
 
   private func feedbackRow(_ item: CoachFeedback) -> some View {
-    HStack(alignment: .top, spacing: 10) {
+    HStack(alignment: .top, spacing: MeetPRSpacing.point10) {
       if item.readAt == nil {
-        Circle().fill(Color.MeetPR.brandRed).frame(width: 6, height: 6).padding(.top, 6)
+        Circle().fill(Color.MeetPR.gold500).frame(width: 6, height: 6).padding(
+          .top, MeetPRSpacing.point6)
       }
-      VStack(alignment: .leading, spacing: 4) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
         Text(feedbackTitle(item))
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Text(item.text)
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
       Text(StudentFormatting.dayMonthFormatter.string(from: item.postedAt))
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
-    .padding(14)
+    .padding(MeetPRSpacing.point14)
   }
 
   private func feedbackTitle(_ item: CoachFeedback) -> String {
@@ -349,26 +365,30 @@ public struct TrainingHistoryView: View {
   // MARK: - All-history stats
 
   private var allHistorySection: some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
       sectionLabel("全部历史")
       HStack {
         stat("训练次数", value: sessionCountText)
         stat("训练周", value: "\(weekCount)")
         stat("三大项合计", value: sbdTotalText)
       }
-      .padding(16)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+      .padding(MeetPRSpacing.space4)
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
+      }
     }
   }
 
   private func stat(_ label: String, value: String) -> some View {
-    VStack(alignment: .leading, spacing: 2) {
-      Text(label).font(.system(size: 11)).foregroundStyle(Color.MeetPR.fgTertiary)
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+      Text(label).font(.MeetPR.system(size: MeetPRFontMetrics.size11)).foregroundStyle(
+        Color.MeetPR.textTertiary)
       Text(value)
-        .font(.system(size: 28, weight: .heavy).monospacedDigit())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: 30, weight: .extraBold).monospacedDigit())
+        .foregroundStyle(Color.MeetPR.textPrimary)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }
@@ -380,23 +400,31 @@ public struct TrainingHistoryView: View {
       Analytics.shared.progressViewed(.history)
       showsAllHistory = true
     } label: {
-      HStack(spacing: 12) {
-        Image(systemName: "clock").font(.system(size: 20)).foregroundStyle(Color.MeetPR.fgSecondary)
-        VStack(alignment: .leading, spacing: 2) {
-          Text("全部训练历史").font(.system(size: 15)).foregroundStyle(Color.MeetPR.fgPrimary)
+      HStack(spacing: MeetPRSpacing.space3) {
+        Image(systemName: "clock").font(.MeetPR.system(size: MeetPRFontMetrics.size20))
+          .foregroundStyle(
+            Color.MeetPR.textSecondary)
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+          Text("全部训练历史").font(.MeetPR.system(size: MeetPRFontMetrics.size15)).foregroundStyle(
+            Color.MeetPR.textPrimary)
           Text("按周 / 月查看 · 含每组数据")
-            .font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size12)).foregroundStyle(
+              Color.MeetPR.textTertiary)
         }
         Spacer()
-        Image(systemName: "chevron.right").font(.system(size: 14)).foregroundStyle(
-          Color.MeetPR.fgTertiary)
+        Image(systemName: "chevron.right").font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(
+            Color.MeetPR.textTertiary)
       }
-      .padding(16)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+      .padding(MeetPRSpacing.space4)
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
+      }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   // MARK: - Volume / intensity (preserved analytic)
@@ -405,7 +433,7 @@ public struct TrainingHistoryView: View {
   private var volumeIntensitySection: some View {
     let buckets = ProgressMetrics.weeklyVolumeIntensity(from: loadedLogs)
     if !buckets.isEmpty {
-      VStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
         sectionLabel("容量 / 强度")
         VolumeIntensityChart(buckets: buckets)
       }
@@ -416,35 +444,38 @@ public struct TrainingHistoryView: View {
     Text(text)
       .font(Font.MeetPR.monoLabel)
       .tracking(Font.MeetPR.monoLabelTracking)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
   }
 
   /// Repo-failure surface for the weeks/logs load (restores the old
   /// `.error` ContentUnavailableView behavior — never silently show 0 stats).
   private func failureCard(_ message: String) -> some View {
-    VStack(alignment: .leading, spacing: 8) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
       Label("加载失败", systemImage: "exclamationmark.triangle")
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.amber)
+        .foregroundStyle(Color.MeetPR.gold500)
       Text(message)
-        .font(.system(size: 14))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .frame(maxWidth: .infinity, alignment: .leading)
       Button {
         Task { await viewModel.load(studentID: studentID) }
       } label: {
         Text("重试")
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
-      .buttonStyle(.plain)
-      .padding(.top, 4)
+      .buttonStyle(PressScaleButtonStyle())
+      .padding(.top, MeetPRSpacing.space1)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
+    }
   }
 
   // MARK: - Derived data
@@ -472,7 +503,7 @@ public struct TrainingHistoryView: View {
     let sign = kilograms >= 0 ? "+" : "−"
     let color =
       kilograms > 0
-      ? Color.MeetPR.green : (kilograms < 0 ? Color.MeetPR.brandRed : Color.MeetPR.fgSecondary)
+      ? Color.MeetPR.success : (kilograms < 0 ? Color.MeetPR.danger : Color.MeetPR.textSecondary)
     return ("\(sign)\(StudentFormatting.kilograms(abs(kilograms))) KG", color)
   }
 
@@ -581,7 +612,7 @@ private struct AllHistoryScreen: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("训练历史")
   }
 }

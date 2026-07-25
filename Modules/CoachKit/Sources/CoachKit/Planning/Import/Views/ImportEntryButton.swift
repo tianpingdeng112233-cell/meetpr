@@ -75,7 +75,7 @@ struct ImportFlowView: View {
       if let loadError {
         Text("学员加载失败：\(loadError)")
           .font(.footnote)
-          .foregroundStyle(Color.MeetPR.amber)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
       Section("选学员") {
         ForEach(students) { student in
@@ -83,7 +83,7 @@ struct ImportFlowView: View {
             selected = student
           } label: {
             Text(student.displayName)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
           }
         }
       }

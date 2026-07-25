@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -39,6 +40,9 @@ struct RestTimerSettingsView: View {
         LabeledContent("RPE 9 及以上", value: "4 分钟")
       }
     }
+    .scrollContentBackground(.hidden)
+    .background(Color.MeetPR.bgBase)
+    .tint(Color.MeetPR.gold500)
     .navigationTitle("组间休息")
     #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)

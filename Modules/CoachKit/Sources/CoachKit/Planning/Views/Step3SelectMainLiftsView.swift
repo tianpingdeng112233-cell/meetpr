@@ -22,7 +22,7 @@ public struct Step3SelectMainLiftsView: View {
           Eyebrow("STEP 3")
           Text("选择主项及变式")
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
 
         ForEach(viewModel.sortedAssignedDays, id: \.self) { day in
@@ -41,7 +41,7 @@ public struct Step3SelectMainLiftsView: View {
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("主项及变式")
     .scrollDismissesKeyboard(.interactively)
   }
@@ -57,7 +57,7 @@ private struct MainLiftDaySection: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
         Text(title)
           .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
 
         ForEach(viewModel.sortedLiftFamilies(in: dayOfWeek), id: \.self) { family in
           MainLiftPickerRow(
@@ -91,7 +91,7 @@ private struct MainLiftPickerRow: View {
       HStack(spacing: MeetPRSpacing.md) {
         Text("\(PlanningDisplay.liftName(family)):")
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(width: 56, alignment: .leading)
 
         Button {
@@ -101,22 +101,22 @@ private struct MainLiftPickerRow: View {
             Text(currentSelectionLabel)
               .font(Font.MeetPR.body)
               .foregroundStyle(
-                currentSelection == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary
+                currentSelection == nil ? Color.MeetPR.textTertiary : Color.MeetPR.textPrimary
               )
               .lineLimit(1)
               .truncationMode(.tail)
             Spacer()
             Image(systemName: "chevron.up.chevron.down")
               .font(.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
           .padding(.horizontal, MeetPRSpacing.sm)
           .padding(.vertical, MeetPRSpacing.xs)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
           .contentShape(.rect)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityLabel(
           "\(PlanningDisplay.liftName(family))主项及变式: \(currentSelectionLabel)"
@@ -173,20 +173,20 @@ private struct VariantPickerSheet: View {
           onSelect(exercise)
         } label: {
           HStack(spacing: MeetPRSpacing.sm) {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
               Text(exercise.name)
                 .font(Font.MeetPR.body)
-                .foregroundStyle(Color.MeetPR.fgPrimary)
+                .foregroundStyle(Color.MeetPR.textPrimary)
             }
             Spacer()
             if exercise.id == selectedID {
               Image(systemName: "checkmark")
-                .foregroundStyle(Color.MeetPR.brandRed)
+                .foregroundStyle(Color.MeetPR.gold500)
             }
           }
           .contentShape(.rect)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
       }
       .listStyle(.plain)
       .searchable(text: $searchText, prompt: "搜索 / Search")

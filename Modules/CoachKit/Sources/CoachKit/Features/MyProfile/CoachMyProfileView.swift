@@ -37,32 +37,35 @@ struct CoachMyProfileView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         HStack {
           Text("我的")
-            .font(.system(size: 36, weight: .heavy))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.display(size: 34, weight: .extraBold))
+            .tracking(-0.7)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Spacer()
           CoachChatHeaderButton(chat: chat) {
             isConversationListPresented = true
           }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.top, MeetPRSpacing.space2)
+        .meetPRRiseIn(index: 0)
 
         ScrollView {
-          VStack(alignment: .leading, spacing: 16) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
             identityCard
             inviteCard
             rowsCard
           }
-          .padding(16)
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+          .padding(.vertical, MeetPRSpacing.point14)
         }
         .scrollContentBackground(.hidden)
         .refreshable { await codesViewModel.reload() }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $isConversationListPresented) {
         if let chat {
@@ -80,22 +83,22 @@ struct CoachMyProfileView: View {
   // without a fabricated name/count, keeping the card's framing.
   private var identityCard: some View {
     card {
-      HStack(spacing: 14) {
+      HStack(spacing: MeetPRSpacing.point14) {
         Image(systemName: "person.fill")
-          .font(.system(size: 20, weight: .bold))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size20, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .frame(width: 52, height: 52)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(Circle())
-          .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
-        VStack(alignment: .leading, spacing: 2) {
+          .overlay { Circle().stroke(Color.MeetPR.borderDefault, lineWidth: 1) }
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
           Text("教练")
-            .font(.system(size: 18, weight: .bold))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size18, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("MeetPR · V0.1 内测")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
         Spacer()
       }
@@ -113,39 +116,41 @@ struct CoachMyProfileView: View {
       InviteCodesView(repository: inviteCodes)
     } label: {
       card {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
           HStack {
             Text("永久邀请码")
               .font(Font.MeetPR.monoLabel)
               .tracking(Font.MeetPR.monoLabelTracking)
-              .foregroundStyle(Color.MeetPR.brandRed)
+              .foregroundStyle(Color.MeetPR.gold500)
             Spacer()
             Image(systemName: "chevron.right")
-              .font(.system(size: 13))
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+              .foregroundStyle(Color.MeetPR.textTertiary)
           }
 
           if let code = codesViewModel.activePersonalCode {
             Text(InviteCodeFormat.grouped(code.code))
-              .font(.system(size: 24, weight: .bold, design: .monospaced))
+              .font(.MeetPR.mono(size: 26, weight: .bold))
               .tracking(1.5)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
-              .padding(.top, 10)
+              .foregroundStyle(Color.MeetPR.textPrimary)
+              .padding(.top, MeetPRSpacing.point10)
             Text("已使用 \(code.usedCount) 次")
-              .font(.system(size: 11, weight: .medium, design: .monospaced))
+              .font(
+                .MeetPR.system(size: MeetPRFontMetrics.size11, weight: .medium, design: .monospaced)
+              )
               .tracking(0.8)
-              .foregroundStyle(Color.MeetPR.fgTertiary)
-              .padding(.top, 8)
+              .foregroundStyle(Color.MeetPR.textTertiary)
+              .padding(.top, MeetPRSpacing.space2)
           } else {
             Text(inviteSubtitle)
-              .font(.system(size: 16))
-              .foregroundStyle(Color.MeetPR.fgSecondary)
-              .padding(.top, 10)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+              .foregroundStyle(Color.MeetPR.textSecondary)
+              .padding(.top, MeetPRSpacing.point10)
           }
         }
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private var inviteSubtitle: String {
@@ -163,33 +168,36 @@ struct CoachMyProfileView: View {
   // and 退出登录 (the destructive logout action). Unbuilt features are omitted
   // rather than shown as dead rows.
   private var rowsCard: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: MeetPRSpacing.zero) {
       versionRow
       divider
       logoutRow
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
+    }
   }
 
   private var versionRow: some View {
-    HStack(spacing: 14) {
+    HStack(spacing: MeetPRSpacing.point14) {
       Image(systemName: "info.circle")
-        .font(.system(size: 20))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size20))
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .frame(width: 22)
       Text("App 版本")
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()
       Text(viewModel.appVersion)
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 14)
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.vertical, MeetPRSpacing.point14)
     .frame(minHeight: 56)
   }
 
@@ -199,37 +207,40 @@ struct CoachMyProfileView: View {
         await viewModel.logout()
       }
     } label: {
-      HStack(spacing: 14) {
+      HStack(spacing: MeetPRSpacing.point14) {
         Image(systemName: "rectangle.portrait.and.arrow.right")
-          .font(.system(size: 20))
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size20))
+          .foregroundStyle(Color.MeetPR.gold500)
           .frame(width: 22)
         Text(viewModel.isLoggingOut ? "退出中" : "退出登录")
-          .font(.system(size: 16, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.gold500)
         Spacer()
       }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 14)
+      .padding(.horizontal, MeetPRSpacing.space4)
+      .padding(.vertical, MeetPRSpacing.point14)
       .frame(minHeight: 56)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(viewModel.isLoggingOut)
   }
 
   // MARK: - Building blocks
 
   private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-    VStack(spacing: 0) { content() }
-      .padding(16)
+    VStack(spacing: MeetPRSpacing.zero) { content() }
+      .padding(MeetPRSpacing.space4)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
+      }
   }
 
   private var divider: some View {
-    Rectangle().fill(Color.MeetPR.border).frame(height: 1)
+    Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
   }
 }

@@ -29,12 +29,12 @@ public struct AccessoryMatchListSection: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
         Text("匹配 \(filteredExercises.count) 个")
           .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
 
         HStack(spacing: MeetPRSpacing.sm) {
           Image(systemName: "magnifyingglass")
             .font(.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           TextField("搜索 / Search", text: $searchText)
             .font(Font.MeetPR.body)
             .planningNoAutocapitalization()
@@ -45,15 +45,15 @@ public struct AccessoryMatchListSection: View {
             } label: {
               Image(systemName: "xmark.circle.fill")
                 .font(.footnote)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .foregroundStyle(Color.MeetPR.textSecondary)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(PressScaleButtonStyle())
             .accessibilityLabel("清空搜索")
           }
         }
         .padding(.horizontal, MeetPRSpacing.sm)
         .padding(.vertical, MeetPRSpacing.xs)
-        .background(Color.MeetPR.surface2)
+        .background(Color.MeetPR.surfaceElevated)
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
 
         if isLoading {
@@ -62,7 +62,7 @@ public struct AccessoryMatchListSection: View {
         } else if filteredExercises.isEmpty {
           Text(searchText.isEmpty ? "没有匹配动作" : "没有符合搜索的动作")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         } else {
           LazyVStack(spacing: MeetPRSpacing.sm) {
             ForEach(filteredExercises) { exercise in
@@ -100,20 +100,20 @@ private struct AccessoryMatchRow: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text(exercise.name)
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
 
         // Selected → tappable minus so it reads as "added, tap to remove".
         Image(systemName: isSelected ? "minus.circle.fill" : "plus.circle.fill")
           .font(Font.MeetPR.headline)
-          .foregroundStyle(isSelected ? Color.MeetPR.fgTertiary : Color.MeetPR.brandRed)
+          .foregroundStyle(isSelected ? Color.MeetPR.textTertiary : Color.MeetPR.gold500)
       }
       .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.surface2)
+      .background(Color.MeetPR.surfaceElevated)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel(isSelected ? "移除 \(exercise.name)" : "添加 \(exercise.name)")
   }
 }

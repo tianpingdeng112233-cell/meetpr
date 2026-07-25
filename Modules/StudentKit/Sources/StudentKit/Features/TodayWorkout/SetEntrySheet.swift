@@ -83,22 +83,27 @@ struct SetEntrySheet: View {
   }
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: MeetPRSpacing.zero) {
       navBar
       ScrollView {
-        VStack(spacing: 0) {
+        VStack(spacing: MeetPRSpacing.zero) {
           if draft.allowsPlateLoadingGuidance {
-            PlateLoadout(plates: plates, showCollar: collarOn).padding(.top, 8)
+            PlateLoadout(plates: plates, showCollar: collarOn)
+              .padding(.top, MeetPRSpacing.space2)
             Text(breakdownLine)
-              .font(.system(size: 14, weight: .semibold, design: .monospaced))
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .font(
+                .MeetPR.system(
+                  size: MeetPRFontMetrics.size14, weight: .semibold, design: .monospaced)
+              )
+              .foregroundStyle(Color.MeetPR.textPrimary)
               .frame(maxWidth: .infinity)
-              .padding(.top, 4)
-            collarToggle.padding(.top, 10)
+              .padding(.top, MeetPRSpacing.space1)
+            collarToggle
+              .padding(.top, MeetPRSpacing.point10)
           }
 
-          VStack(spacing: 18) {
-            VStack(spacing: 6) {
+          VStack(spacing: MeetPRSpacing.point18) {
+            VStack(spacing: MeetPRSpacing.point6) {
               plateStepper(
                 "重量", unit: "KG", sub: "± 2.5",
                 onDec: { updateWeightText(max(0, weightValue - 2.5)) },
@@ -116,7 +121,7 @@ struct SetEntrySheet: View {
               if let weightSuggestion {
                 Text(suggestionLabel(weightSuggestion))
                   .font(Font.MeetPR.footnote)
-                  .foregroundStyle(Color.MeetPR.fgTertiary)
+                  .foregroundStyle(Color.MeetPR.textTertiary)
                   .frame(maxWidth: .infinity, alignment: .leading)
               }
             }
@@ -157,14 +162,14 @@ struct SetEntrySheet: View {
           }
           .padding(.top, draft.allowsPlateLoadingGuidance ? 28 : 0)
         }
-        .padding(16)
+        .padding(MeetPRSpacing.space4)
       }
       .defaultScrollAnchor(scrollToVideo ? .bottom : .top)
       .scrollDismissesKeyboard(.interactively)
       footer
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .presentationDetents([.large])
     .modifier(SetEntryErrorAlert(viewModel: viewModel))
     .modifier(
@@ -179,7 +184,7 @@ struct SetEntrySheet: View {
         ToolbarItemGroup(placement: .keyboard) {
           Spacer()
           Button("完成") { focusedField = nil }
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
         }
       }
     #endif
@@ -194,24 +199,24 @@ struct SetEntrySheet: View {
       Button {
         collarOn.toggle()
       } label: {
-        HStack(spacing: 8) {
+        HStack(spacing: MeetPRSpacing.space2) {
           Image(systemName: collarOn ? "checkmark.circle.fill" : "circle")
-            .font(.system(size: 18))
-            .foregroundStyle(collarOn ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size18))
+            .foregroundStyle(collarOn ? Color.MeetPR.gold500 : Color.MeetPR.textTertiary)
           Text("上赛扣")
-            .font(.system(size: 14, weight: .medium))
-            .foregroundStyle(collarOn ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary)
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .medium))
+            .foregroundStyle(collarOn ? Color.MeetPR.textPrimary : Color.MeetPR.textTertiary)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
-        .background(Color.MeetPR.surface1)
+        .padding(.horizontal, MeetPRSpacing.point14)
+        .padding(.vertical, MeetPRSpacing.space2)
+        .background(Color.MeetPR.surfaceCard)
         .clipShape(Capsule())
         .overlay {
           Capsule().stroke(
-            collarOn ? Color.MeetPR.brandRed.opacity(0.4) : Color.MeetPR.border, lineWidth: 1)
+            collarOn ? Color.MeetPR.gold500.opacity(0.4) : Color.MeetPR.borderDefault, lineWidth: 1)
         }
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityIdentifier("setEntry.collarToggle")
     }
   }
@@ -221,16 +226,16 @@ struct SetEntrySheet: View {
   /// RPE band: the same mono label row as the steppers, then the drag-to-pick
   /// tick scale (SetEntryRPEScale) in place of the old +/- box.
   private var rpeSection: some View {
-    VStack(spacing: 8) {
+    VStack(spacing: MeetPRSpacing.space2) {
       HStack {
         Text("RPE")
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
         Spacer()
         Text("5–10 · 0.5")
-          .font(.system(size: 10, design: .monospaced))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size10, design: .monospaced))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       SetEntryRPEScale(value: rpeBinding)
     }
@@ -279,50 +284,50 @@ struct SetEntrySheet: View {
     ZStack {
       Text("\(draft.exerciseName) · 第 \(setNumber) 组")
         .font(Font.MeetPR.body.weight(.semibold))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       HStack {
         Button {
           SetEntryAnalytics.trackCancel()
           dismiss()
         } label: {
-          HStack(spacing: 4) {
+          HStack(spacing: MeetPRSpacing.space1) {
             Image(systemName: "chevron.left")
             Text("返回")
           }
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         Spacer()
       }
     }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 10)
-    .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.vertical, MeetPRSpacing.point10)
+    .overlay(alignment: .bottom) { Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1) }
   }
 
   private var footer: some View {
-    VStack(spacing: 10) {
+    VStack(spacing: MeetPRSpacing.point10) {
       // Primary = inverted fill (white-on-dark in the dark sheet), secondary =
       // ghost with a hairline border, per the record-v2 mockup.
       actionButton(
         "完成本组", icon: "checkmark",
-        background: Color.MeetPR.fgPrimary, foreground: Color.MeetPR.bg
+        background: Color.MeetPR.ctaBackground, foreground: Color.MeetPR.ctaText
       ) {
         save(failed: false)
       }
       actionButton(
-        "未完成 / 失败", icon: "xmark", background: Color.MeetPR.surface1,
-        foreground: Color.MeetPR.fgSecondary, border: Color.MeetPR.border
+        "未完成 / 失败", icon: "xmark", background: Color.MeetPR.surfaceCard,
+        foreground: Color.MeetPR.textSecondary, border: Color.MeetPR.borderDefault
       ) {
         save(failed: true)
       }
     }
-    .padding(.horizontal, 16)
-    .padding(.top, 12)
-    .padding(.bottom, 24)
-    .background(Color.MeetPR.bg)
-    .overlay(alignment: .top) { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.top, MeetPRSpacing.space3)
+    .padding(.bottom, MeetPRSpacing.space6)
+    .background(Color.MeetPR.bgBase)
+    .overlay(alignment: .top) { Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1) }
   }
 
   private func actionButton(
@@ -331,23 +336,23 @@ struct SetEntrySheet: View {
     action: @escaping () -> Void
   ) -> some View {
     Button(action: action) {
-      HStack(spacing: 8) {
+      HStack(spacing: MeetPRSpacing.space2) {
         Image(systemName: icon)
         Text(title)
       }
-      .font(.system(size: 16, weight: .semibold))
+      .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
       .foregroundStyle(foreground)
       .frame(maxWidth: .infinity)
       .frame(height: 52)
       .background(background)
-      .clipShape(.rect(cornerRadius: 12))
+      .clipShape(.rect(cornerRadius: title == "完成本组" ? MeetPRRadius.pill : 12))
       .overlay {
         if let border {
-          RoundedRectangle(cornerRadius: 12).stroke(border, lineWidth: 1)
+          RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(border, lineWidth: 1)
         }
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   // MARK: - Steppers
@@ -358,31 +363,35 @@ struct SetEntrySheet: View {
     focus: @escaping () -> Void,
     @ViewBuilder field: () -> Field
   ) -> some View {
-    VStack(spacing: 8) {
+    VStack(spacing: MeetPRSpacing.space2) {
       HStack {
         Text(label)
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
         Spacer()
-        Text(sub).font(.system(size: 10, design: .monospaced)).foregroundStyle(
-          Color.MeetPR.fgTertiary)
+        Text(sub).font(.MeetPR.system(size: MeetPRFontMetrics.size10, design: .monospaced))
+          .foregroundStyle(
+            Color.MeetPR.textTertiary)
       }
-      HStack(spacing: 12) {
+      HStack(spacing: MeetPRSpacing.space3) {
         stepButton("minus", action: onDec)
         // Filled slot marks the value as a tap-to-type input (students missed the
         // bare-label number); tapping anywhere in the slot focuses the field.
-        HStack(alignment: .lastTextBaseline, spacing: 6) {
+        HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
           field()
           if let unit {
-            Text(unit).font(.system(size: 14, weight: .bold)).foregroundStyle(
-              Color.MeetPR.fgTertiary)
+            Text(unit).font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .bold))
+              .foregroundStyle(
+                Color.MeetPR.textTertiary)
           }
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 64)
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color.MeetPR.surface2))
-        .contentShape(RoundedRectangle(cornerRadius: 16))
+        .frame(height: 54)
+        .background(
+          RoundedRectangle(cornerRadius: MeetPRRadius.card).fill(Color.MeetPR.surfaceCard)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: MeetPRRadius.card))
         .onTapGesture(perform: focus)
         stepButton("plus", action: onInc)
       }
@@ -392,14 +401,14 @@ struct SetEntrySheet: View {
   private func stepButton(_ symbol: String, action: @escaping () -> Void) -> some View {
     Button(action: action) {
       Image(systemName: symbol)
-        .font(.system(size: 20))
-        .foregroundStyle(Color.MeetPR.brandRed)
-        .frame(width: 52, height: 52)
-        .background(Color.MeetPR.brandRedSoft)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size20))
+        .foregroundStyle(Color.MeetPR.gold500)
+        .frame(width: 48, height: 48)
+        .background(Color.MeetPR.goldSoft)
         .clipShape(Circle())
-        .overlay { Circle().stroke(Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1) }
+        .overlay { Circle().stroke(Color.MeetPR.gold500.opacity(0.3), lineWidth: 1) }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
 }
@@ -466,8 +475,8 @@ private struct SetEntryErrorAlert: ViewModifier {
 private struct EntryFieldStyle: ViewModifier {
   func body(content: Content) -> some View {
     content
-      .font(.system(size: 40, weight: .heavy, design: .monospaced))
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .font(.MeetPR.mono(size: 34, weight: .bold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
       .multilineTextAlignment(.center)
       .fixedSize(horizontal: true, vertical: false)
   }

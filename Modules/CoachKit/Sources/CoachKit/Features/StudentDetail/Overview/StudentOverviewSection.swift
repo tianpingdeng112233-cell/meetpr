@@ -41,7 +41,7 @@ struct StudentOverviewSection: View {
         } label: {
           completionCard
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
 
         StudentReadinessCard(readiness: readiness)
 
@@ -50,25 +50,25 @@ struct StudentOverviewSection: View {
         } label: {
           feedbackCard
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
 
         Button {
           onSelectSection(.videos)
         } label: {
           videoCard
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
 
         Button {
           onOpenEvaluationSummary()
         } label: {
           evaluationSummaryCard
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private var evaluationSummaryCard: some View {
@@ -78,18 +78,18 @@ struct StudentOverviewSection: View {
         if let evaluationSummary {
           Text(evaluationSummary.trainingPlanExcerpt)
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .lineLimit(2)
           Text("更新于 \(CoachStudentFormatting.shortDateText(evaluationSummary.lastUpdatedAt))")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         } else {
           Text("未填写,去写一份")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("评估总结是学员的长期参照")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
     }
@@ -101,7 +101,7 @@ struct StudentOverviewSection: View {
         Eyebrow("本周完成度")
         Text("本周完成 \(summary.completedTrainingDays)/\(summary.plannedTrainingDays) 训练日")
           .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         CompletionBar(
           completed: summary.completedTrainingDays,
           total: max(summary.plannedTrainingDays, 1)
@@ -109,7 +109,7 @@ struct StudentOverviewSection: View {
         if let latestActivityAt = summary.latestActivityAt {
           Text("上次活跃 \(CoachStudentFormatting.relativeText(latestActivityAt))")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
     }
@@ -122,18 +122,18 @@ struct StudentOverviewSection: View {
         if let latestFeedback = summary.latestFeedback {
           Text(latestFeedback.text)
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
             .lineLimit(3)
           Text(CoachStudentFormatting.relativeText(latestFeedback.postedAt))
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         } else {
           Text("暂无反馈")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("去反馈段写一条")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
     }
@@ -146,34 +146,34 @@ struct StudentOverviewSection: View {
         if videosUnavailable {
           Text("视频加载失败")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("下拉刷新重试")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         } else if recentVideos.isEmpty {
           Text("学员还没有上传视频")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         } else {
           HStack(spacing: MeetPRSpacing.sm) {
             ForEach(recentVideos) { video in
               VStack(spacing: MeetPRSpacing.xs) {
                 Image(systemName: "video.fill")
                   .font(Font.MeetPR.headline)
-                  .foregroundStyle(Color.MeetPR.brandRed)
+                  .foregroundStyle(Color.MeetPR.gold500)
                 Text(CoachStudentFormatting.shortDateText(video.displayDate))
                   .font(Font.MeetPR.footnote)
-                  .foregroundStyle(Color.MeetPR.fgSecondary)
+                  .foregroundStyle(Color.MeetPR.textSecondary)
               }
               .frame(maxWidth: .infinity)
               .padding(.vertical, MeetPRSpacing.sm)
-              .background(Color.MeetPR.surface3)
+              .background(Color.MeetPR.surfaceKey)
               .clipShape(.rect(cornerRadius: MeetPRRadius.md))
             }
           }
           Text("查看全部视频")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
     }
@@ -195,21 +195,21 @@ private struct StudentReadinessCard: View {
         case .loaded(let checkin):
           Text(CoachStudentFormatting.readinessScalesText(checkin))
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text(CoachStudentFormatting.readinessFatigueText(checkin))
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         case .notFiled:
           Text("今日未填")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         case .unavailable:
           Text("暂时无法获取")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("下拉刷新重试")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
     }
@@ -226,7 +226,7 @@ private struct CompletionBar: View {
     HStack(spacing: MeetPRSpacing.xs) {
       ForEach(0..<total, id: \.self) { index in
         Capsule()
-          .fill(index < completed ? Color.MeetPR.green : Color.MeetPR.surface3)
+          .fill(index < completed ? Color.MeetPR.success : Color.MeetPR.surfaceKey)
           .frame(height: 8)
       }
     }

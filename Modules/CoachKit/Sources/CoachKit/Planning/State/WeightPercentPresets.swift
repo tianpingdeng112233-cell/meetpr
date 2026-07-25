@@ -22,7 +22,8 @@ public protocol WeightPercentPresetStoring: Sendable {
   func save(_ values: [Int])
 }
 
-public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring, @unchecked Sendable
+{
   private let defaults: UserDefaults
   private let key = "coach.planning.weightPercentPresets"
 

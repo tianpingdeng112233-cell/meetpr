@@ -2,6 +2,7 @@ import Analytics
 import ChatUI
 import CoachKit
 import CoreModels
+import DesignSystem
 import Foundation
 import RepositoryContracts
 import StudentKit
@@ -26,6 +27,7 @@ public struct RootView: View {
   private let studentFeedback: any StudentFeedbackRepository
   private let studentE1RM: any E1RMRepository
   private let studentReadiness: any ReadinessRepository
+  private let studentStreak: any StudentStreakRepository
   private let studentVideoUploads: VideoUploadServices?
   private let studentBind: any BindRepository
   private let studentOnboarding: any OnboardingRepository
@@ -55,6 +57,7 @@ public struct RootView: View {
     studentFeedback: (any StudentFeedbackRepository)? = nil,
     studentE1RM: (any E1RMRepository)? = nil,
     studentReadiness: (any ReadinessRepository)? = nil,
+    studentStreak: (any StudentStreakRepository)? = nil,
     studentVideoUploads: VideoUploadServices? = nil,
     studentBind: (any BindRepository)? = nil,
     studentOnboarding: (any OnboardingRepository)? = nil,
@@ -78,6 +81,7 @@ public struct RootView: View {
     self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
+    self.studentStreak = studentStreak ?? RootViewDemoDefaults.streak()
     self.studentVideoUploads = studentVideoUploads
     self.studentBind = studentBind ?? RootViewDemoDefaults.bind()
     self.studentOnboarding = studentOnboarding ?? RootViewDemoDefaults.onboarding()
@@ -119,12 +123,19 @@ public struct RootView: View {
     switch session.state {
     case .anonymous:
       AuthFlowView()
+        .preferredColorScheme(.dark)
     case .authenticating:
-      VStack(spacing: 12) {
+      VStack(spacing: MeetPRSpacing.space3) {
+        MeetPRMark(size: 52)
         ProgressView()
+          .tint(Color.MeetPR.gold500)
         Text("正在验证会话…")
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.mono(size: 12, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .background(Color.MeetPR.bgBase)
+      .preferredColorScheme(.dark)
     case .authenticated(let user):
       authenticatedContent(for: user)
     }
@@ -134,9 +145,12 @@ public struct RootView: View {
   private func authenticatedContent(for user: User) -> some View {
     switch Self.authenticatedDestination(for: user.role) {
     case .coach:
+      // The coach mockups are dark-only, so the coach side stays locked.
       coachRoot(for: user)
+        .preferredColorScheme(.dark)
     case .studentBehindE1RMGate:
       studentEntry(for: user)
+        .meetPRStudentAppearance()
     }
   }
 
@@ -338,6 +352,7 @@ extension RootView {
       feedback: studentFeedback,
       e1rm: studentE1RM,
       readiness: studentReadiness,
+      streak: studentStreak,
       videoUploads: studentVideoUploads,
       onboarding: studentOnboarding,
       evaluationSummaries: studentEvaluationSummaries,

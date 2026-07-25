@@ -48,6 +48,10 @@ enum RootViewDemoDefaults {
     )
   }
 
+  static func streak() -> any StudentStreakRepository {
+    InMemoryStudentStreakRepository(current: 12)
+  }
+
   static func bind() -> any BindRepository {
     InMemoryBindRepository(
       studentId: StudentDemoSeed.studentID,

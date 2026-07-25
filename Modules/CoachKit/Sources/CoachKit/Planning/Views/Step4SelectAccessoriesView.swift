@@ -23,7 +23,7 @@ public struct Step4SelectAccessoriesView: View {
           Eyebrow("STEP 4")
           Text("添加辅助动作")
             .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
 
         DayChipBar(
@@ -47,7 +47,7 @@ public struct Step4SelectAccessoriesView: View {
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
             Text("已选 \(accessories.count) 个")
               .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
 
             ForEach(accessories, id: \.id) { exercise in
               ExerciseSetEditorCard(
@@ -86,13 +86,13 @@ public struct Step4SelectAccessoriesView: View {
           Card(accessibilityLabel: "No training days") {
             Text("请先完成训练日分配")
               .font(Font.MeetPR.body)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
         }
       }
       .padding(MeetPRSpacing.base)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("辅助动作")
     .scrollDismissesKeyboard(.interactively)
     .task {
@@ -143,10 +143,10 @@ private struct MainLiftSummarySection: View {
           VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
             Text("本日主项")
               .font(Font.MeetPR.headline)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text("上一步选择的主项、变式和 W1 强度")
               .font(Font.MeetPR.footnote)
-              .foregroundStyle(Color.MeetPR.fgSecondary)
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
 
           Spacer()
@@ -174,14 +174,14 @@ private struct MainLiftSummaryRow: View {
         HStack(spacing: MeetPRSpacing.xs) {
           Text(familyName)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
 
           StatusBadge(status: .live, title: "主项")
         }
 
         Text(viewModel.exerciseName(for: draftExercise))
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
           .truncationMode(.tail)
       }
@@ -190,13 +190,13 @@ private struct MainLiftSummaryRow: View {
 
       Text(intensityText)
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .monospacedDigit()
         .multilineTextAlignment(.trailing)
         .lineLimit(2)
     }
     .padding(MeetPRSpacing.md)
-    .background(Color.MeetPR.surface2)
+    .background(Color.MeetPR.surfaceElevated)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
 

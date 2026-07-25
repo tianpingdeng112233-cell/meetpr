@@ -13,30 +13,30 @@ public struct LoginView: View {
 
     GeometryReader { proxy in
       ScrollView {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
           // ── Brand hero ───────────────────────────────────────────────
           MeetPRMark(size: 56)
             .padding(.bottom, MeetPRSpacing.lg)
 
-          VStack(alignment: .leading, spacing: 0) {
+          VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
             Text("Better")
-              .font(.system(size: 92, weight: .black))
+              .font(.MeetPR.display(size: 92, weight: .black))
               .tracking(-3)
             Text("than yesterday")
-              .font(.system(size: 46, weight: .black))
+              .font(.MeetPR.display(size: 46, weight: .black))
               .tracking(-1)
           }
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .fixedSize(horizontal: false, vertical: true)
 
           Rectangle()
-            .fill(Color.MeetPR.brandRed)
+            .fill(Color.MeetPR.gold500)
             .frame(width: 48, height: 3)
             .padding(.top, MeetPRSpacing.base)
 
           Text("输入手机号和密码登录。")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .padding(.top, MeetPRSpacing.md)
 
           // ── Form (bare fields, mono labels — no card, matches kit) ───
@@ -62,7 +62,7 @@ public struct LoginView: View {
             if let toastMessage = viewModel.toastMessage {
               Text(toastMessage)
                 .font(Font.MeetPR.footnote)
-                .foregroundStyle(Color.MeetPR.brandRed)
+                .foregroundStyle(Color.MeetPR.gold500)
                 .accessibilityIdentifier("login.toast")
             }
           }
@@ -71,8 +71,9 @@ public struct LoginView: View {
           Spacer(minLength: MeetPRSpacing.xl)
 
           // ── Actions ──────────────────────────────────────────────────
-          PrimaryButton(
+          BrandPrimaryButton(
             "登录",
+            showsShimmer: true,
             isDisabled: !viewModel.canSubmit,
             isLoading: viewModel.isSubmitting,
             isFullWidth: true
@@ -94,7 +95,7 @@ public struct LoginView: View {
       }
       .scrollBounceBehavior(.basedOnSize)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .hideNavigationBar()
   }
 
@@ -108,17 +109,17 @@ public struct LoginView: View {
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
         .padding(.horizontal, MeetPRSpacing.xs)
-        .padding(.vertical, 2)
-        .background(Color.MeetPR.surface2)
+        .padding(.vertical, MeetPRSpacing.point2)
+        .background(Color.MeetPR.surfaceElevated)
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
     }
-    .foregroundStyle(Color.MeetPR.fgTertiary)
+    .foregroundStyle(Color.MeetPR.textTertiary)
     .frame(maxWidth: .infinity)
     .frame(minHeight: 44)
-    .padding(.vertical, 14)
+    .padding(.vertical, MeetPRSpacing.point14)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .opacity(0.55)
     .accessibilityElement(children: .ignore)

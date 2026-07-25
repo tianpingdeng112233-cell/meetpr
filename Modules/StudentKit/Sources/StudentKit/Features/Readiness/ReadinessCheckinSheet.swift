@@ -39,7 +39,7 @@ struct ReadinessCheckinSheet: View {
         }
         .padding(MeetPRSpacing.md)
       }
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("今日状态 \(step)/2")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -50,13 +50,13 @@ struct ReadinessCheckinSheet: View {
             viewModel.skip(studentId: studentID)
             onClose()
           }
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
       .safeAreaInset(edge: .bottom) {
         footer
           .padding(MeetPRSpacing.md)
-          .background(Color.MeetPR.bg)
+          .background(Color.MeetPR.bgBase)
       }
     }
     .interactiveDismissDisabled()
@@ -97,11 +97,11 @@ struct ReadinessCheckinSheet: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       Text(title)
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       HStack(spacing: MeetPRSpacing.sm) {
         Text(lowAnchor)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .frame(width: 56, alignment: .leading)
         ForEach(1...5, id: \.self) { level in
           Button {
@@ -110,20 +110,20 @@ struct ReadinessCheckinSheet: View {
             Circle()
               .fill(
                 (value.wrappedValue ?? 0) >= level
-                  ? Color.MeetPR.fgPrimary : Color.MeetPR.surface3
+                  ? Color.MeetPR.textPrimary : Color.MeetPR.surfaceKey
               )
               .frame(width: 30, height: 30)
               .overlay(
                 Circle().strokeBorder(
-                  value.wrappedValue == level ? Color.MeetPR.bg : .clear, lineWidth: 2)
+                  value.wrappedValue == level ? Color.MeetPR.bgBase : .clear, lineWidth: 2)
               )
           }
-          .buttonStyle(.plain)
+          .buttonStyle(PressScaleButtonStyle())
           .accessibilityLabel("\(title) \(level) 分")
         }
         Text(highAnchor)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .frame(width: 56, alignment: .trailing)
       }
     }
@@ -135,10 +135,10 @@ struct ReadinessCheckinSheet: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
       Text("今天哪些肌群还累？")
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Text("点一下：轻 → 中 → 重 → 取消。不累可以直接完成。")
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
 
       FlowChips(
         groups: ReadinessCheckin.allowedMuscleGroups,
@@ -152,7 +152,7 @@ struct ReadinessCheckinSheet: View {
       if let error = viewModel.submitError {
         Label(error, systemImage: "exclamationmark.triangle")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
     }
   }
@@ -164,13 +164,13 @@ struct ReadinessCheckinSheet: View {
       if step == 2 {
         Button("上一步") { step = 1 }
           .buttonStyle(.bordered)
-          .tint(Color.MeetPR.fgSecondary)
+          .tint(Color.MeetPR.textSecondary)
       }
       Spacer()
       if step == 1 {
         Button("下一步") { step = 2 }
           .buttonStyle(.borderedProminent)
-          .tint(Color.MeetPR.brandRed)
+          .tint(Color.MeetPR.gold500)
           .disabled(!draft.stepOneComplete)
       } else {
         Button(submitting ? "提交中…" : "完成") {
@@ -182,7 +182,7 @@ struct ReadinessCheckinSheet: View {
           }
         }
         .buttonStyle(.borderedProminent)
-        .tint(Color.MeetPR.brandRed)
+        .tint(Color.MeetPR.gold500)
         .disabled(submitting)
       }
     }
@@ -205,25 +205,25 @@ private struct FlowChips: View {
         Button {
           onTap(group)
         } label: {
-          VStack(spacing: 2) {
+          VStack(spacing: MeetPRSpacing.point2) {
             Text(Self.displayName(group))
               .font(Font.MeetPR.footnote)
             Text(level.map { String(repeating: "·", count: $0) } ?? " ")
               .font(Font.MeetPR.monoLabel)
           }
           .padding(.horizontal, MeetPRSpacing.sm)
-          .padding(.vertical, 8)
+          .padding(.vertical, MeetPRSpacing.space2)
           .frame(maxWidth: .infinity)
-          .background(level == nil ? Color.MeetPR.surface2 : Color.MeetPR.surface3)
-          .foregroundStyle(level == nil ? Color.MeetPR.fgSecondary : Color.MeetPR.fgPrimary)
+          .background(level == nil ? Color.MeetPR.surfaceElevated : Color.MeetPR.surfaceKey)
+          .foregroundStyle(level == nil ? Color.MeetPR.textSecondary : Color.MeetPR.textPrimary)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
           .overlay(
             RoundedRectangle(cornerRadius: MeetPRRadius.md)
               .strokeBorder(
-                level == nil ? Color.MeetPR.border : Color.MeetPR.fgPrimary, lineWidth: 1)
+                level == nil ? Color.MeetPR.borderDefault : Color.MeetPR.textPrimary, lineWidth: 1)
           )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel("\(Self.displayName(group))，疲劳度 \(level ?? 0)")
       }
     }

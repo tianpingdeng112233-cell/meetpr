@@ -39,7 +39,7 @@ struct ProfileCardsSection: View {
       }
       evaluationRow
     }
-    .listRowBackground(Color.MeetPR.surface1)
+    .listRowBackground(Color.MeetPR.surfaceCard)
   }
 
   /// Card 9: live entry to the coach's evaluation summary once written;
@@ -86,7 +86,7 @@ struct ProfileCardsSection: View {
         summary: OnboardingSummaryFormatter.oneRM(profile), locked: true)
       Text("🔒 已锁定,联系教练修改")
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
   }
 
@@ -104,23 +104,23 @@ struct ProfileCardsSection: View {
   ) -> some View {
     HStack(spacing: MeetPRSpacing.md) {
       Image(systemName: icon)
-        .font(.system(size: 18))
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size18))
         .frame(width: 28)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-      VStack(alignment: .leading, spacing: 2) {
+        .foregroundStyle(Color.MeetPR.textSecondary)
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
         HStack(spacing: MeetPRSpacing.xs) {
           Text(title)
             .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           if locked {
             Image(systemName: "lock.fill")
-              .font(.system(size: 11))
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size11))
+              .foregroundStyle(Color.MeetPR.textTertiary)
           }
         }
         Text(summary)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .lineLimit(1)
       }
     }
@@ -181,7 +181,7 @@ struct ProfileCardEditView: View {
         if let saveError = viewModel.saveError {
           Text(saveError)
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
         PrimaryButton("保存", isLoading: isSaving, isFullWidth: true) {
           Task { await save() }
@@ -190,7 +190,7 @@ struct ProfileCardEditView: View {
       .padding(MeetPRSpacing.base)
     }
     .scrollContentBackground(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle(kind.title)
   }
 

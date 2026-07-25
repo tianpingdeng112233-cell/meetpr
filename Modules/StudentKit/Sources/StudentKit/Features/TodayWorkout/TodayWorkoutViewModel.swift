@@ -172,7 +172,7 @@ public final class TodayWorkoutViewModel {
       return false
     }
     actionErrorMessage = nil
-    var nextDrafts = drafts
+    let nextDrafts = drafts
     var draft = nextDrafts[rowIndex]
     state = .recording(plan: plan, drafts: nextDrafts, rowIndex: rowIndex)
 

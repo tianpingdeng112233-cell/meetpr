@@ -37,7 +37,7 @@ struct StudentGrowthView: View {
       }
       .padding(MeetPRSpacing.md)
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .task {
       await viewModel.loadIfNeeded(studentID: studentID)
     }
@@ -71,7 +71,7 @@ struct StudentGrowthView: View {
         )
         .frame(height: 280)
         .padding(MeetPRSpacing.sm)
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.surfaceCard)
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
     }

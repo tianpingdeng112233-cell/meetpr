@@ -74,13 +74,14 @@ struct SetEntryRPEScale: View {
   private var active: Double { previewValue ?? value }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 14) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
       header
       strip
     }
-    .padding(16)
+    .padding(.horizontal, MeetPRSpacing.point14)
+    .padding(.vertical, MeetPRSpacing.point13)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(RoundedRectangle(cornerRadius: 16).fill(Color.MeetPR.surface2))
+    .background(RoundedRectangle(cornerRadius: MeetPRRadius.card).fill(Color.MeetPR.surfaceCard))
     .accessibilityElement(children: .ignore)
     .accessibilityLabel("RPE")
     .accessibilityValue(SetEntryRPE.text(value))
@@ -99,14 +100,14 @@ struct SetEntryRPEScale: View {
   private var header: some View {
     HStack(alignment: .firstTextBaseline) {
       Text(SetEntryRPE.text(active))
-        .font(.system(size: 40, weight: .heavy, design: .monospaced))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.mono(size: 32, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .monospacedDigit()
         .contentTransition(.numericText())
       Spacer(minLength: 8)
       Text(hint)
-        .font(.system(size: 13, weight: .medium))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size13, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
   }
 
@@ -120,7 +121,7 @@ struct SetEntryRPEScale: View {
   private var strip: some View {
     GeometryReader { proxy in
       let width = proxy.size.width
-      HStack(spacing: 3) {
+      HStack(spacing: MeetPRSpacing.point3) {
         ForEach(0..<SetEntryRPE.cellCount, id: \.self) { index in
           cell(index: index)
         }
@@ -162,19 +163,21 @@ struct SetEntryRPEScale: View {
     let whole = cellValue.truncatingRemainder(dividingBy: 1) == 0
     let selected = abs(cellValue - active) < 0.01
     let lit = cellValue <= active + 0.01
-    let barHeight: CGFloat = selected ? 40 : whole ? 26 : 16
+    let barHeight: CGFloat = selected ? 32 : whole ? 22 : 13
     let labelLit = selected || (whole && abs(cellValue - active) < 0.3)
 
-    return VStack(spacing: 6) {
+    return VStack(spacing: MeetPRSpacing.point6) {
       ZStack(alignment: .bottom) {
         Color.clear.frame(height: 40)
-        RoundedRectangle(cornerRadius: 3)
+        RoundedRectangle(cornerRadius: MeetPRRadius.point3)
           .fill(selected ? Self.selectedBar : lit ? Self.litBar : Self.unlitBar)
           .frame(width: 6, height: barHeight)
       }
       Text(whole ? "\(Int(cellValue))" : "")
-        .font(.system(size: 12, weight: .semibold, design: .monospaced))
-        .foregroundStyle(labelLit ? Color.MeetPR.fgPrimary : Self.inactiveLabel)
+        .font(
+          .MeetPR.system(size: MeetPRFontMetrics.size12, weight: .semibold, design: .monospaced)
+        )
+        .foregroundStyle(labelLit ? Color.MeetPR.textPrimary : Self.inactiveLabel)
         .frame(height: 14)
     }
     .frame(maxWidth: .infinity)
@@ -182,13 +185,13 @@ struct SetEntryRPEScale: View {
 
   // MARK: - Bar / label colours (mockup dark values, light-mode fallbacks)
 
-  private static let selectedBar = Color.MeetPR.fgPrimary
+  private static let selectedBar = Color.MeetPR.gold500
   private static let litBar = Color(light: rgb(168, 168, 172), dark: rgb(138, 138, 142))
   private static let unlitBar = Color(light: rgb(220, 220, 222), dark: rgb(44, 44, 46))
   private static let inactiveLabel = Color(light: rgb(168, 168, 168), dark: rgb(82, 82, 82))
 
   private static func rgb(_ red: Double, _ green: Double, _ blue: Double) -> Color {
-    Color(red: red / 255, green: green / 255, blue: blue / 255)
+    Color.MeetPR.rpeScale(red: red, green: green, blue: blue)
   }
 }
 
@@ -200,6 +203,6 @@ struct SetEntryRPEScale: View {
     Text("value = " + SetEntryRPE.text(rpe)).foregroundStyle(.secondary)
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }

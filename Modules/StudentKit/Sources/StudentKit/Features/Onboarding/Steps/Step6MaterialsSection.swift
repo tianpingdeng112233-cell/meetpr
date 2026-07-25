@@ -30,31 +30,31 @@ struct Step6MaterialsSection: View {
   private func uploadCard(icon: String, title: String, detail: String) -> some View {
     HStack(spacing: MeetPRSpacing.md) {
       Image(systemName: icon)
-        .font(.system(size: 22))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-      VStack(alignment: .leading, spacing: 2) {
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size22))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
         Text(title)
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Text(detail)
           .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       Spacer()
       Text("即将开放")
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
         .padding(.horizontal, MeetPRSpacing.sm)
-        .padding(.vertical, 4)
-        .background(Color.MeetPR.surface2)
+        .padding(.vertical, MeetPRSpacing.space1)
+        .background(Color.MeetPR.surfaceElevated)
         .clipShape(Capsule())
     }
     .padding(MeetPRSpacing.md)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.md)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .opacity(uploadsEnabled ? 1 : 0.55)

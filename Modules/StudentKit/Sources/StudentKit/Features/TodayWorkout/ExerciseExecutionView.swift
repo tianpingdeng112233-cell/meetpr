@@ -16,15 +16,15 @@ struct ExerciseExecutionView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
       HStack(alignment: .firstTextBaseline) {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           Text(exercise.exercise.name)
             .font(.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text(prescriptionSummary)
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           if let reference, reference.hasValue {
             ExerciseReferenceRow(reference: reference)
           }
@@ -32,7 +32,7 @@ struct ExerciseExecutionView: View {
         Spacer()
         Image(systemName: allCompleted ? "checkmark.circle.fill" : "circle")
           .font(.title3)
-          .foregroundStyle(allCompleted ? Color.MeetPR.green : Color.MeetPR.fgTertiary)
+          .foregroundStyle(allCompleted ? Color.MeetPR.success : Color.MeetPR.textTertiary)
       }
 
       ForEach(Array(rows.enumerated()), id: \.element.id) { offset, row in
@@ -43,18 +43,18 @@ struct ExerciseExecutionView: View {
         }
       }
     }
-    .padding(14)
-    .background(Color.MeetPR.surface1)
+    .padding(MeetPRSpacing.point14)
+    .background(Color.MeetPR.surfaceCard)
     .overlay(alignment: .leading) {
       Rectangle()
-        .fill(Color.MeetPR.brandRed)
+        .fill(Color.MeetPR.gold500)
         .frame(width: 3)
     }
     .overlay {
-      RoundedRectangle(cornerRadius: 14)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.point14)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
-    .clipShape(.rect(cornerRadius: 14))
+    .clipShape(.rect(cornerRadius: MeetPRRadius.point14))
   }
 
   private var prescriptionSummary: String {
@@ -75,7 +75,7 @@ private struct ExerciseReferenceRow: View {
   var body: some View {
     Text(parts.joined(separator: " · "))
       .font(.caption)
-      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .foregroundStyle(Color.MeetPR.textTertiary)
       .frame(maxWidth: .infinity, alignment: .leading)
   }
 

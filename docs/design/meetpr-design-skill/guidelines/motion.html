@@ -1,0 +1,14 @@
+<!-- @dsCard group="Brand" viewport="700x200" subtitle="动效语言：按压 / 错峰上浮 / 呼吸发光" name="Motion" -->
+<!DOCTYPE html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>body{margin:0;font-family:var(--font-mono);background:var(--bg-base);color:var(--text-secondary);padding:20px 24px;font-size:12px}
+table{border-collapse:collapse;width:100%}td{padding:7px 10px;border-top:1px solid var(--border-subtle)}
+td:first-child{color:#fff;font-weight:600}td:last-child{color:var(--text-faint)}</style></head><body>
+<table>
+<tr><td>按压反馈</td><td>scale(.97) + opacity .9</td><td>120ms ease · 所有可点元素</td></tr>
+<tr><td>错峰上浮</td><td>translateY(72→0) + scaleY(.88→1)</td><td>500ms easeOutCubic · stagger 40–90ms</td></tr>
+<tr><td>收纳卷折</td><td>scaleY 收起 + 高度塌缩</td><td>动作完成后归为一行</td></tr>
+<tr><td>呼吸发光</td><td>金色 box-shadow 脉冲</td><td>4.2s · 仅「进行中」元素</td></tr>
+<tr><td>光泽扫过</td><td>斜向亮带 -160%→340%</td><td>4.5s 周期 · 仅顶级 CTA</td></tr>
+<tr><td>底部弹层</td><td>translateY(100%→0)</td><td>340ms cubic-bezier(.2,.8,.2,1)</td></tr>
+</table>
+</body></html>

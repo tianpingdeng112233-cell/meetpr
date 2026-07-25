@@ -47,7 +47,7 @@ struct StudentOnboardingProfileView: View {
     .safeAreaInset(edge: .bottom) {
       decisionFooter
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle(item.displayName)
     .task {
       await load()
@@ -186,7 +186,7 @@ private struct OnboardingProfileGroups: View {
       if let notes = profile.injuryNotes {
         Text(notes)
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
       row("是否备赛", profile.isCompeting.map { $0 ? "是" : "否" })
       if profile.isCompeting == true {
@@ -220,11 +220,11 @@ private struct OnboardingProfileGroups: View {
     HStack(alignment: .firstTextBaseline) {
       Text(label)
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
         .frame(width: 72, alignment: .leading)
       Text(value ?? "—")
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
   }

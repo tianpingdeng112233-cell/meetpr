@@ -7,7 +7,7 @@ import SwiftUI
 /// mock's “文本反馈” surface: a custom large-title header, a card-surfaced
 /// editor with a placeholder, and a bordered “关联” card holding the day /
 /// exercise pickers. The Form is replaced by a ScrollView of
-/// Color.MeetPR.surface1 cards (RoundedRectangle stroke Color.MeetPR.border,
+/// Color.MeetPR.surfaceCard cards (RoundedRectangle stroke Color.MeetPR.borderDefault,
 /// MeetPRRadius.lg) with Font.MeetPR.monoLabel section labels.
 ///
 /// All behavior is preserved verbatim: the editor binds `$viewModel.text`,
@@ -40,7 +40,7 @@ struct FeedbackComposerView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         header
 
         ScrollView {
@@ -57,7 +57,7 @@ struct FeedbackComposerView: View {
         .scrollContentBackground(.hidden)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .safeAreaInset(edge: .bottom) {
         sendBar
@@ -68,19 +68,19 @@ struct FeedbackComposerView: View {
   // MARK: - Header (cancel · large title)
 
   private var header: some View {
-    VStack(alignment: .leading, spacing: 4) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
       HStack {
         Eyebrow("文本反馈 //")
         Spacer()
         Button("取消") {
           dismiss()
         }
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+        .foregroundStyle(Color.MeetPR.textSecondary)
       }
       Text("给 \(studentName) 写反馈")
-        .font(.system(size: 28, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: 28, weight: .extraBold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .lineLimit(1)
         .minimumScaleFactor(0.7)
     }
@@ -98,11 +98,11 @@ struct FeedbackComposerView: View {
       editor
         .frame(minHeight: 180)
         .padding(MeetPRSpacing.md)
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.surfaceCard)
         .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-            .stroke(Color.MeetPR.border, lineWidth: 1)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
     }
   }
@@ -112,13 +112,13 @@ struct FeedbackComposerView: View {
       if viewModel.text.isEmpty {
         Text("给 \(studentName) 写反馈...")
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .padding(.top, 8)
-          .padding(.leading, 5)
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .padding(.top, MeetPRSpacing.space2)
+          .padding(.leading, MeetPRSpacing.point5)
       }
       TextEditor(text: $viewModel.text)
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .scrollContentBackground(.hidden)
     }
   }
@@ -128,16 +128,16 @@ struct FeedbackComposerView: View {
   private var linkCard: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       sectionLabel("关联")
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         dayRow
-        Rectangle().fill(Color.MeetPR.border).frame(height: 1)
+        Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
         exerciseRow
       }
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
   }
@@ -145,8 +145,8 @@ struct FeedbackComposerView: View {
   private var dayRow: some View {
     HStack {
       Text("日期")
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()
       Picker("日期", selection: $viewModel.selectedDayDate) {
         Text("不关联").tag(Date?.none)
@@ -155,7 +155,7 @@ struct FeedbackComposerView: View {
         }
       }
       .labelsHidden()
-      .tint(Color.MeetPR.fgPrimary)
+      .tint(Color.MeetPR.textPrimary)
       .onChange(of: viewModel.selectedDayDate) { _, _ in
         viewModel.reconcileExerciseSelection(days: days)
       }
@@ -168,8 +168,8 @@ struct FeedbackComposerView: View {
   private var exerciseRow: some View {
     HStack {
       Text("动作")
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()
       Picker("动作", selection: $viewModel.selectedExerciseID) {
         Text("不关联").tag(UUID?.none)
@@ -178,7 +178,7 @@ struct FeedbackComposerView: View {
         }
       }
       .labelsHidden()
-      .tint(Color.MeetPR.fgPrimary)
+      .tint(Color.MeetPR.textPrimary)
     }
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.vertical, MeetPRSpacing.md)
@@ -190,40 +190,32 @@ struct FeedbackComposerView: View {
   private func failureBanner(_ message: String) -> some View {
     Label(message, systemImage: "exclamationmark.triangle")
       .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.amber)
+      .foregroundStyle(Color.MeetPR.gold500)
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.amberSoft)
+      .background(Color.MeetPR.goldSoft)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
 
   // MARK: - Send bar (mock's filled dark primary action)
 
   private var sendBar: some View {
-    Button {
+    BrandPrimaryButton(
+      "发送",
+      systemImage: "paperplane.fill",
+      isDisabled: !viewModel.canSend,
+      isFullWidth: true
+    ) {
       Task {
         guard let item = await viewModel.send() else { return }
         onSent(item)
         dismiss()
       }
-    } label: {
-      HStack(spacing: MeetPRSpacing.sm) {
-        Image(systemName: "paperplane.fill")
-        Text("发送")
-      }
-      .font(.system(size: 16, weight: .semibold))
-      .foregroundStyle(viewModel.canSend ? Color.MeetPR.bg : Color.MeetPR.fgTertiary)
-      .frame(maxWidth: .infinity)
-      .frame(height: 50)
-      .background(viewModel.canSend ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
-    .disabled(!viewModel.canSend)
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.top, MeetPRSpacing.sm)
     .padding(.bottom, MeetPRSpacing.sm)
-    .background(.ultraThinMaterial)
+    .background(Color.MeetPR.bgBase)
     .accessibilityLabel("发送")
   }
 
@@ -233,7 +225,7 @@ struct FeedbackComposerView: View {
     Text(text)
       .font(Font.MeetPR.monoLabel)
       .tracking(Font.MeetPR.monoLabelTracking)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       .frame(maxWidth: .infinity, alignment: .leading)
   }
 }

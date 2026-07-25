@@ -2,6 +2,35 @@ import SwiftUI
 
 @MainActor
 public struct StatusBadge: View {
+  public enum Tone: Sendable {
+    case success
+    case neutral
+    case danger
+    case gold
+
+    var foreground: Color {
+      switch self {
+      case .success: Color.MeetPR.success
+      case .neutral: Color.MeetPR.textTertiary
+      case .danger: Color.MeetPR.danger
+      case .gold: Color.MeetPR.gold500
+      }
+    }
+
+    var background: Color {
+      switch self {
+      case .success: Color.MeetPR.successSoft
+      case .neutral: Color.MeetPR.surfaceElevated
+      case .danger: Color.MeetPR.dangerSoft
+      case .gold: Color.MeetPR.goldSoft
+      }
+    }
+
+    var border: Color {
+      foreground.opacity(0.32)
+    }
+  }
+
   public enum Status: Sendable {
     case ready
     case pending
@@ -19,46 +48,12 @@ public struct StatusBadge: View {
       }
     }
 
-    var foreground: Color {
+    var tone: Tone {
       switch self {
-      case .ready:
-        Color.MeetPR.green
-      case .pending:
-        Color.MeetPR.fgTertiary
-      case .overdue:
-        Color.MeetPR.amber
-      case .completed:
-        Color.MeetPR.fgPrimary
-      case .live:
-        Color.MeetPR.brandRed
-      }
-    }
-
-    var background: Color {
-      switch self {
-      case .ready:
-        Color.MeetPR.greenSoft
-      case .pending, .completed:
-        .clear
-      case .overdue:
-        Color.MeetPR.amberSoft
-      case .live:
-        Color.MeetPR.brandRedSoft
-      }
-    }
-
-    var border: Color {
-      switch self {
-      case .ready:
-        Color.MeetPR.green.opacity(0.3)
-      case .pending:
-        Color.MeetPR.border
-      case .overdue:
-        Color.MeetPR.amber.opacity(0.3)
-      case .completed:
-        Color.MeetPR.fgPrimary
-      case .live:
-        Color.MeetPR.brandRed.opacity(0.3)
+      case .ready, .completed: .success
+      case .pending: .neutral
+      case .overdue: .danger
+      case .live: .gold
       }
     }
 
@@ -76,30 +71,38 @@ public struct StatusBadge: View {
 
   private let status: Status
   private let title: String
+  private let tone: Tone
 
   public init(status: Status, title: String? = nil) {
     self.status = status
     self.title = title ?? status.title
+    self.tone = status.tone
+  }
+
+  public init(_ title: String, tone: Tone) {
+    self.status = .pending
+    self.title = title
+    self.tone = tone
   }
 
   public var body: some View {
-    HStack(spacing: 6) {
+    HStack(spacing: MeetPRSpacing.point6) {
       if let iconName = status.iconName {
         Image(systemName: iconName)
-          .font(.system(size: 11, weight: .semibold))
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size11, weight: .semibold))
       }
 
       Text(title.uppercased())
-        .font(.system(size: MeetPRFontMetrics.captionSize, weight: .semibold, design: .monospaced))
-        .tracking(0.88)
+        .font(.MeetPR.mono(size: 11, weight: .bold))
+        .tracking(0.72)
     }
-    .foregroundStyle(status.foreground)
-    .padding(.horizontal, 10)
-    .padding(.vertical, 5)
-    .background(status.background)
+    .foregroundStyle(tone.foreground)
+    .padding(.horizontal, MeetPRSpacing.sm)
+    .padding(.vertical, MeetPRSpacing.xs)
+    .background(tone.background)
     .overlay {
       Capsule()
-        .stroke(status.border, lineWidth: 1)
+        .stroke(tone.border, lineWidth: 1)
     }
     .clipShape(.capsule)
     .accessibilityLabel(title)
@@ -116,13 +119,13 @@ public struct StatusBadge: View {
     StatusBadge(status: .live)
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("StatusBadge Light") {
   StatusBadge(status: .ready)
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

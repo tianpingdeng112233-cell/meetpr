@@ -14,6 +14,7 @@ public struct StudentRootView: View {
   private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
   private let readiness: any ReadinessRepository
+  private let streak: any StudentStreakRepository
   private let videoUploads: VideoUploadServices
   private let onboarding: any OnboardingRepository
   private let importedHistoryBackfill: ImportedHistoryBackfill
@@ -60,6 +61,7 @@ public struct StudentRootView: View {
       readiness: InMemoryReadinessRepository(
         seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
       ),
+      streak: InMemoryStudentStreakRepository(current: 12),
       importedHistoryReviews: InMemoryImportedHistoryReviewStore()
     )
   }
@@ -73,6 +75,7 @@ public struct StudentRootView: View {
     feedback: any StudentFeedbackRepository,
     e1rm: any E1RMRepository = LocalE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
+    streak: any StudentStreakRepository = InMemoryStudentStreakRepository(current: 12),
     videoUploads: VideoUploadServices? = nil,
     onboarding: (any OnboardingRepository)? = nil,
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
@@ -96,6 +99,7 @@ public struct StudentRootView: View {
     self.logs = logs
     self.e1rm = e1rm
     self.readiness = readiness
+    self.streak = streak
     self.videoUploads = videoUploads ?? .demo()
     self.onLogout = onLogout
     self.account = account
@@ -205,6 +209,7 @@ extension StudentRootView {
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding, readiness: readiness,
+        streak: streak,
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
         jumpToTodayToken: trainingJumpToken,
         planRevision: planRevision,
@@ -309,7 +314,11 @@ extension StudentRootView {
       review: $pendingImportedHistoryReview,
       onAnswer: answerImportedHistoryReview
     )
-    .tint(Color.MeetPR.brandRed)
+    .meetPRStudentTabBar(
+      selection: $selectedTab,
+      profileBadge: pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount
+    )
+    .tint(Color.MeetPR.gold500)
   }
 
   var hasNotificationCoordinator: Bool {

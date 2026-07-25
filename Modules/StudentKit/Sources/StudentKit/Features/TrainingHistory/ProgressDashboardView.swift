@@ -37,6 +37,6 @@ private struct ProgressSectionHeader: View {
   var body: some View {
     Text(title)
       .font(Font.MeetPR.headline)
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .foregroundStyle(Color.MeetPR.textPrimary)
   }
 }

@@ -38,20 +38,26 @@ struct CoachDashboardView: View {
 
   var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         header
         ScrollView {
           VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-            if pendingCount > 0 { newStudentCard }
+            if pendingCount > 0 {
+              newStudentCard
+                .meetPRRiseIn(index: 1)
+            }
             statsCard
+              .meetPRRiseIn(index: 2)
             todaySection
+              .meetPRRiseIn(index: 3)
           }
-          .padding(MeetPRSpacing.base)
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+          .padding(.vertical, MeetPRSpacing.point14)
         }
         .scrollContentBackground(.hidden)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $isConversationListPresented) {
         if let chat {
@@ -69,52 +75,57 @@ struct CoachDashboardView: View {
   private var header: some View {
     HStack(alignment: .bottom) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-        Eyebrow(Self.headerEyebrow)
+        Text(Self.headerEyebrow)
+          .font(.MeetPR.mono(size: 12, weight: .medium))
+          .tracking(0.72)
+          .foregroundStyle(Color.MeetPR.textMuted)
         Text("今日")
-          .font(.system(size: 36, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: 38, weight: .extraBold))
+          .tracking(-0.8)
+          .foregroundStyle(Color.MeetPR.textPrimary)
       }
       Spacer()
       CoachChatHeaderButton(chat: chat) {
         isConversationListPresented = true
       }
     }
-    .padding(.horizontal, MeetPRSpacing.base)
+    .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.xs)
     .padding(.bottom, MeetPRSpacing.md)
+    .meetPRRiseIn(index: 0)
   }
 
   // MARK: - New-student request card
 
   private var newStudentCard: some View {
     Button(action: onOpenReceiving) {
-      VStack(alignment: .leading, spacing: 0) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
         HStack(spacing: MeetPRSpacing.sm) {
-          Circle().fill(Color.MeetPR.brandRed).frame(width: 6, height: 6)
+          Circle().fill(Color.MeetPR.danger).frame(width: 7, height: 7)
           Text("新学员请求 // \(String(format: "%02d", pendingCount))")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.textMuted)
         }
         Text("\(pendingCount) 名新学员等待你接收")
-          .font(.system(size: 17, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .padding(.top, MeetPRSpacing.sm)
         Text("查看接收队列 →")
-          .font(.system(size: 14))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .padding(.top, MeetPRSpacing.xs + 2)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       .padding(MeetPRSpacing.base)
-      .background(Color.MeetPR.surface2)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   // MARK: - 3-stat overview
@@ -125,31 +136,32 @@ struct CoachDashboardView: View {
   /// it is substituted with the real 待关注 (triage) count, which IS actionable
   /// from this screen.
   private var statsCard: some View {
-    HStack(spacing: 0) {
-      statColumn(label: "学员", value: activeCount, unit: "活跃", valueColor: Color.MeetPR.fgPrimary)
+    HStack(spacing: MeetPRSpacing.zero) {
+      statColumn(label: "学员", value: activeCount, unit: "活跃", valueColor: Color.MeetPR.textPrimary)
       divider
       statColumn(
         label: "评估期", value: inEvaluationCount, unit: "进行中",
-        valueColor: inEvaluationCount > 0 ? Color.MeetPR.amber : Color.MeetPR.fgPrimary)
+        valueColor: inEvaluationCount > 0 ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary)
       divider
       Button(action: onOpenRoster) {
         statContent(
           label: "待关注", value: attentionCount, unit: "学员",
-          valueColor: attentionCount > 0 ? Color.MeetPR.brandRed : Color.MeetPR.fgPrimary)
+          valueColor: attentionCount > 0 ? Color.MeetPR.danger : Color.MeetPR.textPrimary)
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
     }
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
     }
   }
 
   private var divider: some View {
     Rectangle()
-      .fill(Color.MeetPR.border)
+      .fill(Color.MeetPR.borderDefault)
       .frame(width: 1, height: 48)
       .padding(.horizontal, MeetPRSpacing.md)
   }
@@ -165,14 +177,14 @@ struct CoachDashboardView: View {
       Text(label)
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
       HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.xs) {
         Text("\(value)")
-          .font(.system(size: 36, weight: .heavy).monospacedDigit())
+          .font(.MeetPR.display(size: 30, weight: .extraBold).monospacedDigit())
           .foregroundStyle(valueColor)
         Text(unit)
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -189,7 +201,7 @@ struct CoachDashboardView: View {
       Text("学员 — 今日")
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       todayCard
     }
   }
@@ -199,7 +211,7 @@ struct CoachDashboardView: View {
     if todayRows.isEmpty {
       emptyTodayCard
     } else {
-      VStack(spacing: 0) {
+      VStack(spacing: MeetPRSpacing.zero) {
         ForEach(Array(todayRows.enumerated()), id: \.element.id) { index, row in
           NavigationLink {
             StudentDetailView(
@@ -210,14 +222,15 @@ struct CoachDashboardView: View {
           } label: {
             athleteRow(row, showsTopBorder: index > 0)
           }
-          .buttonStyle(.plain)
+          .buttonStyle(PressScaleButtonStyle())
         }
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
   }
@@ -225,32 +238,33 @@ struct CoachDashboardView: View {
   private var emptyTodayCard: some View {
     HStack(spacing: MeetPRSpacing.md) {
       Image(systemName: "checkmark.circle")
-        .font(.system(size: 20))
-        .foregroundStyle(Color.MeetPR.green)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size20))
+        .foregroundStyle(Color.MeetPR.success)
       Text(rows.isEmpty ? "暂无学员" : "今天没有需要你处理的学员")
-        .font(.system(size: 14))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+        .foregroundStyle(Color.MeetPR.textSecondary)
       Spacer()
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
     }
   }
 
   private func athleteRow(_ row: StudentRosterRowModel, showsTopBorder: Bool) -> some View {
     HStack(spacing: MeetPRSpacing.md) {
       Circle().fill(dotColor(for: row)).frame(width: 9, height: 9)
-      VStack(alignment: .leading, spacing: 3) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
         Text(row.student.displayName)
-          .font(.system(size: 17, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.body(size: 16, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Text(subtitle(for: row))
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textTertiary)
           .lineLimit(1)
       }
       Spacer()
@@ -258,14 +272,14 @@ struct CoachDashboardView: View {
         StatusBadge(status: badge.status, title: badge.title)
       }
       Image(systemName: "chevron.right")
-        .font(.system(size: 15))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.vertical, MeetPRSpacing.base - 2)
     .frame(minHeight: 64)
     .overlay(alignment: .top) {
-      if showsTopBorder { Rectangle().fill(Color.MeetPR.border).frame(height: 1) }
+      if showsTopBorder { Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1) }
     }
   }
 
@@ -294,15 +308,7 @@ struct CoachDashboardView: View {
   /// evaluation, green for an active student in good standing — mirrors the
   /// mock's per-row dot color semantics using REAL triage state.
   private func dotColor(for row: StudentRosterRowModel) -> Color {
-    if row.triageSignals.contains(where: {
-      if case .notTrained = $0 { return true }
-      return false
-    }) {
-      return Color.MeetPR.brandRed
-    }
-    if !row.triageSignals.isEmpty { return Color.MeetPR.amber }
-    if case .inEvaluation = row.student.status { return Color.MeetPR.amber }
-    return Color.MeetPR.green
+    row.statusTone.color
   }
 
   /// Real subtitle: completion progress + a triage hint when present, else the

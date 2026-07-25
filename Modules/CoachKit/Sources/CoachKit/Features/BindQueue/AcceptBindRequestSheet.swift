@@ -24,11 +24,11 @@ struct AcceptBindRequestSheet: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
           Text("确认接收 \(studentName) 为学员?")
             .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
 
           Text("接收后即可为其查看资料、编排训练计划。")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
 
           PrimaryButton("确认接收", isDisabled: isSubmitting, isFullWidth: true) {
             submit()
@@ -36,7 +36,7 @@ struct AcceptBindRequestSheet: View {
         }
         .padding(MeetPRSpacing.base)
       }
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("接收新学员")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

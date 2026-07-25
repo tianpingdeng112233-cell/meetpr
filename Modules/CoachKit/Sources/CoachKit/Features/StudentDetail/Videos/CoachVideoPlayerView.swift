@@ -9,7 +9,7 @@ import SwiftUI
 /// Reskinned to the `DKCoachVideoFeedback` mock's video surface: a pure black
 /// stage with house-token chrome — a circular close control top-left, an
 /// Eyebrow "视频回放 //" tag, and a bordered mono rate capsule top-right. The
-/// expiry-retry overlay is rebuilt as a card surface (Color.MeetPR.surface1 +
+/// expiry-retry overlay is rebuilt as a card surface (Color.MeetPR.surfaceCard +
 /// border, MeetPRRadius.lg). All AVPlayer behavior — playback, rate cycling
 /// via `defaultRate`, the presigned-URL re-exchange on item failure, and the
 /// two failure publishers — is preserved verbatim.
@@ -76,7 +76,7 @@ struct CoachVideoPlayerView: View {
         dismiss()
       } label: {
         Image(systemName: "xmark")
-          .font(.system(size: 16, weight: .bold))
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .bold))
           .foregroundStyle(.white)
           .frame(width: 36, height: 36)
           .background(.ultraThinMaterial, in: Circle())
@@ -93,7 +93,9 @@ struct CoachVideoPlayerView: View {
         cycleRate()
       } label: {
         Text(Self.rateText(rate))
-          .font(.system(size: 14, weight: .semibold, design: .monospaced))
+          .font(
+            .MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold, design: .monospaced)
+          )
           .foregroundStyle(.white)
           .padding(.horizontal, MeetPRSpacing.md)
           .frame(height: 36)
@@ -111,11 +113,11 @@ struct CoachVideoPlayerView: View {
   private var failureCard: some View {
     VStack(spacing: MeetPRSpacing.md) {
       Image(systemName: "exclamationmark.triangle.fill")
-        .font(.system(size: 26))
-        .foregroundStyle(Color.MeetPR.amber)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size26))
+        .foregroundStyle(Color.MeetPR.gold500)
       Text("播放失败，链接可能已过期")
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .multilineTextAlignment(.center)
       Button {
         retrying = true
@@ -129,22 +131,23 @@ struct CoachVideoPlayerView: View {
         }
       } label: {
         Text(retrying ? "刷新中…" : "重试")
-          .font(.system(size: 15, weight: .semibold))
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size15, weight: .semibold))
           .foregroundStyle(.white)
           .frame(maxWidth: .infinity)
           .frame(height: 44)
-          .background(Color.MeetPR.brandRed)
+          .background(Color.MeetPR.gold500)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .disabled(retrying)
     }
     .padding(MeetPRSpacing.lg)
     .frame(maxWidth: 280)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(Color.MeetPR.border, lineWidth: 1)
+      RoundedRectangle(cornerRadius: MeetPRRadius.lg).stroke(
+        Color.MeetPR.borderDefault, lineWidth: 1)
     }
   }
 

@@ -9,11 +9,11 @@ struct RestTimerExplanationView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
       Image(systemName: "timer")
         .font(.largeTitle)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
 
       Text("休息时间会自动匹配")
         .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       explanationRow(
         icon: "gauge.with.dots.needle.33percent",
@@ -24,23 +24,23 @@ struct RestTimerExplanationView: View {
 
       Button("知道了", action: onAcknowledge)
         .buttonStyle(.borderedProminent)
-        .tint(Color.MeetPR.brandRed)
+        .tint(Color.MeetPR.gold500)
         .frame(maxWidth: .infinity)
         .padding(.top, MeetPRSpacing.xs)
     }
     .padding(MeetPRSpacing.lg)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private func explanationRow(icon: String, text: String) -> some View {
     HStack(alignment: .top, spacing: MeetPRSpacing.sm) {
       Image(systemName: icon)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .frame(width: 24)
       Text(text)
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .fixedSize(horizontal: false, vertical: true)
     }
   }

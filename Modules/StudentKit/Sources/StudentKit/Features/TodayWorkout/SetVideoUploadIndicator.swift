@@ -52,13 +52,13 @@ enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
   var strokeColor: Color? {
     switch self {
     case .unattached:
-      Color.MeetPR.fgTertiary
+      Color.MeetPR.textMuted
     case .uploading:
       nil
     case .uploaded:
-      Color.MeetPR.green
+      Color.MeetPR.success
     case .failed:
-      Color.MeetPR.brandRed
+      Color.MeetPR.danger
     }
   }
 
@@ -89,11 +89,11 @@ struct SetVideoUploadIndicator: View {
   var body: some View {
     Group {
       if case .uploading(let progress) = style {
-        glyph(Color.MeetPR.fgTertiary)
+        glyph(Color.MeetPR.textMuted)
           .overlay {
             // Left-to-right sweep: the fgPrimary glyph is revealed across the
             // real part-upload fraction from VideoAttachmentViewModel.
-            glyph(Color.MeetPR.fgPrimary)
+            glyph(Color.MeetPR.textPrimary)
               .mask(alignment: .leading) {
                 GeometryReader { geo in
                   Rectangle().frame(width: geo.size.width * progress)
@@ -101,7 +101,7 @@ struct SetVideoUploadIndicator: View {
               }
           }
       } else {
-        glyph(style.strokeColor ?? Color.MeetPR.fgTertiary)
+        glyph(style.strokeColor ?? Color.MeetPR.textMuted)
       }
     }
     .accessibilityLabel(style.accessibilityLabel)
@@ -109,7 +109,7 @@ struct SetVideoUploadIndicator: View {
 
   private func glyph(_ color: Color) -> some View {
     Image(systemName: "video")
-      .font(.system(size: size))
+      .font(.MeetPR.system(size: size))
       .foregroundStyle(color)
   }
 }

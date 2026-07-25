@@ -41,6 +41,7 @@ public struct DashboardView: View {
   @State private var isUpdatingDayShift = false
   /// Day whose growth curve is shown. `nil` ⇒ today (the default selection).
   @State private var selectedDate: Date?
+  @Environment(\.colorScheme) private var colorScheme
 
   public init(
     studentID: UUID,
@@ -89,42 +90,53 @@ public struct DashboardView: View {
   public var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
           header
 
           if let evaluationSummaryViewModel {
             EvaluationCompletedCard(viewModel: evaluationSummaryViewModel)
-              .padding(.top, 16)
+              .padding(.top, MeetPRSpacing.space4)
+              .meetPRRiseIn(index: 1)
           }
 
           weekProgressBar
-            .padding(.top, 16)
+            .padding(.top, MeetPRSpacing.space4)
+            .meetPRRiseIn(index: 2)
+
+          // Handoff §4.1 order: week strip, coach feedback, weight/meet tiles,
+          // E1RM curve, then the primary CTA closes the screen.
+          weekToggle
+            .padding(.top, MeetPRSpacing.space5)
+          weekGrid
+            .padding(.top, MeetPRSpacing.space2)
+            .meetPRRiseIn(index: 3)
 
           if let feedback = latestFeedback {
             todayFeedbackCard(feedback)
-              .padding(.top, 16)
+              .padding(.top, MeetPRSpacing.space4)
+              .meetPRRiseIn(index: 4)
           }
-
-          weekToggle
-            .padding(.top, 20)
-          weekGrid
-            .padding(.top, 8)
-
-          liftCard
-            .padding(.top, 20)
-
-          startButton
-            .padding(.top, 16)
 
           if let metrics = profileMetricsViewModel.metrics {
             DashboardProfileMetricsView(metrics: metrics)
-              .padding(.top, 20)
+              .padding(.top, MeetPRSpacing.space4)
+              .meetPRRiseIn(index: 5)
           }
+
+          liftCard
+            .padding(.top, MeetPRSpacing.space5)
+            .meetPRRiseIn(index: 6)
+
+          startButton
+            .padding(.top, MeetPRSpacing.space4)
+            .meetPRRiseIn(index: 7)
         }
-        .padding(16)
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.top, MeetPRSpacing.point6)
+        .padding(.bottom, MeetPRSpacing.point28)
       }
       .scrollContentBackground(.hidden)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $showsEvaluationSummary) {
         if let summary = evaluationSummaryViewModel?.summary {
@@ -184,23 +196,49 @@ public struct DashboardView: View {
   // MARK: - Header
 
   private var header: some View {
-    HStack(alignment: .firstTextBaseline) {
-      Text(titleLabel)
-        .font(.system(size: 36, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      Spacer()
-      if let notifications {
-        StudentNotificationBell(coordinator: notifications) {
-          showsNotifications = true
+    VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+      HStack(spacing: MeetPRSpacing.sm) {
+        MeetPRMark(size: 32)
+        Text(Date(), format: .dateTime.month().day().weekday(.wide))
+          .font(.MeetPR.mono(size: 12, weight: .medium))
+          .tracking(0.72)
+          .foregroundStyle(Color.MeetPR.textMuted)
+        Spacer()
+      }
+
+      HStack(alignment: .center) {
+        Text(titleLabel)
+          .font(.MeetPR.display(size: 54, weight: .extraBold))
+          .tracking(-1.4)
+          .foregroundStyle(Color.MeetPR.displayText)
+          // The mockups only cast the display-title shadow on dark; on the
+          // light page it would read as smudged ink.
+          .shadow(
+            color: colorScheme == .dark ? .black.opacity(0.55) : .clear,
+            radius: 2, y: 3
+          )
+        Spacer()
+        if let notifications {
+          StudentNotificationBell(coordinator: notifications) {
+            showsNotifications = true
+          }
         }
       }
     }
+    .meetPRRiseIn(index: 0)
   }
 
   // MARK: - Week progress bar
 
   private var weekProgressBar: some View {
-    ProgressSegments(values: weekProgressValues, spacing: 6)
+    GoldProgressBar(fraction: weekProgressFraction)
+  }
+
+  /// Overall week completion: mean of per-training-day set fractions.
+  private var weekProgressFraction: Double {
+    let values = weekProgressValues
+    guard !values.isEmpty else { return 0 }
+    return values.reduce(0, +) / Double(values.count)
   }
 
   /// One segment per training day in the week (rest days excluded), each filled
@@ -222,39 +260,45 @@ public struct DashboardView: View {
 
   private func todayFeedbackCard(_ item: CoachFeedback) -> some View {
     Button(action: onSeeAllFeedback) {
-      VStack(alignment: .leading, spacing: 0) {
-        HStack(spacing: 8) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+        HStack(spacing: MeetPRSpacing.space2) {
           if item.readAt == nil {
-            Circle().fill(Color.MeetPR.brandRed).frame(width: 7, height: 7)
+            // An inline "new here" marker, not a count badge: the mockups draw
+            // it in gold on both themes.
+            Circle().fill(MeetPRSemanticTone.inProgress.color).frame(width: 7, height: 7)
           }
           Text(feedbackEyebrow(item))
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
         Text(item.text)
-          .font(.system(size: 14))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .multilineTextAlignment(.leading)
           .lineLimit(3)
           .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.top, 10)
+          .padding(.top, MeetPRSpacing.point10)
         Text(feedbackFooter(item))
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .padding(.top, 8)
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .padding(.top, MeetPRSpacing.space2)
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(16)
-      .background(Color.MeetPR.surface2)
-      .clipShape(.rect(cornerRadius: 12))
+      .padding(MeetPRSpacing.space4)
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       .overlay {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1)
+        HStack(spacing: MeetPRSpacing.zero) {
+          Rectangle()
+            .fill(Color.MeetPR.gold500)
+            .frame(width: 3)
+          Spacer(minLength: 0)
+        }
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private func feedbackEyebrow(_ item: CoachFeedback) -> String {
@@ -269,16 +313,16 @@ public struct DashboardView: View {
   // MARK: - Week grid (Mon–Sun, S/B/D)
 
   private var weekToggle: some View {
-    HStack(spacing: 6) {
+    HStack(spacing: MeetPRSpacing.point6) {
       Text("本周")
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
   }
 
   private var weekGrid: some View {
-    HStack(spacing: 6) {
+    HStack(spacing: MeetPRSpacing.point6) {
       ForEach(0..<7, id: \.self) { offset in
         let date = weekday(offset)
         dayCell(offset: offset, date: date, day: planDay(on: date))
@@ -287,46 +331,26 @@ public struct DashboardView: View {
   }
 
   private func dayCell(offset: Int, date: Date, day: StudentPlanDay?) -> some View {
-    let active = Calendar.current.isDate(date, inSameDayAs: effectiveSelectedDate)
-    // All SBD families trained that day (main lifts + variations), ordered S→B→D
-    // so the badge reads "SB" / "SBD" rather than a single lift.
-    let families = day.map(dayFamilies) ?? []
-    let isPast = date < Calendar.current.startOfDay(for: Date())
-    let done =
-      isPast && day != nil
-      && TrainingDayProgress(day: day, logs: weekData?.logs ?? []).state == .complete
-    let liftText = families.isEmpty ? "—" : families.map(liftLetter).joined()
-
-    return Button {
+    MeetPRDayChip(
+      weekday: TodayFormat.weekdayLetter(offset),
+      date: Calendar.current.component(.day, from: date),
+      state: dayChipState(for: date, day: day),
+      isSelected: Calendar.current.isDate(date, inSameDayAs: effectiveSelectedDate)
+    ) {
       selectedDate = date
-    } label: {
-      VStack(alignment: .leading) {
-        Text(TodayFormat.weekdayLetter(offset))
-          .font(.system(size: 11))
-          .foregroundStyle(active ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary)
-        Spacer(minLength: 0)
-        Text(liftText)
-          .font(.system(size: 18, weight: .bold, design: .monospaced))
-          .lineLimit(1)
-          .minimumScaleFactor(0.6)
-          .foregroundStyle(families.isEmpty ? Color.MeetPR.fgTertiary : Color.MeetPR.fgPrimary)
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .aspectRatio(1, contentMode: .fit)
-      .padding(8)
-      .background(active ? Color.MeetPR.surface2 : Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 8))
-      .overlay {
-        RoundedRectangle(cornerRadius: 8)
-          .stroke(active ? Color.MeetPR.fgPrimary : Color.MeetPR.border, lineWidth: 1)
-      }
-      .overlay(alignment: .topTrailing) {
-        if done {
-          CornerTriangle().fill(Color.MeetPR.brandRed).frame(width: 10, height: 10)
-        }
-      }
     }
-    .buttonStyle(.plain)
+  }
+
+  /// Rest days are never "missed": only a planned day without a completed
+  /// session goes red, per the handoff spec's DayChip rule.
+  private func dayChipState(for date: Date, day: StudentPlanDay?) -> MeetPRDayChip.DayState {
+    if Calendar.current.isDateInToday(date) { return .today }
+    guard day != nil else { return .rest }
+    let isPast = date < Calendar.current.startOfDay(for: Date())
+    guard isPast else { return .future }
+    let complete =
+      TrainingDayProgress(day: day, logs: weekData?.logs ?? []).state == .complete
+    return complete ? .done : .missed
   }
 
   // MARK: - Selected-day lift card
@@ -340,25 +364,26 @@ public struct DashboardView: View {
         onboarding: onboarding
       )
     } label: {
-      VStack(alignment: .leading, spacing: 0) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
         liftCardContent
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(16)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
+      .padding(MeetPRSpacing.space4)
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       .overlay {
-        RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
       }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   @ViewBuilder
   private var liftCardContent: some View {
     let rows = selectedTrendRows
     if !rows.isEmpty {
-      VStack(alignment: .leading, spacing: 24) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space6) {
         ForEach(rows) { row in
           liftTrendBlock(row)
         }
@@ -366,17 +391,17 @@ public struct DashboardView: View {
       Text(liftCardFooter())
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-        .padding(.top, 12)
+        .foregroundStyle(Color.MeetPR.textTertiary)
+        .padding(.top, MeetPRSpacing.space3)
     } else {
-      VStack(alignment: .leading, spacing: 8) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
         Text("成长曲线")
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
         Text(selectedFamilies.isEmpty ? "选中训练日查看对应成长曲线" : "练几次就有趋势了")
-          .font(.system(size: 14))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .frame(maxWidth: .infinity, minHeight: 96, alignment: .leading)
       }
     }
@@ -388,28 +413,28 @@ public struct DashboardView: View {
   @ViewBuilder
   private func liftTrendBlock(_ row: DashboardE1RMTrendRow) -> some View {
     let now = Date()
-    VStack(alignment: .leading, spacing: 0) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
       HStack(alignment: .bottom) {
-        VStack(alignment: .leading, spacing: 0) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
           Text("\(row.family.studentDisplayName) E1RM · \(trendPeriodLabel(row, now: now))")
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
-          HStack(alignment: .lastTextBaseline, spacing: 6) {
+            .foregroundStyle(Color.MeetPR.gold500)
+          HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
             Text(StudentFormatting.kilograms(row.displayPoint(now: now)?.e1RMKg ?? 0))
-              .font(.system(size: 44, weight: .heavy).monospacedDigit())
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .font(.MeetPR.display(size: 30, weight: .extraBold).monospacedDigit())
+              .foregroundStyle(Color.MeetPR.textPrimary)
             Text("KG")
-              .font(.system(size: 16, weight: .heavy))
-              .foregroundStyle(Color.MeetPR.brandRed)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .heavy))
+              .foregroundStyle(Color.MeetPR.gold500)
           }
-          .padding(.top, 4)
+          .padding(.top, MeetPRSpacing.space1)
         }
         Spacer()
         if let deltaKg = row.trendDeltaKg {
           let delta = deltaLabel(deltaKg)
           Text(delta.text)
-            .font(.system(size: 13, design: .monospaced))
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size13, design: .monospaced))
             .foregroundStyle(delta.color)
         }
       }
@@ -419,7 +444,7 @@ public struct DashboardView: View {
         showsPointDots: true
       )
       .frame(height: 110)
-      .padding(.top, 12)
+      .padding(.top, MeetPRSpacing.space3)
     }
   }
 
@@ -439,7 +464,7 @@ public struct DashboardView: View {
   @ViewBuilder
   private var startButton: some View {
     let progress = TrainingDayProgress(day: todayDay, logs: weekData?.logs ?? [])
-    VStack(spacing: 8) {
+    VStack(spacing: MeetPRSpacing.space2) {
       startButtonPrimary(progress)
 
       if canShiftPlanDays,
@@ -452,12 +477,15 @@ public struct DashboardView: View {
           proposeShiftToday()
         }
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .frame(maxWidth: .infinity)
         .frame(height: 44)
-        .background(Color.MeetPR.surface1)
-        .clipShape(.rect(cornerRadius: 12))
-        .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+        .overlay {
+          RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+            Color.MeetPR.borderDefault, lineWidth: 1)
+        }
         .disabled(isUpdatingDayShift)
       }
 
@@ -466,11 +494,11 @@ public struct DashboardView: View {
           dayShiftAlert = .confirmCancel(Date())
         }
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
         .frame(maxWidth: .infinity)
         .frame(height: 44)
-        .background(Color.MeetPR.brandRedSoft)
-        .clipShape(.rect(cornerRadius: 12))
+        .background(Color.MeetPR.goldSoft)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
         .disabled(isUpdatingDayShift)
       }
     }
@@ -480,27 +508,29 @@ public struct DashboardView: View {
   private func startButtonPrimary(_ progress: TrainingDayProgress) -> some View {
     switch progress.state {
     case .noPlan:
-      HStack(spacing: 10) {
-        Image(systemName: "bed.double.fill").foregroundStyle(Color.MeetPR.fgSecondary)
-        Text("今日休息").font(Font.MeetPR.bodyEmphasis).foregroundStyle(Color.MeetPR.fgPrimary)
+      HStack(spacing: MeetPRSpacing.point10) {
+        Image(systemName: "bed.double.fill").foregroundStyle(Color.MeetPR.textSecondary)
+        Text("今日休息").font(Font.MeetPR.bodyEmphasis).foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(16)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
-    default:
-      Button(action: onStartWorkout) {
-        Text(startButtonLabel(progress))
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.bg)
-          .frame(maxWidth: .infinity)
-          .frame(height: 50)
-          .background(Color.MeetPR.fgPrimary)
-          .clipShape(.rect(cornerRadius: 12))
+      .padding(MeetPRSpacing.space4)
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+          Color.MeetPR.borderDefault, lineWidth: 1)
       }
-      .buttonStyle(.plain)
+    default:
+      BrandPrimaryButton(
+        startButtonLabel(progress),
+        // Handoff §4.1 fixes the subtitle to the brand line (David 2026-07-26).
+        subtitle: "蹲 · 推 · 拉",
+        systemImage: "play.fill",
+        showsShimmer: true,
+        isFullWidth: true,
+        action: onStartWorkout
+      )
     }
   }
 
@@ -616,7 +646,7 @@ public struct DashboardView: View {
     let sign = kilograms >= 0 ? "+" : "−"
     let color =
       kilograms > 0
-      ? Color.MeetPR.green : (kilograms < 0 ? Color.MeetPR.brandRed : Color.MeetPR.fgSecondary)
+      ? Color.MeetPR.success : (kilograms < 0 ? Color.MeetPR.danger : Color.MeetPR.textSecondary)
     return ("\(sign)\(StudentFormatting.kilograms(abs(kilograms))) KG", color)
   }
 

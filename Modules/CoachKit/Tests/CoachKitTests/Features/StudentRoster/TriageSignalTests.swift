@@ -26,6 +26,22 @@ import Testing
   #expect(signals == [.notTrained(daysMissed: 2)])
 }
 
+@Test func notTrainedRosterStatusUsesDangerTone() {
+  let row = StudentRosterRowModel(
+    student: CoachStudentSummary(
+      id: CoachStudentFeatureFixtures.studentID,
+      displayName: "测试学员",
+      status: .active
+    ),
+    plannedTrainingDays: 3,
+    completedTrainingDays: 0,
+    lastActiveAt: nil,
+    triageSignals: [.notTrained(daysMissed: 2)]
+  )
+
+  #expect(row.statusTone == .notCompleted)
+}
+
 @Test func notTrainedSignalCountsMissesAboveThreshold() {
   let signals = StudentTriageSignalCalculator.signals(
     plan: triagePlan(trainingOffsets: [0, 1, 2]),

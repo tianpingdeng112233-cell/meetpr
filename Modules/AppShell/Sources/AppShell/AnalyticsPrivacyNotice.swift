@@ -7,10 +7,10 @@ struct AnalyticsPrivacyNotice: View {
   let onConfirm: () -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 20) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space5) {
       Text("使用数据说明")
-        .font(.title2.bold())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: 28, weight: .extraBold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Text(
         "为改进训练流程,MeetPR 会收集产品交互、匿名设备标识,以及你主动填写的反馈文本。"
           + "数据仅用于产品功能,留存在境内自建阿里云,不接入第三方统计 SDK、不出境,"
@@ -18,14 +18,12 @@ struct AnalyticsPrivacyNotice: View {
           + "你可通过删除账号或联系我们请求删除。"
       )
       .font(.body)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       Link("隐私政策", destination: Self.privacyPolicyURL)
-      Button("知道了", action: onConfirm)
-        .buttonStyle(.borderedProminent)
-        .frame(maxWidth: .infinity, alignment: .trailing)
+      BrandPrimaryButton("知道了", isFullWidth: true, action: onConfirm)
     }
-    .padding(24)
-    .background(Color.MeetPR.bg)
+    .padding(MeetPRSpacing.space6)
+    .background(Color.MeetPR.bgBase)
     .presentationDetents([.medium])
   }
 

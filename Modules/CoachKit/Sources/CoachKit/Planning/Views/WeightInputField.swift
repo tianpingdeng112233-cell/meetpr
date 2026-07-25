@@ -50,18 +50,18 @@ public struct WeightInputField: View {
           )
           .monospacedDigit()
           .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding(MeetPRSpacing.sm)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
 
           Text(inputUnit.title)
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
       }
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel("编辑重量")
       .sheet(isPresented: $showPanel) {
         WeightEntryPanel(
@@ -77,9 +77,9 @@ public struct WeightInputField: View {
       if inputUnit == .percent, let oneRM {
         Text("= \(displayKg(for: inputValue, oneRM: oneRM)) kg")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       } else if oneRM == nil {
-        Eyebrow("未设 1RM，无法换算 %1RM", color: Color.MeetPR.fgTertiary, showsRule: false)
+        Eyebrow("未设 1RM，无法换算 %1RM", color: Color.MeetPR.textTertiary, showsRule: false)
       }
     }
   }

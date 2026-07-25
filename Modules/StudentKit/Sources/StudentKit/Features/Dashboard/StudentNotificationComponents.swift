@@ -9,20 +9,12 @@ struct StudentNotificationBell: View {
   let action: () -> Void
 
   var body: some View {
-    Button(action: action) {
-      Image(systemName: coordinator.totalUnreadCount > 0 ? "bell.badge" : "bell")
-        .font(.body.bold())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .frame(width: 44, height: 44)
-        .overlay(alignment: .topTrailing) {
-          if coordinator.totalUnreadCount > 0 {
-            StudentUnreadBadge(count: coordinator.totalUnreadCount)
-          }
-        }
-        .contentShape(.rect)
+    HeaderChatButton(
+      unreadCount: coordinator.totalUnreadCount,
+      accessibilityLabel: StudentStrings.notifications
+    ) {
+      action()
     }
-    .buttonStyle(.plain)
-    .accessibilityLabel(StudentStrings.notifications)
     .accessibilityValue(
       coordinator.totalUnreadCount > 0 ? StudentStrings.notificationsUnread : ""
     )
@@ -115,22 +107,22 @@ struct MyCoachCard: View {
 
   var body: some View {
     Button(action: action) {
-      HStack(spacing: 12) {
+      HStack(spacing: MeetPRSpacing.space3) {
         Image(systemName: "person.crop.circle.badge.checkmark")
           .font(.title2)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
           .frame(width: 36)
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
           Text(StudentStrings.myCoach)
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
           Text(coordinator.activeCoach?.coachDisplayName ?? "")
             .font(.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text(coordinator.coachMessagePreview)
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
             .lineLimit(1)
         }
         Spacer(minLength: 8)
@@ -139,12 +131,12 @@ struct MyCoachCard: View {
         }
         Image(systemName: "chevron.right")
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .modifier(DashboardCard())
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
   }
 }
 
@@ -156,9 +148,9 @@ private struct StudentUnreadBadge: View {
     Text(count > 99 ? "99+" : count.formatted())
       .font(.caption2.bold())
       .foregroundStyle(.white)
-      .padding(.horizontal, 5)
+      .padding(.horizontal, MeetPRSpacing.point5)
       .frame(minWidth: 18, minHeight: 18)
-      .background(Color.MeetPR.brandRed, in: .capsule)
+      .background(MeetPRSemanticTone.unread.color, in: .capsule)
       .accessibilityLabel("\(count) \(StudentStrings.unreadSuffix)")
   }
 }

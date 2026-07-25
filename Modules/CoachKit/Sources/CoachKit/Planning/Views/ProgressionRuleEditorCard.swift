@@ -120,7 +120,7 @@ extension ProgressionRuleEditorCard {
   private var exerciseRequiredHint: some View {
     Text("先选择一个应用动作，再设置该动作的递进规则。")
       .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
+      .foregroundStyle(Color.MeetPR.textSecondary)
       .padding(.vertical, MeetPRSpacing.xs)
       .accessibilityIdentifier("progression.rule.exerciseRequiredHint")
   }
@@ -129,7 +129,7 @@ extension ProgressionRuleEditorCard {
     HStack(alignment: .firstTextBaseline) {
       Text("规则 \(rule.displayOrder + 1)")
         .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       if viewModel.isRuleOverridden(rule) {
         StatusBadge(status: .overdue, title: "被覆盖")
@@ -143,7 +143,7 @@ extension ProgressionRuleEditorCard {
         }
       }
       .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.brandRed)
+      .foregroundStyle(Color.MeetPR.gold500)
       .buttonStyle(.borderless)
     }
   }
@@ -161,7 +161,7 @@ extension ProgressionRuleEditorCard {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       Text("增减量")
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
 
       PlanningNumberField(
         value: incrementBinding,
@@ -188,7 +188,7 @@ extension ProgressionRuleEditorCard {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text("W\(week) 值")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
 
           PlanningNumberField(
             value: customValueBinding(index: index),
@@ -207,7 +207,7 @@ extension ProgressionRuleEditorCard {
           persistRule()
         }
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
         .buttonStyle(.borderless)
       }
     }
@@ -236,11 +236,11 @@ extension ProgressionRuleEditorCard {
     @ViewBuilder content: () -> Content
   ) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Eyebrow(title, color: Color.MeetPR.fgTertiary, showsRule: false)
+      Eyebrow(title, color: Color.MeetPR.textTertiary, showsRule: false)
       RuleChipFlow(spacing: MeetPRSpacing.sm) {
         content()
       }
-      .padding(.vertical, 1)
+      .padding(.vertical, MeetPRSpacing.point1)
     }
   }
 
@@ -445,19 +445,20 @@ private struct RuleChip: View {
     Button(action: action) {
       Text(title)
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(isSelected ? Color.MeetPR.bg : Color.MeetPR.fgPrimary)
+        .foregroundStyle(isSelected ? Color.MeetPR.bgBase : Color.MeetPR.textPrimary)
         .lineLimit(1)
         .padding(.horizontal, MeetPRSpacing.md)
         .padding(.vertical, MeetPRSpacing.sm)
-        .background(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
+        .background(isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.surfaceElevated)
         .overlay {
           Capsule()
-            .stroke(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.border, lineWidth: 1)
+            .stroke(
+              isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.borderDefault, lineWidth: 1)
         }
         .clipShape(.capsule)
         .opacity(isDisabled ? 0.35 : 1)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(isDisabled)
     .accessibilityLabel(title)
   }

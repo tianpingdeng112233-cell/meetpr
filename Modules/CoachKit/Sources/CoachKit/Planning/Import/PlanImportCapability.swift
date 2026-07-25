@@ -9,6 +9,7 @@ import Foundation
 //
 // This is a real gate, not advisory: when `false`, `ImportEntryButton` renders
 // greyed-out and inert, so the flow cannot be reached.
+@MainActor
 enum PlanImportCapability {
   /// `false` while in-app import is frozen in favour of the web editor. Flip to
   /// `true` to re-enable the full flow; override in previews/tests as needed.

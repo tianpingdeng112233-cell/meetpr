@@ -1,3 +1,4 @@
+import DesignSystem
 import Foundation
 import Observation
 import SwiftUI
@@ -171,7 +172,7 @@ private struct FrictionFeedbackSheet: View {
   @State private var text = ""
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space4) {
       Text("卡住了?一句话告诉我们")
         .font(.headline)
       TextField("哪里让你不顺手?", text: $text, axis: .vertical)

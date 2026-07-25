@@ -33,25 +33,25 @@ struct PlateMathSheet: View {
     }
     .padding(MeetPRSpacing.md)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private func header(_ loadout: PlateMathCalculator.Loadout) -> some View {
     HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
       Text("\(StudentFormatting.kilograms(loadout.achievedKg)) kg")
         .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       Text("杠 \(StudentFormatting.kilograms(PlateMathCalculator.barWeightKg)) kg")
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
   }
 
   private func plateVisualization(_ loadout: PlateMathCalculator.Loadout) -> some View {
-    HStack(alignment: .center, spacing: 3) {
+    HStack(alignment: .center, spacing: MeetPRSpacing.point3) {
       // Bar stub
-      RoundedRectangle(cornerRadius: 2)
-        .fill(Color.MeetPR.fgTertiary)
+      RoundedRectangle(cornerRadius: MeetPRRadius.point2)
+        .fill(Color.MeetPR.textTertiary)
         .frame(width: 44, height: 8)
 
       ForEach(Array(loadout.platesPerSideKg.enumerated()), id: \.offset) { _, plate in
@@ -61,7 +61,7 @@ struct PlateMathSheet: View {
       if loadout.platesPerSideKg.isEmpty {
         Text("空杠")
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -72,12 +72,12 @@ struct PlateMathSheet: View {
 
   private func plateView(_ denomination: Double) -> some View {
     let style = Self.plateStyle(denomination)
-    return RoundedRectangle(cornerRadius: 3)
+    return RoundedRectangle(cornerRadius: MeetPRRadius.point3)
       .fill(style.color)
       .frame(width: 14, height: style.height)
       .overlay(
-        RoundedRectangle(cornerRadius: 3)
-          .strokeBorder(style.needsBorder ? Color.MeetPR.border : .clear, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.point3)
+          .strokeBorder(style.needsBorder ? Color.MeetPR.borderDefault : .clear, lineWidth: 1)
       )
   }
 
@@ -88,7 +88,7 @@ struct PlateMathSheet: View {
     }
     return Text(parts.isEmpty ? "每边：无（空杠）" : "每边：\(parts.joined(separator: " · "))")
       .font(Font.MeetPR.body)
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .foregroundStyle(Color.MeetPR.textPrimary)
       // 多片组合排版不乱 (P2-10): 片数多时让文案纵向换行,别横向截断。
       .fixedSize(horizontal: false, vertical: true)
       .frame(maxWidth: .infinity, alignment: .leading)
@@ -102,7 +102,7 @@ struct PlateMathSheet: View {
       systemImage: "info.circle"
     )
     .font(Font.MeetPR.footnote)
-    .foregroundStyle(Color.MeetPR.amber)
+    .foregroundStyle(Color.MeetPR.gold500)
   }
 
   private func accessibilitySummary(_ loadout: PlateMathCalculator.Loadout) -> String {
@@ -128,13 +128,13 @@ struct PlateMathSheet: View {
   private static func plateStyle(_ denomination: Double) -> PlateStyle {
     switch denomination {
     case 25:
-      PlateStyle(color: Color(red: 0.85, green: 0.15, blue: 0.15), height: 64, needsBorder: false)
+      PlateStyle(color: Color.MeetPR.plate25, height: 64, needsBorder: false)
     case 20:
-      PlateStyle(color: Color(red: 0.15, green: 0.3, blue: 0.8), height: 60, needsBorder: false)
+      PlateStyle(color: Color.MeetPR.plate20, height: 60, needsBorder: false)
     case 15:
-      PlateStyle(color: Color(red: 0.95, green: 0.8, blue: 0.1), height: 54, needsBorder: false)
+      PlateStyle(color: Color.MeetPR.plate15, height: 54, needsBorder: false)
     case 10:
-      PlateStyle(color: Color(red: 0.15, green: 0.6, blue: 0.3), height: 46, needsBorder: false)
+      PlateStyle(color: Color.MeetPR.plate10, height: 46, needsBorder: false)
     case 5: PlateStyle(color: .white, height: 36, needsBorder: true)
     case 2.5: PlateStyle(color: .black, height: 28, needsBorder: true)
     default: PlateStyle(color: Color(white: 0.75), height: 22, needsBorder: false)  // 1.25 silver

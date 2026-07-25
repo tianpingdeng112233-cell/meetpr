@@ -18,16 +18,16 @@ struct DashboardSection<Content: View>: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
       HStack {
         Text(title)
           .font(.title3.bold())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         if let action {
           Spacer()
           Button(action.label, action: action.handler)
             .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
       }
       content
@@ -39,13 +39,13 @@ struct DashboardSection<Content: View>: View {
 struct DashboardCard: ViewModifier {
   func body(content: Content) -> some View {
     content
-      .padding(14)
+      .padding(MeetPRSpacing.point14)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .overlay {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
-      .clipShape(.rect(cornerRadius: 12))
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
 }

@@ -33,10 +33,10 @@ struct EnterCodeView: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Text("输入教练邀请码")
             .font(Font.MeetPR.title1)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("没有教练?请向你的教练索取邀请码")
             .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
         }
 
         codeField
@@ -51,11 +51,12 @@ struct EnterCodeView: View {
         if viewModel.showsNetworkBanner {
           Text("网络异常,请重试")
             .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
 
-        PrimaryButton(
+        BrandPrimaryButton(
           "提交",
+          showsShimmer: true,
           isDisabled: !viewModel.isSubmittable,
           isLoading: viewModel.isSubmitting,
           isFullWidth: true
@@ -70,7 +71,7 @@ struct EnterCodeView: View {
       .padding(MeetPRSpacing.base)
     }
     .scrollContentBackground(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .onAppear {
       Analytics.shared.screen(.bindEnterCode)
       Analytics.shared.bindCoachAction(.inviteOpen)
@@ -96,7 +97,7 @@ struct EnterCodeView: View {
       if let grouped = viewModel.groupedCodePreview {
         Text(grouped)
           .font(Font.MeetPR.monoLabel)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
     }
   }
@@ -104,10 +105,10 @@ struct EnterCodeView: View {
   private func noticeBanner(_ notice: BindNotice) -> some View {
     Text(notice.message)
       .font(Font.MeetPR.body)
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .foregroundStyle(Color.MeetPR.textPrimary)
       .padding(MeetPRSpacing.md)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface2)
+      .background(Color.MeetPR.surfaceElevated)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
 }

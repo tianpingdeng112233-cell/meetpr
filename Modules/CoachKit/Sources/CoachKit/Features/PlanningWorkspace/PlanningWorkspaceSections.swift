@@ -61,7 +61,7 @@ struct PlanningRecentPublishedSection: View {
         } label: {
           PlanningWorkspacePublishedRow(row: row)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
       }
     }
   }
@@ -131,7 +131,7 @@ private struct PlanningWorkspaceActionRow: View {
       HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
         Text(title)
           .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
 
         StatusBadge(status: badge.status, title: badge.title)
@@ -139,7 +139,7 @@ private struct PlanningWorkspaceActionRow: View {
 
       Text(summary)
         .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .lineLimit(2)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -163,7 +163,7 @@ private struct PlanningWorkspacePublishedRow: View {
           HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
             Text(row.student.displayName)
               .font(Font.MeetPR.bodyEmphasis)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
+              .foregroundStyle(Color.MeetPR.textPrimary)
               .lineLimit(1)
 
             StatusBadge(status: .completed, title: "已发布")
@@ -171,7 +171,7 @@ private struct PlanningWorkspacePublishedRow: View {
 
           Text("\(row.summary) · \(dateText)发")
             .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .foregroundStyle(Color.MeetPR.textSecondary)
             .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -196,13 +196,13 @@ private struct PlanningWorkspaceActionPill: View {
     HStack(spacing: MeetPRSpacing.xs) {
       Text(title)
       Image(systemName: "chevron.right")
-        .font(.system(size: 12, weight: .semibold))
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size12, weight: .semibold))
     }
     .font(Font.MeetPR.bodyEmphasis)
     .foregroundStyle(.white)
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.vertical, MeetPRSpacing.sm)
-    .background(Color.MeetPR.brandRed)
+    .background(Color.MeetPR.gold500)
     .clipShape(.capsule)
   }
 }
