@@ -41,6 +41,8 @@ public struct DashboardView: View {
   @State private var isUpdatingDayShift = false
   /// Day whose growth curve is shown. `nil` ⇒ today (the default selection).
   @State private var selectedDate: Date?
+  /// Manual E1RM-card lift pick; `nil` follows the selected day.
+  @State private var liftOverride: LiftFamily?
   @Environment(\.colorScheme) private var colorScheme
 
   public init(
@@ -383,6 +385,10 @@ public struct DashboardView: View {
   private var liftCardContent: some View {
     let rows = selectedTrendRows
     if !rows.isEmpty {
+      if switchableFamilies.count > 1 {
+        liftSwitcher
+          .padding(.bottom, MeetPRSpacing.space3)
+      }
       VStack(alignment: .leading, spacing: MeetPRSpacing.space6) {
         ForEach(rows) { row in
           liftTrendBlock(row)
@@ -599,9 +605,52 @@ public struct DashboardView: View {
   /// Selected-day families that actually have e1RM history to plot, in S→B→D
   /// order — the lift card renders one curve block per row.
   private var selectedTrendRows: [DashboardE1RMTrendRow] {
-    selectedFamilies.compactMap { family in
+    // Handoff §4.1: the E1RM card is switchable between the three lifts. A
+    // manual pick wins; otherwise it follows the selected day's lifts.
+    if let liftOverride, let row = trendRow(for: liftOverride), !row.points.isEmpty {
+      return [row]
+    }
+    return selectedFamilies.compactMap { family in
       guard let row = trendRow(for: family), !row.points.isEmpty else { return nil }
       return row
+    }
+  }
+
+  /// Lift families that have any trend data, in S/B/D order — the switcher row.
+  private var switchableFamilies: [LiftFamily] {
+    MainLiftExerciseFamilyResolver.dashboardFamilies.filter { family in
+      guard let row = trendRow(for: family) else { return false }
+      return !row.points.isEmpty
+    }
+  }
+
+  private var liftSwitcher: some View {
+    HStack(spacing: MeetPRSpacing.space2) {
+      ForEach(switchableFamilies, id: \.self) { family in
+        let active =
+          liftOverride == family
+          || (liftOverride == nil && selectedTrendRows.first?.family == family)
+        Button {
+          liftOverride = family
+        } label: {
+          Text(family.studentDisplayName)
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+            .foregroundStyle(active ? Color.MeetPR.gold500 : Color.MeetPR.textFaint)
+            .padding(.horizontal, MeetPRSpacing.space3)
+            .padding(.vertical, MeetPRSpacing.point5)
+            .background(active ? Color.MeetPR.goldSoft : Color.MeetPR.surfaceKey)
+            .clipShape(Capsule())
+            .overlay {
+              if active {
+                Capsule().stroke(Color.MeetPR.gold500.opacity(0.5), lineWidth: 1)
+              }
+            }
+            // Keep the small pill tappable at the 44pt minimum.
+            .contentShape(Rectangle().inset(by: -8))
+        }
+        .buttonStyle(PressScaleButtonStyle())
+      }
+      Spacer()
     }
   }
 
