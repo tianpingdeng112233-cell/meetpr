@@ -29,6 +29,9 @@ public struct TodayWorkoutView: View {
   @State private var showingSummary = false
   /// Two-state flow (§4.2): false = overview (state A), true = recording (B).
   @State private var sessionStarted = false
+  /// Hero inline editing: which value the number pad edits (§4.2 recording).
+  @State private var heroNumberPad: MeetPRNumberPad.Field?
+  @State private var heroPadTarget: (rowIndex: Int, draftID: UUID)?
   @State private var editing: EditingTarget?
   @State private var directCameraTarget: DirectCameraTarget?
   @State private var showingDirectCameraConsent = false
@@ -363,6 +366,14 @@ public struct TodayWorkoutView: View {
     }
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bgBase)
+    .sheet(
+      isPresented: Binding(
+        get: { heroNumberPad != nil },
+        set: { if !$0 { heroNumberPad = nil } }
+      )
+    ) {
+      heroNumberPadSheet
+    }
     .sheet(item: $editing) { target in
       SetEntrySheet(
         rowIndex: target.rowIndex,
@@ -446,6 +457,33 @@ public struct TodayWorkoutView: View {
       setCount: setCount,
       durationMilliseconds: max(0, Int(Date().timeIntervalSince(startedAt) * 1_000)))
     workoutStartedAt.wrappedValue = nil
+  }
+
+  @ViewBuilder
+  private var heroNumberPadSheet: some View {
+    if let field = heroNumberPad, let target = heroPadTarget,
+      let draft = viewModel.currentDrafts?.first(where: { $0.id == target.draftID })
+    {
+      MeetPRNumberPad(
+        field: field,
+        value: field == .weight
+          ? ((draft.actualWeight ?? draft.prescribed.weightKg ?? 0) as NSDecimalNumber)
+            .doubleValue
+          : Double(draft.actualReps ?? draft.prescribed.reps ?? 0),
+        onCommit: { snapped in
+          switch field {
+          case .weight:
+            viewModel.updateWeight(rowIndex: target.rowIndex, weight: Decimal(snapped))
+          case .reps:
+            viewModel.updateReps(rowIndex: target.rowIndex, reps: Int(snapped))
+          }
+          heroNumberPad = nil
+        },
+        onCancel: { heroNumberPad = nil }
+      )
+      .presentationDetents([.height(430)])
+      .presentationDragIndicator(.visible)
+    }
   }
 
   /// State B: the active-set hero plus per-exercise tables. Freshly revealed
@@ -597,26 +635,20 @@ public struct TodayWorkoutView: View {
           .foregroundStyle(Color.MeetPR.textSecondary)
       }
 
-      heroTargetRow(draft: draft)
-        .padding(.top, MeetPRSpacing.space3)
+      if isEditable {
+        heroEditableTargetRow(draft: draft, rowIndex: rowIndex)
+          .padding(.top, MeetPRSpacing.space3)
+      } else {
+        heroTargetRow(draft: draft)
+          .padding(.top, MeetPRSpacing.space3)
+      }
 
       if let exerciseNote {
         CoachNotePill(note: exerciseNote)
           .padding(.top, MeetPRSpacing.point10)
       }
 
-      Text("RPE")
-        .font(Font.MeetPR.monoLabel)
-        .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.gold500)
-        .padding(.top, MeetPRSpacing.space4)
-      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.space2) {
-        Text(StudentFormatting.decimal(currentRPE(draft)))
-          .font(.MeetPR.display(size: 20, weight: .extraBold).monospacedDigit())
-          .foregroundStyle(Color.MeetPR.textPrimary)
-        Text("/ 10").font(.MeetPR.system(size: MeetPRFontMetrics.size12)).foregroundStyle(
-          Color.MeetPR.textTertiary)
-      }
+      heroRPEBlock(draft: draft, rowIndex: rowIndex, isEditable: isEditable)
 
       if isEditable {
         recordActions(draft: draft, rowIndex: rowIndex, setNumber: setNumber)
@@ -635,6 +667,141 @@ public struct TodayWorkoutView: View {
       .frame(width: 3)
     }
     .meetPRGoldGlow()
+  }
+
+  @ViewBuilder
+  private func heroRPEBlock(
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, isEditable: Bool
+  ) -> some View {
+    HStack(alignment: .lastTextBaseline) {
+      Text("RPE")
+        .font(Font.MeetPR.monoLabel)
+        .tracking(Font.MeetPR.monoLabelTracking)
+        .foregroundStyle(Color.MeetPR.gold500)
+      Spacer()
+      if isEditable {
+        Text("5–10 · 0.5")
+          .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size10))
+          .foregroundStyle(Color.MeetPR.textFaint)
+      }
+    }
+    .padding(.top, MeetPRSpacing.space4)
+    if isEditable {
+      heroStepperRow(
+        value: StudentFormatting.decimal(currentRPE(draft)),
+        suffix: "/ 10",
+        onDec: {
+          viewModel.updateRPE(rowIndex: rowIndex, rpe: max(5, currentRPE(draft) - 0.5))
+        },
+        onInc: {
+          viewModel.updateRPE(rowIndex: rowIndex, rpe: min(10, currentRPE(draft) + 0.5))
+        },
+        onTapValue: nil
+      )
+    } else {
+      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.space2) {
+        Text(StudentFormatting.decimal(currentRPE(draft)))
+          .font(.MeetPR.display(size: 20, weight: .extraBold).monospacedDigit())
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text("/ 10").font(.MeetPR.system(size: MeetPRFontMetrics.size12)).foregroundStyle(
+          Color.MeetPR.textTertiary)
+      }
+    }
+  }
+
+  /// §4.2 recording surface: weight and reps edit in place — ± steppers plus
+  /// a tap-to-type value that opens the number pad. Writes go straight to the
+  /// view model; the draft is the single source of truth.
+  private func heroEditableTargetRow(
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int
+  ) -> some View {
+    VStack(spacing: MeetPRSpacing.space2) {
+      heroStepperRow(
+        value: weightText(draft),
+        suffix: "KG · ±2.5",
+        onDec: {
+          let current = draft.actualWeight ?? draft.prescribed.weightKg ?? 0
+          viewModel.updateWeight(rowIndex: rowIndex, weight: max(0, current - 2.5))
+        },
+        onInc: {
+          let current = draft.actualWeight ?? draft.prescribed.weightKg ?? 0
+          viewModel.updateWeight(rowIndex: rowIndex, weight: current + 2.5)
+        },
+        onTapValue: {
+          heroPadTarget = (rowIndex, draft.id)
+          heroNumberPad = .weight
+        }
+      )
+      heroStepperRow(
+        value: targetRepsText(draft),
+        suffix: "次 · ±1",
+        onDec: {
+          let current = draft.actualReps ?? draft.prescribed.reps ?? 0
+          viewModel.updateReps(rowIndex: rowIndex, reps: max(0, current - 1))
+        },
+        onInc: {
+          let current = draft.actualReps ?? draft.prescribed.reps ?? 0
+          viewModel.updateReps(rowIndex: rowIndex, reps: current + 1)
+        },
+        onTapValue: {
+          heroPadTarget = (rowIndex, draft.id)
+          heroNumberPad = .reps
+        }
+      )
+    }
+  }
+
+  private func heroStepperRow(
+    value: String,
+    suffix: String,
+    onDec: @escaping () -> Void,
+    onInc: @escaping () -> Void,
+    onTapValue: (() -> Void)?
+  ) -> some View {
+    HStack(spacing: MeetPRSpacing.space3) {
+      heroStepButton("minus", action: onDec)
+      Group {
+        if let onTapValue {
+          Button(action: onTapValue) {
+            heroStepperValue(value: value, suffix: suffix)
+          }
+          .buttonStyle(PressScaleButtonStyle())
+        } else {
+          heroStepperValue(value: value, suffix: suffix)
+        }
+      }
+      heroStepButton("plus", action: onInc)
+    }
+  }
+
+  private func heroStepperValue(value: String, suffix: String) -> some View {
+    HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
+      Text(value)
+        .font(.MeetPR.display(size: 34, weight: .extraBold).monospacedDigit())
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text(suffix)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textMuted)
+    }
+    .frame(maxWidth: .infinity, minHeight: 48)
+    .background(Color.MeetPR.surfaceRaised)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    .contentShape(Rectangle())
+  }
+
+  private func heroStepButton(_ symbol: String, action: @escaping () -> Void) -> some View {
+    Button(action: action) {
+      Image(systemName: symbol)
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.gold500)
+        .frame(width: 44, height: 44)
+        .background(Color.MeetPR.goldSoft)
+        .clipShape(.circle)
+        .overlay {
+          Circle().stroke(Color.MeetPR.gold500.opacity(0.4), lineWidth: 1)
+        }
+    }
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private func heroTargetRow(draft: TodayWorkoutViewModel.SetRowDraft) -> some View {
@@ -663,7 +830,77 @@ public struct TodayWorkoutView: View {
   private func recordActions(
     draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, setNumber: Int
   ) -> some View {
-    HStack(spacing: MeetPRSpacing.space2) {
+    VStack(spacing: MeetPRSpacing.space2) {
+      HStack(spacing: MeetPRSpacing.space2) {
+        Button {
+          // Values are already in the draft (steppers/number pad write through),
+          // so recording commits in place — no detour through a sheet (§4.2).
+          Task { _ = await viewModel.commitSet(rowIndex: rowIndex, failed: false) }
+        } label: {
+          Text("记录此组")
+            .font(.MeetPR.body(size: 15, weight: .bold))
+            .foregroundStyle(Color.MeetPR.ctaText)
+            .frame(maxWidth: .infinity)
+            .frame(height: 48)
+            .background(Color.MeetPR.ctaBackground)
+            .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
+        }
+        .buttonStyle(PressScaleButtonStyle())
+
+        Button {
+          switch SetVideoButtonDestination.resolve(
+            for: videoRowState(for: draft)?.attachment.status,
+            cameraAvailable: cameraAvailable
+          ) {
+          case .camera:
+            beginDirectCamera(for: draft)
+          case .details:
+            editing = EditingTarget(
+              id: draft.id,
+              rowIndex: rowIndex,
+              draft: draft,
+              setNumber: setNumber,
+              scrollToVideo: true)
+          case .retry:
+            // A failed upload routes straight to retry: the set already cost the
+            // student real fatigue and can't be re-done, so the recording must
+            // never be one buried menu away (David, beta 2026-07-11).
+            retryTargetSetLogID = draft.loggedSetID
+          }
+        } label: {
+          SetVideoUploadIndicator(
+            status: videoIndicatorStatus(for: draft),
+            progress: videoRowState(for: draft)?.progress ?? 0,
+            size: 20
+          )
+          .frame(width: 56, height: 48)
+          .overlay {
+            RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
+              Color.MeetPR.borderDefault, lineWidth: 1)
+          }
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        .disabled(preparingVideoSetID == draft.id)
+      }
+
+      secondaryRecordActions(draft: draft, rowIndex: rowIndex, setNumber: setNumber)
+    }
+  }
+
+  private func secondaryRecordActions(
+    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, setNumber: Int
+  ) -> some View {
+    HStack(spacing: MeetPRSpacing.space4) {
+      Button {
+        Task { _ = await viewModel.commitSet(rowIndex: rowIndex, failed: true) }
+      } label: {
+        Label("未完成 / 失败", systemImage: "xmark")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.danger)
+          .frame(minHeight: 44)
+      }
+      .buttonStyle(PressScaleButtonStyle())
+      Spacer()
       Button {
         editing = EditingTarget(
           id: draft.id,
@@ -672,50 +909,12 @@ public struct TodayWorkoutView: View {
           setNumber: setNumber,
           scrollToVideo: false)
       } label: {
-        Text("记录此组")
-          .font(.MeetPR.body(size: 15, weight: .bold))
-          .foregroundStyle(Color.MeetPR.ctaText)
-          .frame(maxWidth: .infinity)
-          .frame(height: 48)
-          .background(Color.MeetPR.ctaBackground)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
+        Label("配片 · 详情", systemImage: "slider.horizontal.3")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .frame(minHeight: 44)
       }
       .buttonStyle(PressScaleButtonStyle())
-
-      Button {
-        switch SetVideoButtonDestination.resolve(
-          for: videoRowState(for: draft)?.attachment.status,
-          cameraAvailable: cameraAvailable
-        ) {
-        case .camera:
-          beginDirectCamera(for: draft)
-        case .details:
-          editing = EditingTarget(
-            id: draft.id,
-            rowIndex: rowIndex,
-            draft: draft,
-            setNumber: setNumber,
-            scrollToVideo: true)
-        case .retry:
-          // A failed upload routes straight to retry: the set already cost the
-          // student real fatigue and can't be re-done, so the recording must
-          // never be one buried menu away (David, beta 2026-07-11).
-          retryTargetSetLogID = draft.loggedSetID
-        }
-      } label: {
-        SetVideoUploadIndicator(
-          status: videoIndicatorStatus(for: draft),
-          progress: videoRowState(for: draft)?.progress ?? 0,
-          size: 20
-        )
-        .frame(width: 56, height: 48)
-        .overlay {
-          RoundedRectangle(cornerRadius: MeetPRRadius.control).stroke(
-            Color.MeetPR.borderDefault, lineWidth: 1)
-        }
-      }
-      .buttonStyle(PressScaleButtonStyle())
-      .disabled(preparingVideoSetID == draft.id)
     }
   }
 
@@ -822,8 +1021,10 @@ public struct TodayWorkoutView: View {
       .allowsHitTesting(!isCollapsed)
 
       if isCollapsed {
-        collapsedExercisePill(exercise: exercise, completedSetCount: rows.count)
-          .meetPRPillRiseIn()
+        collapsedExercisePill(
+          exercise: exercise, completedSetCount: rows.count, rows: rows
+        )
+        .meetPRPillRiseIn()
       }
     }
     .frame(maxHeight: isCollapsed ? 48 : nil, alignment: .top)
@@ -835,9 +1036,28 @@ public struct TodayWorkoutView: View {
     }
   }
 
+  /// Mockup copy: "3 组 · 175kg×3 @8.5" — set count plus the top set.
+  private func collapsedSummaryText(
+    completedSetCount: Int, rows: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> String {
+    let top = rows.max { lhs, rhs in
+      (lhs.actualWeight ?? 0) < (rhs.actualWeight ?? 0)
+    }
+    guard let top, let weight = top.actualWeight ?? top.prescribed.weightKg else {
+      return "\(completedSetCount) 组"
+    }
+    var text = "\(completedSetCount) 组 · \(StudentFormatting.decimal(weight))kg"
+    if let reps = top.actualReps ?? top.prescribed.reps { text += "×\(reps)" }
+    if let rpe = top.actualRPE ?? top.prescribed.rpe {
+      text += " @\(StudentFormatting.decimal(rpe))"
+    }
+    return text
+  }
+
   private func collapsedExercisePill(
     exercise: StudentPlanExercise,
-    completedSetCount: Int
+    completedSetCount: Int,
+    rows: [TodayWorkoutViewModel.SetRowDraft]
   ) -> some View {
     Button {
       expandedCompletedExerciseIDs.insert(exercise.id)
@@ -856,7 +1076,7 @@ public struct TodayWorkoutView: View {
 
         Spacer(minLength: MeetPRSpacing.space2)
 
-        Text("\(completedSetCount) 组完成")
+        Text(collapsedSummaryText(completedSetCount: completedSetCount, rows: rows))
           .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size11))
           .foregroundStyle(Color.MeetPR.textFaint)
 

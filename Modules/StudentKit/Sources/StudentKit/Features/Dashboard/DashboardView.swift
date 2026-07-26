@@ -694,15 +694,19 @@ public struct DashboardView: View {
   /// Selected-day families that actually have e1RM history to plot, in S→B→D
   /// order — the lift card renders one curve block per row.
   private var selectedTrendRows: [DashboardE1RMTrendRow] {
-    // Handoff §4.1: the E1RM card is switchable between the three lifts. A
-    // manual pick wins; otherwise it follows the selected day's lifts.
+    // Handoff §4.1: the switcher shows exactly one lift at a time. A manual
+    // pick wins; otherwise the selected day's first lift with data.
     if let liftOverride, let row = trendRow(for: liftOverride), !row.points.isEmpty {
       return [row]
     }
-    return selectedFamilies.compactMap { family in
+    let dayRows = selectedFamilies.compactMap { family -> DashboardE1RMTrendRow? in
       guard let row = trendRow(for: family), !row.points.isEmpty else { return nil }
       return row
     }
+    if let first = dayRows.first { return [first] }
+    // Rest day / no data for the day's lifts: fall back to the first lift
+    // with any history so the card never sits empty.
+    return switchableFamilies.first.flatMap { trendRow(for: $0) }.map { [$0] } ?? []
   }
 
   /// Lift families that have any trend data, in S/B/D order — the switcher row.

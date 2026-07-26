@@ -51,11 +51,8 @@ struct SessionSummaryView: View {
             streakCurrent: streakCurrent
           )
           .frame(maxWidth: .infinity)
+          .padding(.top, MeetPRSpacing.space2)
           .meetPRRiseIn(index: 0)
-          SummarySection(title: "总览") {
-            SummaryOverviewGrid(summary: summary)
-          }
-          .meetPRRiseIn(index: 1)
           if !summary.exercises.isEmpty {
             SummarySection(title: "动作表现") {
               SummaryPerformanceList(exercises: summary.exercises)

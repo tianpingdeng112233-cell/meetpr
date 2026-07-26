@@ -24,19 +24,26 @@ struct DashboardProfileMetricsView: View {
         )
       }
     } else if let bodyWeightText = metrics.bodyWeightText {
-      DashboardMetricCard(
-        systemImage: "scalemass",
-        title: "体重",
-        value: bodyWeightText,
-        caption: "资料档案"
-      )
+      // Keep the mockup's two-column rhythm even with a single tile.
+      HStack(alignment: .top, spacing: MeetPRSpacing.space3) {
+        DashboardMetricCard(
+          systemImage: "scalemass",
+          title: "体重",
+          value: bodyWeightText,
+          caption: "资料档案"
+        )
+        Color.clear.frame(maxWidth: .infinity, minHeight: 1)
+      }
     } else if let competition = metrics.competition {
-      DashboardMetricCard(
-        systemImage: "flag.checkered",
-        title: "距比赛",
-        value: "\(competition.days) 天",
-        caption: competition.dateText
-      )
+      HStack(alignment: .top, spacing: MeetPRSpacing.space3) {
+        DashboardMetricCard(
+          systemImage: "flag.checkered",
+          title: "距比赛",
+          value: "\(competition.days) 天",
+          caption: competition.dateText
+        )
+        Color.clear.frame(maxWidth: .infinity, minHeight: 1)
+      }
     }
   }
 }
