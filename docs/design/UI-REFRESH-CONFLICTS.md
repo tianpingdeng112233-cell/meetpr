@@ -124,3 +124,6 @@
 - 离线优先记组:确认要做;定位=UI 主线 PR 之后的独立收尾子轮(独立互审+PR)。
 - token 正典=handoff-v2/tokens.css+README 表;包内矛盾 --gold-cta 暗色(README #FFC53D vs tokens.css #FFB800)按 tokens.css=#FFB800 执行,待设计师澄清。
 - 旧 meetpr-design-skill/ 已被 handoff-v2 取代(设计师明示),仅存档。
+
+## 终验走查发现（待返修轮处理）
+- W-01: 训练页在「全部组已完成 + App 重启」的残留态下,动作卡区域渲染为空(仅剩长按完成钮)。亮色 demo 复现;疑与两态改造后 exerciseSections 的显隐条件或 rise-in 初始态相关。互审轮请重点看 TodayWorkoutView.recordingContent / exerciseTableCard 的 allCompleted 分支。
