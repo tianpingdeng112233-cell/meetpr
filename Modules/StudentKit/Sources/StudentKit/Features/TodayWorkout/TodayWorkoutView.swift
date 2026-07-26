@@ -132,6 +132,7 @@ public struct TodayWorkoutView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
       .background(Color.MeetPR.bgBase)
+      .meetPRHideSystemTabBar()
       .navigationTitle("")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

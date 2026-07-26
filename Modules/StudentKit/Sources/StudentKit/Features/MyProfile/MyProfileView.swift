@@ -106,6 +106,7 @@ public struct MyProfileView: View {
           onOpenEvaluation: onOpenEvaluationNotification
         )
       )
+      .meetPRHideSystemTabBar()
     }
     .task { await viewModel.loadIfNeeded() }
   }

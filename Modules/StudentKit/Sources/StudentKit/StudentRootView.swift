@@ -32,6 +32,10 @@ public struct StudentRootView: View {
   /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
+  /// Gold-curtain transition phase for 开始训练 → 训练 (§6).
+  @State private var curtainPhase: MeetPRGoldCurtain.Phase = .hidden
+  @State private var curtainLabel = ""
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var planRevision = 0
   @State private var nextWorkoutSource: WorkoutSource?
   @State private var workoutStartedAt: Date?
@@ -177,7 +181,7 @@ public struct StudentRootView: View {
 
 extension StudentRootView {
   private var studentTabs: some View {
-    TabView(selection: $selectedTab) {
+    ZStack {
       // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
       // here + full history under 成长, so there is no separate 反馈 tab).
       DashboardView(
@@ -193,18 +197,14 @@ extension StudentRootView {
         evaluationNavigationPulse: evaluationNavigationPulse,
         onStartWorkout: {
           nextWorkoutSource = .dashboard
-          trainingJumpToken += 1
-          selectedTab = .training
+          startTrainingWithCurtain()
         },
         onSeeAllFeedback: { selectedTab = .growth },
         onOpenEvaluation: openEvaluationNotification,
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         onPlanChanged: { planRevision += 1 }
       )
-      .tag(StudentTab.today)
-      .tabItem {
-        Label("今日", systemImage: "house")
-      }
+      .modifier(StudentPageVisibility(tab: .today, selection: selectedTab))
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
@@ -219,10 +219,7 @@ extension StudentRootView {
         onOpenFeedbackNotification: openFeedbackNotification,
         onOpenEvaluationNotification: openEvaluationNotification
       )
-      .tag(StudentTab.training)
-      .tabItem {
-        Label("训练", systemImage: "dumbbell.fill")
-      }
+      .modifier(StudentPageVisibility(tab: .training, selection: selectedTab))
 
       // 成长 — e1RM growth + full training history + coach-feedback history all
       // live here (the 历史 tab folds in; assembled fully in a later slice).
@@ -237,10 +234,7 @@ extension StudentRootView {
         onOpenFeedbackNotification: openFeedbackNotification,
         onOpenEvaluationNotification: openEvaluationNotification
       )
-      .tag(StudentTab.growth)
-      .tabItem {
-        Label("成长", systemImage: "chart.line.uptrend.xyaxis")
-      }
+      .modifier(StudentPageVisibility(tab: .growth, selection: selectedTab))
 
       MyProfileView(
         studentID: studentID,
@@ -257,20 +251,11 @@ extension StudentRootView {
         onOpenFeedbackNotification: openFeedbackNotification,
         onOpenEvaluationNotification: openEvaluationNotification
       )
-      .tag(StudentTab.profile)
-      .tabItem {
-        Label("我的", systemImage: "person")
-      }
-      // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
-      // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
-      .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
+      .modifier(StudentPageVisibility(tab: .profile, selection: selectedTab))
     }
-    .modifier(
-      StudentFlatTabBarModifier(
-        selection: $selectedTab,
-        profileBadge: pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount
-      )
-    )
+    .overlay {
+      MeetPRGoldCurtain(phase: curtainPhase, label: curtainLabel)
+    }
     .task {
       Analytics.shared.screen(.dashboard)
       if let notifications {
@@ -329,6 +314,26 @@ extension StudentRootView {
 
   var hasNotificationCoordinator: Bool {
     notifications != nil
+  }
+
+  /// Runs the §6 gold-curtain pass (~700ms): sweep up, switch tabs while
+  /// covered, keep sweeping to reveal. Reduced motion switches directly.
+  private func startTrainingWithCurtain() {
+    guard !reduceMotion, curtainPhase == .hidden else {
+      trainingJumpToken += 1
+      selectedTab = .training
+      return
+    }
+    curtainLabel = "蹲 · 推 · 拉"
+    curtainPhase = .covering
+    Task { @MainActor in
+      try? await Task.sleep(for: .milliseconds(280))
+      trainingJumpToken += 1
+      selectedTab = .training
+      curtainPhase = .revealing
+      try? await Task.sleep(for: .milliseconds(430))
+      curtainPhase = .hidden
+    }
   }
 
   private func openPlanNotification() {

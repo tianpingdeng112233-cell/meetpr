@@ -109,3 +109,16 @@ private struct TabUnreadBadge: View {
       .background(MeetPRSemanticTone.unread.color, in: .capsule)
   }
 }
+
+extension View {
+  /// Hides the system tab bar for this screen. Must be applied to content
+  /// *inside* the screen's `NavigationStack` — on the stack or the enclosing
+  /// `TabView` it silently does nothing (iOS 17–26 behavior).
+  public func meetPRHideSystemTabBar() -> some View {
+    #if os(iOS)
+      return toolbar(.hidden, for: .tabBar)
+    #else
+      return self
+    #endif
+  }
+}

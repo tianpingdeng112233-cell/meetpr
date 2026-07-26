@@ -134,6 +134,7 @@ public struct TrainingHistoryView: View {
           onOpenEvaluation: onOpenEvaluationNotification
         )
       )
+      .meetPRHideSystemTabBar()
     }
     .task {
       await loadIfNeeded()

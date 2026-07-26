@@ -34,3 +34,20 @@ extension View {
     #endif
   }
 }
+
+/// Keeps every page mounted (state and tasks intact, mirroring `TabView`)
+/// while showing only the selected one.
+@available(iOS 17.0, macOS 14.0, *)
+struct StudentPageVisibility: ViewModifier {
+  let tab: StudentTab
+  let selection: StudentTab
+
+  func body(content: Content) -> some View {
+    let isActive = tab == selection
+    content
+      .opacity(isActive ? 1 : 0)
+      .allowsHitTesting(isActive)
+      .accessibilityHidden(!isActive)
+      .zIndex(isActive ? 1 : 0)
+  }
+}

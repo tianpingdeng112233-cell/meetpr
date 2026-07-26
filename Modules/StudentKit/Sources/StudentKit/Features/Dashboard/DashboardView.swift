@@ -140,6 +140,7 @@ public struct DashboardView: View {
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
+      .meetPRHideSystemTabBar()
       .navigationDestination(isPresented: $showsEvaluationSummary) {
         if let summary = evaluationSummaryViewModel?.summary {
           EvaluationSummaryView(summary: summary) {
