@@ -313,6 +313,14 @@ public struct DashboardView: View {
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
           .foregroundStyle(Color.MeetPR.gold500)
+        if feedbackViewModel.unreadCount > 0 {
+          Text("\(feedbackViewModel.unreadCount) 条未读")
+            .font(.MeetPR.mono(size: 10, weight: .bold))
+            .foregroundStyle(Color.MeetPR.inkOnGold)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 1)
+            .background(Color.MeetPR.gold500, in: .capsule)
+        }
         Spacer()
         Image(systemName: "chevron.down")
           .font(.MeetPR.system(size: MeetPRFontMetrics.size12))

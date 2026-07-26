@@ -635,6 +635,14 @@ public struct TodayWorkoutView: View {
           .foregroundStyle(Color.MeetPR.textSecondary)
       }
 
+      // Mockup shows the last/best reference right under the title.
+      if let reference = viewModel.exerciseReferences[draft.exerciseID], reference.hasValue {
+        Text(referenceText(reference))
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .padding(.top, MeetPRSpacing.point3)
+      }
+
       if isEditable {
         heroEditableTargetRow(draft: draft, rowIndex: rowIndex)
           .padding(.top, MeetPRSpacing.space3)
