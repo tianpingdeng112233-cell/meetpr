@@ -1,24 +1,27 @@
 import SwiftUI
 
+/// ⛔️ FROZEN W0 view — compatibility quarantine, not a v3 component.
+///
+/// New code must use `GoldCTA`. This implementation preserves the exact
+/// `2e46d52` rendering and behavior until the coach migration wave, including
+/// loading, charge, and release-burst states.
 @MainActor
-public struct BrandPrimaryButton: View {
-  private let title: String
-  private let subtitle: String?
-  private let systemImage: String?
-  private let showsShimmer: Bool
-  private let isDisabled: Bool
-  private let isLoading: Bool
-  private let isFullWidth: Bool
-  private let action: @MainActor () -> Void
+struct LegacyBrandPrimaryButton: View {
+  let title: String
+  let subtitle: String?
+  let systemImage: String?
+  let showsShimmer: Bool
+  let isDisabled: Bool
+  let isLoading: Bool
+  let isFullWidth: Bool
+  let action: @MainActor () -> Void
 
   @State private var feedbackTrigger = false
-  /// Charge-up press state (§3 GoldCTA): dims the label and tightens the glow
-  /// while held; release fires the expanding burst below.
   @State private var isCharging = false
   @State private var burstID = 0
   @Environment(\.colorScheme) private var colorScheme
 
-  public init(
+  init(
     _ title: String,
     subtitle: String? = nil,
     systemImage: String? = nil,
@@ -38,7 +41,7 @@ public struct BrandPrimaryButton: View {
     self.action = action
   }
 
-  public var body: some View {
+  var body: some View {
     Button(action: handleTap) {
       VStack(spacing: MeetPRSpacing.space1) {
         if isLoading {
@@ -92,13 +95,9 @@ public struct BrandPrimaryButton: View {
           }
       }
       .meetPRShimmer(showsShimmer)
-      // Clip first — anything drawn later (held ring, shadow) must survive
-      // the pill clip or the out-of-pill glow disappears.
       .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
       .overlay {
         if let ring = moldLayers.first(where: { $0.spread > 0 }) {
-          // CSS `0 0 0 4px` is a spread ring sitting fully outside the pill,
-          // so center the stroke on a boundary pushed out by half its width.
           Capsule()
             .inset(by: -ring.spread / 2)
             .stroke(ring.color, lineWidth: ring.spread)
@@ -113,13 +112,11 @@ public struct BrandPrimaryButton: View {
       .opacity(isCharging ? 0.88 : 1)
       .animation(MeetPRMotion.press, value: isCharging)
       .background {
-        // Release burst: a gold ring that expands past the screen edge and
-        // fades, keyed by burstID so consecutive taps re-fire.
-        BurstRing(trigger: burstID)
+        LegacyBurstRing(trigger: burstID)
       }
     }
     .buttonStyle(
-      ChargeButtonStyle(isDisabled: isDisabled || isLoading) { pressing in
+      LegacyChargeButtonStyle(isDisabled: isDisabled || isLoading) { pressing in
         isCharging = pressing
       }
     )
@@ -146,36 +143,43 @@ public struct BrandPrimaryButton: View {
   }
 }
 
-#Preview("BrandPrimaryButton") {
-  VStack(spacing: MeetPRSpacing.base) {
-    BrandPrimaryButton("Start Training") {}
-    BrandPrimaryButton("Loading", isLoading: true) {}
-    BrandPrimaryButton("Disabled", isDisabled: true) {}
+/// Frozen W0 public entry. New code must use `GoldCTA`.
+@MainActor
+public struct BrandPrimaryButton: View {
+  private let legacy: LegacyBrandPrimaryButton
+
+  public init(
+    _ title: String,
+    subtitle: String? = nil,
+    systemImage: String? = nil,
+    showsShimmer: Bool = false,
+    isDisabled: Bool = false,
+    isLoading: Bool = false,
+    isFullWidth: Bool = false,
+    action: @escaping @MainActor () -> Void
+  ) {
+    legacy = LegacyBrandPrimaryButton(
+      title,
+      subtitle: subtitle,
+      systemImage: systemImage,
+      showsShimmer: showsShimmer,
+      isDisabled: isDisabled,
+      isLoading: isLoading,
+      isFullWidth: isFullWidth,
+      action: action
+    )
   }
-  .padding()
-  .background(Color.MeetPR.bgBase)
-  .preferredColorScheme(.dark)
+
+  public var body: some View {
+    legacy
+  }
 }
 
-#Preview("BrandPrimaryButton Light") {
-  BrandPrimaryButton("Start Training", isFullWidth: true) {}
-    .padding()
-    .background(Color.MeetPR.bgBase)
-    .preferredColorScheme(.light)
-}
-
-/// Press-scale plus a charge callback so the label can dim and the glow can
-/// tighten while held.
-private struct ChargeButtonStyle: ButtonStyle {
+private struct LegacyChargeButtonStyle: ButtonStyle {
   let isDisabled: Bool
   let onPressingChanged: (Bool) -> Void
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-  init(isDisabled: Bool, onPressingChanged: @escaping (Bool) -> Void) {
-    self.isDisabled = isDisabled
-    self.onPressingChanged = onPressingChanged
-  }
 
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
@@ -189,9 +193,7 @@ private struct ChargeButtonStyle: ButtonStyle {
   }
 }
 
-/// The expanding gold ring fired on release. Respects reduced motion by
-/// simply not drawing.
-private struct BurstRing: View {
+private struct LegacyBurstRing: View {
   let trigger: Int
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion

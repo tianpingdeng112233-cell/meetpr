@@ -19,7 +19,7 @@ public struct MeetPRTabBarItem<ID: Hashable & Sendable>: Identifiable, Sendable 
   }
 }
 
-public struct MeetPRTabBar<ID: Hashable>: View {
+public struct MeetPRTabBar<ID: Hashable & Sendable>: View {
   @Binding private var selection: ID
   private let items: [MeetPRTabBarItem<ID>]
 

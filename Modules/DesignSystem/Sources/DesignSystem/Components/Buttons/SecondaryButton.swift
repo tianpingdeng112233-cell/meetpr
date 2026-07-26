@@ -1,7 +1,11 @@
 import SwiftUI
 
+/// ⛔️ FROZEN W0 view — compatibility quarantine, not a v3 component.
+///
+/// New code must use `GoldCTA(.secondary)`. Delete this rendering after the
+/// coach migration wave.
 @MainActor
-public struct SecondaryButton: View {
+struct LegacySecondaryButton: View {
   private let title: String
   private let isDisabled: Bool
   private let isFullWidth: Bool
@@ -9,7 +13,7 @@ public struct SecondaryButton: View {
 
   @State private var feedbackTrigger = false
 
-  public init(
+  init(
     _ title: String,
     isDisabled: Bool = false,
     isFullWidth: Bool = false,
@@ -21,7 +25,7 @@ public struct SecondaryButton: View {
     self.action = action
   }
 
-  public var body: some View {
+  var body: some View {
     Button(action: handleTap) {
       Text(title)
         .font(Font.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
@@ -49,6 +53,29 @@ public struct SecondaryButton: View {
   private func handleTap() {
     feedbackTrigger.toggle()
     action()
+  }
+}
+
+@MainActor
+public struct SecondaryButton: View {
+  private let legacy: LegacySecondaryButton
+
+  public init(
+    _ title: String,
+    isDisabled: Bool = false,
+    isFullWidth: Bool = false,
+    action: @escaping @MainActor () -> Void
+  ) {
+    legacy = LegacySecondaryButton(
+      title,
+      isDisabled: isDisabled,
+      isFullWidth: isFullWidth,
+      action: action
+    )
+  }
+
+  public var body: some View {
+    legacy
   }
 }
 

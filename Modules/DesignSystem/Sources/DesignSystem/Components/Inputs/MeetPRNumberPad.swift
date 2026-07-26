@@ -1,47 +1,37 @@
 import SwiftUI
 
-/// The bottom-sheet keypad from the handoff `NumberPad` contract.
-///
-/// Three columns, 52pt keys, mono display. Reps mode disables the decimal key
-/// outright. Commit snaps instead of validating loudly: weight to the nearest
-/// 0.25kg inside 20–500, reps to a whole number inside 1–100. Cancel (or the
-/// sheet's drag-down) writes nothing back.
+/// Bottom-sheet keypad defined by `NumberPad.dc.html`.
+@MainActor
 public struct MeetPRNumberPad: View {
-  public enum Field: Sendable {
+  public enum Field: Equatable, Sendable {
     case weight
     case reps
   }
 
-  private let field: Field
-  private let onCommit: (Double) -> Void
-  private let onCancel: () -> Void
+  let field: Field
+  let initialValueText: String
+  private let onCommit: @MainActor (Double) -> Void
+  private let onCancel: @MainActor () -> Void
 
-  @State private var text: String
-  @State private var feedback = 0
-  @FocusState private var displayFocused: Bool
+  @State private var text = ""
+  @State private var feedbackTrigger = 0
+  @FocusState private var isFocused: Bool
 
   public init(
-    field: Field,
+    field: Field = .weight,
     value: Double,
-    onCommit: @escaping (Double) -> Void,
-    onCancel: @escaping () -> Void
+    onCommit: @escaping @MainActor (Double) -> Void,
+    onCancel: @escaping @MainActor () -> Void
   ) {
     self.field = field
+    self.initialValueText =
+      field == .reps
+      ? value.rounded().formatted(.number.precision(.fractionLength(0)))
+      : value.formatted(.number.precision(.fractionLength(0...2)))
     self.onCommit = onCommit
     self.onCancel = onCancel
-    let initial =
-      field == .reps
-      ? String(Int(value.rounded()))
-      : (value == value.rounded() ? String(Int(value)) : String(value))
-    self._text = State(initialValue: initial)
   }
 
-  private var allowsDecimal: Bool { field == .weight }
-
-  private var unitLabel: String { field == .weight ? "KG" : "次" }
-
-  /// Snap per the contract: weight → 0.25kg multiples in 20...500,
-  /// reps → integers in 1...100.
   public static func snapped(_ raw: Double, field: Field) -> Double {
     switch field {
     case .weight:
@@ -53,70 +43,141 @@ public struct MeetPRNumberPad: View {
   }
 
   public var body: some View {
-    VStack(spacing: MeetPRSpacing.space4) {
-      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.space2) {
-        // A real text field is the editing source (§3 "真 input"): the grid
-        // below writes into it, and a hardware keyboard can type directly.
-        TextField("0", text: $text)
-          .font(.MeetPR.mono(size: 34, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .focused($displayFocused)
-          .textFieldStyle(.plain)
-          .fixedSize()
-          #if os(iOS)
-            .keyboardType(field == .weight ? .decimalPad : .numberPad)
-          #endif
-          .accessibilityLabel("\(text.isEmpty ? "0" : text) \(unitLabel)")
-        Text(unitLabel)
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textMuted)
-        Spacer()
-        Button("取消", action: onCancel)
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.textTertiary)
-          .frame(minWidth: 44, minHeight: 44)
+    // dc: header owns its 12pt bottom padding; the grid→buttons gap is 8.
+    VStack(spacing: MeetPRSpacing.zero) {
+      header
+
+      LazyVGrid(
+        columns: Array(repeating: GridItem(.flexible(), spacing: MeetPRSpacing.space2), count: 3),
+        spacing: MeetPRSpacing.space2
+      ) {
+        ForEach(["1", "2", "3", "4", "5", "6", "7", "8", "9"], id: \.self) {
+          keypadButton($0)
+        }
+        keypadButton(".", isDisabled: field == .reps)
+        keypadButton("0")
+        deleteButton
       }
 
-      Grid(horizontalSpacing: MeetPRSpacing.space2, verticalSpacing: MeetPRSpacing.space2) {
-        ForEach(0..<3, id: \.self) { row in
-          GridRow {
-            ForEach(1...3, id: \.self) { column in
-              key("\(row * 3 + column)")
+      HStack(spacing: MeetPRSpacing.space2) {
+        Button(action: cancel) {
+          Text("取消")
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textSecondary)
+            .frame(maxWidth: .infinity)
+            .frame(height: 46)
+            .overlay {
+              Capsule()
+                .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
             }
-          }
         }
-        GridRow {
-          key(".", disabled: !allowsDecimal)
-          key("0")
-          deleteKey
-        }
-      }
+        .buttonStyle(PressScaleButtonStyle())
 
-      Button {
-        let raw = Double(text) ?? 0
-        onCommit(Self.snapped(raw, field: field))
-      } label: {
-        Text("确认")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
-          .foregroundStyle(Color.MeetPR.ctaText)
-          .frame(maxWidth: .infinity)
-          .frame(height: 48)
-          .background(Color.MeetPR.ctaBackground)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
+        Button(action: commit) {
+          Text("确定")
+            .font(.MeetPR.display(size: MeetPRFontMetrics.size15, weight: .extraBold))
+            .foregroundStyle(Color.MeetPR.ctaText)
+            .frame(maxWidth: .infinity)
+            .frame(height: 46)
+            .background(
+              // `linear-gradient(180deg, var(--gold-400), var(--gold-500))`
+              LinearGradient(
+                colors: [Color.MeetPR.gold400, Color.MeetPR.gold500],
+                startPoint: .top,
+                endPoint: .bottom
+              )
+            )
+            .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        .containerRelativeFrame(.horizontal, count: 3, span: 2, spacing: MeetPRSpacing.space2)
       }
-      .buttonStyle(PressScaleButtonStyle())
+      // dc: `margin-top:8px` on the cancel/confirm row.
+      .padding(.top, MeetPRSpacing.space2)
     }
-    .padding(MeetPRSpacing.space4)
-    .background(Color.MeetPR.surfaceElevated)
-    .sensoryFeedback(.selection, trigger: feedback)
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.top, MeetPRSpacing.point14)
+    .padding(.bottom, MeetPRSpacing.point22)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(
+      .rect(
+        topLeadingRadius: MeetPRRadius.modal,
+        bottomLeadingRadius: 0,
+        bottomTrailingRadius: 0,
+        topTrailingRadius: MeetPRRadius.modal
+      )
+    )
+    .overlay(alignment: .top) {
+      Rectangle()
+        .fill(Color.MeetPR.borderDefault)
+        .frame(height: 1)
+    }
+    .sensoryFeedback(.selection, trigger: feedbackTrigger)
   }
 
-  private func key(_ digit: String, disabled: Bool = false) -> some View {
+  private var header: some View {
+    // dc: `padding:2px 4px 12px`; the unit hangs off the value at exactly 5pt.
+    HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.zero) {
+      Text(field == .reps ? "输入次数" : "输入重量")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .tracking(0.72)
+        .foregroundStyle(Color.MeetPR.textMuted)
+
+      Spacer()
+
+      TextField(
+        "",
+        text: $text,
+        prompt: Text(initialValueText).foregroundStyle(Color.MeetPR.textFaint)
+      )
+      .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      .multilineTextAlignment(.trailing)
+      .focused($isFocused)
+      .textFieldStyle(.plain)
+      .frame(minWidth: 80)
+      .fixedSize(horizontal: true, vertical: false)
+      #if os(iOS)
+        .keyboardType(field == .weight ? .decimalPad : .numberPad)
+      #endif
+      .accessibilityLabel(field == .weight ? "重量" : "次数")
+
+      Text(field == .reps ? "次" : "KG")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .padding(.leading, MeetPRSpacing.point5)
+    }
+    .padding(.top, MeetPRSpacing.point2)
+    .padding(.horizontal, MeetPRSpacing.space1)
+    .padding(.bottom, MeetPRSpacing.space3)
+  }
+
+  private func keypadButton(_ character: String, isDisabled: Bool = false) -> some View {
     Button {
-      tap(digit)
+      append(character)
     } label: {
-      Text(digit)
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .semibold))
+      Text(character)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size21, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .frame(maxWidth: .infinity)
+        .frame(height: 52)
+        .background(Color.MeetPR.surfaceKey)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    }
+    .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled))
+    .disabled(isDisabled)
+    .opacity(isDisabled ? 0.25 : 1)
+    .accessibilityLabel(character == "." ? "小数点" : character)
+  }
+
+  private var deleteButton: some View {
+    Button {
+      guard !text.isEmpty else { return }
+      text.removeLast()
+      feedbackTrigger += 1
+    } label: {
+      Text("⌫")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size19, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
         .frame(maxWidth: .infinity)
         .frame(height: 52)
@@ -124,37 +185,53 @@ public struct MeetPRNumberPad: View {
         .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
     .buttonStyle(PressScaleButtonStyle())
-    .disabled(disabled)
-    .opacity(disabled ? 0.25 : 1)
+    .accessibilityLabel("退格")
   }
 
-  private var deleteKey: some View {
-    Button {
-      guard !text.isEmpty else { return }
-      text.removeLast()
-      feedback += 1
-    } label: {
-      Image(systemName: "delete.backward")
-        .font(.MeetPR.system(size: MeetPRFontMetrics.size16))
-        .foregroundStyle(Color.MeetPR.textSecondary)
-        .frame(maxWidth: .infinity)
-        .frame(height: 52)
-        .background(Color.MeetPR.surfaceKey)
-        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-    }
-    .buttonStyle(PressScaleButtonStyle())
-    .accessibilityLabel("删除")
-  }
-
-  private func tap(_ digit: String) {
-    if digit == "." {
-      guard allowsDecimal, !text.contains(".") else { return }
-      text = text.isEmpty ? "0." : text + "."
+  private func append(_ character: String) {
+    if character == "." {
+      guard field == .weight, !text.isEmpty, !text.contains("."), text.count <= 4 else {
+        return
+      }
+      text.append(character)
     } else {
-      // Cap total length; nobody lifts a 5-digit kilo number.
-      guard text.count < 6 else { return }
-      text = (text == "0" ? "" : text) + digit
+      let digitCount = text.filter(\.isNumber).count
+      guard digitCount < (field == .reps ? 3 : 5) else { return }
+      text = text == "0" ? character : text + character
     }
-    feedback += 1
+    feedbackTrigger += 1
   }
+
+  private func cancel() {
+    text = ""
+    onCancel()
+  }
+
+  private func commit() {
+    guard let rawValue = Double(text), !text.isEmpty else {
+      cancel()
+      return
+    }
+    let value = Self.snapped(rawValue, field: field)
+    text = ""
+    onCommit(value)
+  }
+}
+
+#Preview("NumberPad · Weight + Reps · Dark") {
+  VStack(spacing: MeetPRSpacing.space4) {
+    MeetPRNumberPad(field: .weight, value: 175, onCommit: { _ in }, onCancel: {})
+    MeetPRNumberPad(field: .reps, value: 3, onCommit: { _ in }, onCancel: {})
+  }
+  .background(Color.MeetPR.bgInset)
+  .preferredColorScheme(.dark)
+}
+
+#Preview("NumberPad · Weight + Reps · Light") {
+  VStack(spacing: MeetPRSpacing.space4) {
+    MeetPRNumberPad(field: .weight, value: 175, onCommit: { _ in }, onCancel: {})
+    MeetPRNumberPad(field: .reps, value: 3, onCommit: { _ in }, onCancel: {})
+  }
+  .background(Color.MeetPR.bgBase)
+  .preferredColorScheme(.light)
 }

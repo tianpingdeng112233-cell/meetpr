@@ -1,18 +1,22 @@
 import SwiftUI
 
+/// ⛔️ FROZEN W0 view — compatibility quarantine, not a v3 component.
+///
+/// New code must use `StatTile`. This implementation preserves the exact
+/// `2e46d52` rendering until the coach migration wave, then should be deleted.
 @MainActor
-public struct StatBlock: View {
-  private let label: String
-  private let value: String
-  private let unit: String
+struct LegacyStatBlock: View {
+  let label: String
+  let value: String
+  let unit: String
 
-  public init(label: String, value: String, unit: String) {
+  init(label: String, value: String, unit: String) {
     self.label = label
     self.value = value
     self.unit = unit
   }
 
-  public var body: some View {
+  var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       Text(label.uppercased())
         .font(.MeetPR.mono(size: 11, weight: .bold))
@@ -37,19 +41,16 @@ public struct StatBlock: View {
   }
 }
 
-#Preview("StatBlock") {
-  HStack(alignment: .bottom, spacing: MeetPRSpacing.lg) {
-    StatBlock(label: "Squat Standard", value: "320", unit: "KG")
-    StatBlock(label: "Bench", value: "200", unit: "KG")
-  }
-  .padding()
-  .background(Color.MeetPR.bgBase)
-  .preferredColorScheme(.dark)
-}
+/// Frozen W0 public entry. New code must use `StatTile`.
+@MainActor
+public struct StatBlock: View {
+  private let legacy: LegacyStatBlock
 
-#Preview("StatBlock Light") {
-  StatBlock(label: "Squat 1RM", value: "94", unit: "%")
-    .padding()
-    .background(Color.MeetPR.bgBase)
-    .preferredColorScheme(.light)
+  public init(label: String, value: String, unit: String) {
+    legacy = LegacyStatBlock(label: label, value: value, unit: unit)
+  }
+
+  public var body: some View {
+    legacy
+  }
 }

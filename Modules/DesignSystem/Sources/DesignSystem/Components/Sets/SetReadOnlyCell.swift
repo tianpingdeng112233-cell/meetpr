@@ -1,16 +1,21 @@
 import SwiftUI
 
+/// ⛔️ FROZEN W0 view — compatibility quarantine, not a v3 component.
+///
+/// New code must use `SetRow`. This implementation exists only so coach-side
+/// screens keep the exact `2e46d52` rendering until the coach migration wave;
+/// delete it after that migration.
 @MainActor
-public struct SetReadOnlyCell: View {
-  private let setNumber: Int
-  private let weightText: String
-  private let repsText: String
-  private let rpeText: String
-  private let isCompleted: Bool
-  private let isFailed: Bool
-  private let isVideoUploaded: Bool
+struct LegacySetReadOnlyCell: View {
+  let setNumber: Int
+  let weightText: String
+  let repsText: String
+  let rpeText: String
+  let isCompleted: Bool
+  let isFailed: Bool
+  let isVideoUploaded: Bool
 
-  public init(
+  init(
     setNumber: Int,
     weightKg: Decimal?,
     reps: Int?,
@@ -28,7 +33,7 @@ public struct SetReadOnlyCell: View {
     self.isVideoUploaded = isVideoUploaded
   }
 
-  public var body: some View {
+  var body: some View {
     HStack(spacing: MeetPRSpacing.sm) {
       Text("#\(setNumber + 1)")
         .font(.MeetPR.mono(size: 11, weight: .bold))
@@ -123,12 +128,32 @@ public struct SetReadOnlyCell: View {
   }
 }
 
-#Preview {
-  VStack(spacing: MeetPRSpacing.sm) {
-    SetReadOnlyCell(setNumber: 0, weightKg: 142.5, reps: 5, rpe: 8, isCompleted: true)
-    SetReadOnlyCell(setNumber: 1, weightKg: nil, reps: nil, rpe: nil, isCompleted: false)
+/// Frozen W0 public entry. New code must use `SetRow`.
+@MainActor
+public struct SetReadOnlyCell: View {
+  private let legacy: LegacySetReadOnlyCell
+
+  public init(
+    setNumber: Int,
+    weightKg: Decimal?,
+    reps: Int?,
+    rpe: Decimal?,
+    isCompleted: Bool,
+    isFailed: Bool = false,
+    isVideoUploaded: Bool = false
+  ) {
+    legacy = LegacySetReadOnlyCell(
+      setNumber: setNumber,
+      weightKg: weightKg,
+      reps: reps,
+      rpe: rpe,
+      isCompleted: isCompleted,
+      isFailed: isFailed,
+      isVideoUploaded: isVideoUploaded
+    )
   }
-  .padding()
-  .background(Color.MeetPR.bgBase)
-  .preferredColorScheme(.dark)
+
+  public var body: some View {
+    legacy
+  }
 }

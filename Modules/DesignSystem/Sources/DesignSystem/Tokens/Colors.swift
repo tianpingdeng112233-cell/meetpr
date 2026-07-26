@@ -208,6 +208,9 @@ extension Color {
       dark: rgb(20, 20, 20)
     )
     public static let ctaFill = rgb(17, 24, 39)
+    /// `#FFFFFF` — ink on the `--cta-fill` slab (DayChip selected state);
+    /// dc literal, both themes.
+    public static let inkOnCTAFill = rgb(255, 255, 255)
 
     /// `rgba(17,24,39,.06)` — the light theme's card shadow. Dark never casts
     /// one (it separates surfaces with a hairline instead), so this is only
@@ -299,4 +302,75 @@ extension Color {
       )
     }
   }
+}
+
+extension Color.MeetPR {
+  // Single-value colors traced verbatim to `MeetPR 学员端.dc.html`
+  // SE_SPEC / SetEntry barbell markup (lines 438–450, 972–973); specifically,
+  // lever/knob are line 447 and sleeve is line 450. Physical
+  // plate and steel colors are theme-invariant; 5kg/2.5kg consume tokens.
+  static let plate25Gradient = [
+    rgb(58, 21, 18), rgb(110, 42, 38), rgb(193, 90, 82), rgb(210, 104, 95),
+    rgb(166, 66, 60), rgb(138, 52, 46), rgb(94, 36, 31), rgb(56, 19, 15),
+  ]
+  static let plate20Gradient = [
+    rgb(14, 29, 56), rgb(24, 46, 82), rgb(62, 107, 181), rgb(78, 123, 197),
+    rgb(51, 89, 155), rgb(39, 71, 119), rgb(20, 38, 68), rgb(12, 24, 48),
+  ]
+  static let plate15Gradient = [
+    rgb(62, 50, 10), rgb(119, 98, 26), rgb(211, 180, 70), rgb(227, 197, 87),
+    rgb(185, 154, 49), rgb(142, 117, 34), rgb(99, 80, 15), rgb(58, 47, 10),
+  ]
+  static let plate10Gradient = [
+    rgb(12, 36, 21), rgb(23, 63, 36), rgb(63, 160, 92), rgb(79, 176, 108),
+    rgb(47, 132, 73), rgb(35, 104, 57), rgb(18, 52, 32), rgb(10, 32, 18),
+  ]
+  static let plate5Gradient = [
+    rgb(90, 90, 90), rgb(138, 138, 138), rgb(250, 250, 250), textPrimary,
+    rgb(226, 226, 226), rgb(184, 184, 184), rgb(122, 122, 122), rgb(78, 78, 78),
+  ]
+  static let plate2Point5Gradient = [
+    bgBase, rgb(35, 35, 38), rgb(114, 114, 119), rgb(130, 130, 136),
+    rgb(70, 70, 74), rgb(46, 46, 49), surfaceCard, bgBase,
+  ]
+  static let plate1Point25Gradient = [
+    rgb(72, 76, 82), rgb(127, 131, 138), rgb(240, 242, 245), rgb(251, 252, 254),
+    rgb(196, 200, 206), rgb(154, 158, 164), rgb(110, 114, 121), rgb(72, 76, 82),
+  ]
+  static let barShaftGradient = [
+    rgb(110, 114, 120), rgb(157, 161, 167), rgb(232, 234, 237), rgb(251, 252, 253),
+    rgb(207, 211, 216), rgb(154, 158, 164), rgb(106, 110, 116),
+  ]
+  static let barShoulderGradient = [
+    rgb(110, 114, 120), rgb(166, 170, 176), rgb(242, 244, 246),
+    rgb(210, 214, 219), rgb(154, 158, 164), rgb(106, 110, 116),
+  ]
+  static let barSleeveGradient = [
+    rgb(106, 110, 116), rgb(157, 161, 167), rgb(237, 239, 242), rgb(251, 252, 253),
+    rgb(203, 207, 213), rgb(149, 153, 159), rgb(101, 105, 111),
+  ]
+  static let collarBodyGradient = [
+    rgb(62, 66, 71), rgb(138, 142, 148), rgb(242, 244, 246), rgb(251, 252, 253),
+    rgb(207, 211, 216), rgb(154, 158, 164), rgb(62, 66, 71),
+  ]
+  static let collarNutGradient = [
+    rgb(84, 88, 94), rgb(157, 161, 167), rgb(244, 246, 248), rgb(251, 252, 253),
+    rgb(203, 207, 213), rgb(143, 147, 153), rgb(84, 88, 94),
+  ]
+  static let collarLeverGradient = [
+    rgb(234, 236, 239), rgb(180, 184, 190), rgb(106, 110, 116),
+  ]
+  static let collarKnobGradient = [
+    rgb(244, 246, 248), rgb(154, 158, 164), rgb(90, 94, 100),
+  ]
+  static let plateDropShadow = rgb(0, 0, 0, opacity: 0.5)
+  static let plateInnerHighlight = rgb(255, 255, 255, opacity: 0.16)
+  static let plateInnerShade = rgb(0, 0, 0, opacity: 0.45)
+  static let barDropShadow = rgb(0, 0, 0, opacity: 0.4)
+  static let steelDarkEdge = rgb(59, 65, 73)
+  static let steelLightEdge = rgb(255, 255, 255, opacity: 0.4)
+  static let collarKnurlDark = rgb(0, 0, 0, opacity: 0.3)
+  static let collarKnurlLight = rgb(255, 255, 255, opacity: 0.16)
+  static let collarNutInsetShade = rgb(0, 0, 0, opacity: 0.35)
+  static let collarNutInsetHighlight = rgb(255, 255, 255, opacity: 0.3)
 }

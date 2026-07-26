@@ -1,12 +1,10 @@
 import SwiftUI
 
-/// One cell of the week calendar strip, per the handoff `DayChip` contract.
+/// The 52×44 week-calendar cell defined by `DayChip.dc.html`.
 ///
-/// Exactly one status dot, top-right: green for a completed day, red for a
-/// planned day that was missed, breathing gold for today. Rest days show no
-/// dot at all — the design is explicit that a rest day is never "missed" —
-/// and drop to faint text. Today-while-selected inverts to the navy fill in
-/// both themes with a gold ring.
+/// A rest day is intentionally point-free: only a planned session that was
+/// missed receives the red state dot.
+@MainActor
 public struct MeetPRDayChip: View {
   public enum DayState: Equatable, Sendable {
     case done
@@ -17,19 +15,20 @@ public struct MeetPRDayChip: View {
   }
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
 
   private let weekday: String
   private let date: Int
   private let state: DayState
   private let isSelected: Bool
-  private let onSelect: () -> Void
+  private let onSelect: @MainActor () -> Void
 
   public init(
     weekday: String,
     date: Int,
     state: DayState,
     isSelected: Bool,
-    onSelect: @escaping () -> Void
+    onSelect: @escaping @MainActor () -> Void
   ) {
     self.weekday = weekday
     self.date = date
@@ -38,42 +37,23 @@ public struct MeetPRDayChip: View {
     self.onSelect = onSelect
   }
 
-  /// Navy in both themes — the one deliberate non-dynamic fill in the system,
-  /// mirroring `--cta-bg`'s light value so "today" reads identically anywhere.
-  private static let todaySelectedFill = Color(red: 17 / 255, green: 24 / 255, blue: 39 / 255)
-
-  private var isInverted: Bool { state == .today && isSelected }
-
-  private var textColor: Color {
-    if isInverted { return .white }
-    switch state {
-    case .rest, .future: return Color.MeetPR.textFaint
-    case .done, .missed, .today: return Color.MeetPR.textPrimary
-    }
-  }
-
-  private var dotColor: Color? {
-    switch state {
-    case .done: Color.MeetPR.success
-    case .missed: Color.MeetPR.danger
-    case .today: Color.MeetPR.gold500
-    case .rest, .future: nil
-    }
-  }
-
   public var body: some View {
     Button(action: onSelect) {
-      VStack(spacing: 3) {
+      VStack(spacing: MeetPRSpacing.zero) {
         Text(weekday)
-          .font(.MeetPR.system(size: MeetPRFontMetrics.size10))
-          .foregroundStyle(isInverted ? Color.white : Color.MeetPR.textTertiary)
-        Text("\(date)")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-          .foregroundStyle(textColor)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size10, weight: .medium))
+          .foregroundStyle(weekdayColor)
+
+        Spacer(minLength: MeetPRSpacing.zero)
+
+        Text(date.formatted())
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
+          .foregroundStyle(dateColor)
+          .padding(.bottom, MeetPRSpacing.point5)
       }
-      // 44pt is the §2 floor; the strip scrolls when seven don't fit.
-      .frame(minWidth: 44, maxWidth: .infinity, minHeight: 44)
-      .background(background)
+      .padding(.top, MeetPRSpacing.point5)
+      .frame(width: 52, height: 44)
+      .background(isSelected ? Color.MeetPR.ctaFill : Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       .overlay {
         if isSelected {
@@ -82,45 +62,87 @@ public struct MeetPRDayChip: View {
         }
       }
       .overlay(alignment: .topTrailing) {
-        if let dotColor {
-          statusDot(dotColor)
-            .padding(.top, 5)
-            .padding(.trailing, 6)
+        if let statusColor {
+          statusDot(statusColor)
+            .padding(.top, MeetPRSpacing.point5)
+            .padding(.trailing, MeetPRSpacing.point6)
         }
       }
-      // 44pt cell + padding keeps the touch target at the minimum.
-      .contentShape(Rectangle())
-      .accessibilityLabel(accessibilityText)
+      .shadow(
+        color: Color.MeetPR.cardShadow.opacity(isSelected ? 0 : 1),
+        radius: 9,
+        y: 4
+      )
+      .contentShape(.rect)
     }
-    .buttonStyle(PressScaleButtonStyle())
+    .buttonStyle(.plain)
+    .frame(minWidth: MeetPRSpacing.minimumHitTarget, minHeight: MeetPRSpacing.minimumHitTarget)
+    .accessibilityLabel(accessibilityText)
+    .accessibilityAddTraits(isSelected ? .isSelected : [])
   }
 
-  @ViewBuilder
-  private var background: some View {
-    if isInverted {
-      Self.todaySelectedFill
-    } else if isSelected {
-      Color.MeetPR.goldSoft
-    } else {
-      Color.MeetPR.surfaceCard
+  private var weekdayColor: Color {
+    if isSelected { return Color.MeetPR.inkOnCTAFill }
+    switch state {
+    case .rest, .future:
+      return Color.MeetPR.textFaint
+    case .done, .missed, .today:
+      return Color.MeetPR.textDim
+    }
+  }
+
+  private var dateColor: Color {
+    if isSelected { return Color.MeetPR.inkOnCTAFill }
+    switch state {
+    case .rest, .future:
+      return Color.MeetPR.textFaint
+    case .done, .missed, .today:
+      return Color.MeetPR.textPrimary
+    }
+  }
+
+  private var statusColor: Color? {
+    switch state {
+    case .done:
+      Color.MeetPR.success
+    case .missed:
+      Color.MeetPR.danger
+    case .today:
+      Color.MeetPR.gold500
+    case .future where isSelected:
+      Color.MeetPR.gold500
+    case .rest, .future:
+      nil
     }
   }
 
   @ViewBuilder
   private func statusDot(_ color: Color) -> some View {
-    if state == .today && !reduceMotion {
+    if (state == .today || isSelected) && !reduceMotion {
       TimelineView(.animation) { context in
-        let cycle = context.date.timeIntervalSinceReferenceDate
-          .truncatingRemainder(dividingBy: 1.8)
-        let phase = (1 - cos((cycle / 1.8) * 2 * .pi)) / 2
-        Circle()
-          .fill(color)
-          .frame(width: 5, height: 5)
-          .opacity(0.55 + 0.45 * phase)
-          .scaleEffect(1 + 0.25 * phase)
+        let elapsed = context.date.timeIntervalSinceReferenceDate
+        let phase = elapsed.truncatingRemainder(dividingBy: 1.8) / 1.8
+        let amount = (1 - cos(phase * 2 * .pi)) / 2
+
+        dot(color)
+          .opacity(1 - (0.65 * amount))
+          .scaleEffect(1 - (0.18 * amount))
       }
     } else {
-      Circle().fill(color).frame(width: 5, height: 5)
+      dot(color)
+    }
+  }
+
+  @ViewBuilder
+  private func dot(_ color: Color) -> some View {
+    if state == .missed && differentiateWithoutColor {
+      Circle()
+        .stroke(color, lineWidth: 1.5)
+        .frame(width: MeetPRSpacing.point5, height: MeetPRSpacing.point5)
+    } else {
+      Circle()
+        .fill(color)
+        .frame(width: MeetPRSpacing.point5, height: MeetPRSpacing.point5)
     }
   }
 
@@ -128,11 +150,37 @@ public struct MeetPRDayChip: View {
     let stateText =
       switch state {
       case .done: "已完成"
-      case .missed: "未完成"
+      case .missed: "有计划，未完成"
       case .rest: "休息日"
       case .today: "今天"
-      case .future: "未开始"
+      case .future: "未来"
       }
-    return "周\(weekday) \(date)日，\(stateText)\(isSelected ? "，已选中" : "")"
+    return "\(weekday)\(date)日，\(stateText)"
   }
+}
+
+#Preview("DayChip · All States · Dark") {
+  HStack(spacing: MeetPRSpacing.space2) {
+    MeetPRDayChip(weekday: "一", date: 20, state: .done, isSelected: false) {}
+    MeetPRDayChip(weekday: "二", date: 21, state: .missed, isSelected: false) {}
+    MeetPRDayChip(weekday: "三", date: 22, state: .rest, isSelected: false) {}
+    MeetPRDayChip(weekday: "四", date: 23, state: .today, isSelected: true) {}
+    MeetPRDayChip(weekday: "五", date: 24, state: .future, isSelected: false) {}
+  }
+  .padding()
+  .background(Color.MeetPR.bgInset)
+  .preferredColorScheme(.dark)
+}
+
+#Preview("DayChip · All States · Light") {
+  HStack(spacing: MeetPRSpacing.space2) {
+    MeetPRDayChip(weekday: "一", date: 20, state: .done, isSelected: false) {}
+    MeetPRDayChip(weekday: "二", date: 21, state: .missed, isSelected: false) {}
+    MeetPRDayChip(weekday: "三", date: 22, state: .rest, isSelected: false) {}
+    MeetPRDayChip(weekday: "四", date: 23, state: .today, isSelected: true) {}
+    MeetPRDayChip(weekday: "五", date: 24, state: .future, isSelected: false) {}
+  }
+  .padding()
+  .background(Color.MeetPR.bgBase)
+  .preferredColorScheme(.light)
 }

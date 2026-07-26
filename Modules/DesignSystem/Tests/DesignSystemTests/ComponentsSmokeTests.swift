@@ -55,9 +55,9 @@ struct ComponentsSmokeTests {
     _ = Eyebrow("PROTOCOL 01")
   }
 
-  @Test("StatBlock instantiates")
-  func statBlockInstantiates() {
-    _ = StatBlock(label: "Squat Standard", value: "320", unit: "KG")
+  @Test("StatTile instantiates")
+  func statTileInstantiates() {
+    _ = StatTile(label: "Squat Standard", value: "320", unit: "KG")
   }
 
   @Test("StatusBadge instantiates")
@@ -67,6 +67,46 @@ struct ComponentsSmokeTests {
     _ = StatusBadge(status: .overdue)
     _ = StatusBadge(status: .completed)
     _ = StatusBadge(status: .live)
+  }
+
+  @Test("SetRow instantiates")
+  func setRowInstantiates() {
+    _ = SetRow(
+      index: 1,
+      weight: 175,
+      reps: 3,
+      rpe: 8.5,
+      status: .done,
+      videoState: .uploaded
+    )
+  }
+
+  @Test("GoldCTA instantiates all variants")
+  func goldCTAInstantiates() {
+    _ = GoldCTA("Start", variant: .primary) {}
+    _ = GoldCTA("Cancel", variant: .secondary) {}
+    _ = GoldCTA("Logout", variant: .danger) {}
+    _ = GoldCTA("Postpone", variant: .link) {}
+  }
+
+  @Test("ExerciseCard instantiates")
+  func exerciseCardInstantiates() {
+    _ = ExerciseCard(
+      exercise: "Deadlift",
+      meta: "Last 170kg×3 @8",
+      note: "Push the floor away",
+      collapsed: false,
+      sets: [
+        ExerciseSetRecord(
+          index: 1,
+          weight: 175,
+          reps: 3,
+          rpe: 8.5,
+          status: .done,
+          videoState: .uploaded
+        )
+      ]
+    )
   }
 
   @Test("PRBadge instantiates")
