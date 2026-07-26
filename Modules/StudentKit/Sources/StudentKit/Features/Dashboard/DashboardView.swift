@@ -274,40 +274,7 @@ public struct DashboardView: View {
           feedbackExpanded.toggle()
         }
       } label: {
-        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-          HStack(spacing: MeetPRSpacing.space2) {
-            if item.readAt == nil {
-              // An inline "new here" marker, not a count badge: the mockups
-              // draw it in gold on both themes.
-              Circle().fill(MeetPRSemanticTone.inProgress.color).frame(width: 7, height: 7)
-            }
-            Text(feedbackEyebrow(item))
-              .font(Font.MeetPR.monoLabel)
-              .tracking(Font.MeetPR.monoLabelTracking)
-              .foregroundStyle(Color.MeetPR.gold500)
-            Spacer()
-            Image(systemName: "chevron.down")
-              .font(.MeetPR.system(size: MeetPRFontMetrics.size12))
-              .foregroundStyle(Color.MeetPR.textTertiary)
-              .rotationEffect(.degrees(feedbackExpanded ? 180 : 0))
-          }
-          if !feedbackExpanded {
-            Text(item.text)
-              .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
-              .foregroundStyle(Color.MeetPR.textPrimary)
-              .multilineTextAlignment(.leading)
-              .lineLimit(3)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(.top, MeetPRSpacing.point10)
-              .transition(.opacity)
-            Text("展开全部 \(feedbackViewModel.items.count) 条反馈")
-              .font(Font.MeetPR.monoLabel)
-              .tracking(Font.MeetPR.monoLabelTracking)
-              .foregroundStyle(Color.MeetPR.textTertiary)
-              .padding(.top, MeetPRSpacing.space2)
-          }
-        }
-        .contentShape(Rectangle())
+        feedbackCardHeader(item)
       }
       .buttonStyle(.plain)
 
@@ -329,6 +296,43 @@ public struct DashboardView: View {
       Rectangle().fill(Color.MeetPR.gold500).frame(width: 3)
     }
     .meetPRCardSurface(.inset)
+  }
+
+  private func feedbackCardHeader(_ item: CoachFeedback) -> some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+      HStack(spacing: MeetPRSpacing.space2) {
+        if item.readAt == nil {
+          // An inline "new here" marker, not a count badge: the mockups
+          // draw it in gold on both themes.
+          Circle().fill(MeetPRSemanticTone.inProgress.color).frame(width: 7, height: 7)
+        }
+        Text(feedbackEyebrow(item))
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.gold500)
+        Spacer()
+        Image(systemName: "chevron.down")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .rotationEffect(.degrees(feedbackExpanded ? 180 : 0))
+      }
+      if !feedbackExpanded {
+        Text(item.text)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .multilineTextAlignment(.leading)
+          .lineLimit(3)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.top, MeetPRSpacing.point10)
+          .transition(.opacity)
+        Text("展开全部 \(feedbackViewModel.items.count) 条反馈")
+          .font(Font.MeetPR.monoLabel)
+          .tracking(Font.MeetPR.monoLabelTracking)
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .padding(.top, MeetPRSpacing.space2)
+      }
+    }
+    .contentShape(Rectangle())
   }
 
   private func expandedFeedbackRow(_ item: CoachFeedback) -> some View {
