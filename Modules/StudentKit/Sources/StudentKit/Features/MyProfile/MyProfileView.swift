@@ -28,7 +28,6 @@ public struct MyProfileView: View {
   private let onOpenEvaluationNotification: () -> Void
   @State private var viewModel: MyProfileViewModel
   @State private var showingNotifications = false
-  @State private var conversationID: UUID?
 
   public init(
     studentID: UUID,
@@ -100,7 +99,6 @@ public struct MyProfileView: View {
         OptionalStudentNotificationHostModifier(
           coordinator: notifications,
           showsNotifications: $showingNotifications,
-          conversationID: $conversationID,
           onOpenPlan: onOpenPlanNotification,
           onOpenFeedback: onOpenFeedbackNotification,
           onOpenEvaluation: onOpenEvaluationNotification
@@ -165,9 +163,7 @@ public struct MyProfileView: View {
   private func sections(_ profile: OnboardingProfile) -> some View {
     if let notifications, notifications.hasActiveCoach {
       MyCoachCard(coordinator: notifications) {
-        Task {
-          conversationID = await notifications.openCoachConversation()
-        }
+        notifications.requestCoachConversation()
       }
       .padding(.bottom, MeetPRSpacing.point18)
     }

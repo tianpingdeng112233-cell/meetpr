@@ -213,6 +213,25 @@ public final class StudentNotificationsCoordinator {
     chatContext?.inbox.stopPolling()
   }
 
+  /// Root-presented coach conversation (full-screen, mockup's chat overlay).
+  /// Living on the shared coordinator makes the open request single-flight
+  /// across all four permanently-mounted tabs.
+  var presentedConversationID: UUID?
+  private var isOpeningConversation = false
+
+  func requestCoachConversation() {
+    guard !isOpeningConversation, presentedConversationID == nil else { return }
+    isOpeningConversation = true
+    Task { @MainActor in
+      presentedConversationID = await openCoachConversation()
+      isOpeningConversation = false
+    }
+  }
+
+  func dismissCoachConversation() {
+    presentedConversationID = nil
+  }
+
   func openCoachConversation() async -> UUID? {
     guard let activeCoach, let chatContext else {
       return nil

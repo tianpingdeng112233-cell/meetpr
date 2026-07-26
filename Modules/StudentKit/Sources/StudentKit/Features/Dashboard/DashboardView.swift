@@ -36,7 +36,6 @@ public struct DashboardView: View {
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
   @State private var showsNotifications = false
   @State private var showsEvaluationSummary = false
-  @State private var conversationID: UUID?
   @State private var dayShiftAlert: DashboardDayShiftAlert?
   @State private var isUpdatingDayShift = false
   /// Day whose growth curve is shown. `nil` ⇒ today (the default selection).
@@ -898,7 +897,6 @@ public struct DashboardView: View {
     OptionalStudentNotificationHostModifier(
       coordinator: notifications,
       showsNotifications: $showsNotifications,
-      conversationID: $conversationID,
       onOpenPlan: onStartWorkout,
       onOpenFeedback: onSeeAllFeedback,
       onOpenEvaluation: onOpenEvaluation

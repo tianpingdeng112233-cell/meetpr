@@ -30,7 +30,6 @@ public struct TrainingHistoryView: View {
   @State private var showsAllHistory = false
   @State private var currentOnboarding: OnboardingProfile?
   @State private var showsNotifications = false
-  @State private var conversationID: UUID?
 
   public init(
     studentID: UUID,
@@ -128,7 +127,6 @@ public struct TrainingHistoryView: View {
         OptionalStudentNotificationHostModifier(
           coordinator: notifications,
           showsNotifications: $showsNotifications,
-          conversationID: $conversationID,
           onOpenPlan: onOpenPlanNotification,
           onOpenFeedback: onOpenFeedbackNotification,
           onOpenEvaluation: onOpenEvaluationNotification

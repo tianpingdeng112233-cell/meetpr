@@ -37,7 +37,6 @@ public struct TodayWorkoutView: View {
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
   @State private var showingNotifications = false
-  @State private var conversationID: UUID?
   /// Completed exercises collapse by *derivation* (BLOCKER-1 / W-01 fix): a
   /// card is collapsed iff all its sets are done and the user hasn't manually
   /// re-expanded it. First render of a persisted completed day is therefore a
@@ -170,7 +169,6 @@ public struct TodayWorkoutView: View {
         OptionalStudentNotificationHostModifier(
           coordinator: notifications,
           showsNotifications: $showingNotifications,
-          conversationID: $conversationID,
           onOpenPlan: onOpenPlanNotification,
           onOpenFeedback: onOpenFeedbackNotification,
           onOpenEvaluation: onOpenEvaluationNotification

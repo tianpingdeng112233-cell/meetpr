@@ -256,6 +256,14 @@ extension StudentRootView {
     .overlay {
       MeetPRGoldCurtain(phase: curtainPhase, label: curtainLabel)
     }
+    .modifier(
+      StudentRootConversationCover(
+        coordinator: notifications,
+        onOpenPlan: openPlanNotification,
+        onOpenFeedback: openFeedbackNotification,
+        onOpenEvaluation: openEvaluationNotification
+      )
+    )
     .task {
       Analytics.shared.screen(.dashboard)
       if let notifications {
