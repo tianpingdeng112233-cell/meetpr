@@ -113,8 +113,8 @@ public struct TodayWorkoutView: View {
         Group {
           switch viewModel.state {
           case .idle, .loading:
-            ProgressView()
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
+            loadingSkeleton
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
           // One pattern, one branch: .loaded → .recording → .loaded round-trips
           // during every persist, and separate cases are separate structural
           // identities — SwiftUI tore down the subtree, which dismissed and
@@ -123,7 +123,8 @@ public struct TodayWorkoutView: View {
           case .loaded(let day, let drafts), .recording(let day, let drafts, _):
             workout(day: day, drafts: drafts)
           case .rest:
-            ContentUnavailableView(restTitle, systemImage: "bed.double", description: Text("看本周计划"))
+            restDayHero
+              .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
           case .error(let message):
             ContentUnavailableView(
               "加载失败", systemImage: "exclamationmark.triangle", description: Text(message))
@@ -1114,7 +1115,40 @@ public struct TodayWorkoutView: View {
   }
 
   private var restTitle: String {
-    WorkoutDatePolicy.isEditable(selectedDate) ? "今日休息" : "这天休息"
+    WorkoutDatePolicy.isEditable(selectedDate) ? "今天是休息日" : "这天休息"
+  }
+
+  /// Rest-day hero (§7): plain card with the next planned session, no sad
+  /// empty-state iconography.
+  private var restDayHero: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      Text(restTitle)
+        .font(.MeetPR.display(size: 22, weight: .extraBold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text("恢复也是训练的一部分 · 看「今日」的本周条安排下一练")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(MeetPRSpacing.space4)
+    .meetPRCardSurface(.card)
+    .padding(MeetPRSpacing.space4)
+  }
+
+  /// Loading skeleton (§7): ghost blocks, never a spinner.
+  private var loadingSkeleton: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
+      RoundedRectangle(cornerRadius: MeetPRRadius.card)
+        .fill(Color.MeetPR.textGhost)
+        .frame(height: 190)
+      ForEach(0..<2, id: \.self) { _ in
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .fill(Color.MeetPR.textGhost)
+          .frame(height: 52)
+      }
+    }
+    .padding(MeetPRSpacing.space4)
+    .meetPRSkeletonPulse()
   }
 
   private var readinessFiled: Bool {

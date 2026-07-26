@@ -43,6 +43,8 @@ public struct DashboardView: View {
   @State private var selectedDate: Date?
   /// Manual E1RM-card lift pick; `nil` follows the selected day.
   @State private var liftOverride: LiftFamily?
+  /// Inline expansion of the coach-feedback card (§6 motion).
+  @State private var feedbackExpanded = false
   @Environment(\.colorScheme) private var colorScheme
 
   public init(
@@ -115,6 +117,10 @@ public struct DashboardView: View {
 
           if let feedback = latestFeedback {
             todayFeedbackCard(feedback)
+              .padding(.top, MeetPRSpacing.space4)
+              .meetPRRiseIn(index: 4)
+          } else if case .loaded = feedbackViewModel.state {
+            emptyFeedbackRow
               .padding(.top, MeetPRSpacing.space4)
               .meetPRRiseIn(index: 4)
           }
@@ -262,46 +268,114 @@ public struct DashboardView: View {
   // MARK: - Today feedback card
 
   private func todayFeedbackCard(_ item: CoachFeedback) -> some View {
-    Button(action: onSeeAllFeedback) {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-        HStack(spacing: MeetPRSpacing.space2) {
-          if item.readAt == nil {
-            // An inline "new here" marker, not a count badge: the mockups draw
-            // it in gold on both themes.
-            Circle().fill(MeetPRSemanticTone.inProgress.color).frame(width: 7, height: 7)
+    VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+      Button {
+        withAnimation(.spring(duration: 0.34, bounce: 0.18)) {
+          feedbackExpanded.toggle()
+        }
+      } label: {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+          HStack(spacing: MeetPRSpacing.space2) {
+            if item.readAt == nil {
+              // An inline "new here" marker, not a count badge: the mockups
+              // draw it in gold on both themes.
+              Circle().fill(MeetPRSemanticTone.inProgress.color).frame(width: 7, height: 7)
+            }
+            Text(feedbackEyebrow(item))
+              .font(Font.MeetPR.monoLabel)
+              .tracking(Font.MeetPR.monoLabelTracking)
+              .foregroundStyle(Color.MeetPR.gold500)
+            Spacer()
+            Image(systemName: "chevron.down")
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.textTertiary)
+              .rotationEffect(.degrees(feedbackExpanded ? 180 : 0))
           }
+          if !feedbackExpanded {
+            Text(item.text)
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+              .multilineTextAlignment(.leading)
+              .lineLimit(3)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .padding(.top, MeetPRSpacing.point10)
+              .transition(.opacity)
+            Text("展开全部 \(feedbackViewModel.items.count) 条反馈")
+              .font(Font.MeetPR.monoLabel)
+              .tracking(Font.MeetPR.monoLabelTracking)
+              .foregroundStyle(Color.MeetPR.textTertiary)
+              .padding(.top, MeetPRSpacing.space2)
+          }
+        }
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+
+      if feedbackExpanded {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+          ForEach(Array(feedbackViewModel.items.prefix(4).enumerated()), id: \.element.id) { pair in
+            expandedFeedbackRow(pair.element)
+              .meetPRRiseIn(index: pair.offset, initialDelay: 0.02, stagger: 0.03)
+          }
+        }
+        .padding(.top, MeetPRSpacing.space2)
+        .transition(.opacity.combined(with: .move(edge: .top)))
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(MeetPRSpacing.space4)
+    .padding(.leading, 3)
+    .overlay(alignment: .leading) {
+      Rectangle().fill(Color.MeetPR.gold500).frame(width: 3)
+    }
+    .meetPRCardSurface(.inset)
+  }
+
+  private func expandedFeedbackRow(_ item: CoachFeedback) -> some View {
+    Button(action: onSeeAllFeedback) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
+        HStack(spacing: MeetPRSpacing.space2) {
           Text(feedbackEyebrow(item))
             .font(Font.MeetPR.monoLabel)
             .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.gold500)
+            .foregroundStyle(Color.MeetPR.textSecondary)
+          if item.readAt == nil {
+            Circle().fill(MeetPRSemanticTone.inProgress.color).frame(width: 6, height: 6)
+          }
+          Spacer()
+          Text("查看")
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size11))
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
         Text(item.text)
-          .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
-          .foregroundStyle(Color.MeetPR.textPrimary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
           .multilineTextAlignment(.leading)
-          .lineLimit(3)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.top, MeetPRSpacing.point10)
-        Text(feedbackFooter(item))
-          .font(Font.MeetPR.monoLabel)
-          .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.textTertiary)
-          .padding(.top, MeetPRSpacing.space2)
+          .lineLimit(2)
       }
+      .padding(.vertical, MeetPRSpacing.point10)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(MeetPRSpacing.space4)
-      .background(Color.MeetPR.surfaceCard)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-      .overlay {
-        HStack(spacing: MeetPRSpacing.zero) {
-          Rectangle()
-            .fill(Color.MeetPR.gold500)
-            .frame(width: 3)
-          Spacer(minLength: 0)
-        }
+      .overlay(alignment: .top) {
+        Rectangle().fill(Color.MeetPR.borderHairline).frame(height: 1)
       }
+      .contentShape(Rectangle())
     }
-    .buttonStyle(PressScaleButtonStyle())
+    .buttonStyle(.plain)
+  }
+
+  /// Collapsed single line when there is nothing new — the spec's "暂无新反馈"
+  /// row that must not reserve card height.
+  private var emptyFeedbackRow: some View {
+    HStack(spacing: MeetPRSpacing.space2) {
+      Circle().fill(Color.MeetPR.textFaint).frame(width: 6, height: 6)
+      Text("暂无新反馈")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+      Spacer()
+    }
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.vertical, MeetPRSpacing.point10)
+    .meetPRCardSurface(.inset)
   }
 
   private func feedbackEyebrow(_ item: CoachFeedback) -> String {
@@ -406,7 +480,7 @@ public struct DashboardView: View {
           .font(Font.MeetPR.monoLabel)
           .tracking(Font.MeetPR.monoLabelTracking)
           .foregroundStyle(Color.MeetPR.gold500)
-        Text(selectedFamilies.isEmpty ? "选中训练日查看对应成长曲线" : "练几次就有趋势了")
+        Text(selectedFamilies.isEmpty ? "选中训练日查看对应成长曲线" : "完成 3 次训练后解锁趋势")
           .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
           .foregroundStyle(Color.MeetPR.textSecondary)
           .frame(maxWidth: .infinity, minHeight: 96, alignment: .leading)

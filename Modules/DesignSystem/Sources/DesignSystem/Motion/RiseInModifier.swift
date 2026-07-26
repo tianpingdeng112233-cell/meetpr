@@ -76,3 +76,27 @@ extension View {
     modifier(PillRiseInModifier())
   }
 }
+
+extension View {
+  /// Gentle opacity pulse for skeleton placeholders; static under reduced
+  /// motion (the ghost tone alone still reads as "loading").
+  public func meetPRSkeletonPulse() -> some View {
+    modifier(SkeletonPulseModifier())
+  }
+}
+
+private struct SkeletonPulseModifier: ViewModifier {
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @State private var dimmed = false
+
+  func body(content: Content) -> some View {
+    content
+      .opacity(dimmed ? 0.55 : 1)
+      .onAppear {
+        guard !reduceMotion else { return }
+        withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
+          dimmed = true
+        }
+      }
+  }
+}
