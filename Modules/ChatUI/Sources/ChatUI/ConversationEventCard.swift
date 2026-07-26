@@ -10,6 +10,8 @@ public struct ConversationEventItem: Identifiable {
     case planPublished
     /// The gold left-border feedback card.
     case feedback
+    /// Same gold-edge card, labeled for the evaluation summary.
+    case evaluation
   }
 
   public let id: String
@@ -47,11 +49,13 @@ struct ConversationEventCard: View {
       Button(action: item.action) {
         switch item.kind {
         case .planPublished: planCard
-        case .feedback: feedbackCard
+        case .feedback, .evaluation: feedbackCard
         }
       }
       .buttonStyle(PressScaleButtonStyle())
-      Spacer(minLength: MeetPRSpacing.point28)
+      // The mockup caps event cards at 88% of the stream width.
+      Spacer(minLength: MeetPRSpacing.zero)
+        .containerRelativeFrame(.horizontal) { length, _ in length * 0.12 }
     }
   }
 
@@ -109,7 +113,7 @@ struct ConversationEventCard: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
       HStack(spacing: MeetPRSpacing.point6) {
         Circle().fill(Color.MeetPR.gold500).frame(width: 7, height: 7)
-        Text("教练反馈")
+        Text(item.kind == .evaluation ? "评估总结" : "教练反馈")
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer(minLength: MeetPRSpacing.space2)

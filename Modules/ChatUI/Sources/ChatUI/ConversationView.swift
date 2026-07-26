@@ -121,10 +121,6 @@ private struct ConversationTimeline: View {
           HistoryLoadingSentinel(load: loadOlderPreservingPosition)
         }
 
-        ForEach(events) { event in
-          ConversationEventCard(item: event)
-        }
-
         ForEach(viewModel.renderedMessages) { message in
           ChatMessageRow(
             message: message,
@@ -144,6 +140,12 @@ private struct ConversationTimeline: View {
             }
           )
           .id(messageScrollID(message.id))
+        }
+
+        // Events sit at the tail of the stream: the conversation opens
+        // scrolled to the bottom, so plan/feedback cards are always visible.
+        ForEach(events) { event in
+          ConversationEventCard(item: event)
         }
 
         ForEach(viewModel.pending, id: \.clientID) { item in

@@ -26,6 +26,7 @@ struct StudentNotificationHostModifier: ViewModifier {
   let coordinator: StudentNotificationsCoordinator
   @Binding var showsNotifications: Bool
   @Binding var conversationID: UUID?
+  @State private var isOpeningConversation = false
   let onOpenPlan: () -> Void
   let onOpenFeedback: () -> Void
   let onOpenEvaluation: () -> Void
@@ -59,7 +60,14 @@ struct StudentNotificationHostModifier: ViewModifier {
       .onChange(of: showsNotifications) { _, isPresented in
         guard isPresented, coordinator.chatContext != nil else { return }
         showsNotifications = false
-        Task { await openCoachConversation() }
+        // Single-flight: taps during the open request (or while the
+        // conversation is already up) must not stack another push.
+        guard !isOpeningConversation, conversationID == nil else { return }
+        isOpeningConversation = true
+        Task {
+          await openCoachConversation()
+          isOpeningConversation = false
+        }
       }
       .sheet(
         isPresented: Binding(
@@ -94,8 +102,7 @@ struct StudentNotificationHostModifier: ViewModifier {
           isUnread: true
         ) {
           coordinator.markCurrentPlanSeen()
-          conversationID = nil
-          onOpenPlan()
+          closeConversationThenRoute(onOpenPlan)
         }
       )
     }
@@ -109,12 +116,34 @@ struct StudentNotificationHostModifier: ViewModifier {
           subtitle: "查看教练最近的训练反馈",
           isUnread: true
         ) {
-          conversationID = nil
-          onOpenFeedback()
+          closeConversationThenRoute(onOpenFeedback)
+        }
+      )
+    }
+    if coordinator.evaluationUnreadCount > 0 {
+      items.append(
+        ConversationEventItem(
+          id: "evaluation-unread",
+          kind: .evaluation,
+          title: "评估总结已发布",
+          subtitle: "查看教练的评估结论",
+          isUnread: true
+        ) {
+          closeConversationThenRoute(onOpenEvaluation)
         }
       )
     }
     return items
+  }
+
+  /// Pop the conversation first, yield so the dismissal lands its own
+  /// transaction, then route — mirroring the legacy sheet's ordering.
+  private func closeConversationThenRoute(_ route: @escaping () -> Void) {
+    conversationID = nil
+    Task { @MainActor in
+      await Task.yield()
+      route()
+    }
   }
 
   private func openCoachConversation() async {
