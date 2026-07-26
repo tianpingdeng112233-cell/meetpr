@@ -350,31 +350,9 @@ public struct TodayWorkoutView: View {
           overviewHero(day: day, drafts: drafts)
             .meetPRRiseIn(index: 2)
         } else {
-          if let activeIndex {
-            activeSetHero(
-              day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
-            )
-            .meetPRRiseIn(index: 2)
-          }
-
-          exerciseSections(
+          recordingContent(
             day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
           )
-          .meetPRRiseIn(
-            index: 3,
-            initialDelay: sessionStarted
-              ? MeetPRMotion.recordingRevealDelay : MeetPRMotion.riseInitialDelay,
-            stagger: sessionStarted ? MeetPRMotion.recordingRevealStagger : MeetPRMotion.riseStagger
-          )
-
-          completionControls(drafts: drafts, day: day, isEditable: isEditable)
-            .meetPRRiseIn(
-              index: 4,
-              initialDelay: sessionStarted
-                ? MeetPRMotion.recordingRevealDelay : MeetPRMotion.riseInitialDelay,
-              stagger: sessionStarted
-                ? MeetPRMotion.recordingRevealStagger : MeetPRMotion.riseStagger
-            )
         }
       }
       .padding(MeetPRSpacing.space4)
@@ -463,6 +441,35 @@ public struct TodayWorkoutView: View {
       setCount: setCount,
       durationMilliseconds: max(0, Int(Date().timeIntervalSince(startedAt) * 1_000)))
     workoutStartedAt.wrappedValue = nil
+  }
+
+  /// State B: the active-set hero plus per-exercise tables. Freshly revealed
+  /// sections fan in on the spec's 360ms/90ms stagger.
+  @ViewBuilder
+  private func recordingContent(
+    day: StudentPlanDay,
+    drafts: [TodayWorkoutViewModel.SetRowDraft],
+    activeIndex: Int?,
+    isEditable: Bool
+  ) -> some View {
+    let delay =
+      sessionStarted ? MeetPRMotion.recordingRevealDelay : MeetPRMotion.riseInitialDelay
+    let stagger =
+      sessionStarted ? MeetPRMotion.recordingRevealStagger : MeetPRMotion.riseStagger
+    if let activeIndex {
+      activeSetHero(
+        day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
+      )
+      .meetPRRiseIn(index: 2)
+    }
+
+    exerciseSections(
+      day: day, drafts: drafts, activeIndex: activeIndex, isEditable: isEditable
+    )
+    .meetPRRiseIn(index: 3, initialDelay: delay, stagger: stagger)
+
+    completionControls(drafts: drafts, day: day, isEditable: isEditable)
+      .meetPRRiseIn(index: 4, initialDelay: delay, stagger: stagger)
   }
 
   // MARK: - Overview (state A)

@@ -265,6 +265,12 @@ extension StudentRootView {
       // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
       .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
     }
+    .modifier(
+      StudentFlatTabBarModifier(
+        selection: $selectedTab,
+        profileBadge: pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount
+      )
+    )
     .task {
       Analytics.shared.screen(.dashboard)
       if let notifications {
