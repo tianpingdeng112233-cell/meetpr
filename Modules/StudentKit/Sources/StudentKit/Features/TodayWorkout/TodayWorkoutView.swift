@@ -375,7 +375,8 @@ public struct TodayWorkoutView: View {
     // from the completion banner after the hold control is gone.
     .sheet(isPresented: $showingSummary) {
       SessionSummaryView(
-        summary: StudentSessionSummary(drafts: drafts), date: day.date, studentID: studentID,
+        summary: StudentSessionSummary(drafts: drafts), date: day.date,
+        dayLabel: todayLabelText(for: day), studentID: studentID,
         streak: streak,
         onComplete: { markReviewCompleted(for: day.date, setCount: drafts.count) }
       )
@@ -1079,6 +1080,15 @@ public struct TodayWorkoutView: View {
       planContext: viewModel.planContext,
       onboarding: viewModel.onboardingProfile
     )
+  }
+
+  /// Day code for the celebration stage, e.g. "W1D4 · 硬拉" → "W1D4".
+  private func todayLabelText(for day: StudentPlanDay) -> String {
+    TodayWorkoutTitleResolver.title(
+      day: day,
+      planContext: viewModel.planContext,
+      onboarding: viewModel.onboardingProfile
+    ).components(separatedBy: " · ").first ?? ""
   }
 
   private var currentDay: StudentPlanDay? {

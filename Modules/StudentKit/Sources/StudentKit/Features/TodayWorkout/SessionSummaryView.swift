@@ -12,6 +12,8 @@ import SwiftUI
 struct SessionSummaryView: View {
   let summary: StudentSessionSummary
   let date: Date
+  /// The day code shown as the first hero numeral, e.g. "W1D4".
+  let dayLabel: String?
   let studentID: UUID
   let streak: any StudentStreakRepository
   let reflectionStore: any SessionReflectionStore
@@ -23,6 +25,7 @@ struct SessionSummaryView: View {
   init(
     summary: StudentSessionSummary,
     date: Date,
+    dayLabel: String? = nil,
     studentID: UUID,
     streak: any StudentStreakRepository = InMemoryStudentStreakRepository(current: 12),
     reflectionStore: any SessionReflectionStore = UserDefaultsSessionReflectionStore(),
@@ -30,6 +33,7 @@ struct SessionSummaryView: View {
   ) {
     self.summary = summary
     self.date = date
+    self.dayLabel = dayLabel
     self.studentID = studentID
     self.streak = streak
     self.reflectionStore = reflectionStore
@@ -40,8 +44,14 @@ struct SessionSummaryView: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: MeetPRSpacing.space6) {
-          SummaryHeader(date: date, streakCurrent: streakCurrent)
-            .meetPRRiseIn(index: 0)
+          CelebrationStage(
+            date: date,
+            dayLabel: dayLabel,
+            totalVolumeKg: summary.totalVolumeKg,
+            streakCurrent: streakCurrent
+          )
+          .frame(maxWidth: .infinity)
+          .meetPRRiseIn(index: 0)
           SummarySection(title: "总览") {
             SummaryOverviewGrid(summary: summary)
           }
@@ -61,6 +71,18 @@ struct SessionSummaryView: View {
       }
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bgBase)
+      .background(alignment: .bottom) {
+        // §4.5: a faint gold bloom rising from the bottom — the screen is the
+        // stage, not a stack of cards.
+        RadialGradient(
+          colors: [Color.MeetPR.gold500.opacity(0.16), .clear],
+          center: .bottom,
+          startRadius: 0,
+          endRadius: 420
+        )
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+      }
       .navigationTitle("训练回顾")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -95,43 +117,96 @@ struct SessionSummaryView: View {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-private struct SummaryHeader: View {
+private struct CelebrationStage: View {
   let date: Date
+  let dayLabel: String?
+  let totalVolumeKg: Decimal
   let streakCurrent: Int?
 
+  /// Drives the volume ticker from 0 to the real total on appear.
+  @State private var shownVolume = 0
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+  private var volumeTarget: Int {
+    (totalVolumeKg as NSDecimalNumber).intValue
+  }
+
   var body: some View {
-    HStack(spacing: MeetPRSpacing.space3) {
+    VStack(spacing: MeetPRSpacing.space3) {
       CelebrationEffects()
-        .frame(width: 104, height: 104)
-      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-        Text("今日训练完成")
-          .font(.MeetPR.display(size: 26, weight: .extraBold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-        Text(StudentFormatting.dayMonthFormatter.string(from: date))
-          .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.textSecondary)
-        if let streakCurrent {
-          Label("连续第 \(streakCurrent) 次训练", systemImage: "flame.fill")
-            .font(
-              .MeetPR.system(
-                size: MeetPRFontMetrics.size12,
-                weight: .bold
-              )
-            )
-            .foregroundStyle(Color.MeetPR.gold500)
-            .padding(.horizontal, MeetPRSpacing.point14)
-            .padding(.vertical, MeetPRSpacing.point6)
-            .background(Color.MeetPR.goldSoft, in: .capsule)
-            .overlay {
-              Capsule()
-                .stroke(Color.MeetPR.gold500.opacity(0.3), lineWidth: 1)
-            }
-            .padding(.top, MeetPRSpacing.space2)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+        .frame(width: 128, height: 128)
+      Text("今日训练完成")
+        .font(.MeetPR.display(size: 27, weight: .extraBold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text(StudentFormatting.dayMonthFormatter.string(from: date))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+
+      HStack(spacing: MeetPRSpacing.space6) {
+        if let dayLabel {
+          heroNumeral(dayLabel, caption: "训练日")
         }
+        heroNumeral(
+          shownVolume.formatted(.number.grouping(.automatic)) + " KG",
+          caption: "今日总容量"
+        )
+        .contentTransition(.numericText(value: Double(shownVolume)))
       }
+      .padding(.top, MeetPRSpacing.space1)
+
+      if let streakCurrent {
+        Label("连续第 \(streakCurrent) 次训练", systemImage: "flame.fill")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size12, weight: .bold))
+          .foregroundStyle(Color.MeetPR.gold500)
+          .padding(.horizontal, MeetPRSpacing.point14)
+          .padding(.vertical, MeetPRSpacing.point6)
+          .background(Color.MeetPR.goldSoft, in: .capsule)
+          .overlay {
+            Capsule().stroke(Color.MeetPR.gold500.opacity(0.3), lineWidth: 1)
+          }
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+      }
+
+      HStack(spacing: MeetPRSpacing.space2) {
+        Image(systemName: "person.crop.circle.badge.checkmark")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
+          .foregroundStyle(Color.MeetPR.success)
+        Text("教练已收到你的训练日志")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+      }
+      .padding(.top, MeetPRSpacing.space1)
     }
     .animation(MeetPRMotion.rise, value: streakCurrent)
+    .task {
+      guard !reduceMotion else {
+        shownVolume = volumeTarget
+        return
+      }
+      // Roll the ticker in ~14 steps over ~0.7s.
+      let target = volumeTarget
+      guard target > 0 else { return }
+      for step in 1...14 {
+        try? await Task.sleep(for: .milliseconds(50))
+        withAnimation(.linear(duration: 0.05)) {
+          shownVolume = target * step / 14
+        }
+      }
+      shownVolume = target
+    }
+  }
+
+  private func heroNumeral(_ value: String, caption: String) -> some View {
+    VStack(spacing: MeetPRSpacing.point3) {
+      Text(value)
+        .font(.MeetPR.mono(size: 30, weight: .bold))
+        .foregroundStyle(Color.MeetPR.gold500)
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
+      Text(caption)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textFaint)
+    }
   }
 }
 
