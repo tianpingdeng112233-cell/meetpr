@@ -121,16 +121,10 @@ struct SetEntrySheet: View {
                 onInc: { updateWeightText(weightValue + 2.5) },
                 focus: { numberPadField = .weight },
                 field: {
-                  Button {
-                    numberPadField = .weight
-                  } label: {
-                    Text(weightText.isEmpty ? "0" : weightText)
-                      .modifier(EntryFieldStyle())
-                      .contentShape(Rectangle())
-                  }
-                  .buttonStyle(.plain)
-                  .accessibilityLabel("重量 \(weightText)")
-                  .accessibilityHint("打开数字键盘修改")
+                  Text(weightText.isEmpty ? "0" : weightText)
+                    .modifier(EntryFieldStyle())
+                    .accessibilityLabel("重量 \(weightText)")
+                    .accessibilityHint("打开数字键盘修改")
                 }
               )
               if let weightSuggestion {
@@ -146,16 +140,10 @@ struct SetEntrySheet: View {
               onInc: { repsText = "\(repsValue + 1)" },
               focus: { numberPadField = .reps },
               field: {
-                Button {
-                  numberPadField = .reps
-                } label: {
-                  Text(repsText.isEmpty ? "0" : repsText)
-                    .modifier(EntryFieldStyle())
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("次数 \(repsText)")
-                .accessibilityHint("打开数字键盘修改")
+                Text(repsText.isEmpty ? "0" : repsText)
+                  .modifier(EntryFieldStyle())
+                  .accessibilityLabel("次数 \(repsText)")
+                  .accessibilityHint("打开数字键盘修改")
               }
             )
             rpeSection
@@ -421,22 +409,25 @@ struct SetEntrySheet: View {
       }
       HStack(spacing: MeetPRSpacing.space3) {
         stepButton("minus", action: onDec)
-        // Filled slot marks the value as a tap-to-type input (students missed the
-        // bare-label number); tapping anywhere in the slot focuses the field.
-        HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
-          field()
-          if let unit {
-            Text(unit).font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .bold))
-              .foregroundStyle(
-                Color.MeetPR.textTertiary)
+        // The entire filled slot is one 54pt button (students missed the bare
+        // number): tapping value, unit, or whitespace opens the number pad.
+        Button(action: focus) {
+          HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
+            field()
+            if let unit {
+              Text(unit).font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .bold))
+                .foregroundStyle(
+                  Color.MeetPR.textTertiary)
+            }
           }
+          .frame(maxWidth: .infinity)
+          .frame(height: 54)
+          .background(
+            RoundedRectangle(cornerRadius: MeetPRRadius.card).fill(Color.MeetPR.surfaceCard)
+          )
+          .contentShape(RoundedRectangle(cornerRadius: MeetPRRadius.card))
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 54)
-        .background(
-          RoundedRectangle(cornerRadius: MeetPRRadius.card).fill(Color.MeetPR.surfaceCard)
-        )
-        .contentShape(RoundedRectangle(cornerRadius: MeetPRRadius.card))
+        .buttonStyle(PressScaleButtonStyle())
 
         stepButton("plus", action: onInc)
       }
