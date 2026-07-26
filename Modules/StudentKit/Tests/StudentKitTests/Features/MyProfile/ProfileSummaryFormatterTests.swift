@@ -56,14 +56,17 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
 }
 
 @Test func competitionSummaryShowsDateAndClassOrOptOut() {
-  #expect(OnboardingSummaryFormatter.competition(fullProfile()) == "备赛: 2026-07-25 · IPF 83kg")
+  let profile = fullProfile()
+  #expect(
+    OnboardingSummaryFormatter.competition(profile)
+      == "备赛: \(profile.competitionDate ?? "") · IPF 83kg")
 
-  var draft = OnboardingDraft.from(fullProfile())
+  var draft = OnboardingDraft.from(profile)
   draft.isCompeting = false
   draft.competitionDate = nil
   let optedOut = InMemoryOnboardingRepository.applied(
     draft.patch(forStep: 7),
-    to: fullProfile(),
+    to: profile,
     updatedAt: now
   )
   #expect(OnboardingSummaryFormatter.competition(optedOut) == "暂不备赛")

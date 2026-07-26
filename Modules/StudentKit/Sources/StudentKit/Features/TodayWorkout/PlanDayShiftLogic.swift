@@ -18,11 +18,22 @@ enum PlanDayShiftLogic {
   static func proposal(
     plan: StudentPlanView,
     today: Date,
-    calendar suppliedCalendar: Calendar? = nil
+    selectedCalendar: Calendar = PlanCalendarDayIdentity.utcCalendar
   ) -> PlanShiftProposal? {
-    let calendar = suppliedCalendar ?? utcCalendar
+    let calendar = PlanCalendarDayIdentity.utcCalendar
     guard
-      let todayDay = plan.days.first(where: { calendar.isDate($0.date, inSameDayAs: today) }),
+      // spec 054's mutation (POST /plans/:id/shift, no date parameter) anchors
+      // "today" to UTC server-side, so the proposal must resolve the same day
+      // the mutation will move. The UI hides the entry point while the device
+      // day and UTC day diverge (00:00–08:00 UTC+8) — see
+      // `DashboardTodayPresentation.shiftTargetsSelectedDay`.
+      let todayDay = plan.days.first(where: {
+        PlanCalendarDayIdentity.matches(
+          planDate: $0.date,
+          selectedDate: today,
+          selectedCalendar: selectedCalendar
+        )
+      }),
       let courseName = todayDay.exercises.first?.exercise.name,
       let authoredEndDate = plan.endDate ?? plan.days.map(\.scheduledDate).max(),
       let currentEndDate = calendar.date(
@@ -48,12 +59,10 @@ enum PlanDayShiftLogic {
 
   static func canUndo(
     latestShiftCreatedAt: Date?,
-    now: Date,
-    calendar suppliedCalendar: Calendar? = nil
+    now: Date
   ) -> Bool {
     guard let latestShiftCreatedAt else { return false }
-    let calendar = suppliedCalendar ?? utcCalendar
-    return calendar.isDate(latestShiftCreatedAt, inSameDayAs: now)
+    return PlanCalendarDayIdentity.isSameUTCDate(latestShiftCreatedAt, now)
   }
 
   static func cumulativeShiftMessage(totalShiftDays: Int) -> String? {
@@ -89,12 +98,11 @@ enum PlanDayShiftLogic {
   }
 
   private static func dateText(_ date: Date) -> String {
-    date.formatted(.dateTime.month().day().locale(Locale(identifier: "zh_CN")))
-  }
-
-  private static var utcCalendar: Calendar {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
-    return calendar
+    let components = PlanCalendarDayIdentity.utcCalendar.dateComponents(
+      [.month, .day],
+      from: date
+    )
+    guard let month = components.month, let day = components.day else { return "" }
+    return "\(month)月\(day)日"
   }
 }

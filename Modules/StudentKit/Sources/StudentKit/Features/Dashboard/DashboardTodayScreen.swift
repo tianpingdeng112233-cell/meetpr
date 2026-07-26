@@ -1,0 +1,247 @@
+import CoreModels
+import DesignSystem
+import SwiftUI
+
+struct DashboardTodayScreenModel {
+  let weekIndex: Int?
+  let days: [StudentPlanDay]
+  let cycleDays: [StudentPlanDay]
+  let logs: [StudentSetLog]
+  let feedbackItems: [CoachFeedback]
+  let trendRows: [DashboardE1RMTrendRow]
+  let metrics: DashboardProfileMetrics?
+  let showsNotifications: Bool
+  let notificationUnreadCount: Int
+  let canShiftPlanDays: Bool
+  let canUndoPlanShift: Bool
+  let isUpdatingDayShift: Bool
+  let isLoading: Bool
+  let now: Date
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct DashboardTodayScreen: View {
+  let model: DashboardTodayScreenModel
+  let feedbackViewModel: FeedbackInboxViewModel?
+  @Binding var selectedDate: Date?
+  @Binding var isFeedbackExpanded: Bool
+  let onOpenNotifications: () -> Void
+  let onStartWorkout: () -> Void
+  let onShiftPlan: () -> Void
+  let onUndoShift: () -> Void
+
+  /// The repo's date-identity contract is mixed on purpose: plan days compare
+  /// by UTC components, "today"/selection by the device calendar — the same
+  /// convention the training tab uses. Pinning UTC here shifts the whole page
+  /// a day backwards for UTC+ users before 08:00.
+  private var calendar: Calendar {
+    .current
+  }
+
+  private var effectiveSelectedDate: Date {
+    selectedDate ?? model.now
+  }
+
+  private var selectedDay: StudentPlanDay? {
+    DashboardTodayPresentation.planDay(
+      on: effectiveSelectedDate,
+      in: model.days,
+      selectedCalendar: calendar
+    )
+  }
+
+  private var selectedFamilies: [LiftFamily] {
+    selectedDay.map(MainLiftExerciseFamilyResolver.families(in:)) ?? []
+  }
+
+  private var selectedTrendRows: [DashboardE1RMTrendRow] {
+    selectedFamilies.compactMap { family in
+      model.trendRows.first { $0.family == family && !$0.points.isEmpty }
+    }
+  }
+
+  private var isSelectedToday: Bool {
+    calendar.isDate(effectiveSelectedDate, inSameDayAs: model.now)
+  }
+
+  private var isRestDay: Bool {
+    selectedDay?.exercises.isEmpty ?? true
+  }
+
+  private var weekCode: String {
+    DashboardTodayPresentation.weekCode(
+      weekIndex: model.weekIndex,
+      selectedDate: effectiveSelectedDate,
+      days: model.days,
+      selectedCalendar: calendar
+    )
+  }
+
+  private var liftSubtitle: String {
+    selectedFamilies
+      .map(DashboardTodayPresentation.liftShortName)
+      .joined(separator: "·")
+  }
+
+  private var canShiftSelectedDay: Bool {
+    guard model.canShiftPlanDays,
+      isSelectedToday,
+      let selectedDay,
+      TrainingDayProgress(day: selectedDay, logs: model.logs).state == .notStarted,
+      // The shift mutation anchors "today" to UTC (spec 054); hide the entry
+      // while device-today and UTC-today resolve to different plan days
+      // (00:00–08:00 in UTC+8), or the dialog would describe one session and
+      // the server would move another.
+      DashboardTodayPresentation.shiftTargetsSelectedDay(selectedDay, now: model.now)
+    else {
+      return false
+    }
+    let exerciseIDs = Set(selectedDay.exercises.map(\.id))
+    return !model.logs.contains { exerciseIDs.contains($0.planExerciseID) }
+  }
+
+  private var actionState: DashboardTodayActionState {
+    DashboardTodayPresentation.actionState(
+      isSelectedToday: isSelectedToday,
+      isRestDay: isRestDay,
+      canUndoPlanShift: model.canUndoPlanShift
+    )
+  }
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 15) {
+      DashboardHeader(
+        weekCode: weekCode,
+        selectedDate: effectiveSelectedDate,
+        isRestDay: isRestDay,
+        showsNotifications: model.showsNotifications,
+        unreadCount: model.notificationUnreadCount,
+        progressSegments: DashboardTodayPresentation.progressSegments(
+          days: model.days,
+          logs: model.logs,
+          today: model.now,
+          selectedCalendar: calendar
+        ),
+        onOpenNotifications: onOpenNotifications
+      )
+
+      if model.isLoading {
+        DashboardTodayLoadingSkeleton()
+      } else {
+        DashboardFeedbackCard(
+          items: model.feedbackItems,
+          viewModel: feedbackViewModel,
+          isExpanded: $isFeedbackExpanded
+        )
+
+        DashboardWeekCalendar(
+          cells: DashboardTodayPresentation.calendarCells(
+            days: model.days,
+            selectedDate: effectiveSelectedDate,
+            today: model.now,
+            selectedCalendar: calendar
+          ),
+          onSelect: { selectedDate = $0 }
+        )
+
+        if let metrics = model.metrics {
+          DashboardProfileMetricsView(metrics: metrics)
+        }
+
+        Text("周\(weekdayLetter) · E1RM 曲线")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+          .padding(.top, -5)
+
+        if isRestDay {
+          DashboardRestDayCard(
+            isToday: isSelectedToday,
+            nextTrainingDate: DashboardTodayPresentation.nextTrainingDate(
+              after: effectiveSelectedDate,
+              days: model.cycleDays,
+              selectedCalendar: calendar
+            )
+          )
+        } else if selectedTrendRows.isEmpty {
+          Text("完成 3 次训练后解锁趋势")
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textMuted)
+            .frame(maxWidth: .infinity)
+            .padding(20)
+            .background(Color.MeetPR.surfaceCard)
+            .clipShape(.rect(cornerRadius: 16))
+        } else {
+          DashboardE1RMRail(rows: selectedTrendRows)
+        }
+
+        switch actionState {
+        case .postponed:
+          DashboardPostponedState(
+            tomorrowLabel: tomorrowLabel,
+            isUpdatingShift: model.isUpdatingDayShift,
+            onUndo: onUndoShift
+          )
+        case .primary:
+          DashboardPrimaryAction(
+            liftSubtitle: liftSubtitle,
+            canShift: canShiftSelectedDay,
+            isUpdatingShift: model.isUpdatingDayShift,
+            onStart: onStartWorkout,
+            onShift: onShiftPlan
+          )
+        case .hidden:
+          EmptyView()
+        }
+      }
+    }
+    .padding(.horizontal, 20)
+    .padding(.top, 6)
+    .padding(.bottom, 28)
+  }
+
+  private var weekdayLetter: String {
+    let offset = DashboardTodayPresentation.mondayOffset(
+      for: effectiveSelectedDate,
+      calendar: calendar
+    )
+    return DashboardTodayPresentation.weekdayLetter(offset)
+  }
+
+  private var tomorrowLabel: String {
+    let tomorrow =
+      calendar.date(byAdding: .day, value: 1, to: model.now)
+      ?? model.now.addingTimeInterval(86_400)
+    // "Tomorrow" is a device-calendar concept — format it with the same
+    // calendar that computed it, or the month/day and weekday can disagree.
+    let monthDay = DashboardTodayPresentation.monthDayText(tomorrow, calendar: calendar)
+    let offset = DashboardTodayPresentation.mondayOffset(for: tomorrow, calendar: calendar)
+    return "明天 · \(monthDay) 周\(DashboardTodayPresentation.weekdayLetter(offset))"
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct DashboardTodayLoadingSkeleton: View {
+  var body: some View {
+    VStack(spacing: 12) {
+      skeleton(height: 112, radius: 12)
+      HStack(spacing: 6) {
+        ForEach(0..<7, id: \.self) { _ in
+          skeleton(height: 44, radius: 12)
+        }
+      }
+      HStack(spacing: 11) {
+        skeleton(height: 72, radius: 16)
+        skeleton(height: 72, radius: 16)
+      }
+      skeleton(height: 128, radius: 16)
+    }
+    .accessibilityLabel("正在加载今日计划")
+  }
+
+  private func skeleton(height: CGFloat, radius: CGFloat) -> some View {
+    RoundedRectangle(cornerRadius: radius)
+      .fill(Color.MeetPR.textGhost.opacity(0.34))
+      .frame(maxWidth: .infinity)
+      .frame(height: height)
+  }
+}

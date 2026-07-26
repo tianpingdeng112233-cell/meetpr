@@ -356,13 +356,19 @@ extension StudentDemoSeed {
       injuryNotes: "左肩撞击综合征",
       injuryAreas: [.shoulder],
       isCompeting: true,
-      competitionDate: "2026-07-25",
+      competitionDate: demoCompetitionDate(),
       targetWeightClass: "IPF 83kg",
       noteToCoach: "想冲全国赛,请多关注深蹲底部速度",
       completedAt: referenceDate,
       createdAt: referenceDate,
       updatedAt: referenceDate
     )
+  }
+
+  private static func demoCompetitionDate() -> String {
+    let calendar = Calendar.current
+    let date = calendar.date(byAdding: .day, value: 3, to: Date()) ?? Date()
+    return DateOnly.string(from: date)
   }
 
   /// Accepted bond — the demo student goes straight through the BindGate
