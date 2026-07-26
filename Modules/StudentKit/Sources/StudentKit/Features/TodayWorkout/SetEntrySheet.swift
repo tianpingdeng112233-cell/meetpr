@@ -33,6 +33,8 @@ struct SetEntrySheet: View {
   @State private var repsText: String
   @State private var rpeText: String
   @State private var weightSuggestion: SetWeightSuggestion?
+  /// Which value the bottom-sheet keypad is editing; nil = closed (§3 NumberPad).
+  @State private var numberPadField: MeetPRNumberPad.Field?
   @FocusState private var focusedField: SetEntryNumberField?
   /// Whether the 2.5kg competition collar (赛扣) is loaded. When on it counts
   /// toward the dialed weight, so the plates drop 2.5kg per side; the barbell
@@ -116,6 +118,12 @@ struct SetEntrySheet: View {
                     .accessibilityLabel("重量")
                     .maxInputLength($weightText, 6)
                     .modifier(EntryFieldStyle())
+                    .allowsHitTesting(false)
+                    .overlay {
+                      Color.clear
+                        .contentShape(Rectangle())
+                        .onTapGesture { numberPadField = .weight }
+                    }
                 }
               )
               if let weightSuggestion {
@@ -137,6 +145,12 @@ struct SetEntrySheet: View {
                   .accessibilityLabel("次数")
                   .maxInputLength($repsText, 4)
                   .modifier(EntryFieldStyle())
+                  .allowsHitTesting(false)
+                  .overlay {
+                    Color.clear
+                      .contentShape(Rectangle())
+                      .onTapGesture { numberPadField = .reps }
+                  }
               }
             )
             rpeSection
@@ -171,6 +185,30 @@ struct SetEntrySheet: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bgBase)
     .presentationDetents([.large])
+    .sheet(
+      isPresented: Binding(
+        get: { numberPadField != nil },
+        set: { if !$0 { numberPadField = nil } }
+      )
+    ) {
+      if let field = numberPadField {
+        MeetPRNumberPad(
+          field: field,
+          value: field == .weight
+            ? (weightValue as NSDecimalNumber).doubleValue : Double(repsValue),
+          onCommit: { snapped in
+            switch field {
+            case .weight: updateWeightText(Decimal(snapped))
+            case .reps: repsText = "\(Int(snapped))"
+            }
+            numberPadField = nil
+          },
+          onCancel: { numberPadField = nil }
+        )
+        .presentationDetents([.height(430)])
+        .presentationDragIndicator(.visible)
+      }
+    }
     .modifier(SetEntryErrorAlert(viewModel: viewModel))
     .modifier(
       SetEntryAnalyticsModifier(
