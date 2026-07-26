@@ -8,14 +8,19 @@ public struct ConversationView: View {
   @Environment(\.scenePhase) private var scenePhase
   @State private var viewModel: ConversationViewModel
   @State private var selectedImage: SelectedChatImage?
+  /// Coach-side events (plan publishes, feedback) rendered inside the stream
+  /// — the design has no separate notification hub.
+  private let events: [ConversationEventItem]
 
   public init(
     conversationID: UUID,
     currentUserID: UUID,
     repository: any ChatRepository,
     inbox: ChatInboxViewModel,
-    sendCoordinator: ChatSendCoordinator
+    sendCoordinator: ChatSendCoordinator,
+    events: [ConversationEventItem] = []
   ) {
+    self.events = events
     _viewModel = State(
       initialValue: ConversationViewModel(
         conversationID: conversationID,
@@ -35,7 +40,8 @@ public struct ConversationView: View {
 
       ConversationTimeline(
         viewModel: viewModel,
-        selectedImage: $selectedImage
+        selectedImage: $selectedImage,
+        events: events
       )
 
       Divider()
@@ -105,6 +111,7 @@ private struct ChatErrorBanner: View {
 private struct ConversationTimeline: View {
   let viewModel: ConversationViewModel
   @Binding var selectedImage: SelectedChatImage?
+  var events: [ConversationEventItem] = []
   @State private var scrollPosition: String?
 
   var body: some View {
@@ -112,6 +119,10 @@ private struct ConversationTimeline: View {
       LazyVStack(spacing: MeetPRSpacing.sm) {
         if viewModel.hasMoreHistory {
           HistoryLoadingSentinel(load: loadOlderPreservingPosition)
+        }
+
+        ForEach(events) { event in
+          ConversationEventCard(item: event)
         }
 
         ForEach(viewModel.renderedMessages) { message in

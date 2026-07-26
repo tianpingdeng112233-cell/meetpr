@@ -48,11 +48,25 @@ struct StudentNotificationHostModifier: ViewModifier {
             currentUserID: chat.currentUserID,
             repository: chat.repository,
             inbox: chat.inbox,
-            sendCoordinator: chat.sendCoordinator
+            sendCoordinator: chat.sendCoordinator,
+            events: conversationEvents
           )
         }
       }
-      .sheet(isPresented: $showsNotifications) {
+      // The design has no notification hub: the header bubble goes straight
+      // into the coach conversation, where plan and feedback events live as
+      // stream cards. The legacy sheet only remains for accounts without chat.
+      .onChange(of: showsNotifications) { _, isPresented in
+        guard isPresented, coordinator.chatContext != nil else { return }
+        showsNotifications = false
+        Task { await openCoachConversation() }
+      }
+      .sheet(
+        isPresented: Binding(
+          get: { showsNotifications && coordinator.chatContext == nil },
+          set: { if !$0 { showsNotifications = false } }
+        )
+      ) {
         NotificationCenterSheet(
           coordinator: coordinator,
           onOpenPlan: {
@@ -65,6 +79,42 @@ struct StudentNotificationHostModifier: ViewModifier {
         )
         .presentationDetents([.medium, .large])
       }
+  }
+
+  /// Plan and feedback surfaced as in-stream cards, per the mockup.
+  private var conversationEvents: [ConversationEventItem] {
+    var items: [ConversationEventItem] = []
+    if let notice = coordinator.planNotice {
+      items.append(
+        ConversationEventItem(
+          id: "plan-w\(notice.weekIndex)",
+          kind: .planPublished,
+          title: "教练发布了新计划",
+          subtitle: "第 \(notice.weekIndex) 周计划已可查看",
+          isUnread: true
+        ) {
+          coordinator.markCurrentPlanSeen()
+          conversationID = nil
+          onOpenPlan()
+        }
+      )
+    }
+    let unreadFeedback = coordinator.feedbackUnreadCount
+    if unreadFeedback > 0 {
+      items.append(
+        ConversationEventItem(
+          id: "feedback-unread",
+          kind: .feedback,
+          title: "\(unreadFeedback) 条未读反馈",
+          subtitle: "查看教练最近的训练反馈",
+          isUnread: true
+        ) {
+          conversationID = nil
+          onOpenFeedback()
+        }
+      )
+    }
+    return items
   }
 
   private func openCoachConversation() async {
