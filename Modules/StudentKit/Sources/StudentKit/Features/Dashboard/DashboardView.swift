@@ -46,6 +46,7 @@ public struct DashboardView: View {
   /// Inline expansion of the coach-feedback card (§6 motion).
   @State private var feedbackExpanded = false
   @Environment(\.colorScheme) private var colorScheme
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   public init(
     studentID: UUID,
@@ -270,7 +271,7 @@ public struct DashboardView: View {
   private func todayFeedbackCard(_ item: CoachFeedback) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
       Button {
-        withAnimation(.spring(duration: 0.34, bounce: 0.18)) {
+        withAnimation(reduceMotion ? nil : .spring(duration: 0.34, bounce: 0.18)) {
           feedbackExpanded.toggle()
         }
       } label: {
@@ -287,7 +288,9 @@ public struct DashboardView: View {
           }
         }
         .padding(.top, MeetPRSpacing.space2)
-        .transition(.opacity.combined(with: .move(edge: .top)))
+        .transition(
+          reduceMotion ? .opacity : .opacity.combined(with: .move(edge: .top))
+        )
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -404,12 +407,19 @@ public struct DashboardView: View {
   }
 
   private var weekGrid: some View {
-    HStack(spacing: MeetPRSpacing.point6) {
-      ForEach(0..<7, id: \.self) { offset in
-        let date = weekday(offset)
-        dayCell(offset: offset, date: date, day: planDay(on: date))
+    // 7 × 44pt minimum-target chips + 6 × 5pt gaps = 338pt, which fits every
+    // supported width down to the SE's 343pt content box; the scroll view is
+    // the §2-compliant escape hatch for anything narrower.
+    ScrollView(.horizontal, showsIndicators: false) {
+      HStack(spacing: MeetPRSpacing.point5) {
+        ForEach(0..<7, id: \.self) { offset in
+          let date = weekday(offset)
+          dayCell(offset: offset, date: date, day: planDay(on: date))
+        }
       }
+      .frame(minWidth: nil)
     }
+    .scrollBounceBehavior(.basedOnSize)
   }
 
   private func dayCell(offset: Int, date: Date, day: StudentPlanDay?) -> some View {

@@ -71,9 +71,8 @@ public struct MeetPRDayChip: View {
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
           .foregroundStyle(textColor)
       }
-      // Flexible width: seven chips must fit 375–430pt screens inside the
-      // 16pt page margins, so the 52pt mockup width is a maximum, not a floor.
-      .frame(maxWidth: .infinity, minHeight: 44)
+      // 44pt is the §2 floor; the strip scrolls when seven don't fit.
+      .frame(minWidth: 44, maxWidth: .infinity, minHeight: 44)
       .background(background)
       .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       .overlay {

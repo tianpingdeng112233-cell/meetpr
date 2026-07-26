@@ -152,6 +152,17 @@ struct ColorsTests {
       dark: .init(20, 20, 20),
       light: .init(255, 255, 255)
     )
+    try assertDynamicColor(
+      .MeetPR.successSoft,
+      dark: .init(159, 199, 174),
+      light: .init(21, 128, 61)
+    )
+    try assertDynamicColor(.MeetPR.bgDeep, dark: .init(5, 5, 6), light: .init(237, 238, 241))
+    try assertDynamicColor(
+      .MeetPR.textDim,
+      dark: .init(106, 106, 112),
+      light: .init(156, 163, 175)
+    )
   }
 }
 

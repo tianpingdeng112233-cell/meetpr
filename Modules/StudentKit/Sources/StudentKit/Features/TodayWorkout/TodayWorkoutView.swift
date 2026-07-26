@@ -802,7 +802,8 @@ public struct TodayWorkoutView: View {
             Rectangle().fill(Color.MeetPR.borderDefault).frame(height: 1)
           }
 
-          ForEach(Array(rows.enumerated()), id: \.element.id) { offset, draft in
+          ForEach(rows.indices, id: \.self) { offset in
+            let draft = rows[offset]
             let index = allDrafts.firstIndex { $0.id == draft.id } ?? 0
             setRow(
               draft: draft,

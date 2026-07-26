@@ -141,6 +141,8 @@ private struct ChargeButtonStyle: ButtonStyle {
   let isDisabled: Bool
   let onPressingChanged: (Bool) -> Void
 
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
   init(isDisabled: Bool, onPressingChanged: @escaping (Bool) -> Void) {
     self.isDisabled = isDisabled
     self.onPressingChanged = onPressingChanged
@@ -148,8 +150,10 @@ private struct ChargeButtonStyle: ButtonStyle {
 
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
-      .scaleEffect(configuration.isPressed && !isDisabled ? 0.97 : 1)
-      .animation(MeetPRMotion.press, value: configuration.isPressed)
+      .scaleEffect(
+        configuration.isPressed && !isDisabled && !reduceMotion ? 0.97 : 1
+      )
+      .animation(reduceMotion ? nil : MeetPRMotion.press, value: configuration.isPressed)
       .onChange(of: configuration.isPressed) { _, pressed in
         onPressingChanged(pressed && !isDisabled)
       }

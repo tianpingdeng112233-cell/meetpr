@@ -46,6 +46,15 @@ struct SetEntrySheet: View {
   @AppStorage var collarOn: Bool
 
   var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
+
+  /// The analytics-visible field while the number pad edits weight or reps.
+  private var numberPadEditingField: SetEntryNumberField? {
+    switch numberPadField {
+    case .weight: .weight
+    case .reps: .reps
+    case nil: nil
+    }
+  }
   private var repsValue: Int { SetEntryValue.reps(from: repsText) }
   private var rpeValue: Decimal { SetEntryValue.rpe(from: rpeText) }
 
@@ -211,7 +220,9 @@ struct SetEntrySheet: View {
         weightText: weightText,
         repsText: repsText,
         rpeText: rpeText,
-        focusedField: focusedField)
+        // Weight/reps re-edits now happen in the number-pad sheet, so the
+        // friction trackers follow its lifecycle; RPE keeps the focus path.
+        focusedField: numberPadEditingField ?? focusedField)
     )
     #if os(iOS)
       .toolbar {
@@ -426,7 +437,7 @@ struct SetEntrySheet: View {
           RoundedRectangle(cornerRadius: MeetPRRadius.card).fill(Color.MeetPR.surfaceCard)
         )
         .contentShape(RoundedRectangle(cornerRadius: MeetPRRadius.card))
-        .onTapGesture(perform: focus)
+
         stepButton("plus", action: onInc)
       }
     }
