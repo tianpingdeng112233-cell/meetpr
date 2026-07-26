@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// A lightweight polyline mini-chart (e1RM trends, inline cards) with a brand-red
+/// A lightweight polyline mini-chart (e1RM trends, inline cards) with a gold
 /// end dot. For richer interactive charts use `E1RMChart`; this is the compact form.
 @available(iOS 17.0, macOS 14.0, *)
 @MainActor
@@ -15,8 +15,8 @@ public struct Sparkline: View {
   public init(
     points: [CGPoint],
     viewBox: CGSize = CGSize(width: 600, height: 90),
-    lineColor: Color = Color.MeetPR.fgPrimary,
-    lineWidth: CGFloat = 1.5,
+    lineColor: Color = Color.MeetPR.chartLine,
+    lineWidth: CGFloat = 2.5,
     showsEndDot: Bool = true,
     showsPointDots: Bool = false
   ) {
@@ -43,7 +43,7 @@ public struct Sparkline: View {
 
         // Per-point markers (P2-8): a bare polyline reads as "no data points";
         // muted dots make each logged session legible without competing with
-        // the red end dot.
+        // the gold end dot.
         if showsPointDots {
           ForEach(Array(points.enumerated()), id: \.offset) { _, point in
             Circle()
@@ -55,8 +55,9 @@ public struct Sparkline: View {
 
         if showsEndDot, let last = points.last {
           Circle()
-            .fill(Color.MeetPR.brandRed)
-            .frame(width: 8, height: 8)
+            .fill(Color.MeetPR.gold500)
+            .frame(width: 7, height: 7)
+            .shadow(color: Color.MeetPR.gold500.opacity(0.5), radius: 6)
             .position(x: last.x * scaleX, y: last.y * scaleY)
         }
       }
@@ -82,6 +83,6 @@ public struct Sparkline: View {
   )
   .frame(height: 90)
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }

@@ -24,18 +24,22 @@ public struct DangerButton: View {
   public var body: some View {
     Button(action: handleTap) {
       Text(title)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(.white)
+        .font(Font.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.danger)
         .lineLimit(2)
         .multilineTextAlignment(.center)
         .padding(.horizontal, MeetPRSpacing.lg)
-        .padding(.vertical, 14)
+        .padding(.vertical, MeetPRSpacing.point14)
         .frame(maxWidth: isFullWidth ? .infinity : nil)
         .frame(minHeight: 44)
-        .background(Color.MeetPR.brandRed)
-        .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
+        .background(Color.MeetPR.surfaceCard)
+        .overlay {
+          RoundedRectangle(cornerRadius: MeetPRRadius.card)
+            .stroke(Color.MeetPR.danger.opacity(0.4), lineWidth: 1)
+        }
+        .clipShape(.rect(cornerRadius: MeetPRRadius.card))
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: isDisabled))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled))
     .disabled(isDisabled)
     .sensoryFeedback(.warning, trigger: feedbackTrigger)
     .accessibilityLabel(title)
@@ -54,13 +58,13 @@ public struct DangerButton: View {
     DangerButton("Disabled", isDisabled: true) {}
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("DangerButton Light") {
   DangerButton("Revoke Access") {}
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

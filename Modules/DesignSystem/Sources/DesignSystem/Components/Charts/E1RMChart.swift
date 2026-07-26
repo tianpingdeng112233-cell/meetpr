@@ -85,7 +85,7 @@ public struct E1RMChart: View {
   }
 
   public var body: some View {
-    VStack(alignment: .leading, spacing: 4) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
       Chart {
         smoothedLine
         recordDots
@@ -94,12 +94,12 @@ public struct E1RMChart: View {
       .chartYScale(domain: yDomain)
       .chartYAxis {
         AxisMarks(position: .leading) { value in
-          AxisGridLine().foregroundStyle(Color.MeetPR.fgTertiary.opacity(0.25))
+          AxisGridLine().foregroundStyle(Color.MeetPR.borderSubtle)
           AxisValueLabel {
             if let kilograms = value.as(Double.self) {
               Text("\(Int(kilograms))")
-                .font(Font.MeetPR.monoLabel)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .font(.MeetPR.mono(size: 10, weight: .medium))
+                .foregroundStyle(Color.MeetPR.textMuted)
             }
           }
         }
@@ -109,8 +109,8 @@ public struct E1RMChart: View {
           AxisValueLabel {
             if let date = value.as(Date.self) {
               Text(Self.chineseMonthDay(date))
-                .font(Font.MeetPR.monoLabel)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .font(.MeetPR.mono(size: 10, weight: .medium))
+                .foregroundStyle(Color.MeetPR.textMuted)
             }
           }
         }
@@ -148,16 +148,16 @@ public struct E1RMChart: View {
       .accessibilityLabel("e1RM 成长曲线，共 \(smoothed.count) 个主线数据点")
 
       if containsImportedPoint {
-        HStack(spacing: 6) {
+        HStack(spacing: MeetPRSpacing.point6) {
           ImportedLegendDash()
             .stroke(
-              Color.MeetPR.fgSecondary,
+              Color.MeetPR.textTertiary,
               style: StrokeStyle(lineWidth: 1.5, dash: [5, 3])
             )
             .frame(width: 22, height: 1.5)
           Text("虚线 = 导入的历史记录")
-            .font(Font.MeetPR.monoLabel)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .font(.MeetPR.mono(size: 10, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
     }
@@ -186,10 +186,10 @@ public struct E1RMChart: View {
         x: .value("日期", point.date),
         y: .value("e1RM", point.e1RMKg)
       )
-      .foregroundStyle(lineColor(for: point.origin))
+      .foregroundStyle(Color.MeetPR.chartLine)
       .symbol(.circle)
-      .symbolSize(20)
-      .annotation(position: .top, spacing: 4) {
+      .symbolSize(46)
+      .annotation(position: .top, spacing: MeetPRSpacing.space1) {
         recordAnnotation(for: point)
       }
     }
@@ -205,16 +205,16 @@ public struct E1RMChart: View {
   private func recordAnnotation(for point: E1RMChartPoint) -> some View {
     if point.id == calloutPointID {
       Text("\(Self.chineseMonthDay(point.date)) · \(Self.kilograms(point.e1RMKg))kg")
-        .font(Font.MeetPR.monoLabel)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 3)
-        .background(Color.MeetPR.surface3, in: RoundedRectangle(cornerRadius: 5))
+        .font(.MeetPR.mono(size: 10, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .padding(.horizontal, MeetPRSpacing.point6)
+        .padding(.vertical, MeetPRSpacing.point3)
+        .background(Color.MeetPR.surfaceKey, in: RoundedRectangle(cornerRadius: MeetPRRadius.sm))
         .fixedSize()
     } else if calloutPointID == nil, point.id == recordPoints.last?.id {
       Text(Self.chineseMonthDay(point.date))
-        .font(Font.MeetPR.monoLabel)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.mono(size: 10, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textTertiary)
         .fixedSize()
     }
   }
@@ -251,15 +251,15 @@ public struct E1RMChart: View {
 
   private func lineColor(for origin: E1RMChartPointOrigin) -> Color {
     switch origin {
-    case .logged: Color.MeetPR.fgPrimary
-    case .imported: Color.MeetPR.fgSecondary
+    case .logged: Color.MeetPR.chartLine
+    case .imported: Color.MeetPR.textTertiary
     }
   }
 
   private func lineStyle(for origin: E1RMChartPointOrigin) -> StrokeStyle {
     switch origin {
-    case .logged: StrokeStyle(lineWidth: 1.5)
-    case .imported: StrokeStyle(lineWidth: 1.5, dash: [5, 3])
+    case .logged: StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round)
+    case .imported: StrokeStyle(lineWidth: 1.2, lineCap: .round, dash: [5, 3])
     }
   }
 

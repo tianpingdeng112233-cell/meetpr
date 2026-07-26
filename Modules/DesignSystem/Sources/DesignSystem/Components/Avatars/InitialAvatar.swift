@@ -13,15 +13,15 @@ public struct InitialAvatar: View {
   public var body: some View {
     Text(Self.initials(from: name))
       .font(Font.MeetPR.bodyEmphasis)
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .foregroundStyle(Color.MeetPR.textPrimary)
       .lineLimit(1)
       .minimumScaleFactor(0.75)
       .frame(width: size, height: size)
-      .background(Color.MeetPR.surface3)
+      .background(Color.MeetPR.surfaceKey)
       .clipShape(.circle)
       .overlay {
         Circle()
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
       .accessibilityHidden(true)
   }
@@ -45,6 +45,6 @@ public struct InitialAvatar: View {
     InitialAvatar("")
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }

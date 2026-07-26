@@ -15,20 +15,20 @@ public struct StatBlock: View {
   public var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       Text(label.uppercased())
-        .font(Font.MeetPR.monoLabel)
-        .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .font(.MeetPR.mono(size: 11, weight: .bold))
+        .tracking(0.8)
+        .foregroundStyle(Color.MeetPR.textMuted)
 
-      HStack(alignment: .firstTextBaseline, spacing: 6) {
+      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.point6) {
         Text(value)
-          .font(Font.MeetPR.displayNumeral)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: 54, weight: .black))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .monospacedDigit()
 
         Text(unit.uppercased())
-          .font(Font.MeetPR.displayUnit)
+          .font(.MeetPR.mono(size: 12, weight: .bold))
           .tracking(Font.MeetPR.displayUnitTracking)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
     }
     .accessibilityElement(children: .ignore)
@@ -43,13 +43,13 @@ public struct StatBlock: View {
     StatBlock(label: "Bench", value: "200", unit: "KG")
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("StatBlock Light") {
   StatBlock(label: "Squat 1RM", value: "94", unit: "%")
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

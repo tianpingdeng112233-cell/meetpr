@@ -27,24 +27,24 @@ public struct PlateLoadout: View {
   // outboard of the collar. The whole assembly is centered so both ends inset
   // from the edges — the sleeve "truncates" a little short on the right.
   public var body: some View {
-    HStack(spacing: 0) {
+    HStack(spacing: MeetPRSpacing.zero) {
       barSegment(width: 64, height: 7, radius: 4, roundLeading: true, gradient: Self.shaft)
       // Sleeve shoulder / stopper the plates seat against.
-      RoundedRectangle(cornerRadius: 3)
+      RoundedRectangle(cornerRadius: MeetPRRadius.point3)
         .fill(Self.shoulder)
         .frame(width: 10, height: 36)
         .overlay(alignment: .trailing) {
           Rectangle().fill(Color(plateHex: 0x4B5563)).frame(width: 1)
         }
-      HStack(spacing: 2) {
+      HStack(spacing: MeetPRSpacing.point2) {
         ForEach(Array(plates.enumerated()), id: \.offset) { _, plate in PlateView(value: plate) }
       }
-      .padding(.leading, 2)
+      .padding(.leading, MeetPRSpacing.point2)
       if showCollar {
-        CollarView().padding(.leading, 2)
+        CollarView().padding(.leading, MeetPRSpacing.point2)
       }
       barSegment(width: 110, height: 15, radius: 7, roundLeading: false, gradient: Self.sleeve)
-        .padding(.leading, 2)
+        .padding(.leading, MeetPRSpacing.point2)
     }
     .frame(maxWidth: .infinity)
     .frame(height: 208)
@@ -136,7 +136,7 @@ private struct PlateView: View {
   var body: some View {
     // Radius 5 + no outline: the plate is just the gradient bar, exactly as the
     // 杠铃片规格 cards draw it; the 2pt inter-plate gap gives the separation.
-    RoundedRectangle(cornerRadius: 5)
+    RoundedRectangle(cornerRadius: MeetPRRadius.point5)
       .fill(gradient)
       .frame(width: spec.w, height: spec.h)
   }
@@ -183,7 +183,7 @@ private struct CollarView: View {
   ]
 
   var body: some View {
-    HStack(spacing: 1) {
+    HStack(spacing: MeetPRSpacing.point1) {
       octagon
       nut
     }
@@ -204,7 +204,7 @@ private struct CollarView: View {
       .frame(width: 14, height: 44)
       .overlay {
         // Knurl rings.
-        VStack(spacing: 0) {
+        VStack(spacing: MeetPRSpacing.zero) {
           knurlLine(0.16, .black.opacity(0.35))
           knurlLine(0.18, .white.opacity(0.6))
           Spacer()
@@ -216,11 +216,14 @@ private struct CollarView: View {
   }
 
   private func knurlLine(_ topFraction: CGFloat, _ color: Color) -> some View {
-    Rectangle().fill(color).frame(height: 1).padding(.top, 44 * topFraction)
+    Rectangle()
+      .fill(color)
+      .frame(height: MeetPRSpacing.point1)
+      .padding(.top, MeetPRSpacing.minimumHitTarget * topFraction)
   }
 
   private var nut: some View {
-    RoundedRectangle(cornerRadius: 2)
+    RoundedRectangle(cornerRadius: MeetPRRadius.point2)
       .fill(
         LinearGradient(
           colors: [
@@ -230,7 +233,7 @@ private struct CollarView: View {
       )
       .frame(width: 15, height: 34)
       .overlay {
-        HStack(spacing: 1.5) {
+        HStack(spacing: MeetPRSpacing.point1AndHalf) {
           ForEach(0..<4, id: \.self) { _ in
             Rectangle().fill(.white.opacity(0.25)).frame(width: 0.5)
             Rectangle().fill(.black.opacity(0.25)).frame(width: 0.5)
@@ -241,7 +244,7 @@ private struct CollarView: View {
 
   /// The clamp lever, hinged near the nut and swung down-left.
   private var lever: some View {
-    RoundedRectangle(cornerRadius: 1.5)
+    RoundedRectangle(cornerRadius: MeetPRRadius.point1AndHalf)
       .fill(
         LinearGradient(
           colors: [Color(plateHex: 0xD9DCE0), Color(plateHex: 0x84888F)],
@@ -249,7 +252,7 @@ private struct CollarView: View {
       )
       .frame(width: 3, height: 30)
       .overlay(alignment: .bottom) {
-        RoundedRectangle(cornerRadius: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.point1)
           .fill(
             LinearGradient(
               colors: [Color(plateHex: 0xB9BDC4), Color(plateHex: 0x6F7379)],
@@ -291,13 +294,13 @@ extension Color {
 }
 
 #Preview("PlateLoadout") {
-  VStack(spacing: 24) {
+  VStack(spacing: MeetPRSpacing.space6) {
     PlateLoadout(plates: PlateLoadout.load(perSide: 72.5))
     Text(PlateLoadout.breakdownText(PlateLoadout.load(perSide: 72.5)))
-      .font(.system(size: 14, weight: .semibold, design: .monospaced))
-      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold, design: .monospaced))
+      .foregroundStyle(Color.MeetPR.textPrimary)
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }

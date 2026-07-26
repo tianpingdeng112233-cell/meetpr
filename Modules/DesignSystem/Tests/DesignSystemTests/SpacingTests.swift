@@ -4,15 +4,16 @@ import Testing
 
 @Suite("MeetPR spacing tokens")
 struct SpacingTests {
-  @Test("spacing values match CSS 8pt grid")
-  func spacingValuesMatchCSSGrid() {
-    #expect(MeetPRSpacing.xs == 4)
-    #expect(MeetPRSpacing.sm == 8)
-    #expect(MeetPRSpacing.md == 12)
-    #expect(MeetPRSpacing.base == 16)
-    #expect(MeetPRSpacing.lg == 24)
-    #expect(MeetPRSpacing.xl == 32)
-    #expect(MeetPRSpacing.xxl == 48)
-    #expect(MeetPRSpacing.xxxl == 64)
+  @Test("spacing values match the 4pt black-gold grid")
+  func spacingValuesMatchBlackGoldGrid() {
+    #expect(MeetPRSpacing.space1 == 4)
+    #expect(MeetPRSpacing.space2 == 8)
+    #expect(MeetPRSpacing.space3 == 12)
+    #expect(MeetPRSpacing.space4 == 16)
+    #expect(MeetPRSpacing.space5 == 20)
+    #expect(MeetPRSpacing.space6 == 24)
+    #expect(MeetPRSpacing.pageHorizontal == 20)
+    #expect(MeetPRSpacing.compactPageHorizontal == 16)
+    #expect(MeetPRSpacing.minimumHitTarget == 44)
   }
 }

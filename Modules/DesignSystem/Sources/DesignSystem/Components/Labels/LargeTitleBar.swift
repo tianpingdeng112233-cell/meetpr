@@ -24,17 +24,18 @@ public struct LargeTitleBar: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       if let eyebrow { Eyebrow(eyebrow) }
       Text(title)
-        .font(.system(size: titleSize, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: titleSize, weight: .black))
+        .tracking(-0.7)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .fixedSize(horizontal: false, vertical: true)
       if let subtitle {
         Text(subtitle)
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, MeetPRSpacing.base)
+    .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.xs)
     .padding(.bottom, MeetPRSpacing.md)
     .accessibilityElement(children: .combine)
@@ -42,10 +43,10 @@ public struct LargeTitleBar: View {
 }
 
 #Preview("LargeTitleBar") {
-  VStack(spacing: 24) {
+  VStack(spacing: MeetPRSpacing.space6) {
     LargeTitleBar(title: "今日")
     LargeTitleBar(eyebrow: "中周期 · 第 03 / 04 周", title: "SBD 力量块", subtitle: "张教练 · 顶组 + 减载")
   }
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
