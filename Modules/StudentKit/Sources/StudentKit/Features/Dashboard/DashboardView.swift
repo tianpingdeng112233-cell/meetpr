@@ -280,9 +280,10 @@ public struct DashboardView: View {
 
       if feedbackExpanded {
         VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-          ForEach(Array(feedbackViewModel.items.prefix(4).enumerated()), id: \.element.id) { pair in
-            expandedFeedbackRow(pair.element)
-              .meetPRRiseIn(index: pair.offset, initialDelay: 0.02, stagger: 0.03)
+          let expandedItems = Array(feedbackViewModel.items.prefix(4))
+          ForEach(expandedItems.indices, id: \.self) { rowIndex in
+            expandedFeedbackRow(expandedItems[rowIndex])
+              .meetPRRiseIn(index: rowIndex, initialDelay: 0.02, stagger: 0.03)
           }
         }
         .padding(.top, MeetPRSpacing.space2)

@@ -59,7 +59,7 @@ public struct SetReadOnlyCell: View {
     }
     .padding(.horizontal, MeetPRSpacing.sm)
     .padding(.vertical, MeetPRSpacing.point10)
-    .background(isCompleted ? Color.MeetPR.successSoft : Color.MeetPR.bgInset)
+    .background(isCompleted ? Color.MeetPR.successTint : Color.MeetPR.bgInset)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.md)
         .stroke(

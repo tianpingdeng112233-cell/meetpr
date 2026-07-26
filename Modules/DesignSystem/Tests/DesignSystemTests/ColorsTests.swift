@@ -34,7 +34,7 @@ private enum ColorTestError: Error {
 struct ColorsTests {
   @Test("gold tokens match dark and light baselines")
   func goldTokensMatchBaselines() throws {
-    try assertColor(.MeetPR.goldCTA, equals: .init(255, 184, 0))
+    try assertDynamicColor(.MeetPR.goldCTA, dark: .init(255, 184, 0), light: .init(180, 83, 9))
     try assertDynamicColor(.MeetPR.gold500, dark: .init(245, 166, 35), light: .init(217, 119, 6))
     try assertDynamicColor(.MeetPR.gold400, dark: .init(251, 191, 62), light: .init(245, 158, 11))
     try assertDynamicColor(.MeetPR.gold300, dark: .init(255, 212, 112), light: .init(252, 211, 77))
@@ -141,7 +141,7 @@ struct ColorsTests {
       dark: .init(220, 227, 234),
       light: .init(154, 164, 176)
     )
-    try assertColor(.MeetPR.inkOnGold, equals: .init(20, 20, 20))
+    try assertDynamicColor(.MeetPR.inkOnGold, dark: .init(20, 20, 20), light: .init(255, 255, 255))
     try assertDynamicColor(
       .MeetPR.ctaBackground,
       dark: .init(255, 184, 0),

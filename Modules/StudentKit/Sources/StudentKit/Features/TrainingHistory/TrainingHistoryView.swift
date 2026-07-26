@@ -454,7 +454,7 @@ public struct TrainingHistoryView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
       Label("加载失败", systemImage: "exclamationmark.triangle")
         .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.gold500)
+        .foregroundStyle(Color.MeetPR.danger)
       Text(message)
         .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
         .foregroundStyle(Color.MeetPR.textSecondary)

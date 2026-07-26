@@ -454,7 +454,7 @@ private struct LogoutRow: View {
           .MeetPR.system(size: MeetPRFontMetrics.size15, weight: .semibold))
         Spacer()
       }
-      .foregroundStyle(Color.MeetPR.gold500)
+      .foregroundStyle(StudentVisualSemantics.destructiveAction.color)
       .padding(MeetPRSpacing.space4)
       .contentShape(Rectangle())
     }

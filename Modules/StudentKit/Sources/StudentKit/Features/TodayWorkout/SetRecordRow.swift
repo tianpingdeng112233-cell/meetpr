@@ -37,7 +37,7 @@ enum SetRecordResultState: Equatable, Sendable {
   var softBackgroundColor: Color {
     switch self {
     case .completed:
-      Color.MeetPR.successSoft
+      Color.MeetPR.successTint
     case .failed:
       Color.MeetPR.dangerSoft
     case .unlogged:

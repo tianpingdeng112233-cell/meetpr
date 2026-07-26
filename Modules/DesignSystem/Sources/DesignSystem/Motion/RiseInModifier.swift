@@ -5,6 +5,7 @@ public struct RiseInModifier: ViewModifier {
   private let initialDelay: Double
   private let stagger: Double
 
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var isVisible = false
 
   public init(
@@ -24,6 +25,10 @@ public struct RiseInModifier: ViewModifier {
       .scaleEffect(x: 1, y: isVisible ? 1 : 0.88, anchor: .top)
       .task {
         guard !isVisible else { return }
+        guard !reduceMotion else {
+          isVisible = true
+          return
+        }
         let delay = initialDelay + (Double(index) * stagger)
         try? await Task.sleep(for: .seconds(delay))
         guard !Task.isCancelled else { return }
@@ -35,6 +40,7 @@ public struct RiseInModifier: ViewModifier {
 }
 
 public struct PillRiseInModifier: ViewModifier {
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var isVisible = false
 
   public init() {}
@@ -46,6 +52,10 @@ public struct PillRiseInModifier: ViewModifier {
       .scaleEffect(x: 1, y: isVisible ? 1 : 0.62, anchor: .top)
       .task {
         guard !isVisible else { return }
+        guard !reduceMotion else {
+          isVisible = true
+          return
+        }
         withAnimation(
           .timingCurve(
             MeetPRMotion.riseX1,

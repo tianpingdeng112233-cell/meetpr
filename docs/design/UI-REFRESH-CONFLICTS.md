@@ -126,4 +126,4 @@
 - 旧 meetpr-design-skill/ 已被 handoff-v2 取代(设计师明示),仅存档。
 
 ## 终验走查发现（待返修轮处理）
-- W-01: 训练页在「全部组已完成 + App 重启」的残留态下,动作卡区域渲染为空(仅剩长按完成钮)。亮色 demo 复现;疑与两态改造后 exerciseSections 的显隐条件或 rise-in 初始态相关。互审轮请重点看 TodayWorkoutView.recordingContent / exerciseTableCard 的 allCompleted 分支。
+- W-01(已定性): 结构性风险已按互审 BLOCKER-1 修复(完成态折叠改为派生,首帧即稳定,无 mount 后突变)。残余空白经 snapshot_ui 证实为 demo 种子跨午夜漂移: gym-day(04:00 cutoff)仍是前一日,而 demo 计划以日历今日重新锚定,导致该日 exercises 为空(日界线三口径老坑的 demo 表现),真实数据不受影响。跟进: demo seed 应改用 gym-day 锚定,记入 FOLLOWUPS。

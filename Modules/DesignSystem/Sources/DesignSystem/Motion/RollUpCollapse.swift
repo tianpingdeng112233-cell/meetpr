@@ -144,12 +144,34 @@ private struct RollUpHeightPreferenceKey: PreferenceKey {
 
 extension View {
   public func meetPRRollUp(isCollapsed: Bool) -> some View {
-    modifier(RollUpCollapseModifier(isCollapsed: isCollapsed))
-      .modifier(RollUpFeedbackModifier(isCollapsed: isCollapsed))
-      .animation(
-        .timingCurve(0.36, 0.05, 0.3, 1, duration: MeetPRMotion.durationRollUp),
-        value: isCollapsed
-      )
+    modifier(RollUpDispatchModifier(isCollapsed: isCollapsed))
+  }
+}
+
+/// Chooses between the full 3D roll and a reduce-motion instant collapse.
+private struct RollUpDispatchModifier: ViewModifier {
+  let isCollapsed: Bool
+
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+  func body(content: Content) -> some View {
+    if reduceMotion {
+      content
+        .frame(
+          height: isCollapsed ? MeetPRRollUpSpec.collapsedHeight : nil,
+          alignment: .top
+        )
+        .opacity(isCollapsed ? 0 : 1)
+        .clipped()
+    } else {
+      content
+        .modifier(RollUpCollapseModifier(isCollapsed: isCollapsed))
+        .modifier(RollUpFeedbackModifier(isCollapsed: isCollapsed))
+        .animation(
+          .timingCurve(0.36, 0.05, 0.3, 1, duration: MeetPRMotion.durationRollUp),
+          value: isCollapsed
+        )
+    }
   }
 }
 

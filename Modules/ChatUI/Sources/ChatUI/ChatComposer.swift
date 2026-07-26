@@ -25,7 +25,7 @@ public struct ChatComposer: View {
       if let imageErrorMessage {
         Text(imageErrorMessage)
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.gold500)
+          .foregroundStyle(Color.MeetPR.danger)
       }
 
       HStack(alignment: .bottom, spacing: MeetPRSpacing.sm) {
@@ -81,6 +81,12 @@ public struct ChatComposer: View {
                   .offset(x: 2, y: -2)
               }
             }
+            // 34pt visual, 44pt hit target (§2 minimum, no exceptions).
+            .frame(
+              minWidth: MeetPRSpacing.minimumHitTarget,
+              minHeight: MeetPRSpacing.minimumHitTarget
+            )
+            .contentShape(Rectangle())
         }
         .buttonStyle(PressScaleButtonStyle())
         .disabled(!canSendText)

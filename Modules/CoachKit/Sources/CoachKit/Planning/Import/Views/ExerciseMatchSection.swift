@@ -61,7 +61,7 @@ struct ExerciseMatchSection: View {
   private var statusBadge: some View {
     Group {
       if ImportCompleteness.isComplete(exercise) {
-        badge("可发布", color: Color.MeetPR.success, soft: Color.MeetPR.successSoft)
+        badge("可发布", color: Color.MeetPR.success, soft: Color.MeetPR.successTint)
       } else if exercise.boundExerciseID == nil {
         badge("待绑定", color: Color.MeetPR.gold500, soft: Color.MeetPR.goldSoft)
       } else {

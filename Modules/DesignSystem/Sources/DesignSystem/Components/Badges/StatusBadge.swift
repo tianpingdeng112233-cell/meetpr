@@ -19,7 +19,7 @@ public struct StatusBadge: View {
 
     var background: Color {
       switch self {
-      case .success: Color.MeetPR.successSoft
+      case .success: Color.MeetPR.successTint
       case .neutral: Color.MeetPR.surfaceElevated
       case .danger: Color.MeetPR.dangerSoft
       case .gold: Color.MeetPR.goldSoft

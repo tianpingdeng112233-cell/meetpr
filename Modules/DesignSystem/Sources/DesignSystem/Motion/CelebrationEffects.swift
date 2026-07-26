@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct CelebrationEffects: View {
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var bloomProgress = 0.0
   @State private var stampProgress = 0.0
 
@@ -14,6 +15,11 @@ public struct CelebrationEffects: View {
     }
     .frame(width: 220, height: 220)
     .task {
+      guard !reduceMotion else {
+        bloomProgress = 1
+        stampProgress = 1
+        return
+      }
       withAnimation(.easeOut(duration: MeetPRMotion.durationBloom)) {
         bloomProgress = 1
       }
@@ -57,11 +63,14 @@ enum MeetPRCelebrationSpec {
 }
 
 private struct CelebrationSparkField: View {
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   var body: some View {
-    ZStack {
-      ForEach(0..<MeetPRCelebrationSpec.sparkCount, id: \.self) { index in
-        CelebrationSpark(index: index)
+    if !reduceMotion {
+      ZStack {
+        ForEach(0..<MeetPRCelebrationSpec.sparkCount, id: \.self) { index in
+          CelebrationSpark(index: index)
+        }
       }
     }
   }

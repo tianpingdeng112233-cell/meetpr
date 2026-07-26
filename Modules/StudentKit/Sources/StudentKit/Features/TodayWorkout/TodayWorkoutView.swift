@@ -38,7 +38,11 @@ public struct TodayWorkoutView: View {
   @State private var showingReadinessSheet = false
   @State private var showingNotifications = false
   @State private var conversationID: UUID?
-  @State private var collapsedExerciseIDs: Set<UUID> = []
+  /// Completed exercises collapse by *derivation* (BLOCKER-1 / W-01 fix): a
+  /// card is collapsed iff all its sets are done and the user hasn't manually
+  /// re-expanded it. First render of a persisted completed day is therefore a
+  /// stable pill — the roll-up only animates on a live false→true completion.
+  @State private var expandedCompletedExerciseIDs: Set<UUID> = []
   /// Whether the hold-to-complete → 训练回顾 → 完成 flow has been finished for
   /// the loaded day; loaded from `SessionReviewStore` so the hold control does
   /// not re-arm after the review sheet closes (or the app restarts).
@@ -497,8 +501,9 @@ public struct TodayWorkoutView: View {
       }
 
       VStack(spacing: MeetPRSpacing.space2) {
-        ForEach(Array(day.exercises.enumerated()), id: \.element.id) { pair in
-          overviewPreviewRow(number: pair.offset + 1, exercise: pair.element)
+        ForEach(day.exercises.indices, id: \.self) { exerciseIndex in
+          overviewPreviewRow(
+            number: exerciseIndex + 1, exercise: day.exercises[exerciseIndex])
         }
       }
 
@@ -532,7 +537,7 @@ public struct TodayWorkoutView: View {
         .foregroundStyle(Color.MeetPR.gold500)
         .frame(width: 22, height: 22)
         .background(Color.MeetPR.goldSoft)
-        .clipShape(.rect(cornerRadius: 7))
+        .clipShape(.rect(cornerRadius: MeetPRRadius.micro))
       Text(exercise.exercise.name)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
@@ -736,7 +741,7 @@ public struct TodayWorkoutView: View {
     isEditable: Bool
   ) -> some View {
     let allCompleted = !rows.isEmpty && rows.allSatisfy(\.completed)
-    let isCollapsed = collapsedExerciseIDs.contains(exercise.id)
+    let isCollapsed = allCompleted && !expandedCompletedExerciseIDs.contains(exercise.id)
 
     return ZStack(alignment: .top) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
@@ -758,7 +763,7 @@ public struct TodayWorkoutView: View {
 
           if allCompleted {
             Button {
-              collapsedExerciseIDs.insert(exercise.id)
+              _ = expandedCompletedExerciseIDs.remove(exercise.id)
             } label: {
               HStack(spacing: MeetPRSpacing.space1) {
                 Image(systemName: "checkmark.circle.fill")
@@ -824,16 +829,9 @@ public struct TodayWorkoutView: View {
     }
     .frame(maxHeight: isCollapsed ? 48 : nil, alignment: .top)
     .clipped()
-    .onAppear {
-      if allCompleted {
-        collapsedExerciseIDs.insert(exercise.id)
-      }
-    }
-    .onChange(of: allCompleted) { wasCompleted, isCompleted in
-      if isCompleted, !wasCompleted {
-        collapsedExerciseIDs.insert(exercise.id)
-      } else if !isCompleted {
-        collapsedExerciseIDs.remove(exercise.id)
+    .onChange(of: allCompleted) { _, isCompleted in
+      if !isCompleted {
+        expandedCompletedExerciseIDs.remove(exercise.id)
       }
     }
   }
@@ -843,14 +841,14 @@ public struct TodayWorkoutView: View {
     completedSetCount: Int
   ) -> some View {
     Button {
-      collapsedExerciseIDs.remove(exercise.id)
+      expandedCompletedExerciseIDs.insert(exercise.id)
     } label: {
       HStack(spacing: MeetPRSpacing.space3) {
         Image(systemName: "checkmark")
           .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
           .foregroundStyle(Color.MeetPR.success)
           .frame(width: 22, height: 22)
-          .background(Color.MeetPR.successSoft)
+          .background(Color.MeetPR.successTint)
           .clipShape(.circle)
 
         Text(exercise.exercise.name)

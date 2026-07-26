@@ -54,7 +54,7 @@ struct WorkoutDayHeader: View {
       .foregroundStyle(readinessFiled ? Color.MeetPR.success : Color.MeetPR.textTertiary)
       .padding(.horizontal, MeetPRSpacing.space2)
       .padding(.vertical, MeetPRSpacing.point5)
-      .background(readinessFiled ? Color.MeetPR.successSoft : Color.MeetPR.surfaceElevated)
+      .background(readinessFiled ? Color.MeetPR.successTint : Color.MeetPR.surfaceElevated)
       .clipShape(.capsule)
   }
 

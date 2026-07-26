@@ -110,20 +110,18 @@ struct SetEntrySheet: View {
                 "重量", unit: "KG", sub: "± 2.5",
                 onDec: { updateWeightText(max(0, weightValue - 2.5)) },
                 onInc: { updateWeightText(weightValue + 2.5) },
-                focus: { focusedField = .weight },
+                focus: { numberPadField = .weight },
                 field: {
-                  TextField("", text: weightTextBinding)
-                    .decimalKeyboard()
-                    .focused($focusedField, equals: .weight)
-                    .accessibilityLabel("重量")
-                    .maxInputLength($weightText, 6)
-                    .modifier(EntryFieldStyle())
-                    .allowsHitTesting(false)
-                    .overlay {
-                      Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture { numberPadField = .weight }
-                    }
+                  Button {
+                    numberPadField = .weight
+                  } label: {
+                    Text(weightText.isEmpty ? "0" : weightText)
+                      .modifier(EntryFieldStyle())
+                      .contentShape(Rectangle())
+                  }
+                  .buttonStyle(.plain)
+                  .accessibilityLabel("重量 \(weightText)")
+                  .accessibilityHint("打开数字键盘修改")
                 }
               )
               if let weightSuggestion {
@@ -137,20 +135,18 @@ struct SetEntrySheet: View {
               "次数", unit: "次", sub: "± 1",
               onDec: { repsText = "\(max(0, repsValue - 1))" },
               onInc: { repsText = "\(repsValue + 1)" },
-              focus: { focusedField = .reps },
+              focus: { numberPadField = .reps },
               field: {
-                TextField("", text: $repsText)
-                  .numberPadKeyboard()
-                  .focused($focusedField, equals: .reps)
-                  .accessibilityLabel("次数")
-                  .maxInputLength($repsText, 4)
-                  .modifier(EntryFieldStyle())
-                  .allowsHitTesting(false)
-                  .overlay {
-                    Color.clear
-                      .contentShape(Rectangle())
-                      .onTapGesture { numberPadField = .reps }
-                  }
+                Button {
+                  numberPadField = .reps
+                } label: {
+                  Text(repsText.isEmpty ? "0" : repsText)
+                    .modifier(EntryFieldStyle())
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("次数 \(repsText)")
+                .accessibilityHint("打开数字键盘修改")
               }
             )
             rpeSection

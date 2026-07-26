@@ -18,6 +18,7 @@ public struct MeetPRNumberPad: View {
 
   @State private var text: String
   @State private var feedback = 0
+  @FocusState private var displayFocused: Bool
 
   public init(
     field: Field,
@@ -54,10 +55,17 @@ public struct MeetPRNumberPad: View {
   public var body: some View {
     VStack(spacing: MeetPRSpacing.space4) {
       HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.space2) {
-        Text(text.isEmpty ? "0" : text)
+        // A real text field is the editing source (§3 "真 input"): the grid
+        // below writes into it, and a hardware keyboard can type directly.
+        TextField("0", text: $text)
           .font(.MeetPR.mono(size: 34, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
-          .contentTransition(.numericText())
+          .focused($displayFocused)
+          .textFieldStyle(.plain)
+          .fixedSize()
+          #if os(iOS)
+            .keyboardType(field == .weight ? .decimalPad : .numberPad)
+          #endif
           .accessibilityLabel("\(text.isEmpty ? "0" : text) \(unitLabel)")
         Text(unitLabel)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))

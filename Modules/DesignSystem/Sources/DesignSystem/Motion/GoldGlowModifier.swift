@@ -9,6 +9,7 @@ import SwiftUI
 /// keep only the ring gold. Both still breathe on the same 4.2s cycle.
 public struct GoldGlowModifier: ViewModifier {
   @Environment(\.colorScheme) private var colorScheme
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   private let lineWidth: CGFloat
 
@@ -17,6 +18,30 @@ public struct GoldGlowModifier: ViewModifier {
   }
 
   public func body(content: Content) -> some View {
+    if reduceMotion {
+      staticBody(content: content)
+    } else {
+      animatedBody(content: content)
+    }
+  }
+
+  /// Fixed mid-phase ring and shadow — no TimelineView, no breathing.
+  private func staticBody(content: Content) -> some View {
+    let isLight = colorScheme == .light
+    return
+      content
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.card)
+          .stroke(Color.MeetPR.gold500.opacity(0.56), lineWidth: lineWidth)
+      }
+      .shadow(
+        color: isLight ? Color.MeetPR.ctaGlow.opacity(0.9) : Color.MeetPR.gold500.opacity(0.28),
+        radius: isLight ? 10 : 9.5,
+        y: isLight ? 6 : 0
+      )
+  }
+
+  private func animatedBody(content: Content) -> some View {
     TimelineView(.animation) { context in
       let phase = glowPhase(at: context.date)
       let isLight = colorScheme == .light

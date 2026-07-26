@@ -1,9 +1,20 @@
 import SwiftUI
 
 public struct ShimmerOverlay: View {
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
   public init() {}
 
   public var body: some View {
+    if reduceMotion {
+      // The sweep is pure decoration; reduce motion simply drops it.
+      Color.clear.allowsHitTesting(false)
+    } else {
+      animated
+    }
+  }
+
+  private var animated: some View {
     TimelineView(.animation) { context in
       GeometryReader { proxy in
         let progress = shimmerProgress(at: context.date)

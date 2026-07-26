@@ -30,10 +30,14 @@ extension Color {
 }
 
 extension Color {
+  // swiftlint:disable:next type_body_length
   public enum MeetPR {
     // MARK: - Brand gold
 
-    public static let goldCTA = rgb(255, 184, 0)
+    public static let goldCTA = Color(
+      light: rgb(180, 83, 9),
+      dark: rgb(255, 184, 0)
+    )
     public static let gold500 = Color(
       light: rgb(217, 119, 6),
       dark: rgb(245, 166, 35)
@@ -223,7 +227,10 @@ extension Color {
       light: rgb(154, 164, 176),
       dark: rgb(220, 227, 234)
     )
-    public static let inkOnGold = rgb(20, 20, 20)
+    public static let inkOnGold = Color(
+      light: rgb(255, 255, 255),
+      dark: rgb(20, 20, 20)
+    )
     public static let ctaBackground = Color(
       light: rgb(17, 24, 39),
       dark: rgb(255, 184, 0)
@@ -257,8 +264,24 @@ extension Color {
     )
 
     public static let goldSoft = gold500.opacity(0.14)
-    public static let successSoft = success.opacity(0.14)
+    /// `--success-soft`: a lighter success *tone* (text/icons), per theme.
+    public static let successSoft = Color(
+      light: rgb(21, 128, 61),
+      dark: rgb(159, 199, 174)
+    )
+    /// Translucent success fill for backgrounds (the old successSoft role).
+    public static let successTint = success.opacity(0.14)
     public static let dangerSoft = danger.opacity(0.14)
+    /// `--bg-deep`: the layer beneath the page (sheet backdrops).
+    public static let bgDeep = Color(
+      light: rgb(237, 238, 241),
+      dark: rgb(5, 5, 6)
+    )
+    /// `--text-dim`: not-yet-done state text.
+    public static let textDim = Color(
+      light: rgb(156, 163, 175),
+      dark: rgb(106, 106, 112)
+    )
 
     // MARK: - Component palettes
 

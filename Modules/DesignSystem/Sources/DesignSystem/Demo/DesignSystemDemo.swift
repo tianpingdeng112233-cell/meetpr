@@ -86,7 +86,7 @@ private struct ColorTokenCatalog: View {
         DemoColorSwatch(name: "gold400", color: Color.MeetPR.gold400, value: "dynamic")
         DemoColorSwatch(name: "goldSoft", color: Color.MeetPR.goldSoft, value: "14%")
         DemoColorSwatch(name: "success", color: Color.MeetPR.success, value: "dynamic")
-        DemoColorSwatch(name: "successSoft", color: Color.MeetPR.successSoft, value: "14%")
+        DemoColorSwatch(name: "successSoft", color: Color.MeetPR.successTint, value: "14%")
         DemoColorSwatch(name: "danger", color: Color.MeetPR.danger, value: "#E5484D")
         DemoColorSwatch(name: "bgBase", color: Color.MeetPR.bgBase, value: "dynamic")
         DemoColorSwatch(name: "surfaceCard", color: Color.MeetPR.surfaceCard, value: "dynamic")

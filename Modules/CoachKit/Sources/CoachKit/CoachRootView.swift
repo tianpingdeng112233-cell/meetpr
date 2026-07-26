@@ -120,7 +120,7 @@ public struct CoachRootView: View {
   }
 
   public var body: some View {
-    TabView(selection: $selectedTab) {
+    ZStack {
       CoachDashboardView(
         attentionCount: rosterViewModel.pendingAttentionCount,
         pendingCount: queueViewModel.pendingCount,
@@ -131,28 +131,17 @@ public struct CoachRootView: View {
         onEvaluationCompleted: { rosterViewModel.markStudentActive($0) },
         chat: chat
       )
-      .tag(CoachTab.today)
-      .tabItem {
-        Label("今日", systemImage: "house")
-      }
+      .modifier(CoachPageVisibility(tab: .today, selection: selectedTab))
 
       StudentRosterView(
         viewModel: rosterViewModel,
         context: detailContext,
         chat: chat
       )
-      .tag(CoachTab.students)
-      .tabItem {
-        Label("学员", systemImage: "person.2")
-      }
-      // 待关注学员 (新学员 pending 计数已拆到「接收」tab, spec 033 D1).
-      .badge(rosterViewModel.pendingAttentionCount)
+      .modifier(CoachPageVisibility(tab: .students, selection: selectedTab))
 
       CoachPlanningHomeView(context: detailContext, chat: chat)
-        .tag(CoachTab.planning)
-        .tabItem {
-          Label("编排", systemImage: "calendar.badge.plus")
-        }
+        .modifier(CoachPageVisibility(tab: .planning, selection: selectedTab))
 
       CoachReceivingView(
         pendingCount: queueViewModel.pendingCount,
@@ -163,28 +152,14 @@ public struct CoachRootView: View {
         onAccepted: { await rosterViewModel.refresh() },
         chat: chat
       )
-      .tag(CoachTab.receiving)
-      .tabItem {
-        Label("接收", systemImage: "tray")
-      }
-      // 收件箱红点 = 新学员 + 待反馈视频 + 聊天未读(spec 058).
-      .badge(
-        CoachReceivingBadge.total(
-          newStudents: queueViewModel.pendingCount,
-          videos: videoQueueViewModel.pendingCount,
-          chatUnread: chat?.inbox.totalUnread ?? 0
-        )
-      )
+      .modifier(CoachPageVisibility(tab: .receiving, selection: selectedTab))
 
       CoachMyProfileView(
         viewModel: profileViewModel,
         inviteCodes: inviteCodes,
         chat: chat
       )
-      .tag(CoachTab.profile)
-      .tabItem {
-        Label("我的", systemImage: "person")
-      }
+      .modifier(CoachPageVisibility(tab: .profile, selection: selectedTab))
     }
     .task {
       Analytics.shared.screen(.dashboard)
@@ -229,33 +204,32 @@ extension View {
     receivingBadge: Int
   ) -> some View {
     #if os(iOS)
-      toolbar(.hidden, for: .tabBar)
-        .safeAreaInset(edge: .bottom, spacing: MeetPRSpacing.zero) {
-          MeetPRTabBar(
-            selection: selection,
-            items: [
-              MeetPRTabBarItem(id: .today, title: "今日", systemImage: "house"),
-              MeetPRTabBarItem(
-                id: .students,
-                title: "学员",
-                systemImage: "person.2",
-                badge: studentsBadge
-              ),
-              MeetPRTabBarItem(
-                id: .planning,
-                title: "编排",
-                systemImage: "calendar.badge.plus"
-              ),
-              MeetPRTabBarItem(
-                id: .receiving,
-                title: "接收",
-                systemImage: "tray",
-                badge: receivingBadge
-              ),
-              MeetPRTabBarItem(id: .profile, title: "我的", systemImage: "person"),
-            ]
-          )
-        }
+      safeAreaInset(edge: .bottom, spacing: MeetPRSpacing.zero) {
+        MeetPRTabBar(
+          selection: selection,
+          items: [
+            MeetPRTabBarItem(id: .today, title: "今日", systemImage: "house"),
+            MeetPRTabBarItem(
+              id: .students,
+              title: "学员",
+              systemImage: "person.2",
+              badge: studentsBadge
+            ),
+            MeetPRTabBarItem(
+              id: .planning,
+              title: "编排",
+              systemImage: "calendar.badge.plus"
+            ),
+            MeetPRTabBarItem(
+              id: .receiving,
+              title: "接收",
+              systemImage: "tray",
+              badge: receivingBadge
+            ),
+            MeetPRTabBarItem(id: .profile, title: "我的", systemImage: "person"),
+          ]
+        )
+      }
     #else
       self
     #endif
@@ -274,4 +248,22 @@ private enum CoachTab: Hashable {
   case planning
   case receiving
   case profile
+}
+
+/// Keeps every coach page mounted while showing only the selected one —
+/// same ZStack strategy as the student side (the system tab bar cannot be
+/// hidden reliably on iOS 26, so no `TabView` is used at all).
+@available(iOS 17.0, macOS 14.0, *)
+private struct CoachPageVisibility: ViewModifier {
+  let tab: CoachTab
+  let selection: CoachTab
+
+  func body(content: Content) -> some View {
+    let isActive = tab == selection
+    content
+      .opacity(isActive ? 1 : 0)
+      .allowsHitTesting(isActive)
+      .accessibilityHidden(!isActive)
+      .zIndex(isActive ? 1 : 0)
+  }
 }
