@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./dc-tokens.css">
+<style>
+html,body{margin:0;padding:0;background:#0A0A0C}
+*{box-sizing:border-box}
+a{color:#F5A623;text-decoration:none}
+a:hover{color:#FFB800}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#0A0A0C;color:#EDEDED;font-family:'IBM Plex Sans','Noto Sans SC',sans-serif;padding:36px 40px 90px">
+<div style="max-width:1140px;margin:0 auto;display:flex;flex-direction:column;gap:8px">
+
+<div style="display:flex;align-items:baseline;gap:14px">
+<span style="font-family:'Archivo','Noto Sans SC',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.01em">MeetPR 组件库</span>
+<span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;color:#F5A623;font-weight:600">STUDENT · v1</span>
+</div>
+<div style="font-size:14px;color:#8A8A90;line-height:1.7;max-width:780px">7 个组件各是一个独立文件，props 契约写在文件末尾 <span style="font-family:'IBM Plex Mono',monospace;color:#C8C8CC">data-props</span> 的 JSON 里（含 TS 类型）。<b style="color:#C8C8CC;font-weight:600">组件里零硬编码颜色，全部走 <span style="font-family:'IBM Plex Mono',monospace">var()</span></b> —— 主题由祖先 <span style="font-family:'IBM Plex Mono',monospace;color:#C8C8CC">.theme-light</span> 决定，组件不接 theme 属性。下面每行左暗右亮，是同一份代码在两个作用域下的渲染。</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:26px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#5A5A60">
+<span>:root（暗色）</span><span>.theme-light（亮色）</span>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:34px;margin-top:6px">
+
+<div>
+<div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:12px;border-top:1px solid #1E1E22;padding-top:16px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#F5A623">DayChip</span>
+<span style="font-size:13px;color:#8A8A90">周日历的一格 · 完成 / 未完成 / 休息 / 今天选中 / 未来 —— 休息日不显示状态点</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:var(--bg-inset);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:flex;gap:8px">
+<dc-import name="DayChip" weekday="一" date="{{ n20 }}" state="done" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="二" date="{{ n21 }}" state="missed" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="三" date="{{ n22 }}" state="rest" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="四" date="{{ n23 }}" state="today" selected="{{ yes }}" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="五" date="{{ n24 }}" state="future" hint-size="52px,44px"></dc-import>
+</div>
+<div class="theme-light" style="background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:flex;gap:8px">
+<dc-import name="DayChip" weekday="一" date="{{ n20 }}" state="done" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="二" date="{{ n21 }}" state="missed" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="三" date="{{ n22 }}" state="rest" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="四" date="{{ n23 }}" state="today" selected="{{ yes }}" hint-size="52px,44px"></dc-import>
+<dc-import name="DayChip" weekday="五" date="{{ n24 }}" state="future" hint-size="52px,44px"></dc-import>
+</div>
+</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:12px;border-top:1px solid #1E1E22;padding-top:16px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#F5A623">Badge</span>
+<span style="font-size:13px;color:#8A8A90">状态标签 · gold 表示进行中，danger 只给需要处理的异常 · neutral 用 --surface-key，必须放在 --surface-card 上（两者在亮色下只差 2/255，放页底会消失）</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:var(--bg-inset);border:1px solid var(--border-subtle);border-radius:16px;padding:18px">
+<div style="background:var(--surface-card);box-shadow:var(--card-shadow);border-radius:12px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+<dc-import name="Badge" text="当前" tone="gold" hint-size="60px,26px"></dc-import>
+<dc-import name="Badge" text="已通知教练" tone="success" dot="{{ yes }}" hint-size="118px,26px"></dc-import>
+<dc-import name="Badge" text="3 天未训练" tone="danger" dot="{{ yes }}" hint-size="118px,26px"></dc-import>
+<dc-import name="Badge" text="休息日" tone="neutral" hint-size="72px,26px"></dc-import>
+</div>
+</div>
+<div class="theme-light" style="background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:16px;padding:18px">
+<div style="background:var(--surface-card);box-shadow:var(--card-shadow);border-radius:12px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+<dc-import name="Badge" text="当前" tone="gold" hint-size="60px,26px"></dc-import>
+<dc-import name="Badge" text="已通知教练" tone="success" dot="{{ yes }}" hint-size="118px,26px"></dc-import>
+<dc-import name="Badge" text="3 天未训练" tone="danger" dot="{{ yes }}" hint-size="118px,26px"></dc-import>
+<dc-import name="Badge" text="休息日" tone="neutral" hint-size="72px,26px"></dc-import>
+</div>
+</div>
+</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:12px;border-top:1px solid #1E1E22;padding-top:16px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#F5A623">SetRow</span>
+<span style="font-size:13px;color:#8A8A90">一组记录 · 成功/失败与视频上传是两个彼此独立的图标</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:var(--bg-inset);border:1px solid var(--border-subtle);border-radius:16px;padding:18px">
+<div style="border-radius:12px;overflow:hidden;background:var(--surface-card);box-shadow:var(--card-shadow)">
+<dc-import name="SetRow" index="{{ n1 }}" status="done" video-state="uploaded" hint-size="100%,44px"></dc-import>
+<dc-import name="SetRow" index="{{ n2 }}" status="failed" video-state="failed" hint-size="100%,44px"></dc-import>
+<dc-import name="SetRow" index="{{ n3 }}" status="pending" video-state="none" hint-size="100%,44px"></dc-import>
+</div>
+</div>
+<div class="theme-light" style="background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:16px;padding:18px">
+<div style="border-radius:12px;overflow:hidden;background:var(--surface-card);box-shadow:var(--card-shadow)">
+<dc-import name="SetRow" index="{{ n1 }}" status="done" video-state="uploaded" hint-size="100%,44px"></dc-import>
+<dc-import name="SetRow" index="{{ n2 }}" status="failed" video-state="failed" hint-size="100%,44px"></dc-import>
+<dc-import name="SetRow" index="{{ n3 }}" status="pending" video-state="none" hint-size="100%,44px"></dc-import>
+</div>
+</div>
+</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:12px;border-top:1px solid #1E1E22;padding-top:16px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#F5A623">StatTile</span>
+<span style="font-size:13px;color:#8A8A90">数字卡 · 大数字一律 Mono，delta 靠正负号表意而不是箭头</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:var(--bg-inset);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<dc-import name="StatTile" label="体重" value="83" unit="kg" delta="-0.4" hint-size="100%,88px"></dc-import>
+<dc-import name="StatTile" label="距比赛" value="3" unit="天" accent="gold" hint-size="100%,88px"></dc-import>
+</div>
+<div class="theme-light" style="background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<dc-import name="StatTile" label="体重" value="83" unit="kg" delta="-0.4" hint-size="100%,88px"></dc-import>
+<dc-import name="StatTile" label="距比赛" value="3" unit="天" accent="gold" hint-size="100%,88px"></dc-import>
+</div>
+</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:12px;border-top:1px solid #1E1E22;padding-top:16px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#F5A623">GoldCTA</span>
+<span style="font-size:13px;color:#8A8A90">primary 全宽胶囊「开始训练 / 记录此组」· link 是 CTA 下方的小字链接「顺延一天 ›」「未完成 / 失败」，不是胶囊 · secondary 只出现在弹窗里（顺延确认的「取消」）· danger 学员端只有「退出登录」一处</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:var(--bg-inset);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px">
+<dc-import name="GoldCTA" label="开始训练" sub="蹲·推·拉" icon="play" hint-size="100%,62px"></dc-import>
+<dc-import name="GoldCTA" label="顺延一天" variant="link" hint-size="100%,34px"></dc-import>
+<dc-import name="GoldCTA" label="取消" variant="secondary" hint-size="100%,52px"></dc-import>
+<dc-import name="GoldCTA" label="退出登录" variant="danger" icon="logout" hint-size="100%,52px"></dc-import>
+</div>
+<div class="theme-light" style="background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px">
+<dc-import name="GoldCTA" label="开始训练" sub="蹲·推·拉" icon="play" hint-size="100%,62px"></dc-import>
+<dc-import name="GoldCTA" label="顺延一天" variant="link" hint-size="100%,34px"></dc-import>
+<dc-import name="GoldCTA" label="取消" variant="secondary" hint-size="100%,52px"></dc-import>
+<dc-import name="GoldCTA" label="退出登录" variant="danger" icon="logout" hint-size="100%,52px"></dc-import>
+</div>
+</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:12px;border-top:1px solid #1E1E22;padding-top:16px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#F5A623">ExerciseCard</span>
+<span style="font-size:13px;color:#8A8A90">动作卡 · 展开时内部渲染 SetRow；全部记录完毕后收成一行摘要（点标题切换）</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:var(--bg-inset);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px">
+<dc-import name="ExerciseCard" hint-size="100%,290px"></dc-import>
+<dc-import name="ExerciseCard" exercise="节奏卧推" meta="上次 87.5kg×2 @6 · 最佳 90kg×2 @6" note="" collapsed="{{ yes }}" sets="{{ doneSets }}" hint-size="100%,68px"></dc-import>
+</div>
+<div class="theme-light" style="background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px">
+<dc-import name="ExerciseCard" hint-size="100%,290px"></dc-import>
+<dc-import name="ExerciseCard" exercise="节奏卧推" meta="上次 87.5kg×2 @6 · 最佳 90kg×2 @6" note="" collapsed="{{ yes }}" sets="{{ doneSets }}" hint-size="100%,68px"></dc-import>
+</div>
+</div>
+</div>
+
+<div>
+<div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding-bottom:12px;border-top:1px solid #1E1E22;padding-top:16px">
+<span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:#F5A623">NumberPad</span>
+<span style="font-size:13px;color:#8A8A90">数字键盘 · 次数模式禁用小数点；重量吸附 0.25kg、区间 20–500，次数 1–100</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+<div style="background:var(--bg-inset);border:1px solid var(--border-subtle);border-radius:16px;padding:18px">
+<dc-import name="NumberPad" field="weight" value="{{ n175 }}" hint-size="100%,330px"></dc-import>
+</div>
+<div class="theme-light" style="background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:16px;padding:18px">
+<dc-import name="NumberPad" field="reps" value="{{ n3 }}" hint-size="100%,330px"></dc-import>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals(){
+    return {
+      yes: true,
+      n1: 1, n2: 2, n3: 3, n175: 175,
+      n20: 20, n21: 21, n22: 22, n23: 23, n24: 24,
+      doneSets: [
+        { index:1, weight:90, reps:2, rpe:6, status:'done', videoState:'uploaded' },
+        { index:2, weight:90, reps:2, rpe:6, status:'done', videoState:'uploaded' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

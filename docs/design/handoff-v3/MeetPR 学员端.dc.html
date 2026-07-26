@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+:root{
+  --bg-deep:#050506; --bg-base:#0A0A0C; --bg-inset:#101014; --bg-stack:#121217;
+  --surface-card:#141416; --surface-elevated:#161618; --surface-key:#1C1C20; --surface-raised:#232327;
+  --border-hairline:#17171A; --border-subtle:#1E1E22; --border-default:#262629; --border-strong:#2E2E32;
+  --text-primary:#EDEDED; --text-secondary:#C8C8CC; --text-tertiary:#A1A1A6; --text-muted:#8A8A90;
+  --text-faint:#8A8A90; --text-dim:#8A8A90; --text-disabled:#55555C; --text-ghost:#3E3E44;
+  --gold-cta:#FFB800; --gold-500:#F5A623; --gold-400:#FBBF3E; --gold-200:#FFE28E; --gold-rgb:245,166,35; --gold-text:#F5A623;
+  --ink-on-gold:#141414;
+  --success:#5E9E78; --success-soft:#9FC7AE; --success-rgb:94,158,120;
+  --danger:#E5484D; --danger-rgb:229,72,77; --danger-muted:#C88888; --danger-fill:#C0343A;
+  --chart-line:#DCE3EA;
+  --cta-bg:var(--gold-cta); --cta-text:var(--ink-on-gold); --cta-fill:#111827; --card-shadow:none;
+  --headline-emboss:0 2px 0 #000,0 3px 3px rgba(0,0,0,.55),0 -1px 0 rgba(255,255,255,.22);
+  --bezel:#1C1C1E; --bezel-edge:#2A2A2D;
+  --desk-1:#1A1A1E; --desk-2:#050506;
+}
+.theme-light{
+  --bg-deep:#EDEEF1; --bg-base:#F5F6F8; --bg-inset:#FAFAFB; --bg-stack:#EEF0F3;
+  --surface-card:#FFFFFF; --surface-elevated:#FFFFFF; --surface-key:#F3F4F6; --surface-raised:#EEF0F3;
+  --border-hairline:#E9EBEE; --border-subtle:#E5E7EB; --border-default:#E5E7EB; --border-strong:#D1D5DB;
+  --text-primary:#111827; --text-secondary:#4B5563; --text-tertiary:#5C6371; --text-muted:#5C6371;
+  --text-faint:#5C6371; --text-dim:#5C6371; --text-disabled:#9CA3AF; --text-ghost:#D1D5DB;
+  --gold-cta:#B45309; --gold-500:#D97706; --gold-400:#F59E0B; --gold-200:#FEF3C7; --gold-rgb:217,119,6; --gold-text:#9A4A06;
+  --ink-on-gold:#FFFFFF;
+  --success:#15803D; --success-soft:#15803D; --success-rgb:21,128,61;
+  --danger:#E5484D; --danger-rgb:229,72,77; --danger-muted:#A33B40; --danger-fill:#C0343A;
+  --chart-line:#9AA4B0;
+  --cta-bg:#111827; --cta-text:#FFFFFF; --cta-fill:#111827; --card-shadow:0 4px 18px rgba(17,24,39,.06);
+  --headline-emboss:0 1px 0 rgba(255,255,255,.9),0 2px 4px rgba(17,24,39,.14);
+  --bezel:#1C1C1E; --bezel-edge:#2A2A2D;
+  --desk-1:#E9E9EE; --desk-2:#D2D2D9;
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+img{display:block}
+::-webkit-scrollbar{width:0;height:0}
+@keyframes scr{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes spark{0%{transform:translate(-50%,-50%) scale(1);opacity:1}70%{opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.2);opacity:0}}
+@keyframes stamp{0%{transform:scale(1.5);opacity:0}55%{transform:scale(.9);opacity:1}75%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes sweep{0%{transform:translateX(-160%) skewX(-12deg)}30%{transform:translateX(340%) skewX(-12deg)}100%{transform:translateX(340%) skewX(-12deg)}}
+.shimmer{position:absolute;top:0;bottom:0;left:0;width:55%;background:linear-gradient(90deg,transparent,rgba(255,224,160,.42),transparent);transform:translateX(-160%) skewX(-12deg);animation:sweep 4.5s ease-in-out infinite;will-change:transform;pointer-events:none}
+.scrn{animation:scr .28s cubic-bezier(.2,.7,.2,1)}
+.ov{animation:fade .2s ease}
+.sh{animation:sheet .34s cubic-bezier(.2,.8,.2,1)}
+.pb{transition:transform .12s ease,opacity .12s ease}
+.pb:active{transform:scale(.97);opacity:.9}
+.tb:active{transform:scale(.9)}
+@keyframes glow{0%,100%{box-shadow:0 0 0 1px rgba(var(--gold-rgb),.5),0 0 16px 2px rgba(var(--gold-rgb),.24)}50%{box-shadow:0 0 0 1px rgba(var(--gold-rgb),.62),0 0 23px 3px rgba(var(--gold-rgb),.32)}}
+.glow{animation:glow 4.2s ease-in-out infinite}
+@keyframes glow2{0%,100%{box-shadow:0 0 0 2px rgba(var(--gold-rgb),.5),0 0 16px 2px rgba(var(--gold-rgb),.24)}50%{box-shadow:0 0 0 2px rgba(var(--gold-rgb),.62),0 0 23px 3px rgba(var(--gold-rgb),.32)}}
+.glow2{animation:glow2 4.2s ease-in-out infinite}
+@keyframes glowW{0%,100%{box-shadow:inset 0 1.5px 0 rgba(255,255,255,1),inset 0 -2px 3px rgba(0,0,0,.22),0 0 0 2px rgba(var(--gold-rgb),.5),0 0 16px 2px rgba(var(--gold-rgb),.24)}50%{box-shadow:inset 0 1.5px 0 rgba(255,255,255,1),inset 0 -2px 3px rgba(0,0,0,.22),0 0 0 2px rgba(var(--gold-rgb),.62),0 0 23px 3px rgba(var(--gold-rgb),.32)}}
+.glow-w{animation:glowW 4.2s ease-in-out infinite}
+</style>
+</helmet>
+<div style="min-height:100vh;background:radial-gradient(130% 80% at 50% -10%,var(--surface-elevated),var(--bg-deep));display:flex;align-items:center;justify-content:center;padding:clamp(8px,3vw,32px);font-family:'IBM Plex Sans','Noto Sans SC',sans-serif">
+<div ref="{{ bezelRef }}" style="width:414px;flex:none;background:var(--bezel);border-radius:58px;padding:12px;box-shadow:0 50px 100px rgba(0,0,0,.55),inset 0 0 0 1px var(--bezel-edge)">
+<div style="position:relative;width:390px;height:844px;background:var(--bg-base);border-radius:46px;overflow:hidden;display:flex;flex-direction:column;color:var(--text-primary)">
+
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">21:35<span style="display:flex;align-items:center;gap:6px"><svg width="17" height="12" viewBox="0 0 17 12" fill="#fff"><rect x="0" y="7" width="3" height="5" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"></rect><rect x="9" y="2" width="3" height="10" rx="1"></rect><rect x="13.5" y="0" width="3" height="12" rx="1" opacity=".35"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#fff" opacity=".5"></rect><rect x="3" y="3" width="15" height="6" rx="1.5" fill="#fff"></rect><rect x="22" y="4" width="1.6" height="4" rx="1" fill="#fff" opacity=".6"></rect></svg></span></div>
+
+<div ref="{{ appScrollRef }}" onScroll="{{ onAppScroll }}" style="flex:1;overflow-y:auto;overflow-x:hidden;position:relative">
+
+<sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:15px">
+<div style="display:flex;align-items:center;gap:10px"><span style="position:relative;display:inline-block;font-family:'Archivo',sans-serif;font-weight:900;font-size:16px;letter-spacing:-.11em;line-height:1"><span style="-webkit-text-stroke:5px var(--text-primary);color:var(--text-primary);paint-order:stroke fill">MEETP<span style="margin-left:-.13em">R</span></span><span style="position:absolute;left:0;top:0;color:var(--bg-base)">MEETP<span style="margin-left:-.13em">R</span></span></span><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;letter-spacing:.06em;color:var(--text-muted)">{{ selDateStr }}</span></div>
+<div style="display:flex;align-items:flex-start;justify-content:space-between">
+<div style="display:flex;align-items:flex-end;gap:12px"><sc-if value="{{ selHas }}" hint-placeholder-val="{{ true }}"><div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:54px;line-height:.9;color:var(--text-primary);text-shadow:var(--headline-emboss)">{{ dayLabel }}</div></sc-if><sc-if value="{{ selRest }}"><div style="display:flex;align-items:flex-end;gap:11px"><div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:54px;line-height:.9;color:var(--text-dim);text-shadow:var(--headline-emboss)">W1</div><div style="background:var(--surface-elevated);border:1px solid var(--border-strong);color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px;margin-bottom:12px">休息日</div></div></sc-if></div>
+<div class="pb" onclick="{{ openNotes }}" style="position:relative;width:44px;height:44px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg><span style="position:absolute;top:-1px;right:-1px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--danger-fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace">3</span></div>
+</div>
+<div style="display:flex;gap:5px;margin-top:-8px">
+<sc-for list="{{ weekBars }}" as="b" hint-placeholder-count="4"><span ref="{{ b.ref }}" style="flex:{{ b.grow }};height:4px;border-radius:2px;background:{{ b.bg }};box-shadow:{{ b.sh }}"></span></sc-for>
+</div>
+<div ref="{{ fbWrapRef }}" style="position:relative;margin-bottom:8px">
+<sc-if value="{{ fbCollapsed }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:14px;right:14px;top:11px;bottom:-11px;background:var(--bg-inset);border:1px solid var(--surface-key);border-radius:12px"></div>
+<div style="position:absolute;left:7px;right:7px;top:5px;bottom:-5px;background:var(--bg-stack);border:1px solid var(--surface-key);border-radius:12px"></div>
+<div class="pb" onclick="{{ toggleFb }}" style="position:relative;background:var(--surface-card);border-left:3px solid var(--gold-500);border-radius:12px;padding:14px 16px;cursor:pointer">
+<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><span style="width:7px;height:7px;border-radius:50%;background:var(--gold-500)"></span><span style="font-size:13px;font-weight:700">教练反馈</span><sc-if value="{{ hasUnread }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;background:var(--gold-text);color:var(--ink-on-gold);padding:1px 6px;border-radius:999px">{{ unreadCount }} 条未读</span></sc-if><span style="font-size:12px;color:var(--text-faint)">· 周日</span></div>
+<div data-fbpreview="1" style="font-size:14px;line-height:1.55;color:var(--text-primary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ latestFbText }}</div>
+<div style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-muted);margin-top:9px">展开全部 {{ fbCount }} 条反馈<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></div>
+</div>
+</sc-if>
+<sc-if value="{{ fbExpanded }}">
+<div style="background:var(--surface-card);border-left:3px solid var(--gold-500);border-radius:12px;padding:13px 15px 4px">
+<div class="pb" onclick="{{ toggleFb }}" style="display:flex;align-items:center;gap:7px;margin-bottom:6px;cursor:pointer"><span style="width:7px;height:7px;border-radius:50%;background:var(--gold-500)"></span><span style="font-size:13px;font-weight:700">教练反馈</span><sc-if value="{{ hasUnread }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;background:var(--gold-text);color:var(--ink-on-gold);padding:1px 6px;border-radius:999px">{{ unreadCount }} 条未读</span></sc-if><span style="margin-left:auto;display:flex;align-items:center;gap:3px;font-size:12px;color:var(--text-muted)">收起<span data-fbarrow="1" style="display:flex;transform:rotate(180deg)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span></span></div>
+<sc-for list="{{ feedbackItems }}" as="fb" hint-placeholder-count="4">
+<div class="pb" data-fbitem="1" onclick="{{ fb.open }}" style="border-top:1px solid var(--border-subtle);padding:10px 0;cursor:pointer">
+<div style="display:flex;align-items:center;gap:7px;margin-bottom:3px"><span style="font-size:13px;font-weight:600;color:var(--text-secondary)">{{ fb.label }}</span><sc-if value="{{ fb.unread }}"><span style="width:6px;height:6px;border-radius:50%;background:var(--gold-500)"></span></sc-if><span style="margin-left:auto;display:flex;align-items:center;gap:2px;font-size:11px;color:var(--text-muted)">查看<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span></div>
+<div style="font-size:13px;line-height:1.45;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ fb.text }}</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px"><span style="font-size:13px;color:var(--text-secondary);font-family:'IBM Plex Mono','Noto Sans SC',monospace">本周</span><span style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace"><span style="color:var(--text-dim)">深蹲·卧推·硬拉</span><span style="width:1px;height:9px;background:var(--border-strong)"></span><span style="display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;box-sizing:border-box;background:var(--gold-500)"></span>该日有</span><span style="display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;box-sizing:border-box;background:transparent;border:1px solid rgba(var(--gold-rgb),.5)"></span>该日无</span></span></div>
+<div style="display:flex;gap:6px">
+<sc-for list="{{ weekCells }}" as="d" hint-placeholder-count="7">
+<div class="pb" onclick="{{ d.onSel }}" style="flex:1;display:flex;cursor:pointer">
+<sc-if value="{{ d.sel }}"><div style="flex:1;background:rgba(var(--gold-rgb),.12);border:1.5px solid var(--gold-500);border-radius:999px;padding:8px 0;text-align:center"><div style="font-size:11px;color:var(--text-primary)">{{ d.dow }}</div><div style="height:7px;display:flex;align-items:center;justify-content:center;gap:3px;margin-top:5px"><sc-for list="{{ d.dots }}" as="dot" hint-placeholder-count="3"><span style="width:6px;height:6px;border-radius:50%;box-sizing:border-box;background:{{ dot.bg }};border:{{ dot.bd }}"></span></sc-for></div></div></sc-if>
+<sc-if value="{{ d.notSel }}"><div style="flex:1;background:var(--surface-card);border-radius:12px;padding:9px 0;text-align:center"><div style="font-size:11px;color:var(--text-muted)">{{ d.dow }}</div><div style="height:7px;display:flex;align-items:center;justify-content:center;gap:3px;margin-top:5px"><sc-for list="{{ d.dots }}" as="dot" hint-placeholder-count="3"><span style="width:6px;height:6px;border-radius:50%;box-sizing:border-box;background:{{ dot.bg }};border:{{ dot.bd }}"></span></sc-for></div></div></sc-if>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:11px;margin-top:2px">
+<div style="flex:1;background:var(--surface-card);border-radius:16px;padding:14px 16px"><div style="display:flex;align-items:center;gap:6px;color:var(--text-primary);font-size:11px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 3v6M7 21h10a2 2 0 002-2 7 7 0 00-14 0 2 2 0 002 2z"></path></svg>体重</div><div style="font-size:24px;font-weight:800;font-family:'Archivo',sans-serif;margin-top:3px">83<span style="font-size:13px;color:var(--text-muted);font-weight:600"> kg</span></div></div>
+<div style="flex:1;position:relative;background:linear-gradient(155deg,rgba(var(--gold-rgb),.13),var(--surface-card) 62%);box-shadow:inset 0 0 0 1px rgba(var(--gold-rgb),.3);border-radius:16px;padding:14px 16px"><div style="display:flex;align-items:center;gap:6px;color:var(--text-primary);font-size:11px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg>距比赛</div><div style="display:flex;align-items:center;gap:5px;margin-top:3px"><svg width="14" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg><span style="font-size:24px;font-weight:800;font-family:'Archivo',sans-serif;color:var(--gold-text);line-height:1;text-shadow:0 0 14px rgba(var(--gold-rgb),.45)">3</span><span style="font-size:13px;color:var(--text-muted);font-weight:600"> 天</span></div></div>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:10px"><span style="font-size:12px;color:var(--text-secondary);font-family:'IBM Plex Mono','Noto Sans SC',monospace">周{{ selDow }} · E1RM 曲线</span></div>
+<sc-if value="{{ selHas }}">
+<div style="display:flex;flex-direction:column;gap:9px">
+<div ref="{{ railRef }}" onScroll="{{ onRailScroll }}" style="display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch">
+<sc-for list="{{ selLifts }}" as="lift" hint-placeholder-count="1">
+<div style="flex:0 0 100%;box-sizing:border-box;scroll-snap-align:start;background:var(--surface-card);border-radius:16px;padding:14px 15px">
+<div style="font-size:12px;color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-bottom:5px"><span style="color:var(--text-secondary);font-weight:600">{{ lift.name }}</span> E1RM · 90 天</div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:.9">{{ lift.val }}<span style="font-size:13px;color:var(--text-muted);font-weight:600"> kg</span></div><div style="font-size:14px;font-weight:700;color:var(--gold-text);font-family:'IBM Plex Mono',monospace">{{ lift.delta }}</div></div>
+<svg viewBox="0 0 320 70" style="width:100%;height:48px;margin-top:8px;overflow:visible" preserveAspectRatio="none"><defs><linearGradient id="{{ lift.gradId }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gold-500)" stop-opacity=".28"></stop><stop offset="55%" stop-color="var(--gold-500)" stop-opacity=".06"></stop><stop offset="100%" stop-color="var(--gold-500)" stop-opacity="0"></stop></linearGradient></defs><polygon points="{{ lift.areaPoints }}" fill="url(#{{ lift.gradId }})" stroke="none"></polygon><polyline points="{{ lift.points }}" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="312" cy="{{ lift.cy }}" r="3.5" fill="var(--gold-500)"></circle></svg>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ showE1rmDots }}">
+<div style="display:flex;justify-content:center;gap:6px">
+<sc-for list="{{ e1rmDots }}" as="dot" hint-placeholder-count="3"><span style="width:{{ dot.w }};height:6px;border-radius:999px;background:{{ dot.bg }};transition:width .25s ease,background .25s ease"></span></sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ selRest }}">
+<div style="background:var(--surface-card);border-radius:16px;padding:20px;text-align:center;color:var(--text-muted);font-size:14px;font-weight:600">休息日 · 无训练安排</div>
+</sc-if>
+<sc-if value="{{ ctaActive }}">
+<div style="display:flex;flex-direction:column;gap:9px;margin-top:2px">
+<div ref="{{ ctaBtnRef }}" onPointerDown="{{ onCtaDown }}" onPointerUp="{{ onCtaUp }}" onPointerLeave="{{ onCtaCancel }}" onPointerCancel="{{ onCtaCancel }}" style="position:relative;overflow:hidden;background:var(--cta-bg);border-radius:999px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:transform .13s ease,box-shadow .13s ease,filter .13s ease;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)">
+<span class="shimmer"></span>
+<span ref="{{ ctaT1Ref }}" style="position:relative;display:inline-flex;align-items:center;gap:7px;color:var(--cta-text);font-weight:800;font-size:16px;line-height:1;transition:opacity .13s ease"><svg width="13" height="13" viewBox="0 0 24 24" fill="var(--cta-text)"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.6-.4.6-1.4 0-1.8l-12-7.5c-.7-.4-1.6.1-1.6.9z"></path></svg>开始训练</span>
+<span ref="{{ ctaT2Ref }}" style="position:relative;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;letter-spacing:.06em;font-weight:700;color:var(--cta-text);opacity:.72;line-height:1;transition:opacity .13s ease">{{ ctaLift }}</span>
+</div>
+<div style="display:flex;justify-content:center"><span class="pb" onclick="{{ openPostpone }}" title="今天有事 · 顺延一天" style="display:inline-flex;align-items:center;justify-content:center;gap:3px;min-height:44px;padding:0 12px;font-size:13px;color:var(--text-muted);cursor:pointer">顺延一天<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span></div>
+</div>
+</sc-if>
+<sc-if value="{{ ctaPostponed }}">
+<div style="background:rgba(var(--success-rgb),.1);border:1px solid rgba(var(--success-rgb),.32);border-radius:16px;padding:13px 15px;display:flex;align-items:flex-start;gap:10px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6L9 17l-5-5"></path></svg><div style="font-size:13px;color:var(--text-secondary);line-height:1.45">本次训练已顺延至 <b style="color:var(--text-primary)">明天 · 7/23 周四</b>，之后计划整体后移一天，已通知教练。</div></div>
+<div style="background:var(--surface-card);border-radius:16px;padding:17px;text-align:center;font-weight:700;font-size:16px;color:var(--text-muted)">今日休息</div>
+<div class="pb" onclick="{{ undoPostpone }}" style="text-align:center;font-size:13px;color:var(--text-muted);padding:2px;cursor:pointer"><span style="text-decoration:underline">撤销顺延</span></div>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ isTraining }}">
+<div ref="{{ riseRef }}" class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:13px">
+<div style="margin-bottom:1px"><span style="position:relative;display:inline-block;font-family:'Archivo',sans-serif;font-weight:900;font-size:15px;letter-spacing:-.11em;line-height:1"><span style="-webkit-text-stroke:5px var(--text-primary);color:var(--text-primary);paint-order:stroke fill">MEETP<span style="margin-left:-.13em">R</span></span><span style="position:absolute;left:0;top:0;color:var(--bg-base)">MEETP<span style="margin-left:-.13em">R</span></span></span></div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="font-weight:800;font-size:20px;font-family:'Archivo','Noto Sans SC',sans-serif">W1D4</div>
+<div style="display:flex;gap:9px">
+<div class="pb" style="width:40px;height:40px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 10-2 5"></path><path d="M20 5v6h-6"></path></svg></div>
+<div class="pb" onclick="{{ openNotes }}" style="position:relative;width:40px;height:40px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg><span style="position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:var(--danger-fill);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace">3</span></div>
+</div>
+</div>
+<sc-if value="{{ trainCalClosed }}" hint-placeholder-val="{{ true }}">
+<div style="position:sticky;top:6px;z-index:5;display:flex;align-items:center;gap:9px;background:var(--surface-card);border:1px solid var(--surface-key);border-radius:12px;padding:11px 14px;box-shadow:0 6px 16px rgba(0,0,0,.35)"><span style="font-size:13px;color:var(--text-primary);font-family:'IBM Plex Mono','Noto Sans SC',monospace">七月24日 · 星期五</span><span style="margin-left:auto;font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:3px">上滑到顶展开<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg></span></div>
+</sc-if>
+<sc-if value="{{ trainCalOpen }}">
+<div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace">‹ 七月 ›</span><div style="margin-left:auto;display:flex;background:var(--surface-card);border-radius:10px;padding:3px"><sc-if value="{{ calWeek }}"><span onclick="{{ setWeek }}" style="font-size:11px;padding:3px 11px;border-radius:6px;background:var(--cta-fill);color:#fff;cursor:pointer">周</span><span onclick="{{ setMonth }}" style="font-size:11px;padding:3px 11px;border-radius:6px;color:var(--text-muted);cursor:pointer">月</span></sc-if><sc-if value="{{ calMonth }}"><span onclick="{{ setWeek }}" style="font-size:11px;padding:3px 11px;border-radius:6px;color:var(--text-muted);cursor:pointer">周</span><span onclick="{{ setMonth }}" style="font-size:11px;padding:3px 11px;border-radius:6px;background:var(--border-strong);color:#fff;cursor:pointer">月</span></sc-if></div></div>
+<sc-if value="{{ calWeek }}">
+<div style="display:flex;gap:6px">
+<div style="flex:1;position:relative;overflow:hidden;background:var(--surface-card);border-radius:12px;height:44px;padding:5px 0 0;display:flex;flex-direction:column;align-items:center"><span style="position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--success)"></span><div style="font-size:10px;color:var(--text-muted)">周一</div><div style="flex:1"></div><div style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin-bottom:5px">20</div></div>
+<div style="flex:1;position:relative;overflow:hidden;background:var(--surface-card);border-radius:12px;height:44px;padding:5px 0 0;display:flex;flex-direction:column;align-items:center"><div style="font-size:10px;color:var(--text-disabled)">周二</div><div style="flex:1"></div><div style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text-disabled);margin-bottom:5px">21</div></div>
+<div style="flex:1;position:relative;overflow:hidden;background:var(--surface-card);border-radius:12px;height:44px;padding:5px 0 0;display:flex;flex-direction:column;align-items:center"><span style="position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--success)"></span><div style="font-size:10px;color:var(--text-muted)">周三</div><div style="flex:1"></div><div style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin-bottom:5px">22</div></div>
+<div style="flex:1;position:relative;overflow:hidden;background:var(--surface-card);border-radius:12px;height:44px;padding:5px 0 0;display:flex;flex-direction:column;align-items:center"><span style="position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--success)"></span><div style="font-size:10px;color:var(--text-muted)">周四</div><div style="flex:1"></div><div style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin-bottom:5px">23</div></div>
+<div style="flex:1;position:relative;overflow:hidden;background:var(--surface-elevated);border:1.5px solid var(--gold-500);border-radius:12px;height:44px;padding:4px 0 0;display:flex;flex-direction:column;align-items:center"><span style="position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--gold-500)"></span><div style="font-size:10px;color:var(--text-primary)">周五</div><div style="flex:1"></div><div style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;margin-bottom:5px">24</div></div>
+<div style="flex:1;position:relative;overflow:hidden;background:var(--surface-card);border-radius:12px;height:44px;padding:5px 0 0;display:flex;flex-direction:column;align-items:center"><div style="font-size:10px;color:var(--text-dim)">周六</div><div style="flex:1"></div><div style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text-dim);margin-bottom:5px">25</div></div>
+<div style="flex:1;position:relative;background:var(--surface-card);border-radius:12px;height:44px;padding:5px 0 0;display:flex;flex-direction:column;align-items:center"><div style="font-size:10px;color:var(--text-dim)">周日</div><div style="flex:1"></div><div style="font-size:13px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text-dim);margin-bottom:5px">26</div></div>
+</div>
+</sc-if>
+<sc-if value="{{ calMonth }}">
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10px;color:var(--text-dim);text-align:center;margin-bottom:2px"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">
+<sc-for list="{{ monthDays }}" as="d" hint-placeholder-count="35">
+<sc-if value="{{ d.blank }}"><div></div></sc-if>
+<sc-if value="{{ d.notBlank }}">
+<sc-if value="{{ d.today }}"><div style="position:relative;background:var(--surface-elevated);border:1.5px solid var(--gold-500);border-radius:10px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px"><sc-if value="{{ d.hasStatus }}"><span style="position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:{{ d.dotColor }}"></span></sc-if><span style="font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text-primary)">{{ d.n }}</span></div></sc-if>
+<sc-if value="{{ d.notToday }}"><div style="position:relative;background:var(--surface-card);border-radius:10px;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px"><sc-if value="{{ d.hasStatus }}"><span style="position:absolute;top:5px;right:5px;width:5px;height:5px;border-radius:50%;background:{{ d.dotColor }}"></span></sc-if><sc-if value="{{ d.train }}"><span style="font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text-primary)">{{ d.n }}</span></sc-if><sc-if value="{{ d.rest }}"><span style="font-size:14px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--text-dim)">{{ d.n }}</span></sc-if></div></sc-if>
+</sc-if>
+</sc-for>
+</div>
+</sc-if>
+<div style="display:flex;gap:14px;margin-top:1px;font-size:10px;color:var(--text-dim);font-family:'IBM Plex Mono','Noto Sans SC',monospace"><span style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--success)"></span>已完成</span><span style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--gold-500)"></span>进行中</span><span style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:var(--danger)"></span>未完成</span></div>
+</sc-if>
+<div ref="{{ heroCardRef }}" style="position:relative;border:1px solid var(--border-strong);border-left:none;background:var(--bg-inset);border-radius:0 16px 16px 0;padding:16px;overflow:hidden">
+<div ref="{{ heroBarRef }}" style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#FFD470,var(--gold-400),var(--gold-500));pointer-events:none"></div>
+<sc-if value="{{ heroListOn }}" hint-placeholder-val="{{ false }}">
+<div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:22px;line-height:1;margin-bottom:4px">今日训练</div>
+<div style="font-size:12px;color:var(--text-tertiary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-bottom:13px">共 {{ exTotal }} 个动作 · {{ totalSetsN }} 组</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+<sc-for list="{{ heroListRows }}" as="o" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:11px;background:var(--surface-card);border:1px solid var(--border-subtle);border-radius:12px;padding:11px 13px">
+<span style="width:22px;height:22px;border-radius:7px;background:rgba(var(--gold-rgb),.12);color:var(--gold-text);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;flex:none">{{ o.no }}</span>
+<span style="font-size:14px;font-weight:700;color:var(--text-primary)">{{ o.name }}</span>
+<span style="flex:1;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-tertiary)">{{ o.plan }}</span>
+</div>
+</sc-for>
+</div>
+<div class="pb" onclick="{{ startFirstSet }}" style="position:relative;overflow:hidden;background:var(--cta-bg);color:var(--cta-text);border-radius:999px;padding:15px;text-align:center;font-weight:800;font-size:16px;cursor:pointer;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)"><span class="shimmer"></span><span style="position:relative">开始第一组</span></div>
+</sc-if>
+<sc-if value="{{ heroRecOn }}" hint-placeholder-val="{{ true }}">
+<div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:22px;line-height:1;margin-bottom:3px">{{ curExName }}</div>
+<div style="font-size:12px;color:var(--text-tertiary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-bottom:11px">{{ curExLast }}</div>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+<sc-if value="{{ hasPending }}"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;background:rgba(var(--gold-rgb),.16);color:var(--gold-text);padding:3px 11px;border-radius:999px">当前</span><span style="font-size:12px;color:var(--text-muted)">第 {{ curNo }} / {{ curTotal }} 组 · 动作 {{ curExNo }} / {{ exTotal }}</span></sc-if>
+<sc-if value="{{ allDone }}"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;background:rgba(var(--success-rgb),.16);color:var(--success);padding:3px 11px;border-radius:999px">已完成</span><span style="font-size:12px;color:var(--text-muted)">今日全部动作已记录</span></sc-if>
+</div>
+<div style="display:flex;align-items:flex-end;gap:9px"><span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:54px;line-height:.85">{{ curW }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--text-muted);font-weight:700;margin-bottom:8px">KG</span><span style="margin-left:auto;font-size:20px;color:var(--text-primary);font-weight:700;margin-bottom:8px">×{{ curR }}<span style="font-size:12px;color:var(--text-muted);font-weight:500"> 次</span></span></div>
+<div style="display:flex;align-items:baseline;gap:8px;margin-top:8px"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:.05em;color:var(--text-faint);font-weight:600">目标 RPE</span><span style="font-size:20px;font-weight:800;font-family:'Archivo',sans-serif">{{ curRPE }}</span><span style="font-size:12px;color:var(--text-faint)">/ 10</span></div>
+<div style="background:var(--bg-inset);border-radius:10px;padding:10px 12px;margin-top:11px"><span style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace">教练备注</span><div style="font-size:12px;color:#C4C4C8;line-height:1.5;margin-top:3px">{{ curExNote }}</div></div>
+<sc-if value="{{ hasPending }}">
+<div style="display:flex;gap:9px;margin-top:13px"><div class="pb" onclick="{{ openSetEntry }}" style="flex:1;position:relative;overflow:hidden;background:var(--cta-bg);color:var(--cta-text);border-radius:999px;padding:15px;text-align:center;font-weight:800;font-size:15px;cursor:pointer;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)"><span style="position:relative">记录此组</span></div><div class="pb" style="width:52px;background:var(--surface-card);border:1px solid var(--border-strong);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="M16 10l5-2v8l-5-2"></path></svg></div></div>
+</sc-if>
+</sc-if>
+</div>
+<sc-if value="{{ heroRecOn }}" hint-placeholder-val="{{ true }}">
+<div ref="{{ detailsRef }}" style="display:flex;flex-direction:column;gap:13px">
+<sc-for list="{{ exBlocks }}" as="b" hint-placeholder-count="3">
+<div ref="{{ b.wrapRef }}" style="overflow:hidden">
+<div class="pb" ref="{{ b.rollRef }}" style="{{ b.cardStyle }}">
+<div onclick="{{ b.toggle }}" style="display:flex;align-items:center;gap:11px;min-height:44px;padding:12px 16px;cursor:pointer">
+<span style="{{ b.barStyle }}"></span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+<span style="{{ b.nameStyle }}">{{ b.name }}</span>
+<span ref="{{ b.metaRef }}" style="{{ b.metaStyle }}">{{ b.metaLine }}</span>
+</span>
+<span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;font-weight:600;color:{{ b.statColor }};flex:none">{{ b.headStat }}</span>
+<span style="{{ b.caretStyle }}">▾</span>
+</div>
+<sc-if value="{{ b.expanded }}" hint-placeholder-val="{{ true }}">
+<div ref="{{ b.bodyRef }}" style="transform-origin:50% 0;will-change:transform">
+<div style="display:grid;grid-template-columns:22px 1fr 1fr 1fr 64px;padding:6px 14px;border-top:1px solid var(--border-hairline);font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10px;letter-spacing:.05em;color:var(--text-dim)"><span>#</span><span>重量</span><span style="text-align:center">次数</span><span style="text-align:center">RPE</span><span></span></div>
+<sc-for list="{{ b.rows }}" as="row" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:22px 1fr 1fr 1fr 64px;align-items:center;min-height:44px;padding:0 14px;border-bottom:1px solid var(--border-hairline);font-family:'IBM Plex Mono','Noto Sans SC',monospace"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:{{ row.noColor }}">{{ row.no }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:{{ row.txt }}">{{ row.w }}</span><span style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:14px;color:{{ row.txt }}">{{ row.r }}</span><span style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:14px;color:{{ row.txt }}">{{ row.rpe }}</span><span style="display:flex;justify-content:flex-end;align-items:center;gap:11px"><sc-if value="{{ row.okDone }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></sc-if><sc-if value="{{ row.failMark }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.6" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"></path></svg></sc-if><sc-if value="{{ row.pending }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="var(--text-ghost)" stroke-width="2.4"></circle></svg></sc-if><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="{{ row.camColor }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="12.5" height="10" rx="2.5"></rect><path d="M15 10.5l6-3v9l-6-3z"></path></svg></span></div>
+</sc-for>
+<div style="{{ b.noteStyle }}">{{ b.note }}</div>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{ hasPending }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed var(--border-strong);border-radius:999px;padding:16px;color:var(--text-dim)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l2.5 1.5"></path></svg><span style="font-size:14px;font-weight:600">{{ remainText }}</span></div>
+</sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ allDone }}">
+<div ref="{{ holdBtnRef }}" onPointerDown="{{ onHoldStart }}" onPointerUp="{{ onHoldEnd }}" onPointerLeave="{{ onHoldEnd }}" onPointerCancel="{{ onHoldEnd }}" style="position:relative;overflow:hidden;border-radius:999px;padding:17px;cursor:pointer;background:#17120A;border:1px solid rgba(var(--gold-rgb),.5);box-shadow:0 4px 20px rgba(var(--gold-rgb),.15);user-select:none;-webkit-user-select:none;transition:transform .12s ease;touch-action:none">
+<div ref="{{ holdFillRef }}" style="position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,#E0951C,var(--gold-400));box-shadow:0 0 22px rgba(var(--gold-rgb),.55)"></div>
+<div class="shimmer"></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:center;gap:9px;color:#fff;font-weight:800;font-size:16px;text-shadow:0 1px 2px rgba(0,0,0,.45)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l2.5 1.5"></path></svg>长按 · 完成今日训练</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isGrowth }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:14px">
+<div><span style="position:relative;display:inline-block;font-family:'Archivo',sans-serif;font-weight:900;font-size:15px;letter-spacing:-.11em;line-height:1"><span style="-webkit-text-stroke:5px var(--text-primary);color:var(--text-primary);paint-order:stroke fill">MEETP<span style="margin-left:-.13em">R</span></span><span style="position:absolute;left:0;top:0;color:var(--bg-base)">MEETP<span style="margin-left:-.13em">R</span></span></span></div>
+<div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:34px;line-height:.95">成长</div>
+<div style="font-size:12px;color:var(--text-faint);line-height:1.5">E1RM ＝ 用你完成的组数估算的单次最大重量</div>
+<sc-for list="{{ growthLifts }}" as="g" hint-placeholder-count="3">
+<div style="background:var(--surface-card);border-radius:16px;padding:16px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+<div style="font-size:12px;color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace"><span style="color:var(--text-secondary);font-weight:600">{{ g.name }}</span> E1RM</div>
+<div class="pb" onclick="{{ g.cycleRange }}" style="display:flex;align-items:center;gap:4px;background:var(--surface-elevated);border:1px solid var(--border-strong);border-radius:999px;padding:3px 5px 3px 10px;cursor:pointer"><span style="font-size:11px;color:#D8D8DC;font-family:'IBM Plex Mono','Noto Sans SC',monospace">{{ g.range }}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></div>
+</div>
+<div style="display:flex;align-items:flex-end;justify-content:space-between"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:38px;line-height:.9">{{ g.val }}<span style="font-size:15px;color:var(--text-muted)"> kg</span></div><span style="font-size:13px;font-weight:700;color:var(--gold-text);font-family:'IBM Plex Mono',monospace">{{ g.delta }}</span></div>
+<svg viewBox="0 0 320 118" style="width:100%;height:auto;margin-top:8px;overflow:visible">
+<defs><linearGradient id="{{ g.areaId }}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gold-500)" stop-opacity=".22"></stop><stop offset="72%" stop-color="var(--gold-500)" stop-opacity=".04"></stop><stop offset="100%" stop-color="var(--gold-500)" stop-opacity="0"></stop></linearGradient></defs>
+<line x1="46" y1="18" x2="46" y2="84" stroke="var(--text-ghost)" stroke-width="1"></line>
+<line x1="46" y1="84" x2="304" y2="84" stroke="var(--text-ghost)" stroke-width="1"></line>
+<line x1="46" y1="51" x2="304" y2="51" stroke="var(--border-subtle)" stroke-width="1" stroke-dasharray="3 4"></line>
+<text x="42" y="22" text-anchor="end" font-size="9.5" fill="var(--text-tertiary)" font-family="monospace">{{ g.yTop }}</text>
+<text x="42" y="54" text-anchor="end" font-size="9.5" fill="var(--text-dim)" font-family="monospace">{{ g.yMid }}</text>
+<text x="42" y="88" text-anchor="end" font-size="9.5" fill="var(--text-tertiary)" font-family="monospace">{{ g.yBot }}</text>
+<polygon points="{{ g.area }}" fill="url(#{{ g.areaId }})" stroke="none"></polygon>
+<polyline points="{{ g.pts }}" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+<line x1="{{ g.bx }}" y1="{{ g.by }}" x2="{{ g.bx }}" y2="84" stroke="var(--gold-500)" stroke-width="1" stroke-dasharray="2 3" opacity=".6"></line>
+<circle cx="{{ g.bx }}" cy="{{ g.by }}" r="4.5" fill="var(--gold-500)" stroke="var(--surface-card)" stroke-width="1.5"></circle>
+<text x="13" y="54" transform="rotate(-90 13 54)" text-anchor="middle" font-size="8.5" fill="var(--text-muted)" font-family="monospace">重量 / kg</text>
+<text x="175" y="114" text-anchor="middle" font-size="8.5" fill="var(--text-muted)" font-family="monospace">日期</text>
+<text x="50" y="98" text-anchor="start" font-size="9" fill="var(--text-muted)" font-family="monospace">{{ g.xs }}</text>
+<text x="{{ g.xMid }}" y="98" text-anchor="middle" font-size="9" fill="var(--text-muted)" font-family="monospace">{{ g.xm }}</text>
+<text x="304" y="98" text-anchor="end" font-size="10" fill="var(--gold-500)" font-weight="700" font-family="monospace">{{ g.pr }}</text>
+</svg>
+</div>
+</sc-for>
+
+<div style="font-size:13px;color:var(--text-secondary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:8px">E1RM vs 训练 1RM</div>
+<div style="background:var(--surface-card);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:15px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between">
+<div><div style="font-size:11px;color:var(--text-muted)">三项 E1RM 合计</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:28px;line-height:1;margin-top:3px">{{ e1rmTotal }}<span style="font-size:12px;color:var(--text-muted);font-weight:600"> kg</span></div></div>
+<div style="width:1px;height:34px;background:var(--border-strong)"></div>
+<div style="text-align:right"><div style="font-size:11px;color:var(--text-muted)">训练 1RM 合计</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:28px;line-height:1;margin-top:3px;color:var(--text-muted)">{{ ormTotal }}<span style="font-size:12px;color:var(--text-muted);font-weight:600"> kg</span></div></div>
+</div>
+<sc-for list="{{ cmpLifts }}" as="c" hint-placeholder-count="3">
+<div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">{{ c.name }}</span><span style="font-size:12px;color:var(--text-tertiary);font-family:'IBM Plex Mono',monospace">{{ c.e1rm }} / {{ c.orm }} kg</span></div>
+<div style="position:relative;height:8px;background:var(--bg-inset);border-radius:4px;overflow:hidden"><div style="position:absolute;left:0;top:0;bottom:0;width:{{ c.fillW }};background:linear-gradient(90deg,#A9731C,var(--gold-500));border-radius:4px"></div></div>
+<sc-if value="{{ c.over }}"><div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--success);font-family:'IBM Plex Mono',monospace;margin-top:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>已突破训练 1RM · {{ c.pct }}%</div></sc-if>
+</div>
+</sc-for>
+</div>
+
+<div style="font-size:13px;color:var(--text-secondary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:8px">教练反馈记录</div>
+<div class="pb" onclick="{{ openFbArchive }}" style="background:var(--surface-card);border-radius:16px;padding:14px 15px;display:flex;align-items:center;gap:12px;cursor:pointer">
+<div style="width:38px;height:38px;border-radius:10px;background:var(--surface-raised);display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg></div>
+<div style="flex:1"><div style="font-size:15px;font-weight:700">全部教练反馈</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">共 {{ fbTotalCount }} 条 · 含视频回放</div></div>
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+</div>
+
+<div style="font-size:13px;color:var(--text-secondary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:8px">全部历史</div>
+<div style="background:var(--surface-card);border-radius:16px;padding:16px;display:flex">
+<div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">训练次数</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1;margin-top:4px">2</div></div>
+<div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">训练周</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1;margin-top:4px">1</div></div>
+<div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">训练总容量</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;line-height:1;margin-top:4px">6,510<span style="font-size:12px;color:var(--text-muted);font-weight:600"> kg</span></div></div>
+</div>
+
+<div class="pb" style="background:var(--surface-card);border-radius:16px;padding:15px 16px;display:flex;align-items:center;gap:13px;cursor:pointer">
+<div style="width:40px;height:40px;border-radius:12px;background:var(--surface-raised);display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></div>
+<div style="flex:1"><div style="font-size:15px;font-weight:700">全部训练历史</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">按周 / 月查看 · 含每组数据</div></div>
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+</div>
+
+<div style="font-size:13px;color:var(--text-secondary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:8px">容量 / 强度</div>
+<div style="background:var(--surface-card);border-radius:16px;padding:15px 14px 12px">
+<svg viewBox="0 0 320 172" style="width:100%;height:auto;display:block">
+<defs><linearGradient id="volGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gold-400)"></stop><stop offset="100%" stop-color="#A9731C" stop-opacity=".28"></stop></linearGradient></defs>
+<line x1="42" y1="18" x2="300" y2="18" stroke="var(--surface-raised)" stroke-width="1"></line>
+<line x1="42" y1="82" x2="300" y2="82" stroke="var(--surface-raised)" stroke-width="1"></line>
+<line x1="42" y1="146" x2="300" y2="146" stroke="#333333" stroke-width="1"></line>
+<sc-for list="{{ volBars }}" as="b" hint-placeholder-count="6"><path d="{{ b.path }}" fill="url(#volGrad)"></path></sc-for>
+<polyline points="{{ rpePts }}" fill="none" stroke="var(--bg-base)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+<polyline points="{{ rpePts }}" fill="none" stroke="var(--chart-line)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 3px rgba(220,227,234,.45))"></polyline>
+<sc-for list="{{ rpeDots }}" as="d" hint-placeholder-count="6"><circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="2.6" fill="var(--chart-line)" stroke="var(--bg-base)" stroke-width="1.2"></circle></sc-for>
+<text x="38" y="21" text-anchor="end" font-size="9" fill="var(--text-muted)" font-family="monospace">15k</text>
+<text x="38" y="85" text-anchor="end" font-size="9" fill="var(--text-muted)" font-family="monospace">7.5k</text>
+<text x="38" y="149" text-anchor="end" font-size="9" fill="var(--text-muted)" font-family="monospace">0</text>
+<text x="302" y="21" text-anchor="start" font-size="9" fill="#AEB6BE" font-family="monospace">10</text>
+<text x="302" y="58" text-anchor="start" font-size="9" fill="#AEB6BE" font-family="monospace">7.5</text>
+<text x="302" y="95" text-anchor="start" font-size="9" fill="#AEB6BE" font-family="monospace">5</text>
+<text x="58" y="162" text-anchor="middle" font-size="8.5" fill="var(--text-muted)" font-family="monospace">13/07</text>
+<text x="146" y="162" text-anchor="middle" font-size="8.5" fill="var(--text-muted)" font-family="monospace">15/07</text>
+<text x="234" y="162" text-anchor="middle" font-size="8.5" fill="var(--text-muted)" font-family="monospace">17/07</text>
+</svg>
+<div style="display:flex;gap:16px;margin-top:9px;padding-left:2px;font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace"><span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:var(--gold-500)"></span>训练容量 kg</span><span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:50%;background:var(--chart-line)"></span>平均 RPE</span></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isMe }}">
+<div class="scrn" style="padding:6px 20px 28px;display:flex;flex-direction:column;gap:14px">
+<div><span style="position:relative;display:inline-block;font-family:'Archivo',sans-serif;font-weight:900;font-size:15px;letter-spacing:-.11em;line-height:1"><span style="-webkit-text-stroke:5px var(--text-primary);color:var(--text-primary);paint-order:stroke fill">MEETP<span style="margin-left:-.13em">R</span></span><span style="position:absolute;left:0;top:0;color:var(--bg-base)">MEETP<span style="margin-left:-.13em">R</span></span></span></div>
+<div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:34px;line-height:.95">我的资料</div>
+<div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.04em;margin-top:2px">训练基线 · 教练管理</div>
+<div style="background:var(--surface-card);border-radius:16px;padding:16px">
+<div style="display:flex;align-items:center;justify-content:space-between"><div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;color:var(--text-secondary);font-weight:600">当前 1RM</span><span class="pb" onclick="{{ toggleRmInfo }}" style="cursor:pointer;display:flex;align-items:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><path d="M12 16.5v-5" stroke-linecap="round"></path><circle cx="12" cy="8" r="1" fill="var(--text-muted)" stroke="none"></circle></svg></span></div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 018 0v3"></path></svg></div>
+<sc-if value="{{ showRmInfo }}"><div style="font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:9px;background:var(--bg-inset);border-radius:10px;padding:9px 11px">教练设定的训练基准 · 与「成长」按训练自动估算的 E1RM 不是同一个值</div></sc-if>
+<div style="display:flex;gap:10px;margin-top:14px">
+<div style="flex:1"><div style="font-size:10px;color:var(--text-muted)">深蹲</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:26px">185<span style="font-size:11px;color:var(--text-muted)"> kg</span></div></div>
+<div style="flex:1"><div style="font-size:10px;color:var(--text-muted)">卧推</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:26px">115<span style="font-size:11px;color:var(--text-muted)"> kg</span></div></div>
+<div style="flex:1"><div style="font-size:10px;color:var(--text-muted)">硬拉</div><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:26px">220<span style="font-size:11px;color:var(--text-muted)"> kg</span></div></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid var(--surface-raised)"><span style="font-size:12px;color:var(--text-secondary);font-weight:600;font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.03em">SBD 总和</span><span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:24px;color:var(--gold-text);line-height:1">520<span style="font-size:12px;opacity:.7"> kg</span></span></div>
+<div style="display:flex;align-items:center;gap:5px;margin-top:11px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 018 0v3"></path></svg><span style="font-size:11px;color:var(--text-dim)">训练周期中无法修改 · 联系教练</span></div>
+</div>
+<div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.04em;margin-top:2px">恢复与伤病 · 改动通知教练</div>
+<div class="pb" style="background:var(--surface-card);border-radius:16px;padding:14px 16px;display:flex;align-items:center;cursor:pointer"><div style="flex:1"><div style="display:flex;align-items:center;gap:7px"><span style="font-size:14px;font-weight:600">恢复评估</span><span style="font-size:10px;color:var(--gold-text);background:rgba(var(--gold-rgb),.12);border:1px solid rgba(var(--gold-rgb),.35);border-radius:5px;padding:1px 7px">通知教练</span></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><span style="font-size:12px;color:var(--text-secondary);background:var(--border-subtle);padding:3px 9px;border-radius:6px">较低强度</span><span style="width:1px;height:11px;background:var(--border-strong)"></span><span style="font-size:12px;color:var(--text-secondary);background:var(--border-subtle);padding:3px 9px;border-radius:6px">中等压力</span><span style="width:1px;height:11px;background:var(--border-strong)"></span><span style="font-size:12px;color:var(--text-secondary);background:var(--border-subtle);padding:3px 9px;border-radius:6px">约2天恢复</span></div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="pb" style="background:var(--surface-card);border-radius:16px;padding:14px 16px;display:flex;align-items:center;cursor:pointer"><div style="flex:1"><div style="display:flex;align-items:center;gap:7px"><span style="font-size:14px;font-weight:600">伤病记录</span><span style="font-size:10px;color:var(--gold-text);background:rgba(var(--gold-rgb),.12);border:1px solid rgba(var(--gold-rgb),.35);border-radius:5px;padding:1px 7px">通知教练</span></div><div style="margin-top:8px"><span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#FF6B66;background:rgba(var(--danger-rgb),.1);border:1px solid rgba(var(--danger-rgb),.4);border-radius:7px;padding:3px 9px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6B66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>腰部伤病</span></div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+
+<div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.04em;margin-top:2px">偏好与基础信息</div>
+<div style="background:var(--surface-card);border-radius:16px;overflow:hidden">
+<div class="pb" style="display:flex;align-items:center;padding:14px 16px;cursor:pointer"><div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">想增强肌群</div><div style="font-size:16px;font-weight:600;margin-top:3px">肩 / 肱二头 / 核心</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="pb" style="display:flex;align-items:center;padding:14px 16px;border-top:1px solid var(--border-subtle);cursor:pointer"><div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">组间休息</div><div style="font-size:16px;font-weight:600;margin-top:3px">自动 (按 RPE)</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="pb" style="display:flex;align-items:center;padding:14px 16px;border-top:1px solid var(--border-subtle);cursor:pointer"><div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">比赛日期</div><div style="font-size:16px;font-weight:600;margin-top:3px">备赛: <span style="color:var(--gold-text)">2026-09-05</span> · IPF 74</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="pb" style="display:flex;align-items:center;padding:14px 16px;border-top:1px solid var(--border-subtle);cursor:pointer"><div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">身高 / 体重</div><div style="font-size:16px;font-weight:600;margin-top:3px">175 cm · 77 kg</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+<div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.04em;margin-top:2px">训练背景 · 环境</div>
+<div style="background:var(--surface-card);border-radius:16px;overflow:hidden">
+<div class="pb" style="display:flex;align-items:center;padding:14px 16px;cursor:pointer"><div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">训练背景</div><div style="font-size:16px;font-weight:600;margin-top:3px">2 年 · 低杠深蹲 · 相扑硬拉</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="pb" style="display:flex;align-items:center;padding:14px 16px;border-top:1px solid var(--border-subtle);cursor:pointer"><div style="flex:1"><div style="font-size:11px;color:var(--text-muted)">训练环境</div><div style="font-size:16px;font-weight:600;margin-top:3px">周二 · 三 · 五 · 六 (4天/周) · 专业力量馆</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+<div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.04em;margin-top:2px">更多</div>
+<div style="background:var(--surface-card);border-radius:16px;overflow:hidden">
+<div class="pb" onclick="{{ goGrowth }}" style="display:flex;align-items:center;gap:13px;padding:15px 16px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 3 4-6"></path></svg><span style="flex:1;font-size:15px;font-weight:600">成长曲线</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+<div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.04em;margin-top:2px">账号与安全</div>
+<div style="background:var(--surface-card);border-radius:16px;overflow:hidden">
+<div class="pb" style="display:flex;align-items:center;gap:13px;padding:15px 16px;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"></circle><path d="M10.7 12.3 21 2"></path><path d="M16 5l3 3"></path><path d="M18.5 3.5l2.5 2.5"></path></svg><span style="flex:1;font-size:15px;font-weight:600">改密码</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+<div class="pb" style="display:flex;align-items:center;gap:13px;padding:15px 16px;border-top:1px solid var(--border-subtle);cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"></path><path d="M16 6l-4-4-4 4"></path><path d="M12 2v13"></path></svg><span style="flex:1;font-size:15px;font-weight:600">导出训练数据</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div>
+</div>
+<div class="pb" style="margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:16px;background:var(--surface-card);border:1px solid var(--border-strong);cursor:pointer"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--danger-muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg><span style="font-size:14px;font-weight:600;color:var(--danger-muted)">退出登录</span></div>
+</div>
+</sc-if>
+
+</div>
+
+<div style="flex:none;height:83px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-around;align-items:flex-start;padding-top:9px;background:var(--surface-card)">
+<div class="tb pb" onclick="{{ goToday }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:64px"><svg width="24" height="24" viewBox="0 0 24 24" fill="{{ cTodayI }}" stroke="{{ cTodayI }}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11.5" cy="12.5" r="8.6" fill="none"></circle><circle cx="11.5" cy="12.5" r="4.8" fill="none"></circle><circle cx="11.5" cy="12.5" r="1.6" stroke="none"></circle><path d="M10.8 12.2 L16.2 10.2 L13.8 7.2 Z" stroke="none"></path><path d="M14.4 8.6 L21.5 2.3" fill="none" stroke-width="2"></path><path d="M22.6 4.5 L20.1 3.5 L19.5 0.9" fill="none" stroke-width="2"></path><path d="M21.1 5.8 L18.6 4.8 L18 2.2" fill="none" stroke-width="2"></path></svg><span style="font-size:11px;color:{{ cTodayT }}">今日</span></div>
+<div class="tb pb" onclick="{{ goTraining }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:64px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ cTrainI }}" stroke-width="2" stroke-linecap="round"><path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12"></path></svg><span style="font-size:11px;color:{{ cTrainT }}">训练</span></div>
+<div class="tb pb" onclick="{{ goGrowth }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:64px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ cGrowI }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 15l3-4 3 3 4-6"></path></svg><span style="font-size:11px;color:{{ cGrowT }}">成长</span></div>
+<div class="tb pb" onclick="{{ goMe }}" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;width:64px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{ cMeI }}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"></circle><path d="M5.5 20a6.5 6.5 0 0113 0"></path></svg><span style="font-size:11px;color:{{ cMeT }}">我的</span></div>
+</div>
+
+<sc-if value="{{ showSetEntry }}">
+<div class="sh" style="position:absolute;inset:0;background:var(--bg-base);z-index:35;display:flex;flex-direction:column;color:var(--text-primary)">
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">21:35<span style="display:flex;align-items:center;gap:6px"><svg width="17" height="12" viewBox="0 0 17 12" fill="#fff"><rect x="0" y="7" width="3" height="5" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"></rect><rect x="9" y="2" width="3" height="10" rx="1"></rect><rect x="13.5" y="0" width="3" height="12" rx="1" opacity=".35"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#fff" opacity=".5"></rect><rect x="3" y="3" width="15" height="6" rx="1.5" fill="#fff"></rect><rect x="22" y="4" width="1.6" height="4" rx="1" fill="#fff" opacity=".6"></rect></svg></span></div>
+<div style="flex:none;position:relative;padding:6px 16px 12px;border-bottom:1px solid var(--border-default)">
+<div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:17px;font-weight:600;pointer-events:none">{{ seTitle }}</div>
+<div class="pb" onclick="{{ closeSetEntry }}" style="display:inline-flex;align-items:center;gap:3px;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg><span style="font-size:17px">返回</span></div>
+</div>
+<div ref="{{ seScrollRef }}" style="flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column">
+<div style="display:flex;align-items:center;justify-content:center;height:148px;filter:drop-shadow(0 6px 8px rgba(0,0,0,.5))">
+<div style="flex:none;width:58px;height:9px;border-radius:5px 0 0 5px;background:linear-gradient(180deg,#6E7278 0%,#9DA1A7 14%,#E8EAED 34%,#FBFCFD 44%,#CFD3D8 60%,#9A9EA4 78%,#6A6E74 100%)"></div>
+<div style="flex:none;width:11px;height:37px;border-radius:3px;background:linear-gradient(180deg,#6E7278 0%,#A6AAB0 16%,#F2F4F6 40%,#D2D6DB 62%,#9A9EA4 80%,#6A6E74 100%);box-shadow:0 1px 3px rgba(0,0,0,.4);position:relative"><div style="position:absolute;right:0;top:1px;bottom:1px;width:1px;background:#3B4149"></div><div style="position:absolute;left:1px;top:1px;bottom:1px;width:1px;background:rgba(255,255,255,.4)"></div></div>
+<div style="display:flex;align-items:center;gap:1.5px;margin-left:2px">
+<sc-for list="{{ sePlates }}" as="p" hint-placeholder-count="4"><div style="{{ p.style }}"></div></sc-for>
+</div>
+<sc-if value="{{ seCollarOn }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:1px;margin-left:2px;position:relative">
+<div style="width:11px;height:35px;background:linear-gradient(180deg,#3E4247 0%,#8A8E94 15%,#F2F4F6 33%,#FBFCFD 42%,#CFD3D8 58%,#9A9EA4 76%,#3E4247 100%);clip-path:polygon(25% 0,75% 0,100% 14%,100% 86%,75% 100%,25% 100%,0 86%,0 14%);box-shadow:1px 0 3px rgba(0,0,0,.45)"></div>
+<div style="width:14px;height:27px;border-radius:3px;background:repeating-linear-gradient(90deg,rgba(0,0,0,.3) 0 1px,rgba(255,255,255,.16) 1px 2px),linear-gradient(180deg,#54585E 0%,#9DA1A7 16%,#F4F6F8 36%,#FBFCFD 44%,#CBCFD5 58%,#8F9399 78%,#54585E 100%);box-shadow:1px 0 3px rgba(0,0,0,.4),inset -1px 0 2px rgba(0,0,0,.35),inset 1px 0 1px rgba(255,255,255,.3)"></div>
+<div style="position:absolute;left:8px;bottom:-9px;width:3px;height:27px;border-radius:2px;background:linear-gradient(90deg,#EAECEF,#B4B8BE 45%,#6A6E74);transform:rotate(-34deg);transform-origin:top;box-shadow:0 1px 2px rgba(0,0,0,.4)"><div style="position:absolute;left:-2.5px;bottom:-3px;width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F4F6F8,#9A9EA4 58%,#5A5E64);box-shadow:0 1px 2px rgba(0,0,0,.45)"></div></div>
+</div>
+</sc-if>
+<div style="flex:none;width:92px;height:17px;border-radius:0 2px 2px 0;background:linear-gradient(180deg,#6A6E74 0%,#9DA1A7 15%,#EDEFF2 36%,#FBFCFD 46%,#CBCFD5 62%,#95999F 80%,#65696F 100%);box-shadow:0 1px 3px rgba(0,0,0,.4);margin-left:2px"></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:6px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--text-primary);line-height:1.4">{{ seBreakdown }}</div>
+<div class="pb" onclick="{{ seToggleCollar }}" style="{{ seCollarStyle }}">
+<sc-if value="{{ seCollarOn }}" hint-placeholder-val="{{ false }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="var(--gold-500)"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1.2 14.4l-4-4 1.4-1.4 2.6 2.6 5.6-5.6 1.4 1.4-7 7z"></path></svg></sc-if>
+<sc-if value="{{ seCollarOff }}" hint-placeholder-val="{{ true }}"><span style="width:17px;height:17px;border-radius:50%;border:2px solid var(--text-muted);display:block"></span></sc-if>
+<span style="{{ seCollarTextStyle }}">上赛扣</span>
+</div>
+</div>
+<div style="padding-top:12px;display:flex;flex-direction:column;gap:12px;flex:1;justify-content:space-between">
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.96px;color:var(--text-muted)">重量</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted)">± 2.5</span></div>
+<div style="display:flex;align-items:center;gap:12px">
+<div class="pb" onclick="{{ seDecW }}" style="width:48px;height:48px;flex:none;border-radius:50%;background:rgba(var(--gold-rgb),.12);border:1px solid rgba(var(--gold-rgb),.3);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></div>
+<div class="pb" onclick="{{ padOpenW }}" style="flex:1;height:54px;border-radius:16px;background:var(--surface-card);display:flex;align-items:baseline;justify-content:center;gap:6px;cursor:pointer"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:800;color:var(--text-primary);line-height:1">{{ seWeightText }}</span><span style="font-size:14px;font-weight:700;color:var(--text-muted)">KG</span></div>
+<div class="pb" onclick="{{ seIncW }}" style="width:48px;height:48px;flex:none;border-radius:50%;background:rgba(var(--gold-rgb),.12);border:1px solid rgba(var(--gold-rgb),.3);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.96px;color:var(--text-muted)">次数</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted)">± 1</span></div>
+<div style="display:flex;align-items:center;gap:12px">
+<div class="pb" onclick="{{ seDecR }}" style="width:48px;height:48px;flex:none;border-radius:50%;background:rgba(var(--gold-rgb),.12);border:1px solid rgba(var(--gold-rgb),.3);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"></path></svg></div>
+<div class="pb" onclick="{{ padOpenR }}" style="flex:1;height:54px;border-radius:16px;background:var(--surface-card);display:flex;align-items:baseline;justify-content:center;gap:6px;cursor:pointer"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:800;color:var(--text-primary);line-height:1">{{ seReps }}</span><span style="font-size:14px;font-weight:700;color:var(--text-muted)">次</span></div>
+<div class="pb" onclick="{{ seIncR }}" style="width:48px;height:48px;flex:none;border-radius:50%;background:rgba(var(--gold-rgb),.12);border:1px solid rgba(var(--gold-rgb),.3);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.96px;color:var(--text-muted)">RPE</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text-muted)">5–10 · 0.5</span></div>
+<div style="background:var(--surface-card);border-radius:16px;padding:13px 14px">
+<div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:800;color:var(--text-primary);line-height:1">{{ seRpeText }}</span><span style="font-size:13px;font-weight:500;color:var(--text-muted);padding-left:8px">{{ seRirText }}</span></div>
+<div style="display:flex;align-items:flex-end;gap:3px;height:48px;margin-top:10px">
+<sc-for list="{{ seTicks }}" as="tick" hint-placeholder-count="11">
+<div class="pb" onclick="{{ tick.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+<div style="height:32px;display:flex;align-items:flex-end"><div style="{{ tick.barStyle }}"></div></div>
+<div style="height:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:{{ tick.labelColor }}">{{ tick.label }}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+<div style="background:var(--surface-card);border-radius:16px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between">
+<span style="font-size:16px;font-weight:500;color:var(--text-primary)">视频</span>
+<div style="display:flex;gap:10px">
+<div class="pb" style="display:flex;align-items:center;gap:7px;padding:8px 15px;border-radius:12px;background:transparent;border:1px solid rgba(var(--gold-rgb),.24);cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--gold-rgb),.72)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="12.5" height="10" rx="2.5"></rect><path d="M15 10.5l6-3v9l-6-3z"></path></svg><span style="font-size:15px;font-weight:600;color:rgba(var(--gold-rgb),.72)">拍摄</span></div>
+<div class="pb" style="display:flex;align-items:center;gap:7px;padding:8px 15px;border-radius:12px;background:transparent;border:1px solid rgba(var(--gold-rgb),.24);cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(var(--gold-rgb),.72)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><circle cx="8.5" cy="8.5" r="1.8"></circle><path d="M21 15l-5-5L5 21"></path></svg><span style="font-size:15px;font-weight:600;color:rgba(var(--gold-rgb),.72)">相册</span></div>
+</div>
+</div>
+</div>
+</div>
+<div style="flex:none;padding:12px 16px 20px;background:var(--bg-base);border-top:1px solid var(--border-default);display:flex;flex-direction:column;gap:12px">
+<div class="pb" onclick="{{ commitSet }}" style="position:relative;overflow:hidden;height:52px;border-radius:999px;background:var(--cta-bg);color:var(--cta-text);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)"><svg style="position:relative" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-on-gold)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg><span style="position:relative;font-size:16px;font-weight:800">完成本组</span></div>
+<div class="pb" onclick="{{ commitFail }}" style="display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 12px;cursor:pointer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg><span style="font-size:13px;color:var(--text-muted)">未完成 / 失败</span></div>
+</div>
+</div>
+<sc-if value="{{ padOn }}" hint-placeholder-val="{{ false }}">
+<div class="ov" onclick="{{ padCancel }}" style="position:absolute;inset:0;z-index:38;background:rgba(0,0,0,.55);display:flex;flex-direction:column;justify-content:flex-end">
+<div class="sh" onclick="{{ stopProp }}" style="background:var(--surface-card);border-radius:20px 20px 0 0;padding:14px 16px 22px;border-top:1px solid var(--border-default)">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:2px 4px 12px"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;letter-spacing:.06em;color:var(--text-muted)">{{ padTitle }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:800;color:{{ padValColor }};line-height:1">{{ padValText }}<span style="font-size:13px;font-weight:700;color:var(--text-muted);margin-left:5px">{{ padUnit }}</span></span></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+<sc-for list="{{ padKeys }}" as="k" hint-placeholder-count="12">
+<div class="pb" onclick="{{ k.tap }}" style="{{ k.style }}">{{ k.label }}</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<div class="pb" onclick="{{ padCancel }}" style="flex:1;height:46px;border-radius:12px;border:1px solid var(--border-strong);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;cursor:pointer">取消</div>
+<div class="pb" onclick="{{ padOk }}" style="flex:2;height:46px;border-radius:12px;background:linear-gradient(180deg,var(--gold-400),var(--gold-500));color:var(--ink-on-gold);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;cursor:pointer">确定</div>
+</div>
+</div>
+</div>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{ showReview }}">
+<div class="ov" style="position:absolute;inset:0;background:var(--bg-base);display:flex;flex-direction:column;z-index:41;color:var(--text-primary)">
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">21:58<span style="display:flex;align-items:center;gap:6px"><svg width="17" height="12" viewBox="0 0 17 12" fill="#fff"><rect x="0" y="7" width="3" height="5" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"></rect><rect x="9" y="2" width="3" height="10" rx="1"></rect><rect x="13.5" y="0" width="3" height="12" rx="1" opacity=".35"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#fff" opacity=".5"></rect><rect x="3" y="3" width="15" height="6" rx="1.5" fill="#fff"></rect></svg></span></div>
+<div style="flex:none;display:flex;align-items:center;gap:10px;padding:4px 20px 13px;border-bottom:1px solid var(--border-hairline)">
+<div><div style="font-size:17px;font-weight:800;font-family:'Archivo','Noto Sans SC',sans-serif">训练回顾</div><div style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:2px">7月24日 · 星期五 · W1D4</div></div>
+<span style="margin-left:auto;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;background:rgba(var(--success-rgb),.16);color:var(--success);padding:4px 12px;border-radius:999px">已通知教练</span>
+</div>
+<div style="flex:1;overflow-y:auto;padding:16px 20px 24px;display:flex;flex-direction:column;gap:14px">
+<div style="background:linear-gradient(180deg,#17120A,var(--surface-card));border:1px solid rgba(var(--gold-rgb),.25);border-radius:16px;padding:18px 16px 15px">
+<div style="font-size:11px;letter-spacing:.08em;color:#B8935A;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-weight:600">总容量</div>
+<div style="display:flex;align-items:baseline;gap:7px;margin-top:5px"><span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:46px;line-height:.9">{{ rvTon }}</span><span style="font-size:14px;font-weight:700;color:var(--text-muted)">kg</span><span style="margin-left:auto;font-size:12px;color:var(--success);font-family:'IBM Plex Mono','Noto Sans SC',monospace">{{ rvTonNote }}</span></div>
+<div style="display:flex;gap:8px;margin-top:15px">
+<div style="flex:1;background:rgba(0,0,0,.35);border-radius:12px;padding:9px 4px;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:19px">{{ rvExN }}</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">动作</div></div>
+<div style="flex:1;background:rgba(0,0,0,.35);border-radius:12px;padding:9px 4px;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:19px">{{ rvSets }}</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">组数</div></div>
+<div style="flex:1;background:rgba(0,0,0,.35);border-radius:12px;padding:9px 4px;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:19px">{{ rvReps }}</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">总次数</div></div>
+<div style="flex:1;background:rgba(0,0,0,.35);border-radius:12px;padding:9px 4px;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:19px">{{ rvRpe }}</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">平均 RPE</div></div>
+</div>
+</div>
+<sc-if value="{{ rvHasPr }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:10px;background:rgba(var(--gold-rgb),.1);border:1px solid rgba(var(--gold-rgb),.35);border-radius:12px;padding:11px 14px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="var(--gold-500)"><path d="M5 16L3 5l5.5 4L12 3l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"></path></svg>
+<span style="font-size:13px;font-weight:700;color:var(--gold-text)">{{ rvPrText }}</span>
+</div>
+</sc-if>
+<div style="display:flex;align-items:center;gap:9px"><span style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace">动作表现</span><span style="flex:1;height:1px;background:var(--border-subtle)"></span></div>
+<div style="flex:none;background:var(--surface-card);border-radius:16px;overflow:hidden">
+<sc-for list="{{ rvRows }}" as="r" hint-placeholder-count="7">
+<div style="display:flex;align-items:center;gap:10px;padding:13px 15px;border-top:1px solid var(--border-subtle)">
+<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text-primary)">{{ r.name }}</div><div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-top:3px">最重组 {{ r.best }}</div></div>
+<sc-if value="{{ r.pr }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;color:var(--gold-text);border:1px solid rgba(var(--gold-rgb),.4);border-radius:999px;padding:2px 8px;font-family:'IBM Plex Mono',monospace">PR</span></sc-if>
+<span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;color:{{ r.statColor }}">{{ r.stat }}</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;align-items:center;gap:9px;margin-top:2px"><span style="font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono','Noto Sans SC',monospace">训练反思</span><span style="flex:1;height:1px;background:var(--border-subtle)"></span><span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-dim)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2.4"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 018 0v3"></path></svg>仅自己可见 · 保存在本机</span></div>
+<div style="background:var(--surface-card);border-radius:16px;padding:4px 15px">
+<div style="padding:11px 0 12px;border-bottom:1px solid var(--border-subtle)"><div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px">本次目标</div><textarea rows="1" placeholder="这次训练你想达成什么？" style="width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--text-secondary);font-size:13px;font-family:inherit;line-height:1.5;padding:0"></textarea></div>
+<div style="padding:11px 0 12px;border-bottom:1px solid var(--border-subtle)"><div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px">做到了什么</div><textarea rows="1" placeholder="这次训练有哪些收获？" style="width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--text-secondary);font-size:13px;font-family:inherit;line-height:1.5;padding:0"></textarea></div>
+<div style="padding:11px 0 12px"><div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px">可以更好</div><textarea rows="1" placeholder="哪里还能做得更好？" style="width:100%;background:transparent;border:none;outline:none;resize:none;color:var(--text-secondary);font-size:13px;font-family:inherit;line-height:1.5;padding:0"></textarea></div>
+</div>
+</div>
+<div style="flex:none;padding:12px 20px 20px;border-top:1px solid var(--border-hairline)">
+<div class="pb" onclick="{{ finishDone }}" style="position:relative;overflow:hidden;background:var(--cta-bg);color:var(--cta-text);border-radius:999px;padding:15px;text-align:center;font-weight:800;font-size:16px;cursor:pointer;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)"><span class="shimmer"></span><span style="position:relative">完成 · 回到今日</span></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showDone }}">
+<div ref="{{ doneRef }}" class="ov" style="position:absolute;inset:0;background:var(--bg-base);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:40;padding:32px 28px;overflow:hidden">
+<div style="position:absolute;left:-20%;right:-20%;bottom:-10%;height:70%;background:radial-gradient(ellipse at 50% 100%,rgba(var(--gold-rgb),.2),rgba(var(--gold-rgb),.06) 48%,transparent 72%);pointer-events:none"></div>
+<div data-bloom="1" style="position:absolute;left:50%;top:40%;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,220,140,.55),rgba(var(--gold-rgb),.16) 55%,transparent 74%);transform:translate(-50%,-50%) scale(.2);opacity:0;pointer-events:none"></div>
+<div style="position:relative;display:flex;align-items:center;justify-content:center;width:110px;height:110px">
+<sc-for list="{{ sparks }}" as="sp" hint-placeholder-count="18"><div data-spark="{{ sp.delay }}" style="{{ sp.style }}"></div></sc-for>
+<div data-stamp="1" style="position:relative;width:96px;height:104px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 26px rgba(var(--gold-rgb),.45))">
+<svg width="96" height="104" viewBox="0 0 96 104"><defs><linearGradient id="dnMedal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gold-200)"></stop><stop offset="55%" stop-color="var(--gold-500)"></stop><stop offset="100%" stop-color="#C98A18"></stop></linearGradient><linearGradient id="dnRibL" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D89226"></stop><stop offset="100%" stop-color="#9A6413"></stop></linearGradient><linearGradient id="dnRibR" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#B8791A"></stop><stop offset="100%" stop-color="#7A4E0E"></stop></linearGradient></defs><path d="M27 0h17l9 39-15 9L27 0z" fill="url(#dnRibL)"></path><path d="M69 0H52l-9 39 15 9L69 0z" fill="url(#dnRibR)"></path><circle cx="48" cy="72" r="29" fill="url(#dnMedal)"></circle><circle cx="48" cy="72" r="22" fill="#17120A" opacity=".92"></circle><circle cx="48" cy="72" r="22" fill="none" stroke="rgba(255,226,142,.35)" stroke-width="1"></circle><path d="M37.5 73l8 7.5L59.5 62" fill="none" stroke="var(--gold-400)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<div data-fade="140" style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:26px;color:var(--text-primary);margin-top:22px">今日训练完成</div>
+<div data-fade="240" style="display:flex;align-items:center;gap:8px;margin-top:12px"><span style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--text-ghost),var(--surface-key));border:1px solid rgba(var(--gold-rgb),.4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold-text)">教</span><span style="font-size:12px;color:var(--text-secondary)">教练已收到你的训练日志</span></div>
+<div style="display:flex;align-items:stretch;gap:0;margin-top:30px;width:100%;max-width:300px">
+<div data-slide="1" style="flex:1;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:34px;line-height:1;color:var(--gold-text)">W1D4</div><div style="font-size:11px;color:var(--text-muted);margin-top:6px;font-family:'IBM Plex Mono','Noto Sans SC',monospace">本周第 4 练</div></div>
+<div style="width:1px;background:var(--surface-raised)"></div>
+<div data-slide="2" style="flex:1;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:34px;line-height:1;color:var(--gold-text)"><span data-ticker="1">{{ dnSetsDone }}</span><span style="font-size:15px;color:#B8935A">{{ dnSetsTotal }}</span></div><div style="font-size:11px;color:var(--text-muted);margin-top:6px;font-family:'IBM Plex Mono','Noto Sans SC',monospace">{{ dnSetsLabel }}</div></div>
+</div>
+<div data-slide="3" style="margin-top:18px;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;color:var(--text-muted)">{{ dnMeta }}</div>
+<div data-slide="4" style="margin-top:13px;display:flex;align-items:center;gap:6px;background:rgba(var(--gold-rgb),.1);border:1px solid rgba(var(--gold-rgb),.3);border-radius:999px;padding:6px 14px"><svg width="12" height="14" viewBox="0 0 24 28" fill="var(--gold-500)"><path d="M12 0s2 5 2 8c0 2-1 3-1 3s3-1 4-4c2 3 4 6.5 4 11a9 9 0 01-18 0c0-6 5-10 9-18z"></path></svg><span style="font-size:12px;font-weight:700;color:var(--gold-text)">连续第 12 次训练</span></div>
+<div data-fade="820" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:34px">
+<div class="pb" onclick="{{ openReview }}" style="position:relative;overflow:hidden;background:var(--cta-bg);color:var(--cta-text);font-weight:800;font-size:16px;border-radius:999px;padding:15px 52px;cursor:pointer;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)"><span class="shimmer"></span><span style="position:relative">查看详细报告</span></div>
+<div class="pb" onclick="{{ finishDone }}" style="font-size:13px;color:var(--text-muted);cursor:pointer;padding:4px 10px">完成</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showPostpone }}">
+<div class="ov" onclick="{{ closeOverlay }}" style="position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:28px;z-index:25">
+<div onclick="{{ stopProp }}" style="background:var(--surface-elevated);border:1px solid var(--border-default);border-radius:20px;padding:22px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,.5)">
+<div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:21px">今天有事？</div>
+<div style="font-size:14px;color:var(--text-tertiary);line-height:1.6;margin-top:10px">本次训练将顺延到 <b style="color:var(--text-primary)">明天（7/23 周四）</b>，之后的计划整体后移一天。教练会收到通知。</div>
+<div style="display:flex;gap:10px;margin-top:20px"><div class="pb" onclick="{{ closeOverlay }}" style="flex:1;border:1px solid var(--border-strong);border-radius:999px;padding:14px;text-align:center;font-size:14px;font-weight:600;color:var(--text-primary);cursor:pointer">取消</div><div class="pb" onclick="{{ confirmPostpone }}" style="flex:1;background:#fff;color:#000;border-radius:999px;padding:14px;text-align:center;font-size:14px;font-weight:700;cursor:pointer">顺延一天</div></div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showFbArchive }}">
+<div class="ov" style="position:absolute;inset:0;background:var(--bg-base);display:flex;flex-direction:column;z-index:30">
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">21:40<span style="display:flex;align-items:center;gap:6px"><svg width="17" height="12" viewBox="0 0 17 12" fill="#fff"><rect x="0" y="7" width="3" height="5" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"></rect><rect x="9" y="2" width="3" height="10" rx="1"></rect><rect x="13.5" y="0" width="3" height="12" rx="1" opacity=".35"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#fff" opacity=".5"></rect><rect x="3" y="3" width="15" height="6" rx="1.5" fill="#fff"></rect></svg></span></div>
+<div style="flex:none;display:flex;align-items:center;gap:12px;padding:4px 18px 14px;border-bottom:1px solid var(--border-hairline)">
+<div class="pb" onclick="{{ closeOverlay }}" style="width:40px;height:40px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div>
+<div><div style="font-size:16px;font-weight:700">教练反馈</div><div style="font-size:11px;color:var(--text-muted)">全部记录 · 含视频回放</div></div>
+</div>
+<div style="flex:1;overflow-y:auto;padding:16px 18px 28px;display:flex;flex-direction:column;gap:11px">
+<div style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace;letter-spacing:.04em">全部反馈 · {{ fbTotalCount }} 条</div>
+<sc-for list="{{ fbArchive }}" as="fb" hint-placeholder-count="6">
+<div style="background:var(--surface-card);border-left:3px solid {{ fb.accent }};border-radius:12px;padding:13px 15px">
+<div style="display:flex;align-items:center;gap:7px;margin-bottom:8px"><sc-if value="{{ fb.unread }}"><span style="width:7px;height:7px;border-radius:50%;background:var(--gold-500);flex:none"></span></sc-if><span style="font-size:14px;font-weight:700">{{ fb.label }}</span><span style="margin-left:auto;font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace">{{ fb.date }}</span></div>
+<div style="font-size:14px;color:var(--text-primary);line-height:1.55;margin-bottom:11px">{{ fb.text }}</div>
+<div class="pb" style="display:flex;align-items:center;gap:10px;background:var(--bg-inset);border-radius:10px;padding:8px 11px;cursor:pointer">
+<div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--border-strong),var(--surface-card));display:flex;align-items:center;justify-content:center;flex:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"></path></svg></div>
+<span style="font-size:13px;color:var(--text-secondary)">查看回放视频</span>
+<span style="margin-left:auto;font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono',monospace">{{ fb.dur }}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showChat }}">
+<div class="ov" style="position:absolute;inset:0;background:var(--bg-base);display:flex;flex-direction:column;z-index:30">
+<div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 30px 0 34px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600">21:40<span style="display:flex;align-items:center;gap:6px"><svg width="17" height="12" viewBox="0 0 17 12" fill="#fff"><rect x="0" y="7" width="3" height="5" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="7.5" rx="1"></rect><rect x="9" y="2" width="3" height="10" rx="1"></rect><rect x="13.5" y="0" width="3" height="12" rx="1" opacity=".35"></rect></svg><svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="20" height="10" rx="3" stroke="#fff" opacity=".5"></rect><rect x="3" y="3" width="15" height="6" rx="1.5" fill="#fff"></rect></svg></span></div>
+<div style="flex:none;display:flex;align-items:center;gap:12px;padding:4px 18px 14px;border-bottom:1px solid var(--border-hairline)">
+<div class="pb" onclick="{{ closeOverlay }}" style="width:40px;height:40px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></div>
+<div><div style="font-size:16px;font-weight:700">演示教练</div><div style="font-size:11px;color:var(--success)">● 在线</div></div>
+</div>
+<div id="chatScroll" ref="{{ chatRef }}" onScroll="{{ onChatScroll }}" style="flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px">
+<div style="text-align:center;font-size:11px;color:var(--text-dim);margin-bottom:4px">今天 21:40</div>
+<sc-for list="{{ chat }}" as="m" hint-placeholder-count="2">
+<sc-if value="{{ m.coachText }}"><div style="align-self:flex-start;max-width:76%;background:var(--surface-elevated);border-radius:16px 16px 16px 5px;padding:11px 14px;font-size:14px;line-height:1.45">{{ m.t }}</div></sc-if>
+<sc-if value="{{ m.mine }}"><div style="align-self:flex-end;max-width:76%;background:var(--text-primary);color:var(--bg-base);border-radius:16px 16px 5px 16px;padding:11px 14px;font-size:14px;line-height:1.45;font-weight:500">{{ m.t }}</div></sc-if>
+<sc-if value="{{ m.isPlan }}"><div class="pb" onclick="{{ goTraining }}" style="align-self:flex-start;max-width:88%;background:var(--surface-card);border:1px solid var(--border-strong);border-radius:16px 16px 16px 5px;padding:13px 14px;cursor:pointer;display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:12px;background:var(--surface-raised);display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 3v4M16 3v4"></path></svg></div><div style="flex:1"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;background:rgba(230,190,85,.14);color:var(--gold-text);padding:2px 7px;border-radius:999px">新计划</span><div style="font-size:14.5px;font-weight:700;margin-top:5px">{{ m.title }}</div><div style="font-size:12px;color:var(--text-muted);margin-top:2px">{{ m.sub }}</div></div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></div></sc-if>
+<sc-if value="{{ m.isFeedback }}"><div data-fb="{{ m.fbId }}" style="align-self:flex-start;max-width:88%;background:var(--surface-card);border-left:3px solid var(--gold-500);border-radius:5px 16px 16px 5px;padding:12px 13px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:9px"><span style="width:7px;height:7px;border-radius:50%;background:var(--gold-500)"></span><span style="font-size:13px;font-weight:700">教练反馈</span><div style="margin-left:auto;display:flex;align-items:center;gap:6px"><sc-if value="{{ m.unread }}"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;background:var(--gold-text);color:var(--ink-on-gold);padding:2px 6px;border-radius:999px">未读</span></sc-if><sc-if value="{{ m.read }}"><span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--gold-text);font-family:'IBM Plex Mono','Noto Sans SC',monospace"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>已读</span></sc-if></div></div><div style="position:relative;height:150px;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,var(--border-strong),var(--surface-card));margin-bottom:9px"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center"><div style="width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.45);border:1.5px solid rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"></path></svg></div></div><span style="position:absolute;top:8px;left:9px;font-size:11px;color:var(--text-primary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;background:rgba(0,0,0,.5);padding:2px 7px;border-radius:5px">{{ m.vid }}</span><span style="position:absolute;bottom:8px;right:9px;font-size:10px;color:#fff;font-family:'IBM Plex Mono',monospace;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:5px">{{ m.dur }}</span></div><div style="font-size:14px;line-height:1.5;color:var(--text-primary)">{{ m.t }}</div></div></sc-if>
+</sc-for>
+</div>
+<div style="flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px 26px;border-top:1px solid var(--border-hairline)">
+<div style="flex:1;background:var(--surface-card);border:1px solid var(--border-strong);border-radius:20px;display:flex;align-items:center;padding:0 6px 0 16px"><input value="{{ draft }}" oninput="{{ onDraft }}" placeholder="输入消息" style="flex:1;background:transparent;border:none;outline:none;color:var(--text-primary);font-size:14px;padding:11px 0;font-family:inherit"><div class="pb" onclick="{{ send }}" style="width:34px;height:34px;border-radius:50%;background:var(--border-strong);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"></path></svg></div></div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    screen: 'today', overlay: null, currentIdx: 0, exIdx: 0,
+    exs: [
+      {name:'硬拉', last:'上次 170kg×3 @8 · 最佳 175kg×3 @8.5', note:'注意启动时股四的蹬地', sets:[{w:175,r:3,rpe:8.5,done:false},{w:175,r:3,rpe:8.5,done:false},{w:175,r:3,rpe:8.5,done:false}]},
+      {name:'低杠位深蹲', last:'上次 125kg×4 @6 · 最佳 125kg×4 @6', note:'控速下蹲，膝盖不要内扣', sets:[{w:125,r:4,rpe:6,done:false},{w:125,r:4,rpe:6,done:false},{w:125,r:4,rpe:6,done:false}]},
+      {name:'节奏卧推', last:'上次 87.5kg×2 @6 · 最佳 90kg×2 @6', note:'节奏 3-1-0，触胸稳一点', sets:[{w:90,r:2,rpe:6,done:false}]}
+    ],
+    todayDone: false, postponed: false, selDay: 4, e1rmIdx: 0, calView: 'week', trainCalOpen: true, readFb: {},
+    seW: 175, seR: 3, seRpe: 8.5, seCollar: false, fbExpanded: false, growthRange: '90天', showRmInfo: false,
+    chat: [{from:'coach',type:'plan',title:'教练发布了新计划',sub:'第 1 周计划已可查看 · 点按进入训练'},{from:'coach',t:'明天深蹲加到 140。'},{from:'me',t:'收到。'},{from:'coach',t:'今天几组视频我都看了，逐组反馈一下。'},{from:'me',t:'好的，谢谢教练！'},{from:'coach',type:'feedback',fbId:'f1',t:'深蹲第一组速度很好，下一次保持同样节奏，最后一组不要急着起杠。',vid:'我的深蹲 · 第 1 组',dur:'0:08'},{from:'coach',type:'feedback',fbId:'f2',t:'第三组有点塌腰，注意先收紧背部再下蹲。',vid:'我的深蹲 · 第 3 组',dur:'0:07'},{from:'coach',type:'feedback',fbId:'f3',t:'硬拉锁定很稳，起始阶段可以再快一点发力。',vid:'我的硬拉 · 第 2 组',dur:'0:09'},{from:'coach',type:'feedback',fbId:'f4',t:'卧推落杠位置偏高，收紧上背，触胸再稳一点。',vid:'我的卧推 · 第 2 组',dur:'0:06'}],
+    draft: ''
+  };
+  go(s){ this.setState({screen:s, overlay:null, trainCalOpen:true}); if(this.appScrollEl) this.appScrollEl.scrollTop=0; }
+  tween(dur, step, done){
+    const t0=performance.now();
+    const run=()=>{ const p=Math.min(1,(performance.now()-t0)/dur); step(p); if(p<1) requestAnimationFrame(run); else if(done) done(); };
+    requestAnimationFrame(run);
+  }
+  riseIn(el, base, step){
+    if(base===undefined) base=20; if(step===undefined) step=40;
+    [...el.children].forEach((c,i)=>{
+      c.style.opacity='0';
+      setTimeout(()=>{
+        if(!c.isConnected) return;
+        this.tween(500,(p)=>{ const e=1-Math.pow(1-p,3); c.style.opacity=String(e); c.style.transform=`translateY(${(72*(1-e)).toFixed(1)}px) scaleY(${(0.88+0.12*e).toFixed(3)})`; }, ()=>{ c.style.opacity=''; c.style.transform=''; });
+      }, base+i*step);
+    });
+  }
+  startFirstSet(){
+    try{ navigator.vibrate && navigator.vibrate(12); }catch(e){}
+    const card=this.heroCardEl;
+    this._justStarted=true;
+    if(!card){ this.setState({started:true}); return; }
+    const h0=card.getBoundingClientRect().height;
+    const kids=()=>[...card.children].filter(c=>getComputedStyle(c).position!=='absolute');
+    this.tween(160,(p)=>{ const e=p*p; kids().forEach(c=>{ c.style.opacity=String(1-e); c.style.transform=`translateY(${(-10*e).toFixed(1)}px)`; }); }, ()=>{
+      this.setState({started:true}, ()=>{
+        const h1=card.getBoundingClientRect().height;
+        card.style.height=h0+'px';
+        const fresh=kids(); fresh.forEach(c=>{ c.style.opacity='0'; c.style.transform='translateY(14px)'; });
+        this.tween(320,(p)=>{ const e=1-Math.pow(1-p,3); card.style.height=(h0+(h1-h0)*e).toFixed(1)+'px'; const q=Math.max(0,(p-0.25)/0.75), eq=1-Math.pow(1-q,3); fresh.forEach(c=>{ c.style.opacity=String(eq); c.style.transform=`translateY(${(14*(1-eq)).toFixed(1)}px)`; }); }, ()=>{ card.style.height=''; fresh.forEach(c=>{ c.style.opacity=''; c.style.transform=''; }); });
+      });
+    });
+  }
+  startPulse(el){
+    if(el.__pulse) return; el.__pulse=true;
+    const t0=performance.now(), DUR=3200;
+    const loop=()=>{
+      if(!el.isConnected){ el.__pulse=false; return; }
+      const el0=performance.now()-t0;
+      if(el0>=DUR){ el.style.boxShadow='0 0 8px rgba(var(--gold-rgb),.55)'; el.style.filter=''; return; }
+      const k=(Math.sin(el0/1000*Math.PI*2/1.6)+1)/2;
+      el.style.boxShadow=`0 0 ${(4+9*k).toFixed(1)}px rgba(var(--gold-rgb),${(0.35+0.5*k).toFixed(2)})`;
+      el.style.filter=`brightness(${(0.95+0.3*k).toFixed(2)})`;
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+  toggleFb(){
+    const wrap=this.fbWrapEl;
+    if(!wrap){ this.setState(st=>({fbExpanded:!st.fbExpanded})); return; }
+    const expanding=!this.state.fbExpanded;
+    const h0=wrap.getBoundingClientRect().height;
+    const preview=wrap.querySelector('[data-fbpreview]');
+    const doSwitch=()=>{
+      this.setState({fbExpanded:expanding}, ()=>{
+        const h1=wrap.getBoundingClientRect().height;
+        wrap.style.height=h0+'px'; wrap.style.overflow='hidden';
+        if(expanding){
+          const items=[...wrap.querySelectorAll('[data-fbitem]')];
+          items.forEach(c=>{ c.style.opacity='0'; });
+          items.forEach((c,i)=>{ setTimeout(()=>{ if(!c.isConnected) return; this.tween(200,(p)=>{ const e=1-Math.pow(1-p,3); c.style.opacity=String(e); c.style.transform=`translateY(${(-8*(1-e)).toFixed(1)}px)`; }, ()=>{ c.style.opacity=''; c.style.transform=''; }); }, 20+i*30); });
+          const arrow=wrap.querySelector('[data-fbarrow]');
+          if(arrow){ arrow.style.transform='rotate(0deg)'; this.tween(260,(p)=>{ const e=1-Math.pow(1-p,3); arrow.style.transform=`rotate(${(180*e).toFixed(0)}deg)`; }); }
+          this.tween(380,(p)=>{ const e=1-Math.pow(1-p,3); const os=p>0.62?3*Math.sin((p-0.62)/0.38*Math.PI):0; wrap.style.height=(h0+(h1-h0)*e+os).toFixed(1)+'px'; }, ()=>{ wrap.style.height=''; wrap.style.overflow=''; });
+        } else {
+          const pv=wrap.querySelector('[data-fbpreview]');
+          if(pv){ pv.style.opacity='0'; setTimeout(()=>{ if(pv.isConnected) this.tween(180,(p)=>{ pv.style.opacity=String(p); }, ()=>{ pv.style.opacity=''; }); }, 90); }
+          this.tween(280,(p)=>{ const e=1-Math.pow(1-p,3); wrap.style.height=(h0+(h1-h0)*e).toFixed(1)+'px'; }, ()=>{ wrap.style.height=''; wrap.style.overflow=''; });
+        }
+      });
+    };
+    if(expanding && preview) this.tween(50,(p)=>{ preview.style.opacity=String(1-p); }, doSwitch);
+    else doSwitch();
+  }
+  ctaDown(){
+    this._ctaDown=true;
+    const b=this.ctaBtnEl;
+    if(b){ b.style.transform='scale(.97)'; b.style.boxShadow='inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 0 0 1.5px rgba(255,210,110,.9),0 0 36px 9px rgba(var(--gold-rgb),.6),0 0 74px 16px rgba(var(--gold-rgb),.28)'; b.style.filter='brightness(1.06)'; }
+    if(this.ctaT1El) this.ctaT1El.style.opacity='.6';
+    if(this.ctaT2El) this.ctaT2El.style.opacity='.45';
+    try{ navigator.vibrate && navigator.vibrate(10); }catch(e){}
+  }
+  ctaReset(){
+    const b=this.ctaBtnEl;
+    if(b){ b.style.transform=''; b.style.boxShadow=''; b.style.animationPlayState=''; }
+    if(this.ctaT1El) this.ctaT1El.style.opacity='';
+    if(this.ctaT2El) this.ctaT2El.style.opacity='';
+  }
+  ctaCancel(){ if(!this._ctaDown) return; this._ctaDown=false; this.ctaReset(); }
+  morphLaunch(){
+    const b=this.ctaBtnEl;
+    const host=b && b.closest('[style*="border-radius: 46px"]');
+    if(!b||!host){ this.go('training'); return; }
+    try{ navigator.vibrate && navigator.vibrate([16,40,26]); }catch(e){}
+    const hostR=host.getBoundingClientRect(), r=b.getBoundingClientRect();
+    const s0={l:r.left-hostR.left, t:r.top-hostR.top, w:r.width, h:r.height};
+    const g=document.createElement('div');
+    g.style.cssText=`position:absolute;left:${s0.l}px;top:${s0.t}px;width:${s0.w}px;height:${s0.h}px;border-radius:28px;background:rgba(15,15,18,.97);border:1px solid rgba(var(--gold-rgb),.8);box-shadow:0 0 26px rgba(var(--gold-rgb),.18);z-index:44;pointer-events:none`;
+    host.appendChild(g);
+    b.style.opacity='0';
+    const scr=this.appScrollEl && this.appScrollEl.querySelector('.scrn');
+    if(scr) this.tween(200,(p)=>{ const e=p*p; scr.style.transform=`translateY(${(26*e).toFixed(1)}px)`; scr.style.opacity=String(1-e); });
+    setTimeout(()=>{
+      this.setState({screen:'training', overlay:null, trainCalOpen:true, rising:false}, ()=>{
+        if(this.appScrollEl) this.appScrollEl.scrollTop=0;
+        const hero=this.heroCardEl, nscr=this.appScrollEl && this.appScrollEl.querySelector('.scrn');
+        if(!hero||!nscr){ if(nscr){nscr.style.opacity='';nscr.style.transform='';} g.remove(); return; }
+        nscr.style.transform=''; nscr.style.opacity='0'; hero.style.opacity='0';
+        const hr2=host.getBoundingClientRect(), hR=hero.getBoundingClientRect();
+        const s1={l:hR.left-hr2.left, t:hR.top-hr2.top, w:hR.width, h:hR.height};
+        this.tween(280,(p)=>{ nscr.style.opacity=String(p); });
+        this.tween(420,(p)=>{
+          const e=1-Math.pow(1-p,3);
+          g.style.left=(s0.l+(s1.l-s0.l)*e).toFixed(1)+'px'; g.style.top=(s0.t+(s1.t-s0.t)*e).toFixed(1)+'px';
+          g.style.width=(s0.w+(s1.w-s0.w)*e).toFixed(1)+'px'; g.style.height=(s0.h+(s1.h-s0.h)*e).toFixed(1)+'px';
+          g.style.borderRadius=(28-12*e).toFixed(1)+'px';
+        },()=>{
+          hero.style.opacity='';
+          const kids=[...hero.children].filter(c=>getComputedStyle(c).position!=='absolute');
+          kids.forEach(c=>{ c.style.opacity='0'; });
+          kids.forEach((c,i)=>{ setTimeout(()=>{ if(!c.isConnected) return; this.tween(220,(p)=>{ const e2=1-Math.pow(1-p,3); c.style.opacity=String(e2); c.style.transform=`translateY(${(9*(1-e2)).toFixed(1)}px)`; }, ()=>{ c.style.opacity=''; c.style.transform=''; }); }, i*55); });
+          this.tween(200,(p)=>{ g.style.opacity=String(1-p); }, ()=>g.remove());
+        });
+      });
+    },140);
+  }
+  ctaUp(){
+    if(!this._ctaDown) return; this._ctaDown=false;
+    this.ctaReset();
+    this.morphLaunch();
+  }
+  curEx(st){ const s=st||this.state; return s.exs[s.exIdx]||s.exs[s.exs.length-1]; }
+  rollUp(i){
+    const wrap=(this.exWrap||{})[i], roll=(this.exRoll||{})[i], body=(this.exBody||{})[i], meta=(this.exMeta||{})[i];
+    const release=()=>{
+      [wrap, roll, body, meta].forEach(el=>{ if(!el) return;
+        try{ (el.getAnimations?el.getAnimations():[]).forEach(an=>an.cancel()); }catch(e){}
+        el.style.transform=''; el.style.opacity=''; el.style.height=''; el.style.overflow='';
+      });
+    };
+    const finish=()=>this.setState(st=>({collapsed:{...(st.collapsed||{}),[i]:true}, rolling:null}), release);
+    if(!wrap||!body||!wrap.animate){ finish(); return; }
+    const h=wrap.offsetHeight;
+    const bodyH=body.offsetHeight;
+    const hdr=roll && roll.firstElementChild;
+    // measure the real collapsed height instead of deriving it — the header loses its 上次/最佳 line,
+    // so any subtraction guess lands a few px off and snaps on the final frame
+    let endH=Math.max(44, h-bodyH);
+    const metaH=meta ? meta.offsetHeight+3 : 0;
+    if(hdr && meta){
+      const prev=meta.style.display;
+      meta.style.display='none';
+      endH=Math.max(44, hdr.offsetHeight);
+      meta.style.display=prev;
+    }
+    const D=620;
+    const EASE='cubic-bezier(.4,0,.2,1)';
+    body.animate([
+      {transform:'perspective(760px) rotateX(0deg) scaleY(1)', opacity:1, offset:0},
+      {transform:'perspective(760px) rotateX(-26deg) scaleY(.82)', opacity:.92, offset:.3},
+      {transform:'perspective(760px) rotateX(-52deg) scaleY(.48)', opacity:.6, offset:.62},
+      {transform:'perspective(760px) rotateX(-78deg) scaleY(.06)', opacity:0, offset:1}
+    ],{duration:D, easing:EASE, fill:'forwards'});
+    if(meta && metaH){
+      meta.style.overflow='hidden';
+      meta.animate([{height:(metaH-3)+'px', opacity:1},{height:'0px', opacity:0}],{duration:D, easing:EASE, fill:'forwards'});
+    }
+    const a=wrap.animate([{height:h+'px'},{height:endH+'px'}],{duration:D, easing:EASE, fill:'both'});
+    try{ navigator.vibrate && navigator.vibrate([6,50,8,60,12]); }catch(e){}
+    a.onfinish=finish;
+    setTimeout(()=>{ if(this.state.rolling===i) finish(); }, D+140);
+  }
+  tickRoll(){
+    const i=this.state.rolling;
+    if(i!==null && i!==undefined && this._rollingStarted!==i){ this._rollingStarted=i; requestAnimationFrame(()=>this.rollUp(i)); }
+    if(i===null||i===undefined) this._rollingStarted=null;
+  }
+  writeSet(st, patch){
+    const exs=st.exs.map((e,ei)=> ei!==st.exIdx?e:{...e, sets:e.sets.map((x,i)=> i===st.currentIdx?{...x,...patch}:x)});
+    let exIdx=st.exIdx, currentIdx=st.currentIdx+1;
+    if(currentIdx>=exs[exIdx].sets.length){
+      const nx=exs.findIndex((e,ei)=> ei>exIdx && e.sets.some(x=>!x.done));
+      if(nx>=0){ exIdx=nx; currentIdx=exs[nx].sets.findIndex(x=>!x.done); }
+      else { const any=exs.findIndex(e=>e.sets.some(x=>!x.done)); if(any>=0){ exIdx=any; currentIdx=exs[any].sets.findIndex(x=>!x.done); } else currentIdx=exs[exIdx].sets.length; }
+    }
+    return {exs, exIdx, currentIdx};
+  }
+  logSet(){ this.setState(st=>this.writeSet(st,{done:true})); }
+  openSetEntry(){ const e=this.curEx(); const c=e.sets[this.state.currentIdx]||e.sets[e.sets.length-1]; this.setState({overlay:'setentry', seW:c.w, seR:c.r, seRpe:c.rpe, seCollar:false}); if(this.seScrollEl) this.seScrollEl.scrollTop=0; }
+  commitSet(failed){ this.setState(st=>{ const from=st.exIdx; const next=this.writeSet(st,{w:st.seW,r:st.seR,rpe:st.seRpe,done:true,failed:!!failed}); const justDone = next.exs[from].sets.every(x=>x.done); return {...next, overlay:null, rolling: justDone?from:null}; }); }
+  completeWorkout(){ try{ if(navigator.vibrate) navigator.vibrate([45,25,75]); }catch(e){} this.setState({overlay:'done'}); }
+  finishDone(){ this.setState({todayDone:true, screen:'today', overlay:null}); if(this.appScrollEl) this.appScrollEl.scrollTop=0; }
+  onHoldStart(e){ if(this._holdDone||this._holdActive) return; this._holdActive=true; this._holdStart=performance.now(); this._hapticStep=0; if(this.holdBtnEl) this.holdBtnEl.style.transform='scale(.96)'; if(this.holdFillEl) this.holdFillEl.style.transition='none'; try{navigator.vibrate&&navigator.vibrate(12);}catch(err){} const DUR=1100; const tick=()=>{ if(!this._holdActive) return; const p=Math.min(1,(performance.now()-this._holdStart)/DUR); if(this.holdFillEl) this.holdFillEl.style.width=(p*100).toFixed(1)+'%'; const step=Math.floor(p*7); if(step>this._hapticStep){ this._hapticStep=step; try{navigator.vibrate&&navigator.vibrate(6+step*3);}catch(err){} } if(p>=1) this.onHoldComplete(); else this._holdRAF=requestAnimationFrame(tick); }; this._holdRAF=requestAnimationFrame(tick); }
+  onHoldEnd(){ if(!this._holdActive) return; this._holdActive=false; if(this._holdRAF) cancelAnimationFrame(this._holdRAF); if(this.holdBtnEl) this.holdBtnEl.style.transform=''; if(this.holdFillEl){ this.holdFillEl.style.transition='width .3s cubic-bezier(.4,0,.2,1)'; this.holdFillEl.style.width='0%'; } }
+  onHoldComplete(){ this._holdActive=false; this._holdDone=true; if(this._holdRAF) cancelAnimationFrame(this._holdRAF); if(this.holdBtnEl) this.holdBtnEl.style.transform=''; try{navigator.vibrate&&navigator.vibrate([70,30,110]);}catch(err){} this.setState({overlay:'done'}); setTimeout(()=>{ this._holdDone=false; if(this.holdFillEl){ this.holdFillEl.style.transition='none'; this.holdFillEl.style.width='0%'; } },600); }
+  send(){ const t=(this.state.draft||'').trim(); if(!t) return; this.setState(st=>({chat:[...st.chat,{from:'me',t}], draft:''})); }
+  openChatScreen(fbId){ this.setState({overlay:'chat'}); this._targetFb=fbId; const run=()=>{ const c=document.getElementById('chatScroll'); if(!c) return; const els=[...c.querySelectorAll('[data-fb]')]; if(this._targetFb===undefined){ const fu=els.find(el=>!this.state.readFb[el.getAttribute('data-fb')]); this._targetFb=fu?fu.getAttribute('data-fb'):null; } const t=this._targetFb?els.find(el=>el.getAttribute('data-fb')===this._targetFb):null; if(t){ const cr=c.getBoundingClientRect(), r=t.getBoundingClientRect(); c.scrollTop=Math.max(0, Math.min(c.scrollTop+(r.bottom-(cr.bottom-16)), c.scrollHeight)); } else c.scrollTop=c.scrollHeight; this.checkVisible(); }; setTimeout(run,90); setTimeout(run,340); }
+  markRead(id){ if(id && !this.state.readFb[id]) this.setState(st=>({readFb:{...st.readFb,[id]:true}})); }
+  checkVisible(){ const c=document.getElementById('chatScroll'); if(!c) return; const cr=c.getBoundingClientRect(); c.querySelectorAll('[data-fb]').forEach(el=>{ const r=el.getBoundingClientRect(); const vis=Math.min(r.bottom,cr.bottom)-Math.max(r.top,cr.top); if(vis>0 && vis/r.height>=0.55) this.markRead(el.getAttribute('data-fb')); }); }
+  componentDidUpdate(){ this.tickRoll(); if(this._prevSelDay!==undefined && this._prevSelDay!==this.state.selDay){ if(this.railEl) this.railEl.scrollLeft=0; if(this.state.e1rmIdx!==0) this.setState({e1rmIdx:0}); } this._prevSelDay=this.state.selDay; }
+  componentDidMount(){
+    this._fit=()=>{ const el=this.bezelEl; if(!el) return; const k=Math.min(1,(window.innerWidth-12)/438,(window.innerHeight-12)/892); el.style.transform=k<1?`scale(${k.toFixed(3)})`:''; el.style.transformOrigin='50% 50%'; const m=k<1?`${Math.round(-868*(1-k)/2)}px`:''; el.style.marginTop=m; el.style.marginBottom=m; };
+    window.addEventListener('resize',this._fit); this._fit();
+  }
+  componentWillUnmount(){ window.removeEventListener('resize',this._fit); }
+  renderVals(){
+    const s=this.state;
+    const ex = s.exs[s.exIdx] || s.exs[s.exs.length-1];
+    const cur = ex.sets[s.currentIdx] || ex.sets[ex.sets.length-1];
+    const exDone = ex.sets.every(x=>x.done);
+    const allDone = s.exs.every(e=>e.sets.every(x=>x.done));
+    const mkRows = (e)=> e.sets.map((x,i)=>({no:i+1, w:x.w, r:x.r, rpe:x.rpe, done:x.done, pending:!x.done, txt: x.done?(x.failed?'var(--danger-muted)':'var(--text-primary)'):'var(--text-dim)', noColor: x.done?'var(--text-muted)':'var(--text-dim)', camColor: x.done?'var(--success)':'var(--text-dim)', okDone: x.done && !x.failed, failMark: x.done && !!x.failed, camOk: x.done, camFail: false, camNone: !x.done}));
+    const exStat = (e)=>{ const n=e.sets.filter(x=>x.done).length; return {stat:`${n} / ${e.sets.length} 组已记录`, color: n===e.sets.length?'var(--success)':'var(--text-dim)'}; };
+    const isCollapsed=(i)=> !!(s.collapsed||{})[i];
+    const exSummary=(e)=>{ const d=e.sets.filter(x=>x.done); if(!d.length) return ''; const l=d[d.length-1]; const f=d.filter(x=>x.failed).length; return `${d.length} 组 · ${l.w}kg×${l.r} @${l.rpe}`+(f?` · ${f} 组未完成`:''); };
+    const toggleEx=(i)=>{ if(isCollapsed(i)){ const w=(this.exWrap||{})[i]; if(w){ try{ (w.getAnimations?w.getAnimations():[]).forEach(an=>an.cancel()); }catch(e){} w.style.height=''; } this.setState(st=>({collapsed:{...(st.collapsed||{}),[i]:false}})); } else if(s.exs[i].sets.every(x=>x.done)) this.setState({rolling:i}); };
+    const exRef=(i)=>(el)=>{ this.exWrap=this.exWrap||{}; this.exWrap[i]=el; };
+    const rollRef=(i)=>(el)=>{ this.exRoll=this.exRoll||{}; this.exRoll[i]=el; };
+    const bodyRef=(i)=>(el)=>{ this.exBody=this.exBody||{}; this.exBody[i]=el; };
+    const metaRef=(i)=>(el)=>{ this.exMeta=this.exMeta||{}; this.exMeta[i]=el; };
+    const remainSets = s.exs.reduce((a,e)=>a+e.sets.filter(x=>!x.done).length,0);
+    const remainExs = s.exs.filter(e=>e.sets.some(x=>!x.done)).length;
+    const setRows = ex.sets.map((x,i)=>({no:i+1, w:x.w, r:x.r, rpe:x.rpe, done:x.done, okDone: x.done && !x.failed, failMark: x.done && !!x.failed, pending:!x.done, txt: x.done?(x.failed?'var(--danger-muted)':'var(--text-primary)'):'var(--text-dim)', camOk: x.done && i!==1, camFail: x.done && i===1, camNone: !x.done}));
+    const chat = s.chat.map(m=>{ const isFb=m.type==='feedback'; const rd=isFb && !!s.readFb[m.fbId]; return {t:m.t, title:m.title, sub:m.sub, vid:m.vid, dur:m.dur, fbId:m.fbId, read:rd, unread:isFb&&!rd, mine:m.from==='me', coachText:m.from!=='me'&&!m.type, isPlan:m.type==='plan', isFeedback:isFb}; });
+    const fbList = s.chat.filter(m=>m.type==='feedback');
+    const unreadCount = fbList.filter(m=>!s.readFb[m.fbId]).length;
+    const hasUnread = unreadCount>0;
+    const feedbackItems = fbList.map(m=>({ fbId:m.fbId, label:(m.vid||'').replace('我的','').trim(), text:m.t, read:!!s.readFb[m.fbId], unread:!s.readFb[m.fbId], open:()=>this.openChatScreen(m.fbId) }));
+    const latestFb = fbList.find(m=>!s.readFb[m.fbId]) || fbList[0];
+    const latestFbText = latestFb ? latestFb.t : '';
+    const fbCount = fbList.length;
+    const fbArchive = [
+      ...fbList.map(m=>({ label:(m.vid||'').replace('我的','').trim(), date:'今天', text:m.t, dur:m.dur, unread:!s.readFb[m.fbId], accent:(!s.readFb[m.fbId]?'var(--gold-500)':'var(--border-strong)') })),
+      {label:'深蹲', date:'上周五 · 7/18', text:'前两个幅度不太够，后面的可以，下次热身多加一组。', dur:'0:11', unread:false, accent:'var(--border-strong)'},
+      {label:'硬拉', date:'上周三 · 7/16', text:'节奏保持得不错，锁定顶端再稳一点。', dur:'0:08', unread:false, accent:'var(--border-strong)'},
+    ];
+    const fbTotalCount = fbArchive.length;
+    const RANGES=['30天','90天','1年','历史总览'];
+    const growthRange=s.growthRange||'90天';
+    const cycleRange=()=>{ const i=RANGES.indexOf(growthRange); this.setState({growthRange:RANGES[(i+1)%RANGES.length]}); };
+    const ORM={'深蹲':180,'卧推':120,'硬拉':220};
+    const GRW=[
+      {name:'深蹲',val:187.5,delta:'+2.5',vals:[170,172.5,177.5,180,185,187.5],xs:'4/24',xm:'6/8',pr:'7/22'},
+      {name:'卧推',val:118.6,delta:'+1.1',vals:[110,112,113.5,115,117.5,118.6],xs:'4/24',xm:'6/8',pr:'7/18'},
+      {name:'硬拉',val:205.0,delta:'+5.0',vals:[188,190,193,197,200,205],xs:'4/24',xm:'6/8',pr:'7/20'},
+    ];
+    const gpL=46,gpR=300,gpT=20,gpB=84;
+    const rangeSeries=(g,range)=>{
+      const v=g.vals;
+      if(range==='30天') return {vals:v.slice(-4), xs:'6/24'};
+      if(range==='1年') return {vals:[v[0]-7.5,v[0]-5,v[0]-2.5].concat(v), xs:'去年8月'};
+      if(range==='历史总览') return {vals:[v[0]-15,v[0]-11,v[0]-8,v[0]-5,v[0]-2.5].concat(v), xs:'2023'};
+      return {vals:v, xs:g.xs};
+    };
+    const growthLifts=GRW.map((g,gi)=>{
+      const rng=(s.growthRanges||{})[gi]||'90天';
+      const rs=rangeSeries(g,rng);
+      const vals=rs.vals;
+      const n=vals.length, mn=Math.min(...vals), mx=Math.max(...vals);
+      const lo=mn-(mx-mn)*0.35-1, hi=mx+(mx-mn)*0.12+1;
+      const X=i=>gpL+(gpR-gpL)*i/(n-1), Y=v=>gpB-(gpB-gpT)*(v-lo)/(hi-lo);
+      const pts=vals.map((v,i)=>X(i).toFixed(1)+','+Y(v).toFixed(1)).join(' ');
+      const area=pts+' '+X(n-1).toFixed(1)+','+gpB+' '+X(0).toFixed(1)+','+gpB;
+      const by=Y(vals[n-1]);
+      const cyc=()=>{ const i=RANGES.indexOf(rng); this.setState(st=>({growthRanges:{...(st.growthRanges||{}),[gi]:RANGES[(i+1)%RANGES.length]}})); };
+      return { name:g.name, val:g.val.toFixed(1), delta:g.delta, pts, area, bx:X(n-1).toFixed(1), by:by.toFixed(1), byLabel:Math.max(15,by-8).toFixed(1), yTop:Math.round(hi), yBot:Math.round(lo), yMid:Math.round((hi+lo)/2), xs:rs.xs, xm:g.xm, pr:g.pr, xMid:((gpL+gpR)/2).toFixed(0), areaId:'gArea'+gi, range:rng, cycleRange:cyc };
+    });
+    const cmpLifts=GRW.map(g=>{ const orm=ORM[g.name], pct=g.val/orm; return { name:g.name, e1rm:g.val.toFixed(1), orm, over:g.val>=orm, fillW:(Math.min(pct,1)*100).toFixed(1)+'%', pct:Math.round(pct*100) }; });
+    const e1rmTotal=GRW.reduce((a,g)=>a+g.val,0).toFixed(1);
+    const ormTotal=Object.values(ORM).reduce((a,b)=>a+b,0);
+    const VOL=[50,58,44,62,53,59];
+    const volBars=VOL.map((h,i)=>{ const c=58+i*44,w=10,x=c-5,r=4,topY=146-h; return { path:'M'+x+',146 L'+x+','+(topY+r)+' Q'+x+','+topY+' '+(x+r)+','+topY+' L'+(x+w-r)+','+topY+' Q'+(x+w)+','+topY+' '+(x+w)+','+(topY+r)+' L'+(x+w)+',146 Z' }; });
+    const RPEv=[7.75,8.25,7.25,8.75,8.25,8.75];
+    const rpePts=RPEv.map((r,i)=>(58+i*44)+','+(92-(r-5)/5*74).toFixed(1)).join(' ');
+    const rpeDots=RPEv.map((r,i)=>({cx:58+i*44, cy:(92-(r-5)/5*74).toFixed(1)}));
+    const LIFTS = {
+      S:{name:'深蹲', val:'187.5', delta:'+2.5', points:'0,52 60,50 120,44 180,40 240,30 312,20', cy:'20'},
+      B:{name:'卧推', val:'118.6', delta:'+1.1', points:'0,50 60,48 120,46 180,42 240,38 312,30', cy:'30'},
+      D:{name:'硬拉', val:'205.0', delta:'+5.0', points:'0,54 60,50 120,48 180,38 240,32 312,18', cy:'18'}
+    };
+    const WEEK = [{dow:'一',codes:['S']},{dow:'二',codes:[]},{dow:'三',codes:['D']},{dow:'四',codes:['S','B']},{dow:'五',codes:['S','B','D']},{dow:'六',codes:[]},{dow:'日',codes:[]}];
+    const AMBER='var(--gold-500)', SLOTS=['S','B','D'];
+    const weekCells = WEEK.map((d,i)=>({dow:d.dow, codes:d.codes, dots:SLOTS.map(c=>{const on=d.codes.includes(c);return{bg:on?AMBER:'transparent', bd:on?('1px solid '+AMBER):'1px solid rgba(var(--gold-rgb),.18)'};}), letter:d.codes.join(''), rest:d.codes.length===0, hasLift:d.codes.length>0, sel:i===s.selDay, notSel:i!==s.selDay, onSel:()=>this.setState({selDay:i})}));
+    const TODAY_IDX = 4;
+    const weekBars = WEEK.map((d,i)=>({i,train:d.codes.length>0})).filter(x=>x.train).map(x=>{ const st = x.i<TODAY_IDX?'done':(x.i===TODAY_IDX?(s.todayDone?'done':'current'):'up'); return {grow: st==='current'?'1.5':'1', bg: st==='done'?'var(--text-primary)':(st==='current'?'linear-gradient(90deg,var(--gold-500),var(--gold-400),#FFD470)':'var(--border-strong)'), sh: st==='current'?'0 0 7px rgba(var(--gold-rgb),.75)':'none', ref: st==='current'?(el)=>{ if(el) this.startPulse(el); }:()=>{}}; });
+    const selLifts = WEEK[s.selDay].codes.map(c=>({...LIFTS[c], areaPoints: LIFTS[c].points+' 312,70 0,70', gradId:'area'+c}));
+    const selRest = selLifts.length===0, selHas = selLifts.length>0, selDow = WEEK[s.selDay].dow;
+    const dayLabel = selRest ? 'W1' : ('W1D'+WEEK.slice(0,s.selDay+1).filter(d=>d.codes.length>0).length);
+    const DATES=['7月20日','7月21日','7月22日','7月23日','7月24日','7月25日','7月26日'];
+    const selDateStr = DATES[s.selDay]+' · 星期'+WEEK[s.selDay].dow;
+    const selLiftNames = WEEK[s.selDay].codes.map(c=>LIFTS[c].name).join(' · ');
+    const ctaLift = WEEK[s.selDay].codes.map(c=>({S:'蹲',B:'推',D:'拉'}[c])).join(' · ');
+    const ctaTags = WEEK[s.selDay].codes.map(c=>LIFTS[c].name);
+    const monthDays = [];
+    for(let i=0;i<2;i++) monthDays.push({blank:true, notBlank:false});
+    for(let n=1;n<=31;n++){
+      const wd=(2+(n-1))%7, train=wd<=4, today=n===24;
+      let dotColor=null;
+      if(train){ if(n===24) dotColor='var(--gold-500)'; else if(n===21) dotColor='var(--danger)'; else if(n<24) dotColor='var(--success)'; }
+      monthDays.push({blank:false, notBlank:true, n, train, rest:!train, today, notToday:!today, hasStatus:!!dotColor, dotColor});
+    }
+    for(let i=0;i<2;i++) monthDays.push({blank:true, notBlank:false});
+    const seFmt = (n)=> n===Math.round(n)?String(Math.round(n)):String(n);
+    const SE_SPEC={25:{w:12,h:135,g:'linear-gradient(180deg,#3A1512 0%,#6E2A26 4%,#C15A52 15%,#D2685F 22%,#A6423C 46%,#8A342E 68%,#5E241F 90%,#38130F 100%)'},20:{w:11,h:135,g:'linear-gradient(180deg,#0E1D38 0%,#182E52 4%,#3E6BB5 15%,#4E7BC5 22%,#33599B 46%,#274777 68%,#142644 90%,#0C1830 100%)'},15:{w:11,h:120,g:'linear-gradient(180deg,#3E320A 0%,#77621A 4%,#D3B446 15%,#E3C557 22%,#B99A31 46%,#8E7522 68%,#63500F 90%,#3A2F0A 100%)'},10:{w:9,h:98,g:'linear-gradient(180deg,#0C2415 0%,#173F24 4%,#3FA05C 15%,#4FB06C 22%,#2F8449 46%,#236839 68%,#123420 90%,#0A2012 100%)'},5:{w:9,h:68,g:'linear-gradient(180deg,#5A5A5A 0%,#8A8A8A 4%,#FAFAFA 15%,var(--text-primary) 22%,#E2E2E2 46%,#B8B8B8 68%,#7A7A7A 90%,#4E4E4E 100%)'},2.5:{w:8,h:57,g:'linear-gradient(180deg,var(--bg-base) 0%,#232326 4%,#727277 15%,#828288 22%,#46464A 46%,#2E2E31 68%,var(--surface-card) 90%,var(--bg-base) 100%)'},1.25:{w:7,h:48,g:'linear-gradient(180deg,#484C52 0%,#7F838A 4%,#F0F2F5 15%,#FBFCFE 22%,#C4C8CE 46%,#9A9EA4 68%,#6E7279 90%,#484C52 100%)'}};
+    const SE_DIM={25:{w:11,h:135},20:{w:8,h:135},15:{w:8,h:120},10:{w:8,h:98},5:{w:8,h:68},2.5:{w:6,h:57},1.25:{w:5,h:48}};
+    const seLoad=(per)=>{const D=[25,20,15,10,5,2.5,1.25];const o=[];let r=Math.round(per*100)/100;for(const d of D){while(r+1e-6>=d){o.push(d);r=Math.round((r-d)*100)/100;}}return o;};
+    const sePer=(s.seW-20)/2-(s.seCollar?2.5:0);
+    const seLoaded=sePer>1e-6?seLoad(sePer):[];
+    const sePlates=seLoaded.map(p=>{const m=Object.assign({},SE_SPEC[p],SE_DIM[p]);return{style:`flex:none;width:${m.w}px;height:${m.h}px;border-radius:5px;background:${m.g};box-shadow:2px 0 5px rgba(0,0,0,.5),inset 1px 0 1.5px rgba(255,255,255,.16),inset -1.5px 0 2.5px rgba(0,0,0,.45)`};});
+    const seGroups=[];seLoaded.forEach(p=>{const l=seGroups[seGroups.length-1];if(l&&l.w===p)l.n++;else seGroups.push({w:p,n:1});});
+    const seBase=seGroups.map(g=>`${seFmt(g.w)}kg × ${g.n}`).join(' · ');
+    const seBreakdown=s.seCollar?(seBase?seBase+' + 2.5kg 赛扣':'仅 2.5kg 赛扣'):(seBase||'空杠 20kg');
+    const SE_RIR=['还能多做 5 次','还能多做 4-5 次','还能多做 4 次','还能多做 3-4 次','还能多做 3 次','还能多做 2-3 次','还能多做 2 次','还能多做 1-2 次','还能多做 1 次','或许还能多做 1 次','力竭，无保留'];
+    const seTicks=[];for(let i=0;i<11;i++){const v=5+i*0.5;const whole=v%1===0;const selq=Math.abs(v-s.seRpe)<0.01;const lit=v<=s.seRpe+0.01;const bh=selq?32:whole?22:13;const bc=selq?'var(--gold-500)':lit?'#8A8A8E':'#2C2C2E';const ll=selq||(whole&&Math.abs(v-s.seRpe)<0.3);seTicks.push({label:whole?String(Math.round(v)):'',labelColor:ll?'var(--text-primary)':'#525252',barStyle:`width:6px;height:${bh}px;border-radius:3px;background:${bc}`,onClick:()=>this.setState({seRpe:v})});}
+    const seIdx=Math.round((s.seRpe-5)*2);
+    const sparks = Array.from({length:18}, (_,i)=>{ const a=(i/18)*6.283+(i%3)*0.35; const r=66+(i%4)*24; const tx=(Math.cos(a)*r).toFixed(0), ty=(Math.sin(a)*r).toFixed(0); const sz=3+(i%3); const dl=(i%6)*18; const c=i%3===0?'#FFE9A8':'var(--gold-500)'; return {delay:dl, style:`position:absolute;left:50%;top:50%;width:${sz}px;height:${sz}px;border-radius:50%;background:${c};--tx:${tx}px;--ty:${ty}px;transform:translate(-50%,-50%);box-shadow:0 0 7px rgba(var(--gold-rgb),.85)`}; });
+    return {
+      isToday:s.screen==='today', isTraining:s.screen==='training', isGrowth:s.screen==='growth', isMe:s.screen==='me',
+      showDone: s.overlay==='done', sparks, finishDone:()=>this.finishDone(),
+      showReview: s.overlay==='review', openReview:()=>this.setState({overlay:'review'}),
+      ...(()=>{
+        const anyDone=s.exs.some(e=>e.sets.some(x=>x.done));
+        const flat=[]; s.exs.forEach(e=>e.sets.forEach(x=>{ if(!anyDone||x.done) flat.push(x); }));
+        const ton=flat.reduce((a,x)=>a+x.w*x.r,0);
+        const reps=flat.reduce((a,x)=>a+x.r,0);
+        const rpe=flat.length?(flat.reduce((a,x)=>a+x.rpe,0)/flat.length):0;
+        const fmtW=(n)=>n===Math.round(n)?String(Math.round(n)):String(n);
+        const rvRows=s.exs.map(e=>{
+          const d=anyDone?e.sets.filter(x=>x.done):e.sets;
+          const fails=d.filter(x=>x.failed).length;
+          let best=null; d.forEach(x=>{ if(!best||x.w>best.w||(x.w===best.w&&x.r>best.r)) best=x; });
+          const m=(e.last||'').match(/最佳 \+?([\d.]+)kg×(\d+)/);
+          const pr=!!(best&&m&&(best.w>parseFloat(m[1])||(best.w===parseFloat(m[1])&&best.r>parseInt(m[2],10))));
+          return {name:e.name, best: best?`${fmtW(best.w)}kg × ${best.r} @${best.rpe}`:'—', pr,
+            stat: fails?`${d.length} 组 · ${fails} 失败`:`${d.length} 组 全部完成`,
+            statColor: fails?'var(--danger)':'var(--success)'};
+        });
+        const prNames=rvRows.filter(r=>r.pr).map(r=>r.name);
+        const dnFails=flat.filter(x=>x.failed).length;
+        const total=s.exs.reduce((a,e)=>a+e.sets.length,0);
+        const mainDone=anyDone?s.exs[0].sets.filter(x=>x.done):s.exs[0].sets;
+        const mainRpe=mainDone.length?(mainDone.reduce((a,x)=>a+x.rpe,0)/mainDone.length):s.exs[0].sets[0].rpe;
+        const planRpe=s.exs[0].sets[0].rpe;
+        const dnPlanNote=Math.abs(mainRpe-planRpe)<=0.5?'符合计划':(mainRpe>planRpe?'高于计划':'低于计划');
+        const mainRpeText=mainRpe===Math.round(mainRpe)?String(Math.round(mainRpe)):mainRpe.toFixed(1);
+        return {rvTon: ton.toLocaleString('en-US'), rvTonNote: anyDone?'较上次 +6%':'按计划完成',
+          dnSetsDone: flat.length-dnFails, dnSetsTotal: '/'+total+' 组',
+          dnSetsLabel: dnFails?`降重完成 ${dnFails} 组`:'全部完成',
+          dnMeta: `${reps} 次 · 主项 RPE ${mainRpeText} · ${dnPlanNote}`,
+          rvExN: s.exs.length, rvSets: flat.length, rvReps: reps, rvRpe: rpe?rpe.toFixed(1):'—',
+          rvRows, rvHasPr: prNames.length>0, rvPrText: prNames.length?`${prNames.join('、')} 追平/刷新最佳纪录`:''};
+      })(),
+      holdBtnRef:(el)=>{this.holdBtnEl=el;}, holdFillRef:(el)=>{this.holdFillEl=el;}, onHoldStart:(e)=>this.onHoldStart(e), onHoldEnd:()=>this.onHoldEnd(),
+      showNotes:s.overlay==='notes', showChat:s.overlay==='chat', showPostpone:s.overlay==='postpone',
+      postponed:s.postponed, notPostponed:!s.postponed,
+      ctaActive: s.selDay===4 && !s.postponed, ctaPostponed: s.selDay===4 && s.postponed,
+      dCode: s.todayDone?'var(--success)':'var(--text-primary)',
+      curNo: Math.min(s.currentIdx+1, ex.sets.length), curTotal: ex.sets.length, curW:cur.w, curR:cur.r, curRPE:cur.rpe,
+      curExName: ex.name, curExLast: ex.last, curExNote: ex.note, curExNo: s.exIdx+1, exTotal: s.exs.length,
+      remainText: `还有 ${remainExs} 个动作 · ${remainSets} 组未记录`,
+      heroListOn: !s.started && !s.exs.some(e=>e.sets.some(x=>x.done)),
+      heroRecOn: !!s.started || s.exs.some(e=>e.sets.some(x=>x.done)),
+      heroListRows: s.exs.map((e,i)=>{ const f=e.sets[0]; const fw=f.w===Math.round(f.w)?String(Math.round(f.w)):String(f.w); return {no:String(i+1), name:e.name, plan:`${fw}kg × ${f.r} · ${e.sets.length} 组`}; }),
+      totalSetsN: s.exs.reduce((a,e)=>a+e.sets.length,0),
+      estMin: Math.round((s.exs.reduce((a,e)=>a+e.sets.length,0)*6+5)/5)*5,
+      startFirstSet: ()=>this.startFirstSet(),
+      heroCardRef: (el)=>{this.heroCardEl=el;},
+      heroBarRef: (el)=>{ if(el) this.startPulse(el); },
+      detailsRef: (el)=>{ if(!el || el.__risen) return; if(this.state.started && this._justStarted){ el.__risen=true; this._justStarted=false; this.riseIn(el, 360, 90); } },
+      exBlocks: s.exs.map((e,i)=>{
+        const st = exStat(e);
+        const open = !isCollapsed(i);
+        const allSetsDone = e.sets.every(x=>x.done);
+        return {
+          name: e.name, rows: mkRows(e),
+          metaLine: e.last,
+          nameStyle: "font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:" + (open ? 16 : 14) + "px;color:var(--text-" + (open ? 'primary' : 'secondary') + ");transition:font-size .28s cubic-bezier(.4,0,.2,1),color .28s ease",
+          // a finished lift needs no coaching context — only the receipt
+          metaStyle: open
+            ? "font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+            : 'display:none',
+          headStat: open ? st.stat : exSummary(e),  // collapsed reads as a one-line receipt
+          statColor: allSetsDone ? 'var(--success)' : st.color,
+          note: e.note, expanded: open,
+          cardStyle: 'transform-origin:50% 0;will-change:transform;border-radius:' + (open ? 16 : 14) + 'px;overflow:hidden;background:' + (open ? 'var(--surface-card)' : 'var(--bg-stack)') + ';box-shadow:var(--card-shadow);align-self:center;width:' + (open ? '100%' : '92%') + ';transition:background .24s ease,width .28s cubic-bezier(.22,.61,.36,1)',
+          barStyle: 'width:3px;align-self:stretch;min-height:' + (open ? 26 : 18) + 'px;border-radius:2px;flex:none;background:' + (allSetsDone ? 'var(--success)' : 'var(--gold-500)'),
+          caretStyle: 'color:var(--text-muted);font-size:11px;flex:none;transform:rotate(' + (open ? 0 : -90) + 'deg);transition:transform .22s cubic-bezier(.22,.61,.36,1)',
+          noteStyle: e.note ? 'padding:11px 16px;font-size:12px;line-height:1.6;color:var(--text-secondary)' : 'display:none',
+          toggle: ()=>toggleEx(i), wrapRef: exRef(i), rollRef: rollRef(i), bodyRef: bodyRef(i), metaRef: metaRef(i)
+        };
+      }),
+      hasPending: !allDone, allDone, setRows, chat, draft:s.draft,
+      weekCells, weekBars, selLifts, selRest, selHas, selDow, dayLabel, selDateStr, selLiftNames, ctaLift, ctaTags, monthDays, unreadCount, hasUnread,
+      feedbackItems, latestFbText, fbCount, fbCollapsed:!s.fbExpanded, fbExpanded:s.fbExpanded, toggleFb:()=>this.toggleFb(), fbWrapRef:(el)=>{this.fbWrapEl=el;},
+      fbArchive, fbTotalCount, showFbArchive: s.overlay==='fbarchive', openFbArchive:()=>this.setState({overlay:'fbarchive'}),
+      growthLifts, cmpLifts, e1rmTotal, ormTotal, volBars, rpePts, rpeDots,
+      showRmInfo: s.showRmInfo, toggleRmInfo:()=>this.setState(st=>({showRmInfo:!st.showRmInfo})),
+      showE1rmDots: selLifts.length>1, e1rmDots: selLifts.map((_,i)=>({w:i===s.e1rmIdx?'18px':'6px', bg:i===s.e1rmIdx?'var(--gold-500)':'var(--text-ghost)'})),
+      railRef:(el)=>{this.railEl=el;}, onRailScroll:(e)=>{const el=e.currentTarget;const i=Math.round(el.scrollLeft/Math.max(1,el.clientWidth));if(i!==s.e1rmIdx)this.setState({e1rmIdx:i});},
+      calWeek: s.calView==='week', calMonth: s.calView==='month',
+      setWeek:()=>this.setState({calView:'week'}), setMonth:()=>this.setState({calView:'month'}),
+      trainCalOpen: s.trainCalOpen, trainCalClosed: !s.trainCalOpen,
+      bezelRef:(el)=>{this.bezelEl=el; if(el&&this._fit) this._fit();},
+      appScrollRef:(el)=>{this.appScrollEl=el;}, onAppScroll:(e)=>{ if(this.state.screen!=='training') return; const el=e.currentTarget; const t=el.scrollTop; const slack=el.scrollHeight-el.clientHeight; const cur=this.state.trainCalOpen; let open=cur; if(cur){ if(slack>200 && t>56) open=false; } else { if(t<6) open=true; } if(open!==cur) this.setState({trainCalOpen:open}); },
+      cTodayI: s.screen==='today'?'var(--gold-cta)':'var(--text-tertiary)', cTodayT: s.screen==='today'?'var(--gold-cta)':'var(--text-tertiary)',
+      cTrainI: s.screen==='training'?'var(--gold-cta)':'var(--text-tertiary)', cTrainT: s.screen==='training'?'var(--gold-cta)':'var(--text-tertiary)',
+      cGrowI: s.screen==='growth'?'var(--gold-cta)':'var(--text-tertiary)', cGrowT: s.screen==='growth'?'var(--gold-cta)':'var(--text-tertiary)',
+      cMeI: s.screen==='me'?'var(--gold-cta)':'var(--text-tertiary)', cMeT: s.screen==='me'?'var(--gold-cta)':'var(--text-tertiary)',
+      goToday:()=>this.go('today'), goTraining:()=>this.go('training'), goGrowth:()=>this.go('growth'), goMe:()=>this.go('me'),
+      openNotes:()=>this.openChatScreen(), openChat:()=>this.openChatScreen(), closeOverlay:()=>this.setState({overlay:null}),
+      openPostpone:()=>this.setState({overlay:'postpone'}), confirmPostpone:()=>this.setState({postponed:true, overlay:null}), undoPostpone:()=>this.setState({postponed:false}),
+      ctaBtnRef:(el)=>{this.ctaBtnEl=el;}, ctaT1Ref:(el)=>{this.ctaT1El=el;}, ctaT2Ref:(el)=>{this.ctaT2El=el;},
+      onCtaDown:()=>this.ctaDown(), onCtaUp:()=>this.ctaUp(), onCtaCancel:()=>this.ctaCancel(),
+
+      riseRef:(el)=>{ if(!el || !this.state.rising || el.__risen) return; el.__risen=true; this.riseIn(el); },
+      pillInRef:(el)=>{ if(!el || el.__animed) return; el.__animed=true; this.tween(340,(p)=>{ const e=1-Math.pow(1-p,3); el.style.opacity=String(e); el.style.transform=`translateY(${(-9*(1-e)).toFixed(1)}px) scaleY(${(0.62+0.38*e).toFixed(3)})`; }, ()=>{ el.style.opacity=''; el.style.transform=''; }); },
+      doneRef:(el)=>{
+        if(!el || el.__animed) return; el.__animed=true;
+        const bloom=el.querySelector('[data-bloom]');
+        if(bloom) this.tween(750,(p)=>{ const e=1-Math.pow(1-p,3); bloom.style.transform=`translate(-50%,-50%) scale(${(0.2+e*8.5).toFixed(2)})`; bloom.style.opacity=String(p<0.2?p*4.5:Math.max(0,0.9*(1-(p-0.2)/0.8))); }, ()=>{ bloom.style.opacity='0'; });
+        el.querySelectorAll('[data-slide]').forEach((sl,i)=>{ sl.style.opacity='0'; setTimeout(()=>{ if(!sl.isConnected) return; this.tween(460,(p)=>{ const e=1-Math.pow(1-p,3); sl.style.opacity=String(e); sl.style.transform=`translateY(${(26*(1-e)).toFixed(1)}px)`; }, ()=>{ sl.style.opacity=''; sl.style.transform=''; }); }, 340+i*130); });
+        const tick=el.querySelector('[data-ticker]');
+        if(tick){ const final=parseInt((tick.textContent||'0').replace(/[^\d]/g,''),10)||0; tick.textContent='0'; setTimeout(()=>{ this.tween(900,(p)=>{ const e=1-Math.pow(1-p,4); tick.textContent=Math.round(final*e).toLocaleString('en-US'); }, ()=>{ tick.textContent=final.toLocaleString('en-US'); }); }, 470); }
+        const stamp=el.querySelector('[data-stamp]');
+        if(stamp){ stamp.style.opacity='0'; this.tween(520,(p)=>{ const s2=p<.55?1.5-0.6*(p/.55):(p<.78?0.9+0.15*((p-.55)/.23):1.05-0.05*((p-.78)/.22)); stamp.style.transform=`scale(${s2.toFixed(3)})`; stamp.style.opacity=String(Math.min(1,p/.4)); }, ()=>{ stamp.style.transform=''; stamp.style.opacity=''; }); }
+        el.querySelectorAll('[data-fade]').forEach(f=>{ const d=parseInt(f.getAttribute('data-fade'),10)||0; f.style.opacity='0'; setTimeout(()=>{ if(!f.isConnected) return; this.tween(450,(p)=>{ f.style.opacity=String(p); }, ()=>{ f.style.opacity=''; }); }, d); });
+        el.querySelectorAll('[data-spark]').forEach(sp=>{
+          const cs=getComputedStyle(sp); const tx=parseFloat(cs.getPropertyValue('--tx'))||0, ty=parseFloat(cs.getPropertyValue('--ty'))||0;
+          const d=parseInt(sp.getAttribute('data-spark'),10)||0; sp.style.opacity='0';
+          setTimeout(()=>{ if(!sp.isConnected) return; this.tween(800,(p)=>{ const e=1-Math.pow(1-p,3); sp.style.transform=`translate(calc(-50% + ${(tx*e).toFixed(1)}px), calc(-50% + ${(ty*e).toFixed(1)}px)) scale(${(1-0.8*e).toFixed(2)})`; sp.style.opacity=String(p<.7?1:Math.max(0,1-(p-.7)/.3)); }, ()=>{ sp.style.opacity='0'; }); }, d);
+        });
+      },
+      startWorkout:()=>this.go('training'), logSet:()=>this.logSet(), completeWorkout:()=>this.completeWorkout(),
+      onDraft:(e)=>this.setState({draft:e.target.value}), send:()=>this.send(),
+      chatRef:(el)=>{this.chatEl=el;}, onChatScroll:()=>this.checkVisible(),
+      stopProp:(e)=>e.stopPropagation(),
+      showSetEntry: s.overlay==='setentry',
+      seTitle: ex.name+' · 第 '+Math.min(s.currentIdx+1,ex.sets.length)+' 组',
+      doneSummary: 'W1D4 · '+s.exs.reduce((a,e)=>a+e.sets.filter(x=>x.done).length,0)+' 组已记录 · 已通知教练',
+      seWeightText: seFmt(s.seW), seReps: s.seR, seRpeText: s.seRpe.toFixed(1), seRirText: SE_RIR[seIdx],
+      ...(()=>{
+        const pad=s.pad;
+        const mkTap=(ch)=>()=>this.setState(st=>{ const p=st.pad; if(!p) return null; let b=p.buf;
+          if(ch==='back'){ b=b.slice(0,-1); }
+          else if(ch==='.'){ if(p.field==='r'||b.includes('.')||b.length===0||b.length>4) return null; b+='.'; }
+          else { if(b.replace('.','').length>=(p.field==='w'?5:3)) return null; if(b==='0') b=ch; else b+=ch; }
+          return {pad:{...p,buf:b}}; });
+        const keyBase='height:52px;border-radius:12px;background:var(--surface-key);color:var(--text-primary);display:flex;align-items:center;justify-content:center;font-family:\'IBM Plex Mono\',monospace;font-size:21px;font-weight:700;cursor:pointer;user-select:none';
+        const padKeys=pad?['1','2','3','4','5','6','7','8','9','.','0','back'].map(ch=>({
+          label: ch==='back'?'⌫':ch,
+          style: keyBase+(ch==='.'&&pad.field==='r'?';opacity:.25;pointer-events:none':'')+(ch==='back'?';font-size:19px':''),
+          tap: mkTap(ch)
+        })):[];
+        return {
+          padOn: !!pad,
+          padOpenW: ()=>this.setState({pad:{field:'w',buf:''}}),
+          padOpenR: ()=>this.setState({pad:{field:'r',buf:''}}),
+          padTitle: pad?(pad.field==='w'?'输入重量':'输入次数'):'',
+          padUnit: pad?(pad.field==='w'?'KG':'次'):'',
+          padValText: pad?(pad.buf||(pad.field==='w'?seFmt(s.seW):String(s.seR))):'',
+          padValColor: pad&&pad.buf?'var(--text-primary)':'var(--text-dim)',
+          padKeys,
+          padCancel: ()=>this.setState({pad:null}),
+          padOk: ()=>this.setState(st=>{ const p=st.pad; if(!p) return {pad:null}; if(!p.buf) return {pad:null};
+            if(p.field==='w'){ let v=parseFloat(p.buf); if(isNaN(v)) return {pad:null}; v=Math.max(20,Math.min(500,Math.round(v*4)/4)); return {pad:null,seW:v}; }
+            let v=parseInt(p.buf,10); if(isNaN(v)) return {pad:null}; v=Math.max(1,Math.min(100,v)); return {pad:null,seR:v}; })
+        };
+      })(),
+      seBreakdown, sePlates, seTicks,
+      seCollarOn: s.seCollar, seCollarOff: !s.seCollar,
+      seCollarStyle: `flex:none;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:var(--surface-card);cursor:pointer;border:1px solid ${s.seCollar?'rgba(var(--gold-rgb),.45)':'var(--border-default)'}`,
+      seCollarTextStyle: `font-size:14px;font-weight:500;color:${s.seCollar?'#fff':'var(--text-muted)'}`,
+      seScrollRef:(el)=>{this.seScrollEl=el;},
+      openSetEntry:()=>this.openSetEntry(), closeSetEntry:()=>this.setState({overlay:null}),
+      seDecW:()=>this.setState(st=>({seW:Math.max(20,Math.round((st.seW-2.5)*100)/100)})),
+      seIncW:()=>this.setState(st=>({seW:Math.round((st.seW+2.5)*100)/100})),
+      seDecR:()=>this.setState(st=>({seR:Math.max(0,st.seR-1)})),
+      seIncR:()=>this.setState(st=>({seR:st.seR+1})),
+      seToggleCollar:()=>this.setState(st=>({seCollar:!st.seCollar})),
+      commitSet:()=>this.commitSet(false), commitFail:()=>this.commitSet(true)
+    };
+  }
+}
+</script>
+</body>
+</html>

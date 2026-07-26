@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700;800&family=Noto+Sans+SC:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./dc-tokens.css">
+<style>html,body{margin:0;padding:0}</style>
+</helmet>
+<div style="{{ sheetStyle }}">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:2px 4px 12px">
+<span style="{{ titleStyle }}">{{ title }}</span>
+<span style="{{ valStyle }}">{{ valText }}<span style="{{ unitStyle }}">{{ unit }}</span></span>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+<sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+<button type="button" onclick="{{ k.tap }}" aria-label="{{ k.a11y }}" style="{{ k.style }}">{{ k.label }}</button>
+</sc-for>
+</div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<button type="button" onclick="{{ onCancel }}" style="{{ cancelStyle }}">取消</button>
+<button type="button" onclick="{{ commit }}" style="{{ okStyle }}">确定</button>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:380,&quot;height&quot;:330},&quot;field&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;weight&quot;,&quot;reps&quot;],&quot;default&quot;:&quot;weight&quot;,&quot;tsType&quot;:&quot;'weight'|'reps'&quot;},&quot;value&quot;:{&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:175,&quot;step&quot;:2.5,&quot;tsType&quot;:&quot;number&quot;},&quot;onCommit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(v: number) =&gt; void&quot;},&quot;onCancel&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { buf: '' };
+  renderVals(){
+    const p = this.props;
+    const isReps = p.field === 'reps';
+    const buf = this.state.buf;
+
+    const tap = (ch) => () => this.setState((s) => {
+      let b = s.buf;
+      if (ch === 'back') b = b.slice(0, -1);
+      else if (ch === '.') { if (isReps || b.includes('.') || !b.length || b.length > 4) return null; b += '.'; }
+      else { if (b.replace('.', '').length >= (isReps ? 3 : 5)) return null; b = b === '0' ? ch : b + ch; }
+      return { buf: b };
+    });
+
+    const keyBase = `height:52px;border:0;border-radius:12px;background:var(--surface-key);color:var(--text-primary);display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:700;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent`;
+
+    const keys = ['1','2','3','4','5','6','7','8','9','.','0','back'].map((ch) => ({
+      label: ch === 'back' ? '⌫' : ch,
+      a11y: ch === 'back' ? '退格' : ch === '.' ? '小数点' : ch,
+      tap: tap(ch),
+      style: keyBase + (ch === '.' && isReps ? ';opacity:.25;pointer-events:none' : '') + (ch === 'back' ? ';font-size:19px' : '')
+    }));
+
+    // commit rules mirror the app: weight snaps to 0.25kg within 20–500, reps are whole within 1–100
+    const commit = () => {
+      if (!buf) return (p.onCancel || (() => {}))();
+      let v = parseFloat(buf);
+      if (isNaN(v)) return (p.onCancel || (() => {}))();
+      v = isReps
+        ? Math.max(1, Math.min(100, Math.round(v)))
+        : Math.max(20, Math.min(500, Math.round(v * 4) / 4));
+      this.setState({ buf: '' });
+      (p.onCommit || (() => {}))(v);
+    };
+
+    return {
+      keys, commit,
+      onCancel: () => { this.setState({ buf: '' }); (p.onCancel || (() => {}))(); },
+      title: isReps ? '输入次数' : '输入重量',
+      unit: isReps ? '次' : 'KG',
+      valText: buf || String(p.value ?? (isReps ? 3 : 175)),
+      sheetStyle: `background:var(--surface-card);border-radius:20px 20px 0 0;padding:14px 16px 22px;border-top:1px solid var(--border-default);font-family:'Noto Sans SC',sans-serif`,
+      titleStyle: `font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;letter-spacing:.06em;color:var(--text-muted)`,
+      valStyle: `font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:800;line-height:1;color:${buf ? 'var(--text-primary)' : 'var(--text-faint)'}`,
+      unitStyle: `font-size:13px;font-weight:700;color:var(--text-muted);margin-left:5px`,
+      cancelStyle: `flex:1;height:46px;border-radius:999px;border:1px solid var(--border-strong);background:transparent;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans SC',sans-serif`,
+      okStyle: `flex:2;height:46px;border:0;border-radius:999px;background:var(--cta-bg);color:var(--cta-text);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;cursor:pointer;font-family:'Noto Sans SC',sans-serif`
+    };
+  }
+}
+</script>
+</body>
+</html>

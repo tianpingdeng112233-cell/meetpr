@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=IBM+Plex+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./dc-tokens.css">
+<style>html,body{margin:0;padding:0}</style>
+</helmet>
+<section style="{{ rootStyle }}">
+<button type="button" onclick="{{ onToggle }}" aria-expanded="{{ expandedAttr }}" style="{{ headStyle }}">
+<span style="{{ barStyle }}"></span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px">
+<span style="{{ nameStyle }}">{{ exercise }}</span>
+<span style="{{ metaStyle }}">{{ meta }}</span>
+</span>
+<span style="{{ statStyle }}">{{ stat }}</span>
+<span style="{{ caretStyle }}">▾</span>
+</button>
+<div style="{{ bodyStyle }}">
+<div style="{{ headRowStyle }}">
+<span>#</span><span>重量</span><span style="text-align:center">次数</span><span style="text-align:center">RPE</span><span></span>
+</div>
+<sc-for list="{{ sets }}" as="s" hint-placeholder-count="3">
+<dc-import name="SetRow" index="{{ s.index }}" weight="{{ s.weight }}" reps="{{ s.reps }}" rpe="{{ s.rpe }}" status="{{ s.status }}" video-state="{{ s.videoState }}" hint-size="100%,44px"></dc-import>
+</sc-for>
+<div style="{{ noteStyle }}">{{ note }}</div>
+</div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:300},&quot;exercise&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;硬拉&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;meta&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;上次 170kg×3 @8 · 最佳 175kg×3 @8.5&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;note&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;注意启动时股四的蹬地&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;collapsed&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;sets&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;SetRecord[]&quot;},&quot;onToggle&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(open: boolean) =&gt; void&quot;}}">
+const DEMO = [
+  { index:1, weight:175, reps:3, rpe:8.5, status:'done', videoState:'uploaded' },
+  { index:2, weight:175, reps:3, rpe:8.5, status:'failed', videoState:'uploaded' },
+  { index:3, weight:175, reps:3, rpe:8.5, status:'pending', videoState:'none' }
+];
+
+class Component extends DCLogic {
+  state = { open: null };
+  renderVals(){
+    const p = this.props;
+    const sets = Array.isArray(p.sets) && p.sets.length ? p.sets : DEMO;
+    const controlled = typeof p.collapsed === 'boolean';
+    const open = this.state.open !== null ? this.state.open : controlled ? !p.collapsed : true;
+
+    const done = sets.filter((s) => s.status === 'done' || s.status === 'failed');
+    const allDone = done.length === sets.length && sets.length > 0;
+    const last = done[done.length - 1];
+    // a collapsed, finished lift reads as a one-line receipt; an in-progress one shows the count
+    const summary = allDone && last ? `${done.length} 组 · ${last.weight}kg×${last.reps} @${last.rpe}` : `${done.length} / ${sets.length} 组已记录`;
+
+    return {
+      // NB: not `name` — dc-import already owns that attribute, a second one never reaches the child
+      exercise: p.exercise ?? '硬拉',
+      meta: p.meta ?? '上次 170kg×3 @8 · 最佳 175kg×3 @8.5',
+      note: p.note ?? '注意启动时股四的蹬地',
+      stat: open ? `${done.length} / ${sets.length} 组已记录` : summary,
+      expandedAttr: open ? 'true' : 'false',
+      sets,
+      onToggle: () => { this.setState({ open: !open }); (p.onToggle || (() => {}))(!open); },
+      rootStyle: `border-radius:16px;overflow:hidden;background:${open ? 'var(--surface-card)' : 'var(--bg-stack)'};box-shadow:var(--card-shadow);font-family:'Noto Sans SC',sans-serif;transition:background .2s ease`,
+      headStyle: `width:100%;border:0;background:transparent;display:flex;align-items:center;gap:11px;padding:14px 16px;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent`,
+      barStyle: `width:3px;align-self:stretch;min-height:26px;border-radius:2px;background:${allDone ? 'var(--success)' : 'var(--gold-500)'};flex:none`,
+      nameStyle: `font-family:'Archivo','Noto Sans SC',sans-serif;font-size:16px;font-weight:800;color:var(--text-primary)`,
+      metaStyle: `font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%`,
+      statStyle: `font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;font-weight:600;color:${allDone ? 'var(--success)' : 'var(--text-dim)'};flex:none`,
+      caretStyle: `color:var(--text-muted);font-size:11px;flex:none;transform:rotate(${open ? 0 : -90}deg);transition:transform .22s cubic-bezier(.22,.61,.36,1)`,
+      bodyStyle: open ? 'display:block' : 'display:none',
+      headRowStyle: `display:grid;grid-template-columns:22px 1fr 1fr 1fr 64px;padding:6px 14px;border-top:1px solid var(--border-hairline);font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10px;letter-spacing:.05em;color:var(--text-dim)`,
+      noteStyle: p.note === '' ? 'display:none' : `padding:11px 16px;font-size:12px;line-height:1.6;color:var(--text-secondary)`
+    };
+  }
+}
+</script>
+</body>
+</html>

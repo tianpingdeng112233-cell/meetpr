@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+html,body{margin:0;padding:0;background:#0A0A0C}
+a{color:#D97706;text-decoration:none}
+a:hover{color:#B45309}
+.pb{transition:opacity .12s ease}
+.pb:active{opacity:.72}
+</style>
+</helmet>
+<div class="{{ themeClass }}" style="position:relative;min-height:100vh;background:radial-gradient(130% 80% at 50% -10%,var(--desk-1),var(--desk-2))">
+<dc-import name="MeetPR 学员端" hint-size="100%,100vh"></dc-import>
+<div class="pb" onclick="{{ toggle }}" style="position:fixed;left:50%;top:32px;transform:translateX(-50%) translateX(300px);z-index:80;display:flex;align-items:center;gap:3px;background:var(--surface-card);border:1px solid var(--border-strong);border-radius:999px;padding:4px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.3);user-select:none;font-family:'IBM Plex Mono','Noto Sans SC',monospace">
+<span style="{{ darkChip }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z"></path></svg>暗色</span>
+<span style="{{ lightChip }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"></path></svg>亮色</span>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { theme: 'dark' };
+  renderVals(){
+    const dark = (this.state.theme || 'dark') === 'dark';
+    const chip = (on) => `display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:7px 13px;border-radius:999px;transition:background .15s ease,color .15s ease;${on ? 'background:var(--gold-500);color:var(--ink-on-gold)' : 'color:var(--text-muted)'}`;
+    return {
+      themeClass: dark ? '' : 'theme-light',
+      toggle: () => this.setState(s => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
+      darkChip: chip(dark),
+      lightChip: chip(!dark)
+    };
+  }
+}
+</script>
+</body>
+</html>
