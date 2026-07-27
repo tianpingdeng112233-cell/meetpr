@@ -45,7 +45,9 @@ public actor InMemoryPlanRepository: PlanRepository {
     let renamed = CoachStudentSummary(
       id: students[index].id,
       displayName: displayName,
-      status: students[index].status
+      status: students[index].status,
+      competitionDate: students[index].competitionDate,
+      recentFourWeeks: students[index].recentFourWeeks
     )
     students[index] = renamed
     return renamed
@@ -114,29 +116,62 @@ public actor InMemoryPlanRepository: PlanRepository {
       CoachStudentSummary(
         id: uuid(4),
         displayName: "王晨曦",
-        status: .active
+        status: .active,
+        competitionDate: previewCompetitionDate(daysFromNow: 17),
+        recentFourWeeks: recentWeeks((0, 3), (2, 3), (3, 3), (1, 3))
       ),
       CoachStudentSummary(
         id: uuid(2),
         displayName: "张以恒",
-        status: .active
+        status: .active,
+        competitionDate: previewCompetitionDate(daysFromNow: 38),
+        recentFourWeeks: recentWeeks((2, 3), (3, 3), (3, 3), (3, 3))
       ),
       CoachStudentSummary(
         id: uuid(8),
         displayName: "李嘉宁",
-        status: .active
+        status: .active,
+        recentFourWeeks: recentWeeks((0, 0), (1, 3), (2, 3), (3, 3))
       ),
       CoachStudentSummary(
         id: uuid(10),
         displayName: "赵安然",
-        status: .active
+        status: .active,
+        competitionDate: previewCompetitionDate(daysFromNow: 6),
+        recentFourWeeks: recentWeeks((0, 2), (0, 2), (1, 2), (2, 2))
       ),
       CoachStudentSummary(
         id: uuid(6),
         displayName: "钱骁",
-        status: .abnormal(reason: .noTrainingForDays(3))
+        status: .abnormal(reason: .noTrainingForDays(3)),
+        recentFourWeeks: recentWeeks((1, 3), (0, 3), (0, 3), (0, 3))
       ),
     ]
+  }
+
+  private static func recentWeeks(
+    _ values: (Int, Int)...
+  ) -> [CoachStudentRecentWeek] {
+    values.map { trainedDays, plannedDays in
+      CoachStudentRecentWeek(trainedDays: trainedDays, plannedDays: plannedDays)
+    }
+  }
+
+  private static func previewCompetitionDate(daysFromNow: Int) -> String {
+    let calendar = Calendar(identifier: .iso8601)
+    let date = calendar.date(byAdding: .day, value: daysFromNow, to: Date()) ?? Date()
+    let components = calendar.dateComponents([.year, .month, .day], from: date)
+    guard let year = components.year,
+      let month = components.month,
+      let day = components.day
+    else {
+      return ""
+    }
+    return "\(year)-\(twoDigit(month))-\(twoDigit(day))"
+  }
+
+  private static func twoDigit(_ value: Int) -> String {
+    value < 10 ? "0\(value)" : "\(value)"
   }
 
   private static func previewCatalog() -> [Exercise] {

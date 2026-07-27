@@ -94,8 +94,6 @@ struct PlanningStudentHeaderView: View {
 
   private var statusSummary: String {
     switch student.status {
-    case .inEvaluation(let days, let hours):
-      "评估期 \(days) 天 \(hours) 时剩"
     case .active:
       "活跃"
     case .abnormal(let reason):

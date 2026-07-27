@@ -117,12 +117,21 @@ final class StudentDetailViewModel {
     plannedDays.flatMap(\.exercises)
   }
 
+  var competitionCountdownText: String? {
+    CompetitionCountdownText.make(
+      competitionDate: summary.competitionDate,
+      relativeTo: now(),
+      timeZone: timeZone
+    )
+  }
+
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let trainingLogs: any StudentTrainingLogRepository
   @ObservationIgnored private let feedback: any StudentFeedbackRepository
   @ObservationIgnored private let videoWall: any CoachStudentVideoRepository
   @ObservationIgnored private let readiness: any ReadinessRepository
   @ObservationIgnored private let now: @Sendable () -> Date
+  @ObservationIgnored private let timeZone: TimeZone
 
   init(
     summary: CoachStudentSummary,
@@ -131,7 +140,8 @@ final class StudentDetailViewModel {
     feedback: any StudentFeedbackRepository,
     videos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
-    now: @escaping @Sendable () -> Date = { Date() }
+    now: @escaping @Sendable () -> Date = { Date() },
+    timeZone: TimeZone = .current
   ) {
     self.summary = summary
     self.plans = plans
@@ -140,6 +150,7 @@ final class StudentDetailViewModel {
     self.videoWall = videos
     self.readiness = readiness
     self.now = now
+    self.timeZone = timeZone
   }
 
   func loadIfNeeded() async {

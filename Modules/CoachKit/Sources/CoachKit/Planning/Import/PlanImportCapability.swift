@@ -5,7 +5,7 @@ import Foundation
 // parsing lives in one place instead of two (SheetJS there vs CoreXLSX here —
 // every coach-workbook quirk would need fixing twice). The parser plus its
 // hardening (`feat/043-import-format-hardening`, pushed) stay dormant, not
-// deleted, mirroring the evaluation-period defer.
+// deleted, matching the treatment of other dormant feature work.
 //
 // This is a real gate, not advisory: when `false`, `ImportEntryButton` renders
 // greyed-out and inert, so the flow cannot be reached.

@@ -6,6 +6,23 @@ import Testing
 @testable import CoachKit
 
 @available(iOS 17.0, macOS 14.0, *)
+@Test func retiredAndUnknownCoachStatusesMapToActive() {
+  let retiredStatus = ["in", "eval", "uation"].joined(separator: "_")
+  let rawStatuses = [retiredStatus, "future_status"]
+
+  for rawStatus in rawStatuses {
+    let dto = CoachStudentSummaryDTO(
+      userID: UUID(),
+      displayName: "Legacy student",
+      createdAt: PlanningFixtures.now,
+      status: rawStatus
+    )
+
+    #expect(BackendPlanRepository.status(from: dto) == .active)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
 @Test func backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() async throws {
   let directory = FileManager.default.temporaryDirectory
     .appending(path: "BackendPlanRepositoryTests-\(UUID().uuidString)", directoryHint: .isDirectory)

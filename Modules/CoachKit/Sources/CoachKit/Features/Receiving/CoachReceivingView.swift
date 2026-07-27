@@ -98,10 +98,9 @@ struct CoachReceivingView: View {
       }
     }
     .sheet(item: $acceptTarget) { item in
-      AcceptBindRequestSheet(studentName: item.displayName) { skipEvaluation, skipReason in
+      AcceptBindRequestSheet(studentName: item.displayName) {
         guard let queueViewModel else { return false }
-        let accepted = await queueViewModel.accept(
-          item, skipEvaluation: skipEvaluation, skipReason: skipReason)
+        let accepted = await queueViewModel.accept(item)
         if accepted {
           profileTarget = nil
           await onAccepted()
@@ -365,8 +364,7 @@ struct CoachReceivingView: View {
 
   private func actionRow(_ item: CoachBindRequestItem) -> some View {
     HStack(spacing: MeetPRSpacing.sm) {
-      // "接收" — opens the two-choice evaluation sheet (the mock's "▾"
-      // disclosure is decorative; the real accept always presents the sheet).
+      // "接收" — opens the accept confirmation sheet.
       pillButton("接收", filled: true) { acceptTarget = item }
       pillButton("查看资料", filled: false) { profileTarget = item }
       Button {

@@ -91,6 +91,11 @@ func typedEndpointsUseWireContractPaths() async throws {
   )
   _ = try await client.studentFeedback(studentID: studentID, accessToken: "token")
   try await client.markFeedbackRead(id: feedbackID, accessToken: "token")
+  let currentSession = try await client.studentSession(accessToken: "token")
+  _ = try await client.studentSession(date: "2026-05-22", accessToken: "token")
+  _ = try await client.startStudentSession(accessToken: "token")
+
+  #expect(currentSession.gymDay == "2026-05-22")
 
   let requests = await log.requests()
   #expect(
@@ -109,6 +114,9 @@ func typedEndpointsUseWireContractPaths() async throws {
       "POST /coach/feedback",
       "GET /students/\(studentID.uuidString)/feedback",
       "PATCH /feedback/\(feedbackID.uuidString)/read",
+      "GET /students/me/session",
+      "GET /students/me/session?date=2026-05-22",
+      "POST /students/me/session/start",
     ]
   )
 }
@@ -168,8 +176,7 @@ private struct TypedEndpointResponseStub: Sendable {
             "display_name": "王馨伟",
             "created_at": "2026-05-22T12:00:00Z"
           },
-          "status": "active",
-          "evaluation": null
+          "status": "active"
         }
         """#
       return Data(studentJSON.utf8)
@@ -192,6 +199,9 @@ private struct TypedEndpointResponseStub: Sendable {
     }
     if path.hasSuffix("/plans") {
       return Data(#"{"plans":[]}"#.utf8)
+    }
+    if path == "/students/me/session" {
+      return sessionData()
     }
     return Data("{}".utf8)
   }
@@ -217,7 +227,26 @@ private struct TypedEndpointResponseStub: Sendable {
     if path == "/coach/feedback" {
       return Data(feedbackJSON(id: "00000000-0000-4000-8000-000000000503").utf8)
     }
+    if path == "/students/me/session/start" {
+      return sessionData()
+    }
     return Data("{}".utf8)
+  }
+
+  private func sessionData() -> Data {
+    let json = #"""
+      {
+        "gym_day": "2026-05-22",
+        "session": {
+          "status": "in_progress",
+          "started_at": "2026-05-22T12:00:00Z",
+          "last_set_at": "2026-05-22T12:00:00Z",
+          "completed_at": null,
+          "duration_seconds": 0
+        }
+      }
+      """#
+    return Data(json.utf8)
   }
 
   private func statusCode(for request: URLRequest) -> Int {
@@ -226,6 +255,16 @@ private struct TypedEndpointResponseStub: Sendable {
     }
     return request.httpMethod == "POST" ? 201 : 200
   }
+}
+
+@Test func trainingSessionResponseDecodesLegacyMissingGymDayAsNil() throws {
+  let response = try MeetPRCodec.decoder.decode(
+    TrainingSessionResponseDTO.self,
+    from: Data(#"{"session":null}"#.utf8)
+  )
+
+  #expect(response.gymDay == nil)
+  #expect(response.session == nil)
 }
 
 private func planJSON(id: String, includesChildren: Bool = false) -> String {

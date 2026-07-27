@@ -22,21 +22,13 @@ public actor BackendCoachBindQueueRepository: CoachBindQueueRepository {
       .map(Self.item(from:))
   }
 
-  public func accept(
-    requestID: UUID,
-    skipEvaluation: Bool,
-    skipReason: String?
-  ) async throws -> (request: BindRequestDecision, evaluation: EvaluationPeriod?) {
+  public func accept(requestID: UUID) async throws {
     let token = try await session.accessToken()
     do {
-      let response = try await api.acceptBindRequest(
+      _ = try await api.acceptBindRequest(
         id: requestID,
-        AcceptBindRequestRequestDTO(skipEvaluation: skipEvaluation, skipReason: skipReason),
+        AcceptBindRequestRequestDTO(),
         accessToken: token
-      )
-      return (
-        request: Self.decision(from: response.bindRequest),
-        evaluation: response.evaluationPeriod?.toDomain()
       )
     } catch {
       throw Self.mapped(error)
@@ -79,15 +71,6 @@ public actor BackendCoachBindQueueRepository: CoachBindQueueRepository {
         noteToCoach: dto.onboarding.noteToCoach,
         uploadCount: dto.onboarding.uploadCount
       )
-    )
-  }
-
-  private static func decision(from dto: BindRequestDTO) -> BindRequestDecision {
-    BindRequestDecision(
-      id: dto.id,
-      status: dto.status,
-      skipEvaluation: dto.skipEvaluation,
-      skipReason: dto.skipReason
     )
   }
 }

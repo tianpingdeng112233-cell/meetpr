@@ -7,7 +7,7 @@ import Foundation
 public enum PlanningIntent: Sendable {
   /// Tab 1 "排新计划": pick a student at Step 0.
   case blank
-  /// Evaluation banner [发适应周]: kind=adaptation, duration locked to 1
+  /// Adaptation-week entry: kind=adaptation, duration locked to 1
   /// week (UI lock; the publish真 gate is the backend's).
   case adaptationWeek(CoachStudentSummary)
   /// Soft recommendation [立即排]: first regular plan with onboarding

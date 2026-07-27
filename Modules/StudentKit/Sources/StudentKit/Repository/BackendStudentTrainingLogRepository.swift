@@ -4,6 +4,8 @@ import Networking
 import RepositoryContracts
 
 public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
+  public nonisolated let trainingSessions: any TrainingSessionRepository
+
   private let api: APIClient
   private let session: any SessionStateReader
   private let cache: TrainingLogCache
@@ -16,6 +18,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
     self.api = api
     self.session = session
     self.cache = cache
+    self.trainingSessions = BackendTrainingSessionRepository(api: api, session: session)
   }
 
   @discardableResult

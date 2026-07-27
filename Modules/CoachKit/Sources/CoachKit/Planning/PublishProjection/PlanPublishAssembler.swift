@@ -67,8 +67,8 @@ enum PlanPublishAssembler {
       startDate: draft.startDate,
       endDate: draft.endDate,
       planWeeks: draft.planWeeks,
-      // Explicit kind so an adaptation week never publishes as regular and
-      // trips the evaluation真 gate (the draft model carries no kind).
+      // Explicit kind so an adaptation week never publishes as regular (the
+      // draft model carries no kind).
       kind: kind,
       source: .coach,
       status: .draft,

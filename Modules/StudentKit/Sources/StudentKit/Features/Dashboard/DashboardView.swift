@@ -19,7 +19,6 @@ public struct DashboardView: View {
   private let onboarding: any OnboardingProfileReading
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
-  private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   private let onStartWorkout: () -> Void
   private let onSeeAllFeedback: () -> Void
   private let onPlanChanged: () -> Void
@@ -27,8 +26,8 @@ public struct DashboardView: View {
   @State private var notificationsViewModel: DashboardNotificationsViewModel
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
+  @State private var trainingStatusViewModel: DashboardTrainingStatusViewModel
   @State private var showsNotifications = false
-  @State private var showsEvaluationSummary = false
   @State private var dayChangeTick = 0
   @State private var dayShiftAlert: DashboardDayShiftAlert?
   @State private var isUpdatingDayShift = false
@@ -43,7 +42,8 @@ public struct DashboardView: View {
     onboarding: any OnboardingProfileReading,
     e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel,
-    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
+    trainingSessions: any TrainingSessionRepository,
+    sessionActivityCenter: TrainingSessionActivityCenter = TrainingSessionActivityCenter(),
     onStartWorkout: @escaping () -> Void,
     onSeeAllFeedback: @escaping () -> Void,
     onPlanChanged: @escaping () -> Void = {}
@@ -55,7 +55,6 @@ public struct DashboardView: View {
     self.onboarding = onboarding
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
-    self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onStartWorkout = onStartWorkout
     self.onSeeAllFeedback = onSeeAllFeedback
     self.onPlanChanged = onPlanChanged
@@ -73,6 +72,13 @@ public struct DashboardView: View {
     self._profileMetricsViewModel = State(
       initialValue: DashboardProfileMetricsViewModel(onboarding: onboarding)
     )
+    self._trainingStatusViewModel = State(
+      initialValue: DashboardTrainingStatusViewModel(
+        sessions: trainingSessions,
+        sessionActivityCenter: sessionActivityCenter,
+        onOpenTraining: onStartWorkout
+      )
+    )
   }
 
   public var body: some View {
@@ -80,11 +86,6 @@ public struct DashboardView: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 0) {
           header
-
-          if let evaluationSummaryViewModel {
-            EvaluationCompletedCard(viewModel: evaluationSummaryViewModel)
-              .padding(.top, 16)
-          }
 
           weekProgressBar
             .padding(.top, 16)
@@ -105,7 +106,7 @@ public struct DashboardView: View {
           liftCard
             .padding(.top, 20)
 
-          startButton
+          trainingStatusSection
             .padding(.top, 16)
 
           if let metrics = profileMetricsViewModel.metrics {
@@ -120,21 +121,12 @@ public struct DashboardView: View {
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
-      .navigationDestination(isPresented: $showsEvaluationSummary) {
-        if let summary = evaluationSummaryViewModel?.summary {
-          EvaluationSummaryView(summary: summary) {
-            evaluationSummaryViewModel?.markRead()
-          }
-        }
-      }
       .sheet(isPresented: $showsNotifications) {
         NotificationCenterSheet(
           planNotice: notificationsViewModel.planNotice,
           feedbackUnreadCount: feedbackViewModel.unreadCount,
-          evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0,
           onOpenPlan: openPlanNotification,
-          onOpenFeedback: onSeeAllFeedback,
-          onOpenEvaluation: { showsEvaluationSummary = true }
+          onOpenFeedback: onSeeAllFeedback
         )
         .presentationDetents([.medium])
       }
@@ -150,7 +142,10 @@ public struct DashboardView: View {
     // stale `loadIfNeeded` gate was why a finished day still said 「继续」).
     .onAppear {
       guard weekViewModel.state != .idle else { return }
-      Task { await weekViewModel.load(studentID: studentID) }
+      Task {
+        await weekViewModel.load(studentID: studentID)
+        await trainingStatusViewModel.reload()
+      }
     }
     // 完成庆祝时刻: the day's only achievement feedback (spec 049 §1).
     .sensoryFeedback(.success, trigger: todayIsComplete) { _, newValue in newValue }
@@ -347,7 +342,10 @@ public struct DashboardView: View {
     let done =
       isPast && day != nil
       && weekSnapshot?.progress(for: day).state == .complete
-    let liftText = families.isEmpty ? "—" : families.map(liftLetter).joined()
+    let liftText =
+      MainLiftExerciseFamilyResolver.shorthand(in: day).flatMap {
+        $0.isEmpty ? nil : $0
+      } ?? "—"
 
     return Button {
       selectedDate = date
@@ -476,15 +474,18 @@ public struct DashboardView: View {
       + " · \(names)日"
   }
 
-  // MARK: - Start CTA
+  // MARK: - Today training status
 
   @ViewBuilder
-  private var startButton: some View {
+  private var trainingStatusSection: some View {
     let progress =
       weekSnapshot?.progress(for: todayDay)
       ?? TrainingDayProgress(day: todayDay, logs: [])
     VStack(spacing: 8) {
-      startButtonPrimary(progress)
+      DashboardTrainingStatusBar(
+        day: trainingStatusDay,
+        viewModel: trainingStatusViewModel
+      )
 
       if canShiftPlanDays,
         progress.state == .notStarted,
@@ -523,44 +524,6 @@ public struct DashboardView: View {
     }
   }
 
-  @ViewBuilder
-  private func startButtonPrimary(_ progress: TrainingDayProgress) -> some View {
-    switch progress.state {
-    case .noPlan:
-      HStack(spacing: 10) {
-        Image(systemName: "bed.double.fill").foregroundStyle(Color.MeetPR.fgSecondary)
-        Text("今日休息").font(Font.MeetPR.bodyEmphasis).foregroundStyle(Color.MeetPR.fgPrimary)
-        Spacer()
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(16)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
-    default:
-      Button(action: onStartWorkout) {
-        Text(startButtonLabel(progress))
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.bg)
-          .frame(maxWidth: .infinity)
-          .frame(height: 50)
-          .background(Color.MeetPR.fgPrimary)
-          .clipShape(.rect(cornerRadius: 12))
-      }
-      .buttonStyle(.plain)
-    }
-  }
-
-  private func startButtonLabel(_ progress: TrainingDayProgress) -> String {
-    let lift = todayDay.flatMap(mainFamily)?.studentDisplayName ?? "训练"
-    let label = todayLabel
-    switch progress.state {
-    case .complete: return "今日已完成 · 查看"
-    case .partial: return "继续 \(label) · \(lift)"
-    default: return "开始 \(label) · \(lift)"
-    }
-  }
-
   // MARK: - Derived data
 
   private var weekData: (days: [StudentPlanDay], logs: [StudentSetLog], weekIndex: Int)? {
@@ -596,20 +559,6 @@ public struct DashboardView: View {
     MainLiftExerciseFamilyResolver.families(in: day)
   }
 
-  /// The day's primary family (first in S→B→D order) — drives the selected-day
-  /// growth curve and the start-CTA label, which are single-lift by design.
-  private func mainFamily(_ day: StudentPlanDay) -> LiftFamily? {
-    dayFamilies(day).first
-  }
-
-  private func liftLetter(_ family: LiftFamily) -> String {
-    switch family {
-    case .squat: "S"
-    case .bench: "B"
-    case .deadlift: "D"
-    }
-  }
-
   private var effectiveSelectedDate: Date {
     selectedDate ?? Date()
   }
@@ -630,6 +579,21 @@ public struct DashboardView: View {
 
   private var todayDay: StudentPlanDay? {
     planDay(on: Date())
+  }
+
+  private var trainingStatusDay: StudentPlanDay? {
+    Self.trainingStatusDay(
+      in: weekData?.days ?? [],
+      displayDate: trainingStatusViewModel.displayDate
+    )
+  }
+
+  static func trainingStatusDay(
+    in days: [StudentPlanDay],
+    displayDate: Date,
+    calendar: Calendar = .current
+  ) -> StudentPlanDay? {
+    days.first { calendar.isDate($0.date, inSameDayAs: displayDate) }
   }
 
   private var cancellableShiftedDay: StudentPlanDay? {
@@ -653,11 +617,6 @@ public struct DashboardView: View {
     guard let weekIndex = weekData?.weekIndex else { return "今日" }
     let offset = mondayOffset(for: effectiveSelectedDate)
     return "W\(weekIndex)D\(offset + 1)"
-  }
-
-  private var todayLabel: String {
-    guard let weekIndex = weekData?.weekIndex else { return "今日训练" }
-    return "W\(weekIndex)D\(mondayOffset(for: Date()) + 1)"
   }
 
   private func mondayOffset(for date: Date) -> Int {
@@ -690,10 +649,7 @@ public struct DashboardView: View {
   }
 
   private var hasUnreadNotifications: Bool {
-    notificationsViewModel.hasUnread(
-      feedbackUnreadCount: feedbackViewModel.unreadCount,
-      evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0
-    )
+    notificationsViewModel.hasUnread(feedbackUnreadCount: feedbackViewModel.unreadCount)
   }
 
   // MARK: - Loading
@@ -703,11 +659,8 @@ public struct DashboardView: View {
     // resets the in-flight VM to `.idle` (see Error.isTaskCancellation);
     // gating the whole reload on the week VM alone would strand any later VM
     // at `.idle` with no retry. Mirrors TrainingHistoryView.loadIfNeeded.
-    // (StudentEvaluationSummaryViewModel has no `.idle` state, so it rides the
-    // week VM's first-load.)
     if weekViewModel.state == .idle {
       await weekViewModel.load(studentID: studentID)
-      await evaluationSummaryViewModel?.load(studentID: studentID)
     }
     if feedbackViewModel.state == .idle {
       await feedbackViewModel.load(studentID: studentID)
@@ -721,15 +674,16 @@ public struct DashboardView: View {
     if profileMetricsViewModel.state == .idle {
       await profileMetricsViewModel.load(studentID: studentID)
     }
+    await trainingStatusViewModel.loadIfNeeded()
   }
 
   private func reload() async {
     await weekViewModel.load(studentID: studentID)
     await feedbackViewModel.load(studentID: studentID)
-    await evaluationSummaryViewModel?.load(studentID: studentID)
     await notificationsViewModel.load(studentID: studentID)
     await e1rmTrendViewModel.load(studentID: studentID)
     await profileMetricsViewModel.load(studentID: studentID)
+    await trainingStatusViewModel.reload()
   }
 
   private func proposeShiftToday() {

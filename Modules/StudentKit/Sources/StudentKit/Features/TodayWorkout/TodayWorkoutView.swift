@@ -17,6 +17,7 @@ public struct TodayWorkoutView: View {
   @State private var selectedDate: Date
   @State private var backfillUnlocked = false
   private let resetToTodayPulse: Int
+  private let tabEntryPulse: Int
   private let sessionReviews: (any SessionReviewRepository)?
   @State private var showingSummary = false
   @State private var editing: EditingTarget?
@@ -33,12 +34,16 @@ public struct TodayWorkoutView: View {
     videoUploads: VideoUploadServices? = nil,
     resetToTodayPulse: Int = 0,
     sessionReviews: (any SessionReviewRepository)? = nil,
+    trainingSessions: any TrainingSessionRepository = InMemoryTrainingSessionRepository(),
+    sessionActivityCenter: TrainingSessionActivityCenter = TrainingSessionActivityCenter(),
+    tabEntryPulse: Int = 0,
     planRevision: Int = 0
   ) {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
     self.resetToTodayPulse = resetToTodayPulse
+    self.tabEntryPulse = tabEntryPulse
     self.sessionReviews = sessionReviews
     self.planRevision = planRevision
     self._selectedDate = State(initialValue: date)
@@ -47,7 +52,9 @@ public struct TodayWorkoutView: View {
         plans: plans,
         logs: logs,
         e1rm: e1rm,
-        onboarding: onboarding
+        onboarding: onboarding,
+        sessions: trainingSessions,
+        sessionActivityCenter: sessionActivityCenter
       ))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness))
@@ -96,7 +103,11 @@ public struct TodayWorkoutView: View {
             ProgressView()
               .frame(maxWidth: .infinity, maxHeight: .infinity)
           case .loaded(let day, let drafts):
-            workout(day: day, drafts: drafts)
+            if shouldShowOverview {
+              overview(day: day, drafts: drafts)
+            } else {
+              workout(day: day, drafts: drafts)
+            }
           case .recording(let day, let drafts, _):
             workout(day: day, drafts: drafts)
           case .rest:
@@ -189,6 +200,9 @@ public struct TodayWorkoutView: View {
     .onChange(of: planRevision) { _, _ in
       Task { await loadWorkout(for: selectedDate) }
     }
+    .onChange(of: tabEntryPulse) { _, _ in
+      Task { await loadWorkout(for: selectedDate) }
+    }
   }
 
   private var dateLock: TodayWorkoutDateLock {
@@ -205,7 +219,14 @@ public struct TodayWorkoutView: View {
     let activeIndex = drafts.firstIndex { !$0.completed }
     return ScrollView {
       VStack(alignment: .leading, spacing: 16) {
-        WorkoutDayHeader(day: day, context: viewModel.planContext, readinessFiled: readinessFiled)
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+          WorkoutDayHeader(
+            day: day,
+            context: viewModel.planContext,
+            readinessFiled: readinessFiled,
+            sessionElapsedSeconds: viewModel.sessionElapsedSeconds(at: context.date)
+          )
+        }
 
         if let activeIndex {
           activeSetHero(
@@ -214,6 +235,8 @@ public struct TodayWorkoutView: View {
             setNumber: setNumber(for: drafts[activeIndex], in: drafts),
             totalSets: totalSets(for: drafts[activeIndex].planExerciseID, in: drafts))
         }
+
+        WorkoutSetProgress(drafts: drafts)
 
         ForEach(day.exercises) { exercise in
           exerciseTableCard(
@@ -259,6 +282,22 @@ public struct TodayWorkoutView: View {
         videoViewModel: videoViewModel
       )
     }
+  }
+
+  private func overview(
+    day: StudentPlanDay,
+    drafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> some View {
+    TodayWorkoutOverviewView(
+      day: day,
+      drafts: drafts,
+      context: viewModel.planContext,
+      references: viewModel.exerciseReferences,
+      lastDurationSeconds: viewModel.lastCompletedDurationSeconds,
+      onStart: {
+        Task { await viewModel.startSession() }
+      }
+    )
   }
 
   // MARK: - Active set hero
@@ -550,6 +589,11 @@ public struct TodayWorkoutView: View {
     }
   }
 
+  private var shouldShowOverview: Bool {
+    guard dateLock == .editable else { return false }
+    return viewModel.sessionPage == .overview
+  }
+
   private func mainLift(_ day: StudentPlanDay) -> LiftFamily? {
     day.exercises.first {
       $0.exercise.exerciseType == .mainLift && $0.exercise.mainLiftFamily != nil
@@ -597,7 +641,15 @@ public struct TodayWorkoutView: View {
   }
 
   private func loadWorkout(for date: Date) async {
-    await viewModel.load(date: date, studentID: studentID)
+    let explicitSessionDate =
+      TodayWorkoutDateLock.mode(
+        selected: date,
+        today: Date(),
+        backfillUnlocked: backfillUnlocked
+      ) == .editable
+      ? nil
+      : date
+    await viewModel.load(date: date, sessionDate: explicitSessionDate, studentID: studentID)
     await presentReadinessIfNeeded(for: date)
   }
 

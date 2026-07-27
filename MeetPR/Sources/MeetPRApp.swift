@@ -1,5 +1,6 @@
 import AppShell
 import CoachKit
+import CoreModels
 import Networking
 import StudentKit
 import SwiftData
@@ -8,17 +9,38 @@ import SwiftUI
 @main
 @MainActor
 struct MeetPRApp: App {
+  @Environment(\.scenePhase) private var scenePhase
+  #if !DEMO_MODE
+    @UIApplicationDelegateAdaptor(MeetPRAppDelegate.self) private var appDelegate
+  #endif
+
   private let draftStore: DraftStore
   private let rootView: RootView
+  private let appNavigation: AppNavigationModel
+  #if !DEMO_MODE
+    private let pushRegistration: PushRegistrationCoordinator
+  #endif
   @State private var session: Session
 
   init() {
     let draftStore = DraftStore.shared
     self.draftStore = draftStore
+    let appNavigation = AppNavigationModel()
+    self.appNavigation = appNavigation
 
-    let dependencies = Self.makeRootDependencies(draftStore: draftStore)
+    let dependencies = Self.makeRootDependencies(
+      draftStore: draftStore,
+      appNavigation: appNavigation
+    )
     rootView = dependencies.rootView
     _session = State(initialValue: dependencies.session)
+    #if !DEMO_MODE
+      let api = APIClient.shared
+      pushRegistration = PushRegistrationCoordinator { token, _ in
+        let accessToken = try await dependencies.session.accessToken()
+        try await api.registerDeviceToken(token, accessToken: accessToken)
+      }
+    #endif
   }
 
   private struct RootDependencies {
@@ -27,28 +49,19 @@ struct MeetPRApp: App {
   }
 
   #if DEMO_MODE
-    private struct DemoEvaluationFunnel {
+    private struct DemoCoachDependencies {
       let bindQueue: InMemoryCoachBindQueueRepository
-      let evaluations: InMemoryCoachEvaluationRepository
-      let summaries: InMemoryCoachEvaluationSummaryRepository
+      let dashboard: InMemoryCoachDashboardRepository
       let profiles: InMemoryCoachStudentProfileReader
     }
 
-    /// Demo evaluation funnel (spec 033): one pending receive-queue card +
-    /// live evaluation periods for the two in-evaluation roster students.
-    /// Queue accepts mint periods into the same shared store.
-    private static func makeDemoEvaluationFunnel() -> DemoEvaluationFunnel {
-      let evaluationStore = InMemoryEvaluationPeriodStore(
-        seed: CoachDemoSeed.evaluationPeriods(coachId: StudentDemoSeed.coachID)
-      )
-      return DemoEvaluationFunnel(
-        bindQueue: InMemoryCoachBindQueueRepository(
-          coachId: StudentDemoSeed.coachID,
-          seed: CoachDemoSeed.pendingBindRequests(),
-          evaluationStore: evaluationStore
+    private static func makeDemoCoachDependencies() -> DemoCoachDependencies {
+      DemoCoachDependencies(
+        bindQueue: InMemoryCoachBindQueueRepository(seed: CoachDemoSeed.pendingBindRequests()),
+        dashboard: InMemoryCoachDashboardRepository(
+          signals: CoachDemoSeed.dashboardSignals(),
+          dailyDigestBody: CoachDemoSeed.dailyDigestBody
         ),
-        evaluations: InMemoryCoachEvaluationRepository(store: evaluationStore),
-        summaries: InMemoryCoachEvaluationSummaryRepository(coachId: StudentDemoSeed.coachID),
         profiles: InMemoryCoachStudentProfileReader(
           profiles: [
             StudentDemoSeed.makeOnboardingProfile(studentID: CoachDemoSeed.queueStudentID)
@@ -57,7 +70,10 @@ struct MeetPRApp: App {
       )
     }
 
-    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
+    private static func makeRootDependencies(
+      draftStore: DraftStore,
+      appNavigation: AppNavigationModel
+    ) -> RootDependencies {
       // Seed the student projection so the demo shows a real plan (today/week)
       // without a coach publish round-trip.
       let planStore = InMemoryPlanStore(
@@ -79,7 +95,7 @@ struct MeetPRApp: App {
           try? await draftStore.deleteAll()
         }
       )
-      let funnel = makeDemoEvaluationFunnel()
+      let coachDependencies = makeDemoCoachDependencies()
       return RootDependencies(
         rootView: RootView(
           coachPlans: InMemoryPlanRepository.preview(store: planStore),
@@ -89,10 +105,9 @@ struct MeetPRApp: App {
             coachId: StudentDemoSeed.coachID,
             seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
           ),
-          coachBindQueue: funnel.bindQueue,
-          coachEvaluations: funnel.evaluations,
-          coachEvaluationSummaries: funnel.summaries,
-          coachStudentProfiles: funnel.profiles,
+          coachBindQueue: coachDependencies.bindQueue,
+          coachDashboard: coachDependencies.dashboard,
+          coachStudentProfiles: coachDependencies.profiles,
           studentPlans: InMemoryStudentPlanRepository(store: planStore),
           studentLogs: InMemoryStudentTrainingLogRepository(
             seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
@@ -114,6 +129,7 @@ struct MeetPRApp: App {
           // 训练视频 inbox: boot straight into a populated queue (spec 042).
           coachVideoQueue: InMemoryCoachVideoQueueRepository(
             seed: CoachDemoSeed.pendingVideos()),
+          appNavigation: appNavigation,
           draftStore: draftStore
         ),
         session: session
@@ -140,18 +156,18 @@ struct MeetPRApp: App {
       return session
     }
 
-    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
+    private static func makeRootDependencies(
+      draftStore: DraftStore,
+      appNavigation: AppNavigationModel
+    ) -> RootDependencies {
       let api = APIClient.shared
       let session = makeSession(api: api, draftStore: draftStore)
       return RootDependencies(
         rootView: RootView(
           coachPlans: BackendPlanRepository(api: api, session: session, cache: PlanCache()),
           coachInviteCodes: BackendInviteCodeRepository(api: api, session: session),
-          // Coach receive queue + evaluation funnel (spec 033).
           coachBindQueue: BackendCoachBindQueueRepository(api: api, session: session),
-          coachEvaluations: BackendCoachEvaluationRepository(api: api, session: session),
-          coachEvaluationSummaries: BackendCoachEvaluationSummaryRepository(
-            api: api, session: session),
+          coachDashboard: BackendCoachDashboardRepository(api: api, session: session),
           coachStudentProfiles: BackendCoachStudentProfileReader(api: api, session: session),
           studentPlans: BackendStudentPlanRepository(
             api: api,
@@ -179,19 +195,15 @@ struct MeetPRApp: App {
           // both must read live server state.
           studentBind: BackendBindRepository(api: api, session: session),
           studentOnboarding: BackendOnboardingRepository(api: api, session: session),
-          // Evaluation funnel (spec 033) — all cache-free by design.
-          studentEvaluations: BackendStudentEvaluationRepository(api: api, session: session),
-          studentEvaluationSummaries: BackendEvaluationSummaryRepository(
-            api: api, session: session),
           studentSessionReviews: BackendSessionReviewRepository(api: api, session: session),
           studentAccount: BackendAccountRepository(api: api, session: session),
-          summaryReadStore: UserDefaultsEvaluationSummaryReadStore(),
           // Coach-side video wall (spec 029 second pass): server-side
           // metadata + per-item presigned playback URLs.
           coachStudentVideos: BackendCoachStudentVideoRepository(api: api, session: session),
           // Growth-tab family mapping reads the coach-owned full plan tree
           // (the student projection only carries the current week).
           coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(api: api, session: session),
+          appNavigation: appNavigation,
           draftStore: draftStore
         ),
         session: session
@@ -201,18 +213,62 @@ struct MeetPRApp: App {
 
   var body: some Scene {
     WindowGroup {
-      rootView
-        .environment(session)
+      appContent
+    }
+  }
+
+  @ViewBuilder
+  private var appContent: some View {
+    #if DEMO_MODE
+      configuredRootView
         .task {
           await session.bootstrap()
         }
-        .modelContainer(
-          draftStore.modelContainer
-        )
-        // MeetPR is dark-only in V0.1 (David 2026-06-12: 学员向导的深色为
-        // 全 app 标准): one root-level force instead of per-view sprinkles,
-        // so auth + coach + student render the same palette.
-        .preferredColorScheme(.dark)
-    }
+    #else
+      configuredRootView
+        .task {
+          appDelegate.configure(
+            routeHandler: { route in
+              appNavigation.open(route)
+            },
+            deviceTokenHandler: { token in
+              pushRegistration.receiveDeviceToken(token)
+            }
+          )
+          await session.bootstrap()
+        }
+        .task(id: authenticatedCoach?.id) {
+          guard let coach = authenticatedCoach else {
+            pushRegistration.deactivate()
+            return
+          }
+          pushRegistration.activate(for: coach)
+        }
+        .onChange(of: scenePhase) { _, phase in
+          guard phase == .active, let coach = authenticatedCoach else { return }
+          pushRegistration.activate(for: coach)
+        }
+    #endif
   }
+
+  private var configuredRootView: some View {
+    rootView
+      .environment(session)
+      .modelContainer(
+        draftStore.modelContainer
+      )
+      // MeetPR is dark-only in V0.1 (David 2026-06-12: 学员向导的深色为
+      // 全 app 标准): one root-level force instead of per-view sprinkles,
+      // so auth + coach + student render the same palette.
+      .preferredColorScheme(.dark)
+  }
+
+  #if !DEMO_MODE
+    private var authenticatedCoach: User? {
+      guard case .authenticated(let user) = session.state, user.role == .coach else {
+        return nil
+      }
+      return user
+    }
+  #endif
 }
