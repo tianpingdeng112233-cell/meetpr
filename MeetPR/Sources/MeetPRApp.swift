@@ -2,6 +2,7 @@ import AppShell
 import ChatUI
 import CoachKit
 import CoreModels
+import DesignSystem
 import Networking
 import StudentKit
 import SwiftData
@@ -270,6 +271,9 @@ struct MeetPRApp: App {
     }
   #endif
 
+  @AppStorage(MeetPRAppearance.storageKey)
+  private var studentAppearanceRaw = MeetPRAppearance.system.rawValue
+
   private var preferredAppColorScheme: ColorScheme? {
     guard case .authenticated(let user) = session.state else {
       // Auth/login and bootstrap keep the v2 dark-only contract.
@@ -280,8 +284,9 @@ struct MeetPRApp: App {
       // CoachKit has no audited light palette yet.
       return .dark
     case .coachedStudent, .selfTrainStudent:
-      // Black-gold v3 student roots follow the device appearance.
-      return nil
+      // Black-gold v3 student roots follow the device appearance unless the
+      // user pinned one in 我的 → 外观.
+      return MeetPRAppearance(rawValue: studentAppearanceRaw)?.colorScheme
     }
   }
 

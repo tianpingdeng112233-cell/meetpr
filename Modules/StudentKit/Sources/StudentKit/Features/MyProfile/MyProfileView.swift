@@ -179,6 +179,8 @@ public struct MyProfileView: View {
           profile: profile
         )
         MyProfileDivider()
+        AppearancePreferenceRow()
+        MyProfileDivider()
         RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
         MyProfileDivider()
         profileRow(
@@ -297,6 +299,8 @@ public struct MyProfileView: View {
   private var fallbackRows: some View {
     MyProfileSectionLabel("偏好与基础信息")
     MyProfileGroupCard {
+      AppearancePreferenceRow()
+      MyProfileDivider()
       RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
     }
     if let onLogout {
