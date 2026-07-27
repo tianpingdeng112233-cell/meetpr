@@ -6,6 +6,11 @@ import SwiftUI
 /// missed receives the red state dot.
 @MainActor
 public struct MeetPRDayChip: View {
+  public enum SelectedAppearance: Equatable, Sendable {
+    case filled
+    case outlined
+  }
+
   public enum DayState: Equatable, Sendable {
     case done
     case missed
@@ -21,6 +26,8 @@ public struct MeetPRDayChip: View {
   private let date: Int
   private let state: DayState
   private let isSelected: Bool
+  private let width: CGFloat?
+  private let selectedAppearance: SelectedAppearance
   private let onSelect: @MainActor () -> Void
 
   public init(
@@ -28,12 +35,16 @@ public struct MeetPRDayChip: View {
     date: Int,
     state: DayState,
     isSelected: Bool,
+    width: CGFloat? = 52,
+    selectedAppearance: SelectedAppearance = .filled,
     onSelect: @escaping @MainActor () -> Void
   ) {
     self.weekday = weekday
     self.date = date
     self.state = state
     self.isSelected = isSelected
+    self.width = width
+    self.selectedAppearance = selectedAppearance
     self.onSelect = onSelect
   }
 
@@ -52,8 +63,9 @@ public struct MeetPRDayChip: View {
           .padding(.bottom, MeetPRSpacing.point5)
       }
       .padding(.top, MeetPRSpacing.point5)
-      .frame(width: 52, height: 44)
-      .background(isSelected ? Color.MeetPR.ctaFill : Color.MeetPR.surfaceCard)
+      .frame(width: width, height: 44)
+      .frame(maxWidth: width == nil ? .infinity : nil)
+      .background(backgroundColor)
       .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       .overlay {
         if isSelected {
@@ -82,7 +94,7 @@ public struct MeetPRDayChip: View {
   }
 
   private var weekdayColor: Color {
-    if isSelected { return Color.MeetPR.inkOnCTAFill }
+    if isSelected && selectedAppearance == .filled { return Color.MeetPR.inkOnCTAFill }
     switch state {
     case .rest, .future:
       return Color.MeetPR.textFaint
@@ -92,13 +104,20 @@ public struct MeetPRDayChip: View {
   }
 
   private var dateColor: Color {
-    if isSelected { return Color.MeetPR.inkOnCTAFill }
+    if isSelected && selectedAppearance == .filled { return Color.MeetPR.inkOnCTAFill }
     switch state {
     case .rest, .future:
       return Color.MeetPR.textFaint
     case .done, .missed, .today:
       return Color.MeetPR.textPrimary
     }
+  }
+
+  private var backgroundColor: Color {
+    guard isSelected else { return Color.MeetPR.surfaceCard }
+    return selectedAppearance == .filled
+      ? Color.MeetPR.ctaFill
+      : Color.MeetPR.surfaceElevated
   }
 
   private var statusColor: Color? {

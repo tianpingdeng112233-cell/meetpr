@@ -36,18 +36,21 @@ struct TrainingDayProgress: Equatable, Sendable {
   }
 }
 
-@available(iOS 17.0, macOS 14.0, *)
-extension TrainingDayCompletionState {
-  var dotColor: Color {
-    switch self {
-    case .noPlan:
-      Color.MeetPR.fgTertiary.opacity(0.4)
-    case .notStarted:
-      Color.MeetPR.brandRed
-    case .partial:
-      Color.MeetPR.amber
-    case .complete:
-      Color.MeetPR.green
+enum TrainingCalendarV3State {
+  static func resolve(
+    progress: TrainingDayProgress,
+    date: Date,
+    today: Date,
+    calendar: Calendar
+  ) -> MeetPRDayChip.DayState {
+    guard progress.state != .noPlan else { return .rest }
+    if progress.state == .complete { return .done }
+    if calendar.compare(date, to: today, toGranularity: .day) == .orderedAscending {
+      return .missed
     }
+    if calendar.isDate(date, inSameDayAs: today) {
+      return .today
+    }
+    return .future
   }
 }

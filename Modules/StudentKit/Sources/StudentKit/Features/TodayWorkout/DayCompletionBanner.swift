@@ -8,27 +8,27 @@ struct DayCompletionBanner: View {
 
   var body: some View {
     Button(action: onShowReview) {
-      HStack(spacing: 10) {
+      HStack(spacing: MeetPRSpacing.point10) {
         Image(systemName: "checkmark.seal.fill")
-          .foregroundStyle(Color.MeetPR.green)
+          .foregroundStyle(Color.MeetPR.success)
         Text("今日训练完成 · \(totalSets) 组")
-          .font(.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
         Text("查看回顾")
-          .font(.subheadline)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Image(systemName: "chevron.right")
-          .font(.caption)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textSecondary)
       }
-      .padding()
-      .background(Color.MeetPR.green.opacity(0.14))
+      .padding(MeetPRSpacing.space4)
+      .background(Color.MeetPR.successRGB.opacity(0.14))
       .overlay {
-        RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.MeetPR.green.opacity(0.4), lineWidth: 1)
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.successRGB.opacity(0.4), lineWidth: 1)
       }
-      .clipShape(.rect(cornerRadius: 12))
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
     .buttonStyle(.plain)
     .accessibilityLabel("今日训练完成，共 \(totalSets) 组，点按查看训练回顾")

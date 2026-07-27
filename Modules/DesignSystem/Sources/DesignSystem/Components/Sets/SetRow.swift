@@ -20,21 +20,23 @@ public struct SetRow: View {
   @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
 
   let index: Int
-  let weight: Double
+  let weight: Double?
   let reps: Int
   let rpe: Double
   let status: Status
   let videoState: VideoState
   private let onEdit: (@MainActor () -> Void)?
+  private let onVideoAction: (@MainActor () -> Void)?
 
   public init(
     index: Int,
-    weight: Double,
+    weight: Double?,
     reps: Int,
     rpe: Double,
     status: Status,
     videoState: VideoState,
-    onEdit: (@MainActor () -> Void)? = nil
+    onEdit: (@MainActor () -> Void)? = nil,
+    onVideoAction: (@MainActor () -> Void)? = nil
   ) {
     self.index = index
     self.weight = weight
@@ -43,32 +45,43 @@ public struct SetRow: View {
     self.status = status
     self.videoState = videoState
     self.onEdit = onEdit
+    self.onVideoAction = onVideoAction
   }
 
   public var body: some View {
-    Group {
+    HStack(spacing: MeetPRSpacing.zero) {
       if let onEdit {
         Button(action: onEdit) {
-          rowContent
+          metrics
         }
         .buttonStyle(.plain)
       } else {
-        rowContent
+        metrics
       }
+
+      trailingColumn
     }
+    .padding(.horizontal, SetRowContract.horizontalPadding)
+    .frame(minHeight: SetRowContract.minimumRowHeight)
+    .overlay(alignment: .bottom) {
+      Rectangle()
+        .fill(Color.MeetPR.borderHairline)
+        .frame(height: 1)
+    }
+    .contentShape(.rect)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(accessibilityText)
     .accessibilityHint(onEdit == nil ? "" : "轻点编辑本组")
   }
 
-  private var rowContent: some View {
+  private var metrics: some View {
     HStack(spacing: MeetPRSpacing.zero) {
       Text(index.formatted())
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
         .foregroundStyle(status == .pending ? Color.MeetPR.textDim : Color.MeetPR.textMuted)
         .frame(width: SetRowContract.indexColumnWidth, alignment: .leading)
 
-      Text(numberText(weight))
+      Text(weight.map { numberText($0) } ?? "—")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
         .foregroundStyle(valueColor)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -82,21 +95,36 @@ public struct SetRow: View {
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size14))
         .foregroundStyle(valueColor)
         .frame(maxWidth: .infinity)
+    }
+    .frame(maxWidth: .infinity)
+    .frame(minHeight: SetRowContract.minimumRowHeight)
+    .contentShape(.rect)
+  }
 
-      HStack(spacing: SetRowContract.iconSpacing) {
-        statusIcon
+  private var trailingColumn: some View {
+    HStack(spacing: SetRowContract.iconSpacing) {
+      statusIcon
+
+      if let onVideoAction {
+        Button(action: onVideoAction) {
+          videoIcon
+        }
+        .buttonStyle(.plain)
+        .contentShape(
+          .rect.inset(
+            by: -(SetRowContract.videoHitTarget - SetRowContract.cameraFrame) / 2
+          )
+        )
+        .accessibilityLabel(videoAccessibilityText)
+      } else {
         videoIcon
       }
-      .frame(width: SetRowContract.trailingColumnWidth, alignment: .trailing)
     }
-    .padding(.horizontal, SetRowContract.horizontalPadding)
-    .frame(minHeight: SetRowContract.minimumRowHeight)
-    .overlay(alignment: .bottom) {
-      Rectangle()
-        .fill(Color.MeetPR.borderHairline)
-        .frame(height: 1)
-    }
-    .contentShape(.rect)
+    .frame(
+      width: SetRowContract.trailingColumnWidth,
+      height: SetRowContract.minimumRowHeight,
+      alignment: .trailing
+    )
   }
 
   private var valueColor: Color {
@@ -198,10 +226,20 @@ public struct SetRow: View {
       case .uploaded: "视频已上传"
       case .failed: "视频上传失败"
       }
+    let weightText = weight.map { "\(numberText($0)) 千克" } ?? "暂无建议重量"
     let metrics =
-      "\(numberText(weight)) 千克，\(reps) 次，"
+      "\(weightText)，\(reps) 次，"
       + "RPE \(numberText(rpe, alwaysShowsFraction: true))"
     return "第 \(index) 组，\(metrics)，\(statusText)，\(videoText)"
+  }
+
+  private var videoAccessibilityText: String {
+    switch videoState {
+    case .none: "无视频"
+    case .uploading: "视频上传中"
+    case .uploaded: "视频已上传"
+    case .failed: "视频上传失败，轻点重试"
+    }
   }
 
   private func numberText(_ value: Double, alwaysShowsFraction: Bool = false) -> String {
@@ -215,6 +253,7 @@ public struct SetRow: View {
 enum SetRowContract {
   static let indexColumnWidth: CGFloat = 22
   static let trailingColumnWidth: CGFloat = 64
+  static let videoHitTarget: CGFloat = 44
   static let minimumRowHeight: CGFloat = 44
   static let horizontalPadding: CGFloat = 14
   static let iconSpacing: CGFloat = 11

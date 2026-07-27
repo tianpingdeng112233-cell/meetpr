@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct ExerciseSetRecord: Equatable, Sendable {
   public let index: Int
-  public let weight: Double
+  public let weight: Double?
   public let reps: Int
   public let rpe: Double
   public let status: SetRow.Status
@@ -10,7 +10,7 @@ public struct ExerciseSetRecord: Equatable, Sendable {
 
   public init(
     index: Int,
-    weight: Double,
+    weight: Double?,
     reps: Int,
     rpe: Double,
     status: SetRow.Status,
@@ -36,8 +36,8 @@ public struct ExerciseCard: View {
   let collapsed: Bool
   let sets: [ExerciseSetRecord]
   private let onToggle: @MainActor (Bool) -> Void
-
-  @State private var isOpen: Bool
+  private let onEditSet: @MainActor (ExerciseSetRecord) -> Void
+  private let onVideoAction: @MainActor (ExerciseSetRecord) -> Void
 
   public init(
     exercise: String,
@@ -45,7 +45,9 @@ public struct ExerciseCard: View {
     note: String,
     collapsed: Bool,
     sets: [ExerciseSetRecord],
-    onToggle: @escaping @MainActor (Bool) -> Void = { _ in }
+    onToggle: @escaping @MainActor (Bool) -> Void = { _ in },
+    onEditSet: @escaping @MainActor (ExerciseSetRecord) -> Void = { _ in },
+    onVideoAction: @escaping @MainActor (ExerciseSetRecord) -> Void = { _ in }
   ) {
     self.exercise = exercise
     self.meta = meta
@@ -53,51 +55,56 @@ public struct ExerciseCard: View {
     self.collapsed = collapsed
     self.sets = sets
     self.onToggle = onToggle
-    self._isOpen = State(initialValue: !collapsed)
+    self.onEditSet = onEditSet
+    self.onVideoAction = onVideoAction
   }
 
   public var body: some View {
-    VStack(spacing: MeetPRSpacing.zero) {
-      header
+    ExerciseCardWidthLayout(
+      widthFraction: isOpen ? 1 : ExerciseCardContract.collapsedWidthFraction
+    ) {
+      VStack(spacing: MeetPRSpacing.zero) {
+        header
 
-      if isOpen {
-        VStack(spacing: MeetPRSpacing.zero) {
-          columnHeaders
+        if isOpen {
+          VStack(spacing: MeetPRSpacing.zero) {
+            columnHeaders
 
-          ForEach(Array(sets.enumerated()), id: \.offset) { _, set in
-            SetRow(
-              index: set.index,
-              weight: set.weight,
-              reps: set.reps,
-              rpe: set.rpe,
-              status: set.status,
-              videoState: set.videoState
-            )
+            ForEach(Array(sets.enumerated()), id: \.offset) { _, set in
+              SetRow(
+                index: set.index,
+                weight: set.weight,
+                reps: set.reps,
+                rpe: set.rpe,
+                status: set.status,
+                videoState: set.videoState,
+                onEdit: { onEditSet(set) },
+                onVideoAction: { onVideoAction(set) }
+              )
+            }
+
+            if !note.isEmpty {
+              Text(note)
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+                .foregroundStyle(Color.MeetPR.textSecondary)
+                .lineSpacing(MeetPRSpacing.point7)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, MeetPRSpacing.space4)
+                .padding(.vertical, MeetPRSpacing.point11)
+            }
           }
-
-          if !note.isEmpty {
-            Text(note)
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-              .foregroundStyle(Color.MeetPR.textSecondary)
-              .lineSpacing(MeetPRSpacing.point7)
-              .frame(maxWidth: .infinity, alignment: .leading)
-              .padding(.horizontal, MeetPRSpacing.space4)
-              .padding(.vertical, MeetPRSpacing.point11)
-          }
+          .transition(.opacity)
         }
-        .transition(.opacity)
       }
-    }
-    .background(isOpen ? Color.MeetPR.surfaceCard : Color.MeetPR.bgStack)
-    .clipShape(.rect(cornerRadius: ExerciseCardContract.radius))
-    .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
-    .containerRelativeFrame(.horizontal) { length, _ in
-      isOpen ? length : length * ExerciseCardContract.collapsedWidthFraction
+      .background(isOpen ? Color.MeetPR.surfaceCard : Color.MeetPR.bgStack)
+      .clipShape(.rect(cornerRadius: ExerciseCardContract.radius))
+      .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
     }
     .animation(reduceMotion ? nil : MeetPRMotion.easeOut, value: isOpen)
-    .onChange(of: collapsed) { _, newValue in
-      isOpen = !newValue
-    }
+  }
+
+  private var isOpen: Bool {
+    !collapsed
   }
 
   private var header: some View {
@@ -140,8 +147,12 @@ public struct ExerciseCard: View {
 
         Text(isOpen ? progressText : summaryText)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+          .tracking(isOpen ? 0 : -0.2)
           .foregroundStyle(allRecorded ? Color.MeetPR.success : Color.MeetPR.textDim)
           .lineLimit(1)
+          .minimumScaleFactor(0.85)
+          .allowsTightening(true)
+          .layoutPriority(1)
 
         Text("▾")
           .font(.MeetPR.system(size: MeetPRFontMetrics.size11))
@@ -204,20 +215,13 @@ public struct ExerciseCard: View {
     }
     let failedCount = completedSets.filter { $0.status == .failed }.count
     let failure = failedCount > 0 ? " · \(failedCount) 组未完成" : ""
-    let prescription =
-      "\(numberText(last.weight))kg×\(last.reps) @\(numberText(last.rpe))"
+    let weight = last.weight.map { "\(numberText($0))kg" } ?? "—"
+    let prescription = "\(weight)×\(last.reps) @\(numberText(last.rpe))"
     return "\(completedSets.count) 组 · \(prescription)\(failure)"
   }
 
   private func toggle() {
     let newValue = !isOpen
-    if reduceMotion {
-      isOpen = newValue
-    } else {
-      withAnimation(MeetPRMotion.easeOut) {
-        isOpen = newValue
-      }
-    }
     onToggle(newValue)
   }
 
@@ -234,6 +238,45 @@ enum ExerciseCardContract {
   static let expandedBarMinimumHeight: CGFloat = 26
   static let collapsedBarMinimumHeight: CGFloat = 18
   static let collapsedCaretRotation: Double = -90
+}
+
+private struct ExerciseCardWidthLayout: Layout {
+  var widthFraction: CGFloat
+
+  var animatableData: CGFloat {
+    get { widthFraction }
+    set { widthFraction = newValue }
+  }
+
+  func sizeThatFits(
+    proposal: ProposedViewSize,
+    subviews: Subviews,
+    cache: inout ()
+  ) -> CGSize {
+    guard let subview = subviews.first else { return .zero }
+    let proposedWidth = proposal.width.map { $0 * widthFraction }
+    let childSize = subview.sizeThatFits(
+      ProposedViewSize(width: proposedWidth, height: proposal.height)
+    )
+    return CGSize(width: proposal.width ?? childSize.width, height: childSize.height)
+  }
+
+  func placeSubviews(
+    in bounds: CGRect,
+    proposal: ProposedViewSize,
+    subviews: Subviews,
+    cache: inout ()
+  ) {
+    guard let subview = subviews.first else { return }
+    subview.place(
+      at: bounds.origin,
+      anchor: .topLeading,
+      proposal: ProposedViewSize(
+        width: bounds.width * widthFraction,
+        height: bounds.height
+      )
+    )
+  }
 }
 
 private let mixedExerciseSets = [

@@ -30,6 +30,7 @@ import Foundation
   public static let point34: CGFloat = 34
   public static let point36: CGFloat = 36
   public static let point40: CGFloat = 40
+  public static let size46: CGFloat = 46
   public static let point48: CGFloat = 48
   public static let point52: CGFloat = 52
   public static let point56: CGFloat = 56

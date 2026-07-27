@@ -314,12 +314,18 @@ extension StudentDemoSeed {
         setLogId: uuid(idOffset + 50 + offset),
         computedAt: baseline.addingTimeInterval(Double(offset - 26) * 86_400 * 3),
         e1RMKg: value,
-        sourceWeightKg: value * 0.88,
+        sourceWeightKg: demoSourceWeights[exerciseID]?[offset] ?? value,
         sourceReps: 5,
         sourceRPE: 8.0
       )
     }
   }
+
+  private static let demoSourceWeights = [
+    uuid(2_000): [130, 130, 132.5, 132.5, 135, 137.5, 137.5, 140, 142.5],
+    uuid(2_001): [80, 82.5, 82.5, 85, 87.5, 90, 92.5],
+    uuid(2_002): [155, 157.5, 160, 165, 167.5, 170, 175],
+  ]
 }
 
 // MARK: - Spec 031/032 demo seeds (extension keeps the enum body within

@@ -17,7 +17,7 @@ import Testing
   #expect(logs.allSatisfy { $0.studentID == StudentDemoSeed.studentID })
 }
 
-@Test func demoStudentKeepsSquatBenchDeadliftE1RMThroughCompetitionGate() {
+@Test func demoStudentKeepsSquatBenchDeadliftE1RMThroughCompetitionGate() throws {
   let plan = StudentDemoSeed.makePlanView()
   let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
   let resolved = Dictionary(
@@ -36,4 +36,10 @@ import Testing
         resolved.first(where: { $0.value == point.exerciseId })?.key
       }) == [.squat, .bench, .deadlift]
   )
+  let squatExerciseID = try #require(resolved[.squat])
+  let latestSquat =
+    histories
+    .filter { $0.exerciseId == squatExerciseID }
+    .max { $0.computedAt < $1.computedAt }
+  #expect(latestSquat?.sourceWeightKg == 142.5)
 }

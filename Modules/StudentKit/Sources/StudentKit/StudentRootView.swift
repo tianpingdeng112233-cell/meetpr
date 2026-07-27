@@ -38,6 +38,7 @@ public struct StudentRootView: View {
   @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
   @State private var importedHistoryRefreshToken = 0
   @State private var evaluationNavigationPulse = 0
+  @State private var tabHostStore = StudentTabHostStore()
   @Environment(\.scenePhase) private var scenePhase
 
   public init() {
@@ -173,9 +174,8 @@ public struct StudentRootView: View {
 
 extension StudentRootView {
   private var studentTabs: some View {
-    TabView(selection: $selectedTab) {
-      // 今日 — student home (merges the old 仪表盘 + 计划; feedback now inlines
-      // here + full history under 成长, so there is no separate 反馈 tab).
+    let shell = StudentTabShellPresentation(selection: selectedTab)
+    return ZStack {
       DashboardView(
         studentID: studentID,
         canShiftPlanDays: canShiftPlanDays,
@@ -197,15 +197,13 @@ extension StudentRootView {
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         onPlanChanged: { planRevision += 1 }
       )
-      .tag(StudentTab.today)
-      .tabItem {
-        Label("今日", systemImage: "house")
-      }
+      .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding, readiness: readiness,
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
+        isActive: selectedTab == .training,
         jumpToTodayToken: trainingJumpToken,
         planRevision: planRevision,
         workoutStartedAt: $workoutStartedAt,
@@ -214,13 +212,8 @@ extension StudentRootView {
         onOpenFeedbackNotification: openFeedbackNotification,
         onOpenEvaluationNotification: openEvaluationNotification
       )
-      .tag(StudentTab.training)
-      .tabItem {
-        Label("训练", systemImage: "dumbbell.fill")
-      }
+      .studentTabLayer(shell.layer(for: .training), store: tabHostStore)
 
-      // 成长 — e1RM growth + full training history + coach-feedback history all
-      // live here (the 历史 tab folds in; assembled fully in a later slice).
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding,
@@ -232,10 +225,7 @@ extension StudentRootView {
         onOpenFeedbackNotification: openFeedbackNotification,
         onOpenEvaluationNotification: openEvaluationNotification
       )
-      .tag(StudentTab.growth)
-      .tabItem {
-        Label("成长", systemImage: "chart.line.uptrend.xyaxis")
-      }
+      .studentTabLayer(shell.layer(for: .growth), store: tabHostStore)
 
       MyProfileView(
         studentID: studentID,
@@ -252,13 +242,24 @@ extension StudentRootView {
         onOpenFeedbackNotification: openFeedbackNotification,
         onOpenEvaluationNotification: openEvaluationNotification
       )
-      .tag(StudentTab.profile)
-      .tabItem {
-        Label("我的", systemImage: "person")
-      }
-      // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
-      // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
-      .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
+      .studentTabLayer(shell.layer(for: .profile), store: tabHostStore)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .safeAreaInset(edge: .bottom, spacing: 0) {
+      MeetPRTabBar(
+        selection: $selectedTab,
+        items: [
+          MeetPRTabBarItem(id: .today, title: "今日", icon: .today),
+          MeetPRTabBarItem(id: .training, title: "训练", icon: .training),
+          MeetPRTabBarItem(id: .growth, title: "成长", icon: .growth),
+          MeetPRTabBarItem(
+            id: .profile,
+            title: "我的",
+            icon: .profile,
+            badge: pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount
+          ),
+        ]
+      )
     }
     .task {
       Analytics.shared.screen(.dashboard)
@@ -309,7 +310,6 @@ extension StudentRootView {
       review: $pendingImportedHistoryReview,
       onAnswer: answerImportedHistoryReview
     )
-    .tint(Color.MeetPR.brandRed)
   }
 
   var hasNotificationCoordinator: Bool {

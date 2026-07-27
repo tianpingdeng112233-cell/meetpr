@@ -87,6 +87,35 @@ import Testing
   }
 }
 
+@Test func tabLayersRemainMountedAcrossSelectionRoundTrip() {
+  let training = StudentTabShellPresentation(selection: .training)
+  let growth = StudentTabShellPresentation(selection: .growth)
+  let returned = StudentTabShellPresentation(selection: .training)
+
+  #expect(training.layers.map(\.id) == StudentTab.allCases)
+  #expect(growth.layers.map(\.id) == StudentTab.allCases)
+  #expect(returned.layers.map(\.id) == StudentTab.allCases)
+  #expect(training.layer(for: .training) == returned.layer(for: .training))
+  #expect(!growth.layer(for: .training).allowsHitTesting)
+  #expect(growth.layer(for: .training).opacity == 0)
+  #expect(growth.layer(for: .training).isAccessibilityHidden)
+  #expect(!growth.layer(for: .training).isEnabled)
+  #expect(returned.layer(for: .training).allowsHitTesting)
+  #expect(!returned.layer(for: .training).isAccessibilityHidden)
+  #expect(returned.layer(for: .training).isEnabled)
+  #expect(returned.layer(for: .training).zIndex == 1)
+}
+
+@Test func exactlyOneTabLayerParticipatesInAccessibility() {
+  for selection in StudentTab.allCases {
+    let layers = StudentTabShellPresentation(selection: selection).layers
+    let exposed = layers.filter { !$0.isAccessibilityHidden }
+
+    #expect(exposed.map(\.id) == [selection])
+    #expect(layers.filter(\.isEnabled).map(\.id) == [selection])
+  }
+}
+
 @Test func importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() {
   let current = pendingReview(family: .squat)
   let waiting = pendingReview(family: .bench)
