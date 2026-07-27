@@ -94,5 +94,27 @@ public protocol ChatRepository: Sendable {
     -> ChatMessage
   func sendImage(in conversationID: UUID, imageData: Data, clientID: String) async throws
     -> ChatMessage
+  func sendSetRef(
+    in conversationID: UUID,
+    body: String,
+    setRef: SetRefV1,
+    videoID: UUID?,
+    clientID: String
+  ) async throws -> ChatMessage
   func markRead(in conversationID: UUID, upTo messageID: UUID) async throws -> ChatReadState
+}
+
+extension ChatRepository {
+  /// Non-network repositories retain a text fallback until they opt into
+  /// structured set-card storage. The production network repository overrides
+  /// this requirement with the full `set_ref` wire request.
+  public func sendSetRef(
+    in conversationID: UUID,
+    body: String,
+    setRef: SetRefV1,
+    videoID: UUID?,
+    clientID: String
+  ) async throws -> ChatMessage {
+    try await sendText(in: conversationID, text: body, clientID: clientID)
+  }
 }

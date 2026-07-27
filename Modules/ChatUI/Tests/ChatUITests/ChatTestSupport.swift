@@ -22,6 +22,7 @@ actor TestChatRepository: ChatRepository {
   private var pages: [ChatMessagePage] = []
   private var plannedTextSends: [PlannedChatSend] = []
   private var plannedImageSends: [PlannedChatSend] = []
+  private var plannedSetRefSends: [PlannedChatSend] = []
   private var suspendedTextSends = false
   private var pendingTextContinuations: [String: CheckedContinuation<ChatMessage, any Error>] = [:]
   private var cancelledTextClientIDs: Set<String> = []
@@ -33,6 +34,10 @@ actor TestChatRepository: ChatRepository {
   private(set) var textClientIDs: [String] = []
   private(set) var textBodies: [String] = []
   private(set) var imageClientIDs: [String] = []
+  private(set) var setRefClientIDs: [String] = []
+  private(set) var setRefBodies: [String] = []
+  private(set) var sentSetRefs: [SetRefV1] = []
+  private(set) var setRefVideoIDs: [UUID?] = []
   private(set) var readMessageIDs: [UUID] = []
 
   func setConversations(_ conversations: [ChatConversation]) {
@@ -52,6 +57,10 @@ actor TestChatRepository: ChatRepository {
 
   func enqueueImageSend(_ send: PlannedChatSend) {
     plannedImageSends.append(send)
+  }
+
+  func enqueueSetRefSend(_ send: PlannedChatSend) {
+    plannedSetRefSends.append(send)
   }
 
   func suspendTextSends() {
@@ -148,6 +157,30 @@ actor TestChatRepository: ChatRepository {
       senderID: chatTestUUID(1),
       clientID: clientID,
       kind: .image
+    )
+  }
+
+  func sendSetRef(
+    in conversationID: UUID,
+    body: String,
+    setRef: SetRefV1,
+    videoID: UUID?,
+    clientID: String
+  ) async throws -> ChatMessage {
+    setRefClientIDs.append(clientID)
+    setRefBodies.append(body)
+    sentSetRefs.append(setRef)
+    setRefVideoIDs.append(videoID)
+    if !plannedSetRefSends.isEmpty {
+      return try resolve(plannedSetRefSends.removeFirst())
+    }
+    automaticSequence += 1
+    return chatTestMessage(
+      conversationID: conversationID,
+      seq: automaticSequence,
+      senderID: chatTestUUID(1),
+      clientID: clientID,
+      text: body
     )
   }
 

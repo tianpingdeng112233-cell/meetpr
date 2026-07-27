@@ -109,6 +109,49 @@ import Testing
   #expect(readBody["message_id"] as? String == ChatWireFixture.imageMessageID.uuidString)
 }
 
+@Test func networkChatRepositoryEncodesSetRefPostWithoutImageCleanupRequests() async throws {
+  let recorder = ChatRequestRecorder()
+  let client = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
+    await recorder.record(request)
+    return APIResponse(data: textMessageResponse(), statusCode: 201)
+  }
+  let repository = NetworkChatRepository(
+    apiClient: client,
+    session: ChatSessionStub(),
+    uploader: OSSPartUploader()
+  )
+  let setRef = try SetRefV1(
+    exerciseName: "低杠位深蹲",
+    setNumber: 3,
+    weightKg: "100",
+    reps: 5,
+    rpe: "8.5",
+    dayDate: "2026-07-27",
+    setLogId: ChatWireFixture.textMessageID
+  )
+  let videoID = ChatWireFixture.imageMessageID
+  let body = SetRefCanonicalFormatter.body(for: setRef, note: "看看深度")
+
+  _ = try await repository.sendSetRef(
+    in: ChatWireFixture.conversationID,
+    body: body,
+    setRef: setRef,
+    videoID: videoID,
+    clientID: "set-ref-client"
+  )
+
+  let requests = await recorder.requests()
+  try #require(requests.count == 1)
+  #expect(requests[0].httpMethod == "POST")
+  #expect(
+    requests[0].url?.path()
+      == "/conversations/\(ChatWireFixture.conversationID.uuidString)/messages"
+  )
+  let wire = try jsonBody(requests[0])
+  try assertSetRefWire(wire, body: body, videoID: videoID)
+  #expect(requests.contains(where: { $0.httpMethod == "DELETE" }) == false)
+}
+
 @Test func networkChatRepositoryMapsBackendChatErrors() async throws {
   let cases: [ChatErrorMappingCase] = [
     ChatErrorMappingCase(
@@ -200,4 +243,26 @@ private func textMessageResponse() -> Data {
     }
     """.utf8
   )
+}
+
+private func assertSetRefWire(
+  _ wire: [String: Any],
+  body: String,
+  videoID: UUID
+) throws {
+  #expect(wire.count == 5)
+  #expect(wire["kind"] as? String == "text")
+  #expect(wire["body"] as? String == body)
+  #expect(wire["client_id"] as? String == "set-ref-client")
+  #expect(wire["video_id"] as? String == videoID.uuidString)
+  let wireSetRef = try #require(wire["set_ref"] as? [String: Any])
+  #expect(wireSetRef.count == 8)
+  #expect(wireSetRef["v"] as? Int == 1)
+  #expect(wireSetRef["exercise_name"] as? String == "低杠位深蹲")
+  #expect(wireSetRef["set_number"] as? Int == 3)
+  #expect(wireSetRef["weight_kg"] as? String == "100")
+  #expect(wireSetRef["reps"] as? Int == 5)
+  #expect(wireSetRef["rpe"] as? String == "8.5")
+  #expect(wireSetRef["day_date"] as? String == "2026-07-27")
+  #expect(wireSetRef["set_log_id"] as? String == ChatWireFixture.textMessageID.uuidString)
 }

@@ -3,7 +3,7 @@ import Foundation
 import Observation
 import RepositoryContracts
 
-private struct ChatSendOperationKey: Hashable, Sendable {
+struct ChatSendOperationKey: Hashable, Sendable {
   let conversationID: UUID
   let clientID: String
 }
@@ -22,6 +22,8 @@ public final class ChatSendCoordinator {
   private var outboxesByConversationID: [UUID: [ChatOutboxItem]] = [:]
   @ObservationIgnored private var tasks: [ChatSendOperationKey: Task<Void, Never>] = [:]
   @ObservationIgnored private var itemGenerations: [ChatSendOperationKey: UInt64] = [:]
+  @ObservationIgnored var setRefOperations: [ChatSendOperationKey: SetRefSendOperation] =
+    [:]
   @ObservationIgnored private var settledClientIDs: [UUID: Set<String>] = [:]
   @ObservationIgnored private var generation: UInt64 = 0
   @ObservationIgnored private var invalidationGeneration: UInt64?
@@ -165,10 +167,11 @@ public final class ChatSendCoordinator {
     }
   }
 
-  private func enqueue(
+  func enqueue(
     _ draft: PendingChatMessage,
     in conversationID: UUID,
-    clientID: String
+    clientID: String,
+    setRefOperation: SetRefSendOperation? = nil
   ) -> String {
     // A drain is not a moment, it is an interval: `cancelAllAndWaitForCleanup`
     // suspends, and the MainActor is re-entrant across those suspensions. Work
@@ -194,6 +197,9 @@ public final class ChatSendCoordinator {
       draft: draft,
       state: .sending
     )
+    if let setRefOperation {
+      setRefOperations[key] = setRefOperation
+    }
     outboxesByConversationID[conversationID, default: []].append(item)
     itemGenerations[key] = generation
     start(item: item, generation: generation)
@@ -223,19 +229,30 @@ public final class ChatSendCoordinator {
     )
     do {
       let message: ChatMessage
-      switch item.draft {
-      case .text(let text):
-        message = try await repository.sendText(
+      if let operation = setRefOperations[key] {
+        let videoID = try await resolveVideoID(for: operation, key: key)
+        message = try await repository.sendSetRef(
           in: item.conversationID,
-          text: text,
+          body: operation.intent.body,
+          setRef: operation.intent.setRef,
+          videoID: videoID,
           clientID: item.clientID
         )
-      case .image(let imageData):
-        message = try await repository.sendImage(
-          in: item.conversationID,
-          imageData: imageData,
-          clientID: item.clientID
-        )
+      } else {
+        switch item.draft {
+        case .text(let text):
+          message = try await repository.sendText(
+            in: item.conversationID,
+            text: text,
+            clientID: item.clientID
+          )
+        case .image(let imageData):
+          message = try await repository.sendImage(
+            in: item.conversationID,
+            imageData: imageData,
+            clientID: item.clientID
+          )
+        }
       }
       unregister(key)
       guard canApplyResult(for: key, generation: capturedGeneration) else {
@@ -310,6 +327,7 @@ extension ChatSendCoordinator {
     }
     let key = ChatSendOperationKey(conversationID: conversationID, clientID: clientID)
     itemGenerations[key] = nil
+    setRefOperations[key] = nil
     if markSettled {
       settledClientIDs[conversationID, default: []].insert(clientID)
     }
@@ -328,7 +346,7 @@ extension ChatSendCoordinator {
     }
   }
 
-  fileprivate static func makeClientID() -> String {
+  static func makeClientID() -> String {
     "ios-\(UUID().uuidString.lowercased())"
   }
 }
