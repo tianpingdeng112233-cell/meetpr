@@ -25,20 +25,34 @@ import Testing
   }
 
   @Test func descriptionMapsEveryHalfStepToRIRCopy() {
-    #expect(SetEntryRPE.description(5.0) == "还能多做 5 次")
-    #expect(SetEntryRPE.description(5.5) == "还能多做 4-5 次")
-    #expect(SetEntryRPE.description(6.0) == "还能多做 4 次")
-    #expect(SetEntryRPE.description(6.5) == "还能多做 3-4 次")
-    #expect(SetEntryRPE.description(7.0) == "还能多做 3 次")
-    #expect(SetEntryRPE.description(7.5) == "还能多做 2-3 次")
-    #expect(SetEntryRPE.description(8.0) == "还能多做 2 次")
-    #expect(SetEntryRPE.description(8.5) == "还能多做 1-2 次")
-    #expect(SetEntryRPE.description(9.0) == "还能多做 1 次")
-    #expect(SetEntryRPE.description(9.5) == "或许还能多做 1 次")
-    #expect(SetEntryRPE.description(10.0) == "力竭，无保留")
+    let expected = [
+      "还能多做 5 次",
+      "还能多做 4-5 次",
+      "还能多做 4 次",
+      "还能多做 3-4 次",
+      "还能多做 3 次",
+      "还能多做 2-3 次",
+      "还能多做 2 次",
+      "还能多做 1-2 次",
+      "还能多做 1 次",
+      "或许还能多做 1 次",
+      "力竭，无保留",
+    ]
+    #expect(SetEntryRPE.descriptions == expected)
+    for (index, copy) in expected.enumerated() {
+      #expect(SetEntryRPE.description(5 + Double(index) * 0.5) == copy)
+    }
     #expect(SetEntryRPE.description(8.2) == "还能多做 2 次")  // snaps before describing
     #expect(SetEntryRPE.description(4.0) == "还能多做 5 次")  // clamp low
     #expect(SetEntryRPE.description(11.0) == "力竭，无保留")  // clamp high
+  }
+
+  @Test func tickHeightsAndLitRangeMatchV3Contract() {
+    #expect(SetEntryRPE.barHeight(for: 8.5, selectedValue: 8.5) == 32)
+    #expect(SetEntryRPE.barHeight(for: 8.0, selectedValue: 8.5) == 22)
+    #expect(SetEntryRPE.barHeight(for: 7.5, selectedValue: 8.5) == 13)
+    #expect(SetEntryRPE.isLit(8.5, selectedValue: 8.5))
+    #expect(!SetEntryRPE.isLit(9.0, selectedValue: 8.5))
   }
 
   @Test func rpeTextBridgeSnapsClampsAndRoundTrips() {

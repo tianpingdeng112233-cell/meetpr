@@ -15,7 +15,6 @@ public struct MeetPRNumberPad: View {
 
   @State private var text = ""
   @State private var feedbackTrigger = 0
-  @FocusState private var isFocused: Bool
 
   public init(
     field: Field = .weight,
@@ -125,22 +124,14 @@ public struct MeetPRNumberPad: View {
 
       Spacer()
 
-      TextField(
-        "",
-        text: $text,
-        prompt: Text(initialValueText).foregroundStyle(Color.MeetPR.textFaint)
-      )
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
-      .foregroundStyle(Color.MeetPR.textPrimary)
-      .multilineTextAlignment(.trailing)
-      .focused($isFocused)
-      .textFieldStyle(.plain)
-      .frame(minWidth: 80)
-      .fixedSize(horizontal: true, vertical: false)
-      #if os(iOS)
-        .keyboardType(field == .weight ? .decimalPad : .numberPad)
-      #endif
-      .accessibilityLabel(field == .weight ? "重量" : "次数")
+      Text(text.isEmpty ? initialValueText : text)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
+        .foregroundStyle(text.isEmpty ? Color.MeetPR.textFaint : Color.MeetPR.textPrimary)
+        .multilineTextAlignment(.trailing)
+        .frame(minWidth: 80)
+        .fixedSize(horizontal: true, vertical: false)
+        .accessibilityLabel(field == .weight ? "重量" : "次数")
+        .accessibilityValue(text.isEmpty ? initialValueText : text)
 
       Text(field == .reps ? "次" : "KG")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))

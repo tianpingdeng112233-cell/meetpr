@@ -48,9 +48,8 @@ public struct PlateVisual: View {
 
   public var body: some View {
     HStack(spacing: MeetPRSpacing.zero) {
-      shaft
+      leftEndCap
       shoulder
-
       HStack(spacing: MeetPRSpacing.point1AndHalf) {
         ForEach(plates.indices, id: \.self) { index in
           PlateSideView(plate: plates[index])
@@ -63,20 +62,21 @@ public struct PlateVisual: View {
           .padding(.leading, MeetPRSpacing.point2)
       }
 
-      sleeve
+      rightShaft
         .padding(.leading, MeetPRSpacing.point2)
     }
     .frame(maxWidth: .infinity)
     .frame(height: 148)
+    .environment(\.layoutDirection, .leftToRight)
     .shadow(color: Color.MeetPR.plateDropShadow, radius: 4, y: 6)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(Self.accessibilityText(plates.map(\.weightKg), showCollar: hasCollar))
   }
 
-  private var shaft: some View {
+  private var leftEndCap: some View {
     UnevenRoundedRectangle(
-      topLeadingRadius: MeetPRRadius.micro,
-      bottomLeadingRadius: MeetPRRadius.micro
+      topLeadingRadius: 5,
+      bottomLeadingRadius: 5
     )
     .fill(
       LinearGradient(
@@ -92,7 +92,7 @@ public struct PlateVisual: View {
   }
 
   private var shoulder: some View {
-    RoundedRectangle(cornerRadius: MeetPRRadius.micro)
+    RoundedRectangle(cornerRadius: 3)
       .fill(
         LinearGradient(
           stops: Self.gradientStops(
@@ -120,22 +120,23 @@ public struct PlateVisual: View {
       .shadow(color: Color.MeetPR.barDropShadow, radius: 1.5, y: 1)
   }
 
-  /// A rectangle intentionally leaves the right bar end flat in both collar
-  /// states. Toggling the collar only inserts the collar assembly.
-  private var sleeve: some View {
-    Rectangle()
-      .fill(
-        LinearGradient(
-          stops: Self.gradientStops(
-            Color.MeetPR.barSleeveGradient,
-            locations: PlateVisualContract.sleeveLocations
-          ),
-          startPoint: .top,
-          endPoint: .bottom
-        )
+  private var rightShaft: some View {
+    UnevenRoundedRectangle(
+      bottomTrailingRadius: 2,
+      topTrailingRadius: 2
+    )
+    .fill(
+      LinearGradient(
+        stops: Self.gradientStops(
+          Color.MeetPR.barSleeveGradient,
+          locations: PlateVisualContract.sleeveLocations
+        ),
+        startPoint: .top,
+        endPoint: .bottom
       )
-      .frame(width: 92, height: 17)
-      .shadow(color: Color.MeetPR.barDropShadow, radius: 1.5, y: 1)
+    )
+    .frame(width: 92, height: 17)
+    .shadow(color: Color.MeetPR.barDropShadow, radius: 1.5, y: 1)
   }
 
   public static func load(perSide: Double) -> [Double] {

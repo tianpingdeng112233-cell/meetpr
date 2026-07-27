@@ -59,27 +59,31 @@ struct VideoAttachmentSection: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      HStack(spacing: 12) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      HStack(spacing: MeetPRSpacing.space3) {
         Text("视频")
-          .font(.body)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
-        content
+        VideoAttachmentV3Controls(
+          state: presentationState,
+          onCamera: { requestPick(.camera) },
+          onLibrary: { requestPick(.library) },
+          onCancel: { removeAttachment() },
+          onRetry: { retryAttachment() },
+          onDelete: { removeAttachment() }
+        )
       }
       if let message = videoViewModel.lastErrorMessage {
         Text(message)
-          .font(.caption)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+          .foregroundStyle(Color.MeetPR.danger)
       }
     }
-    .padding(14)
-    .background(Color.MeetPR.surface1)
-    .overlay {
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
-    }
-    .clipShape(.rect(cornerRadius: 12))
+    .padding(.horizontal, MeetPRSpacing.point14)
+    .padding(.vertical, MeetPRSpacing.point11)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
     .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingConsent) {
       Button(VideoPrivacyCopy.consentAgree) {
         videoViewModel.recordConsent()
@@ -147,111 +151,136 @@ struct VideoAttachmentSection: View {
     #endif
   }
 
-  @ViewBuilder
-  private var content: some View {
-    // The manager's row wins as soon as it exists; until then, a freshly
-    // picked video shows "准备中…" so the copy/save window isn't a dead screen.
+  private var presentationState: VideoAttachmentV3State {
     if let status = rowState?.attachment.status {
       switch status {
       case .pending:
-        statusRow(text: "处理中…", showsSpinner: true)
+        return .processing(text: "处理中…", canCancel: true)
       case .uploading:
-        uploadingRow
+        return .uploading(progress: rowState?.progress ?? 0)
       case .uploaded:
-        uploadedRow
+        return .uploaded
       case .failed:
-        failedRow
+        return .failed
       }
-    } else if isPreparing {
-      // No manager row exists yet, so there's nothing to cancel; the spinner
-      // alone tells the user the pick registered.
-      statusRow(text: "准备中…", showsSpinner: true, showsCancel: false)
-    } else {
-      pickButtons
     }
+    if isPreparing {
+      return .processing(text: "准备中…", canCancel: false)
+    }
+    return .choices(cameraAvailable: cameraAvailable)
   }
 
-  private var pickButtons: some View {
-    HStack(spacing: 10) {
-      #if os(iOS)
-        if CameraVideoPicker.isAvailable {
-          actionChip("拍摄", systemImage: "video") { requestPick(.camera) }
-        }
-      #endif
-      actionChip("相册", systemImage: "photo.on.rectangle") { requestPick(.library) }
-    }
+  private var cameraAvailable: Bool {
+    #if os(iOS)
+      CameraVideoPicker.isAvailable
+    #else
+      false
+    #endif
   }
+}
 
-  private var uploadingRow: some View {
-    HStack(spacing: 10) {
-      ProgressView(value: rowState?.progress ?? 0)
-        .frame(width: 90)
-      Text("\(Int((rowState?.progress ?? 0) * 100))%")
-        .font(.caption.monospacedDigit())
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-      cancelButton
-    }
-  }
+enum VideoAttachmentV3State: Equatable {
+  case choices(cameraAvailable: Bool)
+  case processing(text: String, canCancel: Bool)
+  case uploading(progress: Double)
+  case uploaded
+  case failed
+}
 
-  private var uploadedRow: some View {
-    HStack(spacing: 10) {
-      Image(systemName: "checkmark.circle.fill")
-        .foregroundStyle(Color.MeetPR.green)
-      Text("已上传")
-        .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-      actionChip("删除", systemImage: "trash") { removeAttachment() }
-    }
-  }
+@available(iOS 17.0, macOS 14.0, *)
+struct VideoAttachmentV3Controls: View {
+  let state: VideoAttachmentV3State
+  let onCamera: @MainActor () -> Void
+  let onLibrary: @MainActor () -> Void
+  let onCancel: @MainActor () -> Void
+  let onRetry: @MainActor () -> Void
+  let onDelete: @MainActor () -> Void
 
-  private var failedRow: some View {
-    HStack(spacing: 10) {
-      Image(systemName: "exclamationmark.triangle.fill")
-        .foregroundStyle(Color.MeetPR.brandRed)
-      Text("上传失败")
-        .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-      actionChip("重试", systemImage: "arrow.clockwise") { retryAttachment() }
-      actionChip("删除", systemImage: "trash") { removeAttachment() }
-    }
-  }
+  var body: some View {
+    switch state {
+    case .choices(let cameraAvailable):
+      HStack(spacing: MeetPRSpacing.point10) {
+        actionButton(
+          "拍摄",
+          systemImage: "video",
+          isEnabled: cameraAvailable,
+          action: onCamera
+        )
+        actionButton("相册", systemImage: "photo", action: onLibrary)
+      }
 
-  private func statusRow(text: String, showsSpinner: Bool, showsCancel: Bool = true) -> some View {
-    HStack(spacing: 10) {
-      if showsSpinner {
+    case .processing(let text, let canCancel):
+      HStack(spacing: MeetPRSpacing.point10) {
         ProgressView()
           .controlSize(.small)
+          .tint(Color.MeetPR.gold500)
+        statusText(text)
+        if canCancel {
+          actionButton("取消", systemImage: "xmark", action: onCancel)
+        }
       }
-      Text(text)
-        .font(.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-      if showsCancel {
-        cancelButton
+
+    case .uploading(let progress):
+      HStack(spacing: MeetPRSpacing.space2) {
+        ProgressView(value: progress)
+          .tint(Color.MeetPR.gold500)
+          .frame(width: 64)
+        Text(Int(progress * 100).formatted() + "%")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textMuted)
+        actionButton("取消", systemImage: "xmark", action: onCancel)
+      }
+
+    case .uploaded:
+      HStack(spacing: MeetPRSpacing.point10) {
+        Label("已上传", systemImage: "checkmark.circle.fill")
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
+          .foregroundStyle(Color.MeetPR.success)
+        actionButton("删除", systemImage: "trash", action: onDelete)
+      }
+
+    case .failed:
+      HStack(spacing: MeetPRSpacing.space2) {
+        Label("上传失败", systemImage: "exclamationmark.triangle.fill")
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+          .foregroundStyle(Color.MeetPR.danger)
+        actionButton("重试", systemImage: "arrow.clockwise", action: onRetry)
+        actionButton("删除", systemImage: "trash", action: onDelete)
       }
     }
   }
 
-  private var cancelButton: some View {
-    actionChip("取消", systemImage: "xmark") { removeAttachment() }
+  private func statusText(_ text: String) -> some View {
+    Text(text)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
+      .foregroundStyle(Color.MeetPR.textMuted)
   }
 
-  private func actionChip(
+  private func actionButton(
     _ title: String,
     systemImage: String,
-    action: @escaping () -> Void
+    isEnabled: Bool = true,
+    action: @escaping @MainActor () -> Void
   ) -> some View {
     Button(action: action) {
-      Label(title, systemImage: systemImage)
-        .font(.caption.bold())
-        .foregroundStyle(Color.MeetPR.brandRed)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(Color.MeetPR.brandRedSoft)
-        .clipShape(.capsule)
+      HStack(spacing: MeetPRSpacing.point7) {
+        Image(systemName: systemImage)
+          .font(.system(size: MeetPRFontMetrics.size20, weight: .regular))
+        Text(title)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+      }
+      .foregroundStyle(Color.MeetPR.goldRGB.opacity(isEnabled ? 0.72 : 0.30))
+      .padding(.horizontal, MeetPRSpacing.point15)
+      .padding(.vertical, MeetPRSpacing.space2)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.goldRGB.opacity(isEnabled ? 0.24 : 0.12), lineWidth: 1)
+      }
+      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
+    .disabled(!isEnabled)
   }
-
 }
 
 // MARK: - Actions

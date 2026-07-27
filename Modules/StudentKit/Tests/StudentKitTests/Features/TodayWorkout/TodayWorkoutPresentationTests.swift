@@ -46,6 +46,8 @@ import Testing
     #expect(presentation.progress.currentExerciseNumber == 1)
     #expect(presentation.progress.positionText == "第 2 / 2 组 · 动作 1 / 2")
     #expect(presentation.progress.remainingText == "还有 2 个动作 · 2 组未记录")
+    #expect(presentation.currentRow?.stableIndex == 1)
+    #expect(presentation.currentRow?.record.index == 2)
   }
 
   @Test func draftMappingKeepsFailureAndVideoSemantics() throws {

@@ -169,17 +169,15 @@ public struct TodayWorkoutView: View {
       }
     }
     .animation(MeetPRMotion.spring, value: viewModel.restTimer)
-    .sheet(item: $editing) { target in
-      SetEntrySheet(
-        rowIndex: target.rowIndex,
-        draft: target.draft,
-        setNumber: target.setNumber,
-        viewModel: viewModel,
-        studentID: studentID,
-        videoViewModel: videoViewModel,
-        scrollToVideo: target.scrollToVideo
-      )
-    }
+    #if os(iOS)
+      .fullScreenCover(item: $editing) { target in
+        setEntry(for: target)
+      }
+    #else
+      .sheet(item: $editing) { target in
+        setEntry(for: target)
+      }
+    #endif
     .sheet(isPresented: $showingSummary) {
       if let workout = currentWorkout {
         SessionSummaryView(
@@ -374,6 +372,18 @@ public struct TodayWorkoutView: View {
       draft: row.draft,
       setNumber: row.record.index,
       scrollToVideo: false
+    )
+  }
+
+  private func setEntry(for target: EditingTarget) -> some View {
+    SetEntrySheet(
+      rowIndex: target.rowIndex,
+      draft: target.draft,
+      setNumber: target.setNumber,
+      viewModel: viewModel,
+      studentID: studentID,
+      videoViewModel: videoViewModel,
+      scrollToVideo: target.scrollToVideo
     )
   }
 
