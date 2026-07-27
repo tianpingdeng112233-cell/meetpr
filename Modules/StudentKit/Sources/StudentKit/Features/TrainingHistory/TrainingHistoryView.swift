@@ -10,6 +10,7 @@ import SwiftUI
 /// plans, logs, e1RM, onboarding, and feedback continue through their existing
 /// repositories and view models.
 @available(iOS 17.0, macOS 14.0, *)
+// swiftlint:disable:next type_body_length
 public struct TrainingHistoryView: View {
   private let studentID: UUID
   private let onboarding: (any OnboardingProfileReading)?
@@ -27,6 +28,7 @@ public struct TrainingHistoryView: View {
   @State private var ranges: [LiftFamily: GrowthTimeRange] = [:]
   @State private var snapshots: [LiftFamily: GrowthCurveSnapshot] = [:]
   @State private var showsAllHistory = false
+  @State private var showsFeedbackArchive = false
   @State private var showsNotifications = false
   @State private var conversationID: UUID?
 
@@ -97,6 +99,11 @@ public struct TrainingHistoryView: View {
       }
     }
     .background(Color.MeetPR.bgBase)
+    .feedbackArchiveCover(
+      isPresented: $showsFeedbackArchive,
+      studentID: studentID,
+      viewModel: feedbackViewModel
+    )
     .task {
       await loadIfNeeded()
       Analytics.shared.progressViewed(.e1rm)
@@ -168,9 +175,9 @@ public struct TrainingHistoryView: View {
 
   @ViewBuilder
   private var feedbackEntry: some View {
-    if let feedbackViewModel {
-      NavigationLink {
-        FeedbackInboxView(studentID: studentID, viewModel: feedbackViewModel)
+    if feedbackViewModel != nil {
+      Button {
+        showsFeedbackArchive = true
       } label: {
         GrowthNavigationCard(
           icon: "bubble.left",

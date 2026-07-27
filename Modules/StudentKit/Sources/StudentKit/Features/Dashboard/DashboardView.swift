@@ -32,6 +32,7 @@ public struct DashboardView: View {
   @State private var showsEvaluationSummary = false
   @State private var conversationID: UUID?
   @State private var dayShiftAlert: DashboardDayShiftAlert?
+  @State private var shiftProposal: PlanShiftProposal?
   @State private var isUpdatingDayShift = false
   @State private var selectedDate: Date?
   @State private var isFeedbackExpanded = false
@@ -128,17 +129,34 @@ public struct DashboardView: View {
       guard evaluationNavigationPulse > 0 else { return }
       showsEvaluationSummary = true
     }
+    #if os(iOS)
+      .fullScreenCover(item: $shiftProposal) { proposal in
+        PostponeConfirmationOverlay(
+          tomorrow: shiftTargetDate,
+          isConfirming: isUpdatingDayShift,
+          onCancel: { shiftProposal = nil },
+          onConfirm: {
+            shiftProposal = nil
+            Task { await shiftToday(proposal) }
+          }
+        )
+        .presentationBackground(.clear)
+      }
+    #else
+      .sheet(item: $shiftProposal) { proposal in
+        PostponeConfirmationOverlay(
+          tomorrow: shiftTargetDate,
+          isConfirming: isUpdatingDayShift,
+          onCancel: { shiftProposal = nil },
+          onConfirm: {
+            shiftProposal = nil
+            Task { await shiftToday(proposal) }
+          }
+        )
+      }
+    #endif
     .alert(item: $dayShiftAlert) { alert in
       switch alert {
-      case .confirmShift(let proposal):
-        Alert(
-          title: Text("把整份计划往后顺延一天？"),
-          message: Text(PlanDayShiftLogic.confirmationMessage(for: proposal)),
-          primaryButton: .default(Text("确认顺延")) {
-            Task { await shiftToday(proposal) }
-          },
-          secondaryButton: .cancel(Text("取消"))
-        )
       case .confirmCancel(let returnDate):
         Alert(
           title: Text("撤销顺延？"),
@@ -238,7 +256,11 @@ public struct DashboardView: View {
     else {
       return
     }
-    dayShiftAlert = .confirmShift(proposal)
+    shiftProposal = proposal
+  }
+
+  private var shiftTargetDate: Date {
+    PlanCalendarDayIdentity.utcCalendar.date(byAdding: .day, value: 1, to: Date()) ?? Date()
   }
 
   @MainActor
@@ -296,13 +318,11 @@ public struct DashboardView: View {
 }
 
 private enum DashboardDayShiftAlert: Identifiable {
-  case confirmShift(PlanShiftProposal)
   case confirmCancel(Date)
   case message(title: String, text: String)
 
   var id: String {
     switch self {
-    case .confirmShift(let proposal): "shift-\(proposal.planID.uuidString)"
     case .confirmCancel(let date): "cancel-\(date.timeIntervalSince1970)"
     case .message(let title, let text): "message-\(title)-\(text)"
     }

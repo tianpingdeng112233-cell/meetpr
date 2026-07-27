@@ -277,6 +277,8 @@ extension Color {
     public static let celebrationSpark = rgb(255, 233, 168)
     /// `#C98A18` — medal disc gradient bottom stop; SVG literal, both themes.
     public static let celebrationMedalBottom = rgb(201, 138, 24)
+    /// `rgba(255,226,142,.35)` — medal inset ring; SVG literal, both themes.
+    public static let celebrationMedalRing = rgb(255, 226, 142)
     /// `#D89226` — left medal-ribbon gradient start; SVG literal, both themes.
     public static let celebrationRibbonStart = rgb(216, 146, 38)
 

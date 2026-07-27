@@ -19,12 +19,13 @@ public struct TodayWorkoutView: View {
   private let onOpenPlanNotification: () -> Void
   private let onOpenFeedbackNotification: () -> Void
   private let onOpenEvaluationNotification: () -> Void
+  private let onReturnToToday: () -> Void
 
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
   @State private var selectedDate: Date
-  @State private var showingSummary = false
+  @State private var completionPhase: WorkoutCompletionFlowPhase?
   @State private var editing: EditingTarget?
   @State private var directCameraTarget: DirectCameraTarget?
   @State private var showingDirectCameraConsent = false
@@ -59,7 +60,8 @@ public struct TodayWorkoutView: View {
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
     onOpenFeedbackNotification: @escaping () -> Void = {},
-    onOpenEvaluationNotification: @escaping () -> Void = {}
+    onOpenEvaluationNotification: @escaping () -> Void = {},
+    onReturnToToday: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -72,6 +74,7 @@ public struct TodayWorkoutView: View {
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onOpenFeedbackNotification = onOpenFeedbackNotification
     self.onOpenEvaluationNotification = onOpenEvaluationNotification
+    self.onReturnToToday = onReturnToToday
     self._selectedDate = State(initialValue: date ?? WorkoutDatePolicy.gymDayToday())
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
@@ -124,10 +127,10 @@ public struct TodayWorkoutView: View {
         onEdit: openEditor,
         onVideoAction: openVideoAction,
         onComplete: {
-          showingSummary = true
+          completionPhase = .celebration
         },
         onShowReview: {
-          showingSummary = true
+          completionPhase = .review
         }
       )
       .safeAreaInset(edge: .top, spacing: 0) {
@@ -178,21 +181,15 @@ public struct TodayWorkoutView: View {
         setEntry(for: target)
       }
     #endif
-    .sheet(isPresented: $showingSummary) {
-      if let workout = currentWorkout {
-        SessionSummaryView(
-          summary: StudentSessionSummary(drafts: workout.drafts),
-          date: workout.day.date,
-          studentID: studentID,
-          onComplete: {
-            markReviewCompleted(
-              for: workout.day.date,
-              setCount: workout.drafts.count
-            )
-          }
-        )
+    #if os(iOS)
+      .fullScreenCover(item: $completionPhase) { phase in
+        completionFlow(phase: phase)
       }
-    }
+    #else
+      .sheet(item: $completionPhase) { phase in
+        completionFlow(phase: phase)
+      }
+    #endif
     .sheet(isPresented: restTimerExplanationPresented) {
       RestTimerExplanationView {
         viewModel.acknowledgeRestTimerExplanation()
@@ -298,6 +295,34 @@ public struct TodayWorkoutView: View {
     .onChange(of: planRevision) { _, _ in
       editing = nil
       Task { await loadWorkout(for: selectedDate) }
+    }
+  }
+
+  @ViewBuilder
+  private func completionFlow(phase: WorkoutCompletionFlowPhase) -> some View {
+    if let workout = currentWorkout {
+      let presentation = WorkoutCompletionPresentation(
+        day: workout.day,
+        drafts: workout.drafts,
+        references: viewModel.exerciseReferences,
+        weekCode: weekCode,
+        coachName: notifications?.activeCoach?.coachDisplayName,
+        streak: nil
+      )
+      WorkoutCompletionFlowView(
+        presentation: presentation,
+        studentID: studentID,
+        initialPhase: phase,
+        onFinish: {
+          markReviewCompleted(
+            for: workout.day.date,
+            setCount: workout.drafts.count
+          )
+          onReturnToToday()
+        }
+      )
+    } else {
+      Color.MeetPR.bgBase
     }
   }
 

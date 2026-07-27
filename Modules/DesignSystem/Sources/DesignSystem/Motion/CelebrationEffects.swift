@@ -2,32 +2,37 @@ import SwiftUI
 
 public struct CelebrationEffects: View {
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
-  @State private var bloomProgress = 0.0
-  @State private var stampProgress = 0.0
+  @State private var startedAt: Date?
 
   public init() {}
 
   public var body: some View {
-    ZStack {
-      CelebrationBloom(progress: bloomProgress)
-      CelebrationSparkField()
-      CelebrationMedal(progress: stampProgress)
+    TimelineView(.animation(minimumInterval: 1 / 60, paused: reduceMotion)) { context in
+      let elapsed = max(0, context.date.timeIntervalSince(startedAt ?? context.date))
+      ZStack {
+        CelebrationBloom(progress: bloomProgress(elapsed: elapsed))
+        if !reduceMotion {
+          CelebrationSparkField(elapsed: elapsed)
+        }
+        CelebrationMedal(progress: reduceMotion ? 1 : stampProgress(elapsed: elapsed))
+      }
     }
     .frame(width: 220, height: 220)
-    .task {
-      guard !reduceMotion else {
-        bloomProgress = 1
-        stampProgress = 1
-        return
-      }
-      withAnimation(.easeOut(duration: MeetPRMotion.durationBloom)) {
-        bloomProgress = 1
-      }
-      withAnimation(.linear(duration: MeetPRMotion.durationStamp)) {
-        stampProgress = 1
+    .onAppear {
+      if startedAt == nil {
+        startedAt = Date()
       }
     }
     .accessibilityHidden(true)
+  }
+
+  private func bloomProgress(elapsed: TimeInterval) -> Double {
+    guard !reduceMotion else { return 1 }
+    return min(1, elapsed / MeetPRMotion.durationBloom)
+  }
+
+  private func stampProgress(elapsed: TimeInterval) -> Double {
+    min(1, elapsed / MeetPRMotion.durationStamp)
   }
 }
 
@@ -35,13 +40,14 @@ private struct CelebrationBloom: View {
   let progress: Double
 
   var body: some View {
+    let eased = MeetPRMotion.easeOutCubic(progress)
     Circle()
       .fill(
         RadialGradient(
-          colors: [
-            Color.MeetPR.celebrationBloom.opacity(0.55),
-            Color.MeetPR.gold500.opacity(0.16),
-            .clear,
+          stops: [
+            .init(color: Color.MeetPR.celebrationBloom.opacity(0.55), location: 0),
+            .init(color: Color.MeetPR.gold500.opacity(0.16), location: 0.55),
+            .init(color: .clear, location: 0.74),
           ],
           center: .center,
           startRadius: 0,
@@ -49,8 +55,12 @@ private struct CelebrationBloom: View {
         )
       )
       .frame(width: 130, height: 130)
-      .scaleEffect(0.2 + (8.5 * progress))
-      .opacity(progress < 0.2 ? progress * 4.5 : max(0, 1.125 * (1 - progress)))
+      .scaleEffect(0.2 + (8.5 * eased))
+      .opacity(
+        progress < 0.2
+          ? progress * 4.5
+          : max(0, 0.9 * (1 - ((progress - 0.2) / 0.8)))
+      )
   }
 }
 
@@ -63,14 +73,12 @@ enum MeetPRCelebrationSpec {
 }
 
 private struct CelebrationSparkField: View {
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  let elapsed: TimeInterval
 
   var body: some View {
-    if !reduceMotion {
-      ZStack {
-        ForEach(0..<MeetPRCelebrationSpec.sparkCount, id: \.self) { index in
-          CelebrationSpark(index: index)
-        }
+    ZStack {
+      ForEach(0..<MeetPRCelebrationSpec.sparkCount, id: \.self) { index in
+        CelebrationSpark(index: index, elapsed: elapsed)
       }
     }
   }
@@ -78,8 +86,7 @@ private struct CelebrationSparkField: View {
 
 private struct CelebrationSpark: View {
   let index: Int
-
-  @State private var progress = 0.0
+  let elapsed: TimeInterval
 
   var body: some View {
     let angle =
@@ -87,6 +94,9 @@ private struct CelebrationSpark: View {
       + (Double(index % 3) * 0.35)
     let radius = Double(66 + ((index % 4) * 24))
     let size = CGFloat(3 + (index % 3))
+    let delayed = elapsed - MeetPRCelebrationSpec.sparkDelay(for: index)
+    let progress = min(1, max(0, delayed / MeetPRMotion.durationSpark))
+    let eased = MeetPRMotion.easeOutCubic(progress)
     let fade = progress < 0.7 ? 1 : max(0, 1 - ((progress - 0.7) / 0.3))
 
     Circle()
@@ -94,19 +104,11 @@ private struct CelebrationSpark: View {
       .frame(width: size, height: size)
       .shadow(color: .MeetPR.gold500.opacity(0.85), radius: 7)
       .offset(
-        x: cos(angle) * radius * progress,
-        y: sin(angle) * radius * progress
+        x: cos(angle) * radius * eased,
+        y: sin(angle) * radius * eased
       )
-      .scaleEffect(1 - (0.8 * progress))
-      .opacity(fade)
-      .task {
-        try? await Task.sleep(
-          for: .seconds(MeetPRCelebrationSpec.sparkDelay(for: index))
-        )
-        withAnimation(.easeOut(duration: MeetPRMotion.durationSpark)) {
-          progress = 1
-        }
-      }
+      .scaleEffect(1 - (0.8 * eased))
+      .opacity(delayed < 0 ? 0 : fade)
   }
 }
 
@@ -114,76 +116,117 @@ private struct CelebrationMedal: View {
   let progress: Double
 
   var body: some View {
-    let scale: Double
-    if progress < 0.55 {
-      scale = 1.5 - (0.6 * (progress / 0.55))
-    } else if progress < 0.78 {
-      scale = 0.9 + (0.15 * ((progress - 0.55) / 0.23))
-    } else {
-      scale = 1.05 - (0.05 * ((progress - 0.78) / 0.22))
-    }
+    CelebrationMedalArtwork()
+      .frame(width: 96, height: 104)
+      .scaleEffect(scale)
+      .opacity(min(1, progress / 0.4))
+      .shadow(color: .MeetPR.gold500.opacity(0.45), radius: 26)
+  }
 
-    return ZStack {
-      MedalRibbons()
-      Circle()
-        .fill(
-          LinearGradient(
-            colors: [
-              .MeetPR.gold200, .MeetPR.gold500,
-              Color.MeetPR.celebrationMedalBottom,
-            ],
-            startPoint: .top,
-            endPoint: .bottom
-          )
-        )
-        .frame(width: 58, height: 58)
-        .overlay {
-          Circle()
-            .fill(Color.MeetPR.medalInset.opacity(0.92))
-            .padding(MeetPRSpacing.point7)
-            .overlay {
-              Image(systemName: "checkmark")
-                .font(
-                  .MeetPR.system(
-                    size: MeetPRFontMetrics.size28,
-                    weight: .bold
-                  )
-                )
-                .foregroundStyle(Color.MeetPR.gold400)
-            }
-        }
-        .offset(y: 20)
+  private var scale: Double {
+    if progress < 0.55 {
+      return 1.5 - (0.6 * (progress / 0.55))
     }
-    .frame(width: 96, height: 104)
-    .scaleEffect(scale)
-    .opacity(min(1, progress / 0.4))
-    .shadow(color: .MeetPR.gold500.opacity(0.45), radius: 26)
+    if progress < 0.78 {
+      return 0.9 + (0.15 * ((progress - 0.55) / 0.23))
+    }
+    return 1.05 - (0.05 * ((progress - 0.78) / 0.22))
   }
 }
 
-private struct MedalRibbons: View {
+private struct CelebrationMedalArtwork: View {
   var body: some View {
-    HStack(spacing: -MeetPRSpacing.point5) {
-      Rectangle()
-        .fill(
-          LinearGradient(
-            colors: [.MeetPR.celebrationRibbonStart, .MeetPR.gold800],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+    GeometryReader { proxy in
+      let size = proxy.size
+      ZStack {
+        CelebrationLeftRibbon()
+          .fill(
+            LinearGradient(
+              colors: [.MeetPR.celebrationRibbonStart, .MeetPR.gold800],
+              startPoint: .topLeading,
+              endPoint: .bottomTrailing
+            )
           )
-        )
-        .rotationEffect(.degrees(-13))
-      Rectangle()
-        .fill(
-          LinearGradient(
-            colors: [.MeetPR.gold700, .MeetPR.gold900],
-            startPoint: .topTrailing,
-            endPoint: .bottomLeading
+        CelebrationRightRibbon()
+          .fill(
+            LinearGradient(
+              colors: [.MeetPR.gold700, .MeetPR.gold900],
+              startPoint: .topTrailing,
+              endPoint: .bottomLeading
+            )
           )
-        )
-        .rotationEffect(.degrees(13))
+        Circle()
+          .fill(
+            LinearGradient(
+              stops: [
+                .init(color: .MeetPR.gold200, location: 0),
+                .init(color: .MeetPR.gold500, location: 0.55),
+                .init(color: .MeetPR.celebrationMedalBottom, location: 1),
+              ],
+              startPoint: .top,
+              endPoint: .bottom
+            )
+          )
+          .frame(width: size.width * 58 / 96, height: size.height * 58 / 104)
+          .position(x: size.width / 2, y: size.height * 72 / 104)
+        Circle()
+          .fill(Color.MeetPR.medalInset.opacity(0.92))
+          .frame(width: size.width * 44 / 96, height: size.height * 44 / 104)
+          .position(x: size.width / 2, y: size.height * 72 / 104)
+        Circle()
+          .stroke(Color.MeetPR.celebrationMedalRing.opacity(0.35), lineWidth: 1)
+          .frame(width: size.width * 44 / 96, height: size.height * 44 / 104)
+          .position(x: size.width / 2, y: size.height * 72 / 104)
+        CelebrationCheckmark()
+          .stroke(
+            Color.MeetPR.gold400,
+            style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round)
+          )
+      }
     }
-    .frame(width: 42, height: 56)
-    .offset(y: -20)
+  }
+}
+
+private struct CelebrationLeftRibbon: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.move(to: rect.point(x: 27, y: 0, viewBox: CGSize(width: 96, height: 104)))
+    path.addLine(to: rect.point(x: 44, y: 0, viewBox: CGSize(width: 96, height: 104)))
+    path.addLine(to: rect.point(x: 53, y: 39, viewBox: CGSize(width: 96, height: 104)))
+    path.addLine(to: rect.point(x: 38, y: 48, viewBox: CGSize(width: 96, height: 104)))
+    path.closeSubpath()
+    return path
+  }
+}
+
+private struct CelebrationRightRibbon: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.move(to: rect.point(x: 69, y: 0, viewBox: CGSize(width: 96, height: 104)))
+    path.addLine(to: rect.point(x: 52, y: 0, viewBox: CGSize(width: 96, height: 104)))
+    path.addLine(to: rect.point(x: 43, y: 39, viewBox: CGSize(width: 96, height: 104)))
+    path.addLine(to: rect.point(x: 58, y: 48, viewBox: CGSize(width: 96, height: 104)))
+    path.closeSubpath()
+    return path
+  }
+}
+
+private struct CelebrationCheckmark: Shape {
+  func path(in rect: CGRect) -> Path {
+    let viewBox = CGSize(width: 96, height: 104)
+    var path = Path()
+    path.move(to: rect.point(x: 37.5, y: 73, viewBox: viewBox))
+    path.addLine(to: rect.point(x: 45.5, y: 80.5, viewBox: viewBox))
+    path.addLine(to: rect.point(x: 59.5, y: 62, viewBox: viewBox))
+    return path
+  }
+}
+
+extension CGRect {
+  fileprivate func point(x: CGFloat, y: CGFloat, viewBox: CGSize) -> CGPoint {
+    CGPoint(
+      x: minX + (x / viewBox.width * width),
+      y: minY + (y / viewBox.height * height)
+    )
   }
 }

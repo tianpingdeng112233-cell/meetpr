@@ -210,7 +210,8 @@ extension StudentRootView {
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
         onOpenFeedbackNotification: openFeedbackNotification,
-        onOpenEvaluationNotification: openEvaluationNotification
+        onOpenEvaluationNotification: openEvaluationNotification,
+        onReturnToToday: { selectedTab = .today }
       )
       .studentTabLayer(shell.layer(for: .training), store: tabHostStore)
 
