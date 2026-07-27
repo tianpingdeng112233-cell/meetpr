@@ -114,10 +114,9 @@ struct SetEntrySheet: View {
               .id("setEntry.video")
             }
           }
-          .padding(.top, draft.allowsPlateLoadingGuidance ? MeetPRSpacing.space3 : 0)
+          .padding(.top, draft.allowsPlateLoadingGuidance ? MeetPRSpacing.point6 : 0)
         }
         .padding(.horizontal, MeetPRSpacing.space4)
-        .padding(.top, MeetPRSpacing.space3)
         .padding(.bottom, MeetPRSpacing.space4)
       }
       .defaultScrollAnchor(scrollToVideo ? .bottom : .top)
@@ -176,8 +175,7 @@ struct SetEntrySheet: View {
       }
     }
     .padding(.horizontal, MeetPRSpacing.space4)
-    .padding(.top, MeetPRSpacing.point6)
-    .padding(.bottom, MeetPRSpacing.space3)
+    .padding(.bottom, MeetPRSpacing.point3)
     .overlay(alignment: .bottom) {
       Rectangle()
         .fill(Color.MeetPR.borderDefault)
@@ -401,7 +399,7 @@ struct SetEntrySheet: View {
       .buttonStyle(PressScaleButtonStyle())
     }
     .padding(.horizontal, MeetPRSpacing.space4)
-    .padding(.top, MeetPRSpacing.space3)
+    .padding(.top, MeetPRSpacing.point10)
     .padding(.bottom, MeetPRSpacing.space5)
     .background(Color.MeetPR.bgBase)
     .overlay(alignment: .top) {
