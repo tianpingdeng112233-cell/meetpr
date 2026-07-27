@@ -232,6 +232,7 @@ extension StudentRootView {
         plans: plans,
         e1rm: e1rm,
         onboarding: onboarding,
+        readiness: readiness,
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
         account: account,
@@ -240,7 +241,8 @@ extension StudentRootView {
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
         onOpenFeedbackNotification: openFeedbackNotification,
-        onOpenEvaluationNotification: openEvaluationNotification
+        onOpenEvaluationNotification: openEvaluationNotification,
+        onOpenGrowth: { selectedTab = .growth }
       )
       .studentTabLayer(shell.layer(for: .profile), store: tabHostStore)
     }

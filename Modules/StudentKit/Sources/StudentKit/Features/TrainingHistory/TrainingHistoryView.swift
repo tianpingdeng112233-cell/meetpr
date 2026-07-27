@@ -1,4 +1,4 @@
-// swiftlint:disable file_length type_body_length
+// swiftlint:disable file_length
 import Analytics
 import CoreModels
 import DesignSystem
@@ -6,15 +6,12 @@ import Foundation
 import RepositoryContracts
 import SwiftUI
 
-/// Student 成长 (growth), reskinned to the design's single-scroll page: a fresh
-/// PR banner, the three main-lift e1RM charts, the coach-feedback history, an
-/// all-history stats row, and a button into the detailed week/set history. The
-/// volume/intensity analytic is preserved as a supplementary section beneath.
+/// Black-gold v3 成长 tab. The view owns presentation and navigation only;
+/// plans, logs, e1RM, onboarding, and feedback continue through their existing
+/// repositories and view models.
 @available(iOS 17.0, macOS 14.0, *)
 public struct TrainingHistoryView: View {
   private let studentID: UUID
-  private let plans: any StudentPlanRepository
-  private let e1rm: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
   private let feedbackViewModel: FeedbackInboxViewModel?
   private let importedHistoryRefreshToken: Int
@@ -23,12 +20,13 @@ public struct TrainingHistoryView: View {
   private let onOpenPlanNotification: () -> Void
   private let onOpenFeedbackNotification: () -> Void
   private let onOpenEvaluationNotification: () -> Void
+
   @State private var viewModel: TrainingHistoryViewModel
-  @State private var trendViewModel: DashboardE1RMTrendViewModel
-  @State private var prEvent: PRBreakthroughEvent?
-  @State private var prFamily: LiftFamily?
-  @State private var showsAllHistory = false
+  @State private var growthViewModel: GrowthCurveViewModel
   @State private var currentOnboarding: OnboardingProfile?
+  @State private var ranges: [LiftFamily: GrowthTimeRange] = [:]
+  @State private var snapshots: [LiftFamily: GrowthCurveSnapshot] = [:]
+  @State private var showsAllHistory = false
   @State private var showsNotifications = false
   @State private var conversationID: UUID?
 
@@ -47,8 +45,6 @@ public struct TrainingHistoryView: View {
     onOpenEvaluationNotification: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
-    self.plans = plans
-    self.e1rm = e1rm
     self.onboarding = onboarding
     self.feedbackViewModel = feedbackViewModel
     self.importedHistoryRefreshToken = importedHistoryRefreshToken
@@ -58,8 +54,8 @@ public struct TrainingHistoryView: View {
     self.onOpenFeedbackNotification = onOpenFeedbackNotification
     self.onOpenEvaluationNotification = onOpenEvaluationNotification
     self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
-    self._trendViewModel = State(
-      initialValue: DashboardE1RMTrendViewModel(
+    self._growthViewModel = State(
+      initialValue: GrowthCurveViewModel(
         plans: plans,
         e1rm: e1rm,
         onboarding: onboarding
@@ -69,49 +65,18 @@ public struct TrainingHistoryView: View {
 
   public var body: some View {
     NavigationStack {
-      VStack(spacing: 0) {
-        HStack {
-          Text("成长")
-            .font(.system(size: 36, weight: .heavy))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Spacer()
-          if let notifications {
-            StudentNotificationBell(coordinator: notifications) {
-              showsNotifications = true
-            }
-          }
+      ScrollView {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
+          GrowthScreenHeader()
+          content
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
-
-        ScrollView {
-          VStack(alignment: .leading, spacing: 16) {
-            if let prEvent { prBanner(prEvent) }
-
-            switch viewModel.state {
-            case .idle, .loading:
-              ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 200)
-            case .error(let message):
-              failureCard(message)
-            case .loaded:
-              liftCharts
-              feedbackSection
-              allHistorySection
-              detailedHistoryButton
-              volumeIntensitySection
-            }
-          }
-          .padding(16)
-        }
-        .scrollContentBackground(.hidden)
-        .refreshable {
-          await onImportedHistoryRefresh?()
-          await reloadAfterImportedHistoryChange()
-        }
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.top, MeetPRSpacing.point6)
+        .padding(.bottom, MeetPRSpacing.point28)
       }
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .scrollIndicators(.hidden)
+      .scrollContentBackground(.hidden)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $showsAllHistory) {
         AllHistoryScreen(viewModel: viewModel)
@@ -126,7 +91,12 @@ public struct TrainingHistoryView: View {
           onOpenEvaluation: onOpenEvaluationNotification
         )
       )
+      .refreshable {
+        await onImportedHistoryRefresh?()
+        await reload()
+      }
     }
+    .background(Color.MeetPR.bgBase)
     .task {
       await loadIfNeeded()
       Analytics.shared.progressViewed(.e1rm)
@@ -134,439 +104,444 @@ public struct TrainingHistoryView: View {
     }
     .task(id: importedHistoryRefreshToken) {
       guard importedHistoryRefreshToken > 0 else { return }
-      await reloadAfterImportedHistoryChange()
+      await reload()
     }
   }
 
-  // MARK: - PR banner
-
-  private func prBanner(_ event: PRBreakthroughEvent) -> some View {
-    HStack(spacing: 14) {
-      Image(systemName: "trophy.fill")
-        .font(.system(size: 18))
-        .foregroundStyle(Color.MeetPR.brandRed)
-        .frame(width: 40, height: 40)
-        .background(Color.MeetPR.brandRed.opacity(0.15))
-        .clipShape(Circle())
-      VStack(alignment: .leading, spacing: 4) {
-        Text("新 e1RM PR · \(prWhen(event.occurredAt))")
-          .font(Font.MeetPR.monoLabel)
-          .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.brandRed)
-        Text(
-          "\(prFamily?.studentDisplayName ?? "三大项") e1RM 突破 "
-            + "\(StudentFormatting.kilograms(event.breakthroughE1RMKg)) KG"
-        )
-        .font(.system(size: 17, weight: .bold))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+  @ViewBuilder
+  private var content: some View {
+    switch (viewModel.state, growthViewModel.state) {
+    case (.error(let message), _), (_, .error(let message)):
+      GrowthFailureCard(message: message) {
+        Task { await reload() }
       }
-      Spacer(minLength: 0)
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.MeetPR.brandRedSoft)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay {
-      RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.brandRed.opacity(0.3), lineWidth: 1)
+    case (.loaded, .loaded):
+      loadedContent
+    default:
+      GrowthScreenSkeleton()
     }
   }
 
-  private func prWhen(_ date: Date) -> String {
-    if Calendar.current.isDateInToday(date) { return "今天" }
-    return StudentFormatting.dayMonthFormatter.string(from: date)
-  }
-
-  // MARK: - e1RM lift charts
-
-  private var liftCharts: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      // 首屏黑话有解释 (P2-1): E1RM 是全 app 最高频的专业词,给一句白话锚点,
-      // 别让新手对着首字母缩写猜。放段首出现一次,不逐卡重复。
-      Text("E1RM = 用你完成的组数估算的单次最大重量")
-        .font(.system(size: 12))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-        .frame(maxWidth: .infinity, alignment: .leading)
+  private var loadedContent: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
       ForEach(MainLiftExerciseFamilyResolver.dashboardFamilies, id: \.self) { family in
-        liftChartCard(family)
-      }
-    }
-  }
-
-  private func liftChartCard(_ family: LiftFamily) -> some View {
-    let row = trendRow(for: family)
-    let now = Date()
-    let displayPoint = row?.displayPoint(now: now)
-    return VStack(alignment: .leading, spacing: 0) {
-      HStack(alignment: .bottom) {
-        VStack(alignment: .leading, spacing: 0) {
-          Text("\(family.studentDisplayName) E1RM · \(chartPeriodLabel(for: row, now: now))")
-            .font(Font.MeetPR.monoLabel)
-            .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
-          HStack(alignment: .lastTextBaseline, spacing: 6) {
-            Text(displayPoint.map { StudentFormatting.kilograms($0.e1RMKg) } ?? "—")
-              .font(.system(size: 40, weight: .heavy).monospacedDigit())
-              .foregroundStyle(Color.MeetPR.fgPrimary)
-            Text("KG")
-              .font(.system(size: 15, weight: .heavy))
-              .foregroundStyle(Color.MeetPR.brandRed)
-          }
-          .padding(.top, 4)
-        }
-        Spacer()
-        if let row, let deltaKg = row.trendDeltaKg {
-          let delta = deltaLabel(deltaKg)
-          Text(delta.text)
-            .font(.system(size: 13, design: .monospaced))
-            .foregroundStyle(delta.color)
-        }
-      }
-      if let row, !row.points.isEmpty || !row.rawEligiblePoints.isEmpty {
-        e1rmChart(row)
-          .padding(.top, 12)
-      } else {
-        Text("练几次就有趋势了")
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
-          .padding(.top, 12)
-      }
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
-  }
-
-  private func e1rmChart(_ row: DashboardE1RMTrendRow) -> some View {
-    E1RMChart(
-      smoothed: row.smoothedSamples.map { sample in
-        E1RMChartPoint(
-          id: sample.sampleID,
-          date: sample.date,
-          e1RMKg: sample.valueKg,
-          origin: chartOrigin(sample.winnerOrigin),
-          confidence: chartConfidence(sample.winnerConfidence),
-          winnerPointID: sample.winnerPointID,
-          marksRecord: sample.sampleID == sample.winnerPointID
-        )
-      },
-      rawEligible: row.rawEligiblePoints.compactMap { point in
-        guard point.confidence == .low else { return nil }
-        return E1RMChartPoint(
-          id: point.id,
-          date: point.computedAt,
-          e1RMKg: point.e1RMKg,
-          origin: chartOrigin(point.origin),
-          confidence: chartConfidence(point.confidence)
+        GrowthE1RMCard(
+          snapshot: snapshot(for: family),
+          range: range(for: family),
+          onCycleRange: { cycleRange(for: family) }
         )
       }
-    )
-    .frame(height: 140)
-  }
 
-  private func chartPeriodLabel(for row: DashboardE1RMTrendRow?, now: Date) -> String {
-    row?.displaysHistoricalBest(now: now) == true
-      ? "历史最佳" : "\(DashboardE1RMTrendViewModel.chartWindowDays) 天"
-  }
+      GrowthSectionLabel("E1RM vs 训练 1RM")
+        .padding(.top, MeetPRSpacing.space2)
+      GrowthComparisonCard(presentation: comparison)
 
-  private func chartOrigin(_ origin: E1RMPointOrigin) -> E1RMChartPointOrigin {
-    switch origin {
-    case .logged: .logged
-    case .imported: .imported
-    }
-  }
+      GrowthSectionLabel("教练反馈记录")
+        .padding(.top, MeetPRSpacing.space2)
+      feedbackEntry
 
-  private func chartConfidence(_ confidence: E1RMConfidence) -> E1RMChartPointConfidence {
-    switch confidence {
-    case .normal: .normal
-    case .low: .low
-    }
-  }
+      GrowthSectionLabel("全部历史")
+        .padding(.top, MeetPRSpacing.space2)
+      GrowthHistoryStatsCard(stats: stats)
 
-  // MARK: - Coach feedback history
-
-  @ViewBuilder
-  private var feedbackSection: some View {
-    if let items = feedbackItems, !items.isEmpty {
-      VStack(alignment: .leading, spacing: 8) {
-        sectionLabel("教练反馈记录")
-        VStack(spacing: 0) {
-          ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-            if index > 0 {
-              Rectangle().fill(Color.MeetPR.border).frame(height: 1)
-            }
-            NavigationLink {
-              FeedbackDetailView(item: item, viewModel: feedbackViewModel)
-                .task { await feedbackViewModel?.markRead(item) }
-            } label: {
-              feedbackRow(item)
-            }
-            .buttonStyle(.plain)
-          }
-        }
-        .background(Color.MeetPR.surface1)
-        .clipShape(.rect(cornerRadius: 12))
-        .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
-      }
-    }
-  }
-
-  private func feedbackRow(_ item: CoachFeedback) -> some View {
-    HStack(alignment: .top, spacing: 10) {
-      if item.readAt == nil {
-        Circle().fill(Color.MeetPR.brandRed).frame(width: 6, height: 6).padding(.top, 6)
-      }
-      VStack(alignment: .leading, spacing: 4) {
-        Text(feedbackTitle(item))
-          .font(Font.MeetPR.monoLabel)
-          .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Text(item.text)
-          .font(.system(size: 13))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .lineLimit(1)
-          .frame(maxWidth: .infinity, alignment: .leading)
-      }
-      Text(StudentFormatting.dayMonthFormatter.string(from: item.postedAt))
-        .font(Font.MeetPR.monoLabel)
-        .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-    }
-    .padding(14)
-  }
-
-  private func feedbackTitle(_ item: CoachFeedback) -> String {
-    let date = item.dayDate ?? item.postedAt
-    var title = GrowthFormat.shortWeekday.string(from: date)
-    if let dayDate = item.dayDate, let family = planFamily(on: dayDate) {
-      title += " · \(family.studentDisplayName)"
-    }
-    return title
-  }
-
-  // MARK: - All-history stats
-
-  private var allHistorySection: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      sectionLabel("全部历史")
-      HStack {
-        stat("训练次数", value: sessionCountText)
-        stat("训练周", value: "\(weekCount)")
-        stat("三大项合计", value: sbdTotalText)
-      }
-      .padding(16)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
-    }
-  }
-
-  private func stat(_ label: String, value: String) -> some View {
-    VStack(alignment: .leading, spacing: 2) {
-      Text(label).font(.system(size: 11)).foregroundStyle(Color.MeetPR.fgTertiary)
-      Text(value)
-        .font(.system(size: 28, weight: .heavy).monospacedDigit())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-  }
-
-  // MARK: - Detailed history entry
-
-  private var detailedHistoryButton: some View {
-    Button {
-      Analytics.shared.progressViewed(.history)
-      showsAllHistory = true
-    } label: {
-      HStack(spacing: 12) {
-        Image(systemName: "clock").font(.system(size: 20)).foregroundStyle(Color.MeetPR.fgSecondary)
-        VStack(alignment: .leading, spacing: 2) {
-          Text("全部训练历史").font(.system(size: 15)).foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("按周 / 月查看 · 含每组数据")
-            .font(.system(size: 12)).foregroundStyle(Color.MeetPR.fgTertiary)
-        }
-        Spacer()
-        Image(systemName: "chevron.right").font(.system(size: 14)).foregroundStyle(
-          Color.MeetPR.fgTertiary)
-      }
-      .padding(16)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
-    }
-    .buttonStyle(.plain)
-  }
-
-  // MARK: - Volume / intensity (preserved analytic)
-
-  @ViewBuilder
-  private var volumeIntensitySection: some View {
-    let buckets = ProgressMetrics.weeklyVolumeIntensity(from: loadedLogs)
-    if !buckets.isEmpty {
-      VStack(alignment: .leading, spacing: 8) {
-        sectionLabel("容量 / 强度")
-        VolumeIntensityChart(buckets: buckets)
-      }
-    }
-  }
-
-  private func sectionLabel(_ text: String) -> some View {
-    Text(text)
-      .font(Font.MeetPR.monoLabel)
-      .tracking(Font.MeetPR.monoLabelTracking)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
-  }
-
-  /// Repo-failure surface for the weeks/logs load (restores the old
-  /// `.error` ContentUnavailableView behavior — never silently show 0 stats).
-  private func failureCard(_ message: String) -> some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Label("加载失败", systemImage: "exclamationmark.triangle")
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.amber)
-      Text(message)
-        .font(.system(size: 14))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-        .frame(maxWidth: .infinity, alignment: .leading)
       Button {
-        Task { await viewModel.load(studentID: studentID) }
+        Analytics.shared.progressViewed(.history)
+        showsAllHistory = true
       } label: {
-        Text("重试")
-          .font(Font.MeetPR.bodyEmphasis)
-          .foregroundStyle(Color.MeetPR.brandRed)
+        GrowthNavigationCard(
+          icon: "clock",
+          title: "全部训练历史",
+          subtitle: "按周 / 月查看 · 含每组数据"
+        )
       }
       .buttonStyle(.plain)
-      .padding(.top, 4)
+      .accessibilityHint("打开训练历史列表")
+
+      GrowthSectionLabel("容量 / 强度")
+        .padding(.top, MeetPRSpacing.space2)
+      VolumeIntensityChart(
+        buckets: chartBuckets,
+        isUnlocked: stats.unlocksTrends
+      )
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(16)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
   }
 
-  // MARK: - Derived data
+  @ViewBuilder
+  private var feedbackEntry: some View {
+    if let feedbackViewModel {
+      NavigationLink {
+        FeedbackInboxView(studentID: studentID, viewModel: feedbackViewModel)
+      } label: {
+        GrowthNavigationCard(
+          icon: "bubble.left",
+          title: "全部教练反馈",
+          subtitle: "共 \(feedbackCount) 条 · 含视频回放"
+        )
+      }
+      .buttonStyle(.plain)
+    } else {
+      GrowthNavigationCard(
+        icon: "bubble.left",
+        title: "全部教练反馈",
+        subtitle: "暂无反馈数据"
+      )
+    }
+  }
 
-  private var loadedWeeks: [TrainingHistoryViewModel.HistoryWeek] {
-    if case .loaded(let weeks, _) = viewModel.state { return weeks }
-    return []
+  private var comparison: GrowthComparisonPresentation {
+    GrowthComparisonPresentation.make(
+      snapshots: MainLiftExerciseFamilyResolver.dashboardFamilies.map(snapshot(for:)),
+      onboarding: currentOnboarding
+    )
+  }
+
+  private var stats: GrowthHistoryStats {
+    GrowthScreenPresentation.historyStats(logs: loadedLogs)
+  }
+
+  private var chartBuckets: [WeeklyProgressMetric] {
+    GrowthScreenPresentation.chartBuckets(logs: loadedLogs)
   }
 
   private var loadedLogs: [StudentSetLog] {
-    if case .loaded(_, let logs) = viewModel.state { return logs }
-    return []
+    guard case .loaded(_, let logs) = viewModel.state else { return [] }
+    return logs
   }
 
-  private var trendPresentation: DashboardE1RMTrendPresentation? {
-    if case .loaded(let presentation) = trendViewModel.state { return presentation }
-    return nil
-  }
-
-  private func trendRow(for family: LiftFamily) -> DashboardE1RMTrendRow? {
-    trendPresentation?.rows.first { $0.family == family }
-  }
-
-  private func deltaLabel(_ kilograms: Double) -> (text: String, color: Color) {
-    let sign = kilograms >= 0 ? "+" : "−"
-    let color =
-      kilograms > 0
-      ? Color.MeetPR.green : (kilograms < 0 ? Color.MeetPR.brandRed : Color.MeetPR.fgSecondary)
-    return ("\(sign)\(StudentFormatting.kilograms(abs(kilograms))) KG", color)
-  }
-
-  private var feedbackItems: [CoachFeedback]? {
+  private var feedbackCount: Int {
     guard let feedbackViewModel, case .loaded(let items) = feedbackViewModel.state else {
-      return nil
+      return 0
     }
-    return items.sorted { $0.postedAt > $1.postedAt }
+    return items.count
   }
 
-  /// Distinct calendar days on which at least one set was completed.
-  private var sessionCountText: String {
-    "\(Self.completedSessionCount(logs: loadedLogs, calendar: .current))"
+  private func snapshot(for family: LiftFamily) -> GrowthCurveSnapshot {
+    snapshots[family] ?? .empty(family: family)
   }
 
-  static func completedSessionCount(
-    logs: [StudentSetLog],
-    calendar: Calendar
-  ) -> Int {
-    Set(
-      logs.filter { $0.completed && !$0.assumed }
-        .map { calendar.startOfDay(for: $0.loggedAt) }
-    ).count
+  private func range(for family: LiftFamily) -> GrowthTimeRange {
+    ranges[family] ?? .ninetyDays
   }
 
-  private var weekCount: Int { loadedWeeks.count }
-
-  /// SBD e1RM total — sum of the latest squat / bench / deadlift e1RM. Shown
-  /// only when all three lifts have data (a partial sum would misrepresent a
-  /// "total"). Replaces a fabricated PR count — the repo exposes no total-PR API.
-  private var sbdTotalText: String {
-    guard let rows = trendPresentation?.rows else { return "—" }
-    let values = MainLiftExerciseFamilyResolver.dashboardFamilies.compactMap { family in
-      rows.first { $0.family == family }?.displayPoint(now: Date())?.e1RMKg
-    }
-    guard values.count == 3 else { return "—" }
-    return StudentFormatting.kilograms(values.reduce(0, +))
+  private func cycleRange(for family: LiftFamily) {
+    let all = GrowthTimeRange.allCases
+    let current = range(for: family)
+    let currentIndex = all.firstIndex(of: current) ?? 0
+    ranges[family] = all[(currentIndex + 1) % all.count]
+    refreshSnapshot(for: family)
   }
-
-  private func planFamily(on date: Date) -> LiftFamily? {
-    for week in loadedWeeks {
-      if let day = week.days.first(where: { Calendar.current.isDate($0.date, inSameDayAs: date) }) {
-        return day.exercises.compactMap {
-          resolveCompetitionFamily(exercise: $0.exercise, onboarding: currentOnboarding)
-        }.first
-      }
-    }
-    return nil
-  }
-
-  private func familyForExercise(_ exerciseId: UUID) -> LiftFamily? {
-    for week in loadedWeeks {
-      for day in week.days {
-        for slot in day.exercises where slot.exercise.id == exerciseId {
-          return resolveCompetitionFamily(
-            exercise: slot.exercise,
-            onboarding: currentOnboarding
-          )
-        }
-      }
-    }
-    return nil
-  }
-
-  // MARK: - Loading
 
   private func loadIfNeeded() async {
     currentOnboarding = try? await onboarding?.fetchProfile(studentId: studentID)
     if viewModel.state == .idle {
       await viewModel.load(studentID: studentID)
     }
-    if trendViewModel.state == .idle {
-      await trendViewModel.load(studentID: studentID)
+    if growthViewModel.state == .idle {
+      await growthViewModel.load(studentID: studentID)
     }
+    adoptInitialRangesIfNeeded()
+    refreshSnapshots()
     if let feedbackViewModel, feedbackViewModel.state == .idle {
       await feedbackViewModel.load(studentID: studentID)
     }
-    let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
-    prEvent = prs.max { $0.occurredAt < $1.occurredAt }
-    prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
   }
 
-  private func reloadAfterImportedHistoryChange() async {
+  private func reload() async {
     currentOnboarding = try? await onboarding?.fetchProfile(studentId: studentID)
     await viewModel.load(studentID: studentID)
-    await trendViewModel.load(studentID: studentID)
-    let prs = (try? await e1rm.unacknowledgedPRs(studentId: studentID)) ?? []
-    prEvent = prs.max { $0.occurredAt < $1.occurredAt }
-    prFamily = prEvent.flatMap { familyForExercise($0.exerciseId) }
+    await growthViewModel.load(studentID: studentID)
+    adoptInitialRangesIfNeeded()
+    refreshSnapshots()
+    if let feedbackViewModel {
+      await feedbackViewModel.load(studentID: studentID)
+    }
+  }
+
+  static func completedSessionCount(
+    logs: [StudentSetLog],
+    calendar: Calendar
+  ) -> Int {
+    GrowthScreenPresentation.historyStats(logs: logs, calendar: calendar)
+      .trainingSessionCount
+  }
+
+  private func refreshSnapshots() {
+    for family in MainLiftExerciseFamilyResolver.dashboardFamilies {
+      refreshSnapshot(for: family)
+    }
+  }
+
+  private func adoptInitialRangesIfNeeded() {
+    guard ranges.isEmpty, growthViewModel.state == .loaded else { return }
+    let initialRange = GrowthTimeRange(timeWindow: growthViewModel.selectedWindow)
+    for family in MainLiftExerciseFamilyResolver.dashboardFamilies {
+      ranges[family] = initialRange
+    }
+  }
+
+  private func refreshSnapshot(for family: LiftFamily) {
+    snapshots[family] = GrowthScreenPresentation.snapshot(
+      from: growthViewModel,
+      family: family,
+      range: range(for: family)
+    )
   }
 }
 
-/// The pushed "detailed history" screen — owns the exercise-filter selection and
-/// wraps the existing week/set `HistoryEntriesView`.
+@available(iOS 17.0, macOS 14.0, *)
+private struct GrowthScreenHeader: View {
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
+      MeetPRMark(size: 44)
+        .frame(width: 92, height: MeetPRFontMetrics.size16, alignment: .leading)
+        .clipped()
+      Text("成长")
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text("E1RM ＝ 用你完成的组数估算的单次最大重量")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textFaint)
+        .padding(.top, -MeetPRSpacing.space2)
+    }
+    .accessibilityElement(children: .combine)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct GrowthSectionLabel: View {
+  let text: String
+
+  init(_ text: String) {
+    self.text = text
+  }
+
+  var body: some View {
+    Text(text)
+      .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+      .foregroundStyle(Color.MeetPR.textSecondary)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct GrowthComparisonCard: View {
+  let presentation: GrowthComparisonPresentation
+
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.point15) {
+      HStack(alignment: .bottom) {
+        total(
+          title: "三项 E1RM 合计",
+          value: presentation.estimatedTotalKg.map(Self.weight) ?? "—",
+          color: Color.MeetPR.textPrimary,
+          alignment: .leading
+        )
+        Rectangle()
+          .fill(Color.MeetPR.borderStrong)
+          .frame(width: 1, height: MeetPRSpacing.point34)
+        total(
+          title: "训练 1RM 合计",
+          value: presentation.trainingTotalKg.map(Self.weight) ?? "—",
+          color: Color.MeetPR.textMuted,
+          alignment: .trailing
+        )
+      }
+
+      ForEach(presentation.rows) { row in
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point5) {
+          HStack {
+            Text(row.family.studentDisplayName)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+            Spacer()
+            Text(rowValue(row))
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.textTertiary)
+          }
+          GeometryReader { proxy in
+            ZStack(alignment: .leading) {
+              Capsule()
+                .fill(Color.MeetPR.bgInset)
+              Capsule()
+                .fill(
+                  LinearGradient(
+                    colors: [Color.MeetPR.goldBarDeep, Color.MeetPR.gold500],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                  )
+                )
+                .frame(width: proxy.size.width * row.progress)
+            }
+          }
+          .frame(height: MeetPRSpacing.space2)
+          if row.hasExceededTrainingBaseline, let percentage = row.percentage {
+            Label("已突破训练 1RM · \(percentage)%", systemImage: "checkmark")
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+              .foregroundStyle(Color.MeetPR.success)
+          }
+        }
+      }
+    }
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+  }
+
+  private func total(
+    title: String,
+    value: String,
+    color: Color,
+    alignment: HorizontalAlignment
+  ) -> some View {
+    VStack(alignment: alignment, spacing: MeetPRSpacing.point3) {
+      Text(title)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+        .foregroundStyle(Color.MeetPR.textMuted)
+      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point3) {
+        Text(value)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size28, weight: .bold))
+        Text("kg")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
+      .foregroundStyle(color)
+    }
+    .frame(maxWidth: .infinity, alignment: alignment == .leading ? .leading : .trailing)
+  }
+
+  private func rowValue(_ row: GrowthComparisonRow) -> String {
+    let estimated = row.estimatedOneRepMaxKg.map(Self.weight) ?? "—"
+    let training = row.trainingOneRepMaxKg.map(Self.weight) ?? "—"
+    return "\(estimated) / \(training) kg"
+  }
+
+  private static func weight(_ value: Double) -> String {
+    value.formatted(.number.precision(.fractionLength(1)))
+  }
+
+  private static func weight(_ value: Decimal) -> String {
+    UnitDisplay.plainString(value)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct GrowthHistoryStatsCard: View {
+  let stats: GrowthHistoryStats
+
+  var body: some View {
+    HStack {
+      stat("训练次数", stats.trainingSessionCount.formatted())
+      stat("训练周", stats.trainingWeekCount.formatted())
+      stat(
+        "训练总容量",
+        NSDecimalNumber(decimal: stats.totalVolumeKg).doubleValue.formatted(
+          .number.grouping(.automatic).precision(.fractionLength(0))
+        ),
+        unit: "kg"
+      )
+    }
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+  }
+
+  private func stat(_ label: String, _ value: String, unit: String? = nil) -> some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+      Text(label)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+        .foregroundStyle(Color.MeetPR.textMuted)
+      HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point2) {
+        Text(value)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .minimumScaleFactor(0.65)
+          .lineLimit(1)
+        if let unit {
+          Text(unit)
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textMuted)
+        }
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct GrowthNavigationCard: View {
+  let icon: String
+  let title: String
+  let subtitle: String
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.space3) {
+      Image(systemName: icon)
+        .font(.system(size: MeetPRFontMetrics.size19, weight: .medium))
+        .foregroundStyle(Color.MeetPR.gold500)
+        .frame(width: 40, height: 40)
+        .background(Color.MeetPR.surfaceRaised)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+        Text(title)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(subtitle)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
+      Spacer(minLength: 0)
+      Image(systemName: "chevron.right")
+        .font(.system(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textDim)
+    }
+    .padding(.vertical, MeetPRSpacing.point14)
+    .padding(.horizontal, MeetPRSpacing.point15)
+    .frame(minHeight: 68)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+    .contentShape(Rectangle())
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct GrowthScreenSkeleton: View {
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.point14) {
+      ForEach(0..<3, id: \.self) { _ in
+        RoundedRectangle(cornerRadius: MeetPRRadius.card)
+          .fill(Color.MeetPR.textGhost.opacity(0.3))
+          .frame(height: 220)
+      }
+    }
+    .accessibilityLabel("正在加载成长数据")
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct GrowthFailureCard: View {
+  let message: String
+  let retry: () -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      Label("加载失败", systemImage: "exclamationmark.triangle")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+        .foregroundStyle(Color.MeetPR.dangerMuted)
+      Text(message)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textSecondary)
+      Button("重试", action: retry)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.goldText)
+        .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(MeetPRSpacing.space4)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+  }
+}
+
+/// Existing detailed week/set history retained behind the v3 entry card.
 @available(iOS 17.0, macOS 14.0, *)
 private struct AllHistoryScreen: View {
   let viewModel: TrainingHistoryViewModel
@@ -581,17 +556,8 @@ private struct AllHistoryScreen: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle("训练历史")
   }
 }
-
-private enum GrowthFormat {
-  static let shortWeekday: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "zh_CN")
-    formatter.setLocalizedDateFormatFromTemplate("EEE")
-    return formatter
-  }()
-}
-// swiftlint:enable file_length type_body_length
+// swiftlint:enable file_length

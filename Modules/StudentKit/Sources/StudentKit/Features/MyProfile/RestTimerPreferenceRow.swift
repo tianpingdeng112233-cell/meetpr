@@ -20,23 +20,7 @@ struct RestTimerPreferenceRow: View {
     NavigationLink {
       RestTimerSettingsView(preference: preferenceBinding)
     } label: {
-      HStack(spacing: 12) {
-        VStack(alignment: .leading, spacing: 4) {
-          Text("组间休息")
-            .font(.system(size: 14))
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-          Text(summary)
-            .font(.system(size: 17))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-        }
-        Spacer()
-        Image(systemName: "chevron.right")
-          .font(.system(size: 15))
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-      }
-      .padding(16)
-      .frame(minHeight: 64)
-      .contentShape(Rectangle())
+      MyProfileValueRow(label: "组间休息", value: summary)
     }
     .buttonStyle(.plain)
   }
@@ -52,7 +36,7 @@ struct RestTimerPreferenceRow: View {
   }
 
   private var summary: String {
-    guard let seconds = preference.fixedSeconds else { return "自动(按 RPE)" }
+    guard let seconds = preference.fixedSeconds else { return "自动 (按 RPE)" }
     return "固定 \(Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond)))"
   }
 }
