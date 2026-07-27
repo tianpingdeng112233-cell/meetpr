@@ -87,6 +87,22 @@ public struct TodayWorkoutView: View {
       initialValue: VideoAttachmentViewModel(manager: (videoUploads ?? .demo()).manager))
   }
 
+  init(
+    studentID: UUID,
+    date: Date,
+    plans: any StudentPlanRepository,
+    logs: any StudentTrainingLogRepository,
+    preloadedViewModel: TodayWorkoutViewModel
+  ) {
+    self.init(
+      studentID: studentID,
+      date: date,
+      plans: plans,
+      logs: logs
+    )
+    _viewModel = State(initialValue: preloadedViewModel)
+  }
+
   public var body: some View {
     NavigationStack {
       VStack(spacing: 0) {
@@ -457,7 +473,7 @@ public struct TodayWorkoutView: View {
   ) -> some View {
     let draft = drafts[activeIndex]
     let rowIndex = activeIndex
-    let setNumber = setNumber(for: draft, in: drafts)
+    let setNumber = setNumber(for: draft)
     let totalSets = totalSets(for: draft.planExerciseID, in: drafts)
     let exerciseNote = exerciseNote(for: draft.planExerciseID, in: day)
     return VStack(alignment: .leading, spacing: 0) {
@@ -468,6 +484,7 @@ public struct TodayWorkoutView: View {
         Text("\(setNumber)/\(totalSets)")
           .font(.system(size: 15, weight: .bold).monospacedDigit())
           .foregroundStyle(Color.MeetPR.fgSecondary)
+          .accessibilityIdentifier("todayWorkout.activeSet.position")
       }
 
       heroTargetRow(draft: draft)
@@ -692,6 +709,7 @@ public struct TodayWorkoutView: View {
     return LazyVGrid(columns: columns, spacing: 0) {
       Text("\(setNumber)")
         .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
+        .accessibilityIdentifier("todayWorkout.set.\(draft.id.uuidString).number")
       Text(weightText(draft)).fontWeight(active ? .bold : .regular).foregroundStyle(foreground)
       Text(repsText(draft)).foregroundStyle(foreground)
       Text(rpeText(draft)).foregroundStyle(foreground)
@@ -864,12 +882,8 @@ public struct TodayWorkoutView: View {
     drafts.filter { $0.planExerciseID == planExerciseID }.count
   }
 
-  private func setNumber(
-    for draft: TodayWorkoutViewModel.SetRowDraft,
-    in drafts: [TodayWorkoutViewModel.SetRowDraft]
-  ) -> Int {
-    let exerciseRows = drafts.filter { $0.planExerciseID == draft.planExerciseID }
-    return SetDisplayNumber.number(for: draft, in: exerciseRows)
+  private func setNumber(for draft: TodayWorkoutViewModel.SetRowDraft) -> Int {
+    SetDisplayNumber.number(for: draft)
   }
 
   private var restTitle: String {

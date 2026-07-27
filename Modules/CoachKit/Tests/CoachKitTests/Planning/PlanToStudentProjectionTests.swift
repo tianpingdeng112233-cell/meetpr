@@ -39,7 +39,7 @@ import Testing
 
   let outSet = try #require(outExercise.prescribedSets.first)
   #expect(outExercise.prescribedSets.count == 1)
-  #expect(outSet.setIndex == 1)
+  #expect(outSet.setIndex == 0)
   #expect(outSet.weightKg == Decimal(100))
   #expect(outSet.reps == 5)
   #expect(outSet.repsMax == nil)
@@ -179,7 +179,7 @@ import Testing
 
   let outExercise = try #require(view.days.first?.exercises.first)
   #expect(outExercise.prescribedSets.count == 3)
-  #expect(outExercise.prescribedSets.map(\.setIndex) == [1, 2, 3])
+  #expect(outExercise.prescribedSets.map(\.setIndex) == [0, 1, 2])
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -271,7 +271,7 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-private enum ProjFixtures {
+enum ProjFixtures {
   static let now = Date(timeIntervalSince1970: 1_766_630_400)
   static let planID = uuid(1)
   static let traineeID = uuid(2)

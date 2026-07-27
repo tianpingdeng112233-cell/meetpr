@@ -49,7 +49,7 @@ struct CoachDayDetailView: View {
         } else {
           ForEach(logs) { log in
             SetReadOnlyCell(
-              setNumber: log.setIndex,
+              setIndex: log.setIndex,
               weightKg: log.weightKg,
               reps: log.reps,
               rpe: log.rpe,
@@ -69,7 +69,7 @@ struct CoachDayDetailView: View {
           .foregroundStyle(Color.MeetPR.fgPrimary)
         ForEach(day.logs) { log in
           SetReadOnlyCell(
-            setNumber: log.setIndex,
+            setIndex: log.setIndex,
             weightKg: log.weightKg,
             reps: log.reps,
             rpe: log.rpe,

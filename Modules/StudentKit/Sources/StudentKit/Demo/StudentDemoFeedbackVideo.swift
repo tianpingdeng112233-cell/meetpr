@@ -17,7 +17,7 @@ func demoFeedbackVideo(id: UUID, loggedAt: Date) -> CoachFeedbackVideo {
   CoachFeedbackVideo(
     id: id,
     exerciseName: "低杠位深蹲",
-    setIndex: 1,
+    setIndex: 0,
     weightKg: "125.00",
     reps: 5,
     loggedAt: loggedAt
