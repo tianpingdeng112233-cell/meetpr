@@ -12,6 +12,10 @@ public struct DayDetailView: View {
     self.logs = logs
   }
 
+  static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
+    "第 \(SetIndexDisplay.number(forZeroBasedIndex: setIndex)) 组"
+  }
+
   public var body: some View {
     Group {
       if day.exercises.isEmpty {
@@ -49,7 +53,7 @@ public struct DayDetailView: View {
         }
         HStack {
           VStack(alignment: .leading, spacing: 2) {
-            Text("第 \(set.setIndex + 1) 组")
+            Text(Self.setLabel(forZeroBasedIndex: set.setIndex))
               .font(.subheadline)
               .foregroundStyle(Color.MeetPR.fgSecondary)
             if let coachNote = CoachNoteDisplay.text(set.coachNote) {

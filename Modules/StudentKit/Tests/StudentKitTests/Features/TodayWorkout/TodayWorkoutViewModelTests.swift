@@ -138,6 +138,7 @@ import Testing
     planExerciseID: recordedDrafts[0].planExerciseID
   )
   #expect(recordedLogs.count == 1)
+  #expect(recordedLogs[0].setIndex == 0)
   #expect(recordedLogs[0].reps == 4)
 
   await viewModel.load(date: plan.days[0].date, studentID: studentID)

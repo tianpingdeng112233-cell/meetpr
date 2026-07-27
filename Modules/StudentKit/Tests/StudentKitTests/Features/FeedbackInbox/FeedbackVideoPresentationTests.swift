@@ -4,21 +4,19 @@ import Testing
 
 @testable import StudentKit
 
-/// `set_logs.set_index` is already 1-based on the wire, and plan-web renders the
-/// same field verbatim — so set 2 must read 第2组 on both ends, not 第3组.
-/// (`SetDisplayNumber` solves the 0-vs-1-based mix by row position, but that
-/// needs the sibling sets; a feedback card only ever holds one clip.)
-@Test func feedbackVideoSummaryPrintsBackendSetNumberVerbatim() {
+/// Feedback serialization returns the zero-based `set_logs.set_index` verbatim;
+/// the card owns the display-boundary conversion.
+@Test func feedbackVideoSummaryDisplaysFirstZeroBasedSetAsOne() {
   let video = CoachFeedbackVideo(
     id: UUID(),
     exerciseName: "暂停深蹲",
-    setIndex: 2,
+    setIndex: 0,
     weightKg: "125.00",
     reps: 5,
     loggedAt: Date()
   )
 
-  #expect(FeedbackVideoPresentation.summary(video) == "暂停深蹲 · 第2组 · 125kg×5次")
+  #expect(FeedbackVideoPresentation.summary(video) == "暂停深蹲 · 第1组 · 125kg×5次")
 }
 
 /// A freely recorded clip has no set log, so every joined field comes back null.
@@ -30,7 +28,7 @@ import Testing
   let nameOnly = CoachFeedbackVideo(id: UUID(), exerciseName: "暂停深蹲")
   #expect(FeedbackVideoPresentation.summary(nameOnly) == "暂停深蹲")
 
-  let noLoad = CoachFeedbackVideo(id: UUID(), exerciseName: "暂停深蹲", setIndex: 3)
+  let noLoad = CoachFeedbackVideo(id: UUID(), exerciseName: "暂停深蹲", setIndex: 2)
   #expect(FeedbackVideoPresentation.summary(noLoad) == "暂停深蹲 · 第3组")
 
   let repsOnly = CoachFeedbackVideo(id: UUID(), exerciseName: "暂停深蹲", reps: 5)

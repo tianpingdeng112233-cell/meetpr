@@ -1,4 +1,5 @@
 import CoreModels
+import DesignSystem
 import Foundation
 
 enum FeedbackVideoAssociation: Equatable, Sendable {
@@ -20,14 +21,14 @@ enum FeedbackVideoPresentation {
   /// Every part is optional and drops out cleanly, so a freely recorded clip
   /// with no set log still gets a usable card instead of "第0组 · kg×次".
   ///
-  /// `setIndex` is rendered as-is: `set_logs.set_index` is already 1-based
-  /// (it is projected from `plan_sets.set_number`, which the database pins to
-  /// `>= 1`), and plan-web prints the same field verbatim. Adding one here
-  /// would show the coach and the student different set numbers for one clip.
+  /// `setIndex` comes from the linked `set_logs.set_index` and remains
+  /// zero-based until this display boundary.
   static func summary(_ video: CoachFeedbackVideo) -> String {
     [
       video.exerciseName,
-      video.setIndex.map { "第\($0)组" },
+      video.setIndex.map {
+        "第\(SetIndexDisplay.number(forZeroBasedIndex: $0))组"
+      },
       load(weightKg: video.weightKg, reps: video.reps),
     ]
     .compactMap { $0 }

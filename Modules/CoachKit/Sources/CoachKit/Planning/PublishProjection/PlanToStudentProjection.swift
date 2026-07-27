@@ -68,7 +68,7 @@ public enum PlanToStudentProjection {
         let prescribed =
           (setsByExercise[planExercise.id] ?? [])
           .sorted { $0.setNumber < $1.setNumber }
-          .map(prescribedSet)
+          .compactMap(prescribedSet)
         return StudentPlanExercise(
           id: planExercise.id,
           exercise: exercise,
@@ -85,11 +85,16 @@ public enum PlanToStudentProjection {
 
   /// Routes the single `intensityMode` value to the matching field (weight XOR
   /// rpe), and carries reps as either a single value or an upper-bound range.
-  private static func prescribedSet(_ planSet: PlanSet) -> PrescribedSet {
+  /// Returns nil for a corrupt planning row (`setNumber < 1`). Clamping instead would fold
+  /// plan sets [0, 1] into execution index [0, 0], and the execution layer keys logs by
+  /// (planExerciseID, setIndex) — two cards would silently share one log and the later set
+  /// would overwrite the earlier. Dropping the corrupt set keeps every legal set's identity.
+  private static func prescribedSet(_ planSet: PlanSet) -> PrescribedSet? {
+    guard planSet.setNumber >= 1 else { return nil }
     let isRange = planSet.targetRepsMax != nil
     return PrescribedSet(
       id: planSet.id,
-      setIndex: planSet.setNumber,
+      setIndex: planSet.setNumber - 1,
       weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
       reps: isRange ? nil : planSet.targetReps,
       repsMax: planSet.targetRepsMax,

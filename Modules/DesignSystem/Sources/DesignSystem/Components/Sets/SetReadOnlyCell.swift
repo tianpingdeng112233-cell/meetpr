@@ -2,20 +2,20 @@ import SwiftUI
 
 @MainActor
 public struct SetReadOnlyCell: View {
-  private let setNumber: Int
+  private let setIndex: Int
   private let weightText: String
   private let repsText: String
   private let rpeText: String
   private let isCompleted: Bool
 
   public init(
-    setNumber: Int,
+    setIndex: Int,
     weightKg: Decimal?,
     reps: Int?,
     rpe: Decimal?,
     isCompleted: Bool
   ) {
-    self.setNumber = setNumber
+    self.setIndex = setIndex
     weightText = weightKg.map { "\(Self.decimalString($0)) kg" } ?? "-"
     repsText = reps.map(String.init) ?? "-"
     rpeText = rpe.map(Self.decimalString) ?? "-"
@@ -24,7 +24,7 @@ public struct SetReadOnlyCell: View {
 
   public var body: some View {
     HStack(spacing: MeetPRSpacing.sm) {
-      Text("#\(setNumber + 1)")
+      Text(Self.setLabel(forZeroBasedIndex: setIndex))
         .font(Font.MeetPR.monoLabel)
         .foregroundStyle(Color.MeetPR.fgSecondary)
         .frame(width: 42, alignment: .leading)
@@ -43,6 +43,10 @@ public struct SetReadOnlyCell: View {
     .background(Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .accessibilityElement(children: .combine)
+  }
+
+  static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
+    "#\(SetIndexDisplay.number(forZeroBasedIndex: setIndex))"
   }
 
   private func metric(title: String, value: String) -> some View {
@@ -79,8 +83,8 @@ public struct SetReadOnlyCell: View {
 
 #Preview {
   VStack(spacing: MeetPRSpacing.sm) {
-    SetReadOnlyCell(setNumber: 0, weightKg: 142.5, reps: 5, rpe: 8, isCompleted: true)
-    SetReadOnlyCell(setNumber: 1, weightKg: nil, reps: nil, rpe: nil, isCompleted: false)
+    SetReadOnlyCell(setIndex: 0, weightKg: 142.5, reps: 5, rpe: 8, isCompleted: true)
+    SetReadOnlyCell(setIndex: 1, weightKg: nil, reps: nil, rpe: nil, isCompleted: false)
   }
   .padding()
   .background(Color.MeetPR.bg)

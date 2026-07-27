@@ -15,6 +15,7 @@ let package = Package(
     .package(path: "../DesignSystem"),
     .package(path: "../Analytics"),
     .package(path: "../ChatUI"),
+    .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
   ],
   targets: [
     .target(
@@ -37,6 +38,7 @@ let package = Package(
         .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "ChatUI", package: "ChatUI"),
+        .product(name: "ViewInspector", package: "ViewInspector"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),

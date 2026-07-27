@@ -10,6 +10,22 @@ import Testing
 // The exercise-level note (PlanExercise.notes, the web 备注 column) must
 // survive the same projection onto StudentPlanExercise.notes.
 
+@Test func studentProjectionDropsCorruptZeroSetNumber() throws {
+  // Dropping, not clamping: a clamp folds plan sets [0, 1] onto execution index 0 and the
+  // (planExerciseID, setIndex) log key would make two cards share one log. See the CoachKit
+  // twin test for the coexistence case; this fixture builder carries a single set, so here
+  // the corrupt set must simply vanish rather than masquerade as the first set.
+  let fixture = projectionFixture(setNumber: 0)
+
+  let view = StudentPlanProjection.project(
+    tree: fixture.tree,
+    catalog: [fixture.catalogExercise],
+    weekIndex: 1
+  )
+
+  #expect(view.days.first?.exercises.first?.prescribedSets.isEmpty == true)
+}
+
 // swiftlint:disable:next function_body_length
 @Test func projectionCarriesCoachNoteOntoPrescribedSet() throws {
   let planID = UUID()
@@ -87,6 +103,75 @@ import Testing
 
   let prescribed = projectedExercise.prescribedSets
   #expect(prescribed.count == 2)
+  #expect(prescribed.map(\.setIndex) == [0, 1])
   #expect(prescribed[0].coachNote == "70%top")
   #expect(prescribed[1].coachNote == nil)
+}
+
+// swiftlint:disable:next function_body_length
+private func projectionFixture(
+  setNumber: Int
+) -> (tree: TrainingPlanTree, catalogExercise: Exercise) {
+  let planID = UUID()
+  let dayID = UUID()
+  let planExerciseID = UUID()
+  let catalogID = UUID()
+  let timestamp = Date(timeIntervalSince1970: 1_777_248_000)
+  let plan = TrainingPlan(
+    id: planID,
+    coachID: UUID(),
+    traineeID: UUID(),
+    name: "防御测试计划",
+    startDate: timestamp,
+    endDate: timestamp.addingTimeInterval(604_800),
+    planWeeks: 1,
+    source: .coach,
+    status: .published,
+    createdAt: timestamp,
+    updatedAt: timestamp
+  )
+  let day = PlanDay(
+    id: dayID,
+    planID: planID,
+    dayOfWeek: 1,
+    weekNumber: 1,
+    sortOrder: 0
+  )
+  let planExercise = PlanExercise(
+    id: planExerciseID,
+    planDayID: dayID,
+    exerciseID: catalogID,
+    isMainLift: true,
+    sortOrder: 0
+  )
+  let planSet = PlanSet(
+    id: UUID(),
+    planExerciseID: planExerciseID,
+    setNumber: setNumber,
+    targetReps: 5,
+    intensityMode: .weight,
+    targetValue: 100,
+    setType: .working,
+    createdAt: timestamp
+  )
+  let catalogExercise = Exercise(
+    id: catalogID,
+    name: "低杆深蹲",
+    exerciseType: .mainLift,
+    mainLiftFamily: .squat,
+    isCompetitionLift: true,
+    muscleGroups: [.quad],
+    equipment: [.barbell],
+    movementPattern: [.squat],
+    createdAt: timestamp
+  )
+  return (
+    TrainingPlanTree(
+      plan: plan,
+      days: [day],
+      exercises: [planExercise],
+      sets: [planSet]
+    ),
+    catalogExercise
+  )
 }

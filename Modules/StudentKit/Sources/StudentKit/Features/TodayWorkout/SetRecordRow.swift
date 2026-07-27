@@ -69,9 +69,8 @@ enum SetRecordResultState: Equatable, Sendable {
 @available(iOS 17.0, macOS 14.0, *)
 struct SetRecordRow: View {
   let draft: TodayWorkoutViewModel.SetRowDraft
-  /// 1-based position within the exercise. Decoupled from the stored setIndex,
-  /// which is 0-based in demo seeds but 1-based from the backend — deriving the
-  /// label from setIndex showed real plans as 2,3,4,5 instead of 1,2,3,4.
+  /// One-based display number derived from the execution domain's zero-based
+  /// `setIndex`.
   let setNumber: Int
   let rowIndex: Int
   let onTap: (Int) -> Void

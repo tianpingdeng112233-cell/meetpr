@@ -7,6 +7,9 @@ let package = Package(
   products: [
     .library(name: "DesignSystem", targets: ["DesignSystem"])
   ],
+  dependencies: [
+    .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0")
+  ],
   targets: [
     .target(
       name: "DesignSystem",
@@ -14,7 +17,10 @@ let package = Package(
     ),
     .testTarget(
       name: "DesignSystemTests",
-      dependencies: ["DesignSystem"],
+      dependencies: [
+        "DesignSystem",
+        .product(name: "ViewInspector", package: "ViewInspector"),
+      ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
   ]
