@@ -116,6 +116,52 @@ import Testing
   }
 }
 
+@Test func staleTokenReplayedAfterAwaitCannotDowngradePendingToken() {
+  var gate = TodayWorkoutAutoStartGate()
+
+  gate.receive(token: 2)
+  // The initial .task resuming after loadWorkout replays its captured token.
+  gate.receive(token: 1)
+
+  #expect(gate.pendingToken == 2)
+
+  let consumed = gate.consumeIfReady(isTargetDateLoaded: true)
+  #expect(consumed)
+  #expect(gate.pendingToken == nil)
+}
+
+@Test func historicalDayAutoStartWaitsForTodayReloadBeforeConsumption() {
+  var gate = TodayWorkoutAutoStartGate()
+
+  gate.receive(token: 1)
+  let consumedWhileHistorical = gate.consumeIfReady(isTargetDateLoaded: false)
+
+  #expect(!consumedWhileHistorical)
+  #expect(gate.pendingToken == 1)
+
+  let consumedAfterTodayReload = gate.consumeIfReady(isTargetDateLoaded: true)
+  let consumedTwice = gate.consumeIfReady(isTargetDateLoaded: true)
+
+  #expect(consumedAfterTodayReload)
+  #expect(gate.pendingToken == nil)
+  #expect(!consumedTwice)
+}
+
+@Test func feedbackHeightReversalStartsFromCurrentPresentation() {
+  #expect(
+    FeedbackHeightTransition.resolvedStartHeight(
+      presentedHeight: 184,
+      fallbackHeight: 320
+    ) == 184
+  )
+  #expect(
+    FeedbackHeightTransition.resolvedStartHeight(
+      presentedHeight: 0,
+      fallbackHeight: 112
+    ) == 112
+  )
+}
+
 @Test func importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() {
   let current = pendingReview(family: .squat)
   let waiting = pendingReview(family: .bench)

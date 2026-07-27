@@ -107,14 +107,14 @@ struct WorkoutCelebrationView: View {
               suffix: nil,
               label: presentation.weekDayLabel
             )
-            .modifier(CompletionSlide(delay: 0.34))
+            .modifier(CompletionSlide(delay: MeetPRMotion.completionSlideDelay(0)))
 
             Rectangle()
               .fill(Color.MeetPR.surfaceRaised)
               .frame(width: 1)
 
             CompletionSetTicker(presentation: presentation)
-              .modifier(CompletionSlide(delay: 0.47))
+              .modifier(CompletionSlide(delay: MeetPRMotion.completionSlideDelay(1)))
           }
           .frame(maxWidth: 300)
           .fixedSize(horizontal: false, vertical: true)
@@ -124,12 +124,12 @@ struct WorkoutCelebrationView: View {
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.textMuted)
             .padding(.top, MeetPRSpacing.point18)
-            .modifier(CompletionSlide(delay: 0.60))
+            .modifier(CompletionSlide(delay: MeetPRMotion.completionSlideDelay(2)))
 
           if let streak = presentation.streak {
             StreakCapsule(streak: streak)
               .padding(.top, MeetPRSpacing.point13)
-              .modifier(CompletionSlide(delay: 0.73))
+              .modifier(CompletionSlide(delay: MeetPRMotion.completionSlideDelay(3)))
           }
 
           VStack(spacing: MeetPRSpacing.point14) {
@@ -279,7 +279,11 @@ private struct CompletionTicker: View {
     ) { context in
       let progress = min(
         1,
-        max(0, context.date.timeIntervalSince(startedAt ?? context.date) / 0.9)
+        max(
+          0,
+          context.date.timeIntervalSince(startedAt ?? context.date)
+            / MeetPRMotion.completionTickerDuration
+        )
       )
       let displayed =
         reduceMotion
@@ -287,11 +291,22 @@ private struct CompletionTicker: View {
         : Int((Double(finalValue) * MeetPRMotion.easeOutQuart(progress)).rounded())
       Text(displayed.formatted(.number.grouping(.automatic)))
     }
-    .task {
-      guard !reduceMotion else { return }
-      try? await Task.sleep(for: .milliseconds(470))
-      guard !Task.isCancelled else { return }
+    .task(id: reduceMotion) {
+      // Reduce Motion active at appearance latches the final value too.
+      if reduceMotion {
+        startedAt = .distantPast
+        return
+      }
+      guard startedAt == nil else { return }
+      // motion/05 line 67: ticker waits 470ms, then runs 900ms easeOutQuart.
+      try? await Task.sleep(for: .seconds(MeetPRMotion.completionTickerDelay))
+      guard !Task.isCancelled, startedAt == nil else { return }
       startedAt = Date()
+    }
+    .onChange(of: reduceMotion) { _, isOn in
+      // Latch the final value: toggling Reduce Motion back off must not
+      // rewind or replay the ticker.
+      if isOn { startedAt = .distantPast }
     }
     .accessibilityLabel("\(finalValue) 组成功完成")
   }
@@ -321,29 +336,16 @@ private struct StreakCapsule: View {
 private struct CompletionSlide: ViewModifier {
   let delay: TimeInterval
 
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
-  @State private var visible = false
-
   func body(content: Content) -> some View {
+    // motion/05 line 65: each data-slide waits 340+i×130ms, then uses a
+    // 460ms exact easeOutCubic y=26→0 + opacity tween.
     content
-      .opacity(visible || reduceMotion ? 1 : 0)
-      .offset(y: visible || reduceMotion ? 0 : 26)
-      .task {
-        guard !reduceMotion else { return }
-        try? await Task.sleep(for: .seconds(delay))
-        guard !Task.isCancelled else { return }
-        withAnimation(
-          .timingCurve(
-            MeetPRMotion.easeOutX1,
-            MeetPRMotion.easeOutY1,
-            MeetPRMotion.easeOutX2,
-            MeetPRMotion.easeOutY2,
-            duration: 0.46
-          )
-        ) {
-          visible = true
-        }
-      }
+      .meetPRRiseIn(
+        delay: delay,
+        duration: MeetPRMotion.completionSlideDuration,
+        offset: MeetPRMotion.completionSlideOffset,
+        initialScaleY: 1
+      )
   }
 }
 
@@ -356,13 +358,24 @@ private struct CompletionFade: ViewModifier {
   func body(content: Content) -> some View {
     content
       .opacity(visible || reduceMotion ? 1 : 0)
-      .task {
-        guard !reduceMotion else { return }
+      .task(id: reduceMotion) {
+        // Reduce Motion active at appearance latches visibility too.
+        if reduceMotion {
+          visible = true
+          return
+        }
+        guard !visible else { return }
         try? await Task.sleep(for: .seconds(delay))
-        guard !Task.isCancelled else { return }
-        withAnimation(.linear(duration: 0.45)) {
+        guard !Task.isCancelled, !visible else { return }
+        // motion/05 line 70: data-fade elements use a 450ms linear tween.
+        withAnimation(.linear(duration: MeetPRMotion.completionFadeDuration)) {
           visible = true
         }
+      }
+      .onChange(of: reduceMotion) { _, isOn in
+        // Latch visibility so a Reduce Motion round-trip cannot re-hide
+        // content or let the stale sleeping task replay the fade.
+        if isOn { visible = true }
       }
   }
 }

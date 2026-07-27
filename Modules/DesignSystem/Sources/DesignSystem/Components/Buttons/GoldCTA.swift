@@ -92,12 +92,22 @@ public struct GoldCTA: View {
               .stroke(spreadRing.color, lineWidth: spreadRing.spread)
           }
         }
+        .overlay {
+          if isHeld && variant == .primary && colorScheme == .dark {
+            GoldCTAHeldGlow(
+              cornerRadius: cornerRadius,
+              layers: MeetPRVisualEffects.ctaMoldHeld(for: colorScheme)
+            )
+          }
+        }
         .shadow(
           color: shadowColor,
           radius: shadowRadius,
           x: outerShadow?.offsetX ?? 0,
           y: outerShadow?.offsetY ?? 0
         )
+        // motion/01 line 77: held CTA uses `filter:brightness(1.06)`.
+        .brightness(isHeld && variant == .primary ? 0.06 : 0)
     }
     .buttonStyle(
       GoldCTAButtonStyle(isDisabled: isDisabled || isLoading) { pressed in
@@ -158,13 +168,15 @@ public struct GoldCTA: View {
               .padding(.leading, GoldCTAContract.chevronLabelSpacing)
           }
         }
-        .opacity(isHeld ? 0.72 : 1)
+        // motion/01 line 78: primary label opacity 1→.6 while held.
+        .opacity(isHeld && variant == .primary ? 0.6 : 1)
 
         if let sub, variant != .link {
           Text(sub)
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .bold))
             .tracking(0.72)
-            .opacity(isHeld ? 0.42 : 0.72)
+            // motion/01 line 78: subtitle opacity .72→.45 while held.
+            .opacity(isHeld && variant == .primary ? 0.45 : 0.72)
         }
       }
     }
@@ -233,7 +245,11 @@ public struct GoldCTA: View {
   }
 
   private var outerShadow: MeetPRShadowToken? {
-    moldLayers.last(where: { !$0.isInset && $0.blur > 0 })
+    // motion/01 line 76 has one ring plus two glow layers. During the held
+    // state GoldCTAHeldGlow owns both glows; applying `.shadow` here would
+    // render the 74/16 layer a second time.
+    if isHeld && variant == .primary && colorScheme == .dark { return nil }
+    return moldLayers.last(where: { !$0.isInset && $0.blur > 0 })
   }
 
   private var shadowColor: Color {

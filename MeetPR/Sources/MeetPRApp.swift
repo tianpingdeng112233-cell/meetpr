@@ -270,6 +270,21 @@ struct MeetPRApp: App {
     }
   #endif
 
+  private var preferredAppColorScheme: ColorScheme? {
+    guard case .authenticated(let user) = session.state else {
+      // Auth/login and bootstrap keep the v2 dark-only contract.
+      return .dark
+    }
+    switch user.role {
+    case .coach:
+      // CoachKit has no audited light palette yet.
+      return .dark
+    case .coachedStudent, .selfTrainStudent:
+      // Black-gold v3 student roots follow the device appearance.
+      return nil
+    }
+  }
+
   var body: some Scene {
     WindowGroup {
       rootView
@@ -280,10 +295,7 @@ struct MeetPRApp: App {
         .modelContainer(
           draftStore.modelContainer
         )
-        // MeetPR is dark-only in V0.1 (David 2026-06-12: 学员向导的深色为
-        // 全 app 标准): one root-level force instead of per-view sprinkles,
-        // so auth + coach + student render the same palette.
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(preferredAppColorScheme)
     }
   }
 }

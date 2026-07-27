@@ -97,17 +97,28 @@ public enum MeetPRVisualEffects {
         isInset: true
       ),
       MeetPRShadowToken(
-        color: Color.MeetPR.goldRGB.opacity(0.28),
+        // motion/01 line 76: `0 0 0 1.5px rgba(255,210,110,.9)`.
+        color: Color(red: 1, green: 210 / 255, blue: 110 / 255).opacity(0.9),
         offsetX: 0,
         offsetY: 0,
         blur: 0,
-        spread: 4
+        spread: 1.5
       ),
       MeetPRShadowToken(
-        color: Color.MeetPR.goldRGB.opacity(0.45),
+        // motion/01 line 76: `0 0 36px 9px rgba(var(--gold-rgb),.6)`.
+        color: Color.MeetPR.goldRGB.opacity(0.6),
         offsetX: 0,
         offsetY: 0,
-        blur: 30
+        blur: 36,
+        spread: 9
+      ),
+      MeetPRShadowToken(
+        // motion/01 line 76: `0 0 74px 16px rgba(var(--gold-rgb),.28)`.
+        color: Color.MeetPR.goldRGB.opacity(0.28),
+        offsetX: 0,
+        offsetY: 0,
+        blur: 74,
+        spread: 16
       ),
     ]
   }

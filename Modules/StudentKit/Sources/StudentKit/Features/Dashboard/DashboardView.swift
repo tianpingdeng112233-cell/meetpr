@@ -20,6 +20,8 @@ public struct DashboardView: View {
   private let notifications: StudentNotificationsCoordinator?
   private let evaluationNavigationPulse: Int
   private let onStartWorkout: () -> Void
+  private let onStartWorkoutFrameChange: (CGRect) -> Void
+  private let isStartWorkoutHidden: Bool
   private let onSeeAllFeedback: () -> Void
   private let onOpenEvaluation: () -> Void
   private let onPlanChanged: () -> Void
@@ -49,6 +51,8 @@ public struct DashboardView: View {
     notifications: StudentNotificationsCoordinator? = nil,
     evaluationNavigationPulse: Int = 0,
     onStartWorkout: @escaping () -> Void,
+    onStartWorkoutFrameChange: @escaping (CGRect) -> Void = { _ in },
+    isStartWorkoutHidden: Bool = false,
     onSeeAllFeedback: @escaping () -> Void,
     onOpenEvaluation: @escaping () -> Void = {},
     todayReloadToken: Int = 0,
@@ -62,6 +66,8 @@ public struct DashboardView: View {
     self.notifications = notifications
     self.evaluationNavigationPulse = evaluationNavigationPulse
     self.onStartWorkout = onStartWorkout
+    self.onStartWorkoutFrameChange = onStartWorkoutFrameChange
+    self.isStartWorkoutHidden = isStartWorkoutHidden
     self.onSeeAllFeedback = onSeeAllFeedback
     self.onOpenEvaluation = onOpenEvaluation
     self.todayReloadToken = todayReloadToken
@@ -93,6 +99,8 @@ public struct DashboardView: View {
             }
           },
           onStartWorkout: onStartWorkout,
+          onStartWorkoutFrameChange: onStartWorkoutFrameChange,
+          isStartWorkoutHidden: isStartWorkoutHidden,
           onShiftPlan: proposeShiftToday,
           onUndoShift: {
             dayShiftAlert = .confirmCancel(Date())

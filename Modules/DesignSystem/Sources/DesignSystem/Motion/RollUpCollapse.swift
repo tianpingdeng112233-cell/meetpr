@@ -97,10 +97,15 @@ enum MeetPRRollUpSpec {
 public struct RollUpCollapseModifier: @preconcurrency AnimatableModifier {
   public var progress: CGFloat
   private let measuredHeaderHeight: CGFloat?
-  @State private var expandedSize: CGSize = .zero
+  @State private var expandedHeight: CGFloat = 0
 
   public init(isCollapsed: Bool, collapsedHeight: CGFloat? = nil) {
     progress = isCollapsed ? 1 : 0
+    measuredHeaderHeight = collapsedHeight
+  }
+
+  public init(progress: CGFloat, collapsedHeight: CGFloat? = nil) {
+    self.progress = progress
     measuredHeaderHeight = collapsedHeight
   }
 
@@ -110,36 +115,20 @@ public struct RollUpCollapseModifier: @preconcurrency AnimatableModifier {
   }
 
   public func body(content: Content) -> some View {
-    let values = MeetPRRollUpSpec.values(at: progress)
     content
       .background {
         GeometryReader { proxy in
-          Color.clear.preference(key: RollUpSizePreferenceKey.self, value: proxy.size)
+          Color.clear.preference(key: RollUpHeightPreferenceKey.self, value: proxy.size.height)
         }
       }
-      .onPreferenceChange(RollUpSizePreferenceKey.self) { measuredSize in
-        expandedSize = CGSize(
-          width: max(expandedSize.width, measuredSize.width),
-          height: max(expandedSize.height, measuredSize.height)
-        )
+      .onPreferenceChange(RollUpHeightPreferenceKey.self) { measuredHeight in
+        expandedHeight = max(expandedHeight, measuredHeight)
       }
-      .rotation3DEffect(
-        .degrees(values.rotation),
-        axis: (x: 1, y: 0, z: 0),
-        anchor: .top,
-        // CSS `perspective(760px)`: m34 = -1/760 per point. SwiftUI's
-        // dimensionless factor divides by the view's width, so scale it back.
-        perspective: expandedSize.width > 0
-          ? expandedSize.width / MeetPRRollUpSpec.perspectiveDistance
-          : 0.47
-      )
-      .scaleEffect(x: 1, y: values.scaleY, anchor: .top)
-      .opacity(values.opacity)
       .frame(
-        height: expandedSize.height > 0
+        height: expandedHeight > 0
           ? MeetPRRollUpSpec.containerHeight(
             at: progress,
-            expandedHeight: expandedSize.height,
+            expandedHeight: expandedHeight,
             collapsedHeight: measuredHeaderHeight
           )
           : nil,
@@ -149,12 +138,91 @@ public struct RollUpCollapseModifier: @preconcurrency AnimatableModifier {
   }
 }
 
-private struct RollUpSizePreferenceKey: PreferenceKey {
-  static let defaultValue: CGSize = .zero
+struct RollUpBodyModifier: @preconcurrency AnimatableModifier {
+  var progress: CGFloat
+  @State private var expandedWidth: CGFloat = 0
 
-  static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
-    let next = nextValue()
-    value = CGSize(width: max(value.width, next.width), height: max(value.height, next.height))
+  var animatableData: CGFloat {
+    get { progress }
+    set { progress = newValue }
+  }
+
+  func body(content: Content) -> some View {
+    let values = MeetPRRollUpSpec.values(at: progress)
+    content
+      .background {
+        GeometryReader { proxy in
+          Color.clear.preference(key: RollUpWidthPreferenceKey.self, value: proxy.size.width)
+        }
+      }
+      .onPreferenceChange(RollUpWidthPreferenceKey.self) { measuredWidth in
+        expandedWidth = max(expandedWidth, measuredWidth)
+      }
+      .rotation3DEffect(
+        .degrees(values.rotation),
+        axis: (x: 1, y: 0, z: 0),
+        anchor: .top,
+        // CSS `perspective(760px)`: m34 = -1/760 per point. SwiftUI's
+        // dimensionless factor divides by the view's width, so scale it back.
+        perspective: expandedWidth > 0
+          ? expandedWidth / MeetPRRollUpSpec.perspectiveDistance
+          : 0.47
+      )
+      .scaleEffect(x: 1, y: values.scaleY, anchor: .top)
+      .opacity(values.opacity)
+  }
+}
+
+struct RollUpMetaModifier: @preconcurrency AnimatableModifier {
+  var progress: CGFloat
+  @State private var expandedHeight: CGFloat = 0
+
+  var animatableData: CGFloat {
+    get { progress }
+    set { progress = newValue }
+  }
+
+  func body(content: Content) -> some View {
+    let visibleFraction = 1 - min(max(progress, 0), 1)
+    content
+      .background {
+        GeometryReader { proxy in
+          Color.clear.preference(key: RollUpMetaHeightPreferenceKey.self, value: proxy.size.height)
+        }
+      }
+      .onPreferenceChange(RollUpMetaHeightPreferenceKey.self) { measuredHeight in
+        expandedHeight = max(expandedHeight, measuredHeight)
+      }
+      .frame(
+        height: expandedHeight > 0 ? expandedHeight * visibleFraction : nil,
+        alignment: .top
+      )
+      .opacity(visibleFraction)
+      .clipped()
+  }
+}
+
+private struct RollUpHeightPreferenceKey: PreferenceKey {
+  static let defaultValue: CGFloat = 0
+
+  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+    value = max(value, nextValue())
+  }
+}
+
+private struct RollUpWidthPreferenceKey: PreferenceKey {
+  static let defaultValue: CGFloat = 0
+
+  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+    value = max(value, nextValue())
+  }
+}
+
+private struct RollUpMetaHeightPreferenceKey: PreferenceKey {
+  static let defaultValue: CGFloat = 0
+
+  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+    value = max(value, nextValue())
   }
 }
 
@@ -186,6 +254,7 @@ private struct RollUpDispatchModifier: ViewModifier {
         .clipped()
     } else {
       content
+        .modifier(RollUpBodyModifier(progress: isCollapsed ? 1 : 0))
         .modifier(
           RollUpCollapseModifier(isCollapsed: isCollapsed, collapsedHeight: collapsedHeight)
         )

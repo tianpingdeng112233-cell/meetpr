@@ -29,6 +29,10 @@ public struct ExerciseSetRecord: Equatable, Sendable {
 @MainActor
 public struct ExerciseCard: View {
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @State private var rollProgress: CGFloat
+  @State private var showsCollapsedRepresentation: Bool
+  @State private var collapsedHeaderHeight: CGFloat = 0
+  @State private var rollTask: Task<Void, Never>?
 
   let exercise: String
   let meta: String
@@ -57,118 +61,122 @@ public struct ExerciseCard: View {
     self.onToggle = onToggle
     self.onEditSet = onEditSet
     self.onVideoAction = onVideoAction
+    self._rollProgress = State(initialValue: collapsed ? 1 : 0)
+    self._showsCollapsedRepresentation = State(initialValue: collapsed)
   }
 
   public var body: some View {
     ExerciseCardWidthLayout(
-      widthFraction: isOpen ? 1 : ExerciseCardContract.collapsedWidthFraction
+      widthFraction: showsCollapsedRepresentation
+        ? ExerciseCardContract.collapsedWidthFraction
+        : 1
     ) {
+      ZStack(alignment: .top) {
+        expandedCard
+          .modifier(
+            RollUpCollapseModifier(
+              progress: effectiveRollProgress,
+              collapsedHeight: collapsedHeaderHeight
+            )
+          )
+          .allowsHitTesting(!showsCollapsedRepresentation)
+          .accessibilityHidden(showsCollapsedRepresentation)
+
+        collapsedCard
+          .opacity(showsCollapsedRepresentation ? 1 : 0)
+          .allowsHitTesting(showsCollapsedRepresentation)
+          .accessibilityHidden(!showsCollapsedRepresentation)
+          .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+          } action: { height in
+            collapsedHeaderHeight = height
+          }
+      }
+    }
+    // motion/03 line 31: collapsed width uses 280ms
+    // cubic-bezier(.22,.61,.36,1).
+    .animation(
+      reduceMotion
+        ? nil
+        : .timingCurve(
+          MeetPRMotion.easeOutX1,
+          MeetPRMotion.easeOutY1,
+          MeetPRMotion.easeOutX2,
+          MeetPRMotion.easeOutY2,
+          duration: 0.28
+        ),
+      value: showsCollapsedRepresentation
+    )
+    .onChange(of: collapsed) { _, newValue in
+      animateCollapse(to: newValue)
+    }
+    .onChange(of: reduceMotion) { _, newValue in
+      guard newValue else { return }
+      finishRollWithoutAnimation()
+    }
+    .onDisappear {
+      rollTask?.cancel()
+    }
+  }
+
+  private var expandedCard: some View {
+    VStack(spacing: MeetPRSpacing.zero) {
+      exerciseHeader(open: true, rollProgress: effectiveRollProgress)
+
       VStack(spacing: MeetPRSpacing.zero) {
-        header
+        columnHeaders
 
-        if isOpen {
-          VStack(spacing: MeetPRSpacing.zero) {
-            columnHeaders
+        ForEach(sets.indices, id: \.self) { index in
+          let set = sets[index]
+          SetRow(
+            index: set.index,
+            weight: set.weight,
+            reps: set.reps,
+            rpe: set.rpe,
+            status: set.status,
+            videoState: set.videoState,
+            onEdit: { onEditSet(set) },
+            onVideoAction: { onVideoAction(set) }
+          )
+        }
 
-            ForEach(Array(sets.enumerated()), id: \.offset) { _, set in
-              SetRow(
-                index: set.index,
-                weight: set.weight,
-                reps: set.reps,
-                rpe: set.rpe,
-                status: set.status,
-                videoState: set.videoState,
-                onEdit: { onEditSet(set) },
-                onVideoAction: { onVideoAction(set) }
-              )
-            }
-
-            if !note.isEmpty {
-              Text(note)
-                .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-                .foregroundStyle(Color.MeetPR.textSecondary)
-                .lineSpacing(MeetPRSpacing.point7)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, MeetPRSpacing.space4)
-                .padding(.vertical, MeetPRSpacing.point11)
-            }
-          }
-          .transition(.opacity)
+        if !note.isEmpty {
+          Text(note)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textSecondary)
+            .lineSpacing(MeetPRSpacing.point7)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, MeetPRSpacing.space4)
+            .padding(.vertical, MeetPRSpacing.point11)
         }
       }
-      .background(isOpen ? Color.MeetPR.surfaceCard : Color.MeetPR.bgStack)
-      .clipShape(.rect(cornerRadius: ExerciseCardContract.radius))
+      // motion/03 lines 65-69: only `#body` receives the four 3D keyframes.
+      // The header remains stable while the outer height and meta collapse.
+      .modifier(RollUpBodyModifier(progress: effectiveRollProgress))
+    }
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: ExerciseCardContract.expandedRadius))
+    .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
+  }
+
+  private func exerciseHeader(open: Bool, rollProgress: CGFloat = 0) -> some View {
+    ExerciseCardHeader(
+      exercise: exercise,
+      meta: meta,
+      allRecorded: allRecorded,
+      progressText: progressText,
+      summaryText: summaryText,
+      open: open,
+      rollProgress: rollProgress,
+      action: toggle
+    )
+  }
+
+  private var collapsedCard: some View {
+    exerciseHeader(open: false)
+      .background(Color.MeetPR.bgStack)
+      .clipShape(.rect(cornerRadius: ExerciseCardContract.collapsedRadius))
       .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
-    }
-    .animation(reduceMotion ? nil : MeetPRMotion.easeOut, value: isOpen)
-  }
-
-  private var isOpen: Bool {
-    !collapsed
-  }
-
-  private var header: some View {
-    Button(action: toggle) {
-      HStack(spacing: MeetPRSpacing.point11) {
-        RoundedRectangle(cornerRadius: MeetPRRadius.micro)
-          .fill(allRecorded ? Color.MeetPR.success : Color.MeetPR.gold500)
-          .frame(width: MeetPRSpacing.point3)
-          .frame(
-            minHeight: isOpen
-              ? ExerciseCardContract.expandedBarMinimumHeight
-              : ExerciseCardContract.collapsedBarMinimumHeight
-          )
-          .frame(maxHeight: .infinity)
-
-        VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
-          Text(exercise)
-            .font(
-              .MeetPR.display(
-                size: isOpen
-                  ? ExerciseCardContract.expandedNameSize
-                  : ExerciseCardContract.collapsedNameSize
-              )
-            )
-            .foregroundStyle(
-              isOpen
-                ? Color.MeetPR.textPrimary
-                : Color.MeetPR.textSecondary
-            )
-            .lineLimit(1)
-
-          if isOpen {
-            Text(meta)
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-              .foregroundStyle(Color.MeetPR.textMuted)
-              .lineLimit(1)
-          }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-        Text(isOpen ? progressText : summaryText)
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
-          .tracking(isOpen ? 0 : -0.2)
-          .foregroundStyle(allRecorded ? Color.MeetPR.success : Color.MeetPR.textDim)
-          .lineLimit(1)
-          .minimumScaleFactor(0.85)
-          .allowsTightening(true)
-          .layoutPriority(1)
-
-        Text("▾")
-          .font(.MeetPR.system(size: MeetPRFontMetrics.size11))
-          .foregroundStyle(Color.MeetPR.textMuted)
-          .rotationEffect(
-            .degrees(isOpen ? 0 : ExerciseCardContract.collapsedCaretRotation)
-          )
-      }
-      .padding(.horizontal, MeetPRSpacing.space4)
-      .padding(.vertical, MeetPRSpacing.space3)
-      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-      .contentShape(.rect)
-    }
-    .buttonStyle(.plain)
-    .accessibilityLabel("\(exercise)，\(isOpen ? progressText : summaryText)")
-    .accessibilityValue(isOpen ? "已展开" : "已收起")
   }
 
   private var columnHeaders: some View {
@@ -221,8 +229,59 @@ public struct ExerciseCard: View {
   }
 
   private func toggle() {
-    let newValue = !isOpen
-    onToggle(newValue)
+    onToggle(collapsed)
+  }
+
+  private func animateCollapse(to isCollapsed: Bool) {
+    rollTask?.cancel()
+    if reduceMotion {
+      finishRollWithoutAnimation()
+      return
+    }
+
+    if !isCollapsed {
+      // motion/03 lines 48 and 31-32: expanding switches the open DOM
+      // immediately; only width/background retain their CSS transitions.
+      var transaction = Transaction()
+      transaction.animation = nil
+      withTransaction(transaction) {
+        rollProgress = 0
+        showsCollapsedRepresentation = false
+      }
+      return
+    }
+
+    showsCollapsedRepresentation = false
+    var resetTransaction = Transaction()
+    resetTransaction.animation = nil
+    withTransaction(resetTransaction) {
+      rollProgress = 0
+    }
+    // motion/03 lines 64-73: all four roll keyframes and measured height
+    // share 620ms cubic-bezier(.4,0,.2,1).
+    withAnimation(MeetPRMotion.rollUp) {
+      rollProgress = 1
+    }
+    rollTask = Task { @MainActor in
+      try? await Task.sleep(for: .seconds(MeetPRMotion.durationRollUp))
+      guard !Task.isCancelled else { return }
+      showsCollapsedRepresentation = true
+    }
+  }
+
+  private var effectiveRollProgress: CGFloat {
+    reduceMotion ? (collapsed ? 1 : 0) : rollProgress
+  }
+
+  private func finishRollWithoutAnimation() {
+    rollTask?.cancel()
+    rollTask = nil
+    var transaction = Transaction()
+    transaction.animation = nil
+    withTransaction(transaction) {
+      rollProgress = collapsed ? 1 : 0
+      showsCollapsedRepresentation = collapsed
+    }
   }
 
   private static func numberText(_ value: Double) -> String {
@@ -233,6 +292,8 @@ public struct ExerciseCard: View {
 enum ExerciseCardContract {
   static let collapsedWidthFraction: CGFloat = 0.92
   static let radius: CGFloat = 16
+  static let expandedRadius = radius
+  static let collapsedRadius: CGFloat = 14
   static let expandedNameSize: CGFloat = 16
   static let collapsedNameSize: CGFloat = 14
   static let expandedBarMinimumHeight: CGFloat = 26
@@ -316,7 +377,6 @@ private let finishedExerciseSets = [
   .background(Color.MeetPR.bgInset)
   .preferredColorScheme(.dark)
 }
-
 #Preview("ExerciseCard · Expanded + Summary · Light") {
   VStack(spacing: MeetPRSpacing.point10) {
     ExerciseCard(

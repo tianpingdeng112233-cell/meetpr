@@ -19,11 +19,14 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let unreadCount: Int
   let showsNotifications: Bool
   let namespace: Namespace.ID
+  let isLaunchTargetHidden: Bool
+  let launchHeroRevealToken: Int
   @Binding var collapsedExercises: [UUID: Bool]
   let calendarContent: CalendarContent
   let onRefresh: () -> Void
   let onReadiness: () -> Void
   let onNotifications: () -> Void
+  let onHeroFrameChange: (CGRect) -> Void
   let onStart: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
@@ -170,6 +173,9 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         presentation: presentation,
         isEditable: isEditable,
         namespace: namespace,
+        isLaunchTargetHidden: isLaunchTargetHidden,
+        launchHeroRevealToken: launchHeroRevealToken,
+        onFrameChange: onHeroFrameChange,
         onStart: onStart,
         onEdit: onEdit,
         onVideoAction: onVideoAction
@@ -316,6 +322,9 @@ private struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
   let namespace: Namespace.ID
+  let isLaunchTargetHidden: Bool
+  let launchHeroRevealToken: Int
+  let onFrameChange: (CGRect) -> Void
   let onStart: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
@@ -363,6 +372,14 @@ private struct TodayWorkoutHero: View {
       .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
     }
     .matchedGeometryEffect(id: "today-workout-hero", in: namespace)
+    .opacity(isLaunchTargetHidden ? 0 : 1)
+    .onGeometryChange(for: CGRect.self) { proxy in
+      proxy.frame(in: .global)
+    } action: { frame in
+      // The dashboard launch morph targets the auto-start recording hero.
+      // Never publish the taller pre-start list hero as a candidate frame.
+      if presentation.heroMode == .recording { onFrameChange(frame) }
+    }
   }
 
   private var listHero: some View {
@@ -441,11 +458,13 @@ private struct TodayWorkoutHero: View {
           .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
           .foregroundStyle(Color.MeetPR.textPrimary)
           .padding(.bottom, MeetPRSpacing.point3)
+          .launchHeroRise(index: 0, trigger: launchHeroRevealToken)
 
         Text(exercise.reference)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textTertiary)
           .padding(.bottom, MeetPRSpacing.point11)
+          .launchHeroRise(index: 1, trigger: launchHeroRevealToken)
 
         HStack(spacing: MeetPRSpacing.space2) {
           Text(presentation.progress.allDone ? "已完成" : "当前")
@@ -475,6 +494,7 @@ private struct TodayWorkoutHero: View {
           .foregroundStyle(Color.MeetPR.textMuted)
         }
         .padding(.bottom, MeetPRSpacing.point10)
+        .launchHeroRise(index: 2, trigger: launchHeroRevealToken)
 
         HStack(alignment: .bottom, spacing: MeetPRSpacing.point9) {
           Text(row.record.weight.map(numberText) ?? "—")
@@ -498,6 +518,7 @@ private struct TodayWorkoutHero: View {
             .foregroundStyle(Color.MeetPR.textMuted)
             .padding(.bottom, MeetPRSpacing.point9)
         }
+        .launchHeroRise(index: 3, trigger: launchHeroRevealToken)
 
         HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
           Text("目标 RPE")
@@ -512,6 +533,7 @@ private struct TodayWorkoutHero: View {
             .foregroundStyle(Color.MeetPR.textFaint)
         }
         .padding(.top, MeetPRSpacing.space2)
+        .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
 
         if !exercise.note.isEmpty {
           VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
@@ -529,6 +551,7 @@ private struct TodayWorkoutHero: View {
           .background(Color.MeetPR.bgInset)
           .clipShape(.rect(cornerRadius: MeetPRRadius.inset))
           .padding(.top, MeetPRSpacing.point11)
+          .launchHeroRise(index: 5, trigger: launchHeroRevealToken)
         }
 
         if isEditable && !presentation.progress.allDone {
@@ -561,6 +584,7 @@ private struct TodayWorkoutHero: View {
             .accessibilityLabel("记录本组视频")
           }
           .padding(.top, MeetPRSpacing.point13)
+          .launchHeroRise(index: 6, trigger: launchHeroRevealToken)
         }
       }
     }
@@ -578,7 +602,8 @@ private struct TodayWorkoutExerciseList: View {
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
 
   var body: some View {
-    ForEach(exercises) { exercise in
+    ForEach(exercises.indices, id: \.self) { index in
+      let exercise = exercises[index]
       ExerciseCard(
         exercise: exercise.name,
         meta: exercise.reference,
@@ -601,7 +626,27 @@ private struct TodayWorkoutExerciseList: View {
           onVideoAction(row)
         }
       )
+      // motion/04 lines 98-99: after "开始第一组", cards use
+      // base=360ms and step=90ms.
+      .meetPRRiseIn(
+        delay: MeetPRMotion.recordingRevealDelay
+          + (Double(index) * MeetPRMotion.recordingRevealStagger)
+      )
     }
+  }
+}
+
+extension View {
+  fileprivate func launchHeroRise(index: Int, trigger: Int) -> some View {
+    meetPRRiseIn(
+      // motion/01 lines 107-109: child delay is i×55ms.
+      delay: Double(index) * MeetPRMotion.launchHeroChildStagger,
+      duration: MeetPRMotion.launchHeroChildDuration,
+      offset: MeetPRMotion.launchHeroChildOffset,
+      initialScaleY: 1,
+      trigger: trigger,
+      playsInitially: false
+    )
   }
 }
 
@@ -834,7 +879,14 @@ extension View {
       if !isOpen {
         TrainingCalendarCollapsedBar(date: date)
           .padding(.horizontal, MeetPRSpacing.pageHorizontal)
-          .transition(.opacity)
+          // motion/04 lines 101-107: pillIn is 340ms with exact
+          // easeOutCubic, y=-9→0, scaleY=.62→1 and opacity 0→1.
+          .meetPRRiseIn(
+            delay: 0,
+            duration: MeetPRMotion.durationPill,
+            offset: MeetPRMotion.pillInitialOffset,
+            initialScaleY: MeetPRMotion.pillInitialScaleY
+          )
       }
     }
   }

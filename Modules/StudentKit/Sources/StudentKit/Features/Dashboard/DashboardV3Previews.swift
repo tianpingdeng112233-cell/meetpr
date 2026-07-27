@@ -88,6 +88,8 @@
             isFeedbackExpanded: $isFeedbackExpanded,
             onOpenNotifications: {},
             onStartWorkout: {},
+            onStartWorkoutFrameChange: { _ in },
+            isStartWorkoutHidden: false,
             onShiftPlan: {},
             onUndoShift: {}
           )

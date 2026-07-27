@@ -7,6 +7,8 @@ struct DashboardPrimaryAction: View {
   let canShift: Bool
   let isUpdatingShift: Bool
   let onStart: () -> Void
+  let onStartFrameChange: (CGRect) -> Void
+  let isStartHidden: Bool
   let onShift: () -> Void
 
   var body: some View {
@@ -19,6 +21,18 @@ struct DashboardPrimaryAction: View {
         showsShimmer: true,
         action: onStart
       )
+      .onGeometryChange(for: CGRect.self) { proxy in
+        proxy.frame(in: .global)
+      } action: { frame in
+        onStartFrameChange(frame)
+      }
+      .accessibilityRepresentation {
+        Button("开始训练", action: onStart)
+      }
+      // motion/01 line 90: the source CTA is hidden under the gold ghost.
+      .opacity(isStartHidden ? 0 : 1)
+      .allowsHitTesting(!isStartHidden)
+      .accessibilityHidden(isStartHidden)
 
       if canShift {
         GoldCTA(

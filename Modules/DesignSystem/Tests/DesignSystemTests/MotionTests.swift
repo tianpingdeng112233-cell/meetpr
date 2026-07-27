@@ -1,3 +1,4 @@
+import CoreGraphics
 import Testing
 
 @testable import DesignSystem
@@ -6,7 +7,7 @@ import Testing
 struct MotionTests {
   @Test("timing values match the interactive dark mockup")
   func timingValuesMatchInteractiveDarkMockup() {
-    #expect(MeetPRMotion.durationPress == 0.12)
+    #expect(MeetPRMotion.durationPress == 0.13)
     #expect(MeetPRMotion.durationFast == 0.20)
     #expect(MeetPRMotion.durationScreen == 0.28)
     #expect(MeetPRMotion.durationSheet == 0.34)
@@ -22,6 +23,74 @@ struct MotionTests {
     #expect(MeetPRMotion.sparkStagger == 0.018)
     #expect(MeetPRMotion.riseInitialDelay == 0.02)
     #expect(MeetPRMotion.riseStagger == 0.04)
+    #expect(MeetPRMotion.recordingRevealDelay == 0.36)
+    #expect(MeetPRMotion.recordingRevealStagger == 0.09)
+    #expect(MeetPRMotion.launchExitDuration == 0.20)
+    #expect(MeetPRMotion.launchSwitchDelay == 0.14)
+    #expect(MeetPRMotion.launchMorphDuration == 0.42)
+    #expect(MeetPRMotion.launchGhostFadeDuration == 0.20)
+    #expect(MeetPRMotion.launchHeroChildDuration == 0.22)
+    #expect(MeetPRMotion.launchHeroChildStagger == 0.055)
+    #expect(MeetPRMotion.feedbackExpandDuration == 0.38)
+    #expect(MeetPRMotion.feedbackCollapseDuration == 0.28)
+    #expect(MeetPRMotion.feedbackItemDuration == 0.20)
+    #expect(MeetPRMotion.feedbackItemInitialDelay == 0.02)
+    #expect(MeetPRMotion.feedbackItemStagger == 0.03)
+    #expect(MeetPRMotion.completionSlideInitialDelay == 0.34)
+    #expect(MeetPRMotion.completionSlideStagger == 0.13)
+    #expect(MeetPRMotion.completionSlideDuration == 0.46)
+    #expect(MeetPRMotion.completionSlideOffset == 26)
+    // motion/05 line 65: 340+i×130ms — the schedule call sites consume.
+    #expect(MeetPRMotion.completionSlideDelay(0) == 0.34)
+    #expect(abs(MeetPRMotion.completionSlideDelay(1) - 0.47) < 1e-9)
+    #expect(abs(MeetPRMotion.completionSlideDelay(2) - 0.60) < 1e-9)
+    #expect(abs(MeetPRMotion.completionSlideDelay(3) - 0.73) < 1e-9)
+    #expect(MeetPRMotion.completionTickerDelay == 0.47)
+    #expect(MeetPRMotion.completionTickerDuration == 0.90)
+  }
+
+  @Test("launch morph geometry follows exact easeOutCubic interpolation")
+  func launchMorphGeometryUsesReferenceTween() {
+    let source = CGRect(x: 20, y: 600, width: 350, height: 62)
+    let destination = CGRect(x: 20, y: 120, width: 350, height: 360)
+    let midpoint = MeetPRLaunchMorphSpec.state(
+      from: source,
+      to: destination,
+      rawProgress: 0.5
+    )
+
+    #expect(midpoint.frame.minX == 20)
+    #expect(midpoint.frame.minY == 180)
+    #expect(midpoint.frame.width == 350)
+    #expect(midpoint.frame.height == 322.75)
+    #expect(midpoint.cornerRadius == 17.5)
+  }
+
+  @Test("launch and feedback detail parameters stay locked to the HTML")
+  func detailedMotionParametersMatchReference() {
+    #expect(MeetPRMotion.launchSourceCornerRadius == 28)
+    #expect(MeetPRMotion.launchDestinationCornerRadius == 16)
+    #expect(MeetPRMotion.launchExitOffset == 26)
+    #expect(MeetPRMotion.launchHeroChildOffset == 9)
+    #expect(MeetPRMotion.riseInitialOffset == 72)
+    #expect(MeetPRMotion.riseInitialScaleY == 0.88)
+    #expect(MeetPRMotion.pillInitialOffset == -9)
+    #expect(MeetPRMotion.pillInitialScaleY == 0.62)
+    #expect(MeetPRMotion.feedbackItemOffset == -8)
+    #expect(MeetPRMotion.feedbackPreviewFadeDuration == 0.05)
+    #expect(MeetPRMotion.feedbackPreviewReturnDelay == 0.09)
+    #expect(MeetPRMotion.feedbackPreviewReturnDuration == 0.18)
+    #expect(MeetPRMotion.feedbackArrowDuration == 0.26)
+    #expect(MeetPRMotion.launchDestinationFadeDuration == 0.28)
+    #expect(MeetPRMotion.launchGhostFadeDuration == 0.20)
+    #expect(MeetPRMotion.completionFadeDuration == 0.45)
+  }
+
+  @Test("feedback height overshoot starts after sixty-two percent and returns to zero")
+  func feedbackOvershootMatchesReferenceSine() {
+    #expect(MeetPRMotion.feedbackOvershoot(at: 0.62) == 0)
+    #expect(abs(MeetPRMotion.feedbackOvershoot(at: 0.81) - 3) < 0.000_001)
+    #expect(abs(MeetPRMotion.feedbackOvershoot(at: 1)) < 0.000_001)
   }
 
   @Test("cubic curves match screen, sheet, and rise transitions")

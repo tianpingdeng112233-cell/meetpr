@@ -14,10 +14,11 @@ struct VisualEffectsTests {
     #expect(dark.map(\.isInset) == [true, true, false])
 
     let darkHeld = MeetPRVisualEffects.ctaMoldHeld(for: .dark)
-    #expect(darkHeld.map(\.offsetY) == [1.5, -2, 0, 0])
-    #expect(darkHeld.map(\.blur) == [0, 3, 0, 30])
-    #expect(darkHeld.map(\.spread) == [0, 0, 4, 0])
-    #expect(darkHeld.map(\.isInset) == [true, true, false, false])
+    // motion/01 line 76: 1.5px ring + 36/9px and 74/16px glows.
+    #expect(darkHeld.map(\.offsetY) == [1.5, -2, 0, 0, 0])
+    #expect(darkHeld.map(\.blur) == [0, 3, 0, 36, 74])
+    #expect(darkHeld.map(\.spread) == [0, 0, 1.5, 9, 16])
+    #expect(darkHeld.map(\.isInset) == [true, true, false, false, false])
 
     let light = MeetPRVisualEffects.ctaMold(for: .light)
     #expect(light.map(\.offsetY) == [6])

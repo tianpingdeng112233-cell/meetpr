@@ -13,12 +13,16 @@ public struct TodayWorkoutView: View {
   private let logs: any StudentTrainingLogRepository
   private let isActive: Bool
   private let jumpToTodayToken: Int
+  private let autoStartToken: Int
+  private let isLaunchTargetHidden: Bool
+  private let launchHeroRevealToken: Int
   private let planRevision: Int
   private var workoutStartedAt: Binding<Date?>
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
   private let onOpenFeedbackNotification: () -> Void
   private let onOpenEvaluationNotification: () -> Void
+  private let onHeroFrameChange: (CGRect) -> Void
   private let onReturnToToday: () -> Void
 
   @State private var viewModel: TodayWorkoutViewModel
@@ -37,6 +41,7 @@ public struct TodayWorkoutView: View {
   @State private var conversationID: UUID?
   @State private var reviewCompleted = false
   @State private var started = false
+  @State private var autoStartGate = TodayWorkoutAutoStartGate()
   @State private var collapsedExercises: [UUID: Bool] = [:]
   @Namespace private var heroNamespace
 
@@ -55,12 +60,16 @@ public struct TodayWorkoutView: View {
     videoUploads: VideoUploadServices? = nil,
     isActive: Bool = true,
     jumpToTodayToken: Int = 0,
+    autoStartToken: Int = 0,
+    isLaunchTargetHidden: Bool = false,
+    launchHeroRevealToken: Int = 0,
     planRevision: Int = 0,
     workoutStartedAt: Binding<Date?> = .constant(nil),
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
     onOpenFeedbackNotification: @escaping () -> Void = {},
     onOpenEvaluationNotification: @escaping () -> Void = {},
+    onHeroFrameChange: @escaping (CGRect) -> Void = { _ in },
     onReturnToToday: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
@@ -68,12 +77,16 @@ public struct TodayWorkoutView: View {
     self.logs = logs
     self.isActive = isActive
     self.jumpToTodayToken = jumpToTodayToken
+    self.autoStartToken = autoStartToken
+    self.isLaunchTargetHidden = isLaunchTargetHidden
+    self.launchHeroRevealToken = launchHeroRevealToken
     self.planRevision = planRevision
     self.workoutStartedAt = workoutStartedAt
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onOpenFeedbackNotification = onOpenFeedbackNotification
     self.onOpenEvaluationNotification = onOpenEvaluationNotification
+    self.onHeroFrameChange = onHeroFrameChange
     self.onReturnToToday = onReturnToToday
     self._selectedDate = State(initialValue: date ?? WorkoutDatePolicy.gymDayToday())
     self._viewModel = State(
@@ -104,6 +117,8 @@ public struct TodayWorkoutView: View {
         unreadCount: notifications?.totalUnreadCount ?? 0,
         showsNotifications: notifications != nil,
         namespace: heroNamespace,
+        isLaunchTargetHidden: isLaunchTargetHidden,
+        launchHeroRevealToken: launchHeroRevealToken,
         collapsedExercises: $collapsedExercises,
         calendarContent: TrainingCalendarView(
           studentID: studentID,
@@ -121,6 +136,7 @@ public struct TodayWorkoutView: View {
         onNotifications: {
           showingNotifications = true
         },
+        onHeroFrameChange: onHeroFrameChange,
         onStart: {
           started = true
         },
@@ -274,6 +290,14 @@ public struct TodayWorkoutView: View {
       if isFirstLoad {
         await loadWorkout(for: selectedDate)
       }
+      // A CTA tap can mount this view with the token already advanced, in
+      // which case onChange(of: autoStartToken) never fires — hand the gate
+      // the current token before consuming, or a cold-start CTA launch
+      // strands the morph waiting for a recording hero that never comes.
+      if autoStartToken > 0 {
+        autoStartGate.receive(token: autoStartToken)
+      }
+      consumePendingAutoStartIfReady()
       await videoViewModel.start(studentID: studentID)
       if isFirstLoad { await surfacePRIfVisible() }
     }
@@ -285,12 +309,20 @@ public struct TodayWorkoutView: View {
       editing = nil
       started = false
       collapsedExercises = [:]
-      Task { await loadWorkout(for: newDate) }
+      Task {
+        await loadWorkout(for: newDate)
+        consumePendingAutoStartIfReady()
+      }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
       if !WorkoutDatePolicy.isEditable(selectedDate) {
         selectedDate = WorkoutDatePolicy.gymDayToday()
       }
+    }
+    .onChange(of: autoStartToken) { _, token in
+      guard token > 0 else { return }
+      autoStartGate.receive(token: token)
+      consumePendingAutoStartIfReady()
     }
     .onChange(of: planRevision) { _, _ in
       editing = nil
@@ -565,6 +597,17 @@ public struct TodayWorkoutView: View {
       reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
     }
     await refreshReadinessStatus(for: date)
+  }
+
+  private func consumePendingAutoStartIfReady() {
+    let targetDateIsLoaded =
+      WorkoutDatePolicy.isEditable(selectedDate)
+      && currentWorkout.map {
+        Calendar.current.isDate($0.day.date, inSameDayAs: selectedDate)
+      } == true
+    if autoStartGate.consumeIfReady(isTargetDateLoaded: targetDateIsLoaded) {
+      started = true
+    }
   }
 
   private func refreshReadinessStatus(for date: Date) async {

@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import Analytics
 import ChatUI
 import CoreModels
@@ -5,6 +6,14 @@ import DesignSystem
 import Foundation
 import RepositoryContracts
 import SwiftUI
+
+private enum LaunchMorphPhase: Equatable {
+  case idle
+  case exitingDashboard
+  case awaitingDestinationFrame
+  case morphing
+  case fadingGhost
+}
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
@@ -31,6 +40,8 @@ public struct StudentRootView: View {
   /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
+  @State private var trainingAutoStartToken = 0
+  @State private var launchHeroRevealToken = 0
   @State private var planRevision = 0
   @State private var nextWorkoutSource: WorkoutSource?
   @State private var workoutStartedAt: Date?
@@ -39,7 +50,20 @@ public struct StudentRootView: View {
   @State private var importedHistoryRefreshToken = 0
   @State private var evaluationNavigationPulse = 0
   @State private var tabHostStore = StudentTabHostStore()
+  @State private var dashboardCTAFrame = CGRect.zero
+  @State private var trainingHeroFrame = CGRect.zero
+  @State private var rootGlobalFrame = CGRect.zero
+  @State private var launchSourceFrame: CGRect?
+  @State private var launchMorphProgress = 0.0
+  @State private var launchGhostFadeProgress = 0.0
+  @State private var dashboardExitProgress = 0.0
+  @State private var launchDestinationOpacity = 1.0
+  @State private var revealsLaunchTarget = true
+  @State private var launchMorphPhase: LaunchMorphPhase = .idle
+  @State private var launchTask: Task<Void, Never>?
+  @State private var launchCompletionTask: Task<Void, Never>?
   @Environment(\.scenePhase) private var scenePhase
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   public init() {
     let plan = StudentDemoSeed.makePlanView()
@@ -187,17 +211,16 @@ extension StudentRootView {
         evaluationSummaryViewModel: evaluationSummaryViewModel,
         notifications: notifications,
         evaluationNavigationPulse: evaluationNavigationPulse,
-        onStartWorkout: {
-          nextWorkoutSource = .dashboard
-          trainingJumpToken += 1
-          selectedTab = .training
-        },
+        onStartWorkout: startWorkoutFromDashboard,
+        onStartWorkoutFrameChange: { dashboardCTAFrame = $0 },
+        isStartWorkoutHidden: launchSourceFrame != nil,
         onSeeAllFeedback: { selectedTab = .growth },
         onOpenEvaluation: openEvaluationNotification,
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         onPlanChanged: { planRevision += 1 }
       )
       .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
+      .modifier(MeetPRLaunchExitModifier(progress: dashboardExitProgress))
 
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
@@ -205,15 +228,24 @@ extension StudentRootView {
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
         isActive: selectedTab == .training,
         jumpToTodayToken: trainingJumpToken,
+        autoStartToken: trainingAutoStartToken,
+        isLaunchTargetHidden: launchSourceFrame != nil && !revealsLaunchTarget,
+        launchHeroRevealToken: launchHeroRevealToken,
         planRevision: planRevision,
         workoutStartedAt: $workoutStartedAt,
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
         onOpenFeedbackNotification: openFeedbackNotification,
         onOpenEvaluationNotification: openEvaluationNotification,
+        onHeroFrameChange: updateTrainingHeroFrame,
         onReturnToToday: { selectedTab = .today }
       )
       .studentTabLayer(shell.layer(for: .training), store: tabHostStore)
+      .opacity(
+        launchSourceFrame != nil && selectedTab == .training
+          ? launchDestinationOpacity
+          : 1
+      )
 
       TrainingHistoryView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
@@ -246,8 +278,28 @@ extension StudentRootView {
         onOpenGrowth: { selectedTab = .growth }
       )
       .studentTabLayer(shell.layer(for: .profile), store: tabHostStore)
+
+      if let launchSourceFrame {
+        let launchDestinationFrame =
+          trainingHeroFrame.width > 0 && trainingHeroFrame.height > 0
+          ? trainingHeroFrame
+          : launchSourceFrame
+        MeetPRLaunchMorphOverlay(
+          source: launchSourceFrame,
+          destination: launchDestinationFrame,
+          rootOrigin: rootGlobalFrame.origin,
+          progress: launchMorphProgress,
+          fadeProgress: launchGhostFadeProgress
+        )
+        .zIndex(20)
+      }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .onGeometryChange(for: CGRect.self) { proxy in
+      proxy.frame(in: .global)
+    } action: { frame in
+      rootGlobalFrame = frame
+    }
     .safeAreaInset(edge: .bottom, spacing: 0) {
       MeetPRTabBar(
         selection: $selectedTab,
@@ -281,6 +333,7 @@ extension StudentRootView {
       await runImportedHistoryBackfill()
     }
     .onChange(of: selectedTab) { _, newTab in
+      handleTabSelectionChange(newTab)
       if newTab == .today { todayReloadToken += 1 }
       switch newTab {
       case .today:
@@ -297,6 +350,10 @@ extension StudentRootView {
         Analytics.shared.screen(.account)
       }
     }
+    .onChange(of: reduceMotion) { _, newValue in
+      guard newValue, launchMorphPhase != .idle else { return }
+      finishLaunchForReducedMotion()
+    }
     .onChange(of: scenePhase) { _, phase in
       guard let notifications else { return }
       if phase == .active {
@@ -308,6 +365,7 @@ extension StudentRootView {
     }
     .onDisappear {
       notifications?.stopChatPolling()
+      cancelLaunchTransition()
     }
     .importedHistoryReviewAlert(
       review: $pendingImportedHistoryReview,
@@ -331,6 +389,152 @@ extension StudentRootView {
   private func openEvaluationNotification() {
     selectedTab = StudentNotificationRoute.evaluation.targetTab(from: selectedTab)
     evaluationNavigationPulse += 1
+  }
+
+  private func startWorkoutFromDashboard() {
+    // Ignore repeated activation until the current launch has either
+    // completed or been explicitly cancelled by navigation/reduced motion.
+    guard launchMorphPhase == .idle else { return }
+
+    nextWorkoutSource = .dashboard
+    trainingJumpToken += 1
+
+    guard !reduceMotion,
+      dashboardCTAFrame.width > 0,
+      dashboardCTAFrame.height > 0
+    else {
+      trainingAutoStartToken += 1
+      selectedTab = .training
+      return
+    }
+
+    cancelLaunchTasks()
+    launchSourceFrame = dashboardCTAFrame
+    trainingHeroFrame = .zero
+    launchMorphProgress = 0
+    launchGhostFadeProgress = 0
+    dashboardExitProgress = 0
+    launchDestinationOpacity = 0
+    revealsLaunchTarget = false
+    launchMorphPhase = .exitingDashboard
+
+    // motion/01 line 92: old screen uses a 200ms quadratic sink/fade.
+    withAnimation(.linear(duration: MeetPRMotion.launchExitDuration)) {
+      dashboardExitProgress = 1
+    }
+
+    launchTask = Task { @MainActor in
+      // motion/01 lines 93-112: destination is mounted after exactly 140ms.
+      try? await Task.sleep(for: .seconds(MeetPRMotion.launchSwitchDelay))
+      guard !Task.isCancelled else { return }
+      // Auto-start while the training layer is still inactive, then open the
+      // destination-frame gate. The first accepted geometry is therefore the
+      // recording hero, never the pre-start list hero.
+      trainingAutoStartToken += 1
+      launchMorphPhase = .awaitingDestinationFrame
+      selectedTab = .training
+      // motion/01 line 99: destination screen fades linearly for 280ms.
+      withAnimation(.linear(duration: MeetPRMotion.launchDestinationFadeDuration)) {
+        launchDestinationOpacity = 1
+      }
+    }
+  }
+
+  private func updateTrainingHeroFrame(_ frame: CGRect) {
+    guard launchMorphPhase == .awaitingDestinationFrame,
+      frame.width > 0,
+      frame.height > 0
+    else {
+      return
+    }
+
+    // Lock the first recording-hero frame for the entire morph. Subsequent
+    // layout callbacks cannot move the target underneath the running tween.
+    trainingHeroFrame = frame
+    beginLaunchMorph()
+  }
+
+  private func beginLaunchMorph() {
+    guard launchSourceFrame != nil,
+      selectedTab == .training,
+      trainingHeroFrame.width > 0,
+      trainingHeroFrame.height > 0,
+      launchMorphPhase == .awaitingDestinationFrame
+    else {
+      return
+    }
+
+    launchMorphPhase = .morphing
+    // motion/01 lines 100-105: a linear clock feeds exact easeOutCubic for
+    // 420ms so position, size and radius share one mathematical curve.
+    withAnimation(.linear(duration: MeetPRMotion.launchMorphDuration)) {
+      launchMorphProgress = 1
+    }
+
+    launchCompletionTask = Task { @MainActor in
+      try? await Task.sleep(for: .seconds(MeetPRMotion.launchMorphDuration))
+      guard !Task.isCancelled else { return }
+      launchMorphPhase = .fadingGhost
+      revealsLaunchTarget = true
+      launchHeroRevealToken += 1
+      // motion/01 line 110: the gold ghost fades for 200ms while hero
+      // children start their 55ms-staggered reveal.
+      withAnimation(.linear(duration: MeetPRMotion.launchGhostFadeDuration)) {
+        launchGhostFadeProgress = 1
+      }
+      try? await Task.sleep(for: .seconds(MeetPRMotion.launchGhostFadeDuration))
+      guard !Task.isCancelled else { return }
+      resetLaunchTransition()
+    }
+  }
+
+  private func resetLaunchTransition() {
+    var transaction = Transaction()
+    transaction.animation = nil
+    withTransaction(transaction) {
+      launchMorphPhase = .idle
+      launchSourceFrame = nil
+      trainingHeroFrame = .zero
+      launchMorphProgress = 0
+      launchGhostFadeProgress = 0
+      dashboardExitProgress = 0
+      launchDestinationOpacity = 1
+      revealsLaunchTarget = true
+    }
+  }
+
+  private func handleTabSelectionChange(_ newTab: StudentTab) {
+    guard launchMorphPhase != .idle else { return }
+    let isExpectedDestinationSwitch =
+      newTab == .training
+      && launchMorphPhase == .awaitingDestinationFrame
+    guard !isExpectedDestinationSwitch else {
+      beginLaunchMorph()
+      return
+    }
+    cancelLaunchTransition()
+  }
+
+  private func finishLaunchForReducedMotion() {
+    let stillNeedsAutoStart = launchMorphPhase == .exitingDashboard
+    cancelLaunchTasks()
+    if stillNeedsAutoStart {
+      trainingAutoStartToken += 1
+    }
+    resetLaunchTransition()
+    selectedTab = .training
+  }
+
+  private func cancelLaunchTransition() {
+    cancelLaunchTasks()
+    resetLaunchTransition()
+  }
+
+  private func cancelLaunchTasks() {
+    launchTask?.cancel()
+    launchCompletionTask?.cancel()
+    launchTask = nil
+    launchCompletionTask = nil
   }
 
   @MainActor

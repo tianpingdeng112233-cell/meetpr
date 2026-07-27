@@ -27,6 +27,8 @@ struct DashboardTodayScreen: View {
   @Binding var isFeedbackExpanded: Bool
   let onOpenNotifications: () -> Void
   let onStartWorkout: () -> Void
+  let onStartWorkoutFrameChange: (CGRect) -> Void
+  let isStartWorkoutHidden: Bool
   let onShiftPlan: () -> Void
   let onUndoShift: () -> Void
 
@@ -124,15 +126,19 @@ struct DashboardTodayScreen: View {
         ),
         onOpenNotifications: onOpenNotifications
       )
+      // motion/04 lines 28-35: 今日页 base=20ms, step=40ms.
+      .meetPRRiseIn(delay: riseDelay(index: 0))
 
       if model.isLoading {
         DashboardTodayLoadingSkeleton()
+          .meetPRRiseIn(delay: riseDelay(index: 1))
       } else {
         DashboardFeedbackCard(
           items: model.feedbackItems,
           viewModel: feedbackViewModel,
           isExpanded: $isFeedbackExpanded
         )
+        .meetPRRiseIn(delay: riseDelay(index: 1))
 
         DashboardWeekCalendar(
           cells: DashboardTodayPresentation.calendarCells(
@@ -143,15 +149,18 @@ struct DashboardTodayScreen: View {
           ),
           onSelect: { selectedDate = $0 }
         )
+        .meetPRRiseIn(delay: riseDelay(index: 2))
 
         if let metrics = model.metrics {
           DashboardProfileMetricsView(metrics: metrics)
+            .meetPRRiseIn(delay: riseDelay(index: 3))
         }
 
         Text("周\(weekdayLetter) · E1RM 曲线")
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textSecondary)
           .padding(.top, -5)
+          .meetPRRiseIn(delay: riseDelay(index: trendTitleRiseIndex))
 
         if isRestDay {
           DashboardRestDayCard(
@@ -162,6 +171,7 @@ struct DashboardTodayScreen: View {
               selectedCalendar: calendar
             )
           )
+          .meetPRRiseIn(delay: riseDelay(index: trendContentRiseIndex))
         } else if selectedTrendRows.isEmpty {
           Text("完成 3 次训练后解锁趋势")
             .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
@@ -170,8 +180,10 @@ struct DashboardTodayScreen: View {
             .padding(20)
             .background(Color.MeetPR.surfaceCard)
             .clipShape(.rect(cornerRadius: 16))
+            .meetPRRiseIn(delay: riseDelay(index: trendContentRiseIndex))
         } else {
           DashboardE1RMRail(rows: selectedTrendRows)
+            .meetPRRiseIn(delay: riseDelay(index: trendContentRiseIndex))
         }
 
         switch actionState {
@@ -181,14 +193,18 @@ struct DashboardTodayScreen: View {
             isUpdatingShift: model.isUpdatingDayShift,
             onUndo: onUndoShift
           )
+          .meetPRRiseIn(delay: riseDelay(index: actionRiseIndex))
         case .primary:
           DashboardPrimaryAction(
             liftSubtitle: liftSubtitle,
             canShift: canShiftSelectedDay,
             isUpdatingShift: model.isUpdatingDayShift,
             onStart: onStartWorkout,
+            onStartFrameChange: onStartWorkoutFrameChange,
+            isStartHidden: isStartWorkoutHidden,
             onShift: onShiftPlan
           )
+          .meetPRRiseIn(delay: riseDelay(index: actionRiseIndex))
         case .hidden:
           EmptyView()
         }
@@ -205,6 +221,22 @@ struct DashboardTodayScreen: View {
       calendar: calendar
     )
     return DashboardTodayPresentation.weekdayLetter(offset)
+  }
+
+  private var trendTitleRiseIndex: Int {
+    model.metrics == nil ? 3 : 4
+  }
+
+  private var trendContentRiseIndex: Int {
+    trendTitleRiseIndex + 1
+  }
+
+  private var actionRiseIndex: Int {
+    trendContentRiseIndex + 1
+  }
+
+  private func riseDelay(index: Int) -> TimeInterval {
+    MeetPRMotion.riseInitialDelay + (Double(index) * MeetPRMotion.riseStagger)
   }
 
   private var tomorrowLabel: String {

@@ -19,14 +19,23 @@ public struct CelebrationEffects: View {
     }
     .frame(width: 220, height: 220)
     .onAppear {
-      if startedAt == nil {
+      // Reduce Motion latches the terminal state: with the clock pinned to
+      // the distant past every progress reads 1 and sparks are spent, so
+      // toggling Reduce Motion back off cannot replay from mid-flight.
+      if reduceMotion {
+        startedAt = .distantPast
+      } else if startedAt == nil {
         startedAt = Date()
       }
+    }
+    .onChange(of: reduceMotion) { _, isOn in
+      if isOn { startedAt = .distantPast }
     }
     .accessibilityHidden(true)
   }
 
   private func bloomProgress(elapsed: TimeInterval) -> Double {
+    // motion/05 line 64: bloom uses a 750ms clock.
     guard !reduceMotion else { return 1 }
     return min(1, elapsed / MeetPRMotion.durationBloom)
   }
@@ -65,9 +74,11 @@ private struct CelebrationBloom: View {
 }
 
 enum MeetPRCelebrationSpec {
+  // motion/05 lines 48-54: exactly 18 generated sparks.
   static let sparkCount = 18
 
   static func sparkDelay(for index: Int) -> Double {
+    // motion/05 line 51: `(i % 6) * 18ms`.
     Double(index % 6) * MeetPRMotion.sparkStagger
   }
 }
@@ -76,6 +87,8 @@ private struct CelebrationSparkField: View {
   let elapsed: TimeInterval
 
   var body: some View {
+    // motion/05 lines 49-54 and 71-74: angle/radius/size/color generation,
+    // 800ms easeOutCubic scatter, scale 1→.2 and final-30% fade.
     ZStack {
       ForEach(0..<MeetPRCelebrationSpec.sparkCount, id: \.self) { index in
         CelebrationSpark(index: index, elapsed: elapsed)
@@ -124,6 +137,7 @@ private struct CelebrationMedal: View {
   }
 
   private var scale: Double {
+    // motion/05 line 69: 520ms stamp segments 1.5→.9→1.05→1 at .55/.78.
     if progress < 0.55 {
       return 1.5 - (0.6 * (progress / 0.55))
     }
