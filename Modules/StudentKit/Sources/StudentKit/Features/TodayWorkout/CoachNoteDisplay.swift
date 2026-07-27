@@ -24,19 +24,19 @@ enum CoachNoteDisplay {
 /// exercise cards, and the history day detail.
 struct CoachNotePill: View {
   let note: String
-  /// Surface behind the pill — bump to `surface2` when the pill itself sits on
-  /// a `surface1` card (e.g. history day detail) so it stays visible.
-  var background: Color = Color.MeetPR.surface1
+  /// Surface behind the pill — bump to `surfaceElevated` when the pill itself
+  /// sits on a `surfaceCard` (e.g. history day detail) so it stays visible.
+  var background: Color = Color.MeetPR.surfaceCard
 
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
       Text("教练备注")
-        .font(.system(size: 10, weight: .medium, design: .monospaced))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .medium))
         .tracking(0.8)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textMuted)
       Text(note)
-        .font(.system(size: 13, weight: .medium))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textPrimary)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, 10)
@@ -45,7 +45,7 @@ struct CoachNotePill: View {
     .clipShape(.rect(cornerRadius: 8))
     .overlay {
       RoundedRectangle(cornerRadius: 8)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .accessibilityElement(children: .combine)
     .accessibilityLabel("教练备注 \(note)")

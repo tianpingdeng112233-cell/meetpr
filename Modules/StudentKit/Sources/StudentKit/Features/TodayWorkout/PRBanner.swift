@@ -19,10 +19,10 @@ struct PRBanner: View {
         .font(.system(size: 24))
       VStack(alignment: .leading, spacing: 2) {
         Text(headline)
-          .font(Font.MeetPR.bodyEmphasis)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
           .foregroundStyle(.white)
         Text(detail)
-          .font(Font.MeetPR.footnote)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
           .foregroundStyle(.white.opacity(0.85))
       }
       Spacer(minLength: 0)
@@ -32,7 +32,7 @@ struct PRBanner: View {
     }
     .padding(.horizontal, MeetPRSpacing.md)
     .padding(.vertical, MeetPRSpacing.sm)
-    .background(Color.MeetPR.green)
+    .background(Color.MeetPR.success)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
     .padding(.horizontal, MeetPRSpacing.md)

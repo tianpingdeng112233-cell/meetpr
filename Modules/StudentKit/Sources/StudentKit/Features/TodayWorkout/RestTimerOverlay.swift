@@ -67,7 +67,7 @@ struct RestTimerOverlay: View {
           .tint(Color.MeetPR.textSecondary)
         Button("跳过") { onSkip() }
           .buttonStyle(.bordered)
-          .tint(Color.MeetPR.gold500)
+          .tint(Color.MeetPR.goldText)
         Button("+30s") { onAdjust(30) }
           .buttonStyle(.bordered)
           .tint(Color.MeetPR.textSecondary)
@@ -84,7 +84,7 @@ struct RestTimerOverlay: View {
   private var finished: some View {
     HStack {
       Text("休息结束 💪")
-        .font(Font.MeetPR.bodyEmphasis)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
         .foregroundStyle(Color.MeetPR.success)
       Spacer()
     }

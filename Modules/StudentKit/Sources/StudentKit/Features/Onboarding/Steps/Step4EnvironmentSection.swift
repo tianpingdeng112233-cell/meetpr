@@ -73,24 +73,29 @@ struct Step4EnvironmentSection: View {
       HStack {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           Text(OnboardingLabels.label(tier))
-            .font(Font.MeetPR.body)
-            .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size17))
+            .foregroundStyle(isSelected ? Color.MeetPR.goldText : Color.MeetPR.textMuted)
           Text(Self.tierSubtitle(tier))
-            .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textMuted)
             .multilineTextAlignment(.leading)
         }
         Spacer()
         if isSelected {
           Image(systemName: "checkmark.circle.fill")
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
       }
       .padding(MeetPRSpacing.md)
-      .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
+      .background(
+        isSelected ? Color.MeetPR.goldRGB.opacity(0.12) : Color.MeetPR.surfaceCard
+      )
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.md)
-          .stroke(isSelected ? Color.MeetPR.brandRed : Color.MeetPR.border, lineWidth: 1)
+          .stroke(
+            isSelected ? Color.MeetPR.goldRGB.opacity(0.4) : Color.MeetPR.borderDefault,
+            lineWidth: 1
+          )
       }
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
@@ -114,8 +119,8 @@ struct Step4EnvironmentSection: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
         OnboardingFieldLabel(title: "器械微调")
         Text("按场馆预填 — 勾掉没有的、补上有的,不确定就保持默认")
-          .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textMuted)
       }
       equipmentChipGrid("基础", .basics)
       OnboardingChoiceCards(

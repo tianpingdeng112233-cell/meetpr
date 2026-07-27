@@ -102,7 +102,7 @@ struct AccountSecuritySection: View {
 
   private var passwordUpdatedToast: some View {
     Label("密码已更新,其他设备将退出登录", systemImage: "checkmark.circle.fill")
-      .font(Font.MeetPR.caption)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
       .foregroundStyle(Color.MeetPR.textPrimary)
       .padding(.horizontal, MeetPRSpacing.base)
       .padding(.vertical, MeetPRSpacing.sm)
@@ -210,7 +210,7 @@ struct DeleteAccountSheet: View {
       ScrollView {
         VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
           Text("账号与全部训练数据将永久删除,无法恢复。")
-            .font(Font.MeetPR.bodyEmphasis)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
             .foregroundStyle(Color.MeetPR.textPrimary)
 
           VStack(alignment: .leading, spacing: 6) {
@@ -222,7 +222,7 @@ struct DeleteAccountSheet: View {
 
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
             Text("输入「\(DeleteAccountViewModel.requiredWord)」以确认")
-              .font(Font.MeetPR.caption)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
               .foregroundStyle(Color.MeetPR.textSecondary)
             TextField(DeleteAccountViewModel.requiredWord, text: $viewModel.confirmationText)
               .textFieldStyle(.roundedBorder)
@@ -231,21 +231,20 @@ struct DeleteAccountSheet: View {
 
           if case .failed(let message) = viewModel.state {
             Label(message, systemImage: "exclamationmark.triangle")
-              .font(Font.MeetPR.caption)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
               .foregroundStyle(Color.MeetPR.dangerMuted)
           }
 
-          Button {
+          GoldCTA(
+            viewModel.state == .deleting ? "删除中…" : "永久删除我的账号",
+            sub: nil,
+            variant: .danger,
+            icon: .none,
+            isDisabled: !viewModel.canSubmit,
+            isLoading: viewModel.state == .deleting
+          ) {
             Task { await viewModel.submit() }
-          } label: {
-            Text(viewModel.state == .deleting ? "删除中…" : "永久删除我的账号")
-              .font(.headline)
-              .frame(maxWidth: .infinity)
-              .padding(.vertical, 6)
           }
-          .buttonStyle(.borderedProminent)
-          .tint(Color.MeetPR.danger)
-          .disabled(!viewModel.canSubmit)
           .accessibilityIdentifier("account.delete.submit")
         }
         .padding(MeetPRSpacing.base)
@@ -267,7 +266,9 @@ struct DeleteAccountSheet: View {
   private func bullet(_ text: String) -> some View {
     HStack(spacing: 6) {
       Circle().fill(Color.MeetPR.textTertiary).frame(width: 4, height: 4)
-      Text(text).font(Font.MeetPR.caption).foregroundStyle(Color.MeetPR.textSecondary)
+      Text(text)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textSecondary)
     }
   }
 }
@@ -301,23 +302,24 @@ struct ChangePasswordSheet: View {
             .foregroundStyle(Color.MeetPR.dangerMuted)
         }
 
-        Button {
+        GoldCTA(
+          viewModel.state == .submitting ? "提交中…" : "确认修改",
+          sub: nil,
+          icon: .none,
+          isDisabled: !viewModel.canSubmit,
+          isLoading: viewModel.state == .submitting
+        ) {
           Task {
             await viewModel.submit()
             if viewModel.state == .saved {
               onSaved()
             }
           }
-        } label: {
-          Text(viewModel.state == .submitting ? "提交中…" : "确认修改")
-            .frame(maxWidth: .infinity)
-            .font(.headline)
         }
-        .buttonStyle(.borderedProminent)
-        .tint(Color.MeetPR.gold500)
-        .disabled(!viewModel.canSubmit)
         .accessibilityIdentifier("account.password.submit")
       }
+      .scrollContentBackground(.hidden)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("改密码")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

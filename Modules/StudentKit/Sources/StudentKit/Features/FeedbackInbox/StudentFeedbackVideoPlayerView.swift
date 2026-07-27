@@ -114,7 +114,7 @@ private struct StudentFeedbackVideoPlayerChrome: View {
 
       Button(action: cycleRate) {
         Text(rateText)
-          .font(.system(size: 14, weight: .semibold, design: .monospaced))
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .semibold))
           .foregroundStyle(.white)
           .padding(.horizontal, MeetPRSpacing.md)
           .frame(height: 36)
@@ -137,30 +137,30 @@ private struct StudentFeedbackVideoFailureCard: View {
     VStack(spacing: MeetPRSpacing.md) {
       Image(systemName: "exclamationmark.triangle.fill")
         .font(.system(size: 26))
-        .foregroundStyle(Color.MeetPR.amber)
+        .foregroundStyle(Color.MeetPR.danger)
       Text("播放失败，链接可能已过期")
-        .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size17))
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .multilineTextAlignment(.center)
       Button(action: retry) {
         Text(retrying ? "刷新中…" : "重试")
-          .font(.system(size: 15, weight: .semibold))
-          .foregroundStyle(.white)
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size15))
+          .foregroundStyle(Color.MeetPR.ctaText)
           .frame(maxWidth: .infinity)
-          .frame(height: 44)
-          .background(Color.MeetPR.brandRed)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+          .frame(height: MeetPRSpacing.point52)
+          .background(Color.MeetPR.ctaBackground)
+          .clipShape(.capsule)
       }
       .buttonStyle(.plain)
       .disabled(retrying)
     }
     .padding(MeetPRSpacing.lg)
     .frame(maxWidth: 280)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceElevated)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
   }
 }
