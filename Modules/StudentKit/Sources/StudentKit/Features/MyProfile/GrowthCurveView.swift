@@ -3,42 +3,6 @@ import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// Spec 028 §6: per-family e1RM growth curve with time-window filtering.
-/// Variation-level curves and the variation picker sheet are V0.1.x.
-@available(iOS 17.0, macOS 14.0, *)
-public struct GrowthCurveView: View {
-  private let studentID: UUID
-  private let plans: any StudentPlanRepository
-  private let e1rm: any E1RMRepository
-  private let onboarding: (any OnboardingProfileReading)?
-
-  public init(
-    studentID: UUID,
-    plans: any StudentPlanRepository,
-    e1rm: any E1RMRepository,
-    onboarding: (any OnboardingProfileReading)? = nil
-  ) {
-    self.studentID = studentID
-    self.plans = plans
-    self.e1rm = e1rm
-    self.onboarding = onboarding
-  }
-
-  public var body: some View {
-    ScrollView {
-      GrowthCurvePanelView(
-        studentID: studentID,
-        plans: plans,
-        e1rm: e1rm,
-        onboarding: onboarding
-      )
-      .padding(MeetPRSpacing.md)
-    }
-    .background(Color.MeetPR.bg)
-    .navigationTitle("成长曲线")
-  }
-}
-
 /// Embeddable e1RM growth panel without scroll view, navigation title, or page background.
 @available(iOS 17.0, macOS 14.0, *)
 struct GrowthCurvePanelView: View {

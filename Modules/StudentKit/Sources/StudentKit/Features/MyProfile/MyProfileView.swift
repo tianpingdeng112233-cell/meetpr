@@ -18,7 +18,6 @@ public struct MyProfileView: View {
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
-  private let onOpenGrowth: (() -> Void)?
 
   @State private var viewModel: MyProfileViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
@@ -40,8 +39,7 @@ public struct MyProfileView: View {
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
     notifications: StudentNotificationsCoordinator? = nil,
-    onOpenPlanNotification: @escaping () -> Void = {},
-    onOpenGrowth: (() -> Void)? = nil
+    onOpenPlanNotification: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
     self.plans = plans
@@ -53,7 +51,6 @@ public struct MyProfileView: View {
     self.restTimerSettings = restTimerSettings
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
-    self.onOpenGrowth = onOpenGrowth
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding)
     )
@@ -212,10 +209,6 @@ public struct MyProfileView: View {
         )
       }
 
-      MyProfileSectionLabel("更多")
-        .padding(.top, MeetPRSpacing.point2)
-      growthEntry
-
       accountSecuritySection
 
       if let onLogout {
@@ -250,28 +243,6 @@ public struct MyProfileView: View {
       )
     }
     .buttonStyle(.plain)
-  }
-
-  @ViewBuilder
-  private var growthEntry: some View {
-    if let onOpenGrowth {
-      Button(action: onOpenGrowth) {
-        MyProfileIconRow(icon: "chart.xyaxis.line", title: "成长曲线")
-      }
-      .buttonStyle(.plain)
-    } else {
-      NavigationLink {
-        GrowthCurveView(
-          studentID: studentID,
-          plans: plans,
-          e1rm: e1rm,
-          onboarding: onboarding
-        )
-      } label: {
-        MyProfileIconRow(icon: "chart.xyaxis.line", title: "成长曲线")
-      }
-      .buttonStyle(.plain)
-    }
   }
 
   @ViewBuilder

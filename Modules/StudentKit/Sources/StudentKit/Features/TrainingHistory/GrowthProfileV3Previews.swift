@@ -90,8 +90,7 @@
         onLogout: {},
         account: InMemoryAccountRepository(),
         logs: logs,
-        restTimerSettings: PreviewRestTimerSettingsStore(),
-        onOpenGrowth: {}
+        restTimerSettings: PreviewRestTimerSettingsStore()
       )
     }
   }

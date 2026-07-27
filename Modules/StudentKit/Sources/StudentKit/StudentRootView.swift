@@ -263,8 +263,7 @@ extension StudentRootView {
         logs: logs,
         restTimerSettings: restTimerSettings,
         notifications: notifications,
-        onOpenPlanNotification: openPlanNotification,
-        onOpenGrowth: { selectedTab = .growth }
+        onOpenPlanNotification: openPlanNotification
       )
       .studentTabLayer(shell.layer(for: .profile), store: tabHostStore)
 
