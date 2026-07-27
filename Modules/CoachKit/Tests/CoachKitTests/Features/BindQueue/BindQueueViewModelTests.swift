@@ -24,69 +24,18 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() async {
-  let repository = StubBindQueueRepository(
-    evaluationOnAccept: BindQueueFixtures.evaluation())
+@Test func acceptRemovesItemAndReportsGenericToast() async {
+  let repository = StubBindQueueRepository()
   let viewModel = BindQueueViewModel(repository: repository, now: { BindQueueFixtures.now })
   await viewModel.loadIfNeeded()
   let item = viewModel.items[0]
 
-  let accepted = await viewModel.accept(item, skipEvaluation: false, skipReason: nil)
+  let accepted = await viewModel.accept(item)
 
   #expect(accepted)
   #expect(viewModel.items.isEmpty)
-  #expect(viewModel.toastMessage == "已接收,评估期 7 天开始")
-  let recorded = await repository.acceptedRequests
-  #expect(recorded.count == 1)
-  #expect(recorded[0].skip == false)
-  #expect(recorded[0].reason == nil)
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() async {
-  let repository = StubBindQueueRepository()
-  let viewModel = BindQueueViewModel(repository: repository, now: { BindQueueFixtures.now })
-  await viewModel.loadIfNeeded()
-  let item = viewModel.items[0]
-
-  let accepted = await viewModel.accept(item, skipEvaluation: true, skipReason: "  老学员  ")
-
-  #expect(accepted)
   #expect(viewModel.toastMessage == "已接收")
-  let recorded = await repository.acceptedRequests
-  #expect(recorded[0].skip == true)
-  #expect(recorded[0].reason == "老学员")
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() async {
-  let repository = StubBindQueueRepository()
-  let viewModel = BindQueueViewModel(repository: repository, now: { BindQueueFixtures.now })
-  await viewModel.loadIfNeeded()
-  let item = viewModel.items[0]
-
-  // UI-layer guarantee for the zod superRefine: reason dropped off the
-  // evaluation branch.
-  _ = await viewModel.accept(item, skipEvaluation: false, skipReason: "误传")
-
-  let recorded = await repository.acceptedRequests
-  #expect(recorded[0].reason == nil)
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func blankSkipReasonIsDroppedNotSentEmpty() async {
-  let repository = StubBindQueueRepository()
-  let viewModel = BindQueueViewModel(repository: repository, now: { BindQueueFixtures.now })
-  await viewModel.loadIfNeeded()
-  let item = viewModel.items[0]
-
-  _ = await viewModel.accept(item, skipEvaluation: true, skipReason: "   ")
-
-  let recorded = await repository.acceptedRequests
-  #expect(recorded[0].reason == nil)
+  #expect(await repository.acceptedRequestIDs == [item.id])
 }
 
 // MARK: - 4xx machine codes → banner + refresh (D12)
@@ -106,8 +55,7 @@ import Testing
     await viewModel.loadIfNeeded()
     let fetchesBefore = await repository.fetchCount
 
-    let accepted = await viewModel.accept(
-      viewModel.items[0], skipEvaluation: false, skipReason: nil)
+    let accepted = await viewModel.accept(viewModel.items[0])
 
     #expect(!accepted)
     #expect(viewModel.bannerMessage == expectedBanner)

@@ -11,8 +11,6 @@ public struct RootView: View {
   private let coachPlans: any PlanRepository
   private let coachInviteCodes: any InviteCodeRepository
   private let coachBindQueue: any CoachBindQueueRepository
-  private let coachEvaluations: any EvaluationRepository
-  private let coachEvaluationSummaries: any EvaluationSummaryRepository
   private let coachStudentProfiles: any OnboardingProfileReading
   private let studentPlans: any StudentPlanRepository
   private let studentLogs: any StudentTrainingLogRepository
@@ -29,9 +27,6 @@ public struct RootView: View {
   private let studentVideoUploads: VideoUploadServices?
   private let studentBind: any BindRepository
   private let studentOnboarding: any OnboardingRepository
-  private let studentEvaluations: any EvaluationRepository
-  private let studentEvaluationSummaries: any EvaluationSummaryRepository
-  private let summaryReadStore: any EvaluationSummaryReadStoring
   private let pendingBindStore: any PendingBindCodeStoring
   private let onboardingDraftStore = LocalOnboardingDraftStore()
   private let coachStudentVideos: any CoachStudentVideoRepository
@@ -43,8 +38,6 @@ public struct RootView: View {
     coachPlans: any PlanRepository = InMemoryPlanRepository.preview(),
     coachInviteCodes: (any InviteCodeRepository)? = nil,
     coachBindQueue: (any CoachBindQueueRepository)? = nil,
-    coachEvaluations: (any EvaluationRepository)? = nil,
-    coachEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     coachStudentProfiles: (any OnboardingProfileReading)? = nil,
     studentPlans: (any StudentPlanRepository)? = nil,
     studentLogs: (any StudentTrainingLogRepository)? = nil,
@@ -54,11 +47,8 @@ public struct RootView: View {
     studentVideoUploads: VideoUploadServices? = nil,
     studentBind: (any BindRepository)? = nil,
     studentOnboarding: (any OnboardingRepository)? = nil,
-    studentEvaluations: (any EvaluationRepository)? = nil,
-    studentEvaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     studentSessionReviews: (any SessionReviewRepository)? = nil,
     studentAccount: (any AccountRepository)? = nil,
-    summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
     coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
@@ -80,21 +70,11 @@ public struct RootView: View {
     self.studentVideoUploads = studentVideoUploads
     self.studentBind = studentBind ?? RootViewDemoDefaults.bind()
     self.studentOnboarding = studentOnboarding ?? RootViewDemoDefaults.onboarding()
-    // Evaluation funnel defaults (spec 033): in-memory demo/preview repos;
-    // the live wiring injects the Backend implementations from MeetPRApp.
     self.coachBindQueue =
       coachBindQueue
-      ?? InMemoryCoachBindQueueRepository(coachId: StudentDemoSeed.coachID)
-    self.coachEvaluations = coachEvaluations ?? InMemoryCoachEvaluationRepository()
-    self.coachEvaluationSummaries =
-      coachEvaluationSummaries
-      ?? InMemoryCoachEvaluationSummaryRepository(coachId: StudentDemoSeed.coachID)
+      ?? InMemoryCoachBindQueueRepository()
     self.coachStudentProfiles =
       coachStudentProfiles ?? RootViewDemoDefaults.coachStudentProfiles()
-    self.studentEvaluations = studentEvaluations ?? InMemoryStudentEvaluationRepository()
-    self.studentEvaluationSummaries =
-      studentEvaluationSummaries ?? InMemoryEvaluationSummaryRepository()
-    self.summaryReadStore = summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
     self.pendingBindStore = pendingBindStore
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
     self.coachVideoQueue = coachVideoQueue
@@ -125,8 +105,6 @@ public struct RootView: View {
           readiness: studentReadiness,
           familyMapProvider: coachFamilyMapProvider,
           bindQueue: coachBindQueue,
-          evaluations: coachEvaluations,
-          evaluationSummaries: coachEvaluationSummaries,
           studentProfiles: coachStudentProfiles,
           videoQueue: coachVideoQueue,
           onLogout: {
@@ -156,7 +134,6 @@ public struct RootView: View {
       studentId: studentId,
       bind: studentBind,
       stash: pendingBindStore,
-      evaluations: studentEvaluations,
       isOnboardingComplete: {
         // Fetch failure reads as "incomplete" (`try?` flattens the error and
         // the 404 into nil): worst case is one extra trip through the wizard
@@ -184,32 +161,9 @@ public struct RootView: View {
           onCompleted: onCompleted
         )
       },
-      evaluationFlow: { _, onCompleted in
-        // Single-page evaluation state replaces the 5 tabs (spec 033 D6).
-        EvaluationPeriodView(
-          studentID: studentId,
-          dependencies: evaluationPeriodDependencies,
-          onLogout: {
-            await session.logout()
-          },
-          onCompleted: onCompleted
-        )
-      },
       content: {
         studentRoot(for: user)
       }
-    )
-  }
-
-  private var evaluationPeriodDependencies: EvaluationPeriodDependencies {
-    EvaluationPeriodDependencies(
-      evaluations: studentEvaluations,
-      plans: studentPlans,
-      logs: studentLogs,
-      feedback: studentFeedback,
-      e1rm: studentE1RM,
-      readiness: studentReadiness,
-      onboarding: studentOnboarding
     )
   }
 
@@ -238,8 +192,6 @@ public struct RootView: View {
       readiness: studentReadiness,
       videoUploads: studentVideoUploads,
       onboarding: studentOnboarding,
-      evaluationSummaries: studentEvaluationSummaries,
-      summaryReadStore: summaryReadStore,
       onLogout: {
         await session.logout()
       },

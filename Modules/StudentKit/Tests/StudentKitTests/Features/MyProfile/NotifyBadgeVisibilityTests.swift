@@ -19,13 +19,11 @@ import Testing
   #expect(MyProfileView.showsNotifyBadge(push: false, trainingMode: .coached) == false)
 }
 
-// U12 (spec 046 §3 / 047 AC#3): coach deliverables — the 评估总结 card and the
-// 成长 tab 教练反馈记录 section — must be structurally gated out of solo.
+// U12 (spec 046 §3 / 047 AC#3): coach feedback history must be structurally
+// gated out of solo.
 @available(iOS 17.0, macOS 14.0, *)
 @MainActor
 @Test func coachSurfacesHiddenForSolo() {
-  #expect(MyProfileView.showsEvaluationSummary(trainingMode: .selfTrain) == false)
-  #expect(MyProfileView.showsEvaluationSummary(trainingMode: .coached) == true)
   #expect(TrainingHistoryView.showsCoachFeedback(trainingMode: .selfTrain) == false)
   #expect(TrainingHistoryView.showsCoachFeedback(trainingMode: .coached) == true)
 }

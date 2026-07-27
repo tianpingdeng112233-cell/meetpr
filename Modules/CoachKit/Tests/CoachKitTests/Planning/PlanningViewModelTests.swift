@@ -75,21 +75,6 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func evaluationStudentCannotSelectFourWeeks() async throws {
-  let viewModel = try PlanningFixtures.viewModel()
-  await viewModel.bootstrap()
-
-  viewModel.selectStudent(PlanningFixtures.students()[0])
-  try await viewModel.goNext()
-  viewModel.selectDuration(4)
-
-  #expect(throws: PlanningValidationError.evaluationStudentRequiresOneWeek) {
-    try viewModel.validateCurrentStep()
-  }
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
 @Test func assignmentValidationRequiresFrequencyToMatchAssignedLifts() async throws {
   let viewModel = try PlanningFixtures.viewModel()
   await viewModel.bootstrap()

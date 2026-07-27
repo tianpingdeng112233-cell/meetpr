@@ -142,39 +142,30 @@ public struct CoachBindRequestOnboardingDTO: Codable, Equatable, Sendable {
   }
 }
 
-/// POST /coach/bind-requests/:id/accept body. zod `.strict()` + superRefine:
-/// `skip_reason` is only legal when `skip_evaluation` is true — the key is
-/// omitted entirely when nil (custom encode).
+/// POST /coach/bind-requests/:id/accept body.
 public struct AcceptBindRequestRequestDTO: Encodable, Equatable, Sendable {
-  public let skipEvaluation: Bool
-  public let skipReason: String?
+  /// Required online-backend wire contract. Keep this field and its fixed
+  /// `true` value even though the client no longer exposes evaluation flows.
+  public let skipEvaluation = true
 
-  public init(skipEvaluation: Bool, skipReason: String?) {
-    self.skipEvaluation = skipEvaluation
-    self.skipReason = skipReason
-  }
+  public init() {}
 
   public func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
     try container.encode(skipEvaluation, forKey: .skipEvaluation)
-    try container.encodeIfPresent(skipReason, forKey: .skipReason)
   }
 
   private enum CodingKeys: String, CodingKey {
-    case skipEvaluation, skipReason
+    case skipEvaluation
   }
 }
 
-/// POST .../accept response — `{ "bind_request": {...}, "evaluation_period":
-/// {...} | null }`. The bind request is the full student-side wire shape;
-/// CoachKit maps it down to the lightweight BindRequestDecision.
+/// POST .../accept response. Retired and future response fields are ignored.
 public struct AcceptBindRequestResponseDTO: Codable, Equatable, Sendable {
   public let bindRequest: BindRequestDTO
-  public let evaluationPeriod: EvaluationPeriodDTO?
 
-  public init(bindRequest: BindRequestDTO, evaluationPeriod: EvaluationPeriodDTO?) {
+  public init(bindRequest: BindRequestDTO) {
     self.bindRequest = bindRequest
-    self.evaluationPeriod = evaluationPeriod
   }
 }
 

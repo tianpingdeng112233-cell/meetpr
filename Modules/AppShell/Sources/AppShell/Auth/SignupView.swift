@@ -5,7 +5,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct SignupView: View {
   /// 内测注册开放的角色。solo(自练)线 2026-07-10 拍板暂不进 TestFlight 内测包:
-  /// 注册入口隐藏、代码休眠(defer≠delete,先例 spec 033 评估期停用)。
+  /// 注册入口隐藏、代码休眠(defer≠delete,遵循既有停用先例)。
   /// 恢复 solo 注册 = 改回 `UserRole.allCases`。
   static let offeredRoles: [UserRole] = UserRole.allCases.filter { $0 != .selfTrainStudent }
 

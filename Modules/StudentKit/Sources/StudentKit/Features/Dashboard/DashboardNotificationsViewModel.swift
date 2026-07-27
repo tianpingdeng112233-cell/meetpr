@@ -99,8 +99,8 @@ final class DashboardNotificationsViewModel {
     return notice
   }
 
-  func hasUnread(feedbackUnreadCount: Int, evaluationUnreadCount: Int) -> Bool {
-    planNotice != nil || feedbackUnreadCount > 0 || evaluationUnreadCount > 0
+  func hasUnread(feedbackUnreadCount: Int) -> Bool {
+    planNotice != nil || feedbackUnreadCount > 0
   }
 
   func load(studentID: UUID) async {

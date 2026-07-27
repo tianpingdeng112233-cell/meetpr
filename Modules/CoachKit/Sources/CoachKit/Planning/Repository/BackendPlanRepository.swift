@@ -22,12 +22,11 @@ public actor BackendPlanRepository: PlanRepository {
   public func fetchStudents() async throws -> [CoachStudentSummary] {
     let token = try await session.accessToken()
     let response = try await api.coachStudents(accessToken: token)
-    let now = Date()
     return response.students.map { dto in
       CoachStudentSummary(
         id: dto.userID,
         displayName: dto.displayName,
-        status: Self.status(from: dto, now: now)
+        status: Self.status(from: dto)
       )
     }
   }
@@ -42,7 +41,7 @@ public actor BackendPlanRepository: PlanRepository {
     return CoachStudentSummary(
       id: dto.userID,
       displayName: dto.displayName,
-      status: Self.status(from: dto, now: Date())
+      status: Self.status(from: dto)
     )
   }
 
@@ -246,19 +245,10 @@ public actor BackendPlanRepository: PlanRepository {
       .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
   }
 
-  /// Spec 033 D2 (revised): `/coach/students` returns the live status plus
-  /// the evaluation window; remaining time derives from `expected_end_at`
-  /// and a local now — overdue clamps to 0/0 (the detail banner carries the
-  /// overdue copy).
-  static func status(from dto: CoachStudentSummaryDTO, now: Date) -> CoachStudentStatus {
-    guard dto.status == "in_evaluation", let evaluation = dto.evaluation else {
-      return .active
-    }
-    let totalHours = max(0, Int(evaluation.expectedEndAt.timeIntervalSince(now) / 3_600))
-    return .inEvaluation(
-      remainingDays: totalHours / 24,
-      remainingHours: totalHours % 24
-    )
+  /// The backend can still return retired or future status values. They are
+  /// deliberately tolerated as active so stale rows never break roster load.
+  static func status(from _: CoachStudentSummaryDTO) -> CoachStudentStatus {
+    .active
   }
 }
 

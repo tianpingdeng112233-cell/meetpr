@@ -6,39 +6,15 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func step0RendersThreeStudentSections() async throws {
+@Test func step0RendersActiveAndAbnormalStudentSections() async throws {
   let viewModel = try PlanningFixtures.viewModel()
   await viewModel.bootstrap()
 
   let sut = Step0SelectStudentView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "评估期内 (1)").string() == "评估期内 (1)")
-  #expect(try inspected.find(text: "活跃 (2)").string() == "活跃 (2)")
+  #expect(try inspected.find(text: "活跃 (3)").string() == "活跃 (3)")
   #expect(try inspected.find(text: "异常 (1)").string() == "异常 (1)")
-  #expect(try inspected.find(text: "评估期 4 天 13 时剩").string() == "评估期 4 天 13 时剩")
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func step1ShowsOnlyOneWeekCardForEvaluationStudent() async throws {
-  let viewModel = try PlanningFixtures.viewModel()
-  await viewModel.bootstrap()
-  viewModel.selectStudent(PlanningFixtures.students()[0])
-
-  let sut = Step1SelectDurationView(viewModel: viewModel)
-  let inspected = try sut.inspect()
-
-  // Adaptation week (spec 033 §7) is the single-week exception, so the step
-  // offers only the 1-week card — no 4-week choice.
-  _ = try inspected.find(ViewType.Button.self) { button in
-    (try? button.labelView().find(text: "1 周")) != nil
-  }
-  #expect(throws: (any Error).self) {
-    try inspected.find(ViewType.Button.self) { button in
-      (try? button.labelView().find(text: "4 周")) != nil
-    }
-  }
 }
 
 @MainActor
