@@ -20,6 +20,7 @@ func demoFeedbackVideo(id: UUID, loggedAt: Date) -> CoachFeedbackVideo {
     setIndex: 1,
     weightKg: "125.00",
     reps: 5,
-    loggedAt: loggedAt
+    loggedAt: loggedAt,
+    durationSeconds: 8
   )
 }

@@ -20,8 +20,6 @@ public struct TodayWorkoutView: View {
   private var workoutStartedAt: Binding<Date?>
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
-  private let onOpenFeedbackNotification: () -> Void
-  private let onOpenEvaluationNotification: () -> Void
   private let onHeroFrameChange: (CGRect) -> Void
   private let onReturnToToday: () -> Void
 
@@ -67,8 +65,6 @@ public struct TodayWorkoutView: View {
     workoutStartedAt: Binding<Date?> = .constant(nil),
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
-    onOpenFeedbackNotification: @escaping () -> Void = {},
-    onOpenEvaluationNotification: @escaping () -> Void = {},
     onHeroFrameChange: @escaping (CGRect) -> Void = { _ in },
     onReturnToToday: @escaping () -> Void = {}
   ) {
@@ -84,8 +80,6 @@ public struct TodayWorkoutView: View {
     self.workoutStartedAt = workoutStartedAt
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
-    self.onOpenFeedbackNotification = onOpenFeedbackNotification
-    self.onOpenEvaluationNotification = onOpenEvaluationNotification
     self.onHeroFrameChange = onHeroFrameChange
     self.onReturnToToday = onReturnToToday
     self._selectedDate = State(initialValue: date ?? WorkoutDatePolicy.gymDayToday())
@@ -171,9 +165,7 @@ public struct TodayWorkoutView: View {
           coordinator: notifications,
           showsNotifications: $showingNotifications,
           conversationID: $conversationID,
-          onOpenPlan: onOpenPlanNotification,
-          onOpenFeedback: onOpenFeedbackNotification,
-          onOpenEvaluation: onOpenEvaluationNotification
+          onOpenPlan: onOpenPlanNotification
         )
       )
     }

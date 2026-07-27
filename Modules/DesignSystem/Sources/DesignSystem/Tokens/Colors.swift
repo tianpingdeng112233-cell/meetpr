@@ -224,6 +224,10 @@ extension Color {
     public static let modalShadow = rgb(0, 0, 0, opacity: 0.5)
 
     public static let goldSoft = gold500.opacity(0.14)
+    /// `rgba(230,190,85,.14)` — the "新计划" badge fill in the student chat
+    /// mockup (`MeetPR 学员端.dc.html`, line 642). This is a literal overlay,
+    /// not the theme-varying `gold500` at 14% opacity.
+    public static let chatPlanBadgeFill = rgb(230, 190, 85, opacity: 0.14)
     /// `--success-soft`: a lighter success *tone* (text/icons), per theme.
     public static let successSoft = Color(
       light: rgb(21, 128, 61),

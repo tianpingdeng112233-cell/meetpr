@@ -81,9 +81,6 @@ import Testing
 @Test func notificationRoutesAreIdenticalFromEveryTab() {
   for source in StudentTab.allCases {
     #expect(StudentNotificationRoute.plan.targetTab(from: source) == .training)
-    #expect(StudentNotificationRoute.feedback.targetTab(from: source) == .growth)
-    #expect(StudentNotificationRoute.evaluation.targetTab(from: source) == .today)
-    #expect(StudentNotificationRoute.coachMessages.targetTab(from: source) == source)
   }
 }
 

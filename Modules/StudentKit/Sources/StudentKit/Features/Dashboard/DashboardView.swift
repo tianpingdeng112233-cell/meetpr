@@ -16,14 +16,11 @@ public struct DashboardView: View {
   private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
   private let feedbackViewModel: FeedbackInboxViewModel
-  private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   private let notifications: StudentNotificationsCoordinator?
-  private let evaluationNavigationPulse: Int
   private let onStartWorkout: () -> Void
   private let onStartWorkoutFrameChange: (CGRect) -> Void
   private let isStartWorkoutHidden: Bool
-  private let onSeeAllFeedback: () -> Void
-  private let onOpenEvaluation: () -> Void
+  private let onOpenPlanNotification: () -> Void
   private let onPlanChanged: () -> Void
   private let todayReloadToken: Int
 
@@ -31,7 +28,6 @@ public struct DashboardView: View {
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
   @State private var showsNotifications = false
-  @State private var showsEvaluationSummary = false
   @State private var conversationID: UUID?
   @State private var dayShiftAlert: DashboardDayShiftAlert?
   @State private var shiftProposal: PlanShiftProposal?
@@ -47,14 +43,11 @@ public struct DashboardView: View {
     onboarding: any OnboardingProfileReading,
     e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel,
-    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     notifications: StudentNotificationsCoordinator? = nil,
-    evaluationNavigationPulse: Int = 0,
     onStartWorkout: @escaping () -> Void,
     onStartWorkoutFrameChange: @escaping (CGRect) -> Void = { _ in },
     isStartWorkoutHidden: Bool = false,
-    onSeeAllFeedback: @escaping () -> Void,
-    onOpenEvaluation: @escaping () -> Void = {},
+    onOpenPlanNotification: @escaping () -> Void = {},
     todayReloadToken: Int = 0,
     onPlanChanged: @escaping () -> Void = {}
   ) {
@@ -62,14 +55,11 @@ public struct DashboardView: View {
     self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
     self.feedbackViewModel = feedbackViewModel
-    self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.notifications = notifications
-    self.evaluationNavigationPulse = evaluationNavigationPulse
     self.onStartWorkout = onStartWorkout
     self.onStartWorkoutFrameChange = onStartWorkoutFrameChange
     self.isStartWorkoutHidden = isStartWorkoutHidden
-    self.onSeeAllFeedback = onSeeAllFeedback
-    self.onOpenEvaluation = onOpenEvaluation
+    self.onOpenPlanNotification = onOpenPlanNotification
     self.todayReloadToken = todayReloadToken
     self.onPlanChanged = onPlanChanged
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
@@ -111,13 +101,6 @@ public struct DashboardView: View {
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
-      .navigationDestination(isPresented: $showsEvaluationSummary) {
-        if let summary = evaluationSummaryViewModel?.summary {
-          EvaluationSummaryView(summary: summary) {
-            evaluationSummaryViewModel?.markRead()
-          }
-        }
-      }
       .modifier(notificationHost)
       .refreshable {
         await reload()
@@ -132,10 +115,6 @@ public struct DashboardView: View {
     }
     .onChange(of: todayReloadToken) { _, _ in
       Task { await reload() }
-    }
-    .task(id: evaluationNavigationPulse) {
-      guard evaluationNavigationPulse > 0 else { return }
-      showsEvaluationSummary = true
     }
     #if os(iOS)
       .fullScreenCover(item: $shiftProposal) { proposal in
@@ -228,9 +207,6 @@ public struct DashboardView: View {
   private func loadIfNeeded() async {
     if weekViewModel.state == .idle {
       await weekViewModel.load(studentID: studentID)
-      if notifications == nil {
-        await evaluationSummaryViewModel?.load(studentID: studentID)
-      }
     }
     if notifications == nil, feedbackViewModel.state == .idle {
       await feedbackViewModel.load(studentID: studentID)
@@ -249,7 +225,6 @@ public struct DashboardView: View {
       await notifications.reload(studentID: studentID)
     } else {
       await feedbackViewModel.load(studentID: studentID)
-      await evaluationSummaryViewModel?.load(studentID: studentID)
     }
     await e1rmTrendViewModel.load(studentID: studentID)
     await profileMetricsViewModel.load(studentID: studentID)
@@ -318,9 +293,7 @@ public struct DashboardView: View {
       coordinator: notifications,
       showsNotifications: $showsNotifications,
       conversationID: $conversationID,
-      onOpenPlan: onStartWorkout,
-      onOpenFeedback: onSeeAllFeedback,
-      onOpenEvaluation: onOpenEvaluation
+      onOpenPlan: onOpenPlanNotification
     )
   }
 }

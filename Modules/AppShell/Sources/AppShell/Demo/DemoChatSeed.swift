@@ -1,5 +1,6 @@
 import ChatUI
 import CoreModels
+import Foundation
 import StudentKit
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -10,20 +11,9 @@ public enum DemoChatSeed {
     }
 
     let base = ChatDemoSeed.student()
-    let conversations = base.conversations.map { conversation in
-      ChatConversation(
-        id: conversation.id,
-        otherPartyID: StudentDemoSeed.coachID,
-        otherPartyName: "演示教练",
-        lastMessagePreview: conversation.lastMessagePreview,
-        lastMessageAt: conversation.lastMessageAt,
-        unreadCount: conversation.unreadCount,
-        myLastRead: conversation.myLastRead,
-        otherLastRead: conversation.otherLastRead
-      )
-    }
+    let firstMessageAt = Date().addingTimeInterval(-900)
     let messages = base.messagesByConversationID.mapValues { items in
-      items.map { message in
+      items.enumerated().map { index, message in
         let senderID =
           message.senderID == ChatDemoSeed.coachUserID
           ? StudentDemoSeed.coachID
@@ -39,9 +29,21 @@ public enum DemoChatSeed {
           imageURL: message.imageURL,
           imageExpiresIn: message.imageExpiresIn,
           clientID: message.clientID,
-          createdAt: message.createdAt
+          createdAt: firstMessageAt.addingTimeInterval(Double(index) * 300)
         )
       }
+    }
+    let conversations = base.conversations.map { conversation in
+      ChatConversation(
+        id: conversation.id,
+        otherPartyID: StudentDemoSeed.coachID,
+        otherPartyName: "演示教练",
+        lastMessagePreview: conversation.lastMessagePreview,
+        lastMessageAt: messages[conversation.id]?.last?.createdAt,
+        unreadCount: conversation.unreadCount,
+        myLastRead: conversation.myLastRead,
+        otherLastRead: conversation.otherLastRead
+      )
     }
     return ChatDemoSeed(
       conversations: conversations,

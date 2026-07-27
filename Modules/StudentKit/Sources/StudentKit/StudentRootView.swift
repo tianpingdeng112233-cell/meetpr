@@ -48,7 +48,6 @@ public struct StudentRootView: View {
   @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
   @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
   @State private var importedHistoryRefreshToken = 0
-  @State private var evaluationNavigationPulse = 0
   @State private var tabHostStore = StudentTabHostStore()
   @State private var dashboardCTAFrame = CGRect.zero
   @State private var trainingHeroFrame = CGRect.zero
@@ -208,14 +207,11 @@ extension StudentRootView {
         onboarding: onboarding,
         e1rm: e1rm,
         feedbackViewModel: feedbackViewModel,
-        evaluationSummaryViewModel: evaluationSummaryViewModel,
         notifications: notifications,
-        evaluationNavigationPulse: evaluationNavigationPulse,
         onStartWorkout: startWorkoutFromDashboard,
         onStartWorkoutFrameChange: { dashboardCTAFrame = $0 },
         isStartWorkoutHidden: launchSourceFrame != nil,
-        onSeeAllFeedback: { selectedTab = .growth },
-        onOpenEvaluation: openEvaluationNotification,
+        onOpenPlanNotification: openPlanNotification,
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         onPlanChanged: { planRevision += 1 }
       )
@@ -235,8 +231,6 @@ extension StudentRootView {
         workoutStartedAt: $workoutStartedAt,
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
-        onOpenFeedbackNotification: openFeedbackNotification,
-        onOpenEvaluationNotification: openEvaluationNotification,
         onHeroFrameChange: updateTrainingHeroFrame,
         onReturnToToday: { selectedTab = .today }
       )
@@ -254,9 +248,7 @@ extension StudentRootView {
         importedHistoryRefreshToken: importedHistoryRefreshToken,
         onImportedHistoryRefresh: { await runImportedHistoryBackfill() },
         notifications: notifications,
-        onOpenPlanNotification: openPlanNotification,
-        onOpenFeedbackNotification: openFeedbackNotification,
-        onOpenEvaluationNotification: openEvaluationNotification
+        onOpenPlanNotification: openPlanNotification
       )
       .studentTabLayer(shell.layer(for: .growth), store: tabHostStore)
 
@@ -266,15 +258,12 @@ extension StudentRootView {
         e1rm: e1rm,
         onboarding: onboarding,
         readiness: readiness,
-        evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
         account: account,
         logs: logs,
         restTimerSettings: restTimerSettings,
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
-        onOpenFeedbackNotification: openFeedbackNotification,
-        onOpenEvaluationNotification: openEvaluationNotification,
         onOpenGrowth: { selectedTab = .growth }
       )
       .studentTabLayer(shell.layer(for: .profile), store: tabHostStore)
@@ -311,7 +300,7 @@ extension StudentRootView {
             id: .profile,
             title: "我的",
             icon: .profile,
-            badge: pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount
+            badge: pendingPRCount
           ),
         ]
       )
@@ -380,15 +369,6 @@ extension StudentRootView {
   private func openPlanNotification() {
     trainingJumpToken += 1
     selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
-  }
-
-  private func openFeedbackNotification() {
-    selectedTab = StudentNotificationRoute.feedback.targetTab(from: selectedTab)
-  }
-
-  private func openEvaluationNotification() {
-    selectedTab = StudentNotificationRoute.evaluation.targetTab(from: selectedTab)
-    evaluationNavigationPulse += 1
   }
 
   private func startWorkoutFromDashboard() {

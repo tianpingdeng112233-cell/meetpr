@@ -18,6 +18,7 @@ import Testing
 
   await viewModel.loadIfNeeded(studentID: studentID)
   #expect(viewModel.planNotice?.weekIndex == plan.weekIndex)
+  #expect(viewModel.planNotice?.occurredAt == plan.startDate)
   #expect(viewModel.totalUnreadCount == 1)
 
   viewModel.markCurrentPlanSeen()
@@ -30,7 +31,7 @@ import Testing
 
 @MainActor
 // swiftlint:disable:next function_body_length
-@Test func notificationBadgeAddsPlanFeedbackEvaluationAndChatUnread() async throws {
+@Test func notificationBadgeExcludesSealedEvaluationUnread() async throws {
   let studentID = StudentDemoSeed.studentID
   let coachID = StudentDemoSeed.coachID
   let plan = StudentDemoSeed.makePlanView()
@@ -114,7 +115,51 @@ import Testing
   #expect(viewModel.feedbackUnreadCount == 2)
   #expect(viewModel.evaluationUnreadCount == 1)
   #expect(viewModel.chatUnreadCount == 3)
-  #expect(viewModel.totalUnreadCount == 7)
+  #expect(viewModel.totalUnreadCount == 6)
+}
+
+@MainActor
+@Test func visibleFeedbackMarkReadSynchronizesCoordinatorAndArchiveUnreadState() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let feedbackItem = CoachFeedback(
+    id: UUID(),
+    coachID: StudentDemoSeed.coachID,
+    studentID: studentID,
+    text: "保持起杠路径",
+    postedAt: Date(),
+    readAt: nil
+  )
+  let repository = InMemoryStudentFeedbackRepository(
+    seed: [feedbackItem],
+    now: { Date(timeIntervalSince1970: 1_900_000_000) }
+  )
+  let feedback = FeedbackInboxViewModel(repository: repository)
+  let plans = InMemoryStudentPlanRepository(store: TestStudentPlanStore())
+  let coordinator = StudentNotificationsCoordinator(
+    plans: plans,
+    feedback: feedback,
+    evaluation: makeEvaluationViewModel(plans: plans),
+    activeCoach: nil,
+    chatContext: nil,
+    seenStore: InMemoryDashboardPlanSeenStore()
+  )
+
+  await coordinator.loadIfNeeded(studentID: studentID)
+  #expect(coordinator.feedbackUnreadCount == 1)
+  #expect(feedback.unreadCount == 1)
+
+  let visibleFraction = StudentChatTimeline.visibleFraction(
+    card: CGRect(x: 0, y: 145, width: 300, height: 100),
+    viewport: CGRect(x: 0, y: 0, width: 300, height: 200)
+  )
+  #expect(visibleFraction >= StudentChatTimeline.feedbackReadVisibilityThreshold)
+  if visibleFraction >= StudentChatTimeline.feedbackReadVisibilityThreshold {
+    await coordinator.markFeedbackRead(try #require(feedback.items.first))
+  }
+
+  #expect(coordinator.feedbackUnreadCount == 0)
+  #expect(feedback.unreadCount == 0)
+  #expect(feedback.items.first?.readAt != nil)
 }
 
 @MainActor
@@ -159,7 +204,6 @@ import Testing
   )
 
   await coordinator.loadIfNeeded(studentID: studentID)
-  #expect(coordinator.hasActiveCoach)
   #expect(coordinator.chatUnreadCount == 0)
   #expect(coordinator.coachConversation == nil)
 

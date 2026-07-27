@@ -18,8 +18,6 @@ public struct MyProfileView: View {
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
-  private let onOpenFeedbackNotification: () -> Void
-  private let onOpenEvaluationNotification: () -> Void
   private let onOpenGrowth: (() -> Void)?
 
   @State private var viewModel: MyProfileViewModel
@@ -36,7 +34,6 @@ public struct MyProfileView: View {
     e1rm: any E1RMRepository,
     onboarding: any OnboardingRepository,
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
-    evaluationSummaryViewModel _: StudentEvaluationSummaryViewModel? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
     account: (any AccountRepository)? = nil,
     logs: (any StudentTrainingLogRepository)? = nil,
@@ -44,8 +41,6 @@ public struct MyProfileView: View {
       UserDefaultsRestTimerSettingsStore(),
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
-    onOpenFeedbackNotification: @escaping () -> Void = {},
-    onOpenEvaluationNotification: @escaping () -> Void = {},
     onOpenGrowth: (() -> Void)? = nil
   ) {
     self.studentID = studentID
@@ -58,8 +53,6 @@ public struct MyProfileView: View {
     self.restTimerSettings = restTimerSettings
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
-    self.onOpenFeedbackNotification = onOpenFeedbackNotification
-    self.onOpenEvaluationNotification = onOpenEvaluationNotification
     self.onOpenGrowth = onOpenGrowth
     self._viewModel = State(
       initialValue: MyProfileViewModel(studentId: studentID, repo: onboarding)
@@ -73,7 +66,11 @@ public struct MyProfileView: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-          MyProfileHeader()
+          MyProfileHeader(
+            showsChat: notifications != nil,
+            unreadCount: notifications?.totalUnreadCount ?? 0,
+            onOpenChat: { showingNotifications = true }
+          )
           content
         }
         .padding(.horizontal, MeetPRSpacing.pageHorizontal)
@@ -89,9 +86,7 @@ public struct MyProfileView: View {
           coordinator: notifications,
           showsNotifications: $showingNotifications,
           conversationID: $conversationID,
-          onOpenPlan: onOpenPlanNotification,
-          onOpenFeedback: onOpenFeedbackNotification,
-          onOpenEvaluation: onOpenEvaluationNotification
+          onOpenPlan: onOpenPlanNotification
         )
       )
       .refreshable {
@@ -334,11 +329,25 @@ public struct MyProfileView: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct MyProfileHeader: View {
+  let showsChat: Bool
+  let unreadCount: Int
+  let onOpenChat: @MainActor () -> Void
+
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-      MeetPRMark(size: 44)
-        .frame(width: 92, height: MeetPRFontMetrics.size16, alignment: .leading)
-        .clipped()
+      HStack {
+        MeetPRMark(size: 44)
+          .frame(width: 92, height: MeetPRFontMetrics.size16, alignment: .leading)
+          .clipped()
+        Spacer()
+        if showsChat {
+          HeaderChatButton(
+            unreadCount: unreadCount,
+            accessibilityLabel: "消息与通知",
+            action: onOpenChat
+          )
+        }
+      }
       Text("我的资料")
         .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
         .foregroundStyle(Color.MeetPR.textPrimary)

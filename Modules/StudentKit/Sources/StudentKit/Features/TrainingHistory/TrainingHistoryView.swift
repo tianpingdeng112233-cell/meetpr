@@ -19,8 +19,6 @@ public struct TrainingHistoryView: View {
   private let onImportedHistoryRefresh: (@MainActor () async -> Void)?
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
-  private let onOpenFeedbackNotification: () -> Void
-  private let onOpenEvaluationNotification: () -> Void
 
   @State private var viewModel: TrainingHistoryViewModel
   @State private var growthViewModel: GrowthCurveViewModel
@@ -42,9 +40,7 @@ public struct TrainingHistoryView: View {
     importedHistoryRefreshToken: Int = 0,
     onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil,
     notifications: StudentNotificationsCoordinator? = nil,
-    onOpenPlanNotification: @escaping () -> Void = {},
-    onOpenFeedbackNotification: @escaping () -> Void = {},
-    onOpenEvaluationNotification: @escaping () -> Void = {}
+    onOpenPlanNotification: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
     self.onboarding = onboarding
@@ -53,8 +49,6 @@ public struct TrainingHistoryView: View {
     self.onImportedHistoryRefresh = onImportedHistoryRefresh
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
-    self.onOpenFeedbackNotification = onOpenFeedbackNotification
-    self.onOpenEvaluationNotification = onOpenEvaluationNotification
     self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
     self._growthViewModel = State(
       initialValue: GrowthCurveViewModel(
@@ -69,7 +63,11 @@ public struct TrainingHistoryView: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-          GrowthScreenHeader()
+          GrowthScreenHeader(
+            showsChat: notifications != nil,
+            unreadCount: notifications?.totalUnreadCount ?? 0,
+            onOpenChat: { showsNotifications = true }
+          )
           content
         }
         .padding(.horizontal, MeetPRSpacing.pageHorizontal)
@@ -88,9 +86,7 @@ public struct TrainingHistoryView: View {
           coordinator: notifications,
           showsNotifications: $showsNotifications,
           conversationID: $conversationID,
-          onOpenPlan: onOpenPlanNotification,
-          onOpenFeedback: onOpenFeedbackNotification,
-          onOpenEvaluation: onOpenEvaluationNotification
+          onOpenPlan: onOpenPlanNotification
         )
       )
       .refreshable {
@@ -297,11 +293,25 @@ public struct TrainingHistoryView: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct GrowthScreenHeader: View {
+  let showsChat: Bool
+  let unreadCount: Int
+  let onOpenChat: @MainActor () -> Void
+
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-      MeetPRMark(size: 44)
-        .frame(width: 92, height: MeetPRFontMetrics.size16, alignment: .leading)
-        .clipped()
+      HStack {
+        MeetPRMark(size: 44)
+          .frame(width: 92, height: MeetPRFontMetrics.size16, alignment: .leading)
+          .clipped()
+        Spacer()
+        if showsChat {
+          HeaderChatButton(
+            unreadCount: unreadCount,
+            accessibilityLabel: "消息与通知",
+            action: onOpenChat
+          )
+        }
+      }
       Text("成长")
         .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
         .foregroundStyle(Color.MeetPR.textPrimary)

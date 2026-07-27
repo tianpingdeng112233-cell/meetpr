@@ -76,6 +76,7 @@ public enum StudentDemoSeed {
   ) -> [CoachFeedback] {
     let plan = makePlanView()
     let linkedExerciseID = plan.days.first?.exercises.first?.id
+    let newestFeedbackAt = Date().addingTimeInterval(-120)
     return [
       CoachFeedback(
         id: uuid(401),
@@ -85,9 +86,9 @@ public enum StudentDemoSeed {
         planExerciseID: linkedExerciseID,
         videoID: uuid(411),
         video: demoFeedbackVideo(
-          id: uuid(411), loggedAt: referenceDate.addingTimeInterval(4 * 86_400)),
+          id: uuid(411), loggedAt: newestFeedbackAt.addingTimeInterval(-60)),
         text: "深蹲第一组速度很好，下一次保持同样节奏，最后一组不要急着起杠。",
-        postedAt: referenceDate.addingTimeInterval(4 * 86_400),
+        postedAt: newestFeedbackAt,
         readAt: nil
       ),
       CoachFeedback(
@@ -96,7 +97,7 @@ public enum StudentDemoSeed {
         studentID: studentID,
         dayDate: plan.days[1].date,
         text: "卧推动作稳定，肘部路径比上周干净。辅助动作可以控制离心两秒。",
-        postedAt: referenceDate.addingTimeInterval(3 * 86_400),
+        postedAt: newestFeedbackAt.addingTimeInterval(-180),
         readAt: nil
       ),
       CoachFeedback(
@@ -104,8 +105,8 @@ public enum StudentDemoSeed {
         coachID: coachID,
         studentID: studentID,
         text: "本周总体恢复不错，睡眠继续保持。周末拉伸别省。",
-        postedAt: referenceDate.addingTimeInterval(86_400),
-        readAt: referenceDate.addingTimeInterval(2 * 86_400)
+        postedAt: newestFeedbackAt.addingTimeInterval(-420),
+        readAt: newestFeedbackAt.addingTimeInterval(-360)
       ),
     ]
   }

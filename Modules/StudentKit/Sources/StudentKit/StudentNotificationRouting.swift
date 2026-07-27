@@ -35,17 +35,13 @@ struct StudentTabShellPresentation: Equatable {
 }
 
 enum StudentNotificationRoute: Hashable {
+  // The merged chat timeline (2026-07-27) absorbed the feedback/evaluation/
+  // coach-message routes; plan is the only notification that still deep-links.
   case plan
-  case feedback
-  case evaluation
-  case coachMessages
 
   func targetTab(from currentTab: StudentTab) -> StudentTab {
     switch self {
     case .plan: .training
-    case .feedback: .growth
-    case .evaluation: .today
-    case .coachMessages: currentTab
     }
   }
 }
