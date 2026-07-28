@@ -63,6 +63,13 @@ public final class ConversationViewModel {
   @ObservationIgnored var imageRenewalsInFlight: Set<UUID> = []
   @ObservationIgnored var lastImageRenewalAttemptAt: [UUID: Date] = [:]
   @ObservationIgnored var loadFailureRenewalAttempted: Set<UUID> = []
+  @ObservationIgnored var videoURLObtainedAt: [UUID: Date] = [:]
+  @ObservationIgnored var videoRenewalsInFlight: Set<UUID> = []
+  /// Prevents an already-removed message from being resurrected by a stale
+  /// fetch that was in flight when renewal proved the message inaccessible.
+  /// A view model owns one immutable conversation, so a conversation switch
+  /// creates a fresh set.
+  @ObservationIgnored var removedMessageIDs: Set<UUID> = []
   @ObservationIgnored var readRequest: UInt64 = 0
   @ObservationIgnored var latestRequestedReadSequence = 0
   @ObservationIgnored var latestAppliedReadSequence = 0

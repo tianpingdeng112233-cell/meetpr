@@ -24,6 +24,8 @@ actor TestChatRepository: ChatRepository {
   private var plannedImageSends: [PlannedChatSend] = []
   private var plannedSetRefSends: [PlannedChatSend] = []
   private var suspendedTextSends = false
+  private var shouldSuspendNextFetch = false
+  private var pendingFetchContinuation: CheckedContinuation<ChatMessagePage, any Error>?
   private var pendingTextContinuations: [String: CheckedContinuation<ChatMessage, any Error>] = [:]
   private var cancelledTextClientIDs: Set<String> = []
   private var knownMessagesByID: [UUID: ChatMessage] = [:]
@@ -67,6 +69,22 @@ actor TestChatRepository: ChatRepository {
     suspendedTextSends = true
   }
 
+  func suspendNextFetch() {
+    shouldSuspendNextFetch = true
+  }
+
+  func hasPendingFetch() -> Bool {
+    pendingFetchContinuation != nil
+  }
+
+  func resolvePendingFetch(with page: ChatMessagePage) {
+    for message in page.messages {
+      knownMessagesByID[message.id] = message
+    }
+    pendingFetchContinuation?.resume(returning: page)
+    pendingFetchContinuation = nil
+  }
+
   func pendingTextClientIDs() -> Set<String> {
     Set(pendingTextContinuations.keys)
   }
@@ -104,6 +122,12 @@ actor TestChatRepository: ChatRepository {
     query: ChatMessageQuery
   ) async throws -> ChatMessagePage {
     queries.append(query)
+    if shouldSuspendNextFetch {
+      shouldSuspendNextFetch = false
+      return try await withCheckedThrowingContinuation { continuation in
+        pendingFetchContinuation = continuation
+      }
+    }
     guard !pages.isEmpty else {
       return ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
     }
@@ -289,7 +313,10 @@ func chatTestMessage(
   kind: ChatMessageKind = .text,
   text: String? = "消息",
   imageURL: URL? = nil,
-  imageExpiresIn: Int? = nil
+  imageExpiresIn: Int? = nil,
+  setRef: SetRefV1? = nil,
+  videoURL: URL? = nil,
+  videoExpiresIn: Int? = nil
 ) -> ChatMessage {
   ChatMessage(
     id: id,
@@ -301,6 +328,9 @@ func chatTestMessage(
     attachmentID: kind == .image ? UUID() : nil,
     imageURL: imageURL,
     imageExpiresIn: imageExpiresIn,
+    setRef: setRef,
+    videoURL: videoURL,
+    videoExpiresIn: videoExpiresIn,
     clientID: clientID,
     createdAt: Date(timeIntervalSince1970: TimeInterval(1_700_000_000 + seq))
   )

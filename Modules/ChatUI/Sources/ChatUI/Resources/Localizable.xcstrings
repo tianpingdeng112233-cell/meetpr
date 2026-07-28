@@ -23,6 +23,17 @@
         }
       }
     },
+    "chat.closePlayback": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭播放"
+          }
+        }
+      }
+    },
     "chat.composerPlaceholder": {
       "extractionState": "manual",
       "localizations": {
@@ -78,6 +89,17 @@
         }
       }
     },
+    "chat.load": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重量 × 次数"
+          }
+        }
+      }
+    },
     "chat.loadOlder": {
       "extractionState": "manual",
       "localizations": {
@@ -122,6 +144,39 @@
         }
       }
     },
+    "chat.playbackFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放失败，链接可能已过期"
+          }
+        }
+      }
+    },
+    "chat.playbackSpeed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放速度"
+          }
+        }
+      }
+    },
+    "chat.playVideo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放视频"
+          }
+        }
+      }
+    },
     "chat.read": {
       "extractionState": "manual",
       "localizations": {
@@ -140,6 +195,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "重试"
+          }
+        }
+      }
+    },
+    "chat.refreshing": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刷新中…"
           }
         }
       }
@@ -166,6 +232,17 @@
         }
       }
     },
+    "chat.setNumber": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "组次"
+          }
+        }
+      }
+    },
     "chat.sending": {
       "extractionState": "manual",
       "localizations": {
@@ -177,6 +254,17 @@
         }
       }
     },
+    "chat.trainingShare": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练分享"
+          }
+        }
+      }
+    },
     "chat.unread": {
       "extractionState": "manual",
       "localizations": {
@@ -184,6 +272,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "条未读"
+          }
+        }
+      }
+    },
+    "chat.videoPlayback": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频回放 //"
           }
         }
       }
