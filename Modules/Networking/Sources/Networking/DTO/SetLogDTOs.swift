@@ -82,6 +82,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   public let weightKg: Decimal
   public let reps: Int
   public let rpe: Decimal?
+  public let coachRPE: Decimal?
   public let completed: Bool
   public let failed: Bool
   public let assumed: Bool
@@ -96,6 +97,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
+    coachRPE: Decimal? = nil,
     completed: Bool,
     failed: Bool = false,
     assumed: Bool = false,
@@ -109,6 +111,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.weightKg = weightKg
     self.reps = reps
     self.rpe = rpe
+    self.coachRPE = coachRPE
     self.completed = completed
     self.failed = failed
     self.assumed = assumed
@@ -125,6 +128,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     weightKg = try container.decodeDecimal(forKey: .weightKg)
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
+    coachRPE = try container.decodeDecimalIfPresent(forKey: .coachRPE)
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
     assumed = try container.decodeIfPresent(Bool.self, forKey: .assumed) ?? false
@@ -141,6 +145,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
+    try container.encodeDecimalStringIfPresent(coachRPE, forKey: .coachRPE)
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
     try container.encode(assumed, forKey: .assumed)
@@ -156,6 +161,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case weightKg
     case reps
     case rpe
+    case coachRPE = "coachRpe"
     case completed
     case failed
     case assumed

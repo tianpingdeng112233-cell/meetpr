@@ -209,14 +209,15 @@ final class DashboardE1RMTrendViewModel {
         let family = MainLiftExerciseFamilyResolver.family(
           for: event.exerciseId,
           in: idsByFamily
-        )
+        ),
+        let breakthroughE1RMKg = event.breakthroughE1RMKg
       else {
         continue
       }
       return DashboardE1RMHeadline(
         kind: .latestPR,
         family: family,
-        valueKg: event.breakthroughE1RMKg
+        valueKg: breakthroughE1RMKg
       )
     }
     return nil

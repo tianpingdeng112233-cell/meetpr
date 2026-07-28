@@ -29,6 +29,7 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         weightKg: log.weightKg,
         reps: log.reps,
         rpe: log.rpe,
+        coachRPE: log.coachRPE,
         completed: log.completed,
         failed: log.failed,
         assumed: false
@@ -45,6 +46,7 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         weightKg: log.weightKg,
         reps: log.reps,
         rpe: log.rpe,
+        coachRPE: log.coachRPE,
         completed: log.completed,
         failed: log.failed,
         assumed: false

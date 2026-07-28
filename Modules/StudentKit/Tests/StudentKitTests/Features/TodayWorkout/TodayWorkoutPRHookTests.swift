@@ -85,7 +85,7 @@ private struct TestFailure: Error, CustomStringConvertible {
 }
 
 @MainActor
-@Test func lowRPECompletionStaysInLogButDoesNotRecordE1RM() async throws {
+@Test func lowRPECompletionUsesSegmentedCalculatorAndRecordsE1RM() async throws {
   let e1rm = InMemoryE1RMRepository()
   let (viewModel, studentID) = try await makeLoadedViewModel(e1rm: e1rm)
   guard case .loaded(_, let drafts) = viewModel.state, let first = drafts.first else {
@@ -100,8 +100,15 @@ private struct TestFailure: Error, CustomStringConvertible {
   }
   #expect(updated[0].completed)
   let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: first.exerciseID)
-  #expect(history.isEmpty)
-  #expect(viewModel.pendingPRBanner == nil)
+  #expect(history.count == 1)
+  #expect(history.first?.sourceRPE == 6)
+  #expect(
+    history.first?.e1RMKg
+      == E1RMCalculator.calculate(
+        weightKg: NSDecimalNumber(decimal: updated[0].actualWeight ?? 0).doubleValue,
+        reps: updated[0].actualReps ?? 0,
+        rpe: 6
+      ))
 }
 
 @MainActor
@@ -119,36 +126,46 @@ private struct TestFailure: Error, CustomStringConvertible {
 
   let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: first.exerciseID)
   #expect(history.count == 1)
-  // Rechecking upserts the same set-log point; the identical e1RM remains
-  // inside the 0.5kg buffer and does not create another PR.
+  // Rechecking upserts the same set-log point; identical measured weight does
+  // not create another PR.
   let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
   #expect(pending.isEmpty)
   #expect(viewModel.pendingPRBanner == nil)
 }
 
 @MainActor
-@Test func bufferSuppressesSubHalfKiloImprovements() async throws {
+@Test func e1RMImprovementAtTheSameMeasuredWeightDoesNotFirePR() async throws {
   let e1rm = InMemoryE1RMRepository()
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView(today: frozenNow)
   guard let deadlift = plan.days[3].exercises.first?.exercise else {
     throw TestFailure("seed shape changed")
   }
-  // Seed a baseline just under what today's prescribed set will produce:
-  // 硬拉 175×3 @8.5 → RTS 0.86 → ≈203.49. Baseline 203.3 → +0.19 < 0.5 buffer.
+  // Seed the same measured weight with a slightly lower e1RM. Today's
+  // projected estimate improves, but 175 kg itself is not a weight PR.
   try await e1rm.recordPoint(
     E1RMHistoryPoint(
-      id: UUID(), studentId: studentID, exerciseId: deadlift.id, setLogId: UUID(),
+      id: UUID(), studentId: studentID, exerciseId: deadlift.id, family: .deadlift,
+      setLogId: UUID(),
       computedAt: frozenNow.addingTimeInterval(-86_400),
-      e1RMKg: 203.3, sourceWeightKg: 172.5, sourceReps: 3, sourceRPE: 8.5
+      e1RMKg: 203.3, sourceWeightKg: 175, sourceReps: 3, sourceRPE: 8.5
     ))
+  try await e1rm.recordWeightBaseline(
+    E1RMWeightBaseline(
+      studentId: studentID,
+      family: .deadlift,
+      maxWeightKg: 175,
+      setLogId: UUID(),
+      achievedAt: frozenNow.addingTimeInterval(-86_400)
+    )
+  )
 
   let (viewModel, _) = try await makeLoadedViewModel(e1rm: e1rm)
   await viewModel.toggleComplete(rowIndex: 0)
 
   let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: deadlift.id)
   #expect(history.count == 2, "point still recorded")
-  #expect(viewModel.pendingPRBanner == nil, "sub-buffer improvement must not fire a PR")
+  #expect(viewModel.pendingPRBanner == nil, "e1RM extrapolation alone must not fire a PR")
 }
 
 @MainActor
@@ -174,7 +191,7 @@ private struct TestFailure: Error, CustomStringConvertible {
 @Test func sameTimestampCompletionsDoNotDoubleFirePRs() async throws {
   // Frozen clock: both completions get identical computedAt. The baseline is
   // taken over the full history before insertion (Codex review P1), so the
-  // second identical-e1RM set must not break the 0.5kg buffer.
+  // second identical measured-weight set must not create another PR.
   let e1rm = InMemoryE1RMRepository()
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView(today: frozenNow)

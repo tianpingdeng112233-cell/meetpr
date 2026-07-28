@@ -46,7 +46,8 @@ private func seriesPoint(
       failed: true, reps: 5, rpe: 8, family: .squat
     ) == false
   )
-  #expect(E1RMEligibility.isEligible(reps: 5, rpe: 6.5, family: .squat) == false)
+  #expect(E1RMEligibility.isEligible(reps: 5, rpe: 6.5, family: .squat))
+  #expect(E1RMEligibility.isEligible(reps: 5, rpe: 11, family: .squat) == false)
   #expect(E1RMEligibility.isEligible(reps: 11, rpe: 9, family: .squat) == false)
   #expect(E1RMEligibility.isEligible(reps: 6, rpe: 9, family: .deadlift) == false)
   #expect(E1RMEligibility.isEligible(reps: 5, rpe: 9, family: .deadlift))

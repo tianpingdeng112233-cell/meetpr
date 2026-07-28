@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import CoreModels
 import Foundation
 import RepositoryContracts
@@ -14,12 +15,14 @@ private func point(
   e1RM: Double,
   anchor: Date = Date(timeIntervalSince1970: 1_768_262_400),
   confidence: E1RMConfidence = .normal,
-  origin: E1RMPointOrigin = .logged
+  origin: E1RMPointOrigin = .logged,
+  family: LiftFamily? = nil
 ) -> E1RMHistoryPoint {
   E1RMHistoryPoint(
     id: id,
     studentId: studentId,
     exerciseId: exerciseId,
+    family: family,
     setLogId: setLogId,
     computedAt: anchor.addingTimeInterval(-daysAgo * 86_400),
     e1RMKg: e1RM,
@@ -29,6 +32,49 @@ private func point(
     confidence: confidence,
     origin: origin
   )
+}
+
+@Test func familyFetchCrossesExerciseBucketsAndExcludesLegacyNilFamily() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let genericSquat = UUID()
+    let lowBarSquat = UUID()
+    let bench = UUID()
+    try await repo.recordPoint(
+      point(
+        studentId: student,
+        exerciseId: genericSquat,
+        daysAgo: 3,
+        e1RM: 130,
+        family: .squat
+      )
+    )
+    try await repo.recordPoint(
+      point(
+        studentId: student,
+        exerciseId: lowBarSquat,
+        daysAgo: 1,
+        e1RM: 140,
+        family: .squat
+      )
+    )
+    try await repo.recordPoint(
+      point(
+        studentId: student,
+        exerciseId: bench,
+        daysAgo: 2,
+        e1RM: 100,
+        family: .bench
+      )
+    )
+    try await repo.recordPoint(
+      point(studentId: student, exerciseId: UUID(), daysAgo: 0, e1RM: 150)
+    )
+
+    let squatHistory = try await repo.fetchHistory(studentId: student, family: .squat)
+
+    #expect(squatHistory.map(\.e1RMKg) == [130, 140], "\(label)")
+  }
 }
 
 /// Both implementations must satisfy the same contract; Local gets a temp dir.
@@ -139,6 +185,7 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
       id: UUID(),
       studentId: student,
       exerciseId: UUID(),
+      family: .squat,
       pointId: UUID(),
       breakthroughE1RMKg: 140,
       previousMaxE1RMKg: 132,
@@ -152,7 +199,46 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
 
     try await repo.acknowledgePR(eventId: event.id)
     let afterAck = try await repo.unacknowledgedPRs(studentId: student)
+    let familyHistory = try await repo.fetchPRs(studentId: student, family: .squat)
     #expect(afterAck.isEmpty, "\(label)")
+    #expect(familyHistory.map(\.id) == [event.id], "\(label): acknowledged PR remains a baseline")
+  }
+}
+
+@Test func weightBaselineUpdateIsPersistentAndStrictlyMonotonic() async throws {
+  for (label, repo) in makeRepos() {
+    let student = UUID()
+    let anchor = Date(timeIntervalSince1970: 1_768_262_400)
+    let first = E1RMWeightBaseline(
+      studentId: student,
+      family: .deadlift,
+      maxWeightKg: 220,
+      setLogId: UUID(),
+      achievedAt: anchor
+    )
+    let lower = E1RMWeightBaseline(
+      studentId: student,
+      family: .deadlift,
+      maxWeightKg: 215,
+      setLogId: UUID(),
+      achievedAt: anchor.addingTimeInterval(86_400)
+    )
+    let higher = E1RMWeightBaseline(
+      studentId: student,
+      family: .deadlift,
+      maxWeightKg: 222.5,
+      setLogId: UUID(),
+      achievedAt: anchor.addingTimeInterval(2 * 86_400)
+    )
+
+    #expect(try await repo.recordWeightBaseline(first) == nil, "\(label)")
+    #expect(try await repo.recordWeightBaseline(lower) == first, "\(label)")
+    #expect(try await repo.recordWeightBaseline(higher) == first, "\(label)")
+    #expect(
+      try await repo.fetchWeightBaseline(studentId: student, family: .deadlift) == higher,
+      "\(label)"
+    )
+    #expect(try await repo.fetchWeightBaselines(studentId: student) == [higher], "\(label)")
   }
 }
 
@@ -164,11 +250,22 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
 
   let first = LocalE1RMRepository(directory: tempDir)
   try await first.recordPoint(point(studentId: student, exerciseId: squat, daysAgo: 1, e1RM: 128))
+  let baseline = E1RMWeightBaseline(
+    studentId: student,
+    family: .squat,
+    maxWeightKg: 115,
+    setLogId: UUID(),
+    achievedAt: Date(timeIntervalSince1970: 1_768_262_400)
+  )
+  try await first.recordWeightBaseline(baseline)
 
   let second = LocalE1RMRepository(directory: tempDir)
   let history = try await second.fetchHistory(studentId: student, exerciseId: squat)
   #expect(history.count == 1)
   #expect(history.first?.e1RMKg == 128)
+  #expect(
+    try await second.fetchWeightBaseline(studentId: student, family: .squat) == baseline
+  )
 }
 
 @Test func localRepositoryThrowsOnCorruptFileInsteadOfErasing() async throws {

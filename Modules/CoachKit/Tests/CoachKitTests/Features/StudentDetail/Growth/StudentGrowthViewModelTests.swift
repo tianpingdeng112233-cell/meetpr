@@ -91,6 +91,25 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func growthPointsUseCoachCalibrationAsTheAuthoritativeRPE() throws {
+  let log = growthLog(
+    loggedAt: CoachStudentFeatureFixtures.startDate,
+    weightKg: 140,
+    rpe: 6,
+    coachRPE: 8
+  )
+
+  let points = StudentGrowthViewModel.makePoints(
+    logs: [log],
+    familyByPlanExerciseID: [CoachStudentFeatureFixtures.planExerciseID: .squat]
+  )
+  let point = try #require(points[.squat]?.first)
+
+  #expect(abs(point.e1RMKg - 179.49) < 0.01)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func growthLoadFiltersByFamilyAndTimeWindow() async {
   let now = CoachStudentFeatureFixtures.startDate.addingTimeInterval(3 * 86_400)
   let recent = growthLog(loggedAt: now.addingTimeInterval(-2 * 86_400))
@@ -137,6 +156,7 @@ private func growthLog(
   loggedAt: Date,
   weightKg: Decimal = 142.5,
   rpe: Decimal? = 8.5,
+  coachRPE: Decimal? = nil,
   completed: Bool = true,
   planExerciseID: UUID = CoachStudentFeatureFixtures.planExerciseID
 ) -> StudentSetLog {
@@ -149,6 +169,7 @@ private func growthLog(
     weightKg: weightKg,
     reps: 5,
     rpe: rpe,
+    coachRPE: coachRPE,
     completed: completed
   )
 }

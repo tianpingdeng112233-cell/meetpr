@@ -21,12 +21,18 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
   /// Catalog exercise identity (variation-level): squat / high-bar squat /
   /// lunge each keep an independent history and PR lineage.
   public let exerciseId: UUID
+  /// Competition family resolved when the point was recorded. Points persisted
+  /// before spec 050's family-wide baseline decode as nil.
+  public let family: LiftFamily?
   public let setLogId: UUID
   public let computedAt: Date
   public let e1RMKg: Double
   public let sourceWeightKg: Double
   public let sourceReps: Int
   public let sourceRPE: Double?
+  /// Optional coach calibration retained separately so suggestion policy can
+  /// distinguish a calibrated low-RPE set from an unreviewed one.
+  public let sourceCoachRPE: Double?
   /// Points written before anomaly quarantine decode as `.normal`.
   public let confidence: E1RMConfidence
   /// Points written before imported-history support decode as `.logged`.
@@ -36,24 +42,28 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
     id: UUID,
     studentId: UUID,
     exerciseId: UUID,
+    family: LiftFamily? = nil,
     setLogId: UUID,
     computedAt: Date,
     e1RMKg: Double,
     sourceWeightKg: Double,
     sourceReps: Int,
     sourceRPE: Double?,
+    sourceCoachRPE: Double? = nil,
     confidence: E1RMConfidence = .normal,
     origin: E1RMPointOrigin = .logged
   ) {
     self.id = id
     self.studentId = studentId
     self.exerciseId = exerciseId
+    self.family = family
     self.setLogId = setLogId
     self.computedAt = computedAt
     self.e1RMKg = e1RMKg
     self.sourceWeightKg = sourceWeightKg
     self.sourceReps = sourceReps
     self.sourceRPE = sourceRPE
+    self.sourceCoachRPE = sourceCoachRPE
     self.confidence = confidence
     self.origin = origin
   }
@@ -63,12 +73,14 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
     id = try container.decode(UUID.self, forKey: .id)
     studentId = try container.decode(UUID.self, forKey: .studentId)
     exerciseId = try container.decode(UUID.self, forKey: .exerciseId)
+    family = try container.decodeIfPresent(LiftFamily.self, forKey: .family)
     setLogId = try container.decode(UUID.self, forKey: .setLogId)
     computedAt = try container.decode(Date.self, forKey: .computedAt)
     e1RMKg = try container.decode(Double.self, forKey: .e1RMKg)
     sourceWeightKg = try container.decode(Double.self, forKey: .sourceWeightKg)
     sourceReps = try container.decode(Int.self, forKey: .sourceReps)
     sourceRPE = try container.decodeIfPresent(Double.self, forKey: .sourceRPE)
+    sourceCoachRPE = try container.decodeIfPresent(Double.self, forKey: .sourceCoachRPE)
     confidence = try container.decodeIfPresent(E1RMConfidence.self, forKey: .confidence) ?? .normal
     origin = try container.decodeIfPresent(E1RMPointOrigin.self, forKey: .origin) ?? .logged
   }
@@ -78,12 +90,14 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
       id: id,
       studentId: studentId,
       exerciseId: exerciseId,
+      family: family,
       setLogId: setLogId,
       computedAt: computedAt,
       e1RMKg: e1RMKg,
       sourceWeightKg: sourceWeightKg,
       sourceReps: sourceReps,
       sourceRPE: sourceRPE,
+      sourceCoachRPE: sourceCoachRPE,
       confidence: confidence,
       origin: origin
     )
@@ -94,14 +108,21 @@ public struct E1RMHistoryPoint: Codable, Hashable, Sendable, Identifiable {
       id: id,
       studentId: studentId,
       exerciseId: exerciseId,
+      family: family,
       setLogId: setLogId,
       computedAt: computedAt,
       e1RMKg: e1RMKg,
       sourceWeightKg: sourceWeightKg,
       sourceReps: sourceReps,
       sourceRPE: sourceRPE,
+      sourceCoachRPE: sourceCoachRPE,
       confidence: confidence,
       origin: origin
     )
+  }
+
+  /// Coach calibration wins everywhere strength math consumes this point.
+  public var effectiveSourceRPE: Double? {
+    sourceCoachRPE ?? sourceRPE
   }
 }

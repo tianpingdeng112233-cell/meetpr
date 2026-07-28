@@ -6,9 +6,36 @@ import RepositoryContracts
 /// JSON file under Documents/e1rm/). Backend stays uninvolved in V0.1; the
 /// history survives relaunches but not device changes.
 public actor LocalE1RMRepository: E1RMRepository {
+  private struct StorageState: Codable {
+    var points: [E1RMHistoryPoint]
+    var weightBaselines: [E1RMWeightBaseline]
+    var prEvents: [PRBreakthroughEvent]
+
+    init(
+      points: [E1RMHistoryPoint] = [],
+      weightBaselines: [E1RMWeightBaseline] = [],
+      prEvents: [PRBreakthroughEvent] = []
+    ) {
+      self.points = points
+      self.weightBaselines = weightBaselines
+      self.prEvents = prEvents
+    }
+
+    init(from decoder: any Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      points = try container.decodeIfPresent([E1RMHistoryPoint].self, forKey: .points) ?? []
+      weightBaselines =
+        try container.decodeIfPresent(
+          [E1RMWeightBaseline].self,
+          forKey: .weightBaselines
+        ) ?? []
+      prEvents =
+        try container.decodeIfPresent([PRBreakthroughEvent].self, forKey: .prEvents) ?? []
+    }
+  }
+
   private let directory: URL
-  private var cachedPoints: [E1RMHistoryPoint]?
-  private var cachedPRs: [PRBreakthroughEvent]?
+  private var cachedState: StorageState?
 
   private let encoder: JSONEncoder
   private let decoder: JSONDecoder
@@ -31,25 +58,25 @@ public actor LocalE1RMRepository: E1RMRepository {
   // MARK: - E1RMRepository
 
   public func recordPoint(_ point: E1RMHistoryPoint) async throws {
-    var all = try loadPoints()
-    all.append(point)
-    try save(points: all)
+    var state = try loadState()
+    state.points.append(point)
+    try save(state)
   }
 
   @discardableResult
   public func upsertPoint(_ point: E1RMHistoryPoint) async throws -> E1RMHistoryPoint {
-    var all = try loadPoints()
-    if let index = all.firstIndex(where: {
+    var state = try loadState()
+    if let index = state.points.firstIndex(where: {
       $0.studentId == point.studentId && $0.setLogId == point.setLogId
     }) {
-      let replacement = point.replacing(id: all[index].id)
-      all[index] = replacement
-      try save(points: all)
+      let replacement = point.replacing(id: state.points[index].id)
+      state.points[index] = replacement
+      try save(state)
       return replacement
     }
 
-    all.append(point)
-    try save(points: all)
+    state.points.append(point)
+    try save(state)
     return point
   }
 
@@ -59,28 +86,47 @@ public actor LocalE1RMRepository: E1RMRepository {
     confidence: E1RMConfidence
   ) async throws {
     guard !pointIDs.isEmpty else { return }
-    var all = try loadPoints()
+    var state = try loadState()
     var didChange = false
-    for index in all.indices
-    where all[index].studentId == studentId && pointIDs.contains(all[index].id) {
-      guard all[index].origin == .imported, all[index].confidence != confidence else { continue }
-      all[index] = all[index].replacing(confidence: confidence)
+    for index in state.points.indices
+    where state.points[index].studentId == studentId
+      && pointIDs.contains(state.points[index].id)
+    {
+      guard
+        state.points[index].origin == .imported,
+        state.points[index].confidence != confidence
+      else { continue }
+      state.points[index] = state.points[index].replacing(confidence: confidence)
       didChange = true
     }
     if didChange {
-      try save(points: all)
+      try save(state)
     }
   }
 
-  public func replaceHistory(studentId: UUID, with replacement: [E1RMHistoryPoint]) async throws {
-    let retainedPoints = try loadPoints().filter { $0.studentId != studentId }
-    let retainedPRs = try loadPRs().filter { $0.studentId != studentId }
-    try save(points: retainedPoints + replacement.filter { $0.studentId == studentId })
-    try save(prs: retainedPRs)
+  public func replaceHistory(
+    studentId: UUID,
+    with replacement: [E1RMHistoryPoint],
+    weightBaselines replacementBaselines: [E1RMWeightBaseline],
+    prEvents replacementPREvents: [PRBreakthroughEvent]
+  ) async throws {
+    var state = try loadState()
+    state.points =
+      state.points.filter { $0.studentId != studentId }
+      + replacement.filter { $0.studentId == studentId }
+    state.weightBaselines =
+      state.weightBaselines.filter { $0.studentId != studentId }
+      + Self.maximumBaselines(
+        replacementBaselines.filter { $0.studentId == studentId }
+      )
+    state.prEvents =
+      state.prEvents.filter { $0.studentId != studentId }
+      + replacementPREvents.filter { $0.studentId == studentId }
+    try save(state)
   }
 
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
-    try loadPoints()
+    try loadState().points
       .filter { $0.studentId == studentId && $0.exerciseId == exerciseId }
       .sorted { $0.computedAt < $1.computedAt }
   }
@@ -96,13 +142,22 @@ public actor LocalE1RMRepository: E1RMRepository {
     return result
   }
 
+  public func fetchHistory(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> [E1RMHistoryPoint] {
+    try loadState().points
+      .filter { $0.studentId == studentId && $0.family == family }
+      .sorted { $0.computedAt < $1.computedAt }
+  }
+
   public func maxBefore(
     studentId: UUID,
     exerciseId: UUID,
     before: Date,
     excludingSetLogId: UUID?
   ) async throws -> Double? {
-    try loadPoints()
+    try loadState().points
       .filter {
         $0.studentId == studentId && $0.exerciseId == exerciseId
           && $0.computedAt < before && $0.confidence == .normal
@@ -111,71 +166,126 @@ public actor LocalE1RMRepository: E1RMRepository {
       .map(\.e1RMKg).max()
   }
 
+  @discardableResult
+  public func recordWeightBaseline(
+    _ candidate: E1RMWeightBaseline
+  ) async throws -> E1RMWeightBaseline? {
+    var state = try loadState()
+    let previous = state.weightBaselines.first {
+      $0.studentId == candidate.studentId && $0.family == candidate.family
+    }
+    guard candidate.maxWeightKg > (previous?.maxWeightKg ?? -.infinity) else {
+      return previous
+    }
+    state.weightBaselines.removeAll {
+      $0.studentId == candidate.studentId && $0.family == candidate.family
+    }
+    state.weightBaselines.append(candidate)
+    try save(state)
+    return previous
+  }
+
+  public func fetchWeightBaseline(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> E1RMWeightBaseline? {
+    try loadState().weightBaselines.first {
+      $0.studentId == studentId && $0.family == family
+    }
+  }
+
+  public func fetchWeightBaselines(studentId: UUID) async throws -> [E1RMWeightBaseline] {
+    try loadState().weightBaselines
+      .filter { $0.studentId == studentId }
+      .sorted { $0.family.rawValue < $1.family.rawValue }
+  }
+
   public func recordPR(_ event: PRBreakthroughEvent) async throws {
-    var all = try loadPRs()
-    all.append(event)
-    try save(prs: all)
+    var state = try loadState()
+    state.prEvents.append(event)
+    try save(state)
+  }
+
+  public func fetchPRs(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> [PRBreakthroughEvent] {
+    try loadState().prEvents
+      .filter { $0.studentId == studentId && $0.family == family }
+      .sorted { $0.occurredAt < $1.occurredAt }
   }
 
   public func prEvents(studentId: UUID, since: Date) async throws -> [PRBreakthroughEvent] {
-    try loadPRs()
+    // The release line added this reader against the old split-file store; #286
+    // collapsed persistence into one atomic state.json, so it reads state now.
+    try loadState().prEvents
       .filter { $0.studentId == studentId && $0.occurredAt >= since }
       .sorted { $0.occurredAt < $1.occurredAt }
   }
 
   public func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent] {
-    try loadPRs()
+    try loadState().prEvents
       .filter { $0.studentId == studentId && $0.acknowledgedAt == nil }
       .sorted { $0.occurredAt < $1.occurredAt }
   }
 
   public func acknowledgePR(eventId: UUID) async throws {
-    var all = try loadPRs()
-    guard let index = all.firstIndex(where: { $0.id == eventId }) else { return }
-    all[index] = all[index].acknowledged(at: Date())
-    try save(prs: all)
+    var state = try loadState()
+    guard let index = state.prEvents.firstIndex(where: { $0.id == eventId }) else { return }
+    state.prEvents[index] = state.prEvents[index].acknowledged(at: Date())
+    try save(state)
   }
 
   // MARK: - File IO
 
+  private var stateURL: URL { directory.appendingPathComponent("state.json") }
   private var pointsURL: URL { directory.appendingPathComponent("points.json") }
   private var prsURL: URL { directory.appendingPathComponent("prs.json") }
 
-  // Missing file = genuinely empty history. Read/decode failures must throw:
-  // mapping them to [] silently erases history and fakes first-PR detection,
-  // and the next save would overwrite the real data (Codex review P1).
-  private func loadPoints() throws -> [E1RMHistoryPoint] {
-    if let cachedPoints { return cachedPoints }
-    guard FileManager.default.fileExists(atPath: pointsURL.path) else {
-      cachedPoints = []
-      return []
+  /// A single state file makes migration replacement atomic across points,
+  /// weight baselines, and PR events. When upgrading from the former two-file
+  /// layout, the first mutation writes the consolidated state without
+  /// modifying either legacy file.
+  private func loadState() throws -> StorageState {
+    if let cachedState { return cachedState }
+    if FileManager.default.fileExists(atPath: stateURL.path) {
+      let loaded = try decoder.decode(StorageState.self, from: Data(contentsOf: stateURL))
+      cachedState = loaded
+      return loaded
     }
-    let loaded = try decoder.decode([E1RMHistoryPoint].self, from: Data(contentsOf: pointsURL))
-    cachedPoints = loaded
+    let loaded = StorageState(
+      points: try loadLegacy([E1RMHistoryPoint].self, from: pointsURL),
+      prEvents: try loadLegacy([PRBreakthroughEvent].self, from: prsURL)
+    )
+    cachedState = loaded
     return loaded
   }
 
-  private func loadPRs() throws -> [PRBreakthroughEvent] {
-    if let cachedPRs { return cachedPRs }
-    guard FileManager.default.fileExists(atPath: prsURL.path) else {
-      cachedPRs = []
+  private func loadLegacy<Value: Decodable>(
+    _ type: Value.Type,
+    from url: URL
+  ) throws -> Value where Value: ExpressibleByArrayLiteral {
+    guard FileManager.default.fileExists(atPath: url.path) else {
       return []
     }
-    let loaded = try decoder.decode([PRBreakthroughEvent].self, from: Data(contentsOf: prsURL))
-    cachedPRs = loaded
-    return loaded
+    return try decoder.decode(type, from: Data(contentsOf: url))
   }
 
-  private func save(points: [E1RMHistoryPoint]) throws {
-    cachedPoints = points
+  private func save(_ state: StorageState) throws {
     try ensureDirectory()
-    try encoder.encode(points).write(to: pointsURL, options: .atomic)
+    try encoder.encode(state).write(to: stateURL, options: .atomic)
+    cachedState = state
   }
 
-  private func save(prs: [PRBreakthroughEvent]) throws {
-    cachedPRs = prs
-    try ensureDirectory()
-    try encoder.encode(prs).write(to: prsURL, options: .atomic)
+  private static func maximumBaselines(
+    _ baselines: [E1RMWeightBaseline]
+  ) -> [E1RMWeightBaseline] {
+    Dictionary(
+      baselines.map { ($0.family, $0) },
+      uniquingKeysWith: { existing, candidate in
+        existing.maxWeightKg >= candidate.maxWeightKg ? existing : candidate
+      }
+    ).values.sorted { $0.family.rawValue < $1.family.rawValue }
   }
 
   private func ensureDirectory() throws {
