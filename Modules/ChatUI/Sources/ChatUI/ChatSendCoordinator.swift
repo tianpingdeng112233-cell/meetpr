@@ -24,6 +24,7 @@ public final class ChatSendCoordinator {
   @ObservationIgnored private var itemGenerations: [ChatSendOperationKey: UInt64] = [:]
   @ObservationIgnored var setRefOperations: [ChatSendOperationKey: SetRefSendOperation] =
     [:]
+  var stagedSetRefsByConversationID: [UUID: SetRefSendIntent] = [:]
   @ObservationIgnored private var settledClientIDs: [UUID: Set<String>] = [:]
   @ObservationIgnored private var generation: UInt64 = 0
   @ObservationIgnored private var invalidationGeneration: UInt64?
@@ -125,6 +126,7 @@ public final class ChatSendCoordinator {
   public func cancelAllAndWaitForCleanup() async {
     generation &+= 1
     invalidationGeneration = nil
+    stagedSetRefsByConversationID.removeAll()
     let survivingGeneration = generation
     let callerKey = ChatSendTaskContext.operationKey
 

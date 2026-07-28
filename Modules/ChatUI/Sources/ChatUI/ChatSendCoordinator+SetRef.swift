@@ -1,6 +1,14 @@
 import CoreModels
 import Foundation
 
+enum SetRefMessageLengthPolicy {
+  static let maximumBodyUTF16Count = 4_000
+
+  static func isAllowed(_ body: String) -> Bool {
+    body.utf16.count <= maximumBodyUTF16Count
+  }
+}
+
 enum SetRefVideoResolution: Sendable {
   case waiting
   case resolved(UUID?)
@@ -19,11 +27,15 @@ extension ChatSendCoordinator {
     video: SetRefVideoSelection? = nil
   ) throws -> SetRefSendIntent {
     let setRef = try SetRefV1.normalizingSource(source)
+    let body = SetRefCanonicalFormatter.body(for: setRef, note: note)
+    guard SetRefMessageLengthPolicy.isAllowed(body) else {
+      throw SetRefSendError.messageTooLong
+    }
     return SetRefSendIntent(
       conversationID: conversationID,
       clientID: Self.makeClientID(),
       setRef: setRef,
-      body: SetRefCanonicalFormatter.body(for: setRef, note: note),
+      body: body,
       video: video
     )
   }
@@ -50,6 +62,46 @@ extension ChatSendCoordinator {
         videoResolution: videoResolution
       )
     )
+  }
+
+  public func stageSetRef(_ intent: SetRefSendIntent) {
+    stagedSetRefsByConversationID[intent.conversationID] = intent
+  }
+
+  public func stagedSetRef(in conversationID: UUID) -> SetRefSendIntent? {
+    stagedSetRefsByConversationID[conversationID]
+  }
+
+  public func discardStagedSetRef(in conversationID: UUID) {
+    stagedSetRefsByConversationID[conversationID] = nil
+  }
+
+  /// Sends a staged snapshot with the note currently in the composer.
+  ///
+  /// The snapshot, upload selection, and client ID remain the values frozen at
+  /// confirmation time. Only the canonical body is regenerated to append the
+  /// student's optional note.
+  @discardableResult
+  public func sendStagedSetRef(
+    in conversationID: UUID,
+    note: String?
+  ) throws -> String {
+    guard let staged = stagedSetRefsByConversationID[conversationID] else {
+      throw SetRefSendError.missingStagedIntent
+    }
+    let body = SetRefCanonicalFormatter.body(for: staged.setRef, note: note)
+    guard SetRefMessageLengthPolicy.isAllowed(body) else {
+      throw SetRefSendError.messageTooLong
+    }
+    stagedSetRefsByConversationID[conversationID] = nil
+    let intent = SetRefSendIntent(
+      conversationID: staged.conversationID,
+      clientID: staged.clientID,
+      setRef: staged.setRef,
+      body: body,
+      video: staged.video
+    )
+    return sendSetRef(intent)
   }
 
   func resolveVideoID(

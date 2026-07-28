@@ -9,14 +9,18 @@ public struct ConversationView: View {
   @State private var viewModel: ConversationViewModel
   @State private var selectedImage: SelectedChatImage?
   @State private var selectedVideo: SelectedChatVideo?
+  @State private var showsSetRefPicker = false
+  private let setRefSharing: SetRefSharingContext?
 
   public init(
     conversationID: UUID,
     currentUserID: UUID,
     repository: any ChatRepository,
     inbox: ChatInboxViewModel,
-    sendCoordinator: ChatSendCoordinator
+    sendCoordinator: ChatSendCoordinator,
+    setRefSharing: SetRefSharingContext? = nil
   ) {
+    self.setRefSharing = setRefSharing
     _viewModel = State(
       initialValue: ConversationViewModel(
         conversationID: conversationID,
@@ -42,7 +46,14 @@ public struct ConversationView: View {
 
       Divider()
         .overlay(Color.MeetPR.border)
-      ChatComposer(viewModel: viewModel)
+      if setRefSharing == nil {
+        ChatComposer(viewModel: viewModel)
+      } else {
+        ChatComposer(
+          viewModel: viewModel,
+          onShareTodayTraining: { showsSetRefPicker = true }
+        )
+      }
     }
     .background(Color.MeetPR.bg)
     .navigationTitle(ChatStrings.messages)
@@ -67,6 +78,16 @@ public struct ConversationView: View {
         viewModel: viewModel
       )
     )
+    .sheet(isPresented: $showsSetRefPicker) {
+      if let setRefSharing {
+        SetRefSharePicker(
+          context: setRefSharing,
+          conversationID: viewModel.conversationID,
+          coordinator: viewModel.sendCoordinator,
+          onStaged: { showsSetRefPicker = false }
+        )
+      }
+    }
   }
 }
 

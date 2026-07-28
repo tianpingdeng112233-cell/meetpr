@@ -84,7 +84,7 @@ import Testing
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
     logs: logs,
-    now: { plan.days[0].date.addingTimeInterval(3_600) }
+    now: { plan.days[0].date.addingTimeInterval(12 * 3_600) }
   )
   await viewModel.load(date: plan.days[0].date, studentID: studentID)
 
@@ -111,7 +111,7 @@ import Testing
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
     logs: logs,
-    now: { plan.days[0].date.addingTimeInterval(3_600) }
+    now: { plan.days[0].date.addingTimeInterval(12 * 3_600) }
   )
 
   #expect(viewModel.state == .idle)
@@ -159,7 +159,7 @@ import Testing
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
     logs: logs,
-    now: { plan.days[0].date.addingTimeInterval(3_600) }
+    now: { plan.days[0].date.addingTimeInterval(12 * 3_600) }
   )
 
   await viewModel.load(date: plan.days[0].date, studentID: studentID)
@@ -334,7 +334,7 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
     logs: InMemoryStudentTrainingLogRepository(),
-    now: { plan.days[0].date.addingTimeInterval(3_600) }
+    now: { plan.days[0].date.addingTimeInterval(12 * 3_600) }
   )
   await viewModel.load(date: plan.days[0].date, studentID: studentID)
 

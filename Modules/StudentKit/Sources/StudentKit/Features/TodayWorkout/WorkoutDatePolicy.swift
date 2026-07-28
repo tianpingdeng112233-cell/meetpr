@@ -32,6 +32,28 @@ enum WorkoutDatePolicy {
     now.addingTimeInterval(-gymDayCutoff)
   }
 
+  /// The persisted-log window for one plan day: 04:00 at the start of that
+  /// calendar date through the instant before 04:00 on the following date.
+  ///
+  /// Calendar arithmetic keeps this definition shared by the training screen
+  /// and set-ref picker without assuming every local day is exactly 86,400
+  /// seconds.
+  static func dayRange(
+    containing date: Date,
+    calendar: Calendar = .current
+  ) -> ClosedRange<Date> {
+    let calendarDayStart = calendar.startOfDay(for: date)
+    let start =
+      calendar.date(
+        bySettingHour: 4,
+        minute: 0,
+        second: 0,
+        of: calendarDayStart
+      ) ?? calendarDayStart
+    let nextStart = calendar.date(byAdding: .day, value: 1, to: start) ?? start
+    return start...nextStart.addingTimeInterval(-0.001)
+  }
+
   static func isEditable(_ date: Date, now: Date = Date(), calendar: Calendar = .current) -> Bool {
     calendar.isDate(date, inSameDayAs: gymDayToday(now: now))
   }

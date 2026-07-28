@@ -96,7 +96,8 @@ public struct StudentRootView: View {
     self.logs = logs
     self.e1rm = e1rm
     self.readiness = readiness
-    self.videoUploads = videoUploads ?? .demo()
+    let resolvedVideoUploads = videoUploads ?? .demo()
+    self.videoUploads = resolvedVideoUploads
     self.onLogout = onLogout
     self.account = account
     self.restTimerSettings = restTimerSettings
@@ -143,7 +144,13 @@ public struct StudentRootView: View {
         repository: chat,
         currentUserID: currentUserID,
         inbox: inbox,
-        sendCoordinator: sendCoordinator
+        sendCoordinator: sendCoordinator,
+        setRefSharing: TodaySetRefSharingSource(
+          studentID: studentID,
+          plans: plans,
+          logs: logs,
+          videoManager: resolvedVideoUploads.manager
+        ).sharingContext()
       )
     } else {
       chatContext = nil

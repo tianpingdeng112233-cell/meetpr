@@ -56,7 +56,8 @@ struct StudentNotificationHostModifier: ViewModifier {
             currentUserID: chat.currentUserID,
             repository: chat.repository,
             inbox: chat.inbox,
-            sendCoordinator: chat.sendCoordinator
+            sendCoordinator: chat.sendCoordinator,
+            setRefSharing: chat.setRefSharing
           )
         }
       }

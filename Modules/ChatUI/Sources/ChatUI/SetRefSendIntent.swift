@@ -19,6 +19,8 @@ public enum SetRefSendError: Error, Equatable, Sendable {
   case videoUploadFailed
   case videoUploadRemoved
   case videoUploadEnded
+  case messageTooLong
+  case missingStagedIntent
 }
 
 /// Immutable session-owned send intent. The set snapshot, canonical body,
