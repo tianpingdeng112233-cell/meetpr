@@ -75,6 +75,21 @@ struct StudentChatContext {
   let currentUserID: UUID
   let inbox: ChatInboxViewModel
   let sendCoordinator: ChatSendCoordinator
+  let setRefSharing: SetRefSharingContext?
+
+  init(
+    repository: any ChatRepository,
+    currentUserID: UUID,
+    inbox: ChatInboxViewModel,
+    sendCoordinator: ChatSendCoordinator,
+    setRefSharing: SetRefSharingContext? = nil
+  ) {
+    self.repository = repository
+    self.currentUserID = currentUserID
+    self.inbox = inbox
+    self.sendCoordinator = sendCoordinator
+    self.setRefSharing = setRefSharing
+  }
 }
 
 /// One notification graph shared by all four coached-student tabs.

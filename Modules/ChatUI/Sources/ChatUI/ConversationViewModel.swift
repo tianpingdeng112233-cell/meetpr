@@ -11,7 +11,7 @@ public enum ChatDeliveryStatus: Equatable, Sendable {
 @Observable
 @MainActor
 public final class ConversationViewModel {
-  public static let maximumTextLength = 4_000
+  public static let maximumTextLength = SetRefMessageLengthPolicy.maximumBodyUTF16Count
 
   public let conversationID: UUID
   public let currentUserID: UUID
@@ -22,6 +22,7 @@ public final class ConversationViewModel {
   public internal(set) var isLoadingOlder = false
   public internal(set) var isPolling = false
   public internal(set) var error: (any Error)?
+  public private(set) var setRefSendErrorMessage: String?
 
   public var pending: [ChatOutboxItem] {
     sendCoordinator.outbox(in: conversationID).filter { item in
@@ -51,6 +52,23 @@ public final class ConversationViewModel {
       }
       return false
     }
+  }
+
+  public var stagedSetRef: SetRefSendIntent? {
+    sendCoordinator.stagedSetRef(in: conversationID)
+  }
+
+  public func stagedSetRefLength(note: String) -> SetRefComposerLength? {
+    guard let stagedSetRef else { return nil }
+    let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+    let body = SetRefCanonicalFormatter.body(
+      for: stagedSetRef.setRef,
+      note: trimmed.isEmpty ? nil : trimmed
+    )
+    return SetRefComposerLength(
+      bodyUTF16Count: body.utf16.count,
+      maximumUTF16Count: Self.maximumTextLength
+    )
   }
 
   @ObservationIgnored let repository: any ChatRepository
@@ -116,6 +134,42 @@ public final class ConversationViewModel {
     return sendCoordinator.sendImage(in: conversationID, imageData: imageData)
   }
 
+  @discardableResult
+  public func sendStagedSetRef(note: String) -> String? {
+    let trimmed = note.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard let length = stagedSetRefLength(note: trimmed) else {
+      setRefSendErrorMessage = ChatStrings.trainingShareFailed
+      return nil
+    }
+    guard !length.isOverLimit else {
+      setRefSendErrorMessage = ChatStrings.messageTooLong
+      return nil
+    }
+    do {
+      let clientID = try sendCoordinator.sendStagedSetRef(
+        in: conversationID,
+        note: trimmed.isEmpty ? nil : trimmed
+      )
+      setRefSendErrorMessage = nil
+      return clientID
+    } catch SetRefSendError.messageTooLong {
+      setRefSendErrorMessage = ChatStrings.messageTooLong
+      return nil
+    } catch {
+      setRefSendErrorMessage = ChatStrings.trainingShareFailed
+      return nil
+    }
+  }
+
+  public func discardStagedSetRef() {
+    sendCoordinator.discardStagedSetRef(in: conversationID)
+    setRefSendErrorMessage = nil
+  }
+
+  public func clearSetRefSendError() {
+    setRefSendErrorMessage = nil
+  }
+
   public func retry(clientID: String) {
     sendCoordinator.retry(in: conversationID, clientID: clientID)
   }
@@ -137,4 +191,13 @@ public final class ConversationViewModel {
     messages.first { $0.id == messageID }
   }
 
+}
+
+public struct SetRefComposerLength: Equatable, Sendable {
+  public let bodyUTF16Count: Int
+  public let maximumUTF16Count: Int
+
+  public var isOverLimit: Bool {
+    bodyUTF16Count > maximumUTF16Count
+  }
 }

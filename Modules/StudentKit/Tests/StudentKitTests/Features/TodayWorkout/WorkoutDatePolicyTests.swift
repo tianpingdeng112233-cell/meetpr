@@ -105,6 +105,21 @@ import Testing
     #expect(calendar.isDate(anchor, inSameDayAs: try day(2026, 7, 4)))
   }
 
+  @Test func sharedDayRangeSpansFourAMToTheNextFourAM() throws {
+    let planDay = try day(2026, 7, 4)
+    let range = WorkoutDatePolicy.dayRange(containing: planDay, calendar: calendar)
+
+    #expect(range.contains(try day(2026, 7, 4, hour: 4)))
+    #expect(range.contains(try day(2026, 7, 5, hour: 0)))
+    #expect(range.contains(try day(2026, 7, 5, hour: 3, minute: 59)))
+    #expect(!range.contains(try day(2026, 7, 4, hour: 3, minute: 59)))
+    #expect(!range.contains(try day(2026, 7, 5, hour: 4)))
+    #expect(
+      TodayWorkoutViewModel.dayRange(containing: planDay, calendar: calendar)
+        == range
+    )
+  }
+
   @Test func pastClassificationFollowsGymDayAcrossMidnightAndMonthEnd() throws {
     // At 00:30 July 5 the gym-day is July 4: July 4 is not yet past.
     #expect(

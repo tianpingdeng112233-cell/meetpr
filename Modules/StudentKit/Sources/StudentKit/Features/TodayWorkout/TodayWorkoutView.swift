@@ -1,5 +1,6 @@
 // swiftlint:disable file_length type_body_length
 import Analytics
+import ChatUI
 import CoreModels
 import DesignSystem
 import Foundation
@@ -35,6 +36,9 @@ public struct TodayWorkoutView: View {
   @State private var showingReadinessSheet = false
   @State private var showingNotifications = false
   @State private var conversationID: UUID?
+  @State private var setRefPickerRoute: SetRefPickerRoute?
+  @State private var isPreparingSetRefPicker = false
+  @State private var setRefEntryErrorMessage: String?
   /// Whether the slide-to-complete → 训练回顾 → 完成 flow has been finished for
   /// the loaded day; loaded from `SessionReviewStore` so the slide control does
   /// not re-arm after the review sheet closes (or the app restarts).
@@ -92,13 +96,15 @@ public struct TodayWorkoutView: View {
     date: Date,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
-    preloadedViewModel: TodayWorkoutViewModel
+    preloadedViewModel: TodayWorkoutViewModel,
+    notifications: StudentNotificationsCoordinator? = nil
   ) {
     self.init(
       studentID: studentID,
       date: date,
       plans: plans,
-      logs: logs
+      logs: logs,
+      notifications: notifications
     )
     _viewModel = State(initialValue: preloadedViewModel)
   }
@@ -222,6 +228,26 @@ public struct TodayWorkoutView: View {
     } message: {
       Text(viewModel.actionErrorMessage ?? "")
     }
+    .alert(StudentStrings.trainingShareFailed, isPresented: setRefEntryErrorPresented) {
+      Button(StudentStrings.acknowledge, role: .cancel) {
+        setRefEntryErrorMessage = nil
+      }
+    } message: {
+      Text(setRefEntryErrorMessage ?? "")
+    }
+    .sheet(item: $setRefPickerRoute) { route in
+      if let chat = notifications?.chatContext, let setRefSharing = chat.setRefSharing {
+        SetRefSharePicker(
+          context: setRefSharing,
+          conversationID: route.conversationID,
+          coordinator: chat.sendCoordinator,
+          onStaged: {
+            setRefPickerRoute = nil
+            conversationID = route.conversationID
+          }
+        )
+      }
+    }
     .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingDirectCameraConsent) {
       Button(VideoPrivacyCopy.consentAgree) {
         videoViewModel.recordConsent()
@@ -320,6 +346,13 @@ public struct TodayWorkoutView: View {
     )
   }
 
+  private var setRefEntryErrorPresented: Binding<Bool> {
+    Binding(
+      get: { setRefEntryErrorMessage != nil },
+      set: { if !$0 { setRefEntryErrorMessage = nil } }
+    )
+  }
+
   private var restTimerExplanationPresented: Binding<Bool> {
     Binding(
       // Gated on `editing == nil`: the first completed set is recorded inside
@@ -412,6 +445,10 @@ public struct TodayWorkoutView: View {
     isEditable: Bool
   ) -> some View {
     let dayComplete = !drafts.isEmpty && drafts.allSatisfy(\.completed)
+
+    if dayComplete && canShowSetRefEntry(drafts: drafts, isEditable: isEditable) {
+      askCoachButton()
+    }
 
     // On an editable day the banner (with its 查看回顾 entry) must not appear
     // until the slide confirmation closes the day. Read-only days have no slide
@@ -508,8 +545,13 @@ public struct TodayWorkoutView: View {
       }
 
       if isEditable {
-        recordActions(draft: draft, rowIndex: rowIndex, setNumber: setNumber)
-          .padding(.top, 16)
+        recordActions(
+          draft: draft,
+          rowIndex: rowIndex,
+          setNumber: setNumber,
+          showsAskCoach: canShowSetRefEntry(drafts: drafts, isEditable: isEditable)
+        )
+        .padding(.top, 16)
       }
     }
     .padding(16)
@@ -542,7 +584,10 @@ public struct TodayWorkoutView: View {
   }
 
   private func recordActions(
-    draft: TodayWorkoutViewModel.SetRowDraft, rowIndex: Int, setNumber: Int
+    draft: TodayWorkoutViewModel.SetRowDraft,
+    rowIndex: Int,
+    setNumber: Int,
+    showsAskCoach: Bool
   ) -> some View {
     HStack(spacing: 8) {
       Button {
@@ -564,25 +609,7 @@ public struct TodayWorkoutView: View {
       .buttonStyle(.plain)
 
       Button {
-        switch SetVideoButtonDestination.resolve(
-          for: videoRowState(for: draft)?.attachment.status,
-          cameraAvailable: cameraAvailable
-        ) {
-        case .camera:
-          beginDirectCamera(for: draft)
-        case .details:
-          editing = EditingTarget(
-            id: draft.id,
-            rowIndex: rowIndex,
-            draft: draft,
-            setNumber: setNumber,
-            scrollToVideo: true)
-        case .retry:
-          // A failed upload routes straight to retry: the set already cost the
-          // student real fatigue and can't be re-done, so the recording must
-          // never be one buried menu away (David, beta 2026-07-11).
-          retryTargetSetLogID = draft.loggedSetID
-        }
+        openVideoEntry(draft: draft, rowIndex: rowIndex, setNumber: setNumber)
       } label: {
         SetVideoUploadIndicator(
           status: videoIndicatorStatus(for: draft),
@@ -596,19 +623,40 @@ public struct TodayWorkoutView: View {
       }
       .buttonStyle(.plain)
       .disabled(preparingVideoSetID == draft.id)
+
+      if showsAskCoach {
+        askCoachButton()
+      }
     }
   }
 
-  // MARK: - Per-exercise set table
+  private func askCoachButton() -> some View {
+    Button {
+      openSetRefPicker()
+    } label: {
+      Group {
+        if isPreparingSetRefPicker {
+          ProgressView()
+            .controlSize(.small)
+        } else {
+          Label(StudentStrings.askCoach, systemImage: "bubble.left")
+        }
+      }
+      .font(Font.MeetPR.bodyEmphasis)
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .frame(maxWidth: .infinity)
+      .frame(height: 48)
+      .overlay {
+        RoundedRectangle(cornerRadius: 12)
+          .stroke(Color.MeetPR.border, lineWidth: 1)
+      }
+    }
+    .buttonStyle(.plain)
+    .disabled(isPreparingSetRefPicker)
+    .accessibilityIdentifier("todayWorkout.askCoach")
+  }
 
-  private let columns: [GridItem] = [
-    GridItem(.fixed(28), alignment: .leading),
-    GridItem(.flexible(), alignment: .trailing),
-    GridItem(.flexible(), alignment: .trailing),
-    GridItem(.flexible(), alignment: .trailing),
-    GridItem(.fixed(36), alignment: .trailing),
-    GridItem(.fixed(28), alignment: .trailing),
-  ]
+  // MARK: - Per-exercise set table
 
   private func exerciseTableCard(
     exercise: StudentPlanExercise,
@@ -636,13 +684,13 @@ public struct TodayWorkoutView: View {
       }
 
       VStack(spacing: 0) {
-        LazyVGrid(columns: columns, spacing: 0) {
-          tableHeaderCell("#", leading: true)
-          tableHeaderCell("重量")
-          tableHeaderCell("次数")
-          tableHeaderCell("RPE")
-          Text("")
-          Text("")
+        LazyVGrid(columns: TodayWorkoutTableLayout.columns, spacing: 0) {
+          ForEach(TodayWorkoutTableLayout.headerTitles.indices, id: \.self) { index in
+            tableHeaderCell(
+              TodayWorkoutTableLayout.headerTitles[index],
+              leading: index == 0
+            )
+          }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -706,7 +754,7 @@ public struct TodayWorkoutView: View {
   ) -> some View {
     let resolved = draft.completed || active
     let foreground: Color = resolved ? Color.MeetPR.fgPrimary : Color.MeetPR.fgTertiary
-    return LazyVGrid(columns: columns, spacing: 0) {
+    return LazyVGrid(columns: TodayWorkoutTableLayout.columns, spacing: 0) {
       Text("\(setNumber)")
         .foregroundStyle(active ? Color.MeetPR.brandRed : Color.MeetPR.fgTertiary)
         .accessibilityIdentifier("todayWorkout.set.\(draft.id.uuidString).number")
@@ -794,6 +842,33 @@ public struct TodayWorkoutView: View {
     return draft.loggedSetID
   }
 
+  private func canShowSetRefEntry(
+    drafts: [TodayWorkoutViewModel.SetRowDraft],
+    isEditable: Bool
+  ) -> Bool {
+    SetRefEntryVisibility.shouldShow(
+      drafts: drafts,
+      isEditable: isEditable,
+      hasActiveCoach: notifications?.hasActiveCoach == true,
+      hasSharingContext: notifications?.chatContext?.setRefSharing != nil
+    )
+  }
+
+  private func openSetRefPicker() {
+    guard !isPreparingSetRefPicker, let notifications else { return }
+    isPreparingSetRefPicker = true
+    setRefEntryErrorMessage = nil
+    Task {
+      let openedConversationID = await notifications.openCoachConversation()
+      isPreparingSetRefPicker = false
+      guard let openedConversationID else {
+        setRefEntryErrorMessage = StudentStrings.trainingShareConversationFailed
+        return
+      }
+      setRefPickerRoute = SetRefPickerRoute(conversationID: openedConversationID)
+    }
+  }
+
   private var cameraAvailable: Bool {
     #if os(iOS)
       CameraVideoPicker.isAvailable
@@ -808,6 +883,32 @@ public struct TodayWorkoutView: View {
       showingDirectCamera = true
     } else {
       showingDirectCameraConsent = true
+    }
+  }
+
+  private func openVideoEntry(
+    draft: TodayWorkoutViewModel.SetRowDraft,
+    rowIndex: Int,
+    setNumber: Int
+  ) {
+    switch SetVideoButtonDestination.resolve(
+      for: videoRowState(for: draft)?.attachment.status,
+      cameraAvailable: cameraAvailable
+    ) {
+    case .camera:
+      beginDirectCamera(for: draft)
+    case .details:
+      editing = EditingTarget(
+        id: draft.id,
+        rowIndex: rowIndex,
+        draft: draft,
+        setNumber: setNumber,
+        scrollToVideo: true)
+    case .retry:
+      // A failed upload routes straight to retry: the set already cost the
+      // student real fatigue and can't be re-done, so the recording must
+      // never be one buried menu away (David, beta 2026-07-11).
+      retryTargetSetLogID = draft.loggedSetID
     }
   }
 
@@ -961,5 +1062,55 @@ private struct EditingTarget: Identifiable {
 
 private struct DirectCameraTarget {
   let id: UUID
+}
+
+private struct SetRefPickerRoute: Identifiable {
+  var id: UUID { conversationID }
+
+  let conversationID: UUID
+}
+
+enum SetRefEntryVisibility {
+  static func shouldShow(
+    drafts: [TodayWorkoutViewModel.SetRowDraft],
+    isEditable: Bool,
+    hasActiveCoach: Bool,
+    hasSharingContext: Bool
+  ) -> Bool {
+    shouldShow(
+      isEditable: isEditable,
+      hasCompletedSet: drafts.contains {
+        SetRefCompletedSetEligibility.isEligible(
+          completed: $0.completed,
+          assumed: $0.assumed,
+          loggedSetID: $0.loggedSetID
+        )
+      },
+      hasActiveCoach: hasActiveCoach,
+      hasSharingContext: hasSharingContext
+    )
+  }
+
+  static func shouldShow(
+    isEditable: Bool,
+    hasCompletedSet: Bool,
+    hasActiveCoach: Bool,
+    hasSharingContext: Bool
+  ) -> Bool {
+    isEditable && hasCompletedSet && hasActiveCoach && hasSharingContext
+  }
+}
+
+enum TodayWorkoutTableLayout {
+  static let columns: [GridItem] = [
+    GridItem(.fixed(28), alignment: .leading),
+    GridItem(.flexible(), alignment: .trailing),
+    GridItem(.flexible(), alignment: .trailing),
+    GridItem(.flexible(), alignment: .trailing),
+    GridItem(.fixed(36), alignment: .trailing),
+    GridItem(.fixed(28), alignment: .trailing),
+  ]
+  static let headerTitles = ["#", "重量", "次数", "RPE", "", ""]
+  static let rowCellCount = 6
 }
 // swiftlint:enable file_length type_body_length

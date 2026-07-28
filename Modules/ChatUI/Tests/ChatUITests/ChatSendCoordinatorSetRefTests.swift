@@ -6,6 +6,7 @@ import Testing
 
 @testable import ChatUI
 
+// swiftlint:disable type_body_length
 @Suite @MainActor struct ChatSendCoordinatorSetRefTests {
   private let currentUserID = chatTestUUID(1)
   private let conversationID = chatTestUUID(10)
@@ -39,6 +40,97 @@ import Testing
     )
     #expect(sourceWeight == "120.00")
     #expect(await repository.imageClientIDs.isEmpty)
+  }
+
+  @Test func stagedIntentKeepsFrozenClientIDWhenComposerAddsNote() async throws {
+    let repository = TestChatRepository()
+    let coordinator = ChatSendCoordinator(
+      repository: repository,
+      currentUserID: currentUserID
+    )
+    let intent = try coordinator.makeSetRefIntent(
+      in: conversationID,
+      source: setRefSource(),
+      note: nil
+    )
+    coordinator.stageSetRef(intent)
+    let viewModel = ConversationViewModel(
+      conversationID: conversationID,
+      currentUserID: currentUserID,
+      repository: repository,
+      sendCoordinator: coordinator
+    )
+
+    #expect(viewModel.stagedSetRef?.clientID == intent.clientID)
+    #expect(viewModel.sendStagedSetRef(note: "  看看深度  ") == intent.clientID)
+    #expect(viewModel.stagedSetRef.map { _ in false } ?? true)
+    let didSend = await chatEventually { await repository.setRefClientIDs.count == 1 }
+
+    #expect(didSend)
+    #expect(await repository.setRefClientIDs == [intent.clientID])
+    #expect(
+      await repository.setRefBodies.first
+        == "[训练分享] 低杠位深蹲 第3组 100kg×5 @RPE8 (2026-07-27)\n看看深度"
+    )
+  }
+
+  @Test func stagedUploadingVideoCanSendBeforeUploadIsReady() async throws {
+    let repository = TestChatRepository()
+    let coordinator = ChatSendCoordinator(
+      repository: repository,
+      currentUserID: currentUserID
+    )
+    let localAttachmentID = chatTestUUID(30)
+    let remoteVideoID = chatTestUUID(31)
+    let eventSource = AsyncStream.makeStream(
+      of: SetRefVideoUploadEvent.self,
+      bufferingPolicy: .bufferingNewest(8)
+    )
+    let intent = try coordinator.makeSetRefIntent(
+      in: conversationID,
+      source: setRefSource(),
+      note: nil,
+      video: .uploading(
+        localAttachmentID: localAttachmentID,
+        events: eventSource.stream
+      )
+    )
+    coordinator.stageSetRef(intent)
+    let viewModel = ConversationViewModel(
+      conversationID: conversationID,
+      currentUserID: currentUserID,
+      repository: repository,
+      sendCoordinator: coordinator
+    )
+
+    #expect(viewModel.sendStagedSetRef(note: "") == intent.clientID)
+    #expect(coordinator.outbox(in: conversationID).count == 1)
+    await Task.yield()
+    #expect(await repository.setRefClientIDs.isEmpty)
+
+    eventSource.continuation.yield(
+      .ready(localAttachmentID: localAttachmentID, videoID: remoteVideoID)
+    )
+    let didSend = await chatEventually { await repository.setRefClientIDs.count == 1 }
+    #expect(didSend)
+    eventSource.continuation.finish()
+  }
+
+  @Test func logoutDropsUnsentStagedIntent() async throws {
+    let coordinator = ChatSendCoordinator(
+      repository: TestChatRepository(),
+      currentUserID: currentUserID
+    )
+    let intent = try coordinator.makeSetRefIntent(
+      in: conversationID,
+      source: setRefSource(),
+      note: nil
+    )
+    coordinator.stageSetRef(intent)
+
+    await coordinator.cancelAllAndWaitForCleanup()
+
+    #expect(coordinator.stagedSetRef(in: conversationID).map { _ in false } ?? true)
   }
 
   @Test func failedRetryReusesClientIDAndNeverEntersImageCleanupPath() async throws {
@@ -213,6 +305,7 @@ import Testing
     )
   }
 }
+// swiftlint:enable type_body_length
 
 private final class SetRefSheetOwner {
   let intent: SetRefSendIntent

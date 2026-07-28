@@ -1,6 +1,28 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "chat.addAttachment": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加附件"
+          }
+        }
+      }
+    },
+    "chat.back": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "返回"
+          }
+        }
+      }
+    },
     "chat.choosePhoto": {
       "extractionState": "manual",
       "localizations": {
@@ -41,6 +63,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "输入消息"
+          }
+        }
+      }
+    },
+    "chat.continueSelection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续"
+          }
+        }
+      }
+    },
+    "chat.continueToChat": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去聊天补充一句话"
           }
         }
       }
@@ -89,6 +133,28 @@
         }
       }
     },
+    "chat.includeVideo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一并发送这组视频"
+          }
+        }
+      }
+    },
+    "chat.invalidSetRecord": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这组记录暂时无法分享"
+          }
+        }
+      }
+    },
     "chat.load": {
       "extractionState": "manual",
       "localizations": {
@@ -111,6 +177,17 @@
         }
       }
     },
+    "chat.messageTooLong": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "训练记录和备注合计不能超过 4000 个字符，请缩短备注"
+          }
+        }
+      }
+    },
     "chat.messages": {
       "extractionState": "manual",
       "localizations": {
@@ -118,6 +195,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "消息"
+          }
+        }
+      }
+    },
+    "chat.noCompletedSets": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天还没有已完成的组"
+          }
+        }
+      }
+    },
+    "chat.noCompletedSetsDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成并保存一组训练后即可分享"
           }
         }
       }
@@ -133,13 +232,13 @@
         }
       }
     },
-    "chat.preparingImage": {
+    "chat.playVideo": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "正在处理图片"
+            "value": "播放视频"
           }
         }
       }
@@ -166,13 +265,13 @@
         }
       }
     },
-    "chat.playVideo": {
+    "chat.preparingImage": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "播放视频"
+            "value": "正在处理图片"
           }
         }
       }
@@ -188,17 +287,6 @@
         }
       }
     },
-    "chat.retry": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重试"
-          }
-        }
-      }
-    },
     "chat.refreshing": {
       "extractionState": "manual",
       "localizations": {
@@ -206,6 +294,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "刷新中…"
+          }
+        }
+      }
+    },
+    "chat.removeTrainingShare": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除训练分享"
+          }
+        }
+      }
+    },
+    "chat.retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
           }
         }
       }
@@ -221,6 +331,17 @@
         }
       }
     },
+    "chat.sendCurrentSetRecord": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送这组当前的记录"
+          }
+        }
+      }
+    },
     "chat.sendFailed": {
       "extractionState": "manual",
       "localizations": {
@@ -228,17 +349,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "发送失败"
-          }
-        }
-      }
-    },
-    "chat.setNumber": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "组次"
           }
         }
       }
@@ -254,6 +364,50 @@
         }
       }
     },
+    "chat.setNumber": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "组次"
+          }
+        }
+      }
+    },
+    "chat.setRefNotePlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "补一句话（可选）"
+          }
+        }
+      }
+    },
+    "chat.shareTodayTraining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享今日训练"
+          }
+        }
+      }
+    },
+    "chat.trainingLoadFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日训练记录加载失败，请重试"
+          }
+        }
+      }
+    },
     "chat.trainingShare": {
       "extractionState": "manual",
       "localizations": {
@@ -261,6 +415,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "训练分享"
+          }
+        }
+      }
+    },
+    "chat.trainingShareFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这组记录暂时无法发送"
           }
         }
       }
@@ -276,6 +441,17 @@
         }
       }
     },
+    "chat.videoFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频上传失败，请先在训练页重试"
+          }
+        }
+      }
+    },
     "chat.videoPlayback": {
       "extractionState": "manual",
       "localizations": {
@@ -283,6 +459,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "视频回放 //"
+          }
+        }
+      }
+    },
+    "chat.videoReady": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频已就绪"
+          }
+        }
+      }
+    },
+    "chat.videoUnavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这段视频已不可用，请取消勾选后继续"
+          }
+        }
+      }
+    },
+    "chat.videoUploading": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频上传中，仍可继续发送"
           }
         }
       }

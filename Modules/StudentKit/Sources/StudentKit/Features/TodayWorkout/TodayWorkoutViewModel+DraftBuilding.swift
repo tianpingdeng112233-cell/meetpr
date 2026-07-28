@@ -191,6 +191,7 @@ extension TodayWorkoutViewModel {
       actualRPE: existingLog?.rpe ?? set.rpe ?? 8,
       completed: existingLog?.completed ?? false,
       failed: existingLog?.failed ?? false,
+      assumed: existingLog?.assumed ?? false,
       loggedSetID: existingLog?.id
     )
   }

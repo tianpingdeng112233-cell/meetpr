@@ -23,6 +23,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   public var actualRPE: Decimal?
   public var completed: Bool
   public var failed: Bool
+  public var assumed: Bool
   public var loggedSetID: UUID?
 
   public init(
@@ -38,6 +39,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     actualRPE: Decimal? = nil,
     completed: Bool = false,
     failed: Bool = false,
+    assumed: Bool = false,
     loggedSetID: UUID? = nil
   ) {
     self.id = id
@@ -52,11 +54,26 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.actualRPE = actualRPE
     self.completed = completed
     self.failed = failed
+    self.assumed = assumed
     self.loggedSetID = loggedSetID
   }
 
   public var allowsPlateLoadingGuidance: Bool {
     !isAccessory
+  }
+
+  /// Merges a persisted recordSet result into the draft. `assumed` must come along:
+  /// a real save overwrites an assumed record server-side, and without the write-back
+  /// the ask-coach entry stays hidden until a full reload (sharing eligibility keys on it).
+  public mutating func applyPersistResult(
+    _ persisted: StudentSetLog,
+    completed: Bool,
+    failed: Bool
+  ) {
+    self.completed = completed
+    self.failed = failed
+    loggedSetID = persisted.id
+    assumed = persisted.assumed
   }
 }
 
