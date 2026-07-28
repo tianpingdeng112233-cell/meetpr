@@ -34,7 +34,9 @@ struct TrainingMonthDay: View {
     .buttonStyle(.plain)
   }
 
-  private var hasTraining: Bool { day.planDay != nil }
+  // A plan can materialize rest days as exercise-less plan-day rows, so
+  // "has training" means the day actually carries exercises.
+  private var hasTraining: Bool { !(day.planDay?.exercises.isEmpty ?? true) }
 
   // David 2026-07-28: the mockup's color-only distinction is too subtle —
   // training days keep the raised card and primary number (future included),
