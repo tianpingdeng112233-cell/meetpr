@@ -243,59 +243,6 @@ struct TrainingCalendarView: View {
   }
 }
 
-@available(iOS 17.0, macOS 14.0, *)
-private struct TrainingMonthDay: View {
-  let day: TrainingCalendarDay
-  let state: MeetPRDayChip.DayState
-  let dayNumber: Int
-  let onSelect: () -> Void
-
-  var body: some View {
-    Button(action: onSelect) {
-      Text(dayNumber.formatted())
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-        .foregroundStyle(numberColor)
-        .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.size46)
-        .background(day.isToday ? Color.MeetPR.surfaceElevated : Color.MeetPR.surfaceCard)
-        .clipShape(.rect(cornerRadius: MeetPRRadius.inset))
-        .overlay {
-          if day.isToday {
-            RoundedRectangle(cornerRadius: MeetPRRadius.inset)
-              .stroke(Color.MeetPR.gold500, lineWidth: MeetPRSpacing.point1AndHalf)
-          }
-        }
-        .overlay(alignment: .topTrailing) {
-          if let dotColor {
-            Circle()
-              .fill(dotColor)
-              .frame(width: MeetPRSpacing.point5, height: MeetPRSpacing.point5)
-              .padding(MeetPRSpacing.point5)
-          }
-        }
-    }
-    .buttonStyle(.plain)
-  }
-
-  private var numberColor: Color {
-    state == .rest || state == .future
-      ? Color.MeetPR.textDim
-      : Color.MeetPR.textPrimary
-  }
-
-  private var dotColor: Color? {
-    switch state {
-    case .done:
-      Color.MeetPR.success
-    case .today:
-      Color.MeetPR.gold500
-    case .missed:
-      Color.MeetPR.danger
-    case .rest, .future:
-      nil
-    }
-  }
-}
-
 /// The decorative color key under the calendar. The screen owns it (instead
 /// of `TrainingCalendarView`) so the collapsed state can drop it from the
 /// tree entirely — see `TodayWorkoutScreen`.
