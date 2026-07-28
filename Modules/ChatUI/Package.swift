@@ -14,6 +14,7 @@ let package = Package(
     .package(path: "../CoreModels"),
     .package(path: "../RepositoryContracts"),
     .package(path: "../DesignSystem"),
+    .package(path: "../Networking"),
   ],
   targets: [
     .target(
@@ -31,6 +32,7 @@ let package = Package(
       dependencies: [
         "ChatUI",
         .product(name: "CoreModels", package: "CoreModels"),
+        .product(name: "Networking", package: "Networking"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
       ],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]

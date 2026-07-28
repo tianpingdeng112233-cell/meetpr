@@ -261,17 +261,23 @@ public struct ChatSendMessageRequestDTO: Codable, Equatable, Sendable {
   public let body: String?
   public let attachmentID: UUID?
   public let clientID: String
+  public let setRef: SetRefV1?
+  public let videoID: UUID?
 
   public init(
     kind: ChatMessageKind,
     body: String? = nil,
     attachmentID: UUID? = nil,
-    clientID: String
+    clientID: String,
+    setRef: SetRefV1? = nil,
+    videoID: UUID? = nil
   ) {
     self.kind = kind
     self.body = body
     self.attachmentID = attachmentID
     self.clientID = clientID
+    self.setRef = setRef
+    self.videoID = videoID
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -279,6 +285,8 @@ public struct ChatSendMessageRequestDTO: Codable, Equatable, Sendable {
     case body
     case attachmentID = "attachmentId"
     case clientID = "clientId"
+    case setRef
+    case videoID
   }
 }
 
