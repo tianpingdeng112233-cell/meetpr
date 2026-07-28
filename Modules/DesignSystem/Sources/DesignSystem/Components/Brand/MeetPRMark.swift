@@ -37,7 +37,7 @@ public struct MeetPRMark: View {
       markText
         .foregroundStyle(Color.MeetPR.bgBase)
     }
-    .frame(width: size * 2.05, height: size)
+    .frame(width: size * 2.05, height: size, alignment: .leading)
     .accessibilityHidden(true)
   }
 
