@@ -369,7 +369,9 @@ private struct GrowthChartGeometry {
       return nil
     }
     let x = min(max(point.x, scaleX(62)), scaleX(286))
-    let y = max(plotTop + scaleY(7), point.y - scaleY(12))
+    // Mockup 934: byLabel = max(15, by - 8) — the label may float above the
+    // plot top (y=20), so a peak-ending curve is never covered by its label.
+    let y = max(scaleY(15), point.y - scaleY(8))
     return (Self.monthDay(date), CGPoint(x: x, y: y))
   }
 
