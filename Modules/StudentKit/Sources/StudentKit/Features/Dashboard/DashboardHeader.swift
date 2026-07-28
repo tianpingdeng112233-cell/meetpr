@@ -24,7 +24,8 @@ struct DashboardHeader: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 15) {
       HStack(spacing: 10) {
-        DashboardWordmark()
+        MeetPRMark.header
+          .frame(width: 97, height: 24, alignment: .leading)
         Text(dateLabel)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .tracking(0.72)
@@ -70,41 +71,6 @@ struct DashboardHeader: View {
       DashboardWeekProgressBar(segments: progressSegments)
         .padding(.top, -8)
     }
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct DashboardWordmark: View {
-  var body: some View {
-    let strokeRadius = MeetPRFontMetrics.size16 * 0.16
-    ZStack {
-      ForEach(0..<8, id: \.self) { index in
-        let angle = Double(index) * .pi / 4
-        wordmark
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .offset(
-            x: cos(angle) * strokeRadius,
-            y: sin(angle) * strokeRadius
-          )
-          .accessibilityHidden(true)
-      }
-      wordmark
-        .foregroundStyle(Color.MeetPR.bgBase)
-        .accessibilityHidden(true)
-    }
-    .fixedSize()
-    .accessibilityElement(children: .ignore)
-    .accessibilityLabel("MeetPR")
-  }
-
-  private var wordmark: some View {
-    HStack(spacing: 0) {
-      Text("MEETP")
-      Text("R")
-        .padding(.leading, -MeetPRFontMetrics.size16 * 0.13)
-    }
-    .font(.MeetPR.display(size: MeetPRFontMetrics.size16, weight: .black))
-    .tracking(-MeetPRFontMetrics.size16 * 0.11)
   }
 }
 

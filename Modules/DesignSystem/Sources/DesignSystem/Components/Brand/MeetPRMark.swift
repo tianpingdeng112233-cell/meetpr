@@ -9,6 +9,18 @@ public struct MeetPRMark: View {
     self.size = size
   }
 
+  /// Canonical tab-header wordmark: every student tab renders the mark at the
+  /// today-header spec (16pt glyphs) so position and size never drift again.
+  public static var header: MeetPRMark {
+    MeetPRMark(fontSize: 16)
+  }
+
+  /// Explicit glyph size — `size` is the legacy frame-height parameter with
+  /// glyphs at 0.34×; this maps a wanted font size back onto that scale.
+  public init(fontSize: CGFloat) {
+    self.size = fontSize / 0.34
+  }
+
   /// The mockup draws the wordmark as a 5px `text-primary` stroke with a
   /// `bg-base` knockout fill (`-webkit-text-stroke` + overlay). SwiftUI has no
   /// text stroke, so the stroke mass is eight offset copies under the fill.

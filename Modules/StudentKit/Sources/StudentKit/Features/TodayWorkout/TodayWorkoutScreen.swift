@@ -350,8 +350,8 @@ private struct TodayWorkoutHeader: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point1) {
-      MeetPRMark(size: MeetPRSpacing.point40)
-        .frame(width: 82, height: 24, alignment: .leading)
+      MeetPRMark.header
+        .frame(width: 97, height: 24, alignment: .leading)
 
       HStack {
         Text(weekCode)

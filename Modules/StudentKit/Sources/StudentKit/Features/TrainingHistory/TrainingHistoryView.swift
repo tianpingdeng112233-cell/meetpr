@@ -312,10 +312,9 @@ private struct GrowthScreenHeader: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-      HStack {
-        MeetPRMark(size: 44)
-          .frame(width: 92, height: MeetPRFontMetrics.size16, alignment: .leading)
-          .clipped()
+      HStack(alignment: .top) {
+        MeetPRMark.header
+          .frame(width: 97, height: 24, alignment: .leading)
         Spacer()
         if showsChat {
           HeaderChatButton(
