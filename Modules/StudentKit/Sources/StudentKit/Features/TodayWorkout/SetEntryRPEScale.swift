@@ -187,8 +187,17 @@ struct SetEntryRPEScale: View {
       : Self.unlitBar
   }
 
-  private static let litBar = Color(red: 138 / 255, green: 138 / 255, blue: 142 / 255)
-  private static let unlitBar = Color(red: 44 / 255, green: 44 / 255, blue: 46 / 255)
+  // Mockup literals are dark-theme values (#8A8A8E lit / #2C2C2E unlit);
+  // David 2026-07-28: light theme inverts the weight so passed ticks stay
+  // the stronger side there too.
+  private static let litBar = Color(
+    light: Color(red: 58 / 255, green: 58 / 255, blue: 64 / 255),
+    dark: Color(red: 138 / 255, green: 138 / 255, blue: 142 / 255)
+  )
+  private static let unlitBar = Color(
+    light: Color(red: 209 / 255, green: 211 / 255, blue: 214 / 255),
+    dark: Color(red: 44 / 255, green: 44 / 255, blue: 46 / 255)
+  )
   private static let inactiveLabel = Color(red: 82 / 255, green: 82 / 255, blue: 82 / 255)
 }
 
