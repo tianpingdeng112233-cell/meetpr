@@ -163,9 +163,9 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 - **禁止**：一次 commit 跨多个无关改动
 - **鼓励**：每写一个新决策（例如"为什么选 TCA 而不是 MVVM"）就沉淀到 `~/Brain/wiki/projects/MeetPR/decisions/` 里
 
-## PR Codex review pass(Claude 写的任何 PR merge 前必经 Codex 互审)
+## PR Codex review pass(Claude 写的代码类 PR merge 前必经 Codex 互审;纯文档免跑)
 
-**触发**: 任何 PR(doc 或 code,`specs/NN/SPEC.md` / ADR / `CLAUDE.md` / `AGENTS.md` / `FOLLOWUPS.md` / README / 其他 `*.md` / `*.swift` / `Package.swift` / `*.json` / `*.py` / `project.pbxproj` 等)由 Claude 起草后,**开 PR 前必须先经 `/review-loop` 本地 Codex 互审收敛**(这就是真 gate);loop 收敛后 PR 级 Codex review pass **默认免跑**(见下方程序第 4 步)。
+**触发(2026-07-27 收窄,范围权威 = [`review-loop` SKILL.md §何时跑](~/.claude/skills/review-loop/SKILL.md))**:**只有代码类产物**(`*.swift` / `Package.swift` / `*.ts` / `*.tsx` / `*.py` / `*.sql` 迁移 / 行为性 `*.json` / `project.pbxproj`)由 Claude 起草后,**开 PR 前必须先经 `/review-loop` 本地 Codex 互审收敛**(这就是真 gate);loop 收敛后 PR 级 Codex review pass **默认免跑**(见下方程序第 4 步)。**spec / ADR / `CLAUDE.md` / `AGENTS.md` / README / 其他纯文档一律免跑**——文档 = Claude 起草 + David 终审,不再烧互审轮次(2026-07-12 拍板 code-only,2026-07-27 明确文档全免)。
 
 > **背景**:CLAUDE.md §角色 已规定 Claude 写 Swift 代码(过去 default 走 Codex,Codex 限额触顶 Claude 接管 code 实装)。无论谁写,另一方必 review = 双向 second-pair-of-eyes。本节定义 Claude 写 → Codex review 这一向;反向(Codex 写 → Claude review)是既有流程,无需新规则。
 
@@ -174,14 +174,14 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 2. **开一个干净 PR**(同既有流程,用 enforce_admins 套路 / 普通 push):草稿已本地洗过,PR 只含收敛后的最终改动。
 3. **PR body 附「Pre-PR review loop 摘要」**:总轮数 / blocker 找到+解决数 / David 裁决记录 + 全文 transcript 链接(`~/Brain/wiki/projects/MeetPR/reviews/YYYY-MM-DD-<topic>.md`)。
 4. **PR 级 Codex review pass = 可选(`/review-loop` 收敛后默认免跑)**:`/review-loop` 已是真 gate——它对**进 PR 的同一份代码**审到了 `VERDICT: CLEAN`(过程中还复跑测试 + build),PR 级再让同一个 Codex 审一遍同样的代码是冗余的纸面 gate。所以 **loop 收敛 `VERDICT: CLEAN` 且收敛后无语义改动时,PR 级 gate 免跑**(收敛后只有 swift-format / lint 自动修、commit message 这类**非语义**变更不算改动);loop 的 transcript 链接即审查留痕,直接进合并流程。
-   - **仍必须跑 PR 级 gate 的情况**:① `/review-loop` 没跑(走了下方 §例外 的免 loop 情形);② 收敛后 PR 里有**语义改动**(改了逻辑 / 接口 / 行为,非纯排版)——这部分没被 loop 审过;③ 想在 GitHub PR 上额外留一条 Codex review comment 作审计。
+   - **仍必须跑 PR 级 gate 的情况**:① **代码类改动**没跑 `/review-loop`(走了下方 §例外 的免 loop 情形;纯文档 PR 本就不触发,不算此项);② 收敛后 PR 里有**语义改动**(改了逻辑 / 接口 / 行为,非纯排版)——这部分没被 loop 审过;③ 想在 GitHub PR 上额外留一条 Codex review comment 作审计。
    - 跑的话仍按既有流程:`gh pr review --comment`(same-account 下 `--approve` / `--request-changes` 被 GitHub 拒,详见 §例外 与 [`AGENTS.md` §PR review pass](./AGENTS.md));报 blocker 则 Claude 在 PR 内修,该修复属 finding 内容**必须再过一次 gate**;只有纯 typo / metadata / commit message / 不动 body 的小修按 §例外 免 re-review。
 
 **review 重点 by PR 类型**:
 
 | PR 类型 | 让 Codex 找的 |
 |---|---|
-| **Doc / spec / ADR / *.md** | factual errors / scope ambiguity / 缺细节 / contradictions / unsafe assumptions |
+| **Doc / spec / ADR / *.md**(默认不触发,仅 David 显式点名要 Codex 审某份文档时) | factual errors / scope ambiguity / 缺细节 / contradictions / unsafe assumptions |
 | **Code(*.swift / Package.swift / config)** | 上面 + Swift API Design Guidelines / 现有 codebase 风格契合度 / Sendable + Actor 隔离 / force unwrap / type 错误 / 测试覆盖洞 / `swift test` + `xcodebuild` 是否能跑(快速 sanity) |
 | **JSON / fixture(数据)** | schema 跟 Codable model 对齐 / row count / id namespace 不冲突 / encode round-trip |
 | **`project.pbxproj` / build config** | INFOPLIST_KEY 是否 dead / signing setup / scheme 一致 |
@@ -189,7 +189,10 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 **为什么这条规则**:
 2026-05-13 加。spec 022 由 Claude 写,Codex impl 时 catch 到事实错误(catalog 总条数 SPEC 写 436 实际 xlsx 是 435)+ 补 PlanningDisplay 中文映射(SPEC 漏)。**前置 Codex review 能 catch 这类问题,省一次 amendment cycle**。同日扩 Claude 也写 code(Codex 限额 fallback)— 同样需要双向 review。规则本身经 Codex review(meta:PR #53)采纳了 3 个 wording fix(same-account `--approve` 限制 / re-review 触发 / 跟 CHALLENGE 边界)。
 
+2026-07-12 / 2026-07-27 两次收窄:先拍板「只有代码类产物跑 review-loop」,后明确 spec / ADR / 纯文档一律免跑(文档 = Claude 起草 + David 终审);触发范围权威落 [`review-loop` SKILL.md §何时跑](~/.claude/skills/review-loop/SKILL.md),本节与之冲突时以 SKILL.md 为准。
+
 **例外**(免 Codex review):
+- **spec / ADR / 纯文档类 PR**(2026-07-27 拍板,见上方触发;文档 = Claude 起草 + David 终审)
 - 修字符 typo / 链接 dead URL / 单纯 frontmatter 字段填值(无语义改动)
 - 已经经 Codex review 过的 PR 的**小修** follow-up commit(force-push 同 PR 内 + 改的不是 finding 内容)
 - 紧急 hotfix(Apple 审核拒回 / production blocker / CI red 阻塞)— merge 后补 review
