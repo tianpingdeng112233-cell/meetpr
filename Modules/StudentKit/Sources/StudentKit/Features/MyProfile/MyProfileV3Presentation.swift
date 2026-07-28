@@ -86,8 +86,7 @@ struct MyProfileV3Presentation: Equatable, Sendable {
   }
 
   private static func restTimerText(_ preference: StudentRestTimerPreference) -> String {
-    guard let seconds = preference.fixedSeconds else { return "自动 (按 RPE)" }
-    return "固定 \(Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond)))"
+    StudentRestTimerCopy.summary(for: preference)
   }
 
   private static func heightAndWeight(_ profile: OnboardingProfile) -> String {

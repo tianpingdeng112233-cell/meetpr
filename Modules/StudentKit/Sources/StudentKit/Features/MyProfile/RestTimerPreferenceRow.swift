@@ -36,7 +36,6 @@ struct RestTimerPreferenceRow: View {
   }
 
   private var summary: String {
-    guard let seconds = preference.fixedSeconds else { return "自动 (按 RPE)" }
-    return "固定 \(Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond)))"
+    StudentRestTimerCopy.summary(for: preference)
   }
 }

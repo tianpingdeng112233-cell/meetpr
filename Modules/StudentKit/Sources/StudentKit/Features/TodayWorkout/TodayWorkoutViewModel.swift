@@ -255,7 +255,9 @@ public final class TodayWorkoutViewModel {
     }
     let seconds =
       draft.prescribed.restSeconds
-      ?? currentStudentID.flatMap { restTimerSettings.preference(for: $0).fixedSeconds }
+      ?? currentStudentID.flatMap {
+        restTimerSettings.preference(for: $0).customSeconds(forRPE: draft.actualRPE)
+      }
       ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
     restTimer = RestTimerState(
       endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)

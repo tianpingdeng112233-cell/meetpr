@@ -31,15 +31,15 @@ import Testing
   #expect(presentation.trainingEnvironment.contains("4天/周"))
 }
 
-@Test func profileV3PresentationFallsBackToRecoveryProfileAndFixedTimer() {
+@Test func profileV3PresentationFallsBackToRecoveryProfileAndCustomTimer() {
   let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
 
   let presentation = MyProfileV3Presentation.make(
     profile: profile,
     readiness: nil,
-    restTimer: .fixed(seconds: 180)
+    restTimer: .custom(lowSeconds: 120, midSeconds: 180, highSeconds: 240)
   )
 
   #expect(presentation.recoveryChips == ["中等强度", "较高压力", "约2天恢复"])
-  #expect(presentation.restTimer == "固定 3:00")
+  #expect(presentation.restTimer == "自定义 2:00/3:00/4:00")
 }

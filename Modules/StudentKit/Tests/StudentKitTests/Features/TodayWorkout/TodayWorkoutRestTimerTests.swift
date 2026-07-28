@@ -55,7 +55,10 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 @Test func completionEdgePrefersPrescribedRestSecondsOverStudentPreference() async throws {
   let plan = planReplacingFirstSet(restSeconds: 75)
   let settings = try testRestTimerSettingsStore()
-  settings.store.setPreference(.fixed(seconds: 150), for: StudentDemoSeed.studentID)
+  settings.store.setPreference(
+    .custom(lowSeconds: 105, midSeconds: 195, highSeconds: 300),
+    for: StudentDemoSeed.studentID
+  )
   let viewModel = try await makeViewModel(
     now: frozenNow, plan: plan, restTimerSettings: settings.store)
 
@@ -68,19 +71,34 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 }
 
 @MainActor
-@Test func completionEdgeUsesStudentFixedPreferenceBeforeAutoPolicy() async throws {
-  let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)
+@Test(
+  "Custom preference uses actual RPE bands",
+  arguments: [
+    (Optional<Decimal>.none, 195),
+    (Decimal(string: "6.5"), 105),
+    (Decimal(7), 195),
+    (Decimal(string: "8.5"), 195),
+    (Decimal(9), 300),
+  ]
+)
+func completionEdgeUsesStudentCustomBandBeforeAutoPolicy(
+  actualRPE: Decimal?,
+  expectedSeconds: Int
+) async throws {
   let settings = try testRestTimerSettingsStore()
-  settings.store.setPreference(.fixed(seconds: 150), for: StudentDemoSeed.studentID)
+  settings.store.setPreference(
+    .custom(lowSeconds: 105, midSeconds: 195, highSeconds: 300),
+    for: StudentDemoSeed.studentID
+  )
   let viewModel = try await makeViewModel(
     now: frozenNow, restTimerSettings: settings.store)
 
-  viewModel.updateRPE(rowIndex: 0, rpe: 10)
+  viewModel.updateRPE(rowIndex: 0, rpe: actualRPE)
   await viewModel.toggleComplete(rowIndex: 0)
 
   let timer = try #require(viewModel.restTimer)
-  #expect(timer.totalSeconds == 150)
-  #expect(timer.endsAt == frozenNow.addingTimeInterval(150))
+  #expect(timer.totalSeconds == expectedSeconds)
+  #expect(timer.endsAt == frozenNow.addingTimeInterval(TimeInterval(expectedSeconds)))
 }
 
 @MainActor
