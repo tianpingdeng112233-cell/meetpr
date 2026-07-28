@@ -121,7 +121,7 @@ private struct SessionVolumeCard: View {
       Text("总容量")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
         .tracking(0.88)
-        .foregroundStyle(Color.MeetPR.goldMuted)
+        .foregroundStyle(Color.MeetPR.goldText)
 
       HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.point7) {
         Text(presentation.totalVolumeText)
@@ -153,7 +153,7 @@ private struct SessionVolumeCard: View {
     .padding(.bottom, MeetPRSpacing.point15)
     .background(
       LinearGradient(
-        colors: [.MeetPR.medalInset, .MeetPR.surfaceCard],
+        colors: [.MeetPR.reviewHeroTop, .MeetPR.surfaceCard],
         startPoint: .top,
         endPoint: .bottom
       )
@@ -185,7 +185,7 @@ private struct SessionVolumeStat: View {
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, MeetPRSpacing.point9)
-    .background(Color.black.opacity(0.35))
+    .background(Color.MeetPR.medalStatTile)
     .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
 }

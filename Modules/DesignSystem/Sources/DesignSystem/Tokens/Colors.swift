@@ -117,6 +117,20 @@ extension Color {
     /// `#17120A` at 0.92 — the medal's inner disc; SVG literal, both themes.
     public static let medalInset = rgb(23, 18, 10)
 
+    /// Review-hero gradient top. ⚖️ David 2026-07-28: the mockup hard-codes
+    /// `#17120A` even in light theme; light gets a warm cream instead.
+    public static let reviewHeroTop = Color(
+      light: rgb(247, 240, 228),
+      dark: rgb(23, 18, 10)
+    )
+
+    /// Stat tiles on the review hero: the dark value matches the previous
+    /// black-35% overlay on the dark gradient; light uses a soft inset.
+    public static let medalStatTile = Color(
+      light: rgb(255, 255, 255).opacity(0.55),
+      dark: rgb(0, 0, 0).opacity(0.35)
+    )
+
     // MARK: - Borders
 
     public static let borderHairline = Color(
