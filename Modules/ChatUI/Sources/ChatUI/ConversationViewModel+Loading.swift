@@ -166,13 +166,19 @@ extension ConversationViewModel {
 
   private func merge(_ incoming: [ChatMessage], obtainedAt: Date) {
     var bySequence = Dictionary(uniqueKeysWithValues: messages.map { ($0.seq, $0) })
-    for message in incoming where message.conversationID == conversationID {
+    for message in incoming
+    where message.conversationID == conversationID && !removedMessageIDs.contains(message.id) {
       let existing = bySequence[message.seq]
       bySequence[message.seq] = message
       if message.kind == .image, message.imageURL != nil,
         existing?.imageURL != message.imageURL || imageURLObtainedAt[message.id] == nil
       {
         imageURLObtainedAt[message.id] = obtainedAt
+      }
+      if message.setRef != nil, message.videoURL != nil,
+        existing?.videoURL != message.videoURL || videoURLObtainedAt[message.id] == nil
+      {
+        videoURLObtainedAt[message.id] = obtainedAt
       }
     }
     messages = bySequence.values.sorted { $0.seq < $1.seq }
