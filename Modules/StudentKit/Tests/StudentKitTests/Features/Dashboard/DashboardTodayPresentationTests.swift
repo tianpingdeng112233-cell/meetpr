@@ -364,3 +364,14 @@ private func dashboardExercise(named name: String = "深蹲") -> StudentPlanExer
     prescribedSets: []
   )
 }
+
+@Test func liftSubtitleUsesFullNamesForOneOrTwoLiftsOnly() {
+  #expect(DashboardTodayPresentation.liftSubtitle([.deadlift]) == "硬拉日")
+  #expect(
+    DashboardTodayPresentation.liftSubtitle([.squat, .bench]) == "深蹲、卧推日"
+  )
+  #expect(
+    DashboardTodayPresentation.liftSubtitle([.squat, .bench, .deadlift]) == "蹲·推·拉"
+  )
+  #expect(DashboardTodayPresentation.liftSubtitle([]).isEmpty)
+}

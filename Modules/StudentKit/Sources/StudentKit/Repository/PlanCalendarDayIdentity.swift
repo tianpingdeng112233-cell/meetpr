@@ -47,6 +47,20 @@ enum PlanCalendarDayIdentity {
     utcCalendar.isDate(lhs, inSameDayAs: rhs)
   }
 
+  static func deviceDay(containing date: Date, calendar: Calendar) -> Date {
+    calendar.startOfDay(for: date)
+  }
+
+  static func planDate(
+    matching selectedDate: Date,
+    selectedCalendar: Calendar
+  ) -> Date? {
+    guard let selectedComponents = components(of: selectedDate, in: selectedCalendar) else {
+      return nil
+    }
+    return utcCalendar.date(from: selectedComponents.dateComponents)
+  }
+
   private static func components(of date: Date, in calendar: Calendar) -> Components? {
     let components = calendar.dateComponents([.year, .month, .day], from: date)
     guard

@@ -82,7 +82,11 @@ public struct TodayWorkoutView: View {
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onHeroFrameChange = onHeroFrameChange
     self.onReturnToToday = onReturnToToday
-    self._selectedDate = State(initialValue: date ?? WorkoutDatePolicy.gymDayToday())
+    self._selectedDate = State(
+      initialValue: TodayWorkoutSelectionResolver.initialSelection(
+        explicitDate: date
+      )
+    )
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
         plans: plans,
@@ -311,8 +315,10 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
-      if !WorkoutDatePolicy.isEditable(selectedDate) {
-        selectedDate = WorkoutDatePolicy.gymDayToday()
+      if let jumpTarget = TodayWorkoutSelectionResolver.jumpToTodaySelection(
+        from: selectedDate
+      ) {
+        selectedDate = jumpTarget
       }
     }
     .onChange(of: autoStartToken) { _, token in
@@ -604,7 +610,11 @@ public struct TodayWorkoutView: View {
     let targetDateIsLoaded =
       WorkoutDatePolicy.isEditable(selectedDate)
       && currentWorkout.map {
-        Calendar.current.isDate($0.day.date, inSameDayAs: selectedDate)
+        PlanCalendarDayIdentity.matches(
+          planDate: $0.day.date,
+          selectedDate: selectedDate,
+          selectedCalendar: .current
+        )
       } == true
     if autoStartGate.consumeIfReady(isTargetDateLoaded: targetDateIsLoaded) {
       started = true

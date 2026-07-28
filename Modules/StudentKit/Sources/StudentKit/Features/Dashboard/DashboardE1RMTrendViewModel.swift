@@ -12,14 +12,33 @@ struct DashboardE1RMTrendPresentation: Equatable, Sendable {
   }
 }
 
+enum DashboardE1RMTrendState: Equatable, Sendable {
+  case zero
+  case forming
+  case mature
+}
+
 struct DashboardE1RMTrendRow: Equatable, Identifiable, Sendable {
   let family: LiftFamily
   let points: [E1RMHistoryPoint]
   let smoothedSamples: [E1RMSeries.Sample]
   let rawEligiblePoints: [E1RMHistoryPoint]
+  let eligibleRecordCount: Int
+  let latestDisplayDate: Date?
   let latestRecordPoint: E1RMHistoryPoint?
 
   var id: LiftFamily { family }
+
+  var trendState: DashboardE1RMTrendState {
+    switch eligibleRecordCount {
+    case 0:
+      .zero
+    case ..<GrowthHistoryStats.trendUnlockThreshold:
+      .forming
+    default:
+      .mature
+    }
+  }
 
   var latestPoint: E1RMHistoryPoint? {
     latestRecordPoint
@@ -146,13 +165,16 @@ final class DashboardE1RMTrendViewModel {
         from: windowStart,
         extendedTo: extensionDate
       )
+      let latestRecordPoint = series.records.last.flatMap { rawByID[$0.winnerPointID] }
       return DashboardE1RMTrendRow(
         family: family,
         points: E1RMSeries.historyPoints(for: recordTrajectory, sourcePoints: rawPoints),
         smoothedSamples: recordTrajectory,
         rawEligiblePoints: E1RMSeries.eligibleRaw(points: rawPoints, family: family)
           .filter { $0.confidence == .low },
-        latestRecordPoint: series.records.last.flatMap { rawByID[$0.winnerPointID] }
+        eligibleRecordCount: series.rawEligible.count,
+        latestDisplayDate: latestRecordPoint?.computedAt ?? series.rawEligible.last?.date,
+        latestRecordPoint: latestRecordPoint
       )
     }
   }

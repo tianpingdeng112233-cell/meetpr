@@ -23,7 +23,7 @@ struct TrainingCalendarView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     calendar: Calendar = .current,
-    today: @escaping @Sendable () -> Date = { WorkoutDatePolicy.gymDayToday() },
+    today: @escaping @Sendable () -> Date = { Date() },
     planRevision: Int = 0
   ) {
     self.studentID = studentID
@@ -33,7 +33,12 @@ struct TrainingCalendarView: View {
     self.today = today
     self.planRevision = planRevision
     self._selectedDate = selectedDate
-    self._displayedDate = State(initialValue: selectedDate.wrappedValue)
+    self._displayedDate = State(
+      initialValue: PlanCalendarDayIdentity.deviceDay(
+        containing: selectedDate.wrappedValue,
+        calendar: resolvedCalendar
+      )
+    )
     self._viewModel = State(initialValue: TrainingCalendarViewModel(plans: plans, logs: logs))
   }
 

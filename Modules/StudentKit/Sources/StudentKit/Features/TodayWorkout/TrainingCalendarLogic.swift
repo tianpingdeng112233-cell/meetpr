@@ -63,7 +63,13 @@ enum TrainingCalendarLayout {
       ? weekDates(containing: period.displayedDate, calendar: calendar)
       : monthDates(containing: period.displayedDate, calendar: calendar)
     return dates.map { date in
-      let planDay = cycleDays.first { calendar.isDate($0.date, inSameDayAs: date) }
+      let planDay = cycleDays.first {
+        PlanCalendarDayIdentity.matches(
+          planDate: $0.date,
+          selectedDate: date,
+          selectedCalendar: calendar
+        )
+      }
       return TrainingCalendarDay(
         date: date,
         planDay: planDay,

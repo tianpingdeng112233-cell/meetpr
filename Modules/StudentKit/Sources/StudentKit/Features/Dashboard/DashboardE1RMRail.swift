@@ -69,7 +69,17 @@ private struct DashboardE1RMCard: View {
   }
 
   private var latestValue: String {
-    StudentFormatting.kilograms(row.displayPoint(now: Date())?.e1RMKg ?? 0)
+    guard let value = row.displayPoint(now: Date())?.e1RMKg else { return "—" }
+    return StudentFormatting.kilograms(value)
+  }
+
+  private var accessibilityValue: String {
+    switch row.trendState {
+    case .zero:
+      "未设定"
+    case .forming, .mature:
+      "\(latestValue) 千克"
+    }
   }
 
   private var deltaText: String? {
@@ -89,36 +99,54 @@ private struct DashboardE1RMCard: View {
       .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
       .foregroundStyle(Color.MeetPR.textMuted)
 
-      HStack(alignment: .lastTextBaseline) {
-        HStack(alignment: .lastTextBaseline, spacing: 0) {
-          Text(latestValue)
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
-            .foregroundStyle(Color.MeetPR.textPrimary)
-          Text(" kg")
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textMuted)
-        }
-        Spacer(minLength: 8)
-        if let deltaText {
-          Text(deltaText)
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-            .foregroundStyle(Color.MeetPR.goldText)
-        }
-      }
-      .padding(.top, 5)
-
-      ZStack {
-        DashboardSparklineArea(points: points, viewBox: viewBox)
-        Sparkline(
-          points: points,
-          viewBox: viewBox,
-          lineColor: Color.MeetPR.inkOnCTAFill,
-          lineWidth: 2.5,
-          showsEndDot: true
+      switch row.trendState {
+      case .zero:
+        DashboardE1RMValueRow(
+          value: "未设定",
+          unit: nil,
+          trailingText: nil,
+          trailingColor: Color.clear
         )
+        GrowthZeroTrainingState(
+          showsAction: false,
+          isCompact: true,
+          onOpenToday: {}
+        )
+      case .forming:
+        DashboardE1RMValueRow(
+          value: latestValue,
+          unit: "kg",
+          trailingText: "首次估算",
+          trailingColor: Color.MeetPR.textMuted
+        )
+        GrowthFormingTrendState(
+          recordedCount: row.eligibleRecordCount,
+          threshold: GrowthHistoryStats.trendUnlockThreshold,
+          familyName: row.family.studentDisplayName,
+          currentKg: row.latestPoint?.e1RMKg,
+          latestRecordDate: row.latestDisplayDate,
+          chartHeight: 100
+        )
+      case .mature:
+        DashboardE1RMValueRow(
+          value: latestValue,
+          unit: "kg",
+          trailingText: deltaText,
+          trailingColor: Color.MeetPR.goldText
+        )
+        ZStack {
+          DashboardSparklineArea(points: points, viewBox: viewBox)
+          Sparkline(
+            points: points,
+            viewBox: viewBox,
+            lineColor: Color.MeetPR.inkOnCTAFill,
+            lineWidth: 2.5,
+            showsEndDot: true
+          )
+        }
+        .frame(height: 48)
+        .padding(.top, 8)
       }
-      .frame(height: 48)
-      .padding(.top, 8)
     }
     .padding(.horizontal, 15)
     .padding(.vertical, 14)
@@ -127,8 +155,38 @@ private struct DashboardE1RMCard: View {
     .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(
-      "\(row.family.studentDisplayName) E1RM，\(latestValue) 千克"
+      "\(row.family.studentDisplayName) E1RM，\(accessibilityValue)"
     )
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct DashboardE1RMValueRow: View {
+  let value: String
+  let unit: String?
+  let trailingText: String?
+  let trailingColor: Color
+
+  var body: some View {
+    HStack(alignment: .lastTextBaseline) {
+      HStack(alignment: .lastTextBaseline, spacing: 0) {
+        Text(value)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        if let unit {
+          Text(" \(unit)")
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textMuted)
+        }
+      }
+      Spacer(minLength: 8)
+      if let trailingText {
+        Text(trailingText)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .bold))
+          .foregroundStyle(trailingColor)
+      }
+    }
+    .padding(.top, 5)
   }
 }
 

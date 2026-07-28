@@ -400,6 +400,7 @@ private struct TodayWorkoutHeader: View {
         }
       }
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
 

@@ -23,10 +23,15 @@ public enum StudentDemoSeed {
   public static func makePlanView(
     weekIndex: Int = 1,
     today: Date = Date(),
-    todayOffset: Int = 3
+    todayOffset: Int = 3,
+    selectedCalendar: Calendar = .current
   ) -> StudentPlanView {
-    let startDate = demoCycleStart(today: today, todayOffset: todayOffset).addingTimeInterval(
-      Double(max(0, weekIndex - 1)) * 7 * 86_400)
+    let startDate = demoCycleStart(
+      today: today,
+      todayOffset: todayOffset,
+      selectedCalendar: selectedCalendar
+    )
+    .addingTimeInterval(Double(max(0, weekIndex - 1)) * 7 * 86_400)
     let days = (0..<7).map { offset in
       let date = startDate.addingTimeInterval(Double(offset) * 86_400)
       return StudentPlanDay(
@@ -51,7 +56,11 @@ public enum StudentDemoSeed {
   ) -> [StudentSetLog] {
     let plan = makePlanView(weekIndex: weekIndex)
     let calendar = utcCalendar
-    let today = calendar.startOfDay(for: Date())
+    let today =
+      PlanCalendarDayIdentity.planDate(
+        matching: Date(),
+        selectedCalendar: .current
+      ) ?? calendar.startOfDay(for: Date())
     // Past training days are fully logged; today is in progress (first two sets);
     // future days are never seeded.
     return plan.days.flatMap { day -> [StudentSetLog] in
@@ -271,9 +280,17 @@ public enum StudentDemoSeed {
   /// i.e. the week began three days ago. This keeps the 锻炼 tab on a real workout
   /// whenever the demo is launched, while leaving genuine *past* training days
   /// (深蹲, 卧推) for 历史/仪表盘 to show — and never seeding future logs.
-  private static func demoCycleStart(today: Date, todayOffset: Int) -> Date {
+  private static func demoCycleStart(
+    today: Date,
+    todayOffset: Int,
+    selectedCalendar: Calendar
+  ) -> Date {
     let calendar = utcCalendar
-    let startOfToday = calendar.startOfDay(for: today)
+    let startOfToday =
+      PlanCalendarDayIdentity.planDate(
+        matching: today,
+        selectedCalendar: selectedCalendar
+      ) ?? calendar.startOfDay(for: today)
     return calendar.date(
       byAdding: .day,
       value: -min(max(todayOffset, 0), 6),

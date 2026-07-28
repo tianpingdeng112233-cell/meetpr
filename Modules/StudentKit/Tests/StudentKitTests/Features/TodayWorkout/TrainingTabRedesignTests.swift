@@ -105,4 +105,32 @@ import Testing
     let nonTraining = days.first { !calendar.isDate($0.date, inSameDayAs: trainingDate) }
     #expect(nonTraining?.planDay == nil)
   }
+
+  @Test func makeDaysMatchesUTCPlanAnchorToDeviceCalendarDay() throws {
+    var shanghai = Calendar(identifier: .gregorian)
+    shanghai.timeZone = try #require(TimeZone(identifier: "Asia/Shanghai"))
+    shanghai.firstWeekday = 2
+    let utcPlanDate = day(2026, 7, 29)
+    let selectedDate = try #require(
+      shanghai.date(from: DateComponents(year: 2026, month: 7, day: 29))
+    )
+    let planDay = StudentPlanDay(id: UUID(), date: utcPlanDate, exercises: [])
+    let period = TrainingCalendarPeriod(
+      displayedDate: selectedDate,
+      selectedDate: selectedDate,
+      today: selectedDate,
+      mode: .week
+    )
+
+    let days = TrainingCalendarLayout.makeDays(
+      period: period,
+      cycleDays: [planDay],
+      logs: [],
+      calendar: shanghai
+    )
+
+    let selected = try #require(days.first { $0.isSelected })
+    #expect(selected.planDay?.id == planDay.id)
+    #expect(selected.isToday)
+  }
 }

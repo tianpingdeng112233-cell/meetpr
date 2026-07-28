@@ -33,7 +33,10 @@ struct DashboardWeekCalendar: View {
 
               HStack(spacing: 3) {
                 ForEach(LiftFamily.dashboardOrder, id: \.self) { family in
-                  DashboardLiftSlot(isFilled: cell.families.contains(family))
+                  DashboardLiftSlot(
+                    isFilled: cell.families.contains(family),
+                    isInProgress: cell.isInProgress
+                  )
                 }
               }
               .frame(height: 7)
@@ -65,7 +68,8 @@ struct DashboardWeekCalendar: View {
 
   private func accessibilityLabel(for cell: DashboardWeekCalendarCell) -> String {
     let lifts = cell.families.map(\.studentDisplayName).joined(separator: "、")
-    return "周\(cell.weekday)，\(lifts.isEmpty ? "无训练安排" : lifts)"
+    let status = cell.isInProgress ? "，进行中" : ""
+    return "周\(cell.weekday)，\(lifts.isEmpty ? "无训练安排" : lifts)\(status)"
   }
 }
 
@@ -79,12 +83,16 @@ private struct DashboardWeekCalendarLegend: View {
         .fill(Color.MeetPR.borderStrong)
         .frame(width: 1, height: 9)
       HStack(spacing: 4) {
-        DashboardLiftSlot(isFilled: true)
+        DashboardLiftSlot(isFilled: true, isInProgress: false)
         Text("该日有")
       }
       HStack(spacing: 4) {
-        DashboardLiftSlot(isFilled: false)
+        DashboardLiftSlot(isFilled: false, isInProgress: false)
         Text("该日无")
+      }
+      HStack(spacing: 4) {
+        DashboardLiftSlot(isFilled: true, isInProgress: true)
+        Text("进行中")
       }
     }
     .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
@@ -97,10 +105,11 @@ private struct DashboardWeekCalendarLegend: View {
 @available(iOS 17.0, macOS 14.0, *)
 private struct DashboardLiftSlot: View {
   let isFilled: Bool
+  let isInProgress: Bool
 
   var body: some View {
     Circle()
-      .fill(isFilled ? Color.MeetPR.gold500 : Color.MeetPR.bgBase.opacity(0))
+      .fill(fill)
       .frame(width: 6, height: 6)
       .overlay {
         if !isFilled {
@@ -109,6 +118,11 @@ private struct DashboardLiftSlot: View {
         }
       }
       .accessibilityHidden(true)
+  }
+
+  private var fill: Color {
+    guard isFilled else { return Color.MeetPR.bgBase.opacity(0) }
+    return isInProgress ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary
   }
 }
 

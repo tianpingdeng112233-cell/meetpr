@@ -134,6 +134,8 @@
           points: familyPoints,
           smoothedSamples: [],
           rawEligiblePoints: [],
+          eligibleRecordCount: familyPoints.count,
+          latestDisplayDate: familyPoints.map(\.computedAt).max(),
           latestRecordPoint: familyPoints.max { $0.computedAt < $1.computedAt }
         )
       }

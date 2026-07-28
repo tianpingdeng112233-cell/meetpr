@@ -22,6 +22,23 @@ struct GrowthFormingTrendState: View {
   let familyName: String
   let currentKg: Double?
   let latestRecordDate: Date?
+  let chartHeight: CGFloat
+
+  init(
+    recordedCount: Int,
+    threshold: Int,
+    familyName: String,
+    currentKg: Double?,
+    latestRecordDate: Date?,
+    chartHeight: CGFloat = 68
+  ) {
+    self.recordedCount = recordedCount
+    self.threshold = threshold
+    self.familyName = familyName
+    self.currentKg = currentKg
+    self.latestRecordDate = latestRecordDate
+    self.chartHeight = chartHeight
+  }
 
   var body: some View {
     VStack(spacing: MeetPRSpacing.point10) {
@@ -31,7 +48,7 @@ struct GrowthFormingTrendState: View {
         currentKg: currentKg,
         latestRecordDate: latestRecordDate
       )
-      .frame(height: 68)
+      .frame(height: chartHeight)
 
       HStack(spacing: MeetPRSpacing.point9) {
         progressDots
@@ -264,13 +281,24 @@ private struct GrowthFormingTrendChart: View {
 @available(iOS 17.0, macOS 14.0, *)
 struct GrowthZeroTrainingState: View {
   let showsAction: Bool
+  let isCompact: Bool
   let onOpenToday: () -> Void
 
-  var body: some View {
-    VStack(spacing: MeetPRSpacing.point10) {
-      GrowthZeroGhostChart()
+  init(
+    showsAction: Bool,
+    isCompact: Bool = false,
+    onOpenToday: @escaping () -> Void
+  ) {
+    self.showsAction = showsAction
+    self.isCompact = isCompact
+    self.onOpenToday = onOpenToday
+  }
 
-      Text("第一个数据点，等你练出来")
+  var body: some View {
+    VStack(spacing: isCompact ? MeetPRSpacing.point6 : MeetPRSpacing.point10) {
+      GrowthZeroGhostChart(size: 64)
+
+      Text(isCompact ? "第一个数据点·等你练出来" : "第一个数据点，等你练出来")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
       Text("完成第一次训练后，这里开始记录 e1RM、总量和 PR")
@@ -301,6 +329,8 @@ struct GrowthZeroTrainingState: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct GrowthZeroGhostChart: View {
+  let size: CGFloat
+
   var body: some View {
     Canvas { context, size in
       let circle = Path(
@@ -338,7 +368,7 @@ private struct GrowthZeroGhostChart: View {
         with: .color(Color.MeetPR.gold500)
       )
     }
-    .frame(width: 64, height: 64)
+    .frame(width: size, height: size)
     .accessibilityHidden(true)
   }
 }

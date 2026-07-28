@@ -64,7 +64,7 @@ struct DashboardTodayScreen: View {
 
   private var selectedTrendRows: [DashboardE1RMTrendRow] {
     selectedFamilies.compactMap { family in
-      model.trendRows.first { $0.family == family && !$0.points.isEmpty }
+      model.trendRows.first { $0.family == family }
     }
   }
 
@@ -103,9 +103,7 @@ struct DashboardTodayScreen: View {
   }
 
   private var liftSubtitle: String {
-    selectedFamilies
-      .map(DashboardTodayPresentation.liftShortName)
-      .joined(separator: "·")
+    DashboardTodayPresentation.liftSubtitle(selectedFamilies)
   }
 
   private var canShiftSelectedDay: Bool {
@@ -188,6 +186,7 @@ struct DashboardTodayScreen: View {
         DashboardWeekCalendar(
           cells: DashboardTodayPresentation.calendarCells(
             days: model.days,
+            logs: model.logs,
             selectedDate: effectiveSelectedDate,
             today: model.now,
             selectedCalendar: calendar
@@ -219,16 +218,7 @@ struct DashboardTodayScreen: View {
             )
           )
           .meetPRRiseIn(delay: riseDelay(index: trendContentRiseIndex))
-        } else if selectedTrendRows.isEmpty {
-          Text("完成 3 次训练后解锁趋势")
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textMuted)
-            .frame(maxWidth: .infinity)
-            .padding(20)
-            .background(Color.MeetPR.surfaceCard)
-            .clipShape(.rect(cornerRadius: 16))
-            .meetPRRiseIn(delay: riseDelay(index: trendContentRiseIndex))
-        } else {
+        } else if !selectedTrendRows.isEmpty {
           DashboardE1RMRail(rows: selectedTrendRows)
             .meetPRRiseIn(delay: riseDelay(index: trendContentRiseIndex))
         }

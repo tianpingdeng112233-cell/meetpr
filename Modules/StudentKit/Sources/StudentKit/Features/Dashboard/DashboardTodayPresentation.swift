@@ -23,6 +23,7 @@ struct DashboardWeekCalendarCell: Identifiable, Sendable {
   let date: Date
   let weekday: String
   let families: [LiftFamily]
+  let isInProgress: Bool
   let isSelected: Bool
 }
 
@@ -148,6 +149,7 @@ enum DashboardTodayPresentation {
 
   static func calendarCells(
     days: [StudentPlanDay],
+    logs: [StudentSetLog],
     selectedDate: Date,
     today: Date,
     selectedCalendar: Calendar
@@ -161,6 +163,8 @@ enum DashboardTodayPresentation {
           date: date,
           weekday: weekdayLetter(offset),
           families: day.map(MainLiftExerciseFamilyResolver.families(in:)) ?? [],
+          isInProgress: day.map { TrainingDayProgress(day: $0, logs: logs).state == .partial }
+            ?? false,
           isSelected: selectedCalendar.isDate(date, inSameDayAs: selectedDate)
         )
       }
@@ -235,6 +239,24 @@ enum DashboardTodayPresentation {
     case .squat: "蹲"
     case .bench: "推"
     case .deadlift: "拉"
+    }
+  }
+
+  static func liftFullName(_ family: LiftFamily) -> String {
+    switch family {
+    case .squat: "深蹲"
+    case .bench: "卧推"
+    case .deadlift: "硬拉"
+    }
+  }
+
+  /// David 2026-07-28: one or two lifts read as full names ("深蹲日",
+  /// "深蹲、卧推日"); only three-lift days keep the abbreviated form.
+  static func liftSubtitle(_ families: [LiftFamily]) -> String {
+    switch families.count {
+    case 0: ""
+    case 1, 2: families.map(liftFullName).joined(separator: "、") + "日"
+    default: families.map(liftShortName).joined(separator: "·")
     }
   }
 }

@@ -5,10 +5,12 @@ import Foundation
 /// set can't be logged (or the day completed) on a day the student has not
 /// trained. Extracted from the view so the gate has a unit-testable seam.
 ///
-/// "Today" uses the gym-day cutoff: the day rolls over at 04:00, not midnight,
-/// so a session that crosses 00:00 stays editable until 4 AM (and the next
-/// calendar day does not open for writing before 04:00). Counterpart of the
-/// backend's spec 017 default-`logged_date` cutoff (04:00 Asia/Shanghai).
+/// Write eligibility uses the gym-day cutoff: the day rolls over at 04:00, not
+/// midnight, so a session that crosses 00:00 stays editable until 4 AM (and the
+/// next calendar day does not open for writing before 04:00). Calendar
+/// selection and the visible "today" identity still use the device day through
+/// `PlanCalendarDayIdentity`. Counterpart of the backend's spec 017
+/// default-`logged_date` cutoff (04:00 Asia/Shanghai).
 ///
 /// Trade-offs, accepted deliberately (review 2026-07-14):
 /// - The shift is a fixed -4h on the wall clock in the *device* calendar. In
@@ -25,9 +27,8 @@ enum WorkoutDatePolicy {
   /// resolving the calendar day.
   static let gymDayCutoff: TimeInterval = 4 * 3600
 
-  /// A timestamp that falls inside the current gym-day — use it wherever a
-  /// "today" anchor seeds day selection (initial `selectedDate`, jump-to-today)
-  /// so navigation lands on the day that is actually editable.
+  /// A timestamp that falls inside the current gym-day, used only for write
+  /// eligibility. It is not the calendar's visible "today" anchor.
   static func gymDayToday(now: Date = Date()) -> Date {
     now.addingTimeInterval(-gymDayCutoff)
   }
