@@ -119,7 +119,7 @@
 
 ### F-008 — 定期 ADR review
 
-- **触发条件**:距离上次 ADR review **满 30 天**(first review: 2026-05-24)
+- **触发条件**:距离上次 ADR review **满 30 天**(上次 review: **2026-07-28** → 下次触发: **2026-08-27**)
 - **动作**:
   1. 过一遍 `~/Brain/wiki/projects/MeetPR/decisions/` 下所有 accepted ADR
   2. 对每个 ADR 的 "后续需回顾" 条件检查是否触发
@@ -128,6 +128,9 @@
   5. 把下次 review 日期加进本文件(F-008 的触发日期 +30)
 - **为什么**:屎山帖里作者最大的问题之一就是"决策从不 revisit" — 早期决策成了历史枷锁
 - **创建于**:2026-04-24
+- **复审记录**:
+  - **2026-07-10**(全文档:`~/Brain/wiki/projects/MeetPR/reviews/2026-07-10-adr-review.md`):9 个 ADR 全过一遍,`reviewed:` 全 bump 到 2026-07-10。无 supersede、无新 ADR 强制触发——所有硬触发条件(V1 公测数据 / Stage 4-6 / 付费转化 / 多角色 5+ 用户)因仍在 TestFlight 闭门内测均未满足;架构不变量(CoachKit⊥StudentKit / SwiftData 窄例外 3 `@Model` / 单角色 `user.role`)全部守住。2 个上桌项:① ADR-007 网页栈漂移(plan-web 实际 React+Vite 而非 Next.js 15,ADR-008 token 同步从未落地)→ 裁决为解冻 PD-007 dashboard 时再议;② 算法引擎(spec 052)无 ADR → spec 052 foundation 落地时补。⚠️ 本条记录当时未 commit(只在 wip 树工作区),导致 main 台账停在 05-24、07-28 被开工自检误报超期——07-28 场一并修正。
+  - **2026-07-28**(全文档:`~/Brain/wiki/projects/MeetPR/reviews/2026-07-28-adr-review.md`;台账漂移触发的提前场,新规:纯文档不跑 review-loop):无 supersede;7 个 ADR `reviewed:` bump 到 2026-07-28,**ADR-005 出 amendment 草稿待 David 终审**(未 bump)。核心差异:① `Analytics` SPM target(07-13 spec 043 落 release/1.0)漏登记,与 CatalogKit 前科同款;② 双线 target 集合分裂——main = 8(7+CatalogKit),release/1.0 = 9(7+ChatUI+Analytics),ADR-005 的「9 target」清单不存在于任何单一分支,归一后应为 10;③ ChatUI 组卡片波扩容(C2a #281 已入,19 源文件)边界纪律复核**通过**(违禁 import 为零)。上桌:ADR-010 算法引擎触发条件已成立(#225 已合 main + 07-27 intake 三拍板),待 David 点头起草。
 
 ### F-011 — 公司注册(杭州互联网科技)+ side letter + 银行开户
 
