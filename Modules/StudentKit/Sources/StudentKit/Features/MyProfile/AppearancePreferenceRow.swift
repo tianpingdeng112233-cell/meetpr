@@ -6,7 +6,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct AppearancePreferenceRow: View {
   @AppStorage(MeetPRAppearance.storageKey)
-  private var storedPreference = MeetPRAppearance.system.rawValue
+  private var storedPreference = MeetPRAppearance.defaultPreference.rawValue
 
   var body: some View {
     HStack(spacing: MeetPRSpacing.space3) {
@@ -33,7 +33,7 @@ struct AppearancePreferenceRow: View {
   }
 
   private var selection: MeetPRAppearance {
-    MeetPRAppearance(rawValue: storedPreference) ?? .system
+    MeetPRAppearance(rawValue: storedPreference) ?? .defaultPreference
   }
 
   private func optionChip(_ option: MeetPRAppearance) -> some View {

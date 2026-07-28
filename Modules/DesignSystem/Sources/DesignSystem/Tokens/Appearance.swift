@@ -12,6 +12,10 @@ public enum MeetPRAppearance: String, CaseIterable, Identifiable, Sendable {
 
   public static let storageKey = "meetpr.appearance"
 
+  /// ⚖️ David 2026-07-28: the student app opens in light mode by default;
+  /// system-following and dark stay available in 我的 → 外观.
+  public static let defaultPreference: MeetPRAppearance = .light
+
   public var id: String { rawValue }
 
   /// `nil` hands the decision back to the system, which is what
@@ -51,7 +55,7 @@ extension View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct MeetPRStudentAppearanceModifier: ViewModifier {
-  @AppStorage(MeetPRAppearance.storageKey) private var stored = MeetPRAppearance.system
+  @AppStorage(MeetPRAppearance.storageKey) private var stored = MeetPRAppearance.defaultPreference
 
   func body(content: Content) -> some View {
     content.preferredColorScheme(stored.colorScheme)

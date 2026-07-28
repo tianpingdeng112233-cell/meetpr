@@ -19,6 +19,12 @@ import Testing
     #expect((restored ?? .system).colorScheme == nil)
   }
 
+  @Test func defaultPreferenceIsLight() {
+    // ⚖️ 2026-07-28: fresh installs open in light mode.
+    #expect(MeetPRAppearance.defaultPreference == .light)
+    #expect(MeetPRAppearance.defaultPreference.colorScheme == .light)
+  }
+
   @Test func labelsAreStable() {
     #expect(MeetPRAppearance.system.label == "跟随系统")
     #expect(MeetPRAppearance.light.label == "浅色")

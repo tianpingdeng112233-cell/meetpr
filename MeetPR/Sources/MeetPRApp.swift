@@ -274,7 +274,7 @@ struct MeetPRApp: App {
   #endif
 
   @AppStorage(MeetPRAppearance.storageKey)
-  private var studentAppearanceRaw = MeetPRAppearance.system.rawValue
+  private var studentAppearanceRaw = MeetPRAppearance.defaultPreference.rawValue
 
   private var preferredAppColorScheme: ColorScheme? {
     guard case .authenticated(let user) = session.state else {
@@ -286,9 +286,11 @@ struct MeetPRApp: App {
       // CoachKit has no audited light palette yet.
       return .dark
     case .coachedStudent, .selfTrainStudent:
-      // Black-gold v3 student roots follow the device appearance unless the
-      // user pinned one in 我的 → 外观.
-      return MeetPRAppearance(rawValue: studentAppearanceRaw)?.colorScheme
+      // ⚖️ 2026-07-28: student roots open in light mode by default; the user
+      // can pin dark or system-following in 我的 → 外观.
+      return
+        (MeetPRAppearance(rawValue: studentAppearanceRaw)
+        ?? MeetPRAppearance.defaultPreference).colorScheme
     }
   }
 
