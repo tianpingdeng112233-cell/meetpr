@@ -36,6 +36,12 @@ public protocol E1RMRepository: Sendable {
   func recordPR(_ event: PRBreakthroughEvent) async throws
   func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent]
   func acknowledgePR(eventId: UUID) async throws
+
+  /// PR events that occurred at or after `since`, regardless of
+  /// acknowledgement. Weekly-summary counters use this window query; the
+  /// acknowledgement chain is dormant while no surface consumes it
+  /// (celebration banner removed 2026-07-28).
+  func prEvents(studentId: UUID, since: Date) async throws -> [PRBreakthroughEvent]
 }
 
 extension E1RMRepository {

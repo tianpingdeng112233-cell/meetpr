@@ -9,7 +9,7 @@ public actor InMemoryE1RMRepository: E1RMRepository {
   }
 
   private var points: [HistoryKey: [E1RMHistoryPoint]]
-  private var prEvents: [PRBreakthroughEvent]
+  private var storedPREvents: [PRBreakthroughEvent]
 
   public init(
     seedPoints: [E1RMHistoryPoint] = [],
@@ -21,7 +21,7 @@ public actor InMemoryE1RMRepository: E1RMRepository {
         .append(point)
     }
     self.points = grouped
-    self.prEvents = seedPRs
+    self.storedPREvents = seedPRs
   }
 
   public func recordPoint(_ point: E1RMHistoryPoint) async throws {
@@ -71,7 +71,7 @@ public actor InMemoryE1RMRepository: E1RMRepository {
       points[HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId), default: []]
         .append(point)
     }
-    prEvents.removeAll { $0.studentId == studentId }
+    storedPREvents.removeAll { $0.studentId == studentId }
   }
 
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
@@ -108,17 +108,23 @@ public actor InMemoryE1RMRepository: E1RMRepository {
   }
 
   public func recordPR(_ event: PRBreakthroughEvent) async throws {
-    prEvents.append(event)
+    storedPREvents.append(event)
+  }
+
+  public func prEvents(studentId: UUID, since: Date) async throws -> [PRBreakthroughEvent] {
+    storedPREvents
+      .filter { $0.studentId == studentId && $0.occurredAt >= since }
+      .sorted { $0.occurredAt < $1.occurredAt }
   }
 
   public func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent] {
-    prEvents
+    storedPREvents
       .filter { $0.studentId == studentId && $0.acknowledgedAt == nil }
       .sorted { $0.occurredAt < $1.occurredAt }
   }
 
   public func acknowledgePR(eventId: UUID) async throws {
-    guard let index = prEvents.firstIndex(where: { $0.id == eventId }) else { return }
-    prEvents[index] = prEvents[index].acknowledged(at: Date())
+    guard let index = storedPREvents.firstIndex(where: { $0.id == eventId }) else { return }
+    storedPREvents[index] = storedPREvents[index].acknowledged(at: Date())
   }
 }

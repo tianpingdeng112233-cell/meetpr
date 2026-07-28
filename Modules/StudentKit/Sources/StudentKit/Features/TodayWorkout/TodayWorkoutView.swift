@@ -11,7 +11,6 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
-  private let isActive: Bool
   private let jumpToTodayToken: Int
   private let autoStartToken: Int
   private let isLaunchTargetHidden: Bool
@@ -56,7 +55,6 @@ public struct TodayWorkoutView: View {
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
     videoUploads: VideoUploadServices? = nil,
-    isActive: Bool = true,
     jumpToTodayToken: Int = 0,
     autoStartToken: Int = 0,
     isLaunchTargetHidden: Bool = false,
@@ -71,7 +69,6 @@ public struct TodayWorkoutView: View {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
-    self.isActive = isActive
     self.jumpToTodayToken = jumpToTodayToken
     self.autoStartToken = autoStartToken
     self.isLaunchTargetHidden = isLaunchTargetHidden
@@ -151,20 +148,6 @@ public struct TodayWorkoutView: View {
           completionPhase = .review
         }
       )
-      .safeAreaInset(edge: .top, spacing: 0) {
-        if let event = viewModel.pendingPRBanner {
-          PRBanner(
-            event: event,
-            exerciseName: viewModel.exerciseName(for: event.exerciseId),
-            onDismiss: {
-              Task { await viewModel.acknowledgePendingPR() }
-            }
-          )
-          .padding(.horizontal, MeetPRSpacing.space3)
-          .padding(.vertical, MeetPRSpacing.space2)
-        }
-      }
-      .animation(MeetPRMotion.spring, value: viewModel.pendingPRBanner)
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
       #endif
@@ -299,11 +282,6 @@ public struct TodayWorkoutView: View {
       }
       consumePendingAutoStartIfReady()
       await videoViewModel.start(studentID: studentID)
-      if isFirstLoad { await surfacePRIfVisible() }
-    }
-    .onChange(of: isActive) { _, newValue in
-      guard newValue else { return }
-      Task { await surfacePRIfVisible() }
     }
     .onChange(of: selectedDate) { _, newDate in
       editing = nil
@@ -358,13 +336,6 @@ public struct TodayWorkoutView: View {
     } else {
       Color.MeetPR.bgBase
     }
-  }
-
-  private func surfacePRIfVisible() async {
-    guard isActive else { return }
-    try? await Task.sleep(for: .seconds(1.5))
-    guard isActive, !Task.isCancelled else { return }
-    await viewModel.surfaceUnacknowledgedPR(studentID: studentID)
   }
 
   private var screenContent: TodayWorkoutScreen<TrainingCalendarView>.Content {

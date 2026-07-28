@@ -116,7 +116,12 @@ final class DashboardE1RMTrendViewModel {
       )
       let histories = try await fetchHistories(studentID: studentID, idsByFamily: idsByFamily)
       let rows = Self.rows(from: histories, idsByFamily: idsByFamily, now: now())
-      let prs = try await e1rm.unacknowledgedPRs(studentId: studentID)
+      // Ack-independent: the celebration banner is gone, so "最新 PR" reads
+      // recent events by time window instead of unacknowledged state.
+      let prs = try await e1rm.prEvents(
+        studentId: studentID,
+        since: now().addingTimeInterval(-30 * 86_400)
+      )
       state = .loaded(
         DashboardE1RMTrendPresentation(
           rows: rows,

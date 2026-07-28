@@ -33,7 +33,6 @@ public struct StudentRootView: View {
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var notifications: StudentNotificationsCoordinator?
   @State private var selectedTab: StudentTab = .today
-  @State private var pendingPRCount = 0
   /// Bumped whenever 今日 becomes active so the home screen reloads data logged
   /// in other tabs (see DashboardView.todayReloadToken).
   @State private var todayReloadToken = 0
@@ -222,7 +221,6 @@ extension StudentRootView {
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding, readiness: readiness,
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
-        isActive: selectedTab == .training,
         jumpToTodayToken: trainingJumpToken,
         autoStartToken: trainingAutoStartToken,
         isLaunchTargetHidden: launchSourceFrame != nil && !revealsLaunchTarget,
@@ -300,7 +298,7 @@ extension StudentRootView {
             id: .profile,
             title: "我的",
             icon: .profile,
-            badge: pendingPRCount
+            badge: 0
           ),
         ]
       )
@@ -318,7 +316,6 @@ extension StudentRootView {
         }
         await evaluationSummaryViewModel.load(studentID: studentID)
       }
-      pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
       await runImportedHistoryBackfill()
     }
     .onChange(of: selectedTab) { _, newTab in

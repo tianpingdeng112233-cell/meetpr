@@ -242,7 +242,21 @@ public struct DashboardView: View {
   }
 
   private func loadNewPRCount() async {
-    newPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
+    // Weekly summary counts PR events inside the loaded plan week (same
+    // range as the card's session/volume stats); the acknowledgement chain
+    // went dormant with the celebration banner. No loaded week → no count.
+    guard let days = weekData?.days.map(\.date), let firstDay = days.min(),
+      let lastDay = days.max()
+    else {
+      newPRCount = 0
+      return
+    }
+    // Upper bound: PR events carry no plan-week identity, so clamp to the
+    // end of the week's last plan day to mirror the card's other stats.
+    let weekEnd = lastDay.addingTimeInterval(86_400)
+    let events =
+      (try? await e1rm.prEvents(studentId: studentID, since: firstDay)) ?? []
+    newPRCount = events.filter { $0.occurredAt < weekEnd }.count
   }
 
   private func proposeShiftToday() {

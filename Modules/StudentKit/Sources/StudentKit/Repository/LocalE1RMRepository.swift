@@ -117,6 +117,12 @@ public actor LocalE1RMRepository: E1RMRepository {
     try save(prs: all)
   }
 
+  public func prEvents(studentId: UUID, since: Date) async throws -> [PRBreakthroughEvent] {
+    try loadPRs()
+      .filter { $0.studentId == studentId && $0.occurredAt >= since }
+      .sorted { $0.occurredAt < $1.occurredAt }
+  }
+
   public func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent] {
     try loadPRs()
       .filter { $0.studentId == studentId && $0.acknowledgedAt == nil }

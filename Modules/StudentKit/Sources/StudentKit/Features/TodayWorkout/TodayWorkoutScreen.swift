@@ -362,11 +362,9 @@ private struct TodayWorkoutHeader: View {
 
         HStack(spacing: MeetPRSpacing.point9) {
           TrainingHeaderButton(accessibilityLabel: "刷新", action: onRefresh) {
-            RefreshIcon()
-              .stroke(
-                Color.MeetPR.textSecondary,
-                style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
-              )
+            Image(systemName: "arrow.clockwise")
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.textSecondary)
           }
 
           TrainingHeaderButton(accessibilityLabel: "填写今日状态", action: onReadiness) {
@@ -1008,23 +1006,6 @@ extension View {
           )
       }
     }
-  }
-}
-
-private struct RefreshIcon: Shape {
-  func path(in rect: CGRect) -> Path {
-    var path = Path()
-    path.addArc(
-      center: rect.svgPoint(x: 12, y: 12),
-      radius: rect.width * 8 / 24,
-      startAngle: .degrees(-8),
-      endAngle: .degrees(315),
-      clockwise: true
-    )
-    path.move(to: rect.svgPoint(x: 20, y: 5))
-    path.addLine(to: rect.svgPoint(x: 20, y: 11))
-    path.addLine(to: rect.svgPoint(x: 14, y: 11))
-    return path
   }
 }
 

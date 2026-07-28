@@ -266,15 +266,6 @@ public final class TodayWorkoutViewModel {
     }
   }
 
-  public func exerciseName(for exerciseId: UUID) -> String? {
-    switch state {
-    case .loaded(_, let drafts), .recording(_, let drafts, _):
-      drafts.first { $0.exerciseID == exerciseId }?.exerciseName
-    default:
-      nil
-    }
-  }
-
   public func acknowledgePendingPR() async {
     guard let event = pendingPRBanner else { return }
     pendingPRBanner = nil
