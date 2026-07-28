@@ -102,18 +102,21 @@ struct GrowthFormingTrendState: View {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-private struct GrowthFormingTrendChart: View {
+struct GrowthFormingTrendChart: View {
   let recordedCount: Int
   let threshold: Int
   let currentKg: Double?
   let latestRecordDate: Date?
+  var showsRecordPoints = true
 
   var body: some View {
     Canvas { context, size in
       let points = chartPoints(in: size)
       drawGrid(in: &context, size: size)
       drawGhostCurve(in: &context, points: points)
-      drawPoints(in: &context, points: points)
+      if showsRecordPoints {
+        drawPoints(in: &context, points: points)
+      }
       drawLabels(in: &context, size: size, points: points)
     }
     .accessibilityHidden(true)
@@ -242,8 +245,8 @@ private struct GrowthFormingTrendChart: View {
       }
     }
 
-    let visibleIndex = min(max(0, recordedCount - 1), max(0, points.count - 1))
-    guard !points.isEmpty else { return }
+    guard showsRecordPoints, !points.isEmpty else { return }
+    let visibleIndex = min(max(0, recordedCount - 1), points.count - 1)
     context.draw(
       Text(dateLabel)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))

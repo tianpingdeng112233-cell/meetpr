@@ -21,6 +21,10 @@ struct E1RMSeries: Equatable, Sendable {
   let smoothed: [Sample]
   /// Eligible raw points, chronological, available for honest scatter views.
   let rawEligible: [Sample]
+  /// One canonical point per eligible training day. Multiple estimates on the
+  /// same day collapse to that day's best; low-confidence winners remain here
+  /// so point identity stays aligned with the unlock count.
+  let dailyBestEligible: [Sample]
   /// Trusted all-time records, chronological and strictly increasing by value.
   let records: [Sample]
   /// Highest eligible raw point across all history.
@@ -74,6 +78,25 @@ struct E1RMSeries: Equatable, Sendable {
   ) -> [E1RMHistoryPoint] {
     eligibleRaw(points: points, family: family)
       .filter { $0.confidence == .normal }
+  }
+
+  /// The shared chart-point identity policy: one best eligible estimate for
+  /// each distinct training day. Confidence affects value rendering, not day
+  /// identity. Equal values prefer a trusted estimate so an equivalent
+  /// low-confidence record cannot demote that day from the main line.
+  static func dailyBestEligible(
+    points: [E1RMHistoryPoint],
+    family: LiftFamily?,
+    calendar: Calendar = .current
+  ) -> [E1RMHistoryPoint] {
+    let pointsByDay = Dictionary(
+      grouping: eligibleRaw(points: points, family: family),
+      by: { calendar.startOfDay(for: $0.computedAt) }
+    )
+    return pointsByDay.values.compactMap { pointsForDay in
+      pointsForDay.max(by: dailyBestPrecedes)
+    }
+    .sorted { $0.computedAt < $1.computedAt }
   }
 
   /// Extends an all-time record series across a chart window. A record already
@@ -149,6 +172,8 @@ struct E1RMSeries: Equatable, Sendable {
   static func build(points: [E1RMHistoryPoint], family: LiftFamily?) -> E1RMSeries {
     let eligiblePoints = eligibleRaw(points: points, family: family)
     let rawEligible = eligiblePoints.map(Sample.init(point:))
+    let dailyBestEligible = dailyBestEligible(points: points, family: family)
+      .map(Sample.init(point:))
     let trusted = eligiblePoints.filter { $0.confidence == .normal }
 
     var recordValue = -Double.infinity
@@ -189,10 +214,24 @@ struct E1RMSeries: Equatable, Sendable {
     return E1RMSeries(
       smoothed: smoothed,
       rawEligible: rawEligible,
+      dailyBestEligible: dailyBestEligible,
       records: records,
       best: trusted.max { $0.e1RMKg < $1.e1RMKg }.map(Sample.init(point:)),
       last: trusted.last.map(Sample.init(point:))
     )
+  }
+
+  private static func dailyBestPrecedes(
+    _ lhs: E1RMHistoryPoint,
+    _ rhs: E1RMHistoryPoint
+  ) -> Bool {
+    if lhs.e1RMKg != rhs.e1RMKg {
+      return lhs.e1RMKg < rhs.e1RMKg
+    }
+    if lhs.confidence != rhs.confidence {
+      return lhs.confidence == .low
+    }
+    return lhs.computedAt < rhs.computedAt
   }
 
   private static func continuationSample(

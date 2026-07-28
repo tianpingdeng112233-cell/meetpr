@@ -87,12 +87,12 @@ import Testing
   #expect(GrowthTimeRange(timeWindow: .all) == .all)
   #expect(GrowthTimeRange.thirtyDays.timeWindow == .fourWeeks)
   #expect(GrowthTimeRange.ninetyDays.timeWindow == .threeMonths)
-  #expect(GrowthTimeRange.oneYear.timeWindow == .all)
   #expect(GrowthTimeRange.all.timeWindow == .all)
+  #expect(GrowthTimeRange.allCases == [.thirtyDays, .ninetyDays, .all])
 }
 
 @MainActor
-@Test func growthSnapshotAnchorsLatestRecordAndCarriesLowConfidenceScatter() async {
+@Test func growthSnapshotKeepsHeadlineButAnchorsChartToWindowMainLine() async {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
   let exerciseID = plan.days[0].exercises[0].exercise.id
@@ -131,9 +131,11 @@ import Testing
     now: now
   )
 
-  #expect(snapshot.samples.last?.date == now)
-  #expect(snapshot.latestRecordPoint?.id == record.id)
+  #expect(snapshot.samples.map(\.valueKg) == [150, 145])
+  #expect(snapshot.samples.last?.date == laterNonRecord.computedAt)
+  #expect(snapshot.currentKg == 150)
   #expect(snapshot.latestRecordDate == record.computedAt)
+  #expect(snapshot.chartCurrentPoint?.id == laterNonRecord.id)
   #expect(snapshot.rawEligiblePoints.map(\.id) == [importedLow.id])
 }
 
@@ -171,8 +173,9 @@ import Testing
     now: now
   )
 
-  #expect(snapshot.eligibleRecordCount == GrowthHistoryStats.trendUnlockThreshold)
-  #expect(!snapshot.isFormingTrend)
+  #expect(snapshot.eligibleDataPointCount == GrowthHistoryStats.trendUnlockThreshold)
+  #expect(snapshot.windowDataPointCount == GrowthHistoryStats.trendUnlockThreshold)
+  #expect(snapshot.cardState == .chart)
 }
 
 @MainActor
@@ -222,10 +225,10 @@ import Testing
     now: now
   )
 
-  #expect(squat.eligibleRecordCount == 3)
-  #expect(!squat.isFormingTrend)
-  #expect(bench.eligibleRecordCount == 1)
-  #expect(bench.isFormingTrend)
+  #expect(squat.eligibleDataPointCount == 3)
+  #expect(squat.cardState == .chart)
+  #expect(bench.eligibleDataPointCount == 1)
+  #expect(bench.cardState == .formingProgress)
 }
 
 private func snapshot(_ family: LiftFamily, current: Double) -> GrowthCurveSnapshot {
@@ -233,11 +236,12 @@ private func snapshot(_ family: LiftFamily, current: Double) -> GrowthCurveSnaps
     family: family,
     samples: [],
     rawEligiblePoints: [],
-    eligibleRecordCount: 0,
+    windowDataPointCount: 0,
+    eligibleDataPointCount: 0,
     currentKg: current,
     deltaKg: nil,
     latestRecordDate: nil,
-    latestRecordPoint: nil
+    chartCurrentPoint: nil
   )
 }
 

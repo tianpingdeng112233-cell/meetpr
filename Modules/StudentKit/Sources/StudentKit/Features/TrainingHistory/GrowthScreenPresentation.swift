@@ -4,7 +4,6 @@ import Foundation
 enum GrowthTimeRange: String, CaseIterable, Equatable, Sendable {
   case thirtyDays = "30天"
   case ninetyDays = "90天"
-  case oneYear = "1年"
   case all = "历史总览"
 
   init(timeWindow: GrowthCurveViewModel.TimeWindow) {
@@ -24,18 +23,54 @@ enum GrowthTimeRange: String, CaseIterable, Equatable, Sendable {
       .fourWeeks
     case .ninetyDays:
       .threeMonths
-    case .oneYear, .all:
+    case .all:
       .all
     }
   }
+}
 
-  func cutoff(now: Date) -> Date? {
-    switch self {
-    case .oneYear:
-      now.addingTimeInterval(-365 * 86_400)
-    case .thirtyDays, .ninetyDays, .all:
-      nil
+enum GrowthE1RMCardState: Equatable, Sendable {
+  case chart
+  case formingProgress
+  case formingWindowSparse
+  case zero
+}
+
+enum GrowthE1RMCardPolicy {
+  static func state(
+    windowDataPointCount: Int,
+    familyTotalDataPointCount: Int,
+    windowMainLinePointCount: Int,
+    windowMainLineValueRangeKg: Double?
+  ) -> GrowthE1RMCardState {
+    let totalCount = max(0, familyTotalDataPointCount)
+    let windowCount = min(max(0, windowDataPointCount), totalCount)
+    let mainLineCount = min(max(0, windowMainLinePointCount), windowCount)
+
+    if totalCount == 0 {
+      return .zero
     }
+    if totalCount < GrowthHistoryStats.trendUnlockThreshold {
+      return .formingProgress
+    }
+    if mainLineCount < GrowthHistoryStats.trendUnlockThreshold {
+      return .formingWindowSparse
+    }
+    guard let windowMainLineValueRangeKg, windowMainLineValueRangeKg > 0 else {
+      return .formingWindowSparse
+    }
+    return .chart
+  }
+}
+
+enum GrowthE1RMCardCopy {
+  // David 2026-07-28 provisional wording; keep this as the single edit point
+  // until product review confirms it.
+  static let windowSparseMessageTemplate =
+    "近 {window} 数据不足 · 切到更长时间范围查看"
+
+  static func windowSparseMessage(window: String) -> String {
+    windowSparseMessageTemplate.replacing("{window}", with: window)
   }
 }
 
@@ -43,15 +78,28 @@ struct GrowthCurveSnapshot: Equatable, Sendable {
   let family: LiftFamily
   let samples: [E1RMSeries.Sample]
   let rawEligiblePoints: [E1RMHistoryPoint]
-  let eligibleRecordCount: Int
+  let windowDataPointCount: Int
+  let eligibleDataPointCount: Int
   let currentKg: Double?
   let deltaKg: Double?
   let latestRecordDate: Date?
-  let latestRecordPoint: E1RMHistoryPoint?
+  let chartCurrentPoint: E1RMHistoryPoint?
 
-  var isFormingTrend: Bool {
-    eligibleRecordCount > 0
-      && eligibleRecordCount < GrowthHistoryStats.trendUnlockThreshold
+  var cardState: GrowthE1RMCardState {
+    GrowthE1RMCardPolicy.state(
+      windowDataPointCount: windowDataPointCount,
+      familyTotalDataPointCount: eligibleDataPointCount,
+      windowMainLinePointCount: samples.count,
+      windowMainLineValueRangeKg: windowMainLineValueRangeKg
+    )
+  }
+
+  private var windowMainLineValueRangeKg: Double? {
+    let values = samples.map(\.valueKg)
+    guard let minimum = values.min(), let maximum = values.max() else {
+      return nil
+    }
+    return maximum - minimum
   }
 
   static func empty(family: LiftFamily) -> GrowthCurveSnapshot {
@@ -59,11 +107,12 @@ struct GrowthCurveSnapshot: Equatable, Sendable {
       family: family,
       samples: [],
       rawEligiblePoints: [],
-      eligibleRecordCount: 0,
+      windowDataPointCount: 0,
+      eligibleDataPointCount: 0,
       currentKg: nil,
       deltaKg: nil,
       latestRecordDate: nil,
-      latestRecordPoint: nil
+      chartCurrentPoint: nil
     )
   }
 }
@@ -159,21 +208,15 @@ enum GrowthScreenPresentation {
     from viewModel: GrowthCurveViewModel,
     family: LiftFamily,
     range: GrowthTimeRange,
-    now: Date = Date()
+    now _: Date = Date()
   ) -> GrowthCurveSnapshot {
     viewModel.selectedFamily = family
     viewModel.selectedWindow = range.timeWindow
 
-    let samples = samples(
-      viewModel.visibleSmoothedSamples,
-      cutoff: range.cutoff(now: now)
-    )
-    let rawEligiblePoints = viewModel.visibleRawEligiblePoints.filter { point in
-      range.cutoff(now: now).map { point.computedAt >= $0 } ?? true
-    }
-    let latestRecordPoint = viewModel.visibleSmoothedSamples.last.flatMap {
-      viewModel.winnerPoint(forSampleID: $0.sampleID)
-    }
+    let samples = viewModel.visibleDailyBestSamples
+    let rawEligiblePoints = viewModel.visibleRawEligiblePoints
+    let headlinePoint = viewModel.headlinePoint(for: family)
+    let chartCurrentPoint = samples.last.flatMap(viewModel.sourcePoint(for:))
     let deltaKg: Double?
     if let first = samples.first, let last = samples.last, samples.count > 1 {
       deltaKg = last.valueKg - first.valueKg
@@ -185,12 +228,13 @@ enum GrowthScreenPresentation {
       family: family,
       samples: samples,
       rawEligiblePoints: rawEligiblePoints,
-      eligibleRecordCount: viewModel.eligibleRecordCount(for: family),
-      currentKg: latestRecordPoint?.e1RMKg,
+      windowDataPointCount: viewModel.visibleDataPointCount(for: family),
+      eligibleDataPointCount: viewModel.eligibleDataPointCount(for: family),
+      currentKg: headlinePoint?.e1RMKg,
       deltaKg: deltaKg,
-      latestRecordDate: latestRecordPoint?.computedAt
+      latestRecordDate: headlinePoint?.computedAt
         ?? rawEligiblePoints.map(\.computedAt).max(),
-      latestRecordPoint: latestRecordPoint
+      chartCurrentPoint: chartCurrentPoint
     )
   }
 
@@ -233,28 +277,6 @@ enum GrowthScreenPresentation {
     )
   }
 
-  private static func samples(
-    _ samples: [E1RMSeries.Sample],
-    cutoff: Date?
-  ) -> [E1RMSeries.Sample] {
-    guard let cutoff else { return samples }
-
-    var visible = samples.filter { $0.date >= cutoff }
-    if let carry = samples.last(where: { $0.date < cutoff }) {
-      visible.insert(
-        E1RMSeries.Sample(
-          sampleID: UUID(),
-          date: cutoff,
-          valueKg: carry.valueKg,
-          winnerPointID: carry.winnerPointID,
-          winnerOrigin: carry.winnerOrigin,
-          winnerConfidence: carry.winnerConfidence
-        ),
-        at: 0
-      )
-    }
-    return visible
-  }
 }
 
 private struct GrowthWeekID: Hashable {

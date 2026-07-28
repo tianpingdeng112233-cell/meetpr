@@ -29,6 +29,7 @@ public final class GrowthCurveViewModel {
   /// Points for the selected family within the selected window, ascending by date.
   public private(set) var visiblePoints: [E1RMHistoryPoint] = []
   private(set) var visibleSmoothedSamples: [E1RMSeries.Sample] = []
+  private(set) var visibleDailyBestSamples: [E1RMSeries.Sample] = []
   private(set) var visibleRawEligiblePoints: [E1RMHistoryPoint] = []
 
   private let plans: any StudentPlanRepository
@@ -103,9 +104,14 @@ public final class GrowthCurveViewModel {
       from: cutoff,
       extendedTo: extensionDate
     )
-    visibleRawEligiblePoints = series.rawEligible.compactMap { sample in
+    let visibleDailyBest = series.dailyBestEligible.filter { sample in
+      cutoff.map { sample.date >= $0 } ?? true
+    }
+    visibleDailyBestSamples = visibleDailyBest.filter {
+      $0.winnerConfidence == .normal
+    }
+    visibleRawEligiblePoints = visibleDailyBest.compactMap { sample in
       guard sample.winnerConfidence == .low else { return nil }
-      guard cutoff.map({ sample.date >= $0 }) ?? true else { return nil }
       return rawPointsByID[sample.winnerPointID]
     }
     visiblePoints = E1RMSeries.historyPoints(
@@ -121,8 +127,27 @@ public final class GrowthCurveViewModel {
     return rawPointsByID[sample.winnerPointID]
   }
 
-  func eligibleRecordCount(for family: LiftFamily) -> Int {
-    seriesByFamily[family]?.rawEligible.count ?? 0
+  func eligibleDataPointCount(for family: LiftFamily) -> Int {
+    seriesByFamily[family]?.dailyBestEligible.count ?? 0
+  }
+
+  func visibleDataPointCount(for family: LiftFamily) -> Int {
+    let dailyBestEligible = seriesByFamily[family]?.dailyBestEligible ?? []
+    let cutoff = windowCutoff
+    return dailyBestEligible.count { sample in
+      cutoff.map { sample.date >= $0 } ?? true
+    }
+  }
+
+  func headlinePoint(for family: LiftFamily) -> E1RMHistoryPoint? {
+    guard let sample = seriesByFamily[family]?.smoothed.last else {
+      return nil
+    }
+    return rawPointsByID[sample.winnerPointID]
+  }
+
+  func sourcePoint(for sample: E1RMSeries.Sample) -> E1RMHistoryPoint? {
+    rawPointsByID[sample.winnerPointID]
   }
 
   private var windowCutoff: Date? {

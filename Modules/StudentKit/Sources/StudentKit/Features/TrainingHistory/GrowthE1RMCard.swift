@@ -68,36 +68,39 @@ struct GrowthE1RMCard: View {
             .foregroundStyle(Color.MeetPR.textMuted)
         }
         Spacer()
-        if snapshot.isFormingTrend {
+        if snapshot.cardState == .formingProgress {
           Text("首次估算")
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.textMuted)
-        } else if let deltaText {
+        } else if snapshot.cardState == .chart, let deltaText {
           Text(deltaText)
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
             .foregroundStyle(Color.MeetPR.goldText)
         }
       }
 
-      if isGlobalTrainingEmpty {
+      switch snapshot.cardState {
+      case .zero:
         GrowthZeroTrainingState(
-          showsAction: snapshot.family == .squat,
+          showsAction: isGlobalTrainingEmpty && snapshot.family == .squat,
           onOpenToday: onOpenToday
         )
         .frame(height: 228)
-      } else if snapshot.isFormingTrend {
+      case .formingProgress:
         GrowthFormingTrendState(
-          recordedCount: snapshot.eligibleRecordCount,
+          recordedCount: snapshot.eligibleDataPointCount,
           threshold: GrowthHistoryStats.trendUnlockThreshold,
           familyName: snapshot.family.studentDisplayName,
           currentKg: snapshot.currentKg,
           latestRecordDate: snapshot.latestRecordDate
         )
         .frame(height: 126)
-      } else if snapshot.samples.isEmpty && snapshot.rawEligiblePoints.isEmpty {
-        GrowthTrendEmptyState()
-          .frame(height: 126)
-      } else {
+      case .formingWindowSparse:
+        GrowthWindowSparseTrendState(
+          message: GrowthE1RMCardCopy.windowSparseMessage(window: range.rawValue)
+        )
+        .frame(height: 126)
+      case .chart:
         GrowthE1RMChart(snapshot: snapshot)
           .aspectRatio(320 / 118, contentMode: .fit)
           .padding(.top, MeetPRSpacing.space2)
@@ -111,7 +114,7 @@ struct GrowthE1RMCard: View {
 
   private var weightText: String {
     guard let value = snapshot.currentKg else {
-      return isGlobalTrainingEmpty ? "未设定" : "—"
+      return snapshot.cardState == .zero ? "未设定" : "—"
     }
     return value.formatted(.number.precision(.fractionLength(1)))
   }
@@ -136,14 +139,14 @@ private struct GrowthE1RMChart: View {
           drawGrid(context: &context, geometry: geometry)
           drawAreaAndLine(context: &context, geometry: geometry)
           drawRawEligible(context: &context, geometry: geometry)
-          drawLatestRecord(context: &context, geometry: geometry)
+          drawCurrentPoint(context: &context, geometry: geometry)
         }
         chartLabels(geometry)
       }
     }
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(
-      "\(snapshot.family.studentDisplayName) E1RM \(snapshot.samples.count) 个趋势点"
+      "\(snapshot.family.studentDisplayName) E1RM \(snapshot.windowDataPointCount) 个趋势点"
     )
   }
 
@@ -229,14 +232,14 @@ private struct GrowthE1RMChart: View {
     }
   }
 
-  private func drawLatestRecord(
+  private func drawCurrentPoint(
     context: inout GraphicsContext,
     geometry: GrowthChartGeometry
   ) {
-    guard let latestRecord = geometry.latestRecordPlotPoint else { return }
+    guard let currentPoint = geometry.currentPlotPoint else { return }
     var guide = Path()
-    guide.move(to: latestRecord)
-    guide.addLine(to: CGPoint(x: latestRecord.x, y: geometry.plotBottom))
+    guide.move(to: currentPoint)
+    guide.addLine(to: CGPoint(x: currentPoint.x, y: geometry.plotBottom))
     context.stroke(
       guide,
       with: .color(Color.MeetPR.gold500.opacity(0.6)),
@@ -245,8 +248,8 @@ private struct GrowthE1RMChart: View {
     let radius = geometry.scaleX(4.5)
     let dot = Path(
       ellipseIn: CGRect(
-        x: latestRecord.x - radius,
-        y: latestRecord.y - radius,
+        x: currentPoint.x - radius,
+        y: currentPoint.y - radius,
         width: radius * 2,
         height: radius * 2
       )
@@ -275,9 +278,7 @@ private struct GrowthE1RMChart: View {
       ZStack {
         dateText(geometry.startDateText)
           .frame(width: geometry.dateAxisWidth, alignment: .leading)
-        Text(geometry.latestRecordDateText)
-          .font(.MeetPR.mono(size: geometry.scaleY(10), weight: .bold))
-          .foregroundStyle(Color.MeetPR.gold500)
+        dateText(geometry.endDateText)
           .frame(width: geometry.dateAxisWidth, alignment: .trailing)
       }
       .position(x: geometry.dateAxisCenterX, y: geometry.point(x: 0, y: 98).y)
@@ -285,6 +286,14 @@ private struct GrowthE1RMChart: View {
       // midpoint, not the center of the 50…304 label frame.
       dateText(geometry.middleDateText)
         .position(geometry.point(x: 173, y: 98))
+      if let currentPointLabel = geometry.currentPointLabel {
+        Text(currentPointLabel.text)
+          .font(.MeetPR.mono(size: geometry.scaleY(10), weight: .bold))
+          .foregroundStyle(Color.MeetPR.gold500)
+          .padding(.horizontal, geometry.scaleX(2))
+          .background(Color.MeetPR.surfaceCard.opacity(0.9))
+          .position(currentPointLabel.position)
+      }
     }
   }
 
@@ -304,7 +313,8 @@ private struct GrowthE1RMChart: View {
 private struct GrowthChartGeometry {
   let samples: [E1RMSeries.Sample]
   let rawEligiblePoints: [E1RMHistoryPoint]
-  let latestRecordPoint: E1RMHistoryPoint?
+  let chartCurrentPoint: E1RMHistoryPoint?
+  let dateAxis: GrowthChartDateAxis
   let size: CGSize
   let lowValue: Double
   let highValue: Double
@@ -312,7 +322,8 @@ private struct GrowthChartGeometry {
   init(snapshot: GrowthCurveSnapshot, size: CGSize) {
     self.samples = snapshot.samples
     self.rawEligiblePoints = snapshot.rawEligiblePoints
-    self.latestRecordPoint = snapshot.latestRecordPoint
+    self.chartCurrentPoint = snapshot.chartCurrentPoint
+    self.dateAxis = GrowthChartDateAxis(snapshot: snapshot)
     self.size = size
     let values = snapshot.samples.map(\.valueKg) + snapshot.rawEligiblePoints.map(\.e1RMKg)
     let minimum = values.min() ?? 0
@@ -337,8 +348,8 @@ private struct GrowthChartGeometry {
     }
   }
 
-  var latestRecordPlotPoint: CGPoint? {
-    latestRecordPoint.map {
+  var currentPlotPoint: CGPoint? {
+    chartCurrentPoint.map {
       plotPoint(date: $0.computedAt, valueKg: $0.e1RMKg)
     }
   }
@@ -349,15 +360,18 @@ private struct GrowthChartGeometry {
   var middleLabel: String { Int(((highValue + lowValue) / 2).rounded()).formatted() }
   var bottomLabel: String { Int(lowValue.rounded()).formatted() }
   var startDateText: String { Self.monthDay(dateDomain.lowerBound) }
-  var middleDateText: String {
-    let midpoint = dateDomain.lowerBound.addingTimeInterval(
-      dateDomain.upperBound.timeIntervalSince(dateDomain.lowerBound) / 2
-    )
-    return Self.monthDay(midpoint)
-  }
-  var latestRecordDateText: String { Self.monthDay(latestRecordPoint?.computedAt) }
+  var middleDateText: String { Self.monthDay(dateAxis.middleDate) }
+  var endDateText: String { Self.monthDay(dateDomain.upperBound) }
   var dateAxisWidth: CGFloat { scaleX(304 - 50) }
   var dateAxisCenterX: CGFloat { scaleX((304 + 50) / 2) }
+  var currentPointLabel: (text: String, position: CGPoint)? {
+    guard let point = currentPlotPoint, let date = dateAxis.currentPointDate else {
+      return nil
+    }
+    let x = min(max(point.x, scaleX(62)), scaleX(286))
+    let y = max(plotTop + scaleY(7), point.y - scaleY(12))
+    return (Self.monthDay(date), CGPoint(x: x, y: y))
+  }
 
   func point(x: Double, y: Double) -> CGPoint {
     CGPoint(x: scaleX(x), y: scaleY(y))
@@ -372,15 +386,7 @@ private struct GrowthChartGeometry {
   }
 
   private var dateDomain: ClosedRange<Date> {
-    let dates = samples.map(\.date) + rawEligiblePoints.map(\.computedAt)
-    guard let first = dates.min(), let last = dates.max() else {
-      let fallback = Date(timeIntervalSince1970: 0)
-      return fallback...fallback.addingTimeInterval(1)
-    }
-    if first == last {
-      return first...last.addingTimeInterval(1)
-    }
-    return first...last
+    dateAxis.startDate...dateAxis.endDate
   }
 
   private func plotPoint(date: Date, valueKg: Double) -> CGPoint {
@@ -398,6 +404,33 @@ private struct GrowthChartGeometry {
     let components = Calendar.current.dateComponents([.month, .day], from: date)
     guard let month = components.month, let day = components.day else { return "—" }
     return "\(month)/\(day)"
+  }
+}
+
+struct GrowthChartDateAxis: Equatable, Sendable {
+  let startDate: Date
+  let middleDate: Date
+  let endDate: Date
+  let currentPointDate: Date?
+
+  init(snapshot: GrowthCurveSnapshot) {
+    self.init(
+      plotDates: snapshot.samples.map(\.date)
+        + snapshot.rawEligiblePoints.map(\.computedAt),
+      currentPointDate: snapshot.chartCurrentPoint?.computedAt
+    )
+  }
+
+  init(plotDates: [Date], currentPointDate: Date?) {
+    let fallback = Date(timeIntervalSince1970: 0)
+    let first = plotDates.min() ?? fallback
+    let last = plotDates.max() ?? fallback.addingTimeInterval(1)
+    let end = first == last ? last.addingTimeInterval(1) : last
+
+    self.startDate = first
+    self.middleDate = first.addingTimeInterval(end.timeIntervalSince(first) / 2)
+    self.endDate = end
+    self.currentPointDate = currentPointDate
   }
 }
 
