@@ -83,6 +83,7 @@ public struct ExerciseCard: View {
           .accessibilityHidden(showsCollapsedRepresentation)
 
         collapsedCard
+          .fixedSize(horizontal: false, vertical: true)
           .opacity(showsCollapsedRepresentation ? 1 : 0)
           .allowsHitTesting(showsCollapsedRepresentation)
           .accessibilityHidden(!showsCollapsedRepresentation)
@@ -316,8 +317,11 @@ private struct ExerciseCardWidthLayout: Layout {
   ) -> CGSize {
     guard let subview = subviews.first else { return .zero }
     let proposedWidth = proposal.width.map { $0 * widthFraction }
+    // The card is intrinsically sized: never forward the parent's height
+    // proposal, or the header's greedy accent bar stretches the collapsed
+    // card to fill whatever height the context offers.
     let childSize = subview.sizeThatFits(
-      ProposedViewSize(width: proposedWidth, height: proposal.height)
+      ProposedViewSize(width: proposedWidth, height: nil)
     )
     return CGSize(width: proposal.width ?? childSize.width, height: childSize.height)
   }
@@ -329,72 +333,16 @@ private struct ExerciseCardWidthLayout: Layout {
     cache: inout ()
   ) {
     guard let subview = subviews.first else { return }
+    // Height stays unspecified here too: proposing bounds.height lets the
+    // greedy header bar inflate the collapsed card, which then feeds back
+    // into the measured collapsed height and locks the card tall.
     subview.place(
       at: bounds.origin,
       anchor: .topLeading,
       proposal: ProposedViewSize(
         width: bounds.width * widthFraction,
-        height: bounds.height
+        height: nil
       )
     )
   }
-}
-
-private let mixedExerciseSets = [
-  ExerciseSetRecord(
-    index: 1, weight: 175, reps: 3, rpe: 8.5, status: .done, videoState: .uploaded),
-  ExerciseSetRecord(
-    index: 2, weight: 175, reps: 3, rpe: 8.5, status: .failed, videoState: .failed),
-  ExerciseSetRecord(
-    index: 3, weight: 175, reps: 3, rpe: 8.5, status: .pending, videoState: .none),
-]
-
-private let finishedExerciseSets = [
-  ExerciseSetRecord(
-    index: 1, weight: 90, reps: 2, rpe: 6, status: .done, videoState: .uploaded),
-  ExerciseSetRecord(
-    index: 2, weight: 90, reps: 2, rpe: 6, status: .failed, videoState: .uploaded),
-]
-
-#Preview("ExerciseCard · Expanded + Summary · Dark") {
-  VStack(spacing: MeetPRSpacing.point10) {
-    ExerciseCard(
-      exercise: "硬拉",
-      meta: "上次 170kg×3 @8 · 最佳 175kg×3 @8.5",
-      note: "注意启动时股四的蹬地",
-      collapsed: false,
-      sets: mixedExerciseSets
-    )
-    ExerciseCard(
-      exercise: "节奏卧推",
-      meta: "上次 87.5kg×2 @6 · 最佳 90kg×2 @6",
-      note: "",
-      collapsed: true,
-      sets: finishedExerciseSets
-    )
-  }
-  .padding()
-  .background(Color.MeetPR.bgInset)
-  .preferredColorScheme(.dark)
-}
-#Preview("ExerciseCard · Expanded + Summary · Light") {
-  VStack(spacing: MeetPRSpacing.point10) {
-    ExerciseCard(
-      exercise: "硬拉",
-      meta: "上次 170kg×3 @8 · 最佳 175kg×3 @8.5",
-      note: "注意启动时股四的蹬地",
-      collapsed: false,
-      sets: mixedExerciseSets
-    )
-    ExerciseCard(
-      exercise: "节奏卧推",
-      meta: "上次 87.5kg×2 @6 · 最佳 90kg×2 @6",
-      note: "",
-      collapsed: true,
-      sets: finishedExerciseSets
-    )
-  }
-  .padding()
-  .background(Color.MeetPR.bgBase)
-  .preferredColorScheme(.light)
 }
