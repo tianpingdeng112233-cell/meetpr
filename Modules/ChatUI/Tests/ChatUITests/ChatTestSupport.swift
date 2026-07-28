@@ -19,7 +19,7 @@ enum PlannedChatSend: Sendable {
 
 actor TestChatRepository: ChatRepository {
   private var conversations: [ChatConversation] = []
-  private var pages: [ChatMessagePage] = []
+  private var pageResults: [Result<ChatMessagePage, ChatTestError>] = []
   private var plannedTextSends: [PlannedChatSend] = []
   private var plannedImageSends: [PlannedChatSend] = []
   private var suspendedTextSends = false
@@ -40,10 +40,14 @@ actor TestChatRepository: ChatRepository {
   }
 
   func enqueuePage(_ page: ChatMessagePage) {
-    pages.append(page)
+    pageResults.append(.success(page))
     for message in page.messages {
       knownMessagesByID[message.id] = message
     }
+  }
+
+  func enqueuePageFailure() {
+    pageResults.append(.failure(.failed))
   }
 
   func enqueueTextSend(_ send: PlannedChatSend) {
@@ -95,10 +99,10 @@ actor TestChatRepository: ChatRepository {
     query: ChatMessageQuery
   ) async throws -> ChatMessagePage {
     queries.append(query)
-    guard !pages.isEmpty else {
+    guard !pageResults.isEmpty else {
       return ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
     }
-    return pages.removeFirst()
+    return try pageResults.removeFirst().get()
   }
 
   func sendText(

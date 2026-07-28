@@ -13,6 +13,7 @@ public final class TodayWorkoutViewModel {
     case loading
     case loaded(plan: StudentPlanDay, drafts: [SetRowDraft])
     case recording(plan: StudentPlanDay, drafts: [SetRowDraft], rowIndex: Int)
+    case noPlan
     case rest
     case error(String)
   }
@@ -69,6 +70,11 @@ public final class TodayWorkoutViewModel {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       guard isCurrentLoad(generation) else { return }
       planContext = Self.planContext(from: plan, selectedDate: date, calendar: calendar)
+      guard let plan else {
+        exerciseReferences = [:]
+        state = .noPlan
+        return
+      }
 
       guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
         guard isCurrentLoad(generation) else { return }

@@ -92,6 +92,53 @@ import Testing
     #expect(await repository.queries.map(\.mode) == [.latest, .after(seq: 1)])
   }
 
+  @Test func emptyConversationFinishesInitialLoadOnlyAfterSuccessfulFetch() async {
+    let repository = TestChatRepository()
+    await repository.enqueuePage(
+      ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
+    )
+    let viewModel = makeViewModel(repository: repository)
+
+    #expect(!viewModel.didFinishInitialLoad)
+    await viewModel.load()
+
+    #expect(viewModel.didFinishInitialLoad)
+    #expect(viewModel.error == nil)
+    #expect(viewModel.renderedMessages.isEmpty)
+  }
+
+  @Test func failedInitialConversationLoadStaysOutOfTheEmptyState() async {
+    let repository = TestChatRepository()
+    await repository.enqueuePageFailure()
+    let viewModel = makeViewModel(repository: repository)
+
+    await viewModel.load()
+
+    #expect(!viewModel.didFinishInitialLoad)
+    #expect(viewModel.error != nil)
+    #expect(viewModel.renderedMessages.isEmpty)
+  }
+
+  @Test func successfulEmptyPollRecoversFailedInitialLoadIntoEmptyState() async {
+    let repository = TestChatRepository()
+    await repository.enqueuePageFailure()
+    await repository.enqueuePage(
+      ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
+    )
+    let viewModel = makeViewModel(repository: repository)
+
+    await viewModel.load()
+    #expect(!viewModel.didFinishInitialLoad)
+    #expect(viewModel.error != nil)
+
+    await viewModel.pollOnce()
+
+    #expect(viewModel.didFinishInitialLoad)
+    #expect(viewModel.error == nil)
+    #expect(viewModel.renderedMessages.isEmpty)
+    #expect(await repository.queries.map(\.mode) == [.latest, .latest])
+  }
+
   @Test func historyPrependDeduplicatesAndPreservesSequenceOrder() async {
     let repository = TestChatRepository()
     let third = chatTestMessage(

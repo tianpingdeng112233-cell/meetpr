@@ -19,6 +19,7 @@ public struct TrainingHistoryView: View {
   private let onImportedHistoryRefresh: (@MainActor () async -> Void)?
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
+  private let onOpenToday: () -> Void
 
   @State private var viewModel: TrainingHistoryViewModel
   @State private var growthViewModel: GrowthCurveViewModel
@@ -40,7 +41,8 @@ public struct TrainingHistoryView: View {
     importedHistoryRefreshToken: Int = 0,
     onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil,
     notifications: StudentNotificationsCoordinator? = nil,
-    onOpenPlanNotification: @escaping () -> Void = {}
+    onOpenPlanNotification: @escaping () -> Void = {},
+    onOpenToday: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
     self.onboarding = onboarding
@@ -49,6 +51,7 @@ public struct TrainingHistoryView: View {
     self.onImportedHistoryRefresh = onImportedHistoryRefresh
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
+    self.onOpenToday = onOpenToday
     self._viewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
     self._growthViewModel = State(
       initialValue: GrowthCurveViewModel(
@@ -131,6 +134,8 @@ public struct TrainingHistoryView: View {
         GrowthE1RMCard(
           snapshot: snapshot(for: family),
           range: range(for: family),
+          isGlobalTrainingEmpty: isZeroTraining,
+          onOpenToday: onOpenToday,
           onCycleRange: { cycleRange(for: family) }
         )
       }
@@ -145,7 +150,7 @@ public struct TrainingHistoryView: View {
 
       GrowthSectionLabel("全部历史")
         .padding(.top, MeetPRSpacing.space2)
-      GrowthHistoryStatsCard(stats: stats)
+      GrowthHistoryStatsCard(stats: stats, isZeroTraining: isZeroTraining)
 
       Button {
         Analytics.shared.progressViewed(.history)
@@ -154,18 +159,22 @@ public struct TrainingHistoryView: View {
         GrowthNavigationCard(
           icon: "clock",
           title: "全部训练历史",
-          subtitle: "按周 / 月查看 · 含每组数据"
+          subtitle: isZeroTraining ? "第一次训练后解锁" : "按周 / 月查看 · 含每组数据"
         )
       }
       .buttonStyle(.plain)
+      .disabled(isZeroTraining)
+      .opacity(isZeroTraining ? 0.55 : 1)
       .accessibilityHint("打开训练历史列表")
 
-      GrowthSectionLabel("容量 / 强度")
-        .padding(.top, MeetPRSpacing.space2)
-      VolumeIntensityChart(
-        buckets: chartBuckets,
-        isUnlocked: stats.unlocksTrends
-      )
+      if stats.trainingSessionCount >= 2 {
+        GrowthSectionLabel("容量 / 强度")
+          .padding(.top, MeetPRSpacing.space2)
+        VolumeIntensityChart(
+          buckets: chartBuckets,
+          isUnlocked: stats.unlocksTrends
+        )
+      }
     }
   }
 
@@ -186,7 +195,7 @@ public struct TrainingHistoryView: View {
       GrowthNavigationCard(
         icon: "bubble.left",
         title: "全部教练反馈",
-        subtitle: "暂无反馈数据"
+        subtitle: "完成训练后，教练点评会归档在这里"
       )
     }
   }
@@ -204,6 +213,10 @@ public struct TrainingHistoryView: View {
 
   private var chartBuckets: [WeeklyProgressMetric] {
     GrowthScreenPresentation.chartBuckets(logs: loadedLogs)
+  }
+
+  private var isZeroTraining: Bool {
+    stats.trainingSessionCount == 0
   }
 
   private var loadedLogs: [StudentSetLog] {
@@ -443,6 +456,7 @@ private struct GrowthComparisonCard: View {
 @available(iOS 17.0, macOS 14.0, *)
 private struct GrowthHistoryStatsCard: View {
   let stats: GrowthHistoryStats
+  let isZeroTraining: Bool
 
   var body: some View {
     HStack {
@@ -469,13 +483,17 @@ private struct GrowthHistoryStatsCard: View {
       HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point2) {
         Text(value)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
+          .foregroundStyle(
+            isZeroTraining ? Color.MeetPR.textDim : Color.MeetPR.textPrimary
+          )
           .minimumScaleFactor(0.65)
           .lineLimit(1)
         if let unit {
           Text(unit)
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textMuted)
+            .foregroundStyle(
+              isZeroTraining ? Color.MeetPR.textDim : Color.MeetPR.textMuted
+            )
         }
       }
     }

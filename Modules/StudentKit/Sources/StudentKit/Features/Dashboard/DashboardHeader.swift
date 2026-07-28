@@ -5,7 +5,7 @@ import SwiftUI
 struct DashboardHeader: View {
   let weekCode: String
   let selectedDate: Date
-  let isRestDay: Bool
+  let statusBadge: String?
   let showsNotifications: Bool
   let unreadCount: Int
   let progressSegments: [DashboardWeekProgressSegment]
@@ -32,13 +32,13 @@ struct DashboardHeader: View {
       }
 
       HStack(alignment: .top) {
-        if isRestDay {
+        if let statusBadge {
           HStack(alignment: .bottom, spacing: 11) {
             DashboardEmbossedHeadline(
               text: weekCode,
               foregroundStyle: Color.MeetPR.textDim
             )
-            Text("休息日")
+            Text(statusBadge)
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .bold))
               .foregroundStyle(Color.MeetPR.textMuted)
               .padding(.horizontal, 11)

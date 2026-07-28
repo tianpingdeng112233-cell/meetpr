@@ -137,11 +137,103 @@ import Testing
   #expect(snapshot.rawEligiblePoints.map(\.id) == [importedLow.id])
 }
 
+@MainActor
+@Test func growthTrendUnlocksAtExactlyThreeRecordsForItsExerciseFamily() async throws {
+  let now = Date(timeIntervalSince1970: 1_774_742_400)
+  let plan = StudentDemoSeed.makePlanView(today: now)
+  let squatExerciseID = try #require(
+    plan.days
+      .flatMap(\.exercises)
+      .first(where: { $0.exercise.mainLiftFamily == .squat })?
+      .exercise.id
+  )
+  let points = (1...3).map { index in
+    growthSnapshotPoint(
+      studentID: StudentDemoSeed.studentID,
+      exerciseID: squatExerciseID,
+      date: now.addingTimeInterval(Double(index - 4) * 86_400),
+      e1RMKg: Double(140 + index)
+    )
+  }
+  let viewModel = GrowthCurveViewModel(
+    plans: InMemoryStudentPlanRepository(
+      store: TestStudentPlanStore(seed: [StudentDemoSeed.studentID: plan])
+    ),
+    e1rm: InMemoryE1RMRepository(seedPoints: points),
+    now: { now }
+  )
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+  let snapshot = GrowthScreenPresentation.snapshot(
+    from: viewModel,
+    family: .squat,
+    range: .ninetyDays,
+    now: now
+  )
+
+  #expect(snapshot.eligibleRecordCount == GrowthHistoryStats.trendUnlockThreshold)
+  #expect(!snapshot.isFormingTrend)
+}
+
+@MainActor
+@Test func growthTrendRecordCountsStayIsolatedBetweenExerciseFamilies() async throws {
+  let now = Date(timeIntervalSince1970: 1_774_742_400)
+  let plan = StudentDemoSeed.makePlanView(today: now)
+  let exercises = plan.days.flatMap(\.exercises)
+  let squatExerciseID = try #require(
+    exercises.first(where: { $0.exercise.mainLiftFamily == .squat })?.exercise.id
+  )
+  let benchExerciseID = try #require(
+    exercises.first(where: { $0.exercise.mainLiftFamily == .bench })?.exercise.id
+  )
+  let squatPoints = (1...3).map { index in
+    growthSnapshotPoint(
+      studentID: StudentDemoSeed.studentID,
+      exerciseID: squatExerciseID,
+      date: now.addingTimeInterval(Double(index - 4) * 86_400),
+      e1RMKg: Double(140 + index)
+    )
+  }
+  let benchPoint = growthSnapshotPoint(
+    studentID: StudentDemoSeed.studentID,
+    exerciseID: benchExerciseID,
+    date: now.addingTimeInterval(-86_400),
+    e1RMKg: 100
+  )
+  let viewModel = GrowthCurveViewModel(
+    plans: InMemoryStudentPlanRepository(
+      store: TestStudentPlanStore(seed: [StudentDemoSeed.studentID: plan])
+    ),
+    e1rm: InMemoryE1RMRepository(seedPoints: squatPoints + [benchPoint]),
+    now: { now }
+  )
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+  let squat = GrowthScreenPresentation.snapshot(
+    from: viewModel,
+    family: .squat,
+    range: .ninetyDays,
+    now: now
+  )
+  let bench = GrowthScreenPresentation.snapshot(
+    from: viewModel,
+    family: .bench,
+    range: .ninetyDays,
+    now: now
+  )
+
+  #expect(squat.eligibleRecordCount == 3)
+  #expect(!squat.isFormingTrend)
+  #expect(bench.eligibleRecordCount == 1)
+  #expect(bench.isFormingTrend)
+}
+
 private func snapshot(_ family: LiftFamily, current: Double) -> GrowthCurveSnapshot {
   GrowthCurveSnapshot(
     family: family,
     samples: [],
     rawEligiblePoints: [],
+    eligibleRecordCount: 0,
     currentKg: current,
     deltaKg: nil,
     latestRecordDate: nil,

@@ -61,17 +61,22 @@
           DashboardTodayScreen(
             model: DashboardTodayScreenModel(
               weekIndex: plan.weekIndex,
+              planStartDate: plan.startDate,
+              planEndDate: plan.endDate,
               days: plan.days,
               cycleDays: plan.days,
               logs: [],
               feedbackItems: scenario.hidesFeedback
                 ? []
                 : StudentDemoSeed.makeFeedback(),
+              isFeedbackLoaded: true,
               trendRows: trendRows,
               metrics: DashboardProfileMetrics(
                 bodyWeightText: "83 kg",
                 competition: CompetitionCountdown(days: 3, dateText: "2026-07-29")
               ),
+              coachName: "演示教练",
+              newPRCount: 0,
               showsNotifications: true,
               notificationUnreadCount: 3,
               canShiftPlanDays: true,
@@ -91,7 +96,8 @@
             onStartWorkoutFrameChange: { _ in },
             isStartWorkoutHidden: false,
             onShiftPlan: {},
-            onUndoShift: {}
+            onUndoShift: {},
+            onMessageCoach: {}
           )
         }
         .scrollIndicators(.hidden)

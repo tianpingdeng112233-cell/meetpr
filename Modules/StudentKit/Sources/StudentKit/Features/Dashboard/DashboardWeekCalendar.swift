@@ -115,38 +115,86 @@ private struct DashboardLiftSlot: View {
 @available(iOS 17.0, macOS 14.0, *)
 struct DashboardRestDayCard: View {
   let isToday: Bool
-  let nextTrainingDate: Date?
+  let preview: DashboardRestDayPreview?
 
   var body: some View {
-    VStack(spacing: 5) {
-      Text(isToday ? "今天是休息日" : "休息日 · 无训练安排")
-        .font(
-          .MeetPR.body(
-            size: isToday ? MeetPRFontMetrics.size16 : MeetPRFontMetrics.size14,
-            weight: .semibold
-          )
-        )
+    if isToday {
+      recoveryCard
+    } else {
+      // Scene 06 covers today's rest slot only; other days keep the original
+      // compact card so non-slot areas stay untouched.
+      Text("休息日 · 无训练安排")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
         .foregroundStyle(Color.MeetPR.textMuted)
+        .frame(maxWidth: .infinity)
+        .padding(20)
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.rect(cornerRadius: 16))
+    }
+  }
 
-      if isToday, let nextTrainingDate {
-        Text("下次训练 \(nextTrainingLabel(nextTrainingDate))")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.textFaint)
+  private var recoveryCard: some View {
+    VStack(spacing: 9) {
+      Image(systemName: "moon")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size34, weight: .regular))
+        .foregroundStyle(Color.MeetPR.gold500)
+
+      Text("恢复也是计划的一部分")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+
+      Text(restCopy)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .multilineTextAlignment(.center)
+        .lineSpacing(3)
+
+      if isToday, let preview {
+        HStack(spacing: 11) {
+          // Scene 06 preview row uses a barbell glyph, not a calendar.
+          Image(systemName: "dumbbell")
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.gold500)
+            .frame(width: 34, height: 34)
+            .background(Color.MeetPR.surfaceRaised)
+            .clipShape(.rect(cornerRadius: 10))
+
+          VStack(alignment: .leading, spacing: 1) {
+            Text(preview.title)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+            Text(
+              "\(preview.exerciseCount) 个动作 · \(preview.setCount) 组 · "
+                + "约 \(preview.estimatedMinutes) 分钟"
+            )
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+            .foregroundStyle(Color.MeetPR.textMuted)
+          }
+          Spacer(minLength: 0)
+          Image(systemName: "chevron.right")
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size13, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textGhost)
+        }
+        .padding(.horizontal, 13)
+        .padding(.vertical, 11)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.MeetPR.bgInset)
+        .clipShape(.rect(cornerRadius: 12))
+        .padding(.top, 5)
       }
     }
     .frame(maxWidth: .infinity)
     .padding(20)
     .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: 16))
+    // Design source:
+    // docs/design/handoff-v3/empty-states/MeetPR 学员端 空状态 暗色.html
+    // scene 06, rest-day dashed slot.
   }
 
-  private func nextTrainingLabel(_ date: Date) -> String {
-    let offset = DashboardTodayPresentation.mondayOffset(
-      for: date,
-      calendar: PlanCalendarDayIdentity.utcCalendar
-    )
-    let monthDay = DashboardTodayPresentation.monthDayText(date)
-    return "周\(DashboardTodayPresentation.weekdayLetter(offset)) · \(monthDay)"
+  private var restCopy: String {
+    let nextTraining = preview?.farewellText ?? "下次训练见。"
+    return "肌肉在休息时生长。睡够、吃够蛋白质，\(nextTraining)"
   }
 }
 

@@ -110,6 +110,7 @@ public struct TodayWorkoutView: View {
         reviewCompleted: reviewCompleted,
         unreadCount: notifications?.totalUnreadCount ?? 0,
         showsNotifications: notifications != nil,
+        coachName: notifications?.activeCoach?.coachDisplayName ?? "教练",
         namespace: heroNamespace,
         isLaunchTargetHidden: isLaunchTargetHidden,
         launchHeroRevealToken: launchHeroRevealToken,
@@ -128,6 +129,9 @@ public struct TodayWorkoutView: View {
           showingReadinessSheet = true
         },
         onNotifications: {
+          showingNotifications = true
+        },
+        onMessageCoach: {
           showingNotifications = true
         },
         onHeroFrameChange: onHeroFrameChange,
@@ -380,6 +384,8 @@ public struct TodayWorkoutView: View {
       }
     case .rest:
       .rest
+    case .noPlan:
+      .noPlan
     case .error(let message):
       .error(message)
     }
@@ -389,7 +395,7 @@ public struct TodayWorkoutView: View {
     switch viewModel.state {
     case .loaded(let day, let drafts), .recording(let day, let drafts, _):
       (day, drafts)
-    case .idle, .loading, .rest, .error:
+    case .idle, .loading, .noPlan, .rest, .error:
       nil
     }
   }
@@ -403,6 +409,9 @@ public struct TodayWorkoutView: View {
   }
 
   private var weekCode: String {
+    if viewModel.state == .noPlan {
+      return "W—"
+    }
     let title = TodayWorkoutTitleResolver.title(
       day: currentDay,
       planContext: viewModel.planContext,

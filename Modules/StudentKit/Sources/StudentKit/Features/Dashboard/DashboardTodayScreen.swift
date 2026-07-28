@@ -4,12 +4,17 @@ import SwiftUI
 
 struct DashboardTodayScreenModel {
   let weekIndex: Int?
+  let planStartDate: Date?
+  let planEndDate: Date?
   let days: [StudentPlanDay]
   let cycleDays: [StudentPlanDay]
   let logs: [StudentSetLog]
   let feedbackItems: [CoachFeedback]
+  let isFeedbackLoaded: Bool
   let trendRows: [DashboardE1RMTrendRow]
   let metrics: DashboardProfileMetrics?
+  let coachName: String
+  let newPRCount: Int
   let showsNotifications: Bool
   let notificationUnreadCount: Int
   let canShiftPlanDays: Bool
@@ -31,6 +36,7 @@ struct DashboardTodayScreen: View {
   let isStartWorkoutHidden: Bool
   let onShiftPlan: () -> Void
   let onUndoShift: () -> Void
+  let onMessageCoach: () -> Void
 
   /// The repo's date-identity contract is mixed on purpose: plan days compare
   /// by UTC components, "today"/selection by the device calendar — the same
@@ -71,12 +77,29 @@ struct DashboardTodayScreen: View {
   }
 
   private var weekCode: String {
-    DashboardTodayPresentation.weekCode(
+    if isAwaitingNextPlan {
+      return "W\(nextWeekIndex)"
+    }
+    return DashboardTodayPresentation.weekCode(
       weekIndex: model.weekIndex,
       selectedDate: effectiveSelectedDate,
       days: model.days,
       selectedCalendar: calendar
     )
+  }
+
+  private var nextWeekIndex: Int {
+    max(1, (model.weekIndex ?? 0) + 1)
+  }
+
+  private var isAwaitingNextPlan: Bool {
+    isSelectedToday
+      && DashboardTodayPresentation.isAwaitingNextPlan(
+        planEndDate: model.planEndDate,
+        cycleDays: model.cycleDays,
+        now: model.now,
+        selectedCalendar: calendar
+      )
   }
 
   private var liftSubtitle: String {
@@ -115,7 +138,7 @@ struct DashboardTodayScreen: View {
       DashboardHeader(
         weekCode: weekCode,
         selectedDate: effectiveSelectedDate,
-        isRestDay: isRestDay,
+        statusBadge: isAwaitingNextPlan ? "编排中" : (isRestDay ? "休息日" : nil),
         showsNotifications: model.showsNotifications,
         unreadCount: model.notificationUnreadCount,
         progressSegments: DashboardTodayPresentation.progressSegments(
@@ -132,9 +155,31 @@ struct DashboardTodayScreen: View {
       if model.isLoading {
         DashboardTodayLoadingSkeleton()
           .meetPRRiseIn(delay: riseDelay(index: 1))
+      } else if isAwaitingNextPlan {
+        DashboardPlanWaitingState(
+          coachName: model.coachName,
+          nextWeekIndex: nextWeekIndex,
+          summary: DashboardTodayPresentation.weekSummary(
+            days: model.days,
+            logs: model.logs,
+            newPRCount: model.newPRCount
+          ),
+          onMessageCoach: onMessageCoach
+        )
+        .meetPRRiseIn(delay: riseDelay(index: 1))
+
+        if let metrics = model.metrics {
+          DashboardProfileMetricsView(
+            metrics: metrics,
+            showsCompetitionPlaceholder: metrics.competition == nil
+          )
+          .meetPRRiseIn(delay: riseDelay(index: 2))
+        }
       } else {
         DashboardFeedbackCard(
           items: model.feedbackItems,
+          pending: pendingFeedback,
+          coachName: model.coachName,
           viewModel: feedbackViewModel,
           isExpanded: $isFeedbackExpanded
         )
@@ -165,9 +210,11 @@ struct DashboardTodayScreen: View {
         if isRestDay {
           DashboardRestDayCard(
             isToday: isSelectedToday,
-            nextTrainingDate: DashboardTodayPresentation.nextTrainingDate(
+            preview: DashboardTodayPresentation.restDayPreview(
               after: effectiveSelectedDate,
               days: model.cycleDays,
+              planStartDate: model.planStartDate,
+              fallbackWeekIndex: model.weekIndex,
               selectedCalendar: calendar
             )
           )
@@ -213,6 +260,17 @@ struct DashboardTodayScreen: View {
     .padding(.horizontal, 20)
     .padding(.top, 6)
     .padding(.bottom, 28)
+  }
+
+  private var pendingFeedback: DashboardPendingFeedbackPresentation? {
+    guard model.isFeedbackLoaded else { return nil }
+    return DashboardTodayPresentation.pendingFeedback(
+      for: selectedDay,
+      logs: model.logs,
+      feedbackItems: model.feedbackItems,
+      now: model.now,
+      selectedCalendar: calendar
+    )
   }
 
   private var weekdayLetter: String {

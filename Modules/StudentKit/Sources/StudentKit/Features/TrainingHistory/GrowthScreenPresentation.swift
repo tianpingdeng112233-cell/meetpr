@@ -43,16 +43,23 @@ struct GrowthCurveSnapshot: Equatable, Sendable {
   let family: LiftFamily
   let samples: [E1RMSeries.Sample]
   let rawEligiblePoints: [E1RMHistoryPoint]
+  let eligibleRecordCount: Int
   let currentKg: Double?
   let deltaKg: Double?
   let latestRecordDate: Date?
   let latestRecordPoint: E1RMHistoryPoint?
+
+  var isFormingTrend: Bool {
+    eligibleRecordCount > 0
+      && eligibleRecordCount < GrowthHistoryStats.trendUnlockThreshold
+  }
 
   static func empty(family: LiftFamily) -> GrowthCurveSnapshot {
     GrowthCurveSnapshot(
       family: family,
       samples: [],
       rawEligiblePoints: [],
+      eligibleRecordCount: 0,
       currentKg: nil,
       deltaKg: nil,
       latestRecordDate: nil,
@@ -135,12 +142,14 @@ struct GrowthComparisonPresentation: Equatable, Sendable {
 }
 
 struct GrowthHistoryStats: Equatable, Sendable {
+  static let trendUnlockThreshold = 3
+
   let trainingSessionCount: Int
   let trainingWeekCount: Int
   let totalVolumeKg: Decimal
 
   var unlocksTrends: Bool {
-    trainingSessionCount >= 3
+    trainingSessionCount >= Self.trendUnlockThreshold
   }
 }
 
@@ -176,9 +185,11 @@ enum GrowthScreenPresentation {
       family: family,
       samples: samples,
       rawEligiblePoints: rawEligiblePoints,
+      eligibleRecordCount: viewModel.eligibleRecordCount(for: family),
       currentKg: latestRecordPoint?.e1RMKg,
       deltaKg: deltaKg,
-      latestRecordDate: latestRecordPoint?.computedAt,
+      latestRecordDate: latestRecordPoint?.computedAt
+        ?? rawEligiblePoints.map(\.computedAt).max(),
       latestRecordPoint: latestRecordPoint
     )
   }

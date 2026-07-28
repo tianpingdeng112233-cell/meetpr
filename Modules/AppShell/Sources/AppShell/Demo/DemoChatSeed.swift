@@ -5,15 +5,21 @@ import StudentKit
 
 @available(iOS 17.0, macOS 14.0, *)
 public enum DemoChatSeed {
-  public static func make(for user: User) -> ChatDemoSeed {
+  public static func make(
+    for user: User,
+    emptyConversation: Bool = false
+  ) -> ChatDemoSeed {
     guard user.role == .coachedStudent else {
       return .coach()
     }
 
     let base = ChatDemoSeed.student()
     let firstMessageAt = Date().addingTimeInterval(-900)
-    let messages = base.messagesByConversationID.mapValues { items in
-      items.enumerated().map { index, message in
+    let messages: [UUID: [ChatMessage]] = base.messagesByConversationID.mapValues { items in
+      if emptyConversation {
+        return [ChatMessage]()
+      }
+      return items.enumerated().map { index, message in
         let senderID =
           message.senderID == ChatDemoSeed.coachUserID
           ? StudentDemoSeed.coachID
@@ -38,9 +44,9 @@ public enum DemoChatSeed {
         id: conversation.id,
         otherPartyID: StudentDemoSeed.coachID,
         otherPartyName: "演示教练",
-        lastMessagePreview: conversation.lastMessagePreview,
+        lastMessagePreview: emptyConversation ? nil : conversation.lastMessagePreview,
         lastMessageAt: messages[conversation.id]?.last?.createdAt,
-        unreadCount: conversation.unreadCount,
+        unreadCount: emptyConversation ? 0 : conversation.unreadCount,
         myLastRead: conversation.myLastRead,
         otherLastRead: conversation.otherLastRead
       )

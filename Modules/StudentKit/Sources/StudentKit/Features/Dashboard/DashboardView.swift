@@ -15,6 +15,7 @@ public struct DashboardView: View {
   private let studentID: UUID
   private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
+  private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let notifications: StudentNotificationsCoordinator?
   private let onStartWorkout: () -> Void
@@ -34,6 +35,7 @@ public struct DashboardView: View {
   @State private var isUpdatingDayShift = false
   @State private var selectedDate: Date?
   @State private var isFeedbackExpanded = false
+  @State private var newPRCount = 0
 
   public init(
     studentID: UUID,
@@ -54,6 +56,7 @@ public struct DashboardView: View {
     self.studentID = studentID
     self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
+    self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
     self.notifications = notifications
     self.onStartWorkout = onStartWorkout
@@ -94,7 +97,8 @@ public struct DashboardView: View {
           onShiftPlan: proposeShiftToday,
           onUndoShift: {
             dayShiftAlert = .confirmCancel(Date())
-          }
+          },
+          onMessageCoach: { showsNotifications = true }
         )
       }
       .scrollIndicators(.hidden)
@@ -166,12 +170,17 @@ public struct DashboardView: View {
   private var screenModel: DashboardTodayScreenModel {
     DashboardTodayScreenModel(
       weekIndex: weekData?.weekIndex,
+      planStartDate: weekViewModel.planStartDate,
+      planEndDate: weekViewModel.plan?.endDate,
       days: weekData?.days ?? [],
       cycleDays: weekViewModel.cycleDays,
       logs: weekData?.logs ?? [],
       feedbackItems: feedbackViewModel.items,
+      isFeedbackLoaded: feedbackViewModel.hasFinishedLoading,
       trendRows: trendPresentation?.rows ?? [],
       metrics: profileMetricsViewModel.metrics,
+      coachName: notifications?.activeCoach?.coachDisplayName ?? "教练",
+      newPRCount: newPRCount,
       showsNotifications: notifications != nil,
       notificationUnreadCount: notifications?.totalUnreadCount ?? 0,
       canShiftPlanDays: canShiftPlanDays,
@@ -217,6 +226,7 @@ public struct DashboardView: View {
     if profileMetricsViewModel.state == .idle {
       await profileMetricsViewModel.load(studentID: studentID)
     }
+    await loadNewPRCount()
   }
 
   private func reload() async {
@@ -228,6 +238,11 @@ public struct DashboardView: View {
     }
     await e1rmTrendViewModel.load(studentID: studentID)
     await profileMetricsViewModel.load(studentID: studentID)
+    await loadNewPRCount()
+  }
+
+  private func loadNewPRCount() async {
+    newPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
   }
 
   private func proposeShiftToday() {

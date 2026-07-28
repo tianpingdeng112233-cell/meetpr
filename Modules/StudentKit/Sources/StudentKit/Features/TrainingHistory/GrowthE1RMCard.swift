@@ -1,3 +1,5 @@
+// Chart drawing helpers intentionally stay with their shared geometry model.
+// swiftlint:disable file_length
 import CoreModels
 import DesignSystem
 import SwiftUI
@@ -6,6 +8,8 @@ import SwiftUI
 struct GrowthE1RMCard: View {
   let snapshot: GrowthCurveSnapshot
   let range: GrowthTimeRange
+  let isGlobalTrainingEmpty: Bool
+  let onOpenToday: () -> Void
   let onCycleRange: () -> Void
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -64,14 +68,33 @@ struct GrowthE1RMCard: View {
             .foregroundStyle(Color.MeetPR.textMuted)
         }
         Spacer()
-        if let deltaText {
+        if snapshot.isFormingTrend {
+          Text("首次估算")
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textMuted)
+        } else if let deltaText {
           Text(deltaText)
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
             .foregroundStyle(Color.MeetPR.goldText)
         }
       }
 
-      if snapshot.samples.isEmpty && snapshot.rawEligiblePoints.isEmpty {
+      if isGlobalTrainingEmpty {
+        GrowthZeroTrainingState(
+          showsAction: snapshot.family == .squat,
+          onOpenToday: onOpenToday
+        )
+        .frame(height: 228)
+      } else if snapshot.isFormingTrend {
+        GrowthFormingTrendState(
+          recordedCount: snapshot.eligibleRecordCount,
+          threshold: GrowthHistoryStats.trendUnlockThreshold,
+          familyName: snapshot.family.studentDisplayName,
+          currentKg: snapshot.currentKg,
+          latestRecordDate: snapshot.latestRecordDate
+        )
+        .frame(height: 126)
+      } else if snapshot.samples.isEmpty && snapshot.rawEligiblePoints.isEmpty {
         GrowthTrendEmptyState()
           .frame(height: 126)
       } else {
@@ -87,7 +110,9 @@ struct GrowthE1RMCard: View {
   }
 
   private var weightText: String {
-    guard let value = snapshot.currentKg else { return "—" }
+    guard let value = snapshot.currentKg else {
+      return isGlobalTrainingEmpty ? "未设定" : "—"
+    }
     return value.formatted(.number.precision(.fractionLength(1)))
   }
 
@@ -96,17 +121,7 @@ struct GrowthE1RMCard: View {
     let sign = delta >= 0 ? "+" : "−"
     return sign + abs(delta).formatted(.number.precision(.fractionLength(1)))
   }
-}
 
-@available(iOS 17.0, macOS 14.0, *)
-struct GrowthTrendEmptyState: View {
-  var body: some View {
-    Text("完成 3 次训练后解锁趋势")
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-      .foregroundStyle(Color.MeetPR.textMuted)
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .accessibilityLabel("完成三次训练后解锁趋势")
-  }
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -385,3 +400,5 @@ private struct GrowthChartGeometry {
     return "\(month)/\(day)"
   }
 }
+
+// swiftlint:enable file_length

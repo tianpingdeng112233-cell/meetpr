@@ -4,6 +4,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct DashboardProfileMetricsView: View {
   let metrics: DashboardProfileMetrics
+  var showsCompetitionPlaceholder = false
 
   var body: some View {
     HStack(spacing: 11) {
@@ -12,6 +13,8 @@ struct DashboardProfileMetricsView: View {
       }
       if let competition = metrics.competition {
         DashboardCompetitionCard(competition: competition)
+      } else if showsCompetitionPlaceholder {
+        DashboardCompetitionPlaceholder()
       }
     }
   }
@@ -114,6 +117,48 @@ private struct DashboardCompetitionCard: View {
     }
     .accessibilityElement(children: .ignore)
     .accessibilityLabel("距比赛 \(competition.days) 天")
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct DashboardCompetitionPlaceholder: View {
+  var body: some View {
+    VStack(alignment: .leading, spacing: 3) {
+      HStack(spacing: 6) {
+        DashboardFlagIcon()
+          .stroke(
+            Color.MeetPR.textDim,
+            style: StrokeStyle(lineWidth: 2, lineJoin: .round)
+          )
+          .frame(width: 13, height: 13)
+        Text("距比赛")
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+      }
+      .foregroundStyle(Color.MeetPR.textMuted)
+
+      Text("未安排")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .padding(.top, 3)
+      HStack(spacing: 4) {
+        // Reference: standalone 11pt stroked plus glyph before the label.
+        Image(systemName: "plus")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size11, weight: .bold))
+        Text("填写比赛")
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .bold))
+      }
+      .foregroundStyle(Color.MeetPR.gold500)
+    }
+    .padding(.horizontal, 16)
+    .padding(.vertical, 14)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: 16))
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("距比赛，未安排，填写比赛")
+    // Design source:
+    // docs/design/handoff-v3/empty-states/MeetPR 学员端 空状态 暗色.html
+    // scene 04, bottom-right competition tile.
   }
 }
 

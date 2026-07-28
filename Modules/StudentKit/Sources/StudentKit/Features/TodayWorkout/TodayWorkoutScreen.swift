@@ -7,6 +7,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   enum Content {
     case loading
     case workout(TodayWorkoutPresentation)
+    case noPlan
     case rest
     case error(String)
   }
@@ -18,6 +19,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let reviewCompleted: Bool
   let unreadCount: Int
   let showsNotifications: Bool
+  let coachName: String
   let namespace: Namespace.ID
   let isLaunchTargetHidden: Bool
   let launchHeroRevealToken: Int
@@ -26,6 +28,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let onRefresh: () -> Void
   let onReadiness: () -> Void
   let onNotifications: () -> Void
+  let onMessageCoach: () -> Void
   let onHeroFrameChange: (CGRect) -> Void
   let onStart: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
@@ -197,6 +200,11 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
       completionContent(presentation)
     case .rest:
       TodayWorkoutRestCard()
+    case .noPlan:
+      TodayWorkoutPlanUnavailableCard(
+        coachName: coachName,
+        onMessageCoach: onMessageCoach
+      )
     case .error(let message):
       ContentUnavailableView(
         "加载失败",
@@ -217,6 +225,116 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
       } else {
         HoldToCompleteButton(action: onComplete)
       }
+    }
+  }
+}
+
+/// Design source:
+/// `docs/design/handoff-v3/empty-states/MeetPR 学员端 空状态 暗色.html`
+/// scene 07, training-content dashed slot.
+@available(iOS 17.0, macOS 14.0, *)
+private struct TodayWorkoutPlanUnavailableCard: View {
+  let coachName: String
+  let onMessageCoach: () -> Void
+
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.space3) {
+      TodayWorkoutPlanSkeleton()
+
+      Text("第一周计划还没生效")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text("\(coachName)确认你的基线后，这里会出现当天的动作清单——每个动作带组数、重量和示范视频")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .multilineTextAlignment(.center)
+        .lineSpacing(4)
+        .frame(maxWidth: 260)
+      Button("看看教练发来的消息", action: onMessageCoach)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .padding(.horizontal, MeetPRSpacing.point18)
+        .frame(minHeight: 38)
+        .overlay {
+          Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+        }
+        .buttonStyle(.plain)
+    }
+    .padding(.horizontal, MeetPRSpacing.point18)
+    .padding(.vertical, MeetPRSpacing.point26)
+    .frame(maxWidth: .infinity)
+    .background(Color.MeetPR.bgInset)
+    .clipShape(.rect(cornerRadius: 16))
+    .accessibilityElement(children: .combine)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct TodayWorkoutPlanSkeleton: View {
+  var body: some View {
+    ZStack(alignment: .bottomTrailing) {
+      Canvas { context, _ in
+        drawSkeletonRow(
+          in: &context,
+          frame: CGRect(x: 4, y: 4, width: 64, height: 12),
+          opacity: 1,
+          labelWidth: 18
+        )
+        drawSkeletonRow(
+          in: &context,
+          frame: CGRect(x: 4, y: 22, width: 52, height: 12),
+          opacity: 0.7,
+          labelWidth: 14
+        )
+        drawSkeletonRow(
+          in: &context,
+          frame: CGRect(x: 4, y: 40, width: 40, height: 12),
+          opacity: 0.4,
+          labelWidth: nil
+        )
+      }
+      .frame(width: 72, height: 56)
+
+      Circle()
+        .fill(Color.MeetPR.gold500)
+        .frame(width: 22, height: 22)
+        .overlay {
+          Image(systemName: "clock")
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size10, weight: .bold))
+            .foregroundStyle(Color.MeetPR.inkOnGold)
+        }
+        .overlay {
+          Circle().stroke(Color.MeetPR.bgInset, lineWidth: 2.5)
+        }
+        .offset(x: 7, y: 3)
+    }
+    .accessibilityHidden(true)
+  }
+
+  private func drawSkeletonRow(
+    in context: inout GraphicsContext,
+    frame: CGRect,
+    opacity: Double,
+    labelWidth: CGFloat?
+  ) {
+    context.stroke(
+      Path(roundedRect: frame, cornerRadius: 4),
+      with: .color(Color.MeetPR.borderStrong.opacity(opacity)),
+      style: StrokeStyle(lineWidth: 1.5, dash: [4, 4])
+    )
+    if let labelWidth {
+      context.fill(
+        Path(
+          roundedRect: CGRect(
+            x: frame.minX + 5,
+            y: frame.minY + 4,
+            width: labelWidth,
+            height: 4
+          ),
+          cornerRadius: 2
+        ),
+        with: .color(Color.MeetPR.borderStrong.opacity(opacity))
+      )
     }
   }
 }

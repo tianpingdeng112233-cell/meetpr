@@ -121,6 +121,10 @@ public final class GrowthCurveViewModel {
     return rawPointsByID[sample.winnerPointID]
   }
 
+  func eligibleRecordCount(for family: LiftFamily) -> Int {
+    seriesByFamily[family]?.rawEligible.count ?? 0
+  }
+
   private var windowCutoff: Date? {
     switch selectedWindow {
     case .fourWeeks: now().addingTimeInterval(-E1RMPolicy.rollingWindow)

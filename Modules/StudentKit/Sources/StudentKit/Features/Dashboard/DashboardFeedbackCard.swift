@@ -5,6 +5,8 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct DashboardFeedbackCard: View {
   let items: [CoachFeedback]
+  let pending: DashboardPendingFeedbackPresentation?
+  let coachName: String
   let viewModel: FeedbackInboxViewModel?
   @Binding var isExpanded: Bool
 
@@ -36,16 +38,12 @@ struct DashboardFeedbackCard: View {
 
   var body: some View {
     Group {
-      if items.isEmpty {
-        Text("暂无新反馈")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-          .foregroundStyle(Color.MeetPR.textMuted)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.horizontal, 16)
-          .frame(minHeight: 44)
-          .background(Color.MeetPR.surfaceCard)
-          .clipShape(.rect(cornerRadius: 12))
-      } else {
+      if let pending {
+        DashboardPendingFeedbackCard(
+          pending: pending,
+          coachName: coachName
+        )
+      } else if !items.isEmpty {
         ZStack(alignment: .top) {
           collapsedCard
             .opacity(isExpanded ? 0 : 1)

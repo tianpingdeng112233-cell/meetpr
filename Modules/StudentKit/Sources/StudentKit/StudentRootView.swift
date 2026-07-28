@@ -248,7 +248,8 @@ extension StudentRootView {
         importedHistoryRefreshToken: importedHistoryRefreshToken,
         onImportedHistoryRefresh: { await runImportedHistoryBackfill() },
         notifications: notifications,
-        onOpenPlanNotification: openPlanNotification
+        onOpenPlanNotification: openPlanNotification,
+        onOpenToday: { selectedTab = .today }
       )
       .studentTabLayer(shell.layer(for: .growth), store: tabHostStore)
 

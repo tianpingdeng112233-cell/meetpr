@@ -113,7 +113,7 @@ struct StudentBlackGoldChatView: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
         Text(coachName)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
-        Text("● 在线")
+        Text(isConversationEmpty ? "● 今晚在线" : "● 在线")
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
           .foregroundStyle(Color.MeetPR.success)
       }
@@ -135,11 +135,26 @@ struct StudentBlackGoldChatView: View {
   private var timeline: some View {
     ScrollView {
       LazyVStack(spacing: MeetPRSpacing.point10) {
-        if viewModel.hasMoreHistory {
+        if isInitialLoadFailed {
+          StudentConversationLoadErrorState {
+            Task { await viewModel.load() }
+          }
+          .frame(maxWidth: .infinity)
+          .containerRelativeFrame(.vertical)
+        } else if isConversationEmpty {
+          StudentEmptyConversationState(coachName: coachName)
+            .frame(maxWidth: .infinity)
+            .containerRelativeFrame(.vertical)
+        } else if isInitialLoadPending {
+          ProgressView()
+            .tint(Color.MeetPR.gold500)
+            .frame(maxWidth: .infinity)
+            .containerRelativeFrame(.vertical)
+        } else if viewModel.hasMoreHistory {
           StudentChatHistoryLoadingSentinel(load: loadOlderPreservingPosition)
         }
 
-        if let timestamp = timelineItems.first?.occurredAt {
+        if !isConversationEmpty, let timestamp = timelineItems.first?.occurredAt {
           Text(chatTimestamp(timestamp))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
             .foregroundStyle(Color.MeetPR.textDim)
@@ -256,6 +271,28 @@ struct StudentBlackGoldChatView: View {
       && draft.count <= ConversationViewModel.maximumTextLength
   }
 
+  private var isConversationEmpty: Bool {
+    viewModel.didFinishInitialLoad
+      && viewModel.error == nil
+      && timelineItems.isEmpty
+      && viewModel.pending.isEmpty
+      && !viewModel.hasMoreHistory
+  }
+
+  private var isInitialLoadPending: Bool {
+    !viewModel.didFinishInitialLoad
+      && viewModel.error == nil
+      && timelineItems.isEmpty
+      && viewModel.pending.isEmpty
+  }
+
+  private var isInitialLoadFailed: Bool {
+    !viewModel.didFinishInitialLoad
+      && viewModel.error != nil
+      && timelineItems.isEmpty
+      && viewModel.pending.isEmpty
+  }
+
   private func send() {
     guard viewModel.sendText(draft) != nil else { return }
     draft = ""
@@ -328,6 +365,74 @@ struct StudentBlackGoldChatView: View {
       .dateTime.month().day().locale(Locale(identifier: "zh_CN"))
     )
     return "\(day) \(time)"
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct StudentConversationLoadErrorState: View {
+  let onRetry: () -> Void
+
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.point13) {
+      Image(systemName: "exclamationmark.triangle")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size24, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textMuted)
+      Text("消息暂时没加载出来")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text("检查网络后再试一次，你的历史消息不会丢失。")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .multilineTextAlignment(.center)
+      Button("重新加载", action: onRetry)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .padding(.horizontal, MeetPRSpacing.point18)
+        .frame(minHeight: 38)
+        .overlay {
+          Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+        }
+        .buttonStyle(.plain)
+    }
+    .padding(.horizontal, MeetPRSpacing.space6)
+  }
+}
+
+/// Design source:
+/// `docs/design/handoff-v3/empty-states/MeetPR 学员端 空状态 暗色.html`
+/// scene 05, messages-area dashed slot.
+@available(iOS 17.0, macOS 14.0, *)
+private struct StudentEmptyConversationState: View {
+  let coachName: String
+
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.point13) {
+      Image(systemName: "bubble.left")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size23, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .frame(width: 54, height: 54)
+        .overlay {
+          Circle()
+            .stroke(
+              Color.MeetPR.borderStrong,
+              style: StrokeStyle(lineWidth: 1.5, dash: [4, 4])
+            )
+        }
+
+      Text("跟\(coachName)打个招呼")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      HStack(spacing: MeetPRSpacing.point7) {
+        Text("在下方输入框发送消息")
+        Image(systemName: "arrow.down")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.gold500)
+      }
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+      .foregroundStyle(Color.MeetPR.textMuted)
+    }
+    .multilineTextAlignment(.center)
+    .accessibilityElement(children: .combine)
   }
 }
 

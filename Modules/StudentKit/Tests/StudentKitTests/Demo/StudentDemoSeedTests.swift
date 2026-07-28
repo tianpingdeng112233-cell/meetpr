@@ -43,3 +43,15 @@ import Testing
     .max { $0.computedAt < $1.computedAt }
   #expect(latestSquat?.sourceWeightKg == 142.5)
 }
+
+@Test func growthFormingDemoHasOneEligibleSetAndOneHistoryPoint() {
+  let plan = StudentDemoSeed.makePlanView()
+  let logs = StudentDemoSeed.makeSingleSessionLogs(plan: plan)
+  let history = StudentDemoSeed.makeFormingE1RMHistory()
+
+  #expect(logs.count == 1)
+  #expect(logs.first?.completed == true)
+  #expect(GrowthScreenPresentation.historyStats(logs: logs).trainingSessionCount == 1)
+  #expect(history.count == 1)
+  #expect(history.first?.exerciseId == logs.first?.exerciseID)
+}

@@ -1,6 +1,9 @@
+// Demo fixture catalog intentionally stays co-located for cross-feature consistency.
+// swiftlint:disable file_length
 import CoreModels
 import Foundation
 
+// swiftlint:disable:next type_body_length
 public enum StudentDemoSeed {
   public static let studentID = UUID(uuidString: "02400000-0000-0000-0000-000000000101")!
   public static let coachID = UUID(uuidString: "02400000-0000-0000-0000-000000000201")!
@@ -17,8 +20,12 @@ public enum StudentDemoSeed {
 
   public static let referenceDate = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-13
 
-  public static func makePlanView(weekIndex: Int = 1, today: Date = Date()) -> StudentPlanView {
-    let startDate = demoCycleStart(today: today).addingTimeInterval(
+  public static func makePlanView(
+    weekIndex: Int = 1,
+    today: Date = Date(),
+    todayOffset: Int = 3
+  ) -> StudentPlanView {
+    let startDate = demoCycleStart(today: today, todayOffset: todayOffset).addingTimeInterval(
       Double(max(0, weekIndex - 1)) * 7 * 86_400)
     let days = (0..<7).map { offset in
       let date = startDate.addingTimeInterval(Double(offset) * 86_400)
@@ -86,7 +93,7 @@ public enum StudentDemoSeed {
         planExerciseID: linkedExerciseID,
         videoID: uuid(411),
         video: demoFeedbackVideo(
-          id: uuid(411), loggedAt: newestFeedbackAt.addingTimeInterval(-60)),
+          id: uuid(411), loggedAt: newestFeedbackAt.addingTimeInterval(-86_400)),
         text: "深蹲第一组速度很好，下一次保持同样节奏，最后一组不要急着起杠。",
         postedAt: newestFeedbackAt,
         readAt: nil
@@ -264,10 +271,14 @@ public enum StudentDemoSeed {
   /// i.e. the week began three days ago. This keeps the 锻炼 tab on a real workout
   /// whenever the demo is launched, while leaving genuine *past* training days
   /// (深蹲, 卧推) for 历史/仪表盘 to show — and never seeding future logs.
-  private static func demoCycleStart(today: Date) -> Date {
+  private static func demoCycleStart(today: Date, todayOffset: Int) -> Date {
     let calendar = utcCalendar
     let startOfToday = calendar.startOfDay(for: today)
-    return calendar.date(byAdding: .day, value: -3, to: startOfToday) ?? startOfToday
+    return calendar.date(
+      byAdding: .day,
+      value: -min(max(todayOffset, 0), 6),
+      to: startOfToday
+    ) ?? startOfToday
   }
 
   /// Backend plan-day dates decode as UTC-midnight anchors; the demo seed must
@@ -336,7 +347,10 @@ extension StudentDemoSeed {
   /// Fully completed 29-field profile so the nine archive cards demo with
   /// real-looking data (spec 032 D10 / spec 031 D10: the demo student is
   /// past onboarding — the wizard itself demos on a fresh staging account).
-  public static func makeOnboardingProfile(studentID: UUID) -> OnboardingProfile {
+  public static func makeOnboardingProfile(
+    studentID: UUID,
+    isCompeting: Bool = true
+  ) -> OnboardingProfile {
     OnboardingProfile(
       userId: studentID,
       unitPreference: .kg,
@@ -362,8 +376,8 @@ extension StudentDemoSeed {
       uploadAttachmentIds: [],
       injuryNotes: "左肩撞击综合征",
       injuryAreas: [.shoulder],
-      isCompeting: true,
-      competitionDate: demoCompetitionDate(),
+      isCompeting: isCompeting,
+      competitionDate: isCompeting ? demoCompetitionDate() : nil,
       targetWeightClass: "IPF 83kg",
       noteToCoach: "想冲全国赛,请多关注深蹲底部速度",
       completedAt: referenceDate,
@@ -397,3 +411,5 @@ extension StudentDemoSeed {
     )
   }
 }
+
+// swiftlint:enable file_length
