@@ -1,31 +1,39 @@
 import DesignSystem
 import SwiftUI
 
+/// Black-gold v3 palette. The card first shipped on the legacy red tokens because ChatUI was
+/// written before the student-side redo landed; the redo did not reach this module, so an
+/// outgoing card sat as a red block in an otherwise gold thread.
 enum ChatSetCardColorToken: Equatable, Sendable {
-  case brandRed
-  case surface1
-  case white
-  case whiteMuted
-  case fgPrimary
-  case fgTertiary
-  case border
+  case goldCTA
+  case surfaceCard
+  case ctaText
+  case ctaTextMuted
+  case textPrimary
+  case textTertiary
+  case borderDefault
+  case gold500
 
   var color: Color {
     switch self {
-    case .brandRed:
-      Color.MeetPR.brandRed
-    case .surface1:
-      Color.MeetPR.surface1
-    case .white:
-      Color.white
-    case .whiteMuted:
-      Color.white.opacity(0.72)
-    case .fgPrimary:
-      Color.MeetPR.fgPrimary
-    case .fgTertiary:
-      Color.MeetPR.fgTertiary
-    case .border:
-      Color.MeetPR.border
+    case .goldCTA:
+      Color.MeetPR.goldCTA
+    case .surfaceCard:
+      Color.MeetPR.surfaceCard
+    case .ctaText:
+      // The on-gold ink the CTA buttons use. `goldText` is the opposite pairing — gold ink on a
+      // dark surface — and reading it as "gold's text colour" put gold on gold.
+      Color.MeetPR.ctaText
+    case .ctaTextMuted:
+      Color.MeetPR.ctaText.opacity(0.72)
+    case .textPrimary:
+      Color.MeetPR.textPrimary
+    case .textTertiary:
+      Color.MeetPR.textTertiary
+    case .borderDefault:
+      Color.MeetPR.borderDefault
+    case .gold500:
+      Color.MeetPR.gold500
     }
   }
 }
@@ -39,20 +47,22 @@ struct ChatSetCardAppearance: Equatable, Sendable {
 
   static func resolve(isCurrentUser: Bool) -> Self {
     if isCurrentUser {
+      // Outgoing: gold fill with the dark on-gold text the CTA buttons use.
       Self(
-        background: .brandRed,
-        primaryText: .white,
-        secondaryText: .whiteMuted,
-        accent: .white,
-        border: .whiteMuted
+        background: .goldCTA,
+        primaryText: .ctaText,
+        secondaryText: .ctaTextMuted,
+        accent: .ctaText,
+        border: .ctaTextMuted
       )
     } else {
+      // Incoming: neutral card, gold only as the accent.
       Self(
-        background: .surface1,
-        primaryText: .fgPrimary,
-        secondaryText: .fgTertiary,
-        accent: .brandRed,
-        border: .border
+        background: .surfaceCard,
+        primaryText: .textPrimary,
+        secondaryText: .textTertiary,
+        accent: .gold500,
+        border: .borderDefault
       )
     }
   }

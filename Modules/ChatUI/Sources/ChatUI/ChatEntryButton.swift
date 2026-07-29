@@ -15,7 +15,7 @@ public struct ChatEntryButton: View {
     Button(action: action) {
       Image(systemName: "message")
         .font(.body.bold())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .frame(width: 44, height: 44)
         .overlay(alignment: .topTrailing) {
           if unreadCount > 0 {
@@ -41,7 +41,7 @@ private struct ChatUnreadBadge: View {
       .foregroundStyle(.white)
       .padding(.horizontal, 5)
       .frame(minWidth: 18, minHeight: 18)
-      .background(Color.MeetPR.brandRed, in: .capsule)
+      .background(Color.MeetPR.gold500, in: .capsule)
       .accessibilityHidden(true)
   }
 }

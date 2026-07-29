@@ -159,7 +159,7 @@ private struct FeedbackVideoFailureCard: View {
         .foregroundStyle(Color.MeetPR.amber)
       Text(ChatStrings.playbackFailed)
         .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .multilineTextAlignment(.center)
       Button(action: retry) {
         Text(retrying ? ChatStrings.refreshing : ChatStrings.retry)
@@ -167,7 +167,7 @@ private struct FeedbackVideoFailureCard: View {
           .foregroundStyle(.white)
           .frame(maxWidth: .infinity)
           .frame(height: 44)
-          .background(Color.MeetPR.brandRed)
+          .background(Color.MeetPR.goldCTA)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
       .buttonStyle(.plain)
@@ -175,11 +175,11 @@ private struct FeedbackVideoFailureCard: View {
     }
     .padding(MeetPRSpacing.lg)
     .frame(maxWidth: 280)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
   }
 }

@@ -30,7 +30,7 @@ struct ChatMessageRow: View {
         if let deliveryStatus {
           Text(deliveryStatus == .read ? ChatStrings.read : ChatStrings.delivered)
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
 
@@ -67,7 +67,7 @@ private struct ChatMessageBubble: View {
           // applied after the frame.
           Text(message.text ?? "")
             .font(.body)
-            .foregroundStyle(isCurrentUser ? .white : Color.MeetPR.fgPrimary)
+            .foregroundStyle(isCurrentUser ? .white : Color.MeetPR.textPrimary)
             .multilineTextAlignment(isCurrentUser ? .trailing : .leading)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, MeetPRSpacing.md)
@@ -95,7 +95,7 @@ private struct ChatMessageBubble: View {
     }
     .background(
       ChatSetCardPresentation(message: message) == nil
-        ? (isCurrentUser ? Color.MeetPR.brandRed : Color.MeetPR.surface2)
+        ? (isCurrentUser ? Color.MeetPR.goldCTA : Color.MeetPR.surfaceElevated)
         : Color.clear
     )
     .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
@@ -139,7 +139,7 @@ private struct ChatImagePlaceholder: View {
 
   var body: some View {
     ZStack {
-      Color.MeetPR.surface2
+      Color.MeetPR.surfaceElevated
       if showsProgress {
         ProgressView()
       } else {
@@ -148,7 +148,7 @@ private struct ChatImagePlaceholder: View {
           Text(ChatStrings.imageUnavailable)
             .font(.caption)
         }
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
   }
@@ -180,19 +180,19 @@ struct PendingChatMessageRow: View {
         // Hugs its content, same as a confirmed bubble — otherwise a short
         // message in flight is a full-width bar that then snaps narrow on
         // confirmation.
-        .background(Color.MeetPR.brandRed.opacity(0.72))
+        .background(Color.MeetPR.goldCTA.opacity(0.72))
         .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
 
         switch item.state {
         case .sending:
           Label(ChatStrings.sending, systemImage: "clock")
             .font(.caption)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
+            .foregroundStyle(Color.MeetPR.textTertiary)
         case .failed:
           Button(action: retry) {
             Label(ChatStrings.retry, systemImage: "arrow.clockwise")
               .font(.caption.bold())
-              .foregroundStyle(Color.MeetPR.brandRed)
+              .foregroundStyle(Color.MeetPR.goldCTA)
           }
           .buttonStyle(.plain)
           .accessibilityHint(ChatStrings.sendFailed)
