@@ -16,8 +16,8 @@ struct Step3StrengthSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       Text("⚠️ 1RM 一旦填写,完成后只有教练能改")
-        .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textSecondary)
 
       oneRMField(
         lift: .squat, title: "深蹲 1RM", text: $squatText,
@@ -67,12 +67,12 @@ struct Step3StrengthSection: View {
         estimatorTarget = lift
       } label: {
         Text("🧮")
-          .font(Font.MeetPR.title2)
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size28))
           .frame(width: 44, height: 44)
-          .background(Color.MeetPR.surface1)
+          .background(Color.MeetPR.surfaceCard)
           .overlay {
             RoundedRectangle(cornerRadius: MeetPRRadius.md)
-              .stroke(Color.MeetPR.border, lineWidth: 1)
+              .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
           }
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
@@ -128,8 +128,8 @@ struct OneRMEstimatorSheet: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       Text("用近期训练估算 1RM")
-        .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size28))
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       OnboardingNumberField(
         title: "重量", unitSuffix: "kg", text: $weightText, onCommit: { _ in },
@@ -140,18 +140,18 @@ struct OneRMEstimatorSheet: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         OnboardingFieldLabel(title: "RPE: \(String(format: "%.1f", rpe))")
         Slider(value: $rpe, in: 6...10, step: 0.5)
-          .tint(Color.MeetPR.brandRed)
+          .tint(Color.MeetPR.gold500)
         Text("RPE = 这组做完有多吃力:10=力竭、9=还能多做 1 次、8=还能多做 2 次。")
-          .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textMuted)
       }
 
       if let estimate {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Text("估算 1RM ≈ \(UnitDisplay.plainString(estimate.estimated)) kg")
-            .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          PrimaryButton("填入估算值", isFullWidth: true) {
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+          GoldCTA("填入估算值", sub: nil, icon: .none) {
             onFill(estimate.estimated)
             dismiss()
           }
@@ -165,12 +165,12 @@ struct OneRMEstimatorSheet: View {
         }
       } else {
         Text("输入重量与次数后显示估算结果")
-          .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textMuted)
       }
       Spacer()
     }
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 }

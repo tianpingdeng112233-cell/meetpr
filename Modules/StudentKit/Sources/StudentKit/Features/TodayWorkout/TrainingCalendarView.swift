@@ -27,26 +27,30 @@ struct TrainingCalendarView: View {
     planRevision: Int = 0
   ) {
     self.studentID = studentID
-    self.calendar = calendar
+    var resolvedCalendar = calendar
+    resolvedCalendar.firstWeekday = 2
+    self.calendar = resolvedCalendar
     self.today = today
     self.planRevision = planRevision
     self._selectedDate = selectedDate
-    self._displayedDate = State(initialValue: selectedDate.wrappedValue)
+    self._displayedDate = State(
+      initialValue: PlanCalendarDayIdentity.deviceDay(
+        containing: selectedDate.wrappedValue,
+        calendar: resolvedCalendar
+      )
+    )
     self._viewModel = State(initialValue: TrainingCalendarViewModel(plans: plans, logs: logs))
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
       toolbar
       content
+      // The legend lives in `TrainingCalendarLegend`, rendered by the screen
+      // so the collapsed state can *remove* it — static text nodes survive
+      // accessibility hiding in runtime snapshots, and the legend is the one
+      // stateless piece that can safely leave the tree.
     }
-    .padding(12)
-    .background(Color.MeetPR.surface1)
-    .overlay {
-      RoundedRectangle(cornerRadius: 14)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
-    }
-    .clipShape(.rect(cornerRadius: 14))
     .task(id: planRevision) {
       await viewModel.load(studentID: studentID)
     }
@@ -59,47 +63,86 @@ struct TrainingCalendarView: View {
   }
 
   private var toolbar: some View {
-    HStack(spacing: 8) {
-      Button(
-        action: { movePeriod(by: -1) },
-        label: {
-          Image(systemName: "chevron.left")
-            .frame(width: 32, height: 32)
-        }
-      )
+    HStack(spacing: MeetPRSpacing.space2) {
+      Button {
+        movePeriod(by: -1)
+      } label: {
+        Text("‹")
+          .frame(
+            width: MeetPRSpacing.minimumHitTarget,
+            height: MeetPRSpacing.minimumHitTarget
+          )
+          .contentShape(.rect)
+      }
       .buttonStyle(.plain)
       .accessibilityLabel(mode == .week ? "上一周" : "上一月")
 
-      Text(TrainingCalendarLayout.periodTitle(for: displayedDate, mode: mode, calendar: calendar))
-        .font(.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .frame(maxWidth: .infinity, alignment: .leading)
+      Text(periodTitle)
 
-      Picker("日历模式", selection: $mode) {
-        Text("周").tag(TrainingCalendarMode.week)
-        Text("月").tag(TrainingCalendarMode.month)
+      Button {
+        movePeriod(by: 1)
+      } label: {
+        Text("›")
+          .frame(
+            width: MeetPRSpacing.minimumHitTarget,
+            height: MeetPRSpacing.minimumHitTarget
+          )
+          .contentShape(.rect)
       }
-      .pickerStyle(.segmented)
-      .frame(width: 112)
-
-      Button(
-        action: { movePeriod(by: 1) },
-        label: {
-          Image(systemName: "chevron.right")
-            .frame(width: 32, height: 32)
-        }
-      )
       .buttonStyle(.plain)
       .accessibilityLabel(mode == .week ? "下一周" : "下一月")
+
+      Spacer()
+
+      HStack(spacing: MeetPRSpacing.zero) {
+        modeButton(.week, title: "周")
+        modeButton(.month, title: "月")
+      }
+      .background {
+        RoundedRectangle(cornerRadius: MeetPRRadius.inset)
+          .fill(Color.MeetPR.surfaceCard)
+          .frame(height: 23)
+      }
     }
-    .foregroundStyle(Color.MeetPR.fgSecondary)
+    .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+    .foregroundStyle(Color.MeetPR.textMuted)
+  }
+
+  private var periodTitle: String {
+    displayedDate.formatted(
+      .dateTime.month(.wide).locale(Locale(identifier: "zh_CN"))
+    )
+  }
+
+  private func modeButton(_ value: TrainingCalendarMode, title: String) -> some View {
+    Button {
+      mode = value
+    } label: {
+      ZStack {
+        if mode == value {
+          RoundedRectangle(cornerRadius: MeetPRSpacing.point6)
+            .fill(value == .week ? Color.MeetPR.ctaFill : Color.MeetPR.borderStrong)
+            .frame(width: 38, height: 17)
+        }
+
+        Text(title)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(mode == value ? Color.white : Color.MeetPR.textMuted)
+      }
+      .frame(
+        width: MeetPRSpacing.minimumHitTarget,
+        height: MeetPRSpacing.minimumHitTarget
+      )
+      .contentShape(.rect)
+    }
+    .buttonStyle(.plain)
   }
 
   @ViewBuilder private var content: some View {
     switch viewModel.state {
     case .idle, .loading:
       ProgressView()
-        .frame(maxWidth: .infinity, minHeight: 80)
+        .frame(maxWidth: .infinity, minHeight: 46)
     case .loaded(let cycleDays, let logs):
       let days = TrainingCalendarLayout.makeDays(
         period: TrainingCalendarPeriod(
@@ -125,9 +168,16 @@ struct TrainingCalendarView: View {
   }
 
   private func weekStrip(_ days: [TrainingCalendarDay]) -> some View {
-    HStack(spacing: 8) {
+    HStack(spacing: MeetPRSpacing.point6) {
       ForEach(days) { day in
-        TrainingCalendarDayButton(day: day, mode: .week) {
+        MeetPRDayChip(
+          weekday: weekdayText(day.date),
+          date: calendar.component(.day, from: day.date),
+          state: v3State(for: day),
+          isSelected: day.isSelected,
+          width: nil,
+          selectedAppearance: .outlined
+        ) {
           select(day.date)
         }
       }
@@ -135,21 +185,47 @@ struct TrainingCalendarView: View {
   }
 
   private func monthGrid(_ days: [TrainingCalendarDay]) -> some View {
-    let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 7)
-    return LazyVGrid(columns: columns, spacing: 8) {
-      ForEach(TrainingCalendarLayout.weekdayLabels(calendar: calendar), id: \.self) { label in
-        Text(label)
-          .font(.caption2)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .frame(maxWidth: .infinity)
-      }
+    let columns = Array(
+      repeating: GridItem(.flexible(), spacing: MeetPRSpacing.point5),
+      count: 7
+    )
+    return VStack(spacing: MeetPRSpacing.point5) {
+      LazyVGrid(columns: columns, spacing: MeetPRSpacing.point5) {
+        ForEach(TrainingCalendarLayout.weekdayLabels(calendar: calendar), id: \.self) { label in
+          Text(label)
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+            .foregroundStyle(Color.MeetPR.textDim)
+            .frame(maxWidth: .infinity)
+        }
 
-      ForEach(days) { day in
-        TrainingCalendarDayButton(day: day, mode: .month) {
-          select(day.date)
+        ForEach(days) { day in
+          if day.isInDisplayedMonth {
+            TrainingMonthDay(
+              day: day,
+              state: v3State(for: day),
+              dayNumber: calendar.component(.day, from: day.date)
+            ) {
+              select(day.date)
+            }
+          } else {
+            Color.clear.frame(height: MeetPRSpacing.size46)
+          }
         }
       }
     }
+  }
+
+  private func v3State(for day: TrainingCalendarDay) -> MeetPRDayChip.DayState {
+    TrainingCalendarV3State.resolve(
+      progress: day.progress,
+      date: day.date,
+      today: today(),
+      calendar: calendar
+    )
+  }
+
+  private func weekdayText(_ date: Date) -> String {
+    TrainingCalendarText.weekday(for: date, calendar: calendar)
   }
 
   private func movePeriod(by value: Int) {
@@ -164,6 +240,36 @@ struct TrainingCalendarView: View {
   private func select(_ date: Date) {
     selectedDate = calendar.startOfDay(for: date)
     displayedDate = selectedDate
+  }
+}
+
+/// The decorative color key under the calendar. The screen owns it (instead
+/// of `TrainingCalendarView`) so the collapsed state can drop it from the
+/// tree entirely — see `TodayWorkoutScreen`.
+struct TrainingCalendarLegend: View {
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.point14) {
+      TrainingCalendarLegendItem(color: Color.MeetPR.success, label: "已完成")
+      TrainingCalendarLegendItem(color: Color.MeetPR.gold500, label: "进行中")
+      TrainingCalendarLegendItem(color: Color.MeetPR.danger, label: "未完成")
+    }
+    .accessibilityHidden(true)
+  }
+}
+
+private struct TrainingCalendarLegendItem: View {
+  let color: Color
+  let label: String
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.point5) {
+      Circle()
+        .fill(color)
+        .frame(width: MeetPRSpacing.point6, height: MeetPRSpacing.point6)
+      Text(label)
+    }
+    .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+    .foregroundStyle(Color.MeetPR.textDim)
   }
 }
 
@@ -218,79 +324,21 @@ private final class TrainingCalendarViewModel {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-private struct TrainingCalendarDayButton: View {
-  let day: TrainingCalendarDay
-  let mode: TrainingCalendarMode
-  let onSelect: () -> Void
-
-  var body: some View {
-    Button(action: onSelect) {
-      VStack(spacing: 5) {
-        if mode == .week {
-          Text(
-            day.date.formatted(
-              .dateTime.weekday(.abbreviated).locale(Locale(identifier: "zh_CN")))
-          )
-          .font(.caption2)
-        }
-        Text(day.date.formatted(.dateTime.day()))
-          .font(.subheadline.monospacedDigit().bold())
-        Circle()
-          .fill(day.progress.state.dotColor)
-          .frame(width: 6, height: 6)
-      }
-      .foregroundStyle(day.isSelected ? Color.MeetPR.brandRed : Color.MeetPR.fgPrimary)
-      .frame(maxWidth: .infinity, minHeight: mode == .week ? 62 : 44)
-      .background(backgroundColor)
-      .opacity(contentOpacity)
-      .overlay {
-        RoundedRectangle(cornerRadius: 10)
-          .strokeBorder(strokeColor, lineWidth: day.isSelected ? 1.5 : 1)
-      }
-      .clipShape(.rect(cornerRadius: 10))
-    }
-    .buttonStyle(.plain)
-    .accessibilityLabel(accessibilityLabel)
-  }
-
-  private var backgroundColor: Color {
-    if day.isSelected { return Color.MeetPR.brandRedSoft }
-    return day.isToday ? Color.MeetPR.surface3 : Color.MeetPR.surface2
-  }
-
-  private var strokeColor: Color {
-    if day.isSelected { return Color.MeetPR.brandRed }
-    return day.isToday ? Color.MeetPR.green : Color.MeetPR.border
-  }
-
-  private var contentOpacity: Double {
-    if day.isSelected { return 1 }
-    if mode == .month && !day.isInDisplayedMonth { return 0.32 }
-    return day.progress.state == .noPlan ? 0.5 : 1
-  }
-
-  private var accessibilityLabel: String {
-    let date = day.date.formatted(.dateTime.month().day().locale(Locale(identifier: "zh_CN")))
-    return day.progress.state == .noPlan ? "\(date)，无计划" : "\(date)，训练日"
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
 private struct CalendarLoadError: View {
   let message: String
   let retry: () -> Void
 
   var body: some View {
-    HStack(spacing: 8) {
+    HStack(spacing: MeetPRSpacing.space2) {
       Image(systemName: "exclamationmark.triangle")
       Text(message)
         .lineLimit(1)
       Spacer()
       Button("重试", action: retry)
-        .font(.caption)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
     }
-    .font(.footnote)
-    .foregroundStyle(Color.MeetPR.fgSecondary)
-    .padding(.vertical, 10)
+    .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+    .foregroundStyle(Color.MeetPR.textSecondary)
+    .padding(.vertical, MeetPRSpacing.point10)
   }
 }

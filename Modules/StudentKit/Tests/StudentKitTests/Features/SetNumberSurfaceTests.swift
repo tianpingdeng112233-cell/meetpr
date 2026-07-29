@@ -1,4 +1,5 @@
 import CoreModels
+import DesignSystem
 import Foundation
 import SwiftUI
 import Testing
@@ -31,19 +32,19 @@ struct SetNumberSurfaceTests {
     #expect(try inspected.find(text: "深蹲 · 第1组").string() == "深蹲 · 第1组")
   }
 
-  @Test("exercise execution row renders source index zero as set one")
-  func exerciseExecutionRowRendersSourceIndexZeroAsSetOne() throws {
+  @Test("v3 set row renders source index zero as set one")
+  func v3SetRowRendersSourceIndexZeroAsSetOne() throws {
     let fixture = makeSurfaceFixture()
-    let inspected = try ExerciseExecutionView(
-      exercise: fixture.exercise,
-      rows: [fixture.draft],
-      reference: nil,
-      rowIndex: { _ in 0 },
-      onTapSet: { _ in }
+    let inspected = try SetRow(
+      index: SetDisplayNumber.number(for: fixture.draft),
+      weight: 100,
+      reps: 5,
+      rpe: 8,
+      status: .pending,
+      videoState: .none
     ).inspect()
 
-    let row = try inspected.find(SetRecordRow.self)
-    #expect(try row.find(text: "1").string() == "1")
+    #expect(try inspected.find(text: "1").string() == "1")
   }
 
   @Test("today workout table offset path renders source index zero as set one")
@@ -66,7 +67,7 @@ struct SetNumberSurfaceTests {
       viewWithAccessibilityIdentifier: "todayWorkout.activeSet.position"
     )
 
-    #expect(try position.text().string().hasPrefix("1/"))
+    #expect(try position.text().string().contains("第 1 /"))
   }
 
   @Test("set entry sheet renders a source-zero draft as set one")
@@ -84,6 +85,26 @@ struct SetNumberSurfaceTests {
     ).inspect()
 
     #expect(try inspected.find(text: "深蹲 · 第 1 组").string() == "深蹲 · 第 1 组")
+  }
+
+  @Test("dashboard feedback label renders source index zero as set one")
+  func dashboardFeedbackLabelRendersSourceIndexZeroAsSetOne() {
+    let video = CoachFeedbackVideo(
+      id: UUID(),
+      exerciseName: "深蹲",
+      setIndex: 0
+    )
+    let feedback = CoachFeedback(
+      id: UUID(),
+      coachID: UUID(),
+      studentID: UUID(),
+      videoID: video.id,
+      video: video,
+      text: "保持节奏",
+      postedAt: Date(timeIntervalSince1970: 1_777_248_000)
+    )
+
+    #expect(DashboardFeedbackText.label(for: feedback) == "深蹲 · 第 1 组")
   }
 
   @Test("day detail renders source index zero as set one")
@@ -184,7 +205,8 @@ private func makeTodayWorkoutFixture() async throws -> (
       date: day.date,
       plans: repository,
       logs: logs,
-      preloadedViewModel: viewModel
+      preloadedViewModel: viewModel,
+      started: true
     ),
     firstSetID
   )

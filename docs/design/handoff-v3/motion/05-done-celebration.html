@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05 · 结算庆祝（bloom + 盖章 + 火花 + 数字滚动）</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=IBM+Plex+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../motion.css">
+<style>
+body{margin:0;background:var(--bg-deep);color:var(--text-primary);font-family:'IBM Plex Sans','Noto Sans SC',sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px}
+.note{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;color:var(--text-muted);max-width:390px;line-height:1.7}
+</style>
+</head>
+<body>
+<button onclick="document.body.classList.toggle('theme-light')" style="position:fixed;top:12px;right:12px;z-index:99;border:1px solid var(--border-strong);background:var(--surface-card);color:var(--text-secondary);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Mono','Noto Sans SC',monospace;box-shadow:var(--card-shadow)">暗色 / 亮色</button>
+<div class="note">结算页，DOM 与样式逐字取自样机（含奖牌 SVG、教练徽章、W1D4 / 7组 双栏、火苗连胜胶囊、金 CTA）。时序（全部 JS tween）：光焰 bloom 750ms scale .2→8.7、20% 处到峰值后衰减；奖牌盖章 520ms 分段 scale 1.5→.9→1.05→1；18 颗火花按 --tx/--ty 各 800ms 散射（i%6×18ms 错峰）；data-slide 从 340ms 起、130ms 步长、460ms translateY(26→0)；组数 ticker 延迟 470ms、900ms quart（1-(1-p)^4）从 0 滚到终值；data-fade 元素按各自延迟淡入。</div>
+<button id="replay" style="width:390px;border:1px solid var(--border-strong);background:transparent;color:var(--text-secondary);border-radius:999px;padding:11px;font-size:13px;cursor:pointer">重播</button>
+<div id="stage" style="position:relative;width:390px;height:720px;background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 28px;overflow:hidden;box-sizing:border-box">
+  <div style="position:absolute;left:-20%;right:-20%;bottom:-10%;height:70%;background:radial-gradient(ellipse at 50% 100%,rgba(var(--gold-rgb),.2),rgba(var(--gold-rgb),.06) 48%,transparent 72%);pointer-events:none"></div>
+  <div data-bloom style="position:absolute;left:50%;top:40%;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,220,140,.55),rgba(var(--gold-rgb),.16) 55%,transparent 74%);transform:translate(-50%,-50%) scale(.2);opacity:0;pointer-events:none"></div>
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;width:110px;height:110px">
+    <span id="sparks"></span>
+    <div data-stamp style="position:relative;width:96px;height:104px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 26px rgba(var(--gold-rgb),.45))">
+      <svg width="96" height="104" viewBox="0 0 96 104"><defs><linearGradient id="dnMedal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gold-200)"></stop><stop offset="55%" stop-color="var(--gold-500)"></stop><stop offset="100%" stop-color="#C98A18"></stop></linearGradient><linearGradient id="dnRibL" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D89226"></stop><stop offset="100%" stop-color="#9A6413"></stop></linearGradient><linearGradient id="dnRibR" x1="1" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#B8791A"></stop><stop offset="100%" stop-color="#7A4E0E"></stop></linearGradient></defs><path d="M27 0h17l9 39-15 9L27 0z" fill="url(#dnRibL)"></path><path d="M69 0H52l-9 39 15 9L69 0z" fill="url(#dnRibR)"></path><circle cx="48" cy="72" r="29" fill="url(#dnMedal)"></circle><circle cx="48" cy="72" r="22" fill="#17120A" opacity=".92"></circle><circle cx="48" cy="72" r="22" fill="none" stroke="rgba(255,226,142,.35)" stroke-width="1"></circle><path d="M37.5 73l8 7.5L59.5 62" fill="none" stroke="var(--gold-400)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </div>
+  </div>
+  <div data-fade="140" style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:26px;color:var(--text-primary);margin-top:22px">今日训练完成</div>
+  <div data-fade="240" style="display:flex;align-items:center;gap:8px;margin-top:12px"><span style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--text-ghost),var(--surface-key));border:1px solid rgba(var(--gold-rgb),.4);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--gold-text)">教</span><span style="font-size:12px;color:var(--text-secondary)">教练已收到你的训练日志</span></div>
+  <div style="display:flex;align-items:stretch;gap:0;margin-top:30px;width:100%;max-width:300px">
+    <div data-slide style="flex:1;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:34px;line-height:1;color:var(--gold-text)">W1D4</div><div style="font-size:11px;color:var(--text-muted);margin-top:6px;font-family:'IBM Plex Mono','Noto Sans SC',monospace">本周第 4 练</div></div>
+    <div style="width:1px;background:var(--surface-raised)"></div>
+    <div data-slide style="flex:1;text-align:center"><div style="font-family:'Archivo',sans-serif;font-weight:800;font-size:34px;line-height:1;color:var(--gold-text)"><span data-ticker>7</span><span style="font-size:15px;color:#B8935A">/7 组</span></div><div style="font-size:11px;color:var(--text-muted);margin-top:6px;font-family:'IBM Plex Mono','Noto Sans SC',monospace">全部完成</div></div>
+  </div>
+  <div data-slide style="margin-top:18px;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;color:var(--text-muted)">23 次 · 主项 RPE 8.5 · 符合计划</div>
+  <div data-slide style="margin-top:13px;display:flex;align-items:center;gap:6px;background:rgba(var(--gold-rgb),.1);border:1px solid rgba(var(--gold-rgb),.3);border-radius:999px;padding:6px 14px"><svg width="12" height="14" viewBox="0 0 24 28" fill="var(--gold-500)"><path d="M12 0s2 5 2 8c0 2-1 3-1 3s3-1 4-4c2 3 4 6.5 4 11a9 9 0 01-18 0c0-6 5-10 9-18z"></path></svg><span style="font-size:12px;font-weight:700;color:var(--gold-text)">连续第 12 次训练</span></div>
+  <div data-fade="820" style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:34px">
+    <div class="pb" style="position:relative;overflow:hidden;background:var(--cta-bg);color:var(--cta-text);font-weight:800;font-size:16px;border-radius:999px;padding:15px 52px;cursor:pointer;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)"><span class="shimmer"></span><span style="position:relative">查看详细报告</span></div>
+    <div class="pb" style="font-size:13px;color:var(--text-muted);cursor:pointer;padding:4px 10px">完成</div>
+  </div>
+</div>
+<script>
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function tween(dur,step,done){const t0=performance.now();const run=()=>{const p=Math.min(1,(performance.now()-t0)/dur);step(p);if(p<1)requestAnimationFrame(run);else if(done)done();};requestAnimationFrame(run);}
+// 火花参数生成 —— 逐字对应样机 sparks
+function makeSparks(){
+  const host=document.getElementById('sparks'); host.innerHTML='';
+  Array.from({length:18},(_,i)=>{
+    const a=(i/18)*6.283+(i%3)*0.35, r=66+(i%4)*24;
+    const tx=(Math.cos(a)*r).toFixed(0), ty=(Math.sin(a)*r).toFixed(0);
+    const sz=3+(i%3), dl=(i%6)*18, c=i%3===0?'#FFE9A8':'var(--gold-500)';
+    const sp=document.createElement('span');
+    sp.setAttribute('data-spark',dl);
+    sp.style.cssText=`position:absolute;left:50%;top:50%;width:${sz}px;height:${sz}px;border-radius:50%;background:${c};--tx:${tx}px;--ty:${ty}px;transform:translate(-50%,-50%);box-shadow:0 0 7px rgba(var(--gold-rgb),.85)`;
+    host.appendChild(sp);
+  });
+}
+// 逐字对应样机 doneRef
+function play(){
+  makeSparks();
+  const el=document.getElementById('stage');
+  if(reduced) return;
+  const bloom=el.querySelector('[data-bloom]');
+  if(bloom) tween(750,(p)=>{const e=1-Math.pow(1-p,3);bloom.style.transform=`translate(-50%,-50%) scale(${(0.2+e*8.5).toFixed(2)})`;bloom.style.opacity=String(p<0.2?p*4.5:Math.max(0,0.9*(1-(p-0.2)/0.8)));},()=>{bloom.style.opacity='0';});
+  el.querySelectorAll('[data-slide]').forEach((sl,i)=>{sl.style.opacity='0';setTimeout(()=>{tween(460,(p)=>{const e=1-Math.pow(1-p,3);sl.style.opacity=String(e);sl.style.transform=`translateY(${(26*(1-e)).toFixed(1)}px)`;},()=>{sl.style.opacity='';sl.style.transform='';});},340+i*130);});
+  const tick=el.querySelector('[data-ticker]');
+  if(tick){const final=parseInt((tick.getAttribute('data-final')||tick.textContent||'0').replace(/[^\d]/g,''),10)||0;tick.setAttribute('data-final',String(final));tick.textContent='0';setTimeout(()=>{tween(900,(p)=>{const e=1-Math.pow(1-p,4);tick.textContent=String(Math.round(final*e));},()=>{tick.textContent=String(final);});},470);}
+  const stamp=el.querySelector('[data-stamp]');
+  if(stamp){stamp.style.opacity='0';tween(520,(p)=>{const s2=p<.55?1.5-0.6*(p/.55):(p<.78?0.9+0.15*((p-.55)/.23):1.05-0.05*((p-.78)/.22));stamp.style.transform=`scale(${s2.toFixed(3)})`;stamp.style.opacity=String(Math.min(1,p/.4));},()=>{stamp.style.transform='';stamp.style.opacity='';});}
+  el.querySelectorAll('[data-fade]').forEach(f=>{const d=parseInt(f.getAttribute('data-fade'),10)||0;f.style.opacity='0';setTimeout(()=>{tween(450,(p)=>{f.style.opacity=String(p);},()=>{f.style.opacity='';});},d);});
+  el.querySelectorAll('[data-spark]').forEach(sp=>{
+    const cs=getComputedStyle(sp);const tx=parseFloat(cs.getPropertyValue('--tx'))||0,ty=parseFloat(cs.getPropertyValue('--ty'))||0;
+    const d=parseInt(sp.getAttribute('data-spark'),10)||0;sp.style.opacity='0';
+    setTimeout(()=>{tween(800,(p)=>{const e=1-Math.pow(1-p,3);sp.style.transform=`translate(calc(-50% + ${(tx*e).toFixed(1)}px), calc(-50% + ${(ty*e).toFixed(1)}px)) scale(${(1-0.8*e).toFixed(2)})`;sp.style.opacity=String(p<.7?1:Math.max(0,1-(p-.7)/.3));},()=>{sp.style.opacity='0';});},d);
+  });
+}
+document.getElementById('replay').onclick=play;
+play();
+</script>
+</body>
+</html>

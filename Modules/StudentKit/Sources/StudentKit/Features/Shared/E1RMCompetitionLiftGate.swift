@@ -77,12 +77,13 @@ public struct E1RMCompetitionLiftGate<Content: View>: View {
       case .failed:
         VStack(spacing: MeetPRSpacing.md) {
           Text("实力记录校准失败")
-            .font(Font.MeetPR.headline)
+            .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
+            .foregroundStyle(Color.MeetPR.textPrimary)
           Text("请重试，校准完成前不会使用旧的 e1RM 或 PR 基线。")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+            .foregroundStyle(Color.MeetPR.dangerMuted)
             .multilineTextAlignment(.center)
-          PrimaryButton("重试") {
+          GoldCTA("重试", sub: nil, icon: .none, isFullWidth: false) {
             Task { await viewModel.migrate(studentID: studentID) }
           }
         }
@@ -92,6 +93,7 @@ public struct E1RMCompetitionLiftGate<Content: View>: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color.MeetPR.bgBase)
     .task {
       await viewModel.migrate(studentID: studentID)
     }

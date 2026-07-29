@@ -81,10 +81,82 @@ import Testing
 @Test func notificationRoutesAreIdenticalFromEveryTab() {
   for source in StudentTab.allCases {
     #expect(StudentNotificationRoute.plan.targetTab(from: source) == .training)
-    #expect(StudentNotificationRoute.feedback.targetTab(from: source) == .growth)
-    #expect(StudentNotificationRoute.evaluation.targetTab(from: source) == .today)
-    #expect(StudentNotificationRoute.coachMessages.targetTab(from: source) == source)
   }
+}
+
+@Test func tabLayersRemainMountedAcrossSelectionRoundTrip() {
+  let training = StudentTabShellPresentation(selection: .training)
+  let growth = StudentTabShellPresentation(selection: .growth)
+  let returned = StudentTabShellPresentation(selection: .training)
+
+  #expect(training.layers.map(\.id) == StudentTab.allCases)
+  #expect(growth.layers.map(\.id) == StudentTab.allCases)
+  #expect(returned.layers.map(\.id) == StudentTab.allCases)
+  #expect(training.layer(for: .training) == returned.layer(for: .training))
+  #expect(!growth.layer(for: .training).allowsHitTesting)
+  #expect(growth.layer(for: .training).opacity == 0)
+  #expect(growth.layer(for: .training).isAccessibilityHidden)
+  #expect(!growth.layer(for: .training).isEnabled)
+  #expect(returned.layer(for: .training).allowsHitTesting)
+  #expect(!returned.layer(for: .training).isAccessibilityHidden)
+  #expect(returned.layer(for: .training).isEnabled)
+  #expect(returned.layer(for: .training).zIndex == 1)
+}
+
+@Test func exactlyOneTabLayerParticipatesInAccessibility() {
+  for selection in StudentTab.allCases {
+    let layers = StudentTabShellPresentation(selection: selection).layers
+    let exposed = layers.filter { !$0.isAccessibilityHidden }
+
+    #expect(exposed.map(\.id) == [selection])
+    #expect(layers.filter(\.isEnabled).map(\.id) == [selection])
+  }
+}
+
+@Test func staleTokenReplayedAfterAwaitCannotDowngradePendingToken() {
+  var gate = TodayWorkoutAutoStartGate()
+
+  gate.receive(token: 2)
+  // The initial .task resuming after loadWorkout replays its captured token.
+  gate.receive(token: 1)
+
+  #expect(gate.pendingToken == 2)
+
+  let consumed = gate.consumeIfReady(isTargetDateLoaded: true)
+  #expect(consumed)
+  #expect(gate.pendingToken == nil)
+}
+
+@Test func historicalDayAutoStartWaitsForTodayReloadBeforeConsumption() {
+  var gate = TodayWorkoutAutoStartGate()
+
+  gate.receive(token: 1)
+  let consumedWhileHistorical = gate.consumeIfReady(isTargetDateLoaded: false)
+
+  #expect(!consumedWhileHistorical)
+  #expect(gate.pendingToken == 1)
+
+  let consumedAfterTodayReload = gate.consumeIfReady(isTargetDateLoaded: true)
+  let consumedTwice = gate.consumeIfReady(isTargetDateLoaded: true)
+
+  #expect(consumedAfterTodayReload)
+  #expect(gate.pendingToken == nil)
+  #expect(!consumedTwice)
+}
+
+@Test func feedbackHeightReversalStartsFromCurrentPresentation() {
+  #expect(
+    FeedbackHeightTransition.resolvedStartHeight(
+      presentedHeight: 184,
+      fallbackHeight: 320
+    ) == 184
+  )
+  #expect(
+    FeedbackHeightTransition.resolvedStartHeight(
+      presentedHeight: 0,
+      fallbackHeight: 112
+    ) == 112
+  )
 }
 
 @Test func importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() {

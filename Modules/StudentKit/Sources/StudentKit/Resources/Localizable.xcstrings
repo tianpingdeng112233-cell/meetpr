@@ -110,6 +110,72 @@
           }
         }
       }
+    },
+    "student.filter.searchPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索动作"
+          }
+        }
+      }
+    },
+    "student.filter.clearSearch": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空搜索"
+          }
+        }
+      }
+    },
+    "student.filter.allExercises": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全部动作"
+          }
+        }
+      }
+    },
+    "student.filter.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按动作筛选"
+          }
+        }
+      }
+    },
+    "student.filter.noMatch %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有匹配「%@」的动作"
+          }
+        }
+      }
+    },
+    "student.filter.accessibilityLabel %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按动作筛选，当前%@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

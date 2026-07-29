@@ -21,13 +21,13 @@ struct DashboardSection<Content: View>: View {
     VStack(alignment: .leading, spacing: 12) {
       HStack {
         Text(title)
-          .font(.title3.bold())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
+          .foregroundStyle(Color.MeetPR.textPrimary)
         if let action {
           Spacer()
           Button(action.label, action: action.handler)
-            .font(.subheadline)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.goldText)
         }
       }
       content
@@ -41,10 +41,10 @@ struct DashboardCard: ViewModifier {
     content
       .padding(14)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceCard)
       .overlay {
         RoundedRectangle(cornerRadius: 12)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
       }
       .clipShape(.rect(cornerRadius: 12))
   }

@@ -33,6 +33,20 @@ public final class FeedbackInboxViewModel {
     items.filter { $0.readAt == nil }.count
   }
 
+  public var hasFinishedLoading: Bool {
+    if case .loaded = state {
+      return true
+    }
+    return false
+  }
+
+  public var isLoadedEmpty: Bool {
+    if case .loaded(let items) = state {
+      return items.isEmpty
+    }
+    return false
+  }
+
   public func load(studentID: UUID) async {
     currentStudentID = studentID
     state = .loading

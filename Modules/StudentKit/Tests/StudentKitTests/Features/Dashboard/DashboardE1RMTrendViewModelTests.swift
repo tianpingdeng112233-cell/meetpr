@@ -249,6 +249,8 @@ import Testing
   let presentation = try #require(viewModel.presentation)
   #expect(presentation.rows.count == 3)
   #expect(!presentation.hasHistory)
+  #expect(presentation.rows.allSatisfy { $0.trendState == .zero })
+  #expect(presentation.rows.allSatisfy { $0.eligibleRecordCount == 0 })
   #expect(presentation.headline == nil)
 }
 

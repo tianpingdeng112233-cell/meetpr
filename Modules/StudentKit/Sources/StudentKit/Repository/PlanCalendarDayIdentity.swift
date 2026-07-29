@@ -43,6 +43,24 @@ enum PlanCalendarDayIdentity {
     return calendar.dateComponents([.day], from: planDay, to: selectedDay).day
   }
 
+  static func isSameUTCDate(_ lhs: Date, _ rhs: Date) -> Bool {
+    utcCalendar.isDate(lhs, inSameDayAs: rhs)
+  }
+
+  static func deviceDay(containing date: Date, calendar: Calendar) -> Date {
+    calendar.startOfDay(for: date)
+  }
+
+  static func planDate(
+    matching selectedDate: Date,
+    selectedCalendar: Calendar
+  ) -> Date? {
+    guard let selectedComponents = components(of: selectedDate, in: selectedCalendar) else {
+      return nil
+    }
+    return utcCalendar.date(from: selectedComponents.dateComponents)
+  }
+
   private static func components(of date: Date, in calendar: Calendar) -> Components? {
     let components = calendar.dateComponents([.year, .month, .day], from: date)
     guard
@@ -55,9 +73,13 @@ enum PlanCalendarDayIdentity {
     return Components(year: year, month: month, day: day)
   }
 
-  private static var utcCalendar: Calendar {
+  static var utcCalendar: Calendar {
     var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
+    calendar.timeZone = utcTimeZone
     return calendar
+  }
+
+  static var utcTimeZone: TimeZone {
+    TimeZone(secondsFromGMT: 0) ?? TimeZone.current
   }
 }

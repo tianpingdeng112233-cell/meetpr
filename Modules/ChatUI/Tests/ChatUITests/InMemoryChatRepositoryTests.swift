@@ -54,6 +54,43 @@ import Testing
   #expect(conversation.lastMessageAt == sent.createdAt)
 }
 
+@Test func inMemorySendSetRefPreservesStructuredCardPayload() async throws {
+  let fixture = chatFixture()
+  let repository = InMemoryChatRepository(currentUserID: fixture.currentUserID, seed: fixture.seed)
+  let videoID = testUUID(20)
+  let setRef = try SetRefV1(
+    exerciseName: "硬拉",
+    setNumber: 1,
+    weightKg: "175",
+    reps: 3,
+    rpe: "8.5",
+    dayDate: "2026-07-29",
+    setLogId: testUUID(21)
+  )
+  let body = SetRefCanonicalFormatter.body(for: setRef, note: nil)
+
+  let sent = try await repository.sendSetRef(
+    in: fixture.conversationID,
+    body: body,
+    setRef: setRef,
+    videoID: videoID,
+    clientID: "cli-set-ref"
+  )
+  let duplicate = try await repository.sendSetRef(
+    in: fixture.conversationID,
+    body: "不同内容也应命中幂等",
+    setRef: setRef,
+    videoID: nil,
+    clientID: "cli-set-ref"
+  )
+
+  #expect(sent.id == duplicate.id)
+  #expect(sent.text == body)
+  #expect(sent.setRef == setRef)
+  #expect(sent.attachmentID == videoID)
+  #expect(ChatSetCardPresentation(message: sent) != nil)
+}
+
 @Test func inMemoryMarkReadIsMonotonic() async throws {
   let fixture = chatFixture()
   let repository = InMemoryChatRepository(currentUserID: fixture.currentUserID, seed: fixture.seed)

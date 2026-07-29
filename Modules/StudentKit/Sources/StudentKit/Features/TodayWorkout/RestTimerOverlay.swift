@@ -29,7 +29,7 @@ struct RestTimerOverlay: View {
       .padding(.horizontal, MeetPRSpacing.md)
       .padding(.vertical, MeetPRSpacing.sm)
       .frame(maxWidth: .infinity)
-      .background(Color.MeetPR.surface1)
+      .background(Color.MeetPR.surfaceElevated)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       .shadow(color: .black.opacity(0.3), radius: 10, y: 4)
       .padding(.horizontal, MeetPRSpacing.md)
@@ -56,26 +56,26 @@ struct RestTimerOverlay: View {
     VStack(spacing: MeetPRSpacing.xs) {
       HStack(spacing: MeetPRSpacing.md) {
         Image(systemName: "timer")
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
         Text(Self.minutesSeconds(remaining))
-          .font(Font.MeetPR.title2.monospacedDigit())
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(Font.MeetPR.mono(size: MeetPRFontMetrics.size22, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .contentTransition(.numericText())
         Spacer()
         Button("-30s") { onAdjust(-30) }
           .buttonStyle(.bordered)
-          .tint(Color.MeetPR.fgSecondary)
+          .tint(Color.MeetPR.textSecondary)
         Button("跳过") { onSkip() }
           .buttonStyle(.bordered)
-          .tint(Color.MeetPR.brandRed)
+          .tint(Color.MeetPR.goldText)
         Button("+30s") { onAdjust(30) }
           .buttonStyle(.bordered)
-          .tint(Color.MeetPR.fgSecondary)
+          .tint(Color.MeetPR.textSecondary)
       }
       ProgressView(
         value: max(0, min(1, remaining / Double(timer.totalSeconds)))
       )
-      .tint(Color.MeetPR.brandRed)
+      .tint(Color.MeetPR.gold500)
     }
     .accessibilityElement(children: .contain)
     .accessibilityLabel("组间休息，剩余 \(Self.minutesSeconds(remaining))")
@@ -84,8 +84,8 @@ struct RestTimerOverlay: View {
   private var finished: some View {
     HStack {
       Text("休息结束 💪")
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.green)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.success)
       Spacer()
     }
   }

@@ -28,19 +28,24 @@ public struct MeetPRTextField: View {
   }
 
   public var body: some View {
-    VStack(alignment: .leading, spacing: 6) {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point6) {
       Text(label.uppercased())
-        .font(.system(size: MeetPRFontMetrics.captionSize, weight: .medium, design: .monospaced))
-        .tracking(0.66)
-        .foregroundStyle(errorMessage == nil ? Color.MeetPR.fgTertiary : Color.MeetPR.brandRed)
+        .font(.MeetPR.mono(size: 11, weight: .semibold))
+        .tracking(0.7)
+        .foregroundStyle(errorMessage == nil ? Color.MeetPR.textMuted : Color.MeetPR.danger)
 
       TextField(placeholder, text: $text)
-        .font(isMonospaced ? Font.MeetPR.monoLabel : Font.MeetPR.body)
-        .tracking(isMonospaced ? 6.8 : 0)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(
+          isMonospaced
+            ? Font.MeetPR.mono(size: MeetPRFontMetrics.bodySize, weight: .medium)
+            : Font.MeetPR.body(size: MeetPRFontMetrics.bodySize)
+        )
+        .tracking(isMonospaced ? 0.8 : 0)
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .tint(Color.MeetPR.gold500)
         .padding(MeetPRSpacing.md)
         .frame(minHeight: 44)
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.bgInset)
         .overlay {
           RoundedRectangle(cornerRadius: MeetPRRadius.md)
             .stroke(borderColor, lineWidth: 1)
@@ -53,18 +58,18 @@ public struct MeetPRTextField: View {
       if let message = errorMessage ?? helperText {
         Text(message)
           .font(Font.MeetPR.footnote)
-          .foregroundStyle(errorMessage == nil ? Color.MeetPR.fgSecondary : Color.MeetPR.brandRed)
+          .foregroundStyle(errorMessage == nil ? Color.MeetPR.textTertiary : Color.MeetPR.danger)
       }
     }
   }
 
   private var borderColor: Color {
     if errorMessage != nil {
-      Color.MeetPR.brandRed
+      Color.MeetPR.danger
     } else if isFocused {
-      Color.MeetPR.fgPrimary
+      Color.MeetPR.gold500
     } else {
-      Color.MeetPR.border
+      Color.MeetPR.borderDefault
     }
   }
 }
@@ -85,7 +90,7 @@ public struct MeetPRTextField: View {
     )
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
@@ -94,6 +99,6 @@ public struct MeetPRTextField: View {
 
   MeetPRTextField("Phone", text: $phone)
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

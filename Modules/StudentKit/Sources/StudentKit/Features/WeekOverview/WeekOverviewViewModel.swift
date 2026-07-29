@@ -16,6 +16,7 @@ public final class WeekOverviewViewModel {
   public private(set) var state: State = .idle
   public private(set) var planStartDate: Date?
   public private(set) var plan: StudentPlanView?
+  public private(set) var cycleDays: [StudentPlanDay] = []
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -27,6 +28,7 @@ public final class WeekOverviewViewModel {
 
   public func load(studentID: UUID) async {
     state = .loading
+    cycleDays = []
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       self.plan = plan
@@ -35,6 +37,7 @@ public final class WeekOverviewViewModel {
       // fetchCycleDays now returns the whole cycle; the dashboard strip only
       // wants this week, so filter to the current plan-week window by date.
       let allDays = try await plans.fetchCycleDays(studentID: studentID)
+      cycleDays = allDays
       let days = Self.currentWeekDays(
         from: allDays, startDate: plan?.startDate, weekIndex: weekIndex)
       let fetchedLogs: [StudentSetLog]

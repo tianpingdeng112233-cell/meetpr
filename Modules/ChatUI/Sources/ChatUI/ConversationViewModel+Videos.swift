@@ -20,7 +20,7 @@ extension ConversationViewModel {
     }
   }
 
-  func videoPlaybackURL(
+  public func videoPlaybackURL(
     messageID: UUID,
     forceRenewal: Bool = false
   ) async throws -> URL {

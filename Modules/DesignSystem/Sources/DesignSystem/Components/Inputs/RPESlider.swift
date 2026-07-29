@@ -9,49 +9,34 @@ public struct RPESlider: View {
   }
 
   public var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-      Text("RPE")
-        .font(Font.MeetPR.monoLabel)
-        .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.brandRed)
+    VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+      HStack(alignment: .firstTextBaseline) {
+        Text("RPE")
+          .font(.MeetPR.mono(size: 11, weight: .bold))
+          .tracking(0.8)
+          .foregroundStyle(Color.MeetPR.textMuted)
 
-      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
+        Spacer()
+
         Text(formattedValue)
-          .font(Font.MeetPR.displayNumeral)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: 34, weight: .black))
+          .foregroundStyle(Color.MeetPR.gold500)
           .monospacedDigit()
 
         Text("/ 10")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .font(.MeetPR.mono(size: 11, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textMuted)
       }
 
       GeometryReader { proxy in
         let width = proxy.size.width
-        let fillWidth = width * progress
-        let thumbX = max(12, min(width - 12, fillWidth))
-
-        VStack(spacing: MeetPRSpacing.xs) {
-          ZStack(alignment: .leading) {
-            Capsule()
-              .fill(Color.MeetPR.border)
-              .frame(height: 4)
-
-            Capsule()
-              .fill(Color.MeetPR.fgPrimary)
-              .frame(width: fillWidth, height: 4)
-
-            Circle()
-              .stroke(Color.MeetPR.fgPrimary.opacity(0.08), lineWidth: 8)
-              .frame(width: 32, height: 32)
-              .position(x: thumbX, y: 12)
-
-            Circle()
-              .fill(Color.MeetPR.fgPrimary)
-              .frame(width: 24, height: 24)
-              .position(x: thumbX, y: 12)
+        VStack(spacing: MeetPRSpacing.sm) {
+          HStack(alignment: .bottom, spacing: MeetPRSpacing.xs) {
+            ForEach(0..<11, id: \.self) { index in
+              RPEBar(index: index, selectedIndex: selectedIndex)
+            }
           }
-          .frame(height: 24)
+          .frame(height: 44, alignment: .bottom)
           .contentShape(.rect)
           .gesture(
             DragGesture(minimumDistance: 0)
@@ -61,25 +46,23 @@ public struct RPESlider: View {
           )
 
           HStack {
-            ForEach(["5.0", "6.0", "7.0", "8.0", "9.0", "10.0"], id: \.self) { tick in
-              Text(tick)
-                .font(Font.MeetPR.caption)
-                .monospacedDigit()
-                .foregroundStyle(Color.MeetPR.fgTertiary)
-              if tick != "10.0" {
-                Spacer(minLength: 0)
-              }
-            }
+            Text("5")
+            Spacer()
+            Text("7.5")
+            Spacer()
+            Text("10")
           }
+          .font(.MeetPR.mono(size: 10, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textMuted)
         }
       }
-      .frame(height: 48)
+      .frame(height: 68)
     }
-    .padding(20)
-    .background(Color.MeetPR.surface1)
+    .padding(MeetPRSpacing.base)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-        .stroke(Color.MeetPR.border, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .sensoryFeedback(.selection, trigger: steppedValue)
@@ -107,6 +90,10 @@ public struct RPESlider: View {
     (steppedValue - 5) / 5
   }
 
+  private var selectedIndex: Int {
+    Int((progress * 10).rounded())
+  }
+
   private var formattedValue: String {
     steppedValue.formatted(.number.precision(.fractionLength(1)))
   }
@@ -118,12 +105,30 @@ public struct RPESlider: View {
   }
 }
 
+@MainActor
+private struct RPEBar: View {
+  let index: Int
+  let selectedIndex: Int
+
+  var body: some View {
+    Capsule()
+      .fill(index <= selectedIndex ? Color.MeetPR.gold500 : Color.MeetPR.borderDefault)
+      .frame(maxWidth: .infinity)
+      .frame(height: 18 + CGFloat(index) * 2.4)
+      .shadow(
+        color: index == selectedIndex ? Color.MeetPR.gold500.opacity(0.5) : .clear,
+        radius: 8
+      )
+      .animation(MeetPRMotion.pillSelect, value: selectedIndex)
+  }
+}
+
 #Preview("RPESlider") {
   @Previewable @State var rpe = 8.5
 
   RPESlider(value: $rpe)
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.dark)
 }
 
@@ -132,6 +137,6 @@ public struct RPESlider: View {
 
   RPESlider(value: $rpe)
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

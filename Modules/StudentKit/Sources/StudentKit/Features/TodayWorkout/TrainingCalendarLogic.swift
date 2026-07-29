@@ -63,7 +63,13 @@ enum TrainingCalendarLayout {
       ? weekDates(containing: period.displayedDate, calendar: calendar)
       : monthDates(containing: period.displayedDate, calendar: calendar)
     return dates.map { date in
-      let planDay = cycleDays.first { calendar.isDate($0.date, inSameDayAs: date) }
+      let planDay = cycleDays.first {
+        PlanCalendarDayIdentity.matches(
+          planDate: $0.date,
+          selectedDate: date,
+          selectedCalendar: calendar
+        )
+      }
       return TrainingCalendarDay(
         date: date,
         planDay: planDay,
@@ -80,23 +86,6 @@ enum TrainingCalendarLayout {
     let symbols = ["日", "一", "二", "三", "四", "五", "六"]
     let start = max(0, min(symbols.count - 1, calendar.firstWeekday - 1))
     return Array(symbols[start...]) + Array(symbols[..<start])
-  }
-
-  static func periodTitle(for date: Date, mode: TrainingCalendarMode, calendar: Calendar) -> String
-  {
-    if mode == .month {
-      return date.formatted(.dateTime.year().month(.wide).locale(Locale(identifier: "zh_CN")))
-    }
-    let dates = weekDates(containing: date, calendar: calendar)
-    guard let first = dates.first, let last = dates.last else {
-      return date.formatted(.dateTime.month(.wide).locale(Locale(identifier: "zh_CN")))
-    }
-    let firstMonth = first.formatted(.dateTime.month(.wide).locale(Locale(identifier: "zh_CN")))
-    let lastMonth = last.formatted(.dateTime.month(.wide).locale(Locale(identifier: "zh_CN")))
-    if calendar.isDate(first, equalTo: last, toGranularity: .month) {
-      return firstMonth
-    }
-    return "\(firstMonth) / \(lastMonth)"
   }
 
   private static func startOfWeek(containing date: Date, calendar: Calendar) -> Date {
@@ -131,5 +120,32 @@ enum TrainingCalendarLayout {
       current = next
     }
     return result
+  }
+}
+
+enum TrainingCalendarText {
+  private static let shortWeekdays = [
+    "周日", "周一", "周二", "周三", "周四", "周五", "周六",
+  ]
+  private static let longWeekdays = [
+    "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六",
+  ]
+  private static let months = [
+    "一月", "二月", "三月", "四月", "五月", "六月",
+    "七月", "八月", "九月", "十月", "十一月", "十二月",
+  ]
+
+  static func weekday(for date: Date, calendar: Calendar) -> String {
+    let index = calendar.component(.weekday, from: date) - 1
+    return shortWeekdays.indices.contains(index) ? shortWeekdays[index] : ""
+  }
+
+  static func collapsedDate(for date: Date, calendar: Calendar = .current) -> String {
+    let monthIndex = calendar.component(.month, from: date) - 1
+    let month = months.indices.contains(monthIndex) ? months[monthIndex] : ""
+    let day = calendar.component(.day, from: date)
+    let weekdayIndex = calendar.component(.weekday, from: date) - 1
+    let weekday = longWeekdays.indices.contains(weekdayIndex) ? longWeekdays[weekdayIndex] : ""
+    return "\(month)\(day)日 · \(weekday)"
   }
 }

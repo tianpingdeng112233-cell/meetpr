@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 import Testing
 
@@ -42,4 +43,41 @@ import Testing
   }
   #expect(days.isEmpty)
   #expect(logs.isEmpty)
+}
+
+@MainActor
+@Test func weekOverviewRetainsFullCycleForCrossWeekNextTrainingLookup() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let seed = StudentDemoSeed.makePlanView()
+  let nextWeekTraining = StudentPlanDay(
+    id: UUID(),
+    date: seed.days[6].date.addingTimeInterval(86_400),
+    exercises: seed.days[0].exercises
+  )
+  let plan = StudentPlanView(
+    cycleID: seed.cycleID,
+    weekIndex: seed.weekIndex,
+    startDate: seed.startDate,
+    endDate: nextWeekTraining.date,
+    planKind: seed.planKind,
+    totalShiftDays: seed.totalShiftDays,
+    latestShiftCreatedAt: seed.latestShiftCreatedAt,
+    days: seed.days + [nextWeekTraining]
+  )
+  let viewModel = WeekOverviewViewModel(
+    plans: InMemoryStudentPlanRepository(
+      store: TestStudentPlanStore(seed: [studentID: plan])
+    ),
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  guard case .loaded(let currentWeekDays, _, _) = viewModel.state else {
+    Issue.record("Expected loaded state")
+    return
+  }
+  #expect(currentWeekDays.count == 7)
+  #expect(viewModel.cycleDays.count == 8)
+  #expect(viewModel.cycleDays.last?.id == nextWeekTraining.id)
 }

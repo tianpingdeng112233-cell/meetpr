@@ -3,55 +3,58 @@ import SwiftUI
 @MainActor
 public struct Card<Content: View>: View {
   private let accessibilityLabelText: String
+  private let accent: Bool
+  private let inset: Bool
   private let content: Content
 
   public init(
     accessibilityLabel: String = "Card",
+    accent: Bool = false,
+    inset: Bool = false,
     @ViewBuilder content: () -> Content
   ) {
     self.accessibilityLabelText = accessibilityLabel
+    self.accent = accent
+    self.inset = inset
     self.content = content()
   }
 
   public var body: some View {
     content
-      .padding(MeetPRSpacing.base)
+      .padding(.vertical, inset ? 10 : 14)
+      .padding(.horizontal, inset ? 12 : 16)
+      .padding(.leading, accent ? 3 : 0)
       .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
       .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
-          .allowsHitTesting(false)
+        if accent {
+          HStack(spacing: MeetPRSpacing.zero) {
+            Rectangle()
+              .fill(Color.MeetPR.gold500)
+              .frame(width: 3)
+            Spacer(minLength: 0)
+          }
+        }
       }
-      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-      .accessibilityIdentifier(accessibilityLabelText)
+      .meetPRCardSurface(inset ? .inset : .card)
+      .accessibilityElement(children: .contain)
+      .accessibilityLabel(accessibilityLabelText)
   }
 }
 
-#Preview("Card") {
-  Card(accessibilityLabel: "Training card") {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Eyebrow("SQUAT W3D1")
-      Text("Top Set + 3 Backoff")
-        .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      Text("4 sets - about 28 min")
-        .font(Font.MeetPR.footnote)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+#Preview("Card variants") {
+  VStack(spacing: MeetPRSpacing.space3) {
+    Card {
+      Text("Standard card")
+    }
+    Card(accent: true) {
+      Text("Coach feedback")
+    }
+    Card(inset: true) {
+      Text("Coach note")
     }
   }
+  .foregroundStyle(Color.MeetPR.textPrimary)
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
-}
-
-#Preview("Card Light") {
-  Card {
-    Text("Light mode card")
-      .font(Font.MeetPR.body)
-      .foregroundStyle(Color.MeetPR.fgPrimary)
-  }
-  .padding()
-  .background(Color.MeetPR.bg)
-  .preferredColorScheme(.light)
 }

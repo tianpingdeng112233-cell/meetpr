@@ -12,14 +12,33 @@ struct DashboardE1RMTrendPresentation: Equatable, Sendable {
   }
 }
 
+enum DashboardE1RMTrendState: Equatable, Sendable {
+  case zero
+  case forming
+  case mature
+}
+
 struct DashboardE1RMTrendRow: Equatable, Identifiable, Sendable {
   let family: LiftFamily
   let points: [E1RMHistoryPoint]
   let smoothedSamples: [E1RMSeries.Sample]
   let rawEligiblePoints: [E1RMHistoryPoint]
+  let eligibleRecordCount: Int
+  let latestDisplayDate: Date?
   let latestRecordPoint: E1RMHistoryPoint?
 
   var id: LiftFamily { family }
+
+  var trendState: DashboardE1RMTrendState {
+    switch eligibleRecordCount {
+    case 0:
+      .zero
+    case ..<GrowthHistoryStats.trendUnlockThreshold:
+      .forming
+    default:
+      .mature
+    }
+  }
 
   var latestPoint: E1RMHistoryPoint? {
     latestRecordPoint
@@ -97,7 +116,12 @@ final class DashboardE1RMTrendViewModel {
       )
       let histories = try await fetchHistories(studentID: studentID, idsByFamily: idsByFamily)
       let rows = Self.rows(from: histories, idsByFamily: idsByFamily, now: now())
-      let prs = try await e1rm.unacknowledgedPRs(studentId: studentID)
+      // Ack-independent: the celebration banner is gone, so "最新 PR" reads
+      // recent events by time window instead of unacknowledged state.
+      let prs = try await e1rm.prEvents(
+        studentId: studentID,
+        since: now().addingTimeInterval(-30 * 86_400)
+      )
       state = .loaded(
         DashboardE1RMTrendPresentation(
           rows: rows,
@@ -146,13 +170,16 @@ final class DashboardE1RMTrendViewModel {
         from: windowStart,
         extendedTo: extensionDate
       )
+      let latestRecordPoint = series.records.last.flatMap { rawByID[$0.winnerPointID] }
       return DashboardE1RMTrendRow(
         family: family,
         points: E1RMSeries.historyPoints(for: recordTrajectory, sourcePoints: rawPoints),
         smoothedSamples: recordTrajectory,
         rawEligiblePoints: E1RMSeries.eligibleRaw(points: rawPoints, family: family)
           .filter { $0.confidence == .low },
-        latestRecordPoint: series.records.last.flatMap { rawByID[$0.winnerPointID] }
+        eligibleRecordCount: series.rawEligible.count,
+        latestDisplayDate: latestRecordPoint?.computedAt ?? series.rawEligible.last?.date,
+        latestRecordPoint: latestRecordPoint
       )
     }
   }

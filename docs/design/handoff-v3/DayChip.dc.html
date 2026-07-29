@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600;700&family=Noto+Sans+SC:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./dc-tokens.css">
+<style>
+html,body{margin:0;padding:0}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.82)}}
+</style>
+</helmet>
+<button type="button" onclick="{{ onSelect }}" aria-label="{{ a11y }}" style="{{ rootStyle }}">
+<span style="{{ dotStyle }}"></span>
+<span style="{{ wdStyle }}">{{ weekday }}</span>
+<span style="{{ dateStyle }}">{{ date }}</span>
+</button>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:72,&quot;height&quot;:64},&quot;weekday&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;三&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;date&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:22,&quot;min&quot;:1,&quot;max&quot;:31,&quot;tsType&quot;:&quot;number&quot;},&quot;state&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;done&quot;,&quot;missed&quot;,&quot;rest&quot;,&quot;today&quot;,&quot;future&quot;],&quot;default&quot;:&quot;today&quot;,&quot;tsType&quot;:&quot;'done'|'missed'|'rest'|'today'|'future'&quot;},&quot;selected&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;onSelect&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  renderVals(){
+    const p = this.props;
+    const st = p.state || 'future';
+    const sel = !!p.selected;
+    const rest = st === 'rest';
+    const quiet = rest || st === 'future';
+
+    // selected today = deep ink slab with a gold ring; every other day sits on the card surface
+    const bg = sel ? 'var(--cta-fill)' : 'var(--surface-card)';
+    const ring = sel ? '0 0 0 1.5px var(--gold-500)' : 'var(--card-shadow)';
+    const ink = sel ? '#FFFFFF' : quiet ? 'var(--text-faint)' : 'var(--text-primary)';
+    const dot = rest ? null
+      : st === 'done' ? 'var(--success)'
+      : st === 'missed' ? 'var(--danger)'
+      : (st === 'today' || sel) ? 'var(--gold-500)' : null;
+
+    return {
+      weekday: p.weekday ?? '三',
+      date: p.date ?? 22,
+      onSelect: p.onSelect || (() => {}),
+      a11y: `${p.weekday ?? ''}${p.date ?? ''}日 ${({done:'已完成',missed:'未完成',rest:'休息日',today:'今天',future:'未来'})[st] || ''}`,
+      rootStyle: `position:relative;width:52px;height:44px;flex:none;border:0;padding:5px 0 0;border-radius:12px;background:${bg};box-shadow:${ring};display:flex;flex-direction:column;align-items:center;cursor:pointer;font-family:'Noto Sans SC',sans-serif;-webkit-tap-highlight-color:transparent`,
+      dotStyle: dot
+        ? `position:absolute;top:5px;right:6px;width:5px;height:5px;border-radius:50%;background:${dot}${st === 'today' || sel ? ';animation:pulseDot 1.8s ease-in-out infinite' : ''}`
+        : 'display:none',
+      wdStyle: `font-size:10px;font-weight:500;color:${sel ? '#FFFFFF' : quiet ? 'var(--text-faint)' : 'var(--text-dim)'}`,
+      dateStyle: `margin-top:auto;margin-bottom:5px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:${ink}`
+    };
+  }
+}
+</script>
+</body>
+</html>

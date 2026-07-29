@@ -39,7 +39,7 @@ struct ProfileCardsSection: View {
       }
       evaluationRow
     }
-    .listRowBackground(Color.MeetPR.surface1)
+    .listRowBackground(Color.MeetPR.surfaceCard)
   }
 
   /// Card 9: live entry to the coach's evaluation summary once written;
@@ -85,8 +85,8 @@ struct ProfileCardsSection: View {
         icon: "scalemass", title: "我的极限",
         summary: OnboardingSummaryFormatter.oneRM(profile), locked: true)
       Text("🔒 已锁定,联系教练修改")
-        .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+        .foregroundStyle(Color.MeetPR.textMuted)
     }
   }
 
@@ -106,21 +106,21 @@ struct ProfileCardsSection: View {
       Image(systemName: icon)
         .font(.system(size: 18))
         .frame(width: 28)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textMuted)
       VStack(alignment: .leading, spacing: 2) {
         HStack(spacing: MeetPRSpacing.xs) {
           Text(title)
-            .font(Font.MeetPR.bodyEmphasis)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
           if locked {
             Image(systemName: "lock.fill")
               .font(.system(size: 11))
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+              .foregroundStyle(Color.MeetPR.textMuted)
           }
         }
         Text(summary)
-          .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textMuted)
           .lineLimit(1)
       }
     }
@@ -180,17 +180,22 @@ struct ProfileCardEditView: View {
         fields
         if let saveError = viewModel.saveError {
           Text(saveError)
-            .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+            .foregroundStyle(Color.MeetPR.dangerMuted)
         }
-        PrimaryButton("保存", isLoading: isSaving, isFullWidth: true) {
+        GoldCTA(
+          "保存",
+          sub: nil,
+          icon: .none,
+          isLoading: isSaving
+        ) {
           Task { await save() }
         }
       }
       .padding(MeetPRSpacing.base)
     }
     .scrollContentBackground(.hidden)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle(kind.title)
   }
 

@@ -84,31 +84,36 @@ struct ExportDataSheet: View {
           ProgressView("正在整理你的全部训练数据…")
         case .failed(let message):
           Label(message, systemImage: "exclamationmark.triangle")
-            .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+            .foregroundStyle(Color.MeetPR.dangerMuted)
           Button("重试") {
             Task { await viewModel.export(studentID: studentID) }
           }
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.goldText)
         case .ready(let url):
           Label("CSV 已生成", systemImage: "checkmark.circle.fill")
-            .foregroundStyle(Color.MeetPR.green)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.success)
           Text("包含全部训练组:日期/动作/重量/次数/RPE。")
-            .font(Font.MeetPR.caption)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textSecondary)
           ShareLink(item: url) {
             Label("分享 / 存储", systemImage: "square.and.arrow.up")
-              .font(.headline)
+              .font(.MeetPR.display(size: MeetPRFontMetrics.size16))
+              .foregroundStyle(Color.MeetPR.ctaText)
               .frame(maxWidth: .infinity)
-              .padding(.vertical, 6)
+              .frame(height: MeetPRSpacing.point52)
+              .background(Color.MeetPR.ctaBackground)
+              .clipShape(.capsule)
           }
-          .buttonStyle(.borderedProminent)
-          .tint(Color.MeetPR.brandRed)
+          .buttonStyle(PressScaleButtonStyle())
           .accessibilityIdentifier("account.export.share")
         }
       }
       .padding(MeetPRSpacing.base)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle("导出训练数据")
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)

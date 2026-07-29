@@ -46,7 +46,8 @@ import Testing
       setIndex: 2,
       weightKg: "125.00",
       reps: 5,
-      loggedAt: loggedAt
+      loggedAt: loggedAt,
+      durationSeconds: 8
     ),
     text: "底部保持张力",
     postedAt: loggedAt
@@ -56,4 +57,5 @@ import Testing
   let decoded = try MeetPRCodec.decoder.decode(CoachFeedback.self, from: data)
 
   #expect(decoded == feedback)
+  #expect(decoded.video?.durationSeconds == 8)
 }

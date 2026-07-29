@@ -58,16 +58,26 @@ struct ChatSetCardAppearance: Equatable, Sendable {
   }
 }
 
-struct ChatSetCardView: View {
+public struct ChatSetCardView: View {
   let presentation: ChatSetCardPresentation
   let isCurrentUser: Bool
   let openVideo: @MainActor () -> Void
+
+  public init(
+    presentation: ChatSetCardPresentation,
+    isCurrentUser: Bool,
+    openVideo: @escaping @MainActor () -> Void
+  ) {
+    self.presentation = presentation
+    self.isCurrentUser = isCurrentUser
+    self.openVideo = openVideo
+  }
 
   private var appearance: ChatSetCardAppearance {
     .resolve(isCurrentUser: isCurrentUser)
   }
 
-  var body: some View {
+  public var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
       Label(ChatStrings.trainingShare, systemImage: "dumbbell.fill")
         .font(.caption.bold())

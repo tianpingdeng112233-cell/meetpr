@@ -1,5 +1,6 @@
 import ChatUI
 import CoreModels
+import DesignSystem
 import Foundation
 import RepositoryContracts
 import Testing
@@ -24,12 +25,22 @@ struct TodayWorkoutSetRefEntryLayoutTests {
     #expect(askCoachEntryCount(in: view) == 1)
   }
 
-  @Test("set table keeps the six-column layout after removing the share column")
-  func setTableKeepsSixColumns() {
-    #expect(TodayWorkoutTableLayout.columns.count == 6)
-    #expect(TodayWorkoutTableLayout.headerTitles == ["#", "重量", "次数", "RPE", "", ""])
-    #expect(TodayWorkoutTableLayout.headerTitles.count == TodayWorkoutTableLayout.columns.count)
-    #expect(TodayWorkoutTableLayout.rowCellCount == TodayWorkoutTableLayout.columns.count)
+  @Test("v3 set row stays free of a per-row ask-coach entry")
+  func v3SetRowHasNoAskCoachEntry() throws {
+    let inspected = try SetRow(
+      index: 1,
+      weight: 100,
+      reps: 5,
+      rpe: 8,
+      status: .done,
+      videoState: .none
+    ).inspect()
+
+    #expect(
+      inspected.findAll {
+        try $0.accessibilityIdentifier() == "todayWorkout.askCoach"
+      }.isEmpty
+    )
   }
 
   private func askCoachEntryCount(in view: TodayWorkoutView) -> Int {

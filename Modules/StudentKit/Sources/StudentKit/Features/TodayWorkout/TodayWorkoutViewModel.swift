@@ -13,6 +13,7 @@ public final class TodayWorkoutViewModel {
     case loading
     case loaded(plan: StudentPlanDay, drafts: [SetRowDraft])
     case recording(plan: StudentPlanDay, drafts: [SetRowDraft], rowIndex: Int)
+    case noPlan
     case rest
     case error(String)
   }
@@ -69,6 +70,11 @@ public final class TodayWorkoutViewModel {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       guard isCurrentLoad(generation) else { return }
       planContext = Self.planContext(from: plan, selectedDate: date, calendar: calendar)
+      guard let plan else {
+        exerciseReferences = [:]
+        state = .noPlan
+        return
+      }
 
       guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
         guard isCurrentLoad(generation) else { return }
@@ -172,7 +178,7 @@ public final class TodayWorkoutViewModel {
       return false
     }
     actionErrorMessage = nil
-    var nextDrafts = drafts
+    let nextDrafts = drafts
     var draft = nextDrafts[rowIndex]
     state = .recording(plan: plan, drafts: nextDrafts, rowIndex: rowIndex)
 
@@ -247,7 +253,9 @@ public final class TodayWorkoutViewModel {
     }
     let seconds =
       draft.prescribed.restSeconds
-      ?? currentStudentID.flatMap { restTimerSettings.preference(for: $0).fixedSeconds }
+      ?? currentStudentID.flatMap {
+        restTimerSettings.preference(for: $0).customSeconds(forRPE: draft.actualRPE)
+      }
       ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
     restTimer = RestTimerState(
       endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
@@ -255,15 +263,6 @@ public final class TodayWorkoutViewModel {
       !restTimerSettings.hasAcknowledgedExplanation(for: currentStudentID)
     {
       showsRestTimerExplanation = true
-    }
-  }
-
-  public func exerciseName(for exerciseId: UUID) -> String? {
-    switch state {
-    case .loaded(_, let drafts), .recording(_, let drafts, _):
-      drafts.first { $0.exerciseID == exerciseId }?.exerciseName
-    default:
-      nil
     }
   }
 

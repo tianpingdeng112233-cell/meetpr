@@ -2,6 +2,7 @@ import AppShell
 import ChatUI
 import CoachKit
 import CoreModels
+import DesignSystem
 import Networking
 import StudentKit
 import SwiftData
@@ -9,6 +10,7 @@ import SwiftUI
 
 @main
 @MainActor
+// swiftlint:disable:next type_body_length
 struct MeetPRApp: App {
   private let draftStore: DraftStore
   private let rootView: RootView
@@ -23,25 +25,7 @@ struct MeetPRApp: App {
     _session = State(initialValue: dependencies.session)
   }
 
-  private struct RootDependencies {
-    let rootView: RootView
-    let session: Session
-  }
-
   #if DEMO_MODE
-    private struct DemoEvaluationFunnel {
-      let bindQueue: InMemoryCoachBindQueueRepository
-      let evaluations: InMemoryCoachEvaluationRepository
-      let summaries: InMemoryCoachEvaluationSummaryRepository
-      let profiles: InMemoryCoachStudentProfileReader
-    }
-
-    private struct DemoChatDependencies {
-      let session: Session
-      let controller: ChatSessionController
-      let repository: InMemoryChatRepository
-    }
-
     /// Demo evaluation funnel (spec 033): one pending receive-queue card +
     /// live evaluation periods for the two in-evaluation roster students.
     /// Queue accepts mint periods into the same shared store.
@@ -65,20 +49,10 @@ struct MeetPRApp: App {
       )
     }
 
-    private static func makeDemoStudentLogs(
-      includeToday: Bool
-    ) -> InMemoryStudentTrainingLogRepository {
-      InMemoryStudentTrainingLogRepository(
-        seed: StudentDemoSeed.makeHistoricalLogs(
-          studentID: StudentDemoSeed.studentID,
-          includeToday: includeToday
-        )
-      )
-    }
-
     private static func makeDemoChatDependencies(
       user: User,
-      draftStore: DraftStore
+      draftStore: DraftStore,
+      emptyConversation: Bool
     ) -> DemoChatDependencies {
       let controller = ChatSessionController()
       let session = Session(
@@ -94,16 +68,14 @@ struct MeetPRApp: App {
         controller: controller,
         repository: InMemoryChatRepository(
           currentUserID: user.id,
-          seed: DemoChatSeed.make(for: user)
+          seed: DemoChatSeed.make(for: user, emptyConversation: emptyConversation)
         )
       )
     }
 
-    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
-      // Seed the student projection so the demo shows a real plan (today/week)
-      // without a coach publish round-trip.
-      let planStore = InMemoryPlanStore(
-        seed: [StudentDemoSeed.studentID: StudentDemoSeed.makePlanView()])
+    private static func makeRootDependencies(
+      draftStore: DraftStore
+    ) -> (rootView: RootView, session: Session) {
       // DEMO_USER_STUDENT is read here in the app target, NOT inside AppShell:
       // Xcode does not propagate the app target's compilation conditions to its
       // SPM package deps, so the chosen user must be injected down.
@@ -112,46 +84,75 @@ struct MeetPRApp: App {
       #else
         let demoUser = DemoUserSeed.coach
       #endif
-      let chat = makeDemoChatDependencies(user: demoUser, draftStore: draftStore)
+      let studentState = DemoStudentState.make(
+        scenario: DemoEmptyStateScenario.launchValue,
+        includesTodayByDefault: demoUser.role != .coachedStudent
+      )
+      // Seed the student projection so the demo shows a real plan (today/week)
+      // without a coach publish round-trip.
+      let planStore = InMemoryPlanStore(
+        seed: studentState.plan.map { [StudentDemoSeed.studentID: $0] } ?? [:])
+      let chat = makeDemoChatDependencies(
+        user: demoUser,
+        draftStore: draftStore,
+        emptyConversation: studentState.hasEmptyConversation
+      )
       let funnel = makeDemoEvaluationFunnel()
-      return RootDependencies(
-        rootView: RootView(
-          coachPlans: InMemoryPlanRepository.preview(store: planStore),
-          // Demo coach: personal (used 23) + unused single-use + 6-day
-          // time-limited seed codes (spec 031 D10).
-          coachInviteCodes: InMemoryInviteCodeRepository(
-            coachId: StudentDemoSeed.coachID,
-            seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
-          ),
-          coachBindQueue: funnel.bindQueue,
-          coachEvaluations: funnel.evaluations,
-          coachEvaluationSummaries: funnel.summaries,
-          coachStudentProfiles: funnel.profiles,
-          studentPlans: InMemoryStudentPlanRepository(store: planStore),
-          studentLogs: makeDemoStudentLogs(includeToday: demoUser.role != .coachedStudent),
-          studentFeedback: InMemoryStudentFeedbackRepository(
-            seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
-          ),
-          // Demo student: accepted bond + completed profile → the BindGate
-          // falls straight through to the 5 tabs; no wizard, no enter-code
-          // (spec 031 D10 — the DEMO_USER_STUDENT path stays gate-free).
-          studentBind: InMemoryBindRepository(
-            studentId: StudentDemoSeed.studentID,
-            seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
-          ),
-          studentOnboarding: InMemoryOnboardingRepository(
-            studentId: StudentDemoSeed.studentID,
-            seed: StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
-          ),
-          // 训练视频 inbox: boot straight into a populated queue (spec 042).
-          coachVideoQueue: InMemoryCoachVideoQueueRepository(
-            seed: CoachDemoSeed.pendingVideos()),
-          chatSession: chat.controller,
-          chatRepository: chat.repository,
-          draftStore: draftStore,
-          analyticsMode: .disabled
+      return (
+        rootView: makeDemoRootView(
+          studentState: studentState,
+          planStore: planStore,
+          chat: chat,
+          funnel: funnel,
+          draftStore: draftStore
         ),
         session: chat.session
+      )
+    }
+
+    private static func makeDemoRootView(
+      studentState: DemoStudentState,
+      planStore: InMemoryPlanStore,
+      chat: DemoChatDependencies,
+      funnel: DemoEvaluationFunnel,
+      draftStore: DraftStore
+    ) -> RootView {
+      RootView(
+        coachPlans: InMemoryPlanRepository.preview(store: planStore),
+        // Demo coach: personal (used 23) + unused single-use + 6-day
+        // time-limited seed codes (spec 031 D10).
+        coachInviteCodes: InMemoryInviteCodeRepository(
+          coachId: StudentDemoSeed.coachID,
+          seed: InMemoryInviteCodeRepository.demoSeed(coachId: StudentDemoSeed.coachID)
+        ),
+        coachBindQueue: funnel.bindQueue,
+        coachEvaluations: funnel.evaluations,
+        coachEvaluationSummaries: funnel.summaries,
+        coachStudentProfiles: funnel.profiles,
+        studentPlans: InMemoryStudentPlanRepository(store: planStore),
+        studentLogs: InMemoryStudentTrainingLogRepository(seed: studentState.logs),
+        studentFeedback: InMemoryStudentFeedbackRepository(seed: studentState.feedback),
+        studentE1RM: InMemoryE1RMRepository(
+          seedPoints: studentState.e1rmPoints,
+          seedPRs: studentState.prEvents
+        ),
+        // Demo student: accepted bond + completed profile → the BindGate
+        // falls straight through to the 5 tabs; no wizard, no enter-code
+        // (spec 031 D10 — the DEMO_USER_STUDENT path stays gate-free).
+        studentBind: InMemoryBindRepository(
+          studentId: StudentDemoSeed.studentID,
+          seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
+        ),
+        studentOnboarding: InMemoryOnboardingRepository(
+          studentId: StudentDemoSeed.studentID,
+          seed: studentState.profile
+        ),
+        // 训练视频 inbox: boot straight into a populated queue (spec 042).
+        coachVideoQueue: InMemoryCoachVideoQueueRepository(seed: CoachDemoSeed.pendingVideos()),
+        chatSession: chat.controller,
+        chatRepository: chat.repository,
+        draftStore: draftStore,
+        analyticsMode: .disabled
       )
     }
   #else
@@ -207,10 +208,12 @@ struct MeetPRApp: App {
       )
     }
 
-    private static func makeRootDependencies(draftStore: DraftStore) -> RootDependencies {
+    private static func makeRootDependencies(
+      draftStore: DraftStore
+    ) -> (rootView: RootView, session: Session) {
       let api = APIClient.shared
       let chat = makeLiveChatDependencies(api: api, draftStore: draftStore)
-      return RootDependencies(
+      return (
         rootView: RootView(
           coachPlans: BackendPlanRepository(
             api: api, session: chat.session, cache: PlanCache()),
@@ -270,6 +273,27 @@ struct MeetPRApp: App {
     }
   #endif
 
+  @AppStorage(MeetPRAppearance.storageKey)
+  private var studentAppearanceRaw = MeetPRAppearance.defaultPreference.rawValue
+
+  private var preferredAppColorScheme: ColorScheme? {
+    guard case .authenticated(let user) = session.state else {
+      // Auth/login and bootstrap keep the v2 dark-only contract.
+      return .dark
+    }
+    switch user.role {
+    case .coach:
+      // CoachKit has no audited light palette yet.
+      return .dark
+    case .coachedStudent, .selfTrainStudent:
+      // ⚖️ 2026-07-28: student roots open in light mode by default; the user
+      // can pin dark or system-following in 我的 → 外观.
+      return
+        (MeetPRAppearance(rawValue: studentAppearanceRaw)
+        ?? MeetPRAppearance.defaultPreference).colorScheme
+    }
+  }
+
   var body: some Scene {
     WindowGroup {
       rootView
@@ -280,10 +304,7 @@ struct MeetPRApp: App {
         .modelContainer(
           draftStore.modelContainer
         )
-        // MeetPR is dark-only in V0.1 (David 2026-06-12: 学员向导的深色为
-        // 全 app 标准): one root-level force instead of per-view sprinkles,
-        // so auth + coach + student render the same palette.
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(preferredAppColorScheme)
     }
   }
 }

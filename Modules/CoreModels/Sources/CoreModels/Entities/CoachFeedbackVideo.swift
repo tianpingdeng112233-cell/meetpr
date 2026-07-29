@@ -15,6 +15,11 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
   public let weightKg: String?
   public let reps: Int?
   public let loggedAt: Date?
+  /// Clip duration when the feedback projection can provide it.
+  ///
+  /// Older backend payloads omit this field, so the student chat keeps it
+  /// optional and renders a neutral placeholder when unavailable.
+  public let durationSeconds: Int?
 
   public init(
     id: UUID,
@@ -22,7 +27,8 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
     setIndex: Int? = nil,
     weightKg: String? = nil,
     reps: Int? = nil,
-    loggedAt: Date? = nil
+    loggedAt: Date? = nil,
+    durationSeconds: Int? = nil
   ) {
     self.id = id
     self.exerciseName = exerciseName
@@ -30,5 +36,6 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
     self.weightKg = weightKg
     self.reps = reps
     self.loggedAt = loggedAt
+    self.durationSeconds = durationSeconds
   }
 }

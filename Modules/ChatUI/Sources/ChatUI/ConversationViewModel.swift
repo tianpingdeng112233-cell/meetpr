@@ -19,6 +19,7 @@ public final class ConversationViewModel {
   public internal(set) var otherLastRead: ChatCursor?
   public internal(set) var hasMoreHistory = false
   public internal(set) var isLoading = false
+  public internal(set) var didFinishInitialLoad = false
   public internal(set) var isLoadingOlder = false
   public internal(set) var isPolling = false
   public internal(set) var error: (any Error)?

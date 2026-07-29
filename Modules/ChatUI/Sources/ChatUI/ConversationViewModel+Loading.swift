@@ -19,6 +19,7 @@ extension ConversationViewModel {
       hasMoreHistory = page.hasMore
       synchronizeOutbox()
       error = nil
+      didFinishInitialLoad = true
       bindingInvalidationReported = false
       await markReadIfNeeded(from: page.messages)
     } catch {
@@ -161,6 +162,7 @@ extension ConversationViewModel {
       }
       query = try .after(seq: nextSequence, limit: pageLimit)
     }
+    didFinishInitialLoad = true
     await markReadIfNeeded(from: incomingMessages)
   }
 

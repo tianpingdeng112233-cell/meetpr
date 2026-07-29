@@ -27,10 +27,16 @@ public final class TrainingHistoryViewModel {
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let now: @Sendable () -> Date
 
-  public init(plans: any StudentPlanRepository, logs: any StudentTrainingLogRepository) {
+  public init(
+    plans: any StudentPlanRepository,
+    logs: any StudentTrainingLogRepository,
+    now: @escaping @Sendable () -> Date = { Date() }
+  ) {
     self.plans = plans
     self.logs = logs
+    self.now = now
   }
 
   public func load(studentID: UUID) async {
@@ -39,12 +45,10 @@ public final class TrainingHistoryViewModel {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       let days = try await plans.fetchCycleDays(studentID: studentID)
       let weeks = Self.groupByWeek(days, startDate: plan?.startDate)
-      let fetchedLogs: [StudentSetLog]
-      if let dateRange = Self.dateRange(for: days) {
-        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
-      } else {
-        fetchedLogs = []
-      }
+      let fetchedLogs = try await logs.fetchLogs(
+        studentID: studentID,
+        in: Self.allHistoryStart...now()
+      )
       state = .loaded(weeks: weeks, logs: fetchedLogs)
     } catch {
       if error.isTaskCancellation {
@@ -76,10 +80,5 @@ public final class TrainingHistoryViewModel {
     }
   }
 
-  private static func dateRange(for days: [StudentPlanDay]) -> ClosedRange<Date>? {
-    guard let first = days.map(\.date).min(), let last = days.map(\.date).max() else {
-      return nil
-    }
-    return first...last.addingTimeInterval(86_400 - 1)
-  }
+  private static let allHistoryStart = Date(timeIntervalSince1970: 946_684_800)
 }

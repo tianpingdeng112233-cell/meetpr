@@ -76,6 +76,18 @@ import Testing
 }
 
 @MainActor
+@Test func todayWorkoutDistinguishesMissingPlanFromRestDay() async {
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore()),
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(date: Date(), studentID: StudentDemoSeed.studentID)
+
+  #expect(viewModel.state == .noPlan)
+}
+
+@MainActor
 @Test func todayWorkoutViewModelPersistsEditsToCompletedSet() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()

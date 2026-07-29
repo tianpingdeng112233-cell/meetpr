@@ -78,6 +78,26 @@ import Testing
   }
 }
 
+@Test func selectedTodayUsesDeviceDayInsteadOfGymDayCutoff() throws {
+  let shanghaiCalendar = try calendar(timeZoneIdentifier: "Asia/Shanghai")
+  let earlyMorning = try date(
+    2026,
+    7,
+    29,
+    hour: 2,
+    minute: 30,
+    calendar: shanghaiCalendar
+  )
+  let selectedToday = PlanCalendarDayIdentity.deviceDay(
+    containing: earlyMorning,
+    calendar: shanghaiCalendar
+  )
+  let gymDay = WorkoutDatePolicy.gymDayToday(now: earlyMorning)
+
+  #expect(shanghaiCalendar.component(.day, from: selectedToday) == 29)
+  #expect(shanghaiCalendar.component(.day, from: gymDay) == 28)
+}
+
 @Test func utcCalendarDayBehaviorRemainsUnchanged() throws {
   let utcCalendar = try calendar(timeZoneIdentifier: "UTC")
   let july24PlanDate = try date(2026, 7, 24, calendar: utcCalendar)

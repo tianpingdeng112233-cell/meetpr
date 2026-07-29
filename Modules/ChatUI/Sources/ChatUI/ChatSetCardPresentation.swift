@@ -1,7 +1,7 @@
 import CoreModels
 import Foundation
 
-struct ChatSetCardPresentation: Equatable, Sendable {
+public struct ChatSetCardPresentation: Equatable, Sendable {
   let exerciseName: String
   let setNumber: Int
   let load: String
@@ -10,7 +10,7 @@ struct ChatSetCardPresentation: Equatable, Sendable {
   let note: String?
   let videoURL: URL?
 
-  init?(message: ChatMessage) {
+  public init?(message: ChatMessage) {
     guard
       message.kind == .text,
       let setRef = message.setRef,

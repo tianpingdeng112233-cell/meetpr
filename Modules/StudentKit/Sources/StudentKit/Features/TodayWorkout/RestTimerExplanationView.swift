@@ -9,11 +9,11 @@ struct RestTimerExplanationView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
       Image(systemName: "timer")
         .font(.largeTitle)
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
 
       Text("休息时间会自动匹配")
-        .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
       explanationRow(
         icon: "gauge.with.dots.needle.33percent",
@@ -22,25 +22,31 @@ struct RestTimerExplanationView: View {
       explanationRow(icon: "person.fill.checkmark", text: "教练指定过休息时长的组，会按教练设定。")
       explanationRow(icon: "gearshape", text: "可在「我的 → 组间休息」修改默认行为。")
 
-      Button("知道了", action: onAcknowledge)
-        .buttonStyle(.borderedProminent)
-        .tint(Color.MeetPR.brandRed)
-        .frame(maxWidth: .infinity)
-        .padding(.top, MeetPRSpacing.xs)
+      Button(action: onAcknowledge) {
+        Text("知道了")
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size16))
+          .foregroundStyle(Color.MeetPR.ctaText)
+          .frame(maxWidth: .infinity)
+          .frame(height: MeetPRSpacing.point52)
+          .background(Color.MeetPR.ctaBackground)
+          .clipShape(.capsule)
+      }
+      .buttonStyle(PressScaleButtonStyle())
+      .padding(.top, MeetPRSpacing.xs)
     }
     .padding(MeetPRSpacing.lg)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.surfaceElevated)
   }
 
   private func explanationRow(icon: String, text: String) -> some View {
     HStack(alignment: .top, spacing: MeetPRSpacing.sm) {
       Image(systemName: icon)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .foregroundStyle(Color.MeetPR.textMuted)
         .frame(width: 24)
       Text(text)
-        .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size15))
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .fixedSize(horizontal: false, vertical: true)
     }
   }

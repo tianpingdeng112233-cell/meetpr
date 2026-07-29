@@ -24,7 +24,7 @@ import Testing
   )
 
   let proposal = try #require(
-    PlanDayShiftLogic.proposal(plan: plan, today: today, calendar: utcCalendar())
+    PlanDayShiftLogic.proposal(plan: plan, today: today)
   )
 
   #expect(proposal.courseName == "深蹲")
@@ -55,22 +55,19 @@ import Testing
   #expect(
     PlanDayShiftLogic.canUndo(
       latestShiftCreatedAt: createdAt,
-      now: isoDate("2026-07-11T00:01:00Z"),
-      calendar: utcCalendar()
+      now: isoDate("2026-07-11T00:01:00Z")
     )
   )
   #expect(
     !PlanDayShiftLogic.canUndo(
       latestShiftCreatedAt: createdAt,
-      now: isoDate("2026-07-12T00:00:00Z"),
-      calendar: utcCalendar()
+      now: isoDate("2026-07-12T00:00:00Z")
     )
   )
   #expect(
     !PlanDayShiftLogic.canUndo(
       latestShiftCreatedAt: nil,
-      now: createdAt,
-      calendar: utcCalendar()
+      now: createdAt
     )
   )
 }

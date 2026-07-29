@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@600;700&family=Noto+Sans+SC:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./dc-tokens.css">
+<style>html,body{margin:0;padding:0}</style>
+</helmet>
+<span style="{{ rootStyle }}">
+<span style="{{ dotStyle }}"></span>{{ text }}
+</span>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:160,&quot;height&quot;:40},&quot;text&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;已通知教练&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;tone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;gold&quot;,&quot;success&quot;,&quot;danger&quot;,&quot;neutral&quot;],&quot;default&quot;:&quot;success&quot;,&quot;tsType&quot;:&quot;'gold'|'success'|'danger'|'neutral'&quot;},&quot;dot&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const TONE = {
+  gold:    ['rgba(var(--gold-rgb),.14)',    'var(--gold-500)'],
+  success: ['rgba(var(--success-rgb),.14)', 'var(--success)'],
+  danger:  ['rgba(var(--danger-rgb),.14)',  'var(--danger)'],
+  neutral: ['var(--surface-key)',           'var(--text-muted)']
+};
+class Component extends DCLogic {
+  renderVals(){
+    const p = this.props;
+    const [bg, fg] = TONE[p.tone] || TONE.neutral;
+    return {
+      text: p.text ?? '已通知教练',
+      rootStyle: `display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:${bg};color:${fg};font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;font-weight:600;letter-spacing:.04em;white-space:nowrap`,
+      dotStyle: p.dot ? `width:5px;height:5px;border-radius:50%;background:${fg};flex:none` : 'display:none'
+    };
+  }
+}
+</script>
+</body>
+</html>

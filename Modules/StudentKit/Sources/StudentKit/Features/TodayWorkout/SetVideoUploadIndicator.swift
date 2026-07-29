@@ -23,8 +23,8 @@ enum SetVideoButtonDestination: Equatable, Sendable {
 }
 
 /// Visual language (David 2026-07-11): always the same camera glyph, only the
-/// stroke color changes — gray when no video, a progress-proportional
-/// foreground sweep while uploading, green on success, red on failure.
+/// stroke color changes — muted when no video, a progress-proportional gold
+/// sweep while uploading, success green when uploaded, danger red on failure.
 enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
   case unattached
   case uploading(progress: Double)
@@ -52,13 +52,13 @@ enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
   var strokeColor: Color? {
     switch self {
     case .unattached:
-      Color.MeetPR.fgTertiary
+      Color.MeetPR.textMuted
     case .uploading:
       nil
     case .uploaded:
-      Color.MeetPR.green
+      Color.MeetPR.success
     case .failed:
-      Color.MeetPR.brandRed
+      Color.MeetPR.danger
     }
   }
 
@@ -89,11 +89,11 @@ struct SetVideoUploadIndicator: View {
   var body: some View {
     Group {
       if case .uploading(let progress) = style {
-        glyph(Color.MeetPR.fgTertiary)
+        glyph(Color.MeetPR.textMuted)
           .overlay {
-            // Left-to-right sweep: the fgPrimary glyph is revealed across the
+            // Left-to-right sweep: the gold glyph is revealed across the
             // real part-upload fraction from VideoAttachmentViewModel.
-            glyph(Color.MeetPR.fgPrimary)
+            glyph(Color.MeetPR.gold500)
               .mask(alignment: .leading) {
                 GeometryReader { geo in
                   Rectangle().frame(width: geo.size.width * progress)
@@ -101,7 +101,7 @@ struct SetVideoUploadIndicator: View {
               }
           }
       } else {
-        glyph(style.strokeColor ?? Color.MeetPR.fgTertiary)
+        glyph(style.strokeColor ?? Color.MeetPR.textMuted)
       }
     }
     .accessibilityLabel(style.accessibilityLabel)

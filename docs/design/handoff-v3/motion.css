@@ -1,0 +1,48 @@
+/* MeetPR motion — 与 tokens.css 拼接即 globals.css。
+ * 所有曲线、时长、关键帧逐字取自样机源码（MeetPR 学员端.dc.html），不要"凭感觉"改数。
+ * JS 补间统一 easeOutCubic：e = 1-(1-p)^3；数字滚动用 quart：1-(1-p)^4。
+ */
+:root{
+  --ease-out: cubic-bezier(.22,.61,.36,1);    /* 常规过渡 200–260ms */
+  --ease-spring: cubic-bezier(.34,1.36,.64,1); /* 容器弹性展开，允许 2–3px overshoot */
+  --ease-roll: cubic-bezier(.4,0,.2,1);        /* 卷折收纳 620ms（WAAPI） */
+  --ease-screen: cubic-bezier(.2,.7,.2,1);     /* 屏幕切换 .scrn 280ms */
+  --ease-sheet: cubic-bezier(.2,.8,.2,1);      /* 底部 Sheet 340ms */
+}
+
+/* 屏幕/浮层/Sheet 进场 */
+@keyframes scr{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.scrn{animation:scr .28s var(--ease-screen)}
+.ov{animation:fade .2s ease}
+.sh{animation:sheet .34s var(--ease-sheet)}
+
+/* 按压反馈：所有可点元素统一 scale(.97) 120ms */
+.pb{transition:transform .12s ease,opacity .12s ease}
+.pb:active{transform:scale(.97);opacity:.9}
+.tb:active{transform:scale(.9)}
+
+/* hero CTA 斜向光泽扫过（App 级，只给首屏「开始训练」） */
+@keyframes sweep{0%{transform:translateX(-160%) skewX(-12deg)}30%{transform:translateX(340%) skewX(-12deg)}100%{transform:translateX(340%) skewX(-12deg)}}
+.shimmer{position:absolute;top:0;bottom:0;left:0;width:55%;background:linear-gradient(90deg,transparent,rgba(255,224,160,.42),transparent);transform:translateX(-160%) skewX(-12deg);animation:sweep 4.5s ease-in-out infinite;will-change:transform;pointer-events:none}
+
+/* 金色发光呼吸 4.2s —— 「进行中」状态 */
+@keyframes glow{0%,100%{box-shadow:0 0 0 1px rgba(var(--gold-rgb),.5),0 0 16px 2px rgba(var(--gold-rgb),.24)}50%{box-shadow:0 0 0 1px rgba(var(--gold-rgb),.62),0 0 23px 3px rgba(var(--gold-rgb),.32)}}
+.glow{animation:glow 4.2s ease-in-out infinite}
+@keyframes glow2{0%,100%{box-shadow:0 0 0 2px rgba(var(--gold-rgb),.5),0 0 16px 2px rgba(var(--gold-rgb),.24)}50%{box-shadow:0 0 0 2px rgba(var(--gold-rgb),.62),0 0 23px 3px rgba(var(--gold-rgb),.32)}}
+.glow2{animation:glow2 4.2s ease-in-out infinite}
+/* 带顶部内高光的 CTA 版本（内阴影要写进每一帧，否则呼吸时会丢） */
+@keyframes glowW{0%,100%{box-shadow:inset 0 1.5px 0 rgba(255,255,255,1),inset 0 -2px 3px rgba(0,0,0,.22),0 0 0 2px rgba(var(--gold-rgb),.5),0 0 16px 2px rgba(var(--gold-rgb),.24)}50%{box-shadow:inset 0 1.5px 0 rgba(255,255,255,1),inset 0 -2px 3px rgba(0,0,0,.22),0 0 0 2px rgba(var(--gold-rgb),.62),0 0 23px 3px rgba(var(--gold-rgb),.32)}}
+.glow-w{animation:glowW 4.2s ease-in-out infinite}
+
+/* 结算庆祝的 CSS 侧（JS 侧见 motion/05） */
+@keyframes spark{0%{transform:translate(-50%,-50%) scale(1);opacity:1}70%{opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.2);opacity:0}}
+@keyframes stamp{0%{transform:scale(1.5);opacity:0}55%{transform:scale(.9);opacity:1}75%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+/* 无障碍：所有动效降级为直接切换/透明度 */
+@media (prefers-reduced-motion: reduce){
+  .scrn,.ov,.sh,.shimmer,.glow,.glow2,.glow-w{animation:none !important}
+  .pb,.tb{transition:none !important}
+  *{scroll-behavior:auto !important}
+}

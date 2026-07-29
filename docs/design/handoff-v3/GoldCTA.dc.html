@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./dc-tokens.css">
+<style>
+html,body{margin:0;padding:0}
+@keyframes sweep{0%{transform:translateX(-160%) skewX(-12deg)}30%{transform:translateX(340%) skewX(-12deg)}100%{transform:translateX(340%) skewX(-12deg)}}
+.mp-shimmer{position:absolute;top:0;bottom:0;left:0;width:55%;background:linear-gradient(90deg,transparent,rgba(255,224,160,.42),transparent);transform:translateX(-160%) skewX(-12deg);animation:sweep 4.5s cubic-bezier(.35,0,.2,1) infinite;pointer-events:none}
+/* 金色光带只属于暗色金胶囊；亮色 CTA 是深蓝黑实色，扫光会显脏 */
+.theme-light .mp-shimmer{display:none}
+@media (prefers-reduced-motion:reduce){.mp-shimmer{animation:none;opacity:0}}
+</style>
+</helmet>
+<button type="button" onclick="{{ onPress }}" onmousedown="{{ down }}" onmouseup="{{ up }}" onmouseleave="{{ up }}" ontouchstart="{{ down }}" ontouchend="{{ up }}" style="{{ rootStyle }}">
+<span style="{{ shimmerWrapStyle }}"><span class="mp-shimmer"></span></span>
+<span style="{{ logoutStyle }}"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg></span>
+<span style="position:relative;display:flex;flex-direction:column;align-items:center;gap:4px">
+<span style="{{ labelStyle }}"><span style="{{ playStyle }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.6-.4.6-1.4 0-1.8l-12-7.5c-.7-.4-1.6.1-1.6.9z"></path></svg></span>{{ label }}<span style="{{ chevronStyle }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span></span>
+<span style="{{ subStyle }}">{{ sub }}</span>
+</span>
+</button>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:360,&quot;height&quot;:86},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;开始训练&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;sub&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;蹲·推·拉&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;primary&quot;,&quot;secondary&quot;,&quot;danger&quot;,&quot;link&quot;],&quot;default&quot;:&quot;primary&quot;,&quot;tsType&quot;:&quot;'primary'|'secondary'|'danger'|'link'&quot;},&quot;icon&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;none&quot;,&quot;play&quot;,&quot;logout&quot;],&quot;default&quot;:&quot;play&quot;,&quot;tsType&quot;:&quot;'none'|'play'|'logout'&quot;},&quot;onPress&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;() =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = { held: false };
+  renderVals(){
+    const p = this.props;
+    const variant = p.variant || 'primary';
+    const held = this.state.held;
+    const hasSub = !!p.sub;
+    const isLink = variant === 'link';
+
+    // primary rides --cta-bg / --cta-text: gold pill on dark, deep-ink pill on light.
+    // The 4.5s gold sweep lives in CSS (.mp-shimmer) so .theme-light can switch it off — it belongs
+    // to the gold fill only; on the light deep-ink pill a white streak just reads as dirt.
+    // link is a quiet text action under the CTA — no fill, no border, not full width.
+    let bg = 'transparent', ink = 'var(--text-muted)', border = '0', glow = 'none';
+    if (variant === 'primary') {
+      bg = 'var(--cta-bg)'; ink = 'var(--cta-text)';
+      // molded gold pill, straight from the app: top inner highlight + bottom inner lip + gold drop.
+      // --cta-mold flips to a plain lift under .theme-light, where the fill is deep ink and a gold
+      // drop would read as a stain.
+      glow = held
+        ? 'var(--cta-mold-held)'
+        : 'var(--cta-mold)';
+    } else if (variant === 'secondary') {
+      bg = 'var(--surface-card)'; ink = 'var(--text-secondary)';
+      border = '1px solid var(--border-default)'; glow = 'var(--card-shadow)';
+    } else if (variant === 'danger') {
+      // matches the app's 退出登录 row: card surface, 16px box, muted red ink — not a red-outlined pill
+      bg = 'var(--surface-card)'; ink = 'var(--danger-muted)';
+      border = '1px solid var(--border-strong)'; glow = 'var(--card-shadow)';
+    }
+
+    return {
+      label: p.label ?? '开始训练',
+      sub: p.sub ?? '',
+      onPress: p.onPress || (() => {}),
+      down: () => this.setState({ held: true }),
+      up: () => this.setState({ held: false }),
+      rootStyle: isLink
+        ? `position:relative;border:0;background:transparent;min-height:44px;padding:0 12px;margin:0 auto;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:${held ? 0.6 : 1};transition:opacity .12s ease;-webkit-tap-highlight-color:transparent;font-family:'Noto Sans SC',sans-serif`
+        : `position:relative;overflow:hidden;width:100%;min-height:${hasSub ? 62 : 52}px;border:${border};border-radius:${variant === 'danger' ? 16 : 999}px;background:${bg};box-shadow:${glow};display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;color:${ink};transform:scale(${held ? 0.97 : 1});transition:transform .12s cubic-bezier(.22,.61,.36,1),box-shadow .18s ease;-webkit-tap-highlight-color:transparent;font-family:'Noto Sans SC',sans-serif`,
+      shimmerWrapStyle: variant === 'primary' ? 'position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none' : 'display:none',
+      logoutStyle: p.icon === 'logout' && !isLink ? 'display:flex;flex:none' : 'display:none',
+      playStyle: p.icon === 'play' && !isLink ? 'display:inline-flex;margin-right:7px' : 'display:none',
+      chevronStyle: isLink ? 'display:inline-flex;margin-left:3px' : 'display:none',
+      labelStyle: isLink
+        ? `display:inline-flex;align-items:center;font-size:13px;font-weight:500;color:${ink}`
+        : variant === 'danger'
+        ? `position:relative;font-size:14px;font-weight:600;color:${ink};opacity:${held ? 0.72 : 1};transition:opacity .12s ease`
+        : `position:relative;display:inline-flex;align-items:center;font-family:'Archivo','Noto Sans SC',sans-serif;font-size:16px;font-weight:800;letter-spacing:.01em;color:${ink};opacity:${held ? 0.72 : 1};transition:opacity .12s ease`,
+      subStyle: hasSub && !isLink
+        ? `position:relative;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;font-weight:700;letter-spacing:.06em;color:${ink};opacity:${held ? 0.42 : 0.72};transition:opacity .12s ease`
+        : 'display:none'
+    };
+  }
+}
+</script>
+</body>
+</html>

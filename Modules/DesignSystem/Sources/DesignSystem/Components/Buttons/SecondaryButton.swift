@@ -1,7 +1,11 @@
 import SwiftUI
 
+/// ⛔️ FROZEN W0 view — compatibility quarantine, not a v3 component.
+///
+/// New code must use `GoldCTA(.secondary)`. Delete this rendering after the
+/// coach migration wave.
 @MainActor
-public struct SecondaryButton: View {
+struct LegacySecondaryButton: View {
   private let title: String
   private let isDisabled: Bool
   private let isFullWidth: Bool
@@ -9,7 +13,7 @@ public struct SecondaryButton: View {
 
   @State private var feedbackTrigger = false
 
-  public init(
+  init(
     _ title: String,
     isDisabled: Bool = false,
     isFullWidth: Bool = false,
@@ -21,25 +25,25 @@ public struct SecondaryButton: View {
     self.action = action
   }
 
-  public var body: some View {
+  var body: some View {
     Button(action: handleTap) {
       Text(title)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(Font.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textSecondary)
         .lineLimit(2)
         .multilineTextAlignment(.center)
         .padding(.horizontal, MeetPRSpacing.lg)
-        .padding(.vertical, 14)
+        .padding(.vertical, MeetPRSpacing.point14)
         .frame(maxWidth: isFullWidth ? .infinity : nil)
         .frame(minHeight: 44)
-        .background(.clear)
+        .background(Color.MeetPR.surfaceCard)
         .overlay {
-          RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-            .stroke(Color.MeetPR.fgPrimary, lineWidth: 1)
+          RoundedRectangle(cornerRadius: MeetPRRadius.pill)
+            .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
         }
-        .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
+        .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
     }
-    .buttonStyle(MeetPRPressOpacityButtonStyle(isDisabled: isDisabled))
+    .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled))
     .disabled(isDisabled)
     .sensoryFeedback(.impact(weight: .light), trigger: feedbackTrigger)
     .accessibilityLabel(title)
@@ -52,19 +56,42 @@ public struct SecondaryButton: View {
   }
 }
 
+@MainActor
+public struct SecondaryButton: View {
+  private let legacy: LegacySecondaryButton
+
+  public init(
+    _ title: String,
+    isDisabled: Bool = false,
+    isFullWidth: Bool = false,
+    action: @escaping @MainActor () -> Void
+  ) {
+    legacy = LegacySecondaryButton(
+      title,
+      isDisabled: isDisabled,
+      isFullWidth: isFullWidth,
+      action: action
+    )
+  }
+
+  public var body: some View {
+    legacy
+  }
+}
+
 #Preview("SecondaryButton") {
   VStack(spacing: MeetPRSpacing.base) {
     SecondaryButton("Discard") {}
     SecondaryButton("Disabled", isDisabled: true) {}
   }
   .padding()
-  .background(Color.MeetPR.bg)
+  .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)
 }
 
 #Preview("SecondaryButton Light") {
   SecondaryButton("Discard") {}
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.light)
 }

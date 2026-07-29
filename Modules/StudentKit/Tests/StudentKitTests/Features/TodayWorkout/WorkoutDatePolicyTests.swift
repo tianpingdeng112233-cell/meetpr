@@ -92,9 +92,9 @@ import Testing
     #expect(!WorkoutDatePolicy.isPast(calendarToday, now: earlyMorning, calendar: calendar))
   }
 
-  @Test func gymDayTodayAnchorsSelectionToTheEditableDay() throws {
-    // Seeding selectedDate with gymDayToday lands on the editable day both
-    // mid-day and inside the early-morning window.
+  @Test func gymDayTodayAnchorsWriteEligibilityAcrossCutoff() throws {
+    // The shifted timestamp stays inside the writable gym-day both at midday
+    // and during the early-morning cutoff window.
     let midDay = try day(2026, 7, 4, hour: 14)
     #expect(
       WorkoutDatePolicy.isEditable(

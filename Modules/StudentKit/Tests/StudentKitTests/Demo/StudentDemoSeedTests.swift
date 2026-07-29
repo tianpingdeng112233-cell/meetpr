@@ -1,4 +1,5 @@
 import CoreModels
+import Foundation
 import Testing
 
 @testable import StudentKit
@@ -17,7 +18,7 @@ import Testing
   #expect(logs.allSatisfy { $0.studentID == StudentDemoSeed.studentID })
 }
 
-@Test func demoStudentKeepsSquatBenchDeadliftE1RMThroughCompetitionGate() {
+@Test func demoStudentKeepsSquatBenchDeadliftE1RMThroughCompetitionGate() throws {
   let plan = StudentDemoSeed.makePlanView()
   let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
   let resolved = Dictionary(
@@ -36,4 +37,54 @@ import Testing
         resolved.first(where: { $0.value == point.exerciseId })?.key
       }) == [.squat, .bench, .deadlift]
   )
+  let squatExerciseID = try #require(resolved[.squat])
+  let latestSquat =
+    histories
+    .filter { $0.exerciseId == squatExerciseID }
+    .max { $0.computedAt < $1.computedAt }
+  #expect(latestSquat?.sourceWeightKg == 142.5)
+}
+
+@Test func growthFormingDemoHasOneEligibleSetAndOneHistoryPoint() {
+  let plan = StudentDemoSeed.makePlanView()
+  let logs = StudentDemoSeed.makeSingleSessionLogs(plan: plan)
+  let history = StudentDemoSeed.makeFormingE1RMHistory()
+
+  #expect(logs.count == 1)
+  #expect(logs.first?.completed == true)
+  #expect(GrowthScreenPresentation.historyStats(logs: logs).trainingSessionCount == 1)
+  #expect(history.count == 1)
+  #expect(history.first?.exerciseId == logs.first?.exerciseID)
+}
+
+@Test func relativeSeedD1MatchesDeviceTodayAcrossUTCBoundary() throws {
+  var shanghai = Calendar(identifier: .gregorian)
+  shanghai.timeZone = try #require(TimeZone(identifier: "Asia/Shanghai"))
+  let deviceToday = try #require(
+    shanghai.date(
+      from: DateComponents(
+        year: 2026,
+        month: 7,
+        day: 29,
+        hour: 0,
+        minute: 30
+      )
+    )
+  )
+  let plan = StudentDemoSeed.makePlanView(
+    today: deviceToday,
+    todayOffset: 0,
+    selectedCalendar: shanghai
+  )
+  let dayOne = try #require(plan.days.first)
+
+  #expect(
+    PlanCalendarDayIdentity.matches(
+      planDate: dayOne.date,
+      selectedDate: deviceToday,
+      selectedCalendar: shanghai
+    )
+  )
+  #expect(shanghai.component(.day, from: deviceToday) == 29)
+  #expect(StudentDemoSeed.utcCalendar.component(.day, from: deviceToday) == 28)
 }

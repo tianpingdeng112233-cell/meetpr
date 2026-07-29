@@ -3,42 +3,6 @@ import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// Spec 028 §6: per-family e1RM growth curve with time-window filtering.
-/// Variation-level curves and the variation picker sheet are V0.1.x.
-@available(iOS 17.0, macOS 14.0, *)
-public struct GrowthCurveView: View {
-  private let studentID: UUID
-  private let plans: any StudentPlanRepository
-  private let e1rm: any E1RMRepository
-  private let onboarding: (any OnboardingProfileReading)?
-
-  public init(
-    studentID: UUID,
-    plans: any StudentPlanRepository,
-    e1rm: any E1RMRepository,
-    onboarding: (any OnboardingProfileReading)? = nil
-  ) {
-    self.studentID = studentID
-    self.plans = plans
-    self.e1rm = e1rm
-    self.onboarding = onboarding
-  }
-
-  public var body: some View {
-    ScrollView {
-      GrowthCurvePanelView(
-        studentID: studentID,
-        plans: plans,
-        e1rm: e1rm,
-        onboarding: onboarding
-      )
-      .padding(MeetPRSpacing.md)
-    }
-    .background(Color.MeetPR.bg)
-    .navigationTitle("成长曲线")
-  }
-}
-
 /// Embeddable e1RM growth panel without scroll view, navigation title, or page background.
 @available(iOS 17.0, macOS 14.0, *)
 struct GrowthCurvePanelView: View {
@@ -137,7 +101,7 @@ struct GrowthCurvePanelView: View {
         )
         .frame(height: 280)
         .padding(MeetPRSpacing.sm)
-        .background(Color.MeetPR.surface1)
+        .background(Color.MeetPR.surfaceCard)
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
     }
@@ -146,8 +110,8 @@ struct GrowthCurvePanelView: View {
   private func pointDetail(_ point: E1RMHistoryPoint) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Text(point.computedAt, format: .dateTime.year().month().day().weekday())
-        .font(Font.MeetPR.headline)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
+        .foregroundStyle(Color.MeetPR.textPrimary)
       HStack(spacing: MeetPRSpacing.lg) {
         metric("重量", "\(StudentFormatting.kilograms(point.sourceWeightKg)) kg")
         metric("次数", "\(point.sourceReps)")
@@ -155,27 +119,27 @@ struct GrowthCurvePanelView: View {
       }
       HStack {
         Text("e1RM")
-          .font(Font.MeetPR.monoLabel)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textMuted)
         Text("\(StudentFormatting.kilograms(point.e1RMKg)) kg")
-          .font(Font.MeetPR.title2)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size28, weight: .bold))
+          .foregroundStyle(Color.MeetPR.goldText)
       }
       Spacer(minLength: 0)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(MeetPRSpacing.md)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private func metric(_ title: String, _ value: String) -> some View {
     VStack(alignment: .leading, spacing: 2) {
       Text(title)
-        .font(Font.MeetPR.monoLabel)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textMuted)
       Text(value)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
     }
   }
 

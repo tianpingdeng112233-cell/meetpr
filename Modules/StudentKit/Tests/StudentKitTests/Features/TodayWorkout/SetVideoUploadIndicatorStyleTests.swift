@@ -39,9 +39,9 @@ import Testing
 }
 
 @Test func setVideoUploadIndicatorStrokeColorsMatchDesignTokens() {
-  #expect(SetVideoUploadIndicatorStyle.unattached.strokeColor == Color.MeetPR.fgTertiary)
-  #expect(SetVideoUploadIndicatorStyle.uploaded.strokeColor == Color.MeetPR.green)
-  #expect(SetVideoUploadIndicatorStyle.failed.strokeColor == Color.MeetPR.brandRed)
+  #expect(SetVideoUploadIndicatorStyle.unattached.strokeColor == Color.MeetPR.textMuted)
+  #expect(SetVideoUploadIndicatorStyle.uploaded.strokeColor == Color.MeetPR.success)
+  #expect(SetVideoUploadIndicatorStyle.failed.strokeColor == Color.MeetPR.danger)
   #expect(SetVideoUploadIndicatorStyle.uploading(progress: 0.5).strokeColor == nil)
 }
 

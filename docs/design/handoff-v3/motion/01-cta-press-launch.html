@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01 · CTA 蓄力 → 变形转场</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../motion.css">
+<style>
+body{margin:0;background:var(--bg-deep);color:var(--text-primary);font-family:'IBM Plex Sans','Noto Sans SC',sans-serif;display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px}
+.note{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;color:var(--text-muted);max-width:390px;line-height:1.7}
+</style>
+</head>
+<body>
+<button onclick="document.body.classList.toggle('theme-light')" style="position:fixed;top:12px;right:12px;z-index:99;border:1px solid var(--border-strong);background:var(--surface-card);color:var(--text-secondary);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'IBM Plex Mono','Noto Sans SC',monospace;box-shadow:var(--card-shadow)">暗色 / 亮色</button>
+<div class="note">CTA 蓄力按压 + 变形转场（金环从「开始训练」按钮几何变形到训练页 hero 卡）。按下→scale(.97)+发光增强+文字变暗；抬起→旧屏 200ms 下沉淡出，140ms 后切屏，金环 420ms easeOutCubic 变形（圆角 28→16），hero 子元素 55ms 步长错峰浮现，金环 200ms 淡出。总时长约 700ms。DOM 与样式逐字取自样机。</div>
+<div style="position:relative;width:390px;height:760px;background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:24px;overflow:hidden" id="host">
+
+  <div id="scrA" class="scrn" style="position:absolute;inset:0;padding:20px 20px 28px;display:flex;flex-direction:column;gap:15px;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:10px"><span style="position:relative;display:inline-block;font-family:'Archivo',sans-serif;font-weight:900;font-size:16px;letter-spacing:-.11em;line-height:1"><span style="-webkit-text-stroke:5px var(--text-primary);color:var(--text-primary);paint-order:stroke fill">MEETP<span style="margin-left:-.13em">R</span></span><span style="position:absolute;left:0;top:0;color:var(--bg-base)">MEETP<span style="margin-left:-.13em">R</span></span></span><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;letter-spacing:.06em;color:var(--text-muted)">7月24日 · 星期五</span></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between">
+      <div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:54px;line-height:.9;color:var(--text-primary);text-shadow:var(--headline-emboss)">W1D4</div>
+      <div class="pb" style="position:relative;width:44px;height:44px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg><span style="position:absolute;top:-1px;right:-1px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:var(--danger-fill);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace">3</span></div>
+    </div>
+    <div style="display:flex;gap:5px;margin-top:-8px">
+      <span style="flex:1;height:4px;border-radius:2px;background:var(--text-primary)"></span>
+      <span style="flex:1;height:4px;border-radius:2px;background:var(--text-primary)"></span>
+      <span style="flex:1;height:4px;border-radius:2px;background:var(--text-primary)"></span>
+      <span style="flex:1.5;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--gold-500),var(--gold-400),#FFD470);box-shadow:0 0 7px rgba(var(--gold-rgb),.75)"></span>
+    </div>
+    <div style="display:flex;gap:11px;margin-top:2px">
+      <div style="flex:1;background:var(--surface-card);border-radius:16px;padding:14px 16px"><div style="display:flex;align-items:center;gap:6px;color:var(--text-primary);font-size:11px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2"><path d="M12 3v6M7 21h10a2 2 0 002-2 7 7 0 00-14 0 2 2 0 002 2z"></path></svg>体重</div><div style="font-size:24px;font-weight:800;font-family:'Archivo',sans-serif;margin-top:3px">83<span style="font-size:13px;color:var(--text-muted);font-weight:600"> kg</span></div></div>
+      <div style="flex:1;position:relative;background:linear-gradient(155deg,rgba(var(--gold-rgb),.13),var(--surface-card) 62%);box-shadow:inset 0 0 0 1px rgba(var(--gold-rgb),.3);border-radius:16px;padding:14px 16px"><div style="display:flex;align-items:center;gap:6px;color:var(--text-primary);font-size:11px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4h11l-2 4 2 4H5"></path></svg>距比赛</div><div style="display:flex;align-items:center;gap:5px;margin-top:3px"><svg width="14" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold-500)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg><span style="font-size:24px;font-weight:800;font-family:'Archivo',sans-serif;color:var(--gold-text);line-height:1;text-shadow:0 0 14px rgba(var(--gold-rgb),.45)">3</span><span style="font-size:13px;color:var(--text-muted);font-weight:600"> 天</span></div></div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-top:2px">
+      <div id="cta" style="position:relative;overflow:hidden;background:var(--cta-bg);border-radius:999px;padding:13px 17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:transform .13s ease,box-shadow .13s ease,filter .13s ease;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)">
+        <span class="shimmer"></span>
+        <span id="ctaT1" style="position:relative;display:inline-flex;align-items:center;gap:7px;color:var(--cta-text);font-weight:800;font-size:16px;line-height:1;transition:opacity .13s ease"><svg width="13" height="13" viewBox="0 0 24 24" fill="var(--cta-text)"><path d="M7 4.5v15c0 .8.9 1.3 1.6.9l12-7.5c.6-.4.6-1.4 0-1.8l-12-7.5c-.7-.4-1.6.1-1.6.9z"></path></svg>开始训练</span>
+        <span id="ctaT2" style="position:relative;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:12px;letter-spacing:.06em;font-weight:700;color:var(--cta-text);opacity:.72;line-height:1;transition:opacity .13s ease">蹲 · 推 · 拉</span>
+      </div>
+      <div style="display:flex;justify-content:center"><span class="pb" style="display:inline-flex;align-items:center;justify-content:center;gap:3px;min-height:44px;padding:0 12px;font-size:13px;color:var(--text-muted);cursor:pointer">顺延一天<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span></div>
+    </div>
+  </div>
+
+  <div id="scrB" style="position:absolute;inset:0;padding:20px 20px 28px;display:none;flex-direction:column;gap:13px;overflow:hidden">
+    <div style="margin-bottom:1px"><span style="position:relative;display:inline-block;font-family:'Archivo',sans-serif;font-weight:900;font-size:15px;letter-spacing:-.11em;line-height:1"><span style="-webkit-text-stroke:5px var(--text-primary);color:var(--text-primary);paint-order:stroke fill">MEETP<span style="margin-left:-.13em">R</span></span><span style="position:absolute;left:0;top:0;color:var(--bg-base)">MEETP<span style="margin-left:-.13em">R</span></span></span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="font-weight:800;font-size:20px;font-family:'Archivo','Noto Sans SC',sans-serif">W1D4</div>
+      <div style="display:flex;gap:9px">
+        <div class="pb" style="width:40px;height:40px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 10-2 5"></path><path d="M20 5v6h-6"></path></svg></div>
+        <div class="pb" style="position:relative;width:40px;height:40px;border-radius:50%;background:var(--surface-card);display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg><span style="position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:var(--danger-fill);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace">3</span></div>
+      </div>
+    </div>
+    <div id="hero" style="position:relative;border:1px solid var(--border-strong);border-left:none;background:var(--bg-inset);border-radius:0 16px 16px 0;padding:16px;overflow:hidden">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#FFD470,var(--gold-400),var(--gold-500));pointer-events:none"></div>
+      <div style="font-family:'Archivo','Noto Sans SC',sans-serif;font-weight:800;font-size:22px;line-height:1;margin-bottom:3px">硬拉</div>
+      <div style="font-size:12px;color:var(--text-tertiary);font-family:'IBM Plex Mono','Noto Sans SC',monospace;margin-bottom:11px">上次 170kg×3 @8 · 最佳 175kg×3 @8.5</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;font-weight:700;letter-spacing:.05em;background:rgba(var(--gold-rgb),.16);color:var(--gold-text);padding:3px 11px;border-radius:999px">当前</span><span style="font-size:12px;color:var(--text-muted)">第 1 / 3 组 · 动作 1 / 3</span></div>
+      <div style="display:flex;align-items:flex-end;gap:9px"><span style="font-family:'Archivo',sans-serif;font-weight:800;font-size:54px;line-height:.85">175</span><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--text-muted);font-weight:700;margin-bottom:8px">KG</span><span style="margin-left:auto;font-size:20px;color:var(--text-primary);font-weight:700;margin-bottom:8px">×3<span style="font-size:12px;color:var(--text-muted);font-weight:500"> 次</span></span></div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px"><span style="font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:.05em;color:var(--text-faint);font-weight:600">目标 RPE</span><span style="font-size:20px;font-weight:800;font-family:'Archivo',sans-serif">8.5</span><span style="font-size:12px;color:var(--text-faint)">/ 10</span></div>
+      <div style="background:var(--bg-inset);border-radius:10px;padding:10px 12px;margin-top:11px"><span style="font-size:11px;color:var(--text-faint);font-family:'IBM Plex Mono','Noto Sans SC',monospace">教练备注</span><div style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-top:3px">注意启动时股四的蹬地</div></div>
+      <div style="display:flex;gap:9px;margin-top:13px"><div class="pb" style="flex:1;position:relative;overflow:hidden;background:var(--cta-bg);color:var(--cta-text);border-radius:999px;padding:15px;text-align:center;font-weight:800;font-size:15px;cursor:pointer;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38)"><span style="position:relative">记录此组</span></div><div class="pb" style="width:52px;background:var(--surface-card);border:1px solid var(--border-strong);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="M16 10l5-2v8l-5-2"></path></svg></div></div>
+    </div>
+    <button id="reset" style="margin-top:auto;border:1px solid var(--border-strong);background:transparent;color:var(--text-secondary);border-radius:999px;padding:12px;font-size:14px;cursor:pointer;font-family:inherit">重置 demo</button>
+  </div>
+</div>
+<script>
+const $=(id)=>document.getElementById(id);
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function tween(dur,step,done){const t0=performance.now();const run=()=>{const p=Math.min(1,(performance.now()-t0)/dur);step(p);if(p<1)requestAnimationFrame(run);else if(done)done();};requestAnimationFrame(run);}
+const cta=$('cta');
+cta.addEventListener('pointerdown',()=>{
+  cta.style.transform='scale(.97)';
+  cta.style.boxShadow='inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 0 0 1.5px rgba(255,210,110,.9),0 0 36px 9px rgba(var(--gold-rgb),.6),0 0 74px 16px rgba(var(--gold-rgb),.28)';
+  cta.style.filter='brightness(1.06)';
+  $('ctaT1').style.opacity='.6'; $('ctaT2').style.opacity='.45';
+});
+function ctaReset(){cta.style.transform='';cta.style.boxShadow='';cta.style.filter='';$('ctaT1').style.opacity='';$('ctaT2').style.opacity='';}
+cta.addEventListener('pointerleave',ctaReset);
+cta.addEventListener('pointerup',()=>{
+  ctaReset();
+  if(reduced){ $('scrA').style.display='none'; $('scrB').style.display='flex'; return; }
+  const host=$('host'), hostR=host.getBoundingClientRect(), r=cta.getBoundingClientRect();
+  const s0={l:r.left-hostR.left,t:r.top-hostR.top,w:r.width,h:r.height};
+  const g=document.createElement('div');
+  g.style.cssText=`position:absolute;left:${s0.l}px;top:${s0.t}px;width:${s0.w}px;height:${s0.h}px;border-radius:28px;background:rgba(15,15,18,.97);border:1px solid rgba(var(--gold-rgb),.8);box-shadow:0 0 26px rgba(var(--gold-rgb),.18);z-index:44;pointer-events:none`;
+  host.appendChild(g);
+  cta.style.opacity='0';
+  const scrA=$('scrA');
+  tween(200,(p)=>{const e=p*p;scrA.style.transform=`translateY(${(26*e).toFixed(1)}px)`;scrA.style.opacity=String(1-e);});
+  setTimeout(()=>{
+    scrA.style.display='none'; scrA.style.transform=''; scrA.style.opacity=''; cta.style.opacity='';
+    const scrB=$('scrB'); scrB.style.display='flex'; scrB.style.opacity='0';
+    const hero=$('hero'); hero.style.opacity='0';
+    const hr2=host.getBoundingClientRect(), hR=hero.getBoundingClientRect();
+    const s1={l:hR.left-hr2.left,t:hR.top-hr2.top,w:hR.width,h:hR.height};
+    tween(280,(p)=>{scrB.style.opacity=String(p);});
+    tween(420,(p)=>{
+      const e=1-Math.pow(1-p,3);
+      g.style.left=(s0.l+(s1.l-s0.l)*e).toFixed(1)+'px'; g.style.top=(s0.t+(s1.t-s0.t)*e).toFixed(1)+'px';
+      g.style.width=(s0.w+(s1.w-s0.w)*e).toFixed(1)+'px'; g.style.height=(s0.h+(s1.h-s0.h)*e).toFixed(1)+'px';
+      g.style.borderRadius=(28-12*e).toFixed(1)+'px';
+    },()=>{
+      hero.style.opacity='';
+      const kids=[...hero.children].filter(c=>getComputedStyle(c).position!=='absolute');
+      kids.forEach(c=>{c.style.opacity='0';});
+      kids.forEach((c,i)=>{setTimeout(()=>{tween(220,(p)=>{const e2=1-Math.pow(1-p,3);c.style.opacity=String(e2);c.style.transform=`translateY(${(9*(1-e2)).toFixed(1)}px)`;},()=>{c.style.opacity='';c.style.transform='';});},i*55);});
+      tween(200,(p)=>{g.style.opacity=String(1-p);},()=>g.remove());
+    });
+  },140);
+});
+$('reset').addEventListener('click',()=>{ $('scrB').style.display='none'; const a=$('scrA'); a.style.display='flex'; a.classList.remove('scrn'); void a.offsetWidth; a.classList.add('scrn'); });
+</script>
+</body>
+</html>

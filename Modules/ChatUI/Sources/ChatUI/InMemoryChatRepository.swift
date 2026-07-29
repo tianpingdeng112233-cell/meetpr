@@ -110,6 +110,23 @@ public actor InMemoryChatRepository: ChatRepository {
     )
   }
 
+  public func sendSetRef(
+    in conversationID: UUID,
+    body: String,
+    setRef: SetRefV1,
+    videoID: UUID?,
+    clientID: String
+  ) async throws -> ChatMessage {
+    try appendMessage(
+      in: conversationID,
+      kind: .text,
+      text: body,
+      attachmentID: videoID,
+      setRef: setRef,
+      clientID: clientID
+    )
+  }
+
   public func markRead(
     in conversationID: UUID,
     upTo messageID: UUID
@@ -145,6 +162,7 @@ public actor InMemoryChatRepository: ChatRepository {
     kind: ChatMessageKind,
     text: String?,
     attachmentID: UUID?,
+    setRef: SetRefV1? = nil,
     clientID: String
   ) throws -> ChatMessage {
     guard let conversationIndex = conversations.firstIndex(where: { $0.id == conversationID })
@@ -170,6 +188,7 @@ public actor InMemoryChatRepository: ChatRepository {
       attachmentID: attachmentID,
       imageURL: nil,
       imageExpiresIn: nil,
+      setRef: setRef,
       clientID: clientID,
       createdAt: createdAt
     )

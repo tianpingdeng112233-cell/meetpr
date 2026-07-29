@@ -1,0 +1,37 @@
+/* MeetPR 设计 token — 与 MeetPR 学员端.dc.html 完全一致（唯一标准）
+ * 暗色 = :root 默认；亮色 = 祖先元素加 .theme-light
+ */
+:root{
+  --bg-deep:#050506; --bg-base:#0A0A0C; --bg-inset:#101014; --bg-stack:#121217;
+  --surface-card:#141416; --surface-elevated:#161618; --surface-key:#1C1C20; --surface-raised:#232327;
+  --border-hairline:#17171A; --border-subtle:#1E1E22; --border-default:#262629; --border-strong:#2E2E32;
+  --text-primary:#EDEDED; --text-secondary:#C8C8CC; --text-tertiary:#A1A1A6; --text-muted:#8A8A90;
+  --text-faint:#8A8A90; --text-dim:#8A8A90; --text-disabled:#55555C; --text-ghost:#3E3E44;
+  --gold-cta:#FFB800; --gold-500:#F5A623; --gold-400:#FBBF3E; --gold-200:#FFE28E; --gold-rgb:245,166,35; --gold-text:#F5A623;
+  --ink-on-gold:#141414;
+  --success:#5E9E78; --success-soft:#9FC7AE; --success-rgb:94,158,120;
+  --danger:#E5484D; --danger-rgb:229,72,77; --danger-muted:#C88888; --danger-fill:#C0343A;
+  --chart-line:#DCE3EA;
+  --cta-bg:var(--gold-cta); --cta-text:var(--ink-on-gold); --cta-fill:#111827;
+  --cta-mold:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 8px 26px rgba(var(--gold-rgb),.38);
+  --cta-mold-held:inset 0 1.5px 0 rgba(255,255,255,.55),inset 0 -2px 3px rgba(120,60,0,.25),0 0 0 4px rgba(var(--gold-rgb),.28),0 0 30px rgba(var(--gold-rgb),.45);
+  --card-shadow:none;
+  --bezel:#1C1C1E; --bezel-edge:#2A2A2D; --desk-1:#1A1A1E; --desk-2:#050506;
+}
+.theme-light{
+  --bg-deep:#EDEEF1; --bg-base:#F5F6F8; --bg-inset:#FAFAFB; --bg-stack:#EEF0F3;
+  --surface-card:#FFFFFF; --surface-elevated:#FFFFFF; --surface-key:#F3F4F6; --surface-raised:#EEF0F3;
+  --border-hairline:#E9EBEE; --border-subtle:#E5E7EB; --border-default:#E5E7EB; --border-strong:#D1D5DB;
+  --text-primary:#111827; --text-secondary:#4B5563; --text-tertiary:#5C6371; --text-muted:#5C6371;
+  --text-faint:#5C6371; --text-dim:#5C6371; --text-disabled:#9CA3AF; --text-ghost:#D1D5DB;
+  --gold-cta:#B45309; --gold-500:#D97706; --gold-400:#F59E0B; --gold-200:#FEF3C7; --gold-rgb:217,119,6; --gold-text:#9A4A06;
+  --ink-on-gold:#FFFFFF;
+  --success:#15803D; --success-soft:#15803D; --success-rgb:21,128,61;
+  --danger:#E5484D; --danger-rgb:229,72,77; --danger-muted:#A33B40; --danger-fill:#C0343A;
+  --chart-line:#9AA4B0;
+  --cta-bg:#111827; --cta-text:#FFFFFF; --cta-fill:#111827;
+  --cta-mold:0 6px 20px rgba(17,24,39,.18);
+  --cta-mold-held:0 0 0 4px rgba(17,24,39,.14);
+  --card-shadow:0 4px 18px rgba(17,24,39,.06);
+  --desk-1:#E9E9EE; --desk-2:#D2D2D9;
+}

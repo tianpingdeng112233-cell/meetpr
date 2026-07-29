@@ -24,6 +24,7 @@ struct DashboardPlanSignature: Equatable, Hashable, Sendable {
 struct DashboardPlanNotice: Equatable, Sendable {
   let signature: DashboardPlanSignature
   let weekIndex: Int
+  let occurredAt: Date
 }
 
 final class UserDefaultsDashboardPlanSeenStore: DashboardPlanSeenStoring, @unchecked Sendable {
@@ -147,6 +148,10 @@ public final class StudentNotificationsCoordinator {
     feedback.unreadCount
   }
 
+  var feedbackItems: [CoachFeedback] {
+    feedback.items
+  }
+
   var evaluationUnreadCount: Int {
     evaluation.unreadBadgeCount
   }
@@ -159,21 +164,15 @@ public final class StudentNotificationsCoordinator {
   var totalUnreadCount: Int {
     (planNotice == nil ? 0 : 1)
       + feedbackUnreadCount
-      + evaluationUnreadCount
       + chatUnreadCount
+    // Evaluation remains implemented for a future unseal, but the 2026-07-13
+    // hard-seal decision is defer-not-delete: no evaluation ghost badge may
+    // surface in the coached student's header while that flow is sealed.
   }
 
   var coachConversation: ChatConversation? {
     guard let coachID = activeCoach?.coachID else { return nil }
     return chatContext?.inbox.conversations.first { $0.otherPartyID == coachID }
-  }
-
-  var coachMessagePreview: String {
-    coachConversation?.lastMessagePreview ?? StudentStrings.startCoachConversation
-  }
-
-  var hasActiveCoach: Bool {
-    activeCoach != nil
   }
 
   func loadIfNeeded(studentID: UUID) async {
@@ -200,7 +199,11 @@ public final class StudentNotificationsCoordinator {
       let notice =
         seenStore.hasSeen(studentID: studentID, signature: signature)
         ? nil
-        : DashboardPlanNotice(signature: signature, weekIndex: plan.weekIndex)
+        : DashboardPlanNotice(
+          signature: signature,
+          weekIndex: plan.weekIndex,
+          occurredAt: plan.startDate
+        )
       state = .loaded(notice)
     } catch {
       if error.isTaskCancellation {
@@ -217,6 +220,11 @@ public final class StudentNotificationsCoordinator {
     }
     seenStore.markSeen(studentID: currentStudentID, signature: notice.signature)
     state = .loaded(nil)
+  }
+
+  func markFeedbackRead(_ item: CoachFeedback) async {
+    guard item.readAt == nil else { return }
+    await feedback.markRead(item)
   }
 
   func startChatPolling() {

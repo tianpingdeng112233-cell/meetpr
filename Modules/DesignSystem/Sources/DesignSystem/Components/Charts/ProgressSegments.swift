@@ -2,7 +2,7 @@ import SwiftUI
 
 /// A segmented progress bar (mesocycle weeks, cycle progress). Each value is a
 /// fill fraction 0...1: `1` = complete (green), `0` = empty (hairline outline),
-/// in-between = partially filled (white over a track).
+/// in-between = active gold progress over a dark track.
 @available(iOS 17.0, macOS 14.0, *)
 @MainActor
 public struct ProgressSegments: View {
@@ -33,12 +33,20 @@ public struct ProgressSegments: View {
       GeometryReader { geo in
         ZStack(alignment: .leading) {
           if value >= 1 {
-            Capsule().fill(Color.MeetPR.green)
+            Capsule().fill(Color.MeetPR.success)
           } else if value <= 0 {
-            Capsule().stroke(Color.MeetPR.border, lineWidth: 1)
+            Capsule().stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
           } else {
-            Capsule().fill(Color.MeetPR.border)
-            Capsule().fill(Color.MeetPR.fgPrimary).frame(width: geo.size.width * value)
+            Capsule().fill(Color.MeetPR.borderSubtle)
+            Capsule()
+              .fill(
+                LinearGradient(
+                  colors: [Color.MeetPR.goldGradientStart, Color.MeetPR.goldGradientEnd],
+                  startPoint: .leading,
+                  endPoint: .trailing
+                )
+              )
+              .frame(width: geo.size.width * value)
           }
         }
       }
@@ -49,6 +57,6 @@ public struct ProgressSegments: View {
 #Preview("ProgressSegments") {
   ProgressSegments(values: [1, 1, 0.4, 0])
     .padding()
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .preferredColorScheme(.dark)
 }
