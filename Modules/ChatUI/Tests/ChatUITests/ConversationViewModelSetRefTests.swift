@@ -17,7 +17,7 @@ import Testing
     presentation.load(candidates: candidates, initialSetLogID: nil)
 
     #expect(presentation.page == .selection)
-    #expect(presentation.selectedSetLogID == firstID)
+    #expect(presentation.selectedCandidateID == firstID)
   }
 
   @Test func pickerFlowRequiresContinueAfterChangingThePrecheckedSelection() {
@@ -31,11 +31,11 @@ import Testing
 
     presentation.load(candidates: candidates, initialSetLogID: nil)
     #expect(presentation.page == .selection)
-    #expect(presentation.selectedSetLogID == firstID)
+    #expect(presentation.selectedCandidateID == firstID)
 
     presentation.select(secondID)
     #expect(presentation.page == .selection)
-    #expect(presentation.selectedSetLogID == secondID)
+    #expect(presentation.selectedCandidateID == secondID)
 
     let didProceed = presentation.proceedToConfirmation()
     #expect(didProceed)
@@ -54,7 +54,23 @@ import Testing
     )
 
     #expect(presentation.page == .selection)
-    #expect(presentation.selectedSetLogID == secondID)
+    #expect(presentation.selectedCandidateID == secondID)
+  }
+
+  @Test func pickerPartitionsLoggedBeforePlannedWithoutReorderingEitherSection() {
+    let loggedOne = Self.candidate(id: chatTestUUID(20))
+    let loggedTwo = Self.candidate(id: chatTestUUID(21))
+    let plannedOne = Self.candidate(id: chatTestUUID(22), source: .planned)
+    let plannedTwo = Self.candidate(id: chatTestUUID(23), source: .planned)
+    var presentation = SetRefPickerPresentation()
+
+    presentation.load(
+      candidates: [loggedOne, loggedTwo, plannedOne, plannedTwo],
+      initialSetLogID: nil
+    )
+
+    #expect(presentation.loggedCandidates.map(\.id) == [loggedOne.id, loggedTwo.id])
+    #expect(presentation.plannedCandidates.map(\.id) == [plannedOne.id, plannedTwo.id])
   }
 
   @Test func canonicalBodyAtUTF16LimitSendsIncludingAnEmoji() async throws {
@@ -141,25 +157,37 @@ import Testing
   }
 
   private static let setRefSource = SetRefSourceSnapshot(
+    source: .logged,
     exerciseName: "低杠位深蹲",
     setNumber: 3,
+    setTotal: 5,
     weightKg: "100.00",
     reps: 5,
+    repsMax: nil,
     rpe: "8.0",
     dayDate: "2026-07-27",
-    setLogId: chatTestUUID(20)
+    setLogId: chatTestUUID(20),
+    planSetId: nil
   )
 
-  private static func candidate(id: UUID) -> SetRefShareCandidate {
+  private static func candidate(
+    id: UUID,
+    source: SetRefSource = .logged
+  ) -> SetRefShareCandidate {
     SetRefShareCandidate(
+      id: id,
       source: SetRefSourceSnapshot(
+        source: source,
         exerciseName: "低杠位深蹲",
         setNumber: 3,
+        setTotal: 5,
         weightKg: "100",
         reps: 5,
+        repsMax: nil,
         rpe: "8",
         dayDate: "2026-07-28",
-        setLogId: id
+        setLogId: source == .logged ? id : nil,
+        planSetId: source == .planned ? id : nil
       )
     )
   }

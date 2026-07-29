@@ -31,7 +31,12 @@ enum StudentFormatting {
   }
 
   static func prescribed(_ set: PrescribedSet) -> String {
-    let reps = set.reps.map(String.init) ?? set.repsMax.map { "<= \($0)" } ?? "-"
+    let reps: String
+    if let lowerBound = set.reps, let upperBound = set.repsMax {
+      reps = "\(lowerBound)-\(upperBound)"
+    } else {
+      reps = set.reps.map(String.init) ?? "-"
+    }
     return "\(decimal(set.weightKg))kg x \(reps)"
   }
 

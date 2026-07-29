@@ -56,6 +56,17 @@
         }
       }
     },
+    "chat.completedSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成"
+          }
+        }
+      }
+    },
     "chat.composerPlaceholder": {
       "extractionState": "manual",
       "localizations": {
@@ -177,6 +188,17 @@
         }
       }
     },
+    "chat.loggedSetCardLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我记录的一组"
+          }
+        }
+      }
+    },
     "chat.messageTooLong": {
       "extractionState": "manual",
       "localizations": {
@@ -199,28 +221,6 @@
         }
       }
     },
-    "chat.noCompletedSets": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今天还没有已完成的组"
-          }
-        }
-      }
-    },
-    "chat.noCompletedSetsDescription": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "完成并保存一组训练后即可分享"
-          }
-        }
-      }
-    },
     "chat.noConversations": {
       "extractionState": "manual",
       "localizations": {
@@ -228,6 +228,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂无会话"
+          }
+        }
+      }
+    },
+    "chat.noShareableSets": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天没有可分享的训练组"
+          }
+        }
+      }
+    },
+    "chat.noShareableSetsDescription": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天的计划组或已记录组会显示在这里"
+          }
+        }
+      }
+    },
+    "chat.plannedSetCardLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我今天的计划"
           }
         }
       }
@@ -320,6 +353,17 @@
         }
       }
     },
+    "chat.rpeMetric": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE"
+          }
+        }
+      }
+    },
     "chat.send": {
       "extractionState": "manual",
       "localizations": {
@@ -327,6 +371,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "发送"
+          }
+        }
+      }
+    },
+    "chat.sendCurrentSetPlan": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送这组当前的计划"
           }
         }
       }
@@ -364,6 +419,28 @@
         }
       }
     },
+    "chat.setCardDelivered": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "✓ 已送达 · 等教练看"
+          }
+        }
+      }
+    },
+    "chat.setCardRead": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "✓ 教练已读"
+          }
+        }
+      }
+    },
     "chat.setNumber": {
       "extractionState": "manual",
       "localizations": {
@@ -393,6 +470,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "分享今日训练"
+          }
+        }
+      }
+    },
+    "chat.todayPlanSection": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日计划"
           }
         }
       }
@@ -492,6 +580,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "视频上传中，仍可继续发送"
+          }
+        }
+      }
+    },
+    "chat.weightRepsMetric": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WEIGHT × REPS"
           }
         }
       }

@@ -121,13 +121,17 @@ import Testing
     uploader: OSSPartUploader()
   )
   let setRef = try SetRefV1(
+    source: .logged,
     exerciseName: "低杠位深蹲",
     setNumber: 3,
+    setTotal: 5,
     weightKg: "100",
     reps: 5,
+    repsMax: nil,
     rpe: "8.5",
     dayDate: "2026-07-27",
-    setLogId: ChatWireFixture.textMessageID
+    setLogId: ChatWireFixture.textMessageID,
+    planSetId: nil
   )
   let videoID = ChatWireFixture.imageMessageID
   let body = SetRefCanonicalFormatter.body(for: setRef, note: "看看深度")
@@ -256,13 +260,17 @@ private func assertSetRefWire(
   #expect(wire["client_id"] as? String == "set-ref-client")
   #expect(wire["video_id"] as? String == videoID.uuidString)
   let wireSetRef = try #require(wire["set_ref"] as? [String: Any])
-  #expect(wireSetRef.count == 8)
+  #expect(wireSetRef.count == 12)
   #expect(wireSetRef["v"] as? Int == 1)
+  #expect(wireSetRef["source"] as? String == "logged")
   #expect(wireSetRef["exercise_name"] as? String == "低杠位深蹲")
   #expect(wireSetRef["set_number"] as? Int == 3)
+  #expect(wireSetRef["set_total"] as? Int == 5)
   #expect(wireSetRef["weight_kg"] as? String == "100")
   #expect(wireSetRef["reps"] as? Int == 5)
+  #expect(wireSetRef["reps_max"] is NSNull)
   #expect(wireSetRef["rpe"] as? String == "8.5")
   #expect(wireSetRef["day_date"] as? String == "2026-07-27")
   #expect(wireSetRef["set_log_id"] as? String == ChatWireFixture.textMessageID.uuidString)
+  #expect(wireSetRef["plan_set_id"] is NSNull)
 }

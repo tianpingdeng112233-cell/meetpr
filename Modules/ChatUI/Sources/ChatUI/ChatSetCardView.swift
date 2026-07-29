@@ -1,146 +1,53 @@
 import DesignSystem
 import SwiftUI
 
-/// Black-gold v3 palette. The card first shipped on the legacy red tokens because ChatUI was
-/// written before the student-side redo landed; the redo did not reach this module, so an
-/// outgoing card sat as a red block in an otherwise gold thread.
-enum ChatSetCardColorToken: Equatable, Sendable {
-  case goldCTA
-  case surfaceCard
-  case ctaText
-  case ctaTextMuted
-  case textPrimary
-  case textTertiary
-  case borderDefault
-  case gold500
-
-  var color: Color {
-    switch self {
-    case .goldCTA:
-      Color.MeetPR.goldCTA
-    case .surfaceCard:
-      Color.MeetPR.surfaceCard
-    case .ctaText:
-      // The on-gold ink the CTA buttons use. `goldText` is the opposite pairing — gold ink on a
-      // dark surface — and reading it as "gold's text colour" put gold on gold.
-      Color.MeetPR.ctaText
-    case .ctaTextMuted:
-      Color.MeetPR.ctaText.opacity(0.72)
-    case .textPrimary:
-      Color.MeetPR.textPrimary
-    case .textTertiary:
-      Color.MeetPR.textTertiary
-    case .borderDefault:
-      Color.MeetPR.borderDefault
-    case .gold500:
-      Color.MeetPR.gold500
-    }
-  }
-}
-
-struct ChatSetCardAppearance: Equatable, Sendable {
-  let background: ChatSetCardColorToken
-  let primaryText: ChatSetCardColorToken
-  let secondaryText: ChatSetCardColorToken
-  let accent: ChatSetCardColorToken
-  let border: ChatSetCardColorToken
-
-  static func resolve(isCurrentUser: Bool) -> Self {
-    if isCurrentUser {
-      // Outgoing: gold fill with the dark on-gold text the CTA buttons use.
-      Self(
-        background: .goldCTA,
-        primaryText: .ctaText,
-        secondaryText: .ctaTextMuted,
-        accent: .ctaText,
-        border: .ctaTextMuted
-      )
-    } else {
-      // Incoming: neutral card, gold only as the accent.
-      Self(
-        background: .surfaceCard,
-        primaryText: .textPrimary,
-        secondaryText: .textTertiary,
-        accent: .gold500,
-        border: .borderDefault
-      )
-    }
-  }
-}
-
 public struct ChatSetCardView: View {
   let presentation: ChatSetCardPresentation
   let isCurrentUser: Bool
+  let deliveryStatus: ChatDeliveryStatus?
   let openVideo: @MainActor () -> Void
 
   public init(
     presentation: ChatSetCardPresentation,
     isCurrentUser: Bool,
+    deliveryStatus: ChatDeliveryStatus? = nil,
     openVideo: @escaping @MainActor () -> Void
   ) {
     self.presentation = presentation
     self.isCurrentUser = isCurrentUser
+    self.deliveryStatus = deliveryStatus
     self.openVideo = openVideo
   }
 
-  private var appearance: ChatSetCardAppearance {
-    .resolve(isCurrentUser: isCurrentUser)
-  }
-
   public var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-      Label(ChatStrings.trainingShare, systemImage: "dumbbell.fill")
-        .font(.caption.bold())
-        .foregroundStyle(appearance.accent.color)
-
-      Text(presentation.exerciseName)
-        .font(.body.bold())
-        .foregroundStyle(appearance.primaryText.color)
-        .fixedSize(horizontal: false, vertical: true)
-
-      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.md) {
-        ChatSetCardMetric(
-          label: ChatStrings.setNumber,
-          value: "第 \(presentation.setNumber) 组",
-          appearance: appearance
-        )
-        ChatSetCardMetric(
-          label: ChatStrings.load,
-          value: presentation.load,
-          appearance: appearance
-        )
-        if let rpe = presentation.rpe {
-          ChatSetCardMetric(label: "RPE", value: rpe, appearance: appearance)
-        }
-      }
-
-      Text(presentation.dayDate)
-        .font(.caption)
-        .foregroundStyle(appearance.secondaryText.color)
-
-      if presentation.videoURL != nil {
-        Button(action: openVideo) {
-          Label(ChatStrings.playVideo, systemImage: "play.rectangle.fill")
-            .font(.subheadline.bold())
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.bordered)
-        .tint(appearance.accent.color)
-      }
-
-      if let note = presentation.note, !note.isEmpty {
-        Text(note)
-          .font(.body)
-          .foregroundStyle(appearance.primaryText.color)
-          .fixedSize(horizontal: false, vertical: true)
+    // Spacing 0 at the outer level so the delivery strip can run edge to edge;
+    // the body carries its own padding instead.
+    VStack(alignment: .leading, spacing: 0) {
+      ChatSetCardBody(presentation: presentation, openVideo: openVideo)
+      if isCurrentUser, let deliveryStatus {
+        Divider()
+          .overlay(Color.MeetPR.borderDefault)
+        // The presentation string already carries its own ✓; a Label's systemImage
+        // would draw a second one.
+        Text(ChatSetCardDeliveryPresentation.text(for: deliveryStatus))
+          .font(.caption)
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.horizontal, MeetPRSpacing.md)
+          .padding(.vertical, MeetPRSpacing.sm)
+          .background(Color.MeetPR.surfaceElevated)
       }
     }
-    .padding(MeetPRSpacing.md)
-    .background(appearance.background.color)
+    .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-        .stroke(appearance.border.color, lineWidth: 1)
+        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
+    }
+    .overlay(alignment: isCurrentUser ? .trailing : .leading) {
+      Rectangle()
+        .fill(Color.MeetPR.gold500)
+        .frame(width: MeetPRSpacing.point3)
     }
     .containerRelativeFrame(
       .horizontal,
@@ -151,19 +58,152 @@ public struct ChatSetCardView: View {
   }
 }
 
+private struct ChatSetCardBody: View {
+  let presentation: ChatSetCardPresentation
+  let openVideo: @MainActor () -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+      ChatSetCardHeader(presentation: presentation)
+      ChatSetCardTitle(presentation: presentation)
+      ChatSetCardMetrics(presentation: presentation)
+
+      if presentation.videoURL != nil {
+        Button(action: openVideo) {
+          Label(ChatStrings.playVideo, systemImage: "play.rectangle.fill")
+            .font(.subheadline.bold())
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .tint(Color.MeetPR.goldText)
+      }
+
+      if let note = presentation.note, !note.isEmpty {
+        Text(note)
+          .font(.body)
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .fixedSize(horizontal: false, vertical: true)
+          .padding(MeetPRSpacing.sm)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .background(Color.MeetPR.surfaceElevated)
+          .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      }
+    }
+    .padding(MeetPRSpacing.md)
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+}
+
+private struct ChatSetCardHeader: View {
+  let presentation: ChatSetCardPresentation
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.xs) {
+      Image(systemName: "dumbbell.fill")
+        .foregroundStyle(Color.MeetPR.goldText)
+      Text(
+        presentation.source == .logged
+          ? ChatStrings.loggedSetCardLabel
+          : ChatStrings.plannedSetCardLabel
+      )
+      .foregroundStyle(Color.MeetPR.goldText)
+      Spacer(minLength: MeetPRSpacing.sm)
+      Text(presentation.createdAt.formatted(date: .omitted, time: .shortened))
+        .monospacedDigit()
+        .foregroundStyle(Color.MeetPR.textTertiary)
+    }
+    .font(.caption.bold())
+  }
+}
+
+private struct ChatSetCardTitle: View {
+  let presentation: ChatSetCardPresentation
+
+  var body: some View {
+    HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
+      Text(presentation.exerciseName)
+        .font(.title3.bold())
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .fixedSize(horizontal: false, vertical: true)
+      Spacer(minLength: 0)
+      Text(setPosition)
+        .font(.caption)
+        .monospacedDigit()
+        .foregroundStyle(Color.MeetPR.textTertiary)
+        .fixedSize(horizontal: true, vertical: false)
+    }
+  }
+
+  private var setPosition: String {
+    if let total = presentation.setTotal {
+      return "第 \(presentation.setNumber) 组 / \(total)"
+    }
+    return "第 \(presentation.setNumber) 组"
+  }
+}
+
+private struct ChatSetCardMetrics: View {
+  let presentation: ChatSetCardPresentation
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.md) {
+      ChatSetCardLoadMetric(
+        weight: presentation.weight,
+        reps: presentation.reps
+      )
+      .frame(maxWidth: .infinity, alignment: .leading)
+
+      Rectangle()
+        .fill(Color.MeetPR.borderDefault)
+        .frame(width: 1, height: 52)
+
+      ChatSetCardMetric(
+        label: ChatStrings.rpeMetric,
+        value: presentation.rpe ?? "-",
+        valueColor: Color.MeetPR.goldText
+      )
+      .frame(maxWidth: .infinity, alignment: .leading)
+    }
+  }
+}
+
+private struct ChatSetCardLoadMetric: View {
+  let weight: String
+  let reps: String
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+      Text(ChatStrings.weightRepsMetric)
+        .font(.caption2)
+        .tracking(1.1)
+        .foregroundStyle(Color.MeetPR.textTertiary)
+      (Text(weight)
+        .font(.title2.bold())
+        + Text("kg")
+        .font(.subheadline.bold())
+        + Text(" × \(reps)")
+        .font(.title2.bold()))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .fixedSize(horizontal: true, vertical: false)
+    }
+  }
+}
+
 private struct ChatSetCardMetric: View {
   let label: String
   let value: String
-  let appearance: ChatSetCardAppearance
+  let valueColor: Color
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       Text(label)
         .font(.caption2)
-        .foregroundStyle(appearance.secondaryText.color)
+        .tracking(1.1)
+        .foregroundStyle(Color.MeetPR.textTertiary)
       Text(value)
-        .font(.subheadline.bold())
-        .foregroundStyle(appearance.primaryText.color)
+        .font(.title2.bold())
+        .monospacedDigit()
+        .foregroundStyle(valueColor)
         .fixedSize(horizontal: true, vertical: false)
     }
   }

@@ -727,13 +727,7 @@ enum SetRefEntryVisibility {
   ) -> Bool {
     shouldShow(
       isEditable: isEditable,
-      hasCompletedSet: drafts.contains {
-        SetRefCompletedSetEligibility.isEligible(
-          completed: $0.completed,
-          assumed: $0.assumed,
-          loggedSetID: $0.loggedSetID
-        )
-      },
+      hasAvailableSet: !drafts.isEmpty,
       hasActiveCoach: hasActiveCoach,
       hasSharingContext: hasSharingContext
     )
@@ -741,11 +735,11 @@ enum SetRefEntryVisibility {
 
   static func shouldShow(
     isEditable: Bool,
-    hasCompletedSet: Bool,
+    hasAvailableSet: Bool,
     hasActiveCoach: Bool,
     hasSharingContext: Bool
   ) -> Bool {
-    isEditable && hasCompletedSet && hasActiveCoach && hasSharingContext
+    isEditable && hasAvailableSet && hasActiveCoach && hasSharingContext
   }
 }
 // swiftlint:enable file_length type_body_length

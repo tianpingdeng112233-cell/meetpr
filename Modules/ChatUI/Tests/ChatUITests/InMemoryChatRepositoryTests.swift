@@ -59,13 +59,17 @@ import Testing
   let repository = InMemoryChatRepository(currentUserID: fixture.currentUserID, seed: fixture.seed)
   let videoID = testUUID(20)
   let setRef = try SetRefV1(
+    source: .logged,
     exerciseName: "硬拉",
     setNumber: 1,
+    setTotal: 3,
     weightKg: "175",
     reps: 3,
+    repsMax: nil,
     rpe: "8.5",
     dayDate: "2026-07-29",
-    setLogId: testUUID(21)
+    setLogId: testUUID(21),
+    planSetId: nil
   )
   let body = SetRefCanonicalFormatter.body(for: setRef, note: nil)
 
