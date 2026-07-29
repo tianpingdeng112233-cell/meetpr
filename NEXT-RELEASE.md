@@ -52,6 +52,19 @@
   - ⚠️ **切包即失效的前提**:`set_ref` 就地扩 v1 不升版本,靠的是「该形状从未发过版」。**1.0(15) 一切包
     这条就不再成立**,之后再改 `set_ref` 必须升版本 + 写降级路径。
 
+- **e1RM 口径修订:取消低 RPE 门 + 消费教练校准 + PR 改实测重量**(PR #286 已合 `1c2c787`,
+  2026-07-29,spec 050 修订):①入选门取消(分段口径 nil/<6→Epley、6–10→RTS、>10 拒);
+  ②`coach_rpe` 全链路(取 `coachRPE ?? rpe`,教练端成长页同步);③**PR 判定改成实测重量**——
+  只有真正完成的重量超过 max(登记 1RM, 历史实测最高) 才算 PR,新增 `E1RMWeightBaseline` 持久实体、
+  基线单调更新、v2 重放按时序原子重建;④建议重量只吃 RPE≥7 或已校准组(与显示口径分离)。
+  - ⚠️ **本卡 base 停在 v3 落线之前,是 rebase 上来的**,四处冲突 + 一处 git 自动合并语义断裂,
+    解法逐条记在 PR 评论里。三条对后人有用:**a)** v3 已退役 PR 庆祝横幅(`PRBanner` 与成长 tab
+    横幅双双移除),但 `pendingPRBanner` 检测状态仍在、展示改走「新 PR」计数器——**别再把横幅接回来**;
+    **b)** `InMemoryE1RMRepository`/`LocalE1RMRepository` 里数组叫 `storedPREvents` 而非 `prEvents`,
+    因为后者已是方法名(`prEvents(studentId:since:)`),写成裸 `prEvents` 会解析到方法;
+    **c)** `LocalE1RMRepository` 的持久化已收敛为单一 `state.json`,`loadPRs()` 不复存在。
+  - 闸门:review-loop 2 轮 CLEAN;八包 **1434 测试全绿**;swiftlint strict 零;CI 三项绿。
+
 ## 🕐 已完工、等前置解锁(还没落线,落线后挪到上面)
 
 - **学员端 wellness 五档量表 + energy 档**(PR #273,base 已是 `release/1.0`,CI 绿):睡眠/精力/压力/情绪
