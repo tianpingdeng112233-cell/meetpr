@@ -95,11 +95,11 @@ private func itemKind(_ item: StudentChatTimelineItem) -> TimelineItemKind {
   let video = CoachFeedbackVideo(
     id: UUID(),
     exerciseName: "暂停深蹲",
-    setIndex: 2
+    setIndex: 0
   )
 
-  #expect(FeedbackVideoPresentation.summary(video).contains("第2组"))
-  #expect(StudentChatTimeline.videoLabel(for: video) == "我的暂停深蹲 · 第 2 组")
+  #expect(FeedbackVideoPresentation.summary(video).contains("第1组"))
+  #expect(StudentChatTimeline.videoLabel(for: video) == "我的暂停深蹲 · 第 1 组")
 }
 
 @MainActor

@@ -137,6 +137,7 @@ public struct StudentPlanExercise: Codable, Hashable, Sendable, Identifiable {
 }
 
 /// A single prescribed set the student is asked to perform.
+/// `setIndex` is zero-based throughout the execution domain.
 /// `reps` and `repsMax` are mutually exclusive (single value vs range); `rpe` is
 /// optional (the coach may leave it blank). Weights use Decimal-as-string per the
 /// project codec to avoid float drift on 2.5kg increments.

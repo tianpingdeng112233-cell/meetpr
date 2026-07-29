@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import ChatUI
 import CoreModels
 import Foundation
@@ -215,6 +216,34 @@ import Testing
   #expect(conversations.first?.lastMessagePreview == nil)
 }
 
+@MainActor
+@Test func lazyConversationCreationNetworkFailureReturnsNoRouteWithoutInvalidatingBind() async {
+  let callback = BindingInvalidationRecorder()
+  let coordinator = makeFailingChatNotifications(
+    error: DashboardChatTestError.network,
+    onBindingInvalidated: { await callback.record() }
+  )
+
+  let conversationID = await coordinator.openCoachConversation()
+
+  #expect(conversationID == nil)
+  #expect(!(await callback.hasRecordedCall))
+}
+
+@MainActor
+@Test func bindRequiredDuringLazyConversationCreationInvalidatesBinding() async {
+  let callback = BindingInvalidationRecorder()
+  let coordinator = makeFailingChatNotifications(
+    error: ChatRepositoryError.bindRequired,
+    onBindingInvalidated: { await callback.record() }
+  )
+
+  let conversationID = await coordinator.openCoachConversation()
+
+  #expect(conversationID == nil)
+  #expect(await callback.invocationCount == 1)
+}
+
 @Test func userDefaultsPlanSeenStorePersistsPerStudentAndSignature() throws {
   let suiteName = "test.dashboard.plan-seen.\(UUID().uuidString)"
   let defaults = try #require(UserDefaults(suiteName: suiteName))
@@ -236,6 +265,32 @@ import Testing
   #expect(!store.hasSeen(studentID: studentB, signature: signature))
   let otherSignature = DashboardPlanSignature(plan: StudentDemoSeed.makePlanView(weekIndex: 2))
   #expect(!store.hasSeen(studentID: studentA, signature: otherSignature))
+}
+
+@MainActor
+private func makeFailingChatNotifications(
+  error: any Error & Sendable,
+  onBindingInvalidated: @escaping @Sendable () async -> Void
+) -> StudentNotificationsCoordinator {
+  let studentID = StudentDemoSeed.studentID
+  let plans = InMemoryStudentPlanRepository(store: TestStudentPlanStore())
+  let chat = FailingOpenChatRepository(error: error)
+  return StudentNotificationsCoordinator(
+    plans: plans,
+    feedback: FeedbackInboxViewModel(repository: InMemoryStudentFeedbackRepository()),
+    evaluation: makeEvaluationViewModel(plans: plans),
+    activeCoach: ActiveCoachContext(
+      coachID: StudentDemoSeed.coachID,
+      coachDisplayName: "周教练"
+    ),
+    chatContext: StudentChatContext(
+      repository: chat,
+      currentUserID: studentID,
+      inbox: ChatInboxViewModel(repository: chat, currentUserID: studentID),
+      sendCoordinator: ChatSendCoordinator(repository: chat, currentUserID: studentID)
+    ),
+    onBindingInvalidated: onBindingInvalidated
+  )
 }
 
 @MainActor
@@ -262,6 +317,78 @@ private func makeEvaluationViewModel(
     plans: plans,
     readStore: InMemoryEvaluationSummaryReadStore()
   )
+}
+
+private enum DashboardChatTestError: Error, Sendable {
+  case network
+}
+
+private actor BindingInvalidationRecorder {
+  private(set) var invocationCount = 0
+
+  var hasRecordedCall: Bool {
+    invocationCount > 0
+  }
+
+  func record() {
+    invocationCount += 1
+  }
+}
+
+private actor FailingOpenChatRepository: ChatRepository {
+  private let error: any Error & Sendable
+
+  init(error: any Error & Sendable) {
+    self.error = error
+  }
+
+  func fetchConversations() async throws -> [ChatConversation] {
+    []
+  }
+
+  func openConversation(withOtherParty otherPartyID: UUID) async throws -> ChatConversation {
+    throw error
+  }
+
+  func fetchMessages(
+    in conversationID: UUID,
+    query: ChatMessageQuery
+  ) async throws -> ChatMessagePage {
+    ChatMessagePage(messages: [], otherLastRead: nil, hasMore: false)
+  }
+
+  func sendText(
+    in conversationID: UUID,
+    text: String,
+    clientID: String
+  ) async throws -> ChatMessage {
+    throw error
+  }
+
+  func sendImage(
+    in conversationID: UUID,
+    imageData: Data,
+    clientID: String
+  ) async throws -> ChatMessage {
+    throw error
+  }
+
+  func sendSetRef(
+    in conversationID: UUID,
+    body: String,
+    setRef: SetRefV1,
+    videoID: UUID?,
+    clientID: String
+  ) async throws -> ChatMessage {
+    throw error
+  }
+
+  func markRead(
+    in conversationID: UUID,
+    upTo messageID: UUID
+  ) async throws -> ChatReadState {
+    throw error
+  }
 }
 
 private actor CountingPlanRepository: StudentPlanRepository {

@@ -99,10 +99,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
           stableIndex: drafts.firstIndex { $0.id == draft.id } ?? 0,
           record: Self.record(
             from: draft,
-            index: SetDisplayNumber.number(
-              for: draft,
-              in: drafts.filter { $0.planExerciseID == exercise.id }
-            ),
+            index: SetDisplayNumber.number(for: draft),
             videoState: draft.loggedSetID.flatMap { videoStates[$0] } ?? .none
           ),
           draft: draft
@@ -133,7 +130,8 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
       rpe: decimalDouble(draft.actualRPE ?? draft.prescribed.rpe ?? 0),
       status: draft.failed ? .failed : (draft.completed ? .done : .pending),
-      videoState: videoState
+      videoState: videoState,
+      indexAccessibilityIdentifier: "todayWorkout.set.\(draft.id.uuidString).number"
     )
   }
 

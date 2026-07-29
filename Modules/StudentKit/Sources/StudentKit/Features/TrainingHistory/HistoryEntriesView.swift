@@ -8,6 +8,10 @@ struct HistoryEntriesView: View {
   let logs: [StudentSetLog]
   @Binding var selectedExerciseName: String?
 
+  static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
+    "第 \(SetIndexDisplay.number(forZeroBasedIndex: setIndex)) 组"
+  }
+
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
@@ -301,7 +305,7 @@ private struct HistorySetRow: View {
 
   var body: some View {
     HStack {
-      Text("第 \(set.setIndex + 1) 组")
+      Text(HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
       Spacer()

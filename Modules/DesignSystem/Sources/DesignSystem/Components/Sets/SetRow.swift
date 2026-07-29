@@ -25,6 +25,7 @@ public struct SetRow: View {
   let rpe: Double
   let status: Status
   let videoState: VideoState
+  private let indexAccessibilityIdentifier: String?
   private let onEdit: (@MainActor () -> Void)?
   private let onVideoAction: (@MainActor () -> Void)?
 
@@ -35,6 +36,7 @@ public struct SetRow: View {
     rpe: Double,
     status: Status,
     videoState: VideoState,
+    indexAccessibilityIdentifier: String? = nil,
     onEdit: (@MainActor () -> Void)? = nil,
     onVideoAction: (@MainActor () -> Void)? = nil
   ) {
@@ -44,6 +46,7 @@ public struct SetRow: View {
     self.rpe = rpe
     self.status = status
     self.videoState = videoState
+    self.indexAccessibilityIdentifier = indexAccessibilityIdentifier
     self.onEdit = onEdit
     self.onVideoAction = onVideoAction
   }
@@ -80,6 +83,7 @@ public struct SetRow: View {
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
         .foregroundStyle(status == .pending ? Color.MeetPR.textDim : Color.MeetPR.textMuted)
         .frame(width: SetRowContract.indexColumnWidth, alignment: .leading)
+        .optionalAccessibilityIdentifier(indexAccessibilityIdentifier)
 
       Text(weight.map { numberText($0) } ?? "—")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
@@ -247,6 +251,17 @@ public struct SetRow: View {
       return value.formatted(.number.precision(.fractionLength(1)))
     }
     return value.formatted(.number.precision(.fractionLength(0...2)))
+  }
+}
+
+extension View {
+  @ViewBuilder
+  fileprivate func optionalAccessibilityIdentifier(_ identifier: String?) -> some View {
+    if let identifier {
+      accessibilityIdentifier(identifier)
+    } else {
+      self
+    }
   }
 }
 

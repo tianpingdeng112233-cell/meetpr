@@ -46,6 +46,7 @@ struct StudentNotificationHostModifier: ViewModifier {
         repository: chat.repository,
         inbox: chat.inbox,
         sendCoordinator: chat.sendCoordinator,
+        setRefSharing: chat.setRefSharing,
         onOpenTraining: onOpenPlan,
         dismiss: { self.conversationID = nil }
       )

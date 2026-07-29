@@ -1,6 +1,28 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "student.acknowledge": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "知道了"
+          }
+        }
+      }
+    },
+    "student.askCoach": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "问教练"
+          }
+        }
+      }
+    },
     "student.coachMessages": {
       "extractionState": "manual",
       "localizations": {
@@ -52,6 +74,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "还没有消息，点按开始对话"
+          }
+        }
+      }
+    },
+    "student.trainingShareConversationFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法进入教练会话，请稍后重试。"
+          }
+        }
+      }
+    },
+    "student.trainingShareFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法分享训练记录"
           }
         }
       }

@@ -60,6 +60,9 @@ import Testing
   #expect(text.attachmentID == nil)
   #expect(text.imageURL == nil)
   #expect(text.imageExpiresIn == nil)
+  #expect(text.setRef == nil)
+  #expect(text.videoURL == nil)
+  #expect(text.videoExpiresIn == nil)
   #expect(text.clientID == "cli-text")
 
   let image = response.messages[1]
@@ -72,6 +75,9 @@ import Testing
   #expect(image.attachmentID == ChatWireFixture.attachmentID)
   #expect(image.imageURL?.absoluteString == "https://oss.example.test/chat/image.jpg?signature=abc")
   #expect(image.imageExpiresIn == 900)
+  #expect(image.setRef == nil)
+  #expect(image.videoURL == nil)
+  #expect(image.videoExpiresIn == nil)
   #expect(image.clientID == "cli-xyz")
   #expect(response.meta.otherLastRead?.messageID == ChatWireFixture.readMessageID)
   #expect(response.meta.otherLastRead?.seq == 40)

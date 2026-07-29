@@ -1,22 +1,16 @@
 import CoreModels
+import DesignSystem
 
 enum SetDisplayNumber {
   static func number(atOffset offset: Int) -> Int {
-    offset + 1
+    SetIndexDisplay.number(forZeroBasedIndex: offset)
   }
 
-  static func number(for draft: TodayWorkoutSetRowDraft, in rows: [TodayWorkoutSetRowDraft]) -> Int
-  {
-    rows.firstIndex { $0.id == draft.id }.map(number(atOffset:))
-      ?? fallback(storedIndex: draft.prescribed.setIndex)
+  static func number(for draft: TodayWorkoutSetRowDraft) -> Int {
+    number(for: draft.prescribed)
   }
 
-  static func number(for set: PrescribedSet, in sets: [PrescribedSet]) -> Int {
-    sets.firstIndex { $0.id == set.id }.map(number(atOffset:))
-      ?? fallback(storedIndex: set.setIndex)
-  }
-
-  private static func fallback(storedIndex: Int) -> Int {
-    max(1, storedIndex)
+  static func number(for set: PrescribedSet) -> Int {
+    SetIndexDisplay.number(forZeroBasedIndex: set.setIndex)
   }
 }

@@ -141,17 +141,7 @@ struct W1ContractTests {
 
   @Test("Frozen W0 entries retain legacy parameters")
   func legacyParameters() {
-    let setCell = LegacySetReadOnlyCell(
-      setNumber: 2,
-      weightKg: nil,
-      reps: nil,
-      rpe: nil,
-      isCompleted: false
-    )
-    #expect(setCell.setNumber == 2)
-    #expect(setCell.weightText == "-")
-    #expect(setCell.repsText == "-")
-    #expect(setCell.rpeText == "-")
+    #expect(SetReadOnlyCell.setLabel(forZeroBasedIndex: 1) == "#2")
 
     let brandButton = LegacyBrandPrimaryButton("开始") {}
     #expect(brandButton.subtitle == nil)
@@ -176,7 +166,7 @@ struct W1ContractTests {
     #expect(LegacyStatusBadgeContract.borderWidth == 1)
 
     _ = SetReadOnlyCell(
-      setNumber: 0,
+      setIndex: 0,
       weightKg: nil,
       reps: nil,
       rpe: nil,

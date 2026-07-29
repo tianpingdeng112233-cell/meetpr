@@ -25,9 +25,13 @@ struct StudentBlackGoldChatView: View {
   let coordinator: StudentNotificationsCoordinator
   let onOpenTraining: @MainActor () -> Void
   let dismiss: @MainActor () -> Void
+  private let setRefSharing: SetRefSharingContext?
+  private let sendCoordinator: ChatSendCoordinator
 
   @State private var viewModel: ConversationViewModel
   @State private var draft = ""
+  @State private var showsSetRefPicker = false
+  @State private var selectedVideo: StudentSelectedChatVideo?
   @State private var scrollPosition: String?
   // Mockup 865 positions the target card's bottom near the viewport bottom;
   // history restoration (B4) needs a top anchor instead, so the anchor is
@@ -47,6 +51,7 @@ struct StudentBlackGoldChatView: View {
     repository: any ChatRepository,
     inbox: ChatInboxViewModel,
     sendCoordinator: ChatSendCoordinator,
+    setRefSharing: SetRefSharingContext? = nil,
     onOpenTraining: @escaping @MainActor () -> Void,
     dismiss: @escaping @MainActor () -> Void
   ) {
@@ -54,6 +59,8 @@ struct StudentBlackGoldChatView: View {
     self.coordinator = coordinator
     self.onOpenTraining = onOpenTraining
     self.dismiss = dismiss
+    self.setRefSharing = setRefSharing
+    self.sendCoordinator = sendCoordinator
     _viewModel = State(
       initialValue: ConversationViewModel(
         conversationID: conversationID,
@@ -81,6 +88,7 @@ struct StudentBlackGoldChatView: View {
     .task(id: scenePhase) {
       guard scenePhase == .active else { return }
       await viewModel.load()
+      await viewModel.refreshVideosIfNeeded()
       chooseInitialScrollPositionIfNeeded()
       await viewModel.pollUntilCancelled()
     }
@@ -94,6 +102,21 @@ struct StudentBlackGoldChatView: View {
       scrollAnchor = .bottom
       scrollPosition = "pending-\(clientID)"
     }
+    .sheet(isPresented: $showsSetRefPicker) {
+      if let setRefSharing {
+        SetRefSharePicker(
+          context: setRefSharing,
+          conversationID: viewModel.conversationID,
+          coordinator: sendCoordinator,
+          onStaged: { showsSetRefPicker = false }
+        )
+      }
+    }
+    #if os(iOS)
+      .fullScreenCover(item: $selectedVideo, content: videoContent)
+    #else
+      .sheet(item: $selectedVideo, content: videoContent)
+    #endif
   }
 
   /// Mockup lines 633-636: 40pt circular back control, coach name, success
@@ -193,11 +216,23 @@ struct StudentBlackGoldChatView: View {
   private func timelineRow(_ item: StudentChatTimelineItem) -> some View {
     switch item {
     case .message(let message):
-      StudentChatMessageRow(
-        message: message,
-        isCurrentUser: message.senderID == viewModel.currentUserID,
-        deliveryStatus: viewModel.deliveryStatus(for: message)
-      )
+      if let presentation = ChatSetCardPresentation(message: message) {
+        ChatSetCardView(
+          presentation: presentation,
+          isCurrentUser: message.senderID == viewModel.currentUserID,
+          openVideo: { openVideo(for: message) }
+        )
+        .frame(
+          maxWidth: .infinity,
+          alignment: message.senderID == viewModel.currentUserID ? .trailing : .leading
+        )
+      } else {
+        StudentChatMessageRow(
+          message: message,
+          isCurrentUser: message.senderID == viewModel.currentUserID,
+          deliveryStatus: viewModel.deliveryStatus(for: message)
+        )
+      }
     case .plan(let notice):
       StudentPlanChatCard(notice: notice, action: openTraining)
     case .feedback(let feedback):
@@ -213,39 +248,98 @@ struct StudentBlackGoldChatView: View {
   /// Mockup lines 646-648: a 20pt input capsule containing the 34pt circular
   /// upward-arrow send control. Sending stays on spec 058's coordinator path.
   private var composer: some View {
-    HStack(spacing: MeetPRSpacing.point10) {
-      HStack(spacing: MeetPRSpacing.space2) {
-        TextField("输入消息", text: $draft, axis: .vertical)
-          .lineLimit(1...5)
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
-          .textFieldStyle(.plain)
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .padding(.vertical, MeetPRSpacing.point11)
-          .onChange(of: draft) { _, value in
-            if value.count > ConversationViewModel.maximumTextLength {
-              draft = String(value.prefix(ConversationViewModel.maximumTextLength))
-            }
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      if let stagedSetRef = viewModel.stagedSetRef {
+        HStack(spacing: MeetPRSpacing.space2) {
+          Image(systemName: "dumbbell")
+            .foregroundStyle(Color.MeetPR.gold500)
+          Text(SetRefCanonicalFormatter.firstLine(for: stagedSetRef.setRef))
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textSecondary)
+            .lineLimit(2)
+          Spacer(minLength: 0)
+          Button(action: viewModel.discardStagedSetRef) {
+            Image(systemName: "xmark.circle.fill")
+              .foregroundStyle(Color.MeetPR.textDim)
           }
-
-        Button(action: send) {
-          Image(systemName: "arrow.up")
-            .font(.MeetPR.system(size: MeetPRFontMetrics.size18, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.ctaTopHighlight)
-            .frame(width: MeetPRSpacing.point34, height: MeetPRSpacing.point34)
-            .background(Color.MeetPR.borderStrong, in: .circle)
+          .buttonStyle(.plain)
+          .accessibilityLabel("移除训练记录")
         }
-        .buttonStyle(.plain)
-        .disabled(!canSend)
-        .opacity(canSend ? 1 : 0.55)
-        .accessibilityLabel("发送")
+        .padding(MeetPRSpacing.space2)
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+        .accessibilityIdentifier("chat.setRef.staged")
       }
-      .padding(.leading, MeetPRSpacing.space4)
-      .padding(.trailing, MeetPRSpacing.point6)
-      .background(Color.MeetPR.surfaceCard)
-      .clipShape(.rect(cornerRadius: 20))
-      .overlay {
-        RoundedRectangle(cornerRadius: 20)
-          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+
+      if let setRefLength {
+        HStack {
+          if setRefLength.isOverLimit {
+            Text("消息过长")
+              .foregroundStyle(Color.MeetPR.danger)
+              .accessibilityIdentifier("chat.setRef.lengthError")
+          } else if let errorMessage = viewModel.setRefSendErrorMessage {
+            Text(errorMessage)
+              .foregroundStyle(Color.MeetPR.danger)
+          }
+          Spacer(minLength: 0)
+          Text("\(setRefLength.bodyUTF16Count)/\(setRefLength.maximumUTF16Count)")
+            .foregroundStyle(Color.MeetPR.textDim)
+            .accessibilityIdentifier("chat.setRef.lengthCount")
+        }
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+      }
+
+      HStack(spacing: MeetPRSpacing.point10) {
+        if setRefSharing != nil {
+          Button {
+            showsSetRefPicker = true
+          } label: {
+            Image(systemName: "plus")
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.textSecondary)
+              .frame(width: MeetPRSpacing.point34, height: MeetPRSpacing.point34)
+              .background(Color.MeetPR.surfaceCard, in: .circle)
+          }
+          .buttonStyle(.plain)
+          .accessibilityLabel("分享今日训练")
+        }
+
+        HStack(spacing: MeetPRSpacing.space2) {
+          TextField(composerPlaceholder, text: $draft, axis: .vertical)
+            .lineLimit(1...5)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+            .textFieldStyle(.plain)
+            .foregroundStyle(Color.MeetPR.textPrimary)
+            .padding(.vertical, MeetPRSpacing.point11)
+            .onChange(of: draft) { _, value in
+              viewModel.clearSetRefSendError()
+              if viewModel.stagedSetRef == nil,
+                value.count > ConversationViewModel.maximumTextLength
+              {
+                draft = String(value.prefix(ConversationViewModel.maximumTextLength))
+              }
+            }
+
+          Button(action: send) {
+            Image(systemName: "arrow.up")
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size18, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.ctaTopHighlight)
+              .frame(width: MeetPRSpacing.point34, height: MeetPRSpacing.point34)
+              .background(Color.MeetPR.borderStrong, in: .circle)
+          }
+          .buttonStyle(.plain)
+          .disabled(!canSend)
+          .opacity(canSend ? 1 : 0.55)
+          .accessibilityLabel("发送")
+        }
+        .padding(.leading, MeetPRSpacing.space4)
+        .padding(.trailing, MeetPRSpacing.point6)
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.rect(cornerRadius: 20))
+        .overlay {
+          RoundedRectangle(cornerRadius: 20)
+            .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+        }
       }
     }
     .padding(.horizontal, MeetPRSpacing.space4)
@@ -267,8 +361,19 @@ struct StudentBlackGoldChatView: View {
   }
 
   private var canSend: Bool {
-    !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    if let setRefLength {
+      return !setRefLength.isOverLimit
+    }
+    return !draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
       && draft.count <= ConversationViewModel.maximumTextLength
+  }
+
+  private var setRefLength: SetRefComposerLength? {
+    viewModel.stagedSetRefLength(note: draft)
+  }
+
+  private var composerPlaceholder: String {
+    viewModel.stagedSetRef == nil ? "输入消息" : "添加备注（可选）"
   }
 
   private var isConversationEmpty: Bool {
@@ -294,8 +399,34 @@ struct StudentBlackGoldChatView: View {
   }
 
   private func send() {
-    guard viewModel.sendText(draft) != nil else { return }
+    let clientID =
+      viewModel.stagedSetRef == nil
+      ? viewModel.sendText(draft)
+      : viewModel.sendStagedSetRef(note: draft)
+    guard clientID != nil else { return }
     draft = ""
+  }
+
+  private func openVideo(for message: ChatMessage) {
+    Task {
+      guard let url = try? await viewModel.videoPlaybackURL(messageID: message.id) else {
+        return
+      }
+      selectedVideo = StudentSelectedChatVideo(id: message.id, url: url)
+    }
+  }
+
+  private func videoContent(_ selection: StudentSelectedChatVideo) -> some View {
+    FeedbackVideoPlayerView(
+      videoID: selection.id,
+      url: selection.url,
+      refreshURL: { _ in
+        try await viewModel.videoPlaybackURL(
+          messageID: selection.id,
+          forceRenewal: true
+        )
+      }
+    )
   }
 
   private func openTraining() {
@@ -366,6 +497,11 @@ struct StudentBlackGoldChatView: View {
     )
     return "\(day) \(time)"
   }
+}
+
+private struct StudentSelectedChatVideo: Identifiable {
+  let id: UUID
+  let url: URL
 }
 
 @available(iOS 17.0, macOS 14.0, *)

@@ -1,5 +1,6 @@
 // swiftlint:disable file_length type_body_length
 import Analytics
+import ChatUI
 import CoreModels
 import DesignSystem
 import Foundation
@@ -36,6 +37,9 @@ public struct TodayWorkoutView: View {
   @State private var showingReadinessSheet = false
   @State private var showingNotifications = false
   @State private var conversationID: UUID?
+  @State private var setRefPickerRoute: SetRefPickerRoute?
+  @State private var isPreparingSetRefPicker = false
+  @State private var setRefEntryErrorMessage: String?
   @State private var reviewCompleted = false
   @State private var started = false
   @State private var autoStartGate = TodayWorkoutAutoStartGate()
@@ -101,6 +105,26 @@ public struct TodayWorkoutView: View {
     )
   }
 
+  init(
+    studentID: UUID,
+    date: Date,
+    plans: any StudentPlanRepository,
+    logs: any StudentTrainingLogRepository,
+    preloadedViewModel: TodayWorkoutViewModel,
+    notifications: StudentNotificationsCoordinator? = nil,
+    started: Bool = false
+  ) {
+    self.init(
+      studentID: studentID,
+      date: date,
+      plans: plans,
+      logs: logs,
+      notifications: notifications
+    )
+    _viewModel = State(initialValue: preloadedViewModel)
+    _started = State(initialValue: started)
+  }
+
   public var body: some View {
     NavigationStack {
       TodayWorkoutScreen(
@@ -112,6 +136,8 @@ public struct TodayWorkoutView: View {
         unreadCount: notifications?.totalUnreadCount ?? 0,
         showsNotifications: notifications != nil,
         coachName: notifications?.activeCoach?.coachDisplayName ?? "教练",
+        showsAskCoach: showsSetRefEntry,
+        isPreparingAskCoach: isPreparingSetRefPicker,
         namespace: heroNamespace,
         isLaunchTargetHidden: isLaunchTargetHidden,
         launchHeroRevealToken: launchHeroRevealToken,
@@ -135,6 +161,7 @@ public struct TodayWorkoutView: View {
         onMessageCoach: {
           showingNotifications = true
         },
+        onAskCoach: openSetRefPicker,
         onHeroFrameChange: onHeroFrameChange,
         onStart: {
           started = true
@@ -209,6 +236,26 @@ public struct TodayWorkoutView: View {
       Button("知道了", role: .cancel) { viewModel.clearActionError() }
     } message: {
       Text(viewModel.actionErrorMessage ?? "")
+    }
+    .alert(StudentStrings.trainingShareFailed, isPresented: setRefEntryErrorPresented) {
+      Button(StudentStrings.acknowledge, role: .cancel) {
+        setRefEntryErrorMessage = nil
+      }
+    } message: {
+      Text(setRefEntryErrorMessage ?? "")
+    }
+    .sheet(item: $setRefPickerRoute) { route in
+      if let chat = notifications?.chatContext, let setRefSharing = chat.setRefSharing {
+        SetRefSharePicker(
+          context: setRefSharing,
+          conversationID: route.conversationID,
+          coordinator: chat.sendCoordinator,
+          onStaged: {
+            setRefPickerRoute = nil
+            conversationID = route.conversationID
+          }
+        )
+      }
     }
     .alert(VideoPrivacyCopy.consentTitle, isPresented: $showingDirectCameraConsent) {
       Button(VideoPrivacyCopy.consentAgree) {
@@ -550,6 +597,13 @@ public struct TodayWorkoutView: View {
     )
   }
 
+  private var setRefEntryErrorPresented: Binding<Bool> {
+    Binding(
+      get: { setRefEntryErrorMessage != nil },
+      set: { if !$0 { setRefEntryErrorMessage = nil } }
+    )
+  }
+
   private var restTimerExplanationPresented: Binding<Bool> {
     Binding(
       get: { viewModel.showsRestTimerExplanation && editing == nil },
@@ -567,6 +621,31 @@ public struct TodayWorkoutView: View {
   private var readinessPrefill: ReadinessCheckin? {
     if case .done(let checkin) = readinessViewModel.gate { return checkin }
     return nil
+  }
+
+  private var showsSetRefEntry: Bool {
+    guard let currentWorkout else { return false }
+    return SetRefEntryVisibility.shouldShow(
+      drafts: currentWorkout.drafts,
+      isEditable: isEditable,
+      hasActiveCoach: notifications?.activeCoach != nil,
+      hasSharingContext: notifications?.chatContext?.setRefSharing != nil
+    )
+  }
+
+  private func openSetRefPicker() {
+    guard !isPreparingSetRefPicker, let notifications else { return }
+    isPreparingSetRefPicker = true
+    setRefEntryErrorMessage = nil
+    Task {
+      let openedConversationID = await notifications.openCoachConversation()
+      isPreparingSetRefPicker = false
+      guard let openedConversationID else {
+        setRefEntryErrorMessage = StudentStrings.trainingShareConversationFailed
+        return
+      }
+      setRefPickerRoute = SetRefPickerRoute(conversationID: openedConversationID)
+    }
   }
 
   private func loadWorkout(for date: Date) async {
@@ -631,5 +710,42 @@ private struct EditingTarget: Identifiable {
 
 private struct DirectCameraTarget {
   let id: UUID
+}
+
+private struct SetRefPickerRoute: Identifiable {
+  var id: UUID { conversationID }
+
+  let conversationID: UUID
+}
+
+enum SetRefEntryVisibility {
+  static func shouldShow(
+    drafts: [TodayWorkoutViewModel.SetRowDraft],
+    isEditable: Bool,
+    hasActiveCoach: Bool,
+    hasSharingContext: Bool
+  ) -> Bool {
+    shouldShow(
+      isEditable: isEditable,
+      hasCompletedSet: drafts.contains {
+        SetRefCompletedSetEligibility.isEligible(
+          completed: $0.completed,
+          assumed: $0.assumed,
+          loggedSetID: $0.loggedSetID
+        )
+      },
+      hasActiveCoach: hasActiveCoach,
+      hasSharingContext: hasSharingContext
+    )
+  }
+
+  static func shouldShow(
+    isEditable: Bool,
+    hasCompletedSet: Bool,
+    hasActiveCoach: Bool,
+    hasSharingContext: Bool
+  ) -> Bool {
+    isEditable && hasCompletedSet && hasActiveCoach && hasSharingContext
+  }
 }
 // swiftlint:enable file_length type_body_length

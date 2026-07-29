@@ -7,6 +7,7 @@ struct ChatMessageRow: View {
   let isCurrentUser: Bool
   let deliveryStatus: ChatDeliveryStatus?
   let openImage: @MainActor () -> Void
+  let openVideo: @MainActor () -> Void
   let imageLoaded: @MainActor () -> Void
   let imageFailed: @MainActor () async -> Void
 
@@ -21,6 +22,7 @@ struct ChatMessageRow: View {
           message: message,
           isCurrentUser: isCurrentUser,
           openImage: openImage,
+          openVideo: openVideo,
           imageLoaded: imageLoaded,
           imageFailed: imageFailed
         )
@@ -43,6 +45,7 @@ private struct ChatMessageBubble: View {
   let message: ChatMessage
   let isCurrentUser: Bool
   let openImage: @MainActor () -> Void
+  let openVideo: @MainActor () -> Void
   let imageLoaded: @MainActor () -> Void
   let imageFailed: @MainActor () async -> Void
 
@@ -50,18 +53,26 @@ private struct ChatMessageBubble: View {
     Group {
       switch message.kind {
       case .text:
-        // Text hugs its content; the row's Spacer keeps the gutter, so a short
-        // reply stays a small bubble. Neither `containerRelativeFrame` nor
-        // `frame(maxWidth:)` belongs here — both fix the width and stretch a
-        // two-character reply into a full-width bar, since the background is
-        // applied after the frame.
-        Text(message.text ?? "")
-          .font(.body)
-          .foregroundStyle(isCurrentUser ? .white : Color.MeetPR.fgPrimary)
-          .multilineTextAlignment(isCurrentUser ? .trailing : .leading)
-          .fixedSize(horizontal: false, vertical: true)
-          .padding(.horizontal, MeetPRSpacing.md)
-          .padding(.vertical, MeetPRSpacing.sm)
+        if let presentation = ChatSetCardPresentation(message: message) {
+          ChatSetCardView(
+            presentation: presentation,
+            isCurrentUser: isCurrentUser,
+            openVideo: openVideo
+          )
+        } else {
+          // Text hugs its content; the row's Spacer keeps the gutter, so a short
+          // reply stays a small bubble. Neither `containerRelativeFrame` nor
+          // `frame(maxWidth:)` belongs here — both fix the width and stretch a
+          // two-character reply into a full-width bar, since the background is
+          // applied after the frame.
+          Text(message.text ?? "")
+            .font(.body)
+            .foregroundStyle(isCurrentUser ? .white : Color.MeetPR.fgPrimary)
+            .multilineTextAlignment(isCurrentUser ? .trailing : .leading)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, MeetPRSpacing.md)
+            .padding(.vertical, MeetPRSpacing.sm)
+        }
       case .image:
         // Images keep the fixed three-quarter width so the 4:3 frame is stable.
         Button(action: openImage) {
@@ -82,7 +93,11 @@ private struct ChatMessageBubble: View {
         )
       }
     }
-    .background(isCurrentUser ? Color.MeetPR.brandRed : Color.MeetPR.surface2)
+    .background(
+      ChatSetCardPresentation(message: message) == nil
+        ? (isCurrentUser ? Color.MeetPR.brandRed : Color.MeetPR.surface2)
+        : Color.clear
+    )
     .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
   }
 

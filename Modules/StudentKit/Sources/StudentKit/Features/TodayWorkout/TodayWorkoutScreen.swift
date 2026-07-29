@@ -20,6 +20,8 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let unreadCount: Int
   let showsNotifications: Bool
   let coachName: String
+  let showsAskCoach: Bool
+  let isPreparingAskCoach: Bool
   let namespace: Namespace.ID
   let isLaunchTargetHidden: Bool
   let launchHeroRevealToken: Int
@@ -29,6 +31,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let onReadiness: () -> Void
   let onNotifications: () -> Void
   let onMessageCoach: () -> Void
+  let onAskCoach: () -> Void
   let onHeroFrameChange: (CGRect) -> Void
   let onStart: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
@@ -197,6 +200,13 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         }
       }
 
+      if showsAskCoach {
+        TodayWorkoutAskCoachButton(
+          isPreparing: isPreparingAskCoach,
+          action: onAskCoach
+        )
+      }
+
       completionContent(presentation)
     case .rest:
       TodayWorkoutRestCard()
@@ -226,6 +236,35 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         HoldToCompleteButton(action: onComplete)
       }
     }
+  }
+}
+
+private struct TodayWorkoutAskCoachButton: View {
+  let isPreparing: Bool
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Group {
+        if isPreparing {
+          ProgressView()
+            .controlSize(.small)
+        } else {
+          Label(StudentStrings.askCoach, systemImage: "bubble.left")
+        }
+      }
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      .frame(maxWidth: .infinity)
+      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+      }
+    }
+    .buttonStyle(.plain)
+    .disabled(isPreparing)
+    .accessibilityIdentifier("todayWorkout.askCoach")
   }
 }
 
@@ -435,6 +474,7 @@ private struct TrainingHeaderButton<Icon: View>: View {
   }
 }
 
+// swiftlint:disable:next type_body_length
 private struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
@@ -609,6 +649,7 @@ private struct TodayWorkoutHero: View {
           )
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textMuted)
+          .accessibilityIdentifier("todayWorkout.activeSet.position")
         }
         .padding(.bottom, MeetPRSpacing.point10)
         .launchHeroRise(index: 2, trigger: launchHeroRevealToken)

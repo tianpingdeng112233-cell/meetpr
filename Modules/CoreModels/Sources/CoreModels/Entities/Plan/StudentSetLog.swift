@@ -1,6 +1,7 @@
 import Foundation
 
 /// A set the student actually recorded against a prescribed set.
+/// `setIndex` is the wire's zero-based `set_logs.set_index`.
 /// Wire shape (`GET /students/:id/sets`): weight_kg / rpe are Decimal-as-string.
 public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
   public let id: UUID

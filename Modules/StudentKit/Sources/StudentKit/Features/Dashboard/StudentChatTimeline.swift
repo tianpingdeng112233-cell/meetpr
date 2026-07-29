@@ -1,5 +1,6 @@
 import ChatUI
 import CoreModels
+import DesignSystem
 import Foundation
 
 enum StudentChatTimelineItem: Identifiable, Equatable, Sendable {
@@ -65,7 +66,7 @@ enum StudentChatTimeline {
     // Mockup 643 fixed copy has no space after 我的: 我的深蹲 · 第 1 组.
     var parts = ["我的\(video.exerciseName ?? "训练")"]
     if let setIndex = video.setIndex {
-      parts.append("第 \(setIndex) 组")
+      parts.append("第 \(SetIndexDisplay.number(forZeroBasedIndex: setIndex)) 组")
     }
     return parts.joined(separator: " · ")
   }

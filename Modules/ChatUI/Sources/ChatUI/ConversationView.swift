@@ -8,14 +8,19 @@ public struct ConversationView: View {
   @Environment(\.scenePhase) private var scenePhase
   @State private var viewModel: ConversationViewModel
   @State private var selectedImage: SelectedChatImage?
+  @State private var selectedVideo: SelectedChatVideo?
+  @State private var showsSetRefPicker = false
+  private let setRefSharing: SetRefSharingContext?
 
   public init(
     conversationID: UUID,
     currentUserID: UUID,
     repository: any ChatRepository,
     inbox: ChatInboxViewModel,
-    sendCoordinator: ChatSendCoordinator
+    sendCoordinator: ChatSendCoordinator,
+    setRefSharing: SetRefSharingContext? = nil
   ) {
+    self.setRefSharing = setRefSharing
     _viewModel = State(
       initialValue: ConversationViewModel(
         conversationID: conversationID,
@@ -35,12 +40,20 @@ public struct ConversationView: View {
 
       ConversationTimeline(
         viewModel: viewModel,
-        selectedImage: $selectedImage
+        selectedImage: $selectedImage,
+        selectedVideo: $selectedVideo
       )
 
       Divider()
         .overlay(Color.MeetPR.border)
-      ChatComposer(viewModel: viewModel)
+      if setRefSharing == nil {
+        ChatComposer(viewModel: viewModel)
+      } else {
+        ChatComposer(
+          viewModel: viewModel,
+          onShareTodayTraining: { showsSetRefPicker = true }
+        )
+      }
     }
     .background(Color.MeetPR.bg)
     .navigationTitle(ChatStrings.messages)
@@ -50,6 +63,7 @@ public struct ConversationView: View {
       }
       await viewModel.load()
       await viewModel.refreshImagesIfNeeded()
+      await viewModel.refreshVideosIfNeeded()
       await viewModel.pollUntilCancelled()
     }
     .modifier(
@@ -58,11 +72,32 @@ public struct ConversationView: View {
         viewModel: viewModel
       )
     )
+    .modifier(
+      ChatVideoPresentationModifier(
+        selectedVideo: $selectedVideo,
+        viewModel: viewModel
+      )
+    )
+    .sheet(isPresented: $showsSetRefPicker) {
+      if let setRefSharing {
+        SetRefSharePicker(
+          context: setRefSharing,
+          conversationID: viewModel.conversationID,
+          coordinator: viewModel.sendCoordinator,
+          onStaged: { showsSetRefPicker = false }
+        )
+      }
+    }
   }
 }
 
 private struct SelectedChatImage: Identifiable {
   let id: UUID
+}
+
+private struct SelectedChatVideo: Identifiable {
+  let id: UUID
+  let url: URL
 }
 
 @MainActor
@@ -90,6 +125,35 @@ private struct ChatImagePresentationModifier: ViewModifier {
   }
 }
 
+@MainActor
+private struct ChatVideoPresentationModifier: ViewModifier {
+  @Binding var selectedVideo: SelectedChatVideo?
+  let viewModel: ConversationViewModel
+
+  func body(content: Content) -> some View {
+    #if os(iOS)
+      content
+        .fullScreenCover(item: $selectedVideo, content: videoContent)
+    #else
+      content
+        .sheet(item: $selectedVideo, content: videoContent)
+    #endif
+  }
+
+  private func videoContent(_ selection: SelectedChatVideo) -> some View {
+    FeedbackVideoPlayerView(
+      videoID: selection.id,
+      url: selection.url,
+      refreshURL: { _ in
+        try await viewModel.videoPlaybackURL(
+          messageID: selection.id,
+          forceRenewal: true
+        )
+      }
+    )
+  }
+}
+
 private struct ChatErrorBanner: View {
   var body: some View {
     Text(ChatStrings.sendFailed)
@@ -105,6 +169,7 @@ private struct ChatErrorBanner: View {
 private struct ConversationTimeline: View {
   let viewModel: ConversationViewModel
   @Binding var selectedImage: SelectedChatImage?
+  @Binding var selectedVideo: SelectedChatVideo?
   @State private var scrollPosition: String?
 
   var body: some View {
@@ -123,6 +188,16 @@ private struct ConversationTimeline: View {
               selectedImage = SelectedChatImage(id: message.id)
               Task {
                 await viewModel.refreshImageIfNeeded(messageID: message.id)
+              }
+            },
+            openVideo: {
+              Task {
+                guard
+                  let url = try? await viewModel.videoPlaybackURL(messageID: message.id)
+                else {
+                  return
+                }
+                selectedVideo = SelectedChatVideo(id: message.id, url: url)
               }
             },
             imageLoaded: {

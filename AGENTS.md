@@ -159,9 +159,9 @@ Claude 裁决三种结果:
 
 ---
 
-## PR review pass(Claude 开的任何 PR 你做 second-pair-of-eyes)
+## PR review pass(Claude 开的代码类 PR 你做 second-pair-of-eyes;纯文档免跑)
 
-**触发**:Claude 通过 `/review-loop` 用 `codex exec`(read-only)**自动发起**——开 PR 前在工作区未提交改动上跑本地多轮互审 + 对质,无需 User 手动 paste。你在本地循环里审未提交 diff、按输出契约回应、**不改任何文件**;PR 开出后再做一次 PR 级最终 gate。这是 Claude 起草任何产物后必经的流程,**不论 doc 还是 code**(Claude 端规定见 [`CLAUDE.md` §PR Codex review pass](./CLAUDE.md))。
+**触发**:Claude 通过 `/review-loop` 用 `codex exec`(read-only)**自动发起**——开 PR 前在工作区未提交改动上跑本地多轮互审 + 对质,无需 User 手动 paste。你在本地循环里审未提交 diff、按输出契约回应、**不改任何文件**;PR 开出后再做一次 PR 级最终 gate。**仅 Claude 起草的代码类产物走此流程**(2026-07-12 拍板 code-only,2026-07-27 明确 spec / ADR / 纯文档一律免跑——文档 = Claude 起草 + David 终审);**触发范围权威 = [`review-loop` SKILL.md §何时跑](~/.claude/skills/review-loop/SKILL.md)**,Claude 端规定见 [`CLAUDE.md` §PR Codex review pass](./CLAUDE.md)。
 
 > **背景**:CLAUDE.md §角色 已规定 Claude 也写 Swift 代码(过去 default 走你,你限额触顶 Claude 接管 code 实装)。无论谁写,另一方必 review = 双向 second-pair-of-eyes。本节定义 Claude → 你 review 这一向;反向(你写 code → Claude review)是既有流程。
 
@@ -173,7 +173,7 @@ Claude 裁决三种结果:
 2. **不改任何文件**(纯 review,不 commit / 不 push;本地循环里你是 `-s read-only`,物理上也改不了)——单写者:只有 Claude 改文件
 3. **找问题**(按 PR 类型选 checklist):
 
-   **Doc / spec / ADR / *.md PR**(模板 spec 022 Q1):
+   **Doc / spec / ADR / *.md PR**(2026-07-27 起默认不触发,仅 David 显式点名要你审某份文档时;模板 spec 022 Q1):
    - **Factual errors**:数字 / 路径 / API name / 引用是否真存在(spec 022 Q1: catalog 总条数 SPEC 写 436 实际 xlsx 435)
    - **Scope ambiguity**:某条 SPEC 项指代不明 / 多种合理解读
    - **缺细节**:实操时 implementer 会 stuck 的地方(e.g., SPEC 没说怎么生成 fixture / 没列 raw value)
@@ -232,6 +232,8 @@ Claude 裁决三种结果:
 2026-05-13 加。spec 022 由 Claude 写,你 impl 时 catch 到 436 vs 435 事实错误 + PlanningDisplay 中文映射 SPEC 漏。**前置你做 review 能省一次 amendment cycle,提高 PR quality 进入 merge 前的成熟度**。同日扩 Claude 也写 code(你限额 fallback)→ scope 包含 code PR(不只 doc)。规则本身也经你 review(meta:PR #53),3 个 findings 全采纳改进了 wording(same-account `--approve` 限制 / re-review 触发条件 / 跟 CHALLENGE 边界)。
 
 2026-05-22:手动 paste 流程(3 处往返)自动化为 `/review-loop`——Claude 用 `codex exec`(read-only)本地发起多轮互审 + 对质,收敛后才开 PR,PR 级 review 退化为最终 gate。设计决策见 design doc(`~/ClaudeConfig/docs/specs/2026-05-22-claude-codex-review-loop-design.md`,设计期文档);**命令契约以 [`review-loop` skill](~/ClaudeConfig/skills/review-loop/SKILL.md) 为准**(design doc 里 `codex review --uncommitted` 等已被实现期 findings 取代)。本次 amendment 即该 skill 的首次实跑(dogfood)。
+
+2026-07-12 / 2026-07-27:触发范围两次收窄为 **code-only**——spec / ADR / 纯文档一律免跑(文档 = Claude 起草 + David 终审);触发范围权威落 [`review-loop` SKILL.md §何时跑](~/.claude/skills/review-loop/SKILL.md),本节与之冲突时以 SKILL.md 为准。
 
 ---
 
@@ -445,6 +447,10 @@ commits: N 个
 1.0(12) 2026-07-17;1.0(11) 2026-07-17 内外测首次同版;1.0(10) 2026-07-13 首个带埋点包;
 1.0(9) 2026-07-12;1.0(8) 2026-07-11;内容存档见 RELEASES.md。)
 `main` 是大版本线(solo/e1RM wave 等),**本包不带**;严禁擅自 merge main 进本分支(两线合并只由 David/Claude 决策)。
+
+### 双线期 P 尺附则(2026-07-28 从全局规约移入;回归单线后本节删)
+- P0/P1 修复若两条线都需要:**双落两份**(发版线一份 + main 一份,通常是重做非 cherry-pick,理由同捞回方法),交付时列清两侧 commit,防单侧遗漏。
+- 双线期的天然 P2 = 合「非发版线」(如留待大包的 main);发版线上仍用「留分支不合」机制。
 
 ### ⚖️ 形态正典裁决(2026-07-10,David 三包同屏对比后拍板 —— 别再问"main 是不是更新")
 

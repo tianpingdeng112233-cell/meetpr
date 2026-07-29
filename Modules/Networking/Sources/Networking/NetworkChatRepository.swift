@@ -130,6 +130,32 @@ public actor NetworkChatRepository: ChatRepository {
     }
   }
 
+  public func sendSetRef(
+    in conversationID: UUID,
+    body: String,
+    setRef: SetRefV1,
+    videoID: UUID?,
+    clientID: String
+  ) async throws -> ChatMessage {
+    let token = try await session.accessToken()
+    do {
+      let response: ChatMessageResponseDTO = try await apiClient.post(
+        path: "/conversations/\(conversationID.uuidString)/messages",
+        body: ChatSendMessageRequestDTO(
+          kind: .text,
+          body: body,
+          clientID: clientID,
+          setRef: setRef,
+          videoID: videoID
+        ),
+        accessToken: token
+      )
+      return response.message.toDomain()
+    } catch {
+      throw Self.mapped(error)
+    }
+  }
+
   public func markRead(
     in conversationID: UUID,
     upTo messageID: UUID

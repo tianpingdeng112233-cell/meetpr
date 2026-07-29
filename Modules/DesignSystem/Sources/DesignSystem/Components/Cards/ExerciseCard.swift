@@ -7,6 +7,7 @@ public struct ExerciseSetRecord: Equatable, Sendable {
   public let rpe: Double
   public let status: SetRow.Status
   public let videoState: SetRow.VideoState
+  public let indexAccessibilityIdentifier: String?
 
   public init(
     index: Int,
@@ -14,7 +15,8 @@ public struct ExerciseSetRecord: Equatable, Sendable {
     reps: Int,
     rpe: Double,
     status: SetRow.Status,
-    videoState: SetRow.VideoState
+    videoState: SetRow.VideoState,
+    indexAccessibilityIdentifier: String? = nil
   ) {
     self.index = index
     self.weight = weight
@@ -22,6 +24,7 @@ public struct ExerciseSetRecord: Equatable, Sendable {
     self.rpe = rpe
     self.status = status
     self.videoState = videoState
+    self.indexAccessibilityIdentifier = indexAccessibilityIdentifier
   }
 }
 
@@ -136,6 +139,7 @@ public struct ExerciseCard: View {
             rpe: set.rpe,
             status: set.status,
             videoState: set.videoState,
+            indexAccessibilityIdentifier: set.indexAccessibilityIdentifier,
             onEdit: { onEditSet(set) },
             onVideoAction: { onVideoAction(set) }
           )

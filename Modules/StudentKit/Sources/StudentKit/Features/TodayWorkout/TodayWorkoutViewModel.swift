@@ -82,7 +82,7 @@ public final class TodayWorkoutViewModel {
         state = .rest
         return
       }
-      let dayRange = Self.dayRange(containing: day.date)
+      let dayRange = Self.dayRange(containing: day.date, calendar: calendar)
       let existingLogs = try await logs.fetchLogs(studentID: studentID, in: dayRange)
       let drafts = Self.makeDrafts(for: day, existingLogs: existingLogs)
       let references = try await exerciseReferences(for: day, studentID: studentID)
@@ -178,7 +178,7 @@ public final class TodayWorkoutViewModel {
       return false
     }
     actionErrorMessage = nil
-    var nextDrafts = drafts
+    let nextDrafts = drafts
     var draft = nextDrafts[rowIndex]
     state = .recording(plan: plan, drafts: nextDrafts, rowIndex: rowIndex)
 
@@ -206,9 +206,7 @@ public final class TodayWorkoutViewModel {
       // recordSet was in flight; restoring the captured array would drop them.
       var latestDrafts = currentDrafts ?? nextDrafts
       draft = latestDrafts.indices.contains(rowIndex) ? latestDrafts[rowIndex] : draft
-      draft.completed = completed
-      draft.failed = failed
-      draft.loggedSetID = persisted.id
+      draft.applyPersistResult(persisted, completed: completed, failed: failed)
       if latestDrafts.indices.contains(rowIndex) {
         latestDrafts[rowIndex] = draft
       }
@@ -335,9 +333,11 @@ public final class TodayWorkoutViewModel {
 
   // Internal + nonisolated (not private): the DraftBuilding extension derives
   // the last-weight lookback window from it in a separate file, off-actor.
-  nonisolated static func dayRange(containing date: Date) -> ClosedRange<Date> {
-    let start = Calendar.current.startOfDay(for: date)
-    return start...start.addingTimeInterval(86_400 - 1)
+  nonisolated static func dayRange(
+    containing date: Date,
+    calendar: Calendar = .current
+  ) -> ClosedRange<Date> {
+    WorkoutDatePolicy.dayRange(containing: date, calendar: calendar)
   }
 }
 
