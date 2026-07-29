@@ -7,20 +7,25 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   private let api: APIClient
   private let session: any SessionStateReader
   private let cache: StudentPlanCache
+  private let catalogCache: ExerciseCatalogCache
   private let calendar: Calendar
   private let now: @Sendable () -> Date
   private var catalog: [UUID: Exercise] = [:]
+  private var catalogRefreshTask: Task<[Exercise], any Error>?
+  private var planRefreshTasks: [UUID: Task<StudentPlanView?, any Error>] = [:]
 
   public init(
     api: APIClient,
     session: any SessionStateReader,
     cache: StudentPlanCache = StudentPlanCache(),
+    catalogCache: ExerciseCatalogCache = ExerciseCatalogCache(),
     calendar: Calendar = .current,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.api = api
     self.session = session
     self.cache = cache
+    self.catalogCache = catalogCache
     self.calendar = calendar
     self.now = now
   }
@@ -95,6 +100,19 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
 
   @discardableResult
   private func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    if let task = planRefreshTasks[studentID] {
+      return try await task.value
+    }
+    let task: Task<StudentPlanView?, any Error> = Task { [weak self] in
+      guard let self else { return nil }
+      return try await self.performPlanRefresh(studentID: studentID)
+    }
+    planRefreshTasks[studentID] = task
+    defer { planRefreshTasks[studentID] = nil }
+    return try await task.value
+  }
+
+  private func performPlanRefresh(studentID: UUID) async throws -> StudentPlanView? {
     let token = try await session.accessToken()
     let response = try await api.studentPlans(
       studentID: studentID,
@@ -122,10 +140,42 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     if !catalog.isEmpty {
       return Array(catalog.values)
     }
-    let response = try await api.exercises(accessToken: accessToken)
+    if let catalogRefreshTask {
+      return try await catalogRefreshTask.value
+    }
+    let task: Task<[Exercise], any Error> = Task { [weak self] in
+      guard let self else { return [] }
+      return try await self.loadExerciseCatalog(accessToken: accessToken)
+    }
+    catalogRefreshTask = task
+    defer { catalogRefreshTask = nil }
+    let exercises = try await task.value
     catalog = Dictionary(
-      response.exercises.map { ($0.id, $0) }, uniquingKeysWith: { _, new in new })
-    return response.exercises
+      exercises.map { ($0.id, $0) }, uniquingKeysWith: { _, new in new })
+    return exercises
+  }
+
+  private func loadExerciseCatalog(accessToken: String) async throws -> [Exercise] {
+    let cached = await catalogCache.load()
+    let response = try await api.exerciseCatalogResponse(
+      ifNoneMatch: cached?.etag,
+      accessToken: accessToken
+    )
+    let exercises: [Exercise]
+    if response.statusCode == 304, let cached {
+      exercises = cached.exercises
+    } else {
+      let decoded = try MeetPRCodec.decoder.decode(
+        ExercisesResponseDTO.self,
+        from: response.data
+      )
+      exercises = decoded.exercises
+      try await catalogCache.save(
+        exercises: exercises,
+        etag: response.headerValue(for: "ETag")
+      )
+    }
+    return exercises
   }
 
   private func updateCachedPlan(

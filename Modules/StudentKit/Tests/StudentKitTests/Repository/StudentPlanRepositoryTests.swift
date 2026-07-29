@@ -124,6 +124,34 @@ func backendStudentPlanRepositoryMapsShiftMachineCodes(
   }
 }
 
+@Test func backendExerciseCatalogUsesDiskCopyWhenServerReturnsNotModified() async throws {
+  let directory = FileManager.default.temporaryDirectory
+    .appending(path: "ExerciseCatalog304Tests-\(UUID().uuidString)", directoryHint: .isDirectory)
+  defer { try? FileManager.default.removeItem(at: directory) }
+
+  let exercise = try #require(
+    StudentDemoSeed.makePlanView().days.first?.exercises.first?.exercise
+  )
+  let cache = ExerciseCatalogCache(directory: directory)
+  try await cache.save(exercises: [exercise], etag: #""catalog-v1""#)
+  let capture = CatalogRequestCapture()
+  let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
+    await capture.record(request)
+    return APIResponse(data: Data(), statusCode: 304)
+  }
+  let repository = BackendStudentPlanRepository(
+    api: api,
+    session: ShiftTestSession(),
+    catalogCache: cache
+  )
+
+  let exercises = try await repository.fetchExerciseCatalog()
+  let request = try #require(await capture.request)
+
+  #expect(exercises == [exercise])
+  #expect(request.value(forHTTPHeaderField: "If-None-Match") == #""catalog-v1""#)
+}
+
 private final class ShiftTestClock: @unchecked Sendable {
   private let lock = NSLock()
   private var value: Date
@@ -150,5 +178,13 @@ private struct ShiftTestSession: SessionStateReader {
 
   func currentUser() async throws -> User {
     throw SessionStateReaderError.missingCurrentUser
+  }
+}
+
+private actor CatalogRequestCapture {
+  private(set) var request: URLRequest?
+
+  func record(_ request: URLRequest) {
+    self.request = request
   }
 }

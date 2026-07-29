@@ -36,10 +36,13 @@ public struct StudentRootView: View {
   /// Bumped whenever 今日 becomes active so the home screen reloads data logged
   /// in other tabs (see DashboardView.todayReloadToken).
   @State private var todayReloadToken = 0
+  @State private var todayVolatileReloadToken = 0
+  @State private var todayRefreshThrottle = StudentTodayRefreshThrottle()
   /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
   @State private var trainingAutoStartToken = 0
+  @State private var workoutPlanHandoff: TodayWorkoutPlanHandoff?
   @State private var launchHeroRevealToken = 0
   @State private var planRevision = 0
   @State private var nextWorkoutSource: WorkoutSource?
@@ -219,6 +222,10 @@ extension StudentRootView {
         isStartWorkoutHidden: launchSourceFrame != nil,
         onOpenPlanNotification: openPlanNotification,
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
+        todayVolatileReloadToken: todayVolatileReloadToken,
+        onFullReload: {
+          todayRefreshThrottle.recordFullRefresh(at: Date())
+        },
         onPlanChanged: { planRevision += 1 }
       )
       .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
@@ -228,6 +235,7 @@ extension StudentRootView {
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding, readiness: readiness,
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
+        planHandoff: workoutPlanHandoff,
         jumpToTodayToken: trainingJumpToken,
         autoStartToken: trainingAutoStartToken,
         isLaunchTargetHidden: launchSourceFrame != nil && !revealsLaunchTarget,
@@ -327,7 +335,14 @@ extension StudentRootView {
     }
     .onChange(of: selectedTab) { _, newTab in
       handleTabSelectionChange(newTab)
-      if newTab == .today { todayReloadToken += 1 }
+      if newTab == .today {
+        switch todayRefreshThrottle.refreshWhenReturning(at: Date()) {
+        case .full:
+          todayReloadToken += 1
+        case .volatileOnly:
+          todayVolatileReloadToken += 1
+        }
+      }
       switch newTab {
       case .today:
         Analytics.shared.screen(.dashboard)
@@ -375,12 +390,15 @@ extension StudentRootView {
     selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
   }
 
-  private func startWorkoutFromDashboard() {
+  private func startWorkoutFromDashboard(handoff: TodayWorkoutPlanHandoff?) {
     // Ignore repeated activation until the current launch has either
     // completed or been explicitly cancelled by navigation/reduced motion.
     guard launchMorphPhase == .idle else { return }
 
     nextWorkoutSource = .dashboard
+    if let handoff {
+      workoutPlanHandoff = handoff
+    }
     trainingJumpToken += 1
 
     guard !reduceMotion,

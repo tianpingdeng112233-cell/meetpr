@@ -18,12 +18,14 @@ public struct DashboardView: View {
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let notifications: StudentNotificationsCoordinator?
-  private let onStartWorkout: () -> Void
+  private let onStartWorkout: (TodayWorkoutPlanHandoff?) -> Void
   private let onStartWorkoutFrameChange: (CGRect) -> Void
   private let isStartWorkoutHidden: Bool
   private let onOpenPlanNotification: () -> Void
   private let onPlanChanged: () -> Void
   private let todayReloadToken: Int
+  private let todayVolatileReloadToken: Int
+  private let onFullReload: () -> Void
 
   @State private var weekViewModel: WeekOverviewViewModel
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
@@ -46,11 +48,13 @@ public struct DashboardView: View {
     e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel,
     notifications: StudentNotificationsCoordinator? = nil,
-    onStartWorkout: @escaping () -> Void,
+    onStartWorkout: @escaping (TodayWorkoutPlanHandoff?) -> Void,
     onStartWorkoutFrameChange: @escaping (CGRect) -> Void = { _ in },
     isStartWorkoutHidden: Bool = false,
     onOpenPlanNotification: @escaping () -> Void = {},
     todayReloadToken: Int = 0,
+    todayVolatileReloadToken: Int = 0,
+    onFullReload: @escaping () -> Void = {},
     onPlanChanged: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
@@ -64,6 +68,8 @@ public struct DashboardView: View {
     self.isStartWorkoutHidden = isStartWorkoutHidden
     self.onOpenPlanNotification = onOpenPlanNotification
     self.todayReloadToken = todayReloadToken
+    self.todayVolatileReloadToken = todayVolatileReloadToken
+    self.onFullReload = onFullReload
     self.onPlanChanged = onPlanChanged
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
     self._e1rmTrendViewModel = State(
@@ -91,7 +97,17 @@ public struct DashboardView: View {
               showsNotifications = true
             }
           },
-          onStartWorkout: onStartWorkout,
+          onStartWorkout: {
+            onStartWorkout(
+              weekViewModel.plan.map {
+                TodayWorkoutPlanHandoff(
+                  plan: $0,
+                  date: Date(),
+                  existingLogs: weekData?.logs ?? []
+                )
+              }
+            )
+          },
           onStartWorkoutFrameChange: onStartWorkoutFrameChange,
           isStartWorkoutHidden: isStartWorkoutHidden,
           onShiftPlan: proposeShiftToday,
@@ -113,12 +129,16 @@ public struct DashboardView: View {
     .background(Color.MeetPR.bgBase)
     .task {
       await loadIfNeeded()
+      onFullReload()
       if let planID = weekViewModel.plan?.cycleID {
         Analytics.shared.planViewed(planID: planID)
       }
     }
     .onChange(of: todayReloadToken) { _, _ in
       Task { await reload() }
+    }
+    .onChange(of: todayVolatileReloadToken) { _, _ in
+      Task { await reloadVolatileData() }
     }
     #if os(iOS)
       .fullScreenCover(item: $shiftProposal) { proposal in
@@ -214,31 +234,65 @@ public struct DashboardView: View {
   }
 
   private func loadIfNeeded() async {
-    if weekViewModel.state == .idle {
-      await weekViewModel.load(studentID: studentID)
-    }
-    if notifications == nil, feedbackViewModel.state == .idle {
-      await feedbackViewModel.load(studentID: studentID)
-    }
-    if e1rmTrendViewModel.state == .idle {
-      await e1rmTrendViewModel.load(studentID: studentID)
-    }
-    if profileMetricsViewModel.state == .idle {
-      await profileMetricsViewModel.load(studentID: studentID)
-    }
+    async let weekLoad: Void = loadWeekIfNeeded()
+    async let notificationLoad: Void = loadNotificationsIfNeeded()
+    async let trendLoad: Void = loadTrendIfNeeded()
+    async let metricsLoad: Void = loadMetricsIfNeeded()
+    _ = await (weekLoad, notificationLoad, trendLoad, metricsLoad)
     await loadNewPRCount()
   }
 
   private func reload() async {
+    async let weekLoad: Void = weekViewModel.load(studentID: studentID)
+    async let notificationLoad: Void = reloadNotifications()
+    async let trendLoad: Void = e1rmTrendViewModel.load(studentID: studentID)
+    async let metricsLoad: Void = profileMetricsViewModel.load(studentID: studentID)
+    _ = await (weekLoad, notificationLoad, trendLoad, metricsLoad)
+    await loadNewPRCount()
+    onFullReload()
+  }
+
+  private func reloadVolatileData() async {
+    async let logLoad: Void = weekViewModel.refreshLogs(studentID: studentID)
+    async let notificationLoad: Void = reloadVolatileNotifications()
+    _ = await (logLoad, notificationLoad)
+    await loadNewPRCount()
+  }
+
+  private func loadWeekIfNeeded() async {
+    guard weekViewModel.state == .idle else { return }
     await weekViewModel.load(studentID: studentID)
+  }
+
+  private func loadNotificationsIfNeeded() async {
+    guard notifications == nil, feedbackViewModel.state == .idle else { return }
+    await feedbackViewModel.load(studentID: studentID)
+  }
+
+  private func loadTrendIfNeeded() async {
+    guard e1rmTrendViewModel.state == .idle else { return }
+    await e1rmTrendViewModel.load(studentID: studentID)
+  }
+
+  private func loadMetricsIfNeeded() async {
+    guard profileMetricsViewModel.state == .idle else { return }
+    await profileMetricsViewModel.load(studentID: studentID)
+  }
+
+  private func reloadNotifications() async {
     if let notifications {
       await notifications.reload(studentID: studentID)
     } else {
       await feedbackViewModel.load(studentID: studentID)
     }
-    await e1rmTrendViewModel.load(studentID: studentID)
-    await profileMetricsViewModel.load(studentID: studentID)
-    await loadNewPRCount()
+  }
+
+  private func reloadVolatileNotifications() async {
+    if let notifications {
+      await notifications.reloadVolatile(studentID: studentID)
+    } else {
+      await feedbackViewModel.load(studentID: studentID)
+    }
   }
 
   private func loadNewPRCount() async {

@@ -40,7 +40,8 @@ public final class TrainingHistoryViewModel {
   }
 
   public func load(studentID: UUID) async {
-    state = .loading
+    let isInitialLoad = state == .idle
+    if isInitialLoad { state = .loading }
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       let days = try await plans.fetchCycleDays(studentID: studentID)
@@ -52,9 +53,10 @@ public final class TrainingHistoryViewModel {
       state = .loaded(weeks: weeks, logs: fetchedLogs)
     } catch {
       if error.isTaskCancellation {
-        state = .idle
+        if isInitialLoad { state = .idle }
         return
       }
+      if case .loaded = state { return }
       state = .error(error.localizedDescription)
     }
   }

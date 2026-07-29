@@ -182,13 +182,13 @@ public final class StudentNotificationsCoordinator {
 
   func reload(studentID: UUID) async {
     currentStudentID = studentID
-    state = .loading
+    let isInitialLoad = state == .idle
+    if isInitialLoad { state = .loading }
 
-    await feedback.load(studentID: studentID)
-    await evaluation.load(studentID: studentID)
-    if let chatContext, activeCoach != nil {
-      await chatContext.inbox.refresh()
-    }
+    async let feedbackLoad: Void = feedback.load(studentID: studentID)
+    async let evaluationLoad: Void = evaluation.load(studentID: studentID)
+    async let chatLoad: Void = refreshChatIfAvailable()
+    _ = await (feedbackLoad, evaluationLoad, chatLoad)
 
     do {
       guard let plan = try await plans.fetchCurrentPlan(studentID: studentID) else {
@@ -207,11 +207,24 @@ public final class StudentNotificationsCoordinator {
       state = .loaded(notice)
     } catch {
       if error.isTaskCancellation {
-        state = .idle
+        if isInitialLoad { state = .idle }
         return
       }
+      if case .loaded = state { return }
       state = .error(error.localizedDescription)
     }
+  }
+
+  func reloadVolatile(studentID: UUID) async {
+    currentStudentID = studentID
+    async let feedbackLoad: Void = feedback.load(studentID: studentID)
+    async let chatLoad: Void = refreshChatIfAvailable()
+    _ = await (feedbackLoad, chatLoad)
+  }
+
+  private func refreshChatIfAvailable() async {
+    guard let chatContext, activeCoach != nil else { return }
+    await chatContext.inbox.refresh()
   }
 
   func markCurrentPlanSeen() {

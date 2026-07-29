@@ -27,16 +27,16 @@ public final class WeekOverviewViewModel {
   }
 
   public func load(studentID: UUID) async {
-    state = .loading
-    cycleDays = []
+    let isInitialLoad = state == .idle
+    if isInitialLoad { state = .loading }
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       self.plan = plan
       planStartDate = plan?.startDate
       let weekIndex = plan?.weekIndex ?? 1
-      // fetchCycleDays now returns the whole cycle; the dashboard strip only
-      // wants this week, so filter to the current plan-week window by date.
-      let allDays = try await plans.fetchCycleDays(studentID: studentID)
+      // The current-plan projection already contains the whole cycle. Calling
+      // fetchCycleDays would resolve the same projection a second time.
+      let allDays = plan?.days.sorted { $0.date < $1.date } ?? []
       cycleDays = allDays
       let days = Self.currentWeekDays(
         from: allDays, startDate: plan?.startDate, weekIndex: weekIndex)
@@ -49,10 +49,27 @@ public final class WeekOverviewViewModel {
       state = .loaded(days: days, logs: fetchedLogs, weekIndex: weekIndex)
     } catch {
       if error.isTaskCancellation {
-        state = .idle
+        if isInitialLoad { state = .idle }
         return
       }
+      if case .loaded = state { return }
       state = .error(error.localizedDescription)
+    }
+  }
+
+  func refreshLogs(studentID: UUID) async {
+    guard case .loaded(let days, _, let weekIndex) = state else { return }
+    do {
+      let fetchedLogs: [StudentSetLog]
+      if let dateRange = Self.dateRange(for: days) {
+        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
+      } else {
+        fetchedLogs = []
+      }
+      state = .loaded(days: days, logs: fetchedLogs, weekIndex: weekIndex)
+    } catch {
+      if error.isTaskCancellation { return }
+      // A volatile refresh must never throw away the week already on screen.
     }
   }
 

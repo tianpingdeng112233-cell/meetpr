@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import CoreModels
 import Foundation
 import Networking
@@ -85,6 +86,274 @@ import Testing
   await viewModel.load(date: Date(), studentID: StudentDemoSeed.studentID)
 
   #expect(viewModel.state == .noPlan)
+}
+
+@MainActor
+@Test func todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() async {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let plans = GatedStudentPlanRepository(plan: plan)
+  let logs = SnapshotCountingTrainingLogRepository()
+  let e1rm = SnapshotCountingE1RMRepository()
+  let viewModel = TodayWorkoutViewModel(
+    plans: plans,
+    logs: logs,
+    e1rm: e1rm
+  )
+
+  let loadTask = Task {
+    await viewModel.load(
+      date: plan.days[0].date,
+      studentID: studentID,
+      preloadedPlan: plan
+    )
+  }
+  await plans.waitUntilFetchStarted()
+  for _ in 0..<100 {
+    if case .loaded = viewModel.state { break }
+    await Task.yield()
+  }
+
+  let renderedDayID: UUID?
+  if case .loaded(let day, _) = viewModel.state {
+    renderedDayID = day.id
+  } else {
+    renderedDayID = nil
+  }
+  #expect(await plans.fetchCallCount == 1)
+  #expect(renderedDayID == plan.days[0].id)
+
+  await plans.open()
+  await loadTask.value
+
+  let fetchedRanges = await logs.fetchedRanges
+  let dayRange = TodayWorkoutViewModel.dayRange(containing: plan.days[0].date)
+  let historyRange = TodayWorkoutViewModel.lastWeightHistoryRange(before: plan.days[0].date)
+  #expect(fetchedRanges.count == 2)
+  #expect(fetchedRanges.filter { $0 == dayRange }.count == 1)
+  #expect(fetchedRanges.filter { $0 == historyRange }.count == 1)
+  #expect(
+    await e1rm.historyFetchCallCount
+      == Set(plan.days[0].exercises.map(\.exercise.id)).count
+  )
+}
+
+@MainActor
+@Test func todayWorkoutAppliesRefreshedPlanWhenItDiffersFromHandoff() async {
+  let studentID = StudentDemoSeed.studentID
+  let handedOffPlan = StudentDemoSeed.makePlanView()
+  let refreshedDay = StudentPlanDay(
+    id: UUID(),
+    date: handedOffPlan.days[0].date,
+    exercises: handedOffPlan.days[0].exercises
+  )
+  let refreshedPlan = StudentPlanView(
+    cycleID: handedOffPlan.cycleID,
+    weekIndex: handedOffPlan.weekIndex,
+    startDate: handedOffPlan.startDate,
+    endDate: handedOffPlan.endDate,
+    planKind: handedOffPlan.planKind,
+    totalShiftDays: handedOffPlan.totalShiftDays,
+    latestShiftCreatedAt: handedOffPlan.latestShiftCreatedAt,
+    days: [refreshedDay] + handedOffPlan.days.dropFirst()
+  )
+  let plans = GatedStudentPlanRepository(plan: refreshedPlan)
+  await plans.open()
+  let viewModel = TodayWorkoutViewModel(
+    plans: plans,
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(
+    date: handedOffPlan.days[0].date,
+    studentID: studentID,
+    preloadedPlan: handedOffPlan
+  )
+
+  guard case .loaded(let day, _) = viewModel.state else {
+    Issue.record("Expected refreshed plan content to be loaded")
+    return
+  }
+  #expect(await plans.fetchCallCount == 1)
+  #expect(day.id == refreshedDay.id)
+}
+
+@MainActor
+@Test func todayWorkoutKeepsHandedOffPlanWhenRefreshFails() async {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let viewModel = TodayWorkoutViewModel(
+    plans: ThrowingStudentPlanRepository { TestError() },
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(
+    date: plan.days[0].date,
+    studentID: studentID,
+    preloadedPlan: plan
+  )
+
+  guard case .loaded(let day, _) = viewModel.state else {
+    Issue.record("Expected handed-off plan to remain visible after refresh failure")
+    return
+  }
+  #expect(day.id == plan.days[0].id)
+}
+
+private actor GatedStudentPlanRepository: StudentPlanRepository {
+  private let plan: StudentPlanView?
+  private var isOpen = false
+  private var fetchStarted = false
+  private var gateWaiters: [CheckedContinuation<Void, Never>] = []
+  private var fetchStartWaiters: [CheckedContinuation<Void, Never>] = []
+  private(set) var fetchCallCount = 0
+
+  init(plan: StudentPlanView?) {
+    self.plan = plan
+  }
+
+  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    fetchCallCount += 1
+    fetchStarted = true
+    for waiter in fetchStartWaiters { waiter.resume() }
+    fetchStartWaiters = []
+    if !isOpen {
+      await withCheckedContinuation { gateWaiters.append($0) }
+    }
+    return plan
+  }
+
+  func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? {
+    plan?.days.first { $0.date == date }
+  }
+
+  func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
+    plan?.days ?? []
+  }
+
+  func waitUntilFetchStarted() async {
+    if fetchStarted { return }
+    await withCheckedContinuation { fetchStartWaiters.append($0) }
+  }
+
+  func open() {
+    isOpen = true
+    for waiter in gateWaiters { waiter.resume() }
+    gateWaiters = []
+  }
+}
+
+private actor SnapshotCountingTrainingLogRepository: StudentTrainingLogRepository {
+  private(set) var fetchedRanges: [ClosedRange<Date>] = []
+
+  func recordSet(_ log: StudentSetLog) async throws -> StudentSetLog {
+    log
+  }
+
+  func fetchLogs(
+    studentID: UUID,
+    in dateRange: ClosedRange<Date>
+  ) async throws -> [StudentSetLog] {
+    fetchedRanges.append(dateRange)
+    return []
+  }
+
+  func fetchLogsForExercise(
+    studentID: UUID,
+    planExerciseID: UUID
+  ) async throws -> [StudentSetLog] {
+    []
+  }
+}
+
+private actor SnapshotCountingE1RMRepository: E1RMRepository {
+  private(set) var historyFetchCallCount = 0
+
+  func recordPoint(_ point: E1RMHistoryPoint) async throws {}
+
+  func upsertPoint(_ point: E1RMHistoryPoint) async throws -> E1RMHistoryPoint {
+    point
+  }
+
+  func updatePointConfidence(
+    studentId: UUID,
+    pointIDs: Set<UUID>,
+    confidence: E1RMConfidence
+  ) async throws {}
+
+  func replaceHistory(
+    studentId: UUID,
+    with points: [E1RMHistoryPoint],
+    weightBaselines: [E1RMWeightBaseline],
+    prEvents: [PRBreakthroughEvent]
+  ) async throws {}
+
+  func fetchHistory(
+    studentId: UUID,
+    exerciseId: UUID
+  ) async throws -> [E1RMHistoryPoint] {
+    historyFetchCallCount += 1
+    return []
+  }
+
+  func fetchHistory(
+    studentId: UUID,
+    exerciseIds: [UUID]
+  ) async throws -> [UUID: [E1RMHistoryPoint]] {
+    [:]
+  }
+
+  func fetchHistory(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> [E1RMHistoryPoint] {
+    []
+  }
+
+  func maxBefore(
+    studentId: UUID,
+    exerciseId: UUID,
+    before: Date,
+    excludingSetLogId: UUID?
+  ) async throws -> Double? {
+    nil
+  }
+
+  func recordWeightBaseline(
+    _ candidate: E1RMWeightBaseline
+  ) async throws -> E1RMWeightBaseline? {
+    nil
+  }
+
+  func fetchWeightBaseline(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> E1RMWeightBaseline? {
+    nil
+  }
+
+  func fetchWeightBaselines(studentId: UUID) async throws -> [E1RMWeightBaseline] {
+    []
+  }
+
+  func recordPR(_ event: PRBreakthroughEvent) async throws {}
+
+  func fetchPRs(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> [PRBreakthroughEvent] {
+    []
+  }
+
+  func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent] {
+    []
+  }
+
+  func acknowledgePR(eventId: UUID) async throws {}
+
+  func prEvents(studentId: UUID, since: Date) async throws -> [PRBreakthroughEvent] {
+    []
+  }
 }
 
 @MainActor

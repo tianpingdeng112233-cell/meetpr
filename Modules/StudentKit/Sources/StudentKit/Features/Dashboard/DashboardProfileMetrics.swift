@@ -112,7 +112,8 @@ final class DashboardProfileMetricsViewModel {
   }
 
   func load(studentID: UUID) async {
-    state = .loading
+    let isInitialLoad = state == .idle
+    if isInitialLoad { state = .loading }
     do {
       let profile = try await onboarding.fetchProfile(studentId: studentID)
       state = .loaded(
@@ -124,9 +125,10 @@ final class DashboardProfileMetricsViewModel {
       )
     } catch {
       if error.isTaskCancellation {
-        state = .idle
+        if isInitialLoad { state = .idle }
         return
       }
+      if case .loaded = state { return }
       state = .error(error.localizedDescription)
     }
   }

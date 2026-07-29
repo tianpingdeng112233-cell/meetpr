@@ -69,6 +69,35 @@ import Testing
   #expect(!viewModel.isLoadedEmpty)
 }
 
+@MainActor
+@Test func feedbackInboxRefreshKeepsLoadedContentVisible() async {
+  let repository = EmptyStateFeedbackRepository()
+  let viewModel = FeedbackInboxViewModel(repository: repository)
+
+  let initialLoad = Task { @MainActor in
+    await viewModel.load(studentID: StudentDemoSeed.studentID)
+  }
+  while !(await repository.isWaiting) {
+    await Task.yield()
+  }
+  let items = StudentDemoSeed.makeFeedback()
+  await repository.resolve(.success(items))
+  await initialLoad.value
+
+  let refresh = Task { @MainActor in
+    await viewModel.load(studentID: StudentDemoSeed.studentID)
+  }
+  while !(await repository.isWaiting) {
+    await Task.yield()
+  }
+
+  #expect(viewModel.state == .loaded(items))
+  #expect(viewModel.items == items)
+
+  await repository.resolve(.success(items))
+  await refresh.value
+}
+
 private enum EmptyStateFeedbackError: Error {
   case failed
 }

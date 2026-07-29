@@ -12,6 +12,7 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let planHandoff: TodayWorkoutPlanHandoff?
   private let jumpToTodayToken: Int
   private let autoStartToken: Int
   private let isLaunchTargetHidden: Bool
@@ -59,6 +60,7 @@ public struct TodayWorkoutView: View {
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
     videoUploads: VideoUploadServices? = nil,
+    planHandoff: TodayWorkoutPlanHandoff? = nil,
     jumpToTodayToken: Int = 0,
     autoStartToken: Int = 0,
     isLaunchTargetHidden: Bool = false,
@@ -73,6 +75,7 @@ public struct TodayWorkoutView: View {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
+    self.planHandoff = planHandoff
     self.jumpToTodayToken = jumpToTodayToken
     self.autoStartToken = autoStartToken
     self.isLaunchTargetHidden = isLaunchTargetHidden
@@ -318,7 +321,10 @@ public struct TodayWorkoutView: View {
     .task {
       let isFirstLoad = viewModel.state == .idle
       if isFirstLoad {
-        await loadWorkout(for: selectedDate)
+        await loadWorkout(
+          for: selectedDate,
+          preloadedPlan: handedOffPlan(for: selectedDate)
+        )
       }
       // A CTA tap can mount this view with the token already advanced, in
       // which case onChange(of: autoStartToken) never fires — hand the gate
@@ -335,7 +341,17 @@ public struct TodayWorkoutView: View {
       started = false
       collapsedExercises = [:]
       Task {
-        await loadWorkout(for: newDate)
+        await loadWorkout(
+          for: newDate,
+          preloadedPlan: handedOffPlan(for: newDate)
+        )
+        consumePendingAutoStartIfReady()
+      }
+    }
+    .onChange(of: planHandoff?.id) { _, _ in
+      guard let plan = handedOffPlan(for: selectedDate) else { return }
+      Task {
+        await loadWorkout(for: selectedDate, preloadedPlan: plan)
         consumePendingAutoStartIfReady()
       }
     }
@@ -388,7 +404,19 @@ public struct TodayWorkoutView: View {
   private var screenContent: TodayWorkoutScreen<TrainingCalendarView>.Content {
     switch viewModel.state {
     case .idle, .loading:
-      .loading
+      if let workout = handedOffWorkout(for: selectedDate) {
+        .workout(
+          TodayWorkoutPresentation(
+            day: workout.day,
+            drafts: workout.drafts,
+            references: [:],
+            videoStates: [:],
+            started: started
+          )
+        )
+      } else {
+        .loading
+      }
     // One pattern, one branch: .loaded → .recording → .loaded round-trips
     // during every persist. Keeping one structural identity prevents SwiftUI
     // from dismissing and re-presenting SetEntrySheet with reset fields.
@@ -419,7 +447,9 @@ public struct TodayWorkoutView: View {
     switch viewModel.state {
     case .loaded(let day, let drafts), .recording(let day, let drafts, _):
       (day, drafts)
-    case .idle, .loading, .noPlan, .rest, .error:
+    case .idle, .loading:
+      handedOffWorkout(for: selectedDate)
+    case .noPlan, .rest, .error:
       nil
     }
   }
@@ -648,12 +678,51 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private func loadWorkout(for date: Date) async {
-    await viewModel.load(date: date, studentID: studentID)
+  private func loadWorkout(
+    for date: Date,
+    preloadedPlan: StudentPlanView? = nil
+  ) async {
+    await viewModel.load(
+      date: date,
+      studentID: studentID,
+      preloadedPlan: preloadedPlan
+    )
     if Calendar.current.isDate(date, inSameDayAs: selectedDate) {
       reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
     }
     await refreshReadinessStatus(for: date)
+  }
+
+  private func handedOffPlan(for date: Date) -> StudentPlanView? {
+    guard let planHandoff,
+      Calendar.current.isDate(planHandoff.date, inSameDayAs: date)
+    else {
+      return nil
+    }
+    return planHandoff.plan
+  }
+
+  private func handedOffWorkout(
+    for date: Date
+  ) -> (day: StudentPlanDay, drafts: [TodayWorkoutViewModel.SetRowDraft])? {
+    guard let plan = handedOffPlan(for: date),
+      let day = plan.days.first(where: {
+        PlanCalendarDayIdentity.matches(
+          planDate: $0.date,
+          selectedDate: date,
+          selectedCalendar: .current
+        )
+      })
+    else {
+      return nil
+    }
+    return (
+      day,
+      TodayWorkoutViewModel.makeDrafts(
+        for: day,
+        existingLogs: planHandoff?.existingLogs ?? []
+      )
+    )
   }
 
   private func consumePendingAutoStartIfReady() {
