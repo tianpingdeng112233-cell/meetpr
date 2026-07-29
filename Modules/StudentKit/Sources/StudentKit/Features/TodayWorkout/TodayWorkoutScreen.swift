@@ -184,7 +184,10 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         onFrameChange: onHeroFrameChange,
         onStart: onStart,
         onEdit: onEdit,
-        onVideoAction: onVideoAction
+        onVideoAction: onVideoAction,
+        showsAskCoach: showsAskCoach,
+        isPreparingAskCoach: isPreparingAskCoach,
+        onAskCoach: onAskCoach
       )
 
       if presentation.heroMode == .recording {
@@ -198,13 +201,6 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         if !presentation.progress.allDone {
           TodayWorkoutRemainingPill(text: presentation.progress.remainingText)
         }
-      }
-
-      if showsAskCoach {
-        TodayWorkoutAskCoachButton(
-          isPreparing: isPreparingAskCoach,
-          action: onAskCoach
-        )
       }
 
       completionContent(presentation)
@@ -228,6 +224,16 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   @ViewBuilder
   private func completionContent(_ presentation: TodayWorkoutPresentation) -> some View {
     if presentation.progress.allDone {
+      // The hero action row is gone once every set is logged, so the entry has to land here —
+      // finishing a session is exactly when a student wants to ask. Full width rather than the
+      // hero's square icon: there is no camera control to sit beside.
+      if showsAskCoach {
+        TodayWorkoutAskCoachWideButton(
+          isPreparing: isPreparingAskCoach,
+          action: onAskCoach
+        )
+      }
+
       if reviewCompleted || !isEditable {
         DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.rows).count) {
           onShowReview()
@@ -239,7 +245,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   }
 }
 
-private struct TodayWorkoutAskCoachButton: View {
+private struct TodayWorkoutAskCoachWideButton: View {
   let isPreparing: Bool
   let action: () -> Void
 
@@ -249,6 +255,7 @@ private struct TodayWorkoutAskCoachButton: View {
         if isPreparing {
           ProgressView()
             .controlSize(.small)
+            .tint(Color.MeetPR.textTertiary)
         } else {
           Label(StudentStrings.askCoach, systemImage: "bubble.left")
         }
@@ -257,13 +264,51 @@ private struct TodayWorkoutAskCoachButton: View {
       .foregroundStyle(Color.MeetPR.textPrimary)
       .frame(maxWidth: .infinity)
       .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+      .background(Color.MeetPR.surfaceCard)
       .overlay {
         RoundedRectangle(cornerRadius: MeetPRRadius.control)
           .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
       }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
     .buttonStyle(.plain)
     .disabled(isPreparing)
+    .accessibilityIdentifier("todayWorkout.askCoach")
+  }
+}
+
+private struct TodayWorkoutAskCoachButton: View {
+  let isPreparing: Bool
+  let action: () -> Void
+
+  var body: some View {
+    // Square icon button sized to match the camera control beside it. It lives in the hero
+    // action row rather than at the foot of the page: the rest timer pins itself to the bottom
+    // the moment a set is logged, and that is exactly when a student wants to ask — the old
+    // placement put the entry underneath the bar.
+    Button(action: action) {
+      Group {
+        if isPreparing {
+          ProgressView()
+            .controlSize(.small)
+            .tint(Color.MeetPR.textTertiary)
+        } else {
+          Image(systemName: "bubble.left")
+            .font(.system(size: 20, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textTertiary)
+        }
+      }
+      .frame(width: 52, height: 52)
+      .background(Color.MeetPR.surfaceCard)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.control)
+          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+      }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    }
+    .buttonStyle(.plain)
+    .disabled(isPreparing)
+    .accessibilityLabel(StudentStrings.askCoach)
     .accessibilityIdentifier("todayWorkout.askCoach")
   }
 }
@@ -485,6 +530,9 @@ private struct TodayWorkoutHero: View {
   let onStart: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
+  let showsAskCoach: Bool
+  let isPreparingAskCoach: Bool
+  let onAskCoach: () -> Void
 
   var body: some View {
     ZStack(alignment: .leading) {
@@ -740,6 +788,13 @@ private struct TodayWorkoutHero: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("记录本组视频")
+
+            if showsAskCoach {
+              TodayWorkoutAskCoachButton(
+                isPreparing: isPreparingAskCoach,
+                action: onAskCoach
+              )
+            }
           }
           .padding(.top, MeetPRSpacing.point13)
           .launchHeroRise(index: 6, trigger: launchHeroRevealToken)

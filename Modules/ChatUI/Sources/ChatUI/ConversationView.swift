@@ -45,7 +45,7 @@ public struct ConversationView: View {
       )
 
       Divider()
-        .overlay(Color.MeetPR.border)
+        .overlay(Color.MeetPR.borderDefault)
       if setRefSharing == nil {
         ChatComposer(viewModel: viewModel)
       } else {
@@ -55,7 +55,7 @@ public struct ConversationView: View {
         )
       }
     }
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
     .navigationTitle(ChatStrings.messages)
     .task(id: scenePhase) {
       guard scenePhase == .active else {
@@ -158,10 +158,10 @@ private struct ChatErrorBanner: View {
   var body: some View {
     Text(ChatStrings.sendFailed)
       .font(.footnote)
-      .foregroundStyle(Color.MeetPR.brandRed)
+      .foregroundStyle(Color.MeetPR.goldCTA)
       .frame(maxWidth: .infinity)
       .padding(.vertical, MeetPRSpacing.sm)
-      .background(Color.MeetPR.brandRedSoft)
+      .background(Color.MeetPR.goldSoft)
   }
 }
 

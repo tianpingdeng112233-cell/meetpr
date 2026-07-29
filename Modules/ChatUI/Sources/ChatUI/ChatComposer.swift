@@ -37,7 +37,7 @@ public struct ChatComposer: View {
       if let imageErrorMessage {
         Text(imageErrorMessage)
           .font(.caption)
-          .foregroundStyle(Color.MeetPR.brandRed)
+          .foregroundStyle(Color.MeetPR.gold500)
       }
 
       if let setRefLength {
@@ -56,8 +56,8 @@ public struct ChatComposer: View {
         .font(.caption)
         .foregroundStyle(
           setRefLength.isOverLimit
-            ? Color.MeetPR.brandRed
-            : Color.MeetPR.fgSecondary
+            ? Color.MeetPR.gold500
+            : Color.MeetPR.textSecondary
         )
       }
 
@@ -94,7 +94,7 @@ public struct ChatComposer: View {
           .textFieldStyle(.plain)
           .padding(.horizontal, MeetPRSpacing.md)
           .padding(.vertical, MeetPRSpacing.sm)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
           .onChange(of: text) { _, newValue in
             viewModel.clearSetRefSendError()
@@ -108,7 +108,7 @@ public struct ChatComposer: View {
         Button(action: send) {
           Image(systemName: "arrow.up.circle.fill")
             .font(.title)
-            .foregroundStyle(canSendText ? Color.MeetPR.brandRed : Color.MeetPR.fgDisabled)
+            .foregroundStyle(canSendText ? Color.MeetPR.gold500 : Color.MeetPR.textDisabled)
             .frame(width: 44, height: 44)
             .overlay(alignment: .topTrailing) {
               if viewModel.hasSendingMessages {
@@ -125,7 +125,7 @@ public struct ChatComposer: View {
     }
     .padding(.horizontal, MeetPRSpacing.md)
     .padding(.vertical, MeetPRSpacing.sm)
-    .background(Color.MeetPR.surface1)
+    .background(Color.MeetPR.surfaceCard)
     .onChange(of: selectedPhoto) { _, newItem in
       guard let newItem else {
         return
@@ -202,7 +202,7 @@ private struct ComposerAttachmentIcon: View {
     } else {
       Image(systemName: systemImage)
         .font(.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
         .frame(width: 44, height: 44)
     }
   }
@@ -216,26 +216,26 @@ private struct StagedSetRefComposerCard: View {
   var body: some View {
     HStack(alignment: .top, spacing: MeetPRSpacing.sm) {
       Image(systemName: "dumbbell")
-        .foregroundStyle(Color.MeetPR.brandRed)
+        .foregroundStyle(Color.MeetPR.gold500)
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
         Text(ChatStrings.sendCurrentSetRecord)
           .font(.caption.bold())
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         Text(SetRefCanonicalFormatter.firstLine(for: intent.setRef))
           .font(.footnote)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(2)
       }
       Spacer(minLength: 0)
       Button(action: discard) {
         Image(systemName: "xmark.circle.fill")
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
       .buttonStyle(.plain)
       .accessibilityLabel(ChatStrings.removeTrainingShare)
     }
     .padding(MeetPRSpacing.sm)
-    .background(Color.MeetPR.surface2)
+    .background(Color.MeetPR.surfaceElevated)
     .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
     .accessibilityIdentifier("chat.setRef.staged")
   }

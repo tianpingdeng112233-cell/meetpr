@@ -69,23 +69,23 @@ import Testing
     #expect(presentation.note == "")
   }
 
-  @Test func ownCardUsesOutgoingBrandAndWhiteAppearance() {
+  @Test func ownCardUsesOnGoldInkAppearance() {
     let appearance = ChatSetCardAppearance.resolve(isCurrentUser: true)
 
-    #expect(appearance.background == .brandRed)
-    #expect(appearance.primaryText == .white)
-    #expect(appearance.secondaryText == .whiteMuted)
-    #expect(appearance.accent == .white)
+    #expect(appearance.background == .goldCTA)
+    #expect(appearance.primaryText == .ctaText)
+    #expect(appearance.secondaryText == .ctaTextMuted)
+    #expect(appearance.accent == .ctaText)
   }
 
   @Test func otherPartyCardUsesNeutralSurfaceAppearance() {
     let appearance = ChatSetCardAppearance.resolve(isCurrentUser: false)
 
-    #expect(appearance.background == .surface1)
-    #expect(appearance.primaryText == .fgPrimary)
-    #expect(appearance.secondaryText == .fgTertiary)
-    #expect(appearance.accent == .brandRed)
-    #expect(appearance.border == .border)
+    #expect(appearance.background == .surfaceCard)
+    #expect(appearance.primaryText == .textPrimary)
+    #expect(appearance.secondaryText == .textTertiary)
+    #expect(appearance.accent == .gold500)
+    #expect(appearance.border == .borderDefault)
   }
 
   @Test func mismatchedBodyFallsBackToPlainText() throws {

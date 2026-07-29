@@ -76,7 +76,7 @@ public struct SetRefSharePicker: View {
           }
         }
       }
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .navigationTitle(ChatStrings.shareTodayTraining)
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -218,10 +218,10 @@ private struct SetRefCandidateList: View {
             VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
               Text(candidate.source.exerciseName)
                 .font(.body.bold())
-                .foregroundStyle(Color.MeetPR.fgPrimary)
+                .foregroundStyle(Color.MeetPR.textPrimary)
               Text(summary(for: candidate))
                 .font(.footnote)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .foregroundStyle(Color.MeetPR.textSecondary)
             }
             Spacer(minLength: 0)
             Image(
@@ -232,8 +232,8 @@ private struct SetRefCandidateList: View {
             )
             .foregroundStyle(
               selectedSetLogID == candidate.id
-                ? Color.MeetPR.brandRed
-                : Color.MeetPR.fgTertiary
+                ? Color.MeetPR.gold500
+                : Color.MeetPR.textTertiary
             )
           }
           .frame(maxWidth: .infinity, alignment: .leading)
@@ -249,8 +249,8 @@ private struct SetRefCandidateList: View {
           .font(.body.bold())
           .frame(maxWidth: .infinity)
           .frame(height: 48)
-          .foregroundStyle(Color.MeetPR.bg)
-          .background(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.bgBase)
+          .background(Color.MeetPR.textPrimary)
           .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       }
       .buttonStyle(.plain)
@@ -281,14 +281,14 @@ private struct SetRefConfirmationCard: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
         Text(ChatStrings.sendCurrentSetRecord)
           .font(.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
 
         Text(firstLine)
           .font(.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .padding(MeetPRSpacing.base)
           .frame(maxWidth: .infinity, alignment: .leading)
-          .background(Color.MeetPR.surface2)
+          .background(Color.MeetPR.surfaceElevated)
           .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
 
         if let video = candidate.video {
@@ -297,7 +297,7 @@ private struct SetRefConfirmationCard: View {
               Text(ChatStrings.includeVideo)
               Text(videoStatus(video.state))
                 .font(.caption)
-                .foregroundStyle(Color.MeetPR.fgSecondary)
+                .foregroundStyle(Color.MeetPR.textSecondary)
             }
           }
           .disabled(video.state == .failed)
@@ -306,14 +306,14 @@ private struct SetRefConfirmationCard: View {
         if let errorMessage {
           Text(errorMessage)
             .font(.footnote)
-            .foregroundStyle(Color.MeetPR.brandRed)
+            .foregroundStyle(Color.MeetPR.gold500)
         }
 
         Button(action: confirm) {
           Group {
             if isConfirming {
               ProgressView()
-                .tint(Color.MeetPR.bg)
+                .tint(Color.MeetPR.bgBase)
             } else {
               Text(ChatStrings.continueToChat)
             }
@@ -321,8 +321,8 @@ private struct SetRefConfirmationCard: View {
           .font(.body.bold())
           .frame(maxWidth: .infinity)
           .frame(height: 48)
-          .foregroundStyle(Color.MeetPR.bg)
-          .background(Color.MeetPR.fgPrimary)
+          .foregroundStyle(Color.MeetPR.bgBase)
+          .background(Color.MeetPR.textPrimary)
           .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
         }
         .buttonStyle(.plain)
