@@ -41,5 +41,5 @@ import Testing
   )
 
   #expect(presentation.recoveryChips == ["中等强度", "较高压力", "约2天恢复"])
-  #expect(presentation.restTimer == "自定义 2:00/3:00/4:00")
+  #expect(presentation.restTimer == "手动设置 2:00/3:00/4:00")
 }
