@@ -38,12 +38,20 @@ private func greedyPlateLoad(perSide: Double) -> [Plate] {
 /// SetEntry's loaded-barbell side view, translated from `SE_SPEC`/`SE_DIM`.
 @MainActor
 public struct PlateVisual: View {
+  /// `SE_DIM`'s height for the barbell block.
+  public static let standardHeight: CGFloat = 148
+
   private let plates: [Plate]
   private let hasCollar: Bool
+  private let height: CGFloat
 
-  public init(totalKg: Double, hasCollar: Bool) {
+  /// - Parameter height: room the barbell gets. Defaults to the spec's 148pt;
+  ///   pass less only where the surrounding screen would otherwise push its own
+  ///   controls off a short display, and scale rather than crop.
+  public init(totalKg: Double, hasCollar: Bool, height: CGFloat = PlateVisual.standardHeight) {
     self.plates = plateBreakdown(totalKg: totalKg, hasCollar: hasCollar)
     self.hasCollar = hasCollar
+    self.height = height
   }
 
   public var body: some View {
@@ -66,7 +74,11 @@ public struct PlateVisual: View {
         .padding(.leading, MeetPRSpacing.point2)
     }
     .frame(maxWidth: .infinity)
-    .frame(height: 148)
+    // Drawn at spec size and scaled down as a whole, so every plate keeps its
+    // relative width and thickness instead of being squashed or clipped.
+    .frame(height: Self.standardHeight)
+    .scaleEffect(height / Self.standardHeight, anchor: .center)
+    .frame(height: height)
     .environment(\.layoutDirection, .leftToRight)
     .shadow(color: Color.MeetPR.plateDropShadow, radius: 4, y: 6)
     .accessibilityElement(children: .ignore)
@@ -182,44 +194,6 @@ public struct PlateVisual: View {
   fileprivate static func numberText(_ value: Double) -> String {
     value.formatted(.number.precision(.fractionLength(0...2)))
   }
-}
-
-struct PlateSourceDimensions: Equatable, Sendable {
-  let width: CGFloat
-  let height: CGFloat
-}
-
-enum PlateVisualContract {
-  static let seSpecDimensions: [Double: PlateSourceDimensions] = [
-    25: .init(width: 12, height: 135),
-    20: .init(width: 11, height: 135),
-    15: .init(width: 11, height: 120),
-    10: .init(width: 9, height: 98),
-    5: .init(width: 9, height: 68),
-    2.5: .init(width: 8, height: 57),
-    1.25: .init(width: 7, height: 48),
-  ]
-
-  static let seDimensions: [Double: PlateSourceDimensions] = [
-    25: .init(width: 11, height: 135),
-    20: .init(width: 8, height: 135),
-    15: .init(width: 8, height: 120),
-    10: .init(width: 8, height: 98),
-    5: .init(width: 8, height: 68),
-    2.5: .init(width: 6, height: 57),
-    1.25: .init(width: 5, height: 48),
-  ]
-
-  static let plateLocations: [CGFloat] = [0, 0.04, 0.15, 0.22, 0.46, 0.68, 0.90, 1]
-  static let shaftLocations: [CGFloat] = [0, 0.14, 0.34, 0.44, 0.60, 0.78, 1]
-  static let shoulderLocations: [CGFloat] = [0, 0.16, 0.40, 0.62, 0.80, 1]
-  static let sleeveLocations: [CGFloat] = [0, 0.15, 0.36, 0.46, 0.62, 0.80, 1]
-  static let collarBodyLocations: [CGFloat] = [0, 0.15, 0.33, 0.42, 0.58, 0.76, 1]
-  static let collarNutLocations: [CGFloat] = [0, 0.16, 0.36, 0.44, 0.58, 0.78, 1]
-  static let leverLocations: [CGFloat] = [0, 0.45, 1]
-  static let knobLocations: [CGFloat] = [0, 0.58, 1]
-  static let collarLeverLeft: CGFloat = 8
-  static let collarLeverTop: CGFloat = 17
 }
 
 @MainActor

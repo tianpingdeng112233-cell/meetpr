@@ -207,7 +207,11 @@ struct SetEntrySheet: View {
 
   private var plateSection: some View {
     VStack(spacing: MeetPRSpacing.zero) {
-      PlateVisual(totalKg: totalWeight, hasCollar: collarOn)
+      // On a 852pt-tall phone the spec's 148pt barbell pushed the video row
+      // under the footer, so the camera button only existed if you scrolled
+      // (David 2026-07-29, iPhone 17e). The barbell is the one decorative
+      // block here, so it gives up the ~40pt the controls need.
+      PlateVisual(totalKg: totalWeight, hasCollar: collarOn, height: 108)
 
       HStack(spacing: MeetPRSpacing.point10) {
         Text(breakdownLine)
