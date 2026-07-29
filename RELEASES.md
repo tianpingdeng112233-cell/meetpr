@@ -18,6 +18,67 @@
 
 ---
 
+## 1.0 (15) — 2026-07-29 — 🟢 已上传(Neice 免审生效;外测 Ceshi 已提交 Beta App Review)
+- 打包来源:tag `beta/1.0-15` @ 4739896(`release/1.0`,1.0(14) 基底累积;tag = 发版线 tip,零落差——其后仅追加纯 docs commit)
+- 规模:beta/1.0-14 起 **52 个 commit**,1.0 线至今最大一包
+- 闸门:tag CI 三项绿;八个候选逐个 `merge-base --is-ancestor` 核实真在发版线上
+- Archive 起点:专用干净树 `~/Projects/apps/MeetPR-archive-1015`(detached @ tag,零脏文件)
+- ⚠️ 已知未验:黑金 v3 全程只在模拟器验证,真机学员端主链路未走;另见 FOLLOWUPS **F-030**(分享该组视频在 Demo 上勾不到,真机待核)
+
+- **学员端黑金 v3 UI 全量重做**(PR #279 已合 `dd699fc`,2026-07-29):今日 / 训练 / 成长 / 我的
+  四屏 + 记录链路(SetEntry / 数字键盘 / 组间休息)+ 收官 overlay(结算庆祝 / 训练回顾 / 顺延 /
+  反馈档案)+ 七个空状态 + 动效逐参对齐 + 通知并入聊天。**双主题,默认浅色**(我的 → 外观 可切
+  跟随系统 / 深色);教练端与登录流保持恒暗、全程零 diff。设计系统正典落
+  `docs/design/handoff-v3/DESIGN-SYSTEM-CANON.md`(⚖️ David:今后学员端 iOS 新设计以它为准)。
+  - 合并同时把发版线 spec 029(C0 组号契约 / C2a-c 组引用卡与「问教练」)接进 v3 各面,
+    功能不回归;~~**遗留视觉债**:组引用卡与分享选择器仍是 ChatUI 现成样式,黑金化是下一张卡~~
+    (清单见 `docs/design/handoff-v3/SETREF-BRIDGE-PHASE1-RECEIPT.md` 末节)——**✅ 已由 PR #287
+    还清**(见下条)。
+  - 闸门:每卡 review-loop CLEAN(累计 100+ blocker)、全量 SPM 1439 绿、三 configuration
+    build 0 warning、lint/format strict 零、CI 三项绿。
+  - ⚠️ 上包前建议真机走一遍学员端主链路(本波全部验证在 iPhone 17 模拟器完成)。
+
+- **聊天面黑金化 + 「问教练」入口进 hero**(PR #287 已合 `c028860`,2026-07-29):v3 学员端重做没覆盖
+  到 ChatUI 模块,自己发的组卡片在整条金色对话流里是块红砖;整模块统一到 v3 token。⚠️ 施工中踩过
+  一个坑并已修:`goldText` 是「深色底上的金字」、`ctaText` 才是「金底上的深色墨」,用反会金底金字
+  几乎不可读。同时把「问教练」从页面最底部挪进 hero 操作行——记完一组休息条立刻 pin 到底部把它
+  盖住,恰恰是最想问教练的那一刻;完成态 hero 行消失,保留通栏变体落在完成区。
+
+- **学员可分享「计划了但没练」的组 + 组卡片按参考设计重做**(PR #288 已合 `64d6b6d`,2026-07-29,
+  SPEC 029 §11 修订 R3):⚖️ David 07-29 两拍——①「今日所有训练无论练完没练完」= 连计划组也能发;
+  ②参考设计的「第 1 组 / 3」总组数要做,接受三仓小改。
+  - 候选 = 当日 logged ∪ 当日 planned,按 plan set 去重(已练过的组只出现一次,落「已完成」而非
+    「今日计划」);logged 侧 eligibility 放宽,不再要求打完成勾——**有数值的组就值得拿去问教练**。
+  - 卡片改为深色卡 + 金色侧边条(贴外侧)、表头带发送时刻、两列数据行 + 竖分隔线、RPE 值金色、
+    备注嵌套气泡、送达态通栏页脚。
+  - ⚠️ **组号口径在 iOS 侧是反的**:backend 读的 `plan_sets.set_number` 本来就 1-based,但投影层交给
+    iOS 的 `PrescribedSet.setIndex` 是 0-based,故 **iOS 两条路径都 +1、服务端只有 logged 路径 +1**。
+    spec 原话「planned 不许 +1」只对 backend 成立,照搬会把第 2 组发成第 1 组。
+  - ⚠️ 计划里的非规范值(`plan_sets` 无 RPE 步进约束,可写 7.25)**整组排除,不四舍五入**——
+    永不悄悄改教练开的处方。
+  - **明确没做**(spec 写死 deferred,别当遗漏):「新纪录」badge(需 PR 判定,数据里没有,不许用近似
+    规则冒充)、连发折叠紧凑行(属消息列表分组归并)。
+  - **硬前置已满足**:backend #135 已合并并部署 staging(`sha-267d61a`,无迁移)。plan-web #48 已合
+    main,**web 换装待做**。
+  - 闸门:review-loop 4 轮 2 BLOCKER;CoreModels 145 / ChatUI 63 / Networking 98 / StudentKit 595 /
+    DesignSystem 69 = 970 绿;swiftlint strict 零;CI 三项绿;DemoStudent 模拟器实走(计划组发送、
+    分区、去重、两种首行前缀全验)。
+  - ⚠️ **切包即失效的前提**:`set_ref` 就地扩 v1 不升版本,靠的是「该形状从未发过版」。**1.0(15) 一切包
+    这条就不再成立**,之后再改 `set_ref` 必须升版本 + 写降级路径。
+
+- **e1RM 口径修订:取消低 RPE 门 + 消费教练校准 + PR 改实测重量**(PR #286 已合 `1c2c787`,
+  2026-07-29,spec 050 修订):①入选门取消(分段口径 nil/<6→Epley、6–10→RTS、>10 拒);
+  ②`coach_rpe` 全链路(取 `coachRPE ?? rpe`,教练端成长页同步);③**PR 判定改成实测重量**——
+  只有真正完成的重量超过 max(登记 1RM, 历史实测最高) 才算 PR,新增 `E1RMWeightBaseline` 持久实体、
+  基线单调更新、v2 重放按时序原子重建;④建议重量只吃 RPE≥7 或已校准组(与显示口径分离)。
+  - ⚠️ **本卡 base 停在 v3 落线之前,是 rebase 上来的**,四处冲突 + 一处 git 自动合并语义断裂,
+    解法逐条记在 PR 评论里。三条对后人有用:**a)** v3 已退役 PR 庆祝横幅(`PRBanner` 与成长 tab
+    横幅双双移除),但 `pendingPRBanner` 检测状态仍在、展示改走「新 PR」计数器——**别再把横幅接回来**;
+    **b)** `InMemoryE1RMRepository`/`LocalE1RMRepository` 里数组叫 `storedPREvents` 而非 `prEvents`,
+    因为后者已是方法名(`prEvents(studentId:since:)`),写成裸 `prEvents` 会解析到方法;
+    **c)** `LocalE1RMRepository` 的持久化已收敛为单一 `state.json`,`loadPRs()` 不复存在。
+  - 闸门:review-loop 2 轮 CLEAN;八包 **1434 测试全绿**;swiftlint strict 零;CI 三项绿。
+
 ## 1.0 (14) — 2026-07-24 — 🟢 已上传(Neice 免审生效;**外测 Ceshi 同日已过 Beta App Review,在 Testing**)
 - 打包来源:tag `beta/1.0-14` @ 7125a21(`release/1.0`,1.0(13) 基底小步直推;tag = 发版线 tip,零落差)
 - tag CI 绿(run 30101801797)
