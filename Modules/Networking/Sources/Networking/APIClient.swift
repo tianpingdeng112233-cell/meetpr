@@ -4,10 +4,22 @@ import Foundation
 public struct APIResponse: Sendable, Equatable {
   public let data: Data
   public let statusCode: Int
+  public let headers: [String: String]
 
-  public init(data: Data, statusCode: Int) {
+  public init(
+    data: Data,
+    statusCode: Int,
+    headers: [String: String] = [:]
+  ) {
     self.data = data
     self.statusCode = statusCode
+    self.headers = headers
+  }
+
+  public func headerValue(for field: String) -> String? {
+    headers.first { key, _ in
+      key.compare(field, options: .caseInsensitive) == .orderedSame
+    }?.value
   }
 }
 
@@ -87,6 +99,28 @@ public final class APIClient: Sendable {
 
     let data = try await perform(request, unauthorizedAccessToken: accessToken)
     return try MeetPRCodec.decoder.decode(responseType, from: data)
+  }
+
+  public func getResponse(
+    path: String,
+    queryItems: [URLQueryItem] = [],
+    accessToken: String,
+    headers: [String: String] = [:],
+    additionalAcceptedStatusCodes: Set<Int> = []
+  ) async throws -> APIResponse {
+    var request = URLRequest(url: url(path: path, queryItems: queryItems))
+    request.httpMethod = "GET"
+    authorize(&request, accessToken: accessToken)
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+    for (field, value) in headers {
+      request.setValue(value, forHTTPHeaderField: field)
+    }
+
+    return try await performResponse(
+      request,
+      unauthorizedAccessToken: accessToken,
+      additionalAcceptedStatusCodes: additionalAcceptedStatusCodes
+    )
   }
 
   public func post<Request: Encodable, Response: Decodable>(
@@ -218,6 +252,17 @@ public final class APIClient: Sendable {
     _ request: URLRequest,
     unauthorizedAccessToken: String? = nil
   ) async throws -> Data {
+    try await performResponse(
+      request,
+      unauthorizedAccessToken: unauthorizedAccessToken
+    ).data
+  }
+
+  private func performResponse(
+    _ request: URLRequest,
+    unauthorizedAccessToken: String? = nil,
+    additionalAcceptedStatusCodes: Set<Int> = []
+  ) async throws -> APIResponse {
     var response = try await transport(request)
 
     if response.statusCode == 401,
@@ -235,10 +280,13 @@ public final class APIClient: Sendable {
       throw APIError.authInvalid
     }
 
-    guard (200..<300).contains(response.statusCode) else {
+    guard
+      (200..<300).contains(response.statusCode)
+        || additionalAcceptedStatusCodes.contains(response.statusCode)
+    else {
       throw APIError.httpStatus(response.statusCode, response.data)
     }
-    return response.data
+    return response
   }
 
   private static func liveTransport(request: URLRequest) async throws -> APIResponse {
@@ -246,7 +294,15 @@ public final class APIClient: Sendable {
     guard let httpResponse = response as? HTTPURLResponse else {
       throw APIError.invalidResponse
     }
-    return APIResponse(data: data, statusCode: httpResponse.statusCode)
+    let headers = httpResponse.allHeaderFields.reduce(into: [String: String]()) { result, item in
+      guard let field = item.key as? String else { return }
+      result[field] = String(describing: item.value)
+    }
+    return APIResponse(
+      data: data,
+      statusCode: httpResponse.statusCode,
+      headers: headers
+    )
   }
 
 }
