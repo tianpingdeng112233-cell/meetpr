@@ -6,7 +6,7 @@
 
 ## 🎯 目标:1.0 (15)
 - 基底:`beta/1.0-14`(= TestFlight 在测的 1.0(14),2026-07-24 上传)之后的 release/1.0 直推累积
-- build 号:15(prep-beta 时统一 bump,平时不动)
+- build 号:**15 已 bump**(2026-07-29,agvtool 单源,pbxproj project 级 4 处;Info.plist 仍为变量引用)
 - 切包:本分支打 tag `beta/1.0-15`
 
 ## 本版将包含(落线后追加到这里)
