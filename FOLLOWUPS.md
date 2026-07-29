@@ -13,25 +13,6 @@
 
 ## 待触发
 
-### F-030 — 真机核实「分享该组视频」是否真的发得出去
-
-- **触发条件**:1.0(15) 装上测试机、用**真账号**（非 Demo）能走训练链路时
-- **动作**:给某一组录/挂一段视频 → 训练页「问教练」→ 选中该组 → **看确认页有没有「一并发送视频」的开关**
-- **为什么等**:2026-07-29 在 **DemoStudent** 上完整复现:相册挂视频 → 录入页显示「已上传」→
-  完成本组 → 组列表标「视频已上传」→ 问教练选中该组 → **确认页无视频开关**。
-  退出 sheet 重开、候选列表重新加载仍无,**排除时序**。
-  已核实:①开关代码完好(`SetRefSharePicker` 仍是 `if let video = candidate.video`),
-  故运行时 `candidate.video` 为 nil;②录入页与分享源**共用同一个** `VideoUploadManager` 实例
-  (`StudentRootView` 传 `resolvedVideoUploads.manager`),排除双仓储;
-  ③`InMemoryStudentTrainingLogRepository.recordSet` 同槽位**保持 id 不变**,排除「完成本组换 id」。
-  根因指向 `attachment.setLogID` 与分享源查到的 `log.id` 对不上,**未钉死**。
-- **⚠️ 关键未知**:只在 Demo 上验过。Demo 走 `InMemoryVideoAttachmentRepository` + loopback 上传,
-  真机走 `BackendVideoAttachmentRepository`——**可能是 demo 接线特有,也可能是真 bug**,不许当结论用。
-- **若真机也不灵**:①把「该组若已拍视频,可勾选一并发送」从对外文案撤下(ASC What to Test /
-  更新说明页都写了这句);②开卡查根因,重点比对两处 setLogID 的来源。
-- **创建于**:2026-07-29(1.0(15) 切包当天,截图取材时撞出)
-
-
 ### F-001 — log4brains 站点化
 
 - **触发条件**:`~/Brain/wiki/projects/MeetPR/decisions/` 下 **ADR 数 ≥ 10**(不含 TEMPLATE.md 和 README.md)
@@ -319,6 +300,13 @@
 ## 已完成
 
 _(执行完的触发条目移到这里,保留作历史。格式:日期 + 原触发条件 + 执行结果链接)_
+
+### F-030 — 真机核实「分享该组视频」是否真的发得出去 — **关闭于 2026-07-29**
+
+- **原触发条件**:1.0(15) 装上测试机、用真账号能走训练链路时
+- **执行结果**:David 用 `+8613810000202`(蛋挞皮,`coached_student`,已绑教练 + 已发布计划)在 **1.0(15) 真机**上走查**成功**——分享确认页的「一并发送视频」开关正常出现。
+- **结论**:**真实路径没有 bug**,Demo 上的缺失是 **DemoStudent 接线特有**(走 `InMemoryVideoAttachmentRepository` + `LoopbackVideoUploadService`,真机走 `BackendVideoAttachmentRepository`)。对外文案「该组若已拍视频,可勾选一并发送」**准确,无需撤下**。
+- **⚠️ 遗留(不阻塞,另记)**:**DemoStudent 里这条链路仍走不通**——挂完视频、完成本组后,分享确认页拿不到 `candidate.video`。演示时无法展示「分享组卡片+视频」,截图取材也做不出这张图。要不要修取决于 demo 保真度的优先级。
 
 ### F-002 — 生产发布 checklist 适配 iOS — **关闭于 2026-05-10**
 
