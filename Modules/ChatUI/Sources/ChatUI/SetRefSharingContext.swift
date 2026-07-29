@@ -25,12 +25,16 @@ public struct SetRefShareVideo: Sendable {
 }
 
 public struct SetRefShareCandidate: Identifiable, Sendable {
-  public var id: UUID { source.setLogId }
-
+  public let id: UUID
   public let source: SetRefSourceSnapshot
   public let video: SetRefShareVideo?
 
-  public init(source: SetRefSourceSnapshot, video: SetRefShareVideo? = nil) {
+  public init(
+    id: UUID,
+    source: SetRefSourceSnapshot,
+    video: SetRefShareVideo? = nil
+  ) {
+    self.id = id
     self.source = source
     self.video = video
   }

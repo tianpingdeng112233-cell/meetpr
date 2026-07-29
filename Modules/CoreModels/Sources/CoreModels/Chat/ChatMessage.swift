@@ -94,26 +94,37 @@ public struct SetRefV1ReadValue: Decodable, Sendable {
 
   public init(from decoder: any Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
+    for key in CodingKeys.allCases where !container.contains(key) {
+      throw SetRefValidationError.missingField(key.stringValue)
+    }
     value = try SetRefV1(
       version: container.decode(Int.self, forKey: .version),
+      source: container.decode(SetRefSource.self, forKey: .source),
       exerciseName: container.decode(String.self, forKey: .exerciseName),
       setNumber: container.decode(Int.self, forKey: .setNumber),
+      setTotal: container.decodeIfPresent(Int.self, forKey: .setTotal),
       weightKg: container.decodeIfPresent(String.self, forKey: .weightKg),
       reps: container.decodeIfPresent(Int.self, forKey: .reps),
+      repsMax: container.decodeIfPresent(Int.self, forKey: .repsMax),
       rpe: container.decodeIfPresent(String.self, forKey: .rpe),
       dayDate: container.decode(String.self, forKey: .dayDate),
-      setLogId: container.decode(UUID.self, forKey: .setLogID)
+      setLogId: container.decodeIfPresent(UUID.self, forKey: .setLogID),
+      planSetId: container.decodeIfPresent(UUID.self, forKey: .planSetID)
     )
   }
 
-  private enum CodingKeys: String, CodingKey {
+  private enum CodingKeys: String, CodingKey, CaseIterable {
     case version = "v"
+    case source
     case exerciseName
     case setNumber
+    case setTotal
     case weightKg
     case reps
+    case repsMax
     case rpe
     case dayDate
     case setLogID = "setLogId"
+    case planSetID = "planSetId"
   }
 }

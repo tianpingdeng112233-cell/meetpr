@@ -13,13 +13,17 @@ import Testing
 
   #expect(message.body == ChatWireFixture.setRefFirstLine + "\n看看深度")
   #expect(message.setRef?.version == 1)
+  #expect(message.setRef?.source == .logged)
   #expect(message.setRef?.exerciseName == "低杠位深蹲")
   #expect(message.setRef?.setNumber == 3)
+  #expect(message.setRef?.setTotal == 5)
   #expect(message.setRef?.weightKg == "100")
   #expect(message.setRef?.reps == 5)
+  #expect(message.setRef?.repsMax == nil)
   #expect(message.setRef?.rpe == "8.5")
   #expect(message.setRef?.dayDate == "2026-07-27")
   #expect(message.setRef?.setLogId == ChatWireFixture.setLogID)
+  #expect(message.setRef?.planSetId == nil)
   #expect(message.videoURL?.absoluteString == "https://oss.example.test/set.mp4?signature=abc")
   #expect(message.videoExpiresIn == 900)
 
@@ -48,6 +52,20 @@ import Testing
   }
 }
 
+@Test func readSideSetRefWithMissingNullableFieldDegradesToText() throws {
+  let missingSetTotal = ChatWireFixture.setRefMessageResponse.replacing(
+    "\"set_total\": 5,",
+    with: ""
+  )
+  let response = try MeetPRCodec.decoder.decode(
+    ChatMessageResponseDTO.self,
+    from: Data(missingSetTotal.utf8)
+  )
+
+  #expect(response.message.setRef == nil)
+  #expect(response.message.body == ChatWireFixture.setRefFirstLine + "\n看看深度")
+}
+
 @Test func malformedSetRefsInsideMessageArrayDegradeOnlyThoseCardsToText() throws {
   let response = try MeetPRCodec.decoder.decode(
     ChatMessagesResponseDTO.self,
@@ -68,7 +86,8 @@ extension ChatWireFixture {
   static let setLogID = UUID(
     uuid: (0, 0, 0, 0, 0, 0, 0x40, 0, 0x80, 0, 0, 0, 0, 0, 0x5A, 7)
   )
-  static let setRefFirstLine = "[训练分享] 低杠位深蹲 第3组 100kg×5 @RPE8.5 (2026-07-27)"
+  static let setRefFirstLine =
+    "[训练分享] 低杠位深蹲 第3组/5 100kg×5 @RPE8.5 (2026-07-27)"
 
   static var setRefMessageResponse: String {
     """
@@ -190,13 +209,17 @@ extension ChatWireFixture {
     """
     {
       "v": 1,
+      "source": "logged",
       "exercise_name": "低杠位深蹲",
       "set_number": 3,
+      "set_total": 5,
       "weight_kg": "100",
       "reps": 5,
+      "reps_max": null,
       "rpe": "8.5",
       "day_date": "2026-07-27",
-      "set_log_id": "\(setLogID.uuidString)"
+      "set_log_id": "\(setLogID.uuidString)",
+      "plan_set_id": null
     }
     """
   }

@@ -22,19 +22,45 @@ import Testing
 
   @Test func goldenInvalidCasesAreRejectedBeforeFormatting() throws {
     let fixture = try loadSetRefGoldenFixture()
-    let validCases = try #require(fixture["valid"] as? [[String: Any]])
-    let base = try #require(validCases.first?["set_ref"] as? [String: Any])
+    let base = try requireGoldenSetRef(named: "logged-full", in: fixture)
     let invalidCases = try #require(fixture["invalid"] as? [[String: Any]])
 
     for invalidCase in invalidCases {
       let name = try #require(invalidCase["name"] as? String)
-      let patch = try #require(invalidCase["patch"] as? [String: Any])
+      // A case carries `patch` (replace a field) or `omit` (drop one); the
+      // missing-field cases need the latter, which a dictionary merge cannot
+      // express. Both decoding paths here are the strict construct contract,
+      // so `write-only` cases apply — the tolerant read path is asserted
+      // separately in `readValueIgnoresFieldsThisBuildPredates`.
       var candidate = base
-      candidate.merge(patch) { _, new in new }
+      if let patch = invalidCase["patch"] as? [String: Any] {
+        candidate.merge(patch) { _, new in new }
+      }
+      for field in invalidCase["omit"] as? [String] ?? [] {
+        candidate.removeValue(forKey: field)
+      }
 
       #expect(throws: (any Error).self, "Expected golden rejection: \(name)") {
         try decodeSetRef(candidate)
       }
+    }
+  }
+
+  /// The wire shape will grow fields this build has never heard of. The strict
+  /// initializer above is the *construct* contract; the read path has to keep
+  /// rendering a card the server already accepted, or a shipped build blanks
+  /// every card the moment the server adds one.
+  @Test func readValueIgnoresFieldsThisBuildPredates() throws {
+    let fixture = try loadSetRefGoldenFixture()
+    var candidate = try requireGoldenSetRef(named: "logged-full", in: fixture)
+    candidate["fieldFromAFutureRelease"] = "x"
+
+    let data = try JSONSerialization.data(withJSONObject: candidate, options: [.sortedKeys])
+    let read = try MeetPRCodec.decoder.decode(SetRefV1ReadValue.self, from: data)
+
+    #expect(read.value.exerciseName == (candidate["exercise_name"] as? String))
+    #expect(throws: (any Error).self, "The construct path must stay strict") {
+      try decodeSetRef(candidate)
     }
   }
 
@@ -129,6 +155,57 @@ import Testing
     )
   }
 
+  @Test func everyNewCrossFieldInvariantHasItsOwnError() throws {
+    #expect(
+      throws: SetRefValidationError.invalidSourceIdentifiers(
+        source: .logged,
+        setLogId: setLogID,
+        planSetId: planSetID
+      )
+    ) {
+      try makeSetRef(planSetId: planSetID)
+    }
+    #expect(throws: SetRefValidationError.invalidSetTotal(0)) {
+      try makeSetRef(setTotal: 0)
+    }
+    #expect(
+      throws: SetRefValidationError.setNumberExceedsSetTotal(
+        setNumber: 3,
+        setTotal: 2
+      )
+    ) {
+      try makeSetRef(setTotal: 2)
+    }
+    #expect(
+      throws: SetRefValidationError.invalidRepsMaximum(
+        reps: 5,
+        repsMax: 5
+      )
+    ) {
+      try makeSetRef(reps: 5, repsMax: 5)
+    }
+  }
+
+  @Test func everyExpandedWireFieldMustBePresentEvenWhenNull() throws {
+    let fixture = try loadSetRefGoldenFixture()
+    let validCases = try #require(fixture["valid"] as? [[String: Any]])
+    let base = try #require(validCases.first?["set_ref"] as? [String: Any])
+
+    let requiredFields = [
+      ("source", "source"),
+      ("set_total", "setTotal"),
+      ("reps_max", "repsMax"),
+      ("plan_set_id", "planSetId"),
+    ]
+    for (wireKey, errorKey) in requiredFields {
+      var missing = base
+      missing[wireKey] = nil
+      #expect(throws: SetRefValidationError.missingField(errorKey)) {
+        try decodeSetRef(missing)
+      }
+    }
+  }
+
   @Test func encodingUsesStableCanonicalKeyOrderAndExplicitNulls() throws {
     let setRef = try makeSetRef(weightKg: nil, reps: nil, rpe: nil)
     let first = try encodedJSONString(setRef)
@@ -136,9 +213,10 @@ import Testing
 
     #expect(first == second)
     let expected =
-      #"{"day_date":"2026-07-27","exercise_name":"低杠位深蹲","reps":null,"rpe":null,"#
-      + #""set_log_id":"70000000-0000-4000-8000-000000000001","set_number":3,"v":1,"#
-      + #""weight_kg":null}"#
+      #"{"day_date":"2026-07-27","exercise_name":"低杠位深蹲","plan_set_id":null,"#
+      + #""reps":null,"reps_max":null,"rpe":null,"#
+      + #""set_log_id":"70000000-0000-4000-8000-000000000001","set_number":3,"#
+      + #""set_total":5,"source":"logged","v":1,"weight_kg":null}"#
     #expect(
       first
         == expected
@@ -149,40 +227,72 @@ import Testing
 private let setLogID = UUID(
   uuid: (0x70, 0, 0, 0, 0, 0, 0x40, 0, 0x80, 0, 0, 0, 0, 0, 0, 1)
 )
+private let planSetID = UUID(
+  uuid: (0x70, 0, 0, 0, 0, 0, 0x40, 0, 0x80, 0, 0, 0, 0, 0, 0, 2)
+)
 
 private func makeSetRef(
+  source: SetRefSource = .logged,
   exerciseName: String = "低杠位深蹲",
+  setTotal: Int? = 5,
   weightKg: String? = "100",
   reps: Int? = 5,
-  rpe: String? = "8.5"
+  repsMax: Int? = nil,
+  rpe: String? = "8.5",
+  setLogId: UUID? = setLogID,
+  planSetId: UUID? = nil
 ) throws -> SetRefV1 {
   try SetRefV1(
+    source: source,
     exerciseName: exerciseName,
     setNumber: 3,
+    setTotal: setTotal,
     weightKg: weightKg,
     reps: reps,
+    repsMax: repsMax,
     rpe: rpe,
     dayDate: "2026-07-27",
-    setLogId: setLogID
+    setLogId: setLogId,
+    planSetId: planSetId
   )
 }
 
 private func sourceSnapshot(
+  source: SetRefSource = .logged,
   exerciseName: String = "低杠位深蹲",
   setNumber: Int = 3,
+  setTotal: Int? = 5,
   weightKg: String? = nil,
-  reps: Int = 5,
-  rpe: String? = nil
+  reps: Int? = 5,
+  repsMax: Int? = nil,
+  rpe: String? = nil,
+  setLogId: UUID? = setLogID,
+  planSetId: UUID? = nil
 ) -> SetRefSourceSnapshot {
   SetRefSourceSnapshot(
+    source: source,
     exerciseName: exerciseName,
     setNumber: setNumber,
+    setTotal: setTotal,
     weightKg: weightKg,
     reps: reps,
+    repsMax: repsMax,
     rpe: rpe,
     dayDate: "2026-07-27",
-    setLogId: setLogID
+    setLogId: setLogId,
+    planSetId: planSetId
   )
+}
+
+/// Fixtures are addressed by name — index lookup silently re-points at another
+/// case whenever the shared file grows an entry.
+private func requireGoldenSetRef(
+  named name: String,
+  in fixture: [String: Any]
+) throws -> [String: Any] {
+  let validCases = try #require(fixture["valid"] as? [[String: Any]])
+  let match = validCases.first { $0["name"] as? String == name }
+  return try #require(match?["set_ref"] as? [String: Any], "missing golden fixture: \(name)")
 }
 
 private func loadSetRefGoldenFixture() throws -> [String: Any] {

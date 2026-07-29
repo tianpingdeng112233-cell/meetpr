@@ -21,13 +21,14 @@ struct ChatMessageRow: View {
         ChatMessageBubble(
           message: message,
           isCurrentUser: isCurrentUser,
+          deliveryStatus: deliveryStatus,
           openImage: openImage,
           openVideo: openVideo,
           imageLoaded: imageLoaded,
           imageFailed: imageFailed
         )
 
-        if let deliveryStatus {
+        if ChatSetCardPresentation(message: message) == nil, let deliveryStatus {
           Text(deliveryStatus == .read ? ChatStrings.read : ChatStrings.delivered)
             .font(.caption)
             .foregroundStyle(Color.MeetPR.textTertiary)
@@ -44,6 +45,7 @@ struct ChatMessageRow: View {
 private struct ChatMessageBubble: View {
   let message: ChatMessage
   let isCurrentUser: Bool
+  let deliveryStatus: ChatDeliveryStatus?
   let openImage: @MainActor () -> Void
   let openVideo: @MainActor () -> Void
   let imageLoaded: @MainActor () -> Void
@@ -57,6 +59,7 @@ private struct ChatMessageBubble: View {
           ChatSetCardView(
             presentation: presentation,
             isCurrentUser: isCurrentUser,
+            deliveryStatus: deliveryStatus,
             openVideo: openVideo
           )
         } else {

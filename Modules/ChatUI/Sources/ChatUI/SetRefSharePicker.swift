@@ -46,9 +46,9 @@ public struct SetRefSharePicker: View {
             )
           } else {
             ContentUnavailableView(
-              ChatStrings.noCompletedSets,
+              ChatStrings.noShareableSets,
               systemImage: "dumbbell",
-              description: Text(ChatStrings.noCompletedSetsDescription)
+              description: Text(ChatStrings.noShareableSetsDescription)
             )
           }
         } else {
@@ -56,7 +56,7 @@ public struct SetRefSharePicker: View {
           case .selection:
             SetRefCandidateList(
               candidates: presentation.candidates,
-              selectedSetLogID: presentation.selectedSetLogID,
+              selectedCandidateID: presentation.selectedCandidateID,
               select: { candidate in
                 presentation.select(candidate.id)
                 errorMessage = nil
@@ -157,90 +157,41 @@ public struct SetRefSharePicker: View {
   }
 }
 
-enum SetRefPickerPage: Equatable {
-  case selection
-  case confirmation
-}
-
-struct SetRefPickerPresentation {
-  private(set) var candidates: [SetRefShareCandidate] = []
-  private(set) var selectedSetLogID: UUID?
-  private(set) var page: SetRefPickerPage = .selection
-
-  var selectedCandidate: SetRefShareCandidate? {
-    guard let selectedSetLogID else { return nil }
-    return candidates.first { $0.id == selectedSetLogID }
-  }
-
-  mutating func load(
-    candidates: [SetRefShareCandidate],
-    initialSetLogID: UUID?
-  ) {
-    self.candidates = candidates
-    selectedSetLogID =
-      initialSetLogID.flatMap { requestedID in
-        candidates.contains { $0.id == requestedID } ? requestedID : nil
-      } ?? candidates.first?.id
-    page = .selection
-  }
-
-  mutating func select(_ setLogID: UUID) {
-    guard candidates.contains(where: { $0.id == setLogID }) else { return }
-    selectedSetLogID = setLogID
-  }
-
-  @discardableResult
-  mutating func proceedToConfirmation() -> Bool {
-    guard selectedCandidate != nil else { return false }
-    page = .confirmation
-    return true
-  }
-
-  mutating func showSelection() {
-    page = .selection
-  }
-}
-
 @MainActor
 private struct SetRefCandidateList: View {
   let candidates: [SetRefShareCandidate]
-  let selectedSetLogID: UUID?
+  let selectedCandidateID: UUID?
   let select: @MainActor (SetRefShareCandidate) -> Void
   let proceed: @MainActor () -> Void
 
   var body: some View {
     VStack(spacing: 0) {
-      List(candidates) { candidate in
-        Button {
-          select(candidate)
-        } label: {
-          HStack(spacing: MeetPRSpacing.sm) {
-            VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-              Text(candidate.source.exerciseName)
-                .font(.body.bold())
-                .foregroundStyle(Color.MeetPR.textPrimary)
-              Text(summary(for: candidate))
-                .font(.footnote)
-                .foregroundStyle(Color.MeetPR.textSecondary)
+      List {
+        let loggedCandidates = candidates.filter { $0.source.source == .logged }
+        if !loggedCandidates.isEmpty {
+          Section(ChatStrings.completedSection) {
+            ForEach(loggedCandidates) { candidate in
+              SetRefCandidateRow(
+                candidate: candidate,
+                isSelected: selectedCandidateID == candidate.id,
+                select: select
+              )
             }
-            Spacer(minLength: 0)
-            Image(
-              systemName:
-                selectedSetLogID == candidate.id
-                ? "checkmark.circle.fill"
-                : "circle"
-            )
-            .foregroundStyle(
-              selectedSetLogID == candidate.id
-                ? Color.MeetPR.gold500
-                : Color.MeetPR.textTertiary
-            )
           }
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .contentShape(.rect)
         }
-        .buttonStyle(.plain)
-        .accessibilityIdentifier("chat.setRef.candidate.\(candidate.id.uuidString)")
+
+        let plannedCandidates = candidates.filter { $0.source.source == .planned }
+        if !plannedCandidates.isEmpty {
+          Section(ChatStrings.todayPlanSection) {
+            ForEach(plannedCandidates) { candidate in
+              SetRefCandidateRow(
+                candidate: candidate,
+                isSelected: selectedCandidateID == candidate.id,
+                select: select
+              )
+            }
+          }
+        }
       }
       .scrollContentBackground(.hidden)
 
@@ -249,18 +200,53 @@ private struct SetRefCandidateList: View {
           .font(.body.bold())
           .frame(maxWidth: .infinity)
           .frame(height: 48)
-          .foregroundStyle(Color.MeetPR.bgBase)
-          .background(Color.MeetPR.textPrimary)
+          .foregroundStyle(Color.MeetPR.ctaText)
+          .background(Color.MeetPR.goldCTA)
           .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       }
       .buttonStyle(.plain)
-      .disabled(selectedSetLogID == nil)
+      .disabled(selectedCandidateID == nil)
       .accessibilityIdentifier("chat.setRef.proceed")
       .padding(MeetPRSpacing.base)
     }
   }
+}
 
-  private func summary(for candidate: SetRefShareCandidate) -> String {
+@MainActor
+private struct SetRefCandidateRow: View {
+  let candidate: SetRefShareCandidate
+  let isSelected: Bool
+  let select: @MainActor (SetRefShareCandidate) -> Void
+
+  var body: some View {
+    Button {
+      select(candidate)
+    } label: {
+      HStack(spacing: MeetPRSpacing.sm) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+          Text(candidate.source.exerciseName)
+            .font(.body.bold())
+            .foregroundStyle(Color.MeetPR.textPrimary)
+          Text(summary)
+            .font(.footnote)
+            .foregroundStyle(Color.MeetPR.textSecondary)
+        }
+        Spacer(minLength: 0)
+        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+          .foregroundStyle(
+            isSelected
+              ? Color.MeetPR.gold500
+              : Color.MeetPR.textTertiary
+          )
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .contentShape(.rect)
+    }
+    .buttonStyle(.plain)
+    .accessibilityIdentifier("chat.setRef.candidate.\(candidate.id.uuidString)")
+  }
+
+  private var summary: String {
     guard let setRef = try? SetRefV1.normalizingSource(candidate.source) else {
       return ChatStrings.invalidSetRecord
     }
@@ -279,7 +265,7 @@ private struct SetRefConfirmationCard: View {
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        Text(ChatStrings.sendCurrentSetRecord)
+        Text(SetRefConfirmationCopy.prompt(for: candidate.source.source))
           .font(.headline)
           .foregroundStyle(Color.MeetPR.textPrimary)
 
@@ -313,7 +299,7 @@ private struct SetRefConfirmationCard: View {
           Group {
             if isConfirming {
               ProgressView()
-                .tint(Color.MeetPR.bgBase)
+                .tint(Color.MeetPR.ctaText)
             } else {
               Text(ChatStrings.continueToChat)
             }
@@ -321,8 +307,8 @@ private struct SetRefConfirmationCard: View {
           .font(.body.bold())
           .frame(maxWidth: .infinity)
           .frame(height: 48)
-          .foregroundStyle(Color.MeetPR.bgBase)
-          .background(Color.MeetPR.textPrimary)
+          .foregroundStyle(Color.MeetPR.ctaText)
+          .background(Color.MeetPR.goldCTA)
           .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
         }
         .buttonStyle(.plain)

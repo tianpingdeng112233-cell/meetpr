@@ -193,13 +193,17 @@ import Testing
     expiresIn: Int = 900
   ) throws -> ChatMessage {
     let setRef = try SetRefV1(
+      source: .logged,
       exerciseName: "暂停深蹲",
       setNumber: 1,
+      setTotal: 3,
       weightKg: "125",
       reps: 5,
+      repsMax: nil,
       rpe: "8",
       dayDate: "2026-07-27",
-      setLogId: chatTestUUID(50)
+      setLogId: chatTestUUID(50),
+      planSetId: nil
     )
     return chatTestMessage(
       id: id,

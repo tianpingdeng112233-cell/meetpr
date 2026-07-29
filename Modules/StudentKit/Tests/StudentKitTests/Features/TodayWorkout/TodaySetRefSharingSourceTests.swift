@@ -8,8 +8,8 @@ import Testing
 // swiftlint:disable file_length type_body_length
 @Suite("Today set-ref sharing")
 struct TodaySetRefSharingSourceTests {
-  @Test("only today's completed recorded sets are selectable")
-  func onlyTodayCompletedRecordedSetsAreSelectable() async throws {
+  @Test("every recorded row is selectable and replaces its planned candidate")
+  func everyRecordedRowIsSelectableAndReplacesItsPlannedCandidate() async throws {
     let fixture = makeFixture()
     let now = fixture.now
     let source = TodaySetRefSharingSource(
@@ -24,22 +24,28 @@ struct TodaySetRefSharingSourceTests {
     )
 
     let candidates = try await source.loadCandidates()
-    let candidate = try #require(candidates.first)
+    let candidate = try #require(
+      candidates.first(where: { $0.id == fixture.completedLogID })
+    )
 
-    #expect(candidates.count == 1)
-    #expect(candidate.id == fixture.completedLogID)
+    #expect(candidates.count == 3)
+    #expect(candidates.allSatisfy { $0.source.source == .logged })
     #expect(candidate.source.exerciseName == "低杠位深蹲")
     #expect(candidate.source.setNumber == 1)
+    #expect(candidate.source.setTotal == 3)
     #expect(candidate.source.weightKg == "100")
     #expect(candidate.source.reps == 5)
+    #expect(candidate.source.repsMax == nil)
     #expect(candidate.source.rpe == "8")
     #expect(candidate.source.dayDate == "2026-07-28")
+    #expect(candidate.source.setLogId == fixture.completedLogID)
+    #expect(candidate.source.planSetId == nil)
     #expect(candidate.video.map { _ in false } ?? true)
   }
 
   @MainActor
-  @Test("assumed completion is neither selectable nor enough to show the entry")
-  func assumedCompletionDoesNotEnableSharing() async throws {
+  @Test("an assumed log row is selectable and a planned workout shows the entry")
+  func assumedLogAndPlannedWorkoutEnableSharing() async throws {
     let fixture = makeFixture()
     let assumedLogs = fixture.logs.filter(\.assumed)
     let source = makeSource(fixture: fixture, logs: assumedLogs)
@@ -49,9 +55,11 @@ struct TodaySetRefSharingSourceTests {
       existingLogs: assumedLogs
     )
 
-    #expect(try await source.loadCandidates().isEmpty)
+    let candidates = try await source.loadCandidates()
+    #expect(candidates.contains { $0.source.source == .logged })
+    #expect(candidates.contains { $0.source.source == .planned })
     #expect(
-      !SetRefEntryVisibility.shouldShow(
+      SetRefEntryVisibility.shouldShow(
         drafts: drafts,
         isEditable: true,
         hasActiveCoach: true,
@@ -96,7 +104,11 @@ struct TodaySetRefSharingSourceTests {
       now: { now }
     )
 
-    let candidate = try #require(try await source.loadCandidates().first)
+    let candidate = try #require(
+      try await source.loadCandidates().first {
+        $0.id == fixture.completedLogID
+      }
+    )
     let video = try #require(candidate.video)
     let selection = try #require(await video.selection())
 
@@ -143,7 +155,11 @@ struct TodaySetRefSharingSourceTests {
       calendar: fixture.calendar,
       now: { now }
     )
-    let candidate = try #require(try await source.loadCandidates().first)
+    let candidate = try #require(
+      try await source.loadCandidates().first {
+        $0.id == fixture.completedLogID
+      }
+    )
     let video = try #require(candidate.video)
     let selection = try #require(await video.selection())
     guard case .uploading(let resolvedLocalID, let events) = selection else {
@@ -169,12 +185,12 @@ struct TodaySetRefSharingSourceTests {
     )
   }
 
-  @Test("entry requires today, an active coach, and sharing wiring")
+  @Test("entry requires an available set, an active coach, and sharing wiring")
   func entryVisibilityRequiresEveryGate() {
     #expect(
       SetRefEntryVisibility.shouldShow(
         isEditable: true,
-        hasCompletedSet: true,
+        hasAvailableSet: true,
         hasActiveCoach: true,
         hasSharingContext: true
       )
@@ -182,7 +198,7 @@ struct TodaySetRefSharingSourceTests {
     #expect(
       !SetRefEntryVisibility.shouldShow(
         isEditable: true,
-        hasCompletedSet: true,
+        hasAvailableSet: true,
         hasActiveCoach: false,
         hasSharingContext: true
       )
@@ -190,7 +206,7 @@ struct TodaySetRefSharingSourceTests {
     #expect(
       !SetRefEntryVisibility.shouldShow(
         isEditable: false,
-        hasCompletedSet: true,
+        hasAvailableSet: true,
         hasActiveCoach: true,
         hasSharingContext: true
       )
@@ -198,7 +214,7 @@ struct TodaySetRefSharingSourceTests {
     #expect(
       !SetRefEntryVisibility.shouldShow(
         isEditable: true,
-        hasCompletedSet: false,
+        hasAvailableSet: false,
         hasActiveCoach: true,
         hasSharingContext: true
       )
@@ -206,7 +222,7 @@ struct TodaySetRefSharingSourceTests {
     #expect(
       !SetRefEntryVisibility.shouldShow(
         isEditable: true,
-        hasCompletedSet: true,
+        hasAvailableSet: true,
         hasActiveCoach: true,
         hasSharingContext: false
       )
@@ -247,6 +263,108 @@ struct TodaySetRefSharingSourceTests {
     let candidates = try await source.loadCandidates()
 
     #expect(candidates.first?.id == mostRecentLogID)
+  }
+
+  @Test("failed recorded rows remain shareable")
+  func failedRecordedRowsRemainShareable() async throws {
+    let fixture = makeFixture()
+    let planExerciseID = try #require(fixture.plan.days.first?.exercises.first?.id)
+    let failedID = UUID()
+    let failed = StudentSetLog(
+      id: failedID,
+      studentID: fixture.studentID,
+      planExerciseID: planExerciseID,
+      setIndex: 0,
+      loggedAt: fixture.now,
+      weightKg: 100,
+      reps: 0,
+      rpe: 10,
+      completed: false,
+      failed: true
+    )
+
+    let candidates = try await makeSource(
+      fixture: fixture,
+      logs: [failed]
+    ).loadCandidates()
+
+    let candidate = try #require(candidates.first(where: { $0.id == failedID }))
+    #expect(candidate.source.source == .logged)
+    #expect(candidate.source.reps == 0)
+  }
+
+  @Test("planned candidates map intensity and ranges without rounding invalid values")
+  // swiftlint:disable:next function_body_length
+  func plannedCandidatesMapIntensityAndRejectInvalidValues() async throws {
+    let fixture = makeFixture()
+    let day = try #require(fixture.plan.days.first)
+    let original = try #require(day.exercises.first)
+    let weightSetID = UUID()
+    let rpeSetID = UUID()
+    let exercise = StudentPlanExercise(
+      id: original.id,
+      exercise: original.exercise,
+      sequenceIndex: original.sequenceIndex,
+      prescribedSets: [
+        PrescribedSet(
+          id: weightSetID,
+          setIndex: 0,
+          weightKg: 175,
+          reps: 3,
+          repsMax: 5
+        ),
+        PrescribedSet(
+          id: rpeSetID,
+          setIndex: 1,
+          reps: 5,
+          rpe: 8
+        ),
+        PrescribedSet(
+          id: UUID(),
+          setIndex: 2,
+          reps: 5,
+          rpe: Decimal(string: "7.25")
+        ),
+        PrescribedSet(
+          id: UUID(),
+          setIndex: 3,
+          weightKg: 10_000,
+          reps: 5
+        ),
+      ]
+    )
+    let plan = StudentPlanView(
+      cycleID: fixture.plan.cycleID,
+      weekIndex: fixture.plan.weekIndex,
+      startDate: fixture.plan.startDate,
+      days: [
+        StudentPlanDay(id: day.id, date: day.date, exercises: [exercise])
+      ]
+    )
+    let source = TodaySetRefSharingSource(
+      studentID: fixture.studentID,
+      plans: InMemoryStudentPlanRepository(
+        store: TestStudentPlanStore(seed: [fixture.studentID: plan])
+      ),
+      logs: InMemoryStudentTrainingLogRepository(),
+      videoManager: VideoUploadServices.demo().manager,
+      calendar: fixture.calendar,
+      now: { fixture.now }
+    )
+
+    let candidates = try await source.loadCandidates()
+
+    #expect(candidates.map(\.id) == [weightSetID, rpeSetID])
+    #expect(candidates.allSatisfy { $0.source.source == .planned })
+    #expect(candidates[0].source.setNumber == 1)
+    #expect(candidates[0].source.setTotal == 4)
+    #expect(candidates[0].source.weightKg == "175")
+    #expect(candidates[0].source.reps == 3)
+    #expect(candidates[0].source.repsMax == 5)
+    #expect(candidates[0].source.rpe == nil)
+    #expect(candidates[0].source.planSetId == weightSetID)
+    #expect(candidates[1].source.weightKg == nil)
+    #expect(candidates[1].source.rpe == "8")
   }
 
   @Test("equal completion timestamps prefer larger sequence then set index")
@@ -325,7 +443,10 @@ struct TodaySetRefSharingSourceTests {
 
     let candidates = try await source.loadCandidates()
 
-    #expect(candidates.map(\.id) == [higherSequenceID, higherSetID, fixture.completedLogID])
+    #expect(
+      Array(candidates.prefix(3).map(\.id))
+        == [higherSequenceID, higherSetID, fixture.completedLogID]
+    )
   }
 
   @Test("gym-day candidates include 00:00-03:59 and exclude adjacent days")
@@ -389,7 +510,11 @@ struct TodaySetRefSharingSourceTests {
 
     let candidates = try await source.loadCandidates()
 
-    #expect(Set(candidates.map(\.id)) == [fixture.completedLogID, earlyMorningID])
+    let loggedIDs =
+      candidates
+      .filter { $0.source.source == .logged }
+      .map(\.id)
+    #expect(Set(loggedIDs) == [fixture.completedLogID, earlyMorningID])
   }
 }
 

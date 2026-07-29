@@ -255,12 +255,11 @@ enum StudentPlanProjection {
   /// would overwrite the earlier. Dropping the corrupt set keeps every legal set's identity.
   private static func prescribedSet(_ planSet: PlanSet) -> PrescribedSet? {
     guard planSet.setNumber >= 1 else { return nil }
-    let isRange = planSet.targetRepsMax != nil
     return PrescribedSet(
       id: planSet.id,
       setIndex: planSet.setNumber - 1,
       weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
-      reps: isRange ? nil : planSet.targetReps,
+      reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
       rpe: planSet.intensityMode == .rpe ? planSet.targetValue : nil,
       restSeconds: planSet.restSeconds,

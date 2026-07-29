@@ -36,7 +36,7 @@ import Testing
     #expect(await repository.sentSetRefs.first?.weightKg == "100")
     #expect(
       await repository.setRefBodies.first
-        == "[训练分享] 低杠位深蹲 第3组 100kg×5 @RPE8 (2026-07-27)\n看看深度"
+        == "[训练分享] 低杠位深蹲 第3组/5 100kg×5 @RPE8 (2026-07-27)\n看看深度"
     )
     #expect(sourceWeight == "120.00")
     #expect(await repository.imageClientIDs.isEmpty)
@@ -70,7 +70,7 @@ import Testing
     #expect(await repository.setRefClientIDs == [intent.clientID])
     #expect(
       await repository.setRefBodies.first
-        == "[训练分享] 低杠位深蹲 第3组 100kg×5 @RPE8 (2026-07-27)\n看看深度"
+        == "[训练分享] 低杠位深蹲 第3组/5 100kg×5 @RPE8 (2026-07-27)\n看看深度"
     )
   }
 
@@ -295,13 +295,17 @@ import Testing
 
   private func setRefSource(weightKg: String = "100.00") -> SetRefSourceSnapshot {
     SetRefSourceSnapshot(
+      source: .logged,
       exerciseName: "低杠位深蹲",
       setNumber: 3,
+      setTotal: 5,
       weightKg: weightKg,
       reps: 5,
+      repsMax: nil,
       rpe: "8.0",
       dayDate: "2026-07-27",
-      setLogId: chatTestUUID(20)
+      setLogId: chatTestUUID(20),
+      planSetId: nil
     )
   }
 }

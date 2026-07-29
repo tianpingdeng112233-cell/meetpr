@@ -220,6 +220,7 @@ struct StudentBlackGoldChatView: View {
         ChatSetCardView(
           presentation: presentation,
           isCurrentUser: message.senderID == viewModel.currentUserID,
+          deliveryStatus: viewModel.deliveryStatus(for: message),
           openVideo: { openVideo(for: message) }
         )
         .frame(

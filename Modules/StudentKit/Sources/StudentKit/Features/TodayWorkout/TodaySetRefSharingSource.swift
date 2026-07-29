@@ -64,34 +64,92 @@ struct TodaySetRefSharingSource: Sendable {
     )
     let videoBySetLogID = await latestVideosBySetLogID()
 
-    return
+    let loggedCandidates: [SetRefShareCandidate] =
       dayLogs
       .filter {
-        SetRefCompletedSetEligibility.isEligible(
-          completed: $0.completed,
-          assumed: $0.assumed,
-          loggedSetID: $0.id
-        ) && exerciseByID[$0.planExerciseID] != nil
+        SetRefRecordedSetEligibility.isEligible(loggedSetID: $0.id)
+          && exerciseByID[$0.planExerciseID] != nil
       }
       .sorted(by: recentCompletionOrder(exerciseByID: exerciseByID))
-      .compactMap { log in
+      .compactMap { log -> SetRefShareCandidate? in
         guard let exercise = exerciseByID[log.planExerciseID] else { return nil }
+        let setNumber = SetIndexDisplay.number(forZeroBasedIndex: log.setIndex)
+        let plannedTotal = exercise.prescribedSets.count
+        let setTotal = plannedTotal >= setNumber ? plannedTotal : nil
         let source = SetRefSourceSnapshot(
+          source: .logged,
           exerciseName: exercise.exercise.name,
-          setNumber: SetIndexDisplay.number(forZeroBasedIndex: log.setIndex),
+          setNumber: setNumber,
+          setTotal: setTotal,
           weightKg: Self.decimalSource(log.weightKg),
           reps: log.reps,
+          repsMax: nil,
           rpe: log.rpe.map(Self.decimalSource),
           dayDate: Self.dayDate(day.date, calendar: calendar),
-          setLogId: log.id
+          setLogId: log.id,
+          planSetId: nil
         )
         return SetRefShareCandidate(
+          id: log.id,
           source: source,
           video: videoBySetLogID[log.id].map(makeShareVideo)
         )
       }
+
+    let loggedPlanSetIDs = Set(
+      dayLogs.compactMap { log in
+        exerciseByID[log.planExerciseID]?.prescribedSets
+          .first(where: { $0.setIndex == log.setIndex })?
+          .id
+      }
+    )
+    let plannedCandidates: [SetRefShareCandidate] =
+      day.exercises
+      .sorted { lhs, rhs in
+        lhs.sequenceIndex < rhs.sequenceIndex
+      }
+      .flatMap { exercise -> [SetRefShareCandidate] in
+        exercise.prescribedSets
+          .sorted { $0.setIndex < $1.setIndex }
+          .compactMap { set -> SetRefShareCandidate? in
+            guard !loggedPlanSetIDs.contains(set.id) else { return nil }
+            return plannedCandidate(
+              set,
+              exercise: exercise,
+              dayDate: Self.dayDate(day.date, calendar: calendar)
+            )
+          }
+      }
+
+    return loggedCandidates + plannedCandidates
   }
 
+  private func plannedCandidate(
+    _ set: PrescribedSet,
+    exercise: StudentPlanExercise,
+    dayDate: String
+  ) -> SetRefShareCandidate? {
+    let source = SetRefSourceSnapshot(
+      source: .planned,
+      exerciseName: exercise.exercise.name,
+      setNumber: SetIndexDisplay.number(forZeroBasedIndex: set.setIndex),
+      setTotal: exercise.prescribedSets.count,
+      weightKg: set.weightKg.map(Self.decimalSource),
+      reps: set.reps,
+      repsMax: set.repsMax,
+      rpe: set.rpe.map(Self.decimalSource),
+      dayDate: dayDate,
+      setLogId: nil,
+      planSetId: set.id
+    )
+    guard (try? SetRefV1.normalizingSource(source)) != nil else {
+      return nil
+    }
+    return SetRefShareCandidate(id: set.id, source: source)
+  }
+}
+
+extension TodaySetRefSharingSource {
   private func latestVideosBySetLogID() async -> [UUID: VideoAttachment] {
     var result: [UUID: VideoAttachment] = [:]
     for attachment in await videoManager.attachments(studentID: studentID)
@@ -232,18 +290,14 @@ struct TodaySetRefSharingSource: Sendable {
     return "\(padded(year, width: 4))-\(padded(month, width: 2))-\(padded(day, width: 2))"
   }
 
-  private static func padded(_ value: Int, width: Int) -> String {
+  fileprivate static func padded(_ value: Int, width: Int) -> String {
     let raw = String(value)
     return String(repeating: "0", count: max(0, width - raw.count)) + raw
   }
 }
 
-enum SetRefCompletedSetEligibility {
-  static func isEligible(
-    completed: Bool,
-    assumed: Bool,
-    loggedSetID: UUID?
-  ) -> Bool {
-    completed && !assumed && loggedSetID != nil
+enum SetRefRecordedSetEligibility {
+  static func isEligible(loggedSetID: UUID?) -> Bool {
+    loggedSetID != nil
   }
 }

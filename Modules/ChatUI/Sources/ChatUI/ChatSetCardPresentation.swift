@@ -2,11 +2,14 @@ import CoreModels
 import Foundation
 
 public struct ChatSetCardPresentation: Equatable, Sendable {
+  let source: SetRefSource
   let exerciseName: String
   let setNumber: Int
-  let load: String
+  let setTotal: Int?
+  let weight: String
+  let reps: String
   let rpe: String?
-  let dayDate: String
+  let createdAt: Date
   let note: String?
   let videoURL: URL?
 
@@ -33,12 +36,30 @@ public struct ChatSetCardPresentation: Equatable, Sendable {
       note = String(body.dropFirst(prefix.count))
     }
 
+    source = setRef.source
     exerciseName = setRef.exerciseName
     setNumber = setRef.setNumber
-    load = "\(setRef.weightKg.map { "\($0)kg" } ?? "-kg")×\(setRef.reps.map(String.init) ?? "-")"
+    setTotal = setRef.setTotal
+    weight = setRef.weightKg ?? "-"
+    if let lowerBound = setRef.reps, let upperBound = setRef.repsMax {
+      reps = "\(lowerBound)-\(upperBound)"
+    } else {
+      reps = setRef.reps.map(String.init) ?? "-"
+    }
     rpe = setRef.rpe
-    dayDate = setRef.dayDate
+    createdAt = message.createdAt
     self.note = note
     videoURL = message.videoURL.flatMap { $0.absoluteString.isEmpty ? nil : $0 }
+  }
+}
+
+enum ChatSetCardDeliveryPresentation {
+  static func text(for status: ChatDeliveryStatus) -> String {
+    switch status {
+    case .delivered:
+      ChatStrings.setCardDelivered
+    case .read:
+      ChatStrings.setCardRead
+    }
   }
 }
