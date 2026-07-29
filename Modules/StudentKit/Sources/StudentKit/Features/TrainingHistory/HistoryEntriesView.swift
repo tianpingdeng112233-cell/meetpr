@@ -102,29 +102,160 @@ private struct ExerciseFilterPicker: View {
   let exerciseNames: [String]
   @Binding var selectedExerciseName: String?
 
+  @State private var showsSheet = false
+
   var body: some View {
-    HStack {
-      Text("按动作筛选")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-        .foregroundStyle(Color.MeetPR.textSecondary)
-      Spacer()
-      Picker("按动作筛选", selection: $selectedExerciseName) {
-        Text("全部动作").tag(nil as String?)
-        ForEach(exerciseNames, id: \.self) { name in
-          Text(name).tag(name as String?)
+    Button {
+      showsSheet = true
+    } label: {
+      HStack {
+        Text(StudentStrings.filterTitle)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+        Spacer()
+        Text(selectedExerciseName ?? StudentStrings.filterAllExercises)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.goldText)
+        Image(systemName: "chevron.up.chevron.down")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size11, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textDim)
+      }
+      .padding(.horizontal, MeetPRSpacing.md)
+      .padding(.vertical, MeetPRSpacing.sm)
+      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+      .background(Color.MeetPR.surfaceCard)
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.md)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
+      }
+      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel(
+      StudentStrings.filterAccessibilityLabel(
+        selectedExerciseName ?? StudentStrings.filterAllExercises
+      )
+    )
+    .sheet(isPresented: $showsSheet) {
+      ExerciseFilterSheet(
+        exerciseNames: exerciseNames,
+        selectedExerciseName: $selectedExerciseName
+      )
+      .presentationDetents([.medium, .large])
+    }
+  }
+}
+
+/// Searchable exercise filter (David 2026-07-28): a flat menu stops scaling
+/// once the history spans many exercises.
+@available(iOS 17.0, macOS 14.0, *)
+private struct ExerciseFilterSheet: View {
+  let exerciseNames: [String]
+  @Binding var selectedExerciseName: String?
+
+  @Environment(\.dismiss) private var dismiss
+  @State private var query = ""
+  @FocusState private var searchFocused: Bool
+
+  private var filteredNames: [String] {
+    let trimmed = query.trimmingCharacters(in: .whitespaces)
+    guard !trimmed.isEmpty else { return exerciseNames }
+    return exerciseNames.filter { $0.localizedCaseInsensitiveContains(trimmed) }
+  }
+
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.zero) {
+      HStack(spacing: MeetPRSpacing.point9) {
+        Image(systemName: "magnifyingglass")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textDim)
+        TextField(StudentStrings.filterSearchPlaceholder, text: $query)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size15))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .tint(Color.MeetPR.gold500)
+          .focused($searchFocused)
+          .submitLabel(.done)
+        if !query.isEmpty {
+          Button {
+            query = ""
+          } label: {
+            Image(systemName: "xmark.circle.fill")
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size14))
+              .foregroundStyle(Color.MeetPR.textDim)
+              .frame(
+                width: MeetPRSpacing.minimumHitTarget,
+                height: MeetPRSpacing.minimumHitTarget
+              )
+              .contentShape(Rectangle())
+          }
+          .buttonStyle(.plain)
+          .accessibilityLabel(StudentStrings.filterClearSearch)
         }
       }
-      .pickerStyle(.menu)
-      .tint(Color.MeetPR.goldText)
+      .padding(.horizontal, MeetPRSpacing.point14)
+      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+      .background(Color.MeetPR.surfaceCard)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.md)
+          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
+      }
+      .padding(.horizontal, MeetPRSpacing.space4)
+      .padding(.top, MeetPRSpacing.space4)
+      .padding(.bottom, MeetPRSpacing.point10)
+
+      ScrollView {
+        LazyVStack(spacing: MeetPRSpacing.zero) {
+          if query.trimmingCharacters(in: .whitespaces).isEmpty {
+            filterRow(title: StudentStrings.filterAllExercises, value: nil)
+          }
+          ForEach(filteredNames, id: \.self) { name in
+            filterRow(title: name, value: name)
+          }
+          if filteredNames.isEmpty {
+            Text(StudentStrings.filterNoMatch(query))
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+              .foregroundStyle(Color.MeetPR.textMuted)
+              .frame(maxWidth: .infinity)
+              .padding(.vertical, MeetPRSpacing.space5)
+          }
+        }
+      }
     }
-    .padding(.horizontal, MeetPRSpacing.md)
-    .padding(.vertical, MeetPRSpacing.sm)
-    .background(Color.MeetPR.surfaceCard)
-    .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.md)
-        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
+    .background(Color.MeetPR.bgBase.ignoresSafeArea())
+    .onAppear { searchFocused = true }
+  }
+
+  private func filterRow(title: String, value: String?) -> some View {
+    Button {
+      selectedExerciseName = value
+      dismiss()
+    } label: {
+      HStack {
+        Text(title)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .medium))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Spacer()
+        if selectedExerciseName == value {
+          Image(systemName: "checkmark")
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .bold))
+            .foregroundStyle(Color.MeetPR.gold500)
+            .accessibilityHidden(true)
+        }
+      }
+      .padding(.horizontal, MeetPRSpacing.space4)
+      .frame(minHeight: MeetPRSpacing.point52)
+      .contentShape(Rectangle())
     }
-    .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+    .buttonStyle(.plain)
+    .accessibilityAddTraits(selectedExerciseName == value ? [.isSelected] : [])
+    .overlay(alignment: .bottom) {
+      Rectangle()
+        .fill(Color.MeetPR.borderHairline)
+        .frame(height: 1)
+        .padding(.leading, MeetPRSpacing.space4)
+    }
   }
 }
 

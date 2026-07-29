@@ -7,6 +7,18 @@ enum StudentStrings {
   static let myCoach = localized("student.myCoach")
   static let startCoachConversation = localized("student.startCoachConversation")
   static let unreadSuffix = localized("student.unreadSuffix")
+  static let filterTitle = localized("student.filter.title")
+  static let filterAllExercises = localized("student.filter.allExercises")
+  static let filterSearchPlaceholder = localized("student.filter.searchPlaceholder")
+  static let filterClearSearch = localized("student.filter.clearSearch")
+
+  static func filterNoMatch(_ query: String) -> String {
+    String(localized: "student.filter.noMatch \(query)", bundle: .module)
+  }
+
+  static func filterAccessibilityLabel(_ selection: String) -> String {
+    String(localized: "student.filter.accessibilityLabel \(selection)", bundle: .module)
+  }
 
   private static func localized(_ key: String.LocalizationValue) -> String {
     String(localized: key, bundle: .module)
