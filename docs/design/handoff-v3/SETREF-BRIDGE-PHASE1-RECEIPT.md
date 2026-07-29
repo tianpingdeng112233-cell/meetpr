@@ -89,3 +89,16 @@ commit/push”的约束，在临时 clone 中对相同的两端 commit 完成真
   尚未按黑金稿统一间距与控件形态。
 - 今日页「问教练」按钮是临时的 v3 兼容轮廓样式与位置，未做最终黑金视觉。
 - 带视频的组引用继续使用共享 `FeedbackVideoPlayerView` 播放 chrome，未做黑金化。
+
+
+## 互审第 1 轮处置(2026-07-29)
+
+- **BLOCKER 1 已修**:`DashboardFeedbackText.label` 直接显示 0-based `setIndex`
+  (第一组显示成「第 0 组」)。改经 `SetIndexDisplay.number(forZeroBasedIndex:)`,
+  并在 `SetNumberSurfaceTests` 补该面回归。C0 契约现覆盖 v3 全部四个显示面:
+  今日反馈卡 / 黑金聊天视频标签 / 反馈档案 / 训练历史。
+- **BLOCKER 2 判定为豁免(非违规)**:`CoachFeedbackVideo.durationSeconds` 是本波
+  自加的**可选**字段(默认 nil,无 Networking DTO 解码,生产恒为 nil),仅供
+  DemoStudent 种子渲染样机上的时长角标;教练端与线上行为零影响。红线原意是
+  「spec 029 的 CoreModels/Networking 实现不改」,该字段不属 spec 029 实现,
+  故保留并在此明确豁免。若日后后端补 duration 字段,再走正式契约。
