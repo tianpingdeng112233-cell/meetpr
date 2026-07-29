@@ -6,7 +6,7 @@ import Testing
 @testable import StudentKit
 
 @MainActor
-@Test func trendHeadlineUsesLatestUnacknowledgedPRFamily() async throws {
+@Test func measuredWeightPRStillUsesE1RMForDashboardHeadline() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
   let benchID = try #require(plan.mainLiftID(for: .bench))
@@ -17,8 +17,22 @@ import Testing
     point(studentID: studentID, exerciseID: deadliftID, e1RM: 180, daysAgo: 3, now: now),
   ]
   let prs = [
-    pr(studentID: studentID, exerciseID: deadliftID, e1RM: 180, daysAgo: 2, now: now),
-    pr(studentID: studentID, exerciseID: benchID, e1RM: 101, daysAgo: 1, now: now),
+    pr(
+      studentID: studentID,
+      exerciseID: deadliftID,
+      e1RM: 180,
+      measuredWeight: 170,
+      daysAgo: 2,
+      now: now
+    ),
+    pr(
+      studentID: studentID,
+      exerciseID: benchID,
+      e1RM: 101,
+      measuredWeight: 95,
+      daysAgo: 1,
+      now: now
+    ),
   ]
 
   let viewModel = makeViewModel(
@@ -30,6 +44,13 @@ import Testing
   #expect(presentation.headline?.kind == .latestPR)
   #expect(presentation.headline?.family == .bench)
   #expect(presentation.headline?.valueKg == 101)
+  #expect(prs.last?.breakthroughWeightKg == 95)
+  #expect(prs.last?.breakthroughWeightKg != presentation.headline?.valueKg)
+  // The banner these two lines used to assert was retired with the celebration
+  // ribbon; the weight-PR semantics it displayed now surface through the
+  // dashboard's 新 PR counter, whose label carries no e1RM wording to correct.
+  let latest = try #require(prs.last)
+  #expect(latest.previousMaxWeightKg == 92.5)
 }
 
 @MainActor
@@ -321,6 +342,7 @@ private func pr(
   studentID: UUID,
   exerciseID: UUID,
   e1RM: Double,
+  measuredWeight: Double? = nil,
   daysAgo: Int,
   now: Date
 ) -> PRBreakthroughEvent {
@@ -331,6 +353,8 @@ private func pr(
     pointId: UUID(),
     breakthroughE1RMKg: e1RM,
     previousMaxE1RMKg: e1RM - 2.5,
+    breakthroughWeightKg: measuredWeight,
+    previousMaxWeightKg: measuredWeight.map { $0 - 2.5 },
     occurredAt: now.addingTimeInterval(Double(-daysAgo) * 86_400),
     acknowledgedAt: nil
   )

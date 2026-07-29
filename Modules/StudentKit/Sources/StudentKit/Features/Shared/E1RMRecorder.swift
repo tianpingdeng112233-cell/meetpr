@@ -16,11 +16,15 @@ struct E1RMRecorder: Sendable {
     let weightKg: Decimal
     let reps: Int
     let rpe: Decimal?
+    let coachRPE: Decimal?
     let completed: Bool
     let failed: Bool
-    /// Migration/import paths may preserve an already-reviewed trust tier.
-    /// Normal set recording leaves this nil and still runs the release anomaly gate.
-    let priorConfidence: E1RMConfidence?
+    /// Locked onboarding 1RM for the resolved competition family.
+    let registeredOneRMKg: Decimal?
+    /// Replay paths may preserve an already-reviewed trust tier or explicitly
+    /// trust a newly eligible historical point. Live recording leaves this nil
+    /// and still runs the release anomaly gate.
+    let confidenceOverride: E1RMConfidence?
 
     init(
       studentID: UUID,
@@ -30,9 +34,11 @@ struct E1RMRecorder: Sendable {
       weightKg: Decimal,
       reps: Int,
       rpe: Decimal?,
+      coachRPE: Decimal? = nil,
       completed: Bool,
       failed: Bool,
-      priorConfidence: E1RMConfidence? = nil
+      registeredOneRMKg: Decimal? = nil,
+      confidenceOverride: E1RMConfidence? = nil
     ) {
       self.studentID = studentID
       self.exerciseID = exerciseID
@@ -41,119 +47,214 @@ struct E1RMRecorder: Sendable {
       self.weightKg = weightKg
       self.reps = reps
       self.rpe = rpe
+      self.coachRPE = coachRPE
       self.completed = completed
       self.failed = failed
-      self.priorConfidence = priorConfidence
+      self.registeredOneRMKg = registeredOneRMKg
+      self.confidenceOverride = confidenceOverride
     }
   }
 
-  /// Eligible points are always recorded. A PR is emitted only when the new
-  /// estimate clears both the prior eligible best and its configured noise
-  /// band. Persistence remains best-effort and never blocks set logging.
+  private struct PointValues {
+    let estimatedOneRepMaxKg: Double
+    let sourceWeightKg: Double
+    let sourceRPE: Double?
+    let sourceCoachRPE: Double?
+    let confidence: E1RMConfidence
+  }
+
+  private struct RecordingContext {
+    let family: LiftFamily
+    let weight: Double
+    let sourceRPE: Double?
+    let sourceCoachRPE: Double?
+    let effectiveRPE: Double?
+    let recordedAt: Date
+    let baselines: Baselines
+
+    var clearsMeasuredWeightBaseline: Bool {
+      weight > baselines.measuredWeightKg
+    }
+  }
+
+  /// Eligible points are always recorded. A PR is emitted only when the
+  /// completed set's measured weight strictly clears both the registered 1RM
+  /// and the persisted family-wide weight baseline. Every completed,
+  /// non-failed competition set advances that baseline independently of point
+  /// eligibility. Persistence remains best-effort and never blocks set logging.
   func record(_ input: Input) async -> PRBreakthroughEvent? {
-    let weight = NSDecimalNumber(decimal: input.weightKg).doubleValue
-    let rpe = input.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
-    guard
-      E1RMEligibility.isEligible(
-        completed: input.completed,
-        failed: input.failed,
-        reps: input.reps,
-        rpe: rpe,
-        family: input.family
-      ),
-      let estimatedOneRepMaxKg = E1RMCalculator.calculate(
-        weightKg: weight,
-        reps: input.reps,
-        rpe: rpe
-      )
-    else {
+    guard input.completed, !input.failed, let family = input.family else {
       return nil
     }
 
-    do {
-      // Read the baseline before insertion. Reapplying eligibility and trust
-      // filters prevents legacy-invalid or quarantined points raising the bar.
-      let previousMax = try await previousTrustedMax(for: input)
-      let verdict = E1RMPolicy.anomalyVerdict(
-        newE1RMKg: estimatedOneRepMaxKg,
-        previousBestKg: previousMax
-      )
-      let confidence: E1RMConfidence =
-        input.priorConfidence != .low && verdict == .normal ? .normal : .low
-      let point = makePoint(
-        input: input,
-        estimatedOneRepMaxKg: estimatedOneRepMaxKg,
-        sourceWeightKg: weight,
-        sourceRPE: rpe,
-        confidence: confidence
-      )
-      let storedPoint = try await e1rm.upsertPoint(point)
+    let weight = NSDecimalNumber(decimal: input.weightKg).doubleValue
+    let sourceRPE = input.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
+    let sourceCoachRPE = input.coachRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
+    let effectiveRPE = sourceCoachRPE ?? sourceRPE
+    let recordedAt = now()
 
-      // Phase 1 persists both anomaly bands as `.low`; Phase 2 will confirm
-      // hard suspects before they can become trusted.
-      guard confidence == .normal else { return nil }
-      return try await recordPRIfCleared(point: storedPoint, previousMax: previousMax)
+    do {
+      let previousWeightBaseline = try await e1rm.recordWeightBaseline(
+        E1RMWeightBaseline(
+          studentId: input.studentID,
+          family: family,
+          maxWeightKg: weight,
+          setLogId: input.setLogID,
+          achievedAt: recordedAt
+        )
+      )
+      let registeredOneRMKg =
+        input.registeredOneRMKg
+        .map { NSDecimalNumber(decimal: $0).doubleValue }
+        .flatMap { $0 > 0 ? $0 : nil }
+      let baselines = Baselines(
+        e1RMKg: try await previousTrustedE1RMBaseline(for: input, family: family),
+        measuredWeightKg: max(
+          registeredOneRMKg ?? 0,
+          previousWeightBaseline?.maxWeightKg ?? 0
+        )
+      )
+      let context = RecordingContext(
+        family: family,
+        weight: weight,
+        sourceRPE: sourceRPE,
+        sourceCoachRPE: sourceCoachRPE,
+        effectiveRPE: effectiveRPE,
+        recordedAt: recordedAt,
+        baselines: baselines
+      )
+      let storedPoint = await recordPointIfEligible(input, context: context)
+      return try await recordPRIfCleared(
+        input: input,
+        point: storedPoint,
+        context: context
+      )
     } catch {
       return nil
     }
   }
 
+  private func recordPointIfEligible(
+    _ input: Input,
+    context: RecordingContext
+  ) async -> E1RMHistoryPoint? {
+    guard
+      E1RMEligibility.isEligible(
+        completed: input.completed,
+        failed: input.failed,
+        reps: input.reps,
+        rpe: context.effectiveRPE,
+        family: context.family
+      ),
+      let estimatedOneRepMaxKg = E1RMCalculator.calculate(
+        weightKg: context.weight,
+        reps: input.reps,
+        rpe: context.effectiveRPE
+      )
+    else {
+      return nil
+    }
+    let confidence =
+      input.confidenceOverride
+      ?? E1RMPolicy.anomalyVerdict(
+        newE1RMKg: estimatedOneRepMaxKg,
+        previousBestKg: context.baselines.e1RMKg
+      ).confidence
+    let point = makePoint(
+      input: input,
+      family: context.family,
+      recordedAt: context.recordedAt,
+      values: PointValues(
+        estimatedOneRepMaxKg: estimatedOneRepMaxKg,
+        sourceWeightKg: context.weight,
+        sourceRPE: context.sourceRPE,
+        sourceCoachRPE: context.sourceCoachRPE,
+        confidence: confidence
+      )
+    )
+    return try? await e1rm.upsertPoint(point)
+  }
+
   private func makePoint(
     input: Input,
-    estimatedOneRepMaxKg: Double,
-    sourceWeightKg: Double,
-    sourceRPE: Double?,
-    confidence: E1RMConfidence
+    family: LiftFamily,
+    recordedAt: Date,
+    values: PointValues
   ) -> E1RMHistoryPoint {
     E1RMHistoryPoint(
       id: UUID(),
       studentId: input.studentID,
       exerciseId: input.exerciseID,
+      family: family,
       setLogId: input.setLogID,
-      computedAt: now(),
-      e1RMKg: estimatedOneRepMaxKg,
-      sourceWeightKg: sourceWeightKg,
+      computedAt: recordedAt,
+      e1RMKg: values.estimatedOneRepMaxKg,
+      sourceWeightKg: values.sourceWeightKg,
       sourceReps: input.reps,
-      sourceRPE: sourceRPE,
-      confidence: confidence,
+      sourceRPE: values.sourceRPE,
+      sourceCoachRPE: values.sourceCoachRPE,
+      confidence: values.confidence,
       origin: .logged
     )
   }
 
-  private func previousTrustedMax(for input: Input) async throws -> Double? {
-    let history = try await e1rm.fetchHistory(
-      studentId: input.studentID,
-      exerciseId: input.exerciseID
-    )
-    return E1RMSeries.trustedEligibleRaw(
+  private struct Baselines {
+    let e1RMKg: Double?
+    let measuredWeightKg: Double
+  }
+
+  private func previousTrustedE1RMBaseline(
+    for input: Input,
+    family: LiftFamily
+  ) async throws -> Double? {
+    let history = try await e1rm.fetchHistory(studentId: input.studentID, family: family)
+    let eligible = E1RMSeries.eligibleRaw(
       points: history.filter {
         !($0.setLogId == input.setLogID && $0.origin == .imported)
       },
-      family: input.family
+      family: family
     )
-    .map(\.e1RMKg)
-    .max()
+    return eligible.filter { $0.confidence == .normal }.map(\.e1RMKg).max()
   }
 
   private func recordPRIfCleared(
-    point: E1RMHistoryPoint,
-    previousMax: Double?
+    input: Input,
+    point: E1RMHistoryPoint?,
+    context: RecordingContext
   ) async throws -> PRBreakthroughEvent? {
-    let baseline = previousMax ?? 0
-    let noiseBand = E1RMPolicy.prNoiseBand(previousBestKg: baseline)
-    guard point.e1RMKg > baseline + noiseBand else { return nil }
+    guard context.clearsMeasuredWeightBaseline else { return nil }
 
     let event = PRBreakthroughEvent(
       id: UUID(),
-      studentId: point.studentId,
-      exerciseId: point.exerciseId,
-      pointId: point.id,
-      breakthroughE1RMKg: point.e1RMKg,
-      previousMaxE1RMKg: baseline,
-      occurredAt: point.computedAt,
+      studentId: input.studentID,
+      exerciseId: input.exerciseID,
+      family: context.family,
+      pointId: point?.id,
+      breakthroughE1RMKg: point?.e1RMKg,
+      previousMaxE1RMKg: context.baselines.e1RMKg,
+      breakthroughWeightKg: context.weight,
+      previousMaxWeightKg: context.baselines.measuredWeightKg,
+      occurredAt: context.recordedAt,
       acknowledgedAt: nil
     )
     try await e1rm.recordPR(event)
     return event
+  }
+}
+
+extension E1RMAnomalyClassifier.Verdict {
+  fileprivate var confidence: E1RMConfidence {
+    self == .normal ? .normal : .low
+  }
+}
+
+extension OnboardingProfile {
+  func registeredOneRMKg(for family: LiftFamily?) -> Decimal? {
+    switch family {
+    case .squat: squat1RMKg
+    case .bench: bench1RMKg
+    case .deadlift: deadlift1RMKg
+    case nil: nil
+    }
   }
 }

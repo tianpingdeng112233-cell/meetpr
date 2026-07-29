@@ -49,12 +49,14 @@ struct E1RMSeries: Equatable, Sendable {
         id: sample.sampleID,
         studentId: winner.studentId,
         exerciseId: winner.exerciseId,
+        family: winner.family,
         setLogId: winner.setLogId,
         computedAt: sample.date,
         e1RMKg: sample.valueKg,
         sourceWeightKg: winner.sourceWeightKg,
         sourceReps: winner.sourceReps,
         sourceRPE: winner.sourceRPE,
+        sourceCoachRPE: winner.sourceCoachRPE,
         confidence: sample.winnerConfidence,
         origin: sample.winnerOrigin
       )
@@ -97,6 +99,20 @@ struct E1RMSeries: Equatable, Sendable {
       pointsForDay.max(by: dailyBestPrecedes)
     }
     .sorted { $0.computedAt < $1.computedAt }
+  }
+
+  /// A separate, stricter baseline for prescription suggestions. Display
+  /// series include every calculator-supported RPE, while suggested weights
+  /// only learn from student RPE >= 7 or an explicitly calibrated coach RPE.
+  static func trustedSuggestionEligibleRaw(
+    points: [E1RMHistoryPoint],
+    family: LiftFamily?
+  ) -> [E1RMHistoryPoint] {
+    trustedEligibleRaw(points: points, family: family)
+      .filter { point in
+        point.sourceCoachRPE != nil
+          || point.sourceRPE.map { $0 >= 7 } == true
+      }
   }
 
   /// Extends an all-time record series across a chart window. A record already
@@ -157,12 +173,14 @@ struct E1RMSeries: Equatable, Sendable {
         id: sample.sampleID,
         studentId: winner.studentId,
         exerciseId: winner.exerciseId,
+        family: winner.family,
         setLogId: winner.setLogId,
         computedAt: sample.date,
         e1RMKg: sample.valueKg,
         sourceWeightKg: winner.sourceWeightKg,
         sourceReps: winner.sourceReps,
         sourceRPE: winner.sourceRPE,
+        sourceCoachRPE: winner.sourceCoachRPE,
         confidence: sample.winnerConfidence,
         origin: sample.winnerOrigin
       )

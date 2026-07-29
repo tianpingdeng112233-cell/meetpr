@@ -8,16 +8,20 @@ import Testing
     id: UUID(),
     studentId: UUID(),
     exerciseId: UUID(),
+    family: .squat,
     setLogId: UUID(),
     computedAt: Date(timeIntervalSince1970: 1_768_262_400),
     e1RMKg: 128.2,
     sourceWeightKg: 100,
     sourceReps: 5,
-    sourceRPE: 8.0
+    sourceRPE: 6.0,
+    sourceCoachRPE: 8.0
   )
   let data = try JSONEncoder().encode(point)
   let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: data)
   #expect(decoded == point)
+  #expect(decoded.family == .squat)
+  #expect(decoded.effectiveSourceRPE == 8)
 }
 
 @Test func e1rmHistoryPointRoundTripsWithNilRPE() throws {
@@ -25,6 +29,7 @@ import Testing
     id: UUID(),
     studentId: UUID(),
     exerciseId: UUID(),
+    family: .bench,
     setLogId: UUID(),
     computedAt: Date(timeIntervalSince1970: 1_768_262_400),
     e1RMKg: 116.7,
@@ -46,6 +51,8 @@ import Testing
     pointId: UUID(),
     breakthroughE1RMKg: 137.6,
     previousMaxE1RMKg: 135.2,
+    breakthroughWeightKg: 120,
+    previousMaxWeightKg: 117.5,
     occurredAt: Date(timeIntervalSince1970: 1_768_262_400),
     acknowledgedAt: nil
   )
@@ -58,13 +65,16 @@ import Testing
   #expect(acked.acknowledgedAt == ackDate)
   #expect(acked.id == event.id)
   #expect(acked.breakthroughE1RMKg == event.breakthroughE1RMKg)
+  #expect(acked.breakthroughWeightKg == 120)
+  #expect(acked.previousMaxWeightKg == 117.5)
 }
 
-@Test func e1rmHistoryPointDecodesLegacyJSONWithoutConfidenceAsNormal() throws {
+@Test func e1rmHistoryPointDecodesLegacyJSONWithoutFamilyOrConfidence() throws {
   let point = E1RMHistoryPoint(
     id: UUID(),
     studentId: UUID(),
     exerciseId: UUID(),
+    family: .bench,
     setLogId: UUID(),
     computedAt: Date(timeIntervalSince1970: 1_768_262_400),
     e1RMKg: 128.2,
@@ -74,12 +84,39 @@ import Testing
   )
   let data = try JSONEncoder().encode(point)
   var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+  object.removeValue(forKey: "family")
   object.removeValue(forKey: "confidence")
   let legacyData = try JSONSerialization.data(withJSONObject: object)
 
   let decoded = try JSONDecoder().decode(E1RMHistoryPoint.self, from: legacyData)
 
+  #expect(decoded.family == nil)
   #expect(decoded.confidence == .normal)
+}
+
+@Test func measuredWeightPREventRoundTripsWithoutE1RMPoint() throws {
+  let event = PRBreakthroughEvent(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    family: .deadlift,
+    pointId: nil,
+    breakthroughE1RMKg: nil,
+    previousMaxE1RMKg: nil,
+    breakthroughWeightKg: 220,
+    previousMaxWeightKg: 215,
+    occurredAt: Date(timeIntervalSince1970: 1_768_262_400),
+    acknowledgedAt: nil
+  )
+
+  let decoded = try JSONDecoder().decode(
+    PRBreakthroughEvent.self,
+    from: JSONEncoder().encode(event)
+  )
+
+  #expect(decoded == event)
+  #expect(decoded.family == .deadlift)
+  #expect(decoded.pointId == nil)
 }
 
 @Test func e1rmHistoryPointPreservesLowConfidenceAcrossRoundTrip() throws {

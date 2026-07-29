@@ -202,21 +202,21 @@ public enum StudentDemoSeed {
     return makeE1RMHistory(
       studentID: studentID,
       exerciseID: uuid(2_000),
-      idOffset: 5_000,
+      family: .squat,
       baseline: baseline,
       values: [128.0, 129.5, 128.8, 131.0, 132.4, 131.8, 134.0, 135.2, 137.6]
     )
       + makeE1RMHistory(
         studentID: studentID,
         exerciseID: uuid(2_001),
-        idOffset: 5_100,
+        family: .bench,
         baseline: baseline,
         values: [86.0, 87.2, 88.0, 88.5, 89.4, 90.1, 91.0]
       )
       + makeE1RMHistory(
         studentID: studentID,
         exerciseID: uuid(2_002),
-        idOffset: 5_200,
+        family: .deadlift,
         baseline: baseline,
         values: [168.0, 170.0, 171.5, 173.0, 174.2, 176.0, 178.5]
       )
@@ -236,6 +236,7 @@ public enum StudentDemoSeed {
         id: uuid(6_000),
         studentId: studentID,
         exerciseId: latest.exerciseId,
+        family: latest.family,
         pointId: latest.id,
         breakthroughE1RMKg: latest.e1RMKg,
         previousMaxE1RMKg: previousMax,
@@ -331,15 +332,22 @@ extension StudentDemoSeed {
   private static func makeE1RMHistory(
     studentID: UUID,
     exerciseID: UUID,
-    idOffset: Int,
+    family: LiftFamily,
     baseline: Date,
     values: [Double]
   ) -> [E1RMHistoryPoint] {
-    values.enumerated().map { offset, value in
+    let idOffset =
+      switch family {
+      case .squat: 5_000
+      case .bench: 5_100
+      case .deadlift: 5_200
+      }
+    return values.enumerated().map { offset, value in
       E1RMHistoryPoint(
         id: uuid(idOffset + offset),
         studentId: studentID,
         exerciseId: exerciseID,
+        family: family,
         setLogId: uuid(idOffset + 50 + offset),
         computedAt: baseline.addingTimeInterval(Double(offset - 26) * 86_400 * 3),
         e1RMKg: value,

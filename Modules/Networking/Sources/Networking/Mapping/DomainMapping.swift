@@ -113,6 +113,7 @@ extension SetLogDTO {
       weightKg: weightKg,
       reps: reps,
       rpe: rpe,
+      coachRPE: coachRPE,
       completed: completed,
       failed: failed,
       assumed: assumed

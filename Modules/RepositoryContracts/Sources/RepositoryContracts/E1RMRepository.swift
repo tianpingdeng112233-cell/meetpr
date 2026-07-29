@@ -16,12 +16,20 @@ public protocol E1RMRepository: Sendable {
     pointIDs: Set<UUID>,
     confidence: E1RMConfidence
   ) async throws
-  /// Replaces one student's local history and clears their stored PR events.
-  /// Other students sharing the device are retained.
-  func replaceHistory(studentId: UUID, with points: [E1RMHistoryPoint]) async throws
+  /// Atomically replaces one student's points, measured-weight baselines, and
+  /// PR events. Other students sharing the device are retained.
+  func replaceHistory(
+    studentId: UUID,
+    with points: [E1RMHistoryPoint],
+    weightBaselines: [E1RMWeightBaseline],
+    prEvents: [PRBreakthroughEvent]
+  ) async throws
   func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint]
   func fetchHistory(studentId: UUID, exerciseIds: [UUID]) async throws -> [UUID:
     [E1RMHistoryPoint]]
+  /// All points for one student's resolved competition family, across every
+  /// catalog exercise and plan cycle.
+  func fetchHistory(studentId: UUID, family: LiftFamily) async throws -> [E1RMHistoryPoint]
   /// Maximum e1RM over prior `.normal` points strictly before `before`.
   /// Quarantined points must never raise the PR-detection baseline. When an
   /// imported point is being replaced by its real log, it can be excluded by
@@ -33,7 +41,22 @@ public protocol E1RMRepository: Sendable {
     excludingSetLogId: UUID?
   ) async throws -> Double?
 
+  /// Atomically keeps `candidate` only when it is strictly heavier than the
+  /// stored baseline for its student and family, and returns the prior record.
+  @discardableResult
+  func recordWeightBaseline(
+    _ candidate: E1RMWeightBaseline
+  ) async throws -> E1RMWeightBaseline?
+  func fetchWeightBaseline(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> E1RMWeightBaseline?
+  func fetchWeightBaselines(studentId: UUID) async throws -> [E1RMWeightBaseline]
+
   func recordPR(_ event: PRBreakthroughEvent) async throws
+  /// All measured-weight PR events for one resolved competition family,
+  /// including acknowledged events that still establish the rolling baseline.
+  func fetchPRs(studentId: UUID, family: LiftFamily) async throws -> [PRBreakthroughEvent]
   func unacknowledgedPRs(studentId: UUID) async throws -> [PRBreakthroughEvent]
   func acknowledgePR(eventId: UUID) async throws
 

@@ -8,7 +8,7 @@ protocol E1RMMigrationStoring: Sendable {
 }
 
 actor UserDefaultsE1RMMigrationStore: E1RMMigrationStoring {
-  private static let version = "competition-lift-resolver-v1"
+  private static let version = "coach-rpe-low-rpe-replay-v2"
   private let defaults: UserDefaults
 
   init(defaults: UserDefaults = .standard) {
@@ -45,6 +45,11 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
     let exerciseIDByPlanExerciseID: [UUID: UUID]
     let oldExerciseIDBySetLogID: [UUID: UUID]
     let priorConfidenceBySetLogID: [UUID: E1RMConfidence]
+  }
+
+  private struct ReplayHistory: Sendable {
+    let points: [E1RMHistoryPoint]
+    let weightBaselines: [E1RMWeightBaseline]
   }
 
   struct Result: Equatable, Sendable {
@@ -105,7 +110,7 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
       studentID: studentID,
       in: Date(timeIntervalSince1970: 0)...now()
     )
-    let points = try await rebuild(
+    let rebuilt = try await rebuild(
       studentID: studentID,
       context: ReplayContext(
         profile: profile,
@@ -116,24 +121,33 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
       ),
       setLogs: setLogs
     )
-    try await e1rm.replaceHistory(studentId: studentID, with: points)
+    try await e1rm.replaceHistory(
+      studentId: studentID,
+      with: rebuilt.points,
+      weightBaselines: rebuilt.weightBaselines,
+      prEvents: []
+    )
     await marker.markCompleted(studentID: studentID)
-    return Result(didRun: true, pointCount: points.count)
+    return Result(didRun: true, pointCount: rebuilt.points.count)
   }
 
   private func rebuild(
     studentID: UUID,
     context: ReplayContext,
     setLogs: [StudentSetLog]
-  ) async throws -> [E1RMHistoryPoint] {
+  ) async throws -> ReplayHistory {
     let rebuilt = InMemoryE1RMRepository()
     var includedExerciseIDs: Set<UUID> = []
     for log in setLogs.sorted(by: { $0.loggedAt < $1.loggedAt })
     where log.completed && !log.assumed {
       // Assumed imported history belongs exclusively to ImportedHistoryBackfill;
       // replaying it here would mislabel the point as a real `.logged` set.
+      // The canonical log's own exerciseID wins: plans that left the current
+      // cycle have no planExerciseID mapping, and rule-excluded sets (e.g.
+      // deadlift 220×6) never produced an old point to map back through.
       let exerciseID =
-        context.oldExerciseIDBySetLogID[log.id]
+        log.exerciseID
+        ?? context.oldExerciseIDBySetLogID[log.id]
         ?? context.exerciseIDByPlanExerciseID[log.planExerciseID]
       guard let exerciseID,
         let exercise = context.exerciseByID[exerciseID],
@@ -151,9 +165,11 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
           weightKg: log.weightKg,
           reps: log.reps,
           rpe: log.rpe,
+          coachRPE: log.coachRPE,
           completed: log.completed,
           failed: log.failed,
-          priorConfidence: context.priorConfidenceBySetLogID[log.id]
+          registeredOneRMKg: context.profile?.registeredOneRMKg(for: family),
+          confidenceOverride: context.priorConfidenceBySetLogID[log.id] ?? .normal
         )
       )
     }
@@ -162,7 +178,10 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
       studentId: studentID,
       exerciseIds: Array(includedExerciseIDs)
     )
-    return history.values.flatMap { $0 }.sorted { $0.computedAt < $1.computedAt }
+    return ReplayHistory(
+      points: history.values.flatMap { $0 }.sorted { $0.computedAt < $1.computedAt },
+      weightBaselines: try await rebuilt.fetchWeightBaselines(studentId: studentID)
+    )
   }
 
   private func resolvedCatalog(studentID: UUID) async throws -> CatalogContext {

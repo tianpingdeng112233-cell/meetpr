@@ -26,6 +26,7 @@ actor ImportedHistoryBackfill {
     let e1RMKg: Double
     let sourceWeightKg: Double
     let sourceRPE: Double?
+    let sourceCoachRPE: Double?
   }
 
   private struct ExerciseContext: Sendable {
@@ -119,7 +120,8 @@ actor ImportedHistoryBackfill {
     let exerciseContext = try await resolvedExercises(studentID: studentID)
     let candidates = try await eligibleCandidates(
       studentID: studentID,
-      exerciseContext: exerciseContext
+      exerciseContext: exerciseContext,
+      onboardingProfile: profile
     )
     let existingBySetLogID = try await existingImportedPoints(
       studentID: studentID,
@@ -291,7 +293,8 @@ actor ImportedHistoryBackfill {
 extension ImportedHistoryBackfill {
   private func eligibleCandidates(
     studentID: UUID,
-    exerciseContext: ExerciseContext
+    exerciseContext: ExerciseContext,
+    onboardingProfile: OnboardingProfile?
   ) async throws -> [Candidate] {
     let allLogs = try await fetchWindow(studentID: studentID)
     return allLogs.compactMap { log in
@@ -300,14 +303,22 @@ extension ImportedHistoryBackfill {
           log.exerciseID ?? exerciseContext.exerciseIDByPlanExerciseID[log.planExerciseID]
       else { return nil }
 
-      let family = exerciseContext.exerciseByID[exerciseID]?.mainLiftFamily
+      // The competition resolver is the eligibility guard (spec 050 主项门):
+      // variants like RDL resolve to nil and must produce no point at all.
+      guard
+        let family = exerciseContext.exerciseByID[exerciseID].flatMap({
+          resolveCompetitionFamily(exercise: $0, onboarding: onboardingProfile)
+        })
+      else { return nil }
       let sourceWeightKg = NSDecimalNumber(decimal: log.weightKg).doubleValue
       let sourceRPE = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
-      guard E1RMEligibility.isEligible(reps: log.reps, rpe: sourceRPE, family: family),
+      let sourceCoachRPE = log.coachRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
+      let effectiveRPE = sourceCoachRPE ?? sourceRPE
+      guard E1RMEligibility.isEligible(reps: log.reps, rpe: effectiveRPE, family: family),
         let e1RMKg = E1RMCalculator.calculate(
           weightKg: sourceWeightKg,
           reps: log.reps,
-          rpe: sourceRPE
+          rpe: effectiveRPE
         )
       else { return nil }
 
@@ -317,7 +328,8 @@ extension ImportedHistoryBackfill {
         family: family,
         e1RMKg: e1RMKg,
         sourceWeightKg: sourceWeightKg,
-        sourceRPE: sourceRPE
+        sourceRPE: sourceRPE,
+        sourceCoachRPE: sourceCoachRPE
       )
     }
   }
@@ -396,12 +408,14 @@ extension ImportedHistoryBackfill {
       id: UUID(),
       studentId: studentID,
       exerciseId: candidate.exerciseID,
+      family: candidate.family,
       setLogId: candidate.log.id,
       computedAt: candidate.log.loggedAt,
       e1RMKg: candidate.e1RMKg,
       sourceWeightKg: candidate.sourceWeightKg,
       sourceReps: candidate.log.reps,
       sourceRPE: candidate.sourceRPE,
+      sourceCoachRPE: candidate.sourceCoachRPE,
       confidence: confidence,
       origin: .imported
     )

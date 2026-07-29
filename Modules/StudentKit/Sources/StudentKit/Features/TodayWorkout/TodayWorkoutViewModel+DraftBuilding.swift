@@ -14,7 +14,7 @@ extension TodayWorkoutViewModel {
     return Self.weightSuggestion(
       forSetID: setID,
       in: drafts,
-      currentE1RMKg: exerciseReferences[draft.exerciseID]?.best?.e1RMKg,
+      currentE1RMKg: suggestionE1RMByExercise[draft.exerciseID],
       lastLoggedWeightKg: lastWeightByExercise[draft.exerciseID]
     )
   }

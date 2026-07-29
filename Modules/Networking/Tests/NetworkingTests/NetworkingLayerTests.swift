@@ -77,6 +77,7 @@ import Testing
       "weight_kg": "100.00",
       "reps": 5,
       "rpe": "8.0",
+      "coach_rpe": "9.0",
       "completed": true,
       "logged_at": "2026-05-22T12:00:00Z"
     }
@@ -87,12 +88,36 @@ import Testing
 
   #expect(domain.weightKg == Decimal(100))
   #expect(domain.rpe == Decimal(8))
+  #expect(dto.coachRPE == Decimal(9))
+  #expect(domain.coachRPE == Decimal(9))
+  #expect(domain.effectiveRPE == Decimal(9))
   #expect(domain.completed)
   #expect(!domain.failed)
   #expect(dto.exerciseID == nil)
   #expect(domain.exerciseID == nil)
   #expect(!dto.assumed)
   #expect(!domain.assumed)
+}
+
+@Test func setLogDTODecodesMissingCoachRPEAsNil() throws {
+  let json = """
+    {
+      "id": "00000000-0000-4000-8000-000000000101",
+      "student_id": "00000000-0000-4000-8000-000000000102",
+      "plan_exercise_id": "00000000-0000-4000-8000-000000000103",
+      "set_index": 1,
+      "weight_kg": "100.00",
+      "reps": 5,
+      "rpe": "8.0",
+      "completed": true,
+      "logged_at": "2026-05-22T12:00:00Z"
+    }
+    """
+
+  let dto = try MeetPRCodec.decoder.decode(SetLogDTO.self, from: Data(json.utf8))
+
+  #expect(dto.coachRPE == nil)
+  #expect(dto.toDomain().coachRPE == nil)
 }
 
 @Test func setLogDTODecodesFailedTrueAndMapsToDomain() throws {

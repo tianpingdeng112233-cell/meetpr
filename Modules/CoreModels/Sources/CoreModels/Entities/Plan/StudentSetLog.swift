@@ -2,7 +2,8 @@ import Foundation
 
 /// A set the student actually recorded against a prescribed set.
 /// `setIndex` is the wire's zero-based `set_logs.set_index`.
-/// Wire shape (`GET /students/:id/sets`): weight_kg / rpe are Decimal-as-string.
+/// Wire shape (`GET /students/:id/sets`): weight_kg / rpe / coach_rpe are
+/// Decimal-as-string.
 public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
   public let id: UUID
   public let studentID: UUID
@@ -13,6 +14,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
   public let weightKg: Decimal
   public let reps: Int
   public let rpe: Decimal?
+  public let coachRPE: Decimal?
   public let completed: Bool
   public let failed: Bool
   public let assumed: Bool
@@ -27,6 +29,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
+    coachRPE: Decimal? = nil,
     completed: Bool,
     failed: Bool = false,
     assumed: Bool = false
@@ -40,6 +43,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     self.weightKg = weightKg
     self.reps = reps
     self.rpe = rpe
+    self.coachRPE = coachRPE
     self.completed = completed
     self.failed = failed
     self.assumed = assumed
@@ -56,6 +60,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     weightKg = try container.decodeDecimal(forKey: .weightKg)
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
+    coachRPE = try container.decodeDecimalIfPresent(forKey: .coachRPE)
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
     assumed = try container.decodeIfPresent(Bool.self, forKey: .assumed) ?? false
@@ -72,6 +77,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
+    try container.encodeDecimalStringIfPresent(coachRPE, forKey: .coachRPE)
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
     try container.encode(assumed, forKey: .assumed)
@@ -87,8 +93,15 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     case weightKg
     case reps
     case rpe
+    case coachRPE = "coachRpe"
     case completed
     case failed
     case assumed
+  }
+
+  /// Coach calibration is authoritative for strength calculations while the
+  /// student's own entry remains available for display and audit.
+  public var effectiveRPE: Decimal? {
+    coachRPE ?? rpe
   }
 }

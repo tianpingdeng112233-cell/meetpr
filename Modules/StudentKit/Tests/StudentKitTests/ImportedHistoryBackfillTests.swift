@@ -51,29 +51,32 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
     exerciseId: squat.exercise.id
   )
 
-  #expect(first.newImportedPointCount == 1)
+  #expect(first.newImportedPointCount == 2)
   #expect(second.newImportedPointCount == 0)
-  #expect(history.count == 1)
+  #expect(history.count == 2)
   #expect(history.first?.origin == .imported)
   #expect(history.first?.computedAt == eligible.loggedAt)
+  #expect(history.last?.computedAt == lowRPE.loggedAt)
   #expect(try await e1rm.unacknowledgedPRs(studentId: backfillStudentID).isEmpty)
 }
 
 @Test func logExerciseIDImportsWhenCurrentCycleIsEmpty() async throws {
-  let exerciseID = UUID()
+  // The current cycle is empty (planSlots: []) but the catalog still knows
+  // the competition lift — log.exerciseID alone must be enough to import.
+  let squat = backfillSlot(family: .squat)
   let log = backfillLog(
     planExerciseID: UUID(),
-    exerciseID: exerciseID,
+    exerciseID: squat.exercise.id,
     weightKg: 140,
     daysAgo: 40
   )
   let e1rm = InMemoryE1RMRepository()
-  let service = makeBackfill(logs: [log], slots: [], planSlots: [], e1rm: e1rm)
+  let service = makeBackfill(logs: [log], slots: [squat], planSlots: [], e1rm: e1rm)
 
   let result = try await service.backfill(studentID: backfillStudentID)
   let history = try await e1rm.fetchHistory(
     studentId: backfillStudentID,
-    exerciseId: exerciseID
+    exerciseId: squat.exercise.id
   )
 
   #expect(result.newImportedPointCount == 1)
@@ -97,6 +100,48 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
   #expect(log.exerciseID == nil)
   #expect(result.newImportedPointCount == 1)
   #expect(history.first?.setLogId == log.id)
+}
+
+@Test func importedVariationUsesCompetitionResolverAndDoesNotBlockMeasuredPR() async throws {
+  let rdl = backfillSlot(family: .deadlift, isCompetitionLift: false)
+  let importedRDL = backfillLog(
+    slot: rdl,
+    weightKg: 200,
+    reps: 5,
+    daysAgo: 40
+  )
+  let e1rm = InMemoryE1RMRepository()
+  let service = makeBackfill(logs: [importedRDL], slots: [rdl], e1rm: e1rm)
+
+  _ = try await service.backfill(studentID: backfillStudentID)
+  let rdlHistory = try await e1rm.fetchHistory(
+    studentId: backfillStudentID,
+    exerciseId: rdl.exercise.id
+  )
+  let deadliftFamilyHistory = try await e1rm.fetchHistory(
+    studentId: backfillStudentID,
+    family: .deadlift
+  )
+  let recorder = E1RMRecorder(e1rm: e1rm, now: { backfillNow })
+  let competitionDeadliftPR = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: backfillStudentID,
+      exerciseID: UUID(),
+      family: .deadlift,
+      setLogID: UUID(),
+      weightKg: 190,
+      reps: 1,
+      rpe: 10,
+      completed: true,
+      failed: false
+    )
+  )
+
+  // spec 050 主项门: variants produce no point at all, not a nil-family one.
+  #expect(rdlHistory.isEmpty)
+  #expect(deadliftFamilyHistory.isEmpty)
+  #expect(competitionDeadliftPR?.breakthroughWeightKg == 190)
+  #expect(competitionDeadliftPR?.previousMaxWeightKg == 0)
 }
 
 @Test func unresolvedLogWithoutExerciseIDIsSkipped() async throws {
@@ -267,15 +312,14 @@ private let backfillNow = Date(timeIntervalSince1970: 1_783_468_800)
   )
 
   let result = try await service.backfill(studentID: backfillStudentID)
-  let accessoryPoint = try #require(
-    try await e1rm.fetchHistory(
-      studentId: backfillStudentID,
-      exerciseId: accessory.exercise.id
-    ).first
+  let accessoryHistory = try await e1rm.fetchHistory(
+    studentId: backfillStudentID,
+    exerciseId: accessory.exercise.id
   )
 
   #expect(result.pendingReviews.map(\.family) == [.bench, .deadlift, .squat])
-  #expect(accessoryPoint.confidence == .normal)
+  // spec 050 主项门: accessory slots resolve to no family and produce no point.
+  #expect(accessoryHistory.isEmpty)
 }
 
 @Test func replayPreservesExistingImportedPointConfidence() async throws {
@@ -466,15 +510,21 @@ private actor GatedLogRepository: StudentTrainingLogRepository {
   }
 }
 
-private func backfillSlot(family: LiftFamily?) -> BackfillSlot {
-  BackfillSlot(
+private func backfillSlot(
+  family: LiftFamily?,
+  isCompetitionLift: Bool? = nil
+) -> BackfillSlot {
+  let competitionLift = isCompetitionLift ?? (family != nil)
+  return BackfillSlot(
     planExerciseID: UUID(),
     exercise: Exercise(
       id: UUID(),
       name: "测试动作",
-      exerciseType: family == nil ? .accessory : .mainLift,
+      exerciseType: family == nil
+        ? .accessory
+        : competitionLift ? .mainLift : .mainLiftVariation,
       mainLiftFamily: family,
-      isCompetitionLift: family != nil,
+      isCompetitionLift: competitionLift,
       muscleGroups: [.quad],
       equipment: [.barbell],
       createdAt: backfillNow

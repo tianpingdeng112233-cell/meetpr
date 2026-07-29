@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import CoreModels
 import Foundation
 import RepositoryContracts
@@ -150,6 +151,244 @@ import Testing
   #expect(points.first?.origin == .logged)
 }
 
+@Test func migrationChronologicallyReplaysNewlyEligibleLowRPEHistoryWithoutQuarantine() async throws
+{
+  let studentID = UUID()
+  let exercise = migrationExercise(family: .bench, isCompetitionLift: true)
+  let slot = StudentPlanExercise(
+    id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: [])
+  let anchor = Date(timeIntervalSince1970: 1_780_000_000)
+  let plan = StudentPlanView(
+    cycleID: UUID(),
+    weekIndex: 1,
+    startDate: anchor,
+    days: [StudentPlanDay(id: UUID(), date: anchor, exercises: [slot])]
+  )
+  let logs = [100, 130, 132].enumerated().map { offset, weight in
+    migrationLog(
+      studentID: studentID,
+      planExerciseID: slot.id,
+      weightKg: Decimal(weight),
+      date: anchor.addingTimeInterval(Double(offset) * 86_400),
+      rpe: 6
+    )
+  }
+  let e1rm = InMemoryE1RMRepository()
+  let migration = E1RMCompetitionLiftMigration(
+    logs: InMemoryStudentTrainingLogRepository(seed: logs),
+    onboarding: InMemoryOnboardingRepository(studentId: studentID),
+    plans: MigrationPlanRepository(plan: plan),
+    catalogReader: nil,
+    e1rm: e1rm,
+    marker: InMemoryE1RMMigrationStore(),
+    now: { anchor.addingTimeInterval(3 * 86_400) }
+  )
+
+  let result = try await migration.runIfNeeded(studentID: studentID)
+  let points = try await e1rm.fetchHistory(studentId: studentID, exerciseId: exercise.id)
+
+  #expect(result.pointCount == 3)
+  #expect(points.map(\.sourceWeightKg) == [100, 130, 132])
+  #expect(points.allSatisfy { $0.family == .bench })
+  #expect(points.allSatisfy { $0.sourceRPE == 6 && $0.confidence == .normal })
+  #expect(try await e1rm.unacknowledgedPRs(studentId: studentID).isEmpty)
+}
+
+@Test func migrationUsesCoachCalibrationForStudentE1RM() async throws {
+  let studentID = UUID()
+  let exercise = migrationExercise(family: .bench, isCompetitionLift: true)
+  let slot = StudentPlanExercise(
+    id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: [])
+  let anchor = Date(timeIntervalSince1970: 1_780_000_000)
+  let plan = StudentPlanView(
+    cycleID: UUID(),
+    weekIndex: 1,
+    startDate: anchor,
+    days: [StudentPlanDay(id: UUID(), date: anchor, exercises: [slot])]
+  )
+  let calibratedLog = migrationLog(
+    studentID: studentID,
+    planExerciseID: slot.id,
+    weightKg: 140,
+    date: anchor,
+    rpe: 6,
+    coachRPE: 8
+  )
+  let e1rm = InMemoryE1RMRepository()
+  let migration = E1RMCompetitionLiftMigration(
+    logs: InMemoryStudentTrainingLogRepository(seed: [calibratedLog]),
+    onboarding: InMemoryOnboardingRepository(studentId: studentID),
+    plans: MigrationPlanRepository(plan: plan),
+    catalogReader: nil,
+    e1rm: e1rm,
+    marker: InMemoryE1RMMigrationStore(),
+    now: { anchor.addingTimeInterval(86_400) }
+  )
+
+  _ = try await migration.runIfNeeded(studentID: studentID)
+  let point = try #require(
+    try await e1rm.fetchHistory(studentId: studentID, exerciseId: exercise.id).first
+  )
+
+  #expect(abs(point.e1RMKg - 179.49) < 0.01)
+  #expect(point.sourceRPE == 6)
+  #expect(point.sourceCoachRPE == 8)
+}
+
+// swiftlint:disable:next function_body_length
+@Test func migrationRebuildsWeightBaselineFromDeadliftSetThatCannotProducePoint() async throws {
+  let studentID = UUID()
+  let exercise = migrationExercise(family: .deadlift, isCompetitionLift: true)
+  let slot = StudentPlanExercise(
+    id: UUID(),
+    exercise: exercise,
+    sequenceIndex: 0,
+    prescribedSets: []
+  )
+  let anchor = Date(timeIntervalSince1970: 1_780_000_000)
+  let plan = StudentPlanView(
+    cycleID: UUID(),
+    weekIndex: 1,
+    startDate: anchor,
+    days: [StudentPlanDay(id: UUID(), date: anchor, exercises: [slot])]
+  )
+  let highRepRecord = migrationLog(
+    studentID: studentID,
+    planExerciseID: slot.id,
+    weightKg: 220,
+    date: anchor,
+    reps: 6
+  )
+  let profile = OnboardingProfile(
+    userId: studentID,
+    deadlift1RMKg: 217.5,
+    createdAt: anchor,
+    updatedAt: anchor
+  )
+  let e1rm = InMemoryE1RMRepository()
+  let migration = E1RMCompetitionLiftMigration(
+    logs: InMemoryStudentTrainingLogRepository(seed: [highRepRecord]),
+    onboarding: InMemoryOnboardingRepository(studentId: studentID, seed: profile),
+    plans: MigrationPlanRepository(plan: plan),
+    catalogReader: nil,
+    e1rm: e1rm,
+    marker: InMemoryE1RMMigrationStore(),
+    now: { anchor.addingTimeInterval(86_400) }
+  )
+
+  let result = try await migration.runIfNeeded(studentID: studentID)
+  let baseline = try await e1rm.fetchWeightBaseline(
+    studentId: studentID,
+    family: .deadlift
+  )
+  let replayedPREvents = try await e1rm.unacknowledgedPRs(studentId: studentID)
+  let recorder = E1RMRecorder(
+    e1rm: e1rm,
+    now: { anchor.addingTimeInterval(2 * 86_400) }
+  )
+  let belowPersistentRecord = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: studentID,
+      exerciseID: exercise.id,
+      family: .deadlift,
+      setLogID: UUID(),
+      weightKg: 215,
+      reps: 1,
+      rpe: 10,
+      completed: true,
+      failed: false,
+      registeredOneRMKg: 217.5
+    )
+  )
+  let abovePersistentRecord = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: studentID,
+      exerciseID: exercise.id,
+      family: .deadlift,
+      setLogID: UUID(),
+      weightKg: 222.5,
+      reps: 1,
+      rpe: 10,
+      completed: true,
+      failed: false,
+      registeredOneRMKg: 217.5
+    )
+  )
+
+  #expect(result.pointCount == 0)
+  #expect(baseline?.maxWeightKg == 220)
+  #expect(baseline?.setLogId == highRepRecord.id)
+  #expect(replayedPREvents.isEmpty)
+  #expect(try await e1rm.unacknowledgedPRs(studentId: studentID).count == 1)
+  #expect(belowPersistentRecord == nil)
+  #expect(abovePersistentRecord?.previousMaxWeightKg == 220)
+  #expect(abovePersistentRecord?.breakthroughWeightKg == 222.5)
+}
+
+// swiftlint:disable:next function_body_length
+@Test func migrationResolvesRetiredCycleLogByItsOwnExerciseID() async throws {
+  // The plan that prescribed this set left the current cycle, and the old
+  // rules produced no point for 220×6 — only log.exerciseID can resolve it.
+  let studentID = UUID()
+  let exercise = migrationExercise(family: .deadlift, isCompetitionLift: true)
+  let anchor = Date(timeIntervalSince1970: 1_780_000_000)
+  let emptyPlan = StudentPlanView(
+    cycleID: UUID(), weekIndex: 1, startDate: anchor, days: [])
+  let retiredLog = migrationLog(
+    studentID: studentID,
+    planExerciseID: UUID(),
+    exerciseID: exercise.id,
+    weightKg: 220,
+    date: anchor,
+    reps: 6
+  )
+  let profile = OnboardingProfile(
+    userId: studentID,
+    deadlift1RMKg: 217.5,
+    createdAt: anchor,
+    updatedAt: anchor
+  )
+  let e1rm = InMemoryE1RMRepository()
+  let migration = E1RMCompetitionLiftMigration(
+    logs: InMemoryStudentTrainingLogRepository(seed: [retiredLog]),
+    onboarding: InMemoryOnboardingRepository(studentId: studentID, seed: profile),
+    plans: MigrationPlanRepository(plan: emptyPlan),
+    catalogReader: MigrationCatalogReader(exercises: [exercise]),
+    e1rm: e1rm,
+    marker: InMemoryE1RMMigrationStore(),
+    now: { anchor.addingTimeInterval(86_400) }
+  )
+
+  _ = try await migration.runIfNeeded(studentID: studentID)
+  let baseline = try await e1rm.fetchWeightBaseline(
+    studentId: studentID,
+    family: .deadlift
+  )
+  let recorder = E1RMRecorder(
+    e1rm: e1rm,
+    now: { anchor.addingTimeInterval(2 * 86_400) }
+  )
+  let below = await recorder.record(
+    E1RMRecorder.Input(
+      studentID: studentID,
+      exerciseID: exercise.id,
+      family: .deadlift,
+      setLogID: UUID(),
+      weightKg: 215,
+      reps: 1,
+      rpe: 10,
+      completed: true,
+      failed: false,
+      registeredOneRMKg: 217.5
+    )
+  )
+
+  #expect(baseline?.maxWeightKg == 220)
+  #expect(baseline?.setLogId == retiredLog.id)
+  #expect(below == nil)
+}
+
+// swiftlint:disable:next function_body_length
 @Test func replacingHistoryPreservesOtherStudentsForBothRepositories() async throws {
   let otherStudentID = UUID()
   let migratedStudentID = UUID()
@@ -171,14 +410,42 @@ import Testing
     let replacement = migrationPoint(
       studentID: migratedStudentID, exerciseID: exercise.id, setLogID: UUID(), date: date,
       value: 140)
+    let otherBaseline = E1RMWeightBaseline(
+      studentId: otherStudentID,
+      family: .bench,
+      maxWeightKg: 120,
+      setLogId: UUID(),
+      achievedAt: date
+    )
+    let oldBaseline = E1RMWeightBaseline(
+      studentId: migratedStudentID,
+      family: .bench,
+      maxWeightKg: 130,
+      setLogId: UUID(),
+      achievedAt: date
+    )
+    let replacementBaseline = E1RMWeightBaseline(
+      studentId: migratedStudentID,
+      family: .bench,
+      maxWeightKg: 140,
+      setLogId: replacement.setLogId,
+      achievedAt: date
+    )
     try await repository.recordPoint(otherPoint)
     try await repository.recordPoint(oldPoint)
+    try await repository.recordWeightBaseline(otherBaseline)
+    try await repository.recordWeightBaseline(oldBaseline)
     try await repository.recordPR(
       PRBreakthroughEvent(
         id: UUID(), studentId: migratedStudentID, exerciseId: exercise.id,
         pointId: oldPoint.id, breakthroughE1RMKg: 130, previousMaxE1RMKg: 120,
         occurredAt: date, acknowledgedAt: nil))
-    try await repository.replaceHistory(studentId: migratedStudentID, with: [replacement])
+    try await repository.replaceHistory(
+      studentId: migratedStudentID,
+      with: [replacement],
+      weightBaselines: [replacementBaseline],
+      prEvents: []
+    )
 
     #expect(
       try await repository.fetchHistory(studentId: otherStudentID, exerciseId: exercise.id)
@@ -186,6 +453,16 @@ import Testing
     #expect(
       try await repository.fetchHistory(studentId: migratedStudentID, exerciseId: exercise.id)
         .map(\.e1RMKg) == [140])
+    #expect(
+      try await repository.fetchWeightBaseline(
+        studentId: otherStudentID,
+        family: .bench
+      ) == otherBaseline)
+    #expect(
+      try await repository.fetchWeightBaseline(
+        studentId: migratedStudentID,
+        family: .bench
+      ) == replacementBaseline)
     #expect(try await repository.unacknowledgedPRs(studentId: migratedStudentID).isEmpty)
   }
 }
@@ -264,13 +541,19 @@ private func migrationExercise(
 private func migrationLog(
   studentID: UUID,
   planExerciseID: UUID,
+  exerciseID: UUID? = nil,
   weightKg: Decimal,
   date: Date,
-  assumed: Bool = false
+  assumed: Bool = false,
+  reps: Int = 5,
+  rpe: Decimal? = 8,
+  coachRPE: Decimal? = nil
 ) -> StudentSetLog {
   StudentSetLog(
     id: UUID(), studentID: studentID, planExerciseID: planExerciseID,
-    setIndex: 0, loggedAt: date, weightKg: weightKg, reps: 5, rpe: 8,
+    exerciseID: exerciseID,
+    setIndex: 0, loggedAt: date, weightKg: weightKg, reps: reps, rpe: rpe,
+    coachRPE: coachRPE,
     completed: true, assumed: assumed)
 }
 

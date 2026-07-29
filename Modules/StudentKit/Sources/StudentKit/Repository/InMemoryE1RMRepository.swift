@@ -8,11 +8,18 @@ public actor InMemoryE1RMRepository: E1RMRepository {
     let exerciseId: UUID
   }
 
+  private struct WeightBaselineKey: Hashable {
+    let studentId: UUID
+    let family: LiftFamily
+  }
+
   private var points: [HistoryKey: [E1RMHistoryPoint]]
+  private var weightBaselines: [WeightBaselineKey: E1RMWeightBaseline]
   private var storedPREvents: [PRBreakthroughEvent]
 
   public init(
     seedPoints: [E1RMHistoryPoint] = [],
+    seedWeightBaselines: [E1RMWeightBaseline] = [],
     seedPRs: [PRBreakthroughEvent] = []
   ) {
     var grouped: [HistoryKey: [E1RMHistoryPoint]] = [:]
@@ -21,6 +28,14 @@ public actor InMemoryE1RMRepository: E1RMRepository {
         .append(point)
     }
     self.points = grouped
+    self.weightBaselines = Dictionary(
+      seedWeightBaselines.map {
+        (WeightBaselineKey(studentId: $0.studentId, family: $0.family), $0)
+      },
+      uniquingKeysWith: { existing, candidate in
+        existing.maxWeightKg >= candidate.maxWeightKg ? existing : candidate
+      }
+    )
     self.storedPREvents = seedPRs
   }
 
@@ -65,13 +80,27 @@ public actor InMemoryE1RMRepository: E1RMRepository {
     }
   }
 
-  public func replaceHistory(studentId: UUID, with replacement: [E1RMHistoryPoint]) async throws {
+  public func replaceHistory(
+    studentId: UUID,
+    with replacement: [E1RMHistoryPoint],
+    weightBaselines replacementBaselines: [E1RMWeightBaseline],
+    prEvents replacementPREvents: [PRBreakthroughEvent]
+  ) async throws {
     points = points.filter { $0.key.studentId != studentId }
     for point in replacement where point.studentId == studentId {
       points[HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId), default: []]
         .append(point)
     }
-    storedPREvents.removeAll { $0.studentId == studentId }
+    weightBaselines = weightBaselines.filter { $0.key.studentId != studentId }
+    for baseline in replacementBaselines where baseline.studentId == studentId {
+      let key = WeightBaselineKey(studentId: baseline.studentId, family: baseline.family)
+      if baseline.maxWeightKg > (weightBaselines[key]?.maxWeightKg ?? -.infinity) {
+        weightBaselines[key] = baseline
+      }
+    }
+    storedPREvents =
+      storedPREvents.filter { $0.studentId != studentId }
+      + replacementPREvents.filter { $0.studentId == studentId }
   }
 
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
@@ -88,6 +117,18 @@ public actor InMemoryE1RMRepository: E1RMRepository {
       result[exerciseId] = try await fetchHistory(studentId: studentId, exerciseId: exerciseId)
     }
     return result
+  }
+
+  public func fetchHistory(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> [E1RMHistoryPoint] {
+    points
+      .filter { $0.key.studentId == studentId }
+      .values
+      .flatMap { $0 }
+      .filter { $0.family == family }
+      .sorted { $0.computedAt < $1.computedAt }
   }
 
   public func maxBefore(
@@ -107,6 +148,32 @@ public actor InMemoryE1RMRepository: E1RMRepository {
       .max()
   }
 
+  @discardableResult
+  public func recordWeightBaseline(
+    _ candidate: E1RMWeightBaseline
+  ) async throws -> E1RMWeightBaseline? {
+    let key = WeightBaselineKey(studentId: candidate.studentId, family: candidate.family)
+    let previous = weightBaselines[key]
+    if candidate.maxWeightKg > (previous?.maxWeightKg ?? -.infinity) {
+      weightBaselines[key] = candidate
+    }
+    return previous
+  }
+
+  public func fetchWeightBaseline(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> E1RMWeightBaseline? {
+    weightBaselines[WeightBaselineKey(studentId: studentId, family: family)]
+  }
+
+  public func fetchWeightBaselines(studentId: UUID) async throws -> [E1RMWeightBaseline] {
+    weightBaselines
+      .filter { $0.key.studentId == studentId }
+      .values
+      .sorted { $0.family.rawValue < $1.family.rawValue }
+  }
+
   public func recordPR(_ event: PRBreakthroughEvent) async throws {
     storedPREvents.append(event)
   }
@@ -114,6 +181,15 @@ public actor InMemoryE1RMRepository: E1RMRepository {
   public func prEvents(studentId: UUID, since: Date) async throws -> [PRBreakthroughEvent] {
     storedPREvents
       .filter { $0.studentId == studentId && $0.occurredAt >= since }
+      .sorted { $0.occurredAt < $1.occurredAt }
+  }
+
+  public func fetchPRs(
+    studentId: UUID,
+    family: LiftFamily
+  ) async throws -> [PRBreakthroughEvent] {
+    storedPREvents
+      .filter { $0.studentId == studentId && $0.family == family }
       .sorted { $0.occurredAt < $1.occurredAt }
   }
 

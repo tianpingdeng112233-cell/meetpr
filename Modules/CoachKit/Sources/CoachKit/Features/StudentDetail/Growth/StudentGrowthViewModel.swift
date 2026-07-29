@@ -148,7 +148,7 @@ final class StudentGrowthViewModel {
     for log in logs where log.completed {
       guard let family = familyByPlanExerciseID[log.planExerciseID] else { continue }
       let weight = NSDecimalNumber(decimal: log.weightKg).doubleValue
-      let rpe = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
+      let rpe = log.effectiveRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
       guard
         let e1RMKg = E1RMCalculator.calculate(weightKg: weight, reps: log.reps, rpe: rpe)
       else { continue }

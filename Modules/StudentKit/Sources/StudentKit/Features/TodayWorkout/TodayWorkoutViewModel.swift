@@ -25,6 +25,8 @@ public final class TodayWorkoutViewModel {
   public private(set) var showsRestTimerExplanation = false
   public private(set) var planContext: TodayWorkoutPlanContext?
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
+  /// Best trusted e1RM under the stricter suggestion-only RPE policy.
+  public private(set) var suggestionE1RMByExercise: [UUID: Double] = [:]
   /// Latest logged weight per catalog exercise (variation/accessory fill).
   public private(set) var lastWeightByExercise: [UUID: Decimal] = [:]
   public private(set) var actionErrorMessage: String?
@@ -79,19 +81,24 @@ public final class TodayWorkoutViewModel {
       guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
         guard isCurrentLoad(generation) else { return }
         exerciseReferences = [:]
+        suggestionE1RMByExercise = [:]
         state = .rest
         return
       }
       let dayRange = Self.dayRange(containing: day.date, calendar: calendar)
       let existingLogs = try await logs.fetchLogs(studentID: studentID, in: dayRange)
       let drafts = Self.makeDrafts(for: day, existingLogs: existingLogs)
-      let references = try await exerciseReferences(for: day, studentID: studentID)
+      let referenceSnapshot = try await exerciseReferenceSnapshot(
+        for: day,
+        studentID: studentID
+      )
       // Best-effort: the last-weight fill must never fail the day load.
       let historyLogs =
         (try? await logs.fetchLogs(
           studentID: studentID, in: Self.lastWeightHistoryRange(before: day.date))) ?? []
       guard isCurrentLoad(generation) else { return }
-      exerciseReferences = references
+      exerciseReferences = referenceSnapshot.references
+      suggestionE1RMByExercise = referenceSnapshot.suggestionE1RMByExercise
       lastWeightByExercise = Self.lastWeights(
         from: historyLogs,
         planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day)
@@ -345,10 +352,13 @@ public final class TodayWorkoutViewModel {
 
 @available(iOS 17.0, macOS 14.0, *)
 extension TodayWorkoutViewModel {
-  func exerciseReferences(
+  func exerciseReferenceSnapshot(
     for day: StudentPlanDay,
     studentID: UUID
-  ) async throws -> [UUID: ExerciseReference] {
+  ) async throws -> (
+    references: [UUID: ExerciseReference],
+    suggestionE1RMByExercise: [UUID: Double]
+  ) {
     let familyByExercise = Dictionary(
       day.exercises.map {
         (
@@ -360,29 +370,44 @@ extension TodayWorkoutViewModel {
     )
     let exerciseIDs = Set(day.exercises.map(\.exercise.id))
     let e1rmRepo = self.e1rmRepo
-    return try await withThrowingTaskGroup(of: (UUID, ExerciseReference?).self) { group in
+    return try await withThrowingTaskGroup(
+      of: (UUID, ExerciseReference?, Double?).self
+    ) { group in
       for exerciseID in exerciseIDs {
         let family = familyByExercise[exerciseID].flatMap { $0 }
         group.addTask {
           let points = try await e1rmRepo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
-          let selected = lastAndBest(
-            from: E1RMSeries.trustedEligibleRaw(points: points, family: family)
-          )
+          let displayPoints = E1RMSeries.trustedEligibleRaw(points: points, family: family)
+          let selected = lastAndBest(from: displayPoints)
           let reference = ExerciseReference(
             last: selected.last.map(ExerciseReferenceSet.init(point:)),
             best: selected.best.map(ExerciseReferenceSet.init(point:))
           )
-          return (exerciseID, reference.hasValue ? reference : nil)
+          let suggestionE1RM = E1RMSeries.trustedSuggestionEligibleRaw(
+            points: points,
+            family: family
+          )
+          .map(\.e1RMKg)
+          .max()
+          return (
+            exerciseID,
+            reference.hasValue ? reference : nil,
+            suggestionE1RM
+          )
         }
       }
 
       var references: [UUID: ExerciseReference] = [:]
-      for try await (exerciseID, reference) in group {
+      var suggestionE1RMByExercise: [UUID: Double] = [:]
+      for try await (exerciseID, reference, suggestionE1RM) in group {
         if let reference {
           references[exerciseID] = reference
         }
+        if let suggestionE1RM {
+          suggestionE1RMByExercise[exerciseID] = suggestionE1RM
+        }
       }
-      return references
+      return (references, suggestionE1RMByExercise)
     }
   }
 
@@ -392,17 +417,20 @@ extension TodayWorkoutViewModel {
     studentID: UUID
   ) async {
     let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
+    let family = exerciseFamily(planExerciseID: draft.planExerciseID)
     let event = await recorder.record(
       E1RMRecorder.Input(
         studentID: studentID,
         exerciseID: draft.exerciseID,
-        family: exerciseFamily(planExerciseID: draft.planExerciseID),
+        family: family,
         setLogID: log.id,
         weightKg: log.weightKg,
         reps: log.reps,
-        rpe: draft.actualRPE,
+        rpe: log.rpe,
+        coachRPE: log.coachRPE,
         completed: log.completed,
-        failed: log.failed
+        failed: log.failed,
+        registeredOneRMKg: onboardingProfile?.registeredOneRMKg(for: family)
       )
     )
     if let event {
@@ -422,6 +450,7 @@ extension TodayWorkoutViewModel {
     else { return nil }
     return resolveCompetitionFamily(exercise: exercise, onboarding: onboardingProfile)
   }
+
 }
 
 // MARK: - Persist serialization
