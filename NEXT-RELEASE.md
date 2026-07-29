@@ -11,7 +11,17 @@
 
 ## 本版将包含(落线后追加到这里)
 
-- (暂无候选)
+- **学员端黑金 v3 UI 全量重做**(PR #279 已合 `dd699fc`,2026-07-29):今日 / 训练 / 成长 / 我的
+  四屏 + 记录链路(SetEntry / 数字键盘 / 组间休息)+ 收官 overlay(结算庆祝 / 训练回顾 / 顺延 /
+  反馈档案)+ 七个空状态 + 动效逐参对齐 + 通知并入聊天。**双主题,默认浅色**(我的 → 外观 可切
+  跟随系统 / 深色);教练端与登录流保持恒暗、全程零 diff。设计系统正典落
+  `docs/design/handoff-v3/DESIGN-SYSTEM-CANON.md`(⚖️ David:今后学员端 iOS 新设计以它为准)。
+  - 合并同时把发版线 spec 029(C0 组号契约 / C2a-c 组引用卡与「问教练」)接进 v3 各面,
+    功能不回归;**遗留视觉债**:组引用卡与分享选择器仍是 ChatUI 现成样式,黑金化是下一张卡
+    (清单见 `docs/design/handoff-v3/SETREF-BRIDGE-PHASE1-RECEIPT.md` 末节)。
+  - 闸门:每卡 review-loop CLEAN(累计 100+ blocker)、全量 SPM 1439 绿、三 configuration
+    build 0 warning、lint/format strict 零、CI 三项绿。
+  - ⚠️ 上包前建议真机走一遍学员端主链路(本波全部验证在 iPhone 17 模拟器完成)。
 
 ## 🕐 已完工、等前置解锁(还没落线,落线后挪到上面)
 
