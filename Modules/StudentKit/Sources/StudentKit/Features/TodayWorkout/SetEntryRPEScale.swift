@@ -2,68 +2,43 @@ import DesignSystem
 import Foundation
 import SwiftUI
 
-/// Pure RPE scale contract from `SE_RIR` and `seTicks`.
-enum SetEntryRPE {
-  static let minValue = 5.0
-  static let maxValue = 10.0
-  static let step = 0.5
-  static let cellCount = 11
-
-  static let descriptions = [
-    "还能多做 5 次",
-    "还能多做 4-5 次",
-    "还能多做 4 次",
-    "还能多做 3-4 次",
-    "还能多做 3 次",
-    "还能多做 2-3 次",
-    "还能多做 2 次",
-    "还能多做 1-2 次",
-    "还能多做 1 次",
-    "或许还能多做 1 次",
-    "力竭，无保留",
-  ]
-
-  static func snap(_ value: Double) -> Double {
-    min(maxValue, max(minValue, (value * 2).rounded() / 2))
-  }
-
-  static func value(atX x: Double, width: Double) -> Double {
-    guard width > 0 else { return minValue }
-    let raw = Int((x / width * Double(cellCount)).rounded(.down))
-    let index = min(cellCount - 1, max(0, raw))
-    return minValue + Double(index) * step
-  }
-
-  static func description(_ value: Double) -> String {
-    descriptions[Int(((snap(value) - minValue) * 2).rounded())]
-  }
-
-  static func text(_ value: Double) -> String {
-    snap(value).formatted(.number.precision(.fractionLength(1)))
-  }
-
-  static func barHeight(for value: Double, selectedValue: Double) -> CGFloat {
-    if abs(value - snap(selectedValue)) < 0.01 {
-      return 32
-    }
-    return value.truncatingRemainder(dividingBy: 1) == 0 ? 22 : 13
-  }
-
-  static func isLit(_ value: Double, selectedValue: Double) -> Bool {
-    value <= snap(selectedValue) + 0.01
-  }
-}
-
 /// Eleven-stop v3 RPE selector. Tap and horizontal scrub both write through the
 /// same binding; vertical movement remains available to the enclosing scroll.
+///
+/// A cell is only ~30pt wide on a 393pt phone — under the 44pt touch minimum —
+/// so scrubbing precision rests on three things (David 2026-07-29, after
+/// "老是选错"): the finger never loses sight of the active stop (the bubble
+/// tracks it above the strip), lifting off never re-reads the touch point, and
+/// a gesture that turns out to be a scroll can never write a value.
 @available(iOS 17.0, macOS 14.0, *)
 struct SetEntryRPEScale: View {
   @Binding var value: Double
-  @State private var previewValue: Double?
+  @State private var bubbleWidth: CGFloat = 0
+  /// What this gesture turned out to mean. Written and read only by
+  /// `onChanged`/`onEnded` — one chain, in the order SwiftUI defines for a
+  /// single gesture. Nothing else touches it, so the release decision can never
+  /// race anything.
+  @State private var scrubIntent = SetEntryRPE.ScrubIntent.idle
+  /// Start point of the gesture `scrubIntent` describes. A cancelled gesture
+  /// skips `onEnded` and leaves the intent behind; the next gesture notices the
+  /// start point moved and rearms itself, so no cleanup has to happen outside
+  /// this one chain.
+  @State private var activeStart: CGPoint?
+  /// Display only, never consulted when writing: `@GestureState` is restored on
+  /// both endings, so a cancelled scrub drops the bubble immediately instead of
+  /// leaving it stranded until the next touch.
+  @GestureState private var isTouchDown = false
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+  /// There is no previewed-vs-committed split: a scrub writes the binding live,
+  /// so what the student sees *is* what is stored. Releasing changes nothing,
+  /// which is exactly what keeps lift-off drift from moving the value.
   private var activeValue: Double {
-    SetEntryRPE.snap(previewValue ?? value)
+    SetEntryRPE.snap(value)
+  }
+
+  private var isScrubbing: Bool {
+    isTouchDown && scrubIntent == .scrub
   }
 
   var body: some View {
@@ -102,80 +77,153 @@ struct SetEntryRPEScale: View {
       Spacer(minLength: MeetPRSpacing.space2)
 
       // The mockup always shows `SE_RIR[seIdx]` for the active value — even
-      // mid-scrub there is no "release to confirm" copy.
+      // mid-scrub there is no "release to confirm" copy. It only steps aside
+      // while the bubble is up, which carries the same copy over the finger.
       Text(SetEntryRPE.description(activeValue))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
         .lineLimit(1)
         .minimumScaleFactor(0.8)
+        .opacity(isScrubbing ? 0 : 1)
     }
   }
 
   private var tickStrip: some View {
     GeometryReader { proxy in
-      HStack(alignment: .bottom, spacing: MeetPRSpacing.point3) {
-        ForEach(0..<SetEntryRPE.cellCount, id: \.self) { index in
-          let tickValue = SetEntryRPE.minValue + Double(index) * SetEntryRPE.step
-          tickButton(value: tickValue)
+      ZStack(alignment: .topLeading) {
+        HStack(alignment: .bottom, spacing: MeetPRSpacing.point3) {
+          ForEach(0..<SetEntryRPE.cellCount, id: \.self) { index in
+            let tickValue = SetEntryRPE.minValue + Double(index) * SetEntryRPE.step
+            tickBar(value: tickValue)
+          }
+        }
+        .frame(width: proxy.size.width, height: 48, alignment: .bottom)
+        .contentShape(.rect)
+        // One gesture owns every write. The ticks used to be Buttons, which gave
+        // a tap a second, unarbitrated path to the binding: a short drag could
+        // fire both, and whichever ran last won.
+        .simultaneousGesture(scrubGesture(width: proxy.size.width))
+
+        if isScrubbing {
+          scrubBubble
+            .offset(x: bubbleOffset(stripWidth: proxy.size.width), y: -MeetPRSpacing.point36)
+            // The strip's easeOut belongs to the bars. Inheriting it here made
+            // the bubble chase the finger a frame-run behind on a fast scrub.
+            .animation(nil, value: activeValue)
+            .allowsHitTesting(false)
+            .transition(.opacity)
         }
       }
-      .frame(width: proxy.size.width, height: 48, alignment: .bottom)
-      .contentShape(.rect)
-      .simultaneousGesture(scrubGesture(width: proxy.size.width))
     }
     .frame(height: 48)
     .animation(reduceMotion ? nil : MeetPRMotion.easeOut, value: activeValue)
+    .animation(reduceMotion ? nil : MeetPRMotion.easeOut, value: isScrubbing)
     .sensoryFeedback(.selection, trigger: activeValue)
   }
 
-  private func tickButton(value tickValue: Double) -> some View {
+  // MARK: - Scrub bubble
+  //
+  // No mockup source: the v3 design pack has no finger-tracking readout for this
+  // control. David picked option B on 2026-07-29 and this shape is the
+  // implementation's own — gold500 to read as "this is the selected stop",
+  // reusing the header's two pieces of copy so nothing new is invented.
+
+  private var scrubBubble: some View {
+    HStack(spacing: MeetPRSpacing.point6) {
+      Text(SetEntryRPE.text(activeValue))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .bold))
+        .monospacedDigit()
+
+      Text(SetEntryRPE.description(activeValue))
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+    }
+    .foregroundStyle(Color.MeetPR.inkOnGold)
+    .lineLimit(1)
+    .fixedSize()
+    .padding(.horizontal, MeetPRSpacing.point10)
+    .padding(.vertical, MeetPRSpacing.point6)
+    .background(Capsule().fill(Color.MeetPR.gold500))
+    .background(
+      GeometryReader { bubble in
+        Color.clear.preference(key: ScrubBubbleWidthKey.self, value: bubble.size.width)
+      }
+    )
+    .onPreferenceChange(ScrubBubbleWidthKey.self) { bubbleWidth = $0 }
+  }
+
+  /// Centre the bubble over the active tick, then keep it inside the strip so a
+  /// stop at either end still reads fully.
+  private func bubbleOffset(stripWidth: CGFloat) -> CGFloat {
+    let center = SetEntryRPE.centerX(
+      ofIndex: SetEntryRPE.index(for: activeValue),
+      width: stripWidth,
+      spacing: MeetPRSpacing.point3
+    )
+    return min(max(0, center - bubbleWidth / 2), max(0, stripWidth - bubbleWidth))
+  }
+
+  /// Pure presentation. VoiceOver reaches the control through the card's own
+  /// adjustable action — the card is `.accessibilityElement(children: .ignore)`,
+  /// so per-tick labels were never surfaced anyway.
+  private func tickBar(value tickValue: Double) -> some View {
     let isWhole = tickValue.truncatingRemainder(dividingBy: 1) == 0
     let isSelected = abs(tickValue - activeValue) < 0.01
     let labelIsLit = isSelected || (isWhole && abs(tickValue - activeValue) < 0.3)
 
-    return Button {
-      value = tickValue
-    } label: {
-      VStack(spacing: MeetPRSpacing.point6) {
-        ZStack(alignment: .bottom) {
-          Color.clear.frame(height: 32)
-          RoundedRectangle(cornerRadius: MeetPRSpacing.point3)
-            .fill(barColor(value: tickValue, selected: isSelected))
-            .frame(
-              width: MeetPRSpacing.point6,
-              height: SetEntryRPE.barHeight(for: tickValue, selectedValue: activeValue)
-            )
-        }
-
-        Text(isWhole ? Int(tickValue).formatted() : "")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
-          .foregroundStyle(labelIsLit ? Color.MeetPR.textPrimary : Self.inactiveLabel)
-          .frame(height: MeetPRSpacing.point14)
+    return VStack(spacing: MeetPRSpacing.point6) {
+      ZStack(alignment: .bottom) {
+        Color.clear.frame(height: 32)
+        RoundedRectangle(cornerRadius: MeetPRSpacing.point3)
+          .fill(barColor(value: tickValue, selected: isSelected))
+          .frame(
+            width: MeetPRSpacing.point6,
+            height: SetEntryRPE.barHeight(for: tickValue, selectedValue: activeValue)
+          )
       }
-      .frame(maxWidth: .infinity)
+
+      Text(isWhole ? Int(tickValue).formatted() : "")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+        .foregroundStyle(labelIsLit ? Color.MeetPR.textPrimary : Self.inactiveLabel)
+        .frame(height: MeetPRSpacing.point14)
     }
-    .buttonStyle(.plain)
-    .accessibilityLabel("RPE \(SetEntryRPE.text(tickValue))")
+    .frame(maxWidth: .infinity)
   }
 
   private func scrubGesture(width: CGFloat) -> some Gesture {
     DragGesture(minimumDistance: 0)
+      .updating($isTouchDown) { _, touching, _ in touching = true }
       .onChanged { gesture in
-        guard isHorizontal(gesture) else {
-          previewValue = nil
-          return
+        // Rearm if this is a different gesture than the one the intent belongs
+        // to — the cancellation path, handled inside the same chain that reads
+        // the intent rather than by an outside observer that could race it.
+        if activeStart != gesture.startLocation {
+          activeStart = gesture.startLocation
+          scrubIntent = .idle
         }
-        previewValue = SetEntryRPE.value(atX: gesture.location.x, width: width)
+        // Lock the intent and act on it in the same callback: the frame that
+        // first crosses the threshold is also the frame that starts writing,
+        // so no movement can slip through unrecorded.
+        scrubIntent = SetEntryRPE.lockedIntent(
+          current: scrubIntent, translation: gesture.translation)
+        guard scrubIntent == .scrub else { return }
+        value = SetEntryRPE.value(
+          atX: gesture.location.x, width: width, spacing: MeetPRSpacing.point3)
       }
       .onEnded { gesture in
-        defer { previewValue = nil }
-        guard isHorizontal(gesture) else { return }
-        value = SetEntryRPE.value(atX: gesture.location.x, width: width)
+        defer {
+          scrubIntent = .idle
+          activeStart = nil
+        }
+        // A scrub has already written every value the student saw, so release
+        // deliberately does nothing — the points a finger drifts on lift-off
+        // can't push it to the neighbouring stop. A scroll must never write.
+        // Only a touch that stayed put is a tap. This asks the locked intent
+        // rather than the final translation, so a scroll that wanders back to
+        // where it started is still a scroll.
+        guard SetEntryRPE.commitsOnRelease(intent: scrubIntent) else { return }
+        value = SetEntryRPE.value(
+          atX: gesture.location.x, width: width, spacing: MeetPRSpacing.point3)
       }
-  }
-
-  private func isHorizontal(_ gesture: DragGesture.Value) -> Bool {
-    abs(gesture.translation.width) >= abs(gesture.translation.height)
   }
 
   private func barColor(value tickValue: Double, selected: Bool) -> Color {
@@ -199,6 +247,16 @@ struct SetEntryRPEScale: View {
     dark: Color(red: 44 / 255, green: 44 / 255, blue: 46 / 255)
   )
   private static let inactiveLabel = Color(red: 82 / 255, green: 82 / 255, blue: 82 / 255)
+}
+
+/// Measured width of the scrub bubble, so it can be centred over the active
+/// tick without overhanging the strip.
+private struct ScrubBubbleWidthKey: PreferenceKey {
+  static let defaultValue: CGFloat = 0
+
+  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+    value = nextValue()
+  }
 }
 
 #Preview("RPE · Every Stop · Dark") {
