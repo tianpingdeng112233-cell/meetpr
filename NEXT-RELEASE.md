@@ -110,7 +110,10 @@
   (三次实测恒为 `342×16 @ y=69`,而网格 154pt)。必须走显式 `tap → isFocused = true`。
   详见 `~/Brain/wiki/projects/MeetPR/reviews/2026-07-30-bind-flow-v3-light.md`。
 
-## 🎯 已排上但未开工
+
+## 不进 1.0(16) —— 留下一班车
+
+⚖️ 2026-07-31 切包时核实后移出「本版将包含」。**登记在此不等于已排期**,下次切包前重新核。
 
 - **spec 062 学员端统一收件口**:SPEC.md 已写好(19KB,Draft/T3,David 07-25 三拍)但**从未提交**,只存在于 `~/Projects/apps/MeetPR-release` 工作区,未跟踪。开工前先把它落进仓里。
 
@@ -133,3 +136,12 @@
 
 ## 收尾约定
 archive 上传后:把「本版将包含」挪进 RELEASES.md 作 1.0(N) 一节,清空本文件、目标号 +1。
+
+**移出理由**:
+- **wellness**:硬前置 backend PR #95(迁移 0047)**仍是 OPEN、未部署 staging**。旧后端
+  `ReadinessBodySchema` 走 `.strict()`,会把新增的 `energy` 字段当未知字段 **400 掉**,
+  学员 readiness 提交将全数失败。顺序不变:#95 合并 → 部署 staging → #273 合并 → 进下一包。
+- **spec 062**:SPEC 至今**未提交**,只存在于 `~/Projects/apps/MeetPR-release` 工作区(未跟踪),
+  且是文档不影响包体。落进仓里之后再谈排期。
+
+## 🎯 已排上但未开工
