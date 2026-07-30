@@ -10,6 +10,9 @@ struct ChatMessageRow: View {
   let openVideo: @MainActor () -> Void
   let imageLoaded: @MainActor () -> Void
   let imageFailed: @MainActor () async -> Void
+  let outgoingBubbleColor: Color
+  let incomingBubbleColor: Color
+  let bubbleLayout: ChatBubbleLayout
 
   var body: some View {
     HStack {
@@ -25,7 +28,10 @@ struct ChatMessageRow: View {
           openImage: openImage,
           openVideo: openVideo,
           imageLoaded: imageLoaded,
-          imageFailed: imageFailed
+          imageFailed: imageFailed,
+          outgoingBubbleColor: outgoingBubbleColor,
+          incomingBubbleColor: incomingBubbleColor,
+          bubbleLayout: bubbleLayout
         )
 
         if ChatSetCardPresentation(message: message) == nil, let deliveryStatus {
@@ -50,6 +56,9 @@ private struct ChatMessageBubble: View {
   let openVideo: @MainActor () -> Void
   let imageLoaded: @MainActor () -> Void
   let imageFailed: @MainActor () async -> Void
+  let outgoingBubbleColor: Color
+  let incomingBubbleColor: Color
+  let bubbleLayout: ChatBubbleLayout
 
   var body: some View {
     Group {
@@ -69,7 +78,7 @@ private struct ChatMessageBubble: View {
           // two-character reply into a full-width bar, since the background is
           // applied after the frame.
           Text(message.text ?? "")
-            .font(.body)
+            .font(messageFont)
             .foregroundStyle(isCurrentUser ? .white : Color.MeetPR.textPrimary)
             .multilineTextAlignment(isCurrentUser ? .trailing : .leading)
             .fixedSize(horizontal: false, vertical: true)
@@ -98,12 +107,50 @@ private struct ChatMessageBubble: View {
     }
     .background(
       ChatSetCardPresentation(message: message) == nil
-        ? (isCurrentUser ? Color.MeetPR.goldCTA : Color.MeetPR.surfaceElevated)
+        ? (isCurrentUser ? outgoingBubbleColor : incomingBubbleColor)
         : Color.clear
     )
-    .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
+    .clipShape(bubbleShape)
   }
 
+  private var messageFont: Font {
+    switch bubbleLayout {
+    case .uniform:
+      .body
+    case .directional:
+      .MeetPR.body(
+        size: MeetPRFontMetrics.size14,
+        weight: isCurrentUser ? .medium : .regular
+      )
+    }
+  }
+
+  private var bubbleShape: AnyShape {
+    switch bubbleLayout {
+    case .uniform:
+      AnyShape(.rect(cornerRadius: MeetPRRadius.xl))
+    case .directional:
+      if isCurrentUser {
+        AnyShape(
+          .rect(
+            topLeadingRadius: MeetPRRadius.xl,
+            bottomLeadingRadius: MeetPRRadius.xl,
+            bottomTrailingRadius: MeetPRSpacing.point5,
+            topTrailingRadius: MeetPRRadius.xl
+          )
+        )
+      } else {
+        AnyShape(
+          .rect(
+            topLeadingRadius: MeetPRRadius.xl,
+            bottomLeadingRadius: MeetPRSpacing.point5,
+            bottomTrailingRadius: MeetPRRadius.xl,
+            topTrailingRadius: MeetPRRadius.xl
+          )
+        )
+      }
+    }
+  }
 }
 
 private struct ChatRemoteImage: View {
@@ -160,6 +207,8 @@ private struct ChatImagePlaceholder: View {
 struct PendingChatMessageRow: View {
   let item: ChatOutboxItem
   let retry: @MainActor () -> Void
+  let outgoingBubbleColor: Color
+  let bubbleLayout: ChatBubbleLayout
 
   var body: some View {
     HStack {
@@ -183,8 +232,8 @@ struct PendingChatMessageRow: View {
         // Hugs its content, same as a confirmed bubble — otherwise a short
         // message in flight is a full-width bar that then snaps narrow on
         // confirmation.
-        .background(Color.MeetPR.goldCTA.opacity(0.72))
-        .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
+        .background(outgoingBubbleColor.opacity(0.72))
+        .clipShape(pendingBubbleShape)
 
         switch item.state {
         case .sending:
@@ -203,6 +252,22 @@ struct PendingChatMessageRow: View {
           EmptyView()
         }
       }
+    }
+  }
+
+  private var pendingBubbleShape: AnyShape {
+    switch bubbleLayout {
+    case .uniform:
+      AnyShape(.rect(cornerRadius: MeetPRRadius.xl))
+    case .directional:
+      AnyShape(
+        .rect(
+          topLeadingRadius: MeetPRRadius.xl,
+          bottomLeadingRadius: MeetPRRadius.xl,
+          bottomTrailingRadius: MeetPRSpacing.point5,
+          topTrailingRadius: MeetPRRadius.xl
+        )
+      )
     }
   }
 }

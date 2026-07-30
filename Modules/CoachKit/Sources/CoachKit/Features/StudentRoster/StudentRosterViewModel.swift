@@ -5,19 +5,26 @@ import RepositoryContracts
 
 struct StudentRosterRowModel: Hashable, Identifiable, Sendable {
   let student: CoachStudentSummary
-  let plannedTrainingDays: Int
-  let completedTrainingDays: Int
   let lastActiveAt: Date?
   let triageSignals: [TriageSignal]
+  let trainingDays: [CoachWeekOverview.TrainingDay]
+
+  init(
+    student: CoachStudentSummary,
+    lastActiveAt: Date?,
+    triageSignals: [TriageSignal],
+    trainingDays: [CoachWeekOverview.TrainingDay] = []
+  ) {
+    self.student = student
+    self.lastActiveAt = lastActiveAt
+    self.triageSignals = triageSignals
+    self.trainingDays = trainingDays
+  }
 
   var id: UUID { student.id }
 
   var needsAttention: Bool {
     !triageSignals.isEmpty
-  }
-
-  var completionText: String {
-    "本周完成 \(completedTrainingDays)/\(plannedTrainingDays) 训练"
   }
 
   var statusText: String {
@@ -101,10 +108,9 @@ final class StudentRosterViewModel {
           displayName: row.student.displayName,
           status: .active
         ),
-        plannedTrainingDays: row.plannedTrainingDays,
-        completedTrainingDays: row.completedTrainingDays,
         lastActiveAt: row.lastActiveAt,
-        triageSignals: row.triageSignals
+        triageSignals: row.triageSignals,
+        trainingDays: row.trainingDays
       )
     }
   }
@@ -158,6 +164,10 @@ final class StudentRosterViewModel {
     }
   }
 
+  /// 计划日与完成日志配对的时间窗:±36h 覆盖任何时区/DST 偏移,
+  /// 又不至于把整份日志挂到每一个训练日上。
+  private static let logPairingWindow: TimeInterval = 36 * 60 * 60
+
   private static func loadRow(
     for summary: CoachStudentSummary,
     plans: any StudentPlanRepository,
@@ -181,10 +191,9 @@ final class StudentRosterViewModel {
     } catch {
       return StudentRosterRowModel(
         student: summary,
-        plannedTrainingDays: 0,
-        completedTrainingDays: 0,
         lastActiveAt: nil,
-        triageSignals: []
+        triageSignals: [],
+        trainingDays: []
       )
     }
   }
@@ -197,10 +206,17 @@ final class StudentRosterViewModel {
     now: Date
   ) -> StudentRosterRowModel {
     let plannedDays = plan?.days.filter { !$0.exercises.isEmpty } ?? []
-    let completedDays = plannedDays.filter { day in
-      logs.contains { log in
-        log.completed && CoachFeatureCalendar.isSameDay(log.loggedAt, day.date)
-      }
+    // 完成态不在这里固化:只把「可能与这一天配对」的完成日志时间戳带下去,
+    // 由 CoachWeekOverview 聚合时用同一份 calendar 现场判定(见 TrainingDay 注释)。
+    // ±36h 足够覆盖任何时区/DST 偏移,又不会把整份日志挂到每一天上。
+    let completedLogDates = logs.filter(\.completed).map(\.loggedAt)
+    let trainingDays = plannedDays.map { day in
+      CoachWeekOverview.TrainingDay(
+        date: day.date,
+        completedLogDates: completedLogDates.filter {
+          abs($0.timeIntervalSince(day.date)) <= Self.logPairingWindow
+        }
+      )
     }
     let latestLog = logs.filter(\.completed).map(\.loggedAt).max()
     let triageSignals = StudentTriageSignalCalculator.signals(
@@ -213,10 +229,9 @@ final class StudentRosterViewModel {
 
     return StudentRosterRowModel(
       student: summary,
-      plannedTrainingDays: plannedDays.count,
-      completedTrainingDays: completedDays.count,
       lastActiveAt: latestLog,
-      triageSignals: triageSignals
+      triageSignals: triageSignals,
+      trainingDays: trainingDays
     )
   }
 

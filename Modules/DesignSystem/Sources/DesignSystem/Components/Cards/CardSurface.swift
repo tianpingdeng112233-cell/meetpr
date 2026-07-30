@@ -21,14 +21,21 @@ public struct MeetPRCardSurface: ViewModifier {
 
   private let elevation: Elevation
   private let fill: Color?
+  private let cornerRadiusOverride: CGFloat?
 
-  public init(elevation: Elevation = .card, fill: Color? = nil) {
+  public init(
+    elevation: Elevation = .card,
+    fill: Color? = nil,
+    cornerRadius: CGFloat? = nil
+  ) {
     self.elevation = elevation
     self.fill = fill
+    cornerRadiusOverride = cornerRadius
   }
 
   private var cornerRadius: CGFloat {
-    switch elevation {
+    if let cornerRadiusOverride { return cornerRadiusOverride }
+    return switch elevation {
     case .card: MeetPRRadius.card
     case .inset: MeetPRRadius.chip
     case .modal: MeetPRRadius.modal
@@ -105,8 +112,15 @@ extension View {
   /// See ``MeetPRCardSurface``.
   public func meetPRCardSurface(
     _ elevation: MeetPRCardSurface.Elevation = .card,
-    fill: Color? = nil
+    fill: Color? = nil,
+    cornerRadius: CGFloat? = nil
   ) -> some View {
-    modifier(MeetPRCardSurface(elevation: elevation, fill: fill))
+    modifier(
+      MeetPRCardSurface(
+        elevation: elevation,
+        fill: fill,
+        cornerRadius: cornerRadius
+      )
+    )
   }
 }

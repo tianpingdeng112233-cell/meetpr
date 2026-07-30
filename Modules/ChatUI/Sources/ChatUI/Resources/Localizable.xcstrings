@@ -276,6 +276,28 @@
         }
       }
     },
+    "chat.playPlayback": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放"
+          }
+        }
+      }
+    },
+    "chat.pausePlayback": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂停"
+          }
+        }
+      }
+    },
     "chat.playbackFailed": {
       "extractionState": "manual",
       "localizations": {
@@ -283,6 +305,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "播放失败，链接可能已过期"
+          }
+        }
+      }
+    },
+    "chat.playbackProgress": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放进度"
           }
         }
       }
@@ -437,6 +470,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "✓ 教练已读"
+          }
+        }
+      }
+    },
+    "chat.selected": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已选择"
           }
         }
       }

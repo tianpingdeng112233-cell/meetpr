@@ -5,20 +5,20 @@ import RepositoryContracts
 
 enum StudentDetailSection: String, CaseIterable, Identifiable, Sendable {
   case overview
-  case execution
   case videos
   case growth
   case feedback
+  case profile
 
   var id: String { rawValue }
 
   var title: String {
     switch self {
     case .overview: "概览"
-    case .execution: "执行"
     case .videos: "视频"
     case .growth: "成长"
     case .feedback: "反馈"
+    case .profile: "资料"
     }
   }
 }
@@ -62,6 +62,12 @@ enum ReadinessRowState: Equatable, Sendable {
   case unavailable
 }
 
+enum StudentProfileState: Equatable, Sendable {
+  case loading
+  case loaded(OnboardingProfile)
+  case unavailable
+}
+
 struct StudentOverviewSummary: Equatable, Sendable {
   let completedTrainingDays: Int
   let plannedTrainingDays: Int
@@ -97,6 +103,7 @@ final class StudentDetailViewModel {
   private(set) var videos: [StudentVideo] = []
   private(set) var videosUnavailable = false
   private(set) var todayReadiness: ReadinessRowState = .notFiled
+  private(set) var profileState: StudentProfileState = .loading
 
   /// Newest three for the overview card; the grid shows the full wall.
   var recentVideos: [StudentVideo] {
@@ -121,6 +128,7 @@ final class StudentDetailViewModel {
   @ObservationIgnored private let feedback: any StudentFeedbackRepository
   @ObservationIgnored private let videoWall: any CoachStudentVideoRepository
   @ObservationIgnored private let readiness: any ReadinessRepository
+  @ObservationIgnored private let profiles: any OnboardingProfileReading
   @ObservationIgnored private let now: @Sendable () -> Date
 
   init(
@@ -130,6 +138,7 @@ final class StudentDetailViewModel {
     feedback: any StudentFeedbackRepository,
     videos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
+    profiles: any OnboardingProfileReading = InMemoryCoachStudentProfileReader(),
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.summary = summary
@@ -138,6 +147,7 @@ final class StudentDetailViewModel {
     self.feedback = feedback
     self.videoWall = videos
     self.readiness = readiness
+    self.profiles = profiles
     self.now = now
   }
 
@@ -146,16 +156,29 @@ final class StudentDetailViewModel {
     await refresh()
   }
 
+  func loadIfNeeded(now: Date) async {
+    guard state != .loaded else { return }
+    await refresh(now: now)
+  }
+
   func refresh() async {
+    await refresh(now: now())
+  }
+
+  func refresh(now currentDate: Date) async {
     state = .loading
     do {
       let loadedPlan = try await plans.fetchCurrentPlan(studentID: summary.id)
-      let range = Self.weekRange(for: loadedPlan, now: now())
+      let range = Self.weekRange(for: loadedPlan, now: currentDate)
       let loadedLogs = try await trainingLogs.fetchLogs(studentID: summary.id, in: range)
       let loadedFeedback = try await feedback.fetchInbox(studentID: summary.id)
 
       plan = loadedPlan
-      executionDays = Self.makeExecutionDays(plan: loadedPlan, logs: loadedLogs, now: now())
+      executionDays = Self.makeExecutionDays(
+        plan: loadedPlan,
+        logs: loadedLogs,
+        now: currentDate
+      )
       feedbackItems = loadedFeedback.sorted { $0.postedAt > $1.postedAt }
       overview = Self.makeOverview(days: executionDays, feedback: feedbackItems)
       state = .loaded
@@ -166,7 +189,8 @@ final class StudentDetailViewModel {
     // Auxiliary sections (video wall, today's readiness) degrade in place —
     // a failed side fetch must not blank the whole detail screen.
     await refreshVideos()
-    await refreshReadiness()
+    await refreshReadiness(now: currentDate)
+    await refreshProfile()
   }
 
   private func refreshVideos() async {
@@ -179,15 +203,27 @@ final class StudentDetailViewModel {
     }
   }
 
-  private func refreshReadiness() async {
+  private func refreshReadiness(now currentDate: Date) async {
     do {
       let checkin = try await readiness.fetchCheckin(
         studentId: summary.id,
-        checkinDate: CoachStudentFormatting.localDayString(now())
+        checkinDate: CoachStudentFormatting.localDayString(currentDate)
       )
       todayReadiness = checkin.map(ReadinessRowState.loaded) ?? .notFiled
     } catch {
       todayReadiness = .unavailable
+    }
+  }
+
+  private func refreshProfile() async {
+    do {
+      if let profile = try await profiles.fetchProfile(studentId: summary.id) {
+        profileState = .loaded(profile)
+      } else {
+        profileState = .unavailable
+      }
+    } catch {
+      profileState = .unavailable
     }
   }
 

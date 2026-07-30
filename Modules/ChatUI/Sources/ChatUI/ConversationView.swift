@@ -11,6 +11,14 @@ public struct ConversationView: View {
   @State private var selectedVideo: SelectedChatVideo?
   @State private var showsSetRefPicker = false
   private let setRefSharing: SetRefSharingContext?
+  private let initialDraft: String
+  private let conversationTitle: String
+  private let conversationSubtitle: String?
+  private let conversationSubtitleColor: Color
+  private let outgoingBubbleColor: Color
+  private let incomingBubbleColor: Color
+  private let bubbleLayout: ChatBubbleLayout
+  private let composerLayout: ChatComposerLayout
 
   public init(
     conversationID: UUID,
@@ -18,9 +26,25 @@ public struct ConversationView: View {
     repository: any ChatRepository,
     inbox: ChatInboxViewModel,
     sendCoordinator: ChatSendCoordinator,
-    setRefSharing: SetRefSharingContext? = nil
+    setRefSharing: SetRefSharingContext? = nil,
+    initialDraft: String = "",
+    conversationTitle: String? = nil,
+    conversationSubtitle: String? = nil,
+    conversationSubtitleColor: Color = Color.MeetPR.textTertiary,
+    outgoingBubbleColor: Color = Color.MeetPR.goldCTA,
+    incomingBubbleColor: Color = Color.MeetPR.surfaceElevated,
+    bubbleLayout: ChatBubbleLayout = .uniform,
+    composerLayout: ChatComposerLayout = .standard
   ) {
     self.setRefSharing = setRefSharing
+    self.initialDraft = initialDraft
+    self.conversationTitle = conversationTitle ?? ChatStrings.messages
+    self.conversationSubtitle = conversationSubtitle
+    self.conversationSubtitleColor = conversationSubtitleColor
+    self.outgoingBubbleColor = outgoingBubbleColor
+    self.incomingBubbleColor = incomingBubbleColor
+    self.bubbleLayout = bubbleLayout
+    self.composerLayout = composerLayout
     _viewModel = State(
       initialValue: ConversationViewModel(
         conversationID: conversationID,
@@ -41,22 +65,38 @@ public struct ConversationView: View {
       ConversationTimeline(
         viewModel: viewModel,
         selectedImage: $selectedImage,
-        selectedVideo: $selectedVideo
+        selectedVideo: $selectedVideo,
+        outgoingBubbleColor: outgoingBubbleColor,
+        incomingBubbleColor: incomingBubbleColor,
+        bubbleLayout: bubbleLayout
       )
 
       Divider()
         .overlay(Color.MeetPR.borderDefault)
       if setRefSharing == nil {
-        ChatComposer(viewModel: viewModel)
+        ChatComposer(
+          viewModel: viewModel,
+          initialText: initialDraft,
+          layout: composerLayout
+        )
       } else {
         ChatComposer(
           viewModel: viewModel,
+          initialText: initialDraft,
+          layout: composerLayout,
           onShareTodayTraining: { showsSetRefPicker = true }
         )
       }
     }
     .background(Color.MeetPR.bgBase)
-    .navigationTitle(ChatStrings.messages)
+    .navigationTitle(conversationTitle)
+    .modifier(
+      ConversationHeaderModifier(
+        title: conversationTitle,
+        subtitle: conversationSubtitle,
+        subtitleColor: conversationSubtitleColor
+      )
+    )
     .task(id: scenePhase) {
       guard scenePhase == .active else {
         return
@@ -89,6 +129,11 @@ public struct ConversationView: View {
       }
     }
   }
+}
+
+public enum ChatBubbleLayout: Sendable {
+  case uniform
+  case directional
 }
 
 private struct SelectedChatImage: Identifiable {
@@ -165,11 +210,41 @@ private struct ChatErrorBanner: View {
   }
 }
 
+private struct ConversationHeaderModifier: ViewModifier {
+  let title: String
+  let subtitle: String?
+  let subtitleColor: Color
+
+  func body(content: Content) -> some View {
+    #if os(iOS)
+      content.toolbar {
+        if let subtitle {
+          ToolbarItem(placement: .principal) {
+            VStack(spacing: MeetPRSpacing.point2) {
+              Text(title)
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+                .foregroundStyle(Color.MeetPR.textPrimary)
+              Text(subtitle)
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+                .foregroundStyle(subtitleColor)
+            }
+          }
+        }
+      }
+    #else
+      content
+    #endif
+  }
+}
+
 @MainActor
 private struct ConversationTimeline: View {
   let viewModel: ConversationViewModel
   @Binding var selectedImage: SelectedChatImage?
   @Binding var selectedVideo: SelectedChatVideo?
+  let outgoingBubbleColor: Color
+  let incomingBubbleColor: Color
+  let bubbleLayout: ChatBubbleLayout
   @State private var scrollPosition: String?
 
   var body: some View {
@@ -205,7 +280,10 @@ private struct ConversationTimeline: View {
             },
             imageFailed: {
               await viewModel.imageLoadingFailed(messageID: message.id)
-            }
+            },
+            outgoingBubbleColor: outgoingBubbleColor,
+            incomingBubbleColor: incomingBubbleColor,
+            bubbleLayout: bubbleLayout
           )
           .id(messageScrollID(message.id))
         }
@@ -213,7 +291,9 @@ private struct ConversationTimeline: View {
         ForEach(viewModel.pending, id: \.clientID) { item in
           PendingChatMessageRow(
             item: item,
-            retry: { viewModel.retry(clientID: item.clientID) }
+            retry: { viewModel.retry(clientID: item.clientID) },
+            outgoingBubbleColor: outgoingBubbleColor,
+            bubbleLayout: bubbleLayout
           )
           .id(pendingScrollID(item.clientID))
         }

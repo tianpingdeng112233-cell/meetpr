@@ -53,6 +53,7 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
             id: video.id,
             studentID: student.id,
             studentDisplayName: student.displayName,
+            setLogID: video.setLogID,
             planExerciseID: exerciseID,
             exerciseName: exerciseNamesByID[exerciseID],
             dayDate: video.loggedAt.map { Calendar(identifier: .gregorian).startOfDay(for: $0) },

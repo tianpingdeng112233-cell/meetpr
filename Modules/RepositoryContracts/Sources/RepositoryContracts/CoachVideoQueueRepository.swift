@@ -10,6 +10,9 @@ public struct PendingVideoItem: Hashable, Identifiable, Sendable {
   public let id: UUID
   public let studentID: UUID
   public let studentDisplayName: String
+  /// `StudentVideo.setLogID` — resolves the four set metrics in the coach
+  /// feedback workbench. Nil for an upload that is not linked to a logged set.
+  public let setLogID: UUID?
   /// Feedback scope — the plan exercise the video is linked to (nil if unlinked).
   public let planExerciseID: UUID?
   /// Display only; nil when the inbox can't resolve a name (e.g. the live
@@ -25,6 +28,7 @@ public struct PendingVideoItem: Hashable, Identifiable, Sendable {
     id: UUID,
     studentID: UUID,
     studentDisplayName: String,
+    setLogID: UUID? = nil,
     planExerciseID: UUID? = nil,
     exerciseName: String? = nil,
     dayDate: Date? = nil,
@@ -34,6 +38,7 @@ public struct PendingVideoItem: Hashable, Identifiable, Sendable {
     self.id = id
     self.studentID = studentID
     self.studentDisplayName = studentDisplayName
+    self.setLogID = setLogID
     self.planExerciseID = planExerciseID
     self.exerciseName = exerciseName
     self.dayDate = dayDate

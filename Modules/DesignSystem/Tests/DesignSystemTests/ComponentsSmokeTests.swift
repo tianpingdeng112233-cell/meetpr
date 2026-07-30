@@ -144,4 +144,35 @@ struct ComponentsSmokeTests {
       showsPRBadge: true
     ) {}
   }
+
+  @Test("MeetPRTabBar preserves student defaults and supports a coach palette")
+  func meetPRTabBarPalettes() {
+    enum Tab: Hashable, Sendable {
+      case today
+      case messages
+      case students
+    }
+
+    let items = [
+      MeetPRTabBarItem(id: Tab.today, title: "今日", icon: .house),
+      MeetPRTabBarItem(id: Tab.messages, title: "消息", icon: .message, badge: 3),
+      MeetPRTabBarItem(id: Tab.students, title: "学员", icon: .students),
+    ]
+    let defaultBar = MeetPRTabBar(
+      selection: .constant(Tab.messages),
+      items: items
+    )
+
+    #expect(defaultBar.selectedColor == Color.MeetPR.goldCTA)
+    #expect(defaultBar.unselectedColor == Color.MeetPR.textTertiary)
+    #expect(defaultBar.badgeColor == Color.MeetPR.dangerFill)
+
+    _ = MeetPRTabBar(
+      selection: .constant(Tab.messages),
+      items: items,
+      selectedColor: Color.MeetPR.gold500,
+      unselectedColor: Color.MeetPR.textDisabled,
+      badgeColor: Color.MeetPR.danger
+    )
+  }
 }

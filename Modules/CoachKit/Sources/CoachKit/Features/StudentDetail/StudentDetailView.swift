@@ -8,28 +8,34 @@ import SwiftUI
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct StudentDetailView: View {
-  @Bindable private var viewModel: StudentDetailViewModel
+  @Environment(\.coachNow) private var now
+  @Environment(\.dismiss) private var dismiss
+  @State private var viewModel: StudentDetailViewModel
   @State private var videoGridViewModel: StudentVideoGridViewModel
   @State private var growthViewModel: StudentGrowthViewModel
   @State private var evaluationViewModel: EvaluationBannerViewModel
   @State private var conversationOpener: CoachConversationOpener
-  private let context: CoachStudentDetailContext
-  @State private var showComposer = false
-  @State private var showSummaryEditor = false
+  @State private var showEvaluationSummaryEditor = false
   @State private var showAdaptationPlanning = false
+  @State private var conversationInitialDraft = ""
+  private let context: CoachStudentDetailContext
 
   init(
     summary: CoachStudentSummary,
     context: CoachStudentDetailContext,
     onEvaluationCompleted: (@MainActor () -> Void)? = nil
   ) {
-    viewModel = StudentDetailViewModel(
-      summary: summary,
-      plans: context.plans,
-      trainingLogs: context.trainingLogs,
-      feedback: context.feedback,
-      videos: context.videos,
-      readiness: context.readiness
+    _viewModel = State(
+      initialValue: StudentDetailViewModel(
+        summary: summary,
+        plans: context.plans,
+        trainingLogs: context.trainingLogs,
+        feedback: context.feedback,
+        videos: context.videos,
+        readiness: context.readiness,
+        profiles: context.profiles,
+        now: { Date.distantPast }
+      )
     )
     _videoGridViewModel = State(
       initialValue: StudentVideoGridViewModel(repository: context.videos)
@@ -57,70 +63,56 @@ struct StudentDetailView: View {
   }
 
   var body: some View {
-    VStack(spacing: 0) {
-      header
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
+      detailHeader
 
-      if evaluationViewModel.loadFailed {
-        EvaluationLoadFailureStrip {
-          Task { await evaluationViewModel.load() }
+      if CoachEvaluationSeal.shouldLoadEvaluation {
+        if evaluationViewModel.loadFailed {
+          EvaluationLoadFailureStrip {
+            Task { await evaluationViewModel.load() }
+          }
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        } else if CoachEvaluationSeal.shouldRenderBanner(
+          isBannerVisible: evaluationViewModel.isBannerVisible
+        ) {
+          EvaluationStatusBanner(
+            viewModel: evaluationViewModel,
+            hasPublishedPlan: viewModel.plan != nil,
+            onSendAdaptationWeek: { showAdaptationPlanning = true },
+            onViewAdaptationWeek: { viewModel.select(.overview) },
+            onOpenSummary: { showEvaluationSummaryEditor = true }
+          )
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
         }
-        .padding(.horizontal, MeetPRSpacing.base)
-        .padding(.top, MeetPRSpacing.sm)
-      } else if evaluationViewModel.isBannerVisible {
-        EvaluationStatusBanner(
-          viewModel: evaluationViewModel,
-          hasPublishedPlan: viewModel.plan != nil,
-          onSendAdaptationWeek: { showAdaptationPlanning = true },
-          onViewAdaptationWeek: { viewModel.select(.execution) },
-          onOpenSummary: { showSummaryEditor = true }
-        )
-        .padding(.horizontal, MeetPRSpacing.base)
-        .padding(.top, MeetPRSpacing.sm)
       }
 
       sectionTabs
-
       content
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        // Spec 029 §risk 5: auto fetch once on appear + pull-to-refresh as
-        // the explicit retry path (the "下拉刷新重试" copy in the video wall
-        // and readiness row points here). Growth keeps its own cache, so the
-        // pull refreshes whichever data the visible section reads.
-        .refreshable { [viewModel, growthViewModel] in
-          if await viewModel.selectedSection == .growth {
-            await growthViewModel.load(studentID: viewModel.summary.id)
+        .refreshable {
+          if viewModel.selectedSection == .growth {
+            await growthViewModel.load(studentID: viewModel.summary.id, now: now)
           } else {
-            await viewModel.refresh()
+            await viewModel.refresh(now: now)
           }
         }
     }
-    .background(Color.MeetPR.bg)
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    .background(Color.MeetPR.bgBase)
     .hideNavigationBar()
-    .sheet(isPresented: $showComposer) {
-      FeedbackComposerView(
-        studentID: viewModel.summary.id,
-        studentName: viewModel.summary.displayName,
-        days: viewModel.plannedDays,
-        repository: context.feedback
-      ) { item in
-        viewModel.appendPostedFeedback(item)
-      }
-    }
-    .navigationDestination(isPresented: $showSummaryEditor) {
-      summaryEditor
+    .coachFullScreenDestination()
+    .navigationDestination(isPresented: $showEvaluationSummaryEditor) {
+      evaluationSummaryEditor
     }
     .navigationDestination(item: conversationDestinationBinding) { conversation in
       if let chat = context.chat {
         CoachConversationDestination(
           conversationID: conversation.id,
-          chat: chat
+          chat: chat,
+          studentName: conversationOpener.destinationStudentName,
+          initialDraft: conversationInitialDraft,
+          studentStatus: viewModel.summary.status
         )
-      }
-    }
-    .onChange(of: showSummaryEditor) { _, isShowing in
-      if !isShowing {
-        // Returning from the editor: refresh the overview summary card.
-        Task { await evaluationViewModel.reloadSummary() }
       }
     }
     .modifier(
@@ -141,99 +133,285 @@ struct StudentDetailView: View {
     .task {
       Analytics.shared.screen(.coachStudentDetail)
       Analytics.shared.coachOpenedStudent(id: viewModel.summary.id)
-      await viewModel.loadIfNeeded()
-      await evaluationViewModel.load()
+      await viewModel.loadIfNeeded(now: now)
+      if CoachEvaluationSeal.shouldLoadEvaluation {
+        await evaluationViewModel.load()
+      }
     }
   }
 
-  // MARK: - Header (custom large title + student identity + status)
-
-  /// Reskins the mock's nav bar (back chevron · name · ellipsis) into the house
-  /// large-title header: a back affordance row, the student's real
-  /// `displayName`, a status line, and — when the active feedback section
-  /// exposes it — the 写反馈 compose action that previously lived in the
-  /// nav-bar toolbar (preserved verbatim, just relocated into the header).
-  private var header: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+  private var detailHeader: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
       backRow
-
-      HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.md) {
+      HStack(alignment: .center, spacing: MeetPRSpacing.point10) {
         Text(viewModel.summary.displayName)
-          .font(.system(size: 34, weight: .heavy))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size32))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
           .minimumScaleFactor(0.7)
-        Spacer(minLength: MeetPRSpacing.sm)
-        let badge = statusBadge
-        StatusBadge(status: badge.status, title: badge.title)
+        statusPill
       }
-
-      Text(statusLine)
-        .font(Font.MeetPR.monoLabel)
-        .tracking(Font.MeetPR.monoLabelTracking)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
+      planCard
     }
-    .padding(.horizontal, MeetPRSpacing.base)
-    .padding(.top, MeetPRSpacing.sm)
-    .padding(.bottom, MeetPRSpacing.md)
-    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+    .padding(.top, MeetPRSpacing.point6)
   }
-
-  @Environment(\.dismiss) private var dismiss
 
   private var backRow: some View {
     HStack {
       Button {
         dismiss()
       } label: {
-        HStack(spacing: 4) {
+        HStack(spacing: MeetPRSpacing.point5) {
           Image(systemName: "chevron.left")
-          Text("学员")
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size20, weight: .semibold))
+          Text(CoachDetailStrings.backToStudents)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
         }
-        .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textSecondary)
       }
-      .buttonStyle(.plain)
-      .accessibilityLabel("返回学员列表")
+      .buttonStyle(PressScaleButtonStyle(scale: 0.95))
+      .accessibilityLabel(CoachDetailStrings.backToStudents)
+      .accessibilityIdentifier("coach.detail.back")
 
       Spacer()
 
       if context.chat != nil {
         Button {
-          Task {
-            await conversationOpener.openConversation(
-              withOtherParty: viewModel.summary.id
-            )
-          }
+          openConversation(initialDraft: "")
         } label: {
           Image(systemName: "message")
-            .font(.system(size: 17, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-            .frame(width: 36, height: 36)
-            .background(Color.MeetPR.surface1)
-            .clipShape(Circle())
-            .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
+            .font(.MeetPR.system(size: MeetPRFontMetrics.size18))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+            .frame(width: 38, height: 38)
+            .meetPRCardSurface(.card)
+            .clipShape(.circle)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle(scale: 0.94))
         .disabled(conversationOpener.isOpening)
         .accessibilityLabel(CoachStrings.sendMessage)
+        .accessibilityIdentifier("coach.detail.chat")
+      }
+    }
+  }
+
+  private var statusPill: some View {
+    Text(statusPresentation.text)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+      .foregroundStyle(statusPresentation.color)
+      .padding(.horizontal, MeetPRSpacing.point10)
+      .padding(.vertical, MeetPRSpacing.point3)
+      .overlay {
+        Capsule()
+          .stroke(statusPresentation.color.opacity(0.35), lineWidth: MeetPRSpacing.point1)
+      }
+  }
+
+  private var statusPresentation: (text: String, color: Color) {
+    switch viewModel.summary.status {
+    case .active:
+      (CoachDetailStrings.active, Color.MeetPR.success)
+    case .abnormal:
+      (CoachDetailStrings.needsAttention, Color.MeetPR.danger)
+    case .inEvaluation(let days, let hours):
+      (
+        days > 0
+          ? CoachDetailStrings.evaluationDays(days)
+          : CoachDetailStrings.evaluationHours(hours),
+        Color.MeetPR.gold500
+      )
+    }
+  }
+
+  private var planCard: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point11) {
+      HStack(spacing: MeetPRSpacing.space2) {
+        Text(CoachDetailStrings.weekRunningTitle(calendarWeek))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(
+          "· "
+            + CoachDetailStrings.weekProgress(
+              completed: viewModel.overview.completedTrainingDays,
+              total: viewModel.overview.plannedTrainingDays
+            )
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
       }
 
-      if viewModel.selectedSection == .feedback {
+      ProgressView(value: completionFraction)
+        .progressViewStyle(.linear)
+        .tint(Color.MeetPR.success)
+        .background(Color.MeetPR.borderDefault)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.micro))
+        .frame(height: MeetPRSpacing.point6)
+
+      HStack(spacing: MeetPRSpacing.point9) {
         Button {
-          showComposer = true
+          openConversation(initialDraft: CoachDetailStrings.trainingReminderDraft)
         } label: {
-          Image(systemName: "square.and.pencil")
-            .font(.system(size: 18))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-            .frame(width: 36, height: 36)
-            .background(Color.MeetPR.surface1)
-            .clipShape(Circle())
-            .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
+          planActionLabel(CoachDetailStrings.remindTraining)
+        }
+        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+        .disabled(context.chat == nil || conversationOpener.isOpening)
+        .accessibilityIdentifier("coach.detail.remindTraining")
+
+        Button {
+        } label: {
+          planActionLabel(CoachDetailStrings.weekSummary)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("写反馈")
+        .disabled(true)
+        .accessibilityHint(CoachDetailStrings.weekSummaryUnavailable)
+        .accessibilityIdentifier("coach.detail.weekSummary")
       }
+    }
+    .padding(MeetPRSpacing.space4)
+    .meetPRCardSurface(.card)
+  }
+
+  private func planActionLabel(_ title: String) -> some View {
+    Text(title)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      .frame(maxWidth: .infinity)
+      .padding(.vertical, MeetPRSpacing.point11)
+      .overlay {
+        Capsule()
+          .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
+      }
+  }
+
+  private var sectionTabs: some View {
+    ScrollView(.horizontal) {
+      HStack(spacing: MeetPRSpacing.point6) {
+        ForEach(StudentDetailSection.allCases) { section in
+          Button {
+            viewModel.select(section)
+          } label: {
+            Text(CoachDetailStrings.sectionTitle(section))
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
+              .foregroundStyle(
+                viewModel.selectedSection == section
+                  ? Color.MeetPR.inkOnCTAFill
+                  : Color.MeetPR.textTertiary
+              )
+              .padding(.horizontal, MeetPRSpacing.point11)
+              .padding(.vertical, MeetPRSpacing.space2)
+              .background(
+                viewModel.selectedSection == section
+                  ? Color.MeetPR.textPrimary
+                  : Color.MeetPR.surfaceCard
+              )
+              .clipShape(.rect(cornerRadius: MeetPRRadius.chip))
+          }
+          .buttonStyle(PressScaleButtonStyle(scale: 0.95))
+          .accessibilityIdentifier("coach.detail.tab.\(section.rawValue)")
+        }
+      }
+      .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+    }
+    .scrollIndicators(.hidden)
+  }
+
+  @ViewBuilder
+  private var content: some View {
+    switch viewModel.state {
+    case .idle, .loading:
+      VStack(spacing: MeetPRSpacing.point10) {
+        Spacer()
+        ProgressView()
+          .tint(Color.MeetPR.gold500)
+        Text(CoachDetailStrings.loading)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+        Spacer()
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+    case .failed(let message):
+      failureCard(message)
+    case .loaded:
+      sectionContent
+    }
+  }
+
+  private func failureCard(_ message: String) -> some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      Text(CoachDetailStrings.loadFailed)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+        .foregroundStyle(Color.MeetPR.danger)
+      Text(message)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text(CoachDetailStrings.pullToRetry)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+    }
+    .padding(MeetPRSpacing.space4)
+    .meetPRCardSurface(.card)
+    .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+  }
+
+  @ViewBuilder
+  private var sectionContent: some View {
+    switch viewModel.selectedSection {
+    case .overview:
+      StudentOverviewSection(
+        summary: viewModel.overview,
+        readiness: viewModel.todayReadiness,
+        days: viewModel.executionDays,
+        planWeekIndex: viewModel.plan?.weekIndex ?? 1,
+        shiftBadgeText: viewModel.planShiftBadgeText,
+        now: now,
+        onSelectSection: viewModel.select,
+        onRemindReadiness: {
+          openConversation(initialDraft: CoachDetailStrings.readinessReminderDraft)
+        }
+      )
+    case .videos:
+      StudentVideoGridView(
+        videos: viewModel.videos,
+        unavailable: viewModel.videosUnavailable,
+        now: now,
+        planDays: viewModel.plannedDays,
+        feedbackVideoIDs: Set(viewModel.feedbackItems.compactMap(\.videoID)),
+        viewModel: videoGridViewModel
+      )
+    case .growth:
+      StudentGrowthView(
+        studentID: viewModel.summary.id,
+        now: now,
+        viewModel: growthViewModel
+      )
+    case .feedback:
+      CoachFeedbackHistoryView(
+        feedback: viewModel.feedbackItems,
+        days: viewModel.plannedDays,
+        now: now
+      )
+    case .profile:
+      StudentProfileSection(state: viewModel.profileState, now: now)
+    }
+  }
+
+  private var calendarWeek: Int {
+    CoachFeatureCalendar.calendar.component(.weekOfYear, from: now)
+  }
+
+  private var completionFraction: Double {
+    guard viewModel.overview.plannedTrainingDays > 0 else { return 0 }
+    return Double(viewModel.overview.completedTrainingDays)
+      / Double(viewModel.overview.plannedTrainingDays)
+  }
+
+  private func openConversation(initialDraft: String) {
+    conversationInitialDraft = initialDraft
+    Task {
+      await conversationOpener.openConversation(
+        withOtherParty: viewModel.summary.id,
+        studentName: viewModel.summary.displayName
+      )
     }
   }
 
@@ -242,6 +420,7 @@ struct StudentDetailView: View {
       get: { conversationOpener.destination },
       set: { destination in
         if destination == nil {
+          conversationInitialDraft = ""
           conversationOpener.dismissDestination()
         }
       }
@@ -259,56 +438,7 @@ struct StudentDetailView: View {
     )
   }
 
-  /// Status line beneath the name. Mirrors the mock's "教练 · 学员" identity
-  /// framing using the real `CoachStudentStatus` rather than fabricated
-  /// W3D1 live-session strings.
-  private var statusLine: String {
-    switch viewModel.summary.status {
-    case .inEvaluation(let days, let hours):
-      if days > 0 { return "学员 · 评估期 · 还剩 \(days) 天" }
-      return "学员 · 评估期 · 还剩 \(hours) 小时"
-    case .active:
-      return "学员 · 活跃"
-    case .abnormal:
-      return "学员 · 异常"
-    }
-  }
-
-  /// Maps the real lifecycle status to a `StatusBadge`. No fabricated copy —
-  /// the evaluation countdown text comes straight from the status payload.
-  private var statusBadge: (status: StatusBadge.Status, title: String) {
-    switch viewModel.summary.status {
-    case .inEvaluation(let days, let hours):
-      let amount = days > 0 ? "评估期 \(days)天" : "评估期 \(hours)时"
-      return (.pending, amount)
-    case .active:
-      return (.ready, "活跃")
-    case .abnormal:
-      return (.overdue, "异常")
-    }
-  }
-
-  // MARK: - Section tabs (reskinned segmented picker)
-
-  /// The five-section switch is core behavior (drives `selectedSection`, which
-  /// every sub-view and the toolbar depend on), so the segmented `Picker` is
-  /// preserved verbatim — only its surround is restyled to the house card:
-  /// a mono section label over a bordered surface that contains the picker.
-  private var sectionTabs: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Eyebrow("学员档案")
-
-      Picker("", selection: $viewModel.selectedSection) {
-        ForEach(StudentDetailSection.allCases) { section in
-          Text(section.title).tag(section)
-        }
-      }
-      .pickerStyle(.segmented)
-    }
-    .padding(MeetPRSpacing.base)
-  }
-
-  private var summaryEditor: some View {
+  private var evaluationSummaryEditor: some View {
     EvaluationSummaryEditorView(
       viewModel: EvaluationSummaryEditorViewModel(
         student: viewModel.summary,
@@ -323,126 +453,28 @@ struct StudentDetailView: View {
       context: context
     )
   }
-
-  // MARK: - Content states (reskinned loading / failure)
-
-  @ViewBuilder
-  private var content: some View {
-    switch viewModel.state {
-    case .idle, .loading:
-      VStack(spacing: MeetPRSpacing.md) {
-        Spacer()
-        ProgressView()
-          .tint(Color.MeetPR.brandRed)
-        Text("加载学员详情…")
-          .font(Font.MeetPR.monoLabel)
-          .tracking(Font.MeetPR.monoLabelTracking)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-        Spacer()
-      }
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-    case .failed(let message):
-      detailFailureCard(message)
-    case .loaded:
-      sectionContent
-    }
-  }
-
-  /// House-style failure surface in place of the bare `ContentUnavailableView`,
-  /// preserving the failed-state message verbatim.
-  private func detailFailureCard(_ message: String) -> some View {
-    VStack {
-      Spacer()
-      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("加载失败", color: Color.MeetPR.brandRed)
-        Text(message)
-          .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("下拉刷新重试")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-      }
-      .padding(MeetPRSpacing.base)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
-      }
-      .padding(.horizontal, MeetPRSpacing.base)
-      Spacer()
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-  }
-
-  @ViewBuilder
-  private var sectionContent: some View {
-    switch viewModel.selectedSection {
-    case .overview:
-      StudentOverviewSection(
-        summary: viewModel.overview,
-        readiness: viewModel.todayReadiness,
-        recentVideos: viewModel.recentVideos,
-        videosUnavailable: viewModel.videosUnavailable,
-        evaluationSummary: evaluationViewModel.summary,
-        onSelectSection: { section in
-          viewModel.select(section)
-        },
-        onOpenEvaluationSummary: {
-          showSummaryEditor = true
-        }
-      )
-    case .execution:
-      StudentExecutionView(
-        days: viewModel.executionDays,
-        shiftBadgeText: viewModel.planShiftBadgeText
-      )
-    case .videos:
-      StudentVideoGridView(
-        videos: viewModel.videos,
-        unavailable: viewModel.videosUnavailable,
-        viewModel: videoGridViewModel
-      )
-    case .growth:
-      StudentGrowthView(studentID: viewModel.summary.id, viewModel: growthViewModel)
-    case .feedback:
-      CoachFeedbackHistoryView(
-        feedback: viewModel.feedbackItems,
-        days: viewModel.plannedDays,
-        onCompose: {
-          showComposer = true
-        }
-      )
-    }
-  }
 }
 
-/// Transport-failure fallback for the evaluation strip (Codex review P2):
-/// without it a network blip silently hides a live evaluation banner and the
-/// page reads as "no evaluation".
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 private struct EvaluationLoadFailureStrip: View {
   let onRetry: () -> Void
 
   var body: some View {
-    Card(accessibilityLabel: "评估状态加载失败") {
-      HStack(spacing: MeetPRSpacing.sm) {
-        Text("评估状态加载失败")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Spacer()
-        SecondaryButton("重试") {
-          onRetry()
-        }
-      }
+    HStack(spacing: MeetPRSpacing.space2) {
+      Text(CoachDetailStrings.evaluationLoadFailed)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+      Spacer()
+      Button(CoachDetailStrings.retry, action: onRetry)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
     }
+    .padding(MeetPRSpacing.space3)
+    .meetPRCardSurface(.card)
   }
 }
 
-/// fullScreenCover on iOS / sheet on macOS for the adaptation-week planning
-/// entry (spec 033 §7).
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 private struct AdaptationPlanningPresenter: ViewModifier {

@@ -2,25 +2,35 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
-/// Coach video wall: date-grouped grid of the student's uploaded set videos
-/// (spec 029 §2.6, second pass). Metadata only — tapping a tile exchanges
-/// the video id for a 15-minute presigned URL and plays it full screen.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct StudentVideoGridView: View {
   let videos: [StudentVideo]
   let unavailable: Bool
+  let now: Date
+  let planDays: [StudentPlanDay]
+  let feedbackVideoIDs: Set<UUID>
   @Bindable private var viewModel: StudentVideoGridViewModel
 
-  init(videos: [StudentVideo], unavailable: Bool, viewModel: StudentVideoGridViewModel) {
+  init(
+    videos: [StudentVideo],
+    unavailable: Bool,
+    now: Date,
+    planDays: [StudentPlanDay],
+    feedbackVideoIDs: Set<UUID>,
+    viewModel: StudentVideoGridViewModel
+  ) {
     self.videos = videos
     self.unavailable = unavailable
+    self.now = now
+    self.planDays = planDays
+    self.feedbackVideoIDs = feedbackVideoIDs
     self.viewModel = viewModel
   }
 
   var body: some View {
     content
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       #if os(iOS)
         .fullScreenCover(item: $viewModel.playbackItem) { item in
           CoachVideoPlayerView(
@@ -43,126 +53,162 @@ struct StudentVideoGridView: View {
   @ViewBuilder
   private var content: some View {
     if unavailable {
-      wallMessage(
-        "视频加载失败",
-        systemImage: "exclamationmark.triangle",
-        description: "下拉刷新重试"
+      message(
+        CoachVideoStrings.loadFailed,
+        subtitle: CoachVideoStrings.pullToRetry
       )
     } else if videos.isEmpty {
-      wallMessage(
-        "学员还没有上传视频",
-        systemImage: "video",
-        description: "学员在打卡时录的视频会出现在这里"
+      message(
+        CoachVideoStrings.emptyTitle,
+        subtitle: CoachVideoStrings.emptySubtitle
       )
     } else {
       ScrollView {
-        VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point10) {
           if let playbackError = viewModel.playbackError {
             playbackErrorBanner(playbackError)
           }
           ForEach(StudentVideoGridViewModel.makeSections(videos: videos)) { section in
-            daySection(section)
+            Text(sectionTitle(section.day))
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.textTertiary)
+              .padding(.top, MeetPRSpacing.space1)
+            ForEach(section.videos) { video in
+              videoRow(video)
+            }
           }
         }
-        .padding(MeetPRSpacing.base)
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.bottom, MeetPRSpacing.point28)
       }
+      .scrollIndicators(.hidden)
     }
   }
 
-  /// Empty/error states sit inside a ScrollView so the detail screen's
-  /// pull-to-refresh retry path keeps working when there is nothing to scroll.
-  private func wallMessage(
-    _ title: String,
-    systemImage: String,
-    description: String
-  ) -> some View {
+  private func videoRow(_ video: StudentVideo) -> some View {
+    Button {
+      Task { await viewModel.play(video) }
+    } label: {
+      HStack(spacing: MeetPRSpacing.point13) {
+        ZStack {
+          RoundedRectangle(cornerRadius: MeetPRRadius.inset)
+            .fill(Color.MeetPR.textPrimary)
+            .frame(width: 72, height: 56)
+          if viewModel.loadingVideoID == video.id {
+            ProgressView()
+              .tint(Color.MeetPR.inkOnCTAFill)
+          } else {
+            Image(systemName: "play.fill")
+              .font(.MeetPR.system(size: MeetPRFontMetrics.size20))
+              .foregroundStyle(Color.MeetPR.inkOnCTAFill)
+          }
+        }
+
+        VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
+          Text(videoLabel(video))
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+            .lineLimit(1)
+          HStack(spacing: MeetPRSpacing.point6) {
+            Text(
+              feedbackVideoIDs.contains(video.id)
+                ? CoachVideoStrings.feedbackSent
+                : CoachVideoStrings.awaitingFeedback
+            )
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+            .foregroundStyle(
+              feedbackVideoIDs.contains(video.id)
+                ? Color.MeetPR.success
+                : Color.MeetPR.gold500
+            )
+            Text(CoachStudentFormatting.relativeText(video.displayDate, now: now))
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+              .foregroundStyle(Color.MeetPR.textTertiary)
+          }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+      }
+      .padding(MeetPRSpacing.space3)
+      .meetPRCardSurface(.card)
+    }
+    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+    .disabled(viewModel.loadingVideoID == video.id)
+    .accessibilityIdentifier("coach.detail.video.\(video.id.uuidString)")
+  }
+
+  private func videoLabel(_ video: StudentVideo) -> String {
+    if let exerciseID = video.planExerciseID,
+      let exercise = planDays.flatMap(\.exercises).first(where: { $0.id == exerciseID })
+    {
+      return exercise.exercise.name
+    }
+    if let filename = video.filename, !filename.isEmpty {
+      return filename
+    }
+    return CoachVideoStrings.trainingVideo
+  }
+
+  private func sectionTitle(_ day: Date) -> String {
+    let calendar = CoachFeatureCalendar.calendar
+    if CoachFeatureCalendar.isSameDay(day, now, calendar: calendar) {
+      return CoachVideoStrings.today
+    }
+    let yesterday =
+      calendar.date(byAdding: .day, value: -1, to: now)
+      ?? now
+    if CoachFeatureCalendar.isSameDay(day, yesterday, calendar: calendar) {
+      return CoachVideoStrings.yesterday
+    }
+    return day.formatted(
+      .dateTime.month(.twoDigits).day(.twoDigits)
+        .locale(Locale(identifier: "zh_Hans_CN"))
+    )
+  }
+
+  private func message(_ title: String, subtitle: String) -> some View {
     ScrollView {
-      ContentUnavailableView(title, systemImage: systemImage, description: Text(description))
-        .containerRelativeFrame(.vertical)
-    }
-  }
-
-  private func daySection(_ section: StudentVideoDaySection) -> some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Text(CoachStudentFormatting.fullDateText(section.day))
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      LazyVGrid(
-        columns: Array(repeating: GridItem(.flexible(), spacing: MeetPRSpacing.sm), count: 3),
-        spacing: MeetPRSpacing.sm
-      ) {
-        ForEach(section.videos) { video in
-          StudentVideoTile(video: video, isLoading: viewModel.loadingVideoID == video.id) {
-            Task { await viewModel.play(video) }
-          }
-        }
+      VStack(spacing: MeetPRSpacing.point10) {
+        Image(systemName: "video")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size26))
+          .foregroundStyle(Color.MeetPR.success)
+        Text(title)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(subtitle)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textDisabled)
+          .multilineTextAlignment(.center)
       }
+      .frame(maxWidth: .infinity)
+      .padding(.top, MeetPRSpacing.point32)
     }
   }
 
   private func playbackErrorBanner(_ message: String) -> some View {
-    HStack(spacing: MeetPRSpacing.sm) {
-      Image(systemName: "exclamationmark.triangle")
+    HStack(spacing: MeetPRSpacing.space2) {
       Text(message)
-        .font(Font.MeetPR.footnote)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
       Spacer()
-      Button("知道了") {
+      Button(CoachVideoStrings.confirmation) {
         viewModel.clearPlaybackError()
       }
-      .font(Font.MeetPR.footnote)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
     }
-    .foregroundStyle(Color.MeetPR.brandRed)
-    .padding(MeetPRSpacing.sm)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+    .foregroundStyle(Color.MeetPR.danger)
+    .padding(MeetPRSpacing.space3)
+    .meetPRCardSurface(.card)
   }
 }
 
-/// No server-side thumbnails in V0.1 (the wall is metadata-only by design),
-/// so the tile is an icon + capture time + size.
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct StudentVideoTile: View {
-  let video: StudentVideo
-  let isLoading: Bool
-  let onTap: () -> Void
-
-  var body: some View {
-    Button(action: onTap) {
-      VStack(spacing: MeetPRSpacing.xs) {
-        ZStack {
-          Image(systemName: "play.rectangle.fill")
-            .font(Font.MeetPR.title2)
-            .foregroundStyle(Color.MeetPR.brandRed)
-            .opacity(isLoading ? 0 : 1)
-          if isLoading {
-            ProgressView()
-          }
-        }
-        Text(CoachStudentFormatting.timeText(video.displayDate))
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text(Self.sizeText(video.sizeBytes))
-          .font(Font.MeetPR.monoLabel)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-      }
-      .frame(maxWidth: .infinity)
-      .padding(.vertical, MeetPRSpacing.base)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
-    }
-    .buttonStyle(.plain)
-    .disabled(isLoading)
-    .accessibilityLabel(
-      "视频 \(CoachStudentFormatting.timeText(video.displayDate))，点按播放"
-    )
-  }
-
-  static func sizeText(_ sizeBytes: Int64) -> String {
-    let megabytes = Double(sizeBytes) / 1_048_576
-    if megabytes >= 10 {
-      return "\(Int(megabytes.rounded())) MB"
-    }
-    return String(format: "%.1f MB", megabytes)
-  }
+enum CoachVideoStrings {
+  static let loadFailed = CoachLocalization.localized("coach.video.loadFailed")
+  static let pullToRetry = CoachLocalization.localized("coach.video.pullToRetry")
+  static let emptyTitle = CoachLocalization.localized("coach.video.emptyTitle")
+  static let emptySubtitle = CoachLocalization.localized("coach.video.emptySubtitle")
+  static let feedbackSent = CoachLocalization.localized("coach.video.feedbackSent")
+  static let awaitingFeedback = CoachLocalization.localized("coach.video.awaitingFeedback")
+  static let trainingVideo = CoachLocalization.localized("coach.video.trainingVideo")
+  static let today = CoachLocalization.localized("coach.video.today")
+  static let yesterday = CoachLocalization.localized("coach.video.yesterday")
+  static let confirmation = CoachLocalization.localized("coach.video.confirmation")
 }
