@@ -118,11 +118,13 @@ import Testing
     plans: StubStudentPlanRepository(
       plans: [CoachStudentFeatureFixtures.studentID: CoachStudentFeatureFixtures.plan()]
     ),
-    trainingLogs: StubTrainingLogRepository(logs: [recent, old]),
-    now: { now }
+    trainingLogs: StubTrainingLogRepository(logs: [recent, old])
   )
 
-  await viewModel.loadIfNeeded(studentID: CoachStudentFeatureFixtures.studentID)
+  await viewModel.loadIfNeeded(
+    studentID: CoachStudentFeatureFixtures.studentID,
+    now: now
+  )
 
   #expect(viewModel.state == .loaded)
   // Default window 近 4 周 hides the 40-day-old point.
@@ -146,7 +148,10 @@ import Testing
     trainingLogs: StubTrainingLogRepository(logs: [])
   )
 
-  await viewModel.load(studentID: CoachStudentFeatureFixtures.studentID)
+  await viewModel.load(
+    studentID: CoachStudentFeatureFixtures.studentID,
+    now: CoachStudentFeatureFixtures.startDate
+  )
 
   #expect(viewModel.state == .failed("成长曲线加载失败，请稍后重试"))
   #expect(viewModel.visiblePoints.isEmpty)
@@ -217,6 +222,7 @@ private actor FailingStudentPlanRepository: StudentPlanRepository {
   // (Codex review P1: projection-only mapping dropped cross-week points).
   let weekOnePlanExerciseID = UUID(uuidString: "02900000-0000-0000-0000-000000003001")!
   let studentID = UUID(uuidString: "02900000-0000-0000-0000-000000003002")!
+  let now = CoachStudentFeatureFixtures.startDate.addingTimeInterval(7 * 86_400)
   let provider = StaticCoachPlanFamilyMapProvider(map: [weekOnePlanExerciseID: .squat])
   let logs = StubTrainingLogRepository(logs: [
     StudentSetLog(
@@ -224,7 +230,7 @@ private actor FailingStudentPlanRepository: StudentPlanRepository {
       studentID: studentID,
       planExerciseID: weekOnePlanExerciseID,
       setIndex: 0,
-      loggedAt: Date().addingTimeInterval(-86_400),
+      loggedAt: now.addingTimeInterval(-86_400),
       weightKg: 140,
       reps: 5,
       rpe: 8,
@@ -237,7 +243,7 @@ private actor FailingStudentPlanRepository: StudentPlanRepository {
     trainingLogs: logs,
     familyMapProvider: provider
   )
-  await viewModel.load(studentID: studentID)
+  await viewModel.load(studentID: studentID, now: now)
 
   #expect(viewModel.state == .loaded)
   viewModel.selectedFamily = .squat

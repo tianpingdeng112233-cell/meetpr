@@ -62,36 +62,37 @@ final class StudentGrowthViewModel {
   @ObservationIgnored private let trainingLogs: any StudentTrainingLogRepository
   @ObservationIgnored private let profiles: any OnboardingProfileReading
   @ObservationIgnored private let familyMapProvider: (any CoachPlanFamilyMapProviding)?
-  @ObservationIgnored private let now: @Sendable () -> Date
+  private var referenceDate: Date?
   private var pointsByFamily: [LiftFamily: [GrowthPoint]] = [:]
+  private(set) var oneRMByFamily: [LiftFamily: Decimal] = [:]
 
   init(
     plans: any StudentPlanRepository,
     trainingLogs: any StudentTrainingLogRepository,
     profiles: any OnboardingProfileReading = InMemoryCoachStudentProfileReader(),
-    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
-    now: @escaping @Sendable () -> Date = { Date() }
+    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil
   ) {
     self.plans = plans
     self.trainingLogs = trainingLogs
     self.profiles = profiles
     self.familyMapProvider = familyMapProvider
-    self.now = now
   }
 
-  func loadIfNeeded(studentID: UUID) async {
+  func loadIfNeeded(studentID: UUID, now: Date) async {
     guard state == .idle else { return }
-    await load(studentID: studentID)
+    await load(studentID: studentID, now: now)
   }
 
-  func load(studentID: UUID) async {
+  func load(studentID: UUID, now currentDate: Date) async {
     state = .loading
+    referenceDate = currentDate
     do {
       // The student projection only carries the current week (publish
       // filters by weekIndex), so the coach-owned full plan tree is the
       // primary family source; the projection remains a fallback so the tab
       // degrades instead of blanking when the tree fetch fails (Codex P1).
       let onboarding = try await profiles.fetchProfile(studentId: studentID)
+      oneRMByFamily = Self.oneRMByFamily(onboarding)
       var familyMap: [UUID: LiftFamily] = [:]
       if let provider = familyMapProvider {
         familyMap =
@@ -101,7 +102,7 @@ final class StudentGrowthViewModel {
         let cycleDays = try await plans.fetchCycleDays(studentID: studentID)
         familyMap = Self.familyByPlanExerciseID(days: cycleDays, onboarding: onboarding)
       }
-      let end = now()
+      let end = currentDate
       let start =
         CoachFeatureCalendar.calendar.date(byAdding: .day, value: -Self.fetchDays, to: end)
         ?? end.addingTimeInterval(-Double(Self.fetchDays) * 86_400)
@@ -115,6 +116,39 @@ final class StudentGrowthViewModel {
     } catch {
       state = .failed("成长曲线加载失败，请稍后重试")
     }
+  }
+
+  func points(for family: LiftFamily) -> [GrowthPoint] {
+    pointsByFamily[family] ?? []
+  }
+
+  func latestPoint(for family: LiftFamily) -> GrowthPoint? {
+    points(for: family).last
+  }
+
+  func gain(for family: LiftFamily) -> Double? {
+    let points = points(for: family)
+    guard let first = points.first, let last = points.last else { return nil }
+    return last.e1RMKg - first.e1RMKg
+  }
+
+  var latestTotal: Double {
+    LiftFamily.allCases.compactMap { latestPoint(for: $0)?.e1RMKg }.reduce(0, +)
+  }
+
+  var oneRMTotal: Decimal {
+    LiftFamily.allCases.compactMap { oneRMByFamily[$0] }.reduce(0, +)
+  }
+
+  private static func oneRMByFamily(
+    _ profile: OnboardingProfile?
+  ) -> [LiftFamily: Decimal] {
+    guard let profile else { return [:] }
+    return [
+      .squat: profile.squat1RMKg,
+      .bench: profile.bench1RMKg,
+      .deadlift: profile.deadlift1RMKg,
+    ].compactMapValues { $0 }
   }
 
   /// Main-lift plan exercises only — accessories carry no lift family.
@@ -169,10 +203,13 @@ final class StudentGrowthViewModel {
   }
 
   private var windowCutoff: Date? {
+    guard let referenceDate else {
+      return nil
+    }
     switch selectedWindow {
-    case .fourWeeks: now().addingTimeInterval(-28 * 86_400)
-    case .threeMonths: now().addingTimeInterval(-90 * 86_400)
-    case .all: nil
+    case .fourWeeks: return referenceDate.addingTimeInterval(-28 * 86_400)
+    case .threeMonths: return referenceDate.addingTimeInterval(-90 * 86_400)
+    case .all: return nil
     }
   }
 }

@@ -27,6 +27,7 @@ public struct CoachRootView: View {
   /// 否则 app 停留过夜后,周概况仍停在昨天那一周(review-loop 2026-07-30)。
   @State private var now = Date()
   @State private var dashboardLoadTask: Task<Void, Never>?
+  @State private var fullScreenDestinationIDs: Set<UUID> = []
 
   @MainActor
   // swiftlint:disable:next function_body_length
@@ -149,12 +150,9 @@ public struct CoachRootView: View {
       .coachTabLayer(shell.layer(for: .today), store: tabHostStore)
 
       CoachReceivingView(
-        pendingCount: queueViewModel.pendingCount,
-        videoCount: videoQueueViewModel.pendingCount,
-        queueViewModel: queueViewModel,
+        now: now,
         videoQueueViewModel: videoQueueViewModel,
-        profiles: detailContext.profiles,
-        onAccepted: { await rosterViewModel.refresh() },
+        studentStatuses: studentStatuses,
         chat: chat
       )
       .coachTabLayer(shell.layer(for: .messages), store: tabHostStore)
@@ -184,34 +182,43 @@ public struct CoachRootView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bgBase)
+    .environment(\.coachNow, now)
+    .environment(
+      \.coachFullScreenDestinationRegistration,
+      CoachFullScreenDestinationRegistration { destinationID, isActive in
+        setFullScreenDestination(destinationID, isActive)
+      }
+    )
     .safeAreaInset(edge: .bottom, spacing: 0) {
-      MeetPRTabBar(
-        selection: $selectedTab,
-        items: [
-          MeetPRTabBarItem(id: .today, title: CoachShellStrings.today, icon: .house),
-          MeetPRTabBarItem(
-            id: .messages,
-            title: CoachStrings.messages,
-            icon: .message,
-            // Intentional prototype deviation: the badge uses unread message count,
-            // not the number of conversations containing unread messages.
-            badge: CoachMessageBadge.total(
-              videos: videoQueueViewModel.pendingCount,
-              chatUnread: chat?.inbox.totalUnread ?? 0
-            )
-          ),
-          MeetPRTabBarItem(
-            id: .students,
-            title: CoachShellStrings.students,
-            icon: .students,
-            badge: queueViewModel.pendingCount
-          ),
-          MeetPRTabBarItem(id: .profile, title: CoachShellStrings.profile, icon: .profile),
-        ],
-        selectedColor: Color.MeetPR.gold500,
-        unselectedColor: Color.MeetPR.textDisabled,
-        badgeColor: Color.MeetPR.danger
-      )
+      if fullScreenDestinationIDs.isEmpty {
+        MeetPRTabBar(
+          selection: $selectedTab,
+          items: [
+            MeetPRTabBarItem(id: .today, title: CoachShellStrings.today, icon: .house),
+            MeetPRTabBarItem(
+              id: .messages,
+              title: CoachStrings.messages,
+              icon: .message,
+              // Intentional prototype deviation: the badge uses unread message count,
+              // not the number of conversations containing unread messages.
+              badge: CoachMessageBadge.total(
+                videos: videoQueueViewModel.pendingCount,
+                chatUnread: chat?.inbox.totalUnread ?? 0
+              )
+            ),
+            MeetPRTabBarItem(
+              id: .students,
+              title: CoachShellStrings.students,
+              icon: .students,
+              badge: queueViewModel.pendingCount
+            ),
+            MeetPRTabBarItem(id: .profile, title: CoachShellStrings.profile, icon: .profile),
+          ],
+          selectedColor: Color.MeetPR.gold500,
+          unselectedColor: Color.MeetPR.textDisabled,
+          badgeColor: Color.MeetPR.danger
+        )
+      }
     }
     .onChange(of: scenePhase) { _, phase in
       guard phase == .active else { return }
@@ -252,9 +259,26 @@ public struct CoachRootView: View {
     }
   }
 
+}
+
+extension CoachRootView {
+  fileprivate var studentStatuses: [UUID: CoachStudentStatus] {
+    rosterViewModel.rows.reduce(into: [:]) { result, row in
+      result[row.id] = row.student.status
+    }
+  }
+
+  fileprivate func setFullScreenDestination(_ destinationID: UUID, _ isActive: Bool) {
+    if isActive {
+      fullScreenDestinationIDs.insert(destinationID)
+    } else {
+      fullScreenDestinationIDs.remove(destinationID)
+    }
+  }
+
   /// 推进统一时钟。跨过日界线时顺带重取一次 roster——本周的日志窗口已经换了一周,
   /// 光把 `now` 往前推只会让格子空着。
-  private func advanceClock() {
+  fileprivate func advanceClock() {
     let updated = Date()
     let rolledOver = !CoachFeatureCalendar.isSameDay(updated, now)
     now = updated
@@ -262,7 +286,7 @@ public struct CoachRootView: View {
     Task { await rosterViewModel.refresh() }
   }
 
-  private func loadDashboardData() async {
+  fileprivate func loadDashboardData() async {
     Analytics.shared.screen(.dashboard)
     async let rosterRefresh: Void = rosterViewModel.loadIfNeeded()
     async let queueRefresh: Void = queueViewModel.loadIfNeeded()

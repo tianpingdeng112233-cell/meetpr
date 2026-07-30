@@ -7,228 +7,218 @@ import SwiftUI
 struct StudentOverviewSection: View {
   let summary: StudentOverviewSummary
   let readiness: ReadinessRowState
-  let recentVideos: [StudentVideo]
-  let videosUnavailable: Bool
-  /// The coach-authored evaluation summary; the 5th card is its permanent
-  /// entry after the evaluation banner collapses (spec 033 D5).
-  let evaluationSummary: EvaluationSummary?
+  let days: [StudentExecutionDay]
+  let planWeekIndex: Int
+  let shiftBadgeText: String?
+  let now: Date
   let onSelectSection: (StudentDetailSection) -> Void
-  let onOpenEvaluationSummary: () -> Void
-
-  init(
-    summary: StudentOverviewSummary,
-    readiness: ReadinessRowState,
-    recentVideos: [StudentVideo],
-    videosUnavailable: Bool,
-    evaluationSummary: EvaluationSummary? = nil,
-    onSelectSection: @escaping (StudentDetailSection) -> Void,
-    onOpenEvaluationSummary: @escaping () -> Void = {}
-  ) {
-    self.summary = summary
-    self.readiness = readiness
-    self.recentVideos = recentVideos
-    self.videosUnavailable = videosUnavailable
-    self.evaluationSummary = evaluationSummary
-    self.onSelectSection = onSelectSection
-    self.onOpenEvaluationSummary = onOpenEvaluationSummary
-  }
+  let onRemindReadiness: () -> Void
 
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        Button {
-          onSelectSection(.execution)
-        } label: {
-          completionCard
-        }
-        .buttonStyle(.plain)
-
-        StudentReadinessCard(readiness: readiness)
-
-        Button {
-          onSelectSection(.feedback)
-        } label: {
-          feedbackCard
-        }
-        .buttonStyle(.plain)
-
-        Button {
-          onSelectSection(.videos)
-        } label: {
-          videoCard
-        }
-        .buttonStyle(.plain)
-
-        Button {
-          onOpenEvaluationSummary()
-        } label: {
-          evaluationSummaryCard
-        }
-        .buttonStyle(.plain)
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point10) {
+        trainingCard
+        readinessCard
+        feedbackCard
       }
-      .padding(MeetPRSpacing.base)
+      .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+      .padding(.bottom, MeetPRSpacing.point28)
     }
-    .background(Color.MeetPR.bg)
+    .scrollIndicators(.hidden)
+    .background(Color.MeetPR.bgBase)
   }
 
-  private var evaluationSummaryCard: some View {
-    Card(accessibilityLabel: "评估总结") {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("评估总结")
-        if let evaluationSummary {
-          Text(evaluationSummary.trainingPlanExcerpt)
-            .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-            .lineLimit(2)
-          Text("更新于 \(CoachStudentFormatting.shortDateText(evaluationSummary.lastUpdatedAt))")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-        } else {
-          Text("未填写,去写一份")
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("评估总结是学员的长期参照")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+  private var trainingCard: some View {
+    VStack(spacing: 0) {
+      HStack {
+        Text(CoachDetailStrings.weekTraining)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.gold500)
+        Spacer()
+        Text(CoachDetailStrings.tapDayForDetails)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+      }
+      .padding(.horizontal, MeetPRSpacing.space4)
+      .padding(.top, MeetPRSpacing.point14)
+      .padding(.bottom, MeetPRSpacing.point11)
+
+      if trainingDays.isEmpty {
+        Text(CoachDetailStrings.noTrainingThisWeek)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .padding(.horizontal, MeetPRSpacing.space4)
+          .padding(.vertical, MeetPRSpacing.point13)
+          .overlay(alignment: .top) {
+            Rectangle()
+              .fill(Color.MeetPR.borderHairline)
+              .frame(height: MeetPRSpacing.point1)
+          }
+      } else {
+        ForEach(Array(trainingDays.enumerated()), id: \.element.id) { index, day in
+          NavigationLink {
+            CoachDayDetailView(day: day)
+          } label: {
+            trainingDayRow(day, ordinal: index + 1)
+          }
+          .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+          .accessibilityIdentifier("coach.detail.day.\(day.id.timeIntervalSinceReferenceDate)")
         }
       }
+    }
+    .meetPRCardSurface(.card)
+  }
+
+  private func trainingDayRow(_ day: StudentExecutionDay, ordinal: Int) -> some View {
+    HStack(spacing: MeetPRSpacing.point10) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+        Text(dayTitle(day, ordinal: ordinal))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .lineLimit(1)
+        Text(dateLine(day.date))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+
+      if day.planDay?.shiftedToDate != nil {
+        Text(CoachDetailStrings.adjusted)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size10, weight: .bold))
+          .foregroundStyle(Color.MeetPR.gold500)
+          .padding(.horizontal, MeetPRSpacing.space2)
+          .padding(.vertical, MeetPRSpacing.point2)
+          .background(Color.MeetPR.gold500.opacity(0.12))
+          .clipShape(.capsule)
+      } else if let shiftBadgeText, ordinal == 1 {
+        Text(shiftBadgeText)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size10, weight: .bold))
+          .foregroundStyle(Color.MeetPR.gold500)
+          .padding(.horizontal, MeetPRSpacing.space2)
+          .padding(.vertical, MeetPRSpacing.point2)
+          .background(Color.MeetPR.gold500.opacity(0.12))
+          .clipShape(.capsule)
+      }
+
+      Text(dayState(day).text)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+        .foregroundStyle(dayState(day).color)
+      Image(systemName: "chevron.right")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textDisabled)
+    }
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.vertical, MeetPRSpacing.point13)
+    .overlay(alignment: .top) {
+      Rectangle()
+        .fill(Color.MeetPR.borderHairline)
+        .frame(height: MeetPRSpacing.point1)
     }
   }
 
-  private var completionCard: some View {
-    Card(accessibilityLabel: "本周完成度") {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("本周完成度")
-        Text("本周完成 \(summary.completedTrainingDays)/\(summary.plannedTrainingDays) 训练日")
-          .font(Font.MeetPR.headline)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-        CompletionBar(
-          completed: summary.completedTrainingDays,
-          total: max(summary.plannedTrainingDays, 1)
-        )
-        if let latestActivityAt = summary.latestActivityAt {
-          Text("上次活跃 \(CoachStudentFormatting.relativeText(latestActivityAt))")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+  private var readinessCard: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point5) {
+      Text(CoachDetailStrings.todayStatus)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+
+      switch readiness {
+      case .loaded(let checkin):
+        Text(CoachStudentFormatting.readinessScalesText(checkin))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(CoachStudentFormatting.readinessFatigueText(checkin))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+      case .notFiled:
+        HStack(spacing: MeetPRSpacing.point10) {
+          Text(CoachDetailStrings.todayNotFiled)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textTertiary)
+          Spacer()
+          Button(CoachDetailStrings.remindToFile, action: onRemindReadiness)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+            .padding(.horizontal, MeetPRSpacing.point14)
+            .padding(.vertical, MeetPRSpacing.point7)
+            .overlay {
+              Capsule()
+                .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
+            }
+            .buttonStyle(PressScaleButtonStyle(scale: 0.96))
         }
+      case .unavailable:
+        Text(CoachDetailStrings.statusUnavailable)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
+    .padding(MeetPRSpacing.point15)
+    .meetPRCardSurface(.card)
   }
 
   private var feedbackCard: some View {
-    Card(accessibilityLabel: "最近反馈") {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("最近反馈")
-        if let latestFeedback = summary.latestFeedback {
-          Text(latestFeedback.text)
-            .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-            .lineLimit(3)
-          Text(CoachStudentFormatting.relativeText(latestFeedback.postedAt))
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+    Button {
+      onSelectSection(summary.latestFeedback == nil ? .videos : .feedback)
+    } label: {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+        Text(CoachDetailStrings.recentFeedback)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+        if let feedback = summary.latestFeedback {
+          Text(feedback.text)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+            .lineLimit(1)
+          Text(
+            CoachDetailStrings.feedbackMeta(
+              relativeTime: CoachStudentFormatting.relativeText(feedback.postedAt, now: now)
+            )
+          )
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
         } else {
-          Text("暂无反馈")
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("去反馈段写一条")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+          Text(CoachDetailStrings.noFeedback)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textTertiary)
+          Text(CoachDetailStrings.writeFirstFeedback)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textTertiary)
         }
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(MeetPRSpacing.point15)
+      .meetPRCardSurface(.card)
     }
+    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
   }
 
-  private var videoCard: some View {
-    Card(accessibilityLabel: "最近视频") {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("最近视频")
-        if videosUnavailable {
-          Text("视频加载失败")
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("下拉刷新重试")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-        } else if recentVideos.isEmpty {
-          Text("学员还没有上传视频")
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-        } else {
-          HStack(spacing: MeetPRSpacing.sm) {
-            ForEach(recentVideos) { video in
-              VStack(spacing: MeetPRSpacing.xs) {
-                Image(systemName: "video.fill")
-                  .font(Font.MeetPR.headline)
-                  .foregroundStyle(Color.MeetPR.brandRed)
-                Text(CoachStudentFormatting.shortDateText(video.displayDate))
-                  .font(Font.MeetPR.footnote)
-                  .foregroundStyle(Color.MeetPR.fgSecondary)
-              }
-              .frame(maxWidth: .infinity)
-              .padding(.vertical, MeetPRSpacing.sm)
-              .background(Color.MeetPR.surface3)
-              .clipShape(.rect(cornerRadius: MeetPRRadius.md))
-            }
-          }
-          Text("查看全部视频")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-        }
-      }
-    }
+  private var trainingDays: [StudentExecutionDay] {
+    days.filter { $0.planDay?.exercises.isEmpty == false }
   }
-}
 
-/// "今日状态" — the coach's read of today's readiness check-in (spec 030 §C
-/// downstream, raw values only; no readiness score per ADR-001).
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct StudentReadinessCard: View {
-  let readiness: ReadinessRowState
-
-  var body: some View {
-    Card(accessibilityLabel: "今日状态") {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("今日状态")
-        switch readiness {
-        case .loaded(let checkin):
-          Text(CoachStudentFormatting.readinessScalesText(checkin))
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text(CoachStudentFormatting.readinessFatigueText(checkin))
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-        case .notFiled:
-          Text("今日未填")
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-        case .unavailable:
-          Text("暂时无法获取")
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("下拉刷新重试")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-        }
-      }
-    }
+  private func dayTitle(_ day: StudentExecutionDay, ordinal: Int) -> String {
+    let exerciseName = day.planDay?.exercises.first?.exercise.name ?? CoachDetailStrings.training
+    return "W\(planWeekIndex)D\(ordinal) · \(exerciseName)"
   }
-}
 
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct CompletionBar: View {
-  let completed: Int
-  let total: Int
+  private func dateLine(_ date: Date) -> String {
+    let calendar = CoachFeatureCalendar.calendar
+    let month = calendar.component(.month, from: date)
+    let day = calendar.component(.day, from: date)
+    let weekday = calendar.component(.weekday, from: date)
+    let weekdayText = CoachDetailStrings.weekday(weekday)
+    return "\(month)/\(day) · \(weekdayText)"
+  }
 
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.xs) {
-      ForEach(0..<total, id: \.self) { index in
-        Capsule()
-          .fill(index < completed ? Color.MeetPR.green : Color.MeetPR.surface3)
-          .frame(height: 8)
-      }
+  private func dayState(_ day: StudentExecutionDay) -> (text: String, color: Color) {
+    if day.completedSetCount > 0 {
+      return (CoachDetailStrings.completed, Color.MeetPR.success)
     }
+    if CoachFeatureCalendar.isSameDay(day.date, now) {
+      return (CoachDetailStrings.today, Color.MeetPR.textTertiary)
+    }
+    return (CoachDetailStrings.notStarted, Color.MeetPR.textTertiary)
   }
 }

@@ -40,6 +40,7 @@ struct StudentPendingVideosView: View {
     }
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bg)
+    .coachFullScreenDestination()
     .navigationTitle(studentName)
     #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)

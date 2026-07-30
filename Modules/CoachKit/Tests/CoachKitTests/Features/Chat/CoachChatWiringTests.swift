@@ -33,8 +33,10 @@ import ViewInspector
       chat: chat
     ).inspect().findAll(ChatEntryButton.self).count,
     CoachReceivingView(
-      pendingCount: 0,
-      videoCount: 0,
+      now: Date(),
+      videoQueueViewModel: CoachVideoQueueViewModel(
+        repository: InMemoryCoachVideoQueueRepository()
+      ),
       chat: chat
     ).inspect().findAll(ChatEntryButton.self).count,
     CoachMyProfileView(
@@ -44,7 +46,7 @@ import ViewInspector
     ).inspect().findAll(ChatEntryButton.self).count,
   ]
 
-  #expect(views == [0, 0, 1, 1, 1])
+  #expect(views == [0, 0, 1, 0, 1])
 }
 
 @Test func messageBadgeIncludesVideosAndChatUnread() {
@@ -76,6 +78,35 @@ import ViewInspector
   await opener.openConversation(withOtherParty: studentID)
 
   #expect(opener.destination?.id == firstID)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func directMessageEntryCarriesStudentNameIntoEmptyConversation() async {
+  let studentID = UUID()
+  let userID = UUID()
+  let repository = InMemoryChatRepository(
+    currentUserID: userID,
+    seed: ChatDemoSeed(
+      conversations: [],
+      messagesByConversationID: [:]
+    )
+  )
+  let chat = CoachChatContext(
+    repository: repository,
+    currentUserID: userID,
+    inbox: ChatInboxViewModel(repository: repository, currentUserID: userID),
+    sendCoordinator: ChatSendCoordinator(repository: repository, currentUserID: userID)
+  )
+  let opener = CoachConversationOpener(chat: chat)
+
+  await opener.openConversation(
+    withOtherParty: studentID,
+    studentName: "王晨曦"
+  )
+
+  #expect(opener.destinationStudentName == "王晨曦")
+  #expect(opener.destination?.otherPartyID == studentID)
 }
 
 @MainActor

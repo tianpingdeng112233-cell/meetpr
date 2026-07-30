@@ -7,84 +7,96 @@ import SwiftUI
 struct CoachFeedbackHistoryView: View {
   let feedback: [CoachFeedback]
   let days: [StudentPlanDay]
-  let onCompose: () -> Void
+  let now: Date
 
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        Button(action: onCompose) {
-          Label("写反馈", systemImage: "square.and.pencil")
-            .font(Font.MeetPR.bodyEmphasis)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 13)
-            .foregroundStyle(Color.MeetPR.bg)
-            .background(Color.MeetPR.fgPrimary)
-            .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point10) {
+        HStack {
+          Text(CoachFeedbackStrings.recordCount(feedback.count))
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textTertiary)
+          Spacer()
+          Text(CoachFeedbackStrings.writeFromVideo)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+            .foregroundStyle(Color.MeetPR.textDisabled)
         }
 
         if feedback.isEmpty {
-          ContentUnavailableView("暂无反馈", systemImage: "bubble.left.and.text.bubble.right")
+          Text(CoachFeedbackStrings.empty)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textTertiary)
             .frame(maxWidth: .infinity)
-            .padding(.top, MeetPRSpacing.xl)
+            .padding(.top, MeetPRSpacing.point22)
         } else {
           ForEach(feedback) { item in
-            FeedbackHistoryRow(item: item, exerciseName: exerciseName(for: item.planExerciseID))
+            feedbackCard(item)
           }
         }
       }
-      .padding(MeetPRSpacing.base)
+      .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+      .padding(.bottom, MeetPRSpacing.point28)
     }
-    .background(Color.MeetPR.bg)
+    .scrollIndicators(.hidden)
+    .background(Color.MeetPR.bgBase)
   }
 
-  private func exerciseName(for id: UUID?) -> String? {
-    guard let id else { return nil }
-    return days.flatMap(\.exercises).first { $0.id == id }?.exercise.name
+  private func feedbackCard(_ item: CoachFeedback) -> some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point6) {
+      HStack(spacing: MeetPRSpacing.space2) {
+        Text(CoachStudentFormatting.relativeText(item.postedAt, now: now))
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+        if let subject = subject(item) {
+          Text(subject)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+            .foregroundStyle(Color.MeetPR.textTertiary)
+            .lineLimit(1)
+            .padding(.horizontal, MeetPRSpacing.space2)
+            .padding(.vertical, MeetPRSpacing.point2)
+            .overlay {
+              Capsule()
+                .stroke(Color.MeetPR.borderDefault, lineWidth: MeetPRSpacing.point1)
+            }
+        }
+      }
+      Text(item.text)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .lineSpacing(MeetPRSpacing.point7)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(MeetPRSpacing.point14)
+    .meetPRCardSurface(.card)
+  }
+
+  private func subject(_ item: CoachFeedback) -> String? {
+    if let exerciseID = item.planExerciseID,
+      let exercise = days.flatMap(\.exercises).first(where: { $0.id == exerciseID })
+    {
+      return exercise.exercise.name
+    }
+    if item.videoID != nil {
+      return CoachFeedbackStrings.videoFeedback
+    }
+    return item.dayDate.map { date in
+      date.formatted(
+        .dateTime.month(.twoDigits).day(.twoDigits)
+          .locale(Locale(identifier: "zh_Hans_CN"))
+      )
+    }
   }
 }
 
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct FeedbackHistoryRow: View {
-  let item: CoachFeedback
-  let exerciseName: String?
+enum CoachFeedbackStrings {
+  static let writeFromVideo = CoachLocalization.localized("coach.feedback.writeFromVideo")
+  static let empty = CoachLocalization.localized("coach.feedback.empty")
+  static let videoFeedback = CoachLocalization.localized("coach.feedback.videoFeedback")
 
-  var body: some View {
-    Card(accessibilityLabel: "反馈") {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Text(item.text)
-          .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .lineLimit(4)
-
-        HStack(spacing: MeetPRSpacing.sm) {
-          if let dayDate = item.dayDate {
-            chip(CoachStudentFormatting.shortDateText(dayDate), systemImage: "calendar")
-          }
-          if let exerciseName {
-            chip(exerciseName, systemImage: "figure.strengthtraining.traditional")
-          }
-          Spacer(minLength: MeetPRSpacing.sm)
-          Text(CoachStudentFormatting.relativeText(item.postedAt))
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-        }
-
-        Text(item.readAt == nil ? "未读" : "已读")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(item.readAt == nil ? Color.MeetPR.amber : Color.MeetPR.fgSecondary)
-      }
-    }
-  }
-
-  private func chip(_ title: String, systemImage: String) -> some View {
-    Label(title, systemImage: systemImage)
-      .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
-      .lineLimit(1)
-      .padding(.horizontal, MeetPRSpacing.sm)
-      .padding(.vertical, 5)
-      .background(Color.MeetPR.surface2)
-      .clipShape(.capsule)
+  static func recordCount(_ count: Int) -> String {
+    CoachLocalization.replacing(
+      "coach.feedback.recordCount",
+      values: ["count": count.formatted()]
+    )
   }
 }

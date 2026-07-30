@@ -7,7 +7,7 @@ import Testing
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func detailDefinesFiveSectionsInSpecOrder() {
-  #expect(StudentDetailSection.allCases.map(\.title) == ["概览", "执行", "视频", "成长", "反馈"])
+  #expect(StudentDetailSection.allCases.map(\.title) == ["概览", "视频", "成长", "反馈", "资料"])
 }
 
 @MainActor
