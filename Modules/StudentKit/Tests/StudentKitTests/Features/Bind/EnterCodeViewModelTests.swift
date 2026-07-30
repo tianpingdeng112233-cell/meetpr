@@ -135,7 +135,19 @@ private func makeViewModel(
 
   #expect(outcome == nil)
   #expect(viewModel.fieldError == .invalidCode)
+  #expect(
+    viewModel.fieldError?.message
+      == "这个码不存在或已过期。让教练在「我的」→「我的邀请码」里重新生成一个。"
+  )
+  #expect(viewModel.codeInput == "XK7MPQ2RVT")
   #expect(harness.stash.peek(studentId: BindFixtures.studentId) == nil)
+}
+
+@Test func clipboardPasteNormalizesValidCodeAndRejectsInvalidContent() {
+  #expect(InviteCodePaste.validCode(from: "xk7m pq2-rvt") == "XK7MPQ2RVT")
+  #expect(InviteCodePaste.validCode(from: "XK7MPQ2RV0") == nil)
+  #expect(InviteCodePaste.validCode(from: "") == nil)
+  #expect(InviteCodePaste.validCode(from: nil) == nil)
 }
 
 @MainActor
@@ -171,4 +183,33 @@ private func makeViewModel(
   let outcome = await viewModel.submit()
   #expect(outcome == nil)
   #expect(repo.submitCalls.isEmpty)
+}
+
+// MARK: - Boxed-field input sanitising
+
+/// `EnterCodeView.sanitized` is what stands between the boxed field and a code
+/// that can never validate: without the alphabet filter a student could fill
+/// all ten boxes with `O`s and get a permanently disabled button and no
+/// explanation of why.
+@Test func sanitizedUppercasesAndStripsSeparators() {
+  #expect(EnterCodeView.sanitized("xk7m-pq2 rvt") == "XK7MPQ2RVT")
+}
+
+@Test func sanitizedDropsCharactersOutsideTheLockedAlphabet() {
+  // I / O / 0 / 1 are excluded from the invite-code alphabet on purpose.
+  #expect(EnterCodeView.sanitized("XKI7O0M1PQ2RVT") == "XK7MPQ2RVT")
+  #expect(EnterCodeView.sanitized("!@#$%^") == "")
+  #expect(EnterCodeView.sanitized("中文") == "")
+}
+
+@Test func sanitizedCapsAtTheCodeLength() {
+  let overlong = EnterCodeView.sanitized("XK7MPQ2RVTZZZZ")
+
+  #expect(overlong.count == InviteCodeFormat.length)
+  #expect(overlong == "XK7MPQ2RVT")
+}
+
+@Test func sanitizedKeepsPartialInputIntact() {
+  #expect(EnterCodeView.sanitized("xk7") == "XK7")
+  #expect(EnterCodeView.sanitized("") == "")
 }
