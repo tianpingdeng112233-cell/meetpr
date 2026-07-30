@@ -8,6 +8,7 @@ public struct ChatComposer: View {
   private let viewModel: ConversationViewModel
   private let downsampler: ChatImageDownsampler
   private let onShareTodayTraining: (@MainActor () -> Void)?
+  private let layout: ChatComposerLayout
   @State private var text = ""
   @State private var selectedPhoto: PhotosPickerItem?
   @State private var isPreparingImage = false
@@ -16,11 +17,15 @@ public struct ChatComposer: View {
   public init(
     viewModel: ConversationViewModel,
     downsampler: ChatImageDownsampler = ChatImageDownsampler(),
+    initialText: String = "",
+    layout: ChatComposerLayout = .standard,
     onShareTodayTraining: (@MainActor () -> Void)? = nil
   ) {
     self.viewModel = viewModel
     self.downsampler = downsampler
     self.onShareTodayTraining = onShareTodayTraining
+    self.layout = layout
+    _text = State(initialValue: String(initialText.prefix(ConversationViewModel.maximumTextLength)))
   }
 
   public var body: some View {
@@ -61,66 +66,11 @@ public struct ChatComposer: View {
         )
       }
 
-      HStack(alignment: .bottom, spacing: MeetPRSpacing.sm) {
-        if let onShareTodayTraining {
-          Menu {
-            Button(action: onShareTodayTraining) {
-              Label(ChatStrings.shareTodayTraining, systemImage: "dumbbell")
-            }
-            PhotosPicker(selection: $selectedPhoto, matching: .images) {
-              Label(ChatStrings.choosePhoto, systemImage: "photo")
-            }
-          } label: {
-            ComposerAttachmentIcon(
-              preparingImage: preparingImage,
-              systemImage: "plus"
-            )
-          }
-          .disabled(isPreparingImage)
-          .accessibilityLabel(ChatStrings.addAttachment)
-        } else {
-          PhotosPicker(selection: $selectedPhoto, matching: .images) {
-            ComposerAttachmentIcon(
-              preparingImage: preparingImage,
-              systemImage: "photo"
-            )
-          }
-          .disabled(isPreparingImage)
-          .accessibilityLabel(ChatStrings.choosePhoto)
-        }
-
-        TextField(composerPlaceholder, text: $text, axis: .vertical)
-          .lineLimit(1...5)
-          .textFieldStyle(.plain)
-          .padding(.horizontal, MeetPRSpacing.md)
-          .padding(.vertical, MeetPRSpacing.sm)
-          .background(Color.MeetPR.surfaceElevated)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
-          .onChange(of: text) { _, newValue in
-            viewModel.clearSetRefSendError()
-            if viewModel.stagedSetRef == nil,
-              newValue.count > ConversationViewModel.maximumTextLength
-            {
-              text = String(newValue.prefix(ConversationViewModel.maximumTextLength))
-            }
-          }
-
-        Button(action: send) {
-          Image(systemName: "arrow.up.circle.fill")
-            .font(.title)
-            .foregroundStyle(canSendText ? Color.MeetPR.gold500 : Color.MeetPR.textDisabled)
-            .frame(width: 44, height: 44)
-            .overlay(alignment: .topTrailing) {
-              if viewModel.hasSendingMessages {
-                ProgressView()
-                  .controlSize(.mini)
-                  .offset(x: 2, y: -2)
-              }
-            }
-        }
-        .buttonStyle(.plain)
-        .disabled(!canSendText)
-        .accessibilityLabel(ChatStrings.send)
+      switch layout {
+      case .standard:
+        standardComposer(preparingImage: preparingImage)
+      case .compactPill:
+        compactPillComposer
       }
     }
     .padding(.horizontal, MeetPRSpacing.md)
@@ -134,6 +84,113 @@ public struct ChatComposer: View {
         await prepareAndSend(newItem)
       }
     }
+  }
+
+  private func standardComposer(preparingImage: Bool) -> some View {
+    HStack(alignment: .bottom, spacing: MeetPRSpacing.sm) {
+      attachmentControl(preparingImage: preparingImage)
+      composerTextField
+        .padding(.horizontal, MeetPRSpacing.md)
+        .padding(.vertical, MeetPRSpacing.sm)
+        .background(Color.MeetPR.surfaceElevated)
+        .clipShape(.rect(cornerRadius: MeetPRRadius.xl))
+      standardSendButton
+    }
+  }
+
+  private var compactPillComposer: some View {
+    HStack(spacing: MeetPRSpacing.point6) {
+      composerTextField
+        .padding(.leading, MeetPRSpacing.point10)
+        .padding(.vertical, MeetPRSpacing.point10)
+      Button(action: send) {
+        Image(systemName: "arrow.up")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size18, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .frame(width: 34, height: 34)
+          .background(Color.MeetPR.borderStrong.opacity(canSendText ? 1 : 0.65))
+          .clipShape(.circle)
+          .overlay {
+            if viewModel.hasSendingMessages {
+              ProgressView()
+                .controlSize(.mini)
+            }
+          }
+      }
+      .buttonStyle(.plain)
+      .disabled(!canSendText)
+      .accessibilityLabel(ChatStrings.send)
+    }
+    .padding(.trailing, MeetPRSpacing.point5)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.capsule)
+    .overlay {
+      Capsule()
+        .stroke(Color.MeetPR.borderDefault, lineWidth: MeetPRSpacing.point1)
+    }
+  }
+
+  @ViewBuilder
+  private func attachmentControl(preparingImage: Bool) -> some View {
+    if let onShareTodayTraining {
+      Menu {
+        Button(action: onShareTodayTraining) {
+          Label(ChatStrings.shareTodayTraining, systemImage: "dumbbell")
+        }
+        PhotosPicker(selection: $selectedPhoto, matching: .images) {
+          Label(ChatStrings.choosePhoto, systemImage: "photo")
+        }
+      } label: {
+        ComposerAttachmentIcon(
+          preparingImage: preparingImage,
+          systemImage: "plus"
+        )
+      }
+      .disabled(isPreparingImage)
+      .accessibilityLabel(ChatStrings.addAttachment)
+    } else {
+      PhotosPicker(selection: $selectedPhoto, matching: .images) {
+        ComposerAttachmentIcon(
+          preparingImage: preparingImage,
+          systemImage: "photo"
+        )
+      }
+      .disabled(isPreparingImage)
+      .accessibilityLabel(ChatStrings.choosePhoto)
+    }
+  }
+
+  private var composerTextField: some View {
+    TextField(composerPlaceholder, text: $text, axis: .vertical)
+      .lineLimit(1...5)
+      .textFieldStyle(.plain)
+      .onChange(of: text) { _, newValue in
+        viewModel.clearSetRefSendError()
+        if viewModel.stagedSetRef == nil,
+          newValue.count > ConversationViewModel.maximumTextLength
+        {
+          text = String(newValue.prefix(ConversationViewModel.maximumTextLength))
+        }
+      }
+  }
+
+  private var standardSendButton: some View {
+    Button(action: send) {
+      Image(systemName: "arrow.up.circle.fill")
+        .font(.title)
+        .foregroundStyle(canSendText ? Color.MeetPR.gold500 : Color.MeetPR.textDisabled)
+        .frame(width: 44, height: 44)
+        .overlay(alignment: .topTrailing) {
+          if viewModel.hasSendingMessages {
+            ProgressView()
+              .controlSize(.mini)
+              .offset(x: 2, y: -2)
+          }
+        }
+    }
+    .buttonStyle(.plain)
+    .disabled(!canSendText)
+    .accessibilityLabel(ChatStrings.send)
   }
 
   private var canSendText: Bool {
@@ -188,6 +245,11 @@ public struct ChatComposer: View {
       imageErrorMessage = ChatStrings.imagePreparationFailed
     }
   }
+}
+
+public enum ChatComposerLayout: Sendable {
+  case standard
+  case compactPill
 }
 
 private struct ComposerAttachmentIcon: View {
