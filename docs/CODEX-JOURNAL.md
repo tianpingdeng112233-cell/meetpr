@@ -7,6 +7,7 @@
 
 ## release/1.0(1.0(8) 累积线)
 
+- 2026-07-30 560d840 — [Claude][P1] App 图标换成 David 定稿的「片里的折线」(纸底 #F5F6F8 + 金盘 #D97706 + 折线/淡段/上弧/下沿 PERSONAL RECORD,两色无渐变):主图与 dark 同一张 1024(无 alpha,3 通道),tinted 另出灰度挖空版(圆盘实心 + 盘内挖成透明,系统自己上用户色);矢量真源 + SPEC + 重出 PNG 命令落 docs/brand/(3 张 PNG + 3 个新文件;asset catalog 编译 0 警告,iPhone 17 模拟器主屏亲验 light/dark/tinted 三态)
 - 2026-07-23 3808f44 — [Codex][P1] 当前组大卡摄像头改为未附视频时直达系统拍摄页,保留首次隐私确认/相册留底/上传链路;上传中与已上传仍进详情、失败仍直达重试,无视频摄像头能力时安全回退弹层并修 `UIImagePickerController` 媒体类型误报崩溃(StudentKit 5 文件;strict lint/format 0,467 测试绿;MeetPR-DemoStudent iPhone 17 模拟器构建绿并实点回退路径)
 - 2026-07-18 5f34e96 — [Claude][P1] 回看也能看到动作备注(David 追加拍板):无活动组时(日练完/历史只读)动作卡头显示备注、全部训练历史动作块同步补;抽共享 CoachNotePill(surface2 变体防 surface1 卡上隐形)+ CoachNoteDisplay.reviewNote 纯函数策略,补 3 测(StudentKit 426);ExerciseSpec 移文件级解 type_body_length(StudentKit 5 文件;swiftlint strict 0,426+126 绿;review-loop 2 轮 3 BLOCKER 全修 CLEAN;模拟器亲验训练tab历史日+全部训练历史两路径)
 - 2026-07-18 9c788a1 — [Claude][P1] 学员端动作级教练备注可见:StudentPlanExercise.notes 投影透传(backend plan_exercises.notes,web 备注列)+ 训练页当前组 hero 卡渲染(灰标签+正文独立换行,仅 hero 卡,David 三拍板),旧缓存缺 key 解码兼容测试 + 投影 passthrough 测试补齐(CoreModels/StudentKit 6 文件;swiftlint strict 0 + 双模块测试绿;review-loop 2 轮 3 BLOCKER 全修 CLEAN;DemoStudent 模拟器亲验)
