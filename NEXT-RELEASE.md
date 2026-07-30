@@ -11,7 +11,24 @@
 
 ## 本版将包含(落线后追加到这里)
 
-_(尚无候选)_
+- **学员端首屏与切 tab 提速**(PR #289,`aa54155`,P1):David 在 1.0(15) 实机反馈「加载特别慢,
+  骨架屏要看很久,开始训练跳转不丝滑」。三层根因逐条修:①9 个 ViewModel 改保鲜刷新——原先 `load()`
+  首行无条件 `state = .loading`,手里有数据也先扔掉退回骨架;②串行瀑布压平——今日页 5 段串行 → 4 路
+  并发 + 1 段真依赖,训练页 6 段 → 3 跳,周概览去掉重复投影;③切回今日 25 秒节流窗(窗口内只刷日志/
+  反馈/聊天/PR 数,**下拉刷新永远强制全量**);④动作库落版本化磁盘缓存 + `If-None-Match`/304
+  (此前只有随进程消亡的内存缓存,每次冷启动都在首屏关键路径上全量重下 518KB);⑤「开始训练」把已加载
+  的 plan 交棒给训练页,首帧立即出内容。
+  证据:StudentKit 615 + Networking 99 测试绿、`xcodebuild -configuration Demo` 0 warning、
+  **2026-07-30 David 真机(iPhone 12,Release 配置连真实后端)验收通过**——「不再重新加载了」。
+  配套后端 gzip 已于同日部署 staging(backend #141,`sha-6c65173`,JS bundle 实测省 69%),
+  **本包发出后学员端冷启动还会再快一截**(动作库 518KB → 约 30KB)。
+  ⚠️ 收货期两轮定向返修拦下的坑,改这块前必读:交棒路径最初写成 `if let preloadedPlan { return ... }`,
+  直接跳过 `fetchCurrentPlan`——而那个方法的 cache-first 分支**顺带启动仓储后台刷新**,于是教练改的
+  计划不会出现;修完又发现计划没变时会白白重取一轮当日快照,再加等值比较挡掉。
+  ⚠️ 另一条别重走的弯路:我曾判定 `MeetPRRiseInModifier` 的 `guard !Task.isCancelled` 会让卡片
+  **永久透明**并开了 fix 分支——**前提错误,已撤回**。`.task(id:)` 每次 view appear 都会执行,
+  id 只是「值变化时额外重建」的附加触发;实测(delay 放大到 2s)切 tab 回来内容立即完整、零重播。
+  详见 `~/Brain/wiki/projects/MeetPR/reviews/2026-07-29-rise-in-cancellation.md`。
 
 ## 🎯 已排上但未开工
 
