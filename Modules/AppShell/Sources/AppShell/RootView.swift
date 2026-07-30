@@ -173,7 +173,7 @@ public struct RootView: View {
       if let chat = chatSession.context, chat.currentUserID == user.id,
         chatSession.activeStudentCoachID == nil
       {
-        coachContent(chat: chat)
+        coachContent(for: user, chat: chat)
       } else {
         ProgressView()
           .task(id: user.id) {
@@ -184,11 +184,11 @@ public struct RootView: View {
           }
       }
     } else {
-      coachContent(chat: nil)
+      coachContent(for: user, chat: nil)
     }
   }
 
-  private func coachContent(chat: ChatSessionContext?) -> some View {
+  private func coachContent(for user: User, chat: ChatSessionContext?) -> some View {
     CoachRootView(
       repository: coachPlans,
       studentPlans: studentPlans,
@@ -207,6 +207,8 @@ public struct RootView: View {
       currentUserID: chat?.currentUserID,
       inbox: chat?.inbox,
       sendCoordinator: chat?.sendCoordinator,
+      coachDisplayName: user.name,
+      privacyPolicyURL: AnalyticsPrivacyNotice.privacyPolicyURL,
       onLogout: {
         await session.logout()
       },

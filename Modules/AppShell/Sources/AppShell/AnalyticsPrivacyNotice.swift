@@ -29,6 +29,6 @@ struct AnalyticsPrivacyNotice: View {
     .presentationDetents([.medium])
   }
 
-  private static let privacyPolicyURL =
+  static let privacyPolicyURL =
     URL(string: "https://meetpr.app/privacy") ?? URL(fileURLWithPath: "/")
 }

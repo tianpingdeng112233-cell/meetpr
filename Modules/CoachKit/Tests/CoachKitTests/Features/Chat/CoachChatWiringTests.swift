@@ -41,12 +41,11 @@ import ViewInspector
     ).inspect().findAll(ChatEntryButton.self).count,
     CoachMyProfileView(
       viewModel: CoachMyProfileViewModel(logoutAction: {}),
-      inviteCodes: InMemoryInviteCodeRepository(),
-      chat: chat
+      inviteCodes: InMemoryInviteCodeRepository()
     ).inspect().findAll(ChatEntryButton.self).count,
   ]
 
-  #expect(views == [0, 0, 1, 0, 1])
+  #expect(views == [0, 0, 1, 0, 0])
 }
 
 @Test func messageBadgeIncludesVideosAndChatUnread() {

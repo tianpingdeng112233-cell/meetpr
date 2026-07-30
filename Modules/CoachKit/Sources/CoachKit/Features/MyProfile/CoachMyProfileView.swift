@@ -1,235 +1,334 @@
 import CoreModels
 import DesignSystem
+import Foundation
 import RepositoryContracts
 import SwiftUI
 
-/// Coach "我的" tab, reskinned 1:1 to the `DKCoachProfile` mock: an identity
-/// card, the permanent invite-code card (with the live code + scan count
-/// previewed inline), and a stacked rows card for the remaining entries.
+/// Coach "我的" tab on the audited v3 light palette.
 ///
-/// All real behavior is preserved — the 我的邀请码 feature still pushes the full
-/// `InviteCodesView` (generate / regenerate / single-use / revoke / copy live
-/// there), the App 版本 row reads `viewModel.appVersion`, and 退出登录 calls
-/// `viewModel.logout()`. The mock's avatar/name/student-count, QR glyph, "分享"
-/// button, and 自定义动作库 / 订阅管理 / 设置 rows have no backing model and are
-/// degraded honestly (see file-level notes / honestDegrades).
+/// The profile intentionally presents only backend-backed values and actions.
+/// Unsupported prototype concepts (avatar editing, coach title, aggregate
+/// statistics, exercise library, and reminder rules) are not rendered.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct CoachMyProfileView: View {
   @Bindable private var viewModel: CoachMyProfileViewModel
   private let inviteCodes: any InviteCodeRepository
-  private let chat: CoachChatContext?
-  /// Local read-model so the permanent code + scan count can be previewed on
-  /// this screen; the full mutate/list UI still lives in `InviteCodesView`.
+  private let privacyPolicyURL: URL?
   @State private var codesViewModel: InviteCodesViewModel
-  @State private var isConversationListPresented = false
+  @State private var presentedOverlay: CoachProfileOverlay?
+  @State private var isInviteCodesPresented = false
+  @State private var toastMessage: String?
+  @State private var toastTask: Task<Void, Never>?
 
   init(
     viewModel: CoachMyProfileViewModel,
     inviteCodes: any InviteCodeRepository,
-    chat: CoachChatContext? = nil
+    privacyPolicyURL: URL? = nil
   ) {
     self.viewModel = viewModel
     self.inviteCodes = inviteCodes
-    self.chat = chat
+    self.privacyPolicyURL = privacyPolicyURL
     self._codesViewModel = State(initialValue: InviteCodesViewModel(repository: inviteCodes))
   }
 
+  @ViewBuilder
   var body: some View {
-    NavigationStack {
-      VStack(spacing: 0) {
-        HStack {
-          Text("我的")
-            .font(.system(size: 36, weight: .heavy))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Spacer()
-          CoachChatHeaderButton(chat: chat) {
-            isConversationListPresented = true
-          }
+    #if os(iOS)
+      profileContent
+        .fullScreenCover(item: $presentedOverlay) { overlay in
+          overlayContent(overlay)
+            .presentationBackground(
+              overlay == .logout ? Color.clear : Color.MeetPR.bgBase
+            )
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 8)
+    #else
+      profileContent
+        .sheet(item: $presentedOverlay) { overlay in
+          overlayContent(overlay)
+        }
+    #endif
+  }
 
+  private var profileContent: some View {
+    NavigationStack {
+      ZStack(alignment: .bottom) {
         ScrollView {
-          VStack(alignment: .leading, spacing: 16) {
-            identityCard
+          VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
+            Text(CoachMyProfileStrings.title)
+              .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+
+            nameCard
             inviteCard
-            rowsCard
+            generalSection
+            logoutButton
           }
-          .padding(16)
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+          .padding(.top, MeetPRSpacing.point6)
+          .padding(.bottom, MeetPRSpacing.point28)
         }
-        .scrollContentBackground(.hidden)
+        .scrollIndicators(.hidden)
         .refreshable { await codesViewModel.reload() }
+
+        if let toastMessage {
+          Text(toastMessage)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.surfaceCard)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, MeetPRSpacing.point18)
+            .padding(.vertical, MeetPRSpacing.point11)
+            .background(Color.MeetPR.textPrimary)
+            .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+            .padding(.horizontal, MeetPRSpacing.point28)
+            .padding(.bottom, MeetPRSpacing.space5)
+            .transition(.opacity)
+            .accessibilityIdentifier("coach.profile.toast")
+        }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
+      .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
-      .navigationDestination(isPresented: $isConversationListPresented) {
-        if let chat {
-          ConversationListView(chat: chat)
-        }
+      .navigationDestination(isPresented: $isInviteCodesPresented) {
+        InviteCodesView(repository: inviteCodes)
       }
     }
     .task { await codesViewModel.loadIfNeeded() }
-  }
-
-  // MARK: - Identity
-
-  // The mock shows an avatar initial, coach name, and "教练 · 14 名学员". None
-  // of those are on `CoachMyProfileViewModel`, so we degrade to the role line
-  // without a fabricated name/count, keeping the card's framing.
-  private var identityCard: some View {
-    card {
-      HStack(spacing: 14) {
-        Image(systemName: "person.fill")
-          .font(.system(size: 20, weight: .bold))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-          .frame(width: 52, height: 52)
-          .background(Color.MeetPR.surface2)
-          .clipShape(Circle())
-          .overlay { Circle().stroke(Color.MeetPR.border, lineWidth: 1) }
-        VStack(alignment: .leading, spacing: 2) {
-          Text("教练")
-            .font(.system(size: 18, weight: .bold))
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("MeetPR · V0.1 内测")
-            .font(Font.MeetPR.monoLabel)
-            .tracking(Font.MeetPR.monoLabelTracking)
-            .foregroundStyle(Color.MeetPR.brandRed)
-        }
-        Spacer()
-      }
+    .onDisappear {
+      toastTask?.cancel()
+      toastTask = nil
     }
   }
+}
 
-  // MARK: - Invite code
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+extension CoachMyProfileView {
+  private var nameCard: some View {
+    Text(viewModel.displayName)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .bold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .padding(MeetPRSpacing.space4)
+      .meetPRCardSurface(.card)
+      .accessibilityIdentifier("coach.profile.displayName")
+  }
 
-  // Reproduces the mock's permanent-code card: the live code in big mono, the
-  // real scan/use count, and an action row. The mock's QR glyph + "分享" have no
-  // backend (no QR payload, no share sheet wiring), so the card pushes the real
-  // `InviteCodesView` where the code is generated / copied / managed.
   private var inviteCard: some View {
-    NavigationLink {
-      InviteCodesView(repository: inviteCodes)
-    } label: {
-      card {
-        VStack(alignment: .leading, spacing: 0) {
-          HStack {
-            Text("永久邀请码")
-              .font(Font.MeetPR.monoLabel)
-              .tracking(Font.MeetPR.monoLabelTracking)
-              .foregroundStyle(Color.MeetPR.brandRed)
-            Spacer()
-            Image(systemName: "chevron.right")
-              .font(.system(size: 13))
-              .foregroundStyle(Color.MeetPR.fgTertiary)
-          }
+    ZStack(alignment: .topTrailing) {
+      Button {
+        isInviteCodesPresented = true
+      } label: {
+        inviteCardContent
+      }
+      .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+      .accessibilityIdentifier("coach.profile.inviteCard")
 
-          if let code = codesViewModel.activePersonalCode {
-            Text(InviteCodeFormat.grouped(code.code))
-              .font(.system(size: 24, weight: .bold, design: .monospaced))
-              .tracking(1.5)
-              .foregroundStyle(Color.MeetPR.fgPrimary)
-              .padding(.top, 10)
-            Text("已使用 \(code.usedCount) 次")
-              .font(.system(size: 11, weight: .medium, design: .monospaced))
-              .tracking(0.8)
-              .foregroundStyle(Color.MeetPR.fgTertiary)
-              .padding(.top, 8)
-          } else {
-            Text(inviteSubtitle)
-              .font(.system(size: 16))
-              .foregroundStyle(Color.MeetPR.fgSecondary)
-              .padding(.top, 10)
-          }
+      if let code = codesViewModel.activePersonalCode {
+        Button(CoachMyProfileStrings.copy) {
+          copy(code)
         }
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .padding(.horizontal, MeetPRSpacing.point14)
+        .padding(.vertical, MeetPRSpacing.point6)
+        .overlay {
+          RoundedRectangle(cornerRadius: MeetPRRadius.inset)
+            .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
+        }
+        .buttonStyle(PressScaleButtonStyle(scale: 0.95))
+        .padding(MeetPRSpacing.space4)
+        .accessibilityIdentifier("coach.profile.copyInvite")
       }
     }
-    .buttonStyle(.plain)
+  }
+
+  private var inviteCardContent: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+      HStack {
+        Text(CoachMyProfileStrings.permanentInvite)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.gold500)
+        Spacer()
+        if codesViewModel.activePersonalCode != nil {
+          Color.clear
+            .frame(width: MeetPRSpacing.point56, height: MeetPRSpacing.point30)
+        }
+      }
+
+      if let code = codesViewModel.activePersonalCode {
+        Text(code.code)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size26, weight: .bold))
+          .tracking(MeetPRFontMetrics.size26 * 0.14)
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .minimumScaleFactor(0.7)
+          .lineLimit(1)
+          .padding(.top, MeetPRSpacing.space2)
+
+        Text(CoachMyProfileStrings.inviteUsage(code.usedCount))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .padding(.top, MeetPRSpacing.space2)
+      } else {
+        Text(inviteSubtitle)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+          .padding(.top, MeetPRSpacing.space2)
+      }
+    }
+    .padding(MeetPRSpacing.space4)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .meetPRCardSurface(.card)
+    .contentShape(.rect(cornerRadius: MeetPRRadius.card))
   }
 
   private var inviteSubtitle: String {
     switch codesViewModel.state {
-    case .idle, .loading: "加载中…"
-    case .failed: "加载失败 · 点击重试"
-    case .loaded: "还没有永久码 · 点击生成"
+    case .idle, .loading: CoachMyProfileStrings.inviteLoading
+    case .failed: CoachMyProfileStrings.inviteFailed
+    case .loaded: CoachMyProfileStrings.inviteEmpty
     }
   }
 
-  // MARK: - Rows
+  private var generalSection: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      Text(CoachMyProfileStrings.general)
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
 
-  // The mock lists 自定义动作库 / 订阅管理 / 设置 (none exist yet) plus implicit
-  // version + logout. We keep the real, wired rows: App 版本 (read-only value)
-  // and 退出登录 (the destructive logout action). Unbuilt features are omitted
-  // rather than shown as dead rows.
-  private var rowsCard: some View {
-    VStack(spacing: 0) {
-      versionRow
-      divider
-      logoutRow
+      VStack(spacing: MeetPRSpacing.zero) {
+        actionRow(
+          title: CoachMyProfileStrings.help,
+          accessibilityIdentifier: "coach.profile.help"
+        ) {
+          presentedOverlay = .help
+        }
+        divider
+        actionRow(
+          title: CoachMyProfileStrings.privacyAndTerms,
+          accessibilityIdentifier: "coach.profile.privacyTerms"
+        ) {
+          presentedOverlay = .privacyAndTerms
+        }
+        divider
+        HStack {
+          Text(CoachMyProfileStrings.appVersion)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+          Spacer()
+          Text(CoachMyProfileStrings.appVersionValue(viewModel.appVersion))
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+            .foregroundStyle(Color.MeetPR.textTertiary)
+        }
+        .padding(.horizontal, MeetPRSpacing.space4)
+        .padding(.vertical, MeetPRSpacing.point14)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("coach.profile.appVersion")
+      }
+      .meetPRCardSurface(.card)
     }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color.MeetPR.surface1)
-    .clipShape(.rect(cornerRadius: 12))
-    .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
   }
 
-  private var versionRow: some View {
-    HStack(spacing: 14) {
-      Image(systemName: "info.circle")
-        .font(.system(size: 20))
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-        .frame(width: 22)
-      Text("App 版本")
-        .font(.system(size: 16))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      Spacer()
-      Text(viewModel.appVersion)
-        .font(Font.MeetPR.bodyEmphasis)
-        .foregroundStyle(Color.MeetPR.fgSecondary)
-    }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 14)
-    .frame(minHeight: 56)
-  }
-
-  private var logoutRow: some View {
+  private var logoutButton: some View {
     Button {
-      Task { @MainActor in
-        await viewModel.logout()
-      }
+      presentedOverlay = .logout
     } label: {
-      HStack(spacing: 14) {
-        Image(systemName: "rectangle.portrait.and.arrow.right")
-          .font(.system(size: 20))
-          .foregroundStyle(Color.MeetPR.brandRed)
-          .frame(width: 22)
-        Text(viewModel.isLoggingOut ? "退出中" : "退出登录")
-          .font(.system(size: 16, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.brandRed)
-        Spacer()
-      }
-      .padding(.horizontal, 16)
-      .padding(.vertical, 14)
-      .frame(minHeight: 56)
-      .contentShape(Rectangle())
+      Text(CoachMyProfileStrings.logout)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.danger)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, MeetPRSpacing.point15)
+        .overlay {
+          Capsule()
+            .stroke(Color.MeetPR.danger.opacity(0.35), lineWidth: MeetPRSpacing.point1)
+        }
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
     .disabled(viewModel.isLoggingOut)
+    .accessibilityIdentifier("coach.profile.logout")
   }
 
-  // MARK: - Building blocks
-
-  private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {
-    VStack(spacing: 0) { content() }
-      .padding(16)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: 12))
-      .overlay { RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.border, lineWidth: 1) }
+  private func actionRow(
+    title: String,
+    accessibilityIdentifier: String,
+    action: @escaping @MainActor () -> Void
+  ) -> some View {
+    Button(action: action) {
+      HStack {
+        Text(title)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Spacer()
+        Image(systemName: "chevron.right")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size16, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textDisabled)
+      }
+      .padding(.horizontal, MeetPRSpacing.space4)
+      .padding(.vertical, MeetPRSpacing.point14)
+      .contentShape(.rect)
+    }
+    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+    .accessibilityIdentifier(accessibilityIdentifier)
   }
 
   private var divider: some View {
-    Rectangle().fill(Color.MeetPR.border).frame(height: 1)
+    Rectangle()
+      .fill(Color.MeetPR.borderHairline)
+      .frame(height: MeetPRSpacing.point1)
   }
+
+  @ViewBuilder
+  private func overlayContent(_ overlay: CoachProfileOverlay) -> some View {
+    switch overlay {
+    case .help:
+      CoachHelpFeedbackSheet()
+    case .privacyAndTerms:
+      CoachPrivacyTermsSheet(privacyPolicyURL: privacyPolicyURL)
+    case .logout:
+      CoachLogoutConfirmationView(
+        isLoggingOut: viewModel.isLoggingOut,
+        onCancel: { presentedOverlay = nil },
+        onLogout: {
+          Task {
+            await viewModel.logout()
+            presentedOverlay = nil
+          }
+        }
+      )
+    }
+  }
+
+  private func copy(_ code: InviteCode) {
+    #if os(iOS)
+      UIPasteboard.general.string = code.code
+    #elseif os(macOS)
+      NSPasteboard.general.clearContents()
+      NSPasteboard.general.setString(code.code, forType: .string)
+    #endif
+    codesViewModel.markCopied(code)
+    showToast(CoachMyProfileStrings.copied)
+  }
+
+  private func showToast(_ message: String) {
+    toastTask?.cancel()
+    withAnimation(MeetPRMotion.press) {
+      toastMessage = message
+    }
+    toastTask = Task {
+      try? await Task.sleep(for: .seconds(2))
+      guard !Task.isCancelled else { return }
+      withAnimation(MeetPRMotion.press) {
+        toastMessage = nil
+      }
+    }
+  }
+
+}
+
+private enum CoachProfileOverlay: String, Identifiable {
+  case help
+  case privacyAndTerms
+  case logout
+
+  var id: String { rawValue }
 }
