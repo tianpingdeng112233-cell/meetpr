@@ -2,6 +2,50 @@ import AVKit
 import DesignSystem
 import SwiftUI
 
+/// Opts the shared player into the coach feedback workbench's embedded chrome.
+/// Leaving this nil preserves the existing full-screen chat/player behavior.
+public struct FeedbackVideoWorkbenchConfiguration: Sendable {
+  public init() {}
+}
+
+enum FeedbackVideoPlaybackBehavior: Equatable, Sendable {
+  case legacyFullScreen
+  case workbench
+
+  enum PlaybackCommand: Equatable, Sendable {
+    case none
+    case play
+    case playImmediatelyAtSelectedRate
+  }
+
+  var appearanceCommand: PlaybackCommand {
+    switch self {
+    case .legacyFullScreen:
+      return .play
+    case .workbench:
+      return .none
+    }
+  }
+
+  var retryCommand: PlaybackCommand {
+    switch self {
+    case .legacyFullScreen:
+      return .play
+    case .workbench:
+      return .playImmediatelyAtSelectedRate
+    }
+  }
+
+  func appliesSelectedRate(while status: AVPlayer.TimeControlStatus) -> Bool {
+    switch self {
+    case .legacyFullScreen:
+      return status == .playing
+    case .workbench:
+      return status != .paused
+    }
+  }
+}
+
 /// Shared full-screen player for coach feedback and chat set-card videos.
 ///
 /// Presigned URLs can expire while the player is open. Both item-failure
@@ -17,21 +61,124 @@ public struct FeedbackVideoPlayerView: View {
   @State private var rate: Float = 1.0
   @State private var playbackFailed = false
   @State private var retrying = false
+  @State private var isPlaying = false
+  @State private var currentSeconds = 0.0
+  @State private var durationSeconds = 0.0
 
   private let videoID: UUID
   private let refreshURL: @MainActor (UUID) async throws -> URL
+  private let workbenchConfiguration: FeedbackVideoWorkbenchConfiguration?
 
   public init(
     videoID: UUID,
     url: URL,
+    workbenchConfiguration: FeedbackVideoWorkbenchConfiguration? = nil,
     refreshURL: @escaping @MainActor (UUID) async throws -> URL
   ) {
     self.videoID = videoID
     self.refreshURL = refreshURL
+    self.workbenchConfiguration = workbenchConfiguration
     _player = State(initialValue: AVPlayer(url: url))
   }
 
   public var body: some View {
+    playerContent
+      .overlay {
+        if playbackFailed {
+          FeedbackVideoFailureCard(retrying: retrying, retry: retry)
+        }
+      }
+      .onReceive(
+        NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification)
+      ) { _ in
+        playbackFailed = true
+      }
+      .onReceive(player.publisher(for: \.currentItem?.status).removeDuplicates()) { status in
+        if status == .failed {
+          playbackFailed = true
+        }
+      }
+      .onReceive(player.publisher(for: \.timeControlStatus).removeDuplicates()) { status in
+        if status == .playing {
+          isPlaying = true
+        } else if status == .paused {
+          isPlaying = false
+        }
+      }
+      .onReceive(
+        NotificationCenter.default.publisher(for: AVPlayerItem.didPlayToEndTimeNotification)
+      ) { notification in
+        guard notification.object as? AVPlayerItem === player.currentItem else { return }
+        isPlaying = false
+      }
+      .onAppear {
+        switch playbackBehavior.appearanceCommand {
+        case .none:
+          player.defaultRate = rate
+        case .play:
+          player.play()
+        case .playImmediatelyAtSelectedRate:
+          player.playImmediately(atRate: rate)
+        }
+      }
+      .onDisappear {
+        player.pause()
+      }
+      .task {
+        guard workbenchConfiguration != nil else { return }
+        while !Task.isCancelled {
+          updateTimeline()
+          try? await Task.sleep(for: .milliseconds(250))
+        }
+      }
+  }
+
+  static func rateText(_ rate: Float) -> String {
+    switch rate {
+    case 0.5: "0.5x"
+    case 1.5: "1.5x"
+    case 2: "2x"
+    default: "1x"
+    }
+  }
+
+  static func workbenchRateText(_ rate: Float) -> String {
+    switch rate {
+    case 0.5: "0.5×"
+    case 1.5: "1.5×"
+    case 2: "2×"
+    default: "1×"
+    }
+  }
+
+  static func timeText(_ seconds: Double) -> String {
+    let totalSeconds = max(0, Int(seconds.rounded(.down)))
+    let minutes = totalSeconds / 60
+    let remainder = totalSeconds % 60
+    let secondText = remainder < 10 ? "0\(remainder)" : "\(remainder)"
+    return "\(minutes):\(secondText)"
+  }
+
+  static func playbackBehavior(
+    for configuration: FeedbackVideoWorkbenchConfiguration?
+  ) -> FeedbackVideoPlaybackBehavior {
+    configuration == nil ? .legacyFullScreen : .workbench
+  }
+
+  private var playbackBehavior: FeedbackVideoPlaybackBehavior {
+    Self.playbackBehavior(for: workbenchConfiguration)
+  }
+
+  @ViewBuilder
+  private var playerContent: some View {
+    if workbenchConfiguration != nil {
+      workbenchPlayer
+    } else {
+      fullScreenPlayer
+    }
+  }
+
+  private var fullScreenPlayer: some View {
     ZStack(alignment: .top) {
       VideoPlayer(player: player)
         .ignoresSafeArea()
@@ -43,36 +190,19 @@ public struct FeedbackVideoPlayerView: View {
       )
     }
     .background(Color.black)
-    .overlay {
-      if playbackFailed {
-        FeedbackVideoFailureCard(retrying: retrying, retry: retry)
-      }
-    }
-    .onReceive(
-      NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification)
-    ) { _ in
-      playbackFailed = true
-    }
-    .onReceive(player.publisher(for: \.currentItem?.status).removeDuplicates()) { status in
-      if status == .failed {
-        playbackFailed = true
-      }
-    }
-    .onAppear {
-      player.play()
-    }
-    .onDisappear {
-      player.pause()
-    }
   }
 
-  static func rateText(_ rate: Float) -> String {
-    switch rate {
-    case 0.5: "0.5x"
-    case 1.5: "1.5x"
-    case 2: "2x"
-    default: "1x"
-    }
+  private var workbenchPlayer: some View {
+    FeedbackVideoWorkbenchPlayer(
+      player: player,
+      rates: Self.rates,
+      selectedRate: rate,
+      isPlaying: isPlaying,
+      currentSeconds: currentSeconds,
+      durationSeconds: durationSeconds,
+      togglePlayback: togglePlayback,
+      selectRate: selectRate
+    )
   }
 
   private func close() {
@@ -90,16 +220,61 @@ public struct FeedbackVideoPlayerView: View {
       playbackFailed = false
       player.replaceCurrentItem(with: AVPlayerItem(url: fresh))
       player.defaultRate = rate
-      player.play()
+      switch playbackBehavior.retryCommand {
+      case .none:
+        break
+      case .play:
+        player.play()
+      case .playImmediatelyAtSelectedRate:
+        player.playImmediately(atRate: rate)
+      }
+      isPlaying = true
     }
   }
 
   private func cycleRate() {
-    let index = Self.rates.firstIndex(of: rate) ?? 1
-    rate = Self.rates[(index + 1) % Self.rates.count]
-    player.defaultRate = rate
-    if player.timeControlStatus == .playing {
-      player.rate = rate
+    if playbackBehavior == .legacyFullScreen {
+      let index = Self.rates.firstIndex(of: rate) ?? 1
+      rate = Self.rates[(index + 1) % Self.rates.count]
+      player.defaultRate = rate
+      if player.timeControlStatus == .playing {
+        player.rate = rate
+      }
+    } else {
+      let index = Self.rates.firstIndex(of: rate) ?? 1
+      selectRate(Self.rates[(index + 1) % Self.rates.count])
+    }
+  }
+
+  private func selectRate(_ selectedRate: Float) {
+    rate = selectedRate
+    player.defaultRate = selectedRate
+    if playbackBehavior.appliesSelectedRate(while: player.timeControlStatus) {
+      player.rate = selectedRate
+    }
+  }
+
+  private func togglePlayback() {
+    if isPlaying {
+      player.pause()
+      isPlaying = false
+    } else {
+      if currentSeconds >= durationSeconds, durationSeconds > 0 {
+        player.seek(to: .zero)
+      }
+      player.playImmediately(atRate: rate)
+      isPlaying = true
+    }
+  }
+
+  private func updateTimeline() {
+    let current = player.currentTime().seconds
+    if current.isFinite {
+      currentSeconds = max(0, current)
+    }
+    let duration = player.currentItem?.duration.seconds ?? 0
+    if duration.isFinite {
+      durationSeconds = max(0, duration)
     }
   }
 }
