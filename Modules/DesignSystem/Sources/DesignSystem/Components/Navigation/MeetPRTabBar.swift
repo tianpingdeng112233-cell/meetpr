@@ -2,6 +2,9 @@ import SwiftUI
 
 public enum MeetPRTabIcon: Sendable {
   case today
+  case house
+  case message
+  case students
   case training
   case growth
   case profile
@@ -29,13 +32,22 @@ public struct MeetPRTabBarItem<ID: Hashable & Sendable>: Identifiable, Sendable 
 public struct MeetPRTabBar<ID: Hashable & Sendable>: View {
   @Binding private var selection: ID
   private let items: [MeetPRTabBarItem<ID>]
+  let selectedColor: Color
+  let unselectedColor: Color
+  let badgeColor: Color
 
   public init(
     selection: Binding<ID>,
-    items: [MeetPRTabBarItem<ID>]
+    items: [MeetPRTabBarItem<ID>],
+    selectedColor: Color = Color.MeetPR.goldCTA,
+    unselectedColor: Color = Color.MeetPR.textTertiary,
+    badgeColor: Color = Color.MeetPR.dangerFill
   ) {
     self._selection = selection
     self.items = items
+    self.selectedColor = selectedColor
+    self.unselectedColor = unselectedColor
+    self.badgeColor = badgeColor
   }
 
   public var body: some View {
@@ -49,7 +61,7 @@ public struct MeetPRTabBar<ID: Hashable & Sendable>: View {
               .frame(width: MeetPRSpacing.space6, height: MeetPRSpacing.space6)
               .overlay(alignment: .topTrailing) {
                 if item.badge > 0 {
-                  TabUnreadBadge(count: item.badge)
+                  TabUnreadBadge(count: item.badge, color: badgeColor)
                     .offset(x: MeetPRSpacing.point10, y: -MeetPRSpacing.point6)
                 }
               }
@@ -59,8 +71,8 @@ public struct MeetPRTabBar<ID: Hashable & Sendable>: View {
           }
           .foregroundStyle(
             selection == item.id
-              ? Color.MeetPR.goldCTA
-              : Color.MeetPR.textTertiary
+              ? selectedColor
+              : unselectedColor
           )
           .frame(maxWidth: .infinity)
           .frame(minHeight: MeetPRTabBarContract.contentHeight)
@@ -110,6 +122,15 @@ private struct MeetPRTabIconView: View {
         TodayTabArrowFill()
           .fill(.foreground)
       }
+    case .house:
+      HouseTabIcon()
+        .stroke(style: iconStroke)
+    case .message:
+      MessageTabIcon()
+        .stroke(style: iconStroke)
+    case .students:
+      StudentsTabIcon()
+        .stroke(style: iconStroke)
     case .training:
       TrainingTabIcon()
         .stroke(style: iconStroke)
@@ -124,6 +145,74 @@ private struct MeetPRTabIconView: View {
 
   private var iconStroke: StrokeStyle {
     StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
+  }
+}
+
+private struct HouseTabIcon: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.move(to: rect.svgPoint(x: 3, y: 11))
+    path.addLine(to: rect.svgPoint(x: 12, y: 3))
+    path.addLine(to: rect.svgPoint(x: 21, y: 11))
+    path.move(to: rect.svgPoint(x: 5, y: 10))
+    path.addLine(to: rect.svgPoint(x: 5, y: 20))
+    path.addLine(to: rect.svgPoint(x: 19, y: 20))
+    path.addLine(to: rect.svgPoint(x: 19, y: 10))
+    return path
+  }
+}
+
+private struct MessageTabIcon: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.move(to: rect.svgPoint(x: 21, y: 15))
+    path.addCurve(
+      to: rect.svgPoint(x: 19, y: 17),
+      control1: rect.svgPoint(x: 21, y: 16.1),
+      control2: rect.svgPoint(x: 20.1, y: 17)
+    )
+    path.addLine(to: rect.svgPoint(x: 7, y: 17))
+    path.addLine(to: rect.svgPoint(x: 3, y: 21))
+    path.addLine(to: rect.svgPoint(x: 3, y: 5))
+    path.addCurve(
+      to: rect.svgPoint(x: 5, y: 3),
+      control1: rect.svgPoint(x: 3, y: 3.9),
+      control2: rect.svgPoint(x: 3.9, y: 3)
+    )
+    path.addLine(to: rect.svgPoint(x: 19, y: 3))
+    path.addCurve(
+      to: rect.svgPoint(x: 21, y: 5),
+      control1: rect.svgPoint(x: 20.1, y: 3),
+      control2: rect.svgPoint(x: 21, y: 3.9)
+    )
+    path.closeSubpath()
+    return path
+  }
+}
+
+private struct StudentsTabIcon: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    path.addEllipse(in: rect.svgRect(x: 6, y: 5, width: 6, height: 6))
+    path.move(to: rect.svgPoint(x: 3.5, y: 19))
+    path.addCurve(
+      to: rect.svgPoint(x: 14.5, y: 19),
+      control1: rect.svgPoint(x: 3.5, y: 11.7),
+      control2: rect.svgPoint(x: 14.5, y: 11.7)
+    )
+    path.move(to: rect.svgPoint(x: 16, y: 6))
+    path.addCurve(
+      to: rect.svgPoint(x: 16, y: 12),
+      control1: rect.svgPoint(x: 20, y: 6),
+      control2: rect.svgPoint(x: 20, y: 12)
+    )
+    path.move(to: rect.svgPoint(x: 15.5, y: 19))
+    path.addCurve(
+      to: rect.svgPoint(x: 21.5, y: 14),
+      control1: rect.svgPoint(x: 16.3, y: 15.8),
+      control2: rect.svgPoint(x: 18.6, y: 14)
+    )
+    return path
   }
 }
 
@@ -215,6 +304,7 @@ private struct TodayTabArrowFill: Shape {
 
 private struct TabUnreadBadge: View {
   let count: Int
+  let color: Color
 
   var body: some View {
     Text(count > 99 ? "99+" : count.formatted())
@@ -222,7 +312,7 @@ private struct TabUnreadBadge: View {
       .foregroundStyle(Color.white)
       .padding(.horizontal, MeetPRSpacing.point3)
       .frame(minWidth: MeetPRSpacing.space4, minHeight: MeetPRSpacing.space4)
-      .background(Color.MeetPR.dangerFill, in: .capsule)
+      .background(color, in: .capsule)
   }
 }
 
