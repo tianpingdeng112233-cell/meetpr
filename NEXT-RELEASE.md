@@ -43,10 +43,48 @@
   id 只是「值变化时额外重建」的附加触发;实测(delay 放大到 2s)切 tab 回来内容立即完整、零重播。
   详见 `~/Brain/wiki/projects/MeetPR/reviews/2026-07-29-rise-in-cancellation.md`。
 
+- **登录页 v3 浅色重做**(PR #291,`dfc24a8` 前一个 merge,P1):兑现 David 2026-07-29 提的「登录页重做」,
+  两个待拍板都由 David 2026-07-30 提供的《MeetPR 登录 + 绑定教练(浅色)》设计稿一并解掉——**登录页跟浅色**,
+  参照物就是稿子的 4a 屏(已抽成 `docs/design/login-v3/4a-login-light.html` 入仓,原始导出是 7MB 的
+  design-canvas HTML,内联了 gzip 运行时,不适合入仓)。
+  版式对调成 hero 在上 / 表单在下,字段改卡片式(`AuthPhoneField` 新增,带纯展示的 `+86` 前缀),
+  密码加明文开关,CTA 换扁平金色矩形。`preferredAppColorScheme` 未登录态 `.dark` → `.light`(**只此一行**),
+  coach 恒暗与 student 读 `@AppStorage` 两条分支零改动。
+  ⚠️ **已知连带**:教练登录会「浅→暗」闪一下(David 已接受,没为它加逻辑);学员那边原有的「暗→浅」闪反而被修掉。
+  ⚖️ **David 拍板 A**:忘记密码整行删掉(全仓零实现,不做死链)、条款行只写「隐私政策」(服务条款零 URL)。
+  ⚠️ **条款行的隐私政策当前打不开**:`https://meetpr.app/privacy` 实测 DNS 解析到 `192.64.119.206`
+  (Namecheap 停放段)但 HTTPS 超时,同机 `apple.com` 200。死链在 production 本已存在(原先藏在
+  「使用数据说明」sheet 里),本包把它提到了**人人必经的首屏**。⚖️ David 拍板 D:先留着不阻塞发版,
+  域名上线单独跟进。**切包前值得再 curl 一次**。
+  证据:AppShell 65/65、`swiftlint --strict` 0 违规、iPhone 17 模拟器四态亲验(浅色初始 / 手机号聚焦 /
+  密码明文 / 格式错误)。
+  ⚠️ 改这块前必读的两条:①自绘按钮只加 `.disabled()` **不会**改自绘背景,空表单下按钮会满亮可点
+  (真回归,截图证实,已修成 `surfaceRaised` + `textDisabled`);②`MeetPRRadius.point14` 实际是 **16**、
+  `point9` 是 **10** —— `Radius.swift` 声明了 `§2 radius canon: 4/10/12/16/20/999` 并把所有 `pointNN`
+  别名 snap 到这六档,**这是文档化的既定量化不是 bug**(review-loop 就此对质,Codex `CONCEDE`)。
+  名字骗人这件事已另开仓级重命名卡。
+  详见 `~/Brain/wiki/projects/MeetPR/reviews/2026-07-30-login-page-v3-light.md`。
+
+- **绑定教练流 v3 浅色换皮**(PR #292,`dfc24a8`,P1):同一份设计稿的 4b/4d 屏。
+  ⚖️ **David 拍板 A = 换皮**:10 位邀请码、`displayName` 必填、「提交 = 发申请等教练同意」机制一律不动。
+  邀请码改分格输入(**2×5**,稿子画的是 6 格单行但 10 格挤在 342pt 里每格只剩约 27pt、装不下 mono 26pt),
+  加「从剪贴板粘贴」按钮(教练多半微信发码),错误态染红且**不清空已输入**且提交按钮仍可用(能直接重试)。
+  顺手修掉两个输入缺陷:字母表外字符(`O`/`0`/`I`/`1`)能打进格子但永不可能通过校验、按钮永久禁用且零解释;
+  格下提示丢了 `I/O/0/1` 排除规则(唯一携带该信息的 `codeFormatHint` 已成死代码)。
+  ⛔ **九条有意偏离设计稿**(跳过出口 / 4c 教练确认屏 / 教练卡六个字段 / 隐私承诺文案 / 今日页常驻卡 /
+  步骤条等)全部写进了 PR 描述与 `docs/design/login-v3/CARD-bind.md`,**别当成漏做**;其中「门口死路」
+  已开成独立 T3 卡(要角色变更能力 + 自练形态先解禁)。
+  证据:StudentKit 620/620、`xcodebuild -configuration Demo` 0 warning、lint 全干净。
+  ⚠️ **验证缺口**:这一屏**没人在模拟器里亲眼看过**——Demo 模式按设计穿过绑定门直落 5 tab
+  (`RootViewDemoDefaults.swift:7`,spec 031 D10),要看得在 staging 造未绑定的 coachedStudent 真账号
+  (走 `/testacct`)。**prep-beta 走查时优先补这一屏。**
+  ⚠️ 改分格框前必读:透明 `TextField` 盖在自绘视觉上时,**平台控件保留自己约 16pt 的 intrinsic height,
+  hit-test 走它的真实 frame**——`ZStack` sibling 加 `maxHeight:.infinity` 和改 `.overlay` 都无效
+  (三次实测恒为 `342×16 @ y=69`,而网格 154pt)。必须走显式 `tap → isFocused = true`。
+  详见 `~/Brain/wiki/projects/MeetPR/reviews/2026-07-30-bind-flow-v3-light.md`。
+
 ## 🎯 已排上但未开工
 
-- **登录页重做**(David 2026-07-29 提):登录页是 v3 唯一没覆盖的界面(#279 收据明写「教练端与登录流保持恒暗、全程零 diff」),现仍是 v2 旧 token——`brandRed`×2 / `fgPrimary` / `fgSecondary` / `fgTertiary` / `surface2` / `border` / `bg`,一个 v3 token 都没有,在新学员端旁边割裂。
-  ⚠️ **两个待拍板**:①登录页**角色无关**(还不知道是教练还是学员),而 v3 正典只覆盖学员端且默认浅色、教练端恒暗——跟哪套?②v3 设计包里**没有登录页参照物**,是照 `DESIGN-SYSTEM-CANON.md` 推导还是另出稿?
 - **spec 062 学员端统一收件口**:SPEC.md 已写好(19KB,Draft/T3,David 07-25 三拍)但**从未提交**,只存在于 `~/Projects/apps/MeetPR-release` 工作区,未跟踪。开工前先把它落进仓里。
 
 ## 🕐 已完工、等前置解锁(还没落线,落线后挪到上面)
