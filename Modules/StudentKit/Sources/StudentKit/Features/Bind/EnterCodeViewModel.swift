@@ -21,7 +21,8 @@ public final class EnterCodeViewModel {
 
     public var message: String {
       switch self {
-      case .invalidCode: "邀请码无效或已失效"
+      case .invalidCode:
+        "这个码不存在或已过期。让教练在「我的」→「我的邀请码」里重新生成一个。"
       }
     }
   }

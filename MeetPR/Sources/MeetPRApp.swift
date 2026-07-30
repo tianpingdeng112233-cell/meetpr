@@ -299,8 +299,10 @@ struct MeetPRApp: App {
 
   private var preferredAppColorScheme: ColorScheme? {
     guard case .authenticated(let user) = session.state else {
-      // Auth/login and bootstrap keep the v2 dark-only contract.
-      return .dark
+      // ⚖️ 2026-07-30: auth/login and bootstrap open light, matching the
+      // student roots they lead into (the v3 login mockup is light-only).
+      // Every authenticated root is light too now, so nothing flips on sign-in.
+      return .light
     }
     switch user.role {
     case .coach:
