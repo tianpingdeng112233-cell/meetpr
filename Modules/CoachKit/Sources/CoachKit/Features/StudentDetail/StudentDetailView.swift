@@ -66,20 +66,24 @@ struct StudentDetailView: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
       detailHeader
 
-      if evaluationViewModel.loadFailed {
-        EvaluationLoadFailureStrip {
-          Task { await evaluationViewModel.load() }
+      if CoachEvaluationSeal.shouldLoadEvaluation {
+        if evaluationViewModel.loadFailed {
+          EvaluationLoadFailureStrip {
+            Task { await evaluationViewModel.load() }
+          }
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        } else if CoachEvaluationSeal.shouldRenderBanner(
+          isBannerVisible: evaluationViewModel.isBannerVisible
+        ) {
+          EvaluationStatusBanner(
+            viewModel: evaluationViewModel,
+            hasPublishedPlan: viewModel.plan != nil,
+            onSendAdaptationWeek: { showAdaptationPlanning = true },
+            onViewAdaptationWeek: { viewModel.select(.overview) },
+            onOpenSummary: { showEvaluationSummaryEditor = true }
+          )
+          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
         }
-        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
-      } else if evaluationViewModel.isBannerVisible {
-        EvaluationStatusBanner(
-          viewModel: evaluationViewModel,
-          hasPublishedPlan: viewModel.plan != nil,
-          onSendAdaptationWeek: { showAdaptationPlanning = true },
-          onViewAdaptationWeek: { viewModel.select(.overview) },
-          onOpenSummary: { showEvaluationSummaryEditor = true }
-        )
-        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
       }
 
       sectionTabs
@@ -130,7 +134,9 @@ struct StudentDetailView: View {
       Analytics.shared.screen(.coachStudentDetail)
       Analytics.shared.coachOpenedStudent(id: viewModel.summary.id)
       await viewModel.loadIfNeeded(now: now)
-      await evaluationViewModel.load()
+      if CoachEvaluationSeal.shouldLoadEvaluation {
+        await evaluationViewModel.load()
+      }
     }
   }
 
