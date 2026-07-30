@@ -24,10 +24,14 @@ public struct ChatDemoSeed: Sendable {
   }
 
   public static func coach() -> ChatDemoSeed {
-    let secondStudentID = uuid(0x03)
+    let firstStudentID = coachPreviewStudentID(4)
+    let secondStudentID = coachPreviewStudentID(8)
     let firstConversationID = uuid(0x11)
     let secondConversationID = uuid(0x12)
-    let firstMessage = coachTextMessage(conversationID: firstConversationID)
+    let firstMessage = coachTextMessage(
+      conversationID: firstConversationID,
+      senderID: firstStudentID
+    )
     let secondMessage = coachImageMessage(
       conversationID: secondConversationID,
       senderID: secondStudentID
@@ -37,12 +41,12 @@ public struct ChatDemoSeed: Sendable {
         conversation(
           id: secondConversationID,
           otherPartyID: secondStudentID,
-          otherPartyName: "林舟",
+          otherPartyName: "李嘉宁",
           lastMessage: secondMessage
         ),
         conversation(
           id: firstConversationID,
-          otherPartyID: studentUserID,
+          otherPartyID: firstStudentID,
           otherPartyName: "王晨曦",
           lastMessage: firstMessage
         ),
@@ -51,7 +55,7 @@ public struct ChatDemoSeed: Sendable {
         firstConversationID: [firstMessage],
         secondConversationID: [secondMessage],
       ],
-      otherPartyNames: [studentUserID: "王晨曦", secondStudentID: "林舟"]
+      otherPartyNames: [firstStudentID: "王晨曦", secondStudentID: "李嘉宁"]
     )
   }
 
@@ -123,12 +127,15 @@ public struct ChatDemoSeed: Sendable {
     )
   }
 
-  private static func coachTextMessage(conversationID: UUID) -> ChatMessage {
+  private static func coachTextMessage(
+    conversationID: UUID,
+    senderID: UUID
+  ) -> ChatMessage {
     ChatMessage(
       id: uuid(0x21),
       conversationID: conversationID,
       seq: 1,
-      senderID: studentUserID,
+      senderID: senderID,
       kind: .text,
       text: "教练，今天最后一组完成了。",
       attachmentID: nil,
@@ -160,5 +167,12 @@ public struct ChatDemoSeed: Sendable {
 
   private static func uuid(_ suffix: UInt8) -> UUID {
     UUID(uuid: (0, 0, 0, 0, 0, 0, 0x40, 0, 0x80, 0, 0, 0, 0, 0, 0x58, suffix))
+  }
+
+  /// Matches the coach preview roster IDs produced by
+  /// `CoachDemoSeed.previewStudentID`. This stays local to avoid a ChatUI →
+  /// CoachKit dependency cycle.
+  private static func coachPreviewStudentID(_ suffix: UInt8) -> UUID {
+    UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, suffix))
   }
 }
