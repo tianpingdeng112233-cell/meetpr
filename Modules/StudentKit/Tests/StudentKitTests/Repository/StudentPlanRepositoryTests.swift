@@ -37,7 +37,15 @@ import Testing
 @Test func inMemoryStudentPlanRepositoryStacksAcrossDaysAndUndoesLatestBatch() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
-  let today = StudentDemoSeed.utcCalendar.startOfDay(for: Date())
+  // 必须和 StudentDemoSeed.demoCycleStart 用同一个口径:种子把**设备本地的今天**映射成
+  // UTC 午夜锚点,而不是直接取 UTC 日。直接 utcCalendar.startOfDay(Date()) 会在
+  // 本地日 ≠ UTC 日的那段时间里差一天,把「今天」落到种子的休息日上,shiftPlan 于是抛 .onlyToday。
+  // 在 UTC+1 是每天凌晨那一小时,在东八区是每天 00:00–08:00——上海的 CI 会天天红。
+  let today =
+    PlanCalendarDayIdentity.planDate(
+      matching: Date(),
+      selectedCalendar: .current
+    ) ?? StudentDemoSeed.utcCalendar.startOfDay(for: Date())
   let clock = ShiftTestClock(today.addingTimeInterval(12 * 3_600))
   let repository = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: plan]),
