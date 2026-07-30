@@ -49,14 +49,16 @@ public final class FeedbackInboxViewModel {
 
   public func load(studentID: UUID) async {
     currentStudentID = studentID
-    state = .loading
+    let isInitialLoad = state == .idle
+    if isInitialLoad { state = .loading }
     do {
       state = .loaded(try await repository.fetchInbox(studentID: studentID))
     } catch {
       if error.isTaskCancellation {
-        state = .idle
+        if isInitialLoad { state = .idle }
         return
       }
+      if case .loaded = state { return }
       state = .error(error.localizedDescription)
     }
   }

@@ -19,6 +19,15 @@ public final class TodayWorkoutViewModel {
   }
   public typealias SetRowDraft = TodayWorkoutSetRowDraft
   public typealias RestTimerState = TodayWorkoutRestTimerState
+
+  private struct LoadedDaySnapshot {
+    let day: StudentPlanDay
+    let drafts: [SetRowDraft]
+    let references: [UUID: ExerciseReference]
+    let suggestionE1RMByExercise: [UUID: Double]
+    let lastWeightByExercise: [UUID: Decimal]
+  }
+
   public private(set) var state: State = .idle
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
   public private(set) var restTimer: RestTimerState?
@@ -41,6 +50,7 @@ public final class TodayWorkoutViewModel {
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
+  private var recordingGeneration = 0
   private var pendingPersist: Task<Bool, Never>?
 
   public init(
@@ -62,15 +72,52 @@ public final class TodayWorkoutViewModel {
     self.now = now
   }
 
-  public func load(date: Date, studentID: UUID) async {
+  public func load(
+    date: Date,
+    studentID: UUID,
+    preloadedPlan: StudentPlanView? = nil
+  ) async {
     currentStudentID = studentID
     loadGeneration += 1
     let generation = loadGeneration
-    state = .loading
+    let startingRecordingGeneration = recordingGeneration
+    let isInitialLoad = state == .idle
+    if isInitialLoad { state = .loading }
+    if let preloadedPlan {
+      await loadHandedOffPlan(
+        preloadedPlan,
+        date: date,
+        studentID: studentID,
+        generation: generation,
+        recordingGeneration: startingRecordingGeneration
+      )
+      return
+    }
+    await loadRepositoryPlan(
+      date: date,
+      studentID: studentID,
+      generation: generation,
+      recordingGeneration: startingRecordingGeneration,
+      isInitialLoad: isInitialLoad
+    )
+  }
+
+  private func loadRepositoryPlan(
+    date: Date,
+    studentID: UUID,
+    generation: Int,
+    recordingGeneration: Int,
+    isInitialLoad: Bool
+  ) async {
     do {
-      onboardingProfile = try? await onboarding?.fetchProfile(studentId: studentID)
-      let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      guard isCurrentLoad(generation) else { return }
+      let (plan, profile) = try await fetchPlanAndProfile(
+        preloadedPlan: nil,
+        studentID: studentID
+      )
+      guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+        return
+      }
+      onboardingProfile = profile
       planContext = Self.planContext(from: plan, selectedDate: date, calendar: calendar)
       guard let plan else {
         exerciseReferences = [:]
@@ -78,36 +125,258 @@ public final class TodayWorkoutViewModel {
         return
       }
 
-      guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
-        guard isCurrentLoad(generation) else { return }
+      guard
+        let snapshot = try await loadDaySnapshot(
+          from: plan,
+          date: date,
+          studentID: studentID
+        )
+      else {
+        guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+          return
+        }
         exerciseReferences = [:]
         suggestionE1RMByExercise = [:]
         state = .rest
         return
       }
-      let dayRange = Self.dayRange(containing: day.date, calendar: calendar)
-      let existingLogs = try await logs.fetchLogs(studentID: studentID, in: dayRange)
-      let drafts = Self.makeDrafts(for: day, existingLogs: existingLogs)
-      let referenceSnapshot = try await exerciseReferenceSnapshot(
-        for: day,
+      guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+        return
+      }
+      apply(snapshot)
+    } catch {
+      handleLoadError(
+        error,
+        isInitialLoad: isInitialLoad,
+        generation: generation,
+        recordingGeneration: recordingGeneration
+      )
+    }
+  }
+
+  private func loadHandedOffPlan(
+    _ preloadedPlan: StudentPlanView,
+    date: Date,
+    studentID: UUID,
+    generation: Int,
+    recordingGeneration: Int
+  ) async {
+    let isInitialLoad = state == .loading
+    async let refreshedPlanTask = plans.fetchCurrentPlan(studentID: studentID)
+    async let profileTask = Self.fetchOnboardingProfile(
+      from: onboarding,
+      studentID: studentID
+    )
+
+    do {
+      try await applyPlan(
+        preloadedPlan,
+        date: date,
+        studentID: studentID,
+        generation: generation,
+        recordingGeneration: recordingGeneration
+      )
+    } catch {
+      handleLoadError(
+        error,
+        isInitialLoad: isInitialLoad,
+        generation: generation,
+        recordingGeneration: recordingGeneration
+      )
+      return
+    }
+
+    let profile = await profileTask
+    guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+      return
+    }
+    onboardingProfile = profile
+
+    do {
+      let refreshedPlan = try await refreshedPlanTask
+      guard refreshedPlan != preloadedPlan else { return }
+      try await applyPlan(
+        refreshedPlan,
+        date: date,
+        studentID: studentID,
+        generation: generation,
+        recordingGeneration: recordingGeneration,
+        onlyIfChanged: true
+      )
+    } catch {
+      // The handed-off snapshot is already usable. A best-effort refresh must
+      // not replace it with loading or error UI.
+    }
+  }
+
+  private func applyPlan(
+    _ plan: StudentPlanView?,
+    date: Date,
+    studentID: UUID,
+    generation: Int,
+    recordingGeneration: Int,
+    onlyIfChanged: Bool = false
+  ) async throws {
+    guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+      return
+    }
+    let nextPlanContext = Self.planContext(
+      from: plan,
+      selectedDate: date,
+      calendar: calendar
+    )
+    guard let plan else {
+      if onlyIfChanged, state == .noPlan {
+        return
+      }
+      updatePlanContextIfNeeded(nextPlanContext)
+      exerciseReferences = [:]
+      state = .noPlan
+      return
+    }
+
+    guard
+      let snapshot = try await loadDaySnapshot(
+        from: plan,
+        date: date,
         studentID: studentID
       )
-      // Best-effort: the last-weight fill must never fail the day load.
-      let historyLogs =
-        (try? await logs.fetchLogs(
-          studentID: studentID, in: Self.lastWeightHistoryRange(before: day.date))) ?? []
-      guard isCurrentLoad(generation) else { return }
-      exerciseReferences = referenceSnapshot.references
-      suggestionE1RMByExercise = referenceSnapshot.suggestionE1RMByExercise
-      lastWeightByExercise = Self.lastWeights(
+    else {
+      guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+        return
+      }
+      if onlyIfChanged, state == .rest {
+        return
+      }
+      updatePlanContextIfNeeded(nextPlanContext)
+      exerciseReferences = [:]
+      suggestionE1RMByExercise = [:]
+      state = .rest
+      return
+    }
+    guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+      return
+    }
+    if onlyIfChanged,
+      case .loaded(let currentDay, let currentDrafts) = state,
+      currentDay == snapshot.day,
+      currentDrafts == snapshot.drafts
+    {
+      return
+    }
+    updatePlanContextIfNeeded(nextPlanContext)
+    apply(snapshot)
+  }
+
+  private func updatePlanContextIfNeeded(_ nextPlanContext: TodayWorkoutPlanContext?) {
+    guard planContext != nextPlanContext else { return }
+    planContext = nextPlanContext
+  }
+
+  private func fetchPlanAndProfile(
+    preloadedPlan: StudentPlanView?,
+    studentID: UUID
+  ) async throws -> (StudentPlanView?, OnboardingProfile?) {
+    async let profileTask = Self.fetchOnboardingProfile(
+      from: onboarding,
+      studentID: studentID
+    )
+    async let planTask = Self.fetchPlan(
+      preloadedPlan: preloadedPlan,
+      from: plans,
+      studentID: studentID
+    )
+    return try await (planTask, profileTask)
+  }
+
+  private func apply(_ snapshot: LoadedDaySnapshot) {
+    exerciseReferences = snapshot.references
+    suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
+    lastWeightByExercise = snapshot.lastWeightByExercise
+    state = .loaded(plan: snapshot.day, drafts: snapshot.drafts)
+  }
+
+  private func handleLoadError(
+    _ error: any Error,
+    isInitialLoad: Bool,
+    generation: Int,
+    recordingGeneration: Int
+  ) {
+    guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
+      return
+    }
+    if error.isTaskCancellation {
+      if isInitialLoad { state = .idle }
+    } else if case .loaded = state {
+      return
+    } else if case .recording = state {
+      return
+    } else {
+      state = .error(Self.loadErrorMessage(for: error))
+    }
+  }
+
+  private static func fetchPlan(
+    preloadedPlan: StudentPlanView?,
+    from plans: any StudentPlanRepository,
+    studentID: UUID
+  ) async throws -> StudentPlanView? {
+    if let preloadedPlan {
+      return preloadedPlan
+    }
+    return try await plans.fetchCurrentPlan(studentID: studentID)
+  }
+
+  private static func fetchOnboardingProfile(
+    from onboarding: (any OnboardingProfileReading)?,
+    studentID: UUID
+  ) async -> OnboardingProfile? {
+    try? await onboarding?.fetchProfile(studentId: studentID)
+  }
+
+  private static func fetchHistoryLogs(
+    from logs: any StudentTrainingLogRepository,
+    studentID: UUID,
+    before date: Date
+  ) async -> [StudentSetLog] {
+    (try? await logs.fetchLogs(
+      studentID: studentID,
+      in: lastWeightHistoryRange(before: date)
+    )) ?? []
+  }
+
+  private func loadDaySnapshot(
+    from plan: StudentPlanView,
+    date: Date,
+    studentID: UUID
+  ) async throws -> LoadedDaySnapshot? {
+    guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
+      return nil
+    }
+    let dayRange = Self.dayRange(containing: day.date, calendar: calendar)
+    async let existingLogsTask = logs.fetchLogs(studentID: studentID, in: dayRange)
+    async let referenceSnapshotTask = exerciseReferenceSnapshot(
+      for: day,
+      studentID: studentID
+    )
+    // Best-effort: the last-weight fill must never fail the day load.
+    async let historyLogsTask = Self.fetchHistoryLogs(
+      from: logs,
+      studentID: studentID,
+      before: day.date
+    )
+    let (existingLogs, referenceSnapshot, historyLogs) =
+      try await (existingLogsTask, referenceSnapshotTask, historyLogsTask)
+    return LoadedDaySnapshot(
+      day: day,
+      drafts: Self.makeDrafts(for: day, existingLogs: existingLogs),
+      references: referenceSnapshot.references,
+      suggestionE1RMByExercise: referenceSnapshot.suggestionE1RMByExercise,
+      lastWeightByExercise: Self.lastWeights(
         from: historyLogs,
         planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day)
       )
-      state = .loaded(plan: day, drafts: drafts)
-    } catch {
-      guard isCurrentLoad(generation) else { return }
-      state = error.isTaskCancellation ? .idle : .error(Self.loadErrorMessage(for: error))
-    }
+    )
   }
 
   private func loadDay(
@@ -187,19 +456,15 @@ public final class TodayWorkoutViewModel {
     actionErrorMessage = nil
     let nextDrafts = drafts
     var draft = nextDrafts[rowIndex]
+    recordingGeneration += 1
     state = .recording(plan: plan, drafts: nextDrafts, rowIndex: rowIndex)
 
-    let log = StudentSetLog(
-      id: draft.loggedSetID ?? UUID(),
+    let log = Self.makeLog(
+      from: draft,
       studentID: studentID,
-      planExerciseID: draft.planExerciseID,
-      setIndex: draft.prescribed.setIndex,
-      loggedAt: now(),
-      weightKg: draft.actualWeight ?? draft.prescribed.weightKg ?? 0,
-      reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
-      rpe: draft.actualRPE,
       completed: completed,
-      failed: failed
+      failed: failed,
+      loggedAt: now()
     )
 
     do {
@@ -208,7 +473,10 @@ public final class TodayWorkoutViewModel {
       // The page moved to another day while recordSet was in flight: the log
       // is safely on the server and the reload owns state — don't merge a
       // stale day's flags into the new day's drafts.
-      guard isCurrentLoad(generation) else { return true }
+      guard isCurrentLoad(generation) else {
+        restoreRecordingStateIfStillVisible(plan: plan, rowIndex: rowIndex)
+        return true
+      }
       // Merge into the latest drafts: field syncs may have landed while
       // recordSet was in flight; restoring the captured array would drop them.
       var latestDrafts = currentDrafts ?? nextDrafts
@@ -227,12 +495,35 @@ public final class TodayWorkoutViewModel {
     } catch {
       if isCurrentLoad(generation) {
         state = .loaded(plan: plan, drafts: currentDrafts ?? drafts)
+      } else {
+        restoreRecordingStateIfStillVisible(plan: plan, rowIndex: rowIndex)
       }
       if !error.isTaskCancellation {
         actionErrorMessage = Self.recordingErrorMessage(for: error)
       }
       return false
     }
+  }
+
+  private static func makeLog(
+    from draft: SetRowDraft,
+    studentID: UUID,
+    completed: Bool,
+    failed: Bool,
+    loggedAt: Date
+  ) -> StudentSetLog {
+    StudentSetLog(
+      id: draft.loggedSetID ?? UUID(),
+      studentID: studentID,
+      planExerciseID: draft.planExerciseID,
+      setIndex: draft.prescribed.setIndex,
+      loggedAt: loggedAt,
+      weightKg: draft.actualWeight ?? draft.prescribed.weightKg ?? 0,
+      reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
+      rpe: draft.actualRPE,
+      completed: completed,
+      failed: failed
+    )
   }
 
   public func adjustRestTimer(bySeconds delta: Int) {
@@ -300,6 +591,24 @@ public final class TodayWorkoutViewModel {
 
   private func isCurrentLoad(_ generation: Int) -> Bool {
     generation == loadGeneration
+  }
+
+  private func canApplyLoad(_ generation: Int, recordingGeneration: Int) -> Bool {
+    isCurrentLoad(generation)
+      && self.recordingGeneration == recordingGeneration
+  }
+
+  private func restoreRecordingStateIfStillVisible(
+    plan: StudentPlanDay,
+    rowIndex: Int
+  ) {
+    guard case .recording(let currentPlan, let drafts, let currentRowIndex) = state,
+      currentPlan.id == plan.id,
+      currentRowIndex == rowIndex
+    else {
+      return
+    }
+    state = .loaded(plan: currentPlan, drafts: drafts)
   }
 
   private static func planContext(

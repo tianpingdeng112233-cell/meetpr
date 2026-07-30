@@ -52,7 +52,8 @@ public final class GrowthCurveViewModel {
   }
 
   public func load(studentID: UUID) async {
-    state = .loading
+    let isInitialLoad = state == .idle
+    if isInitialLoad { state = .loading }
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       let profile = try await onboarding?.fetchProfile(studentId: studentID)
@@ -85,9 +86,10 @@ public final class GrowthCurveViewModel {
       refreshVisiblePoints()
     } catch {
       if error.isTaskCancellation {
-        state = .idle
+        if isInitialLoad { state = .idle }
         return
       }
+      if case .loaded = state { return }
       state = .error(error.localizedDescription)
     }
   }

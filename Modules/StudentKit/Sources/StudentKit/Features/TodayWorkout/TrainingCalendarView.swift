@@ -294,7 +294,14 @@ private final class TrainingCalendarViewModel {
   }
 
   func load(studentID: UUID) async {
-    state = .loading
+    let isInitialLoad: Bool
+    switch state {
+    case .idle:
+      isInitialLoad = true
+      state = .loading
+    case .loading, .loaded, .error:
+      isInitialLoad = false
+    }
     do {
       let days = try await plans.fetchCycleDays(studentID: studentID)
       let fetchedLogs: [StudentSetLog]
@@ -306,9 +313,10 @@ private final class TrainingCalendarViewModel {
       state = .loaded(days: days, logs: fetchedLogs)
     } catch {
       if error.isTaskCancellation {
-        state = .idle
+        if isInitialLoad { state = .idle }
         return
       }
+      if case .loaded = state { return }
       state = .error(TodayWorkoutViewModel.loadErrorMessage(for: error))
     }
   }
