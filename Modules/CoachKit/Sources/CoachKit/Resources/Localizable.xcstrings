@@ -1,6 +1,523 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "coach.roster.abnormal": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "异常"
+          }
+        }
+      }
+    },
+    "coach.roster.accept": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收"
+          }
+        }
+      }
+    },
+    "coach.roster.active": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "活跃"
+          }
+        }
+      }
+    },
+    "coach.roster.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "coach.roster.clearSearch": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除搜索"
+          }
+        }
+      }
+    },
+    "coach.roster.completionRate": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成率"
+          }
+        }
+      }
+    },
+    "coach.roster.loadFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载失败"
+          }
+        }
+      }
+    },
+    "coach.roster.newStudentRequests": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新学员申请"
+          }
+        }
+      }
+    },
+    "coach.roster.noPlan": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无计划"
+          }
+        }
+      }
+    },
+    "coach.roster.noStudents": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无学员"
+          }
+        }
+      }
+    },
+    "coach.roster.noStudentsSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收新学员后会出现在这里"
+          }
+        }
+      }
+    },
+    "coach.roster.noTrainingRecords": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周未训练"
+          }
+        }
+      }
+    },
+    "coach.roster.notTrainedReason": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已 {days} 天未训练"
+          }
+        }
+      }
+    },
+    "coach.roster.reject": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拒绝"
+          }
+        }
+      }
+    },
+    "coach.roster.rejectConfirmation": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拒绝后学员会看到中性提示（不会显示拒绝原因），确定拒绝？"
+          }
+        }
+      }
+    },
+    "coach.roster.searchStudents": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索学员"
+          }
+        }
+      }
+    },
+    "coach.roster.sectionCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{title} · {count}"
+          }
+        }
+      }
+    },
+    "coach.roster.viewProfile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "查看资料"
+          }
+        }
+      }
+    },
+    "coach.roster.waitingForReplyReason": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待回复"
+          }
+        }
+      }
+    },
+    "coach.roster.weekProgress": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周 {completed}/{planned}"
+          }
+        }
+      }
+    },
+    "coach.shell.profile": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的"
+          }
+        }
+      }
+    },
+    "coach.shell.students": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员"
+          }
+        }
+      }
+    },
+    "coach.shell.today": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        }
+      }
+    },
+    "coach.today.acceptedStudent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新学员 {name} 已接收 · 已加入学员列表"
+          }
+        }
+      }
+    },
+    "coach.today.activeAsPlanned": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按计划在练"
+          }
+        }
+      }
+    },
+    "coach.today.allDone": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天都处理完了"
+          }
+        }
+      }
+    },
+    "coach.today.allDoneSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员新上传视频或发消息时会出现在这里"
+          }
+        }
+      }
+    },
+    "coach.today.askHowThingsAreGoing": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发条消息问问情况"
+          }
+        }
+      }
+    },
+    "coach.today.awaitingFeedback": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待反馈"
+          }
+        }
+      }
+    },
+    "coach.today.earliestApplicationSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最早{waiting}"
+          }
+        }
+      }
+    },
+    "coach.today.earliestVideoSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最早一段 {time}"
+          }
+        }
+      }
+    },
+    "coach.today.multipleApplicationsTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{count} 位新学员申请加入"
+          }
+        }
+      }
+    },
+    "coach.today.needsAttention": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待关注"
+          }
+        }
+      }
+    },
+    "coach.today.newApplication": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新申请"
+          }
+        }
+      }
+    },
+    "coach.today.noTrainingDaysThisWeek": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周还没有训练安排"
+          }
+        }
+      }
+    },
+    "coach.today.notStarted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没开始"
+          }
+        }
+      }
+    },
+    "coach.today.notTrainedTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{name} 已 {days} 天未训练"
+          }
+        }
+      }
+    },
+    "coach.today.orderedByHandling": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按处理顺序排列"
+          }
+        }
+      }
+    },
+    "coach.today.pendingVideosTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{count} 段视频等你反馈"
+          }
+        }
+      }
+    },
+    "coach.today.peopleCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{count} 人"
+          }
+        }
+      }
+    },
+    "coach.today.singleApplicationTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{name} 申请加入"
+          }
+        }
+      }
+    },
+    "coach.today.todo": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待办"
+          }
+        }
+      }
+    },
+    "coach.today.trainingDaysCompleted": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{completed} / {planned} 训练日已完成"
+          }
+        }
+      }
+    },
+    "coach.today.unread": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未读"
+          }
+        }
+      }
+    },
+    "coach.today.unreadMessagesTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{count} 条学员消息未读"
+          }
+        }
+      }
+    },
+    "coach.today.viewAllStudents": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "看全部学员"
+          }
+        }
+      }
+    },
+    "coach.today.weekOverview": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本周概况"
+          }
+        }
+      }
+    },
     "coach.chat.messages": {
       "extractionState": "manual",
       "localizations": {

@@ -7,7 +7,7 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func coachRootMountsOneChatEntryInEveryTabStack() throws {
+@Test func coachShellRoutesDashboardAndRosterChatThroughMessagesTab() throws {
   let chat = makeChatContext()
   let context = try makeDetailContext(chat: chat)
   let rosterViewModel = StudentRosterViewModel(
@@ -18,13 +18,13 @@ import ViewInspector
   )
   let views = try [
     CoachDashboardView(
-      attentionCount: 0,
-      pendingCount: 0,
       context: context,
+      now: Date(),
       chat: chat
     ).inspect().findAll(ChatEntryButton.self).count,
     StudentRosterView(
       viewModel: rosterViewModel,
+      now: Date(),
       context: context,
       chat: chat
     ).inspect().findAll(ChatEntryButton.self).count,
@@ -44,11 +44,11 @@ import ViewInspector
     ).inspect().findAll(ChatEntryButton.self).count,
   ]
 
-  #expect(views == [1, 1, 1, 1, 1])
+  #expect(views == [0, 0, 1, 1, 1])
 }
 
-@Test func receivingBadgeIncludesStudentsVideosAndChatUnread() {
-  #expect(CoachReceivingBadge.total(newStudents: 2, videos: 3, chatUnread: 4) == 9)
+@Test func messageBadgeIncludesVideosAndChatUnread() {
+  #expect(CoachMessageBadge.total(videos: 3, chatUnread: 4) == 7)
 }
 
 @MainActor

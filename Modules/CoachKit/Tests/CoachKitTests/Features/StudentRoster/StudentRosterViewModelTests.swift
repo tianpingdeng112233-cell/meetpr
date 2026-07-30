@@ -43,11 +43,32 @@ import Testing
   #expect(viewModel.rows.count == 2)
   #expect(viewModel.pendingAttentionCount == 1)
   #expect(viewModel.triageRows.count == viewModel.pendingAttentionCount)
-  #expect(viewModel.rows[0].plannedTrainingDays == 1)
-  #expect(viewModel.rows[0].completedTrainingDays == 1)
+  #expect(viewModel.rows[0].trainingDays.count == 1)
   #expect(viewModel.rows[0].needsAttention)
   #expect(viewModel.rows[0].triageSignals == [.awaitingReply])
   #expect(!viewModel.rows[1].needsAttention)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() {
+  let plan = CoachStudentFeatureFixtures.plan(trainingOffsets: [0, 6])
+  let firstDate = plan.days[0].date
+  let lastDate = plan.days[6].date
+  let row = StudentRosterViewModel.makeRow(
+    summary: CoachStudentFeatureFixtures.summary(),
+    plan: plan,
+    logs: [
+      CoachStudentFeatureFixtures.log(
+        loggedAt: firstDate.addingTimeInterval(3_600)
+      )
+    ],
+    feedback: [],
+    now: firstDate
+  )
+
+  #expect(row.trainingDays.map(\.date) == [firstDate, lastDate])
+  #expect(row.trainingDays.map { $0.isCompleted() } == [true, false])
 }
 
 @MainActor

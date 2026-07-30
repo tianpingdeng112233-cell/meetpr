@@ -19,7 +19,14 @@ public struct CoachRootView: View {
   @State private var queueViewModel: BindQueueViewModel
   @State private var videoQueueViewModel: CoachVideoQueueViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
+  @Environment(\.scenePhase) private var scenePhase
+  @State private var tabHostStore = CoachTabHostStore()
   @State private var selectedTab: CoachTab = .today
+  @State private var acceptedStudentName: String?
+  /// 教练端唯一时钟。日切 / 显著时间(时区)变化 / 回到前台时推进——
+  /// 否则 app 停留过夜后,周概况仍停在昨天那一周(review-loop 2026-07-30)。
+  @State private var now = Date()
+  @State private var dashboardLoadTask: Task<Void, Never>?
 
   @MainActor
   // swiftlint:disable:next function_body_length
@@ -120,39 +127,26 @@ public struct CoachRootView: View {
   }
 
   public var body: some View {
-    TabView(selection: $selectedTab) {
+    coachTabs
+  }
+
+  private var coachTabs: some View {
+    let shell = CoachTabShellPresentation(selection: selectedTab)
+    return ZStack {
       CoachDashboardView(
-        attentionCount: rosterViewModel.pendingAttentionCount,
-        pendingCount: queueViewModel.pendingCount,
         context: detailContext,
+        now: now,
         rows: rosterViewModel.rows,
-        onOpenReceiving: { selectedTab = .receiving },
+        videos: videoQueueViewModel.items,
+        applications: queueViewModel.items,
+        conversations: chat?.inbox.conversations ?? [],
+        acceptedStudentName: acceptedStudentName,
+        onOpenMessages: { selectedTab = .messages },
         onOpenRoster: { selectedTab = .students },
         onEvaluationCompleted: { rosterViewModel.markStudentActive($0) },
         chat: chat
       )
-      .tag(CoachTab.today)
-      .tabItem {
-        Label("今日", systemImage: "house")
-      }
-
-      StudentRosterView(
-        viewModel: rosterViewModel,
-        context: detailContext,
-        chat: chat
-      )
-      .tag(CoachTab.students)
-      .tabItem {
-        Label("学员", systemImage: "person.2")
-      }
-      // 待关注学员 (新学员 pending 计数已拆到「接收」tab, spec 033 D1).
-      .badge(rosterViewModel.pendingAttentionCount)
-
-      CoachPlanningHomeView(context: detailContext, chat: chat)
-        .tag(CoachTab.planning)
-        .tabItem {
-          Label("编排", systemImage: "calendar.badge.plus")
-        }
+      .coachTabLayer(shell.layer(for: .today), store: tabHostStore)
 
       CoachReceivingView(
         pendingCount: queueViewModel.pendingCount,
@@ -163,65 +157,126 @@ public struct CoachRootView: View {
         onAccepted: { await rosterViewModel.refresh() },
         chat: chat
       )
-      .tag(CoachTab.receiving)
-      .tabItem {
-        Label("接收", systemImage: "tray")
-      }
-      // 收件箱红点 = 新学员 + 待反馈视频 + 聊天未读(spec 058).
-      .badge(
-        CoachReceivingBadge.total(
-          newStudents: queueViewModel.pendingCount,
-          videos: videoQueueViewModel.pendingCount,
-          chatUnread: chat?.inbox.totalUnread ?? 0
-        )
+      .coachTabLayer(shell.layer(for: .messages), store: tabHostStore)
+
+      StudentRosterView(
+        viewModel: rosterViewModel,
+        queueViewModel: queueViewModel,
+        rows: rosterViewModel.filteredRows,
+        now: now,
+        context: detailContext,
+        profiles: detailContext.profiles,
+        onAccepted: { studentName in
+          acceptedStudentName = studentName
+          await rosterViewModel.refresh()
+        },
+        chat: chat,
+        loadsOnAppear: false
       )
+      .coachTabLayer(shell.layer(for: .students), store: tabHostStore)
 
       CoachMyProfileView(
         viewModel: profileViewModel,
         inviteCodes: inviteCodes,
         chat: chat
       )
-      .tag(CoachTab.profile)
-      .tabItem {
-        Label("我的", systemImage: "person")
-      }
+      .coachTabLayer(shell.layer(for: .profile), store: tabHostStore)
     }
-    .task {
-      Analytics.shared.screen(.dashboard)
-      await rosterViewModel.loadIfNeeded()
-      await queueViewModel.loadIfNeeded()
-      await videoQueueViewModel.loadIfNeeded()
-      if let chat {
-        await chat.inbox.refresh()
-        chat.inbox.startPolling()
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color.MeetPR.bgBase)
+    .safeAreaInset(edge: .bottom, spacing: 0) {
+      MeetPRTabBar(
+        selection: $selectedTab,
+        items: [
+          MeetPRTabBarItem(id: .today, title: CoachShellStrings.today, icon: .house),
+          MeetPRTabBarItem(
+            id: .messages,
+            title: CoachStrings.messages,
+            icon: .message,
+            // Intentional prototype deviation: the badge uses unread message count,
+            // not the number of conversations containing unread messages.
+            badge: CoachMessageBadge.total(
+              videos: videoQueueViewModel.pendingCount,
+              chatUnread: chat?.inbox.totalUnread ?? 0
+            )
+          ),
+          MeetPRTabBarItem(
+            id: .students,
+            title: CoachShellStrings.students,
+            icon: .students,
+            badge: queueViewModel.pendingCount
+          ),
+          MeetPRTabBarItem(id: .profile, title: CoachShellStrings.profile, icon: .profile),
+        ],
+        selectedColor: Color.MeetPR.gold500,
+        unselectedColor: Color.MeetPR.textDisabled,
+        badgeColor: Color.MeetPR.danger
+      )
+    }
+    .onChange(of: scenePhase) { _, phase in
+      guard phase == .active else { return }
+      advanceClock()
+    }
+    #if os(iOS)
+      .onReceive(
+        NotificationCenter.default.publisher(
+          for: UIApplication.significantTimeChangeNotification
+        )
+      ) { _ in
+        advanceClock()
+      }
+    #endif
+    .onReceive(
+      NotificationCenter.default.publisher(for: .NSCalendarDayChanged).receive(on: RunLoop.main)
+    ) { _ in
+      advanceClock()
+    }
+    .onAppear {
+      guard dashboardLoadTask == nil else { return }
+      dashboardLoadTask = Task {
+        await loadDashboardData()
       }
     }
     .onDisappear {
+      dashboardLoadTask?.cancel()
+      dashboardLoadTask = nil
       chat?.inbox.stopPolling()
     }
     .onChange(of: selectedTab) { _, tab in
       switch tab {
       case .today: Analytics.shared.screen(.dashboard)
       case .students: Analytics.shared.screen(.coachRoster)
-      case .planning: Analytics.shared.screen(.coachPlanning)
-      case .receiving: Analytics.shared.screen(.coachReceiving)
+      case .messages: Analytics.shared.screen(.coachReceiving)
       case .profile: Analytics.shared.screen(.account)
       }
     }
-    .tint(Color.MeetPR.brandRed)
+  }
+
+  /// 推进统一时钟。跨过日界线时顺带重取一次 roster——本周的日志窗口已经换了一周,
+  /// 光把 `now` 往前推只会让格子空着。
+  private func advanceClock() {
+    let updated = Date()
+    let rolledOver = !CoachFeatureCalendar.isSameDay(updated, now)
+    now = updated
+    guard rolledOver else { return }
+    Task { await rosterViewModel.refresh() }
+  }
+
+  private func loadDashboardData() async {
+    Analytics.shared.screen(.dashboard)
+    async let rosterRefresh: Void = rosterViewModel.loadIfNeeded()
+    async let queueRefresh: Void = queueViewModel.loadIfNeeded()
+    async let videoRefresh: Void = videoQueueViewModel.loadIfNeeded()
+    _ = await (rosterRefresh, queueRefresh, videoRefresh)
+    if let chat {
+      await chat.inbox.refresh()
+      chat.inbox.startPolling()
+    }
   }
 }
 
-enum CoachReceivingBadge {
-  static func total(newStudents: Int, videos: Int, chatUnread: Int) -> Int {
-    newStudents + videos + chatUnread
+enum CoachMessageBadge {
+  static func total(videos: Int, chatUnread: Int) -> Int {
+    videos + chatUnread
   }
-}
-
-private enum CoachTab: Hashable {
-  case today
-  case students
-  case planning
-  case receiving
-  case profile
 }

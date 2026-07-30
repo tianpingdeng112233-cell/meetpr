@@ -283,8 +283,8 @@ struct MeetPRApp: App {
     }
     switch user.role {
     case .coach:
-      // CoachKit has no audited light palette yet.
-      return .dark
+      // ⚖️ 2026-07-30: 教练端恒亮(样机只有浅色一版).
+      return .light
     case .coachedStudent, .selfTrainStudent:
       // ⚖️ 2026-07-28: student roots open in light mode by default; the user
       // can pin dark or system-following in 我的 → 外观.
