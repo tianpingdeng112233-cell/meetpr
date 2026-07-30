@@ -1,266 +1,201 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// One pending video opened from the 训练视频 inbox (spec 042): play the clip
-/// full screen, then write text feedback. Visually aligned to
-/// `FeedbackComposerView` but scoped to the video — no day / exercise pickers,
-/// since the video already implies the student, day, and exercise.
+/// Full-screen coach workbench for the cross-student pending-video queue.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct VideoFeedbackDetailView: View {
-  private let item: PendingVideoItem
   private let viewModel: CoachVideoQueueViewModel
+  private let trainingLogs: any StudentTrainingLogRepository
   private let onSent: () -> Void
 
-  @State private var text = ""
-  @State private var playbackItem: StudentVideoPlaybackItem?
-  @State private var resolvingPlayback = false
-  @State private var playbackError: String?
-  @State private var sending = false
+  @Environment(\.coachNow) private var now
   @Environment(\.dismiss) private var dismiss
+  @State private var detailModel: VideoFeedbackDetailModel
+  @State private var text = ""
+  @State private var sending = false
 
   init(
     item: PendingVideoItem,
     viewModel: CoachVideoQueueViewModel,
+    trainingLogs: any StudentTrainingLogRepository,
     onSent: @escaping () -> Void = {}
   ) {
-    self.item = item
     self.viewModel = viewModel
+    self.trainingLogs = trainingLogs
     self.onSent = onSent
+    _detailModel = State(initialValue: VideoFeedbackDetailModel(item: item))
   }
 
   var body: some View {
-    NavigationStack {
-      VStack(spacing: 0) {
-        header
+    VStack(spacing: 0) {
+      VideoFeedbackHeader(
+        studentName: detailModel.currentItem.studentDisplayName,
+        exerciseName: detailModel.currentItem.exerciseName
+          ?? CoachVideoFeedbackStrings.trainingVideo,
+        meta: headerMeta,
+        queuePosition: queuePositionText,
+        dismiss: dismiss.callAsFunction
+      )
 
-        ScrollView {
-          VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-            videoCard
-            editorCard
-            if let playbackError {
-              banner(playbackError)
-            }
-            if let banner = viewModel.bannerMessage {
-              self.banner(banner)
-            }
+      ScrollView {
+        VStack(spacing: MeetPRSpacing.space3) {
+          VideoFeedbackPlayerCard(
+            itemID: detailModel.currentItem.id,
+            playbackURL: detailModel.playbackURL,
+            isLoading: detailModel.isResolvingPlayback,
+            hasError: detailModel.playbackError,
+            refreshURL: { try await viewModel.playbackURL(videoID: $0) },
+            retry: retryPlayback
+          )
+
+          if let setInfo = detailModel.setInfo {
+            VideoSetInfoCard(info: setInfo)
           }
-          .padding(MeetPRSpacing.base)
-        }
-        .scrollContentBackground(.hidden)
-      }
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .background(Color.MeetPR.bg)
-      .hideNavigationBar()
-      .safeAreaInset(edge: .bottom) { sendBar }
-    }
-    #if os(iOS)
-      .fullScreenCover(item: $playbackItem) { playback in
-        CoachVideoPlayerView(
-          videoID: playback.id,
-          url: playback.url,
-          refreshURL: { try await viewModel.playbackURL(videoID: $0) }
-        )
-      }
-    #else
-      .sheet(item: $playbackItem) { playback in
-        CoachVideoPlayerView(
-          videoID: playback.id,
-          url: playback.url,
-          refreshURL: { try await viewModel.playbackURL(videoID: $0) }
-        )
-      }
-    #endif
-  }
 
-  // MARK: - Header (cancel · student name)
+          VideoFeedbackComposer(
+            text: $text,
+            studentName: detailModel.currentItem.studentDisplayName,
+            send: send
+          )
 
-  private var header: some View {
-    VStack(alignment: .leading, spacing: 4) {
-      HStack {
-        Eyebrow("视频反馈 //")
-        Spacer()
-        Button("取消") { dismiss() }
-          .font(.system(size: 16))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-      }
-      Text("给 \(item.studentDisplayName) 写反馈")
-        .font(.system(size: 28, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .lineLimit(1)
-        .minimumScaleFactor(0.7)
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, MeetPRSpacing.base)
-    .padding(.top, MeetPRSpacing.sm)
-    .padding(.bottom, MeetPRSpacing.xs)
-  }
-
-  // MARK: - Video card (meta + play)
-
-  private var videoCard: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      sectionLabel("训练视频")
-      VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-        Text(metaLine)
-          .font(.system(size: 14, design: .monospaced))
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Button(action: play) {
-          HStack(spacing: MeetPRSpacing.sm) {
-            if resolvingPlayback {
-              ProgressView()
-            } else {
-              Image(systemName: "play.rectangle.fill")
-                .foregroundStyle(Color.MeetPR.brandRed)
-            }
-            Text(resolvingPlayback ? "加载中…" : "播放视频")
-              .font(.system(size: 15, weight: .semibold))
-              .foregroundStyle(Color.MeetPR.fgPrimary)
-            Spacer()
-            Image(systemName: "chevron.right")
-              .font(.system(size: 13))
-              .foregroundStyle(Color.MeetPR.fgTertiary)
+          if let bannerMessage = viewModel.bannerMessage {
+            Text(bannerMessage)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.danger)
+              .frame(maxWidth: .infinity, alignment: .leading)
           }
-          .frame(maxWidth: .infinity)
-          .padding(.vertical, MeetPRSpacing.md)
-          .padding(.horizontal, MeetPRSpacing.base)
-          .background(Color.MeetPR.surface2)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+
+          Button(action: skip) {
+            Text(CoachVideoFeedbackStrings.skip)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+              .frame(maxWidth: .infinity)
+              .padding(MeetPRSpacing.point14)
+              .contentShape(.capsule)
+          }
+          .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+          .overlay {
+            Capsule()
+              .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
+          }
+          .accessibilityIdentifier("coach.video.skip")
+          .disabled(sending)
         }
-        .buttonStyle(.plain)
-        .disabled(resolvingPlayback)
+        .padding(.horizontal, MeetPRSpacing.point18)
+        .padding(.top, MeetPRSpacing.point14)
+        .padding(.bottom, MeetPRSpacing.point26)
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
-      }
+      .scrollIndicators(.hidden)
     }
-  }
-
-  private var metaLine: String {
-    var parts: [String] = []
-    if let exerciseName = item.exerciseName { parts.append(exerciseName) }
-    parts.append(CoachStudentFormatting.fullDateText(item.uploadedAt))
-    parts.append(Self.sizeText(item.sizeBytes))
-    return parts.joined(separator: " · ")
-  }
-
-  // MARK: - Editor card
-
-  private var editorCard: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      sectionLabel("反馈内容")
-      ZStack(alignment: .topLeading) {
-        if text.isEmpty {
-          Text("给 \(item.studentDisplayName) 写反馈...")
-            .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgTertiary)
-            .padding(.top, 8)
-            .padding(.leading, 5)
-        }
-        TextEditor(text: $text)
-          .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .scrollContentBackground(.hidden)
-      }
-      .frame(minHeight: 160)
-      .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.surface1)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-          .stroke(Color.MeetPR.border, lineWidth: 1)
-      }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color.MeetPR.bgBase)
+    .hideNavigationBar()
+    .task(id: detailModel.currentItem.id) {
+      await detailModel.prepare(videoQueue: viewModel, trainingLogs: trainingLogs)
     }
+    .accessibilityIdentifier("coach.video.feedbackWorkbench")
   }
 
-  private func banner(_ message: String) -> some View {
-    Label(message, systemImage: "exclamationmark.triangle")
-      .font(Font.MeetPR.footnote)
-      .foregroundStyle(Color.MeetPR.amber)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(MeetPRSpacing.md)
-      .background(Color.MeetPR.amberSoft)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+  static func sizeText(_ sizeBytes: Int64) -> String {
+    let megabytes = Double(sizeBytes) / 1_048_576
+    let value =
+      megabytes >= 10
+      ? megabytes.formatted(.number.precision(.fractionLength(0)))
+      : megabytes.formatted(.number.precision(.fractionLength(1)))
+    return CoachVideoFeedbackStrings.sizeMegabytes(value)
   }
 
-  // MARK: - Send bar
-
-  private var sendBar: some View {
-    Button(action: send) {
-      HStack(spacing: MeetPRSpacing.sm) {
-        Image(systemName: "paperplane.fill")
-        Text("发送")
-      }
-      .font(.system(size: 16, weight: .semibold))
-      .foregroundStyle(canSend ? Color.MeetPR.bg : Color.MeetPR.fgTertiary)
-      .frame(maxWidth: .infinity)
-      .frame(height: 50)
-      .background(canSend ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+  private var setText: String {
+    guard let setInfo = detailModel.setInfo else {
+      return CoachVideoFeedbackStrings.trainingVideo
     }
-    .buttonStyle(.plain)
-    .disabled(!canSend)
-    .padding(.horizontal, MeetPRSpacing.base)
-    .padding(.vertical, MeetPRSpacing.sm)
-    .background(.ultraThinMaterial)
-    .accessibilityLabel("发送")
+    return CoachVideoFeedbackStrings.setNumber(setInfo.displaySetNumber)
+  }
+
+  private var headerMeta: String {
+    CoachVideoFeedbackStrings.headerMeta(
+      setText: setText,
+      relativeTime: CoachStudentFormatting.relativeText(
+        detailModel.currentItem.uploadedAt,
+        now: now
+      )
+    )
+  }
+
+  private var queuePositionText: String? {
+    let items = viewModel.items
+    guard
+      let position = VideoFeedbackQueueNavigator.position(
+        of: detailModel.currentItem.id,
+        in: items
+      )
+    else {
+      return nil
+    }
+    return CoachVideoFeedbackStrings.queuePosition(
+      index: position.displayIndex,
+      total: position.total
+    )
   }
 
   private var canSend: Bool {
     !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !sending
   }
 
-  // MARK: - Actions
-
-  private func play() {
-    guard !resolvingPlayback else { return }
-    resolvingPlayback = true
-    playbackError = nil
+  private func retryPlayback() {
     Task {
-      defer { resolvingPlayback = false }
-      do {
-        let url = try await viewModel.playbackURL(videoID: item.id)
-        playbackItem = StudentVideoPlaybackItem(id: item.id, url: url)
-      } catch {
-        playbackError = "播放链接获取失败,请重试"
-      }
+      await detailModel.loadPlayback(using: viewModel)
     }
+  }
+
+  private func skip() {
+    let items = viewModel.items
+    guard
+      let next = VideoFeedbackQueueNavigator.nextItem(
+        after: detailModel.currentItem.id,
+        in: items
+      )
+    else {
+      dismiss()
+      return
+    }
+    show(next)
   }
 
   private func send() {
     guard canSend else { return }
+    let sentItem = detailModel.currentItem
+    // 记下「发送时排在它后面那一段」的**身份**,不是索引:发送等待期间若刷新落地
+    // 并前插/重排,旧索引会指向另一段(review-loop 2026-07-30)。
+    let successorID = VideoFeedbackQueueNavigator.nextItem(
+      after: sentItem.id,
+      in: viewModel.items
+    )?.id
+    let submittedText = text
     sending = true
     Task {
       defer { sending = false }
-      if await viewModel.sendFeedback(for: item, text: text) {
-        onSent()
+      guard await viewModel.sendFeedback(for: sentItem, text: submittedText) else { return }
+      onSent()
+      guard
+        let next = VideoFeedbackQueueNavigator.itemAfterSend(
+          preferring: successorID,
+          in: viewModel.items
+        )
+      else {
         dismiss()
+        return
       }
+      show(next)
     }
   }
 
-  // MARK: - Building blocks
-
-  private func sectionLabel(_ text: String) -> some View {
-    Text(text)
-      .font(Font.MeetPR.monoLabel)
-      .tracking(Font.MeetPR.monoLabelTracking)
-      .foregroundStyle(Color.MeetPR.fgSecondary)
-      .frame(maxWidth: .infinity, alignment: .leading)
-  }
-
-  static func sizeText(_ sizeBytes: Int64) -> String {
-    let megabytes = Double(sizeBytes) / 1_048_576
-    if megabytes >= 10 {
-      return "\(Int(megabytes.rounded())) MB"
-    }
-    return String(format: "%.1f MB", megabytes)
+  private func show(_ item: PendingVideoItem) {
+    text = ""
+    detailModel.select(item)
   }
 }

@@ -196,6 +196,26 @@ import Testing
   #expect(pending.first?.exerciseName == "深蹲")
 }
 
+@Test func aggregatorCarriesStudentVideoSetLogID() async throws {
+  let student = CoachStudentFeatureFixtures.studentID
+  let setLogID = UUID()
+  let video = VideoInboxFixtures.video(
+    setLogID: setLogID,
+    planExerciseID: CoachStudentFeatureFixtures.planExerciseID,
+    createdAt: VideoInboxFixtures.base
+  )
+  let repo = AggregatingCoachVideoQueueRepository(
+    roster: StubCoachPlanRepository(students: [
+      CoachStudentFeatureFixtures.summary(id: student, name: "甲")
+    ]),
+    videos: PerStudentVideoRepo([student: [video]]),
+    feedback: StubFeedbackRepository(),
+    plans: StubStudentPlanRepository(plans: [student: CoachStudentFeatureFixtures.plan()])
+  )
+
+  #expect(try await repo.fetchPendingVideos().first?.setLogID == setLogID)
+}
+
 // MARK: - Demo seed
 
 @Test func demoSeedPendingVideosAreWellFormed() {
@@ -207,6 +227,7 @@ import Testing
   #expect(videos.allSatisfy { !$0.studentDisplayName.isEmpty })
   // Every clip is a coach-programmed 主项/变式 name (spec 042 D2).
   #expect(videos.allSatisfy { ($0.exerciseName?.isEmpty == false) })
+  #expect(videos.filter { $0.setLogID == nil }.count == 1)
   // 王晨曦's day pairs a main lift with its variation (3 clips).
   let topStudent = Dictionary(grouping: videos, by: \.studentID).values.map(\.count).max()
   #expect(topStudent == 3)

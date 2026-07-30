@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import RepositoryContracts
 import Testing
 
 @testable import CoachKit
@@ -116,4 +117,61 @@ import Testing
   #expect(sections.count == 2)
   #expect(sections.first?.items.count == 1)  // newest day on top
   #expect(sections.last?.items.count == 2)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func staleRefreshCannotRestoreVideoAfterFeedbackSend() async {
+  let item = VideoInboxFixtures.item()
+  let repository = StaleRefreshVideoQueueRepository(pending: [item])
+  let viewModel = CoachVideoQueueViewModel(repository: repository)
+  await viewModel.loadIfNeeded()
+
+  let staleRefresh = Task {
+    await viewModel.refresh()
+  }
+  while await repository.fetchCallCount < 2 {
+    await Task.yield()
+  }
+
+  let sent = await viewModel.sendFeedback(for: item, text: "保持背部张力")
+  await staleRefresh.value
+
+  #expect(sent)
+  #expect(viewModel.items.isEmpty)
+  #expect(viewModel.pendingCount == 0)
+}
+
+private actor StaleRefreshVideoQueueRepository: CoachVideoQueueRepository {
+  private var pending: [PendingVideoItem]
+  private(set) var fetchCallCount = 0
+
+  init(pending: [PendingVideoItem]) {
+    self.pending = pending
+  }
+
+  func fetchPendingVideos() async throws -> [PendingVideoItem] {
+    fetchCallCount += 1
+    let snapshot = pending
+    if fetchCallCount > 1 {
+      try? await Task.sleep(for: .milliseconds(80))
+    }
+    return snapshot
+  }
+
+  func playbackURL(videoID: UUID) async throws -> URL {
+    URL(fileURLWithPath: "/tmp/\(videoID).mp4")
+  }
+
+  func sendFeedback(for item: PendingVideoItem, text: String) async throws -> CoachFeedback {
+    pending.removeAll { $0.id == item.id }
+    return CoachFeedback(
+      id: UUID(),
+      coachID: UUID(),
+      studentID: item.studentID,
+      videoID: item.id,
+      text: text,
+      postedAt: VideoInboxFixtures.base
+    )
+  }
 }

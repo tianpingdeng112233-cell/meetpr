@@ -58,6 +58,16 @@ struct ColorsTests {
       dark: .init(35, 35, 39),
       light: .init(238, 240, 243)
     )
+    try assertDynamicColor(
+      .MeetPR.videoStageFill,
+      dark: .init(27, 37, 52),
+      light: .init(27, 37, 52)
+    )
+    try assertDynamicColor(
+      .MeetPR.videoStageBorder,
+      dark: .init(42, 54, 70),
+      light: .init(42, 54, 70)
+    )
   }
 
   @Test("border tokens match both v3 themes")

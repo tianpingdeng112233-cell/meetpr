@@ -58,6 +58,8 @@ final class CoachVideoQueueViewModel {
   }
 
   @ObservationIgnored private let repository: any CoachVideoQueueRepository
+  @ObservationIgnored private var refreshGeneration = 0
+  @ObservationIgnored private var mutationGeneration = 0
 
   init(repository: any CoachVideoQueueRepository) {
     self.repository = repository
@@ -69,11 +71,22 @@ final class CoachVideoQueueViewModel {
   }
 
   func refresh() async {
+    refreshGeneration += 1
+    let requestGeneration = refreshGeneration
+    let requestMutationGeneration = mutationGeneration
     if state == .idle { state = .loading }
     do {
-      items = try await repository.fetchPendingVideos()
+      let snapshot = try await repository.fetchPendingVideos()
+      guard
+        requestGeneration == refreshGeneration,
+        requestMutationGeneration == mutationGeneration
+      else {
+        return
+      }
+      items = snapshot
       state = .loaded
     } catch {
+      guard requestGeneration == refreshGeneration else { return }
       // Keep the last snapshot on transport failure; an empty failed queue
       // collapses the segment, same as empty.
       if state != .loaded { state = .failed }
@@ -94,6 +107,7 @@ final class CoachVideoQueueViewModel {
     }
     do {
       _ = try await repository.sendFeedback(for: item, text: trimmed)
+      mutationGeneration += 1
       items.removeAll { $0.id == item.id }
       toastMessage = "已发送反馈"
       Analytics.shared.coachFeedbackSent(studentID: item.studentID, kind: .video)

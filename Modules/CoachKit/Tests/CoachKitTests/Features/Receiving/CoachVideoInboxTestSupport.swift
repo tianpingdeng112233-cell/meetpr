@@ -11,7 +11,9 @@ enum VideoInboxFixtures {
     id: UUID = UUID(),
     studentID: UUID = UUID(),
     name: String = "学员",
+    setLogID: UUID? = nil,
     planExerciseID: UUID? = nil,
+    exerciseName: String? = nil,
     uploadedAt: Date = base,
     sizeBytes: Int64 = 12_000_000
   ) -> PendingVideoItem {
@@ -19,8 +21,9 @@ enum VideoInboxFixtures {
       id: id,
       studentID: studentID,
       studentDisplayName: name,
+      setLogID: setLogID,
       planExerciseID: planExerciseID,
-      exerciseName: nil,
+      exerciseName: exerciseName,
       dayDate: nil,
       uploadedAt: uploadedAt,
       sizeBytes: sizeBytes
@@ -29,12 +32,13 @@ enum VideoInboxFixtures {
 
   static func video(
     id: UUID = UUID(),
+    setLogID: UUID? = nil,
     planExerciseID: UUID?,
     createdAt: Date
   ) -> StudentVideo {
     StudentVideo(
       id: id,
-      setLogID: nil,
+      setLogID: setLogID,
       planExerciseID: planExerciseID,
       contentType: "video/mp4",
       sizeBytes: 10_000_000,

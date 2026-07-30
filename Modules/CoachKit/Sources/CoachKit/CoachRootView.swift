@@ -159,6 +159,7 @@ public struct CoachRootView: View {
       CoachReceivingView(
         now: now,
         videoQueueViewModel: videoQueueViewModel,
+        trainingLogs: studentLogs,
         studentStatuses: studentStatuses,
         chat: chat
       )

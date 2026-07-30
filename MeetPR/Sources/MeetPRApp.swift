@@ -73,6 +73,25 @@ struct MeetPRApp: App {
       )
     }
 
+    private static func makeDemoVideoQueue() -> InMemoryCoachVideoQueueRepository {
+      let items = CoachDemoSeed.pendingVideos()
+      let playbackURLs: [UUID: URL]
+      if let videoURL = Bundle.main.url(
+        forResource: "coach-demo-video",
+        withExtension: "mp4"
+      ) {
+        playbackURLs = Dictionary(
+          uniqueKeysWithValues: items.map { ($0.id, videoURL) }
+        )
+      } else {
+        playbackURLs = [:]
+      }
+      return InMemoryCoachVideoQueueRepository(
+        seed: items,
+        playbackURLs: playbackURLs
+      )
+    }
+
     private static func makeRootDependencies(
       draftStore: DraftStore
     ) -> (rootView: RootView, session: Session) {
@@ -130,7 +149,9 @@ struct MeetPRApp: App {
         coachEvaluationSummaries: funnel.summaries,
         coachStudentProfiles: funnel.profiles,
         studentPlans: InMemoryStudentPlanRepository(store: planStore),
-        studentLogs: InMemoryStudentTrainingLogRepository(seed: studentState.logs),
+        studentLogs: InMemoryStudentTrainingLogRepository(
+          seed: studentState.logs + CoachDemoSeed.pendingVideoSetLogs()
+        ),
         studentFeedback: InMemoryStudentFeedbackRepository(seed: studentState.feedback),
         studentE1RM: InMemoryE1RMRepository(
           seedPoints: studentState.e1rmPoints,
@@ -148,7 +169,7 @@ struct MeetPRApp: App {
           seed: studentState.profile
         ),
         // 训练视频 inbox: boot straight into a populated queue (spec 042).
-        coachVideoQueue: InMemoryCoachVideoQueueRepository(seed: CoachDemoSeed.pendingVideos()),
+        coachVideoQueue: makeDemoVideoQueue(),
         chatSession: chat.controller,
         chatRepository: chat.repository,
         draftStore: draftStore,

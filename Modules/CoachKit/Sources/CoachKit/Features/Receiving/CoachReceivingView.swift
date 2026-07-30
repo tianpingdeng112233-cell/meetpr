@@ -2,6 +2,7 @@ import Analytics
 import ChatUI
 import CoreModels
 import DesignSystem
+import RepositoryContracts
 import SwiftUI
 
 @MainActor
@@ -9,6 +10,7 @@ import SwiftUI
 struct CoachReceivingView: View {
   private let now: Date
   private let videoQueueViewModel: CoachVideoQueueViewModel
+  private let trainingLogs: any StudentTrainingLogRepository
   private let studentStatuses: [UUID: CoachStudentStatus]
   private let chat: CoachChatContext?
 
@@ -18,11 +20,13 @@ struct CoachReceivingView: View {
   init(
     now: Date,
     videoQueueViewModel: CoachVideoQueueViewModel,
+    trainingLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
     studentStatuses: [UUID: CoachStudentStatus] = [:],
     chat: CoachChatContext? = nil
   ) {
     self.now = now
     self.videoQueueViewModel = videoQueueViewModel
+    self.trainingLogs = trainingLogs
     self.studentStatuses = studentStatuses
     self.chat = chat
     _conversationOpener = State(initialValue: CoachConversationOpener(chat: chat))
@@ -64,7 +68,8 @@ struct CoachReceivingView: View {
         StudentPendingVideosView(
           studentID: group.studentID,
           studentName: group.studentName,
-          viewModel: videoQueueViewModel
+          viewModel: videoQueueViewModel,
+          trainingLogs: trainingLogs
         )
       }
       .navigationDestination(item: conversationDestinationBinding) { conversation in
@@ -187,10 +192,8 @@ struct CoachReceivingView: View {
     studentName: String
   ) -> some View {
     Button {
-      // Intentional prototype deviation: keep the per-student video list as
-      // the landing screen until both that list and video feedback receive
-      // their v3 follow-up card. Opening the first clip now exposes the v2
-      // feedback screen.
+      // Intentional prototype deviation: retain the per-student queue list
+      // between the inbox rollup and the full-screen feedback workbench.
       videoStudentTarget = videoGroup
     } label: {
       HStack(spacing: MeetPRSpacing.point5) {
