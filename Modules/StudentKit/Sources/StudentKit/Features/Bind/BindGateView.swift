@@ -168,27 +168,27 @@ public struct BindGateView<
       ProgressView()
       Text("正在检查绑定状态")
         .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 
   private var failedView: some View {
     VStack(spacing: MeetPRSpacing.lg) {
       Image(systemName: "wifi.slash")
         .font(.system(size: 36))
-        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .foregroundStyle(Color.MeetPR.textTertiary)
       Text("无法获取绑定状态")
         .font(Font.MeetPR.title2)
-        .foregroundStyle(Color.MeetPR.fgPrimary)
+        .foregroundStyle(Color.MeetPR.textPrimary)
       PrimaryButton("重试") {
         Task { await viewModel.load() }
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .padding(MeetPRSpacing.base)
-    .background(Color.MeetPR.bg)
+    .background(Color.MeetPR.bgBase)
   }
 }
 
@@ -224,7 +224,7 @@ private struct GateLogoutButton: View {
       )
       .font(Font.MeetPR.footnote)
     }
-    .foregroundStyle(Color.MeetPR.fgSecondary)
+    .foregroundStyle(Color.MeetPR.textSecondary)
     .disabled(isLoggingOut)
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.top, MeetPRSpacing.sm)
