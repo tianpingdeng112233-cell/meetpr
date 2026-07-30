@@ -124,7 +124,7 @@ public final class InviteCodesViewModel {
       try await operation()
       await reload()
     } catch {
-      actionError = "操作失败,请重试"
+      actionError = InviteCodeStrings.operationFailed
     }
   }
 
