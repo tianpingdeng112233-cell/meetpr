@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 
 enum CoachVideoFeedbackStrings {
@@ -14,6 +15,19 @@ enum CoachVideoFeedbackStrings {
   static let trainingVideo = CoachLocalization.localized("coach.videoFeedback.trainingVideo")
   static let reps = CoachLocalization.localized("coach.videoFeedback.reps")
   static let weight = CoachLocalization.localized("coach.videoFeedback.weight")
+  static let addMarker = CoachLocalization.localized("coach.videoFeedback.addMarker")
+  static let cancel = CoachLocalization.localized("coach.videoFeedback.cancel")
+  static let deleteMarker = CoachLocalization.localized("coach.videoFeedback.deleteMarker")
+  static let markerLevel = CoachLocalization.localized("coach.videoFeedback.markerLevel")
+  static let markerNote = CoachLocalization.localized("coach.videoFeedback.markerNote")
+  static let markerTime = CoachLocalization.localized("coach.videoFeedback.markerTime")
+  static let save = CoachLocalization.localized("coach.videoFeedback.save")
+  static let markersLoadFailed = CoachLocalization.localized(
+    "coach.videoFeedback.markersLoadFailed")
+  static let markerSaveFailed = CoachLocalization.localized(
+    "coach.videoFeedback.markerSaveFailed")
+  static let markerDeleteFailed = CoachLocalization.localized(
+    "coach.videoFeedback.markerDeleteFailed")
 
   static func feedbackPlaceholder(studentName: String) -> String {
     CoachLocalization.replacing(
@@ -78,5 +92,20 @@ enum CoachVideoFeedbackStrings {
       "coach.videoFeedback.sizeMegabytes",
       values: ["size": size]
     )
+  }
+
+  static func markerCount(_ count: Int) -> String {
+    CoachLocalization.replacing(
+      "coach.videoFeedback.markerCount",
+      values: ["count": count.formatted()]
+    )
+  }
+
+  static func markerLevel(_ level: VideoMarkerLevel) -> String {
+    switch level {
+    case .info: CoachLocalization.localized("coach.videoFeedback.markerLevel.info")
+    case .warn: CoachLocalization.localized("coach.videoFeedback.markerLevel.warn")
+    case .bad: CoachLocalization.localized("coach.videoFeedback.markerLevel.bad")
+    }
   }
 }

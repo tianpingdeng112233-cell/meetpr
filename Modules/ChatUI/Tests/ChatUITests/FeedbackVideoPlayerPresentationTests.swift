@@ -53,4 +53,18 @@ struct FeedbackVideoPlayerPresentationTests {
     #expect(behavior.appliesSelectedRate(while: .waitingToPlayAtSpecifiedRate))
     #expect(!behavior.appliesSelectedRate(while: .paused))
   }
+
+  @Test("marker seek conversion uses millisecond timescale and clamps to duration")
+  func markerSeekConversion() {
+    let zero = FeedbackVideoPlayerView.seekTime(milliseconds: 0, durationSeconds: 10)
+    let negative = FeedbackVideoPlayerView.seekTime(milliseconds: -50, durationSeconds: 10)
+    let beyondDuration = FeedbackVideoPlayerView.seekTime(
+      milliseconds: 12_345,
+      durationSeconds: 4.25
+    )
+
+    #expect(zero == CMTime(value: 0, timescale: 1_000))
+    #expect(negative == CMTime(value: 0, timescale: 1_000))
+    #expect(beyondDuration == CMTime(value: 4_250, timescale: 1_000))
+  }
 }

@@ -15,6 +15,16 @@ final class VideoFeedbackDetailModel {
   private(set) var playbackURL: URL?
   private(set) var playbackError = false
   private(set) var setInfo: VideoSetInfo?
+  private(set) var markers: [VideoMarker]?
+  /// The endpoint answered but with an error other than 404 — the marker
+  /// surface stays visible with a failure row instead of vanishing.
+  private(set) var markersFailed = false
+  private(set) var markerActionFailure: VideoMarkerActionFailure?
+
+  enum VideoMarkerActionFailure: Equatable {
+    case save
+    case delete
+  }
 
   var isResolvingPlayback: Bool {
     resolvingPlaybackItemID == currentItem.id
@@ -22,6 +32,7 @@ final class VideoFeedbackDetailModel {
 
   @ObservationIgnored private var playbackRequestID: UUID?
   @ObservationIgnored private var setInfoRequestID: UUID?
+  @ObservationIgnored private var markersRequestID: UUID?
   @ObservationIgnored private var resolvingPlaybackItemID: UUID?
 
   init(item: PendingVideoItem) {
@@ -36,13 +47,55 @@ final class VideoFeedbackDetailModel {
 
   func prepare(
     videoQueue: CoachVideoQueueViewModel,
-    trainingLogs: any StudentTrainingLogRepository
+    trainingLogs: any StudentTrainingLogRepository,
+    markerRepository: any VideoMarkerRepository = InMemoryVideoMarkerRepository()
   ) async {
     invalidateRequests()
     resetPresentation()
     async let playback: Void = loadPlayback(using: videoQueue)
     async let metrics: Void = loadSetInfo(using: trainingLogs)
-    _ = await (playback, metrics)
+    async let markerLoad: Void = loadMarkers(using: markerRepository)
+    _ = await (playback, metrics, markerLoad)
+  }
+
+  func createMarker(
+    timeMilliseconds: Int,
+    level: VideoMarkerLevel,
+    note: String,
+    using repository: any VideoMarkerRepository
+  ) async {
+    let itemID = currentItem.id
+    markerActionFailure = nil
+    do {
+      let created = try await repository.createMarker(
+        videoID: itemID,
+        timeMilliseconds: timeMilliseconds,
+        level: level,
+        note: note
+      )
+      guard currentItem.id == itemID, markers != nil else { return }
+      markers?.append(created)
+      markers?.sort(by: Self.markerOrder)
+    } catch {
+      guard currentItem.id == itemID else { return }
+      markerActionFailure = .save
+    }
+  }
+
+  func deleteMarker(
+    _ marker: VideoMarker,
+    using repository: any VideoMarkerRepository
+  ) async {
+    let itemID = currentItem.id
+    markerActionFailure = nil
+    do {
+      try await repository.deleteMarker(videoID: itemID, markerID: marker.id)
+      guard currentItem.id == itemID else { return }
+      markers?.removeAll { $0.id == marker.id }
+    } catch {
+      guard currentItem.id == itemID else { return }
+      markerActionFailure = .delete
+    }
   }
 
   func loadPlayback(using videoQueue: CoachVideoQueueViewModel) async {
@@ -106,9 +159,34 @@ final class VideoFeedbackDetailModel {
     setInfo = VideoSetInfo.resolve(setLogID: setLogID, from: logs)
   }
 
+  private func loadMarkers(using repository: any VideoMarkerRepository) async {
+    let item = currentItem
+    let requestID = UUID()
+    markersRequestID = requestID
+    do {
+      let loaded = try await repository.markers(videoID: item.id)
+      guard accepts(requestID: requestID, itemID: item.id, kind: .markers) else {
+        return
+      }
+      markers = loaded.sorted(by: Self.markerOrder)
+      markersFailed = false
+    } catch {
+      guard accepts(requestID: requestID, itemID: item.id, kind: .markers) else {
+        return
+      }
+      // A 404 means the endpoint may not be deployed yet: the entire marker
+      // surface is optional and disappears without affecting video feedback.
+      // Fail safe: only that recognized signal hides the surface — any other
+      // error keeps a visible failure row so markers never vanish silently.
+      markers = nil
+      markersFailed = (error as? VideoMarkerRepositoryError) != .unavailable
+    }
+  }
+
   private func invalidateRequests() {
     playbackRequestID = nil
     setInfoRequestID = nil
+    markersRequestID = nil
     resolvingPlaybackItemID = nil
   }
 
@@ -116,6 +194,9 @@ final class VideoFeedbackDetailModel {
     playbackURL = nil
     playbackError = false
     setInfo = nil
+    markers = nil
+    markersFailed = false
+    markerActionFailure = nil
   }
 
   private func accepts(
@@ -129,11 +210,21 @@ final class VideoFeedbackDetailModel {
       return playbackRequestID == requestID
     case .setInfo:
       return setInfoRequestID == requestID
+    case .markers:
+      return markersRequestID == requestID
     }
+  }
+
+  private static func markerOrder(_ lhs: VideoMarker, _ rhs: VideoMarker) -> Bool {
+    if lhs.timeMilliseconds != rhs.timeMilliseconds {
+      return lhs.timeMilliseconds < rhs.timeMilliseconds
+    }
+    return lhs.createdAt < rhs.createdAt
   }
 
   private enum RequestKind {
     case playback
     case setInfo
+    case markers
   }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct VideoFeedbackDetailView: View {
   private let viewModel: CoachVideoQueueViewModel
   private let trainingLogs: any StudentTrainingLogRepository
+  private let markerRepository: any VideoMarkerRepository
   private let onSent: () -> Void
 
   @Environment(\.coachNow) private var now
@@ -17,15 +18,19 @@ struct VideoFeedbackDetailView: View {
   @State private var detailModel: VideoFeedbackDetailModel
   @State private var text = ""
   @State private var sending = false
+  @State private var currentSeconds = 0.0
+  @State private var markerDraft: VideoMarkerDraft?
 
   init(
     item: PendingVideoItem,
     viewModel: CoachVideoQueueViewModel,
     trainingLogs: any StudentTrainingLogRepository,
+    markerRepository: any VideoMarkerRepository,
     onSent: @escaping () -> Void = {}
   ) {
     self.viewModel = viewModel
     self.trainingLogs = trainingLogs
+    self.markerRepository = markerRepository
     self.onSent = onSent
     _detailModel = State(initialValue: VideoFeedbackDetailModel(item: item))
   }
@@ -48,9 +53,31 @@ struct VideoFeedbackDetailView: View {
             playbackURL: detailModel.playbackURL,
             isLoading: detailModel.isResolvingPlayback,
             hasError: detailModel.playbackError,
+            currentSeconds: $currentSeconds,
+            markers: detailModel.markers,
             refreshURL: { try await viewModel.playbackURL(videoID: $0) },
-            retry: retryPlayback
+            retry: retryPlayback,
+            addMarker: addMarkerAction
           )
+
+          if let markers = detailModel.markers, !markers.isEmpty {
+            VideoMarkerList(
+              markers: markers,
+              delete: deleteMarker
+            )
+          }
+
+          if detailModel.markersFailed {
+            markerFailureRow(CoachVideoFeedbackStrings.markersLoadFailed)
+          }
+
+          if let failure = detailModel.markerActionFailure {
+            markerFailureRow(
+              failure == .save
+                ? CoachVideoFeedbackStrings.markerSaveFailed
+                : CoachVideoFeedbackStrings.markerDeleteFailed
+            )
+          }
 
           if let setInfo = detailModel.setInfo {
             VideoSetInfoCard(info: setInfo)
@@ -95,9 +122,24 @@ struct VideoFeedbackDetailView: View {
     .background(Color.MeetPR.bgBase)
     .hideNavigationBar()
     .task(id: detailModel.currentItem.id) {
-      await detailModel.prepare(videoQueue: viewModel, trainingLogs: trainingLogs)
+      currentSeconds = 0
+      await detailModel.prepare(
+        videoQueue: viewModel,
+        trainingLogs: trainingLogs,
+        markerRepository: markerRepository
+      )
+    }
+    .sheet(item: $markerDraft) { draft in
+      VideoMarkerEditor(draft: draft, save: saveMarker)
     }
     .accessibilityIdentifier("coach.video.feedbackWorkbench")
+  }
+
+  private func markerFailureRow(_ message: String) -> some View {
+    Text(message)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+      .foregroundStyle(Color.MeetPR.danger)
+      .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   static func sizeText(_ sizeBytes: Int64) -> String {
@@ -144,6 +186,15 @@ struct VideoFeedbackDetailView: View {
 
   private var canSend: Bool {
     !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !sending
+  }
+
+  private var addMarkerAction: (() -> Void)? {
+    guard detailModel.markers != nil else { return nil }
+    return {
+      markerDraft = VideoMarkerDraft(
+        timeMilliseconds: max(0, Int((currentSeconds * 1_000).rounded()))
+      )
+    }
   }
 
   private func retryPlayback() {
@@ -196,6 +247,131 @@ struct VideoFeedbackDetailView: View {
 
   private func show(_ item: PendingVideoItem) {
     text = ""
+    currentSeconds = 0
     detailModel.select(item)
+  }
+
+  private func saveMarker(_ draft: VideoMarkerDraft) {
+    markerDraft = nil
+    Task {
+      await detailModel.createMarker(
+        timeMilliseconds: draft.timeMilliseconds,
+        level: draft.level,
+        note: draft.note,
+        using: markerRepository
+      )
+    }
+  }
+
+  private func deleteMarker(_ marker: VideoMarker) {
+    Task {
+      await detailModel.deleteMarker(marker, using: markerRepository)
+    }
+  }
+}
+
+private struct VideoMarkerDraft: Identifiable {
+  let id = UUID()
+  let timeMilliseconds: Int
+  var level: VideoMarkerLevel = .info
+  var note = ""
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct VideoMarkerEditor: View {
+  @Environment(\.dismiss) private var dismiss
+  @State private var draft: VideoMarkerDraft
+  let save: (VideoMarkerDraft) -> Void
+
+  init(draft: VideoMarkerDraft, save: @escaping (VideoMarkerDraft) -> Void) {
+    _draft = State(initialValue: draft)
+    self.save = save
+  }
+
+  var body: some View {
+    NavigationStack {
+      Form {
+        LabeledContent(
+          CoachVideoFeedbackStrings.markerTime,
+          value: FeedbackVideoPlayerView.timeText(Double(draft.timeMilliseconds) / 1_000)
+        )
+        Picker(CoachVideoFeedbackStrings.markerLevel, selection: $draft.level) {
+          ForEach(VideoMarkerLevel.allCases, id: \.self) { level in
+            Text(CoachVideoFeedbackStrings.markerLevel(level)).tag(level)
+          }
+        }
+        .pickerStyle(.segmented)
+        TextField(
+          CoachVideoFeedbackStrings.markerNote,
+          text: $draft.note,
+          axis: .vertical
+        )
+        .lineLimit(3...6)
+        .onChange(of: draft.note) { _, note in
+          if note.count > 500 {
+            draft.note = String(note.prefix(500))
+          }
+        }
+      }
+      .navigationTitle(CoachVideoFeedbackStrings.addMarker)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button(CoachVideoFeedbackStrings.cancel) { dismiss() }
+        }
+        ToolbarItem(placement: .confirmationAction) {
+          Button(CoachVideoFeedbackStrings.save) { save(draft) }
+        }
+      }
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct VideoMarkerList: View {
+  let markers: [VideoMarker]
+  let delete: (VideoMarker) -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      Text(CoachVideoFeedbackStrings.markerCount(markers.count))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+
+      VStack(spacing: 0) {
+        ForEach(markers) { marker in
+          HStack(spacing: MeetPRSpacing.point11) {
+            Text(FeedbackVideoPlayerView.timeText(Double(marker.timeMilliseconds) / 1_000))
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .bold))
+              .foregroundStyle(Color.MeetPR.gold500)
+            VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
+              Text(CoachVideoFeedbackStrings.markerLevel(marker.level))
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+                .foregroundStyle(Color.MeetPR.textTertiary)
+              if !marker.note.isEmpty {
+                Text(marker.note)
+                  .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+                  .foregroundStyle(Color.MeetPR.textPrimary)
+              }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            Button(role: .destructive) {
+              delete(marker)
+            } label: {
+              Image(systemName: "trash")
+            }
+            .accessibilityLabel(CoachVideoFeedbackStrings.deleteMarker)
+          }
+          .padding(.horizontal, MeetPRSpacing.space4)
+          .padding(.vertical, MeetPRSpacing.point13)
+
+          if marker.id != markers.last?.id {
+            Rectangle()
+              .fill(Color.MeetPR.borderHairline)
+              .frame(height: MeetPRSpacing.point1)
+          }
+        }
+      }
+      .meetPRCardSurface(.card)
+    }
   }
 }

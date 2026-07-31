@@ -97,6 +97,10 @@ public struct StudentRootView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
+    // Optional-with-nil (not `= InMemoryVideoMarkerRepository()`): a public
+    // default argument is emitted into the CALLER, and app-level targets that
+    // don't link RepositoryContracts directly would fail to link the symbol.
+    videoMarkers: (any VideoMarkerRepository)? = nil,
     e1rm: any E1RMRepository = LocalE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
@@ -150,7 +154,10 @@ public struct StudentRootView: View {
       e1rm: e1rm,
       reviews: resolvedImportedHistoryReviews
     )
-    let feedbackViewModel = FeedbackInboxViewModel(repository: feedback)
+    let feedbackViewModel = FeedbackInboxViewModel(
+      repository: feedback,
+      markerRepository: videoMarkers ?? InMemoryVideoMarkerRepository()
+    )
     let evaluationSummaryViewModel = StudentEvaluationSummaryViewModel(
       summaries: evaluationSummaries ?? InMemoryEvaluationSummaryRepository(),
       plans: plans,

@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import SwiftUI
@@ -27,17 +28,23 @@ public struct FeedbackInboxView: View {
     #if os(iOS)
       .toolbar(.hidden, for: .navigationBar)
       .fullScreenCover(item: $playbackItem) { playback in
-        StudentFeedbackVideoPlayerView(
+        FeedbackVideoPlayerView(
           videoID: playback.id,
           url: playback.url,
+          markers: playback.markers,
+          markersFailed: playback.markersFailed,
+          onSeek: { _ in },
           refreshURL: { try await viewModel.playbackURL(videoID: $0) }
         )
       }
     #else
       .sheet(item: $playbackItem) { playback in
-        StudentFeedbackVideoPlayerView(
+        FeedbackVideoPlayerView(
           videoID: playback.id,
           url: playback.url,
+          markers: playback.markers,
+          markersFailed: playback.markersFailed,
+          onSeek: { _ in },
           refreshURL: { try await viewModel.playbackURL(videoID: $0) }
         )
       }
@@ -107,15 +114,27 @@ public struct FeedbackInboxView: View {
     resolvingVideoID = videoID
     playbackError = nil
     Task {
-      defer { resolvingVideoID = nil }
       await viewModel.markRead(item)
+      // The player opens as soon as the signed URL resolves; a slow or dead
+      // marker endpoint must never delay playback (optional-surface contract).
       do {
-        playbackItem = FeedbackVideoPlaybackItem(
-          id: videoID,
-          url: try await viewModel.playbackURL(videoID: videoID)
-        )
+        let url = try await viewModel.playbackURL(videoID: videoID)
+        playbackItem = FeedbackVideoPlaybackItem(id: videoID, url: url)
       } catch {
         playbackError = "播放链接获取失败，请重试"
+        resolvingVideoID = nil
+        return
+      }
+      resolvingVideoID = nil
+      let outcome = await viewModel.markers(videoID: videoID)
+      guard playbackItem?.id == videoID else { return }
+      switch outcome {
+      case .loaded(let markers):
+        playbackItem?.markers = markers
+      case .failed:
+        playbackItem?.markersFailed = true
+      case .hidden:
+        break
       }
     }
   }

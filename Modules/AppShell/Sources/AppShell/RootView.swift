@@ -24,6 +24,7 @@ public struct RootView: View {
   private let studentPlans: any StudentPlanRepository
   private let studentLogs: any StudentTrainingLogRepository
   private let studentFeedback: any StudentFeedbackRepository
+  private let videoMarkers: any VideoMarkerRepository
   private let studentE1RM: any E1RMRepository
   private let studentReadiness: any ReadinessRepository
   private let studentVideoUploads: VideoUploadServices?
@@ -53,6 +54,7 @@ public struct RootView: View {
     studentPlans: (any StudentPlanRepository)? = nil,
     studentLogs: (any StudentTrainingLogRepository)? = nil,
     studentFeedback: (any StudentFeedbackRepository)? = nil,
+    videoMarkers: (any VideoMarkerRepository)? = nil,
     studentE1RM: (any E1RMRepository)? = nil,
     studentReadiness: (any ReadinessRepository)? = nil,
     studentVideoUploads: VideoUploadServices? = nil,
@@ -76,6 +78,7 @@ public struct RootView: View {
     self.studentPlans = studentPlans ?? RootViewDemoDefaults.plans()
     self.studentLogs = studentLogs ?? RootViewDemoDefaults.logs()
     self.studentFeedback = studentFeedback ?? RootViewDemoDefaults.feedback()
+    self.videoMarkers = videoMarkers ?? InMemoryVideoMarkerRepository()
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
     self.studentVideoUploads = studentVideoUploads
@@ -194,6 +197,7 @@ public struct RootView: View {
       studentPlans: studentPlans,
       studentLogs: studentLogs,
       feedback: studentFeedback,
+      videoMarkers: videoMarkers,
       inviteCodes: coachInviteCodes,
       studentVideos: coachStudentVideos,
       readiness: studentReadiness,
@@ -338,6 +342,7 @@ extension RootView {
       plans: studentPlans,
       logs: studentLogs,
       feedback: studentFeedback,
+      videoMarkers: videoMarkers,
       e1rm: studentE1RM,
       readiness: studentReadiness,
       videoUploads: studentVideoUploads,

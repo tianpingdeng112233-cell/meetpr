@@ -12,6 +12,17 @@
         }
       }
     },
+    "chat.addVideoMarker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "＋ 打点"
+          }
+        }
+      }
+    },
     "chat.back": {
       "extractionState": "manual",
       "localizations": {
@@ -254,6 +265,17 @@
         }
       }
     },
+    "chat.pausePlayback": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂停"
+          }
+        }
+      }
+    },
     "chat.plannedSetCardLabel": {
       "extractionState": "manual",
       "localizations": {
@@ -261,17 +283,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "我今天的计划"
-          }
-        }
-      }
-    },
-    "chat.playVideo": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "播放视频"
           }
         }
       }
@@ -287,13 +298,13 @@
         }
       }
     },
-    "chat.pausePlayback": {
+    "chat.playVideo": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "暂停"
+            "value": "播放视频"
           }
         }
       }
@@ -397,6 +408,28 @@
         }
       }
     },
+    "chat.seekToVideoMarker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳转到 {time}"
+          }
+        }
+      }
+    },
+    "chat.selected": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已选择"
+          }
+        }
+      }
+    },
     "chat.send": {
       "extractionState": "manual",
       "localizations": {
@@ -470,17 +503,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "✓ 教练已读"
-          }
-        }
-      }
-    },
-    "chat.selected": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已选择"
           }
         }
       }
@@ -580,6 +602,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "视频上传失败，请先在训练页重试"
+          }
+        }
+      }
+    },
+    "chat.videoMarker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "视频打点"
+          }
+        }
+      }
+    },
+    "chat.videoMarkers": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打点 · {count}"
+          }
+        }
+      }
+    },
+    "chat.videoMarkersFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打点加载失败"
           }
         }
       }

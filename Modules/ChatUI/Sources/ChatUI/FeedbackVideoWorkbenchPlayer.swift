@@ -1,4 +1,5 @@
 import AVKit
+import CoreModels
 import DesignSystem
 import SwiftUI
 
@@ -11,8 +12,10 @@ struct FeedbackVideoWorkbenchPlayer: View {
   let isPlaying: Bool
   let currentSeconds: Double
   let durationSeconds: Double
+  let markers: [VideoMarker]?
   let togglePlayback: () -> Void
   let selectRate: (Float) -> Void
+  let addMarker: (() -> Void)?
 
   var body: some View {
     VStack(spacing: MeetPRSpacing.point11) {
@@ -24,7 +27,24 @@ struct FeedbackVideoWorkbenchPlayer: View {
         timelineText(FeedbackVideoPlayerView.timeText(durationSeconds))
       }
 
-      ratePicker
+      HStack(spacing: MeetPRSpacing.space2) {
+        ratePicker
+        if let addMarker {
+          Button(action: addMarker) {
+            Text(ChatStrings.addVideoMarker)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+              .foregroundStyle(.white)
+              .padding(.horizontal, MeetPRSpacing.space3)
+              .padding(.vertical, MeetPRSpacing.point7)
+              .overlay {
+                RoundedRectangle(cornerRadius: MeetPRRadius.inset)
+                  .stroke(Color.MeetPR.videoStageBorder, lineWidth: MeetPRSpacing.point1)
+              }
+          }
+          .buttonStyle(.plain)
+          .accessibilityIdentifier("feedback.video.addMarker")
+        }
+      }
     }
     .padding(MeetPRSpacing.space3)
     .background(Color.MeetPR.textPrimary)
@@ -103,6 +123,12 @@ struct FeedbackVideoWorkbenchPlayer: View {
         Capsule()
           .fill(Color.white)
           .frame(width: proxy.size.width * progressFraction)
+        ForEach(markers ?? []) { marker in
+          RoundedRectangle(cornerRadius: MeetPRSpacing.point2)
+            .fill(Color.MeetPR.gold500)
+            .frame(width: MeetPRSpacing.point3, height: MeetPRSpacing.point10)
+            .offset(x: markerOffset(marker, trackWidth: proxy.size.width))
+        }
       }
     }
     .frame(height: MeetPRSpacing.space1)
@@ -124,5 +150,12 @@ struct FeedbackVideoWorkbenchPlayer: View {
   private var progressFraction: CGFloat {
     guard durationSeconds > 0 else { return 0 }
     return CGFloat(min(max(currentSeconds / durationSeconds, 0), 1))
+  }
+
+  private func markerOffset(_ marker: VideoMarker, trackWidth: CGFloat) -> CGFloat {
+    guard durationSeconds > 0 else { return 0 }
+    let seconds = Double(marker.timeMilliseconds) / 1_000
+    let fraction = min(max(seconds / durationSeconds, 0), 1)
+    return max(0, trackWidth * fraction - MeetPRSpacing.point1)
   }
 }

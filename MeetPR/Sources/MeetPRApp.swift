@@ -4,6 +4,7 @@ import CoachKit
 import CoreModels
 import DesignSystem
 import Networking
+import RepositoryContracts
 import StudentKit
 import SwiftData
 import SwiftUI
@@ -136,7 +137,8 @@ struct MeetPRApp: App {
       funnel: DemoEvaluationFunnel,
       draftStore: DraftStore
     ) -> RootView {
-      RootView(
+      let markerRepository = makeDemoVideoMarkers(studentState: studentState)
+      return RootView(
         coachPlans: InMemoryPlanRepository.preview(store: planStore),
         // Demo coach: personal (used 23) + unused single-use + 6-day
         // time-limited seed codes (spec 031 D10).
@@ -152,7 +154,8 @@ struct MeetPRApp: App {
         studentLogs: InMemoryStudentTrainingLogRepository(
           seed: studentState.logs + CoachDemoSeed.pendingVideoSetLogs()
         ),
-        studentFeedback: InMemoryStudentFeedbackRepository(seed: studentState.feedback),
+        studentFeedback: makeDemoStudentFeedback(studentState: studentState),
+        videoMarkers: markerRepository,
         studentE1RM: InMemoryE1RMRepository(
           seedPoints: studentState.e1rmPoints,
           seedPRs: studentState.prEvents
@@ -174,6 +177,63 @@ struct MeetPRApp: App {
         chatRepository: chat.repository,
         draftStore: draftStore,
         analyticsMode: .disabled
+      )
+    }
+
+    private static func makeDemoVideoMarkers(
+      studentState: DemoStudentState
+    ) -> InMemoryVideoMarkerRepository {
+      let pendingVideoIDs = CoachDemoSeed.pendingVideos().map(\.id)
+      let feedbackVideoIDs = studentState.feedback.compactMap(\.videoID)
+      let videoIDs = Array(Set(pendingVideoIDs + feedbackVideoIDs))
+      let timestamp = Date(timeIntervalSince1970: 1_775_000_000)
+      let markers = videoIDs.flatMap { videoID in
+        [
+          VideoMarker(
+            id: UUID(),
+            videoID: videoID,
+            coachID: StudentDemoSeed.coachID,
+            timeMilliseconds: 2_800,
+            level: .info,
+            note: "保持核心收紧",
+            createdAt: timestamp
+          ),
+          VideoMarker(
+            id: UUID(),
+            videoID: videoID,
+            coachID: StudentDemoSeed.coachID,
+            timeMilliseconds: 6_400,
+            level: .warn,
+            note: "注意动作深度",
+            createdAt: timestamp.addingTimeInterval(1)
+          ),
+        ]
+      }
+      return InMemoryVideoMarkerRepository(
+        seed: markers,
+        coachID: StudentDemoSeed.coachID
+      )
+    }
+
+    private static func makeDemoStudentFeedback(
+      studentState: DemoStudentState
+    ) -> InMemoryStudentFeedbackRepository {
+      guard
+        let videoURL = Bundle.main.url(
+          forResource: "coach-demo-video",
+          withExtension: "mp4"
+        )
+      else {
+        return InMemoryStudentFeedbackRepository(seed: studentState.feedback)
+      }
+      let playbackURLs = Dictionary(
+        uniqueKeysWithValues: studentState.feedback.compactMap { feedback in
+          feedback.videoID.map { ($0, videoURL) }
+        }
+      )
+      return InMemoryStudentFeedbackRepository(
+        seed: studentState.feedback,
+        playbackURLs: playbackURLs
       )
     }
   #else
@@ -260,6 +320,7 @@ struct MeetPRApp: App {
             session: chat.session,
             cache: FeedbackCache()
           ),
+          videoMarkers: BackendVideoMarkerRepository(api: api, session: chat.session),
           // e1RM stays fully on-device in V0.1 (spec 028 persistence ladder):
           // JSON files under Documents/e1rm/, no backend endpoint.
           studentE1RM: LocalE1RMRepository(),

@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import SwiftUI
@@ -84,17 +85,23 @@ public struct FeedbackDetailView: View {
     .navigationTitle("反馈")
     #if os(iOS)
       .fullScreenCover(item: $playbackItem) { playback in
-        StudentFeedbackVideoPlayerView(
+        FeedbackVideoPlayerView(
           videoID: playback.id,
           url: playback.url,
+          markers: playback.markers,
+          markersFailed: playback.markersFailed,
+          onSeek: { _ in },
           refreshURL: { try await freshPlaybackURL(videoID: $0) }
         )
       }
     #else
       .sheet(item: $playbackItem) { playback in
-        StudentFeedbackVideoPlayerView(
+        FeedbackVideoPlayerView(
           videoID: playback.id,
           url: playback.url,
+          markers: playback.markers,
+          markersFailed: playback.markersFailed,
+          onSeek: { _ in },
           refreshURL: { try await freshPlaybackURL(videoID: $0) }
         )
       }
@@ -106,14 +113,26 @@ public struct FeedbackDetailView: View {
     resolvingPlayback = true
     playbackError = nil
     Task {
-      defer { resolvingPlayback = false }
+      // The player opens as soon as the signed URL resolves; a slow or dead
+      // marker endpoint must never delay playback (optional-surface contract).
       do {
-        playbackItem = FeedbackVideoPlaybackItem(
-          id: videoID,
-          url: try await freshPlaybackURL(videoID: videoID)
-        )
+        let url = try await freshPlaybackURL(videoID: videoID)
+        playbackItem = FeedbackVideoPlaybackItem(id: videoID, url: url)
       } catch {
         playbackError = "播放链接获取失败，请重试"
+        resolvingPlayback = false
+        return
+      }
+      resolvingPlayback = false
+      let outcome = await freshMarkers(videoID: videoID)
+      guard playbackItem?.id == videoID else { return }
+      switch outcome {
+      case .loaded(let markers):
+        playbackItem?.markers = markers
+      case .failed:
+        playbackItem?.markersFailed = true
+      case .hidden:
+        break
       }
     }
   }
@@ -123,6 +142,11 @@ public struct FeedbackDetailView: View {
       throw FeedbackVideoPlaybackError.unavailable
     }
     return try await viewModel.playbackURL(videoID: videoID)
+  }
+
+  private func freshMarkers(videoID: UUID) async -> VideoMarkerLoadOutcome {
+    guard let viewModel else { return .hidden }
+    return await viewModel.markers(videoID: videoID)
   }
 }
 
@@ -204,6 +228,8 @@ private struct FeedbackVideoUnavailableCard: View {
 struct FeedbackVideoPlaybackItem: Identifiable, Equatable, Sendable {
   let id: UUID
   let url: URL
+  var markers: [VideoMarker]?
+  var markersFailed = false
 }
 
 enum FeedbackVideoPlaybackError: Error, Equatable, Sendable {

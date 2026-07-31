@@ -11,6 +11,7 @@ struct CoachReceivingView: View {
   private let now: Date
   private let videoQueueViewModel: CoachVideoQueueViewModel
   private let trainingLogs: any StudentTrainingLogRepository
+  private let markerRepository: any VideoMarkerRepository
   private let studentStatuses: [UUID: CoachStudentStatus]
   private let chat: CoachChatContext?
 
@@ -21,12 +22,14 @@ struct CoachReceivingView: View {
     now: Date,
     videoQueueViewModel: CoachVideoQueueViewModel,
     trainingLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
+    markerRepository: any VideoMarkerRepository = InMemoryVideoMarkerRepository(),
     studentStatuses: [UUID: CoachStudentStatus] = [:],
     chat: CoachChatContext? = nil
   ) {
     self.now = now
     self.videoQueueViewModel = videoQueueViewModel
     self.trainingLogs = trainingLogs
+    self.markerRepository = markerRepository
     self.studentStatuses = studentStatuses
     self.chat = chat
     _conversationOpener = State(initialValue: CoachConversationOpener(chat: chat))
@@ -69,7 +72,8 @@ struct CoachReceivingView: View {
           studentID: group.studentID,
           studentName: group.studentName,
           viewModel: videoQueueViewModel,
-          trainingLogs: trainingLogs
+          trainingLogs: trainingLogs,
+          markerRepository: markerRepository
         )
       }
       .navigationDestination(item: conversationDestinationBinding) { conversation in
@@ -256,7 +260,10 @@ struct CoachReceivingView: View {
     }
   }
 
-  private var conversationDestinationBinding: Binding<ChatConversation?> {
+}
+
+extension CoachReceivingView {
+  fileprivate var conversationDestinationBinding: Binding<ChatConversation?> {
     Binding(
       get: { conversationOpener.destination },
       set: { destination in
@@ -267,7 +274,7 @@ struct CoachReceivingView: View {
     )
   }
 
-  private var conversationErrorBinding: Binding<Bool> {
+  fileprivate var conversationErrorBinding: Binding<Bool> {
     Binding(
       get: { conversationOpener.errorMessage != nil },
       set: { isPresented in

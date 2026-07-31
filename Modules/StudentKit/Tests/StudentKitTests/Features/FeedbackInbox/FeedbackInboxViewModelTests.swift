@@ -98,6 +98,42 @@ import Testing
   await refresh.value
 }
 
+@MainActor
+@Test("video markers load, hide only when unavailable, and surface other failures")
+func feedbackVideoMarkersDegradeByErrorKind() async throws {
+  let videoID = UUID()
+  let markerRepository = InMemoryVideoMarkerRepository(coachID: UUID())
+  let created = try await markerRepository.createMarker(
+    videoID: videoID,
+    timeMilliseconds: 1_500,
+    level: .warn,
+    note: "Brace"
+  )
+  let available = FeedbackInboxViewModel(
+    repository: InMemoryStudentFeedbackRepository(),
+    markerRepository: markerRepository
+  )
+  let unavailable = FeedbackInboxViewModel(
+    repository: InMemoryStudentFeedbackRepository(),
+    markerRepository: FailingVideoMarkerRepository(error: .unavailable)
+  )
+  let failing = FeedbackInboxViewModel(
+    repository: InMemoryStudentFeedbackRepository(),
+    markerRepository: FailingVideoMarkerRepository(error: .failed)
+  )
+  let unknownError = FeedbackInboxViewModel(
+    repository: InMemoryStudentFeedbackRepository(),
+    markerRepository: FailingVideoMarkerRepository(error: nil)
+  )
+
+  #expect(await available.markers(videoID: videoID) == .loaded([created]))
+  #expect(await unavailable.markers(videoID: videoID) == .hidden)
+  #expect(await failing.markers(videoID: videoID) == .failed)
+  // Fail safe: an error outside the repository's typed domain must surface,
+  // not silently hide the coach's markers.
+  #expect(await unknownError.markers(videoID: videoID) == .failed)
+}
+
 private enum EmptyStateFeedbackError: Error {
   case failed
 }
@@ -131,4 +167,31 @@ private actor EmptyStateFeedbackRepository: StudentFeedbackRepository {
   }
 
   func markRead(feedbackID: UUID) async throws {}
+}
+
+private struct FailingVideoMarkerRepository: VideoMarkerRepository {
+  /// `nil` throws an error outside the repository's typed domain — callers
+  /// must fail safe and surface it rather than hide the marker surface.
+  let error: VideoMarkerRepositoryError?
+
+  private var thrown: any Error {
+    error ?? EmptyStateFeedbackError.failed
+  }
+
+  func markers(videoID: UUID) async throws -> [VideoMarker] {
+    throw thrown
+  }
+
+  func createMarker(
+    videoID: UUID,
+    timeMilliseconds: Int,
+    level: VideoMarkerLevel,
+    note: String
+  ) async throws -> VideoMarker {
+    throw thrown
+  }
+
+  func deleteMarker(videoID: UUID, markerID: UUID) async throws {
+    throw thrown
+  }
 }
