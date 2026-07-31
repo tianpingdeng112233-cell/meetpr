@@ -6,12 +6,16 @@ import Foundation
 // file_length budget (see specs/055 NOTES.md).
 extension TodayWorkoutViewModel {
   func weightSuggestion(forSetID setID: UUID) -> SetWeightSuggestion? {
+    weightSuggestionOutcome(forSetID: setID).suggestion
+  }
+
+  func weightSuggestionOutcome(forSetID setID: UUID) -> SetWeightSuggestionOutcome {
     guard let drafts = currentDrafts,
       let draft = drafts.first(where: { $0.id == setID })
     else {
-      return nil
+      return .unavailableWithoutReason
     }
-    return Self.weightSuggestion(
+    return Self.weightSuggestionOutcome(
       forSetID: setID,
       in: drafts,
       currentE1RMKg: suggestionE1RMByExercise[draft.exerciseID],
@@ -25,35 +29,118 @@ extension TodayWorkoutViewModel {
     currentE1RMKg: Double?,
     lastLoggedWeightKg: Decimal? = nil
   ) -> SetWeightSuggestion? {
+    weightSuggestionOutcome(
+      forSetID: setID,
+      in: drafts,
+      currentE1RMKg: currentE1RMKg,
+      lastLoggedWeightKg: lastLoggedWeightKg
+    ).suggestion
+  }
+
+  nonisolated static func weightSuggestionOutcome(
+    forSetID setID: UUID,
+    in drafts: [SetRowDraft],
+    currentE1RMKg: Double?,
+    lastLoggedWeightKg: Decimal? = nil
+  ) -> SetWeightSuggestionOutcome {
     guard let targetIndex = drafts.firstIndex(where: { $0.id == setID }) else {
-      return nil
+      return .unavailableWithoutReason
     }
     let target = drafts[targetIndex]
-    guard target.prescribed.weightKg == nil,
-      let targetRPE = target.prescribed.rpe,
-      let targetReps = target.prescribed.reps ?? target.prescribed.repsMax
-    else {
-      return nil
+    guard target.prescribed.weightKg == nil else {
+      return .unavailableWithoutReason
     }
 
-    let suggestion: SetWeightSuggestion? =
+    let baseOutcome =
       target.isMainLift
-      ? mainLiftSuggestion(
-        target: target, targetReps: targetReps, targetRPE: targetRPE,
-        priorDrafts: drafts[..<targetIndex], currentE1RMKg: currentE1RMKg)
-      : fallbackSuggestion(
+      ? mainLiftSuggestionOutcome(
+        target: target,
+        priorDrafts: drafts[..<targetIndex],
+        currentE1RMKg: currentE1RMKg
+      )
+      : fallbackSuggestionOutcome(
         target: target, priorDrafts: drafts[..<targetIndex],
         lastLoggedWeightKg: lastLoggedWeightKg)
-    guard let suggestion else { return nil }
+    guard let suggestion = baseOutcome.suggestion else { return baseOutcome }
+    return suggestionOutcome(suggestion, for: target)
+  }
 
+  private nonisolated static func suggestionOutcome(
+    _ suggestion: SetWeightSuggestion,
+    for target: SetRowDraft
+  ) -> SetWeightSuggestionOutcome {
     // Seed case: nothing logged yet. Rebuild case: the camera flow persists the
     // untouched seed into actualWeight (SetEntrySheet onWillPick) and the sheet
     // re-inits, so an incomplete set whose actual still equals the suggestion
     // is still in the suggested state; any other actual means the student took
     // over and the annotation must not resurface.
-    if target.actualWeight == nil { return suggestion }
-    if !target.completed, target.actualWeight == suggestion.weightKg { return suggestion }
-    return nil
+    if target.actualWeight == nil {
+      return SetWeightSuggestionOutcome(suggestion: suggestion, unavailableReason: nil)
+    }
+    if !target.completed, target.actualWeight == suggestion.weightKg {
+      return SetWeightSuggestionOutcome(suggestion: suggestion, unavailableReason: nil)
+    }
+    return .unavailableWithoutReason
+  }
+
+  private nonisolated static func mainLiftSuggestionOutcome(
+    target: SetRowDraft,
+    priorDrafts: ArraySlice<SetRowDraft>,
+    currentE1RMKg: Double?
+  ) -> SetWeightSuggestionOutcome {
+    guard let targetRPE = target.prescribed.rpe else {
+      return SetWeightSuggestionOutcome(
+        suggestion: nil,
+        unavailableReason: .missingPrescribedRPE
+      )
+    }
+    guard let targetReps = target.prescribed.reps ?? target.prescribed.repsMax else {
+      return SetWeightSuggestionOutcome(
+        suggestion: nil,
+        unavailableReason: .missingPrescribedReps
+      )
+    }
+    guard (1...12).contains(targetReps) else {
+      return SetWeightSuggestionOutcome(
+        suggestion: nil,
+        unavailableReason: .prescribedRepsOutsideSupportedRange
+      )
+    }
+    let targetRPEDouble = NSDecimalNumber(decimal: targetRPE).doubleValue
+    let rpeReason: SetWeightSuggestionUnavailableReason? =
+      targetRPEDouble < 5
+      ? .prescribedRPEBelowSupportedRange
+      : targetRPEDouble > 10 ? .prescribedRPEAboveSupportedRange : nil
+    guard rpeReason == nil else {
+      return SetWeightSuggestionOutcome(suggestion: nil, unavailableReason: rpeReason)
+    }
+    let suggestion = mainLiftSuggestion(
+      target: target,
+      targetReps: targetReps,
+      targetRPE: targetRPE,
+      priorDrafts: priorDrafts,
+      currentE1RMKg: currentE1RMKg
+    )
+    return SetWeightSuggestionOutcome(
+      suggestion: suggestion,
+      unavailableReason: suggestion == nil ? .noEligibleE1RMHistory : nil
+    )
+  }
+
+  private nonisolated static func fallbackSuggestionOutcome(
+    target: SetRowDraft,
+    priorDrafts: ArraySlice<SetRowDraft>,
+    lastLoggedWeightKg: Decimal?
+  ) -> SetWeightSuggestionOutcome {
+    let suggestion = fallbackSuggestion(
+      target: target,
+      priorDrafts: priorDrafts,
+      lastLoggedWeightKg: lastLoggedWeightKg
+    )
+    return SetWeightSuggestionOutcome(
+      suggestion: suggestion,
+      unavailableReason: suggestion == nil ? .noExerciseHistory : nil
+    )
   }
 
   /// Main lifts: same-day set with the identical prescription continues,
@@ -68,6 +155,7 @@ extension TodayWorkoutViewModel {
     let previous = priorDrafts.reversed().first { candidate in
       candidate.exerciseID == target.exerciseID
         && candidate.completed
+        && !candidate.failed
         && candidate.actualWeight.map { $0 > 0 } == true
         && (candidate.prescribed.reps ?? candidate.prescribed.repsMax) == targetReps
         && candidate.prescribed.rpe == targetRPE
@@ -102,6 +190,7 @@ extension TodayWorkoutViewModel {
     let previous = priorDrafts.reversed().first { candidate in
       candidate.exerciseID == target.exerciseID
         && candidate.completed
+        && !candidate.failed
         && candidate.actualWeight.map { $0 > 0 } == true
     }
     if let previousWeight = previous?.actualWeight {

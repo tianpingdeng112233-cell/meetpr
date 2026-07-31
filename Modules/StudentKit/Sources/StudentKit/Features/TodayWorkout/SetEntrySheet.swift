@@ -18,10 +18,10 @@ struct SetEntrySheet: View {
   let studentID: UUID?
   let videoViewModel: VideoAttachmentViewModel?
   let scrollToVideo: Bool
-
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.dismiss) private var dismiss
 
+  @State var suggestionOutcomeSnapshot: SetWeightSuggestionOutcome
   @State private var weightText: String
   @State private var repsText: String
   @State private var rpeText: String
@@ -54,8 +54,10 @@ struct SetEntrySheet: View {
     // Camera and picker presentations can recreate the cover. Re-seed from the
     // live, stable-id matched draft so flushed edits survive that churn.
     let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
-    let suggestion = viewModel.weightSuggestion(forSetID: seed.id)
-    let weight = seed.actualWeight ?? seed.prescribed.weightKg ?? suggestion?.weightKg ?? 20
+    let suggestionOutcome = viewModel.weightSuggestionOutcome(forSetID: seed.id)
+    _suggestionOutcomeSnapshot = State(initialValue: suggestionOutcome)
+    let weight =
+      seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg ?? 20
     let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
     _weightText = State(initialValue: SetEntryValue.text(max(20, weight)))
@@ -74,19 +76,31 @@ struct SetEntrySheet: View {
           }
 
           VStack(spacing: MeetPRSpacing.space3) {
-            numberStepper(
-              label: "重量",
-              annotation: "± 2.5",
-              value: weightText,
-              unit: "KG",
-              onDecrement: {
-                updateWeight(max(20, weightValue - Decimal(25) / 10))
-              },
-              onIncrement: {
-                updateWeight(weightValue + Decimal(25) / 10)
-              },
-              onOpenPad: { openNumberPad(.weight) }
-            )
+            VStack(spacing: MeetPRSpacing.space2) {
+              numberStepper(
+                label: "重量",
+                annotation: "± 2.5",
+                value: weightText,
+                unit: "KG",
+                onDecrement: {
+                  updateWeight(max(20, weightValue - Decimal(25) / 10))
+                },
+                onIncrement: {
+                  updateWeight(weightValue + Decimal(25) / 10)
+                },
+                onOpenPad: { openNumberPad(.weight) }
+              )
+
+              if let reason = suggestionOutcomeSnapshot.unavailableReason {
+                Text("暂无建议：\(reason.message)")
+                  .font(Font.MeetPR.caption)
+                  .foregroundStyle(Color.MeetPR.textSecondary)
+                  .frame(maxWidth: .infinity, alignment: .leading)
+                  .lineLimit(1)
+                  .minimumScaleFactor(0.85)
+                  .accessibilityIdentifier("setEntry.weightSuggestionUnavailable")
+              }
+            }
 
             numberStepper(
               label: "次数",

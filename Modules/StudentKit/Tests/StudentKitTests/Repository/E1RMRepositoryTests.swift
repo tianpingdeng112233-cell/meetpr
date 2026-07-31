@@ -87,6 +87,44 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
   ]
 }
 
+@Test func staleHistoryReplacementIsRejectedForBothRepositories() async throws {
+  for (label, repo) in makeRepos() {
+    let studentID = UUID()
+    let exerciseID = UUID()
+    let original = point(
+      studentId: studentID,
+      exerciseId: exerciseID,
+      daysAgo: 2,
+      e1RM: 120
+    )
+    try await repo.recordPoint(original)
+    let snapshot = try await repo.historySnapshot(
+      studentId: studentID,
+      exerciseIds: [exerciseID]
+    )
+    let concurrent = point(
+      studentId: studentID,
+      exerciseId: exerciseID,
+      daysAgo: 1,
+      e1RM: 125
+    )
+    try await repo.recordPoint(concurrent)
+
+    let didReplace = try await repo.replaceHistory(
+      studentId: studentID,
+      with: [original],
+      weightBaselines: [],
+      prEvents: [],
+      ifUnchangedSince: snapshot.revision
+    )
+    let history = try await repo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
+
+    #expect(!didReplace, "\(label): stale revision must reject replacement")
+    #expect(
+      history.map(\.id) == [original.id, concurrent.id], "\(label): concurrent point survives")
+  }
+}
+
 @Test func recordAndFetchHistorySortedByDate() async throws {
   for (label, repo) in makeRepos() {
     let student = UUID()
@@ -205,6 +243,55 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
   }
 }
 
+@Test func livePRRecordingIsIdempotentBySetLogIdentity() async throws {
+  for (label, repo) in makeRepos() {
+    let studentID = UUID()
+    let setLogID = UUID()
+    let first = PRBreakthroughEvent(
+      id: UUID(),
+      studentId: studentID,
+      exerciseId: UUID(),
+      family: .bench,
+      setLogId: setLogID,
+      pointId: UUID(),
+      breakthroughE1RMKg: 120,
+      previousMaxE1RMKg: 115,
+      breakthroughWeightKg: 105,
+      previousMaxWeightKg: 100,
+      occurredAt: Date(timeIntervalSince1970: 1_768_262_400),
+      acknowledgedAt: nil
+    )
+    let duplicate = PRBreakthroughEvent(
+      id: UUID(),
+      studentId: studentID,
+      exerciseId: first.exerciseId,
+      family: .bench,
+      setLogId: setLogID,
+      pointId: first.pointId,
+      breakthroughE1RMKg: first.breakthroughE1RMKg,
+      previousMaxE1RMKg: first.previousMaxE1RMKg,
+      breakthroughWeightKg: first.breakthroughWeightKg,
+      previousMaxWeightKg: first.previousMaxWeightKg,
+      occurredAt: first.occurredAt,
+      acknowledgedAt: nil
+    )
+
+    #expect(
+      try await repo.recordPRIfAbsent(first, forSetLogId: setLogID),
+      "\(label): first derivation inserts"
+    )
+    #expect(
+      !(try await repo.recordPRIfAbsent(duplicate, forSetLogId: setLogID)),
+      "\(label): duplicate derivation is ignored"
+    )
+    let events = try await repo.prEvents(
+      studentId: studentID,
+      since: Date(timeIntervalSince1970: 0)
+    )
+    #expect(events.map(\.id) == [first.id], "\(label)")
+  }
+}
+
 @Test func weightBaselineUpdateIsPersistentAndStrictlyMonotonic() async throws {
   for (label, repo) in makeRepos() {
     let student = UUID()
@@ -234,11 +321,22 @@ private func makeRepos() -> [(String, any E1RMRepository)] {
     #expect(try await repo.recordWeightBaseline(first) == nil, "\(label)")
     #expect(try await repo.recordWeightBaseline(lower) == first, "\(label)")
     #expect(try await repo.recordWeightBaseline(higher) == first, "\(label)")
+    // Advancing writes store the dethroned value alongside the new record.
+    let storedHigher = E1RMWeightBaseline(
+      studentId: higher.studentId,
+      family: higher.family,
+      maxWeightKg: higher.maxWeightKg,
+      setLogId: higher.setLogId,
+      achievedAt: higher.achievedAt,
+      previousMaxWeightKg: first.maxWeightKg
+    )
     #expect(
-      try await repo.fetchWeightBaseline(studentId: student, family: .deadlift) == higher,
+      try await repo.fetchWeightBaseline(studentId: student, family: .deadlift) == storedHigher,
       "\(label)"
     )
-    #expect(try await repo.fetchWeightBaselines(studentId: student) == [higher], "\(label)")
+    #expect(
+      try await repo.fetchWeightBaselines(studentId: student) == [storedHigher], "\(label)"
+    )
   }
 }
 

@@ -2,6 +2,7 @@ import CoreModels
 import Foundation
 import RepositoryContracts
 
+// swiftlint:disable type_body_length
 /// File-backed e1RM store (spec 028 + 026 persistence ladder: in-memory →
 /// JSON file under Documents/e1rm/). Backend stays uninvolved in V0.1; the
 /// history survives relaunches but not device changes.
@@ -36,6 +37,7 @@ public actor LocalE1RMRepository: E1RMRepository {
 
   private let directory: URL
   private var cachedState: StorageState?
+  private var revisionByStudentID: [UUID: UInt64] = [:]
 
   private let encoder: JSONEncoder
   private let decoder: JSONDecoder
@@ -61,6 +63,7 @@ public actor LocalE1RMRepository: E1RMRepository {
     var state = try loadState()
     state.points.append(point)
     try save(state)
+    incrementRevision(for: point.studentId)
   }
 
   @discardableResult
@@ -72,11 +75,13 @@ public actor LocalE1RMRepository: E1RMRepository {
       let replacement = point.replacing(id: state.points[index].id)
       state.points[index] = replacement
       try save(state)
+      incrementRevision(for: point.studentId)
       return replacement
     }
 
     state.points.append(point)
     try save(state)
+    incrementRevision(for: point.studentId)
     return point
   }
 
@@ -101,6 +106,7 @@ public actor LocalE1RMRepository: E1RMRepository {
     }
     if didChange {
       try save(state)
+      incrementRevision(for: studentId)
     }
   }
 
@@ -111,18 +117,50 @@ public actor LocalE1RMRepository: E1RMRepository {
     prEvents replacementPREvents: [PRBreakthroughEvent]
   ) async throws {
     var state = try loadState()
-    state.points =
-      state.points.filter { $0.studentId != studentId }
-      + replacement.filter { $0.studentId == studentId }
-    state.weightBaselines =
-      state.weightBaselines.filter { $0.studentId != studentId }
-      + Self.maximumBaselines(
-        replacementBaselines.filter { $0.studentId == studentId }
-      )
-    state.prEvents =
-      state.prEvents.filter { $0.studentId != studentId }
-      + replacementPREvents.filter { $0.studentId == studentId }
+    Self.replaceHistoryState(
+      &state,
+      studentId: studentId,
+      with: replacement,
+      weightBaselines: replacementBaselines,
+      prEvents: replacementPREvents
+    )
     try save(state)
+    incrementRevision(for: studentId)
+  }
+
+  public func historySnapshot(
+    studentId: UUID,
+    exerciseIds: [UUID]
+  ) async throws -> E1RMHistorySnapshot {
+    let exerciseIDSet = Set(exerciseIds)
+    let points = try loadState().points.filter {
+      $0.studentId == studentId && exerciseIDSet.contains($0.exerciseId)
+    }
+    return E1RMHistorySnapshot(
+      history: Dictionary(grouping: points, by: \.exerciseId),
+      revision: revisionByStudentID[studentId, default: 0]
+    )
+  }
+
+  public func replaceHistory(
+    studentId: UUID,
+    with replacement: [E1RMHistoryPoint],
+    weightBaselines replacementBaselines: [E1RMWeightBaseline],
+    prEvents replacementPREvents: [PRBreakthroughEvent],
+    ifUnchangedSince revision: UInt64
+  ) async throws -> Bool {
+    guard revisionByStudentID[studentId, default: 0] == revision else { return false }
+    var state = try loadState()
+    Self.replaceHistoryState(
+      &state,
+      studentId: studentId,
+      with: replacement,
+      weightBaselines: replacementBaselines,
+      prEvents: replacementPREvents
+    )
+    try save(state)
+    incrementRevision(for: studentId)
+    return true
   }
 
   public func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint] {
@@ -180,8 +218,18 @@ public actor LocalE1RMRepository: E1RMRepository {
     state.weightBaselines.removeAll {
       $0.studentId == candidate.studentId && $0.family == candidate.family
     }
-    state.weightBaselines.append(candidate)
+    state.weightBaselines.append(
+      E1RMWeightBaseline(
+        studentId: candidate.studentId,
+        family: candidate.family,
+        maxWeightKg: candidate.maxWeightKg,
+        setLogId: candidate.setLogId,
+        achievedAt: candidate.achievedAt,
+        previousMaxWeightKg: previous?.maxWeightKg ?? candidate.previousMaxWeightKg
+      )
+    )
     try save(state)
+    incrementRevision(for: candidate.studentId)
     return previous
   }
 
@@ -204,6 +252,25 @@ public actor LocalE1RMRepository: E1RMRepository {
     var state = try loadState()
     state.prEvents.append(event)
     try save(state)
+    incrementRevision(for: event.studentId)
+  }
+
+  @discardableResult
+  public func recordPRIfAbsent(
+    _ event: PRBreakthroughEvent,
+    forSetLogId setLogId: UUID
+  ) async throws -> Bool {
+    guard event.setLogId == setLogId else { return false }
+    var state = try loadState()
+    guard
+      !state.prEvents.contains(where: {
+        $0.studentId == event.studentId && $0.setLogId == setLogId
+      })
+    else { return false }
+    state.prEvents.append(event)
+    try save(state)
+    incrementRevision(for: event.studentId)
+    return true
   }
 
   public func fetchPRs(
@@ -232,8 +299,10 @@ public actor LocalE1RMRepository: E1RMRepository {
   public func acknowledgePR(eventId: UUID) async throws {
     var state = try loadState()
     guard let index = state.prEvents.firstIndex(where: { $0.id == eventId }) else { return }
+    let studentID = state.prEvents[index].studentId
     state.prEvents[index] = state.prEvents[index].acknowledged(at: Date())
     try save(state)
+    incrementRevision(for: studentID)
   }
 
   // MARK: - File IO
@@ -288,7 +357,32 @@ public actor LocalE1RMRepository: E1RMRepository {
     ).values.sorted { $0.family.rawValue < $1.family.rawValue }
   }
 
+  private static func replaceHistoryState(
+    _ state: inout StorageState,
+    studentId: UUID,
+    with replacement: [E1RMHistoryPoint],
+    weightBaselines replacementBaselines: [E1RMWeightBaseline],
+    prEvents replacementPREvents: [PRBreakthroughEvent]
+  ) {
+    state.points =
+      state.points.filter { $0.studentId != studentId }
+      + replacement.filter { $0.studentId == studentId }
+    state.weightBaselines =
+      state.weightBaselines.filter { $0.studentId != studentId }
+      + maximumBaselines(
+        replacementBaselines.filter { $0.studentId == studentId }
+      )
+    state.prEvents =
+      state.prEvents.filter { $0.studentId != studentId }
+      + replacementPREvents.filter { $0.studentId == studentId }
+  }
+
+  private func incrementRevision(for studentID: UUID) {
+    revisionByStudentID[studentID, default: 0] &+= 1
+  }
+
   private func ensureDirectory() throws {
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
   }
 }
+// swiftlint:enable type_body_length

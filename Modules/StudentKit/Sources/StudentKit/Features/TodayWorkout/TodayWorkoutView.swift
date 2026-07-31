@@ -12,6 +12,7 @@ public struct TodayWorkoutView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let coachRPEReconciler: E1RMCoachRPEReconciler?
   private let planHandoff: TodayWorkoutPlanHandoff?
   private let jumpToTodayToken: Int
   private let autoStartToken: Int
@@ -75,6 +76,17 @@ public struct TodayWorkoutView: View {
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
+    if let onboarding {
+      self.coachRPEReconciler = E1RMCoachRPEReconciler(
+        logs: logs,
+        onboarding: onboarding,
+        plans: plans,
+        catalogReader: plans as? any ExerciseCatalogReading,
+        e1rm: e1rm
+      )
+    } else {
+      self.coachRPEReconciler = nil
+    }
     self.planHandoff = planHandoff
     self.jumpToTodayToken = jumpToTodayToken
     self.autoStartToken = autoStartToken
@@ -691,6 +703,15 @@ public struct TodayWorkoutView: View {
       reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
     }
     await refreshReadinessStatus(for: date)
+    guard let coachRPEReconciler,
+      let reconciliation = await viewModel.reconcileCoachRPE(
+        using: coachRPEReconciler,
+        studentID: studentID
+      ),
+      reconciliation.didReconcile,
+      Calendar.current.isDate(date, inSameDayAs: selectedDate)
+    else { return }
+    await viewModel.load(date: date, studentID: studentID)
   }
 
   private func handedOffPlan(for date: Date) -> StudentPlanView? {

@@ -2,6 +2,7 @@ import CoreModels
 import Foundation
 import RepositoryContracts
 
+// swiftlint:disable type_body_length
 public actor InMemoryE1RMRepository: E1RMRepository {
   private struct HistoryKey: Hashable {
     let studentId: UUID
@@ -16,6 +17,7 @@ public actor InMemoryE1RMRepository: E1RMRepository {
   private var points: [HistoryKey: [E1RMHistoryPoint]]
   private var weightBaselines: [WeightBaselineKey: E1RMWeightBaseline]
   private var storedPREvents: [PRBreakthroughEvent]
+  private var revisionByStudentID: [UUID: UInt64] = [:]
 
   public init(
     seedPoints: [E1RMHistoryPoint] = [],
@@ -42,6 +44,7 @@ public actor InMemoryE1RMRepository: E1RMRepository {
   public func recordPoint(_ point: E1RMHistoryPoint) async throws {
     points[HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId), default: []]
       .append(point)
+    incrementRevision(for: point.studentId)
   }
 
   @discardableResult
@@ -59,10 +62,12 @@ public actor InMemoryE1RMRepository: E1RMRepository {
         points[key]?.remove(at: index)
         points[destinationKey, default: []].append(replacement)
       }
+      incrementRevision(for: point.studentId)
       return replacement
     }
 
     points[destinationKey, default: []].append(point)
+    incrementRevision(for: point.studentId)
     return point
   }
 
@@ -78,6 +83,7 @@ public actor InMemoryE1RMRepository: E1RMRepository {
         return point.replacing(confidence: confidence)
       }
     }
+    incrementRevision(for: studentId)
   }
 
   public func replaceHistory(
@@ -86,6 +92,56 @@ public actor InMemoryE1RMRepository: E1RMRepository {
     weightBaselines replacementBaselines: [E1RMWeightBaseline],
     prEvents replacementPREvents: [PRBreakthroughEvent]
   ) async throws {
+    replaceHistoryState(
+      studentId: studentId,
+      with: replacement,
+      weightBaselines: replacementBaselines,
+      prEvents: replacementPREvents
+    )
+    incrementRevision(for: studentId)
+  }
+
+  public func historySnapshot(
+    studentId: UUID,
+    exerciseIds: [UUID]
+  ) async throws -> E1RMHistorySnapshot {
+    var history: [UUID: [E1RMHistoryPoint]] = [:]
+    for exerciseId in exerciseIds {
+      history[exerciseId] =
+        points[
+          HistoryKey(studentId: studentId, exerciseId: exerciseId)
+        ] ?? []
+    }
+    return E1RMHistorySnapshot(
+      history: history,
+      revision: revisionByStudentID[studentId, default: 0]
+    )
+  }
+
+  public func replaceHistory(
+    studentId: UUID,
+    with replacement: [E1RMHistoryPoint],
+    weightBaselines replacementBaselines: [E1RMWeightBaseline],
+    prEvents replacementPREvents: [PRBreakthroughEvent],
+    ifUnchangedSince revision: UInt64
+  ) async throws -> Bool {
+    guard revisionByStudentID[studentId, default: 0] == revision else { return false }
+    replaceHistoryState(
+      studentId: studentId,
+      with: replacement,
+      weightBaselines: replacementBaselines,
+      prEvents: replacementPREvents
+    )
+    incrementRevision(for: studentId)
+    return true
+  }
+
+  private func replaceHistoryState(
+    studentId: UUID,
+    with replacement: [E1RMHistoryPoint],
+    weightBaselines replacementBaselines: [E1RMWeightBaseline],
+    prEvents replacementPREvents: [PRBreakthroughEvent]
+  ) {
     points = points.filter { $0.key.studentId != studentId }
     for point in replacement where point.studentId == studentId {
       points[HistoryKey(studentId: point.studentId, exerciseId: point.exerciseId), default: []]
@@ -155,7 +211,15 @@ public actor InMemoryE1RMRepository: E1RMRepository {
     let key = WeightBaselineKey(studentId: candidate.studentId, family: candidate.family)
     let previous = weightBaselines[key]
     if candidate.maxWeightKg > (previous?.maxWeightKg ?? -.infinity) {
-      weightBaselines[key] = candidate
+      weightBaselines[key] = E1RMWeightBaseline(
+        studentId: candidate.studentId,
+        family: candidate.family,
+        maxWeightKg: candidate.maxWeightKg,
+        setLogId: candidate.setLogId,
+        achievedAt: candidate.achievedAt,
+        previousMaxWeightKg: previous?.maxWeightKg ?? candidate.previousMaxWeightKg
+      )
+      incrementRevision(for: candidate.studentId)
     }
     return previous
   }
@@ -176,6 +240,23 @@ public actor InMemoryE1RMRepository: E1RMRepository {
 
   public func recordPR(_ event: PRBreakthroughEvent) async throws {
     storedPREvents.append(event)
+    incrementRevision(for: event.studentId)
+  }
+
+  @discardableResult
+  public func recordPRIfAbsent(
+    _ event: PRBreakthroughEvent,
+    forSetLogId setLogId: UUID
+  ) async throws -> Bool {
+    guard event.setLogId == setLogId else { return false }
+    guard
+      !storedPREvents.contains(where: {
+        $0.studentId == event.studentId && $0.setLogId == setLogId
+      })
+    else { return false }
+    storedPREvents.append(event)
+    incrementRevision(for: event.studentId)
+    return true
   }
 
   public func prEvents(studentId: UUID, since: Date) async throws -> [PRBreakthroughEvent] {
@@ -201,6 +282,13 @@ public actor InMemoryE1RMRepository: E1RMRepository {
 
   public func acknowledgePR(eventId: UUID) async throws {
     guard let index = storedPREvents.firstIndex(where: { $0.id == eventId }) else { return }
+    let studentID = storedPREvents[index].studentId
     storedPREvents[index] = storedPREvents[index].acknowledged(at: Date())
+    incrementRevision(for: studentID)
+  }
+
+  private func incrementRevision(for studentID: UUID) {
+    revisionByStudentID[studentID, default: 0] &+= 1
   }
 }
+// swiftlint:enable type_body_length

@@ -102,6 +102,13 @@ public final class TodayWorkoutViewModel {
     )
   }
 
+  func reconcileCoachRPE(
+    using reconciler: E1RMCoachRPEReconciler,
+    studentID: UUID
+  ) async -> E1RMCoachRPEReconciler.Result? {
+    try? await reconciler.reconcile(studentID: studentID)
+  }
+
   private func loadRepositoryPlan(
     date: Date,
     studentID: UUID,
@@ -443,6 +450,9 @@ public final class TodayWorkoutViewModel {
     actionErrorMessage = nil
   }
 
+  // Keeping the repository write, durable e1RM effects, and generation-gated
+  // UI merge together makes their required ordering explicit.
+  // swiftlint:disable:next function_body_length
   private func performPersist(
     rowIndex: Int, completed: Bool, failed: Bool, generation: Int
   ) async -> Bool {
@@ -466,13 +476,31 @@ public final class TodayWorkoutViewModel {
       failed: failed,
       loggedAt: now()
     )
+    let family = Self.exerciseFamily(
+      in: plan,
+      planExerciseID: draft.planExerciseID,
+      onboarding: onboardingProfile
+    )
+    let registeredOneRMKg = onboardingProfile?.registeredOneRMKg(for: family)
 
     do {
       let previouslyCompleted = drafts[rowIndex].completed
       let persisted = try await logs.recordSet(log)
+      let prEvent: PRBreakthroughEvent?
+      if !previouslyCompleted, completed {
+        prEvent = await recordE1RMPoint(
+          for: draft,
+          log: persisted,
+          studentID: studentID,
+          family: family,
+          registeredOneRMKg: registeredOneRMKg
+        )
+      } else {
+        prEvent = nil
+      }
       // The page moved to another day while recordSet was in flight: the log
-      // is safely on the server and the reload owns state — don't merge a
-      // stale day's flags into the new day's drafts.
+      // and its domain side effects are safely persisted. The reload owns UI
+      // state, so don't merge stale flags or surface its PR in the new day.
       guard isCurrentLoad(generation) else {
         restoreRecordingStateIfStillVisible(plan: plan, rowIndex: rowIndex)
         return true
@@ -488,7 +516,9 @@ public final class TodayWorkoutViewModel {
       state = .loaded(plan: plan, drafts: latestDrafts)
 
       if !previouslyCompleted, completed {
-        await recordE1RMPoint(for: draft, log: persisted, studentID: studentID)
+        if let prEvent {
+          pendingPRBanner = prEvent
+        }
         startRestTimer(after: draft, drafts: latestDrafts)
       }
       return true
@@ -723,11 +753,12 @@ extension TodayWorkoutViewModel {
   func recordE1RMPoint(
     for draft: SetRowDraft,
     log: StudentSetLog,
-    studentID: UUID
-  ) async {
+    studentID: UUID,
+    family: LiftFamily?,
+    registeredOneRMKg: Decimal?
+  ) async -> PRBreakthroughEvent? {
     let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
-    let family = exerciseFamily(planExerciseID: draft.planExerciseID)
-    let event = await recorder.record(
+    return await recorder.record(
       E1RMRecorder.Input(
         studentID: studentID,
         exerciseID: draft.exerciseID,
@@ -739,25 +770,19 @@ extension TodayWorkoutViewModel {
         coachRPE: log.coachRPE,
         completed: log.completed,
         failed: log.failed,
-        registeredOneRMKg: onboardingProfile?.registeredOneRMKg(for: family)
+        registeredOneRMKg: registeredOneRMKg
       )
     )
-    if let event {
-      pendingPRBanner = event
-    }
   }
 
-  private func exerciseFamily(planExerciseID: UUID) -> LiftFamily? {
-    let day: StudentPlanDay?
-    switch state {
-    case .loaded(let plan, _), .recording(let plan, _, _):
-      day = plan
-    default:
-      day = nil
-    }
-    guard let exercise = day?.exercises.first(where: { $0.id == planExerciseID })?.exercise
+  private static func exerciseFamily(
+    in plan: StudentPlanDay,
+    planExerciseID: UUID,
+    onboarding: OnboardingProfile?
+  ) -> LiftFamily? {
+    guard let exercise = plan.exercises.first(where: { $0.id == planExerciseID })?.exercise
     else { return nil }
-    return resolveCompetitionFamily(exercise: exercise, onboarding: onboardingProfile)
+    return resolveCompetitionFamily(exercise: exercise, onboarding: onboarding)
   }
 
 }

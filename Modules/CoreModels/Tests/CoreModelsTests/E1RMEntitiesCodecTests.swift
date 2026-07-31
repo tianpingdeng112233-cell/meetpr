@@ -48,6 +48,7 @@ import Testing
     id: UUID(),
     studentId: UUID(),
     exerciseId: UUID(),
+    setLogId: UUID(),
     pointId: UUID(),
     breakthroughE1RMKg: 137.6,
     previousMaxE1RMKg: 135.2,
@@ -64,9 +65,32 @@ import Testing
   let acked = event.acknowledged(at: ackDate)
   #expect(acked.acknowledgedAt == ackDate)
   #expect(acked.id == event.id)
+  #expect(acked.setLogId == event.setLogId)
   #expect(acked.breakthroughE1RMKg == event.breakthroughE1RMKg)
   #expect(acked.breakthroughWeightKg == 120)
   #expect(acked.previousMaxWeightKg == 117.5)
+}
+
+@Test func prBreakthroughEventDecodesLegacyJSONWithoutSetLogID() throws {
+  let event = PRBreakthroughEvent(
+    id: UUID(),
+    studentId: UUID(),
+    exerciseId: UUID(),
+    setLogId: UUID(),
+    pointId: UUID(),
+    breakthroughE1RMKg: 137.6,
+    previousMaxE1RMKg: 135.2,
+    occurredAt: Date(timeIntervalSince1970: 1_768_262_400),
+    acknowledgedAt: nil
+  )
+  let data = try JSONEncoder().encode(event)
+  var object = try #require(try JSONSerialization.jsonObject(with: data) as? [String: Any])
+  object.removeValue(forKey: "setLogId")
+  let legacyData = try JSONSerialization.data(withJSONObject: object)
+
+  let decoded = try JSONDecoder().decode(PRBreakthroughEvent.self, from: legacyData)
+
+  #expect(decoded.setLogId == nil)
 }
 
 @Test func e1rmHistoryPointDecodesLegacyJSONWithoutFamilyOrConfidence() throws {
