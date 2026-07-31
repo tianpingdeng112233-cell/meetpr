@@ -38,7 +38,10 @@ public struct CoachRootView: View {
     studentPlans: any StudentPlanRepository = EmptyStudentPlanRepository(),
     studentLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
     feedback: any StudentFeedbackRepository = EmptyStudentFeedbackRepository(),
-    videoMarkers: any VideoMarkerRepository = InMemoryVideoMarkerRepository(),
+    // Optional-with-nil (not `= InMemoryVideoMarkerRepository()`): a public
+    // default argument is emitted into the CALLER, and app-level targets that
+    // don't link RepositoryContracts directly would fail to link the symbol.
+    videoMarkers: (any VideoMarkerRepository)? = nil,
     inviteCodes: (any InviteCodeRepository)? = nil,
     studentVideos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
@@ -61,7 +64,7 @@ public struct CoachRootView: View {
     self.studentPlans = studentPlans
     self.studentLogs = studentLogs
     self.feedback = feedback
-    self.videoMarkers = videoMarkers
+    self.videoMarkers = videoMarkers ?? InMemoryVideoMarkerRepository()
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
     self.draftStore = draftStore
     let resolvedQueue =

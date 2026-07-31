@@ -21,10 +21,12 @@ public final class FeedbackInboxViewModel {
 
   public init(
     repository: any StudentFeedbackRepository,
-    markerRepository: any VideoMarkerRepository = InMemoryVideoMarkerRepository()
+    // Optional-with-nil: a public default argument is emitted into the
+    // caller and would require it to link RepositoryContracts directly.
+    markerRepository: (any VideoMarkerRepository)? = nil
   ) {
     self.repository = repository
-    self.markerRepository = markerRepository
+    self.markerRepository = markerRepository ?? InMemoryVideoMarkerRepository()
   }
 
   public var items: [CoachFeedback] {
