@@ -16,10 +16,15 @@ public final class FeedbackInboxViewModel {
   public private(set) var state: State = .idle
 
   private let repository: any StudentFeedbackRepository
+  private let markerRepository: any VideoMarkerRepository
   private var currentStudentID: UUID?
 
-  public init(repository: any StudentFeedbackRepository) {
+  public init(
+    repository: any StudentFeedbackRepository,
+    markerRepository: any VideoMarkerRepository = InMemoryVideoMarkerRepository()
+  ) {
     self.repository = repository
+    self.markerRepository = markerRepository
   }
 
   public var items: [CoachFeedback] {
@@ -80,4 +85,26 @@ public final class FeedbackInboxViewModel {
   public func playbackURL(videoID: UUID) async throws -> URL {
     try await repository.playbackURL(videoID: videoID)
   }
+
+  /// Marker availability is optional while the endpoint rolls out: a 404 or
+  /// transport failure hides the marker surface without blocking playback.
+  /// Any other error keeps the surface visible with a failure line so the
+  /// coach's markers never vanish silently.
+  public func markers(videoID: UUID) async -> VideoMarkerLoadOutcome {
+    do {
+      return .loaded(try await markerRepository.markers(videoID: videoID))
+    } catch VideoMarkerRepositoryError.unavailable {
+      return .hidden
+    } catch {
+      // Fail safe: only a recognized not-deployed signal hides the surface;
+      // cancellation aside, every other error shows a failure line.
+      return error.isTaskCancellation ? .hidden : .failed
+    }
+  }
+}
+
+public enum VideoMarkerLoadOutcome: Equatable, Sendable {
+  case hidden
+  case failed
+  case loaded([VideoMarker])
 }

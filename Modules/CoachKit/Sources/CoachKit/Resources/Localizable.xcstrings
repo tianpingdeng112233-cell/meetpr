@@ -2893,6 +2893,160 @@
           }
         }
       }
+    },
+    "coach.videoFeedback.addMarker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加打点"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.cancel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.deleteMarker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除打点"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerCount": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打点 · {count}"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerDeleteFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打点删除失败，请重试"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerLevel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "级别"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerLevel.bad": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "严重"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerLevel.info": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "提示"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerLevel.warn": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注意"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerNote": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "备注（选填，最多 500 字）"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerSaveFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打点保存失败，请重试"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markerTime": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "时间点"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.markersLoadFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打点加载失败"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.save": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

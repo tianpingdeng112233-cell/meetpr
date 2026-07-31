@@ -1,4 +1,5 @@
 import AVKit
+import CoreModels
 import DesignSystem
 import SwiftUI
 
@@ -68,16 +69,31 @@ public struct FeedbackVideoPlayerView: View {
   private let videoID: UUID
   private let refreshURL: @MainActor (UUID) async throws -> URL
   private let workbenchConfiguration: FeedbackVideoWorkbenchConfiguration?
+  private let currentSecondsBinding: Binding<Double>?
+  private let markers: [VideoMarker]?
+  private let markersFailed: Bool
+  private let onSeek: @MainActor (Int) -> Void
+  private let onAddMarker: (@MainActor () -> Void)?
 
   public init(
     videoID: UUID,
     url: URL,
     workbenchConfiguration: FeedbackVideoWorkbenchConfiguration? = nil,
+    currentSeconds: Binding<Double>? = nil,
+    markers: [VideoMarker]? = nil,
+    markersFailed: Bool = false,
+    onSeek: @escaping @MainActor (Int) -> Void = { _ in },
+    onAddMarker: (@MainActor () -> Void)? = nil,
     refreshURL: @escaping @MainActor (UUID) async throws -> URL
   ) {
     self.videoID = videoID
     self.refreshURL = refreshURL
     self.workbenchConfiguration = workbenchConfiguration
+    currentSecondsBinding = currentSeconds
+    self.markers = markers
+    self.markersFailed = markersFailed
+    self.onSeek = onSeek
+    self.onAddMarker = onAddMarker
     _player = State(initialValue: AVPlayer(url: url))
   }
 
@@ -125,44 +141,17 @@ public struct FeedbackVideoPlayerView: View {
         player.pause()
       }
       .task {
-        guard workbenchConfiguration != nil else { return }
+        guard
+          workbenchConfiguration != nil || markers != nil || markersFailed
+            || currentSecondsBinding != nil
+        else {
+          return
+        }
         while !Task.isCancelled {
           updateTimeline()
           try? await Task.sleep(for: .milliseconds(250))
         }
       }
-  }
-
-  static func rateText(_ rate: Float) -> String {
-    switch rate {
-    case 0.5: "0.5x"
-    case 1.5: "1.5x"
-    case 2: "2x"
-    default: "1x"
-    }
-  }
-
-  static func workbenchRateText(_ rate: Float) -> String {
-    switch rate {
-    case 0.5: "0.5×"
-    case 1.5: "1.5×"
-    case 2: "2×"
-    default: "1×"
-    }
-  }
-
-  static func timeText(_ seconds: Double) -> String {
-    let totalSeconds = max(0, Int(seconds.rounded(.down)))
-    let minutes = totalSeconds / 60
-    let remainder = totalSeconds % 60
-    let secondText = remainder < 10 ? "0\(remainder)" : "\(remainder)"
-    return "\(minutes):\(secondText)"
-  }
-
-  static func playbackBehavior(
-    for configuration: FeedbackVideoWorkbenchConfiguration?
-  ) -> FeedbackVideoPlaybackBehavior {
-    configuration == nil ? .legacyFullScreen : .workbench
   }
 
   private var playbackBehavior: FeedbackVideoPlaybackBehavior {
@@ -188,6 +177,17 @@ public struct FeedbackVideoPlayerView: View {
         close: close,
         cycleRate: cycleRate
       )
+
+      if markersFailed || markers?.isEmpty == false {
+        FeedbackVideoMarkerOverlay(
+          markers: markers ?? [],
+          failed: markersFailed,
+          currentSeconds: currentSeconds,
+          durationSeconds: durationSeconds,
+          seek: seek(toMilliseconds:)
+        )
+        .frame(maxHeight: .infinity, alignment: .bottom)
+      }
     }
     .background(Color.black)
   }
@@ -200,8 +200,10 @@ public struct FeedbackVideoPlayerView: View {
       isPlaying: isPlaying,
       currentSeconds: currentSeconds,
       durationSeconds: durationSeconds,
+      markers: markers,
       togglePlayback: togglePlayback,
-      selectRate: selectRate
+      selectRate: selectRate,
+      addMarker: onAddMarker
     )
   }
 
@@ -271,11 +273,75 @@ public struct FeedbackVideoPlayerView: View {
     let current = player.currentTime().seconds
     if current.isFinite {
       currentSeconds = max(0, current)
+      currentSecondsBinding?.wrappedValue = currentSeconds
     }
     let duration = player.currentItem?.duration.seconds ?? 0
     if duration.isFinite {
       durationSeconds = max(0, duration)
     }
+  }
+
+  private func seek(toMilliseconds milliseconds: Int) {
+    let target = Self.seekTime(
+      milliseconds: milliseconds,
+      durationSeconds: durationSeconds
+    )
+    let tolerance = CMTime(value: 50, timescale: 1_000)
+    player.seek(
+      to: target,
+      toleranceBefore: tolerance,
+      toleranceAfter: tolerance
+    )
+    currentSeconds = max(0, target.seconds)
+    currentSecondsBinding?.wrappedValue = currentSeconds
+    onSeek(milliseconds)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+extension FeedbackVideoPlayerView {
+  static func rateText(_ rate: Float) -> String {
+    switch rate {
+    case 0.5: "0.5x"
+    case 1.5: "1.5x"
+    case 2: "2x"
+    default: "1x"
+    }
+  }
+
+  static func workbenchRateText(_ rate: Float) -> String {
+    switch rate {
+    case 0.5: "0.5×"
+    case 1.5: "1.5×"
+    case 2: "2×"
+    default: "1×"
+    }
+  }
+
+  public static func timeText(_ seconds: Double) -> String {
+    let totalSeconds = max(0, Int(seconds.rounded(.down)))
+    let minutes = totalSeconds / 60
+    let remainder = totalSeconds % 60
+    let secondText = remainder < 10 ? "0\(remainder)" : "\(remainder)"
+    return "\(minutes):\(secondText)"
+  }
+
+  static func playbackBehavior(
+    for configuration: FeedbackVideoWorkbenchConfiguration?
+  ) -> FeedbackVideoPlaybackBehavior {
+    configuration == nil ? .legacyFullScreen : .workbench
+  }
+
+  static func seekTime(milliseconds: Int, durationSeconds: Double) -> CMTime {
+    let nonnegativeMilliseconds = max(0, milliseconds)
+    let durationMilliseconds =
+      durationSeconds.isFinite && durationSeconds > 0
+      ? Int((durationSeconds * 1_000).rounded(.down))
+      : nonnegativeMilliseconds
+    return CMTime(
+      value: CMTimeValue(min(nonnegativeMilliseconds, durationMilliseconds)),
+      timescale: 1_000
+    )
   }
 }
 
@@ -319,42 +385,5 @@ private struct FeedbackVideoPlayerChrome: View {
     }
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.top, MeetPRSpacing.sm)
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct FeedbackVideoFailureCard: View {
-  let retrying: Bool
-  let retry: () -> Void
-
-  var body: some View {
-    VStack(spacing: MeetPRSpacing.md) {
-      Image(systemName: "exclamationmark.triangle.fill")
-        .font(.system(size: 26))
-        .foregroundStyle(Color.MeetPR.amber)
-      Text(ChatStrings.playbackFailed)
-        .font(Font.MeetPR.body)
-        .foregroundStyle(Color.MeetPR.textPrimary)
-        .multilineTextAlignment(.center)
-      Button(action: retry) {
-        Text(retrying ? ChatStrings.refreshing : ChatStrings.retry)
-          .font(.system(size: 15, weight: .semibold))
-          .foregroundStyle(.white)
-          .frame(maxWidth: .infinity)
-          .frame(height: 44)
-          .background(Color.MeetPR.goldCTA)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.md))
-      }
-      .buttonStyle(.plain)
-      .disabled(retrying)
-    }
-    .padding(MeetPRSpacing.lg)
-    .frame(maxWidth: 280)
-    .background(Color.MeetPR.surfaceCard)
-    .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-    .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
-    }
   }
 }

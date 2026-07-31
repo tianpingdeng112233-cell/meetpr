@@ -26,6 +26,9 @@ enum ChatStrings {
   static let playPlayback = localized("chat.playPlayback")
   static let pausePlayback = localized("chat.pausePlayback")
   static let videoPlayback = localized("chat.videoPlayback")
+  static let videoMarker = localized("chat.videoMarker")
+  static let videoMarkersFailed = localized("chat.videoMarkersFailed")
+  static let addVideoMarker = localized("chat.addVideoMarker")
   static let playbackProgress = localized("chat.playbackProgress")
   static let playbackSpeed = localized("chat.playbackSpeed")
   static let selected = localized("chat.selected")
@@ -59,6 +62,14 @@ enum ChatStrings {
   static let videoUnavailable = localized("chat.videoUnavailable")
   static let videoUploading = localized("chat.videoUploading")
   static let weightRepsMetric = localized("chat.weightRepsMetric")
+
+  static func videoMarkers(_ count: Int) -> String {
+    localized("chat.videoMarkers").replacing("{count}", with: count.formatted())
+  }
+
+  static func seekToVideoMarker(_ time: String) -> String {
+    localized("chat.seekToVideoMarker").replacing("{time}", with: time)
+  }
 
   private static func localized(_ key: String.LocalizationValue) -> String {
     String(localized: key, bundle: .module)

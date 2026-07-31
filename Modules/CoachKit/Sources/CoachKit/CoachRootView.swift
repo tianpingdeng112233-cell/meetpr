@@ -11,6 +11,7 @@ public struct CoachRootView: View {
   private let studentPlans: any StudentPlanRepository
   private let studentLogs: any StudentTrainingLogRepository
   private let feedback: any StudentFeedbackRepository
+  private let videoMarkers: any VideoMarkerRepository
   private let inviteCodes: any InviteCodeRepository
   private let privacyPolicyURL: URL?
   private let detailContext: CoachStudentDetailContext
@@ -37,6 +38,7 @@ public struct CoachRootView: View {
     studentPlans: any StudentPlanRepository = EmptyStudentPlanRepository(),
     studentLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
     feedback: any StudentFeedbackRepository = EmptyStudentFeedbackRepository(),
+    videoMarkers: any VideoMarkerRepository = InMemoryVideoMarkerRepository(),
     inviteCodes: (any InviteCodeRepository)? = nil,
     studentVideos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
@@ -59,6 +61,7 @@ public struct CoachRootView: View {
     self.studentPlans = studentPlans
     self.studentLogs = studentLogs
     self.feedback = feedback
+    self.videoMarkers = videoMarkers
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
     self.draftStore = draftStore
     let resolvedQueue =
@@ -160,6 +163,7 @@ public struct CoachRootView: View {
         now: now,
         videoQueueViewModel: videoQueueViewModel,
         trainingLogs: studentLogs,
+        markerRepository: videoMarkers,
         studentStatuses: studentStatuses,
         chat: chat
       )

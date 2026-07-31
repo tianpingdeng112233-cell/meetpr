@@ -150,3 +150,17 @@ extension FeedbackVideoDTO {
     )
   }
 }
+
+extension VideoMarkerDTO {
+  public func toDomain() -> VideoMarker {
+    VideoMarker(
+      id: id,
+      videoID: videoID,
+      coachID: coachID,
+      timeMilliseconds: timeMs,
+      level: level,
+      note: note,
+      createdAt: createdAt
+    )
+  }
+}

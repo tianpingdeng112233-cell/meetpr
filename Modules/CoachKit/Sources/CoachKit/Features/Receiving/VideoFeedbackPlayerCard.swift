@@ -1,4 +1,5 @@
 import ChatUI
+import CoreModels
 import DesignSystem
 import SwiftUI
 
@@ -8,8 +9,11 @@ struct VideoFeedbackPlayerCard: View {
   let playbackURL: URL?
   let isLoading: Bool
   let hasError: Bool
+  @Binding var currentSeconds: Double
+  let markers: [VideoMarker]?
   let refreshURL: @MainActor (UUID) async throws -> URL
   let retry: () -> Void
+  let addMarker: (() -> Void)?
 
   var body: some View {
     if let playbackURL {
@@ -17,6 +21,9 @@ struct VideoFeedbackPlayerCard: View {
         videoID: itemID,
         url: playbackURL,
         workbenchConfiguration: FeedbackVideoWorkbenchConfiguration(),
+        currentSeconds: $currentSeconds,
+        markers: markers,
+        onAddMarker: addMarker,
         refreshURL: refreshURL
       )
       .id(itemID)

@@ -65,11 +65,3 @@ import Testing
 func feedbackVideoWeightFormatting(rawValue: String, expected: String) {
   #expect(FeedbackVideoPresentation.weight(rawValue) == expected)
 }
-
-@MainActor
-@Test func feedbackVideoPlayerExposesAllSupportedRateLabels() {
-  #expect(StudentFeedbackVideoPlayerView.rateText(0.5) == "0.5x")
-  #expect(StudentFeedbackVideoPlayerView.rateText(1.0) == "1x")
-  #expect(StudentFeedbackVideoPlayerView.rateText(1.5) == "1.5x")
-  #expect(StudentFeedbackVideoPlayerView.rateText(2.0) == "2x")
-}

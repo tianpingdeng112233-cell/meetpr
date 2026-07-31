@@ -97,6 +97,7 @@ public struct StudentRootView: View {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
+    videoMarkers: any VideoMarkerRepository = InMemoryVideoMarkerRepository(),
     e1rm: any E1RMRepository = LocalE1RMRepository(),
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
@@ -150,7 +151,10 @@ public struct StudentRootView: View {
       e1rm: e1rm,
       reviews: resolvedImportedHistoryReviews
     )
-    let feedbackViewModel = FeedbackInboxViewModel(repository: feedback)
+    let feedbackViewModel = FeedbackInboxViewModel(
+      repository: feedback,
+      markerRepository: videoMarkers
+    )
     let evaluationSummaryViewModel = StudentEvaluationSummaryViewModel(
       summaries: evaluationSummaries ?? InMemoryEvaluationSummaryRepository(),
       plans: plans,

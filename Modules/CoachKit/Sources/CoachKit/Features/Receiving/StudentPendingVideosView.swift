@@ -15,6 +15,7 @@ struct StudentPendingVideosView: View {
   private let studentName: String
   private let viewModel: CoachVideoQueueViewModel
   private let trainingLogs: any StudentTrainingLogRepository
+  private let markerRepository: any VideoMarkerRepository
 
   @State private var videoDetailTarget: PendingVideoItem?
   @Environment(\.dismiss) private var dismiss
@@ -23,12 +24,14 @@ struct StudentPendingVideosView: View {
     studentID: UUID,
     studentName: String,
     viewModel: CoachVideoQueueViewModel,
-    trainingLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository()
+    trainingLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
+    markerRepository: any VideoMarkerRepository = InMemoryVideoMarkerRepository()
   ) {
     self.studentID = studentID
     self.studentName = studentName
     self.viewModel = viewModel
     self.trainingLogs = trainingLogs
+    self.markerRepository = markerRepository
   }
 
   private var sections: [PendingVideoDaySection] {
@@ -59,7 +62,8 @@ struct StudentPendingVideosView: View {
         VideoFeedbackDetailView(
           item: item,
           viewModel: viewModel,
-          trainingLogs: trainingLogs
+          trainingLogs: trainingLogs,
+          markerRepository: markerRepository
         )
       }
     #else
@@ -67,7 +71,8 @@ struct StudentPendingVideosView: View {
         VideoFeedbackDetailView(
           item: item,
           viewModel: viewModel,
-          trainingLogs: trainingLogs
+          trainingLogs: trainingLogs,
+          markerRepository: markerRepository
         )
       }
     #endif
