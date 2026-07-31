@@ -2949,50 +2949,6 @@
         }
       }
     },
-    "coach.videoFeedback.markerLevel": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "级别"
-          }
-        }
-      }
-    },
-    "coach.videoFeedback.markerLevel.bad": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "严重"
-          }
-        }
-      }
-    },
-    "coach.videoFeedback.markerLevel.info": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "提示"
-          }
-        }
-      }
-    },
-    "coach.videoFeedback.markerLevel.warn": {
-      "extractionState": "manual",
-      "localizations": {
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "注意"
-          }
-        }
-      }
-    },
     "coach.videoFeedback.markerNote": {
       "extractionState": "manual",
       "localizations": {
@@ -3044,6 +3000,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "保存"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.marker": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打点"
           }
         }
       }

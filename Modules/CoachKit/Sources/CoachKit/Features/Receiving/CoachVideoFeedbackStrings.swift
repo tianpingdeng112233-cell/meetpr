@@ -18,7 +18,7 @@ enum CoachVideoFeedbackStrings {
   static let addMarker = CoachLocalization.localized("coach.videoFeedback.addMarker")
   static let cancel = CoachLocalization.localized("coach.videoFeedback.cancel")
   static let deleteMarker = CoachLocalization.localized("coach.videoFeedback.deleteMarker")
-  static let markerLevel = CoachLocalization.localized("coach.videoFeedback.markerLevel")
+  static let marker = CoachLocalization.localized("coach.videoFeedback.marker")
   static let markerNote = CoachLocalization.localized("coach.videoFeedback.markerNote")
   static let markerTime = CoachLocalization.localized("coach.videoFeedback.markerTime")
   static let save = CoachLocalization.localized("coach.videoFeedback.save")
@@ -101,11 +101,4 @@ enum CoachVideoFeedbackStrings {
     )
   }
 
-  static func markerLevel(_ level: VideoMarkerLevel) -> String {
-    switch level {
-    case .info: CoachLocalization.localized("coach.videoFeedback.markerLevel.info")
-    case .warn: CoachLocalization.localized("coach.videoFeedback.markerLevel.warn")
-    case .bad: CoachLocalization.localized("coach.videoFeedback.markerLevel.bad")
-    }
-  }
 }

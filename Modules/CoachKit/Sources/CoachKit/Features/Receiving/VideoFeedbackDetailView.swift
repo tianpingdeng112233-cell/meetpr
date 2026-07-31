@@ -254,9 +254,11 @@ struct VideoFeedbackDetailView: View {
   private func saveMarker(_ draft: VideoMarkerDraft) {
     markerDraft = nil
     Task {
+      // Level stays single-tier in the UI (⚖️ 2026-07-31 David); the wire
+      // field remains and always carries the backend default.
       await detailModel.createMarker(
         timeMilliseconds: draft.timeMilliseconds,
-        level: draft.level,
+        level: .info,
         note: draft.note,
         using: markerRepository
       )
@@ -273,7 +275,6 @@ struct VideoFeedbackDetailView: View {
 private struct VideoMarkerDraft: Identifiable {
   let id = UUID()
   let timeMilliseconds: Int
-  var level: VideoMarkerLevel = .info
   var note = ""
 }
 
@@ -295,12 +296,6 @@ private struct VideoMarkerEditor: View {
           CoachVideoFeedbackStrings.markerTime,
           value: FeedbackVideoPlayerView.timeText(Double(draft.timeMilliseconds) / 1_000)
         )
-        Picker(CoachVideoFeedbackStrings.markerLevel, selection: $draft.level) {
-          ForEach(VideoMarkerLevel.allCases, id: \.self) { level in
-            Text(CoachVideoFeedbackStrings.markerLevel(level)).tag(level)
-          }
-        }
-        .pickerStyle(.segmented)
         TextField(
           CoachVideoFeedbackStrings.markerNote,
           text: $draft.note,
@@ -343,17 +338,10 @@ private struct VideoMarkerList: View {
             Text(FeedbackVideoPlayerView.timeText(Double(marker.timeMilliseconds) / 1_000))
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .bold))
               .foregroundStyle(Color.MeetPR.gold500)
-            VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-              Text(CoachVideoFeedbackStrings.markerLevel(marker.level))
-                .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
-                .foregroundStyle(Color.MeetPR.textTertiary)
-              if !marker.note.isEmpty {
-                Text(marker.note)
-                  .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
-                  .foregroundStyle(Color.MeetPR.textPrimary)
-              }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Text(marker.note.isEmpty ? CoachVideoFeedbackStrings.marker : marker.note)
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+              .frame(maxWidth: .infinity, alignment: .leading)
             Button(role: .destructive) {
               delete(marker)
             } label: {
