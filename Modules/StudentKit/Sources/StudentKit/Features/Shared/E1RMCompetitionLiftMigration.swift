@@ -39,17 +39,9 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
     let exerciseIDByPlanExerciseID: [UUID: UUID]
   }
 
-  private struct ReplayContext: Sendable {
-    let profile: OnboardingProfile?
-    let exerciseByID: [UUID: Exercise]
-    let exerciseIDByPlanExerciseID: [UUID: UUID]
-    let oldExerciseIDBySetLogID: [UUID: UUID]
-    let priorConfidenceBySetLogID: [UUID: E1RMConfidence]
-  }
-
-  private struct ReplayHistory: Sendable {
-    let points: [E1RMHistoryPoint]
-    let weightBaselines: [E1RMWeightBaseline]
+  private struct ReplayPreparation: Sendable {
+    let context: E1RMHistoryReplayContext
+    let confidenceBySetLogID: [UUID: E1RMConfidence]
   }
 
   struct Result: Equatable, Sendable {
@@ -98,28 +90,21 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
       studentId: studentID,
       exerciseIds: Array(exerciseByID.keys)
     )
-    let oldExerciseIDBySetLogID = Dictionary(
-      oldHistory.values.flatMap { $0 }.map { ($0.setLogId, $0.exerciseId) },
-      uniquingKeysWith: { _, new in new }
-    )
-    let priorConfidenceBySetLogID = Dictionary(
-      oldHistory.values.flatMap { $0 }.map { ($0.setLogId, $0.confidence) },
-      uniquingKeysWith: { _, new in new }
+    let replay = Self.replayPreparation(
+      profile: profile,
+      exerciseByID: exerciseByID,
+      exerciseIDByPlanExerciseID: catalog.exerciseIDByPlanExerciseID,
+      oldHistory: oldHistory
     )
     let setLogs = try await logs.fetchLogs(
       studentID: studentID,
       in: Date(timeIntervalSince1970: 0)...now()
     )
-    let rebuilt = try await rebuild(
+    let rebuilt = try await E1RMHistoryReplayService().rebuild(
       studentID: studentID,
-      context: ReplayContext(
-        profile: profile,
-        exerciseByID: exerciseByID,
-        exerciseIDByPlanExerciseID: catalog.exerciseIDByPlanExerciseID,
-        oldExerciseIDBySetLogID: oldExerciseIDBySetLogID,
-        priorConfidenceBySetLogID: priorConfidenceBySetLogID
-      ),
-      setLogs: setLogs
+      context: replay.context,
+      setLogs: setLogs,
+      confidencePolicy: .preserveExistingOrNormal(replay.confidenceBySetLogID)
     )
     try await e1rm.replaceHistory(
       studentId: studentID,
@@ -131,56 +116,27 @@ actor E1RMCompetitionLiftMigration: E1RMCompetitionLiftRunning {
     return Result(didRun: true, pointCount: rebuilt.points.count)
   }
 
-  private func rebuild(
-    studentID: UUID,
-    context: ReplayContext,
-    setLogs: [StudentSetLog]
-  ) async throws -> ReplayHistory {
-    let rebuilt = InMemoryE1RMRepository()
-    var includedExerciseIDs: Set<UUID> = []
-    for log in setLogs.sorted(by: { $0.loggedAt < $1.loggedAt })
-    where log.completed && !log.assumed {
-      // Assumed imported history belongs exclusively to ImportedHistoryBackfill;
-      // replaying it here would mislabel the point as a real `.logged` set.
-      // The canonical log's own exerciseID wins: plans that left the current
-      // cycle have no planExerciseID mapping, and rule-excluded sets (e.g.
-      // deadlift 220×6) never produced an old point to map back through.
-      let exerciseID =
-        log.exerciseID
-        ?? context.oldExerciseIDBySetLogID[log.id]
-        ?? context.exerciseIDByPlanExerciseID[log.planExerciseID]
-      guard let exerciseID,
-        let exercise = context.exerciseByID[exerciseID],
-        let family = resolveCompetitionFamily(exercise: exercise, onboarding: context.profile)
-      else { continue }
-
-      includedExerciseIDs.insert(exerciseID)
-      let recorder = E1RMRecorder(e1rm: rebuilt, now: { log.loggedAt })
-      _ = await recorder.record(
-        E1RMRecorder.Input(
-          studentID: studentID,
-          exerciseID: exerciseID,
-          family: family,
-          setLogID: log.id,
-          weightKg: log.weightKg,
-          reps: log.reps,
-          rpe: log.rpe,
-          coachRPE: log.coachRPE,
-          completed: log.completed,
-          failed: log.failed,
-          registeredOneRMKg: context.profile?.registeredOneRMKg(for: family),
-          confidenceOverride: context.priorConfidenceBySetLogID[log.id] ?? .normal
-        )
-      )
-    }
-
-    let history = try await rebuilt.fetchHistory(
-      studentId: studentID,
-      exerciseIds: Array(includedExerciseIDs)
+  private static func replayPreparation(
+    profile: OnboardingProfile?,
+    exerciseByID: [UUID: Exercise],
+    exerciseIDByPlanExerciseID: [UUID: UUID],
+    oldHistory: [UUID: [E1RMHistoryPoint]]
+  ) -> ReplayPreparation {
+    let oldPoints = oldHistory.values.flatMap { $0 }
+    let oldPointBySetLogID = Dictionary(
+      oldPoints.map { ($0.setLogId, $0) },
+      uniquingKeysWith: { existing, _ in existing }
     )
-    return ReplayHistory(
-      points: history.values.flatMap { $0 }.sorted { $0.computedAt < $1.computedAt },
-      weightBaselines: try await rebuilt.fetchWeightBaselines(studentId: studentID)
+    return ReplayPreparation(
+      context: E1RMHistoryReplayContext(
+        profile: profile,
+        exerciseByID: exerciseByID,
+        exerciseIDByPlanExerciseID: exerciseIDByPlanExerciseID,
+        oldExerciseIDBySetLogID: oldPointBySetLogID.mapValues(\.exerciseId),
+        existingPointBySetLogID: oldPointBySetLogID,
+        preservedPoints: []
+      ),
+      confidenceBySetLogID: oldPointBySetLogID.mapValues(\.confidence)
     )
   }
 

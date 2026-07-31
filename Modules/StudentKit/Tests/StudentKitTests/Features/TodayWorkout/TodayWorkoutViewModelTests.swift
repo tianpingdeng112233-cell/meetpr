@@ -288,6 +288,23 @@ private actor SnapshotCountingE1RMRepository: E1RMRepository {
     prEvents: [PRBreakthroughEvent]
   ) async throws {}
 
+  func historySnapshot(
+    studentId: UUID,
+    exerciseIds: [UUID]
+  ) async throws -> E1RMHistorySnapshot {
+    E1RMHistorySnapshot(history: [:], revision: 0)
+  }
+
+  func replaceHistory(
+    studentId: UUID,
+    with points: [E1RMHistoryPoint],
+    weightBaselines: [E1RMWeightBaseline],
+    prEvents: [PRBreakthroughEvent],
+    ifUnchangedSince revision: UInt64
+  ) async throws -> Bool {
+    true
+  }
+
   func fetchHistory(
     studentId: UUID,
     exerciseId: UUID
@@ -337,6 +354,13 @@ private actor SnapshotCountingE1RMRepository: E1RMRepository {
   }
 
   func recordPR(_ event: PRBreakthroughEvent) async throws {}
+
+  func recordPRIfAbsent(
+    _ event: PRBreakthroughEvent,
+    forSetLogId setLogId: UUID
+  ) async throws -> Bool {
+    true
+  }
 
   func fetchPRs(
     studentId: UUID,

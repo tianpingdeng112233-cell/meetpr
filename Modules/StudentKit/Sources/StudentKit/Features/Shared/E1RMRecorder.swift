@@ -75,13 +75,22 @@ struct E1RMRecorder: Sendable {
     var clearsMeasuredWeightBaseline: Bool {
       weight > baselines.measuredWeightKg
     }
+
+    var restoresPRDerivationForCurrentBaseline: Bool {
+      baselines.measuredWeightSetLogID == baselines.currentSetLogID
+        && weight > baselines.previousMeasuredWeightKg
+        && weight > baselines.registeredOneRMKg
+    }
   }
 
   /// Eligible points are always recorded. A PR is emitted only when the
   /// completed set's measured weight strictly clears both the registered 1RM
   /// and the persisted family-wide weight baseline. Every completed,
   /// non-failed competition set advances that baseline independently of point
-  /// eligibility. Persistence remains best-effort and never blocks set logging.
+  /// eligibility. If replay advanced the baseline from this same set log before
+  /// live derivation resumed, the repository fills its missing PR exactly once
+  /// by set-log identity. Persistence remains best-effort and never blocks set
+  /// logging.
   func record(_ input: Input) async -> PRBreakthroughEvent? {
     guard input.completed, !input.failed, let family = input.family else {
       return nil
@@ -103,16 +112,10 @@ struct E1RMRecorder: Sendable {
           achievedAt: recordedAt
         )
       )
-      let registeredOneRMKg =
-        input.registeredOneRMKg
-        .map { NSDecimalNumber(decimal: $0).doubleValue }
-        .flatMap { $0 > 0 ? $0 : nil }
-      let baselines = Baselines(
-        e1RMKg: try await previousTrustedE1RMBaseline(for: input, family: family),
-        measuredWeightKg: max(
-          registeredOneRMKg ?? 0,
-          previousWeightBaseline?.maxWeightKg ?? 0
-        )
+      let baselines = try await resolvedBaselines(
+        for: input,
+        family: family,
+        previousWeightBaseline: previousWeightBaseline
       )
       let context = RecordingContext(
         family: family,
@@ -200,21 +203,11 @@ struct E1RMRecorder: Sendable {
 
   private struct Baselines {
     let e1RMKg: Double?
+    let registeredOneRMKg: Double
+    let previousMeasuredWeightKg: Double
+    let measuredWeightSetLogID: UUID?
+    let currentSetLogID: UUID
     let measuredWeightKg: Double
-  }
-
-  private func previousTrustedE1RMBaseline(
-    for input: Input,
-    family: LiftFamily
-  ) async throws -> Double? {
-    let history = try await e1rm.fetchHistory(studentId: input.studentID, family: family)
-    let eligible = E1RMSeries.eligibleRaw(
-      points: history.filter {
-        !($0.setLogId == input.setLogID && $0.origin == .imported)
-      },
-      family: family
-    )
-    return eligible.filter { $0.confidence == .normal }.map(\.e1RMKg).max()
   }
 
   private func recordPRIfCleared(
@@ -222,13 +215,17 @@ struct E1RMRecorder: Sendable {
     point: E1RMHistoryPoint?,
     context: RecordingContext
   ) async throws -> PRBreakthroughEvent? {
-    guard context.clearsMeasuredWeightBaseline else { return nil }
+    guard
+      context.clearsMeasuredWeightBaseline
+        || context.restoresPRDerivationForCurrentBaseline
+    else { return nil }
 
     let event = PRBreakthroughEvent(
       id: UUID(),
       studentId: input.studentID,
       exerciseId: input.exerciseID,
       family: context.family,
+      setLogId: input.setLogID,
       pointId: point?.id,
       breakthroughE1RMKg: point?.e1RMKg,
       previousMaxE1RMKg: context.baselines.e1RMKg,
@@ -237,8 +234,64 @@ struct E1RMRecorder: Sendable {
       occurredAt: context.recordedAt,
       acknowledgedAt: nil
     )
-    try await e1rm.recordPR(event)
-    return event
+    let didRecord = try await e1rm.recordPRIfAbsent(
+      event,
+      forSetLogId: input.setLogID
+    )
+    return didRecord ? event : nil
+  }
+}
+
+// MARK: - Baseline resolution
+extension E1RMRecorder {
+  private func resolvedBaselines(
+    for input: Input,
+    family: LiftFamily,
+    previousWeightBaseline: E1RMWeightBaseline?
+  ) async throws -> Baselines {
+    let registeredOneRMKg =
+      input.registeredOneRMKg
+      .map { NSDecimalNumber(decimal: $0).doubleValue }
+      .flatMap { $0 > 0 ? $0 : nil }
+    // When replay already advanced the baseline from this same set log, the
+    // returned record IS the current set; the genuine prior record is the
+    // value it dethroned, not its own weight.
+    let baselineIsCurrentSet = previousWeightBaseline?.setLogId == input.setLogID
+    let priorMeasuredWeightKg =
+      baselineIsCurrentSet
+      ? previousWeightBaseline?.previousMaxWeightKg ?? 0
+      : previousWeightBaseline?.maxWeightKg ?? 0
+    return Baselines(
+      e1RMKg: try await previousTrustedE1RMBaseline(
+        for: input,
+        family: family,
+        excludingCurrentLoggedPoint: baselineIsCurrentSet
+      ),
+      registeredOneRMKg: registeredOneRMKg ?? 0,
+      previousMeasuredWeightKg: priorMeasuredWeightKg,
+      measuredWeightSetLogID: previousWeightBaseline?.setLogId,
+      currentSetLogID: input.setLogID,
+      measuredWeightKg: max(
+        registeredOneRMKg ?? 0,
+        priorMeasuredWeightKg
+      )
+    )
+  }
+
+  private func previousTrustedE1RMBaseline(
+    for input: Input,
+    family: LiftFamily,
+    excludingCurrentLoggedPoint: Bool
+  ) async throws -> Double? {
+    let history = try await e1rm.fetchHistory(studentId: input.studentID, family: family)
+    let eligible = E1RMSeries.eligibleRaw(
+      points: history.filter {
+        !($0.setLogId == input.setLogID
+          && ($0.origin == .imported || excludingCurrentLoggedPoint))
+      },
+      family: family
+    )
+    return eligible.filter { $0.confidence == .normal }.map(\.e1RMKg).max()
   }
 }
 

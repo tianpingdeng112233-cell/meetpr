@@ -1,6 +1,16 @@
 import CoreModels
 import Foundation
 
+public struct E1RMHistorySnapshot: Sendable {
+  public let history: [UUID: [E1RMHistoryPoint]]
+  public let revision: UInt64
+
+  public init(history: [UUID: [E1RMHistoryPoint]], revision: UInt64) {
+    self.history = history
+    self.revision = revision
+  }
+}
+
 /// Local-first store for e1RM history and PR breakthrough events (spec 028).
 /// V0.1 keeps this entirely on-device (backend uninvolved); a Backend
 /// implementation arrives with the cross-device-history spec.
@@ -24,6 +34,22 @@ public protocol E1RMRepository: Sendable {
     weightBaselines: [E1RMWeightBaseline],
     prEvents: [PRBreakthroughEvent]
   ) async throws
+  /// Reads one student's history together with the revision used by
+  /// `replaceHistory(ifUnchangedSince:)` to reject stale replay results.
+  func historySnapshot(
+    studentId: UUID,
+    exerciseIds: [UUID]
+  ) async throws -> E1RMHistorySnapshot
+  /// Atomically replaces one student's history only when no point, measured
+  /// weight baseline, or PR mutation has landed since `historySnapshot`.
+  @discardableResult
+  func replaceHistory(
+    studentId: UUID,
+    with points: [E1RMHistoryPoint],
+    weightBaselines: [E1RMWeightBaseline],
+    prEvents: [PRBreakthroughEvent],
+    ifUnchangedSince revision: UInt64
+  ) async throws -> Bool
   func fetchHistory(studentId: UUID, exerciseId: UUID) async throws -> [E1RMHistoryPoint]
   func fetchHistory(studentId: UUID, exerciseIds: [UUID]) async throws -> [UUID:
     [E1RMHistoryPoint]]
@@ -54,6 +80,13 @@ public protocol E1RMRepository: Sendable {
   func fetchWeightBaselines(studentId: UUID) async throws -> [E1RMWeightBaseline]
 
   func recordPR(_ event: PRBreakthroughEvent) async throws
+  /// Records a live-derived PR only when no event has already been emitted for
+  /// the same set log. The check and insert are one repository operation.
+  @discardableResult
+  func recordPRIfAbsent(
+    _ event: PRBreakthroughEvent,
+    forSetLogId setLogId: UUID
+  ) async throws -> Bool
   /// All measured-weight PR events for one resolved competition family,
   /// including acknowledged events that still establish the rolling baseline.
   func fetchPRs(studentId: UUID, family: LiftFamily) async throws -> [PRBreakthroughEvent]

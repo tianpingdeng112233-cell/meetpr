@@ -11,17 +11,11 @@ import Testing
   let day = try #require(plan.days.first)
   let targetSetID = try #require(day.exercises.first?.prescribedSets.first?.id)
   let exerciseID = try #require(day.exercises.first?.exercise.id)
-  let uncalibrated = E1RMHistoryPoint(
-    id: UUID(),
+  let uncalibrated = suggestionPoint(
     studentId: studentID,
     exerciseId: exerciseID,
-    family: .squat,
-    setLogId: UUID(),
     computedAt: day.date.addingTimeInterval(-86_400),
-    e1RMKg: 170,
-    sourceWeightKg: 140,
-    sourceReps: 5,
-    sourceRPE: 6
+    e1RMKg: 170
   )
   let uncalibratedViewModel = makeViewModel(
     studentID: studentID,
@@ -33,18 +27,16 @@ import Testing
 
   #expect(uncalibratedViewModel.exerciseReferences[exerciseID]?.best?.e1RMKg == 170)
   #expect(uncalibratedViewModel.weightSuggestion(forSetID: targetSetID) == nil)
+  #expect(
+    uncalibratedViewModel.weightSuggestionOutcome(forSetID: targetSetID).unavailableReason
+      == .noEligibleE1RMHistory
+  )
 
-  let calibrated = E1RMHistoryPoint(
-    id: UUID(),
+  let calibrated = suggestionPoint(
     studentId: studentID,
     exerciseId: exerciseID,
-    family: .squat,
-    setLogId: UUID(),
     computedAt: day.date.addingTimeInterval(-86_400),
     e1RMKg: 179.49,
-    sourceWeightKg: 140,
-    sourceReps: 5,
-    sourceRPE: 6,
     sourceCoachRPE: 8
   )
   let calibratedViewModel = makeViewModel(
@@ -61,6 +53,31 @@ import Testing
   )
   #expect(calibratedSuggestion.basis == .e1RM(179.49))
   #expect(calibratedSuggestion.weightKg > 0)
+  #expect(
+    calibratedViewModel.weightSuggestionOutcome(forSetID: targetSetID).unavailableReason == nil
+  )
+}
+
+private func suggestionPoint(
+  studentId: UUID,
+  exerciseId: UUID,
+  computedAt: Date,
+  e1RMKg: Double,
+  sourceCoachRPE: Double? = nil
+) -> E1RMHistoryPoint {
+  E1RMHistoryPoint(
+    id: UUID(),
+    studentId: studentId,
+    exerciseId: exerciseId,
+    family: .squat,
+    setLogId: UUID(),
+    computedAt: computedAt,
+    e1RMKg: e1RMKg,
+    sourceWeightKg: 140,
+    sourceReps: 5,
+    sourceRPE: 6,
+    sourceCoachRPE: sourceCoachRPE
+  )
 }
 
 @MainActor

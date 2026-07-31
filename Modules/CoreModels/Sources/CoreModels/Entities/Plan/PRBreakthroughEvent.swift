@@ -11,6 +11,9 @@ public struct PRBreakthroughEvent: Codable, Hashable, Sendable, Identifiable {
   /// Resolved competition family for family-wide measured-weight baselines.
   /// Events persisted before spec 050 decode as nil.
   public let family: LiftFamily?
+  /// Source set-log identity for idempotent live PR derivation. Events
+  /// persisted before the identity was added decode as nil.
+  public let setLogId: UUID?
   /// Nil when the measured-weight PR set was not eligible for an e1RM point.
   public let pointId: UUID?
   /// Nil when the measured-weight PR set could not produce a valid e1RM.
@@ -29,6 +32,7 @@ public struct PRBreakthroughEvent: Codable, Hashable, Sendable, Identifiable {
     studentId: UUID,
     exerciseId: UUID,
     family: LiftFamily? = nil,
+    setLogId: UUID? = nil,
     pointId: UUID?,
     breakthroughE1RMKg: Double?,
     previousMaxE1RMKg: Double?,
@@ -41,6 +45,7 @@ public struct PRBreakthroughEvent: Codable, Hashable, Sendable, Identifiable {
     self.studentId = studentId
     self.exerciseId = exerciseId
     self.family = family
+    self.setLogId = setLogId
     self.pointId = pointId
     self.breakthroughE1RMKg = breakthroughE1RMKg
     self.previousMaxE1RMKg = previousMaxE1RMKg
@@ -56,6 +61,7 @@ public struct PRBreakthroughEvent: Codable, Hashable, Sendable, Identifiable {
       studentId: studentId,
       exerciseId: exerciseId,
       family: family,
+      setLogId: setLogId,
       pointId: pointId,
       breakthroughE1RMKg: breakthroughE1RMKg,
       previousMaxE1RMKg: previousMaxE1RMKg,

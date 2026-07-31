@@ -111,6 +111,45 @@ struct SetWeightSuggestion: Equatable, Sendable {
   let basis: Basis
 }
 
+enum SetWeightSuggestionUnavailableReason: Equatable, Sendable {
+  case noEligibleE1RMHistory
+  case missingPrescribedRPE
+  case missingPrescribedReps
+  case prescribedRepsOutsideSupportedRange
+  case prescribedRPEBelowSupportedRange
+  case prescribedRPEAboveSupportedRange
+  case noExerciseHistory
+
+  var message: String {
+    switch self {
+    case .noEligibleE1RMHistory:
+      "还没有可参考的 e1RM 记录"
+    case .missingPrescribedRPE:
+      "这组处方没有标 RPE"
+    case .missingPrescribedReps:
+      "这组处方没有标次数"
+    case .prescribedRepsOutsideSupportedRange:
+      "处方次数需在 1–12 次之间"
+    case .prescribedRPEBelowSupportedRange:
+      "处方 RPE 低于 5，暂不支持反推"
+    case .prescribedRPEAboveSupportedRange:
+      "处方 RPE 高于 10，暂不支持反推"
+    case .noExerciseHistory:
+      "还没有该动作的记录"
+    }
+  }
+}
+
+struct SetWeightSuggestionOutcome: Equatable, Sendable {
+  let suggestion: SetWeightSuggestion?
+  let unavailableReason: SetWeightSuggestionUnavailableReason?
+
+  static let unavailableWithoutReason = SetWeightSuggestionOutcome(
+    suggestion: nil,
+    unavailableReason: nil
+  )
+}
+
 public struct ExerciseReferenceSet: Equatable, Sendable {
   public let reps: Int
   public let weightKg: Double
