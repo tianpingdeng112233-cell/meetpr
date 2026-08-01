@@ -30,6 +30,8 @@ struct SetEntrySheet: View {
   @State var collarOn: Bool
 
   var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
+  /// Barbell lifts floor at the empty bar (20kg); accessories go down to 0.
+  private var weightFloor: Decimal { draft.isAccessory ? 0 : 20 }
   private var repsValue: Int { SetEntryValue.reps(from: repsText) }
   private var rpeValue: Decimal { SetEntryValue.rpe(from: rpeText) }
 
@@ -56,11 +58,15 @@ struct SetEntrySheet: View {
     let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
     let suggestionOutcome = viewModel.weightSuggestionOutcome(forSetID: seed.id)
     _suggestionOutcomeSnapshot = State(initialValue: suggestionOutcome)
+    // Barbell lifts floor at the empty bar (20kg); accessories (dumbbell/cable/
+    // bodyweight) legitimately go below, down to 0.
+    let weightFloor: Decimal = draft.isAccessory ? 0 : 20
     let weight =
-      seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg ?? 20
+      seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg
+      ?? weightFloor
     let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
-    _weightText = State(initialValue: SetEntryValue.text(max(20, weight)))
+    _weightText = State(initialValue: SetEntryValue.text(max(weightFloor, weight)))
     _repsText = State(initialValue: reps.formatted())
     _rpeText = State(initialValue: SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
   }
@@ -83,7 +89,7 @@ struct SetEntrySheet: View {
                 value: weightText,
                 unit: "KG",
                 onDecrement: {
-                  updateWeight(max(20, weightValue - Decimal(25) / 10))
+                  updateWeight(max(weightFloor, weightValue - Decimal(25) / 10))
                 },
                 onIncrement: {
                   updateWeight(weightValue + Decimal(25) / 10)
@@ -374,6 +380,7 @@ struct SetEntrySheet: View {
       MeetPRNumberPad(
         field: field,
         value: field == .weight ? totalWeight : Double(repsValue),
+        minimumWeight: draft.isAccessory ? 0 : 20,
         onCommit: { value in
           switch field {
           case .weight:

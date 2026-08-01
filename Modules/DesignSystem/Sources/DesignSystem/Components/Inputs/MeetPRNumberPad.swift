@@ -10,6 +10,7 @@ public struct MeetPRNumberPad: View {
 
   let field: Field
   let initialValueText: String
+  private let minimumWeight: Double
   private let onCommit: @MainActor (Double) -> Void
   private let onCancel: @MainActor () -> Void
 
@@ -19,6 +20,7 @@ public struct MeetPRNumberPad: View {
   public init(
     field: Field = .weight,
     value: Double,
+    minimumWeight: Double = 20,
     onCommit: @escaping @MainActor (Double) -> Void,
     onCancel: @escaping @MainActor () -> Void
   ) {
@@ -27,14 +29,17 @@ public struct MeetPRNumberPad: View {
       field == .reps
       ? value.rounded().formatted(.number.precision(.fractionLength(0)))
       : value.formatted(.number.precision(.fractionLength(0...2)))
+    self.minimumWeight = minimumWeight
     self.onCommit = onCommit
     self.onCancel = onCancel
   }
 
-  public static func snapped(_ raw: Double, field: Field) -> Double {
+  /// Weight floor is caller-supplied: 20 fits barbell lifts (empty bar), but
+  /// accessories (dumbbell/cable/bodyweight) legitimately go below — pass 0.
+  public static func snapped(_ raw: Double, field: Field, minimumWeight: Double = 20) -> Double {
     switch field {
     case .weight:
-      let clamped = min(max(raw, 20), 500)
+      let clamped = min(max(raw, minimumWeight), 500)
       return (clamped * 4).rounded() / 4
     case .reps:
       return min(max(raw.rounded(), 1), 100)
@@ -203,7 +208,7 @@ public struct MeetPRNumberPad: View {
       cancel()
       return
     }
-    let value = Self.snapped(rawValue, field: field)
+    let value = Self.snapped(rawValue, field: field, minimumWeight: minimumWeight)
     text = ""
     onCommit(value)
   }

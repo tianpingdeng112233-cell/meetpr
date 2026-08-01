@@ -81,6 +81,16 @@ struct NumberPadSnappingTests {
     #expect(MeetPRNumberPad.snapped(500.2, field: .weight) == 500)
   }
 
+  @Test("Accessory weight floor of 0 allows sub-20 loads")
+  @MainActor
+  func accessoryWeightFloor() {
+    #expect(MeetPRNumberPad.snapped(12.5, field: .weight, minimumWeight: 0) == 12.5)
+    #expect(MeetPRNumberPad.snapped(5.13, field: .weight, minimumWeight: 0) == 5.25)
+    #expect(MeetPRNumberPad.snapped(0, field: .weight, minimumWeight: 0) == 0)
+    #expect(MeetPRNumberPad.snapped(-3, field: .weight, minimumWeight: 0) == 0)
+    #expect(MeetPRNumberPad.snapped(500.2, field: .weight, minimumWeight: 0) == 500)
+  }
+
   @Test("Reps snap to whole values within bounds")
   @MainActor
   func repsSnapping() {
