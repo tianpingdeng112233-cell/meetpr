@@ -7799,8 +7799,8 @@
     "id": "00000000-0000-0000-ca70-0000000001b4",
     "name": "杠铃卧推",
     "nameEn": "Barbell Bench Press",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
     "isCompetitionLift": false,
     "muscleGroups": [
       "chest"
