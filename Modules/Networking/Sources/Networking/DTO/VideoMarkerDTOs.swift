@@ -9,6 +9,9 @@ public struct VideoMarkerDTO: Codable, Equatable, Sendable {
   public let level: VideoMarkerLevel
   public let note: String
   public let createdAt: Date
+  public let attachmentID: UUID?
+  public let annotationURL: URL?
+  public let annotationExpiresIn: Int?
 
   public init(
     id: UUID,
@@ -17,7 +20,10 @@ public struct VideoMarkerDTO: Codable, Equatable, Sendable {
     timeMs: Int,
     level: VideoMarkerLevel,
     note: String,
-    createdAt: Date
+    createdAt: Date,
+    attachmentID: UUID? = nil,
+    annotationURL: URL? = nil,
+    annotationExpiresIn: Int? = nil
   ) {
     self.id = id
     self.videoID = videoID
@@ -26,6 +32,9 @@ public struct VideoMarkerDTO: Codable, Equatable, Sendable {
     self.level = level
     self.note = note
     self.createdAt = createdAt
+    self.attachmentID = attachmentID
+    self.annotationURL = annotationURL
+    self.annotationExpiresIn = annotationExpiresIn
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -36,6 +45,9 @@ public struct VideoMarkerDTO: Codable, Equatable, Sendable {
     case level
     case note
     case createdAt
+    case attachmentID = "attachmentId"
+    case annotationURL = "annotationUrl"
+    case annotationExpiresIn
   }
 }
 

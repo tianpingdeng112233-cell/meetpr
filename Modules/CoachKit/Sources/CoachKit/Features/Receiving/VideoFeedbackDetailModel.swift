@@ -127,6 +127,10 @@ final class VideoFeedbackDetailModel {
     }
   }
 
+  func reloadMarkers(using repository: any VideoMarkerRepository) async {
+    await loadMarkers(using: repository)
+  }
+
   private func loadSetInfo(using trainingLogs: any StudentTrainingLogRepository) async {
     let item = currentItem
     guard let setLogID = item.setLogID else { return }

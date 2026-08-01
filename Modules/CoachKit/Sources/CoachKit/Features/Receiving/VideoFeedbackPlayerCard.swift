@@ -10,10 +10,12 @@ struct VideoFeedbackPlayerCard: View {
   let isLoading: Bool
   let hasError: Bool
   @Binding var currentSeconds: Double
+  @Binding var selectedAnnotationMarker: VideoMarker?
   let markers: [VideoMarker]?
   let refreshURL: @MainActor (UUID) async throws -> URL
   let retry: () -> Void
   let addMarker: (() -> Void)?
+  let refreshMarkers: @MainActor () async -> Void
 
   var body: some View {
     if let playbackURL {
@@ -23,7 +25,9 @@ struct VideoFeedbackPlayerCard: View {
         workbenchConfiguration: FeedbackVideoWorkbenchConfiguration(),
         currentSeconds: $currentSeconds,
         markers: markers,
+        selectedAnnotationMarker: $selectedAnnotationMarker,
         onAddMarker: addMarker,
+        onMarkersRefresh: refreshMarkers,
         refreshURL: refreshURL
       )
       .id(itemID)

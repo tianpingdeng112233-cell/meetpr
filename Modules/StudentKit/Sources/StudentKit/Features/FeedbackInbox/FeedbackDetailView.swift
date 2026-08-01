@@ -91,6 +91,7 @@ public struct FeedbackDetailView: View {
           markers: playback.markers,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
+          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
           refreshURL: { try await freshPlaybackURL(videoID: $0) }
         )
       }
@@ -102,6 +103,7 @@ public struct FeedbackDetailView: View {
           markers: playback.markers,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
+          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
           refreshURL: { try await freshPlaybackURL(videoID: $0) }
         )
       }
@@ -124,16 +126,7 @@ public struct FeedbackDetailView: View {
         return
       }
       resolvingPlayback = false
-      let outcome = await freshMarkers(videoID: videoID)
-      guard playbackItem?.id == videoID else { return }
-      switch outcome {
-      case .loaded(let markers):
-        playbackItem?.markers = markers
-      case .failed:
-        playbackItem?.markersFailed = true
-      case .hidden:
-        break
-      }
+      await refreshMarkers(videoID: videoID)
     }
   }
 
@@ -147,6 +140,21 @@ public struct FeedbackDetailView: View {
   private func freshMarkers(videoID: UUID) async -> VideoMarkerLoadOutcome {
     guard let viewModel else { return .hidden }
     return await viewModel.markers(videoID: videoID)
+  }
+
+  private func refreshMarkers(videoID: UUID) async {
+    let outcome = await freshMarkers(videoID: videoID)
+    guard playbackItem?.id == videoID else { return }
+    switch outcome {
+    case .loaded(let markers):
+      playbackItem?.markers = markers
+      playbackItem?.markersFailed = false
+    case .failed:
+      playbackItem?.markersFailed = true
+    case .hidden:
+      playbackItem?.markers = nil
+      playbackItem?.markersFailed = false
+    }
   }
 }
 

@@ -14,7 +14,10 @@ func videoMarkerDecodingAndMapping() throws {
       "time_ms": 1250,
       "level": "warn",
       "note": "保持背部张力",
-      "created_at": "2026-07-31T10:15:30Z"
+      "created_at": "2026-07-31T10:15:30Z",
+      "attachment_id": "00000000-0000-4000-8000-000000000604",
+      "annotation_url": "https://cdn.example.com/annotations/marker.png",
+      "annotation_expires_in": 900
     }
     """
 
@@ -29,6 +32,37 @@ func videoMarkerDecodingAndMapping() throws {
   #expect(marker.timeMilliseconds == 1_250)
   #expect(marker.level == .warn)
   #expect(marker.note == "保持背部张力")
+  #expect(marker.attachmentID == dto.attachmentID)
+  #expect(marker.annotationURL == dto.annotationURL)
+  #expect(marker.annotationExpiresIn == 900)
+  #expect(dto.attachmentID?.uuidString == "00000000-0000-4000-8000-000000000604")
+  #expect(dto.annotationURL?.absoluteString == "https://cdn.example.com/annotations/marker.png")
+  #expect(dto.annotationExpiresIn == 900)
+}
+
+@Test("legacy video marker wire DTO decodes when annotation fields are absent")
+func legacyVideoMarkerDecodingDefaultsAnnotationFields() throws {
+  let json = """
+    {
+      "id": "00000000-0000-4000-8000-000000000621",
+      "video_id": "00000000-0000-4000-8000-000000000622",
+      "coach_id": "00000000-0000-4000-8000-000000000623",
+      "time_ms": 1250,
+      "level": "info",
+      "note": "旧打点",
+      "created_at": "2026-07-31T10:15:30Z"
+    }
+    """
+
+  let dto = try MeetPRCodec.decoder.decode(VideoMarkerDTO.self, from: Data(json.utf8))
+  let marker = dto.toDomain()
+
+  #expect(dto.attachmentID == nil)
+  #expect(dto.annotationURL == nil)
+  #expect(dto.annotationExpiresIn == nil)
+  #expect(marker.attachmentID == nil)
+  #expect(marker.annotationURL == nil)
+  #expect(marker.annotationExpiresIn == nil)
 }
 
 @Test("video marker request and response encode through MeetPRCodec snake-case")
@@ -44,7 +78,10 @@ func videoMarkerEncodingUsesSharedCodec() throws {
     timeMs: request.timeMs,
     level: request.level,
     note: request.note,
-    createdAt: Date(timeIntervalSince1970: 0)
+    createdAt: Date(timeIntervalSince1970: 0),
+    attachmentID: markerID,
+    annotationURL: URL(string: "https://cdn.example.com/annotations/marker.png"),
+    annotationExpiresIn: 900
   )
 
   let requestObject = try #require(
@@ -61,6 +98,13 @@ func videoMarkerEncodingUsesSharedCodec() throws {
   #expect(responseObject["video_id"] as? String == videoID.uuidString)
   #expect(responseObject["coach_id"] as? String == coachID.uuidString)
   #expect(responseObject["created_at"] != nil)
+  #expect(responseObject["attachment_id"] as? String == markerID.uuidString)
+  #expect(
+    responseObject["annotation_url"] as? String
+      == "https://cdn.example.com/annotations/marker.png"
+  )
+  #expect(responseObject["annotation_expires_in"] as? Int == 900)
+  #expect(responseObject["annotationUrl"] == nil)
 }
 
 @Test("marker repository maps 404 and transport errors to unavailable, everything else to failed")

@@ -56,6 +56,17 @@
         }
       }
     },
+    "chat.closeAnnotation": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭标注"
+          }
+        }
+      }
+    },
     "chat.closePlayback": {
       "extractionState": "manual",
       "localizations": {

@@ -196,7 +196,12 @@ struct MeetPRApp: App {
             timeMilliseconds: 2_800,
             level: .info,
             note: "保持核心收紧",
-            createdAt: timestamp
+            createdAt: timestamp,
+            attachmentID: UUID(),
+            annotationURL: URL(
+              string: "https://placehold.co/1200x675/111111/D9A441.png?text=MeetPR+Annotation"
+            ),
+            annotationExpiresIn: 900
           ),
           VideoMarker(
             id: UUID(),

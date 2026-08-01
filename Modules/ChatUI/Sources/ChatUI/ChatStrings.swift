@@ -15,6 +15,7 @@ enum ChatStrings {
   static let choosePhoto = localized("chat.choosePhoto")
   static let close = localized("chat.close")
   static let closePlayback = localized("chat.closePlayback")
+  static let closeAnnotation = localized("chat.closeAnnotation")
   static let loadOlder = localized("chat.loadOlder")
   static let preparingImage = localized("chat.preparingImage")
   static let imagePreparationFailed = localized("chat.imagePreparationFailed")

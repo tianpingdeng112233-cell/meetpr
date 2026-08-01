@@ -54,6 +54,8 @@ enum FeedbackVideoPlaybackBehavior: Equatable, Sendable {
 /// fresh URL before replacing the player item.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+// The shared player intentionally owns the AVPlayer lifecycle and both presentation modes.
+// swiftlint:disable:next type_body_length
 public struct FeedbackVideoPlayerView: View {
   private static let rates: [Float] = [0.5, 1.0, 1.5, 2.0]
 
@@ -65,6 +67,7 @@ public struct FeedbackVideoPlayerView: View {
   @State private var isPlaying = false
   @State private var currentSeconds = 0.0
   @State private var durationSeconds = 0.0
+  @State private var internalAnnotationMarker: VideoMarker?
 
   private let videoID: UUID
   private let refreshURL: @MainActor (UUID) async throws -> URL
@@ -72,8 +75,10 @@ public struct FeedbackVideoPlayerView: View {
   private let currentSecondsBinding: Binding<Double>?
   private let markers: [VideoMarker]?
   private let markersFailed: Bool
+  private let selectedAnnotationMarker: Binding<VideoMarker?>?
   private let onSeek: @MainActor (Int) -> Void
   private let onAddMarker: (@MainActor () -> Void)?
+  private let onMarkersRefresh: (@MainActor () async -> Void)?
 
   public init(
     videoID: UUID,
@@ -82,8 +87,10 @@ public struct FeedbackVideoPlayerView: View {
     currentSeconds: Binding<Double>? = nil,
     markers: [VideoMarker]? = nil,
     markersFailed: Bool = false,
+    selectedAnnotationMarker: Binding<VideoMarker?>? = nil,
     onSeek: @escaping @MainActor (Int) -> Void = { _ in },
     onAddMarker: (@MainActor () -> Void)? = nil,
+    onMarkersRefresh: (@MainActor () async -> Void)? = nil,
     refreshURL: @escaping @MainActor (UUID) async throws -> URL
   ) {
     self.videoID = videoID
@@ -92,8 +99,10 @@ public struct FeedbackVideoPlayerView: View {
     currentSecondsBinding = currentSeconds
     self.markers = markers
     self.markersFailed = markersFailed
+    self.selectedAnnotationMarker = selectedAnnotationMarker
     self.onSeek = onSeek
     self.onAddMarker = onAddMarker
+    self.onMarkersRefresh = onMarkersRefresh
     _player = State(initialValue: AVPlayer(url: url))
   }
 
@@ -136,9 +145,16 @@ public struct FeedbackVideoPlayerView: View {
         case .playImmediatelyAtSelectedRate:
           player.playImmediately(atRate: rate)
         }
+        if let annotationMarker {
+          pauseAndSeek(to: annotationMarker)
+        }
       }
       .onDisappear {
         player.pause()
+      }
+      .onChange(of: selectedAnnotationMarker?.wrappedValue) { oldMarker, newMarker in
+        guard oldMarker?.id != newMarker?.id, let newMarker else { return }
+        pauseAndSeek(to: newMarker)
       }
       .task {
         guard
@@ -184,9 +200,18 @@ public struct FeedbackVideoPlayerView: View {
           failed: markersFailed,
           currentSeconds: currentSeconds,
           durationSeconds: durationSeconds,
-          seek: seek(toMilliseconds:)
+          seek: seek(toMilliseconds:),
+          selectMarker: selectMarker
         )
         .frame(maxHeight: .infinity, alignment: .bottom)
+      }
+
+      if let annotationMarker, let annotationURL = annotationMarker.annotationURL {
+        FeedbackVideoAnnotationOverlay(
+          url: annotationURL,
+          close: closeAnnotation,
+          loadFailed: annotationLoadFailed
+        )
       }
     }
     .background(Color.black)
@@ -201,6 +226,9 @@ public struct FeedbackVideoPlayerView: View {
       currentSeconds: currentSeconds,
       durationSeconds: durationSeconds,
       markers: markers,
+      annotationMarker: annotationMarker,
+      closeAnnotation: closeAnnotation,
+      annotationLoadFailed: annotationLoadFailed,
       togglePlayback: togglePlayback,
       selectRate: selectRate,
       addMarker: onAddMarker
@@ -212,6 +240,45 @@ public struct FeedbackVideoPlayerView: View {
     dismiss()
   }
 
+  private var annotationMarker: VideoMarker? {
+    selectedAnnotationMarker?.wrappedValue ?? internalAnnotationMarker
+  }
+
+  private func selectMarker(_ marker: VideoMarker) {
+    guard marker.annotationURL != nil else {
+      seek(toMilliseconds: marker.timeMilliseconds)
+      return
+    }
+    pauseAndSeek(to: marker)
+    setAnnotationMarker(marker)
+  }
+
+  private func pauseAndSeek(to marker: VideoMarker) {
+    player.pause()
+    isPlaying = false
+    seek(toMilliseconds: marker.timeMilliseconds)
+  }
+
+  private func closeAnnotation() {
+    setAnnotationMarker(nil)
+  }
+
+  private func annotationLoadFailed() {
+    closeAnnotation()
+    guard let onMarkersRefresh else { return }
+    Task {
+      await onMarkersRefresh()
+    }
+  }
+
+  private func setAnnotationMarker(_ marker: VideoMarker?) {
+    if let selectedAnnotationMarker {
+      selectedAnnotationMarker.wrappedValue = marker
+    } else {
+      internalAnnotationMarker = marker
+    }
+  }
+
   private func retry() {
     retrying = true
     Task {
@@ -220,6 +287,9 @@ public struct FeedbackVideoPlayerView: View {
         return
       }
       playbackFailed = false
+      // Replacing the item resumes playback: the annotation overlay's
+      // paused-frame contract cannot hold across the swap, so close it.
+      closeAnnotation()
       player.replaceCurrentItem(with: AVPlayerItem(url: fresh))
       player.defaultRate = rate
       switch playbackBehavior.retryCommand {
@@ -295,95 +365,5 @@ public struct FeedbackVideoPlayerView: View {
     currentSeconds = max(0, target.seconds)
     currentSecondsBinding?.wrappedValue = currentSeconds
     onSeek(milliseconds)
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-extension FeedbackVideoPlayerView {
-  static func rateText(_ rate: Float) -> String {
-    switch rate {
-    case 0.5: "0.5x"
-    case 1.5: "1.5x"
-    case 2: "2x"
-    default: "1x"
-    }
-  }
-
-  static func workbenchRateText(_ rate: Float) -> String {
-    switch rate {
-    case 0.5: "0.5×"
-    case 1.5: "1.5×"
-    case 2: "2×"
-    default: "1×"
-    }
-  }
-
-  public static func timeText(_ seconds: Double) -> String {
-    let totalSeconds = max(0, Int(seconds.rounded(.down)))
-    let minutes = totalSeconds / 60
-    let remainder = totalSeconds % 60
-    let secondText = remainder < 10 ? "0\(remainder)" : "\(remainder)"
-    return "\(minutes):\(secondText)"
-  }
-
-  static func playbackBehavior(
-    for configuration: FeedbackVideoWorkbenchConfiguration?
-  ) -> FeedbackVideoPlaybackBehavior {
-    configuration == nil ? .legacyFullScreen : .workbench
-  }
-
-  static func seekTime(milliseconds: Int, durationSeconds: Double) -> CMTime {
-    let nonnegativeMilliseconds = max(0, milliseconds)
-    let durationMilliseconds =
-      durationSeconds.isFinite && durationSeconds > 0
-      ? Int((durationSeconds * 1_000).rounded(.down))
-      : nonnegativeMilliseconds
-    return CMTime(
-      value: CMTimeValue(min(nonnegativeMilliseconds, durationMilliseconds)),
-      timescale: 1_000
-    )
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct FeedbackVideoPlayerChrome: View {
-  let rateText: String
-  let close: () -> Void
-  let cycleRate: () -> Void
-
-  var body: some View {
-    HStack {
-      Button(action: close) {
-        Image(systemName: "xmark")
-          .bold()
-          .foregroundStyle(.white)
-          .frame(width: 36, height: 36)
-          .background(.ultraThinMaterial, in: Circle())
-          .overlay {
-            Circle().stroke(Color.white.opacity(0.18), lineWidth: 1)
-          }
-      }
-      .accessibilityLabel(ChatStrings.closePlayback)
-
-      Eyebrow(ChatStrings.videoPlayback, color: .white.opacity(0.85))
-        .padding(.leading, MeetPRSpacing.xs)
-
-      Spacer()
-
-      Button(action: cycleRate) {
-        Text(rateText)
-          .font(.system(size: 14, weight: .semibold, design: .monospaced))
-          .foregroundStyle(.white)
-          .padding(.horizontal, MeetPRSpacing.md)
-          .frame(height: 36)
-          .background(.ultraThinMaterial, in: Capsule())
-          .overlay {
-            Capsule().stroke(Color.white.opacity(0.18), lineWidth: 1)
-          }
-      }
-      .accessibilityLabel("\(ChatStrings.playbackSpeed) \(rateText)")
-    }
-    .padding(.horizontal, MeetPRSpacing.base)
-    .padding(.top, MeetPRSpacing.sm)
   }
 }
