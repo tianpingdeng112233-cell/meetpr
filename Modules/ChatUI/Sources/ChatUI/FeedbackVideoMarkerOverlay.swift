@@ -11,6 +11,7 @@ struct FeedbackVideoMarkerOverlay: View {
   let currentSeconds: Double
   let durationSeconds: Double
   let seek: (Int) -> Void
+  var selectMarker: ((VideoMarker) -> Void)?
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
@@ -35,7 +36,11 @@ struct FeedbackVideoMarkerOverlay: View {
         VStack(spacing: 0) {
           ForEach(markers) { marker in
             Button {
-              seek(marker.timeMilliseconds)
+              if let selectMarker {
+                selectMarker(marker)
+              } else {
+                seek(marker.timeMilliseconds)
+              }
             } label: {
               HStack(spacing: MeetPRSpacing.sm) {
                 Text(FeedbackVideoPlayerView.timeText(Double(marker.timeMilliseconds) / 1_000))
@@ -45,6 +50,13 @@ struct FeedbackVideoMarkerOverlay: View {
                   .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
                   .foregroundStyle(.white)
                   .frame(maxWidth: .infinity, alignment: .leading)
+                if marker.annotationURL != nil {
+                  Image(systemName: "pencil")
+                    .font(.system(size: MeetPRFontMetrics.size11, weight: .semibold))
+                    .foregroundStyle(Color.MeetPR.gold500)
+                    .accessibilityHidden(true)
+                    .accessibilityIdentifier("feedback.video.marker.annotationBadge")
+                }
                 Image(systemName: "forward.fill")
                   .font(.system(size: MeetPRFontMetrics.size11))
                   .foregroundStyle(.white.opacity(0.72))
@@ -54,9 +66,10 @@ struct FeedbackVideoMarkerOverlay: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(
-              ChatStrings.seekToVideoMarker(
-                FeedbackVideoPlayerView.timeText(Double(marker.timeMilliseconds) / 1_000)
-              )
+              (marker.annotationURL == nil ? "" : "✏️ ")
+                + ChatStrings.seekToVideoMarker(
+                  FeedbackVideoPlayerView.timeText(Double(marker.timeMilliseconds) / 1_000)
+                )
             )
           }
         }

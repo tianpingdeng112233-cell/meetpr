@@ -20,6 +20,7 @@ struct VideoFeedbackDetailView: View {
   @State private var sending = false
   @State private var currentSeconds = 0.0
   @State private var markerDraft: VideoMarkerDraft?
+  @State private var selectedAnnotationMarker: VideoMarker?
 
   init(
     item: PendingVideoItem,
@@ -54,16 +55,19 @@ struct VideoFeedbackDetailView: View {
             isLoading: detailModel.isResolvingPlayback,
             hasError: detailModel.playbackError,
             currentSeconds: $currentSeconds,
+            selectedAnnotationMarker: $selectedAnnotationMarker,
             markers: detailModel.markers,
             refreshURL: { try await viewModel.playbackURL(videoID: $0) },
             retry: retryPlayback,
-            addMarker: addMarkerAction
+            addMarker: addMarkerAction,
+            refreshMarkers: refreshMarkers
           )
 
           if let markers = detailModel.markers, !markers.isEmpty {
             VideoMarkerList(
               markers: markers,
-              delete: deleteMarker
+              delete: deleteMarker,
+              selectAnnotation: { selectedAnnotationMarker = $0 }
             )
           }
 
@@ -123,11 +127,18 @@ struct VideoFeedbackDetailView: View {
     .hideNavigationBar()
     .task(id: detailModel.currentItem.id) {
       currentSeconds = 0
+      selectedAnnotationMarker = nil
       await detailModel.prepare(
         videoQueue: viewModel,
         trainingLogs: trainingLogs,
         markerRepository: markerRepository
       )
+    }
+    .onChange(of: detailModel.markers) { _, markers in
+      // A deleted or refreshed-away marker must not keep showing its stale
+      // signed URL; a replaced one re-points at the fresh instance.
+      guard let selected = selectedAnnotationMarker else { return }
+      selectedAnnotationMarker = markers?.first { $0.id == selected.id }
     }
     .sheet(item: $markerDraft) { draft in
       VideoMarkerEditor(draft: draft, save: saveMarker)
@@ -203,6 +214,10 @@ struct VideoFeedbackDetailView: View {
     }
   }
 
+  private func refreshMarkers() async {
+    await detailModel.reloadMarkers(using: markerRepository)
+  }
+
   private func skip() {
     let items = viewModel.items
     guard
@@ -248,6 +263,7 @@ struct VideoFeedbackDetailView: View {
   private func show(_ item: PendingVideoItem) {
     text = ""
     currentSeconds = 0
+    selectedAnnotationMarker = nil
     detailModel.select(item)
   }
 
@@ -325,6 +341,7 @@ private struct VideoMarkerEditor: View {
 private struct VideoMarkerList: View {
   let markers: [VideoMarker]
   let delete: (VideoMarker) -> Void
+  let selectAnnotation: (VideoMarker) -> Void
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
@@ -335,13 +352,17 @@ private struct VideoMarkerList: View {
       VStack(spacing: 0) {
         ForEach(markers) { marker in
           HStack(spacing: MeetPRSpacing.point11) {
-            Text(FeedbackVideoPlayerView.timeText(Double(marker.timeMilliseconds) / 1_000))
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .bold))
-              .foregroundStyle(Color.MeetPR.gold500)
-            Text(marker.note.isEmpty ? CoachVideoFeedbackStrings.marker : marker.note)
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
-              .foregroundStyle(Color.MeetPR.textPrimary)
-              .frame(maxWidth: .infinity, alignment: .leading)
+            if marker.annotationURL != nil {
+              Button {
+                selectAnnotation(marker)
+              } label: {
+                VideoMarkerRowLabel(marker: marker)
+              }
+              .buttonStyle(.plain)
+              .accessibilityIdentifier("coach.video.marker.annotation")
+            } else {
+              VideoMarkerRowLabel(marker: marker)
+            }
             Button(role: .destructive) {
               delete(marker)
             } label: {

@@ -160,7 +160,10 @@ extension VideoMarkerDTO {
       timeMilliseconds: timeMs,
       level: level,
       note: note,
-      createdAt: createdAt
+      createdAt: createdAt,
+      attachmentID: attachmentID,
+      annotationURL: annotationURL,
+      annotationExpiresIn: annotationExpiresIn
     )
   }
 }

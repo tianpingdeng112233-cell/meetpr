@@ -13,6 +13,9 @@ struct FeedbackVideoWorkbenchPlayer: View {
   let currentSeconds: Double
   let durationSeconds: Double
   let markers: [VideoMarker]?
+  let annotationMarker: VideoMarker?
+  let closeAnnotation: () -> Void
+  let annotationLoadFailed: () -> Void
   let togglePlayback: () -> Void
   let selectRate: (Float) -> Void
   let addMarker: (() -> Void)?
@@ -74,6 +77,14 @@ struct FeedbackVideoWorkbenchPlayer: View {
       .buttonStyle(.plain)
       .accessibilityLabel(isPlaying ? ChatStrings.pausePlayback : ChatStrings.playPlayback)
       .accessibilityIdentifier("feedback.video.playbackToggle")
+
+      if let annotationMarker, let annotationURL = annotationMarker.annotationURL {
+        FeedbackVideoAnnotationOverlay(
+          url: annotationURL,
+          close: closeAnnotation,
+          loadFailed: annotationLoadFailed
+        )
+      }
     }
     .frame(height: 270)
     .background(Color.MeetPR.videoStageFill)

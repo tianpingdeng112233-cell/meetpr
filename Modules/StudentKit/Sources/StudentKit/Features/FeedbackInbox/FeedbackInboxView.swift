@@ -34,6 +34,7 @@ public struct FeedbackInboxView: View {
           markers: playback.markers,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
+          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
           refreshURL: { try await viewModel.playbackURL(videoID: $0) }
         )
       }
@@ -45,6 +46,7 @@ public struct FeedbackInboxView: View {
           markers: playback.markers,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
+          onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
           refreshURL: { try await viewModel.playbackURL(videoID: $0) }
         )
       }
@@ -126,16 +128,22 @@ public struct FeedbackInboxView: View {
         return
       }
       resolvingVideoID = nil
-      let outcome = await viewModel.markers(videoID: videoID)
-      guard playbackItem?.id == videoID else { return }
-      switch outcome {
-      case .loaded(let markers):
-        playbackItem?.markers = markers
-      case .failed:
-        playbackItem?.markersFailed = true
-      case .hidden:
-        break
-      }
+      await refreshMarkers(videoID: videoID)
+    }
+  }
+
+  private func refreshMarkers(videoID: UUID) async {
+    let outcome = await viewModel.markers(videoID: videoID)
+    guard playbackItem?.id == videoID else { return }
+    switch outcome {
+    case .loaded(let markers):
+      playbackItem?.markers = markers
+      playbackItem?.markersFailed = false
+    case .failed:
+      playbackItem?.markersFailed = true
+    case .hidden:
+      playbackItem?.markers = nil
+      playbackItem?.markersFailed = false
     }
   }
 }
