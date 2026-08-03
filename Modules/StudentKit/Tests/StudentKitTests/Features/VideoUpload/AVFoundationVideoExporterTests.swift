@@ -34,6 +34,97 @@ func videoExportProducesReadableFastStartMP4() async throws {
   #expect(moovRange.lowerBound < mdatRange.lowerBound)
 }
 
+@Test("Eligible source is remuxed without re-encoding its video samples")
+func eligibleSourceUsesPassthrough() async throws {
+  let fixture = try await VideoExportFixture.make(
+    .init(frameCount: 90, sourceBitRate: 1_500_000, highEntropy: true)
+  )
+  defer { fixture.remove() }
+
+  let sourceAsset = AVURLAsset(url: fixture.sourceURL)
+  let sourceTrack = try #require(
+    try await sourceAsset.loadTracks(withMediaType: .video).first
+  )
+  let sourceDataRate = try await sourceTrack.load(.estimatedDataRate)
+  let sourceSamples = try await compressedSampleFingerprints(
+    at: fixture.sourceURL,
+    mediaType: .video
+  )
+  #expect(sourceDataRate > 0)
+  #expect(sourceDataRate <= 3_500_000)
+
+  try await AVFoundationVideoExporter().export(from: fixture.sourceURL, to: fixture.outputURL)
+
+  let outputAsset = AVURLAsset(url: fixture.outputURL)
+  let outputTrack = try #require(
+    try await outputAsset.loadTracks(withMediaType: .video).first
+  )
+  let outputDataRate = try await outputTrack.load(.estimatedDataRate)
+  let outputSamples = try await compressedSampleFingerprints(
+    at: fixture.outputURL,
+    mediaType: .video
+  )
+
+  #expect(outputSamples == sourceSamples)
+  #expect(abs(outputDataRate - sourceDataRate) / sourceDataRate < 0.01)
+}
+
+@Test("Eligible AAC audio is remuxed without re-encoding either media stream")
+func eligibleAACAudioUsesPassthrough() async throws {
+  let fixture = try await VideoExportFixture.make(
+    .init(
+      frameCount: 30,
+      audioChannelCount: 1,
+      audioEncoding: .aac
+    )
+  )
+  defer { fixture.remove() }
+
+  let sourceAsset = AVURLAsset(url: fixture.sourceURL)
+  let sourceAudioTrack = try #require(
+    try await sourceAsset.loadTracks(withMediaType: .audio).first
+  )
+  let sourceAudioDescription = try #require(
+    try await sourceAudioTrack.load(.formatDescriptions).first
+  )
+  let sourceAudioDataRate = try await sourceAudioTrack.load(.estimatedDataRate)
+  let sourceVideoSamples = try await compressedSampleFingerprints(
+    at: fixture.sourceURL,
+    mediaType: .video
+  )
+  let sourceAudioSamples = try await compressedSampleFingerprints(
+    at: fixture.sourceURL,
+    mediaType: .audio
+  )
+  #expect(CMFormatDescriptionGetMediaSubType(sourceAudioDescription) == kAudioFormatMPEG4AAC)
+  #expect(sourceAudioDataRate > 0)
+  #expect(sourceAudioDataRate <= 128_000)
+
+  try await AVFoundationVideoExporter().export(from: fixture.sourceURL, to: fixture.outputURL)
+
+  let outputAsset = AVURLAsset(url: fixture.outputURL)
+  let outputAudioTrack = try #require(
+    try await outputAsset.loadTracks(withMediaType: .audio).first
+  )
+  let outputAudioDescription = try #require(
+    try await outputAudioTrack.load(.formatDescriptions).first
+  )
+  let outputAudioDataRate = try await outputAudioTrack.load(.estimatedDataRate)
+  let outputVideoSamples = try await compressedSampleFingerprints(
+    at: fixture.outputURL,
+    mediaType: .video
+  )
+  let outputAudioSamples = try await compressedSampleFingerprints(
+    at: fixture.outputURL,
+    mediaType: .audio
+  )
+
+  #expect(CMFormatDescriptionGetMediaSubType(outputAudioDescription) == kAudioFormatMPEG4AAC)
+  #expect(outputVideoSamples == sourceVideoSamples)
+  #expect(outputAudioSamples == sourceAudioSamples)
+  #expect(abs(outputAudioDataRate - sourceAudioDataRate) / sourceAudioDataRate < 0.01)
+}
+
 @Test("Video export preserves the full portrait preferred transform")
 func videoExportPreservesPortraitTransform() async throws {
   let portraitTransform = CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: 180, ty: 0)

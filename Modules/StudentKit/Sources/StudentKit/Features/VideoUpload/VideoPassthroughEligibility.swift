@@ -17,56 +17,97 @@ struct VideoTransform: Equatable, Sendable {
   )
 }
 
-/// Platform-neutral export decision. Translation does not affect the rendered
-/// dimensions, so only the linear portion of `preferredTransform` is needed.
+struct VideoTrackExportProperties: Equatable, Sendable {
+  let codecFourCCs: [UInt32]
+  let naturalSize: VideoDimensions
+  let preferredTransform: VideoTransform
+  let estimatedDataRate: Double
+}
+
+struct AudioTrackExportProperties: Equatable, Sendable {
+  let codecFourCCs: [UInt32]
+  let estimatedDataRate: Double
+}
+
+enum VideoExportDecision: Equatable, Sendable {
+  case passthrough
+  case transcode
+}
+
+/// Platform-neutral export decision used by the AVFoundation implementation
+/// and by the macOS host test suite.
 enum VideoPassthroughEligibility {
   static let h264CodecFourCC: UInt32 = 0x6176_6331  // "avc1"
+  static let aacCodecFourCC: UInt32 = 0x6161_6320  // "aac "
+  static let maximumLongEdge = 1_280.0
+  static let maximumVideoDataRate = 3_500_000.0
+  static let maximumAudioDataRate = 128_000.0
 
-  static func shouldPassthrough(
-    codecFourCC: UInt32?,
-    naturalSize: VideoDimensions,
-    preferredTransform: VideoTransform = .identity
-  ) -> Bool {
-    guard codecFourCC == h264CodecFourCC else { return false }
-    guard naturalSize.width.isFinite, naturalSize.height.isFinite else { return false }
-    guard naturalSize.width > 0, naturalSize.height > 0 else { return false }
+  static func decision(
+    video: VideoTrackExportProperties,
+    audio: AudioTrackExportProperties?
+  ) -> VideoExportDecision {
+    guard !video.codecFourCCs.isEmpty else { return .transcode }
+    guard video.codecFourCCs.allSatisfy({ $0 == h264CodecFourCC }) else { return .transcode }
+    guard isPositiveFinite(video.estimatedDataRate) else { return .transcode }
+    guard video.estimatedDataRate <= maximumVideoDataRate else { return .transcode }
+    guard renderedLongEdge(video) <= maximumLongEdge else { return .transcode }
 
+    if let audio {
+      guard !audio.codecFourCCs.isEmpty else { return .transcode }
+      guard audio.codecFourCCs.allSatisfy({ $0 == aacCodecFourCC }) else { return .transcode }
+      guard isPositiveFinite(audio.estimatedDataRate) else { return .transcode }
+      guard audio.estimatedDataRate <= maximumAudioDataRate else { return .transcode }
+    }
+    return .passthrough
+  }
+
+  private static func renderedLongEdge(_ video: VideoTrackExportProperties) -> Double {
+    let width = video.naturalSize.width
+    let height = video.naturalSize.height
+    guard width.isFinite, height.isFinite, width > 0, height > 0 else {
+      return .infinity
+    }
+
+    let transform = video.preferredTransform
     let displayedWidth =
-      abs(preferredTransform.horizontalScale * naturalSize.width)
-      + abs(preferredTransform.horizontalShear * naturalSize.height)
+      abs(transform.horizontalScale * width) + abs(transform.horizontalShear * height)
     let displayedHeight =
-      abs(preferredTransform.verticalShear * naturalSize.width)
-      + abs(preferredTransform.verticalScale * naturalSize.height)
+      abs(transform.verticalShear * width) + abs(transform.verticalScale * height)
+    guard
+      displayedWidth.isFinite,
+      displayedHeight.isFinite,
+      displayedWidth > 0,
+      displayedHeight > 0
+    else {
+      return .infinity
+    }
+    return max(displayedWidth, displayedHeight)
+  }
 
-    guard displayedWidth.isFinite, displayedHeight.isFinite else { return false }
-    guard displayedWidth > 0, displayedHeight > 0 else { return false }
-
-    let longEdge = max(displayedWidth, displayedHeight)
-    let shortEdge = min(displayedWidth, displayedHeight)
-    return longEdge <= 1_920 && shortEdge <= 1_080
+  private static func isPositiveFinite(_ value: Double) -> Bool {
+    value.isFinite && value > 0
   }
 }
 
-/// Platform-neutral passthrough-first orchestration: try remux when eligible,
-/// fall back to the transcode preset exactly once on non-cancellation failure.
+/// Tries a compressed-sample remux first when eligible, then retries once
+/// through the established transcode path on any non-cancellation failure.
 enum VideoExportStrategy {
   static func run(
-    passthroughEligible: Bool,
-    passthroughPreset: String,
-    transcodePreset: String,
-    export: (String) async throws -> Void
+    initialDecision: VideoExportDecision,
+    export: (VideoExportDecision) async throws -> Void
   ) async throws {
-    if passthroughEligible {
-      do {
-        try await export(passthroughPreset)
-        return
-      } catch is CancellationError {
-        throw CancellationError()
-      } catch {
-        // A source can have compatible H.264 video but incompatible audio or
-        // container details. Retry once through the established transcode path.
-      }
+    guard initialDecision == .passthrough else {
+      try await export(.transcode)
+      return
     }
-    try await export(transcodePreset)
+
+    do {
+      try await export(.passthrough)
+    } catch is CancellationError {
+      throw CancellationError()
+    } catch {
+      try await export(.transcode)
+    }
   }
 }
