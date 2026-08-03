@@ -34,6 +34,13 @@
   服务端 = backend spec 032(PR #190 已合并部署 staging)。
   ⚠️ 切包前复核:真双端端到端实测证据(消息 ≤1s/断线回退/回前台追平)应已补进 PR #305。
 
+- **spec 067 APNs 接入**(PR #306,2026-08-03 合入,36f31ed):推送注册/授权/前台策略/点按路由。
+  与 backend spec 033(PR #191,已部署 staging)配对,六类教练推送:聊天/缺练/破 PR/待反馈视频/
+  绑定申请/顺延计划。**硬前置(David 手动)**:ASC 建 APNs Auth Key(p8→Bitwarden)+ SAE 配
+  `PUSH_ENABLED` 与五个 `APNS_*`;未配置时代码安全休眠(注册失败仅打日志)。
+  ⚠️ 切包前必做:真机验收六类推送(SPEC §4 清单;TestFlight 走 production APNs,SAE 须
+  `APNS_ENV=production`);entitlements/push capability 属签名面变更,archive 时留意。
+
 ## 1.0(18) 候选(前置解锁后即可进)
 
 ⚖️ 2026-08-03 切 1.0(17) 时核实。**登记在此不等于已排期**,下次切包前重新核。
