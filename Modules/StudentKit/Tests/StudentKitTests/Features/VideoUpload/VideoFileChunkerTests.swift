@@ -57,3 +57,22 @@ private let fiveMB = 5 * 1024 * 1024
     _ = try chunker.readPart(partNumber: 2, from: fileURL)
   }
 }
+
+@Test func chunkerFilePartsMatchInMemorySlicesByteForByte() throws {
+  let bytes = Data((0..<23).map { UInt8($0) })
+  let root = FileManager.default.temporaryDirectory
+    .appending(path: "chunk-file-test-\(UUID().uuidString)", directoryHint: .isDirectory)
+  let source = root.appending(path: "source.bin")
+  let parts = root.appending(path: "source.parts", directoryHint: .isDirectory)
+  try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+  try bytes.write(to: source)
+  defer { try? FileManager.default.removeItem(at: root) }
+
+  let chunker = VideoFileChunker(partSizeBytes: 5)
+  let fileParts = try chunker.writeParts(from: source, to: parts)
+
+  #expect(fileParts.count == 5)
+  for (index, partURL) in fileParts.enumerated() {
+    #expect(try Data(contentsOf: partURL) == chunker.readPart(partNumber: index + 1, from: source))
+  }
+}

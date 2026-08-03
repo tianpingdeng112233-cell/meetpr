@@ -4,12 +4,7 @@ import Foundation
 import Networking
 import RepositoryContracts
 
-// The export → chunk → initiate → part PUTs → complete pipeline. Split out of
-// VideoUploadManager.swift to keep the actor body within lint budgets; every
-// method here is actor-isolated.
 extension VideoUploadManager {
-  /// Entry point of the per-attachment upload task. `sourceURL` is non-nil on
-  /// first run (export still needed) and nil on retries (exported file kept).
   func run(recordID: UUID, sourceURL: URL?) async {
     defer {
       if let sourceURL {
@@ -17,18 +12,19 @@ extension VideoUploadManager {
       }
     }
 
-    guard var record = try? await repository.fetch(id: recordID) else {
-      return
-    }
+    guard var record = try? await repository.fetch(id: recordID) else { return }
     do {
       if let sourceURL {
         record = try await export(record, from: sourceURL)
       }
       try await upload(record)
     } catch is CancellationError {
-      // remove() owns exported-file cleanup; this method owns source cleanup.
+      // remove() owns exported-file and part-file cleanup.
+    } catch is BackgroundUploadPipelineDeferred {
+      // The background-session event consumer persisted this ETag and owns
+      // scheduling the next bounded batch during the current wake window.
     } catch {
-      await markFailed(recordID: recordID, error: error)
+      await handleUploadFailure(recordID: recordID, error: error)
     }
   }
 
@@ -42,14 +38,13 @@ extension VideoUploadManager {
 
     try Task.checkCancellation()
     guard try await repository.fetch(id: record.id) != nil else {
-      // Removed while exporting: don't resurrect, clean the output.
       try? FileManager.default.removeItem(at: destination)
       throw CancellationError()
     }
     var exported = record
     exported.sizeBytes = try Self.fileSize(at: destination)
     try await repository.save(exported)
-    broadcast(.updated(exported, progress: 0))
+    broadcast(.updated(exported, progress: nil))
     return exported
   }
 
@@ -62,43 +57,66 @@ extension VideoUploadManager {
     var uploading = record
     uploading.status = .uploading
     try await repository.save(uploading)
-    broadcast(.updated(uploading, progress: 0))
+    broadcast(.updated(uploading, progress: nil))
     Analytics.shared.mediaUpload(
-      .started, context: .setLog, bytes: Int(clamping: uploading.sizeBytes))
+      .started,
+      context: .setLog,
+      bytes: Int(clamping: uploading.sizeBytes)
+    )
 
     let chunker = VideoFileChunker(partSizeBytes: configuration.partSizeBytes)
     let partCount = try chunker.partCount(totalBytes: uploading.sizeBytes)
+    let chunkDirectory = chunkDirectory(recordID: uploading.id)
+    _ = try chunker.writeParts(from: fileLocation, to: chunkDirectory)
 
+    if uploading.remoteAttachmentID == nil
+      || uploading.uploadPartTargets.count != partCount
+      || uploading.uploadPartCount != partCount
+    {
+      await flushPendingRemoteCleanups()
+      uploading = try await initiate(uploading, partCount: partCount)
+    }
+
+    guard let remoteID = uploading.remoteAttachmentID else {
+      throw VideoUploadError.fileUnreadable
+    }
+    let etags = try await uploadParts(
+      record: uploading,
+      chunker: chunker,
+      chunkDirectory: chunkDirectory
+    )
+    try await complete(uploading, remoteID: remoteID, etags: etags)
+  }
+
+  func initiate(
+    _ record: VideoAttachment,
+    partCount: Int
+  ) async throws -> VideoAttachment {
     try Task.checkCancellation()
-    // set_log_id is the server-side association (backend spec 007); the
-    // filename stays human-readable only.
     let response = try await service.initiate(
       InitiateUploadRequestDTO(
         kind: .setVideo,
-        contentType: uploading.contentType,
-        sizeBytes: uploading.sizeBytes,
+        contentType: record.contentType,
+        sizeBytes: record.sizeBytes,
         partCount: partCount,
-        filename: "setlog-\(uploading.setLogID.uuidString)-\(uploading.id.uuidString).mp4",
-        setLogID: uploading.setLogID
+        filename: "setlog-\(record.setLogID.uuidString)-\(record.id.uuidString).mp4",
+        setLogID: record.setLogID
       )
     )
-    try Task.checkCancellation()
-    uploading.remoteAttachmentID = response.attachmentID
-    try await repository.save(uploading)
-    broadcast(.updated(uploading, progress: 0))
-
     let partURLs = try Self.partURLMap(from: response.partURLs, expectedCount: partCount)
-    let etags = try await uploadParts(
-      record: uploading,
-      fileLocation: fileLocation,
-      chunker: chunker,
-      partURLs: partURLs
-    )
-
-    try await complete(uploading, remoteID: response.attachmentID, etags: etags)
+    var initiated = record
+    initiated.remoteAttachmentID = response.attachmentID
+    initiated.uploadPartCount = partCount
+    initiated.uploadPartTargets = partURLs.map { partNumber, url in
+      VideoUploadPartTarget(partNumber: partNumber, url: url)
+    }.sorted { $0.partNumber < $1.partNumber }
+    initiated.uploadedParts = []
+    try await repository.save(initiated)
+    broadcast(.updated(initiated, progress: nil))
+    return initiated
   }
 
-  private func complete(
+  func complete(
     _ record: VideoAttachment,
     remoteID: UUID,
     etags: [UploadPartETagDTO]
@@ -109,112 +127,100 @@ extension VideoUploadManager {
       throw VideoUploadError.completeConflict
     }
 
-    // A concurrent remove() may have deleted the record while we were on the
-    // wire; saving now would resurrect it as a ghost (Codex review P1).
     guard try await repository.fetch(id: record.id) != nil else { return }
-
     var uploaded = record
     uploaded.status = .uploaded
     uploaded.uploadedAt = now()
-    // The exported file served its purpose; keeping it leaks 15-200MB per
-    // video (Codex review P1). Playback uses the backend presigned URL.
     uploaded.localFileName = nil
+    uploaded.uploadPartTargets = []
+    uploaded.uploadedParts = []
+    uploaded.uploadPartCount = 0
+    uploaded.uploadRetryCount = 0
+    uploaded.firstUploadFailureAt = nil
     try await repository.save(uploaded)
     try? FileManager.default.removeItem(at: fileURL(for: record))
-    broadcast(.updated(uploaded, progress: 1))
+    removeChunkFiles(recordID: record.id)
+    broadcast(.updated(uploaded, progress: nil))
     Analytics.shared.mediaUpload(
-      .succeeded, context: .setLog, bytes: Int(clamping: record.sizeBytes))
+      .succeeded,
+      context: .setLog,
+      bytes: Int(clamping: record.sizeBytes)
+    )
   }
 
   private func uploadParts(
     record: VideoAttachment,
-    fileLocation: URL,
     chunker: VideoFileChunker,
-    partURLs: [Int: URL]
+    chunkDirectory: URL
   ) async throws -> [UploadPartETagDTO] {
-    let partCount = partURLs.count
-    var etags: [UploadPartETagDTO] = []
-    etags.reserveCapacity(partCount)
+    let completedNumbers = Set(record.uploadedParts.map(\.partNumber))
+    let pendingTargets = record.uploadPartTargets.filter {
+      !completedNumbers.contains($0.partNumber)
+    }
 
-    try await withThrowingTaskGroup(of: UploadPartETagDTO.self) { group in
-      var nextPart = 1
-      func submitNext() throws {
-        guard nextPart <= partCount else { return }
-        let partNumber = nextPart
-        nextPart += 1
-        guard let url = partURLs[partNumber] else {
-          throw VideoUploadError.invalidPartURL(partNumber: partNumber)
-        }
+    try await withThrowingTaskGroup(of: VideoUploadedPart.self) { group in
+      var iterator = pendingTargets.makeIterator()
+
+      func submitNext() {
+        guard let target = iterator.next() else { return }
         group.addTask {
-          try await self.uploadSinglePart(
-            partNumber: partNumber,
-            url: url,
-            fileLocation: fileLocation,
-            chunker: chunker
+          let partFile = chunker.partFileURL(
+            partNumber: target.partNumber,
+            in: chunkDirectory
           )
+          let etag = try await self.service.uploadPart(
+            to: target.url,
+            from: partFile,
+            identifier: VideoUploadPartIdentifier(
+              recordID: record.id,
+              partNumber: target.partNumber
+            )
+          )
+          return VideoUploadedPart(partNumber: target.partNumber, etag: etag)
         }
       }
 
-      for _ in 0..<min(configuration.maxConcurrentParts, partCount) {
-        try submitNext()
+      for _ in 0..<min(configuration.maxConcurrentParts, pendingTargets.count) {
+        submitNext()
       }
-      for try await etag in group {
-        etags.append(etag)
-        broadcast(.updated(record, progress: Double(etags.count) / Double(partCount)))
-        try submitNext()
-      }
-    }
-    return etags.sorted { $0.partNumber < $1.partNumber }
-  }
-
-  /// One part PUT with `configuration.partRetryCount` retries. Runs inside a
-  /// task-group child; nonisolated so concurrent parts never serialize on the
-  /// actor.
-  nonisolated private func uploadSinglePart(
-    partNumber: Int,
-    url: URL,
-    fileLocation: URL,
-    chunker: VideoFileChunker
-  ) async throws -> UploadPartETagDTO {
-    let data = try chunker.readPart(partNumber: partNumber, from: fileLocation)
-    var attempt = 0
-    while true {
-      try Task.checkCancellation()
       do {
-        let etag = try await service.uploadPart(to: url, data: data)
-        return UploadPartETagDTO(partNumber: partNumber, etag: etag)
-      } catch is CancellationError {
-        throw CancellationError()
-      } catch {
-        attempt += 1
-        guard attempt <= configuration.partRetryCount else { throw error }
-        if configuration.partRetryDelay > .zero {
-          try await Task.sleep(for: configuration.partRetryDelay)
+        for try await part in group {
+          try await persist(part: part, recordID: record.id)
+          submitNext()
         }
+      } catch is BackgroundUploadPipelineDeferred {
+        group.cancelAll()
+        throw BackgroundUploadPipelineDeferred()
+      } catch {
+        group.cancelAll()
+        await service.cancelParts(recordID: record.id)
+        throw error
       }
     }
+
+    guard let latest = try await repository.fetch(id: record.id),
+      latest.uploadedParts.count == latest.uploadPartCount
+    else {
+      throw VideoUploadError.fileUnreadable
+    }
+    return latest.uploadedParts
+      .sorted { $0.partNumber < $1.partNumber }
+      .map { UploadPartETagDTO(partNumber: $0.partNumber, etag: $0.etag) }
   }
 
-  private func markFailed(recordID: UUID, error: Error) async {
-    // A remove() racing this task already tore the record down — don't
-    // resurrect it from a stale failure.
-    if Task.isCancelled { return }
-    guard var record = try? await repository.fetch(id: recordID) else {
-      return
+  func persist(part: VideoUploadedPart, recordID: UUID) async throws {
+    guard var latest = try await repository.fetch(id: recordID) else {
+      throw CancellationError()
     }
-
-    // complete-409 means the backend row is terminal; abort would just 409 too.
-    if let remoteID = record.remoteAttachmentID,
-      (error as? VideoUploadError) != .completeConflict
-    {
-      try? await service.abort(attachmentID: remoteID)
-    }
-    record.remoteAttachmentID = nil
-    record.status = .failed
-    try? await repository.save(record)
-    broadcast(.updated(record, progress: nil))
-    Analytics.shared.mediaUpload(
-      .failed, context: .setLog, bytes: Int(clamping: record.sizeBytes))
+    latest.uploadedParts.removeAll { $0.partNumber == part.partNumber }
+    latest.uploadedParts.append(part)
+    latest.uploadedParts.sort { $0.partNumber < $1.partNumber }
+    try await repository.save(latest)
+    let progress =
+      latest.uploadPartCount > 0
+      ? Double(latest.uploadedParts.count) / Double(latest.uploadPartCount)
+      : nil
+    broadcast(.updated(latest, progress: progress))
   }
 
   static func partURLMap(
@@ -229,8 +235,6 @@ extension VideoUploadManager {
       guard let url = URL(string: dto.url) else {
         throw VideoUploadError.invalidPartURL(partNumber: dto.partNumber)
       }
-      // Count alone hides duplicates/out-of-range numbers, which would
-      // silently truncate the upload (Codex review P2).
       guard (1...expectedCount).contains(dto.partNumber), map[dto.partNumber] == nil else {
         throw VideoUploadError.invalidPartURL(partNumber: dto.partNumber)
       }

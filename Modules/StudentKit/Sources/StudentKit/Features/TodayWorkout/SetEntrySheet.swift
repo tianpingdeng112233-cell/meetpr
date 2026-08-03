@@ -16,6 +16,7 @@ struct SetEntrySheet: View {
   let setNumber: Int
   let viewModel: TodayWorkoutViewModel
   let studentID: UUID?
+  let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel?
   let scrollToVideo: Bool
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -41,6 +42,7 @@ struct SetEntrySheet: View {
     setNumber: Int,
     viewModel: TodayWorkoutViewModel,
     studentID: UUID? = nil,
+    trainingDate: Date = Date(),
     videoViewModel: VideoAttachmentViewModel? = nil,
     scrollToVideo: Bool = false
   ) {
@@ -49,6 +51,7 @@ struct SetEntrySheet: View {
     self.setNumber = setNumber
     self.viewModel = viewModel
     self.studentID = studentID
+    self.trainingDate = trainingDate
     self.videoViewModel = videoViewModel
     self.scrollToVideo = scrollToVideo
     _collarOn = State(initialValue: SetEntryPlateMath.defaultCollarOn)
@@ -123,6 +126,7 @@ struct SetEntrySheet: View {
             if let videoViewModel, let studentID {
               VideoAttachmentSection(
                 studentID: studentID,
+                trainingDate: trainingDate,
                 videoViewModel: videoViewModel,
                 initialSetLogID: liveDraft.loggedSetID,
                 resolveSetLogID: {

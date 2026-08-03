@@ -42,25 +42,98 @@ struct FailingVideoExporter: VideoExporting {
 /// per-part failures, complete errors, and a hang (for cancellation tests).
 actor MockVideoUploadService: VideoUploadService {
   let remoteAttachmentID = UUID()
+  nonisolated let backgroundSessionIdentifier = "mock-video-upload-\(UUID().uuidString)"
+  nonisolated let backgroundEvents: AsyncStream<BackgroundVideoUploadEvent>
+  nonisolated let backgroundEventContinuation: AsyncStream<BackgroundVideoUploadEvent>.Continuation
 
   private(set) var calls: [String] = []
   private(set) var partAttempts: [Int: Int] = [:]
   private(set) var abortCount = 0
 
   private var partFailuresRemaining: [Int: Int] = [:]
+  private var signatureFailuresRemaining: [Int: Int] = [:]
+  private var deterministicFailuresRemaining: [Int: Int] = [:]
   private var completeError: Error?
+  private var completeDelay: Duration?
   private var hangOnParts = false
+  private var partDelay: Duration?
+  private var pendingParts: Set<Int> = []
+  private var abortFailuresRemaining = 0
+
+  init() {
+    let stream = AsyncStream.makeStream(
+      of: BackgroundVideoUploadEvent.self,
+      bufferingPolicy: .bufferingNewest(20)
+    )
+    backgroundEvents = stream.stream
+    backgroundEventContinuation = stream.continuation
+  }
 
   func setPartFailures(_ failures: [Int: Int]) {
     partFailuresRemaining = failures
+  }
+
+  func setSignatureFailures(_ failures: [Int: Int]) {
+    signatureFailuresRemaining = failures
+  }
+
+  func setDeterministicFailures(_ failures: [Int: Int]) {
+    deterministicFailuresRemaining = failures
   }
 
   func setCompleteError(_ error: Error?) {
     completeError = error
   }
 
+  func setCompleteDelay(_ delay: Duration?) {
+    completeDelay = delay
+  }
+
   func setHangOnParts(_ hang: Bool) {
     hangOnParts = hang
+  }
+
+  func setPartDelay(_ delay: Duration?) {
+    partDelay = delay
+  }
+
+  func setPendingParts(_ partNumbers: Set<Int>) {
+    pendingParts = partNumbers
+  }
+
+  func setAbortFailures(_ count: Int) {
+    abortFailuresRemaining = count
+  }
+
+  func emitBackgroundEvent(_ event: BackgroundVideoPartEvent) {
+    let token = BackgroundUploadCompletionRegistry.shared.beginEvent(
+      identifier: backgroundSessionIdentifier
+    )
+    backgroundEventContinuation.yield(
+      .part(
+        BackgroundVideoPartEvent(
+          identifier: event.identifier,
+          result: event.result,
+          completionToken: token,
+          hasPipelineContinuation: event.hasPipelineContinuation
+        )
+      )
+    )
+  }
+
+  func finishBackgroundEvents() {
+    let completionToken = BackgroundUploadCompletionRegistry.shared.beginEvent(
+      identifier: backgroundSessionIdentifier
+    )
+    BackgroundUploadCompletionRegistry.shared.markEventsDelivered(
+      identifier: backgroundSessionIdentifier
+    )
+    backgroundEventContinuation.yield(
+      .sessionEventsFinished(
+        identifier: backgroundSessionIdentifier,
+        completionToken: completionToken
+      )
+    )
   }
 
   func initiate(_ request: InitiateUploadRequestDTO) async throws -> InitiateUploadResponseDTO {
@@ -75,12 +148,28 @@ actor MockVideoUploadService: VideoUploadService {
     )
   }
 
-  func uploadPart(to url: URL, data: Data) async throws -> String {
+  func uploadPart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws -> String {
+    _ = try Data(contentsOf: fileURL)
     let partNumber = Int(url.lastPathComponent) ?? 0
     calls.append("part:\(partNumber)")
     partAttempts[partNumber, default: 0] += 1
     if hangOnParts {
       try await Task.sleep(for: .seconds(60))
+    }
+    if let partDelay {
+      try await Task.sleep(for: partDelay)
+    }
+    if let remaining = signatureFailuresRemaining[partNumber], remaining > 0 {
+      signatureFailuresRemaining[partNumber] = remaining - 1
+      throw VideoPartUploadFailure.httpStatus(403)
+    }
+    if let remaining = deterministicFailuresRemaining[partNumber], remaining > 0 {
+      deterministicFailuresRemaining[partNumber] = remaining - 1
+      throw VideoPartUploadFailure.httpStatus(400)
     }
     if let remaining = partFailuresRemaining[partNumber], remaining > 0 {
       partFailuresRemaining[partNumber] = remaining - 1
@@ -89,9 +178,22 @@ actor MockVideoUploadService: VideoUploadService {
     return "etag-\(partNumber)"
   }
 
+  func schedulePart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws {
+    _ = try Data(contentsOf: fileURL)
+    calls.append("schedule:\(identifier.partNumber)")
+    pendingParts.insert(identifier.partNumber)
+  }
+
   func complete(attachmentID: UUID, parts: [UploadPartETagDTO]) async throws -> AttachmentDTO {
     let partList = parts.map { String($0.partNumber) }.joined(separator: ",")
     calls.append("complete:\(partList)")
+    if let completeDelay {
+      try await Task.sleep(for: completeDelay)
+    }
     if let completeError {
       throw completeError
     }
@@ -112,7 +214,20 @@ actor MockVideoUploadService: VideoUploadService {
   func abort(attachmentID: UUID) async throws {
     calls.append("abort")
     abortCount += 1
+    if abortFailuresRemaining > 0 {
+      abortFailuresRemaining -= 1
+      throw MockServiceError.partFailed
+    }
   }
+
+  func isBackgroundWakeActive() async -> Bool {
+    BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
+      identifier: backgroundSessionIdentifier
+    )
+  }
+
+  func pendingPartNumbers(recordID: UUID) async -> Set<Int> { pendingParts }
+  func cancelParts(recordID: UUID) async {}
 }
 
 /// Test fixture: a manager wired against mocks, with a throwaway files
@@ -126,7 +241,8 @@ struct VideoUploadHarness {
 
   init(
     exporter: any VideoExporting = MockVideoExporter(),
-    configuration: VideoUploadConfiguration = VideoUploadHarness.testConfiguration()
+    configuration: VideoUploadConfiguration = VideoUploadHarness.testConfiguration(),
+    failureNotifier: (any UploadFailureNotifying)? = nil
   ) {
     let service = MockVideoUploadService()
     let repository = InMemoryVideoAttachmentRepository()
@@ -140,22 +256,37 @@ struct VideoUploadHarness {
       exporter: exporter,
       repository: repository,
       configuration: configuration,
-      filesDirectory: directory
+      filesDirectory: directory,
+      retryScheduler: UploadRetryScheduler(
+        backoffSeconds: [0, 0, 0, 0, 0],
+        timeBoxSeconds: 30 * 60
+      ),
+      failureNotifier: failureNotifier
     )
   }
 
   /// Small parts + zero retry delay + serial parts so call order is exact.
-  static func testConfiguration(
-    maxConcurrentParts: Int = 1,
-    partRetryCount: Int = 2
-  ) -> VideoUploadConfiguration {
+  static func testConfiguration(maxConcurrentParts: Int = 1) -> VideoUploadConfiguration {
     VideoUploadConfiguration(
       partSizeBytes: 1_024,
       maxDurationSeconds: 120,
-      partRetryCount: partRetryCount,
-      maxConcurrentParts: maxConcurrentParts,
-      partRetryDelay: .zero
+      maxConcurrentParts: maxConcurrentParts
     )
+  }
+}
+
+actor RecordingUploadFailureNotifier: UploadFailureNotifying {
+  private(set) var authorizationRequestCount = 0
+  private(set) var notifiedCounts: [Int] = []
+  private(set) var destinations: [UploadFailureDestination] = []
+
+  func requestProvisionalAuthorization() async {
+    authorizationRequestCount += 1
+  }
+
+  func notifyTerminalFailures(count: Int, destination: UploadFailureDestination) async {
+    notifiedCounts.append(count)
+    destinations.append(destination)
   }
 }
 

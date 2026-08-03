@@ -38,6 +38,11 @@ import Testing
   // 15-200MB per video (Codex review P1); playback uses the backend URL.
   let exportedFile = harness.filesDirectory.appendingPathComponent("\(record.id.uuidString).mp4")
   #expect(!FileManager.default.fileExists(atPath: exportedFile.path))
+  #expect(
+    !FileManager.default.fileExists(
+      atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).parts").path
+    )
+  )
   #expect(uploaded.localFileName == nil)
 }
 
@@ -89,12 +94,14 @@ import Testing
 
   #expect(await harness.service.partAttempts[2] == 3)
   #expect(await harness.service.abortCount == 0)
+  let initiateCalls = await harness.service.calls.filter { $0.hasPrefix("initiate:") }
+  #expect(initiateCalls.count == 1)
 }
 
 @Test func uploadManagerMarksFailedAndAbortsAfterRetryExhaustion() async throws {
   let harness = VideoUploadHarness()
   // Part 1 fails more times than 1 initial attempt + 2 retries can absorb.
-  await harness.service.setPartFailures([1: 5])
+  await harness.service.setPartFailures([1: 6])
 
   let record = try await harness.manager.enqueue(
     sourceURL: harness.sourceURL,
@@ -103,7 +110,7 @@ import Testing
   )
   let failed = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
 
-  #expect(await harness.service.partAttempts[1] == 3)
+  #expect(await harness.service.partAttempts[1] == 6)
   #expect(await harness.service.abortCount == 1)
   // The stale backend row is dead; a retry must re-initiate from scratch.
   #expect(failed.remoteAttachmentID == nil)
@@ -162,11 +169,39 @@ import Testing
   #expect(await harness.service.abortCount == 1)
   let exportedFile = harness.filesDirectory.appendingPathComponent("\(record.id.uuidString).mp4")
   #expect(!FileManager.default.fileExists(atPath: exportedFile.path))
+  #expect(
+    !FileManager.default.fileExists(
+      atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).parts").path
+    )
+  )
+}
+
+@Test func removeUploadedAttachmentOnlyDeletesLocalAssociation() async throws {
+  let harness = VideoUploadHarness()
+  let record = try await harness.manager.enqueue(
+    sourceURL: harness.sourceURL,
+    setLogID: UUID(),
+    studentID: UUID()
+  )
+  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
+
+  await harness.manager.remove(attachmentID: record.id)
+
+  #expect(try await harness.repository.fetch(id: record.id) == nil)
+  #expect(await harness.service.abortCount == 0)
+  let cleanupStore = RemoteAttachmentCleanupStore(
+    fileURL: harness.filesDirectory.appending(path: "pending-remote-cleanup.json")
+  )
+  #expect(try await cleanupStore.pendingAttachmentIDs().isEmpty)
+}
+
+@Test func cleanupTreatsReadyAttachmentConflictAsTerminal() {
+  #expect(VideoUploadManager.isRemoteCleanupTerminal(.httpStatus(409, Data())))
 }
 
 @Test func retryAfterFailureReinitiatesFromScratch() async throws {
   let harness = VideoUploadHarness()
-  await harness.service.setPartFailures([1: 3])
+  await harness.service.setPartFailures([1: 6])
 
   let record = try await harness.manager.enqueue(
     sourceURL: harness.sourceURL,
@@ -175,6 +210,7 @@ import Testing
   )
   _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
 
+  await harness.service.setPartFailures([:])
   await harness.manager.retry(attachmentID: record.id)
   _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
 

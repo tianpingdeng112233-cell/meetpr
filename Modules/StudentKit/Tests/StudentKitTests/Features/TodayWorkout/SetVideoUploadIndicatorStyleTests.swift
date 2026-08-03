@@ -19,36 +19,25 @@ import Testing
 
 @Test func setVideoUploadIndicatorStyleMapsEveryUploadStatus() {
   #expect(SetVideoUploadIndicatorStyle.resolve(for: nil, progress: 0) == .unattached)
-  #expect(
-    SetVideoUploadIndicatorStyle.resolve(for: .pending, progress: 0.4)
-      == .uploading(progress: 0))
-  #expect(
-    SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: 0.42)
-      == .uploading(progress: 0.42))
-  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploaded, progress: 1) == .uploaded)
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: .pending, progress: 0.4) == .attached)
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: 0.42) == .attached)
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploaded, progress: 1) == .attached)
   #expect(SetVideoUploadIndicatorStyle.resolve(for: .failed, progress: 0.7) == .failed)
 }
 
-@Test func setVideoUploadIndicatorClampsUploadProgress() {
-  #expect(
-    SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: -0.3)
-      == .uploading(progress: 0))
-  #expect(
-    SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: 1.7)
-      == .uploading(progress: 1))
+@Test func setVideoUploadIndicatorIgnoresUploadProgress() {
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: -0.3) == .attached)
+  #expect(SetVideoUploadIndicatorStyle.resolve(for: .uploading, progress: 1.7) == .attached)
 }
 
 @Test func setVideoUploadIndicatorStrokeColorsMatchDesignTokens() {
   #expect(SetVideoUploadIndicatorStyle.unattached.strokeColor == Color.MeetPR.textMuted)
-  #expect(SetVideoUploadIndicatorStyle.uploaded.strokeColor == Color.MeetPR.success)
+  #expect(SetVideoUploadIndicatorStyle.attached.strokeColor == Color.MeetPR.textMuted)
   #expect(SetVideoUploadIndicatorStyle.failed.strokeColor == Color.MeetPR.danger)
-  #expect(SetVideoUploadIndicatorStyle.uploading(progress: 0.5).strokeColor == nil)
 }
 
 @Test func setVideoUploadIndicatorAccessibilityLabelsAreDistinct() {
   #expect(SetVideoUploadIndicatorStyle.unattached.accessibilityLabel == "未附视频")
-  #expect(
-    SetVideoUploadIndicatorStyle.uploading(progress: 0.65).accessibilityLabel == "视频上传中 65%")
-  #expect(SetVideoUploadIndicatorStyle.uploaded.accessibilityLabel == "视频已上传")
+  #expect(SetVideoUploadIndicatorStyle.attached.accessibilityLabel == "已附视频")
   #expect(SetVideoUploadIndicatorStyle.failed.accessibilityLabel == "视频上传失败")
 }

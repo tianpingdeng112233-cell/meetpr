@@ -7,16 +7,19 @@ import Networking
 public struct BackendVideoUploadService: VideoUploadService {
   private let api: APIClient
   private let session: any SessionStateReader
-  private let partUploader: OSSPartUploader
+  private let partUploader: BackgroundVideoPartUploader
+
+  public var backgroundEvents: AsyncStream<BackgroundVideoUploadEvent> {
+    partUploader.events
+  }
 
   public init(
     api: APIClient,
-    session: any SessionStateReader,
-    partUploader: OSSPartUploader = OSSPartUploader()
+    session: any SessionStateReader
   ) {
     self.api = api
     self.session = session
-    self.partUploader = partUploader
+    self.partUploader = BackgroundVideoPartUploader()
   }
 
   public func initiate(
@@ -25,8 +28,20 @@ public struct BackendVideoUploadService: VideoUploadService {
     try await api.initiateUpload(request, accessToken: session.accessToken())
   }
 
-  public func uploadPart(to url: URL, data: Data) async throws -> String {
-    try await partUploader.uploadPart(to: url, data: data)
+  public func uploadPart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws -> String {
+    try await partUploader.upload(to: url, from: fileURL, identifier: identifier)
+  }
+
+  public func schedulePart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws {
+    try partUploader.schedule(to: url, from: fileURL, identifier: identifier)
   }
 
   public func complete(
@@ -43,12 +58,30 @@ public struct BackendVideoUploadService: VideoUploadService {
   public func abort(attachmentID: UUID) async throws {
     try await api.abortUpload(attachmentID: attachmentID, accessToken: session.accessToken())
   }
+
+  public func isBackgroundWakeActive() async -> Bool {
+    BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
+      identifier: BackgroundVideoPartUploader.sessionIdentifier
+    )
+  }
+
+  public func pendingPartNumbers(recordID: UUID) async -> Set<Int> {
+    await partUploader.pendingParts(recordID: recordID)
+  }
+
+  public func cancelParts(recordID: UUID) async {
+    await partUploader.cancelParts(recordID: recordID)
+  }
 }
 
 /// Offline stand-in for demo builds and previews: every call succeeds
 /// instantly without touching the network.
 public struct LoopbackVideoUploadService: VideoUploadService {
   public init() {}
+
+  public var backgroundEvents: AsyncStream<BackgroundVideoUploadEvent> {
+    AsyncStream { continuation in continuation.finish() }
+  }
 
   public func initiate(
     _ request: InitiateUploadRequestDTO
@@ -63,8 +96,21 @@ public struct LoopbackVideoUploadService: VideoUploadService {
     )
   }
 
-  public func uploadPart(to url: URL, data: Data) async throws -> String {
-    "demo-etag"
+  public func uploadPart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws -> String {
+    _ = try Data(contentsOf: fileURL)
+    return "demo-etag"
+  }
+
+  public func schedulePart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws {
+    _ = try Data(contentsOf: fileURL)
   }
 
   public func complete(
@@ -86,4 +132,9 @@ public struct LoopbackVideoUploadService: VideoUploadService {
   }
 
   public func abort(attachmentID: UUID) async throws {}
+
+  public func isBackgroundWakeActive() async -> Bool { false }
+
+  public func pendingPartNumbers(recordID: UUID) async -> Set<Int> { [] }
+  public func cancelParts(recordID: UUID) async {}
 }
