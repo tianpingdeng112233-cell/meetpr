@@ -1,5 +1,6 @@
 import ChatUI
 import Foundation
+import Networking
 import Observation
 import RepositoryContracts
 
@@ -10,17 +11,20 @@ public struct ChatSessionContext {
   public let currentUserID: UUID
   public let inbox: ChatInboxViewModel
   public let sendCoordinator: ChatSendCoordinator
+  public let realtimeClient: RealtimeClient?
 
   public init(
     repository: any ChatRepository,
     currentUserID: UUID,
     inbox: ChatInboxViewModel,
-    sendCoordinator: ChatSendCoordinator
+    sendCoordinator: ChatSendCoordinator,
+    realtimeClient: RealtimeClient? = nil
   ) {
     self.repository = repository
     self.currentUserID = currentUserID
     self.inbox = inbox
     self.sendCoordinator = sendCoordinator
+    self.realtimeClient = realtimeClient
   }
 }
 
@@ -51,6 +55,13 @@ public final class ChatSessionController {
   /// immediately — so overlapping callers must join this instead.
   @ObservationIgnored private var teardownTask: Task<Void, Never>?
   @ObservationIgnored private var teardownToken: UInt64 = 0
+  @ObservationIgnored private var realtimeClientFactory: (@Sendable () -> RealtimeClient?)?
+  /// Scene-phase intent, recorded synchronously so an activation that is still
+  /// suspended cannot connect after the app already went to background.
+  @ObservationIgnored private var desiredForeground = true
+  /// Serializes lifecycle applications: only the newest apply may act, so
+  /// rapid background/active flips cannot land out of order.
+  @ObservationIgnored private var lifecycleGeneration: UInt64 = 0
 
   public init() {
     invalidationRouter = ChatBindingInvalidationRouter()
@@ -58,6 +69,21 @@ public final class ChatSessionController {
 
   init(invalidationRouter: ChatBindingInvalidationRouter) {
     self.invalidationRouter = invalidationRouter
+  }
+
+  public func configureRealtime(
+    baseURL: URL,
+    session: Session
+  ) {
+    configureRealtime(factory: { [weak session] in
+      guard let session else { return nil }
+      return RealtimeClient(baseURL: baseURL, session: session)
+    })
+  }
+
+  /// Internal seam so tests can supply a client without a live `Session`.
+  func configureRealtime(factory: @escaping @Sendable () -> RealtimeClient?) {
+    realtimeClientFactory = factory
   }
 
   public func activateCoach(
@@ -91,13 +117,16 @@ public final class ChatSessionController {
       onBindingInvalidated: onBindingInvalidated
     )
     guard generation == activationGeneration else { return }
+    let realtimeClient = makeRealtimeClient(attachedTo: inbox)
     context = ChatSessionContext(
       repository: repository,
       currentUserID: currentUserID,
       inbox: inbox,
-      sendCoordinator: sendCoordinator
+      sendCoordinator: sendCoordinator,
+      realtimeClient: realtimeClient
     )
     activeStudentCoachID = nil
+    resyncChatLifecycle()
   }
 
   public func activateStudent(
@@ -152,15 +181,18 @@ public final class ChatSessionController {
       currentUserID: currentUserID,
       onBindingInvalidated: onBindingInvalidated
     )
+    let realtimeClient = makeRealtimeClient(attachedTo: inbox)
     context = ChatSessionContext(
       repository: repository,
       currentUserID: currentUserID,
       inbox: inbox,
-      sendCoordinator: sendCoordinator
+      sendCoordinator: sendCoordinator,
+      realtimeClient: realtimeClient
     )
     activeStudentCoachID = activeCoachID
     isChangingStudentBinding = false
     pendingStudentCoachID = nil
+    resyncChatLifecycle()
   }
 
   public func prepareForStudentBindingChange(
@@ -179,6 +211,37 @@ public final class ChatSessionController {
 
   public func reportBindingInvalidation() async {
     await invalidationRouter.route()
+  }
+
+  /// Records the scene-phase intent synchronously (callers are on the main
+  /// actor), then applies it asynchronously under a lifecycle generation.
+  public func noteScenePhase(isActive: Bool) {
+    desiredForeground = isActive
+    resyncChatLifecycle()
+  }
+
+  /// Re-applies the current foreground intent to the live chat context.
+  /// Activation calls this instead of connecting directly: the connect then
+  /// happens under the same generation discipline as scene-phase changes.
+  private func resyncChatLifecycle() {
+    lifecycleGeneration &+= 1
+    let generation = lifecycleGeneration
+    Task { @MainActor [weak self] in
+      await self?.applyLifecycle(generation: generation)
+    }
+  }
+
+  private func applyLifecycle(generation: UInt64) async {
+    guard generation == lifecycleGeneration, let context else { return }
+    if desiredForeground {
+      context.inbox.startPolling()
+      await context.realtimeClient?.connect()
+      guard generation == lifecycleGeneration else { return }
+      await context.inbox.refresh()
+    } else {
+      context.inbox.stopPolling()
+      await context.realtimeClient?.disconnect()
+    }
   }
 
   public func cancelAllAndWaitForCleanup() async {
@@ -214,6 +277,7 @@ public final class ChatSessionController {
     let token = teardownToken
     let task = Task { @MainActor in
       context.inbox.stopPolling()
+      await context.realtimeClient?.disconnect()
       await context.sendCoordinator.cancelAllAndWaitForCleanup()
       context.inbox.clear()
     }
@@ -222,6 +286,14 @@ public final class ChatSessionController {
     if teardownToken == token {
       teardownTask = nil
     }
+  }
+
+  private func makeRealtimeClient(
+    attachedTo inbox: ChatInboxViewModel
+  ) -> RealtimeClient? {
+    guard let realtimeClient = realtimeClientFactory?() else { return nil }
+    inbox.attachRealtime(events: realtimeClient.events, state: realtimeClient.state)
+    return realtimeClient
   }
 }
 

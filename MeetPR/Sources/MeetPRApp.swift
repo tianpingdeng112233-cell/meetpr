@@ -283,6 +283,7 @@ struct MeetPRApp: App {
         draftStore: draftStore,
         chatSession: controller
       )
+      controller.configureRealtime(baseURL: BuildConfig.backendBaseURL, session: session)
       return LiveChatDependencies(
         session: session,
         controller: controller,
