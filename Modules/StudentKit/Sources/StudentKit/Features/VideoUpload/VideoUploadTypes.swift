@@ -55,7 +55,8 @@ public enum VideoUploadEvent: Equatable, Sendable {
 /// testable without rendering video (spec 027 tests).
 public protocol VideoExporting: Sendable {
   func durationSeconds(of sourceURL: URL) async throws -> Double
-  /// Prepares an H.264 MP4, remuxing eligible sources and transcoding others.
+  /// Re-encodes the source into a bitrate-capped, fast-start H.264 MP4
+  /// sized for upload (long edge ≤1280, spec 065).
   func export(from sourceURL: URL, to destinationURL: URL) async throws
 }
 
