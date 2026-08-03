@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import AppShell
 import ChatUI
 import CoachKit
@@ -8,13 +9,18 @@ import RepositoryContracts
 import StudentKit
 import SwiftData
 import SwiftUI
+import UserNotifications
 
 @main
 @MainActor
 // swiftlint:disable:next type_body_length
 struct MeetPRApp: App {
+  @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
   private let draftStore: DraftStore
   private let rootView: RootView
+  #if !DEMO_MODE
+    private let pushNotificationDelegate: PushNotificationDelegate
+  #endif
   @State private var session: Session
 
   init() {
@@ -24,6 +30,14 @@ struct MeetPRApp: App {
     let dependencies = Self.makeRootDependencies(draftStore: draftStore)
     rootView = dependencies.rootView
     _session = State(initialValue: dependencies.session)
+    #if !DEMO_MODE
+      let notificationDelegate = PushNotificationDelegate(
+        registrar: dependencies.pushRegistrar
+      )
+      pushNotificationDelegate = notificationDelegate
+      AppDelegate.pushRegistrar = dependencies.pushRegistrar
+      UNUserNotificationCenter.current().delegate = notificationDelegate
+    #endif
   }
 
   #if DEMO_MODE
@@ -248,6 +262,12 @@ struct MeetPRApp: App {
       let repository: NetworkChatRepository
     }
 
+    private struct LiveRootDependencies {
+      let rootView: RootView
+      let session: Session
+      let pushRegistrar: PushRegistrar
+    }
+
     private static func makeSession(
       api: APIClient,
       draftStore: DraftStore,
@@ -295,12 +315,14 @@ struct MeetPRApp: App {
       )
     }
 
+    // swiftlint:disable:next function_body_length
     private static func makeRootDependencies(
       draftStore: DraftStore
-    ) -> (rootView: RootView, session: Session) {
+    ) -> LiveRootDependencies {
       let api = APIClient.shared
       let chat = makeLiveChatDependencies(api: api, draftStore: draftStore)
-      return (
+      let pushRegistrar = PushRegistrar(apiClient: api, session: chat.session)
+      return LiveRootDependencies(
         rootView: RootView(
           coachPlans: BackendPlanRepository(
             api: api, session: chat.session, cache: PlanCache()),
@@ -354,9 +376,11 @@ struct MeetPRApp: App {
           chatSession: chat.controller,
           chatRepository: chat.repository,
           draftStore: draftStore,
-          analyticsMode: .live
+          analyticsMode: .live,
+          pushRegistrar: pushRegistrar
         ),
-        session: chat.session
+        session: chat.session,
+        pushRegistrar: pushRegistrar
       )
     }
   #endif

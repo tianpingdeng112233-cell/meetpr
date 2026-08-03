@@ -93,8 +93,8 @@ public struct EvaluationPeriodView: View {
       await viewModel.refresh()
     }
     .onChange(of: scenePhase) { _, newPhase in
-      // Foreground return is the V0.1b "push": the coach may have
-      // completed the evaluation meanwhile.
+      // APNs wiring lives in spec 067; foreground return remains the source
+      // of truth for evaluation completion state.
       guard newPhase == .active else { return }
       Task { await viewModel.refresh() }
     }

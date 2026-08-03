@@ -14,6 +14,7 @@ struct CoachReceivingView: View {
   private let markerRepository: any VideoMarkerRepository
   private let studentStatuses: [UUID: CoachStudentStatus]
   private let chat: CoachChatContext?
+  @Binding private var pushedConversationID: UUID?
 
   @State private var conversationOpener: CoachConversationOpener
   @State private var videoStudentTarget: PendingVideoStudentGroup?
@@ -24,7 +25,8 @@ struct CoachReceivingView: View {
     trainingLogs: any StudentTrainingLogRepository = EmptyStudentTrainingLogRepository(),
     markerRepository: any VideoMarkerRepository = InMemoryVideoMarkerRepository(),
     studentStatuses: [UUID: CoachStudentStatus] = [:],
-    chat: CoachChatContext? = nil
+    chat: CoachChatContext? = nil,
+    pushedConversationID: Binding<UUID?> = .constant(nil)
   ) {
     self.now = now
     self.videoQueueViewModel = videoQueueViewModel
@@ -32,6 +34,7 @@ struct CoachReceivingView: View {
     self.markerRepository = markerRepository
     self.studentStatuses = studentStatuses
     self.chat = chat
+    self._pushedConversationID = pushedConversationID
     _conversationOpener = State(initialValue: CoachConversationOpener(chat: chat))
   }
 
@@ -100,6 +103,9 @@ struct CoachReceivingView: View {
     .task {
       Analytics.shared.screen(.coachReceiving)
       await videoQueueViewModel.loadIfNeeded()
+    }
+    .task(id: pushedConversationID) {
+      await openPushedConversationIfNeeded()
     }
   }
 
@@ -258,6 +264,16 @@ struct CoachReceivingView: View {
         studentName: row.studentName
       )
     }
+  }
+
+  private func openPushedConversationIfNeeded() async {
+    guard let conversationID = pushedConversationID, let chat else { return }
+    await chat.inbox.refresh()
+    guard pushedConversationID == conversationID else { return }
+    if let conversation = chat.inbox.conversations.first(where: { $0.id == conversationID }) {
+      conversationOpener.openConversation(conversation)
+    }
+    pushedConversationID = nil
   }
 
 }

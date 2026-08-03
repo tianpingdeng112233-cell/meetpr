@@ -1,4 +1,4 @@
-// swiftlint:disable type_body_length
+// swiftlint:disable file_length type_body_length
 import Analytics
 import CoreModels
 import DesignSystem
@@ -26,6 +26,7 @@ public struct DashboardView: View {
   private let todayReloadToken: Int
   private let todayVolatileReloadToken: Int
   private let onFullReload: () -> Void
+  @Binding private var pushedConversationID: UUID?
 
   @State private var weekViewModel: WeekOverviewViewModel
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
@@ -55,7 +56,8 @@ public struct DashboardView: View {
     todayReloadToken: Int = 0,
     todayVolatileReloadToken: Int = 0,
     onFullReload: @escaping () -> Void = {},
-    onPlanChanged: @escaping () -> Void = {}
+    onPlanChanged: @escaping () -> Void = {},
+    pushedConversationID: Binding<UUID?> = .constant(nil)
   ) {
     self.studentID = studentID
     self.canShiftPlanDays = canShiftPlanDays
@@ -71,6 +73,7 @@ public struct DashboardView: View {
     self.todayVolatileReloadToken = todayVolatileReloadToken
     self.onFullReload = onFullReload
     self.onPlanChanged = onPlanChanged
+    self._pushedConversationID = pushedConversationID
     self._weekViewModel = State(initialValue: WeekOverviewViewModel(plans: plans, logs: logs))
     self._e1rmTrendViewModel = State(
       initialValue: DashboardE1RMTrendViewModel(
@@ -139,6 +142,9 @@ public struct DashboardView: View {
     }
     .onChange(of: todayVolatileReloadToken) { _, _ in
       Task { await reloadVolatileData() }
+    }
+    .task(id: pushedConversationID) {
+      await openPushedConversationIfNeeded()
     }
     #if os(iOS)
       .fullScreenCover(item: $shiftProposal) { proposal in
@@ -240,6 +246,20 @@ public struct DashboardView: View {
     async let metricsLoad: Void = loadMetricsIfNeeded()
     _ = await (weekLoad, notificationLoad, trendLoad, metricsLoad)
     await loadNewPRCount()
+  }
+
+  private func openPushedConversationIfNeeded() async {
+    guard let requestedID = pushedConversationID else { return }
+    guard let notifications else {
+      pushedConversationID = nil
+      return
+    }
+    let openedID = await notifications.openCoachConversation()
+    guard pushedConversationID == requestedID else { return }
+    if openedID == requestedID {
+      conversationID = openedID
+    }
+    pushedConversationID = nil
   }
 
   private func reload() async {
@@ -381,15 +401,4 @@ public struct DashboardView: View {
   }
 }
 
-private enum DashboardDayShiftAlert: Identifiable {
-  case confirmCancel(Date)
-  case message(title: String, text: String)
-
-  var id: String {
-    switch self {
-    case .confirmCancel(let date): "cancel-\(date.timeIntervalSince1970)"
-    case .message(let title, let text): "message-\(title)-\(text)"
-    }
-  }
-}
-// swiftlint:enable type_body_length
+// swiftlint:enable file_length type_body_length

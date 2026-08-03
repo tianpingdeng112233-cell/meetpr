@@ -5,8 +5,8 @@ import RepositoryContracts
 import SwiftUI
 
 /// Waiting-for-coach page (spec 031 §7). Refresh paths: pull-to-refresh,
-/// onAppear, and scenePhase → .active (handled by BindGateView). No polling,
-/// no push — V0.1b has no APNs (spec 031 D9) and the copy promises none.
+/// onAppear, and scenePhase → .active (handled by BindGateView). APNs app
+/// registration/routing is owned by spec 067; this state still uses refresh.
 @available(iOS 17.0, macOS 14.0, *)
 struct PendingBindView: View {
   let request: BindRequest

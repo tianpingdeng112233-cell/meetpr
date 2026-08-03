@@ -210,6 +210,11 @@
 				TargetAttributes = {
 					AA0000000000000000000006 = {
 						CreatedOnToolsVersion = 26.4.1;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					AA0000000000000000000060 = {
 						CreatedOnToolsVersion = 26.4.1;
@@ -363,6 +368,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MeetPR/MeetPR.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28JW4SA779;
 				ENABLE_PREVIEWS = YES;
@@ -544,6 +550,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BACKEND_BASE_URL = "http://121.40.160.241:3000";
+				CODE_SIGN_ENTITLEMENTS = MeetPR/MeetPR.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28JW4SA779;
 				ENABLE_PREVIEWS = YES;
@@ -570,6 +577,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BACKEND_BASE_URL = "http://121.40.160.241:3000";
+				CODE_SIGN_ENTITLEMENTS = MeetPR/MeetPR.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28JW4SA779;
 				ENABLE_PREVIEWS = YES;
@@ -712,6 +720,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				BACKEND_BASE_URL = "http://demo.invalid";
+				CODE_SIGN_ENTITLEMENTS = MeetPR/MeetPR.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28JW4SA779;
 				ENABLE_PREVIEWS = YES;

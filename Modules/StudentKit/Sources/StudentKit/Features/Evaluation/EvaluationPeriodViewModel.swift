@@ -6,7 +6,7 @@ import RepositoryContracts
 /// Student evaluation-period page state (spec 033 §11): countdown, the
 /// latest coach messages (feedback reuse), and the adaptation-week training
 /// entry. Completion is discovered on foreground/appear refresh — no
-/// background polling (V0.1b has no push).
+/// background polling; APNs app registration/routing is owned by spec 067.
 @Observable
 @MainActor
 public final class EvaluationPeriodViewModel {

@@ -29,6 +29,7 @@ public struct StudentRootView: View {
   private let onLogout: (@MainActor () async -> Void)?
   private let account: (any AccountRepository)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  @Binding private var pushRoute: PushRouteIntent?
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var notifications: StudentNotificationsCoordinator?
@@ -118,7 +119,8 @@ public struct StudentRootView: View {
     inbox: ChatInboxViewModel? = nil,
     sendCoordinator: ChatSendCoordinator? = nil,
     activeCoach: ActiveCoachContext? = nil,
-    onBindingInvalidated: @escaping @Sendable () async -> Void = {}
+    onBindingInvalidated: @escaping @Sendable () async -> Void = {},
+    pushRoute: Binding<PushRouteIntent?> = .constant(nil)
   ) {
     self.studentID = studentID
     self.canShiftPlanDays = canShiftPlanDays
@@ -131,6 +133,7 @@ public struct StudentRootView: View {
     self.onLogout = onLogout
     self.account = account
     self.restTimerSettings = restTimerSettings
+    self._pushRoute = pushRoute
     let resolvedOnboarding =
       onboarding
       ?? InMemoryOnboardingRepository(
@@ -233,7 +236,8 @@ extension StudentRootView {
         onFullReload: {
           todayRefreshThrottle.recordFullRefresh(at: Date())
         },
-        onPlanChanged: { planRevision += 1 }
+        onPlanChanged: { planRevision += 1 },
+        pushedConversationID: pushedConversationIDBinding
       )
       .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
       .modifier(MeetPRLaunchExitModifier(progress: dashboardExitProgress))
@@ -326,6 +330,7 @@ extension StudentRootView {
       )
     }
     .task {
+      handlePushRoute(pushRoute)
       Analytics.shared.screen(.dashboard)
       if let notifications {
         await notifications.loadIfNeeded(studentID: studentID)
@@ -365,6 +370,9 @@ extension StudentRootView {
         Analytics.shared.screen(.account)
       }
     }
+    .onChange(of: pushRoute) { _, route in
+      handlePushRoute(route)
+    }
     .onChange(of: reduceMotion) { _, newValue in
       guard newValue, launchMorphPhase != .idle else { return }
       finishLaunchForReducedMotion()
@@ -395,6 +403,31 @@ extension StudentRootView {
   private func openPlanNotification() {
     trainingJumpToken += 1
     selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
+  }
+
+  private func handlePushRoute(_ route: PushRouteIntent?) {
+    guard let route else { return }
+    switch route {
+    case .chatMessage:
+      // The current student shell has no standalone messages tab; its existing
+      // inbox path presents the coach conversation from the 今日 tab.
+      selectedTab = .today
+    case .missedTraining, .prCongrats, .videoPending, .bindRequest, .planShift:
+      pushRoute = nil
+    }
+  }
+
+  private var pushedConversationIDBinding: Binding<UUID?> {
+    Binding(
+      get: {
+        guard case .chatMessage(let conversationID) = pushRoute else { return nil }
+        return conversationID
+      },
+      set: { conversationID in
+        guard conversationID == nil else { return }
+        pushRoute = nil
+      }
+    )
   }
 
   private func startWorkoutFromDashboard(handoff: TodayWorkoutPlanHandoff?) {
