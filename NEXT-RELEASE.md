@@ -11,6 +11,15 @@
 
 ## 本版将包含(落线后追加到这里)
 
+- **spec 068 自建录制相机 + 直通快路**(PR #307,2026-08-03 squash 合入 8cb7b51)[P1]:
+  拍摄换自建 AVCaptureSession(720p/60fps 可锁则锁,边录边按 065 口径编码,录完即上传就绪,
+  「处理中」近乎归零);录制状态机(starting/stopping+generation)抗来电/切后台/首帧失败;
+  存相册从恒存改可选 toggle(默认开=保持现行为,留底变 720p 压缩版);恢复 065 无意移除的
+  #269 remux 直通快路(遍历全部 format descriptions,失败回退全量转码)。
+  闸门:review-loop 3 轮 4 BLOCKER 全清,StudentKit 665 绿,Demo sim build 过。
+  ⚠️ 切包前必须真机 smoke(模拟器无相机):录 10s→处理中近乎瞬时→上传→教练端可播、
+  竖屏方向正确;存相册开关两态;昏暗场地录一条验体积。
+
 - **spec 065 视频导出控码率(拍摄上传提速)**(PR #304,2026-08-03 squash 合入 95d0b32)[P1]:
   学员反馈「app 内拍摄的视频上传特别慢」根治。导出器从 AVAssetExportSession(1080p preset
   ~10Mbps 无码率控制)重写为 AVAssetReader+AVAssetWriter:H.264 长边 ≤1280 只降不升、
