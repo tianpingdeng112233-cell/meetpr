@@ -11,6 +11,15 @@
 
 ## 本版将包含(落线后追加到这里)
 
+- **spec 065 视频导出控码率(拍摄上传提速)**(PR #304,2026-08-03 squash 合入 95d0b32)[P1]:
+  学员反馈「app 内拍摄的视频上传特别慢」根治。导出器从 AVAssetExportSession(1080p preset
+  ~10Mbps 无码率控制)重写为 AVAssetReader+AVAssetWriter:H.264 长边 ≤1280 只降不升、
+  2.75Mbps average + 3.5Mbps/1s DataRateLimits 硬顶(纯 average 会被昏暗健身房噪点类内容
+  顶穿到 ~8Mbps,review-loop 实测发现)、AAC 96k、fast-start mp4、保帧率与竖屏 transform;
+  拍摄采集降档 .typeIFrame1280x720。2min 拍摄视频 ~150MB → ~40-50MB。
+  闸门:StudentKit 657 绿 + 60s 1080p 超标源实测 ≤3.5Mbps + Demo sim build 0 warning。
+  ⚠️ 切包前建议真机 smoke:昏暗场地拍 30s 上传,验体积与教练端可播。
+
 - **spec 066 聊天实时化**(PR #305,2026-08-03 合入,52bd0a0):聊天从 30s/3s 轮询升级为
   WebSocket 实时推送(教练/学员两端同吃),断线无感回退轮询,回前台重连+立即刷新。
   服务端 = backend spec 032(PR #190 已合并部署 staging)。
