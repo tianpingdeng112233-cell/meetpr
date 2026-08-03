@@ -215,7 +215,7 @@ func invalidSourceReportsExportFailureAndRemovesOutput() async throws {
   do {
     try await AVFoundationVideoExporter().export(from: sourceURL, to: outputURL)
     Issue.record("Expected export to fail")
-  } catch let VideoUploadError.exportFailed(reason) {
+  } catch VideoUploadError.exportFailed(let reason) {
     #expect(!reason.isEmpty)
   } catch {
     Issue.record("Unexpected error: \(error)")
