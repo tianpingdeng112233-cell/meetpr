@@ -307,7 +307,7 @@ public struct TodayWorkoutView: View {
         isPresented: $showingDirectCamera,
         onDismiss: { directCameraTarget = nil },
         content: {
-          CameraVideoPicker(
+          CameraRecorderView(
             maxDurationSeconds: videoViewModel.maxDurationSeconds,
             isPresented: $showingDirectCamera,
             onPicked: { url in
@@ -318,7 +318,6 @@ public struct TodayWorkoutView: View {
               }
               preparingVideoSetID = target.id
               Task {
-                await VideoLibrarySaver.save(url)
                 await attachDirectCameraVideo(sourceURL: url, target: target)
               }
             },
@@ -574,7 +573,7 @@ public struct TodayWorkoutView: View {
 
   private var cameraAvailable: Bool {
     #if os(iOS)
-      CameraVideoPicker.isAvailable
+      CameraRecorderView.isAvailable
     #else
       false
     #endif

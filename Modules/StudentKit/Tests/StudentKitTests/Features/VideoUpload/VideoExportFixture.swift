@@ -4,7 +4,7 @@ import CoreVideo
 import Foundation
 
 /// Renders throwaway source movies for the exporter tests: configurable
-/// resolution, frame rate, transform, entropy, and an optional PCM audio track.
+/// resolution, frame rate, transform, entropy, and an optional audio track.
 struct VideoExportFixture: Sendable {
   let directory: URL
   let sourceURL: URL
@@ -107,15 +107,7 @@ struct VideoExportFixture: Sendable {
     guard let channelCount = configuration.audioChannelCount else { return nil }
     let input = AVAssetWriterInput(
       mediaType: .audio,
-      outputSettings: [
-        AVFormatIDKey: kAudioFormatLinearPCM,
-        AVSampleRateKey: FixtureAudio.sampleRate,
-        AVNumberOfChannelsKey: channelCount,
-        AVLinearPCMBitDepthKey: 16,
-        AVLinearPCMIsFloatKey: false,
-        AVLinearPCMIsBigEndianKey: false,
-        AVLinearPCMIsNonInterleaved: false,
-      ]
+      outputSettings: configuration.audioEncoding.outputSettings(channelCount: channelCount)
     )
     guard writer.canAdd(input) else {
       throw FixtureError.unavailable("Unable to add fixture audio input")
@@ -336,6 +328,34 @@ struct VideoFixtureConfiguration: Sendable {
   var sourceBitRate = 400_000
   var highEntropy = false
   var audioChannelCount: Int?
+  var audioEncoding: FixtureAudioEncoding = .pcm
+}
+
+enum FixtureAudioEncoding: Sendable {
+  case pcm
+  case aac
+
+  func outputSettings(channelCount: Int) -> [String: Any] {
+    switch self {
+    case .pcm:
+      [
+        AVFormatIDKey: kAudioFormatLinearPCM,
+        AVSampleRateKey: FixtureAudio.sampleRate,
+        AVNumberOfChannelsKey: channelCount,
+        AVLinearPCMBitDepthKey: 16,
+        AVLinearPCMIsFloatKey: false,
+        AVLinearPCMIsBigEndianKey: false,
+        AVLinearPCMIsNonInterleaved: false,
+      ]
+    case .aac:
+      [
+        AVFormatIDKey: kAudioFormatMPEG4AAC,
+        AVEncoderBitRateKey: 96_000,
+        AVSampleRateKey: FixtureAudio.sampleRate,
+        AVNumberOfChannelsKey: channelCount,
+      ]
+    }
+  }
 }
 
 enum FixtureError: Error {

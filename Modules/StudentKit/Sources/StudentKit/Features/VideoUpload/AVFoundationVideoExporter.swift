@@ -35,27 +35,26 @@ public struct AVFoundationVideoExporter: VideoExporting {
       guard videoTracks.count == 1, let videoTrack = videoTracks.first else {
         throw VideoUploadError.exportFailed("Expected exactly one video track")
       }
+      let audioTrack = try await asset.loadTracks(withMediaType: .audio).first
+      let decision = try await Self.exportDecision(videoTrack: videoTrack, audioTrack: audioTrack)
 
-      let reader = try AVAssetReader(asset: asset)
-      let writer = try AVAssetWriter(outputURL: destinationURL, fileType: .mp4)
-      writer.shouldOptimizeForNetworkUse = true
-
-      let videoStream = try await makeVideoStream(
-        track: videoTrack,
-        reader: reader,
-        writer: writer
-      )
-      var streams = [videoStream]
-
-      if let audioTrack = try await asset.loadTracks(withMediaType: .audio).first {
-        streams.append(
-          try await makeAudioStream(track: audioTrack, reader: reader, writer: writer)
+      try await VideoExportStrategy.run(initialDecision: decision) { attempt in
+        try Task.checkCancellation()
+        try? FileManager.default.removeItem(at: destinationURL)
+        let reader = try AVAssetReader(asset: asset)
+        let writer = try AVAssetWriter(outputURL: destinationURL, fileType: .mp4)
+        writer.shouldOptimizeForNetworkUse = true
+        let streams = try await makeStreams(
+          videoTrack: videoTrack,
+          audioTrack: audioTrack,
+          decision: attempt,
+          reader: reader,
+          writer: writer
         )
+        try Task.checkCancellation()
+        let coordinator = AssetWriterCoordinator(reader: reader, writer: writer, streams: streams)
+        try await coordinator.run()
       }
-
-      try Task.checkCancellation()
-      let coordinator = AssetWriterCoordinator(reader: reader, writer: writer, streams: streams)
-      try await coordinator.run()
       succeeded = true
     } catch is CancellationError {
       throw CancellationError()
@@ -67,7 +66,7 @@ public struct AVFoundationVideoExporter: VideoExporting {
     }
   }
 
-  private func makeVideoStream(
+  func makeVideoStream(
     track: AVAssetTrack,
     reader: AVAssetReader,
     writer: AVAssetWriter
@@ -119,7 +118,7 @@ public struct AVFoundationVideoExporter: VideoExporting {
     return AssetWriterStream(input: writerInput, output: readerOutput, label: "video")
   }
 
-  private func makeAudioStream(
+  func makeAudioStream(
     track: AVAssetTrack,
     reader: AVAssetReader,
     writer: AVAssetWriter
