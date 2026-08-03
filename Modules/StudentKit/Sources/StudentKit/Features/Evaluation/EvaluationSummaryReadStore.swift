@@ -1,9 +1,8 @@
 import Foundation
 
-/// Local read-state for the evaluation summary (spec 033 D7): V0.1b has no
-/// APNs, so "unread" is a device-local timestamp compared against the wire's
-/// `last_updated_at`. Losing it on a device switch only re-shows the
-/// dashboard card once — acceptable.
+/// Local read-state for the evaluation summary (spec 033 D7). Spec 067 adds
+/// APNs registration/routing but no server-side read receipt, so "unread"
+/// remains a device-local timestamp compared against wire `last_updated_at`.
 public protocol EvaluationSummaryReadStoring: Sendable {
   func lastReadAt(studentID: UUID) -> Date?
   func markRead(studentID: UUID, at date: Date)

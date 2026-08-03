@@ -1,11 +1,13 @@
 import Analytics
 import ChatUI
+import CoreModels
 import DesignSystem
 import Foundation
 import RepositoryContracts
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
+// swiftlint:disable:next type_body_length
 public struct CoachRootView: View {
   private let repository: any PlanRepository
   private let studentPlans: any StudentPlanRepository
@@ -17,6 +19,7 @@ public struct CoachRootView: View {
   private let detailContext: CoachStudentDetailContext
   private let chat: CoachChatContext?
   private let draftStore: DraftStore
+  @Binding private var pushRoute: PushRouteIntent?
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var queueViewModel: BindQueueViewModel
   @State private var videoQueueViewModel: CoachVideoQueueViewModel
@@ -58,7 +61,8 @@ public struct CoachRootView: View {
     coachDisplayName: String? = nil,
     privacyPolicyURL: URL? = nil,
     onLogout: @escaping @MainActor () async -> Void = {},
-    draftStore: DraftStore = DraftStore.shared
+    draftStore: DraftStore = DraftStore.shared,
+    pushRoute: Binding<PushRouteIntent?> = .constant(nil)
   ) {
     self.repository = repository
     self.studentPlans = studentPlans
@@ -67,6 +71,7 @@ public struct CoachRootView: View {
     self.videoMarkers = videoMarkers ?? InMemoryVideoMarkerRepository()
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
     self.draftStore = draftStore
+    self._pushRoute = pushRoute
     let resolvedQueue =
       bindQueue ?? InMemoryCoachBindQueueRepository(coachId: UUID())
     let resolvedEvaluations = evaluations ?? InMemoryCoachEvaluationRepository()
@@ -168,7 +173,8 @@ public struct CoachRootView: View {
         trainingLogs: studentLogs,
         markerRepository: videoMarkers,
         studentStatuses: studentStatuses,
-        chat: chat
+        chat: chat,
+        pushedConversationID: pushedConversationIDBinding
       )
       .coachTabLayer(shell.layer(for: .messages), store: tabHostStore)
 
@@ -254,6 +260,7 @@ public struct CoachRootView: View {
       advanceClock()
     }
     .onAppear {
+      handlePushRoute(pushRoute)
       guard dashboardLoadTask == nil else { return }
       dashboardLoadTask = Task {
         await loadDashboardData()
@@ -271,6 +278,9 @@ public struct CoachRootView: View {
       case .messages: Analytics.shared.screen(.coachReceiving)
       case .profile: Analytics.shared.screen(.account)
       }
+    }
+    .onChange(of: pushRoute) { _, route in
+      handlePushRoute(route)
     }
   }
 
@@ -311,6 +321,33 @@ extension CoachRootView {
       await chat.inbox.refresh()
       chat.inbox.startPolling()
     }
+  }
+
+  fileprivate func handlePushRoute(_ route: PushRouteIntent?) {
+    guard let route else { return }
+    switch route {
+    case .chatMessage:
+      selectedTab = .messages
+    case .videoPending:
+      selectedTab = .messages
+      pushRoute = nil
+    case .missedTraining, .prCongrats, .bindRequest, .planShift:
+      selectedTab = .students
+      pushRoute = nil
+    }
+  }
+
+  fileprivate var pushedConversationIDBinding: Binding<UUID?> {
+    Binding(
+      get: {
+        guard case .chatMessage(let conversationID) = pushRoute else { return nil }
+        return conversationID
+      },
+      set: { conversationID in
+        guard conversationID == nil else { return }
+        pushRoute = nil
+      }
+    )
   }
 }
 

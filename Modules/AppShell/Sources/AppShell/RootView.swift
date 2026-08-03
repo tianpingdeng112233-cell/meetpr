@@ -42,6 +42,7 @@ public struct RootView: View {
   private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
   private let draftStore: DraftStore
   private let analyticsMode: AnalyticsMode
+  let pushRegistrar: PushRegistrar?
   @State private var chatSession: ChatSessionController
   private let chatRepository: (any ChatRepository)?
 
@@ -72,7 +73,8 @@ public struct RootView: View {
     chatSession: ChatSessionController = ChatSessionController(),
     chatRepository: (any ChatRepository)? = nil,
     draftStore: DraftStore = DraftStore.shared,
-    analyticsMode: AnalyticsMode = .disabled
+    analyticsMode: AnalyticsMode = .disabled,
+    pushRegistrar: PushRegistrar? = nil
   ) {
     self.coachPlans = coachPlans
     self.coachInviteCodes = coachInviteCodes ?? RootViewDemoDefaults.inviteCodes()
@@ -109,6 +111,7 @@ public struct RootView: View {
     self.chatRepository = chatRepository
     self.draftStore = draftStore
     self.analyticsMode = analyticsMode
+    self.pushRegistrar = pushRegistrar
     Analytics.shared.prepare(mode: analyticsMode)
   }
 
@@ -122,6 +125,7 @@ public struct RootView: View {
         switch phase {
         case .active:
           chatSession.noteScenePhase(isActive: true)
+          pushRegistrar?.applicationDidBecomeActive()
         case .background:
           chatSession.noteScenePhase(isActive: false)
         case .inactive:
@@ -129,6 +133,10 @@ public struct RootView: View {
         @unknown default:
           break
         }
+      }
+      .onChange(of: session.state) { oldState, newState in
+        guard Self.isAuthenticated(oldState), !Self.isAuthenticated(newState) else { return }
+        pushRegistrar?.authenticatedSessionDidEnd()
       }
   }
 
@@ -150,11 +158,16 @@ public struct RootView: View {
 
   @ViewBuilder
   private func authenticatedContent(for user: User) -> some View {
-    switch Self.authenticatedDestination(for: user.role) {
-    case .coach:
-      coachRoot(for: user)
-    case .studentBehindE1RMGate:
-      studentEntry(for: user)
+    Group {
+      switch Self.authenticatedDestination(for: user.role) {
+      case .coach:
+        coachRoot(for: user)
+      case .studentBehindE1RMGate:
+        studentEntry(for: user)
+      }
+    }
+    .onAppear {
+      pushRegistrar?.authenticatedRootDidAppear()
     }
   }
 
@@ -231,7 +244,8 @@ public struct RootView: View {
       onLogout: {
         await session.logout()
       },
-      draftStore: draftStore
+      draftStore: draftStore,
+      pushRoute: pushRouteBinding
     )
   }
 
@@ -376,7 +390,9 @@ extension RootView {
       activeCoach: activeCoach,
       onBindingInvalidated: {
         await chatSession.reportBindingInvalidation()
-      }
+      },
+      pushRoute: pushRouteBinding
     )
   }
+
 }
