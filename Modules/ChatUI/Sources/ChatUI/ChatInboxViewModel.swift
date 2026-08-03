@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Observation
 import RepositoryContracts
 
@@ -15,9 +16,16 @@ public final class ChatInboxViewModel {
   @ObservationIgnored private let sleep: @Sendable (Duration) async throws -> Void
   @ObservationIgnored private let onBindingInvalidated: @Sendable () async -> Void
   @ObservationIgnored private var pollingTask: Task<Void, Never>?
+  @ObservationIgnored private var pollingRequested = false
   @ObservationIgnored private var pollingGeneration: UInt64 = 0
   @ObservationIgnored private var refreshRequest: UInt64 = 0
   @ObservationIgnored private var bindingInvalidationReported = false
+  @ObservationIgnored private var realtimeRouter: ChatRealtimeRouter?
+  @ObservationIgnored private var realtimeEventTask: Task<Void, Never>?
+  @ObservationIgnored private var realtimeStateTask: Task<Void, Never>?
+  @ObservationIgnored private var realtimeRefreshTask: Task<Void, Never>?
+  @ObservationIgnored private var realtimeRefreshPending = false
+  @ObservationIgnored var isRealtimeConnected = false
 
   public init(
     repository: any ChatRepository,
@@ -85,6 +93,7 @@ public final class ChatInboxViewModel {
   }
 
   public func clear() {
+    detachRealtime()
     stopPolling()
     refreshRequest &+= 1
     conversations = []
@@ -94,7 +103,110 @@ public final class ChatInboxViewModel {
   }
 
   public func startPolling() {
-    guard pollingTask == nil else {
+    pollingRequested = true
+    startPollingIfNeeded()
+  }
+
+  public func stopPolling() {
+    pollingRequested = false
+    suspendPolling()
+  }
+
+  public func attachRealtime(
+    events: AsyncStream<RealtimeEvent>,
+    state: AsyncStream<RealtimeConnectionState>
+  ) {
+    detachRealtime()
+    let router = ChatRealtimeRouter(events: events, state: state)
+    realtimeRouter = router
+    attachRealtimeSubscription(router.subscribe())
+  }
+
+  func realtimeSubscription() -> ChatRealtimeSubscription? {
+    realtimeRouter?.subscribe()
+  }
+
+  /// Test probe: live router subscriptions, nil when realtime is not attached.
+  var realtimeSubscriberCount: Int? {
+    realtimeRouter?.subscriberCount
+  }
+
+  private func attachRealtimeSubscription(_ subscription: ChatRealtimeSubscription) {
+    realtimeEventTask = Task { @MainActor [weak self] in
+      for await event in subscription.events {
+        guard let self else { return }
+        self.handleRealtime(event)
+      }
+    }
+    realtimeStateTask = Task { @MainActor [weak self] in
+      for await state in subscription.state {
+        guard let self else { return }
+        self.handleRealtime(state)
+      }
+    }
+  }
+
+  deinit {
+    realtimeEventTask?.cancel()
+    realtimeStateTask?.cancel()
+    realtimeRefreshTask?.cancel()
+  }
+
+  private func detachRealtime() {
+    realtimeEventTask?.cancel()
+    realtimeStateTask?.cancel()
+    realtimeRefreshTask?.cancel()
+    realtimeEventTask = nil
+    realtimeStateTask = nil
+    realtimeRefreshTask = nil
+    realtimeRefreshPending = false
+    isRealtimeConnected = false
+    realtimeRouter?.stop()
+    realtimeRouter = nil
+  }
+
+  private func handleRealtime(_ state: RealtimeConnectionState) {
+    switch state {
+    case .connected:
+      isRealtimeConnected = true
+      suspendPolling()
+    case .disconnected:
+      isRealtimeConnected = false
+      startPollingIfNeeded()
+    }
+  }
+
+  private func handleRealtime(_ event: RealtimeEvent) {
+    switch event {
+    case .hello:
+      break
+    case .chatMessage:
+      scheduleRealtimeRefresh()
+    case .chatRead(_, let userID, _):
+      guard userID != currentUserID else { return }
+      // The wire pointer has no message id, while `ChatCursor` does. Refreshing
+      // the inbox obtains the canonical cursor without fabricating one locally.
+      scheduleRealtimeRefresh()
+    }
+  }
+
+  private func scheduleRealtimeRefresh() {
+    if realtimeRefreshTask != nil {
+      realtimeRefreshPending = true
+      return
+    }
+    realtimeRefreshTask = Task { @MainActor [weak self] in
+      guard let self else { return }
+      repeat {
+        realtimeRefreshPending = false
+        await refresh()
+      } while realtimeRefreshPending && !Task.isCancelled
+      realtimeRefreshTask = nil
+    }
+  }
+
+  private func startPollingIfNeeded() {
+    guard pollingRequested, !isRealtimeConnected, pollingTask == nil else {
       return
     }
     pollingGeneration &+= 1
@@ -104,7 +216,7 @@ public final class ChatInboxViewModel {
     }
   }
 
-  public func stopPolling() {
+  private func suspendPolling() {
     pollingGeneration &+= 1
     pollingTask?.cancel()
     pollingTask = nil

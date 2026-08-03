@@ -15,6 +15,7 @@ public struct RootView: View {
   }
 
   @Environment(Session.self) private var session
+  @Environment(\.scenePhase) private var scenePhase
   private let coachPlans: any PlanRepository
   private let coachInviteCodes: any InviteCodeRepository
   private let coachBindQueue: any CoachBindQueueRepository
@@ -115,6 +116,20 @@ public struct RootView: View {
     routedContent
       .analyticsFrictionFeedbackPrompt()
       .modifier(AnalyticsRootModifier(session: session, mode: analyticsMode))
+      .onChange(of: scenePhase) { _, phase in
+        // Intent is recorded synchronously; the controller serializes the
+        // async application so rapid flips cannot land out of order.
+        switch phase {
+        case .active:
+          chatSession.noteScenePhase(isActive: true)
+        case .background:
+          chatSession.noteScenePhase(isActive: false)
+        case .inactive:
+          break
+        @unknown default:
+          break
+        }
+      }
   }
 
   @ViewBuilder

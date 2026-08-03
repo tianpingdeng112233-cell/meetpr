@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Observation
 import RepositoryContracts
 
@@ -52,24 +53,24 @@ extension ConversationViewModel {
       return
     }
     isPolling = true
-    defer { isPolling = false }
+    let ownerID = UUID()
+    pollingOwnerID = ownerID
+    startPollingWorkerIfNeeded()
 
-    while !Task.isCancelled {
-      do {
-        try await sleep(.seconds(3))
-        guard !Task.isCancelled else {
-          return
+    await withTaskCancellationHandler {
+      await withCheckedContinuation { continuation in
+        if Task.isCancelled || pollingOwnerID != ownerID {
+          continuation.resume()
+        } else {
+          pollingLifetimeContinuation = continuation
         }
-        try await pollTick()
-        error = nil
-        bindingInvalidationReported = false
-      } catch {
-        if error.isChatTaskCancellation || Task.isCancelled {
-          return
-        }
-        handle(error)
+      }
+    } onCancel: {
+      Task { @MainActor [weak self] in
+        self?.finishPolling(ownerID: ownerID)
       }
     }
+    finishPolling(ownerID: ownerID)
   }
 
   public func pollOnce() async {
@@ -80,6 +81,46 @@ extension ConversationViewModel {
     } catch {
       handle(error)
     }
+  }
+
+  public func attachRealtime(
+    events: AsyncStream<RealtimeEvent>,
+    state: AsyncStream<RealtimeConnectionState>
+  ) {
+    realtimeEventTask?.cancel()
+    realtimeStateTask?.cancel()
+    realtimeRefreshTask?.cancel()
+    realtimeRefreshPending = false
+
+    // `guard let self else return` (not `self?`) so a deallocated view model
+    // terminates the iteration, which releases the router continuation via
+    // its onTermination hook instead of holding it for the session lifetime.
+    realtimeEventTask = Task { @MainActor [weak self] in
+      for await event in events {
+        guard let self else { return }
+        self.handleRealtime(event)
+      }
+    }
+    realtimeStateTask = Task { @MainActor [weak self] in
+      for await state in state {
+        guard let self else { return }
+        self.handleRealtime(state)
+      }
+    }
+  }
+
+  public func detachRealtime() {
+    realtimeEventTask?.cancel()
+    realtimeStateTask?.cancel()
+    realtimeRefreshTask?.cancel()
+    realtimeEventTask = nil
+    realtimeStateTask = nil
+    realtimeRefreshTask = nil
+    realtimeRefreshPending = false
+    // Without realtime this conversation is back on the polling contract; an
+    // active view must regain its 3s fallback instead of losing both paths.
+    isRealtimeConnected = false
+    startPollingWorkerIfNeeded()
   }
 
   func synchronizeOutbox() {
@@ -119,6 +160,101 @@ extension ConversationViewModel {
     if error as? ChatRepositoryError == .bindRequired, !bindingInvalidationReported {
       bindingInvalidationReported = true
       sendCoordinator.reportBindingInvalidation()
+    }
+  }
+
+  private func startPollingWorkerIfNeeded() {
+    guard isPolling, !isRealtimeConnected, pollingWorker == nil else { return }
+    pollingGeneration &+= 1
+    let generation = pollingGeneration
+    pollingWorker = Task { @MainActor [weak self] in
+      await self?.runPollingWorker(generation: generation)
+    }
+  }
+
+  private func suspendPollingWorker() {
+    pollingGeneration &+= 1
+    pollingWorker?.cancel()
+    pollingWorker = nil
+  }
+
+  private func finishPolling(ownerID: UUID) {
+    guard pollingOwnerID == ownerID else { return }
+    pollingOwnerID = nil
+    isPolling = false
+    suspendPollingWorker()
+    let continuation = pollingLifetimeContinuation
+    pollingLifetimeContinuation = nil
+    continuation?.resume()
+  }
+
+  private func runPollingWorker(generation: UInt64) async {
+    defer {
+      if generation == pollingGeneration {
+        pollingWorker = nil
+      }
+    }
+    while !Task.isCancelled, generation == pollingGeneration {
+      do {
+        try await sleep(.seconds(3))
+        guard
+          !Task.isCancelled,
+          generation == pollingGeneration,
+          !isRealtimeConnected
+        else { return }
+        try await pollTick()
+        error = nil
+        bindingInvalidationReported = false
+      } catch {
+        if error.isChatTaskCancellation || Task.isCancelled {
+          return
+        }
+        handle(error)
+      }
+    }
+  }
+
+  private func handleRealtime(_ state: RealtimeConnectionState) {
+    switch state {
+    case .connected:
+      isRealtimeConnected = true
+      suspendPollingWorker()
+    case .disconnected:
+      isRealtimeConnected = false
+      startPollingWorkerIfNeeded()
+    }
+  }
+
+  private func handleRealtime(_ event: RealtimeEvent) {
+    switch event {
+    case .hello:
+      break
+    case .chatMessage(let conversationID, _, _):
+      guard conversationID == self.conversationID else { return }
+      scheduleRealtimeRefresh()
+    case .chatRead(let conversationID, let userID, let lastReadSeq):
+      guard conversationID == self.conversationID, userID != currentUserID else { return }
+      guard lastReadSeq > (otherLastRead?.seq ?? 0) else { return }
+      if let message = messages.first(where: { $0.seq == lastReadSeq }) {
+        updateOtherLastRead(ChatCursor(messageID: message.id, seq: lastReadSeq))
+      } else {
+        scheduleRealtimeRefresh()
+      }
+    }
+  }
+
+  private func scheduleRealtimeRefresh() {
+    if realtimeRefreshTask != nil {
+      realtimeRefreshPending = true
+      return
+    }
+    realtimeRefreshTask = Task { @MainActor [weak self] in
+      guard let self else { return }
+      repeat {
+        realtimeRefreshPending = false
+        await pollOnce()
+      } while realtimeRefreshPending && !Task.isCancelled
+      realtimeRefreshTask = nil
     }
   }
 
@@ -187,7 +323,7 @@ extension ConversationViewModel {
     sendCoordinator.reconcile(in: conversationID, with: incoming)
   }
 
-  private func updateOtherLastRead(_ cursor: ChatCursor?) {
+  func updateOtherLastRead(_ cursor: ChatCursor?) {
     guard let cursor, cursor.seq >= (otherLastRead?.seq ?? 0) else {
       return
     }

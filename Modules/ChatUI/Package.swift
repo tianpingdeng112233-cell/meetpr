@@ -23,6 +23,7 @@ let package = Package(
         .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "RepositoryContracts", package: "RepositoryContracts"),
         .product(name: "DesignSystem", package: "DesignSystem"),
+        .product(name: "Networking", package: "Networking"),
       ],
       resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]

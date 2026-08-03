@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Observation
 import RepositoryContracts
 
@@ -93,6 +94,15 @@ public final class ConversationViewModel {
   @ObservationIgnored var latestRequestedReadSequence = 0
   @ObservationIgnored var latestAppliedReadSequence = 0
   @ObservationIgnored var bindingInvalidationReported = false
+  @ObservationIgnored var isRealtimeConnected = false
+  @ObservationIgnored var realtimeEventTask: Task<Void, Never>?
+  @ObservationIgnored var realtimeStateTask: Task<Void, Never>?
+  @ObservationIgnored var realtimeRefreshTask: Task<Void, Never>?
+  @ObservationIgnored var realtimeRefreshPending = false
+  @ObservationIgnored var pollingWorker: Task<Void, Never>?
+  @ObservationIgnored var pollingGeneration: UInt64 = 0
+  @ObservationIgnored var pollingOwnerID: UUID?
+  @ObservationIgnored var pollingLifetimeContinuation: CheckedContinuation<Void, Never>?
 
   public init(
     conversationID: UUID,
@@ -116,6 +126,20 @@ public final class ConversationViewModel {
     self.pageLimit = pageLimit
     synchronizeOutbox()
     observeOutbox()
+    if let subscription = inbox?.realtimeSubscription() {
+      attachRealtime(events: subscription.events, state: subscription.state)
+    }
+  }
+
+  deinit {
+    // Cancelling here (not only on re-attach) ends the subscription iterations,
+    // whose termination hooks release this conversation's router continuations.
+    // Without it every opened-and-closed conversation would leak two
+    // subscriptions until the whole chat session tears down.
+    realtimeEventTask?.cancel()
+    realtimeStateTask?.cancel()
+    realtimeRefreshTask?.cancel()
+    pollingWorker?.cancel()
   }
 
   @discardableResult
