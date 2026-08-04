@@ -129,10 +129,7 @@ final class BackgroundVideoPartUploader: NSObject, @unchecked Sendable {
     from fileURL: URL,
     identifier: VideoUploadPartIdentifier
   ) async throws -> String {
-    var request = URLRequest(url: url)
-    request.httpMethod = "PUT"
-    request.timeoutInterval = 60
-    let task = makeUploadTask(request: request, fileURL: fileURL)
+    let task = makeUploadTask(request: Self.makePartRequest(url: url), fileURL: fileURL)
     task.taskDescription = identifier.taskDescription
     return try await withCheckedThrowingContinuation { continuation in
       lock.withLock {
@@ -150,10 +147,7 @@ final class BackgroundVideoPartUploader: NSObject, @unchecked Sendable {
     guard FileManager.default.fileExists(atPath: fileURL.path) else {
       throw VideoUploadError.localFileMissing
     }
-    var request = URLRequest(url: url)
-    request.httpMethod = "PUT"
-    request.timeoutInterval = 60
-    let task = makeUploadTask(request: request, fileURL: fileURL)
+    let task = makeUploadTask(request: Self.makePartRequest(url: url), fileURL: fileURL)
     task.taskDescription = identifier.taskDescription
     task.resume()
   }
@@ -215,6 +209,18 @@ final class BackgroundVideoPartUploader: NSObject, @unchecked Sendable {
 
   private func reconnectSession() {
     _ = session
+  }
+
+  /// OSS V1 presigned part URLs are signed with an empty Content-Type, but
+  /// CFNetwork infers one from the file extension on file-based upload tasks
+  /// and OSS then rejects the signature with 403 (2026-08-04 E2E finding).
+  /// An explicit empty value stops the inference and matches the signature.
+  private static func makePartRequest(url: URL) -> URLRequest {
+    var request = URLRequest(url: url)
+    request.httpMethod = "PUT"
+    request.timeoutInterval = 60
+    request.setValue("", forHTTPHeaderField: "Content-Type")
+    return request
   }
 
   private func makeUploadTask(request: URLRequest, fileURL: URL) -> any BackgroundUploadTask {
