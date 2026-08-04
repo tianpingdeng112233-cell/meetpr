@@ -152,15 +152,62 @@ private func productionEventTokens(
   return (try #require(partToken), try #require(finishToken))
 }
 
+// OSS V1 presigned URLs are signed with an empty Content-Type; CFNetwork
+// infers one from the file extension on file-based tasks unless the header
+// is explicitly present (2026-08-04 E2E 403 regression).
+@Test func partRequestsPinAnEmptyContentTypeOnBothPaths() async throws {
+  let taskFactory = FakeBackgroundUploadTaskFactory()
+  let uploader = BackgroundVideoPartUploader(
+    sessionIdentifier: "content-type-\(UUID().uuidString)",
+    uploadTaskFactory: { request, fileURL in
+      taskFactory.makeTask(request: request, fileURL: fileURL)
+    }
+  )
+
+  let uploadTask = Task {
+    try await uploader.upload(
+      to: try #require(URL(string: "https://oss.test/parts/1")),
+      from: URL(fileURLWithPath: "/tmp/content-type-part.chunk"),
+      identifier: VideoUploadPartIdentifier(recordID: UUID(), partNumber: 1)
+    )
+  }
+  try await waitUntil { taskFactory.task?.wasResumed == true }
+  let awaitedRequest = try #require(taskFactory.request)
+  #expect(awaitedRequest.value(forHTTPHeaderField: "Content-Type") == "")
+  uploader.receiveCompletion(
+    taskIdentifier: try #require(taskFactory.task).taskIdentifier,
+    taskDescription: taskFactory.task?.taskDescription,
+    result: .success("etag-1")
+  )
+  _ = try? await uploadTask.value
+
+  let scheduledFile = FileManager.default.temporaryDirectory
+    .appending(path: "content-type-scheduled-\(UUID().uuidString).chunk")
+  try Data("part".utf8).write(to: scheduledFile)
+  defer { try? FileManager.default.removeItem(at: scheduledFile) }
+  try uploader.schedule(
+    to: try #require(URL(string: "https://oss.test/parts/2")),
+    from: scheduledFile,
+    identifier: VideoUploadPartIdentifier(recordID: UUID(), partNumber: 2)
+  )
+  let scheduledRequest = try #require(taskFactory.request)
+  #expect(scheduledRequest.value(forHTTPHeaderField: "Content-Type") == "")
+}
+
 private final class FakeBackgroundUploadTaskFactory: @unchecked Sendable {
   private let lock = NSLock()
   private var storage: FakeBackgroundUploadTask?
+  private var requestStorage: URLRequest?
 
   var task: FakeBackgroundUploadTask? { lock.withLock { storage } }
+  var request: URLRequest? { lock.withLock { requestStorage } }
 
   func makeTask(request: URLRequest, fileURL: URL) -> FakeBackgroundUploadTask {
     let task = FakeBackgroundUploadTask(taskIdentifier: 42)
-    lock.withLock { storage = task }
+    lock.withLock {
+      storage = task
+      requestStorage = request
+    }
     return task
   }
 }
