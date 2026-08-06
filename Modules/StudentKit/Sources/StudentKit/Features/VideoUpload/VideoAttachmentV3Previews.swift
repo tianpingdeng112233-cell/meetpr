@@ -17,8 +17,8 @@ private struct VideoAttachmentV3PreviewList: View {
     VStack(spacing: MeetPRSpacing.space3) {
       previewRow(.choices(cameraAvailable: true))
       previewRow(.choices(cameraAvailable: false))
-      previewRow(.attached(cameraAvailable: true, canDelete: false))
-      previewRow(.attached(cameraAvailable: true, canDelete: true))
+      previewRow(.attached(cameraAvailable: true, canDelete: false, delivered: false))
+      previewRow(.attached(cameraAvailable: true, canDelete: true, delivered: true))
       previewRow(.failed)
     }
     .padding()

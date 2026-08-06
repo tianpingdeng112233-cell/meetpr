@@ -154,14 +154,16 @@ struct VideoAttachmentSection: View {
   private var presentationState: VideoAttachmentV3State {
     if let status = rowState?.attachment.status {
       switch status {
-      case .pending, .uploading, .uploaded:
-        return .attached(cameraAvailable: cameraAvailable, canDelete: true)
+      case .pending, .uploading:
+        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: false)
+      case .uploaded:
+        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: true)
       case .failed:
         return .failed
       }
     }
     if isPreparing {
-      return .attached(cameraAvailable: cameraAvailable, canDelete: false)
+      return .attached(cameraAvailable: cameraAvailable, canDelete: false, delivered: false)
     }
     return .choices(cameraAvailable: cameraAvailable)
   }
@@ -177,7 +179,7 @@ struct VideoAttachmentSection: View {
 
 enum VideoAttachmentV3State: Equatable {
   case choices(cameraAvailable: Bool)
-  case attached(cameraAvailable: Bool, canDelete: Bool)
+  case attached(cameraAvailable: Bool, canDelete: Bool, delivered: Bool)
   case failed
 }
 
@@ -203,12 +205,22 @@ struct VideoAttachmentV3Controls: View {
         actionButton("相册", systemImage: "photo", action: onLibrary)
       }
 
-    case .attached(let cameraAvailable, let canDelete):
-      HStack(spacing: MeetPRSpacing.point10) {
-        actionButton("重拍", systemImage: "video", isEnabled: cameraAvailable, action: onCamera)
-        actionButton("更换", systemImage: "photo", action: onLibrary)
-        actionButton("删除", systemImage: "trash", action: onDelete)
-          .disabled(!canDelete)
+    case .attached(let cameraAvailable, let canDelete, let delivered):
+      // On-demand confirmation only inside the edit sheet (David 2026-08-06):
+      // the glanceable surfaces stay free of upload chrome.
+      VStack(alignment: .trailing, spacing: MeetPRSpacing.point7) {
+        HStack(spacing: MeetPRSpacing.point10) {
+          actionButton("重拍", systemImage: "video", isEnabled: cameraAvailable, action: onCamera)
+          actionButton("更换", systemImage: "photo", action: onLibrary)
+          actionButton("删除", systemImage: "trash", action: onDelete)
+            .disabled(!canDelete)
+        }
+        Label(
+          delivered ? "已送达教练" : "还在路上",
+          systemImage: delivered ? "checkmark.circle" : "arrow.up.circle.dotted"
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .regular))
+        .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.45))
       }
 
     case .failed:
