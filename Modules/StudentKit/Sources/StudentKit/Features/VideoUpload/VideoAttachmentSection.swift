@@ -154,7 +154,6 @@ struct VideoAttachmentSection: View {
             videoViewModel.reportVideoProcessingFailure()
           }
         )
-        .ignoresSafeArea()
       }
       .fullScreenCover(item: $libraryVideoToTrim) { movie in
         VideoTrimmerView(

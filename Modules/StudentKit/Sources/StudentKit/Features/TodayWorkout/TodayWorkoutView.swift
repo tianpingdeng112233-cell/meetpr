@@ -331,7 +331,6 @@ public struct TodayWorkoutView: View {
               videoViewModel.reportVideoProcessingFailure()
             }
           )
-          .ignoresSafeArea()
         }
       )
     #endif
