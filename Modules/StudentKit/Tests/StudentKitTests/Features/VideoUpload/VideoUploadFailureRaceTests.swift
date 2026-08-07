@@ -29,7 +29,7 @@ import Testing
 
   await service.emitBackgroundEvent(
     BackgroundVideoPartEvent(
-      identifier: VideoUploadPartIdentifier(recordID: record.id, partNumber: 2),
+      identifier: VideoUploadPartIdentifier(recordID: record.id, partNumber: 2, generation: 1),
       result: .failure(.httpStatus(403)),
       hasPipelineContinuation: true
     )
@@ -68,7 +68,8 @@ private func makeFailureRaceRecord(remoteID: UUID) throws -> VideoAttachment {
     recordedAt: Date(),
     uploadPartCount: 3,
     uploadPartTargets: targets,
-    uploadedParts: [VideoUploadedPart(partNumber: 1, etag: "etag-1")]
+    uploadedParts: [VideoUploadedPart(partNumber: 1, etag: "etag-1")],
+    uploadGeneration: 1
   )
 }
 

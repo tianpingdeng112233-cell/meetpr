@@ -20,6 +20,11 @@ import Testing
       atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).mp4").path
     )
   )
+  try await waitUntil {
+    !FileManager.default.fileExists(
+      atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).parts").path
+    )
+  }
   #expect(
     !FileManager.default.fileExists(
       atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).parts").path
@@ -59,7 +64,7 @@ import Testing
 
   await harness.service.emitBackgroundEvent(
     BackgroundVideoPartEvent(
-      identifier: VideoUploadPartIdentifier(recordID: recordID, partNumber: 2),
+      identifier: VideoUploadPartIdentifier(recordID: recordID, partNumber: 2, generation: 1),
       result: .success("etag-2")
     )
   )
@@ -71,7 +76,7 @@ import Testing
   await harness.service.setPendingParts([])
   await harness.service.emitBackgroundEvent(
     BackgroundVideoPartEvent(
-      identifier: VideoUploadPartIdentifier(recordID: recordID, partNumber: 3),
+      identifier: VideoUploadPartIdentifier(recordID: recordID, partNumber: 3, generation: 1),
       result: .success("etag-3")
     )
   )
@@ -95,6 +100,7 @@ import Testing
     trainingDate: trainingDate
   )
   _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
+  try await waitUntil { await notifier.notifiedCounts == [1] }
 
   #expect(await harness.service.partAttempts[1] == 1)
   #expect(await notifier.authorizationRequestCount == 1)
@@ -122,7 +128,11 @@ import Testing
   for partNumber in 2...3 {
     await harness.service.emitBackgroundEvent(
       BackgroundVideoPartEvent(
-        identifier: VideoUploadPartIdentifier(recordID: recordID, partNumber: partNumber),
+        identifier: VideoUploadPartIdentifier(
+          recordID: recordID,
+          partNumber: partNumber,
+          generation: 1
+        ),
         result: .success("etag-\(partNumber)")
       )
     )
@@ -209,7 +219,11 @@ import Testing
   for partNumber in 2...3 {
     await harness.service.emitBackgroundEvent(
       BackgroundVideoPartEvent(
-        identifier: VideoUploadPartIdentifier(recordID: recordID, partNumber: partNumber),
+        identifier: VideoUploadPartIdentifier(
+          recordID: recordID,
+          partNumber: partNumber,
+          generation: 1
+        ),
         result: .success("etag-\(partNumber)")
       )
     )
@@ -243,7 +257,7 @@ import Testing
   }
   await harness.service.emitBackgroundEvent(
     BackgroundVideoPartEvent(
-      identifier: VideoUploadPartIdentifier(recordID: record.id, partNumber: 2),
+      identifier: VideoUploadPartIdentifier(recordID: record.id, partNumber: 2, generation: 1),
       result: .success("etag-2")
     )
   )
@@ -360,7 +374,8 @@ private func makeRestoredRecord(id: UUID, remoteID: UUID, fileName: String) thro
     recordedAt: Date(),
     uploadPartCount: 3,
     uploadPartTargets: targets,
-    uploadedParts: [VideoUploadedPart(partNumber: 1, etag: "etag-1")]
+    uploadedParts: [VideoUploadedPart(partNumber: 1, etag: "etag-1")],
+    uploadGeneration: 1
   )
 }
 
@@ -372,15 +387,4 @@ private func writeVideoFixture(fileName: String, harness: VideoUploadHarness) th
   try Data(repeating: 0xAB, count: 2_560).write(
     to: harness.filesDirectory.appending(path: fileName)
   )
-}
-
-private final class RecoveryLockedCounter: @unchecked Sendable {
-  private let lock = NSLock()
-  private var storage = 0
-
-  var value: Int { lock.withLock { storage } }
-
-  func increment() {
-    lock.withLock { storage += 1 }
-  }
 }

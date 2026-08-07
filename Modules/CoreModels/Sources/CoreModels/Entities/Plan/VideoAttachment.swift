@@ -50,6 +50,9 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
   public var uploadRetryCount: Int
   /// Starts the fixed retry time box and survives app restarts.
   public var firstUploadFailureAt: Date?
+  /// Current multipart attempt identity persisted for cold-start recovery.
+  /// Once the manager is running, its newer in-memory generation is authoritative.
+  public var uploadGeneration: Int?
 
   public init(
     id: UUID,
@@ -68,7 +71,8 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
     uploadPartTargets: [VideoUploadPartTarget] = [],
     uploadedParts: [VideoUploadedPart] = [],
     uploadRetryCount: Int = 0,
-    firstUploadFailureAt: Date? = nil
+    firstUploadFailureAt: Date? = nil,
+    uploadGeneration: Int? = nil
   ) {
     self.id = id
     self.setLogID = setLogID
@@ -87,6 +91,7 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
     self.uploadedParts = uploadedParts
     self.uploadRetryCount = uploadRetryCount
     self.firstUploadFailureAt = firstUploadFailureAt
+    self.uploadGeneration = uploadGeneration
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -107,6 +112,7 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
     case uploadedParts
     case uploadRetryCount
     case firstUploadFailureAt
+    case uploadGeneration
   }
 
   public init(from decoder: any Decoder) throws {
@@ -130,6 +136,7 @@ public struct VideoAttachment: Codable, Hashable, Sendable, Identifiable {
       try container.decodeIfPresent([VideoUploadedPart].self, forKey: .uploadedParts) ?? []
     uploadRetryCount = try container.decodeIfPresent(Int.self, forKey: .uploadRetryCount) ?? 0
     firstUploadFailureAt = try container.decodeIfPresent(Date.self, forKey: .firstUploadFailureAt)
+    uploadGeneration = try container.decodeIfPresent(Int.self, forKey: .uploadGeneration)
   }
 }
 

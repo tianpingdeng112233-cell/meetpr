@@ -3,24 +3,40 @@ import Foundation
 public struct VideoUploadPartIdentifier: Hashable, Sendable {
   public let recordID: UUID
   public let partNumber: Int
+  public let generation: Int?
 
   var taskDescription: String {
-    "\(recordID.uuidString)|\(partNumber)"
+    if let generation {
+      return "\(recordID.uuidString)|\(partNumber)|\(generation)"
+    }
+    return "\(recordID.uuidString)|\(partNumber)"
   }
 
-  public init(recordID: UUID, partNumber: Int) {
+  public init(recordID: UUID, partNumber: Int, generation: Int) {
     self.recordID = recordID
     self.partNumber = partNumber
+    self.generation = generation
+  }
+
+  private init(legacyRecordID: UUID, partNumber: Int) {
+    self.recordID = legacyRecordID
+    self.partNumber = partNumber
+    self.generation = nil
   }
 
   init?(taskDescription: String?) {
     guard let taskDescription else { return nil }
     let pieces = taskDescription.split(separator: "|", omittingEmptySubsequences: false)
-    guard pieces.count == 2,
-      let recordID = UUID(uuidString: String(pieces[0])),
+    guard let recordID = UUID(uuidString: String(pieces.first ?? "")),
+      pieces.count == 2 || pieces.count == 3,
       let partNumber = Int(pieces[1])
     else { return nil }
-    self.init(recordID: recordID, partNumber: partNumber)
+    if pieces.count == 2 {
+      self.init(legacyRecordID: recordID, partNumber: partNumber)
+    } else {
+      guard let generation = Int(pieces[2]) else { return nil }
+      self.init(recordID: recordID, partNumber: partNumber, generation: generation)
+    }
   }
 }
 
@@ -152,16 +168,31 @@ final class BackgroundVideoPartUploader: NSObject, @unchecked Sendable {
     task.resume()
   }
 
-  func pendingParts(recordID: UUID) async -> Set<Int> {
+  func pendingParts(recordID: UUID, generation: Int) async -> Set<Int> {
     let tasks = await session.allTasks
     return Set(
       tasks.compactMap { task in
         guard let identifier = VideoUploadPartIdentifier(taskDescription: task.taskDescription),
-          identifier.recordID == recordID
+          identifier.recordID == recordID,
+          identifier.generation == generation
         else { return nil }
         return identifier.partNumber
       }
     )
+  }
+
+  func cancelLegacyParts(recordID: UUID) async -> Bool {
+    let tasks = await session.allTasks
+    var foundLegacyTask = false
+    for task in tasks {
+      guard let identifier = VideoUploadPartIdentifier(taskDescription: task.taskDescription),
+        identifier.recordID == recordID,
+        identifier.generation == nil
+      else { continue }
+      foundLegacyTask = true
+      task.cancel()
+    }
+    return foundLegacyTask
   }
 
   func cancelParts(recordID: UUID) async {

@@ -107,6 +107,14 @@ public final class VideoAttachmentViewModel {
     await manager.remove(attachmentID: state.attachment.id)
   }
 
+  func playbackSource(attachmentID: UUID) async throws -> VideoAttachmentPlaybackSource? {
+    return try await manager.playbackSource(attachmentID: attachmentID)
+  }
+
+  func freshRemotePlaybackURL(attachmentID: UUID) async throws -> URL {
+    try await manager.freshRemotePlaybackURL(attachmentID: attachmentID)
+  }
+
   // MARK: - Internals
 
   private func apply(_ event: VideoUploadEvent) {

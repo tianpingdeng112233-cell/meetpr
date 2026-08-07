@@ -35,6 +35,7 @@ import Testing
   attachment.uploadedParts = [VideoUploadedPart(partNumber: 1, etag: "etag-1")]
   attachment.uploadRetryCount = 2
   attachment.firstUploadFailureAt = Date(timeIntervalSince1970: 1_780_000_000)
+  attachment.uploadGeneration = 42
 
   try await first.save(attachment)
   let restored = try await makeBackendRepository(directory: directory).fetch(id: attachment.id)

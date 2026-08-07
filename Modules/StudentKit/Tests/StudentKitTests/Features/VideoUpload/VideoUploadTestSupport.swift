@@ -5,36 +5,14 @@ import RepositoryContracts
 
 @testable import StudentKit
 
-enum MockServiceError: Error, Equatable {
-  case partFailed
-  case initiateFailed
-  case exportFailed
-}
+final class RecoveryLockedCounter: @unchecked Sendable {
+  private let lock = NSLock()
+  private var storage = 0
 
-struct TimeoutError: Error {}
+  var value: Int { lock.withLock { storage } }
 
-/// Deterministic exporter: ignores the source and writes `exportedBytes` of
-/// filler to the destination.
-struct MockVideoExporter: VideoExporting {
-  var duration: Double = 30
-  var exportedBytes: Int = 2_560
-
-  func durationSeconds(of sourceURL: URL) async throws -> Double {
-    duration
-  }
-
-  func export(from sourceURL: URL, to destinationURL: URL) async throws {
-    try Data(repeating: 0xAB, count: exportedBytes).write(to: destinationURL)
-  }
-}
-
-struct FailingVideoExporter: VideoExporting {
-  func durationSeconds(of sourceURL: URL) async throws -> Double {
-    30
-  }
-
-  func export(from sourceURL: URL, to destinationURL: URL) async throws {
-    throw MockServiceError.exportFailed
+  func increment() {
+    lock.withLock { storage += 1 }
   }
 }
 
@@ -49,6 +27,13 @@ actor MockVideoUploadService: VideoUploadService {
   private(set) var calls: [String] = []
   private(set) var partAttempts: [Int: Int] = [:]
   private(set) var abortCount = 0
+  private(set) var cancelPartsCount = 0
+  private(set) var cancelLegacyPartsCount = 0
+  private(set) var schedulePartAttemptCount = 0
+  private(set) var scheduledPartIdentifiers: [VideoUploadPartIdentifier] = []
+  private(set) var suspendedCancelLegacyPartsCount = 0
+  private(set) var suspendedPendingPartNumbersCount = 0
+  private(set) var suspendedCancelPartsCount = 0
 
   private var partFailuresRemaining: [Int: Int] = [:]
   private var signatureFailuresRemaining: [Int: Int] = [:]
@@ -58,7 +43,16 @@ actor MockVideoUploadService: VideoUploadService {
   private var hangOnParts = false
   private var partDelay: Duration?
   private var pendingParts: Set<Int> = []
+  private var hasLegacyPendingParts = false
   private var abortFailuresRemaining = 0
+  private var schedulePartSuspensionsRemaining = 0
+  private var schedulePartWaiters: [CheckedContinuation<Void, Never>] = []
+  private var cancelLegacyPartsSuspensionsRemaining = 0
+  private var cancelLegacyPartsWaiters: [CheckedContinuation<Void, Never>] = []
+  private var pendingPartNumbersSuspensionsRemaining = 0
+  private var pendingPartNumbersWaiters: [CheckedContinuation<Void, Never>] = []
+  private var cancelPartsSuspensionsRemaining = 0
+  private var cancelPartsWaiters: [CheckedContinuation<Void, Never>] = []
 
   init() {
     let stream = AsyncStream.makeStream(
@@ -101,8 +95,60 @@ actor MockVideoUploadService: VideoUploadService {
     pendingParts = partNumbers
   }
 
+  func setHasLegacyPendingParts(_ hasLegacyParts: Bool) {
+    hasLegacyPendingParts = hasLegacyParts
+  }
+
   func setAbortFailures(_ count: Int) {
     abortFailuresRemaining = count
+  }
+
+  func suspendNextSchedulePart() {
+    schedulePartSuspensionsRemaining += 1
+  }
+
+  func releaseScheduledParts() {
+    let waiters = schedulePartWaiters
+    schedulePartWaiters = []
+    for waiter in waiters {
+      waiter.resume()
+    }
+  }
+
+  func suspendNextCancelLegacyParts() {
+    cancelLegacyPartsSuspensionsRemaining += 1
+  }
+
+  func releaseCancelLegacyParts() {
+    let waiters = cancelLegacyPartsWaiters
+    cancelLegacyPartsWaiters = []
+    for waiter in waiters {
+      waiter.resume()
+    }
+  }
+
+  func suspendNextPendingPartNumbers() {
+    pendingPartNumbersSuspensionsRemaining += 1
+  }
+
+  func releasePendingPartNumbers() {
+    let waiters = pendingPartNumbersWaiters
+    pendingPartNumbersWaiters = []
+    for waiter in waiters {
+      waiter.resume()
+    }
+  }
+
+  func suspendNextCancelParts() {
+    cancelPartsSuspensionsRemaining += 1
+  }
+
+  func releaseCancelParts() {
+    let waiters = cancelPartsWaiters
+    cancelPartsWaiters = []
+    for waiter in waiters {
+      waiter.resume()
+    }
   }
 
   func emitBackgroundEvent(_ event: BackgroundVideoPartEvent) {
@@ -184,7 +230,15 @@ actor MockVideoUploadService: VideoUploadService {
     identifier: VideoUploadPartIdentifier
   ) async throws {
     _ = try Data(contentsOf: fileURL)
+    schedulePartAttemptCount += 1
+    if schedulePartSuspensionsRemaining > 0 {
+      schedulePartSuspensionsRemaining -= 1
+      await withCheckedContinuation { continuation in
+        schedulePartWaiters.append(continuation)
+      }
+    }
     calls.append("schedule:\(identifier.partNumber)")
+    scheduledPartIdentifiers.append(identifier)
     pendingParts.insert(identifier.partNumber)
   }
 
@@ -211,6 +265,9 @@ actor MockVideoUploadService: VideoUploadService {
     )
   }
 
+}
+
+extension MockVideoUploadService {
   func abort(attachmentID: UUID) async throws {
     calls.append("abort")
     abortCount += 1
@@ -226,8 +283,41 @@ actor MockVideoUploadService: VideoUploadService {
     )
   }
 
-  func pendingPartNumbers(recordID: UUID) async -> Set<Int> { pendingParts }
-  func cancelParts(recordID: UUID) async {}
+  func pendingPartNumbers(recordID: UUID, generation: Int) async -> Set<Int> {
+    if pendingPartNumbersSuspensionsRemaining > 0 {
+      pendingPartNumbersSuspensionsRemaining -= 1
+      suspendedPendingPartNumbersCount += 1
+      await withCheckedContinuation { continuation in
+        pendingPartNumbersWaiters.append(continuation)
+      }
+    }
+    return pendingParts
+  }
+
+  func cancelLegacyParts(recordID: UUID) async -> Bool {
+    if cancelLegacyPartsSuspensionsRemaining > 0 {
+      cancelLegacyPartsSuspensionsRemaining -= 1
+      suspendedCancelLegacyPartsCount += 1
+      await withCheckedContinuation { continuation in
+        cancelLegacyPartsWaiters.append(continuation)
+      }
+    }
+    guard hasLegacyPendingParts else { return false }
+    hasLegacyPendingParts = false
+    cancelLegacyPartsCount += 1
+    return true
+  }
+
+  func cancelParts(recordID: UUID) async {
+    cancelPartsCount += 1
+    if cancelPartsSuspensionsRemaining > 0 {
+      cancelPartsSuspensionsRemaining -= 1
+      suspendedCancelPartsCount += 1
+      await withCheckedContinuation { continuation in
+        cancelPartsWaiters.append(continuation)
+      }
+    }
+  }
 }
 
 /// Test fixture: a manager wired against mocks, with a throwaway files
@@ -295,48 +385,4 @@ func makeTemporaryVideoSource() throws -> URL {
     .appending(path: "video-upload-source-\(UUID().uuidString).mov")
   try Data([0x01]).write(to: sourceURL)
   return sourceURL
-}
-
-func waitForStatus(
-  _ repository: any VideoAttachmentRepository,
-  id: UUID,
-  oneOf statuses: Set<VideoAttachment.Status>,
-  timeoutMilliseconds: Int = 5_000
-) async throws -> VideoAttachment {
-  for _ in 0..<(timeoutMilliseconds / 10) {
-    if let record = try await repository.fetch(id: id), statuses.contains(record.status) {
-      return record
-    }
-    try await Task.sleep(for: .milliseconds(10))
-  }
-  throw TimeoutError()
-}
-
-func waitUntil(
-  timeoutMilliseconds: Int = 5_000,
-  _ condition: () async throws -> Bool
-) async throws {
-  for _ in 0..<(timeoutMilliseconds / 10) {
-    if try await condition() {
-      return
-    }
-    try await Task.sleep(for: .milliseconds(10))
-  }
-  throw TimeoutError()
-}
-
-/// MainActor twin of `waitUntil` so view-model state can be polled without
-/// shipping the non-Sendable view model across isolation domains.
-@MainActor
-func waitUntilOnMain(
-  timeoutMilliseconds: Int = 5_000,
-  _ condition: @MainActor () async throws -> Bool
-) async throws {
-  for _ in 0..<(timeoutMilliseconds / 10) {
-    if try await condition() {
-      return
-    }
-    try await Task.sleep(for: .milliseconds(10))
-  }
-  throw TimeoutError()
 }
