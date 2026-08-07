@@ -61,7 +61,6 @@
               url: url,
               saveToPhotoLibrary: saveToggleBinding,
               isUsingRecording: isUsingRecording,
-              onRetake: { Task { await controller.retake() } },
               onUse: { Task { await useRecording(url) } },
               onClose: close
             )

@@ -29,12 +29,13 @@ struct VideoAttachmentV3Controls: View {
         actionButton("相册", systemImage: "photo", action: onLibrary)
       }
 
-    case .attached(let cameraAvailable, let canDelete, let delivered):
+    case .attached(_, let canDelete, let delivered):
       // On-demand confirmation only inside the edit sheet (David 2026-08-06):
-      // the glanceable surfaces stay free of upload chrome.
+      // the glanceable surfaces stay free of upload chrome. There is no
+      // retake affordance by design (David 2026-08-07): the video documents
+      // the set that happened — a set, once done, is done.
       VStack(alignment: .trailing, spacing: MeetPRSpacing.point7) {
         HStack(spacing: MeetPRSpacing.point10) {
-          actionButton("重拍", systemImage: "video", isEnabled: cameraAvailable, action: onCamera)
           actionButton("更换", systemImage: "photo", action: onLibrary)
           actionButton("删除", systemImage: "trash", action: onDelete)
             .disabled(!canDelete)
