@@ -35,7 +35,7 @@ import Testing
     let connector = RecordingRealtimeConnector(
       connections: (0..<12).map { _ in ControllableRealtimeConnection(failsImmediately: true) }
     )
-    let clock = RetryClock()
+    let clock = ControlledRetryClock()
     let client = RealtimeClient(
       baseURL: URL(string: "https://example.com") ?? URL(filePath: "/invalid"),
       session: RealtimeSessionStub(),
@@ -45,13 +45,29 @@ import Testing
     )
 
     await client.connect()
-    #expect(await realtimeEventually { await clock.retryDelays.count >= 7 })
-    #expect(Array(await clock.retryDelays.prefix(7)) == [1, 2, 4, 8, 16, 30, 30])
 
+    // Step through seven failed attempts one gated retry at a time. Each
+    // recorded delay is appended in the same actor slice that parks the retry
+    // sleep, so observing it guarantees the run loop is suspended in the clock.
+    #expect(await realtimeEventually { await clock.retryDelays.count == 1 })
+    for step in 2...7 {
+      await clock.resumeNextRetry()
+      #expect(await realtimeEventually { await clock.retryDelays.count == step })
+    }
+    #expect(await clock.retryDelays == [1, 2, 4, 8, 16, 30, 30])
+    #expect(await connector.requests.count == 7)
+
+    // The run loop is still parked in the seventh retry sleep, so disconnect()
+    // lands at a fixed suspension point instead of racing a free-running retry
+    // loop that could have an attempt already past its generation check.
+    let runTask = await client.activeRunTask()
+    #expect(runTask != nil)
     await client.disconnect()
-    let attemptsAfterDisconnect = await connector.requests.count
-    for _ in 0..<50 { await Task.yield() }
-    #expect(await connector.requests.count == attemptsAfterDisconnect)
+    await clock.resumeNextRetry()
+    // Awaiting the released run task's exit is the completion barrier that
+    // makes the final count exact: any reconnect it could issue happens before.
+    await runTask?.value
+    #expect(await connector.requests.count == 7)
   }
 
   @Test func helloResetsBackoffBeforeTheNextFailure() async {
@@ -280,22 +296,6 @@ private actor RecordingRealtimeConnector {
       throw RealtimeTestError.noConnection
     }
     return connections.removeFirst()
-  }
-}
-
-private actor RetryClock {
-  private(set) var retryDelays: [Int] = []
-
-  func sleep(for duration: Duration) async throws {
-    if duration == .seconds(20) {
-      try await Task.sleep(for: .seconds(3_600))
-      return
-    }
-    retryDelays.append(Self.seconds(duration))
-  }
-
-  private static func seconds(_ duration: Duration) -> Int {
-    Int(duration.components.seconds)
   }
 }
 
