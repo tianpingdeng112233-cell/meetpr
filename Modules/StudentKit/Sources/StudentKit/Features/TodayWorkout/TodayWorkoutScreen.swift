@@ -443,7 +443,7 @@ private struct TodayWorkoutHero: View {
   let showsAskCoach: Bool
   let isPreparingAskCoach: Bool
   let onAskCoach: () -> Void
-  @State private var isSummaryExpanded = true
+  @State private var summaryExpansion = TodayWorkoutSummaryExpansionState()
 
   var body: some View {
     ZStack(alignment: .leading) {
@@ -496,6 +496,9 @@ private struct TodayWorkoutHero: View {
       // Never publish the taller pre-start list hero as a candidate frame.
       if presentation.heroMode == .recording { onFrameChange(frame) }
     }
+    .onChange(of: presentation.day.id) { _, dayID in
+      summaryExpansion.select(dayID: dayID)
+    }
   }
 
   private var listHero: some View {
@@ -530,7 +533,7 @@ private struct TodayWorkoutHero: View {
           presentation: presentation,
           highlightedExerciseID: exercise.id,
           canCollapse: true,
-          isExpanded: $isSummaryExpanded
+          isExpanded: summaryExpansionBinding
         )
         .padding(.bottom, MeetPRSpacing.point13)
 
@@ -685,6 +688,19 @@ private struct TodayWorkoutHero: View {
 
   private func numberText(_ value: Double) -> String {
     value.formatted(.number.precision(.fractionLength(0...2)))
+  }
+
+  private var summaryExpansionBinding: Binding<Bool> {
+    Binding(
+      get: {
+        summaryExpansion.dayID == presentation.day.id
+          ? summaryExpansion.isExpanded
+          : true
+      },
+      set: { isExpanded in
+        summaryExpansion.setExpanded(isExpanded, for: presentation.day.id)
+      }
+    )
   }
 }
 
@@ -904,6 +920,7 @@ private struct HoldToCompleteButton: View {
   @State private var cancelFeedbackStep = 0
   @State private var successFeedbackStep = 0
   @State private var holdTask: Task<Void, Never>?
+  @State private var gestureState = HoldToCompleteGestureState()
 
   var body: some View {
     ZStack {
@@ -945,7 +962,7 @@ private struct HoldToCompleteButton: View {
     .highPriorityGesture(
       DragGesture(minimumDistance: 0)
         .onChanged(handleDragChanged)
-        .onEnded { _ in cancelHold() }
+        .onEnded { _ in apply(gestureState.dragEnded()) }
     )
     .sensoryFeedback(.impact(weight: .light), trigger: hapticStep)
     .sensoryFeedback(.warning, trigger: cancelFeedbackStep)
@@ -959,12 +976,7 @@ private struct HoldToCompleteButton: View {
 
   private func handleDragChanged(_ value: DragGesture.Value) {
     let distance = hypot(value.translation.width, value.translation.height)
-    guard distance <= 50 else {
-      cancelHold()
-      return
-    }
-    guard !isPressing else { return }
-    beginHold()
+    apply(gestureState.dragChanged(isWithinBounds: distance <= 50))
   }
 
   private func beginHold() {
@@ -986,10 +998,10 @@ private struct HoldToCompleteButton: View {
         } catch {
           return
         }
-        guard isPressing else { return }
+        guard gestureState.isHolding else { return }
         hapticStep = step
       }
-      complete()
+      apply(gestureState.holdCompleted())
     }
   }
 
@@ -1026,6 +1038,27 @@ private struct HoldToCompleteButton: View {
     progress = 1
     successFeedbackStep += 1
     action()
+  }
+
+  private func resetAfterGesture() {
+    holdTask?.cancel()
+    isPressing = false
+    progress = 0
+  }
+
+  private func apply(_ gestureAction: HoldToCompleteGestureState.Action?) {
+    switch gestureAction {
+    case .begin:
+      beginHold()
+    case .cancel:
+      cancelHold()
+    case .complete:
+      complete()
+    case .reset:
+      resetAfterGesture()
+    case nil:
+      break
+    }
   }
 }
 

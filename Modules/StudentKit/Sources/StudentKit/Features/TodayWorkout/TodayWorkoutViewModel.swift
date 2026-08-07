@@ -60,6 +60,7 @@ public final class TodayWorkoutViewModel {
   private var recordingGeneration = 0
   private var pendingPersist: Task<Bool, Never>?
   private var planLogsSnapshot: PlanLogsSnapshot?
+  private var isCompletionMutationInFlight = false
 
   public init(
     plans: any StudentPlanRepository,
@@ -480,7 +481,12 @@ public final class TodayWorkoutViewModel {
   }
 
   public func completeCurrentDay() async -> Bool {
-    guard let studentID = currentStudentID, let day = currentDay else { return false }
+    guard !isCompletionMutationInFlight,
+      let studentID = currentStudentID,
+      let day = currentDay
+    else { return false }
+    isCompletionMutationInFlight = true
+    defer { isCompletionMutationInFlight = false }
     actionErrorMessage = nil
     do {
       let completion = try await plans.completeDay(id: day.id, studentID: studentID)
@@ -501,7 +507,12 @@ public final class TodayWorkoutViewModel {
   }
 
   public func undoCurrentDayCompletion() async -> Bool {
-    guard let studentID = currentStudentID, let day = currentDay else { return false }
+    guard !isCompletionMutationInFlight,
+      let studentID = currentStudentID,
+      let day = currentDay
+    else { return false }
+    isCompletionMutationInFlight = true
+    defer { isCompletionMutationInFlight = false }
     actionErrorMessage = nil
     do {
       try await plans.undoDayCompletion(id: day.id, studentID: studentID)
