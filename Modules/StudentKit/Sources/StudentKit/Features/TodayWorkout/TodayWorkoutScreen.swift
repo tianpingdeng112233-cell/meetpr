@@ -3,6 +3,17 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
+struct TodayWorkoutHeroFrameMeasurement: Equatable {
+  let heroMode: TodayWorkoutPresentation.HeroMode
+  let requestToken: Int
+  let frame: CGRect
+
+  var publishableFrame: CGRect? {
+    guard frame.width > 0, frame.height > 0 else { return nil }
+    return frame
+  }
+}
+
 enum TodayWorkoutDayState: Equatable {
   case completed(canUndo: Bool)
   case current
@@ -34,6 +45,7 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   let isPreparingAskCoach: Bool
   let namespace: Namespace.ID
   let isLaunchTargetHidden: Bool
+  let heroFrameRequestToken: Int
   let launchHeroRevealToken: Int
   @Binding var collapsedExercises: [UUID: Bool]
   let sequenceContent: SequenceContent
@@ -104,6 +116,7 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
         isEditable: dayState.isEditable,
         namespace: namespace,
         isLaunchTargetHidden: isLaunchTargetHidden,
+        frameRequestToken: heroFrameRequestToken,
         launchHeroRevealToken: launchHeroRevealToken,
         onFrameChange: onHeroFrameChange,
         onStart: onStart,
@@ -444,6 +457,7 @@ private struct TodayWorkoutHero: View {
   let isEditable: Bool
   let namespace: Namespace.ID
   let isLaunchTargetHidden: Bool
+  let frameRequestToken: Int
   let launchHeroRevealToken: Int
   let onFrameChange: (CGRect) -> Void
   let onStart: () -> Void
@@ -497,12 +511,18 @@ private struct TodayWorkoutHero: View {
     }
     .matchedGeometryEffect(id: "today-workout-hero", in: namespace)
     .opacity(isLaunchTargetHidden ? 0 : 1)
-    .onGeometryChange(for: CGRect.self) { proxy in
-      proxy.frame(in: .global)
-    } action: { frame in
-      // The dashboard launch morph targets the auto-start recording hero.
-      // Never publish the taller pre-start list hero as a candidate frame.
-      if presentation.heroMode == .recording { onFrameChange(frame) }
+    .onGeometryChange(for: TodayWorkoutHeroFrameMeasurement.self) { proxy in
+      TodayWorkoutHeroFrameMeasurement(
+        heroMode: presentation.heroMode,
+        requestToken: frameRequestToken,
+        frame: proxy.frame(in: .global)
+      )
+    } action: { measurement in
+      // Mode and request token participate in the measured value so the
+      // current hero republishes even when its bounds match an older hero.
+      if let frame = measurement.publishableFrame {
+        onFrameChange(frame)
+      }
     }
   }
 

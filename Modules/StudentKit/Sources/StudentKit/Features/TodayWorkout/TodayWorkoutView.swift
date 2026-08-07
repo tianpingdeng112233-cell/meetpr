@@ -18,8 +18,8 @@ public struct TodayWorkoutView: View {
   private let jumpToTodayToken: Int
   private let uploadFailureDestination: UploadFailureDestination?
   private let uploadFailureNavigationToken: Int
-  private let autoStartToken: Int
   private let isLaunchTargetHidden: Bool
+  private let heroFrameRequestToken: Int
   private let launchHeroRevealToken: Int
   private let planRevision: Int
   private let planProjectionUpdate: StudentPlanView?
@@ -49,7 +49,6 @@ public struct TodayWorkoutView: View {
   @State private var setRefEntryErrorMessage: String?
   @State private var reviewCompleted = false
   @State private var started = false
-  @State private var autoStartGate = TodayWorkoutAutoStartGate()
   @State private var collapsedExercises: [UUID: Bool] = [:]
   @Namespace private var heroNamespace
 
@@ -70,8 +69,8 @@ public struct TodayWorkoutView: View {
     jumpToTodayToken: Int = 0,
     uploadFailureDestination: UploadFailureDestination? = nil,
     uploadFailureNavigationToken: Int = 0,
-    autoStartToken: Int = 0,
     isLaunchTargetHidden: Bool = false,
+    heroFrameRequestToken: Int = 0,
     launchHeroRevealToken: Int = 0,
     planRevision: Int = 0,
     planProjectionUpdate: StudentPlanView? = nil,
@@ -101,8 +100,8 @@ public struct TodayWorkoutView: View {
     self.jumpToTodayToken = jumpToTodayToken
     self.uploadFailureDestination = uploadFailureDestination
     self.uploadFailureNavigationToken = uploadFailureNavigationToken
-    self.autoStartToken = autoStartToken
     self.isLaunchTargetHidden = isLaunchTargetHidden
+    self.heroFrameRequestToken = heroFrameRequestToken
     self.launchHeroRevealToken = launchHeroRevealToken
     self.planRevision = planRevision
     self.planProjectionUpdate = planProjectionUpdate
@@ -164,6 +163,7 @@ public struct TodayWorkoutView: View {
         isPreparingAskCoach: isPreparingSetRefPicker,
         namespace: heroNamespace,
         isLaunchTargetHidden: isLaunchTargetHidden,
+        heroFrameRequestToken: heroFrameRequestToken,
         launchHeroRevealToken: launchHeroRevealToken,
         collapsedExercises: $collapsedExercises,
         sequenceContent: TrainingCurrentWeekSequenceView(days: viewModel.planDays),
@@ -354,14 +354,6 @@ public struct TodayWorkoutView: View {
         )
         resolveInitialSelectionIfNeeded()
       }
-      // A CTA tap can mount this view with the token already advanced, in
-      // which case onChange(of: autoStartToken) never fires — hand the gate
-      // the current token before consuming, or a cold-start CTA launch
-      // strands the morph waiting for a recording hero that never comes.
-      if autoStartToken > 0 {
-        autoStartGate.receive(token: autoStartToken)
-      }
-      consumePendingAutoStartIfReady()
       await videoViewModel.start(studentID: studentID)
       if uploadFailureNavigationToken > 0 {
         openUploadFailureDestination()
@@ -376,17 +368,19 @@ public struct TodayWorkoutView: View {
           for: newDayID,
           preloadedPlan: handedOffPlan(for: newDayID)
         )
-        consumePendingAutoStartIfReady()
       }
     }
     .onChange(of: planHandoff?.id) { _, _ in
       guard let plan = handedOffPlan(for: selectedDayID) else { return }
       Task {
         await loadWorkout(for: selectedDayID, preloadedPlan: plan)
-        consumePendingAutoStartIfReady()
       }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
+      // External routes clear only the ephemeral in-process start flag. The
+      // presentation still resumes recording when real logs already exist;
+      // zero-log days alone return to the explicit pre-start state.
+      started = false
       if let jumpTarget = TodayWorkoutSelectionResolver.jumpToCurrentSelection(
         from: selectedDayID,
         days: viewModel.planDays
@@ -397,11 +391,6 @@ public struct TodayWorkoutView: View {
     .onChange(of: uploadFailureNavigationToken) { _, token in
       guard token > 0 else { return }
       openUploadFailureDestination()
-    }
-    .onChange(of: autoStartToken) { _, token in
-      guard token > 0 else { return }
-      autoStartGate.receive(token: token)
-      consumePendingAutoStartIfReady()
     }
     .onChange(of: planRevision) { _, _ in
       editing = nil
@@ -810,13 +799,6 @@ public struct TodayWorkoutView: View {
         existingLogs: planHandoff?.existingLogs ?? []
       )
     )
-  }
-
-  private func consumePendingAutoStartIfReady() {
-    let targetDayIsLoaded = isEditable && currentWorkout?.day.id == selectedDayID
-    if autoStartGate.consumeIfReady(isTargetDateLoaded: targetDayIsLoaded) {
-      started = true
-    }
   }
 
   private func refreshReadinessStatus() async {

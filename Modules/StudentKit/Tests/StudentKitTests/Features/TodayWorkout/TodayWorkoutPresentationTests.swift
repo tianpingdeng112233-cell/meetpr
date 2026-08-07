@@ -6,10 +6,12 @@ import Testing
 
 @MainActor
 @Suite struct TodayWorkoutPresentationTests {
-  @Test func untouchedWorkoutStartsInListAndStartedWorkoutUsesRecordingHero() {
+  @Test func zeroLogDashboardCTAFramesListHeroWithoutSkippingPreStartState() throws {
     let fixture = makeFixture()
+    let listFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
+    let laterRecordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
 
-    let list = TodayWorkoutPresentation(
+    let dashboardDestination = TodayWorkoutPresentation(
       day: fixture.day,
       drafts: fixture.drafts,
       references: [:],
@@ -21,9 +23,22 @@ import Testing
       references: [:],
       started: true
     )
+    let measurement = TodayWorkoutHeroFrameMeasurement(
+      heroMode: dashboardDestination.heroMode,
+      requestToken: 1,
+      frame: listFrame
+    )
+    var latch = LaunchDestinationFrameLatch()
+    latch.arm()
+    let publishedFrame = try #require(measurement.publishableFrame)
+    let capturedListFrame = latch.capture(publishedFrame)
+    let overwroteListFrame = latch.capture(laterRecordingFrame)
 
-    #expect(list.heroMode == .list)
-    #expect(!list.allowsManualCompletion)
+    #expect(dashboardDestination.heroMode == .list)
+    #expect(!dashboardDestination.allowsManualCompletion)
+    #expect(capturedListFrame)
+    #expect(!overwroteListFrame)
+    #expect(latch.frame == listFrame)
     #expect(recording.heroMode == .recording)
     // Started but nothing recorded yet: hold-to-complete must stay hidden —
     // there is no skip-this-day in sequence progression (David 2026-08-07).
@@ -45,9 +60,11 @@ import Testing
     #expect(presentation.allowsManualCompletion)
   }
 
-  @Test func existingLogForcesRecordingHeroAndProgressSharesItsPositionSource() {
+  @Test func partialRealLogDashboardCTAFramesAndLatchesRecordingHero() throws {
     var fixture = makeFixture()
     fixture.drafts[0].completed = true
+    let staleListFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
+    let recordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
 
     let presentation = TodayWorkoutPresentation(
       day: fixture.day,
@@ -55,8 +72,22 @@ import Testing
       references: [:],
       started: false
     )
+    let measurement = TodayWorkoutHeroFrameMeasurement(
+      heroMode: presentation.heroMode,
+      requestToken: 1,
+      frame: recordingFrame
+    )
+    var latch = LaunchDestinationFrameLatch()
+    latch.arm()
+    let publishedFrame = try #require(measurement.publishableFrame)
+    let capturedRecordingFrame = latch.capture(publishedFrame)
+    let overwroteRecordingFrame = latch.capture(staleListFrame)
 
     #expect(presentation.heroMode == .recording)
+    #expect(measurement.heroMode == .recording)
+    #expect(capturedRecordingFrame)
+    #expect(!overwroteRecordingFrame)
+    #expect(latch.frame == recordingFrame)
     #expect(presentation.allowsManualCompletion)
     #expect(presentation.progress.remainingSets == 2)
     #expect(presentation.progress.remainingExercises == 2)

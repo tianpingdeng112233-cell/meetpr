@@ -35,6 +35,7 @@
         isPreparingAskCoach: false,
         namespace: namespace,
         isLaunchTargetHidden: false,
+        heroFrameRequestToken: 0,
         launchHeroRevealToken: 0,
         collapsedExercises: $collapsed,
         sequenceContent: EmptyView(),
