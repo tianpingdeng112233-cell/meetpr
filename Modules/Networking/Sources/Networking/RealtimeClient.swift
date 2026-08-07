@@ -103,6 +103,12 @@ public actor RealtimeClient {
     wantsConnection
   }
 
+  /// Test probe: the active run task, captured before disconnect() clears it
+  /// so tests can await its exit as a completion barrier.
+  func activeRunTask() -> Task<Void, Never>? {
+    runTask
+  }
+
   private func run(generation: UInt64) async {
     var maximumBackoffSeconds = 1
 
