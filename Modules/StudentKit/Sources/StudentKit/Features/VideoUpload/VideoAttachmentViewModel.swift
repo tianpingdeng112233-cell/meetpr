@@ -51,8 +51,8 @@ public final class VideoAttachmentViewModel {
 
   // MARK: - Lifecycle
 
-  /// Marks uploads interrupted by an app kill as failed, loads existing
-  /// attachments, and starts observing manager events. Idempotent.
+  /// Reconnects interrupted background work, loads existing attachments, and
+  /// starts observing manager events. Idempotent.
   public func start(studentID: UUID) async {
     guard observeTask == nil else { return }
     observeTask = Task { [weak self] in
@@ -73,10 +73,20 @@ public final class VideoAttachmentViewModel {
 
   // MARK: - Actions
 
-  public func attach(sourceURL: URL, setLogID: UUID, studentID: UUID) async {
+  public func attach(
+    sourceURL: URL,
+    setLogID: UUID,
+    studentID: UUID,
+    trainingDate: Date? = nil
+  ) async {
     lastErrorMessage = nil
     do {
-      _ = try await manager.enqueue(sourceURL: sourceURL, setLogID: setLogID, studentID: studentID)
+      _ = try await manager.enqueue(
+        sourceURL: sourceURL,
+        setLogID: setLogID,
+        studentID: studentID,
+        trainingDate: trainingDate
+      )
     } catch let error as VideoUploadError {
       lastErrorMessage = Self.message(for: error)
     } catch {
@@ -85,8 +95,11 @@ public final class VideoAttachmentViewModel {
   }
 
   public func retry(setLogID: UUID) async {
-    guard let state = rowStates[setLogID] else { return }
-    await manager.retry(attachmentID: state.attachment.id)
+    if let state = rowStates[setLogID] {
+      await manager.retry(attachmentID: state.attachment.id)
+    } else {
+      await manager.retry(setLogID: setLogID)
+    }
   }
 
   public func remove(setLogID: UUID) async {

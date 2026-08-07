@@ -190,9 +190,16 @@ public final class PushRegistrar {
   @MainActor
   public final class PushNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
     private weak var registrar: PushRegistrar?
+    /// App-local notifications (e.g. upload-failure alerts, spec 069) route
+    /// here first; returning true consumes the tap before push routing.
+    private let localRouting: (@MainActor ([AnyHashable: Any]) -> Bool)?
 
-    public init(registrar: PushRegistrar) {
+    public init(
+      registrar: PushRegistrar,
+      localRouting: (@MainActor ([AnyHashable: Any]) -> Bool)? = nil
+    ) {
       self.registrar = registrar
+      self.localRouting = localRouting
     }
 
     public func userNotificationCenter(
@@ -212,9 +219,9 @@ public final class PushRegistrar {
       _ center: UNUserNotificationCenter,
       didReceive response: UNNotificationResponse
     ) async {
-      registrar?.receiveNotificationPayload(
-        Self.payloadValues(from: response.notification.request.content.userInfo)
-      )
+      let userInfo = response.notification.request.content.userInfo
+      if localRouting?(userInfo) == true { return }
+      registrar?.receiveNotificationPayload(Self.payloadValues(from: userInfo))
     }
 
     private static func payloadValues(from userInfo: [AnyHashable: Any]) -> PushPayloadValues {

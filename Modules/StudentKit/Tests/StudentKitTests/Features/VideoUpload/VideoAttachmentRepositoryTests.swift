@@ -21,6 +21,27 @@ import Testing
   #expect(try await second.fetchAll(studentID: attachment.studentID) == [attachment])
 }
 
+@Test func backendRepositoryPersistsMultipartCheckpointAcrossInstances() async throws {
+  let directory = tempDirectory()
+  defer { try? FileManager.default.removeItem(at: directory) }
+  let first = makeBackendRepository(directory: directory)
+  var attachment = makeAttachment(status: .uploading)
+  attachment.uploadPartCount = 3
+  attachment.uploadPartTargets = [
+    VideoUploadPartTarget(partNumber: 1, url: try #require(URL(string: "https://oss.test/1"))),
+    VideoUploadPartTarget(partNumber: 2, url: try #require(URL(string: "https://oss.test/2"))),
+    VideoUploadPartTarget(partNumber: 3, url: try #require(URL(string: "https://oss.test/3"))),
+  ]
+  attachment.uploadedParts = [VideoUploadedPart(partNumber: 1, etag: "etag-1")]
+  attachment.uploadRetryCount = 2
+  attachment.firstUploadFailureAt = Date(timeIntervalSince1970: 1_780_000_000)
+
+  try await first.save(attachment)
+  let restored = try await makeBackendRepository(directory: directory).fetch(id: attachment.id)
+
+  #expect(restored == attachment)
+}
+
 @Test func backendRepositorySaveUpsertsByID() async throws {
   let directory = tempDirectory()
   defer { try? FileManager.default.removeItem(at: directory) }

@@ -15,6 +15,8 @@ public struct TodayWorkoutView: View {
   private let coachRPEReconciler: E1RMCoachRPEReconciler?
   private let planHandoff: TodayWorkoutPlanHandoff?
   private let jumpToTodayToken: Int
+  private let uploadFailureDestination: UploadFailureDestination?
+  private let uploadFailureNavigationToken: Int
   private let autoStartToken: Int
   private let isLaunchTargetHidden: Bool
   private let launchHeroRevealToken: Int
@@ -63,6 +65,8 @@ public struct TodayWorkoutView: View {
     videoUploads: VideoUploadServices? = nil,
     planHandoff: TodayWorkoutPlanHandoff? = nil,
     jumpToTodayToken: Int = 0,
+    uploadFailureDestination: UploadFailureDestination? = nil,
+    uploadFailureNavigationToken: Int = 0,
     autoStartToken: Int = 0,
     isLaunchTargetHidden: Bool = false,
     launchHeroRevealToken: Int = 0,
@@ -89,6 +93,8 @@ public struct TodayWorkoutView: View {
     }
     self.planHandoff = planHandoff
     self.jumpToTodayToken = jumpToTodayToken
+    self.uploadFailureDestination = uploadFailureDestination
+    self.uploadFailureNavigationToken = uploadFailureNavigationToken
     self.autoStartToken = autoStartToken
     self.isLaunchTargetHidden = isLaunchTargetHidden
     self.launchHeroRevealToken = launchHeroRevealToken
@@ -346,6 +352,9 @@ public struct TodayWorkoutView: View {
       }
       consumePendingAutoStartIfReady()
       await videoViewModel.start(studentID: studentID)
+      if uploadFailureNavigationToken > 0 {
+        openUploadFailureDestination()
+      }
     }
     .onChange(of: selectedDate) { _, newDate in
       editing = nil
@@ -373,6 +382,10 @@ public struct TodayWorkoutView: View {
         selectedDate = jumpTarget
       }
     }
+    .onChange(of: uploadFailureNavigationToken) { _, token in
+      guard token > 0 else { return }
+      openUploadFailureDestination()
+    }
     .onChange(of: autoStartToken) { _, token in
       guard token > 0 else { return }
       autoStartGate.receive(token: token)
@@ -382,6 +395,12 @@ public struct TodayWorkoutView: View {
       editing = nil
       Task { await loadWorkout(for: selectedDate) }
     }
+  }
+
+  private func openUploadFailureDestination() {
+    guard let destination = uploadFailureDestination else { return }
+    selectedDate = Calendar.current.startOfDay(for: destination.trainingDate)
+    retryTargetSetLogID = destination.setLogID
   }
 
   @ViewBuilder
@@ -505,6 +524,7 @@ public struct TodayWorkoutView: View {
       setNumber: target.setNumber,
       viewModel: viewModel,
       studentID: studentID,
+      trainingDate: selectedDate,
       videoViewModel: videoViewModel,
       scrollToVideo: target.scrollToVideo
     )
@@ -612,7 +632,8 @@ public struct TodayWorkoutView: View {
     await videoViewModel.attach(
       sourceURL: sourceURL,
       setLogID: setLogID,
-      studentID: studentID
+      studentID: studentID,
+      trainingDate: selectedDate
     )
     preparingVideoSetID = nil
   }

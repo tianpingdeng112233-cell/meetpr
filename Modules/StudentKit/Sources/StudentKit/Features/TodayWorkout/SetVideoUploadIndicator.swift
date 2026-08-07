@@ -22,13 +22,11 @@ enum SetVideoButtonDestination: Equatable, Sendable {
   }
 }
 
-/// Visual language (David 2026-07-11): always the same camera glyph, only the
-/// stroke color changes — muted when no video, a progress-proportional gold
-/// sweep while uploading, success green when uploaded, danger red on failure.
+/// Upload work is deliberately silent: every attached nonterminal state uses
+/// the same neutral camera glyph; only terminal failure changes appearance.
 enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
   case unattached
-  case uploading(progress: Double)
-  case uploaded
+  case attached
   case failed
 
   static func resolve(
@@ -37,26 +35,19 @@ enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
     switch status {
     case .none:
       .unattached
-    case .pending:
-      .uploading(progress: 0)
-    case .uploading:
-      .uploading(progress: min(max(progress, 0), 1))
-    case .uploaded:
-      .uploaded
+    case .pending, .uploading, .uploaded:
+      .attached
     case .failed:
       .failed
     }
   }
 
-  /// Single stroke color; nil for `.uploading`, which renders two-tone.
-  var strokeColor: Color? {
+  var strokeColor: Color {
     switch self {
     case .unattached:
       Color.MeetPR.textMuted
-    case .uploading:
-      nil
-    case .uploaded:
-      Color.MeetPR.success
+    case .attached:
+      Color.MeetPR.textMuted
     case .failed:
       Color.MeetPR.danger
     }
@@ -66,10 +57,8 @@ enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
     switch self {
     case .unattached:
       "未附视频"
-    case .uploading(let progress):
-      "视频上传中 \(Int((progress * 100).rounded()))%"
-    case .uploaded:
-      "视频已上传"
+    case .attached:
+      "已附视频"
     case .failed:
       "视频上传失败"
     }
@@ -88,21 +77,7 @@ struct SetVideoUploadIndicator: View {
 
   var body: some View {
     Group {
-      if case .uploading(let progress) = style {
-        glyph(Color.MeetPR.textMuted)
-          .overlay {
-            // Left-to-right sweep: the gold glyph is revealed across the
-            // real part-upload fraction from VideoAttachmentViewModel.
-            glyph(Color.MeetPR.gold500)
-              .mask(alignment: .leading) {
-                GeometryReader { geo in
-                  Rectangle().frame(width: geo.size.width * progress)
-                }
-              }
-          }
-      } else {
-        glyph(style.strokeColor ?? Color.MeetPR.textMuted)
-      }
+      glyph(style.strokeColor)
     }
     .accessibilityLabel(style.accessibilityLabel)
   }

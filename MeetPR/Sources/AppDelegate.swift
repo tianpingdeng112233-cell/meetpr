@@ -1,4 +1,5 @@
 import AppShell
+import StudentKit
 import UIKit
 
 @MainActor
@@ -17,5 +18,17 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     didFailToRegisterForRemoteNotificationsWithError error: Error
   ) {
     Self.pushRegistrar?.remoteRegistrationFailed(error)
+  }
+
+  func application(
+    _ application: UIApplication,
+    handleEventsForBackgroundURLSession identifier: String,
+    completionHandler: @escaping () -> Void
+  ) {
+    BackgroundUploadCompletionRegistry.shared.store(
+      identifier: identifier,
+      completion: completionHandler
+    )
+    BackgroundUploadSessionLifecycle.shared.reconnect(identifier: identifier)
   }
 }

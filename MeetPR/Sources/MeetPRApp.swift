@@ -22,7 +22,6 @@ struct MeetPRApp: App {
     private let pushNotificationDelegate: PushNotificationDelegate
   #endif
   @State private var session: Session
-
   init() {
     let draftStore = DraftStore.shared
     self.draftStore = draftStore
@@ -32,7 +31,14 @@ struct MeetPRApp: App {
     _session = State(initialValue: dependencies.session)
     #if !DEMO_MODE
       let notificationDelegate = PushNotificationDelegate(
-        registrar: dependencies.pushRegistrar
+        registrar: dependencies.pushRegistrar,
+        localRouting: { userInfo in
+          guard
+            let destination = UploadFailureDestination(notificationUserInfo: userInfo)
+          else { return false }
+          UploadFailureNavigation.shared.openFailedAttachment(destination)
+          return true
+        }
       )
       pushNotificationDelegate = notificationDelegate
       AppDelegate.pushRegistrar = dependencies.pushRegistrar

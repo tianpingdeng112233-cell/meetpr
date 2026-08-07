@@ -27,12 +27,13 @@ public struct VideoUploadServices: Sendable {
     api: APIClient,
     session: any SessionStateReader
   ) -> VideoUploadServices {
-    VideoUploadServices(
-      manager: VideoUploadManager(
-        service: BackendVideoUploadService(api: api, session: session),
-        exporter: AVFoundationVideoExporter(),
-        repository: BackendVideoAttachmentRepository(api: api, session: session)
-      )
+    let manager = VideoUploadManager(
+      service: BackendVideoUploadService(api: api, session: session),
+      exporter: AVFoundationVideoExporter(),
+      repository: BackendVideoAttachmentRepository(api: api, session: session),
+      failureNotifier: UploadFailureNotifier(),
+      enableNetworkMonitoring: true
     )
+    return VideoUploadServices(manager: manager)
   }
 }

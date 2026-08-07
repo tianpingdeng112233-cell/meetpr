@@ -188,30 +188,12 @@ public struct SetRow: View {
             )
         }
       }
-      .overlay(alignment: .bottomTrailing) {
-        if differentiateWithoutColor && videoState == .uploaded {
-          ZStack {
-            Circle()
-              .fill(Color.MeetPR.surfaceCard)
-            CheckmarkIconShape()
-              .stroke(
-                Color.MeetPR.success,
-                style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
-              )
-              .padding(1)
-          }
-          .frame(width: 9, height: 9)
-          .offset(x: 2, y: 2)
-        }
-      }
-      .opacity(videoState == .uploading ? 0.55 : 1)
   }
 
   private var videoColor: Color {
     switch videoState {
     case .none: Color.MeetPR.textGhost
-    case .uploading: Color.MeetPR.textMuted
-    case .uploaded: Color.MeetPR.success
+    case .uploading, .uploaded: Color.MeetPR.textMuted
     case .failed: Color.MeetPR.danger
     }
   }
@@ -226,8 +208,7 @@ public struct SetRow: View {
     let videoText =
       switch videoState {
       case .none: "无视频"
-      case .uploading: "视频上传中"
-      case .uploaded: "视频已上传"
+      case .uploading, .uploaded: "已附视频"
       case .failed: "视频上传失败"
       }
     let weightText = weight.map { "\(numberText($0)) 千克" } ?? "暂无建议重量"
@@ -240,8 +221,7 @@ public struct SetRow: View {
   private var videoAccessibilityText: String {
     switch videoState {
     case .none: "无视频"
-    case .uploading: "视频上传中"
-    case .uploaded: "视频已上传"
+    case .uploading, .uploaded: "已附视频"
     case .failed: "视频上传失败，轻点重试"
     }
   }

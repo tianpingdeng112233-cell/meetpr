@@ -16,29 +16,21 @@ public enum VideoUploadError: Error, Equatable, Sendable {
   case completeConflict
 }
 
-/// Tuning knobs for `VideoUploadManager` (spec 027 §chunk size + retry,
-/// trimmed to the V0.1 foreground pipeline).
+/// Tuning knobs for `VideoUploadManager` transport and validation.
 public struct VideoUploadConfiguration: Sendable {
   /// OSS multipart chunk size; 5 MB balances part count vs. re-upload cost.
   public var partSizeBytes: Int
   public var maxDurationSeconds: Double
-  /// Retries per part after the first failed attempt.
-  public var partRetryCount: Int
   public var maxConcurrentParts: Int
-  public var partRetryDelay: Duration
 
   public init(
     partSizeBytes: Int = 5 * 1024 * 1024,
     maxDurationSeconds: Double = 120,
-    partRetryCount: Int = 2,
-    maxConcurrentParts: Int = 3,
-    partRetryDelay: Duration = .seconds(1)
+    maxConcurrentParts: Int = 3
   ) {
     self.partSizeBytes = partSizeBytes
     self.maxDurationSeconds = maxDurationSeconds
-    self.partRetryCount = partRetryCount
     self.maxConcurrentParts = maxConcurrentParts
-    self.partRetryDelay = partRetryDelay
   }
 
   public static let `default` = VideoUploadConfiguration()
@@ -64,8 +56,23 @@ public protocol VideoExporting: Sendable {
 /// the direct-to-OSS part PUT. Mocked wholesale in unit tests.
 public protocol VideoUploadService: Sendable {
   func initiate(_ request: InitiateUploadRequestDTO) async throws -> InitiateUploadResponseDTO
-  /// PUTs one chunk to a presigned OSS URL and returns its unquoted ETag.
-  func uploadPart(to url: URL, data: Data) async throws -> String
+  /// Schedules one file-backed chunk PUT and returns its unquoted ETag.
+  func uploadPart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws -> String
+  /// Enqueues one file-backed PUT without awaiting its transfer. Used only
+  /// while draining an iOS background-session wake window.
+  func schedulePart(
+    to url: URL,
+    from fileURL: URL,
+    identifier: VideoUploadPartIdentifier
+  ) async throws
   func complete(attachmentID: UUID, parts: [UploadPartETagDTO]) async throws -> AttachmentDTO
   func abort(attachmentID: UUID) async throws
+  var backgroundEvents: AsyncStream<BackgroundVideoUploadEvent> { get }
+  func isBackgroundWakeActive() async -> Bool
+  func pendingPartNumbers(recordID: UUID) async -> Set<Int>
+  func cancelParts(recordID: UUID) async
 }

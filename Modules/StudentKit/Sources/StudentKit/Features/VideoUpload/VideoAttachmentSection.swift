@@ -5,12 +5,12 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 /// "附视频" block inside SetEntrySheet (spec 027): pick from the photo
-/// library or record with the camera, then watch upload progress with retry /
-/// delete affordances. The first attach shows the coach-visibility consent
-/// dialog.
+/// library or record with the camera. Successful/background work stays
+/// visually neutral; only a terminal failure surfaces upload semantics.
 @available(iOS 17.0, macOS 14.0, *)
 struct VideoAttachmentSection: View {
   let studentID: UUID
+  let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel
   /// Set-log id when the row was already logged; nil until first commit.
   let initialSetLogID: UUID?
@@ -41,12 +41,14 @@ struct VideoAttachmentSection: View {
 
   init(
     studentID: UUID,
+    trainingDate: Date,
     videoViewModel: VideoAttachmentViewModel,
     initialSetLogID: UUID?,
     resolveSetLogID: @escaping @MainActor () async -> UUID?,
     onWillPick: (() -> Void)? = nil
   ) {
     self.studentID = studentID
+    self.trainingDate = trainingDate
     self.videoViewModel = videoViewModel
     self.initialSetLogID = initialSetLogID
     self.resolveSetLogID = resolveSetLogID
@@ -152,18 +154,16 @@ struct VideoAttachmentSection: View {
   private var presentationState: VideoAttachmentV3State {
     if let status = rowState?.attachment.status {
       switch status {
-      case .pending:
-        return .processing(text: "处理中…", canCancel: true)
-      case .uploading:
-        return .uploading(progress: rowState?.progress ?? 0)
+      case .pending, .uploading:
+        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: false)
       case .uploaded:
-        return .uploaded
+        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: true)
       case .failed:
         return .failed
       }
     }
     if isPreparing {
-      return .processing(text: "准备中…", canCancel: false)
+      return .attached(cameraAvailable: cameraAvailable, canDelete: false, delivered: false)
     }
     return .choices(cameraAvailable: cameraAvailable)
   }
@@ -179,9 +179,7 @@ struct VideoAttachmentSection: View {
 
 enum VideoAttachmentV3State: Equatable {
   case choices(cameraAvailable: Bool)
-  case processing(text: String, canCancel: Bool)
-  case uploading(progress: Double)
-  case uploaded
+  case attached(cameraAvailable: Bool, canDelete: Bool, delivered: Bool)
   case failed
 }
 
@@ -207,34 +205,22 @@ struct VideoAttachmentV3Controls: View {
         actionButton("相册", systemImage: "photo", action: onLibrary)
       }
 
-    case .processing(let text, let canCancel):
-      HStack(spacing: MeetPRSpacing.point10) {
-        ProgressView()
-          .controlSize(.small)
-          .tint(Color.MeetPR.gold500)
-        statusText(text)
-        if canCancel {
-          actionButton("取消", systemImage: "xmark", action: onCancel)
+    case .attached(let cameraAvailable, let canDelete, let delivered):
+      // On-demand confirmation only inside the edit sheet (David 2026-08-06):
+      // the glanceable surfaces stay free of upload chrome.
+      VStack(alignment: .trailing, spacing: MeetPRSpacing.point7) {
+        HStack(spacing: MeetPRSpacing.point10) {
+          actionButton("重拍", systemImage: "video", isEnabled: cameraAvailable, action: onCamera)
+          actionButton("更换", systemImage: "photo", action: onLibrary)
+          actionButton("删除", systemImage: "trash", action: onDelete)
+            .disabled(!canDelete)
         }
-      }
-
-    case .uploading(let progress):
-      HStack(spacing: MeetPRSpacing.space2) {
-        ProgressView(value: progress)
-          .tint(Color.MeetPR.gold500)
-          .frame(width: 64)
-        Text(Int(progress * 100).formatted() + "%")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.textMuted)
-        actionButton("取消", systemImage: "xmark", action: onCancel)
-      }
-
-    case .uploaded:
-      HStack(spacing: MeetPRSpacing.point10) {
-        Label("已上传", systemImage: "checkmark.circle.fill")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
-          .foregroundStyle(Color.MeetPR.success)
-        actionButton("删除", systemImage: "trash", action: onDelete)
+        Label(
+          delivered ? "已送达教练" : "还在路上",
+          systemImage: delivered ? "checkmark.circle" : "arrow.up.circle.dotted"
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .regular))
+        .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.45))
       }
 
     case .failed:
@@ -246,12 +232,6 @@ struct VideoAttachmentV3Controls: View {
         actionButton("删除", systemImage: "trash", action: onDelete)
       }
     }
-  }
-
-  private func statusText(_ text: String) -> some View {
-    Text(text)
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
-      .foregroundStyle(Color.MeetPR.textMuted)
   }
 
   private func actionButton(
@@ -331,7 +311,12 @@ extension VideoAttachmentSection {
       isPreparing = false
       return
     }
-    await videoViewModel.attach(sourceURL: sourceURL, setLogID: setLogID, studentID: studentID)
+    await videoViewModel.attach(
+      sourceURL: sourceURL,
+      setLogID: setLogID,
+      studentID: studentID,
+      trainingDate: trainingDate
+    )
     // `enqueue` sets `lastErrorMessage` synchronously on failure (e.g. the
     // clip exceeds the duration limit) and never broadcasts a row, so the
     // status onChange won't fire — restore the buttons here instead.

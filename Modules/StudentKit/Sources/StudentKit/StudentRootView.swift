@@ -42,6 +42,8 @@ public struct StudentRootView: View {
   /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
+  @State private var uploadFailureDestination: UploadFailureDestination?
+  @State private var uploadFailureNavigationToken = 0
   @State private var trainingAutoStartToken = 0
   @State private var workoutPlanHandoff: TodayWorkoutPlanHandoff?
   @State private var launchHeroRevealToken = 0
@@ -248,6 +250,8 @@ extension StudentRootView {
         restTimerSettings: restTimerSettings, videoUploads: videoUploads,
         planHandoff: workoutPlanHandoff,
         jumpToTodayToken: trainingJumpToken,
+        uploadFailureDestination: uploadFailureDestination,
+        uploadFailureNavigationToken: uploadFailureNavigationToken,
         autoStartToken: trainingAutoStartToken,
         isLaunchTargetHidden: launchSourceFrame != nil && !revealsLaunchTarget,
         launchHeroRevealToken: launchHeroRevealToken,
@@ -344,6 +348,13 @@ extension StudentRootView {
         await evaluationSummaryViewModel.load(studentID: studentID)
       }
       await runImportedHistoryBackfill()
+    }
+    .task {
+      for await destination in UploadFailureNavigation.shared.events {
+        uploadFailureDestination = destination
+        uploadFailureNavigationToken += 1
+        selectedTab = .training
+      }
     }
     .onChange(of: selectedTab) { _, newTab in
       handleTabSelectionChange(newTab)
