@@ -68,7 +68,7 @@ import Testing
   #expect(accepted.uploadGeneration == 9)
 }
 
-@Test func legacyTwoSegmentTasksAreCancelledAndRestartedFromPersistedRecord() async throws {
+@Test func manualRecoveryCancelsLegacyTasksAndRestartsFromPersistedRecord() async throws {
   let harness = VideoUploadHarness()
   let record = try makePersistedGenerationRecord(harness: harness, generation: nil)
   try writePersistedGenerationFixture(record: record, harness: harness)
@@ -78,7 +78,7 @@ import Testing
   await harness.manager.recoverInterruptedUploads(studentID: record.studentID)
 
   _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
-  #expect(await harness.service.cancelLegacyPartsCount == 1)
+  #expect(await harness.service.cancelPartsCount == 1)
   #expect(await harness.service.partAttempts[2] == 1)
   #expect(await harness.service.partAttempts[3] == 1)
   #expect(await harness.service.calls.allSatisfy { !$0.hasPrefix("initiate:") })
@@ -87,6 +87,59 @@ import Testing
   try await waitUntil {
     try await harness.repository.fetch(id: record.id)?.uploadGeneration == nil
   }
+}
+
+@Test func manualRecoveryHarvestsEnumeratedZombiePartsAndRestartsMissingParts() async throws {
+  let harness = VideoUploadHarness()
+  let record = try makePersistedGenerationRecord(harness: harness, generation: 17)
+  try writePersistedGenerationFixture(record: record, harness: harness)
+  try writePersistedGenerationChunks(record: record, harness: harness)
+  try await harness.repository.save(record)
+  await harness.service.setPendingParts([2, 3])
+
+  await harness.manager.recoverInterruptedUploads(studentID: record.studentID)
+
+  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
+  #expect(await harness.service.cancelPartsCount == 1)
+  #expect(await harness.service.partAttempts[1] == nil)
+  #expect(await harness.service.partAttempts[2] == 1)
+  #expect(await harness.service.partAttempts[3] == 1)
+  #expect(await harness.service.calls.allSatisfy { !$0.hasPrefix("initiate:") })
+  try await waitUntil {
+    !FileManager.default.fileExists(
+      atPath: persistedGenerationChunkDirectory(record: record, harness: harness).path
+    )
+  }
+  #expect(
+    !FileManager.default.fileExists(
+      atPath: persistedGenerationChunkDirectory(record: record, harness: harness).path
+    )
+  )
+}
+
+@Test func restoredCancellationWithoutOSHandlerDrainsAfterQuiescence() async throws {
+  let harness = VideoUploadHarness()
+  let record = try makePersistedGenerationRecord(harness: harness, generation: 23)
+  try writePersistedGenerationFixture(record: record, harness: harness)
+  try await harness.repository.save(record)
+  await harness.manager.activateBackgroundHandling()
+
+  await harness.service.emitBackgroundEvent(
+    BackgroundVideoPartEvent(
+      identifier: VideoUploadPartIdentifier(recordID: record.id, partNumber: 2, generation: 23),
+      result: .failure(.cancelled)
+    )
+  )
+
+  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
+  #expect(await harness.service.cancelPartsCount == 1)
+  #expect(await harness.service.partAttempts[2] == 1)
+  #expect(await harness.service.partAttempts[3] == 1)
+  #expect(
+    await harness.manager.restoredBackgroundRecords[
+      harness.service.backgroundSessionIdentifier
+    ] == nil
+  )
 }
 
 private func deliverWake(
@@ -149,6 +202,25 @@ private func writePersistedGenerationFixture(
   let fileName = try #require(record.localFileName)
   try Data(repeating: 0xAB, count: 2_560).write(
     to: harness.filesDirectory.appending(path: fileName)
+  )
+}
+
+private func writePersistedGenerationChunks(
+  record: VideoAttachment,
+  harness: VideoUploadHarness
+) throws {
+  let directory = persistedGenerationChunkDirectory(record: record, harness: harness)
+  try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  try Data([0xAB]).write(to: directory.appending(path: "stale.chunk"))
+}
+
+private func persistedGenerationChunkDirectory(
+  record: VideoAttachment,
+  harness: VideoUploadHarness
+) -> URL {
+  harness.filesDirectory.appending(
+    path: "\(record.id.uuidString).parts",
+    directoryHint: .isDirectory
   )
 }
 

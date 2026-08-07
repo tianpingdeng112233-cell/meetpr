@@ -9,6 +9,7 @@ extension VideoUploadManager {
     activateBackgroundHandling()
     recoveringStudentIDs.insert(studentID)
     await flushPendingLocalCleanups()
+    await cleanTerminalChunkFiles(studentID: studentID)
     await cleanRetainedVideos(studentID: studentID)
     await flushPendingRemoteCleanups()
     guard await !service.isBackgroundWakeActive() else { return }
@@ -50,35 +51,55 @@ extension VideoUploadManager {
 
   private func recoverDormantUpload(_ record: VideoAttachment) async -> Task<Void, Never>? {
     guard activeUploads[record.id] == nil, scheduledRetries[record.id] == nil else { return nil }
-    guard let generation = try? requireLiveSnapshotGeneration(from: record) else {
+    guard let previousGeneration = try? requireLiveSnapshotGeneration(from: record) else {
       return nil
     }
-    if await service.cancelLegacyParts(recordID: record.id) {
-      guard (try? requireLiveWakeContext(recordID: record.id, generation: generation)) != nil else {
-        return nil
-      }
-      return await restartDormantUpload(record, generation: generation)
-    }
-    guard (try? requireLiveWakeContext(recordID: record.id, generation: generation)) != nil else {
+    // fetchAll and earlier cleanup calls suspend. A real OS wake that registers
+    // during that window owns the URLSession tasks and must win before manual
+    // recovery invalidates their generation or cancels them.
+    guard await !service.isBackgroundWakeActive() else { return nil }
+    // A user-initiated launch has no OS background-session completion handler.
+    // URLSession may still enumerate force-quit tasks that can never make
+    // forward progress, so pending-task enumeration is not proof of liveness.
+    // The service atomically arbitrates cancellation against handler storage.
+    // Once manual recovery wins, the harvesting marker keeps wake sweeps away;
+    // advancing and persisting the generation before cancellation rejects old
+    // callbacks throughout the cancellation await. The replacement pipeline
+    // then rebuilds from only the ETags committed before the harvest began.
+    guard manualHarvestingRecordIDs.insert(record.id).inserted else { return nil }
+    defer { manualHarvestingRecordIDs.remove(record.id) }
+    // Claim under the completion-registry lock before committing a generation.
+    // A handler that was already registered wins without any local mutation;
+    // a later handler cannot revoke this claim while persistence suspends.
+    guard let cancellationClaim = await service.claimBackgroundCancellation() else { return nil }
+    nextUploadGeneration = max(nextUploadGeneration, previousGeneration)
+    let harvestGeneration = advanceUploadGeneration(recordID: record.id)
+    guard
+      let harvestedRecord = try? await persistUploadGeneration(
+        harvestGeneration,
+        recordID: record.id
+      ),
+      (try? requireLiveWakeContext(recordID: record.id, generation: harvestGeneration)) != nil
+    else {
+      await service.releaseBackgroundCancellationClaim(cancellationClaim)
       return nil
     }
-    if let firstFailureAt = record.firstUploadFailureAt {
+    await service.cancelParts(recordID: record.id, claim: cancellationClaim)
+    guard
+      (try? requireLiveWakeContext(recordID: record.id, generation: harvestGeneration)) != nil
+    else {
+      return nil
+    }
+    if let firstFailureAt = harvestedRecord.firstUploadFailureAt {
       scheduleRetry(
-        record: record,
+        record: harvestedRecord,
         firstFailureAt: firstFailureAt,
         networkState: .available,
-        generation: generation
+        generation: harvestGeneration
       )
       return nil
     }
-    let pendingParts = await service.pendingPartNumbers(
-      recordID: record.id,
-      generation: generation
-    )
-    guard (try? requireLiveWakeContext(recordID: record.id, generation: generation)) != nil,
-      pendingParts.isEmpty
-    else { return nil }
-    return await restartDormantUpload(record, generation: generation)
+    return await restartDormantUpload(harvestedRecord, generation: harvestGeneration)
   }
 
   private func restartDormantUpload(

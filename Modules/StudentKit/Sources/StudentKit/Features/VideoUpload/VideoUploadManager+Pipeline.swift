@@ -140,9 +140,19 @@ extension VideoUploadManager {
     try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     do {
       _ = try await service.complete(attachmentID: remoteID, parts: etags)
-    } catch APIError.httpStatus(let statusCode, _) where statusCode == 409 {
+    } catch let conflict as VideoUploadCompleteConflict {
       try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
-      throw VideoUploadError.completeConflict
+      switch conflict.status {
+      case .ready:
+        break
+      case .aborted, .failed:
+        throw VideoUploadError.remoteTerminalState
+      case .uploading, .completing, nil:
+        throw conflict
+      }
+    } catch APIError.httpStatus(let statusCode, let data) where statusCode == 409 {
+      try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
+      throw VideoUploadCompleteConflict(apiError: .httpStatus(statusCode, data))
     } catch {
       try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
       throw error
@@ -162,17 +172,18 @@ extension VideoUploadManager {
     try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     try await repository.save(uploaded)
     try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
-    let cleanupGeneration = await removeChunkFiles(recordID: record.id)
-    if wakeGeneration != nil {
-      try requireLiveWakeContext(recordID: record.id, generation: cleanupGeneration)
-    }
     broadcast(.updated(uploaded, progress: nil))
     Analytics.shared.mediaUpload(
       .succeeded,
       context: .setLog,
       bytes: Int(clamping: record.sizeBytes)
     )
-    return cleanupGeneration
+    // Remote completion and the local terminal state are authoritative. Chunk
+    // deletion is best-effort after that commit; its durable intent and launch
+    // sweep recover an interruption without replaying the remote transition.
+    let cleanup = await removeChunkFiles(recordID: record.id)
+    try requireLiveWakeContext(recordID: record.id, generation: cleanup.generation)
+    return cleanup.generation
   }
 
   private func uploadParts(
@@ -208,7 +219,7 @@ extension VideoUploadManager {
       do {
         for try await part in group {
           try requireCurrentUploadGeneration(generation, recordID: record.id)
-          try await persist(part: part, recordID: record.id)
+          try await persist(part: part, recordID: record.id, generation: generation)
           submitNext()
         }
       } catch is BackgroundUploadPipelineDeferred {
@@ -252,14 +263,19 @@ extension VideoUploadManager {
     return VideoUploadedPart(partNumber: target.partNumber, etag: etag)
   }
 
-  func persist(part: VideoUploadedPart, recordID: UUID) async throws {
-    guard var latest = try await repository.fetch(id: recordID) else {
+  func persist(part: VideoUploadedPart, recordID: UUID, generation: Int) async throws {
+    guard try await repository.fetch(id: recordID) != nil else {
       throw CancellationError()
     }
-    latest.uploadedParts.removeAll { $0.partNumber == part.partNumber }
-    latest.uploadedParts.append(part)
-    latest.uploadedParts.sort { $0.partNumber < $1.partNumber }
-    try await repository.save(latest)
+    try requireLiveWakeContext(recordID: recordID, generation: generation)
+    guard
+      let latest = try await repository.persistUploadedPart(
+        part,
+        recordID: recordID,
+        expectedUploadGeneration: generation
+      )
+    else { throw CancellationError() }
+    try requireLiveWakeContext(recordID: recordID, generation: generation)
     let progress =
       latest.uploadPartCount > 0
       ? Double(latest.uploadedParts.count) / Double(latest.uploadPartCount)

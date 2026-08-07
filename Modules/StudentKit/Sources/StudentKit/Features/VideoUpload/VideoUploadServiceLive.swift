@@ -48,11 +48,16 @@ public struct BackendVideoUploadService: VideoUploadService {
     attachmentID: UUID,
     parts: [UploadPartETagDTO]
   ) async throws -> AttachmentDTO {
-    try await api.completeUpload(
-      attachmentID: attachmentID,
-      parts: parts,
-      accessToken: session.accessToken()
-    )
+    do {
+      return try await api.completeUpload(
+        attachmentID: attachmentID,
+        parts: parts,
+        accessToken: session.accessToken()
+      )
+    } catch let error as APIError {
+      guard case .httpStatus(409, _) = error else { throw error }
+      throw VideoUploadCompleteConflict(apiError: error)
+    }
   }
 
   public func abort(attachmentID: UUID) async throws {
@@ -75,6 +80,20 @@ public struct BackendVideoUploadService: VideoUploadService {
 
   public func cancelParts(recordID: UUID) async {
     await partUploader.cancelParts(recordID: recordID)
+  }
+
+  public func claimBackgroundCancellation() async -> BackgroundUploadCancellationClaim? {
+    partUploader.claimCancellationIfBackgroundWakeInactive()
+  }
+
+  public func cancelParts(recordID: UUID, claim: BackgroundUploadCancellationClaim) async {
+    await partUploader.cancelParts(recordID: recordID, claim: claim)
+  }
+
+  public func releaseBackgroundCancellationClaim(
+    _ claim: BackgroundUploadCancellationClaim
+  ) async {
+    partUploader.releaseCancellationClaim(claim)
   }
 }
 
@@ -142,4 +161,11 @@ public struct LoopbackVideoUploadService: VideoUploadService {
   public func pendingPartNumbers(recordID: UUID, generation: Int) async -> Set<Int> { [] }
   public func cancelLegacyParts(recordID: UUID) async -> Bool { false }
   public func cancelParts(recordID: UUID) async {}
+  public func claimBackgroundCancellation() async -> BackgroundUploadCancellationClaim? {
+    BackgroundUploadCancellationClaim(sessionIdentifier: "loopback-video-upload")
+  }
+  public func cancelParts(recordID: UUID, claim: BackgroundUploadCancellationClaim) async {}
+  public func releaseBackgroundCancellationClaim(
+    _ claim: BackgroundUploadCancellationClaim
+  ) async {}
 }

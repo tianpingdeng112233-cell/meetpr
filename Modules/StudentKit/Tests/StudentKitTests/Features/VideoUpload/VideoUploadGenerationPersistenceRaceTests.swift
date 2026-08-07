@@ -72,12 +72,13 @@ import Testing
   try writeGenerationPersistenceRaceFixture(record: record, filesDirectory: filesDirectory)
   await manager.activateBackgroundHandling()
   // Register the student as recovering so the session-finished sweep walks
-  // this record. Keep one OS-owned part pending during registration so
-  // recovery does not also start a foreground writer.
-  await service.setPendingParts([1])
+  // this record. An active OS wake makes launch recovery defer ownership to
+  // the background-session path instead of harvesting and restarting tasks.
+  BackgroundUploadCompletionRegistry.shared.store(
+    identifier: service.backgroundSessionIdentifier
+  ) {}
   await manager.recoverInterruptedUploads(studentID: record.studentID)
   #expect(await manager.activeUploads[record.id] == nil)
-  await service.setPendingParts([])
 
   await repository.suspendNextGenerationSave()
   let task = await manager.startUploadTask(
@@ -205,7 +206,7 @@ private func deliverOldGenerationEvent(
   try await waitUntil { completionCounter.value == 1 }
 }
 
-private func makeGenerationPersistenceRaceRecord(
+func makeGenerationPersistenceRaceRecord(
   service: MockVideoUploadService
 ) throws -> VideoAttachment {
   let recordID = UUID()
@@ -272,6 +273,21 @@ private actor GatedGenerationRepository: VideoAttachmentRepository {
       }
     }
     storage[attachment.id] = attachment
+  }
+
+  func persistUploadedPart(
+    _ part: VideoUploadedPart,
+    recordID: UUID,
+    expectedUploadGeneration: Int
+  ) -> VideoAttachment? {
+    guard var attachment = storage[recordID],
+      attachment.uploadGeneration == expectedUploadGeneration
+    else { return nil }
+    attachment.uploadedParts.removeAll { $0.partNumber == part.partNumber }
+    attachment.uploadedParts.append(part)
+    attachment.uploadedParts.sort { $0.partNumber < $1.partNumber }
+    storage[recordID] = attachment
+    return attachment
   }
 
   func fetch(id: UUID) -> VideoAttachment? {

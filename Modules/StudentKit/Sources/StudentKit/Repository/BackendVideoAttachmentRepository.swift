@@ -46,6 +46,23 @@ public actor BackendVideoAttachmentRepository: VideoAttachmentRepository {
     try persist(all)
   }
 
+  public func persistUploadedPart(
+    _ part: VideoUploadedPart,
+    recordID: UUID,
+    expectedUploadGeneration: Int
+  ) async throws -> VideoAttachment? {
+    var all = try load()
+    guard let index = all.firstIndex(where: { $0.id == recordID }),
+      all[index].uploadGeneration == expectedUploadGeneration
+    else { return nil }
+    all[index].uploadedParts.removeAll { $0.partNumber == part.partNumber }
+    all[index].uploadedParts.append(part)
+    all[index].uploadedParts.sort { $0.partNumber < $1.partNumber }
+    let attachment = all[index]
+    try persist(all)
+    return attachment
+  }
+
   public func fetch(id: UUID) async throws -> VideoAttachment? {
     try load().first { $0.id == id }
   }

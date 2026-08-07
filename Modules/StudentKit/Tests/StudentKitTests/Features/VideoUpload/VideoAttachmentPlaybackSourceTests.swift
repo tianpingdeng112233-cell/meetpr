@@ -135,6 +135,20 @@ private actor PlaybackSourceRepository: VideoAttachmentRepository {
     self.attachment = attachment
   }
 
+  func persistUploadedPart(
+    _ part: VideoUploadedPart,
+    recordID: UUID,
+    expectedUploadGeneration: Int
+  ) async throws -> VideoAttachment? {
+    guard attachment.id == recordID,
+      attachment.uploadGeneration == expectedUploadGeneration
+    else { return nil }
+    attachment.uploadedParts.removeAll { $0.partNumber == part.partNumber }
+    attachment.uploadedParts.append(part)
+    attachment.uploadedParts.sort { $0.partNumber < $1.partNumber }
+    return attachment
+  }
+
   func fetch(id: UUID) async throws -> VideoAttachment? {
     attachment.id == id ? attachment : nil
   }

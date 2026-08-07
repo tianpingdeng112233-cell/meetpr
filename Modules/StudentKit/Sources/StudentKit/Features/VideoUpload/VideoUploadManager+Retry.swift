@@ -110,7 +110,7 @@ extension VideoUploadManager {
     if failureKind == .deterministic {
       await transitionToTerminalFailure(
         record,
-        abandonsRemoteSession: (error as? VideoUploadError) != .completeConflict,
+        abandonsRemoteSession: (error as? VideoUploadError) != .remoteTerminalState,
         generation: generation
       )
       return
@@ -187,22 +187,32 @@ extension VideoUploadManager {
     generation: Int
   ) async {
     guard
-      let record = await prepareTerminalFailureRecord(
+      var record = await prepareTerminalFailureRecord(
         staleRecord,
         abandonsRemoteSession: abandonsRemoteSession,
         generation: generation
       )
     else { return }
-    let cleanupGeneration = await removeChunkFiles(recordID: record.id)
-    guard isLiveRetryContext(recordID: record.id, generation: cleanupGeneration) else { return }
+    record.status = .failed
+    do {
+      try await repository.save(record)
+    } catch {
+      return
+    }
+    guard isLiveRetryContext(recordID: record.id, generation: generation) else { return }
     broadcast(.updated(record, progress: nil))
     Analytics.shared.mediaUpload(
       .failed,
       context: .setLog,
       bytes: Int(clamping: record.sizeBytes)
     )
+    // Terminal persistence owns the lifecycle transition. Physical cleanup is
+    // subsequent best-effort work backed by a durable local intent and launch
+    // sweep, so unlink failure cannot roll the record back to a retryable state.
+    let cleanup = await removeChunkFiles(recordID: record.id)
+    guard isLiveRetryContext(recordID: record.id, generation: cleanup.generation) else { return }
     let records = (try? await repository.fetchAll(studentID: record.studentID)) ?? []
-    guard isLiveRetryContext(recordID: record.id, generation: cleanupGeneration) else { return }
+    guard isLiveRetryContext(recordID: record.id, generation: cleanup.generation) else { return }
     await failureNotifier.notifyTerminalFailures(
       count: records.filter { $0.status == .failed }.count,
       destination: UploadFailureDestination(
@@ -210,7 +220,7 @@ extension VideoUploadManager {
         trainingDate: record.trainingDate
       )
     )
-    guard isLiveRetryContext(recordID: record.id, generation: cleanupGeneration) else { return }
+    guard isLiveRetryContext(recordID: record.id, generation: cleanup.generation) else { return }
   }
 
   private func prepareTerminalFailureRecord(
@@ -236,10 +246,6 @@ extension VideoUploadManager {
     } else {
       resetRemoteSession(on: &record)
     }
-    record.status = .failed
-    guard isLiveRetryContext(recordID: record.id, generation: generation) else { return nil }
-    try? await repository.save(record)
-    guard isLiveRetryContext(recordID: record.id, generation: generation) else { return nil }
     return record
   }
 
@@ -282,7 +288,7 @@ extension VideoUploadManager {
     if let uploadError = error as? VideoUploadError {
       switch uploadError {
       case .durationExceedsLimit, .exportFailed, .emptyFile, .fileUnreadable,
-        .localFileMissing, .invalidPartURL, .partURLCountMismatch, .completeConflict:
+        .localFileMissing, .invalidPartURL, .partURLCountMismatch, .remoteTerminalState:
         return .deterministic
       }
     }
