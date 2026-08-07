@@ -258,6 +258,21 @@ private actor GatedUploadingVideoAttachmentRepository: VideoAttachmentRepository
     }
   }
 
+  func persistUploadedPart(
+    _ part: VideoUploadedPart,
+    recordID: UUID,
+    expectedUploadGeneration: Int
+  ) -> VideoAttachment? {
+    guard var attachment = storage[recordID],
+      attachment.uploadGeneration == expectedUploadGeneration
+    else { return nil }
+    attachment.uploadedParts.removeAll { $0.partNumber == part.partNumber }
+    attachment.uploadedParts.append(part)
+    attachment.uploadedParts.sort { $0.partNumber < $1.partNumber }
+    storage[recordID] = attachment
+    return attachment
+  }
+
   func fetch(id: UUID) -> VideoAttachment? {
     storage[id]
   }

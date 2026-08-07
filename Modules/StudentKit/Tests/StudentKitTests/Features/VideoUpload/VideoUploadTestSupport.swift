@@ -5,17 +5,6 @@ import RepositoryContracts
 
 @testable import StudentKit
 
-final class RecoveryLockedCounter: @unchecked Sendable {
-  private let lock = NSLock()
-  private var storage = 0
-
-  var value: Int { lock.withLock { storage } }
-
-  func increment() {
-    lock.withLock { storage += 1 }
-  }
-}
-
 /// Records the wire-call order of the upload pipeline and lets tests inject
 /// per-part failures, complete errors, and a hang (for cancellation tests).
 actor MockVideoUploadService: VideoUploadService {
@@ -34,11 +23,15 @@ actor MockVideoUploadService: VideoUploadService {
   private(set) var suspendedCancelLegacyPartsCount = 0
   private(set) var suspendedPendingPartNumbersCount = 0
   private(set) var suspendedCancelPartsCount = 0
+  private(set) var pendingPartNumbersCallCount = 0
+  private(set) var backgroundWakeCheckCallCount = 0
+  private(set) var suspendedBackgroundWakeCheckCount = 0
 
   private var partFailuresRemaining: [Int: Int] = [:]
   private var signatureFailuresRemaining: [Int: Int] = [:]
   private var deterministicFailuresRemaining: [Int: Int] = [:]
   private var completeError: Error?
+  private var queuedCompleteErrors: [any Error] = []
   private var completeDelay: Duration?
   private var hangOnParts = false
   private var partDelay: Duration?
@@ -53,6 +46,9 @@ actor MockVideoUploadService: VideoUploadService {
   private var pendingPartNumbersWaiters: [CheckedContinuation<Void, Never>] = []
   private var cancelPartsSuspensionsRemaining = 0
   private var cancelPartsWaiters: [CheckedContinuation<Void, Never>] = []
+  private var backgroundWakeCheckSuspensionCall: Int?
+  private var backgroundWakeCheckWaiters: [CheckedContinuation<Void, Never>] = []
+  private(set) var backgroundCancellationClaim: BackgroundUploadCancellationClaim?
 
   init() {
     let stream = AsyncStream.makeStream(
@@ -77,6 +73,10 @@ actor MockVideoUploadService: VideoUploadService {
 
   func setCompleteError(_ error: Error?) {
     completeError = error
+  }
+
+  func setCompleteErrors(_ errors: [any Error]) {
+    queuedCompleteErrors = errors
   }
 
   func setCompleteDelay(_ delay: Duration?) {
@@ -146,6 +146,18 @@ actor MockVideoUploadService: VideoUploadService {
   func releaseCancelParts() {
     let waiters = cancelPartsWaiters
     cancelPartsWaiters = []
+    for waiter in waiters {
+      waiter.resume()
+    }
+  }
+
+  func suspendBackgroundWakeCheck(call: Int) {
+    backgroundWakeCheckSuspensionCall = call
+  }
+
+  func releaseBackgroundWakeChecks() {
+    let waiters = backgroundWakeCheckWaiters
+    backgroundWakeCheckWaiters = []
     for waiter in waiters {
       waiter.resume()
     }
@@ -248,6 +260,9 @@ actor MockVideoUploadService: VideoUploadService {
     if let completeDelay {
       try await Task.sleep(for: completeDelay)
     }
+    if !queuedCompleteErrors.isEmpty {
+      throw queuedCompleteErrors.removeFirst()
+    }
     if let completeError {
       throw completeError
     }
@@ -278,12 +293,21 @@ extension MockVideoUploadService {
   }
 
   func isBackgroundWakeActive() async -> Bool {
-    BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
+    backgroundWakeCheckCallCount += 1
+    if backgroundWakeCheckSuspensionCall == backgroundWakeCheckCallCount {
+      suspendedBackgroundWakeCheckCount += 1
+      await withCheckedContinuation { continuation in
+        backgroundWakeCheckWaiters.append(continuation)
+      }
+      backgroundWakeCheckSuspensionCall = nil
+    }
+    return BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
       identifier: backgroundSessionIdentifier
     )
   }
 
   func pendingPartNumbers(recordID: UUID, generation: Int) async -> Set<Int> {
+    pendingPartNumbersCallCount += 1
     if pendingPartNumbersSuspensionsRemaining > 0 {
       pendingPartNumbersSuspensionsRemaining -= 1
       suspendedPendingPartNumbersCount += 1
@@ -317,72 +341,27 @@ extension MockVideoUploadService {
         cancelPartsWaiters.append(continuation)
       }
     }
+    pendingParts = []
+    hasLegacyPendingParts = false
   }
-}
 
-/// Test fixture: a manager wired against mocks, with a throwaway files
-/// directory under tmp.
-struct VideoUploadHarness {
-  let service: MockVideoUploadService
-  let repository: InMemoryVideoAttachmentRepository
-  let manager: VideoUploadManager
-  let filesDirectory: URL
-  let sourceURL = URL(fileURLWithPath: "/tmp/ignored-source.mov")
-
-  init(
-    exporter: any VideoExporting = MockVideoExporter(),
-    configuration: VideoUploadConfiguration = VideoUploadHarness.testConfiguration(),
-    failureNotifier: (any UploadFailureNotifying)? = nil
-  ) {
-    let service = MockVideoUploadService()
-    let repository = InMemoryVideoAttachmentRepository()
-    let directory = FileManager.default.temporaryDirectory
-      .appendingPathComponent("video-upload-tests-\(UUID().uuidString)", isDirectory: true)
-    self.service = service
-    self.repository = repository
-    self.filesDirectory = directory
-    self.manager = VideoUploadManager(
-      service: service,
-      exporter: exporter,
-      repository: repository,
-      configuration: configuration,
-      filesDirectory: directory,
-      retryScheduler: UploadRetryScheduler(
-        backoffSeconds: [0, 0, 0, 0, 0],
-        timeBoxSeconds: 30 * 60
-      ),
-      failureNotifier: failureNotifier
+  func claimBackgroundCancellation() async -> BackgroundUploadCancellationClaim? {
+    guard await !isBackgroundWakeActive(), backgroundCancellationClaim == nil else { return nil }
+    let claim = BackgroundUploadCancellationClaim(
+      sessionIdentifier: backgroundSessionIdentifier
     )
+    backgroundCancellationClaim = claim
+    return claim
   }
 
-  /// Small parts + zero retry delay + serial parts so call order is exact.
-  static func testConfiguration(maxConcurrentParts: Int = 1) -> VideoUploadConfiguration {
-    VideoUploadConfiguration(
-      partSizeBytes: 1_024,
-      maxDurationSeconds: 120,
-      maxConcurrentParts: maxConcurrentParts
-    )
-  }
-}
-
-actor RecordingUploadFailureNotifier: UploadFailureNotifying {
-  private(set) var authorizationRequestCount = 0
-  private(set) var notifiedCounts: [Int] = []
-  private(set) var destinations: [UploadFailureDestination] = []
-
-  func requestProvisionalAuthorization() async {
-    authorizationRequestCount += 1
+  func cancelParts(recordID: UUID, claim: BackgroundUploadCancellationClaim) async {
+    guard backgroundCancellationClaim == claim else { return }
+    await cancelParts(recordID: recordID)
+    backgroundCancellationClaim = nil
   }
 
-  func notifyTerminalFailures(count: Int, destination: UploadFailureDestination) async {
-    notifiedCounts.append(count)
-    destinations.append(destination)
+  func releaseBackgroundCancellationClaim(_ claim: BackgroundUploadCancellationClaim) {
+    guard backgroundCancellationClaim == claim else { return }
+    backgroundCancellationClaim = nil
   }
-}
-
-func makeTemporaryVideoSource() throws -> URL {
-  let sourceURL = FileManager.default.temporaryDirectory
-    .appending(path: "video-upload-source-\(UUID().uuidString).mov")
-  try Data([0x01]).write(to: sourceURL)
-  return sourceURL
 }

@@ -10,10 +10,50 @@ public enum VideoUploadError: Error, Equatable, Sendable {
   case localFileMissing
   case invalidPartURL(partNumber: Int)
   case partURLCountMismatch(expected: Int, received: Int)
-  /// `POST /uploads/:id/complete` answered 409 — the backend attachment
-  /// already left the `uploading` state, so this upload session is dead.
-  /// Retry goes through a fresh initiate, never through abort.
-  case completeConflict
+  /// The backend reports that this upload is irreversibly aborted or failed.
+  case remoteTerminalState
+}
+
+enum VideoUploadRemoteStatus: String, Equatable, Sendable {
+  case uploading
+  case completing
+  case ready
+  case aborted
+  case failed
+}
+
+struct VideoUploadCompleteConflict: Error, Equatable, Sendable {
+  let status: VideoUploadRemoteStatus?
+
+  init(status: VideoUploadRemoteStatus?) {
+    self.status = status
+  }
+
+  init(apiError: APIError) {
+    guard case .httpStatus(409, let data) = apiError,
+      let payload = try? JSONDecoder().decode(CompleteUploadConflictPayload.self, from: data),
+      payload.error == "UPLOAD_INVALID_STATE"
+    else {
+      status = nil
+      return
+    }
+    status = VideoUploadRemoteStatus(rawValue: payload.status)
+  }
+}
+
+private struct CompleteUploadConflictPayload: Decodable {
+  let error: String
+  let status: String
+}
+
+public struct BackgroundUploadCancellationClaim: Hashable, Sendable {
+  public let sessionIdentifier: String
+  public let id: UUID
+
+  public init(sessionIdentifier: String, id: UUID = UUID()) {
+    self.sessionIdentifier = sessionIdentifier
+    self.id = id
+  }
 }
 
 /// Tuning knobs for `VideoUploadManager` transport and validation.
@@ -78,4 +118,12 @@ public protocol VideoUploadService: Sendable {
   /// and therefore cannot be safely adopted by a persisted spec-070 attempt.
   func cancelLegacyParts(recordID: UUID) async -> Bool
   func cancelParts(recordID: UUID) async
+  /// Atomically claims manual cancellation only when no UIApplication
+  /// background wake handler already owns the fixed URLSession identifier.
+  func claimBackgroundCancellation() async -> BackgroundUploadCancellationClaim?
+  /// Consumes a successful claim after the caller has advanced and persisted
+  /// its generation, then enumerates and cancels the old URLSession tasks.
+  func cancelParts(recordID: UUID, claim: BackgroundUploadCancellationClaim) async
+  /// Releases a claim when generation persistence fails before cancellation.
+  func releaseBackgroundCancellationClaim(_ claim: BackgroundUploadCancellationClaim) async
 }

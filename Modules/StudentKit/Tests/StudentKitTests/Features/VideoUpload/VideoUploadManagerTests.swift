@@ -123,21 +123,6 @@ import Testing
   #expect(failed.remoteAttachmentID == nil)
 }
 
-@Test func uploadManagerTreatsComplete409AsTerminalWithoutAbort() async throws {
-  let harness = VideoUploadHarness()
-  await harness.service.setCompleteError(APIError.httpStatus(409, Data()))
-
-  let record = try await harness.manager.enqueue(
-    sourceURL: harness.sourceURL,
-    setLogID: UUID(),
-    studentID: UUID()
-  )
-  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
-
-  // The backend row already left `uploading`; aborting it would just 409 too.
-  #expect(await harness.service.abortCount == 0)
-}
-
 @Test func uploadManagerRejectsVideosOverTheDurationLimit() async throws {
   let harness = VideoUploadHarness(exporter: MockVideoExporter(duration: 121))
   let studentID = UUID()

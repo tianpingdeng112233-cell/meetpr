@@ -352,7 +352,7 @@ import Testing
   try await waitUntil { counter.value == 1 }
 }
 
-private func makeRestoredRecord(id: UUID, remoteID: UUID, fileName: String) throws
+func makeRestoredRecord(id: UUID, remoteID: UUID, fileName: String) throws
   -> VideoAttachment
 {
   let targets = try (1...3).map { partNumber in
@@ -379,7 +379,7 @@ private func makeRestoredRecord(id: UUID, remoteID: UUID, fileName: String) thro
   )
 }
 
-private func writeVideoFixture(fileName: String, harness: VideoUploadHarness) throws {
+func writeVideoFixture(fileName: String, harness: VideoUploadHarness) throws {
   try FileManager.default.createDirectory(
     at: harness.filesDirectory,
     withIntermediateDirectories: true

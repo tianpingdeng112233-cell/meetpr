@@ -29,11 +29,11 @@ extension VideoUploadManager {
       BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(event.completionToken)
       return
     }
-    if event.hasPipelineContinuation,
-      !BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
-        identifier: event.completionToken.sessionIdentifier
-      )
-    {
+    let sessionIdentifier = event.completionToken.sessionIdentifier
+    let hasPendingHandler = BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
+      identifier: sessionIdentifier
+    )
+    if event.hasPipelineContinuation, !hasPendingHandler {
       BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(event.completionToken)
       return
     }
@@ -45,9 +45,13 @@ extension VideoUploadManager {
     switch event.result {
     case .success(let etag):
       do {
+        guard let generation = event.identifier.generation else {
+          throw CancellationError()
+        }
         try await persist(
           part: VideoUploadedPart(partNumber: event.identifier.partNumber, etag: etag),
-          recordID: recordID
+          recordID: recordID,
+          generation: generation
         )
       } catch {
         restoredRecord.failure = .unknown
@@ -58,50 +62,10 @@ extension VideoUploadManager {
       }
     }
     pending[recordID] = restoredRecord
-    restoredBackgroundRecords[event.completionToken.sessionIdentifier] = pending
-  }
-
-  private func finishBackgroundSessionEvents(
-    identifier: String,
-    completionToken: BackgroundUploadEventToken
-  ) async {
-    let records = restoredBackgroundRecords.removeValue(forKey: identifier) ?? [:]
-    for (recordID, restoredRecord) in records {
-      if let failure = restoredRecord.failure,
-        let generation = restoredRecord.generation
-      {
-        await handleUploadFailure(
-          recordID: recordID,
-          error: failure,
-          generation: generation
-        )
-      } else {
-        await continueDuringBackgroundWake(recordID: recordID)
-      }
-
-      for token in restoredRecord.tokens {
-        BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(token)
-      }
+    restoredBackgroundRecords[sessionIdentifier] = pending
+    if !hasPendingHandler, !drainingBackgroundSessionIdentifiers.contains(sessionIdentifier) {
+      scheduleManualBackgroundEventDrain(identifier: sessionIdentifier)
     }
-
-    let restoredRecordIDs = Set(records.keys)
-    for studentID in recoveringStudentIDs {
-      let dormantRecords = (try? await repository.fetchAll(studentID: studentID)) ?? []
-      // Records with a live pipeline task are not dormant: waking them here
-      // would run a second writer under the same generation (duplicate part
-      // writes/PUTs, spurious localFileMissing before the export lands).
-      for record in dormantRecords
-      where record.status != .uploaded
-        && record.status != .failed
-        && !restoredRecordIDs.contains(record.id)
-        && activeUploads[record.id] == nil
-        && scheduledRetries[record.id] == nil
-        && !removingRecordIDs.contains(record.id)
-      {
-        await continueDuringBackgroundWake(record)
-      }
-    }
-    BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(completionToken)
   }
 
   /// Drains only bounded work while iOS is waiting for its background-session
@@ -117,7 +81,7 @@ extension VideoUploadManager {
     await continueDuringBackgroundWake(record)
   }
 
-  private func continueDuringBackgroundWake(_ record: VideoAttachment) async {
+  func continueDuringBackgroundWake(_ record: VideoAttachment) async {
     guard record.status != .uploaded,
       record.status != .failed,
       let initialGeneration = try? requireLiveSnapshotGeneration(from: record)

@@ -52,6 +52,17 @@ struct BackgroundUploadCompletionState: Sendable {
     return finishIfPossible(identifier: identifier)
   }
 
+  @discardableResult
+  mutating func discardDeliveredSessionIfNoHandler(identifier: String) -> Bool {
+    guard let session = sessions[identifier],
+      !session.hasHandler,
+      session.eventsDelivered,
+      session.outstandingEvents.isEmpty
+    else { return false }
+    sessions[identifier] = nil
+    return true
+  }
+
   func hasPendingHandler(identifier: String) -> Bool {
     sessions[identifier]?.hasHandler == true
   }
@@ -98,6 +109,7 @@ public final class BackgroundUploadCompletionRegistry: @unchecked Sendable {
   private let lock = NSLock()
   private var state = BackgroundUploadCompletionState()
   private var handlers: [String: CompletionHandler] = [:]
+  private var cancellationClaims: [String: UUID] = [:]
 
   public init() {}
 
@@ -130,8 +142,38 @@ public final class BackgroundUploadCompletionRegistry: @unchecked Sendable {
     callOnMainActor(handler)
   }
 
+  func discardDeliveredSessionIfNoHandler(identifier: String) {
+    _ = lock.withLock {
+      state.discardDeliveredSessionIfNoHandler(identifier: identifier)
+    }
+  }
+
   func hasPendingHandler(identifier: String) -> Bool {
     lock.withLock { state.hasPendingHandler(identifier: identifier) }
+  }
+
+  func claimCancellationIfNoPendingHandler(
+    identifier: String
+  ) -> BackgroundUploadCancellationClaim? {
+    lock.withLock {
+      guard !state.hasPendingHandler(identifier: identifier),
+        cancellationClaims[identifier] == nil
+      else { return nil }
+      let claim = BackgroundUploadCancellationClaim(sessionIdentifier: identifier)
+      cancellationClaims[identifier] = claim.id
+      return claim
+    }
+  }
+
+  func ownsCancellationClaim(_ claim: BackgroundUploadCancellationClaim) -> Bool {
+    lock.withLock { cancellationClaims[claim.sessionIdentifier] == claim.id }
+  }
+
+  func releaseCancellationClaim(_ claim: BackgroundUploadCancellationClaim) {
+    lock.withLock {
+      guard cancellationClaims[claim.sessionIdentifier] == claim.id else { return }
+      cancellationClaims[claim.sessionIdentifier] = nil
+    }
   }
 
   private func callOnMainActor(_ handler: CompletionHandler?) {

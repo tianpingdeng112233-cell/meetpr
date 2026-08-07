@@ -24,10 +24,16 @@ public actor VideoUploadManager {
   var activeUploads: [UUID: Task<Void, Never>] = [:]
   var activeUploadOwnerships: [UUID: Int] = [:]
   var removingRecordIDs: Set<UUID> = []
+  var manualHarvestingRecordIDs: Set<UUID> = []
   var activeUploadOwnershipCounter = 0
   var scheduledRetries: [UUID: Task<Void, Never>] = [:]
   var scheduledRetryGenerations: [UUID: Int] = [:]
   var restoredBackgroundRecords: [String: [UUID: RestoredBackgroundRecord]] = [:]
+  var backgroundEventDrainTasks: [String: Task<Void, Never>] = [:]
+  var backgroundEventDrainTokens: [String: UUID] = [:]
+  var drainingBackgroundSessionIdentifiers: Set<String> = []
+  var drainingBackgroundRecordIDs: Set<UUID> = []
+  var pendingBackgroundFinishTokens: [String: Set<BackgroundUploadEventToken>] = [:]
   var recoveringStudentIDs: Set<UUID> = []
   /// Monotonic attempt identity per attachment. Chunk teardown advances the
   /// value, permanently invalidating every writer that captured an older one.

@@ -10,6 +10,13 @@ import Foundation
 public protocol VideoAttachmentRepository: Sendable {
   /// Inserts or replaces by `attachment.id`.
   func save(_ attachment: VideoAttachment) async throws
+  /// Atomically persists one multipart ETag only while the stored upload
+  /// generation still matches. Returns nil when a newer attempt won first.
+  func persistUploadedPart(
+    _ part: VideoUploadedPart,
+    recordID: UUID,
+    expectedUploadGeneration: Int
+  ) async throws -> VideoAttachment?
   func fetch(id: UUID) async throws -> VideoAttachment?
   func fetch(setLogID: UUID) async throws -> [VideoAttachment]
   func fetchAll(studentID: UUID) async throws -> [VideoAttachment]

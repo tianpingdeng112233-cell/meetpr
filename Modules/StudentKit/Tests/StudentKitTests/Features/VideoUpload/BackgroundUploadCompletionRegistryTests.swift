@@ -56,6 +56,21 @@ import Testing
   #expect(delivered)
 }
 
+@Test func manualFinishDrainDiscardsDeliveredStateBeforeNextWake() {
+  var state = BackgroundUploadCompletionState()
+  let identifier = "reused-production-identifier"
+  let finishToken = state.beginEvent(identifier: identifier)
+
+  let delivered = state.markEventsDelivered(identifier: identifier)
+  let acknowledged = state.acknowledgeEvent(finishToken)
+  let discarded = state.discardDeliveredSessionIfNoHandler(identifier: identifier)
+  let nextWakeStored = state.storeHandler(identifier: identifier)
+  #expect(!delivered)
+  #expect(!acknowledged)
+  #expect(discarded)
+  #expect(!nextWakeStored)
+}
+
 @Test func completionRegistryInvokesHandlerExactlyOnceOnMainThread() async throws {
   let registry = BackgroundUploadCompletionRegistry()
   let identifier = "runtime-\(UUID().uuidString)"
@@ -73,6 +88,27 @@ import Testing
   try await waitUntil { counter.value == 1 }
   #expect(counter.value == 1)
   #expect(counter.allCallsWereOnMainThread)
+}
+
+@Test func completionRegistrySerializesManualClaimAgainstHandlerStorage() async throws {
+  let registry = BackgroundUploadCompletionRegistry()
+  let identifier = "atomic-owner-\(UUID().uuidString)"
+  let handlerCounter = LockedCounter()
+
+  let manualClaim = try #require(
+    registry.claimCancellationIfNoPendingHandler(identifier: identifier)
+  )
+  registry.store(identifier: identifier) {
+    handlerCounter.increment()
+  }
+  let competingClaim = registry.claimCancellationIfNoPendingHandler(identifier: identifier)
+
+  #expect(competingClaim == nil)
+  #expect(registry.ownsCancellationClaim(manualClaim))
+  registry.releaseCancellationClaim(manualClaim)
+  #expect(!registry.ownsCancellationClaim(manualClaim))
+  registry.markEventsDelivered(identifier: identifier)
+  try await waitUntil { handlerCounter.value == 1 }
 }
 
 @Test func sessionLifecycleReconnectsForEitherRegistrationOrder() {

@@ -204,6 +204,28 @@ final class BackgroundVideoPartUploader: NSObject, @unchecked Sendable {
     }
   }
 
+  func claimCancellationIfBackgroundWakeInactive() -> BackgroundUploadCancellationClaim? {
+    BackgroundUploadCompletionRegistry.shared.claimCancellationIfNoPendingHandler(
+      identifier: sessionIdentifier
+    )
+  }
+
+  func cancelParts(recordID: UUID, claim: BackgroundUploadCancellationClaim) async {
+    defer { BackgroundUploadCompletionRegistry.shared.releaseCancellationClaim(claim) }
+    guard BackgroundUploadCompletionRegistry.shared.ownsCancellationClaim(claim) else { return }
+    let tasks = await session.allTasks
+    guard BackgroundUploadCompletionRegistry.shared.ownsCancellationClaim(claim) else { return }
+    for task in tasks {
+      guard VideoUploadPartIdentifier(taskDescription: task.taskDescription)?.recordID == recordID
+      else { continue }
+      task.cancel()
+    }
+  }
+
+  func releaseCancellationClaim(_ claim: BackgroundUploadCancellationClaim) {
+    BackgroundUploadCompletionRegistry.shared.releaseCancellationClaim(claim)
+  }
+
   func receiveCompletion(
     taskIdentifier: Int,
     taskDescription: String?,

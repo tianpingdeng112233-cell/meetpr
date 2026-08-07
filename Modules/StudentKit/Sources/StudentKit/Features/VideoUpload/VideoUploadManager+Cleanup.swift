@@ -2,6 +2,11 @@ import CoreModels
 import Foundation
 import Networking
 
+struct VideoChunkCleanupResult: Sendable {
+  let generation: Int
+  let isDurable: Bool
+}
+
 extension VideoUploadManager {
   /// Cancels any in-flight upload, abandons an unfinished remote upload, and
   /// deletes all local record, video, and chunk files. A ready attachment is
@@ -28,7 +33,7 @@ extension VideoUploadManager {
       guard await abandonRemoteSession(record: &record) else { return }
     }
     guard await removeLocalFileOrPersistCleanupIntent(record) else { return }
-    await removeChunkFiles(recordID: attachmentID)
+    guard await removeChunkFiles(recordID: attachmentID).isDurable else { return }
     do {
       try await repository.delete(id: attachmentID)
     } catch {
@@ -50,10 +55,39 @@ extension VideoUploadManager {
   }
 
   @discardableResult
-  func removeChunkFiles(recordID: UUID) async -> Int {
+  func removeChunkFiles(recordID: UUID) async -> VideoChunkCleanupResult {
     let generation = await persistNewUploadGeneration(recordID: recordID)
-    try? FileManager.default.removeItem(at: chunkDirectory(recordID: recordID))
-    return generation
+    let directory = chunkDirectory(recordID: recordID)
+    guard FileManager.default.fileExists(atPath: directory.path) else {
+      return VideoChunkCleanupResult(generation: generation, isDurable: true)
+    }
+    let directoryName = directory.lastPathComponent
+
+    do {
+      try await localCleanupStore.enqueue(directoryName)
+    } catch {
+      do {
+        try removeLocalFile(directory)
+        return VideoChunkCleanupResult(generation: generation, isDurable: true)
+      } catch {
+        return VideoChunkCleanupResult(generation: generation, isDurable: false)
+      }
+    }
+
+    do {
+      try removeLocalFile(directory)
+      try? await localCleanupStore.remove(directoryName)
+    } catch {}
+    return VideoChunkCleanupResult(generation: generation, isDurable: true)
+  }
+
+  func cleanTerminalChunkFiles(studentID: UUID) async {
+    let records = (try? await repository.fetchAll(studentID: studentID)) ?? []
+    for record in records where record.status == .uploaded || record.status == .failed {
+      let directory = chunkDirectory(recordID: record.id)
+      guard FileManager.default.fileExists(atPath: directory.path) else { continue }
+      _ = await removeChunkFiles(recordID: record.id)
+    }
   }
 
   /// Mirrors the remote-abort queue: once the file name is durable, the local
