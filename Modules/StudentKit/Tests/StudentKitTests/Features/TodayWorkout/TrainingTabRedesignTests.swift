@@ -58,6 +58,47 @@ import Testing
     #expect(TrainingSequenceLayout.currentWeekNumber(days: completed) == 2)
   }
 
+  @Test func planSummaryAndFutureWeekMetadataFollowDesignCopy() throws {
+    let days = StudentDemoSeed.makePlanView().days
+    let weeks = TrainingSequenceLayout.makeWeeks(days: days, selectedDayID: nil)
+    let firstWeek = try #require(weeks.first)
+    let futureWeek = try #require(weeks.last)
+
+    #expect(
+      TrainingSequenceText.weekSummary(firstWeek.days)
+        == "深蹲日 · 卧推日 · 硬拉日 · 深蹲卧推日"
+    )
+    #expect(
+      TrainingSequenceText.shortDate(try #require(futureWeek.days.first).day.scheduledDate) == "8/8"
+    )
+  }
+
+  @Test func planSummaryHidesWeeksBehindTheCursor() {
+    let date = Date(timeIntervalSince1970: 1_800_000_000)
+    let days = [
+      StudentPlanDay(
+        id: UUID(), weekNumber: 1, dayOfWeek: 1, sortOrder: 0, date: date,
+        completedAt: date, completionSource: "auto", exercises: []
+      ),
+      StudentPlanDay(
+        id: UUID(), weekNumber: 2, dayOfWeek: 1, sortOrder: 0, date: date,
+        completedAt: date, completionSource: "auto", exercises: []
+      ),
+      StudentPlanDay(
+        id: UUID(), weekNumber: 2, dayOfWeek: 2, sortOrder: 0, date: date, exercises: []),
+      StudentPlanDay(
+        id: UUID(), weekNumber: 3, dayOfWeek: 1, sortOrder: 0, date: date, exercises: []),
+    ]
+
+    let weeks = TrainingSequenceLayout.weeksFromCurrent(days: days, selectedDayID: nil)
+
+    // Cursor sits in W2: the fully completed W1 must not appear, W2 leads
+    // with the cursor, W3 stays as the sole future week.
+    #expect(weeks.map(\.weekNumber) == [2, 3])
+    #expect(weeks[0].days.map(\.state) == [.completed, .current])
+    #expect(weeks[1].days.map(\.state) == [.upcoming])
+  }
+
   private func sequenceDays() -> [StudentPlanDay] {
     let date = Date(timeIntervalSince1970: 1_800_000_000)
     return [

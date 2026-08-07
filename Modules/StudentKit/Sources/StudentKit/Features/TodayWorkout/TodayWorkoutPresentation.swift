@@ -79,9 +79,14 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
   let exercises: [Exercise]
   let progress: TodayWorkoutProgress
   let currentRow: Row?
+  /// A set that reached the server (or Demo store), failed attempts included.
+  let hasAnyLoggedSet: Bool
 
+  // There is no "skip this day" in sequence progression — an untouched day just
+  // keeps the cursor. Manual completion is only offered once real work exists
+  // (David 2026-08-07: hold button must not appear before any set is recorded).
   var allowsManualCompletion: Bool {
-    heroMode == .recording
+    heroMode == .recording && hasAnyLoggedSet
   }
 
   init(
@@ -93,6 +98,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
   ) {
     let hasRecordedSet = drafts.contains(where: \.completed)
     self.day = day
+    self.hasAnyLoggedSet = drafts.contains { $0.completed || $0.failed }
     self.heroMode = !started && !hasRecordedSet ? .list : .recording
     self.progress = TodayWorkoutProgress(day: day, drafts: drafts)
 

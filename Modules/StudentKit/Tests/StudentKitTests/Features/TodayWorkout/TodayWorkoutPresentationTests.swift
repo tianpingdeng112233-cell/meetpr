@@ -25,8 +25,24 @@ import Testing
     #expect(list.heroMode == .list)
     #expect(!list.allowsManualCompletion)
     #expect(recording.heroMode == .recording)
-    #expect(recording.allowsManualCompletion)
+    // Started but nothing recorded yet: hold-to-complete must stay hidden —
+    // there is no skip-this-day in sequence progression (David 2026-08-07).
+    #expect(!recording.allowsManualCompletion)
     #expect(recording.currentRow?.stableIndex == 0)
+  }
+
+  @Test func manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() {
+    var fixture = makeFixture()
+    fixture.drafts[0].failed = true
+
+    let presentation = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: true
+    )
+
+    #expect(presentation.allowsManualCompletion)
   }
 
   @Test func existingLogForcesRecordingHeroAndProgressSharesItsPositionSource() {

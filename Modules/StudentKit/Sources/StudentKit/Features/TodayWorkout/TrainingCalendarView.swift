@@ -42,56 +42,64 @@ struct TrainingCalendarView: View {
   }
 
   private func sequenceContent(days: [StudentPlanDay]) -> some View {
-    let weeks = TrainingSequenceLayout.makeWeeks(days: days, selectedDayID: selectedDayID)
+    let weeks = TrainingSequenceLayout.weeksFromCurrent(days: days, selectedDayID: selectedDayID)
     let completedCount = days.filter { $0.completedAt != nil }.count
-    return VStack(alignment: .leading, spacing: 10) {
-      Text("计划汇总")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
-        .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("已完成 \(completedCount) / \(days.count) 节")
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-        .foregroundStyle(Color.MeetPR.textMuted)
+    let currentWeekNumber = TrainingSequenceLayout.currentWeekNumber(days: days)
+    return VStack(alignment: .leading, spacing: 8) {
+      HStack {
+        Text("计划汇总")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textSecondary)
+        Spacer()
+        Text("已完成 \(completedCount) / \(days.count) 节")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
 
       ForEach(weeks) { week in
-        weekSection(week)
+        weekSection(week, isCurrentWeek: week.weekNumber == currentWeekNumber)
       }
     }
   }
 
-  private func weekSection(_ week: TrainingSequenceWeek) -> some View {
-    VStack(spacing: 0) {
-      Button {
-        if expandedWeeks.contains(week.weekNumber) {
-          expandedWeeks.remove(week.weekNumber)
-        } else {
-          expandedWeeks.insert(week.weekNumber)
-        }
-      } label: {
-        HStack {
-          Text("W\(week.weekNumber)")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size14))
-            .foregroundStyle(Color.MeetPR.gold500)
-          Text("\(week.days.filter { $0.state == .completed }.count)/\(week.days.count) 节")
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-            .foregroundStyle(Color.MeetPR.textMuted)
-          Spacer()
-          Image(systemName: expandedWeeks.contains(week.weekNumber) ? "chevron.up" : "chevron.down")
-            .foregroundStyle(Color.MeetPR.textDim)
-        }
-        .frame(minHeight: 46)
-        .contentShape(.rect)
-      }
-      .buttonStyle(.plain)
+  private func weekSection(_ week: TrainingSequenceWeek, isCurrentWeek: Bool) -> some View {
+    VStack(spacing: 7) {
+      TrainingWeekHeader(
+        week: week,
+        isCurrentWeek: isCurrentWeek,
+        isExpanded: expandedWeeks.contains(week.weekNumber),
+        meta: weekMeta(week, isCurrentWeek: isCurrentWeek),
+        onToggle: { toggleWeek(week.weekNumber) }
+      )
 
       if expandedWeeks.contains(week.weekNumber) {
-        ForEach(week.days) { item in
-          sequenceRow(item)
+        VStack(spacing: 0) {
+          ForEach(week.days) { item in
+            sequenceRow(item)
+          }
         }
+        .padding(.horizontal, 13)
+        .background(Color.MeetPR.surfaceCard)
+        .clipShape(.rect(cornerRadius: 14))
       }
     }
-    .padding(.horizontal, 13)
-    .background(Color.MeetPR.surfaceCard)
-    .clipShape(.rect(cornerRadius: 14))
+  }
+
+  private func toggleWeek(_ weekNumber: Int) {
+    if expandedWeeks.contains(weekNumber) {
+      expandedWeeks.remove(weekNumber)
+    } else {
+      expandedWeeks.insert(weekNumber)
+    }
+  }
+
+  private func weekMeta(_ week: TrainingSequenceWeek, isCurrentWeek: Bool) -> String {
+    if isCurrentWeek {
+      let completedCount = week.days.filter { $0.state == .completed }.count
+      return "\(completedCount) / \(week.days.count) 节"
+    }
+    guard let firstDay = week.days.first else { return "0 节" }
+    return "\(week.days.count) 节 · \(TrainingSequenceText.shortDate(firstDay.day.scheduledDate)) 起"
   }
 
   private func sequenceRow(_ item: TrainingSequenceDay) -> some View {
@@ -138,6 +146,87 @@ struct TrainingCalendarView: View {
       Circle().fill(Color.MeetPR.gold500).frame(width: 8, height: 8)
     case .upcoming:
       Circle().stroke(Color.MeetPR.textGhost, lineWidth: 1).frame(width: 8, height: 8)
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct TrainingWeekHeader: View {
+  let week: TrainingSequenceWeek
+  let isCurrentWeek: Bool
+  let isExpanded: Bool
+  let meta: String
+  let onToggle: () -> Void
+
+  var body: some View {
+    Button(action: onToggle) {
+      HStack(spacing: 10) {
+        TrainingWeekIdentity(weekNumber: week.weekNumber, isCurrentWeek: isCurrentWeek)
+
+        Text(TrainingSequenceText.weekSummary(week.days))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textMuted)
+          .lineLimit(1)
+
+        Spacer()
+
+        Text(meta)
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textMuted)
+          .fixedSize(horizontal: true, vertical: false)
+
+        Image(systemName: "chevron.right")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size10, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textDim)
+          .rotationEffect(isExpanded ? .degrees(90) : .zero)
+      }
+      .padding(.horizontal, 14)
+      .padding(.vertical, 11)
+      .frame(minHeight: 44)
+      .background(Color.MeetPR.bgStack)
+      .overlay {
+        RoundedRectangle(cornerRadius: 12)
+          .stroke(Color.MeetPR.borderHairline, lineWidth: 1)
+      }
+      .clipShape(.rect(cornerRadius: 12))
+      .contentShape(.rect)
+    }
+    .buttonStyle(.plain)
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct TrainingWeekIdentity: View {
+  let weekNumber: Int
+  let isCurrentWeek: Bool
+
+  var body: some View {
+    HStack(spacing: 10) {
+      Text("W\(weekNumber)")
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textSecondary)
+
+      if isCurrentWeek {
+        Text("本周")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .bold))
+          .tracking(0.6)
+          .foregroundStyle(Color.MeetPR.goldText)
+          .padding(.horizontal, 7)
+          .padding(.vertical, 2)
+          .background(Color.MeetPR.goldRGB.opacity(0.14), in: .capsule)
+      }
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct TrainingCurrentWeekSequenceView: View {
+  let days: [StudentPlanDay]
+
+  var body: some View {
+    let cells = DashboardTodayPresentation.progressSegments(days: days)
+    if let weekNumber = TrainingSequenceLayout.currentWeekNumber(days: days), !cells.isEmpty {
+      DashboardWeekCalendar(weekNumber: weekNumber, cells: cells, headerStyle: .currentWeek)
     }
   }
 }

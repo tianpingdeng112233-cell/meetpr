@@ -15,7 +15,7 @@ enum TodayWorkoutDayState: Equatable {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-struct TodayWorkoutScreen<CalendarContent: View>: View {
+struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   enum Content {
     case loading
     case workout(TodayWorkoutPresentation)
@@ -36,6 +36,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let isLaunchTargetHidden: Bool
   let launchHeroRevealToken: Int
   @Binding var collapsedExercises: [UUID: Bool]
+  let sequenceContent: SequenceContent
   let calendarContent: CalendarContent
   let onRefresh: () -> Void
   let onReadiness: () -> Void
@@ -73,6 +74,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         onNotifications: onNotifications
       )
 
+      sequenceContent
       screenContent
       calendarContent
     }
@@ -83,7 +85,14 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
 
   @ViewBuilder
   private var screenContent: some View {
-    TodayWorkoutSequenceNotice(state: dayState, onUndo: onUndoCompletion)
+    // The design's training tab shows no state pill for the cursor day — the
+    // whole screen already reads "current". The notice only earns its row on
+    // completed (undo entry) and upcoming (preview) days.
+    if case .current = dayState {
+      EmptyView()
+    } else {
+      TodayWorkoutSequenceNotice(state: dayState, onUndo: onUndoCompletion)
+    }
 
     switch content {
     case .loading:

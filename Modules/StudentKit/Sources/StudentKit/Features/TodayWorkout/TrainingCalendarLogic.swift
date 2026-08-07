@@ -58,6 +58,18 @@ enum TrainingSequenceLayout {
     let sequence = StudentPlanSequence(days: days)
     return (sequence.cursorDay ?? sequence.orderedDays.last)?.weekNumber
   }
+
+  /// The plan summary lists the cursor week onward only (design prototype:
+  /// `PLAN.slice(CUR_WK)`) — fully behind weeks would otherwise wear the
+  /// future-week "M 节 · X/X 起" meta.
+  static func weeksFromCurrent(
+    days: [StudentPlanDay],
+    selectedDayID: UUID?
+  ) -> [TrainingSequenceWeek] {
+    let weeks = makeWeeks(days: days, selectedDayID: selectedDayID)
+    guard let currentWeekNumber = currentWeekNumber(days: days) else { return weeks }
+    return weeks.filter { $0.weekNumber >= currentWeekNumber }
+  }
 }
 
 enum TrainingSequenceText {
@@ -73,7 +85,17 @@ enum TrainingSequenceText {
   static func dayName(_ day: StudentPlanDay) -> String {
     let families = MainLiftExerciseFamilyResolver.families(in: day)
     guard !families.isEmpty else { return "训练日" }
-    return families.map(\.studentDisplayName).joined(separator: " · ")
+    if families.count == 3 { return "SBD 日" }
+    return families.map(\.studentDisplayName).joined() + "日"
+  }
+
+  static func weekSummary(_ days: [TrainingSequenceDay]) -> String {
+    days.map { dayName($0.day) }.joined(separator: " · ")
+  }
+
+  static func shortDate(_ date: Date) -> String {
+    let components = PlanCalendarDayIdentity.utcCalendar.dateComponents([.month, .day], from: date)
+    return "\(components.month ?? 0)/\(components.day ?? 0)"
   }
 
   static func unlockMessage(after day: StudentPlanDay) -> String {

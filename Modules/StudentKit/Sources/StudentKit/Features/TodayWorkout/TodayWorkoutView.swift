@@ -166,6 +166,7 @@ public struct TodayWorkoutView: View {
         isLaunchTargetHidden: isLaunchTargetHidden,
         launchHeroRevealToken: launchHeroRevealToken,
         collapsedExercises: $collapsedExercises,
+        sequenceContent: TrainingCurrentWeekSequenceView(days: viewModel.planDays),
         calendarContent: TrainingCalendarView(
           selectedDayID: $selectedDayID,
           days: viewModel.planDays
@@ -458,7 +459,9 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private var screenContent: TodayWorkoutScreen<TrainingCalendarView>.Content {
+  private var screenContent:
+    TodayWorkoutScreen<TrainingCurrentWeekSequenceView, TrainingCalendarView>.Content
+  {
     switch viewModel.state {
     case .idle, .loading:
       if let workout = handedOffWorkout(for: selectedDayID) {

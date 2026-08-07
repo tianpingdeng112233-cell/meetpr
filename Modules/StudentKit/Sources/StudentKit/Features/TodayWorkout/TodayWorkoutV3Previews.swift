@@ -37,6 +37,7 @@
         isLaunchTargetHidden: false,
         launchHeroRevealToken: 0,
         collapsedExercises: $collapsed,
+        sequenceContent: EmptyView(),
         calendarContent: TrainingCalendarPreview(month: state == .month),
         onRefresh: {},
         onReadiness: {},
@@ -53,7 +54,7 @@
       )
     }
 
-    private var content: TodayWorkoutScreen<TrainingCalendarPreview>.Content {
+    private var content: TodayWorkoutScreen<EmptyView, TrainingCalendarPreview>.Content {
       .workout(
         TrainingPreviewFixtures.presentation(
           started: state != .list,
