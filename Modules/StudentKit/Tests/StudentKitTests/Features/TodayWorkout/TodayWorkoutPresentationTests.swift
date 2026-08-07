@@ -69,6 +69,42 @@ import Testing
     #expect(presentation.currentRow?.record.index == 2)
   }
 
+  @Test func assumedHistoryDoesNotStartColdLaunchWorkout() {
+    var fixture = makeFixture()
+    for index in fixture.drafts.indices {
+      fixture.drafts[index].completed = true
+      fixture.drafts[index].assumed = true
+      fixture.drafts[index].loggedSetID = UUID()
+    }
+
+    let presentation = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(presentation.heroMode == .list)
+    #expect(!presentation.hasAnyLoggedSet)
+    #expect(!presentation.allowsManualCompletion)
+  }
+
+  @Test func failedRealLogResumesColdLaunchWorkout() {
+    var fixture = makeFixture()
+    fixture.drafts[0].failed = true
+
+    let presentation = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(presentation.heroMode == .recording)
+    #expect(presentation.hasAnyLoggedSet)
+    #expect(presentation.allowsManualCompletion)
+  }
+
   @Test func draftMappingKeepsFailureAndVideoSemantics() throws {
     var fixture = makeFixture()
     let setLogID = UUID()

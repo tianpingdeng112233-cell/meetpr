@@ -59,7 +59,8 @@ import Testing
   }
 
   @Test func planSummaryAndFutureWeekMetadataFollowDesignCopy() throws {
-    let days = StudentDemoSeed.makePlanView().days
+    let frozenToday = Date(timeIntervalSince1970: 1_786_104_000)  // 2026-08-07 UTC
+    let days = StudentDemoSeed.makePlanView(today: frozenToday).days
     let weeks = TrainingSequenceLayout.makeWeeks(days: days, selectedDayID: nil)
     let firstWeek = try #require(weeks.first)
     let futureWeek = try #require(weeks.last)

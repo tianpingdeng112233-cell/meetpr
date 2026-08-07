@@ -96,10 +96,17 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     videoStates: [UUID: SetRow.VideoState] = [:],
     started: Bool
   ) {
-    let hasRecordedSet = drafts.contains(where: \.completed)
+    // Imported history arrives as assumed set logs before the matching day-
+    // completion projection can become visible on a cold launch. Those rows
+    // describe a past session; they must not manufacture a live recording
+    // session while `started` is still false. Only a real set write (success
+    // or failure) is resumable evidence that this workout was started.
+    let hasSessionLog = drafts.contains {
+      !$0.assumed && ($0.completed || $0.failed)
+    }
     self.day = day
-    self.hasAnyLoggedSet = drafts.contains { $0.completed || $0.failed }
-    self.heroMode = !started && !hasRecordedSet ? .list : .recording
+    self.hasAnyLoggedSet = hasSessionLog
+    self.heroMode = !started && !hasSessionLog ? .list : .recording
     self.progress = TodayWorkoutProgress(day: day, drafts: drafts)
 
     self.exercises = day.exercises.enumerated().map { exerciseIndex, exercise in
