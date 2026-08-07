@@ -3,20 +3,16 @@
   import UIKit
 
   /// Wraps the system video editor for trimming videos imported from Photos.
-  /// Dismissal is owned solely by the presenting SwiftUI state: every callback
-  /// clears the `fullScreenCover` item, which tears the editor down. The
-  /// once-only + cleanup semantics live in `VideoTrimCompletion`.
+  /// The presenting cover and this representable share one `VideoTrimSession`.
+  /// UIKit delegate completion, cover dismissal, and dismantling may all race;
+  /// the session makes their cleanup idempotent.
   struct VideoTrimmerView: UIViewControllerRepresentable {
-    let sourceURL: URL
-    let maxDurationSeconds: TimeInterval
-    let onSave: (URL) -> Void
-    let onCancel: () -> Void
-    let onFailure: () -> Void
+    let session: VideoTrimSession
 
     func makeUIViewController(context: Context) -> UIVideoEditorController {
       let editor = UIVideoEditorController()
-      editor.videoPath = sourceURL.path
-      editor.videoMaximumDuration = maxDurationSeconds
+      editor.videoPath = session.sourceURL.path
+      editor.videoMaximumDuration = session.maxDurationSeconds
       editor.videoQuality = .typeHigh
       editor.delegate = context.coordinator
       return editor
@@ -25,42 +21,42 @@
     func updateUIViewController(_ uiViewController: UIVideoEditorController, context: Context) {}
 
     func makeCoordinator() -> Coordinator {
-      Coordinator(
-        completion: VideoTrimCompletion(sourceURL: sourceURL) { outcome in
-          switch outcome {
-          case .saved(let editedURL): onSave(editedURL)
-          case .cancelled: onCancel()
-          case .failed: onFailure()
-          }
-        }
-      )
+      Coordinator(session: session)
+    }
+
+    static func dismantleUIViewController(
+      _ uiViewController: UIVideoEditorController,
+      coordinator: Coordinator
+    ) {
+      uiViewController.delegate = nil
+      coordinator.session.cancelled()
     }
 
     final class Coordinator: NSObject, UIVideoEditorControllerDelegate,
       UINavigationControllerDelegate
     {
-      private let completion: VideoTrimCompletion
+      let session: VideoTrimSession
 
-      init(completion: VideoTrimCompletion) {
-        self.completion = completion
+      init(session: VideoTrimSession) {
+        self.session = session
       }
 
       func videoEditorController(
         _ editor: UIVideoEditorController,
         didSaveEditedVideoToPath editedVideoPath: String
       ) {
-        completion.saved(editedVideoPath: editedVideoPath)
+        session.saved(editedVideoPath: editedVideoPath)
       }
 
       func videoEditorControllerDidCancel(_ editor: UIVideoEditorController) {
-        completion.cancelled()
+        session.cancelled()
       }
 
       func videoEditorController(
         _ editor: UIVideoEditorController,
         didFailWithError error: any Error
       ) {
-        completion.failed()
+        session.failed()
       }
     }
   }

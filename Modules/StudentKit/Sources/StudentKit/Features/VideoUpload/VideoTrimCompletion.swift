@@ -19,6 +19,12 @@ final class VideoTrimCompletion {
     self.onOutcome = onOutcome
   }
 
+  deinit {
+    if !hasFinished {
+      try? FileManager.default.removeItem(at: sourceURL)
+    }
+  }
+
   func saved(editedVideoPath: String) {
     finish {
       let editedURL = URL(fileURLWithPath: editedVideoPath)
@@ -47,6 +53,47 @@ final class VideoTrimCompletion {
     guard !hasFinished else { return }
     hasFinished = true
     body()
+  }
+}
+
+/// Stable owner for one presented trim flow. The same instance is held by the
+/// cover and its UIKit coordinator so delegate completion, cover dismissal,
+/// and representable dismantling all converge on one idempotent cleanup path.
+final class VideoTrimSession: Identifiable {
+  let id = UUID()
+  let sourceURL: URL
+  let maxDurationSeconds: TimeInterval
+
+  private let completion: VideoTrimCompletion
+
+  init(
+    sourceURL: URL,
+    maxDurationSeconds: TimeInterval,
+    onSave: @escaping (URL) -> Void,
+    onCancel: @escaping () -> Void,
+    onFailure: @escaping () -> Void
+  ) {
+    self.sourceURL = sourceURL
+    self.maxDurationSeconds = maxDurationSeconds
+    completion = VideoTrimCompletion(sourceURL: sourceURL) { outcome in
+      switch outcome {
+      case .saved(let editedURL): onSave(editedURL)
+      case .cancelled: onCancel()
+      case .failed: onFailure()
+      }
+    }
+  }
+
+  func saved(editedVideoPath: String) {
+    completion.saved(editedVideoPath: editedVideoPath)
+  }
+
+  func cancelled() {
+    completion.cancelled()
+  }
+
+  func failed() {
+    completion.failed()
   }
 }
 

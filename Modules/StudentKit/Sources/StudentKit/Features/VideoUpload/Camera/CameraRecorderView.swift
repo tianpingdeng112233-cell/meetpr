@@ -15,6 +15,11 @@
     @State private var saveToPhotoLibrary: Bool
     @State private var toastMessage: String?
     @State private var isUsingRecording = false
+    @State private var isApplyingTrim = false
+    @State private var recordingToTrim: VideoTrimSession?
+    @State private var activeRecordingTrimSession: VideoTrimSession?
+    @State private var trimSuggestionState: RecorderTrimSuggestionState
+    @State private var didRequestShutdown = false
 
     init(
       maxDurationSeconds: TimeInterval,
@@ -31,6 +36,12 @@
       )
       _saveToPhotoLibrary = State(
         initialValue: UserDefaults.standard.object(forKey: Self.savePreferenceKey) as? Bool ?? true
+      )
+      _trimSuggestionState = State(
+        initialValue: RecorderTrimSuggestionState(
+          isPermanentlyDisabled:
+            RecorderTrimSuggestionPreference.isPermanentlyDisabled()
+        )
       )
     }
 
@@ -59,8 +70,12 @@
           if let url = controller.reviewURL {
             RecorderReviewView(
               url: url,
+              duration: controller.recordedDuration,
               saveToPhotoLibrary: saveToggleBinding,
-              isUsingRecording: isUsingRecording,
+              isBusy: isUsingRecording || isApplyingTrim,
+              showsTrimSuggestion: trimSuggestionState.shouldShow,
+              onTrim: { prepareTrim(of: url) },
+              onNeverSuggestTrim: disableTrimSuggestion,
               onUse: { Task { await useRecording(url) } },
               onClose: close
             )
@@ -105,17 +120,32 @@
             .transition(.opacity)
         }
       }
+      .fullScreenCover(
+        item: $recordingToTrim,
+        onDismiss: finishRecordingTrimPresentation
+      ) { session in
+        VideoTrimmerView(session: session)
+          .ignoresSafeArea()
+      }
       .task {
         // Students frame the shot, walk to the bar, and never touch the
         // screen mid-set: the idle timer must not blank the display while
         // the recorder is up. (UIImagePickerController did this for us;
         // a custom AVCaptureSession does not.)
         UIApplication.shared.isIdleTimerDisabled = true
-        await controller.prepare()
+        if controller.phase == .preparing {
+          await controller.prepare()
+        }
       }
       .onDisappear {
-        UIApplication.shared.isIdleTimerDisabled = false
-        Task { await controller.close() }
+        // A full-screen editor temporarily hides this view without ending the
+        // recorder. External dismissal flips `isPresented` to false and takes
+        // the shutdown path below, including both trim files and idle timer.
+        guard activeRecordingTrimSession == nil || !isPresented else { return }
+        shutdownRecorder()
+      }
+      .onChange(of: isPresented) { _, isPresented in
+        if !isPresented { shutdownRecorder() }
       }
       .onChange(of: scenePhase) { _, newPhase in
         Task {
@@ -133,6 +163,9 @@
       }
     }
 
+  }
+
+  extension CameraRecorderView {
     private var saveToggleBinding: Binding<Bool> {
       Binding(
         get: { saveToPhotoLibrary },
@@ -163,6 +196,41 @@
       }
     }
 
+    private func prepareTrim(of sourceURL: URL) {
+      guard recordingToTrim == nil, !isUsingRecording, !isApplyingTrim else { return }
+      guard UIVideoEditorController.canEditVideo(atPath: sourceURL.path) else {
+        showToast("当前视频无法剪辑")
+        return
+      }
+      do {
+        let workingURL = try RecorderVideoTrimFiles.makeWorkingCopy(of: sourceURL)
+        let session = VideoTrimSession(
+          sourceURL: workingURL,
+          maxDurationSeconds: maxDurationSeconds,
+          onSave: applyTrim,
+          onCancel: { recordingToTrim = nil },
+          onFailure: {
+            recordingToTrim = nil
+            showToast("剪辑失败，请重试")
+          }
+        )
+        activeRecordingTrimSession = session
+        recordingToTrim = session
+      } catch {
+        showToast("暂时无法开始剪辑")
+      }
+    }
+
+    private func applyTrim(_ editedURL: URL) {
+      isApplyingTrim = true
+      recordingToTrim = nil
+      trimSuggestionState.completeTrim()
+      Task {
+        await controller.replaceReviewFile(with: editedURL)
+        isApplyingTrim = false
+      }
+    }
+
     private func useRecording(_ url: URL) async {
       guard !isUsingRecording else { return }
       isUsingRecording = true
@@ -185,10 +253,8 @@
     }
 
     private func close() {
-      Task {
-        await controller.close()
-        isPresented = false
-      }
+      isPresented = false
+      shutdownRecorder()
     }
 
     private func openSettings() {
@@ -201,6 +267,28 @@
       UserDefaults.standard.set(enabled, forKey: Self.savePreferenceKey)
     }
 
+    private func disableTrimSuggestion() {
+      trimSuggestionState.disablePermanently()
+      RecorderTrimSuggestionPreference.disablePermanently()
+    }
+
+    private func finishRecordingTrimPresentation() {
+      activeRecordingTrimSession?.cancelled()
+      activeRecordingTrimSession = nil
+      recordingToTrim = nil
+      if !isPresented { shutdownRecorder() }
+    }
+
+    private func shutdownRecorder() {
+      guard !didRequestShutdown else { return }
+      didRequestShutdown = true
+      activeRecordingTrimSession?.cancelled()
+      activeRecordingTrimSession = nil
+      recordingToTrim = nil
+      UIApplication.shared.isIdleTimerDisabled = false
+      Task { await controller.close() }
+    }
+
     private func showToast(_ message: String) {
       withAnimation { toastMessage = message }
       Task {
@@ -211,4 +299,5 @@
       }
     }
   }
+
 #endif
