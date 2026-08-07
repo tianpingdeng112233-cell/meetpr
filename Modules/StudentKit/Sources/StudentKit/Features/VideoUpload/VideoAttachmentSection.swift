@@ -26,7 +26,8 @@ struct VideoAttachmentSection: View {
   @State private var showingPhotosPicker = false
   @State private var showingCamera = false
   @State private var pickedItem: PhotosPickerItem?
-  @State private var libraryVideoToTrim: PickedVideo?
+  @State private var libraryVideoToTrim: VideoTrimSession?
+  @State private var activeLibraryTrimSession: VideoTrimSession?
   @State private var pendingSource: PendingSource?
   @State private var playbackPresentation: SetVideoPlaybackPresentation?
   @State private var playbackErrorMessage: String?
@@ -155,23 +156,11 @@ struct VideoAttachmentSection: View {
           }
         )
       }
-      .fullScreenCover(item: $libraryVideoToTrim) { movie in
-        VideoTrimmerView(
-          sourceURL: movie.url,
-          maxDurationSeconds: videoViewModel.maxDurationSeconds,
-          onSave: { editedURL in
-            libraryVideoToTrim = nil
-            isPreparing = true
-            Task { await attach(sourceURL: editedURL) }
-          },
-          onCancel: {
-            libraryVideoToTrim = nil
-          },
-          onFailure: {
-            libraryVideoToTrim = nil
-            videoViewModel.reportVideoProcessingFailure()
-          }
-        )
+      .fullScreenCover(
+        item: $libraryVideoToTrim,
+        onDismiss: finishLibraryTrimPresentation
+      ) { session in
+        VideoTrimmerView(session: session)
         .ignoresSafeArea()
       }
     #else
@@ -293,7 +282,24 @@ extension VideoAttachmentSection {
         // Trim before upload; the spinner yields to the editor, and the
         // save/cancel/failure callbacks own the next state.
         isPreparing = false
-        libraryVideoToTrim = movie
+        let session = VideoTrimSession(
+          sourceURL: movie.url,
+          maxDurationSeconds: videoViewModel.maxDurationSeconds,
+          onSave: { editedURL in
+            libraryVideoToTrim = nil
+            isPreparing = true
+            Task { await attach(sourceURL: editedURL) }
+          },
+          onCancel: {
+            libraryVideoToTrim = nil
+          },
+          onFailure: {
+            libraryVideoToTrim = nil
+            videoViewModel.reportVideoProcessingFailure()
+          }
+        )
+        activeLibraryTrimSession = session
+        libraryVideoToTrim = session
         return
       }
     #endif
@@ -321,6 +327,12 @@ extension VideoAttachmentSection {
     if videoViewModel.lastErrorMessage != nil {
       isPreparing = false
     }
+  }
+
+  private func finishLibraryTrimPresentation() {
+    activeLibraryTrimSession?.cancelled()
+    activeLibraryTrimSession = nil
+    libraryVideoToTrim = nil
   }
 
   private func ensureSetLogID() async -> UUID? {

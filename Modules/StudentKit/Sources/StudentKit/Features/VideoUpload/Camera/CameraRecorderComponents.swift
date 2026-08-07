@@ -1,5 +1,6 @@
 #if os(iOS)
   import AVFoundation
+  import DesignSystem
   import SwiftUI
 
   struct RecorderCaptureView: View {
@@ -99,8 +100,12 @@
 
   struct RecorderReviewView: View {
     let url: URL
+    let duration: TimeInterval
     @Binding var saveToPhotoLibrary: Bool
-    let isUsingRecording: Bool
+    let isBusy: Bool
+    let showsTrimSuggestion: Bool
+    let onTrim: () -> Void
+    let onNeverSuggestTrim: () -> Void
     let onUse: () -> Void
     let onClose: () -> Void
 
@@ -108,23 +113,54 @@
       VStack(spacing: 0) {
         ZStack(alignment: .topLeading) {
           LoopingVideoPlayer(url: url)
+            .id(url)
             .ignoresSafeArea(edges: .top)
           RecorderCloseButton(action: onClose)
             .padding()
         }
 
         VStack(spacing: 18) {
+          Text("时长 \(RecorderTimeFormatter.string(from: duration))")
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+            .foregroundStyle(.white.opacity(0.82))
+
           Toggle("保存到相册", isOn: $saveToPhotoLibrary)
             .tint(.yellow)
             .foregroundStyle(.white)
 
+          if showsTrimSuggestion {
+            HStack(spacing: MeetPRSpacing.space1) {
+              Text("剪掉前后等待，上传和查看都更快")
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+                .foregroundStyle(Color.MeetPR.textTertiary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+
+              Spacer(minLength: MeetPRSpacing.space1)
+
+              Button("不再提醒", action: onNeverSuggestTrim)
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+                .foregroundStyle(Color.MeetPR.textSecondary)
+                .buttonStyle(.plain)
+            }
+          }
+
           HStack(spacing: 16) {
+            Button("剪辑", action: onTrim)
+              .buttonStyle(.bordered)
+              .tint(.white)
+              .foregroundStyle(.white)
+              .frame(maxWidth: .infinity)
+              .disabled(isBusy)
+
             Button("使用", action: onUse)
               .buttonStyle(.borderedProminent)
               .tint(.yellow)
               .foregroundStyle(.black)
-              .disabled(isUsingRecording)
+              .frame(maxWidth: .infinity)
+              .disabled(isBusy)
           }
+          .controlSize(.large)
         }
         .padding(24)
         .background(.black)

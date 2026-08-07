@@ -60,23 +60,27 @@ public struct FeedbackVideoPlayerView: View {
   private static let rates: [Float] = [0.5, 1.0, 1.5, 2.0]
 
   @Environment(\.dismiss) private var dismiss
-  @State private var player: AVPlayer
+  @State var player: AVPlayer
   @State private var rate: Float = 1.0
   @State private var playbackFailed = false
   @State private var retrying = false
   @State private var isPlaying = false
-  @State private var currentSeconds = 0.0
-  @State private var durationSeconds = 0.0
+  @State var currentSeconds = 0.0
+  @State var durationSeconds = 0.0
   @State private var internalAnnotationMarker: VideoMarker?
+  @State var scrubState = FeedbackVideoScrubState()
+  @State var scrubSeekTask: Task<Void, Never>?
+  @State var pendingScrubSeconds: Double?
+  @State var scrubGeneration = 0
 
   private let videoID: UUID
   private let refreshURL: @MainActor (UUID) async throws -> URL
   private let workbenchConfiguration: FeedbackVideoWorkbenchConfiguration?
-  private let currentSecondsBinding: Binding<Double>?
+  let currentSecondsBinding: Binding<Double>?
   private let markers: [VideoMarker]?
   private let markersFailed: Bool
   private let selectedAnnotationMarker: Binding<VideoMarker?>?
-  private let onSeek: @MainActor (Int) -> Void
+  let onSeek: @MainActor (Int) -> Void
   private let onAddMarker: (@MainActor () -> Void)?
   private let onMarkersRefresh: (@MainActor () async -> Void)?
 
@@ -150,6 +154,7 @@ public struct FeedbackVideoPlayerView: View {
         }
       }
       .onDisappear {
+        scrubSeekTask?.cancel()
         player.pause()
       }
       .onChange(of: selectedAnnotationMarker?.wrappedValue) { oldMarker, newMarker in
@@ -157,12 +162,6 @@ public struct FeedbackVideoPlayerView: View {
         pauseAndSeek(to: newMarker)
       }
       .task {
-        guard
-          workbenchConfiguration != nil || markers != nil || markersFailed
-            || currentSecondsBinding != nil
-        else {
-          return
-        }
         while !Task.isCancelled {
           updateTimeline()
           try? await Task.sleep(for: .milliseconds(250))
@@ -194,16 +193,27 @@ public struct FeedbackVideoPlayerView: View {
         cycleRate: cycleRate
       )
 
-      if markersFailed || markers?.isEmpty == false {
-        FeedbackVideoMarkerOverlay(
-          markers: markers ?? [],
-          failed: markersFailed,
-          currentSeconds: currentSeconds,
+      VStack(spacing: 0) {
+        Spacer()
+
+        if markersFailed || markers?.isEmpty == false {
+          FeedbackVideoMarkerOverlay(
+            markers: markers ?? [],
+            failed: markersFailed,
+            currentSeconds: currentSeconds,
+            durationSeconds: durationSeconds,
+            seek: seek(toMilliseconds:),
+            selectMarker: selectMarker
+          )
+        }
+
+        FeedbackVideoScrubber(
+          positionSeconds: scrubberPositionSeconds,
           durationSeconds: durationSeconds,
-          seek: seek(toMilliseconds:),
-          selectMarker: selectMarker
+          layout: .fullScreen,
+          updatePosition: updateScrubberPosition,
+          setScrubbing: setScrubbing
         )
-        .frame(maxHeight: .infinity, alignment: .bottom)
       }
 
       if let annotationMarker, let annotationURL = annotationMarker.annotationURL {
@@ -223,14 +233,15 @@ public struct FeedbackVideoPlayerView: View {
       rates: Self.rates,
       selectedRate: rate,
       isPlaying: isPlaying,
-      currentSeconds: currentSeconds,
+      scrubberPositionSeconds: scrubberPositionSeconds,
       durationSeconds: durationSeconds,
-      markers: markers,
       annotationMarker: annotationMarker,
       closeAnnotation: closeAnnotation,
       annotationLoadFailed: annotationLoadFailed,
       togglePlayback: togglePlayback,
       selectRate: selectRate,
+      updateScrubberPosition: updateScrubberPosition,
+      setScrubbing: setScrubbing,
       addMarker: onAddMarker
     )
   }
@@ -339,18 +350,6 @@ public struct FeedbackVideoPlayerView: View {
     }
   }
 
-  private func updateTimeline() {
-    let current = player.currentTime().seconds
-    if current.isFinite {
-      currentSeconds = max(0, current)
-      currentSecondsBinding?.wrappedValue = currentSeconds
-    }
-    let duration = player.currentItem?.duration.seconds ?? 0
-    if duration.isFinite {
-      durationSeconds = max(0, duration)
-    }
-  }
-
   private func seek(toMilliseconds milliseconds: Int) {
     let target = Self.seekTime(
       milliseconds: milliseconds,
@@ -366,4 +365,5 @@ public struct FeedbackVideoPlayerView: View {
     currentSecondsBinding?.wrappedValue = currentSeconds
     onSeek(milliseconds)
   }
+
 }

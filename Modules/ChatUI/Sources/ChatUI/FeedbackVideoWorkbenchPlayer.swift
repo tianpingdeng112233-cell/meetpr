@@ -10,25 +10,28 @@ struct FeedbackVideoWorkbenchPlayer: View {
   let rates: [Float]
   let selectedRate: Float
   let isPlaying: Bool
-  let currentSeconds: Double
+  let scrubberPositionSeconds: Double
   let durationSeconds: Double
-  let markers: [VideoMarker]?
   let annotationMarker: VideoMarker?
   let closeAnnotation: () -> Void
   let annotationLoadFailed: () -> Void
   let togglePlayback: () -> Void
   let selectRate: (Float) -> Void
+  let updateScrubberPosition: (Double) -> Void
+  let setScrubbing: (Bool) -> Void
   let addMarker: (() -> Void)?
 
   var body: some View {
     VStack(spacing: MeetPRSpacing.point11) {
       playbackStage
 
-      HStack(spacing: MeetPRSpacing.point10) {
-        timelineText(FeedbackVideoPlayerView.timeText(currentSeconds))
-        progressTrack
-        timelineText(FeedbackVideoPlayerView.timeText(durationSeconds))
-      }
+      FeedbackVideoScrubber(
+        positionSeconds: scrubberPositionSeconds,
+        durationSeconds: durationSeconds,
+        layout: .workbench,
+        updatePosition: updateScrubberPosition,
+        setScrubbing: setScrubbing
+      )
 
       HStack(spacing: MeetPRSpacing.space2) {
         ratePicker
@@ -126,47 +129,4 @@ struct FeedbackVideoWorkbenchPlayer: View {
     .clipShape(.rect(cornerRadius: MeetPRRadius.inset))
   }
 
-  private var progressTrack: some View {
-    GeometryReader { proxy in
-      ZStack(alignment: .leading) {
-        Capsule()
-          .fill(Color.MeetPR.videoStageBorder)
-        Capsule()
-          .fill(Color.white)
-          .frame(width: proxy.size.width * progressFraction)
-        ForEach(markers ?? []) { marker in
-          RoundedRectangle(cornerRadius: MeetPRSpacing.point2)
-            .fill(Color.MeetPR.gold500)
-            .frame(width: MeetPRSpacing.point3, height: MeetPRSpacing.point10)
-            .offset(x: markerOffset(marker, trackWidth: proxy.size.width))
-        }
-      }
-    }
-    .frame(height: MeetPRSpacing.space1)
-    .accessibilityLabel(ChatStrings.playbackProgress)
-    .accessibilityValue(
-      "\(FeedbackVideoPlayerView.timeText(currentSeconds)) / "
-        + FeedbackVideoPlayerView.timeText(durationSeconds)
-    )
-    .accessibilityIdentifier("feedback.video.progress")
-  }
-
-  private func timelineText(_ text: String) -> some View {
-    Text(text)
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-      .foregroundStyle(Color.MeetPR.textDisabled)
-      .monospacedDigit()
-  }
-
-  private var progressFraction: CGFloat {
-    guard durationSeconds > 0 else { return 0 }
-    return CGFloat(min(max(currentSeconds / durationSeconds, 0), 1))
-  }
-
-  private func markerOffset(_ marker: VideoMarker, trackWidth: CGFloat) -> CGFloat {
-    guard durationSeconds > 0 else { return 0 }
-    let seconds = Double(marker.timeMilliseconds) / 1_000
-    let fraction = min(max(seconds / durationSeconds, 0), 1)
-    return max(0, trackWidth * fraction - MeetPRSpacing.point1)
-  }
 }

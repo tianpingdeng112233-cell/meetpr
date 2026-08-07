@@ -20,7 +20,7 @@
   final class RecorderSessionController {
     private(set) var phase: CameraRecorderPhase = .preparing
     private(set) var recordedDuration: TimeInterval = 0
-    private(set) var reviewURL: URL?
+    var reviewURL: URL? { reviewFileOwner.url }
 
     let maximumDuration: TimeInterval
     let captureSession: AVCaptureSession
@@ -28,7 +28,7 @@
     private let worker: RecorderSessionWorker
     private var machine = RecorderStateMachine()
     private var notificationTokens: [NSObjectProtocol] = []
-    private var ownsReviewFile = true
+    private var reviewFileOwner = RecorderReviewFileOwner()
 
     init(maximumDuration: TimeInterval) {
       self.maximumDuration = maximumDuration
@@ -122,16 +122,31 @@
 
     func relinquishReviewFile() async {
       machine.close()
-      ownsReviewFile = false
-      reviewURL = nil
+      _ = reviewFileOwner.relinquishReviewFile()
       await worker.stopSession()
+    }
+
+    func replaceReviewFile(with editedURL: URL) async {
+      guard machine.state == .review else {
+        try? FileManager.default.removeItem(at: editedURL)
+        return
+      }
+
+      reviewFileOwner.replaceReviewFile(with: editedURL)
+      recordedDuration = 0
+
+      let duration = try? await AVURLAsset(url: editedURL).load(.duration)
+      guard machine.state == .review, reviewURL == editedURL, let duration else { return }
+      let seconds = duration.seconds
+      if seconds.isFinite {
+        recordedDuration = max(0, seconds)
+      }
     }
 
     func close() async {
       machine.close()
       await worker.cancelRecording()
-      removeOwnedReviewFile()
-      reviewURL = nil
+      reviewFileOwner.removeOwnedReviewFile()
       await worker.stopSession()
       removeInterruptionObservers()
     }
@@ -180,8 +195,7 @@
           return
         }
         recordedDuration = min(recordedDuration, maximumDuration)
-        reviewURL = url
-        ownsReviewFile = true
+        reviewFileOwner.takeOwnership(of: url)
         phase = .review
       } catch {
         await worker.cancelRecording()
@@ -253,13 +267,7 @@
       await worker.cancelRecording()
       await worker.stopSession()
       recordedDuration = 0
-      reviewURL = nil
-    }
-
-    private func removeOwnedReviewFile() {
-      guard ownsReviewFile, let reviewURL else { return }
-      try? FileManager.default.removeItem(at: reviewURL)
-      ownsReviewFile = false
+      reviewFileOwner.removeOwnedReviewFile()
     }
   }
 
@@ -272,7 +280,7 @@
       guard machine.failActiveOperation(generation: generation) else { return }
       phase = .failed(message)
       recordedDuration = 0
-      reviewURL = nil
+      reviewFileOwner.removeOwnedReviewFile()
       await worker.cancelRecording()
       try? FileManager.default.removeItem(at: outputURL)
     }
