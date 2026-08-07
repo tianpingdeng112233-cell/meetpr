@@ -1,352 +1,143 @@
 import CoreModels
 import DesignSystem
-import Foundation
-import Observation
-import RepositoryContracts
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 struct TrainingCalendarView: View {
-  private let studentID: UUID
-  private let calendar: Calendar
-  private let today: @Sendable () -> Date
-  private let planRevision: Int
+  private let days: [StudentPlanDay]
 
-  @Binding private var selectedDate: Date
-  @State private var displayedDate: Date
-  @State private var mode: TrainingCalendarMode = .week
-  @State private var viewModel: TrainingCalendarViewModel
+  @Binding private var selectedDayID: UUID?
+  @State private var expandedWeeks: Set<Int> = []
 
   init(
-    studentID: UUID,
-    selectedDate: Binding<Date>,
-    plans: any StudentPlanRepository,
-    logs: any StudentTrainingLogRepository,
-    calendar: Calendar = .current,
-    today: @escaping @Sendable () -> Date = { Date() },
-    planRevision: Int = 0
+    selectedDayID: Binding<UUID?>,
+    days: [StudentPlanDay]
   ) {
-    self.studentID = studentID
-    var resolvedCalendar = calendar
-    resolvedCalendar.firstWeekday = 2
-    self.calendar = resolvedCalendar
-    self.today = today
-    self.planRevision = planRevision
-    self._selectedDate = selectedDate
-    self._displayedDate = State(
-      initialValue: PlanCalendarDayIdentity.deviceDay(
-        containing: selectedDate.wrappedValue,
-        calendar: resolvedCalendar
-      )
-    )
-    self._viewModel = State(initialValue: TrainingCalendarViewModel(plans: plans, logs: logs))
+    self.days = days
+    self._selectedDayID = selectedDayID
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
-      toolbar
-      content
-      // The legend lives in `TrainingCalendarLegend`, rendered by the screen
-      // so the collapsed state can *remove* it — static text nodes survive
-      // accessibility hiding in runtime snapshots, and the legend is the one
-      // stateless piece that can safely leave the tree.
-    }
-    .task(id: planRevision) {
-      await viewModel.load(studentID: studentID)
-    }
-    .onChange(of: selectedDate) { _, newValue in
-      displayedDate = newValue
-    }
-    .onChange(of: mode) { _, _ in
-      displayedDate = selectedDate
-    }
+    sequenceContent(days: days)
+      .task(id: daysRevision) {
+        normalizeSelection()
+      }
   }
 
-  private var toolbar: some View {
-    HStack(spacing: MeetPRSpacing.space2) {
-      Button {
-        movePeriod(by: -1)
-      } label: {
-        Text("‹")
-          .frame(
-            width: MeetPRSpacing.minimumHitTarget,
-            height: MeetPRSpacing.minimumHitTarget
-          )
-          .contentShape(.rect)
-      }
-      .buttonStyle(.plain)
-      .accessibilityLabel(mode == .week ? "上一周" : "上一月")
-
-      Text(periodTitle)
-
-      Button {
-        movePeriod(by: 1)
-      } label: {
-        Text("›")
-          .frame(
-            width: MeetPRSpacing.minimumHitTarget,
-            height: MeetPRSpacing.minimumHitTarget
-          )
-          .contentShape(.rect)
-      }
-      .buttonStyle(.plain)
-      .accessibilityLabel(mode == .week ? "下一周" : "下一月")
-
-      Spacer()
-
-      HStack(spacing: MeetPRSpacing.zero) {
-        modeButton(.week, title: "周")
-        modeButton(.month, title: "月")
-      }
-      .background {
-        RoundedRectangle(cornerRadius: MeetPRRadius.inset)
-          .fill(Color.MeetPR.surfaceCard)
-          .frame(height: 23)
-      }
+  private var daysRevision: String {
+    days.map { day in
+      "\(day.id.uuidString)-\(day.completedAt?.timeIntervalSince1970 ?? 0)"
     }
-    .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
-    .foregroundStyle(Color.MeetPR.textMuted)
+    .joined(separator: ":")
   }
 
-  private var periodTitle: String {
-    displayedDate.formatted(
-      .dateTime.month(.wide).locale(Locale(identifier: "zh_CN"))
+  private func normalizeSelection() {
+    selectedDayID = TrainingSequenceLayout.initialSelection(
+      days: days,
+      explicitDayID: selectedDayID
     )
+    if let selected = days.first(where: { $0.id == selectedDayID }) {
+      expandedWeeks.insert(selected.weekNumber)
+    }
   }
 
-  private func modeButton(_ value: TrainingCalendarMode, title: String) -> some View {
-    Button {
-      mode = value
-    } label: {
-      ZStack {
-        if mode == value {
-          RoundedRectangle(cornerRadius: MeetPRSpacing.point6)
-            .fill(value == .week ? Color.MeetPR.ctaFill : Color.MeetPR.borderStrong)
-            .frame(width: 38, height: 17)
-        }
+  private func sequenceContent(days: [StudentPlanDay]) -> some View {
+    let weeks = TrainingSequenceLayout.makeWeeks(days: days, selectedDayID: selectedDayID)
+    let completedCount = days.filter { $0.completedAt != nil }.count
+    return VStack(alignment: .leading, spacing: 10) {
+      Text("\(weeks.count) 周力量 · 推荐日期仅供参考")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text("已完成 \(completedCount) / \(days.count) 节")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textMuted)
 
-        Text(title)
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-          .foregroundStyle(mode == value ? Color.white : Color.MeetPR.textMuted)
+      ForEach(weeks) { week in
+        weekSection(week)
       }
-      .frame(
-        width: MeetPRSpacing.minimumHitTarget,
-        height: MeetPRSpacing.minimumHitTarget
-      )
+    }
+  }
+
+  private func weekSection(_ week: TrainingSequenceWeek) -> some View {
+    VStack(spacing: 0) {
+      Button {
+        if expandedWeeks.contains(week.weekNumber) {
+          expandedWeeks.remove(week.weekNumber)
+        } else {
+          expandedWeeks.insert(week.weekNumber)
+        }
+      } label: {
+        HStack {
+          Text("W\(week.weekNumber)")
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size14))
+            .foregroundStyle(Color.MeetPR.gold500)
+          Text("\(week.days.filter { $0.state == .completed }.count)/\(week.days.count) 节")
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textMuted)
+          Spacer()
+          Image(systemName: expandedWeeks.contains(week.weekNumber) ? "chevron.up" : "chevron.down")
+            .foregroundStyle(Color.MeetPR.textDim)
+        }
+        .frame(minHeight: 46)
+        .contentShape(.rect)
+      }
+      .buttonStyle(.plain)
+
+      if expandedWeeks.contains(week.weekNumber) {
+        ForEach(week.days) { item in
+          sequenceRow(item)
+        }
+      }
+    }
+    .padding(.horizontal, 13)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: 14))
+  }
+
+  private func sequenceRow(_ item: TrainingSequenceDay) -> some View {
+    Button {
+      selectedDayID = item.id
+    } label: {
+      HStack(spacing: 12) {
+        Text("D\(item.day.dayOfWeek)")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(item.state == .current ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary)
+          .frame(width: 32, height: 32)
+          .background(
+            item.state == .current ? Color.MeetPR.goldRGB.opacity(0.12) : Color.MeetPR.bgInset
+          )
+          .clipShape(.circle)
+
+        VStack(alignment: .leading, spacing: 3) {
+          Text(TrainingSequenceText.dayName(item.day))
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+          Text(TrainingSequenceText.exerciseSummary(item.day))
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+            .foregroundStyle(Color.MeetPR.textMuted)
+          Text(TrainingSequenceText.recommendation(item.day.scheduledDate))
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
+            .foregroundStyle(Color.MeetPR.textDim)
+        }
+        Spacer()
+        statusIcon(item.state)
+      }
+      .padding(.vertical, 10)
       .contentShape(.rect)
+      .background(item.isSelected ? Color.MeetPR.goldRGB.opacity(0.08) : Color.clear)
     }
     .buttonStyle(.plain)
   }
 
-  @ViewBuilder private var content: some View {
-    switch viewModel.state {
-    case .idle, .loading:
-      ProgressView()
-        .frame(maxWidth: .infinity, minHeight: 46)
-    case .loaded(let cycleDays, let logs):
-      let days = TrainingCalendarLayout.makeDays(
-        period: TrainingCalendarPeriod(
-          displayedDate: displayedDate,
-          selectedDate: selectedDate,
-          today: today(),
-          mode: mode
-        ),
-        cycleDays: cycleDays,
-        logs: logs,
-        calendar: calendar
-      )
-      if mode == .week {
-        weekStrip(days)
-      } else {
-        monthGrid(days)
-      }
-    case .error(let message):
-      CalendarLoadError(message: message) {
-        Task { await viewModel.load(studentID: studentID) }
-      }
-    }
-  }
-
-  private func weekStrip(_ days: [TrainingCalendarDay]) -> some View {
-    HStack(spacing: MeetPRSpacing.point6) {
-      ForEach(days) { day in
-        MeetPRDayChip(
-          weekday: weekdayText(day.date),
-          date: calendar.component(.day, from: day.date),
-          state: v3State(for: day),
-          isSelected: day.isSelected,
-          width: nil,
-          selectedAppearance: .outlined
-        ) {
-          select(day.date)
-        }
-      }
-    }
-  }
-
-  private func monthGrid(_ days: [TrainingCalendarDay]) -> some View {
-    let columns = Array(
-      repeating: GridItem(.flexible(), spacing: MeetPRSpacing.point5),
-      count: 7
-    )
-    return VStack(spacing: MeetPRSpacing.point5) {
-      LazyVGrid(columns: columns, spacing: MeetPRSpacing.point5) {
-        ForEach(TrainingCalendarLayout.weekdayLabels(calendar: calendar), id: \.self) { label in
-          Text(label)
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-            .foregroundStyle(Color.MeetPR.textDim)
-            .frame(maxWidth: .infinity)
-        }
-
-        ForEach(days) { day in
-          if day.isInDisplayedMonth {
-            TrainingMonthDay(
-              day: day,
-              state: v3State(for: day),
-              dayNumber: calendar.component(.day, from: day.date)
-            ) {
-              select(day.date)
-            }
-          } else {
-            Color.clear.frame(height: MeetPRSpacing.size46)
-          }
-        }
-      }
-    }
-  }
-
-  private func v3State(for day: TrainingCalendarDay) -> MeetPRDayChip.DayState {
-    TrainingCalendarV3State.resolve(
-      progress: day.progress,
-      date: day.date,
-      today: today(),
-      calendar: calendar
-    )
-  }
-
-  private func weekdayText(_ date: Date) -> String {
-    TrainingCalendarText.weekday(for: date, calendar: calendar)
-  }
-
-  private func movePeriod(by value: Int) {
-    displayedDate = TrainingCalendarLayout.move(
-      displayedDate,
-      mode: mode,
-      by: value,
-      calendar: calendar
-    )
-  }
-
-  private func select(_ date: Date) {
-    selectedDate = calendar.startOfDay(for: date)
-    displayedDate = selectedDate
-  }
-}
-
-/// The decorative color key under the calendar. The screen owns it (instead
-/// of `TrainingCalendarView`) so the collapsed state can drop it from the
-/// tree entirely — see `TodayWorkoutScreen`.
-struct TrainingCalendarLegend: View {
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.point14) {
-      TrainingCalendarLegendItem(color: Color.MeetPR.success, label: "已完成")
-      TrainingCalendarLegendItem(color: Color.MeetPR.gold500, label: "进行中")
-      TrainingCalendarLegendItem(color: Color.MeetPR.danger, label: "未完成")
-    }
-    .accessibilityHidden(true)
-  }
-}
-
-private struct TrainingCalendarLegendItem: View {
-  let color: Color
-  let label: String
-
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.point5) {
-      Circle()
-        .fill(color)
-        .frame(width: MeetPRSpacing.point6, height: MeetPRSpacing.point6)
-      Text(label)
-    }
-    .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-    .foregroundStyle(Color.MeetPR.textDim)
-  }
-}
-
-@Observable
-@MainActor
-private final class TrainingCalendarViewModel {
-  enum State {
-    case idle
-    case loading
-    case loaded(days: [StudentPlanDay], logs: [StudentSetLog])
-    case error(String)
-  }
-
-  private(set) var state: State = .idle
-
-  private let plans: any StudentPlanRepository
-  private let logs: any StudentTrainingLogRepository
-
-  init(plans: any StudentPlanRepository, logs: any StudentTrainingLogRepository) {
-    self.plans = plans
-    self.logs = logs
-  }
-
-  func load(studentID: UUID) async {
-    let isInitialLoad: Bool
+  @ViewBuilder
+  private func statusIcon(_ state: TrainingSequenceDayState) -> some View {
     switch state {
-    case .idle:
-      isInitialLoad = true
-      state = .loading
-    case .loading, .loaded, .error:
-      isInitialLoad = false
+    case .completed:
+      Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.MeetPR.success)
+    case .current:
+      Circle().fill(Color.MeetPR.gold500).frame(width: 8, height: 8)
+    case .upcoming:
+      Circle().stroke(Color.MeetPR.textGhost, lineWidth: 1).frame(width: 8, height: 8)
     }
-    do {
-      let days = try await plans.fetchCycleDays(studentID: studentID)
-      let fetchedLogs: [StudentSetLog]
-      if let range = Self.dateRange(for: days) {
-        fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: range)
-      } else {
-        fetchedLogs = []
-      }
-      state = .loaded(days: days, logs: fetchedLogs)
-    } catch {
-      if error.isTaskCancellation {
-        if isInitialLoad { state = .idle }
-        return
-      }
-      if case .loaded = state { return }
-      state = .error(TodayWorkoutViewModel.loadErrorMessage(for: error))
-    }
-  }
-
-  private static func dateRange(for days: [StudentPlanDay]) -> ClosedRange<Date>? {
-    guard let first = days.map(\.date).min(), let last = days.map(\.date).max() else {
-      return nil
-    }
-    let start = Calendar.current.startOfDay(for: first)
-    let end = Calendar.current.startOfDay(for: last).addingTimeInterval(86_400 - 1)
-    return start...end
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct CalendarLoadError: View {
-  let message: String
-  let retry: () -> Void
-
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.space2) {
-      Image(systemName: "exclamationmark.triangle")
-      Text(message)
-        .lineLimit(1)
-      Spacer()
-      Button("重试", action: retry)
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
-    }
-    .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-    .foregroundStyle(Color.MeetPR.textSecondary)
-    .padding(.vertical, MeetPRSpacing.point10)
   }
 }

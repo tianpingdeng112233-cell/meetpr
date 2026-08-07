@@ -1,4 +1,4 @@
-// swiftlint:disable file_length type_body_length
+// swiftlint:disable type_body_length
 import Analytics
 import CoreModels
 import DesignSystem
@@ -8,12 +8,10 @@ import SwiftUI
 
 /// The coached student's black-gold v3 今日 screen.
 ///
-/// The screen composes existing week, feedback, e1RM, profile, notification,
-/// and whole-plan-shift sources. It owns presentation and navigation only.
+/// The screen composes existing plan, feedback, e1RM, profile, and notification sources.
 @available(iOS 17.0, macOS 14.0, *)
 public struct DashboardView: View {
   private let studentID: UUID
-  private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
@@ -22,7 +20,8 @@ public struct DashboardView: View {
   private let onStartWorkoutFrameChange: (CGRect) -> Void
   private let isStartWorkoutHidden: Bool
   private let onOpenPlanNotification: () -> Void
-  private let onPlanChanged: () -> Void
+  private let planProjectionUpdate: StudentPlanView?
+  private let onPlanChanged: (StudentPlanView) -> Void
   private let todayReloadToken: Int
   private let todayVolatileReloadToken: Int
   private let onFullReload: () -> Void
@@ -33,16 +32,13 @@ public struct DashboardView: View {
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
   @State private var showsNotifications = false
   @State private var conversationID: UUID?
-  @State private var dayShiftAlert: DashboardDayShiftAlert?
-  @State private var shiftProposal: PlanShiftProposal?
-  @State private var isUpdatingDayShift = false
-  @State private var selectedDate: Date?
+  @State private var completionErrorMessage: String?
+  @State private var isUpdatingCompletion = false
   @State private var isFeedbackExpanded = false
   @State private var newPRCount = 0
 
   public init(
     studentID: UUID,
-    canShiftPlanDays: Bool,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     onboarding: any OnboardingProfileReading,
@@ -55,12 +51,12 @@ public struct DashboardView: View {
     onOpenPlanNotification: @escaping () -> Void = {},
     todayReloadToken: Int = 0,
     todayVolatileReloadToken: Int = 0,
+    planProjectionUpdate: StudentPlanView? = nil,
     onFullReload: @escaping () -> Void = {},
-    onPlanChanged: @escaping () -> Void = {},
+    onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
     pushedConversationID: Binding<UUID?> = .constant(nil)
   ) {
     self.studentID = studentID
-    self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
@@ -71,6 +67,7 @@ public struct DashboardView: View {
     self.onOpenPlanNotification = onOpenPlanNotification
     self.todayReloadToken = todayReloadToken
     self.todayVolatileReloadToken = todayVolatileReloadToken
+    self.planProjectionUpdate = planProjectionUpdate
     self.onFullReload = onFullReload
     self.onPlanChanged = onPlanChanged
     self._pushedConversationID = pushedConversationID
@@ -93,29 +90,18 @@ public struct DashboardView: View {
         DashboardTodayScreen(
           model: screenModel,
           feedbackViewModel: feedbackViewModel,
-          selectedDate: $selectedDate,
           isFeedbackExpanded: $isFeedbackExpanded,
           onOpenNotifications: {
             if notifications != nil {
               showsNotifications = true
             }
           },
-          onStartWorkout: {
-            onStartWorkout(
-              weekViewModel.plan.map {
-                TodayWorkoutPlanHandoff(
-                  plan: $0,
-                  date: Date(),
-                  existingLogs: weekData?.logs ?? []
-                )
-              }
-            )
-          },
+          onStartWorkout: startCursorWorkout,
           onStartWorkoutFrameChange: onStartWorkoutFrameChange,
           isStartWorkoutHidden: isStartWorkoutHidden,
-          onShiftPlan: proposeShiftToday,
-          onUndoShift: {
-            dayShiftAlert = .confirmCancel(Date())
+          isUpdatingCompletion: isUpdatingCompletion,
+          onUndoCompletion: { dayID in
+            Task { await undoCompletion(dayID: dayID) }
           },
           onMessageCoach: { showsNotifications = true }
         )
@@ -143,53 +129,17 @@ public struct DashboardView: View {
     .onChange(of: todayVolatileReloadToken) { _, _ in
       Task { await reloadVolatileData() }
     }
+    .onChange(of: planProjectionUpdate) { _, plan in
+      guard let plan else { return }
+      Task { await weekViewModel.applyPlanProjection(plan, studentID: studentID) }
+    }
     .task(id: pushedConversationID) {
       await openPushedConversationIfNeeded()
     }
-    #if os(iOS)
-      .fullScreenCover(item: $shiftProposal) { proposal in
-        PostponeConfirmationOverlay(
-          tomorrow: shiftTargetDate,
-          isConfirming: isUpdatingDayShift,
-          onCancel: { shiftProposal = nil },
-          onConfirm: {
-            shiftProposal = nil
-            Task { await shiftToday(proposal) }
-          }
-        )
-        .presentationBackground(.clear)
-      }
-    #else
-      .sheet(item: $shiftProposal) { proposal in
-        PostponeConfirmationOverlay(
-          tomorrow: shiftTargetDate,
-          isConfirming: isUpdatingDayShift,
-          onCancel: { shiftProposal = nil },
-          onConfirm: {
-            shiftProposal = nil
-            Task { await shiftToday(proposal) }
-          }
-        )
-      }
-    #endif
-    .alert(item: $dayShiftAlert) { alert in
-      switch alert {
-      case .confirmCancel(let returnDate):
-        Alert(
-          title: Text("撤销顺延？"),
-          message: Text("课程会回到\(dayShiftDateText(returnDate))。"),
-          primaryButton: .destructive(Text("撤销顺延")) {
-            Task { await cancelShift() }
-          },
-          secondaryButton: .cancel(Text("保留顺延"))
-        )
-      case .message(let title, let message):
-        Alert(
-          title: Text(title),
-          message: Text(message),
-          dismissButton: .default(Text("知道了"))
-        )
-      }
+    .alert("无法撤销", isPresented: completionErrorPresented) {
+      Button("知道了", role: .cancel) { completionErrorMessage = nil }
+    } message: {
+      Text(completionErrorMessage ?? "")
     }
   }
 
@@ -209,9 +159,6 @@ public struct DashboardView: View {
       newPRCount: newPRCount,
       showsNotifications: notifications != nil,
       notificationUnreadCount: notifications?.totalUnreadCount ?? 0,
-      canShiftPlanDays: canShiftPlanDays,
-      canUndoPlanShift: canUndoPlanShift,
-      isUpdatingDayShift: isUpdatingDayShift,
       isLoading: weekViewModel.state == .idle || weekViewModel.state == .loading,
       now: Date()
     )
@@ -231,11 +178,46 @@ public struct DashboardView: View {
     return nil
   }
 
-  private var canUndoPlanShift: Bool {
-    guard canShiftPlanDays, let plan = weekViewModel.plan else { return false }
-    return PlanDayShiftLogic.canUndo(
-      latestShiftCreatedAt: plan.latestShiftCreatedAt,
-      now: Date()
+  private func startCursorWorkout() {
+    guard let plan = weekViewModel.plan else {
+      onStartWorkout(nil)
+      return
+    }
+    let sequence = StudentPlanSequence(days: plan.days)
+    let target = sequence.cursorDay ?? sequence.orderedDays.last
+    onStartWorkout(
+      target.map {
+        TodayWorkoutPlanHandoff(
+          plan: plan,
+          dayID: $0.id,
+          existingLogs: weekData?.logs ?? []
+        )
+      }
+    )
+  }
+
+  @MainActor
+  private func undoCompletion(dayID: UUID) async {
+    guard !isUpdatingCompletion else { return }
+    isUpdatingCompletion = true
+    defer { isUpdatingCompletion = false }
+    do {
+      try await plans.undoDayCompletion(id: dayID, studentID: studentID)
+      await weekViewModel.load(studentID: studentID, serverAuthoritative: true)
+      if let plan = weekViewModel.plan {
+        onPlanChanged(plan)
+      }
+    } catch let error as PlanDayCompletionError {
+      completionErrorMessage = error.localizedMessage
+    } catch {
+      completionErrorMessage = "暂时无法撤销，请稍后重试。"
+    }
+  }
+
+  private var completionErrorPresented: Binding<Bool> {
+    Binding(
+      get: { completionErrorMessage != nil },
+      set: { if !$0 { completionErrorMessage = nil } }
     )
   }
 
@@ -263,7 +245,10 @@ public struct DashboardView: View {
   }
 
   private func reload() async {
-    async let weekLoad: Void = weekViewModel.load(studentID: studentID)
+    async let weekLoad: Void = weekViewModel.load(
+      studentID: studentID,
+      serverAuthoritative: true
+    )
     async let notificationLoad: Void = reloadNotifications()
     async let trendLoad: Void = e1rmTrendViewModel.load(studentID: studentID)
     async let metricsLoad: Void = profileMetricsViewModel.load(studentID: studentID)
@@ -281,7 +266,7 @@ public struct DashboardView: View {
 
   private func loadWeekIfNeeded() async {
     guard weekViewModel.state == .idle else { return }
-    await weekViewModel.load(studentID: studentID)
+    await weekViewModel.load(studentID: studentID, serverAuthoritative: true)
   }
 
   private func loadNotificationsIfNeeded() async {
@@ -319,7 +304,7 @@ public struct DashboardView: View {
     // Weekly summary counts PR events inside the loaded plan week (same
     // range as the card's session/volume stats); the acknowledgement chain
     // went dormant with the celebration banner. No loaded week → no count.
-    guard let days = weekData?.days.map(\.date), let firstDay = days.min(),
+    guard let days = weekData?.days.map(\.scheduledDate), let firstDay = days.min(),
       let lastDay = days.max()
     else {
       newPRCount = 0
@@ -333,64 +318,6 @@ public struct DashboardView: View {
     newPRCount = events.filter { $0.occurredAt < weekEnd }.count
   }
 
-  private func proposeShiftToday() {
-    guard let plan = weekViewModel.plan,
-      let proposal = PlanDayShiftLogic.proposal(
-        plan: plan,
-        today: Date()
-      )
-    else {
-      return
-    }
-    shiftProposal = proposal
-  }
-
-  private var shiftTargetDate: Date {
-    PlanCalendarDayIdentity.utcCalendar.date(byAdding: .day, value: 1, to: Date()) ?? Date()
-  }
-
-  @MainActor
-  private func shiftToday(_ proposal: PlanShiftProposal) async {
-    isUpdatingDayShift = true
-    defer { isUpdatingDayShift = false }
-    do {
-      let result = try await plans.shiftPlan(id: proposal.planID, studentID: studentID)
-      await weekViewModel.load(studentID: studentID)
-      onPlanChanged()
-      if let message = PlanDayShiftLogic.cumulativeShiftMessage(
-        totalShiftDays: result.totalShiftDays
-      ) {
-        dayShiftAlert = .message(title: "顺延成功", text: message)
-      }
-    } catch {
-      dayShiftAlert = .message(
-        title: "无法顺延",
-        text: PlanDayShiftLogic.errorMessage(for: error, operation: .shift)
-      )
-    }
-  }
-
-  @MainActor
-  private func cancelShift() async {
-    isUpdatingDayShift = true
-    defer { isUpdatingDayShift = false }
-    do {
-      guard let planID = weekViewModel.plan?.cycleID else { return }
-      try await plans.cancelPlanShift(id: planID, studentID: studentID)
-      await weekViewModel.load(studentID: studentID)
-      onPlanChanged()
-    } catch {
-      dayShiftAlert = .message(
-        title: "无法撤销",
-        text: PlanDayShiftLogic.errorMessage(for: error, operation: .cancel)
-      )
-    }
-  }
-
-  private func dayShiftDateText(_ date: Date) -> String {
-    date.formatted(.dateTime.month().day().locale(Locale(identifier: "zh_CN")))
-  }
-
   private var notificationHost: some ViewModifier {
     OptionalStudentNotificationHostModifier(
       coordinator: notifications,
@@ -401,4 +328,4 @@ public struct DashboardView: View {
   }
 }
 
-// swiftlint:enable file_length type_body_length
+// swiftlint:enable type_body_length

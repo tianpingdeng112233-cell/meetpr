@@ -36,25 +36,13 @@ struct TodaySetRefSharingSource: Sendable {
 
   // swiftlint:disable:next function_body_length
   func loadCandidates() async throws -> [SetRefShareCandidate] {
-    let today = WorkoutDatePolicy.gymDayToday(now: now())
     let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-    let day: StudentPlanDay?
-    if let plannedDay = plan?.days.first(where: {
-      PlanCalendarDayIdentity.matches(
-        planDate: $0.date,
-        selectedDate: today,
-        selectedCalendar: calendar
-      )
-    }) {
-      day = plannedDay
-    } else {
-      day = try await plans.fetchDay(studentID: studentID, date: today)
-    }
+    let day = plan.flatMap { StudentPlanSequence(days: $0.days).cursorDay }
     guard let day else {
       return []
     }
 
-    let dayRange = WorkoutDatePolicy.dayRange(containing: day.date, calendar: calendar)
+    let dayRange = WorkoutDatePolicy.gymDayRange(containing: now())
     let dayLogs = try await logs.fetchLogs(
       studentID: studentID,
       in: dayRange
@@ -85,7 +73,7 @@ struct TodaySetRefSharingSource: Sendable {
           reps: log.reps,
           repsMax: nil,
           rpe: log.rpe.map(Self.decimalSource),
-          dayDate: Self.dayDate(day.date, calendar: calendar),
+          dayDate: Self.dayDate(day.scheduledDate, calendar: calendar),
           setLogId: log.id,
           planSetId: nil
         )
@@ -116,7 +104,7 @@ struct TodaySetRefSharingSource: Sendable {
             return plannedCandidate(
               set,
               exercise: exercise,
-              dayDate: Self.dayDate(day.date, calendar: calendar)
+              dayDate: Self.dayDate(day.scheduledDate, calendar: calendar)
             )
           }
       }

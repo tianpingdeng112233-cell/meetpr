@@ -89,7 +89,7 @@ import Testing
 }
 
 @MainActor
-@Test func todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() async {
+@Test func todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
   let plans = GatedStudentPlanRepository(plan: plan)
@@ -127,11 +127,14 @@ import Testing
   await loadTask.value
 
   let fetchedRanges = await logs.fetchedRanges
-  let dayRange = TodayWorkoutViewModel.dayRange(containing: plan.days[0].date)
   let historyRange = TodayWorkoutViewModel.lastWeightHistoryRange(before: plan.days[0].date)
+  let firstDate = try #require(plan.days.map(\.date).min())
+  let lastDate = try #require(plan.days.map(\.date).max())
+  let expectedPlanRange =
+    firstDate.addingTimeInterval(-86_400)...lastDate.addingTimeInterval(86_400)
   #expect(fetchedRanges.count == 2)
-  #expect(fetchedRanges.filter { $0 == dayRange }.count == 1)
   #expect(fetchedRanges.filter { $0 == historyRange }.count == 1)
+  #expect(fetchedRanges.filter { $0 == expectedPlanRange }.count == 1)
   #expect(
     await e1rm.historyFetchCallCount
       == Set(plan.days[0].exercises.map(\.exercise.id)).count
@@ -142,10 +145,9 @@ import Testing
 @Test func todayWorkoutAppliesRefreshedPlanWhenItDiffersFromHandoff() async {
   let studentID = StudentDemoSeed.studentID
   let handedOffPlan = StudentDemoSeed.makePlanView()
-  let refreshedDay = StudentPlanDay(
-    id: UUID(),
-    date: handedOffPlan.days[0].date,
-    exercises: handedOffPlan.days[0].exercises
+  let refreshedDay = handedOffPlan.days[0].replacingCompletion(
+    completedAt: handedOffPlan.days[0].date,
+    source: "auto"
   )
   let refreshedPlan = StudentPlanView(
     cycleID: handedOffPlan.cycleID,
@@ -175,7 +177,7 @@ import Testing
     return
   }
   #expect(await plans.fetchCallCount == 1)
-  #expect(day.id == refreshedDay.id)
+  #expect(day.completedAt == refreshedDay.completedAt)
 }
 
 @MainActor
@@ -198,6 +200,132 @@ import Testing
     return
   }
   #expect(day.id == plan.days[0].id)
+}
+
+@MainActor
+@Test func selectingAnotherSequenceDayReusesThePlanLogSnapshot() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let logs = SnapshotCountingTrainingLogRepository()
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(
+      store: TestStudentPlanStore(seed: [studentID: plan])
+    ),
+    logs: logs
+  )
+
+  await viewModel.load(dayID: plan.days[0].id, studentID: studentID)
+  await viewModel.load(dayID: plan.days[1].id, studentID: studentID)
+
+  let firstDate = try #require(plan.days.map(\.date).min())
+  let lastDate = try #require(plan.days.map(\.date).max())
+  let expectedPlanRange =
+    firstDate.addingTimeInterval(-86_400)...lastDate.addingTimeInterval(86_400)
+  #expect(await logs.fetchedRanges.filter { $0 == expectedPlanRange }.count == 1)
+  guard case .loaded(let selectedDay, _) = viewModel.state else {
+    Issue.record("Expected selected sequence day")
+    return
+  }
+  #expect(selectedDay.id == plan.days[1].id)
+}
+
+@MainActor
+@Test func invalidSelectedDayFallsBackToSequenceCursor() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let expectedCursor = try #require(StudentPlanSequence.cursorDay(in: plan))
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(
+      store: TestStudentPlanStore(seed: [studentID: plan])
+    ),
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(dayID: UUID(), studentID: studentID)
+
+  guard case .loaded(let selectedDay, _) = viewModel.state else {
+    Issue.record("Expected cursor workout instead of a rest state")
+    return
+  }
+  #expect(selectedDay.id == expectedCursor.id)
+}
+
+@MainActor
+@Test func completionMutationsFetchAndPropagateOneProjectionEach() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let cursorID = try #require(StudentPlanSequence.cursorDay(in: plan)?.id)
+  let plans = CompletionProjectionCountingRepository(plan: plan)
+  let viewModel = TodayWorkoutViewModel(
+    plans: plans,
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+  await viewModel.load(dayID: cursorID, studentID: studentID)
+
+  #expect(await viewModel.completeCurrentDay())
+  #expect(await plans.refreshCount == 1)
+  #expect(viewModel.planProjection?.days.first { $0.id == cursorID }?.completedAt != nil)
+
+  #expect(await viewModel.undoCurrentDayCompletion())
+  #expect(await plans.refreshCount == 2)
+  #expect(viewModel.planProjection?.days.first { $0.id == cursorID }?.completedAt == nil)
+  #expect(viewModel.completionRevision == 2)
+}
+
+private actor CompletionProjectionCountingRepository: StudentPlanRepository {
+  private var plan: StudentPlanView
+  private(set) var refreshCount = 0
+
+  init(plan: StudentPlanView) {
+    self.plan = plan
+  }
+
+  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    plan
+  }
+
+  func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    refreshCount += 1
+    return plan
+  }
+
+  func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
+    plan.days
+  }
+
+  func completeDay(id: UUID, studentID: UUID) async throws -> PlanDayCompletion {
+    let completedAt = Date(timeIntervalSince1970: 2_000_000_000)
+    replaceDay(id: id, completedAt: completedAt, source: "manual")
+    return PlanDayCompletion(
+      id: UUID(),
+      dayID: id,
+      studentID: studentID,
+      source: "manual",
+      completedAt: completedAt
+    )
+  }
+
+  func undoDayCompletion(id: UUID, studentID: UUID) async throws {
+    replaceDay(id: id, completedAt: nil, source: nil)
+  }
+
+  private func replaceDay(id: UUID, completedAt: Date?, source: String?) {
+    plan = StudentPlanView(
+      cycleID: plan.cycleID,
+      weekIndex: plan.weekIndex,
+      startDate: plan.startDate,
+      endDate: plan.endDate,
+      planKind: plan.planKind,
+      publishedAt: plan.publishedAt,
+      totalShiftDays: plan.totalShiftDays,
+      latestShiftCreatedAt: plan.latestShiftCreatedAt,
+      days: plan.days.map { day in
+        day.id == id
+          ? day.replacingCompletion(completedAt: completedAt, source: source)
+          : day
+      }
+    )
+  }
 }
 
 private actor GatedStudentPlanRepository: StudentPlanRepository {

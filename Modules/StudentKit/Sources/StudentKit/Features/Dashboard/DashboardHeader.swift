@@ -113,6 +113,8 @@ private struct DashboardWeekProgressBar: View {
       return [
         DashboardWeekProgressSegment(
           id: UUID(uuidString: "00000000-0000-0000-0000-000000000001") ?? UUID(),
+          dayNumber: 1,
+          recommendedDate: Date(),
           state: .upcoming
         )
       ]

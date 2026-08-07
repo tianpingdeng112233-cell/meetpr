@@ -1,6 +1,6 @@
 # spec 071 — 训练日推进制(iOS 学员端)
 
-- **状态**:InProgress(David 2026-08-07 拍板换制并终审通过 spec PR #311;设计稿二审已验收,实装开工)
+- **状态**:InReview(实现与本地验证完成,待 Claude review)
 - **对应 backend spec**:`035-sequence-progression`(wire 契约权威;本 spec 消费)
 - **取代**:`061-catch-up-shift`(spec PR #275 已作废关闭)。**父辈系谱**:054 整体顺延 V2
   的学员端 UI 随本 spec 下线——不是修补它,是拆掉它锚定的地基。

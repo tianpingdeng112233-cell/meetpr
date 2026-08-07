@@ -70,13 +70,15 @@ extension APIClient {
     try await get(path: "/plans/\(id.uuidString)", accessToken: accessToken)
   }
 
-  public func shiftPlan(id: UUID, accessToken: String) async throws -> PlanShiftDTO {
-    try await post(path: "/plans/\(id.uuidString)/shift", accessToken: accessToken)
+  public func completePlanDay(id: UUID, accessToken: String) async throws
+    -> PlanDayCompletionDTO
+  {
+    try await post(path: "/plans/days/\(id.uuidString)/complete", accessToken: accessToken)
   }
 
-  public func cancelPlanShift(id: UUID, accessToken: String) async throws {
+  public func undoPlanDayCompletion(id: UUID, accessToken: String) async throws {
     try await deleteNoContent(
-      path: "/plans/\(id.uuidString)/shift",
+      path: "/plans/days/\(id.uuidString)/complete",
       accessToken: accessToken
     )
   }

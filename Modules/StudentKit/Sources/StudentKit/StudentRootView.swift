@@ -18,7 +18,6 @@ private enum LaunchMorphPhase: Equatable {
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
   private let studentID: UUID
-  private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
@@ -48,6 +47,7 @@ public struct StudentRootView: View {
   @State private var workoutPlanHandoff: TodayWorkoutPlanHandoff?
   @State private var launchHeroRevealToken = 0
   @State private var planRevision = 0
+  @State private var planProjectionUpdate: StudentPlanView?
   @State private var nextWorkoutSource: WorkoutSource?
   @State private var workoutStartedAt: Date?
   @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
@@ -72,13 +72,13 @@ public struct StudentRootView: View {
   public init() {
     let plan = StudentDemoSeed.makePlanView()
     let store = StudentRootDemoPlanStore(studentID: StudentDemoSeed.studentID, plan: plan)
+    let logs = InMemoryStudentTrainingLogRepository(
+      seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
+    )
     self.init(
       studentID: StudentDemoSeed.studentID,
-      canShiftPlanDays: true,
-      plans: InMemoryStudentPlanRepository(store: store),
-      logs: InMemoryStudentTrainingLogRepository(
-        seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
-      ),
+      plans: InMemoryStudentPlanRepository(store: store, logs: logs),
+      logs: logs,
       feedback: InMemoryStudentFeedbackRepository(
         seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
       ),
@@ -96,7 +96,6 @@ public struct StudentRootView: View {
   // swiftlint:disable:next function_body_length
   public init(
     studentID: UUID = StudentDemoSeed.studentID,
-    canShiftPlanDays: Bool = false,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
@@ -125,7 +124,6 @@ public struct StudentRootView: View {
     pushRoute: Binding<PushRouteIntent?> = .constant(nil)
   ) {
     self.studentID = studentID
-    self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
     self.logs = logs
     self.e1rm = e1rm
@@ -222,7 +220,6 @@ extension StudentRootView {
     return ZStack {
       DashboardView(
         studentID: studentID,
-        canShiftPlanDays: canShiftPlanDays,
         plans: plans,
         logs: logs,
         onboarding: onboarding,
@@ -235,10 +232,11 @@ extension StudentRootView {
         onOpenPlanNotification: openPlanNotification,
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         todayVolatileReloadToken: todayVolatileReloadToken,
+        planProjectionUpdate: planProjectionUpdate,
         onFullReload: {
           todayRefreshThrottle.recordFullRefresh(at: Date())
         },
-        onPlanChanged: { planRevision += 1 },
+        onPlanChanged: propagatePlanProjection,
         pushedConversationID: pushedConversationIDBinding
       )
       .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
@@ -256,9 +254,11 @@ extension StudentRootView {
         isLaunchTargetHidden: launchSourceFrame != nil && !revealsLaunchTarget,
         launchHeroRevealToken: launchHeroRevealToken,
         planRevision: planRevision,
+        planProjectionUpdate: planProjectionUpdate,
         workoutStartedAt: $workoutStartedAt,
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
+        onPlanChanged: propagatePlanProjection,
         onHeroFrameChange: updateTrainingHeroFrame,
         onReturnToToday: { selectedTab = .today }
       )
@@ -412,8 +412,33 @@ extension StudentRootView {
   }
 
   private func openPlanNotification() {
-    trainingJumpToken += 1
-    selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
+    Task {
+      let plan: StudentPlanView?
+      do {
+        plan = try await plans.refreshCurrentPlan(studentID: studentID)
+      } catch {
+        plan = try? await plans.fetchCurrentPlan(studentID: studentID)
+      }
+      forcePlanTreeReload()
+      workoutPlanHandoff = plan.flatMap { plan in
+        let sequence = StudentPlanSequence(days: plan.days)
+        guard let day = sequence.cursorDay ?? sequence.orderedDays.last else { return nil }
+        return TodayWorkoutPlanHandoff(plan: plan, dayID: day.id, existingLogs: [])
+      }
+      trainingJumpToken += 1
+      selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
+    }
+  }
+
+  private func forcePlanTreeReload() {
+    planProjectionUpdate = nil
+    workoutPlanHandoff = nil
+    planRevision += 1
+    todayReloadToken += 1
+  }
+
+  private func propagatePlanProjection(_ plan: StudentPlanView) {
+    planProjectionUpdate = plan
   }
 
   private func handlePushRoute(_ route: PushRouteIntent?) {

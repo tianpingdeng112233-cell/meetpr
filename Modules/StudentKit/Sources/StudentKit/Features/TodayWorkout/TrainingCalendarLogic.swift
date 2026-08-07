@@ -1,151 +1,82 @@
 import CoreModels
 import Foundation
 
-enum TrainingCalendarMode: String, CaseIterable, Hashable, Identifiable, Sendable {
-  case week
-  case month
-
-  var id: Self { self }
+enum TrainingSequenceDayState: Equatable, Sendable {
+  case completed
+  case current
+  case upcoming
 }
 
-struct TrainingCalendarDay: Equatable, Identifiable, Sendable {
-  let date: Date
-  let planDay: StudentPlanDay?
-  let progress: TrainingDayProgress
-  let isInDisplayedMonth: Bool
+struct TrainingSequenceDay: Equatable, Identifiable, Sendable {
+  let day: StudentPlanDay
+  let state: TrainingSequenceDayState
   let isSelected: Bool
-  let isToday: Bool
 
-  var id: Date { date }
+  var id: UUID { day.id }
 }
 
-/// The view-state inputs for laying out a calendar period (keeps `makeDays`
-/// within the parameter-count limit).
-struct TrainingCalendarPeriod: Equatable, Sendable {
-  let displayedDate: Date
-  let selectedDate: Date
-  let today: Date
-  let mode: TrainingCalendarMode
+struct TrainingSequenceWeek: Equatable, Identifiable, Sendable {
+  let weekNumber: Int
+  let days: [TrainingSequenceDay]
+
+  var id: Int { weekNumber }
 }
 
-enum TrainingCalendarLayout {
-  static func weekDates(containing date: Date, calendar: Calendar) -> [Date] {
-    let start = startOfWeek(containing: date, calendar: calendar)
-    return dates(startingAt: start, count: 7, calendar: calendar)
-  }
-
-  static func monthDates(containing date: Date, calendar: Calendar) -> [Date] {
-    guard let interval = calendar.dateInterval(of: .month, for: date) else {
-      return weekDates(containing: date, calendar: calendar)
-    }
-    let first = calendar.startOfDay(for: interval.start)
-    let last = calendar.date(byAdding: .day, value: -1, to: interval.end) ?? first
-    let start = startOfWeek(containing: first, calendar: calendar)
-    let end = endOfWeek(containing: last, calendar: calendar)
-    return dates(from: start, through: end, calendar: calendar)
-  }
-
-  static func move(_ date: Date, mode: TrainingCalendarMode, by value: Int, calendar: Calendar)
-    -> Date
-  {
-    let component: Calendar.Component = mode == .week ? .weekOfYear : .month
-    return calendar.date(byAdding: component, value: value, to: date) ?? date
-  }
-
-  static func makeDays(
-    period: TrainingCalendarPeriod,
-    cycleDays: [StudentPlanDay],
-    logs: [StudentSetLog],
-    calendar: Calendar
-  ) -> [TrainingCalendarDay] {
-    let dates =
-      period.mode == .week
-      ? weekDates(containing: period.displayedDate, calendar: calendar)
-      : monthDates(containing: period.displayedDate, calendar: calendar)
-    return dates.map { date in
-      let planDay = cycleDays.first {
-        PlanCalendarDayIdentity.matches(
-          planDate: $0.date,
-          selectedDate: date,
-          selectedCalendar: calendar
-        )
-      }
-      return TrainingCalendarDay(
-        date: date,
-        planDay: planDay,
-        progress: TrainingDayProgress(day: planDay, logs: logs),
-        isInDisplayedMonth: calendar.isDate(
-          date, equalTo: period.displayedDate, toGranularity: .month),
-        isSelected: calendar.isDate(date, inSameDayAs: period.selectedDate),
-        isToday: calendar.isDate(date, inSameDayAs: period.today)
+enum TrainingSequenceLayout {
+  /// The cursor order is defined only by backend spec 035 §术语与排序正典.
+  static func makeWeeks(
+    days: [StudentPlanDay],
+    selectedDayID: UUID?
+  ) -> [TrainingSequenceWeek] {
+    let sequence = StudentPlanSequence(days: days)
+    let cursorID = sequence.cursorDay?.id
+    let groups = Dictionary(grouping: sequence.orderedDays, by: \.weekNumber)
+    return groups.keys.sorted().map { weekNumber in
+      TrainingSequenceWeek(
+        weekNumber: weekNumber,
+        days: (groups[weekNumber] ?? []).map { day in
+          TrainingSequenceDay(
+            day: day,
+            state: day.completedAt != nil
+              ? .completed : (day.id == cursorID ? .current : .upcoming),
+            isSelected: day.id == selectedDayID
+          )
+        }
       )
     }
   }
 
-  static func weekdayLabels(calendar: Calendar) -> [String] {
-    let symbols = ["日", "一", "二", "三", "四", "五", "六"]
-    let start = max(0, min(symbols.count - 1, calendar.firstWeekday - 1))
-    return Array(symbols[start...]) + Array(symbols[..<start])
-  }
-
-  private static func startOfWeek(containing date: Date, calendar: Calendar) -> Date {
-    var components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)
-    components.weekday = calendar.firstWeekday
-    return calendar.date(from: components).map(calendar.startOfDay(for:))
-      ?? calendar.startOfDay(for: date)
-  }
-
-  private static func endOfWeek(containing date: Date, calendar: Calendar) -> Date {
-    let start = startOfWeek(containing: date, calendar: calendar)
-    return calendar.date(byAdding: .day, value: 6, to: start) ?? start
-  }
-
-  private static func dates(startingAt start: Date, count: Int, calendar: Calendar) -> [Date] {
-    var result: [Date] = []
-    var current = calendar.startOfDay(for: start)
-    for _ in 0..<count {
-      result.append(current)
-      guard let next = calendar.date(byAdding: .day, value: 1, to: current) else { break }
-      current = next
+  static func initialSelection(days: [StudentPlanDay], explicitDayID: UUID?) -> UUID? {
+    let sequence = StudentPlanSequence(days: days)
+    if let explicitDayID, sequence.orderedDays.contains(where: { $0.id == explicitDayID }) {
+      return explicitDayID
     }
-    return result
-  }
-
-  private static func dates(from start: Date, through end: Date, calendar: Calendar) -> [Date] {
-    var result: [Date] = []
-    var current = calendar.startOfDay(for: start)
-    while calendar.compare(current, to: end, toGranularity: .day) != .orderedDescending {
-      result.append(current)
-      guard let next = calendar.date(byAdding: .day, value: 1, to: current) else { break }
-      current = next
-    }
-    return result
+    return sequence.cursorDay?.id ?? sequence.orderedDays.last?.id
   }
 }
 
-enum TrainingCalendarText {
-  private static let shortWeekdays = [
-    "周日", "周一", "周二", "周三", "周四", "周五", "周六",
-  ]
-  private static let longWeekdays = [
-    "星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六",
-  ]
-  private static let months = [
-    "一月", "二月", "三月", "四月", "五月", "六月",
-    "七月", "八月", "九月", "十月", "十一月", "十二月",
-  ]
-
-  static func weekday(for date: Date, calendar: Calendar) -> String {
-    let index = calendar.component(.weekday, from: date) - 1
-    return shortWeekdays.indices.contains(index) ? shortWeekdays[index] : ""
+enum TrainingSequenceText {
+  static func recommendation(_ date: Date) -> String {
+    let calendar = PlanCalendarDayIdentity.utcCalendar
+    let components = calendar.dateComponents([.month, .day, .weekday], from: date)
+    let weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
+    let weekdayIndex = (components.weekday ?? 1) - 1
+    let weekday = weekdays.indices.contains(weekdayIndex) ? weekdays[weekdayIndex] : ""
+    return "教练推荐 \(components.month ?? 0)/\(components.day ?? 0) \(weekday)"
   }
 
-  static func collapsedDate(for date: Date, calendar: Calendar = .current) -> String {
-    let monthIndex = calendar.component(.month, from: date) - 1
-    let month = months.indices.contains(monthIndex) ? months[monthIndex] : ""
-    let day = calendar.component(.day, from: date)
-    let weekdayIndex = calendar.component(.weekday, from: date) - 1
-    let weekday = longWeekdays.indices.contains(weekdayIndex) ? longWeekdays[weekdayIndex] : ""
-    return "\(month)\(day)日 · \(weekday)"
+  static func dayName(_ day: StudentPlanDay) -> String {
+    let families = MainLiftExerciseFamilyResolver.families(in: day)
+    guard !families.isEmpty else { return "训练日" }
+    return families.map(\.studentDisplayName).joined(separator: " · ")
+  }
+
+  static func unlockMessage(after day: StudentPlanDay) -> String {
+    "练完 W\(day.weekNumber) · \(DashboardTodayPresentation.dayName(day)) 后自动轮到这一节。"
+  }
+
+  static func exerciseSummary(_ day: StudentPlanDay) -> String {
+    let sets = day.exercises.reduce(0) { $0 + $1.prescribedSets.count }
+    return "\(day.exercises.count) 个动作 · \(sets) 组"
   }
 }

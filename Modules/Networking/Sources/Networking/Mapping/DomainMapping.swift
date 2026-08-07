@@ -36,6 +36,7 @@ extension PlanDTO {
       status: status,
       totalShiftDays: totalShiftDays,
       latestShiftCreatedAt: latestShiftCreatedAt,
+      publishedAt: publishedAt,
       createdAt: createdAt,
       updatedAt: updatedAt
     )
@@ -65,7 +66,9 @@ extension PlanDayDTO {
       dayOfWeek: dayOfWeek,
       weekNumber: weekNumber,
       sortOrder: sortOrder,
-      shiftedToDate: shiftedToDate
+      shiftedToDate: shiftedToDate,
+      completedAt: completedAt,
+      completionSource: completionSource
     )
   }
 }

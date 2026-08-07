@@ -25,7 +25,7 @@ import Testing
     onboarding: onboarding
   )
 
-  #expect(title == "W2D1 · 深蹲")
+  #expect(title == "W1D1 · 深蹲")
 }
 
 @Test func mismatchedSquatStanceDoesNotClaimMainLiftInTitle() throws {
@@ -44,7 +44,7 @@ import Testing
     onboarding: onboarding
   )
 
-  #expect(title == "今日")
+  #expect(title == "W1D1")
 }
 
 private func titleDay(date: Date, stance: CompetitionStance) -> StudentPlanDay {

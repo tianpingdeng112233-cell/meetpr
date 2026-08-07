@@ -16,6 +16,7 @@ public struct PlanDTO: Codable, Equatable, Sendable {
   public let status: PlanStatus
   public let totalShiftDays: Int
   public let latestShiftCreatedAt: Date?
+  public let publishedAt: Date?
   public let createdAt: Date
   public let updatedAt: Date
 
@@ -33,6 +34,7 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     status: PlanStatus,
     totalShiftDays: Int = 0,
     latestShiftCreatedAt: Date? = nil,
+    publishedAt: Date? = nil,
     createdAt: Date,
     updatedAt: Date
   ) {
@@ -49,6 +51,7 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     self.status = status
     self.totalShiftDays = totalShiftDays
     self.latestShiftCreatedAt = latestShiftCreatedAt
+    self.publishedAt = publishedAt
     self.createdAt = createdAt
     self.updatedAt = updatedAt
   }
@@ -68,6 +71,7 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     status = try container.decode(PlanStatus.self, forKey: .status)
     totalShiftDays = try container.decodeIfPresent(Int.self, forKey: .totalShiftDays) ?? 0
     latestShiftCreatedAt = try container.decodeIfPresent(Date.self, forKey: .latestShiftCreatedAt)
+    publishedAt = try container.decodeIfPresent(Date.self, forKey: .publishedAt)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
     updatedAt = try container.decode(Date.self, forKey: .updatedAt)
   }
@@ -86,6 +90,7 @@ public struct PlanDTO: Codable, Equatable, Sendable {
     case status
     case totalShiftDays
     case latestShiftCreatedAt
+    case publishedAt
     case createdAt
     case updatedAt
   }
@@ -132,6 +137,8 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
   public let weekNumber: Int
   public let sortOrder: Int
   public let shiftedToDate: Date?
+  public let completedAt: Date?
+  public let completionSource: String?
   public let exercises: [PlanExerciseDTO]
 
   public init(
@@ -141,6 +148,8 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
     weekNumber: Int,
     sortOrder: Int,
     shiftedToDate: Date? = nil,
+    completedAt: Date? = nil,
+    completionSource: String? = nil,
     exercises: [PlanExerciseDTO] = []
   ) {
     self.id = id
@@ -149,6 +158,8 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
     self.weekNumber = weekNumber
     self.sortOrder = sortOrder
     self.shiftedToDate = shiftedToDate
+    self.completedAt = completedAt
+    self.completionSource = completionSource
     self.exercises = exercises
   }
 
@@ -159,7 +170,39 @@ public struct PlanDayDTO: Codable, Equatable, Sendable {
     case weekNumber
     case sortOrder
     case shiftedToDate
+    case completedAt
+    case completionSource
     case exercises
+  }
+}
+
+public struct PlanDayCompletionDTO: Codable, Equatable, Sendable {
+  public let id: UUID
+  public let planDayID: UUID
+  public let studentID: UUID
+  public let source: String
+  public let completedAt: Date
+
+  public init(
+    id: UUID,
+    planDayID: UUID,
+    studentID: UUID,
+    source: String,
+    completedAt: Date
+  ) {
+    self.id = id
+    self.planDayID = planDayID
+    self.studentID = studentID
+    self.source = source
+    self.completedAt = completedAt
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case id
+    case planDayID = "planDayId"
+    case studentID = "studentId"
+    case source
+    case completedAt
   }
 }
 

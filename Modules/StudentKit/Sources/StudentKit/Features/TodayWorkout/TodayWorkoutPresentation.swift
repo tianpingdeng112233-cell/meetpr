@@ -35,7 +35,7 @@ struct TodayWorkoutProgress: Equatable, Sendable {
     self.currentSetTotal = exerciseDrafts.count
     self.currentExerciseNumber = min(currentExerciseIndex + 1, max(exerciseIDs.count, 1))
     self.exerciseTotal = exerciseIDs.count
-    self.allDone = !drafts.isEmpty && drafts.allSatisfy(\.completed)
+    self.allDone = remainingSets == 0
   }
 
   var remainingText: String {

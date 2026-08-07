@@ -87,7 +87,7 @@ extension StudentDemoSeed {
               planExerciseID: exercise.id,
               exerciseID: exercise.exercise.id,
               setIndex: set.setIndex,
-              loggedAt: day.date.addingTimeInterval(
+              loggedAt: day.scheduledDate.addingTimeInterval(
                 Double(21 * 3_600 + set.setIndex * 300)
               ),
               weightKg: set.weightKg ?? 0,

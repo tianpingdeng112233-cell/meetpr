@@ -60,7 +60,7 @@ import Testing
     Issue.record("Expected loaded state")
     return
   }
-  #expect(weeks.count == 1)
-  #expect(weeks[0].days.count == 7)
+  #expect(weeks.count == 2)
+  #expect(weeks.flatMap(\.days).count == 8)
   #expect(!logs.isEmpty)
 }

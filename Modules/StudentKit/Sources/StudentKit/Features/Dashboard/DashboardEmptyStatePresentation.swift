@@ -41,7 +41,7 @@ extension DashboardTodayPresentation {
       let day,
       !day.exercises.isEmpty,
       PlanCalendarDayIdentity.matches(
-        planDate: day.date,
+        planDate: day.scheduledDate,
         selectedDate: now,
         selectedCalendar: selectedCalendar
       )
@@ -196,7 +196,7 @@ extension DashboardTodayPresentation {
         return true
       }
       guard let feedbackDate = feedback.dayDate else { return false }
-      return PlanCalendarDayIdentity.isSameUTCDate(feedbackDate, day.date)
+      return PlanCalendarDayIdentity.isSameUTCDate(feedbackDate, day.scheduledDate)
     }
   }
 
@@ -207,7 +207,7 @@ extension DashboardTodayPresentation {
   ) -> (offset: Int, day: StudentPlanDay)? {
     guard
       let offset = PlanCalendarDayIdentity.dayOffset(
-        fromPlanDate: day.date,
+        fromPlanDate: day.scheduledDate,
         toSelectedDate: date,
         selectedCalendar: calendar
       ),

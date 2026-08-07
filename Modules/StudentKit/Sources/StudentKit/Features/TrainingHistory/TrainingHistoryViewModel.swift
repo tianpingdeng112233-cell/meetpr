@@ -73,7 +73,7 @@ public final class TrainingHistoryViewModel {
     calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
     let base = calendar.startOfDay(for: startDate)
     let grouped = Dictionary(grouping: days) { day -> Int in
-      let dayStart = calendar.startOfDay(for: day.date)
+      let dayStart = calendar.startOfDay(for: day.scheduledDate)
       let elapsed = calendar.dateComponents([.day], from: base, to: dayStart).day ?? 0
       return max(0, elapsed) / 7 + 1
     }

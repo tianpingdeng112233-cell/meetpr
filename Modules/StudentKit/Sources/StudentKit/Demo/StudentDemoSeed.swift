@@ -32,11 +32,16 @@ public enum StudentDemoSeed {
       selectedCalendar: selectedCalendar
     )
     .addingTimeInterval(Double(max(0, weekIndex - 1)) * 7 * 86_400)
-    let days = (0..<7).map { offset in
+    let days = (0..<8).map { offset in
       let date = startDate.addingTimeInterval(Double(offset) * 86_400)
       return StudentPlanDay(
         id: uuid(1_000 + offset),
+        weekNumber: (offset / 4) + 1,
+        dayOfWeek: (offset % 4) + 1,
+        sortOrder: offset,
         date: date,
+        completedAt: offset < 2 ? date.addingTimeInterval(20 * 3_600) : nil,
+        completionSource: offset < 2 ? "auto" : nil,
         exercises: exercises(forDayOffset: offset)
       )
     }
@@ -44,7 +49,8 @@ public enum StudentDemoSeed {
       cycleID: uuid(301),
       weekIndex: weekIndex,
       startDate: startDate,
-      endDate: startDate.addingTimeInterval(6 * 86_400),
+      endDate: startDate.addingTimeInterval(7 * 86_400),
+      publishedAt: referenceDate,
       days: days
     )
   }
@@ -55,27 +61,19 @@ public enum StudentDemoSeed {
     includeToday: Bool = true
   ) -> [StudentSetLog] {
     let plan = makePlanView(weekIndex: weekIndex)
-    let calendar = utcCalendar
-    let today =
-      PlanCalendarDayIdentity.planDate(
-        matching: Date(),
-        selectedCalendar: .current
-      ) ?? calendar.startOfDay(for: Date())
-    // Past training days are fully logged; today is in progress (first two sets);
-    // future days are never seeded.
-    return plan.days.flatMap { day -> [StudentSetLog] in
-      guard day.date <= today, !day.exercises.isEmpty else { return [] }
-      let isToday = calendar.isDate(day.date, inSameDayAs: today)
-      guard includeToday || !isToday else { return [] }
+    // W1D1–D2 are complete; W1D3 is deliberately partial so reopening the
+    // demo proves that partial logs do not advance the sequence cursor.
+    return plan.days.prefix(includeToday ? 3 : 2).flatMap { day -> [StudentSetLog] in
+      let isCursor = day.dayOfWeek == 3
       return day.exercises.flatMap { exercise -> [StudentSetLog] in
-        let sets = isToday ? Array(exercise.prescribedSets.prefix(2)) : exercise.prescribedSets
+        let sets = isCursor ? Array(exercise.prescribedSets.prefix(2)) : exercise.prescribedSets
         return sets.map { set in
           StudentSetLog(
             id: UUID(),
             studentID: studentID,
             planExerciseID: exercise.id,
             setIndex: set.setIndex,
-            loggedAt: day.date.addingTimeInterval(Double(3_600 + set.setIndex * 300)),
+            loggedAt: day.scheduledDate.addingTimeInterval(Double(3_600 + set.setIndex * 300)),
             weightKg: set.weightKg ?? 60,
             reps: set.reps ?? set.repsMax ?? 5,
             rpe: set.rpe ?? 8,
@@ -98,7 +96,7 @@ public enum StudentDemoSeed {
         id: uuid(401),
         coachID: coachID,
         studentID: studentID,
-        dayDate: plan.days[0].date,
+        dayDate: plan.days[0].scheduledDate,
         planExerciseID: linkedExerciseID,
         videoID: uuid(411),
         video: demoFeedbackVideo(
@@ -111,7 +109,7 @@ public enum StudentDemoSeed {
         id: uuid(402),
         coachID: coachID,
         studentID: studentID,
-        dayDate: plan.days[1].date,
+        dayDate: plan.days[1].scheduledDate,
         text: "卧推动作稳定，肘部路径比上周干净。辅助动作可以控制离心两秒。",
         postedAt: newestFeedbackAt.addingTimeInterval(-180),
         readAt: nil
@@ -128,29 +126,30 @@ public enum StudentDemoSeed {
   }
 
   private static func exercises(forDayOffset offset: Int) -> [StudentPlanExercise] {
+    let templates: [StudentPlanExercise]
     switch offset {
     case 0:
-      return [
+      templates = [
         exercise(
           .init(
             index: 0, name: "深蹲", family: .squat, weight: 142.5, reps: 5, rpe: 7.5,
             note: "节奏310,底部不停顿"))
       ]
     case 1:
-      return [exercise(.init(index: 1, name: "卧推", family: .bench, weight: 92.5, reps: 5, rpe: 8))]
-    case 2:
-      return []
-    case 3:
-      return [
+      templates = [
+        exercise(.init(index: 1, name: "卧推", family: .bench, weight: 92.5, reps: 5, rpe: 8))
+      ]
+    case 2, 6:
+      templates = [
         exercise(
           .init(
             index: 2, name: "硬拉", family: .deadlift, weight: 175, reps: 3, rpe: 8.5,
             note: "D170/L190 递增5kg,顶组留一,腰部有感觉就停"))
       ]
-    case 4:
+    case 3, 7:
       // 深蹲主项 + 窄握卧推变式(+ 坐姿划船辅助)→ 角标 "SB"(演示组合日 + S 在 B 前排序 +
       // 辅助动作不计入)。
-      return [
+      templates = [
         exercise(.init(index: 6, name: "深蹲", family: .squat, weight: 130, reps: 5, rpe: 7)),
         exercise(
           .init(
@@ -158,8 +157,44 @@ public enum StudentDemoSeed {
             type: .mainLiftVariation)),
         exercise(.init(index: 4, name: "坐姿划船", family: nil, weight: 55, reps: 10, rpe: 8)),
       ]
+    case 4:
+      templates = [
+        exercise(.init(index: 0, name: "深蹲", family: .squat, weight: 145, reps: 4, rpe: 8))
+      ]
+    case 5:
+      templates = [
+        exercise(.init(index: 1, name: "卧推", family: .bench, weight: 95, reps: 4, rpe: 8))
+      ]
     default:
-      return []
+      templates = []
+    }
+    return uniquelyIdentified(templates, dayOffset: offset)
+  }
+
+  private static func uniquelyIdentified(
+    _ templates: [StudentPlanExercise],
+    dayOffset: Int
+  ) -> [StudentPlanExercise] {
+    templates.map { template in
+      StudentPlanExercise(
+        id: uuid(30_000 + (dayOffset * 100) + template.sequenceIndex),
+        exercise: template.exercise,
+        sequenceIndex: template.sequenceIndex,
+        prescribedSets: template.prescribedSets.map { set in
+          PrescribedSet(
+            id: uuid(
+              40_000 + (dayOffset * 100) + (template.sequenceIndex * 10) + set.setIndex),
+            setIndex: set.setIndex,
+            weightKg: set.weightKg,
+            reps: set.reps,
+            repsMax: set.repsMax,
+            rpe: set.rpe,
+            restSeconds: set.restSeconds,
+            coachNote: set.coachNote
+          )
+        },
+        notes: template.notes
+      )
     }
   }
 
@@ -300,7 +335,7 @@ public enum StudentDemoSeed {
   }
 
   /// Backend plan-day dates decode as UTC-midnight anchors; the demo seed must
-  /// match that shape or UTC-gated features (e.g. 今天有事 shift entry) behave
+  /// match that shape or date-keyed history and notification routes behave
   /// differently in DEMO_MODE than against the real backend.
   static var utcCalendar: Calendar {
     var calendar = Calendar(identifier: .gregorian)

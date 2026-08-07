@@ -8,8 +8,6 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
   private let session: any SessionStateReader
   private let cache: StudentPlanCache
   private let catalogCache: ExerciseCatalogCache
-  private let calendar: Calendar
-  private let now: @Sendable () -> Date
   private var catalog: [UUID: Exercise] = [:]
   private var catalogRefreshTask: Task<[Exercise], any Error>?
   private var planRefreshTasks: [UUID: Task<StudentPlanView?, any Error>] = [:]
@@ -26,8 +24,8 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     self.session = session
     self.cache = cache
     self.catalogCache = catalogCache
-    self.calendar = calendar
-    self.now = now
+    _ = calendar
+    _ = now
   }
 
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
@@ -40,24 +38,22 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     return try await refreshCurrentPlan(studentID: studentID)
   }
 
-  public func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? {
+  public func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    try await refreshCurrentPlanFromBackend(studentID: studentID)
+  }
+
+  public func fetchDay(studentID: UUID, dayID: UUID) async throws -> StudentPlanDay? {
     guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
       return nil
     }
-    return plan.days.first {
-      PlanCalendarDayIdentity.matches(
-        planDate: $0.date,
-        selectedDate: date,
-        selectedCalendar: calendar
-      )
-    }
+    return plan.days.first { $0.id == dayID }
   }
 
   public func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
     guard let plan = try await fetchCurrentPlan(studentID: studentID) else {
       return []
     }
-    return plan.days.sorted { $0.date < $1.date }
+    return StudentPlanSequence.orderedDays(in: plan)
   }
 
   public func fetchExerciseCatalog() async throws -> [Exercise] {
@@ -65,41 +61,47 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     return try await exerciseCatalog(accessToken: accessToken)
   }
 
-  public func shiftPlan(id: UUID, studentID: UUID) async throws -> PlanShiftResult {
+  public func completeDay(id: UUID, studentID: UUID) async throws -> PlanDayCompletion {
     let token = try await session.accessToken()
     do {
-      let shift = try await api.shiftPlan(id: id, accessToken: token)
-      let shiftedDays = shift.shiftedDays.map {
-        ShiftedPlanDay(dayID: $0.dayID, shiftedToDate: $0.shiftedToDate)
-      }
-      await updateCachedPlan(
-        shiftedDays: shiftedDays,
-        totalShiftDays: shift.totalOffsetDays,
-        latestShiftCreatedAt: Date(),
+      let completion = try await api.completePlanDay(id: id, accessToken: token)
+      await updateCachedCompletion(
+        dayID: id,
+        completedAt: completion.completedAt,
+        source: completion.source,
         studentID: studentID
       )
-      return PlanShiftResult(
-        batchID: shift.batchID,
-        shiftedDays: shiftedDays,
-        totalShiftDays: shift.totalOffsetDays
+      return PlanDayCompletion(
+        id: completion.id,
+        dayID: completion.planDayID,
+        studentID: completion.studentID,
+        source: completion.source,
+        completedAt: completion.completedAt
       )
     } catch {
-      throw Self.shiftError(from: error)
+      throw Self.completionError(from: error)
     }
   }
 
-  public func cancelPlanShift(id: UUID, studentID: UUID) async throws {
+  public func undoDayCompletion(id: UUID, studentID: UUID) async throws {
     let token = try await session.accessToken()
     do {
-      try await api.cancelPlanShift(id: id, accessToken: token)
-      _ = try await refreshCurrentPlan(studentID: studentID)
+      try await api.undoPlanDayCompletion(id: id, accessToken: token)
     } catch {
-      throw Self.shiftError(from: error)
+      if BackendErrorEnvelope.machineCode(from: error) != "NO_COMPLETION_TO_UNDO" {
+        throw Self.completionError(from: error)
+      }
     }
+    await updateCachedCompletion(
+      dayID: id,
+      completedAt: nil,
+      source: nil,
+      studentID: studentID
+    )
   }
 
   @discardableResult
-  private func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+  private func refreshCurrentPlanFromBackend(studentID: UUID) async throws -> StudentPlanView? {
     if let task = planRefreshTasks[studentID] {
       return try await task.value
     }
@@ -120,7 +122,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
       accessToken: token
     )
     guard
-      let plan = response.plans.sorted(by: { $0.startDate > $1.startDate }).first
+      let plan = response.plans.max(by: Self.planPrecedes)
     else {
       return nil
     }
@@ -130,7 +132,7 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     let projection = StudentPlanProjection.project(
       tree: tree,
       catalog: exercises,
-      weekIndex: currentWeekIndex(for: tree.plan)
+      weekIndex: 1
     )
     try await cache.save(plan: projection, studentID: studentID)
     return projection
@@ -178,22 +180,24 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
     return exercises
   }
 
-  private func updateCachedPlan(
-    shiftedDays: [ShiftedPlanDay],
-    totalShiftDays: Int,
-    latestShiftCreatedAt: Date,
+  private func updateCachedCompletion(
+    dayID: UUID,
+    completedAt: Date?,
+    source: String?,
     studentID: UUID
   ) async {
     guard let plan = await cache.loadPlan(studentID: studentID) else { return }
-    let shiftedDateByDayID = Dictionary(
-      uniqueKeysWithValues: shiftedDays.map { ($0.dayID, $0.shiftedToDate) }
-    )
     let updatedDays = plan.days.map { day in
-      guard let shiftedToDate = shiftedDateByDayID[day.id] else { return day }
+      guard day.id == dayID else { return day }
       return StudentPlanDay(
         id: day.id,
+        weekNumber: day.weekNumber,
+        dayOfWeek: day.dayOfWeek,
+        sortOrder: day.sortOrder,
         date: day.scheduledDate,
-        shiftedToDate: shiftedToDate,
+        shiftedToDate: day.shiftedToDate,
+        completedAt: completedAt,
+        completionSource: source,
         exercises: day.exercises
       )
     }
@@ -203,27 +207,28 @@ public actor BackendStudentPlanRepository: StudentPlanRepository, ExerciseCatalo
       startDate: plan.startDate,
       endDate: plan.endDate,
       planKind: plan.planKind,
-      totalShiftDays: totalShiftDays,
-      latestShiftCreatedAt: latestShiftCreatedAt,
+      publishedAt: plan.publishedAt,
+      totalShiftDays: plan.totalShiftDays,
+      latestShiftCreatedAt: plan.latestShiftCreatedAt,
       days: updatedDays
     )
     try? await cache.save(plan: updated, studentID: studentID)
   }
 
-  private static func shiftError(from error: any Error) -> any Error {
-    PlanShiftError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
+  private static func completionError(from error: any Error) -> any Error {
+    PlanDayCompletionError(machineCode: BackendErrorEnvelope.machineCode(from: error)) ?? error
   }
 
-  func currentWeekIndex(for plan: TrainingPlan) -> Int {
-    let elapsedDays =
-      PlanCalendarDayIdentity.dayOffset(
-        fromPlanDate: plan.startDate,
-        toSelectedDate: now(),
-        selectedCalendar: calendar
-      ) ?? 0
-    let week = max(1, elapsedDays / 7 + 1)
-    return min(week, plan.planWeeks)
+  /// Current-plan selection from backend spec 035: max publishedAt, then
+  /// createdAt, then id. The list endpoint's createdAt ordering is legacy only.
+  static func planPrecedes(_ lhs: PlanDTO, _ rhs: PlanDTO) -> Bool {
+    let lhsPublishedAt = lhs.publishedAt ?? .distantPast
+    let rhsPublishedAt = rhs.publishedAt ?? .distantPast
+    if lhsPublishedAt != rhsPublishedAt { return lhsPublishedAt < rhsPublishedAt }
+    if lhs.createdAt != rhs.createdAt { return lhs.createdAt < rhs.createdAt }
+    return lhs.id.uuidString < rhs.id.uuidString
   }
+
 }
 
 /// `internal` (not `private`) so `@testable` unit tests can exercise the
@@ -238,16 +243,9 @@ enum StudentPlanProjection {
     let exercisesByDay = Dictionary(grouping: tree.exercises, by: \.planDayID)
     let setsByExercise = Dictionary(grouping: tree.sets, by: \.planExerciseID)
     // Project the WHOLE cycle (all weeks), not just the current week: the
-    // training-tab calendar and history both navigate across weeks, and
-    // fetchDay(date:) must resolve any cycle day. Consumers that want only the
-    // current week (e.g. the dashboard week strip) filter by date themselves.
+    // Student sequence and history both navigate the complete published cycle.
     let days =
-      tree.days
-      .sorted { lhs, rhs in
-        if lhs.dayOfWeek == rhs.dayOfWeek { return lhs.sortOrder < rhs.sortOrder }
-        return lhs.dayOfWeek < rhs.dayOfWeek
-      }
-      .map { day in
+      tree.days.map { day in
         studentDay(
           day,
           startDate: tree.plan.startDate,
@@ -256,13 +254,17 @@ enum StudentPlanProjection {
           exerciseByID: exerciseByID
         )
       }
+      .sorted(by: StudentPlanSequence.precedes)
 
     return StudentPlanView(
       cycleID: tree.plan.id,
-      weekIndex: weekIndex,
+      weekIndex: days.first(where: { $0.completedAt == nil })?.weekNumber
+        ?? days.last?.weekNumber
+        ?? weekIndex,
       startDate: tree.plan.startDate,
       endDate: tree.plan.endDate,
       planKind: tree.plan.kind,
+      publishedAt: tree.plan.publishedAt,
       totalShiftDays: tree.plan.totalShiftDays,
       latestShiftCreatedAt: tree.plan.latestShiftCreatedAt,
       days: days
@@ -293,8 +295,13 @@ enum StudentPlanProjection {
       }
     return StudentPlanDay(
       id: day.id,
+      weekNumber: day.weekNumber,
+      dayOfWeek: day.dayOfWeek,
+      sortOrder: day.sortOrder,
       date: scheduledDate(for: day, startDate: startDate),
       shiftedToDate: day.shiftedToDate,
+      completedAt: day.completedAt,
+      completionSource: day.completionSource,
       exercises: exercises
     )
   }

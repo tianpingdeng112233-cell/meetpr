@@ -9,13 +9,21 @@ import Testing
   let feedback = StudentDemoSeed.makeFeedback()
   let logs = StudentDemoSeed.makeHistoricalLogs()
 
-  #expect(plan.days.count == 7)
+  #expect(plan.days.count == 8)
+  #expect(plan.days.prefix(2).allSatisfy { $0.completedAt != nil })
+  #expect(plan.days[2].completedAt == nil)
+  #expect(StudentPlanSequence.cursorDay(in: plan)?.id == plan.days[2].id)
   #expect(plan.days.contains { !$0.exercises.isEmpty })
   #expect(feedback.contains { $0.readAt == nil })
   #expect(feedback.contains { $0.readAt != nil })
   #expect(feedback.contains { $0.planExerciseID != nil })
   #expect(!logs.isEmpty)
   #expect(logs.allSatisfy { $0.studentID == StudentDemoSeed.studentID })
+
+  let planExerciseIDs = plan.days.flatMap(\.exercises).map(\.id)
+  let prescribedSetIDs = plan.days.flatMap(\.exercises).flatMap(\.prescribedSets).map(\.id)
+  #expect(Set(planExerciseIDs).count == planExerciseIDs.count)
+  #expect(Set(prescribedSetIDs).count == prescribedSetIDs.count)
 }
 
 @Test func demoStudentKeepsSquatBenchDeadliftE1RMThroughCompetitionGate() throws {

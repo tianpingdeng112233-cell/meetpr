@@ -22,7 +22,7 @@ private func makeLoadedViewModel(
   e1rm: InMemoryE1RMRepository
 ) async throws -> (TodayWorkoutViewModel, UUID) {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView(today: frozenNow)
+  let plan = StudentDemoSeed.makePlanView(today: frozenNow, todayOffset: 2)
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
@@ -137,8 +137,8 @@ private struct TestFailure: Error, CustomStringConvertible {
 @Test func e1RMImprovementAtTheSameMeasuredWeightDoesNotFirePR() async throws {
   let e1rm = InMemoryE1RMRepository()
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView(today: frozenNow)
-  guard let deadlift = plan.days[3].exercises.first?.exercise else {
+  let plan = StudentDemoSeed.makePlanView(today: frozenNow, todayOffset: 2)
+  guard let deadlift = plan.days[2].exercises.first?.exercise else {
     throw TestFailure("seed shape changed")
   }
   // Seed the same measured weight with a slightly lower e1RM. Today's
@@ -194,7 +194,7 @@ private struct TestFailure: Error, CustomStringConvertible {
   // second identical measured-weight set must not create another PR.
   let e1rm = InMemoryE1RMRepository()
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView(today: frozenNow)
+  let plan = StudentDemoSeed.makePlanView(today: frozenNow, todayOffset: 2)
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
