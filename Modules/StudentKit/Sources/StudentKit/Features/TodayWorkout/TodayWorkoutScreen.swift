@@ -452,7 +452,6 @@ private struct TodayWorkoutHero: View {
   let showsAskCoach: Bool
   let isPreparingAskCoach: Bool
   let onAskCoach: () -> Void
-  @State private var summaryExpansion = TodayWorkoutSummaryExpansionState()
 
   var body: some View {
     ZStack(alignment: .leading) {
@@ -505,20 +504,12 @@ private struct TodayWorkoutHero: View {
       // Never publish the taller pre-start list hero as a candidate frame.
       if presentation.heroMode == .recording { onFrameChange(frame) }
     }
-    .onChange(of: presentation.day.id) { _, dayID in
-      summaryExpansion.select(dayID: dayID)
-    }
   }
 
   private var listHero: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-      TodayWorkoutActionSummary(
-        presentation: presentation,
-        highlightedExerciseID: nil,
-        canCollapse: false,
-        isExpanded: .constant(true)
-      )
-      .padding(.bottom, MeetPRSpacing.point14)
+      TodayWorkoutActionSummary(presentation: presentation)
+        .padding(.bottom, MeetPRSpacing.point14)
 
       if isEditable {
         GoldCTA(
@@ -537,20 +528,11 @@ private struct TodayWorkoutHero: View {
     if let row = presentation.currentRow,
       let exercise = presentation.exercises.first(where: { $0.id == row.draft.planExerciseID })
     {
+      // The design's recording state shows the active set card and the
+      // per-exercise set table only — the「今日训练」summary card belongs to
+      // the pre-start list state and never coexists with the active card
+      // (David 2026-08-07 真机走查).
       VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-        TodayWorkoutActionSummary(
-          presentation: presentation,
-          highlightedExerciseID: exercise.id,
-          canCollapse: true,
-          isExpanded: summaryExpansionBinding
-        )
-        .padding(.bottom, MeetPRSpacing.point13)
-
-        Rectangle()
-          .fill(Color.MeetPR.borderSubtle)
-          .frame(height: 1)
-          .padding(.bottom, MeetPRSpacing.point13)
-
         Text(exercise.name)
           .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
           .foregroundStyle(Color.MeetPR.textPrimary)
@@ -698,58 +680,21 @@ private struct TodayWorkoutHero: View {
   private func numberText(_ value: Double) -> String {
     value.formatted(.number.precision(.fractionLength(0...2)))
   }
-
-  private var summaryExpansionBinding: Binding<Bool> {
-    Binding(
-      get: {
-        summaryExpansion.dayID == presentation.day.id
-          ? summaryExpansion.isExpanded
-          : true
-      },
-      set: { isExpanded in
-        summaryExpansion.setExpanded(isExpanded, for: presentation.day.id)
-      }
-    )
-  }
 }
 
+// Pre-start list state only — the recording state never shows this card
+// (David 2026-08-07: the active set card and the summary must not coexist).
 private struct TodayWorkoutActionSummary: View {
   let presentation: TodayWorkoutPresentation
-  let highlightedExerciseID: UUID?
-  let canCollapse: Bool
-  @Binding var isExpanded: Bool
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
-      if canCollapse {
-        Button {
-          withAnimation(MeetPRMotion.spring) {
-            isExpanded.toggle()
-          }
-        } label: {
-          TodayWorkoutActionSummaryHeader(
-            presentation: presentation,
-            isExpanded: isExpanded
-          )
-          .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("今日训练动作汇总")
-        .accessibilityValue(isExpanded ? "已展开" : "已收合")
-      } else {
-        TodayWorkoutActionSummaryHeader(presentation: presentation)
-      }
+      TodayWorkoutActionSummaryHeader(presentation: presentation)
 
-      if isExpanded {
-        VStack(spacing: MeetPRSpacing.space2) {
-          ForEach(presentation.exercises) { exercise in
-            TodayWorkoutActionSummaryRow(
-              exercise: exercise,
-              isHighlighted: exercise.id == highlightedExerciseID
-            )
-          }
+      VStack(spacing: MeetPRSpacing.space2) {
+        ForEach(presentation.exercises) { exercise in
+          TodayWorkoutActionSummaryRow(exercise: exercise)
         }
-        .transition(.opacity.combined(with: .move(edge: .top)))
       }
     }
   }
@@ -757,15 +702,6 @@ private struct TodayWorkoutActionSummary: View {
 
 private struct TodayWorkoutActionSummaryHeader: View {
   let presentation: TodayWorkoutPresentation
-  let isExpanded: Bool?
-
-  init(
-    presentation: TodayWorkoutPresentation,
-    isExpanded: Bool? = nil
-  ) {
-    self.presentation = presentation
-    self.isExpanded = isExpanded
-  }
 
   var body: some View {
     HStack(alignment: .firstTextBaseline) {
@@ -782,19 +718,12 @@ private struct TodayWorkoutActionSummaryHeader: View {
       }
 
       Spacer()
-
-      if let isExpanded {
-        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-          .font(.MeetPR.system(size: MeetPRFontMetrics.size13, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.textMuted)
-      }
     }
   }
 }
 
 private struct TodayWorkoutActionSummaryRow: View {
   let exercise: TodayWorkoutPresentation.Exercise
-  let isHighlighted: Bool
 
   var body: some View {
     HStack(spacing: MeetPRSpacing.point11) {
@@ -820,16 +749,12 @@ private struct TodayWorkoutActionSummaryRow: View {
     }
     .padding(.horizontal, MeetPRSpacing.point13)
     .padding(.vertical, MeetPRSpacing.point11)
-    .background(isHighlighted ? Color.MeetPR.goldRGB.opacity(0.12) : Color.MeetPR.surfaceCard)
+    .background(Color.MeetPR.surfaceCard)
     .overlay {
       RoundedRectangle(cornerRadius: MeetPRRadius.control)
-        .stroke(
-          isHighlighted ? Color.MeetPR.gold500 : Color.MeetPR.borderSubtle,
-          lineWidth: isHighlighted ? 1.5 : 1
-        )
+        .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-    .accessibilityAddTraits(isHighlighted ? .isSelected : [])
   }
 
   private func numberText(_ value: Double) -> String {
