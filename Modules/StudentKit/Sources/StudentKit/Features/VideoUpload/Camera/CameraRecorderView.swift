@@ -106,9 +106,15 @@
         }
       }
       .task {
+        // Students frame the shot, walk to the bar, and never touch the
+        // screen mid-set: the idle timer must not blank the display while
+        // the recorder is up. (UIImagePickerController did this for us;
+        // a custom AVCaptureSession does not.)
+        UIApplication.shared.isIdleTimerDisabled = true
         await controller.prepare()
       }
       .onDisappear {
+        UIApplication.shared.isIdleTimerDisabled = false
         Task { await controller.close() }
       }
       .onChange(of: scenePhase) { _, newPhase in
