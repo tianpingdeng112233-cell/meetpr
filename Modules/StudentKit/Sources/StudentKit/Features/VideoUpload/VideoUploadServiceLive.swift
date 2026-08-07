@@ -65,8 +65,12 @@ public struct BackendVideoUploadService: VideoUploadService {
     )
   }
 
-  public func pendingPartNumbers(recordID: UUID) async -> Set<Int> {
-    await partUploader.pendingParts(recordID: recordID)
+  public func pendingPartNumbers(recordID: UUID, generation: Int) async -> Set<Int> {
+    await partUploader.pendingParts(recordID: recordID, generation: generation)
+  }
+
+  public func cancelLegacyParts(recordID: UUID) async -> Bool {
+    await partUploader.cancelLegacyParts(recordID: recordID)
   }
 
   public func cancelParts(recordID: UUID) async {
@@ -135,6 +139,7 @@ public struct LoopbackVideoUploadService: VideoUploadService {
 
   public func isBackgroundWakeActive() async -> Bool { false }
 
-  public func pendingPartNumbers(recordID: UUID) async -> Set<Int> { [] }
+  public func pendingPartNumbers(recordID: UUID, generation: Int) async -> Set<Int> { [] }
+  public func cancelLegacyParts(recordID: UUID) async -> Bool { false }
   public func cancelParts(recordID: UUID) async {}
 }

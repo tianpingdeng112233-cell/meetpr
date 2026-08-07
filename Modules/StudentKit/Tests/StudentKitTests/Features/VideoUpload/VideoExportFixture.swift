@@ -148,12 +148,19 @@ struct VideoExportFixture: Sendable {
     frameIndex: Int,
     highEntropy: Bool
   ) throws -> CVPixelBuffer {
+    // The host's pixel-buffer pool intermittently fails under parallel test
+    // load; a short bounded retry keeps that infrastructure noise out of CI.
     var pixelBuffer: CVPixelBuffer?
-    guard
-      let pool = adaptor.pixelBufferPool,
-      case kCVReturnSuccess = CVPixelBufferPoolCreatePixelBuffer(nil, pool, &pixelBuffer),
-      let pixelBuffer
-    else {
+    for attempt in 0..<3 {
+      if let pool = adaptor.pixelBufferPool,
+        case kCVReturnSuccess = CVPixelBufferPoolCreatePixelBuffer(nil, pool, &pixelBuffer),
+        pixelBuffer != nil
+      {
+        break
+      }
+      if attempt < 2 { usleep(50_000) }
+    }
+    guard let pixelBuffer else {
       throw FixtureError.unavailable("Unable to allocate a fixture pixel buffer")
     }
 

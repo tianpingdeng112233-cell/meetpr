@@ -3,11 +3,6 @@ import CoreModels
 import Foundation
 import Networking
 
-struct RestoredBackgroundRecord: Sendable {
-  var tokens: Set<BackgroundUploadEventToken> = []
-  var failure: VideoPartUploadFailure?
-}
-
 extension VideoUploadManager {
   func receiveBackgroundEvent(_ event: BackgroundVideoUploadEvent) async {
     switch event {
@@ -23,6 +18,17 @@ extension VideoUploadManager {
 
   private func receiveBackgroundPartEvent(_ event: BackgroundVideoPartEvent) async {
     let recordID = event.identifier.recordID
+    guard let record = try? await repository.fetch(id: recordID),
+      record.status != .uploaded,
+      record.status != .failed
+    else {
+      BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(event.completionToken)
+      return
+    }
+    guard matchesPersistedUploadGeneration(event.identifier.generation, record: record) else {
+      BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(event.completionToken)
+      return
+    }
     if event.hasPipelineContinuation,
       !BackgroundUploadCompletionRegistry.shared.hasPendingHandler(
         identifier: event.completionToken.sessionIdentifier
@@ -32,17 +38,10 @@ extension VideoUploadManager {
       return
     }
 
-    guard let record = try? await repository.fetch(id: recordID),
-      record.status != .uploaded,
-      record.status != .failed
-    else {
-      BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(event.completionToken)
-      return
-    }
-
     var pending = restoredBackgroundRecords[event.completionToken.sessionIdentifier, default: [:]]
     var restoredRecord = pending[recordID, default: RestoredBackgroundRecord()]
     restoredRecord.tokens.insert(event.completionToken)
+    restoredRecord.generation = event.identifier.generation
     switch event.result {
     case .success(let etag):
       do {
@@ -68,8 +67,14 @@ extension VideoUploadManager {
   ) async {
     let records = restoredBackgroundRecords.removeValue(forKey: identifier) ?? [:]
     for (recordID, restoredRecord) in records {
-      if let failure = restoredRecord.failure {
-        await handleUploadFailure(recordID: recordID, error: failure)
+      if let failure = restoredRecord.failure,
+        let generation = restoredRecord.generation
+      {
+        await handleUploadFailure(
+          recordID: recordID,
+          error: failure,
+          generation: generation
+        )
       } else {
         await continueDuringBackgroundWake(recordID: recordID)
       }
@@ -82,12 +87,18 @@ extension VideoUploadManager {
     let restoredRecordIDs = Set(records.keys)
     for studentID in recoveringStudentIDs {
       let dormantRecords = (try? await repository.fetchAll(studentID: studentID)) ?? []
+      // Records with a live pipeline task are not dormant: waking them here
+      // would run a second writer under the same generation (duplicate part
+      // writes/PUTs, spurious localFileMissing before the export lands).
       for record in dormantRecords
       where record.status != .uploaded
         && record.status != .failed
         && !restoredRecordIDs.contains(record.id)
+        && activeUploads[record.id] == nil
+        && scheduledRetries[record.id] == nil
+        && !removingRecordIDs.contains(record.id)
       {
-        await continueDuringBackgroundWake(recordID: record.id)
+        await continueDuringBackgroundWake(record)
       }
     }
     BackgroundUploadCompletionRegistry.shared.acknowledgeEvent(completionToken)
@@ -97,36 +108,130 @@ extension VideoUploadManager {
   /// completion handler. Completed transfers may call the quick backend
   /// `/complete`; incomplete transfers enqueue the next file-backed batch and
   /// return without awaiting network I/O.
-  private func continueDuringBackgroundWake(recordID: UUID) async {
-    guard var record = try? await repository.fetch(id: recordID),
+  func continueDuringBackgroundWake(recordID: UUID) async {
+    guard !removingRecordIDs.contains(recordID),
+      let record = try? await repository.fetch(id: recordID),
       record.status != .uploaded,
       record.status != .failed
     else { return }
+    await continueDuringBackgroundWake(record)
+  }
 
+  private func continueDuringBackgroundWake(_ record: VideoAttachment) async {
+    guard record.status != .uploaded,
+      record.status != .failed,
+      let initialGeneration = try? requireLiveSnapshotGeneration(from: record)
+    else { return }
+    await drainBackgroundWake(record, initialGeneration: initialGeneration)
+  }
+
+  private func drainBackgroundWake(
+    _ storedRecord: VideoAttachment,
+    initialGeneration: Int
+  ) async {
+    let recordID = storedRecord.id
+    var record = storedRecord
+    var wakeGeneration: Int?
     do {
-      let fileLocation = fileURL(for: record)
-      guard FileManager.default.fileExists(atPath: fileLocation.path) else {
-        throw VideoUploadError.localFileMissing
-      }
-      let chunker = VideoFileChunker(partSizeBytes: configuration.partSizeBytes)
-      let partCount = try chunker.partCount(totalBytes: record.sizeBytes)
-      let resolved = try await resolveBackgroundWakePlan(record: &record, partCount: partCount)
-      try await executeBackgroundWakePlan(
+      wakeGeneration = initialGeneration
+      let prepared = try await prepareBackgroundWakeRecord(
+        record,
+        initialGeneration: initialGeneration
+      )
+      record = prepared.record
+      let generation = prepared.generation
+      wakeGeneration = generation
+      let input = try backgroundWakeInput(for: record)
+      try requireLiveWakeContext(recordID: recordID, generation: generation)
+      let resolved = try await resolveBackgroundWakePlan(
+        record: &record,
+        partCount: input.partCount,
+        generation: generation
+      )
+      try requireLiveWakeContext(recordID: recordID, generation: generation)
+      let completedGeneration = try await executeBackgroundWakePlan(
         resolved,
         record: record,
-        chunker: chunker,
-        fileLocation: fileLocation
+        chunker: input.chunker,
+        fileLocation: input.fileLocation,
+        generation: generation
       )
+      let liveGeneration = completedGeneration ?? generation
+      wakeGeneration = liveGeneration
+      try requireLiveWakeContext(
+        recordID: recordID,
+        generation: liveGeneration
+      )
+      if let completedGeneration {
+        await reclaimUploadGeneration(completedGeneration, recordID: recordID)
+      }
+    } catch is CancellationError {
+      return
     } catch {
-      await handleUploadFailure(recordID: recordID, error: error)
+      guard let wakeGeneration,
+        wakeFailureContextIsLive(recordID: recordID, generation: wakeGeneration)
+      else { return }
+      await handleUploadFailure(
+        recordID: recordID,
+        error: error,
+        generation: wakeGeneration
+      )
     }
+  }
+
+  private func backgroundWakeInput(
+    for record: VideoAttachment
+  ) throws -> BackgroundUploadWakeInput {
+    let fileLocation = fileURL(for: record)
+    guard FileManager.default.fileExists(atPath: fileLocation.path) else {
+      throw VideoUploadError.localFileMissing
+    }
+    let chunker = VideoFileChunker(partSizeBytes: configuration.partSizeBytes)
+    return BackgroundUploadWakeInput(
+      fileLocation: fileLocation,
+      chunker: chunker,
+      partCount: try chunker.partCount(totalBytes: record.sizeBytes)
+    )
+  }
+
+  private func prepareBackgroundWakeRecord(
+    _ storedRecord: VideoAttachment,
+    initialGeneration: Int
+  ) async throws -> (record: VideoAttachment, generation: Int) {
+    var record = storedRecord
+    try requireLiveWakeContext(recordID: record.id, generation: initialGeneration)
+    let cancelledLegacyParts = await service.cancelLegacyParts(recordID: record.id)
+    try requireLiveWakeContext(recordID: record.id, generation: initialGeneration)
+
+    let generation =
+      cancelledLegacyParts
+      ? advanceUploadGeneration(recordID: record.id)
+      : initialGeneration
+    guard cancelledLegacyParts || record.uploadGeneration != generation else {
+      return (record, generation)
+    }
+    record.uploadGeneration = generation
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
+    try await repository.save(record)
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
+    return (record, generation)
+  }
+
+  private func wakeFailureContextIsLive(recordID: UUID, generation: Int?) -> Bool {
+    (try? requireLiveWakeContextIfPresent(recordID: recordID, generation: generation)) != nil
   }
 
   private func resolveBackgroundWakePlan(
     record: inout VideoAttachment,
-    partCount: Int
+    partCount: Int,
+    generation: Int
   ) async throws -> BackgroundUploadWakePlanner.Decision {
-    var pendingPartNumbers = await service.pendingPartNumbers(recordID: record.id)
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
+    var pendingPartNumbers = await service.pendingPartNumbers(
+      recordID: record.id,
+      generation: generation
+    )
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
     var decision = backgroundWakeDecision(record: record, pendingParts: pendingPartNumbers)
     guard decision == .prepareRemoteSession else { return decision }
     guard record.remoteAttachmentID == nil else {
@@ -137,9 +242,20 @@ extension VideoUploadManager {
     }
 
     record.status = .uploading
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
     try await repository.save(record)
-    record = try await initiate(record, partCount: partCount)
-    pendingPartNumbers = await service.pendingPartNumbers(recordID: record.id)
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
+    record = try await initiate(
+      record,
+      partCount: partCount,
+      wakeGeneration: generation
+    )
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
+    pendingPartNumbers = await service.pendingPartNumbers(
+      recordID: record.id,
+      generation: generation
+    )
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
     decision = backgroundWakeDecision(record: record, pendingParts: pendingPartNumbers)
     return decision
   }
@@ -161,223 +277,90 @@ extension VideoUploadManager {
     _ decision: BackgroundUploadWakePlanner.Decision,
     record: VideoAttachment,
     chunker: VideoFileChunker,
-    fileLocation: URL
-  ) async throws {
+    fileLocation: URL,
+    generation: Int
+  ) async throws -> Int? {
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
     switch decision {
     case .complete:
-      try await completeDuringBackgroundWake(record)
+      let completedGeneration = try await completeDuringBackgroundWake(
+        record,
+        generation: generation
+      )
+      if let completedGeneration {
+        try requireLiveWakeContext(recordID: record.id, generation: completedGeneration)
+      }
+      return completedGeneration
     case .scheduleParts(let partNumbers):
       try await scheduleBackgroundParts(
         partNumbers,
         record: record,
         chunker: chunker,
-        fileLocation: fileLocation
+        fileLocation: fileLocation,
+        generation: generation
       )
+      try requireLiveWakeContext(recordID: record.id, generation: generation)
+      return nil
     case .waitForScheduledParts:
-      break
+      return nil
     case .prepareRemoteSession:
       throw VideoUploadError.fileUnreadable
     }
   }
 
-  private func completeDuringBackgroundWake(_ record: VideoAttachment) async throws {
+  private func completeDuringBackgroundWake(
+    _ record: VideoAttachment,
+    generation: Int
+  ) async throws -> Int? {
+    try requireLiveWakeContext(recordID: record.id, generation: generation)
     guard let remoteID = record.remoteAttachmentID else {
       throw VideoUploadError.fileUnreadable
     }
     let etags = record.uploadedParts
       .sorted { $0.partNumber < $1.partNumber }
       .map { UploadPartETagDTO(partNumber: $0.partNumber, etag: $0.etag) }
-    try await complete(record, remoteID: remoteID, etags: etags)
+    return try await complete(
+      record,
+      remoteID: remoteID,
+      etags: etags,
+      wakeGeneration: generation
+    )
   }
 
   private func scheduleBackgroundParts(
     _ partNumbers: [Int],
     record: VideoAttachment,
     chunker: VideoFileChunker,
-    fileLocation: URL
+    fileLocation: URL,
+    generation: Int
   ) async throws {
     let targets = Dictionary(
       uniqueKeysWithValues: record.uploadPartTargets.map { ($0.partNumber, $0.url) }
     )
     let chunkDirectory = chunkDirectory(recordID: record.id)
     for partNumber in partNumbers {
+      try requireLiveWakeContext(recordID: record.id, generation: generation)
       guard let target = targets[partNumber] else {
         throw VideoUploadError.invalidPartURL(partNumber: partNumber)
       }
+      try requireLiveWakeContext(recordID: record.id, generation: generation)
       let partFile = try chunker.writePart(
         partNumber: partNumber,
         from: fileLocation,
         to: chunkDirectory
       )
+      try requireLiveWakeContext(recordID: record.id, generation: generation)
       try await service.schedulePart(
         to: target,
         from: partFile,
-        identifier: VideoUploadPartIdentifier(recordID: record.id, partNumber: partNumber)
+        identifier: VideoUploadPartIdentifier(
+          recordID: record.id,
+          partNumber: partNumber,
+          generation: generation
+        )
       )
+      try requireLiveWakeContext(recordID: record.id, generation: generation)
     }
   }
 
-  func networkAvailabilityChanged(_ available: Bool) async {
-    let wasAvailable = lastNetworkAvailable
-    lastNetworkAvailable = available
-    guard available, wasAvailable == false else { return }
-
-    await flushPendingRemoteCleanups()
-    let retryIDs = Array(scheduledRetries.keys)
-    for recordID in retryIDs {
-      scheduledRetries[recordID]?.cancel()
-      scheduledRetries[recordID] = nil
-      guard let record = try? await repository.fetch(id: recordID),
-        let firstFailureAt = record.firstUploadFailureAt
-      else { continue }
-      scheduleRetry(record: record, firstFailureAt: firstFailureAt, networkState: .restored)
-    }
-  }
-
-  func handleUploadFailure(recordID: UUID, error: any Error) async {
-    guard !Task.isCancelled,
-      var record = try? await repository.fetch(id: recordID),
-      record.status != .uploaded,
-      record.status != .failed
-    else { return }
-
-    await service.cancelParts(recordID: recordID)
-    if Self.requiresFreshRemoteSession(for: error) {
-      _ = await abandonRemoteSession(record: &record)
-    }
-    let firstFailureAt = record.firstUploadFailureAt ?? now()
-    record.firstUploadFailureAt = firstFailureAt
-    record.uploadRetryCount += 1
-    record.status = .pending
-    try? await repository.save(record)
-    broadcast(.updated(record, progress: nil))
-
-    let failureKind = Self.failureKind(for: error)
-    if failureKind == .deterministic {
-      await transitionToTerminalFailure(
-        record,
-        abandonsRemoteSession: (error as? VideoUploadError) != .completeConflict
-      )
-      return
-    }
-    scheduleRetry(record: record, firstFailureAt: firstFailureAt, networkState: .available)
-  }
-
-  func scheduleRetry(
-    record: VideoAttachment,
-    firstFailureAt: Date,
-    networkState: UploadRetryScheduler.NetworkState
-  ) {
-    let decision = retryScheduler.decision(
-      failure: .transient,
-      retryCount: record.uploadRetryCount,
-      firstFailureAt: firstFailureAt,
-      now: now(),
-      networkState: networkState
-    )
-    switch decision {
-    case .retryNow:
-      startRecoveredUpload(record)
-    case .retryAfter(let seconds):
-      scheduledRetries[record.id]?.cancel()
-      scheduledRetries[record.id] = Task { [weak self] in
-        do {
-          try await Task.sleep(for: .seconds(seconds))
-          await self?.retryTimerFired(recordID: record.id)
-        } catch {}
-      }
-    case .terminalFailure:
-      Task { [weak self] in
-        await self?.transitionToTerminalFailure(record)
-      }
-    }
-  }
-
-  func retryTimerFired(recordID: UUID) async {
-    scheduledRetries[recordID] = nil
-    guard let record = try? await repository.fetch(id: recordID),
-      record.status != .uploaded,
-      record.status != .failed,
-      let firstFailureAt = record.firstUploadFailureAt
-    else { return }
-    if now().timeIntervalSince(firstFailureAt) >= retryScheduler.timeBoxSeconds {
-      await transitionToTerminalFailure(record)
-    } else {
-      startRecoveredUpload(record)
-    }
-  }
-
-  func transitionToTerminalFailure(
-    _ staleRecord: VideoAttachment,
-    abandonsRemoteSession: Bool = true
-  ) async {
-    guard var record = try? await repository.fetch(id: staleRecord.id),
-      record.status != .uploaded
-    else { return }
-    scheduledRetries[record.id]?.cancel()
-    scheduledRetries[record.id] = nil
-    await service.cancelParts(recordID: record.id)
-    if abandonsRemoteSession {
-      _ = await abandonRemoteSession(record: &record)
-    } else {
-      resetRemoteSession(on: &record)
-    }
-    record.status = .failed
-    try? await repository.save(record)
-    removeChunkFiles(recordID: record.id)
-    broadcast(.updated(record, progress: nil))
-    Analytics.shared.mediaUpload(
-      .failed,
-      context: .setLog,
-      bytes: Int(clamping: record.sizeBytes)
-    )
-    let records = (try? await repository.fetchAll(studentID: record.studentID)) ?? []
-    await failureNotifier.notifyTerminalFailures(
-      count: records.filter { $0.status == .failed }.count,
-      destination: UploadFailureDestination(
-        setLogID: record.setLogID,
-        trainingDate: record.trainingDate
-      )
-    )
-  }
-
-  private func startRecoveredUpload(_ record: VideoAttachment) {
-    guard activeUploads[record.id] == nil else { return }
-    startUploadTask(recordID: record.id, sourceURL: nil)
-  }
-
-  static func requiresFreshRemoteSession(for error: any Error) -> Bool {
-    (error as? VideoPartUploadFailure) == .httpStatus(403)
-  }
-
-  static func failureKind(for error: any Error) -> UploadRetryScheduler.FailureKind {
-    if let partFailure = error as? VideoPartUploadFailure {
-      switch partFailure {
-      case .httpStatus(let statusCode):
-        return statusCode == 403 || statusCode >= 500 ? .transient : .deterministic
-      case .network, .invalidResponse, .missingETag, .unknown:
-        return .transient
-      case .cancelled:
-        return .transient
-      }
-    }
-    if let apiError = error as? APIError {
-      switch apiError {
-      case .httpStatus(let statusCode, _):
-        return (400..<500).contains(statusCode) ? .deterministic : .transient
-      case .authInvalid:
-        return .deterministic
-      case .invalidResponse:
-        return .transient
-      }
-    }
-    if let uploadError = error as? VideoUploadError {
-      switch uploadError {
-      case .durationExceedsLimit, .exportFailed, .emptyFile, .fileUnreadable,
-        .localFileMissing, .invalidPartURL, .partURLCountMismatch, .completeConflict:
-        return .deterministic
-      }
-    }
-    return .transient
-  }
 }

@@ -73,6 +73,9 @@ public protocol VideoUploadService: Sendable {
   func abort(attachmentID: UUID) async throws
   var backgroundEvents: AsyncStream<BackgroundVideoUploadEvent> { get }
   func isBackgroundWakeActive() async -> Bool
-  func pendingPartNumbers(recordID: UUID) async -> Set<Int>
+  func pendingPartNumbers(recordID: UUID, generation: Int) async -> Set<Int>
+  /// Cancels spec-069 two-segment tasks. Their callbacks have no generation
+  /// and therefore cannot be safely adopted by a persisted spec-070 attempt.
+  func cancelLegacyParts(recordID: UUID) async -> Bool
   func cancelParts(recordID: UUID) async
 }

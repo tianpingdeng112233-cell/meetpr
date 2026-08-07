@@ -17,12 +17,24 @@ public actor VideoUploadManager {
   let retryScheduler: UploadRetryScheduler
   let failureNotifier: any UploadFailureNotifying
   let cleanupStore: any RemoteAttachmentCleanupStoring
+  let localCleanupStore: any LocalVideoCleanupStoring
+  let removeLocalFile: @Sendable (URL) throws -> Void
   private let networkMonitor: UploadNetworkMonitor?
 
   var activeUploads: [UUID: Task<Void, Never>] = [:]
+  var activeUploadOwnerships: [UUID: Int] = [:]
+  var removingRecordIDs: Set<UUID> = []
+  var activeUploadOwnershipCounter = 0
   var scheduledRetries: [UUID: Task<Void, Never>] = [:]
+  var scheduledRetryGenerations: [UUID: Int] = [:]
   var restoredBackgroundRecords: [String: [UUID: RestoredBackgroundRecord]] = [:]
   var recoveringStudentIDs: Set<UUID> = []
+  /// Monotonic attempt identity per attachment. Chunk teardown advances the
+  /// value, permanently invalidating every writer that captured an older one.
+  /// Successful deletion advances once more and retains that value as an ABA
+  /// tombstone for any suspended repository snapshot.
+  var uploadGenerations: [UUID: Int] = [:]
+  var nextUploadGeneration = 0
   private var observers: [UUID: AsyncStream<VideoUploadEvent>.Continuation] = [:]
   private var backgroundEventTask: Task<Void, Never>?
   private var networkEventTask: Task<Void, Never>?
@@ -39,6 +51,10 @@ public actor VideoUploadManager {
     retryScheduler: UploadRetryScheduler = UploadRetryScheduler(),
     failureNotifier: (any UploadFailureNotifying)? = nil,
     cleanupStore: (any RemoteAttachmentCleanupStoring)? = nil,
+    localCleanupStore: (any LocalVideoCleanupStoring)? = nil,
+    removeLocalFile: @escaping @Sendable (URL) throws -> Void = {
+      try FileManager.default.removeItem(at: $0)
+    },
     enableNetworkMonitoring: Bool = false
   ) {
     self.service = service
@@ -58,6 +74,12 @@ public actor VideoUploadManager {
       ?? RemoteAttachmentCleanupStore(
         fileURL: self.filesDirectory.appending(path: "pending-remote-cleanup.json")
       )
+    self.localCleanupStore =
+      localCleanupStore
+      ?? LocalVideoCleanupStore(
+        fileURL: self.filesDirectory.appending(path: "pending-local-cleanup.json")
+      )
+    self.removeLocalFile = removeLocalFile
     self.networkMonitor = enableNetworkMonitoring ? UploadNetworkMonitor() : nil
   }
 
@@ -121,104 +143,6 @@ public actor VideoUploadManager {
     return record
   }
 
-  /// Re-runs a `failed` upload from scratch: the stale backend row (if any)
-  /// stays `uploading` server-side per backend spec 004; a fresh initiate
-  /// produces a new attachment row.
-  public func retry(attachmentID: UUID) async {
-    guard activeUploads[attachmentID] == nil,
-      var record = try? await repository.fetch(id: attachmentID),
-      record.status == .failed
-    else { return }
-
-    guard FileManager.default.fileExists(atPath: fileURL(for: record).path) else {
-      broadcast(.updated(record, progress: nil))
-      return
-    }
-
-    scheduledRetries[attachmentID]?.cancel()
-    scheduledRetries[attachmentID] = nil
-    await service.cancelParts(recordID: attachmentID)
-    guard await abandonRemoteSession(record: &record) else { return }
-    record.uploadRetryCount = 0
-    record.firstUploadFailureAt = nil
-    record.status = .pending
-    try? await repository.save(record)
-    broadcast(.updated(record, progress: 0))
-    startUploadTask(recordID: attachmentID, sourceURL: nil)
-  }
-
-  public func retry(setLogID: UUID) async {
-    guard
-      let attachment = try? await repository.fetch(setLogID: setLogID)
-        .last(where: { $0.status == .failed })
-    else { return }
-    await retry(attachmentID: attachment.id)
-  }
-
-  /// Cancels any in-flight upload, abandons an unfinished remote upload, and
-  /// deletes all local record, video, and chunk files. A ready attachment is
-  /// only unlinked locally because the upload abort endpoint rejects it.
-  public func remove(attachmentID: UUID) async {
-    if let task = activeUploads[attachmentID] {
-      task.cancel()
-      activeUploads[attachmentID] = nil
-    }
-    scheduledRetries[attachmentID]?.cancel()
-    scheduledRetries[attachmentID] = nil
-    await service.cancelParts(recordID: attachmentID)
-    guard var record = try? await repository.fetch(id: attachmentID) else { return }
-
-    if record.status != .uploaded {
-      guard await abandonRemoteSession(record: &record) else { return }
-    }
-    try? FileManager.default.removeItem(at: fileURL(for: record))
-    removeChunkFiles(recordID: attachmentID)
-    try? await repository.delete(id: attachmentID)
-    broadcast(.removed(setLogID: record.setLogID, attachmentID: attachmentID))
-  }
-
-  /// App-launch recovery reconnects to restored background tasks, resumes any
-  /// locally persisted retry window, and finishes complete when all ETags are
-  /// already present.
-  public func recoverInterruptedUploads(studentID: UUID) async {
-    activateBackgroundHandling()
-    recoveringStudentIDs.insert(studentID)
-    await flushPendingRemoteCleanups()
-    guard await !service.isBackgroundWakeActive() else { return }
-    _ = await recoverDormantUploads(studentID: studentID)
-  }
-
-  func recoverDormantUploads(studentID: UUID) async -> [Task<Void, Never>] {
-    var startedTasks: [Task<Void, Never>] = []
-    let records = (try? await repository.fetchAll(studentID: studentID)) ?? []
-    for storedRecord in records where storedRecord.status == .failed {
-      guard storedRecord.remoteAttachmentID != nil else { continue }
-      var record = storedRecord
-      if await abandonRemoteSession(record: &record) {
-        try? await repository.save(record)
-      }
-    }
-    for record in records where record.status != .uploaded && record.status != .failed {
-      guard activeUploads[record.id] == nil, scheduledRetries[record.id] == nil else { continue }
-      if let firstFailureAt = record.firstUploadFailureAt {
-        scheduleRetry(
-          record: record,
-          firstFailureAt: firstFailureAt,
-          networkState: .available
-        )
-        continue
-      }
-      let pendingParts = await service.pendingPartNumbers(recordID: record.id)
-      if !pendingParts.isEmpty { continue }
-      guard FileManager.default.fileExists(atPath: fileURL(for: record).path) else {
-        await transitionToTerminalFailure(record)
-        continue
-      }
-      startedTasks.append(startUploadTask(recordID: record.id, sourceURL: nil))
-    }
-    return startedTasks
-  }
-
   func activateBackgroundHandling() {
     if backgroundEventTask == nil {
       let events = service.backgroundEvents
@@ -269,32 +193,60 @@ public actor VideoUploadManager {
     observers[observerID] = nil
   }
 
+  func nextActiveUploadOwnership() -> Int {
+    activeUploadOwnershipCounter += 1
+    return activeUploadOwnershipCounter
+  }
+
   @discardableResult
-  func startUploadTask(recordID: UUID, sourceURL: URL?) -> Task<Void, Never> {
+  func startUploadTask(
+    recordID: UUID,
+    sourceURL: URL?,
+    previousGeneration: Int? = nil
+  ) -> Task<Void, Never> {
+    if let previousGeneration {
+      nextUploadGeneration = max(nextUploadGeneration, previousGeneration)
+    }
+    let generation = advanceUploadGeneration(recordID: recordID)
+    let ownership = nextActiveUploadOwnership()
     // Task {} inherits actor isolation, so the bookkeeping call is direct.
     let task = Task {
-      await self.run(recordID: recordID, sourceURL: sourceURL)
-      self.clearActiveUpload(recordID: recordID)
+      await self.run(recordID: recordID, sourceURL: sourceURL, generation: generation)
+      self.clearActiveUpload(recordID: recordID, ownership: ownership)
     }
     activeUploads[recordID] = task
+    activeUploadOwnerships[recordID] = ownership
     return task
   }
 
   @discardableResult
   func startFailureTask(
     recordID: UUID,
-    failure: VideoPartUploadFailure
+    failure: VideoPartUploadFailure,
+    generation: Int? = nil
   ) -> Task<Void, Never> {
     if let active = activeUploads[recordID] { return active }
+    let failureGeneration =
+      generation
+      ?? uploadGenerations[recordID]
+      ?? advanceUploadGeneration(recordID: recordID)
+    let ownership = nextActiveUploadOwnership()
     let task = Task {
-      await self.handleUploadFailure(recordID: recordID, error: failure)
-      self.clearActiveUpload(recordID: recordID)
+      await self.handleUploadFailure(
+        recordID: recordID,
+        error: failure,
+        generation: failureGeneration
+      )
+      self.clearActiveUpload(recordID: recordID, ownership: ownership)
     }
     activeUploads[recordID] = task
+    activeUploadOwnerships[recordID] = ownership
     return task
   }
 
-  private func clearActiveUpload(recordID: UUID) {
+  private func clearActiveUpload(recordID: UUID, ownership: Int) {
+    guard activeUploadOwnerships[recordID] == ownership else { return }
     activeUploads[recordID] = nil
+    activeUploadOwnerships[recordID] = nil
   }
 }

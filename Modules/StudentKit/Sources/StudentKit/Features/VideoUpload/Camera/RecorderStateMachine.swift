@@ -82,12 +82,6 @@ struct RecorderStateMachine: Equatable, Sendable {
     return true
   }
 
-  mutating func beginRetake() -> Bool {
-    guard state == .review else { return false }
-    state = .preparing
-    return true
-  }
-
   mutating func close() {
     state = .closed
   }

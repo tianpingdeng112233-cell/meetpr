@@ -34,16 +34,23 @@ import Testing
   #expect(uploaded.setLogID == setLogID)
   #expect(uploaded.studentID == studentID)
 
-  // Successful uploads release the exported file — keeping it leaks
-  // 15-200MB per video (Codex review P1); playback uses the backend URL.
+  // Successful uploads retain the exported file for same-day local playback,
+  // while multipart fragments are still released immediately.
   let exportedFile = harness.filesDirectory.appendingPathComponent("\(record.id.uuidString).mp4")
-  #expect(!FileManager.default.fileExists(atPath: exportedFile.path))
+  try await waitUntil {
+    !FileManager.default.fileExists(
+      atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).parts").path
+    )
+  }
+  #expect(FileManager.default.fileExists(atPath: exportedFile.path))
   #expect(
     !FileManager.default.fileExists(
       atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).parts").path
     )
   )
-  #expect(uploaded.localFileName == nil)
+  #expect(uploaded.localFileName == "\(record.id.uuidString).mp4")
+  try await waitUntil { await harness.manager.uploadGenerations[record.id] == nil }
+  #expect(try await harness.repository.fetch(id: record.id)?.uploadGeneration == nil)
 }
 
 @Test func uploadManagerDeletesOwnedSourceAfterSuccessfulExport() async throws {
@@ -189,10 +196,67 @@ import Testing
 
   #expect(try await harness.repository.fetch(id: record.id) == nil)
   #expect(await harness.service.abortCount == 0)
+  let exportedFile = harness.filesDirectory.appendingPathComponent("\(record.id.uuidString).mp4")
+  #expect(!FileManager.default.fileExists(atPath: exportedFile.path))
   let cleanupStore = RemoteAttachmentCleanupStore(
     fileURL: harness.filesDirectory.appending(path: "pending-remote-cleanup.json")
   )
   #expect(try await cleanupStore.pendingAttachmentIDs().isEmpty)
+}
+
+@Test func failedLocalDeletionPersistsIntentForColdStartCleanup() async throws {
+  let service = MockVideoUploadService()
+  let repository = InMemoryVideoAttachmentRepository()
+  let directory = FileManager.default.temporaryDirectory
+    .appending(path: "local-cleanup-tests-\(UUID().uuidString)", directoryHint: .isDirectory)
+  defer { try? FileManager.default.removeItem(at: directory) }
+  try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  let cleanupFile = directory.appending(path: "pending-local-cleanup.json")
+  let initialStore = LocalVideoCleanupStore(fileURL: cleanupFile)
+  let fileName = "orphan-candidate.mp4"
+  let fileURL = directory.appending(path: fileName)
+  try Data([0x01]).write(to: fileURL)
+  let record = VideoAttachment(
+    id: UUID(),
+    setLogID: UUID(),
+    studentID: UUID(),
+    remoteAttachmentID: UUID(),
+    status: .uploaded,
+    contentType: "video/mp4",
+    durationSeconds: 30,
+    sizeBytes: 1,
+    localFileName: fileName,
+    recordedAt: Date(),
+    uploadedAt: Date()
+  )
+  try await repository.save(record)
+  let manager = VideoUploadManager(
+    service: service,
+    exporter: MockVideoExporter(),
+    repository: repository,
+    filesDirectory: directory,
+    localCleanupStore: initialStore,
+    removeLocalFile: { _ in throw LocalDeletionTestError.forcedFailure }
+  )
+
+  await manager.remove(attachmentID: record.id)
+
+  #expect(try await repository.fetch(id: record.id) == nil)
+  #expect(FileManager.default.fileExists(atPath: fileURL.path))
+  let restartedStore = LocalVideoCleanupStore(fileURL: cleanupFile)
+  #expect(try await restartedStore.pendingFileNames() == [fileName])
+
+  let restartedManager = VideoUploadManager(
+    service: service,
+    exporter: MockVideoExporter(),
+    repository: repository,
+    filesDirectory: directory,
+    localCleanupStore: restartedStore
+  )
+  await restartedManager.recoverInterruptedUploads(studentID: record.studentID)
+
+  #expect(!FileManager.default.fileExists(atPath: fileURL.path))
+  #expect(try await restartedStore.pendingFileNames().isEmpty)
 }
 
 @Test func cleanupTreatsReadyAttachmentConflictAsTerminal() {
@@ -254,6 +318,40 @@ import Testing
   let forSet = try await harness.repository.fetch(setLogID: setLogID)
   #expect(forSet.map(\.id) == [second.id])
   #expect(try await harness.repository.fetch(id: first.id) == nil)
+  let firstFile = harness.filesDirectory.appendingPathComponent("\(first.id.uuidString).mp4")
+  #expect(!FileManager.default.fileExists(atPath: firstFile.path))
+}
+
+@Test func coldStartCleanupDeletesPreviousDayUploadedFileAndClearsReference() async throws {
+  let harness = VideoUploadHarness()
+  let now = Date()
+  let fileName = "previous-day.mp4"
+  let fileURL = harness.filesDirectory.appending(path: fileName)
+  try FileManager.default.createDirectory(
+    at: harness.filesDirectory,
+    withIntermediateDirectories: true
+  )
+  try Data([0x01]).write(to: fileURL)
+  let record = VideoAttachment(
+    id: UUID(),
+    setLogID: UUID(),
+    studentID: UUID(),
+    remoteAttachmentID: UUID(),
+    status: .uploaded,
+    contentType: "video/mp4",
+    durationSeconds: 30,
+    sizeBytes: 1,
+    localFileName: fileName,
+    recordedAt: now.addingTimeInterval(-86_400),
+    trainingDate: now.addingTimeInterval(-86_400),
+    uploadedAt: now.addingTimeInterval(-86_400)
+  )
+  try await harness.repository.save(record)
+
+  await harness.manager.recoverInterruptedUploads(studentID: record.studentID)
+
+  #expect(!FileManager.default.fileExists(atPath: fileURL.path))
+  #expect(try await harness.repository.fetch(id: record.id)?.localFileName == nil)
 }
 
 private func makeRecord(

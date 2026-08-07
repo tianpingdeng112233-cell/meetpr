@@ -28,6 +28,9 @@ struct VideoAttachmentSection: View {
   @State private var pickedItem: PhotosPickerItem?
   @State private var libraryVideoToTrim: PickedVideo?
   @State private var pendingSource: PendingSource?
+  @State private var playbackPresentation: SetVideoPlaybackPresentation?
+  @State private var playbackErrorMessage: String?
+  @State private var isLoadingPlayback = false
   /// True from the moment a video is chosen until the upload manager owns a
   /// row for it. Covers the otherwise feedback-less window where the picked
   /// file is copied out of the picker sandbox (or saved to the library) before
@@ -63,9 +66,19 @@ struct VideoAttachmentSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
       HStack(spacing: MeetPRSpacing.space3) {
-        Text("视频")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
-          .foregroundStyle(Color.MeetPR.textPrimary)
+        if hasPlayableAttachment {
+          Button(action: playAttachment) {
+            Label("视频", systemImage: "play.circle.fill")
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+          }
+          .buttonStyle(.plain)
+          .disabled(isLoadingPlayback)
+        } else {
+          Text("视频")
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+        }
         Spacer()
         VideoAttachmentV3Controls(
           state: presentationState,
@@ -80,6 +93,17 @@ struct VideoAttachmentSection: View {
         Text(message)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.danger)
+      }
+      if let playbackErrorMessage {
+        HStack(spacing: MeetPRSpacing.space2) {
+          Text(playbackErrorMessage)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+            .foregroundStyle(Color.MeetPR.danger)
+          Button("重试", action: playAttachment)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.72))
+            .disabled(isLoadingPlayback)
+        }
       }
     }
     .padding(.horizontal, MeetPRSpacing.point14)
@@ -113,6 +137,9 @@ struct VideoAttachmentSection: View {
       if status != nil { isPreparing = false }
     }
     #if os(iOS)
+      .fullScreenCover(item: $playbackPresentation) { presentation in
+        playbackView(for: presentation)
+      }
       .fullScreenCover(isPresented: $showingCamera) {
         CameraRecorderView(
           maxDurationSeconds: videoViewModel.maxDurationSeconds,
@@ -148,6 +175,10 @@ struct VideoAttachmentSection: View {
         )
         .ignoresSafeArea()
       }
+    #else
+      .sheet(item: $playbackPresentation) { presentation in
+        playbackView(for: presentation)
+      }
     #endif
   }
 
@@ -175,95 +206,63 @@ struct VideoAttachmentSection: View {
       false
     #endif
   }
-}
 
-enum VideoAttachmentV3State: Equatable {
-  case choices(cameraAvailable: Bool)
-  case attached(cameraAvailable: Bool, canDelete: Bool, delivered: Bool)
-  case failed
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-struct VideoAttachmentV3Controls: View {
-  let state: VideoAttachmentV3State
-  let onCamera: @MainActor () -> Void
-  let onLibrary: @MainActor () -> Void
-  let onCancel: @MainActor () -> Void
-  let onRetry: @MainActor () -> Void
-  let onDelete: @MainActor () -> Void
-
-  var body: some View {
-    switch state {
-    case .choices(let cameraAvailable):
-      HStack(spacing: MeetPRSpacing.point10) {
-        actionButton(
-          "拍摄",
-          systemImage: "video",
-          isEnabled: cameraAvailable,
-          action: onCamera
-        )
-        actionButton("相册", systemImage: "photo", action: onLibrary)
-      }
-
-    case .attached(let cameraAvailable, let canDelete, let delivered):
-      // On-demand confirmation only inside the edit sheet (David 2026-08-06):
-      // the glanceable surfaces stay free of upload chrome.
-      VStack(alignment: .trailing, spacing: MeetPRSpacing.point7) {
-        HStack(spacing: MeetPRSpacing.point10) {
-          actionButton("重拍", systemImage: "video", isEnabled: cameraAvailable, action: onCamera)
-          actionButton("更换", systemImage: "photo", action: onLibrary)
-          actionButton("删除", systemImage: "trash", action: onDelete)
-            .disabled(!canDelete)
-        }
-        Label(
-          delivered ? "已送达教练" : "还在路上",
-          systemImage: delivered ? "checkmark.circle" : "arrow.up.circle.dotted"
-        )
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .regular))
-        .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.45))
-      }
-
-    case .failed:
-      HStack(spacing: MeetPRSpacing.space2) {
-        Label("上传失败", systemImage: "exclamationmark.triangle.fill")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
-          .foregroundStyle(Color.MeetPR.danger)
-        actionButton("重试", systemImage: "arrow.clockwise", action: onRetry)
-        actionButton("删除", systemImage: "trash", action: onDelete)
-      }
+  private var hasPlayableAttachment: Bool {
+    guard rowState != nil else { return false }
+    if case .attached = presentationState {
+      return true
     }
+    return false
   }
 
-  private func actionButton(
-    _ title: String,
-    systemImage: String,
-    isEnabled: Bool = true,
-    action: @escaping @MainActor () -> Void
-  ) -> some View {
-    Button(action: action) {
-      HStack(spacing: MeetPRSpacing.point7) {
-        Image(systemName: systemImage)
-          .font(.system(size: MeetPRFontMetrics.size20, weight: .regular))
-        Text(title)
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+  private func playbackView(
+    for presentation: SetVideoPlaybackPresentation
+  ) -> SetVideoPlaybackView {
+    SetVideoPlaybackView(
+      attachmentID: presentation.attachmentID,
+      source: presentation.source,
+      refreshRemoteURL: { attachmentID in
+        try await videoViewModel.freshRemotePlaybackURL(attachmentID: attachmentID)
       }
-      .foregroundStyle(Color.MeetPR.goldRGB.opacity(isEnabled ? 0.72 : 0.30))
-      .padding(.horizontal, MeetPRSpacing.point15)
-      .padding(.vertical, MeetPRSpacing.space2)
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.control)
-          .stroke(Color.MeetPR.goldRGB.opacity(isEnabled ? 0.24 : 0.12), lineWidth: 1)
-      }
-      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-    }
-    .buttonStyle(PressScaleButtonStyle())
-    .disabled(!isEnabled)
+    )
   }
+}
+
+private struct SetVideoPlaybackPresentation: Identifiable {
+  let id = UUID()
+  let attachmentID: UUID
+  let source: VideoAttachmentPlaybackSource
 }
 
 // MARK: - Actions
 
 extension VideoAttachmentSection {
+  private func playAttachment() {
+    guard !isLoadingPlayback, let attachmentID = rowState?.attachment.id else { return }
+    isLoadingPlayback = true
+    playbackErrorMessage = nil
+    Task {
+      defer { isLoadingPlayback = false }
+      do {
+        guard
+          let source = try await videoViewModel.playbackSource(attachmentID: attachmentID)
+        else {
+          guard rowState?.attachment.id == attachmentID else { return }
+          playbackErrorMessage = "视频暂时无法播放,请重试"
+          return
+        }
+        guard rowState?.attachment.id == attachmentID else { return }
+        playbackPresentation = SetVideoPlaybackPresentation(
+          attachmentID: attachmentID,
+          source: source
+        )
+      } catch {
+        guard rowState?.attachment.id == attachmentID else { return }
+        playbackErrorMessage = "视频加载失败,请检查网络后重试"
+      }
+    }
+  }
+
   private func requestPick(_ source: PendingSource) {
     onWillPick?()
     if videoViewModel.hasConsented {

@@ -5,26 +5,28 @@ import Networking
 import RepositoryContracts
 
 extension VideoUploadManager {
-  func run(recordID: UUID, sourceURL: URL?) async {
+  func run(recordID: UUID, sourceURL: URL?, generation: Int) async {
     defer {
       if let sourceURL {
         try? FileManager.default.removeItem(at: sourceURL)
       }
     }
 
-    guard var record = try? await repository.fetch(id: recordID) else { return }
     do {
+      var record = try await persistUploadGeneration(generation, recordID: recordID)
       if let sourceURL {
         record = try await export(record, from: sourceURL)
       }
-      try await upload(record)
+      if let completedGeneration = try await upload(record, generation: generation) {
+        await reclaimUploadGeneration(completedGeneration, recordID: recordID)
+      }
     } catch is CancellationError {
       // remove() owns exported-file and part-file cleanup.
     } catch is BackgroundUploadPipelineDeferred {
       // The background-session event consumer persisted this ETag and owns
       // scheduling the next bounded batch during the current wake window.
     } catch {
-      await handleUploadFailure(recordID: recordID, error: error)
+      await handleUploadFailure(recordID: recordID, error: error, generation: generation)
     }
   }
 
@@ -48,7 +50,7 @@ extension VideoUploadManager {
     return exported
   }
 
-  private func upload(_ record: VideoAttachment) async throws {
+  private func upload(_ record: VideoAttachment, generation: Int) async throws -> Int? {
     let fileLocation = fileURL(for: record)
     guard FileManager.default.fileExists(atPath: fileLocation.path) else {
       throw VideoUploadError.localFileMissing
@@ -67,6 +69,7 @@ extension VideoUploadManager {
     let chunker = VideoFileChunker(partSizeBytes: configuration.partSizeBytes)
     let partCount = try chunker.partCount(totalBytes: uploading.sizeBytes)
     let chunkDirectory = chunkDirectory(recordID: uploading.id)
+    try requireCurrentUploadGeneration(generation, recordID: uploading.id)
     _ = try chunker.writeParts(from: fileLocation, to: chunkDirectory)
 
     if uploading.remoteAttachmentID == nil
@@ -83,26 +86,36 @@ extension VideoUploadManager {
     let etags = try await uploadParts(
       record: uploading,
       chunker: chunker,
-      chunkDirectory: chunkDirectory
+      chunkDirectory: chunkDirectory,
+      generation: generation
     )
-    try await complete(uploading, remoteID: remoteID, etags: etags)
+    return try await complete(uploading, remoteID: remoteID, etags: etags)
   }
 
   func initiate(
     _ record: VideoAttachment,
-    partCount: Int
+    partCount: Int,
+    wakeGeneration: Int? = nil
   ) async throws -> VideoAttachment {
     try Task.checkCancellation()
-    let response = try await service.initiate(
-      InitiateUploadRequestDTO(
-        kind: .setVideo,
-        contentType: record.contentType,
-        sizeBytes: record.sizeBytes,
-        partCount: partCount,
-        filename: "setlog-\(record.setLogID.uuidString)-\(record.id.uuidString).mp4",
-        setLogID: record.setLogID
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
+    let response: InitiateUploadResponseDTO
+    do {
+      response = try await service.initiate(
+        InitiateUploadRequestDTO(
+          kind: .setVideo,
+          contentType: record.contentType,
+          sizeBytes: record.sizeBytes,
+          partCount: partCount,
+          filename: "setlog-\(record.setLogID.uuidString)-\(record.id.uuidString).mp4",
+          setLogID: record.setLogID
+        )
       )
-    )
+    } catch {
+      try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
+      throw error
+    }
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     let partURLs = try Self.partURLMap(from: response.partURLs, expectedCount: partCount)
     var initiated = record
     initiated.remoteAttachmentID = response.attachmentID
@@ -111,7 +124,9 @@ extension VideoUploadManager {
       VideoUploadPartTarget(partNumber: partNumber, url: url)
     }.sorted { $0.partNumber < $1.partNumber }
     initiated.uploadedParts = []
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     try await repository.save(initiated)
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     broadcast(.updated(initiated, progress: nil))
     return initiated
   }
@@ -119,39 +134,52 @@ extension VideoUploadManager {
   func complete(
     _ record: VideoAttachment,
     remoteID: UUID,
-    etags: [UploadPartETagDTO]
-  ) async throws {
+    etags: [UploadPartETagDTO],
+    wakeGeneration: Int? = nil
+  ) async throws -> Int? {
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     do {
       _ = try await service.complete(attachmentID: remoteID, parts: etags)
     } catch APIError.httpStatus(let statusCode, _) where statusCode == 409 {
+      try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
       throw VideoUploadError.completeConflict
+    } catch {
+      try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
+      throw error
     }
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
 
-    guard try await repository.fetch(id: record.id) != nil else { return }
+    guard try await repository.fetch(id: record.id) != nil else { return nil }
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     var uploaded = record
     uploaded.status = .uploaded
     uploaded.uploadedAt = now()
-    uploaded.localFileName = nil
     uploaded.uploadPartTargets = []
     uploaded.uploadedParts = []
     uploaded.uploadPartCount = 0
     uploaded.uploadRetryCount = 0
     uploaded.firstUploadFailureAt = nil
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     try await repository.save(uploaded)
-    try? FileManager.default.removeItem(at: fileURL(for: record))
-    removeChunkFiles(recordID: record.id)
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
+    let cleanupGeneration = await removeChunkFiles(recordID: record.id)
+    if wakeGeneration != nil {
+      try requireLiveWakeContext(recordID: record.id, generation: cleanupGeneration)
+    }
     broadcast(.updated(uploaded, progress: nil))
     Analytics.shared.mediaUpload(
       .succeeded,
       context: .setLog,
       bytes: Int(clamping: record.sizeBytes)
     )
+    return cleanupGeneration
   }
 
   private func uploadParts(
     record: VideoAttachment,
     chunker: VideoFileChunker,
-    chunkDirectory: URL
+    chunkDirectory: URL,
+    generation: Int
   ) async throws -> [UploadPartETagDTO] {
     let completedNumbers = Set(record.uploadedParts.map(\.partNumber))
     let pendingTargets = record.uploadPartTargets.filter {
@@ -164,19 +192,13 @@ extension VideoUploadManager {
       func submitNext() {
         guard let target = iterator.next() else { return }
         group.addTask {
-          let partFile = chunker.partFileURL(
-            partNumber: target.partNumber,
-            in: chunkDirectory
+          try await self.uploadPart(
+            target,
+            recordID: record.id,
+            chunker: chunker,
+            chunkDirectory: chunkDirectory,
+            generation: generation
           )
-          let etag = try await self.service.uploadPart(
-            to: target.url,
-            from: partFile,
-            identifier: VideoUploadPartIdentifier(
-              recordID: record.id,
-              partNumber: target.partNumber
-            )
-          )
-          return VideoUploadedPart(partNumber: target.partNumber, etag: etag)
         }
       }
 
@@ -185,6 +207,7 @@ extension VideoUploadManager {
       }
       do {
         for try await part in group {
+          try requireCurrentUploadGeneration(generation, recordID: record.id)
           try await persist(part: part, recordID: record.id)
           submitNext()
         }
@@ -206,6 +229,27 @@ extension VideoUploadManager {
     return latest.uploadedParts
       .sorted { $0.partNumber < $1.partNumber }
       .map { UploadPartETagDTO(partNumber: $0.partNumber, etag: $0.etag) }
+  }
+
+  private func uploadPart(
+    _ target: VideoUploadPartTarget,
+    recordID: UUID,
+    chunker: VideoFileChunker,
+    chunkDirectory: URL,
+    generation: Int
+  ) async throws -> VideoUploadedPart {
+    let partFile = chunker.partFileURL(partNumber: target.partNumber, in: chunkDirectory)
+    let etag = try await service.uploadPart(
+      to: target.url,
+      from: partFile,
+      identifier: VideoUploadPartIdentifier(
+        recordID: recordID,
+        partNumber: target.partNumber,
+        generation: generation
+      )
+    )
+    try requireCurrentUploadGeneration(generation, recordID: recordID)
+    return VideoUploadedPart(partNumber: target.partNumber, etag: etag)
   }
 
   func persist(part: VideoUploadedPart, recordID: UUID) async throws {

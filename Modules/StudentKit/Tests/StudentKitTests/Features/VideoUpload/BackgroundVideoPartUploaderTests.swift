@@ -3,6 +3,17 @@ import Testing
 
 @testable import StudentKit
 
+@Test func legacyTwoSegmentTaskDescriptionRemainsRecognizable() throws {
+  let recordID = UUID()
+  let identifier = try #require(
+    VideoUploadPartIdentifier(taskDescription: "\(recordID.uuidString)|2")
+  )
+
+  #expect(identifier.recordID == recordID)
+  #expect(identifier.partNumber == 2)
+  #expect(identifier.generation == nil)
+}
+
 // Simulator/device acceptance remains responsible for the one boundary a
 // macOS host cannot reproduce: kill the app mid-PUT, relaunch it through
 // UIApplicationDelegate, and verify the daemon-restored URLSession callbacks.
@@ -15,7 +26,7 @@ import Testing
       taskFactory.makeTask(request: request, fileURL: fileURL)
     }
   )
-  let identifier = VideoUploadPartIdentifier(recordID: UUID(), partNumber: 2)
+  let identifier = VideoUploadPartIdentifier(recordID: UUID(), partNumber: 2, generation: 7)
   let upload = Task {
     try await uploader.upload(
       to: try #require(URL(string: "https://oss.test/parts/2")),
@@ -64,7 +75,7 @@ import Testing
       taskFactory.makeTask(request: request, fileURL: fileURL)
     }
   )
-  let identifier = VideoUploadPartIdentifier(recordID: UUID(), partNumber: 2)
+  let identifier = VideoUploadPartIdentifier(recordID: UUID(), partNumber: 2, generation: 7)
   let upload = Task {
     try await uploader.upload(
       to: try #require(URL(string: "https://oss.test/parts/2")),
@@ -107,7 +118,7 @@ import Testing
     sessionIdentifier: sessionIdentifier,
     uploadTaskFactory: { _, _ in FakeBackgroundUploadTask(taskIdentifier: 1) }
   )
-  let identifier = VideoUploadPartIdentifier(recordID: UUID(), partNumber: 3)
+  let identifier = VideoUploadPartIdentifier(recordID: UUID(), partNumber: 3, generation: 7)
 
   uploader.receiveCompletion(
     taskIdentifier: 999,
@@ -168,7 +179,7 @@ private func productionEventTokens(
     try await uploader.upload(
       to: try #require(URL(string: "https://oss.test/parts/1")),
       from: URL(fileURLWithPath: "/tmp/content-type-part.chunk"),
-      identifier: VideoUploadPartIdentifier(recordID: UUID(), partNumber: 1)
+      identifier: VideoUploadPartIdentifier(recordID: UUID(), partNumber: 1, generation: 7)
     )
   }
   try await waitUntil { taskFactory.task?.wasResumed == true }
@@ -188,7 +199,7 @@ private func productionEventTokens(
   try uploader.schedule(
     to: try #require(URL(string: "https://oss.test/parts/2")),
     from: scheduledFile,
-    identifier: VideoUploadPartIdentifier(recordID: UUID(), partNumber: 2)
+    identifier: VideoUploadPartIdentifier(recordID: UUID(), partNumber: 2, generation: 7)
   )
   let scheduledRequest = try #require(taskFactory.request)
   #expect(scheduledRequest.value(forHTTPHeaderField: "Content-Type") == "")

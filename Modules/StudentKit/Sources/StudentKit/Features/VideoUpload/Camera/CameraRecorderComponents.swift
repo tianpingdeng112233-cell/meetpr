@@ -101,7 +101,6 @@
     let url: URL
     @Binding var saveToPhotoLibrary: Bool
     let isUsingRecording: Bool
-    let onRetake: () -> Void
     let onUse: () -> Void
     let onClose: () -> Void
 
@@ -120,10 +119,6 @@
             .foregroundStyle(.white)
 
           HStack(spacing: 16) {
-            Button("重拍", action: onRetake)
-              .buttonStyle(.bordered)
-              .tint(.white)
-
             Button("使用", action: onUse)
               .buttonStyle(.borderedProminent)
               .tint(.yellow)

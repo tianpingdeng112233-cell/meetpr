@@ -116,26 +116,6 @@
       await stopRecording(expectedGeneration: nil)
     }
 
-    func retake() async {
-      guard machine.beginRetake() else { return }
-      phase = .preparing
-      removeOwnedReviewFile()
-      reviewURL = nil
-      recordedDuration = 0
-      do {
-        try await worker.configureAndStart()
-        guard machine.completePreparation() else {
-          await worker.stopSession()
-          return
-        }
-        phase = .ready
-      } catch {
-        guard machine.state == .preparing else { return }
-        machine.failPreparation()
-        phase = .failed(error.localizedDescription)
-      }
-    }
-
     func retry() async {
       await prepare()
     }
