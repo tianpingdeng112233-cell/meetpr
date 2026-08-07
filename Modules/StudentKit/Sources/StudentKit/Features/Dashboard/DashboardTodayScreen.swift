@@ -28,8 +28,6 @@ struct DashboardTodayScreen: View {
   @Binding var isFeedbackExpanded: Bool
   let onOpenNotifications: () -> Void
   let onStartWorkout: () -> Void
-  let onStartWorkoutFrameChange: (CGRect) -> Void
-  let isStartWorkoutHidden: Bool
   let isUpdatingCompletion: Bool
   let onUndoCompletion: (UUID) -> Void
   let onMessageCoach: () -> Void
@@ -96,6 +94,10 @@ struct DashboardTodayScreen: View {
           DashboardWeekCalendar(weekNumber: weekNumber, cells: segments)
         }
 
+        if completedToday == nil, let cursorDay {
+          DashboardSequenceDaySummary(day: cursorDay)
+        }
+
         if let metrics = model.metrics {
           DashboardProfileMetricsView(metrics: metrics)
         }
@@ -127,13 +129,6 @@ struct DashboardTodayScreen: View {
         isUpdating: isUpdatingCompletion,
         onUndo: { onUndoCompletion(completedToday.id) },
         onContinue: onStartWorkout
-      )
-    } else if let cursorDay {
-      DashboardPrimaryAction(
-        day: cursorDay,
-        onStart: onStartWorkout,
-        onStartFrameChange: onStartWorkoutFrameChange,
-        isStartHidden: isStartWorkoutHidden
       )
     }
   }

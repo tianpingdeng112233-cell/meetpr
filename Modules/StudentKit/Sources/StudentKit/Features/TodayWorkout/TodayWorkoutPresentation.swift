@@ -80,6 +80,10 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
   let progress: TodayWorkoutProgress
   let currentRow: Row?
 
+  var allowsManualCompletion: Bool {
+    heroMode == .recording
+  }
+
   init(
     day: StudentPlanDay,
     drafts: [TodayWorkoutViewModel.SetRowDraft],

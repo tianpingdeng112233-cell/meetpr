@@ -69,8 +69,6 @@
             isFeedbackExpanded: $isFeedbackExpanded,
             onOpenNotifications: {},
             onStartWorkout: {},
-            onStartWorkoutFrameChange: { _ in },
-            isStartWorkoutHidden: false,
             isUpdatingCompletion: false,
             onUndoCompletion: { _ in },
             onMessageCoach: {}

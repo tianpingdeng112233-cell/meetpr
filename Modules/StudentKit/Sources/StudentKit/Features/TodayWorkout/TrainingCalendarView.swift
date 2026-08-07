@@ -36,8 +36,8 @@ struct TrainingCalendarView: View {
       days: days,
       explicitDayID: selectedDayID
     )
-    if let selected = days.first(where: { $0.id == selectedDayID }) {
-      expandedWeeks.insert(selected.weekNumber)
+    if let currentWeek = TrainingSequenceLayout.currentWeekNumber(days: days) {
+      expandedWeeks.insert(currentWeek)
     }
   }
 
@@ -45,7 +45,7 @@ struct TrainingCalendarView: View {
     let weeks = TrainingSequenceLayout.makeWeeks(days: days, selectedDayID: selectedDayID)
     let completedCount = days.filter { $0.completedAt != nil }.count
     return VStack(alignment: .leading, spacing: 10) {
-      Text("\(weeks.count) 周力量 · 推荐日期仅供参考")
+      Text("计划汇总")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
       Text("已完成 \(completedCount) / \(days.count) 节")

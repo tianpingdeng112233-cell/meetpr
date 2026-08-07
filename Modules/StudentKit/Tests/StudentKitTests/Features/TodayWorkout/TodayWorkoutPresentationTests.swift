@@ -23,7 +23,9 @@ import Testing
     )
 
     #expect(list.heroMode == .list)
+    #expect(!list.allowsManualCompletion)
     #expect(recording.heroMode == .recording)
+    #expect(recording.allowsManualCompletion)
     #expect(recording.currentRow?.stableIndex == 0)
   }
 
@@ -39,6 +41,7 @@ import Testing
     )
 
     #expect(presentation.heroMode == .recording)
+    #expect(presentation.allowsManualCompletion)
     #expect(presentation.progress.remainingSets == 2)
     #expect(presentation.progress.remainingExercises == 2)
     #expect(presentation.progress.currentSetNumber == 2)

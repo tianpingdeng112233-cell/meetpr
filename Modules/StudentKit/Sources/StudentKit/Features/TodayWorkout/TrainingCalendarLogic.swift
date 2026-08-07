@@ -53,6 +53,11 @@ enum TrainingSequenceLayout {
     }
     return sequence.cursorDay?.id ?? sequence.orderedDays.last?.id
   }
+
+  static func currentWeekNumber(days: [StudentPlanDay]) -> Int? {
+    let sequence = StudentPlanSequence(days: days)
+    return (sequence.cursorDay ?? sequence.orderedDays.last)?.weekNumber
+  }
 }
 
 enum TrainingSequenceText {

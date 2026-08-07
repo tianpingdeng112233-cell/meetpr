@@ -48,6 +48,16 @@ import Testing
     #expect(days[2].id != cursorID)
   }
 
+  @Test func currentWeekFollowsCursorAndFallsBackToFinalCompletedWeek() {
+    let days = sequenceDays()
+    #expect(TrainingSequenceLayout.currentWeekNumber(days: days) == 1)
+
+    let completed = days.map {
+      $0.replacingCompletion(completedAt: Date(), source: "manual")
+    }
+    #expect(TrainingSequenceLayout.currentWeekNumber(days: completed) == 2)
+  }
+
   private func sequenceDays() -> [StudentPlanDay] {
     let date = Date(timeIntervalSince1970: 1_800_000_000)
     return [

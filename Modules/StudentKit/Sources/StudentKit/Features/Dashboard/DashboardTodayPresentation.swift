@@ -59,10 +59,6 @@ enum DashboardTodayPresentation {
   }
 
   static func code(for day: StudentPlanDay) -> String {
-    "W\(day.weekNumber) · D\(day.dayOfWeek)"
-  }
-
-  static func compactCode(for day: StudentPlanDay) -> String {
     "W\(day.weekNumber)D\(day.dayOfWeek)"
   }
 

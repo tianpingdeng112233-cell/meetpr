@@ -97,8 +97,6 @@ public struct DashboardView: View {
             }
           },
           onStartWorkout: startCursorWorkout,
-          onStartWorkoutFrameChange: onStartWorkoutFrameChange,
-          isStartWorkoutHidden: isStartWorkoutHidden,
           isUpdatingCompletion: isUpdatingCompletion,
           onUndoCompletion: { dayID in
             Task { await undoCompletion(dayID: dayID) }
@@ -113,6 +111,25 @@ public struct DashboardView: View {
       .modifier(notificationHost)
       .refreshable {
         await reload()
+      }
+      .safeAreaInset(edge: .bottom, spacing: 0) {
+        if let day = stickyStartDay {
+          DashboardPrimaryAction(
+            day: day,
+            onStart: startCursorWorkout,
+            onStartFrameChange: onStartWorkoutFrameChange,
+            isStartHidden: isStartWorkoutHidden
+          )
+          .padding(.horizontal, 20)
+          .padding(.top, 10)
+          .padding(.bottom, 8)
+          .background(Color.MeetPR.bgBase)
+          .overlay(alignment: .top) {
+            Rectangle()
+              .fill(Color.MeetPR.borderSubtle)
+              .frame(height: 1)
+          }
+        }
       }
     }
     .background(Color.MeetPR.bgBase)
@@ -176,6 +193,14 @@ public struct DashboardView: View {
       return presentation
     }
     return nil
+  }
+
+  private var stickyStartDay: StudentPlanDay? {
+    let days = weekViewModel.cycleDays
+    guard DashboardTodayPresentation.completedToday(in: days, now: Date()) == nil else {
+      return nil
+    }
+    return StudentPlanSequence(days: days).cursorDay
   }
 
   private func startCursorWorkout() {

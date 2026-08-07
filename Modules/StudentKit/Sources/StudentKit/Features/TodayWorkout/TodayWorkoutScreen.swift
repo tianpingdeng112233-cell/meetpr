@@ -73,8 +73,8 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         onNotifications: onNotifications
       )
 
-      calendarContent
       screenContent
+      calendarContent
     }
     .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.point6)
@@ -137,7 +137,7 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
       DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.rows).count) {
         onShowReview()
       }
-    } else if dayState.isEditable {
+    } else if dayState.isEditable, presentation.allowsManualCompletion {
       // The hero action row is gone once every set is logged, so the entry has to land here —
       // finishing a session is exactly when a student wants to ask. Full width rather than the
       // hero's square icon: there is no camera control to sit beside.
@@ -430,7 +430,6 @@ private struct TrainingHeaderButton<Icon: View>: View {
   }
 }
 
-// swiftlint:disable:next type_body_length
 private struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
@@ -444,6 +443,7 @@ private struct TodayWorkoutHero: View {
   let showsAskCoach: Bool
   let isPreparingAskCoach: Bool
   let onAskCoach: () -> Void
+  @State private var isSummaryExpanded = true
 
   var body: some View {
     ZStack(alignment: .leading) {
@@ -500,56 +500,12 @@ private struct TodayWorkoutHero: View {
 
   private var listHero: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-      Text("今日训练")
-        .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
-        .foregroundStyle(Color.MeetPR.textPrimary)
-        .padding(.bottom, MeetPRSpacing.space1)
-
-      Text(
-        "共 \(presentation.exercises.count) 个动作 · "
-          + "\(presentation.exercises.flatMap(\.rows).count) 组"
+      TodayWorkoutActionSummary(
+        presentation: presentation,
+        highlightedExerciseID: nil,
+        canCollapse: false,
+        isExpanded: .constant(true)
       )
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-      .foregroundStyle(Color.MeetPR.textTertiary)
-      .padding(.bottom, MeetPRSpacing.point13)
-
-      VStack(spacing: MeetPRSpacing.space2) {
-        ForEach(presentation.exercises) { exercise in
-          let first = exercise.rows.first?.record
-          HStack(spacing: MeetPRSpacing.point11) {
-            Text((exercise.stableIndex + 1).formatted())
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
-              .foregroundStyle(Color.MeetPR.goldText)
-              .frame(width: 22, height: 22)
-              .background(Color.MeetPR.goldRGB.opacity(0.12))
-              .clipShape(.rect(cornerRadius: MeetPRSpacing.point7))
-
-            Text(exercise.name)
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
-              .foregroundStyle(Color.MeetPR.textPrimary)
-
-            Spacer(minLength: MeetPRSpacing.space2)
-
-            if let first {
-              let weight = first.weight.map { "\(numberText($0))kg" } ?? "—"
-              Text(
-                "\(weight) × \(first.reps) · "
-                  + "\(exercise.rows.count) 组"
-              )
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-              .foregroundStyle(Color.MeetPR.textTertiary)
-            }
-          }
-          .padding(.horizontal, MeetPRSpacing.point13)
-          .padding(.vertical, MeetPRSpacing.point11)
-          .background(Color.MeetPR.surfaceCard)
-          .overlay {
-            RoundedRectangle(cornerRadius: MeetPRRadius.control)
-              .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
-          }
-          .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-        }
-      }
       .padding(.bottom, MeetPRSpacing.point14)
 
       if isEditable {
@@ -570,6 +526,19 @@ private struct TodayWorkoutHero: View {
       let exercise = presentation.exercises.first(where: { $0.id == row.draft.planExerciseID })
     {
       VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
+        TodayWorkoutActionSummary(
+          presentation: presentation,
+          highlightedExerciseID: exercise.id,
+          canCollapse: true,
+          isExpanded: $isSummaryExpanded
+        )
+        .padding(.bottom, MeetPRSpacing.point13)
+
+        Rectangle()
+          .fill(Color.MeetPR.borderSubtle)
+          .frame(height: 1)
+          .padding(.bottom, MeetPRSpacing.point13)
+
         Text(exercise.name)
           .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
           .foregroundStyle(Color.MeetPR.textPrimary)
@@ -719,6 +688,130 @@ private struct TodayWorkoutHero: View {
   }
 }
 
+private struct TodayWorkoutActionSummary: View {
+  let presentation: TodayWorkoutPresentation
+  let highlightedExerciseID: UUID?
+  let canCollapse: Bool
+  @Binding var isExpanded: Bool
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
+      if canCollapse {
+        Button {
+          withAnimation(MeetPRMotion.spring) {
+            isExpanded.toggle()
+          }
+        } label: {
+          TodayWorkoutActionSummaryHeader(
+            presentation: presentation,
+            isExpanded: isExpanded
+          )
+          .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("今日训练动作汇总")
+        .accessibilityValue(isExpanded ? "已展开" : "已收合")
+      } else {
+        TodayWorkoutActionSummaryHeader(presentation: presentation)
+      }
+
+      if isExpanded {
+        VStack(spacing: MeetPRSpacing.space2) {
+          ForEach(presentation.exercises) { exercise in
+            TodayWorkoutActionSummaryRow(
+              exercise: exercise,
+              isHighlighted: exercise.id == highlightedExerciseID
+            )
+          }
+        }
+        .transition(.opacity.combined(with: .move(edge: .top)))
+      }
+    }
+  }
+}
+
+private struct TodayWorkoutActionSummaryHeader: View {
+  let presentation: TodayWorkoutPresentation
+  let isExpanded: Bool?
+
+  init(
+    presentation: TodayWorkoutPresentation,
+    isExpanded: Bool? = nil
+  ) {
+    self.presentation = presentation
+    self.isExpanded = isExpanded
+  }
+
+  var body: some View {
+    HStack(alignment: .firstTextBaseline) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+        Text("今日训练")
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(
+          "共 \(presentation.exercises.count) 个动作 · "
+            + "\(presentation.exercises.flatMap(\.rows).count) 组"
+        )
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+      }
+
+      Spacer()
+
+      if let isExpanded {
+        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size13, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
+    }
+  }
+}
+
+private struct TodayWorkoutActionSummaryRow: View {
+  let exercise: TodayWorkoutPresentation.Exercise
+  let isHighlighted: Bool
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.point11) {
+      Text((exercise.stableIndex + 1).formatted())
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+        .foregroundStyle(Color.MeetPR.goldText)
+        .frame(width: 22, height: 22)
+        .background(Color.MeetPR.goldRGB.opacity(0.12))
+        .clipShape(.rect(cornerRadius: MeetPRSpacing.point7))
+
+      Text(exercise.name)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+
+      Spacer(minLength: MeetPRSpacing.space2)
+
+      if let first = exercise.rows.first?.record {
+        let weight = first.weight.map { numberText($0) + "kg" } ?? "—"
+        Text("\(weight) × \(first.reps) · \(exercise.rows.count) 组")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+      }
+    }
+    .padding(.horizontal, MeetPRSpacing.point13)
+    .padding(.vertical, MeetPRSpacing.point11)
+    .background(isHighlighted ? Color.MeetPR.goldRGB.opacity(0.12) : Color.MeetPR.surfaceCard)
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.control)
+        .stroke(
+          isHighlighted ? Color.MeetPR.gold500 : Color.MeetPR.borderSubtle,
+          lineWidth: isHighlighted ? 1.5 : 1
+        )
+    }
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+    .accessibilityAddTraits(isHighlighted ? .isSelected : [])
+  }
+
+  private func numberText(_ value: Double) -> String {
+    value.formatted(.number.precision(.fractionLength(0...2)))
+  }
+}
+
 private struct TodayWorkoutExerciseList: View {
   let exercises: [TodayWorkoutPresentation.Exercise]
   @Binding var collapsedExercises: [UUID: Bool]
@@ -808,7 +901,9 @@ private struct HoldToCompleteButton: View {
   @State private var progress = 0.0
   @State private var isPressing = false
   @State private var hapticStep = 0
-  @State private var hapticTask: Task<Void, Never>?
+  @State private var cancelFeedbackStep = 0
+  @State private var successFeedbackStep = 0
+  @State private var holdTask: Task<Void, Never>?
 
   var body: some View {
     ZStack {
@@ -846,59 +941,90 @@ private struct HoldToCompleteButton: View {
     .meetPRShimmer(true)
     .scaleEffect(isPressing ? 0.96 : 1)
     .animation(reduceMotion ? nil : MeetPRMotion.press, value: isPressing)
-    .onLongPressGesture(
-      minimumDuration: MeetPRMotion.durationHoldComplete,
-      maximumDistance: 50,
-      perform: complete,
-      onPressingChanged: pressingChanged
+    .contentShape(.capsule)
+    .highPriorityGesture(
+      DragGesture(minimumDistance: 0)
+        .onChanged(handleDragChanged)
+        .onEnded { _ in cancelHold() }
     )
     .sensoryFeedback(.impact(weight: .light), trigger: hapticStep)
+    .sensoryFeedback(.warning, trigger: cancelFeedbackStep)
+    .sensoryFeedback(.success, trigger: successFeedbackStep)
     .accessibilityElement()
     .accessibilityLabel("长按完成今日训练")
     .accessibilityAddTraits(.isButton)
-    .accessibilityAction { complete() }
-    .onDisappear { hapticTask?.cancel() }
+    .accessibilityAction { completeForAccessibility() }
+    .onDisappear { holdTask?.cancel() }
   }
 
-  private func pressingChanged(_ pressing: Bool) {
-    isPressing = pressing
-    hapticTask?.cancel()
-    if pressing {
-      if reduceMotion {
-        progress = 1
-        return
-      }
+  private func handleDragChanged(_ value: DragGesture.Value) {
+    let distance = hypot(value.translation.width, value.translation.height)
+    guard distance <= 50 else {
+      cancelHold()
+      return
+    }
+    guard !isPressing else { return }
+    beginHold()
+  }
+
+  private func beginHold() {
+    isPressing = true
+    holdTask?.cancel()
+    if reduceMotion {
+      progress = 1
+    } else {
       withAnimation(.linear(duration: MeetPRMotion.durationHoldComplete)) {
         progress = 1
       }
-      hapticTask = Task { @MainActor in
-        for step in 1...7 {
-          try? await Task.sleep(
+    }
+    holdTask = Task { @MainActor in
+      for step in 1...7 {
+        do {
+          try await Task.sleep(
             for: .milliseconds(Int(MeetPRMotion.durationHoldComplete * 1_000 / 7))
           )
-          guard !Task.isCancelled, isPressing else { return }
-          hapticStep = step
+        } catch {
+          return
         }
+        guard isPressing else { return }
+        hapticStep = step
       }
-    } else if progress < 1 {
-      withAnimation(
-        .timingCurve(
-          MeetPRMotion.rollX1,
-          MeetPRMotion.rollY1,
-          MeetPRMotion.rollX2,
-          MeetPRMotion.rollY2,
-          duration: MeetPRMotion.durationHoldCancel
-        )
-      ) {
-        progress = 0
-      }
+      complete()
+    }
+  }
+
+  private func cancelHold() {
+    guard isPressing else { return }
+    holdTask?.cancel()
+    isPressing = false
+    cancelFeedbackStep += 1
+    withAnimation(
+      .timingCurve(
+        MeetPRMotion.rollX1,
+        MeetPRMotion.rollY1,
+        MeetPRMotion.rollX2,
+        MeetPRMotion.rollY2,
+        duration: MeetPRMotion.durationHoldCancel
+      )
+    ) {
+      progress = 0
     }
   }
 
   private func complete() {
-    hapticTask?.cancel()
+    guard isPressing else { return }
+    holdTask?.cancel()
     isPressing = false
     progress = 1
+    successFeedbackStep += 1
+    action()
+  }
+
+  private func completeForAccessibility() {
+    holdTask?.cancel()
+    isPressing = false
+    progress = 1
+    successFeedbackStep += 1
     action()
   }
 }

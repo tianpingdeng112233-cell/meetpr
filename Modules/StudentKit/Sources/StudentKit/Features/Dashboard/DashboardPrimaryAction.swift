@@ -10,27 +10,22 @@ struct DashboardPrimaryAction: View {
   let isStartHidden: Bool
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 13) {
-      DashboardSequenceDaySummary(day: day)
-      GoldCTA(
-        "开始训练",
-        sub: DashboardTodayPresentation.liftSubtitle(
-          MainLiftExerciseFamilyResolver.families(in: day)
-        ),
-        variant: .primary,
-        icon: .play,
-        showsShimmer: true,
-        action: onStart
-      )
-      .onGeometryChange(for: CGRect.self) { proxy in
-        proxy.frame(in: .global)
-      } action: { frame in
-        onStartFrameChange(frame)
-      }
-      .opacity(isStartHidden ? 0 : 1)
-      .allowsHitTesting(!isStartHidden)
-      .accessibilityHidden(isStartHidden)
+    GoldCTA(
+      "开始训练",
+      sub: DashboardTodayPresentation.dayName(day),
+      variant: .primary,
+      icon: .play,
+      showsShimmer: true,
+      action: onStart
+    )
+    .onGeometryChange(for: CGRect.self) { proxy in
+      proxy.frame(in: .global)
+    } action: { frame in
+      onStartFrameChange(frame)
     }
+    .opacity(isStartHidden ? 0 : 1)
+    .allowsHitTesting(!isStartHidden)
+    .accessibilityHidden(isStartHidden)
   }
 }
 
@@ -49,7 +44,7 @@ struct DashboardCompletedAction: View {
         Image(systemName: "checkmark.circle.fill")
           .font(.MeetPR.system(size: MeetPRFontMetrics.size34, weight: .semibold))
           .foregroundStyle(Color.MeetPR.success)
-        Text("\(DashboardTodayPresentation.compactCode(for: completedDay)) 已完成")
+        Text("\(DashboardTodayPresentation.code(for: completedDay)) 已完成")
           .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
         if canUndo {
@@ -68,7 +63,7 @@ struct DashboardCompletedAction: View {
 
       if let nextDay {
         VStack(alignment: .leading, spacing: 8) {
-          Text("下一节 · \(DashboardTodayPresentation.compactCode(for: nextDay))")
+          Text("下一节 · \(DashboardTodayPresentation.code(for: nextDay))")
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.gold500)
           DashboardSequenceDaySummary(day: nextDay)
@@ -105,7 +100,7 @@ struct DashboardCycleCompletedAction: View {
       Text("W1 – W\(finalWeek) · 共 \(ordered.count) 节")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textMuted)
-      Text("下一份计划由教练发布。发布后这里会直接出现 W1 · D1。")
+      Text("下一份计划由教练发布。发布后这里会直接出现 W1D1。")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         .foregroundStyle(Color.MeetPR.textSecondary)
         .multilineTextAlignment(.center)
@@ -119,7 +114,7 @@ struct DashboardCycleCompletedAction: View {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-private struct DashboardSequenceDaySummary: View {
+struct DashboardSequenceDaySummary: View {
   let day: StudentPlanDay
 
   var body: some View {

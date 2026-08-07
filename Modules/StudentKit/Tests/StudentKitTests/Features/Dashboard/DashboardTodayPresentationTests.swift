@@ -9,7 +9,7 @@ import Testing
   let cursor = DashboardTodayPresentation.cursor(in: days)
 
   #expect(cursor?.id == days[1].id)
-  #expect(DashboardTodayPresentation.code(for: cursor ?? days[0]) == "W1 · D2")
+  #expect(DashboardTodayPresentation.code(for: cursor ?? days[0]) == "W1D2")
 }
 
 @Test func dashboardProgressUsesOnlyCurrentSequenceWeekAndCrossesWeek() {
