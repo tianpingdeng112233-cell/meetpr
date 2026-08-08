@@ -170,6 +170,42 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   }
 }
 
+// Hero-card corner variant: a compact「问教练」text chip instead of the
+// action row's square icon (David 2026-08-08 真机走查).
+private struct TodayWorkoutAskCoachCornerButton: View {
+  let isPreparing: Bool
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Group {
+        if isPreparing {
+          ProgressView()
+            .controlSize(.small)
+            .tint(Color.MeetPR.textTertiary)
+        } else {
+          Text(StudentStrings.askCoach)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+        }
+      }
+      .padding(.horizontal, MeetPRSpacing.point13)
+      .frame(minHeight: 36)
+      .background(Color.MeetPR.surfaceCard)
+      .overlay {
+        Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+      }
+      .clipShape(.capsule)
+      // 36pt visual capsule, 44pt hit target (MeetPRSpacing.minimumHitTarget).
+      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+      .contentShape(.rect)
+    }
+    .buttonStyle(.plain)
+    .disabled(isPreparing)
+    .accessibilityIdentifier("todayWorkout.askCoach")
+  }
+}
+
 private struct TodayWorkoutAskCoachButton: View {
   let isPreparing: Bool
   let action: () -> Void
@@ -521,9 +557,10 @@ private struct TodayWorkoutHero: View {
           Spacer(minLength: MeetPRSpacing.space2)
 
           // The ask-coach entry lives in the card's top-right corner once the
-          // action row is gone (David 2026-08-08 真机走查:不再用底部通宽按钮).
+          // action row is gone, labeled in Chinese rather than an icon
+          // (David 2026-08-08 真机走查:不再用底部通宽按钮,图标换「问教练」).
           if showsAskCoach, presentation.progress.allDone {
-            TodayWorkoutAskCoachButton(
+            TodayWorkoutAskCoachCornerButton(
               isPreparing: isPreparingAskCoach,
               action: onAskCoach
             )
