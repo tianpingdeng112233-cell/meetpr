@@ -111,7 +111,7 @@ import Testing
   }
 }
 
-@Test func automaticCompletionRequiresEveryPrescribedSlot() async throws {
+@Test func recordingEveryPrescribedSlotDoesNotCompleteDayUntilManualCompletion() async throws {
   let studentID = UUID()
   let plan = sequencePlan()
   let day = plan.days[0]
@@ -119,37 +119,33 @@ import Testing
   let logs = InMemoryStudentTrainingLogRepository()
   let repository = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: plan]),
-    logs: logs,
     now: { Date(timeIntervalSince1970: 2_000_000_000) }
   )
 
-  let partial = StudentSetLog(
-    id: UUID(), studentID: studentID, planExerciseID: exercise.id,
-    exerciseID: exercise.exercise.id, setIndex: 0, loggedAt: Date(),
-    weightKg: 100, reps: 5, rpe: 8, completed: true
-  )
-  _ = try await logs.recordSet(partial)
+  for index in 0...1 {
+    _ = try await logs.recordSet(
+      StudentSetLog(
+        id: UUID(), studentID: studentID, planExerciseID: exercise.id,
+        exerciseID: exercise.exercise.id, setIndex: index, loggedAt: Date(),
+        weightKg: 100, reps: 5, rpe: 8, completed: true
+      )
+    )
+  }
   #expect(try await repository.fetchCurrentPlan(studentID: studentID)?.days[0].completedAt == nil)
 
-  var final = partial
-  final = StudentSetLog(
-    id: UUID(), studentID: studentID, planExerciseID: exercise.id,
-    exerciseID: exercise.exercise.id, setIndex: 1, loggedAt: Date(),
-    weightKg: 100, reps: 5, rpe: 8, completed: true
-  )
-  _ = try await logs.recordSet(final)
+  let completion = try await repository.completeDay(id: day.id, studentID: studentID)
   let completed = try await repository.fetchCurrentPlan(studentID: studentID)?.days[0]
-  #expect(completed?.completionSource == "auto")
+  #expect(completion.source == "manual")
+  #expect(completed?.completionSource == "manual")
 }
 
-@Test func failedPrescribedSetParticipatesInAutomaticCompletion() async throws {
+@Test func failedPrescribedSetDoesNotCompleteDayUntilManualCompletion() async throws {
   let studentID = UUID()
   let plan = sequencePlan()
   let exercise = try #require(plan.days[0].exercises.first)
   let logs = InMemoryStudentTrainingLogRepository()
   let repository = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: plan]),
-    logs: logs,
     now: { Date(timeIntervalSince1970: 2_000_000_000) }
   )
 
@@ -163,8 +159,13 @@ import Testing
     )
   }
 
-  let completed = try await repository.fetchCurrentPlan(studentID: studentID)?.days[0]
-  #expect(completed?.completionSource == "auto")
+  #expect(try await repository.fetchCurrentPlan(studentID: studentID)?.days[0].completedAt == nil)
+
+  _ = try await repository.completeDay(id: plan.days[0].id, studentID: studentID)
+  #expect(
+    try await repository.fetchCurrentPlan(studentID: studentID)?.days[0].completionSource
+      == "manual"
+  )
 }
 
 @Test func undoWindowUsesShanghaiFourAMBoundary() async throws {
@@ -195,7 +196,7 @@ import Testing
   }
 }
 
-@Test func undoThenRefillingSetCanAutomaticallyCompleteAgain() async throws {
+@Test func undoThenRefillingSetRequiresManualCompletionAgain() async throws {
   let studentID = UUID()
   let now = Date(timeIntervalSince1970: 2_000_000_000)
   let base = sequencePlan()
@@ -204,7 +205,6 @@ import Testing
   let logs = InMemoryStudentTrainingLogRepository()
   let repository = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: plan]),
-    logs: logs,
     now: { now }
   )
 
@@ -218,6 +218,9 @@ import Testing
     )
     recorded.append(try await logs.recordSet(log))
   }
+  #expect(try await repository.fetchCurrentPlan(studentID: studentID)?.days[0].completedAt == nil)
+
+  _ = try await repository.completeDay(id: plan.days[0].id, studentID: studentID)
   #expect(try await repository.fetchCurrentPlan(studentID: studentID)?.days[0].completedAt != nil)
 
   try await repository.undoDayCompletion(id: plan.days[0].id, studentID: studentID)
@@ -233,9 +236,12 @@ import Testing
       completed: true
     )
   )
+  #expect(try await repository.fetchCurrentPlan(studentID: studentID)?.days[0].completedAt == nil)
+
+  _ = try await repository.completeDay(id: plan.days[0].id, studentID: studentID)
   #expect(
     try await repository.fetchCurrentPlan(studentID: studentID)?.days[0].completionSource
-      == "auto"
+      == "manual"
   )
 }
 

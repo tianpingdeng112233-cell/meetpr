@@ -4,26 +4,18 @@ import RepositoryContracts
 
 public actor InMemoryStudentPlanRepository: StudentPlanRepository {
   private let store: any StudentPlanStore
-  private let logs: (any StudentTrainingLogRepository)?
   private let now: @Sendable () -> Date
-  private var suppressedAutomaticCompletions: [UUID: [UUID: [SetSlot: AutoCompletionSlotState]]] =
-    [:]
 
   public init(
     store: any StudentPlanStore,
-    logs: (any StudentTrainingLogRepository)? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.store = store
-    self.logs = logs
     self.now = now
   }
 
   public func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
-    guard let plan = await store.getPublishedProjection(forStudent: studentID) else {
-      return nil
-    }
-    return try await applyingAutomaticCompletions(to: plan, studentID: studentID)
+    await store.getPublishedProjection(forStudent: studentID)
   }
 
   public func refreshCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
@@ -97,73 +89,7 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
     }
 
     let updated = updatingDay(id, in: plan, completedAt: nil, source: nil)
-    if let logs,
-      let target = updated.days.first(where: { $0.id == id })
-    {
-      let allLogs = try await logs.fetchLogs(
-        studentID: studentID,
-        in: Date.distantPast...Date.distantFuture
-      )
-      suppressedAutomaticCompletions[studentID, default: [:]][id] =
-        completionFingerprint(for: target, logs: allLogs)
-    }
     await store.savePublishedProjection(updated, forStudent: studentID)
-  }
-
-  private func applyingAutomaticCompletions(
-    to plan: StudentPlanView,
-    studentID: UUID
-  ) async throws -> StudentPlanView {
-    guard let logs else { return plan }
-    let allLogs = try await logs.fetchLogs(
-      studentID: studentID,
-      in: Date.distantPast...Date.distantFuture
-    )
-    var updated = plan
-    for day in StudentPlanSequence.orderedDays(in: plan) where day.completedAt == nil {
-      let prescribed = day.exercises.flatMap { exercise in
-        exercise.prescribedSets.map { SetSlot(exerciseID: exercise.id, index: $0.setIndex) }
-      }
-      let fingerprint = completionFingerprint(for: day, logs: allLogs)
-      let completedSlots = Set(
-        fingerprint.compactMap { slot, state in
-          state.completed || state.failed ? slot : nil
-        }
-      )
-      guard !prescribed.isEmpty, prescribed.allSatisfy(completedSlots.contains) else { continue }
-      if suppressedAutomaticCompletions[studentID]?[day.id] == fingerprint {
-        continue
-      }
-      suppressedAutomaticCompletions[studentID]?[day.id] = nil
-      updated = updatingDay(day.id, in: updated, completedAt: now(), source: "auto")
-    }
-    if updated != plan {
-      await store.savePublishedProjection(updated, forStudent: studentID)
-    }
-    return updated
-  }
-
-  private func completionFingerprint(
-    for day: StudentPlanDay,
-    logs: [StudentSetLog]
-  ) -> [SetSlot: AutoCompletionSlotState] {
-    let exerciseIDs = Set(day.exercises.map(\.id))
-    return Dictionary(
-      logs.lazy
-        .filter { exerciseIDs.contains($0.planExerciseID) }
-        .map {
-          (
-            SetSlot(exerciseID: $0.planExerciseID, index: $0.setIndex),
-            AutoCompletionSlotState(
-              id: $0.id,
-              loggedAt: $0.loggedAt,
-              completed: $0.completed,
-              failed: $0.failed
-            )
-          )
-        },
-      uniquingKeysWith: { _, latest in latest }
-    )
   }
 
   private func updatingDay(
@@ -200,16 +126,4 @@ public actor InMemoryStudentPlanRepository: StudentPlanRepository {
       days: days
     )
   }
-}
-
-private struct SetSlot: Hashable, Sendable {
-  let exerciseID: UUID
-  let index: Int
-}
-
-private struct AutoCompletionSlotState: Equatable, Sendable {
-  let id: UUID
-  let loggedAt: Date
-  let completed: Bool
-  let failed: Bool
 }

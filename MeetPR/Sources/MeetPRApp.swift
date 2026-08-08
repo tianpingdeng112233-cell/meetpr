@@ -173,7 +173,7 @@ struct MeetPRApp: App {
         coachEvaluations: funnel.evaluations,
         coachEvaluationSummaries: funnel.summaries,
         coachStudentProfiles: funnel.profiles,
-        studentPlans: InMemoryStudentPlanRepository(store: planStore, logs: studentLogs),
+        studentPlans: InMemoryStudentPlanRepository(store: planStore),
         studentLogs: studentLogs,
         studentFeedback: makeDemoStudentFeedback(studentState: studentState),
         videoMarkers: markerRepository,

@@ -24,7 +24,7 @@ enum RootViewDemoDefaults {
     Task {
       await store.savePublishedProjection(plan, forStudent: StudentDemoSeed.studentID)
     }
-    return InMemoryStudentPlanRepository(store: store, logs: trainingLogs)
+    return InMemoryStudentPlanRepository(store: store)
   }
 
   static func logs() -> any StudentTrainingLogRepository {

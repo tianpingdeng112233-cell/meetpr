@@ -95,7 +95,7 @@ public struct StudentRootView: View {
     )
     self.init(
       studentID: StudentDemoSeed.studentID,
-      plans: InMemoryStudentPlanRepository(store: store, logs: logs),
+      plans: InMemoryStudentPlanRepository(store: store),
       logs: logs,
       feedback: InMemoryStudentFeedbackRepository(
         seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)

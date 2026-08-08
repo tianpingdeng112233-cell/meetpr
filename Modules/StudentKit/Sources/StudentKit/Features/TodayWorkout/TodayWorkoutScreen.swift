@@ -160,16 +160,8 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
         onShowReview()
       }
     } else if dayState.isEditable, presentation.allowsManualCompletion {
-      // The hero action row is gone once every set is logged, so the entry has to land here —
-      // finishing a session is exactly when a student wants to ask. Full width rather than the
-      // hero's square icon: there is no camera control to sit beside.
-      if showsAskCoach, presentation.progress.allDone {
-        TodayWorkoutAskCoachWideButton(
-          isPreparing: isPreparingAskCoach,
-          action: onAskCoach
-        )
-      }
-
+      // Ask-coach moved to the hero card's top-right corner once the action
+      // row is gone (David 2026-08-08) — nothing sits above the hold button.
       if !presentation.progress.allDone {
         TodayWorkoutRemainingPill(text: presentation.progress.remainingText)
       }
@@ -178,47 +170,15 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   }
 }
 
-private struct TodayWorkoutAskCoachWideButton: View {
-  let isPreparing: Bool
-  let action: () -> Void
-
-  var body: some View {
-    Button(action: action) {
-      Group {
-        if isPreparing {
-          ProgressView()
-            .controlSize(.small)
-            .tint(Color.MeetPR.textTertiary)
-        } else {
-          Label(StudentStrings.askCoach, systemImage: "bubble.left")
-        }
-      }
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
-      .foregroundStyle(Color.MeetPR.textPrimary)
-      .frame(maxWidth: .infinity)
-      .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-      .background(Color.MeetPR.surfaceCard)
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.control)
-          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
-      }
-      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-    }
-    .buttonStyle(.plain)
-    .disabled(isPreparing)
-    .accessibilityIdentifier("todayWorkout.askCoach")
-  }
-}
-
 private struct TodayWorkoutAskCoachButton: View {
   let isPreparing: Bool
   let action: () -> Void
 
   var body: some View {
-    // Square icon button sized to match the camera control beside it. It lives in the hero
-    // action row rather than at the foot of the page: the rest timer pins itself to the bottom
-    // the moment a set is logged, and that is exactly when a student wants to ask — the old
-    // placement put the entry underneath the bar.
+    // Square icon button. Mid-recording it sits in the hero action row beside
+    // the camera (the rest timer owns the bottom edge); once every set is
+    // logged the action row is gone and the same control moves to the hero
+    // card's top-right corner (David 2026-08-08 真机走查).
     Button(action: action) {
       Group {
         if isPreparing {
@@ -553,11 +513,24 @@ private struct TodayWorkoutHero: View {
       // the pre-start list state and never coexists with the active card
       // (David 2026-08-07 真机走查).
       VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-        Text(exercise.name)
-          .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .padding(.bottom, MeetPRSpacing.point3)
-          .launchHeroRise(index: 0, trigger: launchHeroRevealToken)
+        HStack(alignment: .top, spacing: MeetPRSpacing.space2) {
+          Text(exercise.name)
+            .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+
+          Spacer(minLength: MeetPRSpacing.space2)
+
+          // The ask-coach entry lives in the card's top-right corner once the
+          // action row is gone (David 2026-08-08 真机走查:不再用底部通宽按钮).
+          if showsAskCoach, presentation.progress.allDone {
+            TodayWorkoutAskCoachButton(
+              isPreparing: isPreparingAskCoach,
+              action: onAskCoach
+            )
+          }
+        }
+        .padding(.bottom, MeetPRSpacing.point3)
+        .launchHeroRise(index: 0, trigger: launchHeroRevealToken)
 
         Text(exercise.reference)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
