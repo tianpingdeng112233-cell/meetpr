@@ -60,14 +60,14 @@ import Testing
     #expect(presentation.allowsManualCompletion)
   }
 
-  @Test func partialRealLogStaysOnPreStartCardAndLatchesListHero() throws {
+  @Test func partialRealLogResumesRecordingHeroAndLatchesItsFrame() throws {
     var fixture = makeFixture()
     fixture.drafts[0].completed = true
-    let lateFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
-    let listFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
+    let staleListFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
+    let recordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
 
-    // Partial logs never fast-forward past the summary card — the pre-start
-    // card stays until 开始第一组 is tapped this visit (David 2026-08-08).
+    // ≥1 real recorded set means the session already started: re-entry (cold
+    // launch included) resumes the recording card directly (David 2026-08-08).
     let presentation = TodayWorkoutPresentation(
       day: fixture.day,
       drafts: fixture.drafts,
@@ -77,20 +77,20 @@ import Testing
     let measurement = TodayWorkoutHeroFrameMeasurement(
       heroMode: presentation.heroMode,
       requestToken: 1,
-      frame: listFrame
+      frame: recordingFrame
     )
     var latch = LaunchDestinationFrameLatch()
     latch.arm()
     let publishedFrame = try #require(measurement.publishableFrame)
-    let capturedListFrame = latch.capture(publishedFrame)
-    let overwroteListFrame = latch.capture(lateFrame)
+    let capturedRecordingFrame = latch.capture(publishedFrame)
+    let overwroteRecordingFrame = latch.capture(staleListFrame)
 
-    #expect(presentation.heroMode == .list)
-    #expect(measurement.heroMode == .list)
-    #expect(capturedListFrame)
-    #expect(!overwroteListFrame)
-    #expect(latch.frame == listFrame)
-    #expect(!presentation.allowsManualCompletion)
+    #expect(presentation.heroMode == .recording)
+    #expect(measurement.heroMode == .recording)
+    #expect(capturedRecordingFrame)
+    #expect(!overwroteRecordingFrame)
+    #expect(latch.frame == recordingFrame)
+    #expect(presentation.allowsManualCompletion)
     #expect(presentation.progress.remainingSets == 2)
     #expect(presentation.progress.remainingExercises == 2)
     #expect(presentation.progress.currentSetNumber == 2)
@@ -144,7 +144,7 @@ import Testing
     #expect(!presentation.allowsManualCompletion)
   }
 
-  @Test func failedRealLogCountsForHoldGateOnlyAfterSessionStart() {
+  @Test func failedRealLogResumesColdLaunchWorkout() {
     var fixture = makeFixture()
     fixture.drafts[0].failed = true
 
@@ -154,18 +154,10 @@ import Testing
       references: [:],
       started: false
     )
-    let resumed = TodayWorkoutPresentation(
-      day: fixture.day,
-      drafts: fixture.drafts,
-      references: [:],
-      started: true
-    )
 
-    #expect(cold.heroMode == .list)
-    #expect(!cold.allowsManualCompletion)
-    #expect(resumed.heroMode == .recording)
-    #expect(resumed.hasAnyLoggedSet)
-    #expect(resumed.allowsManualCompletion)
+    #expect(cold.heroMode == .recording)
+    #expect(cold.hasAnyLoggedSet)
+    #expect(cold.allowsManualCompletion)
   }
 
   @Test func draftMappingKeepsFailureAndVideoSemantics() throws {

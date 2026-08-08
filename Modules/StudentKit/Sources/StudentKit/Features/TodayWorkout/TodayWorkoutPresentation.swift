@@ -96,18 +96,19 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     videoStates: [UUID: SetRow.VideoState] = [:],
     started: Bool
   ) {
-    // The summary card IS the pre-start state of the cursor day, and it stays
-    // until 开始第一组 is tapped in this visit — existing logs (partial
-    // session, imported history) never fast-forward into the recording card
-    // (David 2026-08-08). Completed days are a different animal: they are
-    // read-only detail, keyed off the server-authoritative completion, and
-    // must keep their per-set table visible.
+    // The summary card IS the pre-start state, and it only belongs to a day
+    // with zero recorded sets: tapping 开始第一组 or having ≥1 real recorded
+    // set (failed included) means the session has started, and re-entry —
+    // cold launch included — resumes the recording card directly (David
+    // 2026-08-08 三次收敛). Assumed imported-history rows are not session
+    // evidence; completed days are read-only detail via server `completedAt`.
     let hasSessionLog = drafts.contains {
       !$0.assumed && ($0.completed || $0.failed)
     }
     self.day = day
     self.hasAnyLoggedSet = hasSessionLog
-    self.heroMode = started || day.completedAt != nil ? .recording : .list
+    self.heroMode =
+      started || hasSessionLog || day.completedAt != nil ? .recording : .list
     self.progress = TodayWorkoutProgress(day: day, drafts: drafts)
 
     self.exercises = day.exercises.enumerated().map { exerciseIndex, exercise in
