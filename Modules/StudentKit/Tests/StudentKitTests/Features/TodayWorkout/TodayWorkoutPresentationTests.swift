@@ -60,12 +60,14 @@ import Testing
     #expect(presentation.allowsManualCompletion)
   }
 
-  @Test func partialRealLogDashboardCTAFramesAndLatchesRecordingHero() throws {
+  @Test func partialRealLogStaysOnPreStartCardAndLatchesListHero() throws {
     var fixture = makeFixture()
     fixture.drafts[0].completed = true
-    let staleListFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
-    let recordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
+    let lateFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
+    let listFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
 
+    // Partial logs never fast-forward past the summary card — the pre-start
+    // card stays until 开始第一组 is tapped this visit (David 2026-08-08).
     let presentation = TodayWorkoutPresentation(
       day: fixture.day,
       drafts: fixture.drafts,
@@ -75,20 +77,20 @@ import Testing
     let measurement = TodayWorkoutHeroFrameMeasurement(
       heroMode: presentation.heroMode,
       requestToken: 1,
-      frame: recordingFrame
+      frame: listFrame
     )
     var latch = LaunchDestinationFrameLatch()
     latch.arm()
     let publishedFrame = try #require(measurement.publishableFrame)
-    let capturedRecordingFrame = latch.capture(publishedFrame)
-    let overwroteRecordingFrame = latch.capture(staleListFrame)
+    let capturedListFrame = latch.capture(publishedFrame)
+    let overwroteListFrame = latch.capture(lateFrame)
 
-    #expect(presentation.heroMode == .recording)
-    #expect(measurement.heroMode == .recording)
-    #expect(capturedRecordingFrame)
-    #expect(!overwroteRecordingFrame)
-    #expect(latch.frame == recordingFrame)
-    #expect(presentation.allowsManualCompletion)
+    #expect(presentation.heroMode == .list)
+    #expect(measurement.heroMode == .list)
+    #expect(capturedListFrame)
+    #expect(!overwroteListFrame)
+    #expect(latch.frame == listFrame)
+    #expect(!presentation.allowsManualCompletion)
     #expect(presentation.progress.remainingSets == 2)
     #expect(presentation.progress.remainingExercises == 2)
     #expect(presentation.progress.currentSetNumber == 2)
@@ -98,6 +100,28 @@ import Testing
     #expect(presentation.progress.remainingText == "还有 2 个动作 · 2 组未记录")
     #expect(presentation.currentRow?.stableIndex == 1)
     #expect(presentation.currentRow?.record.index == 2)
+  }
+
+  @Test func completedDayKeepsReadOnlyDetailAcrossColdLaunch() {
+    var fixture = makeFixture()
+    for index in fixture.drafts.indices {
+      fixture.drafts[index].completed = true
+    }
+    let completedDay = fixture.day.replacingCompletion(
+      completedAt: Date(),
+      source: "auto"
+    )
+
+    // A completed day is read-only detail, not a pre-start state: the per-set
+    // table must stay visible even when `started` reset on reselection.
+    let presentation = TodayWorkoutPresentation(
+      day: completedDay,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(presentation.heroMode == .recording)
   }
 
   @Test func assumedHistoryDoesNotStartColdLaunchWorkout() {
@@ -120,20 +144,28 @@ import Testing
     #expect(!presentation.allowsManualCompletion)
   }
 
-  @Test func failedRealLogResumesColdLaunchWorkout() {
+  @Test func failedRealLogCountsForHoldGateOnlyAfterSessionStart() {
     var fixture = makeFixture()
     fixture.drafts[0].failed = true
 
-    let presentation = TodayWorkoutPresentation(
+    let cold = TodayWorkoutPresentation(
       day: fixture.day,
       drafts: fixture.drafts,
       references: [:],
       started: false
     )
+    let resumed = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: true
+    )
 
-    #expect(presentation.heroMode == .recording)
-    #expect(presentation.hasAnyLoggedSet)
-    #expect(presentation.allowsManualCompletion)
+    #expect(cold.heroMode == .list)
+    #expect(!cold.allowsManualCompletion)
+    #expect(resumed.heroMode == .recording)
+    #expect(resumed.hasAnyLoggedSet)
+    #expect(resumed.allowsManualCompletion)
   }
 
   @Test func draftMappingKeepsFailureAndVideoSemantics() throws {
