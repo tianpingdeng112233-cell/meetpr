@@ -206,42 +206,6 @@ private struct TodayWorkoutAskCoachCornerButton: View {
   }
 }
 
-private struct TodayWorkoutAskCoachButton: View {
-  let isPreparing: Bool
-  let action: () -> Void
-
-  var body: some View {
-    // Square icon button. Mid-recording it sits in the hero action row beside
-    // the camera (the rest timer owns the bottom edge); once every set is
-    // logged the action row is gone and the same control moves to the hero
-    // card's top-right corner (David 2026-08-08 真机走查).
-    Button(action: action) {
-      Group {
-        if isPreparing {
-          ProgressView()
-            .controlSize(.small)
-            .tint(Color.MeetPR.textTertiary)
-        } else {
-          Image(systemName: "bubble.left")
-            .font(.system(size: 20, weight: .medium))
-            .foregroundStyle(Color.MeetPR.textTertiary)
-        }
-      }
-      .frame(width: 52, height: 52)
-      .background(Color.MeetPR.surfaceCard)
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.control)
-          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
-      }
-      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-    }
-    .buttonStyle(.plain)
-    .disabled(isPreparing)
-    .accessibilityLabel(StudentStrings.askCoach)
-    .accessibilityIdentifier("todayWorkout.askCoach")
-  }
-}
-
 /// Design source:
 /// `docs/design/handoff-v3/empty-states/MeetPR 学员端 空状态 暗色.html`
 /// scene 07, training-content dashed slot.
@@ -556,10 +520,11 @@ private struct TodayWorkoutHero: View {
 
           Spacer(minLength: MeetPRSpacing.space2)
 
-          // The ask-coach entry lives in the card's top-right corner once the
-          // action row is gone, labeled in Chinese rather than an icon
-          // (David 2026-08-08 真机走查:不再用底部通宽按钮,图标换「问教练」).
-          if showsAskCoach, presentation.progress.allDone {
+          // The one and only ask-coach entry: a「问教练」chip pinned to the
+          // card's top-right corner for the whole recording session — the
+          // action row's square icon and the old wide button are both gone
+          // (David 2026-08-08 真机走查三连改).
+          if showsAskCoach {
             TodayWorkoutAskCoachCornerButton(
               isPreparing: isPreparingAskCoach,
               action: onAskCoach
@@ -692,13 +657,6 @@ private struct TodayWorkoutHero: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("记录本组视频")
-
-            if showsAskCoach {
-              TodayWorkoutAskCoachButton(
-                isPreparing: isPreparingAskCoach,
-                action: onAskCoach
-              )
-            }
           }
           .padding(.top, MeetPRSpacing.point13)
           .launchHeroRise(index: 6, trigger: launchHeroRevealToken)
