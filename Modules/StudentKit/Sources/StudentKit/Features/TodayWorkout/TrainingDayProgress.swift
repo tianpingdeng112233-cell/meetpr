@@ -1,6 +1,4 @@
 import CoreModels
-import DesignSystem
-import SwiftUI
 
 enum TrainingDayCompletionState: Equatable, Sendable {
   case noPlan
@@ -33,24 +31,5 @@ struct TrainingDayProgress: Equatable, Sendable {
     } else {
       self.state = .notStarted
     }
-  }
-}
-
-enum TrainingCalendarV3State {
-  static func resolve(
-    progress: TrainingDayProgress,
-    date: Date,
-    today: Date,
-    calendar: Calendar
-  ) -> MeetPRDayChip.DayState {
-    guard progress.state != .noPlan else { return .rest }
-    if progress.state == .complete { return .done }
-    if calendar.compare(date, to: today, toGranularity: .day) == .orderedAscending {
-      return .missed
-    }
-    if calendar.isDate(date, inSameDayAs: today) {
-      return .today
-    }
-    return .future
   }
 }

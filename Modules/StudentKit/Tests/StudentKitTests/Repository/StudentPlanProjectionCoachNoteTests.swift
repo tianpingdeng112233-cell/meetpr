@@ -26,6 +26,54 @@ import Testing
   #expect(view.days.first?.exercises.first?.prescribedSets.isEmpty == true)
 }
 
+@Test func studentProjectionUsesCanonicalSequenceOrder() throws {
+  let fixture = projectionFixture(setNumber: 1)
+  let lowerID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+  let higherID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000002"))
+  let firstID = UUID()
+  let lastID = UUID()
+  let days = [
+    PlanDay(
+      id: lastID,
+      planID: fixture.tree.plan.id,
+      dayOfWeek: 1,
+      weekNumber: 2,
+      sortOrder: 0
+    ),
+    PlanDay(
+      id: higherID,
+      planID: fixture.tree.plan.id,
+      dayOfWeek: 2,
+      weekNumber: 1,
+      sortOrder: 1
+    ),
+    PlanDay(
+      id: lowerID,
+      planID: fixture.tree.plan.id,
+      dayOfWeek: 2,
+      weekNumber: 1,
+      sortOrder: 1
+    ),
+    PlanDay(
+      id: firstID,
+      planID: fixture.tree.plan.id,
+      dayOfWeek: 1,
+      weekNumber: 1,
+      sortOrder: 0
+    ),
+  ]
+  let tree = TrainingPlanTree(
+    plan: fixture.tree.plan,
+    days: days,
+    exercises: [],
+    sets: []
+  )
+
+  let projection = StudentPlanProjection.project(tree: tree, catalog: [], weekIndex: 1)
+
+  #expect(projection.days.map(\.id) == [firstID, lowerID, higherID, lastID])
+}
+
 // swiftlint:disable:next function_body_length
 @Test func projectionCarriesCoachNoteOntoPrescribedSet() throws {
   let planID = UUID()

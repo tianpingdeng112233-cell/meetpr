@@ -273,26 +273,6 @@
     .preferredColorScheme(.light)
   }
 
-  #Preview("W4 · Postpone · Dark") {
-    PostponeConfirmationOverlay(
-      tomorrow: W4PreviewFixtures.date,
-      isConfirming: false,
-      onCancel: {},
-      onConfirm: {}
-    )
-    .preferredColorScheme(.dark)
-  }
-
-  #Preview("W4 · Postpone · Light") {
-    PostponeConfirmationOverlay(
-      tomorrow: W4PreviewFixtures.date,
-      isConfirming: false,
-      onCancel: {},
-      onConfirm: {}
-    )
-    .preferredColorScheme(.light)
-  }
-
   #Preview("W4 · Feedback · Unread · Dark") {
     W4FeedbackPreview(scenario: .unread)
       .preferredColorScheme(.dark)

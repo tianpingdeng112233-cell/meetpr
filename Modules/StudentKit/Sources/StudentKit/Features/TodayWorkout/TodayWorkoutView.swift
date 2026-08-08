@@ -14,23 +14,26 @@ public struct TodayWorkoutView: View {
   private let logs: any StudentTrainingLogRepository
   private let coachRPEReconciler: E1RMCoachRPEReconciler?
   private let planHandoff: TodayWorkoutPlanHandoff?
+  private let initialDate: Date?
   private let jumpToTodayToken: Int
   private let uploadFailureDestination: UploadFailureDestination?
   private let uploadFailureNavigationToken: Int
-  private let autoStartToken: Int
   private let isLaunchTargetHidden: Bool
+  private let heroFrameRequestToken: Int
   private let launchHeroRevealToken: Int
   private let planRevision: Int
+  private let planProjectionUpdate: StudentPlanView?
   private var workoutStartedAt: Binding<Date?>
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
+  private let onPlanChanged: (StudentPlanView) -> Void
   private let onHeroFrameChange: (CGRect) -> Void
   private let onReturnToToday: () -> Void
 
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
-  @State private var selectedDate: Date
+  @State private var selectedDayID: UUID?
   @State private var completionPhase: WorkoutCompletionFlowPhase?
   @State private var editing: EditingTarget?
   @State private var directCameraTarget: DirectCameraTarget?
@@ -46,7 +49,6 @@ public struct TodayWorkoutView: View {
   @State private var setRefEntryErrorMessage: String?
   @State private var reviewCompleted = false
   @State private var started = false
-  @State private var autoStartGate = TodayWorkoutAutoStartGate()
   @State private var collapsedExercises: [UUID: Bool] = [:]
   @Namespace private var heroNamespace
 
@@ -67,13 +69,15 @@ public struct TodayWorkoutView: View {
     jumpToTodayToken: Int = 0,
     uploadFailureDestination: UploadFailureDestination? = nil,
     uploadFailureNavigationToken: Int = 0,
-    autoStartToken: Int = 0,
     isLaunchTargetHidden: Bool = false,
+    heroFrameRequestToken: Int = 0,
     launchHeroRevealToken: Int = 0,
     planRevision: Int = 0,
+    planProjectionUpdate: StudentPlanView? = nil,
     workoutStartedAt: Binding<Date?> = .constant(nil),
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
+    onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
     onHeroFrameChange: @escaping (CGRect) -> Void = { _ in },
     onReturnToToday: @escaping () -> Void = {}
   ) {
@@ -92,23 +96,22 @@ public struct TodayWorkoutView: View {
       self.coachRPEReconciler = nil
     }
     self.planHandoff = planHandoff
+    self.initialDate = date
     self.jumpToTodayToken = jumpToTodayToken
     self.uploadFailureDestination = uploadFailureDestination
     self.uploadFailureNavigationToken = uploadFailureNavigationToken
-    self.autoStartToken = autoStartToken
     self.isLaunchTargetHidden = isLaunchTargetHidden
+    self.heroFrameRequestToken = heroFrameRequestToken
     self.launchHeroRevealToken = launchHeroRevealToken
     self.planRevision = planRevision
+    self.planProjectionUpdate = planProjectionUpdate
     self.workoutStartedAt = workoutStartedAt
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
+    self.onPlanChanged = onPlanChanged
     self.onHeroFrameChange = onHeroFrameChange
     self.onReturnToToday = onReturnToToday
-    self._selectedDate = State(
-      initialValue: TodayWorkoutSelectionResolver.initialSelection(
-        explicitDate: date
-      )
-    )
+    self._selectedDayID = State(initialValue: planHandoff?.dayID)
     self._viewModel = State(
       initialValue: TodayWorkoutViewModel(
         plans: plans,
@@ -151,8 +154,7 @@ public struct TodayWorkoutView: View {
       TodayWorkoutScreen(
         content: screenContent,
         weekCode: weekCode,
-        selectedDate: selectedDate,
-        isEditable: isEditable,
+        dayState: selectedDayState,
         reviewCompleted: reviewCompleted,
         unreadCount: notifications?.totalUnreadCount ?? 0,
         showsNotifications: notifications != nil,
@@ -161,17 +163,16 @@ public struct TodayWorkoutView: View {
         isPreparingAskCoach: isPreparingSetRefPicker,
         namespace: heroNamespace,
         isLaunchTargetHidden: isLaunchTargetHidden,
+        heroFrameRequestToken: heroFrameRequestToken,
         launchHeroRevealToken: launchHeroRevealToken,
         collapsedExercises: $collapsedExercises,
+        sequenceContent: TrainingCurrentWeekSequenceView(days: viewModel.planDays),
         calendarContent: TrainingCalendarView(
-          studentID: studentID,
-          selectedDate: $selectedDate,
-          plans: plans,
-          logs: logs,
-          planRevision: planRevision
+          selectedDayID: $selectedDayID,
+          days: viewModel.planDays
         ),
         onRefresh: {
-          Task { await loadWorkout(for: selectedDate) }
+          Task { await loadWorkout(for: selectedDayID) }
         },
         onReadiness: {
           showingReadinessSheet = true
@@ -190,7 +191,16 @@ public struct TodayWorkoutView: View {
         onEdit: openEditor,
         onVideoAction: openVideoAction,
         onComplete: {
-          completionPhase = .celebration
+          Task {
+            if await viewModel.completeCurrentDay() {
+              completionPhase = .celebration
+            }
+          }
+        },
+        onUndoCompletion: {
+          Task {
+            _ = await viewModel.undoCurrentDayCompletion()
+          }
         },
         onShowReview: {
           completionPhase = .review
@@ -338,67 +348,74 @@ public struct TodayWorkoutView: View {
       let isFirstLoad = viewModel.state == .idle
       if isFirstLoad {
         await loadWorkout(
-          for: selectedDate,
-          preloadedPlan: handedOffPlan(for: selectedDate)
+          for: selectedDayID,
+          preloadedPlan: handedOffPlan(for: selectedDayID)
         )
+        resolveInitialSelectionIfNeeded()
       }
-      // A CTA tap can mount this view with the token already advanced, in
-      // which case onChange(of: autoStartToken) never fires — hand the gate
-      // the current token before consuming, or a cold-start CTA launch
-      // strands the morph waiting for a recording hero that never comes.
-      if autoStartToken > 0 {
-        autoStartGate.receive(token: autoStartToken)
-      }
-      consumePendingAutoStartIfReady()
       await videoViewModel.start(studentID: studentID)
       if uploadFailureNavigationToken > 0 {
         openUploadFailureDestination()
       }
     }
-    .onChange(of: selectedDate) { _, newDate in
+    .onChange(of: selectedDayID) { _, newDayID in
       editing = nil
       started = false
       collapsedExercises = [:]
       Task {
         await loadWorkout(
-          for: newDate,
-          preloadedPlan: handedOffPlan(for: newDate)
+          for: newDayID,
+          preloadedPlan: handedOffPlan(for: newDayID)
         )
-        consumePendingAutoStartIfReady()
       }
     }
     .onChange(of: planHandoff?.id) { _, _ in
-      guard let plan = handedOffPlan(for: selectedDate) else { return }
+      guard let plan = handedOffPlan(for: selectedDayID) else { return }
       Task {
-        await loadWorkout(for: selectedDate, preloadedPlan: plan)
-        consumePendingAutoStartIfReady()
+        await loadWorkout(for: selectedDayID, preloadedPlan: plan)
       }
     }
     .onChange(of: jumpToTodayToken) { _, _ in
-      if let jumpTarget = TodayWorkoutSelectionResolver.jumpToTodaySelection(
-        from: selectedDate
+      // External routes clear only the ephemeral in-process start flag. The
+      // presentation still resumes recording when real logs already exist;
+      // zero-log days alone return to the explicit pre-start state.
+      started = false
+      if let jumpTarget = TodayWorkoutSelectionResolver.jumpToCurrentSelection(
+        from: selectedDayID,
+        days: viewModel.planDays
       ) {
-        selectedDate = jumpTarget
+        selectedDayID = jumpTarget
       }
     }
     .onChange(of: uploadFailureNavigationToken) { _, token in
       guard token > 0 else { return }
       openUploadFailureDestination()
     }
-    .onChange(of: autoStartToken) { _, token in
-      guard token > 0 else { return }
-      autoStartGate.receive(token: token)
-      consumePendingAutoStartIfReady()
-    }
     .onChange(of: planRevision) { _, _ in
       editing = nil
-      Task { await loadWorkout(for: selectedDate) }
+      Task { await loadWorkout(for: selectedDayID) }
+    }
+    .onChange(of: planProjectionUpdate) { _, plan in
+      guard let plan else { return }
+      viewModel.applyPlanProjection(plan)
+    }
+    .onChange(of: viewModel.completionRevision) { _, _ in
+      if let plan = viewModel.planProjection {
+        onPlanChanged(plan)
+      }
     }
   }
 
   private func openUploadFailureDestination() {
     guard let destination = uploadFailureDestination else { return }
-    selectedDate = Calendar.current.startOfDay(for: destination.trainingDate)
+    selectedDayID =
+      viewModel.planDays.first {
+        PlanCalendarDayIdentity.matches(
+          planDate: $0.scheduledDate,
+          selectedDate: destination.trainingDate,
+          selectedCalendar: .current
+        )
+      }?.id
     retryTargetSetLogID = destination.setLogID
   }
 
@@ -419,7 +436,7 @@ public struct TodayWorkoutView: View {
         initialPhase: phase,
         onFinish: {
           markReviewCompleted(
-            for: workout.day.date,
+            for: workout.day.scheduledDate,
             setCount: workout.drafts.count
           )
           onReturnToToday()
@@ -430,10 +447,12 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private var screenContent: TodayWorkoutScreen<TrainingCalendarView>.Content {
+  private var screenContent:
+    TodayWorkoutScreen<TrainingCurrentWeekSequenceView, TrainingCalendarView>.Content
+  {
     switch viewModel.state {
     case .idle, .loading:
-      if let workout = handedOffWorkout(for: selectedDate) {
+      if let workout = handedOffWorkout(for: selectedDayID) {
         .workout(
           TodayWorkoutPresentation(
             day: workout.day,
@@ -450,21 +469,15 @@ public struct TodayWorkoutView: View {
     // during every persist. Keeping one structural identity prevents SwiftUI
     // from dismissing and re-presenting SetEntrySheet with reset fields.
     case .loaded(let day, let drafts), .recording(let day, let drafts, _):
-      if TodayWorkoutContentPolicy.isRestDay(day) {
-        .rest
-      } else {
-        .workout(
-          TodayWorkoutPresentation(
-            day: day,
-            drafts: drafts,
-            references: viewModel.exerciseReferences,
-            videoStates: videoStates(for: drafts),
-            started: started
-          )
+      .workout(
+        TodayWorkoutPresentation(
+          day: day,
+          drafts: drafts,
+          references: viewModel.exerciseReferences,
+          videoStates: videoStates(for: drafts),
+          started: started
         )
-      }
-    case .rest:
-      .rest
+      )
     case .noPlan:
       .noPlan
     case .error(let message):
@@ -477,8 +490,8 @@ public struct TodayWorkoutView: View {
     case .loaded(let day, let drafts), .recording(let day, let drafts, _):
       (day, drafts)
     case .idle, .loading:
-      handedOffWorkout(for: selectedDate)
-    case .noPlan, .rest, .error:
+      handedOffWorkout(for: selectedDayID)
+    case .noPlan, .error:
       nil
     }
   }
@@ -488,7 +501,30 @@ public struct TodayWorkoutView: View {
   }
 
   private var isEditable: Bool {
-    WorkoutDatePolicy.isEditable(currentDay?.date ?? selectedDate)
+    guard let currentDay else { return false }
+    return currentDay.id == StudentPlanSequence(days: viewModel.planDays).cursorDay?.id
+  }
+
+  private var selectedDayState: TodayWorkoutDayState {
+    guard let currentDay else { return .current }
+    if currentDay.completedAt != nil { return .completed(canUndo: canUndoCurrentDay) }
+    return isEditable ? .current : .upcoming(previousDay: previousSequenceDay)
+  }
+
+  private var canUndoCurrentDay: Bool {
+    guard let completedAt = currentDay?.completedAt else { return false }
+    return WorkoutDatePolicy.gymDayRange(containing: Date()).contains(completedAt)
+  }
+
+  private var previousSequenceDay: StudentPlanDay? {
+    let days = StudentPlanSequence(days: viewModel.planDays).orderedDays
+    guard let currentDay, let index = days.firstIndex(where: { $0.id == currentDay.id }), index > 0
+    else { return nil }
+    return days[index - 1]
+  }
+
+  private var selectedTrainingDate: Date {
+    currentDay?.scheduledDate ?? initialDate ?? Date()
   }
 
   private var weekCode: String {
@@ -523,7 +559,7 @@ public struct TodayWorkoutView: View {
       setNumber: target.setNumber,
       viewModel: viewModel,
       studentID: studentID,
-      trainingDate: selectedDate,
+      trainingDate: selectedTrainingDate,
       videoViewModel: videoViewModel,
       scrollToVideo: target.scrollToVideo
     )
@@ -632,7 +668,7 @@ public struct TodayWorkoutView: View {
       sourceURL: sourceURL,
       setLogID: setLogID,
       studentID: studentID,
-      trainingDate: selectedDate
+      trainingDate: selectedTrainingDate
     )
     preparingVideoSetID = nil
   }
@@ -710,32 +746,37 @@ public struct TodayWorkoutView: View {
   }
 
   private func loadWorkout(
-    for date: Date,
+    for dayID: UUID?,
     preloadedPlan: StudentPlanView? = nil
   ) async {
     await viewModel.load(
-      date: date,
+      dayID: dayID,
       studentID: studentID,
       preloadedPlan: preloadedPlan
     )
-    if Calendar.current.isDate(date, inSameDayAs: selectedDate) {
-      reviewCompleted = reviewStore.didCompleteReview(studentId: studentID, date: date)
+    if selectedDayID == nil || !viewModel.planDays.contains(where: { $0.id == selectedDayID }) {
+      selectedDayID = currentDay?.id
     }
-    await refreshReadinessStatus(for: date)
+    if let currentDay, currentDay.id == selectedDayID {
+      reviewCompleted = reviewStore.didCompleteReview(
+        studentId: studentID,
+        date: currentDay.scheduledDate
+      )
+    }
+    await refreshReadinessStatus()
     guard let coachRPEReconciler,
       let reconciliation = await viewModel.reconcileCoachRPE(
         using: coachRPEReconciler,
         studentID: studentID
       ),
       reconciliation.didReconcile,
-      Calendar.current.isDate(date, inSameDayAs: selectedDate)
+      currentDay?.id == selectedDayID
     else { return }
-    await viewModel.load(date: date, studentID: studentID)
+    await viewModel.load(dayID: dayID, studentID: studentID)
   }
 
-  private func handedOffPlan(for date: Date) -> StudentPlanView? {
-    guard let planHandoff,
-      Calendar.current.isDate(planHandoff.date, inSameDayAs: date)
+  private func handedOffPlan(for dayID: UUID?) -> StudentPlanView? {
+    guard let planHandoff, planHandoff.dayID == dayID
     else {
       return nil
     }
@@ -743,16 +784,10 @@ public struct TodayWorkoutView: View {
   }
 
   private func handedOffWorkout(
-    for date: Date
+    for dayID: UUID?
   ) -> (day: StudentPlanDay, drafts: [TodayWorkoutViewModel.SetRowDraft])? {
-    guard let plan = handedOffPlan(for: date),
-      let day = plan.days.first(where: {
-        PlanCalendarDayIdentity.matches(
-          planDate: $0.date,
-          selectedDate: date,
-          selectedCalendar: .current
-        )
-      })
+    guard let dayID, let plan = handedOffPlan(for: dayID),
+      let day = plan.days.first(where: { $0.id == dayID })
     else {
       return nil
     }
@@ -765,24 +800,21 @@ public struct TodayWorkoutView: View {
     )
   }
 
-  private func consumePendingAutoStartIfReady() {
-    let targetDateIsLoaded =
-      WorkoutDatePolicy.isEditable(selectedDate)
-      && currentWorkout.map {
-        PlanCalendarDayIdentity.matches(
-          planDate: $0.day.date,
-          selectedDate: selectedDate,
-          selectedCalendar: .current
-        )
-      } == true
-    if autoStartGate.consumeIfReady(isTargetDateLoaded: targetDateIsLoaded) {
-      started = true
-    }
+  private func refreshReadinessStatus() async {
+    guard isEditable else { return }
+    await readinessViewModel.load(studentId: studentID)
   }
 
-  private func refreshReadinessStatus(for date: Date) async {
-    guard WorkoutDatePolicy.isEditable(date) else { return }
-    await readinessViewModel.load(studentId: studentID)
+  private func resolveInitialSelectionIfNeeded() {
+    guard let initialDate, planHandoff == nil else { return }
+    selectedDayID =
+      viewModel.planDays.first {
+        PlanCalendarDayIdentity.matches(
+          planDate: $0.scheduledDate,
+          selectedDate: initialDate,
+          selectedCalendar: .current
+        )
+      }?.id ?? selectedDayID
   }
 }
 
@@ -793,8 +825,7 @@ enum TodayWorkoutTitleResolver {
     onboarding: OnboardingProfile?
   ) -> String {
     guard let day else { return "锻炼" }
-    let dayNumber = mondayOffset(day.date) + 1
-    let weekday = planContext.map { "W\($0.weekIndex)D\(dayNumber)" } ?? "今日"
+    let weekday = "W\(day.weekNumber)D\(day.dayOfWeek)"
     let family = day.exercises.lazy.compactMap {
       resolveCompetitionFamily(exercise: $0.exercise, onboarding: onboarding)
     }.first
@@ -802,10 +833,6 @@ enum TodayWorkoutTitleResolver {
     return "\(weekday) · \(lift)"
   }
 
-  private static func mondayOffset(_ date: Date) -> Int {
-    let weekday = Calendar.current.component(.weekday, from: date)
-    return (weekday + 5) % 7
-  }
 }
 
 @available(iOS 17.0, macOS 14.0, *)

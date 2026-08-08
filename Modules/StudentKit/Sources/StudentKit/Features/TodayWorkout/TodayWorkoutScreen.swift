@@ -1,21 +1,42 @@
 // swiftlint:disable file_length
+import CoreModels
 import DesignSystem
 import SwiftUI
 
+struct TodayWorkoutHeroFrameMeasurement: Equatable {
+  let heroMode: TodayWorkoutPresentation.HeroMode
+  let requestToken: Int
+  let frame: CGRect
+
+  var publishableFrame: CGRect? {
+    guard frame.width > 0, frame.height > 0 else { return nil }
+    return frame
+  }
+}
+
+enum TodayWorkoutDayState: Equatable {
+  case completed(canUndo: Bool)
+  case current
+  case upcoming(previousDay: StudentPlanDay?)
+
+  var isEditable: Bool {
+    if case .current = self { return true }
+    return false
+  }
+}
+
 @available(iOS 17.0, macOS 14.0, *)
-struct TodayWorkoutScreen<CalendarContent: View>: View {
+struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   enum Content {
     case loading
     case workout(TodayWorkoutPresentation)
     case noPlan
-    case rest
     case error(String)
   }
 
   let content: Content
   let weekCode: String
-  let selectedDate: Date
-  let isEditable: Bool
+  let dayState: TodayWorkoutDayState
   let reviewCompleted: Bool
   let unreadCount: Int
   let showsNotifications: Bool
@@ -24,8 +45,10 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let isPreparingAskCoach: Bool
   let namespace: Namespace.ID
   let isLaunchTargetHidden: Bool
+  let heroFrameRequestToken: Int
   let launchHeroRevealToken: Int
   @Binding var collapsedExercises: [UUID: Bool]
+  let sequenceContent: SequenceContent
   let calendarContent: CalendarContent
   let onRefresh: () -> Void
   let onReadiness: () -> Void
@@ -37,27 +60,11 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
   let onComplete: () -> Void
+  let onUndoCompletion: () -> Void
   let onShowReview: () -> Void
 
-  @State private var calendarScrollState = TrainingCalendarScrollState(isOpen: true)
-  @State private var contentHeight: CGFloat = 0
-  @State private var viewportHeight: CGFloat = 0
-
-  @ViewBuilder
   var body: some View {
-    if #available(iOS 18.0, macOS 15.0, *) {
-      geometryTrackedScrollView
-        .trainingCalendarCollapsedOverlay(
-          isOpen: calendarScrollState.isOpen,
-          date: selectedDate
-        )
-    } else {
-      legacyGeometryTrackedScrollView
-        .trainingCalendarCollapsedOverlay(
-          isOpen: calendarScrollState.isOpen,
-          date: selectedDate
-        )
-    }
+    trainingScrollView
   }
 
   private var trainingScrollView: some View {
@@ -79,95 +86,24 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
         onNotifications: onNotifications
       )
 
-      // Closed state must be mutually exclusive with the full calendar
-      // (mockup trainCalOpen/Closed). The layout slot is retained so the
-      // scroll offset never feeds back into the open/close state machine —
-      // SwiftUI has no browser-style scroll anchoring; the true in-flow
-      // collapse with offset compensation is a W5 motion item.
-      calendarContent
-        .opacity(calendarScrollState.isOpen ? 1 : 0)
-        .allowsHitTesting(calendarScrollState.isOpen)
-        .accessibilityElement(
-          children: calendarScrollState.isOpen ? .contain : .ignore
-        )
-        .accessibilityHidden(!calendarScrollState.isOpen)
-      // The legend is stateless, so the collapsed state removes it outright —
-      // runtime snapshots collect static text past accessibility hiding.
-      if calendarScrollState.isOpen {
-        TrainingCalendarLegend()
-      }
+      sequenceContent
       screenContent
+      calendarContent
     }
     .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.point6)
     .padding(.bottom, MeetPRSpacing.point28)
   }
 
-  @available(iOS 18.0, macOS 15.0, *)
-  private var geometryTrackedScrollView: some View {
-    trainingScrollView
-      .onScrollGeometryChange(for: TrainingScrollMetrics.self) { geometry in
-        TrainingScrollMetrics(
-          offset: max(0, geometry.contentOffset.y + geometry.contentInsets.top),
-          contentSlack: max(0, geometry.contentSize.height - geometry.containerSize.height)
-        )
-      } action: { _, metrics in
-        updateCalendarScrollState(using: metrics)
-      }
-  }
-
-  private var legacyGeometryTrackedScrollView: some View {
-    GeometryReader { viewport in
-      ScrollView {
-        trainingScrollContent
-          .background {
-            GeometryReader { contentProxy in
-              Color.clear.preference(
-                key: TrainingContentHeightKey.self,
-                value: contentProxy.size.height
-              )
-            }
-          }
-          .background {
-            GeometryReader { offsetProxy in
-              Color.clear.preference(
-                key: TrainingScrollOffsetKey.self,
-                value: offsetProxy.frame(in: .named("training-scroll")).minY
-              )
-            }
-          }
-      }
-      .scrollIndicators(.hidden)
-      .background(Color.MeetPR.bgBase)
-      .coordinateSpace(name: "training-scroll")
-      .onAppear { viewportHeight = viewport.size.height }
-      .onChange(of: viewport.size.height) { _, height in viewportHeight = height }
-      .onPreferenceChange(TrainingContentHeightKey.self) { contentHeight = $0 }
-      .onPreferenceChange(TrainingScrollOffsetKey.self) { minimumY in
-        updateCalendarScrollState(
-          using: TrainingScrollMetrics(
-            offset: max(0, -minimumY),
-            contentSlack: max(0, contentHeight - viewportHeight)
-          )
-        )
-      }
-    }
-  }
-
-  private func updateCalendarScrollState(using metrics: TrainingScrollMetrics) {
-    let next = calendarScrollState.updating(
-      offset: metrics.offset,
-      contentSlack: metrics.contentSlack
-    )
-    if next != calendarScrollState {
-      calendarScrollState = next
-    }
-  }
-
   @ViewBuilder
   private var screenContent: some View {
-    if !isEditable {
-      TodayWorkoutReadOnlyNotice(date: selectedDate)
+    // The design's training tab shows no state pill for the cursor day — the
+    // whole screen already reads "current". The notice only earns its row on
+    // completed (undo entry) and upcoming (preview) days.
+    if case .current = dayState {
+      EmptyView()
+    } else {
+      TodayWorkoutSequenceNotice(state: dayState, onUndo: onUndoCompletion)
     }
 
     switch content {
@@ -177,9 +113,10 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
     case .workout(let presentation):
       TodayWorkoutHero(
         presentation: presentation,
-        isEditable: isEditable,
+        isEditable: dayState.isEditable,
         namespace: namespace,
         isLaunchTargetHidden: isLaunchTargetHidden,
+        frameRequestToken: heroFrameRequestToken,
         launchHeroRevealToken: launchHeroRevealToken,
         onFrameChange: onHeroFrameChange,
         onStart: onStart,
@@ -198,14 +135,9 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
           onVideoAction: onVideoAction
         )
 
-        if !presentation.progress.allDone {
-          TodayWorkoutRemainingPill(text: presentation.progress.remainingText)
-        }
       }
 
       completionContent(presentation)
-    case .rest:
-      TodayWorkoutRestCard()
     case .noPlan:
       TodayWorkoutPlanUnavailableCard(
         coachName: coachName,
@@ -223,29 +155,24 @@ struct TodayWorkoutScreen<CalendarContent: View>: View {
 
   @ViewBuilder
   private func completionContent(_ presentation: TodayWorkoutPresentation) -> some View {
-    if presentation.progress.allDone {
-      // The hero action row is gone once every set is logged, so the entry has to land here —
-      // finishing a session is exactly when a student wants to ask. Full width rather than the
-      // hero's square icon: there is no camera control to sit beside.
-      if showsAskCoach {
-        TodayWorkoutAskCoachWideButton(
-          isPreparing: isPreparingAskCoach,
-          action: onAskCoach
-        )
+    if case .completed = dayState {
+      DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.rows).count) {
+        onShowReview()
       }
-
-      if reviewCompleted || !isEditable {
-        DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.rows).count) {
-          onShowReview()
-        }
-      } else {
-        HoldToCompleteButton(action: onComplete)
+    } else if dayState.isEditable, presentation.allowsManualCompletion {
+      // Ask-coach moved to the hero card's top-right corner once the action
+      // row is gone (David 2026-08-08) — nothing sits above the hold button.
+      if !presentation.progress.allDone {
+        TodayWorkoutRemainingPill(text: presentation.progress.remainingText)
       }
+      HoldToCompleteButton(action: onComplete)
     }
   }
 }
 
-private struct TodayWorkoutAskCoachWideButton: View {
+// Hero-card corner variant: a compact「问教练」text chip instead of the
+// action row's square icon (David 2026-08-08 真机走查).
+private struct TodayWorkoutAskCoachCornerButton: View {
   let isPreparing: Bool
   let action: () -> Void
 
@@ -257,58 +184,24 @@ private struct TodayWorkoutAskCoachWideButton: View {
             .controlSize(.small)
             .tint(Color.MeetPR.textTertiary)
         } else {
-          Label(StudentStrings.askCoach, systemImage: "bubble.left")
+          Text(StudentStrings.askCoach)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
         }
       }
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
-      .foregroundStyle(Color.MeetPR.textPrimary)
-      .frame(maxWidth: .infinity)
+      .padding(.horizontal, MeetPRSpacing.point13)
+      .frame(minHeight: 36)
+      .background(Color.MeetPR.surfaceCard)
+      .overlay {
+        Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+      }
+      .clipShape(.capsule)
+      // 36pt visual capsule, 44pt hit target (MeetPRSpacing.minimumHitTarget).
       .frame(minHeight: MeetPRSpacing.minimumHitTarget)
-      .background(Color.MeetPR.surfaceCard)
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.control)
-          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
-      }
-      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+      .contentShape(.rect)
     }
     .buttonStyle(.plain)
     .disabled(isPreparing)
-    .accessibilityIdentifier("todayWorkout.askCoach")
-  }
-}
-
-private struct TodayWorkoutAskCoachButton: View {
-  let isPreparing: Bool
-  let action: () -> Void
-
-  var body: some View {
-    // Square icon button sized to match the camera control beside it. It lives in the hero
-    // action row rather than at the foot of the page: the rest timer pins itself to the bottom
-    // the moment a set is logged, and that is exactly when a student wants to ask — the old
-    // placement put the entry underneath the bar.
-    Button(action: action) {
-      Group {
-        if isPreparing {
-          ProgressView()
-            .controlSize(.small)
-            .tint(Color.MeetPR.textTertiary)
-        } else {
-          Image(systemName: "bubble.left")
-            .font(.system(size: 20, weight: .medium))
-            .foregroundStyle(Color.MeetPR.textTertiary)
-        }
-      }
-      .frame(width: 52, height: 52)
-      .background(Color.MeetPR.surfaceCard)
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.control)
-          .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
-      }
-      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-    }
-    .buttonStyle(.plain)
-    .disabled(isPreparing)
-    .accessibilityLabel(StudentStrings.askCoach)
     .accessibilityIdentifier("todayWorkout.askCoach")
   }
 }
@@ -519,12 +412,12 @@ private struct TrainingHeaderButton<Icon: View>: View {
   }
 }
 
-// swiftlint:disable:next type_body_length
 private struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
   let namespace: Namespace.ID
   let isLaunchTargetHidden: Bool
+  let frameRequestToken: Int
   let launchHeroRevealToken: Int
   let onFrameChange: (CGRect) -> Void
   let onStart: () -> Void
@@ -578,68 +471,25 @@ private struct TodayWorkoutHero: View {
     }
     .matchedGeometryEffect(id: "today-workout-hero", in: namespace)
     .opacity(isLaunchTargetHidden ? 0 : 1)
-    .onGeometryChange(for: CGRect.self) { proxy in
-      proxy.frame(in: .global)
-    } action: { frame in
-      // The dashboard launch morph targets the auto-start recording hero.
-      // Never publish the taller pre-start list hero as a candidate frame.
-      if presentation.heroMode == .recording { onFrameChange(frame) }
+    .onGeometryChange(for: TodayWorkoutHeroFrameMeasurement.self) { proxy in
+      TodayWorkoutHeroFrameMeasurement(
+        heroMode: presentation.heroMode,
+        requestToken: frameRequestToken,
+        frame: proxy.frame(in: .global)
+      )
+    } action: { measurement in
+      // Mode and request token participate in the measured value so the
+      // current hero republishes even when its bounds match an older hero.
+      if let frame = measurement.publishableFrame {
+        onFrameChange(frame)
+      }
     }
   }
 
   private var listHero: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-      Text("今日训练")
-        .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
-        .foregroundStyle(Color.MeetPR.textPrimary)
-        .padding(.bottom, MeetPRSpacing.space1)
-
-      Text(
-        "共 \(presentation.exercises.count) 个动作 · "
-          + "\(presentation.exercises.flatMap(\.rows).count) 组"
-      )
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-      .foregroundStyle(Color.MeetPR.textTertiary)
-      .padding(.bottom, MeetPRSpacing.point13)
-
-      VStack(spacing: MeetPRSpacing.space2) {
-        ForEach(presentation.exercises) { exercise in
-          let first = exercise.rows.first?.record
-          HStack(spacing: MeetPRSpacing.point11) {
-            Text((exercise.stableIndex + 1).formatted())
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
-              .foregroundStyle(Color.MeetPR.goldText)
-              .frame(width: 22, height: 22)
-              .background(Color.MeetPR.goldRGB.opacity(0.12))
-              .clipShape(.rect(cornerRadius: MeetPRSpacing.point7))
-
-            Text(exercise.name)
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
-              .foregroundStyle(Color.MeetPR.textPrimary)
-
-            Spacer(minLength: MeetPRSpacing.space2)
-
-            if let first {
-              let weight = first.weight.map { "\(numberText($0))kg" } ?? "—"
-              Text(
-                "\(weight) × \(first.reps) · "
-                  + "\(exercise.rows.count) 组"
-              )
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-              .foregroundStyle(Color.MeetPR.textTertiary)
-            }
-          }
-          .padding(.horizontal, MeetPRSpacing.point13)
-          .padding(.vertical, MeetPRSpacing.point11)
-          .background(Color.MeetPR.surfaceCard)
-          .overlay {
-            RoundedRectangle(cornerRadius: MeetPRRadius.control)
-              .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
-          }
-          .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-        }
-      }
-      .padding(.bottom, MeetPRSpacing.point14)
+      TodayWorkoutActionSummary(presentation: presentation)
+        .padding(.bottom, MeetPRSpacing.point14)
 
       if isEditable {
         GoldCTA(
@@ -658,12 +508,31 @@ private struct TodayWorkoutHero: View {
     if let row = presentation.currentRow,
       let exercise = presentation.exercises.first(where: { $0.id == row.draft.planExerciseID })
     {
+      // The design's recording state shows the active set card and the
+      // per-exercise set table only — the「今日训练」summary card belongs to
+      // the pre-start list state and never coexists with the active card
+      // (David 2026-08-07 真机走查).
       VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-        Text(exercise.name)
-          .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .padding(.bottom, MeetPRSpacing.point3)
-          .launchHeroRise(index: 0, trigger: launchHeroRevealToken)
+        HStack(alignment: .top, spacing: MeetPRSpacing.space2) {
+          Text(exercise.name)
+            .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+
+          Spacer(minLength: MeetPRSpacing.space2)
+
+          // The one and only ask-coach entry: a「问教练」chip pinned to the
+          // card's top-right corner for the whole recording session — the
+          // action row's square icon and the old wide button are both gone
+          // (David 2026-08-08 真机走查三连改).
+          if showsAskCoach {
+            TodayWorkoutAskCoachCornerButton(
+              isPreparing: isPreparingAskCoach,
+              action: onAskCoach
+            )
+          }
+        }
+        .padding(.bottom, MeetPRSpacing.point3)
+        .launchHeroRise(index: 0, trigger: launchHeroRevealToken)
 
         Text(exercise.reference)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
@@ -788,19 +657,92 @@ private struct TodayWorkoutHero: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("记录本组视频")
-
-            if showsAskCoach {
-              TodayWorkoutAskCoachButton(
-                isPreparing: isPreparingAskCoach,
-                action: onAskCoach
-              )
-            }
           }
           .padding(.top, MeetPRSpacing.point13)
           .launchHeroRise(index: 6, trigger: launchHeroRevealToken)
         }
       }
     }
+  }
+
+  private func numberText(_ value: Double) -> String {
+    value.formatted(.number.precision(.fractionLength(0...2)))
+  }
+}
+
+// Pre-start list state only — the recording state never shows this card
+// (David 2026-08-07: the active set card and the summary must not coexist).
+private struct TodayWorkoutActionSummary: View {
+  let presentation: TodayWorkoutPresentation
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
+      TodayWorkoutActionSummaryHeader(presentation: presentation)
+
+      VStack(spacing: MeetPRSpacing.space2) {
+        ForEach(presentation.exercises) { exercise in
+          TodayWorkoutActionSummaryRow(exercise: exercise)
+        }
+      }
+    }
+  }
+}
+
+private struct TodayWorkoutActionSummaryHeader: View {
+  let presentation: TodayWorkoutPresentation
+
+  var body: some View {
+    HStack(alignment: .firstTextBaseline) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+        Text("今日训练")
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(
+          "共 \(presentation.exercises.count) 个动作 · "
+            + "\(presentation.exercises.flatMap(\.rows).count) 组"
+        )
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
+      }
+
+      Spacer()
+    }
+  }
+}
+
+private struct TodayWorkoutActionSummaryRow: View {
+  let exercise: TodayWorkoutPresentation.Exercise
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.point11) {
+      Text((exercise.stableIndex + 1).formatted())
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+        .foregroundStyle(Color.MeetPR.goldText)
+        .frame(width: 22, height: 22)
+        .background(Color.MeetPR.goldRGB.opacity(0.12))
+        .clipShape(.rect(cornerRadius: MeetPRSpacing.point7))
+
+      Text(exercise.name)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+
+      Spacer(minLength: MeetPRSpacing.space2)
+
+      if let first = exercise.rows.first?.record {
+        let weight = first.weight.map { numberText($0) + "kg" } ?? "—"
+        Text("\(weight) × \(first.reps) · \(exercise.rows.count) 组")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
+      }
+    }
+    .padding(.horizontal, MeetPRSpacing.point13)
+    .padding(.vertical, MeetPRSpacing.point11)
+    .background(Color.MeetPR.surfaceCard)
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.control)
+        .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
+    }
+    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
 
   private func numberText(_ value: Double) -> String {
@@ -897,7 +839,10 @@ private struct HoldToCompleteButton: View {
   @State private var progress = 0.0
   @State private var isPressing = false
   @State private var hapticStep = 0
-  @State private var hapticTask: Task<Void, Never>?
+  @State private var cancelFeedbackStep = 0
+  @State private var successFeedbackStep = 0
+  @State private var holdTask: Task<Void, Never>?
+  @State private var gestureState = HoldToCompleteGestureState()
 
   var body: some View {
     ZStack {
@@ -935,71 +880,131 @@ private struct HoldToCompleteButton: View {
     .meetPRShimmer(true)
     .scaleEffect(isPressing ? 0.96 : 1)
     .animation(reduceMotion ? nil : MeetPRMotion.press, value: isPressing)
-    .onLongPressGesture(
-      minimumDuration: reduceMotion ? 0 : MeetPRMotion.durationHoldComplete,
-      maximumDistance: 50,
-      perform: complete,
-      onPressingChanged: pressingChanged
+    .contentShape(.capsule)
+    .highPriorityGesture(
+      DragGesture(minimumDistance: 0)
+        .onChanged(handleDragChanged)
+        .onEnded { _ in apply(gestureState.dragEnded()) }
     )
     .sensoryFeedback(.impact(weight: .light), trigger: hapticStep)
+    .sensoryFeedback(.warning, trigger: cancelFeedbackStep)
+    .sensoryFeedback(.success, trigger: successFeedbackStep)
     .accessibilityElement()
     .accessibilityLabel("长按完成今日训练")
     .accessibilityAddTraits(.isButton)
-    .accessibilityAction { complete() }
-    .onDisappear { hapticTask?.cancel() }
+    .accessibilityAction { completeForAccessibility() }
+    .onDisappear { holdTask?.cancel() }
   }
 
-  private func pressingChanged(_ pressing: Bool) {
-    isPressing = pressing
-    hapticTask?.cancel()
-    if pressing {
-      if reduceMotion {
-        progress = 1
-        return
-      }
+  private func handleDragChanged(_ value: DragGesture.Value) {
+    let distance = hypot(value.translation.width, value.translation.height)
+    apply(gestureState.dragChanged(isWithinBounds: distance <= 50))
+  }
+
+  private func beginHold() {
+    isPressing = true
+    holdTask?.cancel()
+    if reduceMotion {
+      progress = 1
+    } else {
       withAnimation(.linear(duration: MeetPRMotion.durationHoldComplete)) {
         progress = 1
       }
-      hapticTask = Task { @MainActor in
-        for step in 1...7 {
-          try? await Task.sleep(
+    }
+    holdTask = Task { @MainActor in
+      for step in 1...7 {
+        do {
+          try await Task.sleep(
             for: .milliseconds(Int(MeetPRMotion.durationHoldComplete * 1_000 / 7))
           )
-          guard !Task.isCancelled, isPressing else { return }
-          hapticStep = step
+        } catch {
+          return
         }
+        guard gestureState.isHolding else { return }
+        hapticStep = step
       }
-    } else if progress < 1 {
-      withAnimation(
-        .timingCurve(
-          MeetPRMotion.rollX1,
-          MeetPRMotion.rollY1,
-          MeetPRMotion.rollX2,
-          MeetPRMotion.rollY2,
-          duration: MeetPRMotion.durationHoldCancel
-        )
-      ) {
-        progress = 0
-      }
+      apply(gestureState.holdCompleted())
+    }
+  }
+
+  private func cancelHold() {
+    guard isPressing else { return }
+    holdTask?.cancel()
+    isPressing = false
+    cancelFeedbackStep += 1
+    withAnimation(
+      .timingCurve(
+        MeetPRMotion.rollX1,
+        MeetPRMotion.rollY1,
+        MeetPRMotion.rollX2,
+        MeetPRMotion.rollY2,
+        duration: MeetPRMotion.durationHoldCancel
+      )
+    ) {
+      progress = 0
     }
   }
 
   private func complete() {
-    hapticTask?.cancel()
+    guard isPressing else { return }
+    holdTask?.cancel()
     isPressing = false
     progress = 1
+    successFeedbackStep += 1
     action()
+  }
+
+  private func completeForAccessibility() {
+    holdTask?.cancel()
+    isPressing = false
+    progress = 1
+    successFeedbackStep += 1
+    action()
+  }
+
+  private func resetAfterGesture() {
+    holdTask?.cancel()
+    isPressing = false
+    progress = 0
+  }
+
+  private func apply(_ gestureAction: HoldToCompleteGestureState.Action?) {
+    switch gestureAction {
+    case .begin:
+      beginHold()
+    case .cancel:
+      cancelHold()
+    case .complete:
+      complete()
+    case .reset:
+      resetAfterGesture()
+    case nil:
+      break
+    }
   }
 }
 
-private struct TodayWorkoutReadOnlyNotice: View {
-  let date: Date
+private struct TodayWorkoutSequenceNotice: View {
+  let state: TodayWorkoutDayState
+  let onUndo: () -> Void
 
   var body: some View {
-    HStack(spacing: MeetPRSpacing.space2) {
-      Image(systemName: WorkoutDatePolicy.isPast(date) ? "clock.arrow.circlepath" : "eye")
-      Text(WorkoutDatePolicy.isPast(date) ? "历史记录 · 不可修改" : "未到训练日 · 仅预览")
-      Spacer()
+    VStack(alignment: .leading, spacing: 7) {
+      HStack(spacing: MeetPRSpacing.space2) {
+        Image(systemName: iconName)
+        Text(title)
+        Spacer()
+        if case .completed(let canUndo) = state, canUndo {
+          Button("撤销完成", action: onUndo)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .bold))
+            .buttonStyle(.plain)
+        }
+      }
+      if case .upcoming(let previousDay) = state, let previousDay {
+        Text(TrainingSequenceText.unlockMessage(after: previousDay))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
     }
     .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
     .foregroundStyle(Color.MeetPR.textSecondary)
@@ -1011,96 +1016,20 @@ private struct TodayWorkoutReadOnlyNotice: View {
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.control))
   }
-}
 
-private struct TodayWorkoutRestCard: View {
-  var body: some View {
-    Text("休息日 · 无训练安排")
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
-      .foregroundStyle(Color.MeetPR.textMuted)
-      .frame(maxWidth: .infinity)
-      .padding(.vertical, MeetPRSpacing.space5)
-      .background(Color.MeetPR.surfaceCard)
-      .clipShape(.rect(cornerRadius: MeetPRRadius.card))
-  }
-}
-
-private struct TrainingCalendarCollapsedBar: View {
-  let date: Date
-
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.point9) {
-      Text(
-        TrainingCalendarText.collapsedDate(for: date)
-      )
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
-      .foregroundStyle(Color.MeetPR.textPrimary)
-
-      Spacer()
-
-      HStack(spacing: MeetPRSpacing.point3) {
-        Text("上滑到顶展开")
-        ChevronUpIcon()
-          .stroke(
-            Color.MeetPR.textDim,
-            style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
-          )
-          .frame(width: 13, height: 13)
-      }
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-      .foregroundStyle(Color.MeetPR.textDim)
+  private var title: String {
+    switch state {
+    case .completed: "已完成 · 不可修改"
+    case .current: "当前 · 可记录"
+    case .upcoming: "未轮到 · 仅预览"
     }
-    .padding(.horizontal, MeetPRSpacing.point14)
-    .padding(.vertical, MeetPRSpacing.point11)
-    .background(Color.MeetPR.surfaceCard)
-    .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.control)
-        .stroke(Color.MeetPR.surfaceKey, lineWidth: 1)
-    }
-    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-    .shadow(color: Color.black.opacity(0.35), radius: 8, y: 6)
-    .padding(.top, MeetPRSpacing.point6)
-    .padding(.bottom, MeetPRSpacing.point3)
   }
-}
 
-private struct TrainingScrollMetrics: Equatable {
-  let offset: CGFloat
-  let contentSlack: CGFloat
-}
-
-private struct TrainingScrollOffsetKey: PreferenceKey {
-  static let defaultValue: CGFloat = 0
-  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-    value = nextValue()
-  }
-}
-
-private struct TrainingContentHeightKey: PreferenceKey {
-  static let defaultValue: CGFloat = 0
-  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-    value = nextValue()
-  }
-}
-
-extension View {
-  fileprivate func trainingCalendarCollapsedOverlay(
-    isOpen: Bool,
-    date: Date
-  ) -> some View {
-    overlay(alignment: .top) {
-      if !isOpen {
-        TrainingCalendarCollapsedBar(date: date)
-          .padding(.horizontal, MeetPRSpacing.pageHorizontal)
-          // motion/04 lines 101-107: pillIn is 340ms with exact
-          // easeOutCubic, y=-9→0, scaleY=.62→1 and opacity 0→1.
-          .meetPRRiseIn(
-            delay: 0,
-            duration: MeetPRMotion.durationPill,
-            offset: MeetPRMotion.pillInitialOffset,
-            initialScaleY: MeetPRMotion.pillInitialScaleY
-          )
-      }
+  private var iconName: String {
+    switch state {
+    case .completed: "checkmark.circle"
+    case .current: "record.circle"
+    case .upcoming: "eye"
     }
   }
 }

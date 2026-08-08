@@ -367,7 +367,6 @@ extension RootView {
   ) -> some View {
     StudentRootView(
       studentID: user.id,
-      canShiftPlanDays: user.role == .coachedStudent,
       plans: studentPlans,
       logs: studentLogs,
       feedback: studentFeedback,

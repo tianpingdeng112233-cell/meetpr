@@ -33,6 +33,7 @@ extension APIClient {
       queryItems: [
         URLQueryItem(name: "from", value: from),
         URLQueryItem(name: "to", value: endDate),
+        URLQueryItem(name: "scope", value: "plan"),
       ],
       accessToken: accessToken
     )

@@ -6,10 +6,12 @@ import Testing
 
 @MainActor
 @Suite struct TodayWorkoutPresentationTests {
-  @Test func untouchedWorkoutStartsInListAndStartedWorkoutUsesRecordingHero() {
+  @Test func zeroLogDashboardCTAFramesListHeroWithoutSkippingPreStartState() throws {
     let fixture = makeFixture()
+    let listFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
+    let laterRecordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
 
-    let list = TodayWorkoutPresentation(
+    let dashboardDestination = TodayWorkoutPresentation(
       day: fixture.day,
       drafts: fixture.drafts,
       references: [:],
@@ -21,24 +23,74 @@ import Testing
       references: [:],
       started: true
     )
+    let measurement = TodayWorkoutHeroFrameMeasurement(
+      heroMode: dashboardDestination.heroMode,
+      requestToken: 1,
+      frame: listFrame
+    )
+    var latch = LaunchDestinationFrameLatch()
+    latch.arm()
+    let publishedFrame = try #require(measurement.publishableFrame)
+    let capturedListFrame = latch.capture(publishedFrame)
+    let overwroteListFrame = latch.capture(laterRecordingFrame)
 
-    #expect(list.heroMode == .list)
+    #expect(dashboardDestination.heroMode == .list)
+    #expect(!dashboardDestination.allowsManualCompletion)
+    #expect(capturedListFrame)
+    #expect(!overwroteListFrame)
+    #expect(latch.frame == listFrame)
     #expect(recording.heroMode == .recording)
+    // Started but nothing recorded yet: hold-to-complete must stay hidden —
+    // there is no skip-this-day in sequence progression (David 2026-08-07).
+    #expect(!recording.allowsManualCompletion)
     #expect(recording.currentRow?.stableIndex == 0)
   }
 
-  @Test func existingLogForcesRecordingHeroAndProgressSharesItsPositionSource() {
+  @Test func manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() {
+    var fixture = makeFixture()
+    fixture.drafts[0].failed = true
+
+    let presentation = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: true
+    )
+
+    #expect(presentation.allowsManualCompletion)
+  }
+
+  @Test func partialRealLogResumesRecordingHeroAndLatchesItsFrame() throws {
     var fixture = makeFixture()
     fixture.drafts[0].completed = true
+    let staleListFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
+    let recordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
 
+    // ≥1 real recorded set means the session already started: re-entry (cold
+    // launch included) resumes the recording card directly (David 2026-08-08).
     let presentation = TodayWorkoutPresentation(
       day: fixture.day,
       drafts: fixture.drafts,
       references: [:],
       started: false
     )
+    let measurement = TodayWorkoutHeroFrameMeasurement(
+      heroMode: presentation.heroMode,
+      requestToken: 1,
+      frame: recordingFrame
+    )
+    var latch = LaunchDestinationFrameLatch()
+    latch.arm()
+    let publishedFrame = try #require(measurement.publishableFrame)
+    let capturedRecordingFrame = latch.capture(publishedFrame)
+    let overwroteRecordingFrame = latch.capture(staleListFrame)
 
     #expect(presentation.heroMode == .recording)
+    #expect(measurement.heroMode == .recording)
+    #expect(capturedRecordingFrame)
+    #expect(!overwroteRecordingFrame)
+    #expect(latch.frame == recordingFrame)
+    #expect(presentation.allowsManualCompletion)
     #expect(presentation.progress.remainingSets == 2)
     #expect(presentation.progress.remainingExercises == 2)
     #expect(presentation.progress.currentSetNumber == 2)
@@ -48,6 +100,64 @@ import Testing
     #expect(presentation.progress.remainingText == "还有 2 个动作 · 2 组未记录")
     #expect(presentation.currentRow?.stableIndex == 1)
     #expect(presentation.currentRow?.record.index == 2)
+  }
+
+  @Test func completedDayKeepsReadOnlyDetailAcrossColdLaunch() {
+    var fixture = makeFixture()
+    for index in fixture.drafts.indices {
+      fixture.drafts[index].completed = true
+    }
+    let completedDay = fixture.day.replacingCompletion(
+      completedAt: Date(),
+      source: "auto"
+    )
+
+    // A completed day is read-only detail, not a pre-start state: the per-set
+    // table must stay visible even when `started` reset on reselection.
+    let presentation = TodayWorkoutPresentation(
+      day: completedDay,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(presentation.heroMode == .recording)
+  }
+
+  @Test func assumedHistoryDoesNotStartColdLaunchWorkout() {
+    var fixture = makeFixture()
+    for index in fixture.drafts.indices {
+      fixture.drafts[index].completed = true
+      fixture.drafts[index].assumed = true
+      fixture.drafts[index].loggedSetID = UUID()
+    }
+
+    let presentation = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(presentation.heroMode == .list)
+    #expect(!presentation.hasAnyLoggedSet)
+    #expect(!presentation.allowsManualCompletion)
+  }
+
+  @Test func failedRealLogResumesColdLaunchWorkout() {
+    var fixture = makeFixture()
+    fixture.drafts[0].failed = true
+
+    let cold = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(cold.heroMode == .recording)
+    #expect(cold.hasAnyLoggedSet)
+    #expect(cold.allowsManualCompletion)
   }
 
   @Test func draftMappingKeepsFailureAndVideoSemantics() throws {
@@ -96,10 +206,13 @@ import Testing
     #expect(row.record.rpe == 8)
   }
 
-  @Test func emptyPlanUsesRestContentInsteadOfListHero() {
+  @Test func zeroSetDayHasNoRemainingWork() {
     let day = StudentPlanDay(id: UUID(), date: Date(), exercises: [])
+    let progress = TodayWorkoutProgress(day: day, drafts: [])
 
-    #expect(TodayWorkoutContentPolicy.isRestDay(day))
+    #expect(progress.allDone)
+    #expect(progress.remainingSets == 0)
+    #expect(progress.remainingExercises == 0)
   }
 
   @Test func allDoneHasNoRemainingWork() {
@@ -159,207 +272,6 @@ import Testing
       ),
       sequenceIndex: sequenceIndex,
       prescribedSets: sets
-    )
-  }
-}
-
-@Suite struct TrainingCalendarV3StateTests {
-  private var calendar: Calendar {
-    var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
-    return calendar
-  }
-
-  @Test func pastPlannedIncompleteDayIsMissed() {
-    let today = date(day: 24)
-    let past = date(day: 23)
-    let exercise = StudentPlanExercise(
-      id: UUID(),
-      exercise: Exercise(
-        id: UUID(),
-        name: "深蹲",
-        exerciseType: .mainLift,
-        isCompetitionLift: true,
-        muscleGroups: [],
-        equipment: [],
-        createdAt: past
-      ),
-      sequenceIndex: 0,
-      prescribedSets: [
-        PrescribedSet(id: UUID(), setIndex: 0, weightKg: 100, reps: 5, rpe: 8)
-      ]
-    )
-    let day = StudentPlanDay(id: UUID(), date: past, exercises: [exercise])
-
-    let state = TrainingCalendarV3State.resolve(
-      progress: TrainingDayProgress(day: day, logs: []),
-      date: past,
-      today: today,
-      calendar: calendar
-    )
-
-    #expect(state == .missed)
-  }
-
-  @Test func emptyPlanObjectIsRestAndNeverMissed() {
-    let past = date(day: 23)
-    let day = StudentPlanDay(id: UUID(), date: past, exercises: [])
-
-    let state = TrainingCalendarV3State.resolve(
-      progress: TrainingDayProgress(day: day, logs: []),
-      date: past,
-      today: date(day: 24),
-      calendar: calendar
-    )
-
-    #expect(state == .rest)
-  }
-
-  @Test func pastRestDayIsNeverMissed() {
-    let state = TrainingCalendarV3State.resolve(
-      progress: TrainingDayProgress(day: nil, logs: []),
-      date: date(day: 23),
-      today: date(day: 24),
-      calendar: calendar
-    )
-
-    #expect(state == .rest)
-  }
-
-  @Test func plannedTodayAndFutureUseTodayAndFutureStates() {
-    let today = date(day: 24)
-    let todayPlan = plannedDay(on: today)
-    let future = date(day: 25)
-    let futurePlan = plannedDay(on: future)
-
-    #expect(
-      TrainingCalendarV3State.resolve(
-        progress: TrainingDayProgress(day: todayPlan, logs: []),
-        date: today,
-        today: today,
-        calendar: calendar
-      ) == .today
-    )
-    #expect(
-      TrainingCalendarV3State.resolve(
-        progress: TrainingDayProgress(day: futurePlan, logs: []),
-        date: future,
-        today: today,
-        calendar: calendar
-      ) == .future
-    )
-  }
-
-  @Test func earlyMorningGymDayStillMarksPreviousCalendarDateAsToday() {
-    let earlyMorning =
-      calendar.date(
-        from: DateComponents(year: 2026, month: 7, day: 24, hour: 3, minute: 30)
-      ) ?? Date()
-    let gymDay = WorkoutDatePolicy.gymDayToday(now: earlyMorning)
-    let plan = StudentPlanDay(
-      id: UUID(),
-      date: gymDay,
-      exercises: [
-        StudentPlanExercise(
-          id: UUID(),
-          exercise: Exercise(
-            id: UUID(),
-            name: "深蹲",
-            exerciseType: .mainLift,
-            isCompetitionLift: true,
-            muscleGroups: [],
-            equipment: [],
-            createdAt: gymDay
-          ),
-          sequenceIndex: 0,
-          prescribedSets: [
-            PrescribedSet(id: UUID(), setIndex: 0, weightKg: 100, reps: 5, rpe: 8)
-          ]
-        )
-      ]
-    )
-
-    let state = TrainingCalendarV3State.resolve(
-      progress: TrainingDayProgress(day: plan, logs: []),
-      date: gymDay,
-      today: gymDay,
-      calendar: calendar
-    )
-
-    #expect(calendar.component(.day, from: gymDay) == 23)
-    #expect(state == .today)
-  }
-
-  @Test func earlyMorningEmptyGymDayIsTodayButRemainsRest() throws {
-    let earlyMorning = try #require(
-      calendar.date(
-        from: DateComponents(year: 2026, month: 7, day: 24, hour: 3, minute: 30)
-      )
-    )
-    let gymDay = WorkoutDatePolicy.gymDayToday(now: earlyMorning)
-    let emptyPlan = StudentPlanDay(id: UUID(), date: gymDay, exercises: [])
-    let days = TrainingCalendarLayout.makeDays(
-      period: TrainingCalendarPeriod(
-        displayedDate: gymDay,
-        selectedDate: gymDay,
-        today: gymDay,
-        mode: .week
-      ),
-      cycleDays: [emptyPlan],
-      logs: [],
-      calendar: calendar
-    )
-    let selectedDay = days.first { $0.isSelected }
-    let selected = try #require(selectedDay)
-
-    #expect(selected.isToday)
-    #expect(selected.progress.state == .noPlan)
-    #expect(
-      TrainingCalendarV3State.resolve(
-        progress: selected.progress,
-        date: selected.date,
-        today: gymDay,
-        calendar: calendar
-      ) == .rest
-    )
-  }
-
-  @Test func trainingCalendarTextMatchesMockupCopyExactly() {
-    let friday = date(day: 24)
-
-    #expect(TrainingCalendarText.weekday(for: friday, calendar: calendar) == "周五")
-    #expect(
-      TrainingCalendarText.collapsedDate(for: friday, calendar: calendar)
-        == "七月24日 · 星期五"
-    )
-  }
-
-  private func date(day: Int) -> Date {
-    calendar.date(from: DateComponents(year: 2026, month: 7, day: day)) ?? Date()
-  }
-
-  private func plannedDay(on date: Date) -> StudentPlanDay {
-    StudentPlanDay(
-      id: UUID(),
-      date: date,
-      exercises: [
-        StudentPlanExercise(
-          id: UUID(),
-          exercise: Exercise(
-            id: UUID(),
-            name: "深蹲",
-            exerciseType: .mainLift,
-            isCompetitionLift: true,
-            muscleGroups: [],
-            equipment: [],
-            createdAt: date
-          ),
-          sequenceIndex: 0,
-          prescribedSets: [
-            PrescribedSet(id: UUID(), setIndex: 0, weightKg: 100, reps: 5, rpe: 8)
-          ]
-        )
-      ]
     )
   }
 }

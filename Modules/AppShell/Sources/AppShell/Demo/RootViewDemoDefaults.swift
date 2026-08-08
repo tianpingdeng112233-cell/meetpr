@@ -7,6 +7,10 @@ import StudentKit
 /// the BindGate falls straight through to the 5 tabs (spec 031 D10).
 @available(iOS 17.0, macOS 14.0, *)
 enum RootViewDemoDefaults {
+  private static let trainingLogs = InMemoryStudentTrainingLogRepository(
+    seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
+  )
+
   static func inviteCodes() -> any InviteCodeRepository {
     InMemoryInviteCodeRepository(
       coachId: StudentDemoSeed.coachID,
@@ -24,9 +28,7 @@ enum RootViewDemoDefaults {
   }
 
   static func logs() -> any StudentTrainingLogRepository {
-    InMemoryStudentTrainingLogRepository(
-      seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
-    )
+    trainingLogs
   }
 
   static func feedback() -> any StudentFeedbackRepository {

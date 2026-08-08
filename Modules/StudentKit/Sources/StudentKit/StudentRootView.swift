@@ -15,10 +15,27 @@ private enum LaunchMorphPhase: Equatable {
   case fadingGhost
 }
 
+struct LaunchDestinationFrameLatch: Equatable {
+  private(set) var frame: CGRect?
+
+  mutating func arm() {
+    frame = nil
+  }
+
+  mutating func capture(_ candidate: CGRect) -> Bool {
+    guard frame == nil, candidate.width > 0, candidate.height > 0 else { return false }
+    frame = candidate
+    return true
+  }
+
+  mutating func reset() {
+    frame = nil
+  }
+}
+
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
   private let studentID: UUID
-  private let canShiftPlanDays: Bool
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let e1rm: any E1RMRepository
@@ -44,10 +61,10 @@ public struct StudentRootView: View {
   @State private var trainingJumpToken = 0
   @State private var uploadFailureDestination: UploadFailureDestination?
   @State private var uploadFailureNavigationToken = 0
-  @State private var trainingAutoStartToken = 0
   @State private var workoutPlanHandoff: TodayWorkoutPlanHandoff?
   @State private var launchHeroRevealToken = 0
   @State private var planRevision = 0
+  @State private var planProjectionUpdate: StudentPlanView?
   @State private var nextWorkoutSource: WorkoutSource?
   @State private var workoutStartedAt: Date?
   @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
@@ -55,7 +72,8 @@ public struct StudentRootView: View {
   @State private var importedHistoryRefreshToken = 0
   @State private var tabHostStore = StudentTabHostStore()
   @State private var dashboardCTAFrame = CGRect.zero
-  @State private var trainingHeroFrame = CGRect.zero
+  @State private var launchDestinationFrameLatch = LaunchDestinationFrameLatch()
+  @State private var heroFrameRequestToken = 0
   @State private var rootGlobalFrame = CGRect.zero
   @State private var launchSourceFrame: CGRect?
   @State private var launchMorphProgress = 0.0
@@ -72,13 +90,13 @@ public struct StudentRootView: View {
   public init() {
     let plan = StudentDemoSeed.makePlanView()
     let store = StudentRootDemoPlanStore(studentID: StudentDemoSeed.studentID, plan: plan)
+    let logs = InMemoryStudentTrainingLogRepository(
+      seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
+    )
     self.init(
       studentID: StudentDemoSeed.studentID,
-      canShiftPlanDays: true,
       plans: InMemoryStudentPlanRepository(store: store),
-      logs: InMemoryStudentTrainingLogRepository(
-        seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
-      ),
+      logs: logs,
       feedback: InMemoryStudentFeedbackRepository(
         seed: StudentDemoSeed.makeFeedback(studentID: StudentDemoSeed.studentID)
       ),
@@ -96,7 +114,6 @@ public struct StudentRootView: View {
   // swiftlint:disable:next function_body_length
   public init(
     studentID: UUID = StudentDemoSeed.studentID,
-    canShiftPlanDays: Bool = false,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
@@ -125,7 +142,6 @@ public struct StudentRootView: View {
     pushRoute: Binding<PushRouteIntent?> = .constant(nil)
   ) {
     self.studentID = studentID
-    self.canShiftPlanDays = canShiftPlanDays
     self.plans = plans
     self.logs = logs
     self.e1rm = e1rm
@@ -222,7 +238,6 @@ extension StudentRootView {
     return ZStack {
       DashboardView(
         studentID: studentID,
-        canShiftPlanDays: canShiftPlanDays,
         plans: plans,
         logs: logs,
         onboarding: onboarding,
@@ -235,10 +250,11 @@ extension StudentRootView {
         onOpenPlanNotification: openPlanNotification,
         todayReloadToken: todayReloadToken + importedHistoryRefreshToken,
         todayVolatileReloadToken: todayVolatileReloadToken,
+        planProjectionUpdate: planProjectionUpdate,
         onFullReload: {
           todayRefreshThrottle.recordFullRefresh(at: Date())
         },
-        onPlanChanged: { planRevision += 1 },
+        onPlanChanged: propagatePlanProjection,
         pushedConversationID: pushedConversationIDBinding
       )
       .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
@@ -252,13 +268,15 @@ extension StudentRootView {
         jumpToTodayToken: trainingJumpToken,
         uploadFailureDestination: uploadFailureDestination,
         uploadFailureNavigationToken: uploadFailureNavigationToken,
-        autoStartToken: trainingAutoStartToken,
         isLaunchTargetHidden: launchSourceFrame != nil && !revealsLaunchTarget,
+        heroFrameRequestToken: heroFrameRequestToken,
         launchHeroRevealToken: launchHeroRevealToken,
         planRevision: planRevision,
+        planProjectionUpdate: planProjectionUpdate,
         workoutStartedAt: $workoutStartedAt,
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
+        onPlanChanged: propagatePlanProjection,
         onHeroFrameChange: updateTrainingHeroFrame,
         onReturnToToday: { selectedTab = .today }
       )
@@ -297,10 +315,7 @@ extension StudentRootView {
       .studentTabLayer(shell.layer(for: .profile), store: tabHostStore)
 
       if let launchSourceFrame {
-        let launchDestinationFrame =
-          trainingHeroFrame.width > 0 && trainingHeroFrame.height > 0
-          ? trainingHeroFrame
-          : launchSourceFrame
+        let launchDestinationFrame = launchDestinationFrameLatch.frame ?? launchSourceFrame
         MeetPRLaunchMorphOverlay(
           source: launchSourceFrame,
           destination: launchDestinationFrame,
@@ -412,8 +427,33 @@ extension StudentRootView {
   }
 
   private func openPlanNotification() {
-    trainingJumpToken += 1
-    selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
+    Task {
+      let plan: StudentPlanView?
+      do {
+        plan = try await plans.refreshCurrentPlan(studentID: studentID)
+      } catch {
+        plan = try? await plans.fetchCurrentPlan(studentID: studentID)
+      }
+      forcePlanTreeReload()
+      workoutPlanHandoff = plan.flatMap { plan in
+        let sequence = StudentPlanSequence(days: plan.days)
+        guard let day = sequence.cursorDay ?? sequence.orderedDays.last else { return nil }
+        return TodayWorkoutPlanHandoff(plan: plan, dayID: day.id, existingLogs: [])
+      }
+      trainingJumpToken += 1
+      selectedTab = StudentNotificationRoute.plan.targetTab(from: selectedTab)
+    }
+  }
+
+  private func forcePlanTreeReload() {
+    planProjectionUpdate = nil
+    workoutPlanHandoff = nil
+    planRevision += 1
+    todayReloadToken += 1
+  }
+
+  private func propagatePlanProjection(_ plan: StudentPlanView) {
+    planProjectionUpdate = plan
   }
 
   private func handlePushRoute(_ route: PushRouteIntent?) {
@@ -456,14 +496,13 @@ extension StudentRootView {
       dashboardCTAFrame.width > 0,
       dashboardCTAFrame.height > 0
     else {
-      trainingAutoStartToken += 1
       selectedTab = .training
       return
     }
 
     cancelLaunchTasks()
+    launchDestinationFrameLatch.arm()
     launchSourceFrame = dashboardCTAFrame
-    trainingHeroFrame = .zero
     launchMorphProgress = 0
     launchGhostFadeProgress = 0
     dashboardExitProgress = 0
@@ -480,11 +519,11 @@ extension StudentRootView {
       // motion/01 lines 93-112: destination is mounted after exactly 140ms.
       try? await Task.sleep(for: .seconds(MeetPRMotion.launchSwitchDelay))
       guard !Task.isCancelled else { return }
-      // Auto-start while the training layer is still inactive, then open the
-      // destination-frame gate. The first accepted geometry is therefore the
-      // recording hero, never the pre-start list hero.
-      trainingAutoStartToken += 1
+      // Open the destination-frame gate before mounting the training layer.
+      // A new request token makes the actual destination hero republish: an
+      // untouched day is a list, while a partially logged day is recording.
       launchMorphPhase = .awaitingDestinationFrame
+      heroFrameRequestToken += 1
       selectedTab = .training
       // motion/01 line 99: destination screen fades linearly for 280ms.
       withAnimation(.linear(duration: MeetPRMotion.launchDestinationFadeDuration)) {
@@ -495,23 +534,18 @@ extension StudentRootView {
 
   private func updateTrainingHeroFrame(_ frame: CGRect) {
     guard launchMorphPhase == .awaitingDestinationFrame,
-      frame.width > 0,
-      frame.height > 0
-    else {
-      return
-    }
+      launchDestinationFrameLatch.capture(frame)
+    else { return }
 
-    // Lock the first recording-hero frame for the entire morph. Subsequent
-    // layout callbacks cannot move the target underneath the running tween.
-    trainingHeroFrame = frame
+    // The first frame from the newly requested current hero is the morph's
+    // immutable geometry. Later layout callbacks cannot move its endpoint.
     beginLaunchMorph()
   }
 
   private func beginLaunchMorph() {
     guard launchSourceFrame != nil,
       selectedTab == .training,
-      trainingHeroFrame.width > 0,
-      trainingHeroFrame.height > 0,
+      launchDestinationFrameLatch.frame != nil,
       launchMorphPhase == .awaitingDestinationFrame
     else {
       return
@@ -547,7 +581,7 @@ extension StudentRootView {
     withTransaction(transaction) {
       launchMorphPhase = .idle
       launchSourceFrame = nil
-      trainingHeroFrame = .zero
+      launchDestinationFrameLatch.reset()
       launchMorphProgress = 0
       launchGhostFadeProgress = 0
       dashboardExitProgress = 0
@@ -569,11 +603,7 @@ extension StudentRootView {
   }
 
   private func finishLaunchForReducedMotion() {
-    let stillNeedsAutoStart = launchMorphPhase == .exitingDashboard
     cancelLaunchTasks()
-    if stillNeedsAutoStart {
-      trainingAutoStartToken += 1
-    }
     resetLaunchTransition()
     selectedTab = .training
   }

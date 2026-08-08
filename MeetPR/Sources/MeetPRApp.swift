@@ -158,6 +158,9 @@ struct MeetPRApp: App {
       draftStore: DraftStore
     ) -> RootView {
       let markerRepository = makeDemoVideoMarkers(studentState: studentState)
+      let studentLogs = InMemoryStudentTrainingLogRepository(
+        seed: studentState.logs + CoachDemoSeed.pendingVideoSetLogs()
+      )
       return RootView(
         coachPlans: InMemoryPlanRepository.preview(store: planStore),
         // Demo coach: personal (used 23) + unused single-use + 6-day
@@ -171,9 +174,7 @@ struct MeetPRApp: App {
         coachEvaluationSummaries: funnel.summaries,
         coachStudentProfiles: funnel.profiles,
         studentPlans: InMemoryStudentPlanRepository(store: planStore),
-        studentLogs: InMemoryStudentTrainingLogRepository(
-          seed: studentState.logs + CoachDemoSeed.pendingVideoSetLogs()
-        ),
+        studentLogs: studentLogs,
         studentFeedback: makeDemoStudentFeedback(studentState: studentState),
         videoMarkers: markerRepository,
         studentE1RM: InMemoryE1RMRepository(

@@ -11,7 +11,6 @@
       case recording
       case complete
       case readOnly
-      case rest
       case month
     }
 
@@ -27,8 +26,7 @@
       TodayWorkoutScreen(
         content: content,
         weekCode: "W1D4",
-        selectedDate: TrainingPreviewFixtures.date,
-        isEditable: state != .readOnly,
+        dayState: state == .readOnly ? .completed(canUndo: true) : .current,
         reviewCompleted: false,
         unreadCount: 3,
         showsNotifications: true,
@@ -37,8 +35,10 @@
         isPreparingAskCoach: false,
         namespace: namespace,
         isLaunchTargetHidden: false,
+        heroFrameRequestToken: 0,
         launchHeroRevealToken: 0,
         collapsedExercises: $collapsed,
+        sequenceContent: EmptyView(),
         calendarContent: TrainingCalendarPreview(month: state == .month),
         onRefresh: {},
         onReadiness: {},
@@ -50,15 +50,13 @@
         onEdit: { _ in },
         onVideoAction: { _ in },
         onComplete: {},
+        onUndoCompletion: {},
         onShowReview: {}
       )
     }
 
-    private var content: TodayWorkoutScreen<TrainingCalendarPreview>.Content {
-      if state == .rest {
-        return .rest
-      }
-      return .workout(
+    private var content: TodayWorkoutScreen<EmptyView, TrainingCalendarPreview>.Content {
+      .workout(
         TrainingPreviewFixtures.presentation(
           started: state != .list,
           complete: state == .complete || state == .readOnly
@@ -108,7 +106,7 @@
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
-          weekday: "周二", date: 21, state: .rest, isSelected: false,
+          weekday: "周二", date: 21, state: .future, isSelected: false,
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
@@ -294,16 +292,6 @@
 
   #Preview("Training · Read-only · Light") {
     TodayWorkoutPreviewHarness(state: .readOnly)
-      .preferredColorScheme(.light)
-  }
-
-  #Preview("Training · Rest · Dark") {
-    TodayWorkoutPreviewHarness(state: .rest)
-      .preferredColorScheme(.dark)
-  }
-
-  #Preview("Training · Rest · Light") {
-    TodayWorkoutPreviewHarness(state: .rest)
       .preferredColorScheme(.light)
   }
 

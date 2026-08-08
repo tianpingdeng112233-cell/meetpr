@@ -35,7 +35,7 @@ struct TodayWorkoutProgress: Equatable, Sendable {
     self.currentSetTotal = exerciseDrafts.count
     self.currentExerciseNumber = min(currentExerciseIndex + 1, max(exerciseIDs.count, 1))
     self.exerciseTotal = exerciseIDs.count
-    self.allDone = !drafts.isEmpty && drafts.allSatisfy(\.completed)
+    self.allDone = remainingSets == 0
   }
 
   var remainingText: String {
@@ -79,6 +79,15 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
   let exercises: [Exercise]
   let progress: TodayWorkoutProgress
   let currentRow: Row?
+  /// A set that reached the server (or Demo store), failed attempts included.
+  let hasAnyLoggedSet: Bool
+
+  // There is no "skip this day" in sequence progression — an untouched day just
+  // keeps the cursor. Manual completion is only offered once real work exists
+  // (David 2026-08-07: hold button must not appear before any set is recorded).
+  var allowsManualCompletion: Bool {
+    heroMode == .recording && hasAnyLoggedSet
+  }
 
   init(
     day: StudentPlanDay,
@@ -87,9 +96,19 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     videoStates: [UUID: SetRow.VideoState] = [:],
     started: Bool
   ) {
-    let hasRecordedSet = drafts.contains(where: \.completed)
+    // The summary card IS the pre-start state, and it only belongs to a day
+    // with zero recorded sets: tapping 开始第一组 or having ≥1 real recorded
+    // set (failed included) means the session has started, and re-entry —
+    // cold launch included — resumes the recording card directly (David
+    // 2026-08-08 三次收敛). Assumed imported-history rows are not session
+    // evidence; completed days are read-only detail via server `completedAt`.
+    let hasSessionLog = drafts.contains {
+      !$0.assumed && ($0.completed || $0.failed)
+    }
     self.day = day
-    self.heroMode = !started && !hasRecordedSet ? .list : .recording
+    self.hasAnyLoggedSet = hasSessionLog
+    self.heroMode =
+      started || hasSessionLog || day.completedAt != nil ? .recording : .list
     self.progress = TodayWorkoutProgress(day: day, drafts: drafts)
 
     self.exercises = day.exercises.enumerated().map { exerciseIndex, exercise in

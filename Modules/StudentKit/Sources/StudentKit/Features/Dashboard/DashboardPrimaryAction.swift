@@ -1,120 +1,134 @@
+import CoreModels
 import DesignSystem
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 struct DashboardPrimaryAction: View {
-  let liftSubtitle: String
-  let canShift: Bool
-  let isUpdatingShift: Bool
+  let day: StudentPlanDay
   let onStart: () -> Void
   let onStartFrameChange: (CGRect) -> Void
   let isStartHidden: Bool
-  let onShift: () -> Void
 
   var body: some View {
-    VStack(spacing: 9) {
-      GoldCTA(
-        "开始训练",
-        sub: liftSubtitle,
-        variant: .primary,
-        icon: .play,
-        showsShimmer: true,
-        action: onStart
-      )
-      .onGeometryChange(for: CGRect.self) { proxy in
-        proxy.frame(in: .global)
-      } action: { frame in
-        onStartFrameChange(frame)
-      }
-      .accessibilityRepresentation {
-        Button("开始训练", action: onStart)
-      }
-      // motion/01 line 90: the source CTA is hidden under the gold ghost.
-      .opacity(isStartHidden ? 0 : 1)
-      .allowsHitTesting(!isStartHidden)
-      .accessibilityHidden(isStartHidden)
-
-      if canShift {
-        GoldCTA(
-          "顺延一天",
-          sub: nil,
-          variant: .link,
-          icon: .none,
-          isDisabled: isUpdatingShift,
-          isFullWidth: false,
-          action: onShift
-        )
-      }
+    GoldCTA(
+      "开始训练",
+      sub: DashboardTodayPresentation.dayName(day),
+      variant: .primary,
+      icon: .play,
+      showsShimmer: true,
+      action: onStart
+    )
+    .onGeometryChange(for: CGRect.self) { proxy in
+      proxy.frame(in: .global)
+    } action: { frame in
+      onStartFrameChange(frame)
     }
-    .padding(.top, 2)
+    .opacity(isStartHidden ? 0 : 1)
+    .allowsHitTesting(!isStartHidden)
+    .accessibilityHidden(isStartHidden)
   }
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-struct DashboardPostponedState: View {
-  let tomorrowLabel: String
-  let isUpdatingShift: Bool
+struct DashboardCompletedAction: View {
+  let completedDay: StudentPlanDay
+  let nextDay: StudentPlanDay?
+  let canUndo: Bool
+  let isUpdating: Bool
   let onUndo: () -> Void
+  let onContinue: () -> Void
 
   var body: some View {
-    VStack(spacing: 0) {
-      HStack(alignment: .top, spacing: 10) {
-        DashboardCheckIcon()
-          .stroke(
-            Color.MeetPR.success,
-            style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round)
-          )
-          .frame(width: 18, height: 18)
-          .padding(.top, 1)
-
-        (Text("本次训练已顺延至 ")
-          + Text(tomorrowLabel)
+    VStack(spacing: 13) {
+      VStack(spacing: 8) {
+        Image(systemName: "checkmark.circle.fill")
+          .font(.MeetPR.system(size: MeetPRFontMetrics.size34, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.success)
+        Text("\(DashboardTodayPresentation.code(for: completedDay)) 已完成")
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
-          .bold()
-          + Text("，之后计划整体后移一天，已通知教练。"))
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-          .foregroundStyle(Color.MeetPR.textSecondary)
-          .lineSpacing(3)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        if canUndo {
+          Button("撤销完成 · 仅限今天", action: onUndo)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+            .foregroundStyle(Color.MeetPR.textMuted)
+            .underline()
+            .buttonStyle(.plain)
+            .disabled(isUpdating)
+        }
       }
-      .padding(.horizontal, 15)
-      .padding(.vertical, 13)
-      .background(Color.MeetPR.successRGB.opacity(0.1))
+      .frame(maxWidth: .infinity)
+      .padding(18)
+      .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: 16))
-      .overlay {
-        RoundedRectangle(cornerRadius: 16)
-          .stroke(Color.MeetPR.successRGB.opacity(0.32), lineWidth: 1)
-      }
 
-      Text("今日休息")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
-        .foregroundStyle(Color.MeetPR.textMuted)
-        .frame(maxWidth: .infinity)
-        .padding(17)
-        .background(Color.MeetPR.surfaceCard)
+      if let nextDay {
+        VStack(alignment: .leading, spacing: 8) {
+          Text("下一节 · \(DashboardTodayPresentation.code(for: nextDay))")
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.gold500)
+          DashboardSequenceDaySummary(day: nextDay)
+        }
+        .padding(15)
+        .background(Color.MeetPR.bgInset)
         .clipShape(.rect(cornerRadius: 16))
-        .padding(.top, 12)
 
-      Button(action: onUndo) {
-        Text("撤销顺延")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-          .foregroundStyle(Color.MeetPR.textMuted)
-          .underline()
-          .frame(maxWidth: .infinity, minHeight: 44)
-          .contentShape(.rect)
+        Button("继续下一节", action: onContinue)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          .frame(maxWidth: .infinity, minHeight: 46)
+          .overlay { Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1) }
+          .buttonStyle(.plain)
       }
-      .buttonStyle(.plain)
-      .disabled(isUpdatingShift)
     }
   }
 }
 
-private struct DashboardCheckIcon: Shape {
-  func path(in rect: CGRect) -> Path {
-    var path = Path()
-    path.move(to: CGPoint(x: rect.width * 0.83, y: rect.height * 0.25))
-    path.addLine(to: CGPoint(x: rect.width * 0.375, y: rect.height * 0.71))
-    path.addLine(to: CGPoint(x: rect.width * 0.17, y: rect.height * 0.5))
-    return path
+@available(iOS 17.0, macOS 14.0, *)
+struct DashboardCycleCompletedAction: View {
+  let days: [StudentPlanDay]
+
+  var body: some View {
+    let ordered = StudentPlanSequence(days: days).orderedDays
+    let finalWeek = ordered.last?.weekNumber ?? 1
+    VStack(spacing: 10) {
+      Image(systemName: "trophy.fill")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size34, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.gold500)
+      Text("\(finalWeek) 周计划已全部完成")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text("W1 – W\(finalWeek) · 共 \(ordered.count) 节")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textMuted)
+      Text("下一份计划由教练发布。发布后这里会直接出现 W1D1。")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textSecondary)
+        .multilineTextAlignment(.center)
+        .lineSpacing(3)
+    }
+    .frame(maxWidth: .infinity)
+    .padding(22)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: 16))
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct DashboardSequenceDaySummary: View {
+  let day: StudentPlanDay
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 5) {
+      Text(DashboardTodayPresentation.dayName(day))
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+      Text(DashboardTodayPresentation.exerciseSummary(day))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textMuted)
+      Text("教练推荐 \(DashboardTodayPresentation.recommendedDateText(day.scheduledDate))")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textDim)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
 }

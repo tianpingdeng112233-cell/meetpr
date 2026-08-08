@@ -7,6 +7,8 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
   public let weekNumber: Int
   public let sortOrder: Int
   public let shiftedToDate: Date?
+  public let completedAt: Date?
+  public let completionSource: String?
 
   public init(
     id: UUID,
@@ -14,7 +16,9 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
     dayOfWeek: Int,
     weekNumber: Int,
     sortOrder: Int,
-    shiftedToDate: Date? = nil
+    shiftedToDate: Date? = nil,
+    completedAt: Date? = nil,
+    completionSource: String? = nil
   ) {
     self.id = id
     self.planID = planID
@@ -22,6 +26,8 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
     self.weekNumber = weekNumber
     self.sortOrder = sortOrder
     self.shiftedToDate = shiftedToDate
+    self.completedAt = completedAt
+    self.completionSource = completionSource
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -31,5 +37,7 @@ public struct PlanDay: Codable, Hashable, Sendable, Identifiable {
     case weekNumber
     case sortOrder
     case shiftedToDate
+    case completedAt
+    case completionSource
   }
 }

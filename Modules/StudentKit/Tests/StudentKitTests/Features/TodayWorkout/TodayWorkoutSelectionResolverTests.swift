@@ -1,42 +1,47 @@
+import CoreModels
 import Foundation
 import Testing
 
 @testable import StudentKit
 
 @Suite struct TodayWorkoutSelectionResolverTests {
-  @Test func initialAndJumpSelectionsUseDeviceDayAtHalfPastMidnight() throws {
-    var shanghai = Calendar(identifier: .gregorian)
-    shanghai.timeZone = try #require(TimeZone(identifier: "Asia/Shanghai"))
-    let now = try #require(
-      shanghai.date(
-        from: DateComponents(
-          year: 2026,
-          month: 7,
-          day: 29,
-          hour: 0,
-          minute: 30
-        )
-      )
+  @Test func initialSelectionPrefersExplicitIdentityThenCursor() {
+    let days = selectionDays()
+    #expect(
+      TodayWorkoutSelectionResolver.initialSelection(explicitDayID: days[2].id, days: days)
+        == days[2].id
     )
-    let previousDay = try #require(
-      shanghai.date(from: DateComponents(year: 2026, month: 7, day: 28))
+    #expect(
+      TodayWorkoutSelectionResolver.initialSelection(explicitDayID: UUID(), days: days)
+        == days[1].id
     )
+  }
 
-    let initialSelection = TodayWorkoutSelectionResolver.initialSelection(
-      explicitDate: nil,
-      now: now,
-      calendar: shanghai
+  @Test func jumpReturnsCursorAndIsClockIndependent() {
+    let days = selectionDays()
+    #expect(
+      TodayWorkoutSelectionResolver.jumpToCurrentSelection(
+        from: days[2].id,
+        days: days
+      ) == days[1].id
     )
-    let jumpSelection = try #require(
-      TodayWorkoutSelectionResolver.jumpToTodaySelection(
-        from: previousDay,
-        now: now,
-        calendar: shanghai
-      )
+    #expect(
+      TodayWorkoutSelectionResolver.jumpToCurrentSelection(
+        from: days[1].id,
+        days: days
+      ) == nil
     )
+  }
 
-    #expect(shanghai.component(.day, from: initialSelection) == 29)
-    #expect(shanghai.component(.day, from: jumpSelection) == 29)
-    #expect(StudentDemoSeed.utcCalendar.component(.day, from: now) == 28)
+  private func selectionDays() -> [StudentPlanDay] {
+    let date = Date(timeIntervalSince1970: 1_800_000_000)
+    return [
+      StudentPlanDay(
+        id: UUID(), weekNumber: 1, dayOfWeek: 1, date: date,
+        completedAt: date, completionSource: "auto", exercises: []
+      ),
+      StudentPlanDay(id: UUID(), weekNumber: 1, dayOfWeek: 2, date: date, exercises: []),
+      StudentPlanDay(id: UUID(), weekNumber: 2, dayOfWeek: 1, date: date, exercises: []),
+    ]
   }
 }

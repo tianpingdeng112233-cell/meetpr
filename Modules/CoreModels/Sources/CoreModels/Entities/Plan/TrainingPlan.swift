@@ -16,6 +16,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
   public let status: PlanStatus
   public let totalShiftDays: Int
   public let latestShiftCreatedAt: Date?
+  public let publishedAt: Date?
   public let createdAt: Date
   public let updatedAt: Date
 
@@ -33,6 +34,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     status: PlanStatus,
     totalShiftDays: Int = 0,
     latestShiftCreatedAt: Date? = nil,
+    publishedAt: Date? = nil,
     createdAt: Date,
     updatedAt: Date
   ) {
@@ -49,6 +51,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     self.status = status
     self.totalShiftDays = totalShiftDays
     self.latestShiftCreatedAt = latestShiftCreatedAt
+    self.publishedAt = publishedAt
     self.createdAt = createdAt
     self.updatedAt = updatedAt
   }
@@ -68,6 +71,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     status = try container.decode(PlanStatus.self, forKey: .status)
     totalShiftDays = try container.decodeIfPresent(Int.self, forKey: .totalShiftDays) ?? 0
     latestShiftCreatedAt = try container.decodeIfPresent(Date.self, forKey: .latestShiftCreatedAt)
+    publishedAt = try container.decodeIfPresent(Date.self, forKey: .publishedAt)
     createdAt = try container.decode(Date.self, forKey: .createdAt)
     updatedAt = try container.decode(Date.self, forKey: .updatedAt)
   }
@@ -86,6 +90,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     case status
     case totalShiftDays
     case latestShiftCreatedAt
+    case publishedAt
     case createdAt
     case updatedAt
   }

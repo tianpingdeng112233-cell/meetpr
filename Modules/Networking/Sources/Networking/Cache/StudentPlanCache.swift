@@ -4,7 +4,9 @@ import Foundation
 public actor StudentPlanCache {
   // v2 invalidates projections whose PrescribedSet.setIndex was cached as
   // one-based before the execution domain standardized on zero-based indexes.
-  private static let fileVersion = 2
+  // v3 (spec 071): pre-sequence projections have no completion or canonical
+  // day-order fields and must never be used to derive the cursor.
+  private static let fileVersion = 3
   private let store: JSONFileCache<StudentPlanView>
 
   public init(directory: URL? = nil) {

@@ -63,6 +63,8 @@ func typedEndpointsUseWireContractPaths() async throws {
     accessToken: "token"
   )
   _ = try await client.plan(id: planID, accessToken: "token")
+  _ = try await client.completePlanDay(id: dayID, accessToken: "token")
+  try await client.undoPlanDayCompletion(id: dayID, accessToken: "token")
   _ = try await client.coachStudents(accessToken: "token")
   _ = try await client.logSet(
     CreateSetLogRequestDTO(
@@ -97,9 +99,11 @@ func typedEndpointsUseWireContractPaths() async throws {
       "POST /plans/\(planID.uuidString)/publish",
       "GET /students/\(studentID.uuidString)/plans?status=published",
       "GET /plans/\(planID.uuidString)",
+      "POST /plans/days/\(dayID.uuidString)/complete",
+      "DELETE /plans/days/\(dayID.uuidString)/complete",
       "GET /coach/students",
       "POST /sets/log",
-      "GET /students/\(studentID.uuidString)/sets?from=2026-05-22&to=2026-05-23",
+      "GET /students/\(studentID.uuidString)/sets?from=2026-05-22&to=2026-05-23&scope=plan",
       "POST /coach/feedback",
       "GET /students/\(studentID.uuidString)/feedback",
       "PATCH /feedback/\(feedbackID.uuidString)/read",
@@ -175,6 +179,20 @@ private struct TypedEndpointResponseStub: Sendable {
   }
 
   private func postData(for path: String) -> Data {
+    if path.hasSuffix("/complete") {
+      return Data(
+        #"""
+        {
+          "id":"00000000-0000-4000-8000-000000000508",
+          "plan_day_id":"00000000-0000-4000-8000-000000000505",
+          "student_id":"00000000-0000-4000-8000-000000000502",
+          "source":"manual",
+          "completed_at":"2026-05-22T12:00:00Z"
+        }
+        """#
+        .utf8
+      )
+    }
     if path == "/plans" || path.hasSuffix("/publish") {
       return Data(planJSON(id: "00000000-0000-4000-8000-000000000501").utf8)
     }

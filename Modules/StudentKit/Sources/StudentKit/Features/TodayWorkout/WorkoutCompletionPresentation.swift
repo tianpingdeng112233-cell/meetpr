@@ -92,8 +92,12 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     self.averageRPEText =
       Self.average(completed.compactMap(Self.resolvedRPE))
       .map(Self.rpeText) ?? "—"
-    self.date = day.date
-    self.dateSubtitle = Self.dateSubtitle(date: day.date, weekCode: weekCode, locale: locale)
+    self.date = day.scheduledDate
+    self.dateSubtitle = Self.dateSubtitle(
+      date: day.scheduledDate,
+      weekCode: weekCode,
+      locale: locale
+    )
     self.streak = streak
     self.exercises = day.exercises.map { exercise in
       Self.exercisePerformance(

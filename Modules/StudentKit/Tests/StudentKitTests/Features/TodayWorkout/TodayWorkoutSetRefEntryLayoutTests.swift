@@ -153,13 +153,16 @@ struct TodayWorkoutSetRefEntryLayoutTests {
         setRefSharing: SetRefSharingContext(load: { [] })
       )
     )
+    // started: the entries under test live in the recording hero / completed
+    // section, which only exist once 开始第一组 has been tapped this visit.
     return TodayWorkoutView(
       studentID: studentID,
       date: planDayDate,
       plans: plans,
       logs: trainingLogs,
       preloadedViewModel: viewModel,
-      notifications: notifications
+      notifications: notifications,
+      started: true
     )
   }
 }
