@@ -18,6 +18,45 @@
 
 ---
 
+## 1.0 (18) — 2026-08-08 — 🟢 已上传(外测 Ceshi Testing 中;2026-08-09 ASC 实证)
+- 打包来源:tag `beta/1.0-18` @ f52c3ccf(`release/1.0`,1.0(17) 基底累积;tag = 发版线 tip,零落差)
+- 双端 demo 已同步本包(`MeetPR-demo-latest` detach @ f52c3ccf)
+- 台账收尾补记:上传后未即时挪账,2026-08-09 补收(David 提示)
+
+### 本版包含
+- **spec 071 训练日推进制(学员端换制,T3;PR #314)**:游标制取代日期锚定——今日卡/训练 tab
+  以「第一个未完成日」为轴,推荐日期降级纯展示,顺延学员端触发链整删(净删 ~2200 行)。
+  ⚖️08-08 三连拍板:未开始态=汇总卡;**结算权归学员**(长按「完成今日训练」唯一结算,
+  backend #201 同步下线 auto);问教练=卡片角文字芯片唯一入口。配套 backend 035(0057+#197+#201)
+  已上线 staging。闸门:loop 10+8 BLOCKER 清、703 测试绿、David 双机多轮真机走查收口。
+- **视频线真机走查修复+改进四连(08-07,David 走查产出并亲验)**:#310 录制全程屏幕常亮;
+  #312 强杀后重开自愈补传(僵尸任务收割+409 远端对账,10 BLOCKER 清);#315 录制控件让开
+  状态栏;#316 回看可拖 scrubber+确认页掐头去尾剪辑+「建议剪辑」轻提醒。⚖️「重拍」全 app 除名。
+- **spec 070 组内视频回看+留存至训练日结束(PR #309)**:「视频」即播放入口,本地秒开无感切
+  云端;本地留存到训练日结束(冷启动清扫+500MB 护栏)。同 PR 带 069 并发加固(~21 竞态
+  BLOCKER,16 条确定性竞态测试)+「已送达教练/还在路上」状态行。闸门:loop 1+11 轮 CLEAN,731 测试绿。
+- **spec 069 视频后台无感上传(PR #308)**:成功路径零 UI;分片迁 background URLSession
+  (杀 app/锁屏续传);失败退避+时间盒本地通知+打开 app 恒可见可重试。零 backend 改动。
+  ⚠️与 070 必须同包(069 原始版竞态由 070 修复,防 cherry-pick 单带)。
+- **spec 068 自建录制相机+直通快路(PR #307)**:AVCaptureSession 720p/60fps 边录边编码,
+  「处理中」近乎归零;录制状态机抗来电/切后台;存相册改可选 toggle;恢复 #269 remux 直通。
+- **spec 065 视频导出控码率(PR #304)**:AVAssetReader/Writer 重写导出,H.264 ≤1280 长边、
+  2.75Mbps average + 3.5Mbps DataRateLimits 硬顶(纯 average 被噪点内容顶穿,loop 实测),
+  2min 视频 ~150MB→~40-50MB。学员「上传特别慢」反馈根治。
+- **spec 066 聊天实时化(PR #305)**:30s/3s 轮询升级 WebSocket 实时(两端),断线回退轮询,
+  回前台重连追平。服务端 backend spec 032 已上线 staging。
+- **spec 067 APNs 接入(PR #306)**:推送注册/授权/前台策略/点按路由,配 backend spec 033
+  六类教练推送。**未配 ASC push key + SAE APNS_* 时代码安全休眠**。
+
+### 已知问题 / 局限
+- 067 推送硬前置未解:ASC APNs Auth Key(David 手动)+ SAE `PUSH_ENABLED`/`APNS_*` 未配,
+  本包推送整体休眠;TestFlight 需 `APNS_ENV=production`。
+- 071 换制后学员记满不自动结算,教练侧感知依赖学员长按——W2 教练分诊重定义再补。
+- wellness 五档(PR #273)未进本包,仍等 backend #95(迁移 0047)。
+
+### 测试反馈
+- (待收集)
+
 ## 1.0 (17) — 2026-08-03 — 🟢 已上传(Neice 免审生效;外测 Ceshi 已提交 Beta App Review)
 - 打包来源:tag `beta/1.0-17` @ 982cfaf(`release/1.0`,1.0(16) 基底累积;tag = 发版线 tip,零落差)
 - 闸门:tag CI 三项绿(**首跑红过一次**:self-hosted runner 所在 Mac 磁盘满,swiftc `No space left
