@@ -135,3 +135,27 @@ import Testing
   #expect(outputAudioTracks.count == 1)
   #expect(!audioPayloads.isEmpty)
 }
+
+/// The recorder stops one frame *past* the cap, so a full-length recording is
+/// clamped by the selection to exactly `maxDurationSeconds` — and `enqueue`
+/// rejects anything longer than the cap outright ("视频超过 120 秒上限").
+/// A passthrough export that overshot its range by even a few milliseconds
+/// would therefore make a just-recorded video unsendable, so pin the contract.
+@Test func passthroughTrimOutputNeverOvershootsTheSelectionCap() async throws {
+  let fixture = try await VideoExportFixture.make(
+    .init(frameCount: 60, sourceBitRate: 600_000, highEntropy: true)
+  )
+  defer { fixture.remove() }
+  var selection = VideoTrimSelection(sourceDurationSeconds: 2, maxDurationSeconds: 1)
+  selection.moveEnd(to: 1)
+
+  let outputURL = try await PassthroughVideoTrimExporter().export(
+    sourceURL: fixture.sourceURL,
+    selection: selection
+  )
+  defer { try? FileManager.default.removeItem(at: outputURL) }
+  let outputDuration = try await AVURLAsset(url: outputURL).load(.duration).seconds
+
+  #expect(selection.durationSeconds == selection.maxDurationSeconds)
+  #expect(outputDuration <= selection.maxDurationSeconds)
+}
