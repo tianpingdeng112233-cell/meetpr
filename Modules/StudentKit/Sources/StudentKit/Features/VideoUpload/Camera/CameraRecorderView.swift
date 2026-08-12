@@ -124,8 +124,7 @@
         item: $recordingToTrim,
         onDismiss: finishRecordingTrimPresentation
       ) { session in
-        VideoTrimmerView(session: session)
-          .ignoresSafeArea()
+        VideoTrimView(session: session)
       }
       .task {
         // Students frame the shot, walk to the bar, and never touch the
@@ -198,10 +197,6 @@
 
     private func prepareTrim(of sourceURL: URL) {
       guard recordingToTrim == nil, !isUsingRecording, !isApplyingTrim else { return }
-      guard UIVideoEditorController.canEditVideo(atPath: sourceURL.path) else {
-        showToast("当前视频无法剪辑")
-        return
-      }
       do {
         let workingURL = try RecorderVideoTrimFiles.makeWorkingCopy(of: sourceURL)
         let session = VideoTrimSession(
