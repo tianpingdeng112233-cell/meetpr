@@ -69,6 +69,26 @@ import Testing
   )
 }
 
+// The header always renders the real today (sequence-handoff canon), so the
+// label must follow the wall clock across a local midnight — not any plan date.
+@Test func headerDateTextFollowsTheWallClockAcrossMidnight() {
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = TimeZone(identifier: "Asia/Shanghai")!
+
+  // 2026-08-12 23:59 CST (Wednesday) vs one minute later (Thursday 08-13).
+  let beforeMidnight = Date(timeIntervalSince1970: 1_786_550_340)
+  let afterMidnight = beforeMidnight.addingTimeInterval(60)
+
+  #expect(
+    DashboardTodayPresentation.headerDateText(beforeMidnight, calendar: calendar)
+      == "8月12日 · 星期三"
+  )
+  #expect(
+    DashboardTodayPresentation.headerDateText(afterMidnight, calendar: calendar)
+      == "8月13日 · 星期四"
+  )
+}
+
 @Test func liftSubtitleUsesFullNamesForOneOrTwoLiftsOnly() {
   #expect(DashboardTodayPresentation.liftSubtitle([.deadlift]) == "硬拉日")
   #expect(DashboardTodayPresentation.liftSubtitle([.squat, .bench]) == "深蹲、卧推日")

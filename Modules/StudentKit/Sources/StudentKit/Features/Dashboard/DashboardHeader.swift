@@ -4,32 +4,27 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct DashboardHeader: View {
   let weekCode: String
-  let selectedDate: Date
   let statusBadge: String?
   let showsNotifications: Bool
   let unreadCount: Int
   let progressSegments: [DashboardWeekProgressSegment]
   let onOpenNotifications: () -> Void
 
-  private var dateLabel: String {
-    // Selection dates are device-calendar anchored — format them the same way.
-    let date = DashboardTodayPresentation.monthDayText(selectedDate, calendar: .current)
-    let offset = DashboardTodayPresentation.mondayOffset(
-      for: selectedDate,
-      calendar: .current
-    )
-    return "\(date) · 星期\(DashboardTodayPresentation.weekdayLetter(offset))"
-  }
-
   var body: some View {
     VStack(alignment: .leading, spacing: 15) {
       HStack(spacing: 10) {
         MeetPRMark.header
           .frame(width: 97, height: 24, alignment: .leading)
-        Text(dateLabel)
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-          .tracking(0.72)
-          .foregroundStyle(Color.MeetPR.textMuted)
+        // Always the real today (sequence-handoff canon: todayStr in all three
+        // scenes) — the coach-recommended date lives on the day card only.
+        // TimelineView keeps the label rolling over local midnight even when
+        // no model state changes to recompute the body.
+        TimelineView(.periodic(from: .now, by: 60)) { context in
+          Text(DashboardTodayPresentation.headerDateText(context.date, calendar: .current))
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+            .tracking(0.72)
+            .foregroundStyle(Color.MeetPR.textMuted)
+        }
       }
 
       HStack(alignment: .top) {

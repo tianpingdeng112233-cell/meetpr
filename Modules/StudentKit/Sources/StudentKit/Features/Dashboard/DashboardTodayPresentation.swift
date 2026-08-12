@@ -100,6 +100,12 @@ enum DashboardTodayPresentation {
     return "\(month)月\(day)日"
   }
 
+  static func headerDateText(_ date: Date, calendar: Calendar) -> String {
+    let monthDay = monthDayText(date, calendar: calendar)
+    let offset = mondayOffset(for: date, calendar: calendar)
+    return "\(monthDay) · 星期\(weekdayLetter(offset))"
+  }
+
   static func mondayOffset(for date: Date, calendar: Calendar) -> Int {
     let weekday = calendar.component(.weekday, from: date)
     return (weekday + 5) % 7

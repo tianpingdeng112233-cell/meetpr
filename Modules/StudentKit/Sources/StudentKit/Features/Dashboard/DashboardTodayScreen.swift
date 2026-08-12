@@ -58,7 +58,6 @@ struct DashboardTodayScreen: View {
     VStack(alignment: .leading, spacing: 15) {
       DashboardHeader(
         weekCode: displayDay.map(DashboardTodayPresentation.code(for:)) ?? "今日",
-        selectedDate: displayDay?.scheduledDate ?? model.now,
         statusBadge: cursorDay == nil && !sequence.orderedDays.isEmpty ? "已完成" : nil,
         showsNotifications: model.showsNotifications,
         unreadCount: model.notificationUnreadCount,
