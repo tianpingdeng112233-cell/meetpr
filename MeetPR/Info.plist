@@ -52,6 +52,8 @@
 	<string>拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

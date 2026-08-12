@@ -35,6 +35,20 @@
                ReferencedContainer = "container:MeetPR.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "91FDB45FCC6F7F39281270BC"
+               BuildableName = "MeetPRWidgets.appex"
+               BlueprintName = "MeetPRWidgets"
+               ReferencedContainer = "container:MeetPR.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

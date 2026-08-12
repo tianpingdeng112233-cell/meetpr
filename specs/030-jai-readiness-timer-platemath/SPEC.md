@@ -32,7 +32,7 @@
 
 [ 学员 tap 组行 → SetEntrySheet 调重量/次数/RPE → "完成本组" ]
   ↓(首次完成边沿)浮层从底部滑入:◔ 组间休息 2:43   [-30s] [跳过] [+30s]
-  ↓ 到点 → "休息结束 💪" + haptic,3s 自动消失;今日最后一组完成 → 不弹(完成 banner 顶上)
+  ↓ 到点 → "休息结束" + haptic,3s 自动消失;今日最后一组完成 → 不弹(完成 banner 顶上)
 
 [ 组行重量 "100 kg" 旁 ⚖ 小图标 ]
   ↓ tap → PlateMathSheet bottom sheet
@@ -209,7 +209,7 @@ public func skipRestTimer() { restTimer = nil }
 - `TodayWorkoutView` 经 `.safeAreaInset(edge: .bottom)` 挂浮层(`viewModel.restTimer != nil` 时出现,滑入滑出动画),不遮 tab bar、不挡组行 tap
 - `TimelineView(.periodic(from:by: 1))` 驱动:剩余时间 `m:ss` 大号 monospacedDigit + 细进度条(`remaining / totalSeconds`,`Color.MeetPR.brandRed`)
 - 三按钮:`[-30s]` `[跳过]` `[+30s]` → 调 B2 的 VM 方法
-- 到点:文案换 "休息结束 💪" + `UINotificationFeedbackGenerator` success haptic(`#if canImport(UIKit)` 包住,macOS 目标跳过),3s 后 VM 清状态自动消失。无声音、无推送(V0.1.x)
+- 到点:文案换 "休息结束" + `UINotificationFeedbackGenerator` success haptic(`#if canImport(UIKit)` 包住,macOS 目标跳过),3s 后 VM 清状态自动消失。无声音、无推送(V0.1.x)
 
 ---
 
