@@ -5,18 +5,40 @@ import Testing
 @testable import StudentKit
 
 @Test(arguments: [
-  (PrescribedSet(id: UUID(), setIndex: 0, intensity: .percentage(72.5), reps: 5), "72.5% × 5"),
-  (PrescribedSet(id: UUID(), setIndex: 0, intensity: .rpeRange(8, 9), reps: 5), "RPE 8–9 × 5"),
   (
-    PrescribedSet(id: UUID(), setIndex: 0, intensity: .weightRange(165, 175), reps: 5),
+    PrescribedSet(
+      id: UUID(), setIndex: 0, intensity: .percentage(72.5), loadMode: .percentage, reps: 5),
+    "72.5% × 5"
+  ),
+  (
+    PrescribedSet(
+      id: UUID(), setIndex: 0, intensity: .rpeRange(8, 9), loadMode: .rpeRange, reps: 5),
+    "RPE 8–9 × 5"
+  ),
+  (
+    PrescribedSet(
+      id: UUID(), setIndex: 0, intensity: .weightRange(165, 175), loadMode: .weightRange, reps: 5),
     "165–175kg × 5"
   ),
   (
-    PrescribedSet(id: UUID(), setIndex: 0, weightKg: 170, intensity: .rpe(9), reps: 5),
+    PrescribedSet(
+      id: UUID(), setIndex: 0, weightKg: 170, intensity: .rpe(9), loadMode: .rpe, reps: 5),
     "170kg × 5 @RPE9"
   ),
-  (PrescribedSet(id: UUID(), setIndex: 0, weightKg: 150, reps: 5), "150kg × 5"),
-  (PrescribedSet(id: UUID(), setIndex: 0, intensity: .rir(2), reps: 5), "RIR 2 × 5"),
+  // Sparse single-value row: weight present, intensity value left empty.
+  (
+    PrescribedSet(id: UUID(), setIndex: 0, weightKg: 150, loadMode: .rpe, reps: 5),
+    "150kg × 5"
+  ),
+  (
+    PrescribedSet(
+      id: UUID(), setIndex: 0, weightKg: 150, loadMode: .fixedWeight, reps: 5),
+    "150kg × 5"
+  ),
+  (
+    PrescribedSet(id: UUID(), setIndex: 0, intensity: .rir(2), loadMode: .rir, reps: 5),
+    "RIR 2 × 5"
+  ),
 ])
 func prescribedIntensityFormattingIsFaithful(set: PrescribedSet, expected: String) {
   let rendered = StudentFormatting.prescribed(set)
@@ -25,17 +47,23 @@ func prescribedIntensityFormattingIsFaithful(set: PrescribedSet, expected: Strin
   #expect(!rendered.contains("-kg"))
 }
 
+// Legacy rows (load_mode == null) must keep the pre-072 strings byte-for-byte
+// (spec 072 §1.4), including the dash placeholder and ASCII "x".
+@Test(arguments: [
+  (PrescribedSet(id: UUID(), setIndex: 0, weightKg: 140, reps: 5), "140kg x 5"),
+  (PrescribedSet(id: UUID(), setIndex: 0, reps: 5, rpe: 8), "-kg x 5"),
+  (PrescribedSet(id: UUID(), setIndex: 0, weightKg: 142.5, reps: 3, repsMax: 5), "142.5kg x 3-5"),
+])
+func legacyPrescriptionFormattingIsUnchanged(set: PrescribedSet, expected: String) {
+  #expect(set.isLegacyPrescription)
+  #expect(StudentFormatting.prescribed(set) == expected)
+}
+
 @MainActor
 @Test func heroUsesPercentageAsPrimaryTextWithoutFabricatedRPE() throws {
   let prescribed = PrescribedSet(
-    id: UUID(), setIndex: 0, intensity: .percentage(72.5), reps: 5)
-  let day = intensityDay(prescribed: prescribed)
-  let presentation = TodayWorkoutPresentation(
-    day: day,
-    drafts: TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []),
-    references: [:],
-    started: true
-  )
+    id: UUID(), setIndex: 0, intensity: .percentage(72.5), loadMode: .percentage, reps: 5)
+  let presentation = intensityPresentation(prescribed: prescribed)
   let row = try #require(presentation.currentRow)
 
   #expect(row.heroPrimaryText == "72.5%")
@@ -48,14 +76,8 @@ func prescribedIntensityFormattingIsFaithful(set: PrescribedSet, expected: Strin
 @MainActor
 @Test func heroShowsIndependentRPEAlongsideWeight() throws {
   let prescribed = PrescribedSet(
-    id: UUID(), setIndex: 0, weightKg: 170, intensity: .rpe(9), reps: 5)
-  let day = intensityDay(prescribed: prescribed)
-  let presentation = TodayWorkoutPresentation(
-    day: day,
-    drafts: TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []),
-    references: [:],
-    started: true
-  )
+    id: UUID(), setIndex: 0, weightKg: 170, intensity: .rpe(9), loadMode: .rpe, reps: 5)
+  let presentation = intensityPresentation(prescribed: prescribed)
   let row = try #require(presentation.currentRow)
 
   #expect(row.heroPrimaryText == "170")
@@ -63,7 +85,50 @@ func prescribedIntensityFormattingIsFaithful(set: PrescribedSet, expected: Strin
   #expect(row.heroSecondaryIntensityText == "RPE 9")
 }
 
-private func intensityDay(prescribed: PrescribedSet) -> StudentPlanDay {
+// A sparse new-form row (weight only) must not fall back into the legacy hero
+// and resurrect the fabricated 目标 RPE 0/10 block.
+@MainActor
+@Test func sparseNewFormRowUsesNewHeroWithoutIntensityBlock() throws {
+  let prescribed = PrescribedSet(
+    id: UUID(), setIndex: 0, weightKg: 150, loadMode: .rpe, reps: 5)
+  let presentation = intensityPresentation(prescribed: prescribed)
+  let row = try #require(presentation.currentRow)
+
+  #expect(!row.usesLegacyHero)
+  #expect(row.heroPrimaryText == "150")
+  #expect(row.heroSecondaryIntensityText == nil)
+}
+
+// Legacy rows keep the pre-072 hero and the record-based exercise summary.
+@MainActor
+@Test func legacyRowKeepsLegacyHeroAndRecordSummary() throws {
+  let prescribed = PrescribedSet(id: UUID(), setIndex: 0, reps: 5, rpe: 8)
+  let presentation = intensityPresentation(prescribed: prescribed)
+  let row = try #require(presentation.currentRow)
+
+  #expect(row.usesLegacyHero)
+  #expect(row.heroPrimaryText == "—")
+  #expect(row.heroSecondaryIntensityText == nil)
+  #expect(presentation.exercises.first?.prescriptionSummary == nil)
+}
+
+@MainActor
+private func intensityPresentation(prescribed: PrescribedSet) -> TodayWorkoutPresentation {
+  intensityPresentation(prescribed: [prescribed])
+}
+
+@MainActor
+private func intensityPresentation(prescribed: [PrescribedSet]) -> TodayWorkoutPresentation {
+  let day = intensityDay(prescribed: prescribed)
+  return TodayWorkoutPresentation(
+    day: day,
+    drafts: TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []),
+    references: [:],
+    started: true
+  )
+}
+
+private func intensityDay(prescribed: [PrescribedSet]) -> StudentPlanDay {
   let exercise = Exercise(
     id: UUID(),
     name: "深蹲",
@@ -78,7 +143,43 @@ private func intensityDay(prescribed: PrescribedSet) -> StudentPlanDay {
     date: Date(),
     exercises: [
       StudentPlanExercise(
-        id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: [prescribed])
+        id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: prescribed)
     ]
   )
+}
+
+// Heterogeneous sets (spec §2) must not be passed off as uniform: the summary
+// names a prescription only when every set renders identically.
+@MainActor
+@Test func heterogeneousSetsSummarizeAsCountOnly() throws {
+  let first = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(72.5), loadMode: .percentage, reps: 5)
+  let second = PrescribedSet(
+    id: UUID(), setIndex: 1, weightKg: 170, intensity: .rpe(9), loadMode: .rpe, reps: 5)
+  let presentation = intensityPresentation(prescribed: [first, second])
+
+  #expect(presentation.exercises.first?.prescriptionSummary == "2 组")
+}
+
+// A legacy first set with a new-form set behind it must not hide the exercise
+// behind the record-based fallback either.
+@MainActor
+@Test func mixedLegacyAndNewFormSetsSummarizeAsCountOnly() throws {
+  let legacy = PrescribedSet(id: UUID(), setIndex: 0, reps: 5, rpe: 8)
+  let newForm = PrescribedSet(
+    id: UUID(), setIndex: 1, weightKg: 170, intensity: .rpe(9), loadMode: .rpe, reps: 5)
+  let presentation = intensityPresentation(prescribed: [legacy, newForm])
+
+  #expect(presentation.exercises.first?.prescriptionSummary == "2 组")
+}
+
+@MainActor
+@Test func uniformSetsKeepNamedSummary() throws {
+  let set = PrescribedSet(
+    id: UUID(), setIndex: 0, weightKg: 150, loadMode: .fixedWeight, reps: 5)
+  let second = PrescribedSet(
+    id: UUID(), setIndex: 1, weightKg: 150, loadMode: .fixedWeight, reps: 5)
+  let presentation = intensityPresentation(prescribed: [set, second])
+
+  #expect(presentation.exercises.first?.prescriptionSummary == "150kg × 5 · 2 组")
 }

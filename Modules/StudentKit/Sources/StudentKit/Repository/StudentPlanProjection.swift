@@ -87,6 +87,7 @@ enum StudentPlanProjection {
       setIndex: planSet.setNumber - 1,
       weightKg: prescription.weightKg,
       intensity: prescription.intensity,
+      loadMode: planSet.loadMode,
       reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
       restSeconds: restSeconds(for: planSet),

@@ -37,6 +37,11 @@ import Testing
   #expect(sets[8].restSeconds == nil)
   #expect(sets[9].weightKg == 140)
   #expect(sets[9].intensity == nil)
+  #expect(sets[0].loadMode == .percentage)
+  #expect(sets[7].loadMode == .percentage)
+  #expect(!sets[7].isLegacyPrescription)
+  #expect(sets[8].isLegacyPrescription)
+  #expect(sets[9].isLegacyPrescription)
 }
 
 @Test func scheduledDateKeepsLegacyStartDateWhenAnchorIsNil() {

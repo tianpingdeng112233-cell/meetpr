@@ -147,7 +147,7 @@ import Testing
     )
 
     #expect(sheet.suggestionOutcomeSnapshot.unavailableReason == .noEligibleE1RMHistory)
-    #expect(sheet.weightValue == 0)
+    #expect(sheet.weightValue == 20)
     let snapshotStorage = Mirror(reflecting: sheet).children.first {
       $0.label == "_suggestionOutcomeSnapshot"
     }
@@ -160,7 +160,7 @@ import Testing
       fixture.viewModel.weightSuggestionOutcome(forSetID: fixture.draft.id).suggestion != nil
     )
     #expect(sheet.suggestionOutcomeSnapshot.unavailableReason == .noEligibleE1RMHistory)
-    #expect(sheet.weightValue == 0)
+    #expect(sheet.weightValue == 20)
   }
 
   @MainActor
@@ -191,11 +191,13 @@ import Testing
   }
 
   @MainActor
-  @Test func sheetPrefillsPercentageConversionAndFixedWeightOnly() async throws {
+  @Test func sheetPrefillsFixedWeightAndLeavesPercentageEmpty() async throws {
+    // pct anchors are tiered (⚖️2026-08-12, default 1RM): no conversion until
+    // pct_anchor lands, so the sheet must stay empty rather than invent 90kg.
     let pctFixture = try await makeSuggestionSheetFixture(
       seedHistory: true,
       prescribed: PrescribedSet(
-        id: UUID(), setIndex: 0, intensity: .percentage(75), reps: 5)
+        id: UUID(), setIndex: 0, intensity: .percentage(75), loadMode: .percentage, reps: 5)
     )
     let pctSheet = SetEntrySheet(
       rowIndex: 0,
@@ -205,7 +207,8 @@ import Testing
     )
     let fixedFixture = try await makeSuggestionSheetFixture(
       seedHistory: false,
-      prescribed: PrescribedSet(id: UUID(), setIndex: 0, weightKg: 150, reps: 5)
+      prescribed: PrescribedSet(
+        id: UUID(), setIndex: 0, weightKg: 150, loadMode: .fixedWeight, reps: 5)
     )
     let fixedSheet = SetEntrySheet(
       rowIndex: 0,
@@ -214,7 +217,7 @@ import Testing
       viewModel: fixedFixture.viewModel
     )
 
-    #expect(pctSheet.weightValue == 90)
+    #expect(pctSheet.weightValue == 0)
     #expect(fixedSheet.weightValue == 150)
   }
 
@@ -222,7 +225,8 @@ import Testing
   @Test func sheetDoesNotPrefillEmptyBarForUnsupportedIntensity() async throws {
     let fixture = try await makeSuggestionSheetFixture(
       seedHistory: true,
-      prescribed: PrescribedSet(id: UUID(), setIndex: 0, intensity: .rir(2), reps: 5)
+      prescribed: PrescribedSet(
+        id: UUID(), setIndex: 0, intensity: .rir(2), loadMode: .rir, reps: 5)
     )
     let sheet = SetEntrySheet(
       rowIndex: 0,

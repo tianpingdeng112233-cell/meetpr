@@ -31,6 +31,18 @@ enum StudentFormatting {
   }
 
   static func prescribed(_ set: PrescribedSet) -> String {
+    // Legacy rows (load_mode == null) keep the pre-072 string byte-for-byte;
+    // only new-form rows get the six-form rendering (spec 072 §1.4).
+    if set.isLegacyPrescription {
+      let reps: String
+      if let lowerBound = set.reps, let upperBound = set.repsMax {
+        reps = "\(lowerBound)-\(upperBound)"
+      } else {
+        reps = set.reps.map(String.init) ?? "-"
+      }
+      return "\(decimal(set.weightKg))kg x \(reps)"
+    }
+
     let reps: String
     if let lowerBound = set.reps, let upperBound = set.repsMax {
       reps = "\(lowerBound)–\(upperBound)"

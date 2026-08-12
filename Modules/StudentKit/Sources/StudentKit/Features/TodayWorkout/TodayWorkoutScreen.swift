@@ -595,7 +595,23 @@ private struct TodayWorkoutHero: View {
         }
         .launchHeroRise(index: 3, trigger: launchHeroRevealToken)
 
-        if let intensityText = row.heroSecondaryIntensityText {
+        if row.usesLegacyHero {
+          // Pre-072 block, unchanged for legacy prescriptions (spec 072 §1.4).
+          HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
+            Text("目标 RPE")
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
+              .tracking(0.55)
+              .foregroundStyle(Color.MeetPR.textFaint)
+            Text(numberText(row.record.rpe))
+              .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+            Text("/ 10")
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.textFaint)
+          }
+          .padding(.top, MeetPRSpacing.space2)
+          .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
+        } else if let intensityText = row.heroSecondaryIntensityText {
           HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
             Text("目标强度")
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
@@ -731,6 +747,12 @@ private struct TodayWorkoutActionSummaryRow: View {
         Text(prescriptionSummary)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textTertiary)
+      } else if let first = exercise.rows.first?.record {
+        // Pre-072 record-based summary, unchanged for legacy prescriptions.
+        let weight = first.weight.map { numberText($0) + "kg" } ?? "—"
+        Text("\(weight) × \(first.reps) · \(exercise.rows.count) 组")
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
     .padding(.horizontal, MeetPRSpacing.point13)
@@ -741,6 +763,10 @@ private struct TodayWorkoutActionSummaryRow: View {
         .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.control))
+  }
+
+  private func numberText(_ value: Double) -> String {
+    value.formatted(.number.precision(.fractionLength(0...2)))
   }
 }
 

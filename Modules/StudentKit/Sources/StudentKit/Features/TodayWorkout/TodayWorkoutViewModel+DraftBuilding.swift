@@ -51,13 +51,19 @@ extension TodayWorkoutViewModel {
       return .unavailableWithoutReason
     }
 
+    // New-form intensities other than plain RPE degrade quietly for now:
+    // pct anchors are tiered (1RM/e1RM/top set, ⚖️2026-08-12) and converting
+    // against the wrong anchor is exactly the fabricated-number failure this
+    // spec removes; ranges and RIR have no suggestion semantics yet (卡 2).
+    switch target.prescribed.intensity {
+    case .percentage, .rir, .rpeRange, .weightRange:
+      return .unavailableWithoutReason
+    case .rpe, nil:
+      break
+    }
+
     let baseOutcome: SetWeightSuggestionOutcome
-    if case .percentage(let targetPct) = target.prescribed.intensity {
-      baseOutcome = percentageSuggestionOutcome(
-        targetPct: targetPct,
-        currentE1RMKg: currentE1RMKg
-      )
-    } else if target.isMainLift {
+    if target.isMainLift {
       baseOutcome = mainLiftSuggestionOutcome(
         target: target,
         priorDrafts: drafts[..<targetIndex],
@@ -132,35 +138,6 @@ extension TodayWorkoutViewModel {
       suggestion: suggestion,
       unavailableReason: suggestion == nil ? .noEligibleE1RMHistory : nil
     )
-  }
-
-  private nonisolated static func percentageSuggestion(
-    targetPct: Decimal,
-    currentE1RMKg: Double
-  ) -> SetWeightSuggestion? {
-    let percentage = NSDecimalNumber(decimal: targetPct).doubleValue
-    guard percentage > 0 else { return nil }
-    let roundedWeight = roundedDownToPlateStep(currentE1RMKg * percentage / 100)
-    guard roundedWeight > 0 else { return nil }
-    return SetWeightSuggestion(
-      weightKg: Decimal(roundedWeight),
-      basis: .e1RM(currentE1RMKg)
-    )
-  }
-
-  private nonisolated static func percentageSuggestionOutcome(
-    targetPct: Decimal,
-    currentE1RMKg: Double?
-  ) -> SetWeightSuggestionOutcome {
-    guard let currentE1RMKg,
-      let suggestion = percentageSuggestion(targetPct: targetPct, currentE1RMKg: currentE1RMKg)
-    else {
-      return SetWeightSuggestionOutcome(
-        suggestion: nil,
-        unavailableReason: .noEligibleE1RMHistory
-      )
-    }
-    return SetWeightSuggestionOutcome(suggestion: suggestion, unavailableReason: nil)
   }
 
   private nonisolated static func fallbackSuggestionOutcome(

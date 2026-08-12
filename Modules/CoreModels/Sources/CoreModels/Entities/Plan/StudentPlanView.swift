@@ -242,6 +242,10 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public let setIndex: Int
   public let weightKg: Decimal?
   public let intensity: PrescribedIntensity?
+  /// Contract v2.1 provenance: `nil` marks a legacy row (`load_mode == null`),
+  /// which must keep rendering and prefill exactly as before spec 072. New-form
+  /// rows carry their wire mode even when the value column is sparse.
+  public let loadMode: PlanLoadMode?
   public let reps: Int?
   public let repsMax: Int?
   public let restSeconds: Int?
@@ -255,6 +259,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     setIndex: Int,
     weightKg: Decimal? = nil,
     intensity: PrescribedIntensity? = nil,
+    loadMode: PlanLoadMode? = nil,
     reps: Int? = nil,
     repsMax: Int? = nil,
     rpe: Decimal? = nil,
@@ -265,6 +270,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     self.setIndex = setIndex
     self.weightKg = weightKg
     self.intensity = intensity ?? rpe.map(PrescribedIntensity.rpe)
+    self.loadMode = loadMode
     self.reps = reps
     self.repsMax = repsMax
     self.restSeconds = restSeconds
@@ -282,6 +288,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     intensity =
       try container.decodeIfPresent(PrescribedIntensity.self, forKey: .intensity)
       ?? legacyRPE.map(PrescribedIntensity.rpe)
+    loadMode = try container.decodeIfPresent(PlanLoadMode.self, forKey: .loadMode)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
     coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
   }
@@ -294,6 +301,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeIfPresent(reps, forKey: .reps)
     try container.encodeIfPresent(repsMax, forKey: .repsMax)
     try container.encodeIfPresent(intensity, forKey: .intensity)
+    try container.encodeIfPresent(loadMode, forKey: .loadMode)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
     try container.encodeIfPresent(coachNote, forKey: .coachNote)
@@ -304,6 +312,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     case setIndex
     case weightKg
     case intensity
+    case loadMode
     case reps
     case repsMax
     case rpe
@@ -316,5 +325,11 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public var rpe: Decimal? {
     guard case .rpe(let value) = intensity else { return nil }
     return value
+  }
+
+  /// Legacy rows (`load_mode == null`) keep the pre-072 rendering and prefill
+  /// paths byte-for-byte; only new-form rows enter the six-form presentation.
+  public var isLegacyPrescription: Bool {
+    loadMode == nil
   }
 }

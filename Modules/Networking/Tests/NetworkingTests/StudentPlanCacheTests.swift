@@ -86,6 +86,7 @@ import Testing
     setIndex: 0,
     weightKg: 170,
     intensity: .rpe(9),
+    loadMode: .rpe,
     reps: 5
   )
   let planExercise = StudentPlanExercise(
@@ -102,4 +103,68 @@ import Testing
   #expect(restored == plan)
   #expect(restored.days[0].exercises[0].prescribedSets[0].weightKg == 170)
   #expect(restored.days[0].exercises[0].prescribedSets[0].intensity == .rpe(9))
+  #expect(restored.days[0].exercises[0].prescribedSets[0].loadMode == .rpe)
+}
+
+// A pre-072 v3 cache file (no `intensity`/`load_mode` keys, RPE stored under
+// `rpe`) must load with legacy semantics intact (spec 072 §5.1).
+@Test func studentPlanCacheLoadsPre072LegacyPayload() async throws {
+  let directory = FileManager.default.temporaryDirectory
+    .appending(
+      path: "StudentPlanLegacyCacheTests-\(UUID().uuidString)",
+      directoryHint: .isDirectory
+    )
+  try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+  defer { try? FileManager.default.removeItem(at: directory) }
+  let studentID = UUID()
+  let date = Date(timeIntervalSince1970: 1_900_000_000)
+  let exercise = Exercise(
+    id: UUID(),
+    name: "深蹲",
+    exerciseType: .mainLift,
+    isCompetitionLift: true,
+    muscleGroups: [.quad],
+    equipment: [.barbell],
+    createdAt: date
+  )
+  let rpeRow = PrescribedSet(id: UUID(), setIndex: 0, reps: 5, rpe: 8)
+  let weightRow = PrescribedSet(id: UUID(), setIndex: 1, weightKg: 140, reps: 5)
+  let planExercise = StudentPlanExercise(
+    id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: [rpeRow, weightRow])
+  let plan = StudentPlanView(
+    cycleID: UUID(), weekIndex: 1, startDate: date,
+    days: [StudentPlanDay(id: UUID(), date: date, exercises: [planExercise])]
+  )
+
+  // Reconstruct the exact pre-072 byte shape: today's encoding minus the keys
+  // that did not exist then.
+  let encoded = try MeetPRCodec.encoder.encode(plan)
+  let object = try JSONSerialization.jsonObject(with: encoded)
+  let stripped = strippingNewIntensityKeys(object)
+  let legacyData = try JSONSerialization.data(withJSONObject: stripped)
+  try legacyData.write(
+    to: directory.appending(path: "student-\(studentID.uuidString)-plan-v3.json"))
+
+  let cache = StudentPlanCache(directory: directory)
+  let restored = try #require(await cache.loadPlan(studentID: studentID))
+
+  let sets = restored.days[0].exercises[0].prescribedSets
+  #expect(sets[0].isLegacyPrescription)
+  #expect(sets[0].rpe == 8)
+  #expect(sets[0].weightKg == nil)
+  #expect(sets[1].isLegacyPrescription)
+  #expect(sets[1].weightKg == 140)
+  #expect(sets[1].rpe == nil)
+}
+
+private func strippingNewIntensityKeys(_ object: Any) -> Any {
+  if var dictionary = object as? [String: Any] {
+    dictionary.removeValue(forKey: "intensity")
+    dictionary.removeValue(forKey: "load_mode")
+    return dictionary.mapValues(strippingNewIntensityKeys)
+  }
+  if let array = object as? [Any] {
+    return array.map(strippingNewIntensityKeys)
+  }
+  return object
 }

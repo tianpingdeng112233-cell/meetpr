@@ -46,8 +46,8 @@
   - 历史行/日详情/汇总行沿用 `StudentFormatting` 统一格式。
 
 ### E2 止血
-- `TodayWorkoutViewModel+DraftBuilding.swift`:`load_mode == 'pct'` 时**不用投影 RPE 算建议**;有该动作 e1RM → 建议重量 = pct × e1RM(复用现有 e1RM 建议管线,来源标注沿用现有 UI);无 e1RM → 走现有「暂无建议」降级(文案沿用现行句式,新文案等 D4 稿)。`rir`/区间模式 → 降级,不硬算。
-- `SetEntrySheet.swift:66-74` 预填:只预填忠实值——`target_weight`/fixed_weight 预填重量;pct 有 e1RM 可预填换算重量;其余不再落 20kg 空杆底。记录「实际 RPE」输入的默认值行为(legacy `?? 8`)不在本卡范围,维持现状。
+- `TodayWorkoutViewModel+DraftBuilding.swift`:新形式(`loadMode != nil`)中除 `.rpe` 沿用现行 RPE 管线外,**pct/rir/区间一律安静降级不给建议**(⚖️08-12 % 锚点拍板 B:锚二级化 1RM/e1RM/当日顶组、默认 1RM,`pct_anchor` spec 未落地前 iOS 不硬算换算——用 e1RM 换算 1RM 锚的 % 同样是错数)。换算建议随卡 2 在 pct_anchor 落定后接。
+- `SetEntrySheet.swift:66-74` 预填:只预填忠实值——`target_weight`/fixed_weight 预填重量;其余新形式行不再落 20kg 空杆底,重量框留空,**空值时禁用「完成」**(显式输入 0 仍合法,自重动作);legacy 行(loadMode==nil)预填链与现状逐字节一致。记录「实际 RPE」输入的默认值行为(legacy `?? 8`)不在本卡范围,维持现状。
 - `RestDefaults.seconds(forRPE:)` 派生(`DraftMapping.swift:100`/`PlanPublishAssembler.swift:156`):rpe_range 取下限喂入;pct/rir/fixed_weight 传 nil 走默认,不喂伪 RPE。
 
 ### E3 周几对齐
@@ -64,7 +64,7 @@
 
 1. 单测 fixture 全覆盖:六形式各一 + 双锚 + 稀疏 + 异构组 + legacy 老行(纯 RPE / 纯重量)+ 老缓存 payload 解码 + 新 payload round-trip。
 2. 投影测试:`load_mode != null` 时旧字段被忽略(pct 行不得产出 RPE 显示);legacy 行为逐项与现状一致。
-3. 建议引擎测试:pct+有 e1RM → 按百分比换算;pct+无 e1RM → 降级;rir/区间 → 降级;rpe/legacy → 现行为不变。
+3. 建议引擎测试:pct/rir/区间(主项与辅助项都要覆盖)→ 安静降级不产生建议;新形式 .rpe 与 legacy → 现行为不变。
 4. anchor 推导测试:null / anchor==startDate 周几 / anchor 偏移若干天 三例,含跨周。
 5. 渲染快照或字符串断言:上述 §3 E1 的格式表逐条;「目标 RPE 0/10」与「-kg x 5」在新形式下不再出现。
 6. `swift test` + `build_sim`/`test_sim` 全绿;swiftlint --strict 零告警。
