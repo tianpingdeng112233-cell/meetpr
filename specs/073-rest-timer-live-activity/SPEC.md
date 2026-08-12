@@ -68,11 +68,15 @@ Codex 自选，但测试必须覆盖全部路径）：
 | `skipRestTimer` / 悬浮条 3s 自动收起 | `end` |
 | 全组记完导致 `restTimer = nil` | `end` |
 
-- **自然到点（app 在后台）**：widget 的 `timerInterval` 到 0 自动停在 0:00，视图切
-  「休息结束 💪」态——**不需要 app 醒来**。`staleDate = endsAt + 60s` 让系统可回收。
-  app 回前台时发现 activity 已过期 → `end`；app 冷启动时清理所有遗留 activity
-  （`Activity<RestTimerActivityAttributes>.activities` 全 end）。锁屏结束态残留到
-  用户回 app 为止，属可接受行为（各大计时 app 同款）。
+- **自然到点（app 在后台）**：`staleDate = endsAt`，到点系统把 activity 标 stale，
+  widget 以 `context.isStale` 切「休息结束 💪」态——**不需要 app 醒来**；倒计时
+  `timerInterval` 文本本身由系统跳秒并停在 0:00。
+  （⚖️ 2026-08-12 实装期修订，Codex CHALLENGE #1 采纳：Live Activity 不跑 widget
+  timeline，`TimelineView` 条件分支渲染后不会重新求值，模拟器实测确认；原
+  「`staleDate = endsAt + 60s` 供系统回收」依据不成立——stale 只标内容过时，不负责
+  回收。）app 回前台时发现 activity 已过期 → `end`；app 冷启动时清理所有遗留
+  activity（`Activity<RestTimerActivityAttributes>.activities` 全 end）。锁屏结束态
+  残留到用户回 app 为止，属可接受行为（各大计时 app 同款）。
 - **授权**：`ActivityAuthorizationInfo().areActivitiesEnabled == false` → 全链 no-op，
   不弹提示不做引导（V1 不做设置项，系统开关即开关）。
 - 教练端 / coach demo 无休息计时，零接触。
