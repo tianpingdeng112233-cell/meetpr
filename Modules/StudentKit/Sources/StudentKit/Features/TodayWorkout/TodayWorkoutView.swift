@@ -64,6 +64,8 @@ public struct TodayWorkoutView: View {
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
+    restTimerActivityController: any RestTimerActivityControlling =
+      NoOpRestTimerActivityController(),
     videoUploads: VideoUploadServices? = nil,
     planHandoff: TodayWorkoutPlanHandoff? = nil,
     jumpToTodayToken: Int = 0,
@@ -118,7 +120,8 @@ public struct TodayWorkoutView: View {
         logs: logs,
         e1rm: e1rm,
         onboarding: onboarding,
-        restTimerSettings: restTimerSettings
+        restTimerSettings: restTimerSettings,
+        restTimerActivityController: restTimerActivityController
       )
     )
     self._readinessViewModel = State(

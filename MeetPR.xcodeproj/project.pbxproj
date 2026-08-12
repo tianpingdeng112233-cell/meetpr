@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0578A41724493A8AEA5D7C3C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 5369CF2E8FEB108BFB6093AA /* Localizable.xcstrings */; };
+		0702C9771F5615B336E3F8F5 /* RestTimerActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1DBCF18CCFFB0A32B073D0 /* RestTimerActivityAttributes.swift */; };
+		2B42D29F810A6A93FD5DD406 /* MeetPRWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADBC37A6EDDB34AF5EEA1A4D /* MeetPRWidgetsBundle.swift */; };
+		2D990D82451D894619F6AF80 /* MeetPRWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 844A03B35D639817A2869838 /* MeetPRWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3A4E421AC08851F88AC27639 /* RestTimerLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 702BB25BCBD4957E618AB6AB /* RestTimerLiveActivityController.swift */; };
+		95191E540843F570487DA6B7 /* RestTimerLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 702BB25BCBD4957E618AB6AB /* RestTimerLiveActivityController.swift */; };
 		AA0000000000000000000030 /* CoreModels in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000020 /* CoreModels */; };
 		AA0000000000000000000031 /* Networking in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000021 /* Networking */; };
 		AA0000000000000000000032 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000022 /* DesignSystem */; };
@@ -23,6 +29,9 @@
 		AA0000000000000000000045 /* StudentKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000025 /* StudentKit */; };
 		AA0000000000000000000046 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000070 /* AppIntents.framework */; };
 		AA0000000000000000000047 /* ChatUI in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000000000000000000026 /* ChatUI */; };
+		CFB87DD2686428EB1079CF52 /* WidgetStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E93FD77AF38F236AF7F5787E /* WidgetStrings.swift */; };
+		D561ED89F43CBFEEC7F1D8DE /* RestTimerLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04523D4F3DCE4DCB785E153 /* RestTimerLiveActivityWidget.swift */; };
+		FB8F1CCD25F3F7B76098F33B /* RestTimerActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1DBCF18CCFFB0A32B073D0 /* RestTimerActivityAttributes.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,12 +42,41 @@
 			remoteGlobalIDString = AA0000000000000000000006;
 			remoteInfo = MeetPR;
 		};
+		F78B8342222906C13ED18E09 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA0000000000000000000002 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 91FDB45FCC6F7F39281270BC;
+			remoteInfo = MeetPRWidgets;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		CC426AEF4F5B1694380CF3C8 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2D990D82451D894619F6AF80 /* MeetPRWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		5369CF2E8FEB108BFB6093AA /* Localizable.xcstrings */ = {isa = PBXFileReference; includeInIndex = 1; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		702BB25BCBD4957E618AB6AB /* RestTimerLiveActivityController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestTimerLiveActivityController.swift; sourceTree = "<group>"; };
+		844A03B35D639817A2869838 /* MeetPRWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MeetPRWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA000000000000000000000A /* MeetPR.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeetPR.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000000000000000000069 /* MeetPRTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MeetPRTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000000000000000000070 /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = System/Library/Frameworks/AppIntents.framework; sourceTree = SDKROOT; };
+		ADBC37A6EDDB34AF5EEA1A4D /* MeetPRWidgetsBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MeetPRWidgetsBundle.swift; sourceTree = "<group>"; };
+		CB49BEF2893BAFDB00568CD3 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CE1DBCF18CCFFB0A32B073D0 /* RestTimerActivityAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestTimerActivityAttributes.swift; sourceTree = "<group>"; };
+		E93FD77AF38F236AF7F5787E /* WidgetStrings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetStrings.swift; sourceTree = "<group>"; };
+		F04523D4F3DCE4DCB785E153 /* RestTimerLiveActivityWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestTimerLiveActivityWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -106,9 +144,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E46FAA087CA52512F3184817 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		715339AEE3C08F57E7D1E92D /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		89DE8FB6D143CF9C48C34D79 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				CE1DBCF18CCFFB0A32B073D0 /* RestTimerActivityAttributes.swift */,
+				702BB25BCBD4957E618AB6AB /* RestTimerLiveActivityController.swift */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		AA0000000000000000000001 = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +178,7 @@
 				AA0000000000000000000068 /* MeetPRTests */,
 				AA0000000000000000000071 /* Frameworks */,
 				AA000000000000000000000C /* Products */,
+				AD5ECA209A551C744FAFA8F1 /* Widgets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -124,6 +187,7 @@
 			children = (
 				AA000000000000000000000A /* MeetPR.app */,
 				AA0000000000000000000069 /* MeetPRTests.xctest */,
+				844A03B35D639817A2869838 /* MeetPRWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -132,13 +196,54 @@
 			isa = PBXGroup;
 			children = (
 				AA0000000000000000000070 /* AppIntents.framework */,
+				715339AEE3C08F57E7D1E92D /* iOS */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		AD5ECA209A551C744FAFA8F1 /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				89DE8FB6D143CF9C48C34D79 /* Shared */,
+				E39AB14E36E3529BDA4D20D2 /* MeetPRWidgets */,
+			);
+			name = Widgets;
+			path = Widgets;
+			sourceTree = "<group>";
+		};
+		E39AB14E36E3529BDA4D20D2 /* MeetPRWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				ADBC37A6EDDB34AF5EEA1A4D /* MeetPRWidgetsBundle.swift */,
+				F04523D4F3DCE4DCB785E153 /* RestTimerLiveActivityWidget.swift */,
+				CB49BEF2893BAFDB00568CD3 /* Info.plist */,
+				5369CF2E8FEB108BFB6093AA /* Localizable.xcstrings */,
+				E93FD77AF38F236AF7F5787E /* WidgetStrings.swift */,
+			);
+			name = MeetPRWidgets;
+			path = MeetPRWidgets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		91FDB45FCC6F7F39281270BC /* MeetPRWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AF854E69B3B55CE4EFDC7DE3 /* Build configuration list for PBXNativeTarget "MeetPRWidgets" */;
+			buildPhases = (
+				0CFD793CA49AA1D168C01833 /* Sources */,
+				E46FAA087CA52512F3184817 /* Frameworks */,
+				8263B69F2EDB1BA4F7B8DD3A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MeetPRWidgets;
+			productName = MeetPRWidgets;
+			productReference = 844A03B35D639817A2869838 /* MeetPRWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		AA0000000000000000000006 /* MeetPR */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA000000000000000000000D /* Build configuration list for PBXNativeTarget "MeetPR" */;
@@ -146,10 +251,12 @@
 				AA0000000000000000000007 /* Sources */,
 				AA0000000000000000000008 /* Frameworks */,
 				AA0000000000000000000009 /* Resources */,
+				CC426AEF4F5B1694380CF3C8 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				74E39EF18CB7817A3ED05730 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				AA000000000000000000000B /* MeetPR */,
@@ -249,11 +356,20 @@
 			targets = (
 				AA0000000000000000000006 /* MeetPR */,
 				AA0000000000000000000060 /* MeetPRTests */,
+				91FDB45FCC6F7F39281270BC /* MeetPRWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		8263B69F2EDB1BA4F7B8DD3A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0578A41724493A8AEA5D7C3C /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA0000000000000000000009 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -271,10 +387,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0CFD793CA49AA1D168C01833 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB8F1CCD25F3F7B76098F33B /* RestTimerActivityAttributes.swift in Sources */,
+				95191E540843F570487DA6B7 /* RestTimerLiveActivityController.swift in Sources */,
+				2B42D29F810A6A93FD5DD406 /* MeetPRWidgetsBundle.swift in Sources */,
+				D561ED89F43CBFEEC7F1D8DE /* RestTimerLiveActivityWidget.swift in Sources */,
+				CFB87DD2686428EB1079CF52 /* WidgetStrings.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AA0000000000000000000007 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0702C9771F5615B336E3F8F5 /* RestTimerActivityAttributes.swift in Sources */,
+				3A4E421AC08851F88AC27639 /* RestTimerLiveActivityController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +418,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		74E39EF18CB7817A3ED05730 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MeetPRWidgets;
+			target = 91FDB45FCC6F7F39281270BC /* MeetPRWidgets */;
+			targetProxy = F78B8342222906C13ED18E09 /* PBXContainerItemProxy */;
+		};
 		AA000000000000000000006B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AA0000000000000000000006 /* MeetPR */;
@@ -296,6 +432,31 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		0125EC69B2A38E0F5E2146FE /* Demo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28JW4SA779;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widgets/MeetPRWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meetpr.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Demo;
+		};
 		3694AAD91CF7932396797BD1 /* DemoStudent */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -391,6 +552,31 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = DemoStudent;
+		};
+		8B31BD287508A4A226D6CCEB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28JW4SA779;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widgets/MeetPRWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meetpr.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 		8C97A77649D9FCF6D09A38BC /* DemoStudent */ = {
 			isa = XCBuildConfiguration;
@@ -770,6 +956,57 @@
 			};
 			name = Demo;
 		};
+		B750AA7E674F5FE5318FA235 /* DemoStudent */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28JW4SA779;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widgets/MeetPRWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meetpr.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = DemoStudent;
+		};
+		B7B3557B835E39D37584F2A4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 28JW4SA779;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widgets/MeetPRWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meetpr.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -802,6 +1039,17 @@
 				AA0000000000000000000074 /* Demo */,
 				AA000000000000000000006E /* Release */,
 				8C97A77649D9FCF6D09A38BC /* DemoStudent */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AF854E69B3B55CE4EFDC7DE3 /* Build configuration list for PBXNativeTarget "MeetPRWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7B3557B835E39D37584F2A4 /* Release */,
+				8B31BD287508A4A226D6CCEB /* Debug */,
+				0125EC69B2A38E0F5E2146FE /* Demo */,
+				B750AA7E674F5FE5318FA235 /* DemoStudent */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
