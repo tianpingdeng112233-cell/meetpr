@@ -8,6 +8,15 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
   public let targetRepsMax: Int?
   public let intensityMode: IntensityMode
   public let targetValue: Decimal
+  public let loadMode: PlanLoadMode?
+  public let targetPct: Decimal?
+  public let targetRPE: Decimal?
+  public let rirTarget: Int?
+  public let rpeLow: Decimal?
+  public let rpeHigh: Decimal?
+  public let weightLow: Decimal?
+  public let weightHigh: Decimal?
+  public let targetWeight: Decimal?
   public let setType: SetType
   public let restSeconds: Int?
   /// Student-visible coach cue carried alongside the set (spec 043 §G).
@@ -24,6 +33,15 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     targetRepsMax: Int? = nil,
     intensityMode: IntensityMode,
     targetValue: Decimal,
+    loadMode: PlanLoadMode? = nil,
+    targetPct: Decimal? = nil,
+    targetRPE: Decimal? = nil,
+    rirTarget: Int? = nil,
+    rpeLow: Decimal? = nil,
+    rpeHigh: Decimal? = nil,
+    weightLow: Decimal? = nil,
+    weightHigh: Decimal? = nil,
+    targetWeight: Decimal? = nil,
     setType: SetType,
     restSeconds: Int? = nil,
     coachNote: String? = nil,
@@ -36,6 +54,15 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     self.targetRepsMax = targetRepsMax
     self.intensityMode = intensityMode
     self.targetValue = targetValue
+    self.loadMode = loadMode
+    self.targetPct = targetPct
+    self.targetRPE = targetRPE
+    self.rirTarget = rirTarget
+    self.rpeLow = rpeLow
+    self.rpeHigh = rpeHigh
+    self.weightLow = weightLow
+    self.weightHigh = weightHigh
+    self.targetWeight = targetWeight
     self.setType = setType
     self.restSeconds = restSeconds
     self.coachNote = coachNote
@@ -52,6 +79,15 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     targetRepsMax = try container.decodeIfPresent(Int.self, forKey: .targetRepsMax)
     intensityMode = try container.decode(IntensityMode.self, forKey: .intensityMode)
     targetValue = try container.decodeDecimal(forKey: .targetValue)
+    loadMode = try container.decodeIfPresent(PlanLoadMode.self, forKey: .loadMode)
+    targetPct = try container.decodeDecimalIfPresent(forKey: .targetPct)
+    targetRPE = try container.decodeDecimalIfPresent(forKey: .targetRPE)
+    rirTarget = try container.decodeIfPresent(Int.self, forKey: .rirTarget)
+    rpeLow = try container.decodeDecimalIfPresent(forKey: .rpeLow)
+    rpeHigh = try container.decodeDecimalIfPresent(forKey: .rpeHigh)
+    weightLow = try container.decodeDecimalIfPresent(forKey: .weightLow)
+    weightHigh = try container.decodeDecimalIfPresent(forKey: .weightHigh)
+    targetWeight = try container.decodeDecimalIfPresent(forKey: .targetWeight)
     setType = try container.decode(SetType.self, forKey: .setType)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
     coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
@@ -68,6 +104,15 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeIfPresent(targetRepsMax, forKey: .targetRepsMax)
     try container.encode(intensityMode, forKey: .intensityMode)
     try container.encodeDecimalString(targetValue, forKey: .targetValue)
+    try container.encodeIfPresent(loadMode, forKey: .loadMode)
+    try container.encodeDecimalStringIfPresent(targetPct, forKey: .targetPct)
+    try container.encodeDecimalStringIfPresent(targetRPE, forKey: .targetRPE)
+    try container.encodeIfPresent(rirTarget, forKey: .rirTarget)
+    try container.encodeDecimalStringIfPresent(rpeLow, forKey: .rpeLow)
+    try container.encodeDecimalStringIfPresent(rpeHigh, forKey: .rpeHigh)
+    try container.encodeDecimalStringIfPresent(weightLow, forKey: .weightLow)
+    try container.encodeDecimalStringIfPresent(weightHigh, forKey: .weightHigh)
+    try container.encodeDecimalStringIfPresent(targetWeight, forKey: .targetWeight)
     try container.encode(setType, forKey: .setType)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
     try container.encodeIfPresent(coachNote, forKey: .coachNote)
@@ -82,6 +127,16 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     case targetRepsMax
     case intensityMode
     case targetValue
+    case loadMode
+    case targetPct
+    // `convertFromSnakeCase` normalizes `target_rpe` to `targetRpe`.
+    case targetRPE = "targetRpe"
+    case rirTarget
+    case rpeLow
+    case rpeHigh
+    case weightLow
+    case weightHigh
+    case targetWeight
     case setType
     case restSeconds
     case coachNote

@@ -8,6 +8,8 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
   public let startDate: Date
   public let endDate: Date
   public let planWeeks: Int
+  /// ISO weekday (1 = Monday ... 7 = Sunday) recommended for cycle D1.
+  public let anchorWeekday: Int?
   /// Decodes as `.regular` when absent — pre-033 fixtures and caches carry
   /// no kind (spec 033 §7).
   public let kind: PlanKind
@@ -28,6 +30,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     startDate: Date,
     endDate: Date,
     planWeeks: Int,
+    anchorWeekday: Int? = nil,
     kind: PlanKind = .regular,
     source: PlanSource,
     sourceTemplateID: UUID? = nil,
@@ -45,6 +48,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     self.startDate = startDate
     self.endDate = endDate
     self.planWeeks = planWeeks
+    self.anchorWeekday = anchorWeekday
     self.kind = kind
     self.source = source
     self.sourceTemplateID = sourceTemplateID
@@ -65,6 +69,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     startDate = try container.decode(Date.self, forKey: .startDate)
     endDate = try container.decode(Date.self, forKey: .endDate)
     planWeeks = try container.decode(Int.self, forKey: .planWeeks)
+    anchorWeekday = try container.decodeIfPresent(Int.self, forKey: .anchorWeekday)
     kind = try container.decodeIfPresent(PlanKind.self, forKey: .kind) ?? .regular
     source = try container.decode(PlanSource.self, forKey: .source)
     sourceTemplateID = try container.decodeIfPresent(UUID.self, forKey: .sourceTemplateID)
@@ -84,6 +89,7 @@ public struct TrainingPlan: Codable, Hashable, Sendable, Identifiable {
     case startDate
     case endDate
     case planWeeks
+    case anchorWeekday
     case kind
     case source
     case sourceTemplateID = "sourceTemplateId"

@@ -1,61 +1,51 @@
 import CoreModels
 import Foundation
+import Networking
 
-/// Maps the coach's materialized plan tree to the student-facing, read-only
-/// projection for a single cycle week.
-///
-/// Runs on the coach publish path; the student side reads the result without any
-/// further mapping. Pure and total — never throws. Days are emitted in
-/// chronological order (by `dayOfWeek`), exercises by `sortOrder`, sets by
-/// `setNumber`. A `PlanExercise` whose `exerciseID` is absent from `catalog` is
-/// dropped, since the student view cannot render an exercise it cannot name.
-public enum PlanToStudentProjection {
-  // Tree params (plan/days/exercises/sets) mirror PlanRepository.publishPlan;
-  // catalog resolves exercise IDs to a full Exercise the student view can render.
-  // swiftlint:disable:next function_parameter_count
-  public static func project(
-    plan: TrainingPlan,
-    days: [PlanDay],
-    exercises: [PlanExercise],
-    sets: [PlanSet],
+/// `internal` so unit tests can exercise the backend projection directly.
+enum StudentPlanProjection {
+  static func project(
+    tree: TrainingPlanTree,
     catalog: [Exercise],
     weekIndex: Int
   ) -> StudentPlanView {
     let exerciseByID = Dictionary(catalog.map { ($0.id, $0) }, uniquingKeysWith: { _, new in new })
-    let exercisesByDay = Dictionary(grouping: exercises, by: \.planDayID)
-    let setsByExercise = Dictionary(grouping: sets, by: \.planExerciseID)
-
-    let studentDays =
-      days
-      .filter { $0.weekNumber == weekIndex }
-      .sorted(by: chronological)
-      .map { day in
+    let exercisesByDay = Dictionary(grouping: tree.exercises, by: \.planDayID)
+    let setsByExercise = Dictionary(grouping: tree.sets, by: \.planExerciseID)
+    let firstScheduledDate = alignedStartDate(
+      tree.plan.startDate,
+      anchorWeekday: tree.plan.anchorWeekday
+    )
+    let days =
+      tree.days.map { day in
         studentDay(
           day,
-          startDate: plan.startDate,
+          firstScheduledDate: firstScheduledDate,
           planExercises: exercisesByDay[day.id] ?? [],
           setsByExercise: setsByExercise,
           exerciseByID: exerciseByID
         )
       }
+      .sorted(by: StudentPlanSequence.precedes)
 
     return StudentPlanView(
-      cycleID: plan.id,
-      weekIndex: weekIndex,
-      startDate: plan.startDate,
-      planKind: plan.kind,
-      days: studentDays
+      cycleID: tree.plan.id,
+      weekIndex: days.first(where: { $0.completedAt == nil })?.weekNumber
+        ?? days.last?.weekNumber
+        ?? weekIndex,
+      startDate: tree.plan.startDate,
+      endDate: tree.plan.endDate,
+      planKind: tree.plan.kind,
+      publishedAt: tree.plan.publishedAt,
+      totalShiftDays: tree.plan.totalShiftDays,
+      latestShiftCreatedAt: tree.plan.latestShiftCreatedAt,
+      days: days
     )
-  }
-
-  private static func chronological(_ lhs: PlanDay, _ rhs: PlanDay) -> Bool {
-    if lhs.dayOfWeek == rhs.dayOfWeek { return lhs.sortOrder < rhs.sortOrder }
-    return lhs.dayOfWeek < rhs.dayOfWeek
   }
 
   private static func studentDay(
     _ day: PlanDay,
-    startDate: Date,
+    firstScheduledDate: Date,
     planExercises: [PlanExercise],
     setsByExercise: [UUID: [PlanSet]],
     exerciseByID: [UUID: Exercise]
@@ -65,42 +55,42 @@ public enum PlanToStudentProjection {
       .sorted { $0.sortOrder < $1.sortOrder }
       .compactMap { planExercise -> StudentPlanExercise? in
         guard let exercise = exerciseByID[planExercise.exerciseID] else { return nil }
-        let prescribed =
-          (setsByExercise[planExercise.id] ?? [])
-          .sorted { $0.setNumber < $1.setNumber }
-          .compactMap(prescribedSet)
         return StudentPlanExercise(
           id: planExercise.id,
           exercise: exercise,
           sequenceIndex: planExercise.sortOrder,
-          prescribedSets: prescribed
+          prescribedSets: (setsByExercise[planExercise.id] ?? [])
+            .sorted { $0.setNumber < $1.setNumber }
+            .compactMap(prescribedSet),
+          notes: planExercise.notes
         )
       }
     return StudentPlanDay(
       id: day.id,
-      date: date(for: day, startDate: startDate),
+      weekNumber: day.weekNumber,
+      dayOfWeek: day.dayOfWeek,
+      sortOrder: day.sortOrder,
+      date: scheduledDate(for: day, firstScheduledDate: firstScheduledDate),
+      shiftedToDate: day.shiftedToDate,
+      completedAt: day.completedAt,
+      completionSource: day.completionSource,
       exercises: exercises
     )
   }
 
-  /// Routes the single `intensityMode` value to the matching field (weight XOR
-  /// rpe), and carries reps as either a single value or an upper-bound range.
-  /// Returns nil for a corrupt planning row (`setNumber < 1`). Clamping instead would fold
-  /// plan sets [0, 1] into execution index [0, 0], and the execution layer keys logs by
-  /// (planExerciseID, setIndex) — two cards would silently share one log and the later set
-  /// would overwrite the earlier. Dropping the corrupt set keeps every legal set's identity.
+  /// Drops corrupt one-based set numbers instead of aliasing a legal set's log identity.
   private static func prescribedSet(_ planSet: PlanSet) -> PrescribedSet? {
     guard planSet.setNumber >= 1 else { return nil }
     let prescription = prescription(for: planSet)
-    let isRange = planSet.targetRepsMax != nil
     return PrescribedSet(
       id: planSet.id,
       setIndex: planSet.setNumber - 1,
       weightKg: prescription.weightKg,
       intensity: prescription.intensity,
-      reps: isRange ? nil : planSet.targetReps,
+      reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
-      restSeconds: restSeconds(for: planSet)
+      restSeconds: restSeconds(for: planSet),
+      coachNote: planSet.coachNote
     )
   }
 
@@ -159,13 +149,32 @@ public enum PlanToStudentProjection {
     return RestDefaults.seconds(forRPE: rpe)
   }
 
-  /// The plan stores only `(weekNumber, dayOfWeek)`; the student view needs a real
-  /// date, anchored at `startDate` (cycle week 1, dayOfWeek 1). A fixed UTC
-  /// calendar keeps the result deterministic regardless of machine timezone.
-  private static func date(for day: PlanDay, startDate: Date) -> Date {
+  static func scheduledDate(
+    for day: PlanDay,
+    startDate: Date,
+    anchorWeekday: Int?
+  ) -> Date {
+    scheduledDate(
+      for: day,
+      firstScheduledDate: alignedStartDate(startDate, anchorWeekday: anchorWeekday)
+    )
+  }
+
+  private static func alignedStartDate(_ startDate: Date, anchorWeekday: Int?) -> Date {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
+    guard let anchorWeekday, (1...7).contains(anchorWeekday) else { return startDate }
+    let calendarWeekday = calendar.component(.weekday, from: startDate)
+    let startISOWeekday = ((calendarWeekday + 5) % 7) + 1
+    let anchorOffset = (anchorWeekday - startISOWeekday + 7) % 7
+    return calendar.date(byAdding: .day, value: anchorOffset, to: startDate) ?? startDate
+  }
+
+  private static func scheduledDate(for day: PlanDay, firstScheduledDate: Date) -> Date {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "UTC") ?? calendar.timeZone
     let offset = (day.weekNumber - 1) * 7 + (day.dayOfWeek - 1)
-    return calendar.date(byAdding: .day, value: offset, to: startDate) ?? startDate
+    return calendar.date(byAdding: .day, value: offset, to: firstScheduledDate)
+      ?? firstScheduledDate
   }
 }

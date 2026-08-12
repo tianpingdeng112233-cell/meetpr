@@ -241,9 +241,9 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public let id: UUID
   public let setIndex: Int
   public let weightKg: Decimal?
+  public let intensity: PrescribedIntensity?
   public let reps: Int?
   public let repsMax: Int?
-  public let rpe: Decimal?
   public let restSeconds: Int?
   /// Student-visible coach cue for this set (spec 043 §G): the original
   /// shorthand the coach kept as context next to the structured target.
@@ -254,6 +254,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     id: UUID,
     setIndex: Int,
     weightKg: Decimal? = nil,
+    intensity: PrescribedIntensity? = nil,
     reps: Int? = nil,
     repsMax: Int? = nil,
     rpe: Decimal? = nil,
@@ -263,9 +264,9 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     self.id = id
     self.setIndex = setIndex
     self.weightKg = weightKg
+    self.intensity = intensity ?? rpe.map(PrescribedIntensity.rpe)
     self.reps = reps
     self.repsMax = repsMax
-    self.rpe = rpe
     self.restSeconds = restSeconds
     self.coachNote = coachNote
   }
@@ -277,7 +278,10 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     weightKg = try container.decodeDecimalIfPresent(forKey: .weightKg)
     reps = try container.decodeIfPresent(Int.self, forKey: .reps)
     repsMax = try container.decodeIfPresent(Int.self, forKey: .repsMax)
-    rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
+    let legacyRPE = try container.decodeDecimalIfPresent(forKey: .rpe)
+    intensity =
+      try container.decodeIfPresent(PrescribedIntensity.self, forKey: .intensity)
+      ?? legacyRPE.map(PrescribedIntensity.rpe)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
     coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
   }
@@ -289,6 +293,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeDecimalStringIfPresent(weightKg, forKey: .weightKg)
     try container.encodeIfPresent(reps, forKey: .reps)
     try container.encodeIfPresent(repsMax, forKey: .repsMax)
+    try container.encodeIfPresent(intensity, forKey: .intensity)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
     try container.encodeIfPresent(coachNote, forKey: .coachNote)
@@ -298,10 +303,18 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     case id
     case setIndex
     case weightKg
+    case intensity
     case reps
     case repsMax
     case rpe
     case restSeconds
     case coachNote
+  }
+
+  /// Compatibility accessor for legacy RPE-only consumers. Other intensity
+  /// forms deliberately do not masquerade as RPE.
+  public var rpe: Decimal? {
+    guard case .rpe(let value) = intensity else { return nil }
+    return value
   }
 }
