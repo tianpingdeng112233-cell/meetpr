@@ -11,6 +11,19 @@
 
 ## 本版将包含(落线后追加到这里)
 
+- **spec 073 休息倒计时 Live Activity(灵动岛+锁屏,T2;PR #319,2026-08-12 合入 21d03285)**[P1]:
+  组间休息倒计时投到灵动岛与锁屏,切后台/刷手机全程可见,点一下回 app 原地续上;到点自动切
+  「休息结束 💪」,app 全程不需要醒。新增 `MeetPRWidgets` widget extension(bundle id
+  `com.meetpr.app.widgets`,四 configuration 全配置);倒计时用系统原生 `Text(timerInterval:)`,
+  **零推送、零后台任务**。架构红线:StudentKit 不 import ActivityKit(只注入纯 Swift 协议
+  `RestTimerActivityControlling`),attributes/controller 放 `Widgets/Shared/` 双 target membership。
+  ⚖️08-12 拍板 A=Live Activity 单做(本地通知兜底未选,防复活);实装期采纳 CHALLENGE #1:
+  Live Activity 不跑 widget timeline,`staleDate=endsAt` + `context.isStale` 切结束态(spec 已修订)。
+  ⚖️08-12 David 终裁本地化=跟活代码(手写 `WidgetStrings` enum,AGENTS.md 死条文另开卡修正)。
+  闸门:review-loop 3 轮 + 1 对质收敛 CLEAN(2 BLOCKER 清),731 测试绿,Release/Demo/DemoStudent
+  三 configuration 构建绿,模拟器实证四态(后台跳秒/到点完成/跳过消失/回前台清理)。
+  **⚠️切包前须 David 真机 smoke 灵动岛**(真机与模拟器行为有差异)。
+
 - **今日页头部日期恒显真实今天(a3273c0,P1)**:修外测「日期卡在 8/9」误读——头部原钉游标日排期,
   现按设计正典显示真实今天并跨午夜自动翻篇;教练推荐日期仍在训练日卡与周条。
 
