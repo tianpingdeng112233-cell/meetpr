@@ -16,8 +16,10 @@ import UserNotifications
 // swiftlint:disable:next type_body_length
 struct MeetPRApp: App {
   @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+  @Environment(\.scenePhase) private var scenePhase
   private let draftStore: DraftStore
   private let rootView: RootView
+  private let restTimerActivityController: RestTimerLiveActivityController
   #if !DEMO_MODE
     private let pushNotificationDelegate: PushNotificationDelegate
   #endif
@@ -25,6 +27,9 @@ struct MeetPRApp: App {
   init() {
     let draftStore = DraftStore.shared
     self.draftStore = draftStore
+    let restTimerActivityController = RestTimerLiveActivityController.shared
+    self.restTimerActivityController = restTimerActivityController
+    restTimerActivityController.cleanUpAllActivities()
 
     let dependencies = Self.makeRootDependencies(draftStore: draftStore)
     rootView = dependencies.rootView
@@ -181,6 +186,7 @@ struct MeetPRApp: App {
           seedPoints: studentState.e1rmPoints,
           seedPRs: studentState.prEvents
         ),
+        restTimerActivityController: RestTimerLiveActivityController.shared,
         // Demo student: accepted bond + completed profile → the BindGate
         // falls straight through to the 5 tabs; no wizard, no enter-code
         // (spec 031 D10 — the DEMO_USER_STUDENT path stays gate-free).
@@ -363,6 +369,7 @@ struct MeetPRApp: App {
           // Set-video uploads (spec 027): backend /uploads/* pipeline; the
           // setLog ↔ attachment mapping persists on-device only in V0.1.
           studentVideoUploads: .backend(api: api, session: chat.session),
+          restTimerActivityController: RestTimerLiveActivityController.shared,
           // Bind + onboarding are cache-free by design (spec 031/032 §9):
           // both must read live server state.
           studentBind: BackendBindRepository(api: api, session: chat.session),
@@ -421,6 +428,10 @@ struct MeetPRApp: App {
         .environment(session)
         .task {
           await session.bootstrap()
+        }
+        .onChange(of: scenePhase) { _, phase in
+          guard phase == .active else { return }
+          restTimerActivityController.cleanUpExpiredActivities()
         }
         .modelContainer(
           draftStore.modelContainer

@@ -1,0 +1,39 @@
+{
+  "sourceLanguage" : "zh-Hans",
+  "strings" : {
+    "widget.restTimer.finished" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "休息结束"
+          }
+        }
+      }
+    },
+    "widget.restTimer.finishedCompact" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
+    },
+    "widget.restTimer.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "组间休息"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

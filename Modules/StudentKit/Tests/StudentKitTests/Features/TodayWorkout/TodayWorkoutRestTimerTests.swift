@@ -15,7 +15,9 @@ private let frozenNow = Date(timeIntervalSince1970: 1_768_262_400)  // 2026-01-1
 private func makeViewModel(
   now: Date = frozenNow,
   plan: StudentPlanView = StudentDemoSeed.makePlanView(today: frozenNow),
-  restTimerSettings: (any StudentRestTimerSettingsStoring)? = nil
+  restTimerSettings: (any StudentRestTimerSettingsStoring)? = nil,
+  restTimerActivityController: any RestTimerActivityControlling =
+    NoOpRestTimerActivityController()
 ) async throws -> TodayWorkoutViewModel {
   let studentID = StudentDemoSeed.studentID
   let store = TestStudentPlanStore(seed: [studentID: plan])
@@ -25,6 +27,7 @@ private func makeViewModel(
     logs: InMemoryStudentTrainingLogRepository(),
     e1rm: InMemoryE1RMRepository(),
     restTimerSettings: settings,
+    restTimerActivityController: restTimerActivityController,
     now: { now }
   )
   await viewModel.load(date: frozenNow, studentID: studentID)
@@ -40,8 +43,35 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
 }
 
 @MainActor
+private final class RestTimerActivityControllerSpy: RestTimerActivityControlling {
+  enum Event: Equatable {
+    case start(endsAt: Date, totalSeconds: Int)
+    case update(endsAt: Date, totalSeconds: Int)
+    case end
+  }
+
+  private(set) var events: [Event] = []
+
+  func start(endsAt: Date, totalSeconds: Int) {
+    events.append(.start(endsAt: endsAt, totalSeconds: totalSeconds))
+  }
+
+  func update(endsAt: Date, totalSeconds: Int) {
+    events.append(.update(endsAt: endsAt, totalSeconds: totalSeconds))
+  }
+
+  func end() {
+    events.append(.end)
+  }
+}
+
+@MainActor
 @Test func completionEdgeStartsTimerWithRPEDuration() async throws {
-  let viewModel = try await makeViewModel(now: frozenNow)
+  let activityController = RestTimerActivityControllerSpy()
+  let viewModel = try await makeViewModel(
+    now: frozenNow,
+    restTimerActivityController: activityController
+  )
 
   // Demo "today" is the 硬拉 day: 3 sets @ RPE 8.5 → 180s per the policy.
   await viewModel.toggleComplete(rowIndex: 0)
@@ -49,6 +79,11 @@ private struct RestTimerTestFailure: Error, CustomStringConvertible {
   let timer = try #require(viewModel.restTimer)
   #expect(timer.totalSeconds == 180)
   #expect(timer.endsAt == frozenNow.addingTimeInterval(180))
+  #expect(
+    activityController.events == [
+      .start(endsAt: timer.endsAt, totalSeconds: timer.totalSeconds)
+    ]
+  )
 }
 
 @MainActor
@@ -118,20 +153,37 @@ func completionEdgeUsesStudentCustomBandBeforeAutoPolicy(
 
 @MainActor
 @Test func editingAlreadyCompletedSetDoesNotRestartTimer() async throws {
-  let viewModel = try await makeViewModel()
+  let activityController = RestTimerActivityControllerSpy()
+  let viewModel = try await makeViewModel(
+    restTimerActivityController: activityController
+  )
 
   await viewModel.toggleComplete(rowIndex: 0)
+  let started = try #require(viewModel.restTimer)
   viewModel.skipRestTimer()
   #expect(viewModel.restTimer == nil)
+  #expect(
+    activityController.events == [
+      .start(endsAt: started.endsAt, totalSeconds: started.totalSeconds),
+      .end,
+    ]
+  )
 
-  // commitSet on an already-completed row persists edits — no new edge.
+  // commitSet on an already-completed row persists edits — no new edge,
+  // and no further activity traffic.
+  let eventsBeforeCommit = activityController.events.count
   await viewModel.commitSet(rowIndex: 0)
   #expect(viewModel.restTimer == nil)
+  #expect(activityController.events.count == eventsBeforeCommit)
 }
 
 @MainActor
 @Test func consecutiveCompletionsReplaceTheTimer() async throws {
-  let viewModel = try await makeViewModel(now: frozenNow)
+  let activityController = RestTimerActivityControllerSpy()
+  let viewModel = try await makeViewModel(
+    now: frozenNow,
+    restTimerActivityController: activityController
+  )
 
   await viewModel.toggleComplete(rowIndex: 0)
   let first = try #require(viewModel.restTimer)
@@ -139,40 +191,87 @@ func completionEdgeUsesStudentCustomBandBeforeAutoPolicy(
   let second = try #require(viewModel.restTimer)
   #expect(first == second || second.endsAt >= first.endsAt)
   #expect(second.totalSeconds == 180)
+  #expect(
+    activityController.events == [
+      .start(endsAt: first.endsAt, totalSeconds: first.totalSeconds),
+      .end,
+      .start(endsAt: second.endsAt, totalSeconds: second.totalSeconds),
+    ]
+  )
 }
 
 @MainActor
 @Test func lastSetOfTheDayDoesNotStartTimer() async throws {
-  let viewModel = try await makeViewModel()
+  let activityController = RestTimerActivityControllerSpy()
+  let viewModel = try await makeViewModel(
+    restTimerActivityController: activityController
+  )
   guard case .loaded(_, let drafts) = viewModel.state else {
     throw RestTimerTestFailure("not loaded")
   }
 
-  for index in drafts.indices {
+  for index in drafts.indices.dropLast() {
     await viewModel.toggleComplete(rowIndex: index)
   }
+  let eventsBeforeFinalSet = activityController.events.count
+  let lastIndex = try #require(drafts.indices.last)
+  await viewModel.toggleComplete(rowIndex: lastIndex)
   #expect(viewModel.restTimer == nil, "completion banner takes over after the final set")
+  #expect(
+    Array(activityController.events.dropFirst(eventsBeforeFinalSet)) == [.end],
+    "the final set must end the activity without starting a new one"
+  )
 }
 
 @MainActor
 @Test func adjustClampsRemainingBetweenZeroAnd900() async throws {
-  let viewModel = try await makeViewModel(now: frozenNow)
+  let activityController = RestTimerActivityControllerSpy()
+  let viewModel = try await makeViewModel(
+    now: frozenNow,
+    restTimerActivityController: activityController
+  )
   await viewModel.toggleComplete(rowIndex: 0)
 
-  // +30s repeatedly clamps at 900s remaining.
+  viewModel.adjustRestTimer(bySeconds: 30)
+  #expect(
+    activityController.events.last
+      == .update(endsAt: frozenNow.addingTimeInterval(210), totalSeconds: 180)
+  )
+
+  viewModel.adjustRestTimer(bySeconds: -30)
+  #expect(
+    activityController.events.last
+      == .update(endsAt: frozenNow.addingTimeInterval(180), totalSeconds: 180)
+  )
+
+  // Repeated positive adjustments clamp at 900s remaining.
   for _ in 0..<40 { viewModel.adjustRestTimer(bySeconds: 30) }
   let maxed = try #require(viewModel.restTimer)
   #expect(maxed.endsAt == frozenNow.addingTimeInterval(900))
+  #expect(
+    activityController.events.last
+      == .update(endsAt: maxed.endsAt, totalSeconds: maxed.totalSeconds)
+  )
 
   // Large negative clamps at 0 (immediately finished, not negative).
   viewModel.adjustRestTimer(bySeconds: -10_000)
   let floored = try #require(viewModel.restTimer)
   #expect(floored.endsAt == frozenNow)
+  #expect(
+    activityController.events.last
+      == .update(endsAt: floored.endsAt, totalSeconds: floored.totalSeconds)
+  )
 
   viewModel.skipRestTimer()
   #expect(viewModel.restTimer == nil)
+  #expect(activityController.events.last == .end)
+  let eventsAfterSkip = activityController.events.count
   viewModel.adjustRestTimer(bySeconds: 30)
   #expect(viewModel.restTimer == nil, "adjust on a dismissed timer is a no-op")
+  #expect(
+    activityController.events.count == eventsAfterSkip,
+    "a dismissed timer must not emit activity traffic on adjust"
+  )
 }
 
 private func planReplacingFirstSet(restSeconds: Int?) -> StudentPlanView {
