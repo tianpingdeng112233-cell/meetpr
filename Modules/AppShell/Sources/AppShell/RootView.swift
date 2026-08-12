@@ -29,6 +29,7 @@ public struct RootView: View {
   private let studentE1RM: any E1RMRepository
   private let studentReadiness: any ReadinessRepository
   private let studentVideoUploads: VideoUploadServices?
+  private let restTimerActivityController: any RestTimerActivityControlling
   private let studentBind: any BindRepository
   private let studentOnboarding: any OnboardingRepository
   private let studentEvaluations: any EvaluationRepository
@@ -45,7 +46,6 @@ public struct RootView: View {
   let pushRegistrar: PushRegistrar?
   @State private var chatSession: ChatSessionController
   private let chatRepository: (any ChatRepository)?
-
   public init(
     coachPlans: any PlanRepository = InMemoryPlanRepository.preview(),
     coachInviteCodes: (any InviteCodeRepository)? = nil,
@@ -60,6 +60,7 @@ public struct RootView: View {
     studentE1RM: (any E1RMRepository)? = nil,
     studentReadiness: (any ReadinessRepository)? = nil,
     studentVideoUploads: VideoUploadServices? = nil,
+    restTimerActivityController: (any RestTimerActivityControlling)? = nil,
     studentBind: (any BindRepository)? = nil,
     studentOnboarding: (any OnboardingRepository)? = nil,
     studentEvaluations: (any EvaluationRepository)? = nil,
@@ -85,6 +86,8 @@ public struct RootView: View {
     self.studentE1RM = studentE1RM ?? RootViewDemoDefaults.e1rm()
     self.studentReadiness = studentReadiness ?? RootViewDemoDefaults.readiness()
     self.studentVideoUploads = studentVideoUploads
+    self.restTimerActivityController =
+      restTimerActivityController ?? NoOpRestTimerActivityController()
     self.studentBind = studentBind ?? RootViewDemoDefaults.bind()
     self.studentOnboarding = studentOnboarding ?? RootViewDemoDefaults.onboarding()
     // Evaluation funnel defaults (spec 033): in-memory demo/preview repos;
@@ -114,7 +117,6 @@ public struct RootView: View {
     self.pushRegistrar = pushRegistrar
     Analytics.shared.prepare(mode: analyticsMode)
   }
-
   public var body: some View {
     routedContent
       .analyticsFrictionFeedbackPrompt()
@@ -381,6 +383,7 @@ extension RootView {
         await session.logout()
       },
       account: studentAccount,
+      restTimerActivityController: restTimerActivityController,
       allowsChat: allowsChat,
       chat: chat?.repository,
       currentUserID: chat?.currentUserID,

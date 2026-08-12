@@ -54,6 +54,7 @@ public final class TodayWorkoutViewModel {
   private let e1rmRepo: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  private let restTimerActivityController: any RestTimerActivityControlling
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
@@ -69,6 +70,8 @@ public final class TodayWorkoutViewModel {
     onboarding: (any OnboardingProfileReading)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
+    restTimerActivityController: any RestTimerActivityControlling =
+      NoOpRestTimerActivityController(),
     calendar: Calendar = .current,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
@@ -77,6 +80,7 @@ public final class TodayWorkoutViewModel {
     self.e1rmRepo = e1rm
     self.onboarding = onboarding
     self.restTimerSettings = restTimerSettings
+    self.restTimerActivityController = restTimerActivityController
     _ = calendar
     self.now = now
   }
@@ -717,12 +721,18 @@ public final class TodayWorkoutViewModel {
     guard let timer = restTimer else { return }
     let remaining = timer.endsAt.timeIntervalSince(now()) + TimeInterval(delta)
     let clamped = min(max(remaining, 0), 900)
-    restTimer = RestTimerState(
+    let adjustedTimer = RestTimerState(
       endsAt: now().addingTimeInterval(clamped), totalSeconds: timer.totalSeconds)
+    restTimer = adjustedTimer
+    restTimerActivityController.update(
+      endsAt: adjustedTimer.endsAt,
+      totalSeconds: adjustedTimer.totalSeconds
+    )
   }
 
   public func skipRestTimer() {
     restTimer = nil
+    restTimerActivityController.end()
   }
 
   public func acknowledgeRestTimerExplanation() {
@@ -734,6 +744,7 @@ public final class TodayWorkoutViewModel {
   private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
     guard !drafts.allSatisfy(\.completed) else {
       restTimer = nil
+      restTimerActivityController.end()
       return
     }
     let seconds =
@@ -742,8 +753,17 @@ public final class TodayWorkoutViewModel {
         restTimerSettings.preference(for: $0).customSeconds(forRPE: draft.actualRPE)
       }
       ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
-    restTimer = RestTimerState(
+    let hadActiveTimer = restTimer != nil
+    let nextTimer = RestTimerState(
       endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
+    restTimer = nextTimer
+    if hadActiveTimer {
+      restTimerActivityController.end()
+    }
+    restTimerActivityController.start(
+      endsAt: nextTimer.endsAt,
+      totalSeconds: nextTimer.totalSeconds
+    )
     if let currentStudentID,
       !restTimerSettings.hasAcknowledgedExplanation(for: currentStudentID)
     {

@@ -46,6 +46,7 @@ public struct StudentRootView: View {
   private let onLogout: (@MainActor () async -> Void)?
   private let account: (any AccountRepository)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  private let restTimerActivityController: any RestTimerActivityControlling
   @Binding private var pushRoute: PushRouteIntent?
   @State private var feedbackViewModel: FeedbackInboxViewModel
   @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
@@ -132,6 +133,8 @@ public struct StudentRootView: View {
     importedHistoryReviews: (any ImportedHistoryReviewStoring)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
+    restTimerActivityController: any RestTimerActivityControlling =
+      NoOpRestTimerActivityController(),
     allowsChat: Bool = false,
     chat: (any ChatRepository)? = nil,
     currentUserID: UUID? = nil,
@@ -151,6 +154,7 @@ public struct StudentRootView: View {
     self.onLogout = onLogout
     self.account = account
     self.restTimerSettings = restTimerSettings
+    self.restTimerActivityController = restTimerActivityController
     self._pushRoute = pushRoute
     let resolvedOnboarding =
       onboarding
@@ -263,7 +267,9 @@ extension StudentRootView {
       TodayWorkoutView(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
         onboarding: onboarding, readiness: readiness,
-        restTimerSettings: restTimerSettings, videoUploads: videoUploads,
+        restTimerSettings: restTimerSettings,
+        restTimerActivityController: restTimerActivityController,
+        videoUploads: videoUploads,
         planHandoff: workoutPlanHandoff,
         jumpToTodayToken: trainingJumpToken,
         uploadFailureDestination: uploadFailureDestination,
