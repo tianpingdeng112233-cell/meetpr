@@ -161,8 +161,7 @@ struct VideoAttachmentSection: View {
         item: $libraryVideoToTrim,
         onDismiss: finishLibraryTrimPresentation
       ) { session in
-        VideoTrimmerView(session: session)
-        .ignoresSafeArea()
+        VideoTrimView(session: session)
       }
     #else
       .sheet(item: $playbackPresentation) { presentation in
@@ -278,33 +277,31 @@ extension VideoAttachmentSection {
       return
     }
     #if os(iOS)
-      if UIVideoEditorController.canEditVideo(atPath: movie.url.path) {
-        let session = VideoTrimSession(
-          sourceURL: movie.url,
-          maxDurationSeconds: videoViewModel.maxDurationSeconds,
-          onSave: { editedURL in
-            activeLibraryTrimSession = nil
-            libraryVideoToTrim = nil
-            Task { await attach(sourceURL: editedURL) }
-          },
-          onCancel: {
-            activeLibraryTrimSession = nil
-            libraryVideoToTrim = nil
-            isPreparing = false
-          },
-          onFailure: {
-            activeLibraryTrimSession = nil
-            libraryVideoToTrim = nil
-            videoViewModel.reportVideoProcessingFailure()
-            isPreparing = false
-          }
-        )
-        activeLibraryTrimSession = session
-        libraryVideoToTrim = session
-        return
-      }
+      let session = VideoTrimSession(
+        sourceURL: movie.url,
+        maxDurationSeconds: videoViewModel.maxDurationSeconds,
+        onSave: { editedURL in
+          activeLibraryTrimSession = nil
+          libraryVideoToTrim = nil
+          Task { await attach(sourceURL: editedURL) }
+        },
+        onCancel: {
+          activeLibraryTrimSession = nil
+          libraryVideoToTrim = nil
+          isPreparing = false
+        },
+        onFailure: {
+          activeLibraryTrimSession = nil
+          libraryVideoToTrim = nil
+          videoViewModel.reportVideoProcessingFailure()
+          isPreparing = false
+        }
+      )
+      activeLibraryTrimSession = session
+      libraryVideoToTrim = session
+    #else
+      await attach(sourceURL: movie.url)
     #endif
-    await attach(sourceURL: movie.url)
   }
 
   private func attach(sourceURL: URL) async {

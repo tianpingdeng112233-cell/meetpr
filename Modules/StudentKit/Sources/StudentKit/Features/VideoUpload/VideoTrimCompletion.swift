@@ -3,7 +3,11 @@ import Foundation
 /// Platform-neutral completion state machine for a video trim session.
 /// Guarantees the outcome handler fires at most once and that the temporary
 /// source copy is cleaned up on every terminal path.
-final class VideoTrimCompletion {
+///
+/// The claim is lock-guarded rather than main-actor isolated because `deinit`
+/// runs wherever the last reference drops: an export finishing off the main
+/// actor and a cover dismissal on it must contend for the same single shot.
+final class VideoTrimCompletion: @unchecked Sendable {
   enum Outcome: Equatable {
     case saved(URL)
     case cancelled
@@ -12,6 +16,7 @@ final class VideoTrimCompletion {
 
   private let sourceURL: URL
   private let onOutcome: (Outcome) -> Void
+  private let lock = NSLock()
   private var hasFinished = false
 
   init(sourceURL: URL, onOutcome: @escaping (Outcome) -> Void) {
@@ -20,12 +25,13 @@ final class VideoTrimCompletion {
   }
 
   deinit {
-    if !hasFinished {
+    if lock.withLock({ !hasFinished }) {
       try? FileManager.default.removeItem(at: sourceURL)
     }
   }
 
-  func saved(editedVideoPath: String) {
+  @discardableResult
+  func saved(editedVideoPath: String) -> Bool {
     finish {
       let editedURL = URL(fileURLWithPath: editedVideoPath)
       if editedURL != sourceURL {
@@ -49,10 +55,18 @@ final class VideoTrimCompletion {
     }
   }
 
-  private func finish(_ body: () -> Void) {
-    guard !hasFinished else { return }
-    hasFinished = true
+  /// Claims the single shot under the lock, then runs `body` outside it: the
+  /// outcome handler touches SwiftUI state and must never run with a lock held.
+  @discardableResult
+  private func finish(_ body: () -> Void) -> Bool {
+    let claimed = lock.withLock {
+      guard !hasFinished else { return false }
+      hasFinished = true
+      return true
+    }
+    guard claimed else { return false }
     body()
+    return true
   }
 }
 
@@ -84,7 +98,8 @@ final class VideoTrimSession: Identifiable {
     }
   }
 
-  func saved(editedVideoPath: String) {
+  @discardableResult
+  func saved(editedVideoPath: String) -> Bool {
     completion.saved(editedVideoPath: editedVideoPath)
   }
 
@@ -94,6 +109,35 @@ final class VideoTrimSession: Identifiable {
 
   func failed() {
     completion.failed()
+  }
+
+  /// Main-actor isolated so the outcome handlers it fires mutate SwiftUI state
+  /// on the main actor; the export itself suspends off it.
+  @MainActor
+  func exportTrim(
+    selection: VideoTrimSelection,
+    using exporter: any VideoTrimExporting = PassthroughVideoTrimExporter()
+  ) async {
+    do {
+      let outputURL = try await exporter.export(sourceURL: sourceURL, selection: selection)
+      // An export that finishes anyway after cancellation must not resurrect a
+      // torn-down cover: treat cancellation as losing the claim outright, since
+      // AVAssetExportSession can complete before it observes cancelExport().
+      guard !Task.isCancelled else {
+        try? FileManager.default.removeItem(at: outputURL)
+        return
+      }
+      // Dismissal may have claimed the session while the export ran; the
+      // orphaned output is ours to delete in that case.
+      if !saved(editedVideoPath: outputURL.path) {
+        try? FileManager.default.removeItem(at: outputURL)
+      }
+    } catch is CancellationError {
+      // Teardown owns the outcome: a cancelled export means the cover is going
+      // away, and reporting a failure here would race that with a false alarm.
+    } catch {
+      failed()
+    }
   }
 }
 
