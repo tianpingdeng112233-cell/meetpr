@@ -86,6 +86,8 @@ Codex 自选，但测试必须覆盖全部路径）：
 - 配色优先 link DesignSystem（extension 可依赖 SPM module）；若依赖链在 extension
   内编译受阻，允许本地常量兜底，注释标明对应 DesignSystem token 名。
 - 锁屏恒深底，对比度要过；app 内深浅色均验。
+- **点击跳回 app**：灵动岛/锁屏卡点击任意位置回 app 前台 = 系统默认行为，零代码；
+  用户切后台前就在今日训练页，回来原地续上即正确。V1 不做 `widgetURL` 深链。
 - **V1 明确不做**（防 scope 爬行）：锁屏交互按钮（跳过/+30s 的 App Intents）、
   休息结束本地通知（拍板未选 B）、Apple Watch、教练端任何形态。
 
