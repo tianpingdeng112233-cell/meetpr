@@ -1,10 +1,33 @@
+import CoreModels
 import DesignSystem
 import SwiftUI
 
 enum VideoAttachmentV3State: Equatable {
   case choices(cameraAvailable: Bool)
+  case preparing
   case attached(cameraAvailable: Bool, canDelete: Bool, delivered: Bool)
   case failed
+
+  static func resolve(
+    status: VideoAttachment.Status?,
+    isPreparing: Bool,
+    cameraAvailable: Bool
+  ) -> Self {
+    if isPreparing {
+      return .preparing
+    }
+    guard let status else {
+      return .choices(cameraAvailable: cameraAvailable)
+    }
+    switch status {
+    case .pending, .uploading:
+      return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: false)
+    case .uploaded:
+      return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: true)
+    case .failed:
+      return .failed
+    }
+  }
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -27,6 +50,14 @@ struct VideoAttachmentV3Controls: View {
           action: onCamera
         )
         actionButton("相册", systemImage: "photo", action: onLibrary)
+      }
+
+    case .preparing:
+      HStack(spacing: MeetPRSpacing.space2) {
+        ProgressView()
+        Text("处理中…")
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+          .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.60))
       }
 
     case .attached(_, let canDelete, let delivered):

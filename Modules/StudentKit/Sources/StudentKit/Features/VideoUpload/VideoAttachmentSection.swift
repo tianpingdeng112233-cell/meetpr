@@ -153,6 +153,7 @@ struct VideoAttachmentSection: View {
           },
           onFailure: {
             videoViewModel.reportVideoProcessingFailure()
+            isPreparing = false
           }
         )
       }
@@ -171,20 +172,11 @@ struct VideoAttachmentSection: View {
   }
 
   private var presentationState: VideoAttachmentV3State {
-    if let status = rowState?.attachment.status {
-      switch status {
-      case .pending, .uploading:
-        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: false)
-      case .uploaded:
-        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: true)
-      case .failed:
-        return .failed
-      }
-    }
-    if isPreparing {
-      return .attached(cameraAvailable: cameraAvailable, canDelete: false, delivered: false)
-    }
-    return .choices(cameraAvailable: cameraAvailable)
+    VideoAttachmentV3State.resolve(
+      status: rowState?.attachment.status,
+      isPreparing: isPreparing,
+      cameraAvailable: cameraAvailable
+    )
   }
 
   private var cameraAvailable: Bool {
@@ -252,6 +244,7 @@ extension VideoAttachmentSection {
   }
 
   private func requestPick(_ source: PendingSource) {
+    guard !isPreparing, activeLibraryTrimSession == nil, libraryVideoToTrim == nil else { return }
     onWillPick?()
     if videoViewModel.hasConsented {
       present(source)
@@ -271,31 +264,39 @@ extension VideoAttachmentSection {
   }
 
   private func importPicked(_ item: PhotosPickerItem) async {
-    guard let movie = try? await item.loadTransferable(type: PickedVideo.self) else {
-      // Load failed or the user backed out: no row will arrive, so clear the
-      // placeholder to bring the pick buttons back.
+    let movie: PickedVideo?
+    do {
+      movie = try await item.loadTransferable(type: PickedVideo.self)
+    } catch {
+      videoViewModel.reportVideoProcessingFailure()
+      isPreparing = false
+      return
+    }
+    guard let movie else {
+      videoViewModel.reportVideoProcessingFailure()
       isPreparing = false
       return
     }
     #if os(iOS)
       if UIVideoEditorController.canEditVideo(atPath: movie.url.path) {
-        // Trim before upload; the spinner yields to the editor, and the
-        // save/cancel/failure callbacks own the next state.
-        isPreparing = false
         let session = VideoTrimSession(
           sourceURL: movie.url,
           maxDurationSeconds: videoViewModel.maxDurationSeconds,
           onSave: { editedURL in
+            activeLibraryTrimSession = nil
             libraryVideoToTrim = nil
-            isPreparing = true
             Task { await attach(sourceURL: editedURL) }
           },
           onCancel: {
+            activeLibraryTrimSession = nil
             libraryVideoToTrim = nil
+            isPreparing = false
           },
           onFailure: {
+            activeLibraryTrimSession = nil
             libraryVideoToTrim = nil
             videoViewModel.reportVideoProcessingFailure()
+            isPreparing = false
           }
         )
         activeLibraryTrimSession = session
@@ -330,9 +331,14 @@ extension VideoAttachmentSection {
   }
 
   private func finishLibraryTrimPresentation() {
-    activeLibraryTrimSession?.cancelled()
+    guard let session = activeLibraryTrimSession else {
+      libraryVideoToTrim = nil
+      return
+    }
+    session.cancelled()
     activeLibraryTrimSession = nil
     libraryVideoToTrim = nil
+    isPreparing = false
   }
 
   private func ensureSetLogID() async -> UUID? {
