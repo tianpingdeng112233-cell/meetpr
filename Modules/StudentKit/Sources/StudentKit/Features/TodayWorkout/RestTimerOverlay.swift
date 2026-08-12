@@ -83,7 +83,7 @@ struct RestTimerOverlay: View {
 
   private var finished: some View {
     HStack {
-      Text("休息结束 💪")
+      Text("休息结束")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
         .foregroundStyle(Color.MeetPR.success)
       Spacer()

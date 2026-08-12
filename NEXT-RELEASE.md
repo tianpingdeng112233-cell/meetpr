@@ -13,7 +13,7 @@
 
 - **spec 073 休息倒计时 Live Activity(灵动岛+锁屏,T2;PR #319,2026-08-12 合入 21d03285)**[P1]:
   组间休息倒计时投到灵动岛与锁屏,切后台/刷手机全程可见,点一下回 app 原地续上;到点自动切
-  「休息结束 💪」,app 全程不需要醒。新增 `MeetPRWidgets` widget extension(bundle id
+  「休息结束」,app 全程不需要醒。新增 `MeetPRWidgets` widget extension(bundle id
   `com.meetpr.app.widgets`,四 configuration 全配置);倒计时用系统原生 `Text(timerInterval:)`,
   **零推送、零后台任务**。架构红线:StudentKit 不 import ActivityKit(只注入纯 Swift 协议
   `RestTimerActivityControlling`),attributes/controller 放 `Widgets/Shared/` 双 target membership。

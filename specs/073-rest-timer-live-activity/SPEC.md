@@ -69,7 +69,7 @@ Codex 自选，但测试必须覆盖全部路径）：
 | 全组记完导致 `restTimer = nil` | `end` |
 
 - **自然到点（app 在后台）**：`staleDate = endsAt`，到点系统把 activity 标 stale，
-  widget 以 `context.isStale` 切「休息结束 💪」态——**不需要 app 醒来**；倒计时
+  widget 以 `context.isStale` 切「休息结束」态——**不需要 app 醒来**；倒计时
   `timerInterval` 文本本身由系统跳秒并停在 0:00。
   （⚖️ 2026-08-12 实装期修订，Codex CHALLENGE #1 采纳：Live Activity 不跑 widget
   timeline，`TimelineView` 条件分支渲染后不会重新求值，模拟器实测确认；原
@@ -84,7 +84,7 @@ Codex 自选，但测试必须覆盖全部路径）：
 ## Widget UI（V1 收口）
 
 - **锁屏卡**：timer 图标 + 「组间休息」标签 + 大号 monospaced 倒计时 + 进度条，
-  品牌金 tint；到点切「休息结束 💪」。
+  品牌金 tint；到点切「休息结束」。
 - **灵动岛** compact：leading 金色 timer 图标，trailing 倒计时；minimal：倒计时；
   expanded：同锁屏卡布局。
 - 配色优先 link DesignSystem（extension 可依赖 SPM module）；若依赖链在 extension
