@@ -572,10 +572,10 @@ private struct TodayWorkoutHero: View {
         .launchHeroRise(index: 2, trigger: launchHeroRevealToken)
 
         HStack(alignment: .bottom, spacing: MeetPRSpacing.point9) {
-          Text(row.record.weight.map(numberText) ?? "—")
+          Text(row.heroPrimaryText)
             .font(.MeetPR.display(size: MeetPRFontMetrics.size54))
             .foregroundStyle(Color.MeetPR.textPrimary)
-          if row.record.weight != nil {
+          if row.heroShowsWeightUnit {
             Text("KG")
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size16, weight: .bold))
               .foregroundStyle(Color.MeetPR.textMuted)
@@ -595,20 +595,19 @@ private struct TodayWorkoutHero: View {
         }
         .launchHeroRise(index: 3, trigger: launchHeroRevealToken)
 
-        HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
-          Text("目标 RPE")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
-            .tracking(0.55)
-            .foregroundStyle(Color.MeetPR.textFaint)
-          Text(numberText(row.record.rpe))
-            .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
-            .foregroundStyle(Color.MeetPR.textPrimary)
-          Text("/ 10")
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-            .foregroundStyle(Color.MeetPR.textFaint)
+        if let intensityText = row.heroSecondaryIntensityText {
+          HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
+            Text("目标强度")
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
+              .tracking(0.55)
+              .foregroundStyle(Color.MeetPR.textFaint)
+            Text(intensityText)
+              .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
+              .foregroundStyle(Color.MeetPR.textPrimary)
+          }
+          .padding(.top, MeetPRSpacing.space2)
+          .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
         }
-        .padding(.top, MeetPRSpacing.space2)
-        .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
 
         if !exercise.note.isEmpty {
           VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
@@ -728,9 +727,8 @@ private struct TodayWorkoutActionSummaryRow: View {
 
       Spacer(minLength: MeetPRSpacing.space2)
 
-      if let first = exercise.rows.first?.record {
-        let weight = first.weight.map { numberText($0) + "kg" } ?? "—"
-        Text("\(weight) × \(first.reps) · \(exercise.rows.count) 组")
+      if let prescriptionSummary = exercise.prescriptionSummary {
+        Text(prescriptionSummary)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textTertiary)
       }
@@ -743,10 +741,6 @@ private struct TodayWorkoutActionSummaryRow: View {
         .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
     }
     .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-  }
-
-  private func numberText(_ value: Double) -> String {
-    value.formatted(.number.precision(.fractionLength(0...2)))
   }
 }
 

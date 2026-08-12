@@ -65,6 +65,11 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     var allRecorded: Bool {
       !rows.isEmpty && rows.allSatisfy { $0.record.status != .pending }
     }
+
+    var prescriptionSummary: String? {
+      guard let first = rows.first else { return nil }
+      return "\(StudentFormatting.prescribed(first.draft.prescribed)) · \(rows.count) 组"
+    }
   }
 
   struct Row: Equatable, Sendable, Identifiable {
@@ -72,6 +77,25 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     let stableIndex: Int
     let record: ExerciseSetRecord
     let draft: TodayWorkoutViewModel.SetRowDraft
+
+    var heroPrimaryText: String {
+      record.weight.map(Self.numberText)
+        ?? draft.prescribed.intensity.map(StudentFormatting.intensityText)
+        ?? "—"
+    }
+
+    var heroShowsWeightUnit: Bool {
+      record.weight != nil
+    }
+
+    var heroSecondaryIntensityText: String? {
+      guard heroShowsWeightUnit else { return nil }
+      return draft.prescribed.intensity.map(StudentFormatting.intensityText)
+    }
+
+    private static func numberText(_ value: Double) -> String {
+      value.formatted(.number.precision(.fractionLength(0...2)))
+    }
   }
 
   let day: StudentPlanDay

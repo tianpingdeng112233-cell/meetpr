@@ -61,15 +61,11 @@ struct SetEntrySheet: View {
     let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
     let suggestionOutcome = viewModel.weightSuggestionOutcome(forSetID: seed.id)
     _suggestionOutcomeSnapshot = State(initialValue: suggestionOutcome)
-    // Barbell lifts floor at the empty bar (20kg); accessories (dumbbell/cable/
-    // bodyweight) legitimately go below, down to 0.
-    let weightFloor: Decimal = draft.isAccessory ? 0 : 20
     let weight =
       seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg
-      ?? weightFloor
     let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
-    _weightText = State(initialValue: SetEntryValue.text(max(weightFloor, weight)))
+    _weightText = State(initialValue: weight.map(SetEntryValue.text) ?? "")
     _repsText = State(initialValue: reps.formatted())
     _rpeText = State(initialValue: SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
   }

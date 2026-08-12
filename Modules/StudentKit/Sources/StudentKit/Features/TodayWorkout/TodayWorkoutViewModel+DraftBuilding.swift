@@ -51,16 +51,23 @@ extension TodayWorkoutViewModel {
       return .unavailableWithoutReason
     }
 
-    let baseOutcome =
-      target.isMainLift
-      ? mainLiftSuggestionOutcome(
+    let baseOutcome: SetWeightSuggestionOutcome
+    if case .percentage(let targetPct) = target.prescribed.intensity {
+      baseOutcome = percentageSuggestionOutcome(
+        targetPct: targetPct,
+        currentE1RMKg: currentE1RMKg
+      )
+    } else if target.isMainLift {
+      baseOutcome = mainLiftSuggestionOutcome(
         target: target,
         priorDrafts: drafts[..<targetIndex],
         currentE1RMKg: currentE1RMKg
       )
-      : fallbackSuggestionOutcome(
+    } else {
+      baseOutcome = fallbackSuggestionOutcome(
         target: target, priorDrafts: drafts[..<targetIndex],
         lastLoggedWeightKg: lastLoggedWeightKg)
+    }
     guard let suggestion = baseOutcome.suggestion else { return baseOutcome }
     return suggestionOutcome(suggestion, for: target)
   }
@@ -127,6 +134,35 @@ extension TodayWorkoutViewModel {
     )
   }
 
+  private nonisolated static func percentageSuggestion(
+    targetPct: Decimal,
+    currentE1RMKg: Double
+  ) -> SetWeightSuggestion? {
+    let percentage = NSDecimalNumber(decimal: targetPct).doubleValue
+    guard percentage > 0 else { return nil }
+    let roundedWeight = roundedDownToPlateStep(currentE1RMKg * percentage / 100)
+    guard roundedWeight > 0 else { return nil }
+    return SetWeightSuggestion(
+      weightKg: Decimal(roundedWeight),
+      basis: .e1RM(currentE1RMKg)
+    )
+  }
+
+  private nonisolated static func percentageSuggestionOutcome(
+    targetPct: Decimal,
+    currentE1RMKg: Double?
+  ) -> SetWeightSuggestionOutcome {
+    guard let currentE1RMKg,
+      let suggestion = percentageSuggestion(targetPct: targetPct, currentE1RMKg: currentE1RMKg)
+    else {
+      return SetWeightSuggestionOutcome(
+        suggestion: nil,
+        unavailableReason: .noEligibleE1RMHistory
+      )
+    }
+    return SetWeightSuggestionOutcome(suggestion: suggestion, unavailableReason: nil)
+  }
+
   private nonisolated static func fallbackSuggestionOutcome(
     target: SetRowDraft,
     priorDrafts: ArraySlice<SetRowDraft>,
@@ -173,10 +209,14 @@ extension TodayWorkoutViewModel {
     // Forward e1RMs are quotients (weight / intensity), so reversing can land
     // a hair under the exact multiple (49.999…); nudge before flooring or the
     // suggestion drops a whole 2.5 step.
-    let steps = (rawWeight / 2.5 + 1e-6).rounded(.down)
-    let roundedWeight = steps * 2.5
+    let roundedWeight = roundedDownToPlateStep(rawWeight)
     guard roundedWeight > 0 else { return nil }
     return SetWeightSuggestion(weightKg: Decimal(roundedWeight), basis: .e1RM(currentE1RMKg))
+  }
+
+  private nonisolated static func roundedDownToPlateStep(_ weight: Double) -> Double {
+    let steps = (weight / 2.5 + 1e-6).rounded(.down)
+    return steps * 2.5
   }
 
   /// Variations / accessories never get e1RM math: today's most recent

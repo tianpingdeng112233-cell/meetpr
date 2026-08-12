@@ -147,7 +147,7 @@ import Testing
     )
 
     #expect(sheet.suggestionOutcomeSnapshot.unavailableReason == .noEligibleE1RMHistory)
-    #expect(sheet.weightValue == 20)
+    #expect(sheet.weightValue == 0)
     let snapshotStorage = Mirror(reflecting: sheet).children.first {
       $0.label == "_suggestionOutcomeSnapshot"
     }
@@ -160,7 +160,7 @@ import Testing
       fixture.viewModel.weightSuggestionOutcome(forSetID: fixture.draft.id).suggestion != nil
     )
     #expect(sheet.suggestionOutcomeSnapshot.unavailableReason == .noEligibleE1RMHistory)
-    #expect(sheet.weightValue == 20)
+    #expect(sheet.weightValue == 0)
   }
 
   @MainActor
@@ -189,6 +189,50 @@ import Testing
     #expect(sheet.suggestionOutcomeSnapshot.unavailableReason == nil)
     #expect(sheet.weightValue == suggestedWeight)
   }
+
+  @MainActor
+  @Test func sheetPrefillsPercentageConversionAndFixedWeightOnly() async throws {
+    let pctFixture = try await makeSuggestionSheetFixture(
+      seedHistory: true,
+      prescribed: PrescribedSet(
+        id: UUID(), setIndex: 0, intensity: .percentage(75), reps: 5)
+    )
+    let pctSheet = SetEntrySheet(
+      rowIndex: 0,
+      draft: pctFixture.draft,
+      setNumber: 1,
+      viewModel: pctFixture.viewModel
+    )
+    let fixedFixture = try await makeSuggestionSheetFixture(
+      seedHistory: false,
+      prescribed: PrescribedSet(id: UUID(), setIndex: 0, weightKg: 150, reps: 5)
+    )
+    let fixedSheet = SetEntrySheet(
+      rowIndex: 0,
+      draft: fixedFixture.draft,
+      setNumber: 1,
+      viewModel: fixedFixture.viewModel
+    )
+
+    #expect(pctSheet.weightValue == 90)
+    #expect(fixedSheet.weightValue == 150)
+  }
+
+  @MainActor
+  @Test func sheetDoesNotPrefillEmptyBarForUnsupportedIntensity() async throws {
+    let fixture = try await makeSuggestionSheetFixture(
+      seedHistory: true,
+      prescribed: PrescribedSet(id: UUID(), setIndex: 0, intensity: .rir(2), reps: 5)
+    )
+    let sheet = SetEntrySheet(
+      rowIndex: 0,
+      draft: fixture.draft,
+      setNumber: 1,
+      viewModel: fixture.viewModel
+    )
+
+    #expect(sheet.weightValue == 0)
+  }
 }
 
 @MainActor
@@ -209,8 +253,11 @@ private struct SuggestionSheetDomain {
 }
 
 @MainActor
-private func makeSuggestionSheetFixture(seedHistory: Bool) async throws -> SuggestionSheetFixture {
-  let domain = makeSuggestionSheetDomain()
+private func makeSuggestionSheetFixture(
+  seedHistory: Bool,
+  prescribed: PrescribedSet? = nil
+) async throws -> SuggestionSheetFixture {
+  let domain = makeSuggestionSheetDomain(prescribed: prescribed)
   let e1rm = InMemoryE1RMRepository(
     seedPoints: seedHistory ? [domain.historyPoint] : []
   )
@@ -234,7 +281,7 @@ private func makeSuggestionSheetFixture(seedHistory: Bool) async throws -> Sugge
   )
 }
 
-private func makeSuggestionSheetDomain() -> SuggestionSheetDomain {
+private func makeSuggestionSheetDomain(prescribed: PrescribedSet? = nil) -> SuggestionSheetDomain {
   let studentID = UUID()
   let date = Date(timeIntervalSince1970: 1_780_000_000)
   let exercise = Exercise(
@@ -248,7 +295,7 @@ private func makeSuggestionSheetDomain() -> SuggestionSheetDomain {
     movementPattern: [.squat],
     createdAt: date
   )
-  let prescribed = suggestionPrescription(setIndex: 0, reps: 5, rpe: 8)
+  let prescribed = prescribed ?? suggestionPrescription(setIndex: 0, reps: 5, rpe: 8)
   let planExercise = StudentPlanExercise(
     id: UUID(),
     exercise: exercise,
