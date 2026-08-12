@@ -318,6 +318,13 @@ public struct TodayWorkoutView: View {
     } message: {
       Text("视频仍保存在本机,可直接重试上传。")
     }
+    .alert("视频无法重试", isPresented: videoRetryErrorPresented) {
+      Button("知道了", role: .cancel) {
+        videoViewModel.clearRetryError()
+      }
+    } message: {
+      Text(videoViewModel.retryErrorMessage ?? "")
+    }
     #if os(iOS)
       .fullScreenCover(
         isPresented: $showingDirectCamera,
@@ -712,6 +719,13 @@ public struct TodayWorkoutView: View {
     Binding(
       get: { retryTargetSetLogID != nil },
       set: { if !$0 { retryTargetSetLogID = nil } }
+    )
+  }
+
+  private var videoRetryErrorPresented: Binding<Bool> {
+    Binding(
+      get: { videoViewModel.retryErrorMessage != nil },
+      set: { if !$0 { videoViewModel.clearRetryError() } }
     )
   }
 

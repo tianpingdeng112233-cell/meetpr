@@ -18,6 +18,7 @@ public final class VideoAttachmentViewModel {
   let maxDurationSeconds: Double
   public private(set) var rowStates: [UUID: RowState] = [:]
   public private(set) var lastErrorMessage: String?
+  public private(set) var retryErrorMessage: String?
 
   private let manager: VideoUploadManager
   private let consentDefaults: UserDefaults
@@ -95,6 +96,8 @@ public final class VideoAttachmentViewModel {
   }
 
   public func retry(setLogID: UUID) async {
+    lastErrorMessage = nil
+    retryErrorMessage = nil
     if let state = rowStates[setLogID] {
       await manager.retry(attachmentID: state.attachment.id)
     } else {
@@ -105,6 +108,10 @@ public final class VideoAttachmentViewModel {
   public func remove(setLogID: UUID) async {
     guard let state = rowStates[setLogID] else { return }
     await manager.remove(attachmentID: state.attachment.id)
+  }
+
+  public func clearRetryError() {
+    retryErrorMessage = nil
   }
 
   func playbackSource(attachmentID: UUID) async throws -> VideoAttachmentPlaybackSource? {
@@ -132,6 +139,18 @@ public final class VideoAttachmentViewModel {
       if rowStates[setLogID]?.attachment.id == attachmentID {
         rowStates[setLogID] = nil
       }
+    case .retryUnavailable(let setLogID, let attachmentID, let reason):
+      guard rowStates[setLogID]?.attachment.id == attachmentID else { return }
+      let message = Self.message(for: reason)
+      lastErrorMessage = message
+      retryErrorMessage = message
+    }
+  }
+
+  private static func message(for reason: VideoRetryUnavailableReason) -> String {
+    switch reason {
+    case .sourceMissing:
+      "本地视频已不存在,请删除后重新选择"
     }
   }
 

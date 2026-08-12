@@ -6,12 +6,6 @@ import RepositoryContracts
 
 extension VideoUploadManager {
   func run(recordID: UUID, sourceURL: URL?, generation: Int) async {
-    defer {
-      if let sourceURL {
-        try? FileManager.default.removeItem(at: sourceURL)
-      }
-    }
-
     do {
       var record = try await persistUploadGeneration(generation, recordID: recordID)
       if let sourceURL {
@@ -36,7 +30,12 @@ extension VideoUploadManager {
   ) async throws -> VideoAttachment {
     try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true)
     let destination = fileURL(for: record)
-    try await exporter.export(from: sourceURL, to: destination)
+    do {
+      try await exporter.export(from: sourceURL, to: destination)
+    } catch {
+      try? FileManager.default.removeItem(at: destination)
+      throw error
+    }
 
     try Task.checkCancellation()
     guard try await repository.fetch(id: record.id) != nil else {
@@ -173,6 +172,8 @@ extension VideoUploadManager {
     try await repository.save(uploaded)
     try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     broadcast(.updated(uploaded, progress: nil))
+    _ = await removeRetainedSourceFilesOrPersistCleanupIntent(recordID: record.id)
+    try requireLiveWakeContextIfPresent(recordID: record.id, generation: wakeGeneration)
     Analytics.shared.mediaUpload(
       .succeeded,
       context: .setLog,

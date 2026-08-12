@@ -90,6 +90,41 @@ import Testing
 }
 
 @MainActor
+@Test func viewModelSurfacesMissingLocalVideoWhenRetryCannotRecover() async throws {
+  let harness = VideoUploadHarness()
+  await harness.service.setDeterministicFailures([1: 1])
+  let viewModel = VideoAttachmentViewModel(
+    manager: harness.manager,
+    consentDefaults: makeDefaults()
+  )
+  let setLogID = UUID()
+  let studentID = UUID()
+  await viewModel.start(studentID: studentID)
+  await viewModel.attach(
+    sourceURL: harness.sourceURL,
+    setLogID: setLogID,
+    studentID: studentID
+  )
+  try await waitUntilOnMain {
+    viewModel.rowStates[setLogID]?.attachment.status == .failed
+  }
+  let attachment = try #require(viewModel.rowStates[setLogID]?.attachment)
+  let exportedURL = await harness.manager.fileURL(for: attachment)
+  try? FileManager.default.removeItem(at: exportedURL)
+  if let sourceURL = await harness.manager.retainedSourceURL(recordID: attachment.id) {
+    try? FileManager.default.removeItem(at: sourceURL)
+  }
+
+  await viewModel.retry(setLogID: setLogID)
+  try await waitUntilOnMain {
+    viewModel.retryErrorMessage != nil
+  }
+
+  #expect(viewModel.retryErrorMessage == "本地视频已不存在,请删除后重新选择")
+  #expect(viewModel.lastErrorMessage == viewModel.retryErrorMessage)
+}
+
+@MainActor
 private func makeDefaults() -> UserDefaults {
   let suiteName = "video-vm-tests-\(UUID().uuidString)"
   let defaults = UserDefaults(suiteName: suiteName) ?? .standard

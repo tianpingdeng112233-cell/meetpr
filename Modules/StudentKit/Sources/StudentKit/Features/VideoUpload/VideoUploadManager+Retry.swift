@@ -15,8 +15,21 @@ extension VideoUploadManager {
     else { return }
     guard let retryGeneration = try? requireLiveSnapshotGeneration(from: record) else { return }
 
-    guard FileManager.default.fileExists(atPath: fileURL(for: record).path) else {
+    let exportedURL = fileURL(for: record)
+    let sourceURL: URL?
+    if FileManager.default.fileExists(atPath: exportedURL.path) {
+      sourceURL = nil
+    } else if let retainedSourceURL = retainedSourceURL(recordID: attachmentID) {
+      sourceURL = retainedSourceURL
+    } else {
       broadcast(.updated(record, progress: nil))
+      broadcast(
+        .retryUnavailable(
+          setLogID: record.setLogID,
+          attachmentID: record.id,
+          reason: .sourceMissing
+        )
+      )
       return
     }
 
@@ -36,7 +49,7 @@ extension VideoUploadManager {
     broadcast(.updated(record, progress: 0))
     startUploadTask(
       recordID: attachmentID,
-      sourceURL: nil,
+      sourceURL: sourceURL,
       previousGeneration: retryGeneration
     )
   }
@@ -255,7 +268,7 @@ extension VideoUploadManager {
     else { return }
     startUploadTask(
       recordID: record.id,
-      sourceURL: nil,
+      sourceURL: recoveredSourceURL(for: record),
       previousGeneration: generation
     )
   }
@@ -286,6 +299,12 @@ extension VideoUploadManager {
       }
     }
     if let uploadError = error as? VideoUploadError {
+      // Every VideoUploadError is deterministic, including .exportFailed: the
+      // exporter also throws it for structurally bad assets (track count,
+      // invalid dimensions), so auto-retry would keep the row silently
+      // "pending" through the whole backoff window. Failing terminally
+      // surfaces the row immediately; the retained source makes the manual
+      // 重试 button re-export, so recoverable encoder hiccups still recover.
       switch uploadError {
       case .durationExceedsLimit, .exportFailed, .emptyFile, .fileUnreadable,
         .localFileMissing, .invalidPartURL, .partURLCountMismatch, .remoteTerminalState:
@@ -293,5 +312,10 @@ extension VideoUploadManager {
       }
     }
     return .transient
+  }
+
+  private func recoveredSourceURL(for record: VideoAttachment) -> URL? {
+    guard !FileManager.default.fileExists(atPath: fileURL(for: record).path) else { return nil }
+    return retainedSourceURL(recordID: record.id)
   }
 }
