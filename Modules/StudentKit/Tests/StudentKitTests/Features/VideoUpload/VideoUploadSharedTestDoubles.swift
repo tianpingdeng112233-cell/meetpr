@@ -42,7 +42,7 @@ struct VideoUploadHarness {
   let repository: InMemoryVideoAttachmentRepository
   let manager: VideoUploadManager
   let filesDirectory: URL
-  let sourceURL = URL(fileURLWithPath: "/tmp/ignored-source.mov")
+  let sourceURL: URL
 
   init(
     exporter: any VideoExporting = MockVideoExporter(),
@@ -56,6 +56,9 @@ struct VideoUploadHarness {
     self.service = service
     self.repository = repository
     self.filesDirectory = directory
+    self.sourceURL = directory.appending(path: "incoming.mov")
+    try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    try? Data([0x01]).write(to: self.sourceURL)
     self.manager = VideoUploadManager(
       service: service,
       exporter: exporter,

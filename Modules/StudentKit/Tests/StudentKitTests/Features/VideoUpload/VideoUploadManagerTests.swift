@@ -53,40 +53,6 @@ import Testing
   #expect(try await harness.repository.fetch(id: record.id)?.uploadGeneration == nil)
 }
 
-@Test func uploadManagerDeletesOwnedSourceAfterSuccessfulExport() async throws {
-  let harness = VideoUploadHarness()
-  let sourceURL = try makeTemporaryVideoSource()
-
-  let record = try await harness.manager.enqueue(
-    sourceURL: sourceURL,
-    setLogID: UUID(),
-    studentID: UUID()
-  )
-  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
-  try await waitUntil {
-    !FileManager.default.fileExists(atPath: sourceURL.path)
-  }
-
-  #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
-}
-
-@Test func uploadManagerDeletesOwnedSourceAfterExportFailure() async throws {
-  let harness = VideoUploadHarness(exporter: FailingVideoExporter())
-  let sourceURL = try makeTemporaryVideoSource()
-
-  let record = try await harness.manager.enqueue(
-    sourceURL: sourceURL,
-    setLogID: UUID(),
-    studentID: UUID()
-  )
-  _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.failed])
-  try await waitUntil {
-    !FileManager.default.fileExists(atPath: sourceURL.path)
-  }
-
-  #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
-}
-
 @Test func uploadManagerRetriesTransientPartFailures() async throws {
   let harness = VideoUploadHarness()
   // Part 2 fails twice; the third attempt (2 retries allowed) succeeds.
@@ -166,6 +132,7 @@ import Testing
       atPath: harness.filesDirectory.appending(path: "\(record.id.uuidString).parts").path
     )
   )
+  #expect(await harness.manager.retainedSourceURL(recordID: record.id) == nil)
 }
 
 @Test func removeUploadedAttachmentOnlyDeletesLocalAssociation() async throws {
@@ -297,7 +264,7 @@ import Testing
   _ = try await waitForStatus(harness.repository, id: first.id, oneOf: [.uploaded])
 
   let second = try await harness.manager.enqueue(
-    sourceURL: harness.sourceURL, setLogID: setLogID, studentID: studentID)
+    sourceURL: makeTemporaryVideoSource(), setLogID: setLogID, studentID: studentID)
   _ = try await waitForStatus(harness.repository, id: second.id, oneOf: [.uploaded])
 
   let forSet = try await harness.repository.fetch(setLogID: setLogID)

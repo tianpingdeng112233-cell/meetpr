@@ -81,6 +81,14 @@ public enum VideoUploadEvent: Equatable, Sendable {
   /// `progress` is 0...1 across the part uploads; nil when unchanged.
   case updated(VideoAttachment, progress: Double?)
   case removed(setLogID: UUID, attachmentID: UUID)
+  case retryUnavailable(
+    setLogID: UUID, attachmentID: UUID, reason: VideoRetryUnavailableReason)
+}
+
+/// Why a manual retry could not start; presentation copy is owned by the
+/// view-model layer, not the upload actor.
+public enum VideoRetryUnavailableReason: Equatable, Sendable {
+  case sourceMissing
 }
 
 /// Abstraction over AVFoundation export so the upload state machine is unit
