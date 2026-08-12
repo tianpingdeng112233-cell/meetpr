@@ -15,9 +15,11 @@ import Testing
     studentID: UUID()
   )
   _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
+  // The record reaches `.uploaded` one step before the retained source is
+  // swept, so poll for the sweep instead of assuming it already ran.
+  try await waitUntil { await harness.manager.retainedSourceURL(recordID: record.id) == nil }
 
   #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
-  #expect(await harness.manager.retainedSourceURL(recordID: record.id) == nil)
 }
 
 @Test func uploadManagerRetainsManagedSourceAfterExportFailure() async throws {
@@ -53,9 +55,9 @@ import Testing
   await exporter.allowExports()
   await harness.manager.retry(attachmentID: record.id)
   _ = try await waitForStatus(harness.repository, id: record.id, oneOf: [.uploaded])
+  try await waitUntil { !FileManager.default.fileExists(atPath: retainedSource.path) }
 
   #expect(await exporter.exportAttempts > 1)
-  #expect(!FileManager.default.fileExists(atPath: retainedSource.path))
 }
 
 @Test func coldStartCleanupDeletesUploadedAndOrphanSourceFiles() async throws {
