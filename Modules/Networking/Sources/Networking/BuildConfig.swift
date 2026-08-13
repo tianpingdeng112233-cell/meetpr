@@ -1,7 +1,27 @@
 import Foundation
 
+public enum PhoneValidationStyle: Sendable, Equatable {
+  case mainlandChina
+  case globalE164
+
+  public var regularExpression: String {
+    switch self {
+    case .mainlandChina:
+      #"^1[3-9]\d{9}$"#
+    case .globalE164:
+      #"^\+[1-9]\d{7,14}$"#
+    }
+  }
+}
+
 public enum BuildConfig {
+  static let buildTrackInfoDictionaryKey = "MeetPRBuildTrack"
+
   public static let productionBackendBaseURL = "http://121.40.160.241:3000"
+
+  public static var phoneValidationStyle: PhoneValidationStyle {
+    phoneValidationStyle(infoDictionary: Bundle.main.infoDictionary)
+  }
 
   public static var backendBaseURL: URL {
     backendBaseURL(environment: ProcessInfo.processInfo.environment)
@@ -32,5 +52,12 @@ public enum BuildConfig {
       return nil
     }
     return URL(string: baseURLString)
+  }
+
+  static func phoneValidationStyle(infoDictionary: [String: Any]?) -> PhoneValidationStyle {
+    guard infoDictionary?[buildTrackInfoDictionaryKey] as? String == "Global" else {
+      return .mainlandChina
+    }
+    return .globalE164
   }
 }

@@ -30,6 +30,23 @@ import Testing
 }
 
 @available(iOS 17.0, macOS 14.0, *)
+@Test func signupPreservesGlobalE164PhoneNumber() async throws {
+  let capture = RequestCapture()
+  let api = try APIClient.stub(data: AuthTestSupport.authResultData(), capture: capture)
+  let repository = NetworkingAuthRepository(api: api)
+
+  _ = try await repository.signup(
+    phone: "+14155550123",
+    password: "password123",
+    role: .coach
+  )
+  let body = try #require(await capture.body())
+  let request = try MeetPRCodec.decoder.decode(AuthRegisterRequestDTO.self, from: body)
+
+  #expect(request.phone == "+14155550123")
+}
+
+@available(iOS 17.0, macOS 14.0, *)
 @Test func loginPrependsChinaCodeAndMapsTokens() async throws {
   let capture = RequestCapture()
   let api = try APIClient.stub(

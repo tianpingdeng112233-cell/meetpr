@@ -52,7 +52,8 @@ public struct LoginView: View {
             AuthPhoneField(
               "手机号",
               text: $viewModel.phone,
-              placeholder: "138 0000 0001",
+              prefix: viewModel.phonePrefix,
+              placeholder: viewModel.loginPhonePlaceholder,
               errorMessage: viewModel.phoneError
             )
             .accessibilityIdentifier("login.phone")
