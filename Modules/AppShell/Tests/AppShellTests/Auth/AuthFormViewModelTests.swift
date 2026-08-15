@@ -8,12 +8,38 @@ import Testing
 @Test func validatesChineseNationalPhoneNumbers() {
   let viewModel = AuthFormViewModel(mode: .login)
 
+  #expect(viewModel.phoneHelperText == "中国大陆 11 位手机号")
+  #expect(viewModel.phonePrefix == "+86")
+  #expect(viewModel.loginPhonePlaceholder == "138 0000 0001")
+  #expect(viewModel.signupPhonePlaceholder == "13800000001")
+
   viewModel.phone = "12800000001"
   #expect(viewModel.phoneError == "手机号格式不正确")
   #expect(!viewModel.canSubmit)
 
   viewModel.phone = "13800000001"
   viewModel.password = "password123"
+  #expect(viewModel.phoneError == nil)
+  #expect(viewModel.canSubmit)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func validatesGlobalE164PhoneNumbers() {
+  let viewModel = AuthFormViewModel(mode: .signup, phoneValidationStyle: .globalE164)
+  viewModel.password = "password123"
+  viewModel.selectedRole = .coach
+
+  #expect(viewModel.phoneHelperText == "International phone number in E.164 format")
+  #expect(viewModel.phonePrefix == nil)
+  #expect(viewModel.loginPhonePlaceholder == "+14155550123")
+  #expect(viewModel.signupPhonePlaceholder == "+14155550123")
+
+  viewModel.phone = "13800138000"
+  #expect(viewModel.phoneError == "手机号格式不正确")
+  #expect(!viewModel.canSubmit)
+
+  viewModel.phone = "+14155550123"
   #expect(viewModel.phoneError == nil)
   #expect(viewModel.canSubmit)
 }

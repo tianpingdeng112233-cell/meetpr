@@ -4,6 +4,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct AuthPhoneField: View {
   private let label: String
+  private let prefix: String?
   private let placeholder: String
   private let errorMessage: String?
 
@@ -13,11 +14,13 @@ struct AuthPhoneField: View {
   init(
     _ label: String,
     text: Binding<String>,
+    prefix: String? = "+86",
     placeholder: String = "",
     errorMessage: String? = nil
   ) {
     self.label = label
     self._text = text
+    self.prefix = prefix
     self.placeholder = placeholder
     self.errorMessage = errorMessage
   }
@@ -31,13 +34,15 @@ struct AuthPhoneField: View {
           .foregroundStyle(labelColor)
 
         HStack(spacing: MeetPRSpacing.point10) {
-          Text("+86")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .medium))
-            .foregroundStyle(Color.MeetPR.textTertiary)
+          if let prefix {
+            Text(prefix)
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .medium))
+              .foregroundStyle(Color.MeetPR.textTertiary)
 
-          Rectangle()
-            .fill(Color.MeetPR.borderStrong)
-            .frame(width: MeetPRSpacing.point1, height: MeetPRSpacing.point18)
+            Rectangle()
+              .fill(Color.MeetPR.borderStrong)
+              .frame(width: MeetPRSpacing.point1, height: MeetPRSpacing.point18)
+          }
 
           TextField(
             "",

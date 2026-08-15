@@ -33,8 +33,8 @@ public struct SignupView: View {
           MeetPRTextField(
             "手机号",
             text: $viewModel.phone,
-            placeholder: "13800000001",
-            helperText: "中国大陆 11 位手机号",
+            placeholder: viewModel.signupPhonePlaceholder,
+            helperText: viewModel.phoneHelperText,
             errorMessage: viewModel.phoneError,
             isMonospaced: true
           )
