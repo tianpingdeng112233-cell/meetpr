@@ -1,6 +1,5 @@
 import CoreModels
 import Foundation
-import Networking
 import Observation
 
 @Observable
@@ -13,55 +12,30 @@ public final class AuthFormViewModel {
   }
 
   public let mode: Mode
-  public let phoneValidationStyle: PhoneValidationStyle
   public var phone = ""
   public var password = ""
   public var selectedRole: UserRole?
   public var isSubmitting = false
   public var toastMessage: String?
 
-  public init(
-    mode: Mode,
-    phoneValidationStyle: PhoneValidationStyle = BuildConfig.phoneValidationStyle
-  ) {
+  public init(mode: Mode) {
     self.mode = mode
-    self.phoneValidationStyle = phoneValidationStyle
   }
 
   public var phoneHelperText: String {
-    switch phoneValidationStyle {
-    case .mainlandChina:
-      "中国大陆 11 位手机号"
-    case .globalE164:
-      "International phone number in E.164 format"
-    }
+    "中国大陆 11 位手机号"
   }
 
   public var phonePrefix: String? {
-    switch phoneValidationStyle {
-    case .mainlandChina:
-      "+86"
-    case .globalE164:
-      nil
-    }
+    "+86"
   }
 
   public var loginPhonePlaceholder: String {
-    switch phoneValidationStyle {
-    case .mainlandChina:
-      "138 0000 0001"
-    case .globalE164:
-      "+14155550123"
-    }
+    "138 0000 0001"
   }
 
   public var signupPhonePlaceholder: String {
-    switch phoneValidationStyle {
-    case .mainlandChina:
-      "13800000001"
-    case .globalE164:
-      "+14155550123"
-    }
+    "13800000001"
   }
 
   public var phoneError: String? {
@@ -130,7 +104,7 @@ public final class AuthFormViewModel {
   }
 
   private var isPhoneValid: Bool {
-    phone.range(of: phoneValidationStyle.regularExpression, options: .regularExpression) != nil
+    phone.range(of: #"^1[3-9]\d{9}$"#, options: .regularExpression) != nil
   }
 
   private var isPasswordValid: Bool {

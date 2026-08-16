@@ -18,12 +18,15 @@ public final class Session {
   }
 
   @ObservationIgnored
-  private static let logger = Logger(subsystem: "com.meetpr.app.appshell", category: "auth")
+  static let logger = Logger(subsystem: "com.meetpr.app.appshell", category: "auth")
 
-  public private(set) var state: State = .anonymous
+  public internal(set) var state: State = .anonymous
 
-  @ObservationIgnored private let auth: any AuthRepository
-  @ObservationIgnored private let tokenStore: any TokenStoring
+  @ObservationIgnored let auth: any AuthRepository
+  @ObservationIgnored let tokenStore: any TokenStoring
+  @ObservationIgnored let timezoneStore: any TimezoneStoring
+  @ObservationIgnored let currentTimezoneIdentifier: @Sendable () -> String
+  @ObservationIgnored let reportsTimezoneOnBootstrap: Bool
   @ObservationIgnored private let onLogout: (@Sendable () async -> Void)?
   @ObservationIgnored private var errorTask: Task<Void, Never>?
   @ObservationIgnored private var refreshTask: Task<TokenPair, Error>?
@@ -34,11 +37,32 @@ public final class Session {
   public init(
     auth: any AuthRepository,
     tokenStore: any TokenStoring,
+    timezoneStore: any TimezoneStoring,
+    currentTimezoneIdentifier: @escaping @Sendable () -> String,
+    reportsTimezoneOnBootstrap: Bool,
     onLogout: (@Sendable () async -> Void)? = nil
   ) {
     self.auth = auth
     self.tokenStore = tokenStore
+    self.timezoneStore = timezoneStore
+    self.currentTimezoneIdentifier = currentTimezoneIdentifier
+    self.reportsTimezoneOnBootstrap = reportsTimezoneOnBootstrap
     self.onLogout = onLogout
+  }
+
+  public convenience init(
+    auth: any AuthRepository,
+    tokenStore: any TokenStoring,
+    onLogout: (@Sendable () async -> Void)? = nil
+  ) {
+    self.init(
+      auth: auth,
+      tokenStore: tokenStore,
+      timezoneStore: UserDefaultsTimezoneStore(),
+      currentTimezoneIdentifier: { TimeZone.current.identifier },
+      reportsTimezoneOnBootstrap: BuildConfig.buildTrack == .global,
+      onLogout: onLogout
+    )
   }
 
   public func bootstrap() async {
@@ -86,6 +110,13 @@ public final class Session {
       await tokenStore.saveUser(cachedUser)
       guard isCurrentSession(generation) else { return }
       state = .authenticated(cachedUser)
+      if reportsTimezoneOnBootstrap {
+        await reportTimezoneIfNeeded(
+          userID: cachedUser.id,
+          accessToken: tokens.accessToken,
+          generation: generation
+        )
+      }
     } catch {
       guard isCurrentSession(generation) else { return }
       Self.logger.warning("bootstrap_refresh_failed \(String(describing: error))")
@@ -98,44 +129,6 @@ public final class Session {
         guard isCurrentSession(generation) else { return }
         state = .anonymous
       }
-    }
-  }
-
-  public func signup(phone: String, password: String, role: UserRole) async throws {
-    let generation = beginSessionTransition()
-    state = .authenticating
-    await tokenStore.clear()
-    guard isCurrentSession(generation) else { throw CancellationError() }
-    do {
-      let result = try await auth.signup(phone: phone, password: password, role: role)
-      guard isCurrentSession(generation) else { throw CancellationError() }
-      guard await persist(result, generation: generation) else { throw CancellationError() }
-      state = .authenticated(result.user)
-    } catch {
-      guard isCurrentSession(generation) else { throw error }
-      await tokenStore.clear()
-      guard isCurrentSession(generation) else { throw error }
-      state = .anonymous
-      throw error
-    }
-  }
-
-  public func login(phone: String, password: String) async throws {
-    let generation = beginSessionTransition()
-    state = .authenticating
-    await tokenStore.clear()
-    guard isCurrentSession(generation) else { throw CancellationError() }
-    do {
-      let result = try await auth.login(phone: phone, password: password)
-      guard isCurrentSession(generation) else { throw CancellationError() }
-      guard await persist(result, generation: generation) else { throw CancellationError() }
-      state = .authenticated(result.user)
-    } catch {
-      guard isCurrentSession(generation) else { throw error }
-      await tokenStore.clear()
-      guard isCurrentSession(generation) else { throw error }
-      state = .anonymous
-      throw error
     }
   }
 
@@ -186,7 +179,7 @@ public final class Session {
     return try await refreshAccessToken()
   }
 
-  private func persist(_ result: AuthResult, generation: UInt) async -> Bool {
+  func persist(_ result: AuthResult, generation: UInt) async -> Bool {
     guard isCurrentSession(generation) else { return false }
     await tokenStore.save(access: result.accessToken, refresh: result.refreshToken)
     guard isCurrentSession(generation) else { return false }
@@ -229,14 +222,14 @@ public final class Session {
     }
   }
 
-  private func beginSessionTransition() -> UInt {
+  func beginSessionTransition() -> UInt {
     sessionGeneration &+= 1
     refreshTask?.cancel()
     refreshTask = nil
     return sessionGeneration
   }
 
-  private func isCurrentSession(_ generation: UInt) -> Bool {
+  func isCurrentSession(_ generation: UInt) -> Bool {
     generation == sessionGeneration
   }
 

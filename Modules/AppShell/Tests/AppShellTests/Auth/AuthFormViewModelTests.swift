@@ -25,27 +25,6 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func validatesGlobalE164PhoneNumbers() {
-  let viewModel = AuthFormViewModel(mode: .signup, phoneValidationStyle: .globalE164)
-  viewModel.password = "password123"
-  viewModel.selectedRole = .coach
-
-  #expect(viewModel.phoneHelperText == "International phone number in E.164 format")
-  #expect(viewModel.phonePrefix == nil)
-  #expect(viewModel.loginPhonePlaceholder == "+14155550123")
-  #expect(viewModel.signupPhonePlaceholder == "+14155550123")
-
-  viewModel.phone = "13800138000"
-  #expect(viewModel.phoneError == "手机号格式不正确")
-  #expect(!viewModel.canSubmit)
-
-  viewModel.phone = "+14155550123"
-  #expect(viewModel.phoneError == nil)
-  #expect(viewModel.canSubmit)
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
 @Test func validatesPasswordLengthAndBcryptByteLimit() {
   let viewModel = AuthFormViewModel(mode: .login)
   viewModel.phone = "13800000001"

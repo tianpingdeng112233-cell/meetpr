@@ -24,6 +24,16 @@ public struct TokenPair: Sendable, Equatable {
   }
 }
 
+public struct AuthChallenge: Sendable, Equatable {
+  public let nonce: String
+  public let expiresAt: Date
+
+  public init(nonce: String, expiresAt: Date) {
+    self.nonce = nonce
+    self.expiresAt = expiresAt
+  }
+}
+
 public struct AuthValidationIssue: Sendable, Equatable {
   public let path: [String]
   public let message: String
@@ -36,9 +46,15 @@ public struct AuthValidationIssue: Sendable, Equatable {
 
 public enum AuthErrorCode: String, Sendable, Equatable {
   case invalidCredentials = "AUTH_INVALID_CREDENTIALS"
+  case invalidIdentityToken = "AUTH_INVALID_IDENTITY_TOKEN"
+  case invalidResetCode = "AUTH_INVALID_RESET_CODE"
+  case invalidTimezone = "INVALID_TIMEZONE"
+  case emailTaken = "AUTH_EMAIL_TAKEN"
   case invalidRefresh = "AUTH_INVALID_REFRESH"
   case phoneTaken = "AUTH_PHONE_TAKEN"
   case rateLimited = "RATE_LIMITED"
+  case registrationDisabled = "AUTH_REGISTRATION_DISABLED"
+  case registrationNotAllowed = "AUTH_REGISTRATION_NOT_ALLOWED"
   case refreshExpired = "AUTH_REFRESH_EXPIRED"
   case validationError = "VALIDATION_ERROR"
 }
@@ -67,11 +83,25 @@ public enum AuthRepositoryError: Error, Sendable, Equatable {
 public protocol AuthRepository: Sendable {
   func signup(phone: String, password: String, role: UserRole) async throws -> AuthResult
   func login(phone: String, password: String) async throws -> AuthResult
+  func fetchChallenge() async throws -> AuthChallenge
+  func signInWithApple(
+    identityToken: String,
+    nonce: String,
+    authorizationCode: String?,
+    timezone: String
+  ) async throws -> AuthResult
+  func signInWithGoogle(idToken: String, timezone: String) async throws -> AuthResult
+  func registerWithEmail(email: String, password: String, timezone: String) async throws
+    -> AuthResult
+  func loginWithEmail(email: String, password: String) async throws -> AuthResult
+  func requestPasswordReset(email: String) async throws
+  func resetPassword(email: String, code: String, newPassword: String) async throws
+  func updateTimezone(_ timezone: String, accessToken: String) async throws
   func refresh(refreshToken: String) async throws -> TokenPair
 }
 
 public struct NetworkingAuthRepository: AuthRepository {
-  private let api: APIClient
+  let api: APIClient
 
   public init(api: APIClient) {
     self.api = api
@@ -115,7 +145,7 @@ public struct NetworkingAuthRepository: AuthRepository {
     return "+86" + nationalPhone
   }
 
-  private static func result(from response: AuthResultDTO) throws -> AuthResult {
+  static func result(from response: AuthResultDTO) throws -> AuthResult {
     do {
       return AuthResult(
         user: try response.user.toUser(),
@@ -127,7 +157,7 @@ public struct NetworkingAuthRepository: AuthRepository {
     }
   }
 
-  private static func map(_ error: Error) -> AuthRepositoryError {
+  static func map(_ error: Error) -> AuthRepositoryError {
     if let authError = error as? AuthRepositoryError {
       return authError
     }
@@ -199,7 +229,7 @@ public actor InMemoryAuthRepository: AuthRepository {
     let refreshToken: String
   }
 
-  private var forcedError: AuthRepositoryError?
+  var forcedError: AuthRepositoryError?
   private var usersByPhone: [String: StoredUser] = [:]
   private var phoneByRefreshToken: [String: String] = [:]
   private var tokenCounter = 0
@@ -289,7 +319,7 @@ public actor InMemoryAuthRepository: AuthRepository {
     return TokenPair(accessToken: nextToken(prefix: "access"), refreshToken: newRefreshToken)
   }
 
-  private func nextToken(prefix: String) -> String {
+  func nextToken(prefix: String) -> String {
     tokenCounter += 1
     return "\(prefix)-\(tokenCounter)"
   }

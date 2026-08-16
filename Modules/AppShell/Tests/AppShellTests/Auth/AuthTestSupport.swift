@@ -7,10 +7,14 @@ import Networking
 enum AuthTestSupport {
   static let createdAt = Date(timeIntervalSince1970: 1_777_448_662)
 
-  static func user(role: UserRole = .coach, phone: String = "+8613800000001") -> User {
+  static func user(
+    id: UUID = UUID(uuidString: "00000000-0000-0000-0000-000000000011") ?? UUID(),
+    role: UserRole = .coach,
+    phone: String = "+8613800000001"
+  ) -> User {
     let createdAt = Date(timeIntervalSince1970: 1_777_448_662)
     return User(
-      id: UUID(uuidString: "00000000-0000-0000-0000-000000000011") ?? UUID(),
+      id: id,
       phone: phone,
       name: nil,
       unitSystem: .metric,
