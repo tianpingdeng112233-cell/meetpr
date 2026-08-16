@@ -85,8 +85,12 @@ extension Session {
   private func authenticate(
     using operation: () async throws -> AuthResult
   ) async throws -> AuthResult {
+    // Unlike the CN phone flow this stays in `.anonymous` while the attempt is
+    // in flight: flipping to `.authenticating` swaps RootView away from the
+    // login screen, so a failure remounts GlobalLoginView and silently drops
+    // the error toast (2026-08-16 device smoke). The Global login buttons show
+    // their own progress state; only success changes the session state.
     let generation = beginSessionTransition()
-    state = .authenticating
     await tokenStore.clear()
     guard isCurrentSession(generation) else { throw CancellationError() }
     do {
@@ -98,8 +102,6 @@ extension Session {
     } catch {
       guard isCurrentSession(generation) else { throw error }
       await tokenStore.clear()
-      guard isCurrentSession(generation) else { throw error }
-      state = .anonymous
       throw error
     }
   }

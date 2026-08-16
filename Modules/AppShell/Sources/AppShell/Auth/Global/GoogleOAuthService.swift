@@ -126,6 +126,10 @@ final class GoogleOAuthService: NSObject, GoogleOAuthAuthorizing {
   func exchangeCode(_ code: String, verifier: String) async throws -> String {
     let response = try await fetch(configuration.tokenRequest(code: code, verifier: verifier))
     guard 200..<300 ~= response.statusCode else {
+      print(
+        "[GoogleOAuth] token exchange failed status=\(response.statusCode) "
+          + "body=\(String(data: response.data, encoding: .utf8) ?? "<binary>")"
+      )
       throw GlobalOAuthError.invalidTokenResponse
     }
     let token = try JSONDecoder().decode(GoogleTokenResponse.self, from: response.data)
