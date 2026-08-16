@@ -177,6 +177,21 @@ public final class APIClient: Sendable {
     _ = try await perform(request, unauthorizedAccessToken: accessToken)
   }
 
+  public func patchNoContent<Request: Encodable>(
+    path: String,
+    body: Request,
+    accessToken: String
+  ) async throws {
+    var request = URLRequest(url: url(path: path))
+    request.httpMethod = "PATCH"
+    authorize(&request, accessToken: accessToken)
+    request.httpBody = try MeetPRCodec.encoder.encode(body)
+    request.setValue("application/json", forHTTPHeaderField: "content-type")
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+
+    _ = try await perform(request, unauthorizedAccessToken: accessToken)
+  }
+
   public func put<Request: Encodable, Response: Decodable>(
     path: String,
     body: Request,

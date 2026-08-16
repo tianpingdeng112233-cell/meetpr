@@ -24,6 +24,44 @@ public final class DemoAuthRepository: AuthRepository, Sendable {
     )
   }
 
+  public func fetchChallenge() async throws -> AuthChallenge {
+    AuthChallenge(
+      nonce: "demo-challenge",
+      expiresAt: Date().addingTimeInterval(10 * 60)
+    )
+  }
+
+  public func signInWithApple(
+    identityToken: String,
+    nonce: String,
+    authorizationCode: String?,
+    timezone: String
+  ) async throws -> AuthResult {
+    fixedResult()
+  }
+
+  public func signInWithGoogle(idToken: String, timezone: String) async throws -> AuthResult {
+    fixedResult()
+  }
+
+  public func registerWithEmail(
+    email: String,
+    password: String,
+    timezone: String
+  ) async throws -> AuthResult {
+    fixedResult()
+  }
+
+  public func loginWithEmail(email: String, password: String) async throws -> AuthResult {
+    fixedResult()
+  }
+
+  public func requestPasswordReset(email: String) async throws {}
+
+  public func resetPassword(email: String, code: String, newPassword: String) async throws {}
+
+  public func updateTimezone(_ timezone: String, accessToken: String) async throws {}
+
   private func fixedResult() -> AuthResult {
     AuthResult(
       user: user,

@@ -380,6 +380,47 @@ private struct UnknownFailureAuthRepository: AuthRepository {
     throw UnknownRefreshError()
   }
 
+  func fetchChallenge() async throws -> AuthChallenge {
+    throw UnknownRefreshError()
+  }
+
+  func signInWithApple(
+    identityToken: String,
+    nonce: String,
+    authorizationCode: String?,
+    timezone: String
+  ) async throws -> AuthResult {
+    throw UnknownRefreshError()
+  }
+
+  func signInWithGoogle(idToken: String, timezone: String) async throws -> AuthResult {
+    throw UnknownRefreshError()
+  }
+
+  func registerWithEmail(
+    email: String,
+    password: String,
+    timezone: String
+  ) async throws -> AuthResult {
+    throw UnknownRefreshError()
+  }
+
+  func loginWithEmail(email: String, password: String) async throws -> AuthResult {
+    throw UnknownRefreshError()
+  }
+
+  func requestPasswordReset(email: String) async throws {
+    throw UnknownRefreshError()
+  }
+
+  func resetPassword(email: String, code: String, newPassword: String) async throws {
+    throw UnknownRefreshError()
+  }
+
+  func updateTimezone(_ timezone: String, accessToken: String) async throws {
+    throw UnknownRefreshError()
+  }
+
   func refresh(refreshToken: String) async throws -> TokenPair {
     throw UnknownRefreshError()
   }
