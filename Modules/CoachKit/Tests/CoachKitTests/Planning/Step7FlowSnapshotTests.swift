@@ -10,7 +10,9 @@ import ViewInspector
 
   let inspected = try Step7WeekCardSwipeView(viewModel: viewModel).inspect()
 
-  #expect(try inspected.find(text: "Week 1 / 4").string() == "Week 1 / 4")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.weekPosition(1, total: 4)).string()
+      == CoachPlanningStrings.weekPosition(1, total: 4))
 }
 
 @MainActor
@@ -21,8 +23,9 @@ import ViewInspector
   try await viewModel.proceedToStep6()
 
   let inspected = try WeekCardView(viewModel: viewModel, weekNumber: 1).inspect()
-
-  #expect(try inspected.find(text: "Week 1 / 1").string() == "Week 1 / 1")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.weekPosition(1, total: 1)).string()
+      == CoachPlanningStrings.weekPosition(1, total: 1))
 }
 
 @MainActor
@@ -31,10 +34,15 @@ import ViewInspector
   let viewModel = try await configuredPreviewViewModel()
 
   let inspected = try WeekCardView(viewModel: viewModel, weekNumber: 1).inspect()
+  let firstExercise = try #require(viewModel.sortedDraftExercises.first)
 
   #expect(try inspected.find(text: "DAY 1").string() == "DAY 1")
-  #expect(try inspected.find(text: "比赛式深蹲").string() == "比赛式深蹲")
-  #expect(try inspected.find(text: "4 组 × 5 次").string() == "4 组 × 5 次")
+  #expect(
+    try inspected.find(text: viewModel.exerciseName(for: firstExercise)).string()
+      == viewModel.exerciseName(for: firstExercise))
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.setAndRepCount(sets: 4, reps: 5)).string()
+      == CoachPlanningStrings.setAndRepCount(sets: 4, reps: 5))
 }
 
 @MainActor

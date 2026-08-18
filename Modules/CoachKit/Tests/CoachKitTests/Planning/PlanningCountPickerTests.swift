@@ -160,7 +160,7 @@ private func plusButton(in inspected: InspectableView<ViewType.ClassifiedView>) 
   -> InspectableView<ViewType.Button>
 {
   try inspected.find(ViewType.Button.self) { button in
-    (try? button.accessibilityLabel().string()) == "增加"
+    (try? button.accessibilityLabel().string()) == CoachPlanningStrings.increase
   }
 }
 
@@ -170,6 +170,6 @@ private func minusButton(in inspected: InspectableView<ViewType.ClassifiedView>)
   -> InspectableView<ViewType.Button>
 {
   try inspected.find(ViewType.Button.self) { button in
-    (try? button.accessibilityLabel().string()) == "减少"
+    (try? button.accessibilityLabel().string()) == CoachPlanningStrings.decrease
   }
 }

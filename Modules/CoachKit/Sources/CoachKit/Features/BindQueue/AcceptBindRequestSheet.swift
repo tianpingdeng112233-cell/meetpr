@@ -22,28 +22,35 @@ struct AcceptBindRequestSheet: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-          Text("确认接收 \(studentName) 为学员?")
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
+          Text(
+            CoachBindStrings.replacing(
+              "coach.bind.accept.confirmQuestion", ["student": studentName])
+          )
+          .font(Font.MeetPR.headline)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
 
-          Text("接收后即可为其查看资料、编排训练计划。")
+          Text(CoachBindStrings.text("coach.bind.accept.explanation"))
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgTertiary)
 
-          PrimaryButton("确认接收", isDisabled: isSubmitting, isFullWidth: true) {
+          PrimaryButton(
+            CoachBindStrings.text("coach.bind.accept.confirm"),
+            isDisabled: isSubmitting,
+            isFullWidth: true
+          ) {
             submit()
           }
         }
         .padding(MeetPRSpacing.base)
       }
       .background(Color.MeetPR.bg)
-      .navigationTitle("接收新学员")
+      .navigationTitle(CoachBindStrings.text("coach.bind.accept.title"))
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("取消") {
+          Button(CoachBindStrings.text("coach.common.cancel")) {
             dismiss()
           }
           .disabled(isSubmitting)

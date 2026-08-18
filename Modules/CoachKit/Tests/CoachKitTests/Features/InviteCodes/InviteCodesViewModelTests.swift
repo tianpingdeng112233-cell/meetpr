@@ -35,7 +35,7 @@ private func makeCode(
 @Test func statusIsActiveForUnusedSingleUse() {
   let status = InviteCodeStatus.status(of: makeCode(id: 1, type: .singleUse), now: fixedNow)
   #expect(status == .active)
-  #expect(status.label == "待用")
+  #expect(status.label == InviteCodeStrings.statusActive)
 }
 
 @Test func statusIsUsedWhenSingleUseBudgetExhausted() {
@@ -48,7 +48,7 @@ private func makeCode(
     id: 3, type: .timeLimited, expiresAt: fixedNow.addingTimeInterval(6 * 86_400))
   let status = InviteCodeStatus.status(of: code, now: fixedNow)
   #expect(status == .expiringIn(days: 6))
-  #expect(status.label == "6 天后过期")
+  #expect(status.label == InviteCodeStrings.expiresIn(6))
 }
 
 @Test func statusFlipsToExpiredAtBoundary() {

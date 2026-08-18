@@ -7,7 +7,12 @@ import Testing
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func detailDefinesFiveSectionsInSpecOrder() {
-  #expect(StudentDetailSection.allCases.map(\.title) == ["概览", "视频", "成长", "反馈", "资料"])
+  #expect(
+    StudentDetailSection.allCases.map(\.title) == [
+      "coach.studentDetail.section.overview", "coach.studentDetail.section.videos",
+      "coach.studentDetail.section.growth", "coach.studentDetail.section.feedback",
+      "coach.studentDetail.section.profile",
+    ])
 }
 
 @MainActor
@@ -32,7 +37,9 @@ import Testing
   #expect(viewModel.overview.completedTrainingDays == 1)
   #expect(viewModel.feedbackItems.first?.id == feedback.id)
   #expect(viewModel.allPlanExercises.map(\.id) == [CoachStudentFeatureFixtures.planExerciseID])
-  #expect(viewModel.planShiftBadgeText == "已顺延 2 天")
+  #expect(
+    viewModel.planShiftBadgeText
+      == CoachLocalization.localized("coach.studentDetail.shiftedDays \(2)"))
 
   viewModel.select(.feedback)
   #expect(viewModel.selectedSection == .feedback)

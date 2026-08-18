@@ -13,10 +13,18 @@ import ViewInspector
   let sut = Step0SelectStudentView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "评估期内 (1)").string() == "评估期内 (1)")
-  #expect(try inspected.find(text: "活跃 (2)").string() == "活跃 (2)")
-  #expect(try inspected.find(text: "异常 (1)").string() == "异常 (1)")
-  #expect(try inspected.find(text: "评估期 4 天 13 时剩").string() == "评估期 4 天 13 时剩")
+  #expect(
+    try inspected.find(text: "\(CoachPlanningStrings.inEvaluation) (1)".uppercased()).string()
+      == "\(CoachPlanningStrings.inEvaluation) (1)".uppercased())
+  #expect(
+    try inspected.find(text: "\(CoachPlanningStrings.active) (2)".uppercased()).string()
+      == "\(CoachPlanningStrings.active) (2)".uppercased())
+  #expect(
+    try inspected.find(text: "\(CoachPlanningStrings.abnormal) (1)".uppercased()).string()
+      == "\(CoachPlanningStrings.abnormal) (1)".uppercased())
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.evaluationRemaining(days: 4, hours: 13)).string()
+      == CoachPlanningStrings.evaluationRemaining(days: 4, hours: 13))
 }
 
 @MainActor
@@ -32,11 +40,11 @@ import ViewInspector
   // Adaptation week (spec 033 §7) is the single-week exception, so the step
   // offers only the 1-week card — no 4-week choice.
   _ = try inspected.find(ViewType.Button.self) { button in
-    (try? button.labelView().find(text: "1 周")) != nil
+    (try? button.labelView().find(text: CoachPlanningStrings.weekCount(1))) != nil
   }
   #expect(throws: (any Error).self) {
     try inspected.find(ViewType.Button.self) { button in
-      (try? button.labelView().find(text: "4 周")) != nil
+      (try? button.labelView().find(text: CoachPlanningStrings.weekCount(4))) != nil
     }
   }
 }
@@ -54,11 +62,11 @@ import ViewInspector
   // Regular plans are always a full 4-week block, so the step offers only the
   // 4-week card — the single-week option is gone.
   _ = try inspected.find(ViewType.Button.self) { button in
-    (try? button.labelView().find(text: "4 周")) != nil
+    (try? button.labelView().find(text: CoachPlanningStrings.weekCount(4))) != nil
   }
   #expect(throws: (any Error).self) {
     try inspected.find(ViewType.Button.self) { button in
-      (try? button.labelView().find(text: "1 周")) != nil
+      (try? button.labelView().find(text: CoachPlanningStrings.weekCount(1))) != nil
     }
   }
 }
@@ -74,11 +82,15 @@ import ViewInspector
   let sut = Step2AssignFrequencyView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "使用模板").string() == "使用模板")
-  #expect(try inspected.find(text: "复制上周").string() == "复制上周")
   #expect(
-    try inspected.find(text: "每周 7 个训练日").string()
-      == "每周 7 个训练日"
+    try inspected.find(text: CoachPlanningStrings.useTemplate).string()
+      == CoachPlanningStrings.useTemplate)
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.copyLastWeek).string()
+      == CoachPlanningStrings.copyLastWeek)
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.trainingDayCount(7, fromProfile: false)).string()
+      == CoachPlanningStrings.trainingDayCount(7, fromProfile: false)
   )
 }
 
@@ -95,9 +107,15 @@ import ViewInspector
   let sut = Step3SelectMainLiftsView(viewModel: viewModel)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "DAY 1 — 深蹲").string() == "DAY 1 — 深蹲")
-  #expect(try inspected.find(text: "深蹲:").string() == "深蹲:")
+  #expect(
+    try inspected.find(text: "DAY 1 — \(CoachPlanningStrings.squat)").string()
+      == "DAY 1 — \(CoachPlanningStrings.squat)")
+  #expect(
+    try inspected.find(text: "\(CoachPlanningStrings.squat):").string()
+      == "\(CoachPlanningStrings.squat):")
   // Variant picker uses a Button + sheet pattern; the variant list itself is in
   // the sheet (not in the inline view tree). Unselected row shows "请选择".
-  #expect(try inspected.find(text: "请选择").string() == "请选择")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.chooseExercise).string()
+      == CoachPlanningStrings.chooseExercise)
 }

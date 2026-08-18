@@ -4,7 +4,7 @@ enum CoachTodayFormatting {
   static func dateText(
     _ date: Date,
     calendar: Calendar = CoachFeatureCalendar.calendar,
-    locale: Locale = Locale(identifier: "zh_Hans_CN")
+    locale: Locale = .current
   ) -> String {
     let style = Date.FormatStyle(
       date: .omitted,

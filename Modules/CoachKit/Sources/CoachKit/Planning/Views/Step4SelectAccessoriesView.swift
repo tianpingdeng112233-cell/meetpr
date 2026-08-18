@@ -21,7 +21,7 @@ public struct Step4SelectAccessoriesView: View {
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Eyebrow("STEP 4")
-          Text("添加辅助动作")
+          Text(CoachPlanningStrings.addAccessoriesTitle)
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
@@ -45,7 +45,7 @@ public struct Step4SelectAccessoriesView: View {
           MainLiftSummarySection(viewModel: viewModel, exercises: mainLifts)
 
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-            Text("已选 \(accessories.count) 个")
+            Text(CoachPlanningStrings.selectedExerciseCount(accessories.count))
               .font(Font.MeetPR.footnote)
               .foregroundStyle(Color.MeetPR.fgSecondary)
 
@@ -61,7 +61,7 @@ public struct Step4SelectAccessoriesView: View {
             }
 
             PrimaryButton(
-              "+ 添加动作",
+              CoachPlanningStrings.addExercise,
               isFullWidth: true
             ) {
               showLibrary = true
@@ -69,7 +69,7 @@ public struct Step4SelectAccessoriesView: View {
           }
 
           PrimaryButton(
-            "完成 — 进入规则配置",
+            CoachPlanningStrings.completeAndConfigureRules,
             isFullWidth: true
           ) {
             // Remind instead of silently no-op'ing (David 2026-06-14): if a
@@ -84,7 +84,7 @@ public struct Step4SelectAccessoriesView: View {
           }
         } else {
           Card(accessibilityLabel: "No training days") {
-            Text("请先完成训练日分配")
+            Text(CoachPlanningStrings.finishTrainingDayAssignment)
               .font(Font.MeetPR.body)
               .foregroundStyle(Color.MeetPR.fgSecondary)
           }
@@ -93,7 +93,7 @@ public struct Step4SelectAccessoriesView: View {
       .padding(MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
-    .navigationTitle("辅助动作")
+    .navigationTitle(CoachPlanningStrings.addAccessoriesTitle)
     .scrollDismissesKeyboard(.interactively)
     .task {
       await selectInitialDayIfNeeded()
@@ -105,10 +105,10 @@ public struct Step4SelectAccessoriesView: View {
         Color.clear
       }
     }
-    .alert("还差一点", isPresented: completionAlertBinding) {
-      Button("知道了", role: .cancel) {}
+    .alert(CoachPlanningStrings.almostThere, isPresented: completionAlertBinding) {
+      Button(CoachPlanningStrings.acknowledge, role: .cancel) {}
     } message: {
-      Text("以下项目需要补全后才能进入下一步：\n\n" + completionIssues.joined(separator: "\n"))
+      Text(CoachPlanningStrings.completionIssues(completionIssues.joined(separator: "\n")))
     }
   }
 
@@ -141,17 +141,17 @@ private struct MainLiftSummarySection: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
         HStack {
           VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-            Text("本日主项")
+            Text(CoachPlanningStrings.todayMainLifts)
               .font(Font.MeetPR.headline)
               .foregroundStyle(Color.MeetPR.fgPrimary)
-            Text("上一步选择的主项、变式和 W1 强度")
+            Text(CoachPlanningStrings.todayMainLiftsSubtitle)
               .font(Font.MeetPR.footnote)
               .foregroundStyle(Color.MeetPR.fgSecondary)
           }
 
           Spacer()
 
-          StatusBadge(status: .live, title: "\(exercises.count) 项")
+          StatusBadge(status: .live, title: CoachPlanningStrings.itemCount(exercises.count))
         }
 
         ForEach(exercises, id: \.id) { exercise in
@@ -176,7 +176,7 @@ private struct MainLiftSummaryRow: View {
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgSecondary)
 
-          StatusBadge(status: .live, title: "主项")
+          StatusBadge(status: .live, title: CoachPlanningStrings.mainLift)
         }
 
         Text(viewModel.exerciseName(for: draftExercise))
@@ -202,7 +202,7 @@ private struct MainLiftSummaryRow: View {
 
   private var familyName: String {
     guard let family = viewModel.catalogExercise(for: draftExercise)?.mainLiftFamily else {
-      return "主项"
+      return CoachPlanningStrings.mainLift
     }
     return PlanningDisplay.liftName(family)
   }
@@ -218,7 +218,12 @@ private struct MainLiftSummaryRow: View {
         "\(spec.targetReps)"
       }
 
-    return "\(spec.setCount) 组 x \(repsText) 次 · \(intensityValueText(for: spec))"
+    return CoachPlanningStrings.setRepIntensity(
+      sets: spec.setCount,
+      reps: repsText,
+      singularReps: spec.targetReps == 1 && spec.targetRepsMax == nil,
+      intensity: intensityValueText(for: spec)
+    )
   }
 
   private func intensityValueText(for spec: DraftSetSpec) -> String {

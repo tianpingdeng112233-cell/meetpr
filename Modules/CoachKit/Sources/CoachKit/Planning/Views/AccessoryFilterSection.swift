@@ -19,7 +19,7 @@ public struct AccessoryFilterSection: View {
   public var body: some View {
     Card(accessibilityLabel: "Accessory filters") {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        Text("筛选")
+        Text(CoachPlanningStrings.filter)
           .font(Font.MeetPR.headline)
           .foregroundStyle(Color.MeetPR.fgPrimary)
 
@@ -31,8 +31,8 @@ public struct AccessoryFilterSection: View {
   }
 
   private var muscleGroupRow: some View {
-    FilterRow(title: "肌群") {
-      FilterChip(title: "全部", isSelected: filters.muscleGroups.isEmpty) {
+    FilterRow(title: CoachPlanningStrings.muscleGroup) {
+      FilterChip(title: CoachPlanningStrings.all, isSelected: filters.muscleGroups.isEmpty) {
         var nextFilters = filters
         nextFilters.muscleGroups = []
         onChange(nextFilters)
@@ -56,8 +56,8 @@ public struct AccessoryFilterSection: View {
   }
 
   private var equipmentRow: some View {
-    FilterRow(title: "器械") {
-      FilterChip(title: "全部", isSelected: filters.equipment.isEmpty) {
+    FilterRow(title: CoachPlanningStrings.equipment) {
+      FilterChip(title: CoachPlanningStrings.all, isSelected: filters.equipment.isEmpty) {
         var nextFilters = filters
         nextFilters.equipment = []
         onChange(nextFilters)
@@ -77,8 +77,8 @@ public struct AccessoryFilterSection: View {
   }
 
   private var movementPatternRow: some View {
-    FilterRow(title: "模式") {
-      FilterChip(title: "全部", isSelected: filters.movementPatterns.isEmpty) {
+    FilterRow(title: CoachPlanningStrings.movementPattern) {
+      FilterChip(title: CoachPlanningStrings.all, isSelected: filters.movementPatterns.isEmpty) {
         var nextFilters = filters
         nextFilters.movementPatterns = []
         onChange(nextFilters)
@@ -182,20 +182,20 @@ enum MuscleGroupChip: CaseIterable, Hashable {
 
   var displayName: String {
     switch self {
-    case .chest: "胸"
-    case .shoulder: "肩"
-    case .back: "背"
-    case .biceps: "二头"
-    case .triceps: "三头"
-    case .forearm: "小臂"
-    case .core: "核心"
-    case .quad: "股四"
-    case .hamstring: "腘绳"
-    case .glute: "臀"
-    case .hip: "髋"
-    case .adductor: "内收"
-    case .calf: "小腿"
-    case .other: "其他"
+    case .chest: CoachPlanningStrings.chest
+    case .shoulder: CoachPlanningStrings.shoulder
+    case .back: CoachPlanningStrings.back
+    case .biceps: CoachPlanningStrings.biceps
+    case .triceps: CoachPlanningStrings.triceps
+    case .forearm: CoachPlanningStrings.forearm
+    case .core: CoachPlanningStrings.core
+    case .quad: CoachPlanningStrings.quadriceps
+    case .hamstring: CoachPlanningStrings.hamstrings
+    case .glute: CoachPlanningStrings.glutes
+    case .hip: CoachPlanningStrings.hip
+    case .adductor: CoachPlanningStrings.adductors
+    case .calf: CoachPlanningStrings.calves
+    case .other: CoachPlanningStrings.other
     }
   }
 

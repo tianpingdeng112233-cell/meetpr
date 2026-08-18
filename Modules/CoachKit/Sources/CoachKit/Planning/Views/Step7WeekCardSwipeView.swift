@@ -24,7 +24,9 @@ public struct Step7WeekCardSwipeView: View {
       }
 
       PrimaryButton(
-        viewModel.isPublishing ? "发布中…" : "发布给学员",
+        viewModel.isPublishing
+          ? CoachPlanningStrings.publishing
+          : CoachPlanningStrings.publishToStudent,
         isDisabled: viewModel.isPublishing,
         isFullWidth: true
       ) {
@@ -34,16 +36,24 @@ public struct Step7WeekCardSwipeView: View {
       .padding(.bottom, MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
-    .navigationTitle("周卡片")
-    .alert("还差一点", isPresented: incompleteAlertBinding) {
-      Button("知道了", role: .cancel) { viewModel.clearPublishFeedback() }
+    .navigationTitle(CoachPlanningStrings.weekCards)
+    .alert(CoachPlanningStrings.almostThere, isPresented: incompleteAlertBinding) {
+      Button(CoachPlanningStrings.acknowledge, role: .cancel) {
+        viewModel.clearPublishFeedback()
+      }
     } message: {
-      Text("以下项目需要补全后才能发布：\n\n" + viewModel.publishIssues.joined(separator: "\n"))
+      Text(
+        CoachPlanningStrings.publishCompletionIssues(
+          viewModel.publishIssues.joined(separator: "\n")
+        )
+      )
     }
-    .alert("发布失败", isPresented: errorAlertBinding) {
-      Button("知道了", role: .cancel) { viewModel.clearPublishFeedback() }
+    .alert(CoachPlanningStrings.publishFailed, isPresented: errorAlertBinding) {
+      Button(CoachPlanningStrings.acknowledge, role: .cancel) {
+        viewModel.clearPublishFeedback()
+      }
     } message: {
-      Text(viewModel.publishError ?? "请稍后重试")
+      Text(viewModel.publishError ?? CoachPlanningStrings.tryAgainLater)
     }
   }
 

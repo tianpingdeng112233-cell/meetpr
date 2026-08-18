@@ -74,7 +74,7 @@ import Testing
   await viewModel.play(video)
 
   #expect(viewModel.playbackItem == nil)
-  #expect(viewModel.playbackError == "播放链接获取失败，请重试")
+  #expect(viewModel.playbackError == CoachStudentDetailStrings.text("coach.video.error.playback"))
   #expect(viewModel.loadingVideoID == nil)
 
   viewModel.clearPlaybackError()

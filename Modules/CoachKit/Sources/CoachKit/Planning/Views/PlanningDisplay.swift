@@ -5,11 +5,11 @@ enum PlanningDisplay {
   static func liftName(_ family: LiftFamily) -> String {
     switch family {
     case .squat:
-      "深蹲"
+      CoachPlanningStrings.squat
     case .bench:
-      "卧推"
+      CoachPlanningStrings.benchPress
     case .deadlift:
-      "硬拉"
+      CoachPlanningStrings.deadlift
     }
   }
 
@@ -17,33 +17,33 @@ enum PlanningDisplay {
   static func muscleGroupName(_ muscleGroup: MuscleGroup) -> String {
     switch muscleGroup {
     case .chest:
-      "胸"
+      CoachPlanningStrings.chest
     case .shoulder:
-      "肩"
+      CoachPlanningStrings.shoulder
     case .back:
-      "背"
+      CoachPlanningStrings.back
     case .biceps:
-      "二头"
+      CoachPlanningStrings.biceps
     case .triceps:
-      "三头"
+      CoachPlanningStrings.triceps
     case .forearm:
-      "小臂"
+      CoachPlanningStrings.forearm
     case .core:
-      "核心"
+      CoachPlanningStrings.core
     case .quad:
-      "股四"
+      CoachPlanningStrings.quadriceps
     case .hamstring:
-      "腘绳"
+      CoachPlanningStrings.hamstrings
     case .glute:
-      "臀"
+      CoachPlanningStrings.glutes
     case .hip, .hipFlexor:
-      "髋"
+      CoachPlanningStrings.hip
     case .adductor:
-      "内收"
+      CoachPlanningStrings.adductors
     case .calf:
-      "小腿"
+      CoachPlanningStrings.calves
     case .tibialis, .trap, .mobility, .cardio, .grip:
-      "其他"
+      CoachPlanningStrings.other
     }
   }
 
@@ -64,44 +64,44 @@ enum PlanningDisplay {
   static func equipmentName(_ equipment: Equipment) -> String {
     switch equipment {
     case .barbell:
-      "杠铃"
+      CoachPlanningStrings.barbell
     case .dumbbell:
-      "哑铃"
+      CoachPlanningStrings.dumbbell
     case .machine:
-      "器械"
+      CoachPlanningStrings.machine
     case .bodyweight:
-      "自重"
+      CoachPlanningStrings.bodyweight
     case .cable:
-      "绳索"
+      CoachPlanningStrings.cable
     case .band:
-      "弹力带"
+      CoachPlanningStrings.resistanceBand
     case .kettlebell:
-      "壶铃"
+      CoachPlanningStrings.kettlebell
     case .specialtyBar:
-      "特殊杆"
+      CoachPlanningStrings.specialtyBar
     case .other:
-      "其他"
+      CoachPlanningStrings.other
     }
   }
 
   static func movementPatternName(_ movementPattern: MovementPattern) -> String {
     switch movementPattern {
     case .squat:
-      "蹲"
+      CoachPlanningStrings.squatPattern
     case .horizontalPush:
-      "水平推"
+      CoachPlanningStrings.horizontalPush
     case .verticalPush:
-      "垂直推"
+      CoachPlanningStrings.verticalPush
     case .hipHinge:
-      "髋铰链"
+      CoachPlanningStrings.hipHinge
     case .horizontalPull:
-      "水平拉"
+      CoachPlanningStrings.horizontalPull
     case .verticalPull:
-      "垂直拉"
+      CoachPlanningStrings.verticalPull
     case .other:
-      "其他"
+      CoachPlanningStrings.other
     case .warmUp:
-      "热身"
+      CoachPlanningStrings.warmUp
     }
   }
 
@@ -117,9 +117,9 @@ enum PlanningDisplay {
   static func abnormalReason(_ reason: AbnormalReason) -> String {
     switch reason {
     case .noTrainingForDays(let days):
-      "\(days) 天未训练"
+      CoachPlanningStrings.daysNotTrained(days)
     case .stuckOnWeek(let week):
-      "卡 W\(week) 未完成"
+      CoachPlanningStrings.stuckOnWeek(week)
     }
   }
 }

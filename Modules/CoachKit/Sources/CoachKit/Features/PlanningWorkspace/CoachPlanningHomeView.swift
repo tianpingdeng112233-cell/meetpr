@@ -47,7 +47,9 @@ struct CoachPlanningHomeView: View {
         VStack(alignment: .leading, spacing: 0) {
           header
 
-          PrimaryButton("排新计划", isFullWidth: true) {
+          PrimaryButton(
+            PlanningWorkspaceStrings.text("coach.workspace.newPlan"), isFullWidth: true
+          ) {
             presentPlanning(intent: .blank)
           }
           .padding(.top, 20)
@@ -96,11 +98,11 @@ struct CoachPlanningHomeView: View {
   private var header: some View {
     HStack(alignment: .top, spacing: MeetPRSpacing.md) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-        Eyebrow("计划编排")
-        Text("编排")
+        Eyebrow(PlanningWorkspaceStrings.text("coach.workspace.eyebrow"))
+        Text(PlanningWorkspaceStrings.text("coach.workspace.title"))
           .font(.system(size: 36, weight: .heavy))
           .foregroundStyle(Color.MeetPR.fgPrimary)
-        Text("为学员排周期 · 续编草稿 · 回看已发布")
+        Text(PlanningWorkspaceStrings.text("coach.workspace.subtitle"))
           .font(.system(size: 14))
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
@@ -169,11 +171,11 @@ struct CoachPlanningHomeView: View {
 
   private var emptyState: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Text("暂无待排计划")
+      Text(PlanningWorkspaceStrings.text("coach.workspace.empty.title"))
         .font(Font.MeetPR.monoLabel)
         .tracking(Font.MeetPR.monoLabelTracking)
         .foregroundStyle(Color.MeetPR.brandRed)
-      Text("所有学员都有在跑计划。需要新建周期时，点上方「排新计划」。")
+      Text(PlanningWorkspaceStrings.text("coach.workspace.empty.body"))
         .font(.system(size: 14))
         .foregroundStyle(Color.MeetPR.fgSecondary)
         .fixedSize(horizontal: false, vertical: true)
@@ -201,13 +203,13 @@ private struct PlanningWorkspaceFailure: View {
   let onRetry: () -> Void
 
   var body: some View {
-    Card(accessibilityLabel: "计划工作台加载失败") {
+    Card(accessibilityLabel: PlanningWorkspaceStrings.text("coach.workspace.error.accessibility")) {
       HStack(spacing: MeetPRSpacing.base) {
         Label(message, systemImage: "exclamationmark.triangle")
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.amber)
         Spacer()
-        SecondaryButton("重试") {
+        SecondaryButton(PlanningWorkspaceStrings.text("coach.common.retry")) {
           onRetry()
         }
       }
@@ -355,6 +357,7 @@ private struct PlanningWorkspacePresenter<PresentedContent: View>: ViewModifier 
       Exercise(
         id: uuid(70),
         name: "深蹲",
+        nameEn: "Squat",
         exerciseType: .mainLift,
         mainLiftFamily: .squat,
         isCompetitionLift: true,

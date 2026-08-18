@@ -57,11 +57,11 @@ enum StudentTriageSignalCalculator {
 
     switch (missedDays, awaitingReply) {
     case (.some(let daysMissed), true):
-      return "没练 \(daysMissed) 天 · 待回复"
+      return CoachRosterStrings.triageMissedAwaitingReply(daysMissed)
     case (.some(let daysMissed), false):
-      return "没练 \(daysMissed) 天"
+      return CoachRosterStrings.triageMissed(daysMissed)
     case (.none, true):
-      return "有新记录待你回复"
+      return CoachRosterStrings.triageNewRecord
     case (.none, false):
       return ""
     }

@@ -72,7 +72,9 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
   private func exerciseNames(forStudent studentID: UUID) async -> [UUID: String] {
     guard let plan = try? await plans.fetchCurrentPlan(studentID: studentID) else { return [:] }
     return Dictionary(
-      plan.days.flatMap(\.exercises).map { ($0.id, $0.exercise.name) },
+      plan.days.flatMap(\.exercises).map {
+        ($0.id, $0.exercise.name)
+      },
       uniquingKeysWith: { first, _ in first }
     )
   }

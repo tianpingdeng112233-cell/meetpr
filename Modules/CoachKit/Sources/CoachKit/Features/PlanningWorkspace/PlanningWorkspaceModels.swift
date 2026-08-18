@@ -34,11 +34,11 @@ enum PlanningPlanNeedReason: Equatable, Sendable {
   var title: String {
     switch self {
     case .noCurrentPlan:
-      "暂无在跑计划"
+      PlanningWorkspaceStrings.text("coach.workspace.need.noCurrentPlan")
     case .ended:
-      "计划已结束"
+      PlanningWorkspaceStrings.text("coach.workspace.need.ended")
     case .endsThisWeek:
-      "计划本周内结束"
+      PlanningWorkspaceStrings.text("coach.workspace.need.endsThisWeek")
     }
   }
 }
@@ -50,7 +50,8 @@ enum PlanningWorkspaceSummary {
     planWeeks: Int
   ) -> String {
     let step = PlanningStep(rawValue: currentStepRawValue)
-    return "\(name) · \(stepTitle(step)) · \(planWeeks)周"
+    return CoachLocalization.localized(
+      "coach.workspace.draftSummary \(name) \(stepTitle(step)) \(planWeeks)")
   }
 
   static func planNeedReason(
@@ -85,7 +86,8 @@ enum PlanningWorkspaceSummary {
   }
 
   static func publishedSummary(plan: StudentPlanView, weeks: Int) -> String {
-    "\(planKindTitle(plan.planKind)) · \(weeks)周"
+    CoachLocalization.localized(
+      "coach.workspace.publishedSummary \(planKindTitle(plan.planKind)) \(weeks)")
   }
 
   static func proxyDateText(
@@ -94,7 +96,8 @@ enum PlanningWorkspaceSummary {
   ) -> String {
     let components = calendar.dateComponents([.month, .day], from: date)
     guard let month = components.month, let day = components.day else { return "" }
-    return "\(month)月\(day)日"
+    return PlanningWorkspaceStrings.replacing(
+      "coach.workspace.shortDate", ["month": month, "day": day])
   }
 
   private static func cycleEndDate(
@@ -112,33 +115,33 @@ enum PlanningWorkspaceSummary {
   }
 
   private static func stepTitle(_ step: PlanningStep?) -> String {
-    guard let step else { return "未开始" }
+    guard let step else { return PlanningWorkspaceStrings.text("coach.workspace.step.notStarted") }
     return switch step {
     case .selectStudent:
-      "选学员"
+      PlanningWorkspaceStrings.text("coach.workspace.step.selectStudent")
     case .selectDuration:
-      "选周期"
+      PlanningWorkspaceStrings.text("coach.workspace.step.selectDuration")
     case .assignFrequency:
-      "分配频率"
+      PlanningWorkspaceStrings.text("coach.workspace.step.assignFrequency")
     case .selectMainLifts:
-      "选主项"
+      PlanningWorkspaceStrings.text("coach.workspace.step.selectMainLifts")
     case .selectAccessories:
-      "选辅助"
+      PlanningWorkspaceStrings.text("coach.workspace.step.selectAccessories")
     case .fillW1Intensity:
-      "填强度"
+      PlanningWorkspaceStrings.text("coach.workspace.step.fillIntensity")
     case .configureRules:
-      "配置进阶"
+      PlanningWorkspaceStrings.text("coach.workspace.step.configureRules")
     case .previewWeekCards:
-      "预览发布"
+      PlanningWorkspaceStrings.text("coach.workspace.step.preview")
     }
   }
 
   private static func planKindTitle(_ kind: PlanKind) -> String {
     switch kind {
     case .regular:
-      "正式计划"
+      PlanningWorkspaceStrings.text("coach.workspace.kind.regular")
     case .adaptation:
-      "适应周"
+      PlanningWorkspaceStrings.text("coach.workspace.kind.adaptation")
     }
   }
 }

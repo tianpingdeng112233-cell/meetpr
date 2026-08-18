@@ -39,10 +39,14 @@ struct PlanningNumberField: View {
 
   var body: some View {
     HStack(alignment: .center, spacing: MeetPRSpacing.sm) {
-      stepButton(systemName: "minus", accessibilityLabel: "减少", action: decrementTapped)
-        .disabled(decrementDisabled)
+      stepButton(
+        systemName: "minus",
+        accessibilityLabel: CoachPlanningStrings.decrease,
+        action: decrementTapped
+      )
+      .disabled(decrementDisabled)
 
-      TextField("数值", text: $textInput)
+      TextField(CoachPlanningStrings.value, text: $textInput)
         .planningDecimalKeyboard()
         .multilineTextAlignment(.center)
         .monospacedDigit()
@@ -66,8 +70,12 @@ struct PlanningNumberField: View {
           )
         }
 
-      stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
-        .disabled(incrementDisabled)
+      stepButton(
+        systemName: "plus",
+        accessibilityLabel: CoachPlanningStrings.increase,
+        action: incrementTapped
+      )
+      .disabled(incrementDisabled)
 
       if let unitLabel {
         Text(unitLabel)
@@ -78,7 +86,10 @@ struct PlanningNumberField: View {
       // 弹出重量面板入口 (David 2026-06-12): weight dimensions only — the
       // caller decides via weightPanelTitle.
       if let weightPanelTitle {
-        stepButton(systemName: "plus.forwardslash.minus", accessibilityLabel: "打开重量面板") {
+        stepButton(
+          systemName: "plus.forwardslash.minus",
+          accessibilityLabel: CoachPlanningStrings.openWeightPanel
+        ) {
           showWeightPanel = true
         }
         .sheet(isPresented: $showWeightPanel) {

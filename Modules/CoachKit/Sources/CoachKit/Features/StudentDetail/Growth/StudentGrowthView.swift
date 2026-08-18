@@ -189,16 +189,10 @@ enum CoachGrowthStrings {
   }
 
   static func totalProgress(_ percent: String) -> String {
-    CoachLocalization.replacing(
-      "coach.growth.totalProgress",
-      values: ["percent": percent]
-    )
+    CoachLocalization.localized("coach.growth.totalProgress \(percent)")
   }
 
   static func oneRMTotal(_ total: String) -> String {
-    CoachLocalization.replacing(
-      "coach.growth.oneRMTotal",
-      values: ["total": total]
-    )
+    CoachLocalization.localized("coach.growth.oneRMTotal \(total)")
   }
 }

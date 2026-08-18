@@ -119,9 +119,12 @@ struct StudentPendingVideosView: View {
             .foregroundStyle(Color.MeetPR.gold500)
         }
         VStack(alignment: .leading, spacing: 4) {
-          Text(item.exerciseName ?? CoachVideoFeedbackStrings.trainingVideo)
-            .font(.system(size: 16, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textPrimary)
+          Text(
+            item.exerciseName.map { CoachLocalization.exerciseName($0) }
+              ?? CoachVideoFeedbackStrings.trainingVideo
+          )
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
           Text(rowMeta(item))
             .font(.system(size: 11, weight: .medium, design: .monospaced))
             .tracking(0.8)
@@ -139,7 +142,8 @@ struct StudentPendingVideosView: View {
     .buttonStyle(.plain)
     .accessibilityLabel(
       CoachVideoFeedbackStrings.rowAccessibility(
-        exerciseName: item.exerciseName ?? CoachVideoFeedbackStrings.trainingVideo
+        exerciseName: item.exerciseName.map { CoachLocalization.exerciseName($0) }
+          ?? CoachVideoFeedbackStrings.trainingVideo
       )
     )
     .accessibilityIdentifier("coach.video.row.\(item.id.uuidString)")

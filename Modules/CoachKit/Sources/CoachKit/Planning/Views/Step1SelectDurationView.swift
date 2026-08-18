@@ -18,7 +18,7 @@ public struct Step1SelectDurationView: View {
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         Eyebrow("STEP 1")
-        Text("这次写几周？")
+        Text(CoachPlanningStrings.durationPrompt)
           .font(Font.MeetPR.title2)
           .foregroundStyle(Color.MeetPR.fgPrimary)
       }
@@ -36,7 +36,7 @@ public struct Step1SelectDurationView: View {
     .padding(MeetPRSpacing.base)
     .frame(maxWidth: .infinity, alignment: .leading)
     .background(Color.MeetPR.bg)
-    .navigationTitle("选计划长度")
+    .navigationTitle(CoachPlanningStrings.durationTitle)
   }
 
   /// Regular plans are always a full 4-week block; the single week is the
@@ -47,11 +47,13 @@ public struct Step1SelectDurationView: View {
   }
 
   private var durationTitle: String {
-    "\(durationWeeks) 周"
+    CoachPlanningStrings.weekCount(durationWeeks)
   }
 
   private var durationSubtitle: String {
-    viewModel.planKind == .adaptation ? "适应周" : "完整训练周期"
+    viewModel.planKind == .adaptation
+      ? CoachPlanningStrings.adaptationWeek
+      : CoachPlanningStrings.fullTrainingCycle
   }
 
   private func choose(weeks: Int) {
@@ -82,7 +84,7 @@ private struct DurationChoiceCard: View {
             .foregroundStyle(Color.MeetPR.fgTertiary)
 
           if isSelected {
-            StatusBadge(status: .ready, title: "已选择")
+            StatusBadge(status: .ready, title: CoachPlanningStrings.selected)
           }
         }
         .frame(maxWidth: .infinity, minHeight: 132, alignment: .topLeading)

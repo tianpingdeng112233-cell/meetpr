@@ -46,13 +46,7 @@ enum CoachDetailStrings {
   }
 
   static func weekProgress(completed: Int, total: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.detail.weekProgress",
-      values: [
-        "completed": completed.formatted(),
-        "total": total.formatted(),
-      ]
-    )
+    CoachLocalization.localized("coach.detail.weekProgress \(completed) \(total)")
   }
 
   static func feedbackMeta(relativeTime: String) -> String {
@@ -63,24 +57,15 @@ enum CoachDetailStrings {
   }
 
   static func weekRunningTitle(_ week: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.detail.weekRunningTitle",
-      values: ["week": week.formatted()]
-    )
+    CoachLocalization.localized("coach.detail.weekRunningTitle \(week)")
   }
 
   static func evaluationDays(_ days: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.detail.evaluationDays",
-      values: ["days": days.formatted()]
-    )
+    CoachLocalization.localized("coach.detail.evaluationDays \(days)")
   }
 
   static func evaluationHours(_ hours: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.detail.evaluationHours",
-      values: ["hours": hours.formatted()]
-    )
+    CoachLocalization.localized("coach.detail.evaluationHours \(hours)")
   }
 
   static func weekday(_ calendarWeekday: Int) -> String {

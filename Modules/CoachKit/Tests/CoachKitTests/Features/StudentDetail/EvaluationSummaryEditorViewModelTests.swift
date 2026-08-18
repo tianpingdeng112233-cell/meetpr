@@ -212,7 +212,9 @@ private func makeEditor(
   #expect(!finished)
   let puts = await summaries.putRequests
   #expect(puts.count == 1)
-  #expect(editor.noticeMessage == "总结已保存,但完成评估失败,请在学员详情页重试")
+  #expect(
+    editor.noticeMessage
+      == CoachStudentDetailStrings.text("coach.evaluation.summary.completeFailed"))
   #expect(!editor.showSoftRecommendation)
 }
 
@@ -245,5 +247,7 @@ private func makeEditor(
   let profile = await editor.fetchPrefillProfile()
 
   #expect(profile == nil)
-  #expect(editor.prefillNotice == "学员资料未读到,手动填写")
+  #expect(
+    editor.prefillNotice
+      == CoachStudentDetailStrings.text("coach.evaluation.summary.profileMissing"))
 }
