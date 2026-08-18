@@ -35,12 +35,17 @@ struct PendingBindView: View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-          Text("已发送绑定请求")
+          Text(StudentStrings.localized(.pendingBindView001))
             .font(Font.MeetPR.title1)
             .foregroundStyle(Color.MeetPR.textPrimary)
-          Text("等待教练 \(request.coachDisplayName ?? "教练") 接收")
-            .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.textSecondary)
+          Text(
+            StudentStrings.replacing(
+              .pendingBindView002,
+              values: ["\(request.coachDisplayName ?? StudentStrings.localized(.bindGateView004))"]
+            )
+          )
+          .font(Font.MeetPR.body)
+          .foregroundStyle(Color.MeetPR.textSecondary)
         }
 
         waitingCard
@@ -49,7 +54,7 @@ struct PendingBindView: View {
           materialsCard(materialsSummary)
         }
 
-        Text("教练通常在 24-48 小时内响应;7 天未响应自动过期,可重新输码。")
+        Text(StudentStrings.localized(.pendingBindView003))
           .font(Font.MeetPR.caption)
           .foregroundStyle(Color.MeetPR.textTertiary)
 
@@ -59,7 +64,7 @@ struct PendingBindView: View {
             .foregroundStyle(Color.MeetPR.danger)
         }
 
-        SecondaryButton("取消请求", isFullWidth: true) {
+        SecondaryButton(StudentStrings.localized(.pendingBindView004), isFullWidth: true) {
           showsCancelConfirm = true
         }
         .disabled(viewModel.isCancelling)
@@ -73,28 +78,28 @@ struct PendingBindView: View {
       await onStateMayHaveChanged()
     }
     .confirmationDialog(
-      "取消绑定请求?",
+      StudentStrings.localized(.pendingBindView005),
       isPresented: $showsCancelConfirm,
       titleVisibility: .visible
     ) {
-      Button("取消请求", role: .destructive) {
+      Button(StudentStrings.localized(.pendingBindView004), role: .destructive) {
         Task { await performCancel() }
       }
-      Button("继续等待", role: .cancel) {}
+      Button(StudentStrings.localized(.pendingBindView006), role: .cancel) {}
     } message: {
-      Text("取消后可重新输入邀请码。")
+      Text(StudentStrings.localized(.pendingBindView007))
     }
   }
 
   private var waitingCard: some View {
-    Card(accessibilityLabel: "等待时长") {
+    Card(accessibilityLabel: StudentStrings.localized(.pendingBindView008)) {
       TimelineView(.periodic(from: .now, by: 60)) { context in
         let waited = PendingBindViewModel.waitingDescription(
           since: request.submittedAt, now: context.date)
         HStack(spacing: MeetPRSpacing.sm) {
           Image(systemName: "clock")
             .foregroundStyle(Color.MeetPR.textSecondary)
-          Text("已等待: \(waited)")
+          Text(StudentStrings.replacing(.pendingBindView009, values: ["\(waited)"]))
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(Color.MeetPR.textPrimary)
         }
@@ -103,18 +108,21 @@ struct PendingBindView: View {
   }
 
   private func materialsCard(_ summary: PendingMaterialsSummary) -> some View {
-    Card(accessibilityLabel: "你已提交给教练的资料") {
+    Card(accessibilityLabel: StudentStrings.localized(.pendingBindView010)) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("你已提交给教练的资料")
+        Eyebrow(StudentStrings.localized(.pendingBindView010))
         if summary.onboardingCompleted {
-          Label("onboarding 完整资料", systemImage: "checkmark.circle")
+          Label(StudentStrings.localized(.pendingBindView011), systemImage: "checkmark.circle")
             .font(Font.MeetPR.body)
             .foregroundStyle(Color.MeetPR.textPrimary)
         }
         if summary.uploadCount > 0 {
-          Label("\(summary.uploadCount) 份上传资料", systemImage: "doc.on.doc")
-            .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.textPrimary)
+          Label(
+            StudentStrings.replacing(.pendingBindView012, values: ["\(summary.uploadCount)"]),
+            systemImage: "doc.on.doc"
+          )
+          .font(Font.MeetPR.body)
+          .foregroundStyle(Color.MeetPR.textPrimary)
         }
       }
     }

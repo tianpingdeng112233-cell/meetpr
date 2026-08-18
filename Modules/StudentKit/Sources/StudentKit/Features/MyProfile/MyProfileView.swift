@@ -115,13 +115,13 @@ public struct MyProfileView: View {
     case .loaded(let profile):
       loadedContent(profile)
     case .empty:
-      MyProfileStateCard(text: "完成资料填写后解锁")
+      MyProfileStateCard(text: StudentStrings.localized(.myProfileView001))
       fallbackRows
     case .failed:
       Button {
         Task { await viewModel.reload() }
       } label: {
-        MyProfileStateCard(text: "加载失败 · 点击重试")
+        MyProfileStateCard(text: StudentStrings.localized(.myProfileView002))
       }
       .buttonStyle(.plain)
       fallbackRows
@@ -141,10 +141,10 @@ public struct MyProfileView: View {
         onToggleInfo: toggleOneRMInfo
       )
 
-      MyProfileSectionLabel("恢复与伤病 · 改动通知教练")
+      MyProfileSectionLabel(StudentStrings.localized(.myProfileView003))
         .padding(.top, MeetPRSpacing.point2)
       MyProfileRecoveryCard(
-        title: "恢复评估",
+        title: StudentStrings.localized(.myProfileView004),
         chips: presentation.recoveryChips,
         style: .recovery,
         action: { showsReadiness = true }
@@ -153,7 +153,7 @@ public struct MyProfileView: View {
         ProfileCardEditView(kind: .injuries, profile: profile, viewModel: viewModel)
       } label: {
         MyProfileRecoveryCard(
-          title: "伤病记录",
+          title: StudentStrings.localized(.myProfileView005),
           chips: presentation.injuryChips,
           style: profile.injuryAreas.isEmpty ? .recovery : .injury,
           action: nil
@@ -161,11 +161,11 @@ public struct MyProfileView: View {
       }
       .buttonStyle(.plain)
 
-      MyProfileSectionLabel("偏好与基础信息")
+      MyProfileSectionLabel(StudentStrings.localized(.myProfileView006))
         .padding(.top, MeetPRSpacing.point2)
       MyProfileGroupCard {
         profileRow(
-          "想增强肌群",
+          StudentStrings.localized(.myProfileView007),
           presentation.muscleGroups,
           kind: .materials,
           profile: profile
@@ -176,7 +176,7 @@ public struct MyProfileView: View {
         RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
         MyProfileDivider()
         profileRow(
-          "比赛日期",
+          StudentStrings.localized(.myProfileView008),
           presentation.competition,
           kind: .competition,
           profile: profile,
@@ -184,25 +184,25 @@ public struct MyProfileView: View {
         )
         MyProfileDivider()
         profileRow(
-          "身高 / 体重",
+          StudentStrings.localized(.myProfileView009),
           presentation.heightAndWeight,
           kind: .basics,
           profile: profile
         )
       }
 
-      MyProfileSectionLabel("训练背景 · 环境")
+      MyProfileSectionLabel(StudentStrings.localized(.myProfileView010))
         .padding(.top, MeetPRSpacing.point2)
       MyProfileGroupCard {
         profileRow(
-          "训练背景",
+          StudentStrings.localized(.myProfileView011),
           presentation.trainingBackground,
           kind: .background,
           profile: profile
         )
         MyProfileDivider()
         profileRow(
-          "训练环境",
+          StudentStrings.localized(.myProfileView012),
           presentation.trainingEnvironment,
           kind: .environment,
           profile: profile
@@ -213,7 +213,7 @@ public struct MyProfileView: View {
 
       if let onLogout {
         GoldCTA(
-          "退出登录",
+          StudentStrings.localized(.myProfileView013),
           sub: nil,
           variant: .danger,
           icon: .logout,
@@ -248,7 +248,7 @@ public struct MyProfileView: View {
   @ViewBuilder
   private var accountSecuritySection: some View {
     if let account, let logs {
-      MyProfileSectionLabel("账号与安全")
+      MyProfileSectionLabel(StudentStrings.localized(.myProfileView014))
         .padding(.top, MeetPRSpacing.point2)
       AccountSecuritySection(
         studentID: studentID,
@@ -263,7 +263,7 @@ public struct MyProfileView: View {
 
   @ViewBuilder
   private var fallbackRows: some View {
-    MyProfileSectionLabel("偏好与基础信息")
+    MyProfileSectionLabel(StudentStrings.localized(.myProfileView006))
     MyProfileGroupCard {
       AppearancePreferenceRow()
       MyProfileDivider()
@@ -271,7 +271,7 @@ public struct MyProfileView: View {
     }
     if let onLogout {
       GoldCTA(
-        "退出登录",
+        StudentStrings.localized(.myProfileView013),
         sub: nil,
         variant: .danger,
         icon: .logout,
@@ -313,15 +313,15 @@ private struct MyProfileHeader: View {
         if showsChat {
           HeaderChatButton(
             unreadCount: unreadCount,
-            accessibilityLabel: "消息与通知",
+            accessibilityLabel: StudentStrings.localized(.myProfileView015),
             action: onOpenChat
           )
         }
       }
-      Text("我的资料")
+      Text(StudentStrings.localized(.myProfileView016))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
         .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("训练基线 · 教练管理")
+      Text(StudentStrings.localized(.myProfileView017))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
         .tracking(0.44)
         .foregroundStyle(Color.MeetPR.textFaint)
@@ -341,7 +341,7 @@ private struct MyProfileOneRMCard: View {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
         HStack(spacing: MeetPRSpacing.point6) {
-          Text("当前 1RM")
+          Text(StudentStrings.localized(.myProfileView018))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
             .foregroundStyle(Color.MeetPR.textSecondary)
           Button(action: onToggleInfo) {
@@ -355,7 +355,7 @@ private struct MyProfileOneRMCard: View {
               .contentShape(Rectangle())
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("说明当前 1RM")
+          .accessibilityLabel(StudentStrings.localized(.myProfileView019))
         }
         Spacer()
         Image(systemName: "lock")
@@ -366,7 +366,7 @@ private struct MyProfileOneRMCard: View {
       .padding(.top, -MeetPRSpacing.point10)
 
       if showsInfo {
-        Text("教练设定的训练基准 · 与「成长」按训练自动估算的 E1RM 不是同一个值")
+        Text(StudentStrings.localized(.myProfileView020))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
           .foregroundStyle(Color.MeetPR.textMuted)
           .padding(.horizontal, MeetPRSpacing.point11)
@@ -398,7 +398,7 @@ private struct MyProfileOneRMCard: View {
       .padding(.top, MeetPRSpacing.point14)
 
       HStack {
-        Text("SBD 总和")
+        Text(StudentStrings.localized(.myProfileView021))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
           .tracking(0.36)
           .foregroundStyle(Color.MeetPR.textSecondary)
@@ -420,7 +420,7 @@ private struct MyProfileOneRMCard: View {
       }
       .padding(.top, MeetPRSpacing.point14)
 
-      Label("训练周期中无法修改 · 联系教练", systemImage: "lock")
+      Label(StudentStrings.localized(.myProfileView022), systemImage: "lock")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
         .foregroundStyle(Color.MeetPR.textDim)
         .padding(.top, MeetPRSpacing.point11)
@@ -461,7 +461,7 @@ private struct MyProfileRecoveryCard: View {
           Text(title)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
             .foregroundStyle(Color.MeetPR.textPrimary)
-          Text("通知教练")
+          Text(StudentStrings.localized(.myProfileView023))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size10, weight: .medium))
             .foregroundStyle(Color.MeetPR.goldText)
             .padding(.horizontal, MeetPRSpacing.point7)
@@ -658,7 +658,7 @@ private struct MyProfileSkeleton: View {
           .frame(height: 76)
       }
     }
-    .accessibilityLabel("正在加载我的资料")
+    .accessibilityLabel(StudentStrings.localized(.myProfileView024))
   }
 }
 

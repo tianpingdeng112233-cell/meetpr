@@ -272,6 +272,7 @@ extension TodayWorkoutViewModel {
       planExerciseID: exercise.id,
       exerciseID: exercise.exercise.id,
       exerciseName: exercise.exercise.name,
+      exerciseNameEn: exercise.exercise.nameEn,
       isAccessory: exercise.exercise.isAccessory,
       isMainLift: exercise.exercise.exerciseType == .mainLift,
       prescribed: set,

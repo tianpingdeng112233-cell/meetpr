@@ -33,7 +33,7 @@ public final class VideoAttachmentViewModel {
   }
 
   public func reportVideoProcessingFailure() {
-    lastErrorMessage = "视频处理失败,请重试"
+    lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
   }
 
   deinit {
@@ -91,7 +91,7 @@ public final class VideoAttachmentViewModel {
     } catch let error as VideoUploadError {
       lastErrorMessage = Self.message(for: error)
     } catch {
-      lastErrorMessage = "视频处理失败,请重试"
+      lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
     }
   }
 
@@ -150,18 +150,18 @@ public final class VideoAttachmentViewModel {
   private static func message(for reason: VideoRetryUnavailableReason) -> String {
     switch reason {
     case .sourceMissing:
-      "本地视频已不存在,请删除后重新选择"
+      StudentStrings.localized(.videoAttachmentViewModel002)
     }
   }
 
   private static func message(for error: VideoUploadError) -> String {
     switch error {
     case .durationExceedsLimit(_, let maxSeconds):
-      "视频超过 \(Int(maxSeconds)) 秒上限,请截短后再上传"
+      StudentStrings.replacing(.videoAttachmentViewModel003, values: ["\(Int(maxSeconds))"])
     case .exportFailed:
-      "视频转码失败,请重试"
+      StudentStrings.localized(.videoAttachmentViewModel004)
     default:
-      "视频处理失败,请重试"
+      StudentStrings.localized(.videoAttachmentViewModel001)
     }
   }
 }

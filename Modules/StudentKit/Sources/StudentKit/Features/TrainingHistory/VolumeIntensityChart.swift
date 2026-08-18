@@ -24,8 +24,12 @@ struct VolumeIntensityChart: View {
         .aspectRatio(320 / 172, contentMode: .fit)
 
         HStack(spacing: MeetPRSpacing.space4) {
-          legend(title: "训练容量 kg", color: Color.MeetPR.gold500, isCircle: false)
-          legend(title: "平均 RPE", color: Color.MeetPR.chartLine, isCircle: true)
+          legend(
+            title: StudentStrings.localized(.volumeIntensityChart001), color: Color.MeetPR.gold500,
+            isCircle: false)
+          legend(
+            title: StudentStrings.localized(.volumeIntensityChart002),
+            color: Color.MeetPR.chartLine, isCircle: true)
         }
         .padding(.leading, MeetPRSpacing.point2)
       } else {
@@ -172,9 +176,9 @@ struct VolumeIntensityChart: View {
 
   private var accessibilityLabel: String {
     guard isUnlocked, !buckets.isEmpty else {
-      return "完成 3 次训练后解锁趋势"
+      return StudentStrings.localized(.volumeIntensityChart003)
     }
-    return "容量和平均 RPE 趋势图，共 \(buckets.count) 周"
+    return StudentStrings.replacing(.volumeIntensityChart004, values: ["\(buckets.count)"])
   }
 }
 

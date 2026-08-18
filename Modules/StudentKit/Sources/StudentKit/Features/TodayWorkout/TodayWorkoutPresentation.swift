@@ -39,12 +39,15 @@ struct TodayWorkoutProgress: Equatable, Sendable {
   }
 
   var remainingText: String {
-    "还有 \(remainingExercises) 个动作 · \(remainingSets) 组未记录"
+    StudentStrings.replacing(
+      .todayWorkoutPresentation001, values: ["\(remainingExercises)", "\(remainingSets)"])
   }
 
   var positionText: String {
-    "第 \(currentSetNumber) / \(currentSetTotal) 组 · "
-      + "动作 \(currentExerciseNumber) / \(exerciseTotal)"
+    StudentStrings.replacing(
+      .todayWorkoutPresentation002, values: ["\(currentSetNumber)", "\(currentSetTotal)"])
+      + StudentStrings.replacing(
+        .todayWorkoutPresentation003, values: ["\(currentExerciseNumber)", "\(exerciseTotal)"])
   }
 }
 
@@ -127,7 +130,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       return Exercise(
         id: exercise.id,
         stableIndex: exerciseIndex,
-        name: exercise.exercise.name,
+        name: StudentExerciseName.display(exercise.exercise),
         reference: Self.referenceText(references[exercise.exercise.id]),
         note: CoachNoteDisplay.text(exercise.notes) ?? "",
         rows: rows
@@ -158,10 +161,14 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     guard let reference else { return "" }
     var parts: [String] = []
     if let last = reference.last {
-      parts.append("上次 \(numberText(last.weightKg))kg×\(last.reps)")
+      parts.append(
+        StudentStrings.replacing(
+          .todayWorkoutPresentation004, values: ["\(numberText(last.weightKg))", "\(last.reps)"]))
     }
     if let best = reference.best {
-      parts.append("最佳 \(numberText(best.weightKg))kg×\(best.reps)")
+      parts.append(
+        StudentStrings.replacing(
+          .todayWorkoutPresentation005, values: ["\(numberText(best.weightKg))", "\(best.reps)"]))
     }
     return parts.joined(separator: " · ")
   }

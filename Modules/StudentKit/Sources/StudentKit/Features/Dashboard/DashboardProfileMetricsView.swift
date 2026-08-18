@@ -37,7 +37,7 @@ private struct DashboardWeightCard: View {
             style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
           )
           .frame(width: 13, height: 13)
-        Text("体重")
+        Text(StudentStrings.localized(.dashboardProfileMetricsView001))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
       }
       .foregroundStyle(Color.MeetPR.textPrimary)
@@ -58,7 +58,8 @@ private struct DashboardWeightCard: View {
     .clipShape(.rect(cornerRadius: 16))
     .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel("体重 \(bodyWeightText)")
+    .accessibilityLabel(
+      StudentStrings.replacing(.dashboardProfileMetricsView002, values: ["\(bodyWeightText)"]))
   }
 }
 
@@ -75,7 +76,7 @@ private struct DashboardCompetitionCard: View {
             style: StrokeStyle(lineWidth: 2, lineJoin: .round)
           )
           .frame(width: 13, height: 13)
-        Text("距比赛")
+        Text(StudentStrings.localized(.dashboardProfileMetricsView003))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
           .foregroundStyle(Color.MeetPR.textPrimary)
       }
@@ -91,7 +92,7 @@ private struct DashboardCompetitionCard: View {
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size24, weight: .bold))
           .foregroundStyle(Color.MeetPR.goldText)
           .shadow(color: Color.MeetPR.goldRGB.opacity(0.45), radius: 7)
-        Text("天")
+        Text(StudentStrings.localized(.dashboardProfileMetricsView004))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
@@ -116,7 +117,8 @@ private struct DashboardCompetitionCard: View {
         .stroke(Color.MeetPR.goldRGB.opacity(0.3), lineWidth: 1)
     }
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel("距比赛 \(competition.days) 天")
+    .accessibilityLabel(
+      StudentStrings.replacing(.dashboardProfileMetricsView005, values: ["\(competition.days)"]))
   }
 }
 
@@ -131,12 +133,12 @@ private struct DashboardCompetitionPlaceholder: View {
             style: StrokeStyle(lineWidth: 2, lineJoin: .round)
           )
           .frame(width: 13, height: 13)
-        Text("距比赛")
+        Text(StudentStrings.localized(.dashboardProfileMetricsView003))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
       }
       .foregroundStyle(Color.MeetPR.textMuted)
 
-      Text("未安排")
+      Text(StudentStrings.localized(.dashboardProfileMetricsView006))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
         .foregroundStyle(Color.MeetPR.textMuted)
         .padding(.top, 3)
@@ -144,7 +146,7 @@ private struct DashboardCompetitionPlaceholder: View {
         // Reference: standalone 11pt stroked plus glyph before the label.
         Image(systemName: "plus")
           .font(.MeetPR.system(size: MeetPRFontMetrics.size11, weight: .bold))
-        Text("填写比赛")
+        Text(StudentStrings.localized(.dashboardProfileMetricsView007))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .bold))
       }
       .foregroundStyle(Color.MeetPR.gold500)
@@ -155,7 +157,7 @@ private struct DashboardCompetitionPlaceholder: View {
     .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: 16))
     .accessibilityElement(children: .combine)
-    .accessibilityLabel("距比赛，未安排，填写比赛")
+    .accessibilityLabel(StudentStrings.localized(.dashboardProfileMetricsView008))
     // Design source:
     // docs/design/handoff-v3/empty-states/MeetPR 学员端 空状态 暗色.html
     // scene 04, bottom-right competition tile.

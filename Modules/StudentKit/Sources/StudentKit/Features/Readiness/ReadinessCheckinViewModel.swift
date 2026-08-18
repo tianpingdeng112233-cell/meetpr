@@ -110,7 +110,7 @@ public final class ReadinessCheckinViewModel {
   /// up with an inline error.
   public func submit(_ draft: ReadinessDraft, studentId: UUID) async -> Bool {
     guard let sleep = draft.sleepQuality, let mood = draft.mood, let stress = draft.stress else {
-      submitError = "请先完成三项状态评分"
+      submitError = StudentStrings.localized(.readinessCheckinViewModel001)
       return false
     }
     let checkin = ReadinessCheckin(
@@ -131,7 +131,7 @@ public final class ReadinessCheckinViewModel {
       gate = .done(checkin)
       return true
     } catch {
-      submitError = "提交失败，请重试"
+      submitError = StudentStrings.localized(.readinessCheckinViewModel002)
       return false
     }
   }

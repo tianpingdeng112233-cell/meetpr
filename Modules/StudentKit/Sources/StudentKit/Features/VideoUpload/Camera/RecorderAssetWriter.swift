@@ -110,17 +110,17 @@
     var errorDescription: String? {
       switch self {
       case .assetWriterSetupFailed:
-        "无法准备视频编码器"
+        StudentStrings.localized(.recorderAssetWriter001)
       case .assetWriterFailed(let error):
-        error?.localizedDescription ?? "视频录制失败"
+        error?.localizedDescription ?? StudentStrings.localized(.recorderAssetWriter002)
       case .cameraConfigurationFailed:
-        "无法配置相机"
+        StudentStrings.localized(.recorderAssetWriter003)
       case .cameraUnavailable:
-        "当前设备没有可用的后置相机"
+        StudentStrings.localized(.recorderAssetWriter004)
       case .noVideoSamples:
-        "没有录到视频画面"
+        StudentStrings.localized(.recorderAssetWriter005)
       case .rotationUnavailable:
-        "当前设备不支持竖屏录制"
+        StudentStrings.localized(.recorderAssetWriter006)
       }
     }
   }

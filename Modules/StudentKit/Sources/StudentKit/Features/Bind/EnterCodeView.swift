@@ -53,14 +53,14 @@ struct EnterCodeView: View {
         BindInstructionsCard()
 
         MeetPRTextField(
-          "你的姓名",
+          StudentStrings.localized(.enterCodeView001),
           text: $viewModel.displayName,
-          placeholder: "填你自己的名字",
-          helperText: "教练会在学员列表里看到这个名字"
+          placeholder: StudentStrings.localized(.enterCodeView002),
+          helperText: StudentStrings.localized(.enterCodeView003)
         )
 
         if viewModel.showsNetworkBanner {
-          Label("网络异常,请重试", systemImage: "wifi.exclamationmark")
+          Label(StudentStrings.localized(.enterCodeView004), systemImage: "wifi.exclamationmark")
             .font(Font.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
             .foregroundStyle(Color.MeetPR.dangerMuted)
         }
@@ -129,7 +129,8 @@ struct EnterCodeView: View {
     #endif
 
     guard let pastedCode else {
-      pasteError = "剪贴板里没有有效的 \(InviteCodeFormat.length) 位邀请码"
+      pasteError = StudentStrings.replacing(
+        .enterCodeView005, values: ["\(InviteCodeFormat.length)"])
       return
     }
 

@@ -15,10 +15,10 @@ struct DashboardPendingFeedbackCard: View {
         Circle()
           .stroke(Color.MeetPR.gold500, lineWidth: 1.5)
           .frame(width: 7, height: 7)
-        Text("教练反馈")
+        Text(StudentStrings.localized(.dashboardFeedbackEmptyCards001))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
-        Text("· 点评在路上")
+        Text(StudentStrings.localized(.dashboardFeedbackEmptyCards002))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
@@ -37,19 +37,20 @@ struct DashboardPendingFeedbackCard: View {
 
   private var description: Text {
     let submitted =
-      Text("今天的 ")
+      Text(StudentStrings.localized(.dashboardFeedbackEmptyCards003))
       + Text(pending.completedSetCount.formatted()).fontWeight(.semibold)
-      + Text(" 组已在 ")
+      + Text(StudentStrings.localized(.dashboardFeedbackEmptyCards004))
       + Text(pending.submittedAt.formatted(date: .omitted, time: .shortened))
       .fontWeight(.semibold)
     if let expectedResponseHours = pending.expectedResponseHours {
       return
         submitted
-        + Text(" 提交，\(coachName)通常 ")
+        + Text(StudentStrings.replacing(.dashboardFeedbackEmptyCards005, values: ["\(coachName)"]))
         + Text(expectedResponseHours.formatted()).fontWeight(.semibold)
-        + Text(" 小时内回看视频。")
+        + Text(StudentStrings.localized(.dashboardFeedbackEmptyCards006))
     }
-    return submitted + Text(" 提交，\(coachName)会在下次训练前回看视频。")
+    return submitted
+      + Text(StudentStrings.replacing(.dashboardFeedbackEmptyCards007, values: ["\(coachName)"]))
   }
 }
 

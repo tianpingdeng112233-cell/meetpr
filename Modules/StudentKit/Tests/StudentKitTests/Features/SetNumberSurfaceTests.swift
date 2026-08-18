@@ -92,6 +92,7 @@ struct SetNumberSurfaceTests {
     let video = CoachFeedbackVideo(
       id: UUID(),
       exerciseName: "深蹲",
+      exerciseNameEn: "Competition Squat",
       setIndex: 0
     )
     let feedback = CoachFeedback(
@@ -104,7 +105,14 @@ struct SetNumberSurfaceTests {
       postedAt: Date(timeIntervalSince1970: 1_777_248_000)
     )
 
-    #expect(DashboardFeedbackText.label(for: feedback) == "深蹲 · 第 1 组")
+    #expect(
+      DashboardFeedbackText.label(for: feedback, locale: Locale(identifier: "zh-Hans"))
+        == "深蹲 · 第 1 组"
+    )
+    #expect(
+      DashboardFeedbackText.label(for: feedback, locale: Locale(identifier: "en"))
+        == "Competition Squat · Set 1"
+    )
   }
 
   @Test("day detail renders source index zero as set one")

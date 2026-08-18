@@ -19,6 +19,20 @@ import Testing
   #expect(FeedbackVideoPresentation.summary(video) == "暂停深蹲 · 第1组 · 125kg×5次")
 }
 
+@Test func feedbackVideoSummaryUsesEnglishExerciseNameInEnglishLocale() {
+  let video = CoachFeedbackVideo(
+    id: UUID(),
+    exerciseName: "暂停深蹲",
+    exerciseNameEn: "Pause Squat",
+    setIndex: 0
+  )
+
+  #expect(
+    FeedbackVideoPresentation.summary(video, locale: Locale(identifier: "en"))
+      == "Pause Squat · Set 1"
+  )
+}
+
 /// A freely recorded clip has no set log, so every joined field comes back null.
 /// The card must degrade to the parts it has rather than print "第0组 · kg×次".
 @Test func feedbackVideoSummaryDropsMissingParts() {

@@ -5,13 +5,15 @@ import Foundation
 
 // swiftlint:disable:next type_body_length
 public enum StudentDemoSeed {
+  private static let canonicalChineseLocale = Locale(identifier: "zh-Hans")
+  private static let englishLocale = Locale(identifier: "en")
   public static let studentID = UUID(uuidString: "02400000-0000-0000-0000-000000000101")!
   public static let coachID = UUID(uuidString: "02400000-0000-0000-0000-000000000201")!
 
   public static let coachedStudent = User(
     id: studentID,
     phone: "+15550102400",
-    name: "演示学员",
+    name: StudentStrings.localized(.studentDemoSeed001),
     unitSystem: .metric,
     role: .coachedStudent,
     createdAt: referenceDate,
@@ -101,7 +103,7 @@ public enum StudentDemoSeed {
         videoID: uuid(411),
         video: demoFeedbackVideo(
           id: uuid(411), loggedAt: newestFeedbackAt.addingTimeInterval(-86_400)),
-        text: "深蹲第一组速度很好，下一次保持同样节奏，最后一组不要急着起杠。",
+        text: StudentStrings.localized(.studentDemoSeed002),
         postedAt: newestFeedbackAt,
         readAt: nil
       ),
@@ -110,7 +112,7 @@ public enum StudentDemoSeed {
         coachID: coachID,
         studentID: studentID,
         dayDate: plan.days[1].scheduledDate,
-        text: "卧推动作稳定，肘部路径比上周干净。辅助动作可以控制离心两秒。",
+        text: StudentStrings.localized(.studentDemoSeed003),
         postedAt: newestFeedbackAt.addingTimeInterval(-180),
         readAt: nil
       ),
@@ -118,13 +120,14 @@ public enum StudentDemoSeed {
         id: uuid(403),
         coachID: coachID,
         studentID: studentID,
-        text: "本周总体恢复不错，睡眠继续保持。周末拉伸别省。",
+        text: StudentStrings.localized(.studentDemoSeed004),
         postedAt: newestFeedbackAt.addingTimeInterval(-420),
         readAt: newestFeedbackAt.addingTimeInterval(-360)
       ),
     ]
   }
 
+  // swiftlint:disable:next function_body_length
   private static func exercises(forDayOffset offset: Int) -> [StudentPlanExercise] {
     let templates: [StudentPlanExercise]
     switch offset {
@@ -132,38 +135,106 @@ public enum StudentDemoSeed {
       templates = [
         exercise(
           .init(
-            index: 0, name: "深蹲", family: .squat, weight: 142.5, reps: 5, rpe: 7.5,
-            note: "节奏310,底部不停顿"))
+            index: 0,
+            name: StudentStrings.localized(
+              .studentDemoSeed005,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed005, locale: englishLocale),
+            family: .squat, weight: 142.5, reps: 5, rpe: 7.5,
+            note: StudentStrings.localized(.studentDemoSeed006)))
       ]
     case 1:
       templates = [
-        exercise(.init(index: 1, name: "卧推", family: .bench, weight: 92.5, reps: 5, rpe: 8))
+        exercise(
+          .init(
+            index: 1,
+            name: StudentStrings.localized(
+              .studentDemoSeed007,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed007, locale: englishLocale),
+            family: .bench, weight: 92.5, reps: 5, rpe: 8
+          )
+        )
       ]
     case 2, 6:
       templates = [
         exercise(
           .init(
-            index: 2, name: "硬拉", family: .deadlift, weight: 175, reps: 3, rpe: 8.5,
-            note: "D170/L190 递增5kg,顶组留一,腰部有感觉就停"))
+            index: 2,
+            name: StudentStrings.localized(
+              .studentDemoSeed008,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed008, locale: englishLocale),
+            family: .deadlift, weight: 175, reps: 3, rpe: 8.5,
+            note: StudentStrings.localized(.studentDemoSeed009)))
       ]
     case 3, 7:
       // 深蹲主项 + 窄握卧推变式(+ 坐姿划船辅助)→ 角标 "SB"(演示组合日 + S 在 B 前排序 +
       // 辅助动作不计入)。
       templates = [
-        exercise(.init(index: 6, name: "深蹲", family: .squat, weight: 130, reps: 5, rpe: 7)),
         exercise(
           .init(
-            index: 3, name: "窄握卧推", family: .bench, weight: 75, reps: 6, rpe: nil,
+            index: 6,
+            name: StudentStrings.localized(
+              .studentDemoSeed005,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed005, locale: englishLocale),
+            family: .squat, weight: 130, reps: 5, rpe: 7
+          )
+        ),
+        exercise(
+          .init(
+            index: 3,
+            name: StudentStrings.localized(
+              .studentDemoSeed010,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed010, locale: englishLocale),
+            family: .bench, weight: 75, reps: 6, rpe: nil,
             type: .mainLiftVariation)),
-        exercise(.init(index: 4, name: "坐姿划船", family: nil, weight: 55, reps: 10, rpe: 8)),
+        exercise(
+          .init(
+            index: 4,
+            name: StudentStrings.localized(
+              .studentDemoSeed011,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed011, locale: englishLocale),
+            family: nil, weight: 55, reps: 10, rpe: 8
+          )
+        ),
       ]
     case 4:
       templates = [
-        exercise(.init(index: 0, name: "深蹲", family: .squat, weight: 145, reps: 4, rpe: 8))
+        exercise(
+          .init(
+            index: 0,
+            name: StudentStrings.localized(
+              .studentDemoSeed005,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed005, locale: englishLocale),
+            family: .squat, weight: 145, reps: 4, rpe: 8
+          )
+        )
       ]
     case 5:
       templates = [
-        exercise(.init(index: 1, name: "卧推", family: .bench, weight: 95, reps: 4, rpe: 8))
+        exercise(
+          .init(
+            index: 1,
+            name: StudentStrings.localized(
+              .studentDemoSeed007,
+              locale: canonicalChineseLocale
+            ),
+            nameEn: StudentStrings.localized(.studentDemoSeed007, locale: englishLocale),
+            family: .bench, weight: 95, reps: 4, rpe: 8
+          )
+        )
       ]
     default:
       templates = []
@@ -206,6 +277,7 @@ public enum StudentDemoSeed {
       exercise: Exercise(
         id: exerciseID,
         name: spec.name,
+        nameEn: spec.nameEn,
         exerciseType: exerciseType,
         mainLiftFamily: spec.family,
         isCompetitionLift: exerciseType == .mainLift,
@@ -223,7 +295,7 @@ public enum StudentDemoSeed {
           reps: spec.reps,
           repsMax: nil,
           rpe: spec.rpe,
-          coachNote: setIndex == 0 ? "下放控制 3 秒" : nil
+          coachNote: setIndex == 0 ? StudentStrings.localized(.studentDemoSeed012) : nil
         )
       },
       notes: spec.note
@@ -349,6 +421,7 @@ public enum StudentDemoSeed {
 private struct ExerciseSpec {
   let index: Int
   let name: String
+  var nameEn: String?
   let family: LiftFamily?
   let weight: Decimal
   let reps: Int
@@ -434,12 +507,12 @@ extension StudentDemoSeed {
       sleepHours: 3,
       muscleGroupsToStrengthen: [.quad, .hamstring, .shoulder],
       uploadAttachmentIds: [],
-      injuryNotes: "左肩撞击综合征",
+      injuryNotes: StudentStrings.localized(.studentDemoSeed013),
       injuryAreas: [.shoulder],
       isCompeting: isCompeting,
       competitionDate: isCompeting ? demoCompetitionDate() : nil,
       targetWeightClass: "IPF 83kg",
-      noteToCoach: "想冲全国赛,请多关注深蹲底部速度",
+      noteToCoach: StudentStrings.localized(.studentDemoSeed014),
       completedAt: referenceDate,
       createdAt: referenceDate,
       updatedAt: referenceDate
@@ -462,7 +535,7 @@ extension StudentDemoSeed {
       id: uuid(8_000),
       studentId: studentID,
       coachId: coachID,
-      coachDisplayName: "演示教练",
+      coachDisplayName: StudentStrings.localized(.studentDemoSeed015),
       inviteCodeId: uuid(8_001),
       status: .accepted,
       submittedAt: referenceDate,

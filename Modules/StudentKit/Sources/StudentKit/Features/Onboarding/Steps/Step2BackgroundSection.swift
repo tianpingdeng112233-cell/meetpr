@@ -13,13 +13,13 @@ struct Step2BackgroundSection: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       trainingYearsSlider
       OnboardingChoiceCards(
-        title: "深蹲杠位",
+        title: StudentStrings.localized(.step2BackgroundSection001),
         options: SquatStance.allCases.map { ($0, OnboardingLabels.label($0)) },
         selection: $draft.squatStance,
         isHighlighted: highlighted.contains("squat_stance")
       )
       OnboardingChoiceCards(
-        title: "硬拉姿势",
+        title: StudentStrings.localized(.step2BackgroundSection002),
         options: DeadliftStance.allCases.map { ($0, OnboardingLabels.label($0)) },
         selection: $draft.deadliftStyle,
         isHighlighted: highlighted.contains("deadlift_style")
@@ -38,11 +38,12 @@ struct Step2BackgroundSection: View {
   private var trainingYearsSlider: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       OnboardingFieldLabel(
-        title: "训练年限", isHighlighted: highlighted.contains("training_years"))
+        title: StudentStrings.localized(.step2BackgroundSection003),
+        isHighlighted: highlighted.contains("training_years"))
       Slider(value: yearsBinding, in: 0...10, step: 1)
         .tint(Color.MeetPR.gold500)
       HStack {
-        Text("<1 年")
+        Text(StudentStrings.localized(.step2BackgroundSection004))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textMuted)
         Spacer()
@@ -50,7 +51,7 @@ struct Step2BackgroundSection: View {
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
-        Text("10+ 年")
+        Text(StudentStrings.localized(.step2BackgroundSection005))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
@@ -67,12 +68,12 @@ struct Step2BackgroundSection: View {
   private var benchGripPicker: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       OnboardingChoiceCards(
-        title: "卧推握距(选填)",
+        title: StudentStrings.localized(.step2BackgroundSection006),
         options: BenchGrip.allCases.map { ($0, OnboardingLabels.label($0)) },
         selection: $draft.benchGrip
       )
       if draft.benchGrip != nil {
-        Button("跳过此项") {
+        Button(StudentStrings.localized(.step2BackgroundSection007)) {
           draft.benchGrip = nil
         }
         .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))

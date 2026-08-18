@@ -67,9 +67,9 @@ struct DashboardE1RMHeadline: Equatable, Sendable {
 
   var label: String {
     switch kind {
-    case .latestPR: "最新 PR"
-    case .best: "最佳"
-    case .historicalBest: "历史最佳"
+    case .latestPR: StudentStrings.localized(.dashboardE1RmtrendViewModel001)
+    case .best: StudentStrings.localized(.dashboardE1RmtrendViewModel002)
+    case .historicalBest: StudentStrings.localized(.dashboardE1RmtrendViewModel003)
     }
   }
 }

@@ -30,7 +30,7 @@ struct CoachNotePill: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 4) {
-      Text("教练备注")
+      Text(StudentStrings.localized(.coachNoteDisplay001))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .medium))
         .tracking(0.8)
         .foregroundStyle(Color.MeetPR.textMuted)
@@ -48,6 +48,6 @@ struct CoachNotePill: View {
         .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
     }
     .accessibilityElement(children: .combine)
-    .accessibilityLabel("教练备注 \(note)")
+    .accessibilityLabel(StudentStrings.replacing(.coachNoteDisplay002, values: ["\(note)"]))
   }
 }

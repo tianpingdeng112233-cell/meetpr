@@ -31,7 +31,7 @@ struct GrowthE1RMCard: View {
           }
         } label: {
           HStack(spacing: MeetPRSpacing.space1) {
-            Text(range.rawValue)
+            Text(range.displayName)
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
               .foregroundStyle(Color.MeetPR.textSecondary)
             Image(systemName: "chevron.down")
@@ -51,9 +51,12 @@ struct GrowthE1RMCard: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(
-          "\(snapshot.family.studentDisplayName)时间范围，当前\(range.rawValue)"
+          StudentStrings.replacing(
+            .growthE1Rmcard001,
+            values: ["\(snapshot.family.studentDisplayName)", "\(range.displayName)"]
+          )
         )
-        .accessibilityHint("切换到下一个时间范围")
+        .accessibilityHint(StudentStrings.localized(.growthE1Rmcard002))
       }
       .frame(height: MeetPRSpacing.minimumHitTarget)
       .padding(.top, -MeetPRSpacing.point9)
@@ -69,7 +72,7 @@ struct GrowthE1RMCard: View {
         }
         Spacer()
         if snapshot.cardState == .formingProgress {
-          Text("首次估算")
+          Text(StudentStrings.localized(.growthE1Rmcard003))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.textMuted)
         } else if snapshot.cardState == .chart, let deltaText {
@@ -97,7 +100,7 @@ struct GrowthE1RMCard: View {
         .frame(height: 126)
       case .formingWindowSparse:
         GrowthWindowSparseTrendState(
-          message: GrowthE1RMCardCopy.windowSparseMessage(window: range.rawValue)
+          message: GrowthE1RMCardCopy.windowSparseMessage(window: range.displayName)
         )
         .frame(height: 126)
       case .chart:
@@ -114,7 +117,7 @@ struct GrowthE1RMCard: View {
 
   private var weightText: String {
     guard let value = snapshot.currentKg else {
-      return snapshot.cardState == .zero ? "未设定" : "—"
+      return snapshot.cardState == .zero ? StudentStrings.localized(.growthE1Rmcard004) : "—"
     }
     return value.formatted(.number.precision(.fractionLength(1)))
   }
@@ -146,7 +149,9 @@ private struct GrowthE1RMChart: View {
     }
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(
-      "\(snapshot.family.studentDisplayName) E1RM \(snapshot.windowDataPointCount) 个趋势点"
+      StudentStrings.replacing(
+        .growthE1Rmcard005,
+        values: ["\(snapshot.family.studentDisplayName)", "\(snapshot.windowDataPointCount)"])
     )
   }
 
@@ -266,12 +271,12 @@ private struct GrowthE1RMChart: View {
         .position(geometry.point(x: 33, y: 52))
       axisText(geometry.bottomLabel)
         .position(geometry.point(x: 33, y: 86))
-      Text("重量 / kg")
+      Text(StudentStrings.localized(.growthE1Rmcard006))
         .font(.MeetPR.mono(size: geometry.scaleY(8.5)))
         .foregroundStyle(Color.MeetPR.textMuted)
         .rotationEffect(.degrees(-90))
         .position(geometry.point(x: 13, y: 54))
-      Text("日期")
+      Text(StudentStrings.localized(.growthE1Rmcard007))
         .font(.MeetPR.mono(size: geometry.scaleY(8.5)))
         .foregroundStyle(Color.MeetPR.textMuted)
         .position(geometry.point(x: 175, y: 114))

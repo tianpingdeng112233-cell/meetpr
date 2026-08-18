@@ -13,13 +13,15 @@ public struct DayDetailView: View {
   }
 
   static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
-    "第 \(SetIndexDisplay.number(forZeroBasedIndex: setIndex)) 组"
+    StudentStrings.replacing(
+      .dayDetailView001, values: ["\(SetIndexDisplay.number(forZeroBasedIndex: setIndex))"])
   }
 
   public var body: some View {
     Group {
       if day.exercises.isEmpty {
-        ContentUnavailableView("休息日", systemImage: "bed.double")
+        ContentUnavailableView(
+          StudentStrings.localized(.dayDetailView002), systemImage: "bed.double")
       } else {
         ScrollView {
           VStack(alignment: .leading, spacing: 14) {
@@ -39,7 +41,7 @@ public struct DayDetailView: View {
 
   private func exerciseCard(_ exercise: StudentPlanExercise) -> some View {
     VStack(alignment: .leading, spacing: 10) {
-      Text(exercise.exercise.name)
+      Text(StudentExerciseName.display(exercise.exercise))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
         .foregroundStyle(Color.MeetPR.textPrimary)
 
@@ -57,7 +59,7 @@ public struct DayDetailView: View {
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size15))
               .foregroundStyle(Color.MeetPR.textSecondary)
             if let coachNote = CoachNoteDisplay.text(set.coachNote) {
-              Text("备注 \(coachNote)")
+              Text(StudentStrings.replacing(.dayDetailView003, values: ["\(coachNote)"]))
                 .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
                 .foregroundStyle(Color.MeetPR.textSecondary)
                 .lineLimit(2)

@@ -15,7 +15,9 @@ struct DashboardRestDayPreview: Equatable, Sendable {
   let estimatedMinutes: Int
 
   var farewellText: String {
-    dateLabel == "明天" ? "明天见。" : "\(dateLabel)见。"
+    dateLabel == StudentStrings.localized(.dashboardEmptyStatePresentation001)
+      ? StudentStrings.localized(.dashboardEmptyStatePresentation002)
+      : StudentStrings.replacing(.dashboardEmptyStatePresentation003, values: ["\(dateLabel)"])
   }
 }
 
@@ -227,9 +229,17 @@ extension DashboardTodayPresentation {
     let nextDay = nextTraining.day
     let families = MainLiftExerciseFamilyResolver.families(in: nextDay)
     let dayName =
-      families.first.map { "\($0.studentDisplayName)日" }
-      ?? nextDay.exercises.first.map { "\($0.exercise.name)日" }
-      ?? "训练日"
+      families.first.map {
+        StudentStrings.replacing(
+          .dashboardEmptyStatePresentation004, values: ["\($0.studentDisplayName)"])
+      }
+      ?? nextDay.exercises.first.map {
+        StudentStrings.replacing(
+          .dashboardEmptyStatePresentation004,
+          values: ["\(StudentExerciseName.display($0.exercise))"]
+        )
+      }
+      ?? StudentStrings.localized(.dashboardEmptyStatePresentation005)
     let weekIndex = resolvedWeekIndex(
       for: nextDay.date,
       planStartDate: planStartDate,
@@ -247,7 +257,7 @@ extension DashboardTodayPresentation {
     let estimatedMinutes = max(5, Int(ceil(Double(durationSeconds) / 300)) * 5)
     let datePrefix =
       nextTraining.offset == 1
-      ? "明天"
+      ? StudentStrings.localized(.dashboardEmptyStatePresentation001)
       : monthDayText(nextDay.date, calendar: PlanCalendarDayIdentity.utcCalendar)
     return DashboardRestDayPreview(
       dateLabel: datePrefix,

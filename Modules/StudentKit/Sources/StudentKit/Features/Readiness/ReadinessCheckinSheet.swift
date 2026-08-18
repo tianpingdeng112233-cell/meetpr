@@ -40,13 +40,13 @@ struct ReadinessCheckinSheet: View {
         .padding(MeetPRSpacing.md)
       }
       .background(Color.MeetPR.bgBase)
-      .navigationTitle("今日状态 \(step)/2")
+      .navigationTitle(StudentStrings.replacing(.readinessCheckinSheet001, values: ["\(step)"]))
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("跳过") {
+          Button(StudentStrings.localized(.readinessCheckinSheet002)) {
             viewModel.skip(studentId: studentID)
             onClose()
           }
@@ -67,22 +67,22 @@ struct ReadinessCheckinSheet: View {
   private var stepOne: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       scaleRow(
-        title: "昨晚睡得怎么样？",
-        lowAnchor: "很差",
-        highAnchor: "很好",
+        title: StudentStrings.localized(.readinessCheckinSheet003),
+        lowAnchor: StudentStrings.localized(.readinessCheckinSheet004),
+        highAnchor: StudentStrings.localized(.readinessCheckinSheet005),
         value: $draft.sleepQuality
       )
       scaleRow(
-        title: "今天状态如何？",
-        lowAnchor: "很糟",
-        highAnchor: "很棒",
+        title: StudentStrings.localized(.readinessCheckinSheet006),
+        lowAnchor: StudentStrings.localized(.readinessCheckinSheet007),
+        highAnchor: StudentStrings.localized(.readinessCheckinSheet008),
         value: $draft.mood
       )
       // Data stays 5 = most relaxed; only the anchor copy inverts.
       scaleRow(
-        title: "今天压力大吗？",
-        lowAnchor: "压力爆表",
-        highAnchor: "很轻松",
+        title: StudentStrings.localized(.readinessCheckinSheet009),
+        lowAnchor: StudentStrings.localized(.readinessCheckinSheet010),
+        highAnchor: StudentStrings.localized(.readinessCheckinSheet011),
         value: $draft.stress
       )
     }
@@ -121,7 +121,8 @@ struct ReadinessCheckinSheet: View {
               )
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("\(title) \(level) 分")
+          .accessibilityLabel(
+            StudentStrings.replacing(.readinessCheckinSheet012, values: ["\(title)", "\(level)"]))
         }
         Text(highAnchor)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
@@ -135,10 +136,10 @@ struct ReadinessCheckinSheet: View {
 
   private var stepTwo: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-      Text("今天哪些肌群还累？")
+      Text(StudentStrings.localized(.readinessCheckinSheet013))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
         .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("点一下：轻 → 中 → 重 → 取消。不累可以直接完成。")
+      Text(StudentStrings.localized(.readinessCheckinSheet014))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         .foregroundStyle(Color.MeetPR.textSecondary)
 
@@ -164,14 +165,14 @@ struct ReadinessCheckinSheet: View {
   private var footer: some View {
     HStack {
       if step == 2 {
-        Button("上一步") { step = 1 }
+        Button(StudentStrings.localized(.readinessCheckinSheet015)) { step = 1 }
           .buttonStyle(.bordered)
           .tint(Color.MeetPR.textMuted)
       }
       Spacer()
       if step == 1 {
         GoldCTA(
-          "下一步",
+          StudentStrings.localized(.readinessCheckinSheet016),
           sub: nil,
           icon: .none,
           isDisabled: !draft.stepOneComplete,
@@ -181,7 +182,9 @@ struct ReadinessCheckinSheet: View {
         }
       } else {
         GoldCTA(
-          submitting ? "提交中…" : "完成",
+          submitting
+            ? StudentStrings.localized(.readinessCheckinSheet017)
+            : StudentStrings.localized(.readinessCheckinSheet018),
           sub: nil,
           icon: .none,
           isDisabled: submitting,
@@ -241,7 +244,9 @@ private struct FlowChips: View {
           )
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(Self.displayName(group))，疲劳度 \(level ?? 0)")
+        .accessibilityLabel(
+          StudentStrings.replacing(
+            .readinessCheckinSheet019, values: ["\(Self.displayName(group))", "\(level ?? 0)"]))
       }
     }
   }
@@ -250,14 +255,14 @@ private struct FlowChips: View {
   /// coach-side; StudentKit only ever shows these eight).
   private static func displayName(_ group: MuscleGroup) -> String {
     switch group {
-    case .quad: "股四"
-    case .hamstring: "腘绳"
-    case .glute: "臀"
-    case .back: "背"
-    case .chest: "胸"
-    case .shoulder: "肩"
-    case .triceps: "肱三头"
-    case .core: "核心·下背"
+    case .quad: StudentStrings.localized(.readinessCheckinSheet020)
+    case .hamstring: StudentStrings.localized(.readinessCheckinSheet021)
+    case .glute: StudentStrings.localized(.readinessCheckinSheet022)
+    case .back: StudentStrings.localized(.readinessCheckinSheet023)
+    case .chest: StudentStrings.localized(.readinessCheckinSheet024)
+    case .shoulder: StudentStrings.localized(.readinessCheckinSheet025)
+    case .triceps: StudentStrings.localized(.readinessCheckinSheet026)
+    case .core: StudentStrings.localized(.readinessCheckinSheet027)
     default: group.rawValue
     }
   }

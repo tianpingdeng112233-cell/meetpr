@@ -53,7 +53,7 @@ struct SetEntryRPEScale: View {
     .accessibilityElement(children: .ignore)
     .accessibilityLabel("RPE")
     .accessibilityValue(SetEntryRPE.text(value))
-    .accessibilityHint("上下滑动，每次 0.5")
+    .accessibilityHint(StudentStrings.localized(.setEntryRpescale001))
     .accessibilityAdjustableAction { direction in
       switch direction {
       case .increment:

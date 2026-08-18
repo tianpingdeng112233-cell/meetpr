@@ -14,10 +14,10 @@ struct ProgressDashboardView: View {
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-        ProgressSectionHeader(title: "e1RM 趋势")
+        ProgressSectionHeader(title: StudentStrings.localized(.progressDashboardView001))
         GrowthCurvePanelView(studentID: studentID, plans: plans, e1rm: e1rm)
 
-        ProgressSectionHeader(title: "容量 / 强度")
+        ProgressSectionHeader(title: StudentStrings.localized(.progressDashboardView002))
         VolumeIntensityChart(buckets: metrics)
       }
       .padding(MeetPRSpacing.md)

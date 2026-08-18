@@ -45,10 +45,10 @@ public enum StudentRestTimerPreference: Equatable, Sendable {
 }
 
 enum StudentRestTimerCopy {
-  static let automaticModeTitle = "自动(按 RPE)"
-  static let automaticSummary = "自动 (按 RPE)"
+  static let automaticModeTitle = StudentStrings.localized(.studentRestTimerSettings001)
+  static let automaticSummary = StudentStrings.localized(.studentRestTimerSettings002)
   // ⚖️ David 2026-07-28.
-  static let customModeTitle = "手动设置"
+  static let customModeTitle = StudentStrings.localized(.studentRestTimerSettings003)
 
   static func summary(for preference: StudentRestTimerPreference) -> String {
     guard let seconds = preference.customSeconds else { return automaticSummary }

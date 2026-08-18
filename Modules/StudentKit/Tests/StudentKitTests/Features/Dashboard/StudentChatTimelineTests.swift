@@ -102,6 +102,20 @@ private func itemKind(_ item: StudentChatTimelineItem) -> TimelineItemKind {
   #expect(StudentChatTimeline.videoLabel(for: video) == "我的暂停深蹲 · 第 1 组")
 }
 
+@Test func chatVideoLabelUsesEnglishExerciseNameInEnglishLocale() {
+  let video = CoachFeedbackVideo(
+    id: UUID(),
+    exerciseName: "暂停深蹲",
+    exerciseNameEn: "Pause Squat",
+    setIndex: 0
+  )
+
+  #expect(
+    StudentChatTimeline.videoLabel(for: video, locale: Locale(identifier: "en"))
+      == "My Pause Squat · Set 1"
+  )
+}
+
 @MainActor
 // swiftlint:disable:next function_body_length
 @Test func studentChatHistoryPagingPrependsOlderMessagesAndReturnsStableAnchor() async {

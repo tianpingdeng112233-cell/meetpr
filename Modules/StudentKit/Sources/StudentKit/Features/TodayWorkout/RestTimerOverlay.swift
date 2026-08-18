@@ -65,7 +65,7 @@ struct RestTimerOverlay: View {
         Button("-30s") { onAdjust(-30) }
           .buttonStyle(.bordered)
           .tint(Color.MeetPR.textSecondary)
-        Button("跳过") { onSkip() }
+        Button(StudentStrings.localized(.restTimerOverlay001)) { onSkip() }
           .buttonStyle(.bordered)
           .tint(Color.MeetPR.goldText)
         Button("+30s") { onAdjust(30) }
@@ -78,12 +78,13 @@ struct RestTimerOverlay: View {
       .tint(Color.MeetPR.gold500)
     }
     .accessibilityElement(children: .contain)
-    .accessibilityLabel("组间休息，剩余 \(Self.minutesSeconds(remaining))")
+    .accessibilityLabel(
+      StudentStrings.replacing(.restTimerOverlay002, values: ["\(Self.minutesSeconds(remaining))"]))
   }
 
   private var finished: some View {
     HStack {
-      Text("休息结束")
+      Text(StudentStrings.localized(.restTimerOverlay003))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
         .foregroundStyle(Color.MeetPR.success)
       Spacer()

@@ -69,14 +69,16 @@ struct VideoAttachmentSection: View {
       HStack(spacing: MeetPRSpacing.space3) {
         if hasPlayableAttachment {
           Button(action: playAttachment) {
-            Label("视频", systemImage: "play.circle.fill")
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
-              .foregroundStyle(Color.MeetPR.textPrimary)
+            Label(
+              StudentStrings.localized(.videoAttachmentSection001), systemImage: "play.circle.fill"
+            )
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textPrimary)
           }
           .buttonStyle(.plain)
           .disabled(isLoadingPlayback)
         } else {
-          Text("视频")
+          Text(StudentStrings.localized(.videoAttachmentSection001))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
             .foregroundStyle(Color.MeetPR.textPrimary)
         }
@@ -100,7 +102,7 @@ struct VideoAttachmentSection: View {
           Text(playbackErrorMessage)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
             .foregroundStyle(Color.MeetPR.danger)
-          Button("重试", action: playAttachment)
+          Button(StudentStrings.localized(.videoAttachmentSection002), action: playAttachment)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
             .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.72))
             .disabled(isLoadingPlayback)
@@ -227,7 +229,7 @@ extension VideoAttachmentSection {
           let source = try await videoViewModel.playbackSource(attachmentID: attachmentID)
         else {
           guard rowState?.attachment.id == attachmentID else { return }
-          playbackErrorMessage = "视频暂时无法播放,请重试"
+          playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection003)
           return
         }
         guard rowState?.attachment.id == attachmentID else { return }
@@ -237,7 +239,7 @@ extension VideoAttachmentSection {
         )
       } catch {
         guard rowState?.attachment.id == attachmentID else { return }
-        playbackErrorMessage = "视频加载失败,请检查网络后重试"
+        playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection004)
       }
     }
   }

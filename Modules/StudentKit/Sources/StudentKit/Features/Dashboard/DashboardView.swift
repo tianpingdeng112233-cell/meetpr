@@ -153,8 +153,10 @@ public struct DashboardView: View {
     .task(id: pushedConversationID) {
       await openPushedConversationIfNeeded()
     }
-    .alert("无法撤销", isPresented: completionErrorPresented) {
-      Button("知道了", role: .cancel) { completionErrorMessage = nil }
+    .alert(StudentStrings.localized(.dashboardView001), isPresented: completionErrorPresented) {
+      Button(StudentStrings.localized(.dashboardView002), role: .cancel) {
+        completionErrorMessage = nil
+      }
     } message: {
       Text(completionErrorMessage ?? "")
     }
@@ -172,7 +174,8 @@ public struct DashboardView: View {
       isFeedbackLoaded: feedbackViewModel.hasFinishedLoading,
       trendRows: trendPresentation?.rows ?? [],
       metrics: profileMetricsViewModel.metrics,
-      coachName: notifications?.activeCoach?.coachDisplayName ?? "教练",
+      coachName: notifications?.activeCoach?.coachDisplayName
+        ?? StudentStrings.localized(.dashboardView003),
       newPRCount: newPRCount,
       showsNotifications: notifications != nil,
       notificationUnreadCount: notifications?.totalUnreadCount ?? 0,
@@ -235,7 +238,7 @@ public struct DashboardView: View {
     } catch let error as PlanDayCompletionError {
       completionErrorMessage = error.localizedMessage
     } catch {
-      completionErrorMessage = "暂时无法撤销，请稍后重试。"
+      completionErrorMessage = StudentStrings.localized(.dashboardView004)
     }
   }
 

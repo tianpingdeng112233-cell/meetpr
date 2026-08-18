@@ -15,20 +15,21 @@ struct Step3StrengthSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-      Text("⚠️ 1RM 一旦填写,完成后只有教练能改")
+      Text(StudentStrings.localized(.step3StrengthSection001))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
         .foregroundStyle(Color.MeetPR.textSecondary)
 
       oneRMField(
-        lift: .squat, title: "深蹲 1RM", text: $squatText,
+        lift: .squat, title: StudentStrings.localized(.step3StrengthSection002), text: $squatText,
         isHighlighted: highlighted.contains("squat_1rm_kg")
       ) { draft.squat1RMKg = UnitDisplay.parseOneRM($0) }
       oneRMField(
-        lift: .bench, title: "卧推 1RM", text: $benchText,
+        lift: .bench, title: StudentStrings.localized(.step3StrengthSection003), text: $benchText,
         isHighlighted: highlighted.contains("bench_1rm_kg")
       ) { draft.bench1RMKg = UnitDisplay.parseOneRM($0) }
       oneRMField(
-        lift: .deadlift, title: "硬拉 1RM", text: $deadliftText,
+        lift: .deadlift, title: StudentStrings.localized(.step3StrengthSection004),
+        text: $deadliftText,
         isHighlighted: highlighted.contains("deadlift_1rm_kg")
       ) { draft.deadlift1RMKg = UnitDisplay.parseOneRM($0) }
     }
@@ -77,7 +78,7 @@ struct Step3StrengthSection: View {
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
       .buttonStyle(.plain)
-      .accessibilityLabel("\(title) 估算器")
+      .accessibilityLabel(StudentStrings.replacing(.step3StrengthSection005, values: ["\(title)"]))
     }
   }
 
@@ -127,36 +128,44 @@ struct OneRMEstimatorSheet: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-      Text("用近期训练估算 1RM")
+      Text(StudentStrings.localized(.step3StrengthSection006))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size28))
         .foregroundStyle(Color.MeetPR.textPrimary)
 
       OnboardingNumberField(
-        title: "重量", unitSuffix: "kg", text: $weightText, onCommit: { _ in },
+        title: StudentStrings.localized(.step3StrengthSection007), unitSuffix: "kg",
+        text: $weightText, onCommit: { _ in },
         placeholder: "100")
       OnboardingNumberField(
-        title: "次数", unitSuffix: "次", text: $repsText, onCommit: { _ in }, placeholder: "5")
+        title: StudentStrings.localized(.step3StrengthSection008),
+        unitSuffix: StudentStrings.localized(.step3StrengthSection009), text: $repsText,
+        onCommit: { _ in }, placeholder: "5")
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         OnboardingFieldLabel(title: "RPE: \(String(format: "%.1f", rpe))")
         Slider(value: $rpe, in: 6...10, step: 0.5)
           .tint(Color.MeetPR.gold500)
-        Text("RPE = 这组做完有多吃力:10=力竭、9=还能多做 1 次、8=还能多做 2 次。")
+        Text(StudentStrings.localized(.step3StrengthSection010))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
 
       if let estimate {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-          Text("估算 1RM ≈ \(UnitDisplay.plainString(estimate.estimated)) kg")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.textPrimary)
-          GoldCTA("填入估算值", sub: nil, icon: .none) {
+          Text(
+            StudentStrings.replacing(
+              .step3StrengthSection011, values: ["\(UnitDisplay.plainString(estimate.estimated))"])
+          )
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+          GoldCTA(StudentStrings.localized(.step3StrengthSection012), sub: nil, icon: .none) {
             onFill(estimate.estimated)
             dismiss()
           }
           SecondaryButton(
-            "保守填入 90% (\(UnitDisplay.plainString(estimate.conservative)) kg)",
+            StudentStrings.replacing(
+              .step3StrengthSection013,
+              values: ["\(UnitDisplay.plainString(estimate.conservative))"]),
             isFullWidth: true
           ) {
             onFill(estimate.conservative)
@@ -164,7 +173,7 @@ struct OneRMEstimatorSheet: View {
           }
         }
       } else {
-        Text("输入重量与次数后显示估算结果")
+        Text(StudentStrings.localized(.step3StrengthSection014))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textMuted)
       }

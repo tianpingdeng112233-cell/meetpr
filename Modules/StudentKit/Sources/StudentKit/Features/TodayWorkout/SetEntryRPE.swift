@@ -9,17 +9,17 @@ enum SetEntryRPE {
   static let cellCount = 11
 
   static let descriptions = [
-    "还能多做 5 次",
-    "还能多做 4-5 次",
-    "还能多做 4 次",
-    "还能多做 3-4 次",
-    "还能多做 3 次",
-    "还能多做 2-3 次",
-    "还能多做 2 次",
-    "还能多做 1-2 次",
-    "还能多做 1 次",
-    "或许还能多做 1 次",
-    "力竭，无保留",
+    StudentStrings.localized(.setEntryRpe001),
+    StudentStrings.localized(.setEntryRpe002),
+    StudentStrings.localized(.setEntryRpe003),
+    StudentStrings.localized(.setEntryRpe004),
+    StudentStrings.localized(.setEntryRpe005),
+    StudentStrings.localized(.setEntryRpe006),
+    StudentStrings.localized(.setEntryRpe007),
+    StudentStrings.localized(.setEntryRpe008),
+    StudentStrings.localized(.setEntryRpe009),
+    StudentStrings.localized(.setEntryRpe010),
+    StudentStrings.localized(.setEntryRpe011),
   ]
 
   static func snap(_ value: Double) -> Double {

@@ -91,7 +91,7 @@ struct WorkoutCelebrationView: View {
             .frame(width: 220, height: 220)
             .frame(width: 110, height: 110)
 
-          Text("今日训练完成")
+          Text(StudentStrings.localized(.workoutCompletionFlowView001))
             .font(.MeetPR.display(size: MeetPRFontMetrics.size26))
             .foregroundStyle(Color.MeetPR.textPrimary)
             .padding(.top, MeetPRSpacing.point22)
@@ -134,7 +134,7 @@ struct WorkoutCelebrationView: View {
 
           VStack(spacing: MeetPRSpacing.point14) {
             GoldCTA(
-              "查看详细报告",
+              StudentStrings.localized(.workoutCompletionFlowView002),
               sub: nil,
               icon: .none,
               showsShimmer: true,
@@ -142,11 +142,11 @@ struct WorkoutCelebrationView: View {
               action: onOpenReview
             )
             .accessibilityRepresentation {
-              Button("查看详细报告", action: onOpenReview)
+              Button(StudentStrings.localized(.workoutCompletionFlowView002), action: onOpenReview)
             }
             .padding(.horizontal, MeetPRSpacing.space6)
 
-            Button("完成", action: onFinish)
+            Button(StudentStrings.localized(.workoutCompletionFlowView003), action: onFinish)
               .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
               .foregroundStyle(Color.MeetPR.textMuted)
               .frame(minWidth: MeetPRSpacing.minimumHitTarget, minHeight: 44)
@@ -194,7 +194,7 @@ private struct CoachReceiptLine: View {
 
   var body: some View {
     HStack(spacing: MeetPRSpacing.space2) {
-      Text("教")
+      Text(StudentStrings.localized(.workoutCompletionFlowView004))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size10, weight: .bold))
         .foregroundStyle(Color.MeetPR.goldText)
         .frame(width: MeetPRSpacing.point22, height: MeetPRSpacing.point22)
@@ -254,10 +254,13 @@ private struct CompletionSetTicker: View {
           .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
           .monospacedDigit()
           .foregroundStyle(Color.MeetPR.goldText)
-        Text("/\(presentation.totalPlannedSets) 组")
-          .font(.MeetPR.display(size: MeetPRFontMetrics.size15))
-          .monospacedDigit()
-          .foregroundStyle(Color.MeetPR.goldMuted)
+        Text(
+          StudentStrings.replacing(
+            .workoutCompletionFlowView005, values: ["\(presentation.totalPlannedSets)"])
+        )
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size15))
+        .monospacedDigit()
+        .foregroundStyle(Color.MeetPR.goldMuted)
       }
       Text(presentation.setCompletionLabel)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
@@ -308,7 +311,8 @@ private struct CompletionTicker: View {
       // rewind or replay the ticker.
       if isOn { startedAt = .distantPast }
     }
-    .accessibilityLabel("\(finalValue) 组成功完成")
+    .accessibilityLabel(
+      StudentStrings.replacing(.workoutCompletionFlowView006, values: ["\(finalValue)"]))
   }
 }
 
@@ -320,7 +324,7 @@ private struct StreakCapsule: View {
       Image(systemName: "flame.fill")
         .font(.system(size: MeetPRFontMetrics.size14))
         .foregroundStyle(Color.MeetPR.gold500)
-      Text("连续第 \(streak) 次训练")
+      Text(StudentStrings.replacing(.workoutCompletionFlowView007, values: ["\(streak)"]))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .bold))
         .foregroundStyle(Color.MeetPR.goldText)
     }

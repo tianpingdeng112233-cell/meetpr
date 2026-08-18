@@ -14,7 +14,7 @@ struct RestTimerSettingsView: View {
 
         if case .custom = preference {
           VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
-            RestTimerSectionTitle("按实际 RPE 设置")
+            RestTimerSectionTitle(StudentStrings.localized(.restTimerSettingsView001))
             VStack(spacing: 0) {
               ForEach(RestTimerBand.allCases) { band in
                 RestTimerDurationRow(
@@ -36,11 +36,11 @@ struct RestTimerSettingsView: View {
         }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
-          RestTimerSectionTitle("自动规则")
+          RestTimerSectionTitle(StudentStrings.localized(.restTimerSettingsView002))
           RestTimerAutomaticRulesCard()
         }
 
-        Text("教练在计划中指定的休息时长始终优先。此设置只改变没有教练设定时的默认行为。")
+        Text(StudentStrings.localized(.restTimerSettingsView003))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textMuted)
           .fixedSize(horizontal: false, vertical: true)
@@ -52,7 +52,7 @@ struct RestTimerSettingsView: View {
     }
     .scrollIndicators(.hidden)
     .background(Color.MeetPR.bgBase)
-    .navigationTitle("组间休息")
+    .navigationTitle(StudentStrings.localized(.restTimerSettingsView004))
     #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
       .toolbarBackground(Color.MeetPR.bgBase, for: .navigationBar)
@@ -140,11 +140,11 @@ private enum RestTimerBand: String, CaseIterable, Identifiable {
   var title: String {
     switch self {
     case .low:
-      "RPE 低于 7"
+      StudentStrings.localized(.restTimerSettingsView005)
     case .mid:
-      "RPE 7 至 9 以下"
+      StudentStrings.localized(.restTimerSettingsView006)
     case .high:
-      "RPE 9 及以上"
+      StudentStrings.localized(.restTimerSettingsView007)
     }
   }
 }
@@ -155,8 +155,8 @@ private struct RestTimerModeCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
-      RestTimerSectionTitle("默认行为")
-      Picker("默认行为", selection: $selection) {
+      RestTimerSectionTitle(StudentStrings.localized(.restTimerSettingsView008))
+      Picker(StudentStrings.localized(.restTimerSettingsView008), selection: $selection) {
         Text(StudentRestTimerCopy.automaticModeTitle)
           .tag(RestTimerPreferenceMode.automatic)
         Text(StudentRestTimerCopy.customModeTitle)
@@ -200,8 +200,16 @@ private struct RestTimerDurationRow: View {
         .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
-      .accessibilityLabel("\(band.title)，\(StudentRestTimerCopy.durationText(selection))")
-      .accessibilityHint(isExpanded ? "收起时长选择器" : "展开时长选择器")
+      .accessibilityLabel(
+        StudentStrings.commaSeparated([
+          band.title,
+          StudentRestTimerCopy.durationText(selection),
+        ])
+      )
+      .accessibilityHint(
+        isExpanded
+          ? StudentStrings.localized(.restTimerSettingsView009)
+          : StudentStrings.localized(.restTimerSettingsView010))
 
       if isExpanded {
         Picker(band.title, selection: $selection) {
@@ -238,11 +246,17 @@ private struct RestTimerDurationRow: View {
 private struct RestTimerAutomaticRulesCard: View {
   var body: some View {
     VStack(spacing: 0) {
-      RestTimerRuleRow(title: "RPE 低于 7", value: "2 分钟")
+      RestTimerRuleRow(
+        title: StudentStrings.localized(.restTimerSettingsView005),
+        value: StudentStrings.localized(.restTimerSettingsView011))
       Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: 1)
-      RestTimerRuleRow(title: "RPE 7 至 9 以下", value: "3 分钟")
+      RestTimerRuleRow(
+        title: StudentStrings.localized(.restTimerSettingsView006),
+        value: StudentStrings.localized(.restTimerSettingsView012))
       Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: 1)
-      RestTimerRuleRow(title: "RPE 9 及以上", value: "4 分钟")
+      RestTimerRuleRow(
+        title: StudentStrings.localized(.restTimerSettingsView007),
+        value: StudentStrings.localized(.restTimerSettingsView013))
     }
     .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.card))

@@ -47,13 +47,16 @@ struct TrainingCalendarView: View {
     let currentWeekNumber = TrainingSequenceLayout.currentWeekNumber(days: days)
     return VStack(alignment: .leading, spacing: 8) {
       HStack {
-        Text("计划汇总")
+        Text(StudentStrings.localized(.trainingCalendarView001))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textSecondary)
         Spacer()
-        Text("已完成 \(completedCount) / \(days.count) 节")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-          .foregroundStyle(Color.MeetPR.textMuted)
+        Text(
+          StudentStrings.replacing(
+            .trainingCalendarView002, values: ["\(completedCount)", "\(days.count)"])
+        )
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+        .foregroundStyle(Color.MeetPR.textMuted)
       }
 
       ForEach(weeks) { week in
@@ -96,10 +99,17 @@ struct TrainingCalendarView: View {
   private func weekMeta(_ week: TrainingSequenceWeek, isCurrentWeek: Bool) -> String {
     if isCurrentWeek {
       let completedCount = week.days.filter { $0.state == .completed }.count
-      return "\(completedCount) / \(week.days.count) 节"
+      return StudentStrings.replacing(
+        .trainingCalendarView003, values: ["\(completedCount)", "\(week.days.count)"])
     }
-    guard let firstDay = week.days.first else { return "0 节" }
-    return "\(week.days.count) 节 · \(TrainingSequenceText.shortDate(firstDay.day.scheduledDate)) 起"
+    guard let firstDay = week.days.first else {
+      return StudentStrings.localized(.trainingCalendarView004)
+    }
+    return StudentStrings.replacing(
+      .trainingCalendarView005,
+      values: [
+        "\(week.days.count)", "\(TrainingSequenceText.shortDate(firstDay.day.scheduledDate))",
+      ])
   }
 
   private func sequenceRow(_ item: TrainingSequenceDay) -> some View {
@@ -207,7 +217,7 @@ private struct TrainingWeekIdentity: View {
         .foregroundStyle(Color.MeetPR.textSecondary)
 
       if isCurrentWeek {
-        Text("本周")
+        Text(StudentStrings.localized(.trainingCalendarView006))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .bold))
           .tracking(0.6)
           .foregroundStyle(Color.MeetPR.goldText)

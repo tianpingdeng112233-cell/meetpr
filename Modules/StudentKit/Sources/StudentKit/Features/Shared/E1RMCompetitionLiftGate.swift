@@ -76,20 +76,23 @@ public struct E1RMCompetitionLiftGate<Content: View>: View {
         content
       case .failed:
         VStack(spacing: MeetPRSpacing.md) {
-          Text("实力记录校准失败")
+          Text(StudentStrings.localized(.e1RmcompetitionLiftGate001))
             .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
             .foregroundStyle(Color.MeetPR.textPrimary)
-          Text("请重试，校准完成前不会使用旧的 e1RM 或 PR 基线。")
+          Text(StudentStrings.localized(.e1RmcompetitionLiftGate002))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
             .foregroundStyle(Color.MeetPR.dangerMuted)
             .multilineTextAlignment(.center)
-          GoldCTA("重试", sub: nil, icon: .none, isFullWidth: false) {
+          GoldCTA(
+            StudentStrings.localized(.e1RmcompetitionLiftGate003), sub: nil, icon: .none,
+            isFullWidth: false
+          ) {
             Task { await viewModel.migrate(studentID: studentID) }
           }
         }
         .padding(MeetPRSpacing.base)
       case .idle, .migrating:
-        ProgressView("正在校准实力记录…")
+        ProgressView(StudentStrings.localized(.e1RmcompetitionLiftGate004))
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)

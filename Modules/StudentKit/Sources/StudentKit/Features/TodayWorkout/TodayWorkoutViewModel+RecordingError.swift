@@ -3,19 +3,22 @@ import Networking
 extension TodayWorkoutViewModel {
   static func recordingErrorMessage(for error: Error) -> String {
     if isAuthExpired(error) {
-      return "登录已过期，请重新登录"
+      return StudentStrings.localized(.todayWorkoutViewModelRecordingError001)
     }
     if BackendErrorEnvelope.machineCode(from: error) == "SETS_PLAN_EXERCISE_NOT_PUBLISHED" {
-      return "训练计划已更新，请刷新训练页后重新记录。你的输入仍保留在本页。"
+      return StudentStrings.localized(.todayWorkoutViewModelRecordingError002)
     }
     if case APIError.httpStatus(let statusCode, _) = error, statusCode >= 500 {
-      return "服务器暂时无法保存（\(statusCode)），请稍后重试。你的输入仍保留在本页。"
+      return StudentStrings.replacing(
+        .todayWorkoutViewModelRecordingError003, values: ["\(statusCode)"])
     }
-    return "记录没有保存，请重试。你的输入仍保留在本页。"
+    return StudentStrings.localized(.todayWorkoutViewModelRecordingError004)
   }
 
   static func loadErrorMessage(for error: Error) -> String {
-    isAuthExpired(error) ? "登录已过期，请重新登录" : "操作失败，请稍后重试"
+    isAuthExpired(error)
+      ? StudentStrings.localized(.todayWorkoutViewModelRecordingError001)
+      : StudentStrings.localized(.todayWorkoutViewModelRecordingError005)
   }
 
   /// Session-state errors and an unrecovered 401 both mean the stored

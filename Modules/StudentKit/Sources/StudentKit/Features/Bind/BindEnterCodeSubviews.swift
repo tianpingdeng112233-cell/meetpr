@@ -6,12 +6,12 @@ import SwiftUI
 struct BindEnterCodeHeader: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
-      Text("输入教练邀请码")
+      Text(StudentStrings.localized(.bindEnterCodeSubviews001))
         .font(Font.MeetPR.display(size: MeetPRFontMetrics.size30, weight: .extraBold))
         .tracking(-0.6)
         .foregroundStyle(Color.MeetPR.textPrimary)
 
-      Text("绑定之后,教练排的计划会直接出现在你的「今日」,你的每组记录也会同步给他。")
+      Text(StudentStrings.localized(.bindEnterCodeSubviews002))
         .font(Font.MeetPR.body(size: MeetPRFontMetrics.size14))
         .lineSpacing(BindEnterCodeMetrics.LineSpacing.body14)
         .foregroundStyle(Color.MeetPR.textSecondary)
@@ -36,8 +36,9 @@ struct BindInstructionsCard: View {
         .foregroundStyle(Color.MeetPR.textTertiary)
 
       Text(
-        "邀请码在教练那边:他打开 MeetPR 教练端 →「我的」→「我的邀请码」,"
-          + "会看到一串 \(InviteCodeFormat.length) 位码。"
+        StudentStrings.localized(.bindEnterCodeSubviews003)
+          + StudentStrings.replacing(
+            .bindEnterCodeSubviews004, values: ["\(InviteCodeFormat.length)"])
       )
       .font(Font.MeetPR.body(size: 12.5))
       .lineSpacing(BindEnterCodeMetrics.LineSpacing.caption125Loose)
@@ -70,7 +71,7 @@ struct BindSubmitCTA: View {
         if isLoading {
           ProgressView().tint(Color.MeetPR.inkOnGold)
         } else {
-          Text("提交绑定申请")
+          Text(StudentStrings.localized(.bindEnterCodeSubviews005))
             .font(Font.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
         }
       }
@@ -98,7 +99,7 @@ struct BindClearCodeButton: View {
   let action: () -> Void
 
   var body: some View {
-    Button("清空重输", action: action)
+    Button(StudentStrings.localized(.bindEnterCodeSubviews006), action: action)
       .font(Font.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
       .foregroundStyle(Color.MeetPR.textSecondary)
       .frame(maxWidth: .infinity)

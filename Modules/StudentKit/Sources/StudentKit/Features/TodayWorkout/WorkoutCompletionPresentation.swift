@@ -12,9 +12,11 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
 
     var statusText: String {
       if failedSetCount > 0 {
-        return "\(completedSetCount) 组 · \(failedSetCount) 失败"
+        return StudentStrings.replacing(
+          .workoutCompletionPresentation001, values: ["\(completedSetCount)", "\(failedSetCount)"])
       }
-      return "\(completedSetCount) 组 全部完成"
+      return StudentStrings.replacing(
+        .workoutCompletionPresentation002, values: ["\(completedSetCount)"])
     }
   }
 
@@ -38,7 +40,9 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
   let exercises: [ExercisePerformance]
 
   var metaText: String {
-    "\(totalReps) 次 · 主项 RPE \(mainRPEText) · \(planComparisonText)"
+    StudentStrings.replacing(
+      .workoutCompletionPresentation003,
+      values: ["\(totalReps)", "\(mainRPEText)", "\(planComparisonText)"])
   }
 
   var hasPersonalRecord: Bool {
@@ -48,7 +52,10 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
   var personalRecordText: String {
     let names = exercises.filter(\.isPersonalRecord).map(\.name)
     guard !names.isEmpty else { return "" }
-    return "\(names.joined(separator: "、")) 追平/刷新最佳纪录"
+    return StudentStrings.replacing(
+      .workoutCompletionPresentation004,
+      values: ["\(StudentStrings.listSeparated(names))"]
+    )
   }
 
   init(
@@ -74,7 +81,9 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     self.completedSuccessfulSets = completed.count - failedCount
     self.totalPlannedSets = drafts.count
     self.setCompletionLabel =
-      failedCount > 0 ? "降重完成 \(failedCount) 组" : "全部完成"
+      failedCount > 0
+      ? StudentStrings.replacing(.workoutCompletionPresentation005, values: ["\(failedCount)"])
+      : StudentStrings.localized(.workoutCompletionPresentation006)
     self.totalReps = completed.reduce(0) { $0 + Self.resolvedReps($1) }
     self.mainRPEText = mainRPE.map(Self.mainRPEText) ?? "—"
     self.planComparisonText = Self.planComparison(actual: mainRPE, planned: plannedRPE)
@@ -85,8 +94,9 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     )
     self.volumeComparisonText =
       previousVolumeChangePercent.map {
-        "较上次 \($0 >= 0 ? "+" : "")\($0)%"
-      } ?? "按计划完成"
+        StudentStrings.replacing(
+          .workoutCompletionPresentation007, values: ["\($0 >= 0 ? "+" : "")", "\($0)"])
+      } ?? StudentStrings.localized(.workoutCompletionPresentation008)
     self.exerciseCount = day.exercises.count
     self.completedSetCount = completed.count
     self.averageRPEText =
@@ -129,7 +139,7 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
 
     return ExercisePerformance(
       id: exercise.id,
-      name: exercise.exercise.name,
+      name: StudentExerciseName.display(exercise.exercise),
       bestSetText: best.map(Self.bestSetText) ?? "—",
       isPersonalRecord: isPersonalRecord,
       completedSetCount: drafts.count,
@@ -160,12 +170,16 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
   }
 
   private static func planComparison(actual: Decimal?, planned: Decimal?) -> String {
-    guard let actual, let planned else { return "暂无 RPE" }
+    guard let actual, let planned else {
+      return StudentStrings.localized(.workoutCompletionPresentation009)
+    }
     let difference = actual - planned
     if abs(NSDecimalNumber(decimal: difference).doubleValue) <= 0.5 {
-      return "符合计划"
+      return StudentStrings.localized(.workoutCompletionPresentation010)
     }
-    return difference > 0 ? "高于计划" : "低于计划"
+    return difference > 0
+      ? StudentStrings.localized(.workoutCompletionPresentation011)
+      : StudentStrings.localized(.workoutCompletionPresentation012)
   }
 
   private static func compactDecimal(_ value: Decimal) -> String {
@@ -205,16 +219,16 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     guard
       let dayToken = weekCode.split(separator: "D").last,
       let day = Int(dayToken)
-    else { return "本周训练" }
-    return "本周第 \(day) 练"
+    else { return StudentStrings.localized(.workoutCompletionPresentation013) }
+    return StudentStrings.replacing(.workoutCompletionPresentation014, values: ["\(day)"])
   }
 
   private static func coachReceiptText(coachName: String?) -> String {
     guard let coachName, !coachName.trimmingCharacters(in: .whitespaces).isEmpty else {
-      return "教练已收到你的训练日志"
+      return StudentStrings.localized(.workoutCompletionPresentation015)
     }
     let trimmed = coachName.trimmingCharacters(in: .whitespaces)
-    return "\(trimmed)已收到你的训练日志"
+    return StudentStrings.replacing(.workoutCompletionPresentation016, values: ["\(trimmed)"])
   }
 
   private static func dateSubtitle(

@@ -76,9 +76,9 @@ private struct DashboardE1RMCard: View {
   private var accessibilityValue: String {
     switch row.trendState {
     case .zero:
-      "未设定"
+      StudentStrings.localized(.dashboardE1Rmrail001)
     case .forming, .mature:
-      "\(latestValue) 千克"
+      StudentStrings.replacing(.dashboardE1Rmrail002, values: ["\(latestValue)"])
     }
   }
 
@@ -94,7 +94,9 @@ private struct DashboardE1RMCard: View {
         Text(row.family.studentDisplayName)
           .foregroundStyle(Color.MeetPR.textSecondary)
           .bold()
-        Text("E1RM · \(DashboardE1RMTrendViewModel.chartWindowDays) 天")
+        Text(
+          StudentStrings.replacing(
+            .dashboardE1Rmrail003, values: ["\(DashboardE1RMTrendViewModel.chartWindowDays)"]))
       }
       .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
       .foregroundStyle(Color.MeetPR.textMuted)
@@ -102,7 +104,7 @@ private struct DashboardE1RMCard: View {
       switch row.trendState {
       case .zero:
         DashboardE1RMValueRow(
-          value: "未设定",
+          value: StudentStrings.localized(.dashboardE1Rmrail001),
           unit: nil,
           trailingText: nil,
           trailingColor: Color.clear
@@ -116,7 +118,7 @@ private struct DashboardE1RMCard: View {
         DashboardE1RMValueRow(
           value: latestValue,
           unit: "kg",
-          trailingText: "首次估算",
+          trailingText: StudentStrings.localized(.dashboardE1Rmrail004),
           trailingColor: Color.MeetPR.textMuted
         )
         GrowthFormingTrendState(
@@ -155,7 +157,10 @@ private struct DashboardE1RMCard: View {
     .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(
-      "\(row.family.studentDisplayName) E1RM，\(accessibilityValue)"
+      StudentStrings.commaSeparated([
+        "\(row.family.studentDisplayName) E1RM",
+        accessibilityValue,
+      ])
     )
   }
 }

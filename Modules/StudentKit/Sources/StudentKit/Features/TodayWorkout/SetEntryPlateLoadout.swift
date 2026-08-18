@@ -21,9 +21,11 @@ enum SetEntryPlateMath {
   static func breakdownLine(total: Double, collarOn: Bool) -> String {
     let base = PlateVisual.breakdownText(plates(total: total, collarOn: collarOn))
     if collarOn {
-      return base.isEmpty ? "仅 2.5kg 赛扣" : base + " + 2.5kg 赛扣"
+      return base.isEmpty
+        ? StudentStrings.localized(.setEntryPlateLoadout001)
+        : base + StudentStrings.localized(.setEntryPlateLoadout002)
     }
-    return base.isEmpty ? "空杠 20kg" : base
+    return base.isEmpty ? StudentStrings.localized(.setEntryPlateLoadout003) : base
   }
 }
 

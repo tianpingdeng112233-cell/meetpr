@@ -56,11 +56,11 @@ enum SetVideoUploadIndicatorStyle: Equatable, Sendable {
   var accessibilityLabel: String {
     switch self {
     case .unattached:
-      "未附视频"
+      StudentStrings.localized(.setVideoUploadIndicator001)
     case .attached:
-      "已附视频"
+      StudentStrings.localized(.setVideoUploadIndicator002)
     case .failed:
-      "视频上传失败"
+      StudentStrings.localized(.setVideoUploadIndicator003)
     }
   }
 }

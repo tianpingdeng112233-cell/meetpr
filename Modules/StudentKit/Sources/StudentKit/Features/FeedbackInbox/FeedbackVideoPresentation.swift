@@ -23,23 +23,41 @@ enum FeedbackVideoPresentation {
   ///
   /// `setIndex` comes from the linked `set_logs.set_index` and remains
   /// zero-based until this display boundary.
-  static func summary(_ video: CoachFeedbackVideo) -> String {
+  static func summary(_ video: CoachFeedbackVideo, locale: Locale = .current) -> String {
     [
-      video.exerciseName,
+      StudentExerciseName.display(video, locale: locale),
       video.setIndex.map {
-        "第\(SetIndexDisplay.number(forZeroBasedIndex: $0))组"
+        StudentStrings.replacing(
+          .feedbackVideoPresentation001,
+          values: ["\(SetIndexDisplay.number(forZeroBasedIndex: $0))"],
+          locale: locale
+        )
       },
-      load(weightKg: video.weightKg, reps: video.reps),
+      load(weightKg: video.weightKg, reps: video.reps, locale: locale),
     ]
     .compactMap { $0 }
     .joined(separator: " · ")
   }
 
-  static func load(weightKg: String?, reps: Int?) -> String? {
+  static func load(
+    weightKg: String?,
+    reps: Int?,
+    locale: Locale = .current
+  ) -> String? {
     switch (weightKg, reps) {
-    case (let loadKg?, let reps?): "\(weight(loadKg))kg×\(reps)次"
+    case (let loadKg?, let reps?):
+      StudentStrings.replacing(
+        .feedbackVideoPresentation002,
+        values: ["\(weight(loadKg))", "\(reps)"],
+        locale: locale
+      )
     case (let loadKg?, nil): "\(weight(loadKg))kg"
-    case (nil, let reps?): "\(reps)次"
+    case (nil, let reps?):
+      StudentStrings.replacing(
+        .feedbackVideoPresentation003,
+        values: ["\(reps)"],
+        locale: locale
+      )
     case (nil, nil): nil
     }
   }

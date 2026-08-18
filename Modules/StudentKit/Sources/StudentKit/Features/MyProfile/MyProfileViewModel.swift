@@ -58,10 +58,10 @@ public final class MyProfileViewModel {
     } catch OnboardingError.oneRMLocked {
       // Structurally unreachable: card patches never carry 1RM fields
       // (spec 032 risk 6) — graceful toast just in case.
-      saveError = "1RM 已锁定,请联系教练修改"
+      saveError = StudentStrings.localized(.myProfileViewModel001)
       return false
     } catch {
-      saveError = "保存失败,请重试"
+      saveError = StudentStrings.localized(.myProfileViewModel002)
       return false
     }
   }

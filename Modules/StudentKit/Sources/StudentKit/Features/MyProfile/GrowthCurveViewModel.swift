@@ -13,10 +13,18 @@ public final class GrowthCurveViewModel {
     case error(String)
   }
 
-  public enum TimeWindow: String, CaseIterable, Sendable {
-    case fourWeeks = "近 4 周"
-    case threeMonths = "近 3 月"
-    case all = "全部"
+  public enum TimeWindow: CaseIterable, Sendable {
+    case fourWeeks
+    case threeMonths
+    case all
+
+    public var displayName: String {
+      switch self {
+      case .fourWeeks: StudentStrings.localized(.growthCurveViewModel001)
+      case .threeMonths: StudentStrings.localized(.growthCurveViewModel002)
+      case .all: StudentStrings.localized(.growthCurveViewModel003)
+      }
+    }
   }
 
   public private(set) var state: State = .idle

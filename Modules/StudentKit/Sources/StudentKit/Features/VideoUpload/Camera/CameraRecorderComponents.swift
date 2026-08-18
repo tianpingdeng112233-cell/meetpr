@@ -53,13 +53,20 @@
           .foregroundStyle(.white)
         if isRecording {
           let remaining = max(0, maximumDuration - recordedDuration)
-          Text("最多 \(RecorderTimeFormatter.string(from: maximumDuration))")
-            .font(.caption)
-            .foregroundStyle(.white.opacity(0.8))
+          Text(
+            StudentStrings.replacing(
+              .cameraRecorderComponents001,
+              values: ["\(RecorderTimeFormatter.string(from: maximumDuration))"])
+          )
+          .font(.caption)
+          .foregroundStyle(.white.opacity(0.8))
           if remaining <= 10 {
-            Text("剩余 \(Int(remaining.rounded(.up))) 秒")
-              .font(.caption.bold())
-              .foregroundStyle(.yellow)
+            Text(
+              StudentStrings.replacing(
+                .cameraRecorderComponents002, values: ["\(Int(remaining.rounded(.up)))"])
+            )
+            .font(.caption.bold())
+            .foregroundStyle(.yellow)
           }
         }
       }
@@ -94,7 +101,10 @@
       }
       .disabled(!isEnabled)
       .opacity(isEnabled ? 1 : 0.65)
-      .accessibilityLabel(isRecording ? "停止录制" : "开始录制")
+      .accessibilityLabel(
+        isRecording
+          ? StudentStrings.localized(.cameraRecorderComponents003)
+          : StudentStrings.localized(.cameraRecorderComponents004))
     }
   }
 
@@ -120,17 +130,21 @@
         }
 
         VStack(spacing: 18) {
-          Text("时长 \(RecorderTimeFormatter.string(from: duration))")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
-            .foregroundStyle(.white.opacity(0.82))
+          Text(
+            StudentStrings.replacing(
+              .cameraRecorderComponents005,
+              values: ["\(RecorderTimeFormatter.string(from: duration))"])
+          )
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+          .foregroundStyle(.white.opacity(0.82))
 
-          Toggle("保存到相册", isOn: $saveToPhotoLibrary)
+          Toggle(StudentStrings.localized(.cameraRecorderComponents006), isOn: $saveToPhotoLibrary)
             .tint(.yellow)
             .foregroundStyle(.white)
 
           if showsTrimSuggestion {
             HStack(spacing: MeetPRSpacing.space1) {
-              Text("剪掉前后等待，上传和查看都更快")
+              Text(StudentStrings.localized(.cameraRecorderComponents007))
                 .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
                 .foregroundStyle(Color.MeetPR.textTertiary)
                 .lineLimit(1)
@@ -138,22 +152,24 @@
 
               Spacer(minLength: MeetPRSpacing.space1)
 
-              Button("不再提醒", action: onNeverSuggestTrim)
-                .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
-                .foregroundStyle(Color.MeetPR.textSecondary)
-                .buttonStyle(.plain)
+              Button(
+                StudentStrings.localized(.cameraRecorderComponents008), action: onNeverSuggestTrim
+              )
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
+              .foregroundStyle(Color.MeetPR.textSecondary)
+              .buttonStyle(.plain)
             }
           }
 
           HStack(spacing: 16) {
-            Button("剪辑", action: onTrim)
+            Button(StudentStrings.localized(.cameraRecorderComponents009), action: onTrim)
               .buttonStyle(.bordered)
               .tint(.white)
               .foregroundStyle(.white)
               .frame(maxWidth: .infinity)
               .disabled(isBusy)
 
-            Button("使用", action: onUse)
+            Button(StudentStrings.localized(.cameraRecorderComponents010), action: onUse)
               .buttonStyle(.borderedProminent)
               .tint(.yellow)
               .foregroundStyle(.black)
@@ -238,7 +254,7 @@
           .background(.black.opacity(0.52))
           .clipShape(.circle)
       }
-      .accessibilityLabel("关闭相机")
+      .accessibilityLabel(StudentStrings.localized(.cameraRecorderComponents011))
     }
   }
 

@@ -76,17 +76,28 @@ enum TrainingSequenceText {
   static func recommendation(_ date: Date) -> String {
     let calendar = PlanCalendarDayIdentity.utcCalendar
     let components = calendar.dateComponents([.month, .day, .weekday], from: date)
-    let weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
+    let weekdays = [
+      StudentStrings.localized(.trainingCalendarLogic001),
+      StudentStrings.localized(.trainingCalendarLogic002),
+      StudentStrings.localized(.trainingCalendarLogic003),
+      StudentStrings.localized(.trainingCalendarLogic004),
+      StudentStrings.localized(.trainingCalendarLogic005),
+      StudentStrings.localized(.trainingCalendarLogic006),
+      StudentStrings.localized(.trainingCalendarLogic007),
+    ]
     let weekdayIndex = (components.weekday ?? 1) - 1
     let weekday = weekdays.indices.contains(weekdayIndex) ? weekdays[weekdayIndex] : ""
-    return "教练推荐 \(components.month ?? 0)/\(components.day ?? 0) \(weekday)"
+    return StudentStrings.replacing(
+      .trainingCalendarLogic008,
+      values: ["\(components.month ?? 0)", "\(components.day ?? 0)", "\(weekday)"])
   }
 
   static func dayName(_ day: StudentPlanDay) -> String {
     let families = MainLiftExerciseFamilyResolver.families(in: day)
-    guard !families.isEmpty else { return "训练日" }
-    if families.count == 3 { return "SBD 日" }
-    return families.map(\.studentDisplayName).joined() + "日"
+    guard !families.isEmpty else { return StudentStrings.localized(.trainingCalendarLogic009) }
+    if families.count == 3 { return StudentStrings.localized(.trainingCalendarLogic010) }
+    return families.map(\.studentDisplayName).joined()
+      + StudentStrings.localized(.trainingCalendarLogic011)
   }
 
   static func weekSummary(_ days: [TrainingSequenceDay]) -> String {
@@ -99,11 +110,14 @@ enum TrainingSequenceText {
   }
 
   static func unlockMessage(after day: StudentPlanDay) -> String {
-    "练完 W\(day.weekNumber) · \(DashboardTodayPresentation.dayName(day)) 后自动轮到这一节。"
+    StudentStrings.replacing(
+      .trainingCalendarLogic012,
+      values: ["\(day.weekNumber)", "\(DashboardTodayPresentation.dayName(day))"])
   }
 
   static func exerciseSummary(_ day: StudentPlanDay) -> String {
     let sets = day.exercises.reduce(0) { $0 + $1.prescribedSets.count }
-    return "\(day.exercises.count) 个动作 · \(sets) 组"
+    return StudentStrings.replacing(
+      .trainingCalendarLogic013, values: ["\(day.exercises.count)", "\(sets)"])
   }
 }

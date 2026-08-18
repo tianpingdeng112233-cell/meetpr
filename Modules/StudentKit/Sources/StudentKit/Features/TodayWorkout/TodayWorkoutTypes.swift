@@ -12,6 +12,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   /// history and PR detection per exercise+variation, not per plan slot.
   public let exerciseID: UUID
   public let exerciseName: String
+  public let exerciseNameEn: String?
   public let isAccessory: Bool
   /// Coach-assigned plan role (`ExerciseType.mainLift`) — gates the e1RM-based
   /// weight suggestion; variations and accessories fill last logged weight
@@ -31,6 +32,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     planExerciseID: UUID,
     exerciseID: UUID,
     exerciseName: String,
+    exerciseNameEn: String? = nil,
     isAccessory: Bool,
     isMainLift: Bool = false,
     prescribed: PrescribedSet,
@@ -46,6 +48,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.planExerciseID = planExerciseID
     self.exerciseID = exerciseID
     self.exerciseName = exerciseName
+    self.exerciseNameEn = exerciseNameEn
     self.isAccessory = isAccessory
     self.isMainLift = isMainLift
     self.prescribed = prescribed
@@ -60,6 +63,16 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
 
   public var allowsPlateLoadingGuidance: Bool {
     !isAccessory
+  }
+
+  public var displayExerciseName: String {
+    guard Locale.current.language.languageCode?.identifier == "en",
+      let exerciseNameEn = exerciseNameEn?.trimmingCharacters(in: .whitespacesAndNewlines),
+      !exerciseNameEn.isEmpty
+    else {
+      return exerciseName
+    }
+    return exerciseNameEn
   }
 
   /// Merges a persisted recordSet result into the draft. `assumed` must come along:
@@ -123,19 +136,19 @@ enum SetWeightSuggestionUnavailableReason: Equatable, Sendable {
   var message: String {
     switch self {
     case .noEligibleE1RMHistory:
-      "还没有可参考的 e1RM 记录"
+      StudentStrings.localized(.todayWorkoutTypes001)
     case .missingPrescribedRPE:
-      "这组处方没有标 RPE"
+      StudentStrings.localized(.todayWorkoutTypes002)
     case .missingPrescribedReps:
-      "这组处方没有标次数"
+      StudentStrings.localized(.todayWorkoutTypes003)
     case .prescribedRepsOutsideSupportedRange:
-      "处方次数需在 1–12 次之间"
+      StudentStrings.localized(.todayWorkoutTypes004)
     case .prescribedRPEBelowSupportedRange:
-      "处方 RPE 低于 5，暂不支持反推"
+      StudentStrings.localized(.todayWorkoutTypes005)
     case .prescribedRPEAboveSupportedRange:
-      "处方 RPE 高于 10，暂不支持反推"
+      StudentStrings.localized(.todayWorkoutTypes006)
     case .noExerciseHistory:
-      "还没有该动作的记录"
+      StudentStrings.localized(.todayWorkoutTypes007)
     }
   }
 }

@@ -109,32 +109,32 @@
     func markExplanationAcknowledged(for studentID: UUID) {}
   }
 
-  #Preview("W2c · 成长有数据 · Dark") {
+  #Preview(StudentStrings.localized(.growthProfileV3Previews001)) {
     GrowthV3Preview(hasData: true)
       .preferredColorScheme(.dark)
   }
 
-  #Preview("W2c · 成长有数据 · Light") {
+  #Preview(StudentStrings.localized(.growthProfileV3Previews002)) {
     GrowthV3Preview(hasData: true)
       .preferredColorScheme(.light)
   }
 
-  #Preview("W2c · 成长空态 · Dark") {
+  #Preview(StudentStrings.localized(.growthProfileV3Previews003)) {
     GrowthV3Preview(hasData: false)
       .preferredColorScheme(.dark)
   }
 
-  #Preview("W2c · 成长空态 · Light") {
+  #Preview(StudentStrings.localized(.growthProfileV3Previews004)) {
     GrowthV3Preview(hasData: false)
       .preferredColorScheme(.light)
   }
 
-  #Preview("W2c · 我的 · Dark") {
+  #Preview(StudentStrings.localized(.growthProfileV3Previews005)) {
     MyProfileV3Preview()
       .preferredColorScheme(.dark)
   }
 
-  #Preview("W2c · 我的 · Light") {
+  #Preview(StudentStrings.localized(.growthProfileV3Previews006)) {
     MyProfileV3Preview()
       .preferredColorScheme(.light)
   }

@@ -13,7 +13,7 @@ struct Step4EnvironmentSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       OnboardingChipGrid(
-        title: "每周哪几天能练?",
+        title: StudentStrings.localized(.step4EnvironmentSection001),
         options: TrainingDay.allCases.map { ($0, OnboardingLabels.label($0)) },
         selection: $draft.trainingDays,
         maxSelection: 6,
@@ -26,37 +26,40 @@ struct Step4EnvironmentSection: View {
       }
     }
     .confirmationDialog(
-      "切换场馆类型?",
+      StudentStrings.localized(.step4EnvironmentSection002),
       isPresented: Binding(
         get: { pendingTier != nil },
         set: { if !$0 { pendingTier = nil } }
       ),
       titleVisibility: .visible
     ) {
-      Button("切换并重置器械清单") {
+      Button(StudentStrings.localized(.step4EnvironmentSection003)) {
         if let tier = pendingTier {
           applyTier(tier)
         }
         pendingTier = nil
       }
-      Button("取消", role: .cancel) { pendingTier = nil }
+      Button(StudentStrings.localized(.step4EnvironmentSection004), role: .cancel) {
+        pendingTier = nil
+      }
     } message: {
-      Text("器械清单将重置为该场馆的预设,手动调整会丢失。")
+      Text(StudentStrings.localized(.step4EnvironmentSection005))
     }
   }
 
   private var daysFooter: String {
     let count = draft.trainingDays.count
     if count < 2 {
-      return "已选 \(count) 天/周 — 至少选 2 天"
+      return StudentStrings.replacing(.step4EnvironmentSection006, values: ["\(count)"])
     }
-    return "已选 \(count) 天/周"
+    return StudentStrings.replacing(.step4EnvironmentSection007, values: ["\(count)"])
   }
 
   private var tierPicker: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       OnboardingFieldLabel(
-        title: "训练场馆", isHighlighted: highlighted.contains("gym_tier"))
+        title: StudentStrings.localized(.step4EnvironmentSection008),
+        isHighlighted: highlighted.contains("gym_tier"))
       VStack(spacing: MeetPRSpacing.sm) {
         ForEach(GymTier.allCases, id: \.self) { tier in
           tierCard(tier)
@@ -106,9 +109,9 @@ struct Step4EnvironmentSection: View {
   /// wiki domain/gym-tier-equipment-research.md §4b).
   private static func tierSubtitle(_ tier: GymTier) -> String {
     switch tier {
-    case .homeWithRack: "家里有深蹲架和杠铃,自己安排训练"
-    case .commercial: "连锁 / 综合健身房 — 有架有杠,力量举专项器械通常没有"
-    case .professional: "力量举专项馆 — 专项杆、微增片、专项机齐全,可做全部变式"
+    case .homeWithRack: StudentStrings.localized(.step4EnvironmentSection009)
+    case .commercial: StudentStrings.localized(.step4EnvironmentSection010)
+    case .professional: StudentStrings.localized(.step4EnvironmentSection011)
     }
   }
 
@@ -117,21 +120,25 @@ struct Step4EnvironmentSection: View {
   private var equipmentSection: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-        OnboardingFieldLabel(title: "器械微调")
-        Text("按场馆预填 — 勾掉没有的、补上有的,不确定就保持默认")
+        OnboardingFieldLabel(title: StudentStrings.localized(.step4EnvironmentSection012))
+        Text(StudentStrings.localized(.step4EnvironmentSection013))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
-      equipmentChipGrid("基础", .basics)
+      equipmentChipGrid(StudentStrings.localized(.step4EnvironmentSection014), .basics)
       OnboardingChoiceCards(
-        title: "哑铃最大重量",
+        title: StudentStrings.localized(.step4EnvironmentSection015),
         options: EquipmentCatalog.items(in: .dumbbellMax).map {
-          ($0.token, $0.label.replacingOccurrences(of: "哑铃 ", with: ""))
+          (
+            $0.token,
+            $0.label.replacingOccurrences(
+              of: StudentStrings.localized(.step4EnvironmentSection016), with: "")
+          )
         },
         selection: dumbbellMaxSelection
       )
-      equipmentChipGrid("固定器械", .machines)
-      equipmentChipGrid("力量举专项", .powerlifting)
+      equipmentChipGrid(StudentStrings.localized(.step4EnvironmentSection017), .machines)
+      equipmentChipGrid(StudentStrings.localized(.step4EnvironmentSection018), .powerlifting)
     }
   }
 

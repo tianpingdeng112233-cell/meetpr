@@ -27,7 +27,7 @@ private struct VideoAttachmentV3PreviewList: View {
 
   private func previewRow(_ state: VideoAttachmentV3State) -> some View {
     HStack(spacing: MeetPRSpacing.space3) {
-      Text("视频")
+      Text(StudentStrings.localized(.videoAttachmentV3Previews001))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
         .foregroundStyle(Color.MeetPR.textPrimary)
       Spacer()

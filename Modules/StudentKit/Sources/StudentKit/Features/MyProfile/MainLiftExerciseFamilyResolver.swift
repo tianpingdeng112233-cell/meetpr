@@ -54,9 +54,9 @@ enum MainLiftExerciseFamilyResolver {
 extension LiftFamily {
   var studentDisplayName: String {
     switch self {
-    case .squat: "深蹲"
-    case .bench: "卧推"
-    case .deadlift: "硬拉"
+    case .squat: StudentStrings.localized(.mainLiftExerciseFamilyResolver001)
+    case .bench: StudentStrings.localized(.mainLiftExerciseFamilyResolver002)
+    case .deadlift: StudentStrings.localized(.mainLiftExerciseFamilyResolver003)
     }
   }
 }

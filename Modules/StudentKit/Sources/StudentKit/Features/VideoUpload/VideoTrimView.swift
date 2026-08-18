@@ -51,7 +51,7 @@
         VideoTrimPlayerSurface(player: player)
           .overlay {
             if !isReady {
-              ProgressView("正在读取视频…")
+              ProgressView(StudentStrings.localized(.videoTrimView001))
                 .tint(.white)
                 .foregroundStyle(.white)
             }
@@ -240,7 +240,7 @@
         }
         .disabled(!canCancel)
         Spacer()
-        Text("编辑视频")
+        Text(StudentStrings.localized(.videoTrimView002))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
@@ -250,7 +250,7 @@
               .tint(Color.MeetPR.gold500)
               .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
           } else {
-            Text("保存")
+            Text(StudentStrings.localized(.videoTrimView003))
               .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
               .frame(
                 minWidth: MeetPRSpacing.minimumHitTarget, minHeight: MeetPRSpacing.minimumHitTarget)
@@ -271,10 +271,15 @@
 
     var body: some View {
       Button(action: action) {
-        Label(isPlaying ? "暂停" : "播放", systemImage: isPlaying ? "pause.fill" : "play.fill")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.gold500)
-          .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point56)
+        Label(
+          isPlaying
+            ? StudentStrings.localized(.videoTrimView004)
+            : StudentStrings.localized(.videoTrimView005),
+          systemImage: isPlaying ? "pause.fill" : "play.fill"
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.gold500)
+        .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point56)
       }
       .buttonStyle(.plain)
       .disabled(!isEnabled)
