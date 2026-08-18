@@ -649,7 +649,7 @@
 			buildSettings = {
 				APP_DISPLAY_NAME = "MeetPR Global";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				BACKEND_BASE_URL = "http://121.40.160.241:3000";
+				BACKEND_BASE_URL = "https://api.meetpr.app";
 				CODE_SIGN_ENTITLEMENTS = MeetPR/MeetPRGlobal.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 28JW4SA779;
