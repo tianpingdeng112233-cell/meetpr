@@ -40,7 +40,7 @@ public struct InitialAvatar: View {
 
 #Preview("InitialAvatar") {
   HStack(spacing: MeetPRSpacing.base) {
-    InitialAvatar("王五")
+    InitialAvatar(DesignSystemStrings.previewInitials)
     InitialAvatar("Chen Lei")
     InitialAvatar("")
   }

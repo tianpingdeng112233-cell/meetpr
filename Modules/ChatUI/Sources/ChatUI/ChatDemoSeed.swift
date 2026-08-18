@@ -41,13 +41,13 @@ public struct ChatDemoSeed: Sendable {
         conversation(
           id: secondConversationID,
           otherPartyID: secondStudentID,
-          otherPartyName: "李嘉宁",
+          otherPartyName: ChatStrings.demoSecondStudent,
           lastMessage: secondMessage
         ),
         conversation(
           id: firstConversationID,
           otherPartyID: firstStudentID,
-          otherPartyName: "王晨曦",
+          otherPartyName: ChatStrings.demoFirstStudent,
           lastMessage: firstMessage
         ),
       ],
@@ -55,7 +55,10 @@ public struct ChatDemoSeed: Sendable {
         firstConversationID: [firstMessage],
         secondConversationID: [secondMessage],
       ],
-      otherPartyNames: [firstStudentID: "王晨曦", secondStudentID: "李嘉宁"]
+      otherPartyNames: [
+        firstStudentID: ChatStrings.demoFirstStudent,
+        secondStudentID: ChatStrings.demoSecondStudent,
+      ]
     )
   }
 
@@ -71,7 +74,7 @@ public struct ChatDemoSeed: Sendable {
       seq: 1,
       senderID: coachUserID,
       kind: .text,
-      text: "明天深蹲加到 140。",
+      text: ChatStrings.demoCoachMessage,
       attachmentID: nil,
       imageURL: nil,
       imageExpiresIn: nil,
@@ -84,7 +87,7 @@ public struct ChatDemoSeed: Sendable {
       seq: 2,
       senderID: studentUserID,
       kind: .text,
-      text: "收到。",
+      text: ChatStrings.demoStudentReply,
       attachmentID: nil,
       imageURL: nil,
       imageExpiresIn: nil,
@@ -96,7 +99,7 @@ public struct ChatDemoSeed: Sendable {
         ChatConversation(
           id: conversationID,
           otherPartyID: coachUserID,
-          otherPartyName: "周教练",
+          otherPartyName: ChatStrings.demoCoach,
           lastMessagePreview: studentMessage.text,
           lastMessageAt: studentCreatedAt,
           unreadCount: 0,
@@ -105,7 +108,7 @@ public struct ChatDemoSeed: Sendable {
         )
       ],
       messagesByConversationID: [conversationID: [coachMessage, studentMessage]],
-      otherPartyNames: [coachUserID: "周教练"]
+      otherPartyNames: [coachUserID: ChatStrings.demoCoach]
     )
   }
 
@@ -119,7 +122,8 @@ public struct ChatDemoSeed: Sendable {
       id: id,
       otherPartyID: otherPartyID,
       otherPartyName: otherPartyName,
-      lastMessagePreview: lastMessage.kind == .image ? "[图片]" : lastMessage.text,
+      lastMessagePreview:
+        lastMessage.kind == .image ? ChatStrings.imageSourceMarker : lastMessage.text,
       lastMessageAt: lastMessage.createdAt,
       unreadCount: 1,
       myLastRead: nil,
@@ -137,7 +141,7 @@ public struct ChatDemoSeed: Sendable {
       seq: 1,
       senderID: senderID,
       kind: .text,
-      text: "教练，今天最后一组完成了。",
+      text: ChatStrings.demoStudentMessage,
       attachmentID: nil,
       imageURL: nil,
       imageExpiresIn: nil,

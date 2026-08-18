@@ -44,8 +44,12 @@ public struct LargeTitleBar: View {
 
 #Preview("LargeTitleBar") {
   VStack(spacing: MeetPRSpacing.space6) {
-    LargeTitleBar(title: "今日")
-    LargeTitleBar(eyebrow: "中周期 · 第 03 / 04 周", title: "SBD 力量块", subtitle: "张教练 · 顶组 + 减载")
+    LargeTitleBar(title: DesignSystemStrings.todayTitle)
+    LargeTitleBar(
+      eyebrow: DesignSystemStrings.mesocycleWeek,
+      title: DesignSystemStrings.strengthBlock,
+      subtitle: DesignSystemStrings.coachTopSetBackOff
+    )
   }
   .background(Color.MeetPR.bgBase)
   .preferredColorScheme(.dark)

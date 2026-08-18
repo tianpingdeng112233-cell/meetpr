@@ -1,0 +1,11 @@
+{
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "coreModels.setReference.loggedTag": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"[Training share]"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"[训练分享]"}}}},
+    "coreModels.setReference.plannedMarker": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":" planned"}},"zh-Hans":{"stringUnit":{"state":"translated","value":" 计划"}}}},
+    "coreModels.setReference.plannedTag": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"[Training plan]"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"[训练计划]"}}}},
+    "coreModels.setReference.set %@": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Set %@"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"第%@组"}}}},
+    "coreModels.setReference.set %@ of %@": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Set %@ of %@"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"第%@组/%@"}}}}
+  },
+  "version": "1.0"
+}

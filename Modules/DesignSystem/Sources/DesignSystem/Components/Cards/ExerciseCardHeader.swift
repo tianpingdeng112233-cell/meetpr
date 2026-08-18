@@ -72,6 +72,8 @@ struct ExerciseCardHeader: View {
     }
     .buttonStyle(.plain)
     .accessibilityLabel("\(exercise)，\(open ? progressText : summaryText)")
-    .accessibilityValue(open ? "已展开" : "已收起")
+    .accessibilityValue(
+      open ? DesignSystemStrings.expanded : DesignSystemStrings.collapsed
+    )
   }
 }

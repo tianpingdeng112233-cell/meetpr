@@ -32,8 +32,8 @@ public struct CapacityIntensityChart: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
       Chart(points) { point in
         BarMark(
-          x: .value("日期", point.date, unit: .day),
-          y: .value("训练容量", point.volumeKilograms)
+          x: .value(DesignSystemStrings.date, point.date, unit: .day),
+          y: .value(DesignSystemStrings.trainingVolume, point.volumeKilograms)
         )
         .foregroundStyle(
           LinearGradient(
@@ -48,24 +48,24 @@ public struct CapacityIntensityChart: View {
         .cornerRadius(MeetPRRadius.point2)
 
         LineMark(
-          x: .value("日期", point.date, unit: .day),
-          y: .value("平均 RPE", normalizedRPE(point.averageRPE))
+          x: .value(DesignSystemStrings.date, point.date, unit: .day),
+          y: .value(DesignSystemStrings.averageRPE, normalizedRPE(point.averageRPE))
         )
         .foregroundStyle(Color.MeetPR.bgBase)
         .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
         .interpolationMethod(.monotone)
 
         LineMark(
-          x: .value("日期", point.date, unit: .day),
-          y: .value("平均 RPE", normalizedRPE(point.averageRPE))
+          x: .value(DesignSystemStrings.date, point.date, unit: .day),
+          y: .value(DesignSystemStrings.averageRPE, normalizedRPE(point.averageRPE))
         )
         .foregroundStyle(Color.MeetPR.chartLine)
         .lineStyle(StrokeStyle(lineWidth: 1.2, lineCap: .round, lineJoin: .round))
         .interpolationMethod(.monotone)
 
         PointMark(
-          x: .value("日期", point.date, unit: .day),
-          y: .value("平均 RPE", normalizedRPE(point.averageRPE))
+          x: .value(DesignSystemStrings.date, point.date, unit: .day),
+          y: .value(DesignSystemStrings.averageRPE, normalizedRPE(point.averageRPE))
         )
         .foregroundStyle(Color.MeetPR.chartLine)
         .symbolSize(22)
@@ -96,8 +96,12 @@ public struct CapacityIntensityChart: View {
       .frame(height: 172)
 
       HStack(spacing: MeetPRSpacing.base) {
-        legend(title: "训练容量 kg", color: Color.MeetPR.gold500, isCircle: false)
-        legend(title: "平均 RPE", color: Color.MeetPR.chartLine, isCircle: true)
+        legend(
+          title: DesignSystemStrings.trainingVolumeKilograms,
+          color: Color.MeetPR.gold500,
+          isCircle: false
+        )
+        legend(title: DesignSystemStrings.averageRPE, color: Color.MeetPR.chartLine, isCircle: true)
       }
     }
     .padding(.horizontal, MeetPRSpacing.point14)

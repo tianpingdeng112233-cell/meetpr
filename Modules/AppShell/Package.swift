@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "AppShell",
+  defaultLocalization: "zh-Hans",
   platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
     .library(name: "AppShell", targets: ["AppShell"])
@@ -31,6 +32,7 @@ let package = Package(
         .product(name: "Analytics", package: "Analytics"),
         .product(name: "ChatUI", package: "ChatUI"),
       ],
+      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(

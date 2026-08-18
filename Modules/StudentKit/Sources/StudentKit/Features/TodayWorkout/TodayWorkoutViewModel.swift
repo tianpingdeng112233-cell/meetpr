@@ -55,6 +55,7 @@ public final class TodayWorkoutViewModel {
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let restTimerActivityController: any RestTimerActivityControlling
+  private let calendar: Calendar
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
@@ -81,7 +82,7 @@ public final class TodayWorkoutViewModel {
     self.onboarding = onboarding
     self.restTimerSettings = restTimerSettings
     self.restTimerActivityController = restTimerActivityController
-    _ = calendar
+    self.calendar = calendar
     self.now = now
   }
 
@@ -130,13 +131,11 @@ public final class TodayWorkoutViewModel {
       PlanCalendarDayIdentity.matches(
         planDate: $0.scheduledDate,
         selectedDate: date,
-        selectedCalendar: calendarForCompatibility
+        selectedCalendar: calendar
       )
     }?.id
     await load(dayID: dayID, studentID: studentID, preloadedPlan: plan)
   }
-
-  private var calendarForCompatibility: Calendar { .current }
 
   func reconcileCoachRPE(
     using reconciler: E1RMCoachRPEReconciler,

@@ -80,10 +80,6 @@ struct OnboardingWizardView: View {
   var body: some View {
     NavigationStack {
       content
-        // Wheel DatePickers (step 1 birthday, step 7 competition date) only
-        // honor a locale inherited from an ancestor — setting it on the
-        // picker itself leaves the wheel in the device language (iOS 26).
-        .environment(\.locale, Locale(identifier: "zh_CN"))
         .background(Color.MeetPR.bgBase)
         .navigationTitle("Step \(viewModel.step) of \(OnboardingDraft.stepCount)")
         #if os(iOS)

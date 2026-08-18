@@ -17,7 +17,7 @@ public struct EvaluationSummaryView: View {
   public var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        Text("更新于 \(StudentFormatting.dayMonthFormatter.string(from: summary.lastUpdatedAt))")
+        Text("更新于 \(StudentFormatting.dayMonth(summary.lastUpdatedAt))")
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgTertiary)
 

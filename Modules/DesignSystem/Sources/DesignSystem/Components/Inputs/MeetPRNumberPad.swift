@@ -65,7 +65,7 @@ public struct MeetPRNumberPad: View {
 
       HStack(spacing: MeetPRSpacing.space2) {
         Button(action: cancel) {
-          Text("取消")
+          Text(DesignSystemStrings.cancel)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
             .foregroundStyle(Color.MeetPR.textSecondary)
             .frame(maxWidth: .infinity)
@@ -78,7 +78,7 @@ public struct MeetPRNumberPad: View {
         .buttonStyle(PressScaleButtonStyle())
 
         Button(action: commit) {
-          Text("确定")
+          Text(DesignSystemStrings.confirm)
             .font(.MeetPR.display(size: MeetPRFontMetrics.size15, weight: .extraBold))
             .foregroundStyle(Color.MeetPR.ctaText)
             .frame(maxWidth: .infinity)
@@ -122,7 +122,7 @@ public struct MeetPRNumberPad: View {
   private var header: some View {
     // dc: `padding:2px 4px 12px`; the unit hangs off the value at exactly 5pt.
     HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.zero) {
-      Text(field == .reps ? "输入次数" : "输入重量")
+      Text(field == .reps ? DesignSystemStrings.enterReps : DesignSystemStrings.enterWeight)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
         .tracking(0.72)
         .foregroundStyle(Color.MeetPR.textMuted)
@@ -135,10 +135,12 @@ public struct MeetPRNumberPad: View {
         .multilineTextAlignment(.trailing)
         .frame(minWidth: 80)
         .fixedSize(horizontal: true, vertical: false)
-        .accessibilityLabel(field == .weight ? "重量" : "次数")
+        .accessibilityLabel(
+          field == .weight ? DesignSystemStrings.weight : DesignSystemStrings.reps
+        )
         .accessibilityValue(text.isEmpty ? initialValueText : text)
 
-      Text(field == .reps ? "次" : "KG")
+      Text(field == .reps ? DesignSystemStrings.repsUnit : "KG")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size13, weight: .bold))
         .foregroundStyle(Color.MeetPR.textMuted)
         .padding(.leading, MeetPRSpacing.point5)
@@ -163,7 +165,7 @@ public struct MeetPRNumberPad: View {
     .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled))
     .disabled(isDisabled)
     .opacity(isDisabled ? 0.25 : 1)
-    .accessibilityLabel(character == "." ? "小数点" : character)
+    .accessibilityLabel(character == "." ? DesignSystemStrings.decimalPoint : character)
   }
 
   private var deleteButton: some View {
@@ -181,7 +183,7 @@ public struct MeetPRNumberPad: View {
         .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
     .buttonStyle(PressScaleButtonStyle())
-    .accessibilityLabel("退格")
+    .accessibilityLabel(DesignSystemStrings.backspace)
   }
 
   private func append(_ character: String) {

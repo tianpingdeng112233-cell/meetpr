@@ -226,7 +226,7 @@ public struct EvaluationPeriodView: View {
   }
 
   private func daySummary(_ day: StudentPlanDay) -> String {
-    let weekday = StudentFormatting.weekdayFormatter.string(from: day.date)
+    let weekday = StudentFormatting.weekday(day.date)
     let names = day.exercises.prefix(3).map(\.exercise.name).joined(separator: "·")
     return "\(weekday): \(names)"
   }

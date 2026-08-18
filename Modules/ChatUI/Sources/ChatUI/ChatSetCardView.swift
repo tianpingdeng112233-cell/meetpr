@@ -136,9 +136,9 @@ private struct ChatSetCardTitle: View {
 
   private var setPosition: String {
     if let total = presentation.setTotal {
-      return "第 \(presentation.setNumber) 组 / \(total)"
+      return ChatStrings.setPosition(presentation.setNumber, total: total)
     }
-    return "第 \(presentation.setNumber) 组"
+    return ChatStrings.setPosition(presentation.setNumber)
   }
 }
 

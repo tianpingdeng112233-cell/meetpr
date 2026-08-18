@@ -172,15 +172,15 @@ private struct FrictionFeedbackSheet: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
-      Text("卡住了?一句话告诉我们")
+      Text(AnalyticsStrings.frictionTitle)
         .font(.headline)
-      TextField("哪里让你不顺手?", text: $text, axis: .vertical)
+      TextField(AnalyticsStrings.frictionPlaceholder, text: $text, axis: .vertical)
         .lineLimit(1...3)
         .textFieldStyle(.roundedBorder)
       HStack {
-        Button("跳过") { controller.skip() }
+        Button(AnalyticsStrings.skip) { controller.skip() }
         Spacer()
-        Button("发送") { controller.send(text: text) }
+        Button(AnalyticsStrings.send) { controller.send(text: text) }
           .buttonStyle(.borderedProminent)
           .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
       }

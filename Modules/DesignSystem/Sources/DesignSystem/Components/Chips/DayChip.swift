@@ -168,23 +168,37 @@ public struct MeetPRDayChip: View {
   private var accessibilityText: String {
     let stateText =
       switch state {
-      case .done: "已完成"
-      case .missed: "有计划，未完成"
-      case .rest: "休息日"
-      case .today: "今天"
-      case .future: "未来"
+      case .done: DesignSystemStrings.completed
+      case .missed: DesignSystemStrings.plannedButIncomplete
+      case .rest: DesignSystemStrings.restDay
+      case .today: DesignSystemStrings.today
+      case .future: DesignSystemStrings.future
       }
-    return "\(weekday)\(date)日，\(stateText)"
+    return DesignSystemStrings.dayAccessibilityLabel(
+      weekday: weekday,
+      date: date,
+      state: stateText
+    )
   }
 }
 
 #Preview("DayChip · All States · Dark") {
   HStack(spacing: MeetPRSpacing.space2) {
-    MeetPRDayChip(weekday: "一", date: 20, state: .done, isSelected: false) {}
-    MeetPRDayChip(weekday: "二", date: 21, state: .missed, isSelected: false) {}
-    MeetPRDayChip(weekday: "三", date: 22, state: .rest, isSelected: false) {}
-    MeetPRDayChip(weekday: "四", date: 23, state: .today, isSelected: true) {}
-    MeetPRDayChip(weekday: "五", date: 24, state: .future, isSelected: false) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayMonday, date: 20, state: .done, isSelected: false
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayTuesday, date: 21, state: .missed, isSelected: false
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayWednesday, date: 22, state: .rest, isSelected: false
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayThursday, date: 23, state: .today, isSelected: true
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayFriday, date: 24, state: .future, isSelected: false
+    ) {}
   }
   .padding()
   .background(Color.MeetPR.bgInset)
@@ -193,11 +207,21 @@ public struct MeetPRDayChip: View {
 
 #Preview("DayChip · All States · Light") {
   HStack(spacing: MeetPRSpacing.space2) {
-    MeetPRDayChip(weekday: "一", date: 20, state: .done, isSelected: false) {}
-    MeetPRDayChip(weekday: "二", date: 21, state: .missed, isSelected: false) {}
-    MeetPRDayChip(weekday: "三", date: 22, state: .rest, isSelected: false) {}
-    MeetPRDayChip(weekday: "四", date: 23, state: .today, isSelected: true) {}
-    MeetPRDayChip(weekday: "五", date: 24, state: .future, isSelected: false) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayMonday, date: 20, state: .done, isSelected: false
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayTuesday, date: 21, state: .missed, isSelected: false
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayWednesday, date: 22, state: .rest, isSelected: false
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayThursday, date: 23, state: .today, isSelected: true
+    ) {}
+    MeetPRDayChip(
+      weekday: DesignSystemStrings.weekdayFriday, date: 24, state: .future, isSelected: false
+    ) {}
   }
   .padding()
   .background(Color.MeetPR.bgBase)

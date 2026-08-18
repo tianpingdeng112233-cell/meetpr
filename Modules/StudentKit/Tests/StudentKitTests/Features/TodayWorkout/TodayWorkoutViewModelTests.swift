@@ -7,6 +7,96 @@ import Testing
 
 @testable import StudentKit
 
+struct TodayWorkoutLocalDayCase: Sendable, CustomTestStringConvertible {
+  let identifier: String
+  let year: Int
+  let month: Int
+  let day: Int
+  let context: String
+
+  var testDescription: String { "\(identifier)-\(context)" }
+}
+
+private let todayWorkoutLocalDayCases = [
+  TodayWorkoutLocalDayCase(
+    identifier: "Asia/Shanghai", year: 2030, month: 8, day: 18, context: "all-hours"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 1, day: 15, context: "GMT"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 7, day: 15, context: "BST"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 3, day: 31, context: "DST-start"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 10, day: 27, context: "DST-end"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 1, day: 15, context: "standard"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 7, day: 15, context: "daylight"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 3, day: 10, context: "DST-start"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 11, day: 3, context: "DST-end"),
+]
+
+@MainActor
+@Test(arguments: todayWorkoutLocalDayCases)
+func todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(
+  localDayCase: TodayWorkoutLocalDayCase
+) async throws {
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(identifier: localDayCase.identifier))
+
+  let localDayStart = try #require(
+    calendar.date(
+      from: DateComponents(
+        year: localDayCase.year,
+        month: localDayCase.month,
+        day: localDayCase.day
+      )
+    )
+  )
+  let nextLocalDayStart = try #require(
+    calendar.date(byAdding: .day, value: 1, to: localDayStart)
+  )
+  let plan = StudentDemoSeed.makePlanView(
+    today: localDayStart,
+    todayOffset: 0,
+    selectedCalendar: calendar
+  )
+  let expectedDay = try #require(plan.days.first)
+  var samples = stride(
+    from: localDayStart,
+    to: nextLocalDayStart,
+    by: 3_600
+  ).map { $0 }
+  samples.append(nextLocalDayStart.addingTimeInterval(-1))
+
+  for selectedDate in samples {
+    let viewModel = TodayWorkoutViewModel(
+      plans: InMemoryStudentPlanRepository(
+        store: TestStudentPlanStore(seed: [StudentDemoSeed.studentID: plan])
+      ),
+      logs: InMemoryStudentTrainingLogRepository(),
+      calendar: calendar
+    )
+
+    await viewModel.load(
+      date: selectedDate,
+      studentID: StudentDemoSeed.studentID,
+      preloadedPlan: plan
+    )
+
+    guard case .loaded(let day, _) = viewModel.state else {
+      var style = Date.FormatStyle.dateTime.year().month().day().hour().minute().second()
+      style.timeZone = calendar.timeZone
+      let localTime = selectedDate.formatted(style)
+      Issue.record("Expected plan day in \(localDayCase.identifier) at \(localTime)")
+      continue
+    }
+    #expect(day.id == expectedDay.id)
+  }
+}
+
 @MainActor
 @Test func studentSessionSummaryAggregatesCompletedSetsOnly() {
   let prescribed = PrescribedSet(

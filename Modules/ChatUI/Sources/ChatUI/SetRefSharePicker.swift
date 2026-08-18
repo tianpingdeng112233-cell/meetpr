@@ -250,7 +250,7 @@ private struct SetRefCandidateRow: View {
     guard let setRef = try? SetRefV1.normalizingSource(candidate.source) else {
       return ChatStrings.invalidSetRecord
     }
-    return SetRefCanonicalFormatter.firstLine(for: setRef)
+    return ChatSetRefDisplayFormatter.firstLine(for: setRef)
   }
 }
 
@@ -323,7 +323,7 @@ private struct SetRefConfirmationCard: View {
     guard let setRef = try? SetRefV1.normalizingSource(candidate.source) else {
       return ChatStrings.invalidSetRecord
     }
-    return SetRefCanonicalFormatter.firstLine(for: setRef)
+    return ChatSetRefDisplayFormatter.firstLine(for: setRef)
   }
 
   private func videoStatus(_ state: SetRefShareVideo.State) -> String {

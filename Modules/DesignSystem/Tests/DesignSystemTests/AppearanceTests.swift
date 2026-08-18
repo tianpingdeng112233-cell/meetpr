@@ -25,9 +25,24 @@ import Testing
     #expect(MeetPRAppearance.defaultPreference.colorScheme == .light)
   }
 
-  @Test func labelsAreStable() {
-    #expect(MeetPRAppearance.system.label == "跟随系统")
-    #expect(MeetPRAppearance.light.label == "浅色")
-    #expect(MeetPRAppearance.dark.label == "深色")
+  @Test func labelsAreStable() throws {
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        MeetPRAppearance.system.label,
+        key: "designSystem.appearance.system"
+      ) == "跟随系统"
+    )
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        MeetPRAppearance.light.label,
+        key: "designSystem.appearance.light"
+      ) == "浅色"
+    )
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        MeetPRAppearance.dark.label,
+        key: "designSystem.appearance.dark"
+      ) == "深色"
+    )
   }
 }

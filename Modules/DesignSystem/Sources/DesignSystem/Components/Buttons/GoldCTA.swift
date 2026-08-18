@@ -29,10 +29,9 @@ public struct GoldCTA: View {
   @Environment(\.colorScheme) private var colorScheme
   @State private var isHeld = false
   @State private var feedbackTrigger = false
-
   public init(
-    _ label: String = "开始训练",
-    sub: String? = "蹲·推·拉",
+    _ label: String = DesignSystemStrings.startTraining,
+    sub: String? = DesignSystemStrings.squatBenchDeadlift,
     variant: Variant = .primary,
     icon: Icon = .play,
     showsShimmer: Bool = false,
@@ -117,7 +116,9 @@ public struct GoldCTA: View {
     .disabled(isDisabled || isLoading)
     .sensoryFeedback(.impact(weight: .light), trigger: feedbackTrigger)
     .accessibilityLabel(label)
-    .accessibilityHint(isLoading ? "操作进行中" : "执行此操作")
+    .accessibilityHint(
+      isLoading ? DesignSystemStrings.actionInProgress : DesignSystemStrings.performAction
+    )
   }
 
   private var labelContent: some View {
@@ -377,9 +378,9 @@ private struct GoldCTAButtonStyle: ButtonStyle {
 #Preview("GoldCTA · All Variants · Dark") {
   VStack(spacing: MeetPRSpacing.point10) {
     GoldCTA {}
-    GoldCTA("顺延一天", variant: .link) {}
-    GoldCTA("取消", sub: nil, variant: .secondary, icon: .none) {}
-    GoldCTA("退出登录", sub: nil, variant: .danger, icon: .logout) {}
+    GoldCTA(DesignSystemStrings.shiftOneDay, variant: .link) {}
+    GoldCTA(DesignSystemStrings.cancel, sub: nil, variant: .secondary, icon: .none) {}
+    GoldCTA(DesignSystemStrings.signOut, sub: nil, variant: .danger, icon: .logout) {}
   }
   .padding()
   .background(Color.MeetPR.bgInset)
@@ -389,9 +390,9 @@ private struct GoldCTAButtonStyle: ButtonStyle {
 #Preview("GoldCTA · All Variants · Light") {
   VStack(spacing: MeetPRSpacing.point10) {
     GoldCTA(showsShimmer: true) {}
-    GoldCTA("顺延一天", variant: .link) {}
-    GoldCTA("取消", sub: nil, variant: .secondary, icon: .none) {}
-    GoldCTA("退出登录", sub: nil, variant: .danger, icon: .logout) {}
+    GoldCTA(DesignSystemStrings.shiftOneDay, variant: .link) {}
+    GoldCTA(DesignSystemStrings.cancel, sub: nil, variant: .secondary, icon: .none) {}
+    GoldCTA(DesignSystemStrings.signOut, sub: nil, variant: .danger, icon: .logout) {}
   }
   .padding()
   .background(Color.MeetPR.bgBase)

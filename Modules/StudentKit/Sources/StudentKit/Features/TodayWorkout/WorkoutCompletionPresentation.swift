@@ -59,7 +59,7 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     coachName: String?,
     streak: Int? = nil,
     previousVolumeChangePercent: Int? = nil,
-    locale: Locale = Locale(identifier: "zh_CN")
+    locale: Locale = .current
   ) {
     let completed = drafts.filter(\.completed)
     let failedCount = completed.filter(\.failed).count
@@ -222,12 +222,8 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     weekCode: String,
     locale: Locale
   ) -> String {
-    let day = date.formatted(
-      .dateTime.month(.defaultDigits).day().locale(locale)
-    )
-    let weekday = date.formatted(
-      .dateTime.weekday(.wide).locale(locale)
-    )
+    let day = StudentFormatting.numericMonthDay(date, locale: locale)
+    let weekday = StudentFormatting.weekday(date, locale: locale)
     return "\(day) · \(weekday) · \(weekCode)"
   }
 }

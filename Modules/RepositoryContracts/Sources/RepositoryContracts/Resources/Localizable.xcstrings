@@ -1,0 +1,11 @@
+{
+  "sourceLanguage": "zh-Hans",
+  "strings": {
+    "repository.planDay.notActive": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This plan is no longer current"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"这份计划已不是当前计划"}}}},
+    "repository.planDay.notPlanStudent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This day's completion status cannot be changed"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"无法修改这一天的完成状态"}}}},
+    "repository.planDay.onlyLatestCanBeUndone": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Only the most recently completed day can be undone"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"只能撤销最近完成的一天"}}}},
+    "repository.planDay.undoTodayOnly": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Completion can only be undone on the same day"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"只能在当天撤销"}}}},
+    "repository.planDay.unavailable": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This action is temporarily unavailable. Try again later."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"暂时无法完成操作，请稍后重试。"}}}}
+  },
+  "version": "1.0"
+}

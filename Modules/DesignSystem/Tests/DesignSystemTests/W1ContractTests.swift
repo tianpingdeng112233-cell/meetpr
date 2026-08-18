@@ -7,10 +7,20 @@ import Testing
 @MainActor
 struct W1ContractTests {
   @Test("Product/presentation defaults are mapped without data defaults")
-  func productDefaults() {
+  func productDefaults() throws {
     let cta = GoldCTA {}
-    #expect(cta.label == "开始训练")
-    #expect(cta.sub == "蹲·推·拉")
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        cta.label,
+        key: "designSystem.action.startTraining"
+      ) == "开始训练"
+    )
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        cta.sub ?? "",
+        key: "designSystem.action.squatBenchDeadlift"
+      ) == "蹲·推·拉"
+    )
     #expect(cta.variant == .primary)
     #expect(cta.icon == .play)
 
@@ -76,7 +86,7 @@ struct W1ContractTests {
   }
 
   @Test("ExerciseCard summary includes failed-set suffix")
-  func exerciseCardSummary() {
+  func exerciseCardSummary() throws {
     let complete = [
       ExerciseSetRecord(
         index: 1,
@@ -97,13 +107,16 @@ struct W1ContractTests {
     ]
 
     #expect(
-      ExerciseCard.summaryText(for: complete)
-        == "2 组 · 175kg×3 @8.5 · 1 组未完成"
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        ExerciseCard.summaryText(for: complete),
+        key: "designSystem.exercise.summary %@ %@ %@",
+        arguments: ["2", "175kg×3 @8.5", " · 1 组未完成"]
+      ) == "2 组 · 175kg×3 @8.5 · 1 组未完成"
     )
   }
 
   @Test("ExerciseCard partial recorded sets still produce a receipt")
-  func exerciseCardPartialSummary() {
+  func exerciseCardPartialSummary() throws {
     let partial = [
       ExerciseSetRecord(
         index: 1,
@@ -123,7 +136,13 @@ struct W1ContractTests {
       ),
     ]
 
-    #expect(ExerciseCard.summaryText(for: partial) == "1 组 · 175kg×3 @8.5")
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        ExerciseCard.summaryText(for: partial),
+        key: "designSystem.exercise.summaryOne %@ %@ %@",
+        arguments: ["1", "175kg×3 @8.5", ""]
+      ) == "1 组 · 175kg×3 @8.5"
+    )
 
     // Mockup `exSummary`: zero logged sets → empty string, never a 0/N counter.
     let untouched = [
@@ -137,6 +156,31 @@ struct W1ContractTests {
       )
     ]
     #expect(ExerciseCard.summaryText(for: untouched).isEmpty)
+  }
+
+  @Test("English count-sensitive copy has singular variants")
+  func englishSingularCopy() throws {
+    #expect(
+      try LocalizationCatalogTestSupport.value(
+        "designSystem.exercise.summaryOne %@ %@ %@",
+        locale: "en",
+        arguments: ["1", "100kg×5 @8", ""]
+      ) == "1 set · 100kg×5 @8"
+    )
+    #expect(
+      try LocalizationCatalogTestSupport.value(
+        "designSystem.exercise.incompleteSet %@",
+        locale: "en",
+        arguments: ["1"]
+      ) == " · 1 incomplete set"
+    )
+    #expect(
+      try LocalizationCatalogTestSupport.value(
+        "designSystem.e1rm.chartLabelOne %@",
+        locale: "en",
+        arguments: ["1"]
+      ) == "e1RM progress chart with 1 main data point"
+    )
   }
 
   @Test("Frozen W0 entries retain legacy parameters")

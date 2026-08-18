@@ -25,5 +25,9 @@ import Testing
   )
   #expect(messages.map(\.seq) == [1, 2])
   #expect(messages.map(\.senderID) == [StudentDemoSeed.coachID, user.id])
-  #expect(messages.map(\.text) == ["明天深蹲加到 140。", "收到。"])
+  let baseConversation = try #require(ChatDemoSeed.student().conversations.first)
+  let baseMessages = try #require(
+    ChatDemoSeed.student().messagesByConversationID[baseConversation.id]
+  )
+  #expect(messages.map(\.text) == baseMessages.map(\.text))
 }
