@@ -2,66 +2,58 @@ import CoreModels
 import Foundation
 
 enum CoachStudentFormatting {
-  static func statusText(_ status: CoachStudentStatus) -> String {
+  static func statusText(_ status: CoachStudentStatus, locale: Locale = .current) -> String {
     switch status {
     case .active:
-      return "活跃"
+      return CoachSharedStrings.active(locale: locale)
     case .inEvaluation(let remainingDays, let remainingHours):
       if remainingDays > 0 {
-        return "评估期 \(remainingDays) 天"
+        return CoachSharedStrings.evaluationDays(remainingDays, locale: locale)
       }
-      return "评估期 \(remainingHours) 小时"
+      return CoachSharedStrings.evaluationHours(remainingHours, locale: locale)
     case .abnormal(let reason):
-      return abnormalText(reason)
+      return abnormalText(reason, locale: locale)
     }
   }
 
-  static func abnormalText(_ reason: AbnormalReason) -> String {
+  static func abnormalText(_ reason: AbnormalReason, locale: Locale = .current) -> String {
     switch reason {
     case .noTrainingForDays(let days):
-      return "\(days) 天未训练"
+      return CoachSharedStrings.daysNotTrained(days, locale: locale)
     case .stuckOnWeek(let week):
-      return "W\(week) 停滞"
+      return CoachSharedStrings.stuckOnWeek(week, locale: locale)
     }
   }
 
   static func weekdayText(_ date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "zh_Hans_CN")
-    formatter.setLocalizedDateFormatFromTemplate("EEE")
-    return formatter.string(from: date)
+    date.formatted(.dateTime.weekday(.abbreviated))
   }
 
   static func shortDateText(_ date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "zh_Hans_CN")
-    formatter.setLocalizedDateFormatFromTemplate("M/d")
-    return formatter.string(from: date)
+    date.formatted(.dateTime.month(.defaultDigits).day())
   }
 
   static func fullDateText(_ date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "zh_Hans_CN")
-    formatter.setLocalizedDateFormatFromTemplate("yyyy/M/d")
-    return formatter.string(from: date)
+    date.formatted(.dateTime.year().month(.defaultDigits).day())
   }
 
-  static func relativeText(_ date: Date, now: Date = Date()) -> String {
+  static func relativeText(
+    _ date: Date,
+    now: Date = Date(),
+    locale: Locale = .current
+  ) -> String {
     let seconds = max(0, Int(now.timeIntervalSince(date)))
     if seconds < 3_600 {
-      return "\(max(1, seconds / 60)) 分钟前"
+      return CoachSharedStrings.minutesAgo(max(1, seconds / 60), locale: locale)
     }
     if seconds < 86_400 {
-      return "\(seconds / 3_600) 小时前"
+      return CoachSharedStrings.hoursAgo(seconds / 3_600, locale: locale)
     }
-    return "\(seconds / 86_400) 天前"
+    return CoachSharedStrings.daysAgo(seconds / 86_400, locale: locale)
   }
 
   static func timeText(_ date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "zh_Hans_CN")
-    formatter.setLocalizedDateFormatFromTemplate("HH:mm")
-    return formatter.string(from: date)
+    date.formatted(.dateTime.hour().minute())
   }
 
   /// Device-local calendar day "yyyy-MM-dd". Mirrors the student-side
@@ -77,45 +69,63 @@ enum CoachStudentFormatting {
 
   /// "睡眠 4 · 状态 3 · 压力 2" — raw 1-5 values, all three scales point the
   /// same way (5 = best) per spec 030 §C1, so no per-item inversion here.
-  static func readinessScalesText(_ checkin: ReadinessCheckin) -> String {
-    "睡眠 \(checkin.sleepQuality) · 状态 \(checkin.mood) · 压力 \(checkin.stress)"
+  static func readinessScalesText(
+    _ checkin: ReadinessCheckin,
+    locale: Locale = .current
+  ) -> String {
+    CoachSharedStrings.readinessScales(
+      sleep: checkin.sleepQuality,
+      mood: checkin.mood,
+      stress: checkin.stress,
+      locale: locale
+    )
   }
 
   /// "疲劳：股四(重) 核心·下背(轻)", ordered by the whitelist chip order;
   /// no fatigue is a legitimate answer and reads "无肌群疲劳".
-  static func readinessFatigueText(_ checkin: ReadinessCheckin) -> String {
+  static func readinessFatigueText(
+    _ checkin: ReadinessCheckin,
+    locale: Locale = .current
+  ) -> String {
     let severityByGroup = Dictionary(
       uniqueKeysWithValues: checkin.muscleFatigue.map { ($0.muscleGroup, $0.severity) }
     )
     let items = ReadinessCheckin.allowedMuscleGroups.compactMap { group in
-      severityByGroup[group].map { "\(muscleGroupText(group))(\(severityText($0)))" }
+      severityByGroup[group].map {
+        "\(muscleGroupText(group, locale: locale))(\(severityText($0, locale: locale)))"
+      }
     }
-    guard !items.isEmpty else { return "无肌群疲劳" }
-    return "疲劳：" + items.joined(separator: " ")
+    guard !items.isEmpty else { return CoachSharedStrings.noMuscleFatigue(locale: locale) }
+    return CoachSharedStrings.fatigue(items.joined(separator: " "), locale: locale)
   }
 
   /// Chinese display for the 8 whitelisted readiness muscle groups, aligned
   /// with the student-side check-in sheet copy.
-  static func muscleGroupText(_ group: MuscleGroup) -> String {
+  static func muscleGroupText(_ group: MuscleGroup, locale: Locale = .current) -> String {
     switch group {
-    case .quad: "股四"
-    case .hamstring: "腘绳"
-    case .glute: "臀"
-    case .back: "背"
-    case .chest: "胸"
-    case .shoulder: "肩"
-    case .triceps: "肱三头"
-    case .core: "核心·下背"
-    default: group.rawValue
+    case .quad:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.quadriceps", locale: locale)
+    case .hamstring:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.hamstrings", locale: locale)
+    case .glute:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.glutes", locale: locale)
+    case .back:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.back", locale: locale)
+    case .chest:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.chest", locale: locale)
+    case .shoulder:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.shoulder", locale: locale)
+    case .triceps:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.triceps", locale: locale)
+    case .core:
+      CoachSharedStrings.muscleGroup("coach.shared.muscle.coreAndLowerBack", locale: locale)
+    default:
+      group.rawValue
     }
   }
 
-  static func severityText(_ severity: Int) -> String {
-    switch severity {
-    case 1: "轻"
-    case 2: "中"
-    default: "重"
-    }
+  static func severityText(_ severity: Int, locale: Locale = .current) -> String {
+    CoachSharedStrings.severity(severity, locale: locale)
   }
 }
 

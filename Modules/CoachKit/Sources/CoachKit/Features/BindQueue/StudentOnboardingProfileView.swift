@@ -239,7 +239,7 @@ struct StudentOnboardingProfileView: View {
     if !profile.equipmentOverrides.isEmpty {
       values.append(
         profile.equipmentOverrides
-          .map(CoachOnboardingDisplay.equipmentLabel)
+          .map { CoachOnboardingDisplay.equipmentLabel($0) }
           .joined(separator: " · ")
       )
     }
@@ -256,7 +256,7 @@ struct StudentOnboardingProfileView: View {
 
   private func injury(_ profile: OnboardingProfile) -> String? {
     let areas = profile.injuryAreas
-      .map(CoachOnboardingDisplay.injuryAreaText)
+      .map { CoachOnboardingDisplay.injuryAreaText($0) }
       .joined(separator: " · ")
     let text = [areas.isEmpty ? nil : areas, profile.injuryNotes]
       .compactMap(\.self)
@@ -308,10 +308,7 @@ enum CoachApplicationProfileStrings {
   }
 
   static func weeklyFrequency(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.applicationProfile.weeklyFrequency",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.applicationProfile.weeklyFrequency \(count)")
   }
 
   static func studentSaid(_ gender: Gender?) -> String {

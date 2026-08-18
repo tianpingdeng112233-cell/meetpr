@@ -49,8 +49,12 @@ struct PlanningCountPicker: View {
       }
 
       HStack(spacing: MeetPRSpacing.sm) {
-        stepButton(systemName: "minus", accessibilityLabel: "减少", action: decrementTapped)
-          .disabled(decrementDisabled)
+        stepButton(
+          systemName: "minus",
+          accessibilityLabel: CoachPlanningStrings.decrease,
+          action: decrementTapped
+        )
+        .disabled(decrementDisabled)
 
         Button {
           showWheel = true
@@ -69,8 +73,12 @@ struct PlanningCountPicker: View {
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
 
-        stepButton(systemName: "plus", accessibilityLabel: "增加", action: incrementTapped)
-          .disabled(incrementDisabled)
+        stepButton(
+          systemName: "plus",
+          accessibilityLabel: CoachPlanningStrings.increase,
+          action: incrementTapped
+        )
+        .disabled(incrementDisabled)
       }
     }
     .frame(maxWidth: .infinity)
@@ -92,7 +100,7 @@ struct PlanningCountPicker: View {
       .planningInlineTitle()
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
-          Button("完成") { showWheel = false }
+          Button(CoachPlanningStrings.done) { showWheel = false }
         }
       }
     }

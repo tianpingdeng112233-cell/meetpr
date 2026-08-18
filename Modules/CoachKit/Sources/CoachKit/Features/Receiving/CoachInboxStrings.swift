@@ -9,36 +9,18 @@ enum CoachInboxStrings {
   static let playPendingVideos = CoachLocalization.localized("coach.inbox.playPendingVideos")
 
   static func eyebrow(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.inbox.eyebrow",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.inbox.eyebrow \(count)")
   }
 
   static func pendingVideoPreview(count: Int, relativeTime: String) -> String {
-    CoachLocalization.replacing(
-      "coach.inbox.pendingVideoPreview",
-      values: [
-        "count": count.formatted(),
-        "relativeTime": relativeTime,
-      ]
-    )
+    CoachLocalization.localized("coach.inbox.pendingVideoPreview \(count) \(relativeTime)")
   }
 
   static func unreadAccessibility(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.inbox.unreadAccessibility",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.inbox.unreadAccessibility \(count)")
   }
 
   static func pendingVideosAccessibility(name: String, count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.inbox.pendingVideosAccessibility",
-      values: [
-        "name": name,
-        "count": count.formatted(),
-      ]
-    )
+    CoachLocalization.localized("coach.inbox.pendingVideosAccessibility \(name) \(count)")
   }
 }

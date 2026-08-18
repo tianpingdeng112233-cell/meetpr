@@ -73,7 +73,7 @@ final class PlanningWorkspaceViewModel {
       draftRows = []
       needsPlanningRows = []
       recentPublishedRows = []
-      state = .failed("计划工作台加载失败，请稍后重试")
+      state = .failed(PlanningWorkspaceStrings.text("coach.workspace.error.load"))
     }
   }
 
@@ -87,7 +87,9 @@ final class PlanningWorkspaceViewModel {
     return PlanningDraftRowModel(
       student: student,
       summary: PlanningWorkspaceSummary.draftProgressSummary(
-        name: name.isEmpty ? student.displayName : name,
+        name: name.isEmpty
+          ? student.displayName
+          : PlanningWorkspaceStrings.displayDraftName(name, studentName: student.displayName),
         currentStepRawValue: draft.currentStepRawValue,
         planWeeks: draft.planWeeks
       ),

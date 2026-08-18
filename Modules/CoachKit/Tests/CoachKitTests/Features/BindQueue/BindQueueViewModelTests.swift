@@ -35,7 +35,7 @@ import Testing
 
   #expect(accepted)
   #expect(viewModel.items.isEmpty)
-  #expect(viewModel.toastMessage == "已接收,评估期 7 天开始")
+  #expect(viewModel.toastMessage == CoachBindStrings.text("coach.bind.acceptedEvaluation"))
   let recorded = await repository.acceptedRequests
   #expect(recorded.count == 1)
   #expect(recorded[0].skip == false)
@@ -53,7 +53,7 @@ import Testing
   let accepted = await viewModel.accept(item, skipEvaluation: true, skipReason: "  老学员  ")
 
   #expect(accepted)
-  #expect(viewModel.toastMessage == "已接收")
+  #expect(viewModel.toastMessage == CoachBindStrings.text("coach.bind.accepted"))
   let recorded = await repository.acceptedRequests
   #expect(recorded[0].skip == true)
   #expect(recorded[0].reason == "老学员")
@@ -95,10 +95,10 @@ import Testing
 @available(iOS 17.0, macOS 14.0, *)
 @Test func acceptMachineCodeErrorsBannerAndForceRefresh() async {
   let cases: [(CoachBindQueueError, String)] = [
-    (.expired, "该请求已过期"),
-    (.notPending, "该请求已被处理"),
-    (.notFound, "该请求已被处理"),
-    (.alreadyBound, "你们已是绑定关系"),
+    (.expired, CoachBindStrings.text("coach.bind.error.expired")),
+    (.notPending, CoachBindStrings.text("coach.bind.error.processed")),
+    (.notFound, CoachBindStrings.text("coach.bind.error.processed")),
+    (.alreadyBound, CoachBindStrings.text("coach.bind.error.alreadyBound")),
   ]
   for (error, expectedBanner) in cases {
     let repository = StubBindQueueRepository(acceptError: error)
@@ -142,7 +142,7 @@ import Testing
   let rejected = await viewModel.reject(viewModel.items[0])
 
   #expect(!rejected)
-  #expect(viewModel.bannerMessage == "该请求已过期")
+  #expect(viewModel.bannerMessage == CoachBindStrings.text("coach.bind.error.expired"))
 }
 
 // MARK: - 9-item summary display mapping
@@ -173,9 +173,13 @@ import Testing
 
 @available(iOS 17.0, macOS 14.0, *)
 @Test func trainingYearsNotchLabels() {
-  #expect(CoachOnboardingDisplay.trainingYearsText(0) == "训练 <1 年")
-  #expect(CoachOnboardingDisplay.trainingYearsText(3) == "训练 3 年")
-  #expect(CoachOnboardingDisplay.trainingYearsText(10) == "训练 10+ 年")
+  #expect(
+    CoachOnboardingDisplay.trainingYearsText(0)
+      == CoachBindStrings.text("coach.bind.training.lessThanOne"))
+  #expect(CoachOnboardingDisplay.trainingYearsText(3) == CoachBindStrings.trainingYears(3))
+  #expect(
+    CoachOnboardingDisplay.trainingYearsText(10)
+      == CoachBindStrings.text("coach.bind.training.tenPlus"))
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -183,14 +187,14 @@ import Testing
   let base = BindQueueFixtures.now
   #expect(
     CoachOnboardingDisplay.waitingText(since: base.addingTimeInterval(-300), now: base)
-      == "已等待 5 分钟")
+      == CoachBindStrings.waitingMinutes(5))
   #expect(
     CoachOnboardingDisplay.waitingText(
       since: base.addingTimeInterval(-(2 * 3_600 + 14 * 60)), now: base)
-      == "已等待 2 小时 14 分")
+      == CoachBindStrings.waitingHoursMinutes(2, 14))
   #expect(
     CoachOnboardingDisplay.waitingText(since: base.addingTimeInterval(-3 * 86_400), now: base)
-      == "已等待 3 天")
+      == CoachBindStrings.waitingDays(3))
 }
 
 @available(iOS 17.0, macOS 14.0, *)

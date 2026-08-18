@@ -34,13 +34,13 @@ struct ImportReviewSheet: View {
       }
     }
     .background(Color.MeetPR.bg)
-    .navigationTitle("导入计划")
+    .navigationTitle(CoachImportStrings.title)
     #if os(iOS)
       .navigationBarTitleDisplayMode(.inline)
     #endif
     .toolbar {
       ToolbarItem(placement: .cancellationAction) {
-        Button("取消") { onCancel() }
+        Button(CoachPlanningStrings.cancel) { onCancel() }
       }
     }
     .fileImporter(
@@ -57,11 +57,11 @@ struct ImportReviewSheet: View {
 
   private var pickFileState: some View {
     VStack(spacing: 16) {
-      Text("把电脑上的 .xlsx 计划表 AirDrop 到手机，选它导入。解析在本机完成，文件不上传。")
+      Text(CoachImportStrings.pickFileDescription)
         .font(.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
         .multilineTextAlignment(.center)
-      PrimaryButton("选择 .xlsx 文件", isFullWidth: true) {
+      PrimaryButton(CoachImportStrings.selectXLSXFile, isFullWidth: true) {
         isImporting = true
       }
     }
@@ -85,11 +85,16 @@ struct ImportReviewSheet: View {
 
   private var summaryHeader: some View {
     VStack(alignment: .leading, spacing: 4) {
-      Eyebrow("导入审阅")
-      Text("共解析出 \(viewModel.weeks.count) 周 · 选中 \(viewModel.selectedWeekCount) 周")
-        .font(.subheadline.bold())
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-      TextField("计划名", text: $viewModel.planName)
+      Eyebrow(CoachImportStrings.review)
+      Text(
+        CoachImportStrings.summary(
+          parsed: viewModel.weeks.count,
+          selected: viewModel.selectedWeekCount
+        )
+      )
+      .font(.subheadline.bold())
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      TextField(CoachImportStrings.planName, text: $viewModel.planName)
         .font(.footnote)
         .textFieldStyle(.roundedBorder)
     }
@@ -97,7 +102,7 @@ struct ImportReviewSheet: View {
 
   private var startDatePicker: some View {
     DatePicker(
-      "开始日（默认下周一）",
+      CoachImportStrings.startDate,
       selection: $viewModel.startDate,
       displayedComponents: .date
     )
@@ -113,7 +118,7 @@ struct ImportReviewSheet: View {
           Image(systemName: week.wrappedValue.isSelected ? "checkmark.square.fill" : "square")
             .foregroundStyle(
               week.wrappedValue.isSelected ? Color.MeetPR.brandRed : Color.MeetPR.fgSecondary)
-          Text("原表第 \(week.wrappedValue.blockIndex + 1) 周")
+          Text(CoachImportStrings.sourceWeek(week.wrappedValue.blockIndex + 1))
             .font(.subheadline.bold())
             .foregroundStyle(Color.MeetPR.fgPrimary)
           Spacer()
@@ -137,7 +142,7 @@ struct ImportReviewSheet: View {
 
   private func dayBlock(_ day: Binding<ImportReviewDay>) -> some View {
     VStack(alignment: .leading, spacing: 10) {
-      Text("第 \(day.wrappedValue.dayOfWeek + 1) 天")
+      Text(CoachImportStrings.day(day.wrappedValue.dayOfWeek + 1))
         .font(Font.MeetPR.monoLabel)
         .foregroundStyle(Color.MeetPR.brandRed)
       ForEach(day.exercises) { $exercise in
@@ -159,12 +164,16 @@ struct ImportReviewSheet: View {
   private var publishBar: some View {
     VStack(spacing: 8) {
       if !viewModel.canPublish {
-        Text("还有「待你定」的项——补齐重量/RPE、绑定动作后才能发布。")
+        Text(CoachImportStrings.incompleteHint)
           .font(.caption)
           .foregroundStyle(Color.MeetPR.amber)
           .frame(maxWidth: .infinity, alignment: .leading)
       }
-      PrimaryButton("发布给学员", isDisabled: !viewModel.canPublish, isFullWidth: true) {
+      PrimaryButton(
+        CoachImportStrings.publishToStudent,
+        isDisabled: !viewModel.canPublish,
+        isFullWidth: true
+      ) {
         Task {
           await viewModel.publish()
           if viewModel.phase == .published { onPublished() }
@@ -178,10 +187,10 @@ struct ImportReviewSheet: View {
       Image(systemName: "checkmark.circle.fill")
         .font(.largeTitle)
         .foregroundStyle(Color.MeetPR.green)
-      Text("已发布给 \(viewModel.student.displayName)")
+      Text(CoachImportStrings.publishedTo(viewModel.student.displayName))
         .font(.subheadline.bold())
         .foregroundStyle(Color.MeetPR.fgPrimary)
-      SecondaryButton("完成") { onPublished() }
+      SecondaryButton(CoachPlanningStrings.done) { onPublished() }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .padding(20)
@@ -196,7 +205,7 @@ struct ImportReviewSheet: View {
         .font(.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
         .multilineTextAlignment(.center)
-      SecondaryButton("重新选择文件") {
+      SecondaryButton(CoachImportStrings.chooseAnotherFile) {
         viewModel.phase = .pickFile
       }
     }

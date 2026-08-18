@@ -88,7 +88,7 @@ final class EvaluationBannerViewModel {
       onCompleted?()
       return true
     } catch {
-      completeError = "完成评估失败,请稍后重试"
+      completeError = CoachStudentDetailStrings.text("coach.evaluation.error.complete")
       return false
     }
   }
@@ -97,13 +97,18 @@ final class EvaluationBannerViewModel {
   func statusText(now: Date) -> String {
     guard let evaluation else { return "" }
     if let overdueBy = evaluation.overdueBy(now: now) {
-      let amount = overdueBy.days > 0 ? "\(overdueBy.days) 天" : "\(overdueBy.hours) 小时"
-      return "已超期 \(amount),请尽快交付总结"
+      let amount =
+        overdueBy.days > 0
+        ? CoachLocalization.localized("coach.evaluation.duration.days \(overdueBy.days)")
+        : CoachLocalization.localized("coach.evaluation.duration.hours \(overdueBy.hours)")
+      return CoachStudentDetailStrings.replacing(
+        "coach.evaluation.overdue", ["duration": amount])
     }
     if let remaining = evaluation.remaining(now: now) {
-      return "评估期 · 还剩 \(remaining.days) 天 \(remaining.hours) 小时"
+      return CoachLocalization.localized(
+        "coach.evaluation.remaining \(remaining.days) \(remaining.hours)")
     }
-    return "评估期"
+    return CoachStudentDetailStrings.text("coach.evaluation.title")
   }
 
   func isOverdue(now: Date) -> Bool {

@@ -13,8 +13,11 @@ import ViewInspector
 
   let inspected = try Step6ProgressionRulesView(viewModel: viewModel).inspect()
 
-  #expect(try inspected.find(text: "递进 / 递减规则").string() == "递进 / 递减规则")
-  #expect(try inspected.find(text: "+ 添加规则").string() == "+ 添加规则")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.progressionRulesTitle).string()
+      == CoachPlanningStrings.progressionRulesTitle)
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.addRule).string() == CoachPlanningStrings.addRule)
 }
 
 @MainActor
@@ -28,10 +31,10 @@ import ViewInspector
   let inspected = try Step6ProgressionRulesView(viewModel: viewModel).inspect()
 
   #expect(
-    try inspected.find(text: "先选择一个应用动作，再设置该动作的递进规则。").string()
-      == "先选择一个应用动作，再设置该动作的递进规则。")
+    try inspected.find(text: CoachPlanningStrings.selectExerciseBeforeRule).string()
+      == CoachPlanningStrings.selectExerciseBeforeRule)
   #expect(throws: (any Error).self) {
-    try inspected.find(text: "增减量")
+    try inspected.find(text: CoachPlanningStrings.changeAmount)
   }
 }
 
@@ -45,7 +48,9 @@ import ViewInspector
 
   let inspected = try Step6ProgressionRulesView(viewModel: viewModel).inspect()
 
-  #expect(try inspected.find(text: "规则 1").string() == "规则 1")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.ruleNumber(1)).string()
+      == CoachPlanningStrings.ruleNumber(1))
   #expect(try inspected.find(text: "W1").string() == "W1")
   #expect(try inspected.find(text: "W2").string() == "W2")
 }
@@ -105,5 +110,7 @@ import ViewInspector
 
   let inspected = try Step6ProgressionRulesView(viewModel: viewModel).inspect()
 
-  #expect(try inspected.find(text: "未被任何规则覆盖").string() == "未被任何规则覆盖")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.uncoveredByRules.uppercased()).string()
+      == CoachPlanningStrings.uncoveredByRules.uppercased())
 }

@@ -59,10 +59,7 @@ enum CoachMyProfileStrings {
   ]
 
   static func inviteUsage(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.profile.inviteUsage",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.profile.inviteUsage \(count)")
   }
 
   static func appVersionValue(_ version: String) -> String {

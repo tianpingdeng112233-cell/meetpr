@@ -61,7 +61,7 @@ final class FeedbackComposerViewModel {
 
   func send() async -> CoachFeedback? {
     guard canSend else {
-      state = .failed("反馈不能为空")
+      state = .failed(CoachStudentDetailStrings.text("coach.feedback.error.empty"))
       return nil
     }
 
@@ -78,7 +78,7 @@ final class FeedbackComposerViewModel {
       Analytics.shared.coachFeedbackSent(studentID: studentID, kind: .text)
       return item
     } catch {
-      state = .failed("发送失败，请稍后重试")
+      state = .failed(CoachStudentDetailStrings.text("coach.feedback.error.send"))
       return nil
     }
   }

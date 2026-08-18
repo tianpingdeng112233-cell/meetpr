@@ -29,10 +29,16 @@ import ViewInspector
   let sut = AccessoryFilterSection(filters: .empty) { _ in }
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "肌群").string() == "肌群")
-  #expect(try inspected.find(text: "器械").string() == "器械")
-  #expect(try inspected.find(text: "模式").string() == "模式")
-  #expect(try inspected.find(text: "全部").string() == "全部")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.muscleGroup).string()
+      == CoachPlanningStrings.muscleGroup)
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.equipment).string()
+      == CoachPlanningStrings.equipment)
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.movementPattern).string()
+      == CoachPlanningStrings.movementPattern)
+  #expect(try inspected.find(text: CoachPlanningStrings.all).string() == CoachPlanningStrings.all)
 }
 
 @MainActor
@@ -49,7 +55,7 @@ import ViewInspector
   }
   let inspected = try sut.inspect()
   let button = try inspected.find(ViewType.Button.self) { button in
-    (try? button.labelView().find(text: "哈克深蹲")) != nil
+    (try? button.labelView().find(text: CoachLocalization.exerciseName(exercise))) != nil
   }
 
   try button.tap()
@@ -68,14 +74,31 @@ import ViewInspector
 
   let sut = Step4SelectAccessoriesView(viewModel: viewModel)
   let inspected = try sut.inspect()
+  let firstExercise = try #require(viewModel.sortedDraftExercises.first)
 
-  #expect(try inspected.find(text: "添加辅助动作").string() == "添加辅助动作")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.addAccessoriesTitle).string()
+      == CoachPlanningStrings.addAccessoriesTitle)
   #expect(try inspected.find(text: "DAY 1").string() == "DAY 1")
-  #expect(try inspected.find(text: "本日主项").string() == "本日主项")
-  #expect(try inspected.find(text: "比赛式深蹲").string() == "比赛式深蹲")
-  #expect(try inspected.find(text: "4 组 x 5 次 · 0kg").string() == "4 组 x 5 次 · 0kg")
-  #expect(try inspected.find(text: "已选 0 个").string() == "已选 0 个")
-  #expect(try inspected.find(text: "+ 添加动作").string() == "+ 添加动作")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.todayMainLifts).string()
+      == CoachPlanningStrings.todayMainLifts)
+  #expect(
+    try inspected.find(text: viewModel.exerciseName(for: firstExercise)).string()
+      == viewModel.exerciseName(for: firstExercise))
+  #expect(
+    try inspected.find(
+      text: CoachPlanningStrings.setRepIntensity(
+        sets: 4, reps: "5", singularReps: false, intensity: "0kg")
+    ).string()
+      == CoachPlanningStrings.setRepIntensity(
+        sets: 4, reps: "5", singularReps: false, intensity: "0kg"))
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.selectedExerciseCount(0)).string()
+      == CoachPlanningStrings.selectedExerciseCount(0))
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.addExercise).string()
+      == CoachPlanningStrings.addExercise)
 }
 
 @MainActor
@@ -90,6 +113,9 @@ import ViewInspector
   let sut = AccessoryLibrarySheet(viewModel: viewModel, dayID: dayID)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "筛选").string() == "筛选")
-  #expect(try inspected.find(text: "匹配 5 个").string() == "匹配 5 个")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.filter).string() == CoachPlanningStrings.filter)
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.matchingExerciseCount(5)).string()
+      == CoachPlanningStrings.matchingExerciseCount(5))
 }

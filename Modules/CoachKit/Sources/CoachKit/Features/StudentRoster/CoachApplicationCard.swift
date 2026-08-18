@@ -89,17 +89,17 @@ struct CoachApplicationCard: View {
   private var summaryText: String {
     let onboarding = item.onboarding
     let parts = [
-      onboarding.gender.map(CoachOnboardingDisplay.genderText),
+      onboarding.gender.map { CoachOnboardingDisplay.genderText($0) },
       CoachOnboardingDisplay.age(
         birthDate: onboarding.birthDate,
         now: now,
         calendar: CoachFeatureCalendar.calendar
       )
-      .map { "\($0) 岁" },
+      .map(CoachRosterStrings.age),
       onboarding.weightKg
         .map { "\(CoachOnboardingDisplay.decimalText($0)) kg" },
       onboarding.trainingYears
-        .map(CoachOnboardingDisplay.trainingYearsText),
+        .map { CoachOnboardingDisplay.trainingYearsText($0) },
     ]
     return parts.compactMap { $0 }.joined(separator: " · ")
   }

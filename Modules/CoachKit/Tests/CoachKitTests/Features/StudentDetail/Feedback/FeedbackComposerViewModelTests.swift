@@ -14,7 +14,8 @@ import Testing
   let item = await viewModel.send()
 
   #expect(item == nil)
-  guard case .failed("反馈不能为空") = viewModel.state else {
+  guard case .failed(CoachStudentDetailStrings.text("coach.feedback.error.empty")) = viewModel.state
+  else {
     Issue.record("Expected empty-text failure")
     return
   }
@@ -57,7 +58,8 @@ import Testing
   let item = await viewModel.send()
 
   #expect(item == nil)
-  guard case .failed("发送失败，请稍后重试") = viewModel.state else {
+  guard case .failed(CoachStudentDetailStrings.text("coach.feedback.error.send")) = viewModel.state
+  else {
     Issue.record("Expected send failure")
     return
   }

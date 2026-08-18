@@ -15,13 +15,13 @@ public struct Step0SelectStudentView: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Eyebrow("STEP 0")
-          Text("为谁创建计划？")
+          Text(CoachPlanningStrings.selectStudentPrompt)
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
 
         studentSection(
-          title: "评估期内",
+          title: CoachPlanningStrings.inEvaluation,
           students: students { status in
             if case .inEvaluation = status { return true }
             return false
@@ -29,7 +29,7 @@ public struct Step0SelectStudentView: View {
         )
 
         studentSection(
-          title: "活跃",
+          title: CoachPlanningStrings.active,
           students: students { status in
             if case .active = status { return true }
             return false
@@ -37,7 +37,7 @@ public struct Step0SelectStudentView: View {
         )
 
         studentSection(
-          title: "异常",
+          title: CoachPlanningStrings.abnormal,
           students: students { status in
             if case .abnormal = status { return true }
             return false
@@ -45,7 +45,7 @@ public struct Step0SelectStudentView: View {
         )
 
         PrimaryButton(
-          "开始编排",
+          CoachPlanningStrings.startPlanning,
           isDisabled: viewModel.selectedStudent == nil,
           isFullWidth: true
         ) {
@@ -149,9 +149,9 @@ private struct StudentRow: View {
   private var subtitle: String {
     switch student.status {
     case .inEvaluation(let days, let hours):
-      "评估期 \(days) 天 \(hours) 时剩"
+      CoachPlanningStrings.evaluationRemaining(days: days, hours: hours)
     case .active:
-      "可创建计划"
+      CoachPlanningStrings.readyForPlan
     case .abnormal(let reason):
       PlanningDisplay.abnormalReason(reason)
     }

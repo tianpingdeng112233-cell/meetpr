@@ -29,23 +29,23 @@ public enum ProgressionRuleType: String, Codable, CaseIterable, Hashable, Sendab
   public var title: String {
     switch self {
     case .weightInc:
-      "重量递增"
+      CoachPlanningStrings.weightIncrease
     case .weightDec:
-      "重量递减"
+      CoachPlanningStrings.weightDecrease
     case .rpeInc:
-      "RPE 递增"
+      CoachPlanningStrings.rpeIncrease
     case .rpeDec:
-      "RPE 递减"
+      CoachPlanningStrings.rpeDecrease
     case .setsInc:
-      "组数递增"
+      CoachPlanningStrings.setIncrease
     case .setsDec:
-      "组数递减"
+      CoachPlanningStrings.setDecrease
     case .repsInc:
-      "次数递增"
+      CoachPlanningStrings.repIncrease
     case .repsDec:
-      "次数递减"
+      CoachPlanningStrings.repDecrease
     case .custom:
-      "自定义"
+      CoachPlanningStrings.custom
     }
   }
 }

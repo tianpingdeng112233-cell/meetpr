@@ -44,20 +44,22 @@ public struct WeekCardView: View {
 
   private var header: some View {
     HStack(alignment: .firstTextBaseline) {
-      Text("Week \(weekNumber) / \(weekCount)")
+      Text(CoachPlanningStrings.weekPosition(weekNumber, total: weekCount))
         .font(Font.MeetPR.title2)
         .foregroundStyle(Color.MeetPR.fgPrimary)
       Spacer()
       StatusBadge(
-        status: weekNumber == 1 ? .completed : .pending, title: weekNumber == 1 ? "基线" : "推导")
+        status: weekNumber == 1 ? .completed : .pending,
+        title: weekNumber == 1 ? CoachPlanningStrings.baseline : CoachPlanningStrings.derived
+      )
     }
   }
 
   private var footerText: String {
     if weekNumber == 1 {
-      "Week 1 是基线（你手填的）"
+      CoachPlanningStrings.baselineFooter()
     } else {
-      "Week \(weekNumber) 由规则推导"
+      CoachPlanningStrings.derivedFooter(weekNumber)
     }
   }
 
@@ -103,10 +105,10 @@ private struct WeekExerciseRow: View {
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(Color.MeetPR.fgPrimary)
           if isMainLift {
-            StatusBadge(status: .live, title: "主项")
+            StatusBadge(status: .live, title: CoachPlanningStrings.mainLift)
           }
         }
-        Text("\(spec.setCount) 组 × \(spec.targetReps) 次")
+        Text(CoachPlanningStrings.setAndRepCount(sets: spec.setCount, reps: spec.targetReps))
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
@@ -122,7 +124,7 @@ private struct WeekExerciseRow: View {
     .background(Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     .contextMenu {
-      Button("查看详情", systemImage: "info.circle") {}
+      Button(CoachPlanningStrings.viewDetails, systemImage: "info.circle") {}
         .disabled(true)
     } preview: {
       ExercisePeekView(title: title, spec: spec)
@@ -149,7 +151,7 @@ private struct ExercisePeekView: View {
       Text(title)
         .font(Font.MeetPR.headline)
         .foregroundStyle(Color.MeetPR.fgPrimary)
-      Text("\(spec.setCount) 组 × \(spec.targetReps) 次")
+      Text(CoachPlanningStrings.setAndRepCount(sets: spec.setCount, reps: spec.targetReps))
       Text(detail)
       if let notes = spec.notes, !notes.isEmpty {
         Text(notes)
@@ -166,9 +168,9 @@ private struct ExercisePeekView: View {
   private var detail: String {
     switch spec.intensityMode {
     case .weight:
-      return "强度：\(spec.targetValue.planningFormatted())kg"
+      return CoachPlanningStrings.intensityWeight(spec.targetValue.planningFormatted())
     case .rpe:
-      return "强度：@RPE \(spec.targetValue.planningFormatted())"
+      return CoachPlanningStrings.intensityRPE(spec.targetValue.planningFormatted())
     }
   }
 }

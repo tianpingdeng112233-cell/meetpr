@@ -20,17 +20,19 @@ enum CoachOnboardingDisplay {
   }
 
   /// "已等待 2 小时 14 分" under a day, "已等待 3 天" beyond.
-  static func waitingText(since submittedAt: Date, now: Date) -> String {
+  static func waitingText(since submittedAt: Date, now: Date, locale: Locale = .current) -> String {
     let seconds = max(0, Int(now.timeIntervalSince(submittedAt)))
     if seconds < 3_600 {
-      return "已等待 \(max(1, seconds / 60)) 分钟"
+      return CoachBindStrings.waitingMinutes(max(1, seconds / 60), locale: locale)
     }
     if seconds < 86_400 {
       let hours = seconds / 3_600
       let minutes = (seconds % 3_600) / 60
-      return minutes > 0 ? "已等待 \(hours) 小时 \(minutes) 分" : "已等待 \(hours) 小时"
+      return minutes > 0
+        ? CoachBindStrings.waitingHoursMinutes(hours, minutes, locale: locale)
+        : CoachBindStrings.waitingHours(hours, locale: locale)
     }
-    return "已等待 \(seconds / 86_400) 天"
+    return CoachBindStrings.waitingDays(seconds / 86_400, locale: locale)
   }
 
   /// Amber cue when the request lazily expires within 24h (spec 033 §3 #9).
@@ -56,77 +58,77 @@ enum CoachOnboardingDisplay {
   }
 
   /// 0 → "训练 <1 年", 10 → "训练 10+ 年", else "训练 N 年".
-  static func trainingYearsText(_ notch: Int) -> String {
+  static func trainingYearsText(_ notch: Int, locale: Locale = .current) -> String {
     switch notch {
-    case ...0: "训练 <1 年"
-    case 10...: "训练 10+ 年"
-    default: "训练 \(notch) 年"
+    case ...0: CoachBindStrings.text("coach.bind.training.lessThanOne", locale: locale)
+    case 10...: CoachBindStrings.text("coach.bind.training.tenPlus", locale: locale)
+    default: CoachBindStrings.trainingYears(notch, locale: locale)
     }
   }
 
   // MARK: - Vocabulary labels (wiki student-onboarding v2.4)
 
-  static func genderText(_ gender: Gender) -> String {
+  static func genderText(_ gender: Gender, locale: Locale = .current) -> String {
     switch gender {
-    case .male: "男"
-    case .female: "女"
-    case .other: "其他"
+    case .male: CoachBindStrings.text("coach.bind.gender.male", locale: locale)
+    case .female: CoachBindStrings.text("coach.bind.gender.female", locale: locale)
+    case .other: CoachBindStrings.text("coach.bind.gender.other", locale: locale)
     }
   }
 
-  static func gymTierText(_ tier: GymTier) -> String {
+  static func gymTierText(_ tier: GymTier, locale: Locale = .current) -> String {
     switch tier {
-    case .homeWithRack: "家庭(含深蹲架)"
-    case .commercial: "商业健身房"
-    case .professional: "专业力量房"
+    case .homeWithRack: CoachBindStrings.text("coach.bind.gym.homeWithRack", locale: locale)
+    case .commercial: CoachBindStrings.text("coach.bind.gym.commercial", locale: locale)
+    case .professional: CoachBindStrings.text("coach.bind.gym.professional", locale: locale)
     }
   }
 
-  static func squatStanceText(_ stance: SquatStance) -> String {
+  static func squatStanceText(_ stance: SquatStance, locale: Locale = .current) -> String {
     switch stance {
-    case .highBar: "高杠"
-    case .lowBar: "低杠"
+    case .highBar: CoachBindStrings.text("coach.bind.squat.highBar", locale: locale)
+    case .lowBar: CoachBindStrings.text("coach.bind.squat.lowBar", locale: locale)
     }
   }
 
-  static func deadliftStyleText(_ style: DeadliftStance) -> String {
+  static func deadliftStyleText(_ style: DeadliftStance, locale: Locale = .current) -> String {
     switch style {
-    case .conventional: "传统"
-    case .sumo: "相扑"
-    case .both: "两种都练"
+    case .conventional: CoachBindStrings.text("coach.bind.deadlift.conventional", locale: locale)
+    case .sumo: CoachBindStrings.text("coach.bind.deadlift.sumo", locale: locale)
+    case .both: CoachBindStrings.text("coach.bind.deadlift.both", locale: locale)
     }
   }
 
-  static func benchGripText(_ grip: BenchGrip) -> String {
+  static func benchGripText(_ grip: BenchGrip, locale: Locale = .current) -> String {
     switch grip {
-    case .narrow: "窄握"
-    case .standard: "标准"
-    case .wide: "宽握"
+    case .narrow: CoachBindStrings.text("coach.bind.bench.narrow", locale: locale)
+    case .standard: CoachBindStrings.text("coach.bind.bench.standard", locale: locale)
+    case .wide: CoachBindStrings.text("coach.bind.bench.wide", locale: locale)
     }
   }
 
-  static func trainingDayText(_ day: TrainingDay) -> String {
+  static func trainingDayText(_ day: TrainingDay, locale: Locale = .current) -> String {
     switch day {
-    case .mon: "周一"
-    case .tue: "周二"
-    case .wed: "周三"
-    case .thu: "周四"
-    case .fri: "周五"
-    case .sat: "周六"
-    case .sun: "周日"
+    case .mon: CoachBindStrings.text("coach.bind.weekday.mon", locale: locale)
+    case .tue: CoachBindStrings.text("coach.bind.weekday.tue", locale: locale)
+    case .wed: CoachBindStrings.text("coach.bind.weekday.wed", locale: locale)
+    case .thu: CoachBindStrings.text("coach.bind.weekday.thu", locale: locale)
+    case .fri: CoachBindStrings.text("coach.bind.weekday.fri", locale: locale)
+    case .sat: CoachBindStrings.text("coach.bind.weekday.sat", locale: locale)
+    case .sun: CoachBindStrings.text("coach.bind.weekday.sun", locale: locale)
     }
   }
 
-  static func injuryAreaText(_ area: InjuryArea) -> String {
+  static func injuryAreaText(_ area: InjuryArea, locale: Locale = .current) -> String {
     switch area {
-    case .shoulder: "肩"
-    case .elbow: "肘"
-    case .wrist: "腕"
-    case .lowerBack: "下背"
-    case .hip: "髋"
-    case .knee: "膝"
-    case .ankle: "踝"
-    case .other: "其他"
+    case .shoulder: CoachBindStrings.text("coach.bind.injury.shoulder", locale: locale)
+    case .elbow: CoachBindStrings.text("coach.bind.injury.elbow", locale: locale)
+    case .wrist: CoachBindStrings.text("coach.bind.injury.wrist", locale: locale)
+    case .lowerBack: CoachBindStrings.text("coach.bind.injury.lowerBack", locale: locale)
+    case .hip: CoachBindStrings.text("coach.bind.injury.hip", locale: locale)
+    case .knee: CoachBindStrings.text("coach.bind.injury.knee", locale: locale)
+    case .ankle: CoachBindStrings.text("coach.bind.injury.ankle", locale: locale)
+    case .other: CoachBindStrings.text("coach.bind.injury.other", locale: locale)
     }
   }
 
@@ -141,49 +143,74 @@ enum CoachOnboardingDisplay {
   /// mirror (CoachKit ⊥ StudentKit, ADR-005 §1) of `EquipmentCatalog` plus
   /// the two retired v1 tokens still present in older profiles; unknown
   /// tokens pass through raw so nothing is silently dropped.
-  static func equipmentLabel(_ token: String) -> String {
-    equipmentLabels[token] ?? token
+  static func equipmentLabel(_ token: String, locale: Locale = .current) -> String {
+    guard let key = equipmentLabelKeys[token] else { return token }
+    return CoachBindStrings.text(key, locale: locale)
   }
 
-  private static let equipmentLabels: [String: String] = [
-    "barbell_dumbbell": "杠铃 + 哑铃",
-    "squat_bench_rack": "深蹲架 + 卧推架",
-    "pullup_bar": "引体向上杆",
-    "db_max_20": "哑铃 ≤20kg",
-    "db_max_40": "哑铃 ≤40kg",
-    "db_max_40_plus": "哑铃 >40kg",
-    "smith_machine": "史密斯架",
-    "cable_crossover": "龙门架(大飞鸟)",
-    "lat_pulldown": "高位下拉",
-    "leg_press_machine": "倒蹬机 / 腿举机",
-    "leg_curl_extension": "腿弯举 / 腿屈伸",
-    "seated_row": "坐姿划船",
-    "landmine": "地雷架(含 T 杆划船)",
-    "seal_row": "海豹划船凳",
-    "hack_squat": "哈克深蹲机",
-    "power_bar_stiff": "力量举专项杆(硬杆)",
-    "deadlift_bar": "硬拉专项杆(软杆)",
-    "safety_bar": "特种杠(SSB / 六角等)",
-    "fractional_plates": "微增片(0.25kg 起)",
-    "lifting_platform": "举重台 / 硬拉台",
-    "rack_pins_blocks": "架上销 / 垫块",
-    "chains_bands": "链条 / 弹力带(变阻)",
-    "ghr": "GHR(臀腿举)",
-    "belt_squat": "腰带深蹲机",
+  private static let equipmentLabelKeys: [String: String.LocalizationValue] = [
+    "barbell_dumbbell": "coach.bind.equipment.barbellDumbbell",
+    "squat_bench_rack": "coach.bind.equipment.squatBenchRack",
+    "pullup_bar": "coach.bind.equipment.pullupBar",
+    "db_max_20": "coach.bind.equipment.dbMax20",
+    "db_max_40": "coach.bind.equipment.dbMax40",
+    "db_max_40_plus": "coach.bind.equipment.dbMax40Plus",
+    "smith_machine": "coach.bind.equipment.smithMachine",
+    "cable_crossover": "coach.bind.equipment.cableCrossover",
+    "lat_pulldown": "coach.bind.equipment.latPulldown",
+    "leg_press_machine": "coach.bind.equipment.legPress",
+    "leg_curl_extension": "coach.bind.equipment.legCurlExtension",
+    "seated_row": "coach.bind.equipment.seatedRow",
+    "landmine": "coach.bind.equipment.landmine",
+    "seal_row": "coach.bind.equipment.sealRow",
+    "hack_squat": "coach.bind.equipment.hackSquat",
+    "power_bar_stiff": "coach.bind.equipment.powerBar",
+    "deadlift_bar": "coach.bind.equipment.deadliftBar",
+    "safety_bar": "coach.bind.equipment.safetyBar",
+    "fractional_plates": "coach.bind.equipment.fractionalPlates",
+    "lifting_platform": "coach.bind.equipment.liftingPlatform",
+    "rack_pins_blocks": "coach.bind.equipment.rackPinsBlocks",
+    "chains_bands": "coach.bind.equipment.chainsBands",
+    "ghr": "coach.bind.equipment.ghr",
+    "belt_squat": "coach.bind.equipment.beltSquat",
     // Retired tokens (pre-change profiles): reverse_hyper + v1-set +
     // cable_lat_pulldown (split into cable_crossover + lat_pulldown).
-    "reverse_hyper": "反向过伸机",
-    "heavy_dumbbells": "哑铃区(>30kg)",
-    "blocks_chains_bands": "块铃 / 链子 / 弹力带",
-    "cable_lat_pulldown": "拉力机 / 高位下拉",
+    "reverse_hyper": "coach.bind.equipment.reverseHyper",
+    "heavy_dumbbells": "coach.bind.equipment.heavyDumbbells",
+    "blocks_chains_bands": "coach.bind.equipment.blocksChainsBands",
+    "cable_lat_pulldown": "coach.bind.equipment.cableLatPulldown",
   ]
 
   // MARK: - Recovery 1-5 scales (wiki v2.1 tables)
 
-  static let dailyLifeIntensityLabels = ["很低", "较低", "中等", "较高", "极高"]
-  static let lifeStressLabels = ["几乎无", "较低", "中等", "较高", "极高"]
-  static let recoverySpeedLabels = ["3天以上", "约3天", "约2天", "约1天", "半天内"]
-  static let sleepHoursLabels = ["≤5h", "6h", "7h", "8h", "9h+"]
+  static var dailyLifeIntensityLabels: [String] {
+    scaleLabels([
+      "coach.bind.scale.daily.1", "coach.bind.scale.daily.2", "coach.bind.scale.daily.3",
+      "coach.bind.scale.daily.4", "coach.bind.scale.daily.5",
+    ])
+  }
+
+  static var lifeStressLabels: [String] {
+    scaleLabels([
+      "coach.bind.scale.stress.1", "coach.bind.scale.stress.2", "coach.bind.scale.stress.3",
+      "coach.bind.scale.stress.4", "coach.bind.scale.stress.5",
+    ])
+  }
+
+  static var recoverySpeedLabels: [String] {
+    scaleLabels([
+      "coach.bind.scale.recovery.1", "coach.bind.scale.recovery.2",
+      "coach.bind.scale.recovery.3", "coach.bind.scale.recovery.4",
+      "coach.bind.scale.recovery.5",
+    ])
+  }
+
+  static var sleepHoursLabels: [String] {
+    scaleLabels([
+      "coach.bind.scale.sleep.1", "coach.bind.scale.sleep.2", "coach.bind.scale.sleep.3",
+      "coach.bind.scale.sleep.4", "coach.bind.scale.sleep.5",
+    ])
+  }
 
   /// "●●●○○" dot strip for a 1-5 notch.
   static func scaleDots(_ notch: Int) -> String {
@@ -194,6 +221,12 @@ enum CoachOnboardingDisplay {
   static func scaleLabel(_ labels: [String], notch: Int) -> String {
     let index = min(max(notch - 1, 0), labels.count - 1)
     return labels[index]
+  }
+
+  private static func scaleLabels(
+    _ keys: [String.LocalizationValue], locale: Locale = .current
+  ) -> [String] {
+    keys.map { CoachLocalization.localized($0, locale: locale) }
   }
 
   // MARK: - Date helpers

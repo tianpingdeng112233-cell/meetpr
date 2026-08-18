@@ -108,7 +108,7 @@ final class EvaluationSummaryEditorViewModel {
         }
       } catch {
         // Summary is saved (PUT-first); the banner stays for a retry.
-        noticeMessage = "总结已保存,但完成评估失败,请在学员详情页重试"
+        noticeMessage = CoachStudentDetailStrings.text("coach.evaluation.summary.completeFailed")
         return false
       }
     }
@@ -123,7 +123,7 @@ final class EvaluationSummaryEditorViewModel {
     if let profile = try? await profiles.fetchProfile(studentId: student.id) {
       return profile
     }
-    prefillNotice = "学员资料未读到,手动填写"
+    prefillNotice = CoachStudentDetailStrings.text("coach.evaluation.summary.profileMissing")
     return nil
   }
 
@@ -145,7 +145,7 @@ final class EvaluationSummaryEditorViewModel {
       lastSavedAt = summary.lastUpdatedAt
       return true
     } catch {
-      noticeMessage = "保存失败,请重试"
+      noticeMessage = CoachStudentDetailStrings.text("coach.evaluation.summary.saveFailed")
       return false
     }
   }

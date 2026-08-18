@@ -74,7 +74,7 @@ struct CoachFeedbackHistoryView: View {
     if let exerciseID = item.planExerciseID,
       let exercise = days.flatMap(\.exercises).first(where: { $0.id == exerciseID })
     {
-      return exercise.exercise.name
+      return CoachLocalization.exerciseName(exercise.exercise)
     }
     if item.videoID != nil {
       return CoachFeedbackStrings.videoFeedback
@@ -94,9 +94,6 @@ enum CoachFeedbackStrings {
   static let videoFeedback = CoachLocalization.localized("coach.feedback.videoFeedback")
 
   static func recordCount(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.feedback.recordCount",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.feedback.recordCount \(count)")
   }
 }

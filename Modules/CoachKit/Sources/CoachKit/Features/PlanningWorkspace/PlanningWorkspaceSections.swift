@@ -8,13 +8,16 @@ struct PlanningDraftSection: View {
   let onContinue: (PlanningDraftRowModel) -> Void
 
   var body: some View {
-    PlanningWorkspaceSection(title: "进行中草稿") {
+    PlanningWorkspaceSection(title: PlanningWorkspaceStrings.text("coach.workspace.section.drafts"))
+    {
       ForEach(rows) { row in
         PlanningWorkspaceActionRow(
           title: row.student.displayName,
           summary: row.summary,
-          badge: PlanningWorkspaceBadge(status: .pending, title: "编到一半"),
-          actionTitle: "继续",
+          badge: PlanningWorkspaceBadge(
+            status: .pending,
+            title: PlanningWorkspaceStrings.text("coach.workspace.badge.inProgress")),
+          actionTitle: PlanningWorkspaceStrings.text("coach.workspace.action.continue"),
           avatarSize: 42
         ) {
           onContinue(row)
@@ -31,13 +34,14 @@ struct PlanningNeedsSection: View {
   let onPlan: (PlanningNeededRowModel) -> Void
 
   var body: some View {
-    PlanningWorkspaceSection(title: "谁需要排计划") {
+    PlanningWorkspaceSection(title: PlanningWorkspaceStrings.text("coach.workspace.section.needs"))
+    {
       ForEach(rows) { row in
         PlanningWorkspaceActionRow(
           title: row.student.displayName,
           summary: row.summary,
           badge: PlanningWorkspaceBadge.needsPlanning(row.reason),
-          actionTitle: "排",
+          actionTitle: PlanningWorkspaceStrings.text("coach.workspace.action.plan"),
           avatarSize: 42
         ) {
           onPlan(row)
@@ -54,7 +58,8 @@ struct PlanningRecentPublishedSection: View {
   let context: CoachStudentDetailContext
 
   var body: some View {
-    PlanningWorkspaceSection(title: "最近发布") {
+    PlanningWorkspaceSection(title: PlanningWorkspaceStrings.text("coach.workspace.section.recent"))
+    {
       ForEach(rows) { row in
         NavigationLink {
           StudentDetailView(summary: row.student, context: context)
@@ -96,11 +101,15 @@ private struct PlanningWorkspaceBadge {
   static func needsPlanning(_ reason: PlanningPlanNeedReason) -> PlanningWorkspaceBadge {
     switch reason {
     case .noCurrentPlan:
-      PlanningWorkspaceBadge(status: .pending, title: "暂无计划")
+      PlanningWorkspaceBadge(
+        status: .pending, title: PlanningWorkspaceStrings.text("coach.workspace.badge.noPlan"))
     case .ended:
-      PlanningWorkspaceBadge(status: .overdue, title: "已结束")
+      PlanningWorkspaceBadge(
+        status: .overdue, title: PlanningWorkspaceStrings.text("coach.workspace.badge.ended"))
     case .endsThisWeek:
-      PlanningWorkspaceBadge(status: .overdue, title: "本周结束")
+      PlanningWorkspaceBadge(
+        status: .overdue, title: PlanningWorkspaceStrings.text("coach.workspace.badge.endsThisWeek")
+      )
     }
   }
 }
@@ -166,24 +175,30 @@ private struct PlanningWorkspacePublishedRow: View {
               .foregroundStyle(Color.MeetPR.fgPrimary)
               .lineLimit(1)
 
-            StatusBadge(status: .completed, title: "已发布")
+            StatusBadge(
+              status: .completed,
+              title: PlanningWorkspaceStrings.text("coach.workspace.badge.published"))
           }
 
-          Text("\(row.summary) · \(dateText)发")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
-            .lineLimit(1)
+          Text(
+            PlanningWorkspaceStrings.replacing(
+              "coach.workspace.publishedRow", ["summary": row.summary, "date": dateText])
+          )
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+          .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
 
         Spacer(minLength: MeetPRSpacing.sm)
-        PlanningWorkspaceActionPill(title: "查看")
+        PlanningWorkspaceActionPill(
+          title: PlanningWorkspaceStrings.text("coach.workspace.action.view"))
       }
     }
   }
 
   private var dateText: String {
-    "\(PlanningWorkspaceSummary.proxyDateText(row.proxyPublishedAt))发"
+    PlanningWorkspaceSummary.proxyDateText(row.proxyPublishedAt)
   }
 }
 

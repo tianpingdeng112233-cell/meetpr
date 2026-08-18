@@ -14,11 +14,11 @@ enum StudentDetailSection: String, CaseIterable, Identifiable, Sendable {
 
   var title: String {
     switch self {
-    case .overview: "概览"
-    case .videos: "视频"
-    case .growth: "成长"
-    case .feedback: "反馈"
-    case .profile: "资料"
+    case .overview: CoachStudentDetailStrings.text("coach.studentDetail.section.overview")
+    case .videos: CoachStudentDetailStrings.text("coach.studentDetail.section.videos")
+    case .growth: CoachStudentDetailStrings.text("coach.studentDetail.section.growth")
+    case .feedback: CoachStudentDetailStrings.text("coach.studentDetail.section.feedback")
+    case .profile: CoachStudentDetailStrings.text("coach.studentDetail.section.profile")
     }
   }
 }
@@ -46,9 +46,12 @@ struct StudentExecutionDay: Hashable, Identifiable, Sendable {
 
   var completionText: String {
     guard plannedSetCount > 0 else {
-      return logs.isEmpty ? "休息日" : "\(completedSetCount) 组已记录"
+      return logs.isEmpty
+        ? CoachStudentDetailStrings.text("coach.execution.restDay")
+        : CoachLocalization.localized("coach.execution.loggedSets \(completedSetCount)")
     }
-    return "\(completedSetCount)/\(plannedSetCount) 组"
+    return CoachLocalization.localized(
+      "coach.execution.setFraction \(completedSetCount) \(plannedSetCount)")
   }
 
 }
@@ -120,7 +123,7 @@ final class StudentDetailViewModel {
 
   var planShiftBadgeText: String? {
     guard let totalShiftDays = plan?.totalShiftDays, totalShiftDays > 0 else { return nil }
-    return "已顺延 \(totalShiftDays) 天"
+    return CoachLocalization.localized("coach.studentDetail.shiftedDays \(totalShiftDays)")
   }
 
   @ObservationIgnored private let plans: any StudentPlanRepository
@@ -183,7 +186,7 @@ final class StudentDetailViewModel {
       overview = Self.makeOverview(days: executionDays, feedback: feedbackItems)
       state = .loaded
     } catch {
-      state = .failed("学员详情加载失败，请稍后重试")
+      state = .failed(CoachStudentDetailStrings.text("coach.studentDetail.error.load"))
       return
     }
     // Auxiliary sections (video wall, today's readiness) degrade in place —

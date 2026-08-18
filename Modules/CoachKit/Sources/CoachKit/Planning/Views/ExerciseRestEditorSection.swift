@@ -13,9 +13,9 @@ struct ExerciseRestEditorSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      RestSecondsPicker(label: "组间休息", value: singleRestBinding)
+      RestSecondsPicker(label: CoachPlanningStrings.restBetweenSets, value: singleRestBinding)
 
-      Toggle("逐组单独设", isOn: perSetEnabledBinding)
+      Toggle(CoachPlanningStrings.setRestIndividually, isOn: perSetEnabledBinding)
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
 
@@ -23,12 +23,12 @@ struct ExerciseRestEditorSection: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
           ForEach(0..<max(1, setCount), id: \.self) { index in
             HStack(spacing: MeetPRSpacing.sm) {
-              Text("第\(index + 1)组")
+              Text(CoachPlanningStrings.setNumber(index + 1))
                 .font(Font.MeetPR.footnote)
                 .foregroundStyle(Color.MeetPR.fgSecondary)
                 .frame(width: 48, alignment: .leading)
 
-              RestSecondsPicker(label: "休息", value: perSetBinding(at: index))
+              RestSecondsPicker(label: CoachPlanningStrings.rest, value: perSetBinding(at: index))
             }
           }
         }

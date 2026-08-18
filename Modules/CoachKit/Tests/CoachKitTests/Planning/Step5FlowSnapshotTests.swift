@@ -25,7 +25,8 @@ import ViewInspector
 @Test func intensityModeToggleRendersBothModes() throws {
   let inspected = try IntensityModeToggleHarness().inspect()
 
-  #expect(try inspected.find(text: "重量").string() == "重量")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.weight).string() == CoachPlanningStrings.weight)
   #expect(try inspected.find(text: "RPE").string() == "RPE")
 }
 
@@ -43,7 +44,9 @@ import ViewInspector
 @Test func weightInputFieldExplainsMissingOneRM() throws {
   let inspected = try WeightInputField(value: 40, oneRM: nil) { _ in }.inspect()
 
-  #expect(try inspected.find(text: "未设 1RM，无法换算 %1RM").string() == "未设 1RM，无法换算 %1RM")
+  #expect(
+    try inspected.find(text: CoachPlanningStrings.missingOneRM.uppercased()).string()
+      == CoachPlanningStrings.missingOneRM.uppercased())
 }
 
 @MainActor

@@ -34,16 +34,19 @@ enum InviteCodeStrings {
   static let operationFailed = CoachLocalization.localized("coach.invites.operationFailed")
 
   static func usedCount(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.invites.usedCount",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.invites.usedCount \(count)")
   }
 
   static func days(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.invites.days",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.invites.days \(count)")
+  }
+
+  static let statusActive = CoachLocalization.localized("coach.invites.status.active")
+  static let statusUsed = CoachLocalization.localized("coach.invites.status.used")
+  static let statusExpired = CoachLocalization.localized("coach.invites.status.expired")
+  static let statusRevoked = CoachLocalization.localized("coach.invites.status.revoked")
+
+  static func expiresIn(_ count: Int) -> String {
+    CoachLocalization.localized("coach.invites.status.expiresIn \(count)")
   }
 }

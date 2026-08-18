@@ -31,11 +31,11 @@ public enum InviteCodeStatus: Equatable, Sendable {
 
   public var label: String {
     switch self {
-    case .active: "待用"
-    case .expiringIn(let days): "\(days) 天后过期"
-    case .used: "已使用"
-    case .expired: "已过期"
-    case .revoked: "已撤销"
+    case .active: InviteCodeStrings.statusActive
+    case .expiringIn(let days): InviteCodeStrings.expiresIn(days)
+    case .used: InviteCodeStrings.statusUsed
+    case .expired: InviteCodeStrings.statusExpired
+    case .revoked: InviteCodeStrings.statusRevoked
     }
   }
 

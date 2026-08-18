@@ -7,7 +7,9 @@ import Testing
 @Test func readinessScalesTextShowsRawValuesWithoutInversion() {
   let checkin = CoachStudentFeatureFixtures.readinessCheckin(checkinDate: "2026-02-02")
 
-  #expect(CoachStudentFormatting.readinessScalesText(checkin) == "睡眠 4 · 状态 3 · 压力 2")
+  #expect(
+    CoachStudentFormatting.readinessScalesText(checkin)
+      == CoachSharedStrings.readinessScales(sleep: 4, mood: 3, stress: 2))
 }
 
 @Test func readinessFatigueTextOrdersByAllowedChipOrder() {
@@ -23,7 +25,16 @@ import Testing
   )
 
   #expect(
-    CoachStudentFormatting.readinessFatigueText(checkin) == "疲劳：股四(重) 肩(中) 核心·下背(轻)"
+    CoachStudentFormatting.readinessFatigueText(checkin)
+      == CoachSharedStrings.fatigue(
+        [
+          CoachSharedStrings.muscleGroup("coach.shared.muscle.quadriceps") + "("
+            + CoachSharedStrings.severity(3) + ")",
+          CoachSharedStrings.muscleGroup("coach.shared.muscle.shoulder") + "("
+            + CoachSharedStrings.severity(2) + ")",
+          CoachSharedStrings.muscleGroup("coach.shared.muscle.coreAndLowerBack") + "("
+            + CoachSharedStrings.severity(1) + ")",
+        ].joined(separator: " "))
   )
 }
 
@@ -33,13 +44,22 @@ import Testing
     muscleFatigue: []
   )
 
-  #expect(CoachStudentFormatting.readinessFatigueText(checkin) == "无肌群疲劳")
+  #expect(
+    CoachStudentFormatting.readinessFatigueText(checkin) == CoachSharedStrings.noMuscleFatigue())
 }
 
 @Test func muscleGroupTextCoversAllEightAllowedGroups() {
-  let texts = ReadinessCheckin.allowedMuscleGroups.map(CoachStudentFormatting.muscleGroupText)
+  let texts = ReadinessCheckin.allowedMuscleGroups.map {
+    CoachStudentFormatting.muscleGroupText($0)
+  }
 
-  #expect(texts == ["股四", "腘绳", "臀", "背", "胸", "肩", "肱三头", "核心·下背"])
+  #expect(
+    texts == [
+      "coach.shared.muscle.quadriceps", "coach.shared.muscle.hamstrings",
+      "coach.shared.muscle.glutes", "coach.shared.muscle.back", "coach.shared.muscle.chest",
+      "coach.shared.muscle.shoulder", "coach.shared.muscle.triceps",
+      "coach.shared.muscle.coreAndLowerBack",
+    ])
 }
 
 @Test func localDayStringMatchesCheckinDateWireShape() {

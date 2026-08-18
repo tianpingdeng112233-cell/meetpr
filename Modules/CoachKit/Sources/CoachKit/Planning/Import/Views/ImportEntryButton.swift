@@ -16,7 +16,11 @@ struct ImportEntryButton: View {
   @State private var isPresenting = false
 
   var body: some View {
-    SecondaryButton("导入计划", isDisabled: !PlanImportCapability.isEnabled, isFullWidth: true) {
+    SecondaryButton(
+      CoachImportStrings.title,
+      isDisabled: !PlanImportCapability.isEnabled,
+      isFullWidth: true
+    ) {
       isPresenting = true
     }
     .sheet(isPresented: $isPresenting) {
@@ -73,11 +77,11 @@ struct ImportFlowView: View {
   private var studentPicker: some View {
     List {
       if let loadError {
-        Text("学员加载失败：\(loadError)")
+        Text(CoachImportStrings.studentLoadFailed(loadError))
           .font(.footnote)
           .foregroundStyle(Color.MeetPR.amber)
       }
-      Section("选学员") {
+      Section(CoachImportStrings.selectStudent) {
         ForEach(students) { student in
           Button {
             selected = student
@@ -88,10 +92,10 @@ struct ImportFlowView: View {
         }
       }
     }
-    .navigationTitle("导入计划")
+    .navigationTitle(CoachImportStrings.title)
     .toolbar {
       ToolbarItem(placement: .cancellationAction) {
-        Button("取消") { onCancel() }
+        Button(CoachPlanningStrings.cancel) { onCancel() }
       }
     }
   }

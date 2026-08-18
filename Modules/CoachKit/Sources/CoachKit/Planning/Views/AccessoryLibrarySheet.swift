@@ -48,10 +48,10 @@ public struct AccessoryLibrarySheet: View {
         .padding(MeetPRSpacing.base)
       }
       .background(Color.MeetPR.bg)
-      .navigationTitle("动作库")
+      .navigationTitle(CoachPlanningStrings.exerciseLibrary)
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
-          Button("完成") { dismiss() }
+          Button(CoachPlanningStrings.done) { dismiss() }
         }
       }
     }

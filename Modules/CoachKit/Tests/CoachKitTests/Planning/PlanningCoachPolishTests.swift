@@ -77,10 +77,24 @@ private func profileFixture(
 @available(iOS 17.0, macOS 14.0, *)
 @Test func profileSummaryFormatsKeyFields() {
   let profile = profileFixture()
-  #expect(StudentProfileSummary.basics(profile) == "男 · 84kg · 178cm")
-  #expect(StudentProfileSummary.oneRMs(profile) == "蹲 180 / 推 120 / 拉 220")
-  #expect(StudentProfileSummary.trainingDays(profile) == "每周 4 天 (一·三·五·六)")
-  #expect(StudentProfileSummary.gym(profile) == "商业健身房 · 额外器械 1 项")
+  #expect(StudentProfileSummary.basics(profile) == "\(CoachPlanningStrings.male) · 84kg · 178cm")
+  #expect(
+    StudentProfileSummary.oneRMs(profile)
+      == [
+        CoachPlanningStrings.oneRMSquat("180"), CoachPlanningStrings.oneRMBench("120"),
+        CoachPlanningStrings.oneRMDeadlift("220"),
+      ].joined(separator: " / "))
+  #expect(
+    StudentProfileSummary.trainingDays(profile)
+      == CoachPlanningStrings.weeklyTrainingDays(
+        count: 4,
+        names: [
+          CoachPlanningStrings.mondayShort, CoachPlanningStrings.wednesdayShort,
+          CoachPlanningStrings.fridayShort, CoachPlanningStrings.saturdayShort,
+        ].joined(separator: "·")))
+  #expect(
+    StudentProfileSummary.gym(profile)
+      == "\(CoachPlanningStrings.commercialGym) · \(CoachPlanningStrings.extraEquipment(1))")
   #expect(StudentProfileSummary.competition(profile) == "2026-09-01 · IPF 83kg")
   #expect(StudentProfileSummary.noteToCoach(profile) == "右肩旧伤，卧推注意")
 }
@@ -91,7 +105,10 @@ private func profileFixture(
   #expect(StudentProfileSummary.competition(profile) == nil)
   #expect(StudentProfileSummary.noteToCoach(profile) == nil)
   // oneRMs still has bench/deadlift, so it's non-nil but drops squat.
-  #expect(StudentProfileSummary.oneRMs(profile) == "推 120 / 拉 220")
+  #expect(
+    StudentProfileSummary.oneRMs(profile)
+      == [CoachPlanningStrings.oneRMBench("120"), CoachPlanningStrings.oneRMDeadlift("220")]
+      .joined(separator: " / "))
 }
 
 // MARK: - #4 completion issues
@@ -104,7 +121,10 @@ private func profileFixture(
   // Default specs carry weight 0 → every exercise reports 未设重量.
   let issues = viewModel.planCompletionIssues()
   #expect(!issues.isEmpty)
-  #expect(issues.allSatisfy { $0.contains("未设重量") })
+  #expect(
+    issues.allSatisfy {
+      $0 == CoachPlanningStrings.missingIntensity(day: "", exercise: "")
+    })
 
   // Fill every exercise with a real weight → no issues.
   for exercise in viewModel.sortedDraftExercises {

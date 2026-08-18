@@ -16,14 +16,17 @@ struct BindRequestCard: View {
   let onReject: () -> Void
 
   var body: some View {
-    Card(accessibilityLabel: "新学员请求 \(item.displayName)") {
+    Card(
+      accessibilityLabel: CoachBindStrings.replacing(
+        "coach.bind.card.accessibility", ["student": item.displayName])
+    ) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         headlineRow
 
         if item.onboarding.completed {
           summaryLines
         } else {
-          Text("资料未填写完成")
+          Text(CoachBindStrings.text("coach.bind.card.profileIncomplete"))
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgSecondary)
         }
@@ -42,7 +45,7 @@ struct BindRequestCard: View {
         .lineLimit(1)
       Spacer(minLength: MeetPRSpacing.sm)
       if CoachOnboardingDisplay.isExpiringSoon(expiredAt: item.expiredAt, now: now) {
-        StatusBadge(status: .overdue, title: "即将过期")
+        StatusBadge(status: .overdue, title: CoachBindStrings.text("coach.bind.card.expiring"))
       }
     }
   }
@@ -54,7 +57,8 @@ struct BindRequestCard: View {
       parts.append(CoachOnboardingDisplay.genderText(gender))
     }
     if let age = CoachOnboardingDisplay.age(birthDate: onboarding.birthDate, now: now) {
-      parts.append("\(age) 岁")
+      parts.append(
+        CoachLocalization.localized("coach.bind.card.age \(age)"))
     }
     if let weight = onboarding.weightKg {
       parts.append("\(CoachOnboardingDisplay.decimalText(weight)) kg")
@@ -78,23 +82,29 @@ struct BindRequestCard: View {
       }
       if !onboarding.muscleGroupsToStrengthen.isEmpty {
         summaryText(
-          "想增强: "
-            + CoachOnboardingDisplay.muscleGroupList(onboarding.muscleGroupsToStrengthen))
+          CoachBindStrings.replacing(
+            "coach.bind.card.strengthen",
+            ["groups": CoachOnboardingDisplay.muscleGroupList(onboarding.muscleGroupsToStrengthen)]
+          ))
       }
       if let tier = onboarding.gymTier {
         summaryText(CoachOnboardingDisplay.gymTierText(tier))
       }
       if onboarding.isCompeting == true, let competitionDate = onboarding.competitionDate {
-        summaryText("备赛: \(competitionDate)")
+        summaryText(
+          CoachBindStrings.replacing(
+            "coach.bind.card.competition", ["date": competitionDate]))
       }
       if let note = onboarding.noteToCoach {
-        Text("备注: \(note)")
+        Text(CoachBindStrings.replacing("coach.bind.card.note", ["note": note]))
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
           .lineLimit(2)
       }
       summaryText(
-        onboarding.uploadCount > 0 ? "资料 \(onboarding.uploadCount) 份" : "无上传资料")
+        onboarding.uploadCount > 0
+          ? CoachLocalization.localized("coach.bind.card.uploadCount \(onboarding.uploadCount)")
+          : CoachBindStrings.text("coach.bind.card.noUploads"))
     }
   }
 
@@ -112,14 +122,14 @@ struct BindRequestCard: View {
 
   private var buttonRow: some View {
     HStack(spacing: MeetPRSpacing.sm) {
-      SecondaryButton("查看完整资料") {
+      SecondaryButton(CoachBindStrings.text("coach.bind.card.viewProfile")) {
         onViewProfile()
       }
       Spacer()
-      SecondaryButton("拒绝") {
+      SecondaryButton(CoachBindStrings.text("coach.bind.card.reject")) {
         onReject()
       }
-      PrimaryButton("接收") {
+      PrimaryButton(CoachBindStrings.text("coach.bind.card.accept")) {
         onAccept()
       }
     }

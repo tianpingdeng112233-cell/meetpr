@@ -28,6 +28,9 @@ enum CoachVideoFeedbackStrings {
     "coach.videoFeedback.markerSaveFailed")
   static let markerDeleteFailed = CoachLocalization.localized(
     "coach.videoFeedback.markerDeleteFailed")
+  static let emptyFeedback = CoachLocalization.localized("coach.videoFeedback.emptyFeedback")
+  static let sentFeedback = CoachLocalization.localized("coach.videoFeedback.sentFeedback")
+  static let sendFailed = CoachLocalization.localized("coach.videoFeedback.sendFailed")
 
   static func feedbackPlaceholder(studentName: String) -> String {
     CoachLocalization.replacing(
@@ -57,20 +60,11 @@ enum CoachVideoFeedbackStrings {
   }
 
   static func queuePosition(index: Int, total: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.videoFeedback.queuePosition",
-      values: [
-        "index": index.formatted(),
-        "total": total.formatted(),
-      ]
-    )
+    CoachLocalization.localized("coach.videoFeedback.queuePosition \(index) \(total)")
   }
 
   static func repsValue(_ reps: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.videoFeedback.repsValue",
-      values: ["reps": reps.formatted()]
-    )
+    CoachLocalization.localized("coach.videoFeedback.repsValue \(reps)")
   }
 
   static func rowAccessibility(exerciseName: String) -> String {
@@ -81,10 +75,7 @@ enum CoachVideoFeedbackStrings {
   }
 
   static func setNumber(_ number: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.videoFeedback.setNumber",
-      values: ["number": number.formatted()]
-    )
+    CoachLocalization.localized("coach.videoFeedback.setNumber \(number)")
   }
 
   static func sizeMegabytes(_ size: String) -> String {
@@ -95,10 +86,7 @@ enum CoachVideoFeedbackStrings {
   }
 
   static func markerCount(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.videoFeedback.markerCount",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.videoFeedback.markerCount \(count)")
   }
 
 }

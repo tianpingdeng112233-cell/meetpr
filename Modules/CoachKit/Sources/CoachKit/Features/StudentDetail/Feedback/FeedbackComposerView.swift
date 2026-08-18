@@ -70,19 +70,22 @@ struct FeedbackComposerView: View {
   private var header: some View {
     VStack(alignment: .leading, spacing: 4) {
       HStack {
-        Eyebrow("文本反馈 //")
+        Eyebrow(CoachStudentDetailStrings.text("coach.feedback.eyebrow"))
         Spacer()
-        Button("取消") {
+        Button(CoachStudentDetailStrings.text("coach.common.cancel")) {
           dismiss()
         }
         .font(.system(size: 16))
         .foregroundStyle(Color.MeetPR.fgSecondary)
       }
-      Text("给 \(studentName) 写反馈")
-        .font(.system(size: 28, weight: .heavy))
-        .foregroundStyle(Color.MeetPR.fgPrimary)
-        .lineLimit(1)
-        .minimumScaleFactor(0.7)
+      Text(
+        CoachStudentDetailStrings.replacing(
+          "coach.feedback.title", ["student": studentName])
+      )
+      .font(.system(size: 28, weight: .heavy))
+      .foregroundStyle(Color.MeetPR.fgPrimary)
+      .lineLimit(1)
+      .minimumScaleFactor(0.7)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(.horizontal, MeetPRSpacing.base)
@@ -94,7 +97,7 @@ struct FeedbackComposerView: View {
 
   private var editorCard: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      sectionLabel("反馈内容")
+      sectionLabel(CoachStudentDetailStrings.text("coach.feedback.content"))
       editor
         .frame(minHeight: 180)
         .padding(MeetPRSpacing.md)
@@ -110,11 +113,14 @@ struct FeedbackComposerView: View {
   private var editor: some View {
     ZStack(alignment: .topLeading) {
       if viewModel.text.isEmpty {
-        Text("给 \(studentName) 写反馈...")
-          .font(Font.MeetPR.body)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
-          .padding(.top, 8)
-          .padding(.leading, 5)
+        Text(
+          CoachStudentDetailStrings.replacing(
+            "coach.feedback.placeholder", ["student": studentName])
+        )
+        .font(Font.MeetPR.body)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
+        .padding(.top, 8)
+        .padding(.leading, 5)
       }
       TextEditor(text: $viewModel.text)
         .font(Font.MeetPR.body)
@@ -127,7 +133,7 @@ struct FeedbackComposerView: View {
 
   private var linkCard: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      sectionLabel("关联")
+      sectionLabel(CoachStudentDetailStrings.text("coach.feedback.link"))
       VStack(spacing: 0) {
         dayRow
         Rectangle().fill(Color.MeetPR.border).frame(height: 1)
@@ -144,12 +150,14 @@ struct FeedbackComposerView: View {
 
   private var dayRow: some View {
     HStack {
-      Text("日期")
+      Text(CoachStudentDetailStrings.text("coach.feedback.date"))
         .font(.system(size: 16))
         .foregroundStyle(Color.MeetPR.fgPrimary)
       Spacer()
-      Picker("日期", selection: $viewModel.selectedDayDate) {
-        Text("不关联").tag(Date?.none)
+      Picker(
+        CoachStudentDetailStrings.text("coach.feedback.date"), selection: $viewModel.selectedDayDate
+      ) {
+        Text(CoachStudentDetailStrings.text("coach.feedback.notLinked")).tag(Date?.none)
         ForEach(days) { day in
           Text(CoachStudentFormatting.fullDateText(day.date)).tag(Optional(day.date))
         }
@@ -167,14 +175,17 @@ struct FeedbackComposerView: View {
 
   private var exerciseRow: some View {
     HStack {
-      Text("动作")
+      Text(CoachStudentDetailStrings.text("coach.feedback.exercise"))
         .font(.system(size: 16))
         .foregroundStyle(Color.MeetPR.fgPrimary)
       Spacer()
-      Picker("动作", selection: $viewModel.selectedExerciseID) {
-        Text("不关联").tag(UUID?.none)
+      Picker(
+        CoachStudentDetailStrings.text("coach.feedback.exercise"),
+        selection: $viewModel.selectedExerciseID
+      ) {
+        Text(CoachStudentDetailStrings.text("coach.feedback.notLinked")).tag(UUID?.none)
         ForEach(viewModel.availableExercises(days: days)) { exercise in
-          Text(exercise.exercise.name).tag(Optional(exercise.id))
+          Text(CoachLocalization.exerciseName(exercise.exercise)).tag(Optional(exercise.id))
         }
       }
       .labelsHidden()
@@ -209,7 +220,7 @@ struct FeedbackComposerView: View {
     } label: {
       HStack(spacing: MeetPRSpacing.sm) {
         Image(systemName: "paperplane.fill")
-        Text("发送")
+        Text(CoachStudentDetailStrings.text("coach.feedback.send"))
       }
       .font(.system(size: 16, weight: .semibold))
       .foregroundStyle(viewModel.canSend ? Color.MeetPR.bg : Color.MeetPR.fgTertiary)
@@ -224,7 +235,7 @@ struct FeedbackComposerView: View {
     .padding(.top, MeetPRSpacing.sm)
     .padding(.bottom, MeetPRSpacing.sm)
     .background(.ultraThinMaterial)
-    .accessibilityLabel("发送")
+    .accessibilityLabel(CoachStudentDetailStrings.text("coach.feedback.send"))
   }
 
   // MARK: - Building blocks

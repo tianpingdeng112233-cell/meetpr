@@ -13,11 +13,11 @@ struct IntensityReviewSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       HStack(spacing: 8) {
-        Text("第 \(set.setNumber) 组")
+        Text(CoachImportStrings.setNumber(set.setNumber))
           .font(.footnote.monospacedDigit().bold())
           .foregroundStyle(Color.MeetPR.fgPrimary)
         if !ImportCompleteness.isComplete(set) {
-          Text("待你定")
+          Text(CoachImportStrings.needsYourInput)
             .font(.caption2.bold())
             .foregroundStyle(Color.MeetPR.amber)
             .padding(.horizontal, 6)
@@ -29,19 +29,27 @@ struct IntensityReviewSection: View {
       }
 
       HStack(spacing: 8) {
-        labeledField("次数", text: intText($set.targetReps))
-        labeledField("重量kg", text: decimalText($set.weightKg))
+        labeledField(CoachPlanningStrings.reps, text: intText($set.targetReps))
+        labeledField(CoachImportStrings.weightKilograms, text: decimalText($set.weightKg))
         labeledField("RPE", text: decimalText($set.rpe))
       }
 
-      labeledField("教练备注", text: optionalText($set.coachNote))
+      labeledField(
+        CoachImportStrings.coachNote,
+        text: optionalText($set.coachNote),
+        usesDefaultKeyboard: true
+      )
     }
     .padding(10)
     .background(Color.MeetPR.surface1)
     .clipShape(.rect(cornerRadius: 10))
   }
 
-  private func labeledField(_ label: String, text: Binding<String>) -> some View {
+  private func labeledField(
+    _ label: String,
+    text: Binding<String>,
+    usesDefaultKeyboard: Bool = false
+  ) -> some View {
     VStack(alignment: .leading, spacing: 2) {
       Text(label)
         .font(.caption2)
@@ -50,7 +58,7 @@ struct IntensityReviewSection: View {
         .font(.footnote)
         .textFieldStyle(.roundedBorder)
         #if os(iOS)
-          .keyboardType(label == "教练备注" ? .default : .numbersAndPunctuation)
+          .keyboardType(usesDefaultKeyboard ? .default : .numbersAndPunctuation)
         #endif
     }
   }

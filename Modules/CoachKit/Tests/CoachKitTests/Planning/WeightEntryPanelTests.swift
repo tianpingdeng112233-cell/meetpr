@@ -194,7 +194,11 @@ private func activeStudent() -> CoachStudentSummary {
 
   let benchBases = viewModel.weightEntryBases(for: bench)
   #expect(benchBases.contains { $0.label.hasPrefix("1RM·") && $0.amount == 120 })
-  #expect(benchBases.contains { $0.label.hasPrefix("主项·") && $0.amount == 140 })
+  #expect(
+    benchBases.contains {
+      $0.label == CoachPlanningStrings.mainLiftBase("Competition Bench Press")
+        && $0.amount == 140
+    })
 
   // The squat's own bases never include itself; with no other weight-mode
   // main that day it offers only the 1RM.
@@ -206,5 +210,8 @@ private func activeStudent() -> CoachStudentSummary {
   spec.intensityMode = .rpe
   spec.targetValue = 8
   try await viewModel.updateW1SetSpec(spec, for: squat.id)
-  #expect(!viewModel.weightEntryBases(for: bench).contains { $0.label.hasPrefix("主项·") })
+  #expect(
+    !viewModel.weightEntryBases(for: bench).contains {
+      $0.label == CoachPlanningStrings.mainLiftBase("Competition Bench Press")
+    })
 }

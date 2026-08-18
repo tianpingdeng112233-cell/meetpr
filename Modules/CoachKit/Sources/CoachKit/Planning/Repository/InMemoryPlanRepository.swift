@@ -207,7 +207,7 @@ private let competitionLiftSeeds = [
   CompetitionLiftSeed(
     id: InMemoryPlanRepository.uuid(22),
     name: "比赛式传统硬拉",
-    nameEn: "Competition Conventional Deadlift",
+    nameEn: "Competition Deadlift",
     mainLiftFamily: .deadlift,
     competitionStance: .conventional,
     muscleGroups: [.back, .hamstring],

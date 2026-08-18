@@ -20,7 +20,7 @@ public struct Step3SelectMainLiftsView: View {
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Eyebrow("STEP 3")
-          Text("选择主项及变式")
+          Text(CoachPlanningStrings.selectMainLiftsTitle)
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
@@ -30,7 +30,7 @@ public struct Step3SelectMainLiftsView: View {
         }
 
         PrimaryButton(
-          "下一步",
+          CoachPlanningStrings.next,
           isDisabled: !viewModel.isCurrentStepValid,
           isFullWidth: true
         ) {
@@ -42,7 +42,7 @@ public struct Step3SelectMainLiftsView: View {
       .padding(MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
-    .navigationTitle("主项及变式")
+    .navigationTitle(CoachPlanningStrings.selectMainLiftsTitle)
     .scrollDismissesKeyboard(.interactively)
   }
 }
@@ -119,7 +119,10 @@ private struct MainLiftPickerRow: View {
         .buttonStyle(.plain)
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityLabel(
-          "\(PlanningDisplay.liftName(family))主项及变式: \(currentSelectionLabel)"
+          CoachPlanningStrings.mainLiftVariationLabel(
+            lift: PlanningDisplay.liftName(family),
+            selection: currentSelectionLabel
+          )
         )
       }
 
@@ -146,8 +149,8 @@ private struct MainLiftPickerRow: View {
   }
 
   private var currentSelectionLabel: String {
-    guard let exercise = currentSelection else { return "请选择" }
-    return exercise.name
+    guard let exercise = currentSelection else { return CoachPlanningStrings.chooseExercise }
+    return CoachLocalization.exerciseName(exercise)
   }
 
   private var key: DayLiftKey {
@@ -174,7 +177,7 @@ private struct VariantPickerSheet: View {
         } label: {
           HStack(spacing: MeetPRSpacing.sm) {
             VStack(alignment: .leading, spacing: 2) {
-              Text(exercise.name)
+              Text(CoachLocalization.exerciseName(exercise))
                 .font(Font.MeetPR.body)
                 .foregroundStyle(Color.MeetPR.fgPrimary)
             }
@@ -189,11 +192,13 @@ private struct VariantPickerSheet: View {
         .buttonStyle(.plain)
       }
       .listStyle(.plain)
-      .searchable(text: $searchText, prompt: "搜索 / Search")
-      .navigationTitle("\(PlanningDisplay.liftName(family))主项及变式")
+      .searchable(text: $searchText, prompt: CoachPlanningStrings.search)
+      .navigationTitle(
+        CoachPlanningStrings.mainLiftVariationTitle(PlanningDisplay.liftName(family))
+      )
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("取消") { dismiss() }
+          Button(CoachPlanningStrings.cancel) { dismiss() }
         }
       }
     }

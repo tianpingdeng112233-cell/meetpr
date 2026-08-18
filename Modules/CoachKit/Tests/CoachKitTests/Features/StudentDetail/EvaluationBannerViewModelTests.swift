@@ -58,7 +58,9 @@ private func makeViewModel(
       evaluationsByStudent: [BindQueueFixtures.studentID: evaluation]))
   await viewModel.load()
 
-  #expect(viewModel.statusText(now: BindQueueFixtures.now) == "评估期 · 还剩 4 天 13 小时")
+  #expect(
+    viewModel.statusText(now: BindQueueFixtures.now)
+      == CoachLocalization.localized("coach.evaluation.remaining \(4) \(13)"))
   #expect(!viewModel.isOverdue(now: BindQueueFixtures.now))
 }
 
@@ -73,7 +75,14 @@ private func makeViewModel(
       evaluationsByStudent: [BindQueueFixtures.studentID: evaluation]))
   await viewModel.load()
 
-  #expect(viewModel.statusText(now: BindQueueFixtures.now) == "已超期 2 天,请尽快交付总结")
+  #expect(
+    viewModel.statusText(now: BindQueueFixtures.now)
+      == CoachStudentDetailStrings.replacing(
+        "coach.evaluation.overdue",
+        [
+          "duration": CoachStudentDetailStrings.replacing(
+            "coach.evaluation.duration.days", ["count": 2])
+        ]))
   #expect(viewModel.isOverdue(now: BindQueueFixtures.now))
   #expect(viewModel.isBannerVisible)
 }

@@ -40,7 +40,7 @@ private final class ConfirmCapture: @unchecked Sendable {
   #expect(throws: (any Error).self) {
     _ = try inspected.find(ViewType.TextField.self)
   }
-  _ = try inspected.find(text: "确认接收")
+  _ = try inspected.find(text: CoachBindStrings.text("coach.bind.accept.confirm"))
 }
 
 @MainActor
@@ -54,7 +54,7 @@ private final class ConfirmCapture: @unchecked Sendable {
     return true
   }
 
-  try sut.inspect().find(button: "确认接收").tap()
+  try sut.inspect().find(button: CoachBindStrings.text("coach.bind.accept.confirm")).tap()
 
   // submit() hops through a Task — poll briefly for the closure to land.
   for _ in 0..<200 where capture.invocation == nil {

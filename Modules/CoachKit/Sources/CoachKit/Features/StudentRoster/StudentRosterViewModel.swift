@@ -123,7 +123,7 @@ final class StudentRosterViewModel {
       state = .loaded
     } catch {
       rows = []
-      state = .failed("学员加载失败，请稍后重试")
+      state = .failed(CoachLocalization.localized("coach.roster.error.load"))
     }
   }
 

@@ -35,7 +35,7 @@ public struct ProgressionRuleEditorCard: View {
         let accessories = viewModel.sortedDraftExercises.filter { !$0.isMainLift }
 
         if !mainLifts.isEmpty {
-          chipSection(title: "应用动作 — 主项及变式") {
+          chipSection(title: CoachPlanningStrings.applyMainLiftVariations) {
             ForEach(mainLifts, id: \.id) { exercise in
               RuleChip(
                 title: viewModel.exerciseName(for: exercise),
@@ -49,7 +49,7 @@ public struct ProgressionRuleEditorCard: View {
         }
 
         if !accessories.isEmpty {
-          chipSection(title: "应用动作 — 辅助项") {
+          chipSection(title: CoachPlanningStrings.applyAccessories) {
             ForEach(accessories, id: \.id) { exercise in
               RuleChip(
                 title: viewModel.exerciseName(for: exercise),
@@ -62,7 +62,7 @@ public struct ProgressionRuleEditorCard: View {
           }
         }
 
-        chipSection(title: "应用周") {
+        chipSection(title: CoachPlanningStrings.applyWeeks) {
           RuleChip(title: "W1", isSelected: false, isDisabled: true) {}
           ForEach([2, 3, 4], id: \.self) { week in
             RuleChip(
@@ -118,7 +118,7 @@ public struct ProgressionRuleEditorCard: View {
 @available(iOS 17.0, macOS 14.0, *)
 extension ProgressionRuleEditorCard {
   private var exerciseRequiredHint: some View {
-    Text("先选择一个应用动作，再设置该动作的递进规则。")
+    Text(CoachPlanningStrings.selectExerciseBeforeRule)
       .font(Font.MeetPR.footnote)
       .foregroundStyle(Color.MeetPR.fgSecondary)
       .padding(.vertical, MeetPRSpacing.xs)
@@ -127,17 +127,17 @@ extension ProgressionRuleEditorCard {
 
   private var header: some View {
     HStack(alignment: .firstTextBaseline) {
-      Text("规则 \(rule.displayOrder + 1)")
+      Text(CoachPlanningStrings.ruleNumber(rule.displayOrder + 1))
         .font(Font.MeetPR.headline)
         .foregroundStyle(Color.MeetPR.fgPrimary)
 
       if viewModel.isRuleOverridden(rule) {
-        StatusBadge(status: .overdue, title: "被覆盖")
+        StatusBadge(status: .overdue, title: CoachPlanningStrings.overridden)
       }
 
       Spacer()
 
-      Button("删除", systemImage: "trash") {
+      Button(CoachPlanningStrings.delete, systemImage: "trash") {
         Task {
           try? await viewModel.deleteRule(id: rule.id)
         }
@@ -149,7 +149,7 @@ extension ProgressionRuleEditorCard {
   }
 
   private var typePicker: some View {
-    Picker("规则类型", selection: $rule.ruleType) {
+    Picker(CoachPlanningStrings.ruleType, selection: $rule.ruleType) {
       ForEach(ProgressionRuleType.allCases, id: \.self) { type in
         Text(type.title).tag(type)
       }
@@ -159,7 +159,7 @@ extension ProgressionRuleEditorCard {
 
   private var incrementControl: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-      Text("增减量")
+      Text(CoachPlanningStrings.changeAmount)
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgSecondary)
 
@@ -169,14 +169,14 @@ extension ProgressionRuleEditorCard {
         step: incrementStep,
         decimalIncrement: incrementDecimalStep,
         unitLabel: incrementUnitLabel,
-        weightPanelTitle: incrementUnitLabel == "kg" ? "每周增减量" : nil
+        weightPanelTitle: incrementUnitLabel == "kg" ? CoachPlanningStrings.weeklyChange : nil
       )
     }
   }
 
   private var customControls: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Picker("自定义维度", selection: customDimensionBinding) {
+      Picker(CoachPlanningStrings.customDimension, selection: customDimensionBinding) {
         ForEach(validCustomDimensions, id: \.self) { dimension in
           Text(dimension.title).tag(dimension)
         }
@@ -186,7 +186,7 @@ extension ProgressionRuleEditorCard {
       ForEach(rule.appliedWeeks.sorted(), id: \.self) { week in
         let index = rule.appliedWeeks.sorted().firstIndex(of: week) ?? 0
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-          Text("W\(week) 值")
+          Text(CoachPlanningStrings.weekValue(week))
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgSecondary)
 
@@ -196,13 +196,14 @@ extension ProgressionRuleEditorCard {
             step: customStep,
             decimalIncrement: customDecimalStep,
             unitLabel: customUnitLabel,
-            weightPanelTitle: customUnitLabel == "kg" ? "W\(week) 值" : nil
+            weightPanelTitle:
+              customUnitLabel == "kg" ? CoachPlanningStrings.weekValue(week) : nil
           )
         }
       }
 
       if !rule.exerciseIDs.isEmpty {
-        Button("按 W1 重置") {
+        Button(CoachPlanningStrings.resetToWeekOne) {
           seedCustomSequenceFromW1()
           persistRule()
         }
@@ -467,13 +468,13 @@ extension ProgressionRuleDimension {
   fileprivate var title: String {
     switch self {
     case .weight:
-      "重量"
+      CoachPlanningStrings.weight
     case .rpe:
       "RPE"
     case .sets:
-      "组数"
+      CoachPlanningStrings.sets
     case .reps:
-      "次数"
+      CoachPlanningStrings.reps
     }
   }
 }
