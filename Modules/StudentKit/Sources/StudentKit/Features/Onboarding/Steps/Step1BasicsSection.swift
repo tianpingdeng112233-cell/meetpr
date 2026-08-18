@@ -17,14 +17,14 @@ struct Step1BasicsSection: View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       unitPicker
       OnboardingChoiceCards(
-        title: "性别",
+        title: StudentStrings.localized(.step1BasicsSection001),
         options: Gender.allCases.map { ($0, OnboardingLabels.label($0)) },
         selection: $draft.gender,
         isHighlighted: highlighted.contains("gender")
       )
       birthDatePicker
       OnboardingNumberField(
-        title: "身高",
+        title: StudentStrings.localized(.step1BasicsSection002),
         unitSuffix: UnitDisplay.heightUnitSuffix(unit),
         text: $heightText,
         onCommit: { draft.heightCm = UnitDisplay.parseHeight($0, unit: unit) },
@@ -32,7 +32,7 @@ struct Step1BasicsSection: View {
         placeholder: unit == .kg ? "178" : "70"
       )
       OnboardingNumberField(
-        title: "体重",
+        title: StudentStrings.localized(.step1BasicsSection003),
         unitSuffix: UnitDisplay.weightUnitSuffix(unit),
         text: $weightText,
         onCommit: { draft.weightKg = UnitDisplay.parseWeight($0, unit: unit) },
@@ -57,10 +57,11 @@ struct Step1BasicsSection: View {
   private var unitPicker: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       OnboardingFieldLabel(
-        title: "单位制", isHighlighted: highlighted.contains("unit_preference"))
-      Picker("单位制", selection: unitSelection) {
-        Text("公斤 · 厘米").tag(UnitPreference.kg)
-        Text("磅 · 英寸").tag(UnitPreference.lb)
+        title: StudentStrings.localized(.step1BasicsSection004),
+        isHighlighted: highlighted.contains("unit_preference"))
+      Picker(StudentStrings.localized(.step1BasicsSection004), selection: unitSelection) {
+        Text(StudentStrings.localized(.step1BasicsSection005)).tag(UnitPreference.kg)
+        Text(StudentStrings.localized(.step1BasicsSection006)).tag(UnitPreference.lb)
       }
       .pickerStyle(.segmented)
     }
@@ -81,9 +82,11 @@ struct Step1BasicsSection: View {
 
   private var birthDatePicker: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      OnboardingFieldLabel(title: "生日", isHighlighted: highlighted.contains("birth_date"))
+      OnboardingFieldLabel(
+        title: StudentStrings.localized(.step1BasicsSection007),
+        isHighlighted: highlighted.contains("birth_date"))
       DatePicker(
-        "生日",
+        StudentStrings.localized(.step1BasicsSection007),
         selection: DateOnly.binding(
           $draft.birthDate, default: DateOnly.date(from: "2000-01-01") ?? Date()),
         in: birthDateRange,

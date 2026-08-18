@@ -51,14 +51,14 @@ public struct OnboardingWizardFlow: View {
       Image(systemName: "list.clipboard")
         .font(.system(size: 40))
         .foregroundStyle(Color.MeetPR.gold500)
-      Text("完成资料填写,教练才能开始评估")
+      Text(StudentStrings.localized(.onboardingWizardView001))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size28))
         .foregroundStyle(Color.MeetPR.textPrimary)
         .multilineTextAlignment(.center)
-      Text("已填的内容都已保存,可随时继续")
+      Text(StudentStrings.localized(.onboardingWizardView002))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size17))
         .foregroundStyle(Color.MeetPR.textSecondary)
-      GoldCTA("继续填写", sub: nil, icon: .none) {
+      GoldCTA(StudentStrings.localized(.onboardingWizardView003), sub: nil, icon: .none) {
         isPresented = true
       }
     }
@@ -74,7 +74,13 @@ struct OnboardingWizardView: View {
   @Environment(\.dismiss) private var dismiss
 
   private static let stepTitles = [
-    "基础信息", "训练背景", "你的三大项极限是多少?", "训练环境", "恢复能力", "训练资料", "补充信息",
+    StudentStrings.localized(.onboardingWizardView004),
+    StudentStrings.localized(.onboardingWizardView005),
+    StudentStrings.localized(.onboardingWizardView006),
+    StudentStrings.localized(.onboardingWizardView007),
+    StudentStrings.localized(.onboardingWizardView008),
+    StudentStrings.localized(.onboardingWizardView009),
+    StudentStrings.localized(.onboardingWizardView010),
   ]
 
   var body: some View {
@@ -87,7 +93,7 @@ struct OnboardingWizardView: View {
         #endif
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
-            Button("保存并退出") {
+            Button(StudentStrings.localized(.onboardingWizardView011)) {
               Analytics.shared.navigationBack(from: .onboardingWizard, in: .onboarding)
               FrictionFeedbackController.shared.recordFlowCancel(
                 flow: .onboarding, fromScreen: .onboardingWizard)
@@ -189,13 +195,15 @@ struct OnboardingWizardView: View {
   private var footerButtons: some View {
     HStack(spacing: MeetPRSpacing.md) {
       if viewModel.step > 1 {
-        SecondaryButton("上一步") {
+        SecondaryButton(StudentStrings.localized(.onboardingWizardView012)) {
           Analytics.shared.navigationBack(from: .onboardingWizard, in: .onboarding)
           viewModel.back()
         }
       }
       GoldCTA(
-        viewModel.isLastStep ? "完成,开始训练!" : "下一步",
+        viewModel.isLastStep
+          ? StudentStrings.localized(.onboardingWizardView013)
+          : StudentStrings.localized(.onboardingWizardView014),
         sub: nil,
         icon: .none,
         isDisabled: !viewModel.canAdvance,
@@ -234,20 +242,20 @@ private struct CompletionHandoffView: View {
       Image(systemName: "checkmark.circle.fill")
         .font(.system(size: 44))
         .foregroundStyle(Color.MeetPR.success)
-      Text("资料已提交")
+      Text(StudentStrings.localized(.onboardingWizardView015))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
         .foregroundStyle(Color.MeetPR.textPrimary)
 
       if viewModel.phase == .handoffFailed {
-        Text("绑定请求发送失败,请检查网络后重试")
+        Text(StudentStrings.localized(.onboardingWizardView016))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size17))
           .foregroundStyle(Color.MeetPR.dangerMuted)
-        GoldCTA("重试发送", sub: nil, icon: .none) {
+        GoldCTA(StudentStrings.localized(.onboardingWizardView017), sub: nil, icon: .none) {
           Task { await viewModel.retryHandoff() }
         }
       } else {
         ProgressView()
-        Text("正在发送绑定请求")
+        Text(StudentStrings.localized(.onboardingWizardView018))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textMuted)
       }

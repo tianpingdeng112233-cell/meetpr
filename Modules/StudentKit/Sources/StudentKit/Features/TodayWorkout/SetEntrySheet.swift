@@ -87,7 +87,7 @@ struct SetEntrySheet: View {
           VStack(spacing: MeetPRSpacing.space3) {
             VStack(spacing: MeetPRSpacing.space2) {
               numberStepper(
-                label: "重量",
+                label: StudentStrings.localized(.setEntrySheet001),
                 annotation: "± 2.5",
                 value: weightText,
                 unit: "KG",
@@ -101,7 +101,7 @@ struct SetEntrySheet: View {
               )
 
               if let reason = suggestionOutcomeSnapshot.unavailableReason {
-                Text("暂无建议：\(reason.message)")
+                Text(StudentStrings.replacing(.setEntrySheet002, values: ["\(reason.message)"]))
                   .font(Font.MeetPR.caption)
                   .foregroundStyle(Color.MeetPR.textSecondary)
                   .frame(maxWidth: .infinity, alignment: .leading)
@@ -112,10 +112,10 @@ struct SetEntrySheet: View {
             }
 
             numberStepper(
-              label: "次数",
+              label: StudentStrings.localized(.setEntrySheet003),
               annotation: "± 1",
               value: repsText,
-              unit: "次",
+              unit: StudentStrings.localized(.setEntrySheet004),
               onDecrement: { repsText = max(0, repsValue - 1).formatted() },
               onIncrement: { repsText = (repsValue + 1).formatted() },
               onOpenPad: { openNumberPad(.reps) }
@@ -173,11 +173,16 @@ struct SetEntrySheet: View {
 
   private var navigationBar: some View {
     ZStack {
-      Text("\(draft.exerciseName) · 第 \(setNumber) 组")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
-        .foregroundStyle(Color.MeetPR.textPrimary)
-        .lineLimit(1)
-        .padding(.horizontal, 88)
+      Text(
+        StudentStrings.replacing(
+          .setEntrySheet005,
+          values: ["\(draft.displayExerciseName)", "\(setNumber)"]
+        )
+      )
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      .lineLimit(1)
+      .padding(.horizontal, 88)
 
       HStack {
         Button {
@@ -187,7 +192,7 @@ struct SetEntrySheet: View {
           HStack(spacing: MeetPRSpacing.point3) {
             Image(systemName: "chevron.left")
               .font(.system(size: MeetPRFontMetrics.size18, weight: .semibold))
-            Text("返回")
+            Text(StudentStrings.localized(.setEntrySheet006))
               .font(.MeetPR.body(size: MeetPRFontMetrics.size17))
           }
           .foregroundStyle(Color.MeetPR.textPrimary)
@@ -245,7 +250,7 @@ struct SetEntrySheet: View {
             .frame(width: 17, height: 17)
         }
 
-        Text("上赛扣")
+        Text(StudentStrings.localized(.setEntrySheet007))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .medium))
           .foregroundStyle(collarOn ? Color.MeetPR.textPrimary : Color.MeetPR.textMuted)
       }
@@ -383,7 +388,7 @@ struct SetEntrySheet: View {
       }
       .buttonStyle(.plain)
       .ignoresSafeArea()
-      .accessibilityLabel("取消数字输入")
+      .accessibilityLabel(StudentStrings.localized(.setEntrySheet008))
 
       MeetPRNumberPad(
         field: field,
@@ -418,7 +423,7 @@ struct SetEntrySheet: View {
         HStack(spacing: MeetPRSpacing.point6) {
           Image(systemName: "xmark")
             .font(.system(size: MeetPRFontMetrics.size14, weight: .semibold))
-          Text("未完成 / 失败")
+          Text(StudentStrings.localized(.setEntrySheet009))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         }
         .foregroundStyle(Color.MeetPR.textMuted)
@@ -489,8 +494,8 @@ private struct SetEntryErrorAlert: ViewModifier {
   }
 
   func body(content: Content) -> some View {
-    content.alert("保存失败", isPresented: isPresented) {
-      Button("知道了", role: .cancel) {
+    content.alert(StudentStrings.localized(.setEntrySheet010), isPresented: isPresented) {
+      Button(StudentStrings.localized(.setEntrySheet011), role: .cancel) {
         viewModel.clearActionError()
       }
     } message: {
@@ -509,7 +514,7 @@ private struct SetEntryCompleteButton: View {
       HStack(spacing: MeetPRSpacing.space2) {
         Image(systemName: "checkmark")
           .font(.system(size: MeetPRFontMetrics.size20, weight: .bold))
-        Text("完成本组")
+        Text(StudentStrings.localized(.setEntrySheet012))
           .font(.MeetPR.display(size: MeetPRFontMetrics.size16))
       }
       .foregroundStyle(Color.MeetPR.ctaText)

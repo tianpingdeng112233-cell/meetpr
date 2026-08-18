@@ -28,8 +28,8 @@ public struct UploadFailureNotifier: UploadFailureNotifying {
     guard settings.authorizationStatus != .denied else { return }
 
     let content = UNMutableNotificationContent()
-    content.title = "训练视频上传失败"
-    content.body = "有 \(count) 条训练视频没传成功，打开看看"
+    content.title = StudentStrings.localized(.uploadFailureNotifier001)
+    content.body = StudentStrings.replacing(.uploadFailureNotifier002, values: ["\(count)"])
     content.userInfo = destination.notificationUserInfo
     let request = UNNotificationRequest(
       identifier: Self.notificationIdentifier,

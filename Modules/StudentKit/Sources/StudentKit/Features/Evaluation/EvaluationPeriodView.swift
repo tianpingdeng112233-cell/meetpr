@@ -75,7 +75,7 @@ public struct EvaluationPeriodView: View {
     NavigationStack {
       content
         .background(Color.MeetPR.bg)
-        .navigationTitle("评估进行中")
+        .navigationTitle(StudentStrings.localized(.evaluationPeriodView001))
         .toolbar {
           if let onLogout {
             ToolbarItem(placement: .primaryAction) {
@@ -84,7 +84,7 @@ public struct EvaluationPeriodView: View {
               } label: {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
               }
-              .accessibilityLabel("退出登录")
+              .accessibilityLabel(StudentStrings.localized(.evaluationPeriodView002))
             }
           }
         }
@@ -108,10 +108,10 @@ public struct EvaluationPeriodView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     case .failed:
       VStack(spacing: MeetPRSpacing.lg) {
-        Text("无法获取评估状态")
+        Text(StudentStrings.localized(.evaluationPeriodView003))
           .font(Font.MeetPR.title2)
           .foregroundStyle(Color.MeetPR.fgPrimary)
-        PrimaryButton("重试") {
+        PrimaryButton(StudentStrings.localized(.evaluationPeriodView004)) {
           Task { await viewModel.refresh() }
         }
       }
@@ -138,9 +138,9 @@ public struct EvaluationPeriodView: View {
 
   private var countdownCard: some View {
     TimelineView(.everyMinute) { context in
-      Card(accessibilityLabel: "评估倒计时") {
+      Card(accessibilityLabel: StudentStrings.localized(.evaluationPeriodView005)) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-          Text("教练正在评估你")
+          Text(StudentStrings.localized(.evaluationPeriodView006))
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
           Text(viewModel.countdownText(now: context.date))
@@ -154,11 +154,11 @@ public struct EvaluationPeriodView: View {
   }
 
   private var messagesCard: some View {
-    Card(accessibilityLabel: "教练留言") {
+    Card(accessibilityLabel: StudentStrings.localized(.evaluationPeriodView007)) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("教练留言")
+        Eyebrow(StudentStrings.localized(.evaluationPeriodView007))
         if viewModel.latestMessages.isEmpty {
-          Text("教练暂时没有留言")
+          Text(StudentStrings.localized(.evaluationPeriodView008))
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgTertiary)
         } else {
@@ -171,7 +171,7 @@ public struct EvaluationPeriodView: View {
           NavigationLink {
             FeedbackInboxView(studentID: studentID, viewModel: feedbackViewModel)
           } label: {
-            Text("查看全部留言")
+            Text(StudentStrings.localized(.evaluationPeriodView009))
               .font(Font.MeetPR.footnote)
               .foregroundStyle(Color.MeetPR.brandRed)
           }
@@ -181,9 +181,9 @@ public struct EvaluationPeriodView: View {
   }
 
   private var adaptationCard: some View {
-    Card(accessibilityLabel: "适应周训练") {
+    Card(accessibilityLabel: StudentStrings.localized(.evaluationPeriodView010)) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Eyebrow("适应周训练(本周)")
+        Eyebrow(StudentStrings.localized(.evaluationPeriodView011))
         if viewModel.hasAdaptationTraining {
           adaptationDaysSummary
           NavigationLink {
@@ -196,7 +196,7 @@ public struct EvaluationPeriodView: View {
               readiness: dependencies.readiness
             )
           } label: {
-            Text("开始训练")
+            Text(StudentStrings.localized(.evaluationPeriodView012))
               .font(Font.MeetPR.headline)
               .foregroundStyle(.white)
               .frame(maxWidth: .infinity)
@@ -205,7 +205,7 @@ public struct EvaluationPeriodView: View {
               .clipShape(.rect(cornerRadius: 12))
           }
         } else {
-          Text("教练正在为你准备适应周训练")
+          Text(StudentStrings.localized(.evaluationPeriodView013))
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgTertiary)
         }
@@ -227,7 +227,9 @@ public struct EvaluationPeriodView: View {
 
   private func daySummary(_ day: StudentPlanDay) -> String {
     let weekday = StudentFormatting.weekday(day.date)
-    let names = day.exercises.prefix(3).map(\.exercise.name).joined(separator: "·")
+    let names = day.exercises.prefix(3).map {
+      StudentExerciseName.display($0.exercise)
+    }.joined(separator: "·")
     return "\(weekday): \(names)"
   }
 }

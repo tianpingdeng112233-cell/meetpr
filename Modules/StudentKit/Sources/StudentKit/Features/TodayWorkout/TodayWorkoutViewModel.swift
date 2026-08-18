@@ -504,7 +504,7 @@ public final class TodayWorkoutViewModel {
     } catch let error as PlanDayCompletionError {
       actionErrorMessage = error.localizedMessage
     } catch {
-      actionErrorMessage = "暂时无法完成训练，请稍后重试。"
+      actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel001)
     }
     return false
   }
@@ -527,7 +527,7 @@ public final class TodayWorkoutViewModel {
     } catch let error as PlanDayCompletionError {
       actionErrorMessage = error.localizedMessage
     } catch {
-      actionErrorMessage = "暂时无法撤销，请稍后重试。"
+      actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel002)
     }
     return false
   }
@@ -614,7 +614,7 @@ public final class TodayWorkoutViewModel {
     rowIndex: Int, completed: Bool, failed: Bool, generation: Int
   ) async -> Bool {
     guard let studentID = currentStudentID else {
-      actionErrorMessage = "无法确认当前学员，请重新进入训练页后重试。"
+      actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel003)
       return false
     }
     guard case .loaded(let plan, let drafts) = state, drafts.indices.contains(rowIndex) else {

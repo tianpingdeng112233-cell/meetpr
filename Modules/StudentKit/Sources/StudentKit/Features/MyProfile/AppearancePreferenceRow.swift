@@ -11,7 +11,7 @@ struct AppearancePreferenceRow: View {
   var body: some View {
     HStack(spacing: MeetPRSpacing.space3) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
-        Text("外观")
+        Text(StudentStrings.localized(.appearancePreferenceRow001))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
           .foregroundStyle(Color.MeetPR.textMuted)
         Text(selection.label)
@@ -29,7 +29,8 @@ struct AppearancePreferenceRow: View {
     .padding(.vertical, MeetPRSpacing.point14)
     .frame(minHeight: 68)
     .accessibilityElement(children: .contain)
-    .accessibilityLabel("外观，当前\(selection.label)")
+    .accessibilityLabel(
+      StudentStrings.replacing(.appearancePreferenceRow002, values: ["\(selection.label)"]))
   }
 
   private var selection: MeetPRAppearance {

@@ -61,15 +61,19 @@
         HStack {
           VideoTrimTimeLabel(seconds: selection.startSeconds)
           Spacer()
-          Text("已选 \(VideoTrimTimeLabel.text(selection.durationSeconds))")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.gold500)
+          Text(
+            StudentStrings.replacing(
+              .videoTrimTimeline001,
+              values: ["\(VideoTrimTimeLabel.text(selection.durationSeconds))"])
+          )
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.gold500)
           Spacer()
           VideoTrimTimeLabel(seconds: selection.endSeconds)
         }
       }
       .accessibilityElement(children: .contain)
-      .accessibilityLabel("视频裁剪区间")
+      .accessibilityLabel(StudentStrings.localized(.videoTrimTimeline002))
     }
   }
 
@@ -131,7 +135,11 @@
           }
           .onEnded { _ in dragOriginSeconds = nil }
       )
-      .accessibilityLabel(edge == .leading ? "裁剪起点" : "裁剪终点")
+      .accessibilityLabel(
+        edge == .leading
+          ? StudentStrings.localized(.videoTrimTimeline003)
+          : StudentStrings.localized(.videoTrimTimeline004)
+      )
       .accessibilityValue(VideoTrimTimeLabel.text(currentSeconds))
       .accessibilityAdjustableAction { direction in
         let step = 1.0

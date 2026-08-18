@@ -70,9 +70,10 @@ public final class EvaluationPeriodViewModel {
   public func countdownText(now: Date) -> String {
     guard case .active(let evaluation) = state else { return "" }
     if let remaining = evaluation.remaining(now: now) {
-      return "评估期还剩: \(remaining.days) 天 \(remaining.hours) 小时"
+      return StudentStrings.replacing(
+        .evaluationPeriodViewModel001, values: ["\(remaining.days)", "\(remaining.hours)"])
     }
-    return "评估即将完成"
+    return StudentStrings.localized(.evaluationPeriodViewModel002)
   }
 
   public func progress(now: Date) -> Double {

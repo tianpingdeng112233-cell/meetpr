@@ -166,7 +166,7 @@ public struct BindGateView<
   private var loadingView: some View {
     VStack(spacing: MeetPRSpacing.md) {
       ProgressView()
-      Text("正在检查绑定状态")
+      Text(StudentStrings.localized(.bindGateView001))
         .font(Font.MeetPR.caption)
         .foregroundStyle(Color.MeetPR.textTertiary)
     }
@@ -179,10 +179,10 @@ public struct BindGateView<
       Image(systemName: "wifi.slash")
         .font(.system(size: 36))
         .foregroundStyle(Color.MeetPR.textTertiary)
-      Text("无法获取绑定状态")
+      Text(StudentStrings.localized(.bindGateView002))
         .font(Font.MeetPR.title2)
         .foregroundStyle(Color.MeetPR.textPrimary)
-      PrimaryButton("重试") {
+      PrimaryButton(StudentStrings.localized(.bindGateView003)) {
         Task { await viewModel.load() }
       }
     }
@@ -196,7 +196,7 @@ extension ActiveCoachContext {
   init(bindRequest request: BindRequest) {
     self.init(
       coachID: request.coachId,
-      coachDisplayName: request.coachDisplayName ?? "教练"
+      coachDisplayName: request.coachDisplayName ?? StudentStrings.localized(.bindGateView004)
     )
   }
 }
@@ -219,7 +219,8 @@ private struct GateLogoutButton: View {
       Task { await onLogout() }
     } label: {
       Label(
-        isLoggingOut ? "退出中" : "登出",
+        isLoggingOut
+          ? StudentStrings.localized(.bindGateView005) : StudentStrings.localized(.bindGateView006),
         systemImage: "rectangle.portrait.and.arrow.right"
       )
       .font(Font.MeetPR.footnote)
@@ -228,7 +229,7 @@ private struct GateLogoutButton: View {
     .disabled(isLoggingOut)
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.top, MeetPRSpacing.sm)
-    .accessibilityLabel("退出登录")
+    .accessibilityLabel(StudentStrings.localized(.bindGateView007))
   }
 }
 

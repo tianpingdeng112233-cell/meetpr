@@ -57,8 +57,10 @@ struct DashboardTodayScreen: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 15) {
       DashboardHeader(
-        weekCode: displayDay.map(DashboardTodayPresentation.code(for:)) ?? "今日",
-        statusBadge: cursorDay == nil && !sequence.orderedDays.isEmpty ? "已完成" : nil,
+        weekCode: displayDay.map(DashboardTodayPresentation.code(for:))
+          ?? StudentStrings.localized(.dashboardTodayScreen001),
+        statusBadge: cursorDay == nil && !sequence.orderedDays.isEmpty
+          ? StudentStrings.localized(.dashboardTodayScreen002) : nil,
         showsNotifications: model.showsNotifications,
         unreadCount: model.notificationUnreadCount,
         progressSegments: DashboardTodayPresentation.progressSegments(days: model.cycleDays),
@@ -102,7 +104,7 @@ struct DashboardTodayScreen: View {
         }
 
         if !selectedTrendRows.isEmpty {
-          Text("本节 · E1RM 曲线")
+          Text(StudentStrings.localized(.dashboardTodayScreen003))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.textSecondary)
           DashboardE1RMRail(rows: selectedTrendRows)

@@ -131,14 +131,18 @@ struct StudentBlackGoldChatView: View {
           .background(Color.MeetPR.surfaceCard, in: .circle)
       }
       .buttonStyle(.plain)
-      .accessibilityLabel("返回")
+      .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView001))
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
         Text(coachName)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
-        Text(isConversationEmpty ? "● 今晚在线" : "● 在线")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-          .foregroundStyle(Color.MeetPR.success)
+        Text(
+          isConversationEmpty
+            ? StudentStrings.localized(.studentBlackGoldChatView002)
+            : StudentStrings.localized(.studentBlackGoldChatView003)
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+        .foregroundStyle(Color.MeetPR.success)
       }
 
       Spacer()
@@ -264,7 +268,7 @@ struct StudentBlackGoldChatView: View {
               .foregroundStyle(Color.MeetPR.textDim)
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("移除训练记录")
+          .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView004))
         }
         .padding(MeetPRSpacing.space2)
         .background(Color.MeetPR.surfaceCard)
@@ -275,7 +279,7 @@ struct StudentBlackGoldChatView: View {
       if let setRefLength {
         HStack {
           if setRefLength.isOverLimit {
-            Text("消息过长")
+            Text(StudentStrings.localized(.studentBlackGoldChatView005))
               .foregroundStyle(Color.MeetPR.danger)
               .accessibilityIdentifier("chat.setRef.lengthError")
           } else if let errorMessage = viewModel.setRefSendErrorMessage {
@@ -302,7 +306,7 @@ struct StudentBlackGoldChatView: View {
               .background(Color.MeetPR.surfaceCard, in: .circle)
           }
           .buttonStyle(.plain)
-          .accessibilityLabel("分享今日训练")
+          .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView006))
         }
 
         HStack(spacing: MeetPRSpacing.space2) {
@@ -331,7 +335,7 @@ struct StudentBlackGoldChatView: View {
           .buttonStyle(.plain)
           .disabled(!canSend)
           .opacity(canSend ? 1 : 0.55)
-          .accessibilityLabel("发送")
+          .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView007))
         }
         .padding(.leading, MeetPRSpacing.space4)
         .padding(.trailing, MeetPRSpacing.point6)
@@ -374,7 +378,9 @@ struct StudentBlackGoldChatView: View {
   }
 
   private var composerPlaceholder: String {
-    viewModel.stagedSetRef == nil ? "输入消息" : "添加备注（可选）"
+    viewModel.stagedSetRef == nil
+      ? StudentStrings.localized(.studentBlackGoldChatView008)
+      : StudentStrings.localized(.studentBlackGoldChatView009)
   }
 
   private var isConversationEmpty: Bool {
@@ -489,7 +495,7 @@ struct StudentBlackGoldChatView: View {
   private func chatTimestamp(_ date: Date) -> String {
     let time = StudentFormatting.time(date)
     if Calendar.current.isDateInToday(date) {
-      return "今天 \(time)"
+      return StudentStrings.replacing(.studentBlackGoldChatView010, values: ["\(time)"])
     }
     let day = StudentFormatting.monthDay(date)
     return "\(day) \(time)"
@@ -510,14 +516,14 @@ private struct StudentConversationLoadErrorState: View {
       Image(systemName: "exclamationmark.triangle")
         .font(.MeetPR.system(size: MeetPRFontMetrics.size24, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
-      Text("消息暂时没加载出来")
+      Text(StudentStrings.localized(.studentBlackGoldChatView011))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("检查网络后再试一次，你的历史消息不会丢失。")
+      Text(StudentStrings.localized(.studentBlackGoldChatView012))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         .foregroundStyle(Color.MeetPR.textMuted)
         .multilineTextAlignment(.center)
-      Button("重新加载", action: onRetry)
+      Button(StudentStrings.localized(.studentBlackGoldChatView013), action: onRetry)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
         .padding(.horizontal, MeetPRSpacing.point18)
@@ -552,11 +558,11 @@ private struct StudentEmptyConversationState: View {
             )
         }
 
-      Text("跟\(coachName)打个招呼")
+      Text(StudentStrings.replacing(.studentBlackGoldChatView014, values: ["\(coachName)"]))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
       HStack(spacing: MeetPRSpacing.point7) {
-        Text("在下方输入框发送消息")
+        Text(StudentStrings.localized(.studentBlackGoldChatView015))
         Image(systemName: "arrow.down")
           .font(.MeetPR.system(size: MeetPRFontMetrics.size14, weight: .semibold))
           .foregroundStyle(Color.MeetPR.gold500)
@@ -598,9 +604,13 @@ private struct StudentChatMessageRow: View {
           .clipShape(messageShape)
 
         if let deliveryStatus {
-          Text(deliveryStatus == .read ? "已读" : "已送达")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-            .foregroundStyle(Color.MeetPR.textDim)
+          Text(
+            deliveryStatus == .read
+              ? StudentStrings.localized(.studentBlackGoldChatView016)
+              : StudentStrings.localized(.studentBlackGoldChatView017)
+          )
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+          .foregroundStyle(Color.MeetPR.textDim)
         }
       }
 
@@ -617,7 +627,7 @@ private struct StudentChatMessageRow: View {
   @ViewBuilder
   private var messageContent: some View {
     if message.kind == .image {
-      Label("图片", systemImage: "photo")
+      Label(StudentStrings.localized(.studentBlackGoldChatView018), systemImage: "photo")
     } else {
       Text(message.text ?? "")
         .fontWeight(isCurrentUser ? .medium : .regular)
@@ -664,20 +674,22 @@ private struct StudentPlanChatCard: View {
           .clipShape(.rect(cornerRadius: MeetPRRadius.control))
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-          Text("新计划")
+          Text(StudentStrings.localized(.studentBlackGoldChatView019))
             .font(.MeetPR.mono(size: 9, weight: .bold))
             .tracking(0.9)
             .foregroundStyle(Color.MeetPR.goldText)
             .padding(.horizontal, MeetPRSpacing.point7)
             .padding(.vertical, MeetPRSpacing.point2)
             .background(Color.MeetPR.chatPlanBadgeFill, in: .capsule)
-          Text("教练发布了新计划")
+          Text(StudentStrings.localized(.studentBlackGoldChatView020))
             .font(.MeetPR.body(size: 14.5, weight: .bold))
             .foregroundStyle(Color.MeetPR.textPrimary)
             .padding(.top, MeetPRSpacing.point3)
-          Text("第 \(notice.weekIndex) 周计划已可查看 · 点按进入训练")
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-            .foregroundStyle(Color.MeetPR.textMuted)
+          Text(
+            StudentStrings.replacing(.studentBlackGoldChatView021, values: ["\(notice.weekIndex)"])
+          )
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.textMuted)
         }
 
         Spacer(minLength: 0)
@@ -730,7 +742,7 @@ private struct StudentFeedbackChatCard: View {
         Circle()
           .fill(Color.MeetPR.gold500)
           .frame(width: MeetPRSpacing.point7, height: MeetPRSpacing.point7)
-        Text("教练反馈")
+        Text(StudentStrings.localized(.studentBlackGoldChatView022))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
         Spacer()
         readBadge
@@ -774,7 +786,7 @@ private struct StudentFeedbackChatCard: View {
   @ViewBuilder
   private var readBadge: some View {
     if feedback.readAt == nil {
-      Text("未读")
+      Text(StudentStrings.localized(.studentBlackGoldChatView023))
         .font(.MeetPR.mono(size: 9, weight: .bold))
         .tracking(0.72)
         .foregroundStyle(Color.MeetPR.inkOnGold)
@@ -782,7 +794,7 @@ private struct StudentFeedbackChatCard: View {
         .padding(.vertical, MeetPRSpacing.point2)
         .background(Color.MeetPR.goldText, in: .capsule)
     } else {
-      Label("已读", systemImage: "checkmark")
+      Label(StudentStrings.localized(.studentBlackGoldChatView016), systemImage: "checkmark")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
         .foregroundStyle(Color.MeetPR.goldText)
     }
@@ -851,7 +863,7 @@ private struct StudentChatHistoryLoadingSentinel: View {
       .controlSize(.small)
       .frame(maxWidth: .infinity)
       .padding(.vertical, MeetPRSpacing.space2)
-      .accessibilityLabel("加载更早消息")
+      .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView024))
       .task {
         await load()
       }
@@ -885,14 +897,16 @@ private struct StudentPendingMessageRow: View {
 
         switch item.state {
         case .sending:
-          Label("发送中", systemImage: "clock")
+          Label(StudentStrings.localized(.studentBlackGoldChatView025), systemImage: "clock")
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
             .foregroundStyle(Color.MeetPR.textDim)
         case .failed:
           Button(action: retry) {
-            Label("重试", systemImage: "arrow.clockwise")
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .bold))
-              .foregroundStyle(Color.MeetPR.danger)
+            Label(
+              StudentStrings.localized(.studentBlackGoldChatView026), systemImage: "arrow.clockwise"
+            )
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .bold))
+            .foregroundStyle(Color.MeetPR.danger)
           }
           .buttonStyle(.plain)
         case .confirmed:
@@ -912,7 +926,7 @@ private struct StudentPendingMessageRow: View {
     case .text(let text):
       Text(text)
     case .image:
-      Label("图片", systemImage: "photo")
+      Label(StudentStrings.localized(.studentBlackGoldChatView018), systemImage: "photo")
     }
   }
 }

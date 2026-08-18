@@ -22,7 +22,7 @@ public final class EnterCodeViewModel {
     public var message: String {
       switch self {
       case .invalidCode:
-        "这个码不存在或已过期。让教练在「我的」→「我的邀请码」里重新生成一个。"
+        StudentStrings.localized(.enterCodeViewModel001)
       }
     }
   }
@@ -82,7 +82,7 @@ public final class EnterCodeViewModel {
   public var codeFormatHint: String? {
     let code = normalizedCode
     guard !code.isEmpty, !InviteCodeFormat.isValid(code) else { return nil }
-    return "邀请码为 10 位字母数字(不含 I/O/0/1)"
+    return StudentStrings.localized(.enterCodeViewModel002)
   }
 
   /// nil = stay on the page (field error / network banner shown).

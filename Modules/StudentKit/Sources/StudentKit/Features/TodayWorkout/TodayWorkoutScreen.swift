@@ -145,7 +145,7 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
       )
     case .error(let message):
       ContentUnavailableView(
-        "加载失败",
+        StudentStrings.localized(.todayWorkoutScreen001),
         systemImage: "exclamationmark.triangle",
         description: Text(message)
       )
@@ -218,16 +218,16 @@ private struct TodayWorkoutPlanUnavailableCard: View {
     VStack(spacing: MeetPRSpacing.space3) {
       TodayWorkoutPlanSkeleton()
 
-      Text("第一周计划还没生效")
+      Text(StudentStrings.localized(.todayWorkoutScreen002))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("\(coachName)确认你的基线后，这里会出现当天的动作清单——每个动作带组数、重量和示范视频")
+      Text(StudentStrings.replacing(.todayWorkoutScreen003, values: ["\(coachName)"]))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         .foregroundStyle(Color.MeetPR.textMuted)
         .multilineTextAlignment(.center)
         .lineSpacing(4)
         .frame(maxWidth: 260)
-      Button("看看教练发来的消息", action: onMessageCoach)
+      Button(StudentStrings.localized(.todayWorkoutScreen004), action: onMessageCoach)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
         .padding(.horizontal, MeetPRSpacing.point18)
@@ -338,13 +338,18 @@ private struct TodayWorkoutHeader: View {
         Spacer()
 
         HStack(spacing: MeetPRSpacing.point9) {
-          TrainingHeaderButton(accessibilityLabel: "刷新", action: onRefresh) {
+          TrainingHeaderButton(
+            accessibilityLabel: StudentStrings.localized(.todayWorkoutScreen005), action: onRefresh
+          ) {
             Image(systemName: "arrow.clockwise")
               .font(.MeetPR.system(size: MeetPRFontMetrics.size17, weight: .semibold))
               .foregroundStyle(Color.MeetPR.textSecondary)
           }
 
-          TrainingHeaderButton(accessibilityLabel: "填写今日状态", action: onReadiness) {
+          TrainingHeaderButton(
+            accessibilityLabel: StudentStrings.localized(.todayWorkoutScreen006),
+            action: onReadiness
+          ) {
             ReadinessIcon()
               .stroke(
                 Color.MeetPR.textSecondary,
@@ -353,7 +358,10 @@ private struct TodayWorkoutHeader: View {
           }
 
           if showsNotifications {
-            TrainingHeaderButton(accessibilityLabel: "消息与通知", action: onNotifications) {
+            TrainingHeaderButton(
+              accessibilityLabel: StudentStrings.localized(.todayWorkoutScreen007),
+              action: onNotifications
+            ) {
               MessageIcon()
                 .stroke(
                   Color.MeetPR.textPrimary,
@@ -493,7 +501,7 @@ private struct TodayWorkoutHero: View {
 
       if isEditable {
         GoldCTA(
-          "开始第一组",
+          StudentStrings.localized(.todayWorkoutScreen008),
           sub: nil,
           icon: .none,
           showsShimmer: true,
@@ -541,27 +549,31 @@ private struct TodayWorkoutHero: View {
           .launchHeroRise(index: 1, trigger: launchHeroRevealToken)
 
         HStack(spacing: MeetPRSpacing.space2) {
-          Text(presentation.progress.allDone ? "已完成" : "当前")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
-            .tracking(0.55)
-            .foregroundStyle(
-              presentation.progress.allDone
-                ? Color.MeetPR.success
-                : Color.MeetPR.goldText
-            )
-            .padding(.horizontal, MeetPRSpacing.point11)
-            .padding(.vertical, MeetPRSpacing.point3)
-            .background(
-              (presentation.progress.allDone
-                ? Color.MeetPR.successRGB
-                : Color.MeetPR.goldRGB)
-                .opacity(0.16),
-              in: .capsule
-            )
+          Text(
+            presentation.progress.allDone
+              ? StudentStrings.localized(.todayWorkoutScreen009)
+              : StudentStrings.localized(.todayWorkoutScreen010)
+          )
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
+          .tracking(0.55)
+          .foregroundStyle(
+            presentation.progress.allDone
+              ? Color.MeetPR.success
+              : Color.MeetPR.goldText
+          )
+          .padding(.horizontal, MeetPRSpacing.point11)
+          .padding(.vertical, MeetPRSpacing.point3)
+          .background(
+            (presentation.progress.allDone
+              ? Color.MeetPR.successRGB
+              : Color.MeetPR.goldRGB)
+              .opacity(0.16),
+            in: .capsule
+          )
 
           Text(
             presentation.progress.allDone
-              ? "今日全部动作已记录"
+              ? StudentStrings.localized(.todayWorkoutScreen011)
               : presentation.progress.positionText
           )
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
@@ -588,7 +600,7 @@ private struct TodayWorkoutHero: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size20, weight: .bold))
             .foregroundStyle(Color.MeetPR.textPrimary)
             .padding(.bottom, MeetPRSpacing.space2)
-          Text("次")
+          Text(StudentStrings.localized(.todayWorkoutScreen012))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.textMuted)
             .padding(.bottom, MeetPRSpacing.point9)
@@ -596,7 +608,7 @@ private struct TodayWorkoutHero: View {
         .launchHeroRise(index: 3, trigger: launchHeroRevealToken)
 
         HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
-          Text("目标 RPE")
+          Text(StudentStrings.localized(.todayWorkoutScreen013))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
             .tracking(0.55)
             .foregroundStyle(Color.MeetPR.textFaint)
@@ -612,7 +624,7 @@ private struct TodayWorkoutHero: View {
 
         if !exercise.note.isEmpty {
           VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
-            Text("教练备注")
+            Text(StudentStrings.localized(.todayWorkoutScreen014))
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
               .foregroundStyle(Color.MeetPR.textFaint)
             Text(exercise.note)
@@ -632,7 +644,7 @@ private struct TodayWorkoutHero: View {
         if isEditable && !presentation.progress.allDone {
           HStack(spacing: MeetPRSpacing.point9) {
             GoldCTA(
-              "记录此组",
+              StudentStrings.localized(.todayWorkoutScreen015),
               sub: nil,
               icon: .none,
               action: { onEdit(row) }
@@ -656,7 +668,7 @@ private struct TodayWorkoutHero: View {
                 .clipShape(.rect(cornerRadius: MeetPRRadius.control))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("记录本组视频")
+            .accessibilityLabel(StudentStrings.localized(.todayWorkoutScreen016))
           }
           .padding(.top, MeetPRSpacing.point13)
           .launchHeroRise(index: 6, trigger: launchHeroRevealToken)
@@ -694,12 +706,14 @@ private struct TodayWorkoutActionSummaryHeader: View {
   var body: some View {
     HStack(alignment: .firstTextBaseline) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
-        Text("今日训练")
+        Text(StudentStrings.localized(.todayWorkoutScreen017))
           .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
           .foregroundStyle(Color.MeetPR.textPrimary)
         Text(
-          "共 \(presentation.exercises.count) 个动作 · "
-            + "\(presentation.exercises.flatMap(\.rows).count) 组"
+          StudentStrings.replacing(
+            .todayWorkoutScreen018, values: ["\(presentation.exercises.count)"])
+            + StudentStrings.replacing(
+              .todayWorkoutScreen019, values: ["\(presentation.exercises.flatMap(\.rows).count)"])
         )
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textTertiary)
@@ -730,9 +744,13 @@ private struct TodayWorkoutActionSummaryRow: View {
 
       if let first = exercise.rows.first?.record {
         let weight = first.weight.map { numberText($0) + "kg" } ?? "—"
-        Text("\(weight) × \(first.reps) · \(exercise.rows.count) 组")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-          .foregroundStyle(Color.MeetPR.textTertiary)
+        Text(
+          StudentStrings.replacing(
+            .todayWorkoutScreen020,
+            values: ["\(weight)", "\(first.reps)", "\(exercise.rows.count)"])
+        )
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textTertiary)
       }
     }
     .padding(.horizontal, MeetPRSpacing.point13)
@@ -865,7 +883,7 @@ private struct HoldToCompleteButton: View {
             style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round)
           )
           .frame(width: 17, height: 17)
-        Text("长按 · 完成今日训练")
+        Text(StudentStrings.localized(.todayWorkoutScreen021))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
       }
       .foregroundStyle(Color.white)
@@ -890,7 +908,7 @@ private struct HoldToCompleteButton: View {
     .sensoryFeedback(.warning, trigger: cancelFeedbackStep)
     .sensoryFeedback(.success, trigger: successFeedbackStep)
     .accessibilityElement()
-    .accessibilityLabel("长按完成今日训练")
+    .accessibilityLabel(StudentStrings.localized(.todayWorkoutScreen022))
     .accessibilityAddTraits(.isButton)
     .accessibilityAction { completeForAccessibility() }
     .onDisappear { holdTask?.cancel() }
@@ -995,7 +1013,7 @@ private struct TodayWorkoutSequenceNotice: View {
         Text(title)
         Spacer()
         if case .completed(let canUndo) = state, canUndo {
-          Button("撤销完成", action: onUndo)
+          Button(StudentStrings.localized(.todayWorkoutScreen023), action: onUndo)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .bold))
             .buttonStyle(.plain)
         }
@@ -1019,9 +1037,9 @@ private struct TodayWorkoutSequenceNotice: View {
 
   private var title: String {
     switch state {
-    case .completed: "已完成 · 不可修改"
-    case .current: "当前 · 可记录"
-    case .upcoming: "未轮到 · 仅预览"
+    case .completed: StudentStrings.localized(.todayWorkoutScreen024)
+    case .current: StudentStrings.localized(.todayWorkoutScreen025)
+    case .upcoming: StudentStrings.localized(.todayWorkoutScreen026)
     }
   }
 

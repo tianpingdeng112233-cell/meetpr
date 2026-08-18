@@ -140,15 +140,15 @@ public struct TrainingHistoryView: View {
         )
       }
 
-      GrowthSectionLabel("E1RM vs 训练 1RM")
+      GrowthSectionLabel(StudentStrings.localized(.trainingHistoryView001))
         .padding(.top, MeetPRSpacing.space2)
       GrowthComparisonCard(presentation: comparison)
 
-      GrowthSectionLabel("教练反馈记录")
+      GrowthSectionLabel(StudentStrings.localized(.trainingHistoryView002))
         .padding(.top, MeetPRSpacing.space2)
       feedbackEntry
 
-      GrowthSectionLabel("全部历史")
+      GrowthSectionLabel(StudentStrings.localized(.trainingHistoryView003))
         .padding(.top, MeetPRSpacing.space2)
       GrowthHistoryStatsCard(stats: stats, isZeroTraining: isZeroTraining)
 
@@ -158,17 +158,19 @@ public struct TrainingHistoryView: View {
       } label: {
         GrowthNavigationCard(
           icon: "clock",
-          title: "全部训练历史",
-          subtitle: isZeroTraining ? "第一次训练后解锁" : "按周 / 月查看 · 含每组数据"
+          title: StudentStrings.localized(.trainingHistoryView004),
+          subtitle: isZeroTraining
+            ? StudentStrings.localized(.trainingHistoryView005)
+            : StudentStrings.localized(.trainingHistoryView006)
         )
       }
       .buttonStyle(.plain)
       .disabled(isZeroTraining)
       .opacity(isZeroTraining ? 0.55 : 1)
-      .accessibilityHint("打开训练历史列表")
+      .accessibilityHint(StudentStrings.localized(.trainingHistoryView007))
 
       if stats.trainingSessionCount >= 2 {
-        GrowthSectionLabel("容量 / 强度")
+        GrowthSectionLabel(StudentStrings.localized(.trainingHistoryView008))
           .padding(.top, MeetPRSpacing.space2)
         VolumeIntensityChart(
           buckets: chartBuckets,
@@ -186,16 +188,16 @@ public struct TrainingHistoryView: View {
       } label: {
         GrowthNavigationCard(
           icon: "bubble.left",
-          title: "全部教练反馈",
-          subtitle: "共 \(feedbackCount) 条 · 含视频回放"
+          title: StudentStrings.localized(.trainingHistoryView009),
+          subtitle: StudentStrings.replacing(.trainingHistoryView010, values: ["\(feedbackCount)"])
         )
       }
       .buttonStyle(.plain)
     } else {
       GrowthNavigationCard(
         icon: "bubble.left",
-        title: "全部教练反馈",
-        subtitle: "完成训练后，教练点评会归档在这里"
+        title: StudentStrings.localized(.trainingHistoryView009),
+        subtitle: StudentStrings.localized(.trainingHistoryView011)
       )
     }
   }
@@ -319,15 +321,15 @@ private struct GrowthScreenHeader: View {
         if showsChat {
           HeaderChatButton(
             unreadCount: unreadCount,
-            accessibilityLabel: "消息与通知",
+            accessibilityLabel: StudentStrings.localized(.trainingHistoryView012),
             action: onOpenChat
           )
         }
       }
-      Text("成长")
+      Text(StudentStrings.localized(.trainingHistoryView013))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size34))
         .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("E1RM ＝ 用你完成的组数估算的单次最大重量")
+      Text(StudentStrings.localized(.trainingHistoryView014))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textFaint)
         .padding(.top, -MeetPRSpacing.space2)
@@ -359,7 +361,7 @@ private struct GrowthComparisonCard: View {
     VStack(spacing: MeetPRSpacing.point15) {
       HStack(alignment: .bottom) {
         total(
-          title: "三项 E1RM 合计",
+          title: StudentStrings.localized(.trainingHistoryView015),
           value: presentation.estimatedTotalKg.map(Self.weight) ?? "—",
           color: Color.MeetPR.textPrimary,
           alignment: .leading
@@ -368,7 +370,7 @@ private struct GrowthComparisonCard: View {
           .fill(Color.MeetPR.borderStrong)
           .frame(width: 1, height: MeetPRSpacing.point34)
         total(
-          title: "训练 1RM 合计",
+          title: StudentStrings.localized(.trainingHistoryView016),
           value: presentation.trainingTotalKg.map(Self.weight) ?? "—",
           color: Color.MeetPR.textMuted,
           alignment: .trailing
@@ -403,9 +405,12 @@ private struct GrowthComparisonCard: View {
           }
           .frame(height: MeetPRSpacing.space2)
           if row.hasExceededTrainingBaseline, let percentage = row.percentage {
-            Label("已突破训练 1RM · \(percentage)%", systemImage: "checkmark")
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-              .foregroundStyle(Color.MeetPR.success)
+            Label(
+              StudentStrings.replacing(.trainingHistoryView017, values: ["\(percentage)"]),
+              systemImage: "checkmark"
+            )
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+            .foregroundStyle(Color.MeetPR.success)
           }
         }
       }
@@ -459,10 +464,11 @@ private struct GrowthHistoryStatsCard: View {
 
   var body: some View {
     HStack {
-      stat("训练次数", stats.trainingSessionCount.formatted())
-      stat("训练周", stats.trainingWeekCount.formatted())
       stat(
-        "训练总容量",
+        StudentStrings.localized(.trainingHistoryView018), stats.trainingSessionCount.formatted())
+      stat(StudentStrings.localized(.trainingHistoryView019), stats.trainingWeekCount.formatted())
+      stat(
+        StudentStrings.localized(.trainingHistoryView020),
         NSDecimalNumber(decimal: stats.totalVolumeKg).doubleValue.formatted(
           .number.grouping(.automatic).precision(.fractionLength(0))
         ),
@@ -546,7 +552,7 @@ private struct GrowthScreenSkeleton: View {
           .frame(height: 220)
       }
     }
-    .accessibilityLabel("正在加载成长数据")
+    .accessibilityLabel(StudentStrings.localized(.trainingHistoryView021))
   }
 }
 
@@ -557,13 +563,15 @@ private struct GrowthFailureCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
-      Label("加载失败", systemImage: "exclamationmark.triangle")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
-        .foregroundStyle(Color.MeetPR.dangerMuted)
+      Label(
+        StudentStrings.localized(.trainingHistoryView022), systemImage: "exclamationmark.triangle"
+      )
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
+      .foregroundStyle(Color.MeetPR.dangerMuted)
       Text(message)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         .foregroundStyle(Color.MeetPR.textSecondary)
-      Button("重试", action: retry)
+      Button(StudentStrings.localized(.trainingHistoryView023), action: retry)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
         .foregroundStyle(Color.MeetPR.goldText)
         .frame(minHeight: MeetPRSpacing.minimumHitTarget)
@@ -591,7 +599,7 @@ private struct AllHistoryScreen: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bgBase)
-    .navigationTitle("训练历史")
+    .navigationTitle(StudentStrings.localized(.trainingHistoryView024))
   }
 }
 // swiftlint:enable file_length

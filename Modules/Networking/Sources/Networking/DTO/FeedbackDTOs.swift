@@ -49,6 +49,7 @@ public struct CreateFeedbackRequestDTO: Encodable, Equatable, Sendable {
 public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
   public let id: UUID
   public let exerciseName: String?
+  public let exerciseNameEn: String?
   public let setIndex: Int?
   public let weightKg: String?
   public let reps: Int?
@@ -57,6 +58,7 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
   public init(
     id: UUID,
     exerciseName: String? = nil,
+    exerciseNameEn: String? = nil,
     setIndex: Int? = nil,
     weightKg: String? = nil,
     reps: Int? = nil,
@@ -64,6 +66,7 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
   ) {
     self.id = id
     self.exerciseName = exerciseName
+    self.exerciseNameEn = exerciseNameEn
     self.setIndex = setIndex
     self.weightKg = weightKg
     self.reps = reps

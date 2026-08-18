@@ -342,12 +342,15 @@ extension StudentRootView {
       MeetPRTabBar(
         selection: $selectedTab,
         items: [
-          MeetPRTabBarItem(id: .today, title: "今日", icon: .today),
-          MeetPRTabBarItem(id: .training, title: "训练", icon: .training),
-          MeetPRTabBarItem(id: .growth, title: "成长", icon: .growth),
+          MeetPRTabBarItem(
+            id: .today, title: StudentStrings.localized(.studentRootView001), icon: .today),
+          MeetPRTabBarItem(
+            id: .training, title: StudentStrings.localized(.studentRootView002), icon: .training),
+          MeetPRTabBarItem(
+            id: .growth, title: StudentStrings.localized(.studentRootView003), icon: .growth),
           MeetPRTabBarItem(
             id: .profile,
-            title: "我的",
+            title: StudentStrings.localized(.studentRootView004),
             icon: .profile,
             badge: 0
           ),

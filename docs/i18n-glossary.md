@@ -11,8 +11,10 @@ language.
 - The bundled catalog currently contains 1,219 entries; the preview repository adds four
   synthetic competition lifts. Counts may change, but `nameEn` remains canonical for every
   catalog-backed exercise.
-- Synthetic competition lifts use these established names: `Competition Squat`, `Competition
-  Bench Press`, `Competition Conventional Deadlift`, and `Competition Sumo Deadlift`.
+- Synthetic competition lifts use the live catalog `name_en` values verbatim: `Competition
+  Squat`, `Competition Bench Press`, `Competition Deadlift` (conventional; the catalog omits
+  "Conventional" — a known asymmetry with `Competition Sumo Deadlift`, renaming is a pending
+  data-migration decision, do not "fix" it client-side).
 - Examples from the catalog: `暂停深蹲` → `Pause Squat`; `节奏卧推` → `Tempo Bench`.
 
 ## Powerlifting and programming

@@ -11,9 +11,11 @@ struct EvaluationCompletedCard: View {
   var body: some View {
     if viewModel.showsDashboardCard, let summary = viewModel.summary {
       VStack(alignment: .leading, spacing: 12) {
-        Label("评估完成", systemImage: "checkmark.seal.fill")
-          .font(.headline)
-          .foregroundStyle(Color.MeetPR.green)
+        Label(
+          StudentStrings.localized(.evaluationCompletedCard001), systemImage: "checkmark.seal.fill"
+        )
+        .font(.headline)
+        .foregroundStyle(Color.MeetPR.green)
 
         Text(summary.trainingPlanExcerpt)
           .font(.subheadline)
@@ -32,13 +34,13 @@ struct EvaluationCompletedCard: View {
             viewModel.markRead()
           }
         } label: {
-          Text("展开看完整")
+          Text(StudentStrings.localized(.evaluationCompletedCard002))
             .font(.subheadline)
             .foregroundStyle(Color.MeetPR.brandRed)
         }
 
         if viewModel.showsAwaitingFirstPlan {
-          Text("教练正在为你排第一份正式计划")
+          Text(StudentStrings.localized(.evaluationCompletedCard003))
             .font(.caption)
             .foregroundStyle(Color.MeetPR.fgTertiary)
         }

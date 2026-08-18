@@ -146,6 +146,7 @@ extension FeedbackVideoDTO {
     CoachFeedbackVideo(
       id: id,
       exerciseName: exerciseName,
+      exerciseNameEn: exerciseNameEn,
       setIndex: setIndex,
       weightKg: weightKg,
       reps: reps,

@@ -58,7 +58,7 @@
                 bodyWeightText: "83 kg",
                 competition: CompetitionCountdown(days: 3, dateText: "2026-07-29")
               ),
-              coachName: "演示教练",
+              coachName: StudentStrings.localized(.dashboardV3Previews001),
               newPRCount: 0,
               showsNotifications: true,
               notificationUnreadCount: 3,
@@ -104,37 +104,37 @@
     }
   }
 
-  #Preview("W2a · 正常日 · Dark") {
+  #Preview(StudentStrings.localized(.dashboardV3Previews002)) {
     DashboardV3Preview(scenario: .normal)
       .preferredColorScheme(.dark)
   }
 
-  #Preview("W2a · 正常日 · Light") {
+  #Preview(StudentStrings.localized(.dashboardV3Previews003)) {
     DashboardV3Preview(scenario: .normal)
       .preferredColorScheme(.light)
   }
 
-  #Preview("W2a · 今日已完成 · Light") {
+  #Preview(StudentStrings.localized(.dashboardV3Previews004)) {
     DashboardV3Preview(scenario: .completed)
       .preferredColorScheme(.light)
   }
 
-  #Preview("W2a · 反馈展开 · Dark") {
+  #Preview(StudentStrings.localized(.dashboardV3Previews005)) {
     DashboardV3Preview(scenario: .feedbackExpanded)
       .preferredColorScheme(.dark)
   }
 
-  #Preview("W2a · 反馈展开 · Light") {
+  #Preview(StudentStrings.localized(.dashboardV3Previews006)) {
     DashboardV3Preview(scenario: .feedbackExpanded)
       .preferredColorScheme(.light)
   }
 
-  #Preview("W2a · 无反馈 · Dark") {
+  #Preview(StudentStrings.localized(.dashboardV3Previews007)) {
     DashboardV3Preview(scenario: .noFeedback)
       .preferredColorScheme(.dark)
   }
 
-  #Preview("W2a · 无反馈 · Light") {
+  #Preview(StudentStrings.localized(.dashboardV3Previews008)) {
     DashboardV3Preview(scenario: .noFeedback)
       .preferredColorScheme(.light)
   }

@@ -161,7 +161,8 @@ public struct TodayWorkoutView: View {
         reviewCompleted: reviewCompleted,
         unreadCount: notifications?.totalUnreadCount ?? 0,
         showsNotifications: notifications != nil,
-        coachName: notifications?.activeCoach?.coachDisplayName ?? "教练",
+        coachName: notifications?.activeCoach?.coachDisplayName
+          ?? StudentStrings.localized(.todayWorkoutView001),
         showsAskCoach: showsSetRefEntry,
         isPreparingAskCoach: isPreparingSetRefPicker,
         namespace: heroNamespace,
@@ -266,8 +267,10 @@ public struct TodayWorkoutView: View {
       )
       .presentationDetents([.large])
     }
-    .alert("保存失败", isPresented: actionErrorPresented) {
-      Button("知道了", role: .cancel) { viewModel.clearActionError() }
+    .alert(StudentStrings.localized(.todayWorkoutView002), isPresented: actionErrorPresented) {
+      Button(StudentStrings.localized(.todayWorkoutView003), role: .cancel) {
+        viewModel.clearActionError()
+      }
     } message: {
       Text(viewModel.actionErrorMessage ?? "")
     }
@@ -303,26 +306,26 @@ public struct TodayWorkoutView: View {
       Text(VideoPrivacyCopy.consentBody)
     }
     .confirmationDialog(
-      "视频上传失败",
+      StudentStrings.localized(.todayWorkoutView004),
       isPresented: retryDialogPresented,
       titleVisibility: .visible
     ) {
-      Button("重试上传") {
+      Button(StudentStrings.localized(.todayWorkoutView005)) {
         if let setLogID = retryTargetSetLogID {
           Task { await videoViewModel.retry(setLogID: setLogID) }
         }
       }
-      Button("删除视频", role: .destructive) {
+      Button(StudentStrings.localized(.todayWorkoutView006), role: .destructive) {
         if let setLogID = retryTargetSetLogID {
           Task { await videoViewModel.remove(setLogID: setLogID) }
         }
       }
-      Button("取消", role: .cancel) {}
+      Button(StudentStrings.localized(.todayWorkoutView007), role: .cancel) {}
     } message: {
-      Text("视频仍保存在本机,可直接重试上传。")
+      Text(StudentStrings.localized(.todayWorkoutView008))
     }
-    .alert("视频无法重试", isPresented: videoRetryErrorPresented) {
-      Button("知道了", role: .cancel) {
+    .alert(StudentStrings.localized(.todayWorkoutView009), isPresented: videoRetryErrorPresented) {
+      Button(StudentStrings.localized(.todayWorkoutView003), role: .cancel) {
         videoViewModel.clearRetryError()
       }
     } message: {
@@ -548,7 +551,7 @@ public struct TodayWorkoutView: View {
     )
     return title.split(separator: "·").first.map {
       String($0).trimmingCharacters(in: .whitespaces)
-    } ?? "今日"
+    } ?? StudentStrings.localized(.todayWorkoutView010)
   }
 
   private func openEditor(_ row: TodayWorkoutPresentation.Row) {
@@ -841,7 +844,7 @@ enum TodayWorkoutTitleResolver {
     planContext: TodayWorkoutPlanContext?,
     onboarding: OnboardingProfile?
   ) -> String {
-    guard let day else { return "锻炼" }
+    guard let day else { return StudentStrings.localized(.todayWorkoutView011) }
     let weekday = "W\(day.weekNumber)D\(day.dayOfWeek)"
     let family = day.exercises.lazy.compactMap {
       resolveCompetitionFamily(exercise: $0.exercise, onboarding: onboarding)

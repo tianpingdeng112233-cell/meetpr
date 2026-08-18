@@ -30,7 +30,7 @@
         reviewCompleted: false,
         unreadCount: 3,
         showsNotifications: true,
-        coachName: "张教练",
+        coachName: StudentStrings.localized(.todayWorkoutV3Previews001),
         showsAskCoach: state == .recording || state == .complete,
         isPreparingAskCoach: false,
         namespace: namespace,
@@ -72,17 +72,21 @@
     var body: some View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
         HStack {
-          Text("‹ 七月 ›")
+          Text(StudentStrings.localized(.todayWorkoutV3Previews002))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
             .foregroundStyle(Color.MeetPR.textMuted)
           Spacer()
-          Text(month ? "周   月" : "周   月")
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-            .foregroundStyle(Color.white)
-            .padding(.horizontal, MeetPRSpacing.point11)
-            .padding(.vertical, MeetPRSpacing.point3)
-            .background(month ? Color.MeetPR.borderStrong : Color.MeetPR.ctaFill)
-            .clipShape(.rect(cornerRadius: MeetPRSpacing.point6))
+          Text(
+            month
+              ? StudentStrings.localized(.todayWorkoutV3Previews003)
+              : StudentStrings.localized(.todayWorkoutV3Previews003)
+          )
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.white)
+          .padding(.horizontal, MeetPRSpacing.point11)
+          .padding(.vertical, MeetPRSpacing.point3)
+          .background(month ? Color.MeetPR.borderStrong : Color.MeetPR.ctaFill)
+          .clipShape(.rect(cornerRadius: MeetPRSpacing.point6))
         }
 
         if month {
@@ -92,9 +96,9 @@
         }
 
         HStack(spacing: MeetPRSpacing.point14) {
-          legend(Color.MeetPR.success, "已完成")
-          legend(Color.MeetPR.gold500, "进行中")
-          legend(Color.MeetPR.danger, "未完成")
+          legend(Color.MeetPR.success, StudentStrings.localized(.todayWorkoutV3Previews004))
+          legend(Color.MeetPR.gold500, StudentStrings.localized(.todayWorkoutV3Previews005))
+          legend(Color.MeetPR.danger, StudentStrings.localized(.todayWorkoutV3Previews006))
         }
       }
     }
@@ -102,31 +106,38 @@
     private var weekStrip: some View {
       HStack(spacing: MeetPRSpacing.point6) {
         MeetPRDayChip(
-          weekday: "周一", date: 20, state: .done, isSelected: false,
+          weekday: StudentStrings.localized(.todayWorkoutV3Previews007), date: 20, state: .done,
+          isSelected: false,
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
-          weekday: "周二", date: 21, state: .future, isSelected: false,
+          weekday: StudentStrings.localized(.todayWorkoutV3Previews008), date: 21, state: .future,
+          isSelected: false,
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
-          weekday: "周三", date: 22, state: .done, isSelected: false,
+          weekday: StudentStrings.localized(.todayWorkoutV3Previews009), date: 22, state: .done,
+          isSelected: false,
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
-          weekday: "周四", date: 23, state: .done, isSelected: false,
+          weekday: StudentStrings.localized(.todayWorkoutV3Previews010), date: 23, state: .done,
+          isSelected: false,
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
-          weekday: "周五", date: 24, state: .today, isSelected: true,
+          weekday: StudentStrings.localized(.todayWorkoutV3Previews011), date: 24, state: .today,
+          isSelected: true,
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
-          weekday: "周六", date: 25, state: .future, isSelected: false,
+          weekday: StudentStrings.localized(.todayWorkoutV3Previews012), date: 25, state: .future,
+          isSelected: false,
           width: nil, selectedAppearance: .outlined
         ) {}
         MeetPRDayChip(
-          weekday: "周日", date: 26, state: .future, isSelected: false,
+          weekday: StudentStrings.localized(.todayWorkoutV3Previews013), date: 26, state: .future,
+          isSelected: false,
           width: nil, selectedAppearance: .outlined
         ) {}
       }
@@ -138,7 +149,17 @@
         count: 7
       )
       return LazyVGrid(columns: columns, spacing: MeetPRSpacing.point5) {
-        ForEach(["一", "二", "三", "四", "五", "六", "日"], id: \.self) { label in
+        ForEach(
+          [
+            StudentStrings.localized(.todayWorkoutV3Previews014),
+            StudentStrings.localized(.todayWorkoutV3Previews015),
+            StudentStrings.localized(.todayWorkoutV3Previews016),
+            StudentStrings.localized(.todayWorkoutV3Previews017),
+            StudentStrings.localized(.todayWorkoutV3Previews018),
+            StudentStrings.localized(.todayWorkoutV3Previews019),
+            StudentStrings.localized(.todayWorkoutV3Previews020),
+          ], id: \.self
+        ) { label in
           Text(label)
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
             .foregroundStyle(Color.MeetPR.textDim)
@@ -214,9 +235,15 @@
         id: UUID(),
         date: date,
         exercises: [
-          exercise("深蹲", sequence: 0, weight: 175, reps: 3, note: "下蹲前先吸气撑住腹压"),
-          exercise("卧推", sequence: 1, weight: 110, reps: 3, note: "触胸后保持腿驱"),
-          exercise("硬拉", sequence: 2, weight: 190, reps: 2, note: "启动时把地面推开"),
+          exercise(
+            StudentStrings.localized(.todayWorkoutV3Previews021), sequence: 0, weight: 175, reps: 3,
+            note: StudentStrings.localized(.todayWorkoutV3Previews022)),
+          exercise(
+            StudentStrings.localized(.todayWorkoutV3Previews023), sequence: 1, weight: 110, reps: 3,
+            note: StudentStrings.localized(.todayWorkoutV3Previews024)),
+          exercise(
+            StudentStrings.localized(.todayWorkoutV3Previews025), sequence: 2, weight: 190, reps: 2,
+            note: StudentStrings.localized(.todayWorkoutV3Previews026)),
         ]
       )
     }

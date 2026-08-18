@@ -35,7 +35,7 @@ public final class PendingBindViewModel {
     } catch BindRequestError.notPending, BindRequestError.notFound {
       return .alreadyResponded
     } catch {
-      cancelError = "取消失败,请重试"
+      cancelError = StudentStrings.localized(.pendingBindViewModel001)
       return nil
     }
   }
@@ -49,11 +49,11 @@ public final class PendingBindViewModel {
     let minutes = totalMinutes % 60
 
     if days > 0 {
-      return "\(days) 天 \(hours) 小时"
+      return StudentStrings.replacing(.pendingBindViewModel002, values: ["\(days)", "\(hours)"])
     }
     if hours > 0 {
-      return "\(hours) 小时 \(minutes) 分"
+      return StudentStrings.replacing(.pendingBindViewModel003, values: ["\(hours)", "\(minutes)"])
     }
-    return "\(minutes) 分钟"
+    return StudentStrings.replacing(.pendingBindViewModel004, values: ["\(minutes)"])
   }
 }

@@ -57,7 +57,7 @@ struct DashboardHeader: View {
         if showsNotifications {
           HeaderChatButton(
             unreadCount: unreadCount,
-            accessibilityLabel: "消息与通知",
+            accessibilityLabel: StudentStrings.localized(.dashboardHeader001),
             action: onOpenNotifications
           )
         }

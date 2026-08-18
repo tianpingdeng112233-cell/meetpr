@@ -119,10 +119,10 @@ public final class OnboardingWizardViewModel {
     do {
       _ = try await repo.upsert(draft.fullPatch())
     } catch OnboardingError.oneRMLocked {
-      saveBanner = "1RM 已锁定,请联系教练修改"
+      saveBanner = StudentStrings.localized(.onboardingWizardViewModel001)
       return
     } catch {
-      saveBanner = "网络异常,资料未能提交,请重试"
+      saveBanner = StudentStrings.localized(.onboardingWizardViewModel002)
       return
     }
 
@@ -139,7 +139,7 @@ public final class OnboardingWizardViewModel {
       }
       return
     } catch {
-      saveBanner = "网络异常,请重试"
+      saveBanner = StudentStrings.localized(.onboardingWizardViewModel003)
       return
     }
 
@@ -190,7 +190,7 @@ public final class OnboardingWizardViewModel {
       _ = try await repo.upsert(draft.patch(forStep: step))
       saveBanner = nil
     } catch {
-      saveBanner = "本步资料已暂存本机,提交完成时会自动补传"
+      saveBanner = StudentStrings.localized(.onboardingWizardViewModel004)
     }
   }
 

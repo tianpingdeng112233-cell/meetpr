@@ -25,7 +25,7 @@ public struct FeedbackDetailView: View {
             .font(.title2)
             .foregroundStyle(Color.MeetPR.gold500)
           VStack(alignment: .leading, spacing: 2) {
-            Text("教练反馈")
+            Text(StudentStrings.localized(.feedbackDetailView001))
               .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
               .foregroundStyle(Color.MeetPR.textPrimary)
             Text(StudentFormatting.dayMonth(item.postedAt))
@@ -36,7 +36,7 @@ public struct FeedbackDetailView: View {
 
         if let dayDate = item.dayDate {
           Label(
-            "关联训练日 " + StudentFormatting.dayMonth(dayDate),
+            StudentStrings.localized(.feedbackDetailView002) + StudentFormatting.dayMonth(dayDate),
             systemImage: "calendar"
           )
           .font(.MeetPR.body(size: MeetPRFontMetrics.size15))
@@ -82,7 +82,7 @@ public struct FeedbackDetailView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bgBase)
-    .navigationTitle("反馈")
+    .navigationTitle(StudentStrings.localized(.feedbackDetailView003))
     #if os(iOS)
       .fullScreenCover(item: $playbackItem) { playback in
         FeedbackVideoPlayerView(
@@ -121,7 +121,7 @@ public struct FeedbackDetailView: View {
         let url = try await freshPlaybackURL(videoID: videoID)
         playbackItem = FeedbackVideoPlaybackItem(id: videoID, url: url)
       } catch {
-        playbackError = "播放链接获取失败，请重试"
+        playbackError = StudentStrings.localized(.feedbackDetailView004)
         resolvingPlayback = false
         return
       }
@@ -168,12 +168,14 @@ private struct FeedbackVideoCard: View {
   /// rather than render an empty line under the label.
   private var displaySummary: String {
     let summary = FeedbackVideoPresentation.summary(video)
-    return summary.isEmpty ? "训练视频" : summary
+    return summary.isEmpty ? StudentStrings.localized(.feedbackDetailView005) : summary
   }
 
   /// Context-only cards must not promise playback to VoiceOver.
   private var accessibilityText: String {
-    action == nil ? "关联视频，\(displaySummary)" : "播放关联视频，\(displaySummary)"
+    action == nil
+      ? StudentStrings.replacing(.feedbackDetailView006, values: ["\(displaySummary)"])
+      : StudentStrings.replacing(.feedbackDetailView007, values: ["\(displaySummary)"])
   }
 
   var body: some View {
@@ -187,7 +189,7 @@ private struct FeedbackVideoCard: View {
             .foregroundStyle(Color.MeetPR.gold500)
         }
         VStack(alignment: .leading, spacing: 4) {
-          Text("关联视频")
+          Text(StudentStrings.localized(.feedbackDetailView008))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
             .foregroundStyle(Color.MeetPR.textMuted)
           Text(displaySummary)
@@ -219,7 +221,7 @@ private struct FeedbackVideoCard: View {
 
 private struct FeedbackVideoUnavailableCard: View {
   var body: some View {
-    Label("关联视频已不可用", systemImage: "video.slash")
+    Label(StudentStrings.localized(.feedbackDetailView009), systemImage: "video.slash")
       .font(.MeetPR.body(size: MeetPRFontMetrics.size15))
       .foregroundStyle(Color.MeetPR.textMuted)
       .frame(maxWidth: .infinity, alignment: .leading)

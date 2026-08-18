@@ -59,7 +59,7 @@ public struct StudentSessionSummary: Equatable, Sendable {
       else { return nil }
       return ExercisePerformance(
         id: exerciseID,
-        name: top.exerciseName,
+        name: top.displayExerciseName,
         topSetWeightKg: top.actualWeight,
         topSetReps: top.actualReps ?? 0,
         topSetRPE: top.actualRPE

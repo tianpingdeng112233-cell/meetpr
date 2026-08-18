@@ -22,6 +22,20 @@ import Testing
   #expect(feedback.video == nil)
 }
 
+@Test func coachFeedbackVideoDecodesLegacyPayloadWithoutEnglishName() throws {
+  let json = """
+    {
+      "id": "00000000-0000-4000-8000-000000000604",
+      "exercise_name": "暂停深蹲"
+    }
+    """
+
+  let video = try MeetPRCodec.decoder.decode(CoachFeedbackVideo.self, from: Data(json.utf8))
+
+  #expect(video.exerciseName == "暂停深蹲")
+  #expect(video.exerciseNameEn == nil)
+}
+
 @Test func coachFeedbackVideoRoundTripPreservesMetadata() throws {
   let videoID = try #require(UUID(uuidString: "00000000-0000-4000-8000-000000000604"))
   let loggedAt = try #require(
@@ -43,6 +57,7 @@ import Testing
     video: CoachFeedbackVideo(
       id: videoID,
       exerciseName: "暂停深蹲",
+      exerciseNameEn: "Pause Squat",
       setIndex: 2,
       weightKg: "125.00",
       reps: 5,
@@ -58,4 +73,5 @@ import Testing
 
   #expect(decoded == feedback)
   #expect(decoded.video?.durationSeconds == 8)
+  #expect(decoded.video?.exerciseNameEn == "Pause Squat")
 }

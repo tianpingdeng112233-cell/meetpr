@@ -40,19 +40,23 @@ struct DashboardPlanWaitingState: View {
             .offset(x: 4, y: -4)
         }
 
-        Text("\(coachName)正在为你排 W\(nextWeekIndex)")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(
+          StudentStrings.replacing(
+            .dashboardPlanWaitingState001, values: ["\(coachName)", "\(nextWeekIndex)"])
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
 
-        (Text("会参考你这周的 RPE 和完成情况 · 通常 ")
-          + Text("周日 21:00").foregroundStyle(Color.MeetPR.textSecondary)
-          + Text(" 前发布"))
+        (Text(StudentStrings.localized(.dashboardPlanWaitingState002))
+          + Text(StudentStrings.localized(.dashboardPlanWaitingState003)).foregroundStyle(
+            Color.MeetPR.textSecondary)
+          + Text(StudentStrings.localized(.dashboardPlanWaitingState004)))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
           .foregroundStyle(Color.MeetPR.textMuted)
           .multilineTextAlignment(.center)
           .lineSpacing(4)
 
-        Button("给教练留言", action: onMessageCoach)
+        Button(StudentStrings.localized(.dashboardPlanWaitingState005), action: onMessageCoach)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
           .padding(.horizontal, 17)
@@ -68,19 +72,24 @@ struct DashboardPlanWaitingState: View {
       .background(Color.MeetPR.surfaceCard)
       .clipShape(.rect(cornerRadius: 16))
 
-      Text("本周小结 · W\(max(1, nextWeekIndex - 1))")
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
-        .foregroundStyle(Color.MeetPR.textSecondary)
+      Text(
+        StudentStrings.replacing(
+          .dashboardPlanWaitingState006, values: ["\(max(1, nextWeekIndex - 1))"])
+      )
+      .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+      .foregroundStyle(Color.MeetPR.textSecondary)
 
       HStack {
         summaryStat(
-          label: "训练完成",
+          label: StudentStrings.localized(.dashboardPlanWaitingState007),
           value: summary.completedTrainingDays.formatted(),
           suffix: "/\(summary.totalTrainingDays)"
         )
-        summaryStat(label: "周总量", value: volumeValue, suffix: volumeUnit)
         summaryStat(
-          label: "新 PR",
+          label: StudentStrings.localized(.dashboardPlanWaitingState008), value: volumeValue,
+          suffix: volumeUnit)
+        summaryStat(
+          label: StudentStrings.localized(.dashboardPlanWaitingState009),
           value: summary.newPRCount.formatted(),
           suffix: nil,
           isGold: true

@@ -34,7 +34,7 @@ struct SessionSummaryView: View {
             SessionPersonalRecordRow(text: presentation.personalRecordText)
           }
 
-          SessionSectionLabel(title: "动作表现")
+          SessionSectionLabel(title: StudentStrings.localized(.sessionSummaryView001))
           SessionPerformanceList(exercises: presentation.exercises)
 
           SessionReflectionHeading()
@@ -53,14 +53,14 @@ struct SessionSummaryView: View {
 
       VStack {
         GoldCTA(
-          "完成 · 回到今日",
+          StudentStrings.localized(.sessionSummaryView002),
           sub: nil,
           icon: .none,
           showsShimmer: true,
           action: onComplete
         )
         .accessibilityRepresentation {
-          Button("完成 · 回到今日", action: onComplete)
+          Button(StudentStrings.localized(.sessionSummaryView002), action: onComplete)
         }
       }
       .padding(.horizontal, MeetPRSpacing.space5)
@@ -84,7 +84,7 @@ private struct SessionSummaryHeader: View {
   var body: some View {
     HStack(spacing: MeetPRSpacing.point10) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-        Text("训练回顾")
+        Text(StudentStrings.localized(.sessionSummaryView003))
           .font(.MeetPR.display(size: MeetPRFontMetrics.size17))
           .foregroundStyle(Color.MeetPR.textPrimary)
         Text(presentation.dateSubtitle)
@@ -94,7 +94,7 @@ private struct SessionSummaryHeader: View {
 
       Spacer()
 
-      Text("已通知教练")
+      Text(StudentStrings.localized(.sessionSummaryView004))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
         .tracking(0.55)
         .foregroundStyle(Color.MeetPR.success)
@@ -118,7 +118,7 @@ private struct SessionVolumeCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      Text("总容量")
+      Text(StudentStrings.localized(.sessionSummaryView005))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
         .tracking(0.88)
         .foregroundStyle(Color.MeetPR.goldText)
@@ -141,10 +141,18 @@ private struct SessionVolumeCard: View {
       .padding(.top, MeetPRSpacing.point5)
 
       HStack(spacing: MeetPRSpacing.space2) {
-        SessionVolumeStat(value: presentation.exerciseCount.formatted(), label: "动作")
-        SessionVolumeStat(value: presentation.completedSetCount.formatted(), label: "组数")
-        SessionVolumeStat(value: presentation.totalReps.formatted(), label: "总次数")
-        SessionVolumeStat(value: presentation.averageRPEText, label: "平均 RPE")
+        SessionVolumeStat(
+          value: presentation.exerciseCount.formatted(),
+          label: StudentStrings.localized(.sessionSummaryView006))
+        SessionVolumeStat(
+          value: presentation.completedSetCount.formatted(),
+          label: StudentStrings.localized(.sessionSummaryView007))
+        SessionVolumeStat(
+          value: presentation.totalReps.formatted(),
+          label: StudentStrings.localized(.sessionSummaryView008))
+        SessionVolumeStat(
+          value: presentation.averageRPEText,
+          label: StudentStrings.localized(.sessionSummaryView009))
       }
       .padding(.top, MeetPRSpacing.point15)
     }
@@ -240,9 +248,11 @@ private struct SessionPerformanceList: View {
             Text(exercise.name)
               .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
               .foregroundStyle(Color.MeetPR.textPrimary)
-            Text("最重组 \(exercise.bestSetText)")
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-              .foregroundStyle(Color.MeetPR.textFaint)
+            Text(
+              StudentStrings.replacing(.sessionSummaryView010, values: ["\(exercise.bestSetText)"])
+            )
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
+            .foregroundStyle(Color.MeetPR.textFaint)
           }
           .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -282,13 +292,13 @@ private struct SessionPerformanceList: View {
 private struct SessionReflectionHeading: View {
   var body: some View {
     HStack(spacing: MeetPRSpacing.point9) {
-      Text("训练反思")
+      Text(StudentStrings.localized(.sessionSummaryView011))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
         .foregroundStyle(Color.MeetPR.textMuted)
       Rectangle()
         .fill(Color.MeetPR.borderSubtle)
         .frame(height: 1)
-      Label("仅自己可见 · 保存在本机", systemImage: "lock.fill")
+      Label(StudentStrings.localized(.sessionSummaryView012), systemImage: "lock.fill")
         .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
         .foregroundStyle(Color.MeetPR.textDim)
     }
@@ -307,18 +317,18 @@ private struct SessionReflectionFields: View {
   var body: some View {
     VStack(spacing: 0) {
       SessionReflectionField(
-        title: "本次目标",
-        prompt: "这次训练你想达成什么？",
+        title: StudentStrings.localized(.sessionSummaryView013),
+        prompt: StudentStrings.localized(.sessionSummaryView014),
         text: $mindset
       )
       SessionReflectionField(
-        title: "做到了什么",
-        prompt: "这次训练有哪些收获？",
+        title: StudentStrings.localized(.sessionSummaryView015),
+        prompt: StudentStrings.localized(.sessionSummaryView016),
         text: $achievements
       )
       SessionReflectionField(
-        title: "可以更好",
-        prompt: "哪里还能做得更好？",
+        title: StudentStrings.localized(.sessionSummaryView017),
+        prompt: StudentStrings.localized(.sessionSummaryView018),
         text: $improvements,
         showsDivider: false
       )

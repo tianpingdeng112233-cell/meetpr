@@ -7,9 +7,9 @@ import Foundation
 /// recorded locally (UserDefaults) because backend spec 004 deferred the
 /// `privacy_consents` ledger to a later consumer-spec increment.
 enum VideoPrivacyCopy {
-  static let consentTitle = "视频上传须知"
+  static let consentTitle = StudentStrings.localized(.videoPrivacyCopy001)
   static let consentBody =
-    "你上传的训练视频将仅你绑定的教练可见。MeetPR 不会向其他人公开你的视频。"
-  static let consentAgree = "同意上传"
-  static let consentDecline = "不上传"
+    StudentStrings.localized(.videoPrivacyCopy002)
+  static let consentAgree = StudentStrings.localized(.videoPrivacyCopy003)
+  static let consentDecline = StudentStrings.localized(.videoPrivacyCopy004)
 }
