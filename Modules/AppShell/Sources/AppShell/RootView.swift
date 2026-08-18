@@ -150,7 +150,7 @@ public struct RootView: View {
     case .authenticating:
       VStack(spacing: 12) {
         ProgressView()
-        Text("正在验证会话…")
+        Text(AppShellStrings.validatingSession)
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
     case .authenticated(let user):

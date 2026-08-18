@@ -3,7 +3,8 @@ import PackageDescription
 
 let package = Package(
   name: "RepositoryContracts",
-  platforms: [.iOS(.v17)],
+  defaultLocalization: "zh-Hans",
+  platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
     .library(name: "RepositoryContracts", targets: ["RepositoryContracts"])
   ],
@@ -16,6 +17,7 @@ let package = Package(
       dependencies: [
         .product(name: "CoreModels", package: "CoreModels")
       ],
+      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(

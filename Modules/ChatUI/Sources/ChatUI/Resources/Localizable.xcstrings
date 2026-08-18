@@ -4,6 +4,12 @@
     "chat.addAttachment": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add attachment"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -15,6 +21,12 @@
     "chat.addVideoMarker": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "＋ Add marker"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -26,6 +38,12 @@
     "chat.back": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -37,6 +55,12 @@
     "chat.choosePhoto": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose photo"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -48,6 +72,12 @@
     "chat.close": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -59,6 +89,12 @@
     "chat.closeAnnotation": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close annotation"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -70,6 +106,12 @@
     "chat.closePlayback": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close playback"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -81,6 +123,12 @@
     "chat.completedSection": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completed"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -92,6 +140,12 @@
     "chat.composerPlaceholder": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Message"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -103,6 +157,12 @@
     "chat.continueSelection": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -114,6 +174,12 @@
     "chat.continueToChat": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue to chat and add a message"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -125,6 +191,12 @@
     "chat.delivered": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delivered"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -133,9 +205,117 @@
         }
       }
     },
+    "chat.demo.coach": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach Zhou"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "周教练"
+          }
+        }
+      }
+    },
+    "chat.demo.coachMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take tomorrow's squat to 140."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "明天深蹲加到 140。"
+          }
+        }
+      }
+    },
+    "chat.demo.firstStudent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chenxi Wang"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "王晨曦"
+          }
+        }
+      }
+    },
+    "chat.demo.secondStudent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jianing Li"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "李嘉宁"
+          }
+        }
+      }
+    },
+    "chat.demo.studentMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach, I finished today's last set."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练，今天最后一组完成了。"
+          }
+        }
+      }
+    },
+    "chat.demo.studentReply": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "收到。"
+          }
+        }
+      }
+    },
     "chat.image": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[Image]"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -147,6 +327,12 @@
     "chat.imagePreparationFailed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not process image"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -158,6 +344,12 @@
     "chat.imageUnavailable": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image unavailable"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -169,6 +361,12 @@
     "chat.includeVideo": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Include this set's video"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -180,6 +378,12 @@
     "chat.invalidSetRecord": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This set cannot be shared right now"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -191,6 +395,12 @@
     "chat.load": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weight × reps"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -202,6 +412,12 @@
     "chat.loadOlder": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Load earlier messages"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -213,6 +429,12 @@
     "chat.loggedSetCardLabel": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A set I logged"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -224,6 +446,12 @@
     "chat.messageTooLong": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The training record and note cannot exceed 4,000 characters. Shorten the note."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -235,6 +463,12 @@
     "chat.messages": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Messages"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -246,6 +480,12 @@
     "chat.noConversations": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No conversations yet"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -257,6 +497,12 @@
     "chat.noShareableSets": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No training sets to share today"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -268,6 +514,12 @@
     "chat.noShareableSetsDescription": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's planned or logged sets will appear here"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -279,6 +531,12 @@
     "chat.pausePlayback": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -290,6 +548,12 @@
     "chat.plannedSetCardLabel": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My plan for today"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -301,6 +565,12 @@
     "chat.playPlayback": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -312,6 +582,12 @@
     "chat.playVideo": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play video"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -323,6 +599,12 @@
     "chat.playbackFailed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback failed. The link may have expired."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -334,6 +616,12 @@
     "chat.playbackProgress": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback progress"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -345,6 +633,12 @@
     "chat.playbackSpeed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback speed"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -356,6 +650,12 @@
     "chat.preparingImage": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Processing image"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -367,6 +667,12 @@
     "chat.read": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -378,6 +684,12 @@
     "chat.refreshing": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refreshing…"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -386,9 +698,202 @@
         }
       }
     },
+    "chat.relative.dayAgo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 day ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 天前"
+          }
+        }
+      }
+    },
+    "chat.relative.daysAgo %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ days ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 天前"
+          }
+        }
+      }
+    },
+    "chat.relative.hourAgo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 hour ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 小时前"
+          }
+        }
+      }
+    },
+    "chat.relative.hoursAgo %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hours ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 小时前"
+          }
+        }
+      }
+    },
+    "chat.relative.justNow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Just now"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "刚刚"
+          }
+        }
+      }
+    },
+    "chat.relative.minuteAgo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 minute ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 分钟前"
+          }
+        }
+      }
+    },
+    "chat.relative.minutesAgo %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ minutes ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 分钟前"
+          }
+        }
+      }
+    },
+    "chat.relative.monthAgo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 month ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 个月前"
+          }
+        }
+      }
+    },
+    "chat.relative.monthsAgo %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ months ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 个月前"
+          }
+        }
+      }
+    },
+    "chat.relative.yearAgo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 year ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 年前"
+          }
+        }
+      }
+    },
+    "chat.relative.yearsAgo %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ years ago"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 年前"
+          }
+        }
+      }
+    },
     "chat.removeTrainingShare": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove training share"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -400,6 +905,12 @@
     "chat.retry": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -411,6 +922,12 @@
     "chat.rpeMetric": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -422,6 +939,12 @@
     "chat.seekToVideoMarker": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jump to {time}"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -433,6 +956,12 @@
     "chat.selected": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -444,6 +973,12 @@
     "chat.send": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -455,6 +990,12 @@
     "chat.sendCurrentSetPlan": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send the current plan for this set"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -466,6 +1007,12 @@
     "chat.sendCurrentSetRecord": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send the current log for this set"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -477,6 +1024,12 @@
     "chat.sendFailed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to send"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -488,6 +1041,12 @@
     "chat.sending": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sending"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -499,6 +1058,12 @@
     "chat.setCardDelivered": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "✓ Delivered · Waiting for coach"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -510,6 +1075,12 @@
     "chat.setCardRead": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "✓ Read by coach"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -521,6 +1092,12 @@
     "chat.setNumber": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -529,9 +1106,49 @@
         }
       }
     },
+    "chat.setPosition %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第%@组"
+          }
+        }
+      }
+    },
+    "chat.setPosition %@ of %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set %@ of %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第%@组/%@"
+          }
+        }
+      }
+    },
     "chat.setRefNotePlaceholder": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a message (optional)"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -540,9 +1157,66 @@
         }
       }
     },
+    "chat.setReference.loggedTag": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[Training share]"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[训练分享]"
+          }
+        }
+      }
+    },
+    "chat.setReference.plannedMarker": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " planned"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " 计划"
+          }
+        }
+      }
+    },
+    "chat.setReference.plannedTag": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[Training plan]"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "[训练计划]"
+          }
+        }
+      }
+    },
     "chat.shareTodayTraining": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share today's training"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -554,6 +1228,12 @@
     "chat.todayPlanSection": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's plan"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -565,6 +1245,12 @@
     "chat.trainingLoadFailed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load today's training. Try again."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -576,6 +1262,12 @@
     "chat.trainingShare": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Training share"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -587,6 +1279,12 @@
     "chat.trainingShareFailed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This set cannot be sent right now"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -598,6 +1296,12 @@
     "chat.unread": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "unread"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -609,6 +1313,12 @@
     "chat.videoFailed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video upload failed. Retry from the training screen first."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -620,6 +1330,12 @@
     "chat.videoMarker": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video marker"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -631,6 +1347,12 @@
     "chat.videoMarkers": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markers · {count}"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -642,6 +1364,12 @@
     "chat.videoMarkersFailed": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load markers"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -653,6 +1381,12 @@
     "chat.videoPlayback": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VIDEO PLAYBACK //"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -664,6 +1398,12 @@
     "chat.videoReady": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video ready"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -675,6 +1415,12 @@
     "chat.videoUnavailable": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This video is no longer available. Deselect it to continue."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -686,6 +1432,12 @@
     "chat.videoUploading": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video is uploading. You can still send the message."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -697,6 +1449,12 @@
     "chat.weightRepsMetric": {
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WEIGHT × REPS"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",

@@ -203,11 +203,14 @@ import Testing
   let wangID = CoachDemoSeed.previewStudentID(4)
   let liID = CoachDemoSeed.previewStudentID(8)
   let zhangID = CoachDemoSeed.previewStudentID(2)
+  let expectedNames = Dictionary(
+    uniqueKeysWithValues: seed.conversations.map { ($0.otherPartyID, $0.otherPartyName) }
+  )
   #expect(Set(rows.map(\.studentID)) == [wangID, liID, zhangID])
-  #expect(rows.first { $0.studentID == wangID }?.studentName == "王晨曦")
+  #expect(rows.first { $0.studentID == wangID }?.studentName == expectedNames[wangID])
   #expect(rows.first { $0.studentID == wangID }?.pendingVideoCount == 3)
   #expect(rows.first { $0.studentID == wangID }?.unreadCount == 1)
-  #expect(rows.first { $0.studentID == liID }?.studentName == "李嘉宁")
+  #expect(rows.first { $0.studentID == liID }?.studentName == expectedNames[liID])
   #expect(rows.first { $0.studentID == liID }?.pendingVideoCount == 2)
   #expect(rows.first { $0.studentID == liID }?.unreadCount == 1)
   #expect(rows.first { $0.studentID == zhangID }?.pendingVideoCount == 1)

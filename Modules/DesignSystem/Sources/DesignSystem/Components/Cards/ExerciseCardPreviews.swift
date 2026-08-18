@@ -19,15 +19,15 @@ private let finishedExerciseSets = [
 #Preview("ExerciseCard · Expanded + Summary · Dark") {
   VStack(spacing: MeetPRSpacing.point10) {
     ExerciseCard(
-      exercise: "硬拉",
-      meta: "上次 170kg×3 @8 · 最佳 175kg×3 @8.5",
-      note: "注意启动时股四的蹬地",
+      exercise: DesignSystemStrings.deadlift,
+      meta: DesignSystemStrings.previousBestDeadlift,
+      note: DesignSystemStrings.deadliftNote,
       collapsed: false,
       sets: mixedExerciseSets
     )
     ExerciseCard(
-      exercise: "节奏卧推",
-      meta: "上次 87.5kg×2 @6 · 最佳 90kg×2 @6",
+      exercise: DesignSystemStrings.tempoBench,
+      meta: DesignSystemStrings.previousBestTempoBench,
       note: "",
       collapsed: true,
       sets: finishedExerciseSets
@@ -40,15 +40,15 @@ private let finishedExerciseSets = [
 #Preview("ExerciseCard · Expanded + Summary · Light") {
   VStack(spacing: MeetPRSpacing.point10) {
     ExerciseCard(
-      exercise: "硬拉",
-      meta: "上次 170kg×3 @8 · 最佳 175kg×3 @8.5",
-      note: "注意启动时股四的蹬地",
+      exercise: DesignSystemStrings.deadlift,
+      meta: DesignSystemStrings.previousBestDeadlift,
+      note: DesignSystemStrings.deadliftNote,
       collapsed: false,
       sets: mixedExerciseSets
     )
     ExerciseCard(
-      exercise: "节奏卧推",
-      meta: "上次 87.5kg×2 @6 · 最佳 90kg×2 @6",
+      exercise: DesignSystemStrings.tempoBench,
+      meta: DesignSystemStrings.previousBestTempoBench,
       note: "",
       collapsed: true,
       sets: finishedExerciseSets

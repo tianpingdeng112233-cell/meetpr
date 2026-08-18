@@ -1,31 +1,28 @@
 import Foundation
 
-/// Chinese-only relative timestamps for chat surfaces.
+/// Stable relative timestamps for chat surfaces.
 ///
-/// The app ships a single language: `MeetPR/Resources/Localizable.xcstrings` is
-/// empty and every existing screen hardcodes Chinese. SwiftUI's
-/// `Text(date, style: .relative)` follows the *device* locale instead, so on a
-/// non-Chinese simulator it renders "7 min, 39 secs" in the middle of a Chinese
-/// list. This mirrors `CoachKit`'s `CoachStudentFormatting.relativeText` — ChatUI
-/// cannot import CoachKit (ADR-005), hence the small duplicate.
+/// SwiftUI's `Text(date, style: .relative)` includes seconds and does not match
+/// the product's minute/hour/day buckets, so ChatUI keeps the bucket logic and
+/// localizes the resulting labels inside its own bundle.
 enum ChatRelativeTime {
   static func text(_ date: Date, now: Date = Date()) -> String {
     let seconds = max(0, Int(now.timeIntervalSince(date)))
     if seconds < 60 {
-      return "刚刚"
+      return ChatStrings.justNow
     }
     if seconds < 3_600 {
-      return "\(seconds / 60) 分钟前"
+      return ChatStrings.minutesAgo(seconds / 60)
     }
     if seconds < 86_400 {
-      return "\(seconds / 3_600) 小时前"
+      return ChatStrings.hoursAgo(seconds / 3_600)
     }
     if seconds < 2_592_000 {
-      return "\(seconds / 86_400) 天前"
+      return ChatStrings.daysAgo(seconds / 86_400)
     }
     if seconds < 31_536_000 {
-      return "\(seconds / 2_592_000) 个月前"
+      return ChatStrings.monthsAgo(seconds / 2_592_000)
     }
-    return "\(seconds / 31_536_000) 年前"
+    return ChatStrings.yearsAgo(seconds / 31_536_000)
   }
 }

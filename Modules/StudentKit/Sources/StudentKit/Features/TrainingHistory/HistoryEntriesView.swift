@@ -271,10 +271,10 @@ private struct HistoryDayHeader: View {
   var body: some View {
     HStack(alignment: .firstTextBaseline) {
       VStack(alignment: .leading, spacing: 2) {
-        Text(StudentFormatting.dayMonthFormatter.string(from: day.date))
+        Text(StudentFormatting.dayMonth(day.date))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textPrimary)
-        Text(StudentFormatting.weekdayFormatter.string(from: day.date))
+        Text(StudentFormatting.weekday(day.date))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textSecondary)
       }

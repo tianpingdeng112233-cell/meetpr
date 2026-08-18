@@ -129,6 +129,38 @@ import Testing
     #expect(presentation.setNumber == 1)
   }
 
+  @Test func setReferenceWireRoundTripIsStableAcrossSenderAndReceiverLocales() throws {
+    let setRef = try makeSetRef()
+    let canonical = SetRefCanonicalFormatter.body(for: setRef, note: "保持节奏")
+    #expect(
+      canonical
+        == "[训练分享] 低杠位深蹲 第3组/5 100kg×5 @RPE8.5 (2026-07-27)\n保持节奏"
+    )
+
+    let wireData = try MeetPRCodec.encoder.encode(
+      makeMessage(setRef: setRef, body: canonical)
+    )
+    let received = try MeetPRCodec.decoder.decode(ChatMessage.self, from: wireData)
+    let receivedSetRef = try #require(received.setRef)
+
+    #expect(received.text == canonical)
+    #expect(SetRefCanonicalFormatter.body(for: receivedSetRef, note: "保持节奏") == canonical)
+    #expect(
+      ChatSetRefDisplayFormatter.firstLine(
+        for: receivedSetRef,
+        copy: try localizedSetRefCopy(locale: "zh-Hans")
+      )
+        == "[训练分享] 低杠位深蹲 第3组/5 100kg×5 @RPE8.5 (2026-07-27)"
+    )
+    #expect(
+      ChatSetRefDisplayFormatter.firstLine(
+        for: receivedSetRef,
+        copy: try localizedSetRefCopy(locale: "en")
+      )
+        == "[Training share] 低杠位深蹲 Set 3 of 5 100kg×5 @RPE8.5 (2026-07-27)"
+    )
+  }
+
   /// 拍板 3 froze the snapshot semantics carried by 「当前」, not the noun after it.
   /// A planned set has no record, and calling it one would undo the whole point of
   /// keeping performed and prescribed sets distinguishable.
@@ -139,6 +171,39 @@ import Testing
     #expect(SetRefConfirmationCopy.prompt(for: .logged) == ChatStrings.sendCurrentSetRecord)
     #expect(ChatStrings.sendCurrentSetPlan != ChatStrings.sendCurrentSetRecord)
   }
+}
+
+private func localizedSetRefCopy(locale: String) throws -> ChatSetRefDisplayFormatter.Copy {
+  ChatSetRefDisplayFormatter.Copy(
+    loggedTag: try LocalizationCatalogTestSupport.value(
+      "chat.setReference.loggedTag",
+      locale: locale
+    ),
+    plannedTag: try LocalizationCatalogTestSupport.value(
+      "chat.setReference.plannedTag",
+      locale: locale
+    ),
+    plannedMarker: try LocalizationCatalogTestSupport.value(
+      "chat.setReference.plannedMarker",
+      locale: locale
+    ),
+    setPosition: { setNumber, total in
+      if let total {
+        return
+          (try? LocalizationCatalogTestSupport.value(
+            "chat.setPosition %@ of %@",
+            locale: locale,
+            arguments: [String(setNumber), String(total)]
+          )) ?? ""
+      }
+      return
+        (try? LocalizationCatalogTestSupport.value(
+          "chat.setPosition %@",
+          locale: locale,
+          arguments: [String(setNumber)]
+        )) ?? ""
+    }
+  )
 }
 
 private let testSetLogID = UUID(

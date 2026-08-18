@@ -254,7 +254,7 @@ struct StudentBlackGoldChatView: View {
         HStack(spacing: MeetPRSpacing.space2) {
           Image(systemName: "dumbbell")
             .foregroundStyle(Color.MeetPR.gold500)
-          Text(SetRefCanonicalFormatter.firstLine(for: stagedSetRef.setRef))
+          Text(ChatSetRefDisplayFormatter.firstLine(for: stagedSetRef.setRef))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
             .foregroundStyle(Color.MeetPR.textSecondary)
             .lineLimit(2)
@@ -487,15 +487,11 @@ struct StudentBlackGoldChatView: View {
   }
 
   private func chatTimestamp(_ date: Date) -> String {
-    let time = date.formatted(
-      .dateTime.hour().minute().locale(Locale(identifier: "zh_CN"))
-    )
+    let time = StudentFormatting.time(date)
     if Calendar.current.isDateInToday(date) {
       return "今天 \(time)"
     }
-    let day = date.formatted(
-      .dateTime.month().day().locale(Locale(identifier: "zh_CN"))
-    )
+    let day = StudentFormatting.monthDay(date)
     return "\(day) \(time)"
   }
 }

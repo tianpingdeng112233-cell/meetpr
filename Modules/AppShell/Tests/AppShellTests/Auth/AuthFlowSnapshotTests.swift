@@ -11,20 +11,29 @@ import ViewInspector
   let inspected = try sut.inspect()
 
   #expect(try inspected.find(text: "Better than\nyesterday").string() == "Better than\nyesterday")
-  #expect(try inspected.find(text: "用手机号和密码登录。").string() == "用手机号和密码登录。")
-  #expect(try inspected.find(text: "手机号").string() == "手机号")
+  #expect(
+    try LocalizationCatalogTestSupport.simplifiedChineseSource(
+      inspected.find(text: AppShellStrings.loginInstructions).string(),
+      key: "appShell.login.instructions"
+    ) == "用手机号和密码登录。"
+  )
+  #expect(
+    try inspected.find(text: AppShellStrings.phoneNumber).string() == AppShellStrings.phoneNumber)
   #expect(try inspected.find(text: "+86").string() == "+86")
-  #expect(try inspected.find(text: "密码").string() == "密码")
-  #expect(try inspected.find(text: "登录").string() == "登录")
-  #expect(try inspected.find(text: "继续即表示同意").string() == "继续即表示同意")
-  #expect(try inspected.find(text: "隐私政策").string() == "隐私政策")
+  #expect(try inspected.find(text: AppShellStrings.password).string() == AppShellStrings.password)
+  #expect(try inspected.find(text: AppShellStrings.signIn).string() == AppShellStrings.signIn)
+  #expect(try inspected.find(text: AppShellStrings.consent).string() == AppShellStrings.consent)
+  #expect(
+    try inspected.find(text: AppShellStrings.privacyPolicy).string()
+      == AppShellStrings.privacyPolicy
+  )
   #expect(
     try inspected.find(link: AnalyticsPrivacyNotice.privacyPolicyURL).url()
       == AnalyticsPrivacyNotice.privacyPolicyURL
   )
   #expect(
-    try inspected.find(viewWithAccessibilityLabel: "显示密码").accessibilityLabel().string()
-      == "显示密码"
+    try inspected.find(viewWithAccessibilityLabel: AppShellStrings.showPassword)
+      .accessibilityLabel().string() == AppShellStrings.showPassword
   )
 }
 
@@ -71,9 +80,9 @@ import ViewInspector
 @Test func passwordStartsMaskedWithAReachableRevealButton() throws {
   let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
   let inspected = try LoginView().environment(session).inspect()
-  let reveal = try inspected.find(viewWithAccessibilityLabel: "显示密码")
+  let reveal = try inspected.find(viewWithAccessibilityLabel: AppShellStrings.showPassword)
 
-  #expect(try reveal.accessibilityLabel().string() == "显示密码")
+  #expect(try reveal.accessibilityLabel().string() == AppShellStrings.showPassword)
   #expect(throws: Never.self) { try reveal.button() }
 }
 
@@ -94,8 +103,15 @@ import ViewInspector
   let sut = SignupView().environment(session)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "选择你的角色").string() == "选择你的角色")
-  #expect(try inspected.find(text: "教练").string() == "教练")
-  #expect(try inspected.find(text: "学员 · 有教练").string() == "学员 · 有教练")
-  #expect(try inspected.find(text: "学员 · 自己练").string() == "学员 · 自己练")
+  #expect(
+    try inspected.find(text: AppShellStrings.signupTitle).string() == AppShellStrings.signupTitle)
+  #expect(try inspected.find(text: AppShellStrings.coach).string() == AppShellStrings.coach)
+  #expect(
+    try inspected.find(text: AppShellStrings.coachedStudent).string()
+      == AppShellStrings.coachedStudent
+  )
+  #expect(
+    try inspected.find(text: AppShellStrings.selfTrainingStudent).string()
+      == AppShellStrings.selfTrainingStudent
+  )
 }

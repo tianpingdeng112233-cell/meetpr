@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "DesignSystem",
+  defaultLocalization: "zh-Hans",
   platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
     .library(name: "DesignSystem", targets: ["DesignSystem"])
@@ -13,6 +14,7 @@ let package = Package(
   targets: [
     .target(
       name: "DesignSystem",
+      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(

@@ -30,9 +30,9 @@ public enum MeetPRAppearance: String, CaseIterable, Identifiable, Sendable {
 
   public var label: String {
     switch self {
-    case .system: "跟随系统"
-    case .light: "浅色"
-    case .dark: "深色"
+    case .system: DesignSystemStrings.appearanceSystem
+    case .light: DesignSystemStrings.appearanceLight
+    case .dark: DesignSystemStrings.appearanceDark
     }
   }
 

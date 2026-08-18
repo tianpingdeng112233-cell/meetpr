@@ -34,7 +34,7 @@ public struct DayDetailView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bgBase)
-    .navigationTitle(StudentFormatting.dayMonthFormatter.string(from: day.date))
+    .navigationTitle(StudentFormatting.dayMonth(day.date))
   }
 
   private func exerciseCard(_ exercise: StudentPlanExercise) -> some View {

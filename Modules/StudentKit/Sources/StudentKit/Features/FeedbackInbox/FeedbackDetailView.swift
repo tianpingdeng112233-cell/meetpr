@@ -28,7 +28,7 @@ public struct FeedbackDetailView: View {
             Text("教练反馈")
               .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
               .foregroundStyle(Color.MeetPR.textPrimary)
-            Text(StudentFormatting.dayMonthFormatter.string(from: item.postedAt))
+            Text(StudentFormatting.dayMonth(item.postedAt))
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
               .foregroundStyle(Color.MeetPR.textMuted)
           }
@@ -36,7 +36,7 @@ public struct FeedbackDetailView: View {
 
         if let dayDate = item.dayDate {
           Label(
-            "关联训练日 " + StudentFormatting.dayMonthFormatter.string(from: dayDate),
+            "关联训练日 " + StudentFormatting.dayMonth(dayDate),
             systemImage: "calendar"
           )
           .font(.MeetPR.body(size: MeetPRFontMetrics.size15))

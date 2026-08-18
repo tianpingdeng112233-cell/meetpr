@@ -63,6 +63,100 @@ enum ChatStrings {
   static let videoUnavailable = localized("chat.videoUnavailable")
   static let videoUploading = localized("chat.videoUploading")
   static let weightRepsMetric = localized("chat.weightRepsMetric")
+  // Stable repository sentinel; rendering replaces it with the localized `image` label.
+  static let imageSourceMarker = "[\u{56FE}\u{7247}]"
+  static let justNow = localized("chat.relative.justNow")
+  static let minuteAgo = localized("chat.relative.minuteAgo")
+  static let hourAgo = localized("chat.relative.hourAgo")
+  static let dayAgo = localized("chat.relative.dayAgo")
+  static let monthAgo = localized("chat.relative.monthAgo")
+  static let yearAgo = localized("chat.relative.yearAgo")
+  static let demoFirstStudent = localized("chat.demo.firstStudent")
+  static let demoSecondStudent = localized("chat.demo.secondStudent")
+  static let demoCoach = localized("chat.demo.coach")
+  static let demoCoachMessage = localized("chat.demo.coachMessage")
+  static let demoStudentReply = localized("chat.demo.studentReply")
+  static let demoStudentMessage = localized("chat.demo.studentMessage")
+
+  static func setReferenceLoggedTag(locale: Locale = .current) -> String {
+    localized("chat.setReference.loggedTag", locale: locale)
+  }
+
+  static func setReferencePlannedTag(locale: Locale = .current) -> String {
+    localized("chat.setReference.plannedTag", locale: locale)
+  }
+
+  static func setReferencePlannedMarker(locale: Locale = .current) -> String {
+    localized("chat.setReference.plannedMarker", locale: locale)
+  }
+
+  static func setPosition(_ setNumber: Int, locale: Locale = .current) -> String {
+    let formattedSetNumber = String(setNumber)
+    return String(
+      localized: "chat.setPosition \(formattedSetNumber)",
+      bundle: .module,
+      locale: locale
+    )
+  }
+
+  static func setPosition(
+    _ setNumber: Int,
+    total: Int,
+    locale: Locale = .current
+  ) -> String {
+    let formattedSetNumber = String(setNumber)
+    let formattedTotal = String(total)
+    return String(
+      localized: "chat.setPosition \(formattedSetNumber) of \(formattedTotal)",
+      bundle: .module,
+      locale: locale
+    )
+  }
+
+  static func minutesAgo(_ count: Int) -> String {
+    if count == 1 { return minuteAgo }
+    let formattedCount = String(count)
+    return String(
+      localized: "chat.relative.minutesAgo \(formattedCount)",
+      bundle: .module
+    )
+  }
+
+  static func hoursAgo(_ count: Int) -> String {
+    if count == 1 { return hourAgo }
+    let formattedCount = String(count)
+    return String(
+      localized: "chat.relative.hoursAgo \(formattedCount)",
+      bundle: .module
+    )
+  }
+
+  static func daysAgo(_ count: Int) -> String {
+    if count == 1 { return dayAgo }
+    let formattedCount = String(count)
+    return String(
+      localized: "chat.relative.daysAgo \(formattedCount)",
+      bundle: .module
+    )
+  }
+
+  static func monthsAgo(_ count: Int) -> String {
+    if count == 1 { return monthAgo }
+    let formattedCount = String(count)
+    return String(
+      localized: "chat.relative.monthsAgo \(formattedCount)",
+      bundle: .module
+    )
+  }
+
+  static func yearsAgo(_ count: Int) -> String {
+    if count == 1 { return yearAgo }
+    let formattedCount = String(count)
+    return String(
+      localized: "chat.relative.yearsAgo \(formattedCount)",
+      bundle: .module
+    )
+  }
 
   static func videoMarkers(_ count: Int) -> String {
     localized("chat.videoMarkers").replacing("{count}", with: count.formatted())
@@ -72,7 +166,10 @@ enum ChatStrings {
     localized("chat.seekToVideoMarker").replacing("{time}", with: time)
   }
 
-  private static func localized(_ key: String.LocalizationValue) -> String {
-    String(localized: key, bundle: .module)
+  private static func localized(
+    _ key: String.LocalizationValue,
+    locale: Locale = .current
+  ) -> String {
+    String(localized: key, bundle: .module, locale: locale)
   }
 }

@@ -23,7 +23,7 @@ public final class AuthFormViewModel {
   }
 
   public var phoneHelperText: String {
-    "中国大陆 11 位手机号"
+    AppShellStrings.phoneHelper
   }
 
   public var phonePrefix: String? {
@@ -42,14 +42,14 @@ public final class AuthFormViewModel {
     guard !phone.isEmpty, !isPhoneValid else {
       return nil
     }
-    return "手机号格式不正确"
+    return AppShellStrings.invalidPhone
   }
 
   public var passwordError: String? {
     guard !password.isEmpty, !isPasswordValid else {
       return nil
     }
-    return "密码至少 8 字符,最多 72 字节"
+    return AppShellStrings.invalidPassword
   }
 
   public var canSubmit: Bool {
@@ -84,22 +84,22 @@ public final class AuthFormViewModel {
 
   public static func toastMessage(for error: Error) -> String {
     guard let authError = error as? AuthRepositoryError else {
-      return "网络不稳定,重试"
+      return AppShellStrings.networkUnstable
     }
 
     switch authError {
     case .backend(_, .phoneTaken, _):
-      return "该手机号已注册"
+      return AppShellStrings.phoneTaken
     case .backend(_, .invalidCredentials, _):
-      return "手机号或密码错误"
+      return AppShellStrings.invalidCredentials
     case .backend(_, .validationError, _):
-      return "手机号格式不对(+86 开头)"
+      return AppShellStrings.invalidPhoneWithPrefix
     case .backend(_, .rateLimited, _):
-      return "请求过于频繁,请稍后重试"
+      return AppShellStrings.rateLimited
     case .backend, .decoding, .server:
-      return "请求失败,请稍后重试"
+      return AppShellStrings.requestFailed
     case .network:
-      return "网络不稳定,重试"
+      return AppShellStrings.networkUnstable
     }
   }
 

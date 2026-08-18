@@ -9,7 +9,7 @@ public enum DemoUserSeed {
   public static let coach = User(
     id: UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)),
     phone: "13800000000",
-    name: "演示教练",
+    name: AppShellStrings.demoCoach,
     unitSystem: .metric,
     role: .coach,
     createdAt: timestamp,
@@ -25,7 +25,7 @@ public enum DemoUserSeed {
     // avoids a production-path force unwrap.
     id: UUID(uuid: (0x02, 0x40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x01)),
     phone: "+15550102400",
-    name: "演示学员",
+    name: AppShellStrings.demoStudent,
     unitSystem: .metric,
     role: .coachedStudent,
     createdAt: timestamp,

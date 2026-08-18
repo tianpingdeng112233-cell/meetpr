@@ -43,7 +43,7 @@ public enum DemoChatSeed {
       ChatConversation(
         id: conversation.id,
         otherPartyID: StudentDemoSeed.coachID,
-        otherPartyName: "演示教练",
+        otherPartyName: AppShellStrings.demoCoach,
         lastMessagePreview: emptyConversation ? nil : conversation.lastMessagePreview,
         lastMessageAt: messages[conversation.id]?.last?.createdAt,
         unreadCount: emptyConversation ? 0 : conversation.unreadCount,
@@ -54,7 +54,7 @@ public enum DemoChatSeed {
     return ChatDemoSeed(
       conversations: conversations,
       messagesByConversationID: messages,
-      otherPartyNames: [StudentDemoSeed.coachID: "演示教练"]
+      otherPartyNames: [StudentDemoSeed.coachID: AppShellStrings.demoCoach]
     )
   }
 }

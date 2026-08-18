@@ -59,7 +59,7 @@ struct AuthPhoneField: View {
             .textContentType(.telephoneNumber)
           #endif
           .accessibilityLabel(label)
-          .accessibilityHint(errorMessage ?? "输入手机号")
+          .accessibilityHint(errorMessage ?? AppShellStrings.phoneInputHint)
         }
       }
       .padding(.horizontal, MeetPRSpacing.point14)

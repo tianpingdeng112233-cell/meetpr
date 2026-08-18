@@ -108,7 +108,7 @@ public struct E1RMChart: View {
         AxisMarks(values: .automatic(desiredCount: 4)) { value in
           AxisValueLabel {
             if let date = value.as(Date.self) {
-              Text(Self.chineseMonthDay(date))
+              Text(Self.localizedMonthDay(date))
                 .font(.MeetPR.mono(size: 10, weight: .medium))
                 .foregroundStyle(Color.MeetPR.textMuted)
             }
@@ -145,7 +145,7 @@ public struct E1RMChart: View {
             }
         }
       }
-      .accessibilityLabel("e1RM 成长曲线，共 \(smoothed.count) 个主线数据点")
+      .accessibilityLabel(DesignSystemStrings.e1rmChartLabel(smoothed.count))
 
       if containsImportedPoint {
         HStack(spacing: MeetPRSpacing.point6) {
@@ -155,7 +155,7 @@ public struct E1RMChart: View {
               style: StrokeStyle(lineWidth: 1.5, dash: [5, 3])
             )
             .frame(width: 22, height: 1.5)
-          Text("虚线 = 导入的历史记录")
+          Text(DesignSystemStrings.importedHistoryLegend)
             .font(.MeetPR.mono(size: 10, weight: .medium))
             .foregroundStyle(Color.MeetPR.textTertiary)
         }
@@ -168,9 +168,9 @@ public struct E1RMChart: View {
     ForEach(lineSegments) { segment in
       ForEach(segment.points) { point in
         LineMark(
-          x: .value("日期", point.date),
+          x: .value(DesignSystemStrings.date, point.date),
           y: .value("e1RM", point.e1RMKg),
-          series: .value("线段", segment.id)
+          series: .value(DesignSystemStrings.segment, segment.id)
         )
         .foregroundStyle(lineColor(for: segment.origin).opacity(0.8))
         .lineStyle(lineStyle(for: segment.origin))
@@ -183,7 +183,7 @@ public struct E1RMChart: View {
   private var recordDots: some ChartContent {
     ForEach(recordPoints) { point in
       PointMark(
-        x: .value("日期", point.date),
+        x: .value(DesignSystemStrings.date, point.date),
         y: .value("e1RM", point.e1RMKg)
       )
       .foregroundStyle(Color.MeetPR.chartLine)
@@ -204,7 +204,7 @@ public struct E1RMChart: View {
   @ViewBuilder
   private func recordAnnotation(for point: E1RMChartPoint) -> some View {
     if point.id == calloutPointID {
-      Text("\(Self.chineseMonthDay(point.date)) · \(Self.kilograms(point.e1RMKg))kg")
+      Text("\(Self.localizedMonthDay(point.date)) · \(Self.kilograms(point.e1RMKg))kg")
         .font(.MeetPR.mono(size: 10, weight: .semibold))
         .foregroundStyle(Color.MeetPR.textPrimary)
         .padding(.horizontal, MeetPRSpacing.point6)
@@ -212,7 +212,7 @@ public struct E1RMChart: View {
         .background(Color.MeetPR.surfaceKey, in: RoundedRectangle(cornerRadius: MeetPRRadius.sm))
         .fixedSize()
     } else if calloutPointID == nil, point.id == recordPoints.last?.id {
-      Text(Self.chineseMonthDay(point.date))
+      Text(Self.localizedMonthDay(point.date))
         .font(.MeetPR.mono(size: 10, weight: .medium))
         .foregroundStyle(Color.MeetPR.textTertiary)
         .fixedSize()
@@ -228,7 +228,7 @@ public struct E1RMChart: View {
   private var rawScatter: some ChartContent {
     ForEach(rawEligible) { point in
       PointMark(
-        x: .value("日期", point.date),
+        x: .value(DesignSystemStrings.date, point.date),
         y: .value("e1RM", point.e1RMKg)
       )
       .foregroundStyle(scatterColor(for: point))
@@ -278,9 +278,9 @@ public struct E1RMChart: View {
     return point.origin == .imported ? base.opacity(0.65) : base
   }
 
-  private static func chineseMonthDay(_ date: Date) -> String {
+  private static func localizedMonthDay(_ date: Date) -> String {
     let parts = Calendar.current.dateComponents([.month, .day], from: date)
-    return "\(parts.month ?? 0)月\(parts.day ?? 0)日"
+    return DesignSystemStrings.monthDay(month: parts.month ?? 0, day: parts.day ?? 0)
   }
 
   private var containsImportedPoint: Bool {

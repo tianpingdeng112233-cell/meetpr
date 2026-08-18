@@ -165,9 +165,7 @@ private struct FeedbackArchivePresentation: Equatable, Sendable, Identifiable {
     if Calendar.current.isDateInToday(item.postedAt) {
       return "今天"
     }
-    return item.postedAt.formatted(
-      .dateTime.month(.defaultDigits).day().locale(Locale(identifier: "zh_CN"))
-    )
+    return StudentFormatting.numericMonthDay(item.postedAt)
   }
 }
 
