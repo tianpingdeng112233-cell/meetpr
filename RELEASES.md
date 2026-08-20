@@ -18,6 +18,29 @@
 
 ---
 
+## 1.0 (20) — 2026-08-20 — 🟢 已上传(外测 Ceshi 提审中)
+- 打包来源:tag `beta/1.0-20` @ f920a107(`release/1.0`,1.0(19) 基底累积;切包时 tip == tag,零落差)
+- 双端 demo 已同步本包(`MeetPR-demo-latest` detach @ f920a107,教练 iPhone 17 / 学员 iPhone 17 Pro 双 sim 现建)
+- tag CI 绿(self-hosted runner)
+
+### 本版包含
+- **[P0] 修「记录完成后消失」**(bdc9ab45):推进制下超过计划排期终点后,今日页/周历拉取
+  计划内记录的日期窗口把新记的组滤掉,显示 0/N 已记录、重量看似丢失(服务端数据完好)。
+  窗口上界改 max(末排期日, 今天)+1d。倪嘉骏 08-19/08-20 两报即此病,升级本包验证。
+- **英文化三连(specs 075/076/077,#325/#327/#328)**:i18n foundation(六小模块 strings enum
+  + 时区安全 today 匹配)+ StudentKit + CoachKit 全量英文;设备语言=英文才生效,中文设备零变化。
+- **spec 074 Global 轨三通道登录(W4)+ #326 Global 域名指 api.meetpr.app**——仅 Global 构建轨生效,
+  **CN 四配置产物逐字节零变化**(Release 产物实证:无 Google scheme/无 applesignin entitlement)。
+  含 #322 拍板前 E.164 遗留清理。
+
+### 已知问题 / 局限
+- 推进制老包尾巴(≤1.0(17) 不写 completion)未根治,靠催升级止血(0059 只回填到 08-09)。
+
+### 测试反馈
+- (待收)
+
+---
+
 ## 1.0 (19) — 2026-08-13 — 🟢 已上传(外测 Ceshi 提审中)
 - 打包来源:tag `beta/1.0-19` @ 6e3d315f(`release/1.0`,1.0(18) 基底累积;
   tip `bb1b8d8b` 比 tag 多一个纯 docs commit = 真机 smoke 记录,零代码落差)
