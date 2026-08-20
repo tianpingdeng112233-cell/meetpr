@@ -880,3 +880,48 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
   #expect(!drafts[0].completed)
   #expect(drafts[0].loggedSetID == setLogID)
 }
+
+// P0 2026-08-20: sequence progression lets real training run past the plan's
+// scheduled calendar. Logs recorded after the scheduled end must still bind to
+// the day's drafts — a schedule-clamped fetch window made them vanish.
+@MainActor
+@Test func todayWorkoutKeepsLogsRecordedAfterScheduledPlanEnd() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let lastScheduled = try #require(plan.days.map(\.scheduledDate).max())
+  let now = lastScheduled.addingTimeInterval(30 * 86_400)
+  let day = plan.days[0]
+  let exercise = try #require(day.exercises.first)
+  let prescribed = try #require(exercise.prescribedSets.first)
+  let lateLog = StudentSetLog(
+    id: UUID(),
+    studentID: studentID,
+    planExerciseID: exercise.id,
+    setIndex: prescribed.setIndex,
+    loggedAt: now.addingTimeInterval(-3_600),
+    weightKg: 123.5,
+    reps: 5,
+    completed: true
+  )
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: InMemoryStudentTrainingLogRepository(seed: [lateLog]),
+    now: { now }
+  )
+
+  await viewModel.load(dayID: day.id, studentID: studentID)
+
+  guard case .loaded(_, let drafts) = viewModel.state else {
+    Issue.record("Expected loaded state")
+    return
+  }
+  let draft = try #require(
+    drafts.first {
+      $0.planExerciseID == exercise.id && $0.prescribed.setIndex == prescribed.setIndex
+    }
+  )
+  #expect(draft.completed)
+  #expect(draft.actualWeight == 123.5)
+  #expect(draft.loggedSetID == lateLog.id)
+}

@@ -832,10 +832,16 @@ public final class TodayWorkoutViewModel {
     )
   }
 
-  private static func planRange(for days: [StudentPlanDay]) -> ClosedRange<Date> {
+  private static func planRange(
+    for days: [StudentPlanDay],
+    now: Date
+  ) -> ClosedRange<Date> {
     guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.scheduledDate).max()
     else { return Date.distantPast...Date.distantFuture }
-    return first.addingTimeInterval(-86_400)...last.addingTimeInterval(86_400)
+    // Sequence progression means real training can run past the plan's
+    // scheduled calendar: clamp the upper bound to today, or sets logged
+    // after the scheduled end vanish from the day view (P0 2026-08-20).
+    return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)
   }
 
   private func planLogs(
@@ -850,7 +856,7 @@ public final class TodayWorkoutViewModel {
     }
     let fetched = try await logs.fetchLogs(
       studentID: studentID,
-      in: Self.planRange(for: plan.days)
+      in: Self.planRange(for: plan.days, now: now())
     )
     planLogsSnapshot = PlanLogsSnapshot(
       cycleID: plan.cycleID,
