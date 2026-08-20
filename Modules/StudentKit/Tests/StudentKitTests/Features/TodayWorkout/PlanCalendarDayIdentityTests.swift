@@ -4,8 +4,9 @@ import Testing
 
 @testable import StudentKit
 
-@Test func cursorDoesNotChangeAcrossShanghaiGymDayBoundary() throws {
-  let calendar = WorkoutDatePolicy.shanghaiCalendar
+@Test func cursorDoesNotChangeAcrossDeviceGymDayBoundary() throws {
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(identifier: "America/New_York"))
   let before = try #require(
     calendar.date(from: DateComponents(year: 2030, month: 1, day: 2, hour: 3, minute: 59))
   )
@@ -17,8 +18,8 @@ import Testing
 
   #expect(StudentPlanSequence(days: days).cursorDay?.id == days[0].id)
   #expect(
-    WorkoutDatePolicy.gymDayRange(containing: before)
-      != WorkoutDatePolicy.gymDayRange(containing: after))
+    WorkoutDatePolicy.gymDayRange(containing: before, calendar: calendar)
+      != WorkoutDatePolicy.gymDayRange(containing: after, calendar: calendar))
   #expect(StudentPlanSequence(days: days).cursorDay?.id == days[0].id)
 }
 

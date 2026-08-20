@@ -172,6 +172,78 @@ func returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(
   #expect(await timezoneStore.lastReportedIdentifier(for: userB.id) == "Europe/London")
 }
 
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func foregroundReportsChangedTimezoneOnceAndSkipsUnchangedValue() async throws {
+  let user = AuthTestSupport.user(role: .coachedStudent, phone: "athlete@example.com")
+  let repository = GlobalAuthRepositorySpy(user: user)
+  let timezoneStore = InMemoryTimezoneStore(
+    reportedIdentifiers: [user.id: "Europe/London"])
+  let timezone = LockedTimezoneIdentifier("Europe/London")
+  let session = Session(
+    auth: repository,
+    tokenStore: InMemoryTokenStore(),
+    timezoneStore: timezoneStore,
+    currentTimezoneIdentifier: { timezone.value() },
+    reportsTimezoneOnBootstrap: true
+  )
+  try await session.loginWithEmail(email: user.phone, password: "password123")
+
+  timezone.setValue("America/New_York")
+  await session.applicationDidBecomeActive()
+  await session.applicationDidBecomeActive()
+
+  #expect(await repository.timezoneUpdates() == ["America/New_York:access"])
+  #expect(
+    await timezoneStore.lastReportedIdentifier(for: user.id) == "America/New_York"
+  )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func failedForegroundTimezoneReportRetriesAtNextActivation() async throws {
+  let user = AuthTestSupport.user(role: .coachedStudent, phone: "athlete@example.com")
+  let repository = GlobalAuthRepositorySpy(user: user, timezoneUpdateError: .network)
+  let timezoneStore = InMemoryTimezoneStore(
+    reportedIdentifiers: [user.id: "Europe/London"])
+  let timezone = LockedTimezoneIdentifier("Europe/London")
+  let session = Session(
+    auth: repository,
+    tokenStore: InMemoryTokenStore(),
+    timezoneStore: timezoneStore,
+    currentTimezoneIdentifier: { timezone.value() },
+    reportsTimezoneOnBootstrap: true
+  )
+  try await session.loginWithEmail(email: user.phone, password: "password123")
+
+  timezone.setValue("America/New_York")
+  await session.applicationDidBecomeActive()
+  await session.applicationDidBecomeActive()
+
+  #expect(
+    await repository.timezoneUpdates()
+      == ["America/New_York:access", "America/New_York:access"]
+  )
+  #expect(await timezoneStore.lastReportedIdentifier(for: user.id) == "Europe/London")
+}
+
+private final class LockedTimezoneIdentifier: @unchecked Sendable {
+  private let lock = NSLock()
+  private var identifier: String
+
+  init(_ identifier: String) {
+    self.identifier = identifier
+  }
+
+  func value() -> String {
+    lock.withLock { identifier }
+  }
+
+  func setValue(_ identifier: String) {
+    lock.withLock { self.identifier = identifier }
+  }
+}
+
 enum InteractiveLoginChannel: CaseIterable, Sendable {
   case apple
   case google

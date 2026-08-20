@@ -882,7 +882,7 @@ public final class TodayWorkoutViewModel {
   // the last-weight lookback window from it in a separate file, off-actor.
   nonisolated static func dayRange(
     containing date: Date,
-    calendar: Calendar = .current
+    calendar: Calendar = WorkoutDatePolicy.deviceCalendar
   ) -> ClosedRange<Date> {
     WorkoutDatePolicy.dayRange(containing: date, calendar: calendar)
   }

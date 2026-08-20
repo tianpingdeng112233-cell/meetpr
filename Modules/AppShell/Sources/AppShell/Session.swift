@@ -30,9 +30,15 @@ public final class Session {
   @ObservationIgnored private let onLogout: (@Sendable () async -> Void)?
   @ObservationIgnored private var errorTask: Task<Void, Never>?
   @ObservationIgnored private var refreshTask: Task<TokenPair, Error>?
+  @ObservationIgnored var timezoneReportsInFlight: Set<TimezoneReport> = []
   /// Every login/bootstrap/logout gets a new generation. Completion handlers
   /// must match it before they are allowed to write credentials or UI state.
   @ObservationIgnored private var sessionGeneration: UInt = 0
+
+  struct TimezoneReport: Hashable {
+    let userID: UUID
+    let identifier: String
+  }
 
   public init(
     auth: any AuthRepository,
@@ -231,6 +237,10 @@ public final class Session {
 
   func isCurrentSession(_ generation: UInt) -> Bool {
     generation == sessionGeneration
+  }
+
+  func currentSessionGeneration() -> UInt {
+    sessionGeneration
   }
 
   private static func shouldClearSession(afterRefreshError error: Error) -> Bool {

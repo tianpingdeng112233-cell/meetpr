@@ -1,29 +1,40 @@
 import Foundation
 
-/// Gym-day bucketing for log timestamps and same-Shanghai-gym-day completion undo.
+/// Gym-day bucketing for log timestamps and same-device-gym-day completion undo.
 /// Sequence editability is cursor-based and must never call this policy.
 enum WorkoutDatePolicy {
-  /// 04:00 gym-day cutoff applied before resolving a calendar day.
-  static let gymDayCutoff: TimeInterval = 4 * 3600
+  static let gymDayCutoffHour = 4
 
-  static var shanghaiCalendar: Calendar {
+  static var deviceCalendar: Calendar {
     var calendar = Calendar(identifier: .gregorian)
-    calendar.timeZone = TimeZone(identifier: "Asia/Shanghai") ?? calendar.timeZone
+    calendar.timeZone = .autoupdatingCurrent
     return calendar
   }
 
-  /// The timestamp shifted into its gym-day for calendar bucketing.
-  static func gymDayToday(now: Date = Date()) -> Date {
-    now.addingTimeInterval(-gymDayCutoff)
+  /// The start of the local calendar date owning this gym-day timestamp.
+  static func gymDayToday(
+    now: Date = Date(),
+    calendar: Calendar = deviceCalendar
+  ) -> Date {
+    let localDay = calendar.startOfDay(for: now)
+    guard calendar.component(.hour, from: now) < gymDayCutoffHour else {
+      return localDay
+    }
+    return calendar.date(byAdding: .day, value: -1, to: localDay) ?? localDay
   }
 
-  static func gymDayRange(containing timestamp: Date) -> ClosedRange<Date> {
-    let calendar = shanghaiCalendar
-    let gymDay = gymDayToday(now: timestamp)
-    let startOfGymDay = calendar.startOfDay(for: gymDay)
+  static func gymDayRange(
+    containing timestamp: Date,
+    calendar: Calendar = deviceCalendar
+  ) -> ClosedRange<Date> {
+    let gymDay = gymDayToday(now: timestamp, calendar: calendar)
     let start =
-      calendar.date(byAdding: .second, value: Int(gymDayCutoff), to: startOfGymDay)
-      ?? startOfGymDay
+      calendar.date(
+        bySettingHour: gymDayCutoffHour,
+        minute: 0,
+        second: 0,
+        of: gymDay
+      ) ?? gymDay
     let end = calendar.date(byAdding: .day, value: 1, to: start) ?? start
     return start...end.addingTimeInterval(-0.001)
   }
@@ -36,12 +47,12 @@ enum WorkoutDatePolicy {
   /// seconds.
   static func dayRange(
     containing date: Date,
-    calendar: Calendar = .current
+    calendar: Calendar = deviceCalendar
   ) -> ClosedRange<Date> {
     let calendarDayStart = calendar.startOfDay(for: date)
     let start =
       calendar.date(
-        bySettingHour: 4,
+        bySettingHour: gymDayCutoffHour,
         minute: 0,
         second: 0,
         of: calendarDayStart

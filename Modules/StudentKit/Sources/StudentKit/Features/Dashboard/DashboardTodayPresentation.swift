@@ -83,9 +83,10 @@ enum DashboardTodayPresentation {
 
   static func completedToday(
     in days: [StudentPlanDay],
-    now: Date
+    now: Date,
+    calendar: Calendar = WorkoutDatePolicy.deviceCalendar
   ) -> StudentPlanDay? {
-    let range = WorkoutDatePolicy.gymDayRange(containing: now)
+    let range = WorkoutDatePolicy.gymDayRange(containing: now, calendar: calendar)
     return StudentPlanSequence(days: days).orderedDays.last {
       guard let completedAt = $0.completedAt else { return false }
       return range.contains(completedAt)
