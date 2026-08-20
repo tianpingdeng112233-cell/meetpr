@@ -38,8 +38,8 @@ _(暂无候选;落线即在此追加)_
 - [ ] 注册页「学员 · 自己练」空壳待拍板:发版线上是否先藏起这一档(solo 波冻结在 main)。
       详见 RELEASES.md 1.0(14) §已知问题
 - [ ] gym-day 残留对齐:今日 tab 头条/周历高亮仍午夜翻篇(纯视觉),待全量对齐 spec
-- [ ] CI 减灾:本机磁盘定期清扫(2026-08-03 打红 tag CI、08-21 再满打崩 Codex 作业;T1 卡已立
-      `~/Projects/scratch/card-disk-janitor-2026-08-21.md`,launchd 清扫+15G 水位告警,待派工)
+- [x] CI 减灾:本机磁盘定期清扫 ✅2026-08-21 已上线(launchd `com.david.disk-janitor` 每小时,
+      清扫四类白名单+15G 水位通知;实装在 ~/ClaudeConfig 33036e0,卡见 scratch/card-disk-janitor-2026-08-21.md)
 
 ## 收尾约定
 archive 上传后:把「本版将包含」挪进 RELEASES.md 作 1.0(N) 一节,清空本文件、目标号 +1。
