@@ -96,6 +96,7 @@ extension PlanSetDTO {
       targetRepsMax: targetRepsMax,
       intensityMode: intensityMode,
       targetValue: targetValue,
+      loadMode: loadMode,
       setType: setType,
       restSeconds: restSeconds,
       coachNote: coachNote,

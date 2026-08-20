@@ -318,7 +318,9 @@ enum StudentPlanProjection {
       weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
       reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
-      rpe: planSet.intensityMode == .rpe ? planSet.targetValue : nil,
+      rpe:
+        planSet.intensityMode == .rpe && planSet.loadMode != "pct"
+        ? planSet.targetValue : nil,
       restSeconds: planSet.restSeconds,
       coachNote: planSet.coachNote
     )

@@ -252,6 +252,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
   public let targetRepsMax: Int?
   public let intensityMode: IntensityMode
   public let targetValue: Decimal
+  public let loadMode: String?
   public let setType: SetType
   public let restSeconds: Int?
   /// Student-visible coach cue (spec 043 §G); `nil` from pre-043 backends.
@@ -266,6 +267,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     targetRepsMax: Int? = nil,
     intensityMode: IntensityMode,
     targetValue: Decimal,
+    loadMode: String? = nil,
     setType: SetType,
     restSeconds: Int? = nil,
     coachNote: String? = nil,
@@ -278,6 +280,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     self.targetRepsMax = targetRepsMax
     self.intensityMode = intensityMode
     self.targetValue = targetValue
+    self.loadMode = loadMode
     self.setType = setType
     self.restSeconds = restSeconds
     self.coachNote = coachNote
@@ -293,6 +296,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     targetRepsMax = try container.decodeIfPresent(Int.self, forKey: .targetRepsMax)
     intensityMode = try container.decode(IntensityMode.self, forKey: .intensityMode)
     targetValue = try container.decodeDecimal(forKey: .targetValue)
+    loadMode = try container.decodeIfPresent(String.self, forKey: .loadMode)
     setType = try container.decode(SetType.self, forKey: .setType)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
     coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
@@ -308,6 +312,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     try container.encodeIfPresent(targetRepsMax, forKey: .targetRepsMax)
     try container.encode(intensityMode, forKey: .intensityMode)
     try container.encodeDecimalString(targetValue, forKey: .targetValue)
+    try container.encodeIfPresent(loadMode, forKey: .loadMode)
     try container.encode(setType, forKey: .setType)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
     try container.encodeIfPresent(coachNote, forKey: .coachNote)
@@ -322,6 +327,7 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     case targetRepsMax
     case intensityMode
     case targetValue
+    case loadMode
     case setType
     case restSeconds
     case coachNote
