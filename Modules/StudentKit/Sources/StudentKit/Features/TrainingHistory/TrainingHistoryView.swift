@@ -169,14 +169,12 @@ public struct TrainingHistoryView: View {
       .opacity(isZeroTraining ? 0.55 : 1)
       .accessibilityHint(StudentStrings.localized(.trainingHistoryView007))
 
-      if stats.trainingSessionCount >= 2 {
-        GrowthSectionLabel(StudentStrings.localized(.trainingHistoryView008))
-          .padding(.top, MeetPRSpacing.space2)
-        VolumeIntensityChart(
-          buckets: chartBuckets,
-          isUnlocked: stats.unlocksTrends
-        )
-      }
+      GrowthSectionLabel(StudentStrings.localized(.trainingHistoryView008))
+        .padding(.top, MeetPRSpacing.space2)
+      VolumeIntensityChart(
+        buckets: chartBuckets,
+        isUnlocked: stats.unlocksTrends
+      )
     }
   }
 

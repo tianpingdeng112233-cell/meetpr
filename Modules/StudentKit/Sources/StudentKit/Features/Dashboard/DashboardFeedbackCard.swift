@@ -82,6 +82,8 @@ struct DashboardFeedbackCard: View {
         } action: { height in
           presentedHeight = height
         }
+      } else if viewModel?.isLoadedEmpty == true {
+        DashboardNoFeedbackCard()
       }
     }
     .onAppear {

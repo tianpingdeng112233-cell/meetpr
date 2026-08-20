@@ -8,6 +8,7 @@ struct StudentNotificationHostModifier: ViewModifier {
   @Binding var conversationID: UUID?
   let onOpenPlan: () -> Void
   @State private var isOpeningConversation = false
+  @State private var openFailure: StudentConversationOpenFailure?
 
   func body(content: Content) -> some View {
     #if os(iOS)
@@ -20,6 +21,7 @@ struct StudentNotificationHostModifier: ViewModifier {
           showsNotifications = false
           openCoachConversation()
         }
+        .alert(item: $openFailure, content: failureAlert)
     #else
       content
         .sheet(isPresented: conversationPresented) {
@@ -30,6 +32,7 @@ struct StudentNotificationHostModifier: ViewModifier {
           showsNotifications = false
           openCoachConversation()
         }
+        .alert(item: $openFailure, content: failureAlert)
     #endif
   }
 
@@ -68,8 +71,55 @@ struct StudentNotificationHostModifier: ViewModifier {
     guard !isOpeningConversation else { return }
     isOpeningConversation = true
     Task { @MainActor in
-      conversationID = await coordinator.openCoachConversation()
+      switch await coordinator.openCoachConversation() {
+      case .opened(let openedConversationID):
+        conversationID = openedConversationID
+      case .noActiveCoach:
+        openFailure = .noActiveCoach
+      case .bindRequired:
+        openFailure = .bindRequired
+      case .failed:
+        openFailure = .network
+      }
       isOpeningConversation = false
+    }
+  }
+
+  private func failureAlert(_ failure: StudentConversationOpenFailure) -> Alert {
+    Alert(
+      title: Text(failure.title),
+      message: Text(failure.message),
+      dismissButton: .default(Text(StudentStrings.localized(.studentNotificationComponents007)))
+    )
+  }
+}
+
+enum StudentConversationOpenFailure: String, Identifiable, Sendable {
+  case noActiveCoach
+  case bindRequired
+  case network
+
+  var id: String { rawValue }
+
+  var title: String {
+    switch self {
+    case .noActiveCoach:
+      StudentStrings.localized(.studentNotificationComponents001)
+    case .bindRequired:
+      StudentStrings.localized(.studentNotificationComponents003)
+    case .network:
+      StudentStrings.localized(.studentNotificationComponents005)
+    }
+  }
+
+  var message: String {
+    switch self {
+    case .noActiveCoach:
+      StudentStrings.localized(.studentNotificationComponents002)
+    case .bindRequired:
+      StudentStrings.localized(.studentNotificationComponents004)
+    case .network:
+      StudentStrings.localized(.studentNotificationComponents006)
     }
   }
 }

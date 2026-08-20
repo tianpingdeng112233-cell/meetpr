@@ -208,8 +208,11 @@ import Testing
   #expect(coordinator.chatUnreadCount == 0)
   #expect(coordinator.coachConversation == nil)
 
-  let openedConversationID = await coordinator.openCoachConversation()
-  let openedID = try #require(openedConversationID)
+  let result = await coordinator.openCoachConversation()
+  guard case .opened(let openedID) = result else {
+    Issue.record("Expected conversation route")
+    return
+  }
   let conversations = try await chat.fetchConversations()
   #expect(conversations.count == 1)
   #expect(conversations.first?.id == openedID)
@@ -224,10 +227,12 @@ import Testing
     onBindingInvalidated: { await callback.record() }
   )
 
-  let conversationID = await coordinator.openCoachConversation()
+  let result = await coordinator.openCoachConversation()
 
-  #expect(conversationID == nil)
+  #expect(result == .failed)
   #expect(!(await callback.hasRecordedCall))
+  #expect(!StudentConversationOpenFailure.network.title.isEmpty)
+  #expect(!StudentConversationOpenFailure.network.message.isEmpty)
 }
 
 @MainActor
@@ -238,10 +243,28 @@ import Testing
     onBindingInvalidated: { await callback.record() }
   )
 
-  let conversationID = await coordinator.openCoachConversation()
+  let result = await coordinator.openCoachConversation()
 
-  #expect(conversationID == nil)
+  #expect(result == .bindRequired)
   #expect(await callback.invocationCount == 1)
+  #expect(!StudentConversationOpenFailure.bindRequired.title.isEmpty)
+  #expect(!StudentConversationOpenFailure.bindRequired.message.isEmpty)
+}
+
+@MainActor
+@Test func missingActiveCoachReturnsVisibleBindGuidance() async {
+  let coordinator = makeNotifications(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore())
+  )
+
+  let result = await coordinator.openCoachConversation()
+
+  #expect(result == .noActiveCoach)
+  #expect(
+    StudentConversationOpenFailure.noActiveCoach.title
+      == StudentStrings.localized(.studentNotificationComponents001)
+  )
+  #expect(!StudentConversationOpenFailure.noActiveCoach.message.isEmpty)
 }
 
 @Test func userDefaultsPlanSeenStorePersistsPerStudentAndSignature() throws {

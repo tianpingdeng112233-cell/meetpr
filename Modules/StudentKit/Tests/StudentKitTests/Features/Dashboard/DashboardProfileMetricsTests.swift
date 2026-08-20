@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import RepositoryContracts
 import Testing
 
 @testable import StudentKit
@@ -87,6 +88,34 @@ import Testing
   #expect(withoutWeight.isEmpty)
 }
 
+@MainActor
+@Test func loadedEmptyMetricsRemainAvailableForDashboardPlaceholders() async throws {
+  let viewModel = DashboardProfileMetricsViewModel(
+    onboarding: EmptyOnboardingProfileReader()
+  )
+
+  await viewModel.load(studentID: UUID())
+
+  #expect(
+    viewModel.state == .loaded(DashboardProfileMetrics(bodyWeightText: nil, competition: nil)))
+  #expect(try #require(viewModel.metrics).isEmpty)
+}
+
+@MainActor
+@Test func profileMetricsFailureDoesNotMasqueradeAsEmptyMetrics() async {
+  let viewModel = DashboardProfileMetricsViewModel(
+    onboarding: FailingOnboardingProfileReader()
+  )
+
+  await viewModel.load(studentID: UUID())
+
+  guard case .error = viewModel.state else {
+    Issue.record("Expected error state")
+    return
+  }
+  #expect(viewModel.metrics == nil)
+}
+
 private func calendar(timeZoneID: String) throws -> Calendar {
   var calendar = Calendar(identifier: .gregorian)
   calendar.timeZone = try #require(TimeZone(identifier: timeZoneID))
@@ -106,4 +135,20 @@ private func profile(
     createdAt: Date(),
     updatedAt: Date()
   )
+}
+
+private actor EmptyOnboardingProfileReader: OnboardingProfileReading {
+  func fetchProfile(studentId: UUID) async throws -> OnboardingProfile? {
+    nil
+  }
+}
+
+private actor FailingOnboardingProfileReader: OnboardingProfileReading {
+  func fetchProfile(studentId: UUID) async throws -> OnboardingProfile? {
+    throw ProfileMetricsTestError.failed
+  }
+}
+
+private enum ProfileMetricsTestError: Error {
+  case failed
 }

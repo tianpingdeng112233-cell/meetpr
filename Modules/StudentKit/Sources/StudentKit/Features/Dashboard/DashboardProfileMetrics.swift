@@ -105,7 +105,7 @@ final class DashboardProfileMetricsViewModel {
   }
 
   var metrics: DashboardProfileMetrics? {
-    guard case .loaded(let metrics) = state, !metrics.isEmpty else {
+    guard case .loaded(let metrics) = state else {
       return nil
     }
     return metrics

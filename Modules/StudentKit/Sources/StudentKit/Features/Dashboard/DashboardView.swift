@@ -36,6 +36,7 @@ public struct DashboardView: View {
   @State private var isUpdatingCompletion = false
   @State private var isFeedbackExpanded = false
   @State private var newPRCount = 0
+  @State private var hasAttemptedWeekLoad = false
 
   public init(
     studentID: UUID,
@@ -101,7 +102,16 @@ public struct DashboardView: View {
           onUndoCompletion: { dayID in
             Task { await undoCompletion(dayID: dayID) }
           },
-          onMessageCoach: { showsNotifications = true }
+          onMessageCoach: { showsNotifications = true },
+          onRetryWeek: {
+            Task { await reload() }
+          },
+          onRetryMetrics: {
+            Task { await profileMetricsViewModel.load(studentID: studentID) }
+          },
+          onRetryTrend: {
+            Task { await e1rmTrendViewModel.load(studentID: studentID) }
+          }
         )
       }
       .scrollIndicators(.hidden)
@@ -172,14 +182,17 @@ public struct DashboardView: View {
       logs: weekData?.logs ?? [],
       feedbackItems: feedbackViewModel.items,
       isFeedbackLoaded: feedbackViewModel.hasFinishedLoading,
-      trendRows: trendPresentation?.rows ?? [],
-      metrics: profileMetricsViewModel.metrics,
+      trendState: e1rmTrendViewModel.state,
+      metricsState: profileMetricsViewModel.state,
       coachName: notifications?.activeCoach?.coachDisplayName
         ?? StudentStrings.localized(.dashboardView003),
       newPRCount: newPRCount,
       showsNotifications: notifications != nil,
       notificationUnreadCount: notifications?.totalUnreadCount ?? 0,
-      isLoading: weekViewModel.state == .idle || weekViewModel.state == .loading,
+      weekContentState: DashboardWeekContentState.resolve(
+        weekViewModel.state,
+        hasAttemptedLoad: hasAttemptedWeekLoad
+      ),
       now: Date()
     )
   }
@@ -187,13 +200,6 @@ public struct DashboardView: View {
   private var weekData: DashboardWeekData? {
     if case .loaded(let days, let logs, let weekIndex) = weekViewModel.state {
       return DashboardWeekData(days: days, logs: logs, weekIndex: weekIndex)
-    }
-    return nil
-  }
-
-  private var trendPresentation: DashboardE1RMTrendPresentation? {
-    if case .loaded(let presentation) = e1rmTrendViewModel.state {
-      return presentation
     }
     return nil
   }
@@ -264,15 +270,16 @@ public struct DashboardView: View {
       pushedConversationID = nil
       return
     }
-    let openedID = await notifications.openCoachConversation()
+    let result = await notifications.openCoachConversation()
     guard pushedConversationID == requestedID else { return }
-    if openedID == requestedID {
+    if case .opened(let openedID) = result, openedID == requestedID {
       conversationID = openedID
     }
     pushedConversationID = nil
   }
 
   private func reload() async {
+    hasAttemptedWeekLoad = true
     async let weekLoad: Void = weekViewModel.load(
       studentID: studentID,
       serverAuthoritative: true
@@ -294,6 +301,7 @@ public struct DashboardView: View {
 
   private func loadWeekIfNeeded() async {
     guard weekViewModel.state == .idle else { return }
+    hasAttemptedWeekLoad = true
     await weekViewModel.load(studentID: studentID, serverAuthoritative: true)
   }
 

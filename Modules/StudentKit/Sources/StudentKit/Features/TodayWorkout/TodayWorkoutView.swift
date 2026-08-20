@@ -755,9 +755,9 @@ public struct TodayWorkoutView: View {
     isPreparingSetRefPicker = true
     setRefEntryErrorMessage = nil
     Task {
-      let openedConversationID = await notifications.openCoachConversation()
+      let result = await notifications.openCoachConversation()
       isPreparingSetRefPicker = false
-      guard let openedConversationID else {
+      guard case .opened(let openedConversationID) = result else {
         setRefEntryErrorMessage = StudentStrings.trainingShareConversationFailed
         return
       }

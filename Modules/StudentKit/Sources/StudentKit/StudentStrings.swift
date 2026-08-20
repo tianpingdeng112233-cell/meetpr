@@ -145,6 +145,7 @@ enum StudentStrings {
     static let dashboardFeedbackCard004 = Key("student.dashboardFeedbackCard.copy004")
     static let dashboardFeedbackCard005 = Key("student.dashboardFeedbackCard.copy005")
     static let dashboardFeedbackCard006 = Key("student.dashboardFeedbackCard.copy006")
+    static let dashboardFeedbackCard007 = Key("student.dashboardFeedbackCard.copy007")
     static let dashboardFeedbackEmptyCards001 = Key("student.dashboardFeedbackEmptyCards.copy001")
     static let dashboardFeedbackEmptyCards002 = Key("student.dashboardFeedbackEmptyCards.copy002")
     static let dashboardFeedbackEmptyCards003 = Key("student.dashboardFeedbackEmptyCards.copy003")
@@ -193,6 +194,9 @@ enum StudentStrings {
     static let dashboardProfileMetricsView006 = Key("student.dashboardProfileMetricsView.copy006")
     static let dashboardProfileMetricsView007 = Key("student.dashboardProfileMetricsView.copy007")
     static let dashboardProfileMetricsView008 = Key("student.dashboardProfileMetricsView.copy008")
+    static let dashboardProfileMetricsView009 = Key("student.dashboardProfileMetricsView.copy009")
+    static let dashboardProfileMetricsView010 = Key("student.dashboardProfileMetricsView.copy010")
+    static let dashboardProfileMetricsView011 = Key("student.dashboardProfileMetricsView.copy011")
     static let dashboardTodayPresentation001 = Key("student.dashboardTodayPresentation.copy001")
     static let dashboardTodayPresentation002 = Key("student.dashboardTodayPresentation.copy002")
     static let dashboardTodayPresentation003 = Key("student.dashboardTodayPresentation.copy003")
@@ -213,6 +217,12 @@ enum StudentStrings {
     static let dashboardTodayScreen001 = Key("student.dashboardTodayScreen.copy001")
     static let dashboardTodayScreen002 = Key("student.dashboardTodayScreen.copy002")
     static let dashboardTodayScreen003 = Key("student.dashboardTodayScreen.copy003")
+    static let dashboardTodayScreen004 = Key("student.dashboardTodayScreen.copy004")
+    static let dashboardTodayScreen005 = Key("student.dashboardTodayScreen.copy005")
+    static let dashboardTodayScreen006 = Key("student.dashboardTodayScreen.copy006")
+    static let dashboardTodayScreen007 = Key("student.dashboardTodayScreen.copy007")
+    static let dashboardTodayScreen008 = Key("student.dashboardTodayScreen.copy008")
+    static let dashboardTodayScreen009 = Key("student.dashboardTodayScreen.copy009")
     static let dashboardV3Previews001 = Key("student.dashboardV3Previews.copy001")
     static let dashboardV3Previews002 = Key("student.dashboardV3Previews.copy002")
     static let dashboardV3Previews003 = Key("student.dashboardV3Previews.copy003")
@@ -808,6 +818,20 @@ enum StudentStrings {
     static let studentBlackGoldChatView024 = Key("student.studentBlackGoldChatView.copy024")
     static let studentBlackGoldChatView025 = Key("student.studentBlackGoldChatView.copy025")
     static let studentBlackGoldChatView026 = Key("student.studentBlackGoldChatView.copy026")
+    static let studentNotificationComponents001 = Key(
+      "student.studentNotificationComponents.copy001")
+    static let studentNotificationComponents002 = Key(
+      "student.studentNotificationComponents.copy002")
+    static let studentNotificationComponents003 = Key(
+      "student.studentNotificationComponents.copy003")
+    static let studentNotificationComponents004 = Key(
+      "student.studentNotificationComponents.copy004")
+    static let studentNotificationComponents005 = Key(
+      "student.studentNotificationComponents.copy005")
+    static let studentNotificationComponents006 = Key(
+      "student.studentNotificationComponents.copy006")
+    static let studentNotificationComponents007 = Key(
+      "student.studentNotificationComponents.copy007")
     static let studentChatTimeline001 = Key("student.studentChatTimeline.copy001")
     static let studentChatTimeline002 = Key("student.studentChatTimeline.copy002")
     static let studentChatTimeline003 = Key("student.studentChatTimeline.copy003")

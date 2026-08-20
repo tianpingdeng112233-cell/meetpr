@@ -53,16 +53,20 @@
                 ? []
                 : StudentDemoSeed.makeFeedback(),
               isFeedbackLoaded: true,
-              trendRows: trendRows,
-              metrics: DashboardProfileMetrics(
-                bodyWeightText: "83 kg",
-                competition: CompetitionCountdown(days: 3, dateText: "2026-07-29")
+              trendState: .loaded(
+                DashboardE1RMTrendPresentation(rows: trendRows, headline: nil)
+              ),
+              metricsState: .loaded(
+                DashboardProfileMetrics(
+                  bodyWeightText: "83 kg",
+                  competition: CompetitionCountdown(days: 3, dateText: "2026-07-29")
+                )
               ),
               coachName: StudentStrings.localized(.dashboardV3Previews001),
               newPRCount: 0,
               showsNotifications: true,
               notificationUnreadCount: 3,
-              isLoading: false,
+              weekContentState: .loaded,
               now: previewNow
             ),
             feedbackViewModel: nil,
@@ -71,7 +75,10 @@
             onStartWorkout: {},
             isUpdatingCompletion: false,
             onUndoCompletion: { _ in },
-            onMessageCoach: {}
+            onMessageCoach: {},
+            onRetryWeek: {},
+            onRetryMetrics: {},
+            onRetryTrend: {}
           )
         }
         .scrollIndicators(.hidden)

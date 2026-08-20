@@ -1548,6 +1548,23 @@
         }
       }
     },
+    "student.dashboardFeedbackCard.copy007": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach feedback will appear here after you complete a workout."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成训练后，教练的点评会显示在这里。"
+          }
+        }
+      }
+    },
     "student.dashboardFeedbackEmptyCards.copy001": {
       "extractionState": "manual",
       "localizations": {
@@ -2194,6 +2211,57 @@
         }
       }
     },
+    "student.dashboardProfileMetricsView.copy009": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not entered"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未填写"
+          }
+        }
+      }
+    },
+    "student.dashboardProfileMetricsView.copy010": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add in Profile"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去我的资料填写"
+          }
+        }
+      }
+    },
+    "student.dashboardProfileMetricsView.copy011": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Body weight not entered. Add it in Profile"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "体重未填写，去我的资料填写"
+          }
+        }
+      }
+    },
     "student.dashboardTodayPresentation.copy001": {
       "extractionState": "manual",
       "localizations": {
@@ -2530,6 +2598,108 @@
           "stringUnit": {
             "state": "translated",
             "value": "本节 · E1RM 曲线"
+          }
+        }
+      }
+    },
+    "student.dashboardTodayScreen.copy004": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading was interrupted. Please retry."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加载已中断，请重试。"
+          }
+        }
+      }
+    },
+    "student.dashboardTodayScreen.copy005": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Planning"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编排中"
+          }
+        }
+      }
+    },
+    "student.dashboardTodayScreen.copy006": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rest day"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息日"
+          }
+        }
+      }
+    },
+    "student.dashboardTodayScreen.copy007": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading today's plan"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在加载今日计划"
+          }
+        }
+      }
+    },
+    "student.dashboardTodayScreen.copy008": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't load data"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "数据加载失败"
+          }
+        }
+      }
+    },
+    "student.dashboardTodayScreen.copy009": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
           }
         }
       }
@@ -12033,6 +12203,125 @@
           "stringUnit": {
             "state": "translated",
             "value": "重试"
+          }
+        }
+      }
+    },
+    "student.studentNotificationComponents.copy001": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No coach connected"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有绑定教练"
+          }
+        }
+      }
+    },
+    "student.studentNotificationComponents.copy002": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect with a coach before sending a message here."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "绑定教练后，就能从这里发消息。"
+          }
+        }
+      }
+    },
+    "student.studentNotificationComponents.copy003": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach connection expired"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练绑定已失效"
+          }
+        }
+      }
+    },
+    "student.studentNotificationComponents.copy004": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect with your coach again, then retry."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请重新绑定教练后再试。"
+          }
+        }
+      }
+    },
+    "student.studentNotificationComponents.copy005": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't open chat"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法打开聊天"
+          }
+        }
+      }
+    },
+    "student.studentNotificationComponents.copy006": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your connection and retry."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请检查网络后重试。"
+          }
+        }
+      }
+    },
+    "student.studentNotificationComponents.copy007": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "知道了"
           }
         }
       }
