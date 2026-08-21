@@ -15,7 +15,7 @@ enum FeedbackVideoPresentation {
       exerciseName: StudentExerciseName.display(video),
       weightKg: video.weightKg.flatMap(Double.init),
       reps: video.reps,
-      rpe: nil,
+      rpe: video.rpe.flatMap(Double.init),
       setOrdinal: video.setIndex.map(SetIndexDisplay.number(forZeroBasedIndex:)),
       coachName: nil
     )

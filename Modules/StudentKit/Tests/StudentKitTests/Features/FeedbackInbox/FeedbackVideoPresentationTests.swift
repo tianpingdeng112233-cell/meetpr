@@ -19,6 +19,20 @@ import Testing
   #expect(FeedbackVideoPresentation.summary(video) == "暂停深蹲 · 第1组 · 125kg×5次")
 }
 
+@Test func feedbackVideoBadgeCarriesBackendRPEWhenPresent() {
+  let video = CoachFeedbackVideo(
+    id: UUID(),
+    exerciseName: "传统硬拉",
+    setIndex: 3,
+    weightKg: "180.00",
+    reps: 4,
+    rpe: "8.5",
+    loggedAt: Date()
+  )
+
+  #expect(FeedbackVideoPresentation.badge(video).rpe == 8.5)
+}
+
 @Test func feedbackVideoBadgeConvertsSetIndexAtStudentDisplayBoundary() {
   let video = CoachFeedbackVideo(
     id: UUID(),
