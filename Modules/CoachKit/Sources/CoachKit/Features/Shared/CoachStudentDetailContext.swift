@@ -15,7 +15,7 @@ struct CoachStudentDetailContext {
   /// Video wall + readiness row + growth mapping (spec 029 second pass).
   let videos: any CoachStudentVideoRepository
   let readiness: any ReadinessRepository
-  let familyMapProvider: (any CoachPlanFamilyMapProviding)?
+  let exerciseStats: any CoachExerciseStatsProviding
   /// Planning entry (适应周 / 软推荐立即排) dependencies.
   let planning: any PlanRepository
   let draftStore: DraftStore
@@ -30,7 +30,7 @@ struct CoachStudentDetailContext {
     profiles: any OnboardingProfileReading,
     videos: any CoachStudentVideoRepository,
     readiness: any ReadinessRepository,
-    familyMapProvider: (any CoachPlanFamilyMapProviding)?,
+    exerciseStats: any CoachExerciseStatsProviding,
     planning: any PlanRepository,
     draftStore: DraftStore,
     chat: CoachChatContext? = nil
@@ -43,7 +43,7 @@ struct CoachStudentDetailContext {
     self.profiles = profiles
     self.videos = videos
     self.readiness = readiness
-    self.familyMapProvider = familyMapProvider
+    self.exerciseStats = exerciseStats
     self.planning = planning
     self.draftStore = draftStore
     self.chat = chat

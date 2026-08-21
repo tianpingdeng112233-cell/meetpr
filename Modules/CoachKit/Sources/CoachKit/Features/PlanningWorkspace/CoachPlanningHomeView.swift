@@ -274,7 +274,7 @@ private struct PlanningWorkspacePresenter<PresentedContent: View>: ViewModifier 
         profiles: InMemoryCoachStudentProfileReader(profiles: profiles()),
         videos: InMemoryCoachStudentVideoRepository(),
         readiness: EmptyReadinessRepository(),
-        familyMapProvider: nil,
+        exerciseStats: InMemoryCoachExerciseStatsRepository(),
         planning: planRepository,
         draftStore: makeStore(draft: draft)
       )
