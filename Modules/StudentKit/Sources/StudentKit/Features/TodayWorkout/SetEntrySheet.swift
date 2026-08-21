@@ -29,6 +29,8 @@ struct SetEntrySheet: View {
   @State private var activeNumberPad: MeetPRNumberPad.Field?
   @State private var focusedField: SetEntryNumberField?
   @State var collarOn: Bool
+  @State var isAutomaticWeight: Bool
+  @State private var showsRPEPlaceholder: Bool
 
   var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
   /// Barbell lifts floor at the empty bar (20kg); accessories go down to 0.
@@ -61,6 +63,12 @@ struct SetEntrySheet: View {
     let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
     let suggestionOutcome = viewModel.weightSuggestionOutcome(forSetID: seed.id)
     _suggestionOutcomeSnapshot = State(initialValue: suggestionOutcome)
+    _isAutomaticWeight = State(
+      initialValue: seed.actualWeight == nil
+        && seed.prescribed.weightKg == nil
+        && suggestionOutcome.percentageSource != nil
+    )
+    _showsRPEPlaceholder = State(initialValue: seed.prescribed.rpe == nil)
     let weight: Decimal?
     if seed.prescribed.isLegacyPrescription {
       // Pre-072 chain, unchanged for legacy rows: barbell lifts floor at the
@@ -101,6 +109,7 @@ struct SetEntrySheet: View {
                 annotation: "± 2.5",
                 value: weightText,
                 unit: "KG",
+                isAutomatic: isAutomaticWeight,
                 onDecrement: {
                   updateWeight(max(weightFloor, weightValue - Decimal(25) / 10))
                 },
@@ -303,11 +312,13 @@ struct SetEntrySheet: View {
 
   // MARK: - Number steppers
 
+  // swiftlint:disable:next function_body_length
   private func numberStepper(
     label: String,
     annotation: String,
     value: String,
     unit: String,
+    isAutomatic: Bool = false,
     onDecrement: @escaping @MainActor () -> Void,
     onIncrement: @escaping @MainActor () -> Void,
     onOpenPad: @escaping @MainActor () -> Void
@@ -329,9 +340,13 @@ struct SetEntrySheet: View {
 
         Button(action: onOpenPad) {
           HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
-            Text(value)
+            Text(value.isEmpty ? "—" : value)
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size34, weight: .bold))
-              .foregroundStyle(Color.MeetPR.textPrimary)
+              .foregroundStyle(
+                isAutomatic
+                  ? Color.MeetPR.textSecondary
+                  : Color.MeetPR.textPrimary
+              )
               .monospacedDigit()
               .contentTransition(.numericText())
             Text(unit)
@@ -342,6 +357,27 @@ struct SetEntrySheet: View {
           .frame(height: MeetPRFontMetrics.size54)
           .background(Color.MeetPR.surfaceCard)
           .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+          .overlay {
+            if isAutomatic {
+              RoundedRectangle(cornerRadius: MeetPRRadius.card)
+                .stroke(
+                  Color.MeetPR.goldRGB.opacity(0.45),
+                  style: StrokeStyle(lineWidth: 1.5, dash: [2, 3])
+                )
+            }
+          }
+          .overlay(alignment: .topTrailing) {
+            if isAutomatic {
+              Text(StudentStrings.localized(.todayWorkoutTypes027))
+                .font(.MeetPR.mono(size: MeetPRFontMetrics.size9))
+                .tracking(0.72)
+                .foregroundStyle(Color.MeetPR.goldText)
+                .padding(.horizontal, MeetPRSpacing.point5)
+                .background(Color.MeetPR.bgBase)
+                .offset(x: -MeetPRSpacing.point10, y: -MeetPRSpacing.point6)
+                .accessibilityIdentifier("setEntry.autoCalculatedBadge")
+            }
+          }
         }
         .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel("\(label) \(value) \(unit)")
@@ -385,14 +421,22 @@ struct SetEntrySheet: View {
           .foregroundStyle(Color.MeetPR.textMuted)
       }
 
-      SetEntryRPEScale(value: rpeBinding)
+      SetEntryRPEScale(
+        value: rpeBinding,
+        placeholder: showsRPEPlaceholder
+          ? StudentStrings.localized(.todayWorkoutTypes028)
+          : nil
+      )
     }
   }
 
   private var rpeBinding: Binding<Double> {
     Binding(
       get: { NSDecimalNumber(decimal: rpeValue).doubleValue },
-      set: { rpeText = SetEntryValue.rpeText($0) }
+      set: {
+        rpeText = SetEntryValue.rpeText($0)
+        showsRPEPlaceholder = false
+      }
     )
   }
 
@@ -475,6 +519,7 @@ struct SetEntrySheet: View {
 
   private func updateWeight(_ weight: Decimal) {
     weightText = SetEntryValue.text(weight)
+    isAutomaticWeight = false
   }
 }
 

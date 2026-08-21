@@ -13,6 +13,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct SetEntryRPEScale: View {
   @Binding var value: Double
+  let placeholder: String?
   @State private var bubbleWidth: CGFloat = 0
   /// What this gesture turned out to mean. Written and read only by
   /// `onChanged`/`onEnded` — one chain, in the order SwiftUI defines for a
@@ -29,6 +30,11 @@ struct SetEntryRPEScale: View {
   /// leaving it stranded until the next touch.
   @GestureState private var isTouchDown = false
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+  init(value: Binding<Double>, placeholder: String? = nil) {
+    self._value = value
+    self.placeholder = placeholder
+  }
 
   /// There is no previewed-vs-committed split: a scrub writes the binding live,
   /// so what the student sees *is* what is stored. Releasing changes nothing,
@@ -52,7 +58,7 @@ struct SetEntryRPEScale: View {
     .clipShape(.rect(cornerRadius: MeetPRRadius.card))
     .accessibilityElement(children: .ignore)
     .accessibilityLabel("RPE")
-    .accessibilityValue(SetEntryRPE.text(value))
+    .accessibilityValue(placeholder ?? SetEntryRPE.text(value))
     .accessibilityHint(StudentStrings.localized(.setEntryRpescale001))
     .accessibilityAdjustableAction { direction in
       switch direction {
@@ -68,9 +74,13 @@ struct SetEntryRPEScale: View {
 
   private var header: some View {
     HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.space2) {
-      Text(SetEntryRPE.text(activeValue))
+      Text(placeholder == nil ? SetEntryRPE.text(activeValue) : "—")
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size32, weight: .bold))
-        .foregroundStyle(Color.MeetPR.textPrimary)
+        .foregroundStyle(
+          placeholder == nil
+            ? Color.MeetPR.textPrimary
+            : Color.MeetPR.textGhost
+        )
         .monospacedDigit()
         .contentTransition(.numericText())
 
@@ -79,7 +89,7 @@ struct SetEntryRPEScale: View {
       // The mockup always shows `SE_RIR[seIdx]` for the active value — even
       // mid-scrub there is no "release to confirm" copy. It only steps aside
       // while the bubble is up, which carries the same copy over the finger.
-      Text(SetEntryRPE.description(activeValue))
+      Text(placeholder ?? SetEntryRPE.description(activeValue))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
         .lineLimit(1)

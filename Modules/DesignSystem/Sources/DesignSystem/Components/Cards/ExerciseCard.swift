@@ -1,6 +1,33 @@
 import SwiftUI
 
 public struct ExerciseSetRecord: Equatable, Sendable {
+  public enum PrescriptionEmphasis: Equatable, Sendable {
+    case primary
+    case muted
+  }
+
+  public struct PrescriptionDisplay: Equatable, Sendable {
+    public let weightPrimary: String
+    public let weightUnit: String?
+    public let weightSecondary: String?
+    public let rpeText: String
+    public let emphasis: PrescriptionEmphasis
+
+    public init(
+      weightPrimary: String,
+      weightUnit: String? = nil,
+      weightSecondary: String? = nil,
+      rpeText: String,
+      emphasis: PrescriptionEmphasis
+    ) {
+      self.weightPrimary = weightPrimary
+      self.weightUnit = weightUnit
+      self.weightSecondary = weightSecondary
+      self.rpeText = rpeText
+      self.emphasis = emphasis
+    }
+  }
+
   public let index: Int
   public let weight: Double?
   public let reps: Int
@@ -8,6 +35,7 @@ public struct ExerciseSetRecord: Equatable, Sendable {
   public let status: SetRow.Status
   public let videoState: SetRow.VideoState
   public let indexAccessibilityIdentifier: String?
+  public let prescriptionDisplay: PrescriptionDisplay?
 
   public init(
     index: Int,
@@ -16,7 +44,8 @@ public struct ExerciseSetRecord: Equatable, Sendable {
     rpe: Double,
     status: SetRow.Status,
     videoState: SetRow.VideoState,
-    indexAccessibilityIdentifier: String? = nil
+    indexAccessibilityIdentifier: String? = nil,
+    prescriptionDisplay: PrescriptionDisplay? = nil
   ) {
     self.index = index
     self.weight = weight
@@ -25,6 +54,7 @@ public struct ExerciseSetRecord: Equatable, Sendable {
     self.status = status
     self.videoState = videoState
     self.indexAccessibilityIdentifier = indexAccessibilityIdentifier
+    self.prescriptionDisplay = prescriptionDisplay
   }
 }
 
@@ -140,6 +170,7 @@ public struct ExerciseCard: View {
             status: set.status,
             videoState: set.videoState,
             indexAccessibilityIdentifier: set.indexAccessibilityIdentifier,
+            prescriptionDisplay: set.prescriptionDisplay,
             onEdit: { onEditSet(set) },
             onVideoAction: { onVideoAction(set) }
           )

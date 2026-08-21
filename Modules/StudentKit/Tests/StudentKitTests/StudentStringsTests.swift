@@ -54,9 +54,26 @@ struct StudentStringsTests {
         .todayWorkoutTypes011,
         values: ["200"],
         locale: chinese
-      ) == "按登记 1RM 200 kg 换算"
+      ) == "按登记 1RM 200 kg 换算 · 改动后按你填的为准"
     )
-    #expect(StudentStrings.localized(.todayWorkoutTypes010, locale: chinese) == "先完成顶组")
+    #expect(
+      StudentStrings.replacing(
+        .todayWorkoutTypes012,
+        values: ["196"],
+        locale: chinese
+      ) == "按当前 e1RM 196 kg 换算 · 改动后按你填的为准"
+    )
+    #expect(
+      StudentStrings.replacing(
+        .todayWorkoutTypes013,
+        values: ["150"],
+        locale: chinese
+      ) == "按当日顶组 150 kg 换算 · 改动后按你填的为准"
+    )
+    #expect(
+      StudentStrings.localized(.todayWorkoutTypes010, locale: chinese)
+        == "先完成顶组，退让组会自动算好"
+    )
   }
 
   @Test("Critical English copy is available")
@@ -89,7 +106,7 @@ struct StudentStringsTests {
         .todayWorkoutTypes013,
         values: ["200"],
         locale: english
-      ) == "Calculated from today's top set 200 kg"
+      ) == "Calculated from today's top set 200 kg · Your entry overrides this"
     )
     #expect(
       StudentStrings.localized(.todayWorkoutTypes008, locale: english)

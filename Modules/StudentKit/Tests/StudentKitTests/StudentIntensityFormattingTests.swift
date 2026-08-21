@@ -93,10 +93,19 @@ func legacyPrescriptionFormattingIsUnchanged(set: PrescribedSet, expected: Strin
 
   #expect(row.heroPrimaryText == "≈ 120")
   #expect(row.heroShowsWeightUnit)
-  #expect(row.heroSecondaryIntensityText == "60% × 1RM")
+  #expect(row.heroSecondaryIntensityText == "60% · 1RM")
+  #expect(row.heroSecondaryLabelText == nil)
+  #expect(row.record.prescriptionDisplay?.weightPrimary == "≈ 120")
+  #expect(row.record.prescriptionDisplay?.weightUnit == "kg")
+  #expect(row.record.prescriptionDisplay?.weightSecondary == "60% · 1RM")
+  #expect(row.record.prescriptionDisplay?.rpeText == "—")
+  #expect(
+    presentation.exercises.first?.cardSubtitle
+      == "% 处方 · 按你登记的 1RM 200 kg 换算"
+  )
   #expect(
     presentation.exercises.first?.prescriptionSummary
-      == "≈ 120 kg · 60% × 1RM × 5 · 1 组"
+      == "≈ 120 kg · 60% · 1RM × 5 · 1 组"
   )
 }
 
@@ -115,9 +124,12 @@ func legacyPrescriptionFormattingIsUnchanged(set: PrescribedSet, expected: Strin
   )
   let row = try #require(presentation.currentRow)
 
-  #expect(row.heroPrimaryText == "85% × 当日顶组 · 先完成顶组")
+  #expect(row.heroPrimaryText == "85% × 顶组")
   #expect(!row.heroShowsWeightUnit)
-  #expect(row.heroSecondaryIntensityText == nil)
+  #expect(row.heroSecondaryIntensityText == "先完成顶组")
+  #expect(row.record.prescriptionDisplay?.weightPrimary == "85% × 顶组")
+  #expect(row.record.prescriptionDisplay?.weightSecondary == "先完成顶组")
+  #expect(row.record.prescriptionDisplay?.rpeText == "—")
 }
 
 @MainActor
@@ -137,6 +149,175 @@ func legacyPrescriptionFormattingIsUnchanged(set: PrescribedSet, expected: Strin
 
   #expect(row.heroPrimaryText == "60%")
   #expect(!row.heroShowsWeightUnit)
+  #expect(row.record.prescriptionDisplay?.weightPrimary == "60%")
+  #expect(row.record.prescriptionDisplay?.weightSecondary == nil)
+}
+
+@MainActor
+@Test func accessoryPercentageSubtitleExplainsThatNoConversionOccurs() throws {
+  let prescribed = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(60),
+    percentageAnchor: .registeredOneRM, loadMode: .percentage, reps: 12)
+  let day = intensityDay(
+    prescribed: [prescribed],
+    family: nil,
+    exerciseType: .accessory
+  )
+  let outcome = SetWeightSuggestionOutcome(
+    suggestion: nil,
+    unavailableReason: .unsupportedPercentageExercise
+  )
+  let presentation = TodayWorkoutPresentation(
+    day: day,
+    drafts: TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []),
+    references: [:],
+    suggestionOutcomes: [prescribed.id: outcome],
+    started: true
+  )
+
+  #expect(presentation.exercises.first?.cardSubtitle == "辅助项 · 教练以 % 设定，不换算")
+  #expect(presentation.currentRow?.record.prescriptionDisplay?.weightPrimary == "60%")
+}
+
+@MainActor
+@Test func e1RMAndFallbackSubtitlesNameTheAnchorActuallyUsed() throws {
+  let prescribed = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(60),
+    percentageAnchor: .e1RM, loadMode: .percentage, reps: 5)
+  let e1RMOutcome = SetWeightSuggestionOutcome(
+    suggestion: SetWeightSuggestion(
+      weightKg: 117.5,
+      basis: .percentage(.e1RM(anchorKg: 196))
+    ),
+    unavailableReason: nil
+  )
+  let fallbackOutcome = SetWeightSuggestionOutcome(
+    suggestion: SetWeightSuggestion(
+      weightKg: 120,
+      basis: .percentage(.fallbackToRegisteredOneRM(anchorKg: 200))
+    ),
+    unavailableReason: nil
+  )
+
+  let e1RM = intensityPresentation(
+    prescribed: [prescribed],
+    suggestionOutcomes: [prescribed.id: e1RMOutcome]
+  )
+  let fallback = intensityPresentation(
+    prescribed: [prescribed],
+    suggestionOutcomes: [prescribed.id: fallbackOutcome]
+  )
+
+  #expect(e1RM.currentRow?.record.prescriptionDisplay?.weightSecondary == "60% · e1RM")
+  #expect(
+    e1RM.exercises.first?.cardSubtitle
+      == "% 处方 · 按当前 e1RM 196 kg 换算"
+  )
+  #expect(fallback.currentRow?.record.prescriptionDisplay?.weightSecondary == "60% · 1RM")
+  #expect(
+    fallback.exercises.first?.cardSubtitle
+      == "% 处方 · 按你登记的 1RM 200 kg 换算"
+  )
+}
+
+@MainActor
+@Test func topSetRowAndBackoffRefreshFromWaitingToResolvedInPlace() throws {
+  let topSet = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .rpe(8), loadMode: .rpe, reps: 1)
+  let backoff = PrescribedSet(
+    id: UUID(), setIndex: 1, intensity: .percentage(85),
+    percentageAnchor: .topSet, loadMode: .percentage, reps: 5)
+  let day = intensityDay(prescribed: [topSet, backoff])
+  var drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
+  let waitingOutcome = SetWeightSuggestionOutcome(
+    suggestion: nil,
+    unavailableReason: .topSetNotCompleted
+  )
+  let waiting = TodayWorkoutPresentation(
+    day: day,
+    drafts: drafts,
+    references: [:],
+    suggestionOutcomes: [backoff.id: waitingOutcome],
+    started: true
+  )
+
+  #expect(waiting.exercises.first?.cardSubtitle == "顶组 @8 · 退让组按当日顶组换算")
+  #expect(waiting.exercises.first?.rows[0].record.prescriptionDisplay?.weightPrimary == "当日顶组")
+  #expect(waiting.exercises.first?.rows[0].record.prescriptionDisplay?.weightSecondary == "自选 · @8")
+  #expect(waiting.exercises.first?.rows[1].record.prescriptionDisplay?.weightPrimary == "85% × 顶组")
+
+  drafts[0].actualWeight = 150
+  drafts[0].actualReps = 1
+  drafts[0].completed = true
+  let resolvedOutcome = SetWeightSuggestionOutcome(
+    suggestion: SetWeightSuggestion(
+      weightKg: 127.5,
+      basis: .percentage(.topSet(anchorKg: 150))
+    ),
+    unavailableReason: nil
+  )
+  let resolved = TodayWorkoutPresentation(
+    day: day,
+    drafts: drafts,
+    references: [:],
+    suggestionOutcomes: [backoff.id: resolvedOutcome],
+    started: true
+  )
+
+  #expect(resolved.exercises.first?.rows[1].id == waiting.exercises.first?.rows[1].id)
+  #expect(resolved.exercises.first?.rows[1].record.prescriptionDisplay?.weightPrimary == "≈ 127.5")
+  #expect(
+    resolved.exercises.first?.rows[1].record.prescriptionDisplay?.weightSecondary == "85% · 顶组")
+}
+
+// The web editor keys load_mode per row, so a real plan carries the top set
+// and its back-offs as two rows of the same exercise. The marking and the
+// subtitle must cross that row boundary the same way PctAnchorResolver does.
+@MainActor
+@Test func topSetMarkingAndSubtitleResolveAcrossRowsOfTheSameExercise() throws {
+  let exercise = Exercise(
+    id: UUID(),
+    name: "传统硬拉",
+    exerciseType: .mainLift,
+    mainLiftFamily: .deadlift,
+    isCompetitionLift: true,
+    muscleGroups: [.back],
+    equipment: [.barbell],
+    createdAt: Date()
+  )
+  let topSet = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .rpe(8), loadMode: .rpe, reps: 1)
+  let backoff = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(85),
+    percentageAnchor: .topSet, loadMode: .percentage, reps: 5)
+  let day = StudentPlanDay(
+    id: UUID(),
+    date: Date(),
+    exercises: [
+      StudentPlanExercise(
+        id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: [topSet]),
+      StudentPlanExercise(
+        id: UUID(), exercise: exercise, sequenceIndex: 1, prescribedSets: [backoff]),
+    ]
+  )
+  let drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
+  let presentation = TodayWorkoutPresentation(
+    day: day,
+    drafts: drafts,
+    references: [:],
+    suggestionOutcomes: [
+      backoff.id: SetWeightSuggestionOutcome(
+        suggestion: nil, unavailableReason: .topSetNotCompleted)
+    ],
+    started: true
+  )
+
+  let topSetCard = try #require(presentation.exercises.first)
+  let backoffCard = try #require(presentation.exercises.last)
+  #expect(topSetCard.rows[0].record.prescriptionDisplay?.weightPrimary == "当日顶组")
+  #expect(topSetCard.rows[0].record.prescriptionDisplay?.weightSecondary == "自选 · @8")
+  #expect(backoffCard.cardSubtitle == "顶组 @8 · 退让组按当日顶组换算")
+  #expect(backoffCard.rows[0].record.prescriptionDisplay?.weightPrimary == "85% × 顶组")
 }
 
 @MainActor
@@ -203,12 +384,17 @@ private func intensityPresentation(
   )
 }
 
-private func intensityDay(prescribed: [PrescribedSet]) -> StudentPlanDay {
+private func intensityDay(
+  prescribed: [PrescribedSet],
+  family: LiftFamily? = .squat,
+  exerciseType: ExerciseType = .mainLift
+) -> StudentPlanDay {
   let exercise = Exercise(
     id: UUID(),
     name: "深蹲",
-    exerciseType: .mainLift,
-    isCompetitionLift: true,
+    exerciseType: exerciseType,
+    mainLiftFamily: family,
+    isCompetitionLift: family != nil,
     muscleGroups: [.quad],
     equipment: [.barbell],
     createdAt: Date()

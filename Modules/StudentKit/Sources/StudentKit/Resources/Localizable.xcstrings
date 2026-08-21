@@ -13216,13 +13216,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Complete the top set first"
+            "value": "Complete the top set first; back-off sets will be calculated automatically"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "先完成顶组"
+            "value": "先完成顶组，退让组会自动算好"
           }
         }
       }
@@ -13233,13 +13233,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Calculated from registered 1RM {0} kg"
+            "value": "Calculated from registered 1RM {0} kg · Your entry overrides this"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按登记 1RM {0} kg 换算"
+            "value": "按登记 1RM {0} kg 换算 · 改动后按你填的为准"
           }
         }
       }
@@ -13250,13 +13250,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Calculated from e1RM {0} kg"
+            "value": "Calculated from current e1RM {0} kg · Your entry overrides this"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按 e1RM {0} kg 换算"
+            "value": "按当前 e1RM {0} kg 换算 · 改动后按你填的为准"
           }
         }
       }
@@ -13267,13 +13267,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Calculated from today's top set {0} kg"
+            "value": "Calculated from today's top set {0} kg · Your entry overrides this"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按当日顶组 {0} kg 换算"
+            "value": "按当日顶组 {0} kg 换算 · 改动后按你填的为准"
           }
         }
       }
@@ -13284,13 +13284,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0}% × 1RM"
+            "value": "{0}% · 1RM"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0}% × 1RM"
+            "value": "{0}% · 1RM"
           }
         }
       }
@@ -13301,13 +13301,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0}% × e1RM"
+            "value": "{0}% · e1RM"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0}% × e1RM"
+            "value": "{0}% · e1RM"
           }
         }
       }
@@ -13318,13 +13318,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0}% × today's top set"
+            "value": "{0}% · top set"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0}% × 当日顶组"
+            "value": "{0}% · 顶组"
           }
         }
       }
@@ -13376,6 +13376,176 @@
           "stringUnit": {
             "state": "translated",
             "value": "≈ {0}"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy020": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "% prescription · Calculated from your registered 1RM of {0} kg"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "% 处方 · 按你登记的 1RM {0} kg 换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy021": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "% prescription · Calculated from current e1RM of {0} kg"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "% 处方 · 按当前 e1RM {0} kg 换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy022": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Top set @{0} · Back-off sets use today's top set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顶组 @{0} · 退让组按当日顶组换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy023": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessory · Coach prescribed a percentage; no conversion"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辅助项 · 教练以 % 设定，不换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy024": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's top set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当日顶组"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy025": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Self-selected · @{0}"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自选 · @{0}"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy026": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete the top set first"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先完成顶组"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy027": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-calculated"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy028": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No prescribed RPE target; choose how it actually felt"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "处方没有 RPE 目标，按实际感受选"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy029": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "top set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顶组"
           }
         }
       }

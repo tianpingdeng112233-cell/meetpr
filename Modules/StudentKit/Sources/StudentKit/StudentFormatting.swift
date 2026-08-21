@@ -1,6 +1,13 @@
 import CoreModels
 import Foundation
 
+struct PercentagePrescriptionPresentation: Equatable, Sendable {
+  let weightPrimary: String
+  let weightUnit: String?
+  let weightSecondary: String?
+  let isMuted: Bool
+}
+
 enum StudentFormatting {
   static func dayMonth(
     _ date: Date,
@@ -128,9 +135,24 @@ enum StudentFormatting {
     }
   }
 
-  static func percentageAnchorText(_ set: PrescribedSet) -> String? {
+  static func percentageAnchorText(
+    _ set: PrescribedSet,
+    source: PctAnchorResolutionSource? = nil
+  ) -> String? {
     guard case .percentage(let value) = set.intensity else { return nil }
     let percentage = decimal(value)
+    if let source {
+      switch source {
+      case .registeredOneRM, .fallbackToRegisteredOneRM:
+        return StudentStrings.replacing(.todayWorkoutTypes014, values: [percentage])
+      case .e1RM:
+        return StudentStrings.replacing(.todayWorkoutTypes015, values: [percentage])
+      case .topSet:
+        return StudentStrings.replacing(.todayWorkoutTypes016, values: [percentage])
+      case .unresolved:
+        break
+      }
+    }
     switch set.effectivePercentageAnchor {
     case .registeredOneRM:
       return StudentStrings.replacing(.todayWorkoutTypes014, values: [percentage])
@@ -141,6 +163,54 @@ enum StudentFormatting {
     }
   }
 
+  static func percentagePresentation(
+    set: PrescribedSet,
+    actualWeight: Decimal?,
+    outcome: SetWeightSuggestionOutcome
+  ) -> PercentagePrescriptionPresentation? {
+    guard case .percentage(let value) = set.intensity else { return nil }
+    let raw = "\(decimal(value))%"
+
+    if let actualWeight {
+      return PercentagePrescriptionPresentation(
+        weightPrimary: weightDecimal(actualWeight),
+        weightUnit: "kg",
+        weightSecondary: percentageAnchorText(set, source: outcome.percentageSource),
+        isMuted: false
+      )
+    }
+
+    if let suggestion = outcome.suggestion,
+      case .percentage(let source) = suggestion.basis
+    {
+      return PercentagePrescriptionPresentation(
+        weightPrimary: StudentStrings.replacing(
+          .todayWorkoutTypes019,
+          values: [weightDecimal(suggestion.weightKg)]
+        ),
+        weightUnit: "kg",
+        weightSecondary: percentageAnchorText(set, source: source),
+        isMuted: false
+      )
+    }
+
+    if outcome.unavailableReason == .topSetNotCompleted {
+      return PercentagePrescriptionPresentation(
+        weightPrimary: "\(raw) × \(StudentStrings.localized(.todayWorkoutTypes029))",
+        weightUnit: nil,
+        weightSecondary: StudentStrings.localized(.todayWorkoutTypes026),
+        isMuted: true
+      )
+    }
+
+    return PercentagePrescriptionPresentation(
+      weightPrimary: raw,
+      weightUnit: nil,
+      weightSecondary: nil,
+      isMuted: true
+    )
+  }
+
   static func percentagePrescription(
     _ value: Decimal,
     set: PrescribedSet,
@@ -148,8 +218,8 @@ enum StudentFormatting {
   ) -> String {
     let raw = "\(decimal(value))%"
     if let suggestion = outcome.suggestion,
-      case .percentage = suggestion.basis,
-      let anchorText = percentageAnchorText(set)
+      case .percentage(let source) = suggestion.basis,
+      let anchorText = percentageAnchorText(set, source: source)
     {
       return StudentStrings.replacing(
         .todayWorkoutTypes017,

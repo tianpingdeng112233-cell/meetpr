@@ -482,7 +482,8 @@ extension StudentDemoSeed {
   /// past onboarding — the wizard itself demos on a fresh staging account).
   public static func makeOnboardingProfile(
     studentID: UUID,
-    isCompeting: Bool = true
+    isCompeting: Bool = true,
+    squat1RMKg: Decimal = 180
   ) -> OnboardingProfile {
     OnboardingProfile(
       userId: studentID,
@@ -495,7 +496,7 @@ extension StudentDemoSeed {
       squatStance: .lowBar,
       deadliftStyle: .conventional,
       benchGrip: .standard,
-      squat1RMKg: 180,
+      squat1RMKg: squat1RMKg,
       bench1RMKg: 120,
       deadlift1RMKg: 220,
       trainingDays: [.mon, .wed, .fri, .sat],

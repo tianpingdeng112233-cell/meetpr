@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import CoreModels
 import DesignSystem
 import Foundation
@@ -51,6 +52,7 @@ struct TodayWorkoutProgress: Equatable, Sendable {
   }
 }
 
+// swiftlint:disable:next type_body_length
 struct TodayWorkoutPresentation: Equatable, Sendable {
   enum HeroMode: Equatable, Sendable {
     case list
@@ -62,6 +64,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     let stableIndex: Int
     let name: String
     let reference: String
+    let cardSubtitle: String
     let note: String
     let rows: [Row]
 
@@ -114,6 +117,9 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       if let weight = record.weight {
         return Self.numberText(weight)
       }
+      if let prescriptionDisplay = record.prescriptionDisplay {
+        return prescriptionDisplay.weightPrimary
+      }
       if let suggestion = suggestionOutcome?.suggestion,
         case .percentage = suggestion.basis
       {
@@ -125,25 +131,45 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       if case .percentage(let value) = draft.prescribed.intensity,
         let suggestionOutcome
       {
-        return StudentFormatting.percentagePrescription(
-          value,
+        return StudentFormatting.percentagePresentation(
           set: draft.prescribed,
+          actualWeight: draft.actualWeight,
           outcome: suggestionOutcome
-        )
+        )?.weightPrimary ?? StudentFormatting.decimal(value) + "%"
       }
       return draft.prescribed.intensity.map(StudentFormatting.intensityText) ?? "—"
     }
 
     var heroShowsWeightUnit: Bool {
-      record.weight != nil || suggestionOutcome?.percentageSource != nil
+      record.weight != nil || record.prescriptionDisplay?.weightUnit != nil
     }
 
     var heroSecondaryIntensityText: String? {
-      guard !usesLegacyHero, heroShowsWeightUnit else { return nil }
-      if suggestionOutcome?.percentageSource != nil {
-        return StudentFormatting.percentageAnchorText(draft.prescribed)
+      guard !usesLegacyHero else { return nil }
+      if let prescriptionDisplay = record.prescriptionDisplay {
+        return prescriptionDisplay.weightSecondary
       }
+      if case .percentage = draft.prescribed.intensity,
+        let suggestionOutcome,
+        let percentage = StudentFormatting.percentagePresentation(
+          set: draft.prescribed,
+          actualWeight: draft.actualWeight,
+          outcome: suggestionOutcome
+        )
+      {
+        return percentage.weightSecondary
+      }
+      guard heroShowsWeightUnit else { return nil }
       return draft.prescribed.intensity.map(StudentFormatting.intensityText)
+    }
+
+    var heroSecondaryLabelText: String? {
+      guard !usesLegacyHero else { return nil }
+      if record.prescriptionDisplay != nil { return nil }
+      if case .percentage = draft.prescribed.intensity { return nil }
+      return heroSecondaryIntensityText == nil
+        ? nil
+        : StudentStrings.localized(.todayWorkoutScreen027)
     }
 
     private static func numberText(_ value: Double) -> String {
@@ -189,25 +215,53 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       started || hasSessionLog || day.completedAt != nil ? .recording : .list
     self.progress = TodayWorkoutProgress(day: day, drafts: drafts)
 
+    // Top-set anchors resolve across rows (spec 034 §9.4): the back-off card
+    // needs its anchor row, and that row — usually a separate card — needs the
+    // "today's top set" marking. Resolve once per card, then index by draft.
+    let topSetTargets = Dictionary(
+      uniqueKeysWithValues: day.exercises.compactMap { exercise in
+        let exerciseDrafts = drafts.filter { $0.planExerciseID == exercise.id }
+        return Self.topSetTarget(for: exerciseDrafts, in: drafts).map { (exercise.id, $0) }
+      }
+    )
+    let topSetRPEByDraftID = Dictionary(
+      topSetTargets.values.map { ($0.id, $0.rpe) },
+      uniquingKeysWith: { first, _ in first }
+    )
     self.exercises = day.exercises.enumerated().map { exerciseIndex, exercise in
-      let rows = drafts.filter { $0.planExerciseID == exercise.id }.map { draft in
+      let exerciseDrafts = drafts.filter { $0.planExerciseID == exercise.id }
+      let topSetTarget = topSetTargets[exercise.id]
+      let rows = exerciseDrafts.map { draft in
+        let suggestionOutcome = suggestionOutcomes[draft.id]
+        let markedTopSet = topSetRPEByDraftID[draft.id].map { (id: draft.id, rpe: $0) }
         return Row(
           id: draft.id,
           stableIndex: drafts.firstIndex { $0.id == draft.id } ?? 0,
           record: Self.record(
             from: draft,
             index: SetDisplayNumber.number(for: draft),
-            videoState: draft.loggedSetID.flatMap { videoStates[$0] } ?? .none
+            videoState: draft.loggedSetID.flatMap { videoStates[$0] } ?? .none,
+            prescriptionDisplay: Self.prescriptionDisplay(
+              for: draft,
+              suggestionOutcome: suggestionOutcome,
+              topSetTarget: markedTopSet
+            )
           ),
           draft: draft,
-          suggestionOutcome: suggestionOutcomes[draft.id]
+          suggestionOutcome: suggestionOutcome
         )
       }
+      let reference = Self.referenceText(references[exercise.exercise.id])
       return Exercise(
         id: exercise.id,
         stableIndex: exerciseIndex,
         name: StudentExerciseName.display(exercise.exercise),
-        reference: Self.referenceText(references[exercise.exercise.id]),
+        reference: reference,
+        cardSubtitle: Self.cardSubtitle(
+          for: exerciseDrafts,
+          outcomes: suggestionOutcomes,
+          topSetTarget: topSetTarget
+        ) ?? reference,
         note: CoachNoteDisplay.text(exercise.notes) ?? "",
         rows: rows
       )
@@ -220,7 +274,8 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
   static func record(
     from draft: TodayWorkoutViewModel.SetRowDraft,
     index: Int,
-    videoState: SetRow.VideoState
+    videoState: SetRow.VideoState,
+    prescriptionDisplay: ExerciseSetRecord.PrescriptionDisplay? = nil
   ) -> ExerciseSetRecord {
     ExerciseSetRecord(
       index: index,
@@ -229,8 +284,112 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       rpe: decimalDouble(draft.actualRPE ?? draft.prescribed.rpe ?? 0),
       status: draft.failed ? .failed : (draft.completed ? .done : .pending),
       videoState: videoState,
-      indexAccessibilityIdentifier: "todayWorkout.set.\(draft.id.uuidString).number"
+      indexAccessibilityIdentifier: "todayWorkout.set.\(draft.id.uuidString).number",
+      prescriptionDisplay: prescriptionDisplay
     )
+  }
+
+  private static func topSetTarget(
+    for exerciseDrafts: [TodayWorkoutViewModel.SetRowDraft],
+    in allDrafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> (id: UUID, rpe: Decimal)? {
+    guard
+      let firstBackoffIndex = exerciseDrafts.firstIndex(where: {
+        if case .percentage = $0.prescribed.intensity {
+          return $0.prescribed.effectivePercentageAnchor == .topSet
+        }
+        return false
+      })
+    else { return nil }
+    let backoff = exerciseDrafts[firstBackoffIndex]
+
+    // The web editor keys load_mode per row, so the top set the coach meant is
+    // the nearest preceding row of the same exercise (mirrors PctAnchorResolver).
+    // Earlier sets inside the same card remain a fallback for hand-built plans.
+    let precedingRows = allDrafts.filter {
+      $0.exerciseID == backoff.exerciseID
+        && $0.planExerciseSortOrder < backoff.planExerciseSortOrder
+    }
+    let sameCardEarlierSets = Array(exerciseDrafts[..<firstBackoffIndex])
+    return (sameCardEarlierSets + precedingRows).reversed().compactMap { draft in
+      draft.prescribed.rpe.map { (draft.id, $0) }
+    }.first
+  }
+
+  private static func prescriptionDisplay(
+    for draft: TodayWorkoutViewModel.SetRowDraft,
+    suggestionOutcome: SetWeightSuggestionOutcome?,
+    topSetTarget: (id: UUID, rpe: Decimal)?
+  ) -> ExerciseSetRecord.PrescriptionDisplay? {
+    let rpeText =
+      (draft.completed || draft.failed ? draft.actualRPE : draft.prescribed.rpe)
+      .map(StudentFormatting.decimal) ?? "—"
+
+    if let topSetTarget, topSetTarget.id == draft.id {
+      return ExerciseSetRecord.PrescriptionDisplay(
+        weightPrimary: StudentStrings.localized(.todayWorkoutTypes024),
+        weightSecondary: StudentStrings.replacing(
+          .todayWorkoutTypes025,
+          values: [StudentFormatting.decimal(topSetTarget.rpe)]
+        ),
+        rpeText: StudentFormatting.decimal(topSetTarget.rpe),
+        emphasis: .primary
+      )
+    }
+
+    guard case .percentage = draft.prescribed.intensity else { return nil }
+    let percentage = StudentFormatting.percentagePresentation(
+      set: draft.prescribed,
+      actualWeight: draft.actualWeight,
+      outcome: suggestionOutcome ?? .unavailableWithoutReason
+    )
+    guard let percentage else { return nil }
+    return ExerciseSetRecord.PrescriptionDisplay(
+      weightPrimary: percentage.weightPrimary,
+      weightUnit: percentage.weightUnit,
+      weightSecondary: percentage.weightSecondary,
+      rpeText: rpeText,
+      emphasis: percentage.isMuted ? .muted : .primary
+    )
+  }
+
+  private static func cardSubtitle(
+    for drafts: [TodayWorkoutViewModel.SetRowDraft],
+    outcomes: [UUID: SetWeightSuggestionOutcome],
+    topSetTarget: (id: UUID, rpe: Decimal)?
+  ) -> String? {
+    guard
+      drafts.contains(where: {
+        if case .percentage = $0.prescribed.intensity { return true }
+        return false
+      })
+    else { return nil }
+
+    if let topSetTarget,
+      drafts.contains(where: { $0.prescribed.effectivePercentageAnchor == .topSet })
+    {
+      return StudentStrings.replacing(
+        .todayWorkoutTypes022,
+        values: [StudentFormatting.decimal(topSetTarget.rpe)]
+      )
+    }
+
+    if drafts.allSatisfy({ $0.liftFamily == nil }) {
+      return StudentStrings.localized(.todayWorkoutTypes023)
+    }
+
+    guard let source = drafts.compactMap({ outcomes[$0.id]?.percentageSource }).first,
+      let anchorKg = source.anchorKg
+    else { return nil }
+    let anchor = StudentFormatting.decimal(anchorKg)
+    switch source {
+    case .registeredOneRM, .fallbackToRegisteredOneRM:
+      return StudentStrings.replacing(.todayWorkoutTypes020, values: [anchor])
+    case .e1RM:
+      return StudentStrings.replacing(.todayWorkoutTypes021, values: [anchor])
+    case .topSet, .unresolved:
+      return nil
+    }
   }
 
   private static func referenceText(_ reference: ExerciseReference?) -> String {
