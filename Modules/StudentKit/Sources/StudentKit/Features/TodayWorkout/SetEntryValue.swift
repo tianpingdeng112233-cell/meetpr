@@ -19,6 +19,25 @@ enum SetEntryValue {
     snapRPE(decimal(text))
   }
 
+  /// Badge-facing variants: an untouched field is `nil` (block hidden) rather
+  /// than the parser's clamped placeholder — recording a set before rating it
+  /// must not stamp "RPE 5" or "0 kg" onto the replay.
+  static func enteredWeight(from text: String) -> Decimal? {
+    isBlank(text) ? nil : weight(from: text)
+  }
+
+  static func enteredReps(from text: String) -> Int? {
+    isBlank(text) ? nil : reps(from: text)
+  }
+
+  static func enteredRPE(from text: String) -> Decimal? {
+    isBlank(text) ? nil : rpe(from: text)
+  }
+
+  private static func isBlank(_ text: String) -> Bool {
+    text.trimmingCharacters(in: .whitespaces).isEmpty
+  }
+
   /// Clamp to 5…10 and snap to the nearest 0.5 — RPE is half-point-grained, so
   /// the value the scale shows and the value we save stay on a tick even when a
   /// prescribed/legacy value (e.g. 8.2) isn't already aligned.

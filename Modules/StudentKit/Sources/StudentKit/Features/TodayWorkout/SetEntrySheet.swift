@@ -220,9 +220,11 @@ struct SetEntrySheet: View {
   private var videoBadge: VideoBadgeInfo {
     VideoBadgeInfo(
       exerciseName: draft.displayExerciseName,
-      weightKg: NSDecimalNumber(decimal: weightValue).doubleValue,
-      reps: repsValue,
-      rpe: NSDecimalNumber(decimal: rpeValue).doubleValue,
+      weightKg: SetEntryValue.enteredWeight(from: weightText)
+        .map { NSDecimalNumber(decimal: $0).doubleValue },
+      reps: SetEntryValue.enteredReps(from: repsText),
+      rpe: SetEntryValue.enteredRPE(from: rpeText)
+        .map { NSDecimalNumber(decimal: $0).doubleValue },
       setOrdinal: setNumber,
       coachName: coachName
     )
