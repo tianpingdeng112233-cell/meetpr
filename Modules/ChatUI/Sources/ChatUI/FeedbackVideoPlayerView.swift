@@ -239,6 +239,11 @@ public struct FeedbackVideoPlayerView: View {
       VideoPlayer(player: player)
         .ignoresSafeArea()
 
+      if badge != nil {
+        VideoBadgeScrim()
+          .ignoresSafeArea()
+      }
+
       FeedbackVideoPlayerChrome(
         rateText: Self.rateText(rate),
         isExporting: isExporting,

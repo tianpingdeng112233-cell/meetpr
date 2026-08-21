@@ -157,6 +157,7 @@ struct VideoBadgeExporter {
     let renderer = ImageRenderer(
       content: ZStack(alignment: .bottom) {
         Color.clear
+        VideoBadgeScrim()
         VideoBadgeCard(
           presentation: VideoBadgePresentation(info: badge),
           width: cardWidth,
