@@ -151,6 +151,47 @@ struct TrainingReminderRecoveryTests {
     #expect(!snapshot.pendingIdentifiers.contains { $0.hasPrefix("training-reminder-") })
   }
 
+  @Test("Recommended training days seed the defaults until the student saves")
+  @MainActor
+  func recommendedWeekdaysSeedDefaults() async throws {
+    let center = FakeTrainingReminderNotificationCenter()
+    let harness = try makeServices(center: center)
+    let studentID = UUID()
+    let recommended: Set<TrainingReminderWeekday> = [.tuesday, .thursday, .saturday, .sunday]
+
+    let viewModel = TrainingReminderSettingsViewModel(
+      studentID: studentID,
+      services: harness.services,
+      recommendedWeekdays: recommended
+    )
+    await viewModel.synchronize()
+
+    #expect(!viewModel.settings.isEnabled)
+    #expect(viewModel.settings.weekdays == recommended)
+    #expect(harness.store.storedSettings(for: studentID) == nil)
+  }
+
+  @Test("Stored preferences win over the recommended training days")
+  @MainActor
+  func storedPreferencesBeatRecommendation() throws {
+    let harness = try makeServices(center: FakeTrainingReminderNotificationCenter())
+    let studentID = UUID()
+    var stored = TrainingReminderSettings.defaultValue
+    stored.weekdays = [.monday]
+    harness.store.setSettings(stored, for: studentID)
+
+    let viewModel = TrainingReminderSettingsViewModel(
+      studentID: studentID,
+      services: harness.services,
+      recommendedWeekdays: [.friday]
+    )
+
+    #expect(viewModel.settings.weekdays == [.monday])
+    #expect(TrainingReminderSettings.initial(recommendedWeekdays: []) == .defaultValue)
+    #expect(TrainingReminderWeekday(.sun) == .sunday)
+    #expect(TrainingReminderWeekday(.mon) == .monday)
+  }
+
   @Test("Preferences are stored per student and never bleed across accounts")
   func perStudentPreferences() throws {
     let harness = try makeServices(center: FakeTrainingReminderNotificationCenter())

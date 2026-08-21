@@ -179,7 +179,8 @@ public struct MyProfileView: View {
         MyProfileDivider()
         TrainingReminderPreferenceRow(
           studentID: studentID,
-          services: trainingReminderServices
+          services: trainingReminderServices,
+          recommendedWeekdays: Set(profile.trainingDays.map(TrainingReminderWeekday.init))
         )
         MyProfileDivider()
         profileRow(

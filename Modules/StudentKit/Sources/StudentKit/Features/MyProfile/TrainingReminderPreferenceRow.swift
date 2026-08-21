@@ -4,11 +4,16 @@ import SwiftUI
 struct TrainingReminderPreferenceRow: View {
   @State private var viewModel: TrainingReminderSettingsViewModel
 
-  init(studentID: UUID, services: TrainingReminderServices) {
+  init(
+    studentID: UUID,
+    services: TrainingReminderServices,
+    recommendedWeekdays: Set<TrainingReminderWeekday>? = nil
+  ) {
     self._viewModel = State(
       initialValue: TrainingReminderSettingsViewModel(
         studentID: studentID,
-        services: services
+        services: services,
+        recommendedWeekdays: recommendedWeekdays
       )
     )
   }

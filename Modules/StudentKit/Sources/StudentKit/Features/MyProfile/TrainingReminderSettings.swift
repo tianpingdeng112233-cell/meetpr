@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 
 enum TrainingReminderWeekday: Int, CaseIterable, Codable, Hashable, Identifiable, Sendable {
@@ -10,6 +11,20 @@ enum TrainingReminderWeekday: Int, CaseIterable, Codable, Hashable, Identifiable
   case sunday = 1
 
   var id: Self { self }
+
+  /// Maps the onboarding profile's training day (mon…sun) to the Calendar
+  /// weekday this reminder schedules on.
+  init(_ day: TrainingDay) {
+    switch day {
+    case .mon: self = .monday
+    case .tue: self = .tuesday
+    case .wed: self = .wednesday
+    case .thu: self = .thursday
+    case .fri: self = .friday
+    case .sat: self = .saturday
+    case .sun: self = .sunday
+    }
+  }
 
   func shortName(locale: Locale = .current) -> String {
     let key: StudentStrings.Key
@@ -49,6 +64,15 @@ struct TrainingReminderSettings: Codable, Equatable, Sendable {
   var isValid: Bool {
     (0...23).contains(hour) && (0...59).contains(minute)
   }
+
+  /// Initial (unpersisted) value: the coach-arranged training days from the
+  /// onboarding profile win over the hard-coded Mon/Wed/Fri fallback.
+  static func initial(recommendedWeekdays: Set<TrainingReminderWeekday>?) -> Self {
+    guard let recommendedWeekdays, !recommendedWeekdays.isEmpty else { return .defaultValue }
+    var settings = defaultValue
+    settings.weekdays = recommendedWeekdays
+    return settings
+  }
 }
 
 enum TrainingReminderCopy {
@@ -85,8 +109,15 @@ enum TrainingReminderCopy {
 }
 
 protocol TrainingReminderSettingsStoring: Sendable {
-  func settings(for studentID: UUID) -> TrainingReminderSettings
+  /// nil when the student has never touched the reminder settings.
+  func storedSettings(for studentID: UUID) -> TrainingReminderSettings?
   func setSettings(_ settings: TrainingReminderSettings, for studentID: UUID)
+}
+
+extension TrainingReminderSettingsStoring {
+  func settings(for studentID: UUID) -> TrainingReminderSettings {
+    storedSettings(for: studentID) ?? .defaultValue
+  }
 }
 
 struct TrainingReminderUserDefaultsStore: TrainingReminderSettingsStoring {
@@ -96,12 +127,12 @@ struct TrainingReminderUserDefaultsStore: TrainingReminderSettingsStoring {
     self.defaults = defaults
   }
 
-  func settings(for studentID: UUID) -> TrainingReminderSettings {
+  func storedSettings(for studentID: UUID) -> TrainingReminderSettings? {
     guard let data = defaults.data(forKey: key(for: studentID)),
       let settings = try? JSONDecoder().decode(TrainingReminderSettings.self, from: data),
       settings.isValid
     else {
-      return .defaultValue
+      return nil
     }
     return settings
   }

@@ -12,10 +12,16 @@ final class TrainingReminderSettingsViewModel {
   @ObservationIgnored private let studentID: UUID
   @ObservationIgnored private let services: TrainingReminderServices
 
-  init(studentID: UUID, services: TrainingReminderServices) {
+  init(
+    studentID: UUID,
+    services: TrainingReminderServices,
+    recommendedWeekdays: Set<TrainingReminderWeekday>? = nil
+  ) {
     self.studentID = studentID
     self.services = services
-    self.settings = services.store.settings(for: studentID)
+    self.settings =
+      services.store.storedSettings(for: studentID)
+      ?? .initial(recommendedWeekdays: recommendedWeekdays)
   }
 
   func synchronize() async {
@@ -23,7 +29,8 @@ final class TrainingReminderSettingsViewModel {
       studentID: studentID,
       services: services
     )
-    settings = services.store.settings(for: studentID)
+    // Keep the unpersisted recommended defaults when nothing is stored yet.
+    settings = services.store.storedSettings(for: studentID) ?? settings
     switch outcome {
     case .disabledByPermission(let denied):
       showsPermissionDenied = denied

@@ -29,7 +29,10 @@
      (`UIApplication.openNotificationSettingsURLString`)。
 - 开关首次打开时才请求通知权限 `requestAuthorization([.alert, .sound, .badge])`
   (不在启动时弹);拒绝则开关回落为关并显示上述提示。
-- 默认值:关;首次进入预选 周一/三/五 + 20:00(仅作初始值,未开启不排程)。
+- 默认值:关;首次进入的预选星期 = 学员档案(onboarding)里教练安排的训练日
+  (`OnboardingProfile.trainingDays`,如「周一·三·五·六」),档案缺失时回落 周一/三/五;
+  时间 20:00。仅作初始值,未开启不排程、不持久化;学员一旦保存过则以保存值为准。
+  (2026-08-21 真机走查 David 改口径:硬编码一三五 → 档案训练日。)
 
 ## 排程逻辑(硬约束)
 
