@@ -17,12 +17,18 @@ enum CoachTodayStrings {
     "coach.today.noTrainingDaysThisWeek"
   )
   static let viewAllStudents = CoachLocalization.localized("coach.today.viewAllStudents")
+  static let weekdays = [
+    CoachLocalization.localized("coach.today.weekday.mon"),
+    CoachLocalization.localized("coach.today.weekday.tue"),
+    CoachLocalization.localized("coach.today.weekday.wed"),
+    CoachLocalization.localized("coach.today.weekday.thu"),
+    CoachLocalization.localized("coach.today.weekday.fri"),
+    CoachLocalization.localized("coach.today.weekday.sat"),
+    CoachLocalization.localized("coach.today.weekday.sun"),
+  ]
 
   static func pendingVideosTitle(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.today.pendingVideosTitle",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.today.pendingVideosTitle \(count)")
   }
 
   static func earliestVideoSubtitle(_ relativeTime: String) -> String {
@@ -30,17 +36,11 @@ enum CoachTodayStrings {
   }
 
   static func unreadMessagesTitle(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.today.unreadMessagesTitle",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.today.unreadMessagesTitle \(count)")
   }
 
   static func notTrainedTitle(studentName: String, daysMissed: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.today.notTrainedTitle",
-      values: ["name": studentName, "days": daysMissed.formatted()]
-    )
+    CoachLocalization.localized("coach.today.notTrainedTitle \(studentName) \(daysMissed)")
   }
 
   static func singleApplicationTitle(_ name: String) -> String {
@@ -48,10 +48,7 @@ enum CoachTodayStrings {
   }
 
   static func multipleApplicationsTitle(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.today.multipleApplicationsTitle",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.today.multipleApplicationsTitle \(count)")
   }
 
   static func earliestApplicationSubtitle(_ waitingText: String) -> String {
@@ -66,14 +63,11 @@ enum CoachTodayStrings {
   }
 
   static func trainingDaysCompleted(completed: Int, planned: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.today.trainingDaysCompleted",
-      values: ["completed": completed.formatted(), "planned": planned.formatted()]
-    )
+    CoachLocalization.localized("coach.today.trainingDaysCompleted \(completed) \(planned)")
   }
 
   static func peopleCount(_ count: Int) -> String {
-    CoachLocalization.replacing("coach.today.peopleCount", values: ["count": count.formatted()])
+    CoachLocalization.localized("coach.today.peopleCount \(count)")
   }
 
 }

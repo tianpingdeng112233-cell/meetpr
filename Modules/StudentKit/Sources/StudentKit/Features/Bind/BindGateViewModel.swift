@@ -18,13 +18,13 @@ public enum BindNotice: Equatable, Sendable {
   public var message: String {
     switch self {
     case .coachNotAccepting:
-      "教练当前不接收新学员,请输入新邀请码或稍后再试"
+      StudentStrings.localized(.bindGateViewModel001)
     case .requestExpired:
-      "上次请求 7 天未响应已自动过期,可重新发送或换教练"
+      StudentStrings.localized(.bindGateViewModel002)
     case .invalidCode:
-      "邀请码无效或已失效,请输入新邀请码"
+      StudentStrings.localized(.bindGateViewModel003)
     case .network:
-      "网络异常,绑定请求暂未发出,可下拉重试"
+      StudentStrings.localized(.bindGateViewModel004)
     }
   }
 }

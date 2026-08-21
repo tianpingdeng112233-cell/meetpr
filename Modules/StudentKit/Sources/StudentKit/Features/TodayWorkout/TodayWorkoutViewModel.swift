@@ -54,6 +54,8 @@ public final class TodayWorkoutViewModel {
   private let e1rmRepo: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  private let restTimerActivityController: any RestTimerActivityControlling
+  private let calendar: Calendar
   private let now: @Sendable () -> Date
   private var currentStudentID: UUID?
   private var loadGeneration = 0
@@ -69,6 +71,8 @@ public final class TodayWorkoutViewModel {
     onboarding: (any OnboardingProfileReading)? = nil,
     restTimerSettings: any StudentRestTimerSettingsStoring =
       UserDefaultsRestTimerSettingsStore(),
+    restTimerActivityController: any RestTimerActivityControlling =
+      NoOpRestTimerActivityController(),
     calendar: Calendar = .current,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
@@ -77,7 +81,8 @@ public final class TodayWorkoutViewModel {
     self.e1rmRepo = e1rm
     self.onboarding = onboarding
     self.restTimerSettings = restTimerSettings
-    _ = calendar
+    self.restTimerActivityController = restTimerActivityController
+    self.calendar = calendar
     self.now = now
   }
 
@@ -126,13 +131,11 @@ public final class TodayWorkoutViewModel {
       PlanCalendarDayIdentity.matches(
         planDate: $0.scheduledDate,
         selectedDate: date,
-        selectedCalendar: calendarForCompatibility
+        selectedCalendar: calendar
       )
     }?.id
     await load(dayID: dayID, studentID: studentID, preloadedPlan: plan)
   }
-
-  private var calendarForCompatibility: Calendar { .current }
 
   func reconcileCoachRPE(
     using reconciler: E1RMCoachRPEReconciler,
@@ -501,7 +504,7 @@ public final class TodayWorkoutViewModel {
     } catch let error as PlanDayCompletionError {
       actionErrorMessage = error.localizedMessage
     } catch {
-      actionErrorMessage = "暂时无法完成训练，请稍后重试。"
+      actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel001)
     }
     return false
   }
@@ -524,7 +527,7 @@ public final class TodayWorkoutViewModel {
     } catch let error as PlanDayCompletionError {
       actionErrorMessage = error.localizedMessage
     } catch {
-      actionErrorMessage = "暂时无法撤销，请稍后重试。"
+      actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel002)
     }
     return false
   }
@@ -611,7 +614,7 @@ public final class TodayWorkoutViewModel {
     rowIndex: Int, completed: Bool, failed: Bool, generation: Int
   ) async -> Bool {
     guard let studentID = currentStudentID else {
-      actionErrorMessage = "无法确认当前学员，请重新进入训练页后重试。"
+      actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel003)
       return false
     }
     guard case .loaded(let plan, let drafts) = state, drafts.indices.contains(rowIndex) else {
@@ -717,12 +720,18 @@ public final class TodayWorkoutViewModel {
     guard let timer = restTimer else { return }
     let remaining = timer.endsAt.timeIntervalSince(now()) + TimeInterval(delta)
     let clamped = min(max(remaining, 0), 900)
-    restTimer = RestTimerState(
+    let adjustedTimer = RestTimerState(
       endsAt: now().addingTimeInterval(clamped), totalSeconds: timer.totalSeconds)
+    restTimer = adjustedTimer
+    restTimerActivityController.update(
+      endsAt: adjustedTimer.endsAt,
+      totalSeconds: adjustedTimer.totalSeconds
+    )
   }
 
   public func skipRestTimer() {
     restTimer = nil
+    restTimerActivityController.end()
   }
 
   public func acknowledgeRestTimerExplanation() {
@@ -734,6 +743,7 @@ public final class TodayWorkoutViewModel {
   private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
     guard !drafts.allSatisfy(\.completed) else {
       restTimer = nil
+      restTimerActivityController.end()
       return
     }
     let seconds =
@@ -742,8 +752,17 @@ public final class TodayWorkoutViewModel {
         restTimerSettings.preference(for: $0).customSeconds(forRPE: draft.actualRPE)
       }
       ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
-    restTimer = RestTimerState(
+    let hadActiveTimer = restTimer != nil
+    let nextTimer = RestTimerState(
       endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
+    restTimer = nextTimer
+    if hadActiveTimer {
+      restTimerActivityController.end()
+    }
+    restTimerActivityController.start(
+      endsAt: nextTimer.endsAt,
+      totalSeconds: nextTimer.totalSeconds
+    )
     if let currentStudentID,
       !restTimerSettings.hasAcknowledgedExplanation(for: currentStudentID)
     {
@@ -813,10 +832,16 @@ public final class TodayWorkoutViewModel {
     )
   }
 
-  private static func planRange(for days: [StudentPlanDay]) -> ClosedRange<Date> {
+  private static func planRange(
+    for days: [StudentPlanDay],
+    now: Date
+  ) -> ClosedRange<Date> {
     guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.scheduledDate).max()
     else { return Date.distantPast...Date.distantFuture }
-    return first.addingTimeInterval(-86_400)...last.addingTimeInterval(86_400)
+    // Sequence progression means real training can run past the plan's
+    // scheduled calendar: clamp the upper bound to today, or sets logged
+    // after the scheduled end vanish from the day view (P0 2026-08-20).
+    return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)
   }
 
   private func planLogs(
@@ -831,7 +856,7 @@ public final class TodayWorkoutViewModel {
     }
     let fetched = try await logs.fetchLogs(
       studentID: studentID,
-      in: Self.planRange(for: plan.days)
+      in: Self.planRange(for: plan.days, now: now())
     )
     planLogsSnapshot = PlanLogsSnapshot(
       cycleID: plan.cycleID,

@@ -19,10 +19,18 @@ final class StudentGrowthViewModel {
     case failed(String)
   }
 
-  enum TimeWindow: String, CaseIterable, Sendable {
-    case fourWeeks = "近 4 周"
-    case threeMonths = "近 3 月"
-    case all = "全部"
+  enum TimeWindow: CaseIterable, Sendable {
+    case fourWeeks
+    case threeMonths
+    case all
+
+    var title: String {
+      switch self {
+      case .fourWeeks: CoachStudentDetailStrings.text("coach.growth.window.fourWeeks")
+      case .threeMonths: CoachStudentDetailStrings.text("coach.growth.window.threeMonths")
+      case .all: CoachStudentDetailStrings.text("coach.growth.window.all")
+      }
+    }
   }
 
   struct GrowthPoint: Hashable, Identifiable, Sendable {
@@ -114,7 +122,7 @@ final class StudentGrowthViewModel {
       state = .loaded
       refreshVisiblePoints()
     } catch {
-      state = .failed("成长曲线加载失败，请稍后重试")
+      state = .failed(CoachStudentDetailStrings.text("coach.growth.error.load"))
     }
   }
 

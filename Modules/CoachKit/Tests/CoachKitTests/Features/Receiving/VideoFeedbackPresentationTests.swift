@@ -39,7 +39,7 @@ struct VideoFeedbackPresentationTests {
     let catalog = try coachStringCatalog()
     let localizedDash =
       catalog.strings["coach.videoFeedback.missingValue"]?
-      .localizations["zh-Hans"]?.stringUnit.value
+      .localizations["zh-Hans"]?.stringUnit?.value
 
     #expect(localizedDash == "—")
     #expect(renderedText.contains(CoachVideoFeedbackStrings.missingValue))
@@ -173,7 +173,7 @@ private struct TestStringCatalog: Decodable {
   }
 
   struct Localization: Decodable {
-    let stringUnit: StringUnit
+    let stringUnit: StringUnit?
   }
 
   struct StringUnit: Decodable {

@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "Analytics",
+  defaultLocalization: "zh-Hans",
   platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
     .library(name: "Analytics", targets: ["Analytics"])
@@ -18,6 +19,7 @@ let package = Package(
         .product(name: "CoreModels", package: "CoreModels"),
         .product(name: "Networking", package: "Networking"),
       ],
+      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(

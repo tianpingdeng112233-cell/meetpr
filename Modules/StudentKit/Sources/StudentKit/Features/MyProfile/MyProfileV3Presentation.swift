@@ -53,9 +53,10 @@ struct MyProfileV3Presentation: Equatable, Sendable {
   ) -> [String] {
     if let readiness {
       return [
-        "睡眠 \(readiness.sleepQuality)/5",
-        "状态 \(readiness.mood)/5",
-        "压力 \(readiness.stress)/5",
+        StudentStrings.replacing(
+          .myProfileV3Presentation001, values: ["\(readiness.sleepQuality)"]),
+        StudentStrings.replacing(.myProfileV3Presentation002, values: ["\(readiness.mood)"]),
+        StudentStrings.replacing(.myProfileV3Presentation003, values: ["\(readiness.stress)"]),
       ]
     }
     return [
@@ -63,13 +64,15 @@ struct MyProfileV3Presentation: Equatable, Sendable {
         OnboardingLabels.scaleLabel(
           OnboardingLabels.dailyLifeIntensityLabels,
           notch: $0
-        ) + "强度"
+        ) + StudentStrings.localized(.myProfileV3Presentation004)
       },
       profile.lifeStress.map {
-        OnboardingLabels.scaleLabel(OnboardingLabels.lifeStressLabels, notch: $0) + "压力"
+        OnboardingLabels.scaleLabel(OnboardingLabels.lifeStressLabels, notch: $0)
+          + StudentStrings.localized(.myProfileV3Presentation005)
       },
       profile.recoverySpeed.map {
-        OnboardingLabels.scaleLabel(OnboardingLabels.recoverySpeedLabels, notch: $0) + "恢复"
+        OnboardingLabels.scaleLabel(OnboardingLabels.recoverySpeedLabels, notch: $0)
+          + StudentStrings.localized(.myProfileV3Presentation006)
       },
     ]
     .compactMap { $0 }
@@ -77,11 +80,13 @@ struct MyProfileV3Presentation: Equatable, Sendable {
 
   private static func injuryChips(_ profile: OnboardingProfile) -> [String] {
     guard !profile.injuryAreas.isEmpty else {
-      return ["无伤病记录"]
+      return [StudentStrings.localized(.myProfileV3Presentation007)]
     }
     return profile.injuryAreas.map { area in
       let label = OnboardingLabels.label(area)
-      return area == .other ? "其他伤病" : "\(label)部伤病"
+      return area == .other
+        ? StudentStrings.localized(.myProfileV3Presentation008)
+        : StudentStrings.replacing(.myProfileV3Presentation009, values: ["\(label)"])
     }
   }
 
@@ -97,6 +102,7 @@ struct MyProfileV3Presentation: Equatable, Sendable {
     if let weight = profile.weightKg {
       parts.append("\(UnitDisplay.plainString(weight)) kg")
     }
-    return parts.isEmpty ? "未填写" : parts.joined(separator: " · ")
+    return parts.isEmpty
+      ? StudentStrings.localized(.myProfileV3Presentation010) : parts.joined(separator: " · ")
   }
 }

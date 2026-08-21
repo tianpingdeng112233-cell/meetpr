@@ -26,12 +26,12 @@ struct InjuryFieldsSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       OnboardingTextEditor(
-        title: "伤病记录(可选)",
+        title: StudentStrings.localized(.step7ExtrasSection001),
         text: $draft.injuryNotes,
-        placeholder: "如:左肩撞击综合征,深蹲低杠位时疼"
+        placeholder: StudentStrings.localized(.step7ExtrasSection002)
       )
       OnboardingChipGrid(
-        title: "伤病部位(可选)",
+        title: StudentStrings.localized(.step7ExtrasSection003),
         options: InjuryArea.allCases.map { ($0, OnboardingLabels.label($0)) },
         selection: $draft.injuryAreas,
         maxSelection: 8
@@ -49,23 +49,26 @@ struct CompetitionFieldsSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       OnboardingChoiceCards(
-        title: "是否在备赛?",
-        options: [(false, "没有"), (true, "有比赛计划")],
+        title: StudentStrings.localized(.step7ExtrasSection004),
+        options: [
+          (false, StudentStrings.localized(.step7ExtrasSection005)),
+          (true, StudentStrings.localized(.step7ExtrasSection006)),
+        ],
         selection: $draft.isCompeting,
         isHighlighted: highlighted.contains("is_competing")
       )
       if draft.isCompeting == true {
         competitionDatePicker
         MeetPRTextField(
-          "目标体重级别(可选)",
+          StudentStrings.localized(.step7ExtrasSection007),
           text: $draft.targetWeightClass,
-          placeholder: "例:IPF 83kg / WP -82.5kg"
+          placeholder: StudentStrings.localized(.step7ExtrasSection008)
         )
       }
       OnboardingTextEditor(
-        title: "想对教练说什么?(可选)",
+        title: StudentStrings.localized(.step7ExtrasSection009),
         text: $draft.noteToCoach,
-        placeholder: "目标、习惯、顾虑都可以写"
+        placeholder: StudentStrings.localized(.step7ExtrasSection010)
       )
     }
   }
@@ -73,9 +76,10 @@ struct CompetitionFieldsSection: View {
   private var competitionDatePicker: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       OnboardingFieldLabel(
-        title: "比赛日期", isHighlighted: highlighted.contains("competition_date"))
+        title: StudentStrings.localized(.step7ExtrasSection011),
+        isHighlighted: highlighted.contains("competition_date"))
       DatePicker(
-        "比赛日期",
+        StudentStrings.localized(.step7ExtrasSection011),
         selection: DateOnly.binding($draft.competitionDate, default: Date()),
         in: Date()...,
         displayedComponents: .date

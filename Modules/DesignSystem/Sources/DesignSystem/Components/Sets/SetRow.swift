@@ -74,7 +74,7 @@ public struct SetRow: View {
     .contentShape(.rect)
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(accessibilityText)
-    .accessibilityHint(onEdit == nil ? "" : "轻点编辑本组")
+    .accessibilityHint(onEdit == nil ? "" : DesignSystemStrings.tapToEditSet)
   }
 
   private var metrics: some View {
@@ -201,28 +201,37 @@ public struct SetRow: View {
   private var accessibilityText: String {
     let statusText =
       switch status {
-      case .pending: "尚未记录"
-      case .done: "本组完成"
-      case .failed: "本组失败"
+      case .pending: DesignSystemStrings.setPending
+      case .done: DesignSystemStrings.setDone
+      case .failed: DesignSystemStrings.setFailed
       }
     let videoText =
       switch videoState {
-      case .none: "无视频"
-      case .uploading, .uploaded: "已附视频"
-      case .failed: "视频上传失败"
+      case .none: DesignSystemStrings.noVideo
+      case .uploading, .uploaded: DesignSystemStrings.videoAttached
+      case .failed: DesignSystemStrings.videoUploadFailed
       }
-    let weightText = weight.map { "\(numberText($0)) 千克" } ?? "暂无建议重量"
-    let metrics =
-      "\(weightText)，\(reps) 次，"
-      + "RPE \(numberText(rpe, alwaysShowsFraction: true))"
-    return "第 \(index) 组，\(metrics)，\(statusText)，\(videoText)"
+    let weightText =
+      weight.map { DesignSystemStrings.setWeight(numberText($0)) }
+      ?? DesignSystemStrings.noSuggestedWeight
+    let metrics = DesignSystemStrings.setMetrics(
+      weight: weightText,
+      reps: reps,
+      rpe: numberText(rpe, alwaysShowsFraction: true)
+    )
+    return DesignSystemStrings.setAccessibilityLabel(
+      index: index,
+      metrics: metrics,
+      status: statusText,
+      video: videoText
+    )
   }
 
   private var videoAccessibilityText: String {
     switch videoState {
-    case .none: "无视频"
-    case .uploading, .uploaded: "已附视频"
-    case .failed: "视频上传失败，轻点重试"
+    case .none: DesignSystemStrings.noVideo
+    case .uploading, .uploaded: DesignSystemStrings.videoAttached
+    case .failed: DesignSystemStrings.videoUploadFailedRetry
     }
   }
 

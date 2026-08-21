@@ -19,8 +19,11 @@ struct StudentExecutionView: View {
       }
 
       if days.isEmpty {
-        ContentUnavailableView("暂无执行记录", systemImage: "list.bullet.rectangle")
-          .background(Color.MeetPR.bg)
+        ContentUnavailableView(
+          CoachStudentDetailStrings.text("coach.execution.empty"),
+          systemImage: "list.bullet.rectangle"
+        )
+        .background(Color.MeetPR.bg)
       } else {
         List {
           ForEach(days) { day in
@@ -76,8 +79,9 @@ private struct StudentExecutionDayRow: View {
 
   private var title: String {
     guard let exercises = day.planDay?.exercises, !exercises.isEmpty else {
-      return day.logs.isEmpty ? "休息" : "自由记录"
+      return CoachStudentDetailStrings.text(
+        day.logs.isEmpty ? "coach.execution.rest" : "coach.execution.freeLog")
     }
-    return exercises.map(\.exercise.name).joined(separator: " / ")
+    return exercises.map { CoachLocalization.exerciseName($0.exercise) }.joined(separator: " / ")
   }
 }

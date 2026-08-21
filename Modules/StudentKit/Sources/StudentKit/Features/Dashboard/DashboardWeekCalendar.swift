@@ -51,7 +51,10 @@ struct DashboardWeekCalendar: View {
             }
           }
           .accessibilityElement(children: .combine)
-          .accessibilityLabel("第\(weekNumber)周第\(cell.dayNumber)天，\(statusText(cell.state))")
+          .accessibilityLabel(
+            StudentStrings.replacing(
+              .dashboardWeekCalendar001,
+              values: ["\(weekNumber)", "\(cell.dayNumber)", "\(statusText(cell.state))"]))
         }
       }
     }
@@ -89,7 +92,15 @@ struct DashboardWeekCalendar: View {
   private func recommendedDate(_ date: Date) -> String {
     let calendar = PlanCalendarDayIdentity.utcCalendar
     let components = calendar.dateComponents([.month, .day, .weekday], from: date)
-    let weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
+    let weekdays = [
+      StudentStrings.localized(.dashboardWeekCalendar002),
+      StudentStrings.localized(.dashboardWeekCalendar003),
+      StudentStrings.localized(.dashboardWeekCalendar004),
+      StudentStrings.localized(.dashboardWeekCalendar005),
+      StudentStrings.localized(.dashboardWeekCalendar006),
+      StudentStrings.localized(.dashboardWeekCalendar007),
+      StudentStrings.localized(.dashboardWeekCalendar008),
+    ]
     let weekdayIndex = (components.weekday ?? 1) - 1
     let weekday = weekdays.indices.contains(weekdayIndex) ? weekdays[weekdayIndex] : ""
     return "\(components.month ?? 0)/\(components.day ?? 0) \(weekday)"
@@ -97,9 +108,9 @@ struct DashboardWeekCalendar: View {
 
   private func statusText(_ state: DashboardWeekProgressState) -> String {
     switch state {
-    case .done: "已完成"
-    case .current: "当前"
-    case .upcoming: "未轮到"
+    case .done: StudentStrings.localized(.dashboardWeekCalendar009)
+    case .current: StudentStrings.localized(.dashboardWeekCalendar010)
+    case .upcoming: StudentStrings.localized(.dashboardWeekCalendar011)
     }
   }
 }
@@ -116,7 +127,7 @@ private struct DashboardWeekCalendarHeader: View {
     case .progress:
       HStack(spacing: 10) {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-          Text("本周进度")
+          Text(StudentStrings.localized(.dashboardWeekCalendar012))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
           Text("\(completedCount) / \(totalCount)")
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
@@ -134,7 +145,7 @@ private struct DashboardWeekCalendarHeader: View {
             .font(.MeetPR.display(size: MeetPRFontMetrics.size14))
             .foregroundStyle(Color.MeetPR.textPrimary)
 
-          Text("当前周")
+          Text(StudentStrings.localized(.dashboardWeekCalendar013))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .bold))
             .tracking(0.6)
             .foregroundStyle(Color.MeetPR.goldText)
@@ -168,7 +179,7 @@ private struct WeekRecommendationLabel: View {
       Image(systemName: "calendar")
         .font(.MeetPR.system(size: MeetPRFontMetrics.size11))
         .foregroundStyle(Color.MeetPR.textDisabled)
-      Text("教练推荐日期")
+      Text(StudentStrings.localized(.dashboardWeekCalendar014))
     }
     .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
     .foregroundStyle(Color.MeetPR.textMuted)

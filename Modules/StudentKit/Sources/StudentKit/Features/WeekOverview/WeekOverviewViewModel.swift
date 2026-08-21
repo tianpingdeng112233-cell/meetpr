@@ -20,10 +20,16 @@ public final class WeekOverviewViewModel {
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
+  private let now: @Sendable () -> Date
 
-  public init(plans: any StudentPlanRepository, logs: any StudentTrainingLogRepository) {
+  public init(
+    plans: any StudentPlanRepository,
+    logs: any StudentTrainingLogRepository,
+    now: @escaping @Sendable () -> Date = { Date() }
+  ) {
     self.plans = plans
     self.logs = logs
+    self.now = now
   }
 
   public func load(studentID: UUID, serverAuthoritative: Bool = true) async {
@@ -47,7 +53,7 @@ public final class WeekOverviewViewModel {
       let days = Self.currentWeekDays(
         from: allDays, weekIndex: weekIndex)
       let fetchedLogs: [StudentSetLog]
-      if let dateRange = Self.dateRange(for: allDays) {
+      if let dateRange = Self.dateRange(for: allDays, now: now()) {
         fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
       } else {
         fetchedLogs = []
@@ -70,7 +76,7 @@ public final class WeekOverviewViewModel {
     let existingLogs: [StudentSetLog]
     if case .loaded(_, let logs, _) = state {
       existingLogs = logs
-    } else if let dateRange = Self.dateRange(for: plan.days) {
+    } else if let dateRange = Self.dateRange(for: plan.days, now: now()) {
       if state == .idle { state = .loading }
       existingLogs = (try? await logs.fetchLogs(studentID: studentID, in: dateRange)) ?? []
     } else {
@@ -99,7 +105,7 @@ public final class WeekOverviewViewModel {
     guard case .loaded(let days, _, let weekIndex) = state else { return }
     do {
       let fetchedLogs: [StudentSetLog]
-      if let dateRange = Self.dateRange(for: cycleDays) {
+      if let dateRange = Self.dateRange(for: cycleDays, now: now()) {
         fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
       } else {
         fetchedLogs = []
@@ -133,13 +139,18 @@ public final class WeekOverviewViewModel {
     )
   }
 
-  private static func dateRange(for days: [StudentPlanDay]) -> ClosedRange<Date>? {
+  private static func dateRange(
+    for days: [StudentPlanDay],
+    now: Date
+  ) -> ClosedRange<Date>? {
     guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.scheduledDate).max()
     else {
       return nil
     }
     // spec 071: one plan-scoped request for the whole cycle, padded one day
-    // around coach-authored recommendation dates.
-    return first.addingTimeInterval(-86_400)...last.addingTimeInterval(86_400)
+    // around coach-authored recommendation dates. Sequence progression means
+    // real training can run past the scheduled calendar, so the upper bound
+    // clamps to today as well (P0 2026-08-20).
+    return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)
   }
 }

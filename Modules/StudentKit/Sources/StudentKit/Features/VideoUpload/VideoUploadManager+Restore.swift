@@ -109,7 +109,9 @@ extension VideoUploadManager {
     guard (try? requireLiveWakeContext(recordID: record.id, generation: generation)) != nil else {
       return nil
     }
-    guard FileManager.default.fileExists(atPath: fileURL(for: record).path) else {
+    let exportedFileExists = FileManager.default.fileExists(atPath: fileURL(for: record).path)
+    let sourceURL = exportedFileExists ? nil : retainedSourceURL(recordID: record.id)
+    guard exportedFileExists || sourceURL != nil else {
       await transitionToTerminalFailure(record, generation: generation)
       return nil
     }
@@ -118,7 +120,7 @@ extension VideoUploadManager {
     }
     return startUploadTask(
       recordID: record.id,
-      sourceURL: nil,
+      sourceURL: sourceURL,
       previousGeneration: generation
     )
   }

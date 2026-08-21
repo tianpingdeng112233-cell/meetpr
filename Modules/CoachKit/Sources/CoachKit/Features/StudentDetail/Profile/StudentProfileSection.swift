@@ -176,7 +176,7 @@ struct StudentProfileSection: View {
     if !profile.equipmentOverrides.isEmpty {
       values.append(
         profile.equipmentOverrides
-          .map(CoachOnboardingDisplay.equipmentLabel)
+          .map { CoachOnboardingDisplay.equipmentLabel($0) }
           .joined(separator: " · ")
       )
     }
@@ -193,7 +193,7 @@ struct StudentProfileSection: View {
 
   private func injury(_ profile: OnboardingProfile) -> String? {
     let areas = profile.injuryAreas
-      .map(CoachOnboardingDisplay.injuryAreaText)
+      .map { CoachOnboardingDisplay.injuryAreaText($0) }
       .joined(separator: " · ")
     return [areas.nilIfEmpty, profile.injuryNotes]
       .compactMap(\.self)

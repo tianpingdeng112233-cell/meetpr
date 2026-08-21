@@ -14,10 +14,14 @@ struct Step6MaterialsSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-      uploadCard(icon: "doc.text", title: "上传训练计划", detail: "PNG / JPG / PDF")
-      uploadCard(icon: "video", title: "三大项动作视频", detail: "深蹲 / 卧推 / 硬拉 各 ≤3 个")
+      uploadCard(
+        icon: "doc.text", title: StudentStrings.localized(.step6MaterialsSection001),
+        detail: "PNG / JPG / PDF")
+      uploadCard(
+        icon: "video", title: StudentStrings.localized(.step6MaterialsSection002),
+        detail: StudentStrings.localized(.step6MaterialsSection003))
       OnboardingChipGrid(
-        title: "想增强的肌群(最多 3 个,可选)",
+        title: StudentStrings.localized(.step6MaterialsSection004),
         options: OnboardingProfile.strengthenMuscleGroups.map {
           ($0, OnboardingLabels.strengthenLabel($0))
         },
@@ -41,7 +45,7 @@ struct Step6MaterialsSection: View {
           .foregroundStyle(Color.MeetPR.textMuted)
       }
       Spacer()
-      Text("即将开放")
+      Text(StudentStrings.localized(.step6MaterialsSection005))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
         .padding(.horizontal, MeetPRSpacing.sm)

@@ -12,12 +12,25 @@ struct PlateBreakdownTests {
 
   @Test("Accessibility text matches empty, collar-only, and loaded branches")
   @MainActor
-  func accessibilityText() {
-    #expect(PlateVisual.accessibilityText([], showCollar: false) == "空杠 20kg")
-    #expect(PlateVisual.accessibilityText([], showCollar: true) == "仅 2.5kg 赛扣")
+  func accessibilityText() throws {
     #expect(
-      PlateVisual.accessibilityText([25, 25, 25], showCollar: true)
-        == "25kg × 3 + 2.5kg 赛扣"
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        PlateVisual.accessibilityText([], showCollar: false),
+        key: "designSystem.plate.emptyBar"
+      ) == "空杠 20kg"
+    )
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        PlateVisual.accessibilityText([], showCollar: true),
+        key: "designSystem.plate.competitionCollarsOnly"
+      ) == "仅 2.5kg 赛扣"
+    )
+    #expect(
+      try LocalizationCatalogTestSupport.simplifiedChinese(
+        PlateVisual.accessibilityText([25, 25, 25], showCollar: true),
+        key: "designSystem.plate.withCollars %@",
+        arguments: ["25kg × 3"]
+      ) == "25kg × 3 + 2.5kg 赛扣"
     )
     #expect(PlateVisual.accessibilityText([25, 2.5], showCollar: false) == "25kg × 1 · 2.5kg × 1")
   }

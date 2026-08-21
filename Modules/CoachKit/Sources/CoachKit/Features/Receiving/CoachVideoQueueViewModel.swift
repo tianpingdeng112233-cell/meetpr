@@ -102,18 +102,18 @@ final class CoachVideoQueueViewModel {
     bannerMessage = nil
     let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !trimmed.isEmpty else {
-      bannerMessage = "反馈不能为空"
+      bannerMessage = CoachVideoFeedbackStrings.emptyFeedback
       return false
     }
     do {
       _ = try await repository.sendFeedback(for: item, text: trimmed)
       mutationGeneration += 1
       items.removeAll { $0.id == item.id }
-      toastMessage = "已发送反馈"
+      toastMessage = CoachVideoFeedbackStrings.sentFeedback
       Analytics.shared.coachFeedbackSent(studentID: item.studentID, kind: .video)
       return true
     } catch {
-      bannerMessage = "发送失败,请稍后重试"
+      bannerMessage = CoachVideoFeedbackStrings.sendFailed
       return false
     }
   }

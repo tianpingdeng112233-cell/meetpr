@@ -7,6 +7,96 @@ import Testing
 
 @testable import StudentKit
 
+struct TodayWorkoutLocalDayCase: Sendable, CustomTestStringConvertible {
+  let identifier: String
+  let year: Int
+  let month: Int
+  let day: Int
+  let context: String
+
+  var testDescription: String { "\(identifier)-\(context)" }
+}
+
+private let todayWorkoutLocalDayCases = [
+  TodayWorkoutLocalDayCase(
+    identifier: "Asia/Shanghai", year: 2030, month: 8, day: 18, context: "all-hours"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 1, day: 15, context: "GMT"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 7, day: 15, context: "BST"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 3, day: 31, context: "DST-start"),
+  TodayWorkoutLocalDayCase(
+    identifier: "Europe/London", year: 2030, month: 10, day: 27, context: "DST-end"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 1, day: 15, context: "standard"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 7, day: 15, context: "daylight"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 3, day: 10, context: "DST-start"),
+  TodayWorkoutLocalDayCase(
+    identifier: "America/New_York", year: 2030, month: 11, day: 3, context: "DST-end"),
+]
+
+@MainActor
+@Test(arguments: todayWorkoutLocalDayCases)
+func todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(
+  localDayCase: TodayWorkoutLocalDayCase
+) async throws {
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(identifier: localDayCase.identifier))
+
+  let localDayStart = try #require(
+    calendar.date(
+      from: DateComponents(
+        year: localDayCase.year,
+        month: localDayCase.month,
+        day: localDayCase.day
+      )
+    )
+  )
+  let nextLocalDayStart = try #require(
+    calendar.date(byAdding: .day, value: 1, to: localDayStart)
+  )
+  let plan = StudentDemoSeed.makePlanView(
+    today: localDayStart,
+    todayOffset: 0,
+    selectedCalendar: calendar
+  )
+  let expectedDay = try #require(plan.days.first)
+  var samples = stride(
+    from: localDayStart,
+    to: nextLocalDayStart,
+    by: 3_600
+  ).map { $0 }
+  samples.append(nextLocalDayStart.addingTimeInterval(-1))
+
+  for selectedDate in samples {
+    let viewModel = TodayWorkoutViewModel(
+      plans: InMemoryStudentPlanRepository(
+        store: TestStudentPlanStore(seed: [StudentDemoSeed.studentID: plan])
+      ),
+      logs: InMemoryStudentTrainingLogRepository(),
+      calendar: calendar
+    )
+
+    await viewModel.load(
+      date: selectedDate,
+      studentID: StudentDemoSeed.studentID,
+      preloadedPlan: plan
+    )
+
+    guard case .loaded(let day, _) = viewModel.state else {
+      var style = Date.FormatStyle.dateTime.year().month().day().hour().minute().second()
+      style.timeZone = calendar.timeZone
+      let localTime = selectedDate.formatted(style)
+      Issue.record("Expected plan day in \(localDayCase.identifier) at \(localTime)")
+      continue
+    }
+    #expect(day.id == expectedDay.id)
+  }
+}
+
 @MainActor
 @Test func studentSessionSummaryAggregatesCompletedSetsOnly() {
   let prescribed = PrescribedSet(
@@ -789,4 +879,49 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
   #expect(drafts[0].actualRPE == 9)
   #expect(!drafts[0].completed)
   #expect(drafts[0].loggedSetID == setLogID)
+}
+
+// P0 2026-08-20: sequence progression lets real training run past the plan's
+// scheduled calendar. Logs recorded after the scheduled end must still bind to
+// the day's drafts — a schedule-clamped fetch window made them vanish.
+@MainActor
+@Test func todayWorkoutKeepsLogsRecordedAfterScheduledPlanEnd() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let lastScheduled = try #require(plan.days.map(\.scheduledDate).max())
+  let now = lastScheduled.addingTimeInterval(30 * 86_400)
+  let day = plan.days[0]
+  let exercise = try #require(day.exercises.first)
+  let prescribed = try #require(exercise.prescribedSets.first)
+  let lateLog = StudentSetLog(
+    id: UUID(),
+    studentID: studentID,
+    planExerciseID: exercise.id,
+    setIndex: prescribed.setIndex,
+    loggedAt: now.addingTimeInterval(-3_600),
+    weightKg: 123.5,
+    reps: 5,
+    completed: true
+  )
+  let viewModel = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: InMemoryStudentTrainingLogRepository(seed: [lateLog]),
+    now: { now }
+  )
+
+  await viewModel.load(dayID: day.id, studentID: studentID)
+
+  guard case .loaded(_, let drafts) = viewModel.state else {
+    Issue.record("Expected loaded state")
+    return
+  }
+  let draft = try #require(
+    drafts.first {
+      $0.planExerciseID == exercise.id && $0.prescribed.setIndex == prescribed.setIndex
+    }
+  )
+  #expect(draft.completed)
+  #expect(draft.actualWeight == 123.5)
+  #expect(draft.loggedSetID == lateLog.id)
 }

@@ -18,6 +18,7 @@ public final class VideoAttachmentViewModel {
   let maxDurationSeconds: Double
   public private(set) var rowStates: [UUID: RowState] = [:]
   public private(set) var lastErrorMessage: String?
+  public private(set) var retryErrorMessage: String?
 
   private let manager: VideoUploadManager
   private let consentDefaults: UserDefaults
@@ -32,7 +33,7 @@ public final class VideoAttachmentViewModel {
   }
 
   public func reportVideoProcessingFailure() {
-    lastErrorMessage = "视频处理失败,请重试"
+    lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
   }
 
   deinit {
@@ -90,11 +91,13 @@ public final class VideoAttachmentViewModel {
     } catch let error as VideoUploadError {
       lastErrorMessage = Self.message(for: error)
     } catch {
-      lastErrorMessage = "视频处理失败,请重试"
+      lastErrorMessage = StudentStrings.localized(.videoAttachmentViewModel001)
     }
   }
 
   public func retry(setLogID: UUID) async {
+    lastErrorMessage = nil
+    retryErrorMessage = nil
     if let state = rowStates[setLogID] {
       await manager.retry(attachmentID: state.attachment.id)
     } else {
@@ -105,6 +108,10 @@ public final class VideoAttachmentViewModel {
   public func remove(setLogID: UUID) async {
     guard let state = rowStates[setLogID] else { return }
     await manager.remove(attachmentID: state.attachment.id)
+  }
+
+  public func clearRetryError() {
+    retryErrorMessage = nil
   }
 
   func playbackSource(attachmentID: UUID) async throws -> VideoAttachmentPlaybackSource? {
@@ -132,17 +139,29 @@ public final class VideoAttachmentViewModel {
       if rowStates[setLogID]?.attachment.id == attachmentID {
         rowStates[setLogID] = nil
       }
+    case .retryUnavailable(let setLogID, let attachmentID, let reason):
+      guard rowStates[setLogID]?.attachment.id == attachmentID else { return }
+      let message = Self.message(for: reason)
+      lastErrorMessage = message
+      retryErrorMessage = message
+    }
+  }
+
+  private static func message(for reason: VideoRetryUnavailableReason) -> String {
+    switch reason {
+    case .sourceMissing:
+      StudentStrings.localized(.videoAttachmentViewModel002)
     }
   }
 
   private static func message(for error: VideoUploadError) -> String {
     switch error {
     case .durationExceedsLimit(_, let maxSeconds):
-      "视频超过 \(Int(maxSeconds)) 秒上限,请截短后再上传"
+      StudentStrings.replacing(.videoAttachmentViewModel003, values: ["\(Int(maxSeconds))"])
     case .exportFailed:
-      "视频转码失败,请重试"
+      StudentStrings.localized(.videoAttachmentViewModel004)
     default:
-      "视频处理失败,请重试"
+      StudentStrings.localized(.videoAttachmentViewModel001)
     }
   }
 }

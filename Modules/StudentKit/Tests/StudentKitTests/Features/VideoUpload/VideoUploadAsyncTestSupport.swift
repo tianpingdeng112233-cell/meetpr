@@ -41,6 +41,27 @@ struct FailingVideoExporter: VideoExporting {
   }
 }
 
+actor RecoveringVideoExporter: VideoExporting {
+  private var shouldFail = true
+  private(set) var exportAttempts = 0
+
+  func allowExports() {
+    shouldFail = false
+  }
+
+  func durationSeconds(of sourceURL: URL) async throws -> Double {
+    30
+  }
+
+  func export(from sourceURL: URL, to destinationURL: URL) async throws {
+    exportAttempts += 1
+    guard !shouldFail else {
+      throw VideoUploadError.exportFailed("forced test failure")
+    }
+    try Data(repeating: 0xAB, count: 2_560).write(to: destinationURL)
+  }
+}
+
 func waitForStatus(
   _ repository: any VideoAttachmentRepository,
   id: UUID,

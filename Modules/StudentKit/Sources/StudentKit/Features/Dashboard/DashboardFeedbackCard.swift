@@ -114,7 +114,7 @@ struct DashboardFeedbackCard: View {
         }
 
         HStack(spacing: 4) {
-          Text("展开全部 \(items.count) 条反馈")
+          Text(StudentStrings.replacing(.dashboardFeedbackCard001, values: ["\(items.count)"]))
           DashboardChevron(direction: .down)
             .stroke(
               Color.MeetPR.textMuted,
@@ -160,7 +160,8 @@ struct DashboardFeedbackCard: View {
       .contentShape(.rect)
     }
     .buttonStyle(.plain)
-    .accessibilityLabel("教练反馈，展开全部 \(items.count) 条")
+    .accessibilityLabel(
+      StudentStrings.replacing(.dashboardFeedbackCard002, values: ["\(items.count)"]))
   }
 
   private var expandedCard: some View {
@@ -211,11 +212,11 @@ extension DashboardFeedbackCard {
       Circle()
         .fill(Color.MeetPR.gold500)
         .frame(width: 7, height: 7)
-      Text("教练反馈")
+      Text(StudentStrings.localized(.dashboardFeedbackCard003))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
       if unreadCount > 0 {
-        Text("\(unreadCount) 条未读")
+        Text(StudentStrings.replacing(.dashboardFeedbackCard004, values: ["\(unreadCount)"]))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .bold))
           .foregroundStyle(Color.MeetPR.inkOnGold)
           .padding(.horizontal, 6)
@@ -226,7 +227,7 @@ extension DashboardFeedbackCard {
       if showsCollapseControl {
         Spacer(minLength: 0)
         HStack(spacing: 3) {
-          Text("收起")
+          Text(StudentStrings.localized(.dashboardFeedbackCard005))
           DashboardChevron(direction: .down)
             .stroke(
               Color.MeetPR.textMuted,
@@ -259,7 +260,7 @@ extension DashboardFeedbackCard {
         }
         Spacer(minLength: 0)
         HStack(spacing: 2) {
-          Text("查看")
+          Text(StudentStrings.localized(.dashboardFeedbackCard006))
           DashboardChevron(direction: .right)
             .stroke(
               Color.MeetPR.textMuted,

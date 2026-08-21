@@ -140,7 +140,7 @@ struct StudentVideoGridView: View {
     if let exerciseID = video.planExerciseID,
       let exercise = planDays.flatMap(\.exercises).first(where: { $0.id == exerciseID })
     {
-      return exercise.exercise.name
+      return CoachLocalization.exerciseName(exercise.exercise)
     }
     if let filename = video.filename, !filename.isEmpty {
       return filename

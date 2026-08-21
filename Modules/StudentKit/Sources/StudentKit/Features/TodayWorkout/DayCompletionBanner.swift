@@ -11,11 +11,11 @@ struct DayCompletionBanner: View {
       HStack(spacing: MeetPRSpacing.point10) {
         Image(systemName: "checkmark.seal.fill")
           .foregroundStyle(Color.MeetPR.success)
-        Text("今日训练完成 · \(totalSets) 组")
+        Text(StudentStrings.replacing(.dayCompletionBanner001, values: ["\(totalSets)"]))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
         Spacer()
-        Text("查看回顾")
+        Text(StudentStrings.localized(.dayCompletionBanner002))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
           .foregroundStyle(Color.MeetPR.textSecondary)
         Image(systemName: "chevron.right")
@@ -31,6 +31,6 @@ struct DayCompletionBanner: View {
       .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
     .buttonStyle(.plain)
-    .accessibilityLabel("今日训练完成，共 \(totalSets) 组，点按查看训练回顾")
+    .accessibilityLabel(StudentStrings.replacing(.dayCompletionBanner003, values: ["\(totalSets)"]))
   }
 }

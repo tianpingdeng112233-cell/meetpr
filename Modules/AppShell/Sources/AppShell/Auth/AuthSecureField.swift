@@ -59,7 +59,7 @@ struct AuthSecureField: View {
             .textContentType(.password)
           #endif
           .accessibilityLabel(label)
-          .accessibilityHint(errorMessage ?? helperText ?? "输入密码")
+          .accessibilityHint(errorMessage ?? helperText ?? AppShellStrings.passwordInputHint)
         }
 
         Button {
@@ -91,7 +91,9 @@ struct AuthSecureField: View {
             .padding(-(MeetPRSpacing.minimumHitTarget - MeetPRSpacing.point34) / 2)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(isPasswordVisible ? "隐藏密码" : "显示密码")
+        .accessibilityLabel(
+          isPasswordVisible ? AppShellStrings.hidePassword : AppShellStrings.showPassword
+        )
       }
       .padding(.horizontal, MeetPRSpacing.point14)
       .padding(.vertical, MeetPRSpacing.space3)

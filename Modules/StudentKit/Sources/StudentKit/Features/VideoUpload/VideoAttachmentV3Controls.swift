@@ -1,10 +1,33 @@
+import CoreModels
 import DesignSystem
 import SwiftUI
 
 enum VideoAttachmentV3State: Equatable {
   case choices(cameraAvailable: Bool)
+  case preparing
   case attached(cameraAvailable: Bool, canDelete: Bool, delivered: Bool)
   case failed
+
+  static func resolve(
+    status: VideoAttachment.Status?,
+    isPreparing: Bool,
+    cameraAvailable: Bool
+  ) -> Self {
+    if isPreparing {
+      return .preparing
+    }
+    guard let status else {
+      return .choices(cameraAvailable: cameraAvailable)
+    }
+    switch status {
+    case .pending, .uploading:
+      return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: false)
+    case .uploaded:
+      return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: true)
+    case .failed:
+      return .failed
+    }
+  }
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -21,12 +44,22 @@ struct VideoAttachmentV3Controls: View {
     case .choices(let cameraAvailable):
       HStack(spacing: MeetPRSpacing.point10) {
         actionButton(
-          "拍摄",
+          StudentStrings.localized(.videoAttachmentV3Controls001),
           systemImage: "video",
           isEnabled: cameraAvailable,
           action: onCamera
         )
-        actionButton("相册", systemImage: "photo", action: onLibrary)
+        actionButton(
+          StudentStrings.localized(.videoAttachmentV3Controls002), systemImage: "photo",
+          action: onLibrary)
+      }
+
+    case .preparing:
+      HStack(spacing: MeetPRSpacing.space2) {
+        ProgressView()
+        Text(StudentStrings.localized(.videoAttachmentV3Controls003))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+          .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.60))
       }
 
     case .attached(_, let canDelete, let delivered):
@@ -36,12 +69,19 @@ struct VideoAttachmentV3Controls: View {
       // the set that happened — a set, once done, is done.
       VStack(alignment: .trailing, spacing: MeetPRSpacing.point7) {
         HStack(spacing: MeetPRSpacing.point10) {
-          actionButton("更换", systemImage: "photo", action: onLibrary)
-          actionButton("删除", systemImage: "trash", action: onDelete)
-            .disabled(!canDelete)
+          actionButton(
+            StudentStrings.localized(.videoAttachmentV3Controls004), systemImage: "photo",
+            action: onLibrary)
+          actionButton(
+            StudentStrings.localized(.videoAttachmentV3Controls005), systemImage: "trash",
+            action: onDelete
+          )
+          .disabled(!canDelete)
         }
         Label(
-          delivered ? "已送达教练" : "还在路上",
+          delivered
+            ? StudentStrings.localized(.videoAttachmentV3Controls006)
+            : StudentStrings.localized(.videoAttachmentV3Controls007),
           systemImage: delivered ? "checkmark.circle" : "arrow.up.circle.dotted"
         )
         .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .regular))
@@ -50,11 +90,18 @@ struct VideoAttachmentV3Controls: View {
 
     case .failed:
       HStack(spacing: MeetPRSpacing.space2) {
-        Label("上传失败", systemImage: "exclamationmark.triangle.fill")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
-          .foregroundStyle(Color.MeetPR.danger)
-        actionButton("重试", systemImage: "arrow.clockwise", action: onRetry)
-        actionButton("删除", systemImage: "trash", action: onDelete)
+        Label(
+          StudentStrings.localized(.videoAttachmentV3Controls008),
+          systemImage: "exclamationmark.triangle.fill"
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+        .foregroundStyle(Color.MeetPR.danger)
+        actionButton(
+          StudentStrings.localized(.videoAttachmentV3Controls009), systemImage: "arrow.clockwise",
+          action: onRetry)
+        actionButton(
+          StudentStrings.localized(.videoAttachmentV3Controls005), systemImage: "trash",
+          action: onDelete)
       }
     }
   }

@@ -28,11 +28,15 @@ struct WeightPercentSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       HStack {
-        Text(isEditing ? "编辑常用百分比" : "常用百分比")
-          .font(Font.MeetPR.caption)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+        Text(
+          isEditing
+            ? CoachPlanningStrings.editCommonPercentages
+            : CoachPlanningStrings.commonPercentages
+        )
+        .font(Font.MeetPR.caption)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
         Spacer()
-        Button(isEditing ? "完成" : "编辑") {
+        Button(isEditing ? CoachPlanningStrings.done : CoachPlanningStrings.edit) {
           isEditing.toggle()
         }
         .font(Font.MeetPR.footnote)
@@ -79,14 +83,14 @@ struct WeightPercentSection: View {
             }
             .buttonStyle(.bordered)
             .tint(Color.MeetPR.fgSecondary)
-            .accessibilityLabel("移除 \(percent)%")
+            .accessibilityLabel(CoachPlanningStrings.removePercentage(percent))
           }
         }
       }
       .scrollIndicators(.hidden)
 
       HStack(spacing: MeetPRSpacing.sm) {
-        TextField("新增 %", text: $newPercentText)
+        TextField(CoachPlanningStrings.newPercentage, text: $newPercentText)
           .planningPercentKeyboard()
           .font(Font.MeetPR.footnote)
           .frame(width: 64)
@@ -94,13 +98,13 @@ struct WeightPercentSection: View {
           .padding(.vertical, MeetPRSpacing.xs)
           .background(Color.MeetPR.surface2)
           .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
-        Button("添加") { addNewPercent() }
+        Button(CoachPlanningStrings.add) { addNewPercent() }
           .font(Font.MeetPR.footnote)
           .buttonStyle(.bordered)
           .tint(Color.MeetPR.brandRed)
           .disabled(Int(newPercentText) == nil)
         Spacer()
-        Button("恢复默认") {
+        Button(CoachPlanningStrings.restoreDefaults) {
           update(WeightPercentPresets.fallback)
         }
         .font(Font.MeetPR.footnote)

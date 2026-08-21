@@ -204,10 +204,10 @@ enum LegacyStatusBadgeContract {
 
 #Preview("Badge · All Tones · Dark") {
   HStack(spacing: MeetPRSpacing.space2) {
-    StatusBadge("当前", tone: .gold, dot: false)
-    StatusBadge("已通知教练", tone: .success, dot: true)
-    StatusBadge("3 天未训练", tone: .danger, dot: true)
-    StatusBadge("休息日", tone: .neutral, dot: false)
+    StatusBadge(DesignSystemStrings.current, tone: .gold, dot: false)
+    StatusBadge(DesignSystemStrings.coachNotified, tone: .success, dot: true)
+    StatusBadge(DesignSystemStrings.threeDaysWithoutTraining, tone: .danger, dot: true)
+    StatusBadge(DesignSystemStrings.restDay, tone: .neutral, dot: false)
   }
   .padding()
   .background(Color.MeetPR.surfaceCard)
@@ -216,10 +216,10 @@ enum LegacyStatusBadgeContract {
 
 #Preview("Badge · All Tones · Light") {
   HStack(spacing: MeetPRSpacing.space2) {
-    StatusBadge("当前", tone: .gold, dot: false)
-    StatusBadge("已通知教练", tone: .success, dot: true)
-    StatusBadge("3 天未训练", tone: .danger, dot: true)
-    StatusBadge("休息日", tone: .neutral, dot: false)
+    StatusBadge(DesignSystemStrings.current, tone: .gold, dot: false)
+    StatusBadge(DesignSystemStrings.coachNotified, tone: .success, dot: true)
+    StatusBadge(DesignSystemStrings.threeDaysWithoutTraining, tone: .danger, dot: true)
+    StatusBadge(DesignSystemStrings.restDay, tone: .neutral, dot: false)
   }
   .padding()
   .background(Color.MeetPR.surfaceCard)

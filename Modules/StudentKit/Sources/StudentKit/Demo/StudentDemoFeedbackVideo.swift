@@ -16,7 +16,14 @@ import Foundation
 func demoFeedbackVideo(id: UUID, loggedAt: Date) -> CoachFeedbackVideo {
   CoachFeedbackVideo(
     id: id,
-    exerciseName: "低杠位深蹲",
+    exerciseName: StudentStrings.localized(
+      .studentDemoFeedbackVideo001,
+      locale: Locale(identifier: "zh-Hans")
+    ),
+    exerciseNameEn: StudentStrings.localized(
+      .studentDemoFeedbackVideo001,
+      locale: Locale(identifier: "en")
+    ),
     setIndex: 0,
     weightKg: "125.00",
     reps: 5,

@@ -45,14 +45,15 @@ public struct LoginView: View {
           Spacer(minLength: MeetPRSpacing.space6)
 
           VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-            Text("用手机号和密码登录。")
+            Text(AppShellStrings.loginInstructions)
               .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
               .foregroundStyle(Color.MeetPR.textTertiary)
 
             AuthPhoneField(
-              "手机号",
+              AppShellStrings.phoneNumber,
               text: $viewModel.phone,
-              placeholder: "138 0000 0001",
+              prefix: viewModel.phonePrefix,
+              placeholder: viewModel.loginPhonePlaceholder,
               errorMessage: viewModel.phoneError
             )
             .accessibilityIdentifier("login.phone")
@@ -61,7 +62,7 @@ public struct LoginView: View {
             // pre-filled password (the mockup only ever draws the filled
             // state), and the mono label above already names the field.
             AuthSecureField(
-              "密码",
+              AppShellStrings.password,
               text: $viewModel.password,
               errorMessage: viewModel.passwordError
             )
@@ -86,7 +87,7 @@ public struct LoginView: View {
                   ProgressView()
                     .tint(Color.MeetPR.inkOnGold)
                 } else {
-                  Text("登录")
+                  Text(AppShellStrings.signIn)
                     .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
                     .tracking(0.32)
 
@@ -119,11 +120,11 @@ public struct LoginView: View {
             .accessibilityIdentifier("login.submit")
 
             HStack(spacing: MeetPRSpacing.space1) {
-              Text("继续即表示同意")
+              Text(AppShellStrings.consent)
                 .foregroundStyle(Color.MeetPR.textMuted)
 
               Link(
-                "隐私政策",
+                AppShellStrings.privacyPolicy,
                 destination: AnalyticsPrivacyNotice.privacyPolicyURL
               )
               .foregroundStyle(Color.MeetPR.goldText)

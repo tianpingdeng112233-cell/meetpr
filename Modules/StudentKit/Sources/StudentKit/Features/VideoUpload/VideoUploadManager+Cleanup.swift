@@ -33,6 +33,9 @@ extension VideoUploadManager {
       guard await abandonRemoteSession(record: &record) else { return }
     }
     guard await removeLocalFileOrPersistCleanupIntent(record) else { return }
+    guard await removeRetainedSourceFilesOrPersistCleanupIntent(recordID: attachmentID) else {
+      return
+    }
     guard await removeChunkFiles(recordID: attachmentID).isDurable else { return }
     do {
       try await repository.delete(id: attachmentID)
@@ -48,6 +51,20 @@ extension VideoUploadManager {
 
   func fileURL(for record: VideoAttachment) -> URL {
     filesDirectory.appendingPathComponent(record.localFileName ?? "\(record.id.uuidString).mp4")
+  }
+
+  func sourceFileURL(recordID: UUID, pathExtension: String) -> URL {
+    let normalizedExtension = pathExtension.isEmpty ? "mov" : pathExtension.lowercased()
+    return filesDirectory.appending(path: "\(recordID.uuidString).source.\(normalizedExtension)")
+  }
+
+  func retainedSourceURL(recordID: UUID) -> URL? {
+    retainedSourceFileURLs(recordID: recordID).first
+  }
+
+  func retainedSourceFileURLs(recordID: UUID) -> [URL] {
+    let prefix = "\(recordID.uuidString).source."
+    return localSourceFileURLs().filter { $0.lastPathComponent.hasPrefix(prefix) }
   }
 
   func chunkDirectory(recordID: UUID) -> URL {
@@ -94,7 +111,17 @@ extension VideoUploadManager {
   /// record can be forgotten even if the immediate unlink fails. If neither
   /// persistence nor deletion succeeds, the record remains the cleanup owner.
   func removeLocalFileOrPersistCleanupIntent(_ record: VideoAttachment) async -> Bool {
-    let url = fileURL(for: record)
+    await removeLocalFileOrPersistCleanupIntent(at: fileURL(for: record))
+  }
+
+  func removeRetainedSourceFilesOrPersistCleanupIntent(recordID: UUID) async -> Bool {
+    for url in retainedSourceFileURLs(recordID: recordID) {
+      guard await removeLocalFileOrPersistCleanupIntent(at: url) else { return false }
+    }
+    return true
+  }
+
+  private func removeLocalFileOrPersistCleanupIntent(at url: URL) async -> Bool {
     guard FileManager.default.fileExists(atPath: url.path) else { return true }
     let fileName = url.lastPathComponent
 
@@ -133,40 +160,97 @@ extension VideoUploadManager {
 
   func cleanRetainedVideos(studentID: UUID) async {
     let records = (try? await repository.fetchAll(studentID: studentID)) ?? []
-    let retainedFiles = records.compactMap { record -> RetainedVideoFile? in
-      guard let localFileName = record.localFileName else { return nil }
-      let url = filesDirectory.appending(path: localFileName)
-      let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
-      let sizeBytes = attributes?[.size] as? Int64 ?? 0
-      return RetainedVideoFile(
-        attachmentID: record.id,
-        status: record.status,
-        trainingDate: record.trainingDate,
-        recordedAt: record.recordedAt,
-        sizeBytes: sizeBytes
-      )
-    }
+    await cleanTerminalAndOrphanSourceFiles()
+
     let removals = RetainedVideoCleanupPolicy.attachmentIDsToRemove(
-      from: retainedFiles,
+      from: records.map(retainedVideoFile),
       now: now(),
       calendar: .autoupdatingCurrent
     )
+    await removeRetainedVideoFiles(records: records, attachmentIDs: removals)
+  }
 
-    for record in records where removals.contains(record.id) {
-      guard let localFileName = record.localFileName else { continue }
-      let url = filesDirectory.appending(path: localFileName)
-      if FileManager.default.fileExists(atPath: url.path) {
+  private func cleanTerminalAndOrphanSourceFiles() async {
+    let sourceFiles = localSourceFileURLs()
+    for sourceURL in sourceFiles {
+      guard let recordID = sourceRecordID(from: sourceURL) else {
+        _ = await removeLocalFileOrPersistCleanupIntent(at: sourceURL)
+        continue
+      }
+      guard !retainingSourceRecordIDs.contains(recordID) else { continue }
+      guard let record = try? await repository.fetch(id: recordID) else {
+        guard !retainingSourceRecordIDs.contains(recordID) else { continue }
+        _ = await removeLocalFileOrPersistCleanupIntent(at: sourceURL)
+        continue
+      }
+      if record.status == .uploaded {
+        _ = await removeLocalFileOrPersistCleanupIntent(at: sourceURL)
+      }
+    }
+  }
+
+  private func retainedVideoFile(for record: VideoAttachment) -> RetainedVideoFile {
+    let exportedSize =
+      record.localFileName.map {
+        localFileSize(at: filesDirectory.appending(path: $0))
+      } ?? 0
+    let sourceSize = retainedSourceFileURLs(recordID: record.id).reduce(into: Int64.zero) {
+      $0 += localFileSize(at: $1)
+    }
+    return RetainedVideoFile(
+      attachmentID: record.id,
+      status: record.status,
+      trainingDate: record.trainingDate,
+      recordedAt: record.recordedAt,
+      sizeBytes: exportedSize + sourceSize
+    )
+  }
+
+  private func removeRetainedVideoFiles(
+    records: [VideoAttachment],
+    attachmentIDs: Set<UUID>
+  ) async {
+    for record in records where attachmentIDs.contains(record.id) {
+      if let localFileName = record.localFileName {
+        let url = filesDirectory.appending(path: localFileName)
         do {
-          try FileManager.default.removeItem(at: url)
+          if FileManager.default.fileExists(atPath: url.path) {
+            try FileManager.default.removeItem(at: url)
+          }
         } catch {
           continue
         }
+      }
+      guard await removeRetainedSourceFilesOrPersistCleanupIntent(recordID: record.id) else {
+        continue
       }
       var cleaned = record
       cleaned.localFileName = nil
       try? await repository.save(cleaned)
       broadcast(.updated(cleaned, progress: nil))
     }
+  }
+
+  private func localSourceFileURLs() -> [URL] {
+    let urls =
+      (try? FileManager.default.contentsOfDirectory(
+        at: filesDirectory,
+        includingPropertiesForKeys: nil
+      )) ?? []
+    return
+      urls
+      .filter { $0.lastPathComponent.contains(".source.") }
+      .sorted { $0.lastPathComponent < $1.lastPathComponent }
+  }
+
+  private func sourceRecordID(from url: URL) -> UUID? {
+    guard let markerRange = url.lastPathComponent.range(of: ".source.") else { return nil }
+    return UUID(uuidString: String(url.lastPathComponent[..<markerRange.lowerBound]))
+  }
+
+  private func localFileSize(at url: URL) -> Int64 {
+    let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
+    return attributes?[.size] as? Int64 ?? 0
   }
 
   func resetRemoteSession(on record: inout VideoAttachment) {

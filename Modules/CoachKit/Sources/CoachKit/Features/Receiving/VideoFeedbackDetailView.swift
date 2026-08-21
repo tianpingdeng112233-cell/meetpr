@@ -40,7 +40,9 @@ struct VideoFeedbackDetailView: View {
     VStack(spacing: 0) {
       VideoFeedbackHeader(
         studentName: detailModel.currentItem.studentDisplayName,
-        exerciseName: detailModel.currentItem.exerciseName
+        exerciseName: detailModel.currentItem.exerciseName.map {
+          CoachLocalization.exerciseName($0)
+        }
           ?? CoachVideoFeedbackStrings.trainingVideo,
         meta: headerMeta,
         queuePosition: queuePositionText,

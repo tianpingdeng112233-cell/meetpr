@@ -16,9 +16,9 @@ struct TodayWorkoutExerciseSection: Equatable, Sendable, Identifiable {
   var title: String {
     switch kind {
     case .mainLiftOrVariation:
-      "主项及变式"
+      StudentStrings.localized(.todayWorkoutExerciseSection001)
     case .accessory:
-      "辅助项"
+      StudentStrings.localized(.todayWorkoutExerciseSection002)
     }
   }
 

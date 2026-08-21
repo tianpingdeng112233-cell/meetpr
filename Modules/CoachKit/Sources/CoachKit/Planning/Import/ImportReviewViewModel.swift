@@ -41,7 +41,7 @@ final class ImportReviewViewModel {
     self.repository = repository
     self.now = now
     assembler = ImportPlanAssembler(now: now)
-    planName = "\(student.displayName) 导入计划"
+    planName = CoachImportStrings.defaultPlanName(student.displayName)
     startDate = Self.defaultStartDate(now: now())
   }
 
@@ -62,7 +62,7 @@ final class ImportReviewViewModel {
       let combined = try await mainLifts + accessories
       catalog = dedupe(combined)
     } catch {
-      phase = .failed("动作库加载失败：\(error.localizedDescription)")
+      phase = .failed(CoachImportStrings.catalogLoadFailed(error.localizedDescription))
     }
   }
 
@@ -76,13 +76,13 @@ final class ImportReviewViewModel {
       let grid = try Self.planGrid(from: reader)
       let parsed = PlanSheetParser.parse(grid)
       guard !parsed.weeks.isEmpty else {
-        phase = .failed("没能在表里识别出训练周——请确认选择的是计划页。")
+        phase = .failed(CoachImportStrings.noTrainingWeeks)
         return
       }
       weeks = ImportReviewBuilder.build(from: parsed, catalog: catalog)
       phase = .review
     } catch {
-      phase = .failed("解析失败：\(error.localizedDescription)")
+      phase = .failed(CoachImportStrings.parseFailed(error.localizedDescription))
     }
   }
 
@@ -93,7 +93,7 @@ final class ImportReviewViewModel {
       let assembled = try assembler.assemble(
         traineeID: student.id,
         coachID: nil,
-        name: planName,
+        name: canonicalPlanName,
         startDate: startDate,
         weeks: weeks
       )
@@ -105,7 +105,7 @@ final class ImportReviewViewModel {
       )
       phase = .published
     } catch {
-      phase = .failed("发布失败：\(error.localizedDescription)")
+      phase = .failed(CoachImportStrings.publishFailed(error.localizedDescription))
     }
   }
 
@@ -152,7 +152,7 @@ final class ImportReviewViewModel {
 
   func boundExerciseName(_ id: UUID?) -> String? {
     guard let id else { return nil }
-    return catalog.first { $0.id == id }?.name
+    return catalog.first { $0.id == id }.map { CoachLocalization.exerciseName($0) }
   }
 
   // MARK: - helpers
@@ -176,6 +176,13 @@ final class ImportReviewViewModel {
   private func dedupe(_ exercises: [Exercise]) -> [Exercise] {
     var seen = Set<UUID>()
     return exercises.filter { seen.insert($0.id).inserted }
+  }
+
+  private var canonicalPlanName: String {
+    guard planName == CoachImportStrings.defaultPlanName(student.displayName) else {
+      return planName
+    }
+    return "\(student.displayName) \u{5BFC}\u{5165}\u{8BA1}\u{5212}"
   }
 
   static func planGrid(from reader: XLSXReader) throws -> CellGrid {

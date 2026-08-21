@@ -14,27 +14,43 @@ struct ProfileCardsSection: View {
   var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
 
   var body: some View {
-    Section("我的资料") {
-      editableRow(.basics, icon: "person.text.rectangle", title: "基础信息") {
+    Section(StudentStrings.localized(.profileCardsSection001)) {
+      editableRow(
+        .basics, icon: "person.text.rectangle",
+        title: StudentStrings.localized(.profileCardsSection002)
+      ) {
         OnboardingSummaryFormatter.basics(profile)
       }
-      editableRow(.background, icon: "figure.strengthtraining.traditional", title: "训练背景") {
+      editableRow(
+        .background, icon: "figure.strengthtraining.traditional",
+        title: StudentStrings.localized(.profileCardsSection003)
+      ) {
         OnboardingSummaryFormatter.background(profile)
       }
       oneRMRow
-      editableRow(.environment, icon: "calendar", title: "训练环境") {
+      editableRow(
+        .environment, icon: "calendar", title: StudentStrings.localized(.profileCardsSection004)
+      ) {
         OnboardingSummaryFormatter.environment(profile)
       }
-      editableRow(.recovery, icon: "bed.double", title: "恢复能力") {
+      editableRow(
+        .recovery, icon: "bed.double", title: StudentStrings.localized(.profileCardsSection005)
+      ) {
         OnboardingSummaryFormatter.recovery(profile)
       }
-      editableRow(.materials, icon: "folder", title: "训练资料") {
+      editableRow(
+        .materials, icon: "folder", title: StudentStrings.localized(.profileCardsSection006)
+      ) {
         OnboardingSummaryFormatter.materials(profile)
       }
-      editableRow(.competition, icon: "target", title: "比赛/备注") {
+      editableRow(
+        .competition, icon: "target", title: StudentStrings.localized(.profileCardsSection007)
+      ) {
         OnboardingSummaryFormatter.competition(profile)
       }
-      editableRow(.injuries, icon: "bandage", title: "伤病记录") {
+      editableRow(
+        .injuries, icon: "bandage", title: StudentStrings.localized(.profileCardsSection008)
+      ) {
         OnboardingSummaryFormatter.injuries(profile)
       }
       evaluationRow
@@ -55,7 +71,7 @@ struct ProfileCardsSection: View {
         }
       } label: {
         cardLabel(
-          icon: "doc.text", title: "教练评估",
+          icon: "doc.text", title: StudentStrings.localized(.profileCardsSection009),
           summary: summary.trainingPlanExcerpt, locked: false
         )
       }
@@ -82,9 +98,9 @@ struct ProfileCardsSection: View {
   private var oneRMRow: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
       cardLabel(
-        icon: "scalemass", title: "我的极限",
+        icon: "scalemass", title: StudentStrings.localized(.profileCardsSection010),
         summary: OnboardingSummaryFormatter.oneRM(profile), locked: true)
-      Text("🔒 已锁定,联系教练修改")
+      Text(StudentStrings.localized(.profileCardsSection011))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
     }
@@ -93,8 +109,8 @@ struct ProfileCardsSection: View {
   /// 033 seam: GET evaluation-summary + detail page replace this row.
   private var evaluationPlaceholderRow: some View {
     cardLabel(
-      icon: "doc.text", title: "教练评估",
-      summary: "教练完成评估后,可在这里查看评估总结", locked: false
+      icon: "doc.text", title: StudentStrings.localized(.profileCardsSection009),
+      summary: StudentStrings.localized(.profileCardsSection012), locked: false
     )
     .opacity(0.5)
   }
@@ -146,13 +162,13 @@ enum ProfileCardKind {
 
   var title: String {
     switch self {
-    case .basics: "基础信息"
-    case .background: "训练背景"
-    case .environment: "训练环境"
-    case .recovery: "恢复能力"
-    case .materials: "训练资料"
-    case .competition: "比赛/备注"
-    case .injuries: "伤病记录"
+    case .basics: StudentStrings.localized(.profileCardsSection002)
+    case .background: StudentStrings.localized(.profileCardsSection003)
+    case .environment: StudentStrings.localized(.profileCardsSection004)
+    case .recovery: StudentStrings.localized(.profileCardsSection005)
+    case .materials: StudentStrings.localized(.profileCardsSection006)
+    case .competition: StudentStrings.localized(.profileCardsSection007)
+    case .injuries: StudentStrings.localized(.profileCardsSection008)
     }
   }
 }
@@ -184,7 +200,7 @@ struct ProfileCardEditView: View {
             .foregroundStyle(Color.MeetPR.dangerMuted)
         }
         GoldCTA(
-          "保存",
+          StudentStrings.localized(.profileCardsSection013),
           sub: nil,
           icon: .none,
           isLoading: isSaving

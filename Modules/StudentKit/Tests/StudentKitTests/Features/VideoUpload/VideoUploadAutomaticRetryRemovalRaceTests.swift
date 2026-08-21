@@ -340,6 +340,8 @@ private actor SnapshotRaceEventRecorder {
       updatedAttachmentIDs.insert(attachment.id)
     case .removed(_, let attachmentID):
       removedAttachmentIDs.insert(attachmentID)
+    case .retryUnavailable:
+      break
     }
   }
 }

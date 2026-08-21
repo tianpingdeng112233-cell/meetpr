@@ -136,8 +136,13 @@ private enum PlanningWorkspaceTestFixtures {
     currentStepRawValue: PlanningStep.configureRules.rawValue,
     planWeeks: 4
   )
+  let stepTitle = PlanningWorkspaceStrings.text("coach.workspace.step.configureRules")
 
-  #expect(summary == "张三 4 周计划 · 配置进阶 · 4周")
+  #expect(
+    summary
+      == CoachLocalization.localized(
+        "coach.workspace.draftSummary \("张三 4 周计划") \(stepTitle) \(4)"
+      ))
 }
 
 @MainActor
@@ -178,7 +183,10 @@ private enum PlanningWorkspaceTestFixtures {
       PlanningWorkspaceTestFixtures.recentStudentID,
       PlanningWorkspaceTestFixtures.endingStudentID,
     ])
-  #expect(viewModel.recentPublishedRows.first?.summary == "正式计划 · 4周")
+  let regularKind = PlanningWorkspaceStrings.text("coach.workspace.kind.regular")
+  #expect(
+    viewModel.recentPublishedRows.first?.summary
+      == CoachLocalization.localized("coach.workspace.publishedSummary \(regularKind) \(4)"))
   #expect(viewModel.hasWorkspaceContent)
 }
 

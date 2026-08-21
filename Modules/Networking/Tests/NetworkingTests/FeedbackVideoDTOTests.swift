@@ -16,6 +16,7 @@ import Testing
       "video": {
         "id": "00000000-0000-4000-8000-000000000215",
         "exercise_name": "暂停深蹲",
+        "exercise_name_en": "Pause Squat",
         "set_index": 2,
         "weight_kg": "125.00",
         "reps": 5,
@@ -32,6 +33,7 @@ import Testing
 
   #expect(domain.videoID?.uuidString == "00000000-0000-4000-8000-000000000215")
   #expect(domain.video?.exerciseName == "暂停深蹲")
+  #expect(domain.video?.exerciseNameEn == "Pause Squat")
   #expect(domain.video?.setIndex == 2)
   #expect(domain.video?.weightKg == "125.00")
   #expect(domain.video?.reps == 5)
@@ -68,6 +70,7 @@ import Testing
 
   #expect(domain.video?.id.uuidString == "00000000-0000-4000-8000-000000000225")
   #expect(domain.video?.exerciseName == nil)
+  #expect(domain.video?.exerciseNameEn == nil)
   #expect(domain.video?.setIndex == nil)
   #expect(domain.video?.weightKg == nil)
   #expect(domain.video?.reps == nil)

@@ -199,7 +199,10 @@ struct StudentOverviewSection: View {
   }
 
   private func dayTitle(_ day: StudentExecutionDay, ordinal: Int) -> String {
-    let exerciseName = day.planDay?.exercises.first?.exercise.name ?? CoachDetailStrings.training
+    let exerciseName =
+      day.planDay?.exercises.first.map {
+        CoachLocalization.exerciseName($0.exercise)
+      } ?? CoachDetailStrings.training
     return "W\(planWeekIndex)D\(ordinal) · \(exerciseName)"
   }
 

@@ -162,3 +162,40 @@ private actor AuthoritativePlanRepository: StudentPlanRepository {
     refreshed.days
   }
 }
+
+// P0 2026-08-20: same schedule-clamped window as TodayWorkout — logs recorded
+// after the plan's scheduled end must still reach the week overview.
+@MainActor
+@Test func weekOverviewKeepsLogsRecordedAfterScheduledPlanEnd() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let lastScheduled = try #require(plan.days.map(\.scheduledDate).max())
+  let now = lastScheduled.addingTimeInterval(30 * 86_400)
+  let day = plan.days[0]
+  let exercise = try #require(day.exercises.first)
+  let prescribed = try #require(exercise.prescribedSets.first)
+  let lateLog = StudentSetLog(
+    id: UUID(),
+    studentID: studentID,
+    planExerciseID: exercise.id,
+    setIndex: prescribed.setIndex,
+    loggedAt: now.addingTimeInterval(-3_600),
+    weightKg: 123.5,
+    reps: 5,
+    completed: true
+  )
+  let viewModel = WeekOverviewViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: InMemoryStudentTrainingLogRepository(seed: [lateLog]),
+    now: { now }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  guard case .loaded(_, let fetchedLogs, _) = viewModel.state else {
+    Issue.record("Expected loaded state")
+    return
+  }
+  #expect(fetchedLogs.contains { $0.id == lateLog.id })
+}

@@ -49,7 +49,7 @@ public final class ExportDataViewModel {
       try Data(csv.utf8).write(to: url, options: .atomic)
       state = .ready(url)
     } catch {
-      state = .failed("导出失败,请检查网络后重试")
+      state = .failed(StudentStrings.localized(.exportDataSheet001))
     }
   }
 
@@ -81,25 +81,25 @@ struct ExportDataSheet: View {
       VStack(spacing: MeetPRSpacing.lg) {
         switch viewModel.state {
         case .idle, .generating:
-          ProgressView("正在整理你的全部训练数据…")
+          ProgressView(StudentStrings.localized(.exportDataSheet002))
         case .failed(let message):
           Label(message, systemImage: "exclamationmark.triangle")
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
             .foregroundStyle(Color.MeetPR.dangerMuted)
-          Button("重试") {
+          Button(StudentStrings.localized(.exportDataSheet003)) {
             Task { await viewModel.export(studentID: studentID) }
           }
           .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
           .foregroundStyle(Color.MeetPR.goldText)
         case .ready(let url):
-          Label("CSV 已生成", systemImage: "checkmark.circle.fill")
+          Label(StudentStrings.localized(.exportDataSheet004), systemImage: "checkmark.circle.fill")
             .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
             .foregroundStyle(Color.MeetPR.success)
-          Text("包含全部训练组:日期/动作/重量/次数/RPE。")
+          Text(StudentStrings.localized(.exportDataSheet005))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
             .foregroundStyle(Color.MeetPR.textSecondary)
           ShareLink(item: url) {
-            Label("分享 / 存储", systemImage: "square.and.arrow.up")
+            Label(StudentStrings.localized(.exportDataSheet006), systemImage: "square.and.arrow.up")
               .font(.MeetPR.display(size: MeetPRFontMetrics.size16))
               .foregroundStyle(Color.MeetPR.ctaText)
               .frame(maxWidth: .infinity)
@@ -114,7 +114,7 @@ struct ExportDataSheet: View {
       .padding(MeetPRSpacing.base)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.MeetPR.bgBase)
-      .navigationTitle("导出训练数据")
+      .navigationTitle(StudentStrings.localized(.exportDataSheet007))
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif

@@ -69,14 +69,16 @@ struct VideoAttachmentSection: View {
       HStack(spacing: MeetPRSpacing.space3) {
         if hasPlayableAttachment {
           Button(action: playAttachment) {
-            Label("视频", systemImage: "play.circle.fill")
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
-              .foregroundStyle(Color.MeetPR.textPrimary)
+            Label(
+              StudentStrings.localized(.videoAttachmentSection001), systemImage: "play.circle.fill"
+            )
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textPrimary)
           }
           .buttonStyle(.plain)
           .disabled(isLoadingPlayback)
         } else {
-          Text("视频")
+          Text(StudentStrings.localized(.videoAttachmentSection001))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
             .foregroundStyle(Color.MeetPR.textPrimary)
         }
@@ -100,7 +102,7 @@ struct VideoAttachmentSection: View {
           Text(playbackErrorMessage)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
             .foregroundStyle(Color.MeetPR.danger)
-          Button("重试", action: playAttachment)
+          Button(StudentStrings.localized(.videoAttachmentSection002), action: playAttachment)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
             .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.72))
             .disabled(isLoadingPlayback)
@@ -153,6 +155,7 @@ struct VideoAttachmentSection: View {
           },
           onFailure: {
             videoViewModel.reportVideoProcessingFailure()
+            isPreparing = false
           }
         )
       }
@@ -160,8 +163,7 @@ struct VideoAttachmentSection: View {
         item: $libraryVideoToTrim,
         onDismiss: finishLibraryTrimPresentation
       ) { session in
-        VideoTrimmerView(session: session)
-        .ignoresSafeArea()
+        VideoTrimView(session: session)
       }
     #else
       .sheet(item: $playbackPresentation) { presentation in
@@ -171,20 +173,11 @@ struct VideoAttachmentSection: View {
   }
 
   private var presentationState: VideoAttachmentV3State {
-    if let status = rowState?.attachment.status {
-      switch status {
-      case .pending, .uploading:
-        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: false)
-      case .uploaded:
-        return .attached(cameraAvailable: cameraAvailable, canDelete: true, delivered: true)
-      case .failed:
-        return .failed
-      }
-    }
-    if isPreparing {
-      return .attached(cameraAvailable: cameraAvailable, canDelete: false, delivered: false)
-    }
-    return .choices(cameraAvailable: cameraAvailable)
+    VideoAttachmentV3State.resolve(
+      status: rowState?.attachment.status,
+      isPreparing: isPreparing,
+      cameraAvailable: cameraAvailable
+    )
   }
 
   private var cameraAvailable: Bool {
@@ -236,7 +229,7 @@ extension VideoAttachmentSection {
           let source = try await videoViewModel.playbackSource(attachmentID: attachmentID)
         else {
           guard rowState?.attachment.id == attachmentID else { return }
-          playbackErrorMessage = "视频暂时无法播放,请重试"
+          playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection003)
           return
         }
         guard rowState?.attachment.id == attachmentID else { return }
@@ -246,12 +239,13 @@ extension VideoAttachmentSection {
         )
       } catch {
         guard rowState?.attachment.id == attachmentID else { return }
-        playbackErrorMessage = "视频加载失败,请检查网络后重试"
+        playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection004)
       }
     }
   }
 
   private func requestPick(_ source: PendingSource) {
+    guard !isPreparing, activeLibraryTrimSession == nil, libraryVideoToTrim == nil else { return }
     onWillPick?()
     if videoViewModel.hasConsented {
       present(source)
@@ -271,39 +265,45 @@ extension VideoAttachmentSection {
   }
 
   private func importPicked(_ item: PhotosPickerItem) async {
-    guard let movie = try? await item.loadTransferable(type: PickedVideo.self) else {
-      // Load failed or the user backed out: no row will arrive, so clear the
-      // placeholder to bring the pick buttons back.
+    let movie: PickedVideo?
+    do {
+      movie = try await item.loadTransferable(type: PickedVideo.self)
+    } catch {
+      videoViewModel.reportVideoProcessingFailure()
+      isPreparing = false
+      return
+    }
+    guard let movie else {
+      videoViewModel.reportVideoProcessingFailure()
       isPreparing = false
       return
     }
     #if os(iOS)
-      if UIVideoEditorController.canEditVideo(atPath: movie.url.path) {
-        // Trim before upload; the spinner yields to the editor, and the
-        // save/cancel/failure callbacks own the next state.
-        isPreparing = false
-        let session = VideoTrimSession(
-          sourceURL: movie.url,
-          maxDurationSeconds: videoViewModel.maxDurationSeconds,
-          onSave: { editedURL in
-            libraryVideoToTrim = nil
-            isPreparing = true
-            Task { await attach(sourceURL: editedURL) }
-          },
-          onCancel: {
-            libraryVideoToTrim = nil
-          },
-          onFailure: {
-            libraryVideoToTrim = nil
-            videoViewModel.reportVideoProcessingFailure()
-          }
-        )
-        activeLibraryTrimSession = session
-        libraryVideoToTrim = session
-        return
-      }
+      let session = VideoTrimSession(
+        sourceURL: movie.url,
+        maxDurationSeconds: videoViewModel.maxDurationSeconds,
+        onSave: { editedURL in
+          activeLibraryTrimSession = nil
+          libraryVideoToTrim = nil
+          Task { await attach(sourceURL: editedURL) }
+        },
+        onCancel: {
+          activeLibraryTrimSession = nil
+          libraryVideoToTrim = nil
+          isPreparing = false
+        },
+        onFailure: {
+          activeLibraryTrimSession = nil
+          libraryVideoToTrim = nil
+          videoViewModel.reportVideoProcessingFailure()
+          isPreparing = false
+        }
+      )
+      activeLibraryTrimSession = session
+      libraryVideoToTrim = session
+    #else
+      await attach(sourceURL: movie.url)
     #endif
-    await attach(sourceURL: movie.url)
   }
 
   private func attach(sourceURL: URL) async {
@@ -330,9 +330,14 @@ extension VideoAttachmentSection {
   }
 
   private func finishLibraryTrimPresentation() {
-    activeLibraryTrimSession?.cancelled()
+    guard let session = activeLibraryTrimSession else {
+      libraryVideoToTrim = nil
+      return
+    }
+    session.cancelled()
     activeLibraryTrimSession = nil
     libraryVideoToTrim = nil
+    isPreparing = false
   }
 
   private func ensureSetLogID() async -> UUID? {

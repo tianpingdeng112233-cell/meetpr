@@ -444,7 +444,7 @@ private struct CoachWeekOverviewCard: View {
   }
 
   private var weekdayHeader: some View {
-    let weekdays = ["一", "二", "三", "四", "五", "六", "日"]
+    let weekdays = CoachTodayStrings.weekdays
     return HStack(spacing: MeetPRSpacing.point10) {
       Color.clear
         .frame(width: MeetPRSpacing.point52, height: MeetPRSpacing.point1)

@@ -20,7 +20,7 @@ struct RestTimerPreferenceRow: View {
     NavigationLink {
       RestTimerSettingsView(preference: preferenceBinding)
     } label: {
-      MyProfileValueRow(label: "组间休息", value: summary)
+      MyProfileValueRow(label: StudentStrings.localized(.restTimerPreferenceRow001), value: summary)
     }
     .buttonStyle(.plain)
   }

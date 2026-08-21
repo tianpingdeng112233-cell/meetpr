@@ -48,7 +48,7 @@ final class StudentVideoGridViewModel {
       let url = try await repository.playbackURL(videoID: video.id)
       playbackItem = StudentVideoPlaybackItem(id: video.id, url: url)
     } catch {
-      playbackError = "播放链接获取失败，请重试"
+      playbackError = CoachStudentDetailStrings.text("coach.video.error.playback")
     }
   }
 

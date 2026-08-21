@@ -12,7 +12,7 @@ public final class DeleteAccountViewModel {
     case failed(String)
   }
 
-  public static let requiredWord = "注销"
+  public static let requiredWord = StudentStrings.localized(.accountSecurityViewModels001)
 
   public var confirmationText = ""
   public private(set) var state: State = .idle
@@ -39,7 +39,7 @@ public final class DeleteAccountViewModel {
       try await account.deleteAccount()
       await onDeleted()
     } catch {
-      state = .failed("删除失败,请检查网络后重试")
+      state = .failed(StudentStrings.localized(.accountSecurityViewModels002))
     }
   }
 }
@@ -68,10 +68,10 @@ public final class ChangePasswordViewModel {
 
   public var localValidationMessage: String? {
     if !newPassword.isEmpty, newPassword.count < 8 {
-      return "新密码至少 8 位"
+      return StudentStrings.localized(.accountSecurityViewModels003)
     }
     if !confirmPassword.isEmpty, newPassword != confirmPassword {
-      return "两次输入的新密码不一致"
+      return StudentStrings.localized(.accountSecurityViewModels004)
     }
     return nil
   }
@@ -88,9 +88,9 @@ public final class ChangePasswordViewModel {
       try await account.changePassword(old: oldPassword, new: newPassword)
       state = .saved
     } catch AccountRepositoryError.passwordMismatch {
-      state = .failed("旧密码不正确")
+      state = .failed(StudentStrings.localized(.accountSecurityViewModels005))
     } catch {
-      state = .failed("修改失败,请检查网络后重试")
+      state = .failed(StudentStrings.localized(.accountSecurityViewModels006))
     }
   }
 }

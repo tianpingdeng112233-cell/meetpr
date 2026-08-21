@@ -1,10 +1,18 @@
 import CoreModels
 import Foundation
 
-enum GrowthTimeRange: String, CaseIterable, Equatable, Sendable {
-  case thirtyDays = "30天"
-  case ninetyDays = "90天"
-  case all = "历史总览"
+enum GrowthTimeRange: CaseIterable, Equatable, Sendable {
+  case thirtyDays
+  case ninetyDays
+  case all
+
+  var displayName: String {
+    switch self {
+    case .thirtyDays: StudentStrings.localized(.growthScreenPresentation001)
+    case .ninetyDays: StudentStrings.localized(.growthScreenPresentation002)
+    case .all: StudentStrings.localized(.growthScreenPresentation003)
+    }
+  }
 
   init(timeWindow: GrowthCurveViewModel.TimeWindow) {
     switch timeWindow {
@@ -67,7 +75,7 @@ enum GrowthE1RMCardCopy {
   // David 2026-07-28 provisional wording; keep this as the single edit point
   // until product review confirms it.
   static let windowSparseMessageTemplate =
-    "近 {window} 数据不足 · 切到更长时间范围查看"
+    StudentStrings.localized(.growthScreenPresentation004)
 
   static func windowSparseMessage(window: String) -> String {
     windowSparseMessageTemplate.replacing("{window}", with: window)

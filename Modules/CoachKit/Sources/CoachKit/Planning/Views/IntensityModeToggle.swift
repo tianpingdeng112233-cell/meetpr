@@ -12,12 +12,12 @@ public struct IntensityModeToggle: View {
   }
 
   public var body: some View {
-    Picker("强度模式", selection: $mode) {
-      Text("重量").tag(IntensityMode.weight)
+    Picker(CoachPlanningStrings.intensityMode, selection: $mode) {
+      Text(CoachPlanningStrings.weight).tag(IntensityMode.weight)
       Text("RPE").tag(IntensityMode.rpe)
     }
     .pickerStyle(.segmented)
     .font(Font.MeetPR.footnote)
-    .accessibilityLabel("强度模式")
+    .accessibilityLabel(CoachPlanningStrings.intensityMode)
   }
 }

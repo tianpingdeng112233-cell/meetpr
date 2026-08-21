@@ -30,6 +30,8 @@ public struct GoldProgressBar: View {
     }
     .frame(height: height)
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel("本周进度 \(Int((fraction * 100).rounded())) %")
+    .accessibilityLabel(
+      DesignSystemStrings.weeklyProgress(Int((fraction * 100).rounded()))
+    )
   }
 }

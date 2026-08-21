@@ -43,9 +43,9 @@ struct EvaluationSummaryEditorView: View {
           .frame(maxWidth: .infinity, maxHeight: .infinity)
       case .failed:
         ContentUnavailableView(
-          "加载失败",
+          CoachStudentDetailStrings.text("coach.common.loadFailed"),
           systemImage: "exclamationmark.triangle",
-          description: Text("评估总结加载失败,请返回重试")
+          description: Text(CoachStudentDetailStrings.text("coach.evaluation.summary.loadFailed"))
         )
       case .ready:
         editorForm
@@ -53,18 +53,24 @@ struct EvaluationSummaryEditorView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bg)
-    .navigationTitle("评估总结 · \(viewModel.student.displayName)")
+    .navigationTitle(
+      CoachStudentDetailStrings.replacing(
+        "coach.evaluation.summary.navigationTitle",
+        ["student": viewModel.student.displayName])
+    )
     .task {
       if viewModel.state == .loading {
         await viewModel.load()
       }
     }
     .alert(
-      "评估完成,\(viewModel.student.displayName) 已收到通知。",
+      CoachStudentDetailStrings.replacing(
+        "coach.evaluation.summary.completedAlert",
+        ["student": viewModel.student.displayName]),
       isPresented: Bindable(viewModel).showSoftRecommendation
     ) {
-      Button("稍后", role: .cancel) {}
-      Button("立即排") {
+      Button(CoachStudentDetailStrings.text("coach.evaluation.summary.later"), role: .cancel) {}
+      Button(CoachStudentDetailStrings.text("coach.evaluation.summary.planNow")) {
         Task {
           let profile = await viewModel.fetchPrefillProfile()
           planningIntent = PlanningIntentBox(
@@ -72,7 +78,7 @@ struct EvaluationSummaryEditorView: View {
         }
       }
     } message: {
-      Text("要不要立即为他排第一份正式计划?")
+      Text(CoachStudentDetailStrings.text("coach.evaluation.summary.planPrompt"))
     }
     #if os(iOS)
       .fullScreenCover(item: $planningIntent) { box in
@@ -108,17 +114,17 @@ struct EvaluationSummaryEditorView: View {
         }
 
         fieldCard(
-          title: "整体评估 · 必填",
+          title: CoachStudentDetailStrings.text("coach.evaluation.summary.overall"),
           text: Bindable(viewModel).overallAssessment,
           minHeight: 104
         )
         fieldCard(
-          title: "训练规划 · 必填",
+          title: CoachStudentDetailStrings.text("coach.evaluation.summary.trainingPlan"),
           text: Bindable(viewModel).trainingPlanText,
           minHeight: 104
         )
         fieldCard(
-          title: "给学员的话 · 选填",
+          title: CoachStudentDetailStrings.text("coach.evaluation.summary.words"),
           text: Bindable(viewModel).wordsToStudent,
           minHeight: 84
         )
@@ -138,7 +144,7 @@ struct EvaluationSummaryEditorView: View {
       if viewModel.isEditMode {
         notifyToggleRow
         PrimaryButton(
-          "保存",
+          CoachStudentDetailStrings.text("coach.common.save"),
           isDisabled: !viewModel.canSave || viewModel.isSaving,
           isFullWidth: true
         ) {
@@ -148,7 +154,7 @@ struct EvaluationSummaryEditorView: View {
         // Mock: a single high-contrast "完成 + 通知学员" primary, with
         // "保存草稿" demoted to a tertiary text action below it.
         PrimaryButton(
-          "完成并通知学员",
+          CoachStudentDetailStrings.text("coach.evaluation.summary.completeNotify"),
           isDisabled: !viewModel.canSave || viewModel.isSaving,
           isFullWidth: true
         ) {
@@ -158,7 +164,7 @@ struct EvaluationSummaryEditorView: View {
         Button {
           Task { _ = await viewModel.save() }
         } label: {
-          Text("保存草稿")
+          Text(CoachStudentDetailStrings.text("coach.evaluation.summary.saveDraft"))
             .font(.system(size: 14))
             .foregroundStyle(Color.MeetPR.fgTertiary)
             .frame(maxWidth: .infinity)
@@ -173,10 +179,14 @@ struct EvaluationSummaryEditorView: View {
     .padding(.top, MeetPRSpacing.sm)
 
     if let savedAt = viewModel.lastSavedAt {
-      Text("已保存 \(CoachStudentFormatting.relativeText(savedAt))")
-        .font(Font.MeetPR.caption)
-        .foregroundStyle(Color.MeetPR.fgTertiary)
-        .frame(maxWidth: .infinity, alignment: .center)
+      Text(
+        CoachStudentDetailStrings.replacing(
+          "coach.evaluation.summary.saved",
+          ["time": CoachStudentFormatting.relativeText(savedAt)])
+      )
+      .font(Font.MeetPR.caption)
+      .foregroundStyle(Color.MeetPR.fgTertiary)
+      .frame(maxWidth: .infinity, alignment: .center)
     }
   }
 
@@ -196,7 +206,7 @@ struct EvaluationSummaryEditorView: View {
             RoundedRectangle(cornerRadius: 5)
               .stroke(Color.MeetPR.border, lineWidth: viewModel.notifyOnSave ? 0 : 1)
           }
-        Text("同时通知学员")
+        Text(CoachStudentDetailStrings.text("coach.evaluation.summary.notifyStudent"))
           .font(.system(size: 15))
           .foregroundStyle(Color.MeetPR.fgPrimary)
         Spacer()
@@ -205,8 +215,10 @@ struct EvaluationSummaryEditorView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .accessibilityLabel("同时通知学员")
-    .accessibilityValue(viewModel.notifyOnSave ? "已选中" : "未选中")
+    .accessibilityLabel(CoachStudentDetailStrings.text("coach.evaluation.summary.notifyStudent"))
+    .accessibilityValue(
+      CoachStudentDetailStrings.text(
+        viewModel.notifyOnSave ? "coach.common.selected" : "coach.common.notSelected"))
   }
 
   // MARK: - Building blocks

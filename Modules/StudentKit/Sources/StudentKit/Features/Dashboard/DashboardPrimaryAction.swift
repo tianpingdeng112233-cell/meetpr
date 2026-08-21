@@ -11,7 +11,7 @@ struct DashboardPrimaryAction: View {
 
   var body: some View {
     GoldCTA(
-      "开始训练",
+      StudentStrings.localized(.dashboardPrimaryAction001),
       sub: DashboardTodayPresentation.dayName(day),
       variant: .primary,
       icon: .play,
@@ -44,11 +44,15 @@ struct DashboardCompletedAction: View {
         Image(systemName: "checkmark.circle.fill")
           .font(.MeetPR.system(size: MeetPRFontMetrics.size34, weight: .semibold))
           .foregroundStyle(Color.MeetPR.success)
-        Text("\(DashboardTodayPresentation.code(for: completedDay)) 已完成")
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(
+          StudentStrings.replacing(
+            .dashboardPrimaryAction002,
+            values: ["\(DashboardTodayPresentation.code(for: completedDay))"])
+        )
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
         if canUndo {
-          Button("撤销完成 · 仅限今天", action: onUndo)
+          Button(StudentStrings.localized(.dashboardPrimaryAction003), action: onUndo)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
             .foregroundStyle(Color.MeetPR.textMuted)
             .underline()
@@ -63,16 +67,20 @@ struct DashboardCompletedAction: View {
 
       if let nextDay {
         VStack(alignment: .leading, spacing: 8) {
-          Text("下一节 · \(DashboardTodayPresentation.code(for: nextDay))")
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-            .foregroundStyle(Color.MeetPR.gold500)
+          Text(
+            StudentStrings.replacing(
+              .dashboardPrimaryAction004,
+              values: ["\(DashboardTodayPresentation.code(for: nextDay))"])
+          )
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.gold500)
           DashboardSequenceDaySummary(day: nextDay)
         }
         .padding(15)
         .background(Color.MeetPR.bgInset)
         .clipShape(.rect(cornerRadius: 16))
 
-        Button("继续下一节", action: onContinue)
+        Button(StudentStrings.localized(.dashboardPrimaryAction005), action: onContinue)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(maxWidth: .infinity, minHeight: 46)
@@ -94,13 +102,16 @@ struct DashboardCycleCompletedAction: View {
       Image(systemName: "trophy.fill")
         .font(.MeetPR.system(size: MeetPRFontMetrics.size34, weight: .semibold))
         .foregroundStyle(Color.MeetPR.gold500)
-      Text("\(finalWeek) 周计划已全部完成")
+      Text(StudentStrings.replacing(.dashboardPrimaryAction006, values: ["\(finalWeek)"]))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("W1 – W\(finalWeek) · 共 \(ordered.count) 节")
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-        .foregroundStyle(Color.MeetPR.textMuted)
-      Text("下一份计划由教练发布。发布后这里会直接出现 W1D1。")
+      Text(
+        StudentStrings.replacing(
+          .dashboardPrimaryAction007, values: ["\(finalWeek)", "\(ordered.count)"])
+      )
+      .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+      .foregroundStyle(Color.MeetPR.textMuted)
+      Text(StudentStrings.localized(.dashboardPrimaryAction008))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         .foregroundStyle(Color.MeetPR.textSecondary)
         .multilineTextAlignment(.center)
@@ -125,9 +136,13 @@ struct DashboardSequenceDaySummary: View {
       Text(DashboardTodayPresentation.exerciseSummary(day))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textMuted)
-      Text("教练推荐 \(DashboardTodayPresentation.recommendedDateText(day.scheduledDate))")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-        .foregroundStyle(Color.MeetPR.textDim)
+      Text(
+        StudentStrings.replacing(
+          .dashboardPrimaryAction009,
+          values: ["\(DashboardTodayPresentation.recommendedDateText(day.scheduledDate))"])
+      )
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+      .foregroundStyle(Color.MeetPR.textDim)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }

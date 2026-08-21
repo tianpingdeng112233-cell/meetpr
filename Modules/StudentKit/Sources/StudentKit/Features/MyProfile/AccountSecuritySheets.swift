@@ -45,7 +45,10 @@ struct AccountSecuritySection: View {
 
   private var accountRows: some View {
     VStack(spacing: 0) {
-      row(icon: "key", title: "改密码", tint: Color.MeetPR.textSecondary) {
+      row(
+        icon: "key", title: StudentStrings.localized(.accountSecuritySheets001),
+        tint: Color.MeetPR.textSecondary
+      ) {
         changePasswordPresentation = ChangePasswordPresentation(
           viewModel: ChangePasswordViewModel(account: account)
         )
@@ -53,7 +56,10 @@ struct AccountSecuritySection: View {
       .accessibilityIdentifier("account.changePassword")
 
       separator
-      row(icon: "square.and.arrow.up", title: "导出训练数据", tint: Color.MeetPR.textSecondary) {
+      row(
+        icon: "square.and.arrow.up", title: StudentStrings.localized(.accountSecuritySheets002),
+        tint: Color.MeetPR.textSecondary
+      ) {
         let viewModel = ExportDataViewModel(logs: logs, plans: plans)
         exportCleanupViewModel = viewModel
         exportPresentation = ExportPresentation(viewModel: viewModel)
@@ -62,7 +68,10 @@ struct AccountSecuritySection: View {
 
       if showsDeleteAccount {
         separator
-        row(icon: "trash", title: "注销账号", tint: Color.MeetPR.dangerMuted) {
+        row(
+          icon: "trash", title: StudentStrings.localized(.accountSecuritySheets003),
+          tint: Color.MeetPR.dangerMuted
+        ) {
           deleteAccountPresentation = DeleteAccountPresentation(
             viewModel: DeleteAccountViewModel(account: account) {
               await onLogout?()
@@ -101,7 +110,7 @@ struct AccountSecuritySection: View {
   }
 
   private var passwordUpdatedToast: some View {
-    Label("密码已更新,其他设备将退出登录", systemImage: "checkmark.circle.fill")
+    Label(StudentStrings.localized(.accountSecuritySheets004), systemImage: "checkmark.circle.fill")
       .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
       .foregroundStyle(Color.MeetPR.textPrimary)
       .padding(.horizontal, MeetPRSpacing.base)
@@ -209,21 +218,24 @@ struct DeleteAccountSheet: View {
     NavigationStack {
       ScrollView {
         VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-          Text("账号与全部训练数据将永久删除,无法恢复。")
+          Text(StudentStrings.localized(.accountSecuritySheets005))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size17, weight: .semibold))
             .foregroundStyle(Color.MeetPR.textPrimary)
 
           VStack(alignment: .leading, spacing: 6) {
-            bullet("全部训练记录与组数据")
-            bullet("e1RM 历史与 PR")
-            bullet("训练回顾与状态问卷")
-            bullet("个人资料与入门基线")
+            bullet(StudentStrings.localized(.accountSecuritySheets006))
+            bullet(StudentStrings.localized(.accountSecuritySheets007))
+            bullet(StudentStrings.localized(.accountSecuritySheets008))
+            bullet(StudentStrings.localized(.accountSecuritySheets009))
           }
 
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-            Text("输入「\(DeleteAccountViewModel.requiredWord)」以确认")
-              .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
-              .foregroundStyle(Color.MeetPR.textSecondary)
+            Text(
+              StudentStrings.replacing(
+                .accountSecuritySheets010, values: ["\(DeleteAccountViewModel.requiredWord)"])
+            )
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
+            .foregroundStyle(Color.MeetPR.textSecondary)
             TextField(DeleteAccountViewModel.requiredWord, text: $viewModel.confirmationText)
               .textFieldStyle(.roundedBorder)
               .accessibilityIdentifier("account.delete.confirmField")
@@ -236,7 +248,9 @@ struct DeleteAccountSheet: View {
           }
 
           GoldCTA(
-            viewModel.state == .deleting ? "删除中…" : "永久删除我的账号",
+            viewModel.state == .deleting
+              ? StudentStrings.localized(.accountSecuritySheets011)
+              : StudentStrings.localized(.accountSecuritySheets012),
             sub: nil,
             variant: .danger,
             icon: .none,
@@ -250,13 +264,13 @@ struct DeleteAccountSheet: View {
         .padding(MeetPRSpacing.base)
       }
       .background(Color.MeetPR.bgBase)
-      .navigationTitle("注销账号")
+      .navigationTitle(StudentStrings.localized(.accountSecuritySheets003))
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("取消") { dismiss() }
+          Button(StudentStrings.localized(.accountSecuritySheets013)) { dismiss() }
             .disabled(viewModel.state == .deleting)
         }
       }
@@ -283,17 +297,23 @@ struct ChangePasswordSheet: View {
     NavigationStack {
       Form {
         Section {
-          SecureField("旧密码", text: $viewModel.oldPassword)
-            .accessibilityIdentifier("account.password.old")
-          SecureField("新密码(至少 8 位)", text: $viewModel.newPassword)
-            .accessibilityIdentifier("account.password.new")
-          SecureField("再输一次新密码", text: $viewModel.confirmPassword)
-            .accessibilityIdentifier("account.password.confirm")
+          SecureField(
+            StudentStrings.localized(.accountSecuritySheets014), text: $viewModel.oldPassword
+          )
+          .accessibilityIdentifier("account.password.old")
+          SecureField(
+            StudentStrings.localized(.accountSecuritySheets015), text: $viewModel.newPassword
+          )
+          .accessibilityIdentifier("account.password.new")
+          SecureField(
+            StudentStrings.localized(.accountSecuritySheets016), text: $viewModel.confirmPassword
+          )
+          .accessibilityIdentifier("account.password.confirm")
         } footer: {
           if let message = viewModel.localValidationMessage {
             Text(message).foregroundStyle(Color.MeetPR.dangerMuted)
           } else {
-            Text("新密码至少 8 位")
+            Text(StudentStrings.localized(.accountSecuritySheets017))
           }
         }
 
@@ -303,7 +323,9 @@ struct ChangePasswordSheet: View {
         }
 
         GoldCTA(
-          viewModel.state == .submitting ? "提交中…" : "确认修改",
+          viewModel.state == .submitting
+            ? StudentStrings.localized(.accountSecuritySheets018)
+            : StudentStrings.localized(.accountSecuritySheets019),
           sub: nil,
           icon: .none,
           isDisabled: !viewModel.canSubmit,
@@ -320,13 +342,13 @@ struct ChangePasswordSheet: View {
       }
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bgBase)
-      .navigationTitle("改密码")
+      .navigationTitle(StudentStrings.localized(.accountSecuritySheets001))
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("取消") { dismiss() }
+          Button(StudentStrings.localized(.accountSecuritySheets013)) { dismiss() }
             .disabled(viewModel.state == .submitting)
         }
       }

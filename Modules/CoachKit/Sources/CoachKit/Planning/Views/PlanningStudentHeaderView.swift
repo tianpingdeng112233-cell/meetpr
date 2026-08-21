@@ -26,7 +26,7 @@ struct PlanningStudentHeaderView: View {
 
           Spacer()
 
-          Button(isExpanded ? "收起" : "展开") {
+          Button(isExpanded ? CoachPlanningStrings.collapse : CoachPlanningStrings.expand) {
             isExpanded.toggle()
           }
           .font(Font.MeetPR.footnote)
@@ -57,7 +57,7 @@ struct PlanningStudentHeaderView: View {
       }
       .font(Font.MeetPR.footnote)
     } else {
-      Text("学员资料加载中或暂未填写")
+      Text(CoachPlanningStrings.profileUnavailable)
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.fgTertiary)
     }
@@ -66,28 +66,33 @@ struct PlanningStudentHeaderView: View {
   private func detailRows(_ profile: OnboardingProfile) -> [DetailRow] {
     var rows: [DetailRow] = []
     if let basics = StudentProfileSummary.basics(profile) {
-      rows.append(DetailRow(label: "基础", value: basics))
+      rows.append(DetailRow(label: CoachPlanningStrings.basic, value: basics))
     }
     if let oneRMs = StudentProfileSummary.oneRMs(profile) {
       rows.append(DetailRow(label: "1RM", value: oneRMs))
     }
     if let days = StudentProfileSummary.trainingDays(profile) {
-      rows.append(DetailRow(label: "训练日", value: days))
+      rows.append(DetailRow(label: CoachPlanningStrings.trainingDays, value: days))
     }
     if let gym = StudentProfileSummary.gym(profile) {
-      rows.append(DetailRow(label: "场地", value: gym))
+      rows.append(DetailRow(label: CoachPlanningStrings.venue, value: gym))
     }
     if let injuries = StudentProfileSummary.injuries(profile) {
-      rows.append(DetailRow(label: "伤病", value: injuries))
+      rows.append(DetailRow(label: CoachPlanningStrings.injuries, value: injuries))
     }
     if let meet = StudentProfileSummary.competition(profile) {
-      rows.append(DetailRow(label: "比赛", value: meet))
+      rows.append(DetailRow(label: CoachPlanningStrings.competition, value: meet))
     }
     if let note = StudentProfileSummary.noteToCoach(profile) {
-      rows.append(DetailRow(label: "留言", value: note))
+      rows.append(DetailRow(label: CoachPlanningStrings.note, value: note))
     }
     if rows.isEmpty {
-      rows.append(DetailRow(label: "资料", value: "学员尚未填写详细资料"))
+      rows.append(
+        DetailRow(
+          label: CoachPlanningStrings.profile,
+          value: CoachPlanningStrings.profileNotCompleted
+        )
+      )
     }
     return rows
   }
@@ -95,9 +100,9 @@ struct PlanningStudentHeaderView: View {
   private var statusSummary: String {
     switch student.status {
     case .inEvaluation(let days, let hours):
-      "评估期 \(days) 天 \(hours) 时剩"
+      CoachPlanningStrings.evaluationRemaining(days: days, hours: hours)
     case .active:
-      "活跃"
+      CoachPlanningStrings.active
     case .abnormal(let reason):
       PlanningDisplay.abnormalReason(reason)
     }

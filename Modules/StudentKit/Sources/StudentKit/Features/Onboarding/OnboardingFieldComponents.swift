@@ -161,7 +161,7 @@ struct OnboardingScalePicker: View {
   }
 
   private var currentLabel: String {
-    guard let notch else { return "请选择" }
+    guard let notch else { return StudentStrings.localized(.onboardingFieldComponents001) }
     return OnboardingLabels.scaleLabel(labels, notch: notch)
   }
 

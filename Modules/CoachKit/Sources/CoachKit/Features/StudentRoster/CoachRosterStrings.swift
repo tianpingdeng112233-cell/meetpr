@@ -15,22 +15,30 @@ enum CoachRosterStrings {
   static let rejectConfirmation = CoachLocalization.localized("coach.roster.rejectConfirmation")
 
   static func weekProgress(completed: Int, planned: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.roster.weekProgress",
-      values: ["completed": completed.formatted(), "planned": planned.formatted()]
-    )
+    CoachLocalization.localized("coach.roster.weekProgress \(completed) \(planned)")
   }
 
   static func notTrainedReason(_ daysMissed: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.roster.notTrainedReason",
-      values: ["days": daysMissed.formatted()]
-    )
+    CoachLocalization.localized("coach.roster.notTrainedReason \(daysMissed)")
   }
 
   static func waitingForReplyReason() -> String {
     CoachLocalization.localized("coach.roster.waitingForReplyReason")
   }
+
+  static func age(_ count: Int) -> String {
+    CoachLocalization.localized("coach.roster.age \(count)")
+  }
+
+  static func triageMissed(_ days: Int) -> String {
+    CoachLocalization.localized("coach.roster.triage.missed \(days)")
+  }
+
+  static func triageMissedAwaitingReply(_ days: Int) -> String {
+    CoachLocalization.localized("coach.roster.triage.missedAwaitingReply \(days)")
+  }
+
+  static let triageNewRecord = CoachLocalization.localized("coach.roster.triage.newRecord")
 
   static func newStudentRequests(_ count: Int) -> String {
     sectionCount(
@@ -48,10 +56,7 @@ enum CoachRosterStrings {
   }
 
   private static func sectionCount(title: String, count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.roster.sectionCount",
-      values: ["title": title, "count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.roster.sectionCount \(title) \(count)")
   }
 
 }

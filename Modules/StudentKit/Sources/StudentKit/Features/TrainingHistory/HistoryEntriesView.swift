@@ -9,7 +9,8 @@ struct HistoryEntriesView: View {
   @Binding var selectedExerciseName: String?
 
   static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
-    "第 \(SetIndexDisplay.number(forZeroBasedIndex: setIndex)) 组"
+    StudentStrings.replacing(
+      .historyEntriesView001, values: ["\(SetIndexDisplay.number(forZeroBasedIndex: setIndex))"])
   }
 
   var body: some View {
@@ -22,7 +23,7 @@ struct HistoryEntriesView: View {
 
         ForEach(filteredWeeks) { week in
           VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-            Text("第 \(week.id) 周")
+            Text(StudentStrings.replacing(.historyEntriesView002, values: ["\(week.id)"]))
               .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
               .foregroundStyle(Color.MeetPR.textPrimary)
 
@@ -40,7 +41,7 @@ struct HistoryEntriesView: View {
   private var exerciseNames: [String] {
     let names = weeks.flatMap { week in
       week.days.flatMap { day in
-        day.exercises.map { $0.exercise.name }
+        day.exercises.map { StudentExerciseName.display($0.exercise) }
       }
     }
     return Array(Set(names)).sorted {
@@ -52,7 +53,9 @@ struct HistoryEntriesView: View {
     guard let selectedExerciseName else { return weeks }
     return weeks.compactMap { week in
       let filteredDays = week.days.filter { day in
-        day.exercises.contains { $0.exercise.name == selectedExerciseName }
+        day.exercises.contains {
+          StudentExerciseName.display($0.exercise) == selectedExerciseName
+        }
       }
       guard !filteredDays.isEmpty else { return nil }
       return TrainingHistoryViewModel.HistoryWeek(id: week.id, days: filteredDays)
@@ -83,7 +86,7 @@ struct HistoryEntriesView: View {
   private func exerciseBlock(_ exercise: StudentPlanExercise, logs: [StudentSetLog]) -> some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Divider().overlay(Color.MeetPR.borderDefault)
-      Text(exercise.exercise.name)
+      Text(StudentExerciseName.display(exercise.exercise))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
 
@@ -271,22 +274,25 @@ private struct HistoryDayHeader: View {
   var body: some View {
     HStack(alignment: .firstTextBaseline) {
       VStack(alignment: .leading, spacing: 2) {
-        Text(StudentFormatting.dayMonthFormatter.string(from: day.date))
+        Text(StudentFormatting.dayMonth(day.date))
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size17, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textPrimary)
-        Text(StudentFormatting.weekdayFormatter.string(from: day.date))
+        Text(StudentFormatting.weekday(day.date))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
           .foregroundStyle(Color.MeetPR.textSecondary)
       }
       Spacer()
       if day.exercises.isEmpty {
-        Text("休息日")
+        Text(StudentStrings.localized(.historyEntriesView003))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
           .foregroundStyle(Color.MeetPR.textMuted)
       } else {
-        Text("\(progress.completed)/\(progress.total) 组")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
-          .foregroundStyle(progressColor)
+        Text(
+          StudentStrings.replacing(
+            .historyEntriesView004, values: ["\(progress.completed)", "\(progress.total)"])
+        )
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(progressColor)
       }
     }
   }

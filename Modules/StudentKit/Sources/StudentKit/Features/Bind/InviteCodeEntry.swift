@@ -80,9 +80,11 @@ struct InviteCodeEntry: View {
           .foregroundStyle(.clear)
           .tint(.clear)
           .focused($isFocused)
-          .accessibilityLabel("邀请码")
-          .accessibilityValue(code.isEmpty ? "未输入" : code)
-          .accessibilityHint("输入 \(InviteCodeFormat.length) 位邀请码,不含 I、O、0、1")
+          .accessibilityLabel(StudentStrings.localized(.inviteCodeEntry001))
+          .accessibilityValue(code.isEmpty ? StudentStrings.localized(.inviteCodeEntry002) : code)
+          .accessibilityHint(
+            StudentStrings.replacing(.inviteCodeEntry003, values: ["\(InviteCodeFormat.length)"])
+          )
           #if os(iOS)
             .keyboardType(.asciiCapable)
             .textInputAutocapitalization(.characters)
@@ -95,18 +97,19 @@ struct InviteCodeEntry: View {
       HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
         // Keeps the alphabet constraint visible: `EnterCodeViewModel` rejects
         // I/O/0/1, and "字母数字" alone would imply they are allowed.
-        Text("\(InviteCodeFormat.length) 位字母数字,不含 I、O、0、1")
+        Text(StudentStrings.replacing(.inviteCodeEntry004, values: ["\(InviteCodeFormat.length)"]))
           .font(Font.MeetPR.body(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textMuted)
 
         Spacer(minLength: MeetPRSpacing.space2)
 
         Button(action: onPaste) {
-          Label("从剪贴板粘贴", systemImage: "doc.on.clipboard")
+          Label(StudentStrings.localized(.inviteCodeEntry005), systemImage: "doc.on.clipboard")
             .font(Font.MeetPR.body(size: 12.5, weight: .semibold))
             .foregroundStyle(Color.MeetPR.goldText)
         }
-        .accessibilityHint("粘贴有效的 \(InviteCodeFormat.length) 位邀请码")
+        .accessibilityHint(
+          StudentStrings.replacing(.inviteCodeEntry006, values: ["\(InviteCodeFormat.length)"]))
       }
 
       if let pasteError {

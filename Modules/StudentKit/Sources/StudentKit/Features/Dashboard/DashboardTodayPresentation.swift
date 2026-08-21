@@ -65,19 +65,20 @@ enum DashboardTodayPresentation {
   static func recommendedDateText(_ date: Date) -> String {
     let components = PlanCalendarDayIdentity.utcCalendar.dateComponents([.month, .day], from: date)
     guard let month = components.month, let day = components.day else { return "" }
-    return "\(month)月\(day)日"
+    return StudentStrings.replacing(.dashboardTodayPresentation001, values: ["\(month)", "\(day)"])
   }
 
   static func dayName(_ day: StudentPlanDay) -> String {
     let families = MainLiftExerciseFamilyResolver.families(in: day)
     let liftName = liftSubtitle(families)
-    return liftName.isEmpty ? "训练日" : liftName
+    return liftName.isEmpty ? StudentStrings.localized(.dashboardTodayPresentation002) : liftName
   }
 
   static func exerciseSummary(_ day: StudentPlanDay) -> String {
     let exerciseCount = day.exercises.count
     let setCount = day.exercises.reduce(0) { $0 + $1.prescribedSets.count }
-    return "\(exerciseCount) 个动作 · \(setCount) 组"
+    return StudentStrings.replacing(
+      .dashboardTodayPresentation003, values: ["\(exerciseCount)", "\(setCount)"])
   }
 
   static func completedToday(
@@ -97,13 +98,14 @@ enum DashboardTodayPresentation {
   ) -> String {
     let components = calendar.dateComponents([.month, .day], from: date)
     guard let month = components.month, let day = components.day else { return "" }
-    return "\(month)月\(day)日"
+    return StudentStrings.replacing(.dashboardTodayPresentation001, values: ["\(month)", "\(day)"])
   }
 
   static func headerDateText(_ date: Date, calendar: Calendar) -> String {
     let monthDay = monthDayText(date, calendar: calendar)
     let offset = mondayOffset(for: date, calendar: calendar)
-    return "\(monthDay) · 星期\(weekdayLetter(offset))"
+    return StudentStrings.replacing(
+      .dashboardTodayPresentation004, values: ["\(monthDay)", "\(weekdayLetter(offset))"])
   }
 
   static func mondayOffset(for date: Date, calendar: Calendar) -> Int {
@@ -112,22 +114,30 @@ enum DashboardTodayPresentation {
   }
 
   static func weekdayLetter(_ offset: Int) -> String {
-    ["一", "二", "三", "四", "五", "六", "日"][min(max(offset, 0), 6)]
+    [
+      StudentStrings.localized(.dashboardTodayPresentation005),
+      StudentStrings.localized(.dashboardTodayPresentation006),
+      StudentStrings.localized(.dashboardTodayPresentation007),
+      StudentStrings.localized(.dashboardTodayPresentation008),
+      StudentStrings.localized(.dashboardTodayPresentation009),
+      StudentStrings.localized(.dashboardTodayPresentation010),
+      StudentStrings.localized(.dashboardTodayPresentation011),
+    ][min(max(offset, 0), 6)]
   }
 
   static func liftFullName(_ family: LiftFamily) -> String {
     switch family {
-    case .squat: "深蹲"
-    case .bench: "卧推"
-    case .deadlift: "硬拉"
+    case .squat: StudentStrings.localized(.dashboardTodayPresentation012)
+    case .bench: StudentStrings.localized(.dashboardTodayPresentation013)
+    case .deadlift: StudentStrings.localized(.dashboardTodayPresentation014)
     }
   }
 
   static func liftShortName(_ family: LiftFamily) -> String {
     switch family {
-    case .squat: "蹲"
-    case .bench: "推"
-    case .deadlift: "拉"
+    case .squat: StudentStrings.localized(.dashboardTodayPresentation015)
+    case .bench: StudentStrings.localized(.dashboardTodayPresentation016)
+    case .deadlift: StudentStrings.localized(.dashboardTodayPresentation017)
     }
   }
 
@@ -142,7 +152,9 @@ enum DashboardTodayPresentation {
   static func liftSubtitle(_ families: [LiftFamily]) -> String {
     switch families.count {
     case 0: ""
-    case 1, 2: families.map(liftFullName).joined(separator: "、") + "日"
+    case 1, 2:
+      StudentStrings.listSeparated(families.map(liftFullName))
+        + StudentStrings.localized(.dashboardTodayPresentation011)
     default: families.map(liftShortName).joined(separator: "·")
     }
   }

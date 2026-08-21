@@ -23,14 +23,14 @@ struct ExerciseMatchSection: View {
       }
 
       if let boundName {
-        Text("已绑定：\(boundName)")
+        Text(CoachImportStrings.boundTo(boundName))
           .font(.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
 
       if exercise.boundExerciseID == nil {
         if candidates.isEmpty {
-          Text("库里没有相近动作——本组导入需要先在库里有它。")
+          Text(CoachImportStrings.noSimilarExercise)
             .font(.caption)
             .foregroundStyle(Color.MeetPR.fgSecondary)
         } else {
@@ -41,7 +41,7 @@ struct ExerciseMatchSection: View {
                   exercise.boundExerciseID = candidate.id
                   exercise.isMainLift = candidate.mainLiftFamily != nil
                 } label: {
-                  Text(candidate.name)
+                  Text(CoachLocalization.exerciseName(candidate))
                     .font(.caption.bold())
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
@@ -61,11 +61,14 @@ struct ExerciseMatchSection: View {
   private var statusBadge: some View {
     Group {
       if ImportCompleteness.isComplete(exercise) {
-        badge("可发布", color: Color.MeetPR.green, soft: Color.MeetPR.greenSoft)
+        badge(
+          CoachImportStrings.publishable, color: Color.MeetPR.green, soft: Color.MeetPR.greenSoft)
       } else if exercise.boundExerciseID == nil {
-        badge("待绑定", color: Color.MeetPR.amber, soft: Color.MeetPR.amberSoft)
+        badge(
+          CoachImportStrings.needsBinding, color: Color.MeetPR.amber, soft: Color.MeetPR.amberSoft)
       } else {
-        badge("待补值", color: Color.MeetPR.amber, soft: Color.MeetPR.amberSoft)
+        badge(
+          CoachImportStrings.needsValues, color: Color.MeetPR.amber, soft: Color.MeetPR.amberSoft)
       }
     }
   }

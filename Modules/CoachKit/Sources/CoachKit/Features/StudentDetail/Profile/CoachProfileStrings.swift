@@ -27,9 +27,6 @@ enum CoachProfileStrings {
   }
 
   static func weeklyFrequency(_ count: Int) -> String {
-    CoachLocalization.replacing(
-      "coach.profile.weeklyFrequency",
-      values: ["count": count.formatted()]
-    )
+    CoachLocalization.localized("coach.profile.weeklyFrequency \(count)")
   }
 }

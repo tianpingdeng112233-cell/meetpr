@@ -153,7 +153,7 @@ import Testing
     now: CoachStudentFeatureFixtures.startDate
   )
 
-  #expect(viewModel.state == .failed("成长曲线加载失败，请稍后重试"))
+  #expect(viewModel.state == .failed(CoachStudentDetailStrings.text("coach.growth.error.load")))
   #expect(viewModel.visiblePoints.isEmpty)
 }
 

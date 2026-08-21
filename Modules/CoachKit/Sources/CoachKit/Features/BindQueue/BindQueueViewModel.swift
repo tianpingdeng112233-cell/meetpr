@@ -71,7 +71,9 @@ final class BindQueueViewModel {
       )
       items.removeAll { $0.id == item.id }
       toastMessage =
-        outcome.evaluation == nil ? "已接收" : "已接收,评估期 7 天开始"
+        outcome.evaluation == nil
+        ? CoachBindStrings.text("coach.bind.accepted")
+        : CoachBindStrings.text("coach.bind.acceptedEvaluation")
       Analytics.shared.coachIntakeAction(
         skipEvaluation ? .acceptedSkip : .acceptedEvaluation,
         studentID: item.studentId)
@@ -81,7 +83,7 @@ final class BindQueueViewModel {
       await refresh()
       return false
     } catch {
-      bannerMessage = "网络异常,请稍后重试"
+      bannerMessage = CoachBindStrings.text("coach.bind.error.network")
       return false
     }
   }
@@ -99,16 +101,16 @@ final class BindQueueViewModel {
       await refresh()
       return false
     } catch {
-      bannerMessage = "网络异常,请稍后重试"
+      bannerMessage = CoachBindStrings.text("coach.bind.error.network")
       return false
     }
   }
 
   static func bannerText(for error: CoachBindQueueError) -> String {
     switch error {
-    case .expired: "该请求已过期"
-    case .notPending, .notFound: "该请求已被处理"
-    case .alreadyBound: "你们已是绑定关系"
+    case .expired: CoachBindStrings.text("coach.bind.error.expired")
+    case .notPending, .notFound: CoachBindStrings.text("coach.bind.error.processed")
+    case .alreadyBound: CoachBindStrings.text("coach.bind.error.alreadyBound")
     }
   }
 }

@@ -20,21 +20,25 @@ public struct Step2AssignFrequencyView: View {
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Eyebrow("STEP 2")
-          Text("定 SBD 频率")
+          Text(CoachPlanningStrings.sbdFrequencyTitle)
             .font(Font.MeetPR.title2)
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
 
         HStack(spacing: MeetPRSpacing.sm) {
-          SecondaryButton("使用模板", isDisabled: true, isFullWidth: true) {}
-          SecondaryButton("复制上周", isDisabled: true, isFullWidth: true) {}
+          SecondaryButton(CoachPlanningStrings.useTemplate, isDisabled: true, isFullWidth: true) {}
+          SecondaryButton(
+            CoachPlanningStrings.copyLastWeek,
+            isDisabled: true,
+            isFullWidth: true
+          ) {}
         }
 
-        Eyebrow("或从零开始")
+        Eyebrow(CoachPlanningStrings.startFromScratch)
 
         Card(accessibilityLabel: "Training days") {
           VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-            Text("训练日")
+            Text(CoachPlanningStrings.trainingDays)
               .font(Font.MeetPR.bodyEmphasis)
               .foregroundStyle(Color.MeetPR.fgPrimary)
             Text(trainingDaySummary)
@@ -44,12 +48,12 @@ public struct Step2AssignFrequencyView: View {
         }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-          Text("三大项每周各练几次？")
+          Text(CoachPlanningStrings.weeklyLiftFrequencyPrompt)
             .font(Font.MeetPR.headline)
             .foregroundStyle(Color.MeetPR.fgPrimary)
 
           FrequencyControl(
-            title: "深蹲",
+            title: CoachPlanningStrings.squat,
             value: viewModel.sbdFrequency.squat,
             maxFrequency: maxFrequency
           ) { delta in
@@ -57,7 +61,7 @@ public struct Step2AssignFrequencyView: View {
           }
 
           FrequencyControl(
-            title: "卧推",
+            title: CoachPlanningStrings.benchPress,
             value: viewModel.sbdFrequency.bench,
             maxFrequency: maxFrequency
           ) { delta in
@@ -65,7 +69,7 @@ public struct Step2AssignFrequencyView: View {
           }
 
           FrequencyControl(
-            title: "硬拉",
+            title: CoachPlanningStrings.deadlift,
             value: viewModel.sbdFrequency.deadlift,
             maxFrequency: maxFrequency
           ) { delta in
@@ -74,7 +78,7 @@ public struct Step2AssignFrequencyView: View {
         }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-          Text("分配到训练日")
+          Text(CoachPlanningStrings.assignToTrainingDays)
             .font(Font.MeetPR.headline)
             .foregroundStyle(Color.MeetPR.fgPrimary)
 
@@ -84,7 +88,7 @@ public struct Step2AssignFrequencyView: View {
         }
 
         PrimaryButton(
-          "下一步",
+          CoachPlanningStrings.next,
           isDisabled: !viewModel.isCurrentStepValid,
           isFullWidth: true
         ) {
@@ -96,15 +100,15 @@ public struct Step2AssignFrequencyView: View {
       .padding(MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
-    .navigationTitle("频率分配")
+    .navigationTitle(CoachPlanningStrings.frequencyNavigationTitle)
   }
 
   private var trainingDaySummary: String {
     let count = viewModel.assignmentDisplayDays.count
-    guard viewModel.preferredTrainingDays.isEmpty else {
-      return "每周 \(count) 个训练日 · 来自学员资料"
-    }
-    return "每周 \(count) 个训练日"
+    return CoachPlanningStrings.trainingDayCount(
+      count,
+      fromProfile: !viewModel.preferredTrainingDays.isEmpty
+    )
   }
 
   private func adjust(_ family: LiftFamily, by delta: Int) {
@@ -157,7 +161,7 @@ private struct FrequencyControl: View {
         .buttonStyle(.bordered)
         .disabled(value <= 0)
 
-        Text("\(value) 次/周")
+        Text(CoachPlanningStrings.sessionsPerWeek(value))
           .font(Font.MeetPR.bodyEmphasis)
           .monospacedDigit()
           .foregroundStyle(Color.MeetPR.fgPrimary)
@@ -191,7 +195,10 @@ private struct AssignmentDayCard: View {
 
           Spacer()
 
-          StatusBadge(status: .pending, title: "\(viewModel.assignedCount(for: dayOfWeek)) 项")
+          StatusBadge(
+            status: .pending,
+            title: CoachPlanningStrings.itemCount(viewModel.assignedCount(for: dayOfWeek))
+          )
         }
 
         HStack(spacing: MeetPRSpacing.sm) {

@@ -92,7 +92,14 @@ public struct StatTile: View {
     .clipShape(.rect(cornerRadius: MeetPRRadius.card))
     .shadow(color: Color.MeetPR.cardShadow, radius: 9, y: 4)
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel("\(label)，\(value) \(unit)\(delta.isEmpty ? "" : "，变化 \(delta)")")
+    .accessibilityLabel(
+      DesignSystemStrings.statAccessibilityLabel(
+        label: label,
+        value: value,
+        unit: unit,
+        delta: delta.isEmpty ? "" : DesignSystemStrings.statChange(delta)
+      )
+    )
   }
 
   private var valueColor: Color {
@@ -117,10 +124,16 @@ public struct StatTile: View {
 
 #Preview("StatTile · All Accents · Dark") {
   LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: MeetPRSpacing.point10) {
-    StatTile(label: "体重", value: "83", unit: "kg", delta: "-0.4")
-    StatTile(label: "距比赛", value: "3", unit: "天", accent: .gold)
-    StatTile(label: "连胜", value: "12", unit: "次", delta: "+2", accent: .success)
-    StatTile(label: "漏练", value: "1", unit: "次", accent: .danger)
+    StatTile(label: DesignSystemStrings.bodyWeight, value: "83", unit: "kg", delta: "-0.4")
+    StatTile(
+      label: DesignSystemStrings.daysUntilMeet, value: "3", unit: DesignSystemStrings.daysUnit,
+      accent: .gold)
+    StatTile(
+      label: DesignSystemStrings.streak, value: "12", unit: DesignSystemStrings.timesUnit,
+      delta: "+2", accent: .success)
+    StatTile(
+      label: DesignSystemStrings.missedWorkout, value: "1", unit: DesignSystemStrings.timesUnit,
+      accent: .danger)
   }
   .padding()
   .background(Color.MeetPR.bgInset)
@@ -129,10 +142,16 @@ public struct StatTile: View {
 
 #Preview("StatTile · All Accents · Light") {
   LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: MeetPRSpacing.point10) {
-    StatTile(label: "体重", value: "83", unit: "kg", delta: "-0.4")
-    StatTile(label: "距比赛", value: "3", unit: "天", accent: .gold)
-    StatTile(label: "连胜", value: "12", unit: "次", delta: "+2", accent: .success)
-    StatTile(label: "漏练", value: "1", unit: "次", accent: .danger)
+    StatTile(label: DesignSystemStrings.bodyWeight, value: "83", unit: "kg", delta: "-0.4")
+    StatTile(
+      label: DesignSystemStrings.daysUntilMeet, value: "3", unit: DesignSystemStrings.daysUnit,
+      accent: .gold)
+    StatTile(
+      label: DesignSystemStrings.streak, value: "12", unit: DesignSystemStrings.timesUnit,
+      delta: "+2", accent: .success)
+    StatTile(
+      label: DesignSystemStrings.missedWorkout, value: "1", unit: DesignSystemStrings.timesUnit,
+      accent: .danger)
   }
   .padding()
   .background(Color.MeetPR.bgBase)

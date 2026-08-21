@@ -133,7 +133,9 @@ public final class PlanningViewModel {
       if lhsCount != rhsCount {
         return lhsCount > rhsCount
       }
-      return lhs.name.localizedStandardCompare(rhs.name) == .orderedAscending
+      return CoachLocalization.exerciseName(lhs).localizedStandardCompare(
+        CoachLocalization.exerciseName(rhs)
+      ) == .orderedAscending
     }
   }
 
@@ -416,7 +418,10 @@ public final class PlanningViewModel {
   }
 
   public func exerciseName(for exerciseID: UUID) -> String {
-    accessoryCatalogByID[exerciseID]?.name ?? "未知动作"
+    guard let exercise = accessoryCatalogByID[exerciseID] else {
+      return CoachPlanningStrings.unknownExercise
+    }
+    return CoachLocalization.exerciseName(exercise)
   }
 
   public func accessoryExercise(for exerciseID: UUID) -> Exercise? {
@@ -470,11 +475,16 @@ public final class PlanningViewModel {
       let label = dayLabel(day.dayOfWeek)
       let mains = day.draftExercises.filter(\.isMainLift)
       if mains.isEmpty {
-        issues.append("\(label):未选主项")
+        issues.append(CoachPlanningStrings.missingMainLift(day: label))
       }
       for exercise in sortedExercises(in: day) {
         guard let spec = w1SetSpecs[exercise.id], spec.isCoachComplete else {
-          issues.append("\(label) · \(exerciseName(for: exercise)):未设重量/强度")
+          issues.append(
+            CoachPlanningStrings.missingIntensity(
+              day: label,
+              exercise: exerciseName(for: exercise)
+            )
+          )
           continue
         }
       }
@@ -539,7 +549,10 @@ public final class PlanningViewModel {
   }
 
   public func exerciseName(for draftExercise: DraftPlanExercise) -> String {
-    catalogExercise(for: draftExercise)?.name ?? "未知动作"
+    guard let exercise = catalogExercise(for: draftExercise) else {
+      return CoachPlanningStrings.unknownExercise
+    }
+    return CoachLocalization.exerciseName(exercise)
   }
 
   public func oneRM(for draftExercise: DraftPlanExercise) -> Decimal? {
@@ -587,7 +600,7 @@ public final class PlanningViewModel {
       bases.append(
         WeightEntryBase(
           id: "main-\(exercise.id.uuidString)",
-          label: "主项·\(exerciseName(for: exercise))",
+          label: CoachPlanningStrings.mainLiftBase(exerciseName(for: exercise)),
           amount: spec.targetValue
         )
       )
@@ -856,7 +869,7 @@ public final class PlanningViewModel {
       return
     }
     guard let draftPlan, let student = selectedStudent else {
-      publishError = "缺少计划或学员信息,无法发布"
+      publishError = CoachPlanningStrings.missingPlanInformation
       return
     }
     isPublishing = true
@@ -880,7 +893,9 @@ public final class PlanningViewModel {
       didFinish = true
       Analytics.shared.coachPlanAssigned(studentID: student.id)
     } catch {
-      publishError = PlanPublishErrorMapping.bannerMessage(for: error) ?? "发布失败,请稍后重试"
+      publishError =
+        PlanPublishErrorMapping.bannerMessage(for: error)
+        ?? CoachPlanningStrings.genericPublishFailed
     }
   }
 }
@@ -991,10 +1006,12 @@ extension PlanningViewModel {
         to: startDate
       ) ?? startDate
 
+    // Locale-stable generated draft canonical. Presentation localizes this
+    // known shape in `PlanningWorkspaceSummary` without mutating storage.
     let planName =
       planKind == .adaptation
-      ? "\(selectedStudent.displayName) 适应周"
-      : "\(selectedStudent.displayName) \(planWeeks) 周计划"
+      ? "\(selectedStudent.displayName) \u{9002}\u{5E94}\u{5468}"
+      : "\(selectedStudent.displayName) \(planWeeks) \u{5468}\u{8BA1}\u{5212}"
     let draft =
       draftPlan
       ?? DraftTrainingPlan(

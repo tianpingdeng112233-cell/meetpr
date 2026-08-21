@@ -1,7 +1,18 @@
 import Foundation
 
+public enum MeetPRBuildTrack: Sendable, Equatable {
+  case china
+  case global
+}
+
 public enum BuildConfig {
+  static let buildTrackInfoDictionaryKey = "MeetPRBuildTrack"
+
   public static let productionBackendBaseURL = "http://121.40.160.241:3000"
+
+  public static var buildTrack: MeetPRBuildTrack {
+    buildTrack(infoDictionary: Bundle.main.infoDictionary)
+  }
 
   public static var backendBaseURL: URL {
     backendBaseURL(environment: ProcessInfo.processInfo.environment)
@@ -32,5 +43,12 @@ public enum BuildConfig {
       return nil
     }
     return URL(string: baseURLString)
+  }
+
+  static func buildTrack(infoDictionary: [String: Any]?) -> MeetPRBuildTrack {
+    guard infoDictionary?[buildTrackInfoDictionaryKey] as? String == "Global" else {
+      return .china
+    }
+    return .global
   }
 }

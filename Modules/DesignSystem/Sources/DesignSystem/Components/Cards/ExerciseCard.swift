@@ -187,8 +187,8 @@ public struct ExerciseCard: View {
   private var columnHeaders: some View {
     HStack(spacing: MeetPRSpacing.zero) {
       Text("#").frame(width: 22, alignment: .leading)
-      Text("重量").frame(maxWidth: .infinity, alignment: .leading)
-      Text("次数").frame(maxWidth: .infinity)
+      Text(DesignSystemStrings.weight).frame(maxWidth: .infinity, alignment: .leading)
+      Text(DesignSystemStrings.reps).frame(maxWidth: .infinity)
       Text("RPE").frame(maxWidth: .infinity)
       Color.MeetPR.bgBase.opacity(0).frame(width: 64)
     }
@@ -213,7 +213,7 @@ public struct ExerciseCard: View {
   }
 
   private var progressText: String {
-    "\(completedSets.count) / \(sets.count) 组已记录"
+    DesignSystemStrings.recordedSets(completedSets.count, total: sets.count)
   }
 
   private var summaryText: String {
@@ -227,10 +227,14 @@ public struct ExerciseCard: View {
       return ""
     }
     let failedCount = completedSets.filter { $0.status == .failed }.count
-    let failure = failedCount > 0 ? " · \(failedCount) 组未完成" : ""
+    let failure = failedCount > 0 ? DesignSystemStrings.incompleteSets(failedCount) : ""
     let weight = last.weight.map { "\(numberText($0))kg" } ?? "—"
     let prescription = "\(weight)×\(last.reps) @\(numberText(last.rpe))"
-    return "\(completedSets.count) 组 · \(prescription)\(failure)"
+    return DesignSystemStrings.exerciseSummary(
+      completed: completedSets.count,
+      prescription: prescription,
+      failure: failure
+    )
   }
 
   private func toggle() {

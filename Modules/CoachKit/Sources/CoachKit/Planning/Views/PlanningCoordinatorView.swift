@@ -29,13 +29,13 @@ public struct PlanningCoordinatorView: View {
 
     NavigationStack(path: $viewModel.path) {
       Step0SelectStudentView(viewModel: viewModel)
-        .navigationTitle("新计划")
+        .navigationTitle(CoachPlanningStrings.newPlan)
         .navigationDestination(for: PlanningStep.self) { step in
           destination(for: step)
         }
         .toolbar {
           ToolbarItem(placement: .cancellationAction) {
-            Button("关闭") {
+            Button(CoachPlanningStrings.close) {
               dismiss()
             }
           }

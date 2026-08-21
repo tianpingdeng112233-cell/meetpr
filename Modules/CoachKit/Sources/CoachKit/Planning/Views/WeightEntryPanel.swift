@@ -75,7 +75,7 @@ public struct WeightEntryPanel: View {
       }
       .frame(maxWidth: .infinity)
       .accessibilityElement(children: .combine)
-      .accessibilityLabel("当前重量 \(draft.displayText) kg")
+      .accessibilityLabel(CoachPlanningStrings.currentWeight(draft.displayText))
 
       if !bases.isEmpty {
         baseSection
@@ -84,7 +84,7 @@ public struct WeightEntryPanel: View {
       stepperRow
       padGrid
 
-      PrimaryButton("填入", isFullWidth: true) {
+      PrimaryButton(CoachPlanningStrings.enterWeight, isFullWidth: true) {
         onCommit(draft.value)
         dismiss()
       }
@@ -162,7 +162,7 @@ public struct WeightEntryPanel: View {
         padButton(".") { draft.tapDot() }
         padButton("0") { draft.tapDigit(0) }
         padButton("⌫") { draft.tapBackspace() }
-          .accessibilityLabel("删除")
+          .accessibilityLabel(CoachPlanningStrings.delete)
         operationButton(.add)
       }
     }
@@ -180,7 +180,7 @@ public struct WeightEntryPanel: View {
     .foregroundStyle(Color.MeetPR.brandRed)
     .background(Color.MeetPR.brandRedSoft)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
-    .accessibilityLabel("运算 \(operation.rawValue)")
+    .accessibilityLabel(CoachPlanningStrings.operation(operation.rawValue))
   }
 
   private func padButton(_ label: String, action: @escaping @MainActor () -> Void) -> some View {

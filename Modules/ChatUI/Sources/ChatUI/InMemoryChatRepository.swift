@@ -200,7 +200,8 @@ public actor InMemoryChatRepository: ChatRepository {
       id: conversation.id,
       otherPartyID: conversation.otherPartyID,
       otherPartyName: conversation.otherPartyName,
-      lastMessagePreview: kind == .image ? "[图片]" : text.map { String($0.prefix(80)) },
+      lastMessagePreview:
+        kind == .image ? ChatStrings.imageSourceMarker : text.map { String($0.prefix(80)) },
       lastMessageAt: createdAt,
       unreadCount: unreadCount(in: conversationID, after: conversation.myLastRead?.seq ?? 0),
       myLastRead: conversation.myLastRead,

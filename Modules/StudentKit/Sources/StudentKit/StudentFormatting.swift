@@ -2,19 +2,56 @@ import CoreModels
 import Foundation
 
 enum StudentFormatting {
-  static let dayMonthFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "zh_CN")
-    formatter.dateFormat = "M月d日"
-    return formatter
-  }()
+  static func dayMonth(
+    _ date: Date,
+    locale: Locale = .current,
+    timeZone: TimeZone = .current
+  ) -> String {
+    var style = Date.FormatStyle.dateTime.month(.abbreviated).day().locale(locale)
+    style.timeZone = timeZone
+    return date.formatted(style)
+  }
 
-  static let weekdayFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "zh_CN")
-    formatter.dateFormat = "EEEE"
-    return formatter
-  }()
+  static func weekday(
+    _ date: Date,
+    locale: Locale = .current,
+    timeZone: TimeZone = .current
+  ) -> String {
+    var style = Date.FormatStyle.dateTime.weekday(.wide).locale(locale)
+    style.timeZone = timeZone
+    return date.formatted(style)
+  }
+
+  static func time(
+    _ date: Date,
+    locale: Locale = .current,
+    timeZone: TimeZone = .current
+  ) -> String {
+    var style = Date.FormatStyle.dateTime.hour().minute().locale(locale)
+    style.timeZone = timeZone
+    return date.formatted(style)
+  }
+
+  static func monthDay(
+    _ date: Date,
+    locale: Locale = .current,
+    timeZone: TimeZone = .current
+  ) -> String {
+    dayMonth(date, locale: locale, timeZone: timeZone)
+  }
+
+  static func numericMonthDay(
+    _ date: Date,
+    locale: Locale = .current,
+    timeZone: TimeZone = .current
+  ) -> String {
+    var style = Date.FormatStyle.dateTime
+      .month(.defaultDigits)
+      .day(.defaultDigits)
+      .locale(locale)
+    style.timeZone = timeZone
+    return date.formatted(style)
+  }
 
   /// Double weights (e1RM math output) formatted like `decimal(_:)`.
   static func kilograms(_ value: Double) -> String {

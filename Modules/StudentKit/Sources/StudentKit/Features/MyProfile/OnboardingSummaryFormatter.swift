@@ -10,7 +10,9 @@ public enum OnboardingSummaryFormatter {
   public static func basics(_ profile: OnboardingProfile, now: Date = Date()) -> String {
     var parts: [String] = []
     if let gender = profile.gender { parts.append(OnboardingLabels.label(gender)) }
-    if let age = age(birthDate: profile.birthDate, now: now) { parts.append("\(age)岁") }
+    if let age = age(birthDate: profile.birthDate, now: now) {
+      parts.append(StudentStrings.replacing(.onboardingSummaryFormatter001, values: ["\(age)"]))
+    }
     if let height = profile.heightCm {
       parts.append("\(UnitDisplay.plainString(height))cm")
     }
@@ -27,10 +29,14 @@ public enum OnboardingSummaryFormatter {
       parts.append(OnboardingLabels.trainingYearsLabel(years))
     }
     if let stance = profile.squatStance {
-      parts.append("\(OnboardingLabels.label(stance))深蹲")
+      parts.append(
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter002, values: ["\(OnboardingLabels.label(stance))"]))
     }
     if let style = profile.deadliftStyle {
-      parts.append("\(OnboardingLabels.label(style))硬拉")
+      parts.append(
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter003, values: ["\(OnboardingLabels.label(style))"]))
     }
     return joined(parts)
   }
@@ -53,8 +59,10 @@ public enum OnboardingSummaryFormatter {
     if !profile.trainingDays.isEmpty {
       let ordered = TrainingDay.allCases.filter { profile.trainingDays.contains($0) }
       var dayText = ordered.map(OnboardingLabels.shortLabel).joined(separator: "·")
-      dayText = "周" + dayText
-      parts.append("\(dayText) (\(ordered.count)天/周)")
+      dayText = StudentStrings.localized(.onboardingSummaryFormatter004) + dayText
+      parts.append(
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter005, values: ["\(dayText)", "\(ordered.count)"]))
     }
     if let tier = profile.gymTier { parts.append(OnboardingLabels.label(tier)) }
     return joined(parts)
@@ -64,22 +72,40 @@ public enum OnboardingSummaryFormatter {
   public static func recovery(_ profile: OnboardingProfile) -> String {
     var parts: [String] = []
     if let value = profile.dailyLifeIntensity {
+      let label = OnboardingLabels.scaleLabel(
+        OnboardingLabels.dailyLifeIntensityLabels,
+        notch: value
+      )
       parts.append(
-        "强度:\(OnboardingLabels.scaleLabel(OnboardingLabels.dailyLifeIntensityLabels, notch: value))"
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter006,
+          values: [label])
       )
     }
     if let value = profile.lifeStress {
       parts.append(
-        "压力:\(OnboardingLabels.scaleLabel(OnboardingLabels.lifeStressLabels, notch: value))")
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter007,
+          values: [
+            "\(OnboardingLabels.scaleLabel(OnboardingLabels.lifeStressLabels, notch: value))"
+          ]))
     }
     if let value = profile.recoverySpeed {
       parts.append(
-        "恢复:\(OnboardingLabels.scaleLabel(OnboardingLabels.recoverySpeedLabels, notch: value))"
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter008,
+          values: [
+            "\(OnboardingLabels.scaleLabel(OnboardingLabels.recoverySpeedLabels, notch: value))"
+          ])
       )
     }
     if let value = profile.sleepHours {
       parts.append(
-        "睡眠:\(OnboardingLabels.scaleLabel(OnboardingLabels.sleepHoursLabels, notch: value))")
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter009,
+          values: [
+            "\(OnboardingLabels.scaleLabel(OnboardingLabels.sleepHoursLabels, notch: value))"
+          ]))
     }
     return parts.isEmpty ? placeholder : parts.joined(separator: " ")
   }
@@ -89,15 +115,22 @@ public enum OnboardingSummaryFormatter {
   public static func materials(_ profile: OnboardingProfile) -> String {
     var parts: [String] = []
     if !profile.uploadAttachmentIds.isEmpty {
-      parts.append("上传 \(profile.uploadAttachmentIds.count) 份")
+      parts.append(
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter010, values: ["\(profile.uploadAttachmentIds.count)"]))
     }
     if !profile.muscleGroupsToStrengthen.isEmpty {
       let names = profile.muscleGroupsToStrengthen.map { group in
-        group == .back ? "背" : OnboardingLabels.strengthenLabel(group)
+        group == .back
+          ? StudentStrings.localized(.onboardingSummaryFormatter011)
+          : OnboardingLabels.strengthenLabel(group)
       }
-      parts.append("想增强:\(names.joined(separator: "/"))")
+      parts.append(
+        StudentStrings.replacing(
+          .onboardingSummaryFormatter012, values: ["\(names.joined(separator: "/"))"]))
     }
-    return parts.isEmpty ? "未上传资料" : parts.joined(separator: " · ")
+    return parts.isEmpty
+      ? StudentStrings.localized(.onboardingSummaryFormatter013) : parts.joined(separator: " · ")
   }
 
   /// "股四头 / 腘绳肌 / 肩" — just the strengthen targets (no upload count),
@@ -105,7 +138,9 @@ public enum OnboardingSummaryFormatter {
   public static func muscleGroups(_ profile: OnboardingProfile) -> String {
     guard !profile.muscleGroupsToStrengthen.isEmpty else { return placeholder }
     let names = profile.muscleGroupsToStrengthen.map { group in
-      group == .back ? "背" : OnboardingLabels.strengthenLabel(group)
+      group == .back
+        ? StudentStrings.localized(.onboardingSummaryFormatter011)
+        : OnboardingLabels.strengthenLabel(group)
     }
     return names.joined(separator: " / ")
   }
@@ -113,10 +148,13 @@ public enum OnboardingSummaryFormatter {
   /// "备赛: 2026-07-25 · IPF 83kg" / "暂不备赛"
   public static func competition(_ profile: OnboardingProfile) -> String {
     guard profile.isCompeting == true else {
-      return profile.isCompeting == false ? "暂不备赛" : placeholder
+      return profile.isCompeting == false
+        ? StudentStrings.localized(.onboardingSummaryFormatter014) : placeholder
     }
     var parts: [String] = []
-    if let date = profile.competitionDate { parts.append("备赛: \(date)") }
+    if let date = profile.competitionDate {
+      parts.append(StudentStrings.replacing(.onboardingSummaryFormatter015, values: ["\(date)"]))
+    }
     if let weightClass = profile.targetWeightClass { parts.append(weightClass) }
     return joined(parts)
   }
@@ -129,7 +167,7 @@ public enum OnboardingSummaryFormatter {
     case (false, false): return "\(notes) (\(areas))"
     case (false, true): return notes
     case (true, false): return areas
-    case (true, true): return "无伤病记录"
+    case (true, true): return StudentStrings.localized(.onboardingSummaryFormatter016)
     }
   }
 
@@ -142,7 +180,7 @@ public enum OnboardingSummaryFormatter {
     return years
   }
 
-  private static let placeholder = "未填写"
+  private static let placeholder = StudentStrings.localized(.onboardingSummaryFormatter017)
 
   private static func joined(_ parts: [String]) -> String {
     parts.isEmpty ? placeholder : parts.joined(separator: " · ")

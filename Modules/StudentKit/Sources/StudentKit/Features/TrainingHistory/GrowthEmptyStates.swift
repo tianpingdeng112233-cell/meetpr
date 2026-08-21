@@ -4,11 +4,11 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct GrowthTrendEmptyState: View {
   var body: some View {
-    Text("完成 3 次训练后解锁趋势")
+    Text(StudentStrings.localized(.growthEmptyStates001))
       .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
       .foregroundStyle(Color.MeetPR.textMuted)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
-      .accessibilityLabel("完成三次训练后解锁趋势")
+      .accessibilityLabel(StudentStrings.localized(.growthEmptyStates002))
   }
 }
 
@@ -94,9 +94,10 @@ struct GrowthFormingTrendState: View {
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textPrimary)
     }
-    return base("已记录 ") + mono("\(recordedCount)/\(threshold)")
-      + base(" 次——再练 ") + mono("\(remaining)")
-      + base(" 次\(familyName)，虚线就变成你的曲线")
+    return base(StudentStrings.localized(.growthEmptyStates003))
+      + mono("\(recordedCount)/\(threshold)")
+      + base(StudentStrings.localized(.growthEmptyStates004)) + mono("\(remaining)")
+      + base(StudentStrings.replacing(.growthEmptyStates005, values: ["\(familyName)"]))
   }
 
 }
@@ -301,10 +302,14 @@ struct GrowthZeroTrainingState: View {
     VStack(spacing: isCompact ? MeetPRSpacing.point6 : MeetPRSpacing.point10) {
       GrowthZeroGhostChart(size: 64)
 
-      Text(isCompact ? "第一个数据点·等你练出来" : "第一个数据点，等你练出来")
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
-        .foregroundStyle(Color.MeetPR.textPrimary)
-      Text("完成第一次训练后，这里开始记录 e1RM、总量和 PR")
+      Text(
+        isCompact
+          ? StudentStrings.localized(.growthEmptyStates006)
+          : StudentStrings.localized(.growthEmptyStates007)
+      )
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      Text(StudentStrings.localized(.growthEmptyStates008))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textMuted)
         .multilineTextAlignment(.center)
@@ -312,7 +317,7 @@ struct GrowthZeroTrainingState: View {
       if showsAction {
         Button(action: onOpenToday) {
           HStack(spacing: MeetPRSpacing.space2) {
-            Text("去看今天的安排")
+            Text(StudentStrings.localized(.growthEmptyStates009))
             Image(systemName: "chevron.right")
               .font(.MeetPR.system(size: MeetPRFontMetrics.size12, weight: .bold))
           }

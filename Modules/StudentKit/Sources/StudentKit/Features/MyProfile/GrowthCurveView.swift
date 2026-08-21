@@ -28,16 +28,16 @@ struct GrowthCurvePanelView: View {
 
   var body: some View {
     VStack(spacing: MeetPRSpacing.md) {
-      Picker("主项", selection: $viewModel.selectedFamily) {
-        Text("深蹲").tag(LiftFamily.squat)
-        Text("卧推").tag(LiftFamily.bench)
-        Text("硬拉").tag(LiftFamily.deadlift)
+      Picker(StudentStrings.localized(.growthCurveView001), selection: $viewModel.selectedFamily) {
+        Text(StudentStrings.localized(.growthCurveView002)).tag(LiftFamily.squat)
+        Text(StudentStrings.localized(.growthCurveView003)).tag(LiftFamily.bench)
+        Text(StudentStrings.localized(.growthCurveView004)).tag(LiftFamily.deadlift)
       }
       .pickerStyle(.segmented)
 
-      Picker("时间", selection: $viewModel.selectedWindow) {
+      Picker(StudentStrings.localized(.growthCurveView005), selection: $viewModel.selectedWindow) {
         ForEach(GrowthCurveViewModel.TimeWindow.allCases, id: \.self) { window in
-          Text(window.rawValue).tag(window)
+          Text(window.displayName).tag(window)
         }
       }
       .pickerStyle(.segmented)
@@ -63,13 +63,14 @@ struct GrowthCurvePanelView: View {
         .frame(maxWidth: .infinity, minHeight: 240)
     case .error(let message):
       ContentUnavailableView(
-        "加载失败", systemImage: "exclamationmark.triangle", description: Text(message))
+        StudentStrings.localized(.growthCurveView006), systemImage: "exclamationmark.triangle",
+        description: Text(message))
     case .loaded:
       if viewModel.visibleSmoothedSamples.isEmpty && viewModel.visibleRawEligiblePoints.isEmpty {
         ContentUnavailableView(
-          "还没有数据点",
+          StudentStrings.localized(.growthCurveView007),
           systemImage: "chart.xyaxis.line",
-          description: Text("至少打勾 1 组训练才有第一点")
+          description: Text(StudentStrings.localized(.growthCurveView008))
         )
         .frame(minHeight: 240)
       } else {
@@ -113,8 +114,10 @@ struct GrowthCurvePanelView: View {
         .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
         .foregroundStyle(Color.MeetPR.textPrimary)
       HStack(spacing: MeetPRSpacing.lg) {
-        metric("重量", "\(StudentFormatting.kilograms(point.sourceWeightKg)) kg")
-        metric("次数", "\(point.sourceReps)")
+        metric(
+          StudentStrings.localized(.growthCurveView009),
+          "\(StudentFormatting.kilograms(point.sourceWeightKg)) kg")
+        metric(StudentStrings.localized(.growthCurveView010), "\(point.sourceReps)")
         metric("RPE", point.sourceRPE.map { StudentFormatting.kilograms($0) } ?? "—")
       }
       HStack {

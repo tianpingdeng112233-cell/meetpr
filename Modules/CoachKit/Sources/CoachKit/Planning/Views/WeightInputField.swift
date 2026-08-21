@@ -28,7 +28,7 @@ public struct WeightInputField: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      Picker("重量单位", selection: $inputUnit) {
+      Picker(CoachPlanningStrings.weightUnit, selection: $inputUnit) {
         Text("kg").tag(WeightInputUnit.kg)
         Text("%1RM").tag(WeightInputUnit.percent)
       }
@@ -62,10 +62,10 @@ public struct WeightInputField: View {
         }
       }
       .buttonStyle(.plain)
-      .accessibilityLabel("编辑重量")
+      .accessibilityLabel(CoachPlanningStrings.editWeight)
       .sheet(isPresented: $showPanel) {
         WeightEntryPanel(
-          title: "目标重量",
+          title: CoachPlanningStrings.targetWeight,
           initialValue: currentKgValue,
           bases: bases
         ) { kilograms in
@@ -79,7 +79,11 @@ public struct WeightInputField: View {
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
       } else if oneRM == nil {
-        Eyebrow("未设 1RM，无法换算 %1RM", color: Color.MeetPR.fgTertiary, showsRule: false)
+        Eyebrow(
+          CoachPlanningStrings.missingOneRM,
+          color: Color.MeetPR.fgTertiary,
+          showsRule: false
+        )
       }
     }
   }

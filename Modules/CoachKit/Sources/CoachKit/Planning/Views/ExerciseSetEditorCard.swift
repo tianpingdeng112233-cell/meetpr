@@ -74,7 +74,7 @@ public struct ExerciseSetEditorCard: View {
 
         HStack(spacing: MeetPRSpacing.md) {
           PlanningCountPicker(
-            label: "组数",
+            label: CoachPlanningStrings.sets,
             value: setCountBinding,
             range: 1...20,
             step: 1
@@ -85,7 +85,7 @@ public struct ExerciseSetEditorCard: View {
           }
 
           PlanningCountPicker(
-            label: "次数",
+            label: CoachPlanningStrings.reps,
             value: targetRepsBinding,
             range: 1...50,
             step: 1
@@ -115,11 +115,11 @@ public struct ExerciseSetEditorCard: View {
         .onChange(of: restSecondsPerSet) { _, _ in persist() }
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-          Text("备注")
+          Text(CoachPlanningStrings.notes)
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.fgSecondary)
           TextField(
-            "可选 · 比如暂停 3 秒 / 节奏 3-0-1 / 卧距宽",
+            CoachPlanningStrings.notesPlaceholder,
             text: $notes,
             axis: .vertical
           )
@@ -154,7 +154,7 @@ public struct ExerciseSetEditorCard: View {
       }
 
       if draftExercise.isMainLift {
-        StatusBadge(status: .live, title: "主项")
+        StatusBadge(status: .live, title: CoachPlanningStrings.mainLift)
       }
 
       Spacer()
@@ -163,7 +163,7 @@ public struct ExerciseSetEditorCard: View {
       // (David 2026-06-14). Computed from live edit state so it flips the
       // moment the coach enters a weight / RPE.
       if currentSpec().isCoachComplete {
-        StatusBadge(status: .ready, title: "已填")
+        StatusBadge(status: .ready, title: CoachPlanningStrings.filled)
       }
 
       if let onDelete {
@@ -173,7 +173,11 @@ public struct ExerciseSetEditorCard: View {
             .foregroundStyle(Color.MeetPR.brandRed)
         }
         .buttonStyle(.borderless)
-        .accessibilityLabel("删除 \(viewModel.exerciseName(for: draftExercise))")
+        .accessibilityLabel(
+          CoachPlanningStrings.deleteExerciseAccessibility(
+            viewModel.exerciseName(for: draftExercise)
+          )
+        )
       }
     }
   }
@@ -259,7 +263,7 @@ private struct OptionalRepsMaxRow: View {
 
   var body: some View {
     if value == nil {
-      Button("添加次数上限", systemImage: "plus") {
+      Button(CoachPlanningStrings.addRepMaximum, systemImage: "plus") {
         value = minimum
       }
       .font(Font.MeetPR.footnote)
@@ -267,7 +271,7 @@ private struct OptionalRepsMaxRow: View {
     } else {
       HStack(spacing: MeetPRSpacing.sm) {
         PlanningCountPicker(
-          label: "次数上限",
+          label: CoachPlanningStrings.repMaximum,
           value: repsMaxBinding,
           range: Double(minimum)...60,
           step: 1
@@ -280,7 +284,7 @@ private struct OptionalRepsMaxRow: View {
             .font(.body)
         }
         .buttonStyle(.borderless)
-        .accessibilityLabel("删除次数上限")
+        .accessibilityLabel(CoachPlanningStrings.removeRepMaximum)
       }
     }
   }

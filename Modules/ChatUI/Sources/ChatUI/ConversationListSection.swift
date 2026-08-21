@@ -104,6 +104,6 @@ private struct ConversationListRow: View {
     guard let preview = conversation.lastMessagePreview, !preview.isEmpty else {
       return ""
     }
-    return preview == "[图片]" ? ChatStrings.image : preview
+    return preview == ChatStrings.imageSourceMarker ? ChatStrings.image : preview
   }
 }

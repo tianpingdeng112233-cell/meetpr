@@ -61,12 +61,31 @@ enum StudentChatTimeline {
     return min(1, visibleHeight / card.height)
   }
 
-  static func videoLabel(for video: CoachFeedbackVideo?) -> String {
-    guard let video else { return "我的训练视频" }
+  static func videoLabel(
+    for video: CoachFeedbackVideo?,
+    locale: Locale = .current
+  ) -> String {
+    guard let video else {
+      return StudentStrings.localized(.studentChatTimeline001, locale: locale)
+    }
+    let exercise =
+      StudentExerciseName.display(video, locale: locale)
+      ?? StudentStrings.localized(.studentRootView002, locale: locale)
     // Mockup 643 fixed copy has no space after 我的: 我的深蹲 · 第 1 组.
-    var parts = ["我的\(video.exerciseName ?? "训练")"]
+    var parts = [
+      StudentStrings.replacing(
+        .studentChatTimeline002,
+        values: ["\(exercise)"],
+        locale: locale
+      )
+    ]
     if let setIndex = video.setIndex {
-      parts.append("第 \(SetIndexDisplay.number(forZeroBasedIndex: setIndex)) 组")
+      parts.append(
+        StudentStrings.replacing(
+          .studentChatTimeline003,
+          values: ["\(SetIndexDisplay.number(forZeroBasedIndex: setIndex))"],
+          locale: locale
+        ))
     }
     return parts.joined(separator: " · ")
   }

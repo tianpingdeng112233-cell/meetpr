@@ -3,13 +3,15 @@ import PackageDescription
 
 let package = Package(
   name: "CoreModels",
-  platforms: [.iOS(.v17)],
+  defaultLocalization: "zh-Hans",
+  platforms: [.iOS(.v17), .macOS(.v14)],
   products: [
     .library(name: "CoreModels", targets: ["CoreModels"])
   ],
   targets: [
     .target(
       name: "CoreModels",
+      resources: [.process("Resources")],
       swiftSettings: [.enableUpcomingFeature("StrictConcurrency")]
     ),
     .testTarget(

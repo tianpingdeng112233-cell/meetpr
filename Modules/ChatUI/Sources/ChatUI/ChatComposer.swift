@@ -283,7 +283,7 @@ private struct StagedSetRefComposerCard: View {
         Text(ChatStrings.sendCurrentSetRecord)
           .font(.caption.bold())
           .foregroundStyle(Color.MeetPR.textSecondary)
-        Text(SetRefCanonicalFormatter.firstLine(for: intent.setRef))
+        Text(ChatSetRefDisplayFormatter.firstLine(for: intent.setRef))
           .font(.footnote)
           .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(2)

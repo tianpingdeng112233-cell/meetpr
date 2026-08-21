@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>MeetPR</string>
+	<string>$(APP_DISPLAY_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -42,16 +42,20 @@
 	<string>public.app-category.healthcare-fitness</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MeetPRBuildTrack</key>
+	<string>$(MEETPR_BUILD_TRACK)</string>
 	<key>NSCameraUsageDescription</key>
-	<string>MeetPR 需要使用相机拍摄你的训练视频,供你绑定的教练查看动作并给出反馈。</string>
+	<string>$(INFOPLIST_KEY_NSCameraUsageDescription)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2026 MeetPR. All rights reserved.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>拍摄训练视频时需要录制声音(例如杠铃落地与口令),用于教练回看。</string>
+	<string>$(INFOPLIST_KEY_NSMicrophoneUsageDescription)</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。</string>
+	<string>$(INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription)</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。</string>
+	<string>$(INFOPLIST_KEY_NSPhotoLibraryUsageDescription)</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

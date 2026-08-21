@@ -39,75 +39,97 @@ public enum EquipmentCatalog {
   public static let items: [EquipmentItem] = [
     // 基础 — all tiers.
     EquipmentItem(
-      token: "barbell_dumbbell", label: "杠铃 + 哑铃", group: .basics, tiers: everyTier),
+      token: "barbell_dumbbell", label: StudentStrings.localized(.equipmentCatalog001),
+      group: .basics, tiers: everyTier),
     EquipmentItem(
-      token: "squat_bench_rack", label: "深蹲架 + 卧推架", group: .basics, tiers: everyTier),
+      token: "squat_bench_rack", label: StudentStrings.localized(.equipmentCatalog002),
+      group: .basics, tiers: everyTier),
     EquipmentItem(
-      token: "pullup_bar", label: "引体向上杆", group: .basics, tiers: everyTier),
+      token: "pullup_bar", label: StudentStrings.localized(.equipmentCatalog003), group: .basics,
+      tiers: everyTier),
 
     // 哑铃最大重量 — exclusive bucket(哑铃动作的可编排上限;中国连锁常见
     // 40kg 封顶,报告 §六 降级链的过滤输入)。
     EquipmentItem(
-      token: "db_max_20", label: "哑铃 ≤20kg", group: .dumbbellMax, tiers: [.homeWithRack]),
+      token: "db_max_20", label: StudentStrings.localized(.equipmentCatalog004),
+      group: .dumbbellMax, tiers: [.homeWithRack]),
     EquipmentItem(
-      token: "db_max_40", label: "哑铃 ≤40kg", group: .dumbbellMax,
+      token: "db_max_40", label: StudentStrings.localized(.equipmentCatalog005),
+      group: .dumbbellMax,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "db_max_40_plus", label: "哑铃 >40kg", group: .dumbbellMax, tiers: []),
+      token: "db_max_40_plus", label: StudentStrings.localized(.equipmentCatalog006),
+      group: .dumbbellMax, tiers: []),
 
     // 固定 / 辅助器械 — each gates catalog exercises the coach may program
     // (Smith rare in PL gyms → not prefilled for .professional).
     EquipmentItem(
-      token: "smith_machine", label: "史密斯架", group: .machines, tiers: [.commercial]),
+      token: "smith_machine", label: StudentStrings.localized(.equipmentCatalog007),
+      group: .machines, tiers: [.commercial]),
     EquipmentItem(
-      token: "cable_crossover", label: "龙门架(大飞鸟)", group: .machines,
+      token: "cable_crossover", label: StudentStrings.localized(.equipmentCatalog008),
+      group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "lat_pulldown", label: "高位下拉", group: .machines,
+      token: "lat_pulldown", label: StudentStrings.localized(.equipmentCatalog009),
+      group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "leg_press_machine", label: "倒蹬机 / 腿举机", group: .machines,
+      token: "leg_press_machine", label: StudentStrings.localized(.equipmentCatalog010),
+      group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "leg_curl_extension", label: "腿弯举 / 腿屈伸", group: .machines,
+      token: "leg_curl_extension", label: StudentStrings.localized(.equipmentCatalog011),
+      group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "seated_row", label: "坐姿划船", group: .machines,
+      token: "seated_row", label: StudentStrings.localized(.equipmentCatalog012), group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "landmine", label: "地雷架(含 T 杆划船)", group: .machines,
+      token: "landmine", label: StudentStrings.localized(.equipmentCatalog013), group: .machines,
       tiers: [.commercial, .professional]),
     EquipmentItem(
-      token: "seal_row", label: "海豹划船凳", group: .machines, tiers: [.professional]),
+      token: "seal_row", label: StudentStrings.localized(.equipmentCatalog014), group: .machines,
+      tiers: [.professional]),
     EquipmentItem(
-      token: "hack_squat", label: "哈克深蹲机", group: .machines, tiers: [.professional]),
+      token: "hack_squat", label: StudentStrings.localized(.equipmentCatalog015), group: .machines,
+      tiers: [.professional]),
 
     // 力量举专项 — 变式解锁与加载粒度(教练编排的直接输入)。
     EquipmentItem(
-      token: "power_bar_stiff", label: "力量举专项杆(硬杆)", group: .powerlifting,
+      token: "power_bar_stiff", label: StudentStrings.localized(.equipmentCatalog016),
+      group: .powerlifting,
       tiers: [.professional]),
     EquipmentItem(
-      token: "deadlift_bar", label: "硬拉专项杆(软杆)", group: .powerlifting,
+      token: "deadlift_bar", label: StudentStrings.localized(.equipmentCatalog017),
+      group: .powerlifting,
       tiers: [.professional]),
     EquipmentItem(
-      token: "safety_bar", label: "特种杠(SSB / 六角等)", group: .powerlifting,
+      token: "safety_bar", label: StudentStrings.localized(.equipmentCatalog018),
+      group: .powerlifting,
       tiers: [.professional]),
     EquipmentItem(
-      token: "fractional_plates", label: "微增片(0.25kg 起)", group: .powerlifting,
+      token: "fractional_plates", label: StudentStrings.localized(.equipmentCatalog019),
+      group: .powerlifting,
       tiers: [.professional]),
     EquipmentItem(
-      token: "lifting_platform", label: "举重台 / 硬拉台", group: .powerlifting,
+      token: "lifting_platform", label: StudentStrings.localized(.equipmentCatalog020),
+      group: .powerlifting,
       tiers: [.professional]),
     EquipmentItem(
-      token: "rack_pins_blocks", label: "架上销 / 垫块", group: .powerlifting,
+      token: "rack_pins_blocks", label: StudentStrings.localized(.equipmentCatalog021),
+      group: .powerlifting,
       tiers: [.professional]),
     EquipmentItem(
-      token: "chains_bands", label: "链条 / 弹力带(变阻)", group: .powerlifting,
+      token: "chains_bands", label: StudentStrings.localized(.equipmentCatalog022),
+      group: .powerlifting,
       tiers: [.professional]),
     EquipmentItem(
-      token: "ghr", label: "GHR(臀腿举)", group: .powerlifting, tiers: [.professional]),
+      token: "ghr", label: StudentStrings.localized(.equipmentCatalog023), group: .powerlifting,
+      tiers: [.professional]),
     EquipmentItem(
-      token: "belt_squat", label: "腰带深蹲机", group: .powerlifting, tiers: [.professional]),
+      token: "belt_squat", label: StudentStrings.localized(.equipmentCatalog024),
+      group: .powerlifting, tiers: [.professional]),
   ]
 
   /// Retired tokens kept label-resolvable so profiles saved before a
@@ -115,10 +137,10 @@ public enum EquipmentCatalog {
   /// (dropped 2026-07-02), and `cable_lat_pulldown` (2026-07-02 split into
   /// `cable_crossover` + `lat_pulldown`, relabeled 拉力机 → 龙门架).
   private static let legacyLabels: [String: String] = [
-    "heavy_dumbbells": "哑铃区(>30kg)",
-    "blocks_chains_bands": "块铃 / 链子 / 弹力带",
-    "reverse_hyper": "反向过伸机",
-    "cable_lat_pulldown": "拉力机 / 高位下拉",
+    "heavy_dumbbells": StudentStrings.localized(.equipmentCatalog025),
+    "blocks_chains_bands": StudentStrings.localized(.equipmentCatalog026),
+    "reverse_hyper": StudentStrings.localized(.equipmentCatalog027),
+    "cable_lat_pulldown": StudentStrings.localized(.equipmentCatalog028),
   ]
 
   public static func items(in group: EquipmentItem.Group) -> [EquipmentItem] {

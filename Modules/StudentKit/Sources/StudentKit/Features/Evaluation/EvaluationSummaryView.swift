@@ -17,20 +17,25 @@ public struct EvaluationSummaryView: View {
   public var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        Text("更新于 \(StudentFormatting.dayMonthFormatter.string(from: summary.lastUpdatedAt))")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgTertiary)
+        Text(
+          StudentStrings.replacing(
+            .evaluationSummaryView001,
+            values: ["\(StudentFormatting.dayMonth(summary.lastUpdatedAt))"])
+        )
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(Color.MeetPR.fgTertiary)
 
-        sectionCard("整体评估", text: summary.overallAssessment)
-        sectionCard("训练规划", text: summary.trainingPlan)
+        sectionCard(
+          StudentStrings.localized(.evaluationSummaryView002), text: summary.overallAssessment)
+        sectionCard(StudentStrings.localized(.evaluationSummaryView003), text: summary.trainingPlan)
         if let words = summary.wordsToStudent {
-          sectionCard("给学员的话", text: words)
+          sectionCard(StudentStrings.localized(.evaluationSummaryView004), text: words)
         }
       }
       .padding(MeetPRSpacing.base)
     }
     .background(Color.MeetPR.bg)
-    .navigationTitle("评估总结")
+    .navigationTitle(StudentStrings.localized(.evaluationSummaryView005))
     .onAppear {
       onRead()
     }

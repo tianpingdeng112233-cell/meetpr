@@ -17,8 +17,10 @@ struct CoachDayDetailView: View {
         } else if !day.logs.isEmpty {
           freeLogCard
         } else {
-          ContentUnavailableView("休息日", systemImage: "moon")
-            .frame(maxWidth: .infinity)
+          ContentUnavailableView(
+            CoachStudentDetailStrings.text("coach.execution.restDay"), systemImage: "moon"
+          )
+          .frame(maxWidth: .infinity)
         }
       }
       .padding(MeetPRSpacing.base)
@@ -29,19 +31,23 @@ struct CoachDayDetailView: View {
 
   private func exerciseCard(_ exercise: StudentPlanExercise) -> some View {
     let logs = logs(for: exercise)
-    return Card(accessibilityLabel: exercise.exercise.name) {
+    let exerciseName = CoachLocalization.exerciseName(exercise.exercise)
+    return Card(accessibilityLabel: exerciseName) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
         VStack(alignment: .leading, spacing: 2) {
-          Text(exercise.exercise.name)
+          Text(exerciseName)
             .font(Font.MeetPR.headline)
             .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text("\(logs.count)/\(exercise.prescribedSets.count) 组已记录")
-            .font(Font.MeetPR.footnote)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+          Text(
+            CoachLocalization.localized(
+              "coach.execution.loggedSetsFraction \(logs.count) \(exercise.prescribedSets.count)")
+          )
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
         }
 
         if logs.isEmpty {
-          Text("暂无已记录组")
+          Text(CoachStudentDetailStrings.text("coach.execution.noLoggedSets"))
             .font(Font.MeetPR.body)
             .foregroundStyle(Color.MeetPR.fgSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -62,9 +68,9 @@ struct CoachDayDetailView: View {
   }
 
   private var freeLogCard: some View {
-    Card(accessibilityLabel: "自由记录") {
+    Card(accessibilityLabel: CoachStudentDetailStrings.text("coach.execution.freeLog")) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Text("自由记录")
+        Text(CoachStudentDetailStrings.text("coach.execution.freeLog"))
           .font(Font.MeetPR.headline)
           .foregroundStyle(Color.MeetPR.fgPrimary)
         ForEach(day.logs) { log in

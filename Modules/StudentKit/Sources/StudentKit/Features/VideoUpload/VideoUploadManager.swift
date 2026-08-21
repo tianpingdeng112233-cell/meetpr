@@ -35,6 +35,15 @@ public actor VideoUploadManager {
   var drainingBackgroundRecordIDs: Set<UUID> = []
   var pendingBackgroundFinishTokens: [String: Set<BackgroundUploadEventToken>] = [:]
   var recoveringStudentIDs: Set<UUID> = []
+  var retainingSourceRecordIDs: Set<UUID> = []
+  /// The recorder writes the frame that first reaches the cap and only then
+  /// asks the session to stop, so a recording held to the limit lands a frame
+  /// past it (~33ms at 30fps). Rejecting that outright stranded the student
+  /// behind 「请截短后再上传」 for a clip the app itself had just capped — and
+  /// the source was deleted on the way out, so the take was simply lost.
+  /// A sub-second grace accepts a maxed-out recording while still refusing
+  /// anything a user could actually trim down.
+  static let durationGraceSeconds: TimeInterval = 0.5
   /// Monotonic attempt identity per attachment. Chunk teardown advances the
   /// value, permanently invalidating every writer that captured an older one.
   /// Successful deletion advances once more and retains that value as an ABA
@@ -96,8 +105,8 @@ public actor VideoUploadManager {
   /// (V0.1: one video per set).
   ///
   /// Ownership of `sourceURL` transfers to the manager when this method is
-  /// called. The manager removes the file on every outcome; the caller must
-  /// not use it after `enqueue` returns, whether the call succeeds or throws.
+  /// called. The manager retains a private source copy until upload succeeds or
+  /// the attachment is removed, so export failures can be retried.
   public func enqueue(
     sourceURL: URL,
     setLogID: UUID,
@@ -110,15 +119,16 @@ public actor VideoUploadManager {
       requestedNotificationAuthorization = true
       await failureNotifier.requestProvisionalAuthorization()
     }
+    var retainedSourceURL: URL?
     var uploadTaskOwnsSource = false
     defer {
       if !uploadTaskOwnsSource {
-        try? FileManager.default.removeItem(at: sourceURL)
+        try? FileManager.default.removeItem(at: retainedSourceURL ?? sourceURL)
       }
     }
 
     let duration = try await exporter.durationSeconds(of: sourceURL)
-    guard duration <= configuration.maxDurationSeconds else {
+    guard duration <= configuration.maxDurationSeconds + Self.durationGraceSeconds else {
       throw VideoUploadError.durationExceedsLimit(
         seconds: duration,
         maxSeconds: configuration.maxDurationSeconds
@@ -130,6 +140,15 @@ public actor VideoUploadManager {
     }
 
     let id = UUID()
+    retainingSourceRecordIDs.insert(id)
+    defer { retainingSourceRecordIDs.remove(id) }
+    try FileManager.default.createDirectory(at: filesDirectory, withIntermediateDirectories: true)
+    let managedSourceURL = sourceFileURL(
+      recordID: id,
+      pathExtension: sourceURL.pathExtension
+    )
+    try FileManager.default.moveItem(at: sourceURL, to: managedSourceURL)
+    retainedSourceURL = managedSourceURL
     let record = VideoAttachment(
       id: id,
       setLogID: setLogID,
@@ -144,7 +163,7 @@ public actor VideoUploadManager {
     )
     try await repository.save(record)
     broadcast(.updated(record, progress: 0))
-    startUploadTask(recordID: id, sourceURL: sourceURL)
+    startUploadTask(recordID: id, sourceURL: managedSourceURL)
     uploadTaskOwnsSource = true
     return record
   }

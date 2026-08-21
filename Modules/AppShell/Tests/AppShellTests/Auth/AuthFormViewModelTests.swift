@@ -5,11 +5,21 @@ import Testing
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func validatesChineseNationalPhoneNumbers() {
+@Test func validatesChineseNationalPhoneNumbers() throws {
   let viewModel = AuthFormViewModel(mode: .login)
 
+  #expect(
+    try LocalizationCatalogTestSupport.simplifiedChineseSource(
+      viewModel.phoneHelperText,
+      key: "appShell.auth.phoneHelper"
+    ) == "中国大陆 11 位手机号"
+  )
+  #expect(viewModel.phonePrefix == "+86")
+  #expect(viewModel.loginPhonePlaceholder == "138 0000 0001")
+  #expect(viewModel.signupPhonePlaceholder == "13800000001")
+
   viewModel.phone = "12800000001"
-  #expect(viewModel.phoneError == "手机号格式不正确")
+  #expect(viewModel.phoneError == AppShellStrings.invalidPhone)
   #expect(!viewModel.canSubmit)
 
   viewModel.phone = "13800000001"
@@ -25,7 +35,7 @@ import Testing
   viewModel.phone = "13800000001"
 
   viewModel.password = "1234567"
-  #expect(viewModel.passwordError == "密码至少 8 字符,最多 72 字节")
+  #expect(viewModel.passwordError == AppShellStrings.invalidPassword)
   #expect(!viewModel.canSubmit)
 
   viewModel.password = String(repeating: "a", count: 72)
@@ -33,7 +43,7 @@ import Testing
   #expect(viewModel.canSubmit)
 
   viewModel.password = String(repeating: "a", count: 73)
-  #expect(viewModel.passwordError == "密码至少 8 字符,最多 72 字节")
+  #expect(viewModel.passwordError == AppShellStrings.invalidPassword)
   #expect(!viewModel.canSubmit)
 }
 
@@ -62,19 +72,22 @@ import Testing
   #expect(
     AuthFormViewModel.toastMessage(
       for: AuthRepositoryError.backend(statusCode: 409, code: .phoneTaken, issues: [])
-    ) == "该手机号已注册"
+    ) == AppShellStrings.phoneTaken
   )
   #expect(
     AuthFormViewModel.toastMessage(
       for: AuthRepositoryError.backend(statusCode: 401, code: .invalidCredentials, issues: [])
-    ) == "手机号或密码错误"
+    ) == AppShellStrings.invalidCredentials
   )
   #expect(
     AuthFormViewModel.toastMessage(
       for: AuthRepositoryError.backend(statusCode: 429, code: .rateLimited, issues: [])
-    ) == "请求过于频繁,请稍后重试"
+    ) == AppShellStrings.rateLimited
   )
-  #expect(AuthFormViewModel.toastMessage(for: AuthRepositoryError.network) == "网络不稳定,重试")
+  #expect(
+    AuthFormViewModel.toastMessage(for: AuthRepositoryError.network)
+      == AppShellStrings.networkUnstable
+  )
 }
 
 @MainActor
@@ -86,7 +99,7 @@ import Testing
     for: AuthRepositoryError.backend(statusCode: 400, code: .validationError, issues: [issue])
   )
 
-  #expect(message == "手机号格式不对(+86 开头)")
+  #expect(message == AppShellStrings.invalidPhoneWithPrefix)
 }
 
 @MainActor
@@ -104,7 +117,7 @@ import Testing
   await viewModel.submit(using: session)
 
   #expect(!viewModel.isSubmitting)
-  #expect(viewModel.toastMessage == "该手机号已注册")
+  #expect(viewModel.toastMessage == AppShellStrings.phoneTaken)
   #expect(session.state == .anonymous)
 }
 

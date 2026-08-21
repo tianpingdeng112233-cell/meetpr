@@ -54,7 +54,7 @@
         Color.black.ignoresSafeArea()
         switch controller.phase {
         case .preparing:
-          ProgressView("正在准备相机…")
+          ProgressView(StudentStrings.localized(.cameraRecorderView001))
             .tint(.white)
             .foregroundStyle(.white)
         case .ready, .starting, .recording, .stopping:
@@ -83,30 +83,34 @@
         case .permissionDenied:
           RecorderStatusView(
             systemImage: "lock.trianglebadge.exclamationmark",
-            title: "需要相机和麦克风权限",
-            message: "请在系统设置中允许 MeetPR 使用相机和麦克风后再试。",
-            primaryAction: .init(title: "打开设置", systemImage: "gear", action: openSettings),
-            secondaryAction: .init(title: "关闭", action: close)
+            title: StudentStrings.localized(.cameraRecorderView002),
+            message: StudentStrings.localized(.cameraRecorderView003),
+            primaryAction: .init(
+              title: StudentStrings.localized(.cameraRecorderView004), systemImage: "gear",
+              action: openSettings),
+            secondaryAction: .init(
+              title: StudentStrings.localized(.cameraRecorderView005), action: close)
           )
         case .unavailable:
           RecorderStatusView(
             systemImage: "video.slash",
-            title: "相机不可用",
-            message: "当前设备没有可用的后置相机。",
-            secondaryAction: .init(title: "关闭", action: close)
+            title: StudentStrings.localized(.cameraRecorderView006),
+            message: StudentStrings.localized(.cameraRecorderView007),
+            secondaryAction: .init(
+              title: StudentStrings.localized(.cameraRecorderView005), action: close)
           )
         case .failed(let message):
           RecorderStatusView(
             systemImage: "exclamationmark.triangle",
-            title: "录制未完成",
+            title: StudentStrings.localized(.cameraRecorderView008),
             message: message,
             primaryAction: .init(
-              title: "重试",
+              title: StudentStrings.localized(.cameraRecorderView009),
               systemImage: "arrow.clockwise",
               action: { Task { await controller.retry() } }
             ),
             secondaryAction: .init(
-              title: "关闭",
+              title: StudentStrings.localized(.cameraRecorderView005),
               action: {
                 onFailure()
                 close()
@@ -124,8 +128,7 @@
         item: $recordingToTrim,
         onDismiss: finishRecordingTrimPresentation
       ) { session in
-        VideoTrimmerView(session: session)
-          .ignoresSafeArea()
+        VideoTrimView(session: session)
       }
       .task {
         // Students frame the shot, walk to the bar, and never touch the
@@ -179,7 +182,7 @@
               setSavePreference(true)
             } else {
               setSavePreference(false)
-              showToast("未能获得相册权限")
+              showToast(StudentStrings.localized(.cameraRecorderView010))
             }
           }
         }
@@ -198,10 +201,6 @@
 
     private func prepareTrim(of sourceURL: URL) {
       guard recordingToTrim == nil, !isUsingRecording, !isApplyingTrim else { return }
-      guard UIVideoEditorController.canEditVideo(atPath: sourceURL.path) else {
-        showToast("当前视频无法剪辑")
-        return
-      }
       do {
         let workingURL = try RecorderVideoTrimFiles.makeWorkingCopy(of: sourceURL)
         let session = VideoTrimSession(
@@ -211,13 +210,13 @@
           onCancel: { recordingToTrim = nil },
           onFailure: {
             recordingToTrim = nil
-            showToast("剪辑失败，请重试")
+            showToast(StudentStrings.localized(.cameraRecorderView011))
           }
         )
         activeRecordingTrimSession = session
         recordingToTrim = session
       } catch {
-        showToast("暂时无法开始剪辑")
+        showToast(StudentStrings.localized(.cameraRecorderView012))
       }
     }
 
@@ -240,7 +239,7 @@
         if !saved {
           onPicked(url)
           await controller.relinquishReviewFile()
-          showToast("保存到相册失败，视频仍会继续上传")
+          showToast(StudentStrings.localized(.cameraRecorderView013))
           try? await Task.sleep(for: .seconds(1.2))
           isPresented = false
           return

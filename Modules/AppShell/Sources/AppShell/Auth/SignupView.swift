@@ -18,33 +18,33 @@ public struct SignupView: View {
         MeetPRMark(size: 56)
           .padding(.bottom, MeetPRSpacing.lg)
 
-        Eyebrow("注册 · 角色")
-        Text("选择你的角色")
+        Eyebrow(AppShellStrings.signupEyebrow)
+        Text(AppShellStrings.signupTitle)
           .font(.system(size: 40, weight: .heavy))
           .foregroundStyle(Color.MeetPR.fgPrimary)
           .padding(.top, 8)
-        (Text("注册后角色将锁定。").foregroundStyle(Color.MeetPR.fgSecondary)
-          + Text("多角色支持在 V1.5 评估。").foregroundStyle(Color.MeetPR.fgTertiary))
+        (Text(AppShellStrings.roleLocked).foregroundStyle(Color.MeetPR.fgSecondary)
+          + Text(AppShellStrings.multiRoleLater).foregroundStyle(Color.MeetPR.fgTertiary))
           .font(.system(size: 14))
           .padding(.top, 12)
 
         // ── Credentials ──────────────────────────────────────────────
         VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
           MeetPRTextField(
-            "手机号",
+            AppShellStrings.phoneNumber,
             text: $viewModel.phone,
-            placeholder: "13800000001",
-            helperText: "中国大陆 11 位手机号",
+            placeholder: viewModel.signupPhonePlaceholder,
+            helperText: viewModel.phoneHelperText,
             errorMessage: viewModel.phoneError,
             isMonospaced: true
           )
           .accessibilityIdentifier("signup.phone")
 
           AuthSecureField(
-            "密码",
+            AppShellStrings.password,
             text: $viewModel.password,
-            placeholder: "至少 8 字符",
-            helperText: "最多 72 字节",
+            placeholder: AppShellStrings.passwordMinimum,
+            helperText: AppShellStrings.passwordMaximum,
             errorMessage: viewModel.passwordError
           )
           .accessibilityIdentifier("signup.password")
@@ -70,7 +70,7 @@ public struct SignupView: View {
 
         // ── Submit ───────────────────────────────────────────────────
         PrimaryButton(
-          "注册",
+          AppShellStrings.signUp,
           isDisabled: !viewModel.canSubmit,
           isLoading: viewModel.isSubmitting,
           isFullWidth: true
@@ -153,9 +153,9 @@ private struct RoleCard: View {
 extension UserRole {
   fileprivate var authTitle: String {
     switch self {
-    case .coach: "教练"
-    case .coachedStudent: "学员 · 有教练"
-    case .selfTrainStudent: "学员 · 自己练"
+    case .coach: AppShellStrings.coach
+    case .coachedStudent: AppShellStrings.coachedStudent
+    case .selfTrainStudent: AppShellStrings.selfTrainingStudent
     }
   }
 
@@ -169,9 +169,9 @@ extension UserRole {
 
   fileprivate var authSubtitle: String {
     switch self {
-    case .coach: "编排周期 · 审阅学员 · 反馈视频"
-    case .coachedStudent: "接收计划 · 记录训练 · 上传视频"
-    case .selfTrainStudent: "选择训练模板 · 自主跟练"
+    case .coach: AppShellStrings.coachRoleDescription
+    case .coachedStudent: AppShellStrings.coachedStudentRoleDescription
+    case .selfTrainStudent: AppShellStrings.selfTrainingRoleDescription
     }
   }
 }

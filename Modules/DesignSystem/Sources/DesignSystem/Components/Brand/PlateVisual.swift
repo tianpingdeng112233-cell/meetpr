@@ -175,11 +175,14 @@ public struct PlateVisual: View {
 
   static func accessibilityText(_ plates: [Double], showCollar: Bool) -> String {
     guard !plates.isEmpty else {
-      return showCollar ? "仅 2.5kg 赛扣" : "空杠 20kg"
+      return
+        showCollar
+        ? DesignSystemStrings.competitionCollarsOnly
+        : DesignSystemStrings.emptyBar
     }
 
     let base = breakdownText(plates)
-    return showCollar ? "\(base) + 2.5kg 赛扣" : base
+    return showCollar ? DesignSystemStrings.plateWithCollars(base) : base
   }
 
   fileprivate static func gradientStops(

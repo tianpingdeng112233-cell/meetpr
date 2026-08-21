@@ -11,27 +11,27 @@ struct Step5RecoverySection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
       OnboardingScalePicker(
-        title: "学习/工作强度",
+        title: StudentStrings.localized(.step5RecoverySection001),
         labels: OnboardingLabels.dailyLifeIntensityLabels,
         notch: $draft.dailyLifeIntensity,
         isHighlighted: highlighted.contains("daily_life_intensity"),
-        footnote: "按身体消耗选择 — 久坐 ≠ 低消耗(如久坐但通勤负重,选中等)"
+        footnote: StudentStrings.localized(.step5RecoverySection002)
       )
       OnboardingScalePicker(
-        title: "生活压力",
+        title: StudentStrings.localized(.step5RecoverySection003),
         labels: OnboardingLabels.lifeStressLabels,
         notch: $draft.lifeStress,
         isHighlighted: highlighted.contains("life_stress")
       )
       OnboardingScalePicker(
-        title: "练后恢复时长",
+        title: StudentStrings.localized(.step5RecoverySection004),
         labels: OnboardingLabels.recoverySpeedLabels,
         notch: $draft.recoverySpeed,
         isHighlighted: highlighted.contains("recovery_speed"),
-        footnote: "回想大强度练腿或爬山后,酸痛疲惫多久消退到能再练 — 拿不准就选 3"
+        footnote: StudentStrings.localized(.step5RecoverySection005)
       )
       OnboardingScalePicker(
-        title: "睡眠时长",
+        title: StudentStrings.localized(.step5RecoverySection006),
         labels: OnboardingLabels.sleepHoursLabels,
         notch: $draft.sleepHours,
         isHighlighted: highlighted.contains("sleep_hours")

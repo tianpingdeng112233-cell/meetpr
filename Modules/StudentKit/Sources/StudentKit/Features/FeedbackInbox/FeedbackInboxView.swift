@@ -69,7 +69,7 @@ public struct FeedbackInboxView: View {
       } else {
         ScrollView {
           VStack(alignment: .leading, spacing: MeetPRSpacing.point11) {
-            Text("全部反馈 · \(items.count) 条")
+            Text(StudentStrings.replacing(.feedbackInboxView001, values: ["\(items.count)"]))
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
               .tracking(0.44)
               .foregroundStyle(Color.MeetPR.textFaint)
@@ -123,7 +123,7 @@ public struct FeedbackInboxView: View {
         let url = try await viewModel.playbackURL(videoID: videoID)
         playbackItem = FeedbackVideoPlaybackItem(id: videoID, url: url)
       } catch {
-        playbackError = "播放链接获取失败，请重试"
+        playbackError = StudentStrings.localized(.feedbackInboxView002)
         resolvingVideoID = nil
         return
       }
@@ -159,15 +159,16 @@ private struct FeedbackArchivePresentation: Equatable, Sendable, Identifiable {
 
   var id: UUID { item.id }
   var isUnread: Bool { item.readAt == nil }
-  var label: String { item.video?.exerciseName ?? "训练反馈" }
+  var label: String {
+    item.video.flatMap { StudentExerciseName.display($0) }
+      ?? StudentStrings.localized(.feedbackInboxView003)
+  }
 
   var dateText: String {
     if Calendar.current.isDateInToday(item.postedAt) {
-      return "今天"
+      return StudentStrings.localized(.feedbackInboxView004)
     }
-    return item.postedAt.formatted(
-      .dateTime.month(.defaultDigits).day().locale(Locale(identifier: "zh_CN"))
-    )
+    return StudentFormatting.numericMonthDay(item.postedAt)
   }
 }
 
@@ -189,13 +190,13 @@ private struct FeedbackArchiveHeader: View {
           )
       }
       .buttonStyle(PressScaleButtonStyle())
-      .accessibilityLabel("返回")
+      .accessibilityLabel(StudentStrings.localized(.feedbackInboxView005))
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-        Text("教练反馈")
+        Text(StudentStrings.localized(.feedbackInboxView006))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
-        Text("全部记录 · 含视频回放")
+        Text(StudentStrings.localized(.feedbackInboxView007))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
@@ -276,7 +277,7 @@ private struct FeedbackArchiveCard<Detail: View>: View {
             .clipShape(.rect(cornerRadius: MeetPRSpacing.space2))
 
             VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-              Text("查看回放视频")
+              Text(StudentStrings.localized(.feedbackInboxView008))
                 .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
                 .foregroundStyle(Color.MeetPR.textSecondary)
               let summary = FeedbackVideoPresentation.summary(video)
@@ -332,7 +333,7 @@ private struct FeedbackArchiveSkeleton: View {
     }
     .padding(.horizontal, MeetPRSpacing.point18)
     .padding(.top, MeetPRSpacing.space4)
-    .accessibilityLabel("正在加载教练反馈")
+    .accessibilityLabel(StudentStrings.localized(.feedbackInboxView009))
   }
 }
 
@@ -342,7 +343,7 @@ private struct FeedbackArchiveEmptyState: View {
       Image(systemName: "bubble.left")
         .font(.system(size: MeetPRFontMetrics.size34))
         .foregroundStyle(Color.MeetPR.textDim)
-      Text("暂无反馈")
+      Text(StudentStrings.localized(.feedbackInboxView010))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .bold))
         .foregroundStyle(Color.MeetPR.textSecondary)
     }
@@ -360,7 +361,7 @@ private struct FeedbackArchiveErrorState: View {
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
         .foregroundStyle(Color.MeetPR.textSecondary)
         .multilineTextAlignment(.center)
-      Button("重试", action: retry)
+      Button(StudentStrings.localized(.feedbackInboxView011), action: retry)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
         .foregroundStyle(Color.MeetPR.goldText)
         .frame(minHeight: MeetPRSpacing.minimumHitTarget)

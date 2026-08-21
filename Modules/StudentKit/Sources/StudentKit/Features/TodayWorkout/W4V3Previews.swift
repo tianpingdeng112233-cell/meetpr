@@ -47,14 +47,14 @@
         video: hasVideo
           ? CoachFeedbackVideo(
             id: videoID,
-            exerciseName: "深蹲",
+            exerciseName: StudentStrings.localized(.w4V3Previews001),
             setIndex: 1,
             weightKg: "175",
             reps: 3,
             loggedAt: W4PreviewFixtures.date
           )
           : nil,
-        text: "深蹲第一组速度很好，下一次保持同样节奏，最后一组不要急着起杠。",
+        text: StudentStrings.localized(.w4V3Previews002),
         postedAt: W4PreviewFixtures.date,
         readAt: scenario == .read ? W4PreviewFixtures.date : nil
       )
@@ -103,7 +103,7 @@
         drafts: drafts,
         references: references,
         weekCode: "W1D4",
-        coachName: "李明",
+        coachName: StudentStrings.localized(.w4V3Previews003),
         streak: streak,
         previousVolumeChangePercent: 6
       )
@@ -114,9 +114,15 @@
         id: UUID(),
         date: date,
         exercises: [
-          exercise("深蹲", sequence: 0, weight: 175, reps: 3, rpe: 8.5),
-          exercise("卧推", sequence: 1, weight: 110, reps: 5, rpe: 8),
-          exercise("硬拉", sequence: 2, weight: 190, reps: 2, rpe: 8.5),
+          exercise(
+            StudentStrings.localized(.w4V3Previews001),
+            sequence: 0, weight: 175, reps: 3, rpe: 8.5),
+          exercise(
+            StudentStrings.localized(.w4V3Previews004),
+            sequence: 1, weight: 110, reps: 5, rpe: 8),
+          exercise(
+            StudentStrings.localized(.w4V3Previews005),
+            sequence: 2, weight: 190, reps: 2, rpe: 8.5),
         ]
       )
     }

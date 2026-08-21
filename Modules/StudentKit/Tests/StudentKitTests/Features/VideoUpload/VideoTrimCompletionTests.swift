@@ -62,6 +62,25 @@ private func makeTempMovieFile() throws -> URL {
   #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
 }
 
+@Test func failedTrimExportReportsFailureIdempotently() async throws {
+  let sourceURL = try makeTempMovieFile()
+  var outcomes: [VideoTrimCompletion.Outcome] = []
+  let session = VideoTrimSession(
+    sourceURL: sourceURL,
+    maxDurationSeconds: 120,
+    onSave: { outcomes.append(.saved($0)) },
+    onCancel: { outcomes.append(.cancelled) },
+    onFailure: { outcomes.append(.failed) }
+  )
+  let selection = VideoTrimSelection(sourceDurationSeconds: 1, maxDurationSeconds: 120)
+
+  await session.exportTrim(selection: selection, using: FailingVideoTrimExporter())
+  await session.exportTrim(selection: selection, using: FailingVideoTrimExporter())
+
+  #expect(outcomes == [.failed])
+  #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
+}
+
 @Test func singleShotRunsBodyExactlyOnce() {
   let singleShot = SingleShot()
   var runCount = 0
@@ -183,4 +202,117 @@ private func makeTempMovieFile() throws -> URL {
   #expect(!FileManager.default.fileExists(atPath: workingURL.path))
   #expect(!FileManager.default.fileExists(atPath: fixture.sourceURL.path))
   #expect(FileManager.default.fileExists(atPath: editedURL.path))
+}
+
+private struct FailingVideoTrimExporter: VideoTrimExporting {
+  func export(sourceURL: URL, selection: VideoTrimSelection) async throws -> URL {
+    throw Failure.expected
+  }
+
+  private enum Failure: Error {
+    case expected
+  }
+}
+
+@Test func dismissDuringExportWinsTheSingleShotAndDeletesTheOrphanOutput() async throws {
+  let sourceURL = try makeTempMovieFile()
+  var outcomes: [VideoTrimCompletion.Outcome] = []
+  let session = VideoTrimSession(
+    sourceURL: sourceURL,
+    maxDurationSeconds: 120,
+    onSave: { outcomes.append(.saved($0)) },
+    onCancel: { outcomes.append(.cancelled) },
+    onFailure: { outcomes.append(.failed) }
+  )
+  let exporter = GatedVideoTrimExporter()
+  let selection = VideoTrimSelection(sourceDurationSeconds: 1, maxDurationSeconds: 120)
+
+  let exportTask = Task { @MainActor in
+    await session.exportTrim(selection: selection, using: exporter)
+  }
+  try await waitUntil { await exporter.hasStarted }
+  // The cover goes away mid-export exactly as onDisappear does it: cancel the
+  // task, then let teardown claim the single shot.
+  exportTask.cancel()
+  session.cancelled()
+  let outputURL = await exporter.release()
+  await exportTask.value
+
+  #expect(outcomes == [.cancelled])
+  #expect(!FileManager.default.fileExists(atPath: outputURL.path))
+  #expect(!FileManager.default.fileExists(atPath: sourceURL.path))
+}
+
+@Test func cancelledTrimExportLeavesTheOutcomeToTeardown() async throws {
+  let sourceURL = try makeTempMovieFile()
+  var outcomes: [VideoTrimCompletion.Outcome] = []
+  let session = VideoTrimSession(
+    sourceURL: sourceURL,
+    maxDurationSeconds: 120,
+    onSave: { outcomes.append(.saved($0)) },
+    onCancel: { outcomes.append(.cancelled) },
+    onFailure: { outcomes.append(.failed) }
+  )
+  let selection = VideoTrimSelection(sourceDurationSeconds: 1, maxDurationSeconds: 120)
+
+  await session.exportTrim(selection: selection, using: CancellingVideoTrimExporter())
+
+  #expect(outcomes.isEmpty)
+  #expect(FileManager.default.fileExists(atPath: sourceURL.path))
+}
+
+@Test func exportCompletingAfterCancellationDiscardsItsOutput() async throws {
+  let sourceURL = try makeTempMovieFile()
+  var outcomes: [VideoTrimCompletion.Outcome] = []
+  let session = VideoTrimSession(
+    sourceURL: sourceURL,
+    maxDurationSeconds: 120,
+    onSave: { outcomes.append(.saved($0)) },
+    onCancel: { outcomes.append(.cancelled) },
+    onFailure: { outcomes.append(.failed) }
+  )
+  let exporter = GatedVideoTrimExporter()
+  let selection = VideoTrimSelection(sourceDurationSeconds: 1, maxDurationSeconds: 120)
+
+  let exportTask = Task { @MainActor in
+    await session.exportTrim(selection: selection, using: exporter)
+  }
+  try await waitUntil { await exporter.hasStarted }
+  // The export ignores cancellation and returns successfully anyway — the
+  // session must still refuse to resurrect a torn-down cover.
+  exportTask.cancel()
+  let outputURL = await exporter.release()
+  await exportTask.value
+
+  #expect(outcomes.isEmpty)
+  #expect(!FileManager.default.fileExists(atPath: outputURL.path))
+  #expect(FileManager.default.fileExists(atPath: sourceURL.path))
+}
+
+private actor GatedVideoTrimExporter: VideoTrimExporting {
+  private(set) var hasStarted = false
+  private var continuation: CheckedContinuation<Void, Never>?
+  private var outputURL: URL?
+
+  func export(sourceURL: URL, selection: VideoTrimSelection) async throws -> URL {
+    let outputURL = FileManager.default.temporaryDirectory
+      .appending(path: "gated-trim-\(UUID().uuidString).mov")
+    try Data([0x01]).write(to: outputURL)
+    self.outputURL = outputURL
+    hasStarted = true
+    await withCheckedContinuation { continuation = $0 }
+    return outputURL
+  }
+
+  func release() -> URL {
+    continuation?.resume()
+    continuation = nil
+    return outputURL ?? URL(fileURLWithPath: "/dev/null")
+  }
+}
+
+private struct CancellingVideoTrimExporter: VideoTrimExporting {
+  func export(sourceURL: URL, selection: VideoTrimSelection) async throws -> URL {
+    throw CancellationError()
+  }
 }

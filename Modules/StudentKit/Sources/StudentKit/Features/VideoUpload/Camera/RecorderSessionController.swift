@@ -153,7 +153,7 @@
 
     func handleApplicationDidEnterBackground() async {
       if machine.activeGeneration != nil {
-        await interruptRecording(message: "录制已中断，请重试")
+        await interruptRecording(message: StudentStrings.localized(.recorderSessionController001))
       } else if machine.state != .review {
         await worker.stopSession()
       }
@@ -236,7 +236,8 @@
         ) { [weak self] _ in
           Task { @MainActor in
             guard let self, self.machine.activeGeneration != nil else { return }
-            await self.interruptRecording(message: "录制已中断，请重试")
+            await self.interruptRecording(
+              message: StudentStrings.localized(.recorderSessionController001))
           }
         }
       )
@@ -248,7 +249,8 @@
         ) { [weak self] _ in
           Task { @MainActor in
             guard let self, self.machine.activeGeneration != nil else { return }
-            await self.interruptRecording(message: "相机发生错误，请重试")
+            await self.interruptRecording(
+              message: StudentStrings.localized(.recorderSessionController002))
           }
         }
       )

@@ -20,11 +20,11 @@ public enum PlanDayCompletionError: Error, Equatable, Sendable {
 
   public var localizedMessage: String {
     switch self {
-    case .notLatestCompletion: "只能撤销最近完成的一天"
-    case .undoWindowPassed: "只能在当天撤销"
-    case .planNotActive: "这份计划已不是当前计划"
-    case .notPlanStudent: "无法修改这一天的完成状态"
-    case .unavailable: "暂时无法完成操作，请稍后重试。"
+    case .notLatestCompletion: RepositoryStrings.onlyLatestDayCanBeUndone
+    case .undoWindowPassed: RepositoryStrings.completionCanOnlyBeUndoneToday
+    case .planNotActive: RepositoryStrings.planIsNoLongerCurrent
+    case .notPlanStudent: RepositoryStrings.dayCannotBeModified
+    case .unavailable: RepositoryStrings.operationUnavailable
     }
   }
 }

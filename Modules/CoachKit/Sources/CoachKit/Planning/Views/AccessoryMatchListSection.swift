@@ -27,7 +27,7 @@ public struct AccessoryMatchListSection: View {
   public var body: some View {
     Card(accessibilityLabel: "Accessory matches") {
       VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-        Text("匹配 \(filteredExercises.count) 个")
+        Text(CoachPlanningStrings.matchingExerciseCount(filteredExercises.count))
           .font(Font.MeetPR.headline)
           .foregroundStyle(Color.MeetPR.fgPrimary)
 
@@ -35,7 +35,7 @@ public struct AccessoryMatchListSection: View {
           Image(systemName: "magnifyingglass")
             .font(.footnote)
             .foregroundStyle(Color.MeetPR.fgSecondary)
-          TextField("搜索 / Search", text: $searchText)
+          TextField(CoachPlanningStrings.search, text: $searchText)
             .font(Font.MeetPR.body)
             .planningNoAutocapitalization()
             .autocorrectionDisabled(true)
@@ -48,7 +48,7 @@ public struct AccessoryMatchListSection: View {
                 .foregroundStyle(Color.MeetPR.fgSecondary)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("清空搜索")
+            .accessibilityLabel(CoachPlanningStrings.clearSearch)
           }
         }
         .padding(.horizontal, MeetPRSpacing.sm)
@@ -57,12 +57,16 @@ public struct AccessoryMatchListSection: View {
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
 
         if isLoading {
-          ProgressView("加载动作中")
+          ProgressView(CoachPlanningStrings.loadingExercises)
             .font(Font.MeetPR.body)
         } else if filteredExercises.isEmpty {
-          Text(searchText.isEmpty ? "没有匹配动作" : "没有符合搜索的动作")
-            .font(Font.MeetPR.body)
-            .foregroundStyle(Color.MeetPR.fgSecondary)
+          Text(
+            searchText.isEmpty
+              ? CoachPlanningStrings.noMatchingExercises
+              : CoachPlanningStrings.noSearchResults
+          )
+          .font(Font.MeetPR.body)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
         } else {
           LazyVStack(spacing: MeetPRSpacing.sm) {
             ForEach(filteredExercises) { exercise in
@@ -98,7 +102,7 @@ private struct AccessoryMatchRow: View {
     Button(action: onToggle) {
       HStack(alignment: .center, spacing: MeetPRSpacing.md) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-          Text(exercise.name)
+          Text(CoachLocalization.exerciseName(exercise))
             .font(Font.MeetPR.bodyEmphasis)
             .foregroundStyle(Color.MeetPR.fgPrimary)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -114,7 +118,13 @@ private struct AccessoryMatchRow: View {
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
     .buttonStyle(.plain)
-    .accessibilityLabel(isSelected ? "移除 \(exercise.name)" : "添加 \(exercise.name)")
+    .accessibilityLabel(
+      isSelected
+        ? CoachPlanningStrings.removeExerciseAccessibility(
+          CoachLocalization.exerciseName(exercise)
+        )
+        : CoachPlanningStrings.addExerciseAccessibility(CoachLocalization.exerciseName(exercise))
+    )
   }
 }
 

@@ -21,7 +21,7 @@ struct EvaluationStatusBanner: View {
 
   var body: some View {
     TimelineView(.everyMinute) { context in
-      Card(accessibilityLabel: "评估期") {
+      Card(accessibilityLabel: CoachStudentDetailStrings.text("coach.evaluation.title")) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
           Text(viewModel.statusText(now: context.date))
             .font(Font.MeetPR.bodyEmphasis)
@@ -46,36 +46,36 @@ struct EvaluationStatusBanner: View {
       }
     }
     .confirmationDialog(
-      "完成后即可发布正式 4 周计划。还没写评估总结的话,建议先写总结再完成。",
+      CoachStudentDetailStrings.text("coach.evaluation.complete.confirmation"),
       isPresented: $showCompleteDialog,
       titleVisibility: .visible
     ) {
-      Button("仍然完成") {
+      Button(CoachStudentDetailStrings.text("coach.evaluation.complete.anyway")) {
         Task { _ = await viewModel.complete() }
       }
-      Button("先写总结") {
+      Button(CoachStudentDetailStrings.text("coach.evaluation.complete.writeSummary")) {
         onOpenSummary()
       }
-      Button("取消", role: .cancel) {}
+      Button(CoachStudentDetailStrings.text("coach.common.cancel"), role: .cancel) {}
     }
   }
 
   private var actionRow: some View {
     HStack(spacing: MeetPRSpacing.sm) {
       if hasPublishedPlan {
-        SecondaryButton("查看适应周") {
+        SecondaryButton(CoachStudentDetailStrings.text("coach.evaluation.viewAdaptation")) {
           onViewAdaptationWeek()
         }
       } else {
-        SecondaryButton("发适应周") {
+        SecondaryButton(CoachStudentDetailStrings.text("coach.evaluation.sendAdaptation")) {
           onSendAdaptationWeek()
         }
       }
-      SecondaryButton("评估总结") {
+      SecondaryButton(CoachStudentDetailStrings.text("coach.evaluation.summary")) {
         onOpenSummary()
       }
       Spacer()
-      PrimaryButton("完成评估") {
+      PrimaryButton(CoachStudentDetailStrings.text("coach.evaluation.complete")) {
         showCompleteDialog = true
       }
     }
