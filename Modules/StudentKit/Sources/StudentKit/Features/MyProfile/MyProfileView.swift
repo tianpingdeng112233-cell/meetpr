@@ -4,7 +4,7 @@ import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// Black-gold v3 我的资料 tab. Existing onboarding, readiness, rest-timer,
+/// Black-gold v3 我的资料 tab. Existing onboarding, readiness, preferences,
 /// account, export, and logout flows remain the only mutation paths.
 @available(iOS 17.0, macOS 14.0, *)
 public struct MyProfileView: View {
@@ -16,6 +16,7 @@ public struct MyProfileView: View {
   private let account: (any AccountRepository)?
   private let logs: (any StudentTrainingLogRepository)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  private let trainingReminderServices: TrainingReminderServices
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
 
@@ -49,6 +50,7 @@ public struct MyProfileView: View {
     self.account = account
     self.logs = logs
     self.restTimerSettings = restTimerSettings
+    self.trainingReminderServices = .live
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self._viewModel = State(
@@ -175,6 +177,11 @@ public struct MyProfileView: View {
         MyProfileDivider()
         RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
         MyProfileDivider()
+        TrainingReminderPreferenceRow(
+          studentID: studentID,
+          services: trainingReminderServices
+        )
+        MyProfileDivider()
         profileRow(
           StudentStrings.localized(.myProfileView008),
           presentation.competition,
@@ -268,6 +275,11 @@ public struct MyProfileView: View {
       AppearancePreferenceRow()
       MyProfileDivider()
       RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
+      MyProfileDivider()
+      TrainingReminderPreferenceRow(
+        studentID: studentID,
+        services: trainingReminderServices
+      )
     }
     if let onLogout {
       GoldCTA(
