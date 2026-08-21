@@ -4,6 +4,12 @@ import Networking
 
 /// `internal` so unit tests can exercise the backend projection directly.
 enum StudentPlanProjection {
+  private struct Prescription {
+    let weightKg: Decimal?
+    let intensity: PrescribedIntensity?
+    let percentageAnchor: PercentageAnchor?
+  }
+
   static func project(
     tree: TrainingPlanTree,
     catalog: [Exercise],
@@ -87,6 +93,7 @@ enum StudentPlanProjection {
       setIndex: planSet.setNumber - 1,
       weightKg: prescription.weightKg,
       intensity: prescription.intensity,
+      percentageAnchor: prescription.percentageAnchor,
       loadMode: planSet.loadMode,
       reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
@@ -97,11 +104,12 @@ enum StudentPlanProjection {
 
   private static func prescription(
     for planSet: PlanSet
-  ) -> (weightKg: Decimal?, intensity: PrescribedIntensity?) {
+  ) -> Prescription {
     guard let loadMode = planSet.loadMode else {
-      return (
-        planSet.intensityMode == .weight ? planSet.targetValue : nil,
-        planSet.intensityMode == .rpe ? .rpe(planSet.targetValue) : nil
+      return Prescription(
+        weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
+        intensity: planSet.intensityMode == .rpe ? .rpe(planSet.targetValue) : nil,
+        percentageAnchor: nil
       )
     }
 
@@ -124,7 +132,13 @@ enum StudentPlanProjection {
     case .fixedWeight:
       intensity = nil
     }
-    return (planSet.targetWeight, intensity)
+    let percentageAnchor =
+      loadMode == .percentage ? planSet.percentageAnchor ?? .registeredOneRM : nil
+    return Prescription(
+      weightKg: planSet.targetWeight,
+      intensity: intensity,
+      percentageAnchor: percentageAnchor
+    )
   }
 
   private static func range(

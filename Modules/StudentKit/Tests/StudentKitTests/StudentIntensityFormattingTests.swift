@@ -74,6 +74,72 @@ func legacyPrescriptionFormattingIsUnchanged(set: PrescribedSet, expected: Strin
 }
 
 @MainActor
+@Test func resolvedPercentageShowsApproximateWeightAndOriginalAnchor() throws {
+  let prescribed = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(60),
+    percentageAnchor: .registeredOneRM, loadMode: .percentage, reps: 5)
+  let outcome = SetWeightSuggestionOutcome(
+    suggestion: SetWeightSuggestion(
+      weightKg: 120,
+      basis: .percentage(.registeredOneRM(anchorKg: 200))
+    ),
+    unavailableReason: nil
+  )
+  let presentation = intensityPresentation(
+    prescribed: [prescribed],
+    suggestionOutcomes: [prescribed.id: outcome]
+  )
+  let row = try #require(presentation.currentRow)
+
+  #expect(row.heroPrimaryText == "≈ 120")
+  #expect(row.heroShowsWeightUnit)
+  #expect(row.heroSecondaryIntensityText == "60% × 1RM")
+  #expect(
+    presentation.exercises.first?.prescriptionSummary
+      == "≈ 120 kg · 60% × 1RM × 5 · 1 组"
+  )
+}
+
+@MainActor
+@Test func unresolvedTopSetShowsSemanticInstructionWithoutPrefill() throws {
+  let prescribed = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(85),
+    percentageAnchor: .topSet, loadMode: .percentage, reps: 5)
+  let outcome = SetWeightSuggestionOutcome(
+    suggestion: nil,
+    unavailableReason: .topSetNotCompleted
+  )
+  let presentation = intensityPresentation(
+    prescribed: [prescribed],
+    suggestionOutcomes: [prescribed.id: outcome]
+  )
+  let row = try #require(presentation.currentRow)
+
+  #expect(row.heroPrimaryText == "85% × 当日顶组 · 先完成顶组")
+  #expect(!row.heroShowsWeightUnit)
+  #expect(row.heroSecondaryIntensityText == nil)
+}
+
+@MainActor
+@Test func unsupportedPercentageExerciseOnlyShowsOriginalPercentage() throws {
+  let prescribed = PrescribedSet(
+    id: UUID(), setIndex: 0, intensity: .percentage(60),
+    percentageAnchor: .registeredOneRM, loadMode: .percentage, reps: 5)
+  let outcome = SetWeightSuggestionOutcome(
+    suggestion: nil,
+    unavailableReason: .unsupportedPercentageExercise
+  )
+  let presentation = intensityPresentation(
+    prescribed: [prescribed],
+    suggestionOutcomes: [prescribed.id: outcome]
+  )
+  let row = try #require(presentation.currentRow)
+
+  #expect(row.heroPrimaryText == "60%")
+  #expect(!row.heroShowsWeightUnit)
+}
+
+@MainActor
 @Test func heroShowsIndependentRPEAlongsideWeight() throws {
   let prescribed = PrescribedSet(
     id: UUID(), setIndex: 0, weightKg: 170, intensity: .rpe(9), loadMode: .rpe, reps: 5)
@@ -119,11 +185,20 @@ private func intensityPresentation(prescribed: PrescribedSet) -> TodayWorkoutPre
 
 @MainActor
 private func intensityPresentation(prescribed: [PrescribedSet]) -> TodayWorkoutPresentation {
+  intensityPresentation(prescribed: prescribed, suggestionOutcomes: [:])
+}
+
+@MainActor
+private func intensityPresentation(
+  prescribed: [PrescribedSet],
+  suggestionOutcomes: [UUID: SetWeightSuggestionOutcome]
+) -> TodayWorkoutPresentation {
   let day = intensityDay(prescribed: prescribed)
   return TodayWorkoutPresentation(
     day: day,
     drafts: TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []),
     references: [:],
+    suggestionOutcomes: suggestionOutcomes,
     started: true
   )
 }

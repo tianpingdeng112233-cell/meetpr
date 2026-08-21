@@ -191,13 +191,12 @@ import Testing
   }
 
   @MainActor
-  @Test func sheetPrefillsFixedWeightAndLeavesPercentageEmpty() async throws {
-    // pct anchors are tiered (⚖️2026-08-12, default 1RM): no conversion until
-    // pct_anchor lands, so the sheet must stay empty rather than invent 90kg.
+  @Test func sheetPrefillsResolvedPercentageAndFixedWeight() async throws {
     let pctFixture = try await makeSuggestionSheetFixture(
       seedHistory: true,
       prescribed: PrescribedSet(
-        id: UUID(), setIndex: 0, intensity: .percentage(75), loadMode: .percentage, reps: 5)
+        id: UUID(), setIndex: 0, intensity: .percentage(75), percentageAnchor: .e1RM,
+        loadMode: .percentage, reps: 5)
     )
     let pctSheet = SetEntrySheet(
       rowIndex: 0,
@@ -217,7 +216,11 @@ import Testing
       viewModel: fixedFixture.viewModel
     )
 
-    #expect(pctSheet.weightValue == 0)
+    #expect(pctSheet.weightValue == 90)
+    #expect(
+      pctSheet.suggestionOutcomeSnapshot.suggestion?.basis
+        == .percentage(.e1RM(anchorKg: 120))
+    )
     #expect(fixedSheet.weightValue == 150)
   }
 

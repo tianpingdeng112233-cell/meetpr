@@ -49,6 +49,14 @@ struct StudentStringsTests {
         locale: chinese
       ) == "评估期还剩: 4 天 13 小时"
     )
+    #expect(
+      StudentStrings.replacing(
+        .todayWorkoutTypes011,
+        values: ["200"],
+        locale: chinese
+      ) == "按登记 1RM 200 kg 换算"
+    )
+    #expect(StudentStrings.localized(.todayWorkoutTypes010, locale: chinese) == "先完成顶组")
   }
 
   @Test("Critical English copy is available")
@@ -75,6 +83,17 @@ struct StudentStringsTests {
         values: ["2"],
         locale: english
       ) == "Set 2"
+    )
+    #expect(
+      StudentStrings.replacing(
+        .todayWorkoutTypes013,
+        values: ["200"],
+        locale: english
+      ) == "Calculated from today's top set 200 kg"
+    )
+    #expect(
+      StudentStrings.localized(.todayWorkoutTypes008, locale: english)
+        == "Coach prescribed a percentage, but this exercise has no reference 1RM"
     )
   }
 

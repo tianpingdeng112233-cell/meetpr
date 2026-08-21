@@ -212,6 +212,14 @@ public final class TodayWorkoutViewModel {
       studentID: studentID
     )
 
+    // A live onboarding reader is required for registered-1RM percentage
+    // resolution and stance-aware family matching, so establish it before
+    // projecting the handoff. Demo/test handoffs without a reader retain the
+    // existing immediate-render behavior.
+    if onboarding != nil {
+      onboardingProfile = await profileTask
+    }
+
     do {
       try await applyPlan(
         preloadedPlan,
@@ -414,7 +422,11 @@ public final class TodayWorkoutViewModel {
       try await (existingLogsTask, referenceSnapshotTask, historyLogsTask)
     return LoadedDaySnapshot(
       day: day,
-      drafts: Self.makeDrafts(for: day, existingLogs: existingLogs),
+      drafts: Self.makeDrafts(
+        for: day,
+        existingLogs: existingLogs,
+        onboardingProfile: onboardingProfile
+      ),
       references: referenceSnapshot.references,
       suggestionE1RMByExercise: referenceSnapshot.suggestionE1RMByExercise,
       lastWeightByExercise: Self.lastWeights(

@@ -18,6 +18,11 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   /// weight suggestion; variations and accessories fill last logged weight
   /// instead.
   public let isMainLift: Bool
+  /// Competition-family resolution from the canonical spec 050 resolver.
+  public let liftFamily: LiftFamily?
+  /// Backend `plan_exercises.sort_order`; top-set anchors only inspect rows
+  /// with a strictly lower value.
+  public let planExerciseSortOrder: Int
   public var prescribed: PrescribedSet
   public var actualWeight: Decimal?
   public var actualReps: Int?
@@ -35,6 +40,8 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     exerciseNameEn: String? = nil,
     isAccessory: Bool,
     isMainLift: Bool = false,
+    liftFamily: LiftFamily? = nil,
+    planExerciseSortOrder: Int = 0,
     prescribed: PrescribedSet,
     actualWeight: Decimal? = nil,
     actualReps: Int? = nil,
@@ -51,6 +58,8 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.exerciseNameEn = exerciseNameEn
     self.isAccessory = isAccessory
     self.isMainLift = isMainLift
+    self.liftFamily = liftFamily
+    self.planExerciseSortOrder = planExerciseSortOrder
     self.prescribed = prescribed
     self.actualWeight = actualWeight
     self.actualReps = actualReps
@@ -118,10 +127,28 @@ struct SetWeightSuggestion: Equatable, Sendable {
     /// Most recent logged weight for this exercise from an earlier session
     /// (variation / accessory path).
     case lastLogged
+    case percentage(PctAnchorResolutionSource)
   }
 
   let weightKg: Decimal
   let basis: Basis
+
+  var percentageAnnotation: String? {
+    guard case .percentage(let source) = basis, let anchorKg = source.anchorKg else {
+      return nil
+    }
+    let anchor = StudentFormatting.decimal(anchorKg)
+    switch source {
+    case .registeredOneRM, .fallbackToRegisteredOneRM:
+      return StudentStrings.replacing(.todayWorkoutTypes011, values: [anchor])
+    case .e1RM:
+      return StudentStrings.replacing(.todayWorkoutTypes012, values: [anchor])
+    case .topSet:
+      return StudentStrings.replacing(.todayWorkoutTypes013, values: [anchor])
+    case .unresolved:
+      return nil
+    }
+  }
 }
 
 enum SetWeightSuggestionUnavailableReason: Equatable, Sendable {
@@ -132,6 +159,9 @@ enum SetWeightSuggestionUnavailableReason: Equatable, Sendable {
   case prescribedRPEBelowSupportedRange
   case prescribedRPEAboveSupportedRange
   case noExerciseHistory
+  case unsupportedPercentageExercise
+  case missingRegisteredOneRM
+  case topSetNotCompleted
 
   var message: String {
     switch self {
@@ -149,6 +179,21 @@ enum SetWeightSuggestionUnavailableReason: Equatable, Sendable {
       StudentStrings.localized(.todayWorkoutTypes006)
     case .noExerciseHistory:
       StudentStrings.localized(.todayWorkoutTypes007)
+    case .unsupportedPercentageExercise:
+      StudentStrings.localized(.todayWorkoutTypes008)
+    case .missingRegisteredOneRM:
+      StudentStrings.localized(.todayWorkoutTypes009)
+    case .topSetNotCompleted:
+      StudentStrings.localized(.todayWorkoutTypes010)
+    }
+  }
+
+  var isPercentageResolutionReason: Bool {
+    switch self {
+    case .unsupportedPercentageExercise, .missingRegisteredOneRM, .topSetNotCompleted:
+      true
+    default:
+      false
     }
   }
 }
@@ -161,6 +206,11 @@ struct SetWeightSuggestionOutcome: Equatable, Sendable {
     suggestion: nil,
     unavailableReason: nil
   )
+
+  var percentageSource: PctAnchorResolutionSource? {
+    guard case .percentage(let source) = suggestion?.basis else { return nil }
+    return source
+  }
 }
 
 public struct ExerciseReferenceSet: Equatable, Sendable {

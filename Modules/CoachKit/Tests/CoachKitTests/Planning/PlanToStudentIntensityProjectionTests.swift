@@ -17,7 +17,8 @@ import Testing
     mode: .rpe,
     value: 7.1,
     loadMode: .percentage,
-    targetPct: 72.5
+    targetPct: 72.5,
+    percentageAnchor: .topSet
   )
   let dual = ProjFixtures.set(
     exID: exercise.id,
@@ -37,6 +38,7 @@ import Testing
 
   #expect(sets[0].weightKg == nil)
   #expect(sets[0].intensity == .percentage(72.5))
+  #expect(sets[0].percentageAnchor == .topSet)
   #expect(sets[0].rpe == nil)
   #expect(sets[0].restSeconds == 180)
   #expect(sets[1].weightKg == 170)
@@ -55,6 +57,7 @@ private func goldenMatrixSets(exerciseID: UUID) -> [PlanSet] {
     value: Decimal,
     loadMode: PlanLoadMode? = nil,
     targetPct: Decimal? = nil,
+    percentageAnchor: PercentageAnchor? = nil,
     targetRPE: Decimal? = nil,
     rirTarget: Int? = nil,
     rpeLow: Decimal? = nil,
@@ -72,6 +75,7 @@ private func goldenMatrixSets(exerciseID: UUID) -> [PlanSet] {
       targetValue: value,
       loadMode: loadMode,
       targetPct: targetPct,
+      percentageAnchor: percentageAnchor,
       targetRPE: targetRPE,
       rirTarget: rirTarget,
       rpeLow: rpeLow,
@@ -80,7 +84,6 @@ private func goldenMatrixSets(exerciseID: UUID) -> [PlanSet] {
       weightHigh: weightHigh,
       targetWeight: targetWeight,
       setType: .working,
-      restSeconds: nil,
       createdAt: timestamp
     )
   }

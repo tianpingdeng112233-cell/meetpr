@@ -19,7 +19,8 @@ extension TodayWorkoutViewModel {
       forSetID: setID,
       in: drafts,
       currentE1RMKg: suggestionE1RMByExercise[draft.exerciseID],
-      lastLoggedWeightKg: lastWeightByExercise[draft.exerciseID]
+      lastLoggedWeightKg: lastWeightByExercise[draft.exerciseID],
+      registeredOneRMKg: registeredOneRMKg(for: draft.liftFamily)
     )
   }
 
@@ -27,13 +28,15 @@ extension TodayWorkoutViewModel {
     forSetID setID: UUID,
     in drafts: [SetRowDraft],
     currentE1RMKg: Double?,
-    lastLoggedWeightKg: Decimal? = nil
+    lastLoggedWeightKg: Decimal? = nil,
+    registeredOneRMKg: Decimal? = nil
   ) -> SetWeightSuggestion? {
     weightSuggestionOutcome(
       forSetID: setID,
       in: drafts,
       currentE1RMKg: currentE1RMKg,
-      lastLoggedWeightKg: lastLoggedWeightKg
+      lastLoggedWeightKg: lastLoggedWeightKg,
+      registeredOneRMKg: registeredOneRMKg
     ).suggestion
   }
 
@@ -41,7 +44,8 @@ extension TodayWorkoutViewModel {
     forSetID setID: UUID,
     in drafts: [SetRowDraft],
     currentE1RMKg: Double?,
-    lastLoggedWeightKg: Decimal? = nil
+    lastLoggedWeightKg: Decimal? = nil,
+    registeredOneRMKg: Decimal? = nil
   ) -> SetWeightSuggestionOutcome {
     guard let targetIndex = drafts.firstIndex(where: { $0.id == setID }) else {
       return .unavailableWithoutReason
@@ -51,12 +55,16 @@ extension TodayWorkoutViewModel {
       return .unavailableWithoutReason
     }
 
-    // New-form intensities other than plain RPE degrade quietly for now:
-    // pct anchors are tiered (1RM/e1RM/top set, ⚖️2026-08-12) and converting
-    // against the wrong anchor is exactly the fabricated-number failure this
-    // spec removes; ranges and RIR have no suggestion semantics yet (卡 2).
     switch target.prescribed.intensity {
-    case .percentage, .rir, .rpeRange, .weightRange:
+    case .percentage(let percentage):
+      return percentageSuggestionOutcome(
+        percentage: percentage,
+        target: target,
+        drafts: drafts,
+        currentE1RMKg: currentE1RMKg,
+        registeredOneRMKg: registeredOneRMKg
+      )
+    case .rir, .rpeRange, .weightRange:
       return .unavailableWithoutReason
     case .rpe, nil:
       break
@@ -186,14 +194,65 @@ extension TodayWorkoutViewModel {
     // Forward e1RMs are quotients (weight / intensity), so reversing can land
     // a hair under the exact multiple (49.999…); nudge before flooring or the
     // suggestion drops a whole 2.5 step.
-    let roundedWeight = roundedDownToPlateStep(rawWeight)
-    guard roundedWeight > 0 else { return nil }
-    return SetWeightSuggestion(weightKg: Decimal(roundedWeight), basis: .e1RM(currentE1RMKg))
+    guard let roundedWeight = SetWeightSuggestionRounding.roundedDownToPlateStep(rawWeight) else {
+      return nil
+    }
+    return SetWeightSuggestion(weightKg: roundedWeight, basis: .e1RM(currentE1RMKg))
   }
 
-  private nonisolated static func roundedDownToPlateStep(_ weight: Double) -> Double {
-    let steps = (weight / 2.5 + 1e-6).rounded(.down)
-    return steps * 2.5
+  private nonisolated static func percentageSuggestionOutcome(
+    percentage: Decimal,
+    target: SetRowDraft,
+    drafts: [SetRowDraft],
+    currentE1RMKg: Double?,
+    registeredOneRMKg: Decimal?
+  ) -> SetWeightSuggestionOutcome {
+    let sameDaySets = drafts.map {
+      PctAnchorResolver.LoggedSet(
+        exerciseID: $0.exerciseID,
+        planExerciseSortOrder: $0.planExerciseSortOrder,
+        actualWeightKg: $0.actualWeight,
+        actualReps: $0.actualReps,
+        completed: $0.completed,
+        failed: $0.failed
+      )
+    }
+    let resolution = PctAnchorResolver.resolve(
+      PctAnchorResolver.Input(
+        percentage: percentage,
+        anchor: target.prescribed.effectivePercentageAnchor,
+        exerciseFamily: target.liftFamily,
+        registeredOneRMKg: registeredOneRMKg,
+        currentE1RMKg: currentE1RMKg,
+        exerciseID: target.exerciseID,
+        planExerciseSortOrder: target.planExerciseSortOrder,
+        sameDaySets: sameDaySets
+      )
+    )
+    guard let resolvedKg = resolution.resolvedKg else {
+      return SetWeightSuggestionOutcome(
+        suggestion: nil,
+        unavailableReason: unavailableReason(for: resolution.source)
+      )
+    }
+    return suggestionOutcome(
+      SetWeightSuggestion(weightKg: resolvedKg, basis: .percentage(resolution.source)),
+      for: target
+    )
+  }
+
+  private nonisolated static func unavailableReason(
+    for source: PctAnchorResolutionSource
+  ) -> SetWeightSuggestionUnavailableReason? {
+    guard case .unresolved(let reason) = source else { return nil }
+    switch reason {
+    case .unsupportedExercise:
+      return .unsupportedPercentageExercise
+    case .missingRegisteredOneRM:
+      return .missingRegisteredOneRM
+    case .topSetNotCompleted:
+      return .topSetNotCompleted
+    }
   }
 
   /// Variations / accessories never get e1RM math: today's most recent
@@ -267,11 +326,17 @@ extension TodayWorkoutViewModel {
 
   static func makeDrafts(
     for day: StudentPlanDay,
-    existingLogs: [StudentSetLog]
+    existingLogs: [StudentSetLog],
+    onboardingProfile: OnboardingProfile? = nil
   ) -> [SetRowDraft] {
     day.exercises.flatMap { exercise in
       exercise.prescribedSets.map { set in
-        makeDraft(exercise: exercise, set: set, existingLogs: existingLogs)
+        makeDraft(
+          exercise: exercise,
+          set: set,
+          existingLogs: existingLogs,
+          onboardingProfile: onboardingProfile
+        )
       }
     }
   }
@@ -279,7 +344,8 @@ extension TodayWorkoutViewModel {
   static func makeDraft(
     exercise: StudentPlanExercise,
     set: PrescribedSet,
-    existingLogs: [StudentSetLog]
+    existingLogs: [StudentSetLog],
+    onboardingProfile: OnboardingProfile? = nil
   ) -> SetRowDraft {
     let existingLog = existingLogs.first {
       $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
@@ -292,6 +358,11 @@ extension TodayWorkoutViewModel {
       exerciseNameEn: exercise.exercise.nameEn,
       isAccessory: exercise.exercise.isAccessory,
       isMainLift: exercise.exercise.exerciseType == .mainLift,
+      liftFamily: resolveCompetitionFamily(
+        exercise: exercise.exercise,
+        onboarding: onboardingProfile
+      ),
+      planExerciseSortOrder: exercise.sequenceIndex,
       prescribed: set,
       actualWeight: existingLog?.weightKg ?? set.weightKg,
       actualReps: existingLog?.reps ?? set.reps,
@@ -301,5 +372,17 @@ extension TodayWorkoutViewModel {
       assumed: existingLog?.assumed ?? false,
       loggedSetID: existingLog?.id
     )
+  }
+
+  private func registeredOneRMKg(for family: LiftFamily?) -> Decimal? {
+    guard let family else { return nil }
+    switch family {
+    case .squat:
+      return onboardingProfile?.squat1RMKg
+    case .bench:
+      return onboardingProfile?.bench1RMKg
+    case .deadlift:
+      return onboardingProfile?.deadlift1RMKg
+    }
   }
 }

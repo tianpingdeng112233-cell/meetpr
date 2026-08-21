@@ -110,7 +110,25 @@ struct SetEntrySheet: View {
                 onOpenPad: { openNumberPad(.weight) }
               )
 
-              if let reason = suggestionOutcomeSnapshot.unavailableReason {
+              if let annotation = suggestionOutcomeSnapshot.suggestion?.percentageAnnotation {
+                Text(annotation)
+                  .font(Font.MeetPR.caption)
+                  .foregroundStyle(Color.MeetPR.textSecondary)
+                  .frame(maxWidth: .infinity, alignment: .leading)
+                  .lineLimit(1)
+                  .minimumScaleFactor(0.85)
+                  .accessibilityIdentifier("setEntry.weightSuggestionSource")
+              } else if let reason = suggestionOutcomeSnapshot.unavailableReason,
+                reason.isPercentageResolutionReason
+              {
+                Text(reason.message)
+                  .font(Font.MeetPR.caption)
+                  .foregroundStyle(Color.MeetPR.textSecondary)
+                  .frame(maxWidth: .infinity, alignment: .leading)
+                  .lineLimit(1)
+                  .minimumScaleFactor(0.85)
+                  .accessibilityIdentifier("setEntry.weightSuggestionUnavailable")
+              } else if let reason = suggestionOutcomeSnapshot.unavailableReason {
                 Text(StudentStrings.replacing(.setEntrySheet002, values: ["\(reason.message)"]))
                   .font(Font.MeetPR.caption)
                   .foregroundStyle(Color.MeetPR.textSecondary)

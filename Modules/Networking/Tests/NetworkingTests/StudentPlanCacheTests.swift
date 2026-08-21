@@ -84,9 +84,9 @@ import Testing
   let prescribed = PrescribedSet(
     id: UUID(),
     setIndex: 0,
-    weightKg: 170,
-    intensity: .rpe(9),
-    loadMode: .rpe,
+    intensity: .percentage(60),
+    percentageAnchor: .e1RM,
+    loadMode: .percentage,
     reps: 5
   )
   let planExercise = StudentPlanExercise(
@@ -101,9 +101,31 @@ import Testing
   let restored = try #require(await cache.loadPlan(studentID: studentID))
 
   #expect(restored == plan)
-  #expect(restored.days[0].exercises[0].prescribedSets[0].weightKg == 170)
-  #expect(restored.days[0].exercises[0].prescribedSets[0].intensity == .rpe(9))
-  #expect(restored.days[0].exercises[0].prescribedSets[0].loadMode == .rpe)
+  let restoredSet = restored.days[0].exercises[0].prescribedSets[0]
+  #expect(restoredSet.weightKg == nil)
+  #expect(restoredSet.intensity == .percentage(60))
+  #expect(restoredSet.percentageAnchor == .e1RM)
+  #expect(restoredSet.loadMode == .percentage)
+}
+
+@Test func studentPlanCacheDefaultsMissingPercentageAnchorToRegisteredOneRM() throws {
+  let set = PrescribedSet(
+    id: UUID(),
+    setIndex: 0,
+    intensity: .percentage(60),
+    percentageAnchor: .e1RM,
+    loadMode: .percentage,
+    reps: 5
+  )
+  let encoded = try MeetPRCodec.encoder.encode(set)
+  var object = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+  object.removeValue(forKey: "percentage_anchor")
+  let oldCache = try JSONSerialization.data(withJSONObject: object)
+
+  let restored = try MeetPRCodec.decoder.decode(PrescribedSet.self, from: oldCache)
+
+  #expect(restored.percentageAnchor == .registeredOneRM)
+  #expect(restored.effectivePercentageAnchor == .registeredOneRM)
 }
 
 // A pre-072 v3 cache file (no `intensity`/`load_mode` keys, RPE stored under

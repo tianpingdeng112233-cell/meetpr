@@ -67,7 +67,10 @@ enum StudentFormatting {
     )
   }
 
-  static func prescribed(_ set: PrescribedSet) -> String {
+  static func prescribed(
+    _ set: PrescribedSet,
+    percentageOutcome: SetWeightSuggestionOutcome? = nil
+  ) -> String {
     // Legacy rows (load_mode == null) keep the pre-072 string byte-for-byte;
     // only new-form rows get the six-form rendering (spec 072 §1.4).
     if set.isLegacyPrescription {
@@ -88,6 +91,12 @@ enum StudentFormatting {
     }
     if case .weightRange(let low, let high) = set.intensity {
       return "\(weightDecimal(low))–\(weightDecimal(high))kg × \(reps)"
+    }
+
+    if case .percentage(let value) = set.intensity,
+      let percentageOutcome
+    {
+      return "\(percentagePrescription(value, set: set, outcome: percentageOutcome)) × \(reps)"
     }
 
     if let weightKg = set.weightKg {
@@ -116,6 +125,47 @@ enum StudentFormatting {
       "RPE \(decimal(low))–\(decimal(high))"
     case .weightRange(let low, let high):
       "\(weightDecimal(low))–\(weightDecimal(high))kg"
+    }
+  }
+
+  static func percentageAnchorText(_ set: PrescribedSet) -> String? {
+    guard case .percentage(let value) = set.intensity else { return nil }
+    let percentage = decimal(value)
+    switch set.effectivePercentageAnchor {
+    case .registeredOneRM:
+      return StudentStrings.replacing(.todayWorkoutTypes014, values: [percentage])
+    case .e1RM:
+      return StudentStrings.replacing(.todayWorkoutTypes015, values: [percentage])
+    case .topSet:
+      return StudentStrings.replacing(.todayWorkoutTypes016, values: [percentage])
+    }
+  }
+
+  static func percentagePrescription(
+    _ value: Decimal,
+    set: PrescribedSet,
+    outcome: SetWeightSuggestionOutcome
+  ) -> String {
+    let raw = "\(decimal(value))%"
+    if let suggestion = outcome.suggestion,
+      case .percentage = suggestion.basis,
+      let anchorText = percentageAnchorText(set)
+    {
+      return StudentStrings.replacing(
+        .todayWorkoutTypes017,
+        values: [weightDecimal(suggestion.weightKg), anchorText]
+      )
+    }
+    switch outcome.unavailableReason {
+    case .topSetNotCompleted:
+      guard let anchorText = percentageAnchorText(set) else { return raw }
+      return StudentStrings.replacing(.todayWorkoutTypes018, values: [anchorText])
+    case .missingRegisteredOneRM:
+      return percentageAnchorText(set) ?? raw
+    case .unsupportedPercentageExercise:
+      return raw
+    default:
+      return raw
     }
   }
 

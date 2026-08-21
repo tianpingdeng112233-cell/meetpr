@@ -13176,6 +13176,210 @@
         }
       }
     },
+    "student.todayWorkoutTypes.copy008": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach prescribed a percentage, but this exercise has no reference 1RM"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练用百分比设定，无参考 1RM"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy009": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registered 1RM is unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂无登记 1RM"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy010": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete the top set first"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先完成顶组"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy011": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calculated from registered 1RM {0} kg"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按登记 1RM {0} kg 换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy012": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calculated from e1RM {0} kg"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按 e1RM {0} kg 换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy013": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calculated from today's top set {0} kg"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按当日顶组 {0} kg 换算"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy014": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}% × 1RM"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}% × 1RM"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy015": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}% × e1RM"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}% × e1RM"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy016": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}% × today's top set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}% × 当日顶组"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy017": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "≈ {0} kg · {1}"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "≈ {0} kg · {1}"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy018": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} · Complete the top set first"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} · 先完成顶组"
+          }
+        }
+      }
+    },
+    "student.todayWorkoutTypes.copy019": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "≈ {0}"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "≈ {0}"
+          }
+        }
+      }
+    },
     "student.todayWorkoutV3Previews.copy001": {
       "extractionState": "manual",
       "localizations": {

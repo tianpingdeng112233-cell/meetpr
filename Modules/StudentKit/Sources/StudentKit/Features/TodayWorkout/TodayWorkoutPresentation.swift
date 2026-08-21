@@ -78,7 +78,14 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       guard rows.contains(where: { !$0.draft.prescribed.isLegacyPrescription }) else {
         return nil
       }
-      let renderings = Set(rows.map { StudentFormatting.prescribed($0.draft.prescribed) })
+      let renderings = Set(
+        rows.map {
+          StudentFormatting.prescribed(
+            $0.draft.prescribed,
+            percentageOutcome: $0.suggestionOutcome
+          )
+        }
+      )
       guard renderings.count == 1, let uniform = renderings.first else {
         return StudentStrings.replacing(.todayWorkoutScreen019, values: ["\(rows.count)"])
       }
@@ -92,6 +99,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     let stableIndex: Int
     let record: ExerciseSetRecord
     let draft: TodayWorkoutViewModel.SetRowDraft
+    let suggestionOutcome: SetWeightSuggestionOutcome?
 
     /// Legacy rows keep the pre-072 hero exactly: record weight (or a dash)
     /// on top and the 目标 RPE block below (spec 072 §1.4).
@@ -103,17 +111,38 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       guard !usesLegacyHero else {
         return record.weight.map(Self.numberText) ?? "—"
       }
-      return record.weight.map(Self.numberText)
-        ?? draft.prescribed.intensity.map(StudentFormatting.intensityText)
-        ?? "—"
+      if let weight = record.weight {
+        return Self.numberText(weight)
+      }
+      if let suggestion = suggestionOutcome?.suggestion,
+        case .percentage = suggestion.basis
+      {
+        return StudentStrings.replacing(
+          .todayWorkoutTypes019,
+          values: [StudentFormatting.decimal(suggestion.weightKg)]
+        )
+      }
+      if case .percentage(let value) = draft.prescribed.intensity,
+        let suggestionOutcome
+      {
+        return StudentFormatting.percentagePrescription(
+          value,
+          set: draft.prescribed,
+          outcome: suggestionOutcome
+        )
+      }
+      return draft.prescribed.intensity.map(StudentFormatting.intensityText) ?? "—"
     }
 
     var heroShowsWeightUnit: Bool {
-      record.weight != nil
+      record.weight != nil || suggestionOutcome?.percentageSource != nil
     }
 
     var heroSecondaryIntensityText: String? {
       guard !usesLegacyHero, heroShowsWeightUnit else { return nil }
+      if suggestionOutcome?.percentageSource != nil {
+        return StudentFormatting.percentageAnchorText(draft.prescribed)
+      }
       return draft.prescribed.intensity.map(StudentFormatting.intensityText)
     }
 
@@ -142,6 +171,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     drafts: [TodayWorkoutViewModel.SetRowDraft],
     references: [UUID: ExerciseReference],
     videoStates: [UUID: SetRow.VideoState] = [:],
+    suggestionOutcomes: [UUID: SetWeightSuggestionOutcome] = [:],
     started: Bool
   ) {
     // The summary card IS the pre-start state, and it only belongs to a day
@@ -169,7 +199,8 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
             index: SetDisplayNumber.number(for: draft),
             videoState: draft.loggedSetID.flatMap { videoStates[$0] } ?? .none
           ),
-          draft: draft
+          draft: draft,
+          suggestionOutcome: suggestionOutcomes[draft.id]
         )
       }
       return Exercise(

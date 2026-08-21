@@ -10,6 +10,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
   public let targetValue: Decimal
   public let loadMode: PlanLoadMode?
   public let targetPct: Decimal?
+  public let percentageAnchor: PercentageAnchor?
   public let targetRPE: Decimal?
   public let rirTarget: Int?
   public let rpeLow: Decimal?
@@ -35,6 +36,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     targetValue: Decimal,
     loadMode: PlanLoadMode? = nil,
     targetPct: Decimal? = nil,
+    percentageAnchor: PercentageAnchor? = nil,
     targetRPE: Decimal? = nil,
     rirTarget: Int? = nil,
     rpeLow: Decimal? = nil,
@@ -56,6 +58,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     self.targetValue = targetValue
     self.loadMode = loadMode
     self.targetPct = targetPct
+    self.percentageAnchor = percentageAnchor
     self.targetRPE = targetRPE
     self.rirTarget = rirTarget
     self.rpeLow = rpeLow
@@ -81,6 +84,9 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     targetValue = try container.decodeDecimal(forKey: .targetValue)
     loadMode = try container.decodeIfPresent(PlanLoadMode.self, forKey: .loadMode)
     targetPct = try container.decodeDecimalIfPresent(forKey: .targetPct)
+    percentageAnchor = PercentageAnchor(
+      wireValue: try container.decodeIfPresent(String.self, forKey: .percentageAnchor)
+    )
     targetRPE = try container.decodeDecimalIfPresent(forKey: .targetRPE)
     rirTarget = try container.decodeIfPresent(Int.self, forKey: .rirTarget)
     rpeLow = try container.decodeDecimalIfPresent(forKey: .rpeLow)
@@ -106,6 +112,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeDecimalString(targetValue, forKey: .targetValue)
     try container.encodeIfPresent(loadMode, forKey: .loadMode)
     try container.encodeDecimalStringIfPresent(targetPct, forKey: .targetPct)
+    try container.encodeIfPresent(percentageAnchor, forKey: .percentageAnchor)
     try container.encodeDecimalStringIfPresent(targetRPE, forKey: .targetRPE)
     try container.encodeIfPresent(rirTarget, forKey: .rirTarget)
     try container.encodeDecimalStringIfPresent(rpeLow, forKey: .rpeLow)
@@ -129,6 +136,7 @@ public struct PlanSet: Codable, Hashable, Sendable, Identifiable {
     case targetValue
     case loadMode
     case targetPct
+    case percentageAnchor = "pctAnchor"
     // `convertFromSnakeCase` normalizes `target_rpe` to `targetRpe`.
     case targetRPE = "targetRpe"
     case rirTarget
