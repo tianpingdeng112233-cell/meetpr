@@ -6,13 +6,14 @@ import SwiftUI
 /// card is 468pt wide there, so `scale = width / 468`.
 enum VideoBadgeLayout {
   static let cardWidthRatio = 468.0 / 540.0
-  static let maximumScreenWidth: CGFloat = 360
   static let referenceWidth: CGFloat = 468
   static let bottomMarginRatio = 76.0 / 960.0
   static let scrimHeightRatio = 0.44
 
+  /// One ratio everywhere (no width cap): Pro Max screens keep the artboard
+  /// proportions instead of showing a narrower card than the design.
   static func screenCardWidth(containerWidth: CGFloat) -> CGFloat {
-    min(maximumScreenWidth, containerWidth * cardWidthRatio)
+    containerWidth * cardWidthRatio
   }
 
   static func exportCardWidth(renderWidth: CGFloat) -> CGFloat {

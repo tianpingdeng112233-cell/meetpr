@@ -72,7 +72,39 @@ struct VideoBadgeExporterTests {
       if let goldCentroid = stats.goldCentroid {
         #expect(abs(goldCentroid.y - centroid.y) > Double(frame.height) * 0.4)
       }
+      Self.expectScrimDarkensBottomBand(of: frame)
     }
+  }
+
+  /// Scrim: the flat-gray source must be darkened in the bottom band only.
+  /// Samples a column outside the card (right edge) and the red marker.
+  private static func expectScrimDarkensBottomBand(of frame: CGImage) {
+    let column = frame.width - 4
+    let top = luminance(in: frame, x: column, y: 8)
+    let middle = luminance(in: frame, x: column, y: frame.height / 2)
+    let bottom = luminance(in: frame, x: column, y: frame.height - 6)
+    #expect(abs(top - 190) < 12)
+    #expect(abs(middle - 190) < 16)
+    #expect(bottom < top * 0.6)
+  }
+
+  private static func luminance(in image: CGImage, x: Int, y: Int) -> Double {
+    var pixel = [UInt8](repeating: 0, count: 4)
+    let context = CGContext(
+      data: &pixel,
+      width: 1,
+      height: 1,
+      bitsPerComponent: 8,
+      bytesPerRow: 4,
+      space: CGColorSpaceCreateDeviceRGB(),
+      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+    )
+    let origin = CGPoint(x: -x, y: -(image.height - 1 - y))
+    context?.draw(
+      image,
+      in: CGRect(origin: origin, size: CGSize(width: image.width, height: image.height))
+    )
+    return (Double(pixel[0]) + Double(pixel[1]) + Double(pixel[2])) / 3
   }
 
   private static func displayedFrame(
