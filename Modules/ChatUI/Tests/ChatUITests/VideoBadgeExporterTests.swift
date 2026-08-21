@@ -40,9 +40,8 @@ struct VideoBadgeExporterTests {
 
     #expect(abs(outputDuration.seconds - sourceDuration.seconds) < 0.05)
     #expect(videoTracks.count == 1)
-    let sourceAudioTracks = try await source.loadTracks(withMediaType: .audio)
-    #expect(sourceAudioTracks.count == 2)
-    #expect(audioTracks.count == sourceAudioTracks.count)
+    #expect(try await source.loadTracks(withMediaType: .audio).count == 2)
+    #expect(audioTracks.count == 2)
     #expect(abs(displayedBounds.width) < abs(displayedBounds.height))
     #expect(abs(Double(nominalFrameRate) - 24.0) < 1.5)
 
