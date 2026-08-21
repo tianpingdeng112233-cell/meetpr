@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import Foundation
@@ -9,6 +10,17 @@ enum FeedbackVideoAssociation: Equatable, Sendable {
 }
 
 enum FeedbackVideoPresentation {
+  static func badge(_ video: CoachFeedbackVideo) -> VideoBadgeInfo {
+    VideoBadgeInfo(
+      exerciseName: StudentExerciseName.display(video),
+      weightKg: video.weightKg.flatMap(Double.init),
+      reps: video.reps,
+      rpe: nil,
+      setOrdinal: video.setIndex.map(SetIndexDisplay.number(forZeroBasedIndex:)),
+      coachName: nil
+    )
+  }
+
   static func association(
     videoID: UUID?,
     video: CoachFeedbackVideo?

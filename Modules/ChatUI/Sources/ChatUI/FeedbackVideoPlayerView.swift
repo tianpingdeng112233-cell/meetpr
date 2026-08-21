@@ -57,25 +57,35 @@ enum FeedbackVideoPlaybackBehavior: Equatable, Sendable {
 // The shared player intentionally owns the AVPlayer lifecycle and both presentation modes.
 // swiftlint:disable:next type_body_length
 public struct FeedbackVideoPlayerView: View {
-  private static let rates: [Float] = [0.5, 1.0, 1.5, 2.0]
+  static let rates: [Float] = [0.5, 1.0, 1.5, 2.0]
 
   @Environment(\.dismiss) private var dismiss
   @State var player: AVPlayer
-  @State private var rate: Float = 1.0
-  @State private var playbackFailed = false
-  @State private var retrying = false
-  @State private var isPlaying = false
+  @State var rate: Float = 1.0
+  @State var playbackFailed = false
+  @State var retrying = false
+  @State var isPlaying = false
   @State var currentSeconds = 0.0
   @State var durationSeconds = 0.0
   @State private var internalAnnotationMarker: VideoMarker?
+  @State private var badgeExpanded = true
+  @State var playbackURL: URL
+  @State var isExporting = false
+  @State var showingCoachExportConfirmation = false
+  @State var showingExportFailure = false
+  @State var exportFailureMessage = ""
+  @State var showingSavedToast = false
+  @State var exportTask: Task<Void, Never>?
   @State var scrubState = FeedbackVideoScrubState()
   @State var scrubSeekTask: Task<Void, Never>?
   @State var pendingScrubSeconds: Double?
   @State var scrubGeneration = 0
 
-  private let videoID: UUID
-  private let refreshURL: @MainActor (UUID) async throws -> URL
+  let videoID: UUID
+  let refreshURL: @MainActor (UUID) async throws -> URL
   private let workbenchConfiguration: FeedbackVideoWorkbenchConfiguration?
+  let badge: VideoBadgeInfo?
+  let requiresCoachExportConfirmation: Bool
   let currentSecondsBinding: Binding<Double>?
   private let markers: [VideoMarker]?
   private let markersFailed: Bool
@@ -90,6 +100,8 @@ public struct FeedbackVideoPlayerView: View {
     workbenchConfiguration: FeedbackVideoWorkbenchConfiguration? = nil,
     currentSeconds: Binding<Double>? = nil,
     markers: [VideoMarker]? = nil,
+    badge: VideoBadgeInfo? = nil,
+    requiresCoachExportConfirmation: Bool = false,
     markersFailed: Bool = false,
     selectedAnnotationMarker: Binding<VideoMarker?>? = nil,
     onSeek: @escaping @MainActor (Int) -> Void = { _ in },
@@ -102,12 +114,15 @@ public struct FeedbackVideoPlayerView: View {
     self.workbenchConfiguration = workbenchConfiguration
     currentSecondsBinding = currentSeconds
     self.markers = markers
+    self.badge = badge
+    self.requiresCoachExportConfirmation = requiresCoachExportConfirmation
     self.markersFailed = markersFailed
     self.selectedAnnotationMarker = selectedAnnotationMarker
     self.onSeek = onSeek
     self.onAddMarker = onAddMarker
     self.onMarkersRefresh = onMarkersRefresh
     _player = State(initialValue: AVPlayer(url: url))
+    _playbackURL = State(initialValue: url)
   }
 
   public var body: some View {
@@ -116,6 +131,42 @@ public struct FeedbackVideoPlayerView: View {
         if playbackFailed {
           FeedbackVideoFailureCard(retrying: retrying, retry: retry)
         }
+      }
+      .overlay(alignment: .top) {
+        if showingSavedToast {
+          Text(ChatStrings.videoExportSaved)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
+            .foregroundStyle(Color.MeetPR.textPrimary)
+            .padding(.horizontal, MeetPRSpacing.space4)
+            .padding(.vertical, MeetPRSpacing.point10)
+            .background(Color.MeetPR.bgInset.opacity(0.96), in: .capsule)
+            .overlay {
+              Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
+            }
+            .padding(.top, MeetPRSpacing.point56)
+            .transition(.move(edge: .top).combined(with: .opacity))
+            .accessibilityIdentifier("feedback.video.exportSaved")
+        }
+      }
+      .alert(
+        ChatStrings.coachExportConfirmationTitle,
+        isPresented: $showingCoachExportConfirmation
+      ) {
+        Button(ChatStrings.cancel, role: .cancel) {}
+        Button(ChatStrings.coachExportConfirmationAction) {
+          UserDefaults.standard.set(
+            true,
+            forKey: Self.coachExportConfirmationDefaultsKey
+          )
+          startExport()
+        }
+      } message: {
+        Text(ChatStrings.coachExportConfirmationMessage)
+      }
+      .alert(ChatStrings.videoExportFailed, isPresented: $showingExportFailure) {
+        Button(ChatStrings.close, role: .cancel) {}
+      } message: {
+        Text(exportFailureMessage)
       }
       .onReceive(
         NotificationCenter.default.publisher(for: AVPlayerItem.failedToPlayToEndTimeNotification)
@@ -155,6 +206,7 @@ public struct FeedbackVideoPlayerView: View {
       }
       .onDisappear {
         scrubSeekTask?.cancel()
+        exportTask?.cancel()
         player.pause()
       }
       .onChange(of: selectedAnnotationMarker?.wrappedValue) { oldMarker, newMarker in
@@ -169,7 +221,7 @@ public struct FeedbackVideoPlayerView: View {
       }
   }
 
-  private var playbackBehavior: FeedbackVideoPlaybackBehavior {
+  var playbackBehavior: FeedbackVideoPlaybackBehavior {
     Self.playbackBehavior(for: workbenchConfiguration)
   }
 
@@ -189,12 +241,22 @@ public struct FeedbackVideoPlayerView: View {
 
       FeedbackVideoPlayerChrome(
         rateText: Self.rateText(rate),
+        isExporting: isExporting,
         close: close,
-        cycleRate: cycleRate
+        cycleRate: cycleRate,
+        export: exportAction
       )
 
       VStack(spacing: 0) {
-        Spacer()
+        // The badge region is greedy (GeometryReader) and bottom-aligned, so
+        // the card always sits directly above whatever the markers panel and
+        // scrubber actually measure — no hard-coded inset to drift out of sync.
+        if let badge {
+          VideoBadgeOverlay(info: badge, isExpanded: $badgeExpanded)
+            .padding(.bottom, MeetPRSpacing.point13)
+        } else {
+          Spacer()
+        }
 
         if markersFailed || markers?.isEmpty == false {
           FeedbackVideoMarkerOverlay(
@@ -223,8 +285,9 @@ public struct FeedbackVideoPlayerView: View {
           loadFailed: annotationLoadFailed
         )
       }
+
     }
-    .background(Color.black)
+    .background(SwiftUI.Color.black)
   }
 
   private var workbenchPlayer: some View {
@@ -242,8 +305,17 @@ public struct FeedbackVideoPlayerView: View {
       selectRate: selectRate,
       updateScrubberPosition: updateScrubberPosition,
       setScrubbing: setScrubbing,
-      addMarker: onAddMarker
+      addMarker: onAddMarker,
+      badge: badge,
+      badgeExpanded: $badgeExpanded,
+      isExporting: isExporting,
+      export: exportAction
     )
+  }
+
+  private var exportAction: (() -> Void)? {
+    guard badge != nil else { return nil }
+    return { requestExport() }
   }
 
   private func close() {
@@ -270,7 +342,7 @@ public struct FeedbackVideoPlayerView: View {
     seek(toMilliseconds: marker.timeMilliseconds)
   }
 
-  private func closeAnnotation() {
+  func closeAnnotation() {
     setAnnotationMarker(nil)
   }
 
@@ -287,66 +359,6 @@ public struct FeedbackVideoPlayerView: View {
       selectedAnnotationMarker.wrappedValue = marker
     } else {
       internalAnnotationMarker = marker
-    }
-  }
-
-  private func retry() {
-    retrying = true
-    Task {
-      defer { retrying = false }
-      guard let fresh = try? await refreshURL(videoID) else {
-        return
-      }
-      playbackFailed = false
-      // Replacing the item resumes playback: the annotation overlay's
-      // paused-frame contract cannot hold across the swap, so close it.
-      closeAnnotation()
-      player.replaceCurrentItem(with: AVPlayerItem(url: fresh))
-      player.defaultRate = rate
-      switch playbackBehavior.retryCommand {
-      case .none:
-        break
-      case .play:
-        player.play()
-      case .playImmediatelyAtSelectedRate:
-        player.playImmediately(atRate: rate)
-      }
-      isPlaying = true
-    }
-  }
-
-  private func cycleRate() {
-    if playbackBehavior == .legacyFullScreen {
-      let index = Self.rates.firstIndex(of: rate) ?? 1
-      rate = Self.rates[(index + 1) % Self.rates.count]
-      player.defaultRate = rate
-      if player.timeControlStatus == .playing {
-        player.rate = rate
-      }
-    } else {
-      let index = Self.rates.firstIndex(of: rate) ?? 1
-      selectRate(Self.rates[(index + 1) % Self.rates.count])
-    }
-  }
-
-  private func selectRate(_ selectedRate: Float) {
-    rate = selectedRate
-    player.defaultRate = selectedRate
-    if playbackBehavior.appliesSelectedRate(while: player.timeControlStatus) {
-      player.rate = selectedRate
-    }
-  }
-
-  private func togglePlayback() {
-    if isPlaying {
-      player.pause()
-      isPlaying = false
-    } else {
-      if currentSeconds >= durationSeconds, durationSeconds > 0 {
-        player.seek(to: .zero)
-      }
-      player.playImmediately(atRate: rate)
-      isPlaying = true
     }
   }
 

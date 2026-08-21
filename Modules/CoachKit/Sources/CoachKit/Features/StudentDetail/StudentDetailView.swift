@@ -375,6 +375,7 @@ struct StudentDetailView: View {
         unavailable: viewModel.videosUnavailable,
         now: now,
         planDays: viewModel.plannedDays,
+        logs: viewModel.executionDays.flatMap(\.logs),
         feedbackVideoIDs: Set(viewModel.feedbackItems.compactMap(\.videoID)),
         viewModel: videoGridViewModel
       )
