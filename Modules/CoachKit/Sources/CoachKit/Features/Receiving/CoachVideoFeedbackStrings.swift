@@ -24,6 +24,10 @@ enum CoachVideoFeedbackStrings {
   static let save = CoachLocalization.localized("coach.videoFeedback.save")
   static let markersLoadFailed = CoachLocalization.localized(
     "coach.videoFeedback.markersLoadFailed")
+  static let setInfoLoadFailed = CoachLocalization.localized(
+    "coach.videoFeedback.setInfoLoadFailed")
+  static let setInfoUnavailable = CoachLocalization.localized(
+    "coach.videoFeedback.setInfoUnavailable")
   static let markerSaveFailed = CoachLocalization.localized(
     "coach.videoFeedback.markerSaveFailed")
   static let markerDeleteFailed = CoachLocalization.localized(
@@ -31,6 +35,9 @@ enum CoachVideoFeedbackStrings {
   static let emptyFeedback = CoachLocalization.localized("coach.videoFeedback.emptyFeedback")
   static let sentFeedback = CoachLocalization.localized("coach.videoFeedback.sentFeedback")
   static let sendFailed = CoachLocalization.localized("coach.videoFeedback.sendFailed")
+  static let noPendingVideos = CoachLocalization.localized("coach.videoFeedback.noPendingVideos")
+  static let noPendingVideosSubtitle = CoachLocalization.localized(
+    "coach.videoFeedback.noPendingVideosSubtitle")
 
   static func feedbackPlaceholder(studentName: String) -> String {
     CoachLocalization.replacing(

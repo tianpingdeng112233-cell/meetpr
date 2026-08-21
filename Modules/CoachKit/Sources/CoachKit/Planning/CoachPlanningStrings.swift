@@ -29,6 +29,8 @@ enum CoachPlanningStrings {
   static let abnormal = localized("coach.planning.step0.abnormal")
   static let startPlanning = localized("coach.planning.step0.startPlanning")
   static let readyForPlan = localized("coach.planning.step0.readyForPlan")
+  static let noStudents = localized("coach.roster.noStudents")
+  static let noStudentsSubtitle = localized("coach.roster.noStudentsSubtitle")
 
   static let durationPrompt = localized("coach.planning.step1.prompt")
   static let durationTitle = localized("coach.planning.step1.navigationTitle")

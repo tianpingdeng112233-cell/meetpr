@@ -44,6 +44,7 @@ struct StudentRosterView: View {
     NavigationStack {
       StudentRosterContent(
         searchText: $viewModel.searchText,
+        loadState: rows == nil ? viewModel.state : .loaded,
         applications: sortedApplications,
         rows: rows ?? viewModel.filteredRows,
         now: now,
@@ -154,8 +155,9 @@ struct StudentRosterView: View {
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-private struct StudentRosterContent: View {
+struct StudentRosterContent: View {
   @Binding var searchText: String
+  let loadState: StudentRosterViewModel.LoadState
   let applications: [CoachBindRequestItem]
   let rows: [StudentRosterRowModel]
   let now: Date
@@ -191,22 +193,43 @@ private struct StudentRosterContent: View {
           }
         }
 
-        Text(CoachRosterStrings.activeStudents(activeRows.count))
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-          .foregroundStyle(Color.MeetPR.textTertiary)
-
-        ForEach(activeRows) { row in
-          studentLink(row)
-        }
-
-        if !abnormalRows.isEmpty {
-          Text(CoachRosterStrings.abnormalStudents(abnormalRows.count))
+        switch contentState {
+        case .loading:
+          ProgressView(CoachRosterStrings.loadingStudents)
+            .tint(Color.MeetPR.gold500)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, MeetPRSpacing.point32)
+            .accessibilityIdentifier("coach.roster.loading")
+        case .emptyRoster:
+          CoachRosterEmptyState(
+            title: CoachRosterStrings.noStudents,
+            description: CoachRosterStrings.noStudentsSubtitle,
+            systemImage: "person.badge.plus"
+          )
+        case .noMatches:
+          CoachRosterEmptyState(
+            title: CoachRosterStrings.noMatchingStudents,
+            description: nil,
+            systemImage: "magnifyingglass"
+          )
+        case .rows:
+          Text(CoachRosterStrings.activeStudents(activeRows.count))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-            .foregroundStyle(Color.MeetPR.danger)
-            .padding(.top, MeetPRSpacing.point2)
+            .foregroundStyle(Color.MeetPR.textTertiary)
 
-          ForEach(abnormalRows) { row in
+          ForEach(activeRows) { row in
             studentLink(row)
+          }
+
+          if !abnormalRows.isEmpty {
+            Text(CoachRosterStrings.abnormalStudents(abnormalRows.count))
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.danger)
+              .padding(.top, MeetPRSpacing.point2)
+
+            ForEach(abnormalRows) { row in
+              studentLink(row)
+            }
           }
         }
       }
@@ -237,6 +260,14 @@ private struct StudentRosterContent: View {
     rows.filter { !isAbnormal($0) }
   }
 
+  private var contentState: StudentRosterContentState {
+    StudentRosterContentState.resolve(
+      loadState: loadState,
+      hasStudents: !rows.isEmpty,
+      hasSearchQuery: !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    )
+  }
+
   private var abnormalRows: [StudentRosterRowModel] {
     rows.filter(isAbnormal)
   }
@@ -249,6 +280,48 @@ private struct StudentRosterContent: View {
       return true
     }
     return false
+  }
+}
+
+enum StudentRosterContentState: Equatable {
+  case loading
+  case emptyRoster
+  case noMatches
+  case rows
+
+  static func resolve(
+    loadState: StudentRosterViewModel.LoadState,
+    hasStudents: Bool,
+    hasSearchQuery: Bool
+  ) -> StudentRosterContentState {
+    switch loadState {
+    case .idle, .loading:
+      return .loading
+    case .failed:
+      return .rows
+    case .loaded:
+      if hasStudents { return .rows }
+      return hasSearchQuery ? .noMatches : .emptyRoster
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct CoachRosterEmptyState: View {
+  let title: String
+  let description: String?
+  let systemImage: String
+
+  var body: some View {
+    ContentUnavailableView {
+      Label(title, systemImage: systemImage)
+    } description: {
+      if let description {
+        Text(description)
+      }
+    }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, MeetPRSpacing.point28)
   }
 }
 

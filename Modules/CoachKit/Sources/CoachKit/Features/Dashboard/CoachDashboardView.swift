@@ -70,7 +70,9 @@ struct CoachDashboardView: View {
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
             .foregroundStyle(Color.MeetPR.textTertiary)
 
-          if todoItems.isEmpty {
+          if rows.isEmpty {
+            CoachTodayNoStudentsState()
+          } else if todoItems.isEmpty {
             CoachTodayEmptyState()
           } else {
             CoachTodoCard(items: todoItems, onSelect: handleTodo)
@@ -159,6 +161,33 @@ struct CoachDashboardView: View {
         }
       }
     )
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct CoachTodayNoStudentsState: View {
+  var body: some View {
+    VStack(spacing: MeetPRSpacing.zero) {
+      Image(systemName: "person.badge.plus")
+        .font(.MeetPR.system(size: MeetPRFontMetrics.size24, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.gold500)
+        .frame(width: MeetPRSpacing.point52, height: MeetPRSpacing.point52)
+        .meetPRCardSurface(.card)
+        .clipShape(.circle)
+        .padding(.bottom, MeetPRSpacing.point14)
+
+      Text(CoachTodayStrings.noStudents)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+
+      Text(CoachTodayStrings.noStudentsSubtitle)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+        .foregroundStyle(Color.MeetPR.textDisabled)
+        .multilineTextAlignment(.center)
+        .padding(.top, MeetPRSpacing.point5)
+    }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, MeetPRSpacing.point40)
   }
 }
 
