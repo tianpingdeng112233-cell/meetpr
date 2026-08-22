@@ -151,7 +151,18 @@ public struct StudentRootView: View {
     self.readiness = readiness
     let resolvedVideoUploads = videoUploads ?? .demo()
     self.videoUploads = resolvedVideoUploads
-    self.onLogout = onLogout
+    // Every student-side logout path (profile, account security, bind gate,
+    // evaluation gate) funnels through this closure, so clearing reminders
+    // here covers them all; reconcile-on-appear handles logouts that bypass
+    // StudentKit entirely (e.g. credential expiry).
+    if let onLogout {
+      self.onLogout = { @MainActor in
+        await TrainingReminderServices.live.scheduler.clear()
+        await onLogout()
+      }
+    } else {
+      self.onLogout = nil
+    }
     self.account = account
     self.restTimerSettings = restTimerSettings
     self.restTimerActivityController = restTimerActivityController
@@ -360,6 +371,10 @@ extension StudentRootView {
     .task {
       handlePushRoute(pushRoute)
       Analytics.shared.screen(.dashboard)
+      await TrainingReminderBootstrap.reconcile(
+        studentID: studentID,
+        services: .live
+      )
       if let notifications {
         await notifications.loadIfNeeded(studentID: studentID)
         if scenePhase == .active {
