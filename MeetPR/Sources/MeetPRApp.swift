@@ -432,6 +432,9 @@ struct MeetPRApp: App {
         .onChange(of: scenePhase) { _, phase in
           guard phase == .active else { return }
           restTimerActivityController.cleanUpExpiredActivities()
+          Task {
+            await session.applicationDidBecomeActive()
+          }
         }
         .modelContainer(
           draftStore.modelContainer
