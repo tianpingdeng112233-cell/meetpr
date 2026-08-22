@@ -87,9 +87,7 @@ struct VideoFeedbackDetailView: View {
             )
           }
 
-          if let setInfo = detailModel.setInfo {
-            VideoSetInfoCard(info: setInfo)
-          }
+          VideoSetInfoStatusView(state: detailModel.setInfoState)
 
           VideoFeedbackComposer(
             text: $text,

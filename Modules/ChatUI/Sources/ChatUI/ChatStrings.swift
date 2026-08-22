@@ -3,6 +3,10 @@ import Foundation
 enum ChatStrings {
   static let messages = localized("chat.messages")
   static let noConversations = localized("chat.noConversations")
+  static let noMessages = localized("chat.noMessages")
+  static let noMessagesDescription = localized("chat.noMessagesDescription")
+  static let loadingMessages = localized("chat.loadingMessages")
+  static let loadMessagesFailed = localized("chat.loadMessagesFailed")
   static let image = localized("chat.image")
   static let imageUnavailable = localized("chat.imageUnavailable")
   static let sending = localized("chat.sending")

@@ -247,7 +247,40 @@ private struct ConversationTimeline: View {
   let bubbleLayout: ChatBubbleLayout
   @State private var scrollPosition: String?
 
+  private var presentation: ConversationTimelinePresentation {
+    ConversationTimelinePresentation.resolve(
+      didFinishInitialLoad: viewModel.didFinishInitialLoad,
+      hasLoadError: viewModel.error != nil,
+      hasMessages: !viewModel.renderedMessages.isEmpty,
+      hasPendingMessages: !viewModel.pending.isEmpty
+    )
+  }
+
+  @ViewBuilder
   var body: some View {
+    switch presentation {
+    case .loading:
+      ProgressView(ChatStrings.loadingMessages)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .accessibilityIdentifier("chat.conversation.loading")
+    case .failed:
+      ContentUnavailableView(
+        ChatStrings.loadMessagesFailed,
+        systemImage: "exclamationmark.triangle"
+      )
+    case .empty:
+      ContentUnavailableView(
+        ChatStrings.noMessages,
+        systemImage: "bubble.left.and.bubble.right",
+        description: Text(ChatStrings.noMessagesDescription)
+      )
+      .accessibilityIdentifier("chat.conversation.empty")
+    case .content:
+      timeline
+    }
+  }
+
+  private var timeline: some View {
     ScrollView {
       LazyVStack(spacing: MeetPRSpacing.sm) {
         if viewModel.hasMoreHistory {

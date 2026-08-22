@@ -10,6 +10,8 @@ enum CoachTodayStrings {
   static let askHowThingsAreGoing = CoachLocalization.localized("coach.today.askHowThingsAreGoing")
   static let allDone = CoachLocalization.localized("coach.today.allDone")
   static let allDoneSubtitle = CoachLocalization.localized("coach.today.allDoneSubtitle")
+  static let noStudents = CoachLocalization.localized("coach.roster.noStudents")
+  static let noStudentsSubtitle = CoachLocalization.localized("coach.roster.noStudentsSubtitle")
   static let weekOverview = CoachLocalization.localized("coach.today.weekOverview")
   static let activeAsPlanned = CoachLocalization.localized("coach.today.activeAsPlanned")
   static let notStarted = CoachLocalization.localized("coach.today.notStarted")

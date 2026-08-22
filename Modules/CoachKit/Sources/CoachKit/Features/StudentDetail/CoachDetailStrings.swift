@@ -21,6 +21,9 @@ enum CoachDetailStrings {
   static let notStarted = CoachLocalization.localized("coach.detail.notStarted")
   static let loading = CoachLocalization.localized("coach.detail.loading")
   static let loadFailed = CoachLocalization.localized("coach.detail.loadFailed")
+  static let noPlan = CoachLocalization.localized("coach.detail.noPlan")
+  static let noPlanSubtitle = CoachLocalization.localized("coach.detail.noPlanSubtitle")
+  static let planLoadFailed = CoachLocalization.localized("coach.detail.planLoadFailed")
   static let pullToRetry = CoachLocalization.localized("coach.detail.pullToRetry")
   static let trainingReminderDraft = CoachLocalization.localized(
     "coach.detail.trainingReminderDraft")
