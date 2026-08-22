@@ -20,6 +20,10 @@ struct FeedbackVideoWorkbenchPlayer: View {
   let updateScrubberPosition: (Double) -> Void
   let setScrubbing: (Bool) -> Void
   let addMarker: (() -> Void)?
+  let badge: VideoBadgeInfo?
+  @Binding var badgeExpanded: Bool
+  let isExporting: Bool
+  let export: (() -> Void)?
 
   var body: some View {
     VStack(spacing: MeetPRSpacing.point11) {
@@ -50,6 +54,32 @@ struct FeedbackVideoWorkbenchPlayer: View {
           .buttonStyle(.plain)
           .accessibilityIdentifier("feedback.video.addMarker")
         }
+        if let export {
+          Button(action: export) {
+            Group {
+              if isExporting {
+                ProgressView()
+                  .tint(.white)
+              } else {
+                Label(ChatStrings.videoExport, systemImage: "square.and.arrow.down")
+              }
+            }
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, MeetPRSpacing.space3)
+            .padding(.vertical, MeetPRSpacing.point7)
+            .overlay {
+              RoundedRectangle(cornerRadius: MeetPRRadius.inset)
+                .stroke(Color.MeetPR.videoStageBorder, lineWidth: MeetPRSpacing.point1)
+            }
+          }
+          .buttonStyle(.plain)
+          .disabled(isExporting)
+          .accessibilityLabel(
+            isExporting ? ChatStrings.videoExporting : ChatStrings.videoExport
+          )
+          .accessibilityIdentifier("feedback.video.export")
+        }
       }
     }
     .padding(MeetPRSpacing.space3)
@@ -64,6 +94,10 @@ struct FeedbackVideoWorkbenchPlayer: View {
     ZStack {
       VideoPlayer(player: player)
         .allowsHitTesting(false)
+
+      if badge != nil {
+        VideoBadgeScrim()
+      }
 
       Button(action: togglePlayback) {
         Image(systemName: isPlaying ? "pause.fill" : "play.fill")
@@ -87,6 +121,15 @@ struct FeedbackVideoWorkbenchPlayer: View {
           close: closeAnnotation,
           loadFailed: annotationLoadFailed
         )
+      }
+
+      if let badge {
+        VideoBadgeOverlay(
+          info: badge,
+          isExpanded: .constant(false),
+          allowsExpansion: false
+        )
+        .padding(.bottom, MeetPRSpacing.point10)
       }
     }
     .frame(height: 270)

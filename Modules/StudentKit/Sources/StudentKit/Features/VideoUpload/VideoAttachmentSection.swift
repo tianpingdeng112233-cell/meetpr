@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import PhotosUI
@@ -12,6 +13,7 @@ struct VideoAttachmentSection: View {
   let studentID: UUID
   let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel
+  let badge: VideoBadgeInfo?
   /// Set-log id when the row was already logged; nil until first commit.
   let initialSetLogID: UUID?
   /// Lazily creates the set log (preserving completion state) so a video can
@@ -47,6 +49,7 @@ struct VideoAttachmentSection: View {
     studentID: UUID,
     trainingDate: Date,
     videoViewModel: VideoAttachmentViewModel,
+    badge: VideoBadgeInfo? = nil,
     initialSetLogID: UUID?,
     resolveSetLogID: @escaping @MainActor () async -> UUID?,
     onWillPick: (() -> Void)? = nil
@@ -54,6 +57,7 @@ struct VideoAttachmentSection: View {
     self.studentID = studentID
     self.trainingDate = trainingDate
     self.videoViewModel = videoViewModel
+    self.badge = badge
     self.initialSetLogID = initialSetLogID
     self.resolveSetLogID = resolveSetLogID
     self.onWillPick = onWillPick
@@ -202,6 +206,7 @@ struct VideoAttachmentSection: View {
     SetVideoPlaybackView(
       attachmentID: presentation.attachmentID,
       source: presentation.source,
+      badge: badge,
       refreshRemoteURL: { attachmentID in
         try await videoViewModel.freshRemotePlaybackURL(attachmentID: attachmentID)
       }

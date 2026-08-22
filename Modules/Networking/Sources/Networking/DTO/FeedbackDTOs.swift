@@ -53,6 +53,7 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
   public let setIndex: Int?
   public let weightKg: String?
   public let reps: Int?
+  public let rpe: String?
   public let loggedAt: Date?
 
   public init(
@@ -62,6 +63,7 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
     setIndex: Int? = nil,
     weightKg: String? = nil,
     reps: Int? = nil,
+    rpe: String? = nil,
     loggedAt: Date? = nil
   ) {
     self.id = id
@@ -70,6 +72,7 @@ public struct FeedbackVideoDTO: Codable, Equatable, Sendable {
     self.setIndex = setIndex
     self.weightKg = weightKg
     self.reps = reps
+    self.rpe = rpe
     self.loggedAt = loggedAt
   }
 }

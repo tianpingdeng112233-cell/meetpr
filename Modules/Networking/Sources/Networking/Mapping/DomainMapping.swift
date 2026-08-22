@@ -160,6 +160,7 @@ extension FeedbackVideoDTO {
       setIndex: setIndex,
       weightKg: weightKg,
       reps: reps,
+      rpe: rpe,
       loggedAt: loggedAt
     )
   }

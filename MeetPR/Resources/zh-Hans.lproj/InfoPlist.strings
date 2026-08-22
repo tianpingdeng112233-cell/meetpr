@@ -1,4 +1,4 @@
 "NSCameraUsageDescription" = "MeetPR 需要使用相机拍摄你的训练视频,供你绑定的教练查看动作并给出反馈。";
 "NSMicrophoneUsageDescription" = "拍摄训练视频时需要录制声音(例如杠铃落地与口令),用于教练回看。";
-"NSPhotoLibraryAddUsageDescription" = "拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。";
+"NSPhotoLibraryAddUsageDescription" = "MeetPR 需要向相册添加拍摄或带训练角标的导出视频,便于你留存和分享训练记录。";
 "NSPhotoLibraryUsageDescription" = "MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。";

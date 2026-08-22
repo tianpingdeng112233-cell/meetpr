@@ -574,7 +574,8 @@ public struct TodayWorkoutView: View {
       studentID: studentID,
       trainingDate: selectedTrainingDate,
       videoViewModel: videoViewModel,
-      scrollToVideo: target.scrollToVideo
+      scrollToVideo: target.scrollToVideo,
+      coachName: notifications?.activeCoach?.coachDisplayName
     )
   }
 

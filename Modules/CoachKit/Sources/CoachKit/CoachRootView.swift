@@ -16,6 +16,7 @@ public struct CoachRootView: View {
   private let videoMarkers: any VideoMarkerRepository
   private let inviteCodes: any InviteCodeRepository
   private let privacyPolicyURL: URL?
+  private let coachDisplayName: String?
   private let detailContext: CoachStudentDetailContext
   private let chat: CoachChatContext?
   private let draftStore: DraftStore
@@ -126,6 +127,7 @@ public struct CoachRootView: View {
       )
     )
     self.privacyPolicyURL = privacyPolicyURL
+    self.coachDisplayName = coachDisplayName
   }
 
   private static func chatContext(
@@ -147,6 +149,7 @@ public struct CoachRootView: View {
 
   public var body: some View {
     coachTabs
+      .environment(\.coachVideoBadgeName, coachDisplayName)
   }
 
   private var coachTabs: some View {
