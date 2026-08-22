@@ -27,6 +27,13 @@ struct DashboardPlanNotice: Equatable, Sendable {
   let occurredAt: Date
 }
 
+enum StudentConversationOpenResult: Equatable, Sendable {
+  case opened(UUID)
+  case noActiveCoach
+  case bindRequired
+  case failed
+}
+
 final class UserDefaultsDashboardPlanSeenStore: DashboardPlanSeenStoring, @unchecked Sendable {
   private let defaults: UserDefaults
 
@@ -249,21 +256,25 @@ public final class StudentNotificationsCoordinator {
     chatContext?.inbox.stopPolling()
   }
 
-  func openCoachConversation() async -> UUID? {
-    guard let activeCoach, let chatContext else {
-      return nil
+  func openCoachConversation() async -> StudentConversationOpenResult {
+    guard let activeCoach else {
+      return .noActiveCoach
+    }
+    guard let chatContext else {
+      return .failed
     }
     do {
       let conversation = try await chatContext.repository.openConversation(
         withOtherParty: activeCoach.coachID
       )
       await chatContext.inbox.refresh()
-      return conversation.id
+      return .opened(conversation.id)
     } catch {
       if error as? ChatRepositoryError == .bindRequired {
         await onBindingInvalidated()
+        return .bindRequired
       }
-      return nil
+      return .failed
     }
   }
 }

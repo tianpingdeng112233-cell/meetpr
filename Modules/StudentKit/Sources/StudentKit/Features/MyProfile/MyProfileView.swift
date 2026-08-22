@@ -271,28 +271,15 @@ public struct MyProfileView: View {
 
   @ViewBuilder
   private var fallbackRows: some View {
-    MyProfileSectionLabel(StudentStrings.localized(.myProfileView006))
-    MyProfileGroupCard {
-      AppearancePreferenceRow()
-      MyProfileDivider()
-      RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
-      MyProfileDivider()
-      TrainingReminderPreferenceRow(
-        studentID: studentID,
-        services: trainingReminderServices
-      )
-    }
-    if let onLogout {
-      GoldCTA(
-        StudentStrings.localized(.myProfileView013),
-        sub: nil,
-        variant: .danger,
-        icon: .logout,
-        action: {
-          Task { await onLogout() }
-        }
-      )
-    }
+    MyProfileFallbackRows(
+      studentID: studentID,
+      plans: plans,
+      account: account,
+      logs: logs,
+      restTimerSettings: restTimerSettings,
+      trainingReminderServices: trainingReminderServices,
+      onLogout: onLogout
+    )
   }
 
   private var currentReadiness: ReadinessCheckin? {
@@ -307,6 +294,54 @@ public struct MyProfileView: View {
       withAnimation(MeetPRMotion.spring) {
         showsOneRMInfo.toggle()
       }
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct MyProfileFallbackRows: View {
+  let studentID: UUID
+  let plans: any StudentPlanRepository
+  let account: (any AccountRepository)?
+  let logs: (any StudentTrainingLogRepository)?
+  let restTimerSettings: any StudentRestTimerSettingsStoring
+  let trainingReminderServices: TrainingReminderServices
+  let onLogout: (@MainActor () async -> Void)?
+
+  var body: some View {
+    MyProfileSectionLabel(StudentStrings.localized(.myProfileView006))
+    MyProfileGroupCard {
+      AppearancePreferenceRow()
+      MyProfileDivider()
+      RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
+      MyProfileDivider()
+      TrainingReminderPreferenceRow(
+        studentID: studentID,
+        services: trainingReminderServices
+      )
+    }
+    if let account, let logs {
+      MyProfileSectionLabel(StudentStrings.localized(.myProfileView014))
+        .padding(.top, MeetPRSpacing.point2)
+      AccountSecuritySection(
+        studentID: studentID,
+        account: account,
+        logs: logs,
+        plans: plans,
+        onLogout: onLogout,
+        showsDeleteAccount: false
+      )
+    }
+    if let onLogout {
+      GoldCTA(
+        StudentStrings.localized(.myProfileView013),
+        sub: nil,
+        variant: .danger,
+        icon: .logout,
+        action: {
+          Task { await onLogout() }
+        }
+      )
     }
   }
 }

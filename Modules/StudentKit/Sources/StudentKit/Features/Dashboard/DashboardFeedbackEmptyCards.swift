@@ -1,6 +1,30 @@
 import DesignSystem
 import SwiftUI
 
+@available(iOS 17.0, macOS 14.0, *)
+struct DashboardNoFeedbackCard: View {
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+      Label(
+        StudentStrings.localized(.dashboardFeedbackCard003),
+        systemImage: "bubble.left"
+      )
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      Text(StudentStrings.localized(.dashboardFeedbackCard007))
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .lineSpacing(4)
+    }
+    .padding(.horizontal, MeetPRSpacing.space4)
+    .padding(.vertical, MeetPRSpacing.point14)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: 12))
+    .accessibilityElement(children: .combine)
+  }
+}
+
 /// Design source:
 /// `docs/design/handoff-v3/empty-states/MeetPR 学员端 空状态 暗色.html`
 /// scene 01, feedback-card dashed slot.

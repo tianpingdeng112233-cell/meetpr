@@ -5,11 +5,14 @@ import SwiftUI
 struct DashboardProfileMetricsView: View {
   let metrics: DashboardProfileMetrics
   var showsCompetitionPlaceholder = false
+  var showsBodyWeightPlaceholder = false
 
   var body: some View {
     HStack(spacing: 11) {
       if let bodyWeightText = metrics.bodyWeightText {
         DashboardWeightCard(bodyWeightText: bodyWeightText)
+      } else if showsBodyWeightPlaceholder {
+        DashboardWeightPlaceholder()
       }
       if let competition = metrics.competition {
         DashboardCompetitionCard(competition: competition)
@@ -17,6 +20,40 @@ struct DashboardProfileMetricsView: View {
         DashboardCompetitionPlaceholder()
       }
     }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct DashboardWeightPlaceholder: View {
+  var body: some View {
+    VStack(alignment: .leading, spacing: 3) {
+      HStack(spacing: 6) {
+        DashboardScaleIcon()
+          .stroke(
+            Color.MeetPR.textDim,
+            style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round)
+          )
+          .frame(width: 13, height: 13)
+        Text(StudentStrings.localized(.dashboardProfileMetricsView001))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+      }
+      .foregroundStyle(Color.MeetPR.textMuted)
+
+      Text(StudentStrings.localized(.dashboardProfileMetricsView009))
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
+        .foregroundStyle(Color.MeetPR.textMuted)
+        .padding(.top, 3)
+      Text(StudentStrings.localized(.dashboardProfileMetricsView010))
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .bold))
+        .foregroundStyle(Color.MeetPR.gold500)
+    }
+    .padding(.horizontal, 16)
+    .padding(.vertical, 14)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(Color.MeetPR.surfaceCard)
+    .clipShape(.rect(cornerRadius: 16))
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(StudentStrings.localized(.dashboardProfileMetricsView011))
   }
 }
 
