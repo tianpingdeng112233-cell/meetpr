@@ -65,15 +65,25 @@ struct SetEntrySheet: View {
     let seed = viewModel.currentDrafts?.first(where: { $0.id == draft.id }) ?? draft
     let suggestionOutcome = viewModel.weightSuggestionOutcome(forSetID: seed.id)
     _suggestionOutcomeSnapshot = State(initialValue: suggestionOutcome)
-    // Barbell lifts floor at the empty bar (20kg); accessories (dumbbell/cable/
-    // bodyweight) legitimately go below, down to 0.
-    let weightFloor: Decimal = draft.isAccessory ? 0 : 20
-    let weight =
-      seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg
-      ?? weightFloor
+    let weight: Decimal?
+    if seed.prescribed.isLegacyPrescription {
+      // Pre-072 chain, unchanged for legacy rows: barbell lifts floor at the
+      // empty bar (20kg); accessories legitimately go below, down to 0.
+      let weightFloor: Decimal = draft.isAccessory ? 0 : 20
+      weight = max(
+        weightFloor,
+        seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg
+          ?? weightFloor
+      )
+    } else {
+      // New-form rows never invent a number: no prescribed/actual/suggested
+      // weight leaves the field empty and the complete button disabled.
+      weight =
+        seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg
+    }
     let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
-    _weightText = State(initialValue: SetEntryValue.text(max(weightFloor, weight)))
+    _weightText = State(initialValue: weight.map(SetEntryValue.text) ?? "")
     _repsText = State(initialValue: reps.formatted())
     _rpeText = State(initialValue: SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
   }
@@ -434,6 +444,8 @@ struct SetEntrySheet: View {
       SetEntryCompleteButton {
         save(failed: false)
       }
+      .disabled(!SetEntryValue.allowsCompletion(weightText: weightText))
+      .opacity(SetEntryValue.allowsCompletion(weightText: weightText) ? 1 : 0.45)
 
       Button {
         save(failed: true)

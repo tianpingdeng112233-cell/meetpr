@@ -56,6 +56,18 @@ import Testing
   #expect(tracker.finish(value: "105") == nil)
 }
 
+// Spec 072 E2: an empty weight box must not complete (it would log 0kg),
+// while an explicit "0" stays legal for bodyweight work.
+@Test(arguments: [
+  ("", false),
+  ("   ", false),
+  ("0", true),
+  ("142.5", true),
+])
+func completionEligibilityRequiresExplicitWeight(text: String, allowed: Bool) {
+  #expect(SetEntryValue.allowsCompletion(weightText: text) == allowed)
+}
+
 @Test("Badge-facing parsers hide untouched fields instead of clamping them")
 func enteredValuesHideBlankFields() {
   #expect(SetEntryValue.enteredRPE(from: "") == nil)

@@ -68,13 +68,76 @@ enum StudentFormatting {
   }
 
   static func prescribed(_ set: PrescribedSet) -> String {
+    // Legacy rows (load_mode == null) keep the pre-072 string byte-for-byte;
+    // only new-form rows get the six-form rendering (spec 072 §1.4).
+    if set.isLegacyPrescription {
+      let reps: String
+      if let lowerBound = set.reps, let upperBound = set.repsMax {
+        reps = "\(lowerBound)-\(upperBound)"
+      } else {
+        reps = set.reps.map(String.init) ?? "-"
+      }
+      return "\(decimal(set.weightKg))kg x \(reps)"
+    }
+
     let reps: String
     if let lowerBound = set.reps, let upperBound = set.repsMax {
-      reps = "\(lowerBound)-\(upperBound)"
+      reps = "\(lowerBound)–\(upperBound)"
     } else {
       reps = set.reps.map(String.init) ?? "-"
     }
-    return "\(decimal(set.weightKg))kg x \(reps)"
+    if case .weightRange(let low, let high) = set.intensity {
+      return "\(weightDecimal(low))–\(weightDecimal(high))kg × \(reps)"
+    }
+
+    if let weightKg = set.weightKg {
+      var result = "\(weightDecimal(weightKg))kg × \(reps)"
+      if let intensity = set.intensity {
+        result += " @\(inlineIntensity(intensity))"
+      }
+      return result
+    }
+
+    if let intensity = set.intensity {
+      return "\(intensityText(intensity)) × \(reps)"
+    }
+    return "× \(reps)"
+  }
+
+  static func intensityText(_ intensity: PrescribedIntensity) -> String {
+    switch intensity {
+    case .percentage(let value):
+      "\(decimal(value))%"
+    case .rpe(let value):
+      "RPE \(decimal(value))"
+    case .rir(let value):
+      "RIR \(value)"
+    case .rpeRange(let low, let high):
+      "RPE \(decimal(low))–\(decimal(high))"
+    case .weightRange(let low, let high):
+      "\(weightDecimal(low))–\(weightDecimal(high))kg"
+    }
+  }
+
+  private static func inlineIntensity(_ intensity: PrescribedIntensity) -> String {
+    switch intensity {
+    case .percentage(let value):
+      "\(decimal(value))%"
+    case .rpe(let value):
+      "RPE\(decimal(value))"
+    case .rir(let value):
+      "RIR\(value)"
+    case .rpeRange(let low, let high):
+      "RPE\(decimal(low))–\(decimal(high))"
+    case .weightRange(let low, let high):
+      "\(weightDecimal(low))–\(weightDecimal(high))kg"
+    }
+  }
+
+  private static func weightDecimal(_ value: Decimal) -> String {
+    NSDecimalNumber(decimal: value).doubleValue.formatted(
+      .number.precision(.fractionLength(0...2))
+    )
   }
 
   /// A logged/achieved set line, e.g. "142.5kg × 5 @ RPE 7.5". Weight and RPE are

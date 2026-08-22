@@ -877,6 +877,7 @@ enum StudentStrings {
     static let todayWorkoutScreen024 = Key("student.todayWorkoutScreen.copy024")
     static let todayWorkoutScreen025 = Key("student.todayWorkoutScreen.copy025")
     static let todayWorkoutScreen026 = Key("student.todayWorkoutScreen.copy026")
+    static let todayWorkoutScreen027 = Key("student.todayWorkoutScreen.copy027")
     static let todayWorkoutTypes001 = Key("student.todayWorkoutTypes.copy001")
     static let todayWorkoutTypes002 = Key("student.todayWorkoutTypes.copy002")
     static let todayWorkoutTypes003 = Key("student.todayWorkoutTypes.copy003")

@@ -13040,6 +13040,23 @@
         }
       }
     },
+    "student.todayWorkoutScreen.copy027": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Target intensity"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目标强度"
+          }
+        }
+      }
+    },
     "student.todayWorkoutTypes.copy001": {
       "extractionState": "manual",
       "localizations": {

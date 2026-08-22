@@ -328,6 +328,10 @@ enum ProjFixtures {
     repsMax: Int? = nil,
     mode: IntensityMode = .weight,
     value: Decimal,
+    loadMode: PlanLoadMode? = nil,
+    targetPct: Decimal? = nil,
+    targetRPE: Decimal? = nil,
+    targetWeight: Decimal? = nil,
     type: SetType = .working,
     restSeconds: Int? = nil
   ) -> PlanSet {
@@ -339,6 +343,10 @@ enum ProjFixtures {
       targetRepsMax: repsMax,
       intensityMode: mode,
       targetValue: value,
+      loadMode: loadMode,
+      targetPct: targetPct,
+      targetRPE: targetRPE,
+      targetWeight: targetWeight,
       setType: type,
       restSeconds: restSeconds,
       createdAt: now

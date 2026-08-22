@@ -51,16 +51,29 @@ extension TodayWorkoutViewModel {
       return .unavailableWithoutReason
     }
 
-    let baseOutcome =
-      target.isMainLift
-      ? mainLiftSuggestionOutcome(
+    // New-form intensities other than plain RPE degrade quietly for now:
+    // pct anchors are tiered (1RM/e1RM/top set, ⚖️2026-08-12) and converting
+    // against the wrong anchor is exactly the fabricated-number failure this
+    // spec removes; ranges and RIR have no suggestion semantics yet (卡 2).
+    switch target.prescribed.intensity {
+    case .percentage, .rir, .rpeRange, .weightRange:
+      return .unavailableWithoutReason
+    case .rpe, nil:
+      break
+    }
+
+    let baseOutcome: SetWeightSuggestionOutcome
+    if target.isMainLift {
+      baseOutcome = mainLiftSuggestionOutcome(
         target: target,
         priorDrafts: drafts[..<targetIndex],
         currentE1RMKg: currentE1RMKg
       )
-      : fallbackSuggestionOutcome(
+    } else {
+      baseOutcome = fallbackSuggestionOutcome(
         target: target, priorDrafts: drafts[..<targetIndex],
         lastLoggedWeightKg: lastLoggedWeightKg)
+    }
     guard let suggestion = baseOutcome.suggestion else { return baseOutcome }
     return suggestionOutcome(suggestion, for: target)
   }
@@ -173,10 +186,14 @@ extension TodayWorkoutViewModel {
     // Forward e1RMs are quotients (weight / intensity), so reversing can land
     // a hair under the exact multiple (49.999…); nudge before flooring or the
     // suggestion drops a whole 2.5 step.
-    let steps = (rawWeight / 2.5 + 1e-6).rounded(.down)
-    let roundedWeight = steps * 2.5
+    let roundedWeight = roundedDownToPlateStep(rawWeight)
     guard roundedWeight > 0 else { return nil }
     return SetWeightSuggestion(weightKg: Decimal(roundedWeight), basis: .e1RM(currentE1RMKg))
+  }
+
+  private nonisolated static func roundedDownToPlateStep(_ weight: Double) -> Double {
+    let steps = (weight / 2.5 + 1e-6).rounded(.down)
+    return steps * 2.5
   }
 
   /// Variations / accessories never get e1RM math: today's most recent

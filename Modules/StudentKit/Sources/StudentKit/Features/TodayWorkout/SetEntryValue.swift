@@ -11,6 +11,13 @@ enum SetEntryValue {
     max(0, decimal(text))
   }
 
+  /// Completing a set with an empty weight box would silently log 0kg; an
+  /// explicit "0" stays legal (bodyweight work). Only new-form rows can reach
+  /// the empty state — legacy prefill always seeds a value (spec 072 E2).
+  static func allowsCompletion(weightText: String) -> Bool {
+    !weightText.trimmingCharacters(in: .whitespaces).isEmpty
+  }
+
   static func reps(from text: String) -> Int {
     max(0, Int(text.trimmingCharacters(in: .whitespaces)) ?? 0)
   }

@@ -144,8 +144,10 @@ import Testing
   )
 
   #expect(decodedSet.restSeconds == 210)
+  #expect(decodedSet.intensity == .rpe(8))
   #expect(json.contains(#""rest_seconds":210"#))
   #expect(legacySet.restSeconds == nil)
+  #expect(legacySet.intensity == .rpe(8))
 }
 
 @Test func planSetTargetRepsExactOmitsMax() throws {

@@ -68,6 +68,23 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     var allRecorded: Bool {
       !rows.isEmpty && rows.allSatisfy { $0.record.status != .pending }
     }
+
+    /// New-form rows summarize the prescription; all-legacy exercises return
+    /// nil so the screen keeps its pre-072 record-based summary (spec 072
+    /// §1.4). Sets may be heterogeneous (spec §2): only a uniform prescription
+    /// may be named, anything mixed shows just the set count instead of
+    /// passing the first set off as all of them.
+    var prescriptionSummary: String? {
+      guard rows.contains(where: { !$0.draft.prescribed.isLegacyPrescription }) else {
+        return nil
+      }
+      let renderings = Set(rows.map { StudentFormatting.prescribed($0.draft.prescribed) })
+      guard renderings.count == 1, let uniform = renderings.first else {
+        return StudentStrings.replacing(.todayWorkoutScreen019, values: ["\(rows.count)"])
+      }
+      let setsLabel = StudentStrings.replacing(.todayWorkoutScreen019, values: ["\(rows.count)"])
+      return "\(uniform) · \(setsLabel)"
+    }
   }
 
   struct Row: Equatable, Sendable, Identifiable {
@@ -75,6 +92,34 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     let stableIndex: Int
     let record: ExerciseSetRecord
     let draft: TodayWorkoutViewModel.SetRowDraft
+
+    /// Legacy rows keep the pre-072 hero exactly: record weight (or a dash)
+    /// on top and the 目标 RPE block below (spec 072 §1.4).
+    var usesLegacyHero: Bool {
+      draft.prescribed.isLegacyPrescription
+    }
+
+    var heroPrimaryText: String {
+      guard !usesLegacyHero else {
+        return record.weight.map(Self.numberText) ?? "—"
+      }
+      return record.weight.map(Self.numberText)
+        ?? draft.prescribed.intensity.map(StudentFormatting.intensityText)
+        ?? "—"
+    }
+
+    var heroShowsWeightUnit: Bool {
+      record.weight != nil
+    }
+
+    var heroSecondaryIntensityText: String? {
+      guard !usesLegacyHero, heroShowsWeightUnit else { return nil }
+      return draft.prescribed.intensity.map(StudentFormatting.intensityText)
+    }
+
+    private static func numberText(_ value: Double) -> String {
+      value.formatted(.number.precision(.fractionLength(0...2)))
+    }
   }
 
   let day: StudentPlanDay
