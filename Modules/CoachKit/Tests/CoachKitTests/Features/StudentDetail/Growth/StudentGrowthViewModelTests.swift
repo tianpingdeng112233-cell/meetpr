@@ -1,151 +1,121 @@
 import CoreModels
 import Foundation
-import RepositoryContracts
+import Networking
 import Testing
+import ViewInspector
 
 @testable import CoachKit
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func growthFamilyMapKeepsMainLiftSlotsOnly() {
-  let accessorySlot = StudentPlanExercise(
-    id: UUID(uuidString: "02900000-0000-0000-0000-000000002001")!,
-    exercise: Exercise(
-      id: UUID(uuidString: "02900000-0000-0000-0000-000000002002")!,
-      name: "腿举",
-      exerciseType: .accessory,
-      mainLiftFamily: nil,
-      isCompetitionLift: false,
-      muscleGroups: [.quad],
-      equipment: [.machine],
-      movementPattern: [.squat],
-      createdAt: CoachStudentFeatureFixtures.startDate
-    ),
-    sequenceIndex: 1,
-    prescribedSets: []
-  )
-  let day = StudentPlanDay(
-    id: UUID(uuidString: "02900000-0000-0000-0000-000000002003")!,
-    date: CoachStudentFeatureFixtures.startDate,
-    exercises: [CoachStudentFeatureFixtures.exercise(), accessorySlot]
-  )
-
-  let families = StudentGrowthViewModel.familyByPlanExerciseID(days: [day])
-
-  #expect(families == [CoachStudentFeatureFixtures.planExerciseID: .squat])
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func growthFamilyMapResolvesStanceForTheSelectedStudent() {
-  let lowBar = growthPlanExercise(stance: .lowBar)
-  let highBar = growthPlanExercise(stance: .highBar)
-  let rdl = growthPlanExercise(family: .deadlift, stance: nil)
-  let day = StudentPlanDay(
-    id: UUID(),
-    date: CoachStudentFeatureFixtures.startDate,
-    exercises: [lowBar, highBar, rdl]
-  )
-  let profile = OnboardingProfile(
-    userId: CoachStudentFeatureFixtures.studentID,
-    squatStance: .lowBar,
-    createdAt: CoachStudentFeatureFixtures.startDate,
-    updatedAt: CoachStudentFeatureFixtures.startDate
-  )
-
-  let families = StudentGrowthViewModel.familyByPlanExerciseID(
-    days: [day],
-    onboarding: profile
-  )
-
-  #expect(families == [lowBar.id: .squat])
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func growthPointsRecomputeE1RMAndDropIneligibleLogs() {
-  let base = CoachStudentFeatureFixtures.startDate
-  let newer = growthLog(loggedAt: base.addingTimeInterval(3 * 86_400))
-  let older = growthLog(loggedAt: base.addingTimeInterval(86_400), weightKg: 140, rpe: 8)
-  let incomplete = growthLog(loggedAt: base.addingTimeInterval(2 * 86_400), completed: false)
-  let unknownExercise = growthLog(
-    loggedAt: base.addingTimeInterval(2 * 86_400),
-    planExerciseID: UUID(uuidString: "02900000-0000-0000-0000-000000002004")!
-  )
-  // RPE > 10 is physically invalid — the calculator returns nil, never a
-  // silent fallback (spec 028 boundary rules), so the point is dropped.
-  let invalidRPE = growthLog(loggedAt: base.addingTimeInterval(2 * 86_400), rpe: 11)
-
-  let points = StudentGrowthViewModel.makePoints(
-    logs: [newer, incomplete, older, unknownExercise, invalidRPE],
-    familyByPlanExerciseID: [CoachStudentFeatureFixtures.planExerciseID: .squat]
-  )
-
-  let squatPoints = points[.squat] ?? []
-  #expect(points.count == 1)
-  #expect(squatPoints.map(\.id) == [older.id, newer.id])
-  let expectedOlder = E1RMCalculator.calculate(weightKg: 140, reps: 5, rpe: 8)
-  let expectedNewer = E1RMCalculator.calculate(weightKg: 142.5, reps: 5, rpe: 8.5)
-  #expect(squatPoints.map(\.e1RMKg) == [expectedOlder, expectedNewer].compactMap { $0 })
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func growthPointsUseCoachCalibrationAsTheAuthoritativeRPE() throws {
-  let log = growthLog(
-    loggedAt: CoachStudentFeatureFixtures.startDate,
-    weightKg: 140,
-    rpe: 6,
-    coachRPE: 8
-  )
-
-  let points = StudentGrowthViewModel.makePoints(
-    logs: [log],
-    familyByPlanExerciseID: [CoachStudentFeatureFixtures.planExerciseID: .squat]
-  )
-  let point = try #require(points[.squat]?.first)
-
-  #expect(abs(point.e1RMKg - 179.49) < 0.01)
-}
-
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-@Test func growthLoadFiltersByFamilyAndTimeWindow() async {
-  let now = CoachStudentFeatureFixtures.startDate.addingTimeInterval(3 * 86_400)
-  let recent = growthLog(loggedAt: now.addingTimeInterval(-2 * 86_400))
-  let old = growthLog(loggedAt: now.addingTimeInterval(-40 * 86_400), weightKg: 137.5)
+@Test
+// swiftlint:disable:next function_body_length
+func growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() async throws {
+  let json = #"""
+    {
+      "e1rm": {
+        "squat": { "value": "180.123456789012345678", "computed_at": "2026-08-20T10:00:00Z" },
+        "bench": { "value": "120.50", "computed_at": "2026-08-19T10:00:00Z" },
+        "deadlift": null
+      },
+      "e1rm_series": {
+        "squat": {
+          "points": [
+            { "date": "2026-07-01", "value": "170.000000000000000001" },
+            { "date": "2026-08-20", "value": "180.123456789012345678" }
+          ],
+          "trend": "down"
+        },
+        "bench": {
+          "points": [{ "date": "2026-08-19", "value": "120.50" }],
+          "trend": "new"
+        },
+        "deadlift": { "points": [], "trend": "future_value" }
+      },
+      "one_rm": { "squat": "180.00", "bench": "120.00", "deadlift": null }
+    }
+    """#
+  let api = APIClient(environment: ["MEETPR_API_BASE_URL": "https://api.test"]) { request in
+    #expect(
+      request.url?.path()
+        == "/coach/students/\(CoachStudentFeatureFixtures.studentID.uuidString)/exercise-stats"
+    )
+    #expect(request.value(forHTTPHeaderField: "authorization") == "Bearer coach-token")
+    return APIResponse(data: Data(json.utf8), statusCode: 200)
+  }
   let viewModel = StudentGrowthViewModel(
-    plans: StubStudentPlanRepository(
-      plans: [CoachStudentFeatureFixtures.studentID: CoachStudentFeatureFixtures.plan()]
-    ),
-    trainingLogs: StubTrainingLogRepository(logs: [recent, old])
+    exerciseStats: BackendCoachExerciseStatsRepository(
+      api: api,
+      session: GrowthTestSession()
+    )
   )
 
-  await viewModel.loadIfNeeded(
+  await viewModel.load(
     studentID: CoachStudentFeatureFixtures.studentID,
-    now: now
+    now: try #require(utcDate("2026-08-21"))
   )
 
+  let squatPoints = viewModel.points(for: .squat)
+  let firstDate = try #require(utcDate("2026-07-01"))
+  let secondDate = try #require(utcDate("2026-08-20"))
+  let firstValue = try #require(decimal("170.000000000000000001"))
+  let secondValue = try #require(decimal("180.123456789012345678"))
+  let benchValue = try #require(decimal("120.50"))
   #expect(viewModel.state == .loaded)
-  // Default window 近 4 周 hides the 40-day-old point.
-  #expect(viewModel.visiblePoints.map(\.id) == [recent.id])
+  #expect(squatPoints.map(\.date) == [firstDate, secondDate])
+  #expect(squatPoints.map(\.e1RMKg) == [firstValue, secondValue])
+  #expect(viewModel.headlineE1RM(for: .squat) == secondValue)
+  #expect(viewModel.headlineE1RM(for: .bench) == benchValue)
+  #expect(viewModel.trend(for: .squat) == .downward)
+  #expect(viewModel.trend(for: .bench) == .new)
+  #expect(viewModel.trend(for: .deadlift) == .unknown("future_value"))
+  #expect(viewModel.oneRMByFamily == [.squat: 180, .bench: 120])
+}
 
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func growthFiltersBackendPointsBySelectedFamilyAndWindow() async throws {
+  let now = try #require(utcDate("2026-08-21"))
+  let recent = try #require(utcDate("2026-08-19"))
+  let old = try #require(utcDate("2026-07-01"))
+  let snapshot = CoachExerciseStatsSnapshot(
+    seriesByFamily: [
+      .squat: .init(
+        points: [
+          .init(date: old, valueKg: 170),
+          .init(date: recent, valueKg: 180),
+        ],
+        trend: .upward
+      )
+    ]
+  )
+  let viewModel = StudentGrowthViewModel(
+    exerciseStats: InMemoryCoachExerciseStatsRepository(
+      snapshots: [CoachStudentFeatureFixtures.studentID: snapshot]
+    )
+  )
+
+  await viewModel.loadIfNeeded(studentID: CoachStudentFeatureFixtures.studentID, now: now)
+
+  #expect(viewModel.visiblePoints.map(\.date) == [recent])
   viewModel.selectedWindow = .threeMonths
-  #expect(viewModel.visiblePoints.map(\.id) == [old.id, recent.id])
-
-  viewModel.selectedWindow = .all
-  #expect(viewModel.visiblePoints.map(\.id) == [old.id, recent.id])
-
+  #expect(viewModel.visiblePoints.map(\.date) == [old, recent])
   viewModel.selectedFamily = .bench
   #expect(viewModel.visiblePoints.isEmpty)
 }
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func growthLoadFailureSetsRetryableFailedState() async {
+@Test func growthMissingSeriesLoadsAsExistingEmptyState() async throws {
+  let response = CoachExerciseStatsResponseDTO(
+    e1RM: .init(squat: .init(value: "180.00")),
+    oneRM: .init(squat: "175.00")
+  )
+  let snapshot = try BackendCoachExerciseStatsRepository.snapshot(from: response)
   let viewModel = StudentGrowthViewModel(
-    plans: FailingStudentPlanRepository(),
-    trainingLogs: StubTrainingLogRepository(logs: [])
+    exerciseStats: InMemoryCoachExerciseStatsRepository(
+      snapshots: [CoachStudentFeatureFixtures.studentID: snapshot]
+    )
   )
 
   await viewModel.load(
@@ -153,100 +123,157 @@ import Testing
     now: CoachStudentFeatureFixtures.startDate
   )
 
-  #expect(viewModel.state == .failed(CoachStudentDetailStrings.text("coach.growth.error.load")))
-  #expect(viewModel.visiblePoints.isEmpty)
-}
-
-private func growthLog(
-  loggedAt: Date,
-  weightKg: Decimal = 142.5,
-  rpe: Decimal? = 8.5,
-  coachRPE: Decimal? = nil,
-  completed: Bool = true,
-  planExerciseID: UUID = CoachStudentFeatureFixtures.planExerciseID
-) -> StudentSetLog {
-  StudentSetLog(
-    id: UUID(),
+  #expect(viewModel.state == .loaded)
+  #expect(LiftFamily.allCases.allSatisfy { viewModel.points(for: $0).isEmpty })
+  let inspected = try StudentGrowthView(
     studentID: CoachStudentFeatureFixtures.studentID,
-    planExerciseID: planExerciseID,
-    setIndex: 0,
-    loggedAt: loggedAt,
-    weightKg: weightKg,
-    reps: 5,
-    rpe: rpe,
-    coachRPE: coachRPE,
-    completed: completed
-  )
+    now: CoachStudentFeatureFixtures.startDate,
+    viewModel: viewModel
+  ).inspect()
+  _ = try inspected.find(text: CoachGrowthStrings.empty)
 }
 
-private func growthPlanExercise(
-  family: LiftFamily = .squat,
-  stance: CompetitionStance?
-) -> StudentPlanExercise {
-  StudentPlanExercise(
-    id: UUID(),
-    exercise: Exercise(
-      id: UUID(),
-      name: "测试动作",
-      exerciseType: .mainLiftVariation,
-      mainLiftFamily: family,
-      isCompetitionLift: false,
-      competitionStance: stance,
-      muscleGroups: [],
-      equipment: [],
-      createdAt: CoachStudentFeatureFixtures.startDate
-    ),
-    sequenceIndex: 0,
-    prescribedSets: []
-  )
-}
-
-private actor FailingStudentPlanRepository: StudentPlanRepository {
-  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
-    throw CoachFeatureTestError()
-  }
-
-  func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? {
-    throw CoachFeatureTestError()
-  }
-
-  func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] {
-    throw CoachFeatureTestError()
-  }
-}
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
-@Test func providerMapBeatsCurrentWeekProjectionForCrossWeekLogs() async throws {
-  // A week-1 plan exercise that the current-week (week-2) projection no
-  // longer carries — only the coach-owned full-tree provider maps it
-  // (Codex review P1: projection-only mapping dropped cross-week points).
-  let weekOnePlanExerciseID = UUID(uuidString: "02900000-0000-0000-0000-000000003001")!
-  let studentID = UUID(uuidString: "02900000-0000-0000-0000-000000003002")!
-  let now = CoachStudentFeatureFixtures.startDate.addingTimeInterval(7 * 86_400)
-  let provider = StaticCoachPlanFamilyMapProvider(map: [weekOnePlanExerciseID: .squat])
-  let logs = StubTrainingLogRepository(logs: [
-    StudentSetLog(
-      id: UUID(uuidString: "02900000-0000-0000-0000-000000003003")!,
-      studentID: studentID,
-      planExerciseID: weekOnePlanExerciseID,
-      setIndex: 0,
-      loggedAt: now.addingTimeInterval(-86_400),
-      weightKg: 140,
-      reps: 5,
-      rpe: 8,
-      completed: true
-    )
-  ])
-
-  let viewModel = StudentGrowthViewModel(
-    plans: StubStudentPlanRepository(plans: [:]),  // projection yields nothing
-    trainingLogs: logs,
-    familyMapProvider: provider
+@Test func growthFailureRendersRetryAndRetrySuccessShowsData() async throws {
+  let successful = CoachExerciseStatsSnapshot(
+    e1RMByFamily: [.squat: .init(valueKg: 180)],
+    seriesByFamily: [
+      .squat: .init(
+        points: [.init(date: CoachStudentFeatureFixtures.startDate, valueKg: 180)],
+        trend: .upward
+      )
+    ]
   )
-  await viewModel.load(studentID: studentID, now: now)
+  let repository = SequencedCoachExerciseStatsRepository(results: [
+    .failure(CoachFeatureTestError()),
+    .success(successful),
+  ])
+  let viewModel = StudentGrowthViewModel(exerciseStats: repository)
+  let view = StudentGrowthView(
+    studentID: CoachStudentFeatureFixtures.studentID,
+    now: CoachStudentFeatureFixtures.startDate,
+    viewModel: viewModel
+  )
 
+  await viewModel.load(
+    studentID: CoachStudentFeatureFixtures.studentID,
+    now: CoachStudentFeatureFixtures.startDate
+  )
+
+  #expect(viewModel.state == .failed(CoachGrowthStrings.loadFailed))
+  let inspected = try view.inspect()
+  _ = try inspected.find(text: CoachGrowthStrings.loadFailed)
+  try inspected.find(button: CoachDetailStrings.retry).tap()
+
+  for _ in 0..<200 where viewModel.state != .loaded {
+    try await Task.sleep(for: .milliseconds(5))
+  }
   #expect(viewModel.state == .loaded)
-  viewModel.selectedFamily = .squat
-  viewModel.selectedWindow = .all
-  #expect(!viewModel.visiblePoints.isEmpty, "cross-week log must survive via the tree map")
+  #expect(viewModel.points(for: .squat).map(\.e1RMKg) == [180])
+  #expect(await repository.requestCount() == 2)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func growthLoadingRendersProgressWithoutFlashingEmptyState() async throws {
+  let repository = SuspendedCoachExerciseStatsRepository()
+  let viewModel = StudentGrowthViewModel(exerciseStats: repository)
+  let loadTask = Task {
+    await viewModel.load(
+      studentID: CoachStudentFeatureFixtures.studentID,
+      now: CoachStudentFeatureFixtures.startDate
+    )
+  }
+
+  for _ in 0..<200 where !(await repository.hasStarted()) {
+    await Task.yield()
+  }
+  #expect(viewModel.state == .loading)
+  let inspected = try StudentGrowthView(
+    studentID: CoachStudentFeatureFixtures.studentID,
+    now: CoachStudentFeatureFixtures.startDate,
+    viewModel: viewModel
+  ).inspect()
+  _ = try inspected.find(ViewType.ProgressView.self)
+  #expect(throws: (any Error).self) {
+    _ = try inspected.find(text: CoachGrowthStrings.empty)
+  }
+
+  await repository.finish(with: CoachExerciseStatsSnapshot())
+  await loadTask.value
+}
+
+private struct GrowthTestSession: SessionStateReader {
+  func accessToken() async throws -> String {
+    "coach-token"
+  }
+
+  func currentUser() async throws -> User {
+    User(
+      id: CoachStudentFeatureFixtures.coachID,
+      phone: "+8613800000001",
+      unitSystem: .metric,
+      role: .coach,
+      createdAt: CoachStudentFeatureFixtures.startDate,
+      updatedAt: CoachStudentFeatureFixtures.startDate
+    )
+  }
+}
+
+private actor SequencedCoachExerciseStatsRepository: CoachExerciseStatsProviding {
+  private var results: [Result<CoachExerciseStatsSnapshot, CoachFeatureTestError>]
+  private var requests = 0
+
+  init(results: [Result<CoachExerciseStatsSnapshot, CoachFeatureTestError>]) {
+    self.results = results
+  }
+
+  func fetchExerciseStats(studentID: UUID) async throws -> CoachExerciseStatsSnapshot {
+    requests += 1
+    guard !results.isEmpty else { return CoachExerciseStatsSnapshot() }
+    return try results.removeFirst().get()
+  }
+
+  func requestCount() -> Int {
+    requests
+  }
+}
+
+private actor SuspendedCoachExerciseStatsRepository: CoachExerciseStatsProviding {
+  private var started = false
+  private var continuation: CheckedContinuation<CoachExerciseStatsSnapshot, Never>?
+
+  func fetchExerciseStats(studentID: UUID) async throws -> CoachExerciseStatsSnapshot {
+    started = true
+    return await withCheckedContinuation { continuation in
+      self.continuation = continuation
+    }
+  }
+
+  func hasStarted() -> Bool {
+    started
+  }
+
+  func finish(with snapshot: CoachExerciseStatsSnapshot) {
+    continuation?.resume(returning: snapshot)
+    continuation = nil
+  }
+}
+
+private func decimal(_ rawValue: String) -> Decimal? {
+  Decimal(string: rawValue, locale: Locale(identifier: "en_US_POSIX"))
+}
+
+private func utcDate(_ rawValue: String) -> Date? {
+  let components = rawValue.split(separator: "-")
+  guard components.count == 3,
+    let year = Int(components[0]),
+    let month = Int(components[1]),
+    let day = Int(components[2]),
+    let timeZone = TimeZone(secondsFromGMT: 0)
+  else { return nil }
+  var calendar = Calendar(identifier: .iso8601)
+  calendar.timeZone = timeZone
+  return calendar.date(from: DateComponents(year: year, month: month, day: day))
 }

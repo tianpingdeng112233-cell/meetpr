@@ -49,7 +49,7 @@ public struct CoachRootView: View {
     inviteCodes: (any InviteCodeRepository)? = nil,
     studentVideos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
-    familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
+    exerciseStats: any CoachExerciseStatsProviding = InMemoryCoachExerciseStatsRepository(),
     bindQueue: (any CoachBindQueueRepository)? = nil,
     evaluations: (any EvaluationRepository)? = nil,
     evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
@@ -95,7 +95,7 @@ public struct CoachRootView: View {
       profiles: resolvedProfiles,
       videos: studentVideos,
       readiness: readiness,
-      familyMapProvider: familyMapProvider,
+      exerciseStats: exerciseStats,
       planning: repository,
       draftStore: draftStore,
       chat: resolvedChat

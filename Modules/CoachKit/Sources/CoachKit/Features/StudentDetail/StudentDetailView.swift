@@ -42,10 +42,7 @@ struct StudentDetailView: View {
     )
     _growthViewModel = State(
       initialValue: StudentGrowthViewModel(
-        plans: context.plans,
-        trainingLogs: context.trainingLogs,
-        profiles: context.profiles,
-        familyMapProvider: context.familyMapProvider
+        exerciseStats: context.exerciseStats
       )
     )
     _evaluationViewModel = State(

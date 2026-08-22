@@ -4447,6 +4447,57 @@
         }
       }
     },
+    "coach.growth.trend.down": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM trend down"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 趋势下降"
+          }
+        }
+      }
+    },
+    "coach.growth.trend.flat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM trend steady"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 趋势持平"
+          }
+        }
+      }
+    },
+    "coach.growth.trend.up": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM trend up"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 趋势上升"
+          }
+        }
+      }
+    },
     "coach.growth.window.all": {
       "extractionState": "manual",
       "localizations": {

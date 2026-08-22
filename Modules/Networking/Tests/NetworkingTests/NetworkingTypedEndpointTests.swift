@@ -66,6 +66,10 @@ func typedEndpointsUseWireContractPaths() async throws {
   _ = try await client.completePlanDay(id: dayID, accessToken: "token")
   try await client.undoPlanDayCompletion(id: dayID, accessToken: "token")
   _ = try await client.coachStudents(accessToken: "token")
+  _ = try await client.coachStudentExerciseStats(
+    studentID: studentID,
+    accessToken: "token"
+  )
   _ = try await client.logSet(
     CreateSetLogRequestDTO(
       planExerciseID: planExerciseID,
@@ -102,6 +106,7 @@ func typedEndpointsUseWireContractPaths() async throws {
       "POST /plans/days/\(dayID.uuidString)/complete",
       "DELETE /plans/days/\(dayID.uuidString)/complete",
       "GET /coach/students",
+      "GET /coach/students/\(studentID.uuidString)/exercise-stats",
       "POST /sets/log",
       "GET /students/\(studentID.uuidString)/sets?from=2026-05-22&to=2026-05-23&scope=plan",
       "POST /coach/feedback",
@@ -165,6 +170,11 @@ private struct TypedEndpointResponseStub: Sendable {
     }
     if path == "/coach/students" {
       return Data(#"{"students":[]}"#.utf8)
+    }
+    if path.hasSuffix("/exercise-stats") {
+      return Data(
+        #"{"one_rm":{"squat":null,"bench":null,"deadlift":null}}"#.utf8
+      )
     }
     if path.hasSuffix("/sets") {
       return Data(#"{"logs":[]}"#.utf8)

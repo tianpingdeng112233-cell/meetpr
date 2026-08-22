@@ -133,7 +133,7 @@ private func makeDetailContext(chat: CoachChatContext) throws -> CoachStudentDet
     profiles: InMemoryCoachStudentProfileReader(),
     videos: InMemoryCoachStudentVideoRepository(),
     readiness: EmptyReadinessRepository(),
-    familyMapProvider: nil,
+    exerciseStats: InMemoryCoachExerciseStatsRepository(),
     planning: InMemoryPlanRepository(students: [], catalog: []),
     draftStore: try DraftStore.inMemory(),
     chat: chat
