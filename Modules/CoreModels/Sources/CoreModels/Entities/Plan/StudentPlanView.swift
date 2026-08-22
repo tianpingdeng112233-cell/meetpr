@@ -242,6 +242,9 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public let setIndex: Int
   public let weightKg: Decimal?
   public let intensity: PrescribedIntensity?
+  /// Percentage reference. Missing cached values retain the backend contract's
+  /// default registered-1RM meaning.
+  public let percentageAnchor: PercentageAnchor?
   /// Contract v2.1 provenance: `nil` marks a legacy row (`load_mode == null`),
   /// which must keep rendering and prefill exactly as before spec 072. New-form
   /// rows carry their wire mode even when the value column is sparse.
@@ -259,6 +262,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     setIndex: Int,
     weightKg: Decimal? = nil,
     intensity: PrescribedIntensity? = nil,
+    percentageAnchor: PercentageAnchor? = nil,
     loadMode: PlanLoadMode? = nil,
     reps: Int? = nil,
     repsMax: Int? = nil,
@@ -270,6 +274,11 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     self.setIndex = setIndex
     self.weightKg = weightKg
     self.intensity = intensity ?? rpe.map(PrescribedIntensity.rpe)
+    if case .some(.percentage) = self.intensity {
+      self.percentageAnchor = percentageAnchor ?? .registeredOneRM
+    } else {
+      self.percentageAnchor = percentageAnchor
+    }
     self.loadMode = loadMode
     self.reps = reps
     self.repsMax = repsMax
@@ -288,6 +297,15 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     intensity =
       try container.decodeIfPresent(PrescribedIntensity.self, forKey: .intensity)
       ?? legacyRPE.map(PrescribedIntensity.rpe)
+    let decodedPercentageAnchor = try container.decodeIfPresent(
+      PercentageAnchor.self,
+      forKey: .percentageAnchor
+    )
+    if case .some(.percentage) = intensity {
+      percentageAnchor = decodedPercentageAnchor ?? .registeredOneRM
+    } else {
+      percentageAnchor = decodedPercentageAnchor
+    }
     loadMode = try container.decodeIfPresent(PlanLoadMode.self, forKey: .loadMode)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
     coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
@@ -301,6 +319,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeIfPresent(reps, forKey: .reps)
     try container.encodeIfPresent(repsMax, forKey: .repsMax)
     try container.encodeIfPresent(intensity, forKey: .intensity)
+    try container.encodeIfPresent(percentageAnchor, forKey: .percentageAnchor)
     try container.encodeIfPresent(loadMode, forKey: .loadMode)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
@@ -312,6 +331,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     case setIndex
     case weightKg
     case intensity
+    case percentageAnchor
     case loadMode
     case reps
     case repsMax
@@ -331,5 +351,9 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   /// paths byte-for-byte; only new-form rows enter the six-form presentation.
   public var isLegacyPrescription: Bool {
     loadMode == nil
+  }
+
+  public var effectivePercentageAnchor: PercentageAnchor {
+    percentageAnchor ?? .registeredOneRM
   }
 }

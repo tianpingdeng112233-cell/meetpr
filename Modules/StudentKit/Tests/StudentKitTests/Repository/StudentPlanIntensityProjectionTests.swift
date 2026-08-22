@@ -18,6 +18,7 @@ import Testing
   #expect(sets.count == 10)
   #expect(sets[0].weightKg == nil)
   #expect(sets[0].intensity == .percentage(72.5))
+  #expect(sets[0].percentageAnchor == .e1RM)
   #expect(sets[0].rpe == nil)
   #expect(sets[0].restSeconds == 180)
   #expect(sets[1].intensity == .rpe(8.5))
@@ -140,7 +141,8 @@ private func projectionSets(planExerciseID: UUID, timestamp: Date) -> [PlanSet] 
   [
     projectionSet(
       exerciseID: planExerciseID, timestamp: timestamp, number: 1,
-      legacyMode: .rpe, legacyValue: 7.1, loadMode: .percentage, targetPct: 72.5),
+      legacyMode: .rpe, legacyValue: 7.1, loadMode: .percentage, targetPct: 72.5,
+      percentageAnchor: .e1RM),
     projectionSet(
       exerciseID: planExerciseID, timestamp: timestamp, number: 2,
       legacyMode: .weight, legacyValue: 999, loadMode: .rpe, targetRPE: 8.5),
@@ -184,6 +186,7 @@ private func projectionSet(
   legacyValue: Decimal,
   loadMode: PlanLoadMode? = nil,
   targetPct: Decimal? = nil,
+  percentageAnchor: PercentageAnchor? = nil,
   targetRPE: Decimal? = nil,
   rirTarget: Int? = nil,
   rpeLow: Decimal? = nil,
@@ -201,6 +204,7 @@ private func projectionSet(
     targetValue: legacyValue,
     loadMode: loadMode,
     targetPct: targetPct,
+    percentageAnchor: percentageAnchor,
     targetRPE: targetRPE,
     rirTarget: rirTarget,
     rpeLow: rpeLow,

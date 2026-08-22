@@ -10,6 +10,12 @@ import Foundation
 /// `setNumber`. A `PlanExercise` whose `exerciseID` is absent from `catalog` is
 /// dropped, since the student view cannot render an exercise it cannot name.
 public enum PlanToStudentProjection {
+  private struct Prescription {
+    let weightKg: Decimal?
+    let intensity: PrescribedIntensity?
+    let percentageAnchor: PercentageAnchor?
+  }
+
   // Tree params (plan/days/exercises/sets) mirror PlanRepository.publishPlan;
   // catalog resolves exercise IDs to a full Exercise the student view can render.
   // swiftlint:disable:next function_parameter_count
@@ -98,6 +104,7 @@ public enum PlanToStudentProjection {
       setIndex: planSet.setNumber - 1,
       weightKg: prescription.weightKg,
       intensity: prescription.intensity,
+      percentageAnchor: prescription.percentageAnchor,
       loadMode: planSet.loadMode,
       reps: isRange ? nil : planSet.targetReps,
       repsMax: planSet.targetRepsMax,
@@ -107,11 +114,12 @@ public enum PlanToStudentProjection {
 
   private static func prescription(
     for planSet: PlanSet
-  ) -> (weightKg: Decimal?, intensity: PrescribedIntensity?) {
+  ) -> Prescription {
     guard let loadMode = planSet.loadMode else {
-      return (
-        planSet.intensityMode == .weight ? planSet.targetValue : nil,
-        planSet.intensityMode == .rpe ? .rpe(planSet.targetValue) : nil
+      return Prescription(
+        weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
+        intensity: planSet.intensityMode == .rpe ? .rpe(planSet.targetValue) : nil,
+        percentageAnchor: nil
       )
     }
 
@@ -134,7 +142,13 @@ public enum PlanToStudentProjection {
     case .fixedWeight:
       intensity = nil
     }
-    return (planSet.targetWeight, intensity)
+    let percentageAnchor =
+      loadMode == .percentage ? planSet.percentageAnchor ?? .registeredOneRM : nil
+    return Prescription(
+      weightKg: planSet.targetWeight,
+      intensity: intensity,
+      percentageAnchor: percentageAnchor
+    )
   }
 
   private static func range(

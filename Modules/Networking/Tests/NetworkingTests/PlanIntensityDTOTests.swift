@@ -10,6 +10,7 @@ import Testing
   #expect(sets.count == 10)
   #expect(sets[0].loadMode == .percentage)
   #expect(sets[0].targetPct == 72.5)
+  #expect(sets[0].percentageAnchor == .e1RM)
   #expect(sets[1].loadMode == .rpe)
   #expect(sets[1].targetRPE == 8.5)
   #expect(sets[2].loadMode == .rir)
@@ -26,6 +27,7 @@ import Testing
   #expect(sets[6].targetRPE == 9)
   #expect(sets[7].targetPct == nil)
   #expect(sets[7].targetWeight == 150)
+  #expect(sets[7].percentageAnchor == nil)
   #expect(sets[8].loadMode == nil)
   #expect(sets[8].intensityMode == .rpe)
   #expect(sets[8].targetValue == 8)
@@ -42,8 +44,17 @@ import Testing
 
   #expect(roundTripped == decoded)
   #expect(json.contains(#""target_pct":"72.5""#))
+  #expect(json.contains(#""pct_anchor":"e1rm""#))
   #expect(json.contains(#""rir_target":2"#))
   #expect(json.contains(#""target_weight":"170""#))
+}
+
+@Test func planSetDTOUnknownPercentageAnchorDecodesAsNil() throws {
+  let unknown = planSetsJSON.replacing("\"pct_anchor\":\"e1rm\"", with: "\"pct_anchor\":\"future\"")
+  let sets = try MeetPRCodec.decoder.decode([PlanSetDTO].self, from: Data(unknown.utf8))
+
+  #expect(sets[0].loadMode == .percentage)
+  #expect(sets[0].percentageAnchor == nil)
 }
 
 @Test func planDTOAnchorWeekdayDecodesAndLegacyAbsenceDefaultsNil() throws {
@@ -84,7 +95,7 @@ private func planJSON(anchorLine: String) -> String {
 // swiftlint:disable line_length
 private let planSetsJSON = """
   [
-    {"id":"20000000-0000-0000-0000-000000000001","plan_exercise_id":"30000000-0000-0000-0000-000000000001","set_number":1,"target_reps":5,"intensity_mode":"rpe","target_value":"7.1","load_mode":"pct","target_pct":"72.5","set_type":"working","created_at":"2026-08-12T08:00:00Z"},
+    {"id":"20000000-0000-0000-0000-000000000001","plan_exercise_id":"30000000-0000-0000-0000-000000000001","set_number":1,"target_reps":5,"intensity_mode":"rpe","target_value":"7.1","load_mode":"pct","target_pct":"72.5","pct_anchor":"e1rm","set_type":"working","created_at":"2026-08-12T08:00:00Z"},
     {"id":"20000000-0000-0000-0000-000000000002","plan_exercise_id":"30000000-0000-0000-0000-000000000001","set_number":2,"target_reps":5,"intensity_mode":"rpe","target_value":"8.5","load_mode":"rpe","target_rpe":"8.5","set_type":"working","created_at":"2026-08-12T08:00:00Z"},
     {"id":"20000000-0000-0000-0000-000000000003","plan_exercise_id":"30000000-0000-0000-0000-000000000001","set_number":3,"target_reps":5,"intensity_mode":"rpe","target_value":"8","load_mode":"rir","rir_target":2,"set_type":"working","created_at":"2026-08-12T08:00:00Z"},
     {"id":"20000000-0000-0000-0000-000000000004","plan_exercise_id":"30000000-0000-0000-0000-000000000001","set_number":4,"target_reps":5,"intensity_mode":"weight","target_value":"165","load_mode":"weight_range","weight_low":"165.00","weight_high":"175.00","set_type":"working","created_at":"2026-08-12T08:00:00Z"},

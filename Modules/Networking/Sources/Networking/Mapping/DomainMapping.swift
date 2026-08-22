@@ -99,6 +99,7 @@ extension PlanSetDTO {
       targetValue: targetValue,
       loadMode: loadMode,
       targetPct: targetPct,
+      percentageAnchor: percentageAnchor,
       targetRPE: targetRPE,
       rirTarget: rirTarget,
       rpeLow: rpeLow,

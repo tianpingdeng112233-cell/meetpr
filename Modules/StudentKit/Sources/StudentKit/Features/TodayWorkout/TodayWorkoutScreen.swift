@@ -625,13 +625,19 @@ private struct TodayWorkoutHero: View {
           .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
         } else if let intensityText = row.heroSecondaryIntensityText {
           HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
-            Text(StudentStrings.localized(.todayWorkoutScreen027))
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
-              .tracking(0.55)
-              .foregroundStyle(Color.MeetPR.textFaint)
+            if let label = row.heroSecondaryLabelText {
+              Text(label)
+                .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
+                .tracking(0.55)
+                .foregroundStyle(Color.MeetPR.textFaint)
+            }
             Text(intensityText)
               .font(.MeetPR.display(size: MeetPRFontMetrics.size20))
-              .foregroundStyle(Color.MeetPR.textPrimary)
+              .foregroundStyle(
+                row.heroShowsWeightUnit
+                  ? Color.MeetPR.textPrimary
+                  : Color.MeetPR.textMuted
+              )
           }
           .padding(.top, MeetPRSpacing.space2)
           .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
@@ -799,7 +805,7 @@ private struct TodayWorkoutExerciseList: View {
       let exercise = exercises[index]
       ExerciseCard(
         exercise: exercise.name,
-        meta: exercise.reference,
+        meta: exercise.cardSubtitle,
         note: exercise.note,
         collapsed: collapsedExercises[exercise.id] ?? exercise.allRecorded,
         sets: exercise.rows.map(\.record),

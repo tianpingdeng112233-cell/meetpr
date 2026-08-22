@@ -1,8 +1,10 @@
+// swiftlint:disable file_length
 import Foundation
 import SwiftUI
 
 /// One training-set row, following the five-column `SetRow.dc.html` grid.
 @MainActor
+// swiftlint:disable:next type_body_length
 public struct SetRow: View {
   public enum Status: Equatable, Sendable {
     case pending
@@ -26,6 +28,7 @@ public struct SetRow: View {
   let status: Status
   let videoState: VideoState
   private let indexAccessibilityIdentifier: String?
+  private let prescriptionDisplay: ExerciseSetRecord.PrescriptionDisplay?
   private let onEdit: (@MainActor () -> Void)?
   private let onVideoAction: (@MainActor () -> Void)?
 
@@ -37,6 +40,7 @@ public struct SetRow: View {
     status: Status,
     videoState: VideoState,
     indexAccessibilityIdentifier: String? = nil,
+    prescriptionDisplay: ExerciseSetRecord.PrescriptionDisplay? = nil,
     onEdit: (@MainActor () -> Void)? = nil,
     onVideoAction: (@MainActor () -> Void)? = nil
   ) {
@@ -47,6 +51,7 @@ public struct SetRow: View {
     self.status = status
     self.videoState = videoState
     self.indexAccessibilityIdentifier = indexAccessibilityIdentifier
+    self.prescriptionDisplay = prescriptionDisplay
     self.onEdit = onEdit
     self.onVideoAction = onVideoAction
   }
@@ -85,24 +90,55 @@ public struct SetRow: View {
         .frame(width: SetRowContract.indexColumnWidth, alignment: .leading)
         .optionalAccessibilityIdentifier(indexAccessibilityIdentifier)
 
-      Text(weight.map { numberText($0) } ?? "—")
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
-        .foregroundStyle(valueColor)
-        .frame(maxWidth: .infinity, alignment: .leading)
+      weightMetric
 
       Text(reps.formatted())
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size14))
         .foregroundStyle(valueColor)
         .frame(maxWidth: .infinity)
 
-      Text(numberText(rpe, alwaysShowsFraction: true))
+      Text(prescriptionDisplay?.rpeText ?? numberText(rpe, alwaysShowsFraction: true))
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size14))
-        .foregroundStyle(valueColor)
+        .foregroundStyle(prescriptionValueColor)
         .frame(maxWidth: .infinity)
     }
     .frame(maxWidth: .infinity)
     .frame(minHeight: SetRowContract.minimumRowHeight)
     .contentShape(.rect)
+  }
+
+  @ViewBuilder
+  private var weightMetric: some View {
+    if let prescriptionDisplay {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point1) {
+        HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.point3) {
+          Text(prescriptionDisplay.weightPrimary)
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
+          if let unit = prescriptionDisplay.weightUnit {
+            Text(unit)
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .medium))
+              .foregroundStyle(Color.MeetPR.textMuted)
+          }
+        }
+        .foregroundStyle(prescriptionWeightColor)
+
+        if let secondary = prescriptionDisplay.weightSecondary {
+          Text(secondary)
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size9))
+            .foregroundStyle(
+              prescriptionDisplay.emphasis == .muted
+                ? Color.MeetPR.textDim
+                : Color.MeetPR.textMuted
+            )
+        }
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+    } else {
+      Text(weight.map { numberText($0) } ?? "—")
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
+        .foregroundStyle(valueColor)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
   }
 
   private var trailingColumn: some View {
@@ -137,6 +173,22 @@ public struct SetRow: View {
     case .done: Color.MeetPR.textPrimary
     case .pending: Color.MeetPR.textDim
     }
+  }
+
+  private var prescriptionWeightColor: Color {
+    guard let prescriptionDisplay else { return valueColor }
+    if status == .failed { return Color.MeetPR.dangerMuted }
+    return prescriptionDisplay.emphasis == .muted
+      ? Color.MeetPR.textMuted
+      : Color.MeetPR.textPrimary
+  }
+
+  private var prescriptionValueColor: Color {
+    guard let prescriptionDisplay else { return valueColor }
+    if status == .failed { return Color.MeetPR.dangerMuted }
+    return prescriptionDisplay.emphasis == .muted
+      ? Color.MeetPR.textDim
+      : Color.MeetPR.textSecondary
   }
 
   @ViewBuilder
@@ -212,12 +264,17 @@ public struct SetRow: View {
       case .failed: DesignSystemStrings.videoUploadFailed
       }
     let weightText =
-      weight.map { DesignSystemStrings.setWeight(numberText($0)) }
+      prescriptionDisplay.map {
+        [$0.weightPrimary, $0.weightUnit, $0.weightSecondary]
+          .compactMap { $0 }
+          .joined(separator: " ")
+      }
+      ?? weight.map { DesignSystemStrings.setWeight(numberText($0)) }
       ?? DesignSystemStrings.noSuggestedWeight
     let metrics = DesignSystemStrings.setMetrics(
       weight: weightText,
       reps: reps,
-      rpe: numberText(rpe, alwaysShowsFraction: true)
+      rpe: prescriptionDisplay?.rpeText ?? numberText(rpe, alwaysShowsFraction: true)
     )
     return DesignSystemStrings.setAccessibilityLabel(
       index: index,

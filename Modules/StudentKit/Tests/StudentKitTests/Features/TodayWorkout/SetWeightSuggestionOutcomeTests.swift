@@ -1,10 +1,13 @@
+// swiftlint:disable file_length
 import CoreModels
 import Foundation
 import SwiftUI
 import Testing
+import ViewInspector
 
 @testable import StudentKit
 
+// swiftlint:disable:next type_body_length
 @Suite struct SetWeightSuggestionOutcomeTests {
   @Test func failedMatchingMainLiftSetFallsBackToE1RM() throws {
     let exerciseID = UUID()
@@ -191,13 +194,12 @@ import Testing
   }
 
   @MainActor
-  @Test func sheetPrefillsFixedWeightAndLeavesPercentageEmpty() async throws {
-    // pct anchors are tiered (⚖️2026-08-12, default 1RM): no conversion until
-    // pct_anchor lands, so the sheet must stay empty rather than invent 90kg.
+  @Test func sheetPrefillsResolvedPercentageAndFixedWeight() async throws {
     let pctFixture = try await makeSuggestionSheetFixture(
       seedHistory: true,
       prescribed: PrescribedSet(
-        id: UUID(), setIndex: 0, intensity: .percentage(75), loadMode: .percentage, reps: 5)
+        id: UUID(), setIndex: 0, intensity: .percentage(75), percentageAnchor: .e1RM,
+        loadMode: .percentage, reps: 5)
     )
     let pctSheet = SetEntrySheet(
       rowIndex: 0,
@@ -217,8 +219,57 @@ import Testing
       viewModel: fixedFixture.viewModel
     )
 
-    #expect(pctSheet.weightValue == 0)
+    #expect(pctSheet.weightValue == 90)
+    #expect(
+      pctSheet.suggestionOutcomeSnapshot.suggestion?.basis
+        == .percentage(.e1RM(anchorKg: 120))
+    )
+    #expect(pctSheet.isAutomaticWeight)
+    #expect(!fixedSheet.isAutomaticWeight)
     #expect(fixedSheet.weightValue == 150)
+
+    let inspected = try pctSheet.inspect()
+    #expect(
+      try inspected.find(text: StudentStrings.localized(.todayWorkoutTypes027)).string()
+        == StudentStrings.localized(.todayWorkoutTypes027)
+    )
+    #expect(
+      try inspected.find(
+        text: StudentStrings.replacing(.todayWorkoutTypes012, values: ["120"])
+      ).string() == StudentStrings.replacing(.todayWorkoutTypes012, values: ["120"])
+    )
+    #expect(
+      try inspected.find(text: StudentStrings.localized(.todayWorkoutTypes028)).string()
+        == StudentStrings.localized(.todayWorkoutTypes028)
+    )
+  }
+
+  @MainActor
+  @Test func unresolvedTopSetSheetShowsDashAndWaitingSourceWithoutAutomaticBadge() async throws {
+    let fixture = try await makeSuggestionSheetFixture(
+      seedHistory: false,
+      prescribed: PrescribedSet(
+        id: UUID(), setIndex: 0, intensity: .percentage(85), percentageAnchor: .topSet,
+        loadMode: .percentage, reps: 5)
+    )
+    let sheet = SetEntrySheet(
+      rowIndex: 0,
+      draft: fixture.draft,
+      setNumber: 1,
+      viewModel: fixture.viewModel
+    )
+    let inspected = try sheet.inspect()
+
+    #expect(sheet.weightValue == 0)
+    #expect(!sheet.isAutomaticWeight)
+    #expect(sheet.suggestionOutcomeSnapshot.unavailableReason == .topSetNotCompleted)
+    #expect(
+      try inspected.find(text: StudentStrings.localized(.todayWorkoutTypes010)).string()
+        == StudentStrings.localized(.todayWorkoutTypes010)
+    )
+    #expect(throws: (any Error).self) {
+      try inspected.find(text: StudentStrings.localized(.todayWorkoutTypes027))
+    }
   }
 
   @MainActor

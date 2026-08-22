@@ -472,6 +472,7 @@ public struct TodayWorkoutView: View {
             drafts: workout.drafts,
             references: [:],
             videoStates: [:],
+            suggestionOutcomes: [:],
             started: started
           )
         )
@@ -488,6 +489,7 @@ public struct TodayWorkoutView: View {
           drafts: drafts,
           references: viewModel.exerciseReferences,
           videoStates: videoStates(for: drafts),
+          suggestionOutcomes: suggestionOutcomes(for: drafts),
           started: started
         )
       )
@@ -496,6 +498,16 @@ public struct TodayWorkoutView: View {
     case .error(let message):
       .error(message)
     }
+  }
+
+  private func suggestionOutcomes(
+    for drafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> [UUID: SetWeightSuggestionOutcome] {
+    Dictionary(
+      uniqueKeysWithValues: drafts.map {
+        ($0.id, viewModel.weightSuggestionOutcome(forSetID: $0.id))
+      }
+    )
   }
 
   private var currentWorkout: (day: StudentPlanDay, drafts: [TodayWorkoutViewModel.SetRowDraft])? {
