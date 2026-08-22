@@ -44,6 +44,11 @@
     { "alias": "臀推", "canonical": "杠铃臀冲" },
     { "alias": "弹力绳-坐姿划船", "canonical": "弹力带坐姿划船" },
     { "alias": "弹力带-腿外展", "canonical": "弹力带髋外展" },
-    { "alias": "单侧射手俯卧撑", "canonical": "射手俯卧撑" }
+    { "alias": "单侧射手俯卧撑", "canonical": "射手俯卧撑" },
+    { "alias": "坐姿推肩", "canonical": "坐姿哑铃推举" },
+    { "alias": "哑铃推肩", "canonical": "坐姿哑铃推举" },
+    { "alias": "两头起", "canonical": "V字上举" },
+    { "alias": "帕洛夫推", "canonical": "弹力带 pallof 推" },
+    { "alias": "对握弯举", "canonical": "绳索锤式弯举" }
   ]
 }
