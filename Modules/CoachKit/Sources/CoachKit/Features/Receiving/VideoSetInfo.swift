@@ -2,14 +2,18 @@ import CoreModels
 import Foundation
 
 struct VideoSetInfo: Equatable, Sendable {
+  let weightKg: Double
   let weightText: String
   let reps: Int
+  let rpe: Double?
   let rpeText: String?
   let displaySetNumber: Int
 
   init(log: StudentSetLog) {
+    weightKg = NSDecimalNumber(decimal: log.weightKg).doubleValue
     weightText = Self.decimalText(log.weightKg)
     reps = log.reps
+    rpe = log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue }
     rpeText = log.rpe.map(Self.decimalText)
     displaySetNumber = log.setIndex + 1
   }

@@ -12,6 +12,7 @@ struct VideoFeedbackPlayerCard: View {
   @Binding var currentSeconds: Double
   @Binding var selectedAnnotationMarker: VideoMarker?
   let markers: [VideoMarker]?
+  let badge: VideoBadgeInfo
   let refreshURL: @MainActor (UUID) async throws -> URL
   let retry: () -> Void
   let addMarker: (() -> Void)?
@@ -25,6 +26,8 @@ struct VideoFeedbackPlayerCard: View {
         workbenchConfiguration: FeedbackVideoWorkbenchConfiguration(),
         currentSeconds: $currentSeconds,
         markers: markers,
+        badge: badge,
+        requiresCoachExportConfirmation: true,
         selectedAnnotationMarker: $selectedAnnotationMarker,
         onAddMarker: addMarker,
         onMarkersRefresh: refreshMarkers,

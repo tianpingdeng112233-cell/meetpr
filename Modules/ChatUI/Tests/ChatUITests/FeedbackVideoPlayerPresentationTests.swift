@@ -40,6 +40,19 @@ struct FeedbackVideoPlayerPresentationTests {
     #expect(!behavior.appliesSelectedRate(while: .paused))
   }
 
+  @Test("badge and coach consent default to the legacy nil path")
+  func badgeDefaultsPreserveLegacyCallers() {
+    let placeholderURL = URL(filePath: "/tmp/feedback-video-placeholder.mov")
+    let player = FeedbackVideoPlayerView(
+      videoID: UUID(),
+      url: placeholderURL,
+      refreshURL: { _ in placeholderURL }
+    )
+
+    #expect(player.badge == nil)
+    #expect(!player.requiresCoachExportConfirmation)
+  }
+
   @Test("workbench configuration owns the expanded playback-rate semantics")
   func workbenchConfigurationOwnsExpandedPlaybackSemantics() {
     let behavior = FeedbackVideoPlayerView.playbackBehavior(

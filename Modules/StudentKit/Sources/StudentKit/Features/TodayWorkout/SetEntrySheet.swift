@@ -1,3 +1,4 @@
+import ChatUI
 // swiftlint:disable file_length function_parameter_count type_body_length
 import CoreModels
 import DesignSystem
@@ -19,6 +20,7 @@ struct SetEntrySheet: View {
   let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel?
   let scrollToVideo: Bool
+  let coachName: String?
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.dismiss) private var dismiss
 
@@ -46,7 +48,8 @@ struct SetEntrySheet: View {
     studentID: UUID? = nil,
     trainingDate: Date = Date(),
     videoViewModel: VideoAttachmentViewModel? = nil,
-    scrollToVideo: Bool = false
+    scrollToVideo: Bool = false,
+    coachName: String? = nil
   ) {
     self.rowIndex = rowIndex
     self.draft = draft
@@ -56,6 +59,7 @@ struct SetEntrySheet: View {
     self.trainingDate = trainingDate
     self.videoViewModel = videoViewModel
     self.scrollToVideo = scrollToVideo
+    self.coachName = coachName
     _collarOn = State(initialValue: SetEntryPlateMath.defaultCollarOn)
 
     // Camera and picker presentations can recreate the cover. Re-seed from the
@@ -165,6 +169,7 @@ struct SetEntrySheet: View {
                 studentID: studentID,
                 trainingDate: trainingDate,
                 videoViewModel: videoViewModel,
+                badge: videoBadge,
                 initialSetLogID: liveDraft.loggedSetID,
                 resolveSetLogID: {
                   syncDraftEdits()
@@ -247,6 +252,19 @@ struct SetEntrySheet: View {
         .fill(Color.MeetPR.borderDefault)
         .frame(height: 1)
     }
+  }
+
+  private var videoBadge: VideoBadgeInfo {
+    VideoBadgeInfo(
+      exerciseName: draft.displayExerciseName,
+      weightKg: SetEntryValue.enteredWeight(from: weightText)
+        .map { NSDecimalNumber(decimal: $0).doubleValue },
+      reps: SetEntryValue.enteredReps(from: repsText),
+      rpe: SetEntryValue.enteredRPE(from: rpeText)
+        .map { NSDecimalNumber(decimal: $0).doubleValue },
+      setOrdinal: setNumber,
+      coachName: coachName
+    )
   }
 
   // MARK: - Plate guidance

@@ -30,6 +30,25 @@ struct VideoFeedbackPresentationTests {
     #expect(VideoSetInfo(log: setLog(setIndex: 0, rpe: 8.5)).rpeText == "8.5")
   }
 
+  @Test("pending video badge reuses resolved set data and display-ready ordinal")
+  func pendingVideoBadgeUsesResolvedContext() {
+    let info = VideoSetInfo(log: setLog(setIndex: 2, rpe: 8.5))
+    let item = VideoInboxFixtures.item(exerciseName: "传统硬拉")
+
+    let badge = CoachVideoBadgeResolver.pendingVideo(
+      item,
+      setInfo: info,
+      coachName: "陈教练"
+    )
+
+    #expect(badge.exerciseName == "传统硬拉")
+    #expect(badge.weightKg == info.weightKg)
+    #expect(badge.reps == info.reps)
+    #expect(badge.rpe == 8.5)
+    #expect(badge.setOrdinal == 3)
+    #expect(badge.coachName == "陈教练")
+  }
+
   @MainActor
   @Test("missing RPE card renders the localized em dash")
   func missingRPECardRendersEmDash() throws {

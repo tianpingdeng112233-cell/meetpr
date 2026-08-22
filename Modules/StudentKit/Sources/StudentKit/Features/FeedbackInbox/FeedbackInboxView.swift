@@ -32,6 +32,7 @@ public struct FeedbackInboxView: View {
           videoID: playback.id,
           url: playback.url,
           markers: playback.markers,
+          badge: playback.badge,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
           onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
@@ -44,6 +45,7 @@ public struct FeedbackInboxView: View {
           videoID: playback.id,
           url: playback.url,
           markers: playback.markers,
+          badge: playback.badge,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
           onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
@@ -121,7 +123,11 @@ public struct FeedbackInboxView: View {
       // marker endpoint must never delay playback (optional-surface contract).
       do {
         let url = try await viewModel.playbackURL(videoID: videoID)
-        playbackItem = FeedbackVideoPlaybackItem(id: videoID, url: url)
+        playbackItem = FeedbackVideoPlaybackItem(
+          id: videoID,
+          url: url,
+          badge: FeedbackVideoPresentation.badge(video)
+        )
       } catch {
         playbackError = StudentStrings.localized(.feedbackInboxView002)
         resolvingVideoID = nil

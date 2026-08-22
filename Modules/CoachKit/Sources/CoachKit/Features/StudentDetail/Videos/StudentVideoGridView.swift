@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import SwiftUI
@@ -9,14 +10,17 @@ struct StudentVideoGridView: View {
   let unavailable: Bool
   let now: Date
   let planDays: [StudentPlanDay]
+  let logs: [StudentSetLog]
   let feedbackVideoIDs: Set<UUID>
   @Bindable private var viewModel: StudentVideoGridViewModel
+  @Environment(\.coachVideoBadgeName) private var coachName
 
   init(
     videos: [StudentVideo],
     unavailable: Bool,
     now: Date,
     planDays: [StudentPlanDay],
+    logs: [StudentSetLog],
     feedbackVideoIDs: Set<UUID>,
     viewModel: StudentVideoGridViewModel
   ) {
@@ -24,6 +28,7 @@ struct StudentVideoGridView: View {
     self.unavailable = unavailable
     self.now = now
     self.planDays = planDays
+    self.logs = logs
     self.feedbackVideoIDs = feedbackVideoIDs
     self.viewModel = viewModel
   }
@@ -36,6 +41,7 @@ struct StudentVideoGridView: View {
           CoachVideoPlayerView(
             videoID: item.id,
             url: item.url,
+            badge: badge(for: item.id),
             refreshURL: { try await viewModel.freshPlaybackURL(videoID: $0) }
           )
         }
@@ -44,6 +50,7 @@ struct StudentVideoGridView: View {
           CoachVideoPlayerView(
             videoID: item.id,
             url: item.url,
+            badge: badge(for: item.id),
             refreshURL: { try await viewModel.freshPlaybackURL(videoID: $0) }
           )
         }
@@ -146,6 +153,17 @@ struct StudentVideoGridView: View {
       return filename
     }
     return CoachVideoStrings.trainingVideo
+  }
+
+  private func badge(for videoID: UUID) -> VideoBadgeInfo? {
+    videos.first(where: { $0.id == videoID }).map {
+      CoachVideoBadgeResolver.studentVideo(
+        $0,
+        planDays: planDays,
+        logs: logs,
+        coachName: coachName
+      )
+    }
   }
 
   private func sectionTitle(_ day: Date) -> String {
