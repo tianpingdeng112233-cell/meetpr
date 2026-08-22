@@ -215,19 +215,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       started || hasSessionLog || day.completedAt != nil ? .recording : .list
     self.progress = TodayWorkoutProgress(day: day, drafts: drafts)
 
-    // Top-set anchors resolve across rows (spec 034 §9.4): the back-off card
-    // needs its anchor row, and that row — usually a separate card — needs the
-    // "today's top set" marking. Resolve once per card, then index by draft.
-    let topSetTargets = Dictionary(
-      uniqueKeysWithValues: day.exercises.compactMap { exercise in
-        let exerciseDrafts = drafts.filter { $0.planExerciseID == exercise.id }
-        return Self.topSetTarget(for: exerciseDrafts, in: drafts).map { (exercise.id, $0) }
-      }
-    )
-    let topSetRPEByDraftID = Dictionary(
-      topSetTargets.values.map { ($0.id, $0.rpe) },
-      uniquingKeysWith: { first, _ in first }
-    )
+    let (topSetTargets, topSetRPEByDraftID) = Self.topSetIndex(day: day, drafts: drafts)
     self.exercises = day.exercises.enumerated().map { exerciseIndex, exercise in
       let exerciseDrafts = drafts.filter { $0.planExerciseID == exercise.id }
       let topSetTarget = topSetTargets[exercise.id]
@@ -287,6 +275,26 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       indexAccessibilityIdentifier: "todayWorkout.set.\(draft.id.uuidString).number",
       prescriptionDisplay: prescriptionDisplay
     )
+  }
+
+  /// Top-set anchors resolve across rows (spec 034 §9.4): the back-off card
+  /// needs its anchor row, and that row — usually a separate card — needs the
+  /// "today's top set" marking. Resolve once per card, then index by draft.
+  private static func topSetIndex(
+    day: StudentPlanDay,
+    drafts: [TodayWorkoutViewModel.SetRowDraft]
+  ) -> (byExercise: [UUID: (id: UUID, rpe: Decimal)], rpeByDraft: [UUID: Decimal]) {
+    let byExercise = Dictionary(
+      uniqueKeysWithValues: day.exercises.compactMap { exercise in
+        let exerciseDrafts = drafts.filter { $0.planExerciseID == exercise.id }
+        return topSetTarget(for: exerciseDrafts, in: drafts).map { (exercise.id, $0) }
+      }
+    )
+    let rpeByDraft = Dictionary(
+      byExercise.values.map { ($0.id, $0.rpe) },
+      uniquingKeysWith: { first, _ in first }
+    )
+    return (byExercise, rpeByDraft)
   }
 
   private static func topSetTarget(
