@@ -44,9 +44,22 @@ struct CoachReceivingView: View {
         VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
           header
 
-          if rows.isEmpty {
+          switch contentState {
+          case .loading:
+            ProgressView(CoachInboxStrings.loading)
+              .tint(Color.MeetPR.gold500)
+              .frame(maxWidth: .infinity)
+              .padding(.vertical, MeetPRSpacing.point32)
+              .accessibilityIdentifier("coach.inbox.loading")
+          case .failed:
+            ContentUnavailableView(
+              CoachInboxStrings.loadFailed,
+              systemImage: "exclamationmark.triangle"
+            )
+            .padding(.vertical, MeetPRSpacing.point18)
+          case .empty:
             emptyState
-          } else {
+          case .content:
             conversationCard
             Text(CoachInboxStrings.hint)
               .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
@@ -107,21 +120,6 @@ struct CoachReceivingView: View {
     .task(id: pushedConversationID) {
       await openPushedConversationIfNeeded()
     }
-  }
-
-  private var rows: [CoachInboxRow] {
-    CoachInboxPresentation.rows(
-      conversations: chat?.inbox.conversations ?? [],
-      videoGroups: videoQueueViewModel.studentGroups,
-      now: now
-    )
-  }
-
-  private var feedCount: Int {
-    CoachInboxPresentation.count(
-      conversations: chat?.inbox.conversations ?? [],
-      pendingVideoCount: videoQueueViewModel.pendingCount
-    )
   }
 
   private var header: some View {
@@ -278,7 +276,53 @@ struct CoachReceivingView: View {
 
 }
 
+enum CoachReceivingContentState: Equatable {
+  case loading
+  case failed
+  case empty
+  case content
+
+  static func resolve(
+    videoState: CoachVideoQueueViewModel.LoadState,
+    hasChatError: Bool,
+    rowsAreEmpty: Bool
+  ) -> CoachReceivingContentState {
+    switch videoState {
+    case .idle, .loading:
+      return .loading
+    case .failed where rowsAreEmpty:
+      return .failed
+    case .loaded, .failed:
+      if hasChatError, rowsAreEmpty { return .failed }
+      return rowsAreEmpty ? .empty : .content
+    }
+  }
+}
+
 extension CoachReceivingView {
+  fileprivate var rows: [CoachInboxRow] {
+    CoachInboxPresentation.rows(
+      conversations: chat?.inbox.conversations ?? [],
+      videoGroups: videoQueueViewModel.studentGroups,
+      now: now
+    )
+  }
+
+  fileprivate var feedCount: Int {
+    CoachInboxPresentation.count(
+      conversations: chat?.inbox.conversations ?? [],
+      pendingVideoCount: videoQueueViewModel.pendingCount
+    )
+  }
+
+  fileprivate var contentState: CoachReceivingContentState {
+    CoachReceivingContentState.resolve(
+      videoState: videoQueueViewModel.state,
+      hasChatError: chat?.inbox.error != nil,
+      rowsAreEmpty: rows.isEmpty
+    )
+  }
+
   fileprivate var conversationDestinationBinding: Binding<ChatConversation?> {
     Binding(
       get: { conversationOpener.destination },

@@ -40,7 +40,7 @@ public struct RootView: View {
   private let onboardingDraftStore = LocalOnboardingDraftStore()
   private let coachStudentVideos: any CoachStudentVideoRepository
   private let coachVideoQueue: (any CoachVideoQueueRepository)?
-  private let coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)?
+  private let coachExerciseStats: any CoachExerciseStatsProviding
   private let draftStore: DraftStore
   private let analyticsMode: AnalyticsMode
   let pushRegistrar: PushRegistrar?
@@ -70,7 +70,7 @@ public struct RootView: View {
     pendingBindStore: any PendingBindCodeStoring = UserDefaultsPendingBindCodeStore(),
     coachStudentVideos: (any CoachStudentVideoRepository)? = nil,
     coachVideoQueue: (any CoachVideoQueueRepository)? = nil,
-    coachFamilyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
+    exerciseStats: (any CoachExerciseStatsProviding)? = nil,
     chatSession: ChatSessionController = ChatSessionController(),
     chatRepository: (any ChatRepository)? = nil,
     draftStore: DraftStore = DraftStore.shared,
@@ -109,7 +109,7 @@ public struct RootView: View {
     self.pendingBindStore = pendingBindStore
     self.coachStudentVideos = coachStudentVideos ?? InMemoryCoachStudentVideoRepository()
     self.coachVideoQueue = coachVideoQueue
-    self.coachFamilyMapProvider = coachFamilyMapProvider
+    self.coachExerciseStats = exerciseStats ?? RootViewDemoDefaults.exerciseStats()
     _chatSession = State(initialValue: chatSession)
     self.chatRepository = chatRepository
     self.draftStore = draftStore
@@ -231,7 +231,7 @@ public struct RootView: View {
       inviteCodes: coachInviteCodes,
       studentVideos: coachStudentVideos,
       readiness: studentReadiness,
-      familyMapProvider: coachFamilyMapProvider,
+      exerciseStats: coachExerciseStats,
       bindQueue: coachBindQueue,
       evaluations: coachEvaluations,
       evaluationSummaries: coachEvaluationSummaries,
@@ -396,5 +396,4 @@ extension RootView {
       pushRoute: pushRouteBinding
     )
   }
-
 }

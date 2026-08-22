@@ -42,10 +42,7 @@ struct StudentDetailView: View {
     )
     _growthViewModel = State(
       initialValue: StudentGrowthViewModel(
-        plans: context.plans,
-        trainingLogs: context.trainingLogs,
-        profiles: context.profiles,
-        familyMapProvider: context.familyMapProvider
+        exerciseStats: context.exerciseStats
       )
     )
     _evaluationViewModel = State(
@@ -223,7 +220,24 @@ struct StudentDetailView: View {
     }
   }
 
+  @ViewBuilder
   private var planCard: some View {
+    switch StudentPlanCardState.resolve(
+      loadState: viewModel.state,
+      hasPlan: viewModel.plan != nil
+    ) {
+    case .loading:
+      StudentPlanStatusView(state: .loading)
+    case .failed:
+      StudentPlanStatusView(state: .failed)
+    case .empty:
+      StudentPlanStatusView(state: .empty)
+    case .plan:
+      loadedPlanCard
+    }
+  }
+
+  private var loadedPlanCard: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point11) {
       HStack(spacing: MeetPRSpacing.space2) {
         Text(CoachDetailStrings.weekRunningTitle(calendarWeek))
@@ -375,6 +389,7 @@ struct StudentDetailView: View {
         unavailable: viewModel.videosUnavailable,
         now: now,
         planDays: viewModel.plannedDays,
+        logs: viewModel.executionDays.flatMap(\.logs),
         feedbackVideoIDs: Set(viewModel.feedbackItems.compactMap(\.videoID)),
         viewModel: videoGridViewModel
       )
@@ -452,6 +467,75 @@ struct StudentDetailView: View {
       ),
       context: context
     )
+  }
+}
+
+enum StudentPlanCardState: Equatable {
+  case loading
+  case failed
+  case empty
+  case plan
+
+  static func resolve(
+    loadState: StudentDetailViewModel.LoadState,
+    hasPlan: Bool
+  ) -> StudentPlanCardState {
+    switch loadState {
+    case .idle, .loading:
+      return .loading
+    case .failed:
+      return .failed
+    case .loaded:
+      return hasPlan ? .plan : .empty
+    }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct StudentPlanStatusView: View {
+  let state: StudentPlanCardState
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.point11) {
+      if state == .loading {
+        ProgressView()
+          .tint(Color.MeetPR.gold500)
+      } else {
+        Image(systemName: state == .failed ? "exclamationmark.triangle" : "calendar.badge.plus")
+          .foregroundStyle(state == .failed ? Color.MeetPR.danger : Color.MeetPR.gold500)
+      }
+
+      VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
+        Text(title)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        if let subtitle {
+          Text(subtitle)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+            .foregroundStyle(Color.MeetPR.textTertiary)
+        }
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(MeetPRSpacing.space4)
+    .meetPRCardSurface(.card)
+  }
+
+  private var title: String {
+    switch state {
+    case .loading:
+      CoachDetailStrings.loading
+    case .failed:
+      CoachDetailStrings.planLoadFailed
+    case .empty:
+      CoachDetailStrings.noPlan
+    case .plan:
+      ""
+    }
+  }
+
+  private var subtitle: String? {
+    state == .empty ? CoachDetailStrings.noPlanSubtitle : nil
   }
 }
 

@@ -17,7 +17,7 @@ struct TodaySetRefSharingSource: Sendable {
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     videoManager: VideoUploadManager,
-    calendar: Calendar = .current,
+    calendar: Calendar = WorkoutDatePolicy.deviceCalendar,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.studentID = studentID
@@ -42,7 +42,7 @@ struct TodaySetRefSharingSource: Sendable {
       return []
     }
 
-    let dayRange = WorkoutDatePolicy.gymDayRange(containing: now())
+    let dayRange = WorkoutDatePolicy.gymDayRange(containing: now(), calendar: calendar)
     let dayLogs = try await logs.fetchLogs(
       studentID: studentID,
       in: dayRange

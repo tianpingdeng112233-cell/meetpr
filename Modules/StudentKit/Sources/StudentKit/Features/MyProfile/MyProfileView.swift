@@ -4,7 +4,7 @@ import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// Black-gold v3 我的资料 tab. Existing onboarding, readiness, rest-timer,
+/// Black-gold v3 我的资料 tab. Existing onboarding, readiness, preferences,
 /// account, export, and logout flows remain the only mutation paths.
 @available(iOS 17.0, macOS 14.0, *)
 public struct MyProfileView: View {
@@ -16,6 +16,7 @@ public struct MyProfileView: View {
   private let account: (any AccountRepository)?
   private let logs: (any StudentTrainingLogRepository)?
   private let restTimerSettings: any StudentRestTimerSettingsStoring
+  private let trainingReminderServices: TrainingReminderServices
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
 
@@ -49,6 +50,7 @@ public struct MyProfileView: View {
     self.account = account
     self.logs = logs
     self.restTimerSettings = restTimerSettings
+    self.trainingReminderServices = .live
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self._viewModel = State(
@@ -175,6 +177,12 @@ public struct MyProfileView: View {
         MyProfileDivider()
         RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
         MyProfileDivider()
+        TrainingReminderPreferenceRow(
+          studentID: studentID,
+          services: trainingReminderServices,
+          recommendedWeekdays: Set(profile.trainingDays.map(TrainingReminderWeekday.init))
+        )
+        MyProfileDivider()
         profileRow(
           StudentStrings.localized(.myProfileView008),
           presentation.competition,
@@ -269,6 +277,7 @@ public struct MyProfileView: View {
       account: account,
       logs: logs,
       restTimerSettings: restTimerSettings,
+      trainingReminderServices: trainingReminderServices,
       onLogout: onLogout
     )
   }
@@ -296,6 +305,7 @@ struct MyProfileFallbackRows: View {
   let account: (any AccountRepository)?
   let logs: (any StudentTrainingLogRepository)?
   let restTimerSettings: any StudentRestTimerSettingsStoring
+  let trainingReminderServices: TrainingReminderServices
   let onLogout: (@MainActor () async -> Void)?
 
   var body: some View {
@@ -304,6 +314,11 @@ struct MyProfileFallbackRows: View {
       AppearancePreferenceRow()
       MyProfileDivider()
       RestTimerPreferenceRow(studentID: studentID, settings: restTimerSettings)
+      MyProfileDivider()
+      TrainingReminderPreferenceRow(
+        studentID: studentID,
+        services: trainingReminderServices
+      )
     }
     if let account, let logs {
       MyProfileSectionLabel(StudentStrings.localized(.myProfileView014))

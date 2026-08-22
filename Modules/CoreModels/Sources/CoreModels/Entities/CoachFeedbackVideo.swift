@@ -15,6 +15,9 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
   public let setIndex: Int?
   public let weightKg: String?
   public let reps: Int?
+  /// Set RPE as the backend's decimal string (e.g. "8.5"); nil on older
+  /// payloads or unrated sets, so the badge hides its capsule.
+  public let rpe: String?
   public let loggedAt: Date?
   /// Clip duration when the feedback projection can provide it.
   ///
@@ -29,6 +32,7 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
     setIndex: Int? = nil,
     weightKg: String? = nil,
     reps: Int? = nil,
+    rpe: String? = nil,
     loggedAt: Date? = nil,
     durationSeconds: Int? = nil
   ) {
@@ -38,6 +42,7 @@ public struct CoachFeedbackVideo: Codable, Hashable, Sendable, Identifiable {
     self.setIndex = setIndex
     self.weightKg = weightKg
     self.reps = reps
+    self.rpe = rpe
     self.loggedAt = loggedAt
     self.durationSeconds = durationSeconds
   }

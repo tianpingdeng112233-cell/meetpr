@@ -141,6 +141,13 @@ struct StudentEmptyStateViewTests {
       account: InMemoryAccountRepository(),
       logs: InMemoryStudentTrainingLogRepository(),
       restTimerSettings: EmptyStateRestTimerSettingsStore(),
+      trainingReminderServices: TrainingReminderServices(
+        store: TrainingReminderUserDefaultsStore(
+          defaults: try #require(
+            UserDefaults(suiteName: "StudentEmptyStateViewTests.\(UUID().uuidString)"))
+        ),
+        center: FakeTrainingReminderNotificationCenter()
+      ),
       onLogout: nil
     ).inspect()
 

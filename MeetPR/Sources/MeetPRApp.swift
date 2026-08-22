@@ -200,10 +200,49 @@ struct MeetPRApp: App {
         ),
         // 训练视频 inbox: boot straight into a populated queue (spec 042).
         coachVideoQueue: makeDemoVideoQueue(),
+        exerciseStats: makeDemoExerciseStats(studentState: studentState),
         chatSession: chat.controller,
         chatRepository: chat.repository,
         draftStore: draftStore,
         analyticsMode: .disabled
+      )
+    }
+
+    private static func makeDemoExerciseStats(
+      studentState: DemoStudentState
+    ) -> InMemoryCoachExerciseStatsRepository {
+      let grouped = Dictionary(
+        grouping: studentState.e1rmPoints.compactMap { point in
+          point.family.map { ($0, point) }
+        }, by: \.0)
+      let series = grouped.mapValues { entries in
+        CoachExerciseStatsSnapshot.FamilySeries(
+          points: entries.map { entry in
+            .init(
+              date: entry.1.computedAt,
+              valueKg: NSDecimalNumber(value: entry.1.e1RMKg).decimalValue
+            )
+          },
+          trend: .new
+        )
+      }
+      let headlines = series.compactMapValues { familySeries in
+        familySeries.points.map(\.valueKg).max().map {
+          CoachExerciseStatsSnapshot.E1RMValue(valueKg: $0)
+        }
+      }
+      let oneRM: [LiftFamily: Decimal] = [
+        .squat: studentState.profile.squat1RMKg,
+        .bench: studentState.profile.bench1RMKg,
+        .deadlift: studentState.profile.deadlift1RMKg,
+      ].compactMapValues { $0 }
+      let snapshot = CoachExerciseStatsSnapshot(
+        e1RMByFamily: headlines,
+        seriesByFamily: series,
+        oneRMByFamily: oneRM
+      )
+      return InMemoryCoachExerciseStatsRepository(
+        snapshots: [StudentDemoSeed.studentID: snapshot]
       )
     }
 
@@ -383,9 +422,9 @@ struct MeetPRApp: App {
           // Coach-side video wall (spec 029 second pass): server-side
           // metadata + per-item presigned playback URLs.
           coachStudentVideos: BackendCoachStudentVideoRepository(api: api, session: chat.session),
-          // Growth-tab family mapping reads the coach-owned full plan tree
-          // (the student projection only carries the current week).
-          coachFamilyMapProvider: BackendCoachPlanFamilyMapProvider(
+          // Coach growth reads the same server aggregates as web; never
+          // recompute e1RM from local set logs.
+          exerciseStats: BackendCoachExerciseStatsRepository(
             api: api, session: chat.session),
           chatSession: chat.controller,
           chatRepository: chat.repository,
@@ -432,6 +471,9 @@ struct MeetPRApp: App {
         .onChange(of: scenePhase) { _, phase in
           guard phase == .active else { return }
           restTimerActivityController.cleanUpExpiredActivities()
+          Task {
+            await session.applicationDidBecomeActive()
+          }
         }
         .modelContainer(
           draftStore.modelContainer

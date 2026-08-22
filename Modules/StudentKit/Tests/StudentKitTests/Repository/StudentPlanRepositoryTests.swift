@@ -6,6 +6,8 @@ import Testing
 
 @testable import StudentKit
 
+// swiftlint:disable file_length
+
 @Test func studentPlanRepositoryFetchesProjectionAndSlicesDayByIdentity() async throws {
   let studentID = StudentDemoSeed.studentID
   let plan = StudentDemoSeed.makePlanView()
@@ -168,8 +170,10 @@ import Testing
   )
 }
 
-@Test func undoWindowUsesShanghaiFourAMBoundary() async throws {
+@Test func undoWindowUsesDeviceFourAMBoundary() async throws {
   let studentID = UUID()
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(identifier: "Asia/Shanghai"))
   let completedAt = try shanghaiDate(2026, 8, 7, hour: 20)
   let beforeCutoffTime = try shanghaiDate(2026, 8, 8, hour: 3, minute: 59)
   let cutoffTime = try shanghaiDate(2026, 8, 8, hour: 4)
@@ -183,10 +187,12 @@ import Testing
   )
   let beforeCutoff = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: completedPlan]),
+    calendar: calendar,
     now: { beforeCutoffTime }
   )
   let atCutoff = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: completedPlan]),
+    calendar: calendar,
     now: { cutoffTime }
   )
 

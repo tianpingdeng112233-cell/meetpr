@@ -1012,6 +1012,35 @@ enum StudentStrings {
     static let trainingHistoryView022 = Key("student.trainingHistoryView.copy022")
     static let trainingHistoryView023 = Key("student.trainingHistoryView.copy023")
     static let trainingHistoryView024 = Key("student.trainingHistoryView.copy024")
+    static let trainingReminderCopy001 = Key("student.trainingReminderCopy.copy001")
+    static let trainingReminderCopy002 = Key("student.trainingReminderCopy.copy002")
+    static let trainingReminderCopy003 = Key("student.trainingReminderCopy.copy003")
+    static let trainingReminderCopy004 = Key("student.trainingReminderCopy.copy004")
+    static let trainingReminderPreferenceRow001 = Key(
+      "student.trainingReminderPreferenceRow.copy001")
+    static let trainingReminderSettingsView001 = Key(
+      "student.trainingReminderSettingsView.copy001")
+    static let trainingReminderSettingsView002 = Key(
+      "student.trainingReminderSettingsView.copy002")
+    static let trainingReminderSettingsView003 = Key(
+      "student.trainingReminderSettingsView.copy003")
+    static let trainingReminderSettingsView004 = Key(
+      "student.trainingReminderSettingsView.copy004")
+    static let trainingReminderSettingsView005 = Key(
+      "student.trainingReminderSettingsView.copy005")
+    static let trainingReminderSettingsView006 = Key(
+      "student.trainingReminderSettingsView.copy006")
+    static let trainingReminderSettingsView007 = Key(
+      "student.trainingReminderSettingsView.copy007")
+    static let trainingReminderSettingsView008 = Key(
+      "student.trainingReminderSettingsView.copy008")
+    static let trainingReminderWeekday001 = Key("student.trainingReminderWeekday.copy001")
+    static let trainingReminderWeekday002 = Key("student.trainingReminderWeekday.copy002")
+    static let trainingReminderWeekday003 = Key("student.trainingReminderWeekday.copy003")
+    static let trainingReminderWeekday004 = Key("student.trainingReminderWeekday.copy004")
+    static let trainingReminderWeekday005 = Key("student.trainingReminderWeekday.copy005")
+    static let trainingReminderWeekday006 = Key("student.trainingReminderWeekday.copy006")
+    static let trainingReminderWeekday007 = Key("student.trainingReminderWeekday.copy007")
     static let uploadFailureNotifier001 = Key("student.uploadFailureNotifier.copy001")
     static let uploadFailureNotifier002 = Key(
       "student.uploadFailureNotifier.copy002",

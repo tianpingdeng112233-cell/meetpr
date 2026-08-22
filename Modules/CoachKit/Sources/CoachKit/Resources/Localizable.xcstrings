@@ -2659,6 +2659,57 @@
         }
       }
     },
+    "coach.detail.noPlan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No plan yet"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有计划"
+          }
+        }
+      }
+    },
+    "coach.detail.noPlanSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create a plan for this student from planning"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去计划页为这位学员排一份"
+          }
+        }
+      }
+    },
+    "coach.detail.planLoadFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load the plan"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计划加载失败"
+          }
+        }
+      }
+    },
     "coach.detail.noFeedback": {
       "extractionState": "manual",
       "localizations": {
@@ -4447,6 +4498,57 @@
         }
       }
     },
+    "coach.growth.trend.down": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM trend down"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 趋势下降"
+          }
+        }
+      }
+    },
+    "coach.growth.trend.flat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM trend steady"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 趋势持平"
+          }
+        }
+      }
+    },
+    "coach.growth.trend.up": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM trend up"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 趋势上升"
+          }
+        }
+      }
+    },
     "coach.growth.window.all": {
       "extractionState": "manual",
       "localizations": {
@@ -5118,6 +5220,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tap a name to chat · Tap the black count to review videos"
+          }
+        }
+      }
+    },
+    "coach.inbox.loadFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load messages"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "消息加载失败"
+          }
+        }
+      }
+    },
+    "coach.inbox.loading": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading messages…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在加载消息…"
           }
         }
       }
@@ -11663,6 +11799,23 @@
         }
       }
     },
+    "coach.roster.loadingStudents": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading students…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在加载学员…"
+          }
+        }
+      }
+    },
     "coach.roster.newStudentRequests": {
       "extractionState": "manual",
       "localizations": {
@@ -11676,6 +11829,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "New Student Requests"
+          }
+        }
+      }
+    },
+    "coach.roster.noMatchingStudents": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matching students"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有匹配的学员"
           }
         }
       }
@@ -11709,7 +11879,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No Students"
+            "value": "No students yet"
           }
         }
       }
@@ -11720,13 +11890,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "接收新学员后会出现在这里"
+            "value": "去「我的」复制邀请码，发给学员加入"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Accepted students will appear here"
+            "value": "Copy your invite code from Me and send it to a student"
           }
         }
       }
@@ -14035,6 +14205,40 @@
         }
       }
     },
+    "coach.videoFeedback.noPendingVideos": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No videos awaiting feedback"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有待反馈视频"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.noPendingVideosSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This student's pending videos have all been handled"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这位学员的视频都处理完了"
+          }
+        }
+      }
+    },
     "coach.videoFeedback.playFailed": {
       "extractionState": "manual",
       "localizations": {
@@ -14247,6 +14451,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Set %lld"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.setInfoLoadFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load set details"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "组次信息加载失败"
+          }
+        }
+      }
+    },
+    "coach.videoFeedback.setInfoUnavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No linked set details"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未关联训练组"
           }
         }
       }

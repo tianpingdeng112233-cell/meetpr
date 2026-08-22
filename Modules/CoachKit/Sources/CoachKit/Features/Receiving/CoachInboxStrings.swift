@@ -6,6 +6,8 @@ enum CoachInboxStrings {
   static let noMessages = CoachLocalization.localized("coach.inbox.noMessages")
   static let emptyTitle = CoachLocalization.localized("coach.inbox.emptyTitle")
   static let emptySubtitle = CoachLocalization.localized("coach.inbox.emptySubtitle")
+  static let loadFailed = CoachLocalization.localized("coach.inbox.loadFailed")
+  static let loading = CoachLocalization.localized("coach.inbox.loading")
   static let playPendingVideos = CoachLocalization.localized("coach.inbox.playPendingVideos")
 
   static func eyebrow(_ count: Int) -> String {

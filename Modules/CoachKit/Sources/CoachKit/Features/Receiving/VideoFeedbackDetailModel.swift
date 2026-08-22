@@ -14,7 +14,7 @@ final class VideoFeedbackDetailModel {
   private(set) var currentItem: PendingVideoItem
   private(set) var playbackURL: URL?
   private(set) var playbackError = false
-  private(set) var setInfo: VideoSetInfo?
+  private(set) var setInfoState: VideoSetInfoState = .loading
   private(set) var markers: [VideoMarker]?
   /// The endpoint answered but with an error other than 404 — the marker
   /// surface stays visible with a failure row instead of vanishing.
@@ -28,6 +28,11 @@ final class VideoFeedbackDetailModel {
 
   var isResolvingPlayback: Bool {
     resolvingPlaybackItemID == currentItem.id
+  }
+
+  var setInfo: VideoSetInfo? {
+    guard case .loaded(let info) = setInfoState else { return nil }
+    return info
   }
 
   @ObservationIgnored private var playbackRequestID: UUID?
@@ -133,7 +138,10 @@ final class VideoFeedbackDetailModel {
 
   private func loadSetInfo(using trainingLogs: any StudentTrainingLogRepository) async {
     let item = currentItem
-    guard let setLogID = item.setLogID else { return }
+    guard let setLogID = item.setLogID else {
+      setInfoState = .unlinked
+      return
+    }
 
     let requestID = UUID()
     setInfoRequestID = requestID
@@ -154,13 +162,21 @@ final class VideoFeedbackDetailModel {
         )
       }
     } catch {
+      guard accepts(requestID: requestID, itemID: item.id, kind: .setInfo) else {
+        return
+      }
+      setInfoState = .failed
       return
     }
 
     guard accepts(requestID: requestID, itemID: item.id, kind: .setInfo) else {
       return
     }
-    setInfo = VideoSetInfo.resolve(setLogID: setLogID, from: logs)
+    if let info = VideoSetInfo.resolve(setLogID: setLogID, from: logs) {
+      setInfoState = .loaded(info)
+    } else {
+      setInfoState = .failed
+    }
   }
 
   private func loadMarkers(using repository: any VideoMarkerRepository) async {
@@ -197,7 +213,7 @@ final class VideoFeedbackDetailModel {
   private func resetPresentation() {
     playbackURL = nil
     playbackError = false
-    setInfo = nil
+    setInfoState = .loading
     markers = nil
     markersFailed = false
     markerActionFailure = nil
@@ -231,4 +247,11 @@ final class VideoFeedbackDetailModel {
     case setInfo
     case markers
   }
+}
+
+enum VideoSetInfoState: Equatable, Sendable {
+  case loading
+  case unlinked
+  case loaded(VideoSetInfo)
+  case failed
 }

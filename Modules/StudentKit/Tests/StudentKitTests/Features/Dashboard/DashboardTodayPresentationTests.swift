@@ -52,19 +52,27 @@ import Testing
   #expect(day.shiftedToDate == shifted)
 }
 
-@Test func dashboardCompletionTodayUsesShanghaiGymDayBoundary() throws {
-  let calendar = WorkoutDatePolicy.shanghaiCalendar
+@Test func dashboardCompletionTodayUsesDeviceGymDayBoundary() throws {
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(identifier: "America/New_York"))
   let beforeCutoff = try #require(
     calendar.date(from: DateComponents(year: 2030, month: 1, day: 2, hour: 3, minute: 59))
   )
   let completedAt = beforeCutoff.addingTimeInterval(-60)
   let day = sequenceDays()[0].replacingCompletion(completedAt: completedAt, source: "manual")
 
-  #expect(DashboardTodayPresentation.completedToday(in: [day], now: beforeCutoff)?.id == day.id)
   #expect(
     DashboardTodayPresentation.completedToday(
       in: [day],
-      now: beforeCutoff.addingTimeInterval(2 * 60)
+      now: beforeCutoff,
+      calendar: calendar
+    )?.id == day.id
+  )
+  #expect(
+    DashboardTodayPresentation.completedToday(
+      in: [day],
+      now: beforeCutoff.addingTimeInterval(2 * 60),
+      calendar: calendar
     ) == nil
   )
 }

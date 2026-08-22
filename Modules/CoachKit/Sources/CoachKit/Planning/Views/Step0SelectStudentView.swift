@@ -20,37 +20,41 @@ public struct Step0SelectStudentView: View {
             .foregroundStyle(Color.MeetPR.fgPrimary)
         }
 
-        studentSection(
-          title: CoachPlanningStrings.inEvaluation,
-          students: students { status in
-            if case .inEvaluation = status { return true }
-            return false
-          }
-        )
+        if viewModel.availableStudents.isEmpty {
+          PlanningNoStudentsState()
+        } else {
+          studentSection(
+            title: CoachPlanningStrings.inEvaluation,
+            students: students { status in
+              if case .inEvaluation = status { return true }
+              return false
+            }
+          )
 
-        studentSection(
-          title: CoachPlanningStrings.active,
-          students: students { status in
-            if case .active = status { return true }
-            return false
-          }
-        )
+          studentSection(
+            title: CoachPlanningStrings.active,
+            students: students { status in
+              if case .active = status { return true }
+              return false
+            }
+          )
 
-        studentSection(
-          title: CoachPlanningStrings.abnormal,
-          students: students { status in
-            if case .abnormal = status { return true }
-            return false
-          }
-        )
+          studentSection(
+            title: CoachPlanningStrings.abnormal,
+            students: students { status in
+              if case .abnormal = status { return true }
+              return false
+            }
+          )
 
-        PrimaryButton(
-          CoachPlanningStrings.startPlanning,
-          isDisabled: viewModel.selectedStudent == nil,
-          isFullWidth: true
-        ) {
-          Task {
-            try? await viewModel.goNext()
+          PrimaryButton(
+            CoachPlanningStrings.startPlanning,
+            isDisabled: viewModel.selectedStudent == nil,
+            isFullWidth: true
+          ) {
+            Task {
+              try? await viewModel.goNext()
+            }
           }
         }
       }
@@ -97,6 +101,19 @@ public struct Step0SelectStudentView: View {
     matching predicate: (CoachStudentStatus) -> Bool
   ) -> [CoachStudentSummary] {
     viewModel.availableStudents.filter { predicate($0.status) }
+  }
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+struct PlanningNoStudentsState: View {
+  var body: some View {
+    ContentUnavailableView(
+      CoachPlanningStrings.noStudents,
+      systemImage: "person.badge.plus",
+      description: Text(CoachPlanningStrings.noStudentsSubtitle)
+    )
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, MeetPRSpacing.xl)
   }
 }
 

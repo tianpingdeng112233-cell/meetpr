@@ -49,15 +49,12 @@ extension Session {
   }
 
   private func reportTimezoneAfterLoginIfNeeded(result: AuthResult, timezone: String) async {
-    let userID = result.user.id
-    let lastReportedTimezone = await timezoneStore.lastReportedIdentifier(for: userID)
-    guard lastReportedTimezone != timezone else { return }
-    do {
-      try await auth.updateTimezone(timezone, accessToken: result.accessToken)
-      await timezoneStore.saveReportedIdentifier(timezone, for: userID)
-    } catch {
-      Self.logger.warning("login_timezone_update_failed \(String(describing: error))")
-    }
+    await reportTimezoneIfNeeded(
+      userID: result.user.id,
+      accessToken: result.accessToken,
+      generation: currentSessionGeneration(),
+      timezone: timezone
+    )
   }
 
   public func requestPasswordReset(email: String) async throws {
@@ -68,16 +65,44 @@ extension Session {
     try await auth.resetPassword(email: email, code: code, newPassword: newPassword)
   }
 
-  func reportTimezoneIfNeeded(userID: UUID, accessToken: String, generation: UInt) async {
-    let timezone = currentTimezoneIdentifier()
+  public func applicationDidBecomeActive() async {
+    guard reportsTimezoneOnBootstrap, case .authenticated(let user) = state else { return }
+    let generation = currentSessionGeneration()
+    guard let accessToken = try? await accessToken(), isCurrentSession(generation) else { return }
+    await reportTimezoneIfNeeded(
+      userID: user.id,
+      accessToken: accessToken,
+      generation: generation
+    )
+  }
+
+  func reportTimezoneIfNeeded(
+    userID: UUID,
+    accessToken: String,
+    generation: UInt,
+    timezone: String? = nil
+  ) async {
+    let timezone = timezone ?? currentTimezoneIdentifier()
     let lastReportedTimezone = await timezoneStore.lastReportedIdentifier(for: userID)
-    guard isCurrentSession(generation), lastReportedTimezone != timezone else { return }
+    guard
+      isCurrentSession(generation),
+      case .authenticated(let currentUser) = state,
+      currentUser.id == userID,
+      lastReportedTimezone != timezone
+    else { return }
+    let report = TimezoneReport(userID: userID, identifier: timezone)
+    guard timezoneReportsInFlight.insert(report).inserted else { return }
+    defer { timezoneReportsInFlight.remove(report) }
     do {
       try await auth.updateTimezone(timezone, accessToken: accessToken)
-      guard isCurrentSession(generation) else { return }
+      guard
+        isCurrentSession(generation),
+        case .authenticated(let currentUser) = state,
+        currentUser.id == userID
+      else { return }
       await timezoneStore.saveReportedIdentifier(timezone, for: userID)
     } catch {
-      Self.logger.warning("bootstrap_timezone_update_failed \(String(describing: error))")
+      Self.logger.warning("timezone_update_failed \(String(describing: error))")
     }
   }
 

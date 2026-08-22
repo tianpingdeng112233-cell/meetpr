@@ -3,6 +3,10 @@ import Foundation
 enum ChatStrings {
   static let messages = localized("chat.messages")
   static let noConversations = localized("chat.noConversations")
+  static let noMessages = localized("chat.noMessages")
+  static let noMessagesDescription = localized("chat.noMessagesDescription")
+  static let loadingMessages = localized("chat.loadingMessages")
+  static let loadMessagesFailed = localized("chat.loadMessagesFailed")
   static let image = localized("chat.image")
   static let imageUnavailable = localized("chat.imageUnavailable")
   static let sending = localized("chat.sending")
@@ -13,6 +17,7 @@ enum ChatStrings {
   static let composerPlaceholder = localized("chat.composerPlaceholder")
   static let send = localized("chat.send")
   static let choosePhoto = localized("chat.choosePhoto")
+  static let cancel = localized("chat.cancel")
   static let close = localized("chat.close")
   static let closePlayback = localized("chat.closePlayback")
   static let closeAnnotation = localized("chat.closeAnnotation")
@@ -27,6 +32,23 @@ enum ChatStrings {
   static let playPlayback = localized("chat.playPlayback")
   static let pausePlayback = localized("chat.pausePlayback")
   static let videoPlayback = localized("chat.videoPlayback")
+  static let collapseVideoBadge = localized("chat.videoBadge.collapse")
+  static let expandVideoBadge = localized("chat.videoBadge.expand")
+  static let videoBadgeSetPrefix = localized("chat.videoBadge.setPrefix")
+  static let videoBadgeSetSuffix = localized("chat.videoBadge.setSuffix")
+  static let coachExportConfirmationTitle = localized(
+    "chat.videoExport.coachConfirmation.title")
+  static let coachExportConfirmationMessage = localized(
+    "chat.videoExport.coachConfirmation.message")
+  static let coachExportConfirmationAction = localized(
+    "chat.videoExport.coachConfirmation.action")
+  static let videoExport = localized("chat.videoExport.action")
+  static let videoExporting = localized("chat.videoExport.exporting")
+  static let videoExportSaved = localized("chat.videoExport.saved")
+  static let videoExportFailed = localized("chat.videoExport.failed")
+  static let videoExportFailureMessage = localized("chat.videoExport.failureMessage")
+  static let videoExportPhotoPermissionDenied = localized(
+    "chat.videoExport.photoPermissionDenied")
   static let videoMarker = localized("chat.videoMarker")
   static let videoMarkersFailed = localized("chat.videoMarkersFailed")
   static let addVideoMarker = localized("chat.addVideoMarker")
@@ -160,6 +182,14 @@ enum ChatStrings {
 
   static func videoMarkers(_ count: Int) -> String {
     localized("chat.videoMarkers").replacing("{count}", with: count.formatted())
+  }
+
+  static func videoBadgeCoach(_ coachName: String, locale: Locale = .current) -> String {
+    String(
+      localized: "chat.videoBadge.coach \(coachName)",
+      bundle: .module,
+      locale: locale
+    )
   }
 
   static func seekToVideoMarker(_ time: String) -> String {

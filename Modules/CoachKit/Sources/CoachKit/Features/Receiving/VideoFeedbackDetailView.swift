@@ -14,6 +14,7 @@ struct VideoFeedbackDetailView: View {
   private let onSent: () -> Void
 
   @Environment(\.coachNow) private var now
+  @Environment(\.coachVideoBadgeName) private var coachName
   @Environment(\.dismiss) private var dismiss
   @State private var detailModel: VideoFeedbackDetailModel
   @State private var text = ""
@@ -59,6 +60,7 @@ struct VideoFeedbackDetailView: View {
             currentSeconds: $currentSeconds,
             selectedAnnotationMarker: $selectedAnnotationMarker,
             markers: detailModel.markers,
+            badge: videoBadge,
             refreshURL: { try await viewModel.playbackURL(videoID: $0) },
             retry: retryPlayback,
             addMarker: addMarkerAction,
@@ -85,9 +87,7 @@ struct VideoFeedbackDetailView: View {
             )
           }
 
-          if let setInfo = detailModel.setInfo {
-            VideoSetInfoCard(info: setInfo)
-          }
+          VideoSetInfoStatusView(state: detailModel.setInfoState)
 
           VideoFeedbackComposer(
             text: $text,
@@ -146,13 +146,6 @@ struct VideoFeedbackDetailView: View {
       VideoMarkerEditor(draft: draft, save: saveMarker)
     }
     .accessibilityIdentifier("coach.video.feedbackWorkbench")
-  }
-
-  private func markerFailureRow(_ message: String) -> some View {
-    Text(message)
-      .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-      .foregroundStyle(Color.MeetPR.danger)
-      .frame(maxWidth: .infinity, alignment: .leading)
   }
 
   static func sizeText(_ sizeBytes: Int64) -> String {
@@ -287,6 +280,23 @@ struct VideoFeedbackDetailView: View {
     Task {
       await detailModel.deleteMarker(marker, using: markerRepository)
     }
+  }
+}
+
+extension VideoFeedbackDetailView {
+  fileprivate var videoBadge: VideoBadgeInfo {
+    CoachVideoBadgeResolver.pendingVideo(
+      detailModel.currentItem,
+      setInfo: detailModel.setInfo,
+      coachName: coachName
+    )
+  }
+
+  fileprivate func markerFailureRow(_ message: String) -> some View {
+    Text(message)
+      .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+      .foregroundStyle(Color.MeetPR.danger)
+      .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
 

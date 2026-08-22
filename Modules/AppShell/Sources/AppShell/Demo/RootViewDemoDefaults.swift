@@ -1,4 +1,6 @@
 import CoachKit
+import CoreModels
+import Foundation
 import RepositoryContracts
 import StudentKit
 
@@ -44,6 +46,16 @@ enum RootViewDemoDefaults {
     )
   }
 
+  static func exerciseStats() -> any CoachExerciseStatsProviding {
+    let points = StudentDemoSeed.makeE1RMHistory(studentID: StudentDemoSeed.studentID)
+    let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
+    return InMemoryCoachExerciseStatsRepository(
+      snapshots: [
+        StudentDemoSeed.studentID: exerciseStatsSnapshot(points: points, profile: profile)
+      ]
+    )
+  }
+
   static func readiness() -> any ReadinessRepository {
     InMemoryReadinessRepository(
       seed: StudentDemoSeed.makeReadinessHistory(studentID: StudentDemoSeed.studentID)
@@ -67,6 +79,42 @@ enum RootViewDemoDefaults {
   static func coachStudentProfiles() -> any OnboardingProfileReading {
     InMemoryCoachStudentProfileReader(
       profiles: [StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)]
+    )
+  }
+
+  private static func exerciseStatsSnapshot(
+    points: [E1RMHistoryPoint],
+    profile: OnboardingProfile
+  ) -> CoachExerciseStatsSnapshot {
+    let grouped = Dictionary(
+      grouping: points.compactMap { point in
+        point.family.map { ($0, point) }
+      }, by: \.0)
+    let series = grouped.mapValues { entries in
+      CoachExerciseStatsSnapshot.FamilySeries(
+        points: entries.map { entry in
+          .init(
+            date: entry.1.computedAt,
+            valueKg: NSDecimalNumber(value: entry.1.e1RMKg).decimalValue
+          )
+        },
+        trend: .new
+      )
+    }
+    let headlines = series.compactMapValues { familySeries in
+      familySeries.points.map(\.valueKg).max().map {
+        CoachExerciseStatsSnapshot.E1RMValue(valueKg: $0)
+      }
+    }
+    let oneRM: [LiftFamily: Decimal] = [
+      .squat: profile.squat1RMKg,
+      .bench: profile.bench1RMKg,
+      .deadlift: profile.deadlift1RMKg,
+    ].compactMapValues { $0 }
+    return CoachExerciseStatsSnapshot(
+      e1RMByFamily: headlines,
+      seriesByFamily: series,
+      oneRMByFamily: oneRM
     )
   }
 }

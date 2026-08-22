@@ -12,6 +12,10 @@ enum CoachRosterStrings {
   static let noPlan = CoachLocalization.localized("coach.roster.noPlan")
   static let noTrainingRecords = CoachLocalization.localized("coach.roster.noTrainingRecords")
   static let loadFailed = CoachLocalization.localized("coach.roster.loadFailed")
+  static let loadingStudents = CoachLocalization.localized("coach.roster.loadingStudents")
+  static let noMatchingStudents = CoachLocalization.localized("coach.roster.noMatchingStudents")
+  static let noStudents = CoachLocalization.localized("coach.roster.noStudents")
+  static let noStudentsSubtitle = CoachLocalization.localized("coach.roster.noStudentsSubtitle")
   static let rejectConfirmation = CoachLocalization.localized("coach.roster.rejectConfirmation")
 
   static func weekProgress(completed: Int, planned: Int) -> String {

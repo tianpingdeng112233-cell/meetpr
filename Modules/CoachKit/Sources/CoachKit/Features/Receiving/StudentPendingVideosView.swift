@@ -40,14 +40,35 @@ struct StudentPendingVideosView: View {
 
   var body: some View {
     ScrollView {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-        ForEach(sections) { section in
-          daySection(section)
+      switch contentState {
+      case .loading:
+        ProgressView(CoachInboxStrings.loading)
+          .tint(Color.MeetPR.gold500)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, MeetPRSpacing.point32)
+      case .failed:
+        ContentUnavailableView(
+          CoachInboxStrings.loadFailed,
+          systemImage: "exclamationmark.triangle"
+        )
+        .padding(.vertical, MeetPRSpacing.point18)
+      case .empty:
+        ContentUnavailableView(
+          CoachVideoFeedbackStrings.noPendingVideos,
+          systemImage: "checkmark.circle",
+          description: Text(CoachVideoFeedbackStrings.noPendingVideosSubtitle)
+        )
+        .padding(.vertical, MeetPRSpacing.point18)
+      case .content:
+        VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
+          ForEach(sections) { section in
+            daySection(section)
+          }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, MeetPRSpacing.pageHorizontal)
+        .padding(.vertical, MeetPRSpacing.point14)
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .padding(.horizontal, MeetPRSpacing.pageHorizontal)
-      .padding(.vertical, MeetPRSpacing.point14)
     }
     .scrollIndicators(.hidden)
     .scrollContentBackground(.hidden)
@@ -84,6 +105,13 @@ struct StudentPendingVideosView: View {
         dismiss()
       }
     }
+  }
+
+  private var contentState: StudentPendingVideosContentState {
+    StudentPendingVideosContentState.resolve(
+      loadState: viewModel.state,
+      sectionsAreEmpty: sections.isEmpty
+    )
   }
 
   static func shouldDismissStudentList(
@@ -156,5 +184,26 @@ struct StudentPendingVideosView: View {
 
   private func dismissIfEmpty() {
     if sections.isEmpty { dismiss() }
+  }
+}
+
+enum StudentPendingVideosContentState: Equatable {
+  case loading
+  case failed
+  case empty
+  case content
+
+  static func resolve(
+    loadState: CoachVideoQueueViewModel.LoadState,
+    sectionsAreEmpty: Bool
+  ) -> StudentPendingVideosContentState {
+    switch loadState {
+    case .idle, .loading:
+      return .loading
+    case .failed:
+      return sectionsAreEmpty ? .failed : .content
+    case .loaded:
+      return sectionsAreEmpty ? .empty : .content
+    }
   }
 }

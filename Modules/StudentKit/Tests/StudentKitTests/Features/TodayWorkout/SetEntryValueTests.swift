@@ -55,3 +55,16 @@ import Testing
   tracker.begin(value: "105")
   #expect(tracker.finish(value: "105") == nil)
 }
+
+@Test("Badge-facing parsers hide untouched fields instead of clamping them")
+func enteredValuesHideBlankFields() {
+  #expect(SetEntryValue.enteredRPE(from: "") == nil)
+  #expect(SetEntryValue.enteredRPE(from: "  ") == nil)
+  #expect(SetEntryValue.enteredRPE(from: "8.5") == 8.5)
+  #expect(SetEntryValue.enteredWeight(from: "") == nil)
+  #expect(SetEntryValue.enteredWeight(from: "180") == 180)
+  #expect(SetEntryValue.enteredReps(from: "") == nil)
+  #expect(SetEntryValue.enteredReps(from: "4") == 4)
+  // The legacy parsers keep their clamped placeholders for the form itself.
+  #expect(SetEntryValue.rpe(from: "") == 5)
+}
