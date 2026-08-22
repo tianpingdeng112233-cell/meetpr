@@ -6,6 +6,7 @@ import SwiftUI
 struct SetVideoPlaybackView: View {
   let attachmentID: UUID
   let source: VideoAttachmentPlaybackSource
+  let badge: VideoBadgeInfo?
   let refreshRemoteURL: @MainActor (UUID) async throws -> URL
 
   var body: some View {
@@ -13,6 +14,7 @@ struct SetVideoPlaybackView: View {
       videoID: attachmentID,
       url: source.url,
       markers: nil,
+      badge: badge,
       refreshURL: { attachmentID in
         try await source.retryURL(
           attachmentID: attachmentID,

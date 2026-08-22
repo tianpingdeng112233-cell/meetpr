@@ -142,3 +142,34 @@ import Testing
   #expect(cached?.first?.video == nil)
   #expect(FileManager.default.fileExists(atPath: fileURL.path))
 }
+
+@Test func feedbackDTODecodesAndMapsLinkedVideoRPE() throws {
+  let json = """
+    {
+      "id": "00000000-0000-4000-8000-000000000221",
+      "coach_id": "00000000-0000-4000-8000-000000000222",
+      "student_id": "00000000-0000-4000-8000-000000000223",
+      "day_date": "2026-08-21",
+      "plan_exercise_id": null,
+      "video_id": "00000000-0000-4000-8000-000000000225",
+      "video": {
+        "id": "00000000-0000-4000-8000-000000000225",
+        "exercise_name": "传统硬拉",
+        "exercise_name_en": "Conventional Deadlift",
+        "set_index": 3,
+        "weight_kg": "180.00",
+        "reps": 4,
+        "rpe": "8.5",
+        "logged_at": "2026-08-21T12:00:00Z"
+      },
+      "text": "锁定时收紧",
+      "posted_at": "2026-08-21T13:00:00Z",
+      "read_at": null
+    }
+    """
+
+  let dto = try MeetPRCodec.decoder.decode(FeedbackDTO.self, from: Data(json.utf8))
+
+  #expect(dto.video?.rpe == "8.5")
+  #expect(dto.toDomain().video?.rpe == "8.5")
+}

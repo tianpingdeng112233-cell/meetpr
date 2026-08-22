@@ -52,7 +52,11 @@ public struct FeedbackDetailView: View {
           FeedbackVideoCard(
             video: video,
             isLoading: resolvingPlayback,
-            action: viewModel == nil ? nil : { play(videoID: item.videoID ?? video.id) }
+            action: viewModel == nil
+              ? nil
+              : {
+                play(video: video, videoID: item.videoID ?? video.id)
+              }
           )
         case .unavailable:
           FeedbackVideoUnavailableCard()
@@ -89,6 +93,7 @@ public struct FeedbackDetailView: View {
           videoID: playback.id,
           url: playback.url,
           markers: playback.markers,
+          badge: playback.badge,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
           onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
@@ -101,6 +106,7 @@ public struct FeedbackDetailView: View {
           videoID: playback.id,
           url: playback.url,
           markers: playback.markers,
+          badge: playback.badge,
           markersFailed: playback.markersFailed,
           onSeek: { _ in },
           onMarkersRefresh: { await refreshMarkers(videoID: playback.id) },
@@ -110,7 +116,7 @@ public struct FeedbackDetailView: View {
     #endif
   }
 
-  private func play(videoID: UUID) {
+  private func play(video: CoachFeedbackVideo, videoID: UUID) {
     guard !resolvingPlayback else { return }
     resolvingPlayback = true
     playbackError = nil
@@ -119,7 +125,11 @@ public struct FeedbackDetailView: View {
       // marker endpoint must never delay playback (optional-surface contract).
       do {
         let url = try await freshPlaybackURL(videoID: videoID)
-        playbackItem = FeedbackVideoPlaybackItem(id: videoID, url: url)
+        playbackItem = FeedbackVideoPlaybackItem(
+          id: videoID,
+          url: url,
+          badge: FeedbackVideoPresentation.badge(video)
+        )
       } catch {
         playbackError = StudentStrings.localized(.feedbackDetailView004)
         resolvingPlayback = false
@@ -238,6 +248,7 @@ private struct FeedbackVideoUnavailableCard: View {
 struct FeedbackVideoPlaybackItem: Identifiable, Equatable, Sendable {
   let id: UUID
   let url: URL
+  let badge: VideoBadgeInfo?
   var markers: [VideoMarker]?
   var markersFailed = false
 }

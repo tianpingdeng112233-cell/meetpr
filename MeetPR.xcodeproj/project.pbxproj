@@ -623,7 +623,7 @@
 				INFOPLIST_FILE = MeetPR/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MeetPR 需要使用相机拍摄你的训练视频,供你绑定的教练查看动作并给出反馈。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "拍摄训练视频时需要录制声音(例如杠铃落地与口令),用于教练回看。";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MeetPR 需要向相册添加拍摄或带训练角标的导出视频,便于你留存和分享训练记录。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -658,7 +658,7 @@
 				INFOPLIST_FILE = MeetPR/GlobalInfo.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MeetPR needs access to the camera to record your training videos so your linked coach can review your technique and provide feedback.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MeetPR needs access to the microphone to record sound while filming training videos (such as the barbell landing and voice cues) for your coach to review.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MeetPR saves recorded training videos to your photo library as a backup so you do not lose completed-set footage.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MeetPR adds recorded or badged export videos to Photos so you can keep and share your training records.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "MeetPR needs access to your photo library so you can choose recorded training videos to upload to your coach.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -869,7 +869,7 @@
 				INFOPLIST_FILE = MeetPR/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MeetPR 需要使用相机拍摄你的训练视频,供你绑定的教练查看动作并给出反馈。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "拍摄训练视频时需要录制声音(例如杠铃落地与口令),用于教练回看。";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MeetPR 需要向相册添加拍摄或带训练角标的导出视频,便于你留存和分享训练记录。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -902,7 +902,7 @@
 				INFOPLIST_FILE = MeetPR/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MeetPR 需要使用相机拍摄你的训练视频,供你绑定的教练查看动作并给出反馈。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "拍摄训练视频时需要录制声音(例如杠铃落地与口令),用于教练回看。";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MeetPR 需要向相册添加拍摄或带训练角标的导出视频,便于你留存和分享训练记录。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1051,7 +1051,7 @@
 				INFOPLIST_FILE = MeetPR/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "MeetPR 需要使用相机拍摄你的训练视频,供你绑定的教练查看动作并给出反馈。";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "拍摄训练视频时需要录制声音(例如杠铃落地与口令),用于教练回看。";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "拍摄的训练视频会先保存到你的相册留底——这一组已经练过,素材不能丢。";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "MeetPR 需要向相册添加拍摄或带训练角标的导出视频,便于你留存和分享训练记录。";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "MeetPR 需要访问相册,以便你选择已拍好的训练视频上传给教练。";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
