@@ -15,10 +15,10 @@ private func fullCatalog() -> [Exercise] {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bundledAliasSeedHasFortyFourEntries() {
+@Test func bundledAliasSeedHasFortyNineEntries() {
   let table = ExerciseAliasTable.bundled()
   #expect(table.version == 1)
-  #expect(table.aliases.count == 44)
+  #expect(table.aliases.count == 49)
 }
 
 // Guardrail: every canonical must fold-resolve to exactly one exercise in the full
@@ -61,6 +61,12 @@ private func fullCatalog() -> [Exercise] {
   ("绳索夹胸", "绳索飞鸟"),  // deleted Cable Fly spelling → survivor
   ("弹力带-腿外展", "弹力带髋外展"),  // hip 误标写法 → glute survivor
   ("单侧射手俯卧撑", "射手俯卧撑"),  // redundant Archer 变式 merged
+  // 2026-08-22 sync with plan-web feat/exercise-crud: canonicals re-pointed at seed
+  // names (哑铃坐姿推肩 / 静力两头起 were a coach-created row or absent from the seed).
+  ("坐姿推肩", "坐姿哑铃推举"),
+  ("两头起", "V字上举"),
+  ("帕洛夫推", "弹力带 pallof 推"),
+  ("对握弯举", "绳索锤式弯举"),
 ])
 func aliasSeedRowsBindToCanonical(rawName: String, canonical: String) {
   let catalog = fullCatalog()
@@ -81,6 +87,19 @@ func newCatalogExercisesBindExactly(name: String) {
     aliases: ExerciseAliasTable.bundled()
   )
   #expect(match?.name == name)
+}
+
+// 哑铃推肩 is itself a seed row (ca70-…007f, DB Shoulder Press), distinct from the
+// alias target 坐姿哑铃推举 (ca70-…0086). Layer ① exact match wins, so the alias row is
+// kept only for parity with plan-web and never changes the binding on iOS.
+@available(iOS 17.0, macOS 14.0, *)
+@Test func exactCatalogNameShadowsDumbbellShoulderPressAlias() {
+  let catalog = fullCatalog()
+  let aliases = ExerciseAliasTable.bundled()
+  #expect(aliases.aliases.contains { $0.alias == "哑铃推肩" && $0.canonical == "坐姿哑铃推举" })
+  let match = ExerciseMatcher.resolve(rawName: "哑铃推肩", catalog: catalog, aliases: aliases)
+  #expect(match?.name == "哑铃推肩")
+  #expect(match?.id.uuidString.lowercased() == "00000000-0000-0000-ca70-00000000007f")
 }
 
 // David 2026-07-02 拍板: 单腿硬拉 and 单腿RDL(现名 单腿罗马尼亚硬拉) are two distinct
