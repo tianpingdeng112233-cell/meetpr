@@ -6,7 +6,7 @@
 
 ## 🎯 目标:1.0 (21)
 - 基底:`beta/1.0-20`(= TestFlight 在测的 1.0(20),2026-08-20 上传)之后的 release/1.0 直推累积
-- build 号:21(待 prep-beta 时 bump,agvtool 单源)
+- build 号:21(✅ 2026-08-23 prep-beta 已 bump,agvtool 单源)
 - 切包:本分支打 tag `beta/1.0-21`
 
 ## 本版将包含(落线后追加到这里)
