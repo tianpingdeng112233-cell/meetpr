@@ -85,7 +85,8 @@
       "quad"
     ],
     "equipment": [
-      "barbell"
+      "barbell",
+      "band"
     ],
     "movementPattern": [
       "squat"
@@ -161,7 +162,7 @@
       "quad"
     ],
     "equipment": [
-      "barbell"
+      "specialty_bar"
     ],
     "movementPattern": [
       "squat"
@@ -180,7 +181,7 @@
       "quad"
     ],
     "equipment": [
-      "barbell"
+      "specialty_bar"
     ],
     "movementPattern": [
       "squat"
@@ -215,8 +216,6 @@
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "core",
-      "back",
       "quad"
     ],
     "equipment": [
@@ -285,25 +284,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Ascent Pause Squat"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000011",
-    "name": "背蹲地面起始设置",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "squat",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Back Squat Ground Setup"
   },
   {
     "id": "00000000-0000-0000-ca70-000000000012",
@@ -506,7 +486,8 @@
       "quad"
     ],
     "equipment": [
-      "barbell"
+      "barbell",
+      "band"
     ],
     "movementPattern": [
       "squat"
@@ -556,8 +537,8 @@
   {
     "id": "00000000-0000-0000-ca70-000000000021",
     "name": "深蹲跳",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "squat",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
       "quad"
@@ -579,7 +560,9 @@
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "hamstring",
+      "glute",
+      "back"
     ],
     "equipment": [
       "barbell"
@@ -696,6 +679,7 @@
       "hamstring"
     ],
     "equipment": [
+      "barbell",
       "band"
     ],
     "movementPattern": [
@@ -745,12 +729,14 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000032",
-    "name": "Jefferson 硬拉",
+    "name": "杰弗森硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "quad",
+      "glute",
+      "hamstring"
     ],
     "equipment": [
       "barbell"
@@ -867,7 +853,8 @@
       "hamstring"
     ],
     "equipment": [
-      "barbell"
+      "barbell",
+      "band"
     ],
     "movementPattern": [
       "hip_hinge"
@@ -886,7 +873,8 @@
       "hamstring"
     ],
     "equipment": [
-      "barbell"
+      "barbell",
+      "band"
     ],
     "movementPattern": [
       "hip_hinge"
@@ -1152,7 +1140,8 @@
       "hamstring"
     ],
     "equipment": [
-      "barbell"
+      "barbell",
+      "band"
     ],
     "movementPattern": [
       "hip_hinge"
@@ -1225,9 +1214,8 @@
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "core",
-      "back",
-      "quad"
+      "hamstring",
+      "glute"
     ],
     "equipment": [
       "barbell"
@@ -1298,7 +1286,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-000000000051",
-    "name": "六角杆硬拉",
+    "name": "六角杠硬拉",
     "exerciseType": "main_lift_variation",
     "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
@@ -1335,25 +1323,6 @@
     "nameEn": "Zercher Deadlift"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000053",
-    "name": "弹力带杠铃卧推",
-    "exerciseType": "main_lift_variation",
-    "mainLiftFamily": "bench",
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Banded Bench"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000054",
     "name": "弹力带中握卧推",
     "exerciseType": "main_lift_variation",
@@ -1363,6 +1332,7 @@
       "chest"
     ],
     "equipment": [
+      "barbell",
       "band"
     ],
     "movementPattern": [
@@ -1743,6 +1713,7 @@
       "chest"
     ],
     "equipment": [
+      "barbell",
       "band"
     ],
     "movementPattern": [
@@ -1895,7 +1866,7 @@
       "shoulder"
     ],
     "equipment": [
-      "other"
+      "cable"
     ],
     "movementPattern": [
       "horizontal_pull"
@@ -1952,7 +1923,7 @@
       "shoulder"
     ],
     "equipment": [
-      "other"
+      "barbell"
     ],
     "movementPattern": [
       "vertical_push"
@@ -2066,7 +2037,7 @@
       "shoulder"
     ],
     "equipment": [
-      "other"
+      "barbell"
     ],
     "movementPattern": [
       "vertical_push"
@@ -2218,7 +2189,7 @@
       "shoulder"
     ],
     "equipment": [
-      "other"
+      "barbell"
     ],
     "movementPattern": [
       "other"
@@ -3966,6 +3937,7 @@
       "quad"
     ],
     "equipment": [
+      "dumbbell",
       "kettlebell"
     ],
     "movementPattern": [
@@ -3982,9 +3954,8 @@
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "core",
-      "back",
-      "quad"
+      "quad",
+      "glute"
     ],
     "equipment": [
       "kettlebell"
@@ -4768,7 +4739,7 @@
       "adductor"
     ],
     "equipment": [
-      "bodyweight"
+      "dumbbell"
     ],
     "movementPattern": [
       "other"
@@ -4947,25 +4918,6 @@
     "createdByCoachId": null,
     "createdAt": "2026-05-12T10:11:42Z",
     "nameEn": "Glute Kickback"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000011e",
-    "name": "早安",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-12T10:11:42Z",
-    "nameEn": "Good Morning"
   },
   {
     "id": "00000000-0000-0000-ca70-00000000011f",
@@ -5188,7 +5140,7 @@
       "glute"
     ],
     "equipment": [
-      "barbell"
+      "cable"
     ],
     "movementPattern": [
       "hip_hinge"
@@ -5587,7 +5539,8 @@
       "core"
     ],
     "equipment": [
-      "other"
+      "band",
+      "cable"
     ],
     "movementPattern": [
       "other"
@@ -5987,10 +5940,12 @@
   {
     "id": "00000000-0000-0000-ca70-000000000156",
     "name": "粗杠硬拉",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
     "isCompetitionLift": false,
     "muscleGroups": [
+      "hamstring",
+      "glute",
       "back"
     ],
     "equipment": [
@@ -6574,7 +6529,7 @@
       "mobility"
     ],
     "equipment": [
-      "other"
+      "band"
     ],
     "movementPattern": [
       "other"
@@ -7129,7 +7084,7 @@
       "shoulder"
     ],
     "equipment": [
-      "bodyweight"
+      "dumbbell"
     ],
     "movementPattern": [
       "other"
@@ -7829,25 +7784,6 @@
     ],
     "movementPattern": [
       "other"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T12:52:23Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000001b6",
-    "name": "抬腿杠铃卧推",
-    "nameEn": "Leg-Up Barbell Bench Press",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "horizontal_push"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T12:52:23Z"
@@ -8942,26 +8878,6 @@
     "isCompetitionLift": false,
     "muscleGroups": [
       "chest"
-    ],
-    "equipment": [
-      "band"
-    ],
-    "movementPattern": [
-      "horizontal_push"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:07:37Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000001f2",
-    "name": "弹力绳-卧推",
-    "nameEn": "Band Bench Press",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "chest",
-      "triceps"
     ],
     "equipment": [
       "band"
@@ -10155,25 +10071,6 @@
     ],
     "movementPattern": [
       "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:24:05Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-000000000231",
-    "name": "宽距高位下拉",
-    "nameEn": "Wide-Grip Lat Pulldown",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back"
-    ],
-    "equipment": [
-      "cable"
-    ],
-    "movementPattern": [
-      "vertical_pull"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:24:05Z"
@@ -11639,26 +11536,6 @@
     "createdAt": "2026-05-14T13:28:51Z"
   },
   {
-    "id": "00000000-0000-0000-ca70-000000000280",
-    "name": "澳式引体",
-    "nameEn": "Australian Pull-Up",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "back",
-      "biceps"
-    ],
-    "equipment": [
-      "bodyweight"
-    ],
-    "movementPattern": [
-      "horizontal_pull"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:28:51Z"
-  },
-  {
     "id": "00000000-0000-0000-ca70-000000000281",
     "name": "弹跳引体",
     "nameEn": "Kipping Pull-Up",
@@ -12218,8 +12095,8 @@
     "id": "00000000-0000-0000-ca70-00000000029e",
     "name": "杠铃深蹲",
     "nameEn": "Barbell Squat",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "squat",
     "isCompetitionLift": false,
     "muscleGroups": [
       "quad",
@@ -12230,46 +12107,6 @@
     ],
     "movementPattern": [
       "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:36:47Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-00000000029f",
-    "name": "杰弗森深蹲",
-    "nameEn": "Jefferson Squat",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad",
-      "glute"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:36:47Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000002a0",
-    "name": "杠铃火箭推",
-    "nameEn": "Barbell Push Press",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "shoulder",
-      "triceps"
-    ],
-    "equipment": [
-      "barbell"
-    ],
-    "movementPattern": [
-      "vertical_push"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:36:47Z"
@@ -13774,26 +13611,6 @@
     ],
     "equipment": [
       "bodyweight"
-    ],
-    "movementPattern": [
-      "squat"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-14T13:42:03Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000002f0",
-    "name": "六角杠深蹲",
-    "nameEn": "Hex Bar Squat",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "quad",
-      "glute"
-    ],
-    "equipment": [
-      "barbell"
     ],
     "movementPattern": [
       "squat"
@@ -16121,7 +15938,7 @@
       "biceps"
     ],
     "equipment": [
-      "other"
+      "dumbbell"
     ],
     "movementPattern": [
       "other"
@@ -16248,8 +16065,8 @@
     "id": "00000000-0000-0000-ca70-000000000372",
     "name": "窄距卧推(敞开式)",
     "nameEn": "Close Grip Bench Press (Open)",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
     "isCompetitionLift": false,
     "muscleGroups": [
       "triceps",
@@ -16268,8 +16085,8 @@
     "id": "00000000-0000-0000-ca70-000000000373",
     "name": "窄距卧推(靠近式)",
     "nameEn": "Close Grip Bench Press (Tight)",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
     "isCompetitionLift": false,
     "muscleGroups": [
       "triceps",
@@ -18463,26 +18280,6 @@
     ],
     "equipment": [
       "dumbbell"
-    ],
-    "movementPattern": [
-      "hip_hinge"
-    ],
-    "createdByCoachId": null,
-    "createdAt": "2026-05-15T00:00:00Z"
-  },
-  {
-    "id": "00000000-0000-0000-ca70-0000000003e7",
-    "name": "壶铃甩",
-    "nameEn": "Kettlebell Swing",
-    "exerciseType": "accessory",
-    "mainLiftFamily": null,
-    "isCompetitionLift": false,
-    "muscleGroups": [
-      "glute",
-      "hamstring"
-    ],
-    "equipment": [
-      "kettlebell"
     ],
     "movementPattern": [
       "hip_hinge"
@@ -23255,7 +23052,9 @@
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "hamstring",
+      "glute",
+      "back"
     ],
     "equipment": [
       "barbell"
@@ -23274,7 +23073,9 @@
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "hamstring",
+      "glute",
+      "back"
     ],
     "equipment": [
       "specialty_bar"
@@ -23293,7 +23094,9 @@
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "hamstring",
+      "glute",
+      "back"
     ],
     "equipment": [
       "barbell"
@@ -23312,7 +23115,9 @@
     "mainLiftFamily": "squat",
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad"
+      "hamstring",
+      "glute",
+      "back"
     ],
     "equipment": [
       "barbell"
@@ -23533,5 +23338,82 @@
     "createdByCoachId": null,
     "createdAt": "2026-06-26T00:00:00Z",
     "nameEn": "Low Bar Tempo Squat"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000012",
+    "name": "坐姿宽握距划船",
+    "exerciseType": "accessory",
+    "mainLiftFamily": null,
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "back"
+    ],
+    "equipment": [
+      "cable"
+    ],
+    "movementPattern": [
+      "horizontal_pull"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-30T00:00:00Z",
+    "nameEn": "Seated Wide Grip Row"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000013",
+    "name": "节奏窄握卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-30T00:00:00Z",
+    "nameEn": "Tempo Close Grip Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000014",
+    "name": "弹力带卧推",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "bench",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "chest"
+    ],
+    "equipment": [
+      "barbell",
+      "band"
+    ],
+    "movementPattern": [
+      "horizontal_push"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-30T00:00:00Z",
+    "nameEn": "Banded Bench Press"
+  },
+  {
+    "id": "00000000-0000-0000-ca71-000000000015",
+    "name": "宽握距罗马尼亚硬拉",
+    "exerciseType": "main_lift_variation",
+    "mainLiftFamily": "deadlift",
+    "isCompetitionLift": false,
+    "muscleGroups": [
+      "hamstring"
+    ],
+    "equipment": [
+      "barbell"
+    ],
+    "movementPattern": [
+      "hip_hinge"
+    ],
+    "createdByCoachId": null,
+    "createdAt": "2026-06-30T00:00:00Z",
+    "nameEn": "Wide Grip RDL"
   }
 ]
