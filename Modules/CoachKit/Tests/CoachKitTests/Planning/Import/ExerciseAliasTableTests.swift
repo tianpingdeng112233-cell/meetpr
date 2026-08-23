@@ -89,17 +89,18 @@ func newCatalogExercisesBindExactly(name: String) {
   #expect(match?.name == name)
 }
 
-// 哑铃推肩 is itself a seed row (ca70-…007f, DB Shoulder Press), distinct from the
-// alias target 坐姿哑铃推举 (ca70-…0086). Layer ① exact match wins, so the alias row is
-// kept only for parity with plan-web and never changes the binding on iOS.
+// Backend 0025 renamed ca70-…007f to 哑铃坐姿推肩, so 哑铃推肩 is no longer a catalog
+// name and the alias row (kept for parity with plan-web) now binds the same way on iOS:
+// to 坐姿哑铃推举 (ca70-…0086). Before the bundle caught up, the stale seed name shadowed it.
 @available(iOS 17.0, macOS 14.0, *)
-@Test func exactCatalogNameShadowsDumbbellShoulderPressAlias() {
+@Test func dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() {
   let catalog = fullCatalog()
   let aliases = ExerciseAliasTable.bundled()
   #expect(aliases.aliases.contains { $0.alias == "哑铃推肩" && $0.canonical == "坐姿哑铃推举" })
+  #expect(!catalog.contains { $0.name == "哑铃推肩" })
   let match = ExerciseMatcher.resolve(rawName: "哑铃推肩", catalog: catalog, aliases: aliases)
-  #expect(match?.name == "哑铃推肩")
-  #expect(match?.id.uuidString.lowercased() == "00000000-0000-0000-ca70-00000000007f")
+  #expect(match?.name == "坐姿哑铃推举")
+  #expect(match?.id.uuidString.lowercased() == "00000000-0000-0000-ca70-000000000086")
 }
 
 // David 2026-07-02 拍板: 单腿硬拉 and 单腿RDL(现名 单腿罗马尼亚硬拉) are two distinct
