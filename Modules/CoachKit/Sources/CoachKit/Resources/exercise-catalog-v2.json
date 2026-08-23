@@ -2067,7 +2067,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000007f",
-    "name": "哑铃推肩",
+    "name": "哑铃坐姿推肩",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -2751,7 +2751,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000a4",
-    "name": "颈后下拉",
+    "name": "颈后高位下拉",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4064,7 +4064,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000000eb",
-    "name": "杠铃反向弓步蹲 (reverse as the motion not static)",
+    "name": "杠铃反向弓步蹲",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -4655,7 +4655,7 @@
   },
   {
     "id": "00000000-0000-0000-ca70-00000000010f",
-    "name": "胫骨前肌抬举  same w calf raises but COM on the heel ",
+    "name": "胫骨前肌抬举",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
@@ -12153,20 +12153,19 @@
   },
   {
     "id": "00000000-0000-0000-ca70-0000000002a3",
-    "name": "哑铃二头弯举深蹲",
-    "nameEn": "DB Curl Squat",
+    "name": "哑铃二头弯举",
+    "nameEn": "DB Biceps Curl",
     "exerciseType": "accessory",
     "mainLiftFamily": null,
     "isCompetitionLift": false,
     "muscleGroups": [
-      "quad",
-      "glute"
+      "biceps"
     ],
     "equipment": [
       "dumbbell"
     ],
     "movementPattern": [
-      "squat"
+      "other"
     ],
     "createdByCoachId": null,
     "createdAt": "2026-05-14T13:36:47Z"
