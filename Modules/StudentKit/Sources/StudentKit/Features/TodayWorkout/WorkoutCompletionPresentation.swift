@@ -102,9 +102,12 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     self.averageRPEText =
       Self.average(completed.compactMap(Self.resolvedRPE))
       .map(Self.rpeText) ?? "—"
+    // `date` keys the session reflection store (SessionReflectionStore), so it
+    // stays on the stable coach-authored schedule; only the subtitle follows the
+    // recommended date (spec 080).
     self.date = day.scheduledDate
     self.dateSubtitle = Self.dateSubtitle(
-      date: day.scheduledDate,
+      date: day.date,
       weekCode: weekCode,
       locale: locale
     )

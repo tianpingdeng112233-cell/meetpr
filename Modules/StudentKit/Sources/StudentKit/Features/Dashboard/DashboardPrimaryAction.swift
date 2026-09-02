@@ -139,7 +139,7 @@ struct DashboardSequenceDaySummary: View {
       Text(
         StudentStrings.replacing(
           .dashboardPrimaryAction009,
-          values: ["\(DashboardTodayPresentation.recommendedDateText(day.scheduledDate))"])
+          values: ["\(DashboardTodayPresentation.recommendedDateText(day.date))"])
       )
       .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
       .foregroundStyle(Color.MeetPR.textDim)

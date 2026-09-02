@@ -12950,7 +12950,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "已顺延 %lld 天"
+            "value": "已后移 %lld 天"
           }
         }
       }

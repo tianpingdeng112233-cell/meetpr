@@ -5,6 +5,18 @@ import Testing
 
 @testable import StudentKit
 
+@Test func shiftedPlanPushesIncrementTrainingRefreshRevision() {
+  let studentID = UUID()
+  let planID = UUID()
+  var trigger = StudentTrainingPlanRefreshTrigger()
+
+  trigger.handlePushRoute(.planShifted(studentID: studentID, planID: planID))
+  #expect(trigger.revision == 1)
+
+  trigger.handlePushRoute(.planShiftUndone(studentID: studentID, planID: planID))
+  #expect(trigger.revision == 2)
+}
+
 @MainActor
 @Test func trainingPlanRefreshAppliesChangedDayAndKeepsUnsubmittedDraft() async throws {
   let studentID = StudentDemoSeed.studentID

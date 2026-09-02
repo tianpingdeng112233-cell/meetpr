@@ -491,11 +491,15 @@ extension StudentRootView {
       // The current student shell has no standalone messages tab; its existing
       // inbox path presents the coach conversation from the 今日 tab.
       selectedTab = .today
-    case .planUpdated(let routeStudentID, _), .planPublished(let routeStudentID, _):
+    case .planShifted(let routeStudentID, _), .planShiftUndone(let routeStudentID, _),
+      .planUpdated(let routeStudentID, _), .planPublished(let routeStudentID, _):
       pushRoute = nil
       guard routeStudentID == studentID,
         StudentNotificationRoute.route(for: route) == .plan
       else { return }
+      if selectedTab == .training {
+        trainingPlanRefreshTrigger.handlePushRoute(route)
+      }
       openPlanNotification()
     case .missedTraining, .prCongrats, .videoPending, .bindRequest, .planShift:
       pushRoute = nil
