@@ -1,6 +1,6 @@
 # spec 080 — 学员端消费教练后移（推荐日期叠加后移 + 推送刷新）
 
-- **状态**: Draft（David 2026-09-02 grill 拍板：1A 2不做 3A 4赞同 5同意 6进；随 backend 045 契约冻结后转 InProgress）
+- **状态**: Approved（David 2026-09-02 grill 拍板：1A 2不做 3A 4赞同 5同意 6进；契约以 backend 045 为准）
 - **级别 / 节奏**: T1（单端 StudentKit + CoreModels 路由，≤5 文件）；P1，目标 1.0(22) 班车（发版线 `release/1.0`）。
 - **对应 backend**: `045-coach-plan-shift`（契约权威）；**基线**: `feat/plan-refresh`（`plan_updated` 路由 + 前台/切 tab 重拉）合入 release/1.0 之后再切分支。
 - **先读**: 仓根 `CONTEXT.md`（游标日 / 推荐日期 / 后移）。
