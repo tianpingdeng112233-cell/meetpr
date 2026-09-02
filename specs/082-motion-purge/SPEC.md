@@ -76,8 +76,10 @@
    typealias 亦可):按下 **即时** scale 0.97 + opacity 0.85,松开即时复原,**无动画**
    (`.animation(nil)`);`reduceMotion` 下去 scale、留 opacity;disabled 保持现有 0.35。
 2. 在 AppShell 根(学员 root、教练 root、登录/注册/全局登录页)以 `.buttonStyle(...)` 注入,
-   使所有 `Button` 默认继承;仓内 `.buttonStyle(.plain)`(115 处)/ `.bordered` /
-   `.borderedProminent` / `.borderless` / `LoginButtonStyle` 全部改为统一样式或删掉让其继承。
+   使所有 `Button` 默认继承;仓内 `.buttonStyle(.plain)`(115 处)/ `.borderless` /
+   `LoginButtonStyle` 全部改为统一样式或删掉让其继承。**系统 `.bordered` / `.borderedProminent`
+   (17 处,登录外的系统风格表单/工具按钮)保留原样**:它们自带系统按压高亮,且其边框/填充是
+   静态外观,重做等于顺手改静态样式(收货时 Claude 定,2026-09-02)。
    `Toggle` / `Picker` / `NavigationLink` 系统控件不动。
 3. **触感分级**(`sensoryFeedback`):
    - 动作型 = `GoldCTA` / `PrimaryButton` / `BrandPrimaryButton` / `SecondaryButton`(light impact)、

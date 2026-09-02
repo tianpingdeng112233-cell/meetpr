@@ -12,8 +12,6 @@ struct GrowthE1RMCard: View {
   let onOpenToday: () -> Void
   let onCycleRange: () -> Void
 
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
@@ -22,13 +20,7 @@ struct GrowthE1RMCard: View {
           .foregroundStyle(Color.MeetPR.textSecondary)
         Spacer()
         Button {
-          if reduceMotion {
-            onCycleRange()
-          } else {
-            withAnimation(MeetPRMotion.pillSelect) {
-              onCycleRange()
-            }
-          }
+          onCycleRange()
         } label: {
           HStack(spacing: MeetPRSpacing.space1) {
             Text(range.displayName)
@@ -49,7 +41,6 @@ struct GrowthE1RMCard: View {
           .frame(minHeight: MeetPRSpacing.minimumHitTarget)
           .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(
           StudentStrings.replacing(
             .growthE1Rmcard001,

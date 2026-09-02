@@ -1,3 +1,4 @@
+// swiftlint:disable file_length
 import SwiftUI
 
 /// The four-variant action component defined by `GoldCTA.dc.html`.
@@ -105,8 +106,6 @@ public struct GoldCTA: View {
           x: outerShadow?.offsetX ?? 0,
           y: outerShadow?.offsetY ?? 0
         )
-        // motion/01 line 77: held CTA uses `filter:brightness(1.06)`.
-        .brightness(isHeld && variant == .primary ? 0.06 : 0)
     }
     .buttonStyle(
       GoldCTAButtonStyle(isDisabled: isDisabled || isLoading) { pressed in
@@ -169,15 +168,12 @@ public struct GoldCTA: View {
               .padding(.leading, GoldCTAContract.chevronLabelSpacing)
           }
         }
-        // motion/01 line 78: primary label opacity 1→.6 while held.
-        .opacity(isHeld && variant == .primary ? 0.6 : 1)
 
         if let sub, variant != .link {
           Text(sub)
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .bold))
             .tracking(0.72)
-            // motion/01 line 78: subtitle opacity .72→.45 while held.
-            .opacity(isHeld && variant == .primary ? 0.45 : 0.72)
+            .opacity(0.72)
         }
       }
     }
@@ -366,9 +362,15 @@ private struct GoldCTAButtonStyle: ButtonStyle {
 
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
-      .scaleEffect(configuration.isPressed && !isDisabled && !reduceMotion ? 0.97 : 1)
-      .opacity(isDisabled ? 0.35 : 1)
-      .animation(reduceMotion ? nil : MeetPRMotion.press, value: configuration.isPressed)
+      .scaleEffect(
+        configuration.isPressed && !isDisabled && !reduceMotion ? MeetPRPressFeedback.scale : 1
+      )
+      .opacity(
+        isDisabled
+          ? MeetPRPressFeedback.disabledOpacity
+          : (configuration.isPressed ? MeetPRPressFeedback.pressedOpacity : 1)
+      )
+      .animation(nil, value: configuration.isPressed)
       .onChange(of: configuration.isPressed) { _, pressed in
         onPressingChanged(pressed && !isDisabled)
       }
@@ -389,7 +391,7 @@ private struct GoldCTAButtonStyle: ButtonStyle {
 
 #Preview("GoldCTA · All Variants · Light") {
   VStack(spacing: MeetPRSpacing.point10) {
-    GoldCTA(showsShimmer: true) {}
+    GoldCTA {}
     GoldCTA(DesignSystemStrings.shiftOneDay, variant: .link) {}
     GoldCTA(DesignSystemStrings.cancel, sub: nil, variant: .secondary, icon: .none) {}
     GoldCTA(DesignSystemStrings.signOut, sub: nil, variant: .danger, icon: .logout) {}

@@ -21,7 +21,6 @@ struct SetEntrySheet: View {
   let videoViewModel: VideoAttachmentViewModel?
   let scrollToVideo: Bool
   let coachName: String?
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.dismiss) private var dismiss
 
   @State var suggestionOutcomeSnapshot: SetWeightSuggestionOutcome
@@ -204,11 +203,9 @@ struct SetEntrySheet: View {
     .overlay {
       if let activeNumberPad {
         numberPadOverlay(field: activeNumberPad)
-          .transition(.opacity)
           .zIndex(1)
       }
     }
-    .animation(reduceMotion ? nil : MeetPRMotion.sheet, value: activeNumberPad)
   }
 
   // MARK: - Navigation
@@ -476,7 +473,6 @@ struct SetEntrySheet: View {
         Color.black.opacity(0.55)
           .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
-      .buttonStyle(.plain)
       .ignoresSafeArea()
       .accessibilityLabel(StudentStrings.localized(.setEntrySheet008))
 
@@ -495,7 +491,6 @@ struct SetEntrySheet: View {
         },
         onCancel: closeNumberPad
       )
-      .transition(.move(edge: .bottom))
     }
   }
 

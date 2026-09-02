@@ -19,7 +19,6 @@ public struct MeetPRDayChip: View {
     case future
   }
 
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
 
   private let weekday: String
@@ -87,7 +86,6 @@ public struct MeetPRDayChip: View {
       )
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .frame(minWidth: MeetPRSpacing.minimumHitTarget, minHeight: MeetPRSpacing.minimumHitTarget)
     .accessibilityLabel(accessibilityText)
     .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -137,19 +135,7 @@ public struct MeetPRDayChip: View {
 
   @ViewBuilder
   private func statusDot(_ color: Color) -> some View {
-    if (state == .today || isSelected) && !reduceMotion {
-      TimelineView(.animation) { context in
-        let elapsed = context.date.timeIntervalSinceReferenceDate
-        let phase = elapsed.truncatingRemainder(dividingBy: 1.8) / 1.8
-        let amount = (1 - cos(phase * 2 * .pi)) / 2
-
-        dot(color)
-          .opacity(1 - (0.65 * amount))
-          .scaleEffect(1 - (0.18 * amount))
-      }
-    } else {
-      dot(color)
-    }
+    dot(color)
   }
 
   @ViewBuilder

@@ -82,7 +82,6 @@ struct CoachMyProfileView: View {
             .clipShape(.rect(cornerRadius: MeetPRRadius.control))
             .padding(.horizontal, MeetPRSpacing.point28)
             .padding(.bottom, MeetPRSpacing.space5)
-            .transition(.opacity)
             .accessibilityIdentifier("coach.profile.toast")
         }
       }
@@ -121,7 +120,7 @@ extension CoachMyProfileView {
       } label: {
         inviteCardContent
       }
-      .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityIdentifier("coach.profile.inviteCard")
 
       if let code = codesViewModel.activePersonalCode {
@@ -136,7 +135,7 @@ extension CoachMyProfileView {
           RoundedRectangle(cornerRadius: MeetPRRadius.inset)
             .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.95))
+        .buttonStyle(PressScaleButtonStyle())
         .padding(MeetPRSpacing.space4)
         .accessibilityIdentifier("coach.profile.copyInvite")
       }
@@ -243,7 +242,7 @@ extension CoachMyProfileView {
             .stroke(Color.MeetPR.danger.opacity(0.35), lineWidth: MeetPRSpacing.point1)
         }
     }
-    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(viewModel.isLoggingOut)
     .accessibilityIdentifier("coach.profile.logout")
   }
@@ -267,7 +266,7 @@ extension CoachMyProfileView {
       .padding(.vertical, MeetPRSpacing.point14)
       .contentShape(.rect)
     }
-    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityIdentifier(accessibilityIdentifier)
   }
 
@@ -311,15 +310,11 @@ extension CoachMyProfileView {
 
   private func showToast(_ message: String) {
     toastTask?.cancel()
-    withAnimation(MeetPRMotion.press) {
-      toastMessage = message
-    }
+    toastMessage = message
     toastTask = Task {
       try? await Task.sleep(for: .seconds(2))
       guard !Task.isCancelled else { return }
-      withAnimation(MeetPRMotion.press) {
-        toastMessage = nil
-      }
+      toastMessage = nil
     }
   }
 
