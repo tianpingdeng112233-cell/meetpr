@@ -21,6 +21,7 @@
 - **按压反馈**:按钮按下瞬间的视觉确认(缩放+变暗)+ 动作型按钮的触感;全 app 统一。
 - **蓄力完成**:训练页底部长按 1.1s 完成当日训练的按钮(`HoldToCompleteButton`)。
 - **奖励页**:蓄力完成后的 `WorkoutCelebrationView`(勋章盖章 + 火花 + 分段入场 + 连胜)。
+- **奖励线(本卡保留的动效全集)**:动作卡卷起收起 → 蓄力完成 → 奖励页 → 完成后 `DayCompletionBanner` 流光。
 
 ## 方案
 
@@ -45,14 +46,17 @@
    原语保留、只删上述用点。
 3. **流光 shimmer**:删 `GoldCTA` / `BrandPrimaryButton` 的 `showsShimmer` 用点
    `TodayWorkoutScreen`(开始 CTA、蓄力按钮待机流光)、`SessionSummaryView`、
-   `DashboardPrimaryAction`。**保留** `ShimmerOverlay` 原语与奖励页「查看总结」那一处。
+   `DashboardPrimaryAction`。**保留** `ShimmerOverlay` 原语,用点只剩两处:奖励页「查看总结」CTA,
+   以及当日完成后训练页底部的 `DayCompletionBanner`(完成当天任务后**开始**流光,作为奖励延续;
+   David 2026-09-02 追加)。蓄力按钮待机无流光。
 4. **呼吸/脉冲**:`DayChip.statusDot` 的 `TimelineView(.animation)` → 静态点;
    `DashboardHeader` 的 `pulses` `repeatForever` → 静态。
 5. **死代码**:`GoldGlowModifier.swift`、`GoldCurtain.swift`(全仓零用点)删除。
 6. **反馈卡编排**:`DashboardFeedbackCard` 的 展开/收起/预览淡出淡入/箭头 全部 `withAnimation`
    与 `Task.sleep` 编排删除,状态直接翻转。
-7. **折叠/收起**:`RollUpCollapse.swift` + `ExerciseCard` 的 rollUp 动画删除,折叠硬切;
-   若 RollUp 带完成触感,保留**一次** light impact,删动画序列。
+7. **卷起收起(保留)**:`RollUpCollapse.swift` + `ExerciseCard` 的 rollUp 动画(0.62s 四帧 +
+   轻→中→重触感)是「一个动作练完」的完成反馈,**原样保留**,含手动折叠走同一动画
+   (David 2026-09-02 拍板);相关 token 与 `MotionTests` 的 roll-up test 一并保留。
 8. **零散过渡**:`TodayWorkoutView` 休息计时器 `.animation(MeetPRMotion.spring, value: restTimer)`;
    `SetEntrySheet` 数字键盘 `.animation(MeetPRMotion.sheet)`;`SetEntryRPEScale` 三处
    `.animation`;`RPESlider` `pillSelect`;`DashboardE1RMRail` `.easeInOut`;
@@ -62,9 +66,9 @@
    `ChatUI/FeedbackVideoPlayerView` `.transition(.move…)`。系统 sheet / NavigationStack /
    fullScreenCover 自带过渡**不动**。
 9. **Motion tokens 瘦身**:`Tokens/Motion.swift` 只留仍有用点的 token(press / hold /
-   celebration / completion / 奖励页用到的曲线);launch* / rise* / feedback* / glow / rollUp
-   等随用点一并删。`MotionTests.swift` 同步:删 launch 几何、feedback overshoot、roll-up
-   keyframes/haptics、rise 曲线相关 test;保留 timing 值(裁到存活 token)与 celebration sparks test。
+   celebration / completion / rollUp / 奖励页用到的曲线);launch* / rise* / feedback* / glow
+   等随用点一并删。`MotionTests.swift` 同步:删 launch 几何、feedback overshoot、rise 曲线相关
+   test;保留 timing 值(裁到存活 token)、roll-up keyframes/haptics 与 celebration sparks test。
 
 ### B. 按压反馈统一(全 app)
 
@@ -106,7 +110,7 @@
 ## 架构约束
 
 1. 动效原语只在 DesignSystem;删除后 `TimelineView(.animation` 在 `Modules/*/Sources` 仅剩
-   `CelebrationEffects.swift` 与 `ShimmerOverlay.swift`;`meetPRShimmer(` 用点仅剩奖励页;
+   `CelebrationEffects.swift` 与 `ShimmerOverlay.swift`;`meetPRShimmer(` 用点仅剩奖励页与 `DayCompletionBanner`;
    `meetPRRiseIn(` 用点为零或仅奖励页。这三条以 grep 作为验收硬指标。
 2. 不做全局强制 reduceMotion 的取巧路径(代码要真删);现有 `accessibilityReduceMotion` 分支在
    保留的动效(奖励页、蓄力、按压)里继续尊重。
@@ -137,12 +141,12 @@
 
 1. `build_sim` + 全量 `test_sim` 绿;`swift-format --strict` + swiftlint 过。
 2. grep 硬指标(`Modules/*/Sources`,排除 `.build`):`TimelineView(.animation` 仅
-   `CelebrationEffects.swift` / `ShimmerOverlay.swift`;`meetPRShimmer(` 用点仅奖励页;
-   `LaunchMorph` / `launchHeroRevealToken` / `meetPRRiseIn(` / `GoldGlow` / `GoldCurtain` /
-   `RollUpCollapse` 零命中(奖励页若确需 rise-in 例外并在 PR 注明)。
+   `CelebrationEffects.swift` / `ShimmerOverlay.swift`;`meetPRShimmer(` 用点仅奖励页 + `DayCompletionBanner`;
+   `LaunchMorph` / `launchHeroRevealToken` / `meetPRRiseIn(` / `GoldGlow` / `GoldCurtain`
+   零命中(奖励页若确需 rise-in 例外并在 PR 注明);`RollUpCollapse` 保留。
 3. 模拟器走查(Claude 收货):Today 点「开始训练」**同帧**切到 Training 且 hero 立即可见,无黑帧
-   无幽灵胶囊;Today / Training 首屏内容随数据到达立即出现;动作卡折叠、反馈卡展开、休息计时器
-   出现均硬切;`.plain` 遗留检查:随机抽 tab、列表行、icon、CTA、登录按钮各一,按下均有缩放+变暗。
+   无幽灵胶囊;Today / Training 首屏内容随数据到达立即出现;反馈卡展开、休息计时器出现硬切,
+   动作卡记完全部组仍有卷起收起动效与三段触感;`.plain` 遗留检查:随机抽 tab、列表行、icon、CTA、登录按钮各一,按下均有缩放+变暗。
 4. 蓄力:长按可感知 7 段由轻到重,满格 `.success` + 回弹,中途松手 `.warning` + 回退。
 5. 奖励页:进入一次 `.success`,盖章一次 heavy impact;开启「减弱动态效果」后奖励页仍走现有降级
    且盖章触感仍触发一次。
