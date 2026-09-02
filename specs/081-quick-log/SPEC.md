@@ -37,15 +37,17 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
 1. 导航:左「返回」;标题「补记 · W#D#」;副标日名(如「硬拉日」)。
 2. **练的日期**行:`DatePicker`(`.date`,compact),默认今天;可选区间 =
    `[上一已完成日的 loggedDate(无则计划 publishedAt 当日), 今天]`;显示格式沿用「9/1 周二」。
-3. 动作列表(按 `sequenceIndex`):每个动作一张卡——
-   - 头:序号胶囊 + 动作名 + 右侧「没做」toggle(默认关);
-   - 处方行:「175kg × 3 · 3 组 · RPE 8.5」(六形态与 % 三锚预填**复用** `makeDrafts` 产出的
-     `SetRowDraft.actualWeight/actualReps/actualRPE`,不另写解码);
-   - 可调三项(仅当「没做」关):顶组重量(`[-][值][+]` ±2.5,对齐 `SetEntrySheet` 步进)、
-     RPE(现有 RPE 刻度控件)、做了几组(`[-][N][+]`,范围 1…处方组数)。
-     改顶组重量/RPE 时,**该动作全部组同步**取新值(补记不做逐组差异,想逐组走记录卡);
-     减组数 = 只写前 N 组。
-   - 卡片勾「没做」后折叠成一行灰字「没做 · 不记录」。
+3. 动作列表(按 `sequenceIndex`),**一组一行**(⚖️09-02 David 改口径:步进式太慢):每个动作一张卡——
+   - 头:序号胶囊 + 动作名 + 处方摘要「140kg × 5 · RPE 8」+ 右侧「N / M 记」计数;
+   - 卡内就是组表,列与现有记录态组表一致(`#` / 重量 / 次数 / RPE),最右一列「记」勾选圈
+     (默认全勾 = 按处方完成)。三格数值**复用** `makeDrafts` 产出的
+     `SetRowDraft.actualWeight/actualReps/actualRPE`(六形态与 % 三锚预填,不另写解码);
+     RPE/% 形式的换算重量弱色 + 「自动」角标(沿用 034 §9.4 预填样式)。
+   - 点格子 → 底部升起 `MeetPRNumberPad`(复用 `SetEntrySheet` 的数字键盘),格子金色高亮;
+     键盘上方两个快捷:「同步到全部 N 组」(改一格全组同值)与「下一格 →」
+     (重量→次数→RPE→下一行);「完成」收起。
+   - 勾掉一行 = 这组不记(尾组勾掉即少做,行灰化划线);整个动作全勾掉 = 没做,卡折叠成
+     一行灰字「0 / M · 没做」,点击可展开恢复。不做逐组失败标记(想标失败走记录卡)。
 4. 底部常驻:剩余摘要「将记录 N 个动作 · M 组」+ **长按按钮**「长按 · 补记并完成今日训练」
    (复用 `HoldToCompleteButton` 与 `HoldToCompleteGestureState`,进度填充/触觉/回弹一致)。
    当所有动作都勾「没做」时按钮不可用(= 0 组,071 红线),摘要改「至少要有一个动作」。
@@ -85,8 +87,9 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
    写组 = 现有 `makeLog` + `logs.recordSet` + `E1RMRecorder` 路径,**禁止**新起一条绕过 e1RM
    钩子的写路;结算 = `completeCurrentDay()`。
 2. 新增纯逻辑 `QuickLogPlan`(CoreModels 或 StudentKit/Features/QuickLog):输入
-   `[SetRowDraft]` + 每动作调整(`skipped / topWeight / rpe / setCount`)+ 所选日期 →
-   输出待写 `[StudentSetLog]`(有序)。这是可单测的核心,UI 只是它的编辑器。
+   `[SetRowDraft]` + 逐组编辑(`included: Bool` + 可覆盖的 weight/reps/rpe)+ 「同步到全部」
+   展开规则 + 所选日期 → 输出待写 `[StudentSetLog]`(有序,仅 `included`)。这是可单测的核心,
+   UI 只是它的编辑器。
 3. VM 新增 `quickLog(plan: QuickLogPlan) async -> QuickLogOutcome`
    (`.completed / .partialFailure(writtenCount:failedIndex:) / .completionFailed`),
    内部串行写组、成功后 `completeCurrentDay()`;`recordingGeneration` 与现有并发防护共用。
@@ -103,13 +106,13 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
    InMemory plans/logs/e1rm + 冻结时钟)**——`TodayWorkoutQuickLogTests`:
    - 全按处方补记 → logs 仓里组数 = 处方总组数、`assumed == false`、`loggedAt` 为所选日 12:00、
      plan day `completedAt != nil`、e1RM 仓有点;
-   - 一个动作勾「没做」+ 另一动作减到 1 组 → 只写对应组;
+   - 一个动作全部勾掉(没做)+ 另一动作勾掉尾组 → 只写勾选的组,`setIndex` 保持处方序号;
    - 全部「没做」→ 拒绝(不写、不结算);
    - 第 k 组 `recordSet` 抛错(用会失败的 fake logs 仓)→ 前 k-1 组已写、未调完成、outcome
      `.partialFailure`;重试从 k 继续、最终结算;
    - 完成接口抛 `PLAN_NOT_ACTIVE` → 组已写、outcome `.completionFailed`。
-2. **纯逻辑**——`QuickLogPlanTests`:调整→输出组序列的映射(顶组改值全组同步、减组数、
-   日期→`loggedAt`/`loggedDate` 派生、区间夹逼)。
+2. **纯逻辑**——`QuickLogPlanTests`:编辑→输出组序列的映射(单格改值、「同步到全部」
+   展开、勾掉行不输出、日期→`loggedAt`/`loggedDate` 派生、区间夹逼)。
 3. **DTO 契约**——`SetLogDTOTests`(Networking):`loggedDate == nil` 不出现 `logged_date` 键;
    非 nil 时编码为 `"logged_date":"2026-09-01"`。
 4. **Presentation**——`TodayWorkoutPresentationTests` 追加:`allowsQuickLog` 仅在
