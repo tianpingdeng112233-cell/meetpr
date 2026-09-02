@@ -84,6 +84,22 @@ import Testing
   }
 }
 
+@Test func planChangePushIntentsMapToTheStudentPlanRoute() {
+  let studentID = UUID()
+  let planID = UUID()
+
+  #expect(
+    StudentNotificationRoute.route(
+      for: .planUpdated(studentID: studentID, planID: planID)
+    ) == .plan
+  )
+  #expect(
+    StudentNotificationRoute.route(
+      for: .planPublished(studentID: studentID, planID: planID)
+    ) == .plan
+  )
+}
+
 @Test func tabLayersRemainMountedAcrossSelectionRoundTrip() {
   let training = StudentTabShellPresentation(selection: .training)
   let growth = StudentTabShellPresentation(selection: .growth)
@@ -111,6 +127,20 @@ import Testing
     #expect(exposed.map(\.id) == [selection])
     #expect(layers.filter(\.isEnabled).map(\.id) == [selection])
   }
+}
+
+@Test func trainingRefreshTriggerAcceptsActiveSceneAndTrainingTabOnly() {
+  var trigger = StudentTrainingPlanRefreshTrigger()
+
+  trigger.handleScenePhase(.background)
+  trigger.handleTabSelection(.growth)
+  #expect(trigger.revision == 0)
+
+  trigger.handleScenePhase(.active)
+  #expect(trigger.revision == 1)
+
+  trigger.handleTabSelection(.training)
+  #expect(trigger.revision == 2)
 }
 
 @Test func feedbackHeightReversalStartsFromCurrentPresentation() {

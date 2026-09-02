@@ -33,6 +33,18 @@ public final class TodayWorkoutViewModel {
     var logs: [StudentSetLog]
   }
 
+  private struct DraftIdentity: Hashable {
+    let exerciseID: UUID
+    let planExerciseSortOrder: Int
+    let setIndex: Int
+  }
+
+  private enum EditedDraftField: Hashable {
+    case weight
+    case reps
+    case rpe
+  }
+
   public private(set) var state: State = .idle
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
   public private(set) var restTimer: RestTimerState?
@@ -63,6 +75,8 @@ public final class TodayWorkoutViewModel {
   private var pendingPersist: Task<Bool, Never>?
   private var planLogsSnapshot: PlanLogsSnapshot?
   private var isCompletionMutationInFlight = false
+  private var editedDraftFields: [DraftIdentity: Set<EditedDraftField>] = [:]
+  private var planRefreshThrottle = StudentTodayRefreshThrottle()
 
   public init(
     plans: any StudentPlanRepository,
@@ -92,6 +106,7 @@ public final class TodayWorkoutViewModel {
     preloadedPlan: StudentPlanView? = nil
   ) async {
     currentStudentID = studentID
+    editedDraftFields = [:]
     loadGeneration += 1
     let generation = loadGeneration
     let startingRecordingGeneration = recordingGeneration
@@ -114,6 +129,37 @@ public final class TodayWorkoutViewModel {
       recordingGeneration: startingRecordingGeneration,
       isInitialLoad: isInitialLoad
     )
+  }
+
+  func refreshCurrentPlan(dayID: UUID?, studentID: UUID) async {
+    currentStudentID = studentID
+    loadGeneration += 1
+    let generation = loadGeneration
+    let startingRecordingGeneration = recordingGeneration
+
+    do {
+      let refreshedPlan = try await plans.refreshCurrentPlan(studentID: studentID)
+      try await applyPlan(
+        refreshedPlan,
+        dayID: dayID,
+        studentID: studentID,
+        generation: generation,
+        recordingGeneration: startingRecordingGeneration,
+        onlyIfChanged: true
+      )
+    } catch {
+      // Automatic refresh is best-effort. Keep the usable workout and any
+      // in-progress input instead of replacing it with an error surface.
+    }
+  }
+
+  func refreshCurrentPlanIfAllowed(
+    dayID: UUID?,
+    studentID: UUID,
+    at date: Date
+  ) async {
+    guard planRefreshThrottle.refreshWhenReturning(at: date) == .full else { return }
+    await refreshCurrentPlan(dayID: dayID, studentID: studentID)
   }
 
   public func load(
@@ -276,18 +322,16 @@ public final class TodayWorkoutViewModel {
       from: plan,
       selectedDayID: dayID
     )
-    planProjection = plan
+    // A best-effort refresh (onlyIfChanged) must never degrade a usable day:
+    // an empty result keeps the visible workout and any in-progress input,
+    // whether the student is still editing (.loaded) or already recording.
     guard let plan else {
-      planDays = []
-      if onlyIfChanged, state == .noPlan {
+      if onlyIfChanged, keepsCurrentWorkoutOnEmptyRefresh {
         return
       }
-      updatePlanContextIfNeeded(nextPlanContext)
-      exerciseReferences = [:]
-      state = .noPlan
+      showNoPlan(nil, planContext: nextPlanContext)
       return
     }
-    planDays = plan.days
 
     guard
       let snapshot = try await loadDaySnapshot(
@@ -299,27 +343,63 @@ public final class TodayWorkoutViewModel {
       guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
         return
       }
-      if onlyIfChanged, state == .noPlan {
+      if onlyIfChanged, keepsCurrentWorkoutOnEmptyRefresh {
         return
       }
-      updatePlanContextIfNeeded(nextPlanContext)
-      exerciseReferences = [:]
-      suggestionE1RMByExercise = [:]
-      state = .noPlan
+      showNoPlan(plan, planContext: nextPlanContext)
       return
     }
     guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
       return
     }
+    planProjection = plan
+    planDays = plan.days
     if onlyIfChanged,
-      case .loaded(let currentDay, let currentDrafts) = state,
-      currentDay == snapshot.day,
-      currentDrafts == snapshot.drafts
+      applyRefreshedSnapshotIfNeeded(snapshot, planContext: nextPlanContext)
     {
       return
     }
     updatePlanContextIfNeeded(nextPlanContext)
     apply(snapshot)
+  }
+
+  private func showNoPlan(_ plan: StudentPlanView?, planContext: TodayWorkoutPlanContext?) {
+    planProjection = plan
+    planDays = plan?.days ?? []
+    updatePlanContextIfNeeded(planContext)
+    exerciseReferences = [:]
+    if plan != nil {
+      suggestionE1RMByExercise = [:]
+    }
+    state = .noPlan
+  }
+
+  /// True while the screen shows a workout the student may be working in;
+  /// an empty best-effort refresh must not replace it with the no-plan state.
+  private var keepsCurrentWorkoutOnEmptyRefresh: Bool {
+    switch state {
+    case .loaded, .recording, .noPlan:
+      true
+    case .idle, .loading, .error:
+      false
+    }
+  }
+
+  private func applyRefreshedSnapshotIfNeeded(
+    _ snapshot: LoadedDaySnapshot,
+    planContext nextPlanContext: TodayWorkoutPlanContext?
+  ) -> Bool {
+    switch state {
+    case .recording:
+      return true
+    case .loaded(let currentDay, let currentDrafts):
+      guard currentDay != snapshot.day else { return true }
+      updatePlanContextIfNeeded(nextPlanContext)
+      apply(snapshot, preservingEditsFrom: currentDrafts)
+      return true
+    case .idle, .loading, .noPlan, .error:
+      return false
+    }
   }
 
   private func updatePlanContextIfNeeded(_ nextPlanContext: TodayWorkoutPlanContext?) {
@@ -348,6 +428,36 @@ public final class TodayWorkoutViewModel {
     suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
     lastWeightByExercise = snapshot.lastWeightByExercise
     state = .loaded(plan: snapshot.day, drafts: snapshot.drafts)
+  }
+
+  private func apply(
+    _ snapshot: LoadedDaySnapshot,
+    preservingEditsFrom currentDrafts: [SetRowDraft]
+  ) {
+    let currentByIdentity = Dictionary(
+      uniqueKeysWithValues: currentDrafts.map { (draftIdentity(for: $0), $0) }
+    )
+    let mergedDrafts = snapshot.drafts.map { refreshedDraft in
+      let identity = draftIdentity(for: refreshedDraft)
+      guard let currentDraft = currentByIdentity[identity],
+        let editedFields = editedDraftFields[identity]
+      else { return refreshedDraft }
+      var mergedDraft = refreshedDraft
+      if editedFields.contains(.weight) {
+        mergedDraft.actualWeight = currentDraft.actualWeight
+      }
+      if editedFields.contains(.reps) {
+        mergedDraft.actualReps = currentDraft.actualReps
+      }
+      if editedFields.contains(.rpe) {
+        mergedDraft.actualRPE = currentDraft.actualRPE
+      }
+      return mergedDraft
+    }
+    exerciseReferences = snapshot.references
+    suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
+    lastWeightByExercise = snapshot.lastWeightByExercise
+    state = .loaded(plan: snapshot.day, drafts: mergedDrafts)
   }
 
   private func handleLoadError(
@@ -449,15 +559,15 @@ public final class TodayWorkoutViewModel {
   }
 
   public func updateWeight(rowIndex: Int, weight: Decimal?) {
-    mutateDraft(rowIndex: rowIndex) { $0.actualWeight = weight }
+    mutateDraft(rowIndex: rowIndex, editedField: .weight) { $0.actualWeight = weight }
   }
 
   public func updateReps(rowIndex: Int, reps: Int?) {
-    mutateDraft(rowIndex: rowIndex) { $0.actualReps = reps }
+    mutateDraft(rowIndex: rowIndex, editedField: .reps) { $0.actualReps = reps }
   }
 
   public func updateRPE(rowIndex: Int, rpe: Decimal?) {
-    mutateDraft(rowIndex: rowIndex) { $0.actualRPE = rpe }
+    mutateDraft(rowIndex: rowIndex, editedField: .rpe) { $0.actualRPE = rpe }
   }
 
   public func toggleComplete(rowIndex: Int) async {
@@ -793,7 +903,11 @@ public final class TodayWorkoutViewModel {
     pendingPRBanner = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID))?.first
   }
 
-  private func mutateDraft(rowIndex: Int, update: (inout SetRowDraft) -> Void) {
+  private func mutateDraft(
+    rowIndex: Int,
+    editedField: EditedDraftField,
+    update: (inout SetRowDraft) -> Void
+  ) {
     switch state {
     case .loaded(let plan, let drafts), .recording(let plan, let drafts, _):
       guard drafts.indices.contains(rowIndex) else {
@@ -801,10 +915,20 @@ public final class TodayWorkoutViewModel {
       }
       var nextDrafts = drafts
       update(&nextDrafts[rowIndex])
+      editedDraftFields[draftIdentity(for: nextDrafts[rowIndex]), default: []]
+        .insert(editedField)
       state = .loaded(plan: plan, drafts: nextDrafts)
     default:
       return
     }
+  }
+
+  private func draftIdentity(for draft: SetRowDraft) -> DraftIdentity {
+    DraftIdentity(
+      exerciseID: draft.exerciseID,
+      planExerciseSortOrder: draft.planExerciseSortOrder,
+      setIndex: draft.prescribed.setIndex
+    )
   }
 
   private func isCurrentLoad(_ generation: Int) -> Bool {

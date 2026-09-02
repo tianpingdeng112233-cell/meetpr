@@ -23,6 +23,7 @@ public struct TodayWorkoutView: View {
   private let launchHeroRevealToken: Int
   private let planRevision: Int
   private let planProjectionUpdate: StudentPlanView?
+  private let planRefreshRevision: Int
   private var workoutStartedAt: Binding<Date?>
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
@@ -76,6 +77,7 @@ public struct TodayWorkoutView: View {
     launchHeroRevealToken: Int = 0,
     planRevision: Int = 0,
     planProjectionUpdate: StudentPlanView? = nil,
+    planRefreshRevision: Int = 0,
     workoutStartedAt: Binding<Date?> = .constant(nil),
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
@@ -107,6 +109,7 @@ public struct TodayWorkoutView: View {
     self.launchHeroRevealToken = launchHeroRevealToken
     self.planRevision = planRevision
     self.planProjectionUpdate = planProjectionUpdate
+    self.planRefreshRevision = planRefreshRevision
     self.workoutStartedAt = workoutStartedAt
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
@@ -411,6 +414,9 @@ public struct TodayWorkoutView: View {
     .onChange(of: planProjectionUpdate) { _, plan in
       guard let plan else { return }
       viewModel.applyPlanProjection(plan)
+    }
+    .onChange(of: planRefreshRevision) { _, _ in
+      Task { await refreshWorkoutPlan() }
     }
     .onChange(of: viewModel.completionRevision) { _, _ in
       if let plan = viewModel.planProjection {
@@ -806,6 +812,17 @@ public struct TodayWorkoutView: View {
       currentDay?.id == selectedDayID
     else { return }
     await viewModel.load(dayID: dayID, studentID: studentID)
+  }
+
+  private func refreshWorkoutPlan() async {
+    await viewModel.refreshCurrentPlanIfAllowed(
+      dayID: selectedDayID,
+      studentID: studentID,
+      at: Date()
+    )
+    if selectedDayID == nil || !viewModel.planDays.contains(where: { $0.id == selectedDayID }) {
+      selectedDayID = currentDay?.id
+    }
   }
 
   private func handedOffPlan(for dayID: UUID?) -> StudentPlanView? {
