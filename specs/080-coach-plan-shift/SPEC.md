@@ -30,7 +30,7 @@
 
 ### 2. 推送路由（CoreModels + StudentKit，基于 feat/plan-refresh）
 
-- `PushNotificationKind` 新增 `planShifted = "plan_shifted"`、`planShiftUndone = "plan_shift_undone"`；路由与 `.planUpdated` 同形（`studentID` + `planID`），`StudentNotificationRouting` / `StudentRootView` 里与 `.planUpdated, .planPublished` 同一分支：触发 `StudentTrainingPlanRefreshTrigger` 重拉并落到 Dashboard。
+- `PushNotificationKind` 新增 `planShifted = "plan_shifted"`、`planShiftUndone = "plan_shift_undone"`；路由与 `.planUpdated` 同形（`studentID` + `planID`），`StudentNotificationRouting` / `StudentRootView` 里与 `.planUpdated, .planPublished` 同一分支：触发 `StudentTrainingPlanRefreshTrigger` 重拉并落到训练 tab（与 `plan_updated` 同路由 `.plan`，⚖️2026-09-02 review 修订：原文误写 Dashboard）。
 - `CoachRootView` 对这两种 kind 与 `.planShift` 同分支（教练端不处理）。
 - 老包不认识新 kind：`PushPayloadParser.route` 返回 nil，按现有 unknown 处理，不崩。
 
@@ -41,7 +41,7 @@
 ## 验收 / 回归矩阵
 
 - 后端造一批 3 天后移 → 冷启（有缓存）Dashboard 先显示旧推荐日期、后台重拉后变新日期；下拉刷新立即变。
-- 推送 `plan_shifted` 到达 → 前台点开落 Dashboard 且已重拉；后台收到后回前台自动重拉（feat/plan-refresh 既有行为）。
+- 推送 `plan_shifted` 到达 → 前台点开落训练 tab（同 `plan_updated`）且已重拉；后台收到后回前台自动重拉（feat/plan-refresh 既有行为）。
 - 游标日、CTA、可写日、完成/撤销完成：与后移前完全一致（回归矩阵沿 071 §验收）。
 - 存量带学员 V2 顺延数据的计划：推荐日期显示叠加后的日期（与 071 拍板 2 验收项**相反**，本 spec 明示替换该项）。
 - 教练端「已后移 N 天」徽标读 `totalShiftDays` 新口径正常。
