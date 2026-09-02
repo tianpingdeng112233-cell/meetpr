@@ -7,6 +7,8 @@ public enum PushNotificationKind: String, CaseIterable, Sendable {
   case videoPending = "video_pending"
   case bindRequest = "bind_request"
   case planShift = "plan_shift"
+  case planUpdated = "plan_updated"
+  case planPublished = "plan_published"
 }
 
 public enum PushRouteIntent: Equatable, Sendable {
@@ -16,6 +18,8 @@ public enum PushRouteIntent: Equatable, Sendable {
   case videoPending(studentID: UUID, videoID: UUID)
   case bindRequest(requestID: UUID)
   case planShift(studentID: UUID, planID: UUID)
+  case planUpdated(studentID: UUID, planID: UUID)
+  case planPublished(studentID: UUID, planID: UUID)
 }
 
 public struct PushPayloadValues: Equatable, Sendable {
@@ -61,7 +65,9 @@ public enum PushPayloadParser {
     case .bindRequest:
       return bindRoute(from: payload)
     case .planShift:
-      return planShiftRoute(from: payload)
+      return planRoute(from: payload, kind: kind)
+    case .planUpdated, .planPublished:
+      return planRoute(from: payload, kind: kind)
     }
   }
 
@@ -79,7 +85,7 @@ public enum PushPayloadParser {
       return .missedTraining(studentID: studentID)
     case .prCongrats:
       return .prCongrats(studentID: studentID)
-    case .chatMessage, .videoPending, .bindRequest, .planShift:
+    case .chatMessage, .videoPending, .bindRequest, .planShift, .planUpdated, .planPublished:
       return nil
     }
   }
@@ -95,11 +101,23 @@ public enum PushPayloadParser {
     uuid(payload.requestID).map(PushRouteIntent.bindRequest(requestID:))
   }
 
-  private static func planShiftRoute(from payload: PushPayloadValues) -> PushRouteIntent? {
+  private static func planRoute(
+    from payload: PushPayloadValues,
+    kind: PushNotificationKind
+  ) -> PushRouteIntent? {
     guard let studentID = uuid(payload.studentID), let planID = uuid(payload.planID) else {
       return nil
     }
-    return .planShift(studentID: studentID, planID: planID)
+    switch kind {
+    case .planShift:
+      return .planShift(studentID: studentID, planID: planID)
+    case .planUpdated:
+      return .planUpdated(studentID: studentID, planID: planID)
+    case .planPublished:
+      return .planPublished(studentID: studentID, planID: planID)
+    case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest:
+      return nil
+    }
   }
 
   private static func uuid(_ value: String?) -> UUID? {

@@ -57,6 +57,7 @@ public struct StudentRootView: View {
   @State private var todayReloadToken = 0
   @State private var todayVolatileReloadToken = 0
   @State private var todayRefreshThrottle = StudentTodayRefreshThrottle()
+  @State private var trainingPlanRefreshTrigger = StudentTrainingPlanRefreshTrigger()
   /// Bumped when the home CTA opens the 训练 tab, so it lands on today rather
   /// than a previously-browsed day (see TodayWorkoutView.jumpToTodayToken).
   @State private var trainingJumpToken = 0
@@ -290,6 +291,7 @@ extension StudentRootView {
         launchHeroRevealToken: launchHeroRevealToken,
         planRevision: planRevision,
         planProjectionUpdate: planProjectionUpdate,
+        planRefreshRevision: trainingPlanRefreshTrigger.revision,
         workoutStartedAt: $workoutStartedAt,
         notifications: notifications,
         onOpenPlanNotification: openPlanNotification,
@@ -397,6 +399,7 @@ extension StudentRootView {
     }
     .onChange(of: selectedTab) { _, newTab in
       handleTabSelectionChange(newTab)
+      trainingPlanRefreshTrigger.handleTabSelection(newTab)
       if newTab == .today {
         switch todayRefreshThrottle.refreshWhenReturning(at: Date()) {
         case .full:
@@ -428,6 +431,7 @@ extension StudentRootView {
       finishLaunchForReducedMotion()
     }
     .onChange(of: scenePhase) { _, phase in
+      trainingPlanRefreshTrigger.handleScenePhase(phase)
       guard let notifications else { return }
       if phase == .active {
         notifications.startChatPolling()
@@ -487,6 +491,12 @@ extension StudentRootView {
       // The current student shell has no standalone messages tab; its existing
       // inbox path presents the coach conversation from the 今日 tab.
       selectedTab = .today
+    case .planUpdated(let routeStudentID, _), .planPublished(let routeStudentID, _):
+      pushRoute = nil
+      guard routeStudentID == studentID,
+        StudentNotificationRoute.route(for: route) == .plan
+      else { return }
+      openPlanNotification()
     case .missedTraining, .prCongrats, .videoPending, .bindRequest, .planShift:
       pushRoute = nil
     }

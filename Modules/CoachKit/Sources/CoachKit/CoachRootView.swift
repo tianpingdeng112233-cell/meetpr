@@ -337,6 +337,10 @@ extension CoachRootView {
     case .missedTraining, .prCongrats, .bindRequest, .planShift:
       selectedTab = .students
       pushRoute = nil
+    case .planUpdated, .planPublished:
+      // These events target the student plan surface. A coach session can
+      // safely consume them if APNs delivers one to the wrong signed-in role.
+      pushRoute = nil
     }
   }
 
