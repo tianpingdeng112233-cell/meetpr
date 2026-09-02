@@ -56,3 +56,31 @@ struct HoldToCompleteGestureState: Equatable, Sendable {
     }
   }
 }
+
+enum HoldToCompleteHapticWeight: Equatable, Sendable {
+  case light
+  case medium
+  case heavy
+}
+
+struct HoldToCompleteHapticSchedule {
+  struct Feedback: Equatable, Sendable {
+    let weight: HoldToCompleteHapticWeight
+    let intensity: Double
+  }
+
+  static func feedback(forStep step: Int) -> Feedback {
+    switch step {
+    case ...2:
+      Feedback(weight: .light, intensity: 0.5)
+    case 3:
+      Feedback(weight: .medium, intensity: 0.7)
+    case 4:
+      Feedback(weight: .medium, intensity: 0.775)
+    case 5:
+      Feedback(weight: .medium, intensity: 0.85)
+    default:
+      Feedback(weight: .heavy, intensity: 1)
+    }
+  }
+}
