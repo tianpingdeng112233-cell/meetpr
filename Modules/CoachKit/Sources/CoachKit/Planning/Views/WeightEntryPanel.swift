@@ -176,7 +176,6 @@ public struct WeightEntryPanel: View {
         .font(Font.MeetPR.title2)
         .frame(maxWidth: .infinity, minHeight: 52)
     }
-    .buttonStyle(.plain)
     .foregroundStyle(Color.MeetPR.brandRed)
     .background(Color.MeetPR.brandRedSoft)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
@@ -190,7 +189,6 @@ public struct WeightEntryPanel: View {
         .monospacedDigit()
         .frame(maxWidth: .infinity, minHeight: 52)
     }
-    .buttonStyle(.plain)
     .background(Color.MeetPR.surface2)
     .clipShape(.rect(cornerRadius: MeetPRRadius.md))
   }
@@ -210,7 +208,6 @@ private struct SelectableChip: View {
         .padding(.horizontal, MeetPRSpacing.md)
         .padding(.vertical, MeetPRSpacing.sm)
     }
-    .buttonStyle(.plain)
     .foregroundStyle(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.fgSecondary)
     .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface2)
     .clipShape(Capsule())

@@ -94,7 +94,6 @@ private struct DurationChoiceCard: View {
           .stroke(isSelected ? Color.MeetPR.brandRed : .clear, lineWidth: 2)
       }
     }
-    .buttonStyle(.plain)
   }
 }
 

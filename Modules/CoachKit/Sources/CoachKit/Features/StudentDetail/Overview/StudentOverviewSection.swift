@@ -62,7 +62,7 @@ struct StudentOverviewSection: View {
           } label: {
             trainingDayRow(day, ordinal: index + 1)
           }
-          .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+          .buttonStyle(PressScaleButtonStyle())
           .accessibilityIdentifier("coach.detail.day.\(day.id.timeIntervalSinceReferenceDate)")
         }
       }
@@ -146,7 +146,7 @@ struct StudentOverviewSection: View {
               Capsule()
                 .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
             }
-            .buttonStyle(PressScaleButtonStyle(scale: 0.96))
+            .buttonStyle(PressScaleButtonStyle())
         }
       case .unavailable:
         Text(CoachDetailStrings.statusUnavailable)
@@ -191,7 +191,7 @@ struct StudentOverviewSection: View {
       .padding(MeetPRSpacing.point15)
       .meetPRCardSurface(.card)
     }
-    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private var trainingDays: [StudentExecutionDay] {

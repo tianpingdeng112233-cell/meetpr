@@ -191,7 +191,6 @@ struct CoachReceivingView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .accessibilityIdentifier("coach.inbox.chat.\(row.studentID.uuidString)")
   }
 
@@ -216,7 +215,7 @@ struct CoachReceivingView: View {
       .background(Color.MeetPR.textPrimary)
       .clipShape(.capsule)
     }
-    .buttonStyle(PressScaleButtonStyle(scale: 0.94))
+    .buttonStyle(PressScaleButtonStyle())
     .accessibilityLabel(
       CoachInboxStrings.pendingVideosAccessibility(
         name: studentName,

@@ -46,7 +46,6 @@ struct FeedbackVideoPlayerChrome: View {
             Circle().stroke(Color.white.opacity(0.18), lineWidth: 1)
           }
         }
-        .buttonStyle(.plain)
         .disabled(isExporting)
         .accessibilityLabel(
           isExporting ? ChatStrings.videoExporting : ChatStrings.videoExport

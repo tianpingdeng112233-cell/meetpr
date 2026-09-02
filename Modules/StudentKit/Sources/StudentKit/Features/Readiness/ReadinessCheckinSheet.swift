@@ -120,7 +120,6 @@ struct ReadinessCheckinSheet: View {
                 )
               )
           }
-          .buttonStyle(.plain)
           .accessibilityLabel(
             StudentStrings.replacing(.readinessCheckinSheet012, values: ["\(title)", "\(level)"]))
         }
@@ -243,7 +242,6 @@ private struct FlowChips: View {
               )
           )
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(
           StudentStrings.replacing(
             .readinessCheckinSheet019, values: ["\(Self.displayName(group))", "\(level ?? 0)"]))

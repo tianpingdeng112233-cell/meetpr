@@ -115,7 +115,6 @@ public struct LoginView: View {
                 y: MeetPRSpacing.point6
               )
             }
-            .buttonStyle(LoginButtonStyle())
             .disabled(isSubmitDisabled)
             .accessibilityIdentifier("login.submit")
 
@@ -191,14 +190,4 @@ private enum Metrics {
   /// See the call site: 42.24pt target line box − Archivo's 47.8726pt natural
   /// line height at 44pt.
   static let headlineLineSpacing: CGFloat = -5.6326
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-private struct LoginButtonStyle: ButtonStyle {
-  @Environment(\.isEnabled) private var isEnabled
-
-  func makeBody(configuration: Configuration) -> some View {
-    configuration.label
-      .scaleEffect(configuration.isPressed && isEnabled ? 0.985 : 1)
-  }
 }

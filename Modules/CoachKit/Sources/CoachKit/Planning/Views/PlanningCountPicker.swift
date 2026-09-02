@@ -70,7 +70,6 @@ struct PlanningCountPicker: View {
             .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
             .contentShape(.rect)
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
 
         stepButton(
@@ -153,7 +152,6 @@ struct PlanningCountPicker: View {
         .clipShape(.circle)
         .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .foregroundStyle(Color.MeetPR.fgPrimary)
     .accessibilityLabel(accessibilityLabel)
   }

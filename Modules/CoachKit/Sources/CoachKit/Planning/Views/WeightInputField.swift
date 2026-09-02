@@ -61,7 +61,6 @@ public struct WeightInputField: View {
             .foregroundStyle(Color.MeetPR.fgSecondary)
         }
       }
-      .buttonStyle(.plain)
       .accessibilityLabel(CoachPlanningStrings.editWeight)
       .sheet(isPresented: $showPanel) {
         WeightEntryPanel(

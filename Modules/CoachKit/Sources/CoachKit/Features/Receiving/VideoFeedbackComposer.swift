@@ -27,7 +27,7 @@ struct VideoFeedbackComposer: View {
           .background(Color.MeetPR.textPrimary)
           .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       }
-      .buttonStyle(PressScaleButtonStyle(scale: 0.96))
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityIdentifier("coach.video.send")
     }
     .padding(.leading, MeetPRSpacing.point14)

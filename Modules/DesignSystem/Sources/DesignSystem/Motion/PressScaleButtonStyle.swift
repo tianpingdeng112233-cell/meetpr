@@ -1,23 +1,34 @@
 import SwiftUI
 
+/// The single source for press-feedback numbers (spec 082 §B.1): every button
+/// style in the app reads these so the feel cannot drift between components.
+public enum MeetPRPressFeedback {
+  public static let scale: CGFloat = 0.97
+  public static let pressedOpacity = 0.85
+  public static let disabledOpacity = 0.35
+}
+
 public struct PressScaleButtonStyle: ButtonStyle {
   private let isDisabled: Bool
-  private let scale: CGFloat
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @Environment(\.isEnabled) private var isEnabled
 
-  public init(isDisabled: Bool = false, scale: CGFloat = 0.97) {
+  public init(isDisabled: Bool = false) {
     self.isDisabled = isDisabled
-    self.scale = scale
   }
 
   public func makeBody(configuration: Configuration) -> some View {
+    let disabled = isDisabled || !isEnabled
     configuration.label
-      // Reduce motion keeps the opacity acknowledgement, drops the transform.
       .scaleEffect(
-        configuration.isPressed && !isDisabled && !reduceMotion ? scale : 1
+        configuration.isPressed && !disabled && !reduceMotion ? MeetPRPressFeedback.scale : 1
       )
-      .opacity(isDisabled ? 0.35 : (configuration.isPressed ? 0.9 : 1))
-      .animation(reduceMotion ? nil : MeetPRMotion.press, value: configuration.isPressed)
+      .opacity(
+        disabled
+          ? MeetPRPressFeedback.disabledOpacity
+          : (configuration.isPressed ? MeetPRPressFeedback.pressedOpacity : 1)
+      )
+      .animation(nil, value: configuration.isPressed)
   }
 }

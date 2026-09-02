@@ -64,7 +64,6 @@ struct AppearancePreferenceRow: View {
           )
         }
     }
-    .buttonStyle(.plain)
     .accessibilityAddTraits(isSelected ? [.isSelected] : [])
   }
 }

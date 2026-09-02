@@ -155,7 +155,6 @@ struct PlanningNumberField: View {
         .clipShape(.circle)
         .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .foregroundStyle(Color.MeetPR.fgPrimary)
     .accessibilityLabel(accessibilityLabel)
   }

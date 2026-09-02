@@ -144,7 +144,6 @@ extension ProgressionRuleEditorCard {
       }
       .font(Font.MeetPR.footnote)
       .foregroundStyle(Color.MeetPR.brandRed)
-      .buttonStyle(.borderless)
     }
   }
 
@@ -209,7 +208,6 @@ extension ProgressionRuleEditorCard {
         }
         .font(Font.MeetPR.footnote)
         .foregroundStyle(Color.MeetPR.brandRed)
-        .buttonStyle(.borderless)
       }
     }
   }
@@ -458,7 +456,6 @@ private struct RuleChip: View {
         .clipShape(.capsule)
         .opacity(isDisabled ? 0.35 : 1)
     }
-    .buttonStyle(.plain)
     .disabled(isDisabled)
     .accessibilityLabel(title)
   }

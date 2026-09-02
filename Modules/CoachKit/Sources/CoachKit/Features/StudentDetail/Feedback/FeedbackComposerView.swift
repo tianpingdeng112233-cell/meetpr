@@ -229,7 +229,6 @@ struct FeedbackComposerView: View {
       .background(viewModel.canSend ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
     .disabled(!viewModel.canSend)
     .padding(.horizontal, MeetPRSpacing.base)
     .padding(.top, MeetPRSpacing.sm)

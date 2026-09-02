@@ -157,7 +157,6 @@
               )
               .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .semibold))
               .foregroundStyle(Color.MeetPR.textSecondary)
-              .buttonStyle(.plain)
             }
           }
 

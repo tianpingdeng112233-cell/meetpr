@@ -64,7 +64,6 @@ struct DashboardPlanWaitingState: View {
           .overlay {
             Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
           }
-          .buttonStyle(.plain)
       }
       .padding(.horizontal, 18)
       .padding(.vertical, 22)
