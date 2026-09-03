@@ -47,6 +47,7 @@
         onAskCoach: {},
         onHeroFrameChange: { _ in },
         onStart: {},
+        onQuickLog: {},
         onEdit: { _ in },
         onVideoAction: { _ in },
         onComplete: {},
