@@ -116,14 +116,19 @@ extension PlanSetDTO {
 }
 
 extension SetLogDTO {
-  public func toDomain() -> StudentSetLog {
+  public func toDomain(calendar: Calendar = .current) -> StudentSetLog {
     StudentSetLog(
       id: id,
       studentID: studentID,
       planExerciseID: planExerciseID,
       exerciseID: exerciseID,
       setIndex: setIndex,
-      loggedAt: loggedAt,
+      loggedAt: StudentSetLog.resolvedLoggedAt(
+        serverLoggedAt: loggedAt,
+        loggedDate: loggedDate,
+        calendar: calendar
+      ),
+      loggedDate: loggedDate,
       weightKg: weightKg,
       reps: reps,
       rpe: rpe,

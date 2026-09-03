@@ -29,6 +29,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
         reps: log.reps,
         rpe: log.rpe,
         completed: log.completed,
+        loggedDate: log.loggedDate,
         failed: log.failed
       ),
       accessToken: token
@@ -41,7 +42,10 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       planExerciseID: log.planExerciseID,
       exerciseID: log.exerciseID,
       setIndex: log.setIndex,
-      loggedAt: response.loggedAt,
+      // Only quick-log (spec 081) sends `loggedDate`; that path owns the
+      // timestamp (local noon of the chosen day). Live sets take the server's.
+      loggedAt: log.loggedDate == nil ? response.loggedAt : log.loggedAt,
+      loggedDate: log.loggedDate,
       weightKg: log.weightKg,
       reps: log.reps,
       rpe: log.rpe,
