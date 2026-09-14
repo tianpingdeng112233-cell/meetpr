@@ -5,7 +5,6 @@ import Testing
 @testable import StudentKit
 
 @MainActor
-// swiftlint:disable:next type_body_length
 @Suite struct TodayWorkoutPresentationTests {
   @Test func zeroLogDashboardEntryKeepsListHeroAndHidesManualCompletion() {
     let fixture = makeFixture()

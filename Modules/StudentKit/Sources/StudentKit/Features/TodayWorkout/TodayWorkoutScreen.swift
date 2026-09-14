@@ -399,9 +399,6 @@ private struct TrainingHeaderButton<Icon: View>: View {
   }
 }
 
-// Pre-existing hero sits at the type_body_length limit; the quick-log entry
-// itself lives in `TodayWorkoutQuickLogEntry` below (one `if` line here).
-// swiftlint:disable:next type_body_length
 private struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
