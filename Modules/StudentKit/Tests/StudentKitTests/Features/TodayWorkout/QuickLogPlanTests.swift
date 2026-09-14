@@ -63,6 +63,24 @@ import Testing
     #expect(log.loggedDate == "2026-09-01")
   }
 
+  @Test func buddhistDeviceCalendarStillWritesGregorianTrainingDateInItsTimeZone() throws {
+    var buddhist = Calendar(identifier: .buddhist)
+    buddhist.timeZone = try #require(TimeZone(identifier: "Asia/Bangkok"))
+    let selected = try Date("2026-09-01T15:30:00Z", strategy: .iso8601)
+    let expectedNoon = try Date("2026-09-01T05:00:00Z", strategy: .iso8601)
+    let plan = QuickLogPlan(
+      drafts: makeFixture().drafts,
+      selectedDate: selected,
+      allowedDateRange: selected.addingTimeInterval(-86_400)...selected,
+      calendar: buddhist
+    )
+
+    let log = try #require(plan.makeLogs(studentID: studentID).first)
+
+    #expect(log.loggedDate == "2026-09-01")
+    #expect(log.loggedAt == expectedNoon)
+  }
+
   @Test func selectedDateIsClampedToAllowedDays() {
     let fixture = makeFixture()
     var plan = QuickLogPlan(

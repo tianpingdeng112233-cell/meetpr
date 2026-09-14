@@ -53,7 +53,7 @@ public final class WeekOverviewViewModel {
       let days = Self.currentWeekDays(
         from: allDays, weekIndex: weekIndex)
       let fetchedLogs: [StudentSetLog]
-      if let dateRange = Self.dateRange(for: allDays, now: now()) {
+      if let dateRange = Self.dateRange(for: plan, now: now()) {
         fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
       } else {
         fetchedLogs = []
@@ -76,7 +76,7 @@ public final class WeekOverviewViewModel {
     let existingLogs: [StudentSetLog]
     if case .loaded(_, let logs, _) = state {
       existingLogs = logs
-    } else if let dateRange = Self.dateRange(for: plan.days, now: now()) {
+    } else if let dateRange = Self.dateRange(for: plan, now: now()) {
       if state == .idle { state = .loading }
       existingLogs = (try? await logs.fetchLogs(studentID: studentID, in: dateRange)) ?? []
     } else {
@@ -105,7 +105,7 @@ public final class WeekOverviewViewModel {
     guard case .loaded(let days, _, let weekIndex) = state else { return }
     do {
       let fetchedLogs: [StudentSetLog]
-      if let dateRange = Self.dateRange(for: cycleDays, now: now()) {
+      if let dateRange = Self.dateRange(for: plan, now: now()) {
         fetchedLogs = try await logs.fetchLogs(studentID: studentID, in: dateRange)
       } else {
         fetchedLogs = []
@@ -140,19 +140,19 @@ public final class WeekOverviewViewModel {
   }
 
   private static func dateRange(
-    for days: [StudentPlanDay],
+    for plan: StudentPlanView?,
     now: Date
   ) -> ClosedRange<Date>? {
-    guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.date).max()
+    guard let plan,
+      let first = plan.days.map(\.scheduledDate).min(), let last = plan.days.map(\.date).max()
     else {
       return nil
     }
-    // spec 071: one plan-scoped request for the whole cycle, padded one day
-    // from the earliest coach-authored date to the latest effective recommended
-    // date (spec 080: shifts only move forward, so pre-shift logs stay inside
-    // the lower bound). Sequence progression means
-    // real training can run past the scheduled calendar, so the upper bound
-    // clamps to today as well (P0 2026-08-20).
-    return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)
+    // Match TodayWorkout's full training window: quick-log may precede the
+    // schedule from publication onward (spec 081), while pre-shift and late
+    // live logs must remain visible too.
+    let earliestTrainingDate = min(first, plan.publishedAt ?? plan.startDate, now)
+    let lowerBound = earliestTrainingDate.addingTimeInterval(-86_400)
+    return lowerBound...max(last, now).addingTimeInterval(86_400)
   }
 }

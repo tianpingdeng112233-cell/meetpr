@@ -1115,17 +1115,17 @@ public final class TodayWorkoutViewModel {
   }
 
   private static func planRange(
-    for days: [StudentPlanDay],
+    for plan: StudentPlanView,
     now: Date
   ) -> ClosedRange<Date> {
-    guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.date).max()
+    guard let first = plan.days.map(\.scheduledDate).min(), let last = plan.days.map(\.date).max()
     else { return Date.distantPast...Date.distantFuture }
-    // Lower bound stays on the coach-authored schedule: a coach shift (spec 080)
-    // only moves recommended dates forward, and sets logged before the shift
-    // must not vanish. Sequence progression means real training can run past
-    // the recommended calendar: clamp the upper bound to today, or sets logged
-    // after the recommended end vanish from the day view (P0 2026-08-20).
-    return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)
+    // Quick-log can date training back to publication, before the first
+    // recommendation (spec 081). Keep pre-shift logs and training beyond the
+    // schedule too; a future publication fallback is clamped to today.
+    let earliestTrainingDate = min(first, plan.publishedAt ?? plan.startDate, now)
+    let lowerBound = earliestTrainingDate.addingTimeInterval(-86_400)
+    return lowerBound...max(last, now).addingTimeInterval(86_400)
   }
 
   private func planLogs(
@@ -1140,7 +1140,7 @@ public final class TodayWorkoutViewModel {
     }
     let fetched = try await logs.fetchLogs(
       studentID: studentID,
-      in: Self.planRange(for: plan.days, now: now())
+      in: Self.planRange(for: plan, now: now())
     )
     planLogsSnapshot = PlanLogsSnapshot(
       cycleID: plan.cycleID,

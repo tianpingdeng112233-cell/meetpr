@@ -135,13 +135,17 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
   static func parseLoggedDate(_ value: String, calendar: Calendar) -> Date? {
     let parts = value.split(separator: "-").compactMap { Int($0) }
     guard parts.count == 3 else { return nil }
+    // The API's YYYY-MM-DD is Gregorian even when the device displays another
+    // calendar. Preserve the caller's time zone when resolving its local day.
+    var wireCalendar = Calendar(identifier: .gregorian)
+    wireCalendar.timeZone = calendar.timeZone
     var components = DateComponents()
-    components.calendar = calendar
-    components.timeZone = calendar.timeZone
+    components.calendar = wireCalendar
+    components.timeZone = wireCalendar.timeZone
     components.year = parts[0]
     components.month = parts[1]
     components.day = parts[2]
-    return calendar.date(from: components).map { calendar.startOfDay(for: $0) }
+    return wireCalendar.date(from: components).map { wireCalendar.startOfDay(for: $0) }
   }
 
   private enum CodingKeys: String, CodingKey {

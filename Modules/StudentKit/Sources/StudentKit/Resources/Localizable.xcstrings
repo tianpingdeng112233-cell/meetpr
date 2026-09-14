@@ -9249,6 +9249,23 @@
         }
       }
     },
+    "student.quickLog.copy030": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Records are saved. Retry to finish, or return to training to edit them."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已有记录保存。请重试完成；如需修改，请返回训练页编辑。"
+          }
+        }
+      }
+    },
     "student.readinessCheckinSheet.copy001": {
       "extractionState": "manual",
       "localizations": {

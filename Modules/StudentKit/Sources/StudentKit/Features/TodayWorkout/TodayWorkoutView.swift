@@ -424,10 +424,8 @@ public struct TodayWorkoutView: View {
           trailingText: StudentStrings.localized(.quickLog027)
         )
         .padding(.top, MeetPRSpacing.space3)
-        .transition(.move(edge: .top).combined(with: .opacity))
       }
     }
-    .animation(MeetPRMotion.spring, value: quickLogToastWeekCode)
     .onDisappear {
       quickLogToastTask?.cancel()
     }

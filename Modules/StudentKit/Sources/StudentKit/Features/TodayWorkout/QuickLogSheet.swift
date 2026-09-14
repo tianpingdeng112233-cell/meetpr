@@ -45,6 +45,7 @@ struct QuickLogSheet: View {
   @State private var activeCell: QuickLogActiveCell?
   @State private var failureAlert: QuickLogFailureAlert?
   @State private var isSubmitting = false
+  @State private var hasSavedRecords = false
 
   init(
     day: StudentPlanDay,
@@ -71,6 +72,11 @@ struct QuickLogSheet: View {
 
       ScrollView {
         VStack(spacing: MeetPRSpacing.space3) {
+          if hasSavedRecords {
+            Text(StudentStrings.localized(.quickLog030))
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+              .foregroundStyle(Color.MeetPR.textMuted)
+          }
           QuickLogDateRow(plan: $plan)
           ForEach(orderedExercises) { item in
             QuickLogExerciseCard(
@@ -93,6 +99,7 @@ struct QuickLogSheet: View {
         .padding(.bottom, MeetPRSpacing.space5)
       }
       .scrollIndicators(.hidden)
+      .disabled(isSubmitting || hasSavedRecords)
     }
     .background(Color.MeetPR.bgBase)
     .safeAreaInset(edge: .bottom, spacing: MeetPRSpacing.zero) {
@@ -107,7 +114,7 @@ struct QuickLogSheet: View {
               .ignoresSafeArea()
           }
         )
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityHidden(true)
       }
     }
@@ -115,10 +122,8 @@ struct QuickLogSheet: View {
       if let activeCell, let row = plan.rows.first(where: { $0.id == activeCell.rowID }) {
         numberPad(for: activeCell, row: row)
           .id(activeCell.id)
-          .transition(.move(edge: .bottom))
       }
     }
-    .animation(MeetPRMotion.spring, value: activeCell?.id)
     .interactiveDismissDisabled(isSubmitting)
     .alert(
       StudentStrings.localized(.quickLog022),
@@ -241,6 +246,7 @@ struct QuickLogSheet: View {
       case .noIncludedSets:
         break
       case .partialFailure(let writtenCount, _):
+        hasSavedRecords = hasSavedRecords || writtenCount > 0
         failureAlert = QuickLogFailureAlert(
           message: StudentStrings.replacing(
             .quickLog023,
@@ -248,6 +254,7 @@ struct QuickLogSheet: View {
           )
         )
       case .completionFailed:
+        hasSavedRecords = true
         viewModel.clearActionError()
         failureAlert = QuickLogFailureAlert(message: StudentStrings.localized(.quickLog024))
       }
@@ -302,7 +309,7 @@ private struct QuickLogNavigationBar: View {
               .frame(minHeight: MeetPRSpacing.minimumHitTarget)
           }
         )
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .disabled(isDismissDisabled)
 
         Spacer()
@@ -467,7 +474,7 @@ private struct QuickLogExerciseCard: View {
           )
         }
       )
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
     } else {
       VStack(spacing: MeetPRSpacing.space2) {
         QuickLogExerciseHeader(
@@ -596,7 +603,7 @@ private struct QuickLogSetRow: View {
             .frame(width: MeetPRSpacing.point32, height: MeetPRSpacing.minimumHitTarget)
         }
       )
-      .buttonStyle(.plain)
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel(StudentStrings.localized(.quickLog011))
       .accessibilityValue("\(SetDisplayNumber.number(for: row.draft))")
       .accessibilityAddTraits(row.included ? .isSelected : [])
@@ -644,7 +651,7 @@ private struct QuickLogSetRow: View {
         .clipShape(.rect(cornerRadius: MeetPRRadius.control))
       }
     )
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(!row.included)
     .accessibilityLabel(QuickLogCellLabel.text(for: row, field: field))
     .accessibilityValue(unit.map { "\(value) \($0)" } ?? value)
