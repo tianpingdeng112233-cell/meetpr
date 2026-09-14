@@ -11,6 +11,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
   public let exerciseID: UUID?
   public let setIndex: Int
   public let loggedAt: Date
+  public let loggedDate: String?
   public let weightKg: Decimal
   public let reps: Int
   public let rpe: Decimal?
@@ -26,6 +27,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     exerciseID: UUID? = nil,
     setIndex: Int,
     loggedAt: Date,
+    loggedDate: String? = nil,
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
@@ -40,6 +42,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     self.exerciseID = exerciseID
     self.setIndex = setIndex
     self.loggedAt = loggedAt
+    self.loggedDate = loggedDate
     self.weightKg = weightKg
     self.reps = reps
     self.rpe = rpe
@@ -57,6 +60,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     exerciseID = try container.decodeIfPresent(UUID.self, forKey: .exerciseID)
     setIndex = try container.decode(Int.self, forKey: .setIndex)
     loggedAt = try container.decode(Date.self, forKey: .loggedAt)
+    loggedDate = try container.decodeIfPresent(String.self, forKey: .loggedDate)
     weightKg = try container.decodeDecimal(forKey: .weightKg)
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
@@ -74,6 +78,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     try container.encodeIfPresent(exerciseID, forKey: .exerciseID)
     try container.encode(setIndex, forKey: .setIndex)
     try container.encode(loggedAt, forKey: .loggedAt)
+    try container.encodeIfPresent(loggedDate, forKey: .loggedDate)
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
@@ -83,6 +88,66 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     try container.encode(assumed, forKey: .assumed)
   }
 
+  /// Gym-day cutoff shared with the backend `trainingDay` (04:00 local):
+  /// a set logged before 04:00 belongs to the previous calendar day.
+  public static let gymDayCutoffHour = 4
+
+  /// The training day this log belongs to: the server-assigned `loggedDate`
+  /// when present, else the gym-day of `loggedAt`.
+  public func loggedDay(calendar: Calendar = .current) -> Date {
+    if let loggedDate, let day = Self.parseLoggedDate(loggedDate, calendar: calendar) {
+      return day
+    }
+    return Self.gymDay(of: loggedAt, calendar: calendar)
+  }
+
+  /// A backfilled log (spec 081 补记) carries a `loggedDate` that is not the
+  /// gym-day of its server write timestamp. Anchor such logs at local noon of
+  /// the training day so day-bucketed consumers place them on the day the
+  /// student trained, not the day they opened the app. Live logs — whose
+  /// `loggedDate` matches the gym-day of `loggedAt` — keep the exact timestamp.
+  public static func resolvedLoggedAt(
+    serverLoggedAt: Date,
+    loggedDate: String?,
+    calendar: Calendar = .current
+  ) -> Date {
+    guard let loggedDate, let day = parseLoggedDate(loggedDate, calendar: calendar),
+      gymDay(of: serverLoggedAt, calendar: calendar) != day
+    else { return serverLoggedAt }
+    return localNoon(of: day, calendar: calendar) ?? serverLoggedAt
+  }
+
+  /// Local noon of the calendar day containing `day` (DST-safe: set the hour,
+  /// never add 12 hours).
+  public static func localNoon(of day: Date, calendar: Calendar) -> Date? {
+    calendar.date(bySettingHour: 12, minute: 0, second: 0, of: calendar.startOfDay(for: day))
+  }
+
+  /// Same rule as `WorkoutDatePolicy`: before the cutoff hour the set belongs
+  /// to the previous calendar day. Uses the local hour component, so DST
+  /// transitions never shift the boundary.
+  public static func gymDay(of date: Date, calendar: Calendar) -> Date {
+    let today = calendar.startOfDay(for: date)
+    guard calendar.component(.hour, from: date) < gymDayCutoffHour else { return today }
+    return calendar.date(byAdding: .day, value: -1, to: today).map(calendar.startOfDay) ?? today
+  }
+
+  static func parseLoggedDate(_ value: String, calendar: Calendar) -> Date? {
+    let parts = value.split(separator: "-").compactMap { Int($0) }
+    guard parts.count == 3 else { return nil }
+    // The API's YYYY-MM-DD is Gregorian even when the device displays another
+    // calendar. Preserve the caller's time zone when resolving its local day.
+    var wireCalendar = Calendar(identifier: .gregorian)
+    wireCalendar.timeZone = calendar.timeZone
+    var components = DateComponents()
+    components.calendar = wireCalendar
+    components.timeZone = wireCalendar.timeZone
+    components.year = parts[0]
+    components.month = parts[1]
+    components.day = parts[2]
+    return wireCalendar.date(from: components).map { wireCalendar.startOfDay(for: $0) }
+  }
+
   private enum CodingKeys: String, CodingKey {
     case id
     case studentID = "studentId"
@@ -90,6 +155,7 @@ public struct StudentSetLog: Codable, Hashable, Sendable, Identifiable {
     case exerciseID = "exerciseId"
     case setIndex
     case loggedAt
+    case loggedDate
     case weightKg
     case reps
     case rpe
