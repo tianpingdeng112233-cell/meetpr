@@ -43,6 +43,8 @@ public struct TodayWorkoutView: View {
   @State private var preparingVideoSetID: UUID?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
+  @State private var showingHistory = false
+  @State private var historyViewModel: TrainingHistoryViewModel
   @State private var showingNotifications = false
   @State private var conversationID: UUID?
   @State private var setRefPickerRoute: SetRefPickerRoute?
@@ -127,6 +129,7 @@ public struct TodayWorkoutView: View {
         restTimerActivityController: restTimerActivityController
       )
     )
+    self._historyViewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness)
     )
@@ -181,6 +184,7 @@ public struct TodayWorkoutView: View {
         onRefresh: {
           Task { await loadWorkout(for: selectedDayID) }
         },
+        onHistory: { showingHistory = true },
         onReadiness: {
           showingReadinessSheet = true
         },
@@ -216,6 +220,9 @@ public struct TodayWorkoutView: View {
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
       #endif
+      .navigationDestination(isPresented: $showingHistory) {
+        AllHistoryScreen(viewModel: historyViewModel, studentID: studentID)
+      }
       .modifier(
         OptionalStudentNotificationHostModifier(
           coordinator: notifications,

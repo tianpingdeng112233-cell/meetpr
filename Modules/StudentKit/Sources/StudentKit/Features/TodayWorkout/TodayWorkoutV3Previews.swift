@@ -41,6 +41,7 @@
         sequenceContent: EmptyView(),
         calendarContent: TrainingCalendarPreview(month: state == .month),
         onRefresh: {},
+        onHistory: {},
         onReadiness: {},
         onNotifications: {},
         onMessageCoach: {},

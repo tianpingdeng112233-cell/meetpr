@@ -216,3 +216,32 @@ extension StudentPlanView {
     }?.exercise.id
   }
 }
+
+@MainActor
+@Test func dailyNodeDetailUsesThatDaysWinnerRatherThanTheHeadline() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = StudentDemoSeed.makePlanView()
+  let squatID = try #require(plan.mainLiftIDForGrowthTests(for: .squat))
+  let now = Date(timeIntervalSince1970: 1_768_262_400)
+  let record = growthPoint(
+    studentID: studentID, exerciseID: squatID, daysAgo: 15, e1RM: 155, now: now)
+  let weaker = growthPoint(
+    studentID: studentID, exerciseID: squatID, daysAgo: 8, e1RM: 140, now: now)
+  let winner = growthPoint(
+    studentID: studentID, exerciseID: squatID, daysAgo: 8, e1RM: 150, now: now)
+  let latest = growthPoint(
+    studentID: studentID, exerciseID: squatID, daysAgo: 1, e1RM: 150, now: now)
+  let viewModel = GrowthCurveViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    e1rm: InMemoryE1RMRepository(seedPoints: [record, weaker, winner, latest]),
+    now: { now }
+  )
+  await viewModel.load(studentID: studentID)
+  #expect(
+    viewModel.visibleDailyBestSamples.map(\.winnerPointID) == [record.id, winner.id, latest.id])
+  let detail = try #require(viewModel.detail(forPointID: winner.id, logs: [], days: plan.days))
+  #expect(detail.id == winner.id)
+  #expect(detail.date == winner.computedAt)
+  #expect(detail.point.e1RMKg == 150)
+  #expect(viewModel.headlinePoint(for: .squat)?.e1RMKg == 155)
+}

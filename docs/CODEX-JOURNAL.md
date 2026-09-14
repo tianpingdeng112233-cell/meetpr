@@ -5,6 +5,16 @@
 > **格式**:`- YYYY-MM-DD <short-sha> — 一句话改了什么(牵动的模块)`
 > 密钥/密码永不入此文件。
 
+## 独立实装分支（未进入发版线）
+
+- 2026-09-14 cc8efa53 — [Codex][T2/P1] Add e1RM source details and training history navigation：学员端每日最佳节点可查来源组和原计算，训练页直达历史并保留活动组/休息计时；869 测试、DemoStudent 双主题实点、strict lint/format 通过；Standards/Spec 独立审查 CLEAN。分支 `feat/083-e1rm-history-impl` 待合并，证据 `docs/evidence/083-e1rm-history/`，原型保留设计分支。
+
+## 独立设计分支（未进入发版线）
+
+- 2026-09-14 876600a — [Codex][设计反馈] Spec 083 原型非末尾节点半径 4→2.7、描边 1.7→1.3；末点与点击范围保持，悬停仍维持大小层级；浏览器截图亲验，spec 同步。
+
+- 2026-09-14 abdff9b — [Codex][P1][待看稿] Spec 083 e1RM 节点溯源与训练历史入口：产品行为写入 spec，ImageGen 概念稿与双主题交互 HTML 已浏览器实点；分支 `feat/083-e1rm-history`，等待 David 确认设计，无 Swift／后端／发布改动。
+
 ## release/1.0(1.0(8) 累积线)
 
 - 2026-08-20 bdc9ab45 — [Claude][P0] 修「记录完成后消失」:推进制下实际训练晚于排期,今日页/周历的计划内 set_logs 拉取窗口钉死在 [首排期日-1d, 末排期日+1d],越过排期终点后新记的组全落窗口外 → 显示 0/N 已记录、重量『丢失』(服务端数据全程完好,staging 已核实倪嘉骏 08-19/08-20 全部在库);窗口上界改 max(末排期日, 今天)+1d,WeekOverviewViewModel 注入可测时钟(StudentKit 2 源文件+2 回归测试;774 测试绿 + swiftlint strict;Global 配置同分支同覆盖,main 为 071 前旧形态无此病不落)

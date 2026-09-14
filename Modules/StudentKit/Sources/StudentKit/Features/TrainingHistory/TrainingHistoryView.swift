@@ -27,6 +27,7 @@ public struct TrainingHistoryView: View {
   @State private var ranges: [LiftFamily: GrowthTimeRange] = [:]
   @State private var snapshots: [LiftFamily: GrowthCurveSnapshot] = [:]
   @State private var showsAllHistory = false
+  @State private var selectedDetail: GrowthE1RMDetail?
   @State private var showsFeedbackArchive = false
   @State private var showsNotifications = false
   @State private var conversationID: UUID?
@@ -82,7 +83,7 @@ public struct TrainingHistoryView: View {
       .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $showsAllHistory) {
-        AllHistoryScreen(viewModel: viewModel)
+        AllHistoryScreen(viewModel: viewModel, studentID: studentID)
       }
       .modifier(
         OptionalStudentNotificationHostModifier(
@@ -98,6 +99,9 @@ public struct TrainingHistoryView: View {
       }
     }
     .background(Color.MeetPR.bgBase)
+    .sheet(item: $selectedDetail) { detail in
+      GrowthE1RMDetailSheet(detail: detail)
+    }
     .feedbackArchiveCover(
       isPresented: $showsFeedbackArchive,
       studentID: studentID,
@@ -136,7 +140,8 @@ public struct TrainingHistoryView: View {
           range: range(for: family),
           isGlobalTrainingEmpty: isZeroTraining,
           onOpenToday: onOpenToday,
-          onCycleRange: { cycleRange(for: family) }
+          onCycleRange: { cycleRange(for: family) },
+          onSelectPoint: showDetail
         )
       }
 
@@ -229,6 +234,13 @@ public struct TrainingHistoryView: View {
       return 0
     }
     return items.count
+  }
+
+  private func showDetail(pointID: UUID) {
+    guard case .loaded(let weeks, let logs) = viewModel.state else { return }
+    selectedDetail = growthViewModel.detail(
+      forPointID: pointID, logs: logs, days: weeks.flatMap(\.days)
+    )
   }
 
   private func snapshot(for family: LiftFamily) -> GrowthCurveSnapshot {
@@ -581,23 +593,4 @@ private struct GrowthFailureCard: View {
   }
 }
 
-/// Existing detailed week/set history retained behind the v3 entry card.
-@available(iOS 17.0, macOS 14.0, *)
-private struct AllHistoryScreen: View {
-  let viewModel: TrainingHistoryViewModel
-  @State private var selectedExerciseName: String?
-
-  var body: some View {
-    Group {
-      if case .loaded(let weeks, let logs) = viewModel.state {
-        HistoryEntriesView(weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName)
-      } else {
-        ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
-      }
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color.MeetPR.bgBase)
-    .navigationTitle(StudentStrings.localized(.trainingHistoryView024))
-  }
-}
 // swiftlint:enable file_length
