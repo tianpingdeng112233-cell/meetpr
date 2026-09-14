@@ -143,12 +143,14 @@ public final class WeekOverviewViewModel {
     for days: [StudentPlanDay],
     now: Date
   ) -> ClosedRange<Date>? {
-    guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.scheduledDate).max()
+    guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.date).max()
     else {
       return nil
     }
     // spec 071: one plan-scoped request for the whole cycle, padded one day
-    // around coach-authored recommendation dates. Sequence progression means
+    // from the earliest coach-authored date to the latest effective recommended
+    // date (spec 080: shifts only move forward, so pre-shift logs stay inside
+    // the lower bound). Sequence progression means
     // real training can run past the scheduled calendar, so the upper bound
     // clamps to today as well (P0 2026-08-20).
     return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)

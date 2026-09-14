@@ -972,11 +972,13 @@ public final class TodayWorkoutViewModel {
     for days: [StudentPlanDay],
     now: Date
   ) -> ClosedRange<Date> {
-    guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.scheduledDate).max()
+    guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.date).max()
     else { return Date.distantPast...Date.distantFuture }
-    // Sequence progression means real training can run past the plan's
-    // scheduled calendar: clamp the upper bound to today, or sets logged
-    // after the scheduled end vanish from the day view (P0 2026-08-20).
+    // Lower bound stays on the coach-authored schedule: a coach shift (spec 080)
+    // only moves recommended dates forward, and sets logged before the shift
+    // must not vanish. Sequence progression means real training can run past
+    // the recommended calendar: clamp the upper bound to today, or sets logged
+    // after the recommended end vanish from the day view (P0 2026-08-20).
     return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)
   }
 

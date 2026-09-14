@@ -340,7 +340,7 @@ public struct DashboardView: View {
     // Weekly summary counts PR events inside the loaded plan week (same
     // range as the card's session/volume stats); the acknowledgement chain
     // went dormant with the celebration banner. No loaded week → no count.
-    guard let days = weekData?.days.map(\.scheduledDate), let firstDay = days.min(),
+    guard let days = weekData?.days.map(\.date), let firstDay = days.min(),
       let lastDay = days.max()
     else {
       newPRCount = 0
