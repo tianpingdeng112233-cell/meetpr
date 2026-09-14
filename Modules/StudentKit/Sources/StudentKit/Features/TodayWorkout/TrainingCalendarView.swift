@@ -108,7 +108,7 @@ struct TrainingCalendarView: View {
     return StudentStrings.replacing(
       .trainingCalendarView005,
       values: [
-        "\(week.days.count)", "\(TrainingSequenceText.shortDate(firstDay.day.scheduledDate))",
+        "\(week.days.count)", "\(TrainingSequenceText.shortDate(firstDay.day.date))",
       ])
   }
 
@@ -133,7 +133,7 @@ struct TrainingCalendarView: View {
           Text(TrainingSequenceText.exerciseSummary(item.day))
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
             .foregroundStyle(Color.MeetPR.textMuted)
-          Text(TrainingSequenceText.recommendation(item.day.scheduledDate))
+          Text(TrainingSequenceText.recommendation(item.day.date))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
             .foregroundStyle(Color.MeetPR.textDim)
         }

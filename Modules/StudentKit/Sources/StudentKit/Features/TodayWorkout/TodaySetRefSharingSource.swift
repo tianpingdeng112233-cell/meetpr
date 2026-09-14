@@ -73,7 +73,7 @@ struct TodaySetRefSharingSource: Sendable {
           reps: log.reps,
           repsMax: nil,
           rpe: log.rpe.map(Self.decimalSource),
-          dayDate: Self.dayDate(day.scheduledDate, calendar: calendar),
+          dayDate: Self.dayDate(day.date, calendar: calendar),
           setLogId: log.id,
           planSetId: nil
         )
@@ -104,7 +104,7 @@ struct TodaySetRefSharingSource: Sendable {
             return plannedCandidate(
               set,
               exercise: exercise,
-              dayDate: Self.dayDate(day.scheduledDate, calendar: calendar)
+              dayDate: Self.dayDate(day.date, calendar: calendar)
             )
           }
       }

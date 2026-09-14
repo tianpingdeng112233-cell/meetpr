@@ -1,3 +1,4 @@
+import CoreModels
 import SwiftUI
 
 struct StudentTrainingPlanRefreshTrigger: Equatable, Sendable {
@@ -10,6 +11,11 @@ struct StudentTrainingPlanRefreshTrigger: Equatable, Sendable {
 
   mutating func handleTabSelection(_ tab: StudentTab) {
     guard tab == .training else { return }
+    revision += 1
+  }
+
+  mutating func handlePushRoute(_ route: PushRouteIntent) {
+    guard StudentNotificationRoute.route(for: route) == .plan else { return }
     revision += 1
   }
 }

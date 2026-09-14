@@ -335,7 +335,8 @@ extension CoachRootView {
     case .videoPending:
       selectedTab = .messages
       pushRoute = nil
-    case .missedTraining, .prCongrats, .bindRequest, .planShift:
+    case .missedTraining, .prCongrats, .bindRequest, .planShift, .planShifted,
+      .planShiftUndone:
       selectedTab = .students
       pushRoute = nil
     case .planUpdated, .planPublished:

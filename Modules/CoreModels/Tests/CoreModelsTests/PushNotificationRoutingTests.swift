@@ -56,6 +56,8 @@ import Testing
   let cases: [(String, PushRouteIntent)] = [
     ("plan_updated", .planUpdated(studentID: studentID, planID: planID)),
     ("plan_published", .planPublished(studentID: studentID, planID: planID)),
+    ("plan_shifted", .planShifted(studentID: studentID, planID: planID)),
+    ("plan_shift_undone", .planShiftUndone(studentID: studentID, planID: planID)),
   ]
 
   for (kind, expected) in cases {
@@ -80,6 +82,8 @@ import Testing
     PushPayloadValues(kind: "plan_shift", studentID: UUID().uuidString),
     PushPayloadValues(kind: "plan_updated", studentID: UUID().uuidString),
     PushPayloadValues(kind: "plan_published", studentID: UUID().uuidString),
+    PushPayloadValues(kind: "plan_shifted", studentID: UUID().uuidString),
+    PushPayloadValues(kind: "plan_shift_undone", studentID: UUID().uuidString),
   ]
 
   for payload in invalidPayloads {
