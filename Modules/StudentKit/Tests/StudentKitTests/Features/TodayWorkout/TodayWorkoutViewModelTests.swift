@@ -181,14 +181,19 @@ func todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(
 @MainActor
 @Test func todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let now = try Date("2026-01-20T12:00:00Z", strategy: .iso8601)
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+  let plan = StudentDemoSeed.makePlanView(today: now, selectedCalendar: calendar)
   let plans = GatedStudentPlanRepository(plan: plan)
   let logs = SnapshotCountingTrainingLogRepository()
   let e1rm = SnapshotCountingE1RMRepository()
   let viewModel = TodayWorkoutViewModel(
     plans: plans,
     logs: logs,
-    e1rm: e1rm
+    e1rm: e1rm,
+    calendar: calendar,
+    now: { now }
   )
 
   let loadTask = Task {
@@ -218,10 +223,11 @@ func todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(
 
   let fetchedRanges = await logs.fetchedRanges
   let historyRange = TodayWorkoutViewModel.lastWeightHistoryRange(before: plan.days[0].date)
-  let firstDate = try #require(plan.days.map(\.date).min())
-  let lastDate = try #require(plan.days.map(\.date).max())
-  let expectedPlanRange =
-    firstDate.addingTimeInterval(-86_400)...lastDate.addingTimeInterval(86_400)
+  // Published Jan 13, recommended Jan 17–24: the plan window includes
+  // quick-log dates from publication, with one day of padding on each end.
+  let lowerBound = try Date("2026-01-12T00:00:00Z", strategy: .iso8601)
+  let upperBound = try Date("2026-01-25T00:00:00Z", strategy: .iso8601)
+  let expectedPlanRange = lowerBound...upperBound
   #expect(fetchedRanges.count == 2)
   #expect(fetchedRanges.filter { $0 == historyRange }.count == 1)
   #expect(fetchedRanges.filter { $0 == expectedPlanRange }.count == 1)
@@ -295,22 +301,27 @@ func todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(
 @MainActor
 @Test func selectingAnotherSequenceDayReusesThePlanLogSnapshot() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let now = try Date("2026-01-20T12:00:00Z", strategy: .iso8601)
+  var calendar = Calendar(identifier: .gregorian)
+  calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+  let plan = StudentDemoSeed.makePlanView(today: now, selectedCalendar: calendar)
   let logs = SnapshotCountingTrainingLogRepository()
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(
       store: TestStudentPlanStore(seed: [studentID: plan])
     ),
-    logs: logs
+    logs: logs,
+    calendar: calendar,
+    now: { now }
   )
 
   await viewModel.load(dayID: plan.days[0].id, studentID: studentID)
   await viewModel.load(dayID: plan.days[1].id, studentID: studentID)
 
-  let firstDate = try #require(plan.days.map(\.date).min())
-  let lastDate = try #require(plan.days.map(\.date).max())
-  let expectedPlanRange =
-    firstDate.addingTimeInterval(-86_400)...lastDate.addingTimeInterval(86_400)
+  // Switching sequence days reuses the same publication-inclusive snapshot.
+  let lowerBound = try Date("2026-01-12T00:00:00Z", strategy: .iso8601)
+  let upperBound = try Date("2026-01-25T00:00:00Z", strategy: .iso8601)
+  let expectedPlanRange = lowerBound...upperBound
   #expect(await logs.fetchedRanges.filter { $0 == expectedPlanRange }.count == 1)
   guard case .loaded(let selectedDay, _) = viewModel.state else {
     Issue.record("Expected selected sequence day")

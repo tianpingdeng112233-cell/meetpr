@@ -147,6 +147,7 @@ enum StudentStrings {
     static let quickLog026 = Key("student.quickLog.copy026")
     static let quickLog027 = Key("student.quickLog.copy027")
     static let quickLog029 = Key("student.quickLog.copy029")
+    static let quickLog030 = Key("student.quickLog.copy030")
     static let dashboardE1Rmrail001 = Key("student.dashboardE1Rmrail.copy001")
     static let dashboardE1Rmrail002 = Key("student.dashboardE1Rmrail.copy002")
     static let dashboardE1Rmrail003 = Key(

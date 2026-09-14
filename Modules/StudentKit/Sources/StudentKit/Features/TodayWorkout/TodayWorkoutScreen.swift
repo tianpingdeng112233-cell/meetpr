@@ -1238,7 +1238,7 @@ private struct TodayWorkoutQuickLogEntry: View {
         .foregroundStyle(Color.MeetPR.goldText)
         .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(PressScaleButtonStyle())
     .padding(.top, MeetPRSpacing.space1)
     .accessibilityIdentifier("todayWorkout.quickLog")
   }

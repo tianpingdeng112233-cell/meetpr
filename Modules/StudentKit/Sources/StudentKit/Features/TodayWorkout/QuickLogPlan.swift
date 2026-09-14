@@ -37,15 +37,19 @@ struct QuickLogPlan: Equatable, Sendable {
     calendar: Calendar,
     automaticWeightRowIDs: Set<UUID> = []
   ) {
-    self.calendar = calendar
-    let upperBound = calendar.startOfDay(for: allowedDateRange.upperBound)
-    let requestedLowerBound = calendar.startOfDay(for: allowedDateRange.lowerBound)
+    // Wire dates use Gregorian years regardless of the device's display
+    // calendar; the training day's local time zone still belongs to the caller.
+    var wireCalendar = Calendar(identifier: .gregorian)
+    wireCalendar.timeZone = calendar.timeZone
+    self.calendar = wireCalendar
+    let upperBound = wireCalendar.startOfDay(for: allowedDateRange.upperBound)
+    let requestedLowerBound = wireCalendar.startOfDay(for: allowedDateRange.lowerBound)
     let lowerBound = min(requestedLowerBound, upperBound)
     self.allowedDateRange = lowerBound...upperBound
     self.selectedDate = Self.clampedDay(
       selectedDate,
       to: lowerBound...upperBound,
-      calendar: calendar
+      calendar: wireCalendar
     )
     self.rows = drafts.map {
       Row(draft: $0, usesAutomaticWeight: automaticWeightRowIDs.contains($0.id))
