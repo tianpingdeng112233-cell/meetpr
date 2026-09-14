@@ -5,6 +5,10 @@
 > **格式**:`- YYYY-MM-DD <short-sha> — 一句话改了什么(牵动的模块)`
 > 密钥/密码永不入此文件。
 
+## 独立实装分支（未进入发版线）
+
+- 2026-09-14 cc8efa53 — [Codex][T2/P1] Add e1RM source details and training history navigation：学员端每日最佳节点可查来源组和原计算，训练页直达历史并保留活动组/休息计时；869 测试、DemoStudent 双主题实点、strict lint/format 通过；Standards/Spec 独立审查 CLEAN。分支 `feat/083-e1rm-history-impl` 待合并，证据 `docs/evidence/083-e1rm-history/`，原型保留设计分支。
+
 ## 独立设计分支（未进入发版线）
 
 - 2026-09-14 876600a — [Codex][设计反馈] Spec 083 原型非末尾节点半径 4→2.7、描边 1.7→1.3；末点与点击范围保持，悬停仍维持大小层级；浏览器截图亲验，spec 同步。
