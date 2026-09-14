@@ -17,7 +17,7 @@ struct VideoFeedbackHeader: View {
           .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(width: MeetPRSpacing.point40, height: MeetPRSpacing.point40)
       }
-      .buttonStyle(PressScaleButtonStyle(scale: 0.94))
+      .buttonStyle(PressScaleButtonStyle())
       .meetPRCardSurface(.card, cornerRadius: MeetPRRadius.pill)
       .accessibilityLabel(CoachVideoFeedbackStrings.back)
       .accessibilityIdentifier("coach.video.back")

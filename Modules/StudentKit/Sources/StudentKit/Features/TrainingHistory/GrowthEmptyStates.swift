@@ -327,7 +327,6 @@ struct GrowthZeroTrainingState: View {
           .frame(minHeight: 40)
           .background(Color.MeetPR.ctaBackground, in: .capsule)
         }
-        .buttonStyle(.plain)
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)

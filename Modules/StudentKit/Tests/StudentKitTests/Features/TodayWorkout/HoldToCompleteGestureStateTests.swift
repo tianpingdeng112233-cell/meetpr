@@ -3,6 +3,13 @@ import Testing
 @testable import StudentKit
 
 @Suite struct HoldToCompleteGestureStateTests {
+  @Test func holdHapticsGrowFromLightToHeavyWithoutLosingIntensity() {
+    let feedback = (1...7).map(HoldToCompleteHapticSchedule.feedback(forStep:))
+
+    #expect(feedback.map(\.weight) == [.light, .light, .medium, .medium, .medium, .heavy, .heavy])
+    #expect(feedback.map(\.intensity) == feedback.map(\.intensity).sorted())
+  }
+
   @Test func movingBackInsideAfterLeavingBoundsDoesNotRestartHold() {
     var state = HoldToCompleteGestureState()
 

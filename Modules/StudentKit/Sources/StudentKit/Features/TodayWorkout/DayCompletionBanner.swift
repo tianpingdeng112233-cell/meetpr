@@ -28,9 +28,9 @@ struct DayCompletionBanner: View {
         RoundedRectangle(cornerRadius: MeetPRRadius.control)
           .stroke(Color.MeetPR.successRGB.opacity(0.4), lineWidth: 1)
       }
+      .meetPRShimmer()
       .clipShape(.rect(cornerRadius: MeetPRRadius.control))
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(StudentStrings.replacing(.dayCompletionBanner003, values: ["\(totalSets)"]))
   }
 }

@@ -144,7 +144,6 @@ struct TrainingCalendarView: View {
       .contentShape(.rect)
       .background(item.isSelected ? Color.MeetPR.goldRGB.opacity(0.08) : Color.clear)
     }
-    .buttonStyle(.plain)
   }
 
   @ViewBuilder
@@ -201,7 +200,6 @@ private struct TrainingWeekHeader: View {
       .clipShape(.rect(cornerRadius: 12))
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
   }
 }
 

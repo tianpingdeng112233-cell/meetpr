@@ -21,7 +21,7 @@ struct CoachProfileSheetScaffold<Content: View>: View {
             .meetPRCardSurface(.card)
             .clipShape(.circle)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.94))
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel(CoachMyProfileStrings.cancel)
         .accessibilityIdentifier("coach.profile.sheet.back")
 

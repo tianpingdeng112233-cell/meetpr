@@ -66,7 +66,6 @@ struct PlanningRecentPublishedSection: View {
         } label: {
           PlanningWorkspacePublishedRow(row: row)
         }
-        .buttonStyle(.plain)
       }
     }
   }

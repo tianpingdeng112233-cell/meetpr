@@ -42,7 +42,6 @@ public struct GlobalLoginView: View {
                     .stroke(Color.MeetPR.borderSubtle, lineWidth: MeetPRSpacing.point1)
                 }
             }
-            .buttonStyle(.plain)
             .disabled(viewModel.isSubmitting)
             .accessibilityIdentifier("global.login.google")
 

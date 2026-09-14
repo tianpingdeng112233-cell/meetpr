@@ -239,7 +239,7 @@ private struct CoachTodoCard: View {
         } label: {
           CoachTodoRow(item: item, showsTopBorder: index > 0)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+        .buttonStyle(PressScaleButtonStyle())
       }
     }
     .meetPRCardSurface(.card)
@@ -376,7 +376,7 @@ private struct CoachWeekOverviewCard: View {
           } label: {
             CoachWeekOverviewRow(row: row)
           }
-          .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+          .buttonStyle(PressScaleButtonStyle())
         }
       } else {
         Text(CoachTodayStrings.noTrainingDaysThisWeek)
@@ -400,7 +400,7 @@ private struct CoachWeekOverviewCard: View {
         .frame(maxWidth: .infinity)
         .contentShape(.rect)
       }
-      .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+      .buttonStyle(PressScaleButtonStyle())
     }
     .padding(.horizontal, MeetPRSpacing.space4)
     .padding(.top, MeetPRSpacing.point15)

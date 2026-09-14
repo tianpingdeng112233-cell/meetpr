@@ -29,7 +29,6 @@ struct SetEntryRPEScale: View {
   /// both endings, so a cancelled scrub drops the bubble immediately instead of
   /// leaving it stranded until the next touch.
   @GestureState private var isTouchDown = false
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   init(value: Binding<Double>, placeholder: String? = nil) {
     self._value = value
@@ -117,17 +116,11 @@ struct SetEntryRPEScale: View {
         if isScrubbing {
           scrubBubble
             .offset(x: bubbleOffset(stripWidth: proxy.size.width), y: -MeetPRSpacing.point36)
-            // The strip's easeOut belongs to the bars. Inheriting it here made
-            // the bubble chase the finger a frame-run behind on a fast scrub.
-            .animation(nil, value: activeValue)
             .allowsHitTesting(false)
-            .transition(.opacity)
         }
       }
     }
     .frame(height: 48)
-    .animation(reduceMotion ? nil : MeetPRMotion.easeOut, value: activeValue)
-    .animation(reduceMotion ? nil : MeetPRMotion.easeOut, value: isScrubbing)
     .sensoryFeedback(.selection, trigger: activeValue)
   }
 

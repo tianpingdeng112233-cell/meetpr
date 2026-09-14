@@ -116,7 +116,6 @@ private struct MainLiftPickerRow: View {
           .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
           .contentShape(.rect)
         }
-        .buttonStyle(.plain)
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityLabel(
           CoachPlanningStrings.mainLiftVariationLabel(
@@ -189,7 +188,6 @@ private struct VariantPickerSheet: View {
           }
           .contentShape(.rect)
         }
-        .buttonStyle(.plain)
       }
       .listStyle(.plain)
       .searchable(text: $searchText, prompt: CoachPlanningStrings.search)

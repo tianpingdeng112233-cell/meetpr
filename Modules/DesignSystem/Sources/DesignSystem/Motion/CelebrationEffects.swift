@@ -1,10 +1,15 @@
 import SwiftUI
 
 public struct CelebrationEffects: View {
+  private let onStamp: @MainActor () -> Void
+
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var startedAt: Date?
+  @State private var didStamp = false
 
-  public init() {}
+  public init(onStamp: @escaping @MainActor () -> Void = {}) {
+    self.onStamp = onStamp
+  }
 
   public var body: some View {
     TimelineView(.animation(minimumInterval: 1 / 60, paused: reduceMotion)) { context in
@@ -30,6 +35,16 @@ public struct CelebrationEffects: View {
     }
     .onChange(of: reduceMotion) { _, isOn in
       if isOn { startedAt = .distantPast }
+    }
+    .task(id: reduceMotion) {
+      guard !didStamp else { return }
+      if !reduceMotion {
+        try? await Task.sleep(for: .seconds(MeetPRMotion.durationStamp))
+        guard !Task.isCancelled else { return }
+      }
+      guard !didStamp else { return }
+      didStamp = true
+      onStamp()
     }
     .accessibilityHidden(true)
   }

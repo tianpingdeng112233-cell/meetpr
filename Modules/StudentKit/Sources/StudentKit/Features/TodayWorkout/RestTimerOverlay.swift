@@ -49,7 +49,6 @@ struct RestTimerOverlay: View {
       guard !Task.isCancelled else { return }
       onSkip()
     }
-    .transition(.move(edge: .bottom).combined(with: .opacity))
   }
 
   private func countdown(remaining: TimeInterval) -> some View {

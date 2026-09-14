@@ -124,7 +124,6 @@ struct ImportReviewSheet: View {
           Spacer()
         }
       }
-      .buttonStyle(.plain)
 
       if week.wrappedValue.isSelected {
         ForEach(week.days) { $day in

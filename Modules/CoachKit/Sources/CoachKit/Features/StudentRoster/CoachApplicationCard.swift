@@ -49,7 +49,7 @@ struct CoachApplicationCard: View {
           .frame(maxWidth: .infinity)
           .padding(.vertical, MeetPRSpacing.space3)
           .background(Color.MeetPR.textPrimary, in: .capsule)
-          .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+          .buttonStyle(PressScaleButtonStyle())
 
         Button(CoachRosterStrings.viewProfile, action: onViewProfile)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
@@ -60,7 +60,7 @@ struct CoachApplicationCard: View {
             Capsule()
               .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
           }
-          .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+          .buttonStyle(PressScaleButtonStyle())
 
         Button(action: onReject) {
           Image(systemName: "xmark")
@@ -73,7 +73,7 @@ struct CoachApplicationCard: View {
                 .stroke(Color.MeetPR.borderDefault, lineWidth: MeetPRSpacing.point1)
             }
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel(CoachRosterStrings.reject)
       }
       .padding(.top, MeetPRSpacing.point13)

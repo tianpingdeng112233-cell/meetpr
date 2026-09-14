@@ -50,7 +50,6 @@ struct VideoFeedbackPlayerCard: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size14))
             .foregroundStyle(.white)
           }
-          .buttonStyle(.plain)
           .accessibilityIdentifier("coach.video.retry")
         }
       }

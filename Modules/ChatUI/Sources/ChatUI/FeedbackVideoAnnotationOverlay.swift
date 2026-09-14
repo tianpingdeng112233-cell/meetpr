@@ -32,7 +32,6 @@ struct FeedbackVideoAnnotationOverlay: View {
       .background(Color.black)
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(ChatStrings.closeAnnotation)
     .accessibilityIdentifier("feedback.video.annotationOverlay")
   }

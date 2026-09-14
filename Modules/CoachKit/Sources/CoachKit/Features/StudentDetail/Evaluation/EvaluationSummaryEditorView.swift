@@ -172,7 +172,6 @@ struct EvaluationSummaryEditorView: View {
             .padding(.bottom, 4)
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
         .disabled(!viewModel.canSave || viewModel.isSaving)
       }
     }
@@ -214,7 +213,6 @@ struct EvaluationSummaryEditorView: View {
       .padding(.bottom, 14)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(CoachStudentDetailStrings.text("coach.evaluation.summary.notifyStudent"))
     .accessibilityValue(
       CoachStudentDetailStrings.text(

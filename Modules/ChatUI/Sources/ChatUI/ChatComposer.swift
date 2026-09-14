@@ -117,7 +117,6 @@ public struct ChatComposer: View {
             }
           }
       }
-      .buttonStyle(.plain)
       .disabled(!canSendText)
       .accessibilityLabel(ChatStrings.send)
     }
@@ -188,7 +187,6 @@ public struct ChatComposer: View {
           }
         }
     }
-    .buttonStyle(.plain)
     .disabled(!canSendText)
     .accessibilityLabel(ChatStrings.send)
   }
@@ -293,7 +291,6 @@ private struct StagedSetRefComposerCard: View {
         Image(systemName: "xmark.circle.fill")
           .foregroundStyle(Color.MeetPR.textTertiary)
       }
-      .buttonStyle(.plain)
       .accessibilityLabel(ChatStrings.removeTrainingShare)
     }
     .padding(MeetPRSpacing.sm)

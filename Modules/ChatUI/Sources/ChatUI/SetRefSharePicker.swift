@@ -204,7 +204,6 @@ private struct SetRefCandidateList: View {
           .background(Color.MeetPR.goldCTA)
           .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
       }
-      .buttonStyle(.plain)
       .disabled(selectedCandidateID == nil)
       .accessibilityIdentifier("chat.setRef.proceed")
       .padding(MeetPRSpacing.base)
@@ -242,7 +241,6 @@ private struct SetRefCandidateRow: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .accessibilityIdentifier("chat.setRef.candidate.\(candidate.id.uuidString)")
   }
 
@@ -311,7 +309,6 @@ private struct SetRefConfirmationCard: View {
           .background(Color.MeetPR.goldCTA)
           .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
         }
-        .buttonStyle(.plain)
         .disabled(isConfirming)
         .accessibilityIdentifier("chat.setRef.confirm")
       }

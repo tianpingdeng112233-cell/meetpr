@@ -62,7 +62,6 @@ public struct SetRow: View {
         Button(action: onEdit) {
           metrics
         }
-        .buttonStyle(.plain)
       } else {
         metrics
       }
@@ -149,7 +148,6 @@ public struct SetRow: View {
         Button(action: onVideoAction) {
           videoIcon
         }
-        .buttonStyle(.plain)
         .contentShape(
           .rect.inset(
             by: -(SetRowContract.videoHitTarget - SetRowContract.cameraFrame) / 2
