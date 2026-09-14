@@ -1,11 +1,15 @@
 # CODEX-JOURNAL — David 直驱改动台账
 
 > **用途**:David 在 Codex 直驱的每笔 commit 在这里留一行,新条目在最上。
-> Claude 每次开工按全局规约读本文件 catch-up——**这里没有的改动等于不存在**。
+> 后续主代理每次开工按全局规约读本文件 catch-up——**这里没有的改动等于不存在**。
 > **格式**:`- YYYY-MM-DD <short-sha> — 一句话改了什么(牵动的模块)`
 > 密钥/密码永不入此文件。
 
-## release/1.0(1.0(8) 累积线)
+## 2026-09-14 收货分支（尚未落线）
+
+- 2026-09-14 73fea6d — [Codex] 组合 #342/#341/#340，修复补记日期窗口、Gregorian 日期、部分写入重试、数字键盘小数及动作清理兼容；#342 修复已回推 c21a3d7/dbcf60fa。组合 1,913 个 SwiftPM + 主工程 9 测试、DemoStudent 实点及完整 lint/format 通过；GitHub billing 与阿里云登录阻塞合并/部署。详见 [验证记录](verification-finish22-2026-09-14.md)。
+
+## release/1.0 历史落线记录
 
 - 2026-08-20 bdc9ab45 — [Claude][P0] 修「记录完成后消失」:推进制下实际训练晚于排期,今日页/周历的计划内 set_logs 拉取窗口钉死在 [首排期日-1d, 末排期日+1d],越过排期终点后新记的组全落窗口外 → 显示 0/N 已记录、重量『丢失』(服务端数据全程完好,staging 已核实倪嘉骏 08-19/08-20 全部在库);窗口上界改 max(末排期日, 今天)+1d,WeekOverviewViewModel 注入可测时钟(StudentKit 2 源文件+2 回归测试;774 测试绿 + swiftlint strict;Global 配置同分支同覆盖,main 为 071 前旧形态无此病不落)
 - 2026-08-12 a3273c0 — [Claude][P1] 今日页头部日期改恒显真实今天(TimelineView 跨午夜自翻篇):原钉在游标日教练排期 scheduledDate,学员落后/当日完成后整页看着冻在旧日期,外测学员 08-12 报「卡在 8.9」;设计正典 sequence-handoff todayStr 三场景均为真实今天,推荐日期只留训练日卡(StudentKit 3 源文件+1 测试 +36/-16;731 测试绿 + swiftlint strict;review-loop 1 轮 1 BLOCKER 修复收敛;DemoStudent 模拟器亲验落后盘头部显 8月12日·周三)
