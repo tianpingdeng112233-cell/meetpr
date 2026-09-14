@@ -1,6 +1,6 @@
 # Spec 083 — e1RM 节点溯源与训练历史入口
 
-- 状态：Draft；产品行为已由 David 于 2026-09-14 确认，正式双主题交互设计待看稿。
+- 状态：Implemented，待 PR 合并；产品行为与缩小历史节点后的双主题交互设计已由 David 于 2026-09-14 确认，已授权实装。
 - 级别／节奏：T2 / P1；基于 `release/1.0`，本稿不代表已进入发版候选。
 - 基线：`202e95dbbf88baf5778f2329f206f34e117a4dd0`，2026-09-14 已核远端。
 - 开工先读已有 `CONTEXT.md`。范围为学员端，复用当前数据与计算规则。
@@ -53,13 +53,13 @@
 
 ## 验收
 
-- [ ] 一周一条有效估算只出现一周一个真实节点，无合成日期节点。
-- [ ] 同日多个有效组显示当日最佳来源；不同日同值仍能分别查看。
-- [ ] 选中历史节点的日期、组、RPE、算式和结果相互一致，不误用卡片大数或末点。
-- [ ] 原始组缺失、导入记录、教练校准与 fallback 都有诚实的来源说明。
-- [ ] 训练页可直接进入历史、筛选动作、返回训练且状态保持。
-- [ ] 受影响包测试、build、strict lint、format 通过；Standards／Spec 独立审查收敛。
-- [ ] DemoStudent 双主题实点与截图；持久化兼容用已有历史 fixture 验证，Demo 不冒充真实后端验收。
+- [x] 一周一条有效估算只出现一周一个真实节点，无合成日期节点。
+- [x] 同日多个有效组显示当日最佳来源；不同日同值仍能分别查看。
+- [x] 选中历史节点的日期、组、RPE、算式和结果相互一致，不误用卡片大数或末点。
+- [x] 原始组缺失、导入记录、教练校准与 fallback 都有诚实的来源说明。
+- [x] 训练页可直接进入历史、筛选动作、返回训练且状态保持。
+- [x] 受影响包测试、build、strict lint、format 通过；Standards／Spec 独立审查收敛。
+- [x] DemoStudent 双主题实点与截图；持久化兼容用已有历史 fixture 验证，Demo 不冒充真实后端验收。
 
 ## Out of Scope
 
@@ -67,12 +67,16 @@
 
 ## 设计产物
 
-- [交互原型](../../docs/design/e1rm-history/prototype/index.html)：双主题、节点面板、训练历史往返；仅使用示例数据。
-- [设计说明与验看记录](../../docs/design/e1rm-history/README.md)：参考来源、边界与浏览器验看。
-- 分支 `feat/083-e1rm-history` 保留原型作设计讨论的一手来源；当前尚无设计批准结论，不能按已批准实装稿执行。
+- [交互原型](https://github.com/tianpingdeng112233-cell/meetpr/blob/232b37f0/docs/design/e1rm-history/prototype/index.html)：双主题、节点面板、训练历史往返；仅使用示例数据。
+- [设计说明与验看记录](https://github.com/tianpingdeng112233-cell/meetpr/blob/232b37f0/docs/design/e1rm-history/README.md)：参考来源、边界与浏览器验看。
+- 分支 `feat/083-e1rm-history` 保留原型作设计讨论的一手来源；David 已确认最终节点大小与整体交互，原生实现位于 `feat/083-e1rm-history-impl`，原型不进入发布线。
 
 ## 参考
 
 - `docs/design/handoff-v3/E1RM-CHART-POLICY-RECEIPT.md`：当前每日点与 headline 的区别。
 - `specs/050-e1rm-single-source/SPEC.md`、`specs/053-imported-history-e1rm/SPEC.md`：来源、校准与隔离约束；图表形态以较新的 policy receipt 和当前代码为准。
 - 本任务 2026-09-14 对话：已确认节点口径、全部历史入口及 spec 后独立设计阶段。
+
+## 实装验收记录
+
+[自动验证、原生截图与独立双轴审查](../../docs/evidence/083-e1rm-history/README.md)。869 项测试、DemoStudent 构建和 strict lint/format 通过；本机 Demo 验收不代表线上或后端发布。
