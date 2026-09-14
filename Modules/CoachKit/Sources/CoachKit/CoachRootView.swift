@@ -149,6 +149,7 @@ public struct CoachRootView: View {
 
   public var body: some View {
     coachTabs
+      .buttonStyle(PressScaleButtonStyle())
       .environment(\.coachVideoBadgeName, coachDisplayName)
   }
 

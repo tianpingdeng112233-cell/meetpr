@@ -104,7 +104,6 @@ struct DashboardTodayScreen: View {
         progressSegments: DashboardTodayPresentation.progressSegments(days: model.cycleDays),
         onOpenNotifications: onOpenNotifications
       )
-      .meetPRRiseIn(delay: riseDelay(index: 0))
 
       switch model.weekContentState {
       case .initial, .loading:
@@ -214,9 +213,6 @@ struct DashboardTodayScreen: View {
     )
   }
 
-  private func riseDelay(index: Int) -> TimeInterval {
-    MeetPRMotion.riseInitialDelay + (Double(index) * MeetPRMotion.riseStagger)
-  }
 }
 
 @available(iOS 17.0, macOS 14.0, *)

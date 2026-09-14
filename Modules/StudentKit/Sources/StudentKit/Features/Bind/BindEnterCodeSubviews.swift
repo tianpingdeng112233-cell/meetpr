@@ -86,7 +86,6 @@ struct BindSubmitCTA: View {
         y: MeetPRSpacing.point6
       )
     }
-    .buttonStyle(.plain)
     .disabled(isDisabled || isLoading)
     .accessibilityIdentifier("bind.enterCode.submit")
   }

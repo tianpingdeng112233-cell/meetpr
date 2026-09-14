@@ -164,7 +164,6 @@ public struct TrainingHistoryView: View {
             : StudentStrings.localized(.trainingHistoryView006)
         )
       }
-      .buttonStyle(.plain)
       .disabled(isZeroTraining)
       .opacity(isZeroTraining ? 0.55 : 1)
       .accessibilityHint(StudentStrings.localized(.trainingHistoryView007))
@@ -190,7 +189,6 @@ public struct TrainingHistoryView: View {
           subtitle: StudentStrings.replacing(.trainingHistoryView010, values: ["\(feedbackCount)"])
         )
       }
-      .buttonStyle(.plain)
     } else {
       GrowthNavigationCard(
         icon: "bubble.left",

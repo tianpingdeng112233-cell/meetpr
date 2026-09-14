@@ -102,7 +102,6 @@ struct Step4EnvironmentSection: View {
       }
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
   }
 
   /// One-line "你能做什么" summary per tier (research: 让学员一眼自判;

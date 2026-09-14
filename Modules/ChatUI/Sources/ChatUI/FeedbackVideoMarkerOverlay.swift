@@ -64,7 +64,6 @@ struct FeedbackVideoMarkerOverlay: View {
               .padding(.vertical, MeetPRSpacing.sm)
               .contentShape(.rect)
             }
-            .buttonStyle(.plain)
             .accessibilityLabel(
               (marker.annotationURL == nil ? "" : "✏️ ")
                 + ChatStrings.seekToVideoMarker(

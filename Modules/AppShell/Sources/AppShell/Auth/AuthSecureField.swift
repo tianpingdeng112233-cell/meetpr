@@ -90,7 +90,6 @@ struct AuthSecureField: View {
             .contentShape(.rect)
             .padding(-(MeetPRSpacing.minimumHitTarget - MeetPRSpacing.point34) / 2)
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(
           isPasswordVisible ? AppShellStrings.hidePassword : AppShellStrings.showPassword
         )

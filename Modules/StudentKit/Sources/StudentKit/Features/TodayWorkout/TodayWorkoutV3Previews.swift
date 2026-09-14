@@ -16,7 +16,6 @@
 
     let state: PreviewState
     @State private var collapsed: [UUID: Bool] = [:]
-    @Namespace private var namespace
 
     init(state: PreviewState) {
       self.state = state
@@ -33,10 +32,6 @@
         coachName: StudentStrings.localized(.todayWorkoutV3Previews001),
         showsAskCoach: state == .recording || state == .complete,
         isPreparingAskCoach: false,
-        namespace: namespace,
-        isLaunchTargetHidden: false,
-        heroFrameRequestToken: 0,
-        launchHeroRevealToken: 0,
         collapsedExercises: $collapsed,
         sequenceContent: EmptyView(),
         calendarContent: TrainingCalendarPreview(month: state == .month),
@@ -45,7 +40,6 @@
         onNotifications: {},
         onMessageCoach: {},
         onAskCoach: {},
-        onHeroFrameChange: { _ in },
         onStart: {},
         onEdit: { _ in },
         onVideoAction: { _ in },

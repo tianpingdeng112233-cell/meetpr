@@ -2,6 +2,7 @@ import Analytics
 import ChatUI
 import CoachKit
 import CoreModels
+import DesignSystem
 import Foundation
 import RepositoryContracts
 import StudentKit
@@ -119,6 +120,7 @@ public struct RootView: View {
   }
   public var body: some View {
     routedContent
+      .buttonStyle(PressScaleButtonStyle())
       .analyticsFrictionFeedbackPrompt()
       .modifier(AnalyticsRootModifier(session: session, mode: analyticsMode))
       .onChange(of: scenePhase) { _, phase in
@@ -201,8 +203,7 @@ public struct RootView: View {
   @ViewBuilder
   private func coachRoot(for user: User) -> some View {
     if let chatRepository {
-      // A student context carries a bound coach; the coach root must never
-      // inherit one, so require the neutral (nil) binding as well as the user.
+      // The coach root must never inherit a student-bound coach context.
       if let chat = chatSession.context, chat.currentUserID == user.id,
         chatSession.activeStudentCoachID == nil
       {

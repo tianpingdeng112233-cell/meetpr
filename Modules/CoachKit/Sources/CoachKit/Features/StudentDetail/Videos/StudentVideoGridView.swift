@@ -138,7 +138,7 @@ struct StudentVideoGridView: View {
       .padding(MeetPRSpacing.space3)
       .meetPRCardSurface(.card)
     }
-    .buttonStyle(PressScaleButtonStyle(scale: 0.98))
+    .buttonStyle(PressScaleButtonStyle())
     .disabled(viewModel.loadingVideoID == video.id)
     .accessibilityIdentifier("coach.detail.video.\(video.id.uuidString)")
   }

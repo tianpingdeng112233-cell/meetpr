@@ -168,7 +168,6 @@ struct GlobalAuthButton: View {
         y: MeetPRSpacing.point6
       )
     }
-    .buttonStyle(.plain)
     .disabled(isDisabled)
   }
 }

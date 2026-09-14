@@ -57,7 +57,7 @@ struct StudentOnboardingProfileView: View {
           .meetPRCardSurface(.card)
           .clipShape(.circle)
       }
-      .buttonStyle(PressScaleButtonStyle(scale: 0.94))
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel(CoachApplicationProfileStrings.back)
       .accessibilityIdentifier("coach.applicationProfile.back")
 
@@ -160,7 +160,7 @@ struct StudentOnboardingProfileView: View {
         .padding(.vertical, MeetPRSpacing.point14)
         .background(Color.MeetPR.textPrimary)
         .clipShape(.capsule)
-        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityIdentifier("coach.applicationProfile.accept")
 
       Button(CoachApplicationProfileStrings.ignore, action: onReject)
@@ -172,7 +172,7 @@ struct StudentOnboardingProfileView: View {
           Capsule()
             .stroke(Color.MeetPR.borderDefault, lineWidth: MeetPRSpacing.point1)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityIdentifier("coach.applicationProfile.ignore")
     }
   }

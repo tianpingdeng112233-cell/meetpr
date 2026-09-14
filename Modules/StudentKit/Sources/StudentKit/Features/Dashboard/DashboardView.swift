@@ -17,8 +17,6 @@ public struct DashboardView: View {
   private let feedbackViewModel: FeedbackInboxViewModel
   private let notifications: StudentNotificationsCoordinator?
   private let onStartWorkout: (TodayWorkoutPlanHandoff?) -> Void
-  private let onStartWorkoutFrameChange: (CGRect) -> Void
-  private let isStartWorkoutHidden: Bool
   private let onOpenPlanNotification: () -> Void
   private let planProjectionUpdate: StudentPlanView?
   private let onPlanChanged: (StudentPlanView) -> Void
@@ -47,8 +45,6 @@ public struct DashboardView: View {
     feedbackViewModel: FeedbackInboxViewModel,
     notifications: StudentNotificationsCoordinator? = nil,
     onStartWorkout: @escaping (TodayWorkoutPlanHandoff?) -> Void,
-    onStartWorkoutFrameChange: @escaping (CGRect) -> Void = { _ in },
-    isStartWorkoutHidden: Bool = false,
     onOpenPlanNotification: @escaping () -> Void = {},
     todayReloadToken: Int = 0,
     todayVolatileReloadToken: Int = 0,
@@ -63,8 +59,6 @@ public struct DashboardView: View {
     self.feedbackViewModel = feedbackViewModel
     self.notifications = notifications
     self.onStartWorkout = onStartWorkout
-    self.onStartWorkoutFrameChange = onStartWorkoutFrameChange
-    self.isStartWorkoutHidden = isStartWorkoutHidden
     self.onOpenPlanNotification = onOpenPlanNotification
     self.todayReloadToken = todayReloadToken
     self.todayVolatileReloadToken = todayVolatileReloadToken
@@ -126,9 +120,7 @@ public struct DashboardView: View {
         if let day = stickyStartDay {
           DashboardPrimaryAction(
             day: day,
-            onStart: startCursorWorkout,
-            onStartFrameChange: onStartWorkoutFrameChange,
-            isStartHidden: isStartWorkoutHidden
+            onStart: startCursorWorkout
           )
           .padding(.horizontal, 20)
           .padding(.top, 10)

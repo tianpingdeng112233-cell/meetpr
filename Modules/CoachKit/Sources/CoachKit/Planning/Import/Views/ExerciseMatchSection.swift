@@ -48,7 +48,6 @@ struct ExerciseMatchSection: View {
                     .background(Color.MeetPR.surface2)
                     .clipShape(.capsule)
                 }
-                .buttonStyle(.plain)
               }
             }
           }

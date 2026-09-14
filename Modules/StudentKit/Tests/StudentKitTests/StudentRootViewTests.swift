@@ -143,21 +143,6 @@ import Testing
   #expect(trigger.revision == 2)
 }
 
-@Test func feedbackHeightReversalStartsFromCurrentPresentation() {
-  #expect(
-    FeedbackHeightTransition.resolvedStartHeight(
-      presentedHeight: 184,
-      fallbackHeight: 320
-    ) == 184
-  )
-  #expect(
-    FeedbackHeightTransition.resolvedStartHeight(
-      presentedHeight: 0,
-      fallbackHeight: 112
-    ) == 112
-  )
-}
-
 @Test func importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() {
   let current = pendingReview(family: .squat)
   let waiting = pendingReview(family: .bench)

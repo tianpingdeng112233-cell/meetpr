@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 
 #if os(iOS)
@@ -54,7 +55,7 @@ extension View {
     #if os(iOS)
       CoachTabAccessibilityHost(
         id: layer.id,
-        rootView: self,
+        rootView: self.buttonStyle(PressScaleButtonStyle()),
         store: store,
         accessibilityElementsHidden: layer.isAccessibilityHidden
       )

@@ -281,7 +281,6 @@
         .foregroundStyle(Color.MeetPR.gold500)
         .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point56)
       }
-      .buttonStyle(.plain)
       .disabled(!isEnabled)
       .background(Color.MeetPR.surfaceCard)
     }

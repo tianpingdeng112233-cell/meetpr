@@ -62,7 +62,6 @@ private struct DayChip: View {
         }
         .clipShape(.capsule)
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(title)
   }
 }

@@ -223,7 +223,6 @@ private struct FeedbackVideoCard: View {
       }
       .clipShape(.rect(cornerRadius: 12))
     }
-    .buttonStyle(.plain)
     .disabled(isLoading || action == nil)
     .accessibilityLabel(accessibilityText)
   }

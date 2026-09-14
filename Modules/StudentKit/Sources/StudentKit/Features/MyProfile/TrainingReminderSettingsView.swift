@@ -114,7 +114,6 @@ struct TrainingReminderSettingsView: View {
                 )
             }
         }
-        .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
       }
     }

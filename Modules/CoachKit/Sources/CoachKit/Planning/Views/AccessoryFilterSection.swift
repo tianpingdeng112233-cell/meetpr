@@ -146,7 +146,6 @@ private struct FilterChip: View {
         }
         .clipShape(.capsule)
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(title)
   }
 }

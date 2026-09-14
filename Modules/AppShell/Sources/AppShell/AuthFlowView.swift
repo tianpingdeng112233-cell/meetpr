@@ -1,3 +1,4 @@
+import DesignSystem
 import Networking
 import SwiftUI
 
@@ -18,5 +19,6 @@ public struct AuthFlowView: View {
         GlobalLoginView()
       }
     }
+    .buttonStyle(PressScaleButtonStyle())
   }
 }

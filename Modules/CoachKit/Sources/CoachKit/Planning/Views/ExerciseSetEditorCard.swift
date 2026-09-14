@@ -172,7 +172,6 @@ public struct ExerciseSetEditorCard: View {
             .font(Font.MeetPR.footnote)
             .foregroundStyle(Color.MeetPR.brandRed)
         }
-        .buttonStyle(.borderless)
         .accessibilityLabel(
           CoachPlanningStrings.deleteExerciseAccessibility(
             viewModel.exerciseName(for: draftExercise)
@@ -267,7 +266,6 @@ private struct OptionalRepsMaxRow: View {
         value = minimum
       }
       .font(Font.MeetPR.footnote)
-      .buttonStyle(.borderless)
     } else {
       HStack(spacing: MeetPRSpacing.sm) {
         PlanningCountPicker(
@@ -283,7 +281,6 @@ private struct OptionalRepsMaxRow: View {
           Image(systemName: "xmark.circle.fill")
             .font(.body)
         }
-        .buttonStyle(.borderless)
         .accessibilityLabel(CoachPlanningStrings.removeRepMaximum)
       }
     }

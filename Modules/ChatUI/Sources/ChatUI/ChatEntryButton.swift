@@ -24,7 +24,6 @@ public struct ChatEntryButton: View {
         }
         .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(ChatStrings.messages)
     .accessibilityValue(
       unreadCount > 0 ? "\(unreadCount) \(ChatStrings.unread)" : ""

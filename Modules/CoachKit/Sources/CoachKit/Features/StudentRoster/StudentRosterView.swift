@@ -253,7 +253,7 @@ struct StudentRosterContent: View {
     } label: {
       StudentRosterRow(row: row, now: now)
     }
-    .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+    .buttonStyle(PressScaleButtonStyle())
   }
 
   private var activeRows: [StudentRosterRowModel] {
@@ -349,7 +349,6 @@ private struct CoachRosterSearchField: View {
             .font(.MeetPR.system(size: MeetPRFontMetrics.size15))
             .foregroundStyle(Color.MeetPR.textDisabled)
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(CoachRosterStrings.clearSearch)
       }
     }

@@ -18,9 +18,6 @@ public struct TodayWorkoutView: View {
   private let jumpToTodayToken: Int
   private let uploadFailureDestination: UploadFailureDestination?
   private let uploadFailureNavigationToken: Int
-  private let isLaunchTargetHidden: Bool
-  private let heroFrameRequestToken: Int
-  private let launchHeroRevealToken: Int
   private let planRevision: Int
   private let planProjectionUpdate: StudentPlanView?
   private let planRefreshRevision: Int
@@ -28,7 +25,6 @@ public struct TodayWorkoutView: View {
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
   private let onPlanChanged: (StudentPlanView) -> Void
-  private let onHeroFrameChange: (CGRect) -> Void
   private let onReturnToToday: () -> Void
 
   @State private var viewModel: TodayWorkoutViewModel
@@ -51,7 +47,6 @@ public struct TodayWorkoutView: View {
   @State private var reviewCompleted = false
   @State private var started = false
   @State private var collapsedExercises: [UUID: Bool] = [:]
-  @Namespace private var heroNamespace
 
   private let reviewStore: any SessionReviewStore = UserDefaultsSessionReviewStore()
 
@@ -72,9 +67,6 @@ public struct TodayWorkoutView: View {
     jumpToTodayToken: Int = 0,
     uploadFailureDestination: UploadFailureDestination? = nil,
     uploadFailureNavigationToken: Int = 0,
-    isLaunchTargetHidden: Bool = false,
-    heroFrameRequestToken: Int = 0,
-    launchHeroRevealToken: Int = 0,
     planRevision: Int = 0,
     planProjectionUpdate: StudentPlanView? = nil,
     planRefreshRevision: Int = 0,
@@ -82,7 +74,6 @@ public struct TodayWorkoutView: View {
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
     onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
-    onHeroFrameChange: @escaping (CGRect) -> Void = { _ in },
     onReturnToToday: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
@@ -104,9 +95,6 @@ public struct TodayWorkoutView: View {
     self.jumpToTodayToken = jumpToTodayToken
     self.uploadFailureDestination = uploadFailureDestination
     self.uploadFailureNavigationToken = uploadFailureNavigationToken
-    self.isLaunchTargetHidden = isLaunchTargetHidden
-    self.heroFrameRequestToken = heroFrameRequestToken
-    self.launchHeroRevealToken = launchHeroRevealToken
     self.planRevision = planRevision
     self.planProjectionUpdate = planProjectionUpdate
     self.planRefreshRevision = planRefreshRevision
@@ -114,7 +102,6 @@ public struct TodayWorkoutView: View {
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onPlanChanged = onPlanChanged
-    self.onHeroFrameChange = onHeroFrameChange
     self.onReturnToToday = onReturnToToday
     self._selectedDayID = State(initialValue: planHandoff?.dayID)
     self._viewModel = State(
@@ -168,10 +155,6 @@ public struct TodayWorkoutView: View {
           ?? StudentStrings.localized(.todayWorkoutView001),
         showsAskCoach: showsSetRefEntry,
         isPreparingAskCoach: isPreparingSetRefPicker,
-        namespace: heroNamespace,
-        isLaunchTargetHidden: isLaunchTargetHidden,
-        heroFrameRequestToken: heroFrameRequestToken,
-        launchHeroRevealToken: launchHeroRevealToken,
         collapsedExercises: $collapsedExercises,
         sequenceContent: TrainingCurrentWeekSequenceView(days: viewModel.planDays),
         calendarContent: TrainingCalendarView(
@@ -191,7 +174,6 @@ public struct TodayWorkoutView: View {
           showingNotifications = true
         },
         onAskCoach: openSetRefPicker,
-        onHeroFrameChange: onHeroFrameChange,
         onStart: {
           started = true
         },
@@ -235,7 +217,6 @@ public struct TodayWorkoutView: View {
         )
       }
     }
-    .animation(MeetPRMotion.spring, value: viewModel.restTimer)
     #if os(iOS)
       .fullScreenCover(item: $editing) { target in
         setEntry(for: target)

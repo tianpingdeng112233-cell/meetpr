@@ -130,7 +130,6 @@ struct StudentBlackGoldChatView: View {
           .frame(width: MeetPRSpacing.point40, height: MeetPRSpacing.point40)
           .background(Color.MeetPR.surfaceCard, in: .circle)
       }
-      .buttonStyle(.plain)
       .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView001))
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
@@ -267,7 +266,6 @@ struct StudentBlackGoldChatView: View {
             Image(systemName: "xmark.circle.fill")
               .foregroundStyle(Color.MeetPR.textDim)
           }
-          .buttonStyle(.plain)
           .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView004))
         }
         .padding(MeetPRSpacing.space2)
@@ -305,7 +303,6 @@ struct StudentBlackGoldChatView: View {
               .frame(width: MeetPRSpacing.point34, height: MeetPRSpacing.point34)
               .background(Color.MeetPR.surfaceCard, in: .circle)
           }
-          .buttonStyle(.plain)
           .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView006))
         }
 
@@ -332,7 +329,6 @@ struct StudentBlackGoldChatView: View {
               .frame(width: MeetPRSpacing.point34, height: MeetPRSpacing.point34)
               .background(Color.MeetPR.borderStrong, in: .circle)
           }
-          .buttonStyle(.plain)
           .disabled(!canSend)
           .opacity(canSend ? 1 : 0.55)
           .accessibilityLabel(StudentStrings.localized(.studentBlackGoldChatView007))
@@ -531,7 +527,6 @@ private struct StudentConversationLoadErrorState: View {
         .overlay {
           Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
         }
-        .buttonStyle(.plain)
     }
     .padding(.horizontal, MeetPRSpacing.space6)
   }
@@ -723,7 +718,6 @@ private struct StudentPlanChatCard: View {
         .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
       }
     }
-    .buttonStyle(.plain)
     .containerRelativeFrame(.horizontal) { length, _ in
       length * 0.88
     }
@@ -908,7 +902,6 @@ private struct StudentPendingMessageRow: View {
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size10, weight: .bold))
             .foregroundStyle(Color.MeetPR.danger)
           }
-          .buttonStyle(.plain)
         case .confirmed:
           EmptyView()
         }
