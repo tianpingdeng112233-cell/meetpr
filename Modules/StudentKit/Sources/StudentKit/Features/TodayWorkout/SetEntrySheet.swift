@@ -458,7 +458,11 @@ struct SetEntrySheet: View {
   // MARK: - NumberPad
 
   private func openNumberPad(_ field: MeetPRNumberPad.Field) {
-    focusedField = field == .weight ? .weight : .reps
+    switch field {
+    case .weight: focusedField = .weight
+    case .reps: focusedField = .reps
+    case .rpe: return
+    }
     activeNumberPad = field
   }
 
@@ -486,6 +490,8 @@ struct SetEntrySheet: View {
             updateWeight(Decimal(value))
           case .reps:
             repsText = Int(value).formatted()
+          case .rpe:
+            break
           }
           closeNumberPad()
         },

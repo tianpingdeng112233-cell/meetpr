@@ -33,6 +33,9 @@ public struct TodayWorkoutView: View {
   @State private var selectedDayID: UUID?
   @State private var completionPhase: WorkoutCompletionFlowPhase?
   @State private var editing: EditingTarget?
+  @State private var quickLogRoute: QuickLogRoute?
+  @State private var quickLogToastWeekCode: String?
+  @State private var quickLogToastTask: Task<Void, Never>?
   @State private var directCameraTarget: DirectCameraTarget?
   @State private var showingDirectCameraConsent = false
   @State private var showingDirectCamera = false
@@ -177,6 +180,7 @@ public struct TodayWorkoutView: View {
         onStart: {
           started = true
         },
+        onQuickLog: openQuickLog,
         onEdit: openEditor,
         onVideoAction: openVideoAction,
         onComplete: {
@@ -224,6 +228,15 @@ public struct TodayWorkoutView: View {
     #else
       .sheet(item: $editing) { target in
         setEntry(for: target)
+      }
+    #endif
+    #if os(iOS)
+      .fullScreenCover(item: $quickLogRoute) { route in
+        quickLogSheet(for: route)
+      }
+    #else
+      .sheet(item: $quickLogRoute) { route in
+        quickLogSheet(for: route)
       }
     #endif
     #if os(iOS)
@@ -404,6 +417,20 @@ public struct TodayWorkoutView: View {
         onPlanChanged(plan)
       }
     }
+    .overlay(alignment: .top) {
+      if let quickLogToastWeekCode {
+        MeetPRToastCapsule(
+          emphasizedText: quickLogToastWeekCode,
+          trailingText: StudentStrings.localized(.quickLog027)
+        )
+        .padding(.top, MeetPRSpacing.space3)
+        .transition(.move(edge: .top).combined(with: .opacity))
+      }
+    }
+    .animation(MeetPRMotion.spring, value: quickLogToastWeekCode)
+    .onDisappear {
+      quickLogToastTask?.cancel()
+    }
   }
 
   private func openUploadFailureDestination() {
@@ -562,6 +589,41 @@ public struct TodayWorkoutView: View {
       setNumber: row.record.index,
       scrollToVideo: false
     )
+  }
+
+  private func openQuickLog() {
+    guard isEditable, let currentDay, let plan = viewModel.makeQuickLogPlan() else {
+      return
+    }
+    quickLogRoute = QuickLogRoute(
+      day: currentDay,
+      weekCode: "W\(currentDay.weekNumber)D\(currentDay.dayOfWeek)",
+      plan: plan
+    )
+  }
+
+  private func quickLogSheet(for route: QuickLogRoute) -> some View {
+    QuickLogSheet(
+      day: route.day,
+      weekCode: route.weekCode,
+      plan: route.plan,
+      viewModel: viewModel,
+      onSuccess: {
+        finishQuickLog(weekCode: route.weekCode)
+      }
+    )
+  }
+
+  private func finishQuickLog(weekCode: String) {
+    quickLogRoute = nil
+    selectedDayID = StudentPlanSequence(days: viewModel.planDays).cursorDay?.id
+    quickLogToastTask?.cancel()
+    quickLogToastWeekCode = weekCode
+    quickLogToastTask = Task {
+      try? await Task.sleep(for: .seconds(2))
+      guard !Task.isCancelled else { return }
+      quickLogToastWeekCode = nil
+    }
   }
 
   private func setEntry(for target: EditingTarget) -> some View {
@@ -873,6 +935,14 @@ private struct EditingTarget: Identifiable {
   let draft: TodayWorkoutViewModel.SetRowDraft
   let setNumber: Int
   let scrollToVideo: Bool
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct QuickLogRoute: Identifiable {
+  let id = UUID()
+  let day: StudentPlanDay
+  let weekCode: String
+  let plan: QuickLogPlan
 }
 
 private struct DirectCameraTarget {

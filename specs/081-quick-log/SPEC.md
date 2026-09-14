@@ -37,7 +37,7 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
 1. 导航:左「返回」;标题「补记 · W#D#」;副标日名(如「硬拉日」)。
 2. **练的日期**行:`DatePicker`(`.date`,compact),默认今天;可选区间 =
    `[上一已完成日的 loggedDate(无则计划 publishedAt 当日), 今天]`;显示格式沿用「9/1 周二」。
-3. 动作列表(按 `sequenceIndex`),**一组一行**(⚖️09-02 David 改口径:步进式太慢):每个动作一张卡——
+3. 动作列表(顺序与汇总卡同源 = `day.exercises` 计划原序,不另按 `sequenceIndex` 排序,⚖️09-03 review 定),**一组一行**(⚖️09-02 David 改口径:步进式太慢):每个动作一张卡——
    - 头:序号胶囊 + 动作名 + 处方摘要「140kg × 5 · RPE 8」+ 右侧「N / M 记」计数;
    - 卡内就是组表,列与现有记录态组表一致(`#` / 重量 / 次数 / RPE),最右一列「记」勾选圈
      (默认全勾 = 按处方完成)。三格数值**复用** `makeDrafts` 产出的
@@ -71,7 +71,11 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
   该键——普通记录路径行为零变化;编码键名 `loggedDate` 走既有 snake-case 转换 → `logged_date`)。
   补记路径:`StudentSetLog.loggedAt` = 所选日期当地 12:00(避开 04:00 gym-day 边界,iOS 归日与
   服务端 `trainingDay(timezone)` 一致),`loggedDate` = 同一日期字符串。**`E1RMRecorder` 的
-  `now` 亦取该时刻**(e1RM 点与 PR 事件落在练的那天,不落提交日)。
+  `now` 亦取该时刻**(e1RM 点与 PR 事件落在练的那天,不落提交日)。写入回包:补记路径保留客户端
+  正午,不用服务端 `logged_at`。**刷新后**(`GET /students/:id/sets` 映射,⚖️09-03 review 定):
+  `logged_date` 与 `logged_at` 的 gym-day(04:00 cutoff,与后端 `trainingDay` 同口径)不一致的
+  记录 = 事后补记,`loggedAt` 锚到该日当地 12:00;一致的保留服务端时间戳(同日归桶无差别,
+  普通记录路径零变化)。
 - **完成**:`POST /plans/days/:dayId/complete`,与长按结算共用 `completeCurrentDay()`
   (含 `isCompletionMutationInFlight` 防重与 `applyCompletionMutation` 缓存对账)。
 - **e1RM / PR**(⚖️Q5 A):补记的组与正常记录同等——`assumed: false`,过同一套

@@ -5,6 +5,7 @@ import Testing
 @testable import StudentKit
 
 @MainActor
+// swiftlint:disable:next type_body_length
 @Suite struct TodayWorkoutPresentationTests {
   @Test func zeroLogDashboardEntryKeepsListHeroAndHidesManualCompletion() {
     let fixture = makeFixture()
@@ -69,6 +70,33 @@ import Testing
     )
 
     #expect(presentation.allowsManualCompletion)
+  }
+
+  @Test func quickLogIsAllowedOnlyForEditableListHero() {
+    let fixture = makeFixture()
+    let untouched = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+    let recording = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: true
+    )
+    let completed = TodayWorkoutPresentation(
+      day: fixture.day.replacingCompletion(completedAt: Date(), source: "manual"),
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(untouched.allowsQuickLog(isEditable: true))
+    #expect(!untouched.allowsQuickLog(isEditable: false), "future days are read-only")
+    #expect(!recording.allowsQuickLog(isEditable: true))
+    #expect(!completed.allowsQuickLog(isEditable: true))
   }
 
   @Test func completedDayKeepsReadOnlyDetailAcrossColdLaunch() {

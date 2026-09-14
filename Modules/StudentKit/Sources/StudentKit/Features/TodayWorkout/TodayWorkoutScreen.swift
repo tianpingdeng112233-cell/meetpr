@@ -41,6 +41,7 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   let onMessageCoach: () -> Void
   let onAskCoach: () -> Void
   let onStart: () -> Void
+  let onQuickLog: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
   let onComplete: () -> Void
@@ -99,6 +100,7 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
         presentation: presentation,
         isEditable: dayState.isEditable,
         onStart: onStart,
+        onQuickLog: onQuickLog,
         onEdit: onEdit,
         onVideoAction: onVideoAction,
         showsAskCoach: showsAskCoach,
@@ -397,10 +399,14 @@ private struct TrainingHeaderButton<Icon: View>: View {
   }
 }
 
+// Pre-existing hero sits at the type_body_length limit; the quick-log entry
+// itself lives in `TodayWorkoutQuickLogEntry` below (one `if` line here).
+// swiftlint:disable:next type_body_length
 private struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
   let onStart: () -> Void
+  let onQuickLog: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
   let showsAskCoach: Bool
@@ -462,6 +468,10 @@ private struct TodayWorkoutHero: View {
           icon: .none,
           action: onStart
         )
+
+        if presentation.allowsQuickLog(isEditable: isEditable) {
+          TodayWorkoutQuickLogEntry(action: onQuickLog)
+        }
       }
     }
   }
@@ -802,8 +812,12 @@ private struct TodayWorkoutRemainingPill: View {
   }
 }
 
-private struct HoldToCompleteButton: View {
+struct HoldToCompleteButton: View {
   let action: () -> Void
+  let title: String
+  let accessibilityLabel: String
+  let isEnabled: Bool
+  let isLoading: Bool
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var progress = 0.0
@@ -815,6 +829,20 @@ private struct HoldToCompleteButton: View {
   @State private var holdTask: Task<Void, Never>?
   @State private var completionTask: Task<Void, Never>?
   @State private var gestureState = HoldToCompleteGestureState()
+
+  init(
+    action: @escaping () -> Void,
+    title: String = StudentStrings.localized(.todayWorkoutScreen021),
+    accessibilityLabel: String = StudentStrings.localized(.todayWorkoutScreen022),
+    isEnabled: Bool = true,
+    isLoading: Bool = false
+  ) {
+    self.action = action
+    self.title = title
+    self.accessibilityLabel = accessibilityLabel
+    self.isEnabled = isEnabled
+    self.isLoading = isLoading
+  }
 
   var body: some View {
     ZStack {
@@ -831,26 +859,36 @@ private struct HoldToCompleteButton: View {
       }
 
       HStack(spacing: MeetPRSpacing.point9) {
-        ClockOutlineIcon()
-          .stroke(
-            Color.white,
-            style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round)
-          )
-          .frame(width: 17, height: 17)
-        Text(StudentStrings.localized(.todayWorkoutScreen021))
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        if isLoading {
+          ProgressView()
+            .tint(.white)
+        } else {
+          ClockOutlineIcon()
+            .stroke(
+              Color.white,
+              style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round)
+            )
+            .frame(width: 17, height: 17)
+          Text(title)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        }
       }
       .foregroundStyle(Color.white)
       .shadow(color: Color.black.opacity(0.45), radius: 1, y: 1)
     }
-    .frame(minHeight: 58)
+    .frame(height: MeetPRSpacing.completionControlHeight)
     .clipShape(.capsule)
     .overlay {
       Capsule().stroke(Color.MeetPR.goldRGB.opacity(0.5), lineWidth: 1)
     }
     .shadow(color: Color.MeetPR.goldRGB.opacity(0.15), radius: 10, y: 4)
+    .opacity(isEnabled ? 1 : 0.45)
     .scaleEffect((isPressing && !reduceMotion ? 0.96 : 1) * completionScale)
     .contentShape(.capsule)
+    .allowsHitTesting(isEnabled && !isLoading)
+    // `.disabled` is what makes VoiceOver read the control as unavailable;
+    // opacity + hit-testing alone still advertise an actionable button.
+    .disabled(!isEnabled || isLoading)
     .highPriorityGesture(
       DragGesture(minimumDistance: 0)
         .onChanged(handleDragChanged)
@@ -871,7 +909,7 @@ private struct HoldToCompleteButton: View {
     .sensoryFeedback(.warning, trigger: cancelFeedbackStep)
     .sensoryFeedback(.success, trigger: successFeedbackStep)
     .accessibilityElement()
-    .accessibilityLabel(StudentStrings.localized(.todayWorkoutScreen022))
+    .accessibilityLabel(accessibilityLabel)
     .accessibilityAddTraits(.isButton)
     .accessibilityAction { completeForAccessibility() }
     .onDisappear {
@@ -953,6 +991,7 @@ private struct HoldToCompleteButton: View {
   }
 
   private func completeForAccessibility() {
+    guard isEnabled, !isLoading else { return }
     holdTask?.cancel()
     isPressing = false
     progress = 1
@@ -1137,5 +1176,23 @@ extension CGRect {
       width: width / 24 * self.width,
       height: height / 24 * self.height
     )
+  }
+}
+
+/// Secondary entry under 开始第一组 on the pre-start summary card (spec 081):
+/// the student trained without the app and wants to quick-log the cursor day.
+private struct TodayWorkoutQuickLogEntry: View {
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Label(StudentStrings.localized(.quickLog001), systemImage: "clock.arrow.circlepath")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.goldText)
+        .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+    }
+    .buttonStyle(.plain)
+    .padding(.top, MeetPRSpacing.space1)
+    .accessibilityIdentifier("todayWorkout.quickLog")
   }
 }

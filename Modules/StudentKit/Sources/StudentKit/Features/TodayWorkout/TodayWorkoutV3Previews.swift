@@ -41,6 +41,7 @@
         onMessageCoach: {},
         onAskCoach: {},
         onStart: {},
+        onQuickLog: {},
         onEdit: { _ in },
         onVideoAction: { _ in },
         onComplete: {},

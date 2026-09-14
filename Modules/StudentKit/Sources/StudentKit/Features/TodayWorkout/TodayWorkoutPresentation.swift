@@ -192,6 +192,10 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     heroMode == .recording && hasAnyLoggedSet
   }
 
+  func allowsQuickLog(isEditable: Bool) -> Bool {
+    heroMode == .list && isEditable
+  }
+
   init(
     day: StudentPlanDay,
     drafts: [TodayWorkoutViewModel.SetRowDraft],
