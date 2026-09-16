@@ -18,4 +18,8 @@ David 明确要求将 #338 也加入下一班车。目标为 release/1.0 / 1.0(2
 - 本机最终组合 CoachKit：443 passed / 0 failed。日志：`/Users/david/Library/Developer/XcodeBuildMCP/workspaces/Projects-cf51cf27789e/logs/swift_package_test_2026-09-16T06-52-47-906Z_pid93432_89283863.log`。出现四处既有 Swift 6 并发预警，均不在本 PR 改动文件。
 - Standards 独立只读审查：CLEAN；目录 ID/中文名唯一、移除 ID 无 Swift 硬编码引用，既有新功能未被覆盖。
 - Spec 独立只读审查：CLEAN；0069 的 43 项字段赋值吻合，0025/0028 来源吻合，新增别名 canonical 均存在；#340–#343 消费路径兼容，分类调整不改变比赛动作资格门。
-- 远端完整 CI：推送后执行，最终 run 与合并 SHA 在落线后补记。
+- [完整 CI run 35065922802](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/35065922802)：最新 PR head 766382ce 全绿，九包 1,922 测试（30/103/85/443/158/73/131/6/893）、主工程 9 测试、swift-format 与 SwiftLint 全部成功。
+
+## 最终落线
+
+[#338](https://github.com/tianpingdeng112233-cell/meetpr/pull/338) 于 2026-09-16T07:01:24Z 合入 release/1.0，merge SHA `24d47f657bf544efeea4a9adfefb5fb674618f73`。#338–#343 六项均已进入 1.0(22) 发版线。build 仍为 21；未切 beta/1.0-22，未 Archive/Upload，后端部署与 APNs 剩余项仍以 NEXT-RELEASE 为准。
