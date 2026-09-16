@@ -1,5 +1,11 @@
 # 1.0(22) 五项整合验收 — 2026-09-16
 
+## 最终落线
+
+整合 PR [#344](https://github.com/tianpingdeng112233-cell/meetpr/pull/344) 于 2026-09-16 合入 release/1.0，merge SHA `9a28115db21ec17ec6e6ef2b18c5ba6f8d940ca8`。#339/#340/#341/#342/#343 均已核实为 MERGED。
+
+[完整 CI run 35064634674](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/35064634674) 全绿：Analytics 30、AppShell 103、ChatUI 85、CoachKit 443、CoreModels 158、DesignSystem 73、Networking 131、RepositoryContracts 6、StudentKit 893，九包共 1,922；主工程 9 测试；swift-format / SwiftLint 成功。
+
 ## 批准范围与基线
 
 David 明确批准 #339 / #342 / #341 / #340 / #343 进入下一班车。#339 已在 release/1.0@202e95db；本次以已审组合 chore/finish-1.0-22@ecfb7ae1 为基线，合入 #343@5fbe67b8（6ad6afd7），保留 73fea6d 两条失效 lint 豁免清理。#338 未加入。
@@ -29,7 +35,7 @@ Spec 轴独立发现同一按压反馈问题（spec 082 §B.2），定向复审 
 - DesignSystem：73 passed / 0 failed。
 - 全仓 swift-format strict 与 SwiftLint strict 通过；新增历史修复文件另跑严格检查通过。
 - DemoStudent 最终 build/run：MeetPR-wt-train22-integration / MeetPR-DemoStudent / DemoStudent / iPhone 17 Pro，0 warnings / 0 errors。
-- 其余模块及主工程由整合 PR 的完整 CI 覆盖，不能把 09-14 的历史组合计数当作本次全套验证。
+- 其余模块及主工程已由整合 PR 的完整 CI 覆盖，计数见顶部最终落线记录。
 
 ## 原生复走查
 
@@ -43,6 +49,6 @@ Demo 使用本机仓储，不作为线上部署、APNs 投递、真机触感或�
 
 ## 远端与发布门禁
 
-09-16 重跑 #340/#341/#342/#343 原失败 hosted jobs 后，四项独立 PR 的 Swift Build & Test / swift-format / SwiftLint 全部成功。GitHub billing 不再阻塞本次 CI。最终整合 PR 仍须自身全绿后合入。
+09-16 重跑 #340/#341/#342/#343 原失败 hosted jobs 后，四项独立 PR 的 Swift Build & Test / swift-format / SwiftLint 全部成功。GitHub billing 不再阻塞本次 CI。最终整合 PR 自身 CI 已全绿并合入，见顶部记录。
 
 本次不改 build 号、不打 beta tag、不 Archive/Upload，也不执行数据库迁移或部署。#340 的 backend #276（0070、镜像、gate）与 web #101、APNs production 配置和实际送达仍待完成；不能把 iOS 落线表述为后移全链路上线。

@@ -1,6 +1,6 @@
 # spec 081 — 学员端补记(quick-log):练完忘开 app,一次按处方录完并结算
 
-- **状态**:InReview(2026-09-14 实装、组合返修与本地收货；远端 CI 尚受 GitHub 账单锁定影响。原批准：2026-09-02 grill 拍板完毕;屏幕稿 David 已拍板,正典 = `docs/design/quick-log/`)
+- **状态**:Done(2026-09-16 随 #344 落线；整合 CI、独立双轴审查及原生复走查通过。原批准：2026-09-02 grill 拍板完毕;屏幕稿 David 已拍板,正典 = `docs/design/quick-log/`)
 - **级别/节奏**:T2;P1,目标 1.0(22) 班车。
 - **范围**:纯 iOS 学员端(StudentKit + Networking DTO 一字段);**零 backend 改动**
   (`POST /sets/log` coached 体已接受可选 `logged_date`,完成接口无 body 幂等)。教练端不动。
