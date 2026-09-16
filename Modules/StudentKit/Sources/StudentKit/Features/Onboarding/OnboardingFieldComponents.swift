@@ -66,7 +66,6 @@ struct OnboardingChoiceCards<Value: Hashable>: View {
         }
         .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
   }
 }
 
@@ -127,7 +126,6 @@ struct OnboardingChipGrid<Value: Hashable>: View {
         .clipShape(Capsule())
         .opacity(!isSelected && isAtLimit ? 0.4 : 1)
     }
-    .buttonStyle(.plain)
   }
 }
 
@@ -186,7 +184,6 @@ struct OnboardingScalePicker: View {
         }
         .clipShape(.rect(cornerRadius: MeetPRRadius.sm))
     }
-    .buttonStyle(.plain)
   }
 }
 

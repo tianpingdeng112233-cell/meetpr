@@ -160,6 +160,13 @@ public final class GrowthCurveViewModel {
     rawPointsByID[sample.winnerPointID]
   }
 
+  func detail(
+    forPointID pointID: UUID, logs: [StudentSetLog], days: [StudentPlanDay]
+  ) -> GrowthE1RMDetail? {
+    guard let point = rawPointsByID[pointID] else { return nil }
+    return GrowthE1RMDetail(point: point, logs: logs, days: days)
+  }
+
   private var windowCutoff: Date? {
     switch selectedWindow {
     case .fourWeeks: now().addingTimeInterval(-E1RMPolicy.rollingWindow)

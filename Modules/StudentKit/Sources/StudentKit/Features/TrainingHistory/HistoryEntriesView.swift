@@ -138,7 +138,6 @@ private struct ExerciseFilterPicker: View {
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(
       StudentStrings.filterAccessibilityLabel(
         selectedExerciseName ?? StudentStrings.filterAllExercises
@@ -196,7 +195,6 @@ private struct ExerciseFilterSheet: View {
               )
               .contentShape(Rectangle())
           }
-          .buttonStyle(.plain)
           .accessibilityLabel(StudentStrings.filterClearSearch)
         }
       }
@@ -255,7 +253,6 @@ private struct ExerciseFilterSheet: View {
       .frame(minHeight: MeetPRSpacing.point52)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
     .accessibilityAddTraits(selectedExerciseName == value ? [.isSelected] : [])
     .overlay(alignment: .bottom) {
       Rectangle()

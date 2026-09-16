@@ -13,7 +13,6 @@ struct CoachLogoutConfirmationView: View {
         Color.MeetPR.textPrimary.opacity(0.6)
           .ignoresSafeArea()
       }
-      .buttonStyle(.plain)
       .accessibilityHidden(true)
 
       VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {

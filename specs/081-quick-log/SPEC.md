@@ -1,6 +1,6 @@
 # spec 081 — 学员端补记(quick-log):练完忘开 app,一次按处方录完并结算
 
-- **状态**:Ready(2026-09-02 grill 拍板完毕;屏幕稿 David 已拍板,正典 = `docs/design/quick-log/`)
+- **状态**:InReview(2026-09-14 实装、组合返修与本地收货；远端 CI 尚受 GitHub 账单锁定影响。原批准：2026-09-02 grill 拍板完毕;屏幕稿 David 已拍板,正典 = `docs/design/quick-log/`)
 - **级别/节奏**:T2;P1,目标 1.0(22) 班车。
 - **范围**:纯 iOS 学员端(StudentKit + Networking DTO 一字段);**零 backend 改动**
   (`POST /sets/log` coached 体已接受可选 `logged_date`,完成接口无 body 幂等)。教练端不动。
@@ -37,7 +37,7 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
 1. 导航:左「返回」;标题「补记 · W#D#」;副标日名(如「硬拉日」)。
 2. **练的日期**行:`DatePicker`(`.date`,compact),默认今天;可选区间 =
    `[上一已完成日的 loggedDate(无则计划 publishedAt 当日), 今天]`;显示格式沿用「9/1 周二」。
-3. 动作列表(按 `sequenceIndex`),**一组一行**(⚖️09-02 David 改口径:步进式太慢):每个动作一张卡——
+3. 动作列表(顺序与汇总卡同源 = `day.exercises` 计划原序,不另按 `sequenceIndex` 排序,⚖️09-03 review 定),**一组一行**(⚖️09-02 David 改口径:步进式太慢):每个动作一张卡——
    - 头:序号胶囊 + 动作名 + 处方摘要「140kg × 5 · RPE 8」+ 右侧「N / M 记」计数;
    - 卡内就是组表,列与现有记录态组表一致(`#` / 重量 / 次数 / RPE),最右一列「记」勾选圈
      (默认全勾 = 按处方完成)。三格数值**复用** `makeDrafts` 产出的
@@ -51,16 +51,16 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
 4. 底部常驻:剩余摘要「将记录 N 个动作 · M 组」+ **长按按钮**「长按 · 补记并完成今日训练」
    (复用 `HoldToCompleteButton` 与 `HoldToCompleteGestureState`,进度填充/触觉/回弹一致)。
    当所有动作都勾「没做」时按钮不可用(= 0 组,071 红线),摘要改「至少要有一个动作」。
-5. 提交中:按钮转 loading、sheet 不可关闭(`interactiveDismissDisabled`);逐组顺序 POST
+5. 提交中:日期与组编辑禁用、按钮转 loading、sheet 不可关闭(`interactiveDismissDisabled`);逐组顺序 POST
    (与 `performPersist` 同一条路:`makeLog` → `logs.recordSet` → `E1RMRecorder`),
    全部成功后调 `plans.completeDay`。
 6. 失败:某组失败即停,弹现有风格 alert「有 K 组没有保存,已保存的 J 组不会丢失,请重试」,
    留在 sheet;重试从失败组继续(后端按 `(student, planExerciseId, setIndex)` upsert 幂等,重发
-   已成功的组也无害)。完成接口失败:组已全部写入,alert「记录已保存,但没有完成今天训练,
+   已成功的组也无害)。已有组保存后，本 sheet 锁定日期、数字与勾选，只能按原提交重试或返回训练页编辑；零组保存失败仍可修改。完成接口失败:组已全部写入,alert「记录已保存,但没有完成今天训练,
    请重试」,重试只调完成接口。
 7. 成功:关闭 sheet,**不走** `WorkoutCompletionFlowView`(庆祝/回顾)(⚖️Q8 A);训练 tab
    回到汇总卡(游标已是下一节)并出 toast「W#D# 已补记」(2 s;仓内没有共享 toast 组件,
-   做最简 capsule 放 DesignSystem,黑底金字,顶部安全区下滑入)。
+   做最简 capsule 放 DesignSystem,黑底金字,置于顶部安全区；与 spec 082 合并时按奖励线外硬切口径显示/消失)。
 
 ### 不出现的东西
 视频、备注、逐组失败标记、教练备注编辑、休息计时器、PR 弹窗(现无,不捞)。
@@ -71,7 +71,11 @@ e1RM 断档。推进制下「今天没练」的正确状态是游标停留,但�
   该键——普通记录路径行为零变化;编码键名 `loggedDate` 走既有 snake-case 转换 → `logged_date`)。
   补记路径:`StudentSetLog.loggedAt` = 所选日期当地 12:00(避开 04:00 gym-day 边界,iOS 归日与
   服务端 `trainingDay(timezone)` 一致),`loggedDate` = 同一日期字符串。**`E1RMRecorder` 的
-  `now` 亦取该时刻**(e1RM 点与 PR 事件落在练的那天,不落提交日)。
+  `now` 亦取该时刻**(e1RM 点与 PR 事件落在练的那天,不落提交日)。写入回包:补记路径保留客户端
+  正午,不用服务端 `logged_at`。**刷新后**(`GET /students/:id/sets` 映射,⚖️09-03 review 定):
+  `logged_date` 与 `logged_at` 的 gym-day(04:00 cutoff,与后端 `trainingDay` 同口径)不一致的
+  记录 = 事后补记,`loggedAt` 锚到该日当地 12:00;一致的保留服务端时间戳(同日归桶无差别,
+  普通记录路径零变化)。
 - **完成**:`POST /plans/days/:dayId/complete`,与长按结算共用 `completeCurrentDay()`
   (含 `isCompletionMutationInFlight` 防重与 `applyCompletionMutation` 缓存对账)。
 - **e1RM / PR**(⚖️Q5 A):补记的组与正常记录同等——`assumed: false`,过同一套

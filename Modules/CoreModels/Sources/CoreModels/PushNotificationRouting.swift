@@ -7,6 +7,8 @@ public enum PushNotificationKind: String, CaseIterable, Sendable {
   case videoPending = "video_pending"
   case bindRequest = "bind_request"
   case planShift = "plan_shift"
+  case planShifted = "plan_shifted"
+  case planShiftUndone = "plan_shift_undone"
   case planUpdated = "plan_updated"
   case planPublished = "plan_published"
 }
@@ -18,6 +20,8 @@ public enum PushRouteIntent: Equatable, Sendable {
   case videoPending(studentID: UUID, videoID: UUID)
   case bindRequest(requestID: UUID)
   case planShift(studentID: UUID, planID: UUID)
+  case planShifted(studentID: UUID, planID: UUID)
+  case planShiftUndone(studentID: UUID, planID: UUID)
   case planUpdated(studentID: UUID, planID: UUID)
   case planPublished(studentID: UUID, planID: UUID)
 }
@@ -66,7 +70,7 @@ public enum PushPayloadParser {
       return bindRoute(from: payload)
     case .planShift:
       return planRoute(from: payload, kind: kind)
-    case .planUpdated, .planPublished:
+    case .planShifted, .planShiftUndone, .planUpdated, .planPublished:
       return planRoute(from: payload, kind: kind)
     }
   }
@@ -85,7 +89,8 @@ public enum PushPayloadParser {
       return .missedTraining(studentID: studentID)
     case .prCongrats:
       return .prCongrats(studentID: studentID)
-    case .chatMessage, .videoPending, .bindRequest, .planShift, .planUpdated, .planPublished:
+    case .chatMessage, .videoPending, .bindRequest, .planShift, .planShifted,
+      .planShiftUndone, .planUpdated, .planPublished:
       return nil
     }
   }
@@ -111,6 +116,10 @@ public enum PushPayloadParser {
     switch kind {
     case .planShift:
       return .planShift(studentID: studentID, planID: planID)
+    case .planShifted:
+      return .planShifted(studentID: studentID, planID: planID)
+    case .planShiftUndone:
+      return .planShiftUndone(studentID: studentID, planID: planID)
     case .planUpdated:
       return .planUpdated(studentID: studentID, planID: planID)
     case .planPublished:

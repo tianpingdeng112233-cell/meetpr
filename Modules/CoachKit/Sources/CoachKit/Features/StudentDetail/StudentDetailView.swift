@@ -167,7 +167,7 @@ struct StudentDetailView: View {
         }
         .foregroundStyle(Color.MeetPR.textSecondary)
       }
-      .buttonStyle(PressScaleButtonStyle(scale: 0.95))
+      .buttonStyle(PressScaleButtonStyle())
       .accessibilityLabel(CoachDetailStrings.backToStudents)
       .accessibilityIdentifier("coach.detail.back")
 
@@ -184,7 +184,7 @@ struct StudentDetailView: View {
             .meetPRCardSurface(.card)
             .clipShape(.circle)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.94))
+        .buttonStyle(PressScaleButtonStyle())
         .disabled(conversationOpener.isOpening)
         .accessibilityLabel(CoachStrings.sendMessage)
         .accessibilityIdentifier("coach.detail.chat")
@@ -267,7 +267,7 @@ struct StudentDetailView: View {
         } label: {
           planActionLabel(CoachDetailStrings.remindTraining)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+        .buttonStyle(PressScaleButtonStyle())
         .disabled(context.chat == nil || conversationOpener.isOpening)
         .accessibilityIdentifier("coach.detail.remindTraining")
 
@@ -275,7 +275,6 @@ struct StudentDetailView: View {
         } label: {
           planActionLabel(CoachDetailStrings.weekSummary)
         }
-        .buttonStyle(.plain)
         .disabled(true)
         .accessibilityHint(CoachDetailStrings.weekSummaryUnavailable)
         .accessibilityIdentifier("coach.detail.weekSummary")
@@ -320,7 +319,7 @@ struct StudentDetailView: View {
               )
               .clipShape(.rect(cornerRadius: MeetPRRadius.chip))
           }
-          .buttonStyle(PressScaleButtonStyle(scale: 0.95))
+          .buttonStyle(PressScaleButtonStyle())
           .accessibilityIdentifier("coach.detail.tab.\(section.rawValue)")
         }
       }

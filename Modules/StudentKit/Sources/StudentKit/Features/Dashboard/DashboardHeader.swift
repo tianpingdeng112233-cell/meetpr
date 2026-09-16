@@ -140,26 +140,16 @@ private struct DashboardWeekProgressBar: View {
 private struct DashboardWeekProgressSegmentView: View {
   let state: DashboardWeekProgressState
 
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
-  @State private var pulses = false
-
   var body: some View {
     Capsule()
       .fill(fill)
       .frame(height: 4)
       .shadow(
         color: state == .current
-          ? Color.MeetPR.goldRGB.opacity(pulses ? 0.85 : 0.35)
+          ? Color.MeetPR.goldRGB.opacity(0.35)
           : .clear,
-        radius: state == .current ? (pulses ? 6.5 : 2) : 0
+        radius: state == .current ? 2 : 0
       )
-      .brightness(state == .current && pulses ? 0.18 : 0)
-      .onAppear {
-        guard state == .current, !reduceMotion else { return }
-        withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
-          pulses = true
-        }
-      }
   }
 
   private var fill: AnyShapeStyle {

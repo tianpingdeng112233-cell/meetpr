@@ -2,30 +2,27 @@ import SwiftUI
 
 /// ⛔️ FROZEN W0 view — compatibility quarantine, not a v3 component.
 ///
-/// New code must use `GoldCTA`. This implementation preserves the exact
-/// `2e46d52` rendering and behavior until the coach migration wave, including
-/// loading, charge, and release-burst states.
+/// New code must use `GoldCTA`. This implementation preserves the legacy
+/// rendering until the coach migration wave while sharing the current press
+/// feedback contract.
 @MainActor
 struct LegacyBrandPrimaryButton: View {
   let title: String
   let subtitle: String?
   let systemImage: String?
-  let showsShimmer: Bool
   let isDisabled: Bool
   let isLoading: Bool
   let isFullWidth: Bool
   let action: @MainActor () -> Void
 
   @State private var feedbackTrigger = false
-  @State private var isCharging = false
-  @State private var burstID = 0
+  @State private var isPressedDown = false
   @Environment(\.colorScheme) private var colorScheme
 
   init(
     _ title: String,
     subtitle: String? = nil,
     systemImage: String? = nil,
-    showsShimmer: Bool = false,
     isDisabled: Bool = false,
     isLoading: Bool = false,
     isFullWidth: Bool = false,
@@ -34,7 +31,6 @@ struct LegacyBrandPrimaryButton: View {
     self.title = title
     self.subtitle = subtitle
     self.systemImage = systemImage
-    self.showsShimmer = showsShimmer
     self.isDisabled = isDisabled
     self.isLoading = isLoading
     self.isFullWidth = isFullWidth
@@ -94,7 +90,6 @@ struct LegacyBrandPrimaryButton: View {
             Rectangle().frame(height: 3)
           }
       }
-      .meetPRShimmer(showsShimmer)
       .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
       .overlay {
         if let ring = moldLayers.first(where: { $0.spread > 0 }) {
@@ -109,15 +104,10 @@ struct LegacyBrandPrimaryButton: View {
         x: outerShadow?.offsetX ?? 0,
         y: outerShadow?.offsetY ?? 0
       )
-      .opacity(isCharging ? 0.88 : 1)
-      .animation(MeetPRMotion.press, value: isCharging)
-      .background {
-        LegacyBurstRing(trigger: burstID)
-      }
     }
     .buttonStyle(
-      LegacyChargeButtonStyle(isDisabled: isDisabled || isLoading) { pressing in
-        isCharging = pressing
+      LegacyPressButtonStyle(isDisabled: isDisabled || isLoading) { pressing in
+        isPressedDown = pressing
       }
     )
     .disabled(isDisabled || isLoading)
@@ -128,12 +118,11 @@ struct LegacyBrandPrimaryButton: View {
 
   private func handleTap() {
     feedbackTrigger.toggle()
-    burstID += 1
     action()
   }
 
   private var moldLayers: [MeetPRShadowToken] {
-    isCharging
+    isPressedDown
       ? MeetPRVisualEffects.ctaMoldHeld(for: colorScheme)
       : MeetPRVisualEffects.ctaMold(for: colorScheme)
   }
@@ -152,7 +141,6 @@ public struct BrandPrimaryButton: View {
     _ title: String,
     subtitle: String? = nil,
     systemImage: String? = nil,
-    showsShimmer: Bool = false,
     isDisabled: Bool = false,
     isLoading: Bool = false,
     isFullWidth: Bool = false,
@@ -162,7 +150,6 @@ public struct BrandPrimaryButton: View {
       title,
       subtitle: subtitle,
       systemImage: systemImage,
-      showsShimmer: showsShimmer,
       isDisabled: isDisabled,
       isLoading: isLoading,
       isFullWidth: isFullWidth,
@@ -175,7 +162,7 @@ public struct BrandPrimaryButton: View {
   }
 }
 
-private struct LegacyChargeButtonStyle: ButtonStyle {
+private struct LegacyPressButtonStyle: ButtonStyle {
   let isDisabled: Bool
   let onPressingChanged: (Bool) -> Void
 
@@ -184,31 +171,16 @@ private struct LegacyChargeButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .scaleEffect(
-        configuration.isPressed && !isDisabled && !reduceMotion ? 0.97 : 1
+        configuration.isPressed && !isDisabled && !reduceMotion ? MeetPRPressFeedback.scale : 1
       )
-      .animation(reduceMotion ? nil : MeetPRMotion.press, value: configuration.isPressed)
+      .opacity(
+        isDisabled
+          ? MeetPRPressFeedback.disabledOpacity
+          : (configuration.isPressed ? MeetPRPressFeedback.pressedOpacity : 1)
+      )
+      .animation(nil, value: configuration.isPressed)
       .onChange(of: configuration.isPressed) { _, pressed in
         onPressingChanged(pressed && !isDisabled)
-      }
-  }
-}
-
-private struct LegacyBurstRing: View {
-  let trigger: Int
-
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
-  @State private var animating = false
-
-  var body: some View {
-    Capsule()
-      .stroke(Color.MeetPR.gold500.opacity(animating ? 0 : 0.6), lineWidth: 2)
-      .scaleEffect(animating ? 6 : 1)
-      .opacity(reduceMotion || trigger == 0 ? 0 : 1)
-      .allowsHitTesting(false)
-      .onChange(of: trigger) { _, _ in
-        guard !reduceMotion else { return }
-        animating = false
-        withAnimation(.easeOut(duration: 0.45)) { animating = true }
       }
   }
 }

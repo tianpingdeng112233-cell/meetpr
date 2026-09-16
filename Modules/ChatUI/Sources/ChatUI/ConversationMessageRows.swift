@@ -95,7 +95,6 @@ private struct ChatMessageBubble: View {
           )
           .aspectRatio(4 / 3, contentMode: .fit)
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(ChatStrings.image)
         .containerRelativeFrame(
           .horizontal,
@@ -246,7 +245,6 @@ struct PendingChatMessageRow: View {
               .font(.caption.bold())
               .foregroundStyle(Color.MeetPR.goldCTA)
           }
-          .buttonStyle(.plain)
           .accessibilityHint(ChatStrings.sendFailed)
         case .confirmed:
           EmptyView()
@@ -301,7 +299,6 @@ struct ChatFullScreenImage: View {
           .foregroundStyle(.white)
           .padding(MeetPRSpacing.base)
       }
-      .buttonStyle(.plain)
       .accessibilityLabel(ChatStrings.close)
     }
     .task {

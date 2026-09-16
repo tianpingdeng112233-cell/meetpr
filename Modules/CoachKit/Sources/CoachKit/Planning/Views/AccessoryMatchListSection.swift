@@ -47,7 +47,6 @@ public struct AccessoryMatchListSection: View {
                 .font(.footnote)
                 .foregroundStyle(Color.MeetPR.fgSecondary)
             }
-            .buttonStyle(.plain)
             .accessibilityLabel(CoachPlanningStrings.clearSearch)
           }
         }
@@ -117,7 +116,6 @@ private struct AccessoryMatchRow: View {
       .background(Color.MeetPR.surface2)
       .clipShape(.rect(cornerRadius: MeetPRRadius.md))
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(
       isSelected
         ? CoachPlanningStrings.removeExerciseAccessibility(

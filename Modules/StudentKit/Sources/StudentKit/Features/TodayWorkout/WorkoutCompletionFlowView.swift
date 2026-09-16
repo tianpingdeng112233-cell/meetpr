@@ -18,7 +18,6 @@ struct WorkoutCompletionFlowView: View {
   let onFinish: () -> Void
 
   @Environment(\.dismiss) private var dismiss
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var phase: WorkoutCompletionFlowPhase
   @State private var didFinish = false
 
@@ -46,7 +45,6 @@ struct WorkoutCompletionFlowView: View {
           onOpenReview: { phase = .review },
           onFinish: finish
         )
-        .transition(.opacity)
       case .review:
         SessionSummaryView(
           presentation: presentation,
@@ -54,10 +52,8 @@ struct WorkoutCompletionFlowView: View {
           reflectionStore: reflectionStore,
           onComplete: finish
         )
-        .transition(.opacity)
       }
     }
-    .animation(reduceMotion ? nil : MeetPRMotion.screen, value: phase)
     .background(Color.MeetPR.bgBase)
     .interactiveDismissDisabled()
     .accessibilityElement(children: .contain)
@@ -78,6 +74,10 @@ struct WorkoutCelebrationView: View {
   let onOpenReview: () -> Void
   let onFinish: () -> Void
 
+  @State private var successFeedbackTrigger = 0
+  @State private var stampFeedbackTrigger = 0
+  @State private var didAppear = false
+
   var body: some View {
     GeometryReader { proxy in
       ZStack {
@@ -87,9 +87,11 @@ struct WorkoutCelebrationView: View {
         VStack(spacing: 0) {
           Spacer(minLength: MeetPRSpacing.space4)
 
-          CelebrationEffects()
-            .frame(width: 220, height: 220)
-            .frame(width: 110, height: 110)
+          CelebrationEffects {
+            stampFeedbackTrigger += 1
+          }
+          .frame(width: 220, height: 220)
+          .frame(width: 110, height: 110)
 
           Text(StudentStrings.localized(.workoutCompletionFlowView001))
             .font(.MeetPR.display(size: MeetPRFontMetrics.size26))
@@ -150,7 +152,6 @@ struct WorkoutCelebrationView: View {
               .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
               .foregroundStyle(Color.MeetPR.textMuted)
               .frame(minWidth: MeetPRSpacing.minimumHitTarget, minHeight: 44)
-              .buttonStyle(.plain)
           }
           .padding(.top, MeetPRSpacing.point34)
           .modifier(CompletionFade(delay: 0.82))
@@ -162,6 +163,13 @@ struct WorkoutCelebrationView: View {
       }
     }
     .ignoresSafeArea()
+    .onAppear {
+      guard !didAppear else { return }
+      didAppear = true
+      successFeedbackTrigger += 1
+    }
+    .sensoryFeedback(.success, trigger: successFeedbackTrigger)
+    .sensoryFeedback(.impact(weight: .heavy), trigger: stampFeedbackTrigger)
   }
 }
 
@@ -274,45 +282,39 @@ private struct CompletionTicker: View {
   let finalValue: Int
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
-  @State private var startedAt: Date?
+  @State private var progress = 0.0
 
   var body: some View {
-    TimelineView(
-      .animation(minimumInterval: 1 / 60, paused: startedAt == nil || reduceMotion)
-    ) { context in
-      let progress = min(
-        1,
-        max(
-          0,
-          context.date.timeIntervalSince(startedAt ?? context.date)
-            / MeetPRMotion.completionTickerDuration
-        )
+    Text(finalValue.formatted(.number.grouping(.automatic)))
+      .meetPRCompletionTicker(
+        progress: reduceMotion ? 1 : progress,
+        finalValue: finalValue
       )
-      let displayed =
-        reduceMotion
-        ? finalValue
-        : Int((Double(finalValue) * MeetPRMotion.easeOutQuart(progress)).rounded())
-      Text(displayed.formatted(.number.grouping(.automatic)))
-    }
-    .task(id: reduceMotion) {
-      // Reduce Motion active at appearance latches the final value too.
-      if reduceMotion {
-        startedAt = .distantPast
-        return
+      .task(id: reduceMotion) {
+        if reduceMotion {
+          finishWithoutAnimation()
+          return
+        }
+        guard progress == 0 else { return }
+        try? await Task.sleep(for: .seconds(MeetPRMotion.completionTickerDelay))
+        guard !Task.isCancelled, progress == 0 else { return }
+        withAnimation(.linear(duration: MeetPRMotion.completionTickerDuration)) {
+          progress = 1
+        }
       }
-      guard startedAt == nil else { return }
-      // motion/05 line 67: ticker waits 470ms, then runs 900ms easeOutQuart.
-      try? await Task.sleep(for: .seconds(MeetPRMotion.completionTickerDelay))
-      guard !Task.isCancelled, startedAt == nil else { return }
-      startedAt = Date()
+      .onChange(of: reduceMotion) { _, isOn in
+        if isOn { finishWithoutAnimation() }
+      }
+      .accessibilityLabel(
+        StudentStrings.replacing(.workoutCompletionFlowView006, values: ["\(finalValue)"]))
+  }
+
+  private func finishWithoutAnimation() {
+    var transaction = Transaction()
+    transaction.animation = nil
+    withTransaction(transaction) {
+      progress = 1
     }
-    .onChange(of: reduceMotion) { _, isOn in
-      // Latch the final value: toggling Reduce Motion back off must not
-      // rewind or replay the ticker.
-      if isOn { startedAt = .distantPast }
-    }
-    .accessibilityLabel(
-      StudentStrings.replacing(.workoutCompletionFlowView006, values: ["\(finalValue)"]))
   }
 }
 

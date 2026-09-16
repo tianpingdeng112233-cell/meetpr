@@ -17,7 +17,6 @@ struct AccountSecuritySection: View {
   @State private var exportPresentation: ExportPresentation?
   @State private var exportCleanupViewModel: ExportDataViewModel?
   @State private var showsPasswordUpdated = false
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   var body: some View {
     accountRows
@@ -38,7 +37,6 @@ struct AccountSecuritySection: View {
         if showsPasswordUpdated {
           passwordUpdatedToast
             .padding()
-            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
       }
   }
@@ -149,7 +147,6 @@ struct AccountSecuritySection: View {
       .frame(minHeight: 52)
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
   }
 
   private func showPasswordUpdatedToast() {
@@ -161,13 +158,7 @@ struct AccountSecuritySection: View {
   }
 
   private func setPasswordUpdated(_ isVisible: Bool) {
-    if reduceMotion {
-      showsPasswordUpdated = isVisible
-    } else {
-      withAnimation {
-        showsPasswordUpdated = isVisible
-      }
-    }
+    showsPasswordUpdated = isVisible
   }
 
   private func discardExport() {

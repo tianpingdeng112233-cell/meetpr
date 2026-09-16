@@ -232,7 +232,6 @@ private struct LiftChip: View {
         .background(isSelected ? Color.MeetPR.fgPrimary : Color.MeetPR.surface2)
         .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
     }
-    .buttonStyle(.plain)
   }
 }
 

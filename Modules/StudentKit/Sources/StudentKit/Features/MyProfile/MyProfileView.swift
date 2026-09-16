@@ -26,7 +26,6 @@ public struct MyProfileView: View {
   @State private var showsReadiness = false
   @State private var showingNotifications = false
   @State private var conversationID: UUID?
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
   public init(
     studentID: UUID,
@@ -125,7 +124,6 @@ public struct MyProfileView: View {
       } label: {
         MyProfileStateCard(text: StudentStrings.localized(.myProfileView002))
       }
-      .buttonStyle(.plain)
       fallbackRows
     }
   }
@@ -161,7 +159,6 @@ public struct MyProfileView: View {
           action: nil
         )
       }
-      .buttonStyle(.plain)
 
       MyProfileSectionLabel(StudentStrings.localized(.myProfileView006))
         .padding(.top, MeetPRSpacing.point2)
@@ -250,7 +247,6 @@ public struct MyProfileView: View {
         highlightedValue: highlightedValue
       )
     }
-    .buttonStyle(.plain)
   }
 
   @ViewBuilder
@@ -288,13 +284,7 @@ public struct MyProfileView: View {
   }
 
   private func toggleOneRMInfo() {
-    if reduceMotion {
-      showsOneRMInfo.toggle()
-    } else {
-      withAnimation(MeetPRMotion.spring) {
-        showsOneRMInfo.toggle()
-      }
-    }
+    showsOneRMInfo.toggle()
   }
 }
 
@@ -402,7 +392,6 @@ private struct MyProfileOneRMCard: View {
               )
               .contentShape(Rectangle())
           }
-          .buttonStyle(.plain)
           .accessibilityLabel(StudentStrings.localized(.myProfileView019))
         }
         Spacer()
@@ -422,7 +411,6 @@ private struct MyProfileOneRMCard: View {
           .frame(maxWidth: .infinity, alignment: .leading)
           .background(Color.MeetPR.bgInset)
           .clipShape(.rect(cornerRadius: MeetPRRadius.inset))
-          .transition(.opacity.combined(with: .move(edge: .top)))
       }
 
       HStack(spacing: MeetPRSpacing.point10) {
@@ -495,7 +483,6 @@ private struct MyProfileRecoveryCard: View {
     Group {
       if let action {
         Button(action: action) { content }
-          .buttonStyle(.plain)
       } else {
         content
       }

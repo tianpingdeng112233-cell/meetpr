@@ -28,7 +28,7 @@ enum DashboardTodayPresentation {
   ) -> StudentPlanDay? {
     days.first {
       PlanCalendarDayIdentity.matches(
-        planDate: $0.scheduledDate,
+        planDate: $0.date,
         selectedDate: selectedDate,
         selectedCalendar: selectedCalendar
       )
@@ -52,7 +52,7 @@ enum DashboardTodayPresentation {
       DashboardWeekProgressSegment(
         id: day.id,
         dayNumber: day.dayOfWeek,
-        recommendedDate: day.scheduledDate,
+        recommendedDate: day.date,
         state: day.completedAt != nil ? .done : (day.id == cursorID ? .current : .upcoming)
       )
     }

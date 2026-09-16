@@ -110,7 +110,7 @@ struct VideoFeedbackDetailView: View {
               .padding(MeetPRSpacing.point14)
               .contentShape(.capsule)
           }
-          .buttonStyle(PressScaleButtonStyle(scale: 0.97))
+          .buttonStyle(PressScaleButtonStyle())
           .overlay {
             Capsule()
               .stroke(Color.MeetPR.borderStrong, lineWidth: MeetPRSpacing.point1)
@@ -370,7 +370,6 @@ private struct VideoMarkerList: View {
               } label: {
                 VideoMarkerRowLabel(marker: marker)
               }
-              .buttonStyle(.plain)
               .accessibilityIdentifier("coach.video.marker.annotation")
             } else {
               VideoMarkerRowLabel(marker: marker)

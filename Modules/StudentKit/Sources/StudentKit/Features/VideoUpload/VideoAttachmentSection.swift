@@ -79,7 +79,6 @@ struct VideoAttachmentSection: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
             .foregroundStyle(Color.MeetPR.textPrimary)
           }
-          .buttonStyle(.plain)
           .disabled(isLoadingPlayback)
         } else {
           Text(StudentStrings.localized(.videoAttachmentSection001))

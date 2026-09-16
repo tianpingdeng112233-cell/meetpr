@@ -70,7 +70,6 @@ struct ExerciseCardHeader: View {
       .frame(minHeight: MeetPRSpacing.minimumHitTarget)
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .accessibilityLabel("\(exercise)，\(open ? progressText : summaryText)")
     .accessibilityValue(
       open ? DesignSystemStrings.expanded : DesignSystemStrings.collapsed

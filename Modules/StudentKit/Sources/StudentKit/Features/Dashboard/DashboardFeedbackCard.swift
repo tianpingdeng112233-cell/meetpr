@@ -10,20 +10,6 @@ struct DashboardFeedbackCard: View {
   let viewModel: FeedbackInboxViewModel?
   @Binding var isExpanded: Bool
 
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
-  @State private var previewOpacity = 1.0
-  @State private var itemRevealToken = 0
-  @State private var arrowProgress = 0.0
-  @State private var collapsedHeight: CGFloat = 0
-  @State private var expandedHeight: CGFloat = 0
-  @State private var heightStart: CGFloat = 0
-  @State private var heightEnd: CGFloat = 0
-  @State private var heightProgress = 1.0
-  @State private var presentedHeight: CGFloat = 0
-  @State private var heightIsExpanding = false
-  @State private var transitionTarget: Bool?
-  @State private var transitionTask: Task<Void, Never>?
-
   private var orderedItems: [CoachFeedback] {
     items.sorted { $0.postedAt > $1.postedAt }
   }
@@ -44,57 +30,14 @@ struct DashboardFeedbackCard: View {
           coachName: coachName
         )
       } else if !items.isEmpty {
-        ZStack(alignment: .top) {
+        if isExpanded {
+          expandedCard
+        } else {
           collapsedCard
-            .opacity(isExpanded ? 0 : 1)
-            .allowsHitTesting(!isExpanded)
-            .accessibilityHidden(isExpanded)
-            .onGeometryChange(for: CGFloat.self) { proxy in
-              proxy.size.height
-            } action: { height in
-              collapsedHeight = height
-            }
-
-          if isExpanded || transitionTarget == true {
-            expandedCard
-              .opacity(isExpanded ? 1 : 0)
-              .allowsHitTesting(isExpanded)
-              .accessibilityHidden(!isExpanded)
-              .onGeometryChange(for: CGFloat.self) { proxy in
-                proxy.size.height
-              } action: { height in
-                expandedHeight = height
-              }
-          }
-        }
-        .modifier(
-          FeedbackHeightEffect(
-            progress: reduceMotion ? 1 : heightProgress,
-            startHeight: heightStart,
-            endHeight: heightEnd,
-            steadyHeight: isExpanded ? expandedHeight : collapsedHeight,
-            addsOvershoot: heightIsExpanding
-          )
-        )
-        .clipped()
-        .onGeometryChange(for: CGFloat.self) { proxy in
-          proxy.size.height
-        } action: { height in
-          presentedHeight = height
         }
       } else if viewModel?.isLoadedEmpty == true {
         DashboardNoFeedbackCard()
       }
-    }
-    .onAppear {
-      arrowProgress = isExpanded ? 1 : 0
-    }
-    .onChange(of: reduceMotion) { _, newValue in
-      guard newValue else { return }
-      finishTransitionWithoutAnimation()
-    }
-    .onDisappear {
-      transitionTask?.cancel()
     }
   }
 
@@ -112,7 +55,6 @@ struct DashboardFeedbackCard: View {
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, 7)
-            .opacity(previewOpacity)
         }
 
         HStack(spacing: 4) {
@@ -161,7 +103,6 @@ struct DashboardFeedbackCard: View {
       .padding(.bottom, 11)
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(
       StudentStrings.replacing(.dashboardFeedbackCard002, values: ["\(items.count)"]))
   }
@@ -174,7 +115,6 @@ struct DashboardFeedbackCard: View {
           .frame(minHeight: 44)
           .contentShape(.rect)
       }
-      .buttonStyle(.plain)
 
       ForEach(orderedItems.indices, id: \.self) { index in
         let item = orderedItems[index]
@@ -183,17 +123,6 @@ struct DashboardFeedbackCard: View {
         } label: {
           feedbackRow(item)
         }
-        .buttonStyle(.plain)
-        .meetPRRiseIn(
-          // motion/02 line 68: 20+i×30ms, 200ms, y=-8→0.
-          delay: MeetPRMotion.feedbackItemInitialDelay
-            + (Double(index) * MeetPRMotion.feedbackItemStagger),
-          duration: MeetPRMotion.feedbackItemDuration,
-          offset: MeetPRMotion.feedbackItemOffset,
-          initialScaleY: 1,
-          trigger: itemRevealToken,
-          playsInitially: isExpanded
-        )
       }
     }
     .padding(.horizontal, 15)
@@ -236,7 +165,8 @@ extension DashboardFeedbackCard {
               style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round)
             )
             .frame(width: 13, height: 13)
-            .modifier(FeedbackArrowEffect(progress: reduceMotion ? 1 : arrowProgress))
+            // Expanded header: same chevron flipped, no animation (spec 082 §A.6).
+            .rotationEffect(.degrees(180))
         }
         .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textMuted)
@@ -288,108 +218,7 @@ extension DashboardFeedbackCard {
   }
 
   private func toggle() {
-    transitionTask?.cancel()
-    let expands = !(transitionTarget ?? isExpanded)
-    transitionTarget = expands
-    if reduceMotion {
-      finishTransitionWithoutAnimation()
-      return
-    }
-    if expands {
-      beginExpansion()
-    } else {
-      beginCollapse()
-    }
-  }
-
-  private func beginCollapse() {
-    if isExpanded {
-      beginHeightTween(
-        from: FeedbackHeightTransition.resolvedStartHeight(
-          presentedHeight: presentedHeight,
-          fallbackHeight: expandedHeight
-        ),
-        to: collapsedHeight,
-        duration: MeetPRMotion.feedbackCollapseDuration,
-        addsOvershoot: false
-      )
-    }
-    isExpanded = false
-    arrowProgress = 0
-    previewOpacity = 0
-    transitionTask = Task { @MainActor in
-      try? await Task.sleep(for: .seconds(MeetPRMotion.feedbackPreviewReturnDelay))
-      guard !Task.isCancelled, transitionTarget == false else { return }
-      withAnimation(.linear(duration: MeetPRMotion.feedbackPreviewReturnDuration)) {
-        previewOpacity = 1
-      }
-      transitionTarget = nil
-    }
-  }
-
-  private func beginExpansion() {
-    withAnimation(.linear(duration: MeetPRMotion.feedbackPreviewFadeDuration)) {
-      previewOpacity = 0
-    }
-    transitionTask = Task { @MainActor in
-      try? await Task.sleep(for: .seconds(MeetPRMotion.feedbackPreviewFadeDuration))
-      guard !Task.isCancelled, transitionTarget == true else { return }
-      beginHeightTween(
-        from: FeedbackHeightTransition.resolvedStartHeight(
-          presentedHeight: presentedHeight,
-          fallbackHeight: collapsedHeight
-        ),
-        to: expandedHeight,
-        duration: MeetPRMotion.feedbackExpandDuration,
-        addsOvershoot: true
-      )
-      isExpanded = true
-      itemRevealToken += 1
-      arrowProgress = 0
-      // motion/02 line 70: a 260ms exact easeOutCubic rotation to 180°.
-      withAnimation(.linear(duration: MeetPRMotion.feedbackArrowDuration)) {
-        arrowProgress = 1
-      }
-      transitionTarget = nil
-    }
-  }
-
-  private func finishTransitionWithoutAnimation() {
-    transitionTask?.cancel()
-    let expands = transitionTarget ?? isExpanded
-    var transaction = Transaction()
-    transaction.animation = nil
-    withTransaction(transaction) {
-      isExpanded = expands
-      heightProgress = 1
-      heightStart = expands ? collapsedHeight : expandedHeight
-      heightEnd = expands ? expandedHeight : collapsedHeight
-      heightIsExpanding = false
-      arrowProgress = expands ? 1 : 0
-      previewOpacity = 1
-      transitionTarget = nil
-    }
-  }
-
-  private func beginHeightTween(
-    from start: CGFloat,
-    to end: CGFloat,
-    duration: TimeInterval,
-    addsOvershoot: Bool
-  ) {
-    var transaction = Transaction()
-    transaction.animation = nil
-    withTransaction(transaction) {
-      heightStart = start
-      heightEnd = end
-      heightIsExpanding = addsOvershoot
-      heightProgress = 0
-    }
-    // motion/02 lines 71 and 75: a linear clock feeds exact easeOutCubic;
-    // only expansion adds the p>.62 three-point sine overshoot.
-    withAnimation(.linear(duration: duration)) {
-      heightProgress = 1
-    }
+    isExpanded.toggle()
   }
 
 }

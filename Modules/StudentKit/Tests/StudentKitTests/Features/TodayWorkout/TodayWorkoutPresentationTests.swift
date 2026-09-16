@@ -6,10 +6,8 @@ import Testing
 
 @MainActor
 @Suite struct TodayWorkoutPresentationTests {
-  @Test func zeroLogDashboardCTAFramesListHeroWithoutSkippingPreStartState() throws {
+  @Test func zeroLogDashboardEntryKeepsListHeroAndHidesManualCompletion() {
     let fixture = makeFixture()
-    let listFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
-    let laterRecordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
 
     let dashboardDestination = TodayWorkoutPresentation(
       day: fixture.day,
@@ -23,27 +21,40 @@ import Testing
       references: [:],
       started: true
     )
-    let measurement = TodayWorkoutHeroFrameMeasurement(
-      heroMode: dashboardDestination.heroMode,
-      requestToken: 1,
-      frame: listFrame
-    )
-    var latch = LaunchDestinationFrameLatch()
-    latch.arm()
-    let publishedFrame = try #require(measurement.publishableFrame)
-    let capturedListFrame = latch.capture(publishedFrame)
-    let overwroteListFrame = latch.capture(laterRecordingFrame)
 
     #expect(dashboardDestination.heroMode == .list)
     #expect(!dashboardDestination.allowsManualCompletion)
-    #expect(capturedListFrame)
-    #expect(!overwroteListFrame)
-    #expect(latch.frame == listFrame)
     #expect(recording.heroMode == .recording)
     // Started but nothing recorded yet: hold-to-complete must stay hidden —
     // there is no skip-this-day in sequence progression (David 2026-08-07).
     #expect(!recording.allowsManualCompletion)
     #expect(recording.currentRow?.stableIndex == 0)
+  }
+
+  @Test func partialRealLogResumesRecordingHero() {
+    var fixture = makeFixture()
+    fixture.drafts[0].completed = true
+
+    // ≥1 real recorded set means the session already started: re-entry (cold
+    // launch included) resumes the recording card directly (David 2026-08-08).
+    let presentation = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
+
+    #expect(presentation.heroMode == .recording)
+    #expect(presentation.allowsManualCompletion)
+    #expect(presentation.progress.remainingSets == 2)
+    #expect(presentation.progress.remainingExercises == 2)
+    #expect(presentation.progress.currentSetNumber == 2)
+    #expect(presentation.progress.currentSetTotal == 2)
+    #expect(presentation.progress.currentExerciseNumber == 1)
+    #expect(presentation.progress.positionText == "第 2 / 2 组 · 动作 1 / 2")
+    #expect(presentation.progress.remainingText == "还有 2 个动作 · 2 组未记录")
+    #expect(presentation.currentRow?.stableIndex == 1)
+    #expect(presentation.currentRow?.record.index == 2)
   }
 
   @Test func manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() {
@@ -60,46 +71,31 @@ import Testing
     #expect(presentation.allowsManualCompletion)
   }
 
-  @Test func partialRealLogResumesRecordingHeroAndLatchesItsFrame() throws {
-    var fixture = makeFixture()
-    fixture.drafts[0].completed = true
-    let staleListFrame = CGRect(x: 20, y: 120, width: 350, height: 420)
-    let recordingFrame = CGRect(x: 20, y: 120, width: 350, height: 260)
-
-    // ≥1 real recorded set means the session already started: re-entry (cold
-    // launch included) resumes the recording card directly (David 2026-08-08).
-    let presentation = TodayWorkoutPresentation(
+  @Test func quickLogIsAllowedOnlyForEditableListHero() {
+    let fixture = makeFixture()
+    let untouched = TodayWorkoutPresentation(
       day: fixture.day,
       drafts: fixture.drafts,
       references: [:],
       started: false
     )
-    let measurement = TodayWorkoutHeroFrameMeasurement(
-      heroMode: presentation.heroMode,
-      requestToken: 1,
-      frame: recordingFrame
+    let recording = TodayWorkoutPresentation(
+      day: fixture.day,
+      drafts: fixture.drafts,
+      references: [:],
+      started: true
     )
-    var latch = LaunchDestinationFrameLatch()
-    latch.arm()
-    let publishedFrame = try #require(measurement.publishableFrame)
-    let capturedRecordingFrame = latch.capture(publishedFrame)
-    let overwroteRecordingFrame = latch.capture(staleListFrame)
+    let completed = TodayWorkoutPresentation(
+      day: fixture.day.replacingCompletion(completedAt: Date(), source: "manual"),
+      drafts: fixture.drafts,
+      references: [:],
+      started: false
+    )
 
-    #expect(presentation.heroMode == .recording)
-    #expect(measurement.heroMode == .recording)
-    #expect(capturedRecordingFrame)
-    #expect(!overwroteRecordingFrame)
-    #expect(latch.frame == recordingFrame)
-    #expect(presentation.allowsManualCompletion)
-    #expect(presentation.progress.remainingSets == 2)
-    #expect(presentation.progress.remainingExercises == 2)
-    #expect(presentation.progress.currentSetNumber == 2)
-    #expect(presentation.progress.currentSetTotal == 2)
-    #expect(presentation.progress.currentExerciseNumber == 1)
-    #expect(presentation.progress.positionText == "第 2 / 2 组 · 动作 1 / 2")
-    #expect(presentation.progress.remainingText == "还有 2 个动作 · 2 组未记录")
-    #expect(presentation.currentRow?.stableIndex == 1)
-    #expect(presentation.currentRow?.record.index == 2)
+    #expect(untouched.allowsQuickLog(isEditable: true))
+    #expect(!untouched.allowsQuickLog(isEditable: false), "future days are read-only")
+    #expect(!recording.allowsQuickLog(isEditable: true))
+    #expect(!completed.allowsQuickLog(isEditable: true))
   }
 
   @Test func completedDayKeepsReadOnlyDetailAcrossColdLaunch() {

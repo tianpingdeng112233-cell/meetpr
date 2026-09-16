@@ -149,6 +149,7 @@ public struct CoachRootView: View {
 
   public var body: some View {
     coachTabs
+      .buttonStyle(PressScaleButtonStyle())
       .environment(\.coachVideoBadgeName, coachDisplayName)
   }
 
@@ -334,7 +335,8 @@ extension CoachRootView {
     case .videoPending:
       selectedTab = .messages
       pushRoute = nil
-    case .missedTraining, .prCongrats, .bindRequest, .planShift:
+    case .missedTraining, .prCongrats, .bindRequest, .planShift, .planShifted,
+      .planShiftUndone:
       selectedTab = .students
       pushRoute = nil
     case .planUpdated, .planPublished:

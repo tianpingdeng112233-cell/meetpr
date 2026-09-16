@@ -43,7 +43,7 @@ enum StudentNotificationRoute: Hashable {
 
   static func route(for intent: PushRouteIntent) -> Self? {
     switch intent {
-    case .planUpdated, .planPublished:
+    case .planShifted, .planShiftUndone, .planUpdated, .planPublished:
       .plan
     case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest, .planShift:
       nil
