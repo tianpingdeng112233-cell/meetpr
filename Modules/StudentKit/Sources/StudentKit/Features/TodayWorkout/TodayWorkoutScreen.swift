@@ -86,7 +86,7 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
           .frame(minHeight: MeetPRSpacing.minimumHitTarget)
           .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityIdentifier("todayWorkout.history")
       }
       .padding(.vertical, -MeetPRSpacing.space2)

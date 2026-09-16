@@ -110,3 +110,50 @@ private actor RecoveringHistoryPlanRepository: StudentPlanRepository {
   #expect(weeks.flatMap(\.days).count == 8)
   #expect(!logs.isEmpty)
 }
+
+@MainActor
+@Test(arguments: [2, 9, 18])
+func trainingHistoryIncludesTodaysQuickLogBeforeNoon(hour: Int) async throws {
+  let calendar = WorkoutDatePolicy.deviceCalendar
+  let now = try #require(
+    calendar.date(from: DateComponents(year: 2026, month: 9, day: 16, hour: hour)))
+  let noon = try #require(
+    calendar.date(from: DateComponents(year: 2026, month: 9, day: 16, hour: 12)))
+  let studentID = StudentDemoSeed.studentID
+  let repository = InMemoryStudentTrainingLogRepository()
+  let saved = try await repository.recordSet(
+    StudentSetLog(
+      id: UUID(), studentID: studentID, planExerciseID: UUID(), setIndex: 0,
+      loggedAt: noon, loggedDate: "2026-09-16", weightKg: 175, reps: 3, rpe: 8.5,
+      completed: true
+    )
+  )
+  let evening = try #require(
+    calendar.date(from: DateComponents(year: 2026, month: 9, day: 16, hour: 17)))
+  let tomorrow = try #require(
+    calendar.date(from: DateComponents(year: 2026, month: 9, day: 17, hour: 12)))
+  let ordinary = try await repository.recordSet(
+    StudentSetLog(
+      id: UUID(), studentID: studentID, planExerciseID: UUID(), setIndex: 0,
+      loggedAt: evening, weightKg: 180, reps: 3, completed: true
+    )
+  )
+  try await repository.recordSet(
+    StudentSetLog(
+      id: UUID(), studentID: studentID, planExerciseID: UUID(), setIndex: 0,
+      loggedAt: tomorrow, loggedDate: "2026-09-17", weightKg: 180, reps: 3, completed: true
+    )
+  )
+  let viewModel = TrainingHistoryViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore()),
+    logs: repository, now: { now }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  guard case .loaded(_, let logs) = viewModel.state else {
+    Issue.record("Expected saved quick-log records in history")
+    return
+  }
+  #expect(logs.map(\.id) == (hour == 18 ? [saved.id, ordinary.id] : [saved.id]))
+}

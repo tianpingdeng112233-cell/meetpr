@@ -25,7 +25,7 @@ struct GrowthE1RMDetailSheet: View {
               .frame(width: 44, height: 44)
               .contentShape(Rectangle())
           }
-          .buttonStyle(.plain)
+          .buttonStyle(PressScaleButtonStyle())
           .accessibilityLabel(StudentStrings.localized(.e1rmSourceClose))
         }
         HStack(alignment: .firstTextBaseline) {
