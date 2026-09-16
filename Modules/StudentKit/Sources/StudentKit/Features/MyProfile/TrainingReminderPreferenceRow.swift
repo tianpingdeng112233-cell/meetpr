@@ -27,7 +27,6 @@ struct TrainingReminderPreferenceRow: View {
         value: TrainingReminderCopy.summary(for: viewModel.settings)
       )
     }
-    .buttonStyle(.plain)
     .task {
       await viewModel.synchronize()
     }

@@ -77,7 +77,6 @@ struct Step3StrengthSection: View {
           }
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
-      .buttonStyle(.plain)
       .accessibilityLabel(StudentStrings.replacing(.step3StrengthSection005, values: ["\(title)"]))
     }
   }

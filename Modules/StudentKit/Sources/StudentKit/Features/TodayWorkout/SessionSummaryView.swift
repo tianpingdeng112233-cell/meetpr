@@ -56,7 +56,6 @@ struct SessionSummaryView: View {
           StudentStrings.localized(.sessionSummaryView002),
           sub: nil,
           icon: .none,
-          showsShimmer: true,
           action: onComplete
         )
         .accessibilityRepresentation {

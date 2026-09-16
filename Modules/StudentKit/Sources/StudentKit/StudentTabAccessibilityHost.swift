@@ -1,3 +1,4 @@
+import DesignSystem
 import SwiftUI
 #if os(iOS)
   import UIKit
@@ -12,7 +13,7 @@ extension View {
     #if os(iOS)
       StudentTabAccessibilityHost(
         id: layer.id,
-        rootView: self,
+        rootView: self.buttonStyle(PressScaleButtonStyle()),
         store: store,
         accessibilityElementsHidden: layer.isAccessibilityHidden
       )

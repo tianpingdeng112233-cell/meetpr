@@ -46,9 +46,16 @@ public final class TrainingHistoryViewModel {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       let days = try await plans.fetchCycleDays(studentID: studentID)
       let weeks = Self.groupByWeek(days, startDate: plan?.startDate)
+      let timestamp = now()
+      // Quick-log anchors the selected date at local noon, including records
+      // saved before noon. Include that anchor without admitting tomorrow.
+      let todayNoon =
+        WorkoutDatePolicy.deviceCalendar.date(
+          bySettingHour: 12, minute: 0, second: 0, of: timestamp
+        ) ?? timestamp
       let fetchedLogs = try await logs.fetchLogs(
         studentID: studentID,
-        in: Self.allHistoryStart...now()
+        in: Self.allHistoryStart...max(timestamp, todayNoon)
       )
       state = .loaded(weeks: weeks, logs: fetchedLogs)
     } catch {

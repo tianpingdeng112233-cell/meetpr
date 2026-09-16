@@ -199,3 +199,63 @@ private actor AuthoritativePlanRepository: StudentPlanRepository {
   }
   #expect(fetchedLogs.contains { $0.id == lateLog.id })
 }
+
+// spec 080: same lower-bound guarantee as TodayWorkout — logs recorded on the
+// original schedule before a coach shift must still reach the week overview.
+@MainActor
+@Test func weekOverviewKeepsLogsRecordedBeforeCoachShift() async throws {
+  let studentID = StudentDemoSeed.studentID
+  let plan = coachShiftedPlan(StudentDemoSeed.makePlanView(), byDays: 5)
+  let store = TestStudentPlanStore(seed: [studentID: plan])
+  let day = plan.days[0]
+  let exercise = try #require(day.exercises.first)
+  let prescribed = try #require(exercise.prescribedSets.first)
+  let earlyLog = StudentSetLog(
+    id: UUID(),
+    studentID: studentID,
+    planExerciseID: exercise.id,
+    setIndex: prescribed.setIndex,
+    loggedAt: day.scheduledDate.addingTimeInterval(3_600),
+    weightKg: 100,
+    reps: 5,
+    completed: true
+  )
+  let viewModel = WeekOverviewViewModel(
+    plans: InMemoryStudentPlanRepository(store: store),
+    logs: InMemoryStudentTrainingLogRepository(seed: [earlyLog]),
+    now: { day.date.addingTimeInterval(86_400) }
+  )
+
+  await viewModel.load(studentID: studentID)
+
+  guard case .loaded(_, let fetchedLogs, _) = viewModel.state else {
+    Issue.record("Expected loaded state")
+    return
+  }
+  #expect(fetchedLogs.contains { $0.id == earlyLog.id })
+}
+
+private func coachShiftedPlan(_ seeded: StudentPlanView, byDays offset: Int) -> StudentPlanView {
+  StudentPlanView(
+    cycleID: seeded.cycleID,
+    weekIndex: seeded.weekIndex,
+    startDate: seeded.startDate,
+    endDate: seeded.endDate,
+    planKind: seeded.planKind,
+    publishedAt: seeded.publishedAt,
+    totalShiftDays: offset,
+    days: seeded.days.map { day in
+      StudentPlanDay(
+        id: day.id,
+        weekNumber: day.weekNumber,
+        dayOfWeek: day.dayOfWeek,
+        sortOrder: day.sortOrder,
+        date: day.scheduledDate,
+        shiftedToDate: day.scheduledDate.addingTimeInterval(Double(offset) * 86_400),
+        completedAt: day.completedAt,
+        completionSource: day.completionSource,
+        exercises: day.exercises
+      )
+    }
+  )
+}

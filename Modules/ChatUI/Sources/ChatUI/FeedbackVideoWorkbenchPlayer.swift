@@ -51,7 +51,6 @@ struct FeedbackVideoWorkbenchPlayer: View {
                   .stroke(Color.MeetPR.videoStageBorder, lineWidth: MeetPRSpacing.point1)
               }
           }
-          .buttonStyle(.plain)
           .accessibilityIdentifier("feedback.video.addMarker")
         }
         if let export {
@@ -73,7 +72,6 @@ struct FeedbackVideoWorkbenchPlayer: View {
                 .stroke(Color.MeetPR.videoStageBorder, lineWidth: MeetPRSpacing.point1)
             }
           }
-          .buttonStyle(.plain)
           .disabled(isExporting)
           .accessibilityLabel(
             isExporting ? ChatStrings.videoExporting : ChatStrings.videoExport
@@ -111,7 +109,6 @@ struct FeedbackVideoWorkbenchPlayer: View {
           .frame(width: MeetPRSpacing.point56, height: MeetPRSpacing.point56)
           .background(.white.opacity(0.14), in: .circle)
       }
-      .buttonStyle(.plain)
       .accessibilityLabel(isPlaying ? ChatStrings.pausePlayback : ChatStrings.playPlayback)
       .accessibilityIdentifier("feedback.video.playbackToggle")
 
@@ -157,7 +154,6 @@ struct FeedbackVideoWorkbenchPlayer: View {
               in: .rect(cornerRadius: MeetPRSpacing.point7)
             )
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(
           "\(ChatStrings.playbackSpeed) \(FeedbackVideoPlayerView.workbenchRateText(option))"
         )

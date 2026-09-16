@@ -73,15 +73,14 @@ public struct StudentPlanDay: Codable, Hashable, Sendable, Identifiable {
   public let sortOrder: Int
   /// The coach-authored recommended date.
   public let scheduledDate: Date
-  /// Retained for wire compatibility and coach-side badges. Student sequence
-  /// progression deliberately does not consume this override (spec 071).
+  /// Latest coach-authored override for the student-facing recommended date.
+  /// Sequence progression deliberately does not consume this value (spec 080).
   public let shiftedToDate: Date?
   public let completedAt: Date?
   public let completionSource: String?
   public let exercises: [StudentPlanExercise]
 
-  /// Effective shifted date retained for coach-side compatibility. Student
-  /// sequence surfaces must use `scheduledDate` as their recommendation.
+  /// Student-facing recommended date, including the latest coach-authored shift (spec 080).
   public var date: Date {
     shiftedToDate ?? scheduledDate
   }

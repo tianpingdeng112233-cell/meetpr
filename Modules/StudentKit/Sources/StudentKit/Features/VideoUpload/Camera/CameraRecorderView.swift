@@ -121,7 +121,6 @@
 
         if let toastMessage {
           RecorderToastView(message: toastMessage)
-            .transition(.opacity)
         }
       }
       .fullScreenCover(
@@ -289,12 +288,10 @@
     }
 
     private func showToast(_ message: String) {
-      withAnimation { toastMessage = message }
+      toastMessage = message
       Task {
         try? await Task.sleep(for: .seconds(2))
-        withAnimation {
-          if toastMessage == message { toastMessage = nil }
-        }
+        if toastMessage == message { toastMessage = nil }
       }
     }
   }

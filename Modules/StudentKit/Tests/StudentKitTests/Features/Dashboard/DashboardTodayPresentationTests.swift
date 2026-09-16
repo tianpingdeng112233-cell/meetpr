@@ -39,17 +39,59 @@ import Testing
     })
 }
 
-@Test func shiftedProjectionStillDisplaysCoachAuthoredRecommendation() {
-  let original = Date(timeIntervalSince1970: 1_800_000_000)
-  let shifted = original.addingTimeInterval(5 * 86_400)
-  let day = StudentPlanDay(
-    id: UUID(), weekNumber: 1, dayOfWeek: 1, date: original,
+@Test func dashboardRecommendedDateUsesShiftWithoutMovingCursor() throws {
+  let scheduled = try #require(
+    PlanCalendarDayIdentity.utcCalendar.date(
+      from: DateComponents(year: 2030, month: 1, day: 10)
+    )
+  )
+  let shifted = scheduled.addingTimeInterval(3 * 86_400)
+  let dayID = UUID()
+  let nextDayID = UUID()
+  // Two unfinished days: shifting D1 past D2's recommended date must not move
+  // the cursor, which orders by (week, day, sortOrder, id), never by date.
+  let shiftedDay = StudentPlanDay(
+    id: dayID, weekNumber: 1, dayOfWeek: 1, date: scheduled,
     shiftedToDate: shifted, exercises: []
   )
+  let unshiftedDay = StudentPlanDay(
+    id: dayID, weekNumber: 1, dayOfWeek: 1, date: scheduled,
+    exercises: []
+  )
+  let nextDay = StudentPlanDay(
+    id: nextDayID, weekNumber: 1, dayOfWeek: 2, date: scheduled.addingTimeInterval(86_400),
+    exercises: []
+  )
 
-  #expect(day.scheduledDate == original)
-  #expect(day.date == shifted)
-  #expect(day.shiftedToDate == shifted)
+  #expect(
+    DashboardTodayPresentation.progressSegments(days: [shiftedDay])[0].recommendedDate == shifted
+  )
+  #expect(
+    DashboardTodayPresentation.planDay(
+      on: shifted,
+      in: [shiftedDay],
+      selectedCalendar: PlanCalendarDayIdentity.utcCalendar
+    )?.id == dayID
+  )
+  #expect(DashboardTodayPresentation.recommendedDateText(shiftedDay.date) == "1月13日")
+  #expect(DashboardTodayPresentation.cursor(in: [shiftedDay, nextDay])?.id == dayID)
+  #expect(DashboardTodayPresentation.cursor(in: [unshiftedDay, nextDay])?.id == dayID)
+  #expect(DashboardTodayPresentation.cursor(in: [nextDay, shiftedDay])?.id == dayID)
+}
+
+@Test func dashboardRecommendedDateFallsBackToScheduledDate() throws {
+  let scheduled = try #require(
+    PlanCalendarDayIdentity.utcCalendar.date(
+      from: DateComponents(year: 2030, month: 2, day: 14)
+    )
+  )
+  let day = StudentPlanDay(
+    id: UUID(), weekNumber: 1, dayOfWeek: 1, date: scheduled,
+    exercises: []
+  )
+
+  #expect(DashboardTodayPresentation.progressSegments(days: [day])[0].recommendedDate == scheduled)
+  #expect(DashboardTodayPresentation.recommendedDateText(day.date) == "2月14日")
 }
 
 @Test func dashboardCompletionTodayUsesDeviceGymDayBoundary() throws {

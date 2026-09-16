@@ -18,16 +18,13 @@ public struct TodayWorkoutView: View {
   private let jumpToTodayToken: Int
   private let uploadFailureDestination: UploadFailureDestination?
   private let uploadFailureNavigationToken: Int
-  private let isLaunchTargetHidden: Bool
-  private let heroFrameRequestToken: Int
-  private let launchHeroRevealToken: Int
   private let planRevision: Int
   private let planProjectionUpdate: StudentPlanView?
+  private let planRefreshRevision: Int
   private var workoutStartedAt: Binding<Date?>
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
   private let onPlanChanged: (StudentPlanView) -> Void
-  private let onHeroFrameChange: (CGRect) -> Void
   private let onReturnToToday: () -> Void
 
   @State private var viewModel: TodayWorkoutViewModel
@@ -36,12 +33,17 @@ public struct TodayWorkoutView: View {
   @State private var selectedDayID: UUID?
   @State private var completionPhase: WorkoutCompletionFlowPhase?
   @State private var editing: EditingTarget?
+  @State private var quickLogRoute: QuickLogRoute?
+  @State private var quickLogToastWeekCode: String?
+  @State private var quickLogToastTask: Task<Void, Never>?
   @State private var directCameraTarget: DirectCameraTarget?
   @State private var showingDirectCameraConsent = false
   @State private var showingDirectCamera = false
   @State private var preparingVideoSetID: UUID?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
+  @State private var showingHistory = false
+  @State private var historyViewModel: TrainingHistoryViewModel
   @State private var showingNotifications = false
   @State private var conversationID: UUID?
   @State private var setRefPickerRoute: SetRefPickerRoute?
@@ -50,7 +52,6 @@ public struct TodayWorkoutView: View {
   @State private var reviewCompleted = false
   @State private var started = false
   @State private var collapsedExercises: [UUID: Bool] = [:]
-  @Namespace private var heroNamespace
 
   private let reviewStore: any SessionReviewStore = UserDefaultsSessionReviewStore()
 
@@ -71,16 +72,13 @@ public struct TodayWorkoutView: View {
     jumpToTodayToken: Int = 0,
     uploadFailureDestination: UploadFailureDestination? = nil,
     uploadFailureNavigationToken: Int = 0,
-    isLaunchTargetHidden: Bool = false,
-    heroFrameRequestToken: Int = 0,
-    launchHeroRevealToken: Int = 0,
     planRevision: Int = 0,
     planProjectionUpdate: StudentPlanView? = nil,
+    planRefreshRevision: Int = 0,
     workoutStartedAt: Binding<Date?> = .constant(nil),
     notifications: StudentNotificationsCoordinator? = nil,
     onOpenPlanNotification: @escaping () -> Void = {},
     onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
-    onHeroFrameChange: @escaping (CGRect) -> Void = { _ in },
     onReturnToToday: @escaping () -> Void = {}
   ) {
     self.studentID = studentID
@@ -102,16 +100,13 @@ public struct TodayWorkoutView: View {
     self.jumpToTodayToken = jumpToTodayToken
     self.uploadFailureDestination = uploadFailureDestination
     self.uploadFailureNavigationToken = uploadFailureNavigationToken
-    self.isLaunchTargetHidden = isLaunchTargetHidden
-    self.heroFrameRequestToken = heroFrameRequestToken
-    self.launchHeroRevealToken = launchHeroRevealToken
     self.planRevision = planRevision
     self.planProjectionUpdate = planProjectionUpdate
+    self.planRefreshRevision = planRefreshRevision
     self.workoutStartedAt = workoutStartedAt
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onPlanChanged = onPlanChanged
-    self.onHeroFrameChange = onHeroFrameChange
     self.onReturnToToday = onReturnToToday
     self._selectedDayID = State(initialValue: planHandoff?.dayID)
     self._viewModel = State(
@@ -124,6 +119,7 @@ public struct TodayWorkoutView: View {
         restTimerActivityController: restTimerActivityController
       )
     )
+    self._historyViewModel = State(initialValue: TrainingHistoryViewModel(plans: plans, logs: logs))
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness)
     )
@@ -165,10 +161,6 @@ public struct TodayWorkoutView: View {
           ?? StudentStrings.localized(.todayWorkoutView001),
         showsAskCoach: showsSetRefEntry,
         isPreparingAskCoach: isPreparingSetRefPicker,
-        namespace: heroNamespace,
-        isLaunchTargetHidden: isLaunchTargetHidden,
-        heroFrameRequestToken: heroFrameRequestToken,
-        launchHeroRevealToken: launchHeroRevealToken,
         collapsedExercises: $collapsedExercises,
         sequenceContent: TrainingCurrentWeekSequenceView(days: viewModel.planDays),
         calendarContent: TrainingCalendarView(
@@ -178,6 +170,7 @@ public struct TodayWorkoutView: View {
         onRefresh: {
           Task { await loadWorkout(for: selectedDayID) }
         },
+        onHistory: { showingHistory = true },
         onReadiness: {
           showingReadinessSheet = true
         },
@@ -188,10 +181,10 @@ public struct TodayWorkoutView: View {
           showingNotifications = true
         },
         onAskCoach: openSetRefPicker,
-        onHeroFrameChange: onHeroFrameChange,
         onStart: {
           started = true
         },
+        onQuickLog: openQuickLog,
         onEdit: openEditor,
         onVideoAction: openVideoAction,
         onComplete: {
@@ -213,6 +206,9 @@ public struct TodayWorkoutView: View {
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
       #endif
+      .navigationDestination(isPresented: $showingHistory) {
+        AllHistoryScreen(viewModel: historyViewModel, studentID: studentID)
+      }
       .modifier(
         OptionalStudentNotificationHostModifier(
           coordinator: notifications,
@@ -232,7 +228,6 @@ public struct TodayWorkoutView: View {
         )
       }
     }
-    .animation(MeetPRMotion.spring, value: viewModel.restTimer)
     #if os(iOS)
       .fullScreenCover(item: $editing) { target in
         setEntry(for: target)
@@ -240,6 +235,15 @@ public struct TodayWorkoutView: View {
     #else
       .sheet(item: $editing) { target in
         setEntry(for: target)
+      }
+    #endif
+    #if os(iOS)
+      .fullScreenCover(item: $quickLogRoute) { route in
+        quickLogSheet(for: route)
+      }
+    #else
+      .sheet(item: $quickLogRoute) { route in
+        quickLogSheet(for: route)
       }
     #endif
     #if os(iOS)
@@ -412,10 +416,25 @@ public struct TodayWorkoutView: View {
       guard let plan else { return }
       viewModel.applyPlanProjection(plan)
     }
+    .onChange(of: planRefreshRevision) { _, _ in
+      Task { await refreshWorkoutPlan() }
+    }
     .onChange(of: viewModel.completionRevision) { _, _ in
       if let plan = viewModel.planProjection {
         onPlanChanged(plan)
       }
+    }
+    .overlay(alignment: .top) {
+      if let quickLogToastWeekCode {
+        MeetPRToastCapsule(
+          emphasizedText: quickLogToastWeekCode,
+          trailingText: StudentStrings.localized(.quickLog027)
+        )
+        .padding(.top, MeetPRSpacing.space3)
+      }
+    }
+    .onDisappear {
+      quickLogToastTask?.cancel()
     }
   }
 
@@ -575,6 +594,41 @@ public struct TodayWorkoutView: View {
       setNumber: row.record.index,
       scrollToVideo: false
     )
+  }
+
+  private func openQuickLog() {
+    guard isEditable, let currentDay, let plan = viewModel.makeQuickLogPlan() else {
+      return
+    }
+    quickLogRoute = QuickLogRoute(
+      day: currentDay,
+      weekCode: "W\(currentDay.weekNumber)D\(currentDay.dayOfWeek)",
+      plan: plan
+    )
+  }
+
+  private func quickLogSheet(for route: QuickLogRoute) -> some View {
+    QuickLogSheet(
+      day: route.day,
+      weekCode: route.weekCode,
+      plan: route.plan,
+      viewModel: viewModel,
+      onSuccess: {
+        finishQuickLog(weekCode: route.weekCode)
+      }
+    )
+  }
+
+  private func finishQuickLog(weekCode: String) {
+    quickLogRoute = nil
+    selectedDayID = StudentPlanSequence(days: viewModel.planDays).cursorDay?.id
+    quickLogToastTask?.cancel()
+    quickLogToastWeekCode = weekCode
+    quickLogToastTask = Task {
+      try? await Task.sleep(for: .seconds(2))
+      guard !Task.isCancelled else { return }
+      quickLogToastWeekCode = nil
+    }
   }
 
   private func setEntry(for target: EditingTarget) -> some View {
@@ -808,6 +862,17 @@ public struct TodayWorkoutView: View {
     await viewModel.load(dayID: dayID, studentID: studentID)
   }
 
+  private func refreshWorkoutPlan() async {
+    await viewModel.refreshCurrentPlanIfAllowed(
+      dayID: selectedDayID,
+      studentID: studentID,
+      at: Date()
+    )
+    if selectedDayID == nil || !viewModel.planDays.contains(where: { $0.id == selectedDayID }) {
+      selectedDayID = currentDay?.id
+    }
+  }
+
   private func handedOffPlan(for dayID: UUID?) -> StudentPlanView? {
     guard let planHandoff, planHandoff.dayID == dayID
     else {
@@ -875,6 +940,14 @@ private struct EditingTarget: Identifiable {
   let draft: TodayWorkoutViewModel.SetRowDraft
   let setNumber: Int
   let scrollToVideo: Bool
+}
+
+@available(iOS 17.0, macOS 14.0, *)
+private struct QuickLogRoute: Identifiable {
+  let id = UUID()
+  let day: StudentPlanDay
+  let weekCode: String
+  let plan: QuickLogPlan
 }
 
 private struct DirectCameraTarget {

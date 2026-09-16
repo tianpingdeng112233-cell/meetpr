@@ -167,7 +167,6 @@ struct StudentPendingVideosView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .meetPRCardSurface(.card)
     }
-    .buttonStyle(.plain)
     .accessibilityLabel(
       CoachVideoFeedbackStrings.rowAccessibility(
         exerciseName: item.exerciseName.map { CoachLocalization.exerciseName($0) }

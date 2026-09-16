@@ -32,7 +32,6 @@ public struct ConversationListSection: View {
             } label: {
               ConversationListRow(conversation: conversation)
             }
-            .buttonStyle(.plain)
 
             if conversation.id != inbox.conversations.last?.id {
               Divider()

@@ -3,17 +3,6 @@ import CoreModels
 import DesignSystem
 import SwiftUI
 
-struct TodayWorkoutHeroFrameMeasurement: Equatable {
-  let heroMode: TodayWorkoutPresentation.HeroMode
-  let requestToken: Int
-  let frame: CGRect
-
-  var publishableFrame: CGRect? {
-    guard frame.width > 0, frame.height > 0 else { return nil }
-    return frame
-  }
-}
-
 enum TodayWorkoutDayState: Equatable {
   case completed(canUndo: Bool)
   case current
@@ -43,20 +32,17 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   let coachName: String
   let showsAskCoach: Bool
   let isPreparingAskCoach: Bool
-  let namespace: Namespace.ID
-  let isLaunchTargetHidden: Bool
-  let heroFrameRequestToken: Int
-  let launchHeroRevealToken: Int
   @Binding var collapsedExercises: [UUID: Bool]
   let sequenceContent: SequenceContent
   let calendarContent: CalendarContent
   let onRefresh: () -> Void
+  let onHistory: () -> Void
   let onReadiness: () -> Void
   let onNotifications: () -> Void
   let onMessageCoach: () -> Void
   let onAskCoach: () -> Void
-  let onHeroFrameChange: (CGRect) -> Void
   let onStart: () -> Void
+  let onQuickLog: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
   let onComplete: () -> Void
@@ -86,6 +72,25 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
         onNotifications: onNotifications
       )
 
+      HStack {
+        Spacer()
+        Button(action: onHistory) {
+          HStack(spacing: MeetPRSpacing.space1) {
+            Image(systemName: "clock")
+            Text(StudentStrings.localized(.e1rmSourceHistory))
+            Image(systemName: "chevron.right")
+              .font(.system(size: MeetPRFontMetrics.size10, weight: .semibold))
+          }
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.goldText)
+          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+          .contentShape(Rectangle())
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        .accessibilityIdentifier("todayWorkout.history")
+      }
+      .padding(.vertical, -MeetPRSpacing.space2)
+
       sequenceContent
       screenContent
       calendarContent
@@ -114,12 +119,8 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
       TodayWorkoutHero(
         presentation: presentation,
         isEditable: dayState.isEditable,
-        namespace: namespace,
-        isLaunchTargetHidden: isLaunchTargetHidden,
-        frameRequestToken: heroFrameRequestToken,
-        launchHeroRevealToken: launchHeroRevealToken,
-        onFrameChange: onHeroFrameChange,
         onStart: onStart,
+        onQuickLog: onQuickLog,
         onEdit: onEdit,
         onVideoAction: onVideoAction,
         showsAskCoach: showsAskCoach,
@@ -200,7 +201,6 @@ private struct TodayWorkoutAskCoachCornerButton: View {
       .frame(minHeight: MeetPRSpacing.minimumHitTarget)
       .contentShape(.rect)
     }
-    .buttonStyle(.plain)
     .disabled(isPreparing)
     .accessibilityIdentifier("todayWorkout.askCoach")
   }
@@ -235,7 +235,6 @@ private struct TodayWorkoutPlanUnavailableCard: View {
         .overlay {
           Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
         }
-        .buttonStyle(.plain)
     }
     .padding(.horizontal, MeetPRSpacing.point18)
     .padding(.vertical, MeetPRSpacing.point26)
@@ -423,12 +422,8 @@ private struct TrainingHeaderButton<Icon: View>: View {
 private struct TodayWorkoutHero: View {
   let presentation: TodayWorkoutPresentation
   let isEditable: Bool
-  let namespace: Namespace.ID
-  let isLaunchTargetHidden: Bool
-  let frameRequestToken: Int
-  let launchHeroRevealToken: Int
-  let onFrameChange: (CGRect) -> Void
   let onStart: () -> Void
+  let onQuickLog: () -> Void
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
   let showsAskCoach: Bool
@@ -461,7 +456,6 @@ private struct TodayWorkoutHero: View {
       }
       .padding(MeetPRSpacing.space4)
       .padding(.leading, MeetPRSpacing.point3)
-      .transition(.opacity)
     }
     .clipShape(
       .rect(
@@ -477,21 +471,6 @@ private struct TodayWorkoutHero: View {
       )
       .stroke(Color.MeetPR.borderStrong, lineWidth: 1)
     }
-    .matchedGeometryEffect(id: "today-workout-hero", in: namespace)
-    .opacity(isLaunchTargetHidden ? 0 : 1)
-    .onGeometryChange(for: TodayWorkoutHeroFrameMeasurement.self) { proxy in
-      TodayWorkoutHeroFrameMeasurement(
-        heroMode: presentation.heroMode,
-        requestToken: frameRequestToken,
-        frame: proxy.frame(in: .global)
-      )
-    } action: { measurement in
-      // Mode and request token participate in the measured value so the
-      // current hero republishes even when its bounds match an older hero.
-      if let frame = measurement.publishableFrame {
-        onFrameChange(frame)
-      }
-    }
   }
 
   private var listHero: some View {
@@ -504,9 +483,12 @@ private struct TodayWorkoutHero: View {
           StudentStrings.localized(.todayWorkoutScreen008),
           sub: nil,
           icon: .none,
-          showsShimmer: true,
           action: onStart
         )
+
+        if presentation.allowsQuickLog(isEditable: isEditable) {
+          TodayWorkoutQuickLogEntry(action: onQuickLog)
+        }
       }
     }
   }
@@ -540,13 +522,11 @@ private struct TodayWorkoutHero: View {
           }
         }
         .padding(.bottom, MeetPRSpacing.point3)
-        .launchHeroRise(index: 0, trigger: launchHeroRevealToken)
 
         Text(exercise.reference)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textTertiary)
           .padding(.bottom, MeetPRSpacing.point11)
-          .launchHeroRise(index: 1, trigger: launchHeroRevealToken)
 
         HStack(spacing: MeetPRSpacing.space2) {
           Text(
@@ -581,7 +561,6 @@ private struct TodayWorkoutHero: View {
           .accessibilityIdentifier("todayWorkout.activeSet.position")
         }
         .padding(.bottom, MeetPRSpacing.point10)
-        .launchHeroRise(index: 2, trigger: launchHeroRevealToken)
 
         HStack(alignment: .bottom, spacing: MeetPRSpacing.point9) {
           Text(row.heroPrimaryText)
@@ -605,7 +584,6 @@ private struct TodayWorkoutHero: View {
             .foregroundStyle(Color.MeetPR.textMuted)
             .padding(.bottom, MeetPRSpacing.point9)
         }
-        .launchHeroRise(index: 3, trigger: launchHeroRevealToken)
 
         if row.usesLegacyHero {
           // Pre-072 block, unchanged for legacy prescriptions (spec 072 §1.4).
@@ -622,7 +600,6 @@ private struct TodayWorkoutHero: View {
               .foregroundStyle(Color.MeetPR.textFaint)
           }
           .padding(.top, MeetPRSpacing.space2)
-          .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
         } else if let intensityText = row.heroSecondaryIntensityText {
           HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.space2) {
             if let label = row.heroSecondaryLabelText {
@@ -640,7 +617,6 @@ private struct TodayWorkoutHero: View {
               )
           }
           .padding(.top, MeetPRSpacing.space2)
-          .launchHeroRise(index: 4, trigger: launchHeroRevealToken)
         }
 
         if !exercise.note.isEmpty {
@@ -659,7 +635,6 @@ private struct TodayWorkoutHero: View {
           .background(Color.MeetPR.bgInset)
           .clipShape(.rect(cornerRadius: MeetPRRadius.inset))
           .padding(.top, MeetPRSpacing.point11)
-          .launchHeroRise(index: 5, trigger: launchHeroRevealToken)
         }
 
         if isEditable && !presentation.progress.allDone {
@@ -688,11 +663,9 @@ private struct TodayWorkoutHero: View {
                 }
                 .clipShape(.rect(cornerRadius: MeetPRRadius.control))
             }
-            .buttonStyle(.plain)
             .accessibilityLabel(StudentStrings.localized(.todayWorkoutScreen016))
           }
           .padding(.top, MeetPRSpacing.point13)
-          .launchHeroRise(index: 6, trigger: launchHeroRevealToken)
         }
       }
     }
@@ -825,27 +798,7 @@ private struct TodayWorkoutExerciseList: View {
           onVideoAction(row)
         }
       )
-      // motion/04 lines 98-99: after "开始第一组", cards use
-      // base=360ms and step=90ms.
-      .meetPRRiseIn(
-        delay: MeetPRMotion.recordingRevealDelay
-          + (Double(index) * MeetPRMotion.recordingRevealStagger)
-      )
     }
-  }
-}
-
-extension View {
-  fileprivate func launchHeroRise(index: Int, trigger: Int) -> some View {
-    meetPRRiseIn(
-      // motion/01 lines 107-109: child delay is i×55ms.
-      delay: Double(index) * MeetPRMotion.launchHeroChildStagger,
-      duration: MeetPRMotion.launchHeroChildDuration,
-      offset: MeetPRMotion.launchHeroChildOffset,
-      initialScaleY: 1,
-      trigger: trigger,
-      playsInitially: false
-    )
   }
 }
 
@@ -876,17 +829,37 @@ private struct TodayWorkoutRemainingPill: View {
   }
 }
 
-private struct HoldToCompleteButton: View {
+struct HoldToCompleteButton: View {
   let action: () -> Void
+  let title: String
+  let accessibilityLabel: String
+  let isEnabled: Bool
+  let isLoading: Bool
 
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var progress = 0.0
   @State private var isPressing = false
+  @State private var completionScale = 1.0
   @State private var hapticStep = 0
   @State private var cancelFeedbackStep = 0
   @State private var successFeedbackStep = 0
   @State private var holdTask: Task<Void, Never>?
+  @State private var completionTask: Task<Void, Never>?
   @State private var gestureState = HoldToCompleteGestureState()
+
+  init(
+    action: @escaping () -> Void,
+    title: String = StudentStrings.localized(.todayWorkoutScreen021),
+    accessibilityLabel: String = StudentStrings.localized(.todayWorkoutScreen022),
+    isEnabled: Bool = true,
+    isLoading: Bool = false
+  ) {
+    self.action = action
+    self.title = title
+    self.accessibilityLabel = accessibilityLabel
+    self.isEnabled = isEnabled
+    self.isLoading = isLoading
+  }
 
   var body: some View {
     ZStack {
@@ -903,41 +876,63 @@ private struct HoldToCompleteButton: View {
       }
 
       HStack(spacing: MeetPRSpacing.point9) {
-        ClockOutlineIcon()
-          .stroke(
-            Color.white,
-            style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round)
-          )
-          .frame(width: 17, height: 17)
-        Text(StudentStrings.localized(.todayWorkoutScreen021))
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        if isLoading {
+          ProgressView()
+            .tint(.white)
+        } else {
+          ClockOutlineIcon()
+            .stroke(
+              Color.white,
+              style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round)
+            )
+            .frame(width: 17, height: 17)
+          Text(title)
+            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+        }
       }
       .foregroundStyle(Color.white)
       .shadow(color: Color.black.opacity(0.45), radius: 1, y: 1)
     }
-    .frame(minHeight: 58)
+    .frame(height: MeetPRSpacing.completionControlHeight)
     .clipShape(.capsule)
     .overlay {
       Capsule().stroke(Color.MeetPR.goldRGB.opacity(0.5), lineWidth: 1)
     }
     .shadow(color: Color.MeetPR.goldRGB.opacity(0.15), radius: 10, y: 4)
-    .meetPRShimmer(true)
-    .scaleEffect(isPressing ? 0.96 : 1)
-    .animation(reduceMotion ? nil : MeetPRMotion.press, value: isPressing)
+    .opacity(isEnabled ? 1 : 0.45)
+    .scaleEffect((isPressing && !reduceMotion ? 0.96 : 1) * completionScale)
     .contentShape(.capsule)
+    .allowsHitTesting(isEnabled && !isLoading)
+    // `.disabled` is what makes VoiceOver read the control as unavailable;
+    // opacity + hit-testing alone still advertise an actionable button.
+    .disabled(!isEnabled || isLoading)
     .highPriorityGesture(
       DragGesture(minimumDistance: 0)
         .onChanged(handleDragChanged)
         .onEnded { _ in apply(gestureState.dragEnded()) }
     )
-    .sensoryFeedback(.impact(weight: .light), trigger: hapticStep)
+    .sensoryFeedback(trigger: hapticStep) { oldStep, newStep in
+      guard oldStep != newStep, newStep > 0 else { return nil }
+      let feedback = HoldToCompleteHapticSchedule.feedback(forStep: newStep)
+      switch feedback.weight {
+      case .light:
+        return .impact(weight: .light, intensity: feedback.intensity)
+      case .medium:
+        return .impact(weight: .medium, intensity: feedback.intensity)
+      case .heavy:
+        return .impact(weight: .heavy, intensity: feedback.intensity)
+      }
+    }
     .sensoryFeedback(.warning, trigger: cancelFeedbackStep)
     .sensoryFeedback(.success, trigger: successFeedbackStep)
     .accessibilityElement()
-    .accessibilityLabel(StudentStrings.localized(.todayWorkoutScreen022))
+    .accessibilityLabel(accessibilityLabel)
     .accessibilityAddTraits(.isButton)
     .accessibilityAction { completeForAccessibility() }
-    .onDisappear { holdTask?.cancel() }
+    .onDisappear {
+      holdTask?.cancel()
+      completionTask?.cancel()
+    }
   }
 
   private func handleDragChanged(_ value: DragGesture.Value) {
@@ -995,10 +990,25 @@ private struct HoldToCompleteButton: View {
     isPressing = false
     progress = 1
     successFeedbackStep += 1
+    // The completion action fires immediately; the bounce is feedback that
+    // runs alongside it and must never gate the reward flow.
     action()
+    guard !reduceMotion else { return }
+    completionTask?.cancel()
+    completionTask = Task { @MainActor in
+      withAnimation(.easeOut(duration: 0.1)) {
+        completionScale = 1.04
+      }
+      try? await Task.sleep(for: .milliseconds(100))
+      guard !Task.isCancelled else { return }
+      withAnimation(.easeIn(duration: 0.1)) {
+        completionScale = 1
+      }
+    }
   }
 
   private func completeForAccessibility() {
+    guard isEnabled, !isLoading else { return }
     holdTask?.cancel()
     isPressing = false
     progress = 1
@@ -1041,7 +1051,6 @@ private struct TodayWorkoutSequenceNotice: View {
         if case .completed(let canUndo) = state, canUndo {
           Button(StudentStrings.localized(.todayWorkoutScreen023), action: onUndo)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .bold))
-            .buttonStyle(.plain)
         }
       }
       if case .upcoming(let previousDay) = state, let previousDay {
@@ -1184,5 +1193,23 @@ extension CGRect {
       width: width / 24 * self.width,
       height: height / 24 * self.height
     )
+  }
+}
+
+/// Secondary entry under 开始第一组 on the pre-start summary card (spec 081):
+/// the student trained without the app and wants to quick-log the cursor day.
+private struct TodayWorkoutQuickLogEntry: View {
+  let action: () -> Void
+
+  var body: some View {
+    Button(action: action) {
+      Label(StudentStrings.localized(.quickLog001), systemImage: "clock.arrow.circlepath")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+        .foregroundStyle(Color.MeetPR.goldText)
+        .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+    }
+    .buttonStyle(PressScaleButtonStyle())
+    .padding(.top, MeetPRSpacing.space1)
+    .accessibilityIdentifier("todayWorkout.quickLog")
   }
 }

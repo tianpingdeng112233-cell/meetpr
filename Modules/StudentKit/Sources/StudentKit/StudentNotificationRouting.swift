@@ -1,3 +1,5 @@
+import CoreModels
+
 enum StudentTab: CaseIterable, Hashable {
   case today
   case training
@@ -38,6 +40,15 @@ enum StudentNotificationRoute: Hashable {
   // The merged chat timeline (2026-07-27) absorbed the feedback/evaluation/
   // coach-message routes; plan is the only notification that still deep-links.
   case plan
+
+  static func route(for intent: PushRouteIntent) -> Self? {
+    switch intent {
+    case .planShifted, .planShiftUndone, .planUpdated, .planPublished:
+      .plan
+    case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest, .planShift:
+      nil
+    }
+  }
 
   func targetTab(from currentTab: StudentTab) -> StudentTab {
     switch self {

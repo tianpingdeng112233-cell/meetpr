@@ -78,7 +78,7 @@ public struct MeetPRTabBar<ID: Hashable & Sendable>: View {
           .frame(minHeight: MeetPRTabBarContract.contentHeight)
           .contentShape(.rect)
         }
-        .buttonStyle(PressScaleButtonStyle(scale: 0.9))
+        .buttonStyle(PressScaleButtonStyle())
         .accessibilityLabel(item.title)
         .accessibilityAddTraits(selection == item.id ? .isSelected : [])
       }

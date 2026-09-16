@@ -2,14 +2,16 @@
 
 力量举学员 + 教练双端 iOS app。这个目录是代码仓库。读这个文件你就知道是在什么项目里、遵守什么规则。
 
+**Codex 接手（2026-09-14）**：使用 Codex 时，按 `~/.codex/AGENTS.md` 和 `~/CodexConfig/docs/engineering-workflow.md` 执行工程闭环。本文旧角色分工中的 Claude 由 Codex 主代理承接，独立实现/审查子任务按卡执行；技术、产品冻结、数据与发布门禁继续适用。代码审查使用当前安装的 `review-loop`，分开记录 Standards 与 Spec。历史作者记录保留原名。
+
 ## ⛔ 发版路标(2026-07-10 拍板,先读这段)
 
-- **你现在就在发版线上**:本 worktree = `release/1.0`(1.0(7) 基底小步直推),下一个内测包从
-  这里打 tag。**行为规则权威 = 本目录 `AGENTS.md` §发版直推流**(P0–P2 尺/捞回队列/失效保护),
-  开工必读,与本文件冲突以它为准。
+- **发版线为 `release/1.0`**：开工先核对 `git status -sb` 与 `git worktree list`；任务 worktree 可以是获准的独立工作分支。下一个内测包从发版线核对候选后打 tag。直驱发布操作按本目录 `AGENTS.md` §发版直推流（P0–P2 尺/捞回队列/失效保护）；派卡按卡内工作树与提交权限执行。
 - **main 不是发版线**:main = 下个大包的待分诊库存(coached 学员端形态正典 = 1.0(7),main 的
   形态批次被否)。**严禁 merge main / 从 main cherry-pick**;已批准项按捞回队列在 7 基底重做。
 - 本文件下方的 V0 时代内容(deadline/冻结清单等)多数已过时,与本路标冲突时以路标为准。
+
+当前版本与进行中工作以 [RELEASES.md](RELEASES.md)、[NEXT-RELEASE.md](NEXT-RELEASE.md) 和 [docs/CODEX-JOURNAL.md](docs/CODEX-JOURNAL.md) 为入口；本轮 #339 已进发版线，#340/#341/#342 的合并与部署依赖以候选账本为准。iOS 入线、服务端部署、TestFlight 上传分别记账。
 
 ## 🚨 Session 启动必读顺序
 
@@ -21,6 +23,9 @@
 4. 扫 `git log --oneline -10` 了解最近进展
 
 跳过第 2 步 = FOLLOWUPS 变黑洞。
+
+<details>
+<summary>2026-04/05 V0 规划档案（解释沿革；当前任务按上方发布入口与批准 spec 执行）</summary>
 
 ## ⚠️ Recent design changes (2026-04-28)
 
@@ -87,6 +92,8 @@ Coach planning 4 周宏观视图设计经历重大 pivot。**任何后续 coach 
 - ❌ **不在 V0 路径上的 refactor / cleanup**:V0 ship 后再清
 - ❌ **Apple Developer membership / Stage A-I release engineering**:User 2026-05-12 决策"还剩一周再开",自动提醒走 [F-026](./FOLLOWUPS.md);本 session 不要主动 propose Stage A 任何环节
 
+</details>
+
 ## 角色
 
 你在这个目录里扮演 **iOS 工程师**：
@@ -144,7 +151,7 @@ XcodeBuildMCP 已接入 Codex MCP，项目配置在 `.xcodebuildmcp/config.yaml`
 - `swift-package`
 - `ui-automation`
 
-规划阶段暂无 scheme / project 默认值。一旦 Xcode 项目生成，典型流程：
+项目为 `MeetPR.xcodeproj`；共享 scheme 见根 [README.md](README.md)。按照当前安装的 XcodeBuildMCP skill 设置目标工作树绝对路径、scheme、configuration 和模拟器，典型流程：
 
 1. `session_set_defaults` 记住 project + scheme + simulator
 2. `build_run_sim` 构建并在模拟器跑起来

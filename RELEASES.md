@@ -18,6 +18,46 @@
 
 ---
 
+## 1.0 (21) — 2026-08-23 — 🟢 已上传(外测 Ceshi 提审中)
+- 打包来源:tag `beta/1.0-21` @ e826b6f0(`release/1.0`,1.0(20) 基底累积;切包时 tip == tag,零落差)
+- 双端 demo 已同步本包(`MeetPR-demo-latest` detach @ e826b6f0,教练 iPhone 17 / 学员 iPhone 17 Pro 双 sim 现建,均 build 21)
+- tag CI 绿(self-hosted runner,run 32668550503)
+
+### 本版包含
+- **学员端训练日定时提醒(spec 079,T1/P1)**:PR #334 → `24b871e0`。「我的」新增训练提醒:开关 +
+  星期几多选 + 时间,默认勾选 = 档案里教练安排的训练日(缺档案回落一/三/五),首开才请求通知权限;
+  纯本地 UNUserNotificationCenter,登出清理 + 进 shell 对账双保险。真机走查 08-21 通过。
+- **训练视频角标:回看浮层 + 烧录导出(spec 078,T2/P1)**:PR #335 → `8b680322`。共享播放器加
+  MeetPR 角标卡(全屏默认展开可收起;教练工作台恒 logo 圆标),式样正典 `docs/design/video-badge/`;
+  「导出」把同款卡 + 渐变压暗 + 「教练:名」署名烧进视频存相册(add-only 权限),教练首次导出弹学员
+  同意确认。配套 backend #262(反馈视频摘要带 `rpe`)已部署,学员「教练反馈→关联视频」的角标 RPE 胶囊点亮。
+- **学员端六形态强度解码 + 忠实渲染 + 止血 + 周几对齐(spec 072 卡 1,T2/P1)**:PR #317 → `98b020fa`。
+  `PlanSetDTO` 解 load_mode 九字段;新形式行渲染「72.5% × 5」「RPE 8–9 × 5」「165–175kg × 5」,
+  消灭「-kg x 5」「目标 RPE 0/10」;非 RPE 新形式不再喂伪 RPE 给建议引擎;`anchor_weekday` 非 null 时 D1 对齐。
+- **% 强度处方三锚换算 + S13 设计稿换皮(spec 034 §9.4,T2/P1,⚖️08-21 口径:app 全算学员不动手)**:
+  PR #336 → `8a5c32ac`。`pct_anchor` 贯穿 DTO/投影/缓存;`PctAnchorResolver` 三锚(登记 1RM /
+  e1RM 回落 / 当日顶组=前序行规则);2.5 kg floor;预填弱色+「自动换算」角标+来源行四变体。
+  08-20 审计 R1(学员按错误预填重量练)的根治。
+- **gym-day 归日改设备时区 + 墙钟 04:00(审计 R6,T2/P1,海外送审前置)**:PR #330 → `75907a8c`。
+  `WorkoutDatePolicy` 去 Asia/Shanghai 硬编码,与 backend `trainingDay` 墙钟语义对齐,DST 安全;
+  时区变化 PATCH /me/timezone。中国用户 24 小时参数化回归钉死零变化。
+- **教练端成长 e1RM 改读 backend 序列(审计 R4,T2/P1)**:PR #332 → `6837de13`。
+  `/coach/students/:id/exercise-stats` 同源于 web,本地计算路径删除;两端数字一致;三态。
+- **学员端空状态/错误态兜底 9 条(08-12 审计,T2/P1)**:PR #331 → `d1766eae`。
+- **教练端空状态/错误态兜底 8 条(08-12 审计,T2/P1)**:PR #333 → `3b6e3a7c`。
+- **CoachKit 动作别名表对齐 plan-web(T1/P1)**:PR #337 → `d886c587`。`exercise-aliases.json`
+  44 → 49 行,影响教练 Excel 导入自动绑定。⚖️08-23:`哑铃推肩` seed 行与 `坐姿哑铃推举` 不去重。
+
+### 已知问题 / 局限
+- iOS 26.5 **模拟器** AVFoundation 丢 Core Animation 层:模拟器导出的成片无角标,真机正常(spec 078 验收注意,不是 bug)。
+- CN 构建仍不上报 timezone(既有 gate),出境旅行归日仍可能两端分裂,口径待拍。
+- 推进制老包尾巴(≤1.0(17) 不写 completion)未根治,靠催升级止血(0059 只回填到 08-09)。
+
+### 测试反馈
+- (待收)
+
+---
+
 ## 1.0 (20) — 2026-08-20 — 🟢 已上传(外测 Ceshi 提审中)
 - 打包来源:tag `beta/1.0-20` @ f920a107(`release/1.0`,1.0(19) 基底累积;切包时 tip == tag,零落差)
 - 双端 demo 已同步本包(`MeetPR-demo-latest` detach @ f920a107,教练 iPhone 17 / 学员 iPhone 17 Pro 双 sim 现建)

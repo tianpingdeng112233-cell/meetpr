@@ -6,8 +6,6 @@ import SwiftUI
 struct DashboardPrimaryAction: View {
   let day: StudentPlanDay
   let onStart: () -> Void
-  let onStartFrameChange: (CGRect) -> Void
-  let isStartHidden: Bool
 
   var body: some View {
     GoldCTA(
@@ -15,17 +13,8 @@ struct DashboardPrimaryAction: View {
       sub: DashboardTodayPresentation.dayName(day),
       variant: .primary,
       icon: .play,
-      showsShimmer: true,
       action: onStart
     )
-    .onGeometryChange(for: CGRect.self) { proxy in
-      proxy.frame(in: .global)
-    } action: { frame in
-      onStartFrameChange(frame)
-    }
-    .opacity(isStartHidden ? 0 : 1)
-    .allowsHitTesting(!isStartHidden)
-    .accessibilityHidden(isStartHidden)
   }
 }
 
@@ -56,7 +45,6 @@ struct DashboardCompletedAction: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
             .foregroundStyle(Color.MeetPR.textMuted)
             .underline()
-            .buttonStyle(.plain)
             .disabled(isUpdating)
         }
       }
@@ -85,7 +73,6 @@ struct DashboardCompletedAction: View {
           .foregroundStyle(Color.MeetPR.textPrimary)
           .frame(maxWidth: .infinity, minHeight: 46)
           .overlay { Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1) }
-          .buttonStyle(.plain)
       }
     }
   }
@@ -139,7 +126,7 @@ struct DashboardSequenceDaySummary: View {
       Text(
         StudentStrings.replacing(
           .dashboardPrimaryAction009,
-          values: ["\(DashboardTodayPresentation.recommendedDateText(day.scheduledDate))"])
+          values: ["\(DashboardTodayPresentation.recommendedDateText(day.date))"])
       )
       .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
       .foregroundStyle(Color.MeetPR.textDim)

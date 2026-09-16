@@ -22,7 +22,6 @@ struct RestTimerPreferenceRow: View {
     } label: {
       MyProfileValueRow(label: StudentStrings.localized(.restTimerPreferenceRow001), value: summary)
     }
-    .buttonStyle(.plain)
   }
 
   private var preferenceBinding: Binding<StudentRestTimerPreference> {

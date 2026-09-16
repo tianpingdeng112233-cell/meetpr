@@ -42,13 +42,11 @@ struct CoachPrivacyTermsSheet: View {
         } label: {
           rowContent(title: title, isEnabled: true)
         }
-        .buttonStyle(.plain)
         .accessibilityIdentifier("coach.profile.privacyPolicy")
       #else
         Link(destination: destination) {
           rowContent(title: title, isEnabled: true)
         }
-        .buttonStyle(.plain)
         .accessibilityIdentifier("coach.profile.privacyPolicy")
       #endif
     } else {

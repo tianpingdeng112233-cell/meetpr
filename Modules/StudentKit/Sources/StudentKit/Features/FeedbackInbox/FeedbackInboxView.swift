@@ -255,7 +255,6 @@ private struct FeedbackArchiveCard<Detail: View>: View {
         }
         .contentShape(Rectangle())
       }
-      .buttonStyle(.plain)
 
       if case .available(let video) = FeedbackVideoPresentation.association(
         videoID: item.item.videoID,
@@ -308,7 +307,6 @@ private struct FeedbackArchiveCard<Detail: View>: View {
           .background(Color.MeetPR.bgInset)
           .clipShape(.rect(cornerRadius: MeetPRRadius.inset))
         }
-        .buttonStyle(.plain)
         .disabled(isResolvingVideo)
         .padding(.top, MeetPRSpacing.point11)
       }

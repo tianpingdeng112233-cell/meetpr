@@ -3,7 +3,6 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 struct RestTimerSettingsView: View {
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Binding var preference: StudentRestTimerPreference
   @State private var expandedBand: RestTimerBand?
 
@@ -119,9 +118,7 @@ struct RestTimerSettingsView: View {
   }
 
   private func toggle(_ band: RestTimerBand) {
-    withAnimation(reduceMotion ? nil : MeetPRMotion.spring) {
-      expandedBand = expandedBand == band ? nil : band
-    }
+    expandedBand = expandedBand == band ? nil : band
   }
 }
 
@@ -173,7 +170,6 @@ private struct RestTimerModeCard: View {
 
 @available(iOS 17.0, macOS 14.0, *)
 private struct RestTimerDurationRow: View {
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   let band: RestTimerBand
   @Binding var selection: Int
   let isExpanded: Bool
@@ -199,7 +195,6 @@ private struct RestTimerDurationRow: View {
         .frame(minHeight: MeetPRSpacing.point56)
         .contentShape(Rectangle())
       }
-      .buttonStyle(.plain)
       .accessibilityLabel(
         StudentStrings.commaSeparated([
           band.title,
@@ -226,9 +221,6 @@ private struct RestTimerDurationRow: View {
         .frame(maxWidth: .infinity)
         .frame(height: 150)
         .background(Color.MeetPR.surfaceRaised)
-        .transition(
-          reduceMotion ? .opacity : .opacity.combined(with: .move(edge: .top))
-        )
       }
     }
   }

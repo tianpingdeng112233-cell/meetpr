@@ -149,7 +149,6 @@ private struct StudentRow: View {
       .padding(MeetPRSpacing.base)
       .background(isSelected ? Color.MeetPR.brandRedSoft : Color.MeetPR.surface1)
     }
-    .buttonStyle(.plain)
   }
 
   private var leadingIcon: String {

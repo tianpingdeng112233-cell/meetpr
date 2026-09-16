@@ -1,6 +1,13 @@
 import CoreModels
 import Foundation
 
+enum QuickLogOutcome: Equatable, Sendable {
+  case completed
+  case noIncludedSets
+  case partialFailure(writtenCount: Int, failedIndex: Int)
+  case completionFailed
+}
+
 // Top-level homes for TodayWorkoutViewModel's value types (typealiased back
 // onto the VM) — keeps the @Observable class body inside SwiftLint's
 // type_body_length budget.

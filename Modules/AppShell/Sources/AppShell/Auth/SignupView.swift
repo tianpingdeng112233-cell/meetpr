@@ -145,7 +145,6 @@ private struct RoleCard: View {
       }
       .contentShape(Rectangle())
     }
-    .buttonStyle(.plain)
     .accessibilityIdentifier("signup.role.\(role.rawValue)")
   }
 }

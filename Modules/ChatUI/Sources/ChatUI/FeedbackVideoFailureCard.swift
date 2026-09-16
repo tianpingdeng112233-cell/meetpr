@@ -24,7 +24,6 @@ struct FeedbackVideoFailureCard: View {
           .background(Color.MeetPR.goldCTA)
           .clipShape(.rect(cornerRadius: MeetPRRadius.md))
       }
-      .buttonStyle(.plain)
       .disabled(retrying)
     }
     .padding(MeetPRSpacing.lg)

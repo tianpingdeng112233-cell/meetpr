@@ -11,8 +11,8 @@ struct GrowthE1RMCard: View {
   let isGlobalTrainingEmpty: Bool
   let onOpenToday: () -> Void
   let onCycleRange: () -> Void
-
-  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  let onSelectPoint: (UUID) -> Void
+  @State private var selectedPointID: UUID?
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -22,13 +22,7 @@ struct GrowthE1RMCard: View {
           .foregroundStyle(Color.MeetPR.textSecondary)
         Spacer()
         Button {
-          if reduceMotion {
-            onCycleRange()
-          } else {
-            withAnimation(MeetPRMotion.pillSelect) {
-              onCycleRange()
-            }
-          }
+          onCycleRange()
         } label: {
           HStack(spacing: MeetPRSpacing.space1) {
             Text(range.displayName)
@@ -49,7 +43,6 @@ struct GrowthE1RMCard: View {
           .frame(minHeight: MeetPRSpacing.minimumHitTarget)
           .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
         .accessibilityLabel(
           StudentStrings.replacing(
             .growthE1Rmcard001,
@@ -104,8 +97,16 @@ struct GrowthE1RMCard: View {
         )
         .frame(height: 126)
       case .chart:
-        GrowthE1RMChart(snapshot: snapshot)
-          .aspectRatio(320 / 118, contentMode: .fit)
+        GrowthE1RMChart(snapshot: snapshot, selectedPointID: selectedPointID) { pointID in
+          selectedPointID = pointID
+          onSelectPoint(pointID)
+        }
+        .aspectRatio(320 / 118, contentMode: .fit)
+        .padding(.top, MeetPRSpacing.space2)
+        Text(StudentStrings.localized(.e1rmSourceHint))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size10))
+          .foregroundStyle(Color.MeetPR.textMuted)
+          .frame(maxWidth: .infinity)
           .padding(.top, MeetPRSpacing.space2)
       }
     }
@@ -113,6 +114,8 @@ struct GrowthE1RMCard: View {
     .background(Color.MeetPR.surfaceCard)
     .clipShape(.rect(cornerRadius: MeetPRRadius.card))
     .accessibilityElement(children: .contain)
+    .onChange(of: range) { _, _ in selectedPointID = nil }
+    .onChange(of: snapshot) { _, _ in selectedPointID = nil }
   }
 
   private var weightText: String {
@@ -133,6 +136,8 @@ struct GrowthE1RMCard: View {
 @available(iOS 17.0, macOS 14.0, *)
 private struct GrowthE1RMChart: View {
   let snapshot: GrowthCurveSnapshot
+  let selectedPointID: UUID?
+  let onSelectPoint: (UUID) -> Void
 
   var body: some View {
     GeometryReader { proxy in
@@ -142,17 +147,75 @@ private struct GrowthE1RMChart: View {
           drawGrid(context: &context, geometry: geometry)
           drawAreaAndLine(context: &context, geometry: geometry)
           drawRawEligible(context: &context, geometry: geometry)
+          drawSamplePoints(context: &context, geometry: geometry)
           drawCurrentPoint(context: &context, geometry: geometry)
         }
         chartLabels(geometry)
       }
+      .contentShape(Rectangle())
+      .gesture(
+        SpatialTapGesture().onEnded { value in
+          if let pointID = geometry.nearestPointID(to: value.location) {
+            onSelectPoint(pointID)
+          }
+        }
+      )
+      .accessibilityRepresentation { accessiblePoints(geometry) }
     }
-    .accessibilityElement(children: .ignore)
-    .accessibilityLabel(
-      StudentStrings.replacing(
-        .growthE1Rmcard005,
-        values: ["\(snapshot.family.studentDisplayName)", "\(snapshot.windowDataPointCount)"])
-    )
+  }
+
+  private func accessiblePoints(_ geometry: GrowthChartGeometry) -> some View {
+    ZStack {
+      ForEach(snapshot.samples.indices, id: \.self) { index in
+        let sample = snapshot.samples[index]
+        Button {
+          onSelectPoint(sample.winnerPointID)
+        } label: {
+          Text(pointLabel(date: sample.date, value: sample.valueKg))
+        }
+        .frame(width: 44, height: 44)
+        .position(geometry.plotPoints[index])
+      }
+      ForEach(snapshot.rawEligiblePoints.indices, id: \.self) { index in
+        let point = snapshot.rawEligiblePoints[index]
+        Button {
+          onSelectPoint(point.id)
+        } label: {
+          Text(
+            pointLabel(date: point.computedAt, value: point.e1RMKg)
+              + ", " + StudentStrings.localized(.e1rmSourceLow))
+        }
+        .frame(width: 44, height: 44)
+        .position(geometry.rawEligiblePlotPoints[index].position)
+      }
+    }
+  }
+
+  private func pointLabel(date: Date, value: Double) -> String {
+    StudentStrings.replacing(
+      .e1rmSourceAccessibility,
+      values: [
+        snapshot.family.studentDisplayName,
+        date.formatted(date: .complete, time: .omitted),
+        value.formatted(.number.precision(.fractionLength(1))),
+      ])
+  }
+
+  private func drawSamplePoints(context: inout GraphicsContext, geometry: GrowthChartGeometry) {
+    for (sample, position) in zip(snapshot.samples, geometry.plotPoints) {
+      guard sample.winnerPointID != snapshot.chartCurrentPoint?.id else { continue }
+      let radius = geometry.scaleX(2.7)
+      let dot = Path(
+        ellipseIn: CGRect(
+          x: position.x - radius, y: position.y - radius, width: radius * 2, height: radius * 2
+        ))
+      let selected = selectedPointID == sample.winnerPointID
+      context.fill(dot, with: .color(selected ? Color.MeetPR.gold500 : Color.MeetPR.surfaceCard))
+      context.stroke(
+        dot, with: .color(selected ? Color.MeetPR.gold500 : Color.MeetPR.chartLine),
+        lineWidth: geometry.scaleX(1.3)
+      )
+    }
   }
 
   private func drawGrid(
@@ -234,6 +297,9 @@ private struct GrowthE1RMChart: View {
         ? Color.MeetPR.textTertiary.opacity(0.35)
         : Color.MeetPR.chartLine.opacity(0.35)
       context.fill(diamond, with: .color(color))
+      if point.id == selectedPointID {
+        context.stroke(diamond, with: .color(Color.MeetPR.gold500), lineWidth: 1)
+      }
     }
   }
 
@@ -344,9 +410,16 @@ private struct GrowthChartGeometry {
     }
   }
 
-  var rawEligiblePlotPoints: [(position: CGPoint, origin: E1RMPointOrigin)] {
+  struct RawPlotPoint {
+    let id: UUID
+    let position: CGPoint
+    let origin: E1RMPointOrigin
+  }
+
+  var rawEligiblePlotPoints: [RawPlotPoint] {
     rawEligiblePoints.map { point in
-      (
+      RawPlotPoint(
+        id: point.id,
         position: plotPoint(date: point.computedAt, valueKg: point.e1RMKg),
         origin: point.origin
       )
@@ -357,6 +430,20 @@ private struct GrowthChartGeometry {
     chartCurrentPoint.map {
       plotPoint(date: $0.computedAt, valueKg: $0.e1RMKg)
     }
+  }
+
+  func nearestPointID(to location: CGPoint) -> UUID? {
+    let points =
+      samples.map { ($0.winnerPointID, plotPoint(date: $0.date, valueKg: $0.valueKg)) }
+      + rawEligiblePoints.map { ($0.id, plotPoint(date: $0.computedAt, valueKg: $0.e1RMKg)) }
+    let nearest = points.min {
+      hypot($0.1.x - location.x, $0.1.y - location.y)
+        < hypot($1.1.x - location.x, $1.1.y - location.y)
+    }
+    guard let nearest,
+      hypot(nearest.1.x - location.x, nearest.1.y - location.y) <= 22
+    else { return nil }
+    return nearest.0
   }
 
   var plotTop: CGFloat { point(x: 0, y: 20).y }

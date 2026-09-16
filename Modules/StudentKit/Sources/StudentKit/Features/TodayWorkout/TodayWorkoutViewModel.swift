@@ -33,6 +33,23 @@ public final class TodayWorkoutViewModel {
     var logs: [StudentSetLog]
   }
 
+  private struct DraftIdentity: Hashable {
+    let exerciseID: UUID
+    let planExerciseSortOrder: Int
+    let setIndex: Int
+  }
+
+  private struct QuickLogSlot: Hashable {
+    let planExerciseID: UUID
+    let setIndex: Int
+  }
+
+  private enum EditedDraftField: Hashable {
+    case weight
+    case reps
+    case rpe
+  }
+
   public private(set) var state: State = .idle
   public private(set) var pendingPRBanner: PRBreakthroughEvent?
   public private(set) var restTimer: RestTimerState?
@@ -63,6 +80,14 @@ public final class TodayWorkoutViewModel {
   private var pendingPersist: Task<Bool, Never>?
   private var planLogsSnapshot: PlanLogsSnapshot?
   private var isCompletionMutationInFlight = false
+  private var editedDraftFields: [DraftIdentity: Set<EditedDraftField>] = [:]
+  private var planRefreshThrottle = StudentTodayRefreshThrottle()
+  // Retry memo for one quick-log attempt: keyed by (day, training date) so an
+  // in-sheet retry resumes at the failed set, while a changed date or a fresh
+  // sheet (`makeQuickLogPlan`) starts over — the backend upsert makes a
+  // rewrite of already-stored slots harmless.
+  private var quickLogAttemptKey: String?
+  private var quickLogWrittenSlots: Set<QuickLogSlot> = []
 
   public init(
     plans: any StudentPlanRepository,
@@ -92,6 +117,7 @@ public final class TodayWorkoutViewModel {
     preloadedPlan: StudentPlanView? = nil
   ) async {
     currentStudentID = studentID
+    editedDraftFields = [:]
     loadGeneration += 1
     let generation = loadGeneration
     let startingRecordingGeneration = recordingGeneration
@@ -114,6 +140,37 @@ public final class TodayWorkoutViewModel {
       recordingGeneration: startingRecordingGeneration,
       isInitialLoad: isInitialLoad
     )
+  }
+
+  func refreshCurrentPlan(dayID: UUID?, studentID: UUID) async {
+    currentStudentID = studentID
+    loadGeneration += 1
+    let generation = loadGeneration
+    let startingRecordingGeneration = recordingGeneration
+
+    do {
+      let refreshedPlan = try await plans.refreshCurrentPlan(studentID: studentID)
+      try await applyPlan(
+        refreshedPlan,
+        dayID: dayID,
+        studentID: studentID,
+        generation: generation,
+        recordingGeneration: startingRecordingGeneration,
+        onlyIfChanged: true
+      )
+    } catch {
+      // Automatic refresh is best-effort. Keep the usable workout and any
+      // in-progress input instead of replacing it with an error surface.
+    }
+  }
+
+  func refreshCurrentPlanIfAllowed(
+    dayID: UUID?,
+    studentID: UUID,
+    at date: Date
+  ) async {
+    guard planRefreshThrottle.refreshWhenReturning(at: date) == .full else { return }
+    await refreshCurrentPlan(dayID: dayID, studentID: studentID)
   }
 
   public func load(
@@ -276,18 +333,16 @@ public final class TodayWorkoutViewModel {
       from: plan,
       selectedDayID: dayID
     )
-    planProjection = plan
+    // A best-effort refresh (onlyIfChanged) must never degrade a usable day:
+    // an empty result keeps the visible workout and any in-progress input,
+    // whether the student is still editing (.loaded) or already recording.
     guard let plan else {
-      planDays = []
-      if onlyIfChanged, state == .noPlan {
+      if onlyIfChanged, keepsCurrentWorkoutOnEmptyRefresh {
         return
       }
-      updatePlanContextIfNeeded(nextPlanContext)
-      exerciseReferences = [:]
-      state = .noPlan
+      showNoPlan(nil, planContext: nextPlanContext)
       return
     }
-    planDays = plan.days
 
     guard
       let snapshot = try await loadDaySnapshot(
@@ -299,27 +354,63 @@ public final class TodayWorkoutViewModel {
       guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
         return
       }
-      if onlyIfChanged, state == .noPlan {
+      if onlyIfChanged, keepsCurrentWorkoutOnEmptyRefresh {
         return
       }
-      updatePlanContextIfNeeded(nextPlanContext)
-      exerciseReferences = [:]
-      suggestionE1RMByExercise = [:]
-      state = .noPlan
+      showNoPlan(plan, planContext: nextPlanContext)
       return
     }
     guard canApplyLoad(generation, recordingGeneration: recordingGeneration) else {
       return
     }
+    planProjection = plan
+    planDays = plan.days
     if onlyIfChanged,
-      case .loaded(let currentDay, let currentDrafts) = state,
-      currentDay == snapshot.day,
-      currentDrafts == snapshot.drafts
+      applyRefreshedSnapshotIfNeeded(snapshot, planContext: nextPlanContext)
     {
       return
     }
     updatePlanContextIfNeeded(nextPlanContext)
     apply(snapshot)
+  }
+
+  private func showNoPlan(_ plan: StudentPlanView?, planContext: TodayWorkoutPlanContext?) {
+    planProjection = plan
+    planDays = plan?.days ?? []
+    updatePlanContextIfNeeded(planContext)
+    exerciseReferences = [:]
+    if plan != nil {
+      suggestionE1RMByExercise = [:]
+    }
+    state = .noPlan
+  }
+
+  /// True while the screen shows a workout the student may be working in;
+  /// an empty best-effort refresh must not replace it with the no-plan state.
+  private var keepsCurrentWorkoutOnEmptyRefresh: Bool {
+    switch state {
+    case .loaded, .recording, .noPlan:
+      true
+    case .idle, .loading, .error:
+      false
+    }
+  }
+
+  private func applyRefreshedSnapshotIfNeeded(
+    _ snapshot: LoadedDaySnapshot,
+    planContext nextPlanContext: TodayWorkoutPlanContext?
+  ) -> Bool {
+    switch state {
+    case .recording:
+      return true
+    case .loaded(let currentDay, let currentDrafts):
+      guard currentDay != snapshot.day else { return true }
+      updatePlanContextIfNeeded(nextPlanContext)
+      apply(snapshot, preservingEditsFrom: currentDrafts)
+      return true
+    case .idle, .loading, .noPlan, .error:
+      return false
+    }
   }
 
   private func updatePlanContextIfNeeded(_ nextPlanContext: TodayWorkoutPlanContext?) {
@@ -348,6 +439,36 @@ public final class TodayWorkoutViewModel {
     suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
     lastWeightByExercise = snapshot.lastWeightByExercise
     state = .loaded(plan: snapshot.day, drafts: snapshot.drafts)
+  }
+
+  private func apply(
+    _ snapshot: LoadedDaySnapshot,
+    preservingEditsFrom currentDrafts: [SetRowDraft]
+  ) {
+    let currentByIdentity = Dictionary(
+      uniqueKeysWithValues: currentDrafts.map { (draftIdentity(for: $0), $0) }
+    )
+    let mergedDrafts = snapshot.drafts.map { refreshedDraft in
+      let identity = draftIdentity(for: refreshedDraft)
+      guard let currentDraft = currentByIdentity[identity],
+        let editedFields = editedDraftFields[identity]
+      else { return refreshedDraft }
+      var mergedDraft = refreshedDraft
+      if editedFields.contains(.weight) {
+        mergedDraft.actualWeight = currentDraft.actualWeight
+      }
+      if editedFields.contains(.reps) {
+        mergedDraft.actualReps = currentDraft.actualReps
+      }
+      if editedFields.contains(.rpe) {
+        mergedDraft.actualRPE = currentDraft.actualRPE
+      }
+      return mergedDraft
+    }
+    exerciseReferences = snapshot.references
+    suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
+    lastWeightByExercise = snapshot.lastWeightByExercise
+    state = .loaded(plan: snapshot.day, drafts: mergedDrafts)
   }
 
   private func handleLoadError(
@@ -449,15 +570,15 @@ public final class TodayWorkoutViewModel {
   }
 
   public func updateWeight(rowIndex: Int, weight: Decimal?) {
-    mutateDraft(rowIndex: rowIndex) { $0.actualWeight = weight }
+    mutateDraft(rowIndex: rowIndex, editedField: .weight) { $0.actualWeight = weight }
   }
 
   public func updateReps(rowIndex: Int, reps: Int?) {
-    mutateDraft(rowIndex: rowIndex) { $0.actualReps = reps }
+    mutateDraft(rowIndex: rowIndex, editedField: .reps) { $0.actualReps = reps }
   }
 
   public func updateRPE(rowIndex: Int, rpe: Decimal?) {
-    mutateDraft(rowIndex: rowIndex) { $0.actualRPE = rpe }
+    mutateDraft(rowIndex: rowIndex, editedField: .rpe) { $0.actualRPE = rpe }
   }
 
   public func toggleComplete(rowIndex: Int) async {
@@ -496,9 +617,15 @@ public final class TodayWorkoutViewModel {
   }
 
   public func completeCurrentDay() async -> Bool {
+    guard let day = currentDay else { return false }
+    return await completeDay(day)
+  }
+
+  /// Completes a specific day. Quick-log passes the day it wrote sets for, so
+  /// a refresh that moves `currentDay` mid-flight can never complete another.
+  private func completeDay(_ day: StudentPlanDay) async -> Bool {
     guard !isCompletionMutationInFlight,
-      let studentID = currentStudentID,
-      let day = currentDay
+      let studentID = currentStudentID
     else { return false }
     isCompletionMutationInFlight = true
     defer { isCompletionMutationInFlight = false }
@@ -519,6 +646,126 @@ public final class TodayWorkoutViewModel {
       actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel001)
     }
     return false
+  }
+
+  func quickLog(plan: QuickLogPlan) async -> QuickLogOutcome {
+    guard plan.hasIncludedSets else { return .noIncludedSets }
+    guard let studentID = currentStudentID, let day = currentDay else {
+      return .partialFailure(writtenCount: 0, failedIndex: 0)
+    }
+    let attemptKey = "\(day.id.uuidString)|\(plan.loggedDate)"
+    if quickLogAttemptKey != attemptKey {
+      quickLogAttemptKey = attemptKey
+      quickLogWrittenSlots = []
+    }
+
+    actionErrorMessage = nil
+    recordingGeneration += 1
+    let entries = plan.entries(studentID: studentID)
+    for (index, entry) in entries.enumerated() {
+      let slot = QuickLogSlot(
+        planExerciseID: entry.log.planExerciseID,
+        setIndex: entry.log.setIndex
+      )
+      guard !quickLogWrittenSlots.contains(slot) else { continue }
+      do {
+        let persisted = try await logs.recordSet(entry.log)
+        quickLogWrittenSlots.insert(slot)
+        mergePersistedLog(persisted)
+        applyQuickLogWrite(persisted, draft: entry.draft)
+        let family = Self.exerciseFamily(
+          in: day,
+          planExerciseID: entry.draft.planExerciseID,
+          onboarding: onboardingProfile
+        )
+        _ = await recordE1RMPoint(
+          for: entry.draft,
+          log: persisted,
+          studentID: studentID,
+          family: family,
+          registeredOneRMKg: onboardingProfile?.registeredOneRMKg(for: family),
+          occurredAt: plan.loggedAt
+        )
+      } catch {
+        let writtenCount = entries.count { candidate in
+          quickLogWrittenSlots.contains(
+            QuickLogSlot(
+              planExerciseID: candidate.log.planExerciseID,
+              setIndex: candidate.log.setIndex
+            )
+          )
+        }
+        return .partialFailure(writtenCount: writtenCount, failedIndex: index)
+      }
+    }
+
+    return await completeDay(day) ? .completed : .completionFailed
+  }
+
+  func makeQuickLogPlan() -> QuickLogPlan? {
+    // A fresh sheet is a fresh attempt: forget the previous attempt's slots.
+    quickLogAttemptKey = nil
+    quickLogWrittenSlots = []
+    // Sequence progression: the cursor day is loggable regardless of the
+    // coach's recommended date (spec 071 拍板 2 — 推荐日期纯展示). Only
+    // non-cursor days are off limits, and that gate lives in `isEditable`.
+    let today = calendar.startOfDay(for: now())
+    guard currentDay != nil, let drafts = currentDrafts, !drafts.isEmpty else { return nil }
+    var prefilledDrafts = drafts
+    var automaticWeightRowIDs: Set<UUID> = []
+    for index in prefilledDrafts.indices where prefilledDrafts[index].actualWeight == nil {
+      let rowID = prefilledDrafts[index].id
+      guard let suggestedWeight = weightSuggestionOutcome(forSetID: rowID).suggestion?.weightKg
+      else { continue }
+      prefilledDrafts[index].actualWeight = suggestedWeight
+      automaticWeightRowIDs.insert(rowID)
+    }
+    return QuickLogPlan(
+      drafts: prefilledDrafts,
+      selectedDate: today,
+      allowedDateRange: quickLogDateRange(through: today),
+      calendar: calendar,
+      automaticWeightRowIDs: automaticWeightRowIDs
+    )
+  }
+
+  private func quickLogDateRange(through today: Date) -> ClosedRange<Date> {
+    guard let currentDay, let planProjection else { return today...today }
+    let days = StudentPlanSequence.orderedDays(in: planProjection)
+    let currentIndex = days.firstIndex(where: { $0.id == currentDay.id }) ?? 0
+    let previousCompletedDay = days[..<currentIndex].reversed().first { $0.completedAt != nil }
+    let previousExerciseIDs = Set(previousCompletedDay?.exercises.map(\.id) ?? [])
+    // The training day, not the write timestamp: a backfilled previous day
+    // carries `loggedDate` earlier than its `loggedAt`.
+    let previousTrainingDay = planLogsSnapshot?.logs
+      .filter { previousExerciseIDs.contains($0.planExerciseID) }
+      .map { $0.loggedDay(calendar: calendar) }
+      .min()
+    let fallback = planProjection.publishedAt ?? planProjection.startDate
+    let requestedLowerBound = previousTrainingDay ?? calendar.startOfDay(for: fallback)
+    return min(requestedLowerBound, today)...today
+  }
+
+  /// Mirror a successful quick-log write into the live drafts so a partial
+  /// failure leaves the day in the recording state (≥1 real set → the summary
+  /// card and its quick-log entry give way, per spec 071).
+  private func applyQuickLogWrite(_ persisted: StudentSetLog, draft: SetRowDraft) {
+    guard var drafts = currentDrafts,
+      let index = drafts.firstIndex(where: { $0.id == draft.id })
+    else { return }
+    drafts[index].actualWeight = persisted.weightKg
+    drafts[index].actualReps = persisted.reps
+    drafts[index].actualRPE = persisted.rpe
+    drafts[index].completed = persisted.completed
+    drafts[index].failed = persisted.failed
+    drafts[index].assumed = false
+    drafts[index].loggedSetID = persisted.id
+    switch state {
+    case .loaded(let plan, _): state = .loaded(plan: plan, drafts: drafts)
+    case .recording(let plan, _, let rowIndex):
+      state = .recording(plan: plan, drafts: drafts, rowIndex: rowIndex)
+    case .idle, .loading, .noPlan, .error: break
+    }
   }
 
   public func undoCurrentDayCompletion() async -> Bool {
@@ -592,15 +839,22 @@ public final class TodayWorkoutViewModel {
     fallback: StudentPlanDay,
     studentID: UUID
   ) async {
+    let completedDay: StudentPlanDay
     if let refreshed = try? await plans.refreshCurrentPlan(studentID: studentID),
       let day = refreshed.days.first(where: { $0.id == fallback.id })
     {
       planProjection = refreshed
       planDays = refreshed.days
-      replaceCurrentDay(day)
+      completedDay = day
     } else {
       planProjection = planProjection.map { replacingDay(fallback, in: $0) }
-      replaceCurrentDay(fallback)
+      completedDay = fallback
+    }
+    // A load/refresh may have moved the visible day while the completion was
+    // in flight (quick-log writes span several awaits). Only the day that is
+    // still on screen gets its `plan` swapped; another day keeps its drafts.
+    if currentDay?.id == completedDay.id {
+      replaceCurrentDay(completedDay)
     }
     completionRevision += 1
   }
@@ -707,12 +961,13 @@ public final class TodayWorkoutViewModel {
     }
   }
 
-  private static func makeLog(
+  nonisolated static func makeLog(
     from draft: SetRowDraft,
     studentID: UUID,
     completed: Bool,
     failed: Bool,
-    loggedAt: Date
+    loggedAt: Date,
+    loggedDate: String? = nil
   ) -> StudentSetLog {
     StudentSetLog(
       id: draft.loggedSetID ?? UUID(),
@@ -720,6 +975,7 @@ public final class TodayWorkoutViewModel {
       planExerciseID: draft.planExerciseID,
       setIndex: draft.prescribed.setIndex,
       loggedAt: loggedAt,
+      loggedDate: loggedDate,
       weightKg: draft.actualWeight ?? draft.prescribed.weightKg ?? 0,
       reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
       rpe: draft.actualRPE,
@@ -793,7 +1049,11 @@ public final class TodayWorkoutViewModel {
     pendingPRBanner = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID))?.first
   }
 
-  private func mutateDraft(rowIndex: Int, update: (inout SetRowDraft) -> Void) {
+  private func mutateDraft(
+    rowIndex: Int,
+    editedField: EditedDraftField,
+    update: (inout SetRowDraft) -> Void
+  ) {
     switch state {
     case .loaded(let plan, let drafts), .recording(let plan, let drafts, _):
       guard drafts.indices.contains(rowIndex) else {
@@ -801,10 +1061,20 @@ public final class TodayWorkoutViewModel {
       }
       var nextDrafts = drafts
       update(&nextDrafts[rowIndex])
+      editedDraftFields[draftIdentity(for: nextDrafts[rowIndex]), default: []]
+        .insert(editedField)
       state = .loaded(plan: plan, drafts: nextDrafts)
     default:
       return
     }
+  }
+
+  private func draftIdentity(for draft: SetRowDraft) -> DraftIdentity {
+    DraftIdentity(
+      exerciseID: draft.exerciseID,
+      planExerciseSortOrder: draft.planExerciseSortOrder,
+      setIndex: draft.prescribed.setIndex
+    )
   }
 
   private func isCurrentLoad(_ generation: Int) -> Bool {
@@ -845,15 +1115,17 @@ public final class TodayWorkoutViewModel {
   }
 
   private static func planRange(
-    for days: [StudentPlanDay],
+    for plan: StudentPlanView,
     now: Date
   ) -> ClosedRange<Date> {
-    guard let first = days.map(\.scheduledDate).min(), let last = days.map(\.scheduledDate).max()
+    guard let first = plan.days.map(\.scheduledDate).min(), let last = plan.days.map(\.date).max()
     else { return Date.distantPast...Date.distantFuture }
-    // Sequence progression means real training can run past the plan's
-    // scheduled calendar: clamp the upper bound to today, or sets logged
-    // after the scheduled end vanish from the day view (P0 2026-08-20).
-    return first.addingTimeInterval(-86_400)...max(last, now).addingTimeInterval(86_400)
+    // Quick-log can date training back to publication, before the first
+    // recommendation (spec 081). Keep pre-shift logs and training beyond the
+    // schedule too; a future publication fallback is clamped to today.
+    let earliestTrainingDate = min(first, plan.publishedAt ?? plan.startDate, now)
+    let lowerBound = earliestTrainingDate.addingTimeInterval(-86_400)
+    return lowerBound...max(last, now).addingTimeInterval(86_400)
   }
 
   private func planLogs(
@@ -868,7 +1140,7 @@ public final class TodayWorkoutViewModel {
     }
     let fetched = try await logs.fetchLogs(
       studentID: studentID,
-      in: Self.planRange(for: plan.days, now: now())
+      in: Self.planRange(for: plan, now: now())
     )
     planLogsSnapshot = PlanLogsSnapshot(
       cycleID: plan.cycleID,
@@ -968,9 +1240,15 @@ extension TodayWorkoutViewModel {
     log: StudentSetLog,
     studentID: UUID,
     family: LiftFamily?,
-    registeredOneRMKg: Decimal?
+    registeredOneRMKg: Decimal?,
+    occurredAt: Date? = nil
   ) async -> PRBreakthroughEvent? {
-    let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
+    let recorder: E1RMRecorder
+    if let occurredAt {
+      recorder = E1RMRecorder(e1rm: e1rmRepo, now: { occurredAt })
+    } else {
+      recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
+    }
     return await recorder.record(
       E1RMRecorder.Input(
         studentID: studentID,

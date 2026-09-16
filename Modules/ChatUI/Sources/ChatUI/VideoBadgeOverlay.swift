@@ -23,7 +23,6 @@ struct VideoBadgeOverlay: View {
             } label: {
               badgeContent(containerWidth: proxy.size.width, expanded: isExpanded)
             }
-            .buttonStyle(.plain)
             .accessibilityLabel(
               isExpanded ? ChatStrings.collapseVideoBadge : ChatStrings.expandVideoBadge
             )

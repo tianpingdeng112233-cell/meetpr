@@ -84,6 +84,22 @@ import Testing
   }
 }
 
+@Test func planChangePushIntentsMapToTheStudentPlanRoute() {
+  let studentID = UUID()
+  let planID = UUID()
+
+  #expect(
+    StudentNotificationRoute.route(
+      for: .planUpdated(studentID: studentID, planID: planID)
+    ) == .plan
+  )
+  #expect(
+    StudentNotificationRoute.route(
+      for: .planPublished(studentID: studentID, planID: planID)
+    ) == .plan
+  )
+}
+
 @Test func tabLayersRemainMountedAcrossSelectionRoundTrip() {
   let training = StudentTabShellPresentation(selection: .training)
   let growth = StudentTabShellPresentation(selection: .growth)
@@ -113,19 +129,18 @@ import Testing
   }
 }
 
-@Test func feedbackHeightReversalStartsFromCurrentPresentation() {
-  #expect(
-    FeedbackHeightTransition.resolvedStartHeight(
-      presentedHeight: 184,
-      fallbackHeight: 320
-    ) == 184
-  )
-  #expect(
-    FeedbackHeightTransition.resolvedStartHeight(
-      presentedHeight: 0,
-      fallbackHeight: 112
-    ) == 112
-  )
+@Test func trainingRefreshTriggerAcceptsActiveSceneAndTrainingTabOnly() {
+  var trigger = StudentTrainingPlanRefreshTrigger()
+
+  trigger.handleScenePhase(.background)
+  trigger.handleTabSelection(.growth)
+  #expect(trigger.revision == 0)
+
+  trigger.handleScenePhase(.active)
+  #expect(trigger.revision == 1)
+
+  trigger.handleTabSelection(.training)
+  #expect(trigger.revision == 2)
 }
 
 @Test func importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() {

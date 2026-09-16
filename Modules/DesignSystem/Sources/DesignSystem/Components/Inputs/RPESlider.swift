@@ -119,7 +119,6 @@ private struct RPEBar: View {
         color: index == selectedIndex ? Color.MeetPR.gold500.opacity(0.5) : .clear,
         radius: 8
       )
-      .animation(MeetPRMotion.pillSelect, value: selectedIndex)
   }
 }
 

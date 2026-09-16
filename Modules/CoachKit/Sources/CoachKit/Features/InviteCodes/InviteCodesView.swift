@@ -203,7 +203,6 @@ struct InviteCodesView: View {
         }
       }
     }
-    .buttonStyle(.plain)
   }
 
   /// Clipboard always gets the raw ungrouped 10 chars (spec 031 D11).

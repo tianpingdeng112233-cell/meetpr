@@ -10,8 +10,6 @@ public struct MeetPRListRow: View {
   private let showsTrailingChevron: Bool
   private let action: (@MainActor () -> Void)?
 
-  @State private var feedbackTrigger = false
-
   public init(
     title: String,
     subtitle: String,
@@ -34,7 +32,6 @@ public struct MeetPRListRow: View {
     Group {
       if let action {
         Button {
-          feedbackTrigger.toggle()
           action()
         } label: {
           MeetPRListRowContent(
@@ -58,7 +55,6 @@ public struct MeetPRListRow: View {
         )
       }
     }
-    .sensoryFeedback(.impact(weight: .light), trigger: feedbackTrigger)
     .accessibilityElement(children: .combine)
     .accessibilityLabel("\(title), \(subtitle)")
     .accessibilityHint(action == nil ? "List row." : "Opens details.")

@@ -37,7 +37,6 @@ struct DashboardE1RMRail: View {
                 width: row.family == effectiveSelectedFamily ? 18 : 6,
                 height: 6
               )
-              .animation(.easeInOut(duration: 0.25), value: effectiveSelectedFamily)
           }
         }
       }

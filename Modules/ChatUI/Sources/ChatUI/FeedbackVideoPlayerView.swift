@@ -144,7 +144,6 @@ public struct FeedbackVideoPlayerView: View {
               Capsule().stroke(Color.MeetPR.borderStrong, lineWidth: 1)
             }
             .padding(.top, MeetPRSpacing.point56)
-            .transition(.move(edge: .top).combined(with: .opacity))
             .accessibilityIdentifier("feedback.video.exportSaved")
         }
       }
