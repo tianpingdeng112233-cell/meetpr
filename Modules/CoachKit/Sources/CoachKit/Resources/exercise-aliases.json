@@ -49,6 +49,18 @@
     { "alias": "哑铃推肩", "canonical": "坐姿哑铃推举" },
     { "alias": "两头起", "canonical": "V字上举" },
     { "alias": "帕洛夫推", "canonical": "弹力带 pallof 推" },
-    { "alias": "对握弯举", "canonical": "绳索锤式弯举" }
+    { "alias": "对握弯举", "canonical": "绳索锤式弯举" },
+    { "alias": "早安", "canonical": "早安式" },
+    { "alias": "六角杠深蹲", "canonical": "六角杠硬拉" },
+    { "alias": "六角杆硬拉", "canonical": "六角杠硬拉" },
+    { "alias": "杰弗森深蹲", "canonical": "杰弗森硬拉" },
+    { "alias": "Jefferson 硬拉", "canonical": "杰弗森硬拉" },
+    { "alias": "抬腿杠铃卧推", "canonical": "无腿卧推" },
+    { "alias": "弹力带杠铃卧推", "canonical": "弹力带卧推" },
+    { "alias": "弹力绳-卧推", "canonical": "弹力带卧推" },
+    { "alias": "背蹲地面起始设置", "canonical": "Anderson 深蹲" },
+    { "alias": "澳式引体", "canonical": "澳大利亚引体" },
+    { "alias": "壶铃甩", "canonical": "壶铃摆动" },
+    { "alias": "杠铃火箭推", "canonical": "借力推举" }
   ]
 }
