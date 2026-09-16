@@ -5,11 +5,15 @@
 > **格式**:`- YYYY-MM-DD <short-sha> — 一句话改了什么(牵动的模块)`
 > 密钥/密码永不入此文件。
 
-## 2026-09-14 收货分支（尚未落线）
+## 2026-09-16 下一班车整合
+
+- 2026-09-16 3acc828 — [Codex][P1] 按 David 批准整合 #339/#342/#341/#340/#343 进入 1.0(22)，保留已有组合修复；修正 #343 两个新按钮绕过 #341 统一按压、上午补记被 Demo 历史时间窗口过滤的问题。#338 留候选；未切包、未执行线上迁移或部署。证据见 [整合验证](verification-train22-2026-09-16.md)。
+
+## 2026-09-14 收货历史（当时尚未落线）
 
 - 2026-09-14 73fea6d — [Codex] 组合 #342/#341/#340，修复补记日期窗口、Gregorian 日期、部分写入重试、数字键盘小数及动作清理兼容；#342 修复已回推 c21a3d7/dbcf60fa。组合 1,913 个 SwiftPM + 主工程 9 测试、DemoStudent 实点及完整 lint/format 通过；GitHub billing 与阿里云登录阻塞合并/部署。详见 [验证记录](verification-finish22-2026-09-14.md)。
 
-## 独立实装分支（未进入发版线）
+## 2026-09-14 独立实装历史（当时未进入发版线）
 
 - 2026-09-14 cc8efa53 — [Codex][T2/P1] Add e1RM source details and training history navigation：学员端每日最佳节点可查来源组和原计算，训练页直达历史并保留活动组/休息计时；869 测试、DemoStudent 双主题实点、strict lint/format 通过；Standards/Spec 独立审查 CLEAN。分支 `feat/083-e1rm-history-impl` 待合并，证据 `docs/evidence/083-e1rm-history/`，原型保留设计分支。
 
