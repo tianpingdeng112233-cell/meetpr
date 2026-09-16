@@ -1,7 +1,53 @@
+import CoreModels
 import Foundation
+import RepositoryContracts
 import Testing
 
 @testable import StudentKit
+
+@MainActor
+@Test func trainingHistoryViewModelLoadsEmptyHistory() async {
+  let viewModel = TrainingHistoryViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore()),
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+
+  #expect(viewModel.state == .loaded(weeks: [], logs: []))
+}
+
+@MainActor
+@Test func trainingHistoryViewModelRecoversWhenRetrySucceeds() async {
+  let viewModel = TrainingHistoryViewModel(
+    plans: RecoveringHistoryPlanRepository(),
+    logs: InMemoryStudentTrainingLogRepository()
+  )
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+  guard case .error = viewModel.state else {
+    Issue.record("Expected the first request to surface a retryable error")
+    return
+  }
+
+  await viewModel.load(studentID: StudentDemoSeed.studentID)
+
+  #expect(viewModel.state == .loaded(weeks: [], logs: []))
+}
+
+private actor RecoveringHistoryPlanRepository: StudentPlanRepository {
+  private var hasFailed = false
+
+  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    if !hasFailed {
+      hasFailed = true
+      throw URLError(.timedOut)
+    }
+    return nil
+  }
+
+  func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] { [] }
+}
 
 @MainActor
 @Test func trainingHistoryViewModelIgnoresURLCancellation() async {

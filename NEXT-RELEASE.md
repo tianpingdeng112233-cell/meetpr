@@ -24,6 +24,8 @@
 
 ## 1.0(22) 候选(前置解锁后即可进)
 
+- **Spec 083 e1RM 节点溯源与训练历史入口（T2 / P1）**：实装分支 `feat/083-e1rm-history-impl`，869 项测试及 DemoStudent 双主题验收通过，独立审查 CLEAN；待 David 确认 PR 合并后进入候选。无后端迁移、无 build 号改动。证据见 [验收记录](docs/evidence/083-e1rm-history/README.md)。
+
 ⚖️ 2026-08-09 收尾 1.0(18) 时登记,08-23 收尾 1.0(21) 时顺延。**登记在此不等于已排期**,下次切包前重新核。
 
 - **iOS 切域名 `https://app.meetpr.cn`(C 序列第 2 步,T1)**:BuildConfig

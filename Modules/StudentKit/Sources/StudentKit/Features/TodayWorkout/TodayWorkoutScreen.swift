@@ -36,6 +36,7 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
   let sequenceContent: SequenceContent
   let calendarContent: CalendarContent
   let onRefresh: () -> Void
+  let onHistory: () -> Void
   let onReadiness: () -> Void
   let onNotifications: () -> Void
   let onMessageCoach: () -> Void
@@ -70,6 +71,25 @@ struct TodayWorkoutScreen<SequenceContent: View, CalendarContent: View>: View {
         onReadiness: onReadiness,
         onNotifications: onNotifications
       )
+
+      HStack {
+        Spacer()
+        Button(action: onHistory) {
+          HStack(spacing: MeetPRSpacing.space1) {
+            Image(systemName: "clock")
+            Text(StudentStrings.localized(.e1rmSourceHistory))
+            Image(systemName: "chevron.right")
+              .font(.system(size: MeetPRFontMetrics.size10, weight: .semibold))
+          }
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.goldText)
+          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+          .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("todayWorkout.history")
+      }
+      .padding(.vertical, -MeetPRSpacing.space2)
 
       sequenceContent
       screenContent
