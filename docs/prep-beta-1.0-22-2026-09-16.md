@@ -21,7 +21,30 @@ David 明确要求“切包发车”。从 release/1.0@a1a578e9 准备，#338–
 
 ## 四基线与验证
 
-含 bump 的准确切包 SHA、tag CI、双端已安装 build 与截图在验收后补记。准备前教练 iPhone 17、学员 iPhone 17 Pro 的 CN app 已安装号均为 21（直接读取 simulator Bundle/Application 下 Info.plist）。
+切包 SHA：`0748931563fefea14e7f50a7c9ee7330b5501bea`。annotated tag `beta/1.0-22` 已推送并解引用核对一致。
+
+| 基线 | 现场值与来源 |
+|---|---|
+| 发版线 tip（切包时） | origin/release/1.0 = 07489315；后续只追加本验收文档与截图，代码不变 |
+| beta tag | beta/1.0-22^{commit} = 07489315，本地/远端均已核实 |
+| 模拟器已安装 | 教练 iPhone 17 与学员 iPhone 17 Pro 的 com.meetpr.app 均 1.0(22)，直接读取已安装容器 Info.plist |
+| ASC 最新已上传 | 1.0(21)，09-16 现场 TestFlight 列表；22 尚未上传 |
+
+双端 demo 专用树 `MeetPR-demo-latest` 已 detached 到准确 tag 07489315，工作树干净。两次 build/run 均 0 warnings / 0 errors，角色与页面亲验：教练 Today 待处理列表；学员训练页 W1D3、历史入口与快捷补记入口。
+
+- [教练截图](evidence/beta-1.0-22/coach.jpg)；[学员截图](evidence/beta-1.0-22/student.jpg)。
+- 教练已安装容器：`/Users/david/Library/Developer/CoreSimulator/Devices/A5119984-9A8D-415C-83D4-E7145351FA79/data/Containers/Bundle/Application/1A81D274-0600-449D-83D2-76B8D3E96DB1/MeetPR.app`。
+- 学员已安装容器：`/Users/david/Library/Developer/CoreSimulator/Devices/D412AE31-0ED9-4A23-B0FD-FFFA4A5A5609/data/Containers/Bundle/Application/24CF4BC3-120C-48C4-BA6B-52FD2E1256EC/MeetPR.app`。
+- build 日志：XcodeBuildMCP `build_run_sim_2026-09-16T07-08-53-848Z_pid93432_f46b3bc8.log`、`build_run_sim_2026-09-16T07-11-47-639Z_pid93432_1ed6ca90.log`，均在 `/Users/david/Library/Developer/XcodeBuildMCP/workspaces/Projects-cf51cf27789e/logs/`。
+- [tag CI run 35067056331](https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/35067056331) 的 headSha 已核实为切包 SHA；最终全绿：九包 1,922（30/103/85/443/158/73/131/6/893）、主工程 9 测试、swift-format、SwiftLint 全部成功。
+
+Xcode 已打开本次专用取包工程，MeetPR / Any iOS Device (arm64)。打开后 Xcode 自动重排 TestAction 的 MacroExpansion/Testables，并写用户界面状态；逐项 XML 比较语义完全一致，ArchiveAction 未变。仅这两处本机状态差异留存，不混入提交；源码、build settings 与 tag 一致。
+
+[TestFlight 更新说明与建议测试项](evidence/beta-1.0-22/testflight-notes.txt) 可直接用于上传时说明。
+
+## 交付状态
+
+代码侧可 Archive：使用本次专用工程，MeetPR scheme / Any iOS Device (arm64) → Product → Archive。尚未 Archive 或上传，ASC 最高仍为 21；Apple 协议需 David 在上传前本人处理。完成上传后再核对 ASC 并关闭本包台账。
 
 ## 发布边界
 
