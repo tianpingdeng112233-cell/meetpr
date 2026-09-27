@@ -7,6 +7,8 @@
 
 ## 2026-09-27 硬拉 e1RM 修复（待合并）
 
+- 2026-09-27 `fix/050-imported-e1rm-baseline` — [Codex][CI] PR #345 首跑被上游 ViewInspector 新版 manifest 阻断；四模块统一固定原已验证的 0.10.3，窄范围双轴补审 CLEAN，StudentKit 901 复验绿，重新跑完整 CI。
+
 - 2026-09-27 `fix/050-imported-e1rm-baseline` — [Codex][T2/P1] 实练异常基线排除 imported，Progress 首次读取前恢复受影响旧历史；保留导入复核、退役历史、PR 与不回退的重量基线。StudentKit 901 测试、strict lint/format、模拟器90天曲线/来源组亲验通过；独立 Standards/Spec 第二轮均 CLEAN。未改 build/tag，未合并/上传。[验证记录](verification-e1rm-imported-baseline-2026-09-27.md)。
 
 ## 2026-09-16 准备 1.0(22)

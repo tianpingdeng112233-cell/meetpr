@@ -15,7 +15,7 @@ let package = Package(
     .package(path: "../DesignSystem"),
     .package(path: "../Analytics"),
     .package(path: "../ChatUI"),
-    .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
+    .package(url: "https://github.com/nalexn/ViewInspector", exact: "0.10.3"),
   ],
   targets: [
     .target(

@@ -13,7 +13,7 @@
 - 红→绿：首次实练 .low→.normal；旧历史 151.7 / formingWindowSparse→31 个可信实练点 / 8 个可信日期 / chart。
 - StudentKit 全量 **901 tests passed**（最终日志 `swift_package_test_2026-09-27T15-11-07-088Z_pid86641_33734c86.log`，XcodeBuildMCP workspace Projects-cf51cf27789e）。
 - 回归覆盖：真实异常仍隔离、已复核导入不污染基线、退役历史与缺失点组合、导入复核并发 CAS 拒写重试、真实磁盘写失败重试、Local 仓储重开首屏、重复刷新无写入、较新重量基线不回退。
-- 目标 Swift 文件 strict swiftlint / swift-format 和 `git diff --check` 通过。SwiftPM 复用本机 CI 已解析 ViewInspector 0.10.3；未修改项目依赖。
+- 目标 Swift 文件 strict swiftlint / swift-format 和 `git diff --check` 通过。本地验证最初复用 ViewInspector 0.10.3。PR CI 首跑在新解析的上游 ViewInspector manifest 失败（tools 5.9 使用 visionOS v2）；四个引用模块随后统一固定既有已验证版本 0.10.3，不新增依赖。
 - `MeetPR-DemoStudent` / `DemoStudent`，iPhone 17 Pro 模拟器构建运行成功。用临时 Demo seed 注入同一去身份化旧历史，从 Today 151.7 直接切 Progress，90 天曲线出现；点选 9/23 显示 160×5、RPE 7、216.2。临时 Demo 源码已还原，不进入提交。
 - Demo 仅证明页面接线与呈现；真实磁盘持久化由 LocalE1RMRepository 升级/重开/失败重试测试证明。未读取学员手机本地文件，不声称已在学员设备验证。
 
@@ -31,3 +31,5 @@
 - Spec 第 1 轮：修复同时补缺失点/coachRPE 时绕过保留逻辑，可能删除退役历史。所有分支统一按受影响主项合并，新增组合红测试；第 2 轮 CLEAN。
 
 两个独立 reviewer 均只读，未决 blocker 0。PR / CI 状态另以 GitHub 为准。
+
+CI 前置约束补审：Standards / Spec 均 CLEAN，仅四个既有测试依赖约束统一为 exact 0.10.3；StudentKit 901 复验通过，完整 CI 重新运行。

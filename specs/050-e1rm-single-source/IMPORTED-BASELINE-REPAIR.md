@@ -15,3 +15,7 @@
 ## Out of Scope
 
 不改暂停变式的入选、不修平值曲线文案、不改公式/阈值、不改变后端/网页/Android、不迁移或删除服务器训练日志、不生成追溯 PR 或通知、不改 build/tag、不 Archive/Upload。main 的旧形态与独立算法波冻结，不借本次修复合入。
+
+## CI 前置修复
+
+PR 首跑暴露上游 ViewInspector 新版 manifest 在 tools 5.9 下使用 visionOS v2，测试尚未进入本次代码即失败。四个引用模块固定到已有 CI/本地验证过的 0.10.3（原范围 from 0.10.0），保证新 checkout 可解析；不新增运行时依赖或升级工具链。
