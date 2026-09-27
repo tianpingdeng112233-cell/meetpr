@@ -9,7 +9,7 @@ let package = Package(
     .library(name: "DesignSystem", targets: ["DesignSystem"])
   ],
   dependencies: [
-    .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0")
+    .package(url: "https://github.com/nalexn/ViewInspector", exact: "0.10.3")
   ],
   targets: [
     .target(

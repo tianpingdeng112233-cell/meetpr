@@ -16,7 +16,7 @@ let package = Package(
     .package(path: "../RepositoryContracts"),
     .package(path: "../Analytics"),
     .package(path: "../ChatUI"),
-    .package(url: "https://github.com/nalexn/ViewInspector", from: "0.10.0"),
+    .package(url: "https://github.com/nalexn/ViewInspector", exact: "0.10.3"),
     // Read-only XLSX parsing for coach plan import (spec 043). Apache-2.0,
     // pure Swift. Pinned exact — the importer depends on its cell-addressing.
     .package(url: "https://github.com/CoreOffice/CoreXLSX", exact: "0.14.2"),

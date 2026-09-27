@@ -161,7 +161,7 @@ struct E1RMRecorder: Sendable {
       input.confidenceOverride
       ?? E1RMPolicy.anomalyVerdict(
         newE1RMKg: estimatedOneRepMaxKg,
-        previousBestKg: context.baselines.e1RMKg
+        previousBestKg: context.baselines.anomalyE1RMKg
       ).confidence
     let point = makePoint(
       input: input,
@@ -203,6 +203,7 @@ struct E1RMRecorder: Sendable {
 
   private struct Baselines {
     let e1RMKg: Double?
+    let anomalyE1RMKg: Double?
     let registeredOneRMKg: Double
     let previousMeasuredWeightKg: Double
     let measuredWeightSetLogID: UUID?
@@ -261,12 +262,14 @@ extension E1RMRecorder {
       baselineIsCurrentSet
       ? previousWeightBaseline?.previousMaxWeightKg ?? 0
       : previousWeightBaseline?.maxWeightKg ?? 0
+    let estimates = try await previousTrustedE1RMBaseline(
+      for: input,
+      family: family,
+      excludingCurrentLoggedPoint: baselineIsCurrentSet
+    )
     return Baselines(
-      e1RMKg: try await previousTrustedE1RMBaseline(
-        for: input,
-        family: family,
-        excludingCurrentLoggedPoint: baselineIsCurrentSet
-      ),
+      e1RMKg: estimates.display,
+      anomalyE1RMKg: estimates.measured,
       registeredOneRMKg: registeredOneRMKg ?? 0,
       previousMeasuredWeightKg: priorMeasuredWeightKg,
       measuredWeightSetLogID: previousWeightBaseline?.setLogId,
@@ -282,7 +285,7 @@ extension E1RMRecorder {
     for input: Input,
     family: LiftFamily,
     excludingCurrentLoggedPoint: Bool
-  ) async throws -> Double? {
+  ) async throws -> (display: Double?, measured: Double?) {
     let history = try await e1rm.fetchHistory(studentId: input.studentID, family: family)
     let eligible = E1RMSeries.eligibleRaw(
       points: history.filter {
@@ -291,7 +294,13 @@ extension E1RMRecorder {
       },
       family: family
     )
-    return eligible.filter { $0.confidence == .normal }.map(\.e1RMKg).max()
+    // Imported prescriptions remain visible history, but cannot establish the
+    // anomaly baseline for measured training (their RPE is often unavailable).
+    let trusted = eligible.filter { $0.confidence == .normal }
+    return (
+      display: trusted.map(\.e1RMKg).max(),
+      measured: trusted.filter { $0.origin == .logged }.map(\.e1RMKg).max()
+    )
   }
 }
 

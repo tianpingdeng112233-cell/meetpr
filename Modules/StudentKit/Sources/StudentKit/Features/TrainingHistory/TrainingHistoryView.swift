@@ -58,7 +58,8 @@ public struct TrainingHistoryView: View {
       initialValue: GrowthCurveViewModel(
         plans: plans,
         e1rm: e1rm,
-        onboarding: onboarding
+        onboarding: onboarding,
+        logs: logs
       )
     )
   }
