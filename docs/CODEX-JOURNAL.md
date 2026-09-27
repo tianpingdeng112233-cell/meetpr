@@ -5,6 +5,10 @@
 > **格式**:`- YYYY-MM-DD <short-sha> — 一句话改了什么(牵动的模块)`
 > 密钥/密码永不入此文件。
 
+## 2026-09-27 硬拉 e1RM 修复（待合并）
+
+- 2026-09-27 `fix/050-imported-e1rm-baseline` — [Codex][T2/P1] 实练异常基线排除 imported，Progress 首次读取前恢复受影响旧历史；保留导入复核、退役历史、PR 与不回退的重量基线。StudentKit 901 测试、strict lint/format、模拟器90天曲线/来源组亲验通过；独立 Standards/Spec 第二轮均 CLEAN。未改 build/tag，未合并/上传。[验证记录](verification-e1rm-imported-baseline-2026-09-27.md)。
+
 ## 2026-09-16 准备 1.0(22)
 
 - 2026-09-16 07489315— [Codex][prep-beta] David 要求切包；核实 ASC 最高 21 与六项祖先关系，agvtool 升至 22、marketing 保持 1.0；使用独立取包树保留旧树修改。tag CI 九包 1,922 + 主工程 9 全绿，双端 demo 已装 22；Archive/Upload 尚未执行，Apple 新协议待本人处理。完整状态见 [切包记录](prep-beta-1.0-22-2026-09-16.md)。

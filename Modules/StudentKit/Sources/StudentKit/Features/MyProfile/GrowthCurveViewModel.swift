@@ -43,6 +43,7 @@ public final class GrowthCurveViewModel {
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
+  private let reconciler: E1RMCoachRPEReconciler?
   private let now: @Sendable () -> Date
   private var seriesByFamily: [LiftFamily: E1RMSeries] = [:]
   private var rawPointsByID: [UUID: E1RMHistoryPoint] = [:]
@@ -51,17 +52,31 @@ public final class GrowthCurveViewModel {
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
     onboarding: (any OnboardingProfileReading)? = nil,
+    logs: (any StudentTrainingLogRepository)? = nil,
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.e1rm = e1rm
     self.onboarding = onboarding
     self.now = now
+    if let logs, let onboarding {
+      reconciler = E1RMCoachRPEReconciler(
+        logs: logs, onboarding: onboarding, plans: plans,
+        catalogReader: plans as? any ExerciseCatalogReading, e1rm: e1rm, now: now
+      )
+    } else {
+      reconciler = nil
+    }
   }
 
   public func load(studentID: UUID) async {
     let isInitialLoad = state == .idle
     if isInitialLoad { state = .loading }
+    // Repair stale derived history before the first Progress snapshot. A failed
+    // refresh keeps cached history readable and can retry on the next load.
+    if let reconciler {
+      _ = try? await reconciler.reconcile(studentID: studentID)
+    }
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       let profile = try await onboarding?.fetchProfile(studentId: studentID)

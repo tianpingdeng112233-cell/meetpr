@@ -65,7 +65,7 @@ actor E1RMCoachRPEReconciler {
     let (profile, catalog, setLogs) = try await (profileTask, catalogTask, setLogsTask)
     let historySnapshot = try await e1rm.historySnapshot(
       studentId: studentID,
-      exerciseIds: Array(catalog.exerciseByID.keys)
+      exerciseIds: try await historyExerciseIDs(studentID: studentID, catalog: catalog)
     )
     let oldPoints = historySnapshot.history.values.flatMap { $0 }
     let replayContext = Self.replayContext(
@@ -73,20 +73,28 @@ actor E1RMCoachRPEReconciler {
       catalog: catalog,
       oldPoints: oldPoints
     )
-    guard
-      needsReconciliation(
-        setLogs: setLogs,
-        context: replayContext
-      )
-    else {
+    let calibratedFamilies = reconciliationFamilies(setLogs: setLogs, context: replayContext)
+    let repairFamilies = E1RMImportedBaselineRepair.affectedFamilies(
+      setLogs: setLogs, context: replayContext
+    )
+    let changedFamilies = calibratedFamilies.union(repairFamilies)
+    guard !changedFamilies.isEmpty else {
       return Result(didReconcile: false, pointCount: 0)
     }
 
-    let replayed = try await E1RMHistoryReplayService().rebuild(
+    var replayed = try await E1RMHistoryReplayService().rebuild(
       studentID: studentID,
       context: replayContext,
       setLogs: setLogs,
       confidencePolicy: .recompute
+    )
+    replayed = E1RMImportedBaselineRepair.merging(
+      replayed,
+      into: .init(
+        points: oldPoints,
+        weightBaselines: try await e1rm.fetchWeightBaselines(studentId: studentID)
+      ),
+      families: changedFamilies, setLogs: setLogs, context: replayContext
     )
     let didReplace = try await e1rm.replaceHistory(
       studentId: studentID,
@@ -99,6 +107,19 @@ actor E1RMCoachRPEReconciler {
       return Result(didReconcile: false, pointCount: 0)
     }
     return Result(didReconcile: true, pointCount: replayed.points.count)
+  }
+
+  private func historyExerciseIDs(
+    studentID: UUID,
+    catalog: CatalogContext
+  ) async throws -> [UUID] {
+    var ids = Set(catalog.exerciseByID.keys)
+    // Replacement is student-wide: include retained history from retired catalog entries.
+    for family in LiftFamily.allCases {
+      let points = try await e1rm.fetchHistory(studentId: studentID, family: family)
+      ids.formUnion(points.map(\.exerciseId))
+    }
+    return Array(ids)
   }
 
   private static func replayContext(
@@ -134,23 +155,25 @@ actor E1RMCoachRPEReconciler {
     return events
   }
 
-  private func needsReconciliation(
+  private func reconciliationFamilies(
     setLogs: [StudentSetLog],
     context: E1RMHistoryReplayContext
-  ) -> Bool {
+  ) -> Set<LiftFamily> {
+    var families: Set<LiftFamily> = []
     for log in setLogs where log.completed && !log.assumed {
+      guard let family = context.family(for: log) else { continue }
       guard let existing = context.existingPointBySetLogID[log.id] else {
-        if Self.shouldProducePoint(for: log, context: context) { return true }
+        if Self.shouldProducePoint(for: log, context: context) { families.insert(family) }
         continue
       }
       guard existing.origin == .logged else { continue }
       let sourceCoachRPE = log.coachRPE.map { NSDecimalNumber(decimal: $0).doubleValue }
-      if existing.sourceCoachRPE != sourceCoachRPE { return true }
+      if existing.sourceCoachRPE != sourceCoachRPE { families.insert(family) }
     }
-    return false
+    return families
   }
 
-  private static func shouldProducePoint(
+  static func shouldProducePoint(
     for log: StudentSetLog,
     context: E1RMHistoryReplayContext
   ) -> Bool {
