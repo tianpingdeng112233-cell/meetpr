@@ -9,6 +9,7 @@
 - build 号：23，marketing version 保持 1.0；原 22 tag 不变。
 - 发版线：`release/1.0`；#345 已于 2026-09-27 squash 合入 `03021ff6`。
 - 本次仅追加以下已批准修复，延期候选不进入本包。
+- 切包完成：`beta/1.0-23@4e97a489`，tag CI run 36330361925 全绿（九包 1,930 + 主工程 9，format/lint）；双端实际安装 1.0(23)，**可 Archive，尚未上传**。
 - 切包与四基线：[1.0(23) 切包记录](docs/prep-beta-1.0-23-2026-09-27.md)。Archive / Upload 由 David 手动。
 
 ## 本版包含
