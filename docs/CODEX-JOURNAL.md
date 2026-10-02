@@ -90,3 +90,36 @@
 - 2026-07-10 4081362 — [Claude] Port #228:清 pbxproj 死 INFOPLIST_KEY 设置(仅 pbxproj)
 - 2026-07-10 01e2ebf — [Claude] Merge three-fix port #231'/#232'/#233' into release/1.0(AppShell/Networking/CoachKit/StudentKit + NEXT-RELEASE 更新)
 - (示例,勿删)2026-07-10 0000000 — Fix xxx in TodayWorkoutView(仅 StudentKit)
+
+## 2026-10-02 · spec 084 卡 A · Codex 实装交回 Opus
+
+- T2 / P1；工作分支 `feat/084a-walkthrough-behaviors`，基准 `bcabd9a4`，目标 PR base 为 `release/1.0`。四项实装保留未提交工作区；未 commit / push / 开 PR，未改版本账本、build 号或 SPEC 状态。最终验收由 Opus 按卡 A 清单执行。
+- §2：共享序号入口为 `StudentPlanSequence.dayNumbers(inWeek:)`，复用原有排序，已完成日占号。接入清单：Today 页头、Today 完成卡和下一练标签、Today 周条、训练页页头、训练页当前周条、计划周列表、补记 sheet / toast、训练奖励与总结页（消费同一 weekCode）、教练学员详情概览。全仓检索确认本线训练历史和聊天训练卡没有独立 W#D# / D# 展示入口；没有新增标签。教练排课 `DAY n`、日期投影、游标、完成推进、组录入及持久化结构未改。
+- §3：体重与 Meetday 的空态、有值态均为带 `PressScaleButtonStyle` 的 Button，分别导航到既有 `.basics` / `.competition` 编辑器。每次导航独立加载 profile 后创建草稿；保存沿用 `MyProfileViewModel.save`，取消沿用返回，回 Today 重新读取指标。
+- §5：删除 `pendingPRBanner` 与旧展示/手动确认方法；新 PR 记录后立即确认，进入训练页时确认积压事件，保留 PR 与 e1RM 历史。现场基准已不存在横幅视图及其专用文案键，因此没有额外视图或文案可删；Progress 未改。
+- §6：未保存设置时，从当前游标周（全完成则最后周）的推荐日期按 UTC 日历身份取星期，包含已完成日与后移日期；回落档案训练日，再回落一三五。提醒页打开时刷新计划；已保存设置优先，加载期间禁用编辑，存储格式不变。
+
+### 自测证据
+
+四个约定 seam 逐项先红后绿，没有新增其他 seam。新增 6 个测试方法（导航按空/有值参数运行），同步旧标签及 PR 测试：
+
+| seam | 红证据 | 绿证据 |
+| --- | --- | --- |
+| 序号函数 / 标签 presentation | `TrainingDayNumberTests` 因缺少序号函数与标签上下文失败 | D1–D4、补早日后 D1–D5、同槽排序、Dashboard / 训练页标签通过 |
+| Today 卡片导航 | `DashboardProfileNavigationTests` 因缺少导航回调失败 | 空态与有值态的两个 Button 点击分别返回 `.basics` / `.competition` |
+| 训练页 PR 处理 | 原 persist / 启动测试观察到横幅待展示状态及未确认事件，4 条断言失败 | 新事件记录与确认、积压确认、重进不再待确认、重复记录隔离通过 |
+| 提醒默认星期 | `TrainingReminderDefaultTests` 因缺少计划 / 已存设置输入失败 | 推荐日期、当前周、三级回落、空星期的已保存设置不变通过 |
+
+- 九个 SPM 包 `swift test` 全通过，共 1936 项：CoreModels 158、RepositoryContracts 6、Networking 131、DesignSystem 73、Analytics 30、ChatUI 85、CoachKit 443、StudentKit 907、AppShell 103。
+- 全量首轮发现已有 `dashboardWeekCellsAreSequenceOrdinalsNotCalendarSlots` 仍断言 `[1, 4]`，按本卡更新为 `[1, 2]`；随后 StudentKit 全量通过。
+- CoachKit / AppShell 初次依赖解析因 GitHub 连接失败中止，使用本机缓存及 `--skip-update` 完成。shell 沙箱下 AppShell 两项 Keychain 测试失败；经 XcodeBuildMCP 重跑 103 项全绿。未改变依赖版本或测试实现。
+- 主工程 XcodeBuildMCP `test_sim`：`MeetPR.xcodeproj` / `MeetPR` / Debug / MeetPR-CI（iOS 26.5），9/9 通过；参数 `CODE_SIGNING_ALLOWED=NO -skipPackageUpdates`。首次网络解析失败，重跑跳过更新后通过。
+- `swiftlint lint --strict`：全仓 1073 个 Swift 文件，0 violations。`swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules`：通过。`git diff --check`：通过。保留既有 Swift 并发等编译 warning，本卡未新增 warning。
+- 本机原始日志：`/tmp/084a-coach-tests.log`、`/tmp/084a-swiftlint-final.log`、`/tmp/084a-format-final.log`；XcodeBuildMCP 本 worktree 日志中 StudentKit 为 `swift_package_test_2026-10-02T13-09-02-507Z_pid7167_945d2585.log`，AppShell 为 `swift_package_test_2026-10-02T13-11-00-051Z_pid7167_4b508db9.log`，主工程为 `test_sim_2026-10-02T13-09-49-406Z_pid7167_04b7057b.log`，同次 xcresult 已保留。
+
+### 自审与待收货
+
+- Standards 独立只读自审：CLEAN。
+- Spec 独立只读自审：发现 1 项 P2（重开 Today 编辑器可能沿用旧草稿），已改为每次导航创建独立 ViewModel，定向复审 CLEAN。
+- 未做设备验证：DemoStudent / Demo 的 Light / Dark、小屏、大字体与保存/取消实屏操作，按卡 A 交 Opus 收货。主工程自动测试通过不等于完成该视觉与交互验收。
+- 2026-10-02 返修第 1 轮：仅修 `dayNumbers(inWeek:)` 重复 id 构造崩溃，保留排序后首次出现的序号；新增重复 id / 反转输入的稳定性回归，先复现 `Duplicate values for key` 崩溃，修后序号测试 3/3 通过。三包均以 `--skip-update` 复跑：CoreModels 158、CoachKit 443 全绿；StudentKit 跑 908 项，序号测试通过，视频测试报 15 个 `Cannot Encode` 问题，全量未绿。全仓 SwiftLint 严格模式 1073 文件 0 违规、swift-format 严格模式及 `git diff --check` 通过；本次未做设备验证，未 commit / push，其余既有改动保留。日志：`/tmp/084a-r1-{red,green,CoreModels,StudentKit,CoachKit,swiftlint,format}.log`。
