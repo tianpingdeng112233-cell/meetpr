@@ -123,3 +123,49 @@
 - Spec 独立只读自审：发现 1 项 P2（重开 Today 编辑器可能沿用旧草稿），已改为每次导航创建独立 ViewModel，定向复审 CLEAN。
 - 未做设备验证：DemoStudent / Demo 的 Light / Dark、小屏、大字体与保存/取消实屏操作，按卡 A 交 Opus 收货。主工程自动测试通过不等于完成该视觉与交互验收。
 - 2026-10-02 返修第 1 轮：仅修 `dayNumbers(inWeek:)` 重复 id 构造崩溃，保留排序后首次出现的序号；新增重复 id / 反转输入的稳定性回归，先复现 `Duplicate values for key` 崩溃，修后序号测试 3/3 通过。三包均以 `--skip-update` 复跑：CoreModels 158、CoachKit 443 全绿；StudentKit 跑 908 项，序号测试通过，视频测试报 15 个 `Cannot Encode` 问题，全量未绿。全仓 SwiftLint 严格模式 1073 文件 0 违规、swift-format 严格模式及 `git diff --check` 通过；本次未做设备验证，未 commit / push，其余既有改动保留。日志：`/tmp/084a-r1-{red,green,CoreModels,StudentKit,CoachKit,swiftlint,format}.log`。
+
+## 2026-10-02 · spec 084 卡 B · Codex 实装交回 Opus
+
+- T2 / P1；工作分支 `feat/084b-week-strip-login`，基准 `605d1243`（卡 A）。按 CARD-B-ios.md 在当前分支实装，未 commit / push / 开 PR；未改 SPEC、NEXT-RELEASE、RELEASES、build 号、依赖或工程结构。本节为末尾追加，前文保留；最终验收由 Opus 按卡 B 清单执行。
+- §1：Global 登录页改为邮箱 → 密码 → Sign in → 两个文字链接 → or → Apple → Google → 法律文案。Apple / Google 同宽同高、描边次要样式，保留认证回调、错误、取消行为和原无障碍标识。GlobalRegisterView 无第三方入口，无需修改；CN 登录未动。
+- §4：TrainingSequenceLayout 提供全部训练周、当前/可见周、每格序号与独立选中状态、完成计数、首尾边界及翻周默认选择。新 TrainingWeekStrip 接入箭头、横滑、状态胶囊、小点（超过 8 周隐藏）、深色选中框和淡金当前训练日。翻回当前周选游标日；全完成计划沿用最后一天回落。
+- 页头非当前选择显示 Back to today；未来日用 TrainingDayPreview 只读展示推荐日期、日名、动作/组数与现有解锁提示。已完成/当前训练日继续走原展示。训练 tab 的用户点击复用 jump token 回当前；下拉刷新和完成流程结束回当前。记录、计时、补记、仓储与持久化结构未改。
+- 删除 TrainingCalendarView、旧 CalendarContent 接线、按周折叠专用函数、旧日历预览及无用双语文案。新增七个周条中英文 symbol key；预览计数复用原有单复数文案。
+
+### 自测证据
+
+仅在卡约定 seam 新增 7 个测试方法（登录顺序 1、TrainingSequenceLayout 分页 6）。红 → 绿按行为逐步执行：
+
+| seam / 行为 | 红证据 | 绿证据 |
+| --- | --- | --- |
+| GlobalLoginView 元素顺序 | `/tmp/084b-login-red.log`：文本/渠道顺序两条断言失败，Apple/Google 位于邮箱前 | `/tmp/084b-login-green.log`：顺序与既有 Apple 取消测试 2/2 通过 |
+| 周分页默认选择 | `/tmp/084b-paging-red.log`：缺少 page 入口编译失败 | `/tmp/084b-paging-green.log`：全部周可访问、默认当前周/当前训练日通过 |
+| 翻周默认选择及首尾边界 | `/tmp/084b-navigation-red.log`：缺少前后周选择入口 | `/tmp/084b-navigation-green.log`：含跳号周、过去/未来/返回当前周 2/2 通过 |
+| 独立选中、当前状态和完成数 | `/tmp/084b-markers-red.log`：缺少状态/计数/小点入口 | `/tmp/084b-markers-green.log`：3/3 通过；后补空计划、失效选择、全完成、单周、8/9 周、完成后游标推进回归 |
+
+- 删除仅针对旧 Plan summary 的两个测试及旧文案断言。全量初跑另外暴露两个 SetNumberSurfaceTests 的 fixture 用未来日期选日，却要求显示录入界面；按未来日只读约束改为选 StudentPlanSequence.cursorDay，保留原组号断言。定向复测分页/组号/本地化 21/21 通过（`/tmp/084b-review-green.log`）。
+- 九包均尝试 `swift test --skip-update --disable-sandbox --cache-path /tmp/084b-swift-cache`；模块缓存通过 `CLANG_MODULE_CACHE_PATH` / `SWIFTPM_MODULECACHE_OVERRIDE` 指向 `/tmp/084b-module-cache`。首次依赖网络代理不可达，复制本机既有依赖缓存后成功解析，未更新依赖版本。XcodeBuildMCP 的 SwiftPM test 工具无 skip-update 参数，因此按用户约束使用 CLI。
+- 六包全量通过：CoreModels 158、RepositoryContracts 6、Networking 131、DesignSystem 73、Analytics 30、CoachKit 443。日志 `/tmp/084b-full-<包名>.log`。
+- 三包全量未绿：ChatUI 85 项有 1 个视频编码问题；StudentKit 912 项初跑有 15 个视频编码问题及上述 2 个 fixture 问题；AppShell 104 项有 2 个 Keychain 测试共 3 条失败断言。编码错误为 AVFoundation `Cannot Encode`，Keychain 失败发生于 shell 沙箱；前序卡 A 已记录同类环境限制，没有修改生产视频/Keychain 逻辑来规避。
+- 修正 fixture 后，排除受限视频/Keychain 测试的可运行回归通过：StudentKit 896、AppShell 102、ChatUI 84（`/tmp/084b-available-<包名>.log`）。排除模式分别为 `AVFoundationVideoExporterTests|PassthroughVideoTrimExporterTests|realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer`、`keychainTokenStore`、`VideoBadgeExporterTests`；不将这些结果写成九包全绿。
+- 主工程 `MeetPR` / Debug / MeetPR-CI（iOS 26.5）XcodeBuildMCP test_sim：9/9 通过，参数 `-skipPackageUpdates CODE_SIGNING_ALLOWED=NO`。xcresult：`~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-084b-5377bbb74f9d/result-bundles/test_sim_2026-10-02T13-59-03-043Z_pid24316_8bd59943.xcresult`。
+- 最终 DemoStudent 与 Global 构建启动均成功，使用同一 worktree、`/tmp/meetpr-084b-derived` 及 `-skipPackageUpdates`。最终全仓 `swiftlint lint --strict`：1075 文件 0 违规；工具链 `swift-format lint --recursive --strict --configuration .swift-format MeetPR MeetPRTests Modules` 与 `git diff --check` 通过（`/tmp/084b-lint-final.log`、`/tmp/084b-format-final.log`）。
+
+### Standards 自审
+
+- 独立只读 reviewer：CLEAN，0 finding。确认状态类型 Sendable、分页逻辑位于约定 seam、独立子视图、现有 token / Dynamic Type、中英文文案及范围约束；未发现值得报告的 Fowler smell。
+
+### Spec 自审
+
+- 独立只读 reviewer 初轮发现 P2：全完成计划切 tab 的旧 jump resolver 无游标可选；已统一调用分页 currentSelection，保留末日回落。另发现 P3：四个旧日历预览键残留；已删除。两项定向复核关闭，最终 CLEAN。
+- 收尾的摘要文案复用、录入测试 fixture 修正、移除覆盖子按钮标识的父级 identifier，已再次定向复核 CLEAN。
+
+### 模拟器证据与待收货
+
+- 已做有限模拟器验证，并非“未做设备验证”：MeetPR-CI / iOS 26.5 / Light / 默认字体 / 英文，Global 登录页亲眼确认顺序与 Apple/Google 同等尺寸；DemoStudent 亲眼确认当前日淡金与选中框并存、未来周只读无开练按钮、首尾箭头状态、小点、同周选日、Back to today、切 tab 回当前，以及横向 drag 翻周、实际下拉 drag 刷新回 W1D3。
+- 截图：`/tmp/084b-evidence/login-light.jpg`、`/tmp/084b-evidence/training-current-light.jpg`、`/tmp/084b-evidence/training-future-light.jpg`。当前周图采于最终文案/identifier 清理前，当前周布局未再改变；未来周与登录图来自最终行为版本。
+- 未做真机、Dark、iPhone SE 尺寸、大字体、完整记组/计时/补记/完成流程及存量升级验收；交 Opus 按卡逐项核，不以自测代替收货。
+- 范围外既有文案：英文训练日后缀 `trainingCalendarLogic.copy011` 被译为 `Sun`，Dashboard 同类拼接也显示 `DeadliftSun`；本卡复用日名/解锁提示后预览显示 `SquatSun`。没有扩展修改共享旧文案，交 Opus 分诊。此项也出现在上述未来周截图。
+- 本次审查直接使用仓内卡与 spec，不依赖 tracker；仓内缺少 `docs/agents/issue-tracker.md`，将来使用依赖 tracker 的 Matt 流程前需由 David 调用 `$setup-matt-pocock-skills`。
+
+- 2026-10-02 返修第 1 轮：仅将 TrainingWeekStrip、TrainingDayPreview 与 Back to today 的文字/图标改为 MeetPR 字体 token（预览标题 display 22、小结 mono 12），删除训练页新增 `.refreshable` / `onPullToRefresh` 及预览接线，保留页头刷新后回当前训练日。两包均以 `--skip-update` 全量复跑：StudentKit 912 项有 15 个既有视频 `Cannot Encode` 问题；AppShell 104 项有 2 个 Keychain 测试共 3 条断言失败，与本节前轮沙箱限制一致，全量未绿；按前轮同一模式排除受限测试后 StudentKit 896、AppShell 102 项通过。全仓 SwiftLint 严格模式 1075 文件 0 违规、swift-format 严格模式与 `git diff --check` 通过；Standards / Spec 独立只读复核均 CLEAN。对照开工快照确认只改本轮五个 Swift 文件并追加本行，其余改动保留；本轮未做设备验证，交 Opus 收货，未 commit / push。日志：`/tmp/084b-r1-{StudentKit,AppShell,available-StudentKit,available-AppShell,swiftlint,format}.log`。
