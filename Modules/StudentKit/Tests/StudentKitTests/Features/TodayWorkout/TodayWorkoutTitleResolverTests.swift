@@ -21,6 +21,7 @@ import Testing
 
   let title = TodayWorkoutTitleResolver.title(
     day: day,
+    days: [day],
     planContext: context,
     onboarding: onboarding
   )
@@ -40,6 +41,7 @@ import Testing
 
   let title = TodayWorkoutTitleResolver.title(
     day: day,
+    days: [day],
     planContext: nil,
     onboarding: onboarding
   )

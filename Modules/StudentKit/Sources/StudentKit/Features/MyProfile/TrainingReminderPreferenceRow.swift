@@ -1,3 +1,4 @@
+import RepositoryContracts
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -7,13 +8,15 @@ struct TrainingReminderPreferenceRow: View {
   init(
     studentID: UUID,
     services: TrainingReminderServices,
+    plans: any StudentPlanRepository,
     recommendedWeekdays: Set<TrainingReminderWeekday>? = nil
   ) {
     self._viewModel = State(
       initialValue: TrainingReminderSettingsViewModel(
         studentID: studentID,
         services: services,
-        recommendedWeekdays: recommendedWeekdays
+        recommendedWeekdays: recommendedWeekdays,
+        plans: plans
       )
     )
   }

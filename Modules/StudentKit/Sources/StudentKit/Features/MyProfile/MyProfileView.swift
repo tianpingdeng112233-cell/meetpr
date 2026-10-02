@@ -177,6 +177,7 @@ public struct MyProfileView: View {
         TrainingReminderPreferenceRow(
           studentID: studentID,
           services: trainingReminderServices,
+          plans: plans,
           recommendedWeekdays: Set(profile.trainingDays.map(TrainingReminderWeekday.init))
         )
         MyProfileDivider()
@@ -307,7 +308,8 @@ struct MyProfileFallbackRows: View {
       MyProfileDivider()
       TrainingReminderPreferenceRow(
         studentID: studentID,
-        services: trainingReminderServices
+        services: trainingReminderServices,
+        plans: plans
       )
     }
     if let account, let logs {

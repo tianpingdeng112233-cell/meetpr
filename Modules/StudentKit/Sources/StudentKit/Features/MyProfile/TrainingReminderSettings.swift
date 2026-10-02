@@ -65,12 +65,30 @@ struct TrainingReminderSettings: Codable, Equatable, Sendable {
     (0...23).contains(hour) && (0...59).contains(minute)
   }
 
-  /// Initial (unpersisted) value: the coach-arranged training days from the
-  /// onboarding profile win over the hard-coded Mon/Wed/Fri fallback.
-  static func initial(recommendedWeekdays: Set<TrainingReminderWeekday>?) -> Self {
-    guard let recommendedWeekdays, !recommendedWeekdays.isEmpty else { return .defaultValue }
+  /// Saved preferences win; otherwise use the cursor week's recommended
+  /// dates, then the onboarding profile, then Mon/Wed/Fri. Plan dates are UTC
+  /// calendar identities, independent of the device's time zone.
+  static func initial(
+    recommendedWeekdays: Set<TrainingReminderWeekday>?,
+    plan: StudentPlanView? = nil,
+    storedSettings: Self? = nil
+  ) -> Self {
+    if let storedSettings { return storedSettings }
+    let sequence = StudentPlanSequence(days: plan?.days ?? [])
+    let weekNumber = (sequence.cursorDay ?? sequence.orderedDays.last)?.weekNumber
+    let planWeekdays = Set(
+      sequence.orderedDays.filter { $0.weekNumber == weekNumber }.compactMap {
+        TrainingReminderWeekday(
+          rawValue: PlanCalendarDayIdentity.utcCalendar.component(.weekday, from: $0.date)
+        )
+      }
+    )
     var settings = defaultValue
-    settings.weekdays = recommendedWeekdays
+    if !planWeekdays.isEmpty {
+      settings.weekdays = planWeekdays
+    } else if let recommendedWeekdays, !recommendedWeekdays.isEmpty {
+      settings.weekdays = recommendedWeekdays
+    }
     return settings
   }
 }

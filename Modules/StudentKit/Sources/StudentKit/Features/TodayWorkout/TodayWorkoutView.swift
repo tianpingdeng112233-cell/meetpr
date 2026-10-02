@@ -577,6 +577,7 @@ public struct TodayWorkoutView: View {
     }
     let title = TodayWorkoutTitleResolver.title(
       day: currentDay,
+      days: viewModel.planDays,
       planContext: viewModel.planContext,
       onboarding: viewModel.onboardingProfile
     )
@@ -602,7 +603,7 @@ public struct TodayWorkoutView: View {
     }
     quickLogRoute = QuickLogRoute(
       day: currentDay,
-      weekCode: "W\(currentDay.weekNumber)D\(currentDay.dayOfWeek)",
+      weekCode: TrainingSequenceText.code(for: currentDay, in: viewModel.planDays),
       plan: plan
     )
   }
@@ -919,11 +920,12 @@ public struct TodayWorkoutView: View {
 enum TodayWorkoutTitleResolver {
   static func title(
     day: StudentPlanDay?,
+    days: [StudentPlanDay],
     planContext: TodayWorkoutPlanContext?,
     onboarding: OnboardingProfile?
   ) -> String {
     guard let day else { return StudentStrings.localized(.todayWorkoutView011) }
-    let weekday = "W\(day.weekNumber)D\(day.dayOfWeek)"
+    let weekday = TrainingSequenceText.code(for: day, in: days)
     let family = day.exercises.lazy.compactMap {
       resolveCompetitionFamily(exercise: $0.exercise, onboarding: onboarding)
     }.first

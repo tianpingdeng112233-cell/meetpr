@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import RepositoryContracts
 
 @Observable
 @MainActor
@@ -8,23 +9,40 @@ final class TrainingReminderSettingsViewModel {
   private(set) var showsPermissionDenied = false
   private(set) var showsScheduleFailure = false
   private(set) var isChangingAuthorization = false
+  private(set) var isLoadingDefaults = false
 
   @ObservationIgnored private let studentID: UUID
   @ObservationIgnored private let services: TrainingReminderServices
+  @ObservationIgnored private let plans: (any StudentPlanRepository)?
+  @ObservationIgnored private let recommendedWeekdays: Set<TrainingReminderWeekday>?
 
   init(
     studentID: UUID,
     services: TrainingReminderServices,
-    recommendedWeekdays: Set<TrainingReminderWeekday>? = nil
+    recommendedWeekdays: Set<TrainingReminderWeekday>? = nil,
+    plans: (any StudentPlanRepository)? = nil
   ) {
     self.studentID = studentID
     self.services = services
+    self.plans = plans
+    self.recommendedWeekdays = recommendedWeekdays
     self.settings =
       services.store.storedSettings(for: studentID)
       ?? .initial(recommendedWeekdays: recommendedWeekdays)
   }
 
   func synchronize() async {
+    guard !isLoadingDefaults else { return }
+    isLoadingDefaults = true
+    defer { isLoadingDefaults = false }
+    if services.store.storedSettings(for: studentID) == nil {
+      let plan = try? await plans?.refreshCurrentPlan(studentID: studentID)
+      settings = .initial(
+        recommendedWeekdays: recommendedWeekdays,
+        plan: plan,
+        storedSettings: services.store.storedSettings(for: studentID)
+      )
+    }
     let outcome = await TrainingReminderBootstrap.reconcile(
       studentID: studentID,
       services: services

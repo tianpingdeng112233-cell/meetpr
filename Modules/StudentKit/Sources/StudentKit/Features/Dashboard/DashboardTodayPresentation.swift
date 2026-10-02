@@ -48,18 +48,20 @@ enum DashboardTodayPresentation {
 
   static func progressSegments(days: [StudentPlanDay]) -> [DashboardWeekProgressSegment] {
     let cursorID = cursor(in: days)?.id
-    return currentWeekDays(in: days).map { day in
+    let weekDays = currentWeekDays(in: days)
+    let numbers = StudentPlanSequence.dayNumbers(inWeek: weekDays)
+    return weekDays.map { day in
       DashboardWeekProgressSegment(
         id: day.id,
-        dayNumber: day.dayOfWeek,
+        dayNumber: numbers[day.id] ?? 1,
         recommendedDate: day.date,
         state: day.completedAt != nil ? .done : (day.id == cursorID ? .current : .upcoming)
       )
     }
   }
 
-  static func code(for day: StudentPlanDay) -> String {
-    "W\(day.weekNumber)D\(day.dayOfWeek)"
+  static func code(for day: StudentPlanDay, in days: [StudentPlanDay]) -> String {
+    TrainingSequenceText.code(for: day, in: days)
   }
 
   static func recommendedDateText(_ date: Date) -> String {

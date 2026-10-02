@@ -9,6 +9,7 @@ enum TrainingSequenceDayState: Equatable, Sendable {
 
 struct TrainingSequenceDay: Equatable, Identifiable, Sendable {
   let day: StudentPlanDay
+  let dayNumber: Int
   let state: TrainingSequenceDayState
   let isSelected: Bool
 
@@ -32,11 +33,14 @@ enum TrainingSequenceLayout {
     let cursorID = sequence.cursorDay?.id
     let groups = Dictionary(grouping: sequence.orderedDays, by: \.weekNumber)
     return groups.keys.sorted().map { weekNumber in
-      TrainingSequenceWeek(
+      let weekDays = groups[weekNumber] ?? []
+      let numbers = StudentPlanSequence.dayNumbers(inWeek: weekDays)
+      return TrainingSequenceWeek(
         weekNumber: weekNumber,
         days: (groups[weekNumber] ?? []).map { day in
           TrainingSequenceDay(
             day: day,
+            dayNumber: numbers[day.id] ?? 1,
             state: day.completedAt != nil
               ? .completed : (day.id == cursorID ? .current : .upcoming),
             isSelected: day.id == selectedDayID
@@ -73,6 +77,12 @@ enum TrainingSequenceLayout {
 }
 
 enum TrainingSequenceText {
+  static func code(for day: StudentPlanDay, in days: [StudentPlanDay]) -> String {
+    let week = days.filter { $0.weekNumber == day.weekNumber }
+    let number = StudentPlanSequence.dayNumbers(inWeek: week)[day.id]
+    return "W\(day.weekNumber)D\(number.map(String.init) ?? "—")"
+  }
+
   static func recommendation(_ date: Date) -> String {
     let calendar = PlanCalendarDayIdentity.utcCalendar
     let components = calendar.dateComponents([.month, .day, .weekday], from: date)

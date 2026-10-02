@@ -51,7 +51,6 @@ public final class TodayWorkoutViewModel {
   }
 
   public private(set) var state: State = .idle
-  public private(set) var pendingPRBanner: PRBreakthroughEvent?
   public private(set) var restTimer: RestTimerState?
   public private(set) var showsRestTimerExplanation = false
   public private(set) var planContext: TodayWorkoutPlanContext?
@@ -123,6 +122,7 @@ public final class TodayWorkoutViewModel {
     let startingRecordingGeneration = recordingGeneration
     let isInitialLoad = state == .idle
     if isInitialLoad { state = .loading }
+    await acknowledgeUnacknowledgedPRs(studentID: studentID)
     if let preloadedPlan {
       await loadHandedOffPlan(
         preloadedPlan,
@@ -922,6 +922,9 @@ public final class TodayWorkoutViewModel {
       } else {
         prEvent = nil
       }
+      if let prEvent {
+        try? await e1rmRepo.acknowledgePR(eventId: prEvent.id)
+      }
       // The page moved to another day while recordSet was in flight: the log
       // and its domain side effects are safely persisted. The reload owns UI
       // state, so don't merge stale flags or surface its PR in the new day.
@@ -942,9 +945,6 @@ public final class TodayWorkoutViewModel {
       await refreshCompletion(for: plan.id, studentID: studentID)
 
       if !previouslyCompleted, completed {
-        if let prEvent {
-          pendingPRBanner = prEvent
-        }
         startRestTimer(after: draft, drafts: latestDrafts)
       }
       return true
@@ -1038,15 +1038,11 @@ public final class TodayWorkoutViewModel {
     }
   }
 
-  public func acknowledgePendingPR() async {
-    guard let event = pendingPRBanner else { return }
-    pendingPRBanner = nil
-    try? await e1rmRepo.acknowledgePR(eventId: event.id)
-  }
-
-  public func surfaceUnacknowledgedPR(studentID: UUID) async {
-    guard pendingPRBanner == nil else { return }
-    pendingPRBanner = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID))?.first
+  private func acknowledgeUnacknowledgedPRs(studentID: UUID) async {
+    let events = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID)) ?? []
+    for event in events {
+      try? await e1rmRepo.acknowledgePR(eventId: event.id)
+    }
   }
 
   private func mutateDraft(

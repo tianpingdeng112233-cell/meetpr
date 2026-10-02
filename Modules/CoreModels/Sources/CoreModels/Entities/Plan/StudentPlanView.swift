@@ -171,6 +171,15 @@ public struct StudentPlanSequence: Equatable, Sendable {
     self.orderedDays = days.sorted(by: Self.precedes)
   }
 
+  /// Display ordinals within one plan week, including completed training days.
+  public static func dayNumbers(inWeek days: [StudentPlanDay]) -> [UUID: Int] {
+    Dictionary(
+      days.sorted(by: precedes).enumerated().map {
+        ($0.element.id, $0.offset + 1)
+      },
+      uniquingKeysWith: { first, _ in first })
+  }
+
   public var cursorDay: StudentPlanDay? {
     orderedDays.first { $0.completedAt == nil }
   }

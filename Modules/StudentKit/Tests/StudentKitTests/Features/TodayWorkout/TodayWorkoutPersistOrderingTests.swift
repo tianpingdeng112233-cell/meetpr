@@ -170,7 +170,7 @@ private actor GatedTrainingLogRepository: StudentTrainingLogRepository {
     exerciseId: fixture.exercise.id
   )
   #expect(points.contains { $0.sourceWeightKg == 150 && $0.sourceReps == 5 })
-  #expect(viewModel.pendingPRBanner == nil)
+  #expect(try await e1rm.unacknowledgedPRs(studentId: fixture.studentID).isEmpty)
 }
 
 @MainActor
@@ -220,7 +220,10 @@ private actor GatedTrainingLogRepository: StudentTrainingLogRepository {
 
   await e1rm.resumeWeightBaseline()
   #expect(await commit.value)
-  let firstEvent = try #require(viewModel.pendingPRBanner)
+  let firstEvent = try #require(
+    try await e1rm.prEvents(studentId: fixture.studentID, since: .distantPast).first
+  )
+  #expect(firstEvent.acknowledgedAt != nil)
   #expect(firstEvent.setLogId == visibleLog.id)
   #expect(firstEvent.previousMaxE1RMKg == nil)
   #expect(

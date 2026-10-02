@@ -6,18 +6,35 @@ struct DashboardProfileMetricsView: View {
   let metrics: DashboardProfileMetrics
   var showsCompetitionPlaceholder = false
   var showsBodyWeightPlaceholder = false
+  var onEditProfile: (ProfileCardKind) -> Void = { _ in }
 
   var body: some View {
     HStack(spacing: 11) {
-      if let bodyWeightText = metrics.bodyWeightText {
-        DashboardWeightCard(bodyWeightText: bodyWeightText)
-      } else if showsBodyWeightPlaceholder {
-        DashboardWeightPlaceholder()
+      if metrics.bodyWeightText != nil || showsBodyWeightPlaceholder {
+        Button {
+          onEditProfile(.basics)
+        } label: {
+          if let bodyWeightText = metrics.bodyWeightText {
+            DashboardWeightCard(bodyWeightText: bodyWeightText)
+          } else {
+            DashboardWeightPlaceholder()
+          }
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        .accessibilityIdentifier("dashboard.profile.basics")
       }
-      if let competition = metrics.competition {
-        DashboardCompetitionCard(competition: competition)
-      } else if showsCompetitionPlaceholder {
-        DashboardCompetitionPlaceholder()
+      if metrics.competition != nil || showsCompetitionPlaceholder {
+        Button {
+          onEditProfile(.competition)
+        } label: {
+          if let competition = metrics.competition {
+            DashboardCompetitionCard(competition: competition)
+          } else {
+            DashboardCompetitionPlaceholder()
+          }
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        .accessibilityIdentifier("dashboard.profile.competition")
       }
     }
   }

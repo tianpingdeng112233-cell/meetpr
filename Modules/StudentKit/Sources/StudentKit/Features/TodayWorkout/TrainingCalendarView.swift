@@ -117,7 +117,7 @@ struct TrainingCalendarView: View {
       selectedDayID = item.id
     } label: {
       HStack(spacing: 12) {
-        Text("D\(item.day.dayOfWeek)")
+        Text("D\(item.dayNumber)")
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(item.state == .current ? Color.MeetPR.gold500 : Color.MeetPR.textPrimary)
           .frame(width: 32, height: 32)
