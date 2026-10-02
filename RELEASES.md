@@ -18,6 +18,25 @@
 
 ---
 
+## 1.0 (23) — 已上传（2026-10-01 David 口报确认）— P0 加急
+- 打包来源：annotated tag `beta/1.0-23` @ `4e97a489`（`release/1.0`，基底 `beta/1.0-22`）；发版线 tip 仅比 tag 多验收文档与截图，无产品代码差异。
+- David 于 2026-10-01 确认已 Archive 并上传；具体上传时间、ASC 处理状态及内外测分发状态未现场核实。
+- tag CI run 36330361925 全绿（九包 1,930 + 主工程 9，format/lint）；双端 demo 实际安装 1.0(23)。切包与四基线见 [切包记录](docs/prep-beta-1.0-23-2026-09-27.md)。
+
+### 本版包含
+- **#345 修复导入历史锁死硬拉 e1RM（T2 / P0）** → `03021ff6`：真实训练不再用导入估算作异常基线；打开或刷新 Progress 自动恢复旧错误置信度，保留原训练记录、来源组与 PR。无需服务端数据修改。
+- 固定测试依赖 ViewInspector 0.10.3，避免新版本 manifest 与现有 Swift 工具链不兼容。
+- PR CI run 36329108282 全绿：九包 1,930 测试、主工程 9 测试、format/lint；独立 Standards / Spec 审查 CLEAN。[修复验证](docs/verification-e1rm-imported-baseline-2026-09-27.md)。
+
+### 已知问题 / 局限
+- 真实受影响学员手机升级后的 Progress 恢复效果，切包记录标注为待上传后确认，截至 2026-10-02 尚无回报记录。
+- 外测组每个新 build 需另过 Beta App Review，本包是否已提审未核实。
+- 长期挂账（推进制老包尾巴、APNs production 验收等）未随本包变化，见 [NEXT-RELEASE.md](./NEXT-RELEASE.md)。
+
+### 测试反馈
+
+---
+
 ## 1.0 (22) — 已上传（2026-09-27 David 口报确认）
 - 打包来源：annotated tag `beta/1.0-22` @ `07489315`；原 tag 保留。
 - 最高已上传 build 22 由 David 确认；具体上传时间及内外测分发状态未现场核实。
