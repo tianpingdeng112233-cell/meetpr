@@ -21,9 +21,47 @@ struct TrainingSequenceWeek: Equatable, Identifiable, Sendable {
   let days: [TrainingSequenceDay]
 
   var id: Int { weekNumber }
+  var completedCount: Int { days.filter { $0.state == .completed }.count }
+  var state: TrainingSequenceDayState {
+    if days.contains(where: { $0.state == .current }) { return .current }
+    return completedCount == days.count ? .completed : .upcoming
+  }
+}
+
+struct TrainingSequencePage: Equatable, Sendable {
+  let weeks: [TrainingSequenceWeek]
+  let currentWeekNumber: Int?
+  let visibleWeek: TrainingSequenceWeek?
+  let showsBackToToday: Bool
+  let currentSelection: UUID?
+
+  var previousWeekSelection: UUID? { selection(offset: -1) }
+  var nextWeekSelection: UUID? { selection(offset: 1) }
+  var showsWeekIndicators: Bool { !weeks.isEmpty && weeks.count <= 8 }
+
+  private func selection(offset: Int) -> UUID? {
+    guard let index = weeks.firstIndex(where: { $0.id == visibleWeek?.id }),
+      weeks.indices.contains(index + offset)
+    else { return nil }
+    let week = weeks[index + offset]
+    if week.weekNumber == currentWeekNumber { return currentSelection }
+    return week.days.first?.id
+  }
 }
 
 enum TrainingSequenceLayout {
+  static func page(days: [StudentPlanDay], selectedDayID: UUID?) -> TrainingSequencePage {
+    let selection = initialSelection(days: days, explicitDayID: selectedDayID)
+    let weeks = makeWeeks(days: days, selectedDayID: selection)
+    return TrainingSequencePage(
+      weeks: weeks,
+      currentWeekNumber: currentWeekNumber(days: days),
+      visibleWeek: weeks.first { $0.days.contains { $0.isSelected } },
+      showsBackToToday: selection != initialSelection(days: days, explicitDayID: nil),
+      currentSelection: initialSelection(days: days, explicitDayID: nil)
+    )
+  }
+
   /// The cursor order is defined only by backend spec 035 §术语与排序正典.
   static func makeWeeks(
     days: [StudentPlanDay],
@@ -63,17 +101,6 @@ enum TrainingSequenceLayout {
     return (sequence.cursorDay ?? sequence.orderedDays.last)?.weekNumber
   }
 
-  /// The plan summary lists the cursor week onward only (design prototype:
-  /// `PLAN.slice(CUR_WK)`) — fully behind weeks would otherwise wear the
-  /// future-week "M 节 · X/X 起" meta.
-  static func weeksFromCurrent(
-    days: [StudentPlanDay],
-    selectedDayID: UUID?
-  ) -> [TrainingSequenceWeek] {
-    let weeks = makeWeeks(days: days, selectedDayID: selectedDayID)
-    guard let currentWeekNumber = currentWeekNumber(days: days) else { return weeks }
-    return weeks.filter { $0.weekNumber >= currentWeekNumber }
-  }
 }
 
 enum TrainingSequenceText {
@@ -110,15 +137,6 @@ enum TrainingSequenceText {
       + StudentStrings.localized(.trainingCalendarLogic011)
   }
 
-  static func weekSummary(_ days: [TrainingSequenceDay]) -> String {
-    days.map { dayName($0.day) }.joined(separator: " · ")
-  }
-
-  static func shortDate(_ date: Date) -> String {
-    let components = PlanCalendarDayIdentity.utcCalendar.dateComponents([.month, .day], from: date)
-    return "\(components.month ?? 0)/\(components.day ?? 0)"
-  }
-
   static func unlockMessage(after day: StudentPlanDay) -> String {
     StudentStrings.replacing(
       .trainingCalendarLogic012,
@@ -127,7 +145,7 @@ enum TrainingSequenceText {
 
   static func exerciseSummary(_ day: StudentPlanDay) -> String {
     let sets = day.exercises.reduce(0) { $0 + $1.prescribedSets.count }
-    return StudentStrings.replacing(
-      .trainingCalendarLogic013, values: ["\(day.exercises.count)", "\(sets)"])
+    return StudentStrings.replacing(.todayWorkoutScreen018, values: ["\(day.exercises.count)"])
+      + StudentStrings.replacing(.todayWorkoutScreen019, values: ["\(sets)"])
   }
 }

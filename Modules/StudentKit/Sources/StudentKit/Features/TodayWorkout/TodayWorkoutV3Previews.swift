@@ -11,10 +11,10 @@
       case recording
       case complete
       case readOnly
-      case month
     }
 
     let state: PreviewState
+    @State private var selectedDayID: UUID?
     @State private var collapsed: [UUID: Bool] = [:]
 
     init(state: PreviewState) {
@@ -33,8 +33,11 @@
         showsAskCoach: state == .recording || state == .complete,
         isPreparingAskCoach: false,
         collapsedExercises: $collapsed,
-        sequenceContent: EmptyView(),
-        calendarContent: TrainingCalendarPreview(month: state == .month),
+        sequenceContent: TrainingWeekStrip(
+          days: StudentDemoSeed.makePlanView().days, selectedDayID: $selectedDayID
+        ),
+        showsBackToToday: state == .readOnly,
+        onBackToToday: {},
         onRefresh: {},
         onHistory: {},
         onReadiness: {},
@@ -51,143 +54,13 @@
       )
     }
 
-    private var content: TodayWorkoutScreen<EmptyView, TrainingCalendarPreview>.Content {
+    private var content: TodayWorkoutScreen<TrainingWeekStrip>.Content {
       .workout(
         TrainingPreviewFixtures.presentation(
           started: state != .list,
           complete: state == .complete || state == .readOnly
         )
       )
-    }
-  }
-
-  @available(iOS 17.0, macOS 14.0, *)
-  private struct TrainingCalendarPreview: View {
-    let month: Bool
-
-    var body: some View {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
-        HStack {
-          Text(StudentStrings.localized(.todayWorkoutV3Previews002))
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
-            .foregroundStyle(Color.MeetPR.textMuted)
-          Spacer()
-          Text(
-            month
-              ? StudentStrings.localized(.todayWorkoutV3Previews003)
-              : StudentStrings.localized(.todayWorkoutV3Previews003)
-          )
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-          .foregroundStyle(Color.white)
-          .padding(.horizontal, MeetPRSpacing.point11)
-          .padding(.vertical, MeetPRSpacing.point3)
-          .background(month ? Color.MeetPR.borderStrong : Color.MeetPR.ctaFill)
-          .clipShape(.rect(cornerRadius: MeetPRSpacing.point6))
-        }
-
-        if month {
-          monthGrid
-        } else {
-          weekStrip
-        }
-
-        HStack(spacing: MeetPRSpacing.point14) {
-          legend(Color.MeetPR.success, StudentStrings.localized(.todayWorkoutV3Previews004))
-          legend(Color.MeetPR.gold500, StudentStrings.localized(.todayWorkoutV3Previews005))
-          legend(Color.MeetPR.danger, StudentStrings.localized(.todayWorkoutV3Previews006))
-        }
-      }
-    }
-
-    private var weekStrip: some View {
-      HStack(spacing: MeetPRSpacing.point6) {
-        MeetPRDayChip(
-          weekday: StudentStrings.localized(.todayWorkoutV3Previews007), date: 20, state: .done,
-          isSelected: false,
-          width: nil, selectedAppearance: .outlined
-        ) {}
-        MeetPRDayChip(
-          weekday: StudentStrings.localized(.todayWorkoutV3Previews008), date: 21, state: .future,
-          isSelected: false,
-          width: nil, selectedAppearance: .outlined
-        ) {}
-        MeetPRDayChip(
-          weekday: StudentStrings.localized(.todayWorkoutV3Previews009), date: 22, state: .done,
-          isSelected: false,
-          width: nil, selectedAppearance: .outlined
-        ) {}
-        MeetPRDayChip(
-          weekday: StudentStrings.localized(.todayWorkoutV3Previews010), date: 23, state: .done,
-          isSelected: false,
-          width: nil, selectedAppearance: .outlined
-        ) {}
-        MeetPRDayChip(
-          weekday: StudentStrings.localized(.todayWorkoutV3Previews011), date: 24, state: .today,
-          isSelected: true,
-          width: nil, selectedAppearance: .outlined
-        ) {}
-        MeetPRDayChip(
-          weekday: StudentStrings.localized(.todayWorkoutV3Previews012), date: 25, state: .future,
-          isSelected: false,
-          width: nil, selectedAppearance: .outlined
-        ) {}
-        MeetPRDayChip(
-          weekday: StudentStrings.localized(.todayWorkoutV3Previews013), date: 26, state: .future,
-          isSelected: false,
-          width: nil, selectedAppearance: .outlined
-        ) {}
-      }
-    }
-
-    private var monthGrid: some View {
-      let columns = Array(
-        repeating: GridItem(.flexible(), spacing: MeetPRSpacing.point5),
-        count: 7
-      )
-      return LazyVGrid(columns: columns, spacing: MeetPRSpacing.point5) {
-        ForEach(
-          [
-            StudentStrings.localized(.todayWorkoutV3Previews014),
-            StudentStrings.localized(.todayWorkoutV3Previews015),
-            StudentStrings.localized(.todayWorkoutV3Previews016),
-            StudentStrings.localized(.todayWorkoutV3Previews017),
-            StudentStrings.localized(.todayWorkoutV3Previews018),
-            StudentStrings.localized(.todayWorkoutV3Previews019),
-            StudentStrings.localized(.todayWorkoutV3Previews020),
-          ], id: \.self
-        ) { label in
-          Text(label)
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-            .foregroundStyle(Color.MeetPR.textDim)
-        }
-        ForEach(1...35, id: \.self) { day in
-          Text(day.formatted())
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-            .foregroundStyle(day > 31 ? Color.clear : Color.MeetPR.textPrimary)
-            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.size46)
-            .background(
-              day == 24
-                ? Color.MeetPR.surfaceElevated
-                : Color.MeetPR.surfaceCard
-            )
-            .clipShape(.rect(cornerRadius: MeetPRRadius.inset))
-            .overlay {
-              if day == 24 {
-                RoundedRectangle(cornerRadius: MeetPRRadius.inset)
-                  .stroke(Color.MeetPR.gold500, lineWidth: 1.5)
-              }
-            }
-        }
-      }
-    }
-
-    private func legend(_ color: Color, _ text: String) -> some View {
-      HStack(spacing: MeetPRSpacing.point5) {
-        Circle().fill(color).frame(width: 6, height: 6)
-        Text(text)
-      }
-      .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-      .foregroundStyle(Color.MeetPR.textDim)
     }
   }
 
@@ -318,13 +191,4 @@
       .preferredColorScheme(.light)
   }
 
-  #Preview("Training · Month · Dark") {
-    TodayWorkoutPreviewHarness(state: .month)
-      .preferredColorScheme(.dark)
-  }
-
-  #Preview("Training · Month · Light") {
-    TodayWorkoutPreviewHarness(state: .month)
-      .preferredColorScheme(.light)
-  }
 #endif

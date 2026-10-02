@@ -285,7 +285,13 @@ extension StudentRootView {
     .buttonStyle(PressScaleButtonStyle())
     .safeAreaInset(edge: .bottom, spacing: 0) {
       MeetPRTabBar(
-        selection: $selectedTab,
+        selection: Binding(
+          get: { selectedTab },
+          set: { tab in
+            if tab == .training { trainingJumpToken += 1 }
+            selectedTab = tab
+          }
+        ),
         items: [
           MeetPRTabBarItem(
             id: .today, title: StudentStrings.localized(.studentRootView001), icon: .today),

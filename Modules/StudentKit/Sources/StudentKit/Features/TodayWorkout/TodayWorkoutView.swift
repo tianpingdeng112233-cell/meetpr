@@ -162,13 +162,11 @@ public struct TodayWorkoutView: View {
         showsAskCoach: showsSetRefEntry,
         isPreparingAskCoach: isPreparingSetRefPicker,
         collapsedExercises: $collapsedExercises,
-        sequenceContent: TrainingCurrentWeekSequenceView(days: viewModel.planDays),
-        calendarContent: TrainingCalendarView(
-          selectedDayID: $selectedDayID,
-          days: viewModel.planDays
-        ),
+        sequenceContent: TrainingWeekStrip(days: viewModel.planDays, selectedDayID: $selectedDayID),
+        showsBackToToday: sequencePage.showsBackToToday,
+        onBackToToday: returnToCurrentDay,
         onRefresh: {
-          Task { await loadWorkout(for: selectedDayID) }
+          Task { await reloadCurrentDay() }
         },
         onHistory: { showingHistory = true },
         onReadiness: {
@@ -397,12 +395,7 @@ public struct TodayWorkoutView: View {
       // presentation still resumes recording when real logs already exist;
       // zero-log days alone return to the explicit pre-start state.
       started = false
-      if let jumpTarget = TodayWorkoutSelectionResolver.jumpToCurrentSelection(
-        from: selectedDayID,
-        days: viewModel.planDays
-      ) {
-        selectedDayID = jumpTarget
-      }
+      returnToCurrentDay()
     }
     .onChange(of: uploadFailureNavigationToken) { _, token in
       guard token > 0 else { return }
@@ -471,6 +464,7 @@ public struct TodayWorkoutView: View {
             for: workout.day.scheduledDate,
             setCount: workout.drafts.count
           )
+          returnToCurrentDay()
           onReturnToToday()
         }
       )
@@ -479,9 +473,7 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private var screenContent:
-    TodayWorkoutScreen<TrainingCurrentWeekSequenceView, TrainingCalendarView>.Content
-  {
+  private var screenContent: TodayWorkoutScreen<TrainingWeekStrip>.Content {
     switch viewModel.state {
     case .idle, .loading:
       if let workout = handedOffWorkout(for: selectedDayID) {
@@ -552,7 +544,8 @@ public struct TodayWorkoutView: View {
   private var selectedDayState: TodayWorkoutDayState {
     guard let currentDay else { return .current }
     if currentDay.completedAt != nil { return .completed(canUndo: canUndoCurrentDay) }
-    return isEditable ? .current : .upcoming(previousDay: previousSequenceDay)
+    return isEditable
+      ? .current : .upcoming(previousDay: StudentPlanSequence(days: viewModel.planDays).cursorDay)
   }
 
   private var canUndoCurrentDay: Bool {
@@ -560,11 +553,17 @@ public struct TodayWorkoutView: View {
     return WorkoutDatePolicy.gymDayRange(containing: Date()).contains(completedAt)
   }
 
-  private var previousSequenceDay: StudentPlanDay? {
-    let days = StudentPlanSequence(days: viewModel.planDays).orderedDays
-    guard let currentDay, let index = days.firstIndex(where: { $0.id == currentDay.id }), index > 0
-    else { return nil }
-    return days[index - 1]
+  private var sequencePage: TrainingSequencePage {
+    TrainingSequenceLayout.page(days: viewModel.planDays, selectedDayID: selectedDayID)
+  }
+
+  private func returnToCurrentDay() {
+    selectedDayID = sequencePage.currentSelection
+  }
+
+  private func reloadCurrentDay() async {
+    await loadWorkout(for: nil)
+    returnToCurrentDay()
   }
 
   private var selectedTrainingDate: Date {
