@@ -249,3 +249,7 @@
 - 原 MeetPR-DemoStudent / DemoStudent / iPhone 17（iOS 26.5）build_run_sim 成功、0 warning；实屏逐组记完三组，未手动折叠/展开，滚动后长按 1300 ms，奖励页正常且无障碍树可读。工具会等待快照，未保证命中收起动画中途的窗口。
 - 临时探针以 `COMPLETION_HANG_PROBE` + `HANG_PROBE=1` 双开关隔离，正常构建不编译；SwiftLint strict / swift-format strict / bash -n / diff whitespace 检查通过，无临时诊断日志遗留。没有业务修复，未声称回归红→绿或验收通过。
 - 方法、命令、测试构建障碍、后续所需证据与六个改动文件见 [排障记录](diagnose/completion-hang-2026-10-03.md)，逐轮输出见 [probe output](diagnose/completion-hang-probe-output-2026-10-03.txt)，原 Demo 实屏见 [奖励页截图](diagnose/completion-hang-demo-not-reproduced-2026-10-03.jpg)。下一步需原容器 UI test 驱动真实保存→收起期间滚动→Hold，或补该时段录像、日志和连续主线程采样；没有红例前不试修。
+
+- 2026-10-03 · T0/P1 Opus 文案卡，`fix/video-row-replace-copy`：仅将 StudentKit `student.videoAttachmentV3Controls.copy004` 英文 Change 改为 Replace，中文「更换」与布局不变；未 commit/push。
+- 使用点核对：Localizable.xcstrings:16358 定义 → StudentStrings.swift:1117 映射 → VideoAttachmentV3Controls.swift:162 的 replace 按钮（上传中/已上传/失败状态、横纵布局共用）；上层为 VideoAttachmentSection → SetEntrySheet，另有 Preview，无异义复用，也无 Change 测试/快照断言需修改。
+- 验证：StudentKit 首轮 928 过/1 项 retryAfterFailureReinitiatesFromScratch 超时，单项复跑 1/1、全包复跑 929/929 通过（0 skipped）；最终日志 `/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-replace-99081fdce275/logs/swift_package_test_2026-10-03T09-40-41-282Z_pid28207_240bc866.log`。相关两份 Swift 的 SwiftLint strict、工具链 swift-format strict、catalog 唯一英文值差异检查及 diff --check 通过；catalog 的 "Change" 搜索为 0。未做模拟器实屏验证。
