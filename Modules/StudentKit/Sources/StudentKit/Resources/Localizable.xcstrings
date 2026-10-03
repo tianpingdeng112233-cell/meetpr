@@ -17902,6 +17902,40 @@
         }
       }
     },
+    "student.trainingWeekRest": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rest"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休"
+          }
+        }
+      }
+    },
+    "student.trainingWeekRestAccessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} {1}, rest day"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} {1}，休息日"
+          }
+        }
+      }
+    },
     "student.trainingWeekCurrentDay": {
       "extractionState": "manual",
       "localizations": {

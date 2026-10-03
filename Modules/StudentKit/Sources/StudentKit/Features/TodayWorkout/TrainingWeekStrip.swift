@@ -22,32 +22,35 @@ struct TrainingWeekStrip: View {
             selection: page.nextWeekSelection, onSelect: select
           )
         }
+        .contentShape(.rect)
+        .simultaneousGesture(pagingGesture(page))
 
-        ViewThatFits(in: .horizontal) {
-          TrainingWeekDays(days: week.days, onSelect: select)
-          ScrollView(.horizontal) {
-            TrainingWeekDays(days: week.days, onSelect: select)
-          }
-          .scrollIndicators(.hidden)
-        }
+        TrainingWeekCalendarRow(
+          cells: week.calendarCells, onSelect: select,
+          onSwipe: { forward in
+            turnPage(page, forward: forward)
+          })
 
         if page.showsWeekIndicators {
           TrainingWeekIndicators(page: page)
+            .simultaneousGesture(pagingGesture(page))
         }
       }
       .padding(.vertical, MeetPRSpacing.space2)
-      .contentShape(.rect)
-      .simultaneousGesture(
-        DragGesture(minimumDistance: MeetPRSpacing.point30)
-          .onEnded { value in
-            guard abs(value.translation.width) > abs(value.translation.height) else { return }
-            let destination =
-              value.translation.width < 0
-              ? page.nextWeekSelection : page.previousWeekSelection
-            if let destination { select(destination) }
-          }
-      )
     }
+  }
+
+  private func pagingGesture(_ page: TrainingSequencePage) -> some Gesture {
+    DragGesture(minimumDistance: MeetPRSpacing.point30)
+      .onEnded { value in
+        guard abs(value.translation.width) > abs(value.translation.height) else { return }
+        turnPage(page, forward: value.translation.width < 0)
+      }
+  }
+
+  private func turnPage(_ page: TrainingSequencePage, forward: Bool) {
+    let destination = forward ? page.nextWeekSelection : page.previousWeekSelection
+    if let destination { select(destination) }
   }
 
   private func select(_ dayID: UUID) {
@@ -125,83 +128,6 @@ private struct TrainingWeekStatus: View {
     case .completed: .trainingWeekCompleted
     case .upcoming: .trainingWeekUpcoming
     }
-  }
-}
-
-private struct TrainingWeekDays: View {
-  let days: [TrainingSequenceDay]
-  let onSelect: (UUID) -> Void
-
-  var body: some View {
-    HStack(alignment: .top, spacing: MeetPRSpacing.space1) {
-      ForEach(days) { item in
-        TrainingWeekDayCell(item: item) { onSelect(item.id) }
-      }
-    }
-  }
-}
-
-private struct TrainingWeekDayCell: View {
-  let item: TrainingSequenceDay
-  let onSelect: () -> Void
-  @ScaledMetric(relativeTo: .caption) private var minimumWidth = MeetPRSpacing.minimumHitTarget
-
-  var body: some View {
-    Button(action: onSelect) {
-      VStack(spacing: MeetPRSpacing.space2) {
-        Image(systemName: item.state == .completed ? "checkmark.circle.fill" : "circle")
-          .font(.MeetPR.system(size: MeetPRFontMetrics.size17))
-          .foregroundStyle(statusColor)
-        Text("D\(item.dayNumber)")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-        Text(dateLabel)
-          .font(
-            .MeetPR.mono(
-              size: MeetPRFontMetrics.size11,
-              weight: item.state == .current ? .bold : .regular
-            )
-          )
-          .foregroundStyle(item.state == .current ? Color.MeetPR.goldText : Color.MeetPR.textMuted)
-          .multilineTextAlignment(.center)
-          .fixedSize(horizontal: false, vertical: true)
-      }
-      .padding(.horizontal, MeetPRSpacing.space1)
-      .padding(.vertical, MeetPRSpacing.space3)
-      .frame(minWidth: minimumWidth, maxWidth: .infinity)
-      .background(
-        item.state == .current ? Color.MeetPR.goldRGB.opacity(0.12) : Color.MeetPR.surfaceCard
-      )
-      .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.control)
-          .strokeBorder(
-            item.isSelected ? Color.MeetPR.textPrimary : .clear,
-            lineWidth: MeetPRSpacing.point2
-          )
-      }
-      .contentShape(.rect)
-    }
-    .buttonStyle(PressScaleButtonStyle())
-    .accessibilityAddTraits(item.isSelected ? .isSelected : [])
-    .accessibilityValue(
-      item.state == .current ? StudentStrings.localized(.trainingWeekCurrentDay) : ""
-    )
-    .accessibilityIdentifier("training.day.\(item.id)")
-  }
-
-  private var statusColor: Color {
-    switch item.state {
-    case .completed: Color.MeetPR.success
-    case .current: Color.MeetPR.goldText
-    case .upcoming: Color.MeetPR.textDim
-    }
-  }
-
-  private var dateLabel: String {
-    var style = Date.FormatStyle().weekday(.abbreviated).month(.defaultDigits).day()
-    style.timeZone = PlanCalendarDayIdentity.utcCalendar.timeZone
-    return item.day.scheduledDate.formatted(style)
   }
 }
 
