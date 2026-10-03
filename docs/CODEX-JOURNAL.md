@@ -169,3 +169,46 @@
 - 本次审查直接使用仓内卡与 spec，不依赖 tracker；仓内缺少 `docs/agents/issue-tracker.md`，将来使用依赖 tracker 的 Matt 流程前需由 David 调用 `$setup-matt-pocock-skills`。
 
 - 2026-10-02 返修第 1 轮：仅将 TrainingWeekStrip、TrainingDayPreview 与 Back to today 的文字/图标改为 MeetPR 字体 token（预览标题 display 22、小结 mono 12），删除训练页新增 `.refreshable` / `onPullToRefresh` 及预览接线，保留页头刷新后回当前训练日。两包均以 `--skip-update` 全量复跑：StudentKit 912 项有 15 个既有视频 `Cannot Encode` 问题；AppShell 104 项有 2 个 Keychain 测试共 3 条断言失败，与本节前轮沙箱限制一致，全量未绿；按前轮同一模式排除受限测试后 StudentKit 896、AppShell 102 项通过。全仓 SwiftLint 严格模式 1075 文件 0 违规、swift-format 严格模式与 `git diff --check` 通过；Standards / Spec 独立只读复核均 CLEAN。对照开工快照确认只改本轮五个 Swift 文件并追加本行，其余改动保留；本轮未做设备验证，交 Opus 收货，未 commit / push。日志：`/tmp/084b-r1-{StudentKit,AppShell,available-StudentKit,available-AppShell,swiftlint,format}.log`。
+
+## 2026-10-02 — Spec 084 Card C · iOS Ask coach / 聊天训练卡 / 组录入视频 / 休息说明
+
+- Opus 派卡；T2 / P1；分支 `feat/084c-chat-video-rest`，起点 `0c9cafb7`（叠在卡 B）。未 commit、未 push、未开 PR；未改发版账本、SPEC 状态、build 号、依赖或线上数据结构。开工时 `CARD-C-ios.md` 已为 untracked，本次未修改该卡。交由 Opus 收货后提交并开 PR。
+- §7：两入口复用单页 picker，动作卡按 exercise ID 分组、三列单选、W#D# 走卡 A 的 `TrainingSequenceText`；训练页预选当前组，聊天入口未选不可发送。问题与选组同页，保留带视频开关/失败禁用；确认后依次走现有 `makeSetRefIntent → stageSetRef → sendStagedSetRef`，outbox、幂等键、重试和 wire set_ref 不变。新增分组元数据只存在于 picker 内存候选。
+- §8：留言在气泡上方，附件内嵌下方，空留言无占位；缺失指标省略；双方配色复用各自会话色与正文字体，时间/现有送达文案在气泡下方。带视频继续走原播放入口，无视频附件可展开只读详情；历史 canonical body 识别规则保留。
+- §9：新增可测 `SetEntryVideoPlaybackState` 与组录入页持有的单一 `AVPlayer`，默认暂停，拖动、四档倍速、同页 overlay 放大/缩小；放大时顶部下滑/收起按钮/无障碍返回先缩小，进度倍速保留。加载重试随视图 task 取消，离开宿主停止并释放。视频下方状态与 Replace/Delete 用 `ViewThatFits` 整体换行；上传、替换、删除、重试入口继续复用原 VM。`SetVideoPlaybackView`、`FeedbackVideoPlayerView`、教练打点/标注未改。
+- §10：底部说明三行由 `RestTimerPolicy` 默认规则计算并格式化；中英文同步，链接进入原 `RestTimerSettingsView` 并复用注入的设置 store。出现条件、用户级已读 key、已有偏好结构不变。新增文字全部使用 `Font.MeetPR` token。
+
+### TDD 与验证证据
+
+只在卡内四个 seam 加/更新 5 个行为测试；替换旧两步 picker 的 4 个测试，未写视图样式镜像测试。
+
+| Seam | Red | Green |
+| --- | --- | --- |
+| Picker 无默认选择 / 显式预选 / 单选 | `/tmp/meetpr-084c-picker-red.log`：默认首项选择导致 2 条断言失败 | `/tmp/meetpr-084c-picker-green.log`：1/1 |
+| Picker 动作分组 / 三列内容 / 发送摘要 | `/tmp/meetpr-084c-groups-red.log`：新 presentation 入口缺失，编译失败 | `/tmp/meetpr-084c-groups-green.log`：2/2（含上一行为） |
+| 气泡留言 / 附件 / 视频 / 缺字段 | `/tmp/meetpr-084c-card-red.log`：新摘要入口缺失，编译失败 | `/tmp/meetpr-084c-card-green.log`：1/1；原历史 fixture 测试保留 |
+| 视频暂停 / 播放 / 四档速率 / 放大返回 | `/tmp/meetpr-084c-video-red.log`：状态模型缺失，编译失败 | `/tmp/meetpr-084c-video-green.log`：1/1 |
+| 休息默认规则与规则变化后的格式化 | `/tmp/meetpr-084c-rest-red.log`：presentation 缺失，编译失败 | `/tmp/meetpr-084c-rest-green.log`：2/2（含视频 seam） |
+
+- 九包均执行 `swift test --skip-update --disable-sandbox`。SwiftPM MCP 无 skip-update 参数，按本卡要求使用 CLI；缓存/构建目录均在 `/tmp/meetpr-084c-*`，模块缓存用 `CLANG_MODULE_CACHE_PATH` / `SWIFTPM_MODULECACHE_OVERRIDE`。首跑系统缓存不可写、依赖代理不可达，改用 `/tmp` 缓存并复制本机卡 B 的既有依赖缓存，未更新版本。
+- 六包全绿：Analytics 30、CoachKit 443、CoreModels 158、DesignSystem 73、Networking 131、RepositoryContracts 6。日志 `/tmp/meetpr-084c-test-<包名>.log`。
+- 三包全量未绿：ChatUI 84 项有 1 条 AVFoundation `Cannot Encode`；StudentKit 914 项有 15 条视频编码失败；AppShell 104 项有 2 个 Keychain 测试共 3 条断言失败。与本文件卡 A/B 已记的 shell 沙箱限制一致；未修改这些生产逻辑或删除测试。AppShell 初跑曾因并行审查修复期间源文件变化而终止，静止代码后已重跑获得上述完整结果。
+- 排除受限项的可运行回归：ChatUI 83、StudentKit 898、AppShell 102 全绿。排除模式分别为 `VideoBadgeExporterTests`、`AVFoundationVideoExporterTests|PassthroughVideoTrimExporterTests|realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer`、`keychainTokenStore`。日志 `/tmp/meetpr-084c-available-ChatUI-final.log`、`/tmp/meetpr-084c-available-StudentKit.log`、`/tmp/meetpr-084c-available-AppShell-final.log`；不视为九包全绿。
+- 主工程 XcodeBuildMCP：`MeetPR` / Debug / MeetPR-CI（iOS 26.5），`-skipPackageUpdates`，9/9 通过。xcresult：`~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-084c-67e6b5aceff6/result-bundles/test_sim_2026-10-02T14-59-55-588Z_pid47335_4c741608.xcresult`。
+- 审查修复后 `MeetPR-DemoStudent` / DemoStudent 最终构建启动成功，无新增构建 warning。日志：`~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-084c-67e6b5aceff6/logs/build_run_sim_2026-10-02T15-08-20-770Z_pid47335_76e9b8f6.log`。
+- 全仓 `swiftlint lint --strict --no-cache`：1081 文件 0 违规；工具链 `swift-format lint --recursive --strict --configuration .swift-format MeetPR MeetPRTests Modules`、`git diff --check` 通过。日志 `/tmp/meetpr-084c-lint-final.log`、`/tmp/meetpr-084c-format-final.log`。
+
+### Standards 自审
+
+- 按 code-review 技能做独立只读 Standards 审查：发现 1 个 P2，关闭组录入后未取消的重试加载可能重建播放器，弱引用监控可能持续空转。已改为随视图取消的 `.task(id:)` 加取消检查，监控宿主释放即退出；复审 CLEAN，0 未解决项。
+- 核对 Font.MeetPR、Sendable、单写者、无新依赖、无 wire / 持久化变更，未发现需单列的 Fowler smell。仓内缺 `docs/agents/issue-tracker.md`，已提示后续用 `$setup-matt-pocock-skills` 补配置；本次直接按任务卡审查，不依赖 tracker。
+
+### Spec 自审
+
+- 独立只读 Spec 审查：发现 1 个 P2，expanded 的 safeAreaInset 挤开视频、inline 仅背景有圆角。已改为 expanded 顶底半透明 overlay、inline 整体圆角裁剪，倍速菜单用向上 popover 避免被裁剪；复审撤销 finding，0 未解决静态项。
+- 已在 DemoStudent 的 MeetPR-CI 上亲看 Light 界面：训练页当前组预选、动作三列卡、同页输入与发送（仅 InMemory demo）、新气泡上文下附件/送达脚注、聊天 + 进入同页且无预选不可发送。截图 `/tmp/meetpr-084c-evidence/ask-coach.jpg`、`/tmp/meetpr-084c-evidence/chat-set-bubble.jpg`。
+- 视频控件尚未做带样片的设备验证：该模拟器 Photos 显示“无视频”（`/tmp/meetpr-084c-evidence/photos-no-video.jpg`），没有把状态单测当成实际播放/上传证据。Computer Use 读取 Simulator 未获访问，未继续该通道。
+- 休息说明/设置链接的实屏、教练端与历史消息实屏、Light/Dark、小屏和大字体矩阵，以及视频播放/拖动/倍速/放缩/替换删除实屏仍留 Opus 按卡验收。保留本地限制，不勾选卡内验收清单；本次开发自测不等于功能验收。
+- 2026-10-03 返修第 1 轮（未 commit/push）：仅修顶部组号 `{0}` 中英文插值并补重量/次数/RPE、保留同一 AVPlayer/item/AVPlayerLayer 与内嵌占位以保持进度和滚动位置、改 4pt 金色进度轨 + 10pt 滑块 + 44pt 命中区；不足 1 秒片段比例同步修正。新增 4 项测试，插值/完整组信息先红后绿；播放器层测试覆盖真实 AVPlayer seek 时间、item/layer 身份、双向缩放及播放意图（macOS 媒体读取受限，不代表解码播放验收）。全量 ChatUI 84 / StudentKit 918 已跑，既有编码测试报 Cannot Encode（分别 1 / 15 条 issue）；排除原有受限项后 83 / 902 通过，两项 strict lint 与 diff-check 通过，Standards / Spec 独立审查均无遗留项。DemoStudent / iPhone 17 构建启动成功；系统相册不在 MCP runtime snapshot 内，Computer Use 未获准访问 Simulator，未完成返修后带样片设备验证，留 Opus 收货。证据 `/tmp/084c-r1-{red,header-red,header-green,player-green,ChatUI,StudentKit,ChatUI-available,StudentKit-available,swiftlint-final,format-final}.log`，本轮增量 `/tmp/084c-r1-only.diff`。
+- 2026-10-03 返修第 2 轮（未 commit/push）：仅修改 SetEntryVideoPlayer / SetEntryVideoPlayerView 及播放器测试；取消跨宿主搬动共享 AVPlayerLayer，改为宿主各自持有 layer、主线程交接时先解绑旧 layer 再绑定同一 AVPlayer，dismantle 显式解绑且迟到的旧宿主拆卸不影响新绑定；保留原 player/item、进度、播放意图、倍速及内嵌占位。新增单宿主绑定回归 1 项，覆盖双向交接、先建后拆/先拆后建与 stop 解绑（新增接口缺失编译红 → 5 项播放器测试绿；不代表黑屏设备复现已转绿）。两包使用 --skip-update 全量重跑：ChatUI 84 / StudentKit 919，既有 AVFoundation Cannot Encode 分别 1 / 15 条 issue；排除原受限项后 83 / 903 全绿。全仓 swiftlint lint --strict --no-cache（1083 文件）、工具链 swift-format lint --recursive --strict、git diff --check 通过；Standards / Spec 独立只读审查均 CLEAN。DemoStudent / iPhone 17（iOS 26.5）用 -skipPackageUpdates 构建启动成功（0 warning），日志 ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-084c-67e6b5aceff6/logs/build_run_sim_2026-10-03T02-16-53-072Z_pid21929_54cfaa1d.log。已进入组录入相册并见样片，但 MCP runtime snapshot 不含系统相册目标，Computer Use 自动审批未批准访问 Simulator（未给具体原因），未完成带样片放缩出画验证，仍留 Opus 按原复现收货。证据 /tmp/084c-r2-{red,green,ChatUI,StudentKit,ChatUI-available,StudentKit-available,swiftlint,format}.log；本轮增量 /tmp/084c-r2-only.diff。
+- 2026-10-03 Opus 接手第 2 轮未收敛项（放大 / 缩小后画面黑）：模拟器日志确认是旧内嵌图层在拆除前又被更新一次、抢回并清空播放器。`SetEntryVideoPlayer` 改为按 `SurfaceRole`（inline / expanded）与展开状态绑定；新增回归测试 `staleUpdateFromOutgoingSurfaceDoesNotStealPlayer`，同角色图层替换时释放旧图层。ChatUI 84 / StudentKit 920、两个严格 lint 通过；模拟器放大与缩小均出画。
