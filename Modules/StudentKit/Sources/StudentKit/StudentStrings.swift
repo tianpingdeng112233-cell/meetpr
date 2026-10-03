@@ -1035,6 +1035,8 @@ enum StudentStrings {
     static let trainingWeekPrevious = Key("student.trainingWeekPrevious")
     static let trainingWeekNext = Key("student.trainingWeekNext")
     static let trainingWeekBackToToday = Key("student.trainingWeekBackToToday")
+    static let trainingWeekRest = Key("student.trainingWeekRest")
+    static let trainingWeekRestAccessibility = Key("student.trainingWeekRestAccessibility")
     static let trainingWeekCurrentDay = Key("student.trainingWeekCurrentDay")
     static let trainingHistoryView001 = Key("student.trainingHistoryView.copy001")
     static let trainingHistoryView002 = Key("student.trainingHistoryView.copy002")

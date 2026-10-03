@@ -21,6 +21,20 @@ struct TrainingSequenceWeek: Equatable, Identifiable, Sendable {
   let days: [TrainingSequenceDay]
 
   var id: Int { weekNumber }
+  var calendarCells: [TrainingSequenceCalendarCell] {
+    let calendar = PlanCalendarDayIdentity.utcCalendar
+    guard let first = days.first, let last = days.last else { return [] }
+    let start = calendar.startOfDay(for: first.day.date)
+    let end = calendar.startOfDay(for: last.day.date)
+    let count = max(7, (calendar.dateComponents([.day], from: start, to: end).day ?? 0) + 1)
+    return (0..<count).compactMap { offset in
+      guard let date = calendar.date(byAdding: .day, value: offset, to: start) else { return nil }
+      if let day = days.first(where: { calendar.isDate($0.day.date, inSameDayAs: date) }) {
+        return .training(day)
+      }
+      return .rest(date)
+    }
+  }
   var completedCount: Int { days.filter { $0.state == .completed }.count }
   var state: TrainingSequenceDayState {
     if days.contains(where: { $0.state == .current }) { return .current }
