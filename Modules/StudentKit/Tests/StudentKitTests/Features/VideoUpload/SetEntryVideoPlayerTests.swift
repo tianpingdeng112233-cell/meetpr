@@ -8,6 +8,32 @@ import ViewInspector
 @testable import StudentKit
 
 @Suite @MainActor struct SetEntryVideoPlayerTests {
+  @Test(arguments: [false, true])
+  func centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded: Bool) throws {
+    let playback = SetEntryVideoPlayer()
+    playback.load(attachmentID: UUID(), source: .local(URL(filePath: "/tmp/unused-video.mp4")))
+    defer { playback.stop() }
+    if expanded { playback.state.toggleExpanded() }
+    let view = SetEntryVideoPlayerView(playback: playback, badge: nil, retry: {})
+    let identifier = "setEntryVideo.centralPlay"
+    let button = try view.inspect().find(viewWithAccessibilityIdentifier: identifier).button()
+    #expect(
+      try button.accessibilityLabel().string() == StudentStrings.localized(.setEntryVideoPlay))
+    try button.tap()
+    #expect(playback.state.isPlaying)
+    #expect((try? view.inspect().find(viewWithAccessibilityIdentifier: identifier)) == nil)
+
+    playback.togglePlayback()
+    #expect(!playback.state.isPlaying)
+    #expect((try? view.inspect().find(viewWithAccessibilityIdentifier: identifier)) != nil)
+    playback.state.updateDuration(10)
+    playback.state.seek(to: 10)
+    try view.inspect().find(viewWithAccessibilityIdentifier: identifier).button().tap()
+    #expect(playback.state.isPlaying)
+    #expect(playback.state.position == 0)
+    #expect((try? view.inspect().find(viewWithAccessibilityIdentifier: identifier)) == nil)
+  }
+
   @Test func surfaceHandoffExclusivelyBindsPlayerAndIgnoresLateDetach() throws {
     let playback = SetEntryVideoPlayer()
     playback.load(attachmentID: UUID(), source: .local(URL(filePath: "/tmp/unused-video.mp4")))
