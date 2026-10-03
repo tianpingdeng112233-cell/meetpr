@@ -29,3 +29,7 @@
 - Dark、小屏与大字体。
 - Replace 按钮文案沿用现有的 "Change"（两端一致），未按设计稿改为 "Replace"。
 - 真实上传链路（Demo 下视频直接显示 Delivered）。
+
+## 追加：中央播放按钮（2026-10-03）
+
+David 真机反馈"播放器中间应该有一个播放按钮"。DemoStudent 实屏通过：暂停时画面中央显示圆形播放按钮，点它开始播放并隐藏。[截图](evidence/c-central-play-button.jpg)。放大态与播完重播由单测覆盖。
