@@ -1,6 +1,21 @@
 import Foundation
 
 enum ChatStrings {
+  static let askCoach = localized("chat.askCoach")
+  static let setRefPrompt = localized("chat.setRefPrompt")
+  static let setRefQuestion = localized("chat.setRefQuestion")
+  static let setRefQuestionPlaceholder = localized("chat.setRefQuestionPlaceholder")
+  static let sendToCoach = localized("chat.sendToCoach")
+  static let setRefLogged = localized("chat.setRefLogged")
+  static let setRefPlanned = localized("chat.setRefPlanned")
+  static let setRefVideo = localized("chat.setRefVideo")
+
+  static func setRefSendSummary(setNumber: Int, exerciseName: String) -> String {
+    localized("chat.setRefSendSummary")
+      .replacing("{set}", with: String(setNumber))
+      .replacing("{exercise}", with: exerciseName)
+  }
+
   static let messages = localized("chat.messages")
   static let noConversations = localized("chat.noConversations")
   static let noMessages = localized("chat.noMessages")

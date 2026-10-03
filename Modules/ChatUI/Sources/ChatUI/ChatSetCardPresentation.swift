@@ -12,6 +12,16 @@ public struct ChatSetCardPresentation: Equatable, Sendable {
   let createdAt: Date
   let note: String?
   let videoURL: URL?
+  let attachmentSummary: String
+
+  var visibleNote: String? {
+    guard let note, !note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+      return nil
+    }
+    return note
+  }
+
+  var hasVideo: Bool { videoURL != nil }
 
   public init?(message: ChatMessage) {
     guard
@@ -36,6 +46,13 @@ public struct ChatSetCardPresentation: Equatable, Sendable {
       note = String(body.dropFirst(prefix.count))
     }
 
+    let position =
+      setRef.setTotal.map { ChatStrings.setPosition(setRef.setNumber, total: $0) }
+      ?? ChatStrings.setPosition(setRef.setNumber)
+    attachmentSummary = [
+      position, ChatSetRefDisplayFormatter.load(for: setRef),
+      setRef.rpe.map { "RPE \($0)" },
+    ].compactMap { $0 }.joined(separator: " · ")
     source = setRef.source
     exerciseName = setRef.exerciseName
     setNumber = setRef.setNumber

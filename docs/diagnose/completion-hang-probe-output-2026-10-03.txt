@@ -1,0 +1,175 @@
+Phase 1 evidence only. No bug-red result and no fix.
+
+Source: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-hang-884474953f5a/logs/test_sim_2026-10-03T07-43-04-768Z_pid88443_38a7e726.log
+/Users/david/Projects/apps/MeetPR-wt-hang/MeetPRTests/CompletionHangProbeTests.swift:10:18: note: found incompatible module '/tmp/MeetPR-completion-hang-derived/Build/Products/DemoStudent-iphonesimulator/StudentKit.swiftmodule/arm64-apple-ios-simulator.swiftmodule': module built without '-enable-testing'
+/Users/david/Projects/apps/MeetPR-wt-hang/MeetPRTests/CompletionHangProbeTests.swift:10:18: note: Found incompatible module '/tmp/MeetPR-completion-hang-derived/Build/Products/DemoStudent-iphonesimulator/StudentKit.swiftmodule/arm64-apple-ios-simulator.swiftmodule': module built without '-enable-testing'
+Undefined symbols for architecture arm64:
+  "RepositoryContracts.InMemoryVideoMarkerRepository.__allocating_init(seed: [CoreModels.VideoMarker], coachID: Foundation.UUID, now: @Sendable () -> Foundation.Date, makeID: @Sendable () -> Foundation.UUID) -> RepositoryContracts.InMemoryVideoMarkerRepository", referenced from:
+  "nominal type descriptor for RepositoryContracts.PendingVideoItem", referenced from:
+** TEST BUILD FAILED **
+
+Source: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-hang-884474953f5a/logs/test_sim_2026-10-03T07-44-46-168Z_pid88443_ea9b8558.log
+Undefined symbols for architecture arm64:
+  "RepositoryContracts.InMemoryVideoMarkerRepository.__allocating_init(seed: [CoreModels.VideoMarker], coachID: Foundation.UUID, now: @Sendable () -> Foundation.Date, makeID: @Sendable () -> Foundation.UUID) -> RepositoryContracts.InMemoryVideoMarkerRepository", referenced from:
+  "nominal type descriptor for RepositoryContracts.PendingVideoItem", referenced from:
+** TEST BUILD FAILED **
+
+Source: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-hang-884474953f5a/logs/test_sim_2026-10-03T07-46-46-253Z_pid88443_e940ef94.log
+Undefined symbols for architecture arm64:
+  "RepositoryContracts.InMemoryVideoMarkerRepository.__allocating_init(seed: [CoreModels.VideoMarker], coachID: Foundation.UUID, now: @Sendable () -> Foundation.Date, makeID: @Sendable () -> Foundation.UUID) -> RepositoryContracts.InMemoryVideoMarkerRepository", referenced from:
+  "nominal type descriptor for RepositoryContracts.PendingVideoItem", referenced from:
+** TEST BUILD FAILED **
+
+Source: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-hang-884474953f5a/logs/test_sim_2026-10-03T07-48-54-244Z_pid88443_c9d4e742.log
+** TEST BUILD SUCCEEDED **
+HANG-PROBE PASS iteration=0 delayMs=0 idleDelta=132
+HANG-PROBE PASS iteration=1 delayMs=16 idleDelta=120
+HANG-PROBE PASS iteration=2 delayMs=50 idleDelta=138
+HANG-PROBE PASS iteration=3 delayMs=100 idleDelta=125
+HANG-PROBE PASS iteration=4 delayMs=200 idleDelta=161
+HANG-PROBE PASS iteration=5 delayMs=350 idleDelta=133
+HANG-PROBE PASS iteration=6 delayMs=0 idleDelta=160
+HANG-PROBE PASS iteration=7 delayMs=16 idleDelta=127
+HANG-PROBE PASS iteration=8 delayMs=50 idleDelta=158
+HANG-PROBE PASS iteration=9 delayMs=100 idleDelta=137
+HANG-PROBE PASS iteration=10 delayMs=200 idleDelta=179
+HANG-PROBE PASS iteration=11 delayMs=350 idleDelta=175
+HANG-PROBE PASS iteration=12 delayMs=0 idleDelta=158
+HANG-PROBE PASS iteration=13 delayMs=16 idleDelta=119
+HANG-PROBE PASS iteration=14 delayMs=50 idleDelta=159
+HANG-PROBE PASS iteration=15 delayMs=100 idleDelta=139
+HANG-PROBE PASS iteration=16 delayMs=200 idleDelta=162
+HANG-PROBE PASS iteration=17 delayMs=350 idleDelta=133
+HANG-PROBE PASS iteration=18 delayMs=0 idleDelta=158
+HANG-PROBE PASS iteration=19 delayMs=16 idleDelta=157
+HANG-PROBE PASS iteration=20 delayMs=50 idleDelta=159
+HANG-PROBE PASS iteration=21 delayMs=100 idleDelta=140
+HANG-PROBE PASS iteration=22 delayMs=200 idleDelta=156
+HANG-PROBE PASS iteration=23 delayMs=350 idleDelta=145
+✔ Test mountedWorkoutReturnsToIdleAfterCompletion() passed after 34.091 seconds.
+✔ Suite CompletionHangProbeTests passed after 34.102 seconds.
+✔ Test run with 1 test in 1 suite passed after 34.102 seconds.
+** TEST EXECUTE SUCCEEDED **
+
+Source: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-hang-884474953f5a/logs/test_sim_2026-10-03T07-51-16-184Z_pid88443_6fb581c9.log
+** TEST BUILD SUCCEEDED **
+HANG-PROBE PASS iteration=0 sheet=true delayMs=0 idleDelta=121
+HANG-PROBE PASS iteration=1 sheet=true delayMs=16 idleDelta=126
+HANG-PROBE PASS iteration=2 sheet=true delayMs=50 idleDelta=124
+HANG-PROBE PASS iteration=3 sheet=true delayMs=100 idleDelta=139
+HANG-PROBE PASS iteration=4 sheet=true delayMs=200 idleDelta=131
+HANG-PROBE PASS iteration=5 sheet=true delayMs=350 idleDelta=126
+HANG-PROBE PASS iteration=6 sheet=true delayMs=0 idleDelta=163
+HANG-PROBE PASS iteration=7 sheet=true delayMs=16 idleDelta=125
+HANG-PROBE PASS iteration=8 sheet=true delayMs=50 idleDelta=122
+HANG-PROBE PASS iteration=9 sheet=true delayMs=100 idleDelta=139
+HANG-PROBE PASS iteration=10 sheet=true delayMs=200 idleDelta=165
+HANG-PROBE PASS iteration=11 sheet=true delayMs=350 idleDelta=146
+HANG-PROBE PASS iteration=12 sheet=true delayMs=0 idleDelta=206
+HANG-PROBE PASS iteration=13 sheet=true delayMs=16 idleDelta=127
+HANG-PROBE PASS iteration=14 sheet=true delayMs=50 idleDelta=153
+HANG-PROBE PASS iteration=15 sheet=true delayMs=100 idleDelta=142
+HANG-PROBE PASS iteration=16 sheet=true delayMs=200 idleDelta=152
+HANG-PROBE PASS iteration=17 sheet=true delayMs=350 idleDelta=143
+HANG-PROBE PASS iteration=18 sheet=true delayMs=0 idleDelta=173
+HANG-PROBE PASS iteration=19 sheet=true delayMs=16 idleDelta=124
+HANG-PROBE PASS iteration=20 sheet=true delayMs=50 idleDelta=124
+HANG-PROBE PASS iteration=21 sheet=true delayMs=100 idleDelta=129
+HANG-PROBE PASS iteration=22 sheet=true delayMs=200 idleDelta=147
+HANG-PROBE PASS iteration=23 sheet=true delayMs=350 idleDelta=159
+HANG-PROBE PASS iteration=24 sheet=true delayMs=0 idleDelta=131
+HANG-PROBE PASS iteration=25 sheet=true delayMs=16 idleDelta=3026
+HANG-PROBE PASS iteration=26 sheet=true delayMs=50 idleDelta=139
+HANG-PROBE PASS iteration=27 sheet=true delayMs=100 idleDelta=126
+HANG-PROBE PASS iteration=28 sheet=true delayMs=200 idleDelta=129
+HANG-PROBE PASS iteration=29 sheet=true delayMs=350 idleDelta=128
+HANG-PROBE PASS iteration=30 sheet=true delayMs=0 idleDelta=146
+HANG-PROBE PASS iteration=31 sheet=true delayMs=16 idleDelta=118
+HANG-PROBE PASS iteration=32 sheet=true delayMs=50 idleDelta=132
+HANG-PROBE PASS iteration=33 sheet=true delayMs=100 idleDelta=120
+HANG-PROBE PASS iteration=34 sheet=true delayMs=200 idleDelta=141
+HANG-PROBE PASS iteration=35 sheet=true delayMs=350 idleDelta=125
+HANG-PROBE PASS iteration=36 sheet=true delayMs=0 idleDelta=129
+HANG-PROBE PASS iteration=37 sheet=true delayMs=16 idleDelta=133
+HANG-PROBE PASS iteration=38 sheet=true delayMs=50 idleDelta=113
+HANG-PROBE PASS iteration=39 sheet=true delayMs=100 idleDelta=170
+HANG-PROBE PASS iteration=40 sheet=true delayMs=200 idleDelta=152
+HANG-PROBE PASS iteration=41 sheet=true delayMs=350 idleDelta=149
+HANG-PROBE PASS iteration=42 sheet=true delayMs=0 idleDelta=127
+HANG-PROBE PASS iteration=43 sheet=true delayMs=16 idleDelta=124
+HANG-PROBE PASS iteration=44 sheet=true delayMs=50 idleDelta=124
+HANG-PROBE PASS iteration=45 sheet=true delayMs=100 idleDelta=144
+HANG-PROBE PASS iteration=46 sheet=true delayMs=200 idleDelta=179
+HANG-PROBE PASS iteration=47 sheet=true delayMs=350 idleDelta=142
+HANG-PROBE PASS iteration=48 sheet=true delayMs=0 idleDelta=144
+HANG-PROBE PASS iteration=49 sheet=true delayMs=16 idleDelta=126
+HANG-PROBE PASS iteration=50 sheet=true delayMs=50 idleDelta=142
+HANG-PROBE PASS iteration=51 sheet=true delayMs=100 idleDelta=121
+HANG-PROBE PASS iteration=52 sheet=true delayMs=200 idleDelta=147
+HANG-PROBE PASS iteration=53 sheet=true delayMs=350 idleDelta=148
+HANG-PROBE PASS iteration=54 sheet=true delayMs=0 idleDelta=130
+HANG-PROBE PASS iteration=55 sheet=true delayMs=16 idleDelta=129
+HANG-PROBE PASS iteration=56 sheet=true delayMs=50 idleDelta=139
+HANG-PROBE PASS iteration=57 sheet=true delayMs=100 idleDelta=143
+HANG-PROBE PASS iteration=58 sheet=true delayMs=200 idleDelta=127
+HANG-PROBE PASS iteration=59 sheet=true delayMs=350 idleDelta=143
+HANG-PROBE PASS iteration=60 sheet=true delayMs=0 idleDelta=143
+HANG-PROBE PASS iteration=61 sheet=true delayMs=16 idleDelta=151
+HANG-PROBE PASS iteration=62 sheet=true delayMs=50 idleDelta=148
+HANG-PROBE PASS iteration=63 sheet=true delayMs=100 idleDelta=135
+HANG-PROBE PASS iteration=64 sheet=true delayMs=200 idleDelta=125
+HANG-PROBE PASS iteration=65 sheet=true delayMs=350 idleDelta=130
+HANG-PROBE PASS iteration=66 sheet=true delayMs=0 idleDelta=128
+HANG-PROBE PASS iteration=67 sheet=true delayMs=16 idleDelta=127
+HANG-PROBE PASS iteration=68 sheet=true delayMs=50 idleDelta=127
+HANG-PROBE PASS iteration=69 sheet=true delayMs=100 idleDelta=126
+HANG-PROBE PASS iteration=70 sheet=true delayMs=200 idleDelta=122
+HANG-PROBE PASS iteration=71 sheet=true delayMs=350 idleDelta=133
+HANG-PROBE PASS iteration=72 sheet=true delayMs=0 idleDelta=138
+HANG-PROBE PASS iteration=73 sheet=true delayMs=16 idleDelta=133
+HANG-PROBE PASS iteration=74 sheet=true delayMs=50 idleDelta=121
+HANG-PROBE PASS iteration=75 sheet=true delayMs=100 idleDelta=142
+HANG-PROBE PASS iteration=76 sheet=true delayMs=200 idleDelta=128
+HANG-PROBE PASS iteration=77 sheet=true delayMs=350 idleDelta=145
+HANG-PROBE PASS iteration=78 sheet=true delayMs=0 idleDelta=145
+HANG-PROBE PASS iteration=79 sheet=true delayMs=16 idleDelta=120
+HANG-PROBE PASS iteration=80 sheet=true delayMs=50 idleDelta=123
+HANG-PROBE PASS iteration=81 sheet=true delayMs=100 idleDelta=132
+HANG-PROBE PASS iteration=82 sheet=true delayMs=200 idleDelta=138
+HANG-PROBE PASS iteration=83 sheet=true delayMs=350 idleDelta=142
+HANG-PROBE PASS iteration=84 sheet=true delayMs=0 idleDelta=123
+HANG-PROBE PASS iteration=85 sheet=true delayMs=16 idleDelta=145
+HANG-PROBE PASS iteration=86 sheet=true delayMs=50 idleDelta=132
+HANG-PROBE PASS iteration=87 sheet=true delayMs=100 idleDelta=129
+HANG-PROBE PASS iteration=88 sheet=true delayMs=200 idleDelta=142
+HANG-PROBE PASS iteration=89 sheet=true delayMs=350 idleDelta=130
+HANG-PROBE PASS iteration=90 sheet=true delayMs=0 idleDelta=120
+HANG-PROBE PASS iteration=91 sheet=true delayMs=16 idleDelta=127
+HANG-PROBE PASS iteration=92 sheet=true delayMs=50 idleDelta=140
+HANG-PROBE PASS iteration=93 sheet=true delayMs=100 idleDelta=164
+HANG-PROBE PASS iteration=94 sheet=true delayMs=200 idleDelta=141
+HANG-PROBE PASS iteration=95 sheet=true delayMs=350 idleDelta=126
+HANG-PROBE PASS iteration=96 sheet=true delayMs=0 idleDelta=125
+HANG-PROBE PASS iteration=97 sheet=true delayMs=16 idleDelta=141
+HANG-PROBE PASS iteration=98 sheet=true delayMs=50 idleDelta=142
+HANG-PROBE PASS iteration=99 sheet=true delayMs=100 idleDelta=144
+✔ Test mountedWorkoutReturnsToIdleAfterCompletion() passed after 303.731 seconds.
+✔ Suite CompletionHangProbeTests passed after 303.742 seconds.
+✔ Test run with 1 test in 1 suite passed after 303.742 seconds.
+** TEST EXECUTE SUCCEEDED **
+
+100-iteration MCP call exceeded its 300 s transport timeout; underlying xcodebuild completed successfully after 303.742 s of test runtime.
+Notification prompt dismissed after iteration 24; remainder ran unattended.
+
+Final guarded/refactored harness, six dismissal timings; Source: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-hang-884474953f5a/logs/test_sim_2026-10-03T07-56-48-203Z_pid88443_d90a6998.log
+** TEST BUILD SUCCEEDED **
+HANG-PROBE PASS iteration=0 sheet=true delayMs=0 idleDelta=69
+HANG-PROBE PASS iteration=1 sheet=true delayMs=16 idleDelta=108
+HANG-PROBE PASS iteration=2 sheet=true delayMs=50 idleDelta=112
+HANG-PROBE PASS iteration=3 sheet=true delayMs=100 idleDelta=131
+HANG-PROBE PASS iteration=4 sheet=true delayMs=200 idleDelta=109
+HANG-PROBE PASS iteration=5 sheet=true delayMs=350 idleDelta=119
+✔ Test mountedWorkoutReturnsToIdleAfterCompletion() passed after 20.285 seconds.
+✔ Suite CompletionHangProbeTests passed after 20.292 seconds.
+✔ Test run with 1 test in 1 suite passed after 20.293 seconds.
+** TEST EXECUTE SUCCEEDED **

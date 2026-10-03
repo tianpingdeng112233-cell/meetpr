@@ -4,52 +4,50 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct RestTimerExplanationView: View {
   let onAcknowledge: () -> Void
+  let onOpenSettings: () -> Void
+  private let presentation = RestTimerExplanationPresentation()
 
   var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-      Image(systemName: "timer")
-        .font(.largeTitle)
-        .foregroundStyle(Color.MeetPR.gold500)
-
-      Text(StudentStrings.localized(.restTimerExplanationView001))
-        .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
-        .foregroundStyle(Color.MeetPR.textPrimary)
-
-      explanationRow(
-        icon: "gauge.with.dots.needle.33percent",
-        text: StudentStrings.localized(.restTimerExplanationView002)
-      )
-      explanationRow(
-        icon: "person.fill.checkmark", text: StudentStrings.localized(.restTimerExplanationView003))
-      explanationRow(
-        icon: "gearshape", text: StudentStrings.localized(.restTimerExplanationView004))
-
-      Button(action: onAcknowledge) {
-        Text(StudentStrings.localized(.restTimerExplanationView005))
-          .font(.MeetPR.display(size: MeetPRFontMetrics.size16))
-          .foregroundStyle(Color.MeetPR.ctaText)
-          .frame(maxWidth: .infinity)
-          .frame(height: MeetPRSpacing.point52)
-          .background(Color.MeetPR.ctaBackground)
-          .clipShape(.capsule)
+    ScrollView {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+        Text(StudentStrings.localized(.restTimerExplanationView001))
+          .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
+          .foregroundStyle(Color.MeetPR.textPrimary)
+        Text(StudentStrings.localized(.restTimerExplanationView002))
+          .font(.MeetPR.body)
+          .foregroundStyle(Color.MeetPR.textSecondary)
+        VStack(spacing: MeetPRSpacing.md) {
+          ForEach(presentation.rows) { row in
+            HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.md) {
+              Text(row.condition).font(.MeetPR.body)
+              Spacer(minLength: MeetPRSpacing.sm)
+              Text(row.duration).font(.MeetPR.monoLabel)
+                .fixedSize()
+            }
+          }
+        }
+        .padding(MeetPRSpacing.md)
+        .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.card))
+        Text(StudentStrings.localized(.restTimerExplanationView003))
+          .font(.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.textSecondary)
+        Button(action: onAcknowledge) {
+          Text(StudentStrings.localized(.restTimerExplanationView005))
+            .font(.MeetPR.bodyEmphasis)
+            .foregroundStyle(Color.MeetPR.ctaText)
+            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point52)
+            .background(Color.MeetPR.ctaBackground, in: .capsule)
+        }
+        .buttonStyle(PressScaleButtonStyle())
+        Button(action: onOpenSettings) {
+          Text(StudentStrings.localized(.restExplanationSettings))
+            .font(.MeetPR.footnote)
+            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+        }
       }
-      .buttonStyle(PressScaleButtonStyle())
-      .padding(.top, MeetPRSpacing.xs)
+      .fixedSize(horizontal: false, vertical: true)
+      .padding(MeetPRSpacing.lg)
     }
-    .padding(MeetPRSpacing.lg)
-    .frame(maxWidth: .infinity, alignment: .leading)
     .background(Color.MeetPR.surfaceElevated)
-  }
-
-  private func explanationRow(icon: String, text: String) -> some View {
-    HStack(alignment: .top, spacing: MeetPRSpacing.sm) {
-      Image(systemName: icon)
-        .foregroundStyle(Color.MeetPR.textMuted)
-        .frame(width: 24)
-      Text(text)
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size15))
-        .foregroundStyle(Color.MeetPR.textSecondary)
-        .fixedSize(horizontal: false, vertical: true)
-    }
   }
 }
