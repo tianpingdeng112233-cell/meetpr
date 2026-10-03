@@ -52,6 +52,19 @@ private struct SetEntryVideoStage: View {
       } else {
         ProgressView().tint(.white)
       }
+      if isActive, playback.player != nil, !playback.state.isPlaying {
+        Button(action: playback.togglePlayback) {
+          Image(systemName: "play.fill")
+            .font(.MeetPR.title2)
+            .foregroundStyle(Color.MeetPR.inkOnCTAFill)
+            .frame(width: MeetPRSpacing.point56, height: MeetPRSpacing.point56)
+            .background(Color.MeetPR.ctaFill.opacity(0.65), in: .circle)
+            .contentShape(.circle)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(StudentStrings.localized(.setEntryVideoPlay))
+        .accessibilityIdentifier("setEntryVideo.centralPlay")
+      }
     }
   }
 }
