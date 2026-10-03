@@ -64,6 +64,8 @@ public final class TodayWorkoutViewModel {
   public private(set) var planDays: [StudentPlanDay] = []
   public private(set) var planProjection: StudentPlanView?
   public private(set) var completionRevision = 0
+  var completionPhase: WorkoutCompletionFlowPhase?
+  private(set) var isCompletionSending = false
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -73,6 +75,7 @@ public final class TodayWorkoutViewModel {
   private let restTimerActivityController: any RestTimerActivityControlling
   private let calendar: Calendar
   private let now: @Sendable () -> Date
+  private let completionSleep: @MainActor @Sendable () async -> Void
   private var currentStudentID: UUID?
   private var loadGeneration = 0
   private var recordingGeneration = 0
@@ -98,7 +101,10 @@ public final class TodayWorkoutViewModel {
     restTimerActivityController: any RestTimerActivityControlling =
       NoOpRestTimerActivityController(),
     calendar: Calendar = .current,
-    now: @escaping @Sendable () -> Date = { Date() }
+    now: @escaping @Sendable () -> Date = { Date() },
+    completionSleep: @escaping @MainActor @Sendable () async -> Void = {
+      try? await Task.sleep(for: .seconds(30))
+    }
   ) {
     self.plans = plans
     self.logs = logs
@@ -108,6 +114,7 @@ public final class TodayWorkoutViewModel {
     self.restTimerActivityController = restTimerActivityController
     self.calendar = calendar
     self.now = now
+    self.completionSleep = completionSleep
   }
 
   public func load(
@@ -618,20 +625,39 @@ public final class TodayWorkoutViewModel {
 
   public func completeCurrentDay() async -> Bool {
     guard let day = currentDay else { return false }
-    return await completeDay(day)
+    return await completeDay(day, presentsCelebration: true)
   }
 
   /// Completes a specific day. Quick-log passes the day it wrote sets for, so
   /// a refresh that moves `currentDay` mid-flight can never complete another.
-  private func completeDay(_ day: StudentPlanDay) async -> Bool {
+  private func completeDay(
+    _ day: StudentPlanDay, presentsCelebration: Bool = false
+  ) async -> Bool {
     guard !isCompletionMutationInFlight,
       let studentID = currentStudentID
     else { return false }
     isCompletionMutationInFlight = true
     defer { isCompletionMutationInFlight = false }
     actionErrorMessage = nil
+    if presentsCelebration {
+      isCompletionSending = true
+      completionPhase = .celebration
+      // Keep the cursor on this day until the server confirms completion.
+      replaceCurrentDay(
+        day.replacingCompletion(completedAt: now(), source: "manual"),
+        updatesPlanDays: false
+      )
+    }
     do {
-      let completion = try await plans.completeDay(id: day.id, studentID: studentID)
+      let completion: PlanDayCompletion
+      if presentsCelebration {
+        completion = try await WorkoutCompletionRequest().complete(
+          dayID: day.id, studentID: studentID, plans: plans, sleep: completionSleep
+        )
+      } else {
+        completion = try await plans.completeDay(id: day.id, studentID: studentID)
+      }
+      isCompletionSending = false
       await applyCompletionMutation(
         fallback: day.replacingCompletion(
           completedAt: completion.completedAt,
@@ -644,6 +670,17 @@ public final class TodayWorkoutViewModel {
       actionErrorMessage = error.localizedMessage
     } catch {
       actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel001)
+    }
+    if presentsCelebration {
+      isCompletionSending = false
+      completionPhase = nil
+      if let visibleDay = currentDay, visibleDay.id == day.id {
+        replaceCurrentDay(
+          visibleDay.replacingCompletion(
+            completedAt: day.completedAt, source: day.completionSource
+          )
+        )
+      }
     }
     return false
   }
@@ -812,8 +849,8 @@ public final class TodayWorkoutViewModel {
     }
   }
 
-  private func replaceCurrentDay(_ day: StudentPlanDay) {
-    if let index = planDays.firstIndex(where: { $0.id == day.id }) {
+  private func replaceCurrentDay(_ day: StudentPlanDay, updatesPlanDays: Bool = true) {
+    if updatesPlanDays, let index = planDays.firstIndex(where: { $0.id == day.id }) {
       planDays[index] = day
     }
     switch state {

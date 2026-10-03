@@ -17035,6 +17035,23 @@
         }
       }
     },
+    "student.workoutCompletionSendingToCoach" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sending to your coach…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在发送给教练…"
+          }
+        }
+      }
+    },
     "student.workoutCompletionPresentation.copy001": {
       "extractionState": "manual",
       "localizations": {

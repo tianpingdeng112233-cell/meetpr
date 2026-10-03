@@ -32,7 +32,6 @@ public struct TodayWorkoutView: View {
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
   @State private var selectedDayID: UUID?
-  @State private var completionPhase: WorkoutCompletionFlowPhase?
   @State private var editing: EditingTarget?
   @State private var quickLogRoute: QuickLogRoute?
   @State private var quickLogToastWeekCode: String?
@@ -192,8 +191,10 @@ public struct TodayWorkoutView: View {
         onVideoAction: openVideoAction,
         onComplete: {
           Task {
-            if await viewModel.completeCurrentDay() {
-              completionPhase = .celebration
+            if await viewModel.completeCurrentDay(), viewModel.completionPhase == nil {
+              // The student may have closed the reward while it was sending.
+              returnToCurrentDay()
+              onReturnToToday()
             }
           }
         },
@@ -203,7 +204,7 @@ public struct TodayWorkoutView: View {
           }
         },
         onShowReview: {
-          completionPhase = .review
+          viewModel.completionPhase = .review
         }
       )
       #if os(iOS)
@@ -250,11 +251,11 @@ public struct TodayWorkoutView: View {
       }
     #endif
     #if os(iOS)
-      .fullScreenCover(item: $completionPhase) { phase in
+      .fullScreenCover(item: $viewModel.completionPhase) { phase in
         completionFlow(phase: phase)
       }
     #else
-      .sheet(item: $completionPhase) { phase in
+      .sheet(item: $viewModel.completionPhase) { phase in
         completionFlow(phase: phase)
       }
     #endif
@@ -487,6 +488,7 @@ public struct TodayWorkoutView: View {
         references: viewModel.exerciseReferences,
         weekCode: weekCode,
         coachName: notifications?.activeCoach?.coachDisplayName,
+        isSendingToCoach: viewModel.isCompletionSending,
         streak: nil
       )
       WorkoutCompletionFlowView(
@@ -494,6 +496,7 @@ public struct TodayWorkoutView: View {
         studentID: studentID,
         initialPhase: phase,
         onFinish: {
+          viewModel.completionPhase = nil
           markReviewCompleted(
             for: workout.day.scheduledDate,
             setCount: workout.drafts.count

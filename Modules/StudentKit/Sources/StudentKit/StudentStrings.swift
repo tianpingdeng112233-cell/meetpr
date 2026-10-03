@@ -1197,6 +1197,7 @@ enum StudentStrings {
       "student.workoutCompletionPresentation.copy013")
     static let workoutCompletionPresentation014 = Key(
       "student.workoutCompletionPresentation.copy014")
+    static let workoutCompletionSendingToCoach = Key("student.workoutCompletionSendingToCoach")
     static let workoutCompletionPresentation015 = Key(
       "student.workoutCompletionPresentation.copy015")
     static let workoutCompletionPresentation016 = Key(
