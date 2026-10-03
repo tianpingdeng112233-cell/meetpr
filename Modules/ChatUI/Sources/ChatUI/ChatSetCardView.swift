@@ -5,206 +5,121 @@ public struct ChatSetCardView: View {
   let presentation: ChatSetCardPresentation
   let isCurrentUser: Bool
   let deliveryStatus: ChatDeliveryStatus?
+  let outgoingBubbleColor: Color
+  let incomingBubbleColor: Color
+  let messageFont: Font
+  let outgoingTextColor: Color
   let openVideo: @MainActor () -> Void
+  @State private var showsDetails = false
 
   public init(
     presentation: ChatSetCardPresentation,
     isCurrentUser: Bool,
     deliveryStatus: ChatDeliveryStatus? = nil,
+    outgoingBubbleColor: Color = Color.MeetPR.goldCTA,
+    incomingBubbleColor: Color = Color.MeetPR.surfaceCard,
+    outgoingTextColor: Color = .white,
+    messageFont: Font = .MeetPR.body(size: MeetPRFontMetrics.size14),
     openVideo: @escaping @MainActor () -> Void
   ) {
     self.presentation = presentation
     self.isCurrentUser = isCurrentUser
     self.deliveryStatus = deliveryStatus
+    self.outgoingBubbleColor = outgoingBubbleColor
+    self.incomingBubbleColor = incomingBubbleColor
+    self.messageFont = messageFont
+    self.outgoingTextColor = outgoingTextColor
     self.openVideo = openVideo
   }
 
   public var body: some View {
-    // Spacing 0 at the outer level so the delivery strip can run edge to edge;
-    // the body carries its own padding instead.
-    VStack(alignment: .leading, spacing: 0) {
-      ChatSetCardBody(presentation: presentation, openVideo: openVideo)
-      if isCurrentUser, let deliveryStatus {
-        Divider()
-          .overlay(Color.MeetPR.borderDefault)
-        // The presentation string already carries its own ✓; a Label's systemImage
-        // would draw a second one.
-        Text(ChatSetCardDeliveryPresentation.text(for: deliveryStatus))
-          .font(.caption)
-          .foregroundStyle(Color.MeetPR.textTertiary)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding(.horizontal, MeetPRSpacing.md)
-          .padding(.vertical, MeetPRSpacing.sm)
-          .background(Color.MeetPR.surfaceElevated)
-      }
-    }
-    .background(Color.MeetPR.surfaceCard)
-    .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-    .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.lg)
-        .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
-    }
-    .overlay(alignment: isCurrentUser ? .trailing : .leading) {
-      Rectangle()
-        .fill(Color.MeetPR.gold500)
-        .frame(width: MeetPRSpacing.point3)
-    }
-    .containerRelativeFrame(
-      .horizontal,
-      count: 4,
-      span: 3,
-      spacing: MeetPRSpacing.sm
-    )
-  }
-}
-
-private struct ChatSetCardBody: View {
-  let presentation: ChatSetCardPresentation
-  let openVideo: @MainActor () -> Void
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
-      ChatSetCardHeader(presentation: presentation)
-      ChatSetCardTitle(presentation: presentation)
-      ChatSetCardMetrics(presentation: presentation)
-
-      if presentation.videoURL != nil {
-        Button(action: openVideo) {
-          Label(ChatStrings.playVideo, systemImage: "play.rectangle.fill")
-            .font(.subheadline.bold())
-            .frame(maxWidth: .infinity)
+    VStack(alignment: isCurrentUser ? .trailing : .leading, spacing: MeetPRSpacing.xs) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+        if let note = presentation.visibleNote {
+          Text(note)
+            .font(messageFont)
+            .foregroundStyle(isCurrentUser ? outgoingTextColor : Color.MeetPR.textPrimary)
+            .fixedSize(horizontal: false, vertical: true)
         }
-        .buttonStyle(.bordered)
-        .tint(Color.MeetPR.goldText)
+        Button {
+          if presentation.hasVideo { openVideo() } else { showsDetails = true }
+        } label: {
+          ChatSetAttachmentRow(presentation: presentation)
+        }
+        .buttonStyle(.plain)
       }
+      .padding(MeetPRSpacing.md)
+      .background(isCurrentUser ? outgoingBubbleColor : incomingBubbleColor)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
 
-      if let note = presentation.note, !note.isEmpty {
-        Text(note)
-          .font(.body)
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .fixedSize(horizontal: false, vertical: true)
-          .padding(MeetPRSpacing.sm)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .background(Color.MeetPR.surfaceElevated)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      Text(footer)
+        .font(.MeetPR.caption)
+        .foregroundStyle(Color.MeetPR.textTertiary)
+    }
+    .containerRelativeFrame(.horizontal, count: 4, span: 3, spacing: MeetPRSpacing.sm)
+    .sheet(isPresented: $showsDetails) {
+      ChatSetAttachmentDetails(presentation: presentation)
+    }
+  }
+
+  private var footer: String {
+    let time = presentation.createdAt.formatted(date: .omitted, time: .shortened)
+    guard isCurrentUser, let deliveryStatus else { return time }
+    return "\(time) · \(ChatSetCardDeliveryPresentation.text(for: deliveryStatus))"
+  }
+}
+
+private struct ChatSetAttachmentRow: View {
+  let presentation: ChatSetCardPresentation
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.sm) {
+      if presentation.hasVideo {
+        Image(systemName: "play.fill")
+          .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+          .background(Color.MeetPR.surfaceElevated, in: .rect(cornerRadius: MeetPRRadius.sm))
+          .accessibilityLabel(ChatStrings.playVideo)
+      }
+      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+        Text(presentation.exerciseName).font(.MeetPR.bodyEmphasis)
+        Text(presentation.attachmentSummary)
+          .font(.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.textSecondary)
+      }
+      .fixedSize(horizontal: false, vertical: true)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      Image(systemName: "chevron.right")
+    }
+    .foregroundStyle(Color.MeetPR.textPrimary)
+    .padding(MeetPRSpacing.sm)
+    .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.md))
+  }
+}
+
+private struct ChatSetAttachmentDetails: View {
+  let presentation: ChatSetCardPresentation
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    NavigationStack {
+      ScrollView {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+          Text(
+            presentation.source == .logged
+              ? ChatStrings.loggedSetCardLabel : ChatStrings.plannedSetCardLabel
+          )
+          .font(.MeetPR.footnote)
+          Text(presentation.exerciseName).font(.MeetPR.headline)
+          Text(presentation.attachmentSummary).font(.MeetPR.body)
+        }
+        .padding(MeetPRSpacing.base)
+      }
+      .toolbar {
+        ToolbarItem(placement: .confirmationAction) {
+          Button(ChatStrings.close) { dismiss() }.font(.MeetPR.body)
+        }
       }
     }
-    .padding(MeetPRSpacing.md)
-    .frame(maxWidth: .infinity, alignment: .leading)
-  }
-}
-
-private struct ChatSetCardHeader: View {
-  let presentation: ChatSetCardPresentation
-
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.xs) {
-      Image(systemName: "dumbbell.fill")
-        .foregroundStyle(Color.MeetPR.goldText)
-      Text(
-        presentation.source == .logged
-          ? ChatStrings.loggedSetCardLabel
-          : ChatStrings.plannedSetCardLabel
-      )
-      .foregroundStyle(Color.MeetPR.goldText)
-      Spacer(minLength: MeetPRSpacing.sm)
-      Text(presentation.createdAt.formatted(date: .omitted, time: .shortened))
-        .monospacedDigit()
-        .foregroundStyle(Color.MeetPR.textTertiary)
-    }
-    .font(.caption.bold())
-  }
-}
-
-private struct ChatSetCardTitle: View {
-  let presentation: ChatSetCardPresentation
-
-  var body: some View {
-    HStack(alignment: .firstTextBaseline, spacing: MeetPRSpacing.sm) {
-      Text(presentation.exerciseName)
-        .font(.title3.bold())
-        .foregroundStyle(Color.MeetPR.textPrimary)
-        .fixedSize(horizontal: false, vertical: true)
-      Spacer(minLength: 0)
-      Text(setPosition)
-        .font(.caption)
-        .monospacedDigit()
-        .foregroundStyle(Color.MeetPR.textTertiary)
-        .fixedSize(horizontal: true, vertical: false)
-    }
-  }
-
-  private var setPosition: String {
-    if let total = presentation.setTotal {
-      return ChatStrings.setPosition(presentation.setNumber, total: total)
-    }
-    return ChatStrings.setPosition(presentation.setNumber)
-  }
-}
-
-private struct ChatSetCardMetrics: View {
-  let presentation: ChatSetCardPresentation
-
-  var body: some View {
-    HStack(spacing: MeetPRSpacing.md) {
-      ChatSetCardLoadMetric(
-        weight: presentation.weight,
-        reps: presentation.reps
-      )
-      .frame(maxWidth: .infinity, alignment: .leading)
-
-      Rectangle()
-        .fill(Color.MeetPR.borderDefault)
-        .frame(width: 1, height: 52)
-
-      ChatSetCardMetric(
-        label: ChatStrings.rpeMetric,
-        value: presentation.rpe ?? "-",
-        valueColor: Color.MeetPR.goldText
-      )
-      .frame(maxWidth: .infinity, alignment: .leading)
-    }
-  }
-}
-
-private struct ChatSetCardLoadMetric: View {
-  let weight: String
-  let reps: String
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-      Text(ChatStrings.weightRepsMetric)
-        .font(.caption2)
-        .tracking(1.1)
-        .foregroundStyle(Color.MeetPR.textTertiary)
-      (Text(weight)
-        .font(.title2.bold())
-        + Text("kg")
-        .font(.subheadline.bold())
-        + Text(" × \(reps)")
-        .font(.title2.bold()))
-        .foregroundStyle(Color.MeetPR.textPrimary)
-        .fixedSize(horizontal: true, vertical: false)
-    }
-  }
-}
-
-private struct ChatSetCardMetric: View {
-  let label: String
-  let value: String
-  let valueColor: Color
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-      Text(label)
-        .font(.caption2)
-        .tracking(1.1)
-        .foregroundStyle(Color.MeetPR.textTertiary)
-      Text(value)
-        .font(.title2.bold())
-        .monospacedDigit()
-        .foregroundStyle(valueColor)
-        .fixedSize(horizontal: true, vertical: false)
-    }
+    .presentationDetents([.medium, .large])
   }
 }

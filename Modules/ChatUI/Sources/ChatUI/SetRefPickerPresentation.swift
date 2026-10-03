@@ -13,27 +13,13 @@ enum SetRefConfirmationCopy {
   }
 }
 
-enum SetRefPickerPage: Equatable {
-  case selection
-  case confirmation
-}
-
-struct SetRefPickerPresentation {
+struct SetRefPickerPresentation: Sendable {
   private(set) var candidates: [SetRefShareCandidate] = []
   private(set) var selectedCandidateID: UUID?
-  private(set) var page: SetRefPickerPage = .selection
 
   var selectedCandidate: SetRefShareCandidate? {
     guard let selectedCandidateID else { return nil }
     return candidates.first { $0.id == selectedCandidateID }
-  }
-
-  var loggedCandidates: [SetRefShareCandidate] {
-    candidates.filter { $0.source.source == .logged }
-  }
-
-  var plannedCandidates: [SetRefShareCandidate] {
-    candidates.filter { $0.source.source == .planned }
   }
 
   mutating func load(
@@ -44,8 +30,7 @@ struct SetRefPickerPresentation {
     selectedCandidateID =
       initialSetLogID.flatMap { requestedID in
         candidates.contains { $0.id == requestedID } ? requestedID : nil
-      } ?? candidates.first?.id
-    page = .selection
+      }
   }
 
   mutating func select(_ setLogID: UUID) {
@@ -53,14 +38,67 @@ struct SetRefPickerPresentation {
     selectedCandidateID = setLogID
   }
 
-  @discardableResult
-  mutating func proceedToConfirmation() -> Bool {
-    guard selectedCandidate != nil else { return false }
-    page = .confirmation
-    return true
+}
+
+struct SetRefPickerGroup: Identifiable, Sendable {
+  let id: String
+  let exerciseName: String
+  let weekCode: String?
+  var candidates: [SetRefShareCandidate]
+}
+
+struct SetRefPickerCell: Equatable, Sendable {
+  let setLabel: String
+  let load: String
+  let status: String
+}
+
+extension SetRefPickerPresentation {
+  var gridColumnCount: Int { 3 }
+  var canSend: Bool { selectedCandidate != nil }
+
+  var sendSummary: String? {
+    selectedCandidate.map {
+      ChatStrings.setRefSendSummary(
+        setNumber: $0.source.setNumber, exerciseName: $0.source.exerciseName)
+    }
   }
 
-  mutating func showSelection() {
-    page = .selection
+  var groups: [SetRefPickerGroup] {
+    var result: [SetRefPickerGroup] = []
+    for candidate in candidates.sorted(by: { $0.exerciseOrder < $1.exerciseOrder }) {
+      let key =
+        candidate.exerciseID?.uuidString
+        ?? "\(candidate.source.dayDate)|\(candidate.source.exerciseName)"
+      if let index = result.firstIndex(where: { $0.id == key }) {
+        result[index].candidates.append(candidate)
+      } else {
+        result.append(
+          SetRefPickerGroup(
+            id: key, exerciseName: candidate.source.exerciseName,
+            weekCode: candidate.weekCode, candidates: [candidate]))
+      }
+    }
+    for index in result.indices {
+      result[index].candidates.sort { $0.source.setNumber < $1.source.setNumber }
+    }
+    return result
+  }
+
+  func cell(for candidate: SetRefShareCandidate) -> SetRefPickerCell? {
+    guard let setRef = try? SetRefV1.normalizingSource(candidate.source) else { return nil }
+    let status: String
+    if setRef.source == .planned {
+      status = ChatStrings.setRefPlanned
+    } else if let rpe = setRef.rpe {
+      status = "\(ChatStrings.setRefLogged) · RPE \(rpe)"
+    } else if candidate.video != nil {
+      status = "\(ChatStrings.setRefLogged) · \(ChatStrings.setRefVideo)"
+    } else {
+      status = ChatStrings.setRefLogged
+    }
+    return SetRefPickerCell(
+      setLabel: ChatStrings.setPosition(setRef.setNumber),
+      load: ChatSetRefDisplayFormatter.load(for: setRef) ?? "—", status: status)
   }
 }

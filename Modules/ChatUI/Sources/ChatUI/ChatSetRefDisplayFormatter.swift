@@ -2,6 +2,15 @@ import CoreModels
 import Foundation
 
 public enum ChatSetRefDisplayFormatter {
+  static func load(for setRef: SetRefV1) -> String? {
+    let weight = setRef.weightKg.map { "\($0)kg" }
+    let reps = setRef.reps.map { lower in
+      setRef.repsMax.map { "\(lower)–\($0)" } ?? String(lower)
+    }
+    if let weight, let reps { return "\(weight) × \(reps)" }
+    return weight ?? reps
+  }
+
   public static func firstLine(
     for setRef: SetRefV1,
     locale: Locale = .current

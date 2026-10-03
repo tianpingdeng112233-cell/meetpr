@@ -192,11 +192,10 @@ private func makeTodayWorkoutFixture() async throws -> (
   firstSetID: UUID
 ) {
   let studentID = StudentDemoSeed.studentID
-  // One frozen clock for both the seed and the filter: two separate Date() calls can straddle
-  // UTC midnight and leave the filter with no matching training day.
+  // Recording belongs to the cursor day; future days are read-only previews.
   let now = Date()
   let plan = StudentDemoSeed.makePlanView(today: now)
-  let day = try #require(plan.days.first { !$0.exercises.isEmpty && $0.date >= now })
+  let day = try #require(StudentPlanSequence(days: plan.days).cursorDay)
   let firstSetID = try #require(day.exercises.first?.prescribedSets.first?.id)
   let repository = InMemoryStudentPlanRepository(
     store: TestStudentPlanStore(seed: [studentID: plan])

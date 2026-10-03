@@ -14,6 +14,7 @@ struct VideoAttachmentSection: View {
   let trainingDate: Date
   let videoViewModel: VideoAttachmentViewModel
   let badge: VideoBadgeInfo?
+  let playback: SetEntryVideoPlayer
   /// Set-log id when the row was already logged; nil until first commit.
   let initialSetLogID: UUID?
   /// Lazily creates the set log (preserving completion state) so a video can
@@ -31,9 +32,9 @@ struct VideoAttachmentSection: View {
   @State private var libraryVideoToTrim: VideoTrimSession?
   @State private var activeLibraryTrimSession: VideoTrimSession?
   @State private var pendingSource: PendingSource?
-  @State private var playbackPresentation: SetVideoPlaybackPresentation?
   @State private var playbackErrorMessage: String?
   @State private var isLoadingPlayback = false
+  @State private var playbackLoadRevision = 0
   /// True from the moment a video is chosen until the upload manager owns a
   /// row for it. Covers the otherwise feedback-less window where the picked
   /// file is copied out of the picker sandbox (or saved to the library) before
@@ -50,6 +51,7 @@ struct VideoAttachmentSection: View {
     trainingDate: Date,
     videoViewModel: VideoAttachmentViewModel,
     badge: VideoBadgeInfo? = nil,
+    playback: SetEntryVideoPlayer,
     initialSetLogID: UUID?,
     resolveSetLogID: @escaping @MainActor () async -> UUID?,
     onWillPick: (() -> Void)? = nil
@@ -58,6 +60,7 @@ struct VideoAttachmentSection: View {
     self.trainingDate = trainingDate
     self.videoViewModel = videoViewModel
     self.badge = badge
+    self.playback = playback
     self.initialSetLogID = initialSetLogID
     self.resolveSetLogID = resolveSetLogID
     self.onWillPick = onWillPick
@@ -70,30 +73,28 @@ struct VideoAttachmentSection: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
-      HStack(spacing: MeetPRSpacing.space3) {
-        if hasPlayableAttachment {
-          Button(action: playAttachment) {
-            Label(
-              StudentStrings.localized(.videoAttachmentSection001), systemImage: "play.circle.fill"
-            )
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
-            .foregroundStyle(Color.MeetPR.textPrimary)
-          }
-          .disabled(isLoadingPlayback)
-        } else {
+      if rowState != nil {
+        // Keep the inline footprint while expanded so the scroll offset is not clamped.
+        SetEntryVideoPlayerView(
+          playback: playback, badge: badge, isInline: true, retry: retryPlayback
+        )
+        .opacity(playback.state.isExpanded ? 0 : 1)
+        .allowsHitTesting(!playback.state.isExpanded)
+        VideoAttachmentV3Controls(
+          state: presentationState,
+          onCamera: { requestPick(.camera) }, onLibrary: { requestPick(.library) },
+          onCancel: removeAttachment, onRetry: retryAttachment, onDelete: removeAttachment)
+      } else {
+        HStack(spacing: MeetPRSpacing.space3) {
           Text(StudentStrings.localized(.videoAttachmentSection001))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .medium))
             .foregroundStyle(Color.MeetPR.textPrimary)
+          Spacer()
+          VideoAttachmentV3Controls(
+            state: presentationState,
+            onCamera: { requestPick(.camera) }, onLibrary: { requestPick(.library) },
+            onCancel: removeAttachment, onRetry: retryAttachment, onDelete: removeAttachment)
         }
-        Spacer()
-        VideoAttachmentV3Controls(
-          state: presentationState,
-          onCamera: { requestPick(.camera) },
-          onLibrary: { requestPick(.library) },
-          onCancel: { removeAttachment() },
-          onRetry: { retryAttachment() },
-          onDelete: { removeAttachment() }
-        )
       }
       if let message = videoViewModel.lastErrorMessage {
         Text(message)
@@ -142,10 +143,14 @@ struct VideoAttachmentSection: View {
       // local placeholder so error/cancel paths can restore the pick buttons.
       if status != nil { isPreparing = false }
     }
-    #if os(iOS)
-      .fullScreenCover(item: $playbackPresentation) { presentation in
-        playbackView(for: presentation)
+    .task(id: "\(rowState?.attachment.id.uuidString ?? "none")-\(playbackLoadRevision)") {
+      guard rowState != nil else {
+        playback.stop()
+        return
       }
+      await loadPlayback()
+    }
+    #if os(iOS)
       .fullScreenCover(isPresented: $showingCamera) {
         CameraRecorderView(
           maxDurationSeconds: videoViewModel.maxDurationSeconds,
@@ -168,10 +173,6 @@ struct VideoAttachmentSection: View {
       ) { session in
         VideoTrimView(session: session)
       }
-    #else
-      .sheet(item: $playbackPresentation) { presentation in
-        playbackView(for: presentation)
-      }
     #endif
   }
 
@@ -191,60 +192,43 @@ struct VideoAttachmentSection: View {
     #endif
   }
 
-  private var hasPlayableAttachment: Bool {
-    guard rowState != nil else { return false }
-    if case .attached = presentationState {
-      return true
-    }
-    return false
-  }
-
-  private func playbackView(
-    for presentation: SetVideoPlaybackPresentation
-  ) -> SetVideoPlaybackView {
-    SetVideoPlaybackView(
-      attachmentID: presentation.attachmentID,
-      source: presentation.source,
-      badge: badge,
-      refreshRemoteURL: { attachmentID in
-        try await videoViewModel.freshRemotePlaybackURL(attachmentID: attachmentID)
-      }
-    )
-  }
-}
-
-private struct SetVideoPlaybackPresentation: Identifiable {
-  let id = UUID()
-  let attachmentID: UUID
-  let source: VideoAttachmentPlaybackSource
 }
 
 // MARK: - Actions
 
 extension VideoAttachmentSection {
   private func playAttachment() {
-    guard !isLoadingPlayback, let attachmentID = rowState?.attachment.id else { return }
+    playbackLoadRevision += 1
+  }
+
+  private func retryPlayback() {
+    guard playback.player != nil else {
+      playAttachment()
+      return
+    }
+    Task {
+      await playback.retry { attachmentID in
+        try await videoViewModel.freshRemotePlaybackURL(attachmentID: attachmentID)
+      }
+    }
+  }
+
+  private func loadPlayback() async {
+    guard let attachmentID = rowState?.attachment.id else { return }
     isLoadingPlayback = true
     playbackErrorMessage = nil
-    Task {
-      defer { isLoadingPlayback = false }
-      do {
-        guard
-          let source = try await videoViewModel.playbackSource(attachmentID: attachmentID)
-        else {
-          guard rowState?.attachment.id == attachmentID else { return }
-          playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection003)
-          return
-        }
+    defer { isLoadingPlayback = false }
+    do {
+      guard let source = try await videoViewModel.playbackSource(attachmentID: attachmentID) else {
         guard rowState?.attachment.id == attachmentID else { return }
-        playbackPresentation = SetVideoPlaybackPresentation(
-          attachmentID: attachmentID,
-          source: source
-        )
-      } catch {
-        guard rowState?.attachment.id == attachmentID else { return }
-        playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection004)
+        playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection003)
+        return
       }
+      guard !Task.isCancelled, rowState?.attachment.id == attachmentID else { return }
+      playback.load(attachmentID: attachmentID, source: source)
+    } catch {
+      guard !Task.isCancelled, rowState?.attachment.id == attachmentID else { return }
+      playbackErrorMessage = StudentStrings.localized(.videoAttachmentSection004)
     }
   }
 

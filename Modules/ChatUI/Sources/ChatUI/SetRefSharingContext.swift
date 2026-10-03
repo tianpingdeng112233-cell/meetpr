@@ -28,15 +28,24 @@ public struct SetRefShareCandidate: Identifiable, Sendable {
   public let id: UUID
   public let source: SetRefSourceSnapshot
   public let video: SetRefShareVideo?
+  public let exerciseID: UUID?
+  public let exerciseOrder: Int
+  public let weekCode: String?
 
   public init(
     id: UUID,
     source: SetRefSourceSnapshot,
-    video: SetRefShareVideo? = nil
+    video: SetRefShareVideo? = nil,
+    exerciseID: UUID? = nil,
+    exerciseOrder: Int = 0,
+    weekCode: String? = nil
   ) {
     self.id = id
     self.source = source
     self.video = video
+    self.exerciseID = exerciseID
+    self.exerciseOrder = exerciseOrder
+    self.weekCode = weekCode
   }
 }
 

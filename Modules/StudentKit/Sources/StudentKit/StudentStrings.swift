@@ -46,6 +46,17 @@ enum StudentStrings {
       self.countIndex = countIndex
     }
 
+    static let setEntryVideoPlay = Key("student.setEntryVideoPlay")
+    static let setEntryVideoPause = Key("student.setEntryVideoPause")
+    static let setEntryVideoProgress = Key("student.setEntryVideoProgress")
+    static let setEntryVideoSpeed = Key("student.setEntryVideoSpeed")
+    static let setEntryVideoExpand = Key("student.setEntryVideoExpand")
+    static let setEntryVideoCollapse = Key("student.setEntryVideoCollapse")
+    static let setEntryVideoSet = Key("student.setEntryVideoSet")
+    static let restExplanationLow = Key("student.restExplanationLow")
+    static let restExplanationMid = Key("student.restExplanationMid")
+    static let restExplanationHigh = Key("student.restExplanationHigh")
+    static let restExplanationSettings = Key("student.restExplanationSettings")
     static let e1rmSourceTitle = Key("student.e1rmSourceTitle")
     static let e1rmSourceClose = Key("student.e1rmSourceClose")
     static let e1rmSourceHint = Key("student.e1rmSourceHint")
@@ -987,25 +998,6 @@ enum StudentStrings {
     static let todayWorkoutTypes028 = Key("student.todayWorkoutTypes.copy028")
     static let todayWorkoutTypes029 = Key("student.todayWorkoutTypes.copy029")
     static let todayWorkoutV3Previews001 = Key("student.todayWorkoutV3Previews.copy001")
-    static let todayWorkoutV3Previews002 = Key("student.todayWorkoutV3Previews.copy002")
-    static let todayWorkoutV3Previews003 = Key("student.todayWorkoutV3Previews.copy003")
-    static let todayWorkoutV3Previews004 = Key("student.todayWorkoutV3Previews.copy004")
-    static let todayWorkoutV3Previews005 = Key("student.todayWorkoutV3Previews.copy005")
-    static let todayWorkoutV3Previews006 = Key("student.todayWorkoutV3Previews.copy006")
-    static let todayWorkoutV3Previews007 = Key("student.todayWorkoutV3Previews.copy007")
-    static let todayWorkoutV3Previews008 = Key("student.todayWorkoutV3Previews.copy008")
-    static let todayWorkoutV3Previews009 = Key("student.todayWorkoutV3Previews.copy009")
-    static let todayWorkoutV3Previews010 = Key("student.todayWorkoutV3Previews.copy010")
-    static let todayWorkoutV3Previews011 = Key("student.todayWorkoutV3Previews.copy011")
-    static let todayWorkoutV3Previews012 = Key("student.todayWorkoutV3Previews.copy012")
-    static let todayWorkoutV3Previews013 = Key("student.todayWorkoutV3Previews.copy013")
-    static let todayWorkoutV3Previews014 = Key("student.todayWorkoutV3Previews.copy014")
-    static let todayWorkoutV3Previews015 = Key("student.todayWorkoutV3Previews.copy015")
-    static let todayWorkoutV3Previews016 = Key("student.todayWorkoutV3Previews.copy016")
-    static let todayWorkoutV3Previews017 = Key("student.todayWorkoutV3Previews.copy017")
-    static let todayWorkoutV3Previews018 = Key("student.todayWorkoutV3Previews.copy018")
-    static let todayWorkoutV3Previews019 = Key("student.todayWorkoutV3Previews.copy019")
-    static let todayWorkoutV3Previews020 = Key("student.todayWorkoutV3Previews.copy020")
     static let todayWorkoutV3Previews021 = Key("student.todayWorkoutV3Previews.copy021")
     static let todayWorkoutV3Previews022 = Key("student.todayWorkoutV3Previews.copy022")
     static let todayWorkoutV3Previews023 = Key("student.todayWorkoutV3Previews.copy023")
@@ -1048,24 +1040,15 @@ enum StudentStrings {
     static let trainingCalendarLogic010 = Key("student.trainingCalendarLogic.copy010")
     static let trainingCalendarLogic011 = Key("student.trainingCalendarLogic.copy011")
     static let trainingCalendarLogic012 = Key("student.trainingCalendarLogic.copy012")
-    static let trainingCalendarLogic013 = Key("student.trainingCalendarLogic.copy013")
-    static let trainingCalendarView001 = Key("student.trainingCalendarView.copy001")
-    static let trainingCalendarView002 = Key(
-      "student.trainingCalendarView.copy002",
-      one: "student.trainingCalendarView.copy002.one",
-      countIndex: 1
-    )
-    static let trainingCalendarView003 = Key(
-      "student.trainingCalendarView.copy003",
-      one: "student.trainingCalendarView.copy003.one",
-      countIndex: 1
-    )
-    static let trainingCalendarView004 = Key("student.trainingCalendarView.copy004")
-    static let trainingCalendarView005 = Key(
-      "student.trainingCalendarView.copy005",
-      one: "student.trainingCalendarView.copy005.one"
-    )
-    static let trainingCalendarView006 = Key("student.trainingCalendarView.copy006")
+    static let trainingWeekCurrent = Key("student.trainingWeekCurrent")
+    static let trainingWeekUpcoming = Key("student.trainingWeekUpcoming")
+    static let trainingWeekCompleted = Key("student.trainingWeekCompleted")
+    static let trainingWeekPrevious = Key("student.trainingWeekPrevious")
+    static let trainingWeekNext = Key("student.trainingWeekNext")
+    static let trainingWeekBackToToday = Key("student.trainingWeekBackToToday")
+    static let trainingWeekRest = Key("student.trainingWeekRest")
+    static let trainingWeekRestAccessibility = Key("student.trainingWeekRestAccessibility")
+    static let trainingWeekCurrentDay = Key("student.trainingWeekCurrentDay")
     static let trainingHistoryView001 = Key("student.trainingHistoryView.copy001")
     static let trainingHistoryView002 = Key("student.trainingHistoryView.copy002")
     static let trainingHistoryView003 = Key("student.trainingHistoryView.copy003")
@@ -1216,6 +1199,7 @@ enum StudentStrings {
       "student.workoutCompletionPresentation.copy013")
     static let workoutCompletionPresentation014 = Key(
       "student.workoutCompletionPresentation.copy014")
+    static let workoutCompletionSendingToCoach = Key("student.workoutCompletionSendingToCoach")
     static let workoutCompletionPresentation015 = Key(
       "student.workoutCompletionPresentation.copy015")
     static let workoutCompletionPresentation016 = Key(

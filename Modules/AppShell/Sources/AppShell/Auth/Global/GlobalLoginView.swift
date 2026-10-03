@@ -5,6 +5,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct GlobalLoginView: View {
   @Environment(Session.self) private var session
+  @Environment(\.colorScheme) private var colorScheme
   @State private var viewModel = GlobalLoginViewModel()
   @State private var passwordResetMessage: String?
 
@@ -25,34 +26,6 @@ public struct GlobalLoginView: View {
           Spacer(minLength: MeetPRSpacing.space6)
 
           VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-            appleButton
-
-            Button {
-              Task { await viewModel.signInWithGoogle(using: session) }
-            } label: {
-              Label("Continue with Google", systemImage: "globe")
-                .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
-                .foregroundStyle(Color.MeetPR.textPrimary)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(Color.MeetPR.surfaceCard)
-                .clipShape(.rect(cornerRadius: MeetPRRadius.point14))
-                .overlay {
-                  RoundedRectangle(cornerRadius: MeetPRRadius.point14)
-                    .stroke(Color.MeetPR.borderSubtle, lineWidth: MeetPRSpacing.point1)
-                }
-            }
-            .disabled(viewModel.isSubmitting)
-            .accessibilityIdentifier("global.login.google")
-
-            HStack(spacing: MeetPRSpacing.space3) {
-              Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: MeetPRSpacing.point1)
-              Text("or")
-                .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-                .foregroundStyle(Color.MeetPR.textMuted)
-              Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: MeetPRSpacing.point1)
-            }
-
             GlobalEmailField(
               "EMAIL",
               text: $viewModel.email,
@@ -98,6 +71,34 @@ public struct GlobalLoginView: View {
             }
             .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
             .foregroundStyle(Color.MeetPR.goldText)
+
+            HStack(spacing: MeetPRSpacing.space3) {
+              Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: MeetPRSpacing.point1)
+              Text("or")
+                .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+                .foregroundStyle(Color.MeetPR.textMuted)
+              Rectangle().fill(Color.MeetPR.borderSubtle).frame(height: MeetPRSpacing.point1)
+            }
+
+            appleButton
+
+            Button {
+              Task { await viewModel.signInWithGoogle(using: session) }
+            } label: {
+              Label("Continue with Google", systemImage: "globe")
+                .font(.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .bold))
+                .foregroundStyle(Color.MeetPR.textPrimary)
+                .frame(maxWidth: .infinity)
+                .frame(height: MeetPRSpacing.point52)
+                .background(Color.MeetPR.surfaceCard)
+                .clipShape(.rect(cornerRadius: MeetPRRadius.point14))
+                .overlay {
+                  RoundedRectangle(cornerRadius: MeetPRRadius.point14)
+                    .stroke(Color.MeetPR.borderSubtle, lineWidth: MeetPRSpacing.point1)
+                }
+            }
+            .disabled(viewModel.isSubmitting)
+            .accessibilityIdentifier("global.login.google")
 
             HStack(spacing: MeetPRSpacing.space1) {
               Text("By continuing, you agree to our")
@@ -162,9 +163,14 @@ public struct GlobalLoginView: View {
         }
       }
     }
-    .signInWithAppleButtonStyle(.black)
-    .frame(height: 52)
+    .signInWithAppleButtonStyle(colorScheme == .dark ? .black : .whiteOutline)
+    .frame(maxWidth: .infinity)
+    .frame(height: MeetPRSpacing.point52)
     .clipShape(.rect(cornerRadius: MeetPRRadius.point14))
+    .overlay {
+      RoundedRectangle(cornerRadius: MeetPRRadius.point14)
+        .stroke(Color.MeetPR.borderSubtle, lineWidth: MeetPRSpacing.point1)
+    }
     .disabled(viewModel.appleNonceHash == nil || viewModel.isSubmitting)
     .opacity(viewModel.appleNonceHash == nil ? 0.55 : 1)
     .accessibilityIdentifier("global.login.apple")
