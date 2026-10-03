@@ -224,6 +224,9 @@ struct StudentBlackGoldChatView: View {
           presentation: presentation,
           isCurrentUser: message.senderID == viewModel.currentUserID,
           deliveryStatus: viewModel.deliveryStatus(for: message),
+          outgoingBubbleColor: Color.MeetPR.textPrimary,
+          incomingBubbleColor: Color.MeetPR.surfaceElevated,
+          outgoingTextColor: Color.MeetPR.bgBase,
           openVideo: { openVideo(for: message) }
         )
         .frame(

@@ -5,6 +5,33 @@ import Testing
 @testable import ChatUI
 
 @Suite struct ChatSetCardPresentationTests {
+  @Test func attachmentSummaryOmitsMissingFieldsAndNoteOccupiesTheTopRegion() throws {
+    let setRef = try makeSetRef()
+    let presentation = try #require(
+      ChatSetCardPresentation(
+        message: makeMessage(
+          setRef: setRef, body: SetRefCanonicalFormatter.body(for: setRef, note: "Check my knees")))
+    )
+    #expect(presentation.visibleNote == "Check my knees")
+    #expect(presentation.hasVideo)
+    #expect(
+      presentation.attachmentSummary == ChatStrings.setPosition(3, total: 5)
+        + " · 100kg × 5 · RPE 8.5")
+
+    let sparse = try SetRefV1(
+      source: .planned, exerciseName: "Press", setNumber: 2,
+      setTotal: nil, weightKg: nil, reps: nil, repsMax: nil, rpe: nil,
+      dayDate: "2026-10-02", setLogId: nil, planSetId: testSetLogID)
+    let withoutNote = try #require(
+      ChatSetCardPresentation(
+        message: makeMessage(
+          setRef: sparse, body: SetRefCanonicalFormatter.body(for: sparse, note: ""), videoURL: nil)
+      ))
+    #expect(withoutNote.visibleNote == nil)
+    #expect(!withoutNote.hasVideo)
+    #expect(withoutNote.attachmentSummary == ChatStrings.setPosition(2))
+  }
+
   @Test func goldenFixturesProduceExactCardFieldsAndMissingShapes() throws {
     let fixture = try loadSetRefGoldenFixture()
     let validCases = try #require(fixture["valid"] as? [[String: Any]])
@@ -226,7 +253,10 @@ private func makeSetRef() throws -> SetRefV1 {
   )
 }
 
-private func makeMessage(setRef: SetRefV1, body: String) -> ChatMessage {
+private func makeMessage(
+  setRef: SetRefV1, body: String,
+  videoURL: URL? = URL(string: "https://example.test/video.mp4")
+) -> ChatMessage {
   ChatMessage(
     id: UUID(),
     conversationID: UUID(),
@@ -238,7 +268,7 @@ private func makeMessage(setRef: SetRefV1, body: String) -> ChatMessage {
     imageURL: nil,
     imageExpiresIn: nil,
     setRef: setRef,
-    videoURL: URL(string: "https://example.test/video.mp4"),
+    videoURL: videoURL,
     videoExpiresIn: 900,
     clientID: "set-card",
     createdAt: Date(timeIntervalSince1970: 1_700_000_000)

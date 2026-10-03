@@ -10,6 +10,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct TodayWorkoutView: View {
   private let studentID: UUID
+  private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let coachRPEReconciler: E1RMCoachRPEReconciler?
@@ -42,6 +43,9 @@ public struct TodayWorkoutView: View {
   @State private var preparingVideoSetID: UUID?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
+  @State private var opensRestSettingsAfterExplanation = false
+  @State private var showingRestSettings = false
+  @State private var restPreference: StudentRestTimerPreference = .automatic
   @State private var showingHistory = false
   @State private var historyViewModel: TrainingHistoryViewModel
   @State private var showingNotifications = false
@@ -95,6 +99,7 @@ public struct TodayWorkoutView: View {
     } else {
       self.coachRPEReconciler = nil
     }
+    self.restTimerSettings = restTimerSettings
     self.planHandoff = planHandoff
     self.initialDate = date
     self.jumpToTodayToken = jumpToTodayToken
@@ -253,12 +258,40 @@ public struct TodayWorkoutView: View {
         completionFlow(phase: phase)
       }
     #endif
-    .sheet(isPresented: restTimerExplanationPresented) {
-      RestTimerExplanationView {
-        viewModel.acknowledgeRestTimerExplanation()
+    .sheet(
+      isPresented: restTimerExplanationPresented,
+      onDismiss: {
+        if opensRestSettingsAfterExplanation {
+          opensRestSettingsAfterExplanation = false
+          restPreference = restTimerSettings.preference(for: studentID)
+          showingRestSettings = true
+        }
+      },
+      content: {
+        RestTimerExplanationView(
+          onAcknowledge: { viewModel.acknowledgeRestTimerExplanation() },
+          onOpenSettings: {
+            opensRestSettingsAfterExplanation = true
+            viewModel.acknowledgeRestTimerExplanation()
+          }
+        )
+        .presentationDetents([.medium, .large])
+        .interactiveDismissDisabled()
       }
-      .presentationDetents([.medium])
-      .interactiveDismissDisabled()
+    )
+    .sheet(isPresented: $showingRestSettings) {
+      NavigationStack {
+        RestTimerSettingsView(preference: $restPreference)
+          .onChange(of: restPreference) { _, preference in
+            restTimerSettings.setPreference(preference, for: studentID)
+          }
+          .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+              Button(StudentStrings.acknowledge) { showingRestSettings = false }
+                .font(.MeetPR.body)
+            }
+          }
+      }
     }
     .sheet(isPresented: $showingReadinessSheet) {
       ReadinessCheckinSheet(
@@ -289,6 +322,7 @@ public struct TodayWorkoutView: View {
           context: setRefSharing,
           conversationID: route.conversationID,
           coordinator: chat.sendCoordinator,
+          initialSetLogID: route.initialSetID,
           onStaged: {
             setRefPickerRoute = nil
             conversationID = route.conversationID
@@ -828,7 +862,11 @@ public struct TodayWorkoutView: View {
         setRefEntryErrorMessage = StudentStrings.trainingShareConversationFailed
         return
       }
-      setRefPickerRoute = SetRefPickerRoute(conversationID: openedConversationID)
+      let drafts = currentWorkout?.drafts ?? []
+      let current = drafts.first { !$0.completed } ?? drafts.last
+      setRefPickerRoute = SetRefPickerRoute(
+        conversationID: openedConversationID,
+        initialSetID: current.flatMap { $0.loggedSetID ?? $0.prescribed.id })
     }
   }
 
@@ -959,6 +997,7 @@ private struct SetRefPickerRoute: Identifiable {
   var id: UUID { conversationID }
 
   let conversationID: UUID
+  let initialSetID: UUID?
 }
 
 enum SetRefEntryVisibility {

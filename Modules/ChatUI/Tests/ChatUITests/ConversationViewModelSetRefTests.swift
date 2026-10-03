@@ -5,72 +5,63 @@ import Testing
 @testable import ChatUI
 
 @Suite @MainActor struct ConversationViewModelSetRefTests {
-  @Test func pickerShowsSelectionWithMostRecentCandidatePrecheckedBeforeConfirmation() {
+  @Test func pickerRequiresASelectionUnlessTheEntryProvidesOne() {
     let firstID = chatTestUUID(20)
     let secondID = chatTestUUID(21)
-    let candidates = [
-      Self.candidate(id: firstID),
-      Self.candidate(id: secondID),
-    ]
+    let candidates = [Self.candidate(id: firstID), Self.candidate(id: secondID)]
     var presentation = SetRefPickerPresentation()
 
     presentation.load(candidates: candidates, initialSetLogID: nil)
-
-    #expect(presentation.page == .selection)
-    #expect(presentation.selectedCandidateID == firstID)
-  }
-
-  @Test func pickerFlowRequiresContinueAfterChangingThePrecheckedSelection() {
-    let firstID = chatTestUUID(20)
-    let secondID = chatTestUUID(21)
-    let candidates = [
-      Self.candidate(id: firstID),
-      Self.candidate(id: secondID),
-    ]
-    var presentation = SetRefPickerPresentation()
-
-    presentation.load(candidates: candidates, initialSetLogID: nil)
-    #expect(presentation.page == .selection)
-    #expect(presentation.selectedCandidateID == firstID)
-
+    #expect(presentation.selectedCandidateID == nil)
     presentation.select(secondID)
-    #expect(presentation.page == .selection)
     #expect(presentation.selectedCandidateID == secondID)
+    presentation.select(firstID)
+    #expect(presentation.selectedCandidate?.id == firstID)
+    presentation.select(chatTestUUID(99))
+    #expect(presentation.selectedCandidateID == firstID)
 
-    let didProceed = presentation.proceedToConfirmation()
-    #expect(didProceed)
-    #expect(presentation.page == .confirmation)
-    #expect(presentation.selectedCandidate?.id == secondID)
+    presentation.load(candidates: candidates, initialSetLogID: secondID)
+    #expect(presentation.selectedCandidateID == secondID)
+    presentation.load(candidates: candidates, initialSetLogID: chatTestUUID(99))
+    #expect(presentation.selectedCandidateID == nil)
   }
 
-  @Test func explicitPreselectionStillOpensOnTheSelectionPage() {
-    let firstID = chatTestUUID(20)
-    let secondID = chatTestUUID(21)
+  @Test func pickerGroupsSetsByExerciseAndShowsTheSelectedSummary() throws {
+    let squatID = chatTestUUID(30)
+    let pressID = chatTestUUID(31)
+    let first = Self.candidate(id: chatTestUUID(20))
+    let second = Self.candidate(id: chatTestUUID(21), source: .planned)
     var presentation = SetRefPickerPresentation()
-
     presentation.load(
-      candidates: [Self.candidate(id: firstID), Self.candidate(id: secondID)],
-      initialSetLogID: secondID
-    )
+      candidates: [
+        SetRefShareCandidate(
+          id: second.id, source: second.source,
+          exerciseID: squatID, exerciseOrder: 0, weekCode: "W2D3"),
+        SetRefShareCandidate(
+          id: first.id, source: first.source,
+          exerciseID: squatID, exerciseOrder: 0, weekCode: "W2D3"),
+        SetRefShareCandidate(
+          id: chatTestUUID(22), source: first.source,
+          exerciseID: pressID, exerciseOrder: 1, weekCode: "W2D3"),
+      ], initialSetLogID: nil)
 
-    #expect(presentation.page == .selection)
-    #expect(presentation.selectedCandidateID == secondID)
-  }
-
-  @Test func pickerPartitionsLoggedBeforePlannedWithoutReorderingEitherSection() {
-    let loggedOne = Self.candidate(id: chatTestUUID(20))
-    let loggedTwo = Self.candidate(id: chatTestUUID(21))
-    let plannedOne = Self.candidate(id: chatTestUUID(22), source: .planned)
-    let plannedTwo = Self.candidate(id: chatTestUUID(23), source: .planned)
-    var presentation = SetRefPickerPresentation()
-
-    presentation.load(
-      candidates: [loggedOne, loggedTwo, plannedOne, plannedTwo],
-      initialSetLogID: nil
-    )
-
-    #expect(presentation.loggedCandidates.map(\.id) == [loggedOne.id, loggedTwo.id])
-    #expect(presentation.plannedCandidates.map(\.id) == [plannedOne.id, plannedTwo.id])
+    #expect(presentation.groups.count == 2)
+    #expect(presentation.groups.first?.weekCode == "W2D3")
+    #expect(presentation.groups.first?.candidates.count == 2)
+    #expect(presentation.gridColumnCount == 3)
+    #expect(!presentation.canSend)
+    #expect(presentation.sendSummary == nil)
+    presentation.select(first.id)
+    #expect(presentation.canSend)
+    #expect(
+      presentation.sendSummary
+        == ChatStrings.setRefSendSummary(
+          setNumber: 3, exerciseName: "低杠位深蹲"))
+    let cell = try #require(presentation.cell(for: first))
+    #expect(cell.setLabel == ChatStrings.setPosition(3))
+    #expect(cell.load == "100kg × 5")
+    #expect(cell.status == ChatStrings.setRefLogged + " · RPE 8")
+    #expect(presentation.cell(for: second)?.status == ChatStrings.setRefPlanned)
   }
 
   @Test func canonicalBodyAtUTF16LimitSendsIncludingAnEmoji() async throws {

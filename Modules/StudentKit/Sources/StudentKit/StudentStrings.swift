@@ -46,6 +46,17 @@ enum StudentStrings {
       self.countIndex = countIndex
     }
 
+    static let setEntryVideoPlay = Key("student.setEntryVideoPlay")
+    static let setEntryVideoPause = Key("student.setEntryVideoPause")
+    static let setEntryVideoProgress = Key("student.setEntryVideoProgress")
+    static let setEntryVideoSpeed = Key("student.setEntryVideoSpeed")
+    static let setEntryVideoExpand = Key("student.setEntryVideoExpand")
+    static let setEntryVideoCollapse = Key("student.setEntryVideoCollapse")
+    static let setEntryVideoSet = Key("student.setEntryVideoSet")
+    static let restExplanationLow = Key("student.restExplanationLow")
+    static let restExplanationMid = Key("student.restExplanationMid")
+    static let restExplanationHigh = Key("student.restExplanationHigh")
+    static let restExplanationSettings = Key("student.restExplanationSettings")
     static let e1rmSourceTitle = Key("student.e1rmSourceTitle")
     static let e1rmSourceClose = Key("student.e1rmSourceClose")
     static let e1rmSourceHint = Key("student.e1rmSourceHint")

@@ -63,46 +63,13 @@ struct VideoAttachmentV3Controls: View {
       }
 
     case .attached(_, let canDelete, let delivered):
-      // On-demand confirmation only inside the edit sheet (David 2026-08-06):
-      // the glanceable surfaces stay free of upload chrome. There is no
-      // retake affordance by design (David 2026-08-07): the video documents
-      // the set that happened — a set, once done, is done.
-      VStack(alignment: .trailing, spacing: MeetPRSpacing.point7) {
-        HStack(spacing: MeetPRSpacing.point10) {
-          actionButton(
-            StudentStrings.localized(.videoAttachmentV3Controls004), systemImage: "photo",
-            action: onLibrary)
-          actionButton(
-            StudentStrings.localized(.videoAttachmentV3Controls005), systemImage: "trash",
-            action: onDelete
-          )
-          .disabled(!canDelete)
-        }
-        Label(
-          delivered
-            ? StudentStrings.localized(.videoAttachmentV3Controls006)
-            : StudentStrings.localized(.videoAttachmentV3Controls007),
-          systemImage: delivered ? "checkmark.circle" : "arrow.up.circle.dotted"
-        )
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .regular))
-        .foregroundStyle(Color.MeetPR.goldRGB.opacity(0.45))
-      }
-
+      VideoAttachmentActionsRow(
+        delivered: delivered, failed: false, canDelete: canDelete,
+        replace: onLibrary, delete: onDelete, retry: onRetry)
     case .failed:
-      HStack(spacing: MeetPRSpacing.space2) {
-        Label(
-          StudentStrings.localized(.videoAttachmentV3Controls008),
-          systemImage: "exclamationmark.triangle.fill"
-        )
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
-        .foregroundStyle(Color.MeetPR.danger)
-        actionButton(
-          StudentStrings.localized(.videoAttachmentV3Controls009), systemImage: "arrow.clockwise",
-          action: onRetry)
-        actionButton(
-          StudentStrings.localized(.videoAttachmentV3Controls005), systemImage: "trash",
-          action: onDelete)
-      }
+      VideoAttachmentActionsRow(
+        delivered: false, failed: true, canDelete: true,
+        replace: onLibrary, delete: onDelete, retry: onRetry)
     }
   }
 
@@ -130,5 +97,76 @@ struct VideoAttachmentV3Controls: View {
     }
     .buttonStyle(PressScaleButtonStyle())
     .disabled(!isEnabled)
+  }
+}
+
+private struct VideoAttachmentActionsRow: View {
+  let delivered: Bool
+  let failed: Bool
+  let canDelete: Bool
+  let replace: @MainActor () -> Void
+  let delete: @MainActor () -> Void
+  let retry: @MainActor () -> Void
+
+  var body: some View {
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: MeetPRSpacing.sm) {
+        VideoAttachmentStatus(delivered: delivered, failed: failed, retry: retry)
+        Spacer(minLength: MeetPRSpacing.sm)
+        VideoAttachmentEditButtons(canDelete: canDelete, replace: replace, delete: delete)
+      }
+      VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+        VideoAttachmentStatus(delivered: delivered, failed: failed, retry: retry)
+        VideoAttachmentEditButtons(canDelete: canDelete, replace: replace, delete: delete)
+          .frame(maxWidth: .infinity, alignment: .trailing)
+      }
+    }
+  }
+}
+
+private struct VideoAttachmentStatus: View {
+  let delivered: Bool
+  let failed: Bool
+  let retry: @MainActor () -> Void
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+      Label(
+        StudentStrings.localized(
+          failed
+            ? .videoAttachmentV3Controls008
+            : (delivered ? .videoAttachmentV3Controls006 : .videoAttachmentV3Controls007)),
+        systemImage: failed
+          ? "exclamationmark.triangle.fill"
+          : (delivered ? "checkmark.circle" : "arrow.up.circle.dotted")
+      )
+      .font(.MeetPR.footnote)
+      .foregroundStyle(failed ? Color.MeetPR.danger : Color.MeetPR.textSecondary)
+      if failed {
+        Button(StudentStrings.localized(.videoAttachmentV3Controls009), action: retry)
+          .font(.MeetPR.footnote)
+          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+      }
+    }
+    .fixedSize(horizontal: false, vertical: true)
+  }
+}
+
+private struct VideoAttachmentEditButtons: View {
+  let canDelete: Bool
+  let replace: @MainActor () -> Void
+  let delete: @MainActor () -> Void
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.sm) {
+      Button(StudentStrings.localized(.videoAttachmentV3Controls004), action: replace)
+      Button(StudentStrings.localized(.videoAttachmentV3Controls005), action: delete)
+        .disabled(!canDelete)
+    }
+    .font(.MeetPR.footnote)
+    .buttonStyle(.bordered)
+    .controlSize(.regular)
+    .fixedSize(horizontal: true, vertical: false)
+    .frame(minHeight: MeetPRSpacing.minimumHitTarget)
   }
 }

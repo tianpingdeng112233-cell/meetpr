@@ -10326,13 +10326,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rest time is matched automatically"
+            "value": "Rest time follows your RPE"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "休息时间会自动匹配"
+            "value": "休息时间随 RPE 调整"
           }
         }
       }
@@ -10343,13 +10343,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Automatically matched to your logged RPE: 2 minutes below RPE 7, 3 minutes from RPE 7 to below 9, and 4 minutes at RPE 9 or above."
+            "value": "After each set, your RPE determines the default rest time."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按你记录的 RPE 自动匹配：RPE 低于 7 为 2 分钟，7 至 9 以下为 3 分钟，9 及以上为 4 分钟。"
+            "value": "每组完成后，根据你记录的 RPE 确定默认休息时间。"
           }
         }
       }
@@ -10360,13 +10360,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sets with coach-prescribed rest times will use the coach's setting."
+            "value": "If your coach set a rest time for a set, that one is used instead."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "教练指定过休息时长的组，会按教练设定。"
+            "value": "如果教练为某组设置了休息时间，则优先使用教练设置的时间。"
           }
         }
       }
@@ -17915,6 +17915,193 @@
           "stringUnit": {
             "state": "translated",
             "value": "当前训练日"
+          }
+        }
+      }
+    },
+    "student.setEntryVideoPlay": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放"
+          }
+        }
+      }
+    },
+    "student.setEntryVideoPause": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂停"
+          }
+        }
+      }
+    },
+    "student.setEntryVideoProgress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback progress"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放进度"
+          }
+        }
+      }
+    },
+    "student.setEntryVideoSpeed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playback speed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放速度"
+          }
+        }
+      }
+    },
+    "student.setEntryVideoExpand": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expand video"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "放大视频"
+          }
+        }
+      }
+    },
+    "student.setEntryVideoCollapse": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse video"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "缩小视频"
+          }
+        }
+      }
+    },
+    "student.setEntryVideoSet": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set {0}"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 组"
+          }
+        }
+      }
+    },
+    "student.restExplanationLow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE below 7"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 低于 7"
+          }
+        }
+      }
+    },
+    "student.restExplanationMid": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 7 to below 9"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 7 至低于 9"
+          }
+        }
+      }
+    },
+    "student.restExplanationHigh": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 9 or above"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 9 或以上"
+          }
+        }
+      }
+    },
+    "student.restExplanationSettings": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change in Profile → Rest between sets"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往「我的」→「组间休息」修改"
           }
         }
       }
