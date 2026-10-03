@@ -55,11 +55,12 @@ private struct TestFailure: Error, CustomStringConvertible {
 
   let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: first.exerciseID)
   #expect(history.count == 1)
-  // Empty history → any first point is a PR (previousMax 0).
-  #expect(viewModel.pendingPRBanner != nil)
-  #expect(viewModel.pendingPRBanner?.exerciseId == first.exerciseID)
+  let events = try await e1rm.prEvents(studentId: studentID, since: .distantPast)
+  #expect(events.count == 1)
+  #expect(events.first?.exerciseId == first.exerciseID)
+  #expect(events.first?.acknowledgedAt != nil)
   let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
-  #expect(pending.count == 1)
+  #expect(pending.isEmpty)
 }
 
 @MainActor
@@ -79,7 +80,6 @@ private struct TestFailure: Error, CustomStringConvertible {
   #expect(updated[0].failed)
   let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: first.exerciseID)
   #expect(history.isEmpty)
-  #expect(viewModel.pendingPRBanner == nil)
   let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
   #expect(pending.isEmpty)
 }
@@ -120,7 +120,6 @@ private struct TestFailure: Error, CustomStringConvertible {
   }
 
   await viewModel.toggleComplete(rowIndex: 0)  // false → true: hook fires
-  await viewModel.acknowledgePendingPR()
   await viewModel.toggleComplete(rowIndex: 0)  // true → false: no hook
   await viewModel.toggleComplete(rowIndex: 0)  // false → true again: hook fires
 
@@ -130,7 +129,7 @@ private struct TestFailure: Error, CustomStringConvertible {
   // not create another PR.
   let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
   #expect(pending.isEmpty)
-  #expect(viewModel.pendingPRBanner == nil)
+  #expect(try await e1rm.prEvents(studentId: studentID, since: .distantPast).count == 1)
 }
 
 @MainActor
@@ -165,26 +164,24 @@ private struct TestFailure: Error, CustomStringConvertible {
 
   let history = try await e1rm.fetchHistory(studentId: studentID, exerciseId: deadlift.id)
   #expect(history.count == 2, "point still recorded")
-  #expect(viewModel.pendingPRBanner == nil, "e1RM extrapolation alone must not fire a PR")
+  #expect(try await e1rm.prEvents(studentId: studentID, since: .distantPast).isEmpty)
 }
 
 @MainActor
-@Test func surfaceUnacknowledgedPROnLaunch() async throws {
+@Test func silentlyAcknowledgesUnacknowledgedPRsOnLaunch() async throws {
   let studentID = StudentDemoSeed.studentID
   let e1rm = InMemoryE1RMRepository(
     seedPoints: StudentDemoSeed.makeE1RMHistory(studentID: studentID),
     seedPRs: StudentDemoSeed.makeUnacknowledgedPR(studentID: studentID)
   )
   let (viewModel, _) = try await makeLoadedViewModel(e1rm: e1rm)
+  #expect(try await e1rm.unacknowledgedPRs(studentId: studentID).isEmpty)
+  let events = try await e1rm.prEvents(studentId: studentID, since: .distantPast)
+  #expect(events.count == 1)
+  #expect(events.allSatisfy { $0.acknowledgedAt != nil })
 
-  #expect(viewModel.pendingPRBanner == nil)
-  await viewModel.surfaceUnacknowledgedPR(studentID: studentID)
-  #expect(viewModel.pendingPRBanner != nil)
-
-  await viewModel.acknowledgePendingPR()
-  #expect(viewModel.pendingPRBanner == nil)
-  await viewModel.surfaceUnacknowledgedPR(studentID: studentID)
-  #expect(viewModel.pendingPRBanner == nil, "acknowledged PR must not re-surface")
+  await viewModel.load(date: frozenNow, studentID: studentID)
+  #expect(try await e1rm.unacknowledgedPRs(studentId: studentID).isEmpty)
 }
 
 @MainActor
@@ -205,10 +202,9 @@ private struct TestFailure: Error, CustomStringConvertible {
   await viewModel.load(date: frozenNow, studentID: studentID)
 
   await viewModel.toggleComplete(rowIndex: 0)
-  await viewModel.acknowledgePendingPR()
   await viewModel.toggleComplete(rowIndex: 1)  // same prescription, same instant
 
-  #expect(viewModel.pendingPRBanner == nil, "identical e1RM at the same instant is not a PR")
   let pending = try await e1rm.unacknowledgedPRs(studentId: studentID)
   #expect(pending.isEmpty)
+  #expect(try await e1rm.prEvents(studentId: studentID, since: .distantPast).count == 1)
 }

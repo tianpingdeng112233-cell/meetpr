@@ -166,20 +166,6 @@ struct StudentStringsTests {
     )
     #expect(
       StudentStrings.replacing(
-        .trainingCalendarView002,
-        values: ["0", "1"],
-        locale: english
-      ) == "Completed 0 / 1 session"
-    )
-    #expect(
-      StudentStrings.replacing(
-        .trainingCalendarView003,
-        values: ["0", "1"],
-        locale: english
-      ) == "0 / 1 session"
-    )
-    #expect(
-      StudentStrings.replacing(
         .dashboardPrimaryAction007,
         values: ["1", "1"],
         locale: english

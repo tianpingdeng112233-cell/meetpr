@@ -14,6 +14,7 @@ public struct DashboardView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
+  private let onboarding: any OnboardingRepository
   private let feedbackViewModel: FeedbackInboxViewModel
   private let notifications: StudentNotificationsCoordinator?
   private let onStartWorkout: (TodayWorkoutPlanHandoff?) -> Void
@@ -28,6 +29,7 @@ public struct DashboardView: View {
   @State private var weekViewModel: WeekOverviewViewModel
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
+  @State private var editingProfile: ProfileCardKind?
   @State private var showsNotifications = false
   @State private var conversationID: UUID?
   @State private var completionErrorMessage: String?
@@ -40,7 +42,7 @@ public struct DashboardView: View {
     studentID: UUID,
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
-    onboarding: any OnboardingProfileReading,
+    onboarding: any OnboardingRepository,
     e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel,
     notifications: StudentNotificationsCoordinator? = nil,
@@ -53,6 +55,7 @@ public struct DashboardView: View {
     onPlanChanged: @escaping (StudentPlanView) -> Void = { _ in },
     pushedConversationID: Binding<UUID?> = .constant(nil)
   ) {
+    self.onboarding = onboarding
     self.studentID = studentID
     self.plans = plans
     self.e1rm = e1rm
@@ -105,7 +108,8 @@ public struct DashboardView: View {
           },
           onRetryTrend: {
             Task { await e1rmTrendViewModel.load(studentID: studentID) }
-          }
+          },
+          onEditProfile: { editingProfile = $0 }
         )
       }
       .scrollIndicators(.hidden)
@@ -113,6 +117,14 @@ public struct DashboardView: View {
       .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .modifier(notificationHost)
+      .navigationDestination(item: $editingProfile) { kind in
+        DashboardProfileEditor(kind: kind, studentID: studentID, onboarding: onboarding)
+      }
+      .onChange(of: editingProfile) { previous, current in
+        if previous != nil, current == nil {
+          Task { await profileMetricsViewModel.load(studentID: studentID) }
+        }
+      }
       .refreshable {
         await reload()
       }

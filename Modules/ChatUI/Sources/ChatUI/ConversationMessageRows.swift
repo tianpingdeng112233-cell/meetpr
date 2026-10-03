@@ -69,6 +69,8 @@ private struct ChatMessageBubble: View {
             presentation: presentation,
             isCurrentUser: isCurrentUser,
             deliveryStatus: deliveryStatus,
+            outgoingBubbleColor: outgoingBubbleColor, incomingBubbleColor: incomingBubbleColor,
+            messageFont: messageFont,
             openVideo: openVideo
           )
         } else {
@@ -115,7 +117,7 @@ private struct ChatMessageBubble: View {
   private var messageFont: Font {
     switch bubbleLayout {
     case .uniform:
-      .body
+      .MeetPR.body
     case .directional:
       .MeetPR.body(
         size: MeetPRFontMetrics.size14,

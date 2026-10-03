@@ -27,6 +27,8 @@ struct TrainingReminderSettingsView: View {
       .padding(.top, MeetPRSpacing.space4)
       .padding(.bottom, MeetPRSpacing.point32)
     }
+    .disabled(viewModel.isLoadingDefaults)
+    .task { await viewModel.synchronize() }
     .scrollIndicators(.hidden)
     .background(Color.MeetPR.bgBase)
     .onChange(of: scenePhase) { _, phase in

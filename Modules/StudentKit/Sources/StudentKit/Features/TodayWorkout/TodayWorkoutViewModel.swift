@@ -51,7 +51,6 @@ public final class TodayWorkoutViewModel {
   }
 
   public private(set) var state: State = .idle
-  public private(set) var pendingPRBanner: PRBreakthroughEvent?
   public private(set) var restTimer: RestTimerState?
   public private(set) var showsRestTimerExplanation = false
   public private(set) var planContext: TodayWorkoutPlanContext?
@@ -65,6 +64,8 @@ public final class TodayWorkoutViewModel {
   public private(set) var planDays: [StudentPlanDay] = []
   public private(set) var planProjection: StudentPlanView?
   public private(set) var completionRevision = 0
+  var completionPhase: WorkoutCompletionFlowPhase?
+  private(set) var isCompletionSending = false
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -74,6 +75,7 @@ public final class TodayWorkoutViewModel {
   private let restTimerActivityController: any RestTimerActivityControlling
   private let calendar: Calendar
   private let now: @Sendable () -> Date
+  private let completionSleep: @MainActor @Sendable () async -> Void
   private var currentStudentID: UUID?
   private var loadGeneration = 0
   private var recordingGeneration = 0
@@ -99,7 +101,10 @@ public final class TodayWorkoutViewModel {
     restTimerActivityController: any RestTimerActivityControlling =
       NoOpRestTimerActivityController(),
     calendar: Calendar = .current,
-    now: @escaping @Sendable () -> Date = { Date() }
+    now: @escaping @Sendable () -> Date = { Date() },
+    completionSleep: @escaping @MainActor @Sendable () async -> Void = {
+      try? await Task.sleep(for: .seconds(30))
+    }
   ) {
     self.plans = plans
     self.logs = logs
@@ -109,6 +114,7 @@ public final class TodayWorkoutViewModel {
     self.restTimerActivityController = restTimerActivityController
     self.calendar = calendar
     self.now = now
+    self.completionSleep = completionSleep
   }
 
   public func load(
@@ -123,6 +129,7 @@ public final class TodayWorkoutViewModel {
     let startingRecordingGeneration = recordingGeneration
     let isInitialLoad = state == .idle
     if isInitialLoad { state = .loading }
+    await acknowledgeUnacknowledgedPRs(studentID: studentID)
     if let preloadedPlan {
       await loadHandedOffPlan(
         preloadedPlan,
@@ -618,20 +625,39 @@ public final class TodayWorkoutViewModel {
 
   public func completeCurrentDay() async -> Bool {
     guard let day = currentDay else { return false }
-    return await completeDay(day)
+    return await completeDay(day, presentsCelebration: true)
   }
 
   /// Completes a specific day. Quick-log passes the day it wrote sets for, so
   /// a refresh that moves `currentDay` mid-flight can never complete another.
-  private func completeDay(_ day: StudentPlanDay) async -> Bool {
+  private func completeDay(
+    _ day: StudentPlanDay, presentsCelebration: Bool = false
+  ) async -> Bool {
     guard !isCompletionMutationInFlight,
       let studentID = currentStudentID
     else { return false }
     isCompletionMutationInFlight = true
     defer { isCompletionMutationInFlight = false }
     actionErrorMessage = nil
+    if presentsCelebration {
+      isCompletionSending = true
+      completionPhase = .celebration
+      // Keep the cursor on this day until the server confirms completion.
+      replaceCurrentDay(
+        day.replacingCompletion(completedAt: now(), source: "manual"),
+        updatesPlanDays: false
+      )
+    }
     do {
-      let completion = try await plans.completeDay(id: day.id, studentID: studentID)
+      let completion: PlanDayCompletion
+      if presentsCelebration {
+        completion = try await WorkoutCompletionRequest().complete(
+          dayID: day.id, studentID: studentID, plans: plans, sleep: completionSleep
+        )
+      } else {
+        completion = try await plans.completeDay(id: day.id, studentID: studentID)
+      }
+      isCompletionSending = false
       await applyCompletionMutation(
         fallback: day.replacingCompletion(
           completedAt: completion.completedAt,
@@ -644,6 +670,17 @@ public final class TodayWorkoutViewModel {
       actionErrorMessage = error.localizedMessage
     } catch {
       actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel001)
+    }
+    if presentsCelebration {
+      isCompletionSending = false
+      completionPhase = nil
+      if let visibleDay = currentDay, visibleDay.id == day.id {
+        replaceCurrentDay(
+          visibleDay.replacingCompletion(
+            completedAt: day.completedAt, source: day.completionSource
+          )
+        )
+      }
     }
     return false
   }
@@ -812,8 +849,8 @@ public final class TodayWorkoutViewModel {
     }
   }
 
-  private func replaceCurrentDay(_ day: StudentPlanDay) {
-    if let index = planDays.firstIndex(where: { $0.id == day.id }) {
+  private func replaceCurrentDay(_ day: StudentPlanDay, updatesPlanDays: Bool = true) {
+    if updatesPlanDays, let index = planDays.firstIndex(where: { $0.id == day.id }) {
       planDays[index] = day
     }
     switch state {
@@ -922,6 +959,9 @@ public final class TodayWorkoutViewModel {
       } else {
         prEvent = nil
       }
+      if let prEvent {
+        try? await e1rmRepo.acknowledgePR(eventId: prEvent.id)
+      }
       // The page moved to another day while recordSet was in flight: the log
       // and its domain side effects are safely persisted. The reload owns UI
       // state, so don't merge stale flags or surface its PR in the new day.
@@ -942,9 +982,6 @@ public final class TodayWorkoutViewModel {
       await refreshCompletion(for: plan.id, studentID: studentID)
 
       if !previouslyCompleted, completed {
-        if let prEvent {
-          pendingPRBanner = prEvent
-        }
         startRestTimer(after: draft, drafts: latestDrafts)
       }
       return true
@@ -1038,15 +1075,11 @@ public final class TodayWorkoutViewModel {
     }
   }
 
-  public func acknowledgePendingPR() async {
-    guard let event = pendingPRBanner else { return }
-    pendingPRBanner = nil
-    try? await e1rmRepo.acknowledgePR(eventId: event.id)
-  }
-
-  public func surfaceUnacknowledgedPR(studentID: UUID) async {
-    guard pendingPRBanner == nil else { return }
-    pendingPRBanner = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID))?.first
+  private func acknowledgeUnacknowledgedPRs(studentID: UUID) async {
+    let events = (try? await e1rmRepo.unacknowledgedPRs(studentId: studentID)) ?? []
+    for event in events {
+      try? await e1rmRepo.acknowledgePR(eventId: event.id)
+    }
   }
 
   private func mutateDraft(

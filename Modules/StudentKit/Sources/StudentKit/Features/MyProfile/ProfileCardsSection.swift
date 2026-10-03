@@ -145,7 +145,7 @@ struct ProfileCardsSection: View {
 
 /// Which archive card is being edited; maps onto the step patch builders
 /// (1RM card deliberately has no kind — the lock is structural, risk 6).
-enum ProfileCardKind {
+enum ProfileCardKind: Hashable {
   case basics, background, environment, recovery, materials, competition, injuries
 
   /// The wizard step whose patch builder saves this card. Never 3.

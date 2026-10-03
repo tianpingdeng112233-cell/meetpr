@@ -31,6 +31,7 @@ struct SetEntrySheet: View {
   @State private var focusedField: SetEntryNumberField?
   @State var collarOn: Bool
   @State var isAutomaticWeight: Bool
+  @State private var videoPlayback = SetEntryVideoPlayer()
   @State private var showsRPEPlaceholder: Bool
 
   var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
@@ -169,6 +170,7 @@ struct SetEntrySheet: View {
                 trainingDate: trainingDate,
                 videoViewModel: videoViewModel,
                 badge: videoBadge,
+                playback: videoPlayback,
                 initialSetLogID: liveDraft.loggedSetID,
                 resolveSetLogID: {
                   syncDraftEdits()
@@ -191,6 +193,8 @@ struct SetEntrySheet: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(Color.MeetPR.bgBase.ignoresSafeArea())
+    .interactiveDismissDisabled(videoPlayback.state.isExpanded)
+    .onDisappear { videoPlayback.stop() }
     .modifier(SetEntryErrorAlert(viewModel: viewModel))
     .modifier(
       SetEntryAnalyticsModifier(
@@ -200,10 +204,23 @@ struct SetEntrySheet: View {
         focusedField: focusedField
       )
     )
+    .accessibilityHidden(videoPlayback.state.isExpanded)
     .overlay {
       if let activeNumberPad {
         numberPadOverlay(field: activeNumberPad)
           .zIndex(1)
+      }
+      if videoPlayback.state.isExpanded, let videoViewModel {
+        SetEntryVideoPlayerView(playback: videoPlayback, badge: videoBadge) {
+          Task {
+            await videoPlayback.retry { attachmentID in
+              try await videoViewModel.freshRemotePlaybackURL(attachmentID: attachmentID)
+            }
+          }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.black.ignoresSafeArea())
+        .zIndex(2)
       }
     }
   }

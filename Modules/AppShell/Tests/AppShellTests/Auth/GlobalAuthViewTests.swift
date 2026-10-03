@@ -7,6 +7,28 @@ import ViewInspector
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
+@Test func globalLoginPlacesEmailAndLinksBeforeSocialSignIn() throws {
+  let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
+  let inspected = try GlobalLoginView().environment(session).inspect()
+  let labels = [
+    "EMAIL", "PASSWORD", "Sign in", "Create account", "Forgot password?", "or",
+    "Continue with Google", "By continuing, you agree to our",
+  ]
+  let rendered = inspected.findAll(ViewType.Text.self).compactMap { try? $0.string() }
+  var seen = Set<String>()
+  #expect(rendered.filter { labels.contains($0) && seen.insert($0).inserted } == labels)
+  let channels = [
+    "global.login.email", "global.login.password", "global.login.submit",
+    "global.login.apple", "global.login.google",
+  ]
+  let renderedChannels = inspected.findAll { view in
+    channels.contains((try? view.accessibilityIdentifier()) ?? "")
+  }.compactMap { try? $0.accessibilityIdentifier() }
+  #expect(renderedChannels == channels)
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
 @Test func globalLoginRendersThreeEnglishChannelsAndPrivacyLink() throws {
   let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
   let inspected = try GlobalLoginView().environment(session).inspect()

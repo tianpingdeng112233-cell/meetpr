@@ -18,6 +18,6 @@ import Testing
   ]
 
   let cells = DashboardTodayPresentation.progressSegments(days: days)
-  #expect(cells.map(\.dayNumber) == [1, 4])
+  #expect(cells.map(\.dayNumber) == [1, 2])
   #expect(cells.map(\.state) == [.done, .current])
 }

@@ -10,6 +10,7 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 public struct TodayWorkoutView: View {
   private let studentID: UUID
+  private let restTimerSettings: any StudentRestTimerSettingsStoring
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
   private let coachRPEReconciler: E1RMCoachRPEReconciler?
@@ -31,7 +32,6 @@ public struct TodayWorkoutView: View {
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
   @State private var selectedDayID: UUID?
-  @State private var completionPhase: WorkoutCompletionFlowPhase?
   @State private var editing: EditingTarget?
   @State private var quickLogRoute: QuickLogRoute?
   @State private var quickLogToastWeekCode: String?
@@ -42,6 +42,9 @@ public struct TodayWorkoutView: View {
   @State private var preparingVideoSetID: UUID?
   @State private var retryTargetSetLogID: UUID?
   @State private var showingReadinessSheet = false
+  @State private var opensRestSettingsAfterExplanation = false
+  @State private var showingRestSettings = false
+  @State private var restPreference: StudentRestTimerPreference = .automatic
   @State private var showingHistory = false
   @State private var historyViewModel: TrainingHistoryViewModel
   @State private var showingNotifications = false
@@ -95,6 +98,7 @@ public struct TodayWorkoutView: View {
     } else {
       self.coachRPEReconciler = nil
     }
+    self.restTimerSettings = restTimerSettings
     self.planHandoff = planHandoff
     self.initialDate = date
     self.jumpToTodayToken = jumpToTodayToken
@@ -162,13 +166,11 @@ public struct TodayWorkoutView: View {
         showsAskCoach: showsSetRefEntry,
         isPreparingAskCoach: isPreparingSetRefPicker,
         collapsedExercises: $collapsedExercises,
-        sequenceContent: TrainingCurrentWeekSequenceView(days: viewModel.planDays),
-        calendarContent: TrainingCalendarView(
-          selectedDayID: $selectedDayID,
-          days: viewModel.planDays
-        ),
+        sequenceContent: TrainingWeekStrip(days: viewModel.planDays, selectedDayID: $selectedDayID),
+        showsBackToToday: sequencePage.showsBackToToday,
+        onBackToToday: returnToCurrentDay,
         onRefresh: {
-          Task { await loadWorkout(for: selectedDayID) }
+          Task { await reloadCurrentDay() }
         },
         onHistory: { showingHistory = true },
         onReadiness: {
@@ -189,8 +191,10 @@ public struct TodayWorkoutView: View {
         onVideoAction: openVideoAction,
         onComplete: {
           Task {
-            if await viewModel.completeCurrentDay() {
-              completionPhase = .celebration
+            if await viewModel.completeCurrentDay(), viewModel.completionPhase == nil {
+              // The student may have closed the reward while it was sending.
+              returnToCurrentDay()
+              onReturnToToday()
             }
           }
         },
@@ -200,7 +204,7 @@ public struct TodayWorkoutView: View {
           }
         },
         onShowReview: {
-          completionPhase = .review
+          viewModel.completionPhase = .review
         }
       )
       #if os(iOS)
@@ -247,20 +251,48 @@ public struct TodayWorkoutView: View {
       }
     #endif
     #if os(iOS)
-      .fullScreenCover(item: $completionPhase) { phase in
+      .fullScreenCover(item: $viewModel.completionPhase) { phase in
         completionFlow(phase: phase)
       }
     #else
-      .sheet(item: $completionPhase) { phase in
+      .sheet(item: $viewModel.completionPhase) { phase in
         completionFlow(phase: phase)
       }
     #endif
-    .sheet(isPresented: restTimerExplanationPresented) {
-      RestTimerExplanationView {
-        viewModel.acknowledgeRestTimerExplanation()
+    .sheet(
+      isPresented: restTimerExplanationPresented,
+      onDismiss: {
+        if opensRestSettingsAfterExplanation {
+          opensRestSettingsAfterExplanation = false
+          restPreference = restTimerSettings.preference(for: studentID)
+          showingRestSettings = true
+        }
+      },
+      content: {
+        RestTimerExplanationView(
+          onAcknowledge: { viewModel.acknowledgeRestTimerExplanation() },
+          onOpenSettings: {
+            opensRestSettingsAfterExplanation = true
+            viewModel.acknowledgeRestTimerExplanation()
+          }
+        )
+        .presentationDetents([.medium, .large])
+        .interactiveDismissDisabled()
       }
-      .presentationDetents([.medium])
-      .interactiveDismissDisabled()
+    )
+    .sheet(isPresented: $showingRestSettings) {
+      NavigationStack {
+        RestTimerSettingsView(preference: $restPreference)
+          .onChange(of: restPreference) { _, preference in
+            restTimerSettings.setPreference(preference, for: studentID)
+          }
+          .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+              Button(StudentStrings.acknowledge) { showingRestSettings = false }
+                .font(.MeetPR.body)
+            }
+          }
+      }
     }
     .sheet(isPresented: $showingReadinessSheet) {
       ReadinessCheckinSheet(
@@ -291,6 +323,7 @@ public struct TodayWorkoutView: View {
           context: setRefSharing,
           conversationID: route.conversationID,
           coordinator: chat.sendCoordinator,
+          initialSetLogID: route.initialSetID,
           onStaged: {
             setRefPickerRoute = nil
             conversationID = route.conversationID
@@ -397,12 +430,7 @@ public struct TodayWorkoutView: View {
       // presentation still resumes recording when real logs already exist;
       // zero-log days alone return to the explicit pre-start state.
       started = false
-      if let jumpTarget = TodayWorkoutSelectionResolver.jumpToCurrentSelection(
-        from: selectedDayID,
-        days: viewModel.planDays
-      ) {
-        selectedDayID = jumpTarget
-      }
+      returnToCurrentDay()
     }
     .onChange(of: uploadFailureNavigationToken) { _, token in
       guard token > 0 else { return }
@@ -460,6 +488,7 @@ public struct TodayWorkoutView: View {
         references: viewModel.exerciseReferences,
         weekCode: weekCode,
         coachName: notifications?.activeCoach?.coachDisplayName,
+        isSendingToCoach: viewModel.isCompletionSending,
         streak: nil
       )
       WorkoutCompletionFlowView(
@@ -467,10 +496,12 @@ public struct TodayWorkoutView: View {
         studentID: studentID,
         initialPhase: phase,
         onFinish: {
+          viewModel.completionPhase = nil
           markReviewCompleted(
             for: workout.day.scheduledDate,
             setCount: workout.drafts.count
           )
+          returnToCurrentDay()
           onReturnToToday()
         }
       )
@@ -479,9 +510,7 @@ public struct TodayWorkoutView: View {
     }
   }
 
-  private var screenContent:
-    TodayWorkoutScreen<TrainingCurrentWeekSequenceView, TrainingCalendarView>.Content
-  {
+  private var screenContent: TodayWorkoutScreen<TrainingWeekStrip>.Content {
     switch viewModel.state {
     case .idle, .loading:
       if let workout = handedOffWorkout(for: selectedDayID) {
@@ -552,7 +581,8 @@ public struct TodayWorkoutView: View {
   private var selectedDayState: TodayWorkoutDayState {
     guard let currentDay else { return .current }
     if currentDay.completedAt != nil { return .completed(canUndo: canUndoCurrentDay) }
-    return isEditable ? .current : .upcoming(previousDay: previousSequenceDay)
+    return isEditable
+      ? .current : .upcoming(previousDay: StudentPlanSequence(days: viewModel.planDays).cursorDay)
   }
 
   private var canUndoCurrentDay: Bool {
@@ -560,11 +590,17 @@ public struct TodayWorkoutView: View {
     return WorkoutDatePolicy.gymDayRange(containing: Date()).contains(completedAt)
   }
 
-  private var previousSequenceDay: StudentPlanDay? {
-    let days = StudentPlanSequence(days: viewModel.planDays).orderedDays
-    guard let currentDay, let index = days.firstIndex(where: { $0.id == currentDay.id }), index > 0
-    else { return nil }
-    return days[index - 1]
+  private var sequencePage: TrainingSequencePage {
+    TrainingSequenceLayout.page(days: viewModel.planDays, selectedDayID: selectedDayID)
+  }
+
+  private func returnToCurrentDay() {
+    selectedDayID = sequencePage.currentSelection
+  }
+
+  private func reloadCurrentDay() async {
+    await loadWorkout(for: nil)
+    returnToCurrentDay()
   }
 
   private var selectedTrainingDate: Date {
@@ -577,6 +613,7 @@ public struct TodayWorkoutView: View {
     }
     let title = TodayWorkoutTitleResolver.title(
       day: currentDay,
+      days: viewModel.planDays,
       planContext: viewModel.planContext,
       onboarding: viewModel.onboardingProfile
     )
@@ -602,7 +639,7 @@ public struct TodayWorkoutView: View {
     }
     quickLogRoute = QuickLogRoute(
       day: currentDay,
-      weekCode: "W\(currentDay.weekNumber)D\(currentDay.dayOfWeek)",
+      weekCode: TrainingSequenceText.code(for: currentDay, in: viewModel.planDays),
       plan: plan
     )
   }
@@ -828,7 +865,11 @@ public struct TodayWorkoutView: View {
         setRefEntryErrorMessage = StudentStrings.trainingShareConversationFailed
         return
       }
-      setRefPickerRoute = SetRefPickerRoute(conversationID: openedConversationID)
+      let drafts = currentWorkout?.drafts ?? []
+      let current = drafts.first { !$0.completed } ?? drafts.last
+      setRefPickerRoute = SetRefPickerRoute(
+        conversationID: openedConversationID,
+        initialSetID: current.flatMap { $0.loggedSetID ?? $0.prescribed.id })
     }
   }
 
@@ -919,11 +960,12 @@ public struct TodayWorkoutView: View {
 enum TodayWorkoutTitleResolver {
   static func title(
     day: StudentPlanDay?,
+    days: [StudentPlanDay],
     planContext: TodayWorkoutPlanContext?,
     onboarding: OnboardingProfile?
   ) -> String {
     guard let day else { return StudentStrings.localized(.todayWorkoutView011) }
-    let weekday = "W\(day.weekNumber)D\(day.dayOfWeek)"
+    let weekday = TrainingSequenceText.code(for: day, in: days)
     let family = day.exercises.lazy.compactMap {
       resolveCompetitionFamily(exercise: $0.exercise, onboarding: onboarding)
     }.first
@@ -958,6 +1000,7 @@ private struct SetRefPickerRoute: Identifiable {
   var id: UUID { conversationID }
 
   let conversationID: UUID
+  let initialSetID: UUID?
 }
 
 enum SetRefEntryVisibility {

@@ -80,7 +80,9 @@ struct TodaySetRefSharingSource: Sendable {
         return SetRefShareCandidate(
           id: log.id,
           source: source,
-          video: videoBySetLogID[log.id].map(makeShareVideo)
+          video: videoBySetLogID[log.id].map(makeShareVideo),
+          exerciseID: exercise.id, exerciseOrder: exercise.sequenceIndex,
+          weekCode: TrainingSequenceText.code(for: day, in: plan?.days ?? [])
         )
       }
 
@@ -109,7 +111,12 @@ struct TodaySetRefSharingSource: Sendable {
           }
       }
 
-    return loggedCandidates + plannedCandidates
+    return (loggedCandidates + plannedCandidates).map { candidate in
+      SetRefShareCandidate(
+        id: candidate.id, source: candidate.source, video: candidate.video,
+        exerciseID: candidate.exerciseID, exerciseOrder: candidate.exerciseOrder,
+        weekCode: TrainingSequenceText.code(for: day, in: plan?.days ?? []))
+    }
   }
 
   private func plannedCandidate(
@@ -133,7 +140,9 @@ struct TodaySetRefSharingSource: Sendable {
     guard (try? SetRefV1.normalizingSource(source)) != nil else {
       return nil
     }
-    return SetRefShareCandidate(id: set.id, source: source)
+    return SetRefShareCandidate(
+      id: set.id, source: source,
+      exerciseID: exercise.id, exerciseOrder: exercise.sequenceIndex)
   }
 }
 

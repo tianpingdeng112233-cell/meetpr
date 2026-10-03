@@ -8,7 +8,7 @@ struct StudentOverviewSection: View {
   let summary: StudentOverviewSummary
   let readiness: ReadinessRowState
   let days: [StudentExecutionDay]
-  let planWeekIndex: Int
+  let planDays: [StudentPlanDay]
   let shiftBadgeText: String?
   let now: Date
   let onSelectSection: (StudentDetailSection) -> Void
@@ -73,7 +73,7 @@ struct StudentOverviewSection: View {
   private func trainingDayRow(_ day: StudentExecutionDay, ordinal: Int) -> some View {
     HStack(spacing: MeetPRSpacing.point10) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.point2) {
-        Text(dayTitle(day, ordinal: ordinal))
+        Text(dayTitle(day))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
           .lineLimit(1)
@@ -198,12 +198,15 @@ struct StudentOverviewSection: View {
     days.filter { $0.planDay?.exercises.isEmpty == false }
   }
 
-  private func dayTitle(_ day: StudentExecutionDay, ordinal: Int) -> String {
+  private func dayTitle(_ day: StudentExecutionDay) -> String {
     let exerciseName =
       day.planDay?.exercises.first.map {
         CoachLocalization.exerciseName($0.exercise)
       } ?? CoachDetailStrings.training
-    return "W\(planWeekIndex)D\(ordinal) · \(exerciseName)"
+    guard let planDay = day.planDay else { return exerciseName }
+    let weekDays = planDays.filter { $0.weekNumber == planDay.weekNumber }
+    let number = StudentPlanSequence.dayNumbers(inWeek: weekDays)[planDay.id]
+    return "W\(planDay.weekNumber)D\(number.map(String.init) ?? "—") · \(exerciseName)"
   }
 
   private func dateLine(_ date: Date) -> String {

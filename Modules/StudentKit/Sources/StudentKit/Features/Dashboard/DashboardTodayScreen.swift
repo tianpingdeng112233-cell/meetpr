@@ -59,6 +59,7 @@ struct DashboardTodayScreen: View {
   let onRetryWeek: () -> Void
   let onRetryMetrics: () -> Void
   let onRetryTrend: () -> Void
+  var onEditProfile: (ProfileCardKind) -> Void = { _ in }
 
   private var sequence: StudentPlanSequence {
     StudentPlanSequence(days: model.cycleDays)
@@ -96,7 +97,7 @@ struct DashboardTodayScreen: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 15) {
       DashboardHeader(
-        weekCode: displayDay.map(DashboardTodayPresentation.code(for:))
+        weekCode: displayDay.map { DashboardTodayPresentation.code(for: $0, in: model.cycleDays) }
           ?? StudentStrings.localized(.dashboardTodayScreen001),
         statusBadge: statusBadge,
         showsNotifications: model.showsNotifications,
@@ -162,7 +163,8 @@ struct DashboardTodayScreen: View {
       DashboardProfileMetricsView(
         metrics: metrics,
         showsCompetitionPlaceholder: metrics.competition == nil,
-        showsBodyWeightPlaceholder: metrics.bodyWeightText == nil
+        showsBodyWeightPlaceholder: metrics.bodyWeightText == nil,
+        onEditProfile: onEditProfile
       )
     case .error(let message):
       DashboardInlineFailureCard(message: message, retry: onRetryMetrics)
@@ -193,6 +195,7 @@ struct DashboardTodayScreen: View {
     } else if let completedToday {
       DashboardCompletedAction(
         completedDay: completedToday,
+        days: model.cycleDays,
         nextDay: cursorDay,
         canUndo: true,
         isUpdating: isUpdatingCompletion,

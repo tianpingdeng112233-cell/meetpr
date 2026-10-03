@@ -374,7 +374,7 @@ struct StudentDetailView: View {
         summary: viewModel.overview,
         readiness: viewModel.todayReadiness,
         days: viewModel.executionDays,
-        planWeekIndex: viewModel.plan?.weekIndex ?? 1,
+        planDays: viewModel.plan?.days ?? [],
         shiftBadgeText: viewModel.planShiftBadgeText,
         now: now,
         onSelectSection: viewModel.select,

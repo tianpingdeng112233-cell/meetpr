@@ -10,9 +10,10 @@ public struct SetRefSharePicker: View {
   private let coordinator: ChatSendCoordinator
   private let initialSetLogID: UUID?
   private let onStaged: @MainActor () -> Void
-
+  @Environment(\.dismiss) private var dismiss
   @State private var presentation = SetRefPickerPresentation()
   @State private var includesVideo = true
+  @State private var question = ""
   @State private var isLoading = true
   @State private var isConfirming = false
   @State private var errorMessage: String?
@@ -33,94 +34,99 @@ public struct SetRefSharePicker: View {
 
   public var body: some View {
     NavigationStack {
-      Group {
-        if isLoading {
-          ProgressView()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if presentation.candidates.isEmpty {
-          if let errorMessage {
-            ContentUnavailableView(
-              ChatStrings.trainingLoadFailed,
-              systemImage: "exclamationmark.triangle",
-              description: Text(errorMessage)
-            )
+      ScrollView {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
+          if isLoading {
+            ProgressView().frame(maxWidth: .infinity)
+          } else if presentation.candidates.isEmpty {
+            Text(errorMessage ?? ChatStrings.noShareableSetsDescription)
+              .font(.MeetPR.body)
           } else {
-            ContentUnavailableView(
-              ChatStrings.noShareableSets,
-              systemImage: "dumbbell",
-              description: Text(ChatStrings.noShareableSetsDescription)
-            )
-          }
-        } else {
-          switch presentation.page {
-          case .selection:
-            SetRefCandidateList(
-              candidates: presentation.candidates,
-              selectedCandidateID: presentation.selectedCandidateID,
-              select: { candidate in
+            Text(ChatStrings.setRefPrompt)
+              .font(.MeetPR.body)
+            ForEach(presentation.groups) { group in
+              SetRefExerciseCard(group: group, presentation: presentation) { candidate in
                 presentation.select(candidate.id)
+                includesVideo = candidate.video?.state != .failed
                 errorMessage = nil
-              },
-              proceed: proceedToConfirmation
-            )
-          case .confirmation:
-            if let candidate = presentation.selectedCandidate {
-              SetRefConfirmationCard(
-                candidate: candidate,
-                includesVideo: $includesVideo,
-                isConfirming: isConfirming,
-                errorMessage: errorMessage,
-                confirm: confirm
-              )
+              }
+            }
+            Text(ChatStrings.setRefQuestion)
+              .font(.MeetPR.bodyEmphasis)
+            TextField(ChatStrings.setRefQuestionPlaceholder, text: $question, axis: .vertical)
+              .font(.MeetPR.body)
+              .lineLimit(3...6)
+              .padding(MeetPRSpacing.md)
+              .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.md))
+              .accessibilityIdentifier("chat.setRef.question")
+            if let video = presentation.selectedCandidate?.video {
+              SetRefVideoToggle(video: video, includesVideo: $includesVideo)
+            }
+            if let errorMessage {
+              Text(errorMessage)
+                .font(.MeetPR.footnote)
+                .foregroundStyle(Color.MeetPR.danger)
             }
           }
         }
+        .padding(MeetPRSpacing.base)
+        .disabled(isConfirming)
       }
       .background(Color.MeetPR.bgBase)
-      .navigationTitle(ChatStrings.shareTodayTraining)
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      .safeAreaInset(edge: .bottom) {
+        VStack(spacing: MeetPRSpacing.sm) {
+          if let summary = presentation.sendSummary {
+            Text(summary)
+              .font(.MeetPR.footnote)
+              .fixedSize(horizontal: false, vertical: true)
+          }
+          Button(action: confirm) {
+            HStack {
+              if isConfirming { ProgressView() }
+              Text(ChatStrings.sendToCoach)
+                .font(.MeetPR.bodyEmphasis)
+            }
+            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+            .padding(.vertical, MeetPRSpacing.sm)
+            .foregroundStyle(Color.MeetPR.ctaText)
+            .background(Color.MeetPR.goldCTA, in: .rect(cornerRadius: MeetPRRadius.lg))
+          }
+          .buttonStyle(PressScaleButtonStyle())
+          .disabled(!presentation.canSend || isConfirming)
+          .accessibilityIdentifier("chat.setRef.confirm")
+        }
+        .padding(MeetPRSpacing.base)
+        .background(Color.MeetPR.bgBase)
+      }
       #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
       #endif
       .toolbar {
-        if presentation.page == .confirmation {
-          ToolbarItem(placement: .cancellationAction) {
-            Button(ChatStrings.back) {
-              presentation.showSelection()
-              errorMessage = nil
-            }
-          }
+        ToolbarItem(placement: .principal) {
+          Text(ChatStrings.askCoach).font(.MeetPR.headline)
+        }
+        ToolbarItem(placement: .confirmationAction) {
+          Button(ChatStrings.close) { dismiss() }
+            .font(.MeetPR.body)
+            .disabled(isConfirming)
         }
       }
     }
-    .task {
-      await loadCandidates()
-    }
+    .interactiveDismissDisabled(isConfirming)
+    .task { await loadCandidates() }
   }
 
   private func loadCandidates() async {
     do {
-      let loaded = try await context.candidates()
       presentation.load(
-        candidates: loaded,
-        initialSetLogID: initialSetLogID
-      )
-      isLoading = false
+        candidates: try await context.candidates(), initialSetLogID: initialSetLogID)
+      includesVideo = presentation.selectedCandidate?.video?.state != .failed
     } catch {
       guard !Task.isCancelled else { return }
-      presentation.load(candidates: [], initialSetLogID: nil)
       errorMessage = ChatStrings.trainingLoadFailed
-      isLoading = false
     }
-  }
-
-  private func proceedToConfirmation() {
-    guard presentation.proceedToConfirmation(),
-      let candidate = presentation.selectedCandidate
-    else {
-      return
-    }
-    includesVideo = candidate.video?.state != .failed
-    errorMessage = nil
+    isLoading = false
   }
 
   private func confirm() {
@@ -128,209 +134,115 @@ public struct SetRefSharePicker: View {
     isConfirming = true
     errorMessage = nil
     Task {
+      defer { isConfirming = false }
       let video: SetRefVideoSelection?
       if includesVideo, let shareVideo = candidate.video {
         guard let selection = await shareVideo.selection() else {
           errorMessage = ChatStrings.videoUnavailable
-          isConfirming = false
           return
         }
         video = selection
       } else {
         video = nil
       }
-
       do {
         let intent = try coordinator.makeSetRefIntent(
-          in: conversationID,
-          source: candidate.source,
-          note: nil,
-          video: video
-        )
+          in: conversationID, source: candidate.source, note: question, video: video)
         coordinator.stageSetRef(intent)
+        try coordinator.sendStagedSetRef(in: conversationID, note: question)
         onStaged()
+      } catch SetRefSendError.messageTooLong {
+        errorMessage = ChatStrings.messageTooLong
       } catch {
         errorMessage = ChatStrings.trainingShareFailed
-        isConfirming = false
       }
     }
   }
 }
 
-@MainActor
-private struct SetRefCandidateList: View {
-  let candidates: [SetRefShareCandidate]
-  let selectedCandidateID: UUID?
-  let select: @MainActor (SetRefShareCandidate) -> Void
-  let proceed: @MainActor () -> Void
+private struct SetRefExerciseCard: View {
+  let group: SetRefPickerGroup
+  let presentation: SetRefPickerPresentation
+  let select: (SetRefShareCandidate) -> Void
 
   var body: some View {
-    VStack(spacing: 0) {
-      List {
-        let loggedCandidates = candidates.filter { $0.source.source == .logged }
-        if !loggedCandidates.isEmpty {
-          Section(ChatStrings.completedSection) {
-            ForEach(loggedCandidates) { candidate in
-              SetRefCandidateRow(
-                candidate: candidate,
-                isSelected: selectedCandidateID == candidate.id,
-                select: select
-              )
-            }
-          }
+    VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
+      HStack(alignment: .firstTextBaseline) {
+        Text(group.exerciseName).font(.MeetPR.bodyEmphasis)
+        Spacer(minLength: MeetPRSpacing.xs)
+        if let weekCode = group.weekCode {
+          Text(weekCode).font(.MeetPR.monoLabel)
         }
-
-        let plannedCandidates = candidates.filter { $0.source.source == .planned }
-        if !plannedCandidates.isEmpty {
-          Section(ChatStrings.todayPlanSection) {
-            ForEach(plannedCandidates) { candidate in
-              SetRefCandidateRow(
-                candidate: candidate,
-                isSelected: selectedCandidateID == candidate.id,
-                select: select
-              )
-            }
+      }
+      LazyVGrid(
+        columns: Array(
+          repeating: GridItem(.flexible(), spacing: MeetPRSpacing.xs),
+          count: presentation.gridColumnCount), spacing: MeetPRSpacing.sm
+      ) {
+        ForEach(group.candidates) { candidate in
+          if let cell = presentation.cell(for: candidate) {
+            SetRefCandidateCell(
+              cell: cell, isSelected: candidate.id == presentation.selectedCandidateID,
+              select: { select(candidate) }
+            )
+            .accessibilityIdentifier("chat.setRef.candidate.\(candidate.id.uuidString)")
           }
         }
       }
-      .scrollContentBackground(.hidden)
-
-      Button(action: proceed) {
-        Text(ChatStrings.continueSelection)
-          .font(.body.bold())
-          .frame(maxWidth: .infinity)
-          .frame(height: 48)
-          .foregroundStyle(Color.MeetPR.ctaText)
-          .background(Color.MeetPR.goldCTA)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-      }
-      .disabled(selectedCandidateID == nil)
-      .accessibilityIdentifier("chat.setRef.proceed")
-      .padding(MeetPRSpacing.base)
     }
+    .padding(MeetPRSpacing.md)
+    .background(Color.MeetPR.surfaceElevated, in: .rect(cornerRadius: MeetPRRadius.lg))
   }
 }
 
-@MainActor
-private struct SetRefCandidateRow: View {
-  let candidate: SetRefShareCandidate
+private struct SetRefCandidateCell: View {
+  let cell: SetRefPickerCell
   let isSelected: Bool
-  let select: @MainActor (SetRefShareCandidate) -> Void
+  let select: () -> Void
 
   var body: some View {
-    Button {
-      select(candidate)
-    } label: {
-      HStack(spacing: MeetPRSpacing.sm) {
-        VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-          Text(candidate.source.exerciseName)
-            .font(.body.bold())
-            .foregroundStyle(Color.MeetPR.textPrimary)
-          Text(summary)
-            .font(.footnote)
-            .foregroundStyle(Color.MeetPR.textSecondary)
-        }
-        Spacer(minLength: 0)
-        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-          .foregroundStyle(
-            isSelected
-              ? Color.MeetPR.gold500
-              : Color.MeetPR.textTertiary
-          )
+    Button(action: select) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+        Text(cell.setLabel).font(.MeetPR.footnote)
+        Text(cell.load).font(.MeetPR.body(size: MeetPRFontMetrics.size14, weight: .semibold))
+        Text(cell.status).font(.MeetPR.caption).foregroundStyle(Color.MeetPR.textSecondary)
       }
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .contentShape(.rect)
+      .fixedSize(horizontal: false, vertical: true)
+      .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget, alignment: .leading)
+      .padding(MeetPRSpacing.sm)
+      .background(isSelected ? Color.MeetPR.surfaceCard : Color.clear)
+      .clipShape(.rect(cornerRadius: MeetPRRadius.md))
+      .overlay {
+        RoundedRectangle(cornerRadius: MeetPRRadius.md)
+          .stroke(
+            isSelected ? Color.MeetPR.textPrimary : Color.MeetPR.borderDefault,
+            lineWidth: isSelected ? 2 : 1)
+      }
     }
-    .accessibilityIdentifier("chat.setRef.candidate.\(candidate.id.uuidString)")
-  }
-
-  private var summary: String {
-    guard let setRef = try? SetRefV1.normalizingSource(candidate.source) else {
-      return ChatStrings.invalidSetRecord
-    }
-    return ChatSetRefDisplayFormatter.firstLine(for: setRef)
+    .buttonStyle(.plain)
+    .accessibilityAddTraits(isSelected ? .isSelected : [])
   }
 }
 
-@MainActor
-private struct SetRefConfirmationCard: View {
-  let candidate: SetRefShareCandidate
+private struct SetRefVideoToggle: View {
+  let video: SetRefShareVideo
   @Binding var includesVideo: Bool
-  let isConfirming: Bool
-  let errorMessage: String?
-  let confirm: @MainActor () -> Void
 
   var body: some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        Text(SetRefConfirmationCopy.prompt(for: candidate.source.source))
-          .font(.headline)
-          .foregroundStyle(Color.MeetPR.textPrimary)
-
-        Text(firstLine)
-          .font(.body)
-          .foregroundStyle(Color.MeetPR.textPrimary)
-          .padding(MeetPRSpacing.base)
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .background(Color.MeetPR.surfaceElevated)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-
-        if let video = candidate.video {
-          Toggle(isOn: $includesVideo) {
-            VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
-              Text(ChatStrings.includeVideo)
-              Text(videoStatus(video.state))
-                .font(.caption)
-                .foregroundStyle(Color.MeetPR.textSecondary)
-            }
-          }
-          .disabled(video.state == .failed)
-        }
-
-        if let errorMessage {
-          Text(errorMessage)
-            .font(.footnote)
-            .foregroundStyle(Color.MeetPR.gold500)
-        }
-
-        Button(action: confirm) {
-          Group {
-            if isConfirming {
-              ProgressView()
-                .tint(Color.MeetPR.ctaText)
-            } else {
-              Text(ChatStrings.continueToChat)
-            }
-          }
-          .font(.body.bold())
-          .frame(maxWidth: .infinity)
-          .frame(height: 48)
-          .foregroundStyle(Color.MeetPR.ctaText)
-          .background(Color.MeetPR.goldCTA)
-          .clipShape(.rect(cornerRadius: MeetPRRadius.lg))
-        }
-        .disabled(isConfirming)
-        .accessibilityIdentifier("chat.setRef.confirm")
+    Toggle(isOn: $includesVideo) {
+      VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+        Text(ChatStrings.includeVideo).font(.MeetPR.body)
+        Text(status).font(.MeetPR.caption).foregroundStyle(Color.MeetPR.textSecondary)
       }
-      .padding(MeetPRSpacing.base)
     }
+    .disabled(video.state == .failed)
   }
 
-  private var firstLine: String {
-    guard let setRef = try? SetRefV1.normalizingSource(candidate.source) else {
-      return ChatStrings.invalidSetRecord
-    }
-    return ChatSetRefDisplayFormatter.firstLine(for: setRef)
-  }
-
-  private func videoStatus(_ state: SetRefShareVideo.State) -> String {
-    switch state {
-    case .uploading:
-      ChatStrings.videoUploading
-    case .ready:
-      ChatStrings.videoReady
-    case .failed:
-      ChatStrings.videoFailed
+  private var status: String {
+    switch video.state {
+    case .uploading: ChatStrings.videoUploading
+    case .ready: ChatStrings.videoReady
+    case .failed: ChatStrings.videoFailed
     }
   }
 }

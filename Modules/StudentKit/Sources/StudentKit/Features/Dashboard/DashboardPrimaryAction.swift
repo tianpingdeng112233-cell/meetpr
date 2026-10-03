@@ -21,6 +21,7 @@ struct DashboardPrimaryAction: View {
 @available(iOS 17.0, macOS 14.0, *)
 struct DashboardCompletedAction: View {
   let completedDay: StudentPlanDay
+  let days: [StudentPlanDay]
   let nextDay: StudentPlanDay?
   let canUndo: Bool
   let isUpdating: Bool
@@ -36,7 +37,7 @@ struct DashboardCompletedAction: View {
         Text(
           StudentStrings.replacing(
             .dashboardPrimaryAction002,
-            values: ["\(DashboardTodayPresentation.code(for: completedDay))"])
+            values: ["\(DashboardTodayPresentation.code(for: completedDay, in: days))"])
         )
         .font(.MeetPR.body(size: MeetPRFontMetrics.size18, weight: .bold))
         .foregroundStyle(Color.MeetPR.textPrimary)
@@ -58,7 +59,7 @@ struct DashboardCompletedAction: View {
           Text(
             StudentStrings.replacing(
               .dashboardPrimaryAction004,
-              values: ["\(DashboardTodayPresentation.code(for: nextDay))"])
+              values: ["\(DashboardTodayPresentation.code(for: nextDay, in: days))"])
           )
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.gold500)
