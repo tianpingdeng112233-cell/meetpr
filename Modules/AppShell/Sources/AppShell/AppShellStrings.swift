@@ -1,4 +1,5 @@
 import Foundation
+import Networking
 
 enum AppShellStrings {
   static let phoneNumber = localized("appShell.auth.phoneNumber")
@@ -38,7 +39,17 @@ enum AppShellStrings {
     "appShell.signup.role.selfTrainingStudent.description"
   )
   static let analyticsPrivacyTitle = localized("appShell.privacy.analytics.title")
-  static let analyticsPrivacyBody = localized("appShell.privacy.analytics.body")
+  static func analyticsPrivacyBodyKey(for track: MeetPRBuildTrack) -> String {
+    switch track {
+    case .china: "appShell.privacy.analytics.body"
+    case .global: "appShell.privacy.analytics.body.global"
+    }
+  }
+
+  static func analyticsPrivacyBody(for track: MeetPRBuildTrack) -> String {
+    localized(String.LocalizationValue(analyticsPrivacyBodyKey(for: track)))
+  }
+
   static let acknowledge = localized("appShell.acknowledge")
   static let validatingSession = localized("appShell.root.validatingSession")
   static let demoCoach = localized("appShell.demo.coach")
