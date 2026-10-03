@@ -64,6 +64,7 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
     references: [UUID: ExerciseReference],
     weekCode: String,
     coachName: String?,
+    isSendingToCoach: Bool = false,
     streak: Int? = nil,
     previousVolumeChangePercent: Int? = nil,
     locale: Locale = .current
@@ -77,7 +78,10 @@ struct WorkoutCompletionPresentation: Equatable, Sendable {
 
     self.weekCode = weekCode
     self.weekDayLabel = Self.weekDayLabel(for: weekCode)
-    self.coachReceiptText = Self.coachReceiptText(coachName: coachName)
+    self.coachReceiptText =
+      isSendingToCoach
+      ? StudentStrings.localized(.workoutCompletionSendingToCoach, locale: locale)
+      : Self.coachReceiptText(coachName: coachName)
     self.completedSuccessfulSets = completed.count - failedCount
     self.totalPlannedSets = drafts.count
     self.setCompletionLabel =

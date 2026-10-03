@@ -213,5 +213,39 @@
 - 2026-10-03 返修第 2 轮（未 commit/push）：仅修改 SetEntryVideoPlayer / SetEntryVideoPlayerView 及播放器测试；取消跨宿主搬动共享 AVPlayerLayer，改为宿主各自持有 layer、主线程交接时先解绑旧 layer 再绑定同一 AVPlayer，dismantle 显式解绑且迟到的旧宿主拆卸不影响新绑定；保留原 player/item、进度、播放意图、倍速及内嵌占位。新增单宿主绑定回归 1 项，覆盖双向交接、先建后拆/先拆后建与 stop 解绑（新增接口缺失编译红 → 5 项播放器测试绿；不代表黑屏设备复现已转绿）。两包使用 --skip-update 全量重跑：ChatUI 84 / StudentKit 919，既有 AVFoundation Cannot Encode 分别 1 / 15 条 issue；排除原受限项后 83 / 903 全绿。全仓 swiftlint lint --strict --no-cache（1083 文件）、工具链 swift-format lint --recursive --strict、git diff --check 通过；Standards / Spec 独立只读审查均 CLEAN。DemoStudent / iPhone 17（iOS 26.5）用 -skipPackageUpdates 构建启动成功（0 warning），日志 ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-084c-67e6b5aceff6/logs/build_run_sim_2026-10-03T02-16-53-072Z_pid21929_54cfaa1d.log。已进入组录入相册并见样片，但 MCP runtime snapshot 不含系统相册目标，Computer Use 自动审批未批准访问 Simulator（未给具体原因），未完成带样片放缩出画验证，仍留 Opus 按原复现收货。证据 /tmp/084c-r2-{red,green,ChatUI,StudentKit,ChatUI-available,StudentKit-available,swiftlint,format}.log；本轮增量 /tmp/084c-r2-only.diff。
 - 2026-10-03 Opus 接手第 2 轮未收敛项（放大 / 缩小后画面黑）：模拟器日志确认是旧内嵌图层在拆除前又被更新一次、抢回并清空播放器。`SetEntryVideoPlayer` 改为按 `SurfaceRole`（inline / expanded）与展开状态绑定；新增回归测试 `staleUpdateFromOutgoingSurfaceDoesNotStealPlayer`，同角色图层替换时释放旧图层。ChatUI 84 / StudentKit 920、两个严格 lint 通过；模拟器放大与缩小均出画。
 
+## 2026-10-03 — Spec 084 · iOS 即时奖励页 / 后台完成请求
+
+- Opus 派卡 `specs/084-walkthrough-polish/CARD-INSTANT-COMPLETION-ios.md`；T1 / P1；分支 `fix/instant-completion-celebration`，基线 `baef8db7`（`feat/084c-chat-video-rest`）。本次未 commit、未 push、未开 PR；未改 SPEC、NEXT-RELEASE、build 号或依赖。开工时任务卡已为 untracked，原样保留。
+- 完成动作在第一次网络等待前设置 VM 的奖励页与发送状态，局部乐观完成不提前推进计划游标；奖励页沿用现有 CoachReceiptLine / MeetPR 字体，仅通过 presentation 切换中英文发送文案。成功响应立即更新回执，再走原有刷新与 completionRevision；提前关闭奖励页时，成功后仍回到当前训练日。undo 与 quick-log 的请求路径保持原状。
+- 失败 / 30 秒截止：关闭仍在展示的完成流程，清除发送状态，只还原当前日完成标记、保留组草稿，沿用完成失败提示。独立 request/deadline 竞速只交付第一个结果，超时不等待不响应取消的 repository，迟到结果不再操作 VM；成功时取消计时任务。
+
+### 红绿与运行证据
+
+- 在卡内 VM / 完成 presentation seam 新增 5 个测试函数：在途奖励与成功回执、失败回滚保留组并可重试、假定时器超时及迟到结果、提前关闭后成功/失败均不重开、中英文发送文案。原重复 complete/undo 与 projection 测试保留。
+- 先红后绿：`/tmp/instant-completion-red.log`（新 seam 未实现编译红）→ `...-green.log`；`...-failure-red.log`（3 条断言失败）→ `...-failure-green.log`；`...-timeout-red.log`（注入 seam 缺失）→ `...-timeout-green.log`（6 项关联测试通过）。完整前缀均为 `/tmp/instant-completion`。
+- 计时实现曾复现本机 Swift 运行时 `freed pointer was not the last allocation`：传递 Duration 的异步闭包在取消后返回处崩溃，单独成功测试也复现；去除取消可通过，换时钟或拆函数仍复现。将注入 seam 收窄为无参数截止等待（默认固定 30 秒，取消检查保留）后，原成功、失败、超时与全量测试均不再崩溃。调查日志 `...-crash-isolated.log`、`...-crash-probe.log`、`...-no-cancel-probe.log`；无临时诊断代码遗留。
+- 九包全部执行 `swift test --skip-update --disable-sandbox`。SwiftPM MCP 没有 skip-update 参数，因此使用 CLI；依赖代理不可达，复用本机卡 C 的固定版本缓存，缓存/构建置于 `/tmp/instant-completion-*`，未更新依赖。
+- 全绿六包：Analytics 30、CoachKit 443、CoreModels 158、DesignSystem 73、Networking 131、RepositoryContracts 6。日志 `/tmp/instant-completion-<包名>-full.log`。
+- 全量未绿三包：StudentKit 925 项 / 15 条既有 AVFoundation Cannot Encode；ChatUI 84 项 / 1 条同类错误；AppShell 104 项 / 2 个 Keychain 测试共 3 条断言失败，另 1 项 push 时序测试初跑失败、复跑通过。没有修改相关生产逻辑或删除测试。
+- 排除历史受限项后：StudentKit 909、ChatUI 83、AppShell 102 全绿，日志 `...-<包名>-available.log`。排除模式分别为 `AVFoundationVideoExporterTests|PassthroughVideoTrimExporterTests|realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer`、`VideoBadgeExporterTests`、`keychainTokenStore`；不视为九包全量通过。
+- 全仓 SwiftLint strict：1084 文件 0 违规；工具链 swift-format recursive strict、JSON 解析及 `git diff --check` 通过。日志 `/tmp/instant-completion-lint-final.log`、`/tmp/instant-completion-format-final.log`。
+
+### 双轴审查与模拟器自测
+
+- `code-review` 两个独立只读 reviewer：Standards CLEAN / Spec CLEAN，均 0 findings；未把自测当作 Opus 收货。任务卡直接提供 spec，不依赖仓内尚缺的 `docs/agents/issue-tracker.md`；后续依赖 tracker 的流程仍需 David 调用 `$setup-matt-pocock-skills`。
+- XcodeBuildMCP 使用本 worktree 的 MeetPR.xcodeproj / MeetPR-DemoStudent / DemoStudent / MeetPR-CI（iOS 26.5），`-skipPackageUpdates`，构建启动成功，无新增 warning。
+- 亲看正常完成奖励页；Demo 仓储临时注入 8 秒等待后，长按调用约 3.6 秒内（含 1.3 秒长按和工具快照）已看到奖励页与发送中，服务器响应模拟完成后原位切为已收到。发送中/已收到截图：`/tmp/instant-completion-evidence/sending-delay8.jpg`、`received-delay8.jpg`；正常截图 `normal-receipt.jpg`。
+- Demo 仓储模拟 HTTP 503 错误：奖励页关闭，原「保存失败 / 暂时无法完成训练，请稍后重试。」提示实际展示；W1D3 仍为游标、3 组记录保留、长按入口恢复；关闭提示再次长按可重进发送中奖励页。截图 `/tmp/instant-completion-evidence/failure-alert.jpg`。这是 repository 错误注入，不是线上服务返回 503 的证据。
+- 临时注入仅用于本机 Demo，已逐字还原 InMemoryStudentPlanRepository，清除启动注入环境并重建最终版本。未做真机流量、真实 backend 503、30 秒实等或其他尺寸/语言设备矩阵；超时用卡内假定时器验证，中英文用 catalog/presentation 测试。交 Opus 按原卡收货。
+- 移除注入后的最终 DemoStudent 构建/启动：`~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-complete-51fc02eb6290/logs/build_run_sim_2026-10-03T05-39-59-847Z_pid57019_0a2b64ef.log`，0 warning。最终产物再次完成 3 组→长按→奖励页→「完成」回到今日已完成卡；训练 tab 继续指向推进后的训练日。
 - 2026-10-03 追加改动（David 真机反馈，未 commit/push）：仅在 SetEntryVideoPlayerView 的共用画面层增加暂停态中央播放按钮（56pt 命中区、仓内字体/颜色/尺寸 token、复用播放无障碍文案），内嵌与放大态一致；播放时隐藏，结尾复用既有暂停/从头播放逻辑，底部控件保留。新增 1 项参数化行为测试覆盖两种形态的按钮点击、显隐、暂停后重现和结尾重播归零；先红后绿，相关 8 项测试通过。StudentKit 使用 --skip-update 全量 921 项有既有 AVFoundation Cannot Encode 15 条 issue；沿用前轮受限项排除后 905 项通过，不视为全量绿。改动 Swift 文件的 swiftlint lint --strict --no-cache、工具链 swift-format lint --strict 与 git diff --check 通过；Standards / Spec 独立只读复核均 CLEAN。本轮未做设备验证，按卡由 Opus 实屏收货。证据 /tmp/meetpr-ios-084c-central-play-{red,green,StudentKit,available,lint,format}.log；增量 /tmp/meetpr-ios-084c-central-play.diff。
 - 2026-10-03 追加「周条 7 天日历格」：仅改训练页周条及分页数据源，按 UTC 推荐日期 `day.date`（含后移）输出至少 7 天，训练格保留序号/状态/选中，空日期输出不可点的约 0.7 倍宽休息格；星期置顶、短日期单行，超 7 格及大字体放不下时使用横向 ScrollView，滚动不触发翻周，换周行仍可滑动。文字/图标全部使用 MeetPR token，新增 Rest/休及双语读屏键。执行中 Opus 更新卡面为「一天一练」，已删除开工版本要求的同日双练分支和测试。约定分页 seam 新增 3 测试：四练补休息日、后移跨月扩展两项逐项红→绿；七天全练/跨年/全完成补回归通过（前两项原始日志 `/tmp/084b-calendar-{red1,green1,red2,green2}.log`）。九包均带 `--skip-update` 全量复跑：CoreModels 158、RepositoryContracts 6、Networking 131、DesignSystem 73、Analytics 30、CoachKit 443 通过；StudentKit 915 项有 15 个既有 Cannot Encode 问题、ChatUI 85 项有 1 个同类问题、AppShell 104 项有 2 个 Keychain 测试共 3 条断言失败，全量未绿；按前轮相同排除模式复跑 StudentKit 899、ChatUI 84、AppShell 102 通过。日志 `/tmp/084b-calendar-{full,available}-<包名>.log`。主工程 MeetPR/Debug、MeetPR-CI/iOS 26.5，XcodeBuildMCP test_sim 加 `-skipPackageUpdates CODE_SIGNING_ALLOWED=NO`：9/9 通过，xcresult `~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-084b-5377bbb74f9d/result-bundles/test_sim_2026-10-03T04-21-48-633Z_pid41868_17b3942b.xcresult`。全仓 SwiftLint strict：1078 文件 0 违规，swift-format strict 通过；本轮 Modules/JOURNAL diff whitespace 检查通过（用户原有 SPEC.md 末尾空行未改）。Standards/Spec 独立只读复核均 CLEAN。DemoStudent 最终构建启动通过，中英文 Light 七格实屏及未来日点选/Back to today 已核，截图 `/tmp/084b-calendar-evidence/{chinese-light,english-light}.jpg`；未做 SE、Dark、大字体、超 7 格滚动及 VoiceOver 实屏验证（Dark 启动参数未实际改变外观），交 Opus 按卡收货。本轮未 commit/push，未改 spec/卡片、发布台账、build 或依赖。
+
+## 2026-10-03 · completion-hang 排障（阶段 1 未通过）
+
+- Opus 派单；当前 `diagnose/completion-hang`，基线 `2baeae10`。不 commit、不 push，未改业务源码、工程结构、依赖或发布账本。
+- **未复现，未修复，根因未确定。成立的假设：无。** 遵守六阶段门槛，因没有稳定红例，未进入最小化/三项改动隔离、假设、埋点或试修。
+- App 托管的真实 TodayWorkoutView 探针：无录入页 24 次、带真实 SetEntrySheet 收起及 1.1 秒等待 100 次、最终加编译开关后 6 次，均恢复主 RunLoop 空闲且呈现 controller。扫描 0/16/50/100/200/350 ms，8 秒独立看门狗。探针为 Debug configuration；直接调用完成入口、UIKit 呈现录入页，未覆盖真实 Hold 手势和私有 editing binding，不能替代原时序。100 次批次中通知授权弹窗已关闭，工具 300 秒超时但底层测试最终成功；详情见原始输出。
+- 原 MeetPR-DemoStudent / DemoStudent / iPhone 17（iOS 26.5）build_run_sim 成功、0 warning；实屏逐组记完三组，未手动折叠/展开，滚动后长按 1300 ms，奖励页正常且无障碍树可读。工具会等待快照，未保证命中收起动画中途的窗口。
+- 临时探针以 `COMPLETION_HANG_PROBE` + `HANG_PROBE=1` 双开关隔离，正常构建不编译；SwiftLint strict / swift-format strict / bash -n / diff whitespace 检查通过，无临时诊断日志遗留。没有业务修复，未声称回归红→绿或验收通过。
+- 方法、命令、测试构建障碍、后续所需证据与六个改动文件见 [排障记录](diagnose/completion-hang-2026-10-03.md)，逐轮输出见 [probe output](diagnose/completion-hang-probe-output-2026-10-03.txt)，原 Demo 实屏见 [奖励页截图](diagnose/completion-hang-demo-not-reproduced-2026-10-03.jpg)。下一步需原容器 UI test 驱动真实保存→收起期间滚动→Hold，或补该时段录像、日志和连续主线程采样；没有红例前不试修。
