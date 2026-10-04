@@ -265,3 +265,45 @@
 - UI 验证限制：沿用模拟器既有安装/数据，通过进程参数 `-meetpr.analytics.privacy_notice_confirmed NO` 展示告知，未卸载或清空现有数据；因此**未覆盖卡验收 1/2 的全新安装前提**。无可用 iPhone SE（第 3 代），创建独立模拟器的 simctl 被沙箱拒绝（CoreSimulatorService / Operation not permitted），因此**验收 3 的 SE + 最大动态字体仍未覆盖**；iPhone 17 最大字号证据不能替代。最终两个测试进程均停止。
 - “90 天 / 90 days / 90d TTL”全仓排查：运行时使用数据文案只命中原 AppShell 正文，现已替换；设置、帮助页、既有测试期望无其他同义副本。StudentKit `student.growthScreenPresentation.copy002`、USER-GUIDE/DEMO-SHOWCASE、设计稿/发版证据中的 90 天为成长曲线时间窗；spec 027 为 OSS 存储分层期限，均无关，保留。
 - 文档交接：旧正典 `specs/043-analytics-instrumentation/SPEC.md` **317、351、413、422 行**仍写 90 天/90d TTL。新口径以本卡为准：账号存续期间保留，删除账号后与账号断开关联成为匿名记录，卸载清匿名安装标识，可删除账号或联系请求删除。按本轮正典文档归 Opus、JOURNAL 仅末尾追加的分工，未改旧 spec；这 4 处及相邻删除路径表述交 Opus 同步定稿，不能把本轮报告当作“全仓所有旧表述已清零”。
+
+## 2026-10-04 · en-concatenated-labels（T1/P1，Opus 派卡，待收货）
+
+- 按 `specs/084-walkthrough-polish/CARD-EN-LABELS-ios.md` 三项范围实装。分支 `fix/en-concatenated-labels`，开工/交付 HEAD `6c3f64b0`；与现场 `release/1.0` 的 merge-base 为 `202e95db`。未 commit、未 push；本节仅追加在 JOURNAL 末尾，未改任务卡、发布账本、Demo 数据、build 号或依赖。
+- 中文硬约束：训练日原为「深蹲卧推日」，Dashboard 原为「深蹲、卧推日」；卡内「中文直接相连」与后者现状不一致，按 David 本轮“中文输出逐字不变”保留两处原输出。零/三主项分支保持原样。Dashboard 新增整句键 `student.dashboardTrainingDayName`，保留也用于星期日的 `student.dashboardTodayPresentation.copy011`（Sun/日）。英文单/双主项为 Deadlift day / Squat / Bench press day；恢复标签为 Medium Intensity / High Stress / About 2 days Recovery。
+
+### 改动文件
+
+均位于 `Modules/StudentKit/`（下列省略此前缀），加本 JOURNAL，共 11 文件：
+
+- `Sources/StudentKit/Features/TodayWorkout/TrainingCalendarLogic.swift`：整句训练日名称；按 locale 连接主项。
+- `Sources/StudentKit/Features/Dashboard/DashboardTodayPresentation.swift`：整句副标题；中文顿号、零/三主项原样。
+- `Sources/StudentKit/Features/MyProfile/MainLiftExerciseFamilyResolver.swift`：主项名称 locale seam，原 property 继续默认当前语言。
+- `Sources/StudentKit/Features/MyProfile/MyProfileV3Presentation.swift`：恢复标签整句占位符及可按语言验证的展示 seam。
+- `Sources/StudentKit/Features/Onboarding/OnboardingLabels.swift`：三个恢复量表的 locale 重载；原公开属性/选项不变。
+- `Sources/StudentKit/Features/MyProfile/MyProfileView.swift`：仅 recovery 标签允许换行、不缩字；injury 原行为不变。
+- `Sources/StudentKit/Features/TodayWorkout/TodayWorkoutScreen.swift`：抽出标题 View，普通字号保留原 HStack/Spacer；accessibility 字号用 VStack，让动作名占整行、单个 Ask coach 在下方。
+- `Sources/StudentKit/StudentStrings.swift`、`Sources/StudentKit/Resources/Localizable.xcstrings`：新增 1 个双语手工键、4 个旧后缀改为整句模板；无其他 catalog 改动。
+- `Tests/StudentKitTests/ConcatenatedLabelsTests.swift`：新增以下 3 个测试。
+
+### 红 → 绿及检查条数
+
+先写测试，再增加语言参数以运行旧逻辑取得真实断言红例，随后修复；未以编译/环境失败代替回归红例。
+
+| 测试名 | 红例 | 绿例 |
+| --- | --- | --- |
+| `trainingDayNamesUseWholeLocalizedPhrases` | 1 测试失败、2 issues：DeadliftSun / SquatBench pressSun | 1/1；中英文单/双/零/三主项 |
+| `dashboardLiftSubtitlesUseWholeLocalizedPhrases` | 1 测试失败、2 issues：DeadliftSun / Squat, Bench pressSun | 1/1；中英文单/双/零/三主项 |
+| `recoveryChipsUseWholeLocalizedPhrases` | 1 测试失败、1 issue：三个标签数组缺空格 | 1/1；英文整句与中文原值 |
+
+- 原始日志 `/tmp/en-labels-evidence/{training,dashboard,recovery}-{red,green}.log`。第一次直接 `swift test --package-path Modules/StudentKit --filter trainingDayNamesUseWholeLocalizedPhrases` 被沙箱 clang ModuleCache 写权限阻止；XcodeBuildMCP 首次随后报缺少 locale 参数的编译错误，补语言 seam 后才取得表中断言红例。首次 ViewInspector 更新网络有 HTTP2 warning，使用缓存后构建完成。
+- StudentKit 首轮全量 932 项中 930 通过、2 失败：`inProgressHeroOwnsAskCoachEntry` / `completedSectionOwnsAskCoachEntry` 发现双候选 ViewThatFits 含两个 Ask coach 实例。保留原测试，改为单组视图后通过；实屏再发现自然宽度方案会提前改变默认字号布局，最终改用上文 AnyLayout。最终全量 **932 passed / 0 failed / 0 skipped**，XcodeBuildMCP `swift_package_test` 执行 `swift test --package-path .../Modules/StudentKit`，日志 `/tmp/en-labels-evidence/studentkit-final.log`（源日志 `swift_package_test_2026-10-04T03-29-41-779Z_pid31366_a7de3bf6.log`）。
+- 最终工具链 `swift-format lint --strict`：**9 Swift 文件，0 违规，exit 0**；`swiftlint lint --strict --no-cache`：**9 文件，0 违规 / 0 serious，exit 0**。日志 `/tmp/en-labels-evidence/{format,lint}.log`。JSON 解析、仅 4 个模板及 1 个新增键的差异核对、中文后缀逐字核对、星期日旧键未变、`git diff --check` 均通过。
+- `code-review` 独立只读 Standards / Spec 两轴及最终布局增量复审均 **CLEAN，0 findings**。未替代 Opus 收货，未改 SPEC 状态。
+
+### 实屏证据与未覆盖验收
+
+- XcodeBuildMCP：本 worktree `MeetPR.xcodeproj` / `MeetPR-DemoStudent` / `DemoStudent`，iPhone 17、iOS 26.5（A5119984-9A8D-415C-83D4-E7145351FA79），DerivedData `/tmp/en-labels-derived`。最终 `build_run_sim -skipPackageUpdates` 成功，0 warning，日志 `/tmp/en-labels-evidence/build-final.log`。
+- 已亲看：英文 Today 的 Deadlift day；英文 Profile 三恢复标签完整可见、同字号自然换行；中文 Today 的「硬拉日」、Profile「中等强度 / 较高压力 / 约2天恢复」。截图 `/tmp/en-labels-evidence/{today-en,profile-en,today-zh,profile-zh}.jpg`。
+- 最终标题：默认字号恢复 Competition / Deadlift 两行、右侧 Ask coach；accessibility-large（启动参数 `UICTContentSizeCategoryAccessibilityL`）完整显示 Competition / Deadlift，Ask coach 在下方。截图 `/tmp/en-labels-evidence/training-en-default.jpg`、`training-en-accessibility-large.jpg`。没有新增能准确测实际词内断行的布局单测，未用无关断言充数；原有唯一入口测试保留并通过。
+- **未覆盖的卡验收**：验收 1/2 的“下一练”双主项卡片在中英实屏未到达（两处函数的双语输出已单测）；验收 3 指定的当前组 Competition Squat + Ask coach 未复现于最终 Demo（游标为 Deadlift，未改 Demo 数据），已用同样较长的 Competition Deadlift 验证；未做改前/改后默认字号截图逐像素对比。Opus 按原卡补验，不把这些替代证据写成完整验收通过。
+- 无障碍大字号下的重量数字及其他卡外布局问题未改。模拟器只经正常导航与开始按钮，未录入/删除训练数据；测试进程已停止，语言/字号通过进程参数注入。

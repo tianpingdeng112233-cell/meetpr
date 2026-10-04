@@ -263,6 +263,8 @@ enum StudentStrings {
     static let dashboardProfileMetricsView009 = Key("student.dashboardProfileMetricsView.copy009")
     static let dashboardProfileMetricsView010 = Key("student.dashboardProfileMetricsView.copy010")
     static let dashboardProfileMetricsView011 = Key("student.dashboardProfileMetricsView.copy011")
+    static let dashboardTrainingDayName = Key("student.dashboardTrainingDayName")
+
     static let dashboardTodayPresentation001 = Key("student.dashboardTodayPresentation.copy001")
     static let dashboardTodayPresentation002 = Key("student.dashboardTodayPresentation.copy002")
     static let dashboardTodayPresentation003 = Key("student.dashboardTodayPresentation.copy003")
