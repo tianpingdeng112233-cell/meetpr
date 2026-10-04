@@ -2687,6 +2687,23 @@
         }
       }
     },
+    "student.dashboardTrainingDayName": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} day"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}日"
+          }
+        }
+      }
+    },
     "student.dashboardTodayPresentation.copy001": {
       "extractionState": "manual",
       "localizations": {
@@ -6416,13 +6433,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Intensity"
+            "value": "{0} Intensity"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "强度"
+            "value": "{0}强度"
           }
         }
       }
@@ -6433,13 +6450,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Stress"
+            "value": "{0} Stress"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "压力"
+            "value": "{0}压力"
           }
         }
       }
@@ -6450,13 +6467,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Recovery"
+            "value": "{0} Recovery"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "恢复"
+            "value": "{0}恢复"
           }
         }
       }
@@ -15375,13 +15392,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sun"
+            "value": "{0} day"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "日"
+            "value": "{0}日"
           }
         }
       }

@@ -177,6 +177,38 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   }
 }
 
+/// Preserves the standard-size header and gives accessibility text the full
+/// card width, with the same single ask-coach button below it.
+private struct TodayWorkoutRecordingHeader: View {
+  let exerciseName: String
+  let showsAskCoach: Bool
+  let isPreparingAskCoach: Bool
+  let onAskCoach: () -> Void
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+  var body: some View {
+    let layout =
+      dynamicTypeSize.isAccessibilitySize
+      ? AnyLayout(VStackLayout(alignment: .leading, spacing: MeetPRSpacing.space2))
+      : AnyLayout(HStackLayout(alignment: .top, spacing: MeetPRSpacing.space2))
+    layout {
+      Text(exerciseName)
+        .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .fixedSize(horizontal: false, vertical: true)
+      if !dynamicTypeSize.isAccessibilitySize {
+        Spacer(minLength: MeetPRSpacing.space2)
+      }
+      if showsAskCoach {
+        TodayWorkoutAskCoachCornerButton(
+          isPreparing: isPreparingAskCoach, action: onAskCoach
+        )
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+}
+
 // Hero-card corner variant: a compact「问教练」text chip instead of the
 // action row's square icon (David 2026-08-08 真机走查).
 private struct TodayWorkoutAskCoachCornerButton: View {
@@ -521,24 +553,12 @@ private struct TodayWorkoutHero: View {
       // the pre-start list state and never coexists with the active card
       // (David 2026-08-07 真机走查).
       VStack(alignment: .leading, spacing: MeetPRSpacing.zero) {
-        HStack(alignment: .top, spacing: MeetPRSpacing.space2) {
-          Text(exercise.name)
-            .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
-            .foregroundStyle(Color.MeetPR.textPrimary)
-
-          Spacer(minLength: MeetPRSpacing.space2)
-
-          // The one and only ask-coach entry: a「问教练」chip pinned to the
-          // card's top-right corner for the whole recording session — the
-          // action row's square icon and the old wide button are both gone
-          // (David 2026-08-08 真机走查三连改).
-          if showsAskCoach {
-            TodayWorkoutAskCoachCornerButton(
-              isPreparing: isPreparingAskCoach,
-              action: onAskCoach
-            )
-          }
-        }
+        TodayWorkoutRecordingHeader(
+          exerciseName: exercise.name,
+          showsAskCoach: showsAskCoach,
+          isPreparingAskCoach: isPreparingAskCoach,
+          onAskCoach: onAskCoach
+        )
         .padding(.bottom, MeetPRSpacing.point3)
 
         Text(exercise.reference)

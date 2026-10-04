@@ -143,12 +143,17 @@ enum TrainingSequenceText {
       values: ["\(components.month ?? 0)", "\(components.day ?? 0)", "\(weekday)"])
   }
 
-  static func dayName(_ day: StudentPlanDay) -> String {
+  static func dayName(_ day: StudentPlanDay, locale: Locale = .current) -> String {
     let families = MainLiftExerciseFamilyResolver.families(in: day)
-    guard !families.isEmpty else { return StudentStrings.localized(.trainingCalendarLogic009) }
-    if families.count == 3 { return StudentStrings.localized(.trainingCalendarLogic010) }
-    return families.map(\.studentDisplayName).joined()
-      + StudentStrings.localized(.trainingCalendarLogic011)
+    guard !families.isEmpty else {
+      return StudentStrings.localized(.trainingCalendarLogic009, locale: locale)
+    }
+    if families.count == 3 {
+      return StudentStrings.localized(.trainingCalendarLogic010, locale: locale)
+    }
+    let separator = locale.language.languageCode?.identifier == "en" ? " / " : ""
+    let names = families.map { $0.studentDisplayName(locale: locale) }.joined(separator: separator)
+    return StudentStrings.replacing(.trainingCalendarLogic011, values: [names], locale: locale)
   }
 
   static func unlockMessage(after day: StudentPlanDay) -> String {

@@ -128,19 +128,19 @@ enum DashboardTodayPresentation {
     ][min(max(offset, 0), 6)]
   }
 
-  static func liftFullName(_ family: LiftFamily) -> String {
+  static func liftFullName(_ family: LiftFamily, locale: Locale = .current) -> String {
     switch family {
-    case .squat: StudentStrings.localized(.dashboardTodayPresentation012)
-    case .bench: StudentStrings.localized(.dashboardTodayPresentation013)
-    case .deadlift: StudentStrings.localized(.dashboardTodayPresentation014)
+    case .squat: StudentStrings.localized(.dashboardTodayPresentation012, locale: locale)
+    case .bench: StudentStrings.localized(.dashboardTodayPresentation013, locale: locale)
+    case .deadlift: StudentStrings.localized(.dashboardTodayPresentation014, locale: locale)
     }
   }
 
-  static func liftShortName(_ family: LiftFamily) -> String {
+  static func liftShortName(_ family: LiftFamily, locale: Locale = .current) -> String {
     switch family {
-    case .squat: StudentStrings.localized(.dashboardTodayPresentation015)
-    case .bench: StudentStrings.localized(.dashboardTodayPresentation016)
-    case .deadlift: StudentStrings.localized(.dashboardTodayPresentation017)
+    case .squat: StudentStrings.localized(.dashboardTodayPresentation015, locale: locale)
+    case .bench: StudentStrings.localized(.dashboardTodayPresentation016, locale: locale)
+    case .deadlift: StudentStrings.localized(.dashboardTodayPresentation017, locale: locale)
     }
   }
 
@@ -152,13 +152,14 @@ enum DashboardTodayPresentation {
     }
   }
 
-  static func liftSubtitle(_ families: [LiftFamily]) -> String {
+  static func liftSubtitle(_ families: [LiftFamily], locale: Locale = .current) -> String {
     switch families.count {
-    case 0: ""
+    case 0: return ""
     case 1, 2:
-      StudentStrings.listSeparated(families.map(liftFullName))
-        + StudentStrings.localized(.dashboardTodayPresentation011)
-    default: families.map(liftShortName).joined(separator: "·")
+      let separator = locale.language.languageCode?.identifier == "en" ? " / " : "、"
+      let names = families.map { liftFullName($0, locale: locale) }.joined(separator: separator)
+      return StudentStrings.replacing(.dashboardTrainingDayName, values: [names], locale: locale)
+    default: return families.map { liftShortName($0, locale: locale) }.joined(separator: "·")
     }
   }
 }

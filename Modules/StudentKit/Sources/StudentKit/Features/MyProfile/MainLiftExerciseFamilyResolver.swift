@@ -53,10 +53,14 @@ enum MainLiftExerciseFamilyResolver {
 
 extension LiftFamily {
   var studentDisplayName: String {
+    studentDisplayName(locale: .current)
+  }
+
+  func studentDisplayName(locale: Locale) -> String {
     switch self {
-    case .squat: StudentStrings.localized(.mainLiftExerciseFamilyResolver001)
-    case .bench: StudentStrings.localized(.mainLiftExerciseFamilyResolver002)
-    case .deadlift: StudentStrings.localized(.mainLiftExerciseFamilyResolver003)
+    case .squat: StudentStrings.localized(.mainLiftExerciseFamilyResolver001, locale: locale)
+    case .bench: StudentStrings.localized(.mainLiftExerciseFamilyResolver002, locale: locale)
+    case .deadlift: StudentStrings.localized(.mainLiftExerciseFamilyResolver003, locale: locale)
     }
   }
 }

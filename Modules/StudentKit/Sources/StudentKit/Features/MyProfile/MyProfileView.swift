@@ -551,6 +551,7 @@ private struct MyProfileRecoveryCard: View {
           .font(.system(size: MeetPRFontMetrics.size12, weight: .semibold))
       }
       Text(chip)
+        .fixedSize(horizontal: false, vertical: style == .recovery)
     }
     .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
     .foregroundStyle(chipForeground)
@@ -564,8 +565,8 @@ private struct MyProfileRecoveryCard: View {
           .stroke(Color.MeetPR.dangerRGB.opacity(0.4), lineWidth: 1)
       }
     }
-    .lineLimit(1)
-    .minimumScaleFactor(0.8)
+    .lineLimit(style == .recovery ? nil : 1)
+    .minimumScaleFactor(style == .recovery ? 1 : 0.8)
   }
 }
 

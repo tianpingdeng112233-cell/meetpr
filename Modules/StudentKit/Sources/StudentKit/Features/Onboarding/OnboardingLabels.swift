@@ -111,21 +111,39 @@ public enum OnboardingLabels {
 
   // MARK: - Step 5 recovery scales (wiki v2.1 tables, 1-5 notches)
 
-  public static let dailyLifeIntensityLabels = [
-    StudentStrings.localized(.onboardingLabels048), StudentStrings.localized(.onboardingLabels049),
-    StudentStrings.localized(.onboardingLabels050), StudentStrings.localized(.onboardingLabels051),
-    StudentStrings.localized(.onboardingLabels052),
-  ]
-  public static let lifeStressLabels = [
-    StudentStrings.localized(.onboardingLabels053), StudentStrings.localized(.onboardingLabels049),
-    StudentStrings.localized(.onboardingLabels050), StudentStrings.localized(.onboardingLabels051),
-    StudentStrings.localized(.onboardingLabels052),
-  ]
-  public static let recoverySpeedLabels = [
-    StudentStrings.localized(.onboardingLabels054), StudentStrings.localized(.onboardingLabels055),
-    StudentStrings.localized(.onboardingLabels056), StudentStrings.localized(.onboardingLabels057),
-    StudentStrings.localized(.onboardingLabels058),
-  ]
+  public static let dailyLifeIntensityLabels = dailyLifeIntensityLabels(locale: .current)
+
+  static func dailyLifeIntensityLabels(locale: Locale) -> [String] {
+    [
+      StudentStrings.localized(.onboardingLabels048, locale: locale),
+      StudentStrings.localized(.onboardingLabels049, locale: locale),
+      StudentStrings.localized(.onboardingLabels050, locale: locale),
+      StudentStrings.localized(.onboardingLabels051, locale: locale),
+      StudentStrings.localized(.onboardingLabels052, locale: locale),
+    ]
+  }
+  public static let lifeStressLabels = lifeStressLabels(locale: .current)
+
+  static func lifeStressLabels(locale: Locale) -> [String] {
+    [
+      StudentStrings.localized(.onboardingLabels053, locale: locale),
+      StudentStrings.localized(.onboardingLabels049, locale: locale),
+      StudentStrings.localized(.onboardingLabels050, locale: locale),
+      StudentStrings.localized(.onboardingLabels051, locale: locale),
+      StudentStrings.localized(.onboardingLabels052, locale: locale),
+    ]
+  }
+  public static let recoverySpeedLabels = recoverySpeedLabels(locale: .current)
+
+  static func recoverySpeedLabels(locale: Locale) -> [String] {
+    [
+      StudentStrings.localized(.onboardingLabels054, locale: locale),
+      StudentStrings.localized(.onboardingLabels055, locale: locale),
+      StudentStrings.localized(.onboardingLabels056, locale: locale),
+      StudentStrings.localized(.onboardingLabels057, locale: locale),
+      StudentStrings.localized(.onboardingLabels058, locale: locale),
+    ]
+  }
   public static let sleepHoursLabels = ["≤5h", "6h", "7h", "8h", "9h+"]
 
   /// 1-based notch → label, clamped.

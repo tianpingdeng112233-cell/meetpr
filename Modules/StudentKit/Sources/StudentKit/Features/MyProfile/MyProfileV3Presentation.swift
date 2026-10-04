@@ -47,32 +47,48 @@ struct MyProfileV3Presentation: Equatable, Sendable {
     )
   }
 
-  private static func recoveryChips(
+  static func recoveryChips(
     profile: OnboardingProfile,
-    readiness: ReadinessCheckin?
+    readiness: ReadinessCheckin?,
+    locale: Locale = .current
   ) -> [String] {
     if let readiness {
       return [
         StudentStrings.replacing(
-          .myProfileV3Presentation001, values: ["\(readiness.sleepQuality)"]),
-        StudentStrings.replacing(.myProfileV3Presentation002, values: ["\(readiness.mood)"]),
-        StudentStrings.replacing(.myProfileV3Presentation003, values: ["\(readiness.stress)"]),
+          .myProfileV3Presentation001, values: ["\(readiness.sleepQuality)"], locale: locale),
+        StudentStrings.replacing(
+          .myProfileV3Presentation002, values: ["\(readiness.mood)"], locale: locale),
+        StudentStrings.replacing(
+          .myProfileV3Presentation003, values: ["\(readiness.stress)"], locale: locale),
       ]
     }
     return [
       profile.dailyLifeIntensity.map {
-        OnboardingLabels.scaleLabel(
-          OnboardingLabels.dailyLifeIntensityLabels,
-          notch: $0
-        ) + StudentStrings.localized(.myProfileV3Presentation004)
+        StudentStrings.replacing(
+          .myProfileV3Presentation004,
+          values: [
+            OnboardingLabels.scaleLabel(
+              OnboardingLabels.dailyLifeIntensityLabels(locale: locale), notch: $0)
+          ],
+          locale: locale)
       },
       profile.lifeStress.map {
-        OnboardingLabels.scaleLabel(OnboardingLabels.lifeStressLabels, notch: $0)
-          + StudentStrings.localized(.myProfileV3Presentation005)
+        StudentStrings.replacing(
+          .myProfileV3Presentation005,
+          values: [
+            OnboardingLabels.scaleLabel(
+              OnboardingLabels.lifeStressLabels(locale: locale), notch: $0)
+          ],
+          locale: locale)
       },
       profile.recoverySpeed.map {
-        OnboardingLabels.scaleLabel(OnboardingLabels.recoverySpeedLabels, notch: $0)
-          + StudentStrings.localized(.myProfileV3Presentation006)
+        StudentStrings.replacing(
+          .myProfileV3Presentation006,
+          values: [
+            OnboardingLabels.scaleLabel(
+              OnboardingLabels.recoverySpeedLabels(locale: locale), notch: $0)
+          ],
+          locale: locale)
       },
     ]
     .compactMap { $0 }
