@@ -7,7 +7,7 @@
 ## 🎯 目标：1.0 (24)
 - 基底：`beta/1.0-23` @ `4e97a489`；David 于 2026-10-01 确认 1.0(23) 已 Archive 上传，内容已挪入 [RELEASES.md](./RELEASES.md)。
 - build 号：24（尚未 bump，切包时用 agvtool 单源更新），marketing version 保持 1.0；原 23 tag 不变。
-- 发版线：`release/1.0`；截至 2026-10-03 tip `40dfe751`，落线候选见下。
+- 发版线：`release/1.0`；截至 2026-10-03 tip `3bec95a8`，落线候选见下。
 - 落线 ≠ 自动进包：切包前由 David 圈选；延期候选不自动进入本包。
 
 ## 本版将包含
@@ -18,6 +18,7 @@
   - 证据：[SPEC](specs/084-walkthrough-polish/SPEC.md) 与同目录各卡收货记录。只在模拟器用 Demo 数据验过；Global 包登录页 2026-10-03 已在模拟器实屏核对顺序。
 - **长按完成后立即弹奖励页、后台同步（#350，T1·P1，同上落线）**：失败或 30 秒超时回滚本地完成状态并提示。收货时见过一次主线程卡死，排障未复现（探针 130 次 + 实屏 1 次），David 拍板不阻塞；记录见 [收货记录](specs/084-walkthrough-polish/ACCEPTANCE-INSTANT-COMPLETION-ios.md) 与 [排障记录](docs/diagnose/completion-hang-2026-10-03.md)。**切包后真机留意完成流程是否卡死。**
 - **组录入页视频行按钮英文文案 "Change" → "Replace"（#351，T0·P1，2026-10-03 落线）**：与 spec 084 设计稿一致，中文"更换"不变。
+- **使用数据告知：按轨道取文案、保留期如实表述、弹层不再截断（#352，T1·P1，2026-10-03 落线 `3bec95a8`）**：Global 轨改为"存放在美国的 DigitalOcean"；两轨去掉"保留 90 天"（后端从未有到期清理），改为"账号存续期间保留，删号后与账号断开关联成为匿名记录"，与官网隐私政策口径一致（官网同步见 meetpr-site#1，未发布）；弹层高度随内容自适应、正文可滚动。模拟器全新安装 Global 包已看（含最大字号）；CN 轨只有单测覆盖。卡与定稿原文见 [CARD](specs/084-walkthrough-polish/CARD-USAGE-NOTICE-ios.md)。
 
 ## 延期候选（未排期，前置解锁后另行排期）
 
