@@ -20,7 +20,8 @@ struct RestTimerPreferenceRow: View {
     NavigationLink {
       RestTimerSettingsView(preference: preferenceBinding)
     } label: {
-      MyProfileValueRow(label: StudentStrings.localized(.restTimerPreferenceRow001), value: summary)
+      MyProfileValueRow(
+        label: StudentStrings.localized(.restTimerPreferenceRow001), value: summary, inline: true)
     }
   }
 

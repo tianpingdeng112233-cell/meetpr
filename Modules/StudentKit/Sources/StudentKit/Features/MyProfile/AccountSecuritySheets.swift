@@ -131,9 +131,6 @@ struct AccountSecuritySection: View {
   ) -> some View {
     Button(action: action) {
       HStack(spacing: MeetPRSpacing.point13) {
-        Image(systemName: icon)
-          .font(.system(size: MeetPRFontMetrics.size20))
-          .frame(width: 20)
         Text(title)
           .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .semibold))
         Spacer()

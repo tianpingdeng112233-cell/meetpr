@@ -9,6 +9,9 @@ import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct StudentRootView: View {
+  private let loginIdentifier: String
+  private let profileCoach: ActiveCoachContext?
+  @State private var profileNavigationActive = false
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
@@ -75,6 +78,7 @@ public struct StudentRootView: View {
   // swiftlint:disable:next function_body_length
   public init(
     studentID: UUID = StudentDemoSeed.studentID,
+    loginIdentifier: String = "",
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
@@ -104,6 +108,8 @@ public struct StudentRootView: View {
     onBindingInvalidated: @escaping @Sendable () async -> Void = {},
     pushRoute: Binding<PushRouteIntent?> = .constant(nil)
   ) {
+    self.loginIdentifier = loginIdentifier
+    self.profileCoach = activeCoach
     self.studentID = studentID
     self.plans = plans
     self.logs = logs
@@ -266,7 +272,8 @@ extension StudentRootView {
       .studentTabLayer(shell.layer(for: .growth), store: tabHostStore)
 
       MyProfileView(
-        studentID: studentID,
+        studentID: studentID, loginIdentifier: loginIdentifier, activeCoach: profileCoach,
+        onNavigationChanged: { profileNavigationActive = $0 },
         plans: plans,
         e1rm: e1rm,
         onboarding: onboarding,
@@ -284,29 +291,31 @@ extension StudentRootView {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .buttonStyle(PressScaleButtonStyle())
     .safeAreaInset(edge: .bottom, spacing: 0) {
-      MeetPRTabBar(
-        selection: Binding(
-          get: { selectedTab },
-          set: { tab in
-            if tab == .training { trainingJumpToken += 1 }
-            selectedTab = tab
-          }
-        ),
-        items: [
-          MeetPRTabBarItem(
-            id: .today, title: StudentStrings.localized(.studentRootView001), icon: .today),
-          MeetPRTabBarItem(
-            id: .training, title: StudentStrings.localized(.studentRootView002), icon: .training),
-          MeetPRTabBarItem(
-            id: .growth, title: StudentStrings.localized(.studentRootView003), icon: .growth),
-          MeetPRTabBarItem(
-            id: .profile,
-            title: StudentStrings.localized(.studentRootView004),
-            icon: .profile,
-            badge: 0
+      if selectedTab != .profile || !profileNavigationActive {
+        MeetPRTabBar(
+          selection: Binding(
+            get: { selectedTab },
+            set: { tab in
+              if tab == .training { trainingJumpToken += 1 }
+              selectedTab = tab
+            }
           ),
-        ]
-      )
+          items: [
+            MeetPRTabBarItem(
+              id: .today, title: StudentStrings.localized(.studentRootView001), icon: .today),
+            MeetPRTabBarItem(
+              id: .training, title: StudentStrings.localized(.studentRootView002), icon: .training),
+            MeetPRTabBarItem(
+              id: .growth, title: StudentStrings.localized(.studentRootView003), icon: .growth),
+            MeetPRTabBarItem(
+              id: .profile,
+              title: StudentStrings.localized(.studentRootView004),
+              icon: .profile,
+              badge: 0
+            ),
+          ]
+        )
+      }
     }
     .task {
       handlePushRoute(pushRoute)
