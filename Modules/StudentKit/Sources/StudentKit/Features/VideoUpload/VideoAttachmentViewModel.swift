@@ -16,6 +16,7 @@ public final class VideoAttachmentViewModel {
   public static let consentDefaultsKey = "video_upload_consent_v1"
 
   let maxDurationSeconds: Double
+  private(set) var hasLoadedAttachments = false
   public private(set) var rowStates: [UUID: RowState] = [:]
   public private(set) var lastErrorMessage: String?
   public private(set) var retryErrorMessage: String?
@@ -64,12 +65,16 @@ public final class VideoAttachmentViewModel {
     }
 
     await manager.recoverInterruptedUploads(studentID: studentID)
-    for attachment in await manager.attachments(studentID: studentID) {
+    guard let attachments = try? await manager.repository.fetchAll(studentID: studentID) else {
+      return
+    }
+    for attachment in attachments.sorted(by: { $0.recordedAt > $1.recordedAt }) {
       rowStates[attachment.setLogID] = RowState(
         attachment: attachment,
         progress: attachment.status == .uploaded ? 1 : 0
       )
     }
+    hasLoadedAttachments = true
   }
 
   // MARK: - Actions

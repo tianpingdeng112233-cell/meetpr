@@ -7,6 +7,34 @@ import Testing
 
 @MainActor
 @Suite struct TodayWorkoutQuickLogTests {
+  @Test func unrecordedAccessoryQuickLogPreservesPrescribedAndFallbackRPE() async throws {
+    let studentID = StudentDemoSeed.studentID
+    let exercise = Exercise(
+      id: UUID(), name: "Row", exerciseType: .accessory, isCompetitionLift: false,
+      muscleGroups: [], equipment: [], createdAt: quickLogNow)
+    let planExercise = StudentPlanExercise(
+      id: UUID(), exercise: exercise, sequenceIndex: 0,
+      prescribedSets: [
+        PrescribedSet(id: UUID(), setIndex: 0, weightKg: 60, reps: 12, rpe: 7),
+        PrescribedSet(id: UUID(), setIndex: 1, weightKg: 60, reps: 12),
+      ])
+    let day = StudentPlanDay(id: UUID(), date: quickLogNow, exercises: [planExercise])
+    let plan = StudentPlanView(cycleID: UUID(), weekIndex: 1, startDate: quickLogNow, days: [day])
+    let logs = InMemoryStudentTrainingLogRepository()
+    let model = TodayWorkoutViewModel(
+      plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+      logs: logs, now: { quickLogNow })
+    await model.load(dayID: day.id, studentID: studentID)
+    let drafts = try #require(model.currentDrafts)
+    #expect(drafts.allSatisfy { $0.loggedSetID == nil && !$0.completed })
+    let quickLog = makeQuickLogTestPlan(drafts: drafts)
+    #expect(quickLog.rows.map(\.draft.actualRPE) == [7, 8])
+    #expect(await model.quickLog(plan: quickLog) == .completed)
+    let stored = try await logs.fetchLogsForExercise(
+      studentID: studentID, planExerciseID: planExercise.id)
+    #expect(stored.sorted { $0.setIndex < $1.setIndex }.map(\.rpe) == [7, 8])
+  }
+
   @Test func prescribedQuickLogRecordsEverySetCompletesDayAndRecordsE1RM() async throws {
     let logs = InMemoryStudentTrainingLogRepository()
     let e1rm = InMemoryE1RMRepository()

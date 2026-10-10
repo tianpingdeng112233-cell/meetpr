@@ -49,6 +49,8 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   let onComplete: () -> Void
   let onUndoCompletion: () -> Void
   let onShowReview: () -> Void
+  var accessoryViewModel: TodayWorkoutViewModel?
+  var accessoryPreviousLogs: [UUID: [Int: StudentSetLog]] = [:]
   var sequencePage: TrainingSequencePage?
   var gymDayToday: Date = WorkoutDatePolicy.gymDayToday()
 
@@ -135,7 +137,9 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
           onVideoAction: onVideoAction,
           showsAskCoach: showsAskCoach,
           isPreparingAskCoach: isPreparingAskCoach,
-          onAskCoach: onAskCoach
+          onAskCoach: onAskCoach,
+          accessoryViewModel: accessoryViewModel,
+          accessoryPreviousLogs: accessoryPreviousLogs
         )
 
         if presentation.heroMode == .recording {
@@ -184,7 +188,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
 
 /// Preserves the standard-size header and gives accessibility text the full
 /// card width, with the same single ask-coach button below it.
-private struct TodayWorkoutRecordingHeader: View {
+struct TodayWorkoutRecordingHeader: View {
   let exerciseName: String
   let showsAskCoach: Bool
   let isPreparingAskCoach: Bool
@@ -485,6 +489,9 @@ private struct TodayWorkoutHero: View {
   let isPreparingAskCoach: Bool
   let onAskCoach: () -> Void
 
+  var accessoryViewModel: TodayWorkoutViewModel?
+  var accessoryPreviousLogs: [UUID: [Int: StudentSetLog]] = [:]
+
   var body: some View {
     ZStack(alignment: .leading) {
       Color.MeetPR.bgInset
@@ -550,7 +557,16 @@ private struct TodayWorkoutHero: View {
 
   @ViewBuilder
   private var recordingHero: some View {
-    if let row = presentation.currentRow,
+    if let exercise = presentation.accessoryExercise(isEditable: isEditable),
+      let accessoryViewModel
+    {
+      AccessoryWorkoutHero(
+        exercise: exercise, exerciseTotal: presentation.exercises.count,
+        accessoryViewModel: accessoryViewModel,
+        previousLogs: accessoryPreviousLogs[exercise.id] ?? [:],
+        showsAskCoach: showsAskCoach, isPreparingAskCoach: isPreparingAskCoach,
+        onAskCoach: onAskCoach, onEdit: onEdit)
+    } else if let row = presentation.currentRow,
       let exercise = presentation.exercises.first(where: { $0.id == row.draft.planExerciseID })
     {
       // The design's recording state shows the active set card and the

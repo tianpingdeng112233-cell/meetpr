@@ -192,6 +192,13 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     heroMode == .recording && hasAnyLoggedSet
   }
 
+  func accessoryExercise(isEditable: Bool) -> Exercise? {
+    guard isEditable, day.completedAt == nil, heroMode == .recording,
+      !progress.allDone, let currentRow, currentRow.draft.isAccessory
+    else { return nil }
+    return exercises.first { $0.id == currentRow.draft.planExerciseID }
+  }
+
   func allowsQuickLog(isEditable: Bool) -> Bool {
     heroMode == .list && isEditable
   }

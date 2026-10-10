@@ -4,11 +4,13 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct RestTimerSettingsView: View {
   @Binding var preference: StudentRestTimerPreference
+  @Binding var accessorySeconds: Int
   @State private var expandedBand: RestTimerBand?
 
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.space5) {
+        RestTimerSectionTitle(StudentStrings.localized(.accessoryMainLifts))
         RestTimerModeCard(selection: modeBinding)
 
         if case .custom = preference {
@@ -38,6 +40,8 @@ struct RestTimerSettingsView: View {
           RestTimerSectionTitle(StudentStrings.localized(.restTimerSettingsView002))
           RestTimerAutomaticRulesCard()
         }
+
+        AccessoryRestSettings(seconds: $accessorySeconds)
 
         Text(StudentStrings.localized(.restTimerSettingsView003))
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))

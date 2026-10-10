@@ -231,6 +231,8 @@ private enum EmptyStateViewTestError: Error {
 }
 
 private struct EmptyStateRestTimerSettingsStore: StudentRestTimerSettingsStoring {
+  func accessorySeconds(for studentID: UUID) -> Int { 60 }
+  func setAccessorySeconds(_ seconds: Int, for studentID: UUID) {}
   func preference(for studentID: UUID) -> StudentRestTimerPreference {
     .automatic
   }
