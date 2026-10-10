@@ -78,7 +78,7 @@ struct GrowthE1RMCard: View {
       switch snapshot.cardState {
       case .zero:
         GrowthZeroTrainingState(
-          showsAction: isGlobalTrainingEmpty && snapshot.family == .squat,
+          showsAction: isGlobalTrainingEmpty,
           onOpenToday: onOpenToday
         )
         .frame(height: 228)

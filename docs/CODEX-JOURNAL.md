@@ -507,3 +507,111 @@
 - `MeetPR-DemoStudent` / DemoStudent 在 **iPhone Air、iOS 26.5** 重新 build_run_sim，158.3 秒，**BUILD SUCCEEDED、0 warnings**，安装并运行成功；日志 `.build/spec085-evidence/r1-build.log`。启动参数为 `-spec085-profile legacy`；英文 `-AppleLanguages '(en)' -AppleLocale en_US -meetpr.appearance light`，中文 `-AppleLanguages '(zh-Hans)' -AppleLocale zh_CN -meetpr.appearance dark`。
 - 已亲看两种主题：Meet 移除入口浅色为深红、深色为浅红；英文体重页为 Body weight 导航标题 / Weight 字段标题，中文字段为体重。四张截图及同名语义快照：`.build/spec085-evidence/r1-meet-en-light.jpg`、`r1-meet-zh-dark.jpg`、`r1-weight-en-light.jpg`、`r1-weight-zh-dark.jpg`。未在本轮保存或移除 Demo 档案。
 - 本轮增量只读复审 **0 findings**。两项返修均完成，无新增待决策问题；先前记录的其他验证缺口不在本轮范围。未 commit、未 push，未改发布文件、build 号或 SPEC。
+## spec 087 iOS
+
+### 开工基线（2026-10-10，代码修改前）
+
+- 工作树 `MeetPR-wt-085`，分支 `feat/087-progress-menu`，HEAD `d07e328c`，开工工作区干净；临时文件试写并删除成功。
+- 默认 MeetPR-DemoStudent，iPhone 17e / iOS 26.5：Squat **187.5 kg**、Bench press **118.6 kg**、Deadlift **178.5 kg**；Big-three e1RM total **484.6 kg**；Training 1RM total **520 kg**；训练次数 **2**、训练周 **1**、总容量 **3,525 kg**；反馈 **3 条 / 2 未读**。强度未解锁，原页显示 Complete 3 workouts to unlock trends。
+- 截图与原始 UI 快照：`.build/spec087-evidence/baseline-progress-top.jpg`、`baseline-comparison.jpg`、`baseline-stats.jpg`、`baselineTop.json`、`baselineBottom.json`、`baselineStats.json`。默认 Demo 有多周 e1RM 点，但训练日志只有一周两次；多周训练验收需额外启动参数场景，不能把默认 Demo 称作多周训练。
+- 安卓只读参照 `meetpr-rn@137d816`。iOS 原对比卡还有逐项比较条，原强度图也保留本平台画法，按卡的“现有 / 原样”边界保留；三段大号值、主线、低置信度与来源详情不改。
+
+### 已确认的实现边界
+
+- `StudentStrings.swift` 是现有本地化唯一边界，卡的 Resources 新增词条必须在那里增加 typed key 与复数入口，属于明确的小范围接线扩展。新增 sessions / new 使用 xcstrings plural 变体，不用英文拼接判断；macOS SwiftPM 未编译 xcstrings，沿现有 catalog fallback 路径读取复数变体。
+- Demo 参数场景需要在现有 `Demo/` 种子和 `MeetPR/Sources/` 的 DEMO_MODE 依赖装配接入；计划只加参数分支，默认种子、线上依赖、存储键与结构不变。此为共同约定明确授权的验证场景扩展，不改 CoachKit。
+- seam 5 的原要求是“现有测试不改断言而保持通过”；不故意破坏既有源码或断言制造红例，将保存修改前与修改后的原始回归输出，明确它是兼容性绿→绿，非新增行为红→绿。
+
+### 改动文件与复用接口
+
+以下均为本次未提交工作区改动，节奏 T2 / P1；未 commit / push，未改 SPEC、发版台账、build 号、后端或 CoachKit。
+
+- `MeetPR/Sources/MeetPRApp.swift`：仅 DEMO_MODE 的日志仓储参数场景装配。
+- `Modules/StudentKit/Sources/StudentKit/Demo/{StudentDemoSeed,ProgressDemoScenario}.swift`：默认种子保持原值，显式参数才注入边界场景。
+- `Modules/StudentKit/Sources/StudentKit/Features/Shared/StudentMenuRow.swift`：供 087 / 088 共用的导航行。
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryView.swift`：根页变为四行，NavigationStack 推入各目的页，保留刷新和通知入口。
+- 同目录 `ProgressMenuContent.swift`、`ProgressMenuValues.swift`、`ProgressDataModel.swift`：菜单顺序 / 路由、值派生、共享现有 history / growth / feedback view model。
+- 同目录 `ProgressE1RMPage.swift`、`ProgressE1RMSelection.swift`、`GrowthTotalPresentation.swift`、`GrowthTotalCard.swift`：四段与共用范围、Total 每日沿用求和及展示；单项仍调用原卡与原来源弹层。
+- 同目录 `ProgressDetailPage.swift`：二级页共同加载 / 重试外壳与强度页，直接使用原 `VolumeIntensityChart`。
+- 同目录 `GrowthComparisonCard.swift`、`GrowthHistoryStatsCard.swift`、`GrowthScreenHeader.swift`：从原根页提取现有组件；统计零训练显示 `—`，页头释义移入 e1RM 页。
+- 同目录 `AllHistoryScreen.swift`：原列表前放三格统计；`GrowthE1RMCard.swift`：仅去掉零训练按钮限定为 squat 的条件。
+- `Modules/StudentKit/Sources/StudentKit/StudentStrings.swift`、`Resources/Localizable.xcstrings`：新增 11 个安卓同文案词条，sessions / new 用 plural；既有词条语义改动 0（`localization-audit.json`）。
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/{GrowthTotalTests,ProgressMenuTests,ProgressMenuNavigationTests,ProgressE1RMSelectionTests}.swift`：6 个新增 Swift Testing 测试，限卡指定的五个 seam。
+- `docs/CODEX-JOURNAL.md`：本节。
+
+088 直接调用 `StudentMenuRow(icon:title:value:valueColor:action:)`：`icon` 为 SF Symbol 名，`title` 为已经本地化的名称，`value: String?` 默认 nil，`valueColor: Color` 默认 `.MeetPR.textMuted`，`action: () -> Void`。名称与值各自按完整单行测量；总宽放不下时只把值整体放到名称下面并左对齐，无截断、词内折行、缩小。整行 Button，读屏合并“名称，值”；图标 / 箭头不重复朗读。无路由、数据源或 Profile 专属逻辑。
+
+### 五处 seam 与原始输出
+
+证据根目录均为 `.build/spec087-evidence/`，不是发布资产；既有测试断言删改 **0**，不存在需说明“旧值→新值”的条目。
+
+| seam | 红与绿 | 结果与边界 |
+| --- | --- | --- |
+| 1 Total 纯函数 | `seam1-red.log` → `seam1-green.log` | 新类型未实现先编译红，1 个测试绿；`seam1-date-red.log` 记录日期被错误归零的失败，修为保留当日最后更新点时间戳。覆盖缺项、齐全日起、沿用、同日合并、低置信度与当前值。 |
+| 1 真实打卡补验 | `seams-integration.log` → `seams-integration-green.log` | 新增真实 `E1RMRecorder` → repository → `GrowthCurveViewModel` → snapshot 路径。首轮 fixture 未使用计划内 exercise ID 导致零点，修正 fixture 后 6 个新增测试全部绿；未改生产算法。正常点逐日为 450 / 460 / 450 / 460，低置信度 900 不参与；headline 475 与 comparison 相等。 |
+| 2 菜单值 | `seam2-red.log` → `seam2-green.log` | 新类型缺失红 → 1 个测试绿，涵盖中英文、单 / 复数、空 / 未读 / 全读、RPE 有 / 无 / 未解锁。 |
+| 3 入口渲染与路由 | `seam3-red.log` → `seam3-green.log` | 新类型缺失红 → 1 个参数化测试（2 cases）绿；挂载真实四行组件，检查顺序 / 名称、四个点击目标、无图表、加载 / 失败仍可点。 |
+| 4 e1RM 状态 | `seam4-red.log` → `seam4-green.log` | 新状态类型缺失红 → 2 个测试绿；默认 Total、范围循环且切段保持、对比 / 来源策略、三个 lift 的零训练 Today 按钮（3 cases）。 |
+| 5 既有回归 | `seam5-before.log` → `studentkit-native-final.log` | 修改前相关子集 42/42；修改后纳入全量 948/948。此 seam 按卡“不改断言保持通过”，记录绿→绿，不伪造红例。 |
+
+- 最终 StudentKit：XcodeBuildMCP `swift_package_test(packagePath: …/Modules/StudentKit)`，**948 passed / 0 failed / 0 skipped，44 suites**；`studentkit-native-final.log`、`studentkit-native-result.json`。其余 SPM 包未改源文件，无需新增包级测试。
+- 沙箱 shell 全量原始结果：`studentkit-shell-full.log`，948 项中出现 15 个 `Cannot Encode` 视频编码 issue；原生入口最终全部通过，不豁免 / 删除这些测试。初次 native 调用因配置 DemoStudent 不适用 SwiftPM 而校验失败，随后切 Debug；缓存路径别名曾导致 Clang module 重复，清理生成缓存后重跑通过，均非代码测试失败。
+- 复用 `.build/DerivedData` 与 `.build/spec085-tests`。为工具没有 scratch 参数的入口，包内既有 `.build` 仅保留指向指定 scratch 内容的链接；删除重复的约 746 MB 缓存，没有再建一套编译缓存。
+- 最终 23 个变更 Swift 文件：`swift-format lint --strict` 与 `swiftlint lint --strict` **0 违规**，`format-final.log`、`lint-final.log`；文件表 `swift-files.txt`，`git diff --check` 通过。原生包编译有既有 Reminder / Video / Onboarding 测试警告，未扩范围修改。
+- MeetPR-DemoStudent / DemoStudent，iPhone 17e / iOS 26.5，最终 `build-final.log` 构建成功、0 build warnings。
+- 独立只读 Standards 与 Spec 审查均 0 findings；图表修正后两路定向复审仍 CLEAN。这是开发自审，不代替 Opus 按原验收清单收货。
+
+### 实屏发现与修复
+
+Total 的 Swift Charts 节点 overlay annotation 在 iOS 26.5 上稳定造成界面无响应：默认 Total 30 天→90 天即可复现，或单项 All history→Total；`total-chart-repro.json` / `total-all-settled.json` 为 AX 0 targets 的红例。按 diagnosing-bugs 流程先验证固定高度（仍卡，`total-fixed-height-chart.json`），再单独移除 annotation（恢复，`total-no-annotation.json`）。最终用同坐标两层 PointMark 画空心历史点，末点保持实心，恢复原宽高比；`total-chart-final` / `total-all-final` 证明原路径恢复、切段后范围保持。没有临时日志或算法改动；此为卡内新图表渲染问题，回归 seam 是实际 iOS UI，纯状态单测无法捕获 Swift Charts 布局挂起。系统 `sample` 被沙箱拒绝，未声称取得堆栈定位。
+
+### Demo 参数
+
+仅 `MeetPR-DemoStudent` 显式加 `-spec087-progress <值>` 才生效；不带参数仍是开工默认 Demo，无线上数据 / 存储结构变化。
+
+| 值 | 场景 |
+| --- | --- |
+| `missing-lift` | 缺 Deadlift，Total 空态明确列缺项；有训练时单项零数据不出现 Today 按钮。 |
+| `squat-only` | 四周 / 4 次，最近一天仅 Squat 160；Bench 最新 101、历史大号 102；Deadlift 最新 202、历史大号 205。Total 曲线末点 463、headline 467。 |
+| `zero` | 零日志 / 零 e1RM，保留默认反馈 3 / 2，因此入口恰好三个 `—`。 |
+| `single` | 一次日志，完整三项趋势；检验 `1 session` 和强度未解锁。 |
+| `forming` | 一次日志、每项一个点，三项均为 1/3 成形中；Total 范围不足。 |
+| `sparse` | 每项三个相同值，Total 及单项范围不足。 |
+| `all-read` / `no-feedback` | 反馈全部已读 / 没有反馈。 |
+| `multiweek` | 四周 / 4 次 / 2,000 kg，Total headline 462、曲线末点 455，RPE 8.0。 |
+| `four-digit` | squat-only 重量乘 3，headline 1,401.0、曲线末点 1,389，用于大小屏 / 字号。 |
+| `no-rpe` | 四周日志均无 RPE，强度入口 `—`，仍可进入现有柱图。 |
+| `loading` / `load-failure` | 日志读延迟 8 秒 / 抛离线错误；失败持续存在直到去掉参数重启，供加载与重试观察。 |
+
+语言 / 主题 / 字号使用进程参数，如 `-AppleLanguages (en) -AppleLocale en_US -meetpr.appearance light -UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityL`；中文为 `(zh-Hans)` / `zh_CN`，深色为 `dark`。未重置、关闭或操作 086 的模拟器。
+
+### 第一步验收 1–12 开发自测
+
+以下名称均指证据根目录下同名 `.jpg` 与 `.json`，除特别说明外为实际模拟器导航后的截图与 AX 快照。未改 SPEC 勾选项，不把开发自测称作终审。
+
+| 项 | 自测结论与证据 |
+| --- | --- |
+| 1 四行入口 | 通过。仅页头与 e1RM / Training history / Coach feedback / Intensity metrics，顺序、图标、值、箭头完整，无图表 / 三格 / Body weight。`default-menu-en`、`default-menu-zh.jpg`。 |
+| 2 右侧值各状态 | 通过。默认 484.6 / 2 sessions / 2 new / —；`forming-menu` 为 1 session；`missing-menu` Total —；`zero-menu` 三个 —；`feedback-read-complete` 与 `all-read-flag-menu` 为反馈总数 3；`no-feedback-menu` 为 —；`multiweek-menu` 为 RPE 8.0；`no-rpe-menu` 为 —。中文对应 `menu-zh-dark-large`。 |
+| 3 四段与范围 | 通过。初进 / 返回再进 Total + 30 days；30→90→All history→30；90 天单项切 Total、All history 单项切 Total 均保留范围。`default-total`、`default-squat-90`、`range-all`、`total-chart-final`、`total-all-final`、`reentry-total`；纯状态测试另覆盖循环。 |
+| 4 Total 口径 | 数值 / 序列 / 缺项自测通过。`squat-only-{total,squat,bench,deadlift}`：大号 160 + 102 + 205 = 467，入口与对比 467；曲线末点 160 + 101 + 202 = 463，相比首点 450，变化 +13。真实打卡 seam 验证每个更新日出点及低置信度不参与。`missing-total` 明确 Still missing: Deadlift；`zero-total` 列全部缺项；`constant-total-sparse` 为范围不足。Total 代码无手势 / 点选 callback，AX 无来源按钮；**未做曲线坐标点按实测**：MCP 只接受交互元素 ref，Computer Use 对 Simulator 返回未授权，因此未越过该权限边界。 |
+| 5 对比仅 Total | 通过。Total 保留原 484.6 / 520 两值与逐项条，深蹲超过时原绿色 104% 行仍在；其他三段没有对比。`default-total`、`default-{squat,bench,deadlift}`、`total-chart-final`。 |
+| 6 三段四态与来源 | 通过。三段均看过零数据（`zero-{squat,bench,deadlift}`）、成形中（`forming-{squat,bench,deadlift}`）、范围不足（`default-{squat,bench,deadlift}`）、曲线（`squat-only-{squat,bench,deadlift}`）。零训练三段均有 Today 按钮，有日志而缺硬拉则没有（`missing-deadlift`）。来源改前 / 改后 `baseline-source` / `default-source-after`：10/7、187.5 kg、深蹲第 3 组、142.5×5、RPE 7.5、76%、142.5÷0.76，逐项一致。 |
+| 7 历史三格与双入口 | 通过。`default-history`、`training-history-entry` 都是 2 / 1 / 3,525 kg，与基线一致；列表内容和筛选保留。`zero-history` 三个 — 与既有空态；`multiweek-history` 为 4 / 4 / 2,000 kg。 |
+| 8 反馈与已读回流 | 通过。新行推入现有 FeedbackInboxView，3 条；逐条进入详情后返回从 2 未读→1 未读→总数 3，`default-feedback`、`feedback-all-read-return`（中间态为 1）、`feedback-read-complete`。Today 仍按 iOS 原交互先展开卡，再进入同一 FeedbackDetailView（`today-feedback` / `today-feedback-open`）；未把 Today 改成安卓的整个收件箱入口，见差异说明。 |
+| 9 强度页 | 通过。`intensity-en-large` 四周柱 + RPE 线 + 原图例；`default-intensity-locked` / `zero-intensity` 保留 Complete 3 workouts to unlock trends；`no-rpe-intensity` 保留原柱图无 RPE 数据的画法。原图源文件没有改动。 |
+| 10 加载 / 失败 / 刷新 | 通过所要求的状态与点击自测。`loading-menu` 值留空、四行可点，`loading-e1rm` 等待态；注入 URLError 离线错误后 `failure-menu` 值留空 + Failed to load · Retry。四行逐个进入 `failure-{e1rm,history,feedback,intensity}` 均不崩溃，各自加载失败或已有数据。点击 Retry 和下拉后仍处持续离线态（`failure-after-retry-refresh`）；正常多周场景下拉后值保持（`multiweek-after-refresh`）。没有切断真实网络，也没有宣称验证同一进程断网再联网恢复。 |
+| 11 升级第一屏 | **部分覆盖**。修改前默认 Demo 基线已在开工保存；构建覆盖安装而未卸载 / 清数据后，Total / 三段数值 / 2 次 / 1 周 / 3,525 kg / 3 反馈与 2 未读全部一致。零训练三个 — 和页面空态已验。默认 Demo 只有一周两次，新增 `multiweek` 证明四周场景的新页面派生值，但没有修改前同一多周场景的覆盖安装证据；因此不把“升级前已有多周训练”这一前提记为完成。 |
+| 12 主题 / 小屏 / 字号 | 通过共同约定允许的替代设备检查：没有已安装 SE，使用可用最小 iPhone 17e（390×844）。英文 Light 普通字号 `default-menu-en`，英文 Light accessibility-large `menu-en-light-large`，中文 Dark accessibility-large `menu-zh-dark-large`；四位数 1,401.0 kg 入口值完整，名称不截 / 不缩，宽度不足时值整体下一行。未做真实 SE 或穷举所有语言×主题×字号组合。 |
+
+大字号补修：`total-zh-dark-large` 暴露新增 Total 数字被 delta 挤成两行；仅新 Total 卡用 AnyLayout 在 accessibility 字号下把变化量放到数字下方，并令重量单行。`total-zh-dark-large-fixed` 的 1,401.0 kg 完整；普通字号仍同行。随后全量 948/948、严格 lint / format 与原生构建再次通过，Standards 定向复审 0 findings。原对比卡在此字号 / 四位数下仍会折行，按“原样搬入”边界记录，不在本卡改旧组件布局。
+
+### 与安卓差异、范围外问题与待补验证
+
+- 保留 iOS 原三段文案（包括英文 Bench press）、原四态 / 来源弹层与卡内轴线画法；切换按钮的 Bench 取安卓词条。既有 e1RM 释义和范围不足提示不替换成安卓排版文案。
+- Total 对比两格继续使用 iOS 原卡，包含逐项对比条与逐项突破文案；没有换成 RN 两张独立 StatTile + 合计百分比的表现。强度图完整复用 iOS 原柱线与图例。二级页保留现有底部 Tab 栏。
+- Today 反馈卡保留“展开→单条详情”现状；Progress 行进入现有反馈收件箱，再进入同一个详情。Today 详情路径的既有已读处理与收件箱路径不同，此次未动 Today / FeedbackInbox 功能。
+- 原对比卡的大字号四位数折行、默认 Demo 仅一周两次的基线限制均未隐藏；多周 Demo 的历史统计来自四周日志，旧历史列表仍照原计划分组，未为场景改列表算法。
+- 没有新增产品决策或接口 / 存储问题需要 David 裁决。待 Opus 补验的是第 4 项物理坐标点按，以及第 11 项严格的升级前多周训练前提；第 12 项采用共同约定的小屏替代。未扩到第二步体重、测试 seam 6–8 或验收 14–21。
+- 证据根目录 `.build/spec087-evidence/`；核心日志为 `studentkit-native-final.log`、`studentkit-shell-full.log`、`build-final.log`、`format-final.log`、`lint-final.log`，五 seam 原始日志见上表；审查摘要 `review-results.txt`。截图仅存文件，不进入产品资源或正典发布台账。
+- 最后复位：去掉所有场景 / 语言 / 字号参数重新启动，`final-default-menu` 仍为 484.6 / 2 次训练 / 2 未读 / —，`final-default-total-90` 可正常显示曲线；已实际点过零训练 Deadlift 的 Today 按钮（`zero-today-action`）。交付时停在默认 Progress 入口。分支仍 `feat/087-progress-menu` @ `d07e328c`，25 个工作区文件，提交数未增加；完整工作区补丁 `spec087-working-tree.diff`。

@@ -62,6 +62,9 @@ public enum StudentDemoSeed {
     weekIndex: Int = 1,
     includeToday: Bool = true
   ) -> [StudentSetLog] {
+    if let scenario = ProgressDemoScenario.launchValue {
+      return scenario.logs(studentID: studentID)
+    }
     let plan = makePlanView(weekIndex: weekIndex)
     // W1D1–D2 are complete; W1D3 is deliberately partial so reopening the
     // demo proves that partial logs do not advance the sequence cursor.
@@ -93,7 +96,7 @@ public enum StudentDemoSeed {
     let plan = makePlanView()
     let linkedExerciseID = plan.days.first?.exercises.first?.id
     let newestFeedbackAt = Date().addingTimeInterval(-120)
-    return [
+    let items = [
       CoachFeedback(
         id: uuid(401),
         coachID: coachID,
@@ -125,6 +128,7 @@ public enum StudentDemoSeed {
         readAt: newestFeedbackAt.addingTimeInterval(-360)
       ),
     ]
+    return ProgressDemoScenario.launchValue?.feedback(items) ?? items
   }
 
   // swiftlint:disable:next function_body_length
@@ -305,6 +309,9 @@ public enum StudentDemoSeed {
   /// Three main-lift e1RM lines over ~4 weeks, plus one unacknowledged PR on
   /// the newest point so the launch re-surface path is exercised in DEMO_MODE.
   public static func makeE1RMHistory(studentID: UUID) -> [E1RMHistoryPoint] {
+    if let scenario = ProgressDemoScenario.launchValue {
+      return scenario.points(studentID: studentID)
+    }
     let baseline = Calendar(identifier: .gregorian).startOfDay(for: Date())
     return makeE1RMHistory(
       studentID: studentID,
