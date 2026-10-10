@@ -46,6 +46,19 @@ enum StudentStrings {
       self.countIndex = countIndex
     }
 
+    static let profileAbout = Key("student.profileAbout")
+    static let profileHealth = Key("student.profileHealth")
+    static let profileSettings = Key("student.profileSettings")
+    static let profileCoach = Key("student.profileCoach")
+    static let profileLocked = Key("student.profileLocked")
+    static let profilePreferences = Key("student.profilePreferences")
+    static let profileAccount = Key("student.profileAccount")
+    static let profileNotify = Key("student.profileNotify")
+    static let profileOneRMLabel = Key("student.profileOneRMLabel")
+    static let profileAdded = Key("student.profileAdded")
+    static let profileNoInjuries = Key("student.profileNoInjuries")
+    static let profileInjuries = Key("student.profileInjuries", one: "student.profileInjury")
+
     static let progressBench = Key("student.progressMenu.bench")
     static let progressE1rm = Key("student.progressMenu.e1rm")
     static let progressIntensity = Key("student.progressMenu.intensity")

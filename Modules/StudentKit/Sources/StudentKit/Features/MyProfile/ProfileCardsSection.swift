@@ -221,6 +221,7 @@ struct ProfileCardEditView: View {
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
             .foregroundStyle(Color.MeetPR.dangerMuted)
         }
+        if kind == .injuries { ProfileCoachNotificationNote() }
         GoldCTA(
           StudentStrings.localized(.profileCardsSection013),
           sub: nil,
