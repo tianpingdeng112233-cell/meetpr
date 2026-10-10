@@ -455,8 +455,10 @@ extension StudentRootView {
     nextWorkoutSource = .dashboard
     if let handoff {
       workoutPlanHandoff = handoff
+    } else {
+      workoutPlanHandoff = nil
+      trainingJumpToken += 1
     }
-    trainingJumpToken += 1
     selectedTab = .training
   }
 

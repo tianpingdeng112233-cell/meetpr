@@ -182,11 +182,18 @@ public struct MyProfileView: View {
         )
         MyProfileDivider()
         profileRow(
-          StudentStrings.localized(.myProfileView008),
+          StudentStrings.localized(.meetTitle),
           presentation.competition,
           kind: .competition,
           profile: profile,
           highlightedValue: presentation.competitionDate
+        )
+        MyProfileDivider()
+        profileRow(
+          StudentStrings.localized(.profileNote),
+          OnboardingSummaryFormatter.note(profile),
+          kind: .note,
+          profile: profile
         )
         MyProfileDivider()
         profileRow(

@@ -53,12 +53,14 @@ import Testing
 
 @Test func step7CompetitionDateIsConditionallyRequired() {
   var draft = OnboardingDraft()
-  #expect(!draft.isStepComplete(7))
+  #expect(draft.isStepComplete(7))
   draft.isCompeting = false
   #expect(draft.isStepComplete(7))
   draft.isCompeting = true
   #expect(!draft.isStepComplete(7))
   draft.competitionDate = "2026-07-25"
+  #expect(!draft.isStepComplete(7))
+  draft.targetWeightClass = "IPF · 83 kg"
   #expect(draft.isStepComplete(7))
 }
 
@@ -227,4 +229,95 @@ import Testing
     OnboardingDraft.earliestStep(forMissingFields: ["sleep_hours", "gender", "gym_tier"]) == 1)
   #expect(OnboardingDraft.earliestStep(forMissingFields: ["competition_date"]) == 7)
   #expect(OnboardingDraft.earliestStep(forMissingFields: ["mystery"]) == nil)
+}
+
+@Test func spec085MeetDraftRequiresCompleteSelectionAndClearsRemovedFields() {
+  var draft = OnboardingDraft()
+  #expect(draft.isStepComplete(7))
+  #expect(draft.patch(forStep: 7).isCompeting == .value(false))
+  draft.isCompeting = true
+  draft.competitionDate = DateOnly.string(from: Date())
+  #expect(!draft.isStepComplete(7))
+  draft.targetWeightClass = "IPF"
+  #expect(!draft.isStepComplete(7))
+  draft.targetWeightClass = "IPF · 83 kg"
+  #expect(draft.isStepComplete(7))
+  let patch = draft.patch(forStep: 7)
+  #expect(patch.isCompeting == .value(true))
+  #expect(patch.competitionDate == .value(DateOnly.string(from: Date())))
+  #expect(patch.targetWeightClass == .value("IPF · 83 kg"))
+  draft.isCompeting = false
+  let removed = draft.patch(forStep: 7)
+  #expect(removed.isCompeting == .value(false))
+  #expect(removed.competitionDate == .null)
+  #expect(removed.targetWeightClass == .null)
+}
+
+@Test func spec085BodyWeightFiltersAndRoundTripsInBothLocales() {
+  let english = Locale(identifier: "en_GB")
+  let german = Locale(identifier: "de_DE")
+  #expect(BodyWeightInput.filtered("83.256", locale: english) == "83.25")
+  #expect(BodyWeightInput.filtered("8a3..25x6", locale: english) == "83.25")
+  #expect(BodyWeightInput.filtered("83,256", locale: german) == "83,25")
+  #expect(BodyWeightInput.text(kg: 83, unit: .kg, locale: english) == "83.00")
+  #expect(BodyWeightInput.text(kg: 83.5, unit: .kg, locale: german) == "83,50")
+  let stored = BodyWeightInput.kilograms("183.25", unit: .lb, locale: english)
+  #expect(stored == Decimal(string: "83.12"))
+  #expect(BodyWeightInput.text(kg: stored, unit: .lb, locale: english) == "183.25")
+  for input in ["183.25", "183.26", "1.11", "999.99"] {
+    let kilograms = BodyWeightInput.kilograms(input, unit: .lb, locale: english)
+    let readBack = BodyWeightInput.text(kg: kilograms, unit: .lb, locale: english)
+    #expect(BodyWeightInput.kilograms(readBack, unit: .lb, locale: english) == kilograms)
+  }
+  for input in ["", "0", "500", "500.01", "NaN", "83kg"] {
+    #expect(BodyWeightInput.kilograms(input, unit: .kg, locale: english) == nil)
+  }
+  #expect(BodyWeightInput.kilograms("83,25", unit: .kg, locale: german) == Decimal(string: "83.25"))
+}
+
+@Test func spec085SingleFieldEditorsOnlyPatchTheirOwnedFields() throws {
+  var draft = OnboardingFixtures.completeDraft()
+  draft.weightKg = 83.25
+  draft.isCompeting = true
+  draft.competitionDate = DateOnly.string(from: Date())
+  draft.targetWeightClass = "IPF · 83 kg"
+  draft.noteToCoach = "Original note\nSecond line"
+  var weight = OnboardingPatch()
+  weight.weightKg = .value(83.25)
+  #expect(draft.profilePatch(for: .weight) == weight)
+  var meet = OnboardingPatch()
+  meet.isCompeting = .value(true)
+  meet.competitionDate = .value(DateOnly.string(from: Date()))
+  meet.targetWeightClass = .value("IPF · 83 kg")
+  #expect(draft.profilePatch(for: .competition) == meet)
+  var note = OnboardingPatch()
+  note.noteToCoach = .value("Original note\nSecond line")
+  #expect(draft.profilePatch(for: .note) == note)
+  draft.isCompeting = false
+  meet.isCompeting = .value(false)
+  meet.competitionDate = .null
+  meet.targetWeightClass = .null
+  #expect(draft.profilePatch(for: .competition) == meet)
+  for competing: Bool? in [nil, false, true] {
+    var legacy = OnboardingFixtures.completeDraft()
+    legacy.isCompeting = competing
+    legacy.competitionDate = "2026-12-01"
+    legacy.targetWeightClass = "83kg"
+    legacy.weightKg = 83.5
+    legacy.noteToCoach = "Original note\nSecond line"
+    let data = try JSONEncoder().encode(legacy)
+    let restored = try JSONDecoder().decode(OnboardingDraft.self, from: data)
+    #expect(restored == legacy)
+    #expect(restored.isStepComplete(7) == (competing != true))
+    let original = InMemoryOnboardingRepository.applied(
+      legacy.fullPatch(),
+      to: StudentDemoSeed.makeOnboardingProfile(studentID: OnboardingFixtures.studentId),
+      updatedAt: OnboardingFixtures.serverUpdatedAt)
+    let removed = InMemoryOnboardingRepository.applied(
+      draft.profilePatch(for: .competition), to: original,
+      updatedAt: OnboardingFixtures.serverUpdatedAt)
+    #expect(removed.noteToCoach == legacy.noteToCoach)
+    #expect(removed.weightKg == legacy.weightKg)
+    #expect(removed.injuryNotes == original.injuryNotes)
+  }
 }

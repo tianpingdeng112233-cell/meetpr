@@ -485,13 +485,20 @@ extension StudentDemoSeed {
     isCompeting: Bool = true,
     squat1RMKg: Decimal = 180
   ) -> OnboardingProfile {
-    OnboardingProfile(
+    let arguments = ProcessInfo.processInfo.arguments
+    let scenario = arguments.firstIndex(of: "-spec085-profile").flatMap {
+      arguments.indices.contains($0 + 1) ? arguments[$0 + 1] : nil
+    }
+    let onboarding = arguments.contains("-spec085-onboarding")
+    let competing: Bool? =
+      onboarding || scenario == "unanswered" ? nil : isCompeting
+    return OnboardingProfile(
       userId: studentID,
-      unitPreference: .kg,
-      gender: .male,
+      unitPreference: scenario == "other-lb" ? .lb : .kg,
+      gender: scenario == "other-lb" ? .other : .male,
       birthDate: "2001-03-15",
       heightCm: 178,
-      weightKg: 83,
+      weightKg: scenario == "empty-weight" ? nil : scenario == "legacy" ? 83.5 : 83,
       trainingYears: 3,
       squatStance: .lowBar,
       deadliftStyle: .conventional,
@@ -510,11 +517,16 @@ extension StudentDemoSeed {
       uploadAttachmentIds: [],
       injuryNotes: StudentStrings.localized(.studentDemoSeed013),
       injuryAreas: [.shoulder],
-      isCompeting: isCompeting,
-      competitionDate: isCompeting ? demoCompetitionDate() : nil,
-      targetWeightClass: "IPF 83kg",
+      isCompeting: competing,
+      competitionDate: competing == true && scenario != "no-date" ? demoCompetitionDate() : nil,
+      targetWeightClass:
+        onboarding
+        ? nil
+        : scenario == "legacy"
+          ? "83kg"
+          : scenario == "formatted" ? "IPF · 83 kg" : "IPF 83kg",
       noteToCoach: StudentStrings.localized(.studentDemoSeed014),
-      completedAt: referenceDate,
+      completedAt: onboarding ? nil : referenceDate,
       createdAt: referenceDate,
       updatedAt: referenceDate
     )

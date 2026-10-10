@@ -192,7 +192,13 @@ struct MeetPRApp: App {
         // (spec 031 D10 — the DEMO_USER_STUDENT path stays gate-free).
         studentBind: InMemoryBindRepository(
           studentId: StudentDemoSeed.studentID,
-          seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
+          validCodes: ProcessInfo.processInfo.arguments.contains("-spec085-onboarding")
+            ? [
+              "ABCDEFGH23": .init(coachId: StudentDemoSeed.coachID, coachDisplayName: "Demo coach")
+            ]
+            : [:],
+          seed: ProcessInfo.processInfo.arguments.contains("-spec085-onboarding")
+            ? nil : StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
         ),
         studentOnboarding: InMemoryOnboardingRepository(
           studentId: StudentDemoSeed.studentID,

@@ -2,6 +2,13 @@ import CoreModels
 import Foundation
 
 enum TodayWorkoutSelectionResolver {
+  static func receive(
+    _ handoff: TodayWorkoutPlanHandoff?, selectedDayID: inout UUID?, days: [StudentPlanDay]
+  ) {
+    selectedDayID = initialSelection(
+      explicitDayID: handoff?.dayID, days: handoff?.plan.days ?? days)
+  }
+
   static func initialSelection(
     explicitDayID: UUID?,
     days: [StudentPlanDay]

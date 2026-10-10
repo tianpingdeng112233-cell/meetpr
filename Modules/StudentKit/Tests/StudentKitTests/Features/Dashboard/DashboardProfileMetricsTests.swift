@@ -76,7 +76,7 @@ import Testing
     now: now,
     calendar: localCalendar
   )
-  #expect(withWeight.bodyWeightText == "76 kg")
+  #expect(withWeight.bodyWeightText == "76.00 kg")
   #expect(withWeight.competition == nil)
 
   let withoutWeight = CompetitionCountdownPresenter.metrics(
@@ -151,4 +151,31 @@ private actor FailingOnboardingProfileReader: OnboardingProfileReading {
 
 private enum ProfileMetricsTestError: Error {
   case failed
+}
+
+@Test func spec085MetricsPreserveLegacyMeetAndShowTwoDecimals() throws {
+  let now = try Date("2026-06-14T12:00:00Z", strategy: .iso8601)
+  let calendar = try calendar(timeZoneID: "Europe/London")
+  for (weight, expected) in [(Decimal(83), "83.00 kg"), (Decimal(string: "83.5") ?? 0, "83.50 kg")]
+  {
+    let snapshot = OnboardingProfile(
+      userId: UUID(), weightKg: weight, isCompeting: true,
+      competitionDate: "2026-06-16", targetWeightClass: "83kg", noteToCoach: "Original note",
+      createdAt: now, updatedAt: now)
+    let metrics = CompetitionCountdownPresenter.metrics(
+      from: snapshot, now: now, calendar: calendar)
+    #expect(metrics.bodyWeightText == expected)
+    #expect(metrics.competition?.days == 2)
+    #expect(metrics.competition?.weightClassText == "83kg")
+    #expect(snapshot.weightKg == weight)
+    #expect(snapshot.targetWeightClass == "83kg")
+  }
+  let noClass = CompetitionCountdownPresenter.metrics(
+    from: profile(isCompeting: true, competitionDate: "2026-06-16"), now: now, calendar: calendar)
+  #expect(noClass.competition?.weightClassText == nil)
+  for competing: Bool? in [nil, false, true] {
+    let noDate = CompetitionCountdownPresenter.metrics(
+      from: profile(isCompeting: competing, competitionDate: nil), now: now, calendar: calendar)
+    #expect(noDate.competition == nil)
+  }
 }

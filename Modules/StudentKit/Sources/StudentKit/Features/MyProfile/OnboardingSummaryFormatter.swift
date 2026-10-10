@@ -17,7 +17,7 @@ public enum OnboardingSummaryFormatter {
       parts.append("\(UnitDisplay.plainString(height))cm")
     }
     if let weight = profile.weightKg {
-      parts.append("\(UnitDisplay.plainString(weight))kg")
+      parts.append("\(BodyWeightInput.text(kg: weight, unit: .kg))kg")
     }
     return joined(parts)
   }
@@ -147,16 +147,20 @@ public enum OnboardingSummaryFormatter {
 
   /// "备赛: 2026-07-25 · IPF 83kg" / "暂不备赛"
   public static func competition(_ profile: OnboardingProfile) -> String {
-    guard profile.isCompeting == true else {
-      return profile.isCompeting == false
-        ? StudentStrings.localized(.onboardingSummaryFormatter014) : placeholder
+    guard profile.isCompeting == true, let date = profile.competitionDate else {
+      return placeholder
     }
-    var parts: [String] = []
-    if let date = profile.competitionDate {
-      parts.append(StudentStrings.replacing(.onboardingSummaryFormatter015, values: ["\(date)"]))
+    var parts = [date]
+    if let weightClass = profile.targetWeightClass, !weightClass.isEmpty {
+      parts.append(weightClass)
     }
-    if let weightClass = profile.targetWeightClass { parts.append(weightClass) }
     return joined(parts)
+  }
+
+  public static func note(_ profile: OnboardingProfile) -> String {
+    guard let note = profile.noteToCoach, !note.isEmpty else { return placeholder }
+    let firstLine = note.components(separatedBy: .newlines).first ?? ""
+    return firstLine.isEmpty ? placeholder : firstLine
   }
 
   /// "左肩撞击综合征 (肩)" / "无伤病记录"
