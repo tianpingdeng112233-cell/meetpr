@@ -20,3 +20,32 @@ import Testing
   #expect(CoachNoteDisplay.reviewNote(activeIndex: nil, notes: "   ") == nil)
   #expect(CoachNoteDisplay.reviewNote(activeIndex: nil, notes: nil) == nil)
 }
+
+@Test func editableHeroSeparatesExerciseAndSetNotes() {
+  #expect(
+    CoachNoteDisplay.heroExerciseNote(isEditable: true, notes: "  Pause 2 seconds  ")
+      == "Pause 2 seconds")
+  #expect(CoachNoteDisplay.heroExerciseNote(isEditable: true, notes: nil) == nil)
+  #expect(CoachNoteDisplay.heroExerciseNote(isEditable: true, notes: " \n ") == nil)
+  #expect(
+    CoachNoteDisplay.heroLowerNote(isEditable: true, notes: "Exercise", coachNote: "Tempo")
+      == "Tempo")
+  #expect(
+    CoachNoteDisplay.heroLowerNote(isEditable: true, notes: nil, coachNote: "Tempo")
+      == "Tempo")
+  #expect(
+    CoachNoteDisplay.heroLowerNote(isEditable: true, notes: "Exercise", coachNote: nil) == nil)
+  #expect(
+    CoachNoteDisplay.heroLowerNote(isEditable: true, notes: "Exercise", coachNote: "  ") == nil)
+}
+
+@Test func readOnlyHeroKeepsIOSExerciseNoteRegardlessOfSetNote() {
+  #expect(CoachNoteDisplay.heroExerciseNote(isEditable: false, notes: "Exercise") == nil)
+  #expect(
+    CoachNoteDisplay.heroLowerNote(isEditable: false, notes: "Exercise", coachNote: "Tempo")
+      == "Exercise")
+  #expect(
+    CoachNoteDisplay.heroLowerNote(isEditable: false, notes: "Exercise", coachNote: nil)
+      == "Exercise")
+  #expect(CoachNoteDisplay.heroLowerNote(isEditable: false, notes: nil, coachNote: "Tempo") == nil)
+}

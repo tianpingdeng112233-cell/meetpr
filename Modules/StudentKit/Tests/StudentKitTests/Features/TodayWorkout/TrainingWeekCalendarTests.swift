@@ -61,6 +61,37 @@ import Testing
     #expect(!page.showsBackToToday)
   }
 
+  @Test func behindUsesRecommendationAndGymDay() throws {
+    let day = try calendarDays(["2026-09-21"])[0]
+    let calendar = PlanCalendarDayIdentity.utcCalendar
+    let today = try Date("2026-10-09T00:00:00Z", strategy: .iso8601)
+    #expect(TrainingSequenceLayout.isBehind(day, today: today, calendar: calendar))
+    #expect(TrainingSequenceLayout.daysBehind(days: [day], today: today, calendar: calendar) == 18)
+    #expect(!TrainingSequenceLayout.isBehind(day, today: day.date, calendar: calendar))
+    let completed = day.replacingCompletion(completedAt: today, source: "manual")
+    #expect(!TrainingSequenceLayout.isBehind(completed, today: today, calendar: calendar))
+    #expect(
+      TrainingSequenceLayout.daysBehind(days: [completed], today: today, calendar: calendar) == 0)
+    let shifted = StudentPlanDay(
+      id: day.id, weekNumber: 1, dayOfWeek: 1, sortOrder: 0,
+      date: day.scheduledDate, shiftedToDate: today, exercises: [])
+    #expect(!TrainingSequenceLayout.isBehind(shifted, today: today, calendar: calendar))
+    #expect(
+      TrainingSequenceLayout.daysBehind(days: [shifted], today: today, calendar: calendar) == 0)
+    let early = try Date("2026-09-22T03:59:00Z", strategy: .iso8601)
+    let boundary = try Date("2026-09-22T04:00:00Z", strategy: .iso8601)
+    #expect(
+      TrainingSequenceLayout.daysBehind(
+        days: [day],
+        today: WorkoutDatePolicy.gymDayToday(now: early, calendar: calendar), calendar: calendar)
+        == 0)
+    #expect(
+      TrainingSequenceLayout.daysBehind(
+        days: [day],
+        today: WorkoutDatePolicy.gymDayToday(now: boundary, calendar: calendar), calendar: calendar)
+        == 1)
+  }
+
   private func calendarDays(_ dates: [String]) throws -> [StudentPlanDay] {
     try dates.enumerated().map { index, date in
       StudentPlanDay(

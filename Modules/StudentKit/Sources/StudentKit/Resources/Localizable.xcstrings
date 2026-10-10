@@ -17959,13 +17959,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} {1}, rest day"
+            "value": "{0}, rest day"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} {1}，休息日"
+            "value": "{0}，休息日"
           }
         }
       }
@@ -18170,6 +18170,110 @@
           "stringUnit": {
             "state": "translated",
             "value": "前往「我的」→「组间休息」修改"
+          }
+        }
+      }
+    },
+    "student.trainingWeekBehind": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behind"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已落后"
+          }
+        }
+      }
+    },
+    "student.trainingWeekBehindAccessibility": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}, behind schedule"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}，已落后"
+          }
+        }
+      }
+    },
+    "student.trainingWeek.daysBehind %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 day behind"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days behind"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "已落后 %lld 天"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "student.trainingWeek.daysBehindAccessibility %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "1 day behind schedule"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days behind schedule"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "已落后 %lld 天"
+                }
+              }
+            }
           }
         }
       }

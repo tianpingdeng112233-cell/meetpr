@@ -3,6 +3,14 @@ import Foundation
 import SwiftUI
 
 enum CoachNoteDisplay {
+  static func heroExerciseNote(isEditable: Bool, notes: String?) -> String? {
+    isEditable ? text(notes) : nil
+  }
+
+  static func heroLowerNote(isEditable: Bool, notes: String?, coachNote: String?) -> String? {
+    text(isEditable ? coachNote : notes)
+  }
+
   static func text(_ raw: String?) -> String? {
     guard let trimmed = raw?.trimmingCharacters(in: .whitespacesAndNewlines),
       !trimmed.isEmpty
@@ -49,5 +57,27 @@ struct CoachNotePill: View {
     }
     .accessibilityElement(children: .combine)
     .accessibilityLabel(StudentStrings.replacing(.coachNoteDisplay002, values: ["\(note)"]))
+  }
+}
+
+/// Only the editable hero promotes the exercise cue; read-only cards keep their existing pill.
+struct HeroCoachNote: View {
+  let note: String
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+      Label(StudentStrings.localized(.coachNoteDisplay001), systemImage: "text.bubble")
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .bold))
+        .foregroundStyle(Color.MeetPR.goldText)
+      Text(note)
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size15, weight: .medium))
+        .lineSpacing(MeetPRSpacing.point6)
+        .foregroundStyle(Color.MeetPR.textPrimary)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(MeetPRSpacing.space3)
+    .background(Color.MeetPR.goldRGB.opacity(0.12), in: .rect(cornerRadius: MeetPRRadius.inset))
+    .accessibilityElement(children: .combine)
   }
 }

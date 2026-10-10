@@ -1042,6 +1042,8 @@ enum StudentStrings {
     static let trainingCalendarLogic010 = Key("student.trainingCalendarLogic.copy010")
     static let trainingCalendarLogic011 = Key("student.trainingCalendarLogic.copy011")
     static let trainingCalendarLogic012 = Key("student.trainingCalendarLogic.copy012")
+    static let trainingWeekBehind = Key("student.trainingWeekBehind")
+    static let trainingWeekBehindAccessibility = Key("student.trainingWeekBehindAccessibility")
     static let trainingWeekCurrent = Key("student.trainingWeekCurrent")
     static let trainingWeekUpcoming = Key("student.trainingWeekUpcoming")
     static let trainingWeekCompleted = Key("student.trainingWeekCompleted")
@@ -1208,6 +1210,27 @@ enum StudentStrings {
       "student.workoutCompletionPresentation.copy016")
   }
 
+  static func trainingDaysBehind(
+    _ count: Int, accessibility: Bool = false, locale: Locale = .current
+  ) -> String {
+    #if DEBUG && os(macOS)
+      let key = accessibility ? "daysBehindAccessibility" : "daysBehind"
+      let variant = isEnglish(locale) && count == 1 ? "one" : "other"
+      if let template = macOSSwiftPMCatalog["student.trainingWeek.\(key) %lld.\(variant)"]?[
+        isEnglish(locale) ? "en" : "zh-Hans"]
+      {
+        return template.replacing("%lld", with: String(count))
+      }
+    #endif
+    if accessibility {
+      return String(
+        localized: "student.trainingWeek.daysBehindAccessibility \(count)",
+        bundle: .module, locale: locale)
+    }
+    return String(
+      localized: "student.trainingWeek.daysBehind \(count)", bundle: .module, locale: locale)
+  }
+
   static func localized(_ key: Key, locale: Locale = .current) -> String {
     resolved(
       String(localized: key.value, bundle: .module, locale: locale),
@@ -1282,6 +1305,19 @@ enum StudentStrings {
           let localizations = entry["localizations"] as? [String: Any]
         else {
           return
+        }
+        for (language, payload) in localizations {
+          guard let payload = payload as? [String: Any],
+            let variations = payload["variations"] as? [String: Any],
+            let plural = variations["plural"] as? [String: Any]
+          else { continue }
+          for (variant, entry) in plural {
+            guard let entry = entry as? [String: Any],
+              let unit = entry["stringUnit"] as? [String: Any],
+              let value = unit["value"] as? String
+            else { continue }
+            result[pair.key + "." + variant, default: [:]][language] = value
+          }
         }
         result[pair.key] = localizations.reduce(into: [:]) { values, localization in
           guard let payload = localization.value as? [String: Any],

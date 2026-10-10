@@ -307,3 +307,119 @@
 - 最终标题：默认字号恢复 Competition / Deadlift 两行、右侧 Ask coach；accessibility-large（启动参数 `UICTContentSizeCategoryAccessibilityL`）完整显示 Competition / Deadlift，Ask coach 在下方。截图 `/tmp/en-labels-evidence/training-en-default.jpg`、`training-en-accessibility-large.jpg`。没有新增能准确测实际词内断行的布局单测，未用无关断言充数；原有唯一入口测试保留并通过。
 - **未覆盖的卡验收**：验收 1/2 的“下一练”双主项卡片在中英实屏未到达（两处函数的双语输出已单测）；验收 3 指定的当前组 Competition Squat + Ask coach 未复现于最终 Demo（游标为 Deadlift，未改 Demo 数据），已用同样较长的 Competition Deadlift 验证；未做改前/改后默认字号截图逐像素对比。Opus 按原卡补验，不把这些替代证据写成完整验收通过。
 - 无障碍大字号下的重量数字及其他卡外布局问题未改。模拟器只经正常导航与开始按钮，未录入/删除训练数据；测试进程已停止，语言/字号通过进程参数注入。
+
+## 2026-10-10 · spec 086 iOS（开工核对，因现状矛盾停止）
+
+- 工作树：`MeetPR-wt-086`；分支：`feat/086-training-strip-coach-note`；HEAD：`a36e1f13`。启动时在当前目录用 `mktemp "$PWD/.codex-write-check.XXXXXX"` 创建临时文件并删除，退出码 0；初始工作区干净。未 commit、未 push。
+- 改动文件清单：仅 `docs/CODEX-JOURNAL.md` 追加本节。代码、测试、Demo、SPEC、发布台账均未修改。
+
+### 阻塞：只读 hero 备注的“保持改前行为”与 iOS 现状不符
+
+- SPEC §3 与 CARD-ios「iOS 上要注意的地方」要求：只读态备注保持改前行为，即“组级备注，没有才显示动作备注”；测试 seam 3 同时要求只读态行为不变。
+- 当前 iOS `TodayWorkoutPresentation.swift:257` 的 `Exercise.note` 仅取 `CoachNoteDisplay.text(exercise.notes)`；`TodayWorkoutScreen.swift:660–675` 的 hero 下方灰色备注块直接显示这个 `exercise.note`，没有按 `isEditable` 区分，也没有读取 `row.draft.prescribed.coachNote`。因此当前可编辑态及已完成只读 hero 都只显示动作备注，并不存在描述中的组级优先回落行为。
+- `coachNote` 字段确实存在于 `StudentPrescribedSet`，`StudentPlanProjection.swift:101` 也保留了它；不是后端缺字段。历史详情 `Features/TrainingHistory/DayDetailView.swift:61` 另有逐组备注展示，不等于训练页 hero 的取值策略，且不在本卡修改范围。
+- 待 David/Opus 裁定：A）“只读态不变”按当前 iOS 事实执行，继续只显示动作备注；可编辑 hero 才新增组级小灰块并上移动作备注。B）以安卓行为为最终口径，iOS 只读 hero 也改为组级优先、动作级兜底，明确这属于新增行为而非保持现状。未替用户选择。
+- 按本次指令“发现 SPEC 与 iOS 现状矛盾时停下来”停止实装。未发现需要更换推荐日期算法的证据：现有周条消费 `StudentPlanDay.date`，已有后移日期的周条测试；本次不改派生。
+
+### 测试、验收与证据状态
+
+- seam 1（落后派生）：未新增测试，未执行红/绿。
+- seam 2（周条 presentation）：未新增测试，未执行红/绿。
+- seam 3（hero 备注）：因上述矛盾未新增测试，未执行红/绿。
+- seam 4（既有训练页测试）：既有断言零修改，未运行；没有人为制造失败。
+- 测试结果数字：新增 0，执行 0；未宣称通过。StudentKit 全量、其他包测试、swift-format、SwiftLint 均未执行。
+- 原验收 1、2、3、3b、4、5、6、7、8、8b、9、10、替换后的 11：全部未实装、未验证。
+- 老用户升级第一屏：落后两周以上、进度正常两种形态均未覆盖；未创建 Demo 开关，默认 Demo 未改变。
+- 未构建或启动模拟器，未触碰另一工作树的模拟器或缓存。无截图及测试日志路径；本节源码路径与行号是此次核对证据。XcodeBuildMCP 仅查询 session defaults，未设置构建配置。
+- spec 外问题：未展开调查或修改；本次唯一阻塞是本卡只读态行为定义与 iOS 基线不符。
+
+## 2026-10-10 · spec 086 iOS（实装交付，修订一取 A）
+
+本节接续上面的开工阻塞记录。David/Opus 已在 CARD-ios「修订一」裁定 A；按裁定实装。工作树 `MeetPR-wt-086`，分支 `feat/086-training-strip-coach-note`，基点 `a36e1f13`。各次续作均在工作树试写、删除临时文件成功。未 commit、未 push；没有修改 SPEC、NEXT-RELEASE、RELEASES、build 号、后端、存储结构/键、依赖或 Dashboard。CARD-ios 的修订一是用户交接时已有的改动，不是本次实现改写。
+
+### 改动文件清单
+
+以下路径均相对仓根；仅 StudentKit 与本 JOURNAL：
+
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingCalendarLogic.swift`：从现有有效推荐日期派生 isBehind / daysBehind，不改游标推进。
+- 同目录 `TrainingWeekPresentation.swift`（新增）：格子文字、无障碍标签、当前周落后胶囊。
+- 同目录 `TrainingWeekStrip.swift`：箭头移到格子两端，删除独立周行与小点；提供合并后的周标题。
+- 同目录 `TrainingWeekCalendarRow.swift`：星期/图形/日期或 Behind；休息无日期；圆点 8、对勾 12；保持宽度比与横滚，横滚初始定位选中格。
+- 同目录 `TrainingWeekHeaderLayout.swift`（新增）：单行宽度不足时按内容比例压缩，防三位数天数截断，历史入口靠右。
+- 同目录 `TodayWorkoutScreen.swift`：周次/胶囊/进度与历史同排；可编辑 hero 动作备注上移、组备注下方独立显示。
+- 同目录 `TodayWorkoutView.swift`：传递 gymDayToday，并在进入、前台、现有计划刷新触发时更新。
+- 同目录 `TrainingDayPreview.swift`：已落后时隐藏推荐日期行，其他情况消费现有 `day.date`（含教练后移）。
+- 同目录 `CoachNoteDisplay.swift`：纯函数区分可编辑/只读备注来源，新增淡金动作备注 View；只读仍只取动作备注。
+- `Modules/StudentKit/Sources/StudentKit/StudentStrings.swift`：新文案访问及原有 macOS DEBUG 测试资源回退支持 xcstrings plural。
+- `Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings`：中英逐字采用 Android `137d816` StudentKit/RnExtras 对应值，daysBehind 与读屏采用 plural one/other；休息读屏移除日期。
+- `Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift` 与新增 `TrainingStripDemoScenario.swift`：仅启动参数启用的正常、落后、三位数、长备注和后移场景。
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TrainingWeekCalendarTests.swift`：新增 1 项。
+- 同目录 `TrainingWeekPresentationTests.swift`（新增）：新增 2 项。
+- 同目录 `CoachNoteReviewDisplayTests.swift`：新增 2 项。既有断言零删除、零改写。
+- `docs/CODEX-JOURNAL.md`：本次开发自测与原始证据记录。
+
+### 四处 seam 与最终检查
+
+全部证据目录 `/tmp/spec086-evidence/`；红阶段是先写测试、公开 seam 尚不存在造成的真实编译失败，未伪造 assertion failure。
+
+| seam | 红 | 绿 |
+| --- | --- | --- |
+| 1 日期与落后天数 | `logic-red.log`，缺 isBehind/daysBehind | `logic-green.log`，新增 1 项通过；完成/同日/18 天/0 天/凌晨 03:59 与 04:00/后移 |
+| 2 周条 presentation | `presentation-red.log`，缺 presentation 类型 | `presentation-green.log`，新增 2 项通过；三种训练格、休息无日期、读屏、当前/非当前、英文 1/18/123 与中文 |
+| 3 备注取值 | `notes-red.log`，缺 heroExerciseNote/heroLowerNote | `notes-green.log`，新增 2 项通过；动作有/无/空白、组级有/无、互不影响、只读 iOS 旧取值 |
+| 4 既有训练页回归 | 无独立人为制造的红；前述编译红阶段全套无法运行。卡要求既有断言不改，故不为了红灯破坏现有行为 | 全量 `studentkit-delivery.log`：937 passed / 0 failed / 0 skipped，45 suites，含既有保存、完成、补记、set-ref、周条及备注测试 |
+
+最终全量是在行长修正之后重新执行；新增合计 5 项，既有 932 项保持通过。实际执行入口：XcodeBuildMCP `swift_package_test({packagePath:"/Users/david/Projects/apps/MeetPR-wt-086/Modules/StudentKit"})`，session configuration `Debug`，内部运行 `swift test --package-path .../Modules/StudentKit`。沿用 JOURNAL 2026-10-04 的 MCP 路径，不使用包 scheme 的 xcodebuild test；本轮未需另设 clang ModuleCache 权限绕行。最终原始源日志 `swift_package_test_2026-10-10T07-48-59-067Z_pid52792_17dbf7b8.log` 已复制到上述目录。其余包零改动，因此没有额外包测试。
+
+最终 `swift-format lint --strict` 和 `swiftlint lint --strict` 均检查 `swift-files.txt` 所列 15 个 Swift 文件：各 exit 0、0 违规；日志 `swift-format.log`、`swiftlint.log`。格式化工具为 Xcode toolchain 内的 swift-format；SwiftLint 为 `/opt/homebrew/bin/swiftlint`。`git diff --check` 通过。`resource-boundary-check.log` 记录新增/调整键 manual、中英齐全、Android 文案逐字、plural 与 StudentKit 无 CoachKit import 的检查；既有 StudentStrings 本地化测试在全量内通过。
+
+### 验收逐项开发自测
+
+以下是开发自测，不代替 Opus 按卡收货。
+
+| SPEC 项 | 结论与证据 |
+| --- | --- |
+| 1 | 实屏：训练格星期/图形/第三行，无 D 序号；休息星期+Rest/休，无日期。见正常与落后截图。 |
+| 2 | 实屏：完成格保留日期、未到期和恰为今天显示日期、未完成过期为金棕 Behind。单测覆盖三分支。 |
+| 3 | 实屏：过期预览无旧推荐日期（`behind-preview.jpg`），未到期预览仍有推荐日期（`normal-preview-zh-dark.jpg`）；落后 18 天能开始并记录 3 组，无落后弹窗/拦截。已完成日期按 §1 保留。 |
+| 3b | 0/1/18/123 天文案有单测；正常/18/123 有实屏。翻其他周 Upcoming 不带天数。长按完成当前日后 18→16、2/4→3/4，见 `completion-cursor-16days.jpg`。 |
+| 4 | 实屏符合 2B，同排周次/胶囊/进度/历史，左右箭头、无小点。源码格子 minHeight=64、箭头 height=64（均≥44）。 |
+| 5 | 已实操首/末周箭头、Back to today、点选未完成预览与已完成日；选中框与当前淡金格分离，见 `behind-preview.jpg`、`completed-readonly.jpg`。 |
+| 6 | `--spec086-shift` 将同周第 4 日后移 5 天，周跨度 12 天；在中文 accessibility-large 实操横滚到后移格，未挤压，见 `shifted-scroll-zh-light-large.jpg`。既有 shiftedRecommendationExtendsCalendarBeyondSevenDays 测试未改。 |
+| 7 | 有备注的可编辑 hero 在动作名下展示金块，灰块仅为组级；无动作备注的当前 Squat 无金块；空白由纯函数测试覆盖。中英≥200字符备注均滚动到末尾，无截断，见 hero-long-* 上/下截图。 |
+| 8 | Deadlift 第 1→2→3 组动作备注保持一致，各组下方小灰字为 3-second eccentric。只读完成日金块消失，原灰字动作备注保留，见 `completed-readonly.jpg`。 |
+| 8b | 实屏完成绿色对勾、当前金色实心、未轮到空心可区分；源码分别 size12 / size8，格高未变。 |
+| 9 | 以有两天完成历史的同构 Demo 数据覆盖正常和落后 18 天第一屏：normal-en-light / normal-zh-dark、behind-en-light。记录组、计时、结算与游标重算均实操（`recorded-set-rest-timer.jpg`、`completion-cursor-16days.jpg`）。这是存量形态模拟，不是对真实账号执行安装升级；未改存储键/结构。 |
+| 10 | 无可用 iPhone SE runtime/device，按共同约定取现有最小 iPhone 17e（390pt 宽）+ accessibility-large；英文 Dark、中文 Light 均检查三位数与长备注。默认字号中英 Light/Dark 已看。滚动视口边缘可出现下一格的部分内容，格内文字完整；选中当前格进入时居中。 |
+| 11 | StudentKit 937/0/0；两 lint 0 违规；DemoStudent 独立 DerivedData 构建与运行记录见下。 |
+
+长按完成确认：模拟器实际录入 3 组，长按完成按钮 2200ms，进入原有完成弹层，Done 返回 Today，再进 Training 游标到 W1D4、落后为 16 天；回选 W1D3 为已完成只读。`HoldToCompleteButton`、gesture state、完成保存链路均零改动，原测试保留。工具曾提示快照未稳定，重新 snapshot 后确认成功，没有把工具超时误认成功。
+
+### Demo、存量形态与复验方法
+
+使用 `MeetPR-DemoStudent` / `DemoStudent`，向 app 进程传下列 launch args；默认不传任何 spec086 参数：
+
+- `--spec086-normal`：两天已完成，第 3 天推荐日期恰为 gymDayToday，第 4 天未来，含休息格。
+- `--spec086-behind`：相同完成历史，当前日落后 18 天；已完成格仍有合法历史日期，未完成过期格无旧日期。
+- `--spec086-behind123`：三位数落后天数。
+- 上述任一基础场景可再加 `--spec086-shift`：同周第 4 日后移 5 天，验证 >7 天横滚；可加 `--spec086-long-note`：重复现有 Demo 备注至 ≥200 字符，不引入新的产品文案。
+- 英文 `-AppleLanguages (en) -AppleLocale en_US`；中文 `-AppleLanguages (zh-Hans) -AppleLocale zh_CN`；大字号 `-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityL`；默认字号 `UICTContentSizeCategoryL`；主题 `-meetpr.appearance light` / `dark`。
+
+默认 Demo 首屏不改的代码证据：无参数时 scenario=nil，原 startDate/todayOffset/day offset/endDate、完成状态、notes、仅第一组 coachNote 均沿用原分支；shift helper 返回 nil，long-note 无参数原样返回。没有写新的 UserDefaults 键；上述 Demo 场景是进程参数，不持久化。原有 Demo tests 保留并在全量通过。
+
+### 平台差异、范围外问题与验证边界
+
+- 修订一：只读 iOS 从来只取动作备注，已原样保留。iOS 原有 Last time 参考行在重量上方，本卡未搬它；新小灰组备注位于下方、仍在该行之后。iOS hero 的 Ask coach 与标题布局、完成流程保留。
+- 既有大字号 logo 显示成 ME…R、概览动作标题词内换行、重量 175 换成 17/5 的问题不在卡内，未改。见大字号截图。此前全量重编译出现 18 条既有 Bind/VideoUpload 等测试并发警告；最终增量全量无警告，未为清警告越界改测试。
+- 未实测真实时间跨凌晨 4 点的驻留/后台全过程；03:59/04:00 算法有单测，前台/进入刷新有源码接线。未用真实线上账户安装升级，存量验证方式如上。未分别构建 CN/Global 正式包；实现无按轨分支。
+- 开始选用的 iOS 26.5 iPhone 17e 安装包中途被并行作业覆盖，后切换先前 Shutdown 的 iOS 26.4 iPhone 17e（`BBE9EB95-01DE-452E-866C-3DD0B62F9BDA`）继续；没有关闭、重置或清掉其他设备。DerivedData 始终 `/tmp/spec086-derived`。尝试 shell 创建 SE 时沙箱 CoreSimulatorService 连接被拒，未绕权限；故使用共同约定的最小可用设备替代。
+- Standards / Spec 独立只读审查均无 blocker；Layout 非有限宽度 nit 已处理。自测不宣告 Opus 验收通过。不需要新增产品裁定。
+
+### 最终构建与证据索引
+
+- 最终 `build_sim`：`MeetPR-DemoStudent` / `DemoStudent`，`-skipPackageUpdates`，独立 `/tmp/spec086-derived`，成功（111.5 秒），工具返回 0 errors / 0 warnings；原始日志已复制为 `/tmp/spec086-evidence/build-delivery.log`。随后 install_app_sim + launch_app_sim 成功；运行源日志 `com.meetpr.app_2026-10-10T07-55-27-106Z_helperpid81663_ownerpid52792_4132f6ab.log`。
+- 最终包复验截图：`final-normal-en-light.jpg`、`final-behind123-en-dark-large.jpg`、`final-behind123-zh-light-large.jpg`。正常时左侧周次/胶囊/进度紧凑、历史右对齐；大字号时三位数完整同排。
+- 默认不传 spec086 参数的最终启动截图：`default-demo-first-screen.jpg`。首屏仍为 Today、W1D3 Deadlift、2/4、原始连续推荐日期与已完成历史。Dashboard 代码零变动；对照 Demo diff 的 nil 分支与原有测试，未把验证场景变成默认首屏。
+- 其余截图均在同一目录：`behind-en-light.jpg`、`behind-preview.jpg`、`normal-en-light.jpg`、`normal-zh-dark.jpg`、`normal-preview-zh-dark.jpg`、`hero-en-light.jpg`、`hero-no-exercise-note.jpg`、`hero-long-en-dark-large-top.jpg`、`hero-long-en-dark-large-bottom.jpg`、`hero-long-zh-light-large-top.jpg`、`hero-long-zh-light-large-bottom.jpg`、`shifted-scroll-zh-light-large.jpg`、`recorded-set-rest-timer.jpg`、`completion-cursor-16days.jpg`、`completed-readonly.jpg`。`behind123-en-dark-large-before-fix.jpg` 是修正前失败证据，不能用于最终通过结论。
+- 验收 8 的覆盖边界补充：已看同一 Deadlift 三组保持原动作备注、结算后下一个训练日 Squat 无动作备注时没有旧金块残留；未在同一训练日实屏跑出“两条不同非空动作备注”的切换（现有组合日三个动作的备注均为空）。取值每次直接消费当前 exercise.note、无缓存，且纯函数测试两来源互不影响；不把该源码证据写成已看过该形态。
+- 无真实安装升级账户、没有 SE 设备、没有实时跨 4 点全过程的限制仍按上文保留；不需要用户作新的产品决定。功能代码交付待 Opus 收货，未修改任何 SPEC 验收勾选或状态。
