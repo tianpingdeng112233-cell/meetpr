@@ -53,6 +53,13 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   var accessoryPreviousLogs: [UUID: [Int: StudentSetLog]] = [:]
   var sequencePage: TrainingSequencePage?
   var gymDayToday: Date = WorkoutDatePolicy.gymDayToday()
+  var restTimerHeight: CGFloat = 0
+
+  @State private var scrollTarget: UUID?
+  @State private var pendingScrollTarget: UUID?
+  @State private var isManualScrolling = false
+  @State private var keyboardVisible = false
+  @State private var feedbackExercises: [UUID] = []
 
   var body: some View {
     trainingScrollView
@@ -63,11 +70,44 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       trainingScrollContent
     }
     .scrollIndicators(.hidden)
+    .scrollPosition(id: $scrollTarget, anchor: .top)
+    .modifier(
+      TrainingScrollInteraction(isScrolling: $isManualScrolling, keyboardVisible: $keyboardVisible)
+    )
+    .onChange(of: flowSnapshot) { old, new in
+      pendingScrollTarget = nil
+      guard old.dayID == new.dayID, new.dayID != nil else {
+        scrollTarget = nil
+        pendingScrollTarget = nil
+        feedbackExercises = []
+        return
+      }
+      let added = new.completed.filter { !old.completed.contains($0) }
+      feedbackExercises = added
+      for id in added { collapsedExercises[id] = true }
+      guard let target = added.last, !isManualScrolling, !keyboardVisible else { return }
+      pendingScrollTarget = target
+    }
+    .task(id: pendingScrollTarget) {
+      guard let target = pendingScrollTarget else { return }
+      // A set may finish while its editor is dismissing. Let that presentation
+      // transaction settle before resolving the newly inserted scroll target.
+      do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
+      guard !isManualScrolling, !keyboardVisible, flowSnapshot.completed.contains(target)
+      else {
+        if pendingScrollTarget == target { pendingScrollTarget = nil }
+        return
+      }
+      var transaction = Transaction(animation: nil)
+      transaction.disablesAnimations = true
+      withTransaction(transaction) { scrollTarget = target }
+      pendingScrollTarget = nil
+    }
     .background(Color.MeetPR.bgBase)
   }
 
   private var trainingScrollContent: some View {
-    LazyVStack(alignment: .leading, spacing: MeetPRSpacing.point13) {
+    TrainingContentStack(recording: flowSnapshot.dayID != nil) {
       TodayWorkoutHeader(
         weekCode: weekCode,
         unreadCount: unreadCount,
@@ -106,7 +146,15 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     }
     .padding(.horizontal, MeetPRSpacing.pageHorizontal)
     .padding(.top, MeetPRSpacing.point6)
-    .padding(.bottom, MeetPRSpacing.point28)
+    .padding(.bottom, MeetPRSpacing.point28 + inlineCompletionBottomInset)
+  }
+
+  // The enclosing NavigationStack does not forward the rest bar's inset to
+  // this scroll content. Reserve its measured height only for the inline CTA.
+  private var inlineCompletionBottomInset: CGFloat {
+    guard case .workout(let presentation) = content else { return 0 }
+    let completion = presentation.completionAvailability(isEditable: dayState.isEditable)
+    return completion.button && !completion.sticky ? restTimerHeight : 0
   }
 
   @ViewBuilder
@@ -128,28 +176,54 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
       if case .upcoming(let cursorDay) = dayState {
         TrainingDayPreview(presentation: presentation, cursorDay: cursorDay, today: gymDayToday)
       } else {
-        TodayWorkoutHero(
-          presentation: presentation,
-          isEditable: dayState.isEditable,
-          onStart: onStart,
-          onQuickLog: onQuickLog,
-          onEdit: onEdit,
-          onVideoAction: onVideoAction,
-          showsAskCoach: showsAskCoach,
-          isPreparingAskCoach: isPreparingAskCoach,
-          onAskCoach: onAskCoach,
-          accessoryViewModel: accessoryViewModel,
-          accessoryPreviousLogs: accessoryPreviousLogs
-        )
+        let flow = presentation.trainingFlow(isEditable: dayState.isEditable)
+        if let flow, !flow.completed.isEmpty {
+          VStack(spacing: MeetPRSpacing.point6) {
+            ForEach(flow.completed) { exercise in
+              CompletedTrainingExercise(
+                exercise: exercise,
+                collapsed: Binding(
+                  get: { collapsedExercises[exercise.id] ?? true },
+                  set: { collapsedExercises[exercise.id] = $0 }),
+                viewModel: accessoryViewModel,
+                previousLogs: accessoryPreviousLogs[exercise.id] ?? [:],
+                onEdit: onEdit, onVideoAction: onVideoAction
+              )
+              .modifier(
+                TrainingFlowFeedback(
+                  trigger: feedbackExercises.contains(exercise.id) ? exercise.id : nil)
+              )
+              .id(exercise.id)
+            }
+          }
+          // Keep target registration local to the stable completed-row identities.
+          .scrollTargetLayout()
+        }
+        if flow == nil || flow?.hero != nil {
+          TodayWorkoutHero(
+            presentation: presentation,
+            isEditable: dayState.isEditable,
+            onStart: onStart,
+            onQuickLog: onQuickLog,
+            onEdit: onEdit,
+            onVideoAction: onVideoAction,
+            showsAskCoach: showsAskCoach,
+            isPreparingAskCoach: isPreparingAskCoach,
+            onAskCoach: onAskCoach,
+            accessoryViewModel: accessoryViewModel,
+            accessoryPreviousLogs: accessoryPreviousLogs
+          )
+          .modifier(TrainingFlowFeedback(trigger: feedbackExercises.last))
+          .accessibilityIdentifier("training.hero")
+        }
 
         if presentation.heroMode == .recording {
           TodayWorkoutExerciseList(
-            exercises: presentation.exercises,
+            exercises: flow?.belowHero ?? presentation.exercises,
             collapsedExercises: $collapsedExercises,
             onEdit: onEdit,
             onVideoAction: onVideoAction
           )
-
         }
       }
 
@@ -169,17 +243,27 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     }
   }
 
+  private var flowSnapshot: TrainingFlowSnapshot {
+    guard case .workout(let presentation) = content,
+      let flow = presentation.trainingFlow(isEditable: dayState.isEditable)
+    else { return TrainingFlowSnapshot(dayID: nil, completed: []) }
+    return TrainingFlowSnapshot(dayID: presentation.day.id, completed: flow.completed.map(\.id))
+  }
+
   @ViewBuilder
   private func completionContent(_ presentation: TodayWorkoutPresentation) -> some View {
     if case .completed = dayState {
       DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.rows).count) {
         onShowReview()
       }
-    } else if dayState.isEditable, presentation.allowsManualCompletion {
+    } else if presentation.completionAvailability(isEditable: dayState.isEditable).button,
+      !presentation.completionAvailability(isEditable: dayState.isEditable).sticky
+    {
       // Ask-coach moved to the hero card's top-right corner once the action
       // row is gone (David 2026-08-08) — nothing sits above the hold button.
-      if !presentation.progress.allDone {
-        TodayWorkoutRemainingPill(text: presentation.progress.remainingText)
+      let progress = presentation.trainingFlow(isEditable: true)?.progress ?? presentation.progress
+      if !progress.allDone {
+        TodayWorkoutRemainingPill(text: progress.remainingText)
       }
       HoldToCompleteButton(action: onComplete)
     }
@@ -492,6 +576,10 @@ private struct TodayWorkoutHero: View {
   var accessoryViewModel: TodayWorkoutViewModel?
   var accessoryPreviousLogs: [UUID: [Int: StudentSetLog]] = [:]
 
+  private var heroProgress: TodayWorkoutProgress {
+    presentation.trainingFlow(isEditable: isEditable)?.progress ?? presentation.progress
+  }
+
   var body: some View {
     ZStack(alignment: .leading) {
       Color.MeetPR.bgInset
@@ -566,7 +654,8 @@ private struct TodayWorkoutHero: View {
         previousLogs: accessoryPreviousLogs[exercise.id] ?? [:],
         showsAskCoach: showsAskCoach, isPreparingAskCoach: isPreparingAskCoach,
         onAskCoach: onAskCoach, onEdit: onEdit)
-    } else if let row = presentation.currentRow,
+    } else if let row = presentation.trainingFlow(isEditable: isEditable)?.currentRow
+      ?? presentation.currentRow,
       let exercise = presentation.exercises.first(where: { $0.id == row.draft.planExerciseID })
     {
       // The design's recording state shows the active set card and the
@@ -582,6 +671,13 @@ private struct TodayWorkoutHero: View {
         )
         .padding(.bottom, MeetPRSpacing.point3)
 
+        if presentation.trainingFlow(isEditable: isEditable) != nil,
+          !row.draft.isAccessory
+        {
+          TrainingSetProgressBar(drafts: exercise.rows.map(\.draft))
+            .padding(.vertical, MeetPRSpacing.space3)
+        }
+
         if let note = CoachNoteDisplay.heroExerciseNote(
           isEditable: isEditable, notes: exercise.note)
         {
@@ -596,21 +692,21 @@ private struct TodayWorkoutHero: View {
 
         HStack(spacing: MeetPRSpacing.space2) {
           Text(
-            presentation.progress.allDone
+            heroProgress.allDone
               ? StudentStrings.localized(.todayWorkoutScreen009)
               : StudentStrings.localized(.todayWorkoutScreen010)
           )
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
           .tracking(0.55)
           .foregroundStyle(
-            presentation.progress.allDone
+            heroProgress.allDone
               ? Color.MeetPR.success
               : Color.MeetPR.goldText
           )
           .padding(.horizontal, MeetPRSpacing.point11)
           .padding(.vertical, MeetPRSpacing.point3)
           .background(
-            (presentation.progress.allDone
+            (heroProgress.allDone
               ? Color.MeetPR.successRGB
               : Color.MeetPR.goldRGB)
               .opacity(0.16),
@@ -618,9 +714,9 @@ private struct TodayWorkoutHero: View {
           )
 
           Text(
-            presentation.progress.allDone
+            heroProgress.allDone
               ? StudentStrings.localized(.todayWorkoutScreen011)
-              : presentation.progress.positionText
+              : heroProgress.positionText
           )
           .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textMuted)
@@ -705,7 +801,7 @@ private struct TodayWorkoutHero: View {
           .padding(.top, MeetPRSpacing.point11)
         }
 
-        if isEditable && !presentation.progress.allDone {
+        if isEditable && !heroProgress.allDone {
           HStack(spacing: MeetPRSpacing.point9) {
             GoldCTA(
               StudentStrings.localized(.todayWorkoutScreen015),
@@ -842,8 +938,7 @@ private struct TodayWorkoutExerciseList: View {
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
 
   var body: some View {
-    ForEach(exercises.indices, id: \.self) { index in
-      let exercise = exercises[index]
+    ForEach(exercises) { exercise in
       ExerciseCard(
         exercise: exercise.name,
         meta: exercise.cardSubtitle,

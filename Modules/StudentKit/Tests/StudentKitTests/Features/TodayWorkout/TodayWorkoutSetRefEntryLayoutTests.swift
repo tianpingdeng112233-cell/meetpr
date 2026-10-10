@@ -18,11 +18,11 @@ struct TodayWorkoutSetRefEntryLayoutTests {
     #expect(askCoachEntryCount(in: view) == 1)
   }
 
-  @Test("completed section owns the only ask-coach entry")
-  func completedSectionOwnsAskCoachEntry() async throws {
+  @Test("all recorded hides the hero and its ask-coach entry (spec 090)")
+  func allRecordedHidesHeroAskCoachEntry() async throws {
     let view = try await makeView(completedSetIndexes: [0, 1])
 
-    #expect(askCoachEntryCount(in: view) == 1)
+    #expect(askCoachEntryCount(in: view) == 0)
   }
 
   @Test("v3 set row stays free of a per-row ask-coach entry")

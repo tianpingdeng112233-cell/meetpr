@@ -46,6 +46,13 @@ enum StudentStrings {
       self.countIndex = countIndex
     }
 
+    static let trainingFlowCompletedOne = Key("student.trainingFlow.completedOne")
+    static let trainingFlowCompletedMany = Key("student.trainingFlow.completedMany")
+    static let trainingFlowCompletedAccessibilityOne = Key(
+      "student.trainingFlow.completedAccessibilityOne")
+    static let trainingFlowCompletedAccessibilityMany = Key(
+      "student.trainingFlow.completedAccessibilityMany")
+
     static let accessoryCompleteAll = Key("student.accessory.completeAll")
     static let accessoryNeedsWeightMany = Key("student.accessory.needsWeightMany")
     static let accessoryVideoWarning = Key("student.accessory.videoWarning")
