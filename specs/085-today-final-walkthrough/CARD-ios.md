@@ -54,3 +54,13 @@
 ## 文件范围
 
 `Modules/StudentKit`（Dashboard、MyProfile、Onboarding、Shared、Resources、对应 Tests）；确有需要时 `Modules/DesignSystem`（通用可选块）与 `Modules/CoreModels`（只加不改）。不动 `CoachKit`、`Networking` 的线上形状、`Widgets`、工程文件里的版本号。
+
+## 修订一（2026-10-10，Opus 裁定 Codex 开工核对的阻塞）
+
+现状：从 Today 交给训练页的指定训练日会被训练页重置回当前训练日（证据见 `docs/CODEX-JOURNAL.md`「spec 085 iOS（开工核对阻塞）」）。裁定：**放开范围，修接收端**。
+
+- 允许改 `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift` 的 handoff 接收与跳转处理，以及 `StudentRootView.swift` 里从 Today 发起跳转的那一段。
+- 要求：从概览卡带着指定训练日进训练页时，选中的就是那一天（非当前训练日显示现有的只读预览）；训练页已在内存里、此前选着别的日子时同样生效。普通点训练 tab、Today 底部 `Start training`、通知跳转仍回到当前训练日，行为与改前逐一相同。
+- 改动取最小：只动接收与跳转这几处，不重排、不重命名、不顺手整理这个文件——另一条线（086）同时在改它，改得越散合并冲突越多。
+- 新增测试 seam 6：指定训练日的接收（放在现有训练页选择 / handoff 的测试旁）——带指定日进入选中该日；已选别的日子时再收到新的指定日会切过去；不带指定日的跳转回当前训练日。先红后绿。
+- 其余各项照卡执行。

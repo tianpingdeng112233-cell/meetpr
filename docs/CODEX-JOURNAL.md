@@ -307,3 +307,203 @@
 - 最终标题：默认字号恢复 Competition / Deadlift 两行、右侧 Ask coach；accessibility-large（启动参数 `UICTContentSizeCategoryAccessibilityL`）完整显示 Competition / Deadlift，Ask coach 在下方。截图 `/tmp/en-labels-evidence/training-en-default.jpg`、`training-en-accessibility-large.jpg`。没有新增能准确测实际词内断行的布局单测，未用无关断言充数；原有唯一入口测试保留并通过。
 - **未覆盖的卡验收**：验收 1/2 的“下一练”双主项卡片在中英实屏未到达（两处函数的双语输出已单测）；验收 3 指定的当前组 Competition Squat + Ask coach 未复现于最终 Demo（游标为 Deadlift，未改 Demo 数据），已用同样较长的 Competition Deadlift 验证；未做改前/改后默认字号截图逐像素对比。Opus 按原卡补验，不把这些替代证据写成完整验收通过。
 - 无障碍大字号下的重量数字及其他卡外布局问题未改。模拟器只经正常导航与开始按钮，未录入/删除训练数据；测试进程已停止，语言/字号通过进程参数注入。
+
+## 2026-10-10 · spec 085 iOS（开工核对阻塞，未实装）
+
+- 工作树 `MeetPR-wt-085`，分支 `feat/085-today-final-walkthrough`，HEAD `a36e1f13`；开工工作区干净。第一条命令在当前目录以 `probe=$(mktemp "$PWD/.codex-write-probe.XXXXXX") && rm "$probe"` 试写并删除，exit 0、无输出。未转到其他目录写入，未 commit/push。
+- 已读 CONTEXT、AGENTS、CLAUDE 发版路标、085–090 共同约定、085 SPEC 与 CARD-ios 全文；安卓 `137d816:src/domain/meet/weight-class.ts` 仅通过 `git show` 读取。
+
+### 阻塞：指定训练日入口不能直接复用来满足验收 1b
+
+卡片要求复用 `TodayWorkoutPlanHandoff` / `TodayWorkoutSelectionResolver`，且 SPEC §1 要求点概览卡后训练页选中同一天；SPEC Out of Scope 明确训练页本身不动，CARD-ios 文件范围只列 Dashboard、MyProfile、Onboarding、Shared、Resources 与对应 Tests。
+
+现场代码证据（均为开工 HEAD，未修改）：
+
+1. `Modules/StudentKit/Sources/StudentKit/StudentRootView.swift:454` 的 `startWorkoutFromDashboard` 保存 handoff 后，无条件递增 `trainingJumpToken`；第 242 行将其传入训练页的 `jumpToTodayToken`。
+2. `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift:115` 仅用 handoff 的 dayID 初始化 `@State selectedDayID`。
+3. 同文件第 422 行监听 handoff 变化，却继续使用旧 `selectedDayID`；第 917 行要求旧选中日与新 handoff 日一致才能取得 handed-off plan，因此从已选 D1 切到 D2 的 handoff 不会在此更新选择。
+4. 同文件第 428–433 行监听跳转 token，并调用 `returnToCurrentDay()`；第 597–598 行把选择设为 `sequencePage.currentSelection`（游标日）。这会把非当前日导航重置为当前日。
+5. `StudentRootView.swift:213` 起以 ZStack 持有各 tab；`StudentTabAccessibilityHost.swift` 通过隐藏和固定 tab identity 切换，不能假设每次点卡都会重建训练页并重新执行 State 初始化。
+
+以上为静态调用链证据，尚未运行模拟器复现。最小需要决策的范围调整：允许修复 `Features/TodayWorkout/TodayWorkoutView.swift` 的 handoff 接收与跳转处理，保证显式日选择优先，同时保留普通训练 tab / Start training 回当前日的行为；如增加接收端回归测试，需同时明确允许对应 TodayWorkout 测试 seam。未实施该调整，也未新建第二条导航路径。按 David「发现 SPEC 与 iOS 现状矛盾就停下来返回」的要求停止，未先做其余三项。
+
+### 改动、测试与验收状态
+
+- 改动文件：仅 `docs/CODEX-JOURNAL.md` 追加本节。Swift、资源、既有测试断言均未改；未改 SPEC、发布账本或 build 号。
+- 五处 seam：级别表与格式、OnboardingDraft、DashboardProfileMetrics、ProfileSummaryFormatter、Today presentation，均未开始红/绿循环；新增测试 0，执行测试 0，无红/绿原始输出。
+- 验收 1a 未实现/未测；1b 被上述入口阻塞；1c、1d 未实现/未测。
+- 验收 2a、2b、2c 未实现/未测。
+- 验收 3a、3b、3c、3d、3e、3f、3g 未实现/未测。
+- 验收 4 未覆盖：五种老用户形态（手填级别、从未回答、有日期、备赛但无日期、体重一位小数）均未进行 Demo 或单测覆盖；留言保留与旧引导草稿恢复亦未验证。
+- 验收 5 未覆盖：Light/Dark、中英文、最小屏及 accessibility-large 均未运行。
+- 替换后的验收 6 未执行：未跑 StudentKit 全量、format、lint 或 DemoStudent 构建运行。未遇到 ModuleCache 报错，因此未使用缓存替代命令。
+- 发现的卡外问题：上述 TodayWorkout handoff 接收行为；其余尚未完成调查。截图与构建/测试日志：无；本节保留静态证据路径及行号，不将代码检查写作实屏验证。
+
+## 2026-10-10 · spec 085 iOS（实装与自测，待收货）
+
+### 验收场景的最小范围补充（先记证据，后改）
+
+- 默认 Demo 的 `StudentDemoSeed.makeOnboardingProfile` 固定 male / kg / 83 / 有比赛 / 已完成引导；`MeetPRApp.makeDemoRootView` 固定 accepted bond，无法经现有界面到达未填体重、other 男女表及第 7 步引导。共同约定允许启动参数 Demo 场景，David 修订一允许明确的小范围补充先记后做。
+- 拟增加 `-spec085-profile <场景>`，只在 `Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift` 的档案种子覆盖中生效；以及 `-spec085-onboarding`，只在 `MeetPR/Sources/MeetPRApp.swift` 的 DEMO seed 分支取消预置绑定，让现有邀请码→引导流程可到达。默认 Demo、线上依赖、存储结构和键保持原样。不修改 CoachKit。该补充不改变真实用户行为。
+
+### 改动文件清单
+
+本次共 36 个文件（包含本 JOURNAL）；CARD-ios.md 的修订一是用户已有改动，未由本轮编辑。
+
+- `MeetPR/Sources/MeetPRApp.swift`
+- `Modules/StudentKit/Sources/StudentKit/BodyWeightInput.swift`
+- `Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardDaySelection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardNutritionCard.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardOverviewCard.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardProfileMetrics.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardProfileMetricsView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardTodayPresentation.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardTodayScreen.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Dashboard/DashboardWeekCalendar.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/MyProfileV3Presentation.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/MyProfileView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/OnboardingSummaryFormatter.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileCardsSection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Onboarding/BodyWeightField.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Onboarding/MeetFieldsSection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Onboarding/OnboardingDraft.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Onboarding/Steps/Step1BasicsSection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Onboarding/Steps/Step7ExtrasSection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Shared/MeetClass.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Shared/StudentSelectionBlock.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutSelectionResolver.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings`
+- `Modules/StudentKit/Sources/StudentKit/StudentRootView.swift`
+- `Modules/StudentKit/Sources/StudentKit/StudentStrings.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardProfileMetricsTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardProfileNavigationTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/DashboardSelectionPresentationTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileSummaryFormatterTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/MeetClassTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingDraftTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutSelectionResolverTests.swift`
+- `docs/CODEX-JOURNAL.md`
+
+### 六处 seam 的红 → 绿
+
+证据目录统一为当前工作树 `.build/spec085-evidence/`，下列日志均为当时原始 stdout/stderr，未覆盖为手写摘要；新增 10 个 Swift Testing `@Test`，未删除既有测试。
+
+| seam | 红例原始日志与结果 | 绿例原始日志与结果 |
+| --- | --- | --- |
+| 1 级别表、格式、解析 | `seam1-red.log`：新 MeetClass / MeetFederation 接口不存在，编译失败 | `seam1-green.log`：2/2，四家×两性别逐格、120+ / 67.5 往返、旧文本与无效联盟级别 |
+| 2 引导 / 保存隔离 / 体重 | `seam2-meet-red.log`：1 测试 5 条真实断言失败；`seam2-weight-red.log` / `seam2-patches-red.log`：新过滤、分字段 patch 接口缺失编译失败 | 对应三个 `*-green.log` 各 1/1；kg/lb/逗号地区、小数截断、kg 往返、移除、三编辑页字段隔离 |
+| 3 Today metrics | `seam3-red.log`：缺 weightClassText 编译失败 | `seam3-green.log`：1/1，83.00 / 83.50、旧级别、空级别、不备赛与缺日期 |
+| 4 Profile 摘要 | `seam4-red-corrected.log`：缺 note 摘要接口编译失败 | `seam4-green.log`：1/1，Meet 与留言分别展示，留言首行、原完整值保留 |
+| 5 Today presentation | `seam5-red.log`：缺选择与概览 presentation 接口编译失败 | `seam5-green.log`：2/2，选择/游标独立、重置、名称/状态/计数/动作顺序 |
+| 6 指定日接收 | `seam6-red.log`：缺 receive 接口编译失败 | `seam6-green.log`：1/1，显式日、再次换日、无显式日返回 cursor |
+
+- 不把编译红例写成断言红例。`seam1-interface-red.log` 是独立编译探针缺 Testing 模块；`seam4-red.log` 含测试枚举值笔误及修改编译中文件的错误，均不是有效行为红例，正式 seam 4 红例为已纠正后重跑的 `seam4-red-corrected.log`。
+- 实屏发现 SwiftUI TextField 在 setter 过滤成相同值时仍显示第三位；`weight-filter-83-25.jpg` 是失败状态（显示 83.256），改成 raw text 状态、onChange 回写过滤值后，`weight-filter-fixed.jpg/.json` 显示 83.25。原六 seam 中的纯过滤测试无法捕捉 UIKit 文本缓存，未加浅层测试冒充该 UI 回归。
+- seam 2 后补旧草稿 nil / false / true Codable 往返，以及 Remove meet 不影响体重、伤病、原多行留言的断言，仍在原 seam 内，最终全量覆盖。
+
+### 既有断言变更（逐条依据）
+
+| 文件 / 测试 / 断言 | 原值 | 新值 | SPEC 依据 |
+| --- | --- | --- | --- |
+| OnboardingDraftTests / step7CompetitionDateIsConditionallyRequired / 空草稿 | `!isStepComplete(7)` | `isStepComplete(7)` | §3「第 7 步不再因没回答是否备赛拦截」，未展开提交 false |
+| 同测试 / true 且只有日期 | `isStepComplete(7)` | `!isStepComplete(7)`，随后增加格式化级别后断言 true | §3「展开后三项同样必填，缺项时这一步不能继续」 |
+| DashboardProfileMetricsTests / metricsShowWeightOnlyWhenPresent | `76 kg` | `76.00 kg` | §2「全端体重显示统一保留两位小数」 |
+| DashboardProfileNavigationTests / metricCardsRouteToExistingEditors（hasValues false / true 两例） | `.basics` | `.weight` | §2 与 2a「体重卡有值、空态进入的页面只有一个体重输入框」 |
+| ProfileSummaryFormatterTests / basicsSummaryFormatsGenderAgeHeightWeight | `男 · 25岁 · 178cm · 83kg` | `男 · 25岁 · 178cm · 83.00kg` | §2 Basic information「该行显示两位小数」 |
+| 同文件 / competitionSummaryShowsDateAndClassOrOptOut / 有值 | `备赛: 日期 · IPF 83kg` | `日期 · IPF 83kg` | §3 Meet 行「值为日期 · 赛事方与级别」；旧手填文字原样保留 |
+| 同测试 / opt-out | `暂不备赛` | `未填写` | §3 Meet 行「没有比赛显示现有的未填占位」 |
+
+首轮 23 条 issue = 上表新口径 8 条（路由参数化两例计两条）+ 15 条视频编码 issue；修正后的沙箱全量仍留 15 条视频 issue。未通过删测试、放宽条件或改视频逻辑换取绿色。
+
+### Basic information 空体重核对
+
+只读安卓 `git -C ../meetpr-rn show 137d816:...`：`src/features/profile/ProfileEditor.tsx:37–44` 对 basics 执行 `invalidFieldsForStep(form, profileSteps[section])`，只对 injuries/note 清空错误、对 weight 过滤错误，没有对 basics 放行。`src/features/profile/model.ts:9` 指定 basics 为第 1 步；`src/features/onboarding/model.ts:277–284` 调用 `bodyWeightKgFromInput(form.weightKg, 'kg')`，空体重产生 `weightKg` 错误；ProfileEditor 在 mutateAsync 前 return。结论：安卓明确禁止空体重时只改身高保存。iOS 保留 `.basics && draft.weightKg == nil` gate，与此行为一致；不是自行扩大必填范围。
+
+### 全量、格式与构建
+
+- 仅改 StudentKit 包（Demo app 不是新 SPM 包；未改 CoreModels / DesignSystem / CoachKit / Networking）。StudentKit 原 932 项，本卡新增 10 项，最终 **942 passed / 0 failed / 0 skipped**。
+- 沙箱内命令（通过 `.build/spec085-evidence/run-tests.sh`，filter 空字符串代表全量）：
+
+  ```sh
+  env CLANG_MODULE_CACHE_PATH="$PWD/.build/clang-module-cache" \
+    SWIFTPM_MODULECACHE_OVERRIDE="$PWD/.build/clang-module-cache" \
+    swift test --disable-sandbox --skip-update \
+    --package-path "$PWD/Modules/StudentKit" \
+    --scratch-path "$PWD/.build/spec085-tests" \
+    --cache-path "$PWD/.build/swift-cache" --filter ''
+  ```
+
+- 系统 cache 权限/依赖代理失败的原始输出在 `test-environment.log`、`test-mcp-environment.log`。依赖离线缓存只读复制本机既有 ViewInspector bare repo 到当前 `.build/swift-cache/repositories`，未更新依赖、未改 HOME。沙箱全量 `studentkit-full-final.log` 942 项有 14 个失败测试、15 条 `Cannot Encode` issue（audio 参数化两例），不称为通过。
+- 依照 2026-10-04 的 MCP 方法，先将 session configuration 设 Debug，再调用 `swift_package_test({packagePath: 当前工作树/Modules/StudentKit})`，执行真实 `swift test --package-path ...`。`studentkit-mcp-full.log` 942/942；Demo 与兼容性补断言后，`studentkit-mcp-interrupted.log` 曾 signal 11 中断，不计通过、根因未定；源文件不再改动、构建结束后同命令重跑 `studentkit-mcp-final.log` **942/942，0 skipped**，包括之前全部视频导出用例。未申请沙箱外 shell、未 stash、未另建基线副本（视频在可运行环境已真实通过）。
+- `swift-format lint --strict` 用 Xcode 工具链绝对路径；`swiftlint lint --strict --no-cache` 用 Homebrew 二进制，输入文件清单 `swift-files.txt`，34 个 Swift 文件 **0 违规**，日志 `format-final.log` / `lint-final.log`。`git diff --check` 通过。
+- `i18n-check.log`：29 个新增双语键逐项匹配安卓 RnExtras / StudentKit 目录，旧键 0 修改；JSON 可解析。StudentKit / CoachKit 无互相 import，未改任何 Package.swift。
+- `MeetPR-DemoStudent` / DemoStudent / iPhone 17e（iOS 26.5，可用最小屏 390×844；无 SE）经 XcodeBuildMCP `build_run_sim({extraArgs:["-skipPackageUpdates"]})` 构建、安装、运行成功，0 warnings；`build-final.log`。DerivedData 在本 worktree `.build/DerivedData`。未使用 `xcodebuild test -scheme <包>`。
+- `code-review` Standards / Spec 两位独立只读 reviewer，初审与最后输入同步 / Demo / 兼容性增量复审均 **CLEAN，0 findings**；不代替 Opus 收货。
+
+- 大字号实屏补修：`today-zh-dark-large.jpg` 暴露新增两位小数后数字被拆成 83. / 00 两行；仅给体重数值加单行与缩放下限，保留原字体 token、单位与卡片结构，后续复验截图见验收项。
+
+- 上述布局补修后最后一轮 `studentkit-mcp-final-layout.log`：**942 项 / 44 suites 全通过，0 失败、0 跳过**（Swift Testing 用例运行 5.721 秒，含视频导出）。`build-final-layout.log`：DemoStudent **BUILD SUCCEEDED**、0 warnings；随后显式安装最终 `.build/DerivedData/Build/Products/DemoStudent-iphonesimulator/MeetPR.app` 并运行，以下末轮截图来自这份产物。
+- 额外 Coach Demo 构建的 MCP 调用曾超过 300 秒返回超时，但后台 xcodebuild 随后正常完成，`build-coach.log` 末尾为 **BUILD SUCCEEDED**；产物实际安装运行并拍到新格式。该构建未退出时，一次学生构建遇到 build.db 锁，随后等其结束再重跑成功。超时和锁冲突不计作成功构建，也未据此修改源文件。
+
+### 验收清单逐项自测
+
+以下是开发自测，不代替 Opus 按 CARD 收货。截图和同名 `.json` 均在 `.build/spec085-evidence/`；仅有 jpg 的早期截图用实屏记录和对应单测补证。Demo 数据为本地内存种子，没有操作线上账号。
+
+| 原验收项 | 自测结论与证据 |
+| --- | --- |
+| 1a 周条选中 / 当前标记分开 | 通过。Demo 当前为 D3：默认 D3 粗框与金底；点 D2 粗框移动、D3 保留当前标记，返回重置。`today-en-light.jpg`、`today-selected-d2.jpg`；seam 5 同时断言选择与 cursor 状态。 |
+| 1b 概览与指定日跳转 | 通过。名称、状态、全天动作/组数与单行动作名按所选日更新；D2 完成只读、再从 Today 点 D4 时内存中的训练页切到 D4 只读，返回 Today 重置 D3。`training-handoff-d2.jpg`、`training-handoff-d4.jpg`；seam 5/6。 |
+| 1c Start training 不跟点选走 | 通过。点非当前日后页头与底部动作不变。训练页先翻到 W2，再从 Today 点 Start training 回 W1D3；普通 Training tab 同样回当前周当前日。`training-week2-before-start.jpg`、`training-week1-after-start.jpg`、`training-tab-resets-week.jpg`。 |
+| 修订一 通知跳转 | 静态调用链和 seam 6 的 nil handoff 返回 cursor 通过；本轮未实际投递并点开系统通知，不写成通知端到端通过。TodayWorkoutView 只改 handoff / token 接收，通知发起处未改。 |
+| 1d 已完成日 / 当天完成后概览 | 通过。先验证 D2 Completed；再用已有 `-student-empty-state next-plan-pending` 场景，在训练页长按完成已有三组日志的 D3，关闭完成页返回 Today，概览仍为 D3 / Completed，cursor 为 D4。`today-completed-overview-final.jpg/.json`。`today-completed-overview.jpg` 是尚未真正完成的前置状态，不作通过证据。 |
+| 2a 单项体重、两位输入与补零 | 通过。有值/空态均仅一个体重框；第三位回写过滤，83.25 保存后 Today 显示 83.25 kg，整数保存显示 83.00 kg。`weight-en-light.jpg`、`weight-empty-editor.jpg`、`weight-filter-fixed.jpg/.json`、`weight-integer-saved.jpg/.json`。 |
+| 2b lb 转换与再次保存 | 英文实屏通过：183.25 lb → Today 83.12 kg → 重开 183.25，再保存仍 83.12。`weight-lb-en.jpg/.json`、`weight-lb-stored-kg.jpg/.json`、`weight-lb-readback.jpg/.json`；seam 2 覆盖 183.26 的稳定往返。中文自动输入存在未解决验证缺口，见下节，不将英文结果外推为中文键盘通过。 |
+| 2c Basic information | 通过英文实屏：同一组件过滤 83.256 为 83.25；Profile 摘要两位，保存后 Today 同步。`basics-weight-filter.jpg`、`today-after-basics.jpg/.json`、`profile-split-rows.jpg/.json`。空体重 gate 与安卓一致，依据见上节。 |
+| 3a Meet 三字段、保存与教练显示 | 通过各端 Demo 展示：无是/否、无留言框；IPF + 83 kg 保存后 Today 倒数与新格式同时在。`meet-saved-today.jpg/.json`；教练 Demo 的申请档案显示 `2026-10-13 · IPF · 83 kg`，`coach-meet-formatted.jpg/.json`。两端是独立内存种子，未把该证据称为真实服务端跨端同步。 |
+| 3b 四家 × 男女 | 通过。纯逻辑逐格断言全 8 张表；other 档案可点 Men / Women，中文深色大字号逐表截图 `meet-{cpa,ipf,ipl,wp}-{men,women}-zh-dark-large.jpg/.json`。 |
+| 3c 必填与清选择 | 通过。缺赛事方点 Save 显示红色缺项和提示：`meet-validation-final.jpg/.json`。先选 IPF / 83 kg，再换 IPL，级别全部未选，滚到 Save 点后仍留编辑页并提示：`meet-switch-clears-class.jpg/.json`。三字段 patch / 缺项在 seam 1/2 覆盖。旧 `meet-reset-class-validation.jpg` 实际误点到了 Progress，不用作本项证据。 |
+| 3d Remove meet | 学员路径通过：确认框 → 确认 → Not scheduled，`meet-remove-confirm.jpg`、`meet-removed.jpg/.json`；seam 2 断言只清比赛三字段且保留留言等。教练无比赛显示 `—`：`coach-no-meet-unanswered.jpg/.json`（nil 种子）；未在同一后台账号实测 false + null 日期/级别同步到教练，教练读取空字段路径静态核对。 |
+| 3e Meet / Note to coach | 通过。两行独立入口，原留言完整可见；改为两行留言后摘要只显示首行，比赛不变。`profile-split-rows.jpg/.json`、`note-original.jpg/.json`、`note-saved-profile.jpg/.json`；seam 2/4 验证字段隔离与完整值。 |
+| 3f 第 7 步 | 不展开完成、展开缺项拦截、选齐完成均实屏通过：`onboarding-step7-collapsed.jpg/.json`、`onboarding-step7-incomplete.jpg/.json`、`onboarding-step7-complete-selection.jpg/.json`、`onboarding-without-meet-completed.jpg/.json`、`onboarding-with-meet-completed.jpg/.json`。完成后现有 coached 流程进入待教练接受页，未继续到该新用户的 Today；false / null 和 true / 格式化级别写入由 seam 2 验证，Today 展示由 seam 3 / 已绑定 Demo 验证。此替代不算“新用户完成后 Today”端到端实屏通过。 |
+| 3g 营养占位 | 中英位置与四格文案通过：`today-en-light.jpg`、`today-zh-dark-large-fixed.jpg/.json`。组件无 Button / gesture，运行时快照无可点击目标；自动化无法对非交互语义目标发送 tap，因此无反应以静态与语义树核对，未声称做过坐标点击。 |
+| 4 老用户升级第一屏 | 按 CARD 允许的 Demo + 单测替换，五种形态逐条见下表；无迁移或回填，没有重新注册旧用户。 |
+| 5 主题 / 语言 / 小屏大字号 | 用可用最小 iPhone 17e 390×844（未安装 SE）；英文 Light 普通字号检查 Today / 体重 / Meet，英文 Light accessibility-large 检查 Meet，中文 Dark accessibility-large 检查 Today / 体重 / 全部 8 张级别表。级别文本可按组件布局将 kg 换行，完整可见；修正后的 Today 83.00 保持单行。`meet-accessibility-before.jpg`、`meet-*-zh-dark-large.jpg`、`today-zh-dark-large-fixed.jpg`。未穷举语言×主题×字号所有交叉组合，也未做真实 SE 验证；共同约定允许无 SE 时替换。 |
+| 6 iOS 替换验证 | StudentKit 942/942，34 个 Swift 文件 format / lint 0 违规；DemoStudent 最终构建、安装、运行通过。未改其他 SPM 包。 |
+
+### 存量数据五种形态与额外数据保留
+
+| 存量形态 | 覆盖方式与结论 |
+| --- | --- |
+| 手填级别 83kg / -93 | Demo `-spec085-profile legacy`：Today 83kg 与倒数，编辑灰字 Previously entered: 83kg，返回未变，重新选齐后新格式；`legacy-first-screen`、`legacy-edit-cancel-before`、`legacy-cancel-preserved` 三组 jpg/json。seam 1 拒绝把旧文字误解析成新选项，seam 3/4 原样显示；-93 作为原文字路径，未单独拍实屏。 |
+| true 且有日期 | 默认 Demo + legacy 场景直接带回日期，Today 倒数原样；`meet-legacy-en.jpg`、`legacy-first-screen.jpg`；seam 3 用固定日期断言倒数为 2。 |
+| false 或 nil | nil 用 `-spec085-profile unanswered`，首屏 Not scheduled，进入默认今天；`unanswered-first-screen`、`unanswered-add-default-date`。false 用 Remove meet 实屏；seam 2/3 各覆盖 false / nil，打开和取消不调用保存路径。 |
+| true 但无日期 | `-spec085-profile no-date` 首屏 Not scheduled：`no-date-first-screen.jpg/.json`；seam 3 明确 nil 日期没有 competition metric，正常编辑可补全。 |
+| 整数 / 一位小数体重 | 默认 83 显示 83.00，legacy 83.5 显示 83.50；seam 3 断言原 snapshot.weightKg 不变，组件初始化只格式化字符串，不回写 kg。只有保存才 patch。 |
+
+- 留言：上述 Demo 种子覆盖只变目标字段，旧留言保持原值；`note-original` 与教练两组截图可见原文。seam 4 检查摘要首行但保留整段，seam 2 对 nil / false / true 存量档案应用 Remove patch 后逐项断言留言、体重、伤病不变。
+- 引导旧草稿：seam 2 以 nil / false / true、旧日期、83kg、多行留言和 83.5 做 Codable 往返，完整 equality；nil / false 收起可过第 7 步、true 必须选齐新格式。`LocalOnboardingDraftStore`、存储键、Codable 字段均未改。未从真实旧版安装提取草稿，覆盖方式为单测。
+
+### 验证缺口、卡外发现与交付状态
+
+- **中文小数输入待复核**：同一最终 app 在英文 en_US 的 MCP `type_text` 能输入并保存 183.25；中文 zh-Hans / zh_CN 下整串输入分别只留下 183、1832，单独追加 `.` 也未出现。`weight-lb-zh-dark-large.jpg/.json`、`weight-lb-zh-final-attempt.jpg/.json` 保留失败状态。不能据此区分 MCP 键盘注入、系统输入法或组件问题；未把原因断言为工具限制，也未按猜测改过滤规则。需要原生键盘或真机复核，中文输入验收不通过。
+- 为交叉验证而调用 Computer Use 获取 Simulator，被自动审批拒绝，未提供原因；未重试或绕过该拒绝。后续只继续已有 XcodeBuildMCP 验证。此处阻止了原生键盘交叉验证，不影响此前真实英文往返与全量单测结果。
+- 未完成的端到端项：实际系统通知跳转；新引导完成并获教练接受后直接进入 Today；同一后端账号 Remove 后教练同步。以上替代证据已在逐项表注明，不冒充全验收通过。没有新增需要产品裁定的行为分支。
+- 卡外既有问题未改：英文 accessibility-large 的 Today 旧 Weekly progress / Coach-recommended date 标题挤压；CoachKit 既有 Basic Info 体重仍显示整数（CARD 明确教练代码不改）；旧 Demo feedback-pending / next-plan-pending 只预填日志、不预置 sequence completion，不能仅凭场景名当作当天完成，需要实际长按完成。上述均未扩大改动。
+- 首次 SwiftPM 编译可见既有 `TrainingReminderScheduling.swift:122` 未使用 Bool? 及旧测试并发 warning；未改其源文件。最终学生模拟器构建 0 warnings。MCP 的 signal 11 中断和沙箱视频编码失败作为原始失败日志保留，后续真正全量绿例独立保存。
+- 两轴只读复审均无新 finding；末轮 reviewer 额外查看 `coach-meet-formatted`、`coach-no-meet-unanswered`、`meet-switch-clears-class`、`today-completed-overview-final` 的截图与 JSON，未发现新问题。截图证明最终画面，不替代操作链与数据断言。
+- 日志、截图统一路径：当前工作树 `.build/spec085-evidence/`（ignored，不加入版本库）；核心最终日志 `studentkit-mcp-final-layout.log`、`build-final-layout.log`、`build-coach.log`、`format-final.log`、`lint-final.log`、`i18n-check.log`；六 seam 原始红绿文件见上表。`.build/opus/` 未动。
+- 交付为当前 feature 分支的未提交工作区改动；未 commit、未 push，未改任何 SPEC、NEXT-RELEASE、RELEASES、build 号或后端；安卓仓全程只读。CARD-ios 修订一保留用户已有改动。
+
+### 返修一（2026-10-10，Opus 收货两项）
+
+- 仅返修 Remove meet 颜色与体重单项页字段标题。本轮改动 5 文件：`Features/MyProfile/ProfileCardsSection.swift`、`Features/Onboarding/BodyWeightField.swift`、`StudentStrings.swift`、`Resources/Localizable.xcstrings`（均在 StudentKit），以及本 JOURNAL；没有改测试或扩大功能范围。
+- Remove meet 的 label 显式设置 `Color.MeetPR.dangerMuted`，与 `AccountSecuritySheets.swift` 的 Delete account 行同源，避免依赖外层可能覆盖的系统 destructive 着色；仍居中。确认框内 Remove 的系统 destructive role 与删除行为不变。
+- 安卓依据：只读 `137d816:src/features/profile/ProfileEditor.tsx`，weight 映射到 `WeightSection`；`src/features/onboarding/OnboardingSteps.tsx:104–110` 默认 `labelKey = 'student.rn.weight.label'`；`src/i18n/catalog/RnExtras.json:242` 对应英文 **Weight**、中文 **体重**。BasicStep 第 98 行单独传旧 `student.step1BasicsSection.copy003`。原始摘录保存在 `.build/spec085-evidence/r1-android-reference.log`。
+- iOS 为 BodyWeightField 增加带默认值的 labelKey，仅单项 `.weight` 分支指定新增的 `bodyWeightLabel`（Weight / 体重，逐字取安卓）；Basic information 和引导第 1 步继续用原默认标题。单项页导航标题仍为 Body weight / 体重，输入、精度、存储规则未改。
+- 验证：XcodeBuildMCP `swift_package_test({packagePath: 当前工作树/Modules/StudentKit})`，Debug，**942 passed / 0 failed / 0 skipped**；`r1-studentkit-full.log` 与 `r1-test-result.json`。既有 `TrainingReminderScheduling.swift:122` unused Bool? warning 仍在，未顺手改。34 个改动 Swift 文件重新跑 `swift-format lint --strict`、`swiftlint lint --strict --no-cache`，均 **0 违规**（`r1-format.log/.exit`、`r1-lint.log/.exit`）。`git diff --check` 通过；既有断言未改，无新增样式测试。
+- `MeetPR-DemoStudent` / DemoStudent 在 **iPhone Air、iOS 26.5** 重新 build_run_sim，158.3 秒，**BUILD SUCCEEDED、0 warnings**，安装并运行成功；日志 `.build/spec085-evidence/r1-build.log`。启动参数为 `-spec085-profile legacy`；英文 `-AppleLanguages '(en)' -AppleLocale en_US -meetpr.appearance light`，中文 `-AppleLanguages '(zh-Hans)' -AppleLocale zh_CN -meetpr.appearance dark`。
+- 已亲看两种主题：Meet 移除入口浅色为深红、深色为浅红；英文体重页为 Body weight 导航标题 / Weight 字段标题，中文字段为体重。四张截图及同名语义快照：`.build/spec085-evidence/r1-meet-en-light.jpg`、`r1-meet-zh-dark.jpg`、`r1-weight-en-light.jpg`、`r1-weight-zh-dark.jpg`。未在本轮保存或移除 Demo 档案。
+- 本轮增量只读复审 **0 findings**。两项返修均完成，无新增待决策问题；先前记录的其他验证缺口不在本轮范围。未 commit、未 push，未改发布文件、build 号或 SPEC。
