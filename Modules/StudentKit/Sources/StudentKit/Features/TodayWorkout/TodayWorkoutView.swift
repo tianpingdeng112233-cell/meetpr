@@ -420,6 +420,12 @@ public struct TodayWorkoutView: View {
       }
     }
     .onChange(of: planHandoff?.id) { _, _ in
+      guard let planHandoff else { return }
+      started = false
+      let previousSelection = selectedDayID
+      TodayWorkoutSelectionResolver.receive(
+        planHandoff, selectedDayID: &selectedDayID, days: viewModel.planDays)
+      guard previousSelection == selectedDayID else { return }
       guard let plan = handedOffPlan(for: selectedDayID) else { return }
       Task {
         await loadWorkout(for: selectedDayID, preloadedPlan: plan)
@@ -430,7 +436,8 @@ public struct TodayWorkoutView: View {
       // presentation still resumes recording when real logs already exist;
       // zero-log days alone return to the explicit pre-start state.
       started = false
-      returnToCurrentDay()
+      TodayWorkoutSelectionResolver.receive(
+        nil, selectedDayID: &selectedDayID, days: viewModel.planDays)
     }
     .onChange(of: uploadFailureNavigationToken) { _, token in
       guard token > 0 else { return }

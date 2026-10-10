@@ -44,9 +44,12 @@ struct ProfileCardsSection: View {
         OnboardingSummaryFormatter.materials(profile)
       }
       editableRow(
-        .competition, icon: "target", title: StudentStrings.localized(.profileCardsSection007)
+        .competition, icon: "target", title: StudentStrings.localized(.meetTitle)
       ) {
         OnboardingSummaryFormatter.competition(profile)
+      }
+      editableRow(.note, icon: "text.bubble", title: StudentStrings.localized(.profileNote)) {
+        OnboardingSummaryFormatter.note(profile)
       }
       editableRow(
         .injuries, icon: "bandage", title: StudentStrings.localized(.profileCardsSection008)
@@ -146,17 +149,17 @@ struct ProfileCardsSection: View {
 /// Which archive card is being edited; maps onto the step patch builders
 /// (1RM card deliberately has no kind — the lock is structural, risk 6).
 enum ProfileCardKind: Hashable {
-  case basics, background, environment, recovery, materials, competition, injuries
+  case basics, weight, background, environment, recovery, materials, competition, note, injuries
 
   /// The wizard step whose patch builder saves this card. Never 3.
   var patchStep: Int {
     switch self {
-    case .basics: 1
+    case .basics, .weight: 1
     case .background: 2
     case .environment: 4
     case .recovery: 5
     case .materials: 6
-    case .competition, .injuries: 7
+    case .competition, .note, .injuries: 7
     }
   }
 
@@ -167,7 +170,9 @@ enum ProfileCardKind: Hashable {
     case .environment: StudentStrings.localized(.profileCardsSection004)
     case .recovery: StudentStrings.localized(.profileCardsSection005)
     case .materials: StudentStrings.localized(.profileCardsSection006)
-    case .competition: StudentStrings.localized(.profileCardsSection007)
+    case .competition: StudentStrings.localized(.meetTitle)
+    case .weight: StudentStrings.localized(.dashboardProfileMetricsView001)
+    case .note: StudentStrings.localized(.profileNote)
     case .injuries: StudentStrings.localized(.profileCardsSection008)
     }
   }
@@ -182,18 +187,35 @@ struct ProfileCardEditView: View {
   let viewModel: MyProfileViewModel
   @State private var draft: OnboardingDraft
   @State private var isSaving = false
+  @State private var showsValidation = false
+  @State private var confirmsRemoval = false
+  private let hasMeet: Bool
   @Environment(\.dismiss) private var dismiss
 
   init(kind: ProfileCardKind, profile: OnboardingProfile, viewModel: MyProfileViewModel) {
     self.kind = kind
     self.viewModel = viewModel
-    self._draft = State(initialValue: OnboardingDraft.from(profile))
+    self.hasMeet = profile.isCompeting == true && profile.competitionDate != nil
+    var initial = OnboardingDraft.from(profile)
+    if kind == .competition {
+      if !hasMeet { initial.competitionDate = DateOnly.string(from: Date()) }
+      initial.isCompeting = true
+    }
+    self._draft = State(initialValue: initial)
   }
 
   var body: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
         fields
+        if showsValidation {
+          Text(
+            StudentStrings.localized(
+              kind == .competition ? .meetChooseClass : .myProfileViewModel002)
+          )
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.dangerMuted)
+        }
         if let saveError = viewModel.saveError {
           Text(saveError)
             .font(.MeetPR.body(size: MeetPRFontMetrics.size11, weight: .medium))
@@ -207,19 +229,42 @@ struct ProfileCardEditView: View {
         ) {
           Task { await save() }
         }
+        if kind == .competition, hasMeet {
+          Button(role: .destructive) {
+            confirmsRemoval = true
+          } label: {
+            Text(StudentStrings.localized(.meetRemove))
+              .foregroundStyle(Color.MeetPR.dangerMuted)
+          }
+          .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+          .disabled(isSaving)
+        }
       }
       .padding(MeetPRSpacing.base)
     }
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bgBase)
     .navigationTitle(kind.title)
+    .alert(StudentStrings.localized(.meetConfirmRemove), isPresented: $confirmsRemoval) {
+      Button(StudentStrings.localized(.meetRemoveAction), role: .destructive) {
+        Task { await removeMeet() }
+      }
+      Button(StudentStrings.localized(.accountSecuritySheets013), role: .cancel) {}
+    }
   }
 
   @ViewBuilder
   private var fields: some View {
     switch kind {
     case .basics:
-      Step1BasicsSection(draft: $draft)
+      Step1BasicsSection(draft: $draft, highlighted: showsValidation ? ["weight_kg"] : [])
+    case .weight:
+      BodyWeightField(
+        kilograms: $draft.weightKg, unit: draft.unitPreference ?? .kg,
+        labelKey: .bodyWeightLabel,
+        isHighlighted: showsValidation, showsHelp: true)
+    case .note:
+      NoteToCoachFieldsSection(note: $draft.noteToCoach)
     case .background:
       Step2BackgroundSection(draft: $draft)
     case .environment:
@@ -229,18 +274,37 @@ struct ProfileCardEditView: View {
     case .materials:
       Step6MaterialsSection(draft: $draft)
     case .competition:
-      CompetitionFieldsSection(draft: $draft)
+      MeetFieldsSection(draft: $draft, showsErrors: showsValidation)
     case .injuries:
       InjuryFieldsSection(draft: $draft)
     }
   }
 
+  private func removeMeet() async {
+    guard !isSaving else { return }
+    isSaving = true
+    defer { isSaving = false }
+    var removed = draft
+    removed.isCompeting = false
+    removed.competitionDate = nil
+    removed.targetWeightClass = ""
+    if await viewModel.save(removed.profilePatch(for: .competition)) { dismiss() }
+  }
+
   private func save() async {
+    guard !isSaving else { return }
+    if (kind == .competition && !draft.isStepComplete(7))
+      || ((kind == .weight || kind == .basics) && draft.weightKg == nil)
+    {
+      showsValidation = true
+      return
+    }
+    showsValidation = false
     isSaving = true
     defer { isSaving = false }
     // patchStep is never 3 → 1RM fields physically absent from every
     // card-edit PUT (spec 032 risk 6 + grep acceptance).
-    if await viewModel.save(draft.patch(forStep: kind.patchStep)) {
+    if await viewModel.save(draft.profilePatch(for: kind)) {
       dismiss()
     }
   }

@@ -40,56 +40,56 @@ struct InjuryFieldsSection: View {
   }
 }
 
-/// 比赛/备注 fields (Step 7 lower half + card 7 edit).
-@available(iOS 17.0, macOS 14.0, *)
+/// Optional meet section shared by the onboarding wizard.
 struct CompetitionFieldsSection: View {
   @Binding var draft: OnboardingDraft
   var highlighted: Set<String> = []
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.lg) {
-      OnboardingChoiceCards(
-        title: StudentStrings.localized(.step7ExtrasSection004),
-        options: [
-          (false, StudentStrings.localized(.step7ExtrasSection005)),
-          (true, StudentStrings.localized(.step7ExtrasSection006)),
-        ],
-        selection: $draft.isCompeting,
-        isHighlighted: highlighted.contains("is_competing")
-      )
-      if draft.isCompeting == true {
-        competitionDatePicker
-        MeetPRTextField(
-          StudentStrings.localized(.step7ExtrasSection007),
-          text: $draft.targetWeightClass,
-          placeholder: StudentStrings.localized(.step7ExtrasSection008)
-        )
-      }
-      OnboardingTextEditor(
-        title: StudentStrings.localized(.step7ExtrasSection009),
-        text: $draft.noteToCoach,
-        placeholder: StudentStrings.localized(.step7ExtrasSection010)
-      )
-    }
-  }
-
-  private var competitionDatePicker: some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-      OnboardingFieldLabel(
-        title: StudentStrings.localized(.step7ExtrasSection011),
-        isHighlighted: highlighted.contains("competition_date"))
-      DatePicker(
-        StudentStrings.localized(.step7ExtrasSection011),
-        selection: DateOnly.binding($draft.competitionDate, default: Date()),
-        in: Date()...,
-        displayedComponents: .date
-      )
-      .labelsHidden()
-      .onAppear {
-        if draft.competitionDate == nil {
-          draft.competitionDate = DateOnly.string(from: Date())
+      HStack {
+        OnboardingFieldLabel(title: StudentStrings.localized(.meetTitle))
+        Spacer()
+        if draft.isCompeting == true {
+          Button(StudentStrings.localized(.meetRemoveAction)) {
+            draft.isCompeting = false
+            draft.competitionDate = nil
+            draft.targetWeightClass = ""
+          }
         }
       }
+      if draft.isCompeting == true {
+        MeetFieldsSection(draft: $draft, showsErrors: !highlighted.isEmpty)
+      } else {
+        Button {
+          draft.isCompeting = true
+          draft.competitionDate = DateOnly.string(from: Date())
+        } label: {
+          Label(StudentStrings.localized(.meetAddOptional), systemImage: "plus")
+            .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
+            .foregroundStyle(Color.MeetPR.goldText)
+            .overlay {
+              RoundedRectangle(cornerRadius: MeetPRRadius.control)
+                .stroke(Color.MeetPR.borderStrong, style: StrokeStyle(lineWidth: 1, dash: [4]))
+            }
+        }
+        Text(StudentStrings.localized(.meetHelp))
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
+      NoteToCoachFieldsSection(note: $draft.noteToCoach)
     }
+  }
+}
+
+struct NoteToCoachFieldsSection: View {
+  @Binding var note: String
+
+  var body: some View {
+    OnboardingTextEditor(
+      title: StudentStrings.localized(.step7ExtrasSection009),
+      text: $note,
+      placeholder: StudentStrings.localized(.step7ExtrasSection010)
+    )
   }
 }

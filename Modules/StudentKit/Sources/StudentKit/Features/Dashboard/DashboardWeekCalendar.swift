@@ -10,6 +10,7 @@ struct DashboardWeekCalendar: View {
 
   let weekNumber: Int
   let cells: [DashboardWeekProgressSegment]
+  var onSelect: (UUID) -> Void = { _ in }
   var headerStyle: HeaderStyle = .progress
 
   var body: some View {
@@ -23,38 +24,49 @@ struct DashboardWeekCalendar: View {
 
       HStack(spacing: 6) {
         ForEach(cells) { cell in
-          VStack(spacing: 5) {
-            status(for: cell.state)
-            Text("D\(cell.dayNumber)")
-              .font(
-                .MeetPR.mono(
-                  size: MeetPRFontMetrics.size10,
-                  weight: cell.state == .current ? .bold : .semibold
+          Button {
+            onSelect(cell.id)
+          } label: {
+            VStack(spacing: 5) {
+              status(for: cell.state)
+              Text("D\(cell.dayNumber)")
+                .font(
+                  .MeetPR.mono(
+                    size: MeetPRFontMetrics.size10,
+                    weight: cell.state == .current ? .bold : .semibold
+                  )
                 )
-              )
-              .foregroundStyle(
-                cell.state == .current ? Color.MeetPR.textPrimary : Color.MeetPR.textMuted)
-            Text(recommendedDate(cell.recommendedDate))
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-              .foregroundStyle(
-                cell.state == .current ? Color.MeetPR.textSecondary : Color.MeetPR.textMuted
-              )
-              .lineLimit(1)
-              .minimumScaleFactor(0.75)
-          }
-          .frame(maxWidth: .infinity, minHeight: 58)
-          .background(background(for: cell.state))
-          .clipShape(.rect(cornerRadius: 12))
-          .overlay {
-            if cell.state == .current {
-              RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.gold500, lineWidth: 1.5)
+                .foregroundStyle(
+                  cell.state == .current || cell.isSelected
+                    ? Color.MeetPR.textPrimary : Color.MeetPR.textMuted)
+              Text(recommendedDate(cell.recommendedDate))
+                .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+                .foregroundStyle(
+                  cell.state == .current || cell.isSelected
+                    ? Color.MeetPR.textSecondary : Color.MeetPR.textMuted
+                )
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
             }
+            .frame(maxWidth: .infinity, minHeight: 58)
+            .background(
+              cell.isSelected && cell.state != .current
+                ? Color.MeetPR.surfaceCard : background(for: cell.state)
+            )
+            .clipShape(.rect(cornerRadius: 12))
+            .overlay {
+              if cell.isSelected {
+                RoundedRectangle(cornerRadius: 12).stroke(Color.MeetPR.textPrimary, lineWidth: 2)
+              }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(
+              StudentStrings.replacing(
+                .dashboardWeekCalendar001,
+                values: ["\(weekNumber)", "\(cell.dayNumber)", "\(statusText(cell.state))"]))
           }
-          .accessibilityElement(children: .combine)
-          .accessibilityLabel(
-            StudentStrings.replacing(
-              .dashboardWeekCalendar001,
-              values: ["\(weekNumber)", "\(cell.dayNumber)", "\(statusText(cell.state))"]))
+          .buttonStyle(.plain)
+          .accessibilityAddTraits(cell.isSelected ? .isSelected : [])
         }
       }
     }

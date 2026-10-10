@@ -109,6 +109,8 @@ public struct DashboardView: View {
           onRetryTrend: {
             Task { await e1rmTrendViewModel.load(studentID: studentID) }
           },
+          onOpenWorkoutDay: openWorkoutDay,
+          selectionResetToken: todayReloadToken + todayVolatileReloadToken,
           onEditProfile: { editingProfile = $0 }
         )
       }
@@ -214,6 +216,15 @@ public struct DashboardView: View {
       return nil
     }
     return StudentPlanSequence(days: days).cursorDay
+  }
+
+  private func openWorkoutDay(_ dayID: UUID) {
+    guard let plan = weekViewModel.plan, plan.days.contains(where: { $0.id == dayID }) else {
+      return
+    }
+    onStartWorkout(
+      TodayWorkoutPlanHandoff(
+        plan: plan, dayID: dayID, existingLogs: weekData?.logs ?? []))
   }
 
   private func startCursorWorkout() {

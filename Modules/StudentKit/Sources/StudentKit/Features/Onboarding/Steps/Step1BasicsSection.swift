@@ -9,7 +9,6 @@ struct Step1BasicsSection: View {
   @Binding var draft: OnboardingDraft
   var highlighted: Set<String> = []
   @State private var heightText = ""
-  @State private var weightText = ""
 
   private var unit: UnitPreference { draft.unitPreference ?? .kg }
 
@@ -31,13 +30,10 @@ struct Step1BasicsSection: View {
         isHighlighted: highlighted.contains("height_cm"),
         placeholder: unit == .kg ? "178" : "70"
       )
-      OnboardingNumberField(
-        title: StudentStrings.localized(.step1BasicsSection003),
-        unitSuffix: UnitDisplay.weightUnitSuffix(unit),
-        text: $weightText,
-        onCommit: { draft.weightKg = UnitDisplay.parseWeight($0, unit: unit) },
-        isHighlighted: highlighted.contains("weight_kg"),
-        placeholder: unit == .kg ? "83" : "183"
+      BodyWeightField(
+        kilograms: $draft.weightKg,
+        unit: unit,
+        isHighlighted: highlighted.contains("weight_kg")
       )
     }
     .onAppear {
@@ -107,6 +103,5 @@ struct Step1BasicsSection: View {
 
   private func syncTexts() {
     heightText = UnitDisplay.heightText(cm: draft.heightCm, unit: unit)
-    weightText = UnitDisplay.weightText(kg: draft.weightKg, unit: unit)
   }
 }
