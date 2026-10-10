@@ -49,6 +49,8 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   let onComplete: () -> Void
   let onUndoCompletion: () -> Void
   let onShowReview: () -> Void
+  var sequencePage: TrainingSequencePage?
+  var gymDayToday: Date = WorkoutDatePolicy.gymDayToday()
 
   var body: some View {
     trainingScrollView
@@ -75,12 +77,15 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         onBackToToday: onBackToToday
       )
 
-      HStack {
-        Spacer()
+      TrainingWeekHeaderLayout(alignsTrailingItem: true) {
+        if let week = sequencePage?.visibleWeek {
+          TrainingWeekHeading(week: week, today: gymDayToday)
+        }
         Button(action: onHistory) {
           HStack(spacing: MeetPRSpacing.space1) {
-            Image(systemName: "clock")
-            Text(StudentStrings.localized(.e1rmSourceHistory))
+            Text(StudentStrings.localized(.trainingHistoryView024))
+              .lineLimit(1)
+              .minimumScaleFactor(0.5)
             Image(systemName: "chevron.right")
               .font(.system(size: MeetPRFontMetrics.size10, weight: .semibold))
           }
@@ -119,7 +124,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
         .frame(maxWidth: .infinity, minHeight: 220)
     case .workout(let presentation):
       if case .upcoming(let cursorDay) = dayState {
-        TrainingDayPreview(presentation: presentation, cursorDay: cursorDay)
+        TrainingDayPreview(presentation: presentation, cursorDay: cursorDay, today: gymDayToday)
       } else {
         TodayWorkoutHero(
           presentation: presentation,
@@ -561,6 +566,13 @@ private struct TodayWorkoutHero: View {
         )
         .padding(.bottom, MeetPRSpacing.point3)
 
+        if let note = CoachNoteDisplay.heroExerciseNote(
+          isEditable: isEditable, notes: exercise.note)
+        {
+          HeroCoachNote(note: note)
+            .padding(.vertical, MeetPRSpacing.space2)
+        }
+
         Text(exercise.reference)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
           .foregroundStyle(Color.MeetPR.textTertiary)
@@ -657,12 +669,14 @@ private struct TodayWorkoutHero: View {
           .padding(.top, MeetPRSpacing.space2)
         }
 
-        if !exercise.note.isEmpty {
+        if let lowerNote = CoachNoteDisplay.heroLowerNote(
+          isEditable: isEditable, notes: exercise.note, coachNote: row.draft.prescribed.coachNote)
+        {
           VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
             Text(StudentStrings.localized(.todayWorkoutScreen014))
               .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
               .foregroundStyle(Color.MeetPR.textFaint)
-            Text(exercise.note)
+            Text(lowerNote)
               .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
               .foregroundStyle(Color.MeetPR.coachNoteText)
               .lineSpacing(MeetPRSpacing.point6)

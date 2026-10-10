@@ -54,6 +54,8 @@ public struct TodayWorkoutView: View {
   @State private var setRefEntryErrorMessage: String?
   @State private var reviewCompleted = false
   @State private var started = false
+  @State private var gymDayToday = WorkoutDatePolicy.gymDayToday()
+  @Environment(\.scenePhase) private var scenePhase
   @State private var collapsedExercises: [UUID: Bool] = [:]
 
   private let reviewStore: any SessionReviewStore = UserDefaultsSessionReviewStore()
@@ -166,7 +168,8 @@ public struct TodayWorkoutView: View {
         showsAskCoach: showsSetRefEntry,
         isPreparingAskCoach: isPreparingSetRefPicker,
         collapsedExercises: $collapsedExercises,
-        sequenceContent: TrainingWeekStrip(days: viewModel.planDays, selectedDayID: $selectedDayID),
+        sequenceContent: TrainingWeekStrip(
+          days: viewModel.planDays, selectedDayID: $selectedDayID, today: gymDayToday),
         showsBackToToday: sequencePage.showsBackToToday,
         onBackToToday: returnToCurrentDay,
         onRefresh: {
@@ -205,7 +208,9 @@ public struct TodayWorkoutView: View {
         },
         onShowReview: {
           viewModel.completionPhase = .review
-        }
+        },
+        sequencePage: sequencePage,
+        gymDayToday: gymDayToday
       )
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -394,7 +399,11 @@ public struct TodayWorkoutView: View {
         }
       )
     #endif
+    .onChange(of: scenePhase) { _, phase in
+      if phase == .active { gymDayToday = WorkoutDatePolicy.gymDayToday() }
+    }
     .task {
+      gymDayToday = WorkoutDatePolicy.gymDayToday()
       let isFirstLoad = viewModel.state == .idle
       if isFirstLoad {
         await loadWorkout(
@@ -445,6 +454,7 @@ public struct TodayWorkoutView: View {
       viewModel.applyPlanProjection(plan)
     }
     .onChange(of: planRefreshRevision) { _, _ in
+      gymDayToday = WorkoutDatePolicy.gymDayToday()
       Task { await refreshWorkoutPlan() }
     }
     .onChange(of: viewModel.completionRevision) { _, _ in

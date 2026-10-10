@@ -3,15 +3,16 @@ import SwiftUI
 
 struct TrainingWeekCalendarRow: View {
   let cells: [TrainingSequenceCalendarCell]
+  let today: Date
   let onSelect: (UUID) -> Void
   let onSwipe: (Bool) -> Void
 
   var body: some View {
     if cells.count > 7 {
-      TrainingWeekCalendarScroll(cells: cells, onSelect: onSelect)
+      TrainingWeekCalendarScroll(cells: cells, today: today, onSelect: onSelect)
     } else {
       ViewThatFits(in: .horizontal) {
-        TrainingWeekCalendarCells(cells: cells, onSelect: onSelect)
+        TrainingWeekCalendarCells(cells: cells, today: today, onSelect: onSelect)
           .contentShape(.rect)
           .simultaneousGesture(
             DragGesture(minimumDistance: MeetPRSpacing.point30)
@@ -20,7 +21,7 @@ struct TrainingWeekCalendarRow: View {
                 onSwipe(value.translation.width < 0)
               }
           )
-        TrainingWeekCalendarScroll(cells: cells, onSelect: onSelect)
+        TrainingWeekCalendarScroll(cells: cells, today: today, onSelect: onSelect)
       }
     }
   }
@@ -28,18 +29,25 @@ struct TrainingWeekCalendarRow: View {
 
 private struct TrainingWeekCalendarScroll: View {
   let cells: [TrainingSequenceCalendarCell]
+  let today: Date
   let onSelect: (UUID) -> Void
+  @State private var scrollPosition: TrainingSequenceCalendarCell.Identity?
 
   var body: some View {
     ScrollView(.horizontal) {
-      TrainingWeekCalendarCells(cells: cells, onSelect: onSelect)
+      TrainingWeekCalendarCells(cells: cells, today: today, onSelect: onSelect)
     }
     .scrollIndicators(.hidden)
+    .scrollPosition(id: $scrollPosition, anchor: .center)
+    .onChange(of: cells, initial: true) { _, cells in
+      scrollPosition = cells.first { $0.trainingDay?.isSelected == true }?.id
+    }
   }
 }
 
 private struct TrainingWeekCalendarCells: View {
   let cells: [TrainingSequenceCalendarCell]
+  let today: Date
   let onSelect: (UUID) -> Void
 
   var body: some View {
@@ -47,12 +55,13 @@ private struct TrainingWeekCalendarCells: View {
       ForEach(cells) { cell in
         switch cell {
         case .training(let item):
-          TrainingWeekDayCell(item: item) { onSelect(item.id) }
+          TrainingWeekDayCell(item: item, today: today) { onSelect(item.id) }
         case .rest(let date):
-          TrainingWeekRestCell(date: date)
+          TrainingWeekRestCell(date: date, today: today)
         }
       }
     }
+    .scrollTargetLayout()
   }
 }
 
@@ -89,34 +98,48 @@ private struct TrainingWeekCalendarLayout: Layout {
 
 private struct TrainingWeekDayCell: View {
   let item: TrainingSequenceDay
+  let today: Date
   let onSelect: () -> Void
   @Environment(\.locale) private var locale
 
   var body: some View {
+    let display = TrainingWeekCellPresentation(cell: .training(item), today: today, locale: locale)
     Button(action: onSelect) {
-      VStack(spacing: MeetPRSpacing.space2) {
-        Text(TrainingWeekCalendarDate.weekday(item.day.date, locale: locale))
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-          .foregroundStyle(Color.MeetPR.textMuted)
-        Image(systemName: item.state == .completed ? "checkmark.circle.fill" : "circle")
-          .font(.MeetPR.system(size: MeetPRFontMetrics.size17))
-          .foregroundStyle(statusColor)
-        Text("D\(item.dayNumber)")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-          .foregroundStyle(Color.MeetPR.textPrimary)
-        Text(TrainingWeekCalendarDate.shortDate(item.day.date))
+      VStack(spacing: MeetPRSpacing.space1) {
+        Text(display.weekday)
           .font(
             .MeetPR.mono(
               size: MeetPRFontMetrics.size11,
               weight: item.state == .current ? .bold : .regular)
           )
           .foregroundStyle(item.state == .current ? Color.MeetPR.goldText : Color.MeetPR.textMuted)
+        Image(
+          systemName: item.state == .completed
+            ? "checkmark"
+            : item.state == .current ? "circle.fill" : "circle"
+        )
+        .font(
+          .MeetPR.system(
+            size: item.state == .completed
+              ? MeetPRFontMetrics.size12 : MeetPRFontMetrics.size8)
+        )
+        .frame(height: MeetPRSpacing.space4)
+        .foregroundStyle(statusColor)
+        Text(display.caption)
+          .font(
+            .MeetPR.mono(
+              size: display.isBehind ? MeetPRFontMetrics.size10 : MeetPRFontMetrics.size11,
+              weight: item.state == .current ? .bold : .regular)
+          )
+          .foregroundStyle(
+            item.state == .current || display.isBehind
+              ? Color.MeetPR.goldText : Color.MeetPR.textPrimary)
       }
       .lineLimit(1)
       .fixedSize(horizontal: true, vertical: true)
       .padding(.horizontal, MeetPRSpacing.point2)
-      .padding(.vertical, MeetPRSpacing.space3)
-      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .padding(.vertical, MeetPRSpacing.space1)
+      .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point64, maxHeight: .infinity)
       .background(
         item.state == .current ? Color.MeetPR.goldRGB.opacity(0.12) : Color.MeetPR.surfaceCard
       )
@@ -130,6 +153,7 @@ private struct TrainingWeekDayCell: View {
       .contentShape(.rect)
     }
     .buttonStyle(PressScaleButtonStyle())
+    .accessibilityLabel(display.accessibilityLabel)
     .accessibilityAddTraits(item.isSelected ? .isSelected : [])
     .accessibilityValue(
       item.state == .current ? StudentStrings.localized(.trainingWeekCurrentDay) : ""
@@ -148,46 +172,24 @@ private struct TrainingWeekDayCell: View {
 
 private struct TrainingWeekRestCell: View {
   let date: Date
+  let today: Date
   @Environment(\.locale) private var locale
 
   var body: some View {
+    let display = TrainingWeekCellPresentation(cell: .rest(date), today: today, locale: locale)
     VStack(spacing: MeetPRSpacing.space2) {
-      Text(TrainingWeekCalendarDate.weekday(date, locale: locale))
+      Text(display.weekday)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
-      Spacer(minLength: 0)
-      Text(StudentStrings.localized(.trainingWeekRest, locale: locale))
+      Text(display.caption)
         .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
-      Spacer(minLength: 0)
-      Text(TrainingWeekCalendarDate.shortDate(date))
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11))
     }
     .lineLimit(1)
     .fixedSize(horizontal: true, vertical: false)
-    .padding(.vertical, MeetPRSpacing.space3)
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .padding(.vertical, MeetPRSpacing.space1)
+    .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.point64, maxHeight: .infinity)
     .foregroundStyle(Color.MeetPR.textMuted)
     .background(Color.MeetPR.bgStack, in: .rect(cornerRadius: MeetPRRadius.control))
     .accessibilityElement(children: .ignore)
-    .accessibilityLabel(
-      StudentStrings.replacing(
-        .trainingWeekRestAccessibility,
-        values: [
-          TrainingWeekCalendarDate.weekday(date, locale: locale),
-          TrainingWeekCalendarDate.shortDate(date),
-        ], locale: locale))
-  }
-}
-
-private enum TrainingWeekCalendarDate {
-  static func weekday(_ date: Date, locale: Locale) -> String {
-    var style = Date.FormatStyle().weekday(.abbreviated).locale(locale)
-    style.calendar = PlanCalendarDayIdentity.utcCalendar
-    style.timeZone = PlanCalendarDayIdentity.utcTimeZone
-    return date.formatted(style)
-  }
-
-  static func shortDate(_ date: Date) -> String {
-    let parts = PlanCalendarDayIdentity.utcCalendar.dateComponents([.month, .day], from: date)
-    return "\(parts.month ?? 0)/\(parts.day ?? 0)"
+    .accessibilityLabel(display.accessibilityLabel)
   }
 }
