@@ -73,16 +73,32 @@
 
 拆成六张卡（多于默认的 1–2 张）的原因：六个 spec 各自有独立的验收清单、可以单独放行或单独退回，合并节奏不同。
 
-## 进度（Opus 维护；交接只认这张表与各卡的 JOURNAL 一节）
+## 进度（Opus 维护；交接只认这张表、各 spec 目录的 `ACCEPTANCE-ios.md` 与 JOURNAL）
 
-| spec | 分支 | 卡 | 状态 |
+2026-10-10：六张卡全部收货，六个 PR 都在等 David「放行」。收货记录在各 PR 的分支里（合并后才出现在发版线上）。
+
+| spec | 分支 | PR | 状态 |
 |---|---|---|---|
-| 085 | `feat/085-today-final-walkthrough` | `CARD-ios.md` | 未派 |
-| 086 | `feat/086-training-strip-coach-note` | `CARD-ios.md` | 未派 |
-| 087 | `feat/087-progress-menu`（叠 085） | `CARD-ios.md` | 未派 |
-| 088 | `feat/088-profile-redesign`（叠 087） | `CARD-ios.md` | 未派 |
-| 089 | `feat/089-accessory-quick-log`（叠 086） | `CARD-ios.md` | 未派 |
-| 090 | `feat/090-training-flow`（叠 089） | `CARD-ios.md` | 未派 |
+| 085 | `feat/085-today-final-walkthrough` | #356 → `release/1.0` | 已收货（返修 1 轮），等放行 |
+| 087 | `feat/087-progress-menu` | #358，叠在 #356 上 | 已收货（返修 0 轮），等放行；只做了第一步 |
+| 088 | `feat/088-profile-redesign` | #360，叠在 #358 上 | 已收货（返修 1 轮），等放行；只做了第一步 |
+| 086 | `feat/086-training-strip-coach-note` | #355 → `release/1.0` | 已收货（返修 0 轮），等放行 |
+| 089 | `feat/089-accessory-quick-log` | #357（草稿），叠在 #355 上 | 已收货（返修 1 轮）；**不可单独合并**，见下 |
+| 090 | `feat/090-training-flow` | #359，叠在 #357 上 | 已收货（返修 1 轮），等放行 |
+
+### 放行顺序与一条硬约束
+
+- 线一：#356 → #358 → #360，依次合；前一个合并后把后一个的 base 改到 `release/1.0`。
+- 线二：#355 → #357 与 #359 **同批**。089 的提交单独运行时，在辅助项卡上点 ✓ 再滚动会卡死（3 次里 3 次，主线程停在 SwiftUI 懒加载列表的布局里）；090 把记录态的列表改成一次排完后不再卡。步骤与采样在 `specs/090-training-flow/ACCEPTANCE-ios.md`。合并时先把 #359 并进 089 的分支，或两者连续合并，中间不切包。
+- 两条线都改了 `TodayWorkoutView.swift`、`Localizable.xcstrings`、`StudentStrings.swift`、`StudentDemoSeed.swift`、`docs/CODEX-JOURNAL.md`，后合的那条要先并发版线再合。
+- 合并后在 `NEXT-RELEASE.md` 登记为 1.0(24) 候选（落线不等于进包）。
+
+### 留给后续的事
+
+- 发版线上的训练页是否也会进同一个布局死循环没有验过；它和 2026-10-03 记录的「完成流程主线程卡死、排障未复现」很像，值得单开一次排障。
+- 089 的「键盘弹出时当前行不被遮住」没有实屏证据，需要真机确认。
+- 088 把学员端的「删除账号」入口放了回来（iOS 自 2026-07-27 起隐藏），是否保留等 David 定。
+- 087 第二步（体重页）、088 第二三步（头像）两端都还没做，依赖后端 spec 046 / 047。
 
 ## 收货（Opus）
 
