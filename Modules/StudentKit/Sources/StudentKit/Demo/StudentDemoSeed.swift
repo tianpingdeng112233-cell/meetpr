@@ -56,14 +56,15 @@ public enum StudentDemoSeed {
         exercises: exercises(forDayOffset: offset)
       )
     }
-    return StudentPlanView(
-      cycleID: uuid(301),
-      weekIndex: weekIndex,
-      startDate: scenarioStart,
-      endDate: scenarioStart.addingTimeInterval(Double(scenario == nil ? 7 : 13) * 86_400),
-      publishedAt: referenceDate,
-      days: days
-    )
+    return AccessoryDemoScenario.configure(
+      StudentPlanView(
+        cycleID: uuid(301),
+        weekIndex: weekIndex,
+        startDate: scenarioStart,
+        endDate: scenarioStart.addingTimeInterval(Double(scenario == nil ? 7 : 13) * 86_400),
+        publishedAt: referenceDate,
+        days: days
+      ))
   }
 
   public static func makeHistoricalLogs(
@@ -72,6 +73,9 @@ public enum StudentDemoSeed {
     includeToday: Bool = true
   ) -> [StudentSetLog] {
     let plan = makePlanView(weekIndex: weekIndex)
+    if AccessoryDemoScenario.enabled {
+      return AccessoryDemoScenario.logs(plan: plan, studentID: studentID)
+    }
     // W1D1–D2 are complete; W1D3 is deliberately partial so reopening the
     // demo proves that partial logs do not advance the sequence cursor.
     return plan.days.prefix(includeToday ? 3 : 2).flatMap { day -> [StudentSetLog] in
@@ -497,7 +501,7 @@ extension StudentDemoSeed {
   ) -> OnboardingProfile {
     OnboardingProfile(
       userId: studentID,
-      unitPreference: .kg,
+      unitPreference: AccessoryDemoScenario.usesPounds ? .lb : .kg,
       gender: .male,
       birthDate: "2001-03-15",
       heightCm: 178,

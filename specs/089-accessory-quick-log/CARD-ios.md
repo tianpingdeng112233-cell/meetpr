@@ -52,3 +52,13 @@
 ## 文件范围
 
 `Modules/StudentKit`（TodayWorkout、MyProfile 的休息设置、Resources、对应 Tests、必要时 Demo）；`Modules/CoreModels` 只加不改；写入路径确需时 `Modules/Networking` / `RepositoryContracts`（不改线上形状，只补能发出的字段）。不动补记、训练日结算与撤销、e1RM、`CoachKit`、`Widgets`。
+
+## 修订一（2026-10-10，Opus 裁定 Codex 开工核对的存储问题）
+
+现状：iOS 的主项休息偏好用「键不存在 = 自动」表示自动模式，自定义才写一份带版本号的 JSON（证据见 `docs/CODEX-JOURNAL.md`「spec 089 iOS（开工核对）」）。在这份 JSON 里加字段表达不了「自动 + 辅助项 90 秒」。裁定：**不动现有那个键的任何语义，辅助项时长单独用一个新键存**。
+
+- 新键：`meetpr.student.rest_timer.accessory_seconds.<studentID>`，存整数秒。键不存在、或值不在 30–300 / 不是 15 的倍数时，一律按 60。
+- 现有键 `meetpr.student.rest_timer.fixed_seconds.<studentID>` 的读、写、删、旧整数迁移、版本号一行不改；不往那份 JSON 里加 `mode` 或别的字段。这样老用户的主项设置原样保留，切换自动 / 自定义自然不影响辅助项时长；用户装回旧版本时旧版本读到的仍是它认识的数据。
+- 本卡「iOS 上要注意的地方」里「在现有休息计时偏好里追加一个字段」「存储键不变」两句相应改为上面这条；`StudentRestTimerSettingsStoring` 协议加读写辅助项时长的两个方法（测试用的内存实现同步补）。
+- 测试 seam 3 相应为：新键缺失 → 60；写入 90 后读回 90；越界或非 15 倍数的脏值 → 60；主项键里存着改前格式的自定义数据（含旧整数）时，主项读回结果与改前逐一相同且辅助项为 60；主项在自动与自定义之间来回切换后辅助项时长不变。
+- 其余各项照卡执行。

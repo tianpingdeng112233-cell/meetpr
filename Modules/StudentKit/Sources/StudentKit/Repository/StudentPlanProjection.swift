@@ -67,7 +67,7 @@ enum StudentPlanProjection {
           sequenceIndex: planExercise.sortOrder,
           prescribedSets: (setsByExercise[planExercise.id] ?? [])
             .sorted { $0.setNumber < $1.setNumber }
-            .compactMap(prescribedSet),
+            .compactMap { prescribedSet($0, isAccessory: exercise.isAccessory) },
           notes: planExercise.notes
         )
       }
@@ -85,7 +85,7 @@ enum StudentPlanProjection {
   }
 
   /// Drops corrupt one-based set numbers instead of aliasing a legal set's log identity.
-  private static func prescribedSet(_ planSet: PlanSet) -> PrescribedSet? {
+  private static func prescribedSet(_ planSet: PlanSet, isAccessory: Bool) -> PrescribedSet? {
     guard planSet.setNumber >= 1 else { return nil }
     let prescription = prescription(for: planSet)
     return PrescribedSet(
@@ -97,7 +97,7 @@ enum StudentPlanProjection {
       loadMode: planSet.loadMode,
       reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
-      restSeconds: restSeconds(for: planSet),
+      restSeconds: isAccessory ? planSet.restSeconds : restSeconds(for: planSet),
       coachNote: planSet.coachNote
     )
   }

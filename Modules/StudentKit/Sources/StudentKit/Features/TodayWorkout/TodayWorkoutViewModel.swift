@@ -22,6 +22,7 @@ public final class TodayWorkoutViewModel {
   private struct LoadedDaySnapshot {
     let day: StudentPlanDay
     let drafts: [SetRowDraft]
+    let accessoryPreviousLogs: [UUID: [Int: StudentSetLog]]
     let references: [UUID: ExerciseReference]
     let suggestionE1RMByExercise: [UUID: Double]
     let lastWeightByExercise: [UUID: Decimal]
@@ -51,9 +52,13 @@ public final class TodayWorkoutViewModel {
   }
 
   public private(set) var state: State = .idle
+  var accessoryVideosLoaded = false
+  private(set) var accessorySavingIDs: Set<UUID> = []
+  private(set) var accessoryBatchInFlight = false
   public private(set) var restTimer: RestTimerState?
   public private(set) var showsRestTimerExplanation = false
   public private(set) var planContext: TodayWorkoutPlanContext?
+  private(set) var accessoryPreviousLogs: [UUID: [Int: StudentSetLog]] = [:]
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
   /// Best trusted e1RM under the stricter suggestion-only RPE policy.
   public private(set) var suggestionE1RMByExercise: [UUID: Double] = [:]
@@ -442,6 +447,7 @@ public final class TodayWorkoutViewModel {
   }
 
   private func apply(_ snapshot: LoadedDaySnapshot) {
+    accessoryPreviousLogs = snapshot.accessoryPreviousLogs
     exerciseReferences = snapshot.references
     suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
     lastWeightByExercise = snapshot.lastWeightByExercise
@@ -472,6 +478,7 @@ public final class TodayWorkoutViewModel {
       }
       return mergedDraft
     }
+    accessoryPreviousLogs = snapshot.accessoryPreviousLogs
     exerciseReferences = snapshot.references
     suggestionE1RMByExercise = snapshot.suggestionE1RMByExercise
     lastWeightByExercise = snapshot.lastWeightByExercise
@@ -555,6 +562,16 @@ public final class TodayWorkoutViewModel {
         existingLogs: existingLogs,
         onboardingProfile: onboardingProfile
       ),
+      accessoryPreviousLogs: Dictionary(
+        uniqueKeysWithValues: day.exercises.map { exercise in
+          (
+            exercise.id,
+            AccessoryHistory.previousSession(
+              logs: historyLogs, exerciseID: exercise.exercise.id,
+              currentPlanExerciseID: exercise.id,
+              planExerciseToExercise: Self.planExerciseMap(plan: plan, day: day))
+          )
+        }),
       references: referenceSnapshot.references,
       suggestionE1RMByExercise: referenceSnapshot.suggestionE1RMByExercise,
       lastWeightByExercise: Self.lastWeights(
@@ -598,6 +615,77 @@ public final class TodayWorkoutViewModel {
   @discardableResult
   public func commitSet(rowIndex: Int, failed: Bool = false) async -> Bool {
     await persist(rowIndex: rowIndex, completed: true, failed: failed)
+  }
+
+  @discardableResult
+  func saveAccessoryRow(_ row: AccessoryRow) async -> Bool {
+    guard accessorySavingIDs.isEmpty, !accessoryBatchInFlight else { return false }
+    accessorySavingIDs.insert(row.id)
+    defer { accessorySavingIDs.remove(row.id) }
+    return await performAccessoryWrite(row, startsRestTimer: true)
+  }
+
+  func completeAccessoryRows(_ rows: [AccessoryRow]) async -> AccessoryBatchResult {
+    let selection = AccessoryRow.selection(rows)
+    guard accessorySavingIDs.isEmpty, !accessoryBatchInFlight else {
+      return AccessoryBatchResult(written: 0, skipped: selection.skipped.count, failed: true)
+    }
+    accessoryBatchInFlight = true
+    defer {
+      accessoryBatchInFlight = false
+      accessorySavingIDs = []
+    }
+    var written = 0
+    for row in selection.writable {
+      accessorySavingIDs = [row.id]
+      guard await performAccessoryWrite(row, startsRestTimer: false) else {
+        return AccessoryBatchResult(
+          written: written, skipped: selection.skipped.count, failed: true)
+      }
+      written += 1
+    }
+    return AccessoryBatchResult(written: written, skipped: selection.skipped.count, failed: false)
+  }
+
+  private func performAccessoryWrite(_ row: AccessoryRow, startsRestTimer: Bool) async -> Bool {
+    guard case .loaded(let plan, let drafts) = state,
+      plan.completedAt == nil,
+      StudentPlanSequence(days: planDays).cursorDay?.id == plan.id,
+      let index = drafts.firstIndex(where: { $0.id == row.id }),
+      drafts[index].isAccessory,
+      drafts[index] == row.draft
+    else { return false }
+    guard !row.isCancellation || accessoryVideosLoaded else {
+      actionErrorMessage = StudentStrings.localized(.dashboardView004)
+      return false
+    }
+    if row.isCancellation && row.hasVideo {
+      actionErrorMessage = StudentStrings.localized(.accessoryVideoWarning)
+      return false
+    }
+    guard row.isCancellation || row.isWritable else { return false }
+    let original = drafts[index]
+    if !row.isCancellation {
+      let preservesWeight =
+        row.input.weight == row.initialInput.weight
+        && !row.isBodyweight
+      let originalWeight =
+        original.loggedSetID == nil ? original.prescribed.weightKg : original.actualWeight
+      updateWeight(rowIndex: index, weight: preservesWeight ? originalWeight : row.weightKg)
+      updateReps(rowIndex: index, reps: row.reps)
+      updateRPE(rowIndex: index, rpe: row.rpe)
+    }
+    let result = await persist(
+      rowIndex: index, completed: !row.isCancellation, failed: false,
+      startsRestTimer: startsRestTimer)
+    if !result, currentDrafts?.indices.contains(index) == true,
+      currentDrafts?[index].id == original.id
+    {
+      updateWeight(rowIndex: index, weight: original.actualWeight)
+      updateReps(rowIndex: index, reps: original.actualReps)
+      updateRPE(rowIndex: index, rpe: original.actualRPE)
+    }
+    return result
   }
 
   public func ensureLoggedSetID(rowIndex: Int) async -> UUID? {
@@ -914,7 +1002,7 @@ public final class TodayWorkoutViewModel {
   // UI merge together makes their required ordering explicit.
   // swiftlint:disable:next function_body_length
   private func performPersist(
-    rowIndex: Int, completed: Bool, failed: Bool, generation: Int
+    rowIndex: Int, completed: Bool, failed: Bool, generation: Int, startsRestTimer: Bool
   ) async -> Bool {
     guard let studentID = currentStudentID else {
       actionErrorMessage = StudentStrings.localized(.todayWorkoutViewModel003)
@@ -981,7 +1069,7 @@ public final class TodayWorkoutViewModel {
 
       await refreshCompletion(for: plan.id, studentID: studentID)
 
-      if !previouslyCompleted, completed {
+      if startsRestTimer, completed, !previouslyCompleted || draft.isAccessory {
         startRestTimer(after: draft, drafts: latestDrafts)
       }
       return true
@@ -1046,17 +1134,27 @@ public final class TodayWorkoutViewModel {
   }
 
   private func startRestTimer(after draft: SetRowDraft, drafts: [SetRowDraft]) {
-    guard !drafts.allSatisfy(\.completed) else {
+    let finishedAccessory =
+      draft.isAccessory
+      && drafts.filter { $0.planExerciseID == draft.planExerciseID }.allSatisfy(\.completed)
+    guard !drafts.allSatisfy(\.completed), !finishedAccessory else {
       restTimer = nil
       restTimerActivityController.end()
       return
     }
-    let seconds =
-      draft.prescribed.restSeconds
-      ?? currentStudentID.flatMap {
-        restTimerSettings.preference(for: $0).customSeconds(forRPE: draft.actualRPE)
-      }
-      ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
+    let seconds: Int
+    if draft.isAccessory {
+      seconds = RestTimerPolicy.accessorySeconds(
+        coachSeconds: draft.prescribed.restSeconds,
+        studentSeconds: currentStudentID.map { restTimerSettings.accessorySeconds(for: $0) })
+    } else {
+      seconds =
+        draft.prescribed.restSeconds
+        ?? currentStudentID.flatMap {
+          restTimerSettings.preference(for: $0).customSeconds(forRPE: draft.actualRPE)
+        }
+        ?? RestTimerPolicy.restSeconds(forRPE: draft.actualRPE)
+    }
     let hadActiveTimer = restTimer != nil
     let nextTimer = RestTimerState(
       endsAt: now().addingTimeInterval(TimeInterval(seconds)), totalSeconds: seconds)
@@ -1068,7 +1166,7 @@ public final class TodayWorkoutViewModel {
       endsAt: nextTimer.endsAt,
       totalSeconds: nextTimer.totalSeconds
     )
-    if let currentStudentID,
+    if !draft.isAccessory, let currentStudentID,
       !restTimerSettings.hasAcknowledgedExplanation(for: currentStudentID)
     {
       showsRestTimerExplanation = true
@@ -1316,7 +1414,9 @@ extension TodayWorkoutViewModel {
   /// The entry sheet stays alive across persists (single render branch), so a
   /// video attach and 完成本组 can overlap — chain persists so completions
   /// apply in submission order instead of racing.
-  fileprivate func persist(rowIndex: Int, completed: Bool, failed: Bool = false) async -> Bool {
+  fileprivate func persist(
+    rowIndex: Int, completed: Bool, failed: Bool = false, startsRestTimer: Bool = true
+  ) async -> Bool {
     let previous = pendingPersist
     // Queued work is only valid for the day it was submitted against: a day
     // switch reloads drafts and rowIndex would address the wrong set.
@@ -1325,7 +1425,8 @@ extension TodayWorkoutViewModel {
       _ = await previous?.value
       guard let self, self.isCurrentLoad(generation) else { return false }
       return await self.performPersist(
-        rowIndex: rowIndex, completed: completed, failed: failed, generation: generation)
+        rowIndex: rowIndex, completed: completed, failed: failed, generation: generation,
+        startsRestTimer: startsRestTimer)
     }
     pendingPersist = task
     return await task.value

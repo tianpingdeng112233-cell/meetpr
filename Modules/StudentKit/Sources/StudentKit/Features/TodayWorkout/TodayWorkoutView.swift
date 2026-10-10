@@ -44,6 +44,7 @@ public struct TodayWorkoutView: View {
   @State private var showingReadinessSheet = false
   @State private var opensRestSettingsAfterExplanation = false
   @State private var showingRestSettings = false
+  @State private var accessoryRestSeconds = 60
   @State private var restPreference: StudentRestTimerPreference = .automatic
   @State private var showingHistory = false
   @State private var historyViewModel: TrainingHistoryViewModel
@@ -209,6 +210,8 @@ public struct TodayWorkoutView: View {
         onShowReview: {
           viewModel.completionPhase = .review
         },
+        accessoryViewModel: viewModel,
+        accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
         sequencePage: sequencePage,
         gymDayToday: gymDayToday
       )
@@ -270,6 +273,7 @@ public struct TodayWorkoutView: View {
         if opensRestSettingsAfterExplanation {
           opensRestSettingsAfterExplanation = false
           restPreference = restTimerSettings.preference(for: studentID)
+          accessoryRestSeconds = restTimerSettings.accessorySeconds(for: studentID)
           showingRestSettings = true
         }
       },
@@ -287,7 +291,10 @@ public struct TodayWorkoutView: View {
     )
     .sheet(isPresented: $showingRestSettings) {
       NavigationStack {
-        RestTimerSettingsView(preference: $restPreference)
+        RestTimerSettingsView(preference: $restPreference, accessorySeconds: $accessoryRestSeconds)
+          .onChange(of: accessoryRestSeconds) { _, seconds in
+            restTimerSettings.setAccessorySeconds(seconds, for: studentID)
+          }
           .onChange(of: restPreference) { _, preference in
             restTimerSettings.setPreference(preference, for: studentID)
           }
@@ -413,9 +420,13 @@ public struct TodayWorkoutView: View {
         resolveInitialSelectionIfNeeded()
       }
       await videoViewModel.start(studentID: studentID)
+      viewModel.accessoryVideosLoaded = videoViewModel.hasLoadedAttachments
       if uploadFailureNavigationToken > 0 {
         openUploadFailureDestination()
       }
+    }
+    .onChange(of: videoViewModel.hasLoadedAttachments) { _, loaded in
+      viewModel.accessoryVideosLoaded = loaded
     }
     .onChange(of: selectedDayID) { _, newDayID in
       editing = nil

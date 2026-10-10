@@ -232,3 +232,44 @@ private func utcDate(year: Int, month: Int, day: Int) -> Date {
   calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? calendar.timeZone
   return calendar.date(from: DateComponents(year: year, month: month, day: day)) ?? .distantPast
 }
+
+@Test func accessoryProjectionDoesNotInventCoachRestFromMainLiftRules() throws {
+  let fixture = intensityProjectionFixture()
+  let catalog = Exercise(
+    id: fixture.catalogExercise.id, name: "Row", exerciseType: .accessory,
+    isCompetitionLift: false, muscleGroups: [], equipment: [], createdAt: .distantPast)
+  let projected = StudentPlanProjection.project(
+    tree: fixture.tree, catalog: [catalog], weekIndex: 1)
+  let sets = try #require(projected.days.first?.exercises.first?.prescribedSets)
+  #expect(sets.allSatisfy { $0.restSeconds == nil })
+}
+
+@Test func accessoryProjectionPreservesCoachRestAndMainLiftVariants() throws {
+  let fixture = intensityProjectionFixture()
+  let encoder = JSONEncoder()
+  let decoder = JSONDecoder()
+  var object = try #require(
+    JSONSerialization.jsonObject(with: encoder.encode(fixture.tree.sets[0])) as? [String: Any])
+  object["restSeconds"] = 75
+  let explicit = try decoder.decode(
+    PlanSet.self, from: JSONSerialization.data(withJSONObject: object))
+  let tree = TrainingPlanTree(
+    plan: fixture.tree.plan, days: fixture.tree.days, exercises: fixture.tree.exercises,
+    sets: [explicit] + fixture.tree.sets.dropFirst())
+  func sets(_ type: ExerciseType) throws -> [PrescribedSet] {
+    let catalog = Exercise(
+      id: fixture.catalogExercise.id, name: "Fixture", exerciseType: type,
+      isCompetitionLift: false, muscleGroups: [], equipment: [], createdAt: .distantPast)
+    return try #require(
+      StudentPlanProjection.project(
+        tree: tree, catalog: [catalog], weekIndex: 1
+      ).days.first?.exercises.first?.prescribedSets)
+  }
+  let accessory = try sets(.accessory)
+  #expect(accessory[0].restSeconds == 75)
+  #expect(accessory.dropFirst().allSatisfy { $0.restSeconds == nil })
+  let main = try sets(.mainLift)
+  let variation = try sets(.mainLiftVariation)
+  #expect(main == variation)
+  #expect(main.map(\.restSeconds) == [75, 180, 180, 180, 240, 180, 240, 180, nil, nil])
+}
