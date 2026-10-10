@@ -423,3 +423,185 @@
 - 其余截图均在同一目录：`behind-en-light.jpg`、`behind-preview.jpg`、`normal-en-light.jpg`、`normal-zh-dark.jpg`、`normal-preview-zh-dark.jpg`、`hero-en-light.jpg`、`hero-no-exercise-note.jpg`、`hero-long-en-dark-large-top.jpg`、`hero-long-en-dark-large-bottom.jpg`、`hero-long-zh-light-large-top.jpg`、`hero-long-zh-light-large-bottom.jpg`、`shifted-scroll-zh-light-large.jpg`、`recorded-set-rest-timer.jpg`、`completion-cursor-16days.jpg`、`completed-readonly.jpg`。`behind123-en-dark-large-before-fix.jpg` 是修正前失败证据，不能用于最终通过结论。
 - 验收 8 的覆盖边界补充：已看同一 Deadlift 三组保持原动作备注、结算后下一个训练日 Squat 无动作备注时没有旧金块残留；未在同一训练日实屏跑出“两条不同非空动作备注”的切换（现有组合日三个动作的备注均为空）。取值每次直接消费当前 exercise.note、无缓存，且纯函数测试两来源互不影响；不把该源码证据写成已看过该形态。
 - 无真实安装升级账户、没有 SE 设备、没有实时跨 4 点全过程的限制仍按上文保留；不需要用户作新的产品决定。功能代码交付待 Opus 收货，未修改任何 SPEC 验收勾选或状态。
+
+## 2026-10-10 · spec 089 iOS（开工核对：休息偏好存储待裁定）
+
+- 工作树 `MeetPR-wt-086`，分支 `feat/089-accessory-quick-log`，HEAD `36770eaa`，初始工作区干净。当前目录创建并删除临时文件成功，exit 0。已读共同约定、089 SPEC / CARD-ios、086 JOURNAL 与 ACCEPTANCE；未 commit、未 push。
+- 改动文件清单：仅本 JOURNAL 末尾追加记录；尚未修改代码、测试、Demo、SPEC 或发布账本。
+
+### 需要裁定：只追加一个字段不能表达现有自动模式
+
+现场证据位于 `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/StudentRestTimerSettings.swift`：
+
+- 第 109–120 行：`setPreference(.automatic)` 删除整个既有存储键；只有 custom 写入 JSON。
+- 第 154–172 行：version 2 JSON 仅有 `version`、`lowSeconds`、`midSeconds`、`highSeconds`，解码后一律构造 custom；不存在 mode 字段。
+- 第 85–106 行：无数据为 automatic；旧整数迁移成三个相同的 custom 分档。
+- 所以在同一个键只加 `accessorySeconds`，无法无歧义地区分“自动 + 辅助项 90 秒”和“自定义 120/180/240 + 辅助项 90 秒”。沿用删除键会丢辅助项时长；把默认三档当自动会丢用户的模式选择；复用 version 或时长哨兵会改变既有字段含义。
+
+拟议最小扩展（未实施）：允许在原 JSON 增加两个可选字段 `mode` 与 `accessorySeconds`，保持原存储键和原有字段。旧 version 2 JSON 缺 mode 按原语义 custom，缺 accessorySeconds 为 60；无存储仍为 automatic / 60；旧整数迁移继续保留原三档。新写入显式保存 automatic/custom，切模式保留辅助项时长。此方案超出本轮“只追加一个字段”限制，按用户规定的存储结构停问边界，等待 David/Opus 裁定。
+
+### 测试与验收状态
+
+- 六处 seam 均未开始红绿；新增测试 0、执行 0，既有断言零删改。未运行包全量、format 或 lint；不宣称通过。
+- 验收 1–13 均未实装、未验证；老用户升级第一屏和旧格式解码验证尚未执行。
+- 未新增 Demo 参数，默认 Demo 未修改；未构建运行模拟器，未生成 DerivedData，未触碰其他工作树的模拟器。
+- 与安卓差异：安卓偏好已有 mode，iOS 以键缺失表示 automatic；本次发现的是存储表示差异，非产品行为裁决。其他差异与 spec 外问题尚未展开。
+- 原始源码证据：`/tmp/spec089-evidence/rest-settings-baseline.txt`；无测试日志或截图。
+
+## spec 089 iOS（实装交付，2026-10-10）
+
+本节接续前面的「开工核对」：该节所述 JSON 扩展提议未实施，待裁定状态已由 CARD-ios「修订一」及 David 后续两次线程指令取代。工作树 `MeetPR-wt-086`，分支 `feat/089-accessory-quick-log`，基于 spec 086 提交 `36770eaa`。未 commit、未 push；自测结果供 Opus 收货，不宣告验收通过。
+
+### 实现与裁定落实
+
+- 仅动作库 `Exercise.exerciseType == .accessory` 进入辅助项卡，nil / 未知 raw value 返回 false；不读取计划主项标记。保留 iOS 对 catalog 缺失动作整项不展示的既有投影，不定义缺失动作模型、名字，不另开卡（David 第二处裁定）。
+- 在现有 hero 内接入六列行内卡，保留 086 淡金动作备注与小灰字组级备注；自重行重量不可编辑、按 0 写入，RIR 仅作占位。常驻视频/失败入口提示；组号仍进原完整录入 sheet。数字输入有逐行 FocusState 与键盘工具条 Done / 完成按钮。
+- 逐组写入、覆盖、取消及串行批量全部复用现有 `persist → recordSet` 路径；取消显式 `completed:false`、`failed:false`，保留原始重量次数。空 RPE 不写处方值，请求省略 RPE；批量只选未记录且合法行，空重量跳过、计数提示，失败停止、成功保留、可重试。无新增后端接口、DTO 字段或依赖。
+- 存储按修订一采用独立整数键 `meetpr.student.rest_timer.accessory_seconds.<studentID>`；缺失、非法类型、越界或非 15 倍数均回退 60。主项 `fixed_seconds` 键的读写删、version 2 JSON、旧整数迁移及「键不存在 = 自动」实现逐字保留，未加 mode 或其他 JSON 字段。协议增加两方法，两个既有 preview/test 内存实现补齐。
+- 设置页新增始终可调的辅助项段，30–300 秒、步进 15 秒；自动/自定义切换不影响辅助项值。24 个辅助项中英键逐字取 `meetpr-rn@137d816`，页底说明改为目录中的复数写法。
+- 休息走教练明确值 → 辅助项偏好 → 60。主项原分支不变；辅助项不弹 RPE 说明；逐组覆盖也重新计时；末组与批量不起计时。计时条与 Live Activity 的 UI、+30/−30/Skip 均未改。
+
+### 投影与范围扩展的证据
+
+`StudentPlanProjection` 以前给所有 canonical load mode 注入主项 180/240 秒，导致辅助项偏好永远无法生效。本卡仅在辅助项投影时保留原始 `planSet.restSeconds`；该处 Repository 范围已由 David 明确允许。
+
+1. `accessoryProjectionPreservesCoachRestAndMainLiftVariants` 用 JSON 解码带显式 75 秒的 PlanSet，确认辅助项保留 75，其余未设组为 nil；写入集成测试再确认偏好 90 时教练 75 仍优先。
+2. 同一 10 组 fixture 的主项与主项变式投影逐字段全等，休息逐组为 `[75,180,180,180,240,180,240,180,nil,nil]`；原 `studentProjectionUsesCanonicalIntensityFieldsAndIgnoresLegacyProjection` 全部断言原样通过。原主项 `restSeconds(for:)` 一行未改。
+3. `accessoryOverwriteRestMatchesLiveActivity` 对 `RestTimerActivityControlling` 注入 spy，逐组、覆盖时校验页面 `restTimer` 与 activity 的 `totalSeconds`、`endsAt` 完全相同；批量后两者为空。生产 `startRestTimer` 只构造一个 nextTimer，原计时条直接消费同一 state。没有修改 Widgets，也未做真机锁屏视觉复验。
+
+另两处小范围协议兼容接线为 `GrowthProfileV3Previews`、`StudentEmptyStateViewTests`；Demo 带视频场景需在 `VideoUploadServices.demo()` 注入 fixture，默认仍为空。VideoUpload 的生产改动只在 `VideoAttachmentViewModel`：增加 `hasLoadedAttachments`，成功读取（含空列表）才设 true；原 `manager.attachments` 把异常折成空列表，无法作取消依据，故在这里调用同一 repository 的 throwing fetchAll，并保持原 recordedAt 排序。加载失败仍保持原界面表现，只让辅助项知道状态未知；上传、压缩、播放、重试管线均未动。既有 VideoUpload 测试文件零改动并全量通过。
+
+### 独立审查与返修
+
+- Standards 第一轮 P2：冷启动附件尚未读完可取消。初步加 VM 状态闸；依 David 最新要求补齐失败状态和提示：未知时点已完成 ✓ 显示既有「暂时无法撤销，请稍后重试」，在 persist 前返回，详情入口保留；已知且有视频用安卓目录提示。测试覆盖成功空列表、读取失败、未知禁止写入并有提示、已知无视频可取消、已知有视频不能取消。
+- Standards 第一轮 P2：lb 显示回算导致未改 60 kg 写成 60.01 kg。修为未编辑重量直接取原处方/原记录 kg；仅编辑后的输入才换算。测试覆盖首次 lb 保存原值和取消保留原值，旧覆盖测试保持。
+- 自查第三项：安卓 `TodayWorkoutView.tsx` 对辅助项已完成组覆盖也起休息，而 iOS 原完成边沿条件漏掉此情形。仅辅助项放开完成边沿；测试先失败，补齐后重计时并同步 Live Activity，主项原规则不变。
+- Spec 第一轮 catalog 缺失 finding 按 David 第二次裁定撤回；平台差异见下。二轴第二轮均 CLEAN；读取失败/提示的追加改动又做了 Standards 定向只读复核，CLEAN。审查者未写文件。
+
+### 六处 seam 与原始红绿
+
+证据目录统一为 `/tmp/spec089-evidence/`；下列均为原始工具/测试日志，不以摘要代替原输出。新增 Swift Testing 16 个，既有测试行及断言零删改。
+
+| seam | 覆盖 | 红 | 绿 |
+|---|---|---|---|
+| 1 判定 | accessory / mainLift / mainLiftVariation / nil / unknown raw value，只有 accessory 为真 | `seam1-red.log`（缺 API 编译失败） | `seam1-green.log`，最终全量 |
+| 2 行模型/历史 | 处方/已有记录/上次同序号；同一次历史不混更早组；BW、RPE/RIR、空重量、选择与校验 | `seam2-red.log`、`seam2-history-red.log` | `seam2-green.log`、`seam2-history-green.log`，最终全量 |
+| 3 休息/存储/投影 | 优先级、旧格式、模式切换、主项不变、教练 75、活动同源、末组 | `seam3-storage-red.log`、`seam3-policy-red.log`、`seam3-projection-red.log`（实际断言失败）、`seam3-overwrite-red.log`（实际断言失败） | 对应 `*-green.log`；`seam3-rest-integration-green.log`、`seam3-terminal-green.log`、`seam-review-green.log`、最终全量 |
+| 4 写入 | 普通记录/显式取消/空 RPE/覆盖/视频保护/串行失败重试/磅原值/未知提示 | `seam4-red.log`、`seam4-batch-red.log`、`seam4-review-compile-red.log`、`seam4-review-red.log`（实际断言失败）、`seam4-video-snapshot-red.log`、`seam4-unknown-hint-red.log`（实际断言失败） | `seam4-green.log`、`seam4-batch-green.log`、`seam-review-green.log`、`seam4-video-snapshot-green.log`；未知提示的绿为 `studentkit-final.log` 对应 test passed 行 |
+| 5 presentation | editable recording 辅助项才替换；main/readonly/planning 不替换；全部记完推进 | `seam5-red.log` | `seam5-green.log`，最终全量 |
+| 6 原功能回归 | 记录、结算、补记、聊天引用、休息、视频等原测试 | 不制造功能红测或改旧断言；全量曾出现 3 个既有视频异步 TimeoutError，原始 `studentkit-timeouts.log` 保留（不能当功能测试的红） | `video-timeouts-recheck.log` 3/0；最终 `studentkit-final.log` 953/0、`coremodels-final.log` 158/0 |
+
+补充投影的显式教练值/主项变式、失败组后的最后未记录组等是同 seam 内已实现行为的追加证明，加入即绿，未伪造失败。六处中的前五处有真实 red→green；第六处是原测试回归边界，未人为破坏旧断言来制造 red。全量中三个超时用例是 `persistedGenerationRejectsOlderEventThatArrivesFirstAfterRestart`、`sessionFinishedDuringPersistenceDoesNotRollBackMemoryGeneration`、`staleRecoveryLoopCannotInterfereWithImmediateRetryOfSameRecord`；停 UI 操作后的定向与完整复跑均通过，代码未针对超时改动。视频导出实际通过，没有把 Cannot Encode 当通过。
+
+### 老用户与 Demo 覆盖
+
+- `accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences` 写入真实改前格式 `{"version":2,"lowSeconds":105,"midSeconds":195,"highSeconds":315}`，逐档读回 105/195/315 且原 JSON 字节未变；旧整数 195 按原迁移读回三档 195，两种均确认辅助项 60。另测新键缺失、90 写读、学生隔离、非法值/字符串回退、自动→自定义→自动保留 90。源码比较确认现有主项 preference 方法起至文件尾与 HEAD 逐字相同。
+- `--spec089-upgrade`：主项三组已完成，辅助项第一组已完成且有 uploaded 视频 marker，其余两组可继续；这是加载已有日志与附件后的第一屏，不是先现场点完的替代。附件 fixture 不含真实可播放文件，覆盖 marker/禁止取消/覆盖，不冒充真实上传。
+- `--spec089-accessory`：基础辅助项 hero，默认 60 kg / 12 次、RPE 8 占位，第二组带 3-1-1 备注。
+- `--spec089-rpe`：纯 RPE 无处方重量；上次 55 kg / 10 次仅作占位，可点 Last 填入。
+- `--spec089-bodyweight`：重量为空但备注 bodyweight，BW / RIR 2，占位不写实际 RPE。
+- `--spec089-coach-rest`：教练明确 75 秒，覆盖已在设置页存入的 90 秒。
+- `--spec089-lb`：可与上述任意场景组合，单位偏好 lb。
+- 任一 `--spec089-` 参数才启用 fixture；默认不带参数时 Today 仍为 W1D3 Deadlift、1 动作/3 组、周进度 2/4。默认截图 `default-demo-first-screen.jpg`；未改导航或默认 Demo 入口。
+- 语言/样式验证附加启动参数：`-AppleLanguages (en)` / `(zh-Hans)`，对应 locale；`-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityL`（恢复常规为 `UICTContentSizeCategoryL`）；用已存在的 `-meetpr.appearance dark` / `light` 覆盖仅本次进程的样式。休息 1:30 是实际进入 Profile 页面按两次 + 设置，并非靠启动参数伪造。
+
+### CARD-ios 验收逐项自测
+
+| 项 | 自测结论与证据 |
+|---|---|
+| 1 | 辅助项六列表格与 086 两级备注实屏确认：`accessory-en-light.jpg`。主项原 hero、淡金备注、小灰字组备注：`main-hero-unchanged.jpg`。主项变式 classifier / projection 断言通过；未单独把变式推进到可编辑 hero，复用的非辅助项分支未改。 |
+| 2 | 处方预填、纯 RPE 空重量/上次占位：`rpe-empty-weight.jpg`；BW 无重量输入：`bodyweight-en-dark-large-rows.jpg`。 |
+| 3 | 逐组变绿、下方组表/Today 在结算后推进；普通 repository 日志与 DTO 假仓库断言证明与完整录入同路径，未改 CoachKit。`single-default60.jpg`、`completion-celebration.jpg`。未连接真实教练账号。 |
+| 4 | 空 RPE 请求无键、日志 nil 的单测通过；实屏保存空 RPE 后行内为空；BW/RIR 2 占位手填 7.5 后保存：`bodyweight-rpe75-saved.jpg`。 |
+| 5 | 取消后行不再绿，重量 55 / 次数 10 保留：`cancel-retains-values.jpg`；fake repo 两个 false，原聚合/Progress 回归通过。带视频取消提示且状态不变：`video-cancel-blocked-zh.jpg`。未知状态/读取失败禁止取消及提示由 seam 4 验证，未额外造 UI 故障场景。 |
+| 6 | 已完成带视频行 lb 重量改为 143 后覆盖成功，视频 marker 保留、重起休息：`video-overwrite-lb.jpg`；fake repo 确认仍同一 log ID。 |
+| 7 | 组号进入原完整录入：`full-entry.jpg`；点失败可返回，行仍为记录态；相册 consent 与系统 picker 可达：`photos-entry.jpg`、`photos-picker.jpg`。本模拟器相册为 No Videos、无实体摄像头，真实拍摄/选片上传再返回的完整往返未验到；上传生命周期/转码等既有单测通过，升级 fixture 的视频 marker 可见。提示行常驻见各行截图。 |
+| 8 | 点击 Last 仅填重量次数；批量只完成合法行、提示缺重 2 组：`batch-skipped-two.jpg`；补齐后无计时、完整完成态：`batch-complete-no-timer.jpg`。中途失败/成功保留/重试不重复用假仓库第 2 次失败断言覆盖，未用真实断网模拟。 |
+| 9 | 默认 60：`single-default60.jpg`；Profile 实调 1:30 与后续生效：`settings90-en.jpg`、`custom90-running.jpg`；教练 75 优先于 90：`coach75-priority.jpg`；最后一组清掉计时：`final-set-no-timer.jpg`；批量无计时。主项旧规则与模式保持的原测试全通过，Live Activity 同源用 spy 证明，锁屏 UI 未单独实屏复验。 |
+| 10 | 老用户首屏含已记组、视频和剩余可写行：`upgrade-zh-lb-large-top.jpg`、`upgrade-zh-lb-large-rows.jpg`；设置旧 JSON/旧整数/从未设置均有解码测试。首次进入设置默认 1:00，之后实调 1:30；原主项自动设置保持。 |
+| 11 | 全部辅助项完成后原长按结算、庆祝、Today 撤销入口走通：`completion-celebration.jpg`、`completion-undone.jpg`，原结算/撤销断言不改。 |
+| 12 | Light 中文 lb 超大字号、Dark 英文 BW/RIR 超大字号、英文常规字号均亲眼检查六列完整、132.3/143 与 7.5 不截断。无 SE；17e 均已 Booted 且有并行作业，选空闲的 iPhone 17 / iOS 26.4 `CFAA1293-2795-45DC-A279-7012482F2716`，不停止/重置其他设备。软键盘避让未验到，按 David 最新指令交 Opus；详见下。 |
+| 13（iOS 替换） | StudentKit **953 passed / 0 failed / 0 skipped**；CoreModels **158 / 0 / 0**，未改其他包。全仓 swift-format strict 0 违规；SwiftLint strict 1106 文件 0 违规。DemoStudent 最终构建运行成功，工具 0 errors / 0 warnings。 |
+
+### 软键盘、未覆盖与平台差异
+
+- 键盘避让：沿用 TodayWorkoutScreen 原 ScrollView 和 SwiftUI 自动 keyboard safe-area/focus 避让，未添加 ignoresSafeArea(.keyboard)。AccessoryLogRow 的每行 FocusState 绑定三个输入框；焦点存在时 `.toolbar` 的 `.keyboard` ToolbarItemGroup 提供 Done / 完成，点它把 focusedField 清为 nil。未加点空白收起，也未另加程序滚动定位。硬件键盘下实际输入并保存了第三组重量、第一组 lb 重量和 RPE 7.5，Done 可清焦点；硬件键盘工具条以系统浮动区域显示，按钮有时缩成 `D…`。软键盘没有弹出；CUA 原生 Simulator 控制被工具拒绝（`Computer Use was not approved to use Simulator`），XcodeBuildMCP 无切换软键盘入口。依 David 指令不等待人工，该项明确未验到，由 Opus 开软键盘收货。
+- 其他未实屏覆盖：实体摄像头、从相册实际选择视频上传再返回（本机相册为空）、真实教练端/真实断网、真机锁屏 Live Activity。分别以入口实屏、原视频全量测试、假仓库与 activity spy 补充，不冒称完整端到端验过。
+- 安卓类型无法解析 → 完整录入；iOS catalog 缺失 → 既有逻辑整项不展示，本卡未改（David 裁定）。仍以唯一 accessory 类型判真，未知绝不误进辅助项。
+- 按 CARD-ios 保留 iOS 完整录入的 RPE 5–10、0.5 步进与现有 lb 换算精度（编辑输入换算到 kg 保留两位；未动重量保存原值）；不复制安卓 0–10 输入范围/另一精度。
+- 休息偏好采用 iOS 独立新键（修订一），安卓仍为自身偏好结构；本地模式/后端形状不改。
+- 现有下方组表/完成 hero 在日志 RPE 为空时仍可能显示处方 RPE；本卡只保证行内与写入为空，按「下方表维持现状」未顺手改。已有休息条在 accessibility-large 下数字和 ±30/Skip 会换行（见 `video-overwrite-lb.jpg` / `bodyweight-rpe75-saved.jpg`），属于本卡明确沿用的 iOS UI，未改。
+- 默认 Demo、spec 081 补记、训练日结算撤销、e1RM、CoachKit、Widgets、发布台账和 build 号均未改。`CARD-ios.md` 工作区改动为用户提供的修订一，本实现未写该文件。无待 David 再裁定的问题。
+
+### 改动文件清单
+
+以下为本任务 33 个文件（不含用户提供的 CARD-ios 修订）：
+
+- `Modules/StudentKit/Sources/StudentKit/Demo/AccessoryDemoScenario.swift`
+- `Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/AccessoryRestSettings.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/RestTimerPreferenceRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/RestTimerSettingsView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/StudentRestTimerSettings.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryClassification.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryHistory.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryLogCard.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryLogRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryWorkoutHero.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/RestTimerPolicy.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutPresentation.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutScreen.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel+DraftBuilding.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/GrowthProfileV3Previews.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoAttachmentViewModel.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoUploadServices.swift`
+- `Modules/StudentKit/Sources/StudentKit/Repository/StudentPlanProjection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings`
+- `Modules/StudentKit/Sources/StudentKit/StudentStrings.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/Dashboard/StudentEmptyStateViewTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/StudentRestTimerSettingsTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryClassificationTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryPresentationTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessoryRowTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/AccessorySaveTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/RestTimerPolicyTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Repository/StudentPlanIntensityProjectionTests.swift`
+- `docs/CODEX-JOURNAL.md`
+
+### 最终证据与环境
+
+- `/tmp/spec089-evidence/studentkit-final.log`：最终 953/0，包含原 VideoUpload、QuickLog、completion、set-ref、rest-timer 全部回归；`coremodels-final.log`：158/0。
+- `swift-format-final.log` 为空（exit 0）；`swiftlint-final.log`：1106 文件 0 违规（exit 0）。`guards.log`：24 × 2 文案逐字比对与四项模块边界通过。源码保护检查确认旧主项偏好实现逐字未改、既有测试零删行、禁改文件未动。
+- `build-final.log`：MeetPR-DemoStudent / DemoStudent，独立 `/tmp/spec089-derived`，`-skipPackageUpdates`，成功 180.6 秒；`runtime-final.log`：安装启动成功。首次 build_run_sim 超过工具 300 秒等待，`build-first-timeout.log` 自身最终 BUILD SUCCEEDED；后续完整构建运行已有明确成功结果。
+- 上表截图全在 `/tmp/spec089-evidence/`，仅文件，不把图片贴进交付正文。`changed-files.txt` 为 33 个本任务文件清单（31 Swift、xcstrings、JOURNAL；不含用户 CARD 改动）。所有日志与截图都是 Demo/假数据，无账号、密钥、内网细节。
+- 使用一份 DerivedData；交付前删除本任务 `/tmp/spec089-derived` 的构建中间产物与模块缓存，保留安装包产品便于复验，不清理其他工作树或模拟器。
+
+### 返修一（共用草稿 RPE 回归，2026-10-10）
+
+Opus 收货指出初版把所有辅助项共用草稿的实际 RPE 都设为 existingLog?.rpe，连带使 spec 081 补记的未记录辅助项初值与提交值变空。上一交付节「补记未改」仅能证明源文件未改，不能证明行为未改；该回归在本轮修复。
+
+- 生产改动只有 `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel+DraftBuilding.swift` 一处条件：仅在 `exercise.exercise.isAccessory && existingLog != nil` 时保留原记录 RPE（含 nil）；无已有记录时所有类型恢复 `set.rpe ?? 8`。主项与变式已有记录继续使用原 `existingLog?.rpe ?? set.rpe ?? 8`。
+- `AccessoryRow` 的既有独立输入初始化保持不变：无 loggedSetID 时输入恒为空，教练 RPE / RIR 仅作占位；saveAccessoryRow 原 `updateRPE(rowIndex:rpe: row.rpe)` 继续把空输入写为 nil。QuickLogPlan / QuickLogSheet 源文件零改动，现有补记断言零删改。
+- 本轮另改三个测试文件：`Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutQuickLogTests.swift` 新增未记录辅助项补记测试；同目录 `AccessoryRowTests.swift` 追加共用草稿默认值与已记录 nil 断言（seam 2）；`AccessorySaveTests.swift` 新增保存空 RPE→重新 load→只改重量覆盖的整条验证（seam 4）。加上本 JOURNAL，本轮共 5 文件，新增 Swift Testing 2 个。
+
+先红后绿与最终结果：
+
+- `r1-quicklog-red.log`：新补记测试 1 个失败、2 个断言失败，页面行初值与实际 repository 提交值均为 `[nil,nil]`，预期 `[7,8]`。工具摘要把两个 issues 算作 2 failed，原始 Swift Testing 明确为 1 test / 2 issues。
+- `r1-quicklog-green.log`：修复后该测试 1/0，处方 7 和无处方默认 8 的初值、写入均正确。
+- `r1-seam2-seam4-green.log`：2/0，未记录行在草稿为 8 时卡输入仍为空；已有记录 nil 经重载后仍为空；只改 60→65 kg 覆盖仍同一 log ID、RPE nil。这里是已满足行为的追加回归验证，没有伪造红测。
+- 最终 StudentKit **955 passed / 0 failed / 0 skipped**（`r1-studentkit-final.log`）；CoreModels **158 / 0 / 0**（`r1-coremodels-final.log`）。既有视频测试及补记测试全量零改动通过。无其他包改动。
+- 全仓 `swift-format lint --strict` exit 0、零违规（`r1-swift-format-final.log`）；`swiftlint lint --strict` exit 0、1106 文件零违规（`r1-swiftlint-final.log`）。`r1-guards.log` 记录补记源码未改、既有测试零删行。Standards / Spec 定向独立只读复核分别 CLEAN，见 `r1-review.txt`。
+
+两处模拟器实屏均完成（iPhone 17 / iOS 26.4，同前轮专用模拟器，不碰其他工作树）：
+
+1. 默认 Demo 无 spec089 参数：从 Training 的 W1D3 补记并完成，自动推进 W1D4，再打开补记页、滚动至 Seated Row。三组辅助项 RPE 都显示处方值 **8**；同屏主项处方 7、变式无处方默认 8 也保持。截图 `/tmp/spec089-evidence/r1-default-demo-quicklog-rpe.jpg`。未修改 Demo 数据或默认首屏。
+2. 重新启动 `--spec089-accessory` 后进入 Training，三组未记录 RPE 输入为空，浅灰 **8** 为教练处方占位，与黑色重量/次数区分。截图 `/tmp/spec089-evidence/r1-accessory-empty-rpe-placeholder.jpg`。系统 accessibility 把 placeholder 也报为 value 8，是否空输入由 seam 2 / seam 4 的 input.rpe.isEmpty 与实际 nil 写入断言共同验证。
+
+最终构建与保留产物：
+
+- MeetPR-DemoStudent / DemoStudent 编译成功，`r1-build-final.log` 末尾 **BUILD SUCCEEDED**。build_run_sim 工具超过 300 秒等待上限；随后直接安装同一产物并 launch_app_sim，二者明确 SUCCEEDED（`r1-install-launch.log`、`r1-runtime-final.log`），未把工具超时冒称为组合调用成功。
+- 最终 app 已保留：`/tmp/spec089-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`。仅删除同一 DerivedData 的 Intermediates.noindex、ModuleCache.noindex、Index.noindex，Build/Products 未删。模拟器停留在辅助项 hero，便于 Opus 继续软键盘验收。
+- 本轮要求的两处实屏无未验项；软键盘避让仍按上一轮裁定交 Opus，其他上轮未覆盖项不因本次测试而冒称补齐。无需要 David 再裁定的问题。未 commit、未 push。
