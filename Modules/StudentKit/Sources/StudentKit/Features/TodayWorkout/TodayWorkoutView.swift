@@ -28,6 +28,7 @@ public struct TodayWorkoutView: View {
   private let onPlanChanged: (StudentPlanView) -> Void
   private let onReturnToToday: () -> Void
 
+  @State private var restTimerHeight: CGFloat = 0
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -193,15 +194,7 @@ public struct TodayWorkoutView: View {
         onQuickLog: openQuickLog,
         onEdit: openEditor,
         onVideoAction: openVideoAction,
-        onComplete: {
-          Task {
-            if await viewModel.completeCurrentDay(), viewModel.completionPhase == nil {
-              // The student may have closed the reward while it was sending.
-              returnToCurrentDay()
-              onReturnToToday()
-            }
-          }
-        },
+        onComplete: completeTraining,
         onUndoCompletion: {
           Task {
             _ = await viewModel.undoCurrentDayCompletion()
@@ -213,7 +206,8 @@ public struct TodayWorkoutView: View {
         accessoryViewModel: viewModel,
         accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
         sequencePage: sequencePage,
-        gymDayToday: gymDayToday
+        gymDayToday: gymDayToday,
+        restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight
       )
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -231,13 +225,25 @@ public struct TodayWorkoutView: View {
       )
     }
     .safeAreaInset(edge: .bottom) {
-      if let timer = viewModel.restTimer {
-        RestTimerOverlay(
-          timer: timer,
-          now: { Date() },
-          onAdjust: { viewModel.adjustRestTimer(bySeconds: $0) },
-          onSkip: { viewModel.skipRestTimer() }
-        )
+      VStack(spacing: 0) {
+        if !showingHistory, case .workout(let presentation) = screenContent,
+          presentation.completionAvailability(isEditable: selectedDayState.isEditable).sticky
+        {
+          TrainingCompletionDock(onComplete: completeTraining)
+        }
+        if let timer = viewModel.restTimer {
+          RestTimerOverlay(
+            timer: timer,
+            now: { Date() },
+            onAdjust: { viewModel.adjustRestTimer(bySeconds: $0) },
+            onSkip: { viewModel.skipRestTimer() }
+          )
+          .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+          } action: { height in
+            restTimerHeight = height
+          }
+        }
       }
     }
     #if os(iOS)
@@ -686,6 +692,16 @@ public struct TodayWorkoutView: View {
       try? await Task.sleep(for: .seconds(2))
       guard !Task.isCancelled else { return }
       quickLogToastWeekCode = nil
+    }
+  }
+
+  private func completeTraining() {
+    Task {
+      if await viewModel.completeCurrentDay(), viewModel.completionPhase == nil {
+        // The student may have closed the reward while it was sending.
+        returnToCurrentDay()
+        onReturnToToday()
+      }
     }
   }
 

@@ -605,3 +605,126 @@ Opus 收货指出初版把所有辅助项共用草稿的实际 RPE 都设为 exi
 - MeetPR-DemoStudent / DemoStudent 编译成功，`r1-build-final.log` 末尾 **BUILD SUCCEEDED**。build_run_sim 工具超过 300 秒等待上限；随后直接安装同一产物并 launch_app_sim，二者明确 SUCCEEDED（`r1-install-launch.log`、`r1-runtime-final.log`），未把工具超时冒称为组合调用成功。
 - 最终 app 已保留：`/tmp/spec089-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`。仅删除同一 DerivedData 的 Intermediates.noindex、ModuleCache.noindex、Index.noindex，Build/Products 未删。模拟器停留在辅助项 hero，便于 Opus 继续软键盘验收。
 - 本轮要求的两处实屏无未验项；软键盘避让仍按上一轮裁定交 Opus，其他上轮未覆盖项不因本次测试而冒称补齐。无需要 David 再裁定的问题。未 commit、未 push。
+
+## spec 090 iOS（2026-10-10，工作区交付，待 Opus 验收）
+
+### 范围与实现
+
+- 当前树 `/Users/david/Projects/apps/MeetPR-wt-086`，分支 `feat/090-training-flow`，基线 `576729ac`（含 086、089 及返修）。开工在本目录创建并删除临时文件，写权限确认成功。未 commit、未 push；未修改任何 SPEC、NEXT-RELEASE、RELEASES、build 号、工程结构或依赖。
+- 仅可编辑记录态消费新分区：真实结果包含 completed/failed，assumed 仍待记录；按计划序排列完成行、首个未完成 hero、其余动作。取消后重新分区。主项/变式 hero 显示分段条，失败弱灰，不向读屏暴露装饰分段。完成行复用原组编辑入口；辅助项展开复用 089 卡，未改其内部。
+- 全记完时按钮与原休息条放在同一底部安全区容器，按钮在上；History 推入时隐藏按钮。未全记完仍是原滚动区按钮/剩余提示。HoldToCompleteButton 源码逐字未改，结算回调仅提取函数共用。重量/次数仅压缩间距、数字字号和数值框高度，各段顺序不变。
+- 记录态使用 eager VStack，以解决完成主项末组时全屏录入关闭与 LazyVStack 重新分区造成的 SwiftUI 卡顿；其余路由保留原 LazyVStack。新完成行是唯一 scroll targets，等待 350ms 让录入关闭事务稳定后直接定位；完成行和 hero 只做局部 0.2s 淡入，已消费 trigger 不重播。初次加载/切日不触发，Reduce Motion 直接呈现；手动滚动/键盘条件中止定位并清理请求。
+
+### 改动文件（19 个，含本节）
+
+以下路径均相对仓根：
+
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutScreen.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutPresentation.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/SetEntrySheet.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingExerciseProgress.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingSetProgress.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingCompletionAvailability.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingFlowPresentation.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingSetProgressBar.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedTrainingExercise.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingFlowScroll.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift`
+- `Modules/StudentKit/Sources/StudentKit/Demo/TrainingFlowDemoScenario.swift`（新增）
+- `Modules/StudentKit/Sources/StudentKit/StudentStrings.swift`
+- `Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TrainingFlowTests.swift`（新增）
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutSetRefEntryLayoutTests.swift`
+- `Modules/DesignSystem/Sources/DesignSystem/DesignSystemStrings.swift`（仅公开已有 expanded/collapsed 文案）
+- `docs/CODEX-JOURNAL.md`
+
+### S1–S4 先红后绿与最终测试
+
+全部原始输出保存在 `/tmp/spec090-evidence/`。新增 5 个 Swift Testing 测试，只落 S1–S4；未加录入页快照测试。
+
+| seam | 红 | 绿 |
+|---|---|---|
+| S1 分区 | `s1-red.log`：先写测试，TrainingExerciseProgress 尚不存在，编译失败 | `s1-green.log`：1/0；后续补齐的第二个 S1 测试覆盖部分、跳做、失败、代填、全完、撤销、输入逆序仍按计划排序 |
+| S2 分段 | `s2-red.log`：缺 TrainingSetProgress，编译失败 | `s2-green.log`：累计 3/0，含 0/3、1/3、失败、全完及代填 |
+| S3 按钮 | `s3-red.log`：缺 completionAvailability，编译失败 | `s3-green.log`：累计 4/0，全完吸底/无 pill、差一组不吸底、只读无按钮 |
+| S4 页面 presentation | `s4-red.log`：缺 trainingFlow，编译失败 | `s4-green.log`：累计 5/0，完成行/hero/标记/撤销/模式隔离 |
+
+- 最终 StudentKit **960 passed / 0 failed / 0 skipped**，`studentkit-final.log`；DesignSystem **73 / 0 / 0**，`designsystem-final.log`。使用 XcodeBuildMCP `swift_package_test`，默认包内缓存，没有改用 xcodebuild 包 scheme；视频导出用例全部真实通过。普通沙箱 swift test 的缓存权限失败未冒充测试红。
+- 最终 `swift-format lint --strict --recursive Modules` 零违规（`swift-format-final.log` 为空）；全仓 `swiftlint lint --strict` **1115 文件、0 违规**（`swiftlint-final.log`）；`git diff --check` 通过。未改其他包。
+- 唯一改动的既有断言：`TodayWorkoutSetRefEntryLayoutTests.completedSectionOwnsAskCoachEntry`，已有全记录 fixture `[0,1]` 的 `askCoachEntryCount` **原值 1 → 新值 0**，测试名改为 `allRecordedHidesHeroAskCoachEntry`。依据 SPEC §3「所有动作都做完时：hero 卡消失」；原唯一 Ask coach 位于该 hero，不能继续要求存在。原 fixture、进行中断言及其余既有断言保持不变。修改前全量 **959/960 通过、此项失败**，原始输出 `studentkit-before-assertion-update.log`。
+- Standards / Spec 独立只读审查均收敛 CLEAN。定向发现并修复：展开辅助项漏备注、完成行间距、History 残留 dock、中止定位后同 UUID 无法重试、全屏返回可能重播反馈。静态审查不替代以下实屏自测或 Opus 验收。
+
+### 验收清单逐项自测
+
+目标设备：同一台 iPhone 17 Pro / iOS 26.5，竖屏、默认字号。下表所有截图路径均加前缀 `/tmp/spec090-evidence/`，不内嵌图片。
+
+| 项 | 自测结论与证据 |
+|---|---|
+| 1 | 已看：开始前仍为原 summary，点击开始后无完成行、主项三段第一段高亮。`01-empty.jpg`、`dark-01.jpg`、`zh-01.jpg`、`lb-01.jpg`。 |
+| 2 | 已实际保存首组：首段实心、次段高亮。三变体 `*-02.jpg`；另实际标第二组失败，`02-failed-segment.jpg` 显示弱灰而非红，第三段高亮。 |
+| 3 | 已实际保存主项末组：完成行贴近可视区顶部、完整下一辅助 hero 同屏。`03-main-complete-final.jpg`、三变体 `*-03.jpg`。已排除中间版本卡顿，最终中文/磅完整链路复跑。 |
+| 4 | 已展开并编辑完成主项第一组 175→177.5，保存后仍在完成区，收起正常。`04-edited-completed-final.jpg`；视频入口可达，但未完成视频选择/回放全链路。 |
+| 5 | 已实际打辅助末组 ✓，也实际运行两个辅助项各自“全部按计划完成”；都上收且无分段条。`05-accessory-individual-final.jpg`、三变体 `*-03.jpg` / `*-08.jpg`。 |
+| 6 | 已对第二动作取消第一组：完成区保留第 1、3 动作，第 2 动作恢复 hero。`06-09-cancel-final.jpg`。 |
+| 7 | 用 `--spec090-skipped` 复现第三动作先全记完：它上收，hero 仍第一个。`07-skipped.jpg`；操作前后的分区含跳做及多个动作同批变完另由 S1/S4 覆盖，未逐次在 UI 手动填第三动作。 |
+| 8 | 已看单一吸底按钮、无 hero、三行无遮挡；有休息条时按钮在其上方，见 `dark-08.jpg` / `zh-08.jpg` / `lb-08.jpg`。最终包实际长按结算出现庆祝页，`08-celebration-final.jpg`。 |
+| 9 | 全记完后取消一组，dock 消失、hero 恢复，按钮回滚动区。`06-09-cancel-final.jpg`、`10-inline-no-rest.jpg`。 |
+| 10 | 剩 1 动作 1 组时，原剩余提示及原长按按钮均在滚动区。`10-inline-no-rest.jpg`。与休息条同时存在时的内联按钮遮挡见下方待核实观察。 |
+| 11 | 五组历史场景冷启动，第一屏即完成主项+辅助 2/3，无初始化自动定位；`11-upgrade-final.jpg`。没有新增存储/字段，覆盖方式是已有记录注入，不是从真实旧版安装包执行数据库升级。首次触发门控有源码核对，未录制逐帧动效测量。 |
+| 12 | 默认 Today/summary、只读预览、已结算详情、History 均打开查看；对应 `12-default-today.jpg`、`12-default-summary.jpg`、`12-preview-final.jpg`、`12-completed-detail-final.jpg`、`12-history-final.jpg`。History 中确认无 dock；summary、Hold 组件源码逐字未改。旧版 .app 不在本机，未完成旧包并排/逐像素比对，因此不把“逐屏一致”标为完整验收通过。 |
+| 13 | 目标机型不滚动可见完整 Record / Photos，`13-entry-final.jpg` 与三变体 `*-13.jpg`。实际点击加号 175→177.5，配片相应多 1.25；数字面板输入 180 正常；Photos 能打开系统视频选择器（`13-photos-picker.jpg`）。模拟器 Record 不可用；工具不能操作系统 picker 内目标，未选视频，未验已选视频显示；RPE 拖动、减号及长按连加未逐项实操。未使用第二台 SE。 |
+| 14 | 深色、中文、磅偏好各完整跑过 1→2→3→8，且查看 13，文件分别为 `dark-*`、`zh-*`、`lb-*`。磅偏好下辅助卡 LB 换算正常；主项 hero/完整录入仍沿用 iOS 原有 KG，未扩改。 |
+
+**结算后回训练页是否正常：正常。** 最终包长按结算→庆祝页 Done→重新点击 Training，直接显示 W1D4 汇总卡，无页头以下空白、无需拖动；`08-return-training-final.jpg`。
+
+尚未现场覆盖：系统 Reduce Motion 开关、VoiceOver 实机朗读、软键盘开启/手动滚动与上收竞争、iOS 17 fallback。代码含相应门控，分段 accessibilityHidden，但不能将静态检查冒称实测。
+
+### Demo、安卓参照与范围外观察
+
+- 新增参数均显式开启，默认 Demo 首屏保持不变：`--spec090-empty`（0/8）、`--spec090-main-one`（1/8）、`--spec090-main-two`（2/8）、`--spec090-upgrade`（5/8）、`--spec090-all`（8/8）、`--spec090-skipped`（只记第 3 动作）、`--spec090-lb`（可与前述参数组合）。同一当天构造主项 3 组、辅助 3 组、辅助 2 组。前两天已有历史保留。086/089 场景不变；本次只复用其 seed/目录动作，不新增生产字段。
+- 语言用启动参数 `-AppleLanguages (en)` / `(zh-Hans)`、`-AppleLocale en_GB` / `zh_CN`；主题用已有偏好参数域 `-meetpr.appearance dark` / `light`，无新增存储键。
+- Android 仅通过 `git ls-tree`、`git show 137d816:...` 读取，没有 checkout/写入。四个新文案键的中英文（共 8 值）逐字取 RnExtras.json，复核见 `guards.log`。
+- 保持 iOS 现状的差异：主项及完整录入页 KG 口径；未全记完按钮原位置/文案；完成主项展开的备注仍在原组表下方；配片说明与 collar 开关原本已同行；保留原数字面板、RPE、媒体入口和段间距，只缩重量/次数。与安卓既有形态不同处没有扩改。
+- 待核实观察：休息条存在时，滚动区内联完成按钮可能被休息条覆盖（`10-inline-final.jpg`）；这一路保留原按钮、padding 与休息条实现，但旧包不可用，不能确认它是既有问题还是本轮记录态布局的回归。本卡要求未全完维持现状、休息计时不动，未扩改，需 Opus 对照旧包定性。新吸底状态的重叠已修复并实测。默认 Today 首屏与主项其他既有样式均未改。
+- UI 调试原始过程 `flow-ui-repro.txt` 保留失败假设与逐轮结果；旧失败截图 `05-accessory-individual.jpg`、`flow-probe1.jpg`、`08-dock-with-rest-before-fix.jpg` 不是最终通过证据。最终修正为记录态 eager layout、唯一完成行 target、延后非动画定位、局部反馈，以及同一安全区排布 dock/rest。
+- 无需要重新决定的产品方案；上述未验项、内联按钮遮挡的归属交 Opus 按既有验收清单定向复核，未自行宣布功能验收通过。
+
+### 最终产物与资源清理
+
+- `MeetPR-DemoStudent` / `DemoStudent` 构建安装运行成功，`build-final.log`、`runtime-final.log`；最终构建耗时 62.1 秒，无新增构建警告。`ui-captures.json` 保存三变体及场景的原始界面结构，`changed-files.txt` 保存文件清单。
+- **最终 app 保留在 `/tmp/spec090-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`**。只用这一份 DerivedData；交付前删除其中除 app 以外的中间产物，以及本树 StudentKit/DesignSystem 默认 `.build` 缓存，未动其他项目产物。
+- 只使用 iPhone 17 Pro（它在开工时已是 Booted），未操作另一台已运行设备。Demo 已停止。按要求执行所选设备的 `xcrun simctl shutdown`，但 shell 沙箱无法连接 CoreSimulatorService，返回 `Connection refused` / `Operation not permitted`；原始报错 `/tmp/spec090-evidence/simulator-shutdown.log`。现有 XcodeBuildMCP 未暴露 shutdown，未绕过权限；**不能声称模拟器已关闭，仍需在宿主侧关闭该设备**。
+- 所有数据与截图均为 Demo，不含账号、密钥或内网信息。工作区保持未提交、未推送，等待 Opus 收货。
+
+### 返修一（2026-10-10）
+
+**既有问题，顺带修复（定性为代码推断，非旧包底部实测）。** 部分记录且休息条在场时，滚动区的长按完成按钮缺少足够底部留白。本次按收货指示补齐；旧包滚动卡死使底部遮挡的版本归属无法直接实测，不能排除 090 的布局变化对表现有影响。
+
+- 旧包证据：安装 Opus 提供的 `576729ac` 包 `/tmp/spec090-baseline-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`。走默认 Demo → Training → Start first set → 主项首组 Complete set，计时开始后上滑，界面在到达底部前冻结；重启后尝试收起动作表、小幅上滑仍冻结。首次休息说明此前已关闭，本次未拦截。`/tmp/spec090-evidence/r1-baseline-089-main-bottom.jpg` 保存卡死位置，**不是旧包底部遮挡截图**；步骤和失败假设见 `r1-diagnosis.txt`。
+- 代码对照依据：旧 `TodayWorkoutView.swift:233` 与 090 都将休息条的 `.safeAreaInset(edge: .bottom)` 放在 NavigationStack 外；旧 `TodayWorkoutScreen.swift:109` 与返修前 090 都只留固定 `point28`。090 的 TrainingContentStack 在记录态改用 eager VStack，spacing 仍为 point13；新增 scrollPosition、滚动/键盘观察未增加休息条等高留白。由共享的底部布局推断为既有问题；因旧版 LazyVStack 无法滚到底，这不是受控实测排除了 eager/scroll 修饰符影响。
+- 补记 Opus 对照：089 的 `--spec089-accessory` 在点第一组 ✓ 后上滑，主线程在 `LazySubviewPlacements.placeSubviews` 空转、CPU 100%，原始采样 `/tmp/spec090-opus/baseline-089-hang-sample.txt`；同样步骤在 090 包上不卡。本次旧包主项路径也冻结，而 090 辅助项路径正常，支持保留记录态 eager VStack。
+
+本轮仅追加修改以下三个文件（相对于已交付的 090 工作区）：
+
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift`：在现有 RestTimerOverlay 外测量其实际高度；计时不存在时向屏幕传 0。
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutScreen.swift`：仅当滚动区完成按钮存在、且不是全完吸底状态时，在原 point28 上加测得的休息条高度。
+- `docs/CODEX-JOURNAL.md`：追加本小节。定向差异保存为 `/tmp/spec090-evidence/r1-change.diff`。
+
+休息条样式、时长、按钮、出现/消失逻辑及 RestTimerOverlay 源码未改；全完 dock 排布、判定和交互未改。没有新字段、存储键或依赖，未新增 Demo 参数；本轮没有新增测试或修改任何既有断言。此缺陷是实际 SwiftUI 遮挡，纯 padding 数值断言无法验证可见性，因此使用同场景实屏红→绿，并全量回归现有 Swift Testing。
+
+| 自测 | 最终结果与证据（路径前缀 `/tmp/spec090-evidence/`） |
+|---|---|
+| 修改前红 | 090 旧产物 `--spec089-accessory` → 第一组 ✓ → 滚到底，计时中，提示可见而按钮被覆盖；`r1-before-partial-rest.jpg`。 |
+| 部分记录 + 休息条 | 相同路径，按钮完整露在休息条上方；`r1-partial-rest-bottom.jpg`。 |
+| 部分记录 + 无休息条 | 同页 Skip 后滚到底，额外留白消失，保留原底部间距；`r1-partial-no-rest-bottom.jpg`。 |
+| 全部做完 + 休息条 | `--spec090-main-two` → 记录主项末组 → 两个辅助项各 Complete all as planned，计时仍走；只有一颗吸底按钮、无 hero、按钮与休息条无重叠；`r1-all-docked-rest.jpg`。 |
+| StudentKit 全量 | **960 passed / 0 failed / 0 skipped**；XcodeBuildMCP `swift_package_test`，包内默认缓存，视频导出真实通过；`r1-studentkit-final.log`。 |
+| 格式与静态检查 | `swift-format lint --strict --recursive Modules`：0 违规，`r1-swift-format-final.log` 为空；`swiftlint lint --strict`：1115 文件、0 违规，`r1-swiftlint-final.log`；`git diff --check` 通过。 |
+| 构建与定向审查 | MeetPR-DemoStudent / DemoStudent 构建安装运行成功，122.3 秒，无构建 warning/error；`r1-build-final.log`、`r1-runtime-final.log`。Standards 与 Spec 两个独立只读 reviewer 均 CLEAN、0 findings。 |
+
+实屏均在同一台 iPhone 17 Pro / iOS 26.5、竖屏默认字号、英文浅色完成。旧包和基线源码树只读使用，`/tmp/spec090-baseline-derived` 与 `/tmp/wt-089-baseline` 均保留，交由 Opus 清理。
+
+最终 `.app`：**`/tmp/spec090-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`**。保留此包，清理本轮同一 DerivedData 中的其他产物及本树 StudentKit 默认 `.build`。仅复用开工时已 Booted 的 iPhone 17 Pro（`D412AE31-0ED9-4A23-B0FD-FFFA4A5A5609`），未启动第二台、未操作另一台设备。App 已停止；再次执行该设备的 `xcrun simctl shutdown` 被沙箱拒绝连接 CoreSimulatorService（`Connection refused`），原始错误 `r1-simulator-shutdown.log`。现有 MCP 无 shutdown，未绕过权限；**不能确认设备已关，仍需宿主侧关闭**。
+
+无新增产品决策题；版本归属的证据限制如上，交 Opus 收货确认。本轮未 commit、未 push，未改发布文档、SPEC 或 build 号，未触碰 Opus 的 `specs/090-training-flow/evidence/`。

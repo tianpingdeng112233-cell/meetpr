@@ -1,6 +1,74 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "student.trainingFlow.completedOne": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completed · 1 set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 · 1 组"
+          }
+        }
+      }
+    },
+    "student.trainingFlow.completedMany": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completed · {0} sets"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成 · {0} 组"
+          }
+        }
+      }
+    },
+    "student.trainingFlow.completedAccessibilityOne": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}, completed, 1 set"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}，已完成，1 组"
+          }
+        }
+      }
+    },
+    "student.trainingFlow.completedAccessibilityMany": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}, completed, {1} sets"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}，已完成，{1} 组"
+          }
+        }
+      }
+    },
     "student.e1rmSourceAccessibility": {
       "extractionState": "manual",
       "localizations": {
