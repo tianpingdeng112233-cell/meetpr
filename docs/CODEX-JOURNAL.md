@@ -615,3 +615,215 @@ Total 的 Swift Charts 节点 overlay annotation 在 iOS 26.5 上稳定造成界
 - 没有新增产品决策或接口 / 存储问题需要 David 裁决。待 Opus 补验的是第 4 项物理坐标点按，以及第 11 项严格的升级前多周训练前提；第 12 项采用共同约定的小屏替代。未扩到第二步体重、测试 seam 6–8 或验收 14–21。
 - 证据根目录 `.build/spec087-evidence/`；核心日志为 `studentkit-native-final.log`、`studentkit-shell-full.log`、`build-final.log`、`format-final.log`、`lint-final.log`，五 seam 原始日志见上表；审查摘要 `review-results.txt`。截图仅存文件，不进入产品资源或正典发布台账。
 - 最后复位：去掉所有场景 / 语言 / 字号参数重新启动，`final-default-menu` 仍为 484.6 / 2 次训练 / 2 未读 / —，`final-default-total-90` 可正常显示曲线；已实际点过零训练 Deadlift 的 Today 按钮（`zero-today-action`）。交付时停在默认 Progress 入口。分支仍 `feat/087-progress-menu` @ `d07e328c`，25 个工作区文件，提交数未增加；完整工作区补丁 `spec087-working-tree.diff`。
+
+## spec 088 iOS
+
+### 开工基线（2026-10-10，代码修改前）
+
+- 临时文件在本工作树试写、删除成功；`feat/088-profile-redesign`，HEAD `99cf27b3`，初始工作区干净。默认 `MeetPR-DemoStudent` 构建运行成功，复用 `.build/DerivedData`。
+- 原设备证据因并发占用作废。以下基线值已经在专属 iPhone 17 Pro / iOS 26.4（`8F164D5D-A450-44FD-BDBF-BB351572CF6E`）用原 HEAD 包重新确认；中文、浅色，无场景参数。
+- 改前截图：`.build/spec088-evidence/baseline-top.jpg`、`baseline-middle.jpg`、`baseline-bottom.jpg`。
+
+| 自上而下名称 | 改前实际值 / 行为 |
+| --- | --- |
+| 页头 | MeetPR、消息与通知（3） |
+| 我的资料 | 副标题「训练基线 · 教练管理」 |
+| 当前 1RM | 深蹲 180 kg / 卧推 120 kg / 硬拉 220 kg |
+| SBD 总和 | 520 kg |
+| 锁定说明 | 训练周期中无法修改 · 联系教练；说明当前 1RM 入口 |
+| 恢复与伤病 | 小标题「恢复与伤病 · 改动通知教练」 |
+| 恢复评估 | 通知教练；中等强度 / 较高压力 / 约2天恢复 |
+| 伤病记录 | 通知教练；肩部伤病 |
+| 偏好与基础信息 | 分组标题 |
+| 想增强肌群 | 股四头 / 腘绳肌 / 肩 |
+| 外观 | 浅色；跟随系统 / 浅色 / 深色 |
+| 组间休息 | 自动 (按 RPE) |
+| 训练提醒 | 关 |
+| 比赛 | 2026-10-13 · IPF 83kg |
+| 给教练的留言 | 想冲全国赛,请多关注深蹲底部速度 |
+| 身高 / 体重 | 178 cm · 83.00 kg |
+| 训练背景 · 环境 | 分组标题 |
+| 训练背景 | 3 年 · 低杠深蹲 · 传统硬拉 |
+| 训练环境 | 周一·三·五·六 (4天/周) · 商业健身房 |
+| 账号与安全 | 分组标题 |
+| 改密码 | 无值，打开现有弹层 |
+| 导出训练数据 | 无值，打开现有弹层 |
+| 退出登录 | 红色按钮，直接调用退出，无二次确认 |
+
+### 实现边界与已核实差异
+
+- iOS 原页未显示 Delete account（`showsDeleteAccount: false`），本卡明确要求展示，复用现有流程。
+- `User.phone` 已同时承载 Global 邮箱 / CN 手机号（既有 Global auth 测试佐证）；从 AppShell 现有 session 传到 StudentRootView / MyProfileView，第一步不读取 `User.name`。需要在卡范围外给 `AppShell/RootView.swift` 增加一个参数接线，不改实体、接口协议、存储与网络。
+- 教练使用现有 `ActiveCoachContext`（只由已通过绑定生成），不新增请求。
+- seam 4 原要求是既有断言不改且保持通过：留改前 / 改后回归输出，不故意破坏既有实现制造红测试。CLI 初次运行被默认 ModuleCache 写权限挡住，原始报错保存为 `seam4-before.log`，改用已授权的 XcodeBuildMCP SwiftPM 入口。
+- Today 原生路径直接在自己的 NavigationStack 打开 `DashboardProfileEditor`，不经过 Profile Tab；保持原状。
+
+### 首轮 seam 证据
+
+- seam 1：`seam1-identity-red.log`（新增类型缺失）、`seam1-values-red.log` → `seam1-green.log`（2 passed）。首字母 / fallback / accepted coach / 菜单有无值与中英文。
+- seam 2：`seam2-red.log` → `seam2-green.log`（2 passed）。身份卡 + 五行、三种不可用状态 Settings 可点；旧快照保留、失败重试状态恢复。
+- seam 4 改前：`seam4-before-mcp.log`（74 passed）。原 CLI 的缓存权限失败在 `seam4-before.log`。
+- 一次测试构建期间误修改新增测试文件，SwiftPM 报 `input file ... was modified during the build`；该轮无效，随后串行重跑并得到上述绿结果。后续构建期间不修改源码。
+
+- Demo 补充范围证据：默认 Demo 经过 BindGate，只能到完整已绑定档案，无法覆盖空档案 / 首次失败 / 无绑定。新增 `Demo/ProfileDemoScene.swift` 与 app 入口的显式 `-spec088-profile` 分支；只在 DemoStudent 且明确传参时使用内存依赖，退出仍调用真实 Session.logout。默认种子、存储与接口不变。异常场景不提供账号弹层（该流程在默认 Demo 验证）。
+
+### 证据失效与重新采集
+
+- David 确认另一工作树 spec 090 同时在 `D412AE31-0ED9-4A23-B0FD-FFFA4A5A5609` 安装同 bundle；本任务在该设备上的全部截图与实屏结论作废，已删除截图，不把旧 UI / 红屏误判为本次代码问题。
+- 后续专属设备：iPhone 17 Pro / iOS 26.4，`8F164D5D-A450-44FD-BDBF-BB351572CF6E`，由宿主提前启动。先把当前工作区变更逐文件备份到 `.build/spec088-source-backup`，临时恢复 `99cf27b3` 构建改前包；构建后立即逐文件还原全部变更。无 checkout、commit、push、外仓写入。基线与新版使用同一 DerivedData，之后同 bundle 覆盖安装、不卸载、不清数据。
+
+### 改前每一行 → 改后入口
+
+| 改前行 / 信息 | 改后位置 |
+| --- | --- |
+| MeetPR、消息与通知（3） | 首屏页头保留 |
+| 我的资料 + 训练基线副标题 | 首屏 My profile；副标题按 spec 去掉 |
+| Current 1RM 三项 180 / 120 / 220 | 身份卡 Squat / Bench / Deadlift（省略格内 kg） |
+| SBD total 520 | 身份卡 Total（金色数字） |
+| 当前 1RM 说明与锁定提示 | 身份卡四格 / 小锁说明均打开原说明 |
+| 恢复评估三项值 | Health & recovery → Recovery assessment → 现有状态打卡 |
+| 伤病记录（肩部伤病） | Health & recovery → Injury history → 现有编辑 |
+| Notify coach 胶囊 / 通知副文 | 按 spec 去掉；仅伤病编辑与打卡最终保存上方灰字 |
+| 想增强肌群（股四头 / 腘绳肌 / 肩） | About me → Muscles to improve |
+| 外观（浅色，跟随系统 / 浅色 / 深色） | Settings → Preferences → Appearance 三块 |
+| 组间休息（自动按 RPE） | Settings → Preferences → Rest between sets |
+| 训练提醒（关） | Settings → Preferences → Training reminders |
+| Meet（日期与组别） | 首屏 Meet 右侧值；点开同一比赛编辑页 |
+| Note to coach（完整留言） | 首屏 Note to coach 显示 Added；点开同一编辑页看全文 |
+| 身高 / 体重（178 / 83.00） | 首屏 About me 摘要 + About me → Basic information |
+| 训练背景（3年、低杠、传统） | About me → Training background |
+| 训练环境（周一三五六、商业健身房） | About me → Training environment |
+| Change password | Settings → Account → Change password |
+| Export training data | Settings → Account → Export training data |
+| Sign out（原为红字、无确认） | Settings 页底描边主文字色按钮；仍直接退出 |
+| 原分组小标题 | 按 spec 收拢到二级页，不属于丢失的数据 |
+| Delete account（原首屏隐藏） | 按本卡明确要求展示 Settings → Account → Delete account，原流程复用 |
+
+- 工具选择器补记：首次切新设备同时传入名称与 UDID，XcodeBuildMCP 后台按名称又选中了同名 iOS 26.5 设备，基线构建误装旧设备；随后只传明确 UDID，安装、启动、截图返回均核实为 `8F164D5D-…`。`session_clear_defaults` 曾被自动审批拒绝（approval policy never），通过 `session_set_defaults` 只设 UDID 的正常入口完成替代，无绕过权限。
+
+- 大字实屏返修：`large-pro-before.jpg` 在独占 Pro 的 accessibility-large 上复现长 Meet 值跨卡片右边界。087 共用 `StudentMenuRow` 原先对值 `.fixedSize()` 并无限宽测量，整体下移仍不足以容纳最长值。保持名称单行与共用组件，值先整体下移；超过整行宽时按可用宽度在词间折行，禁止截断。Settings 同用此 Layout。该改动属于共同约定明确要求的 087 / 088 共用行行为。
+
+### 实屏自测（专属 Pro 上重跑，不等于 Opus 收货）
+
+| 验收项 | 自测结果与证据（目录均为 `.build/spec088-evidence/`） |
+| --- | --- |
+| 1 | 通过：iPhone 17 Pro 默认字号，中英文不滚动可见完整五行；无分组标题/内嵌控件/退出。`home-en.jpg`、`home-zh.jpg`。页头原消息未读红点按现状保留，卡片及菜单没有红色元素。 |
+| 2 | 通过：默认手机号 + 人像；`email` 为邮箱 + S；`no-coach` 隐藏教练行且名字垂直居中，头像均不可点、无上传暗示。`home-zh.jpg`、`identity-email.jpg`、`identity-no-coach.jpg`。 |
+| 3 | 通过：180/120/220/520 对齐改前，格内无单位；`missing-lift` 为302.5/120/—/—，锁定说明与整组四格是同一按钮，打开原说明。`missing-lift.jpg`、`onerm-info-zh.jpg`。 |
+| 4 | 通过：默认四项有值，`unanswered` 对应 — / No injuries / — / —；Settings 无值。`home-en.jpg`、`state-unanswered.jpg`。纯函数补中英文、有无值与 Other injury。 |
+| 5 | 通过：两个二级页逐项对应原内容，四个 About 编辑入口全部实点；伤病与恢复均打开原编辑。把体重83改84保存，二级页与首屏立即更新。`about-en.jpg`、`health-en.jpg`、`editor-background.jpg`、`editor-environment.jpg`、`editor-muscles.jpg`、`about-saved-84.jpg`、`home-saved-84.jpg`。 |
+| 6 | 通过：伤病保存按钮上方灰字；Profile 打卡与 Today → Training 的既有状态入口各进入最终保存步骤，均有灰字。其他编辑页没有。`editor-injuries.jpg`、`readiness-profile-save.jpg`、`readiness-today-save.jpg`。iOS 默认 Demo 的 Start training 先切 Training，状态打卡由该页既有心形入口进入，未改开练门禁。 |
+| 7 | 通过：外观三块、Preferences 三行、Account 三行与描边退出；切 Dark 后立即生效，重启仍保持。休息改手动即时保存，再还原自动；提醒获系统授权后开启，返回摘要更新；密码弹层打开，导出 CSV ready，删号仅到输入确认前并取消；Sign out 直接回登录。`settings-en.jpg`、`settings-dark.jpg`、`home-dark-relaunch.jpg`、`settings-rest-saved.jpg`、`reminder-enabled.jpg`、`settings-reminder-saved.jpg`、`account-password.jpg`、`account-export.jpg`、`account-delete-before-confirmation.jpg`、`signout-login.jpg`。 |
+| 8 | 通过：Today 体重卡直接到体重专用编辑，改84保存回Today；Meet 卡直接到原Meet编辑，选IPF/83kg保存回Today，无二级页绕行。`today-weight-editor.jpg`、`today-weight-saved.jpg`、`today-meet-editor.jpg`、`today-meet-saved.jpg`。 |
+| 9 | 通过：`loading`、`failure`、`empty` 均可到Settings并调用真实Session退出；失败时其余四行分别进入带重试的目标页，不崩溃。刷新失败保留180/120/220/520与全部菜单值，点击重试恢复。`state-loading.jpg`、`loading-settings.jpg`、`loading-signout.jpg`、`state-failure.jpg`、`failure-settings.jpg`、`failure-signout.jpg`、`state-empty.jpg`、`empty-signout.jpg`、`refresh-before.jpg`、`refresh-failure-retained.jpg`、`refresh-retried.jpg`。网络错误在仓储边界注入URLError，不是真实关闭系统网络。 |
+| 10 | 通过本地Demo覆盖：专属设备先安装HEAD原包并逐行记录，再同bundle覆盖安装新版，无卸载/清数据；默认完整档案/伤病/Meet/留言/绑定种子逐项保持（上表）。无绑定/未填档案见场景截图并可退出。Demo档案是现有内存种子，重启重新载入；没有声称覆盖真实后端账号或持久化服务端迁移。本次没有存储/接口变更。 |
+| 11 | 未完成实屏复验：独占 Pro 上大字发现长值越界，已修复共用行并通过最终测试、lint 与构建；17e 的显示服务不可用，四种语言/主题组合均未取得有效截图。详见下方最终补验与原始错误。 |
+
+### Demo 启动参数与已知差异
+
+- 默认启动不带 spec 参数，仍为原 DemoStudent 完整种子。085 参数原样保留，可继续与本卡同时使用，不改变默认首屏。
+- 显式 `-spec088-profile`：`email`、`phone`、`no-coach`、`loading`、`failure`、`empty`、`unanswered`、`missing-lift`、`refresh-failure`、`long-identity`。`refresh-failure` 第二次fetch失败，第三次成功；`loading` 持续挂起到退出/取消；`long-identity` 为长邮箱/长教练名及302.5与642.5。
+- 语言 `-AppleLanguages (en) -AppleLocale en_US` / `(zh-Hans) zh_CN`；大字 `-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityL`；显式主题 `-meetpr.appearance light` / `dark` 仅作截图参数。默认外观偏好未改。
+- iOS名字位取现有User.phone（Global可存邮箱）；手机号显示人像，与安卓登录轨不同；教练来自ActiveCoachContext。原编辑内容、摘要格式、提示/保存路径全沿用iOS，包括旧Meet自由文本显示与保存后规范化。
+- iOS二级页用系统导航栏（标题居中），返回手势与原编辑页一致；不另做安卓导航组件。异常Demo直接展示Profile，因此不提供Tabs/消息/账号弹层依赖；正式Root与默认Demo均完整，账号流程在默认Demo验证。
+- spec外观察：原英文训练环境摘要拼成 `weekMon·Wed·Fri·Sat`，原伤病摘要 `Shoulders injuries`，密码/删号sheet系统Cancel按钮窄时截断；均不在本卡编辑内容范围，记录而未改。
+
+### 独立审查
+
+- Standards 初轮0 blocker/1 nit（退出测试单次Task.yield不保证完成）；已改明确continuation，定向复审0 blocker/0 nit。
+- Spec 初轮0 blocker/1 nit（Settings真实容器顺序覆盖不足）；补实际容器中休息/提醒顺序和值、三个Account按钮顺序、外观与退出存在性。相关2测试通过，定向复审CLEAN。
+- 两个reviewer均只读、未启动构建或模拟器。大字排版finding依据主代理实屏红图返修；两轴确认同一共享行修复符合约定。代码未提交或推送，功能最终验收留给Opus。
+
+### 改动文件清单
+
+- `MeetPR/Sources/MeetPRApp.swift`
+- `Modules/AppShell/Sources/AppShell/RootView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Demo/ProfileDemoScene.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/AccountSecuritySheets.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/AppearancePreferenceRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/MyProfileView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/MyProfileViewModel.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileCardsSection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileDetailPage.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileHomeContent.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileIdentity.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileIdentityCard.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileMenuValues.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfilePageRows.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ProfileSettingsContent.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/RestTimerPreferenceRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderPreferenceRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Readiness/ReadinessCheckinSheet.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Shared/ProfileCoachNotificationNote.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/Shared/StudentMenuRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings`
+- `Modules/StudentKit/Sources/StudentKit/StudentRootView.swift`
+- `Modules/StudentKit/Sources/StudentKit/StudentStrings.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileHomeNavigationTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileHomePresentationTests.swift`
+- `docs/CODEX-JOURNAL.md`
+
+### 最终测试与原始日志
+
+- StudentKit：956 passed / 0 failed / 0 skipped（原有948 + 本卡新增8）；`studentkit-native-final.log`、`studentkit-native-final-result.json`。四个批准seam之外未加测试。
+- AppShell：107 passed / 0 failed / 0 skipped；`appshell-native-final.log`、`appshell-native-final-result.json`。唯一生产改动是现有User.phone传入StudentRootView。
+- `swift-format lint --strict`、`swiftlint lint --strict --no-cache`：25个改动Swift文件，均exit0/0违规；`format-final.log`、`lint-final.log`、`swift-files.txt`。原大文件3条多余disable已删除。`git diff --check`通过。
+- seam 3：`seam3-red.log`（新二级页组件缺失）→ `seam3-green.log`（前三seam共7测试passed）；审查补强后 `seam3-review-green.log`（Settings2测试passed）；最终8个新增测试在全量绿中。
+- seam 4：改前 `seam4-before-mcp.log`（74 passed）→ 最终全量956 passed；既有测试断言0删除/0修改，无需断言迁移清单。此seam按卡要求保持既有断言，故为绿→绿，不伪造红。
+- AppShell缓存路径别名曾触发重复Darwin模块/编译器signal11；移出旧ModuleCache并用原生入口在同一物理测试缓存重建后通过，未新建依赖缓存。沙箱CLI两项Keychain测试3条断言失败保留在 `appshell-sandbox-keychain.log`，原生107项全绿为最终结果。StudentKit沿用XcodeBuildMCP真实环境，视频导出用例亦在全量中通过。
+- 现有非本卡测试的Swift6警告保留（VideoTrim/Bind/Onboarding测试辅助代码），本卡未新增编译warning。
+
+### 最终排版修复与待补实屏
+
+- `StudentMenuTextLayout` 改为按可用宽度测量和放置长值；放不下同行时先把完整值移到下一行，仍超过整行时自然折行。名称维持单行、不缩小，值不截断。该 Layout 同时供 Profile、087 Progress 菜单与 Settings 行使用。
+- 身份卡锁定说明上方的分隔线移除额外左右缩进，铺满卡片内部宽度；四格、字号、取整和点击行为不变。
+- 这些调整之后的 StudentKit 956 项、严格格式/静态检查与 DemoStudent 构建均通过。最终构建原始日志 `build-final.log` 结尾为 `BUILD SUCCEEDED`；随后安装/运行阶段超时，不能将构建成功记作 17e 运行成功。
+- 宿主已关闭专属 Pro，改启动 iPhone 17e / iOS 26.4（`BBE9EB95-01DE-452E-866C-3DD0B62F9BDA`）。MCP 默认设备已改成该 UUID，列表显示 Booted，但 screenshot 连续报 `Device does not have a 'default' display port`（NSPOSIXErrorDomain 22），Home 报 `Mach port not connected`，snapshot 无法取得 UI。`open_sim` 成功返回仍未恢复显示。原始结果保留 `17e-runtime-errors.json`；Computer Use 对 Simulator 返回未授权，未绕过权限。
+
+| 第 11 项最终包组合（iPhone 17e，accessibility-large） | 结论 |
+| --- | --- |
+| English / Light | 未验到：设备显示服务不可用，无有效截图 |
+| English / Dark | 未验到：同上 |
+| 中文 / Light | 未验到：同上 |
+| 中文 / Dark | 未验到：同上 |
+
+- 最终排版变更影响第 1 项（默认五行布局）、第 3 项（身份卡分隔线）、第 4 项（菜单长值排版）、第 7 项（Settings 行）与第 11 项。**修复后均未在 Pro 默认字号重看**；前文第 1–10 项截图为修复前专属 Pro 的有效交互证据，不代表最终版排版已复验。共用组件的 Progress 长值排版也需随收货复看。
+- 需要宿主启动专属 iPhone 17 Pro / iOS 26.4（`8F164D5D-A450-44FD-BDBF-BB351572CF6E`）时再补默认字号复核；17e 四组合需先恢复该设备显示服务。未操作其他设备，也未为本次失败换用 `D412AE31-…`。
+- 没有待拍板的产品/接口/存储问题；剩余是上述实屏验证缺口。未宣称第一步验收全部通过，交 Opus 收货时补验。
+
+### 交付产物
+
+- 最终 App：`/Users/david/Projects/apps/MeetPR-wt-085/.build/DerivedData/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`（`MeetPR-DemoStudent`，含最后排版修复）。保留完整 bundle，未改 build 号。
+- 截图、四 seam 红/绿日志、全量测试结果与构建日志：`/Users/david/Projects/apps/MeetPR-wt-085/.build/spec088-evidence/`。截图仅以文件交付，不贴图；`large-pro-before.jpg` 是修复前问题证据，不能当成修复通过截图。
+- 模拟器：专属 Pro `8F164D5D-A450-44FD-BDBF-BB351572CF6E` 已由宿主关闭；专属 17e `BBE9EB95-01DE-452E-866C-3DD0B62F9BDA` 交宿主关闭。工具默认值留在 17e，不持久化到项目配置。
+- 分支保持 `feat/088-profile-redesign`，未 commit、未 push；未改任何 SPEC、NEXT-RELEASE、RELEASES、后端或 CoachKit。
+- 清理完成：本次源码临时备份、旧 ModuleCache、DerivedData 的编译/索引/模块缓存、除最终 App 外的构建产品、StudentKit 与复用 spec085 测试目录中的编译结果及构建数据库均已删除。保留依赖 checkouts/repositories、已有其他 spec 证据及本卡原始日志；没有新建第二份依赖缓存。最终 App 完整保留，约 63 MB；其 `MeetPR.debug.dylib` SHA-256 为 `c45496ff6eb113384a189bf1ebb547995e62a481d7acb0222e238b00d638749b`。
+- 安装重试补记：独立 `install_app_sim` 最后返回 17e 安装成功（`17e-install-result.json`）；这只确认包已安装，不能替代启动、截图与第 11 项实屏验证。最终 bundle 的 `codesign --verify --deep` 亦通过。
+- 最后一次 English / Light / accessibility-large 启动在 300 秒后超时，之后的 snapshot/screenshot 仍报相同系统显示错误，未取得 App 画面；原始返回文本及启动参数见 `17e-final-launch.log`。没有继续创建或启动其他模拟器。
+
+### 返修一
+
+- 来源：Opus 收货补验确认 Pro 默认字号首屏五行、身份卡与 Settings 符合屏幕稿，StudentKit 956/956 通过；在可用 17e 上发现大字号四格分别缩放，以及数值/单位断行两处问题。本轮只改这两处，不改数据来源、显示文案或默认种子。
+- 本轮改动文件：`Features/MyProfile/ProfileIdentityCard.swift`、`Features/Shared/StudentMenuRow.swift`（均在 StudentKit），以及本 JOURNAL。
+- 身份卡：标签与数字分为两排，分别顶部和首基线对齐；用当前 Dynamic Type 下四个原始数字的最大自然宽度与等宽列宽算出一个共同字号。能放下时比例为 1，继续用原 size22；不再给每格独立的 minimumScaleFactor。
+- 共用列表：按原文的 ` · ` 分段，段内 Text 整体测量和放置，只在段间换行。`178 cm`、`83.00 kg`、`IPF 83kg` 和日期均不会拆开；可见文本与整行读屏原文保持不变，087 入口共用同一实现。
+- 视觉红证据使用 Opus 提供的两张实屏，已复制为 `r1-opus-before-en-light-large.png`、`r1-opus-before-zh-dark-large.png`。这轮为两处排版修复，没有新增纯逻辑 seam 或修改任何既有测试断言；通过对应实屏前后对照和全量回归验证。
+- Standards 与 Spec 两位 reviewer 分别只读审查相对本轮改前快照的两文件 diff，均为 0 blocker / 0 nit（CLEAN），未代跑模拟器或测试。
+- 分段值另保留完整原文的 accessibilityLabel，实屏快照确认读屏标签仍为 `About me, 178 cm · 83.00 kg` / `关于我、178 cm · 83.00 kg`；Spec 对该两行补丁定向复审仍为 CLEAN。
+
+| 返修一实屏项 | 设备 / 启动条件 | 结果与证据 |
+| --- | --- | --- |
+| Profile 英文浅色大字 | iPhone 17e / iOS 26.5，`-spec088-profile long-identity`，`UICTContentSizeCategoryAccessibilityL`，en / light | 通过。302.5 / 120 / 220 / 642.5 同字号、同基线，标签顶部对齐；About / Meet 的值在中点分隔处换行，单位不单独落行。`r1-17e-en-light-large.jpg` |
+| Profile 中文深色大字 | 同一 17e，long-identity，accessibility-large，zh-Hans / dark | 通过。四格对齐；`178 cm`、`83.00 kg`、`IPF 83kg` 均保持整段，长邮箱/教练名正常截断。`r1-17e-zh-dark-large.jpg` |
+| 默认 Profile 英文浅色 | iPhone 17 Pro / iOS 26.4，不带 spec 参数与字号覆盖，en / light | 通过。180 / 120 / 220 / 520 保留原 size22，首屏不滚动看到全部五行，默认值未变。`r1-pro-en-light-default.jpg` |
+| 087 Progress 英文浅色大字 | 17e，`-spec087-progress squat-only`，accessibility-large，en / light，点 Progress Tab | 通过。四行依次 e1RM / Training history / Coach feedback / Intensity metrics，值 Total 467.0 kg / 4 sessions / 2 new / RPE 8.0；整段未拆、未重叠。`r1-17e-progress-squat-only-large.jpg` |
+
+- 四张最终截图均来自最后同一 App；目录为 `.build/spec088-evidence/`，对应语义快照为 `r1-ui-snapshots.json`。前文“最终包未实屏复验”的历史缺口由 Opus 补验与本轮上述结果补上；本轮按返修要求复查英文浅色、中文深色两组合，未额外重跑其余组合。
+- 最终 DemoStudent 构建日志 `r1-build-final.log` 为 `BUILD SUCCEEDED`。第二次 MCP 调用曾在 300 秒后返回等待超时，实际构建继续完成，随后自动安装/启动；通过中文场景与新读屏标签确认最终代码已运行，不把超时报错当作编译失败。
+- 设备 UDID：17e `5D5FA360-BA49-48C6-A887-2F0D22F89749`，Pro `8F164D5D-A450-44FD-BDBF-BB351572CF6E`。两台 App 均已停止；MCP 无关机工具，沙箱 simctl 关机失败（`r1-shutdown.log`），交宿主关闭。本轮没有操作 `D412AE31-…` 或已弃用的 `BBE9EB95-…`。
+- 最终 App 路径仍为 `/Users/david/Projects/apps/MeetPR-wt-085/.build/DerivedData/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`；签名完整校验通过，`MeetPR.debug.dylib` SHA-256 更新为 `2fc20c7450736ee99b629ada3a780cb8f76e0790bee4f1e320f84fb20608cbd1`。未 commit、未 push。
+- 最终回归：XcodeBuildMCP `swift_package_test` 对 StudentKit 全量 **956 passed / 0 failed / 0 skipped**，日志 `r1-studentkit-full.log` / `r1-studentkit-result.json`。未改其他包，本轮不重复 AppShell 全量。25 个本卡改动 Swift 文件的 `swift-format lint --strict`、`swiftlint lint --strict --no-cache` 均 exit 0 / 0 违规（`r1-format.log`、`r1-lint.log`）；`git diff --check` 通过。
+- 编译警告如实保留：测试输出包含本轮未改的 ProfileDetailPagesTests 多余 try 提示，以及原 Onboarding / Bind / VideoTrim 测试并发提示。本轮没有扩到这些文件；不宣称编译日志零 warning。
+- 本轮要求的两处返修、四张截图和回归均已完成；没有未做到的实装项或待决策问题。设备关机受沙箱限制，已列 UDID 交宿主处理。
+- 收尾再次清掉本轮编译/索引/模块缓存、除最终 App 外的构建产品与 StudentKit 测试编译结果；依赖下载缓存、全部原始证据和最终 App 保留。清理后再次通过 App 签名完整校验与 diff 空白检查。独立审查摘要另存 `r1-review-results.txt`。

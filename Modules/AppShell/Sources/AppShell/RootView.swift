@@ -369,7 +369,7 @@ extension RootView {
     allowsChat: Bool
   ) -> some View {
     StudentRootView(
-      studentID: user.id,
+      studentID: user.id, loginIdentifier: user.phone,
       plans: studentPlans,
       logs: studentLogs,
       feedback: studentFeedback,

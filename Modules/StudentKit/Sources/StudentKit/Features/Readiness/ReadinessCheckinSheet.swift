@@ -54,9 +54,12 @@ struct ReadinessCheckinSheet: View {
         }
       }
       .safeAreaInset(edge: .bottom) {
-        footer
-          .padding(MeetPRSpacing.md)
-          .background(Color.MeetPR.bgBase)
+        VStack(spacing: MeetPRSpacing.point10) {
+          if step == 2 { ProfileCoachNotificationNote() }
+          footer
+        }
+        .padding(MeetPRSpacing.md)
+        .background(Color.MeetPR.bgBase)
       }
     }
     .interactiveDismissDisabled()
