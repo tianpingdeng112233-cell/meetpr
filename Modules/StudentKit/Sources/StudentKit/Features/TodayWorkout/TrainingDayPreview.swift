@@ -5,12 +5,15 @@ import SwiftUI
 struct TrainingDayPreview: View {
   let presentation: TodayWorkoutPresentation
   let cursorDay: StudentPlanDay?
+  var today: Date = WorkoutDatePolicy.gymDayToday()
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space3) {
-      Text(TrainingSequenceText.recommendation(presentation.day.scheduledDate))
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-        .foregroundStyle(Color.MeetPR.goldText)
+      if !TrainingSequenceLayout.isBehind(presentation.day, today: today) {
+        Text(TrainingSequenceText.recommendation(presentation.day.date))
+          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+          .foregroundStyle(Color.MeetPR.goldText)
+      }
       Text(TrainingSequenceText.dayName(presentation.day))
         .font(.MeetPR.display(size: MeetPRFontMetrics.size22))
         .foregroundStyle(Color.MeetPR.textPrimary)

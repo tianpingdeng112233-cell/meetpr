@@ -356,7 +356,8 @@ extension TodayWorkoutViewModel {
       exerciseID: exercise.exercise.id,
       exerciseName: exercise.exercise.name,
       exerciseNameEn: exercise.exercise.nameEn,
-      isAccessory: exercise.exercise.isAccessory,
+      isAccessory: AccessoryClassification.isAccessory(
+        exerciseType: exercise.exercise.exerciseType),
       isMainLift: exercise.exercise.exerciseType == .mainLift,
       liftFamily: resolveCompetitionFamily(
         exercise: exercise.exercise,
@@ -366,7 +367,8 @@ extension TodayWorkoutViewModel {
       prescribed: set,
       actualWeight: existingLog?.weightKg ?? set.weightKg,
       actualReps: existingLog?.reps ?? set.reps,
-      actualRPE: existingLog?.rpe ?? set.rpe ?? 8,
+      actualRPE: exercise.exercise.isAccessory && existingLog != nil
+        ? existingLog?.rpe : existingLog?.rpe ?? set.rpe ?? 8,
       completed: existingLog?.completed ?? false,
       failed: existingLog?.failed ?? false,
       assumed: existingLog?.assumed ?? false,

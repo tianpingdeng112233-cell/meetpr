@@ -8,17 +8,22 @@ import SwiftUI
 struct RestTimerPreferenceRow: View {
   private let studentID: UUID
   private let settings: any StudentRestTimerSettingsStoring
+  @State private var accessorySeconds: Int
   @State private var preference: StudentRestTimerPreference
 
   init(studentID: UUID, settings: any StudentRestTimerSettingsStoring) {
     self.studentID = studentID
     self.settings = settings
+    self._accessorySeconds = State(initialValue: settings.accessorySeconds(for: studentID))
     self._preference = State(initialValue: settings.preference(for: studentID))
   }
 
   var body: some View {
     NavigationLink {
-      RestTimerSettingsView(preference: preferenceBinding)
+      RestTimerSettingsView(preference: preferenceBinding, accessorySeconds: $accessorySeconds)
+        .onChange(of: accessorySeconds) { _, value in
+          settings.setAccessorySeconds(value, for: studentID)
+        }
     } label: {
       MyProfileValueRow(label: StudentStrings.localized(.restTimerPreferenceRow001), value: summary)
     }

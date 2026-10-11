@@ -28,33 +28,44 @@ public enum StudentDemoSeed {
     todayOffset: Int = 3,
     selectedCalendar: Calendar = .current
   ) -> StudentPlanView {
+    let scenario = TrainingStripDemoScenario.current
     let startDate = demoCycleStart(
-      today: today,
+      today: scenario == nil
+        ? today : WorkoutDatePolicy.gymDayToday(now: today, calendar: selectedCalendar),
       todayOffset: todayOffset,
       selectedCalendar: selectedCalendar
     )
     .addingTimeInterval(Double(max(0, weekIndex - 1)) * 7 * 86_400)
+    let scenarioStart =
+      scenario.map {
+        TrainingStripDemoScenario.startDate(
+          today: today, calendar: selectedCalendar, daysBehind: $0)
+      } ?? startDate
     let days = (0..<8).map { offset in
-      let date = startDate.addingTimeInterval(Double(offset) * 86_400)
+      let dayOffset = scenario == nil ? offset : (offset / 4) * 7 + (offset % 4) * 2
+      let date = scenarioStart.addingTimeInterval(Double(dayOffset) * 86_400)
       return StudentPlanDay(
         id: uuid(1_000 + offset),
         weekNumber: (offset / 4) + 1,
         dayOfWeek: (offset % 4) + 1,
         sortOrder: offset,
         date: date,
+        shiftedToDate: TrainingStripDemoScenario.shiftedDate(date, offset: offset),
         completedAt: offset < 2 ? date.addingTimeInterval(20 * 3_600) : nil,
         completionSource: offset < 2 ? "auto" : nil,
         exercises: exercises(forDayOffset: offset)
       )
     }
-    return StudentPlanView(
-      cycleID: uuid(301),
-      weekIndex: weekIndex,
-      startDate: startDate,
-      endDate: startDate.addingTimeInterval(7 * 86_400),
-      publishedAt: referenceDate,
-      days: days
-    )
+    return TrainingFlowDemoScenario.configure(
+      AccessoryDemoScenario.configure(
+        StudentPlanView(
+          cycleID: uuid(301),
+          weekIndex: weekIndex,
+          startDate: scenarioStart,
+          endDate: scenarioStart.addingTimeInterval(Double(scenario == nil ? 7 : 13) * 86_400),
+          publishedAt: referenceDate,
+          days: days
+        )))
   }
 
   public static func makeHistoricalLogs(
@@ -63,6 +74,12 @@ public enum StudentDemoSeed {
     includeToday: Bool = true
   ) -> [StudentSetLog] {
     let plan = makePlanView(weekIndex: weekIndex)
+    if TrainingFlowDemoScenario.enabled {
+      return TrainingFlowDemoScenario.logs(plan: plan, studentID: studentID)
+    }
+    if AccessoryDemoScenario.enabled {
+      return AccessoryDemoScenario.logs(plan: plan, studentID: studentID)
+    }
     // W1D1–D2 are complete; W1D3 is deliberately partial so reopening the
     // demo proves that partial logs do not advance the sequence cursor.
     return plan.days.prefix(includeToday ? 3 : 2).flatMap { day -> [StudentSetLog] in
@@ -295,10 +312,11 @@ public enum StudentDemoSeed {
           reps: spec.reps,
           repsMax: nil,
           rpe: spec.rpe,
-          coachNote: setIndex == 0 ? StudentStrings.localized(.studentDemoSeed012) : nil
+          coachNote: setIndex == 0 || TrainingStripDemoScenario.current != nil
+            ? StudentStrings.localized(.studentDemoSeed012) : nil
         )
       },
-      notes: spec.note
+      notes: TrainingStripDemoScenario.note(spec.note)
     )
   }
 
@@ -487,7 +505,8 @@ extension StudentDemoSeed {
   ) -> OnboardingProfile {
     OnboardingProfile(
       userId: studentID,
-      unitPreference: .kg,
+      unitPreference: AccessoryDemoScenario.usesPounds || TrainingFlowDemoScenario.usesPounds
+        ? .lb : .kg,
       gender: .male,
       birthDate: "2001-03-15",
       heightCm: 178,

@@ -17,7 +17,7 @@ public struct VideoUploadServices: Sendable {
       manager: VideoUploadManager(
         service: LoopbackVideoUploadService(),
         exporter: AVFoundationVideoExporter(),
-        repository: InMemoryVideoAttachmentRepository()
+        repository: InMemoryVideoAttachmentRepository(seed: AccessoryDemoScenario.videoAttachments)
       )
     )
   }
