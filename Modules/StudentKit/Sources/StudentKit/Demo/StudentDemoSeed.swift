@@ -73,6 +73,9 @@ public enum StudentDemoSeed {
     weekIndex: Int = 1,
     includeToday: Bool = true
   ) -> [StudentSetLog] {
+    if let scenario = ProgressDemoScenario.launchValue {
+      return scenario.logs(studentID: studentID)
+    }
     let plan = makePlanView(weekIndex: weekIndex)
     if TrainingFlowDemoScenario.enabled {
       return TrainingFlowDemoScenario.logs(plan: plan, studentID: studentID)
@@ -110,7 +113,7 @@ public enum StudentDemoSeed {
     let plan = makePlanView()
     let linkedExerciseID = plan.days.first?.exercises.first?.id
     let newestFeedbackAt = Date().addingTimeInterval(-120)
-    return [
+    let items = [
       CoachFeedback(
         id: uuid(401),
         coachID: coachID,
@@ -142,6 +145,7 @@ public enum StudentDemoSeed {
         readAt: newestFeedbackAt.addingTimeInterval(-360)
       ),
     ]
+    return ProgressDemoScenario.launchValue?.feedback(items) ?? items
   }
 
   // swiftlint:disable:next function_body_length
@@ -323,6 +327,9 @@ public enum StudentDemoSeed {
   /// Three main-lift e1RM lines over ~4 weeks, plus one unacknowledged PR on
   /// the newest point so the launch re-surface path is exercised in DEMO_MODE.
   public static func makeE1RMHistory(studentID: UUID) -> [E1RMHistoryPoint] {
+    if let scenario = ProgressDemoScenario.launchValue {
+      return scenario.points(studentID: studentID)
+    }
     let baseline = Calendar(identifier: .gregorian).startOfDay(for: Date())
     return makeE1RMHistory(
       studentID: studentID,
@@ -503,14 +510,21 @@ extension StudentDemoSeed {
     isCompeting: Bool = true,
     squat1RMKg: Decimal = 180
   ) -> OnboardingProfile {
-    OnboardingProfile(
+    let arguments = ProcessInfo.processInfo.arguments
+    let scenario = arguments.firstIndex(of: "-spec085-profile").flatMap {
+      arguments.indices.contains($0 + 1) ? arguments[$0 + 1] : nil
+    }
+    let onboarding = arguments.contains("-spec085-onboarding")
+    let competing: Bool? =
+      onboarding || scenario == "unanswered" ? nil : isCompeting
+    return OnboardingProfile(
       userId: studentID,
-      unitPreference: AccessoryDemoScenario.usesPounds || TrainingFlowDemoScenario.usesPounds
-        ? .lb : .kg,
-      gender: .male,
+      unitPreference: scenario == "other-lb" || AccessoryDemoScenario.usesPounds
+        || TrainingFlowDemoScenario.usesPounds ? .lb : .kg,
+      gender: scenario == "other-lb" ? .other : .male,
       birthDate: "2001-03-15",
       heightCm: 178,
-      weightKg: 83,
+      weightKg: scenario == "empty-weight" ? nil : scenario == "legacy" ? 83.5 : 83,
       trainingYears: 3,
       squatStance: .lowBar,
       deadliftStyle: .conventional,
@@ -529,11 +543,16 @@ extension StudentDemoSeed {
       uploadAttachmentIds: [],
       injuryNotes: StudentStrings.localized(.studentDemoSeed013),
       injuryAreas: [.shoulder],
-      isCompeting: isCompeting,
-      competitionDate: isCompeting ? demoCompetitionDate() : nil,
-      targetWeightClass: "IPF 83kg",
+      isCompeting: competing,
+      competitionDate: competing == true && scenario != "no-date" ? demoCompetitionDate() : nil,
+      targetWeightClass:
+        onboarding
+        ? nil
+        : scenario == "legacy"
+          ? "83kg"
+          : scenario == "formatted" ? "IPF · 83 kg" : "IPF 83kg",
       noteToCoach: StudentStrings.localized(.studentDemoSeed014),
-      completedAt: referenceDate,
+      completedAt: onboarding ? nil : referenceDate,
       createdAt: referenceDate,
       updatedAt: referenceDate
     )

@@ -46,6 +46,59 @@ enum StudentStrings {
       self.countIndex = countIndex
     }
 
+    static let profileAbout = Key("student.profileAbout")
+    static let profileHealth = Key("student.profileHealth")
+    static let profileSettings = Key("student.profileSettings")
+    static let profileCoach = Key("student.profileCoach")
+    static let profileLocked = Key("student.profileLocked")
+    static let profilePreferences = Key("student.profilePreferences")
+    static let profileAccount = Key("student.profileAccount")
+    static let profileNotify = Key("student.profileNotify")
+    static let profileOneRMLabel = Key("student.profileOneRMLabel")
+    static let profileAdded = Key("student.profileAdded")
+    static let profileNoInjuries = Key("student.profileNoInjuries")
+    static let profileInjuries = Key("student.profileInjuries", one: "student.profileInjury")
+
+    static let progressBench = Key("student.progressMenu.bench")
+    static let progressE1rm = Key("student.progressMenu.e1rm")
+    static let progressIntensity = Key("student.progressMenu.intensity")
+    static let progressTotalValue = Key("student.progressMenu.totalValue")
+    static let progressRpe = Key("student.progressMenu.rpe")
+    static let progressTotal = Key("student.progressMenu.total")
+    static let progressTotalTitle = Key("student.progressMenu.totalTitle")
+    static let progressTotalEmpty = Key("student.progressMenu.totalEmpty")
+    static let progressMissing = Key("student.progressMenu.missing")
+
+    static let overviewExercises = Key(
+      "student.overviewExercises", one: "student.overviewExercisesOne")
+    static let overviewSets = Key("student.overviewSets", one: "student.overviewSetsOne")
+    static let overviewSummary = Key("student.overviewSummary")
+    static let bodyWeightPrecision = Key("student.bodyWeightPrecision")
+    static let bodyWeightLabel = Key("student.bodyWeightLabel")
+    static let meetChooseClass = Key("student.meetChooseClass")
+    static let meetTitle = Key("student.meetTitle")
+    static let meetFederation = Key("student.meetFederation")
+    static let meetWeightClass = Key("student.meetWeightClass")
+    static let meetMen = Key("student.meetMen")
+    static let meetWomen = Key("student.meetWomen")
+    static let meetPrevious = Key("student.meetPrevious")
+    static let meetRemove = Key("student.meetRemove")
+    static let meetConfirmRemove = Key("student.meetConfirmRemove")
+    static let meetRemoveAction = Key("student.meetRemoveAction")
+    static let meetAddOptional = Key("student.meetAddOptional")
+    static let meetHelp = Key("student.meetHelp")
+    static let profileNote = Key("student.profileNote")
+    static let todaySession = Key("student.todaySession")
+    static let todayUpcoming = Key("student.todayUpcoming")
+    static let todaySelectedChart = Key("student.todaySelectedChart")
+    static let nutritionTitle = Key("student.nutritionTitle")
+    static let nutritionSoon = Key("student.nutritionSoon")
+    static let nutritionAccessibility = Key("student.nutritionAccessibility")
+    static let nutritionCarbs = Key("student.nutritionCarbs")
+    static let nutritionProtein = Key("student.nutritionProtein")
+    static let nutritionFat = Key("student.nutritionFat")
+    static let nutritionFiber = Key("student.nutritionFiber")
+
     static let trainingFlowCompletedOne = Key("student.trainingFlow.completedOne")
     static let trainingFlowCompletedMany = Key("student.trainingFlow.completedMany")
     static let trainingFlowCompletedAccessibilityOne = Key(
@@ -1288,6 +1341,34 @@ enum StudentStrings {
     return values.enumerated().reduce(localized(localizedKey, locale: locale)) { result, pair in
       result.replacing("{\(pair.offset)}", with: pair.element)
     }
+  }
+
+  static func progressCount(_ count: Int, unread: Bool, locale: Locale = .current) -> String {
+    #if DEBUG && os(macOS)
+      // SwiftPM on macOS copies xcstrings without compiling plural resources.
+      let key = unread ? "student.progressMenu.new %lld" : "student.progressMenu.sessions %lld"
+      if let url = Bundle.module.url(forResource: "Localizable", withExtension: "xcstrings"),
+        let data = try? Data(contentsOf: url),
+        let root = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+        let strings = root["strings"] as? [String: Any],
+        let entry = strings[key] as? [String: Any],
+        let localizations = entry["localizations"] as? [String: Any],
+        let payload = localizations[isEnglish(locale) ? "en" : "zh-Hans"] as? [String: Any],
+        let variations = payload["variations"] as? [String: Any],
+        let plural = variations["plural"] as? [String: Any],
+        let form = plural[isEnglish(locale) && count == 1 ? "one" : "other"] as? [String: Any],
+        let unit = form["stringUnit"] as? [String: Any],
+        let value = unit["value"] as? String
+      {
+        return value.replacing(
+          "%lld", with: count.formatted(.number.grouping(.never).locale(locale)))
+      }
+    #endif
+    if unread {
+      return String(localized: "student.progressMenu.new \(count)", bundle: .module, locale: locale)
+    }
+    return String(
+      localized: "student.progressMenu.sessions \(count)", bundle: .module, locale: locale)
   }
 
   static func listSeparated(_ values: [String], locale: Locale = .current) -> String {

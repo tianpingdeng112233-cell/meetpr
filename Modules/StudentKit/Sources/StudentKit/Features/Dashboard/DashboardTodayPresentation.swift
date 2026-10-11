@@ -12,6 +12,7 @@ struct DashboardWeekProgressSegment: Equatable, Identifiable, Sendable {
   let dayNumber: Int
   let recommendedDate: Date
   let state: DashboardWeekProgressState
+  var isSelected = false
 }
 
 struct DashboardWeekData: Sendable {
@@ -46,16 +47,22 @@ enum DashboardTodayPresentation {
     return sequence.orderedDays.filter { $0.weekNumber == anchor.weekNumber }
   }
 
-  static func progressSegments(days: [StudentPlanDay]) -> [DashboardWeekProgressSegment] {
+  static func progressSegments(
+    days: [StudentPlanDay], selectedDayID: UUID? = nil, displayedWeek: Int? = nil
+  ) -> [DashboardWeekProgressSegment] {
     let cursorID = cursor(in: days)?.id
-    let weekDays = currentWeekDays(in: days)
+    let weekDays =
+      displayedWeek.map { week in
+        StudentPlanSequence(days: days).orderedDays.filter { $0.weekNumber == week }
+      } ?? currentWeekDays(in: days)
     let numbers = StudentPlanSequence.dayNumbers(inWeek: weekDays)
     return weekDays.map { day in
       DashboardWeekProgressSegment(
         id: day.id,
         dayNumber: numbers[day.id] ?? 1,
         recommendedDate: day.date,
-        state: day.completedAt != nil ? .done : (day.id == cursorID ? .current : .upcoming)
+        state: day.completedAt != nil ? .done : (day.id == cursorID ? .current : .upcoming),
+        isSelected: day.id == (selectedDayID ?? cursorID)
       )
     }
   }

@@ -116,7 +116,7 @@ struct MyProfileV3Presentation: Equatable, Sendable {
       parts.append("\(UnitDisplay.plainString(height)) cm")
     }
     if let weight = profile.weightKg {
-      parts.append("\(UnitDisplay.plainString(weight)) kg")
+      parts.append("\(BodyWeightInput.text(kg: weight, unit: .kg)) kg")
     }
     return parts.isEmpty
       ? StudentStrings.localized(.myProfileV3Presentation010) : parts.joined(separator: " · ")

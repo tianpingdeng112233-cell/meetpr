@@ -159,7 +159,8 @@ extension OnboardingDraft {
     case 6:
       return true  // uploads degraded + muscle groups optional
     case 7:
-      return isCompeting != nil && (isCompeting == false || competitionDate != nil)
+      return isCompeting != true
+        || (competitionDate != nil && MeetClass.parse(targetWeightClass) != nil)
     default:
       return true
     }
@@ -215,9 +216,9 @@ extension OnboardingDraft {
     case 7:
       patch.injuryNotes = Self.nullableText(injuryNotes)
       patch.injuryAreas = injuryAreas.isEmpty ? .null : .value(injuryAreas)
-      patch.isCompeting = Self.ifSet(isCompeting)
+      patch.isCompeting = .value(isCompeting == true)
       patch.competitionDate = isCompeting == true ? Self.nullable(competitionDate) : .null
-      patch.targetWeightClass = Self.nullableText(targetWeightClass)
+      patch.targetWeightClass = isCompeting == true ? Self.nullableText(targetWeightClass) : .null
       patch.noteToCoach = Self.nullableText(noteToCoach)
     default:
       break
@@ -320,5 +321,28 @@ extension OnboardingDraft {
   /// Earliest step covering any of the 422 `missing_fields` (D12).
   public static func earliestStep(forMissingFields fields: [String]) -> Int? {
     fields.compactMap(step(forMissingField:)).min()
+  }
+}
+
+// Profile editors only send fields owned by that page.
+extension OnboardingDraft {
+  func profilePatch(for kind: ProfileCardKind) -> OnboardingPatch {
+    var patch = OnboardingPatch()
+    switch kind {
+    case .weight:
+      patch.weightKg = Self.ifSet(weightKg)
+    case .competition:
+      patch.isCompeting = .value(isCompeting == true)
+      patch.competitionDate = isCompeting == true ? Self.nullable(competitionDate) : .null
+      patch.targetWeightClass = isCompeting == true ? Self.nullableText(targetWeightClass) : .null
+    case .note:
+      patch.noteToCoach = Self.nullableText(noteToCoach)
+    case .injuries:
+      patch.injuryNotes = Self.nullableText(injuryNotes)
+      patch.injuryAreas = injuryAreas.isEmpty ? .null : .value(injuryAreas)
+    default:
+      patch = self.patch(forStep: kind.patchStep)
+    }
+    return patch
   }
 }

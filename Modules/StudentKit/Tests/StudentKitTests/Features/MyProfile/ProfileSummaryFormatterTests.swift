@@ -21,7 +21,7 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
 
 @Test func basicsSummaryFormatsGenderAgeHeightWeight() {
   // birth 2001-03-15 → 25 on 2026-06-11.
-  #expect(OnboardingSummaryFormatter.basics(fullProfile(), now: now) == "男 · 25岁 · 178cm · 83kg")
+  #expect(OnboardingSummaryFormatter.basics(fullProfile(), now: now) == "男 · 25岁 · 178cm · 83.00kg")
 }
 
 @Test func ageIsWholeYearCalendarDifference() {
@@ -59,7 +59,7 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
   let profile = fullProfile()
   #expect(
     OnboardingSummaryFormatter.competition(profile)
-      == "备赛: \(profile.competitionDate ?? "") · IPF 83kg")
+      == "\(profile.competitionDate ?? "") · IPF 83kg")
 
   var draft = OnboardingDraft.from(profile)
   draft.isCompeting = false
@@ -69,7 +69,7 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
     to: profile,
     updatedAt: now
   )
-  #expect(OnboardingSummaryFormatter.competition(optedOut) == "暂不备赛")
+  #expect(OnboardingSummaryFormatter.competition(optedOut) == "未填写")
 }
 
 @Test func injuriesSummaryCombinesNotesAndAreas() {
@@ -83,4 +83,26 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
   #expect(OnboardingSummaryFormatter.oneRM(profile) == "未填写")
   #expect(OnboardingSummaryFormatter.recovery(profile) == "未填写")
   #expect(OnboardingSummaryFormatter.materials(profile) == "未上传资料")
+}
+
+@Test func spec085ProfileMeetAndNoteHaveIndependentSummaries() {
+  let profile = OnboardingProfile(
+    userId: UUID(), weightKg: 83.5, isCompeting: true,
+    competitionDate: "2026-11-01", targetWeightClass: "83kg",
+    noteToCoach: "Original note\nKeep this second line",
+    createdAt: now, updatedAt: now)
+  #expect(OnboardingSummaryFormatter.competition(profile) == "2026-11-01 · 83kg")
+  #expect(OnboardingSummaryFormatter.note(profile) == "Original note")
+  #expect(OnboardingDraft.from(profile).noteToCoach == "Original note\nKeep this second line")
+  #expect(OnboardingSummaryFormatter.basics(profile, now: now) == "83.50kg")
+  let presentation = MyProfileV3Presentation.make(
+    profile: profile, readiness: nil, restTimer: .automatic)
+  #expect(presentation.heightAndWeight == "83.50 kg")
+  for competing: Bool? in [nil, false, true] {
+    let withoutDate = OnboardingProfile(
+      userId: UUID(), isCompeting: competing, targetWeightClass: "83kg",
+      noteToCoach: "Original note", createdAt: now, updatedAt: now)
+    #expect(OnboardingSummaryFormatter.competition(withoutDate) == "未填写")
+    #expect(OnboardingSummaryFormatter.note(withoutDate) == "Original note")
+  }
 }

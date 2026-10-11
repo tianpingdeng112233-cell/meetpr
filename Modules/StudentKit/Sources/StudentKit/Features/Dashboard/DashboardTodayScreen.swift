@@ -59,6 +59,9 @@ struct DashboardTodayScreen: View {
   let onRetryWeek: () -> Void
   let onRetryMetrics: () -> Void
   let onRetryTrend: () -> Void
+  var onOpenWorkoutDay: (UUID) -> Void = { _ in }
+  var selectionResetToken = 0
+  @State private var selection = DashboardDaySelection()
   var onEditProfile: (ProfileCardKind) -> Void = { _ in }
 
   private var sequence: StudentPlanSequence {
@@ -77,8 +80,14 @@ struct DashboardTodayScreen: View {
     completedToday ?? cursorDay ?? sequence.orderedDays.last
   }
 
+  private var selectedDay: StudentPlanDay? {
+    selection.day(in: model.cycleDays, now: model.now)
+  }
+
   private var selectedTrendRows: [DashboardE1RMTrendRow] {
-    guard let displayDay, case .loaded(let presentation) = model.trendState else { return [] }
+    guard let displayDay = selectedDay, case .loaded(let presentation) = model.trendState else {
+      return []
+    }
     let families = MainLiftExerciseFamilyResolver.families(in: displayDay)
     return families.compactMap { family in presentation.rows.first { $0.family == family } }
   }
@@ -133,13 +142,18 @@ struct DashboardTodayScreen: View {
           isExpanded: $isFeedbackExpanded
         )
 
-        let segments = DashboardTodayPresentation.progressSegments(days: model.cycleDays)
+        let segments = DashboardTodayPresentation.progressSegments(
+          days: model.cycleDays, selectedDayID: selectedDay?.id,
+          displayedWeek: displayDay?.weekNumber)
         if let weekNumber = displayDay?.weekNumber, !segments.isEmpty {
-          DashboardWeekCalendar(weekNumber: weekNumber, cells: segments)
+          DashboardWeekCalendar(
+            weekNumber: weekNumber, cells: segments, onSelect: { selection.select($0) })
         }
 
-        if completedToday == nil, let cursorDay {
-          DashboardSequenceDaySummary(day: cursorDay)
+        if let selectedDay {
+          DashboardOverviewCard(
+            overview: DashboardSessionOverview(day: selectedDay, cursorID: cursorDay?.id),
+            onOpen: onOpenWorkoutDay)
         }
 
         profileMetricsContent
@@ -152,6 +166,8 @@ struct DashboardTodayScreen: View {
     .padding(.horizontal, 20)
     .padding(.top, 6)
     .padding(.bottom, 28)
+    .onAppear { selection.reset() }
+    .onChange(of: selectionResetToken) { _, _ in selection.reset() }
   }
 
   @ViewBuilder
@@ -166,6 +182,7 @@ struct DashboardTodayScreen: View {
         showsBodyWeightPlaceholder: metrics.bodyWeightText == nil,
         onEditProfile: onEditProfile
       )
+      DashboardNutritionCard()
     case .error(let message):
       DashboardInlineFailureCard(message: message, retry: onRetryMetrics)
     }
@@ -179,9 +196,12 @@ struct DashboardTodayScreen: View {
     case .error(let message):
       DashboardInlineFailureCard(message: message, retry: onRetryTrend)
     case .loaded where !selectedTrendRows.isEmpty:
-      Text(StudentStrings.localized(.dashboardTodayScreen003))
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
-        .foregroundStyle(Color.MeetPR.textSecondary)
+      Text(
+        StudentStrings.localized(
+          selectedDay?.id == cursorDay?.id ? .dashboardTodayScreen003 : .todaySelectedChart)
+      )
+      .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
+      .foregroundStyle(Color.MeetPR.textSecondary)
       DashboardE1RMRail(rows: selectedTrendRows)
     case .loaded:
       EmptyView()

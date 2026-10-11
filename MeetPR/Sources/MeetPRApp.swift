@@ -179,7 +179,7 @@ struct MeetPRApp: App {
         coachEvaluationSummaries: funnel.summaries,
         coachStudentProfiles: funnel.profiles,
         studentPlans: InMemoryStudentPlanRepository(store: planStore),
-        studentLogs: studentLogs,
+        studentLogs: ProgressDemoScenario.logRepository(wrapping: studentLogs),
         studentFeedback: makeDemoStudentFeedback(studentState: studentState),
         videoMarkers: markerRepository,
         studentE1RM: InMemoryE1RMRepository(
@@ -192,7 +192,13 @@ struct MeetPRApp: App {
         // (spec 031 D10 — the DEMO_USER_STUDENT path stays gate-free).
         studentBind: InMemoryBindRepository(
           studentId: StudentDemoSeed.studentID,
-          seed: StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
+          validCodes: ProcessInfo.processInfo.arguments.contains("-spec085-onboarding")
+            ? [
+              "ABCDEFGH23": .init(coachId: StudentDemoSeed.coachID, coachDisplayName: "Demo coach")
+            ]
+            : [:],
+          seed: ProcessInfo.processInfo.arguments.contains("-spec085-onboarding")
+            ? nil : StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
         ),
         studentOnboarding: InMemoryOnboardingRepository(
           studentId: StudentDemoSeed.studentID,
@@ -461,9 +467,22 @@ struct MeetPRApp: App {
     }
   }
 
+  @ViewBuilder
+  private var appContent: some View {
+    #if DEMO_MODE && DEMO_USER_STUDENT
+      if let scenario = ProfileDemoScenario.launchValue, case .authenticated = session.state {
+        ProfileDemoScene(scenario: scenario, onLogout: { await session.logout() })
+      } else {
+        rootView
+      }
+    #else
+      rootView
+    #endif
+  }
+
   var body: some Scene {
     WindowGroup {
-      rootView
+      appContent
         .environment(session)
         .task {
           await session.bootstrap()

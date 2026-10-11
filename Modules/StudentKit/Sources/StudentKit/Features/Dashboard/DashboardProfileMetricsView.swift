@@ -12,7 +12,7 @@ struct DashboardProfileMetricsView: View {
     HStack(spacing: 11) {
       if metrics.bodyWeightText != nil || showsBodyWeightPlaceholder {
         Button {
-          onEditProfile(.basics)
+          onEditProfile(.weight)
         } label: {
           if let bodyWeightText = metrics.bodyWeightText {
             DashboardWeightCard(bodyWeightText: bodyWeightText)
@@ -21,7 +21,7 @@ struct DashboardProfileMetricsView: View {
           }
         }
         .buttonStyle(PressScaleButtonStyle())
-        .accessibilityIdentifier("dashboard.profile.basics")
+        .accessibilityIdentifier("dashboard.profile.weight")
       }
       if metrics.competition != nil || showsCompetitionPlaceholder {
         Button {
@@ -100,6 +100,8 @@ private struct DashboardWeightCard: View {
         Text(value)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size24, weight: .bold))
           .foregroundStyle(Color.MeetPR.textPrimary)
+          .lineLimit(1)
+          .minimumScaleFactor(0.5)
         Text(" kg")
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textMuted)
@@ -150,6 +152,11 @@ private struct DashboardCompetitionCard: View {
           .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
+      if let weightClass = competition.weightClassText, !weightClass.isEmpty {
+        Text(weightClass)
+          .font(.MeetPR.body(size: MeetPRFontMetrics.size11))
+          .foregroundStyle(Color.MeetPR.textMuted)
+      }
     }
     .padding(.horizontal, 16)
     .padding(.vertical, 14)
@@ -172,7 +179,8 @@ private struct DashboardCompetitionCard: View {
     }
     .accessibilityElement(children: .ignore)
     .accessibilityLabel(
-      StudentStrings.replacing(.dashboardProfileMetricsView005, values: ["\(competition.days)"]))
+      StudentStrings.replacing(.dashboardProfileMetricsView005, values: ["\(competition.days)"])
+        + (competition.weightClassText.map { ", \($0)" } ?? ""))
   }
 }
 

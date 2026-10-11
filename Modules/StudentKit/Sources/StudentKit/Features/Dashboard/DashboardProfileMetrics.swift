@@ -15,6 +15,7 @@ struct DashboardProfileMetrics: Equatable, Sendable {
 struct CompetitionCountdown: Equatable, Sendable {
   let days: Int
   let dateText: String
+  var weightClassText: String?
 }
 
 enum CompetitionCountdownPresenter {
@@ -24,7 +25,7 @@ enum CompetitionCountdownPresenter {
     calendar: Calendar
   ) -> DashboardProfileMetrics {
     DashboardProfileMetrics(
-      bodyWeightText: profile?.weightKg.map { "\(StudentFormatting.decimal($0)) kg" },
+      bodyWeightText: profile?.weightKg.map { "\(BodyWeightInput.text(kg: $0, unit: .kg)) kg" },
       competition: countdown(from: profile, now: now, calendar: calendar)
     )
   }
@@ -41,7 +42,8 @@ enum CompetitionCountdownPresenter {
     else {
       return nil
     }
-    return CompetitionCountdown(days: days, dateText: dateText)
+    return CompetitionCountdown(
+      days: days, dateText: dateText, weightClassText: profile?.targetWeightClass)
   }
 
   static func daysUntil(

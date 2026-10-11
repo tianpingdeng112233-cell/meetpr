@@ -17,6 +17,7 @@ public final class MyProfileViewModel {
   }
 
   public private(set) var state: State = .idle
+  public private(set) var isFailed = false
   public private(set) var saveError: String?
 
   private let repo: any OnboardingRepository
@@ -34,6 +35,7 @@ public final class MyProfileViewModel {
 
   public func reload() async {
     if state == .idle { state = .loading }
+    isFailed = false
     do {
       if let profile = try await repo.fetchProfile(studentId: studentId) {
         state = .loaded(profile)
@@ -41,6 +43,7 @@ public final class MyProfileViewModel {
         state = .empty
       }
     } catch {
+      isFailed = true
       if case .loaded = state { return }  // keep showing the last snapshot
       state = .failed
     }

@@ -45,3 +45,21 @@ import Testing
     ]
   }
 }
+
+@Test func spec085ReceivesExplicitDaysAgainAndOrdinaryRoutesReturnToCursor() {
+  let plan = StudentDemoSeed.makePlanView()
+  let days = StudentPlanSequence(days: plan.days).orderedDays
+  guard days.count >= 3 else {
+    Issue.record("Demo needs three days")
+    return
+  }
+  var selected: UUID?
+  let first = TodayWorkoutPlanHandoff(plan: plan, dayID: days[2].id, existingLogs: [])
+  TodayWorkoutSelectionResolver.receive(first, selectedDayID: &selected, days: days)
+  #expect(selected == days[2].id)
+  let second = TodayWorkoutPlanHandoff(plan: plan, dayID: days[0].id, existingLogs: [])
+  TodayWorkoutSelectionResolver.receive(second, selectedDayID: &selected, days: days)
+  #expect(selected == days[0].id)
+  TodayWorkoutSelectionResolver.receive(nil, selectedDayID: &selected, days: days)
+  #expect(selected == StudentPlanSequence(days: days).cursorDay?.id)
+}

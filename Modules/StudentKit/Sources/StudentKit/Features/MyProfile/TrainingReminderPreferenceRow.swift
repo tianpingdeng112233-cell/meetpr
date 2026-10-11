@@ -27,7 +27,7 @@ struct TrainingReminderPreferenceRow: View {
     } label: {
       MyProfileValueRow(
         label: StudentStrings.localized(.trainingReminderPreferenceRow001),
-        value: TrainingReminderCopy.summary(for: viewModel.settings)
+        value: TrainingReminderCopy.summary(for: viewModel.settings), inline: true
       )
     }
     .task {

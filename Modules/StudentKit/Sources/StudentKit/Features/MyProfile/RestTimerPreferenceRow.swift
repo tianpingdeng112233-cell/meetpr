@@ -25,7 +25,8 @@ struct RestTimerPreferenceRow: View {
           settings.setAccessorySeconds(value, for: studentID)
         }
     } label: {
-      MyProfileValueRow(label: StudentStrings.localized(.restTimerPreferenceRow001), value: summary)
+      MyProfileValueRow(
+        label: StudentStrings.localized(.restTimerPreferenceRow001), value: summary, inline: true)
     }
   }
 

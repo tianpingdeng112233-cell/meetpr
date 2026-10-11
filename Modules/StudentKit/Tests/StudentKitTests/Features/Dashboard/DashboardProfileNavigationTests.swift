@@ -23,7 +23,7 @@ import ViewInspector
     let buttons = try view.inspect().findAll(ViewType.Button.self)
     #expect(buttons.count == 2)
     try buttons[0].tap()
-    #expect(destination == .basics)
+    #expect(destination == .weight)
     try buttons[1].tap()
     #expect(destination == .competition)
   }
