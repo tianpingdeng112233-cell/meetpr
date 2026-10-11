@@ -69,6 +69,8 @@ enum StudentRestTimerCopy {
 /// matching preference in this release, so both the fallback and the one-time
 /// explanation flag live in UserDefaults and remain injectable for tests.
 public protocol StudentRestTimerSettingsStoring: Sendable {
+  func accessorySeconds(for studentID: UUID) -> Int
+  func setAccessorySeconds(_ seconds: Int, for studentID: UUID)
   func preference(for studentID: UUID) -> StudentRestTimerPreference
   func setPreference(_ preference: StudentRestTimerPreference, for studentID: UUID)
   func hasAcknowledgedExplanation(for studentID: UUID) -> Bool
@@ -80,6 +82,20 @@ public struct UserDefaultsRestTimerSettingsStore: StudentRestTimerSettingsStorin
 
   public init(defaults: UserDefaults = .standard) {
     self.defaults = defaults
+  }
+
+  public func accessorySeconds(for studentID: UUID) -> Int {
+    let key = "meetpr.student.rest_timer.accessory_seconds.\(studentID.uuidString)"
+    guard let seconds = defaults.object(forKey: key) as? Int,
+      (30...300).contains(seconds), seconds.isMultiple(of: 15)
+    else { return 60 }
+    return seconds
+  }
+
+  public func setAccessorySeconds(_ seconds: Int, for studentID: UUID) {
+    guard (30...300).contains(seconds), seconds.isMultiple(of: 15) else { return }
+    defaults.set(
+      seconds, forKey: "meetpr.student.rest_timer.accessory_seconds.\(studentID.uuidString)")
   }
 
   public func preference(for studentID: UUID) -> StudentRestTimerPreference {

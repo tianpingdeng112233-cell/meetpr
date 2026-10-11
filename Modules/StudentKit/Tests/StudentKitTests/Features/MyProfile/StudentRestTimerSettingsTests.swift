@@ -153,3 +153,39 @@ private func makeTestStore() throws -> (
 private func preferenceKey(for studentID: UUID) -> String {
   "meetpr.student.rest_timer.fixed_seconds.\(studentID.uuidString)"
 }
+
+@Test func accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences() throws {
+  let studentID = UUID()
+  let testStore = try makeTestStore()
+  let accessoryKey = "meetpr.student.rest_timer.accessory_seconds.\(studentID.uuidString)"
+  let mainKey = preferenceKey(for: studentID)
+  #expect(testStore.store.accessorySeconds(for: studentID) == 60)
+  let oldJSON = Data(#"{"version":2,"lowSeconds":105,"midSeconds":195,"highSeconds":315}"#.utf8)
+  testStore.defaults.set(oldJSON, forKey: mainKey)
+  #expect(
+    testStore.store.preference(for: studentID)
+      == .custom(lowSeconds: 105, midSeconds: 195, highSeconds: 315))
+  #expect(testStore.store.accessorySeconds(for: studentID) == 60)
+  #expect(testStore.defaults.data(forKey: mainKey) == oldJSON)
+  testStore.defaults.set(195, forKey: mainKey)
+  #expect(
+    testStore.store.preference(for: studentID)
+      == .custom(lowSeconds: 195, midSeconds: 195, highSeconds: 195))
+  #expect(testStore.store.accessorySeconds(for: studentID) == 60)
+  testStore.store.setAccessorySeconds(90, for: studentID)
+  #expect(testStore.store.accessorySeconds(for: studentID) == 90)
+  #expect(testStore.store.accessorySeconds(for: UUID()) == 60)
+  testStore.store.setPreference(.automatic, for: studentID)
+  #expect(testStore.defaults.object(forKey: mainKey) == nil)
+  #expect(testStore.store.accessorySeconds(for: studentID) == 90)
+  testStore.store.setPreference(.defaultCustom, for: studentID)
+  #expect(testStore.store.accessorySeconds(for: studentID) == 90)
+  testStore.store.setPreference(.automatic, for: studentID)
+  #expect(testStore.store.accessorySeconds(for: studentID) == 90)
+  for invalid in [0, 29, 31, 301, 600] {
+    testStore.defaults.set(invalid, forKey: accessoryKey)
+    #expect(testStore.store.accessorySeconds(for: studentID) == 60)
+  }
+  testStore.defaults.set("90", forKey: accessoryKey)
+  #expect(testStore.store.accessorySeconds(for: studentID) == 60)
+}
