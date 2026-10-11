@@ -13,13 +13,22 @@ struct AllHistoryScreen: View {
     Group {
       switch viewModel.state {
       case .loaded(let weeks, let logs):
-        if logs.isEmpty {
-          ContentUnavailableView(
-            StudentStrings.localized(.e1rmSourceHistoryEmpty), systemImage: "clock",
-            description: Text(StudentStrings.localized(.e1rmSourceHistoryEmptyNote))
+        VStack(spacing: 0) {
+          GrowthHistoryStatsCard(
+            stats: GrowthScreenPresentation.historyStats(logs: logs),
+            isZeroTraining: GrowthScreenPresentation.historyStats(logs: logs).trainingSessionCount
+              == 0
           )
-        } else {
-          HistoryEntriesView(weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName)
+          .padding([.horizontal, .top], MeetPRSpacing.md)
+          if logs.isEmpty {
+            ContentUnavailableView(
+              StudentStrings.localized(.e1rmSourceHistoryEmpty), systemImage: "clock",
+              description: Text(StudentStrings.localized(.e1rmSourceHistoryEmptyNote))
+            )
+          } else {
+            HistoryEntriesView(
+              weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName)
+          }
         }
       case .error(let message):
         VStack(spacing: MeetPRSpacing.space3) {

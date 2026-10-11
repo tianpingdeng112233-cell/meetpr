@@ -179,7 +179,7 @@ struct MeetPRApp: App {
         coachEvaluationSummaries: funnel.summaries,
         coachStudentProfiles: funnel.profiles,
         studentPlans: InMemoryStudentPlanRepository(store: planStore),
-        studentLogs: studentLogs,
+        studentLogs: ProgressDemoScenario.logRepository(wrapping: studentLogs),
         studentFeedback: makeDemoStudentFeedback(studentState: studentState),
         videoMarkers: markerRepository,
         studentE1RM: InMemoryE1RMRepository(
@@ -467,9 +467,22 @@ struct MeetPRApp: App {
     }
   }
 
+  @ViewBuilder
+  private var appContent: some View {
+    #if DEMO_MODE && DEMO_USER_STUDENT
+      if let scenario = ProfileDemoScenario.launchValue, case .authenticated = session.state {
+        ProfileDemoScene(scenario: scenario, onLogout: { await session.logout() })
+      } else {
+        rootView
+      }
+    #else
+      rootView
+    #endif
+  }
+
   var body: some Scene {
     WindowGroup {
-      rootView
+      appContent
         .environment(session)
         .task {
           await session.bootstrap()
