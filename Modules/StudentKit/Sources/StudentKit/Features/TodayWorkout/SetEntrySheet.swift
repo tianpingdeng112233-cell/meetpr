@@ -355,7 +355,7 @@ struct SetEntrySheet: View {
     onIncrement: @escaping @MainActor () -> Void,
     onOpenPad: @escaping @MainActor () -> Void
   ) -> some View {
-    VStack(spacing: MeetPRSpacing.space2) {
+    VStack(spacing: MeetPRSpacing.space1) {
       HStack {
         Text(label)
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
@@ -373,7 +373,7 @@ struct SetEntrySheet: View {
         Button(action: onOpenPad) {
           HStack(alignment: .lastTextBaseline, spacing: MeetPRSpacing.point6) {
             Text(value.isEmpty ? "—" : value)
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size34, weight: .bold))
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size30, weight: .bold))
               .foregroundStyle(
                 isAutomatic
                   ? Color.MeetPR.textSecondary
@@ -386,7 +386,7 @@ struct SetEntrySheet: View {
               .foregroundStyle(Color.MeetPR.textMuted)
           }
           .frame(maxWidth: .infinity)
-          .frame(height: MeetPRFontMetrics.size54)
+          .frame(height: MeetPRSpacing.point48)
           .background(Color.MeetPR.surfaceCard)
           .clipShape(.rect(cornerRadius: MeetPRRadius.card))
           .overlay {

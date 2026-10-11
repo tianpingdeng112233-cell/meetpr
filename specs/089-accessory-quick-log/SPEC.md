@@ -4,7 +4,7 @@
 > - 文中「只做安卓」「iOS 原生不跟」「iOS 等走查完一起跟」「登记进 `PARITY.md`」等句子在 iOS 上不再适用；文中的 `src/...` 路径、`npx jest` 等命令是安卓的，iOS 的落点、测试 seam 与验收替换见同目录 [`CARD-ios.md`](./CARD-ios.md)，共同约定见 [`../085-090-android-parity/README.md`](../085-090-android-parity/README.md)。
 > - iOS 本波范围：全部。
 > - 屏幕稿沿用文末 David 已「定稿」的那一套（稿只管布局、层级、间距与文案）；颜色、字号、圆角取 iOS `DesignSystem` 现有 token。
-> - Status: Draft（iOS 实装 PR 合并时翻 Done）。
+> - Status: Done（iOS 实装见同目录 `ACCEPTANCE-ios.md`）。
 
 ---
 
