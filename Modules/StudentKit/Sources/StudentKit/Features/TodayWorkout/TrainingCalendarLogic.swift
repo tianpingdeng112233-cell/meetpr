@@ -64,6 +64,26 @@ struct TrainingSequencePage: Equatable, Sendable {
 }
 
 enum TrainingSequenceLayout {
+  static func isBehind(
+    _ day: StudentPlanDay, today: Date, calendar: Calendar = WorkoutDatePolicy.deviceCalendar
+  ) -> Bool {
+    day.completedAt == nil && recommendationAge(day, today: today, calendar: calendar) > 0
+  }
+
+  static func daysBehind(
+    days: [StudentPlanDay], today: Date, calendar: Calendar = WorkoutDatePolicy.deviceCalendar
+  ) -> Int {
+    guard let cursor = StudentPlanSequence(days: days).cursorDay else { return 0 }
+    return max(0, recommendationAge(cursor, today: today, calendar: calendar))
+  }
+
+  private static func recommendationAge(
+    _ day: StudentPlanDay, today: Date, calendar: Calendar
+  ) -> Int {
+    PlanCalendarDayIdentity.dayOffset(
+      fromPlanDate: day.date, toSelectedDate: today, selectedCalendar: calendar) ?? 0
+  }
+
   static func page(days: [StudentPlanDay], selectedDayID: UUID?) -> TrainingSequencePage {
     let selection = initialSelection(days: days, explicitDayID: selectedDayID)
     let weeks = makeWeeks(days: days, selectedDayID: selection)

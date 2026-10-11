@@ -192,6 +192,13 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     heroMode == .recording && hasAnyLoggedSet
   }
 
+  func accessoryExercise(isEditable: Bool) -> Exercise? {
+    guard let flow = trainingFlow(isEditable: isEditable),
+      let exercise = flow.hero, flow.currentRow?.draft.isAccessory == true
+    else { return nil }
+    return exercise
+  }
+
   func allowsQuickLog(isEditable: Bool) -> Bool {
     heroMode == .list && isEditable
   }

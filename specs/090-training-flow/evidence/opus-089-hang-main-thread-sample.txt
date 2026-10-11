@@ -1,0 +1,60 @@
+    254 Thread_31491649   DispatchQueue_1: com.apple.main-thread  (serial)
+    + 254 start  (in dyld) + 6992  [0x1009c3da4]
+    +   254 start_sim  (in dyld_sim) + 20  [0x10082b0b4]
+    +     254 __debug_main_executable_dylib_entry_point  (in MeetPR.debug.dylib) + 12  [0x1043a63c4]  MeetPRApp.swift:0
+    +       254 static MeetPRApp.$main()  (in MeetPR.debug.dylib) + 40  [0x1043a6384]  /<compiler-generated>:0
+    +         254 static App.main()  (in SwiftUI) + 148  [0x1d2afcd34]
+    +           254 runApp<A>(_:)  (in SwiftUI) + 180  [0x1d2d6b948]
+    +             254 closure #1 in KitRendererCommon(_:)  (in SwiftUI) + 164  [0x1d2d6bbd4]
+    +               254 UIApplicationMain  (in UIKitCore) + 120  [0x186b74850]
+    +                 254 -[UIApplication _run]  (in UIKitCore) + 776  [0x18647a4c8]
+    +                   254 GSEventRunModal  (in GraphicsServices) + 116  [0x1932cb9c0]
+    +                     254 _CFRunLoopRunSpecificWithOptions  (in CoreFoundation) + 496  [0x18041a330]
+    +                       254 __CFRunLoopRun  (in CoreFoundation) + 760  [0x18041f234]
+    +                         254 __CFRunLoopDoSources0  (in CoreFoundation) + 220  [0x180420060]
+    +                           254 __CFRunLoopDoSource0  (in CoreFoundation) + 168  [0x1804208d0]
+    +                             254 __CFRUNLOOP_IS_CALLING_OUT_TO_A_SOURCE0_PERFORM_FUNCTION__  (in CoreFoundation) + 24  [0x180420988]
+    +                               254 UC::DriverCore::continueProcessing()  (in UpdateCycle) + 80  [0x23439b2c0]
+    +                                 254 schedulerStepScheduledMainSectionContinue  (in UIKitCore) + 56  [0x18638b060]
+    +                                   254 _UIUpdateSequenceRunNext  (in UIKitCore) + 120  [0x1858d9000]
+    +                                     254 ???  (in UIKitCore)  load address 0x18525f000 + 0x1696f0  [0x1853c86f0]
+    +                                       254 ???  (in UIKitCore)  load address 0x18525f000 + 0x169bf0  [0x1853c8bf0]
+    +                                         254 static ViewGraphHostUpdate.dispatchImmediately<A>(_:)  (in SwiftUICore) + 40  [0x1d38e7218]
+    +                                           253 static Update.dispatchImmediately<A>(reason:_:)  (in SwiftUICore) + 332  [0x1d3ba88c4]
+    +                                           ! 253 ???  (in UIKitCore)  load address 0x18525f000 + 0x1ea30  [0x18527da30]
+    +                                           !   253 ???  (in UIKitCore)  load address 0x18525f000 + 0x1698fc  [0x1853c88fc]
+    +                                           !     253 ???  (in UIKitCore)  load address 0x18525f000 + 0xac224  [0x18530b224]
+    +                                           !       253 partial apply for closure #1 in closure #1 in _UIHostingView.beginTransaction()  (in SwiftUI) + 64  [0x1d27fbf2c]
+    +                                           !         253 static Update.ensure<A>(_:)  (in SwiftUICore) + 96  [0x1d3ba82f0]
+    +                                           !           253 closure #1 in static Update.ensure<A>(_:)  (in SwiftUICore) + 48  [0x1d3ba9718]
+    +                                           !             253 partial apply for closure #1 in closure #1 in closure #1 in _UIHostingView.beginTransaction()  (in SwiftUI) + 20  [0x1d27fbf50]
+    +                                           !               253 closure #1 in closure #1 in closure #1 in _UIHostingView.beginTransaction()  (in SwiftUI) + 144  [0x1d27f24d0]
+    +                                           !                 253 ViewGraphRootValueUpdater.updateGraph<A>(body:)  (in SwiftUICore) + 136  [0x1d425d084]
+    +                                           !                   253 ViewGraphRootValueUpdater._updateViewGraph<A>(body:)  (in SwiftUICore) + 200  [0x1d425e79c]
+    +                                           !                     253 <deduplicated_symbol>  (in SwiftUICore) + 20  [0x1d402e4c0]
+    +                                           !                       253 <deduplicated_symbol>  (in SwiftUI) + 20  [0x1d27f2500]
+    +                                           !                         252 GraphHost.flushTransactions()  (in SwiftUICore) + 176  [0x1d3dd02dc]
+    +                                           !                         : 227 specialized GraphHost.runTransaction(_:do:id:)  (in SwiftUICore) + 352  [0x1d3deaa50]
+    +                                           !                         : | 190 AG::Subgraph::update(unsigned int)  (in AttributeGraph) + 952  [0x1c420a590]
+    +                                           !                         : | + 133 AG::Graph::UpdateStack::update()  (in AttributeGraph) + 488  [0x1c41fb6c0]
+    +                                           !                         : | + ! 54 specialized implicit closure #1 in closure #1 in closure #1 in Attribute.init<A>(_:)  (in SwiftUICore) + 20  [0x1d3
+    +                                           !                         : | + ! : 38 specialized LazySubviewPlacements.updateValue()  (in SwiftUICore) + 2508  [0x1d3ebbd34]
+    +                                           !                         : | + ! : | 33 specialized LazySubviewPlacements.placeSubviews(placementContext:in:nearestVisibleRect:containingVisibleRect:)
+    +                                           !                         : | + ! : | + 32 _LazyLayoutViewCache.withMutableCacheState<A, B>(type:_:)  (in SwiftUICore) + 248  [0x1d406cd14]
+    +                                           !                         : | + ! : | + ! 32 <deduplicated_symbol>  (in SwiftUICore) + 72  [0x1d3918600]
+    +                                           !                         : | + ! : | + !   32 partial apply for closure #1 in _LazyLayoutViewCache.withMutableCacheState<A, B>(type:_:)  (in SwiftUICor
+    +                                           !                         : | + ! : | + !     32 partial apply for specialized closure #1 in LazySubviewPlacements.placeSubviews(placementContext:in:nea
+    +                                           !                         : | + ! : | + !       32 specialized closure #1 in LazySubviewPlacements.placeSubviews(placementContext:in:nearestVisibleRect:
+    +                                           !                         : | + ! : | + !         28 specialized LazyStack<>.place(subviews:context:cache:in:)  (in SwiftUICore) + 1828  [0x1d3e77bdc]
+    +                                           !                         : | + ! : | + !         : 28 _ViewList_Node.applyNodes(from:style:transform:to:)  (in SwiftUICore) + 168  [0x1d3ccc29c]
+    +                                           !                         : | + ! : | + !         :   28 protocol witness for ViewList.applyNodes(from:style:list:transform:to:) in conformance _ViewLis
+    +                                           !                         : | + ! : | + !         :     28 applyNode #1 (start:style:node:transform:) in _LazyLayout_Subviews.applyNodes(from:style:to:)
+    +                                           !                         : | + ! : | + !         :       20 protocol witness for ViewList.applyNodes(from:style:list:transform:to:) in conformance _Vie
+    +                                           !                         : | + ! : | + !         :       | 20 applyNode #1 (start:style:node:transform:) in _LazyLayout_Subviews.applyNodes(from:style:
+    +                                           !                         : | + ! : | + !         :       |   20 DynamicViewList.WrappedList.applyNodes(from:style:list:transform:to:)  (in SwiftUICore)
+    +                                           !                         : | + ! : | + !         :       |     19 _ViewList_TemporarySublistTransform.withPushedItem<A, B>(_:do:)  (in SwiftUICore) + 1
+    +                                           !                         : | + ! : | + !         :       |     + 19 <deduplicated_symbol>  (in SwiftUICore) + 48  [0x1d40385ec]
+    +                                           !                         : | + ! : | + !         :       |     +   19 <deduplicated_symbol>  (in SwiftUICore) + 140  [0x1d4034484]
+    +                                           !                         : | + ! : | + !         :       |     +     19 protocol witness for ViewList.applyNodes(from:style:list:transform:to:) in conf
+    +                                           !                         : | + ! : | + !         :       |     +       19 applyNode #1 (start:style:node:transform:) in _LazyLayout_Subviews.applyNodes
+    +                                           !                         : | + ! : | + !         :       |     +         19 DynamicViewList.WrappedList.applyNodes(from:style:list:transform:to:)  (in

@@ -5,6 +5,10 @@ import Foundation
 /// (spec 030 §B1). The shared table lives in CoreModels.RestDefaults so coach
 /// planning defaults and student fallback stay in lockstep.
 enum RestTimerPolicy {
+  static func accessorySeconds(coachSeconds: Int?, studentSeconds: Int?) -> Int {
+    coachSeconds ?? studentSeconds ?? 60
+  }
+
   /// | RPE          | rest |
   /// |--------------|------|
   /// | nil (unset)  | 3min |

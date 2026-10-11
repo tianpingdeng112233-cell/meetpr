@@ -28,6 +28,7 @@ public struct TodayWorkoutView: View {
   private let onPlanChanged: (StudentPlanView) -> Void
   private let onReturnToToday: () -> Void
 
+  @State private var restTimerHeight: CGFloat = 0
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
   @State private var videoViewModel: VideoAttachmentViewModel
@@ -44,6 +45,7 @@ public struct TodayWorkoutView: View {
   @State private var showingReadinessSheet = false
   @State private var opensRestSettingsAfterExplanation = false
   @State private var showingRestSettings = false
+  @State private var accessoryRestSeconds = 60
   @State private var restPreference: StudentRestTimerPreference = .automatic
   @State private var showingHistory = false
   @State private var historyViewModel: TrainingHistoryViewModel
@@ -54,6 +56,8 @@ public struct TodayWorkoutView: View {
   @State private var setRefEntryErrorMessage: String?
   @State private var reviewCompleted = false
   @State private var started = false
+  @State private var gymDayToday = WorkoutDatePolicy.gymDayToday()
+  @Environment(\.scenePhase) private var scenePhase
   @State private var collapsedExercises: [UUID: Bool] = [:]
 
   private let reviewStore: any SessionReviewStore = UserDefaultsSessionReviewStore()
@@ -166,7 +170,8 @@ public struct TodayWorkoutView: View {
         showsAskCoach: showsSetRefEntry,
         isPreparingAskCoach: isPreparingSetRefPicker,
         collapsedExercises: $collapsedExercises,
-        sequenceContent: TrainingWeekStrip(days: viewModel.planDays, selectedDayID: $selectedDayID),
+        sequenceContent: TrainingWeekStrip(
+          days: viewModel.planDays, selectedDayID: $selectedDayID, today: gymDayToday),
         showsBackToToday: sequencePage.showsBackToToday,
         onBackToToday: returnToCurrentDay,
         onRefresh: {
@@ -189,15 +194,7 @@ public struct TodayWorkoutView: View {
         onQuickLog: openQuickLog,
         onEdit: openEditor,
         onVideoAction: openVideoAction,
-        onComplete: {
-          Task {
-            if await viewModel.completeCurrentDay(), viewModel.completionPhase == nil {
-              // The student may have closed the reward while it was sending.
-              returnToCurrentDay()
-              onReturnToToday()
-            }
-          }
-        },
+        onComplete: completeTraining,
         onUndoCompletion: {
           Task {
             _ = await viewModel.undoCurrentDayCompletion()
@@ -205,7 +202,12 @@ public struct TodayWorkoutView: View {
         },
         onShowReview: {
           viewModel.completionPhase = .review
-        }
+        },
+        accessoryViewModel: viewModel,
+        accessoryPreviousLogs: viewModel.accessoryPreviousLogs,
+        sequencePage: sequencePage,
+        gymDayToday: gymDayToday,
+        restTimerHeight: viewModel.restTimer == nil ? 0 : restTimerHeight
       )
       #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -223,13 +225,25 @@ public struct TodayWorkoutView: View {
       )
     }
     .safeAreaInset(edge: .bottom) {
-      if let timer = viewModel.restTimer {
-        RestTimerOverlay(
-          timer: timer,
-          now: { Date() },
-          onAdjust: { viewModel.adjustRestTimer(bySeconds: $0) },
-          onSkip: { viewModel.skipRestTimer() }
-        )
+      VStack(spacing: 0) {
+        if !showingHistory, case .workout(let presentation) = screenContent,
+          presentation.completionAvailability(isEditable: selectedDayState.isEditable).sticky
+        {
+          TrainingCompletionDock(onComplete: completeTraining)
+        }
+        if let timer = viewModel.restTimer {
+          RestTimerOverlay(
+            timer: timer,
+            now: { Date() },
+            onAdjust: { viewModel.adjustRestTimer(bySeconds: $0) },
+            onSkip: { viewModel.skipRestTimer() }
+          )
+          .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.height
+          } action: { height in
+            restTimerHeight = height
+          }
+        }
       }
     }
     #if os(iOS)
@@ -265,6 +279,7 @@ public struct TodayWorkoutView: View {
         if opensRestSettingsAfterExplanation {
           opensRestSettingsAfterExplanation = false
           restPreference = restTimerSettings.preference(for: studentID)
+          accessoryRestSeconds = restTimerSettings.accessorySeconds(for: studentID)
           showingRestSettings = true
         }
       },
@@ -282,7 +297,10 @@ public struct TodayWorkoutView: View {
     )
     .sheet(isPresented: $showingRestSettings) {
       NavigationStack {
-        RestTimerSettingsView(preference: $restPreference)
+        RestTimerSettingsView(preference: $restPreference, accessorySeconds: $accessoryRestSeconds)
+          .onChange(of: accessoryRestSeconds) { _, seconds in
+            restTimerSettings.setAccessorySeconds(seconds, for: studentID)
+          }
           .onChange(of: restPreference) { _, preference in
             restTimerSettings.setPreference(preference, for: studentID)
           }
@@ -394,7 +412,11 @@ public struct TodayWorkoutView: View {
         }
       )
     #endif
+    .onChange(of: scenePhase) { _, phase in
+      if phase == .active { gymDayToday = WorkoutDatePolicy.gymDayToday() }
+    }
     .task {
+      gymDayToday = WorkoutDatePolicy.gymDayToday()
       let isFirstLoad = viewModel.state == .idle
       if isFirstLoad {
         await loadWorkout(
@@ -404,9 +426,13 @@ public struct TodayWorkoutView: View {
         resolveInitialSelectionIfNeeded()
       }
       await videoViewModel.start(studentID: studentID)
+      viewModel.accessoryVideosLoaded = videoViewModel.hasLoadedAttachments
       if uploadFailureNavigationToken > 0 {
         openUploadFailureDestination()
       }
+    }
+    .onChange(of: videoViewModel.hasLoadedAttachments) { _, loaded in
+      viewModel.accessoryVideosLoaded = loaded
     }
     .onChange(of: selectedDayID) { _, newDayID in
       editing = nil
@@ -452,6 +478,7 @@ public struct TodayWorkoutView: View {
       viewModel.applyPlanProjection(plan)
     }
     .onChange(of: planRefreshRevision) { _, _ in
+      gymDayToday = WorkoutDatePolicy.gymDayToday()
       Task { await refreshWorkoutPlan() }
     }
     .onChange(of: viewModel.completionRevision) { _, _ in
@@ -672,6 +699,16 @@ public struct TodayWorkoutView: View {
       try? await Task.sleep(for: .seconds(2))
       guard !Task.isCancelled else { return }
       quickLogToastWeekCode = nil
+    }
+  }
+
+  private func completeTraining() {
+    Task {
+      if await viewModel.completeCurrentDay(), viewModel.completionPhase == nil {
+        // The student may have closed the reward while it was sending.
+        returnToCurrentDay()
+        onReturnToToday()
+      }
     }
   }
 

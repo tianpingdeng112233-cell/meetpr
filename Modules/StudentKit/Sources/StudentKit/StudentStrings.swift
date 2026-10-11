@@ -99,6 +99,37 @@ enum StudentStrings {
     static let nutritionFat = Key("student.nutritionFat")
     static let nutritionFiber = Key("student.nutritionFiber")
 
+    static let trainingFlowCompletedOne = Key("student.trainingFlow.completedOne")
+    static let trainingFlowCompletedMany = Key("student.trainingFlow.completedMany")
+    static let trainingFlowCompletedAccessibilityOne = Key(
+      "student.trainingFlow.completedAccessibilityOne")
+    static let trainingFlowCompletedAccessibilityMany = Key(
+      "student.trainingFlow.completedAccessibilityMany")
+
+    static let accessoryCompleteAll = Key("student.accessory.completeAll")
+    static let accessoryNeedsWeightMany = Key("student.accessory.needsWeightMany")
+    static let accessoryVideoWarning = Key("student.accessory.videoWarning")
+    static let accessoryAccessory = Key("student.accessory.accessory")
+    static let accessoryBodyweight = Key("student.accessory.bodyweight")
+    static let accessorySet = Key("student.accessory.set")
+    static let accessoryLast = Key("student.accessory.last")
+    static let accessoryBw = Key("student.accessory.bw")
+    static let accessoryRir = Key("student.accessory.rir")
+    static let accessoryWeightLabel = Key("student.accessory.weightLabel")
+    static let accessoryRepsLabel = Key("student.accessory.repsLabel")
+    static let accessoryRpeLabel = Key("student.accessory.rpeLabel")
+    static let accessoryComplete = Key("student.accessory.complete")
+    static let accessoryUndo = Key("student.accessory.undo")
+    static let accessoryDetails = Key("student.accessory.details")
+    static let accessoryUseLast = Key("student.accessory.useLast")
+    static let accessoryHint = Key("student.accessory.hint")
+    static let accessoryNeedsWeightOne = Key("student.accessory.needsWeightOne")
+    static let accessoryMainLifts = Key("student.accessory.mainLifts")
+    static let accessoryExercises = Key("student.accessory.exercises")
+    static let accessoryRest = Key("student.accessory.rest")
+    static let accessoryRange = Key("student.accessory.range")
+    static let accessoryLess = Key("student.accessory.less")
+    static let accessoryMore = Key("student.accessory.more")
     static let setEntryVideoPlay = Key("student.setEntryVideoPlay")
     static let setEntryVideoPause = Key("student.setEntryVideoPause")
     static let setEntryVideoProgress = Key("student.setEntryVideoProgress")
@@ -1095,6 +1126,8 @@ enum StudentStrings {
     static let trainingCalendarLogic010 = Key("student.trainingCalendarLogic.copy010")
     static let trainingCalendarLogic011 = Key("student.trainingCalendarLogic.copy011")
     static let trainingCalendarLogic012 = Key("student.trainingCalendarLogic.copy012")
+    static let trainingWeekBehind = Key("student.trainingWeekBehind")
+    static let trainingWeekBehindAccessibility = Key("student.trainingWeekBehindAccessibility")
     static let trainingWeekCurrent = Key("student.trainingWeekCurrent")
     static let trainingWeekUpcoming = Key("student.trainingWeekUpcoming")
     static let trainingWeekCompleted = Key("student.trainingWeekCompleted")
@@ -1261,6 +1294,27 @@ enum StudentStrings {
       "student.workoutCompletionPresentation.copy016")
   }
 
+  static func trainingDaysBehind(
+    _ count: Int, accessibility: Bool = false, locale: Locale = .current
+  ) -> String {
+    #if DEBUG && os(macOS)
+      let key = accessibility ? "daysBehindAccessibility" : "daysBehind"
+      let variant = isEnglish(locale) && count == 1 ? "one" : "other"
+      if let template = macOSSwiftPMCatalog["student.trainingWeek.\(key) %lld.\(variant)"]?[
+        isEnglish(locale) ? "en" : "zh-Hans"]
+      {
+        return template.replacing("%lld", with: String(count))
+      }
+    #endif
+    if accessibility {
+      return String(
+        localized: "student.trainingWeek.daysBehindAccessibility \(count)",
+        bundle: .module, locale: locale)
+    }
+    return String(
+      localized: "student.trainingWeek.daysBehind \(count)", bundle: .module, locale: locale)
+  }
+
   static func localized(_ key: Key, locale: Locale = .current) -> String {
     resolved(
       String(localized: key.value, bundle: .module, locale: locale),
@@ -1363,6 +1417,19 @@ enum StudentStrings {
           let localizations = entry["localizations"] as? [String: Any]
         else {
           return
+        }
+        for (language, payload) in localizations {
+          guard let payload = payload as? [String: Any],
+            let variations = payload["variations"] as? [String: Any],
+            let plural = variations["plural"] as? [String: Any]
+          else { continue }
+          for (variant, entry) in plural {
+            guard let entry = entry as? [String: Any],
+              let unit = entry["stringUnit"] as? [String: Any],
+              let value = unit["value"] as? String
+            else { continue }
+            result[pair.key + "." + variant, default: [:]][language] = value
+          }
         }
         result[pair.key] = localizations.reduce(into: [:]) { values, localization in
           guard let payload = localization.value as? [String: Any],
