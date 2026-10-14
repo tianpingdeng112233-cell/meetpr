@@ -6,6 +6,7 @@ import RepositoryContracts
 public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
   private let api: APIClient
   private let session: any SessionStateReader
+  private var addedCache: [UUID: [StudentAddedSetLog]] = [:]
   private let cache: TrainingLogCache
 
   public init(
@@ -95,5 +96,50 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       logs
       .filter { $0.planExerciseID == planExerciseID }
       .sorted { $0.setIndex < $1.setIndex }
+  }
+}
+
+extension BackendStudentTrainingLogRepository: StudentAddedLogRepository {
+  public func fetchAllLogs(
+    studentID: UUID, in range: ClosedRange<Date>
+  ) async throws -> StudentWorkoutLogs {
+    let from = WireFormatting.dateOnlyString(from: range.lowerBound)
+    let endDate = WireFormatting.exclusiveEndDateOnlyString(closedUpperBound: range.upperBound)
+    let token = try await session.accessToken()
+    do {
+      let response = try await api.allStudentSetLogs(
+        studentID: studentID, from: from, endDate: endDate, accessToken: token)
+      let planned = response.planned.map { $0.toDomain() }
+      try await cache.save(logs: planned, studentID: studentID, from: from, endDate: endDate)
+      addedCache[studentID] = response.added
+      return StudentWorkoutLogs(
+        planned: planned, added: response.added,
+        isCompleteLedger: range.lowerBound <= Date(timeIntervalSince1970: 0))
+    } catch {
+      guard let planned = await cache.loadLogs(studentID: studentID, from: from, endDate: endDate)
+      else { throw error }
+      return StudentWorkoutLogs(
+        planned: planned,
+        added: (addedCache[studentID] ?? []).filter { range.contains($0.loggedAt) },
+        isAuthoritative: false)
+    }
+  }
+
+  public func recordAddedSet(_ log: StudentAddedSetLog) async throws -> StudentAddedSetLog {
+    let response = try await api.logStudentAddedSet(
+      CreateStudentAddedSetRequestDTO(log: log), accessToken: try await session.accessToken())
+    let saved = StudentAddedSetLog(
+      id: response.id, studentID: log.studentID, planDayID: log.planDayID,
+      exerciseID: log.exerciseID, setIndex: log.setIndex, loggedAt: response.loggedAt,
+      loggedDate: log.loggedDate, weightKg: log.weightKg, reps: log.reps, rpe: log.rpe,
+      coachRPE: log.coachRPE, completed: log.completed, failed: log.failed)
+    addedCache[log.studentID, default: []].removeAll { $0.id == saved.id }
+    addedCache[log.studentID, default: []].append(saved)
+    return saved
+  }
+
+  public func deleteAddedSet(id: UUID, studentID: UUID) async throws {
+    try await api.deleteStudentAddedSet(id: id, accessToken: try await session.accessToken())
+    addedCache[studentID]?.removeAll { $0.id == id }
   }
 }

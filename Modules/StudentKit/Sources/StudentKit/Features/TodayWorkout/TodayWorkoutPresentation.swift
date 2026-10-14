@@ -13,6 +13,7 @@ struct TodayWorkoutProgress: Equatable, Sendable {
   let allDone: Bool
 
   init(day: StudentPlanDay, drafts: [TodayWorkoutViewModel.SetRowDraft]) {
+    let drafts = drafts.filter { !$0.isExtra && !$0.isStudentAdded }
     let active = drafts.first { !$0.completed }
     let current = active ?? drafts.last
     let exerciseIDs = day.exercises.map(\.id)
@@ -69,7 +70,7 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     let rows: [Row]
 
     var allRecorded: Bool {
-      !rows.isEmpty && rows.allSatisfy { $0.record.status != .pending }
+      !prescribedRows.isEmpty && prescribedRows.allSatisfy { $0.record.status != .pending }
     }
 
     /// New-form rows summarize the prescription; all-legacy exercises return
@@ -77,7 +78,10 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
     /// §1.4). Sets may be heterogeneous (spec §2): only a uniform prescription
     /// may be named, anything mixed shows just the set count instead of
     /// passing the first set off as all of them.
+    var prescribedRows: [Row] { rows.filter { !$0.draft.isExtra && !$0.draft.isStudentAdded } }
+
     var prescriptionSummary: String? {
+      let rows = prescribedRows
       guard rows.contains(where: { !$0.draft.prescribed.isLegacyPrescription }) else {
         return nil
       }

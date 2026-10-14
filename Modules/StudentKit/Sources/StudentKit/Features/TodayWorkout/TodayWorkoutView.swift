@@ -609,7 +609,7 @@ public struct TodayWorkoutView: View {
 
   private var isEditable: Bool {
     guard let currentDay else { return false }
-    return currentDay.id == StudentPlanSequence(days: viewModel.planDays).cursorDay?.id
+    return FlexibleTrainingDay.canWrite(currentDay, in: viewModel.planDays)
   }
 
   private var selectedDayState: TodayWorkoutDayState {
@@ -620,8 +620,8 @@ public struct TodayWorkoutView: View {
   }
 
   private var canUndoCurrentDay: Bool {
-    guard let completedAt = currentDay?.completedAt else { return false }
-    return WorkoutDatePolicy.gymDayRange(containing: Date()).contains(completedAt)
+    guard let currentDay else { return false }
+    return FlexibleTrainingDay.canUndo(currentDay.id, days: viewModel.planDays, now: Date())
   }
 
   private var sequencePage: TrainingSequencePage {

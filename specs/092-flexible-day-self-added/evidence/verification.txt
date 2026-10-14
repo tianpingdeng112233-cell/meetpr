@@ -1,21 +1,25 @@
-CoachKit full suite
-✔ Test run with 455 tests in 11 suites passed after 1.742 seconds.
+Spec 092 implementation verification, 2026-10-14 (historical)
+These results predate the integration of PR #364 into PR #363.
 
-Networking full suite
-✔ Test run with 134 tests in 3 suites passed after 0.049 seconds.
+Coach card B:
+- CoachKit 455 and Networking 134 tests passed.
+- MeetPR-Demo build/run succeeded; app stop succeeded.
+- swift-format strict, SwiftLint strict (1166 files), module boundaries and diff check passed.
+- Simulator shutdown initially failed with connection refused (exit 1); it was not verified then.
+- Red phases: missing API/DTO/ownership/presentation seams; D4/D2 ownership and completion assertions; added-card rendering, server catalog refresh and accessible metrics. See red-phases.log (summary).
 
-swiftlint lint --strict --no-cache
-Done linting! Found 0 violations, 0 serious in 1166 files.
+Student card A:
+- StudentKit 1010, Networking 135 and CoreModels 158 tests passed.
+- MeetPR-DemoStudent build/run succeeded.
+- swift-format strict, SwiftLint strict (68 changed files), all four module boundaries and diff check passed.
+- 37 student.added keys / 74 localized values matched Android 02213e4; existing values were unchanged.
+- Red phases first failed to compile missing FlexibleTrainingDay, isExtra, StudentAddedRows, AllStudentSetLogsDTO, StudentExerciseTag, addExtraSet and addStudentExercise seams.
+- flexibleDefaultResumesLatestRealGymDayAndUndoUsesTimestamp initially selected the wrong day; the assertion passed after repair.
+- changingFlexibleDayEndsRestAndPreservesRecordedSets passed (1 test).
+- App stop succeeded; simulator shutdown failed with connection refused (exit 1), so shutdown was not confirmed.
 
-MeetPR-Demo build
-** BUILD SUCCEEDED **
-
-xcrun simctl shutdown 8F164D5D-A450-44FD-BDBF-BB351572CF6E
-Unable to locate device set: Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0x8f7268930 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}
-
-swift-format lint --strict: no output, exit 0
-Module boundary checks: PASS (exit 0)
-git diff --check: no output, exit 0
-XcodeBuildMCP build_run_sim: ✅ Build & Run complete
-XcodeBuildMCP stop_app_sim: ✅ App stopped successfully
-Simulator shutdown: exit 1, NOT VERIFIED
+Later full-suite results, screenshots, review outcomes and unverified boundaries:
+- Student: docs/evidence/092-student/verification.txt and docs/CODEX-JOURNAL.md.
+- Coach: docs/evidence/092-ios-coach/verification.txt and docs/CODEX-JOURNAL.md.
+- Integrated branch: docs/evidence/092-integration/verification.txt.
+Raw console output was replaced with summaries; historical commit objects retain the originals.

@@ -100,8 +100,8 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     id: UUID,
     studentID: UUID,
     planExerciseID: UUID,
-    planDayID: UUID? = nil,
     exerciseID: UUID? = nil,
+    planDayID: UUID? = nil,
     setIndex: Int,
     weightKg: Decimal,
     reps: Int,
@@ -116,8 +116,8 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.id = id
     self.studentID = studentID
     self.planExerciseID = planExerciseID
-    self.planDayID = planDayID
     self.exerciseID = exerciseID
+    self.planDayID = planDayID
     self.setIndex = setIndex
     self.weightKg = weightKg
     self.reps = reps
@@ -154,8 +154,8 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encode(id, forKey: .id)
     try container.encode(studentID, forKey: .studentID)
     try container.encode(planExerciseID, forKey: .planExerciseID)
-    try container.encodeIfPresent(planDayID, forKey: .planDayID)
     try container.encodeIfPresent(exerciseID, forKey: .exerciseID)
+    try container.encodeIfPresent(planDayID, forKey: .planDayID)
     try container.encode(setIndex, forKey: .setIndex)
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
     try container.encode(reps, forKey: .reps)
@@ -172,8 +172,8 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case id
     case studentID = "studentId"
     case planExerciseID = "planExerciseId"
-    case planDayID = "planDayId"
     case exerciseID = "exerciseId"
+    case planDayID = "planDayId"
     case setIndex
     case weightKg
     case reps

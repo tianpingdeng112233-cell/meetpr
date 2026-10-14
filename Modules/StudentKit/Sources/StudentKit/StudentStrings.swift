@@ -32,6 +32,44 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let addedCancel = Key("student.added.cancel")
+    static let addedAddSet = Key("student.added.addSet")
+    static let addedExtra = Key("student.added.extra")
+    static let addedRemoveSet = Key("student.added.removeSet")
+    static let addedExtraHint = Key("student.added.extraHint")
+    static let addedAddExercise = Key("student.added.addExercise")
+    static let addedAdded = Key("student.added.added")
+    static let addedRemove = Key("student.added.remove")
+    static let addedAddedHint = Key("student.added.addedHint")
+    static let addedSearch = Key("student.added.search")
+    static let addedAlreadyAdded = Key("student.added.alreadyAdded")
+    static let addedInPlan = Key("student.added.inPlan")
+    static let addedConfirmSet = Key("student.added.confirmSet")
+    static let addedConfirmExercise = Key("student.added.confirmExercise")
+    static let addedHasVideo = Key("student.added.hasVideo")
+    static let addedRated = Key("student.added.rated")
+    static let addedDayConflict = Key("student.added.dayConflict")
+    static let addedNotAdded = Key("student.added.notAdded")
+    static let addedTagAll = Key("student.added.tag.all")
+    static let addedTagSquat = Key("student.added.tag.squat")
+    static let addedTagBench = Key("student.added.tag.bench")
+    static let addedTagDeadlift = Key("student.added.tag.deadlift")
+    static let addedTagCore = Key("student.added.tag.core")
+    static let addedTagOther = Key("student.added.tag.other")
+    static let addedTagChest = Key("student.added.tag.chest")
+    static let addedTagBack = Key("student.added.tag.back")
+    static let addedTagShoulders = Key("student.added.tag.shoulders")
+    static let addedTagBiceps = Key("student.added.tag.biceps")
+    static let addedTagTriceps = Key("student.added.tag.triceps")
+    static let addedTagTraps = Key("student.added.tag.traps")
+    static let addedTagForearms = Key("student.added.tag.forearms")
+    static let addedTagQuads = Key("student.added.tag.quads")
+    static let addedTagGlutes = Key("student.added.tag.glutes")
+    static let addedTagHamstrings = Key("student.added.tag.hamstrings")
+    static let addedTagCalves = Key("student.added.tag.calves")
+    static let addedTagAdductors = Key("student.added.tag.adductors")
+    static let addedTagHips = Key("student.added.tag.hips")
+
     fileprivate let value: String.LocalizationValue
     fileprivate let oneValue: String.LocalizationValue?
     fileprivate let countIndex: Int
@@ -1320,6 +1358,15 @@ enum StudentStrings {
       String(localized: key.value, bundle: .module, locale: locale),
       locale: locale
     )
+  }
+
+  /// Fixture names represent bilingual server fields, independent of the app's chosen language.
+  static func fixtureName(_ key: Key, locale: Locale) -> String {
+    let language = isEnglish(locale) ? "en" : "zh-Hans"
+    guard let path = Bundle.module.path(forResource: language, ofType: "lproj"),
+      let bundle = Bundle(path: path)
+    else { return localized(key, locale: locale) }
+    return String(localized: key.value, bundle: bundle, locale: locale)
   }
 
   static func replacing(

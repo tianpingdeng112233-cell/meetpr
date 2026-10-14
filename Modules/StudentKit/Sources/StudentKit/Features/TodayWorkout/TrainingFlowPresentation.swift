@@ -25,7 +25,7 @@ struct TrainingFlowPresentation: Equatable, Sendable {
   }
 
   var currentRow: TodayWorkoutPresentation.Row? {
-    hero?.rows.first { $0.draft.needsTrainingResult }
+    hero?.rows.first { $0.draft.needsTrainingResult && !$0.draft.isExtra }
   }
 }
 
@@ -39,14 +39,14 @@ extension TodayWorkoutPresentation {
 extension TodayWorkoutPresentation.Exercise {
   var trainingCompletedText: String {
     StudentStrings.replacing(
-      rows.count == 1 ? .trainingFlowCompletedOne : .trainingFlowCompletedMany,
-      values: [String(rows.count)])
+      prescribedRows.count == 1 ? .trainingFlowCompletedOne : .trainingFlowCompletedMany,
+      values: [String(prescribedRows.count)])
   }
 
   var trainingCompletedAccessibility: String {
     StudentStrings.replacing(
-      rows.count == 1
+      prescribedRows.count == 1
         ? .trainingFlowCompletedAccessibilityOne : .trainingFlowCompletedAccessibilityMany,
-      values: [name, String(rows.count)])
+      values: [name, String(prescribedRows.count)])
   }
 }

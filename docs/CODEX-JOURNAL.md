@@ -1,3 +1,9 @@
+## 2026-10-14 · Spec 092 · PR 整合修复（P1）
+
+David 直接授权先合 #364，再把 `release/1.0` 合入 #363。#364 已合为 `c65795c2`；教练父提交 `69a327fd`。自动合并复现 Networking 的 `planDayID` 重复声明与 CodingKey 重复值编译错误；共享 `SetLogDTOs.swift` 恢复成 #364 的唯一版本（`exerciseID` 后接 `planDayID`）。教练实际调用独立的 `CoachSetLogDTO`，核对后无须修改调用点。两端 Demo 接线、JOURNAL 历史均保留，verification 冲突按两端历史摘要合并。
+
+27 份入库原始日志（约 3.49 MB）换成简短结果摘要，保留原路径、截图、红阶段与未验边界；完整旧输出仍在父提交及仓外备份。九包全量 2169 项和 MeetPR / Debug 9 项通过，strict format/lint、模块边界与 diff check 通过；独立 Standards / Spec 各 0 findings。双端 Demo 构建与最终证据见 [整合验证](evidence/092-integration/verification.txt)，[审查记录](evidence/092-integration/review.txt)。本轮只更新 #363，未合并该 PR；产品正式验收仍由 Opus 按原清单执行。
+
 # 2026-09-27 P0 发版推进
 
 - David 授权 P0 加急，#345 已合并 release/1.0@03021ff6；此前待合并/P1 条目为历史状态。
@@ -1335,3 +1341,223 @@ David 本轮直接授权保留上一轮工作区、完成全量测试和模拟�
 本轮是开发自测与自审，不替代 Opus 的 spec 清单终验。仍未验证真实后端学员删除→教练刷新 E2E、历史 1.0(23) 包升级、iOS 17、VoiceOver 朗读；Dashboard 七列周表实屏仍沿用上一节未验边界（规则有测试，名单不是 Dashboard）。上一节 Networking 测试描述中“与日期参数”不准确：`coachReadRequestsAllLogs` 实际断言 `scope=all`，本轮按真实测试范围记录。原先 `specs/092-flexible-day-self-added/evidence/` 保留为上一轮历史证据，新增证据以本节路径为准。
 
 提交前仓内 hooks 自动清理了证据日志的尾随空白与 EOF 空行，日志内容与测试结论未变；重新暂存后检查。上述 diff-check 的最终核验包含新增文件。
+
+## 2026-10-14 · Spec 092 Card A · iOS 学员端（T2 / P1，工作区交付）
+
+工作树 `/Users/david/Projects/apps/MeetPR-wt-092a`，分支 `feat/092-ios-student`，基线 / 当前 HEAD 均为 `2b647a13`。启动首个操作已在本树试写并删除临时文件成功。按 CARD-A 执行，未 commit / push / 开 PR；未改 CoachKit、SPEC、CONTEXT、NEXT-RELEASE、依赖、工程结构或本地存储键。以下为开发自测证据，功能终验由 Opus 按既定清单收货。
+
+### 实现与工程归属
+
+- 可写、默认选中、撤销资格用 StudentKit 的纯函数 `FlexibleTrainingDay`，不更改共享 CoreModels 的原游标定义；本周未结算日使用原训练页，周历不改，摘要主按钮沿用已有「开始训练」文案键。实际换天后结束当前休息计时。
+- 额外组仍用 coached 请求和计划动作 ID，序号接处方之后；所有处方进度、批量完成、还差组数均排除额外组 / 自加动作。主项走原完整录入页，辅助项走原行内表格；额外组 RPE / 处方休息不预填，纯 RPE 处方不注入空杠重量。Quick log 中额外组只读。
+- 新增 `StudentAddedSetLog`（Sendable），不伪造 `planExerciseID`；StudentKit 增加可选能力仓库，Networking 增加 adhoc 请求、`scope=all` 响应与删除 API，原默认读取不变。`SetLogDTO.planDayID` 采用 `decodeIfPresent`。现有机器码没有白名单，六个码通过传输测试验证，404 `SET_NOT_FOUND` 在删除边界收敛成功。
+- 日期钉住在第一次写入尝试前，失败保留；跨日切换的延迟响应写回原 owner 草稿及服务端 ID；最后一条成功删除后按原 owner 清钉。整卡串行删除遇错停止，已成功的事实不回滚。
+- 历史、容量统计、CSV 和三大项家族 e1RM / PR 纳入自加记录；删除 / 取消后按剩余实录重算派生数据。网络事实与本地派生修复分开；缓存回退不能充当完整账本做删除推断，只有权威完整账本可在下次打开时修复遗漏。既有缓存键与磁盘结构不变。
+- `--spec092-added` 为显式 Demo 场景：D1 已结算、靠后 D4 已结算且时间最新，D2 两个处方组 + 一个额外组 + 坐姿划船自加记录；D3 可演示非游标写入。默认 Demo 保持无自加历史形态。仓库支持新增和删除。
+- 文案取只读 Android `02213e4:src/i18n/catalog/RnExtras.json`：37 个 `student.added.*` 键、74 个中英文值逐字一致；已有同义键复用，原本地化值未变。动作目录无 alias 字段，搜索只匹配中英文名。没有向 Android 工作树写入。
+- 大字号实屏发现新增额外组横排挤压，改为只在 accessibility 字号下纵排，默认字号仍按屏幕稿。原组件的英文动作标题 / 完成按钮在大字号下仍有截断（见截图），未扩改已有组件设计。
+
+### 先红后绿与回归纪律
+
+完整日志在 `/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-092a-6168730f39db/logs/`；仓内留关键原始摘录于 `specs/092-flexible-day-self-added/evidence/verification.txt`。
+
+- seam 1：首次缺 `FlexibleTrainingDay` 编译红（04:29:51），随后次日默认返回错误的断言红（04:33:55），再绿。
+- seam 2：缺 `isExtra` / 合并接口编译红（04:34:37）；Quick log 错把额外组纳入勾选与 entries 断言红（04:47:14）；最近实际记录预填错值（04:59:47）后修正。
+- seam 3：`StudentExerciseTag` 缺失编译红（04:37:35），实现标签归类和双语搜索后绿。
+- seam 4：写入 API 缺失编译红（04:39:18），取消触感、恢复 owner / 日期、错误提示仍落通用分支、删除后 e1RM 遗留分别出现断言红，再定向修复。断网、延迟响应、10/10 限制、非 PR baseline 回退及权威账本修复为审查后补充回归，加入时部分直接绿，不冒称这些补充测试都先红。
+- seam 5：all-scope DTO / 请求缺失编译红（04:35:57 / 04:36:58），可选 `planDayID` 缺失编译红（04:50:24），实现后绿。
+- seam 6：历史映射缺失编译红（04:48:28）；删除后派生数据未消失断言红（04:52:55）；统计 / CSV 新输入 seam 缺失编译红（05:03:50）；同组序上次记录 API 缺失红（05:19:23），随后绿。
+- 模拟器新增发现：换天未结束休息计时。`changingFlexibleDayEndsRestAndPreservesRecordedSets` 在 05:38:15 明确断言红（`restTimer` 仍为 180 秒），05:38:42 绿。首次修复在全量中多发首次加载 `.end`，3 个既有计时测试失败；收窄为“存在计时且换天”后最终 1010 全绿，未改原断言。最新模拟器复走亦确认 D3 → D2 计时条消失、D2 仍 2/3。
+- 直接 shell SwiftPM 的早期失败来自缓存写权限 / 嵌套 sandbox / 依赖网络限制（`/tmp/092-red-sequence*.log`），不计为行为红。最终各包通过 XcodeBuildMCP 的 `swift_package_test` 执行真实 SwiftPM 全量。
+
+既有测试只改 fixture（`makePlanView()` → `StudentAddedTestPlan.unsettledDemo()`），所有 `#expect` / `#require` / `Issue.record` 断言均未删改。原默认 Demo 前两日已结算；新增写门禁后这些“可保存”场景必须使用未结算日，保留原测试意图。逐项如下：
+
+| 原测试 | fixture 调整原因 |
+|---|---|
+| `todayWorkoutViewModelPersistsEditsToCompletedSet` | 已完成组仍属于未结算训练日，才能测试编辑保存。 |
+| `todayWorkoutViewModelLoadsRecordsAndReturnsToLoaded` | 需要实际写入后检查 loaded 状态。 |
+| `todayWorkoutViewModelUpdatesActualWeight` | 编辑场景使用可写训练日，与同组保存 fixture 一致。 |
+| `todayWorkoutViewModelKeepsWorkoutAndDraftWhenRecordingFails` | 需到达假仓库失败，而非被已结算门禁提前拒绝。 |
+| `todayWorkoutViewModelExplainsServerRecordingFailure` | 需执行请求以验证服务端失败提示。 |
+| `todayWorkoutViewModelRestoresLoadedWhenRecordingURLCancelled` | 需执行请求以触发 URL 取消。 |
+| `todayWorkoutViewModelRestoresLoadedWhenRecordingCancellationError` | 需执行请求以触发 Task 取消。 |
+| `todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage` | 需执行请求以触发会话过期映射。 |
+| `ensureLoggedSetIDKeepsFlushedEditsWithoutCompleting` | 视频前置 flush 在可写日测试。 |
+| `stalePersistDoesNotTouchReloadedState` | 需发出可挂起的写入再切换状态。 |
+| `overlappingVideoMintAndCompleteApplyInOrder` | 需进入视频 ID 与完成写入的竞争路径。 |
+| `recordingThatStartsDuringRefreshKeepsTheVisibleWorkoutGeneration` | 需真正开始写入以验证 generation 保护。 |
+| `completionTimeoutRollsBackWithoutWaitingForUncooperativeRequest` | 结算前保存的 fixture 要可写，保留超时断言。 |
+| `completionFailureClosesCelebrationPreservesSetsAndAllowsRetry` | 结算失败前真实组保存需成功。 |
+| `realSaveOverAssumedRecordRestoresSharingImmediately` | assumed → real 的写回需发生于未结算日。 |
+
+### 学员验收清单逐项对应（测试通过不代替终验）
+
+截图均在 `specs/092-flexible-day-self-added/evidence/`，同一 iPhone 17e `BBE9EB95-01DE-452E-866C-3DD0B62F9BDA`，未操作其他模拟器。
+
+| SPEC 项 | 测试名 / 实屏证据 | 覆盖边界 |
+|---|---|---|
+| 1 本周非游标可写、切回保留 | `flexibleWeekAllowsUnsettledDaysOnly`、`changingFlexibleDayEndsRestAndPreservesRecordedSets`；`en-same-week-start.jpg`、`en-same-week-recorded.jpg`、`en-return-d2-preserved-no-rest.jpg` | Demo 用 D3（D4 已结算），实点完整录入成功，回 D2 仍 2/3。 |
+| 2 先后结算 / 最新撤销 | `flexibleDefaultResumesLatestRealGymDayAndUndoUsesTimestamp`；既有 completion / undo 全量测试；`zh-completed-readonly.jpg` | 最新资格按时间验证；未在 UI 连续完成“双日结算再撤销”整条路径。 |
+| 3 外周 / 已结算只读 | `flexibleWeekAllowsUnsettledDaysOnly`、`fullEntryRejectsOtherWeekWrites`；`en-other-week-readonly.jpg`、`zh-completed-readonly.jpg` | 实屏无新增入口，完整录入 public seam 也拦外周。 |
+| 4 重进默认日 / 04:00 gym-day | `flexibleDefaultResumesLatestRealGymDayAndUndoUsesTimestamp`、`addedRowsRestoreOwnerAndPinnedDateAcrossDaySwitch` | 使用纯函数时钟与假仓库；未改系统时钟跨 04:00，Demo 进程重启会重新造 seed，不能当持久化升级证据。 |
+| 5 主项额外组 | `addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes`、`extraPrefillUsesMostRecentlyRecordedSet`、`extraCancellationRemovesE1RMAndPR`；`zh-added-and-extra.jpg`、`zh-extra-entry-optional-rpe.jpg` | 已实点加组、完整页预填 90×3 / 空 RPE 并保存，剩余仍 1 组；未实拍视频上传 / 教练待看联调。 |
+| 6 辅助项额外组 / 批量排除 | `extraRowsNeverReplacePrescriptionProgressAndBatch`、`addedCancellationDoesNotRepeatCompletionFeedback`；既有 089 全量回归 | 行模型与共享行内写入 seam 覆盖；未逐点走完辅助项额外组的 UI 增删整链。 |
+| 7 2 个处方 + 1 额外仍差 1 | `extraRowsNeverReplacePrescriptionProgressAndBatch`；`zh-added-and-extra.jpg`、`zh-added-saved.jpg` | 截图与录入后的运行时文本均仍显示差 1。 |
+| 8 选择、自加卡、历史、进步 | `studentPickerMapsEveryMuscleAndFamily`、`studentPickerIncludesThreeFamiliesMultipleMusclesAndUnclassifiedExercises`、`addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes`、`addedHistoryMarksExtraAndIncludesFamilyRecords`、`addedRecordsContributeToHistoryStatsAndCSV`；`zh-picker.jpg`、`zh-added-saved.jpg`、`en-history-added-extra.jpg`、`zh-history.jpg` | UI 已选硬拉、100×5 保存、确认整卡移除；历史显示双标记。e1RM / PR 纳入及删除由测试验证，未在 UI 完整走进步曲线变化。 |
+| 9 两个 10 上限 | `quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit`、`addedExercisesAndRowsStopAtTenWithoutChangingPrescription` | 测试覆盖到 10 拒绝第 11；未在 UI 重复点击到两种上限。 |
+| 9b 单组完成轻触感 | `addedCancellationDoesNotRepeatCompletionFeedback`、既有 accessory completion 回归；`.sensoryFeedback(.impact(weight: .light), trigger: inlineCompletionFeedback)` 接线自查 | 模拟器已点 ✓；事件只在有效完成递增，取消不增，批量保留原按钮反馈；未验真机体感。 |
+| 10 老用户首屏 | `zh-old-user-no-added.jpg`、`zh-added-and-extra.jpg`、`en-return-d2-preserved-no-rest.jpg`；`plannedDTOAcceptsMissingPlanDayID` | 按卡看默认无自加记录与训练到一半两种 Demo；未安装真实 1.0(23) 旧二进制做升级。 |
+| 11 断网保留 / 重试 | `addedFailureKeepsInputAndPinnedDateAcrossRetry`、`extraFailureKeepsInputAndCanRetry`、`addedWriteFinishingAfterDaySwitchKeepsCanonicalID`、`deletingLastAddedRowDuringDaySwitchClearsDatePin` | 假仓库注入错误 / 延迟响应，保留输入、跨日日期、成功重试；没有连接未部署的 spec 050 后端。 |
+| 补记只读 | `quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit` | 额外组 visible / readonly / excluded，未单独截图补记页。 |
+| 网络六码 / 可选 DTO | `studentAddedErrorCodesSurviveTransport`（六参数）、`addedErrorsHaveSpecificRecovery`（四提示）、`studentAddedResponseKeepsNullablePlanSlotAndOptionalDay`、`studentAddedRequestUsesDayAndAllScopeWithoutChangingPlanDefault`、`plannedDTOAcceptsMissingPlanDayID` | 未发布日复用既有提示；404 已删在网络删除边界验证。 |
+| 派生修复 | `deletingAddedSetRemovesItsE1RMAndPR`、`deletedHighestAddedWeightRestoresNonPRBaseline`、`authoritativeLedgerRepairsDeletedSourceAfterReopening`、`previousAddedSessionUsesMatchingIndexAndIgnoresFailed`、`addedPreviousRecordCanFillWeightAndRepsWithoutRPE` | 权威 / 缓存区分、重新打开修复、同组序上次记录、失败组排除。 |
+| 语言 / 大字号 / 深色 | `zh-picker.jpg`、`en-picker-accessibility-large-dark.jpg`、`en-extra-accessibility-large-dark.jpg` | 中英文实屏；三组标签在大字号各自换行，无横向滚动；新增额外组文字可读。 |
+
+### 独立审查与本地处置
+
+使用 code-review / review-loop 的只读 Standards 与 Spec 双轴，运行两轮（只读快照 `/tmp/092-review`、`/tmp/092-review2`）。仓库缺 `docs/agents/issue-tracker.md`，依赖该配置的 Matt tracker 工作流未运行；不妨碍本地独立审查。未自行创建 tracker 配置。
+
+第一轮 Standards 5 项、Spec 8 项（存在重叠）：跨日服务端 ID、远端事实与派生失败、离线缓存、baseline 从 PR 错误重建、CAS 冲突静默、完整录入门禁、预填时间、上次记录、统计 / CSV。第二轮指出权威账本恢复、额外组重放、跨日删除最后行清钉、同组序历史等缺口。均已本地修复并对应新增回归，最终全量通过。第二轮 reviewer 的快照结论仍为 BLOCKERS；遵守技能两轮上限，没有发起第三轮，**不把后续本地修复冒称独立 reviewer 已给 CLEAN**。交 Opus 收货复核最终 diff。无待 David 决定的产品分叉。
+
+### 自检最后结果、环境限制与清理
+
+| 自检 | 最后结果行 / 结果 |
+|---|---|
+| `swift test --package-path Modules/StudentKit`（MCP SwiftPM） | `✔ Test run with 1010 tests in 46 suites passed`，0 failed / 0 skipped。 |
+| `swift test --package-path Modules/Networking`（MCP SwiftPM） | `✔ Test run with 135 tests`，0 failed / 0 skipped。 |
+| `swift test --package-path Modules/CoreModels`（MCP SwiftPM） | `✔ Test run with 158 tests`，0 failed / 0 skipped。 |
+| `xcrun swift-format lint --strict <68 个改动 Swift 文件>` | exit 0，无输出；`/tmp/092-format.log`。 |
+| `swiftlint lint --strict <同 68 文件>` | `Done linting! Found 0 violations, 0 serious in 68 files.` |
+| 模块边界 CI 等价四项 rg 检查 | PASS：Coach/Student 无互相 import 或 Package 依赖。 |
+| `git diff --check` | exit 0，无输出。 |
+| `MeetPR-DemoStudent`，指定 UDID 构建运行 | `** BUILD SUCCEEDED **`；61.838 秒，0 warnings / 0 errors，已安装运行并实屏检查。 |
+| `stop_app_sim` | `SUCCEEDED`，Demo 已停止。 |
+| `xcrun simctl shutdown BBE9EB95-01DE-452E-866C-3DD0B62F9BDA` | exit 1：`CoreSimulatorService connection became invalid` / `Connection refused`。 |
+
+完整命令结果与原始红阶段摘录见 `evidence/verification.txt`，不是只保留成功摘要。shell 对 CoreSimulator 的 XPC 连接被 sandbox 拒绝；Computer Use 也未获 Simulator 访问，未绕过权限。可用 XcodeBuildMCP 没有 shutdown 接口。**指定模拟器尚未确认关闭，须宿主侧关闭这一台**；没有碰其他设备。
+
+最终已验证 `.app` 保留在 `/tmp/meetpr-spec092-student.app`，删除本任务独占 `.build-092/` 中间产物；未清理别人的工作树 / 模拟器 / 构建目录。测试、截图均用 Demo / 假仓库，不读取凭证。上述 UI 未走全的路径、后端联调、真机触感及旧二进制升级留待终验，未宣称功能验收通过。
+
+### 本卡改动文件清单
+
+- `MeetPR/Sources/MeetPRApp.swift`
+- `Modules/CoreModels/Sources/CoreModels/Entities/Plan/StudentAddedSetLog.swift`
+- `Modules/Networking/Sources/Networking/APIClient+StudentAddedSets.swift`
+- `Modules/Networking/Sources/Networking/DTO/AllStudentSetLogsDTO.swift`
+- `Modules/Networking/Sources/Networking/DTO/CreateStudentAddedSetRequestDTO.swift`
+- `Modules/Networking/Sources/Networking/DTO/SetLogDTOs.swift`
+- `Modules/Networking/Tests/NetworkingTests/StudentAddedSetDTOTests.swift`
+- `Modules/StudentKit/Sources/StudentKit/Demo/StudentAddedDemoScenario.swift`
+- `Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/ExportDataSheet.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/GrowthCurveViewModel.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingLogCSVExporter.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryLogCard.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryLogRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryRow.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedTrainingExercise.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/ExtraSetControls.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/FlexibleTrainingDay.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/QuickLogPlan.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/QuickLogSheet.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/RemoveStudentSetButton.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/SetEntrySheet.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/StudentAddedExerciseSection.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/StudentAddedInlineRows.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/StudentAddedPreviousSession.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/StudentAddedRows.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/StudentExercisePicker.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/StudentExerciseTag.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutPresentation.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutScreen.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutTypes.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel+DraftBuilding.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel+RecordingError.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutViewModel.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingCompletionAvailability.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingExerciseProgress.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingFlowPresentation.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TrainingSetProgress.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/AllHistoryScreen.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/GrowthScreenPresentation.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistoryEntriesView.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/ProgressDataModel.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/ProgressMetrics.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedDerivedHistory.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistory.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistoryRows.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedLedgerRepair.swift`
+- `Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryViewModel.swift`
+- `Modules/StudentKit/Sources/StudentKit/Repository/BackendStudentTrainingLogRepository.swift`
+- `Modules/StudentKit/Sources/StudentKit/Repository/InMemoryStudentTrainingLogRepository.swift`
+- `Modules/StudentKit/Sources/StudentKit/Repository/StudentAddedLogError.swift`
+- `Modules/StudentKit/Sources/StudentKit/Repository/StudentAddedLogRepository.swift`
+- `Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings`
+- `Modules/StudentKit/Sources/StudentKit/StudentFormatting.swift`
+- `Modules/StudentKit/Sources/StudentKit/StudentRootView.swift`
+- `Modules/StudentKit/Sources/StudentKit/StudentStrings.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/FlexibleTrainingDayTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedErrorTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedFailureTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedRowsTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedTestSupport.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedWriteTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentExercisePickerTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutAssumedWriteBackTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutCompletionInFlightTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutPersistOrderingTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutRefreshTests.swift`
+- `Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/TodayWorkoutViewModelTests.swift`
+- `docs/CODEX-JOURNAL.md`
+- `specs/092-flexible-day-self-added/evidence/en-extra-accessibility-large-dark.jpg`
+- `specs/092-flexible-day-self-added/evidence/en-history-added-extra.jpg`
+- `specs/092-flexible-day-self-added/evidence/en-other-week-readonly.jpg`
+- `specs/092-flexible-day-self-added/evidence/en-picker-accessibility-large-dark.jpg`
+- `specs/092-flexible-day-self-added/evidence/en-return-d2-preserved-no-rest.jpg`
+- `specs/092-flexible-day-self-added/evidence/en-same-week-recorded.jpg`
+- `specs/092-flexible-day-self-added/evidence/en-same-week-start.jpg`
+- `specs/092-flexible-day-self-added/evidence/verification.txt`
+- `specs/092-flexible-day-self-added/evidence/zh-added-and-extra.jpg`
+- `specs/092-flexible-day-self-added/evidence/zh-added-saved.jpg`
+- `specs/092-flexible-day-self-added/evidence/zh-completed-readonly.jpg`
+- `specs/092-flexible-day-self-added/evidence/zh-extra-entry-optional-rpe.jpg`
+- `specs/092-flexible-day-self-added/evidence/zh-history.jpg`
+- `specs/092-flexible-day-self-added/evidence/zh-old-user-no-added.jpg`
+- `specs/092-flexible-day-self-added/evidence/zh-picker.jpg`
+
+
+## 2026-10-14 · Spec 092 卡 A 续作与 David 直驱交付
+
+- 工作树：`MeetPR-wt-092a`，分支 `feat/092-ios-student`。接续原有未提交实现，未回滚或重建；David 本轮明确授权测试后 commit / push / PR，不合并，覆盖卡中原「不提交」限制。只改本工作树。
+- 实现依据：本仓 spec 092 / 卡 A，Android PR #92（`meetpr-rn@e00edc5f7f3d0733f2e4ac9aa6f112c2020c48aa`），以及该 RN 分支 `docs/ios-handoff-2026-10-14-walkthrough.md` 第 3 项。后者在 iOS 树不存在，按 RN 原文读取，未另造正典。
+- 已完成日改用与开始前概览一致的卡片：成功色左线、今日训练标题与完成标记、仅处方动作/组数；每动作已记 x/y，展开显示实际记录、未记组为 —、额外标记；自加动作末尾独立行；撤销保留原规则。移除原重复完成 notice 和记录卡。
+- 审查修复：离线缓存账本显式非权威；抓远端账本前取 revision，私有重放后单次 CAS 提交，旧账本不重试覆盖新保存；处方重量基线沿用比赛动作/站姿解析，自加仍按三大项家族；目录失败保留已有行且后续重试，未完整读到目录不得全量重建 PB。
+- UI 续测又修复两处 Demo 问题：固定 locale 不会覆盖 App 的资源语言，动作名改为显式 en / zh-Hans lproj 读取，确保中文环境英文搜索可用；预加载计划首次进入时，目录 fallback 使用传入计划，防止尚未赋值的 planDays 清空目录。
+- 回归：缓存可信性、旧账本与并发保存、目录失败与恢复、目录缺失保留 PB、预加载计划动作名、已完成日处方/实际分离均有失败证据及修后验证；Demo 双语名称另有回归测试。既有断言的调整沿用前节逐项原因。
+
+### 本轮验证证据
+
+原始截图和测试输出放 `docs/evidence/092-student/`；上轮 `specs/092-flexible-day-self-added/evidence/` 保留。下列是开发自测，不替代 Opus 按 spec 的正式验收。
+
+- 全量 SwiftPM：StudentKit **1018**、Networking **135**、CoreModels **158**、CoachKit **443**、AppShell **107**、RepositoryContracts **6**、DesignSystem **73**、ChatUI **84**、Analytics **30**，共 **2154** 通过。StudentKit 首轮并发负载下视频测试超时，串行全量重跑通过；CoachKit / AppShell 首轮 MCP 进程无法连接 GitHub，使用当前 shell 网络下载后完整测试通过。AppShell 曾因同时修改源码中断，最终稳定源码全量 107 再跑通过。
+- 73 个变更 Swift 文件 `swift-format lint --strict`、仓 `swiftlint lint --strict`、模块边界检查和 `git diff --check` 通过。
+- `MeetPR-DemoStudent` 最终 DemoStudent 配置模拟器构建通过，日志：`build_sim_2026-10-14T08-11-27-932Z_pid76155_1a9fe369.log`。仅指定 iPhone 17e / iOS 26.4（`BBE9EB95-01DE-452E-866C-3DD0B62F9BDA`）用于本轮截图。工具早期按同名设备重新解析过目标，后续固定 UDID 并重新构建验证。
+- 中文：同周 D3 开始并记 1 组，回 D2 原 2/3 保留；主项新增额外组、完整录入 RPE 留空保存、删除确认；D2 2/3 + 额外 + 自加结算，新卡展开显示正确，撤销只在最新结算日可用；新增窄握卧推保存；历史显示两类标记。
+- 英文：最终二进制初次加载 Seated Row 名称恢复；选择页搜索 Close 命中，选中后新增自加卡，100 × 5 @8 保存；Progress 刷新后卧推 e1RM 从 118.6 到 128.2，历史显示 Close Grip Bench Press / Added by you / Extra。刻意输入 150 × 5 的异常估计值未抬升曲线，沿用既有异常值规则。
+- 视觉：中文深色；英文浅色、accessibility-large 的选择页（所有筛选标签可见并按语义行换行）和完成日卡（长名称换行，撤销可达）。已亲眼查看截图。原主项 hero 在最大字号下重量会换行，这是既有布局，未在本卡扩大修改。
+- 最终新增两处 Demo 返修经过 Standards 定向复核；Standards 与 Spec 独立结论另见本节后续记录。仓缺 `docs/agents/issue-tracker.md`，未伪称执行依赖 tracker 的 Matt 流程；本地双轴只读审查已执行，配置补齐需 David 调用 `$setup-matt-pocock-skills`。
+
+### 未验证与保留边界
+
+- 后端 spec 050 尚未部署：真实 adhoc 保存/删除、scope=all 联调、教练端实时读回及视频附件联动没有验证；网络契约和错误分支以假仓库/DTO 测试验证。
+- 模拟器无法确认真机触感体感；只验证 light 触发门控与代码接线。没有执行旧发布二进制到新包的真实升级，按卡使用 Demo 的进行中/无自加形态验证。04:00 跨日与进程重入规则由单元测试覆盖，没有让模拟器跨日等待。
+- 辅助项全部完成、上限 10、断网保留/重试等边界以本卡自动化回归与上轮证据为准，本轮未重新手点所有组合。
+
+### 最终工程闸与独立审查
+
+- Xcode MeetPR / Debug / 指定 iPhone 17e：9 项测试通过（test_sim_2026-10-14T08-22-07-424Z_pid76155_58f5dfd1.log），连同 SwiftPM 共 2163 项测试通过。
+- Standards：初轮缓存权威性、旧账本覆盖并发保存两项 P1 修复，第二轮 CLEAN；Demo 双语资源、预加载目录和 SourceSnapshot 参数整理定向复核 CLEAN。
+- Spec：初轮比赛动作基线、目录失败丢行两项修复；第二轮缺目录重建 PB 的 P2 补先红后绿回归并修复，定向复核 CLEAN。无未决 blocker；正式验收仍由 Opus 按原清单执行。
+- David 最终确认 PR 指向 release/1.0，不合并；基线 7acf289c8578663e3b8155544514f080f9795743。未 rebase 或修改其他工作树。
+- 指定模拟器已关机。生成目录移入本树 gitignore 的 .build/spec092-derived，最终 Demo app 位于其中 Build/Products/DemoStudent-iphonesimulator/MeetPR.app；未清理其他任务产物。

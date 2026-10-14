@@ -19,7 +19,8 @@ struct AccessoryLogRow: View {
       AccessoryColumns {
         Button(action: onEdit) {
           VStack(spacing: MeetPRSpacing.zero) {
-            Text(String(number)).font(.MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
+            Text(row.draft.isExtra ? StudentStrings.localized(.addedExtra) : String(number)).font(
+              .MeetPR.mono(size: MeetPRFontMetrics.size15, weight: .bold))
             if row.hasVideo {
               Image(systemName: "video.fill")
                 .font(.caption2)
@@ -29,16 +30,17 @@ struct AccessoryLogRow: View {
           .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
           .background(Color.MeetPR.surfaceRaised, in: .rect(cornerRadius: MeetPRRadius.inset))
         }
+        .disabled(row.draft.isStudentAdded)
         .accessibilityLabel(copy(.accessoryDetails))
         .accessibilityIdentifier("accessory.set.\(number).details")
         Button {
           row.usePrevious()
         } label: {
           Text(
-            row.previous.map {
+            row.previousReps.map {
               [
                 row.isBodyweight ? StudentStrings.localized(.accessoryBw) : row.weightPlaceholder,
-                String($0.reps),
+                String($0),
               ].joined(separator: " × ")
             } ?? "—"
           )
@@ -48,7 +50,7 @@ struct AccessoryLogRow: View {
           .frame(maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget)
         }
         .foregroundStyle(Color.MeetPR.textMuted)
-        .disabled(row.previous == nil)
+        .disabled(row.previousReps == nil)
         .accessibilityLabel(copy(.accessoryUseLast))
         if row.isBodyweight {
           Text(StudentStrings.localized(.accessoryBw))

@@ -164,7 +164,8 @@ struct MeetPRApp: App {
     ) -> RootView {
       let markerRepository = makeDemoVideoMarkers(studentState: studentState)
       let studentLogs = InMemoryStudentTrainingLogRepository(
-        seed: studentState.logs + CoachDemoSeed.pendingVideoSetLogs()
+        seed: studentState.logs + CoachDemoSeed.pendingVideoSetLogs(),
+        added: StudentDemoSeed.makeStudentAddedLogs(plan: studentState.plan)
       )
       return RootView(
         coachPlans: InMemoryPlanRepository.preview(store: planStore),

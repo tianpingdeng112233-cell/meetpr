@@ -45,7 +45,16 @@ struct AccessoryLogCard: View {
             Task { await viewModel.saveAccessoryRow(input) }
           }
         )
+        if presentationRow.draft.isExtra {
+          HStack {
+            Spacer()
+            RemoveStudentSetButton(row: presentationRow, viewModel: viewModel)
+          }
+        }
       }
+      ExtraSetControls(
+        exercise: exercise, viewModel: viewModel, editable: true, onEdit: onEdit,
+        showsRows: false)
       if showsSkipped {
         let count = AccessoryRow.selection(exercise.rows.map { row(for: $0) }).skipped.count
         if count > 0 {
@@ -64,7 +73,9 @@ struct AccessoryLogCard: View {
         .foregroundStyle(Color.MeetPR.textSecondary)
         .fixedSize(horizontal: false, vertical: true)
         .accessibilityIdentifier("accessory.hint")
-      if exercise.rows.contains(where: { !$0.draft.completed && !$0.draft.failed }) {
+      if exercise.rows.contains(where: {
+        !$0.draft.completed && !$0.draft.failed && !$0.draft.isExtra
+      }) {
         Button {
           showsSkipped = true
           let rows = exercise.rows.map { row(for: $0) }
@@ -91,7 +102,8 @@ struct AccessoryLogCard: View {
 
   private func row(for row: TodayWorkoutPresentation.Row) -> AccessoryRow {
     var source = AccessoryRow(
-      draft: row.draft, previous: previousLogs[row.draft.prescribed.setIndex], unit: unit,
+      draft: row.draft,
+      previous: row.draft.isExtra ? nil : previousLogs[row.draft.prescribed.setIndex], unit: unit,
       hasVideo: row.record.videoState != .none)
     if let edit = edits[row.id], edit.draft == source.draft, edit.unit == source.unit {
       source.input = edit.input

@@ -274,14 +274,21 @@ enum StudentFormatting {
     return line
   }
 
+}
+
+extension StudentFormatting {
   static func completedCount(
     for day: StudentPlanDay,
     logs: [StudentSetLog]
   ) -> (completed: Int, total: Int) {
     let total = day.exercises.reduce(0) { $0 + $1.prescribedSets.count }
     let planExerciseIDs = Set(day.exercises.map(\.id))
-    let completed = logs.filter {
-      planExerciseIDs.contains($0.planExerciseID) && $0.completed && !$0.assumed
+    let completed = logs.filter { log in
+      planExerciseIDs.contains(log.planExerciseID) && log.completed && !log.assumed
+        && day.exercises.contains { exercise in
+          exercise.id == log.planExerciseID
+            && exercise.prescribedSets.contains { $0.setIndex == log.setIndex }
+        }
     }.count
     return (completed, total)
   }

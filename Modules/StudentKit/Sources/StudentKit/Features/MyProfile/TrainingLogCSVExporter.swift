@@ -10,6 +10,7 @@ public enum TrainingLogCSVExporter {
   public static func csv(
     logs: [StudentSetLog],
     names: [UUID: (name: String, nameEn: String?)],
+    added: [StudentAddedSetLog] = [], catalog: [Exercise] = [],
     calendar: Calendar = .current
   ) -> String {
     let rows = logs.sorted { $0.loggedAt < $1.loggedAt }.map { log in
@@ -28,7 +29,17 @@ public enum TrainingLogCSVExporter {
       ]
       return fields.map(escape).joined(separator: ",")
     }
-    return ([header] + rows).joined(separator: "\n")
+    let addedRows = added.sorted { $0.loggedAt < $1.loggedAt }.map { log in
+      let exercise = catalog.first { $0.id == log.exerciseID }
+      return [
+        log.loggedDate ?? dayString(log.loggedAt, calendar: calendar),
+        exercise?.name ?? log.exerciseID.uuidString, exercise?.nameEn ?? "",
+        String(log.setIndex), "\(log.weightKg)", String(log.reps),
+        log.rpe.map { "\($0)" } ?? "", log.completed ? "true" : "false",
+        log.failed ? "true" : "false", "true",
+      ].map(escape).joined(separator: ",")
+    }
+    return ([header] + rows + addedRows).joined(separator: "\n")
   }
 
   static func dayString(_ date: Date, calendar: Calendar) -> String {

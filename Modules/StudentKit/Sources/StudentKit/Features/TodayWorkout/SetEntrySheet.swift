@@ -74,7 +74,9 @@ struct SetEntrySheet: View {
     )
     _showsRPEPlaceholder = State(initialValue: seed.prescribed.rpe == nil)
     let weight: Decimal?
-    if seed.prescribed.isLegacyPrescription {
+    if seed.isExtra {
+      weight = seed.actualWeight
+    } else if seed.prescribed.isLegacyPrescription {
       // Pre-072 chain, unchanged for legacy rows: barbell lifts floor at the
       // empty bar (20kg); accessories legitimately go below, down to 0.
       let weightFloor: Decimal = draft.isAccessory ? 0 : 20
@@ -93,7 +95,10 @@ struct SetEntrySheet: View {
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
     _weightText = State(initialValue: weight.map(SetEntryValue.text) ?? "")
     _repsText = State(initialValue: reps.formatted())
-    _rpeText = State(initialValue: SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
+    _rpeText = State(
+      initialValue: seed.isExtra
+        ? seed.actualRPE.map(SetEntryValue.text) ?? ""
+        : SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
   }
 
   var body: some View {
@@ -575,7 +580,10 @@ extension SetEntrySheet {
   fileprivate func syncDraftEdits() {
     viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
     viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
-    viewModel.updateRPE(rowIndex: rowIndex, rpe: rpeValue)
+    viewModel.updateRPE(
+      rowIndex: rowIndex,
+      rpe: draft.isExtra
+        ? SetEntryValue.enteredRPE(from: rpeText) : rpeValue)
   }
 
   fileprivate func save(failed: Bool) {

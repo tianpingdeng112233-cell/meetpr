@@ -12,7 +12,7 @@ import Testing
   // clearing `assumed` on upsert). The persist merge must write persisted.assumed back into
   // the draft, or the ask-coach entry stays hidden until a full reload.
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let firstSet = plan.days[0].exercises[0].prescribedSets[0]
   let assumedLog = StudentSetLog(
     id: UUID(),

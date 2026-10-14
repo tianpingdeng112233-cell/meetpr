@@ -487,12 +487,22 @@ private struct QuickLogExerciseCard: View {
         QuickLogColumnHeaders()
         VStack(spacing: MeetPRSpacing.point6) {
           ForEach(rows) { row in
-            QuickLogSetRow(
-              row: row,
-              isActive: activeRowID == row.id ? activeField : nil,
-              onSelect: { onSelect(row.id, $0) },
-              onToggle: { onToggle(row.id) }
-            )
+            if row.draft.isExtra {
+              HStack {
+                Text(StudentStrings.localized(.addedExtra))
+                Text(UnitDisplay.weightText(kg: row.draft.actualWeight, unit: .kg))
+                Text("× " + String(row.draft.actualReps ?? 0))
+                Spacer()
+                if row.draft.completed { Image(systemName: "checkmark") }
+              }.font(.callout).foregroundStyle(Color.MeetPR.textMuted)
+            } else {
+              QuickLogSetRow(
+                row: row,
+                isActive: activeRowID == row.id ? activeField : nil,
+                onSelect: { onSelect(row.id, $0) },
+                onToggle: { onToggle(row.id) }
+              )
+            }
           }
         }
       }

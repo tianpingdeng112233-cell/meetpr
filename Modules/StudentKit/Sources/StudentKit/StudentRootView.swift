@@ -55,7 +55,8 @@ public struct StudentRootView: View {
     let plan = StudentDemoSeed.makePlanView()
     let store = StudentRootDemoPlanStore(studentID: StudentDemoSeed.studentID, plan: plan)
     let logs = InMemoryStudentTrainingLogRepository(
-      seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID)
+      seed: StudentDemoSeed.makeHistoricalLogs(studentID: StudentDemoSeed.studentID),
+      added: StudentDemoSeed.makeStudentAddedLogs(plan: plan)
     )
     self.init(
       studentID: StudentDemoSeed.studentID,

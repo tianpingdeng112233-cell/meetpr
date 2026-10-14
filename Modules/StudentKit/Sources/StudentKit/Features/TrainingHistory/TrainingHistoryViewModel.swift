@@ -23,6 +23,8 @@ public final class TrainingHistoryViewModel {
     }
   }
 
+  private(set) var addedLogs: [StudentAddedSetLog] = []
+  private(set) var catalog: [Exercise] = []
   public private(set) var state: State = .idle
 
   private let plans: any StudentPlanRepository
@@ -53,10 +55,24 @@ public final class TrainingHistoryViewModel {
         WorkoutDatePolicy.deviceCalendar.date(
           bySettingHour: 12, minute: 0, second: 0, of: timestamp
         ) ?? timestamp
-      let fetchedLogs = try await logs.fetchLogs(
-        studentID: studentID,
-        in: Self.allHistoryStart...max(timestamp, todayNoon)
-      )
+      let fetchedLogs: [StudentSetLog]
+      if let repository = logs as? any StudentAddedLogRepository {
+        let all = try await repository.fetchAllLogs(
+          studentID: studentID,
+          in: Self.allHistoryStart...max(timestamp, todayNoon))
+        fetchedLogs = all.planned
+        addedLogs = all.added
+        if let reader = plans as? any ExerciseCatalogReading {
+          catalog =
+            (try? await reader.fetchExerciseCatalog()) ?? days.flatMap(\.exercises).map(\.exercise)
+        } else {
+          catalog = days.flatMap(\.exercises).map(\.exercise)
+        }
+      } else {
+        fetchedLogs = try await logs.fetchLogs(
+          studentID: studentID,
+          in: Self.allHistoryStart...max(timestamp, todayNoon))
+      }
       state = .loaded(weeks: weeks, logs: fetchedLogs)
     } catch {
       if error.isTaskCancellation {

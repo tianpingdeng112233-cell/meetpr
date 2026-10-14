@@ -56,16 +56,17 @@ public enum StudentDemoSeed {
         exercises: exercises(forDayOffset: offset)
       )
     }
-    return TrainingFlowDemoScenario.configure(
-      AccessoryDemoScenario.configure(
-        StudentPlanView(
-          cycleID: uuid(301),
-          weekIndex: weekIndex,
-          startDate: scenarioStart,
-          endDate: scenarioStart.addingTimeInterval(Double(scenario == nil ? 7 : 13) * 86_400),
-          publishedAt: referenceDate,
-          days: days
-        )))
+    return StudentAddedDemoScenario.configure(
+      TrainingFlowDemoScenario.configure(
+        AccessoryDemoScenario.configure(
+          StudentPlanView(
+            cycleID: uuid(301),
+            weekIndex: weekIndex,
+            startDate: scenarioStart,
+            endDate: scenarioStart.addingTimeInterval(Double(scenario == nil ? 7 : 13) * 86_400),
+            publishedAt: referenceDate,
+            days: days
+          ))))
   }
 
   public static func makeHistoricalLogs(
@@ -77,6 +78,9 @@ public enum StudentDemoSeed {
       return scenario.logs(studentID: studentID)
     }
     let plan = makePlanView(weekIndex: weekIndex)
+    if StudentAddedDemoScenario.enabled {
+      return StudentAddedDemoScenario.logs(plan: plan, studentID: studentID)
+    }
     if TrainingFlowDemoScenario.enabled {
       return TrainingFlowDemoScenario.logs(plan: plan, studentID: studentID)
     }
@@ -157,11 +161,11 @@ public enum StudentDemoSeed {
         exercise(
           .init(
             index: 0,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed005,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed005, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed005, locale: englishLocale),
             family: .squat, weight: 142.5, reps: 5, rpe: 7.5,
             note: StudentStrings.localized(.studentDemoSeed006)))
       ]
@@ -170,11 +174,11 @@ public enum StudentDemoSeed {
         exercise(
           .init(
             index: 1,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed007,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed007, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed007, locale: englishLocale),
             family: .bench, weight: 92.5, reps: 5, rpe: 8
           )
         )
@@ -184,11 +188,11 @@ public enum StudentDemoSeed {
         exercise(
           .init(
             index: 2,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed008,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed008, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed008, locale: englishLocale),
             family: .deadlift, weight: 175, reps: 3, rpe: 8.5,
             note: StudentStrings.localized(.studentDemoSeed009)))
       ]
@@ -199,32 +203,32 @@ public enum StudentDemoSeed {
         exercise(
           .init(
             index: 6,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed005,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed005, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed005, locale: englishLocale),
             family: .squat, weight: 130, reps: 5, rpe: 7
           )
         ),
         exercise(
           .init(
             index: 3,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed010,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed010, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed010, locale: englishLocale),
             family: .bench, weight: 75, reps: 6, rpe: nil,
             type: .mainLiftVariation)),
         exercise(
           .init(
             index: 4,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed011,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed011, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed011, locale: englishLocale),
             family: nil, weight: 55, reps: 10, rpe: 8
           )
         ),
@@ -234,11 +238,11 @@ public enum StudentDemoSeed {
         exercise(
           .init(
             index: 0,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed005,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed005, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed005, locale: englishLocale),
             family: .squat, weight: 145, reps: 4, rpe: 8
           )
         )
@@ -248,11 +252,11 @@ public enum StudentDemoSeed {
         exercise(
           .init(
             index: 1,
-            name: StudentStrings.localized(
+            name: StudentStrings.fixtureName(
               .studentDemoSeed007,
               locale: canonicalChineseLocale
             ),
-            nameEn: StudentStrings.localized(.studentDemoSeed007, locale: englishLocale),
+            nameEn: StudentStrings.fixtureName(.studentDemoSeed007, locale: englishLocale),
             family: .bench, weight: 95, reps: 4, rpe: 8
           )
         )

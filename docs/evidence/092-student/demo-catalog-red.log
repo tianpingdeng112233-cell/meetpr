@@ -1,0 +1,2 @@
+Summary only; original console output removed from the repository.
+Historical student red phase, 2026-10-14: planOnlyCatalogKeepsAddedNamesOnFirstLoad failed 1 assertion; exerciseName was an em dash instead of the expected catalog name. Later green result: student-tests.log (1018 tests).

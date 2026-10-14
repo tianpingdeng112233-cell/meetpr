@@ -41,6 +41,7 @@ public final class GrowthCurveViewModel {
   private(set) var visibleRawEligiblePoints: [E1RMHistoryPoint] = []
 
   private let plans: any StudentPlanRepository
+  private let logs: (any StudentTrainingLogRepository)?
   private let e1rm: any E1RMRepository
   private let onboarding: (any OnboardingProfileReading)?
   private let reconciler: E1RMCoachRPEReconciler?
@@ -57,6 +58,7 @@ public final class GrowthCurveViewModel {
   ) {
     self.plans = plans
     self.e1rm = e1rm
+    self.logs = logs
     self.onboarding = onboarding
     self.now = now
     if let logs, let onboarding {
@@ -80,11 +82,13 @@ public final class GrowthCurveViewModel {
     do {
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
       let profile = try await onboarding?.fetchProfile(studentId: studentID)
-      let idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
+      var idsByFamily = MainLiftExerciseFamilyResolver.exerciseIDsByFamily(
         in: plan,
         onboarding: profile
       )
 
+      try? await includeAddedHistory(
+        studentID: studentID, plan: plan, profile: profile, ids: &idsByFamily)
       var grouped: [LiftFamily: E1RMSeries] = [:]
       var pointsByID: [UUID: E1RMHistoryPoint] = [:]
       for (family, ids) in idsByFamily {
@@ -114,6 +118,40 @@ public final class GrowthCurveViewModel {
       }
       if case .loaded = state { return }
       state = .error(error.localizedDescription)
+    }
+  }
+
+  private func includeAddedHistory(
+    studentID: UUID, plan: StudentPlanView?, profile: OnboardingProfile?,
+    ids: inout [LiftFamily: Set<UUID>]
+  ) async throws {
+    for family in LiftFamily.allCases {
+      let stored = try await e1rm.fetchHistory(studentId: studentID, family: family)
+      ids[family, default: []].formUnion(stored.map(\.exerciseId))
+    }
+    if let repository = logs as? any StudentAddedLogRepository {
+      let revision = try await e1rm.historySnapshot(studentId: studentID, exerciseIds: []).revision
+      let all = try await repository.fetchAllLogs(
+        studentID: studentID,
+        in: Date(timeIntervalSince1970: 0)...now())
+      let catalog: [Exercise]
+      if let reader = plans as? any ExerciseCatalogReading {
+        catalog = try await reader.fetchExerciseCatalog()
+      } else {
+        catalog = plan?.days.flatMap(\.exercises).map(\.exercise) ?? []
+      }
+      try await StudentAddedLedgerRepair.reconcile(
+        source: .init(records: all, revision: revision), studentID: studentID,
+        days: plan?.days ?? [], catalog: catalog,
+        profile: profile, repository: e1rm)
+      if all.isAuthoritative && !all.isCompleteLedger {
+        await StudentAddedHistory.record(all.added, catalog: catalog, e1rm: e1rm, profile: profile)
+      }
+      for log in all.added {
+        if let family = StudentAddedHistory.family(log, catalog: catalog) {
+          ids[family, default: []].insert(log.exerciseID)
+        }
+      }
     }
   }
 

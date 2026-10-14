@@ -7,6 +7,8 @@ struct HistoryEntriesView: View {
   let weeks: [TrainingHistoryViewModel.HistoryWeek]
   let logs: [StudentSetLog]
   @Binding var selectedExerciseName: String?
+  var addedLogs: [StudentAddedSetLog] = []
+  var catalog: [Exercise] = []
 
   static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
     StudentStrings.replacing(
@@ -44,7 +46,11 @@ struct HistoryEntriesView: View {
         day.exercises.map { StudentExerciseName.display($0.exercise) }
       }
     }
-    return Array(Set(names)).sorted {
+    let addedIDs = Set(addedLogs.map(\.exerciseID))
+    let addedNames = catalog.filter { addedIDs.contains($0.id) }.map {
+      StudentExerciseName.display($0)
+    }
+    return Array(Set(names + addedNames)).sorted {
       $0.localizedStandardCompare($1) == .orderedAscending
     }
   }
@@ -56,6 +62,12 @@ struct HistoryEntriesView: View {
         day.exercises.contains {
           StudentExerciseName.display($0.exercise) == selectedExerciseName
         }
+          || addedLogs.contains { log in
+            log.planDayID == day.id
+              && catalog.contains {
+                $0.id == log.exerciseID && StudentExerciseName.display($0) == selectedExerciseName
+              }
+          }
       }
       guard !filteredDays.isEmpty else { return nil }
       return TrainingHistoryViewModel.HistoryWeek(id: week.id, days: filteredDays)
@@ -72,6 +84,7 @@ struct HistoryEntriesView: View {
           exerciseBlock(exercise, logs: logs)
         }
       }
+      StudentAddedHistoryRows(logs: addedLogs.filter { $0.planDayID == day.id }, catalog: catalog)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
     .padding(MeetPRSpacing.md)
@@ -100,6 +113,18 @@ struct HistoryEntriesView: View {
           log: logs.first { $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex }
         )
       }
+      ForEach(
+        logs.filter {
+          $0.planExerciseID == exercise.id && $0.setIndex >= exercise.prescribedSets.count
+        }
+      ) { log in
+        HStack {
+          Text(StudentStrings.localized(.addedExtra)).font(.caption)
+          Text(StudentFormatting.decimal(log.weightKg) + " kg × " + String(log.reps))
+          if log.completed { Image(systemName: "checkmark") }
+        }.foregroundStyle(Color.MeetPR.textSecondary)
+      }
+
     }
   }
 }
