@@ -2,7 +2,7 @@
 
 按 David 截图与明确格式，额外组和学员自加组复用 `HistorySetRow`：左侧「额外」或「第 N 组」，右侧统一重量/次数/RPE，去掉独立勾号与 kg 前空格；自加动作标题沿用计划动作 body13 bold，附小灰字「自加」。原处方组的已记录、未记录状态样式保持一致。
 
-两项渲染回归先红后绿，StudentKit 全量 1020 项、strict format/lint 通过；Standards 与 Spec 独立审查各 0 findings。MeetPR / Debug 已成功构建并安装运行到 iPhone 12（iOS 26.5）。真机目标历史截图待核对。证据见 [验证摘要](evidence/092-history-style/verification.txt) 与 [审查摘要](evidence/092-history-style/review.txt)。本次不含既有 Xcode scheme/用户状态与 xcstrings 工作区改动。
+两项渲染回归先红后绿，StudentKit 全量 1020 项、strict format/lint 通过；Standards 与 Spec 独立审查各 0 findings。MeetPR / Debug 已成功构建并安装运行到 iPhone 12（iOS 26.5）。David 已在真机查看目标记录并确认「修好了」；本轮未留存目标历史页截图。证据见 [验证摘要](evidence/092-history-style/verification.txt) 与 [审查摘要](evidence/092-history-style/review.txt)。本次不含既有 Xcode scheme/用户状态与 xcstrings 工作区改动。
 
 ## 2026-10-14 · Spec 092 · PR 整合修复（P1）
 

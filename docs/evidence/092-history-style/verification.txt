@@ -11,7 +11,10 @@ git diff --check: PASS.
 Device build: MeetPR / Debug / Tianping iPhone 12 / iOS 26.5: PASS.
 Xcode build log: 7A99A9F2-B40A-4BD3-A80C-4873E55EF6A3.xcactivitylog; status S, 0 errors, 0 warnings.
 Install and launch: Xcode reports Running MeetPR on Tianping的iPhone.
-Physical-device screenshot comparison: pending target record navigation.
+Physical-device visual verification: David inspected the updated target history on the phone and confirmed “修好了”.
+No target-history screenshot was retained in this follow-up; do not treat this as an agent screenshot comparison.
+Code commit: 251b163ec8f91e16ad0b972053d62d3419e111be.
+CI: https://github.com/tianpingdeng112233-cell/meetpr/actions/runs/38546225214 (format/lint passed; build/test still running at recording).
 Environment: first full-test/device-build attempt stopped on ENOSPC before validation.
 Removed only this session’s rebuildable 092-integration-derived cache. XcodeBuildMCP transport then closed; full StudentKit rerun used SwiftPM CLI, device build uses Xcode UI.
 Raw outputs remain outside Git in /Users/david/Projects/scratch/092-history-style/ and XcodeBuildMCP local logs.
