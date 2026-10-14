@@ -1,98 +1,25 @@
-Spec 092 Card A verification, 2026-10-14
-Branch feat/092-ios-student, HEAD 2b647a13; no commit/push.
+Spec 092 implementation verification, 2026-10-14 (historical)
+These results predate the integration of PR #364 into PR #363.
 
-StudentKit: ✔ Test run with 1010 tests in 46 suites passed after 4.295 seconds.
-Full log: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-092a-6168730f39db/logs/swift_package_test_2026-10-14T05-40-44-167Z_pid28243_b498dafb.log
+Coach card B:
+- CoachKit 455 and Networking 134 tests passed.
+- MeetPR-Demo build/run succeeded; app stop succeeded.
+- swift-format strict, SwiftLint strict (1166 files), module boundaries and diff check passed.
+- Simulator shutdown initially failed with connection refused (exit 1); it was not verified then.
+- Red phases: missing API/DTO/ownership/presentation seams; D4/D2 ownership and completion assertions; added-card rendering, server catalog refresh and accessible metrics. See red-phases.log (summary).
 
-Networking: ✔ Test run with 135 tests in 3 suites passed after 0.038 seconds.
-Full log: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-092a-6168730f39db/logs/swift_package_test_2026-10-14T05-07-53-900Z_pid28243_86d3267f.log
+Student card A:
+- StudentKit 1010, Networking 135 and CoreModels 158 tests passed.
+- MeetPR-DemoStudent build/run succeeded.
+- swift-format strict, SwiftLint strict (68 changed files), all four module boundaries and diff check passed.
+- 37 student.added keys / 74 localized values matched Android 02213e4; existing values were unchanged.
+- Red phases first failed to compile missing FlexibleTrainingDay, isExtra, StudentAddedRows, AllStudentSetLogsDTO, StudentExerciseTag, addExtraSet and addStudentExercise seams.
+- flexibleDefaultResumesLatestRealGymDayAndUndoUsesTimestamp initially selected the wrong day; the assertion passed after repair.
+- changingFlexibleDayEndsRestAndPreservesRecordedSets passed (1 test).
+- App stop succeeded; simulator shutdown failed with connection refused (exit 1), so shutdown was not confirmed.
 
-CoreModels: ✔ Test run with 158 tests in 2 suites passed after 0.020 seconds.
-Full log: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-092a-6168730f39db/logs/swift_package_test_2026-10-14T05-07-05-269Z_pid28243_4be773de.log
-
-DemoStudent: ** BUILD SUCCEEDED **
-Full log: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-092a-6168730f39db/logs/build_run_sim_2026-10-14T05-41-05-391Z_pid28243_8f32cddb.log
-
-swift-format lint --strict: exit 0, no output.
-swiftlint lint --strict: Done linting! Found 0 violations, 0 serious in 68 files.
-git diff --check: exit 0.
-Module boundary CI checks: PASS (4).
-Localization: 37 student.added keys / 74 values exactly match Android 02213e4; existing values unchanged.
-
-RED EVIDENCE EXCERPTS (compiler missing-seam failures and behavior assertion failures are distinguished):
-
-swift_package_test_2026-10-14T04-29-51-511Z_pid28243_5bf778e4.log
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/FlexibleTrainingDayTests.swift:11:13: error: cannot find 'FlexibleTrainingDay' in scope
-   |             `- error: cannot find 'FlexibleTrainingDay' in scope
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/FlexibleTrainingDayTests.swift:11:13: error: cannot find 'FlexibleTrainingDay' in scope
-
-swift_package_test_2026-10-14T04-33-55-267Z_pid28243_80f46903.log
-✘ Test flexibleDefaultResumesLatestRealGymDayAndUndoUsesTimestamp() recorded an issue at FlexibleTrainingDayTests.swift:27:3: Expectation failed: (FlexibleTrainingDay.defaultDay(days: days, logs: [log], now: now.addingTimeInterval(86400))?.id → 02400000-0000-0000-0000-000000001002) == (first.id → 02400000-0000-0000-0000-000000001000)
-
-swift_package_test_2026-10-14T04-34-37-776Z_pid28243_a0765936.log
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedRowsTests.swift:18:22: error: value of type 'TodayWorkoutViewModel.SetRowDraft' (aka 'TodayWorkoutSetRowDraft') has no member 'isExtra'
-   |                      `- error: value of type 'TodayWorkoutViewModel.SetRowDraft' (aka 'TodayWorkoutSetRowDraft') has no member 'isExtra'
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedRowsTests.swift:21:30: error: cannot find 'StudentAddedRows' in scope
-
-swift_package_test_2026-10-14T04-35-57-390Z_pid28243_5a22a7d6.log
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/Networking/Tests/NetworkingTests/StudentAddedSetDTOTests.swift:14:47: error: cannot find 'AllStudentSetLogsDTO' in scope
-   |                                               `- error: cannot find 'AllStudentSetLogsDTO' in scope
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/Networking/Tests/NetworkingTests/StudentAddedSetDTOTests.swift:14:40: error: failed to produce diagnostic for expression; please submit a bug report (https://swift.org/contributing/#reporting-bugs)
-
-swift_package_test_2026-10-14T04-37-35-597Z_pid28243_f3342ad4.log
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentExercisePickerTests.swift:9:13: error: cannot find 'StudentExerciseTag' in scope
-   |             `- error: cannot find 'StudentExerciseTag' in scope
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentExercisePickerTests.swift:11:11: error: cannot find 'StudentExerciseTag' in scope
-
-swift_package_test_2026-10-14T04-39-18-223Z_pid28243_73d2d476.log
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedWriteTests.swift:17:9: error: value of type 'TodayWorkoutViewModel' has no member 'addExtraSet'
-   |         `- error: value of type 'TodayWorkoutViewModel' has no member 'addExtraSet'
-/Users/david/Projects/apps/MeetPR-wt-092a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/StudentAddedWriteTests.swift:28:9: error: value of type 'TodayWorkoutViewModel' has no member 'addStudentExercise'
-
-swift_package_test_2026-10-14T04-43-34-522Z_pid28243_0b1c75b6.log
-✘ Test addedErrorsHaveSpecificRecovery(code:) recorded an issue with 1 argument code → "SET_NOT_STUDENT_ADDED" at StudentAddedErrorTests.swift:11:3: Expectation failed: (TodayWorkoutViewModel.recordingErrorMessage(for: error) → "记录没有保存，请重试。你的输入仍保留在本页。") != (StudentStrings.localized(.todayWorkoutViewModelRecordingError004) → "记录没有保存，请重试。你的输入仍保留在本页。")
-✘ Test addedErrorsHaveSpecificRecovery(code:) recorded an issue with 1 argument code → "SET_HAS_ATTACHMENT" at StudentAddedErrorTests.swift:11:3: Expectation failed: (TodayWorkoutViewModel.recordingErrorMessage(for: error) → "记录没有保存，请重试。你的输入仍保留在本页。") != (StudentStrings.localized(.todayWorkoutViewModelRecordingError004) → "记录没有保存，请重试。你的输入仍保留在本页。")
-✘ Test addedErrorsHaveSpecificRecovery(code:) recorded an issue with 1 argument code → "SET_HAS_COACH_FEEDBACK" at StudentAddedErrorTests.swift:11:3: Expectation failed: (TodayWorkoutViewModel.recordingErrorMessage(for: error) → "记录没有保存，请重试。你的输入仍保留在本页。") != (StudentStrings.localized(.todayWorkoutViewModelRecordingError004) → "记录没有保存，请重试。你的输入仍保留在本页。")
-
-swift_package_test_2026-10-14T04-47-14-298Z_pid28243_aad87c9b.log
-✘ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() recorded an issue at StudentAddedRowsTests.swift:41:3: Expectation failed: (quick.rows.last?.included → true) == false
-✘ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() recorded an issue at StudentAddedRowsTests.swift:42:3: Expectation failed: (quick.entries(studentID: StudentDemoSeed.studentID).count → 13) == (drafts.count - 10 → 3)
-
-swift_package_test_2026-10-14T04-52-55-483Z_pid28243_b868fe60.log
-✘ Test deletingAddedSetRemovesItsE1RMAndPR() recorded an issue at StudentAddedWriteTests.swift:109:3: Expectation failed: try await e1rm.fetchHistory(studentId: StudentDemoSeed.studentID, exerciseId: exercise.id).isEmpty
-
-swift_package_test_2026-10-14T04-59-47-561Z_pid28243_936a00c8.log
-✘ Test extraPrefillUsesMostRecentlyRecordedSet() recorded an issue at StudentAddedRowsTests.swift:86:3: Expectation failed: (row.actualWeight → 80) == 90
-✘ Test extraPrefillUsesMostRecentlyRecordedSet() recorded an issue at StudentAddedRowsTests.swift:87:3: Expectation failed: (row.actualReps → 5) == 4
-✘ Test fullEntryRejectsOtherWeekWrites() recorded an issue at StudentAddedWriteTests.swift:141:3: Expectation failed: await model.commitSet(rowIndex: 0) == false
-
-swift_package_test_2026-10-14T05-38-15-614Z_pid28243_12a509a1.log
-✘ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() recorded an issue at StudentAddedWriteTests.swift:24:3: Expectation failed: (model.restTimer → TodayWorkoutRestTimerState(endsAt: 2026-10-14 05:41:25 +0000, totalSeconds: 180)) == nil
-
-REST GREEN:
-↳ Target Platform: arm64e-apple-macos14.0
-◇ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() started.
-✔ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() passed after 0.013 seconds.
-✔ Test run with 1 test in 0 suites passed after 0.013 seconds.
-
-SHUTDOWN: app stop SUCCEEDED; xcrun simctl shutdown BBE9EB95-01DE-452E-866C-3DD0B62F9BDA exit 1. Simulator shutdown NOT confirmed.
-2026-10-14 06:47:16.678 simctl[64778:570706] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
-2026-10-14 06:47:16.679 simctl[64778:570709] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f063c0e0> { count = 1, transaction: 0, voucher = 0x0, contents =
-	"XPCErrorDescription" => <string: 0x1f063c220> { string cache = 0x0, length = 18, contents = "Connection invalid" }
-}>
-2026-10-14 06:47:16.680 simctl[64778:570709] Error opening log file (/Users/david/Library/Logs/CoreSimulator/CoreSimulator.com.apple.CoreSimulator.simctl.log): Operation not permitted
-[-[SimServiceContext sendRequest:]:1751] ERROR : Unable to deliver request ({
-    "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
-    request = "set_developer_dir";
-}) because we are not connected to CoreSimulatorService.
-[-[SimServiceContext initWithDeveloperDir:connectionType:error:]:432] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
-[-[SimDiskImageManager init]:175] ERROR : Could not kickstart simdiskimaged; SimDiskImageManager services will not be available: Error Domain=NSPOSIXErrorDomain Code=53 "Software caused connection abort" UserInfo={NSLocalizedDescription=Error returned in reply from CoreSimulatorService: Connection invalid}
-[-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
-[-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
-[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:468] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=410 "The service used to manage runtime disk images (simdiskimaged) crashed or is not responding" UserInfo={NSLocalizedDescription=The service used to manage runtime disk images (simdiskimaged) crashed or is not responding}
-[-[SimServiceContext sendRequest:reply:error:]:1771] ERROR : Unable to deliver request ({
-    request = "notification_subscription";
-    "set_path" = "/Users/david/Library/Developer/CoreSimulator/Devices";
-}) because we are not connected to CoreSimulatorService.
-2026-10-14 06:47:16.792 simctl[64778:570705] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
-Unable to locate device set: Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0xc21220630 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}
+Later full-suite results, screenshots, review outcomes and unverified boundaries:
+- Student: docs/evidence/092-student/verification.txt and docs/CODEX-JOURNAL.md.
+- Coach: docs/evidence/092-ios-coach/verification.txt and docs/CODEX-JOURNAL.md.
+- Integrated branch: docs/evidence/092-integration/verification.txt.
+Raw console output was replaced with summaries; historical commit objects retain the originals.

@@ -1,0 +1,20 @@
+2026-10-14 | Spec 092 integration | independent read-only review
+
+Scope: merge c65795c2 (release/1.0, PR #364) into 69a327fd (feat/092-ios-coach, PR #363).
+Sources: user integration instructions, local AGENTS.md/CLAUDE.md, spec 092 and CARD-B.
+Two independent reviewers; one round; no follow-up fixes required.
+
+Standards: CLEAN, 0 documented-standard violations or material code smells.
+- SetLogDTOs.swift exactly matches the student parent; planDayID is unique.
+- Coach callers use CoachSetLogDTO; no SetLogDTO argument ordering mismatch.
+- Both Demo integrations and both journal histories retained.
+- Historical log summaries preserve outcomes and failed-shutdown limitations.
+
+Spec: CLEAN, 0 missing, extra or incorrect requirements in the integration scope.
+- DTO definition/order matches #364 and coach calls remain compatible.
+- Both parent journal entries and Demo paths are preserved.
+- 17 historical test/lint result lines match the source commits exactly.
+- Red-phase and failure limitations remain explicit; historical results are not presented as new runs.
+
+Review is static and limited to integration, not a repeat of feature acceptance.
+The primary agent owns execution evidence in verification.txt. Opus final acceptance remains separate.

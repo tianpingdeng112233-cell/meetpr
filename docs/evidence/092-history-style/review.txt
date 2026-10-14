@@ -1,0 +1,7 @@
+2026-10-14 — training history row style follow-up
+Base: d271227d45fcce5d4bc3477b6ef5495a7c4a72fe
+Scope: HistoryEntriesView.swift, StudentAddedHistoryRows.swift, SetNumberSurfaceTests.swift.
+One independent read-only review round; unrelated Xcode and xcstrings work excluded.
+Standards: CLEAN (0 findings).
+Spec: CLEAN (0 findings); physical-device screenshot verification tracked separately.
+Source of requirements: David’s explicit history-row formatting request and screenshot.

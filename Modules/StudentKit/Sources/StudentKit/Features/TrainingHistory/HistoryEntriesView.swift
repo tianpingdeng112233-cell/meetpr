@@ -118,11 +118,11 @@ struct HistoryEntriesView: View {
           $0.planExerciseID == exercise.id && $0.setIndex >= exercise.prescribedSets.count
         }
       ) { log in
-        HStack {
-          Text(StudentStrings.localized(.addedExtra)).font(.caption)
-          Text(StudentFormatting.decimal(log.weightKg) + " kg × " + String(log.reps))
-          if log.completed { Image(systemName: "checkmark") }
-        }.foregroundStyle(Color.MeetPR.textSecondary)
+        HistorySetRow(
+          label: StudentStrings.localized(.addedExtra),
+          result: StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe),
+          completed: log.completed
+        )
       }
 
     }
@@ -327,25 +327,42 @@ private struct HistoryDayHeader: View {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-private struct HistorySetRow: View {
-  let set: PrescribedSet
-  let log: StudentSetLog?
+struct HistorySetRow: View {
+  let label: String
+  let result: String
+  let completed: Bool?
+
+  init(set: PrescribedSet, log: StudentSetLog?) {
+    label = HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex)
+    result =
+      log.map {
+        StudentFormatting.result(weightKg: $0.weightKg, reps: $0.reps, rpe: $0.rpe)
+      } ?? StudentFormatting.prescribed(set)
+    completed = log?.completed
+  }
+
+  init(label: String, result: String, completed: Bool) {
+    self.label = label
+    self.result = result
+    self.completed = completed
+  }
 
   var body: some View {
     HStack {
-      Text(HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex))
+      Text(label)
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
       Spacer()
-      if let log {
-        Text(StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe))
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .bold))
-          .foregroundStyle(log.completed ? Color.MeetPR.success : Color.MeetPR.textSecondary)
-      } else {
-        Text(StudentFormatting.prescribed(set))
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
-          .foregroundStyle(Color.MeetPR.textMuted)
-      }
+      Text(result)
+        .font(
+          .MeetPR.mono(size: MeetPRFontMetrics.size11, weight: completed == nil ? .medium : .bold)
+        )
+        .foregroundStyle(resultColor)
     }
+  }
+
+  private var resultColor: Color {
+    guard let completed else { return Color.MeetPR.textMuted }
+    return completed ? Color.MeetPR.success : Color.MeetPR.textSecondary
   }
 }

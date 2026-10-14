@@ -1,5 +1,6 @@
 import CoreModels
 import DesignSystem
+import Networking
 import SwiftUI
 
 @MainActor
@@ -8,19 +9,37 @@ struct CoachDayDetailView: View {
   let day: StudentExecutionDay
 
   var body: some View {
+    let presentation = CoachDayDetailPresentation(day: day)
     ScrollView {
       VStack(alignment: .leading, spacing: MeetPRSpacing.base) {
-        if let planDay = day.planDay, !planDay.exercises.isEmpty {
-          ForEach(planDay.exercises) { exercise in
-            exerciseCard(exercise)
+        if let code = day.dayCode {
+          let status = day.hasTrained ? CoachDetailStrings.completed : CoachDetailStrings.notStarted
+          Text("\(code) · \(status)")
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+        }
+        ForEach(presentation.planned) { group in
+          CoachPlannedExerciseCard(group: group)
+        }
+        ForEach(presentation.added) { group in
+          CoachAddedExerciseCard(group: group)
+        }
+        if presentation.planned.isEmpty && presentation.added.isEmpty {
+          if day.allLogs.isEmpty {
+            ContentUnavailableView(
+              CoachStudentDetailStrings.text("coach.execution.restDay"), systemImage: "moon"
+            )
+            .frame(maxWidth: .infinity)
+          } else {
+            Card(accessibilityLabel: CoachStudentDetailStrings.text("coach.execution.freeLog")) {
+              VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+                Text(CoachStudentDetailStrings.text("coach.execution.freeLog"))
+                  .font(Font.MeetPR.headline)
+                  .foregroundStyle(Color.MeetPR.fgPrimary)
+                CoachReadOnlySets(logs: day.allLogs)
+              }
+            }
           }
-        } else if !day.logs.isEmpty {
-          freeLogCard
-        } else {
-          ContentUnavailableView(
-            CoachStudentDetailStrings.text("coach.execution.restDay"), systemImage: "moon"
-          )
-          .frame(maxWidth: .infinity)
         }
       }
       .padding(MeetPRSpacing.base)
@@ -28,67 +47,78 @@ struct CoachDayDetailView: View {
     .navigationTitle(CoachStudentFormatting.fullDateText(day.date))
     .background(Color.MeetPR.bg)
   }
+}
 
-  private func exerciseCard(_ exercise: StudentPlanExercise) -> some View {
-    let logs = logs(for: exercise)
-    let exerciseName = CoachLocalization.exerciseName(exercise.exercise)
-    return Card(accessibilityLabel: exerciseName) {
+@MainActor
+private struct CoachPlannedExerciseCard: View {
+  let group: CoachDayDetailPresentation.Planned
+
+  var body: some View {
+    let name = CoachLocalization.exerciseName(group.exercise.exercise)
+    let recorded = group.prescribed.count
+    let total = group.exercise.prescribedSets.count
+    Card(accessibilityLabel: name) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        VStack(alignment: .leading, spacing: 2) {
-          Text(exerciseName)
-            .font(Font.MeetPR.headline)
-            .foregroundStyle(Color.MeetPR.fgPrimary)
-          Text(
-            CoachLocalization.localized(
-              "coach.execution.loggedSetsFraction \(logs.count) \(exercise.prescribedSets.count)")
+        Text(name)
+          .font(Font.MeetPR.headline)
+          .foregroundStyle(Color.MeetPR.fgPrimary)
+        Text(
+          CoachLocalization.localized(
+            "coach.execution.loggedSetsFraction \(recorded) \(total)"
           )
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
+        )
+        .font(Font.MeetPR.footnote)
+        .foregroundStyle(Color.MeetPR.fgSecondary)
+        CoachReadOnlySets(logs: group.prescribed)
+        if !group.extra.isEmpty {
+          Text(CoachLocalization.localized("coach.execution.addedByStudent"))
+            .font(Font.MeetPR.footnote)
+            .foregroundStyle(Color.MeetPR.fgSecondary)
+          CoachReadOnlySets(logs: group.extra)
         }
-
-        if logs.isEmpty {
+        if group.prescribed.isEmpty && group.extra.isEmpty {
           Text(CoachStudentDetailStrings.text("coach.execution.noLoggedSets"))
             .font(Font.MeetPR.body)
             .foregroundStyle(Color.MeetPR.fgSecondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, MeetPRSpacing.sm)
-        } else {
-          ForEach(logs) { log in
-            SetReadOnlyCell(
-              setIndex: log.setIndex,
-              weightKg: log.weightKg,
-              reps: log.reps,
-              rpe: log.rpe,
-              isCompleted: log.completed
-            )
-          }
         }
       }
     }
   }
+}
 
-  private var freeLogCard: some View {
-    Card(accessibilityLabel: CoachStudentDetailStrings.text("coach.execution.freeLog")) {
+@MainActor
+private struct CoachAddedExerciseCard: View {
+  let group: CoachDayDetailPresentation.Added
+
+  var body: some View {
+    let name =
+      group.exercise.map { CoachLocalization.exerciseName($0) }
+      ?? CoachLocalization.localized("coach.planning.common.unknownExercise")
+    Card(accessibilityLabel: name) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
-        Text(CoachStudentDetailStrings.text("coach.execution.freeLog"))
+        Text(name)
           .font(Font.MeetPR.headline)
           .foregroundStyle(Color.MeetPR.fgPrimary)
-        ForEach(day.logs) { log in
-          SetReadOnlyCell(
-            setIndex: log.setIndex,
-            weightKg: log.weightKg,
-            reps: log.reps,
-            rpe: log.rpe,
-            isCompleted: log.completed
-          )
-        }
+        Text(CoachLocalization.localized("coach.execution.studentAddedSets \(group.logs.count)"))
+          .font(Font.MeetPR.footnote)
+          .foregroundStyle(Color.MeetPR.fgSecondary)
+        CoachReadOnlySets(logs: group.logs)
       }
     }
   }
 
-  private func logs(for exercise: StudentPlanExercise) -> [StudentSetLog] {
-    day.logs
-      .filter { $0.planExerciseID == exercise.id }
-      .sorted { $0.setIndex < $1.setIndex }
+}
+
+@MainActor
+private struct CoachReadOnlySets: View {
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  let logs: [CoachSetLogDTO]
+
+  var body: some View {
+    ForEach(logs) { log in
+      CoachSetReadOnlyRow(log: log, isAccessibilitySize: dynamicTypeSize.isAccessibilitySize)
+    }
   }
 }

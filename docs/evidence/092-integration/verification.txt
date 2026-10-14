@@ -1,0 +1,38 @@
+2026-10-14 | Spec 092 PR integration | developer verification
+
+Scope and source revisions:
+- PR #364 merged into release/1.0 as c65795c28611e55145c0c4c5486845b1bef3b271.
+- Coach branch before merge: 69a327fd580afbf2d8ebd7c01b40f8c6ca76bcf6 (PR #363).
+- Merge release/1.0 into feat/092-ios-coach; PR #363 stays open for review.
+
+Resolution:
+- SetLogDTOs.swift is byte-identical to #364: one planDayID property, initializer parameter, assignment, decode, encode and CodingKey; initializer order exerciseID then planDayID.
+- Coach added-record callers use the separate CoachSetLogDTO. None passes the old SetLogDTO parameter order, so no call-site rewrite is needed.
+- Retained both journals and both Demo paths. Reconciled historical verification summaries.
+- Replaced 27 raw log files (3,488,122 bytes) with short result/red-phase summaries. Existing screenshot and log paths remain valid. Historical commit objects retain the originals; local copies are under /Users/david/Projects/scratch/092-integration-20261014/original-evidence/.
+
+Red -> green:
+- Automatic Git merge reproduced Networking compilation failure: invalid redeclaration of planDayID and duplicate CodingKeys raw value.
+- After resolution, all nine SwiftPM packages passed through XcodeBuildMCP swift_package_test (no test filter):
+  CoreModels 158; RepositoryContracts 6; DesignSystem 73; ChatUI 84; Analytics 30;
+  Networking 138; CoachKit 455; StudentKit 1018; AppShell 107.
+  Total: 2169 passed, 0 failed, 0 skipped.
+- Existing Swift concurrency and unused-result warnings remain in untouched files; no new warning source was introduced by this merge resolution.
+- swift-format strict full source lint: PASS, exit 0, no diagnostics.
+- SwiftLint strict full repository: PASS, 0 violations in 1199 files.
+- Four module-boundary checks and git diff --check: PASS.
+
+Xcode configuration:
+- Project: /Users/david/Projects/apps/MeetPR-wt-092b/MeetPR.xcodeproj
+- Simulator: iPhone 17 Pro / iOS 26.4 / 8F164D5D-A450-44FD-BDBF-BB351572CF6E.
+- DerivedData: /Users/david/Projects/scratch/092-integration-derived.
+- MeetPR / Debug full test: PASS, 9 passed, 0 failed; opt-in HANG_PROBE diagnostic disabled by default.
+  Result bundle: /Users/david/Projects/scratch/092-integration-20261014/MeetPR.xcresult.
+- MeetPR-Demo / Demo build: PASS (99.6 seconds), no warnings/errors.
+- MeetPR-DemoStudent / DemoStudent build: PASS (84.8 seconds), no warnings/errors.
+- Independent Standards: CLEAN, 0 findings. Independent Spec: CLEAN, 0 findings. One round; review scope is this merge resolution and evidence cleanup.
+
+Limits:
+This integration verifies compilation and automated regressions, not product acceptance.
+No new UI layout, backend deployment, production data change, release tag or Archive/Upload.
+Existing PR limitations (real backend end-to-end, legacy binary upgrade, physical-device haptics and Opus final acceptance) remain.

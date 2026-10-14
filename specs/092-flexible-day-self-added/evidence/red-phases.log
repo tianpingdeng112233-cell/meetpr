@@ -1,0 +1,7 @@
+Summary only; original console output removed from the repository.
+Historical coach red phases, 2026-10-14 (before implementation):
+- Missing coachSetLogs, SetLogDTO.planDayID, CoachDayActivity, CoachDayDetailPresentation and CoachSetReadOnlyRow caused compilation failures.
+- detailOverviewRosterAndReminderShareCompletion failed 4 assertions: D4 logs leaked into D2, D4 lost its logs/completion, and a false not-trained reminder remained.
+- rendersOneExtraGroupCaptionAndSeparateAddedCard failed 2 checks for the caption/added card.
+- refreshShowsServerCatalogNameAndRemovesDeletedAddedSets failed to find the expected rendered content.
+- Subsequent green results and limitations are in verification.txt and docs/CODEX-JOURNAL.md.

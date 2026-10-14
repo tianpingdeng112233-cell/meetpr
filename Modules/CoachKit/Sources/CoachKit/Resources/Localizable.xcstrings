@@ -3886,6 +3886,52 @@
         }
       }
     },
+    "coach.execution.addedByStudent": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员自加"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added by student"
+          }
+        }
+      }
+    },
+    "coach.execution.studentAddedSets %lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员自加 · 不在计划里 · 记录了 %lld 组"
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Added by student · not in plan · %lld set logged"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Added by student · not in plan · %lld sets logged"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "coach.execution.empty": {
       "extractionState": "manual",
       "localizations": {

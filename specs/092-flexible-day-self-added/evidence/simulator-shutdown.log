@@ -1,0 +1,2 @@
+Summary only; original console output removed from the repository.
+Historical shutdown: exit 1, NSPOSIXErrorDomain Code=61 (Connection refused); shutdown was NOT verified at that stage. Later coach verification records successful shutdown.

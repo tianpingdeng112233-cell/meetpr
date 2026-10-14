@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Observation
 import RepositoryContracts
 
@@ -132,7 +133,7 @@ final class StudentRosterViewModel {
   /// degraded linearly with student count). Results keep the summaries' order.
   private func loadRows(for summaries: [CoachStudentSummary]) async -> [StudentRosterRowModel] {
     let plans = self.plans
-    let trainingLogs = self.trainingLogs
+    let trainingLogs = CoachTrainingLogReader(planning: students, fallback: self.trainingLogs)
     let feedback = self.feedback
     let now = self.now
     // Sliding window of 4: still concurrent, but a big roster can't hammer
@@ -164,14 +165,10 @@ final class StudentRosterViewModel {
     }
   }
 
-  /// 计划日与完成日志配对的时间窗:±36h 覆盖任何时区/DST 偏移,
-  /// 又不至于把整份日志挂到每一个训练日上。
-  private static let logPairingWindow: TimeInterval = 36 * 60 * 60
-
   private static func loadRow(
     for summary: CoachStudentSummary,
     plans: any StudentPlanRepository,
-    trainingLogs: any StudentTrainingLogRepository,
+    trainingLogs: CoachTrainingLogReader,
     feedback: any StudentFeedbackRepository,
     now: @Sendable () -> Date
   ) async -> StudentRosterRowModel {
@@ -179,12 +176,12 @@ final class StudentRosterViewModel {
       let timestamp = now()
       let plan = try await plans.fetchCurrentPlan(studentID: summary.id)
       let range = Self.logFetchRange(for: plan, now: timestamp)
-      async let logs = trainingLogs.fetchLogs(studentID: summary.id, in: range)
+      async let logs = trainingLogs.fetch(studentID: summary.id, range: range)
       async let feedbackItems = feedback.fetchInbox(studentID: summary.id)
       return Self.makeRow(
         summary: summary,
         plan: plan,
-        logs: try await logs,
+        coachLogs: try await logs,
         feedback: try await feedbackItems,
         now: timestamp
       )
@@ -205,24 +202,26 @@ final class StudentRosterViewModel {
     feedback: [CoachFeedback],
     now: Date
   ) -> StudentRosterRowModel {
+    makeRow(
+      summary: summary, plan: plan, coachLogs: logs.map(CoachSetLogDTO.init),
+      feedback: feedback, now: now)
+  }
+
+  static func makeRow(
+    summary: CoachStudentSummary, plan: StudentPlanView?, coachLogs: [CoachSetLogDTO],
+    feedback: [CoachFeedback], now: Date
+  ) -> StudentRosterRowModel {
     let plannedDays = plan?.days.filter { !$0.exercises.isEmpty } ?? []
-    // 完成态不在这里固化:只把「可能与这一天配对」的完成日志时间戳带下去,
-    // 由 CoachWeekOverview 聚合时用同一份 calendar 现场判定(见 TrainingDay 注释)。
-    // ±36h 足够覆盖任何时区/DST 偏移,又不会把整份日志挂到每一天上。
-    let completedLogDates = logs.filter(\.completed).map(\.loggedAt)
     let trainingDays = plannedDays.map { day in
       CoachWeekOverview.TrainingDay(
-        date: day.date,
-        completedLogDates: completedLogDates.filter {
-          abs($0.timeIntervalSince(day.date)) <= Self.logPairingWindow
-        }
-      )
+        date: day.date, completedLogDates: [],
+        planDay: day, planDays: plan?.days ?? [], logs: coachLogs)
     }
-    let latestLog = logs.filter(\.completed).map(\.loggedAt).max()
+    let latestLog = coachLogs.map(\.loggedAt).max()
     let triageSignals = StudentTriageSignalCalculator.signals(
       studentID: summary.id,
       plan: plan,
-      logs: logs,
+      coachLogs: coachLogs,
       feedback: feedback,
       now: now
     )

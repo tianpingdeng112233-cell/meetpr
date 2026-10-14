@@ -134,6 +134,47 @@ struct SetNumberSurfaceTests {
 
     #expect(try inspected.find(text: "第 1 组").string() == "第 1 组")
   }
+
+  @Test("history extra sets use the standard result format without a checkmark")
+  func historyExtraSetUsesStandardResult() throws {
+    let fixture = makeSurfaceFixture()
+    let log = StudentSetLog(
+      id: UUID(), studentID: UUID(), planExerciseID: fixture.exercise.id,
+      setIndex: 1, loggedAt: fixture.day.date, weightKg: 12, reps: 10, completed: true
+    )
+    let inspected = try HistoryEntriesView(
+      weeks: [.init(id: 1, days: [fixture.day])], logs: [log],
+      selectedExerciseName: .constant(nil)
+    ).inspect()
+
+    #expect(try inspected.find(text: "额外").string() == "额外")
+    #expect(try inspected.find(text: "12kg × 10").string() == "12kg × 10")
+    #expect(
+      inspected.findAll(ViewType.Image.self).allSatisfy {
+        (try? $0.actualImage().name()) != "checkmark"
+      })
+  }
+
+  @Test("self-added history uses standard exercise typography and numbered result rows")
+  func addedHistoryUsesStandardRows() throws {
+    let fixture = makeSurfaceFixture()
+    let log = StudentAddedSetLog(
+      id: UUID(), studentID: UUID(), planDayID: fixture.day.id,
+      exerciseID: fixture.exercise.exercise.id, setIndex: 0, loggedAt: fixture.day.date,
+      weightKg: 10, reps: 2, rpe: 8, completed: true
+    )
+    let inspected = try StudentAddedHistoryRows(
+      logs: [log], catalog: [fixture.exercise.exercise]
+    ).inspect()
+
+    #expect(
+      try inspected.find(text: "深蹲").attributes().font()
+        == Font.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+    #expect(try inspected.find(text: "自加").string() == "自加")
+    #expect(try inspected.find(text: "第 1 组").string() == "第 1 组")
+    #expect(try inspected.find(text: "10kg × 2 @ RPE 8").string() == "10kg × 2 @ RPE 8")
+    #expect(inspected.findAll(ViewType.Image.self).isEmpty)
+  }
 }
 
 @MainActor

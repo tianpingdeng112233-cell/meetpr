@@ -1,0 +1,10 @@
+2026-10-14 · iOS spec 092 卡 B · 本轮独立只读审查
+
+Scope: HEAD 7acf289c + 当前全部未提交 Swift/xcstrings 与新增源文件、测试。
+Spec: origin/feat/092-ios-student@2b647a13:specs/092-flexible-day-self-added/{SPEC.md,CARD-B-coach-ios.md}
+Android reference: PR #92, coach implementation 02213e4.
+
+Standards: CLEAN, 0 硬性违规、0 有实质影响的坏味道。已核对 Repository/ViewModel 接线、scope=all、可选解码、Demo 生命周期与编译/启动参数隔离。
+Spec: CLEAN, 0 缺做/多做/做错。核对详情分组/文案/计数、归属/日期规则、各消费者、旧数据兼容、服务器目录名称、刷新删除。
+轮次: 1；本轮无业务代码返修。测试与截图由主代理另行执行。
+这属于开发自测与自审，Opus 最终验收尚未执行。

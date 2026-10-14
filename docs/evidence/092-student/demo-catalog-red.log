@@ -1,21 +1,2 @@
-Building for debugging...
-[0/3] Write sources
-[1/3] Write swift-version--58304C5D6DBC2206.txt
-[3/5] Emitting module StudentKitTests
-[4/5] Compiling StudentKitTests StudentAddedCatalogRecoveryTests.swift
-[4/6] Write Objects.LinkFileList
-[5/6] Linking StudentKitPackageTests
-Build complete! (7.87s)
-Test Suite 'Selected tests' started at 2026-10-14 09:11:05.813.
-Test Suite 'StudentKitPackageTests.xctest' started at 2026-10-14 09:11:05.814.
-Test Suite 'StudentKitPackageTests.xctest' passed at 2026-10-14 09:11:05.814.
-	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
-Test Suite 'Selected tests' passed at 2026-10-14 09:11:05.814.
-	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
-◇ Test run started.
-↳ Testing Library Version: 1902
-↳ Target Platform: arm64e-apple-macos14.0
-◇ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() started.
-✘ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() recorded an issue at StudentAddedCatalogRecoveryTests.swift:20:3: Expectation failed: (model.currentDrafts?.first(where: \.isStudentAdded)?.exerciseName → "—") == (exercise.name → "坐姿划船")
-✘ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() failed after 0.014 seconds with 1 issue.
-✘ Test run with 1 test in 0 suites failed after 0.014 seconds with 1 issue.
+Summary only; original console output removed from the repository.
+Historical student red phase, 2026-10-14: planOnlyCatalogKeepsAddedNamesOnFirstLoad failed 1 assertion; exerciseName was an em dash instead of the expected catalog name. Later green result: student-tests.log (1018 tests).

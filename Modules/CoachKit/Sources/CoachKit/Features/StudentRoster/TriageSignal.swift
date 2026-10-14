@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 
 enum TriageSignal: Hashable, Sendable {
   case notTrained(daysMissed: Int)
@@ -33,7 +34,16 @@ enum StudentTriageSignalCalculator {
     feedback: [CoachFeedback],
     now: Date
   ) -> [TriageSignal] {
-    let scopedLogs = studentID.map { id in logs.filter { $0.studentID == id } } ?? logs
+    signals(
+      studentID: studentID, plan: plan, coachLogs: logs.map(CoachSetLogDTO.init),
+      feedback: feedback, now: now)
+  }
+
+  static func signals(
+    studentID: UUID?, plan: StudentPlanView?, coachLogs: [CoachSetLogDTO],
+    feedback: [CoachFeedback], now: Date
+  ) -> [TriageSignal] {
+    let scopedLogs = studentID.map { id in coachLogs.filter { $0.studentID == id } } ?? coachLogs
     let scopedFeedback =
       studentID.map { id in feedback.filter { $0.studentID == id } } ?? feedback
     var signals: [TriageSignal] = []
@@ -69,7 +79,7 @@ enum StudentTriageSignalCalculator {
 
   private static func missedTrainingDays(
     plan: StudentPlanView?,
-    logs: [StudentSetLog],
+    logs: [CoachSetLogDTO],
     now: Date
   ) -> Int {
     guard let plan else { return 0 }
@@ -83,22 +93,12 @@ enum StudentTriageSignalCalculator {
       return !day.exercises.isEmpty
         && dayStart >= windowStart
         && dayStart < today
-        && !hasCompletedLog(on: day.date, logs: logs, calendar: calendar)
+        && !CoachDayActivity.hasTrained(day, days: plan.days, logs: logs, calendar: calendar)
     }.count
   }
 
-  private static func hasCompletedLog(
-    on date: Date,
-    logs: [StudentSetLog],
-    calendar: Calendar
-  ) -> Bool {
-    logs.contains { log in
-      log.completed && CoachFeatureCalendar.isSameDay(log.loggedAt, date, calendar: calendar)
-    }
-  }
-
   private static func isAwaitingReply(
-    logs: [StudentSetLog],
+    logs: [CoachSetLogDTO],
     feedback: [CoachFeedback],
     now: Date
   ) -> Bool {
