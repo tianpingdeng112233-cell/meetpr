@@ -48,8 +48,12 @@ final class ProgressDataModel {
     return logs
   }
 
-  var stats: GrowthHistoryStats { GrowthScreenPresentation.historyStats(logs: logs) }
-  var buckets: [WeeklyProgressMetric] { GrowthScreenPresentation.chartBuckets(logs: logs) }
+  var stats: GrowthHistoryStats {
+    GrowthScreenPresentation.historyStats(logs: logs, added: history.addedLogs)
+  }
+  var buckets: [WeeklyProgressMetric] {
+    GrowthScreenPresentation.chartBuckets(logs: logs, added: history.addedLogs)
+  }
   var comparison: GrowthComparisonPresentation {
     GrowthComparisonPresentation.make(snapshots: allSnapshots, onboarding: profile)
   }

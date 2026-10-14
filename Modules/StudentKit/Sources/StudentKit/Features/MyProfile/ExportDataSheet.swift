@@ -37,12 +37,16 @@ public final class ExportDataViewModel {
     state = .generating
     do {
       let start = Date(timeIntervalSince1970: 946_684_800)
-      async let fetchedLogs = logs.fetchLogs(studentID: studentID, in: start...now())
+      async let fetchedLogs = fetchAllLogs(studentID: studentID, range: start...now())
       async let cycleDays = try? plans.fetchCycleDays(studentID: studentID)
       let allLogs = try await fetchedLogs
       let days = await cycleDays ?? []
       let names = Self.exerciseNames(from: days)
-      let csv = TrainingLogCSVExporter.csv(logs: allLogs, names: names)
+      let catalog =
+        try await (plans as? any ExerciseCatalogReading)?.fetchExerciseCatalog()
+        ?? days.flatMap(\.exercises).map(\.exercise)
+      let csv = TrainingLogCSVExporter.csv(
+        logs: allLogs.planned, names: names, added: allLogs.added, catalog: catalog)
       let stamp = TrainingLogCSVExporter.compactDayString(now(), calendar: .current)
       let url = FileManager.default.temporaryDirectory
         .appending(path: "meetpr-training-log-\(stamp).csv")
@@ -51,6 +55,16 @@ public final class ExportDataViewModel {
     } catch {
       state = .failed(StudentStrings.localized(.exportDataSheet001))
     }
+  }
+
+  private func fetchAllLogs(studentID: UUID, range: ClosedRange<Date>) async throws
+    -> StudentWorkoutLogs
+  {
+    if let repository = logs as? any StudentAddedLogRepository {
+      return try await repository.fetchAllLogs(studentID: studentID, in: range)
+    }
+    return StudentWorkoutLogs(
+      planned: try await logs.fetchLogs(studentID: studentID, in: range), added: [])
   }
 
   public func discardExport() {

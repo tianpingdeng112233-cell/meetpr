@@ -612,7 +612,7 @@ private actor SnapshotCountingE1RMRepository: E1RMRepository {
 @MainActor
 @Test func todayWorkoutViewModelPersistsEditsToCompletedSet() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let logs = InMemoryStudentTrainingLogRepository()
   let viewModel = TodayWorkoutViewModel(
@@ -639,7 +639,7 @@ private actor SnapshotCountingE1RMRepository: E1RMRepository {
 @MainActor
 @Test func todayWorkoutViewModelLoadsRecordsAndReturnsToLoaded() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let logs = InMemoryStudentTrainingLogRepository()
   let viewModel = TodayWorkoutViewModel(
@@ -687,7 +687,7 @@ private actor SnapshotCountingE1RMRepository: E1RMRepository {
 @MainActor
 @Test func todayWorkoutViewModelUpdatesActualWeight() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let logs = InMemoryStudentTrainingLogRepository()
   let viewModel = TodayWorkoutViewModel(
@@ -716,7 +716,7 @@ private actor SnapshotCountingE1RMRepository: E1RMRepository {
 @MainActor
 @Test func todayWorkoutViewModelKeepsWorkoutAndDraftWhenRecordingFails() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
@@ -740,7 +740,7 @@ private actor SnapshotCountingE1RMRepository: E1RMRepository {
 @MainActor
 @Test func todayWorkoutViewModelExplainsServerRecordingFailure() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
@@ -783,7 +783,7 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
 @MainActor
 @Test func todayWorkoutViewModelRestoresLoadedWhenRecordingURLCancelled() async {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
@@ -803,7 +803,7 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
 @MainActor
 @Test func todayWorkoutViewModelRestoresLoadedWhenRecordingCancellationError() async {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
@@ -847,7 +847,7 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
 @MainActor
 @Test func todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage() async {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),
@@ -863,7 +863,7 @@ private actor ServerFailingTrainingLogRepository: StudentTrainingLogRepository {
 @MainActor
 @Test func ensureLoggedSetIDKeepsFlushedEditsWithoutCompleting() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let viewModel = TodayWorkoutViewModel(
     plans: InMemoryStudentPlanRepository(store: store),

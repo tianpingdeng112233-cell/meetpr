@@ -11,6 +11,9 @@ struct AccessoryInput: Equatable, Sendable {
 struct AccessoryRow: Equatable, Sendable, Identifiable {
   let draft: TodayWorkoutSetRowDraft
   let previous: StudentSetLog?
+  let previousAdded: StudentAddedSetLog?
+  var previousWeight: Decimal? { previous?.weightKg ?? previousAdded?.weightKg }
+  var previousReps: Int? { previous?.reps ?? previousAdded?.reps }
   let unit: UnitPreference
   let hasVideo: Bool
   let initialInput: AccessoryInput
@@ -26,7 +29,7 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
   }
   var isRecorded: Bool { draft.completed || draft.failed }
   var isCancellation: Bool { draft.completed && !draft.failed && input == initialInput }
-  var weightPlaceholder: String { UnitDisplay.weightText(kg: previous?.weightKg, unit: unit) }
+  var weightPlaceholder: String { UnitDisplay.weightText(kg: previousWeight, unit: unit) }
   var rpePlaceholder: String {
     switch draft.prescribed.intensity {
     case .rir(let value): "RIR \(value)"
@@ -56,15 +59,17 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
 
   init(
     draft: TodayWorkoutSetRowDraft, previous: StudentSetLog?, unit: UnitPreference,
-    hasVideo: Bool = false
+    hasVideo: Bool = false, previousAdded: StudentAddedSetLog? = nil
   ) {
     self.draft = draft
     self.previous = previous
+    self.previousAdded = previousAdded
     self.unit = unit
     self.hasVideo = hasVideo
     let input = AccessoryInput(
       weight: UnitDisplay.weightText(
-        kg: draft.loggedSetID == nil ? draft.prescribed.weightKg : draft.actualWeight, unit: unit),
+        kg: draft.loggedSetID == nil && !draft.isExtra && !draft.isStudentAdded
+          ? draft.prescribed.weightKg : draft.actualWeight, unit: unit),
       reps: (draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax).map(String.init)
         ?? "",
       rpe: draft.loggedSetID == nil ? "" : draft.actualRPE.map(SetEntryValue.text) ?? ""
@@ -74,15 +79,16 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
   }
 
   mutating func usePrevious() {
-    guard let previous else { return }
-    if !isBodyweight { input.weight = UnitDisplay.weightText(kg: previous.weightKg, unit: unit) }
-    input.reps = String(previous.reps)
+    guard let previousReps else { return }
+    if !isBodyweight { input.weight = UnitDisplay.weightText(kg: previousWeight, unit: unit) }
+    input.reps = String(previousReps)
   }
 
   static func selection(_ rows: [Self]) -> (writable: [Self], skipped: [Self]) {
-    let pending = rows.filter { !$0.isRecorded }.sorted {
-      $0.draft.prescribed.setIndex < $1.draft.prescribed.setIndex
-    }
+    let pending = rows.filter { !$0.isRecorded && !$0.draft.isExtra && !$0.draft.isStudentAdded }
+      .sorted {
+        $0.draft.prescribed.setIndex < $1.draft.prescribed.setIndex
+      }
     return (pending.filter(\.isWritable), pending.filter { !$0.isWritable })
   }
 

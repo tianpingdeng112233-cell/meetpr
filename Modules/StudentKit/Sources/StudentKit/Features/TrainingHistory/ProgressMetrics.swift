@@ -17,7 +17,7 @@ struct WeeklyProgressMetric: Equatable, Identifiable, Sendable {
 
 enum ProgressMetrics {
   static func weeklyVolumeIntensity(
-    from logs: [StudentSetLog],
+    from logs: [StudentSetLog], added: [StudentAddedSetLog] = [],
     calendar: Calendar = .current
   ) -> [WeeklyProgressMetric] {
     var buckets: [Date: ProgressMetricAccumulator] = [:]
@@ -27,6 +27,11 @@ enum ProgressMetrics {
       buckets[weekStart, default: ProgressMetricAccumulator()].add(log)
     }
 
+    for log in added where log.completed && !log.assumed {
+      guard let weekStart = weekStart(for: log.loggedAt, calendar: calendar) else { continue }
+      buckets[weekStart, default: ProgressMetricAccumulator()].add(
+        weight: log.weightKg, reps: log.reps, rpe: log.rpe)
+    }
     return buckets.keys.sorted().map { weekStart in
       let bucket = buckets[weekStart] ?? ProgressMetricAccumulator()
       return WeeklyProgressMetric(
@@ -50,8 +55,12 @@ private struct ProgressMetricAccumulator {
   var rpeCount = 0
 
   mutating func add(_ log: StudentSetLog) {
-    volumeKg += log.weightKg * Decimal(log.reps)
-    if let rpe = log.rpe {
+    add(weight: log.weightKg, reps: log.reps, rpe: log.rpe)
+  }
+
+  mutating func add(weight: Decimal, reps: Int, rpe: Decimal?) {
+    volumeKg += weight * Decimal(reps)
+    if let rpe {
       rpeTotal += rpe
       rpeCount += 1
     }

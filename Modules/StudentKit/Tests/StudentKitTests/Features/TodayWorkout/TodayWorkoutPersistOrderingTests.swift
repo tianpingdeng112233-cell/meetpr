@@ -60,7 +60,7 @@ private actor GatedTrainingLogRepository: StudentTrainingLogRepository {
 @MainActor
 @Test func overlappingVideoMintAndCompleteApplyInOrder() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let gated = GatedTrainingLogRepository()
   let viewModel = TodayWorkoutViewModel(
@@ -98,7 +98,7 @@ private actor GatedTrainingLogRepository: StudentTrainingLogRepository {
 @MainActor
 @Test func stalePersistDoesNotTouchReloadedState() async throws {
   let studentID = StudentDemoSeed.studentID
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let store = TestStudentPlanStore(seed: [studentID: plan])
   let gated = GatedTrainingLogRepository()
   let viewModel = TodayWorkoutViewModel(
