@@ -1,3 +1,7 @@
+## 2026-10-14 · 1.0(24) 切包（P1）
+
+David 下令「发车」。build 23→24（五处 `CURRENT_PROJECT_VERSION`），marketing 1.0 不变；基底发版线 `9935bd95`，NEXT-RELEASE 补登记 spec 092（#364 / #363）。annotated tag `beta/1.0-24` 指向本切包提交，tag CI 与 Archive / Upload 待完成。[切包记录](prep-beta-1.0-24-2026-10-14.md)。
+
 ## 2026-10-14 · Spec 092 · 训练历史行样式修复（P1）
 
 按 David 截图与明确格式，额外组和学员自加组复用 `HistorySetRow`：左侧「额外」或「第 N 组」，右侧统一重量/次数/RPE，去掉独立勾号与 kg 前空格；自加动作标题沿用计划动作 body13 bold，附小灰字「自加」。原处方组的已记录、未记录状态样式保持一致。
