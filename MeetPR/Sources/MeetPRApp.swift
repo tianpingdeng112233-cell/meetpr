@@ -448,6 +448,13 @@ struct MeetPRApp: App {
   private var studentAppearanceRaw = MeetPRAppearance.defaultPreference.rawValue
 
   private var preferredAppColorScheme: ColorScheme? {
+    #if DEMO_MODE && !DEMO_USER_STUDENT
+      if ProcessInfo.processInfo.arguments.contains("-spec092-coach"),
+        ProcessInfo.processInfo.arguments.contains("-spec092-dark")
+      {
+        return .dark
+      }
+    #endif
     guard case .authenticated(let user) = session.state else {
       // ⚖️ 2026-07-30: auth/login and bootstrap open light, matching the
       // student roots they lead into (the v3 login mockup is light-only).
@@ -472,6 +479,12 @@ struct MeetPRApp: App {
     #if DEMO_MODE && DEMO_USER_STUDENT
       if let scenario = ProfileDemoScenario.launchValue, case .authenticated = session.state {
         ProfileDemoScene(scenario: scenario, onLogout: { await session.logout() })
+      } else {
+        rootView
+      }
+    #elseif DEMO_MODE
+      if ProcessInfo.processInfo.arguments.contains("-spec092-coach") {
+        CoachFlexibleDayDemoView()
       } else {
         rootView
       }

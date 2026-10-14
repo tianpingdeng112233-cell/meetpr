@@ -1,0 +1,1006 @@
+[0/1] Planning build
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+[2/3] Emitting module Networking
+[3/4] Emitting module CoachKit
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[4/5] Emitting module CoachKitTests
+Build complete! (18.12s)
+Test Suite 'All tests' started at 2026-10-14 08:19:19.858.
+Test Suite 'All tests' passed at 2026-10-14 08:19:19.860.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Coach day ownership" started.
+◇ Test generatePersonalCodeShowsUpAfterReload() started.
+◇ Test exerciseMustBeBoundAndAllSetsComplete() started.
+◇ Test statusCountsRemainingDaysForTimeLimited() started.
+◇ Test repickingAnotherStudentDropsPreviousStudentSlots() started.
+◇ Suite "Coach video feedback workbench presentation" started.
+◇ Test unmatchedNameDoesNotBind() started.
+◇ Test blankFlowKeepsAllSevenSlots() started.
+◇ Test growthLoadingRendersProgressWithoutFlashingEmptyState() started.
+◇ Test accessorySearchFoldsBarCharacterAcrossSpellings() started.
+◇ Test degradedSummaryReportsIncomplete() started.
+◇ Test videoQueueSendFailureKeepsRowAndBanners() started.
+◇ Test draftTrainingPlanMapsToDomainPlan() started.
+◇ Test accessoryFiltersAreEquatableAndHashable() started.
+◇ Test percentPresetsNormalizeClampDedupeSortCap() started.
+◇ Test parsesSetsAndRepsForms() started.
+◇ Test coachInboxCountAddsPendingVideosAndUnreadMessages() started.
+◇ Test multiLineCellSplitsIntoAccessories() started.
+◇ Test step4ProceedAllowsEmptyAccessoryDays() started.
+◇ Test step6UpdateRuleMutatesByID() started.
+◇ Test "video set information distinguishes unlinked videos from load failures" started.
+◇ Test draftMappingDecodeSetSpecReturnsNilForNilData() started.
+◇ Test projectionWeightModeSetHasWeightAndNilRPE() started.
+◇ Test profileSummaryFormatsKeyFields() started.
+◇ Test weekDerivationAppliesRPEIncrease() started.
+◇ Test dayChipBarRendersAssignedDayChips() started.
+◇ Test publishesThroughRepository() started.
+◇ Test step4KeepsFiltersAndSelectionsIndependentPerDay() started.
+◇ Test profileSummaryReturnsNilForEmptyFields() started.
+◇ Test noSignalWhenRecentLogAlreadyHasFeedback() started.
+◇ Test composerSurfacesSendFailure() started.
+◇ Test corruptDateRowSecondWeekStillParses() started.
+◇ Test rosterTriageSignalsStayScopedPerStudent() started.
+◇ Test blankFlowLoadsSlotsFromSelectedStudentProfile() started.
+◇ Test step5UpdateW1SetSpecWritesDraftData() started.
+◇ Test planningNumberFieldIncrementDisabledAtUpperBound() started.
+◇ Test projectionDropsCorruptZeroSetNumberAndKeepsLegalSetsUncollided() started.
+◇ Test projectionFiltersDaysByWeekIndexPickingThatWeeksValues() started.
+◇ Test previewCatalogTotalCountIsTwelveSixteen() started.
+◇ Test weekDerivationReturnsW1Baseline() started.
+◇ Test projectionSkipsExerciseMissingFromCatalog() started.
+◇ Test growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() started.
+◇ Test inMemoryListIsNewestFirst() started.
+◇ Test bannerVisibleOnlyForLiveEvaluation() started.
+◇ Test draftMappingEncodesRulesEmptyAndNonEmpty() started.
+◇ Test projectionComputesDayDateFromStartDateWeekAndDayOfWeek() started.
+◇ Test planningNumberFieldIncrementButtonAddsStep() started.
+◇ Test emptyStateHasNoPersonalCode() started.
+◇ Test videoQueueLoadsItemsNewestFirst() started.
+◇ Test coachProfileUsesBackendNameWhenPresent() started.
+◇ Test weightInputFieldNegativeOneRMReturnsZero() started.
+◇ Test perSetWeightList() started.
+◇ Test editorCompletionChainNotifiesCompletionCallback() started.
+◇ Suite "Coach chat status subtitle" started.
+◇ Suite "Coach week overview" started.
+◇ Test acceptSheetSealsEvaluationChoice() started.
+◇ Test projectionMatchesStudentGoldenMatrixForAllForms() started.
+◇ Test markStudentActiveDropsInEvaluationBadgeInPlace() started.
+◇ Suite "Coach today todo ordering" started.
+◇ Suite "CoachKit localization runtime" started.
+◇ Suite "CoachKit localization" started.
+◇ Suite "Coach today formatting" started.
+◇ Suite "Coach self-added detail" started.
+◇ Test unmatchedNameFallsThroughToCandidates() started.
+◇ Test accessoryFiltersIsEmptyTracksAnySelectedFacet() started.
+◇ Suite "Coach week overview · completion" started.
+◇ Test weekDerivationAppliesWeightDecrease() started.
+◇ Test workspaceViewModelLoadsDraftNeedsAndRecentSections() started.
+◇ Test step2RendersDisabledTemplateEntrypoints() started.
+◇ Test amrapDefersRepsAndKeepsCue() started.
+◇ Test accessoryRepositoryFiltersSingleFacetSingleValue() started.
+◇ Test regenerateRevokesOldPersonalCode() started.
+◇ Test draftDaysMapToDomainDays() started.
+◇ Test directMessageEntryReopensTheSameConversation() started.
+◇ Test coachRootViewInitializes() started.
+◇ Test timeLimitedCreationCarriesExpiry() started.
+◇ Test videoQueueRejectsBlankFeedbackWithoutDropping() started.
+◇ Test ageDerivesFromBirthDateClientSide() started.
+◇ Test draftExercisesMapToDomainExercises() started.
+◇ Test weekDerivationCombinesDifferentDimensions() started.
+◇ Test adaptationDraftNameUsesAdaptationTemplate() started.
+◇ Test barCharacterFoldsBothWays() started.
+◇ Test planningNumberFieldTextFieldUpdateRoundsToIncrement() started.
+◇ Test completionChainRunsPutThenCompleteThenSoftRecommendation() started.
+◇ Test weekDerivationCarriesRestFieldsUnchanged() started.
+◇ Test step5OneRMOnlyAvailableForMainLiftFamily() started.
+◇ Test growthFiltersBackendPointsBySelectedFamilyAndWindow() started.
+◇ Test restDayHasNoExercises() started.
+◇ Test notTrainedSignalDoesNotCountShiftedOriginalDates() started.
+◇ Test executionDaysShowCurrentPlanWeekRows() started.
+◇ Test exerciseUsageTrackerResetClearsCounts() started.
+◇ Test videoQueueSendFeedbackDropsRowAndToasts() started.
+◇ Test completeNotifiesCompletionCallback() started.
+◇ Test aggregatorLinkedClipDropsAfterSendAndRefetch() started.
+◇ Test projectionSortsDaysChronologicallyByDayOfWeek() started.
+◇ Test percentOfBaseLandsOnPlateGrid() started.
+◇ Test bootstrapRestoresSavedDraftStepAndAssignments() started.
+◇ Test composerRejectsEmptyText() started.
+◇ Test "roster shows loading before empty and distinguishes search misses" started.
+◇ Test exactMatchWinsOverAlias() started.
+◇ Test step5ToggleIntensityModePreservesPreviousValues() started.
+◇ Test step4SwitchToDayLoadsAccessoriesForSelectedDay() started.
+◇ Test coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test draftMappingEncodesAndDecodesSetSpec() started.
+◇ Test everyAliasCanonicalResolvesUniquely() started.
+◇ Test acceptSheetConfirmAlwaysSendsSkipWithNoReason() started.
+◇ Test weightInputFieldRoundTripStableAtCommonBenchmark() started.
+◇ Test percentTopLeftEmptyWithCue() started.
+◇ Test readinessScalesTextShowsRawValuesWithoutInversion() started.
+◇ Test planningNumberFieldEmptyInputResetsToZero() started.
+◇ Test coachInboxUsesStudentIDAsStableTieBreakerForSameName() started.
+◇ Test queueLoadsPendingItemsAndExposesCount() started.
+◇ Test rosterLogFetchRangeCoversRecentWindowBeforePlanStart() started.
+◇ Test singleLegDeadliftAndSingleLegRDLStayDistinct() started.
+◇ Test weekStartClampsToCycleBounds() started.
+◇ Test progressionRuleTypeRawValuesStaySnakeCase() started.
+◇ Test planningCountPickerEnumeratesTagsByStepWithinRange() started.
+◇ Test step5RestSecondsPerSetClampsToSetCount() started.
+◇ Test projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() started.
+◇ Test weightInputFieldZeroOneRMReturnsZero() started.
+◇ Test step6DeleteRuleRemovesAndReorders() started.
+◇ Test sealedStudentDetailDoesNotRenderEvaluationBanner() started.
+◇ Test step7PublishOfCompletePlanFinishesWithoutIssues() started.
+◇ Test corruptDateRowStillOpensABlock() started.
+◇ Test oneRMsMapPerFamilyDroppingMissing() started.
+◇ Test loadPrefillsEditModeFromExistingSummary() started.
+◇ Test step6AddRuleAppendsWithDisplayOrder() started.
+◇ Test incompleteSelectionThrows() started.
+◇ Test backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() started.
+◇ Test domainPlanDaysAndExercisesRebuildDraft() started.
+◇ Test ladderClampsAtCap() started.
+◇ Suite "Coach day detail set numbers" started.
+◇ Test navigationMovesForwardAndBackWithoutDroppingFields() started.
+◇ Test step0RendersThreeStudentSections() started.
+◇ Test padDigitsAppendWithTwoDecimalPlaces() started.
+◇ Test coachInboxUnifiesChatAndVideoStudentsWithoutDuplicates() started.
+◇ Test weightInputFieldPercentToKgRoundsResultToHalfKg() started.
+◇ Test draftProgressionRuleEncodesDecimalAsString() started.
+◇ Test deselectingFirstWeekRenumbersRemainingToOne() started.
+◇ Test aggregatorExcludesAnsweredAndUnlinkedKeepsUnanswered() started.
+◇ Test weekDerivationUsesHigherDisplayOrderForSameDimension() started.
+◇ Test step5TargetRepsIsClampedToAtLeastOne() started.
+◇ Test composerClearsExerciseWhenLinkedDayChanges() started.
+◇ Test draftMappingExpandsSetSpecToPlanSets() started.
+◇ Test oneRMTrioStripsTrailingZeros() started.
+◇ Test detectsDateRowsAndSplitsBlocks() started.
+◇ Test bannerHiddenWhenNoEvaluationOrCompleted() started.
+◇ Test step6ViewRendersUncoveredSummary() started.
+◇ Test inMemorySendFeedbackDropsExactVideoAndScopesIt() started.
+◇ Test firstRegularPlanIntentWithNilProfileResumesExistingDraft() started.
+◇ Test planningNumberFieldTextFieldClampsBelowRange() started.
+◇ Test evaluationStudentCannotSelectFourWeeks() started.
+◇ Test singleWeightAppliesToEverySet() started.
+◇ Test skipEvaluationStudentChainSkipsCompleteStep() started.
+◇ Test coachProfileLogoutRunsInjectedAction() started.
+◇ Test endDateSpansSelectedWeeks() started.
+◇ Test newCatalogExercisesBindExactly(name:) started.
+◇ Test restoredConfigureRulesPathDoesNotDuplicateStep4() started.
+◇ Test step7ViewRendersFourWeekTabTitles() started.
+◇ Test weekDerivationAppliesRPEDecreaseAndClamps() started.
+◇ Test projectionRPEModeSetRoutesValueToRPEFieldLeavingWeightNil() started.
+◇ Test "markers resolved for a previous video never render under a newer one" started.
+◇ Test growthFailureRendersRetryAndRetrySuccessShowsData() started.
+◇ Test previewCatalogContainsFourSyntheticCompetitionLifts() started.
+◇ Test projectionOrdersMainLiftBeforeAccessoryBySortOrder() started.
+◇ Test setNeedsRepsAndAValidTarget() started.
+◇ Test planningCountPickerSnapsValueOutsideGrid() started.
+◇ Test planningCountPickerClampsExternalValueAboveUpperBound() started.
+◇ Test aggregatorResolvesExerciseNameFromPlan() started.
+◇ Test weightInputFieldPercentToKgBasicConversion() started.
+◇ Test messageBadgeIncludesVideosAndChatUnread() started.
+◇ Test detailOverviewRosterAndReminderShareCompletion() started.
+◇ Test detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() started.
+◇ Test crossWeekOwnershipFallsBackToCalendarDate() started.
+◇ Test laggingStudentTrainsAcrossWeeksWithoutMissedReminder() started.
+◇ Test operationsEvaluateWithMultiplicationPrecedence() started.
+◇ Test acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() started.
+◇ Test accessoryRepositoryReturnsEmptyArrayForNoMatches() started.
+◇ Test latestActivityIncludesLogsNotPlacedInDisplayedWeek() started.
+◇ Test unfinishedTrainingSettlementAndLegacyFallback() started.
+◇ Test "missing RPE card renders the localized em dash" started.
+◇ Test "dashboard with zero students shows invitation guidance" started.
+◇ Test "global queue advances across students and wraps after its final item" started.
+◇ Test adhocOwnershipUsesTheSameWeekRule() started.
+◇ Test draftSetSpecPreservesNilRepsMax() started.
+◇ Test planNeedReasonDetectsMissingCurrentPlan() started.
+◇ Test "zero-based set index displays as one-based" started.
+◇ Test notTrainedSignalIgnoresTodayAndCompletedDays() started.
+◇ Test "empty student list stays alive while the global workbench advances" started.
+◇ Test expiringSoonOnlyWithin24Hours() started.
+◇ Test completionIssuesFlagsZeroWeightThenClearsWhenFilled() started.
+◇ Test draftStoreDeleteDraftRemovesMatchingTrainee() started.
+◇ Test "unlinked video resolves no set-info card" started.
+◇ Test "RPE formats whole and half values without decimal noise" started.
+◇ Test step1ShowsOnlyOneWeekCardForEvaluationStudent() started.
+◇ Test "post-send navigation resolves from the latest remaining queue" started.
+◇ Test step6CustomSequenceLengthTracksAppliedWeeks() started.
+◇ Test sameWeekJumpDoesNotCompleteEarlierDay() started.
+◇ Test "missing RPE stays absent instead of becoming zero" started.
+◇ Test "pending video badge reuses resolved set data and display-ready ordinal" started.
+◇ Test acceptMachineCodeErrorsBannerAndForceRefresh() started.
+◇ Test "empty queue has no position or post-send next item" started.
+◇ Test insertingBaseReplacesCurrentOperand() started.
+◇ Test trailingAndRepeatedOperatorsAreForgiving() started.
+◇ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() started.
+◇ Test "marker write failures surface instead of silently dropping the action" started.
+◇ Test videoQueueLoadFailureMovesToFailed() started.
+◇ Test directMessageEntryCarriesStudentNameIntoEmptyConversation() started.
+◇ Test muscleGroupTextCoversAllEightAllowedGroups() started.
+◇ Test blankSkipReasonIsDroppedNotSentEmpty() started.
+◇ Test planningNumberFieldDecrementDisabledAtLowerBound() started.
+◇ Test tempoSuffixStrippedFromName() started.
+◇ Test statusTextCountsDownFromExpectedEnd() started.
+◇ Test previewCatalogHasNoDuplicateIDs() started.
+◇ Test publishableNeedsAtLeastOneSelectedWeekAllComplete() started.
+◇ Test projectionReturnsEmptyDaysWhenNoDayMatchesWeekIndex() started.
+◇ Test planNeedReasonDetectsEndedCycle() started.
+◇ Test readinessFatigueTextHandlesNoFatigue() started.
+◇ Test statusIsUsedWhenSingleUseBudgetExhausted() started.
+◇ Test inMemoryRepositoryFiltersMainLiftCatalog() started.
+◇ Test previewCatalogCoversAllLiftFamilies() started.
+◇ Test detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() started.
+◇ Test weekCardRendersOneWeekTitle() started.
+◇ Test aggregatorSendFeedbackPostsThroughFeedbackRepo() started.
+◇ Test planningCountPickerIncrementDisabledAtUpperBound() started.
+◇ Test accessoryRepositoryFiltersSingleFacetMultipleValuesAsOr() started.
+◇ Test inMemoryRevokeUnknownIdThrowsNotFound() started.
+◇ Test coachInboxIsEmptyOnlyWhenBothSourcesAreEmpty() started.
+◇ Test step5ZeroOneRMIsTreatedAsUnavailable() started.
+◇ Test step7CurrentPreviewWeekDefaultsToOne() started.
+◇ Test aliasBindsWhenNoExactMatch() started.
+◇ Test draftStartsEmptyForZeroAndFormattedOtherwise() started.
+◇ Test step5SetCountIsClampedToAtLeastOne() started.
+◇ Test rejectExpiredBannerAndRefresh() started.
+◇ Test coachInboxPrioritizesVideosThenUnreadThenRecency() started.
+◇ Test prefilledOneRMFeedsOneRMLookupForMainLifts() started.
+◇ Test planningNumberFieldDecrementButtonSubtractsStep() started.
+◇ Test step4ViewRendersMainLiftAndAccessoryCards() started.
+◇ Test weekCardRendersDerivedWeekFooter() started.
+◇ Test dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() started.
+◇ Test planningCountPickerTagValueRoundTrips() started.
+◇ Test planningNumberFieldIncrementButtonCommitsPendingTextFirst() started.
+◇ Test coachInboxCoalescesDuplicateStudentConversationsToTheLatest() started.
+◇ Test "rapid item changes reject stale playback and set-log results" started.
+◇ Test intentResumesExistingDraftInsteadOfOverwriting() started.
+◇ Test planningCountPickerDecrementDisabledAtLowerBound() started.
+◇ Test divideByZeroShowsPlaceholderAndCommitsZero() started.
+◇ Test assembledTreeIsInternallyLinked() started.
+◇ Test coachDemoInboxUsesRosterIDsWithoutDuplicateStudents() started.
+◇ Test weekDerivationAppliesWeightIncrease() started.
+◇ Test step6CustomRuleRestoresExerciseValuesAfterSwitchingActions() started.
+✔ Test unmatchedNameDoesNotBind() passed after 0.018 seconds.
+✔ Test degradedSummaryReportsIncomplete() passed after 0.018 seconds.
+✔ Test coachInboxCountAddsPendingVideosAndUnreadMessages() passed after 0.018 seconds.
+◇ Test exerciseUsageTrackerTracksMultipleIDsIndependently() started.
+◇ Test rosterLoadsStudentsAndComputesAttentionBadge() started.
+✔ Test exerciseMustBeBoundAndAllSetsComplete() passed after 0.018 seconds.
+◇ Test "planning step zero replaces empty student sections with guidance" started.
+◇ Test firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() started.
+◇ Test weekDerivationAppliesSetsIncreaseAndDecreaseClamp() started.
+◇ Test step6RuleIncrementRoundsToPlanningIncrement() started.
+✔ Test parsesSetsAndRepsForms() passed after 0.018 seconds.
+✔ Test accessoryFiltersAreEquatableAndHashable() passed after 0.018 seconds.
+◇ Test inMemoryRepositoryPublishWritesStudentProjectionToStore() started.
+✔ Test weekDerivationAppliesRPEIncrease() passed after 0.018 seconds.
+◇ Test detailReadinessDistinguishesNotFiledFromFetchFailure() started.
+◇ Test assemblerMaterializesEveryWeekFromTheW1Draft() started.
+◇ Test assemblesPerSetTargetsAndRenumbersWeeks() started.
+◇ Test failedCompleteDoesNotNotifyCompletionCallback() started.
+◇ Test statusFlipsToExpiredAtBoundary() started.
+◇ Test ladderHandlesFractionalStep() started.
+✔ Test publishesThroughRepository() passed after 0.018 seconds.
+◇ Test accessoryRepositoryEmptyFilterReturnsAllAccessoriesOnly() started.
+◇ Test blankFlowOneRMStaysNil() started.
+✔ Test projectionDropsCorruptZeroSetNumberAndKeepsLegalSetsUncollided() passed after 0.018 seconds.
+◇ Test daySectionsGroupByTrainingDayNewestFirst() started.
+◇ Test sharedRPE() started.
+◇ Test demoSeedPendingVideosAreWellFormed() started.
+◇ Test demoSeedHasPersonalPlusTwoSecondaryCodes() started.
+◇ Test planningCountPickerIncrementButtonAddsStep() started.
+✔ Test projectionWeightModeSetHasWeightAndNilRPE() passed after 0.018 seconds.
+◇ Test transportFailureSurfacesRetryStateInsteadOfHidingBanner() started.
+◇ Test weekDerivationDefaultsSkippedWeeksToPreviousWeek() started.
+✔ Test percentPresetsNormalizeClampDedupeSortCap() passed after 0.018 seconds.
+◇ Test exerciseUsageTrackerIncrementsCount() started.
+◇ Test statusIsActiveForUnusedSingleUse() started.
+◇ Test triageSignalsCanCoexistForOneStudent() started.
+◇ Test step5ProceedRoutesOneWeekPlanDirectlyToPreview() started.
+◇ Test preferredDaysBecomeTheOnlySlotsLabeledByRank() started.
+✔ Test corruptDateRowSecondWeekStillParses() passed after 0.019 seconds.
+◇ Test backendPublishPlanThrowsWhenAChildCreateFailsAndDoesNotPublish() started.
+◇ Test weekDerivationIgnoresRulesForOtherExercises() started.
+◇ Test step7SetCurrentPreviewWeekClampsToPlanBounds() started.
+◇ Test "receiving inbox never renders empty before its initial load finishes" started.
+◇ Test transportFailureOnCompleteKeepsBannerWithError() started.
+◇ Test waitingTextScalesWithElapsedTime() started.
+◇ Test accessoryFilterSectionRendersThreeFacetRowsAndAllChips() started.
+◇ Test finishWritesDraftAndMarksFlowFinished() started.
+✔ Test projectionFiltersDaysByWeekIndexPickingThatWeeksValues() passed after 0.020 seconds.
+◇ Test weightInputFieldShowsPercentConversionWhenOneRMExists() started.
+◇ Test personalPermanentNeverExpiresOrExhausts() started.
+◇ Test detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() started.
+◇ Test statusTextFlipsToOverdueCopyPastExpectedEnd() started.
+◇ Test rejectRemovesItemSilently() started.
+◇ Test step1ShowsOnlyFourWeekCardForRegularStudent() started.
+◇ Test weekDerivationUsesCustomSequenceBySortedAppliedWeek() started.
+◇ Test prefillProfileMissReturnsNilWithNotice() started.
+◇ Test planningNumberFieldTextFieldClampsAboveRange() started.
+◇ Test trainingYearsNotchLabels() started.
+◇ Test adaptationIntentLoadsSlotsOnBootstrap() started.
+◇ Test step6ToggleAppliedWeekNeverAddsW1() started.
+◇ Test planNeedReasonSkipsRunningCycle() started.
+◇ Test workspaceViewModelEmptyCoachFallsBackToNoSections() started.
+✔ Test projectionSkipsExerciseMissingFromCatalog() passed after 0.020 seconds.
+◇ Test rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() started.
+◇ Test videoGridPlayExchangesIDForPresignedURL() started.
+◇ Test weekStartWithoutPlanKeepsTrailingSevenDayWindow() started.
+◇ Test blankFlowLoadsOneRMAndEquipmentFromProfile() started.
+◇ Test parsesTwoWeekFixtureStructure() started.
+◇ Test draftSetSpecRoundTripsRPEMode() started.
+◇ Test staleAssignmentOutsidePreferredSlotsStaysVisible() started.
+◇ Test saveDraftNeverNotifiesInFirstSaveMode() started.
+◇ Test step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() started.
+◇ Test assemblerAppliesWeeklyRuleWhileSetsStayUnderPerWeekExercise() started.
+◇ Test trainingDayTokensMapToWeekdayInts() started.
+◇ Test videoGridPlayFailureShowsRetryableErrorWithoutPresenting() started.
+◇ Test inMemoryRepositoryStoresPublishedPlans() started.
+◇ Test weightInputFieldExplainsMissingOneRM() started.
+◇ Test previewCatalogCompetitionStancesMatchBackendMetadata() started.
+◇ Test bundledAliasSeedHasSixtyOneEntries() started.
+◇ Test step4ScreenRendersSelectedSectionAndLibraryButton() started.
+◇ Test percentPresetStoreRoundTripsNormalized() started.
+✔ Test multiLineCellSplitsIntoAccessories() passed after 0.020 seconds.
+◇ Test studentGroupsAreOnePerStudentNewestUploadFirst() started.
+◇ Test exactFoldBindsLowBarSquat() started.
+◇ Test completeHidesBannerOnSuccess() started.
+✔ Test weekDerivationReturnsW1Baseline() passed after 0.022 seconds.
+◇ Test aggregatorCarriesStudentVideoSetLogID() started.
+◇ Test exerciseUsageTrackerPersistsAcrossInstancesInSameSuite() started.
+✔ Test projectionComputesDayDateFromStartDateWeekAndDayOfWeek() passed after 0.023 seconds.
+◇ Test adaptationIntentPresetsStudentDurationAndKind() started.
+◇ Test customProgressionRuleRoundTripsSequenceAndDimension() started.
+◇ Test projectionExpandsMultipleSetsSortedBySetNumber() started.
+◇ Test planningStepCodableRoundTripsEveryCase() started.
+◇ Test tempoFloatBecomesCoachNote() started.
+◇ Test loadEntersFirstSaveModeWithoutExistingSummary() started.
+◇ Test exactlyOneCoachTabLayerIsInteractiveAndAccessible() started.
+◇ Test accessorySearchMatchesEnglishNameCaseInsensitively() started.
+◇ Test detailDefinesFiveSectionsInSpecOrder() started.
+◇ Test step4UpdateFiltersReloadsMatchesForDay() started.
+◇ Test composerSendsTrimmedTextWithOptionalLinks() started.
+◇ Test assignmentValidationRequiresFrequencyToMatchAssignedLifts() started.
+✔ Test noSignalWhenRecentLogAlreadyHasFeedback() passed after 0.024 seconds.
+◇ Test retryAfterTransportFailureRecoversBanner() started.
+◇ Test aggregatorSkipsStudentsWithNoVideos() started.
+◇ Test notTrainedSignalCountsMissesAboveThreshold() started.
+◇ Test detailLoadsExecutionAndFeedbackSummaries() started.
+◇ Test percentStyleMathViaMultiply() started.
+✔ Test inMemoryListIsNewestFirst() passed after 0.023 seconds.
+◇ Test step5W1SetSpecRestoresFromDraftStore() started.
+◇ Test projectionMapsRepsMaxRangeToRepsMaxFieldLeavingRepsNil() started.
+◇ Test acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() started.
+◇ Test videoGridGroupsByLoggedDayNewestFirstAndFallsBackToCreatedAt() started.
+◇ Test step7DerivedPreviewReflectsWeightRule() started.
+◇ Test completionChainDegradesWhenCompleteFailsButSummarySaved() started.
+◇ Test notTrainedSignalStaysSilentBelowThreshold() started.
+◇ Test step6RuleRequiresExerciseBeforeShowingValues() started.
+◇ Test step6ToggleAppliedWeekAddsAndRemovesW2ToW4() started.
+◇ Test blankFlowWithEvaluationStudentForcesAdaptationKind() started.
+◇ Test step4AddAccessoryWritesDraftWithPerDaySortOrder() started.
+◇ Test accessoryMatchListSectionAddButtonTriggersCallback() started.
+◇ Test exerciseUsageTrackerStartsAtZero() started.
+◇ Test planNeedReasonDetectsCycleEndingThisWeek() started.
+◇ Test "marker actions update the current item and marker load failures stay hidden" started.
+◇ Test intensityModeToggleRendersBothModes() started.
+◇ Test weekCardRendersDaySectionsAndRows() started.
+◇ Test planningNumberFieldEditingValueCanPersistBeforeBlur() started.
+◇ Test assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() started.
+◇ Test weekStartAnchorsToPlanWeekContainingToday() started.
+◇ Test step6ToggleRuleExerciseAddsAndRemovesDraftExerciseID() started.
+◇ Test defaultStartDateIsNextMonday() started.
+◇ Test accessoryRepositoryFiltersAcrossFacetsAsAnd() started.
+◇ Test rosterMovesToFailedStateWhenStudentsCannotLoad() started.
+◇ Test triageSignalsCanScopeLogsAndFeedbackToOneStudent() started.
+◇ Test planningCountPickerDecrementButtonSubtractsStep() started.
+◇ Test requiredFieldsGateSaving() started.
+◇ Test bootstrapLoadsStudentsAndCatalog() started.
+◇ Test revokedWinsOverEverything() started.
+◇ Test backoffKeepsCueAndType() started.
+◇ Test inMemoryRepositoryFetchesAllStudents() started.
+✔ Test weightInputFieldNegativeOneRMReturnsZero() passed after 0.028 seconds.
+✔ Test perSetWeightList() passed after 0.029 seconds.
+◇ Test previewCatalogAllExercisesHaveValidEnums() started.
+◇ Test step4BootstrapRestoresCurrentDayAndSelectedAccessories() started.
+◇ Test step3RendersPerDayMainLiftPickers() started.
+◇ Test draftSetSpecRoundTripsWeightMode() started.
+◇ Test revokeMovesCodeToDefunctSection() started.
+◇ Test previewCatalogHasNoDuplicateChineseNames() started.
+◇ Test step6ViewRendersEmptyRulesState() started.
+◇ Test draftSetSpecPreservesNonNilRepsMax() started.
+◇ Test notTrainedSignalFiresAtThreshold() started.
+◇ Test "active and in-evaluation students read as 活跃" started.
+◇ Test coachShellRoutesDashboardAndRosterChatThroughMessagesTab() started.
+◇ Test perSetRPEFromFloatDigits() started.
+◇ Test steppersClampAtZeroAndStayOnHalfGrid() started.
+◇ Test step6UncoveredExercisesUpdatesAfterRuleAssignment() started.
+◇ Test step5ProceedAutoFillsMissingSetSpecsWithDefaults() started.
+◇ Test acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() started.
+◇ Test weightInputFieldKgToPercentRoundsResultToHalfPercent() started.
+◇ Test "abnormal students read as 待关注, not 活跃" started.
+◇ Test coachEvaluationSealKeepsEvaluationBannerAndLoadingDormant() started.
+◇ Test "unknown status shows no subtitle instead of claiming active" started.
+◇ Test "single-student video list renders loading, failure, and empty distinctly" started.
+◇ Test equipmentFilterFollowsGymTierTable() started.
+◇ Test aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test weekDerivationAppliesRepsIncreaseAndDecreaseClamp() started.
+◇ Test aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() started.
+◇ Test draftSetSpecRoundTripsRestFields() started.
+◇ Test concurrentCompleteConflictReadsAsSuccessAndRefreshes() started.
+◇ Test weightInputFieldRoundsRawInputBeforeConverting() started.
+◇ Test editModeSaveUsesNotifyCheckbox() started.
+◇ Test step4DeleteAccessoryRemovesOnlySelectedAccessory() started.
+◇ Test growthMissingSeriesLoadsAsExistingEmptyState() started.
+◇ Test case passing 1 argument displayName → nil to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test case passing 1 argument displayName → "" to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test detailAppendPostedFeedbackRefreshesLatestOverview() started.
+◇ Test coachCompleteRequiresRealLoad() started.
+◇ Test case passing 1 argument displayName → "   " to coachProfileFallsBackWhenBackendNameIsMissing(_:) started.
+◇ Test assemblerSkipsSetsForExercisesWithoutAW1Spec() started.
+◇ Test "student detail replaces the zero-progress plan shell with guidance" started.
+◇ Test draftStoreLoadDraftKeepsOtherStudents() started.
+◇ Test draftStoreDeleteAllRemovesEveryDraft() started.
+◇ Test step5RPEValueIsClampedIntoRange() started.
+◇ Test inMemoryPlaybackURLHitAndMiss() started.
+◇ Test inMemoryRevokeIsIdempotent() started.
+◇ Test draftStoreSavesAndLoadsDraft() started.
+◇ Test awaitingReplySignalReusesRecentLogWithoutFeedbackRule() started.
+◇ Test accessoryFiltersEmptyStaticHasNoFacetSelections() started.
+◇ Test planningNumberFieldFormattedDisplayFormatsValue() started.
+◇ Test prefilledEquipmentSeedsDefaultAccessoryFilters() started.
+◇ Test step6ViewRendersSingleRuleChips() started.
+◇ Test noEvaluationIsNotALoadFailure() started.
+◇ Test localDayStringMatchesCheckinDateWireShape() started.
+◇ Test staleRefreshCannotRestoreVideoAfterFeedbackSend() started.
+◇ Test step6ProceedAllowsEmptyRules() started.
+◇ Test inMemoryReturnsSeedNewestFirst() started.
+◇ Test readinessFatigueTextOrdersByAllowedChipOrder() started.
+◇ Test legacyFillW1IntensityDraftRestoresToSingleStep4() started.
+◇ Test detailLoadsVideoWallAndTodayReadiness() started.
+◇ Test weightEntryBasesOfferOneRMAndSameDayMainTopWeight() started.
+◇ Test projectionMapsSingleWeekSingleExerciseHappyPath() started.
+◇ Test dayColumnsUseFiveColumnStride() started.
+◇ Test previewRepositoryStudentIDsAreStableAcrossLaunches() started.
+◇ Test weightInputFieldKgToPercentBasicConversion() started.
+◇ Test projectionYieldsNoSetsWhenEveryPlanSetIsCorrupt() started.
+◇ Test draftProgressSummaryMapsStepNameAndWeeks() started.
+◇ Test weekDerivationDispatchesCustomRuleToEachDimension() started.
+◇ Test accessoryLibrarySheetRendersFilterAndMatchSections() started.
+◇ Test step5WeightValueRoundsToHalfKilogramIncrement() started.
+◇ Test completionChainIgnoresConcurrentCompleteConflict() started.
+◇ Test aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() started.
+◇ Test step5ProceedRoutesFourWeekPlanToRules() started.
+◇ Test previewCatalogCoversAllExerciseTypes() started.
+◇ Test draftProgressionRulePreservesExerciseIDSet() started.
+◇ Test planningCountPickerIncrementSnapsOffGridValueToNextTag() started.
+◇ Test case passing 1 argument name → "离心卧推" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "弹力带窄推" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "安全杠节奏深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "低杠位暂停深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test case passing 1 argument name → "低杠位节奏深蹲" to newCatalogExercisesBindExactly(name:) started.
+◇ Test "the same retained dates remap when Sunday rolls into Monday" started.
+◇ Test "aggregates real plan dates into Monday through Sunday cells" started.
+◇ Test "ISO week and columns stay correct across a calendar-year boundary" started.
+◇ Test "column mapping uses the supplied positive or negative time zone" started.
+◇ Test "an empty current week never falls back to whole-plan totals" started.
+◇ Test "current-week training days produce the expected progress and cells" started.
+✔ Test accessorySearchFoldsBarCharacterAcrossSpellings() passed after 0.119 seconds.
+✔ Test projectionMatchesStudentGoldenMatrixForAllForms() passed after 0.118 seconds.
+✔ Test profileSummaryFormatsKeyFields() passed after 0.122 seconds.
+◇ Test "returns no rows when every source is empty or non-actionable" started.
+◇ Test "orders videos, unread, missed training, then applications" started.
+◇ Test "native plural interpolation selects English variants at runtime" started.
+◇ Test "native interpolation preserves byte-exact Chinese rendering" started.
+✔ Test profileSummaryReturnsNilForEmptyFields() passed after 0.146 seconds.
+✔ Test statusCountsRemainingDaysForTimeLimited() passed after 0.147 seconds.
+◇ Test "exercise display uses catalog English without changing the canonical name" started.
+◇ Test "count strings provide an English singular variation" started.
+◇ Test "critical Chinese source strings stay byte-exact" started.
+◇ Test "English catalog does not contain generated placeholder labels" started.
+◇ Test "every string has complete Chinese and English translations" started.
+◇ Test "every countable English value is plural-aware" started.
+◇ Test unchangedPlannedOnlyDetailHasNoAddedCaption() started.
+◇ Test extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner() started.
+◇ Test accessibleRowRetainsFullSetMetricsWithoutExtraLabel() started.
+◇ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() started.
+◇ Test "a log outside the pairing window never counts as completion" started.
+◇ Test "completion is re-decided per calendar, not frozen at fetch time" started.
+✔ Test accessoryFiltersIsEmptyTracksAnySelectedFacet() passed after 0.213 seconds.
+✔ Test weekDerivationAppliesWeightDecrease() passed after 0.214 seconds.
+✔ Test barCharacterFoldsBothWays() passed after 0.214 seconds.
+✔ Test weekDerivationCarriesRestFieldsUnchanged() passed after 0.215 seconds.
+✔ Test notTrainedSignalDoesNotCountShiftedOriginalDates() passed after 0.214 seconds.
+✔ Test restDayHasNoExercises() passed after 0.215 seconds.
+◇ Test "formats the mockup month-day and weekday with an explicit calendar" started.
+✔ Test aggregatorLinkedClipDropsAfterSendAndRefetch() passed after 0.259 seconds.
+✔ Test amrapDefersRepsAndKeepsCue() passed after 0.261 seconds.
+✔ Test ageDerivesFromBirthDateClientSide() passed after 0.261 seconds.
+✔ Test weekDerivationCombinesDifferentDimensions() passed after 0.261 seconds.
+◇ Test case passing 2 arguments rawName → "低杆深蹲", canonical → "低杠位深蹲" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "卧推", canonical → "杠铃卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "传统硬拉", canonical → "比赛式传统硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "相扑硬拉", canonical → "比赛式相扑硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+✔ Test percentOfBaseLandsOnPlateGrid() passed after 0.307 seconds.
+◇ Test case passing 2 arguments rawName → "窄推", canonical → "窄握卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "长暂停卧推", canonical → "暂停卧推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "弹力带绕髋RDL", canonical → "弹力带绕髋罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "抓举握距RDL", canonical → "抓举握距罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "前后站单腿罗拉", canonical → "前后站单腿罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "相扑RDL", canonical → "相扑罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "节奏RDL", canonical → "节奏罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿RDL", canonical → "单腿罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿 RDL(纯单腿)", canonical → "单腿罗马尼亚硬拉(纯单腿)" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "B 站距 RDL", canonical → "B 站距罗马尼亚硬拉" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单腿 RDL(B 站距)", canonical → "单腿罗马尼亚硬拉(B 站距)" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "臀推", canonical → "杠铃臀冲" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "器械胸推", canonical → "器械推胸" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "绳索夹胸", canonical → "绳索飞鸟" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "弹力带-腿外展", canonical → "弹力带髋外展" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "单侧射手俯卧撑", canonical → "射手俯卧撑" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "坐姿推肩", canonical → "坐姿哑铃推举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "两头起", canonical → "V字上举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "帕洛夫推", canonical → "弹力带 pallof 推" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+◇ Test case passing 2 arguments rawName → "对握弯举", canonical → "绳索锤式弯举" to aliasSeedRowsBindToCanonical(rawName:canonical:) started.
+✔ Test projectionSortsDaysChronologicallyByDayOfWeek() passed after 0.544 seconds.
+✔ Test exactMatchWinsOverAlias() passed after 0.544 seconds.
+✔ Test weightInputFieldRoundTripStableAtCommonBenchmark() passed after 0.544 seconds.
+✔ Test percentTopLeftEmptyWithCue() passed after 0.544 seconds.
+✔ Test readinessScalesTextShowsRawValuesWithoutInversion() passed after 0.546 seconds.
+✔ Test coachInboxUsesStudentIDAsStableTieBreakerForSameName() passed after 0.546 seconds.
+✔ Test progressionRuleTypeRawValuesStaySnakeCase() passed after 0.560 seconds.
+✔ Test projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() passed after 0.560 seconds.
+✔ Test corruptDateRowStillOpensABlock() passed after 0.561 seconds.
+✔ Test oneRMsMapPerFamilyDroppingMissing() passed after 0.562 seconds.
+✔ Test weightInputFieldZeroOneRMReturnsZero() passed after 0.562 seconds.
+✔ Test incompleteSelectionThrows() passed after 0.562 seconds.
+◇ Test "free first set log renders hash one" started.
+◇ Test "planned first set log renders hash one" started.
+✔ Test padDigitsAppendWithTwoDecimalPlaces() passed after 0.562 seconds.
+✔ Test ladderClampsAtCap() passed after 0.562 seconds.
+✔ Test coachInboxUnifiesChatAndVideoStudentsWithoutDuplicates() passed after 0.562 seconds.
+✔ Test deselectingFirstWeekRenumbersRemainingToOne() passed after 0.562 seconds.
+✔ Test weekDerivationUsesHigherDisplayOrderForSameDimension() passed after 0.562 seconds.
+✔ Test oneRMTrioStripsTrailingZeros() passed after 0.561 seconds.
+✔ Test weightInputFieldPercentToKgRoundsResultToHalfKg() passed after 0.562 seconds.
+✔ Test draftProgressionRuleEncodesDecimalAsString() passed after 0.562 seconds.
+✔ Test detectsDateRowsAndSplitsBlocks() passed after 0.562 seconds.
+✔ Test aggregatorExcludesAnsweredAndUnlinkedKeepsUnanswered() passed after 0.562 seconds.
+✔ Test singleWeightAppliesToEverySet() passed after 0.566 seconds.
+✔ Test inMemorySendFeedbackDropsExactVideoAndScopesIt() passed after 0.566 seconds.
+✔ Test endDateSpansSelectedWeeks() passed after 0.566 seconds.
+✔ Test backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() passed after 0.567 seconds.
+✔ Test newCatalogExercisesBindExactly(name:) with 5 test cases passed after 0.566 seconds.
+✔ Test weekDerivationAppliesRPEDecreaseAndClamps() passed after 0.567 seconds.
+✔ Test projectionRPEModeSetRoutesValueToRPEFieldLeavingWeightNil() passed after 0.568 seconds.
+✔ Test singleLegDeadliftAndSingleLegRDLStayDistinct() passed after 0.572 seconds.
+✔ Test projectionOrdersMainLiftBeforeAccessoryBySortOrder() passed after 0.570 seconds.
+✔ Test setNeedsRepsAndAValidTarget() passed after 0.570 seconds.
+✔ Test aggregatorResolvesExerciseNameFromPlan() passed after 0.570 seconds.
+✔ Test weightInputFieldPercentToKgBasicConversion() passed after 0.569 seconds.
+✔ Test messageBadgeIncludesVideosAndChatUnread() passed after 0.569 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetSingleValue() passed after 0.574 seconds.
+✔ Test crossWeekOwnershipFallsBackToCalendarDate() passed after 0.569 seconds.
+✔ Test operationsEvaluateWithMultiplicationPrecedence() passed after 0.569 seconds.
+✔ Test unfinishedTrainingSettlementAndLegacyFallback() passed after 0.569 seconds.
+✔ Test "global queue advances across students and wraps after its final item" passed after 0.569 seconds.
+✔ Test adhocOwnershipUsesTheSameWeekRule() passed after 0.569 seconds.
+✔ Test planNeedReasonDetectsMissingCurrentPlan() passed after 0.569 seconds.
+✔ Test draftSetSpecPreservesNilRepsMax() passed after 0.569 seconds.
+✔ Test notTrainedSignalIgnoresTodayAndCompletedDays() passed after 0.569 seconds.
+✔ Test expiringSoonOnlyWithin24Hours() passed after 0.569 seconds.
+✔ Test "zero-based set index displays as one-based" passed after 0.569 seconds.
+✔ Test "RPE formats whole and half values without decimal noise" passed after 0.569 seconds.
+✔ Test "post-send navigation resolves from the latest remaining queue" passed after 0.569 seconds.
+✔ Test "unlinked video resolves no set-info card" passed after 0.569 seconds.
+✔ Test sameWeekJumpDoesNotCompleteEarlierDay() passed after 0.569 seconds.
+✔ Test "empty queue has no position or post-send next item" passed after 0.568 seconds.
+✔ Test "missing RPE stays absent instead of becoming zero" passed after 0.569 seconds.
+✔ Test trailingAndRepeatedOperatorsAreForgiving() passed after 0.568 seconds.
+✔ Test insertingBaseReplacesCurrentOperand() passed after 0.568 seconds.
+✔ Test "pending video badge reuses resolved set data and display-ready ordinal" passed after 0.569 seconds.
+✔ Test muscleGroupTextCoversAllEightAllowedGroups() passed after 0.568 seconds.
+✔ Test tempoSuffixStrippedFromName() passed after 0.568 seconds.
+✔ Test publishableNeedsAtLeastOneSelectedWeekAllComplete() passed after 0.568 seconds.
+✔ Test projectionReturnsEmptyDaysWhenNoDayMatchesWeekIndex() passed after 0.568 seconds.
+✔ Test planNeedReasonDetectsEndedCycle() passed after 0.568 seconds.
+✔ Test readinessFatigueTextHandlesNoFatigue() passed after 0.568 seconds.
+✔ Test statusIsUsedWhenSingleUseBudgetExhausted() passed after 0.568 seconds.
+✔ Test inMemoryRepositoryFiltersMainLiftCatalog() passed after 0.568 seconds.
+✔ Test aggregatorSendFeedbackPostsThroughFeedbackRepo() passed after 0.568 seconds.
+✔ Test inMemoryRevokeUnknownIdThrowsNotFound() passed after 0.567 seconds.
+✔ Test coachInboxIsEmptyOnlyWhenBothSourcesAreEmpty() passed after 0.567 seconds.
+✔ Test aliasBindsWhenNoExactMatch() passed after 0.567 seconds.
+✔ Test coachInboxPrioritizesVideosThenUnreadThenRecency() passed after 0.568 seconds.
+✔ Test draftStartsEmptyForZeroAndFormattedOtherwise() passed after 0.568 seconds.
+✔ Test unmatchedNameFallsThroughToCandidates() passed after 0.577 seconds.
+✔ Test coachInboxCoalescesDuplicateStudentConversationsToTheLatest() passed after 0.568 seconds.
+✔ Test divideByZeroShowsPlaceholderAndCommitsZero() passed after 0.572 seconds.
+✔ Test assembledTreeIsInternallyLinked() passed after 0.573 seconds.
+✔ Test coachDemoInboxUsesRosterIDsWithoutDuplicateStudents() passed after 0.572 seconds.
+✔ Test weekDerivationAppliesWeightIncrease() passed after 0.572 seconds.
+✔ Test weekDerivationAppliesSetsIncreaseAndDecreaseClamp() passed after 0.572 seconds.
+✔ Test inMemoryRepositoryPublishWritesStudentProjectionToStore() passed after 0.572 seconds.
+✔ Test assemblesPerSetTargetsAndRenumbersWeeks() passed after 0.571 seconds.
+✔ Test statusFlipsToExpiredAtBoundary() passed after 0.572 seconds.
+✔ Test ladderHandlesFractionalStep() passed after 0.572 seconds.
+✔ Test sharedRPE() passed after 0.572 seconds.
+✔ Test demoSeedPendingVideosAreWellFormed() passed after 0.572 seconds.
+✔ Test weekDerivationDefaultsSkippedWeeksToPreviousWeek() passed after 0.571 seconds.
+✔ Test statusIsActiveForUnusedSingleUse() passed after 0.572 seconds.
+✔ Test triageSignalsCanCoexistForOneStudent() passed after 0.571 seconds.
+✔ Test backendPublishPlanThrowsWhenAChildCreateFailsAndDoesNotPublish() passed after 0.593 seconds.
+✔ Test weekDerivationIgnoresRulesForOtherExercises() passed after 0.596 seconds.
+✔ Test waitingTextScalesWithElapsedTime() passed after 0.596 seconds.
+✔ Test personalPermanentNeverExpiresOrExhausts() passed after 0.597 seconds.
+✔ Test weekDerivationUsesCustomSequenceBySortedAppliedWeek() passed after 0.595 seconds.
+✔ Test trainingYearsNotchLabels() passed after 0.595 seconds.
+✔ Test planNeedReasonSkipsRunningCycle() passed after 0.595 seconds.
+✔ Test parsesTwoWeekFixtureStructure() passed after 0.595 seconds.
+✔ Test draftSetSpecRoundTripsRPEMode() passed after 0.594 seconds.
+✔ Test trainingDayTokensMapToWeekdayInts() passed after 0.594 seconds.
+✔ Test inMemoryRepositoryStoresPublishedPlans() passed after 0.594 seconds.
+✔ Test previewCatalogTotalCountIsTwelveSixteen() passed after 0.617 seconds.
+✔ Test bundledAliasSeedHasSixtyOneEntries() passed after 0.594 seconds.
+✔ Test percentPresetStoreRoundTripsNormalized() passed after 0.594 seconds.
+✔ Test exactFoldBindsLowBarSquat() passed after 0.594 seconds.
+✔ Test aggregatorCarriesStudentVideoSetLogID() passed after 0.593 seconds.
+✔ Test customProgressionRuleRoundTripsSequenceAndDimension() passed after 0.593 seconds.
+✔ Test projectionExpandsMultipleSetsSortedBySetNumber() passed after 0.593 seconds.
+✔ Test planningStepCodableRoundTripsEveryCase() passed after 0.593 seconds.
+✔ Test tempoFloatBecomesCoachNote() passed after 0.593 seconds.
+✔ Test exactlyOneCoachTabLayerIsInteractiveAndAccessible() passed after 0.593 seconds.
+✔ Test accessorySearchMatchesEnglishNameCaseInsensitively() passed after 0.593 seconds.
+✔ Test aggregatorSkipsStudentsWithNoVideos() passed after 0.592 seconds.
+✔ Test notTrainedSignalCountsMissesAboveThreshold() passed after 0.593 seconds.
+✔ Test percentStyleMathViaMultiply() passed after 0.592 seconds.
+✔ Test projectionMapsRepsMaxRangeToRepsMaxFieldLeavingRepsNil() passed after 0.592 seconds.
+✔ Test notTrainedSignalStaysSilentBelowThreshold() passed after 0.592 seconds.
+✔ Test planNeedReasonDetectsCycleEndingThisWeek() passed after 0.592 seconds.
+✔ Test defaultStartDateIsNextMonday() passed after 0.592 seconds.
+✔ Test accessoryRepositoryEmptyFilterReturnsAllAccessoriesOnly() passed after 0.600 seconds.
+✔ Test revokedWinsOverEverything() passed after 0.592 seconds.
+✔ Test triageSignalsCanScopeLogsAndFeedbackToOneStudent() passed after 0.592 seconds.
+✔ Test backoffKeepsCueAndType() passed after 0.591 seconds.
+✔ Test inMemoryRepositoryFetchesAllStudents() passed after 0.591 seconds.
+✔ Test accessoryRepositoryReturnsEmptyArrayForNoMatches() passed after 0.607 seconds.
+✔ Test draftSetSpecRoundTripsWeightMode() passed after 0.586 seconds.
+✔ Test dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() passed after 0.602 seconds.
+✔ Test draftSetSpecPreservesNonNilRepsMax() passed after 0.585 seconds.
+✔ Test notTrainedSignalFiresAtThreshold() passed after 0.585 seconds.
+✔ Test "active and in-evaluation students read as 活跃" passed after 0.585 seconds.
+✔ Test perSetRPEFromFloatDigits() passed after 0.585 seconds.
+✔ Test steppersClampAtZeroAndStayOnHalfGrid() passed after 0.585 seconds.
+✔ Test weightInputFieldKgToPercentRoundsResultToHalfPercent() passed after 0.585 seconds.
+✔ Test "abnormal students read as 待关注, not 活跃" passed after 0.585 seconds.
+✔ Test coachEvaluationSealKeepsEvaluationBannerAndLoadingDormant() passed after 0.585 seconds.
+✔ Test "unknown status shows no subtitle instead of claiming active" passed after 0.585 seconds.
+✔ Test equipmentFilterFollowsGymTierTable() passed after 0.585 seconds.
+✔ Test previewCatalogHasNoDuplicateIDs() passed after 0.605 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetMultipleValuesAsOr() passed after 0.605 seconds.
+✔ Test previewCatalogCoversAllLiftFamilies() passed after 0.605 seconds.
+✔ Test accessoryRepositoryFiltersAcrossFacetsAsAnd() passed after 0.595 seconds.
+✔ Test previewCatalogContainsFourSyntheticCompetitionLifts() passed after 0.608 seconds.
+✔ Test previewCatalogCompetitionStancesMatchBackendMetadata() passed after 0.599 seconds.
+✔ Test previewCatalogHasNoDuplicateChineseNames() passed after 0.589 seconds.
+✔ Test previewCatalogAllExercisesHaveValidEnums() passed after 0.596 seconds.
+✔ Test everyAliasCanonicalResolvesUniquely() passed after 0.613 seconds.
+✔ Test weekDerivationAppliesRepsIncreaseAndDecreaseClamp() passed after 0.586 seconds.
+✔ Test draftSetSpecRoundTripsRestFields() passed after 0.586 seconds.
+✔ Test aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() passed after 0.586 seconds.
+✔ Test weightInputFieldRoundsRawInputBeforeConverting() passed after 0.586 seconds.
+✔ Test coachCompleteRequiresRealLoad() passed after 0.585 seconds.
+✔ Test inMemoryPlaybackURLHitAndMiss() passed after 0.584 seconds.
+✔ Test inMemoryRevokeIsIdempotent() passed after 0.584 seconds.
+✔ Test awaitingReplySignalReusesRecentLogWithoutFeedbackRule() passed after 0.584 seconds.
+✔ Test accessoryFiltersEmptyStaticHasNoFacetSelections() passed after 0.584 seconds.
+✔ Test localDayStringMatchesCheckinDateWireShape() passed after 0.583 seconds.
+✔ Test readinessFatigueTextOrdersByAllowedChipOrder() passed after 0.583 seconds.
+✔ Test inMemoryReturnsSeedNewestFirst() passed after 0.583 seconds.
+✔ Test projectionMapsSingleWeekSingleExerciseHappyPath() passed after 0.582 seconds.
+✔ Test dayColumnsUseFiveColumnStride() passed after 0.582 seconds.
+✔ Test projectionYieldsNoSetsWhenEveryPlanSetIsCorrupt() passed after 0.582 seconds.
+✔ Test draftProgressSummaryMapsStepNameAndWeeks() passed after 0.582 seconds.
+✔ Test weekDerivationDispatchesCustomRuleToEachDimension() passed after 0.582 seconds.
+✔ Test aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() passed after 0.580 seconds.
+✔ Test draftProgressionRulePreservesExerciseIDSet() passed after 0.579 seconds.
+✔ Test weightInputFieldKgToPercentBasicConversion() passed after 0.582 seconds.
+✔ Test "the same retained dates remap when Sunday rolls into Monday" passed after 0.512 seconds.
+✔ Test "aggregates real plan dates into Monday through Sunday cells" passed after 0.512 seconds.
+✔ Test "ISO week and columns stay correct across a calendar-year boundary" passed after 0.511 seconds.
+✔ Test "column mapping uses the supplied positive or negative time zone" passed after 0.511 seconds.
+✔ Test "an empty current week never falls back to whole-plan totals" passed after 0.511 seconds.
+✔ Test "current-week training days produce the expected progress and cells" passed after 0.511 seconds.
+✔ Test "returns no rows when every source is empty or non-actionable" passed after 0.495 seconds.
+✔ Test "orders videos, unread, missed training, then applications" passed after 0.495 seconds.
+✔ Test draftTrainingPlanMapsToDomainPlan() passed after 0.625 seconds.
+✔ Test draftMappingDecodeSetSpecReturnsNilForNilData() passed after 0.625 seconds.
+✔ Test "exercise display uses catalog English without changing the canonical name" passed after 0.459 seconds.
+✔ Test "native plural interpolation selects English variants at runtime" passed after 0.482 seconds.
+✔ Test "native interpolation preserves byte-exact Chinese rendering" passed after 0.482 seconds.
+✔ Test "a log outside the pairing window never counts as completion" passed after 0.419 seconds.
+✔ Test dayChipBarRendersAssignedDayChips() passed after 0.626 seconds.
+✔ Test "completion is re-decided per calendar, not frozen at fetch time" passed after 0.419 seconds.
+✔ Test planningNumberFieldIncrementDisabledAtUpperBound() passed after 0.626 seconds.
+✔ Test "formats the mockup month-day and weekday with an explicit calendar" passed after 0.402 seconds.
+✔ Test draftMappingEncodesRulesEmptyAndNonEmpty() passed after 0.626 seconds.
+✔ Test planningNumberFieldIncrementButtonAddsStep() passed after 0.626 seconds.
+✔ Test coachProfileUsesBackendNameWhenPresent() passed after 0.626 seconds.
+✔ Suite "Coach chat status subtitle" passed after 0.626 seconds.
+✔ Suite "Coach week overview" passed after 0.626 seconds.
+✔ Suite "Coach today todo ordering" passed after 0.625 seconds.
+✔ Suite "CoachKit localization runtime" passed after 0.625 seconds.
+✔ Suite "Coach week overview · completion" passed after 0.620 seconds.
+✔ Suite "Coach today formatting" passed after 0.621 seconds.
+✔ Test aliasSeedRowsBindToCanonical(rawName:canonical:) with 24 test cases passed after 0.616 seconds.
+✔ Test "count strings provide an English singular variation" passed after 0.495 seconds.
+✔ Test "critical Chinese source strings stay byte-exact" passed after 0.495 seconds.
+✔ Test acceptSheetSealsEvaluationChoice() passed after 0.662 seconds.
+✔ Test "every countable English value is plural-aware" passed after 0.499 seconds.
+✔ Test "every string has complete Chinese and English translations" passed after 0.526 seconds.
+✔ Test previewRepositoryStudentIDsAreStableAcrossLaunches() passed after 0.660 seconds.
+✔ Test previewCatalogCoversAllExerciseTypes() passed after 0.668 seconds.
+✔ Test coachRootViewInitializes() passed after 0.719 seconds.
+✔ Test planningNumberFieldTextFieldUpdateRoundsToIncrement() passed after 0.724 seconds.
+✔ Test draftExercisesMapToDomainExercises() passed after 0.726 seconds.
+✔ Test draftDaysMapToDomainDays() passed after 0.726 seconds.
+✔ Test "English catalog does not contain generated placeholder labels" passed after 0.641 seconds.
+✔ Suite "CoachKit localization" passed after 0.802 seconds.
+✔ Test executionDaysShowCurrentPlanWeekRows() passed after 0.874 seconds.
+✔ Test exerciseUsageTrackerResetClearsCounts() passed after 0.885 seconds.
+✔ Test draftMappingEncodesAndDecodesSetSpec() passed after 1.001 seconds.
+✔ Test "roster shows loading before empty and distinguishes search misses" passed after 1.165 seconds.
+✔ Test coachProfileFallsBackWhenBackendNameIsMissing(_:) with 3 test cases passed after 1.219 seconds.
+✔ Test weekStartClampsToCycleBounds() passed after 1.219 seconds.
+✔ Test planningNumberFieldEmptyInputResetsToZero() passed after 1.219 seconds.
+✔ Test planningCountPickerEnumeratesTagsByStepWithinRange() passed after 1.218 seconds.
+✔ Test sealedStudentDetailDoesNotRenderEvaluationBanner() passed after 1.421 seconds.
+✔ Test domainPlanDaysAndExercisesRebuildDraft() passed after 1.432 seconds.
+✔ Test composerClearsExerciseWhenLinkedDayChanges() passed after 1.434 seconds.
+✔ Test draftMappingExpandsSetSpecToPlanSets() passed after 1.443 seconds.
+✔ Test planningNumberFieldTextFieldClampsBelowRange() passed after 1.454 seconds.
+✔ Test coachProfileLogoutRunsInjectedAction() passed after 1.457 seconds.
+✔ Test planningCountPickerClampsExternalValueAboveUpperBound() passed after 1.464 seconds.
+✔ Test planningCountPickerSnapsValueOutsideGrid() passed after 1.464 seconds.
+✔ Test detailOverviewRosterAndReminderShareCompletion() passed after 1.464 seconds.
+✔ Test laggingStudentTrainsAcrossWeeksWithoutMissedReminder() passed after 1.464 seconds.
+✔ Test latestActivityIncludesLogsNotPlacedInDisplayedWeek() passed after 1.464 seconds.
+✔ Suite "Coach day ownership" passed after 1.479 seconds.
+✔ Test "missing RPE card renders the localized em dash" passed after 1.525 seconds.
+✔ Test "dashboard with zero students shows invitation guidance" passed after 1.565 seconds.
+✔ Test "empty student list stays alive while the global workbench advances" passed after 1.565 seconds.
+✔ Suite "Coach video feedback workbench presentation" passed after 1.579 seconds.
+✔ Test draftStoreDeleteDraftRemovesMatchingTrainee() passed after 1.585 seconds.
+✔ Test planningNumberFieldDecrementDisabledAtLowerBound() passed after 1.611 seconds.
+✔ Test detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() passed after 1.611 seconds.
+✔ Test planningCountPickerIncrementDisabledAtUpperBound() passed after 1.633 seconds.
+✔ Test planningNumberFieldDecrementButtonSubtractsStep() passed after 1.669 seconds.
+✔ Test planningNumberFieldIncrementButtonCommitsPendingTextFirst() passed after 1.689 seconds.
+✔ Test planningCountPickerTagValueRoundTrips() passed after 1.689 seconds.
+✔ Test planningCountPickerDecrementDisabledAtLowerBound() passed after 1.698 seconds.
+✔ Test exerciseUsageTrackerTracksMultipleIDsIndependently() passed after 1.705 seconds.
+✔ Test "planning step zero replaces empty student sections with guidance" passed after 1.712 seconds.
+✔ Test assemblerMaterializesEveryWeekFromTheW1Draft() passed after 1.728 seconds.
+✔ Test daySectionsGroupByTrainingDayNewestFirst() passed after 1.732 seconds.
+✔ Test planningCountPickerIncrementButtonAddsStep() passed after 1.736 seconds.
+✔ Test exerciseUsageTrackerIncrementsCount() passed after 1.740 seconds.
+✔ Test "receiving inbox never renders empty before its initial load finishes" passed after 1.751 seconds.
+✔ Test accessoryFilterSectionRendersThreeFacetRowsAndAllChips() passed after 1.991 seconds.
+✔ Test weightInputFieldShowsPercentConversionWhenOneRMExists() passed after 2.032 seconds.
+✔ Test detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() passed after 2.032 seconds.
+✔ Test planningNumberFieldTextFieldClampsAboveRange() passed after 2.035 seconds.
+✔ Test rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() passed after 2.062 seconds.
+✔ Test weekStartWithoutPlanKeepsTrailingSevenDayWindow() passed after 2.062 seconds.
+✔ Test assemblerAppliesWeeklyRuleWhileSetsStayUnderPerWeekExercise() passed after 2.080 seconds.
+✔ Test weightInputFieldExplainsMissingOneRM() passed after 2.095 seconds.
+✔ Test exerciseUsageTrackerPersistsAcrossInstancesInSameSuite() passed after 2.121 seconds.
+✔ Test detailDefinesFiveSectionsInSpecOrder() passed after 2.125 seconds.
+✔ Test videoGridGroupsByLoggedDayNewestFirstAndFallsBackToCreatedAt() passed after 2.147 seconds.
+✔ Test accessoryMatchListSectionAddButtonTriggersCallback() passed after 2.349 seconds.
+✔ Test exerciseUsageTrackerStartsAtZero() passed after 2.353 seconds.
+✔ Test intensityModeToggleRendersBothModes() passed after 2.374 seconds.
+✔ Test planningNumberFieldEditingValueCanPersistBeforeBlur() passed after 2.374 seconds.
+✔ Test assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() passed after 2.376 seconds.
+✔ Test weekStartAnchorsToPlanWeekContainingToday() passed after 2.376 seconds.
+✔ Test planningCountPickerDecrementButtonSubtractsStep() passed after 2.389 seconds.
+✔ Test coachShellRoutesDashboardAndRosterChatThroughMessagesTab() passed after 2.826 seconds.
+✔ Test "single-student video list renders loading, failure, and empty distinctly" passed after 2.834 seconds.
+✔ Test assemblerSkipsSetsForExercisesWithoutAW1Spec() passed after 2.845 seconds.
+✔ Test "student detail replaces the zero-progress plan shell with guidance" passed after 2.881 seconds.
+✔ Test draftStoreLoadDraftKeepsOtherStudents() passed after 2.906 seconds.
+✔ Test draftStoreDeleteAllRemovesEveryDraft() passed after 2.918 seconds.
+✔ Test planningNumberFieldFormattedDisplayFormatsValue() passed after 2.936 seconds.
+✔ Test draftStoreSavesAndLoadsDraft() passed after 2.937 seconds.
+✔ Test planningCountPickerIncrementSnapsOffGridValueToNextTag() passed after 2.988 seconds.
+✔ Test composerSurfacesSendFailure() passed after 3.034 seconds.
+✔ Test emptyStateHasNoPersonalCode() passed after 3.034 seconds.
+✔ Test videoQueueLoadsItemsNewestFirst() passed after 3.033 seconds.
+✔ Test growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() passed after 3.034 seconds.
+✔ Test videoQueueRejectsBlankFeedbackWithoutDropping() passed after 3.029 seconds.
+✔ Test growthFiltersBackendPointsBySelectedFamilyAndWindow() passed after 3.029 seconds.
+✔ Test composerRejectsEmptyText() passed after 3.029 seconds.
+✔ Test acceptSheetConfirmAlwaysSendsSkipWithNoReason() passed after 3.028 seconds.
+✔ Test queueLoadsPendingItemsAndExposesCount() passed after 3.028 seconds.
+✔ Test loadPrefillsEditModeFromExistingSummary() passed after 3.027 seconds.
+✔ Test videoQueueLoadFailureMovesToFailed() passed after 3.073 seconds.
+✔ Test demoSeedHasPersonalPlusTwoSecondaryCodes() passed after 3.073 seconds.
+✔ Test transportFailureSurfacesRetryStateInsteadOfHidingBanner() passed after 3.072 seconds.
+✔ Test videoGridPlayExchangesIDForPresignedURL() passed after 3.069 seconds.
+✔ Test videoGridPlayFailureShowsRetryableErrorWithoutPresenting() passed after 3.068 seconds.
+✔ Test studentGroupsAreOnePerStudentNewestUploadFirst() passed after 3.067 seconds.
+✔ Test loadEntersFirstSaveModeWithoutExistingSummary() passed after 3.067 seconds.
+✔ Test requiredFieldsGateSaving() passed after 3.064 seconds.
+✔ Test rosterMovesToFailedStateWhenStudentsCannotLoad() passed after 3.065 seconds.
+✔ Test growthMissingSeriesLoadsAsExistingEmptyState() passed after 3.063 seconds.
+✔ Test videoQueueSendFailureKeepsRowAndBanners() passed after 3.102 seconds.
+✔ Test bannerVisibleOnlyForLiveEvaluation() passed after 3.936 seconds.
+✔ Test editorCompletionChainNotifiesCompletionCallback() passed after 3.935 seconds.
+✔ Test generatePersonalCodeShowsUpAfterReload() passed after 4.015 seconds.
+✔ Test videoQueueSendFeedbackDropsRowAndToasts() passed after 4.006 seconds.
+✔ Test directMessageEntryCarriesStudentNameIntoEmptyConversation() passed after 4.001 seconds.
+✔ Test statusTextCountsDownFromExpectedEnd() passed after 4.001 seconds.
+✔ Test statusTextFlipsToOverdueCopyPastExpectedEnd() passed after 3.998 seconds.
+✔ Test prefillProfileMissReturnsNilWithNotice() passed after 3.996 seconds.
+✔ Test composerSendsTrimmedTextWithOptionalLinks() passed after 3.994 seconds.
+✔ Test noEvaluationIsNotALoadFailure() passed after 3.977 seconds.
+✔ Test blankFlowKeepsAllSevenSlots() passed after 4.020 seconds.
+✔ Test accessibleRowRetainsFullSetMetricsWithoutExtraLabel() passed after 3.820 seconds.
+✔ Test unchangedPlannedOnlyDetailHasNoAddedCaption() passed after 3.820 seconds.
+✔ Test extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner() passed after 3.826 seconds.
+✔ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() passed after 3.826 seconds.
+✔ Suite "Coach self-added detail" passed after 4.025 seconds.
+✔ Test "planned first set log renders hash one" passed after 3.464 seconds.
+✔ Test "free first set log renders hash one" passed after 3.464 seconds.
+✔ Suite "Coach day detail set numbers" passed after 4.026 seconds.
+✔ Test timeLimitedCreationCarriesExpiry() passed after 4.055 seconds.
+✔ Test step2RendersDisabledTemplateEntrypoints() passed after 4.396 seconds.
+✔ Test adaptationDraftNameUsesAdaptationTemplate() passed after 4.406 seconds.
+✔ Test completeNotifiesCompletionCallback() passed after 4.405 seconds.
+✔ Test bootstrapRestoresSavedDraftStepAndAssignments() passed after 4.426 seconds.
+✔ Test navigationMovesForwardAndBackWithoutDroppingFields() passed after 4.461 seconds.
+✔ Test step0RendersThreeStudentSections() passed after 4.683 seconds.
+✔ Test firstRegularPlanIntentWithNilProfileResumesExistingDraft() passed after 4.721 seconds.
+✔ Test evaluationStudentCannotSelectFourWeeks() passed after 4.723 seconds.
+✔ Test skipEvaluationStudentChainSkipsCompleteStep() passed after 4.727 seconds.
+✔ Test restoredConfigureRulesPathDoesNotDuplicateStep4() passed after 4.727 seconds.
+✔ Test acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() passed after 4.733 seconds.
+✔ Test step1ShowsOnlyOneWeekCardForEvaluationStudent() passed after 4.948 seconds.
+✔ Test blankSkipReasonIsDroppedNotSentEmpty() passed after 4.955 seconds.
+✔ Test rejectExpiredBannerAndRefresh() passed after 4.970 seconds.
+✔ Test prefilledOneRMFeedsOneRMLookupForMainLifts() passed after 4.984 seconds.
+✔ Test firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() passed after 5.001 seconds.
+✔ Test failedCompleteDoesNotNotifyCompletionCallback() passed after 5.001 seconds.
+✔ Test blankFlowOneRMStaysNil() passed after 5.013 seconds.
+✔ Test transportFailureOnCompleteKeepsBannerWithError() passed after 5.017 seconds.
+✔ Test preferredDaysBecomeTheOnlySlotsLabeledByRank() passed after 5.018 seconds.
+✔ Test rejectRemovesItemSilently() passed after 5.064 seconds.
+✔ Test finishWritesDraftAndMarksFlowFinished() passed after 5.063 seconds.
+✔ Test step1ShowsOnlyFourWeekCardForRegularStudent() passed after 5.191 seconds.
+✔ Test workspaceViewModelEmptyCoachFallsBackToNoSections() passed after 5.203 seconds.
+✔ Test saveDraftNeverNotifiesInFirstSaveMode() passed after 5.205 seconds.
+✔ Test staleAssignmentOutsidePreferredSlotsStaysVisible() passed after 5.206 seconds.
+✔ Test adaptationIntentPresetsStudentDurationAndKind() passed after 5.216 seconds.
+✔ Test acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() passed after 5.234 seconds.
+✔ Test assignmentValidationRequiresFrequencyToMatchAssignedLifts() passed after 5.253 seconds.
+✔ Test blankFlowWithEvaluationStudentForcesAdaptationKind() passed after 5.260 seconds.
+✔ Test bootstrapLoadsStudentsAndCatalog() passed after 5.260 seconds.
+✔ Test step3RendersPerDayMainLiftPickers() passed after 5.582 seconds.
+✔ Test acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() passed after 5.621 seconds.
+✔ Test editModeSaveUsesNotifyCheckbox() passed after 5.620 seconds.
+✔ Test legacyFillW1IntensityDraftRestoresToSingleStep4() passed after 5.676 seconds.
+✔ Test step4ProceedAllowsEmptyAccessoryDays() passed after 5.745 seconds.
+✔ Test step6UpdateRuleMutatesByID() passed after 5.769 seconds.
+✔ Test blankFlowLoadsSlotsFromSelectedStudentProfile() passed after 5.769 seconds.
+✔ Test step5UpdateW1SetSpecWritesDraftData() passed after 5.867 seconds.
+✔ Test directMessageEntryReopensTheSameConversation() passed after 5.858 seconds.
+✔ Test step5OneRMOnlyAvailableForMainLiftFamily() passed after 5.871 seconds.
+✔ Test step4SwitchToDayLoadsAccessoriesForSelectedDay() passed after 5.871 seconds.
+✔ Test step5ToggleIntensityModePreservesPreviousValues() passed after 5.915 seconds.
+✔ Test step5RestSecondsPerSetClampsToSetCount() passed after 5.932 seconds.
+✔ Test step6DeleteRuleRemovesAndReorders() passed after 5.969 seconds.
+✔ Test step6AddRuleAppendsWithDisplayOrder() passed after 6.017 seconds.
+✔ Test bannerHiddenWhenNoEvaluationOrCompleted() passed after 6.017 seconds.
+✔ Test step5TargetRepsIsClampedToAtLeastOne() passed after 6.050 seconds.
+✔ Test step6ViewRendersUncoveredSummary() passed after 6.223 seconds.
+✔ Test step7ViewRendersFourWeekTabTitles() passed after 6.402 seconds.
+✔ Test completionIssuesFlagsZeroWeightThenClearsWhenFilled() passed after 6.408 seconds.
+✔ Test step6CustomSequenceLengthTracksAppliedWeeks() passed after 6.441 seconds.
+✔ Test weekCardRendersOneWeekTitle() passed after 6.504 seconds.
+✔ Test step5ZeroOneRMIsTreatedAsUnavailable() passed after 6.544 seconds.
+✔ Test step7CurrentPreviewWeekDefaultsToOne() passed after 6.608 seconds.
+✔ Test step5SetCountIsClampedToAtLeastOne() passed after 6.622 seconds.
+✔ Test step4ViewRendersMainLiftAndAccessoryCards() passed after 6.655 seconds.
+✔ Test weekCardRendersDerivedWeekFooter() passed after 6.718 seconds.
+✔ Test step6RuleIncrementRoundsToPlanningIncrement() passed after 7.379 seconds.
+✔ Test step5ProceedRoutesOneWeekPlanDirectlyToPreview() passed after 7.398 seconds.
+✔ Test step7SetCurrentPreviewWeekClampsToPlanBounds() passed after 7.435 seconds.
+✔ Test step6ToggleAppliedWeekNeverAddsW1() passed after 7.449 seconds.
+✔ Test blankFlowLoadsOneRMAndEquipmentFromProfile() passed after 7.449 seconds.
+✔ Test adaptationIntentLoadsSlotsOnBootstrap() passed after 7.449 seconds.
+✔ Test step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() passed after 7.509 seconds.
+✔ Test completeHidesBannerOnSuccess() passed after 7.509 seconds.
+✔ Test step4ScreenRendersSelectedSectionAndLibraryButton() passed after 7.864 seconds.
+✔ Test retryAfterTransportFailureRecoversBanner() passed after 7.865 seconds.
+✔ Test completionChainDegradesWhenCompleteFailsButSummarySaved() passed after 7.865 seconds.
+✔ Test step7DerivedPreviewReflectsWeightRule() passed after 7.882 seconds.
+✔ Test step6RuleRequiresExerciseBeforeShowingValues() passed after 8.044 seconds.
+✔ Test step6ToggleAppliedWeekAddsAndRemovesW2ToW4() passed after 8.059 seconds.
+✔ Test step4AddAccessoryWritesDraftWithPerDaySortOrder() passed after 8.064 seconds.
+✔ Test weekCardRendersDaySectionsAndRows() passed after 8.170 seconds.
+✔ Test step6ToggleRuleExerciseAddsAndRemovesDraftExerciseID() passed after 8.180 seconds.
+✔ Test step6ViewRendersEmptyRulesState() passed after 8.209 seconds.
+✔ Test step6UncoveredExercisesUpdatesAfterRuleAssignment() passed after 8.221 seconds.
+✔ Test step5ProceedAutoFillsMissingSetSpecsWithDefaults() passed after 8.229 seconds.
+✔ Test concurrentCompleteConflictReadsAsSuccessAndRefreshes() passed after 8.227 seconds.
+✔ Test step4DeleteAccessoryRemovesOnlySelectedAccessory() passed after 8.230 seconds.
+✔ Test step5RPEValueIsClampedIntoRange() passed after 8.232 seconds.
+✔ Test step6ViewRendersSingleRuleChips() passed after 8.411 seconds.
+✔ Test staleRefreshCannotRestoreVideoAfterFeedbackSend() passed after 8.412 seconds.
+✔ Test step6ProceedAllowsEmptyRules() passed after 8.421 seconds.
+✔ Test prefilledEquipmentSeedsDefaultAccessoryFilters() passed after 8.422 seconds.
+✔ Test weightEntryBasesOfferOneRMAndSameDayMainTopWeight() passed after 8.424 seconds.
+✔ Test accessoryLibrarySheetRendersFilterAndMatchSections() passed after 8.449 seconds.
+✔ Test step5WeightValueRoundsToHalfKilogramIncrement() passed after 8.453 seconds.
+✔ Test completionChainIgnoresConcurrentCompleteConflict() passed after 8.453 seconds.
+✔ Test step5ProceedRoutesFourWeekPlanToRules() passed after 8.459 seconds.
+✔ Test growthFailureRendersRetryAndRetrySuccessShowsData() passed after 8.490 seconds.
+✔ Test repickingAnotherStudentDropsPreviousStudentSlots() passed after 8.503 seconds.
+✔ Test regenerateRevokesOldPersonalCode() passed after 8.496 seconds.
+✔ Test completionChainRunsPutThenCompleteThenSoftRecommendation() passed after 8.496 seconds.
+✔ Test step7PublishOfCompletePlanFinishesWithoutIssues() passed after 8.497 seconds.
+✔ Test step4UpdateFiltersReloadsMatchesForDay() passed after 8.484 seconds.
+✔ Test revokeMovesCodeToDefunctSection() passed after 8.475 seconds.
+✔ Test step4KeepsFiltersAndSelectionsIndependentPerDay() passed after 8.511 seconds.
+✔ Test detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() passed after 8.498 seconds.
+✔ Test intentResumesExistingDraftInsteadOfOverwriting() passed after 8.494 seconds.
+✔ Test step6CustomRuleRestoresExerciseValuesAfterSwitchingActions() passed after 8.494 seconds.
+✔ Test detailLoadsExecutionAndFeedbackSummaries() passed after 8.487 seconds.
+✔ Test detailAppendPostedFeedbackRefreshesLatestOverview() passed after 8.474 seconds.
+✔ Test detailLoadsVideoWallAndTodayReadiness() passed after 8.471 seconds.
+✔ Test workspaceViewModelLoadsDraftNeedsAndRecentSections() passed after 8.504 seconds.
+✔ Test rosterLogFetchRangeCoversRecentWindowBeforePlanStart() passed after 8.502 seconds.
+✔ Test step5W1SetSpecRestoresFromDraftStore() passed after 8.501 seconds.
+✔ Test rosterTriageSignalsStayScopedPerStudent() passed after 8.526 seconds.
+✔ Test markStudentActiveDropsInEvaluationBadgeInPlace() passed after 8.526 seconds.
+✔ Test "marker write failures surface instead of silently dropping the action" passed after 8.511 seconds.
+✔ Test rosterLoadsStudentsAndComputesAttentionBadge() passed after 8.509 seconds.
+✔ Test "markers resolved for a previous video never render under a newer one" passed after 8.516 seconds.
+✔ Test step4BootstrapRestoresCurrentDayAndSelectedAccessories() passed after 8.498 seconds.
+✔ Test "video set information distinguishes unlinked videos from load failures" passed after 8.532 seconds.
+✔ Test detailReadinessDistinguishesNotFiledFromFetchFailure() passed after 8.514 seconds.
+✔ Test "marker actions update the current item and marker load failures stay hidden" passed after 8.506 seconds.
+✔ Test "rapid item changes reject stale playback and set-log results" passed after 8.515 seconds.
+✔ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() passed after 8.517 seconds.
+✔ Test acceptMachineCodeErrorsBannerAndForceRefresh() passed after 8.518 seconds.
+✔ Test growthLoadingRendersProgressWithoutFlashingEmptyState() passed after 8.540 seconds.
+✔ Test run with 455 tests in 11 suites passed after 8.541 seconds.

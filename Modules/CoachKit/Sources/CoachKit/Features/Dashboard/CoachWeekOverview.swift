@@ -1,4 +1,6 @@
+import CoreModels
 import Foundation
+import Networking
 
 enum CoachWeekOverview {
   struct Week: Hashable, Sendable {
@@ -24,20 +26,19 @@ enum CoachWeekOverview {
     }
   }
 
-  /// 一个计划训练日 + 可能与它配对的已完成日志时间戳。
-  ///
-  /// 完成态**不在取数时固化成 Bool**:计划日与日志是否算「同一天」取决于设备日历,
-  /// 而设备时区可能在两次取数之间变化。提前压成 Bool 会让聚合时重映射了列、完成态
-  /// 却还是旧时区的结论(review-loop 2026-07-30 逮到)。这里保留原始时间戳,由聚合
-  /// 现场用同一个 calendar 判定,保证列与完成态永远出自同一份日历。
+  /// Raw ownership and timestamps are retained for calendar changes after fetching.
   struct TrainingDay: Hashable, Sendable {
     let date: Date
-    /// 已收窄到本计划日 ±36h 内的完成日志时间戳——足够覆盖任何时区/DST 偏移,
-    /// 又不至于把整份日志挂在每一天上。
     let completedLogDates: [Date]
+    var planDay: StudentPlanDay?
+    var planDays: [StudentPlanDay] = []
+    var logs: [CoachSetLogDTO] = []
 
     func isCompleted(calendar: Calendar = CoachFeatureCalendar.calendar) -> Bool {
-      completedLogDates.contains {
+      if let planDay {
+        return CoachDayActivity.hasTrained(planDay, days: planDays, logs: logs, calendar: calendar)
+      }
+      return completedLogDates.contains {
         CoachFeatureCalendar.isSameDay($0, date, calendar: calendar)
       }
     }

@@ -1,0 +1,277 @@
+Building for debugging...
+[0/16] /Users/david/Projects/apps/MeetPR-wt-092b/Modules/Analytics/.build/arm64-apple-macosx/debug/AnalyticsPackageTests.derived/runner.swift
+[1/16] Copying Localizable.xcstrings
+[1/16] Write sources
+[1/16] Copying Info.plist
+[3/16] Write sources
+[8/16] Copying Localizable.xcstrings
+[9/16] Copying Info.plist
+[10/16] Write sources
+[11/16] Copying Info.plist
+[12/16] Copying Localizable.xcstrings
+[13/16] Write swift-version--58304C5D6DBC2206.txt
+[15/80] Compiling CoreModels MovementPattern.swift
+[16/80] Compiling CoreModels MuscleGroup.swift
+[17/80] Compiling CoreModels PlanKind.swift
+[18/80] Compiling CoreModels PlanSource.swift
+[19/80] Compiling CoreModels PlanStatus.swift
+[20/80] Compiling CoreModels SetType.swift
+[21/80] Compiling CoreModels SquatStance.swift
+[22/87] Compiling CoreModels ExerciseType.swift
+[23/87] Compiling CoreModels Gender.swift
+[24/87] Compiling CoreModels GymTier.swift
+[25/87] Compiling CoreModels InjuryArea.swift
+[26/87] Compiling CoreModels IntensityMode.swift
+[27/87] Compiling CoreModels InviteCodeType.swift
+[28/87] Compiling CoreModels LiftFamily.swift
+[29/87] Compiling CoreModels User.swift
+[30/87] Compiling CoreModels VideoMarker.swift
+[31/87] Compiling CoreModels BenchGrip.swift
+[32/87] Compiling CoreModels BindRequestStatus.swift
+[33/87] Compiling CoreModels CompetitionStance.swift
+[34/87] Compiling CoreModels DeadliftStance.swift
+[35/87] Compiling CoreModels Equipment.swift
+[36/87] Compiling CoreModels CoreModelStrings.swift
+[37/87] Compiling CoreModels CompetitionLiftResolver.swift
+[38/87] Compiling CoreModels CompletionHistory.swift
+[39/87] Compiling CoreModels E1RMAnomalyClassifier.swift
+[40/87] Compiling CoreModels E1RMCalculator.swift
+[41/87] Compiling CoreModels E1RMPlateauDetector.swift
+[42/87] Compiling CoreModels InviteCodeFormat.swift
+[43/87] Emitting module CoreModels
+[44/87] Compiling CoreModels PRBreakthroughEvent.swift
+[45/87] Compiling CoreModels PercentageAnchor.swift
+[46/87] Compiling CoreModels PlanDay.swift
+[47/87] Compiling CoreModels PlanExercise.swift
+[48/87] Compiling CoreModels PlanLoadMode.swift
+[49/87] Compiling CoreModels PlanSet.swift
+[50/87] Compiling CoreModels PrescribedIntensity.swift
+[51/87] Compiling CoreModels ActiveCoachContext.swift
+[52/87] Compiling CoreModels ChatConversation.swift
+[53/87] Compiling CoreModels ChatCursor.swift
+[54/87] Compiling CoreModels ChatMessage.swift
+[55/87] Compiling CoreModels ChatMessageKind.swift
+[56/87] Compiling CoreModels SetRefV1.swift
+[57/87] Compiling CoreModels Codec.swift
+[58/87] Compiling CoreModels PlateMathCalculator.swift
+[59/87] Compiling CoreModels RestDefaults.swift
+[60/87] Compiling CoreModels BindRequest.swift
+[61/87] Compiling CoreModels InviteCode.swift
+[62/87] Compiling CoreModels CoachFeedback.swift
+[63/87] Compiling CoreModels CoachFeedbackVideo.swift
+[64/87] Compiling CoreModels CoachProfile.swift
+[65/87] Compiling CoreModels EvaluationPeriod.swift
+[66/87] Compiling CoreModels EvaluationSummary.swift
+[67/87] Compiling CoreModels Exercise.swift
+[68/87] Compiling CoreModels OnboardingPatch.swift
+[69/87] Compiling CoreModels OnboardingProfile.swift
+[70/87] Compiling CoreModels E1RMHistoryPoint.swift
+[71/87] Compiling CoreModels E1RMWeightBaseline.swift
+[72/87] Compiling CoreModels StudentPlanView.swift
+[73/87] Compiling CoreModels StudentSetLog.swift
+[74/87] Compiling CoreModels StudentVideo.swift
+[75/87] Compiling CoreModels TrainingPlan.swift
+[76/87] Compiling CoreModels VideoAttachment.swift
+[77/87] Compiling CoreModels ReadinessCheckin.swift
+[78/87] Compiling CoreModels StudentProfile.swift
+[79/87] Compiling CoreModels TrainingDay.swift
+[80/87] Compiling CoreModels TrainingMode.swift
+[81/87] Compiling CoreModels UnitPreference.swift
+[82/87] Compiling CoreModels UnitSystem.swift
+[83/87] Compiling CoreModels UserRole.swift
+[84/87] Compiling CoreModels PushNotificationRouting.swift
+[85/87] Compiling CoreModels resource_bundle_accessor.swift
+[86/106] Compiling RepositoryContracts RepositoryStrings.swift
+[87/106] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[88/106] Compiling RepositoryContracts StudentPlanRepository.swift
+[89/106] Compiling RepositoryContracts StudentPlanStore.swift
+[90/106] Emitting module RepositoryContracts
+[91/106] Compiling RepositoryContracts ChatRepository.swift
+[92/106] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[93/106] Compiling RepositoryContracts AccountRepository.swift
+[94/106] Compiling RepositoryContracts BindRepository.swift
+[95/106] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[96/106] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[97/106] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[98/106] Compiling RepositoryContracts InviteCodeRepository.swift
+[99/106] Compiling RepositoryContracts OnboardingRepository.swift
+[100/106] Compiling RepositoryContracts ReadinessRepository.swift
+[101/106] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[102/106] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[103/106] Compiling RepositoryContracts E1RMRepository.swift
+[104/106] Compiling RepositoryContracts EvaluationRepository.swift
+[105/108] Compiling RepositoryContracts VideoMarkerRepository.swift
+[106/108] Compiling RepositoryContracts resource_bundle_accessor.swift
+[107/159] Compiling Networking APIClient+Exercises.swift
+[108/159] Compiling Networking APIClient+Feedback.swift
+[109/159] Compiling Networking APIClient+Onboarding.swift
+[110/159] Compiling Networking APIClient+Plans.swift
+[111/159] Compiling Networking APIClient+Readiness.swift
+[112/159] Compiling Networking APIClient+Sets.swift
+[113/164] Compiling Networking APIClient+StudentVideos.swift
+[114/164] Compiling Networking APIClient+Students.swift
+[115/164] Compiling Networking APIClient+Uploads.swift
+[116/164] Compiling Networking APIClient+VideoMarkers.swift
+[117/164] Compiling Networking APIClient.swift
+[118/164] Compiling Networking APIClient+Auth.swift
+[119/164] Compiling Networking AuthDTOs.swift
+[120/164] Compiling Networking SessionStateReader.swift
+[121/164] Compiling Networking BackendVideoMarkerRepository.swift
+[122/164] Compiling Networking BuildConfig.swift
+[123/164] Compiling Networking ExerciseCatalogCache.swift
+[124/164] Compiling Networking FeedbackCache.swift
+[125/164] Compiling Networking JSONFileCache.swift
+[126/164] Compiling Networking PlanCache.swift
+[127/164] Compiling Networking StudentPlanCache.swift
+[128/164] Compiling Networking TrainingLogCache.swift
+[129/164] Compiling Networking BindDTOs.swift
+[130/164] Compiling Networking BindQueueDTOs.swift
+[131/164] Compiling Networking ExerciseDTOs.swift
+[132/164] Compiling Networking ExerciseStatsDTOs.swift
+[133/164] Compiling Networking FeedbackDTOs.swift
+[134/164] Compiling Networking OnboardingDTOs.swift
+[135/164] Compiling Networking OnboardingPatchDTO.swift
+[136/164] Compiling Networking ChatDTOs.swift
+[137/164] Compiling Networking CoachSetLogDTO.swift
+[138/164] Compiling Networking CoachStudentDTOs.swift
+[139/164] Compiling Networking DecimalCoding.swift
+[140/164] Compiling Networking EvaluationDTOs.swift
+[141/164] Compiling Networking UploadDTOs.swift
+[142/164] Compiling Networking VideoMarkerDTOs.swift
+[143/164] Compiling Networking WireFormatting.swift
+[144/164] Compiling Networking Endpoints.swift
+[145/164] Compiling Networking ErrorEnvelope.swift
+[146/164] Compiling Networking APIClient+Account.swift
+[147/164] Compiling Networking APIClient+Bind.swift
+[148/164] Compiling Networking APIClient+BindQueue.swift
+[149/164] Compiling Networking APIClient+CoachSets.swift
+[150/164] Compiling Networking APIClient+Devices.swift
+[151/164] Compiling Networking APIClient+Evaluations.swift
+[152/164] Compiling Networking PlanDTOs.swift
+[153/164] Compiling Networking PlanRequestDTOs.swift
+[154/164] Compiling Networking ReadinessDTOs.swift
+[155/164] Compiling Networking SetLogDTOs.swift
+[156/164] Compiling Networking StudentVideoDTOs.swift
+[157/164] Emitting module Networking
+[158/164] Compiling Networking DomainMapping.swift
+[159/164] Compiling Networking NetworkChatRepository.swift
+[160/164] Compiling Networking OSSPartUploader.swift
+[161/164] Compiling Networking RealtimeClient.swift
+[162/164] Compiling Networking RealtimeEvent.swift
+[163/176] Compiling Analytics EventQueueStore.swift
+[164/176] Compiling Analytics AnalyticsStrings.swift
+[165/176] Compiling Analytics AnalyticsTypes.swift
+[166/176] Compiling Analytics Analytics+Events.swift
+[167/176] Compiling Analytics Analytics.swift
+[168/176] Compiling Analytics CrashCapture.swift
+[169/176] Compiling Analytics AnalyticsSessionStore.swift
+[170/176] Emitting module Analytics
+[171/176] Compiling Analytics FrictionFeedback.swift
+[172/176] Compiling Analytics EventFlusher.swift
+[173/176] Compiling Analytics AnalyticsCore.swift
+[174/176] Compiling Analytics AnalyticsEnvelope.swift
+[175/177] Compiling Analytics resource_bundle_accessor.swift
+[176/186] Compiling AnalyticsTests AnalyticsTestSupport.swift
+[177/186] Compiling AnalyticsTests EventQueueStoreTests.swift
+[178/186] Compiling AnalyticsTests CrashCaptureTests.swift
+[179/186] Compiling AnalyticsTests AnalyticsSmokeTests.swift
+[180/186] Compiling AnalyticsTests AnalyticsAPITests.swift
+[181/186] Compiling AnalyticsTests AnalyticsSessionStoreTests.swift
+[182/186] Emitting module AnalyticsTests
+[183/186] Compiling AnalyticsTests FrictionFeedbackTests.swift
+[184/186] Compiling AnalyticsTests EventFlusherTests.swift
+[185/188] Compiling AnalyticsPackageTests runner.swift
+[186/188] Emitting module AnalyticsPackageTests
+[186/188] Write Objects.LinkFileList
+[187/188] Linking AnalyticsPackageTests
+Build complete! (21.64s)
+Test Suite 'All tests' started at 2026-10-14 08:15:01.589.
+Test Suite 'All tests' passed at 2026-10-14 08:15:01.594.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.005) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test queuePersistsAcrossColdStart() started.
+◇ Test unresolvedKillSwitchConfigPreventsFlushEvenWhenPrivacyGateIsOpen() started.
+◇ Test unavailableAnalyticsSuppressesFrictionPrompt() started.
+◇ Test zeroSampleRateStablyDrainsQueue() started.
+◇ Test privacyGateKeepsEventsOnDeviceUntilConfirmed() started.
+◇ Test submittedTextUsesSignalEventIdentifier() started.
+◇ Test frictionSignalAndTextUseSeparateEndpointsWithSameEventID() started.
+◇ Test feedbackIsCappedThenRequiresRepeated413BeforeIsolation() started.
+◇ Test analyticsEventNamesUseBackendRegistryValues() started.
+◇ Test corruptQueueFileReadsAsEmptyWithoutCrashing() started.
+◇ Test skippingStartsCooldownAndDoesNotSubmitText() started.
+◇ Test serverFailureRetriesToCapAndRetainsBatch() started.
+◇ Test pendingCrashBecomesOneClientErrorOnNextConfigure() started.
+◇ Test anonIDPersistsAndSequenceIsMonotonic() started.
+◇ Test unexpectedSingleEvent413IsRetainedAfterBoundedAttempts() started.
+◇ Test rateLimitRetriesToCapWithBackoffAndRetainsBatch() started.
+◇ Test frictionPromptAppearsOnlyOncePerSession() started.
+◇ Test killSwitchDisabledDrainsQueue() started.
+◇ Test queueCapsAtOneThousandAndDropsOldest() started.
+◇ Test configFailureIsFailOpenAndRetainsQueue() started.
+◇ Test runtimeDisabledAnalyticsNeverConstructsItsDiskBackedCore() started.
+◇ Test flusherSplits413BatchAndDoesNotWedge() started.
+◇ Test reEditRequiresCountOfAtLeastTwo() started.
+◇ Test disabledCoreProducesNoDiskQueueWrites() started.
+◇ Test analyticsEnumValuesMirrorBackendRegistry() started.
+◇ Test sessionOnlyResetsAfterThirtyMinutesInBackground() started.
+◇ Test feedbackTextIsTrimmedAndCappedAtFiveHundredCharacters() started.
+◇ Test locallyOversizeSingleEventIsReplacedByClientError() started.
+◇ Test flusherDeletesOnlyAfterExact204() started.
+◇ Test queueDropsEventsOlderThanSevenDays() started.
+[Analytics] flush batch=1 status=413
+[Analytics] flush batch=1 status=413
+[Analytics] flush batch=1 status=429
+[Analytics] flush batch=1 status=503
+[Analytics] feedback status=413
+[Analytics] feedback status=413
+✔ Test analyticsEventNamesUseBackendRegistryValues() passed after 0.011 seconds.
+✔ Test corruptQueueFileReadsAsEmptyWithoutCrashing() passed after 0.012 seconds.
+✔ Test queuePersistsAcrossColdStart() passed after 0.013 seconds.
+✔ Test unresolvedKillSwitchConfigPreventsFlushEvenWhenPrivacyGateIsOpen() passed after 0.013 seconds.
+✔ Test rateLimitRetriesToCapWithBackoffAndRetainsBatch() passed after 0.012 seconds.
+✔ Test serverFailureRetriesToCapAndRetainsBatch() passed after 0.014 seconds.
+✔ Test killSwitchDisabledDrainsQueue() passed after 0.014 seconds.
+✔ Test disabledCoreProducesNoDiskQueueWrites() passed after 0.014 seconds.
+✔ Test anonIDPersistsAndSequenceIsMonotonic() passed after 0.014 seconds.
+✔ Test sessionOnlyResetsAfterThirtyMinutesInBackground() passed after 0.013 seconds.
+✔ Test zeroSampleRateStablyDrainsQueue() passed after 0.014 seconds.
+✔ Test analyticsEnumValuesMirrorBackendRegistry() passed after 0.013 seconds.
+✔ Test unexpectedSingleEvent413IsRetainedAfterBoundedAttempts() passed after 0.014 seconds.
+✔ Test feedbackIsCappedThenRequiresRepeated413BeforeIsolation() passed after 0.014 seconds.
+✔ Test configFailureIsFailOpenAndRetainsQueue() passed after 0.014 seconds.
+✔ Test queueDropsEventsOlderThanSevenDays() passed after 0.014 seconds.
+✔ Test runtimeDisabledAnalyticsNeverConstructsItsDiskBackedCore() passed after 0.013 seconds.
+✔ Test feedbackTextIsTrimmedAndCappedAtFiveHundredCharacters() passed after 0.014 seconds.
+[Analytics] flush batch=1 status=500
+[Analytics] track client_error ["code": Analytics.AnalyticsValue.int(11), "domain": Analytics.AnalyticsValue.enumCase("unknown"), "screen": Analytics.AnalyticsValue.enumCase("today_workout")]
+[Analytics] flush batch=1 status=204
+[Analytics] flush batch=1 status=204
+[Analytics] track screen_view ["screen": Analytics.AnalyticsValue.enumCase("coach_receiving")]
+[Analytics] flush batch=1 status=204
+✔ Test pendingCrashBecomesOneClientErrorOnNextConfigure() passed after 0.015 seconds.
+✔ Test flusherDeletesOnlyAfterExact204() passed after 0.014 seconds.
+[Analytics] track friction_feedback ["flow": Analytics.AnalyticsValue.enumCase("record_set"), "from_screen": Analytics.AnalyticsValue.enumCase("today_workout"), "trigger": Analytics.AnalyticsValue.enumCase("re_edit")]
+[Analytics] flush batch=4 status=413
+✔ Test privacyGateKeepsEventsOnDeviceUntilConfirmed() passed after 0.016 seconds.
+[Analytics] flush batch=2 status=413
+[Analytics] flush batch=1 status=204
+[Analytics] flush batch=1 status=204
+[Analytics] track app_open ["cold": Analytics.AnalyticsValue.bool(true)]
+[Analytics] flush batch=2 status=204
+[Analytics] flush batch=2 status=413
+[Analytics] flush batch=1 status=204
+[Analytics] flush batch=1 status=204
+[Analytics] feedback status=204
+✔ Test flusherSplits413BatchAndDoesNotWedge() passed after 0.021 seconds.
+✔ Test frictionSignalAndTextUseSeparateEndpointsWithSameEventID() passed after 0.021 seconds.
+✔ Test unavailableAnalyticsSuppressesFrictionPrompt() passed after 0.022 seconds.
+✔ Test submittedTextUsesSignalEventIdentifier() passed after 0.022 seconds.
+✔ Test reEditRequiresCountOfAtLeastTwo() passed after 0.022 seconds.
+✔ Test skippingStartsCooldownAndDoesNotSubmitText() passed after 0.022 seconds.
+✔ Test frictionPromptAppearsOnlyOncePerSession() passed after 0.022 seconds.
+✔ Test locallyOversizeSingleEventIsReplacedByClientError() passed after 0.038 seconds.
+✔ Test queueCapsAtOneThousandAndDropsOldest() passed after 4.236 seconds.
+✔ Test run with 30 tests in 0 suites passed after 4.237 seconds.

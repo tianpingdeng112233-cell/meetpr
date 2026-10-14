@@ -219,7 +219,7 @@ struct StudentOverviewSection: View {
   }
 
   private func dayState(_ day: StudentExecutionDay) -> (text: String, color: Color) {
-    if day.completedSetCount > 0 {
+    if day.hasTrained {
       return (CoachDetailStrings.completed, Color.MeetPR.success)
     }
     if CoachFeatureCalendar.isSameDay(day.date, now) {

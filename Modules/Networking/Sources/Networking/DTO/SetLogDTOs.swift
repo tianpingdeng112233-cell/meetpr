@@ -82,6 +82,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   public let id: UUID
   public let studentID: UUID
   public let planExerciseID: UUID
+  public let planDayID: UUID?
   public let exerciseID: UUID?
   public let setIndex: Int
   public let weightKg: Decimal
@@ -99,6 +100,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     id: UUID,
     studentID: UUID,
     planExerciseID: UUID,
+    planDayID: UUID? = nil,
     exerciseID: UUID? = nil,
     setIndex: Int,
     weightKg: Decimal,
@@ -114,6 +116,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.id = id
     self.studentID = studentID
     self.planExerciseID = planExerciseID
+    self.planDayID = planDayID
     self.exerciseID = exerciseID
     self.setIndex = setIndex
     self.weightKg = weightKg
@@ -132,6 +135,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     id = try container.decode(UUID.self, forKey: .id)
     studentID = try container.decode(UUID.self, forKey: .studentID)
     planExerciseID = try container.decode(UUID.self, forKey: .planExerciseID)
+    planDayID = try container.decodeIfPresent(UUID.self, forKey: .planDayID)
     exerciseID = try container.decodeIfPresent(UUID.self, forKey: .exerciseID)
     setIndex = try container.decode(Int.self, forKey: .setIndex)
     weightKg = try container.decodeDecimal(forKey: .weightKg)
@@ -150,6 +154,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encode(id, forKey: .id)
     try container.encode(studentID, forKey: .studentID)
     try container.encode(planExerciseID, forKey: .planExerciseID)
+    try container.encodeIfPresent(planDayID, forKey: .planDayID)
     try container.encodeIfPresent(exerciseID, forKey: .exerciseID)
     try container.encode(setIndex, forKey: .setIndex)
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
@@ -167,6 +172,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case id
     case studentID = "studentId"
     case planExerciseID = "planExerciseId"
+    case planDayID = "planDayId"
     case exerciseID = "exerciseId"
     case setIndex
     case weightKg

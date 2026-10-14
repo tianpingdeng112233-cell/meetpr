@@ -1247,3 +1247,91 @@ Opus 收货指出初版把所有辅助项共用草稿的实际 RPE 都设为 exi
 最终 `.app`：**`/tmp/spec090-derived/Build/Products/DemoStudent-iphonesimulator/MeetPR.app`**。保留此包，清理本轮同一 DerivedData 中的其他产物及本树 StudentKit 默认 `.build`。仅复用开工时已 Booted 的 iPhone 17 Pro（`D412AE31-0ED9-4A23-B0FD-FFFA4A5A5609`），未启动第二台、未操作另一台设备。App 已停止；再次执行该设备的 `xcrun simctl shutdown` 被沙箱拒绝连接 CoreSimulatorService（`Connection refused`），原始错误 `r1-simulator-shutdown.log`。现有 MCP 无 shutdown，未绕过权限；**不能确认设备已关，仍需宿主侧关闭**。
 
 无新增产品决策题；版本归属的证据限制如上，交 Opus 收货确认。本轮未 commit、未 push，未改发布文档、SPEC 或 build 号，未触碰 Opus 的 `specs/090-training-flow/evidence/`。
+
+
+## 2026-10-14 · Spec 092 · iOS 卡 B · 教练自加记录与训练日归属（T2 / P1，未提交）
+
+**交付状态：代码与开发自测完成，工作区待 Opus 收货；不代替 SPEC 验收。** 工作树 `MeetPR-wt-092b`，分支 `feat/092-ios-coach`，基线 `7acf289c8578663e3b8155544514f080f9795743`。启动第一步已在本目录创建并删除临时文件确认可写。SPEC/CARD-B 从卡 A 工作树只读读取，Android 仅 `git show 02213e4:<path>` 参照。没有 commit、push、PR；未修改 StudentKit、CoreModels、RepositoryContracts、CONTEXT、NEXT-RELEASE、依赖、工程结构或 build 号。既有测试文件与断言均未改动；新增 15 个 Swift Testing 测试。
+
+### 实装与工程选择
+
+- 计划动作内按处方范围和额外组分组、排序，额外组前只有一次灰色「学员自加」；行上无标签，x/y 只计处方组。自加动作按训练日及动作 ID 独立成卡，名称优先读取服务器目录、离线回退内置目录；中英文副标题与 Android 文案一致（英语补单数 plural 分支以遵守既有本地化测试）。没有新增编辑、删除、通知入口。
+- `CoachDayActivity` 是归属与完成的唯一纯函数：已结算或已完成记录即算练了；同计划周按归属日，跨周、未知归属按当地日期。详情、概览、roster 周数据、没练提醒共用；最近活动读取全部日志。核对了执行周列表、概览状态和名单完成率，没有继续按游标之前全完成推断；视频、聊天、反馈流程保持既有 planned-log 映射。
+- **工程决定：** 保留原 `SetLogDTO` 与 plan-only API 兼容形态，仅给 DTO 加 6 行可选 `planDayID`；新增教练只读 DTO/API（允许空 `planExerciseID`，`scope=all`）及可选仓储读取 seam，老 mock 回退既有 reader，避免改动学员端及跨模块合同。遗留重复动作 ID 无法唯一归属时回退日期。
+- 大字号实屏发现原共享行会截断重量，因此在本卡教练详情以同一 `CoachSetReadOnlyRow` 对全部组使用 accessibility 纵排指标；普通字号复用原 `SetReadOnlyCell`。颜色、字体、间距均用已有 token，没有改共享 DesignSystem。
+- 专用 Demo 参数 `-spec092-coach` 打开实际 `StudentRosterView`；名单 fixture 经实际 `makeRow` 计算，进入详情后走仓储读取。State 同时保留 repository/context/rows/roster，防 UUID 重建；注入同一 `coachNow`。可选 `-spec092-coach-day` 直达 D4，`-spec092-accessibility-large` 使用 `.accessibility2`，`-spec092-dark` 仅为该场景启用深色。默认 Demo/生产主题行为未改。
+
+### 先红后绿与验收项对应
+
+红阶段摘录在 `specs/092-flexible-day-self-added/evidence/red-phases.log`：先补测试再实现；先后复现缺少教练 API、可选 DTO 字段、归属函数与详情 presentation；consumer 红阶段实测 D4 日志落进 D2、D4 无日志、已结算空记录被判未练、误报没练；渲染红阶段缺少分组说明/自加卡；服务器新动作名渲染测试先失败后补目录读取；大字号行先缺少可读组件后实现。没有通过改旧断言消红。
+
+| 验收 / seam | 测试名与结论 |
+|---|---|
+| SPEC 12：额外组、自加卡、分母与删除后刷新 | `extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner`、`rendersOneExtraGroupCaptionAndSeparateAddedCard`、`unchangedPlannedOnlyDetailHasNoAddedCaption`、`refreshShowsServerCatalogNameAndRemovesDeletedAddedSets` 全绿。最后一项在真实详情 VM/presentation seam 替换仓储响应，确认自加卡和额外组消失、处方计数保留；不是线上学员删除 E2E。 |
+| SPEC 13：同周先 D4、D2 未练 | `sameWeekJumpDoesNotCompleteEarlierDay`、`detailOverviewRosterAndReminderShareCompletion` 全绿；指定模拟器实际从名单进入概览及 D4/D2，状态正确。 |
+| 完成与兼容边界 | `unfinishedTrainingSettlementAndLegacyFallback`（练了未结算、结算无日志、未完成日志、无归属旧数据）、`crossWeekOwnershipFallsBackToCalendarDate`、`laggingStudentTrainsAcrossWeeksWithoutMissedReminder`、`adhocOwnershipUsesTheSameWeekRule`、`latestActivityIncludesLogsNotPlacedInDisplayedWeek` 全绿。 |
+| Networking | `coachReadRequestsAllLogs` 验 `scope=all` 与日期参数；`plannedLogDecodesOptionalDayOwnership` 验字段缺失/存在；`coachReadDecodesUnplannedAndLegacyLogs` 验自加、旧记录解码，全部绿。 |
+| 大字号只读指标 | `accessibleRowRetainsFullSetMetricsWithoutExtraLabel` 全绿；中文 accessibility-large 深色实屏滚动到额外组和自加动作，重量、次数、RPE 无截断。 |
+
+### 最终工程检查
+
+全部命令在本工作树运行。SwiftPM 默认缓存目录不可写且嵌套 sandbox 不可用，改用 `/tmp` 模块缓存、`--disable-sandbox`（SwiftPM 子沙箱）及已有依赖缓存；不是请求系统提权。网络受限，Xcode 使用本树 DerivedData 中已缓存依赖，禁自动解析/更新。没有读取任何凭证或 `.env`。
+
+| 自检命令 / 工具 | 最后结果行（原文） |
+|---|---|
+| `CLANG_MODULE_CACHE_PATH=/tmp/092b-clang SWIFTPM_MODULECACHE_OVERRIDE=/tmp/092b-swift swift test --disable-sandbox --cache-path /tmp/092b-spm-cache --skip-update --package-path Modules/CoachKit` | `✔ Test run with 455 tests in 11 suites passed after 1.742 seconds.` |
+| `CLANG_MODULE_CACHE_PATH=/tmp/092b-clang SWIFTPM_MODULECACHE_OVERRIDE=/tmp/092b-swift swift test --disable-sandbox --package-path Modules/Networking` | `✔ Test run with 134 tests in 3 suites passed after 0.049 seconds.` |
+| `xcrun swift-format lint --strict --recursive Modules/CoachKit/Sources Modules/CoachKit/Tests Modules/Networking/Sources Modules/Networking/Tests MeetPR/Sources/MeetPRApp.swift` | 原命令无输出，exit 0；包装记录 `swift-format exit=0`。 |
+| `swiftlint lint --strict --no-cache` | `Done linting! Found 0 violations, 0 serious in 1166 files.` |
+| `.github/workflows/ci.yml` 的原 Module boundary checks 脚本 | 原脚本无输出，exit 0；包装记录 `Module boundary checks: PASS (exit 0)`。 |
+| `git diff --check` | 无输出，exit 0。 |
+| XcodeBuildMCP `build_run_sim`，scheme `MeetPR-Demo`，`-disableAutomaticPackageResolution -skipPackageUpdates` | `✅ Build & Run complete`；最终 build 日志最后非空行 `** BUILD SUCCEEDED **`，32.3 秒，0 warning/error。 |
+| XcodeBuildMCP `stop_app_sim` | `✅ App stopped successfully`。 |
+| `xcrun simctl shutdown 8F164D5D-A450-44FD-BDBF-BB351572CF6E` | exit 1，`Unable to locate device set: Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused"`（完整原行及错误保存在 `simulator-shutdown.log`）。不能确认设备关闭。 |
+
+日志均在本卡 `evidence/`：`coachkit-tests.log`、`networking-tests.log`、`swift-format.log`（空文件即零诊断）、`swiftlint.log`、`demo-build.log`、`simulator-shutdown.log`、`red-phases.log`、`verification.txt`。只改两个 SPM 包，因此全量测试范围是 CoachKit 与 Networking。Standards / Spec 独立只读审查最终均 CLEAN；审查指出的服务器动作名和 Demo 生命周期已返修，最终 Demo 入口及 clock 再经 Standards 定向复审。
+
+### 指定模拟器截图
+
+只使用 **iPhone 17 Pro `8F164D5D-A450-44FD-BDBF-BB351572CF6E` / iOS 26.4**，未操作其他设备。下列 10 张均亲眼查看，路径前缀 `specs/092-flexible-day-self-added/evidence/`；MCP 输出为 368×800 JPEG，非原生分辨率 PNG。
+
+- `coach-roster-en-light.jpg`：D4 学员 2/4、跨周学员 2/2；仅既有 Awaiting Reply，没有没练提示（不把待反馈视作没练）。
+- `coach-overview-en-light.jpg`：D1 结算无记录仍已完成，D2/D3 未开始，D4 已完成。
+- `coach-detail-en-light.jpg`：通过实际名单→概览→D4 打开，4/4 + 第 5 额外组 + DB Curl 两组。
+- `coach-d2-en-light.jpg`：实际点击 D2，0/4、Not Started、无串入 D4 记录。
+- `coach-lagging-overview-en-light.jpg`：W4D1/W4D2 按当地日期完成，2/2。
+- `coach-detail-zh-light.jpg`：中文小灰字、标题/副标题与只读行。
+- `coach-detail-en-dark.jpg`：普通字号深色详情。
+- `coach-detail-zh-accessibility-large-dark-top.jpg`：中文大字号深色，页头/处方组完整指标。
+- `coach-detail-zh-accessibility-large-dark-extra.jpg`：同场景向下滚动，额外组前单一说明。
+- `coach-detail-zh-accessibility-large-dark-added.jpg`：同场景自加卡、副标题自然换行，12.5 kg/12/RPE 完整显示。
+
+### 现场问题、未验项与交接边界
+
+- 曾在专用 Demo 用原 `CoachDashboardView` 挂载这批 fixture：冷启动为空态，日志确认任务已返回 2 行后画面停住/空白；预置数据也未解决，工具有一次长时间启动/停止等待及整屏红色。Home 后恢复，换用实际 StudentRosterView 后名单→详情正常。正式 Dashboard 文件未改；这只能隔离到该呈现路径，**没有证据证明是本卡回归或既有缺陷，也没有完成 Dashboard 七列周表的实屏验收**。对应周表纯函数及共享规则测试已绿；名单固定 rows 截图不证明名单网络加载/刷新成功。临时 `[DEBUG-092b]` 日志已全部删除。
+- 详情空周的 Demo 问题有确定原因：没有注入 `coachNow`，默认值为 distantPast；已补同一 fixture clock，实屏复验 2/4 与 2/2 正常。大字号重量截断和专用场景深色被外层恒亮覆盖均已定向修复并实屏复验。
+- 未验：真实后端学员删除→教练刷新 E2E、历史 1.0(23) 包兼容、iOS 17 真机/模拟器、VoiceOver 朗读。SPEC 15 不属于本卡 12/13 的验收范围；没有把 fixture 测试冒称服务器 E2E。
+- 已停止 Demo；交付前再次执行指定设备 shutdown 仍被 shell 沙箱拒绝连接 CoreSimulatorService。Computer Use 访问 Simulator 也未获准，MCP 没有 shutdown 能力，未绕过权限。**设备关闭未验证，仍需宿主侧关闭该 UDID。**
+- 没有产品取舍需要停等裁决；上述 Dashboard 现场观察与未验边界交 Opus 收货时复核。最终 `.app` 在本树 `DerivedData/Build/Products/Demo-iphonesimulator/MeetPR.app`。逐文件清单见本卡 evidence/changed-files.txt。
+
+## 2026-10-14 · iOS 卡 B · 续接复验与 PR 交付
+
+David 本轮直接授权保留上一轮工作区、完成全量测试和模拟器验证后 commit/push 开 PR、不合并。现场核实本树 `feat/092-ios-coach@7acf289c` 与 `origin/release/1.0` 同基底；`main@fbfc25c6` 与本树相差 539 个继承提交、1,287 个文件。David 随后明确将 PR base 改为 `release/1.0`，只交卡 B。spec 依据通过 `git show origin/feat/092-ios-student@2b647a13:specs/092-flexible-day-self-added/{SPEC.md,CARD-B-coach-ios.md}` 读取，参照 Android PR #92 的教练端 `02213e4`；未改 spec、发布台账、build 号或 StudentKit。
+
+保留上一轮全部业务代码与先红后绿证据，本轮没有重写实现、修改既有断言或新增产品行为。重新读全部 diff 与新增文件，并经两名独立只读 reviewer：Standards CLEAN（0 硬违规/实质坏味道），Spec CLEAN（0 缺做/多做/做错），一轮，无返修。记录见 `docs/evidence/092-ios-coach/review.txt`。缺 Matt tracker 配置已告知；使用 review-loop 自身双轴审查，没有声称运行完整 tracker 流程。
+
+### 本轮验证
+
+- 全仓九个 SPM 包全量：Analytics 30、AppShell 107、ChatUI 84、CoachKit 455、CoreModels 158、DesignSystem 73、Networking 134、RepositoryContracts 6、StudentKit 984，共 **2,031** 条通过。
+- DesignSystem 首次解析 ViewInspector 遇 GitHub TLS 失败；复用本树 CoachKit 已有同版本 Git 缓存后 `swift test --skip-update` 通过，未改依赖。首次 git fetch 也遇 TLS 失败，使用 HTTP/1.1 重试成功。
+- `MeetPR-Demo` / `Demo` 的 `build_run_sim` 成功；正式 `MeetPR` / `Debug` 的 `test_sim` 成功，**9 passed / 0 failed**。诊断专用 `HANG_PROBE` suite 按现有条件未启用。
+- Xcode 工具链 `swift-format lint --strict --recursive MeetPR MeetPRTests Modules` exit 0；SwiftLint 严格模式 1,166 文件 0 违规；CI 原模块边界脚本及 `git diff --check` 通过。原始日志与摘要在 `docs/evidence/092-ios-coach/`。
+- 仅使用卡 B 指定 iPhone 17 Pro / iOS 26.4 / `8F164D5D-A450-44FD-BDBF-BB351572CF6E`。亲看中文名单、实际名单→概览→D4 详情及 D2、英文跨周概览与详情、中文 accessibility2 深色的顶部/额外组/自加卡，共 9 张新截图，均存于 `docs/evidence/092-ios-coach/`。D4 为完成且处方 4/4，D2 未开始且 0/4；跨周学员 2/2；自加卡为两组，长副标题自然换行，重量/次数/RPE 完整可读。
+- MCP 整行中央 tap 曾未触发详情导航；改用 Simulator 辅助功能激活同一入口后 D4/D2 均正常进入，未据此改业务代码。MCP swipe 有快照超时，但随后实屏确认滚动成功。未操作其他模拟器。
+- 本轮 `xcrun simctl shutdown` 成功；MCP 列表复核指定 UDID 为 **Shutdown**，关闭了上一轮的设备清理未验项。
+
+### 证据边界
+
+本轮是开发自测与自审，不替代 Opus 的 spec 清单终验。仍未验证真实后端学员删除→教练刷新 E2E、历史 1.0(23) 包升级、iOS 17、VoiceOver 朗读；Dashboard 七列周表实屏仍沿用上一节未验边界（规则有测试，名单不是 Dashboard）。上一节 Networking 测试描述中“与日期参数”不准确：`coachReadRequestsAllLogs` 实际断言 `scope=all`，本轮按真实测试范围记录。原先 `specs/092-flexible-day-self-added/evidence/` 保留为上一轮历史证据，新增证据以本节路径为准。
+
+提交前仓内 hooks 自动清理了证据日志的尾随空白与 EOF 空行，日志内容与测试结论未变；重新暂存后检查。上述 diff-check 的最终核验包含新增文件。

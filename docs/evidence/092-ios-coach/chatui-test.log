@@ -1,0 +1,446 @@
+Building for debugging...
+[0/20] /Users/david/Projects/apps/MeetPR-wt-092b/Modules/ChatUI/.build/arm64-apple-macosx/debug/ChatUIPackageTests.derived/runner.swift
+[1/20] Copying Localizable.xcstrings
+[1/20] Copying Info.plist
+[1/20] Write sources
+[5/20] Copying Localizable.xcstrings
+[5/20] Write sources
+[5/20] Copying Info.plist
+[5/20] Write sources
+[5/20] Copying Localizable.xcstrings
+[5/20] Copying Info.plist
+[5/20] Write sources
+[14/20] Copying Localizable.xcstrings
+[16/20] Copying Media.xcassets
+[17/20] Write swift-version--58304C5D6DBC2206.txt
+[19/141] Emitting module CoreModels
+[20/148] Compiling CoreModels CoreModelStrings.swift
+[21/148] Compiling CoreModels CompetitionLiftResolver.swift
+[22/148] Compiling CoreModels CompletionHistory.swift
+[23/148] Compiling CoreModels E1RMAnomalyClassifier.swift
+[24/148] Compiling CoreModels E1RMCalculator.swift
+[25/148] Compiling CoreModels E1RMPlateauDetector.swift
+[26/148] Compiling CoreModels InviteCodeFormat.swift
+[27/148] Compiling CoreModels TrainingDay.swift
+[28/148] Compiling CoreModels TrainingMode.swift
+[29/148] Compiling CoreModels UnitPreference.swift
+[30/148] Compiling CoreModels UnitSystem.swift
+[31/148] Compiling CoreModels UserRole.swift
+[32/148] Compiling CoreModels PushNotificationRouting.swift
+[33/148] Compiling CoreModels resource_bundle_accessor.swift
+[34/148] Compiling CoreModels PlateMathCalculator.swift
+[35/148] Compiling CoreModels RestDefaults.swift
+[36/148] Compiling CoreModels BindRequest.swift
+[37/148] Compiling CoreModels InviteCode.swift
+[38/148] Compiling CoreModels CoachFeedback.swift
+[39/148] Compiling CoreModels CoachFeedbackVideo.swift
+[40/148] Compiling CoreModels CoachProfile.swift
+[41/148] Compiling CoreModels EvaluationPeriod.swift
+[42/148] Compiling CoreModels EvaluationSummary.swift
+[43/148] Compiling CoreModels Exercise.swift
+[44/148] Compiling CoreModels OnboardingPatch.swift
+[45/148] Compiling CoreModels OnboardingProfile.swift
+[46/148] Compiling CoreModels E1RMHistoryPoint.swift
+[47/148] Compiling CoreModels E1RMWeightBaseline.swift
+[48/148] Compiling CoreModels ActiveCoachContext.swift
+[49/148] Compiling CoreModels ChatConversation.swift
+[50/148] Compiling CoreModels ChatCursor.swift
+[51/148] Compiling CoreModels ChatMessage.swift
+[52/148] Compiling CoreModels ChatMessageKind.swift
+[53/148] Compiling CoreModels SetRefV1.swift
+[54/148] Compiling CoreModels Codec.swift
+[55/148] Compiling CoreModels User.swift
+[56/148] Compiling CoreModels VideoMarker.swift
+[57/148] Compiling CoreModels BenchGrip.swift
+[58/148] Compiling CoreModels BindRequestStatus.swift
+[59/148] Compiling CoreModels CompetitionStance.swift
+[60/148] Compiling CoreModels DeadliftStance.swift
+[61/148] Compiling CoreModels Equipment.swift
+[62/148] Compiling CoreModels MovementPattern.swift
+[63/148] Compiling CoreModels MuscleGroup.swift
+[64/148] Compiling CoreModels PlanKind.swift
+[65/148] Compiling CoreModels PlanSource.swift
+[66/148] Compiling CoreModels PlanStatus.swift
+[67/148] Compiling CoreModels SetType.swift
+[68/148] Compiling CoreModels SquatStance.swift
+[69/148] Compiling CoreModels ExerciseType.swift
+[70/148] Compiling CoreModels Gender.swift
+[71/148] Compiling CoreModels GymTier.swift
+[72/148] Compiling CoreModels InjuryArea.swift
+[73/148] Compiling CoreModels IntensityMode.swift
+[74/148] Compiling CoreModels InviteCodeType.swift
+[75/148] Compiling CoreModels LiftFamily.swift
+[76/148] Compiling CoreModels PRBreakthroughEvent.swift
+[77/148] Compiling CoreModels PercentageAnchor.swift
+[78/148] Compiling CoreModels PlanDay.swift
+[79/148] Compiling CoreModels PlanExercise.swift
+[80/148] Compiling CoreModels PlanLoadMode.swift
+[81/148] Compiling CoreModels PlanSet.swift
+[82/148] Compiling CoreModels PrescribedIntensity.swift
+[83/148] Compiling CoreModels StudentPlanView.swift
+[84/148] Compiling CoreModels StudentSetLog.swift
+[85/148] Compiling CoreModels StudentVideo.swift
+[86/148] Compiling CoreModels TrainingPlan.swift
+[87/148] Compiling CoreModels VideoAttachment.swift
+[88/148] Compiling CoreModels ReadinessCheckin.swift
+[89/148] Compiling CoreModels StudentProfile.swift
+[90/167] Compiling RepositoryContracts OnboardingRepository.swift
+[91/167] Compiling RepositoryContracts ReadinessRepository.swift
+[92/167] Compiling RepositoryContracts AccountRepository.swift
+[93/167] Compiling RepositoryContracts BindRepository.swift
+[94/169] Compiling RepositoryContracts StudentTrainingLogRepository.swift
+[95/169] Compiling RepositoryContracts VideoAttachmentRepository.swift
+[96/169] Compiling RepositoryContracts RepositoryStrings.swift
+[97/169] Compiling RepositoryContracts StudentFeedbackRepository.swift
+[98/169] Compiling RepositoryContracts StudentPlanRepository.swift
+[99/169] Compiling RepositoryContracts StudentPlanStore.swift
+[100/169] Compiling RepositoryContracts E1RMRepository.swift
+[101/169] Compiling RepositoryContracts EvaluationRepository.swift
+[102/169] Compiling RepositoryContracts CoachStudentVideoRepository.swift
+[103/169] Compiling RepositoryContracts CoachVideoQueueRepository.swift
+[104/169] Compiling RepositoryContracts ExerciseCatalogReading.swift
+[105/169] Compiling RepositoryContracts InviteCodeRepository.swift
+[106/169] Emitting module RepositoryContracts
+[107/169] Compiling RepositoryContracts ChatRepository.swift
+[108/169] Compiling RepositoryContracts CoachBindQueueRepository.swift
+[109/169] Compiling RepositoryContracts VideoMarkerRepository.swift
+[110/169] Compiling RepositoryContracts resource_bundle_accessor.swift
+[111/220] Compiling Networking APIClient+Exercises.swift
+[112/220] Compiling Networking APIClient+Feedback.swift
+[113/220] Compiling Networking APIClient+Onboarding.swift
+[114/220] Compiling Networking APIClient+Plans.swift
+[115/220] Compiling Networking APIClient+Readiness.swift
+[116/220] Compiling Networking APIClient+Sets.swift
+[117/225] Compiling Networking APIClient+Account.swift
+[118/225] Compiling Networking APIClient+Bind.swift
+[119/225] Compiling Networking APIClient+BindQueue.swift
+[120/225] Compiling Networking APIClient+CoachSets.swift
+[121/225] Compiling Networking APIClient+Devices.swift
+[122/225] Compiling Networking APIClient+Evaluations.swift
+[123/225] Compiling Networking UploadDTOs.swift
+[124/225] Compiling Networking VideoMarkerDTOs.swift
+[125/225] Compiling Networking WireFormatting.swift
+[126/225] Compiling Networking Endpoints.swift
+[127/225] Compiling Networking ErrorEnvelope.swift
+[128/225] Emitting module Networking
+[129/225] Compiling Networking APIClient+StudentVideos.swift
+[130/225] Compiling Networking APIClient+Students.swift
+[131/225] Compiling Networking APIClient+Uploads.swift
+[132/225] Compiling Networking APIClient+VideoMarkers.swift
+[133/225] Compiling Networking APIClient.swift
+[134/225] Compiling Networking APIClient+Auth.swift
+[135/225] Compiling Networking AuthDTOs.swift
+[136/225] Compiling Networking SessionStateReader.swift
+[137/225] Compiling Networking BackendVideoMarkerRepository.swift
+[138/225] Compiling Networking BuildConfig.swift
+[139/225] Compiling Networking ExerciseCatalogCache.swift
+[140/225] Compiling Networking FeedbackCache.swift
+[141/225] Compiling Networking JSONFileCache.swift
+[142/225] Compiling Networking PlanCache.swift
+[143/225] Compiling Networking StudentPlanCache.swift
+[144/225] Compiling Networking TrainingLogCache.swift
+[145/225] Compiling Networking BindDTOs.swift
+[146/225] Compiling Networking BindQueueDTOs.swift
+[147/225] Emitting module DesignSystem
+[148/231] Compiling Networking ExerciseDTOs.swift
+[149/231] Compiling Networking ExerciseStatsDTOs.swift
+[150/231] Compiling Networking FeedbackDTOs.swift
+[151/231] Compiling Networking OnboardingDTOs.swift
+[152/231] Compiling Networking OnboardingPatchDTO.swift
+[153/231] Compiling Networking ChatDTOs.swift
+[154/231] Compiling Networking CoachSetLogDTO.swift
+[155/231] Compiling Networking CoachStudentDTOs.swift
+[156/231] Compiling Networking DecimalCoding.swift
+[157/231] Compiling Networking EvaluationDTOs.swift
+[158/231] Compiling Networking PlanDTOs.swift
+[159/231] Compiling Networking PlanRequestDTOs.swift
+[160/231] Compiling Networking ReadinessDTOs.swift
+[161/231] Compiling Networking SetLogDTOs.swift
+[162/231] Compiling Networking StudentVideoDTOs.swift
+[163/231] Compiling Networking DomainMapping.swift
+[164/231] Compiling Networking NetworkChatRepository.swift
+[165/231] Compiling Networking OSSPartUploader.swift
+[166/231] Compiling Networking RealtimeClient.swift
+[167/231] Compiling Networking RealtimeEvent.swift
+[174/231] Compiling DesignSystem SemanticTone.swift
+[175/231] Compiling DesignSystem Spacing.swift
+[176/231] Compiling DesignSystem Typography.swift
+[177/231] Compiling DesignSystem VideoColors.swift
+[178/231] Compiling DesignSystem VisualEffects.swift
+[179/231] Compiling DesignSystem resource_bundle_accessor.swift
+[230/271] Emitting module ChatUI
+[231/275] Compiling ChatUI VideoBadgeInfo.swift
+[232/275] Compiling ChatUI VideoBadgeOverlay.swift
+[233/275] Compiling ChatUI VideoBadgePhotoLibrary.swift
+[234/275] Compiling ChatUI resource_bundle_accessor.swift
+[235/275] Compiling ChatUI ChatComposer.swift
+[236/275] Compiling ChatUI ChatDemoSeed.swift
+[237/275] Compiling ChatUI ChatEntryButton.swift
+[238/275] Compiling ChatUI ChatImageDownsampler.swift
+[239/275] Compiling ChatUI ChatInboxViewModel.swift
+[240/275] Compiling ChatUI FeedbackVideoAnnotationOverlay.swift
+[241/275] Compiling ChatUI FeedbackVideoFailureCard.swift
+[242/275] Compiling ChatUI FeedbackVideoMarkerOverlay.swift
+[243/275] Compiling ChatUI FeedbackVideoPlayerActions.swift
+[244/275] Compiling ChatUI ConversationListSection.swift
+[245/275] Compiling ChatUI ConversationMessageRows.swift
+[246/275] Compiling ChatUI ConversationTimelinePresentation.swift
+[247/275] Compiling ChatUI ConversationView.swift
+[248/275] Compiling ChatUI FeedbackVideoWorkbenchPlayer.swift
+[249/275] Compiling ChatUI InMemoryChatRepository.swift
+[250/275] Compiling ChatUI SetRefPickerPresentation.swift
+[251/275] Compiling ChatUI SetRefSendIntent.swift
+[252/275] Compiling ChatUI ConversationViewModel+Images.swift
+[253/275] Compiling ChatUI ConversationViewModel+Loading.swift
+[254/275] Compiling ChatUI ConversationViewModel+Videos.swift
+[255/275] Compiling ChatUI ConversationViewModel.swift
+[256/275] Compiling ChatUI ChatSetCardPresentation.swift
+[257/275] Compiling ChatUI ChatSetCardView.swift
+[258/275] Compiling ChatUI ChatSetRefDisplayFormatter.swift
+[259/275] Compiling ChatUI ChatStrings.swift
+[260/275] Compiling ChatUI ChatTaskCancellation.swift
+[261/275] Compiling ChatUI ChatOutboxItem.swift
+[262/275] Compiling ChatUI ChatRealtimeRouter.swift
+[263/275] Compiling ChatUI ChatRelativeTime.swift
+[264/275] Compiling ChatUI ChatSendCoordinator+SetRef.swift
+[265/275] Compiling ChatUI ChatSendCoordinator.swift
+[266/275] Compiling ChatUI SetRefSharePicker.swift
+[267/275] Compiling ChatUI SetRefSharingContext.swift
+[268/275] Compiling ChatUI VideoBadgeCard.swift
+[269/275] Compiling ChatUI VideoBadgeExporter.swift
+[270/275] Compiling ChatUI FeedbackVideoPlayerChrome.swift
+[271/275] Compiling ChatUI FeedbackVideoPlayerMetrics.swift
+[272/275] Compiling ChatUI FeedbackVideoPlayerView.swift
+[273/275] Compiling ChatUI FeedbackVideoScrubber.swift
+[274/295] Compiling ChatUITests ConversationPollingDirectionTests.swift
+[275/295] Compiling ChatUITests ConversationVideoRenewalTests.swift
+[276/295] Compiling ChatUITests FeedbackVideoPlayerPresentationTests.swift
+[277/295] Compiling ChatUITests InMemoryChatRepositoryTests.swift
+[278/297] Compiling ChatUITests ChatRealtimeTests.swift
+[279/297] Compiling ChatUITests ChatSendCoordinatorCleanupTests.swift
+[280/297] Compiling ChatUITests ChatImageDownsamplerTests.swift
+[281/297] Compiling ChatUITests ChatInboxViewModelTests.swift
+[282/297] Compiling ChatUITests ChatPendingMatchingTests.swift
+[283/297] Compiling ChatUITests LocalizationCatalogTestSupport.swift
+[284/297] Compiling ChatUITests VideoBadgeExportFixture.swift
+[285/297] Compiling ChatUITests ConversationEmptyStateTests.swift
+[286/297] Compiling ChatUITests ConversationImageRenewalTests.swift
+[287/297] Compiling ChatUITests ChatSetCardPresentationTests.swift
+[288/297] Compiling ChatUITests ChatTestSupport.swift
+[289/297] Compiling ChatUITests ChatSendCoordinatorSetRefTests.swift
+[290/297] Compiling ChatUITests ChatSendCoordinatorTests.swift
+[291/297] Emitting module ChatUITests
+[292/297] Compiling ChatUITests ConversationViewModelSetRefTests.swift
+[293/297] Compiling ChatUITests ConversationViewModelTests.swift
+[294/297] Compiling ChatUITests VideoBadgeExporterTests.swift
+[295/297] Compiling ChatUITests VideoBadgePresentationTests.swift
+[296/299] Compiling ChatUIPackageTests runner.swift
+[297/299] Emitting module ChatUIPackageTests
+[297/299] Write Objects.LinkFileList
+[298/299] Linking ChatUIPackageTests
+Build complete! (47.82s)
+Test Suite 'All tests' started at 2026-10-14 08:18:56.855.
+Test Suite 'All tests' passed at 2026-10-14 08:18:56.857.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite ChatRealtimeTests started.
+◇ Suite ChatSendCoordinatorSetRefTests started.
+◇ Suite "Video badge exporter" started.
+◇ Suite ConversationImageRenewalTests started.
+◇ Suite ConversationVideoRenewalTests started.
+◇ Suite ChatPendingMatchingTests started.
+◇ Suite ConversationPollingDirectionTests started.
+◇ Suite "Feedback video workbench player" started.
+◇ Suite ChatSendCoordinatorTests started.
+◇ Suite ChatInboxViewModelTests started.
+◇ Test inMemoryMarkReadIsMonotonic() started.
+◇ Suite ChatSetCardPresentationTests started.
+◇ Suite ConversationViewModelSetRefTests started.
+◇ Test inMemorySendSetRefPreservesStructuredCardPayload() started.
+◇ Suite ConversationViewModelTests started.
+◇ Test "conversation empty-state copy is localized in Chinese and English" started.
+◇ Test inMemoryUnreadAggregationUsesCurrentUserPerspective() started.
+◇ Test inMemorySendAppendsAndUpdatesConversation() started.
+◇ Test "conversation timeline shows loading before the first empty state" started.
+◇ Test routerBroadcastsOneSourceEventToIndependentSubscribers() started.
+◇ Test chatReadAdvancesReceiptWithoutGoingBackwards() started.
+◇ Test conversationFiltersEventsAndCoalescesDenseRefreshes() started.
+◇ Test inboxSuspendsPollingWhileConnectedAndRestoresItWhenDisconnected() started.
+◇ Test deallocatedConversationReleasesItsRouterSubscriptions() started.
+◇ Test stagedIntentKeepsFrozenClientIDWhenComposerAddsNote() started.
+◇ Test failedRetryReusesClientIDAndNeverEntersImageCleanupPath() started.
+◇ Test stagedUploadingVideoCanSendBeforeUploadIsReady() started.
+◇ Test conversationConnectedStateSuspendsThreeSecondPolling() started.
+◇ Test successfulSetRefWithReadyVideoNeverEntersImageCleanupPath() started.
+◇ Suite ChatSendCoordinatorCleanupTests started.
+◇ Test "export preserves orientation, audio, duration, and burns the badge into every segment" started.
+◇ Test intentFreezesSnapshotAndRepeatedTriggerUsesOneClientID() started.
+◇ Test imageLoadFailureForcesExactlyOneRenewalWithoutExpiry() started.
+◇ Suite "Video training badge" started.
+◇ Test nilImageURLShowsPlaceholderWithoutRenewalRequest() started.
+◇ Test logoutDropsUnsentStagedIntent() started.
+◇ Test chatImageDownsamplerRejectsInvalidImageData() started.
+◇ Test playbackFailureReplacesURLUsingExactSingleMessageQuery() started.
+◇ Test inMemoryOpenConversationIsIdempotent() started.
+◇ Test ownCardRenewalFailureKeepsMessageAndMarksVideoUnavailable() started.
+◇ Test opponentUsingSameClientIDDoesNotReconcileCurrentUsersPendingItem() started.
+◇ Test expiredURLRenewsBeforePlayback() started.
+◇ Test uploadSurvivesSheetDismissAndReadyAutomaticallySends() started.
+◇ Test "timeline renders minute and zero-padded second values" started.
+◇ Test expiredImageOutsideLatestPageRenewsInPlaceWithBeforeQuery() started.
+◇ Test "scrubbing keeps the drag position isolated from timeline polling" started.
+◇ Test "workbench uses the four prototype playback rates" started.
+◇ Test failedSendSurvivesReentryAndRetryReusesClientID() started.
+◇ Test pollFirstReconcilesAndLatePostCannotReviveBubble() started.
+◇ Test logoutCancelsWaitingIntentWithoutImageCleanup() started.
+◇ Test successfulSendWhilePoppedIsTransferredOnReentry() started.
+◇ Test oneTickCatchesUpMoreThanTwoPages() started.
+◇ Test postFirstIsConfirmedUntilViewModelAcknowledgesIt() started.
+◇ Test "badge and coach consent default to the legacy nil path" started.
+◇ Test "workbench configuration owns the expanded playback-rate semantics" started.
+◇ Test concurrentSendsAreKeptAsIndependentOutboxItems() started.
+◇ Test refreshLandingAfterMarkReadCannotResurrectTheBadge() started.
+◇ Test staleRefreshResponseCannotOverwriteNewerSnapshot() started.
+◇ Test "scrubber seek conversion clamps invalid and out-of-range positions" started.
+◇ Test repeatedStartCreatesOneThirtySecondPoller() started.
+◇ Test "marker seek conversion uses millisecond timescale and clamps to duration" started.
+◇ Test applyReadStateAtomicallyUpdatesConversationAndTotal() started.
+◇ Test setReferenceWireRoundTripIsStableAcrossSenderAndReceiverLocales() started.
+◇ Test staleLoadCannotResurrectMessageDeletedDuringRenewal() started.
+◇ Test missingNewlineHasNoNoteArea() started.
+◇ Test footerCopyReusesDeliveredAndReadStates() started.
+◇ Test explicitEmptyNoteIsPreservedAsEmptyString() started.
+◇ Test notePreservesEveryCharacterAfterFirstNewline() started.
+◇ Test confirmationCopyNeverCallsAPlannedSetARecord() started.
+◇ Test goldenFixturesProduceExactCardFieldsAndMissingShapes() started.
+◇ Test "default configuration preserves legacy chat and student playback semantics" started.
+◇ Test pickerRequiresASelectionUnlessTheEntryProvidesOne() started.
+◇ Test pickerGroupsSetsByExerciseAndShowsTheSelectedSummary() started.
+◇ Test canonicalBodyOverUTF16LimitShowsErrorAndKeepsStagedSnapshot() started.
+◇ Test coordinatorRejectsOverLimitCanonicalBodyWithoutDiscardingStage() started.
+◇ Test mismatchedBodyFallsBackToPlainText() started.
+◇ Test setNumberIsRenderedWithoutOffset() started.
+◇ Test failedInitialConversationLoadStaysOutOfTheEmptyState() started.
+◇ Test textSendTrimsWhitespaceAndRejectsEmptyOrOversizedInput() started.
+◇ Test repeatedPollingStartHasOneOwnerAndCancellationIsNotAnError() started.
+◇ Test readReceiptUsesInclusiveSequenceBoundary() started.
+◇ Test renewalTargetDisappearingDeletesLocalMessage() started.
+◇ Test emptyConversationFinishesInitialLoadOnlyAfterSuccessfulFetch() started.
+◇ Test emptyConversationUsesLatestThenSwitchesToAfterMaximumSequence() started.
+◇ Test catchUpStopsWhenSequenceDoesNotAdvance() started.
+◇ Test historyPrependDeduplicatesAndPreservesSequenceOrder() started.
+◇ Test staleMarkReadResponseCannotOverwriteNewerInboxState() started.
+◇ Test canonicalBodyAtUTF16LimitSendsIncludingAnEmoji() started.
+◇ Test successfulEmptyPollRecoversFailedInitialLoadIntoEmptyState() started.
+◇ Test attachmentSummaryOmitsMissingFieldsAndNoteOccupiesTheTopRegion() started.
+✔ Test inMemoryMarkReadIsMonotonic() passed after 0.003 seconds.
+✔ Test inMemorySendAppendsAndUpdatesConversation() passed after 0.003 seconds.
+✔ Test inMemoryUnreadAggregationUsesCurrentUserPerspective() passed after 0.003 seconds.
+✔ Test "conversation timeline shows loading before the first empty state" passed after 0.003 seconds.
+◇ Test bindRequiredDoesNotSelfDeadlockAndCallbackFiresOnce() started.
+◇ Test sendEnqueuedDuringCleanupDoesNotOutliveIt() started.
+◇ Test cancelAllWaitsForImageCleanup() started.
+◇ Test cancellationGenerationDiscardsLateNonCooperativeResponse() started.
+◇ Test retryDuringCleanupDoesNotOutliveIt() started.
+◇ Test "metrics use the app's zero-or-one-decimal display convention" started.
+◇ Test "optional fields disappear without placeholder content" started.
+◇ Test "portrait preferred transform swaps render dimensions and normalizes origin" started.
+◇ Test "component preserves display-ready set ordinals without incrementing" started.
+✔ Test inMemoryOpenConversationIsIdempotent() passed after 0.016 seconds.
+✔ Test "conversation empty-state copy is localized in Chinese and English" passed after 0.017 seconds.
+✔ Test confirmationCopyNeverCallsAPlannedSetARecord() passed after 0.015 seconds.
+✔ Test notePreservesEveryCharacterAfterFirstNewline() passed after 0.015 seconds.
+✔ Test missingNewlineHasNoNoteArea() passed after 0.015 seconds.
+✔ Test setReferenceWireRoundTripIsStableAcrossSenderAndReceiverLocales() passed after 0.015 seconds.
+✔ Test explicitEmptyNoteIsPreservedAsEmptyString() passed after 0.015 seconds.
+✔ Test footerCopyReusesDeliveredAndReadStates() passed after 0.015 seconds.
+✔ Test mismatchedBodyFallsBackToPlainText() passed after 0.015 seconds.
+✔ Test chatImageDownsamplerRejectsInvalidImageData() passed after 0.017 seconds.
+✔ Test logoutDropsUnsentStagedIntent() passed after 0.017 seconds.
+✔ Test setNumberIsRenderedWithoutOffset() passed after 0.015 seconds.
+✔ Test inMemorySendSetRefPreservesStructuredCardPayload() passed after 0.018 seconds.
+✔ Test attachmentSummaryOmitsMissingFieldsAndNoteOccupiesTheTopRegion() passed after 0.016 seconds.
+✔ Test "optional fields disappear without placeholder content" passed after 0.002 seconds.
+✔ Test "component preserves display-ready set ordinals without incrementing" passed after 0.002 seconds.
+✔ Test goldenFixturesProduceExactCardFieldsAndMissingShapes() passed after 0.017 seconds.
+✔ Suite ChatSetCardPresentationTests passed after 0.019 seconds.
+✔ Test "metrics use the app's zero-or-one-decimal display convention" passed after 0.003 seconds.
+✔ Test "portrait preferred transform swaps render dimensions and normalizes origin" passed after 0.012 seconds.
+✔ Test "timeline renders minute and zero-padded second values" passed after 0.028 seconds.
+✔ Test "scrubbing keeps the drag position isolated from timeline polling" passed after 0.028 seconds.
+✔ Test "workbench uses the four prototype playback rates" passed after 0.027 seconds.
+✔ Test deallocatedConversationReleasesItsRouterSubscriptions() passed after 0.028 seconds.
+✔ Suite "Video training badge" passed after 0.029 seconds.
+✔ Test "badge and coach consent default to the legacy nil path" passed after 0.028 seconds.
+✔ Test "workbench configuration owns the expanded playback-rate semantics" passed after 0.028 seconds.
+✔ Test "marker seek conversion uses millisecond timescale and clamps to duration" passed after 0.028 seconds.
+✔ Test applyReadStateAtomicallyUpdatesConversationAndTotal() passed after 0.028 seconds.
+✔ Test "scrubber seek conversion clamps invalid and out-of-range positions" passed after 0.028 seconds.
+✔ Test "default configuration preserves legacy chat and student playback semantics" passed after 0.028 seconds.
+✔ Suite "Feedback video workbench player" passed after 0.030 seconds.
+✔ Test canonicalBodyOverUTF16LimitShowsErrorAndKeepsStagedSnapshot() passed after 0.027 seconds.
+✔ Test coordinatorRejectsOverLimitCanonicalBodyWithoutDiscardingStage() passed after 0.027 seconds.
+✔ Test pickerGroupsSetsByExerciseAndShowsTheSelectedSummary() passed after 0.027 seconds.
+✔ Test pickerRequiresASelectionUnlessTheEntryProvidesOne() passed after 0.028 seconds.
+✔ Test failedInitialConversationLoadStaysOutOfTheEmptyState() passed after 0.027 seconds.
+✔ Test emptyConversationFinishesInitialLoadOnlyAfterSuccessfulFetch() passed after 0.027 seconds.
+✔ Test nilImageURLShowsPlaceholderWithoutRenewalRequest() passed after 0.030 seconds.
+✔ Test canonicalBodyAtUTF16LimitSendsIncludingAnEmoji() passed after 0.028 seconds.
+✔ Suite ConversationViewModelSetRefTests passed after 0.032 seconds.
+✔ Test successfulSetRefWithReadyVideoNeverEntersImageCleanupPath() passed after 0.031 seconds.
+✔ Test postFirstIsConfirmedUntilViewModelAcknowledgesIt() passed after 0.031 seconds.
+✔ Test routerBroadcastsOneSourceEventToIndependentSubscribers() passed after 0.031 seconds.
+✔ Test ownCardRenewalFailureKeepsMessageAndMarksVideoUnavailable() passed after 0.032 seconds.
+✔ Test textSendTrimsWhitespaceAndRejectsEmptyOrOversizedInput() passed after 0.030 seconds.
+✔ Test stagedIntentKeepsFrozenClientIDWhenComposerAddsNote() passed after 0.033 seconds.
+✔ Test stagedUploadingVideoCanSendBeforeUploadIsReady() passed after 0.033 seconds.
+✔ Test refreshLandingAfterMarkReadCannotResurrectTheBadge() passed after 0.032 seconds.
+✔ Test concurrentSendsAreKeptAsIndependentOutboxItems() passed after 0.032 seconds.
+✔ Test historyPrependDeduplicatesAndPreservesSequenceOrder() passed after 0.031 seconds.
+✔ Test catchUpStopsWhenSequenceDoesNotAdvance() passed after 0.031 seconds.
+✔ Test successfulEmptyPollRecoversFailedInitialLoadIntoEmptyState() passed after 0.031 seconds.
+✔ Test imageLoadFailureForcesExactlyOneRenewalWithoutExpiry() passed after 0.033 seconds.
+✔ Test playbackFailureReplacesURLUsingExactSingleMessageQuery() passed after 0.033 seconds.
+✔ Test successfulSendWhilePoppedIsTransferredOnReentry() passed after 0.033 seconds.
+✔ Test uploadSurvivesSheetDismissAndReadyAutomaticallySends() passed after 0.033 seconds.
+✔ Test readReceiptUsesInclusiveSequenceBoundary() passed after 0.031 seconds.
+✔ Test expiredImageOutsideLatestPageRenewsInPlaceWithBeforeQuery() passed after 0.033 seconds.
+✔ Test expiredURLRenewsBeforePlayback() passed after 0.033 seconds.
+✔ Suite ConversationImageRenewalTests passed after 0.035 seconds.
+✔ Test intentFreezesSnapshotAndRepeatedTriggerUsesOneClientID() passed after 0.034 seconds.
+✔ Test emptyConversationUsesLatestThenSwitchesToAfterMaximumSequence() passed after 0.032 seconds.
+✔ Test pollFirstReconcilesAndLatePostCannotReviveBubble() passed after 0.034 seconds.
+✔ Test renewalTargetDisappearingDeletesLocalMessage() passed after 0.033 seconds.
+✔ Test failedRetryReusesClientIDAndNeverEntersImageCleanupPath() passed after 0.035 seconds.
+✔ Test failedSendSurvivesReentryAndRetryReusesClientID() passed after 0.034 seconds.
+✔ Suite ChatSendCoordinatorTests passed after 0.035 seconds.
+✔ Test oneTickCatchesUpMoreThanTwoPages() passed after 0.034 seconds.
+✔ Suite ConversationPollingDirectionTests passed after 0.036 seconds.
+✔ Test opponentUsingSameClientIDDoesNotReconcileCurrentUsersPendingItem() passed after 0.035 seconds.
+✔ Test repeatedPollingStartHasOneOwnerAndCancellationIsNotAnError() passed after 0.033 seconds.
+✔ Test bindRequiredDoesNotSelfDeadlockAndCallbackFiresOnce() passed after 0.019 seconds.
+✔ Test staleLoadCannotResurrectMessageDeletedDuringRenewal() passed after 0.034 seconds.
+✔ Test staleRefreshResponseCannotOverwriteNewerSnapshot() passed after 0.034 seconds.
+✔ Suite ChatPendingMatchingTests passed after 0.036 seconds.
+✔ Suite ConversationVideoRenewalTests passed after 0.036 seconds.
+✔ Test cancellationGenerationDiscardsLateNonCooperativeResponse() passed after 0.020 seconds.
+✔ Test repeatedStartCreatesOneThirtySecondPoller() passed after 0.034 seconds.
+✔ Test sendEnqueuedDuringCleanupDoesNotOutliveIt() passed after 0.020 seconds.
+✔ Suite ChatInboxViewModelTests passed after 0.036 seconds.
+✔ Test cancelAllWaitsForImageCleanup() passed after 0.020 seconds.
+✔ Test staleMarkReadResponseCannotOverwriteNewerInboxState() passed after 0.033 seconds.
+✔ Suite ConversationViewModelTests passed after 0.036 seconds.
+✔ Test retryDuringCleanupDoesNotOutliveIt() passed after 0.020 seconds.
+✔ Suite ChatSendCoordinatorCleanupTests passed after 0.037 seconds.
+✔ Test chatReadAdvancesReceiptWithoutGoingBackwards() passed after 0.037 seconds.
+✔ Test conversationConnectedStateSuspendsThreeSecondPolling() passed after 0.037 seconds.
+✔ Test conversationFiltersEventsAndCoalescesDenseRefreshes() passed after 0.037 seconds.
+✔ Test inboxSuspendsPollingWhileConnectedAndRestoresItWhenDisconnected() passed after 0.037 seconds.
+✔ Suite ChatRealtimeTests passed after 0.038 seconds.
+✔ Test logoutCancelsWaitingIntentWithoutImageCleanup() passed after 0.042 seconds.
+✔ Suite ChatSendCoordinatorSetRefTests passed after 0.043 seconds.
+✔ Test "export preserves orientation, audio, duration, and burns the badge into every segment" passed after 2.371 seconds.
+✔ Suite "Video badge exporter" passed after 2.372 seconds.
+✔ Test run with 84 tests in 15 suites passed after 2.372 seconds.

@@ -31,6 +31,7 @@ struct StudentDetailView: View {
         plans: context.plans,
         trainingLogs: context.trainingLogs,
         feedback: context.feedback,
+        planning: context.planning,
         videos: context.videos,
         readiness: context.readiness,
         profiles: context.profiles,

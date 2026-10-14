@@ -1,0 +1,21 @@
+CoachKit full suite
+✔ Test run with 455 tests in 11 suites passed after 1.742 seconds.
+
+Networking full suite
+✔ Test run with 134 tests in 3 suites passed after 0.049 seconds.
+
+swiftlint lint --strict --no-cache
+Done linting! Found 0 violations, 0 serious in 1166 files.
+
+MeetPR-Demo build
+** BUILD SUCCEEDED **
+
+xcrun simctl shutdown 8F164D5D-A450-44FD-BDBF-BB351572CF6E
+Unable to locate device set: Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0x8f7268930 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}
+
+swift-format lint --strict: no output, exit 0
+Module boundary checks: PASS (exit 0)
+git diff --check: no output, exit 0
+XcodeBuildMCP build_run_sim: ✅ Build & Run complete
+XcodeBuildMCP stop_app_sim: ✅ App stopped successfully
+Simulator shutdown: exit 1, NOT VERIFIED

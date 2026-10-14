@@ -70,8 +70,8 @@ private struct StudentExecutionDayRow: View {
 
       Spacer()
 
-      if day.completedSetCount > 0 {
-        StatusBadge(status: day.completedSetCount >= day.plannedSetCount ? .completed : .live)
+      if day.hasTrained {
+        StatusBadge(status: .completed)
       }
     }
     .padding(.vertical, MeetPRSpacing.xs)

@@ -19,6 +19,16 @@ public actor BackendPlanRepository: PlanRepository {
     self.cache = cache
   }
 
+  public func fetchCoachLogs(studentID: UUID, in range: ClosedRange<Date>) async throws
+    -> [CoachSetLogDTO]?
+  {
+    let token = try await session.accessToken()
+    return try await api.coachSetLogs(
+      studentID: studentID, from: range.lowerBound,
+      endDate: range.upperBound, accessToken: token
+    ).logs
+  }
+
   public func fetchStudents() async throws -> [CoachStudentSummary] {
     let token = try await session.accessToken()
     let response = try await api.coachStudents(accessToken: token)

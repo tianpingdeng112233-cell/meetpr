@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Observation
 import RepositoryContracts
 
@@ -26,34 +27,61 @@ enum StudentDetailSection: String, CaseIterable, Identifiable, Sendable {
 struct StudentExecutionDay: Hashable, Identifiable, Sendable {
   let date: Date
   let planDay: StudentPlanDay?
-  let logs: [StudentSetLog]
+  let allLogs: [CoachSetLogDTO]
+  let planDays: [StudentPlanDay]
+  var exerciseCatalog = CoachDayExerciseCatalog.bundled
 
+  init(date: Date, planDay: StudentPlanDay?, logs: [StudentSetLog]) {
+    self.init(
+      date: date, planDay: planDay, allLogs: logs.map(CoachSetLogDTO.init),
+      planDays: planDay.map { [$0] } ?? [])
+  }
+
+  init(date: Date, planDay: StudentPlanDay?, allLogs: [CoachSetLogDTO], planDays: [StudentPlanDay])
+  {
+    self.date = date
+    self.planDay = planDay
+    self.allLogs = allLogs
+    self.planDays = planDays
+  }
+
+  var logs: [StudentSetLog] { allLogs.compactMap(\.plannedLog) }
   var id: Date { date }
-
-  var isRestDay: Bool {
-    (planDay?.exercises.isEmpty ?? true) && logs.isEmpty
+  var isRestDay: Bool { (planDay?.exercises.isEmpty ?? true) && allLogs.isEmpty }
+  var hasTrained: Bool {
+    guard let planDay else { return allLogs.contains(where: \.completed) }
+    return CoachDayActivity.hasTrained(planDay, days: planDays, logs: allLogs)
   }
-
+  var dayCode: String? {
+    guard let planDay else { return nil }
+    let numbers = StudentPlanSequence.dayNumbers(
+      inWeek: planDays.filter {
+        $0.weekNumber == planDay.weekNumber && !$0.exercises.isEmpty
+      })
+    return "W\(planDay.weekNumber)D\(numbers[planDay.id] ?? 1)"
+  }
   var plannedSetCount: Int {
-    planDay?.exercises.reduce(0) { count, exercise in
-      count + exercise.prescribedSets.count
-    } ?? 0
+    planDay?.exercises.reduce(0) { $0 + $1.prescribedSets.count } ?? 0
   }
-
   var completedSetCount: Int {
-    logs.filter(\.completed).count
+    guard let planDay else { return allLogs.filter(\.completed).count }
+    return planDay.exercises.reduce(0) { total, exercise in
+      total
+        + allLogs.filter {
+          $0.completed && $0.planExerciseID == exercise.id
+            && $0.setIndex >= 0 && $0.setIndex < exercise.prescribedSets.count
+        }.count
+    }
   }
-
   var completionText: String {
     guard plannedSetCount > 0 else {
-      return logs.isEmpty
+      return allLogs.isEmpty
         ? CoachStudentDetailStrings.text("coach.execution.restDay")
         : CoachLocalization.localized("coach.execution.loggedSets \(completedSetCount)")
     }
     return CoachLocalization.localized(
       "coach.execution.setFraction \(completedSetCount) \(plannedSetCount)")
   }
-
 }
 
 /// Coach-side view of the student's readiness check-in for today (spec 030
@@ -126,6 +154,8 @@ final class StudentDetailViewModel {
     return CoachLocalization.localized("coach.studentDetail.shiftedDays \(totalShiftDays)")
   }
 
+  @ObservationIgnored private let planning: (any PlanRepository)?
+  private var loadedLogs: [CoachSetLogDTO] = []
   @ObservationIgnored private let plans: any StudentPlanRepository
   @ObservationIgnored private let trainingLogs: any StudentTrainingLogRepository
   @ObservationIgnored private let feedback: any StudentFeedbackRepository
@@ -139,11 +169,13 @@ final class StudentDetailViewModel {
     plans: any StudentPlanRepository,
     trainingLogs: any StudentTrainingLogRepository,
     feedback: any StudentFeedbackRepository,
+    planning: (any PlanRepository)? = nil,
     videos: any CoachStudentVideoRepository = InMemoryCoachStudentVideoRepository(),
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
     profiles: any OnboardingProfileReading = InMemoryCoachStudentProfileReader(),
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
+    self.planning = planning
     self.summary = summary
     self.plans = plans
     self.trainingLogs = trainingLogs
@@ -173,17 +205,28 @@ final class StudentDetailViewModel {
     do {
       let loadedPlan = try await plans.fetchCurrentPlan(studentID: summary.id)
       let range = Self.weekRange(for: loadedPlan, now: currentDate)
-      let loadedLogs = try await trainingLogs.fetchLogs(studentID: summary.id, in: range)
+      let loadedLogs = try await CoachTrainingLogReader(planning: planning, fallback: trainingLogs)
+        .fetch(studentID: summary.id, range: range)
+      self.loadedLogs = loadedLogs
       let loadedFeedback = try await feedback.fetchInbox(studentID: summary.id)
 
       plan = loadedPlan
       executionDays = Self.makeExecutionDays(
         plan: loadedPlan,
-        logs: loadedLogs,
+        coachLogs: loadedLogs,
         now: currentDate
       )
+      if loadedLogs.contains(where: \.adhoc) {
+        let catalog = await CoachDayExerciseCatalog.load(planning: planning)
+        executionDays = executionDays.map { day in
+          var resolved = day
+          resolved.exerciseCatalog = catalog
+          return resolved
+        }
+      }
       feedbackItems = loadedFeedback.sorted { $0.postedAt > $1.postedAt }
-      overview = Self.makeOverview(days: executionDays, feedback: feedbackItems)
+      overview = Self.makeOverview(
+        days: executionDays, feedback: feedbackItems, allLogs: loadedLogs)
       state = .loaded
     } catch {
       state = .failed(CoachStudentDetailStrings.text("coach.studentDetail.error.load"))
@@ -238,13 +281,21 @@ final class StudentDetailViewModel {
     feedbackItems.removeAll { $0.id == item.id }
     feedbackItems.insert(item, at: 0)
     feedbackItems.sort { $0.postedAt > $1.postedAt }
-    overview = Self.makeOverview(days: executionDays, feedback: feedbackItems)
+    overview = Self.makeOverview(days: executionDays, feedback: feedbackItems, allLogs: loadedLogs)
   }
 
   static func makeExecutionDays(
     plan: StudentPlanView?,
     logs: [StudentSetLog],
     now: Date,
+    calendar: Calendar = CoachFeatureCalendar.calendar
+  ) -> [StudentExecutionDay] {
+    makeExecutionDays(
+      plan: plan, coachLogs: logs.map(CoachSetLogDTO.init), now: now, calendar: calendar)
+  }
+
+  static func makeExecutionDays(
+    plan: StudentPlanView?, coachLogs: [CoachSetLogDTO], now: Date,
     calendar: Calendar = CoachFeatureCalendar.calendar
   ) -> [StudentExecutionDay] {
     let startDate = weekStart(for: plan, now: now, calendar: calendar)
@@ -260,8 +311,12 @@ final class StudentDetailViewModel {
         ?? startDate
       let dayStart = CoachFeatureCalendar.startOfDay(date, calendar: calendar)
       let dayLogs =
-        logs
-        .filter { CoachFeatureCalendar.isSameDay($0.loggedAt, date, calendar: calendar) }
+        coachLogs
+        .filter {
+          CoachDayActivity.belongs(
+            $0, to: daysByStart[dayStart], on: date,
+            days: plan?.days ?? [], calendar: calendar)
+        }
         .sorted { lhs, rhs in
           if lhs.planExerciseID == rhs.planExerciseID {
             return lhs.setIndex < rhs.setIndex
@@ -271,22 +326,24 @@ final class StudentDetailViewModel {
       return StudentExecutionDay(
         date: dayStart,
         planDay: daysByStart[dayStart],
-        logs: dayLogs
+        allLogs: dayLogs,
+        planDays: plan?.days ?? []
       )
     }
   }
 
   static func makeOverview(
     days: [StudentExecutionDay],
-    feedback: [CoachFeedback]
+    feedback: [CoachFeedback],
+    allLogs: [CoachSetLogDTO]? = nil
   ) -> StudentOverviewSummary {
     let plannedDays = days.filter { ($0.planDay?.exercises.isEmpty == false) }
-    let completedDays = plannedDays.filter { $0.completedSetCount > 0 }
+    let completedDays = plannedDays.filter(\.hasTrained)
     return StudentOverviewSummary(
       completedTrainingDays: completedDays.count,
       plannedTrainingDays: plannedDays.count,
       latestFeedback: feedback.sorted { $0.postedAt > $1.postedAt }.first,
-      latestActivityAt: days.flatMap(\.logs).map(\.loggedAt).max()
+      latestActivityAt: (allLogs ?? days.flatMap(\.allLogs)).map(\.loggedAt).max()
     )
   }
 

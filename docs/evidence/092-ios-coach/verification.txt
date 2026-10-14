@@ -1,0 +1,17 @@
+analytics-test.log: ✔ Test run with 30 tests in 0 suites passed after 4.237 seconds.
+appshell-test.log: ✔ Test run with 107 tests in 0 suites passed after 3.584 seconds.
+chatui-test.log: ✔ Test run with 84 tests in 15 suites passed after 2.372 seconds.
+coachkit-test.log: ✔ Test run with 455 tests in 11 suites passed after 8.541 seconds.
+coremodels-test.log: ✔ Test run with 158 tests in 2 suites passed after 0.027 seconds.
+designsystem-test.log: ✔ Test run with 73 tests in 16 suites passed after 0.694 seconds.
+networking-test.log: ✔ Test run with 134 tests in 3 suites passed after 0.099 seconds.
+repositorycontracts-test.log: ✔ Test run with 6 tests in 0 suites passed after 0.001 seconds.
+studentkit-test.log: ✔ Test run with 984 tests in 46 suites passed after 7.110 seconds.
+MeetPR-Demo / Demo: BUILD SUCCEEDED, build_run_sim completed; 0 warnings/errors reported.
+MeetPR / Debug: test_sim SUCCEEDED, 9 passed, 0 failed; HANG_PROBE diagnostic suite disabled by default.
+swift-format lint --strict --recursive MeetPR MeetPRTests Modules: exit 0 (empty log).
+swiftlint lint --strict --no-cache: 0 violations in 1166 files.
+CI module boundary script: exit 0.
+git diff --check: exit 0.
+Simulator: iPhone 17 Pro, iOS 26.4, 8F164D5D-A450-44FD-BDBF-BB351572CF6E.
+Simulator shutdown: exit 0, MCP confirms Shutdown.

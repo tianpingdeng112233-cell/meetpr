@@ -1,0 +1,71 @@
+network-red
+warning: 'networking': failed storing manifest for 'networking' in cache: attempt to write a readonly database
+warning: 'coremodels': failed storing manifest for 'coremodels' in cache: attempt to write a readonly database
+warning: 'repositorycontracts': failed storing manifest for 'repositorycontracts' in cache: attempt to write a readonly database
+macro expansion #require:3:3: error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+   |  |   `- error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/Networking/Tests/NetworkingTests/CoachSetReadTests.swift:12:24: error: value of type 'APIClient' has no member 'coachSetLogs'
+   |                        `- error: value of type 'APIClient' has no member 'coachSetLogs'
+macro expansion #require:3:3: error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+   |  |   `- error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/Networking/Tests/NetworkingTests/CoachSetReadTests.swift:12:24: error: value of type 'APIClient' has no member 'coachSetLogs'
+   |                        `- error: value of type 'APIClient' has no member 'coachSetLogs'
+macro expansion #require:3:3: error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+   |  |   `- error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/Networking/Tests/NetworkingTests/CoachSetReadTests.swift:12:24: error: value of type 'APIClient' has no member 'coachSetLogs'
+   |                        `- error: value of type 'APIClient' has no member 'coachSetLogs'
+error: fatalError
+
+dto-red
+warning: 'networking': failed storing manifest for 'networking' in cache: attempt to write a readonly database
+macro expansion #require:3:3: error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+   |  |   `- error: recursive expansion of macro 'require(_:_:sourceLocation:)'
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/Networking/Tests/NetworkingTests/CoachSetReadTests.swift:24:18: error: value of type 'SetLogDTO' has no member 'planDayID'
+   |                  `- error: value of type 'SetLogDTO' has no member 'planDayID'
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/Networking/Tests/NetworkingTests/CoachSetReadTests.swift:27:19: error: value of type 'SetLogDTO' has no member 'planDayID'
+   |                   `- error: value of type 'SetLogDTO' has no member 'planDayID'
+error: fatalError
+
+ownership-red
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Tests/CoachKitTests/Features/StudentDetail/CoachDayActivityTests.swift:14:14: error: cannot find 'CoachDayActivity' in scope
+   |              `- error: cannot find 'CoachDayActivity' in scope
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Tests/CoachKitTests/Features/StudentDetail/CoachDayActivityTests.swift:15:13: error: cannot find 'CoachDayActivity' in scope
+   |             `- error: cannot find 'CoachDayActivity' in scope
+error: fatalError
+
+consumers-red
+✘ Test detailOverviewRosterAndReminderShareCompletion() recorded an issue at CoachDayActivityTests.swift:27:5: Expectation failed: (days.first { $0.planDay?.id == earlier.id }?.logs.isEmpty → false) == true
+✘ Test detailOverviewRosterAndReminderShareCompletion() recorded an issue at CoachDayActivityTests.swift:28:5: Expectation failed: (days.first { $0.planDay?.id == later.id }?.logs.count → 0) == 1
+✘ Test detailOverviewRosterAndReminderShareCompletion() recorded an issue at CoachDayActivityTests.swift:33:5: Expectation failed: (row.trainingDays.first { $0.date == later.date }?.isCompleted() → false) == true
+✘ Test detailOverviewRosterAndReminderShareCompletion() recorded an issue at CoachDayActivityTests.swift:34:5: Expectation failed: !((row.triageSignals → [CoachKit.TriageSignal.notTrained(daysMissed: 2)]).contains(.notTrained(daysMissed: 2)) → true)
+✘ Test detailOverviewRosterAndReminderShareCompletion() failed after 0.004 seconds with 4 issues.
+✘ Suite "Coach day ownership" failed after 0.004 seconds with 4 issues.
+✘ Test run with 4 tests in 1 suite failed after 0.004 seconds with 4 issues.
+
+detail-red
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Tests/CoachKitTests/Features/StudentDetail/CoachDayDetailPresentationTests.swift:14:24: error: cannot find 'CoachDayDetailPresentation' in scope
+   |                        `- error: cannot find 'CoachDayDetailPresentation' in scope
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Tests/CoachKitTests/Features/StudentDetail/CoachDayDetailPresentationTests.swift:16:36: error: cannot infer key path type from context; consider explicitly specifying a root type
+   |                                    `- error: cannot infer key path type from context; consider explicitly specifying a root type
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Tests/CoachKitTests/Features/StudentDetail/CoachDayDetailPresentationTests.swift:17:31: error: cannot infer key path type from context; consider explicitly specifying a root type
+   |                               `- error: cannot infer key path type from context; consider explicitly specifying a root type
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Tests/CoachKitTests/Features/StudentDetail/CoachDayDetailPresentationTests.swift:22:48: error: cannot infer key path type from context; consider explicitly specifying a root type
+   |                                                `- error: cannot infer key path type from context; consider explicitly specifying a root type
+error: fatalError
+
+presentation-red
+✘ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() recorded an issue at CoachDayDetailPresentationTests.swift:29:5: Expectation failed: try inspected.findAll(ViewType.Text.self).filter { try $0.string() == caption }.count == 1
+✘ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() recorded an issue at CoachDayDetailPresentationTests.swift:26:4: Caught error: Search did not find a match. Possible blockers: AccessibilityImageLabel, AccessibilityImageLabel, AccessibilityImageLabel, AccessibilityImageLabel
+✘ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() failed after 0.104 seconds with 2 issues.
+✘ Suite "Coach self-added detail" failed after 0.104 seconds with 2 issues.
+✘ Test run with 3 tests in 1 suite failed after 0.105 seconds with 2 issues.
+
+refresh-red
+✘ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() recorded an issue at CoachDetailRefreshTests.swift:10:2: Caught error: Search did not find a match. Possible blockers: AccessibilityImageLabel, AccessibilityImageLabel, AccessibilityImageLabel, AccessibilityImageLabel, AccessibilityImageLabel, AccessibilityImageLabel
+✘ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() failed after 0.053 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.053 seconds with 1 issue.
+
+accessible-red
+/Users/david/Projects/apps/MeetPR-wt-092b/Modules/CoachKit/Tests/CoachKitTests/Features/StudentDetail/CoachDayDetailPresentationTests.swift:62:25: error: cannot find 'CoachSetReadOnlyRow' in scope
+    |                         `- error: cannot find 'CoachSetReadOnlyRow' in scope
+error: fatalError
