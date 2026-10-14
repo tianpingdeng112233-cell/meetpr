@@ -52,7 +52,9 @@ struct QuickLogPlan: Equatable, Sendable {
       calendar: wireCalendar
     )
     self.rows = drafts.map {
-      Row(draft: $0, usesAutomaticWeight: automaticWeightRowIDs.contains($0.id))
+      Row(
+        draft: $0, included: !$0.isExtra && !$0.isStudentAdded,
+        usesAutomaticWeight: automaticWeightRowIDs.contains($0.id))
     }
   }
 
@@ -110,7 +112,8 @@ struct QuickLogPlan: Equatable, Sendable {
   }
 
   mutating func setExerciseIncluded(_ included: Bool, planExerciseID: UUID) {
-    for index in rows.indices where rows[index].draft.planExerciseID == planExerciseID {
+    for index in rows.indices
+    where rows[index].draft.planExerciseID == planExerciseID && !rows[index].draft.isExtra {
       rows[index].included = included
     }
   }
@@ -118,7 +121,8 @@ struct QuickLogPlan: Equatable, Sendable {
   mutating func syncWeightToExercise(from rowID: UUID) {
     guard let source = rows.first(where: { $0.id == rowID }) else { return }
     let planExerciseID = source.draft.planExerciseID
-    for index in rows.indices where rows[index].draft.planExerciseID == planExerciseID {
+    for index in rows.indices
+    where rows[index].draft.planExerciseID == planExerciseID && !rows[index].draft.isExtra {
       rows[index].draft.actualWeight = source.draft.actualWeight
       rows[index].usesAutomaticWeight = false
     }
@@ -129,7 +133,7 @@ struct QuickLogPlan: Equatable, Sendable {
   }
 
   func entries(studentID: UUID) -> [Entry] {
-    rows.filter(\.included).map {
+    rows.filter { $0.included && !$0.draft.isExtra && !$0.draft.isStudentAdded }.map {
       let log =
         TodayWorkoutViewModel.makeLog(
           from: $0.draft,
@@ -144,7 +148,9 @@ struct QuickLogPlan: Equatable, Sendable {
   }
 
   private mutating func update(_ rowID: UUID, mutation: (inout Row) -> Void) {
-    guard let index = rows.firstIndex(where: { $0.id == rowID }) else { return }
+    guard let index = rows.firstIndex(where: { $0.id == rowID }),
+      !rows[index].draft.isExtra && !rows[index].draft.isStudentAdded
+    else { return }
     mutation(&rows[index])
   }
 

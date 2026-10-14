@@ -81,7 +81,7 @@ func completionDoesNotReopenDismissedReward(failing: Bool) async throws {
 
 @MainActor
 @Test func completionFailureClosesCelebrationPreservesSetsAndAllowsRetry() async throws {
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let cursorID = try #require(StudentPlanSequence.cursorDay(in: plan)?.id)
   let plans = SlowCompletionMutationRepository(plan: plan)
   let viewModel = TodayWorkoutViewModel(
@@ -146,7 +146,7 @@ func completionDoesNotReopenDismissedReward(failing: Bool) async throws {
 
 @MainActor
 @Test func completionTimeoutRollsBackWithoutWaitingForUncooperativeRequest() async throws {
-  let plan = StudentDemoSeed.makePlanView()
+  let plan = StudentAddedTestPlan.unsettledDemo()
   let cursorID = try #require(StudentPlanSequence.cursorDay(in: plan)?.id)
   let plans = SlowCompletionMutationRepository(plan: plan)
   let clock = CompletionTestClock()

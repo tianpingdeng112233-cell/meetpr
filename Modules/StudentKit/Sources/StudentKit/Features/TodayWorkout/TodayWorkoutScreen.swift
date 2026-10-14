@@ -63,6 +63,8 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
 
   var body: some View {
     trainingScrollView
+      .sensoryFeedback(
+        .impact(weight: .light), trigger: accessoryViewModel?.inlineCompletionFeedback ?? 0)
   }
 
   private var trainingScrollView: some View {
@@ -159,15 +161,6 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
 
   @ViewBuilder
   private var screenContent: some View {
-    // The design's training tab shows no state pill for the cursor day — the
-    // whole screen already reads "current". The notice only earns its row on
-    // completed (undo entry) and upcoming (preview) days.
-    if case .current = dayState {
-      EmptyView()
-    } else if case .completed = dayState {
-      TodayWorkoutSequenceNotice(state: dayState, onUndo: onUndoCompletion)
-    }
-
     switch content {
     case .loading:
       ProgressView()
@@ -175,6 +168,13 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
     case .workout(let presentation):
       if case .upcoming(let cursorDay) = dayState {
         TrainingDayPreview(presentation: presentation, cursorDay: cursorDay, today: gymDayToday)
+      } else if case .completed(let canUndo) = dayState {
+        CompletedDayOverviewCard(
+          presentation: presentation, drafts: accessoryViewModel?.currentDrafts ?? [],
+          unit: accessoryViewModel?.onboardingProfile?.unitPreference ?? .kg,
+          canUndo: canUndo, onUndo: onUndoCompletion
+        )
+        .id(presentation.day.id)
       } else {
         let flow = presentation.trainingFlow(isEditable: dayState.isEditable)
         if let flow, !flow.completed.isEmpty {
@@ -221,12 +221,21 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
           TodayWorkoutExerciseList(
             exercises: flow?.belowHero ?? presentation.exercises,
             collapsedExercises: $collapsedExercises,
+            viewModel: accessoryViewModel,
+            editable: dayState.isEditable,
             onEdit: onEdit,
             onVideoAction: onVideoAction
           )
         }
       }
 
+      if presentation.heroMode == .recording, dayState.isEditable,
+        let accessoryViewModel
+      {
+        StudentAddedExerciseSection(
+          viewModel: accessoryViewModel, day: presentation.day,
+          editable: dayState.isEditable)
+      }
       completionContent(presentation)
     case .noPlan:
       TodayWorkoutPlanUnavailableCard(
@@ -253,7 +262,7 @@ struct TodayWorkoutScreen<SequenceContent: View>: View {
   @ViewBuilder
   private func completionContent(_ presentation: TodayWorkoutPresentation) -> some View {
     if case .completed = dayState {
-      DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.rows).count) {
+      DayCompletionBanner(totalSets: presentation.exercises.flatMap(\.prescribedRows).count) {
         onShowReview()
       }
     } else if presentation.completionAvailability(isEditable: dayState.isEditable).button,
@@ -630,7 +639,7 @@ private struct TodayWorkoutHero: View {
 
       if isEditable {
         GoldCTA(
-          StudentStrings.localized(.todayWorkoutScreen008),
+          StudentStrings.localized(.dashboardPrimaryAction001),
           sub: nil,
           icon: .none,
           action: onStart
@@ -871,7 +880,8 @@ private struct TodayWorkoutActionSummaryHeader: View {
           StudentStrings.replacing(
             .todayWorkoutScreen018, values: ["\(presentation.exercises.count)"])
             + StudentStrings.replacing(
-              .todayWorkoutScreen019, values: ["\(presentation.exercises.flatMap(\.rows).count)"])
+              .todayWorkoutScreen019,
+              values: ["\(presentation.exercises.flatMap(\.prescribedRows).count)"])
         )
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12))
         .foregroundStyle(Color.MeetPR.textTertiary)
@@ -934,33 +944,57 @@ struct TodayWorkoutActionSummaryRow: View {
 private struct TodayWorkoutExerciseList: View {
   let exercises: [TodayWorkoutPresentation.Exercise]
   @Binding var collapsedExercises: [UUID: Bool]
+  var viewModel: TodayWorkoutViewModel?
+  var editable = false
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   let onVideoAction: (TodayWorkoutPresentation.Row) -> Void
 
   var body: some View {
     ForEach(exercises) { exercise in
-      ExerciseCard(
-        exercise: exercise.name,
-        meta: exercise.cardSubtitle,
-        note: exercise.note,
-        collapsed: collapsedExercises[exercise.id] ?? exercise.allRecorded,
-        sets: exercise.rows.map(\.record),
-        onToggle: { isOpen in
-          collapsedExercises[exercise.id] = !isOpen
-        },
-        onEditSet: { record in
-          guard let row = exercise.rows.first(where: { $0.record.index == record.index }) else {
-            return
-          }
-          onEdit(row)
-        },
-        onVideoAction: { record in
-          guard let row = exercise.rows.first(where: { $0.record.index == record.index }) else {
-            return
-          }
-          onVideoAction(row)
+      if let viewModel, exercise.rows.first?.draft.isAccessory == true, editable {
+        VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
+          Text(exercise.name).font(.headline)
+          AccessoryLogCard(
+            exercise: exercise, viewModel: viewModel,
+            unit: viewModel.onboardingProfile?.unitPreference ?? .kg,
+            previousLogs: viewModel.accessoryPreviousLogs[exercise.id] ?? [:], onEdit: onEdit)
         }
-      )
+        .padding(MeetPRSpacing.space3)
+        .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.card))
+      } else {
+        VStack(spacing: MeetPRSpacing.zero) {
+          ExerciseCard(
+            exercise: exercise.name,
+            meta: exercise.cardSubtitle,
+            note: exercise.note,
+            collapsed: collapsedExercises[exercise.id] ?? exercise.allRecorded,
+            sets: exercise.rows.filter { !$0.draft.isExtra }.map(\.record),
+            onToggle: { isOpen in
+              collapsedExercises[exercise.id] = !isOpen
+            },
+            onEditSet: { record in
+              guard let row = exercise.rows.first(where: { $0.record.index == record.index }) else {
+                return
+              }
+              onEdit(row)
+            },
+            onVideoAction: { record in
+              guard let row = exercise.rows.first(where: { $0.record.index == record.index }) else {
+                return
+              }
+              onVideoAction(row)
+            }
+          )
+          if let viewModel {
+            ExtraSetControls(
+              exercise: exercise, viewModel: viewModel, editable: editable, onEdit: onEdit
+            )
+            .padding(.horizontal, MeetPRSpacing.space3)
+          }
+        }
+        .background(Color.MeetPR.surfaceCard, in: .rect(cornerRadius: MeetPRRadius.card))
+
+      }
     }
   }
 }
@@ -1197,55 +1231,6 @@ struct HoldToCompleteButton: View {
       resetAfterGesture()
     case nil:
       break
-    }
-  }
-}
-
-private struct TodayWorkoutSequenceNotice: View {
-  let state: TodayWorkoutDayState
-  let onUndo: () -> Void
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 7) {
-      HStack(spacing: MeetPRSpacing.space2) {
-        Image(systemName: iconName)
-        Text(title)
-        Spacer()
-        if case .completed(let canUndo) = state, canUndo {
-          Button(StudentStrings.localized(.todayWorkoutScreen023), action: onUndo)
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .bold))
-        }
-      }
-      if case .upcoming(let previousDay) = state, let previousDay {
-        Text(TrainingSequenceText.unlockMessage(after: previousDay))
-          .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-          .foregroundStyle(Color.MeetPR.textMuted)
-      }
-    }
-    .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
-    .foregroundStyle(Color.MeetPR.textSecondary)
-    .padding(MeetPRSpacing.space3)
-    .background(Color.MeetPR.surfaceCard)
-    .overlay {
-      RoundedRectangle(cornerRadius: MeetPRRadius.control)
-        .stroke(Color.MeetPR.borderSubtle, lineWidth: 1)
-    }
-    .clipShape(.rect(cornerRadius: MeetPRRadius.control))
-  }
-
-  private var title: String {
-    switch state {
-    case .completed: StudentStrings.localized(.todayWorkoutScreen024)
-    case .current: StudentStrings.localized(.todayWorkoutScreen025)
-    case .upcoming: StudentStrings.localized(.todayWorkoutScreen026)
-    }
-  }
-
-  private var iconName: String {
-    switch state {
-    case .completed: "checkmark.circle"
-    case .current: "record.circle"
-    case .upcoming: "eye"
     }
   }
 }

@@ -5,6 +5,7 @@ enum TrainingSetProgress {
   }
 
   static func segments(_ drafts: [TodayWorkoutViewModel.SetRowDraft]) -> [Segment] {
+    let drafts = drafts.filter { !$0.isExtra && !$0.isStudentAdded }
     let current = drafts.firstIndex { $0.needsTrainingResult }
     return drafts.enumerated().map { index, draft in
       if draft.needsTrainingResult { return index == current ? .current : .upcoming }

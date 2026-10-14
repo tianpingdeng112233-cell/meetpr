@@ -15,19 +15,22 @@ struct AllHistoryScreen: View {
       case .loaded(let weeks, let logs):
         VStack(spacing: 0) {
           GrowthHistoryStatsCard(
-            stats: GrowthScreenPresentation.historyStats(logs: logs),
-            isZeroTraining: GrowthScreenPresentation.historyStats(logs: logs).trainingSessionCount
+            stats: GrowthScreenPresentation.historyStats(logs: logs, added: viewModel.addedLogs),
+            isZeroTraining: GrowthScreenPresentation.historyStats(
+              logs: logs, added: viewModel.addedLogs
+            ).trainingSessionCount
               == 0
           )
           .padding([.horizontal, .top], MeetPRSpacing.md)
-          if logs.isEmpty {
+          if logs.isEmpty && viewModel.addedLogs.isEmpty {
             ContentUnavailableView(
               StudentStrings.localized(.e1rmSourceHistoryEmpty), systemImage: "clock",
               description: Text(StudentStrings.localized(.e1rmSourceHistoryEmptyNote))
             )
           } else {
             HistoryEntriesView(
-              weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName)
+              weeks: weeks, logs: logs, selectedExerciseName: $selectedExerciseName,
+              addedLogs: viewModel.addedLogs, catalog: viewModel.catalog)
           }
         }
       case .error(let message):

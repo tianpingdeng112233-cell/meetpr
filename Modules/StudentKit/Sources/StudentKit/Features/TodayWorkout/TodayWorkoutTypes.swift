@@ -38,6 +38,10 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   public var failed: Bool
   public var assumed: Bool
   public var loggedSetID: UUID?
+  public var recordedAt: Date?
+  public var isExtra = false
+  public var studentAddedDayID: UUID?
+  public var isStudentAdded: Bool { studentAddedDayID != nil }
 
   public init(
     id: UUID,
@@ -56,7 +60,8 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     completed: Bool = false,
     failed: Bool = false,
     assumed: Bool = false,
-    loggedSetID: UUID? = nil
+    loggedSetID: UUID? = nil,
+    recordedAt: Date? = nil
   ) {
     self.id = id
     self.planExerciseID = planExerciseID
@@ -75,6 +80,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.failed = failed
     self.assumed = assumed
     self.loggedSetID = loggedSetID
+    self.recordedAt = recordedAt
   }
 
   public var allowsPlateLoadingGuidance: Bool {
@@ -102,6 +108,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.completed = completed
     self.failed = failed
     loggedSetID = persisted.id
+    recordedAt = persisted.loggedAt
     assumed = persisted.assumed
   }
 }

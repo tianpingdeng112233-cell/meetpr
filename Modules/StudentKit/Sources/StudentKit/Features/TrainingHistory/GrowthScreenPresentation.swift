@@ -247,26 +247,21 @@ enum GrowthScreenPresentation {
   }
 
   static func historyStats(
-    logs: [StudentSetLog],
+    logs: [StudentSetLog], added: [StudentAddedSetLog] = [],
     calendar: Calendar = .current
   ) -> GrowthHistoryStats {
     let completed = logs.filter { $0.completed && !$0.assumed }
-    let sessionDays = Set(completed.map { calendar.startOfDay(for: $0.loggedAt) })
+    let addedCompleted = added.filter { $0.completed && !$0.assumed }
+    let dates = completed.map(\.loggedAt) + addedCompleted.map(\.loggedAt)
+    let sessionDays = Set(dates.map { calendar.startOfDay(for: $0) })
     let weekIDs = Set(
-      completed.map { log in
-        let components = calendar.dateComponents(
-          [.yearForWeekOfYear, .weekOfYear],
-          from: log.loggedAt
-        )
-        return GrowthWeekID(
-          year: components.yearForWeekOfYear ?? 0,
-          week: components.weekOfYear ?? 0
-        )
-      }
-    )
-    let volume = completed.reduce(Decimal.zero) { total, log in
-      total + log.weightKg * Decimal(log.reps)
-    }
+      dates.map { date in
+        let parts = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)
+        return GrowthWeekID(year: parts.yearForWeekOfYear ?? 0, week: parts.weekOfYear ?? 0)
+      })
+    let volume =
+      completed.reduce(Decimal.zero) { $0 + $1.weightKg * Decimal($1.reps) }
+      + addedCompleted.reduce(Decimal.zero) { $0 + $1.weightKg * Decimal($1.reps) }
     return GrowthHistoryStats(
       trainingSessionCount: sessionDays.count,
       trainingWeekCount: weekIDs.count,
@@ -275,12 +270,12 @@ enum GrowthScreenPresentation {
   }
 
   static func chartBuckets(
-    logs: [StudentSetLog],
+    logs: [StudentSetLog], added: [StudentAddedSetLog] = [],
     calendar: Calendar = .current,
     maximumCount: Int = 6
   ) -> [WeeklyProgressMetric] {
     Array(
-      ProgressMetrics.weeklyVolumeIntensity(from: logs, calendar: calendar)
+      ProgressMetrics.weeklyVolumeIntensity(from: logs, added: added, calendar: calendar)
         .suffix(max(0, maximumCount))
     )
   }

@@ -77,7 +77,7 @@ import Testing
 @MainActor
 @Test func recordingThatStartsDuringRefreshKeepsTheVisibleWorkoutGeneration() async throws {
   let studentID = StudentDemoSeed.studentID
-  let initialPlan = StudentDemoSeed.makePlanView()
+  let initialPlan = StudentAddedTestPlan.unsettledDemo()
   let selectedDay = try #require(StudentPlanSequence.cursorDay(in: initialPlan))
   let refreshedPlan = try planByAppendingSet(to: selectedDay.id, in: initialPlan)
   let plans = GatedFirstRefreshStudentPlanRepository(

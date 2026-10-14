@@ -56,6 +56,10 @@ struct CompletedTrainingExercise: View {
           } else {
             CompletedTrainingSetTable(
               exercise: exercise, onEdit: onEdit, onVideoAction: onVideoAction)
+            if let viewModel {
+              ExtraSetControls(
+                exercise: exercise, viewModel: viewModel, editable: true, onEdit: onEdit)
+            }
           }
         }
         .padding(MeetPRSpacing.space3)
@@ -86,7 +90,7 @@ private struct CompletedTrainingSetTable: View {
       .foregroundStyle(Color.MeetPR.textDim)
       .padding(.horizontal, MeetPRSpacing.point14)
       .padding(.vertical, MeetPRSpacing.point6)
-      ForEach(exercise.rows) { row in
+      ForEach(exercise.rows.filter { !$0.draft.isExtra }) { row in
         let record = row.record
         SetRow(
           index: record.index, weight: record.weight, reps: record.reps, rpe: record.rpe,

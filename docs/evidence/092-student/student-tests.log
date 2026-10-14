@@ -1,0 +1,2262 @@
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Compiling StudentKit TodayWorkoutViewModel.swift
+[5/6] Emitting module StudentKit
+[6/12] Compiling StudentKit ExtraSetControls.swift
+[7/12] Compiling StudentKit StudentAddedExerciseSection.swift
+[8/12] Compiling StudentKit RemoveStudentSetButton.swift
+[9/12] Compiling StudentKit StudentAddedDemoScenario.swift
+[10/12] Compiling StudentKit StudentAddedInlineRows.swift
+[11/12] Compiling StudentKit StudentExercisePicker.swift
+[12/17] Emitting module StudentKitTests
+[13/17] Compiling StudentKitTests StudentAddedFailureTests.swift
+[14/17] Compiling StudentKitTests StudentAddedWriteTests.swift
+[15/17] Compiling StudentKitTests StudentAddedCatalogRecoveryTests.swift
+[15/17] Write Objects.LinkFileList
+[16/17] Linking StudentKitPackageTests
+Build complete! (11.88s)
+Test Suite 'All tests' started at 2026-10-14 09:11:39.574.
+Test Suite 'All tests' passed at 2026-10-14 09:11:39.575.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" started.
+✔ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" passed after 0.207 seconds.
+◇ Test "Eligible source is remuxed without re-encoding its video samples" started.
+✔ Test "Eligible source is remuxed without re-encoding its video samples" passed after 0.070 seconds.
+◇ Test "Eligible AAC audio is remuxed without re-encoding either media stream" started.
+✔ Test "Eligible AAC audio is remuxed without re-encoding either media stream" passed after 0.084 seconds.
+◇ Test "Video export preserves the full portrait preferred transform" started.
+✔ Test "Video export preserves the full portrait preferred transform" passed after 0.038 seconds.
+◇ Test "Downscaled portrait export rescales the transform translation" started.
+✔ Test "Downscaled portrait export rescales the transform translation" passed after 0.171 seconds.
+◇ Test "High-bitrate 1080p export caps dimensions and bitrate without resampling frames" started.
+✔ Test "High-bitrate 1080p export caps dimensions and bitrate without resampling frames" passed after 0.575 seconds.
+◇ Test "Video export transcodes source audio to AAC" started.
+◇ Test case passing 1 argument channelCount → 1 to "Video export transcodes source audio to AAC" started.
+◇ Test case passing 1 argument channelCount → 2 to "Video export transcodes source audio to AAC" started.
+✔ Test "Video export transcodes source audio to AAC" with 2 test cases passed after 0.217 seconds.
+◇ Test "Cancelling video export removes its partial output" started.
+✔ Test "Cancelling video export removes its partial output" passed after 0.234 seconds.
+◇ Test "A cancel that races the finishWriting success still resolves as cancellation" started.
+✔ Test "A cancel that races the finishWriting success still resolves as cancellation" passed after 0.001 seconds.
+◇ Test "Invalid source errors retain the underlying reason and remove output" started.
+✔ Test "Invalid source errors retain the underlying reason and remove output" passed after 0.002 seconds.
+◇ Test accessoryClassificationRequiresResolvedCatalogType() started.
+✔ Test accessoryClassificationRequiresResolvedCatalogType() passed after 0.001 seconds.
+◇ Test accessoryPresentationOnlyReplacesEditableRecordingAndAdvancesAfterLastSet() started.
+✔ Test accessoryPresentationOnlyReplacesEditableRecordingAndAdvancesAfterLastSet() passed after 0.013 seconds.
+◇ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() started.
+✔ Test accessoryRowsPrefillOnlyActualRPEAndSelectWritablePendingSets() passed after 0.001 seconds.
+◇ Test accessoryHistoryUsesSameSetIndexFromOnePreviousSession() started.
+✔ Test accessoryHistoryUsesSameSetIndexFromOnePreviousSession() passed after 0.001 seconds.
+◇ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() started.
+✔ Test accessoryRowValidationRejectsInvalidNumbersAndPreservesZero() passed after 0.001 seconds.
+◇ Test accessorySaveCancelOverwriteAndVideoGuardUseNormalLogs() started.
+✔ Test accessorySaveCancelOverwriteAndVideoGuardUseNormalLogs() passed after 0.002 seconds.
+◇ Test accessoryBatchKeepsSuccessfulRowsAndRetriesWithoutRest() started.
+✔ Test accessoryBatchKeepsSuccessfulRowsAndRetriesWithoutRest() passed after 0.001 seconds.
+◇ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() started.
+✔ Test accessoryRestHonorsPreferenceAndCoachAndStopsAtExerciseBoundary() passed after 0.002 seconds.
+◇ Test accessoryUneditedPoundsPreservesPrescriptionAndWaitsForVideoHydration() started.
+✔ Test accessoryUneditedPoundsPreservesPrescriptionAndWaitsForVideoHydration() passed after 0.001 seconds.
+◇ Test accessoryOverwriteRestMatchesLiveActivity() started.
+✔ Test accessoryOverwriteRestMatchesLiveActivity() passed after 0.001 seconds.
+◇ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() started.
+✔ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() passed after 0.001 seconds.
+◇ Test accessoryCancellationRequiresSuccessfulAttachmentSnapshot() started.
+✔ Test accessoryCancellationRequiresSuccessfulAttachmentSnapshot() passed after 0.001 seconds.
+◇ Test accessoryReloadAndWeightOverwritePreserveEmptyRPE() started.
+✔ Test accessoryReloadAndWeightOverwritePreserveEmptyRPE() passed after 0.001 seconds.
+◇ Test deleteAccountRequiresExactConfirmationWord() started.
+✔ Test deleteAccountRequiresExactConfirmationWord() passed after 0.001 seconds.
+◇ Test deleteAccountFailureKeepsLocalStateAndAllowsRetry() started.
+✔ Test deleteAccountFailureKeepsLocalStateAndAllowsRetry() passed after 0.001 seconds.
+◇ Test changePasswordValidatesLocallyAndMapsMismatch() started.
+✔ Test changePasswordValidatesLocallyAndMapsMismatch() passed after 0.001 seconds.
+◇ Test backendAccountRepositoryMapsPasswordMismatchEnvelope() started.
+✔ Test backendAccountRepositoryMapsPasswordMismatchEnvelope() passed after 0.001 seconds.
+◇ Test csvExporterEscapesNamesAndFallsBackToPlanExerciseID() started.
+✔ Test csvExporterEscapesNamesAndFallsBackToPlanExerciseID() passed after 0.001 seconds.
+◇ Test csvExporterEmptyDataStillProducesHeader() started.
+✔ Test csvExporterEmptyDataStillProducesHeader() passed after 0.001 seconds.
+◇ Test csvExporterPreservesOneHundredRows() started.
+✔ Test csvExporterPreservesOneHundredRows() passed after 0.001 seconds.
+◇ Test completionStatePairsDeliveredBeforeStore() started.
+✔ Test completionStatePairsDeliveredBeforeStore() passed after 0.001 seconds.
+◇ Test completionStateWaitsForQueuedEventsWhenDeliveredPrecedesStore() started.
+✔ Test completionStateWaitsForQueuedEventsWhenDeliveredPrecedesStore() passed after 0.001 seconds.
+◇ Test completionStateMakesDuplicateDeliveryAndAcknowledgementIdempotent() started.
+✔ Test completionStateMakesDuplicateDeliveryAndAcknowledgementIdempotent() passed after 0.001 seconds.
+◇ Test completionStateHandlesEventAcknowledgedBeforeHandlerAndDelivery() started.
+✔ Test completionStateHandlesEventAcknowledgedBeforeHandlerAndDelivery() passed after 0.001 seconds.
+◇ Test manualFinishDrainDiscardsDeliveredStateBeforeNextWake() started.
+✔ Test manualFinishDrainDiscardsDeliveredStateBeforeNextWake() passed after 0.001 seconds.
+◇ Test completionRegistryInvokesHandlerExactlyOnceOnMainThread() started.
+✔ Test completionRegistryInvokesHandlerExactlyOnceOnMainThread() passed after 0.011 seconds.
+◇ Test completionRegistrySerializesManualClaimAgainstHandlerStorage() started.
+✔ Test completionRegistrySerializesManualClaimAgainstHandlerStorage() passed after 0.011 seconds.
+◇ Test sessionLifecycleReconnectsForEitherRegistrationOrder() started.
+✔ Test sessionLifecycleReconnectsForEitherRegistrationOrder() passed after 0.001 seconds.
+◇ Test uploadFailureNavigationBuffersColdLaunchDestination() started.
+✔ Test uploadFailureNavigationBuffersColdLaunchDestination() passed after 0.001 seconds.
+◇ Test uploadFailureNotificationPayloadRoundTripsHistoricalDestination() started.
+✔ Test uploadFailureNotificationPayloadRoundTripsHistoricalDestination() passed after 0.001 seconds.
+◇ Test legacyTwoSegmentTaskDescriptionRemainsRecognizable() started.
+✔ Test legacyTwoSegmentTaskDescriptionRemainsRecognizable() passed after 0.001 seconds.
+◇ Test productionUploaderPairsContinuationWithBackgroundEvents() started.
+✔ Test productionUploaderPairsContinuationWithBackgroundEvents() passed after 0.024 seconds.
+◇ Test productionUploaderDefersFailureToRestoredEventOwner() started.
+✔ Test productionUploaderDefersFailureToRestoredEventOwner() passed after 0.022 seconds.
+◇ Test productionUploaderMarksRelaunchedTaskWithoutContinuation() started.
+✔ Test productionUploaderMarksRelaunchedTaskWithoutContinuation() passed after 0.001 seconds.
+◇ Test partRequestsPinAnEmptyContentTypeOnBothPaths() started.
+✔ Test partRequestsPinAnEmptyContentTypeOnBothPaths() passed after 0.011 seconds.
+◇ Test activeCoachContextUsesBindNameAndChineseFallback() started.
+✔ Test activeCoachContextUsesBindNameAndChineseFallback() passed after 0.001 seconds.
+◇ Test refreshingSameCoachDoesNotRunChatCleanup() started.
+✔ Test refreshingSameCoachDoesNotRunChatCleanup() passed after 0.001 seconds.
+◇ Test coachChangeWaitsForCleanupBeforePublishingNewContext() started.
+✔ Test coachChangeWaitsForCleanupBeforePublishingNewContext() passed after 0.001 seconds.
+◇ Test unbindRunsCleanupBeforeRemovingActiveCoach() started.
+✔ Test unbindRunsCleanupBeforeRemovingActiveCoach() passed after 0.001 seconds.
+◇ Test acceptedGoesStraightToBound() started.
+✔ Test acceptedGoesStraightToBound() passed after 0.001 seconds.
+◇ Test pendingGoesToPendingAcceptance() started.
+✔ Test pendingGoesToPendingAcceptance() passed after 0.001 seconds.
+◇ Test pendingToAcceptedAdvancesAcceptanceRevisionOnce() started.
+✔ Test pendingToAcceptedAdvancesAcceptanceRevisionOnce() passed after 0.001 seconds.
+◇ Test noHistoryLandsOnEnterCodeWithoutNotice() started.
+✔ Test noHistoryLandsOnEnterCodeWithoutNotice() passed after 0.001 seconds.
+◇ Test rejectedLandsOnEnterCodeWithNeutralNotice() started.
+✔ Test rejectedLandsOnEnterCodeWithNeutralNotice() passed after 0.001 seconds.
+◇ Test expiredLandsOnEnterCodeWithExpiryNotice() started.
+✔ Test expiredLandsOnEnterCodeWithExpiryNotice() passed after 0.001 seconds.
+◇ Test cancelledLandsOnEnterCodeSilently() started.
+✔ Test cancelledLandsOnEnterCodeSilently() passed after 0.001 seconds.
+◇ Test fetchFailureNeverFallsThroughToTabs() started.
+✔ Test fetchFailureNeverFallsThroughToTabs() passed after 0.001 seconds.
+◇ Test noticeCopyNeverSaysRejected() started.
+✔ Test noticeCopyNeverSaysRejected() passed after 0.001 seconds.
+◇ Test stashWithIncompleteOnboardingResumesWizard() started.
+✔ Test stashWithIncompleteOnboardingResumesWizard() passed after 0.001 seconds.
+◇ Test stashWithCompleteOnboardingAutoResubmits() started.
+✔ Test stashWithCompleteOnboardingAutoResubmits() passed after 0.001 seconds.
+◇ Test resubmitInvalidCodeClearsStashAndPrefillsName() started.
+✔ Test resubmitInvalidCodeClearsStashAndPrefillsName() passed after 0.001 seconds.
+◇ Test resubmitAlreadyPendingConvergesViaReread() started.
+✔ Test resubmitAlreadyPendingConvergesViaReread() passed after 0.001 seconds.
+◇ Test resubmitAlreadyBoundConvergesToBound() started.
+✔ Test resubmitAlreadyBoundConvergesToBound() passed after 0.001 seconds.
+◇ Test resubmitNetworkFailureKeepsStash() started.
+✔ Test resubmitNetworkFailureKeepsStash() passed after 0.001 seconds.
+◇ Test stashIsIgnoredWhileRequestIsPending() started.
+✔ Test stashIsIgnoredWhileRequestIsPending() passed after 0.001 seconds.
+◇ Test submittedOutcomeRequestSentLandsOnPending() started.
+✔ Test submittedOutcomeRequestSentLandsOnPending() passed after 0.001 seconds.
+◇ Test submittedOutcomeStashedRoutesToWizard() started.
+✔ Test submittedOutcomeStashedRoutesToWizard() passed after 0.001 seconds.
+◇ Test handoffInvalidCodeLandsOnEnterCodeWithPrefill() started.
+✔ Test handoffInvalidCodeLandsOnEnterCodeWithPrefill() passed after 0.001 seconds.
+◇ Test handoffRequestSentLandsOnPending() started.
+✔ Test handoffRequestSentLandsOnPending() passed after 0.001 seconds.
+◇ Test cancelCallbackClearsStashAndReturnsToEnterCode() started.
+✔ Test cancelCallbackClearsStashAndReturnsToEnterCode() passed after 0.001 seconds.
+◇ Test acceptedWithLiveEvaluationStillGoesToBoundWhileSealed() started.
+✔ Test acceptedWithLiveEvaluationStillGoesToBoundWhileSealed() passed after 0.001 seconds.
+◇ Test acceptedWithCompletedEvaluationGoesToBound() started.
+✔ Test acceptedWithCompletedEvaluationGoesToBound() passed after 0.001 seconds.
+◇ Test acceptedWithoutEvaluationGoesToBound() started.
+✔ Test acceptedWithoutEvaluationGoesToBound() passed after 0.001 seconds.
+◇ Test sealedGateNeverConsultsEvaluationRepo() started.
+✔ Test sealedGateNeverConsultsEvaluationRepo() passed after 0.001 seconds.
+◇ Test skipEvaluationAcceptanceBypassesEvaluationRoute() started.
+✔ Test skipEvaluationAcceptanceBypassesEvaluationRoute() passed after 0.001 seconds.
+◇ Test reviewNoteHiddenWhileASetIsActive() started.
+✔ Test reviewNoteHiddenWhileASetIsActive() passed after 0.001 seconds.
+◇ Test reviewNoteShownWhenNoSetIsActive() started.
+✔ Test reviewNoteShownWhenNoSetIsActive() passed after 0.001 seconds.
+◇ Test reviewNoteTrimsAndDropsEmptyNotes() started.
+✔ Test reviewNoteTrimsAndDropsEmptyNotes() passed after 0.001 seconds.
+◇ Test editableHeroSeparatesExerciseAndSetNotes() started.
+✔ Test editableHeroSeparatesExerciseAndSetNotes() passed after 0.001 seconds.
+◇ Test readOnlyHeroKeepsIOSExerciseNoteRegardlessOfSetNote() started.
+✔ Test readOnlyHeroKeepsIOSExerciseNoteRegardlessOfSetNote() passed after 0.001 seconds.
+◇ Test studentHeadlineUsesPerStudentCompetitionResolver() started.
+✔ Test studentHeadlineUsesPerStudentCompetitionResolver() passed after 0.001 seconds.
+◇ Test completedDayOverviewSeparatesPrescriptionProgressAndActualDetails() started.
+✔ Test completedDayOverviewSeparatesPrescriptionProgressAndActualDetails() passed after 0.001 seconds.
+◇ Test trainingDayNamesUseWholeLocalizedPhrases() started.
+✔ Test trainingDayNamesUseWholeLocalizedPhrases() passed after 0.001 seconds.
+◇ Test dashboardLiftSubtitlesUseWholeLocalizedPhrases() started.
+✔ Test dashboardLiftSubtitlesUseWholeLocalizedPhrases() passed after 0.001 seconds.
+◇ Test recoveryChipsUseWholeLocalizedPhrases() started.
+✔ Test recoveryChipsUseWholeLocalizedPhrases() passed after 0.001 seconds.
+◇ Test eligibleRecordCountSelectsZeroFormingAndMatureStates(recordCount:) started.
+◇ Test case passing 1 argument recordCount → 0 to eligibleRecordCountSelectsZeroFormingAndMatureStates(recordCount:) started.
+◇ Test case passing 1 argument recordCount → 1 to eligibleRecordCountSelectsZeroFormingAndMatureStates(recordCount:) started.
+◇ Test case passing 1 argument recordCount → 2 to eligibleRecordCountSelectsZeroFormingAndMatureStates(recordCount:) started.
+◇ Test case passing 1 argument recordCount → 3 to eligibleRecordCountSelectsZeroFormingAndMatureStates(recordCount:) started.
+✔ Test eligibleRecordCountSelectsZeroFormingAndMatureStates(recordCount:) with 4 test cases passed after 0.002 seconds.
+◇ Test formingTrendDateMatchesRecordValueWhenLatestEligibleIsNotARecord() started.
+✔ Test formingTrendDateMatchesRecordValueWhenLatestEligibleIsNotARecord() passed after 0.001 seconds.
+◇ Test measuredWeightPRStillUsesE1RMForDashboardHeadline() started.
+✔ Test measuredWeightPRStillUsesE1RMForDashboardHeadline() passed after 0.001 seconds.
+◇ Test trendHeadlineFallsBackToBestCurrentE1RM() started.
+✔ Test trendHeadlineFallsBackToBestCurrentE1RM() passed after 0.001 seconds.
+◇ Test trendHeadlineUsesHistoricalBestWhenRollingWindowHasExpired() started.
+✔ Test trendHeadlineUsesHistoricalBestWhenRollingWindowHasExpired() passed after 0.001 seconds.
+◇ Test trendHeadlineAndRowsUseRecordTrajectory() started.
+✔ Test trendHeadlineAndRowsUseRecordTrajectory() passed after 0.001 seconds.
+◇ Test recentTrainingWithoutARecordStillDisplaysHistoricalBest() started.
+✔ Test recentTrainingWithoutARecordStillDisplaysHistoricalBest() passed after 0.001 seconds.
+◇ Test recordWithinFourWeeksDisplaysBestAndCurrentRecordValue() started.
+✔ Test recordWithinFourWeeksDisplaysBestAndCurrentRecordValue() passed after 0.001 seconds.
+◇ Test trendRawLayerOnlyContainsLowConfidencePoints() started.
+✔ Test trendRawLayerOnlyContainsLowConfidencePoints() passed after 0.001 seconds.
+◇ Test trendUsesNinetyDayCarryAsDeltaBaseline() started.
+✔ Test trendUsesNinetyDayCarryAsDeltaBaseline() passed after 0.001 seconds.
+◇ Test trendEmptyHistoryKeepsThreeRowsWithoutHeadline() started.
+✔ Test trendEmptyHistoryKeepsThreeRowsWithoutHeadline() passed after 0.001 seconds.
+◇ Test trendHeadlineSkipsUnresolvablePRToOlderMainLiftPR() started.
+✔ Test trendHeadlineSkipsUnresolvablePRToOlderMainLiftPR() passed after 0.001 seconds.
+◇ Test newPlanNoticePersistsSeenState() started.
+✔ Test newPlanNoticePersistsSeenState() passed after 0.001 seconds.
+◇ Test notificationBadgeExcludesSealedEvaluationUnread() started.
+✔ Test notificationBadgeExcludesSealedEvaluationUnread() passed after 0.001 seconds.
+◇ Test visibleFeedbackMarkReadSynchronizesCoordinatorAndArchiveUnreadState() started.
+✔ Test visibleFeedbackMarkReadSynchronizesCoordinatorAndArchiveUnreadState() passed after 0.001 seconds.
+◇ Test fourBellConsumersShareOneCoordinatorLoad() started.
+✔ Test fourBellConsumersShareOneCoordinatorLoad() passed after 0.001 seconds.
+◇ Test activeCoachRowOpensEmptyConversationEvenWithZeroUnread() started.
+✔ Test activeCoachRowOpensEmptyConversationEvenWithZeroUnread() passed after 0.001 seconds.
+◇ Test lazyConversationCreationNetworkFailureReturnsNoRouteWithoutInvalidatingBind() started.
+✔ Test lazyConversationCreationNetworkFailureReturnsNoRouteWithoutInvalidatingBind() passed after 0.001 seconds.
+◇ Test bindRequiredDuringLazyConversationCreationInvalidatesBinding() started.
+✔ Test bindRequiredDuringLazyConversationCreationInvalidatesBinding() passed after 0.001 seconds.
+◇ Test missingActiveCoachReturnsVisibleBindGuidance() started.
+✔ Test missingActiveCoachReturnsVisibleBindGuidance() passed after 0.001 seconds.
+◇ Test userDefaultsPlanSeenStorePersistsPerStudentAndSignature() started.
+✔ Test userDefaultsPlanSeenStorePersistsPerStudentAndSignature() passed after 0.002 seconds.
+◇ Test countdownUsesLocalCalendarDayAcrossTimeZones() started.
+✔ Test countdownUsesLocalCalendarDayAcrossTimeZones() passed after 0.001 seconds.
+◇ Test expiredCompetitionReturnsNegativeAndIsHidden() started.
+✔ Test expiredCompetitionReturnsNegativeAndIsHidden() passed after 0.001 seconds.
+◇ Test nonCompetingOrMissingDateHidesCountdown() started.
+✔ Test nonCompetingOrMissingDateHidesCountdown() passed after 0.001 seconds.
+◇ Test metricsShowWeightOnlyWhenPresent() started.
+✔ Test metricsShowWeightOnlyWhenPresent() passed after 0.001 seconds.
+◇ Test loadedEmptyMetricsRemainAvailableForDashboardPlaceholders() started.
+✔ Test loadedEmptyMetricsRemainAvailableForDashboardPlaceholders() passed after 0.001 seconds.
+◇ Test profileMetricsFailureDoesNotMasqueradeAsEmptyMetrics() started.
+✔ Test profileMetricsFailureDoesNotMasqueradeAsEmptyMetrics() passed after 0.001 seconds.
+◇ Test spec085MetricsPreserveLegacyMeetAndShowTwoDecimals() started.
+✔ Test spec085MetricsPreserveLegacyMeetAndShowTwoDecimals() passed after 0.001 seconds.
+◇ Suite DashboardProfileNavigationTests started.
+◇ Test metricCardsRouteToExistingEditors(hasValues:) started.
+◇ Test case passing 1 argument hasValues → false to metricCardsRouteToExistingEditors(hasValues:) started.
+◇ Test case passing 1 argument hasValues → true to metricCardsRouteToExistingEditors(hasValues:) started.
+✔ Test metricCardsRouteToExistingEditors(hasValues:) with 2 test cases passed after 0.045 seconds.
+✔ Suite DashboardProfileNavigationTests passed after 0.045 seconds.
+◇ Test spec085TodaySelectionMovesWithoutMovingCursorAndResets() started.
+✔ Test spec085TodaySelectionMovesWithoutMovingCursorAndResets() passed after 0.001 seconds.
+◇ Test spec085OverviewContainsOnlySelectedDaySummaryAndOrderedNames() started.
+✔ Test spec085OverviewContainsOnlySelectedDaySummaryAndOrderedNames() passed after 0.001 seconds.
+◇ Test dashboardCursorUsesCompletionInsteadOfRecommendedDate() started.
+✔ Test dashboardCursorUsesCompletionInsteadOfRecommendedDate() passed after 0.001 seconds.
+◇ Test dashboardProgressUsesOnlyCurrentSequenceWeekAndCrossesWeek() started.
+✔ Test dashboardProgressUsesOnlyCurrentSequenceWeekAndCrossesWeek() passed after 0.001 seconds.
+◇ Test dashboardHasNoCursorAfterEverySequenceDayCompletes() started.
+✔ Test dashboardHasNoCursorAfterEverySequenceDayCompletes() passed after 0.001 seconds.
+◇ Test dashboardRecommendedDateUsesShiftWithoutMovingCursor() started.
+✔ Test dashboardRecommendedDateUsesShiftWithoutMovingCursor() passed after 0.001 seconds.
+◇ Test dashboardRecommendedDateFallsBackToScheduledDate() started.
+✔ Test dashboardRecommendedDateFallsBackToScheduledDate() passed after 0.001 seconds.
+◇ Test dashboardCompletionTodayUsesDeviceGymDayBoundary() started.
+✔ Test dashboardCompletionTodayUsesDeviceGymDayBoundary() passed after 0.001 seconds.
+◇ Test headerDateTextFollowsTheWallClockAcrossMidnight() started.
+✔ Test headerDateTextFollowsTheWallClockAcrossMidnight() passed after 0.001 seconds.
+◇ Test liftSubtitleUsesFullNamesForOneOrTwoLiftsOnly() started.
+✔ Test liftSubtitleUsesFullNamesForOneOrTwoLiftsOnly() passed after 0.001 seconds.
+◇ Test dashboardWeekCellsAreSequenceOrdinalsNotCalendarSlots() started.
+✔ Test dashboardWeekCellsAreSequenceOrdinalsNotCalendarSlots() passed after 0.001 seconds.
+◇ Test coachRPEReconciliationUpdatesSuggestionAndRevertsToStudentRPE() started.
+✔ Test coachRPEReconciliationUpdatesSuggestionAndRevertsToStudentRPE() passed after 0.001 seconds.
+◇ Test coachRPEReconciliationRebuildsConfidenceChronologically() started.
+✔ Test coachRPEReconciliationRebuildsConfidenceChronologically() passed after 0.001 seconds.
+◇ Test coachRPEReconciliationRebuildsMissingEligibleLocalPoint() started.
+✔ Test coachRPEReconciliationRebuildsMissingEligibleLocalPoint() passed after 0.001 seconds.
+◇ Test reconciliationAbandonsStaleReplacementWhenASetIsRecordedAfterSnapshot() started.
+✔ Test reconciliationAbandonsStaleReplacementWhenASetIsRecordedAfterSnapshot() passed after 0.001 seconds.
+◇ Test reconciliationFailureLeavesLoadedWorkoutStateIntact() started.
+✔ Test reconciliationFailureLeavesLoadedWorkoutStateIntact() passed after 0.001 seconds.
+◇ Test competitionLiftGateFailureNeverBecomesReadyAndCanRetry() started.
+✔ Test competitionLiftGateFailureNeverBecomesReadyAndCanRetry() passed after 0.001 seconds.
+◇ Test competitionLiftGateRunsOnlyOnceAfterReady() started.
+✔ Test competitionLiftGateRunsOnlyOnceAfterReady() passed after 0.001 seconds.
+◇ Test competitionLiftMigrationRebuildsSeriesAndClearsVariantPRBaseline() started.
+✔ Test competitionLiftMigrationRebuildsSeriesAndClearsVariantPRBaseline() passed after 0.001 seconds.
+◇ Test migrationPreservesImportedConfidenceAndDropsUnknownCatalogOrphan() started.
+✔ Test migrationPreservesImportedConfidenceAndDropsUnknownCatalogOrphan() passed after 0.001 seconds.
+◇ Test migrationResolvesLegacyPlanExerciseOnlyLog() started.
+✔ Test migrationResolvesLegacyPlanExerciseOnlyLog() passed after 0.001 seconds.
+◇ Test migrationSkipsAssumedImportedLogs() started.
+✔ Test migrationSkipsAssumedImportedLogs() passed after 0.001 seconds.
+◇ Test migrationChronologicallyReplaysNewlyEligibleLowRPEHistoryWithoutQuarantine() started.
+✔ Test migrationChronologicallyReplaysNewlyEligibleLowRPEHistoryWithoutQuarantine() passed after 0.001 seconds.
+◇ Test migrationUsesCoachCalibrationForStudentE1RM() started.
+✔ Test migrationUsesCoachCalibrationForStudentE1RM() passed after 0.001 seconds.
+◇ Test migrationRebuildsWeightBaselineFromDeadliftSetThatCannotProducePoint() started.
+✔ Test migrationRebuildsWeightBaselineFromDeadliftSetThatCannotProducePoint() passed after 0.001 seconds.
+◇ Test migrationResolvesRetiredCycleLogByItsOwnExerciseID() started.
+✔ Test migrationResolvesRetiredCycleLogByItsOwnExerciseID() passed after 0.001 seconds.
+◇ Test replacingHistoryPreservesOtherStudentsForBothRepositories() started.
+✔ Test replacingHistoryPreservesOtherStudentsForBothRepositories() passed after 0.001 seconds.
+◇ Test firstLiveDeadliftEstablishesItsOwnAnomalyBaselineAfterImport() started.
+✔ Test firstLiveDeadliftEstablishesItsOwnAnomalyBaselineAfterImport() passed after 0.001 seconds.
+◇ Test importedBaselineUpgradeRestoresRealHistoryAndIsIdempotent() started.
+✔ Test importedBaselineUpgradeRestoresRealHistoryAndIsIdempotent() passed after 0.002 seconds.
+◇ Test reviewedImportsCannotMaskALiveAnomaly(confidence:) started.
+◇ Test case passing 1 argument confidence → .normal to reviewedImportsCannotMaskALiveAnomaly(confidence:) started.
+◇ Test case passing 1 argument confidence → .low to reviewedImportsCannotMaskALiveAnomaly(confidence:) started.
+✔ Test reviewedImportsCannotMaskALiveAnomaly(confidence:) with 2 test cases passed after 0.001 seconds.
+◇ Test importedBaselineRepairPreservesRetiredFamilyReviewAndPR(missingPoint:) started.
+◇ Test case passing 1 argument missingPoint → false to importedBaselineRepairPreservesRetiredFamilyReviewAndPR(missingPoint:) started.
+◇ Test case passing 1 argument missingPoint → true to importedBaselineRepairPreservesRetiredFamilyReviewAndPR(missingPoint:) started.
+✔ Test importedBaselineRepairPreservesRetiredFamilyReviewAndPR(missingPoint:) with 2 test cases passed after 0.002 seconds.
+◇ Test importedBaselineRepairRetriesAfterConcurrentReviewWithoutOverwritingIt() started.
+✔ Test importedBaselineRepairRetriesAfterConcurrentReviewWithoutOverwritingIt() passed after 0.002 seconds.
+◇ Test importedBaselineRepairSurvivesReopeningTheLocalStore() started.
+✔ Test importedBaselineRepairSurvivesReopeningTheLocalStore() passed after 0.003 seconds.
+◇ Test importedBaselineRepairRetriesAfterDiskWriteFailure() started.
+✔ Test importedBaselineRepairRetriesAfterDiskWriteFailure() passed after 0.005 seconds.
+◇ Test importedBaselineRepairCannotRegressANewerWeightBaseline() started.
+✔ Test importedBaselineRepairCannotRegressANewerWeightBaseline() passed after 0.001 seconds.
+◇ Suite E1RMPREventsContractTests started.
+◇ Test windowIsInclusiveIsolatedSortedAndAckIndependent() started.
+✔ Test windowIsInclusiveIsolatedSortedAndAckIndependent() passed after 0.001 seconds.
+✔ Suite E1RMPREventsContractTests passed after 0.001 seconds.
+◇ Test resumedDerivationReportsDethronedBaselineNotItsOwnWeight() started.
+✔ Test resumedDerivationReportsDethronedBaselineNotItsOwnWeight() passed after 0.001 seconds.
+◇ Test advancingBaselineRecordsTheDethronedValue() started.
+✔ Test advancingBaselineRecordsTheDethronedValue() passed after 0.001 seconds.
+◇ Test anyStrictMeasuredWeightImprovementFiresPR() started.
+✔ Test anyStrictMeasuredWeightImprovementFiresPR() passed after 0.001 seconds.
+◇ Test e1RMImprovementWithoutMeasuredWeightImprovementDoesNotFirePR() started.
+✔ Test e1RMImprovementWithoutMeasuredWeightImprovementDoesNotFirePR() passed after 0.001 seconds.
+◇ Test incompleteAndFailedSetsProduceNeitherPointNorPR() started.
+✔ Test incompleteAndFailedSetsProduceNeitherPointNorPR() passed after 0.001 seconds.
+◇ Test ineligibleE1RMSetStillProducesMeasuredWeightPRWithoutPoint() started.
+✔ Test ineligibleE1RMSetStillProducesMeasuredWeightPRWithoutPoint() passed after 0.001 seconds.
+◇ Test unresolvedCompetitionFamilyProducesNeitherPointNorPR() started.
+✔ Test unresolvedCompetitionFamilyProducesNeitherPointNorPR() passed after 0.001 seconds.
+◇ Test lowRPEUsesEpleyAndCoachCalibrationOverridesIt() started.
+✔ Test lowRPEUsesEpleyAndCoachCalibrationOverridesIt() passed after 0.001 seconds.
+◇ Test registeredOneRMAndMeasuredHistoryDriveRollingPRBaseline() started.
+✔ Test registeredOneRMAndMeasuredHistoryDriveRollingPRBaseline() passed after 0.001 seconds.
+◇ Test competitionFamilyExercisesShareMeasuredWeightBaseline() started.
+✔ Test competitionFamilyExercisesShareMeasuredWeightBaseline() passed after 0.001 seconds.
+◇ Test legacyIneligibleSpikeDoesNotRaisePRBaseline() started.
+✔ Test legacyIneligibleSpikeDoesNotRaisePRBaseline() passed after 0.001 seconds.
+◇ Test normalImprovementBelowAnomalyThresholdStillFiresPR() started.
+✔ Test normalImprovementBelowAnomalyThresholdStillFiresPR() passed after 0.001 seconds.
+◇ Test suspectE1RMSpikeStaysLowConfidenceButMeasuredWeightStillSetsPR() started.
+✔ Test suspectE1RMSpikeStaysLowConfidenceButMeasuredWeightStillSetsPR() passed after 0.001 seconds.
+◇ Test replayConfidenceOverrideBypassesAnomalyVerdict() started.
+✔ Test replayConfidenceOverrideBypassesAnomalyVerdict() passed after 0.001 seconds.
+◇ Test quarantinedE1RMStaysOutOfEstimateBaselineButWeightBaselineRolls() started.
+✔ Test quarantinedE1RMStaysOutOfEstimateBaselineButWeightBaselineRolls() passed after 0.001 seconds.
+◇ Test importedPointDoesNotSubstituteForPersistentWeightBaseline() started.
+✔ Test importedPointDoesNotSubstituteForPersistentWeightBaseline() passed after 0.001 seconds.
+◇ Test realLogReplacesImportedIdentityWithoutStaleValueGatingIt() started.
+✔ Test realLogReplacesImportedIdentityWithoutStaleValueGatingIt() passed after 0.001 seconds.
+◇ Test anomalyThresholdsMatchSpec050() started.
+✔ Test anomalyThresholdsMatchSpec050() passed after 0.001 seconds.
+◇ Test familyFetchCrossesExerciseBucketsAndExcludesLegacyNilFamily() started.
+✔ Test familyFetchCrossesExerciseBucketsAndExcludesLegacyNilFamily() passed after 0.001 seconds.
+◇ Test staleHistoryReplacementIsRejectedForBothRepositories() started.
+✔ Test staleHistoryReplacementIsRejectedForBothRepositories() passed after 0.001 seconds.
+◇ Test recordAndFetchHistorySortedByDate() started.
+✔ Test recordAndFetchHistorySortedByDate() passed after 0.001 seconds.
+◇ Test batchFetchGroupsByExercise() started.
+✔ Test batchFetchGroupsByExercise() passed after 0.001 seconds.
+◇ Test maxBeforeIsStrictlyEarlier() started.
+✔ Test maxBeforeIsStrictlyEarlier() passed after 0.001 seconds.
+◇ Test maxBeforeExcludesQuarantinedPointsWithoutDeletingThem() started.
+✔ Test maxBeforeExcludesQuarantinedPointsWithoutDeletingThem() passed after 0.001 seconds.
+◇ Test prFlowRecordUnacknowledgedAcknowledge() started.
+✔ Test prFlowRecordUnacknowledgedAcknowledge() passed after 0.001 seconds.
+◇ Test livePRRecordingIsIdempotentBySetLogIdentity() started.
+✔ Test livePRRecordingIsIdempotentBySetLogIdentity() passed after 0.001 seconds.
+◇ Test weightBaselineUpdateIsPersistentAndStrictlyMonotonic() started.
+✔ Test weightBaselineUpdateIsPersistentAndStrictlyMonotonic() passed after 0.001 seconds.
+◇ Test localRepositoryPersistsAcrossInstances() started.
+✔ Test localRepositoryPersistsAcrossInstances() passed after 0.001 seconds.
+◇ Test localRepositoryThrowsOnCorruptFileInsteadOfErasing() started.
+✔ Test localRepositoryThrowsOnCorruptFileInsteadOfErasing() passed after 0.002 seconds.
+◇ Test upsertInsertsThenReplacesAcrossExerciseBucketsWithStablePointID() started.
+✔ Test upsertInsertsThenReplacesAcrossExerciseBucketsWithStablePointID() passed after 0.001 seconds.
+◇ Test updatePointConfidenceChangesOnlyImportedPointsForStudent() started.
+✔ Test updatePointConfidenceChangesOnlyImportedPointsForStudent() passed after 0.001 seconds.
+◇ Test maxBeforeExclusionDropsOnlyImportedPointWithMatchingSetLog() started.
+✔ Test maxBeforeExclusionDropsOnlyImportedPointWithMatchingSetLog() passed after 0.001 seconds.
+◇ Test eligibilityGateMatchesSpec050() started.
+✔ Test eligibilityGateMatchesSpec050() passed after 0.001 seconds.
+◇ Test ineligibleSpikeDoesNotMoveTheSeries() started.
+✔ Test ineligibleSpikeDoesNotMoveTheSeries() passed after 0.001 seconds.
+◇ Test rollingMaxHoldsAValleyThenReleasesAfterFourWeeks() started.
+✔ Test rollingMaxHoldsAValleyThenReleasesAfterFourWeeks() passed after 0.001 seconds.
+◇ Test eligiblePRMovesTheSeriesImmediately() started.
+✔ Test eligiblePRMovesTheSeriesImmediately() passed after 0.001 seconds.
+◇ Test lowConfidenceSpikeIsOnlyKeptAsRawScatter() started.
+✔ Test lowConfidenceSpikeIsOnlyKeptAsRawScatter() passed after 0.001 seconds.
+◇ Test smoothedHistoryExcludesLowConfidenceSpike() started.
+✔ Test smoothedHistoryExcludesLowConfidenceSpike() passed after 0.001 seconds.
+◇ Test consecutiveSamplesKeepUniqueIdentityWhileOneWinnerCarries() started.
+✔ Test consecutiveSamplesKeepUniqueIdentityWhileOneWinnerCarries() passed after 0.001 seconds.
+◇ Test mixedWindowUsesTheWholeImportedWinnerPoint() started.
+✔ Test mixedWindowUsesTheWholeImportedWinnerPoint() passed after 0.001 seconds.
+◇ Test lowConfidencePointStaysRawAndCannotBecomeBest() started.
+✔ Test lowConfidencePointStaysRawAndCannotBecomeBest() passed after 0.001 seconds.
+◇ Test smoothedHistoryUsesUniqueSampleIDsAndWinnerPayload() started.
+✔ Test smoothedHistoryUsesUniqueSampleIDsAndWinnerPayload() passed after 0.001 seconds.
+◇ Test equalRollingMaximumKeepsTheEarlierPoint() started.
+✔ Test equalRollingMaximumKeepsTheEarlierPoint() passed after 0.001 seconds.
+◇ Test recordsStartAtTheFirstTrustedPointAndOnlyAdvanceOnStrictImprovement() started.
+✔ Test recordsStartAtTheFirstTrustedPointAndOnlyAdvanceOnStrictImprovement() passed after 0.001 seconds.
+◇ Test importedTrustedPointCanOwnARecordButLowSpikeCannot() started.
+✔ Test importedTrustedPointCanOwnARecordButLowSpikeCannot() passed after 0.001 seconds.
+◇ Test recordTrajectoryCarriesEstablishedRecordAcrossWindowAndTail() started.
+✔ Test recordTrajectoryCarriesEstablishedRecordAcrossWindowAndTail() passed after 0.001 seconds.
+◇ Test recordTrajectoryRemainsVisibleWhenWindowContainsNoNewRecord() started.
+✔ Test recordTrajectoryRemainsVisibleWhenWindowContainsNoNewRecord() passed after 0.001 seconds.
+◇ Test recordTrajectoryIncludesRecordExactlyAtWindowStartWithoutCarry() started.
+✔ Test recordTrajectoryIncludesRecordExactlyAtWindowStartWithoutCarry() passed after 0.001 seconds.
+◇ Test recordTrajectoryReturnsEmptyForEmptyRecords() started.
+✔ Test recordTrajectoryReturnsEmptyForEmptyRecords() passed after 0.001 seconds.
+◇ Test recordTrajectoryDoesNotAppendTailOnLatestRecordDate() started.
+✔ Test recordTrajectoryDoesNotAppendTailOnLatestRecordDate() passed after 0.001 seconds.
+◇ Test mixedImportedAndLoggedRecordsPreserveEachSegmentOwner() started.
+✔ Test mixedImportedAndLoggedRecordsPreserveEachSegmentOwner() passed after 0.001 seconds.
+◇ Test suggestionBaselineExcludesUncalibratedLowRPEButDisplayKeepsIt() started.
+✔ Test suggestionBaselineExcludesUncalibratedLowRPEButDisplayKeepsIt() passed after 0.001 seconds.
+◇ Test lowercaseAndSeparatorsNormalizeBeforeValidation() started.
+✔ Test lowercaseAndSeparatorsNormalizeBeforeValidation() passed after 0.001 seconds.
+◇ Test nineAndElevenCharCodesAreRejected() started.
+✔ Test nineAndElevenCharCodesAreRejected() passed after 0.001 seconds.
+◇ Test foreignAlphabetCharsAreRejected() started.
+✔ Test foreignAlphabetCharsAreRejected() passed after 0.001 seconds.
+◇ Test displayNameMustBeNonEmptyAfterTrim() started.
+✔ Test displayNameMustBeNonEmptyAfterTrim() passed after 0.001 seconds.
+◇ Test displayNameOver100CharsIsRejected() started.
+✔ Test displayNameOver100CharsIsRejected() passed after 0.001 seconds.
+◇ Test prefillSeedsDisplayName() started.
+✔ Test prefillSeedsDisplayName() passed after 0.001 seconds.
+◇ Test incompleteOnboardingStashesInsteadOfPosting() started.
+✔ Test incompleteOnboardingStashesInsteadOfPosting() passed after 0.001 seconds.
+◇ Test completeOnboardingPostsDirectly() started.
+✔ Test completeOnboardingPostsDirectly() passed after 0.001 seconds.
+◇ Test invalidCodeShowsFieldErrorAndWritesNoStash() started.
+✔ Test invalidCodeShowsFieldErrorAndWritesNoStash() passed after 0.001 seconds.
+◇ Test clipboardPasteNormalizesValidCodeAndRejectsInvalidContent() started.
+✔ Test clipboardPasteNormalizesValidCodeAndRejectsInvalidContent() passed after 0.001 seconds.
+◇ Test alreadyPendingAndBoundRequestReload() started.
+✔ Test alreadyPendingAndBoundRequestReload() passed after 0.001 seconds.
+◇ Test transportFailureShowsBannerAndStays() started.
+✔ Test transportFailureShowsBannerAndStays() passed after 0.001 seconds.
+◇ Test submitIsNoOpWhileInvalid() started.
+✔ Test submitIsNoOpWhileInvalid() passed after 0.001 seconds.
+◇ Test sanitizedUppercasesAndStripsSeparators() started.
+✔ Test sanitizedUppercasesAndStripsSeparators() passed after 0.001 seconds.
+◇ Test sanitizedDropsCharactersOutsideTheLockedAlphabet() started.
+✔ Test sanitizedDropsCharactersOutsideTheLockedAlphabet() passed after 0.001 seconds.
+◇ Test sanitizedCapsAtTheCodeLength() started.
+✔ Test sanitizedCapsAtTheCodeLength() passed after 0.001 seconds.
+◇ Test sanitizedKeepsPartialInputIntact() started.
+✔ Test sanitizedKeepsPartialInputIntact() passed after 0.001 seconds.
+◇ Test catalogHasTwentyFourUniqueTokensWithinZodBounds() started.
+✔ Test catalogHasTwentyFourUniqueTokensWithinZodBounds() passed after 0.001 seconds.
+◇ Test groupsPartitionTheCatalog() started.
+✔ Test groupsPartitionTheCatalog() passed after 0.001 seconds.
+◇ Test homeTierPrefillsBasicsAndBucket() started.
+✔ Test homeTierPrefillsBasicsAndBucket() passed after 0.001 seconds.
+◇ Test commercialTierPrefillsElevenItems() started.
+✔ Test commercialTierPrefillsElevenItems() passed after 0.001 seconds.
+◇ Test professionalTierPrefillsTwentyOneItems() started.
+✔ Test professionalTierPrefillsTwentyOneItems() passed after 0.001 seconds.
+◇ Test everyTokenGatesCoachProgramming() started.
+✔ Test everyTokenGatesCoachProgramming() passed after 0.001 seconds.
+◇ Test everyTierPrefillsExactlyOneDumbbellBucket() started.
+✔ Test everyTierPrefillsExactlyOneDumbbellBucket() passed after 0.001 seconds.
+◇ Test labelsResolveForEveryToken() started.
+✔ Test labelsResolveForEveryToken() passed after 0.001 seconds.
+◇ Test retiredV1TokensStillResolveLabels() started.
+✔ Test retiredV1TokensStillResolveLabels() passed after 0.001 seconds.
+◇ Test activeEvaluationShowsCountdownAndProgress() started.
+✔ Test activeEvaluationShowsCountdownAndProgress() passed after 0.001 seconds.
+◇ Test overdueShowsNeutralClosingCopyWithoutNegativeHint() started.
+✔ Test overdueShowsNeutralClosingCopyWithoutNegativeHint() passed after 0.001 seconds.
+◇ Test completedEvaluationFiresHandoffInsteadOfRendering() started.
+✔ Test completedEvaluationFiresHandoffInsteadOfRendering() passed after 0.001 seconds.
+◇ Test missingEvaluationAlsoFiresHandoff() started.
+✔ Test missingEvaluationAlsoFiresHandoff() passed after 0.001 seconds.
+◇ Test assemblesLatestThreeMessagesAndAdaptationEntry() started.
+✔ Test assemblesLatestThreeMessagesAndAdaptationEntry() passed after 0.001 seconds.
+◇ Test transportFailureOnFirstLoadShowsRetryState() started.
+✔ Test transportFailureOnFirstLoadShowsRetryState() passed after 0.001 seconds.
+◇ Test summaryExcerptsKeepTwoLines() started.
+✔ Test summaryExcerptsKeepTwoLines() passed after 0.001 seconds.
+◇ Test unreadWhenNeverReadOrUpdatedAfterLastRead() started.
+✔ Test unreadWhenNeverReadOrUpdatedAfterLastRead() passed after 0.001 seconds.
+◇ Test awaitsFirstRegularPlanUntilRegularPublished() started.
+✔ Test awaitsFirstRegularPlanUntilRegularPublished() passed after 0.001 seconds.
+◇ Test dashboardCardShowsWhileUnreadAndCollapsesOnRead() started.
+✔ Test dashboardCardShowsWhileUnreadAndCollapsesOnRead() passed after 0.001 seconds.
+◇ Test noSummaryMeansNoCardNoBadgeNoWaitingRow() started.
+✔ Test noSummaryMeansNoCardNoBadgeNoWaitingRow() passed after 0.001 seconds.
+◇ Test updatedSummaryReFlagsUnreadAfterEarlierRead() started.
+✔ Test updatedSummaryReFlagsUnreadAfterEarlierRead() passed after 0.001 seconds.
+◇ Test feedbackInboxViewModelTracksUnreadCountAndMarkRead() started.
+✔ Test feedbackInboxViewModelTracksUnreadCountAndMarkRead() passed after 0.001 seconds.
+◇ Test feedbackInboxOnlyReportsEmptyAfterSuccessfulLoad() started.
+✔ Test feedbackInboxOnlyReportsEmptyAfterSuccessfulLoad() passed after 0.001 seconds.
+◇ Test feedbackInboxLoadFailureDoesNotMasqueradeAsEmpty() started.
+✔ Test feedbackInboxLoadFailureDoesNotMasqueradeAsEmpty() passed after 0.001 seconds.
+◇ Test feedbackInboxRefreshKeepsLoadedContentVisible() started.
+✔ Test feedbackInboxRefreshKeepsLoadedContentVisible() passed after 0.001 seconds.
+◇ Test "video markers load, hide only when unavailable, and surface other failures" started.
+✔ Test "video markers load, hide only when unavailable, and surface other failures" passed after 0.001 seconds.
+◇ Test feedbackVideoSummaryDisplaysFirstZeroBasedSetAsOne() started.
+✔ Test feedbackVideoSummaryDisplaysFirstZeroBasedSetAsOne() passed after 0.001 seconds.
+◇ Test feedbackVideoBadgeCarriesBackendRPEWhenPresent() started.
+✔ Test feedbackVideoBadgeCarriesBackendRPEWhenPresent() passed after 0.001 seconds.
+◇ Test feedbackVideoBadgeConvertsSetIndexAtStudentDisplayBoundary() started.
+✔ Test feedbackVideoBadgeConvertsSetIndexAtStudentDisplayBoundary() passed after 0.001 seconds.
+◇ Test feedbackVideoSummaryUsesEnglishExerciseNameInEnglishLocale() started.
+✔ Test feedbackVideoSummaryUsesEnglishExerciseNameInEnglishLocale() passed after 0.001 seconds.
+◇ Test feedbackVideoSummaryDropsMissingParts() started.
+✔ Test feedbackVideoSummaryDropsMissingParts() passed after 0.001 seconds.
+◇ Test feedbackVideoAssociationDistinguishesLegacyDeletedAndAvailableStates() started.
+✔ Test feedbackVideoAssociationDistinguishesLegacyDeletedAndAvailableStates() passed after 0.001 seconds.
+◇ Test feedbackVideoWeightFormatting(rawValue:expected:) started.
+◇ Test case passing 2 arguments rawValue → "125.00", expected → "125" to feedbackVideoWeightFormatting(rawValue:expected:) started.
+◇ Test case passing 2 arguments rawValue → "125.50", expected → "125.5" to feedbackVideoWeightFormatting(rawValue:expected:) started.
+◇ Test case passing 2 arguments rawValue → "0.00", expected → "0" to feedbackVideoWeightFormatting(rawValue:expected:) started.
+◇ Test case passing 2 arguments rawValue → "80", expected → "80" to feedbackVideoWeightFormatting(rawValue:expected:) started.
+✔ Test feedbackVideoWeightFormatting(rawValue:expected:) with 4 test cases passed after 0.001 seconds.
+◇ Test flexibleWeekAllowsUnsettledDaysOnly() started.
+✔ Test flexibleWeekAllowsUnsettledDaysOnly() passed after 0.001 seconds.
+◇ Test flexibleDefaultResumesLatestRealGymDayAndUndoUsesTimestamp() started.
+✔ Test flexibleDefaultResumesLatestRealGymDayAndUndoUsesTimestamp() passed after 0.001 seconds.
+◇ Test defaultWindowExpandsToAllWhenHistoryPredatesFourWeeks() started.
+✔ Test defaultWindowExpandsToAllWhenHistoryPredatesFourWeeks() passed after 0.001 seconds.
+◇ Test defaultWindowExpandsForOlderLowConfidenceImportedScatter() started.
+✔ Test defaultWindowExpandsForOlderLowConfidenceImportedScatter() passed after 0.001 seconds.
+◇ Test defaultWindowStaysAtFourWeeksWithoutEarlierHistory() started.
+✔ Test defaultWindowStaysAtFourWeeksWithoutEarlierHistory() passed after 0.001 seconds.
+◇ Test windowSwitchingWidensTheRange() started.
+✔ Test windowSwitchingWidensTheRange() passed after 0.001 seconds.
+◇ Test familyWithNoMainLiftHistoryIsEmpty() started.
+✔ Test familyWithNoMainLiftHistoryIsEmpty() passed after 0.001 seconds.
+◇ Test pointsStayAscendingForTheChart() started.
+✔ Test pointsStayAscendingForTheChart() passed after 0.001 seconds.
+◇ Test visibleCurveCarriesTheLatestRecordToToday() started.
+✔ Test visibleCurveCarriesTheLatestRecordToToday() passed after 0.001 seconds.
+◇ Test selectedSampleResolvesToWinningRawPoint() started.
+✔ Test selectedSampleResolvesToWinningRawPoint() passed after 0.001 seconds.
+◇ Test lowConfidencePointStaysInRawLayerOnly() started.
+✔ Test lowConfidencePointStaysInRawLayerOnly() passed after 0.001 seconds.
+◇ Test windowWithoutANewRecordCarriesTheEstablishedValueAndStaysNonempty() started.
+✔ Test windowWithoutANewRecordCarriesTheEstablishedValueAndStaysNonempty() passed after 0.001 seconds.
+◇ Test dailyNodeDetailUsesThatDaysWinnerRatherThanTheHeadline() started.
+✔ Test dailyNodeDetailUsesThatDaysWinnerRatherThanTheHeadline() passed after 0.001 seconds.
+◇ Test growthE1RMCardPolicyCoversTheFullWindowAndFamilyCountMatrix() started.
+✔ Test growthE1RMCardPolicyCoversTheFullWindowAndFamilyCountMatrix() passed after 0.001 seconds.
+◇ Test growthDailyPointIdentityCollapsesMultipleRecordsToTheDaysBest() started.
+✔ Test growthDailyPointIdentityCollapsesMultipleRecordsToTheDaysBest() passed after 0.001 seconds.
+◇ Test growthDailyPointIdentityCountsEqualValuesOnDifferentDays() started.
+✔ Test growthDailyPointIdentityCountsEqualValuesOnDifferentDays() passed after 0.001 seconds.
+◇ Test growthFlatDailySeriesStaysInTheFormingState() started.
+✔ Test growthFlatDailySeriesStaysInTheFormingState() passed after 0.001 seconds.
+◇ Test growthVaryingDailySeriesDrawsTheChart() started.
+✔ Test growthVaryingDailySeriesDrawsTheChart() passed after 0.001 seconds.
+◇ Test growthLowConfidencePointCannotUnlockAFlatTrustedMainLine() started.
+✔ Test growthLowConfidencePointCannotUnlockAFlatTrustedMainLine() passed after 0.001 seconds.
+◇ Test growthLowConfidenceOnlyDaysNeverUnlockTheMainLine() started.
+✔ Test growthLowConfidenceOnlyDaysNeverUnlockTheMainLine() passed after 0.001 seconds.
+◇ Test growthChartPointAndDateAxisIgnoreAnOlderHeadlineCandidate() started.
+✔ Test growthChartPointAndDateAxisIgnoreAnOlderHeadlineCandidate() passed after 0.001 seconds.
+◇ Test growthWindowSwitchesAllThreeFamiliesThroughOneSharedPolicy() started.
+✔ Test growthWindowSwitchesAllThreeFamiliesThroughOneSharedPolicy() passed after 0.001 seconds.
+◇ Test growthDemoSeedNeverSelectsAFlatChartAcrossThreeFamiliesAndRanges() started.
+✔ Test growthDemoSeedNeverSelectsAFlatChartAcrossThreeFamiliesAndRanges() passed after 0.001 seconds.
+◇ Suite GrowthE1RMDetailTests started.
+◇ Test detailUsesSelectedSnapshotAndExactSourceSet() started.
+✔ Test detailUsesSelectedSnapshotAndExactSourceSet() passed after 0.001 seconds.
+◇ Test fallbackExplainsStoredEstimateWithoutRPELookup(rpe:) started.
+◇ Test case passing 1 argument rpe → nil to fallbackExplainsStoredEstimateWithoutRPELookup(rpe:) started.
+◇ Test case passing 1 argument rpe → 5.5 to fallbackExplainsStoredEstimateWithoutRPELookup(rpe:) started.
+✔ Test fallbackExplainsStoredEstimateWithoutRPELookup(rpe:) with 2 test cases passed after 0.001 seconds.
+◇ Test incompatibleStoredValueDoesNotInventAnEquation() started.
+✔ Test incompatibleStoredValueDoesNotInventAnEquation() passed after 0.001 seconds.
+◇ Test persistedCoachCalibrationSurvivesMissingOriginalLog() started.
+✔ Test persistedCoachCalibrationSurvivesMissingOriginalLog() passed after 0.001 seconds.
+◇ Test unrelatedLogDoesNotSupplyAGroupNumber() started.
+✔ Test unrelatedLogDoesNotSupplyAGroupNumber() passed after 0.001 seconds.
+✔ Suite GrowthE1RMDetailTests passed after 0.001 seconds.
+◇ Suite GrowthFormingAxisTests started.
+◇ Test trustedAnchorYieldsRoundedTriplet() started.
+✔ Test trustedAnchorYieldsRoundedTriplet() passed after 0.001 seconds.
+◇ Test lowConfidenceOnlyHistoryHasNoFabricatedScale() started.
+✔ Test lowConfidenceOnlyHistoryHasNoFabricatedScale() passed after 0.001 seconds.
+◇ Test chartDateAxisIsMonotonicAndKeepsTheCurrentPointDate() started.
+✔ Test chartDateAxisIsMonotonicAndKeepsTheCurrentPointDate() passed after 0.001 seconds.
+✔ Suite GrowthFormingAxisTests passed after 0.001 seconds.
+◇ Test growthComparisonUsesOnboardingBaselinesAndCapsBars() started.
+✔ Test growthComparisonUsesOnboardingBaselinesAndCapsBars() passed after 0.001 seconds.
+◇ Test growthHistoryStatsExcludeIncompleteAndAssumedLogs() started.
+✔ Test growthHistoryStatsExcludeIncompleteAndAssumedLogs() passed after 0.001 seconds.
+◇ Test growthChartBucketsKeepTheLatestSixWeeks() started.
+✔ Test growthChartBucketsKeepTheLatestSixWeeks() passed after 0.001 seconds.
+◇ Test growthTrendUnlockRequiresThreeDistinctTrainingDays() started.
+✔ Test growthTrendUnlockRequiresThreeDistinctTrainingDays() passed after 0.001 seconds.
+◇ Test growthTimeRangesMapWithoutChangingViewModelContract() started.
+✔ Test growthTimeRangesMapWithoutChangingViewModelContract() passed after 0.001 seconds.
+◇ Test growthSnapshotKeepsHeadlineButAnchorsChartToWindowMainLine() started.
+✔ Test growthSnapshotKeepsHeadlineButAnchorsChartToWindowMainLine() passed after 0.001 seconds.
+◇ Test growthTrendUnlocksAtExactlyThreeRecordsForItsExerciseFamily() started.
+✔ Test growthTrendUnlocksAtExactlyThreeRecordsForItsExerciseFamily() passed after 0.001 seconds.
+◇ Test growthTrendRecordCountsStayIsolatedBetweenExerciseFamilies() started.
+✔ Test growthTrendRecordCountsStayIsolatedBetweenExerciseFamilies() passed after 0.001 seconds.
+◇ Test totalStartsWhenAllLiftsExistAndCarriesDailyMainLineForward() started.
+✔ Test totalStartsWhenAllLiftsExistAndCarriesDailyMainLineForward() passed after 0.001 seconds.
+◇ Test totalUsesEveryDailyMainLineUpdateFromRecordedSetsAndIgnoresLowConfidence() started.
+✔ Test totalUsesEveryDailyMainLineUpdateFromRecordedSetsAndIgnoresLowConfidence() passed after 0.001 seconds.
+◇ Suite HoldToCompleteGestureStateTests started.
+◇ Test holdHapticsGrowFromLightToHeavyWithoutLosingIntensity() started.
+✔ Test holdHapticsGrowFromLightToHeavyWithoutLosingIntensity() passed after 0.001 seconds.
+◇ Test movingBackInsideAfterLeavingBoundsDoesNotRestartHold() started.
+✔ Test movingBackInsideAfterLeavingBoundsDoesNotRestartHold() passed after 0.001 seconds.
+◇ Test movingAfterCompletionDoesNotCompleteTwice() started.
+✔ Test movingAfterCompletionDoesNotCompleteTwice() passed after 0.001 seconds.
+◇ Test endingHoldBeforeCompletionCancelsAndResets() started.
+✔ Test endingHoldBeforeCompletionCancelsAndResets() passed after 0.001 seconds.
+◇ Test oneGestureProducesExactlyOneCompletionAction() started.
+✔ Test oneGestureProducesExactlyOneCompletionAction() passed after 0.001 seconds.
+✔ Suite HoldToCompleteGestureStateTests passed after 0.001 seconds.
+◇ Test backfillFiltersEligibilityUsesLoggedAtAndIsIdempotentWithoutPRs() started.
+✔ Test backfillFiltersEligibilityUsesLoggedAtAndIsIdempotentWithoutPRs() passed after 0.001 seconds.
+◇ Test logExerciseIDImportsWhenCurrentCycleIsEmpty() started.
+✔ Test logExerciseIDImportsWhenCurrentCycleIsEmpty() passed after 0.001 seconds.
+◇ Test missingLogExerciseIDFallsBackToCurrentCycleMapping() started.
+✔ Test missingLogExerciseIDFallsBackToCurrentCycleMapping() passed after 0.001 seconds.
+◇ Test importedVariationUsesCompetitionResolverAndDoesNotBlockMeasuredPR() started.
+✔ Test importedVariationUsesCompetitionResolverAndDoesNotBlockMeasuredPR() passed after 0.001 seconds.
+◇ Test unresolvedLogWithoutExerciseIDIsSkipped() started.
+✔ Test unresolvedLogWithoutExerciseIDIsSkipped() passed after 0.001 seconds.
+◇ Test confirmedReviewPromotesBatchAndReplayDoesNotReprompt() started.
+✔ Test confirmedReviewPromotesBatchAndReplayDoesNotReprompt() passed after 0.001 seconds.
+◇ Test rejectedBatchStaysLowWhenHigherBatchIsConfirmed() started.
+✔ Test rejectedBatchStaysLowWhenHigherBatchIsConfirmed() passed after 0.001 seconds.
+◇ Test newBatchAtOrBelowReviewedMaximumReusesDecision() started.
+✔ Test newBatchAtOrBelowReviewedMaximumReusesDecision() passed after 0.001 seconds.
+◇ Test missingBaselineImportsNormallyWithoutReview() started.
+✔ Test missingBaselineImportsNormallyWithoutReview() passed after 0.001 seconds.
+◇ Test multipleFamiliesProduceOneStablePendingReviewEach() started.
+✔ Test multipleFamiliesProduceOneStablePendingReviewEach() passed after 0.001 seconds.
+◇ Test replayPreservesExistingImportedPointConfidence() started.
+✔ Test replayPreservesExistingImportedPointConfidence() passed after 0.001 seconds.
+◇ Test concurrentBackfillsShareOneRunAndOnePendingReview() started.
+✔ Test concurrentBackfillsShareOneRunAndOnePendingReview() passed after 0.001 seconds.
+◇ Test overlappingBackfillsExecuteThePipelineOnlyOnce() started.
+✔ Test overlappingBackfillsExecuteThePipelineOnlyOnce() passed after 0.001 seconds.
+◇ Test answerDuringBackfillIsNotOverwrittenByStaleSnapshot() started.
+✔ Test answerDuringBackfillIsNotOverwrittenByStaleSnapshot() passed after 0.001 seconds.
+◇ Test reviewRecordAndPendingReviewRoundTrip() started.
+✔ Test reviewRecordAndPendingReviewRoundTrip() passed after 0.001 seconds.
+◇ Test reviewStoresIsolateRecordsByStudentAndFamily() started.
+✔ Test reviewStoresIsolateRecordsByStudentAndFamily() passed after 0.001 seconds.
+◇ Test removePendingReviewRemovesOnlyMatchingStudentAndFamily() started.
+✔ Test removePendingReviewRemovesOnlyMatchingStudentAndFamily() passed after 0.001 seconds.
+◇ Test localReviewStorePersistsAcrossInstances() started.
+✔ Test localReviewStorePersistsAcrossInstances() passed after 0.001 seconds.
+◇ Test assumedLogsDoNotChangeStudentStatisticsButRemainFetchable() started.
+✔ Test assumedLogsDoNotChangeStudentStatisticsButRemainFetchable() passed after 0.001 seconds.
+◇ Suite IntensityWeightSuggestionTests started.
+◇ Test nonRPENewFormsDegradeQuietlyForMainLift(intensity:) started.
+◇ Test case passing 1 argument intensity → .rir(2) to nonRPENewFormsDegradeQuietlyForMainLift(intensity:) started.
+◇ Test case passing 1 argument intensity → .rpeRange(8, 9) to nonRPENewFormsDegradeQuietlyForMainLift(intensity:) started.
+◇ Test case passing 1 argument intensity → .weightRange(165, 175) to nonRPENewFormsDegradeQuietlyForMainLift(intensity:) started.
+✔ Test nonRPENewFormsDegradeQuietlyForMainLift(intensity:) with 3 test cases passed after 0.001 seconds.
+◇ Test nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test case passing 1 argument intensity → .rir(2) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test case passing 1 argument intensity → .rpeRange(8, 9) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+◇ Test case passing 1 argument intensity → .weightRange(165, 175) to nonRPENewFormsDegradeQuietlyForAccessory(intensity:) started.
+✔ Test nonRPENewFormsDegradeQuietlyForAccessory(intensity:) with 3 test cases passed after 0.001 seconds.
+◇ Test registeredOneRMPercentageResolvesAndRounds() started.
+✔ Test registeredOneRMPercentageResolvesAndRounds() passed after 0.001 seconds.
+◇ Test e1RMPercentageUsesCurrentHeadlineValue() started.
+✔ Test e1RMPercentageUsesCurrentHeadlineValue() passed after 0.001 seconds.
+◇ Test e1RMPercentageFallsBackToRegisteredOneRM() started.
+✔ Test e1RMPercentageFallsBackToRegisteredOneRM() passed after 0.001 seconds.
+◇ Test accessoryPercentageIsUnresolvedAndNeverPrefills() started.
+✔ Test accessoryPercentageIsUnresolvedAndNeverPrefills() passed after 0.001 seconds.
+◇ Test percentageRoundingMatchesSuggestionEnginePlateStep() started.
+✔ Test percentageRoundingMatchesSuggestionEnginePlateStep() passed after 0.001 seconds.
+◇ Test completedBackoffKeepsActualWeightWhenTopSetChanges() started.
+✔ Test completedBackoffKeepsActualWeightWhenTopSetChanges() passed after 0.001 seconds.
+◇ Test newFormRPERowStillUsesRPEPipeline() started.
+✔ Test newFormRPERowStillUsesRPEPipeline() passed after 0.001 seconds.
+✔ Suite IntensityWeightSuggestionTests passed after 0.001 seconds.
+◇ Test draftSaveLoadClearRoundTrip() started.
+✔ Test draftSaveLoadClearRoundTrip() passed after 0.001 seconds.
+◇ Test corruptedDraftFileReadsAsNil() started.
+✔ Test corruptedDraftFileReadsAsNil() passed after 0.001 seconds.
+◇ Test draftsAreIsolatedPerStudent() started.
+✔ Test draftsAreIsolatedPerStudent() passed after 0.001 seconds.
+◇ Test spec085MeetClassRoundTripsAndRejectsLegacyValues() started.
+✔ Test spec085MeetClassRoundTripsAndRejectsLegacyValues() passed after 0.001 seconds.
+◇ Test spec085MeetTablesMatchApprovedOpenClasses() started.
+✔ Test spec085MeetTablesMatchApprovedOpenClasses() passed after 0.001 seconds.
+◇ Test profileV3PresentationUsesCurrentReadinessAndOnboardingBaseline() started.
+✔ Test profileV3PresentationUsesCurrentReadinessAndOnboardingBaseline() passed after 0.001 seconds.
+◇ Test profileV3PresentationFallsBackToRecoveryProfileAndCustomTimer() started.
+✔ Test profileV3PresentationFallsBackToRecoveryProfileAndCustomTimer() passed after 0.007 seconds.
+◇ Test step1RequiresAllFiveBasics() started.
+✔ Test step1RequiresAllFiveBasics() passed after 0.001 seconds.
+◇ Test step2BenchGripIsOptional() started.
+✔ Test step2BenchGripIsOptional() passed after 0.001 seconds.
+◇ Test step3RequiresAllThreeLifts() started.
+✔ Test step3RequiresAllThreeLifts() passed after 0.001 seconds.
+◇ Test step4RequiresTwoToSixDaysAndTier() started.
+✔ Test step4RequiresTwoToSixDaysAndTier() passed after 0.001 seconds.
+◇ Test step6IsAlwaysComplete() started.
+✔ Test step6IsAlwaysComplete() passed after 0.001 seconds.
+◇ Test step7CompetitionDateIsConditionallyRequired() started.
+✔ Test step7CompetitionDateIsConditionallyRequired() passed after 0.001 seconds.
+◇ Test resumeStepIsFirstIncompleteStep() started.
+✔ Test resumeStepIsFirstIncompleteStep() passed after 0.001 seconds.
+◇ Test stepPatchOnlyCarriesItsOwnFields() started.
+✔ Test stepPatchOnlyCarriesItsOwnFields() passed after 0.001 seconds.
+◇ Test undersizedTrainingDaysStayAbsent() started.
+✔ Test undersizedTrainingDaysStayAbsent() passed after 0.001 seconds.
+◇ Test uploadAttachmentIdsAreAbsentInEveryStepPatch() started.
+✔ Test uploadAttachmentIdsAreAbsentInEveryStepPatch() passed after 0.001 seconds.
+◇ Test emptyTextFieldsPatchAsNull() started.
+✔ Test emptyTextFieldsPatchAsNull() passed after 0.001 seconds.
+◇ Test notCompetingClearsCompetitionDate() started.
+✔ Test notCompetingClearsCompetitionDate() passed after 0.001 seconds.
+◇ Test fullPatchCoversEveryFilledField() started.
+✔ Test fullPatchCoversEveryFilledField() passed after 0.001 seconds.
+◇ Test cardPatchStepsNeverIncludeOneRM() started.
+✔ Test cardPatchStepsNeverIncludeOneRM() passed after 0.001 seconds.
+◇ Test mergePrefersServerWhenLocalIsStale() started.
+✔ Test mergePrefersServerWhenLocalIsStale() passed after 0.001 seconds.
+◇ Test mergeOverlaysNewerLocalNonEmptyFields() started.
+✔ Test mergeOverlaysNewerLocalNonEmptyFields() passed after 0.001 seconds.
+◇ Test mergeWithoutServerUsesLocalDraft() started.
+✔ Test mergeWithoutServerUsesLocalDraft() passed after 0.001 seconds.
+◇ Test mergeToleratesSmallClockDriftInFavorOfLocal() started.
+✔ Test mergeToleratesSmallClockDriftInFavorOfLocal() passed after 0.001 seconds.
+◇ Test missingFieldStepMappingCoversAllNineteenGateFields() started.
+✔ Test missingFieldStepMappingCoversAllNineteenGateFields() passed after 0.001 seconds.
+◇ Test earliestStepPicksTheLowestStep() started.
+✔ Test earliestStepPicksTheLowestStep() passed after 0.001 seconds.
+◇ Test spec085MeetDraftRequiresCompleteSelectionAndClearsRemovedFields() started.
+✔ Test spec085MeetDraftRequiresCompleteSelectionAndClearsRemovedFields() passed after 0.001 seconds.
+◇ Test spec085BodyWeightFiltersAndRoundTripsInBothLocales() started.
+✔ Test spec085BodyWeightFiltersAndRoundTripsInBothLocales() passed after 0.001 seconds.
+◇ Test spec085SingleFieldEditorsOnlyPatchTheirOwnedFields() started.
+✔ Test spec085SingleFieldEditorsOnlyPatchTheirOwnedFields() passed after 0.001 seconds.
+◇ Test upsertCreatesRowAndAppliesValues() started.
+✔ Test upsertCreatesRowAndAppliesValues() passed after 0.001 seconds.
+◇ Test absentKeepsAndNullClears() started.
+✔ Test absentKeepsAndNullClears() passed after 0.001 seconds.
+◇ Test completeWithoutRowReportsAllRequiredFields() started.
+✔ Test completeWithoutRowReportsAllRequiredFields() passed after 0.001 seconds.
+◇ Test completeListsExactMissingFields() started.
+✔ Test completeListsExactMissingFields() passed after 0.001 seconds.
+◇ Test competitionDateIsRequiredOnlyWhenCompeting() started.
+✔ Test competitionDateIsRequiredOnlyWhenCompeting() passed after 0.001 seconds.
+◇ Test completeSucceedsAndIsIdempotent() started.
+✔ Test completeSucceedsAndIsIdempotent() passed after 0.001 seconds.
+◇ Test oneRMPatchAfterCompletionThrowsLocked() started.
+✔ Test oneRMPatchAfterCompletionThrowsLocked() passed after 0.001 seconds.
+◇ Test nonOneRMEditsRemainAllowedAfterCompletion() started.
+✔ Test nonOneRMEditsRemainAllowedAfterCompletion() passed after 0.001 seconds.
+◇ Test oneRMEditsAreAllowedBeforeCompletion() started.
+✔ Test oneRMEditsAreAllowedBeforeCompletion() passed after 0.001 seconds.
+◇ Test fetchReturnsNilForUnknownStudent() started.
+✔ Test fetchReturnsNilForUnknownStudent() passed after 0.001 seconds.
+◇ Test loadWithoutAnyDataStartsAtStepOne() started.
+✔ Test loadWithoutAnyDataStartsAtStepOne() passed after 0.001 seconds.
+◇ Test loadPrefillsFromServerAndResumesFirstIncompleteStep() started.
+✔ Test loadPrefillsFromServerAndResumesFirstIncompleteStep() passed after 0.001 seconds.
+◇ Test loadMergesNewerLocalDraftOverServer() started.
+✔ Test loadMergesNewerLocalDraftOverServer() passed after 0.001 seconds.
+◇ Test advanceIsBlockedUntilStepIsComplete() started.
+✔ Test advanceIsBlockedUntilStepIsComplete() passed after 0.001 seconds.
+◇ Test advancePutsOnlyCurrentStepFieldsAndMovesOn() started.
+✔ Test advancePutsOnlyCurrentStepFieldsAndMovesOn() passed after 0.001 seconds.
+◇ Test advanceSavesDraftLocallyForResume() started.
+✔ Test advanceSavesDraftLocallyForResume() passed after 0.001 seconds.
+◇ Test stepPutFailureShowsBannerButNeverBlocks() started.
+✔ Test stepPutFailureShowsBannerButNeverBlocks() passed after 0.001 seconds.
+◇ Test completeRunsFullPutBeforeCompleteCall() started.
+✔ Test completeRunsFullPutBeforeCompleteCall() passed after 0.001 seconds.
+◇ Test completeFullPutFailureStopsBeforeCompleteCall() started.
+✔ Test completeFullPutFailureStopsBeforeCompleteCall() passed after 0.001 seconds.
+◇ Test incompleteJumpsToEarliestMissingStepAndHighlights() started.
+✔ Test incompleteJumpsToEarliestMissingStepAndHighlights() passed after 0.001 seconds.
+◇ Test handoffWithoutStashRequestsReload() started.
+✔ Test handoffWithoutStashRequestsReload() passed after 0.001 seconds.
+◇ Test handoffInvalidCodeClearsStashAndReportsDisplayName() started.
+✔ Test handoffInvalidCodeClearsStashAndReportsDisplayName() passed after 0.001 seconds.
+◇ Test handoffAlreadyPendingRequestsReload() started.
+✔ Test handoffAlreadyPendingRequestsReload() passed after 0.001 seconds.
+◇ Test handoffNetworkFailureKeepsStashAndOffersRetry() started.
+✔ Test handoffNetworkFailureKeepsStashAndOffersRetry() passed after 0.001 seconds.
+◇ Test estimatorMatchesSpec028Fixture() started.
+✔ Test estimatorMatchesSpec028Fixture() passed after 0.001 seconds.
+◇ Test conservativeIsNinetyPercentOfRawNotRounded() started.
+✔ Test conservativeIsNinetyPercentOfRawNotRounded() passed after 0.001 seconds.
+◇ Test estimatesSnapToHalfKiloGrid() started.
+✔ Test estimatesSnapToHalfKiloGrid() passed after 0.001 seconds.
+◇ Test invalidInputsProduceNoEstimate() started.
+✔ Test invalidInputsProduceNoEstimate() passed after 0.001 seconds.
+◇ Test weightLensRoundTripsWithoutDrift() started.
+✔ Test weightLensRoundTripsWithoutDrift() passed after 0.001 seconds.
+◇ Test switchingUnitNeverMutatesStoredMetric() started.
+✔ Test switchingUnitNeverMutatesStoredMetric() passed after 0.001 seconds.
+◇ Test heightLensConvertsToInches() started.
+✔ Test heightLensConvertsToInches() passed after 0.001 seconds.
+◇ Test parserRejectsGarbageAndOutOfRangeOneRM() started.
+✔ Test parserRejectsGarbageAndOutOfRangeOneRM() passed after 0.001 seconds.
+◇ Test passthroughTrimExportsRequestedRangeWithoutReencoding() started.
+✔ Test passthroughTrimExportsRequestedRangeWithoutReencoding() passed after 0.096 seconds.
+◇ Test passthroughTrimKeepsOnlySamplesFromTheSelectedRange() started.
+✔ Test passthroughTrimKeepsOnlySamplesFromTheSelectedRange() passed after 0.090 seconds.
+◇ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() started.
+✔ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() passed after 0.045 seconds.
+◇ Test passthroughTrimKeepsTheAudioTrack() started.
+✔ Test passthroughTrimKeepsTheAudioTrack() passed after 0.044 seconds.
+◇ Test passthroughTrimOutputNeverOvershootsTheSelectionCap() started.
+✔ Test passthroughTrimOutputNeverOvershootsTheSelectionCap() passed after 0.043 seconds.
+◇ Suite PctAnchorResolverTests started.
+◇ Test topSetAfterBackoffIsNotAPrecedingCandidate() started.
+✔ Test topSetAfterBackoffIsNotAPrecedingCandidate() passed after 0.001 seconds.
+◇ Test topSetUsesMaximumEligibleActualWeightOnly() started.
+✔ Test topSetUsesMaximumEligibleActualWeightOnly() passed after 0.001 seconds.
+◇ Test unloggedTopSetIsNeverEstimatedInPlanState() started.
+✔ Test unloggedTopSetIsNeverEstimatedInPlanState() passed after 0.001 seconds.
+◇ Test completingOrEditingPriorSetRecalculatesUnloggedBackoff() started.
+✔ Test completingOrEditingPriorSetRecalculatesUnloggedBackoff() passed after 0.001 seconds.
+◇ Test disorderLoggingBackoffFirstHasNoTopSetAnchor() started.
+✔ Test disorderLoggingBackoffFirstHasNoTopSetAnchor() passed after 0.001 seconds.
+✔ Suite PctAnchorResolverTests passed after 0.001 seconds.
+◇ Test stashPeekClearRoundTrip() started.
+✔ Test stashPeekClearRoundTrip() passed after 0.001 seconds.
+◇ Test stashOverwritesPreviousValue() started.
+✔ Test stashOverwritesPreviousValue() passed after 0.001 seconds.
+◇ Test studentsAreIsolatedByKey() started.
+✔ Test studentsAreIsolatedByKey() passed after 0.001 seconds.
+◇ Test cancelSuccessReportsCancelled() started.
+✔ Test cancelSuccessReportsCancelled() passed after 0.001 seconds.
+◇ Test cancelRacingAcceptanceConvergesSilently() started.
+✔ Test cancelRacingAcceptanceConvergesSilently() passed after 0.001 seconds.
+◇ Test cancelTransportFailureShowsInlineError() started.
+✔ Test cancelTransportFailureShowsInlineError() passed after 0.001 seconds.
+◇ Test waitingDescriptionFormatsMinutesHoursDays() started.
+✔ Test waitingDescriptionFormatsMinutesHoursDays() passed after 0.001 seconds.
+◇ Test waitingDescriptionClampsClockSkewToZero() started.
+✔ Test waitingDescriptionClampsClockSkewToZero() passed after 0.001 seconds.
+◇ Test cursorDoesNotChangeAcrossDeviceGymDayBoundary() started.
+✔ Test cursorDoesNotChangeAcrossDeviceGymDayBoundary() passed after 0.001 seconds.
+◇ Test planCalendarIdentityMatchesUTCProjectionToDeviceComponents() started.
+✔ Test planCalendarIdentityMatchesUTCProjectionToDeviceComponents() passed after 0.001 seconds.
+◇ Test profileAboutRowsKeepOrderValuesAndExistingEditors() started.
+✔ Test profileAboutRowsKeepOrderValuesAndExistingEditors() passed after 0.028 seconds.
+◇ Test profileHealthRowsKeepSummariesAndExistingDestinations() started.
+✔ Test profileHealthRowsKeepSummariesAndExistingDestinations() passed after 0.008 seconds.
+◇ Test profileSettingsAppearanceBlocksAndSignOutUseExistingActions() started.
+✔ Test profileSettingsAppearanceBlocksAndSignOutUseExistingActions() passed after 0.008 seconds.
+◇ Test profileSettingsContainsPreferencesAndAllAccountRowsInOrder() started.
+✔ Test profileSettingsContainsPreferencesAndAllAccountRowsInOrder() passed after 0.153 seconds.
+◇ Test profileHomeKeepsIdentityAndSettingsAvailableInEveryState() started.
+✔ Test profileHomeKeepsIdentityAndSettingsAvailableInEveryState() passed after 0.125 seconds.
+◇ Test profileRefreshFailureKeepsSnapshotAndOffersRetry() started.
+✔ Test profileRefreshFailureKeepsSnapshotAndOffersRetry() passed after 0.002 seconds.
+◇ Test profileIdentityUsesSessionFallbackAndLetterInitials() started.
+✔ Test profileIdentityUsesSessionFallbackAndLetterInitials() passed after 0.001 seconds.
+◇ Test profileMenuValuesKeepExistingSummariesAndExplicitEmptyValues() started.
+✔ Test profileMenuValuesKeepExistingSummariesAndExplicitEmptyValues() passed after 0.001 seconds.
+◇ Test basicsSummaryFormatsGenderAgeHeightWeight() started.
+✔ Test basicsSummaryFormatsGenderAgeHeightWeight() passed after 0.001 seconds.
+◇ Test ageIsWholeYearCalendarDifference() started.
+✔ Test ageIsWholeYearCalendarDifference() passed after 0.001 seconds.
+◇ Test backgroundSummaryFormatsYearsAndStances() started.
+✔ Test backgroundSummaryFormatsYearsAndStances() passed after 0.001 seconds.
+◇ Test oneRMSummaryUsesSBDShorthand() started.
+✔ Test oneRMSummaryUsesSBDShorthand() passed after 0.001 seconds.
+◇ Test environmentSummaryOrdersDaysAndShowsTier() started.
+✔ Test environmentSummaryOrdersDaysAndShowsTier() passed after 0.001 seconds.
+◇ Test recoverySummaryUsesWikiScaleLabels() started.
+✔ Test recoverySummaryUsesWikiScaleLabels() passed after 0.001 seconds.
+◇ Test materialsSummaryHidesZeroUploads() started.
+✔ Test materialsSummaryHidesZeroUploads() passed after 0.001 seconds.
+◇ Test competitionSummaryShowsDateAndClassOrOptOut() started.
+✔ Test competitionSummaryShowsDateAndClassOrOptOut() passed after 0.001 seconds.
+◇ Test injuriesSummaryCombinesNotesAndAreas() started.
+✔ Test injuriesSummaryCombinesNotesAndAreas() passed after 0.001 seconds.
+◇ Test emptyProfileSummariesFallBackToPlaceholder() started.
+✔ Test emptyProfileSummariesFallBackToPlaceholder() passed after 0.001 seconds.
+◇ Test spec085ProfileMeetAndNoteHaveIndependentSummaries() started.
+✔ Test spec085ProfileMeetAndNoteHaveIndependentSummaries() passed after 0.001 seconds.
+◇ Test e1rmSelectionStartsAtTotalAndPreservesRangeAcrossSegments() started.
+✔ Test e1rmSelectionStartsAtTotalAndPreservesRangeAcrossSegments() passed after 0.001 seconds.
+◇ Test everyEmptyLiftOffersTodayOnlyWhenAllTrainingIsEmpty(family:) started.
+◇ Test case passing 1 argument family → .squat to everyEmptyLiftOffersTodayOnlyWhenAllTrainingIsEmpty(family:) started.
+◇ Test case passing 1 argument family → .bench to everyEmptyLiftOffersTodayOnlyWhenAllTrainingIsEmpty(family:) started.
+◇ Test case passing 1 argument family → .deadlift to everyEmptyLiftOffersTodayOnlyWhenAllTrainingIsEmpty(family:) started.
+✔ Test everyEmptyLiftOffersTodayOnlyWhenAllTrainingIsEmpty(family:) with 3 test cases passed after 0.015 seconds.
+◇ Test progressMenuKeepsFourNavigableRowsWithoutChartsWhileUnavailable(failed:) started.
+◇ Test case passing 1 argument failed → false to progressMenuKeepsFourNavigableRowsWithoutChartsWhileUnavailable(failed:) started.
+◇ Test case passing 1 argument failed → true to progressMenuKeepsFourNavigableRowsWithoutChartsWhileUnavailable(failed:) started.
+✔ Test progressMenuKeepsFourNavigableRowsWithoutChartsWhileUnavailable(failed:) with 2 test cases passed after 0.050 seconds.
+◇ Test progressMenuValuesCoverLoadedEmptyAndUnreadStates() started.
+✔ Test progressMenuValuesCoverLoadedEmptyAndUnreadStates() passed after 0.010 seconds.
+◇ Test weeklyMetricsSumCompletedVolumeAcrossMultipleWeeks() started.
+✔ Test weeklyMetricsSumCompletedVolumeAcrossMultipleWeeks() passed after 0.001 seconds.
+◇ Test weeklyMetricsAverageRPEExcludesMissingAndIncompleteSets() started.
+✔ Test weeklyMetricsAverageRPEExcludesMissingAndIncompleteSets() passed after 0.001 seconds.
+◇ Test weeklyMetricsExcludeAssumedSetsFromVolumeAndAverageRPE() started.
+✔ Test weeklyMetricsExcludeAssumedSetsFromVolumeAndAverageRPE() passed after 0.001 seconds.
+◇ Test emptyMetricsReturnEmptyAndChartCanInitialize() started.
+✔ Test emptyMetricsReturnEmptyAndChartCanInitialize() passed after 0.001 seconds.
+◇ Suite QuickLogPlanTests started.
+◇ Test editingOneCellChangesOnlyThatSet() started.
+✔ Test editingOneCellChangesOnlyThatSet() passed after 0.001 seconds.
+◇ Test syncingWeightUpdatesEverySetInTheSameExerciseOnly() started.
+✔ Test syncingWeightUpdatesEverySetInTheSameExerciseOnly() passed after 0.001 seconds.
+◇ Test excludedRowsAreOmittedWithoutRenumberingSetIndexes() started.
+✔ Test excludedRowsAreOmittedWithoutRenumberingSetIndexes() passed after 0.001 seconds.
+◇ Test selectedDateDerivesLocalNoonAndDateOnlyWireValue() started.
+✔ Test selectedDateDerivesLocalNoonAndDateOnlyWireValue() passed after 0.001 seconds.
+◇ Test buddhistDeviceCalendarStillWritesGregorianTrainingDateInItsTimeZone() started.
+✔ Test buddhistDeviceCalendarStillWritesGregorianTrainingDateInItsTimeZone() passed after 0.001 seconds.
+◇ Test selectedDateIsClampedToAllowedDays() started.
+✔ Test selectedDateIsClampedToAllowedDays() passed after 0.001 seconds.
+✔ Suite QuickLogPlanTests passed after 0.001 seconds.
+◇ Test gateIsNeededWhenNothingFiledAndNotSkipped() started.
+✔ Test gateIsNeededWhenNothingFiledAndNotSkipped() passed after 0.001 seconds.
+◇ Test gateIsDoneWhenTodayAlreadyFiled() started.
+✔ Test gateIsDoneWhenTodayAlreadyFiled() passed after 0.001 seconds.
+◇ Test skipMarksTodayAndSurvivesReload() started.
+✔ Test skipMarksTodayAndSurvivesReload() passed after 0.001 seconds.
+◇ Test sameDayResubmissionOverwrites() started.
+✔ Test sameDayResubmissionOverwrites() passed after 0.001 seconds.
+◇ Test failedSubmitKeepsGateNeededWithInlineError() started.
+✔ Test failedSubmitKeepsGateNeededWithInlineError() passed after 0.001 seconds.
+◇ Test incompleteStepOneIsRejectedClientSide() started.
+✔ Test incompleteStepOneIsRejectedClientSide() passed after 0.001 seconds.
+◇ Test "Recorder video writer settings enforce the upload-ready H.264 budget" started.
+✔ Test "Recorder video writer settings enforce the upload-ready H.264 budget" passed after 0.001 seconds.
+◇ Test "Recorder audio writer settings encode mono AAC at 96 kbps" started.
+✔ Test "Recorder audio writer settings encode mono AAC at 96 kbps" passed after 0.001 seconds.
+◇ Test "Recording lifecycle advances through explicit start and stop states" started.
+✔ Test "Recording lifecycle advances through explicit start and stop states" passed after 0.001 seconds.
+◇ Test "Interrupting start invalidates its late completion and recording generation" started.
+✔ Test "Interrupting start invalidates its late completion and recording generation" passed after 0.001 seconds.
+◇ Test "Writer failure during start enters failed and rejects the late start completion" started.
+✔ Test "Writer failure during start enters failed and rejects the late start completion" passed after 0.001 seconds.
+◇ Test "Writer failure during recording enters failed" started.
+✔ Test "Writer failure during recording enters failed" passed after 0.001 seconds.
+◇ Test "Interrupting stop prevents its late result from entering review" started.
+✔ Test "Interrupting stop prevents its late result from entering review" passed after 0.001 seconds.
+◇ Test "A stale automatic-stop callback cannot stop a newer recording" started.
+✔ Test "A stale automatic-stop callback cannot stop a newer recording" passed after 0.001 seconds.
+◇ Test "Closing invalidates every in-flight recorder completion" started.
+✔ Test "Closing invalidates every in-flight recorder completion" passed after 0.001 seconds.
+◇ Test "Permission denial can re-enter preparation after Settings authorization" started.
+✔ Test "Permission denial can re-enter preparation after Settings authorization" passed after 0.001 seconds.
+◇ Test enqueueAcceptsARecordingThatRanOneFramePastTheCap() started.
+✔ Test enqueueAcceptsARecordingThatRanOneFramePastTheCap() passed after 0.001 seconds.
+◇ Test enqueueRejectsTheFirstClipPastTheGrace() started.
+✔ Test enqueueRejectsTheFirstClipPastTheGrace() passed after 0.001 seconds.
+◇ Suite RestTimerExplanationPresentationTests started.
+◇ Test explanationFormatsDefaultsAndFollowsAnUpdatedRule() started.
+✔ Test explanationFormatsDefaultsAndFollowsAnUpdatedRule() passed after 0.001 seconds.
+✔ Suite RestTimerExplanationPresentationTests passed after 0.001 seconds.
+◇ Test restTimerPolicyMapsRPEPerSpecTable() started.
+✔ Test restTimerPolicyMapsRPEPerSpecTable() passed after 0.001 seconds.
+◇ Test accessoryRestPolicyUsesCoachThenStudentThenSixtySeconds() started.
+✔ Test accessoryRestPolicyUsesCoachThenStudentThenSixtySeconds() passed after 0.001 seconds.
+◇ Suite "Retained set-video cleanup" started.
+◇ Test "today's uploaded video is retained" started.
+✔ Test "today's uploaded video is retained" passed after 0.001 seconds.
+◇ Test "a previous-day uploaded video is removed" started.
+✔ Test "a previous-day uploaded video is removed" passed after 0.001 seconds.
+◇ Test "over-limit cleanup removes oldest uploaded files until within the limit" started.
+✔ Test "over-limit cleanup removes oldest uploaded files until within the limit" passed after 0.001 seconds.
+◇ Test "cleanup never removes in-flight or failed files" started.
+✔ Test "cleanup never removes in-flight or failed files" passed after 0.001 seconds.
+◇ Test "device-local day handles midnight across a daylight-saving transition" started.
+✔ Test "device-local day handles midnight across a daylight-saving transition" passed after 0.001 seconds.
+◇ Test "the 500 MB guardrail removes only when total bytes exceed the exact limit" started.
+✔ Test "the 500 MB guardrail removes only when total bytes exceed the exact limit" passed after 0.001 seconds.
+✔ Suite "Retained set-video cleanup" passed after 0.001 seconds.
+◇ Suite SBDWeekBadgeTests started.
+◇ Test singleMainLiftReturnsItsFamily() started.
+✔ Test singleMainLiftReturnsItsFamily() passed after 0.001 seconds.
+◇ Test variationCountsTowardItsFamily() started.
+✔ Test variationCountsTowardItsFamily() passed after 0.001 seconds.
+◇ Test mainLiftAndVariationOfSameFamilyDedupe() started.
+✔ Test mainLiftAndVariationOfSameFamilyDedupe() passed after 0.001 seconds.
+◇ Test squatPlusBenchOrdersSBeforeB() started.
+✔ Test squatPlusBenchOrdersSBeforeB() passed after 0.001 seconds.
+◇ Test orderIsAlwaysSBDRegardlessOfInputOrder() started.
+✔ Test orderIsAlwaysSBDRegardlessOfInputOrder() passed after 0.001 seconds.
+◇ Test benchPlusDeadliftReadsBD() started.
+✔ Test benchPlusDeadliftReadsBD() passed after 0.001 seconds.
+◇ Test accessoriesNeverContribute() started.
+✔ Test accessoriesNeverContribute() passed after 0.001 seconds.
+◇ Test mixedMainAndAccessoryKeepsOnlyMain() started.
+✔ Test mixedMainAndAccessoryKeepsOnlyMain() passed after 0.001 seconds.
+◇ Test emptyDayReturnsEmpty() started.
+✔ Test emptyDayReturnsEmpty() passed after 0.001 seconds.
+✔ Suite SBDWeekBadgeTests passed after 0.001 seconds.
+◇ Suite SessionReflectionStoreTests started.
+◇ Test savesAndReloadsReflection() started.
+✔ Test savesAndReloadsReflection() passed after 0.001 seconds.
+◇ Test unknownDayReturnsEmpty() started.
+✔ Test unknownDayReturnsEmpty() passed after 0.001 seconds.
+◇ Test differentStudentsDoNotShareReflections() started.
+✔ Test differentStudentsDoNotShareReflections() passed after 0.001 seconds.
+◇ Test emptyReflectionClearsStoredRecord() started.
+✔ Test emptyReflectionClearsStoredRecord() passed after 0.001 seconds.
+◇ Test sameCalendarDayReloadsRegardlessOfTimeOfDay() started.
+✔ Test sameCalendarDayReloadsRegardlessOfTimeOfDay() passed after 0.001 seconds.
+✔ Suite SessionReflectionStoreTests passed after 0.005 seconds.
+◇ Suite SessionReviewStoreTests started.
+◇ Test marksAndReloadsCompletion() started.
+✔ Test marksAndReloadsCompletion() passed after 0.001 seconds.
+◇ Test otherDayStaysIncomplete() started.
+✔ Test otherDayStaysIncomplete() passed after 0.001 seconds.
+◇ Test differentStudentsDoNotShareCompletion() started.
+✔ Test differentStudentsDoNotShareCompletion() passed after 0.001 seconds.
+◇ Test sameCalendarDayMatchesRegardlessOfTimeOfDay() started.
+✔ Test sameCalendarDayMatchesRegardlessOfTimeOfDay() passed after 0.001 seconds.
+✔ Suite SessionReviewStoreTests passed after 0.003 seconds.
+◇ Test setDisplayNumberConvertsZeroBasedIndexesAtDisplayBoundary() started.
+✔ Test setDisplayNumberConvertsZeroBasedIndexesAtDisplayBoundary() passed after 0.001 seconds.
+◇ Test draftSetDisplayNumberUsesZeroBasedPrescribedIndex() started.
+✔ Test draftSetDisplayNumberUsesZeroBasedPrescribedIndex() passed after 0.001 seconds.
+◇ Suite SetEntryPlateMathTests started.
+◇ Test setEntryAlwaysStartsWithCollarOff() started.
+✔ Test setEntryAlwaysStartsWithCollarOff() passed after 0.001 seconds.
+◇ Test perSideDropsCollarOnlyWhenOn() started.
+✔ Test perSideDropsCollarOnlyWhenOn() passed after 0.001 seconds.
+◇ Test bareBarWithoutCollarUsesExactEmptyBarCopy() started.
+✔ Test bareBarWithoutCollarUsesExactEmptyBarCopy() passed after 0.001 seconds.
+◇ Test collarOnlyLoadReadsAsCollarOnly() started.
+✔ Test collarOnlyLoadReadsAsCollarOnly() passed after 0.001 seconds.
+◇ Test groupedPlateCopyAndCollarSuffixAreExact() started.
+✔ Test groupedPlateCopyAndCollarSuffixAreExact() passed after 0.001 seconds.
+◇ Test platesMatchGreedyLoadForPerSide() started.
+✔ Test platesMatchGreedyLoadForPerSide() passed after 0.001 seconds.
+✔ Suite SetEntryPlateMathTests passed after 0.001 seconds.
+◇ Suite SetEntryRPEScaleTests started.
+◇ Test snapClampsAndRoundsToHalfSteps() started.
+✔ Test snapClampsAndRoundsToHalfSteps() passed after 0.001 seconds.
+◇ Test cellGeometryAccountsForTheGapsBetweenTicks() started.
+✔ Test cellGeometryAccountsForTheGapsBetweenTicks() passed after 0.001 seconds.
+◇ Test valueSnapsToTheNearestTickCentre() started.
+✔ Test valueSnapsToTheNearestTickCentre() passed after 0.001 seconds.
+◇ Test valueRoundsAtTheMidpointBetweenTwoTicks() started.
+✔ Test valueRoundsAtTheMidpointBetweenTwoTicks() passed after 0.001 seconds.
+◇ Test valueClampsOutsideTheStrip() started.
+✔ Test valueClampsOutsideTheStrip() passed after 0.001 seconds.
+◇ Test valueRejectsStripsTooNarrowToHoldElevenCells() started.
+✔ Test valueRejectsStripsTooNarrowToHoldElevenCells() passed after 0.001 seconds.
+◇ Test indexRoundTripsEveryStop() started.
+✔ Test indexRoundTripsEveryStop() passed after 0.001 seconds.
+◇ Test scrubIntentStaysUndecidedUntilTheFingerTravels() started.
+✔ Test scrubIntentStaysUndecidedUntilTheFingerTravels() passed after 0.001 seconds.
+◇ Test lockedIntentHoldsForTheRestOfTheGesture() started.
+✔ Test lockedIntentHoldsForTheRestOfTheGesture() passed after 0.001 seconds.
+◇ Test onlyAnUncommittedTouchWritesOnRelease() started.
+✔ Test onlyAnUncommittedTouchWritesOnRelease() passed after 0.001 seconds.
+◇ Test aScrollThatReturnsToItsStartStillRefusesToWrite() started.
+✔ Test aScrollThatReturnsToItsStartStillRefusesToWrite() passed after 0.001 seconds.
+◇ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() started.
+✔ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() passed after 0.001 seconds.
+◇ Test scrubIntentSplitsHorizontalFromVertical() started.
+✔ Test scrubIntentSplitsHorizontalFromVertical() passed after 0.001 seconds.
+◇ Test descriptionMapsEveryHalfStepToRIRCopy() started.
+✔ Test descriptionMapsEveryHalfStepToRIRCopy() passed after 0.001 seconds.
+◇ Test tickHeightsAndLitRangeMatchV3Contract() started.
+✔ Test tickHeightsAndLitRangeMatchV3Contract() passed after 0.001 seconds.
+◇ Test rpeTextBridgeSnapsClampsAndRoundTrips() started.
+✔ Test rpeTextBridgeSnapsClampsAndRoundTrips() passed after 0.001 seconds.
+◇ Test decimalSnapAlignsNonHalfStepSeed() started.
+✔ Test decimalSnapAlignsNonHalfStepSeed() passed after 0.001 seconds.
+✔ Suite SetEntryRPEScaleTests passed after 0.001 seconds.
+◇ Suite SetEntryValueTests started.
+◇ Test parsesMultiDigitAndDecimal() started.
+✔ Test parsesMultiDigitAndDecimal() passed after 0.001 seconds.
+◇ Test rpeTenIsNotTruncated() started.
+✔ Test rpeTenIsNotTruncated() passed after 0.001 seconds.
+◇ Test clampsOutOfRangeOnCommit() started.
+✔ Test clampsOutOfRangeOnCommit() passed after 0.001 seconds.
+◇ Test commaDecimalIsNormalized() started.
+✔ Test commaDecimalIsNormalized() passed after 0.001 seconds.
+◇ Test emptyOrGarbageFallsBackSafely() started.
+✔ Test emptyOrGarbageFallsBackSafely() passed after 0.001 seconds.
+◇ Test textRoundTripsWithoutTrailingZeros() started.
+✔ Test textRoundTripsWithoutTrailingZeros() passed after 0.001 seconds.
+✔ Suite SetEntryValueTests passed after 0.001 seconds.
+◇ Test fieldReEditCountsCompletedEditSessionsNotKeystrokes() started.
+✔ Test fieldReEditCountsCompletedEditSessionsNotKeystrokes() passed after 0.001 seconds.
+◇ Test completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test case passing 2 arguments text → "", allowed → false to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test case passing 2 arguments text → "   ", allowed → false to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test case passing 2 arguments text → "0", allowed → true to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+◇ Test case passing 2 arguments text → "142.5", allowed → true to completionEligibilityRequiresExplicitWeight(text:allowed:) started.
+✔ Test completionEligibilityRequiresExplicitWeight(text:allowed:) with 4 test cases passed after 0.001 seconds.
+◇ Test "Badge-facing parsers hide untouched fields instead of clamping them" started.
+✔ Test "Badge-facing parsers hide untouched fields instead of clamping them" passed after 0.001 seconds.
+◇ Suite SetEntryVideoPlaybackStateTests started.
+◇ Test playbackStartsPausedAndExpansionPreservesTimeAndSpeed() started.
+✔ Test playbackStartsPausedAndExpansionPreservesTimeAndSpeed() passed after 0.001 seconds.
+✔ Suite SetEntryVideoPlaybackStateTests passed after 0.001 seconds.
+◇ Suite SetEntryVideoPlayerTests started.
+◇ Test centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) started.
+◇ Test case passing 1 argument expanded → false to centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) started.
+◇ Test case passing 1 argument expanded → true to centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) started.
+✔ Test centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded:) with 2 test cases passed after 0.048 seconds.
+◇ Test surfaceHandoffExclusivelyBindsPlayerAndIgnoresLateDetach() started.
+✔ Test surfaceHandoffExclusivelyBindsPlayerAndIgnoresLateDetach() passed after 0.016 seconds.
+◇ Test staleUpdateFromOutgoingSurfaceDoesNotStealPlayer() started.
+✔ Test staleUpdateFromOutgoingSurfaceDoesNotStealPlayer() passed after 0.001 seconds.
+◇ Test resizingPlayerSurfacePreservesActualPlaybackTime() started.
+✔ Test resizingPlayerSurfacePreservesActualPlaybackTime() passed after 0.949 seconds.
+◇ Test expandedHeaderIncludesAvailableSetMetrics() started.
+✔ Test expandedHeaderIncludesAvailableSetMetrics() passed after 0.006 seconds.
+◇ Test expandedHeaderOmitsMissingFields() started.
+✔ Test expandedHeaderOmitsMissingFields() passed after 0.003 seconds.
+◇ Test setOrdinalIsInterpolatedInBothLanguages() started.
+✔ Test setOrdinalIsInterpolatedInBothLanguages() passed after 0.001 seconds.
+✔ Suite SetEntryVideoPlayerTests passed after 1.027 seconds.
+◇ Suite "Set number surfaces" started.
+◇ Test "feedback detail renders source index zero as set one" started.
+✔ Test "feedback detail renders source index zero as set one" passed after 0.012 seconds.
+◇ Test "v3 set row renders source index zero as set one" started.
+✔ Test "v3 set row renders source index zero as set one" passed after 0.007 seconds.
+◇ Test "today workout table offset path renders source index zero as set one" started.
+✔ Test "today workout table offset path renders source index zero as set one" passed after 0.210 seconds.
+◇ Test "today workout hero stored-index path renders source index zero as set one" started.
+✔ Test "today workout hero stored-index path renders source index zero as set one" passed after 0.069 seconds.
+◇ Test "set entry sheet renders a source-zero draft as set one" started.
+✔ Test "set entry sheet renders a source-zero draft as set one" passed after 0.022 seconds.
+◇ Test "dashboard feedback label renders source index zero as set one" started.
+✔ Test "dashboard feedback label renders source index zero as set one" passed after 0.001 seconds.
+◇ Test "day detail renders source index zero as set one" started.
+✔ Test "day detail renders source index zero as set one" passed after 0.007 seconds.
+◇ Test "history entries render source index zero as set one" started.
+✔ Test "history entries render source index zero as set one" passed after 0.014 seconds.
+✔ Suite "Set number surfaces" passed after 0.345 seconds.
+◇ Test setVideoButtonOpensCameraOnlyForAnUnattachedSetOnCameraDevices() started.
+✔ Test setVideoButtonOpensCameraOnlyForAnUnattachedSetOnCameraDevices() passed after 0.001 seconds.
+◇ Test setVideoButtonPreservesExistingUploadManagementRoutes() started.
+✔ Test setVideoButtonPreservesExistingUploadManagementRoutes() passed after 0.001 seconds.
+◇ Test setVideoUploadIndicatorStyleMapsEveryUploadStatus() started.
+✔ Test setVideoUploadIndicatorStyleMapsEveryUploadStatus() passed after 0.001 seconds.
+◇ Test setVideoUploadIndicatorIgnoresUploadProgress() started.
+✔ Test setVideoUploadIndicatorIgnoresUploadProgress() passed after 0.001 seconds.
+◇ Test setVideoUploadIndicatorStrokeColorsMatchDesignTokens() started.
+✔ Test setVideoUploadIndicatorStrokeColorsMatchDesignTokens() passed after 0.001 seconds.
+◇ Test setVideoUploadIndicatorAccessibilityLabelsAreDistinct() started.
+✔ Test setVideoUploadIndicatorAccessibilityLabelsAreDistinct() passed after 0.001 seconds.
+◇ Suite SetWeightSuggestionOutcomeTests started.
+◇ Test failedMatchingMainLiftSetFallsBackToE1RM() started.
+✔ Test failedMatchingMainLiftSetFallsBackToE1RM() passed after 0.001 seconds.
+◇ Test failedVariationSetFallsBackToEarlierSessionWeight() started.
+✔ Test failedVariationSetFallsBackToEarlierSessionWeight() passed after 0.001 seconds.
+◇ Test mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) started.
+◇ Test case passing 2 arguments prescribed → PrescribedSet(id: 779B3F66-23D8-4628-9B40-1D7FC319B5DF, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expectedReason → .noEligibleE1RMHistory to mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) started.
+◇ Test case passing 2 arguments prescribed → PrescribedSet(id: 81904E9C-6BC5-402E-930B-8F72A4358B99, setIndex: 0, weightKg: nil, intensity: nil, percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expectedReason → .missingPrescribedRPE to mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) started.
+◇ Test case passing 2 arguments prescribed → PrescribedSet(id: 781FEE51-E10D-4A15-8FB1-C7FA5E7F9A72, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: nil, repsMax: nil, restSeconds: nil, coachNote: nil), expectedReason → .missingPrescribedReps to mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) started.
+◇ Test case passing 2 arguments prescribed → PrescribedSet(id: 861DDED2-D246-4BE0-B1C7-EF877CE87DCA, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: Optional(13), repsMax: nil, restSeconds: nil, coachNote: nil), expectedReason → .prescribedRepsOutsideSupportedRange to mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) started.
+◇ Test case passing 2 arguments prescribed → PrescribedSet(id: 56130CEC-0E3A-4341-925F-07C19F2C18F0, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(4.5)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expectedReason → .prescribedRPEBelowSupportedRange to mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) started.
+◇ Test case passing 2 arguments prescribed → PrescribedSet(id: DAB1447A-6962-4F26-BDBF-7666217A6BA8, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(10.5)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expectedReason → .prescribedRPEAboveSupportedRange to mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) started.
+✔ Test mainLiftUnavailableReasonMatchesPrescription(prescribed:expectedReason:) with 6 test cases passed after 0.001 seconds.
+◇ Test variationWithoutHistoryReturnsExerciseHistoryReason() started.
+✔ Test variationWithoutHistoryReturnsExerciseHistoryReason() passed after 0.001 seconds.
+◇ Test availableSuggestionHasNoUnavailableReason() started.
+✔ Test availableSuggestionHasNoUnavailableReason() passed after 0.001 seconds.
+◇ Test sheetKeepsUnavailableOutcomeAndDefaultWeightFromItsOpeningSnapshot() started.
+✔ Test sheetKeepsUnavailableOutcomeAndDefaultWeightFromItsOpeningSnapshot() passed after 0.001 seconds.
+◇ Test sheetKeepsSuggestedWeightWithoutAddingALiveUnavailableHint() started.
+✔ Test sheetKeepsSuggestedWeightWithoutAddingALiveUnavailableHint() passed after 0.001 seconds.
+◇ Test sheetPrefillsResolvedPercentageAndFixedWeight() started.
+✔ Test sheetPrefillsResolvedPercentageAndFixedWeight() passed after 0.096 seconds.
+◇ Test unresolvedTopSetSheetShowsDashAndWaitingSourceWithoutAutomaticBadge() started.
+✔ Test unresolvedTopSetSheetShowsDashAndWaitingSourceWithoutAutomaticBadge() passed after 0.052 seconds.
+◇ Test sheetDoesNotPrefillEmptyBarForUnsupportedIntensity() started.
+✔ Test sheetDoesNotPrefillEmptyBarForUnsupportedIntensity() passed after 0.001 seconds.
+✔ Suite SetWeightSuggestionOutcomeTests passed after 0.150 seconds.
+◇ Suite SetWeightSuggestionTests started.
+◇ Test exerciseReferenceRetainsBestPointE1RM() started.
+✔ Test exerciseReferenceRetainsBestPointE1RM() passed after 0.001 seconds.
+◇ Test matchingCompletedSetWinsOverE1RM() started.
+✔ Test matchingCompletedSetWinsOverE1RM() passed after 0.001 seconds.
+◇ Test uncompletedMismatchedRPEOrOtherExerciseSetsAreIgnored() started.
+✔ Test uncompletedMismatchedRPEOrOtherExerciseSetsAreIgnored() passed after 0.001 seconds.
+◇ Test forwardComputedE1RMSurvivesFloorWithoutDroppingAStep() started.
+✔ Test forwardComputedE1RMSurvivesFloorWithoutDroppingAStep() passed after 0.001 seconds.
+◇ Test persistedUntouchedSeedKeepsSuggestionUntilCompletedOrEdited() started.
+✔ Test persistedUntouchedSeedKeepsSuggestionUntilCompletedOrEdited() passed after 0.001 seconds.
+◇ Test differentPrescriptionFallsBackToRoundedE1RMWeight() started.
+✔ Test differentPrescriptionFallsBackToRoundedE1RMWeight() passed after 0.001 seconds.
+◇ Test missingHistoryLeavesWeightUnseeded() started.
+✔ Test missingHistoryLeavesWeightUnseeded() passed after 0.001 seconds.
+◇ Test existingActualOrPrescribedWeightIsNeverOverridden() started.
+✔ Test existingActualOrPrescribedWeightIsNeverOverridden() passed after 0.001 seconds.
+◇ Test variationSameDayCompletedSetWinsRegardlessOfPrescription() started.
+✔ Test variationSameDayCompletedSetWinsRegardlessOfPrescription() passed after 0.001 seconds.
+◇ Test variationFallsBackToLastLoggedWeightAndNeverUsesE1RM() started.
+✔ Test variationFallsBackToLastLoggedWeightAndNeverUsesE1RM() passed after 0.001 seconds.
+◇ Test mainLiftIgnoresLastLoggedWeight() started.
+✔ Test mainLiftIgnoresLastLoggedWeight() passed after 0.001 seconds.
+✔ Suite SetWeightSuggestionTests passed after 0.001 seconds.
+◇ Suite LastWeightsTests started.
+◇ Test lastWeightsPicksLatestCompletedLogPerExercise() started.
+✔ Test lastWeightsPicksLatestCompletedLogPerExercise() passed after 0.001 seconds.
+◇ Test historyRangeExcludesTheViewedDayEntirely() started.
+✔ Test historyRangeExcludesTheViewedDayEntirely() passed after 0.001 seconds.
+✔ Suite LastWeightsTests passed after 0.001 seconds.
+◇ Test cachedAddedLedgerCannotAuthorizeDerivedDeletionRepair() started.
+✔ Test cachedAddedLedgerCannotAuthorizeDerivedDeletionRepair() passed after 0.001 seconds.
+◇ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() started.
+✔ Test planOnlyCatalogKeepsAddedNamesOnFirstLoad() passed after 0.001 seconds.
+◇ Test catalogFailurePreservesAddedRowsAndNextLoadRestoresTheirNames() started.
+✔ Test catalogFailurePreservesAddedRowsAndNextLoadRestoresTheirNames() passed after 0.001 seconds.
+◇ Test unavailableCatalogCannotEraseHistoricalWeightBaseline() started.
+✔ Test unavailableCatalogCannotEraseHistoricalWeightBaseline() passed after 0.001 seconds.
+◇ Test addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_ATTACHMENT" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SET_HAS_COACH_FEEDBACK" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SETS_ADHOC_DAY_CONFLICT" to addedErrorsHaveSpecificRecovery(code:) started.
+◇ Test case passing 1 argument code → "SET_NOT_STUDENT_ADDED" to addedErrorsHaveSpecificRecovery(code:) started.
+✔ Test addedErrorsHaveSpecificRecovery(code:) with 4 test cases passed after 0.001 seconds.
+◇ Test addedFailureKeepsInputAndPinnedDateAcrossRetry() started.
+✔ Test addedFailureKeepsInputAndPinnedDateAcrossRetry() passed after 0.001 seconds.
+◇ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() started.
+✔ Test addedWriteFinishingAfterDaySwitchKeepsCanonicalID() passed after 0.001 seconds.
+◇ Test extraFailureKeepsInputAndCanRetry() started.
+✔ Test extraFailureKeepsInputAndCanRetry() passed after 0.001 seconds.
+◇ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() started.
+✔ Test deletingLastAddedRowDuringDaySwitchClearsDatePin() passed after 0.001 seconds.
+◇ Test plannedBaselinesKeepCompetitionStanceWhileAddedRecordsUseTheirFamily() started.
+✔ Test plannedBaselinesKeepCompetitionStanceWhileAddedRecordsUseTheirFamily() passed after 0.001 seconds.
+◇ Test extraRowsNeverReplacePrescriptionProgressAndBatch() started.
+✔ Test extraRowsNeverReplacePrescriptionProgressAndBatch() passed after 0.001 seconds.
+◇ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() started.
+✔ Test quickLogKeepsExtraRowsReadOnlyAndEnforcesTenExtraLimit() passed after 0.001 seconds.
+◇ Test addedHistoryMarksExtraAndIncludesFamilyRecords() started.
+✔ Test addedHistoryMarksExtraAndIncludesFamilyRecords() passed after 0.001 seconds.
+◇ Test extraPrefillUsesMostRecentlyRecordedSet() started.
+✔ Test extraPrefillUsesMostRecentlyRecordedSet() passed after 0.001 seconds.
+◇ Test addedRecordsContributeToHistoryStatsAndCSV() started.
+✔ Test addedRecordsContributeToHistoryStatsAndCSV() passed after 0.001 seconds.
+◇ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() started.
+✔ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() passed after 0.001 seconds.
+◇ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() started.
+✔ Test changingFlexibleDayEndsRestAndPreservesRecordedSets() passed after 0.001 seconds.
+◇ Test addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes() started.
+✔ Test addedWorkoutWritesExtraAndDayBoundAdhocAndDeletes() passed after 0.001 seconds.
+◇ Test addedCancellationDoesNotRepeatCompletionFeedback() started.
+✔ Test addedCancellationDoesNotRepeatCompletionFeedback() passed after 0.001 seconds.
+◇ Test addedRowsRestoreOwnerAndPinnedDateAcrossDaySwitch() started.
+✔ Test addedRowsRestoreOwnerAndPinnedDateAcrossDaySwitch() passed after 0.001 seconds.
+◇ Test deletingAddedSetRemovesItsE1RMAndPR() started.
+✔ Test deletingAddedSetRemovesItsE1RMAndPR() passed after 0.001 seconds.
+◇ Test fullEntryRejectsOtherWeekWrites() started.
+✔ Test fullEntryRejectsOtherWeekWrites() passed after 0.001 seconds.
+◇ Test addedExercisesAndRowsStopAtTenWithoutChangingPrescription() started.
+✔ Test addedExercisesAndRowsStopAtTenWithoutChangingPrescription() passed after 0.001 seconds.
+◇ Test addedPreviousRecordCanFillWeightAndRepsWithoutRPE() started.
+✔ Test addedPreviousRecordCanFillWeightAndRepsWithoutRPE() passed after 0.001 seconds.
+◇ Test deletedHighestAddedWeightRestoresNonPRBaseline() started.
+✔ Test deletedHighestAddedWeightRestoresNonPRBaseline() passed after 0.001 seconds.
+◇ Test extraCancellationRemovesE1RMAndPR() started.
+✔ Test extraCancellationRemovesE1RMAndPR() passed after 0.001 seconds.
+◇ Test authoritativeLedgerRepairsDeletedSourceAfterReopening() started.
+✔ Test authoritativeLedgerRepairsDeletedSourceAfterReopening() passed after 0.001 seconds.
+◇ Test staleLedgerCannotEraseASetSavedWhileItWasBeingFetched() started.
+✔ Test staleLedgerCannotEraseASetSavedWhileItWasBeingFetched() passed after 0.001 seconds.
+◇ Test studentChatTimelineMergesAllFourPresentationKindsByTimestamp() started.
+✔ Test studentChatTimelineMergesAllFourPresentationKindsByTimestamp() passed after 0.001 seconds.
+◇ Test feedbackReadVisibilityMatchesMockupFiftyFivePercentBoundary() started.
+✔ Test feedbackReadVisibilityMatchesMockupFiftyFivePercentBoundary() passed after 0.001 seconds.
+◇ Test chatVideoLabelUsesSameOneBasedSetNumberAsFeedbackArchive() started.
+✔ Test chatVideoLabelUsesSameOneBasedSetNumberAsFeedbackArchive() passed after 0.001 seconds.
+◇ Test chatVideoLabelUsesEnglishExerciseNameInEnglishLocale() started.
+✔ Test chatVideoLabelUsesEnglishExerciseNameInEnglishLocale() passed after 0.001 seconds.
+◇ Test studentChatHistoryPagingPrependsOlderMessagesAndReturnsStableAnchor() started.
+✔ Test studentChatHistoryPagingPrependsOlderMessagesAndReturnsStableAnchor() passed after 0.001 seconds.
+◇ Test studentDemoSeedIsWellFormed() started.
+✔ Test studentDemoSeedIsWellFormed() passed after 0.001 seconds.
+◇ Test demoStudentKeepsSquatBenchDeadliftE1RMThroughCompetitionGate() started.
+✔ Test demoStudentKeepsSquatBenchDeadliftE1RMThroughCompetitionGate() passed after 0.001 seconds.
+◇ Test growthFormingDemoHasOneEligibleSetAndOneHistoryPoint() started.
+✔ Test growthFormingDemoHasOneEligibleSetAndOneHistoryPoint() passed after 0.001 seconds.
+◇ Test relativeSeedD1MatchesDeviceTodayAcrossUTCBoundary() started.
+✔ Test relativeSeedD1MatchesDeviceTodayAcrossUTCBoundary() passed after 0.001 seconds.
+◇ Suite "Student empty and failure states" started.
+◇ Test "empty dashboard metrics render both actionable placeholders" started.
+✔ Test "empty dashboard metrics render both actionable placeholders" passed after 0.006 seconds.
+◇ Test "dashboard restores the structured loading skeleton" started.
+✔ Test "dashboard restores the structured loading skeleton" passed after 0.001 seconds.
+◇ Test "rest day cursor restores the header badge" started.
+✔ Test "rest day cursor restores the header badge" passed after 0.020 seconds.
+◇ Test "planning state retains the profile metrics row" started.
+✔ Test "planning state retains the profile metrics row" passed after 0.054 seconds.
+◇ Test "profile metrics failures stay visible instead of disappearing" started.
+✔ Test "profile metrics failures stay visible instead of disappearing" passed after 0.012 seconds.
+◇ Test "loaded empty feedback renders guidance only after loading finishes" started.
+✔ Test "loaded empty feedback renders guidance only after loading finishes" passed after 0.002 seconds.
+◇ Test "week error and interrupted idle resolve to retry states" started.
+✔ Test "week error and interrupted idle resolve to retry states" passed after 0.001 seconds.
+◇ Test "week errors do not render the planning empty state" started.
+✔ Test "week errors do not render the planning empty state" passed after 0.002 seconds.
+◇ Test "account actions remain reachable in profile fallback states" started.
+✔ Test "account actions remain reachable in profile fallback states" passed after 0.010 seconds.
+◇ Test "volume chart exposes its own insufficient-data state" started.
+✔ Test "volume chart exposes its own insufficient-data state" passed after 0.003 seconds.
+◇ Test "e1RM failure stays distinct from true empty history" started.
+✔ Test "e1RM failure stays distinct from true empty history" passed after 0.014 seconds.
+✔ Suite "Student empty and failure states" passed after 0.128 seconds.
+◇ Test demoCatalogKeepsBothLanguagesForPickerSearch() started.
+✔ Test demoCatalogKeepsBothLanguagesForPickerSearch() passed after 0.001 seconds.
+◇ Test studentPickerMapsEveryMuscleAndFamily() started.
+✔ Test studentPickerMapsEveryMuscleAndFamily() passed after 0.001 seconds.
+◇ Test studentPickerIncludesThreeFamiliesMultipleMusclesAndUnclassifiedExercises() started.
+✔ Test studentPickerIncludesThreeFamiliesMultipleMusclesAndUnclassifiedExercises() passed after 0.001 seconds.
+◇ Test feedbackRepositoryFiltersInboxAndMarksRead() started.
+✔ Test feedbackRepositoryFiltersInboxAndMarksRead() passed after 0.001 seconds.
+◇ Test feedbackRepositoryIsolatesStudents() started.
+✔ Test feedbackRepositoryIsolatesStudents() passed after 0.001 seconds.
+◇ Test feedbackRepositoryPostsNewUnreadFeedback() started.
+✔ Test feedbackRepositoryPostsNewUnreadFeedback() passed after 0.001 seconds.
+◇ Test feedbackRepositoryPreservesVideoIDAndResolvesPlaybackURL() started.
+✔ Test feedbackRepositoryPreservesVideoIDAndResolvesPlaybackURL() passed after 0.001 seconds.
+◇ Test localizedDateFormatsPreserveSimplifiedChineseOutput() started.
+✔ Test localizedDateFormatsPreserveSimplifiedChineseOutput() passed after 0.001 seconds.
+◇ Test completionDatePreservesSimplifiedChineseOutput() started.
+✔ Test completionDatePreservesSimplifiedChineseOutput() passed after 0.001 seconds.
+◇ Test prescribedIntensityFormattingIsFaithful(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: 4A2CE390-415E-4AD5-B1C6-D14E15B6E7AF, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.percentage(72.5)), percentageAnchor: Optional(CoreModels.PercentageAnchor.registeredOneRM), loadMode: Optional(CoreModels.PlanLoadMode.percentage), reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "72.5% × 5" to prescribedIntensityFormattingIsFaithful(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: 913A199B-B39D-420F-9E13-08DC4671B067, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpeRange(8, 9)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.rpeRange), reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "RPE 8–9 × 5" to prescribedIntensityFormattingIsFaithful(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: 3D1ACC4D-67E6-4407-9740-602B378D3A7D, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.weightRange(165, 175)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.weightRange), reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "165–175kg × 5" to prescribedIntensityFormattingIsFaithful(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: F75BBE7C-CB5E-447A-9F2E-6B66A99AEDC9, setIndex: 0, weightKg: Optional(170), intensity: Optional(CoreModels.PrescribedIntensity.rpe(9)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.rpe), reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "170kg × 5 @RPE9" to prescribedIntensityFormattingIsFaithful(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: 7A371231-C10F-4E11-A214-3776512D67F7, setIndex: 0, weightKg: Optional(150), intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.rpe), reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "150kg × 5" to prescribedIntensityFormattingIsFaithful(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: 30EE1C43-092D-4E5E-8091-CDE3A8B7AAC7, setIndex: 0, weightKg: Optional(150), intensity: nil, percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.fixedWeight), reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "150kg × 5" to prescribedIntensityFormattingIsFaithful(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: F39CF662-78BF-416C-BF8B-6D297E074A45, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rir(2)), percentageAnchor: nil, loadMode: Optional(CoreModels.PlanLoadMode.rir), reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "RIR 2 × 5" to prescribedIntensityFormattingIsFaithful(set:expected:) started.
+✔ Test prescribedIntensityFormattingIsFaithful(set:expected:) with 7 test cases passed after 0.001 seconds.
+◇ Test legacyPrescriptionFormattingIsUnchanged(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: 13D4C16C-0AF4-4709-9833-9D6C764493FC, setIndex: 0, weightKg: Optional(140), intensity: nil, percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "140kg x 5" to legacyPrescriptionFormattingIsUnchanged(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: E1F70FF1-0F44-42C3-B738-0BACED2760EB, setIndex: 0, weightKg: nil, intensity: Optional(CoreModels.PrescribedIntensity.rpe(8)), percentageAnchor: nil, loadMode: nil, reps: Optional(5), repsMax: nil, restSeconds: nil, coachNote: nil), expected → "-kg x 5" to legacyPrescriptionFormattingIsUnchanged(set:expected:) started.
+◇ Test case passing 2 arguments set → PrescribedSet(id: 5040F129-52B9-42F8-9C63-618EE4BFAFBB, setIndex: 0, weightKg: Optional(142.5), intensity: nil, percentageAnchor: nil, loadMode: nil, reps: Optional(3), repsMax: Optional(5), restSeconds: nil, coachNote: nil), expected → "142.5kg x 3-5" to legacyPrescriptionFormattingIsUnchanged(set:expected:) started.
+✔ Test legacyPrescriptionFormattingIsUnchanged(set:expected:) with 3 test cases passed after 0.001 seconds.
+◇ Test heroUsesPercentageAsPrimaryTextWithoutFabricatedRPE() started.
+✔ Test heroUsesPercentageAsPrimaryTextWithoutFabricatedRPE() passed after 0.001 seconds.
+◇ Test resolvedPercentageShowsApproximateWeightAndOriginalAnchor() started.
+✔ Test resolvedPercentageShowsApproximateWeightAndOriginalAnchor() passed after 0.001 seconds.
+◇ Test unresolvedTopSetShowsSemanticInstructionWithoutPrefill() started.
+✔ Test unresolvedTopSetShowsSemanticInstructionWithoutPrefill() passed after 0.001 seconds.
+◇ Test unsupportedPercentageExerciseOnlyShowsOriginalPercentage() started.
+✔ Test unsupportedPercentageExerciseOnlyShowsOriginalPercentage() passed after 0.001 seconds.
+◇ Test accessoryPercentageSubtitleExplainsThatNoConversionOccurs() started.
+✔ Test accessoryPercentageSubtitleExplainsThatNoConversionOccurs() passed after 0.001 seconds.
+◇ Test e1RMAndFallbackSubtitlesNameTheAnchorActuallyUsed() started.
+✔ Test e1RMAndFallbackSubtitlesNameTheAnchorActuallyUsed() passed after 0.001 seconds.
+◇ Test topSetRowAndBackoffRefreshFromWaitingToResolvedInPlace() started.
+✔ Test topSetRowAndBackoffRefreshFromWaitingToResolvedInPlace() passed after 0.001 seconds.
+◇ Test topSetMarkingAndSubtitleResolveAcrossRowsOfTheSameExercise() started.
+✔ Test topSetMarkingAndSubtitleResolveAcrossRowsOfTheSameExercise() passed after 0.001 seconds.
+◇ Test heroShowsIndependentRPEAlongsideWeight() started.
+✔ Test heroShowsIndependentRPEAlongsideWeight() passed after 0.001 seconds.
+◇ Test sparseNewFormRowUsesNewHeroWithoutIntensityBlock() started.
+✔ Test sparseNewFormRowUsesNewHeroWithoutIntensityBlock() passed after 0.001 seconds.
+◇ Test legacyRowKeepsLegacyHeroAndRecordSummary() started.
+✔ Test legacyRowKeepsLegacyHeroAndRecordSummary() passed after 0.001 seconds.
+◇ Test heterogeneousSetsSummarizeAsCountOnly() started.
+✔ Test heterogeneousSetsSummarizeAsCountOnly() passed after 0.001 seconds.
+◇ Test mixedLegacyAndNewFormSetsSummarizeAsCountOnly() started.
+✔ Test mixedLegacyAndNewFormSetsSummarizeAsCountOnly() passed after 0.001 seconds.
+◇ Test uniformSetsKeepNamedSummary() started.
+✔ Test uniformSetsKeepNamedSummary() passed after 0.001 seconds.
+◇ Test studentProjectionUsesCanonicalIntensityFieldsAndIgnoresLegacyProjection() started.
+✔ Test studentProjectionUsesCanonicalIntensityFieldsAndIgnoresLegacyProjection() passed after 0.001 seconds.
+◇ Test scheduledDateKeepsLegacyStartDateWhenAnchorIsNil() started.
+✔ Test scheduledDateKeepsLegacyStartDateWhenAnchorIsNil() passed after 0.001 seconds.
+◇ Test scheduledDateIncludesStartDateWhenItMatchesAnchor() started.
+✔ Test scheduledDateIncludesStartDateWhenItMatchesAnchor() passed after 0.001 seconds.
+◇ Test scheduledDateMovesToNextAnchorAndAppliesCrossWeekOffset() started.
+✔ Test scheduledDateMovesToNextAnchorAndAppliesCrossWeekOffset() passed after 0.001 seconds.
+◇ Test accessoryProjectionDoesNotInventCoachRestFromMainLiftRules() started.
+✔ Test accessoryProjectionDoesNotInventCoachRestFromMainLiftRules() passed after 0.001 seconds.
+◇ Test accessoryProjectionPreservesCoachRestAndMainLiftVariants() started.
+✔ Test accessoryProjectionPreservesCoachRestAndMainLiftVariants() passed after 0.001 seconds.
+◇ Test studentProjectionDropsCorruptZeroSetNumber() started.
+✔ Test studentProjectionDropsCorruptZeroSetNumber() passed after 0.001 seconds.
+◇ Test studentProjectionUsesCanonicalSequenceOrder() started.
+✔ Test studentProjectionUsesCanonicalSequenceOrder() passed after 0.001 seconds.
+◇ Test projectionCarriesCoachNoteOntoPrescribedSet() started.
+✔ Test projectionCarriesCoachNoteOntoPrescribedSet() passed after 0.001 seconds.
+◇ Test studentPlanRepositoryFetchesProjectionAndSlicesDayByIdentity() started.
+✔ Test studentPlanRepositoryFetchesProjectionAndSlicesDayByIdentity() passed after 0.001 seconds.
+◇ Test manualCompletionAdvancesCursorAndUndoRestoresIt() started.
+✔ Test manualCompletionAdvancesCursorAndUndoRestoresIt() passed after 0.001 seconds.
+◇ Test zeroSetDayCanBeCompletedManually() started.
+✔ Test zeroSetDayCanBeCompletedManually() passed after 0.001 seconds.
+◇ Test undoRejectsCompletionThatIsNotLatest() started.
+✔ Test undoRejectsCompletionThatIsNotLatest() passed after 0.001 seconds.
+◇ Test undoRejectsCompletionOutsideCurrentGymDay() started.
+✔ Test undoRejectsCompletionOutsideCurrentGymDay() passed after 0.001 seconds.
+◇ Test recordingEveryPrescribedSlotDoesNotCompleteDayUntilManualCompletion() started.
+✔ Test recordingEveryPrescribedSlotDoesNotCompleteDayUntilManualCompletion() passed after 0.001 seconds.
+◇ Test failedPrescribedSetDoesNotCompleteDayUntilManualCompletion() started.
+✔ Test failedPrescribedSetDoesNotCompleteDayUntilManualCompletion() passed after 0.001 seconds.
+◇ Test undoWindowUsesDeviceFourAMBoundary() started.
+✔ Test undoWindowUsesDeviceFourAMBoundary() passed after 0.001 seconds.
+◇ Test undoThenRefillingSetRequiresManualCompletionAgain() started.
+✔ Test undoThenRefillingSetRequiresManualCompletionAgain() passed after 0.001 seconds.
+◇ Test currentPlanSelectionPrefersPublishedThenCreatedThenIdentity() started.
+✔ Test currentPlanSelectionPrefersPublishedThenCreatedThenIdentity() passed after 0.001 seconds.
+◇ Test completionMachineCodesMapToDomain(machineCode:expected:) started.
+◇ Test case passing 2 arguments machineCode → "NOT_LATEST_COMPLETION", expected → .notLatestCompletion to completionMachineCodesMapToDomain(machineCode:expected:) started.
+◇ Test case passing 2 arguments machineCode → "UNDO_WINDOW_PASSED", expected → .undoWindowPassed to completionMachineCodesMapToDomain(machineCode:expected:) started.
+◇ Test case passing 2 arguments machineCode → "PLAN_NOT_ACTIVE", expected → .planNotActive to completionMachineCodesMapToDomain(machineCode:expected:) started.
+◇ Test case passing 2 arguments machineCode → "NOT_PLAN_STUDENT", expected → .notPlanStudent to completionMachineCodesMapToDomain(machineCode:expected:) started.
+✔ Test completionMachineCodesMapToDomain(machineCode:expected:) with 4 test cases passed after 0.001 seconds.
+◇ Test backendExerciseCatalogUsesDiskCopyWhenServerReturnsNotModified() started.
+✔ Test backendExerciseCatalogUsesDiskCopyWhenServerReturnsNotModified() passed after 0.001 seconds.
+◇ Test restTimerSettingsDefaultToAutomaticAndPersistCustomBands() started.
+✔ Test restTimerSettingsDefaultToAutomaticAndPersistCustomBands() passed after 0.001 seconds.
+◇ Test restTimerPreferenceIsIsolatedPerStudent() started.
+✔ Test restTimerPreferenceIsIsolatedPerStudent() passed after 0.001 seconds.
+◇ Test restTimerSettingsRejectUnsupportedCustomDurations() started.
+✔ Test restTimerSettingsRejectUnsupportedCustomDurations() passed after 0.001 seconds.
+◇ Test legacyFixedDurationMigratesToThreeEqualBands() started.
+✔ Test legacyFixedDurationMigratesToThreeEqualBands() passed after 0.001 seconds.
+◇ Test restTimerPreferenceFallsBackToAutomaticOnCorruptPersistedValue() started.
+✔ Test restTimerPreferenceFallsBackToAutomaticOnCorruptPersistedValue() passed after 0.001 seconds.
+◇ Test unsupportedPersistedVersionFallsBackToAutomatic() started.
+✔ Test unsupportedPersistedVersionFallsBackToAutomatic() passed after 0.001 seconds.
+◇ Test migratedLegacyValueRoundTripsThroughCurrentFormat() started.
+✔ Test migratedLegacyValueRoundTripsThroughCurrentFormat() passed after 0.001 seconds.
+◇ Test restTimerExplanationFlagPersistsPerStudent() started.
+✔ Test restTimerExplanationFlagPersistsPerStudent() passed after 0.001 seconds.
+◇ Test accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences() started.
+✔ Test accessoryRestUsesIndependentKeyAndPreservesLegacyPreferences() passed after 0.001 seconds.
+◇ Test studentRootViewInitializes() started.
+✔ Test studentRootViewInitializes() passed after 0.001 seconds.
+◇ Test studentRootViewInitializesWithInjectedRepositories() started.
+✔ Test studentRootViewInitializesWithInjectedRepositories() passed after 0.001 seconds.
+◇ Test selfTrainRoleGateBuildsNoChatCoordinatorAndMakesZeroRequests() started.
+✔ Test selfTrainRoleGateBuildsNoChatCoordinatorAndMakesZeroRequests() passed after 0.001 seconds.
+◇ Test coachedRoleGateBuildsSharedNotificationCoordinator() started.
+✔ Test coachedRoleGateBuildsSharedNotificationCoordinator() passed after 0.001 seconds.
+◇ Test notificationRoutesAreIdenticalFromEveryTab() started.
+✔ Test notificationRoutesAreIdenticalFromEveryTab() passed after 0.001 seconds.
+◇ Test planChangePushIntentsMapToTheStudentPlanRoute() started.
+✔ Test planChangePushIntentsMapToTheStudentPlanRoute() passed after 0.001 seconds.
+◇ Test tabLayersRemainMountedAcrossSelectionRoundTrip() started.
+✔ Test tabLayersRemainMountedAcrossSelectionRoundTrip() passed after 0.001 seconds.
+◇ Test exactlyOneTabLayerParticipatesInAccessibility() started.
+✔ Test exactlyOneTabLayerParticipatesInAccessibility() passed after 0.001 seconds.
+◇ Test trainingRefreshTriggerAcceptsActiveSceneAndTrainingTabOnly() started.
+✔ Test trainingRefreshTriggerAcceptsActiveSceneAndTrainingTabOnly() passed after 0.001 seconds.
+◇ Test importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() started.
+✔ Test importedHistoryReviewQueueDeduplicatesAndAdvancesInOrder() passed after 0.001 seconds.
+◇ Suite "StudentKit localization" started.
+◇ Test "Critical Chinese copy remains byte-identical" started.
+✔ Test "Critical Chinese copy remains byte-identical" passed after 0.001 seconds.
+◇ Test "Dynamic Chinese templates preserve the original result" started.
+✔ Test "Dynamic Chinese templates preserve the original result" passed after 0.001 seconds.
+◇ Test "Critical English copy is available" started.
+✔ Test "Critical English copy is available" passed after 0.001 seconds.
+◇ Test "List punctuation follows locale without changing Chinese output" started.
+✔ Test "List punctuation follows locale without changing Chinese output" passed after 0.001 seconds.
+◇ Test "English count copy selects singular and plural catalog entries" started.
+✔ Test "English count copy selects singular and plural catalog entries" passed after 0.001 seconds.
+◇ Test "English count copy uses the designated placeholder" started.
+✔ Test "English count copy uses the designated placeholder" passed after 0.001 seconds.
+◇ Test "Catalog exercise names use nameEn only for English display" started.
+✔ Test "Catalog exercise names use nameEn only for English display" passed after 0.001 seconds.
+✔ Suite "StudentKit localization" passed after 0.001 seconds.
+◇ Test todayRefreshThrottleUsesVolatileRefreshWithoutRefetchingPlan() started.
+✔ Test todayRefreshThrottleUsesVolatileRefreshWithoutRefetchingPlan() passed after 0.001 seconds.
+◇ Test trainingLogRepositoryUpsertsByStudentExerciseAndSetIndex() started.
+✔ Test trainingLogRepositoryUpsertsByStudentExerciseAndSetIndex() passed after 0.001 seconds.
+◇ Test trainingLogRepositoryFiltersByRangeAndStudent() started.
+✔ Test trainingLogRepositoryFiltersByRangeAndStudent() passed after 0.001 seconds.
+◇ Suite "Today set-ref sharing" started.
+◇ Test "every recorded row is selectable and replaces its planned candidate" started.
+✔ Test "every recorded row is selectable and replaces its planned candidate" passed after 0.001 seconds.
+◇ Test "an assumed log row is selectable and a planned workout shows the entry" started.
+✔ Test "an assumed log row is selectable and a planned workout shows the entry" passed after 0.001 seconds.
+◇ Test "an uploaded video resolves to its backend attachment id" started.
+✔ Test "an uploaded video resolves to its backend attachment id" passed after 0.001 seconds.
+◇ Test "an in-flight video maps the manager ready event" started.
+✔ Test "an in-flight video maps the manager ready event" passed after 0.001 seconds.
+◇ Test "entry requires an available set, an active coach, and sharing wiring" started.
+✔ Test "entry requires an available set, an active coach, and sharing wiring" passed after 0.001 seconds.
+◇ Test "most recently completed set is the first picker candidate" started.
+✔ Test "most recently completed set is the first picker candidate" passed after 0.001 seconds.
+◇ Test "failed recorded rows remain shareable" started.
+✔ Test "failed recorded rows remain shareable" passed after 0.001 seconds.
+◇ Test "planned candidates map intensity and ranges without rounding invalid values" started.
+✔ Test "planned candidates map intensity and ranges without rounding invalid values" passed after 0.001 seconds.
+◇ Test "equal completion timestamps prefer larger sequence then set index" started.
+✔ Test "equal completion timestamps prefer larger sequence then set index" passed after 0.001 seconds.
+◇ Test "gym-day candidates include 00:00-03:59 and exclude adjacent days" started.
+✔ Test "gym-day candidates include 00:00-03:59 and exclude adjacent days" passed after 0.001 seconds.
+✔ Suite "Today set-ref sharing" passed after 0.001 seconds.
+◇ Test realSaveOverAssumedRecordRestoresSharingImmediately() started.
+✔ Test realSaveOverAssumedRecordRestoresSharingImmediately() passed after 0.001 seconds.
+◇ Test completionPresentsCelebrationWhileSendingThenConfirmsReceipt() started.
+✔ Test completionPresentsCelebrationWhileSendingThenConfirmsReceipt() passed after 0.001 seconds.
+◇ Test completionDoesNotReopenDismissedReward(failing:) started.
+◇ Test case passing 1 argument failing → false to completionDoesNotReopenDismissedReward(failing:) started.
+◇ Test case passing 1 argument failing → true to completionDoesNotReopenDismissedReward(failing:) started.
+✔ Test completionDoesNotReopenDismissedReward(failing:) with 2 test cases passed after 0.001 seconds.
+◇ Test completionSendingReceiptIsLocalizedInBothLanguages() started.
+✔ Test completionSendingReceiptIsLocalizedInBothLanguages() passed after 0.001 seconds.
+◇ Test completionFailureClosesCelebrationPreservesSetsAndAllowsRetry() started.
+✔ Test completionFailureClosesCelebrationPreservesSetsAndAllowsRetry() passed after 0.001 seconds.
+◇ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() started.
+✔ Test completionMutationsIgnoreDuplicateCallsWhileRequestIsInFlight() passed after 0.001 seconds.
+◇ Test completionTimeoutRollsBackWithoutWaitingForUncooperativeRequest() started.
+✔ Test completionTimeoutRollsBackWithoutWaitingForUncooperativeRequest() passed after 0.001 seconds.
+◇ Suite TodayWorkoutExerciseSectionTests started.
+◇ Test sectionsPutMainLiftsAndVariationsBeforeAccessoriesWithoutReordering() started.
+✔ Test sectionsPutMainLiftsAndVariationsBeforeAccessoriesWithoutReordering() passed after 0.001 seconds.
+◇ Test sectionsOmitEmptyKinds() started.
+✔ Test sectionsOmitEmptyKinds() passed after 0.001 seconds.
+◇ Test draftBuilderCarriesExerciseClassificationIntoPlateLoadingGate() started.
+✔ Test draftBuilderCarriesExerciseClassificationIntoPlateLoadingGate() passed after 0.001 seconds.
+◇ Test exerciseClassificationHelpersUseOnlyExerciseType() started.
+✔ Test exerciseClassificationHelpersUseOnlyExerciseType() passed after 0.001 seconds.
+✔ Suite TodayWorkoutExerciseSectionTests passed after 0.001 seconds.
+◇ Test firstCompletionRecordsPointAndDetectsPR() started.
+✔ Test firstCompletionRecordsPointAndDetectsPR() passed after 0.001 seconds.
+◇ Test failedCompletionDoesNotRecordPointOrDetectPR() started.
+✔ Test failedCompletionDoesNotRecordPointOrDetectPR() passed after 0.001 seconds.
+◇ Test lowRPECompletionUsesSegmentedCalculatorAndRecordsE1RM() started.
+✔ Test lowRPECompletionUsesSegmentedCalculatorAndRecordsE1RM() passed after 0.001 seconds.
+◇ Test uncheckingThenRecheckingDoesNotFarmDuplicatePRs() started.
+✔ Test uncheckingThenRecheckingDoesNotFarmDuplicatePRs() passed after 0.001 seconds.
+◇ Test e1RMImprovementAtTheSameMeasuredWeightDoesNotFirePR() started.
+✔ Test e1RMImprovementAtTheSameMeasuredWeightDoesNotFirePR() passed after 0.001 seconds.
+◇ Test silentlyAcknowledgesUnacknowledgedPRsOnLaunch() started.
+✔ Test silentlyAcknowledgesUnacknowledgedPRsOnLaunch() passed after 0.001 seconds.
+◇ Test sameTimestampCompletionsDoNotDoubleFirePRs() started.
+✔ Test sameTimestampCompletionsDoNotDoubleFirePRs() passed after 0.001 seconds.
+◇ Test overlappingVideoMintAndCompleteApplyInOrder() started.
+✔ Test overlappingVideoMintAndCompleteApplyInOrder() passed after 0.001 seconds.
+◇ Test stalePersistDoesNotTouchReloadedState() started.
+✔ Test stalePersistDoesNotTouchReloadedState() passed after 0.001 seconds.
+◇ Test stalePersistStillRecordsE1RMPointAfterReconcileReloadInterleaving() started.
+✔ Test stalePersistStillRecordsE1RMPointAfterReconcileReloadInterleaving() passed after 0.001 seconds.
+◇ Test reconcileCannotConsumeLivePRBeforeE1RMRecordingResumes() started.
+✔ Test reconcileCannotConsumeLivePRBeforeE1RMRecordingResumes() passed after 0.001 seconds.
+◇ Suite TodayWorkoutPresentationTests started.
+◇ Test zeroLogDashboardEntryKeepsListHeroAndHidesManualCompletion() started.
+✔ Test zeroLogDashboardEntryKeepsListHeroAndHidesManualCompletion() passed after 0.001 seconds.
+◇ Test partialRealLogResumesRecordingHero() started.
+✔ Test partialRealLogResumesRecordingHero() passed after 0.001 seconds.
+◇ Test manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() started.
+✔ Test manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() passed after 0.001 seconds.
+◇ Test quickLogIsAllowedOnlyForEditableListHero() started.
+✔ Test quickLogIsAllowedOnlyForEditableListHero() passed after 0.001 seconds.
+◇ Test completedDayKeepsReadOnlyDetailAcrossColdLaunch() started.
+✔ Test completedDayKeepsReadOnlyDetailAcrossColdLaunch() passed after 0.001 seconds.
+◇ Test assumedHistoryDoesNotStartColdLaunchWorkout() started.
+✔ Test assumedHistoryDoesNotStartColdLaunchWorkout() passed after 0.001 seconds.
+◇ Test failedRealLogResumesColdLaunchWorkout() started.
+✔ Test failedRealLogResumesColdLaunchWorkout() passed after 0.001 seconds.
+◇ Test draftMappingKeepsFailureAndVideoSemantics() started.
+✔ Test draftMappingKeepsFailureAndVideoSemantics() passed after 0.001 seconds.
+◇ Test rpePrescriptionWithoutWeightKeepsOptionalTarget() started.
+✔ Test rpePrescriptionWithoutWeightKeepsOptionalTarget() passed after 0.001 seconds.
+◇ Test zeroSetDayHasNoRemainingWork() started.
+✔ Test zeroSetDayHasNoRemainingWork() passed after 0.001 seconds.
+◇ Test allDoneHasNoRemainingWork() started.
+✔ Test allDoneHasNoRemainingWork() passed after 0.001 seconds.
+✔ Suite TodayWorkoutPresentationTests passed after 0.001 seconds.
+◇ Suite TrainingCalendarScrollStateTests started.
+◇ Test openCalendarClosesOnlyPast56WithMoreThan200Slack() started.
+✔ Test openCalendarClosesOnlyPast56WithMoreThan200Slack() passed after 0.001 seconds.
+◇ Test closedCalendarReopensOnlyBelow6() started.
+✔ Test closedCalendarReopensOnlyBelow6() passed after 0.001 seconds.
+✔ Suite TrainingCalendarScrollStateTests passed after 0.001 seconds.
+◇ Suite TodayWorkoutQuickLogDateRangeTests started.
+◇ Test coldLoadKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() started.
+✔ Test coldLoadKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() passed after 0.001 seconds.
+◇ Test weekOverviewKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() started.
+✔ Test weekOverviewKeepsQuickLogsFromPublicationBeforeTheRecommendedStart() passed after 0.001 seconds.
+✔ Suite TodayWorkoutQuickLogDateRangeTests passed after 0.001 seconds.
+◇ Suite TodayWorkoutQuickLogRetryTests started.
+◇ Test changingTheDateAfterPartialFailureRewritesEverySetOnTheNewDate() started.
+✔ Test changingTheDateAfterPartialFailureRewritesEverySetOnTheNewDate() passed after 0.001 seconds.
+◇ Test freshSheetForgetsThePreviousAttempt() started.
+✔ Test freshSheetForgetsThePreviousAttempt() passed after 0.001 seconds.
+◇ Test dateLowerBoundUsesThePreviousDaysTrainingDate() started.
+✔ Test dateLowerBoundUsesThePreviousDaysTrainingDate() passed after 0.001 seconds.
+◇ Test quickLogCompletesTheDayItWroteEvenIfTheCursorMovesMidFlight() started.
+✔ Test quickLogCompletesTheDayItWroteEvenIfTheCursorMovesMidFlight() passed after 0.001 seconds.
+✔ Suite TodayWorkoutQuickLogRetryTests passed after 0.003 seconds.
+◇ Suite TodayWorkoutQuickLogTests started.
+◇ Test unrecordedAccessoryQuickLogPreservesPrescribedAndFallbackRPE() started.
+✔ Test unrecordedAccessoryQuickLogPreservesPrescribedAndFallbackRPE() passed after 0.001 seconds.
+◇ Test prescribedQuickLogRecordsEverySetCompletesDayAndRecordsE1RM() started.
+✔ Test prescribedQuickLogRecordsEverySetCompletesDayAndRecordsE1RM() passed after 0.001 seconds.
+◇ Test exclusionsWriteOnlyIncludedPrescriptionSlots() started.
+✔ Test exclusionsWriteOnlyIncludedPrescriptionSlots() passed after 0.001 seconds.
+◇ Test excludingEverySetRejectsWithoutWritingOrCompleting() started.
+✔ Test excludingEverySetRejectsWithoutWritingOrCompleting() passed after 0.001 seconds.
+◇ Test recordFailureKeepsPrefixAndRetryContinuesAtFailedSet() started.
+✔ Test recordFailureKeepsPrefixAndRetryContinuesAtFailedSet() passed after 0.001 seconds.
+◇ Test partialFailureWritesSuccessfulSetsBackIntoDrafts() started.
+✔ Test partialFailureWritesSuccessfulSetsBackIntoDrafts() passed after 0.001 seconds.
+◇ Test completionFailureKeepsWrittenSetsAndReturnsSeparateOutcome() started.
+✔ Test completionFailureKeepsWrittenSetsAndReturnsSeparateOutcome() passed after 0.001 seconds.
+✔ Suite TodayWorkoutQuickLogTests passed after 0.004 seconds.
+◇ Test shiftedPlanPushesIncrementTrainingRefreshRevision() started.
+✔ Test shiftedPlanPushesIncrementTrainingRefreshRevision() passed after 0.001 seconds.
+◇ Test trainingPlanRefreshAppliesChangedDayAndKeepsUnsubmittedDraft() started.
+✔ Test trainingPlanRefreshAppliesChangedDayAndKeepsUnsubmittedDraft() passed after 0.001 seconds.
+◇ Test trainingPlanRefreshSkipsASecondRequestInsideTheSharedInterval() started.
+✔ Test trainingPlanRefreshSkipsASecondRequestInsideTheSharedInterval() passed after 0.001 seconds.
+◇ Test recordingThatStartsDuringRefreshKeepsTheVisibleWorkoutGeneration() started.
+✔ Test recordingThatStartsDuringRefreshKeepsTheVisibleWorkoutGeneration() passed after 0.001 seconds.
+◇ Test emptyRefreshKeepsTheLoadedWorkoutAndItsDraft() started.
+✔ Test emptyRefreshKeepsTheLoadedWorkoutAndItsDraft() passed after 0.001 seconds.
+◇ Test completionEdgeStartsTimerWithRPEDuration() started.
+✔ Test completionEdgeStartsTimerWithRPEDuration() passed after 0.001 seconds.
+◇ Test completionEdgePrefersPrescribedRestSecondsOverStudentPreference() started.
+✔ Test completionEdgePrefersPrescribedRestSecondsOverStudentPreference() passed after 0.001 seconds.
+◇ Test "Custom preference uses actual RPE bands" started.
+◇ Test case passing 2 arguments actualRPE → nil, expectedSeconds → 195 to "Custom preference uses actual RPE bands" started.
+◇ Test case passing 2 arguments actualRPE → 6.5, expectedSeconds → 105 to "Custom preference uses actual RPE bands" started.
+◇ Test case passing 2 arguments actualRPE → 7, expectedSeconds → 195 to "Custom preference uses actual RPE bands" started.
+◇ Test case passing 2 arguments actualRPE → 8.5, expectedSeconds → 195 to "Custom preference uses actual RPE bands" started.
+◇ Test case passing 2 arguments actualRPE → 9, expectedSeconds → 300 to "Custom preference uses actual RPE bands" started.
+✔ Test "Custom preference uses actual RPE bands" with 5 test cases passed after 0.007 seconds.
+◇ Test explanationIsAcknowledgedOnceAcrossViewModels() started.
+✔ Test explanationIsAcknowledgedOnceAcrossViewModels() passed after 0.002 seconds.
+◇ Test editingAlreadyCompletedSetDoesNotRestartTimer() started.
+✔ Test editingAlreadyCompletedSetDoesNotRestartTimer() passed after 0.001 seconds.
+◇ Test consecutiveCompletionsReplaceTheTimer() started.
+✔ Test consecutiveCompletionsReplaceTheTimer() passed after 0.001 seconds.
+◇ Test lastSetOfTheDayDoesNotStartTimer() started.
+✔ Test lastSetOfTheDayDoesNotStartTimer() passed after 0.001 seconds.
+◇ Test adjustClampsRemainingBetweenZeroAnd900() started.
+✔ Test adjustClampsRemainingBetweenZeroAnd900() passed after 0.001 seconds.
+◇ Suite TodayWorkoutSelectionResolverTests started.
+◇ Test initialSelectionPrefersExplicitIdentityThenCursor() started.
+✔ Test initialSelectionPrefersExplicitIdentityThenCursor() passed after 0.001 seconds.
+◇ Test jumpReturnsCursorAndIsClockIndependent() started.
+✔ Test jumpReturnsCursorAndIsClockIndependent() passed after 0.001 seconds.
+✔ Suite TodayWorkoutSelectionResolverTests passed after 0.001 seconds.
+◇ Test spec085ReceivesExplicitDaysAgainAndOrdinaryRoutesReturnToCursor() started.
+✔ Test spec085ReceivesExplicitDaysAgainAndOrdinaryRoutesReturnToCursor() passed after 0.001 seconds.
+◇ Suite "Today workout set-ref entry layout" started.
+◇ Test "in-progress hero owns the only ask-coach entry" started.
+✔ Test "in-progress hero owns the only ask-coach entry" passed after 0.131 seconds.
+◇ Test "all recorded hides the hero and its ask-coach entry (spec 090)" started.
+✔ Test "all recorded hides the hero and its ask-coach entry (spec 090)" passed after 0.090 seconds.
+◇ Test "v3 set row stays free of a per-row ask-coach entry" started.
+✔ Test "v3 set row stays free of a per-row ask-coach entry" passed after 0.003 seconds.
+✔ Suite "Today workout set-ref entry layout" passed after 0.225 seconds.
+◇ Test workoutKeepsLowRPEInDisplayButRequiresCalibrationForSuggestionBaseline() started.
+✔ Test workoutKeepsLowRPEInDisplayButRequiresCalibrationForSuggestionBaseline() passed after 0.001 seconds.
+◇ Test lowBarStudentGetsSquatTitleForLowBarVariationDay() started.
+✔ Test lowBarStudentGetsSquatTitleForLowBarVariationDay() passed after 0.001 seconds.
+◇ Test mismatchedSquatStanceDoesNotClaimMainLiftInTitle() started.
+✔ Test mismatchedSquatStanceDoesNotClaimMainLiftInTitle() passed after 0.001 seconds.
+◇ Test todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → Asia/Shanghai-all-hours to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → Europe/London-GMT to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → Europe/London-BST to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → Europe/London-DST-start to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → Europe/London-DST-end to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → America/New_York-standard to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → America/New_York-daylight to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → America/New_York-DST-start to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+◇ Test case passing 1 argument localDayCase → America/New_York-DST-end to todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) started.
+✔ Test todayWorkoutMatchesTheDeviceDateOnlyValueAcrossTheEntireLocalDay(localDayCase:) with 9 test cases passed after 0.032 seconds.
+◇ Test studentSessionSummaryAggregatesCompletedSetsOnly() started.
+✔ Test studentSessionSummaryAggregatesCompletedSetsOnly() passed after 0.001 seconds.
+◇ Test studentFormattingResultOmitsMissingWeightAndRPE() started.
+✔ Test studentFormattingResultOmitsMissingWeightAndRPE() passed after 0.001 seconds.
+◇ Test studentSessionSummaryReportsTopSetPerExercise() started.
+✔ Test studentSessionSummaryReportsTopSetPerExercise() passed after 0.001 seconds.
+◇ Test makeHistoricalLogsSeedsNoFutureLogs() started.
+✔ Test makeHistoricalLogsSeedsNoFutureLogs() passed after 0.001 seconds.
+◇ Test todayWorkoutDistinguishesMissingPlanFromRestDay() started.
+✔ Test todayWorkoutDistinguishesMissingPlanFromRestDay() passed after 0.001 seconds.
+◇ Test todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() started.
+✔ Test todayWorkoutRendersHandedOffPlanWhileRefreshingProjection() passed after 0.001 seconds.
+◇ Test todayWorkoutAppliesRefreshedPlanWhenItDiffersFromHandoff() started.
+✔ Test todayWorkoutAppliesRefreshedPlanWhenItDiffersFromHandoff() passed after 0.001 seconds.
+◇ Test todayWorkoutKeepsHandedOffPlanWhenRefreshFails() started.
+✔ Test todayWorkoutKeepsHandedOffPlanWhenRefreshFails() passed after 0.001 seconds.
+◇ Test selectingAnotherSequenceDayReusesThePlanLogSnapshot() started.
+✔ Test selectingAnotherSequenceDayReusesThePlanLogSnapshot() passed after 0.001 seconds.
+◇ Test invalidSelectedDayFallsBackToSequenceCursor() started.
+✔ Test invalidSelectedDayFallsBackToSequenceCursor() passed after 0.001 seconds.
+◇ Test completionMutationsFetchAndPropagateOneProjectionEach() started.
+✔ Test completionMutationsFetchAndPropagateOneProjectionEach() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelPersistsEditsToCompletedSet() started.
+✔ Test todayWorkoutViewModelPersistsEditsToCompletedSet() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelLoadsRecordsAndReturnsToLoaded() started.
+✔ Test todayWorkoutViewModelLoadsRecordsAndReturnsToLoaded() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelUpdatesActualWeight() started.
+✔ Test todayWorkoutViewModelUpdatesActualWeight() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelKeepsWorkoutAndDraftWhenRecordingFails() started.
+✔ Test todayWorkoutViewModelKeepsWorkoutAndDraftWhenRecordingFails() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelExplainsServerRecordingFailure() started.
+✔ Test todayWorkoutViewModelExplainsServerRecordingFailure() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelRestoresLoadedWhenRecordingURLCancelled() started.
+✔ Test todayWorkoutViewModelRestoresLoadedWhenRecordingURLCancelled() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelRestoresLoadedWhenRecordingCancellationError() started.
+✔ Test todayWorkoutViewModelRestoresLoadedWhenRecordingCancellationError() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelMapsExpiredSessionDuringLoadToLoginMessage() started.
+✔ Test todayWorkoutViewModelMapsExpiredSessionDuringLoadToLoginMessage() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelMapsGenericLoadFailureToRetryMessage() started.
+✔ Test todayWorkoutViewModelMapsGenericLoadFailureToRetryMessage() passed after 0.001 seconds.
+◇ Test todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage() started.
+✔ Test todayWorkoutViewModelMapsExpiredSessionDuringSaveToLoginMessage() passed after 0.001 seconds.
+◇ Test ensureLoggedSetIDKeepsFlushedEditsWithoutCompleting() started.
+✔ Test ensureLoggedSetIDKeepsFlushedEditsWithoutCompleting() passed after 0.001 seconds.
+◇ Test todayWorkoutKeepsLogsRecordedAfterScheduledPlanEnd() started.
+✔ Test todayWorkoutKeepsLogsRecordedAfterScheduledPlanEnd() passed after 0.001 seconds.
+◇ Test todayWorkoutKeepsLogsRecordedBeforeCoachShift() started.
+✔ Test todayWorkoutKeepsLogsRecordedBeforeCoachShift() passed after 0.001 seconds.
+◇ Suite TrainingDayNumberTests started.
+◇ Test sparseWeekUsesOrdinalsIncludingCompletedDays() started.
+✔ Test sparseWeekUsesOrdinalsIncludingCompletedDays() passed after 0.001 seconds.
+◇ Test insertedEarlierDayRenumbersAndSortOrderBreaksTies() started.
+✔ Test insertedEarlierDayRenumbersAndSortOrderBreaksTies() passed after 0.001 seconds.
+◇ Test duplicateIDsKeepFirstOrdinalWithoutCrashing() started.
+✔ Test duplicateIDsKeepFirstOrdinalWithoutCrashing() passed after 0.001 seconds.
+✔ Suite TrainingDayNumberTests passed after 0.001 seconds.
+◇ Suite TrainingFlowTests started.
+◇ Test partitionFollowsPlanOrderAndRealResults() started.
+✔ Test partitionFollowsPlanOrderAndRealResults() passed after 0.001 seconds.
+◇ Test partitionHandlesPartialSkippedFailedAssumedAndCancellation() started.
+✔ Test partitionHandlesPartialSkippedFailedAssumedAndCancellation() passed after 0.001 seconds.
+◇ Test segmentsAdvanceAndDistinguishFailure() started.
+✔ Test segmentsAdvanceAndDistinguishFailure() passed after 0.001 seconds.
+◇ Test completionDocksOnlyWhenEveryRealResultExists() started.
+✔ Test completionDocksOnlyWhenEveryRealResultExists() passed after 0.001 seconds.
+◇ Test pageOrdersCompletedBeforeHeroAndRestoresAfterCancellation() started.
+✔ Test pageOrdersCompletedBeforeHeroAndRestoresAfterCancellation() passed after 0.001 seconds.
+✔ Suite TrainingFlowTests passed after 0.001 seconds.
+◇ Suite TrainingHistoryGroupingTests started.
+◇ Test groupsTrainingDaysByPlanWeekNotByIndex() started.
+✔ Test groupsTrainingDaysByPlanWeekNotByIndex() passed after 0.001 seconds.
+◇ Test nilStartDateFallsBackToSingleWeek() started.
+✔ Test nilStartDateFallsBackToSingleWeek() passed after 0.001 seconds.
+◇ Test emptyDaysReturnsNoWeeks() started.
+✔ Test emptyDaysReturnsNoWeeks() passed after 0.001 seconds.
+✔ Suite TrainingHistoryGroupingTests passed after 0.001 seconds.
+◇ Test trainingHistoryViewModelLoadsEmptyHistory() started.
+✔ Test trainingHistoryViewModelLoadsEmptyHistory() passed after 0.001 seconds.
+◇ Test trainingHistoryViewModelRecoversWhenRetrySucceeds() started.
+✔ Test trainingHistoryViewModelRecoversWhenRetrySucceeds() passed after 0.001 seconds.
+◇ Test trainingHistoryViewModelIgnoresURLCancellation() started.
+✔ Test trainingHistoryViewModelIgnoresURLCancellation() passed after 0.001 seconds.
+◇ Test trainingHistoryViewModelIgnoresCancellationError() started.
+✔ Test trainingHistoryViewModelIgnoresCancellationError() passed after 0.001 seconds.
+◇ Test trainingHistoryViewModelSurfacesRealError() started.
+✔ Test trainingHistoryViewModelSurfacesRealError() passed after 0.001 seconds.
+◇ Test trainingHistoryViewModelGroupsCycleDaysIntoWeeks() started.
+✔ Test trainingHistoryViewModelGroupsCycleDaysIntoWeeks() passed after 0.001 seconds.
+◇ Test trainingHistoryIncludesTodaysQuickLogBeforeNoon(hour:) started.
+◇ Test case passing 1 argument hour → 2 to trainingHistoryIncludesTodaysQuickLogBeforeNoon(hour:) started.
+◇ Test case passing 1 argument hour → 9 to trainingHistoryIncludesTodaysQuickLogBeforeNoon(hour:) started.
+◇ Test case passing 1 argument hour → 18 to trainingHistoryIncludesTodaysQuickLogBeforeNoon(hour:) started.
+✔ Test trainingHistoryIncludesTodaysQuickLogBeforeNoon(hour:) with 3 test cases passed after 0.001 seconds.
+◇ Suite TrainingReminderDefaultTests started.
+◇ Test currentWeekUsesRecommendedDatesIncludingCompletedAndShiftedDays() started.
+✔ Test currentWeekUsesRecommendedDatesIncludingCompletedAndShiftedDays() passed after 0.001 seconds.
+◇ Test noPlanFallsBackToProfileThenMondayWednesdayFriday() started.
+✔ Test noPlanFallsBackToProfileThenMondayWednesdayFriday() passed after 0.001 seconds.
+◇ Test savedSettingsIncludingEmptyWeekdaysStayUnchanged() started.
+✔ Test savedSettingsIncludingEmptyWeekdaysStayUnchanged() passed after 0.001 seconds.
+✔ Suite TrainingReminderDefaultTests passed after 0.001 seconds.
+◇ Suite "Training reminder recovery" started.
+◇ Test "A failed add rolls the partial schedule back to empty" started.
+✔ Test "A failed add rolls the partial schedule back to empty" passed after 0.001 seconds.
+◇ Test "Schedule failure falls the toggle and the stored preference back to off" started.
+✔ Test "Schedule failure falls the toggle and the stored preference back to off" passed after 0.001 seconds.
+◇ Test "Reconcile clears stale reminders left by a bypassed logout" started.
+✔ Test "Reconcile clears stale reminders left by a bypassed logout" passed after 0.001 seconds.
+◇ Test "Reconcile reschedules an enabled authorized preference" started.
+✔ Test "Reconcile reschedules an enabled authorized preference" passed after 0.001 seconds.
+◇ Test "Reconcile disables the stored preference when permission is gone" started.
+✔ Test "Reconcile disables the stored preference when permission is gone" passed after 0.001 seconds.
+◇ Test "Foreground refresh clears the denied banner once authorized" started.
+✔ Test "Foreground refresh clears the denied banner once authorized" passed after 0.001 seconds.
+◇ Test "Foreground refresh rolls back when permission was revoked in Settings" started.
+✔ Test "Foreground refresh rolls back when permission was revoked in Settings" passed after 0.001 seconds.
+◇ Test "Recommended training days seed the defaults until the student saves" started.
+✔ Test "Recommended training days seed the defaults until the student saves" passed after 0.001 seconds.
+◇ Test "Stored preferences win over the recommended training days" started.
+✔ Test "Stored preferences win over the recommended training days" passed after 0.001 seconds.
+◇ Test "Preferences are stored per student and never bleed across accounts" started.
+✔ Test "Preferences are stored per student and never bleed across accounts" passed after 0.001 seconds.
+✔ Suite "Training reminder recovery" passed after 0.008 seconds.
+◇ Suite "Training reminders" started.
+◇ Test "Default settings are off with Monday Wednesday Friday at 20:00" started.
+✔ Test "Default settings are off with Monday Wednesday Friday at 20:00" passed after 0.001 seconds.
+◇ Test "Multiple weekdays produce one deterministic request each" started.
+✔ Test "Multiple weekdays produce one deterministic request each" passed after 0.001 seconds.
+◇ Test "A single Sunday uses Calendar weekday one" started.
+✔ Test "A single Sunday uses Calendar weekday one" passed after 0.001 seconds.
+◇ Test "An enabled reminder with no weekdays produces no requests" started.
+✔ Test "An enabled reminder with no weekdays produces no requests" passed after 0.001 seconds.
+◇ Test "A disabled reminder produces no requests" started.
+✔ Test "A disabled reminder produces no requests" passed after 0.001 seconds.
+◇ Test "Changing settings removes only reminder requests before rescheduling" started.
+✔ Test "Changing settings removes only reminder requests before rescheduling" passed after 0.001 seconds.
+◇ Test "Turning reminders off clears the prefix and leaves unrelated requests" started.
+✔ Test "Turning reminders off clears the prefix and leaves unrelated requests" passed after 0.001 seconds.
+◇ Test "Logout cleanup clears only training reminder requests" started.
+✔ Test "Logout cleanup clears only training reminder requests" passed after 0.001 seconds.
+◇ Test "Summary is localized in Chinese and English" started.
+✔ Test "Summary is localized in Chinese and English" passed after 0.001 seconds.
+◇ Test "Denied authorization rolls the toggle back and is not requested again" started.
+✔ Test "Denied authorization rolls the toggle back and is not requested again" passed after 0.001 seconds.
+◇ Test "Allowed authorization enables and schedules the defaults" started.
+✔ Test "Allowed authorization enables and schedules the defaults" passed after 0.001 seconds.
+✔ Suite "Training reminders" passed after 0.002 seconds.
+◇ Test futureDayUnlockCopyUsesPreviousTrainingDayName() started.
+✔ Test futureDayUnlockCopyUsesPreviousTrainingDayName() passed after 0.001 seconds.
+◇ Suite TrainingTabRedesignTests started.
+◇ Test sequenceLayoutGroupsByWeekInCanonicalOrder() started.
+✔ Test sequenceLayoutGroupsByWeekInCanonicalOrder() passed after 0.001 seconds.
+◇ Test canonicalOrderUsesSortOrderThenIdentityAsFinalTieBreaker() started.
+✔ Test canonicalOrderUsesSortOrderThenIdentityAsFinalTieBreaker() passed after 0.001 seconds.
+◇ Test completedDaysAreReadOnlyAndOnlyCursorIsEditable() started.
+✔ Test completedDaysAreReadOnlyAndOnlyCursorIsEditable() passed after 0.001 seconds.
+◇ Test currentWeekFollowsCursorAndFallsBackToFinalCompletedWeek() started.
+✔ Test currentWeekFollowsCursorAndFallsBackToFinalCompletedWeek() passed after 0.001 seconds.
+✔ Suite TrainingTabRedesignTests passed after 0.001 seconds.
+◇ Suite TrainingWeekCalendarTests started.
+◇ Test fourTrainingDaysIncludeRestDaysAtTheirCalendarPositions() started.
+✔ Test fourTrainingDaysIncludeRestDaysAtTheirCalendarPositions() passed after 0.001 seconds.
+◇ Test shiftedRecommendationExtendsCalendarBeyondSevenDays() started.
+✔ Test shiftedRecommendationExtendsCalendarBeyondSevenDays() passed after 0.001 seconds.
+◇ Test sevenTrainingDaysHaveNoRestCellsAndKeepCompletedProgress() started.
+✔ Test sevenTrainingDaysHaveNoRestCellsAndKeepCompletedProgress() passed after 0.001 seconds.
+◇ Test behindUsesRecommendationAndGymDay() started.
+✔ Test behindUsesRecommendationAndGymDay() passed after 0.001 seconds.
+✔ Suite TrainingWeekCalendarTests passed after 0.001 seconds.
+◇ Suite TrainingWeekPagingTests started.
+◇ Test defaultPageSelectsCursorAndKeepsCompletedWeeksAvailable() started.
+✔ Test defaultPageSelectsCursorAndKeepsCompletedWeeksAvailable() passed after 0.001 seconds.
+◇ Test pagingSelectsFirstDayExceptWhenReturningToCursorWeek() started.
+✔ Test pagingSelectsFirstDayExceptWhenReturningToCursorWeek() passed after 0.001 seconds.
+◇ Test selectingAnotherDayKeepsCursorMarkerAndWeekProgress() started.
+✔ Test selectingAnotherDayKeepsCursorMarkerAndWeekProgress() passed after 0.001 seconds.
+◇ Test emptyCompletedAndReplacedPlansHaveSafeSelections() started.
+✔ Test emptyCompletedAndReplacedPlansHaveSafeSelections() passed after 0.001 seconds.
+◇ Test singleWeekHasNoArrowsAndLongPlansHideIndicators() started.
+✔ Test singleWeekHasNoArrowsAndLongPlansHideIndicators() passed after 0.001 seconds.
+◇ Test completingCursorMovesDefaultSelectionToNextWeek() started.
+✔ Test completingCursorMovesDefaultSelectionToNextWeek() passed after 0.001 seconds.
+✔ Suite TrainingWeekPagingTests passed after 0.001 seconds.
+◇ Suite TrainingWeekPresentationTests started.
+◇ Test cellsUseDatesOrBehindAndAccessibleSequenceCodes() started.
+✔ Test cellsUseDatesOrBehindAndAccessibleSequenceCodes() passed after 0.001 seconds.
+◇ Test weekStatusUsesLocalizedPluralOnlyForCurrentWeek() started.
+✔ Test weekStatusUsesLocalizedPluralOnlyForCurrentWeek() passed after 0.001 seconds.
+✔ Suite TrainingWeekPresentationTests passed after 0.001 seconds.
+◇ Test parseWeightRejectsZodOutOfBounds() started.
+✔ Test parseWeightRejectsZodOutOfBounds() passed after 0.001 seconds.
+◇ Test parseHeightRejectsZodOutOfBounds() started.
+✔ Test parseHeightRejectsZodOutOfBounds() passed after 0.001 seconds.
+◇ Test retrySchedulerUsesFixedBackoffTable() started.
+✔ Test retrySchedulerUsesFixedBackoffTable() passed after 0.001 seconds.
+◇ Test retrySchedulerLetsRestoredNetworkJumpTheQueue() started.
+✔ Test retrySchedulerLetsRestoredNetworkJumpTheQueue() passed after 0.001 seconds.
+◇ Test retrySchedulerMakesDeterministicFailureTerminalImmediately() started.
+✔ Test retrySchedulerMakesDeterministicFailureTerminalImmediately() passed after 0.001 seconds.
+◇ Test retrySchedulerEndsAfterFiveRetriesOrThirtyMinutes() started.
+✔ Test retrySchedulerEndsAfterFiveRetriesOrThirtyMinutes() passed after 0.001 seconds.
+◇ Test retrySchedulerPreservesRemainingWindowAcrossRestart() started.
+✔ Test retrySchedulerPreservesRemainingWindowAcrossRestart() passed after 0.001 seconds.
+◇ Test uploadFailureClassificationIsConservativeAndTreatsOSS403AsTransient() started.
+✔ Test uploadFailureClassificationIsConservativeAndTreatsOSS403AsTransient() passed after 0.001 seconds.
+◇ Suite "Set-video playback source" started.
+◇ Test "local file wins without requesting a cloud URL" started.
+✔ Test "local file wins without requesting a cloud URL" passed after 0.001 seconds.
+◇ Test "missing local file requests a fresh cloud URL on every play" started.
+✔ Test "missing local file requests a fresh cloud URL on every play" passed after 0.001 seconds.
+◇ Test "local playback retry reopens the same file without refreshing cloud URL" started.
+✔ Test "local playback retry reopens the same file without refreshing cloud URL" passed after 0.001 seconds.
+◇ Test "remote playback retry requests a fresh cloud URL" started.
+✔ Test "remote playback retry requests a fresh cloud URL" passed after 0.001 seconds.
+✔ Suite "Set-video playback source" passed after 0.001 seconds.
+◇ Test backendRepositoryPersistsAcrossInstances() started.
+✔ Test backendRepositoryPersistsAcrossInstances() passed after 0.001 seconds.
+◇ Test backendRepositoryPersistsMultipartCheckpointAcrossInstances() started.
+✔ Test backendRepositoryPersistsMultipartCheckpointAcrossInstances() passed after 0.001 seconds.
+◇ Test backendRepositorySaveUpsertsByID() started.
+✔ Test backendRepositorySaveUpsertsByID() passed after 0.001 seconds.
+◇ Test backendRepositoryDeleteRemovesRecord() started.
+✔ Test backendRepositoryDeleteRemovesRecord() passed after 0.001 seconds.
+◇ Test backendRepositoryPlaybackURLRequiresUploadedStatus() started.
+✔ Test backendRepositoryPlaybackURLRequiresUploadedStatus() passed after 0.001 seconds.
+◇ Test backendRepositoryPlaybackURLFetchesPresignedGET() started.
+✔ Test backendRepositoryPlaybackURLFetchesPresignedGET() passed after 0.001 seconds.
+◇ Test inMemoryRepositoryFiltersBySetLogAndStudent() started.
+✔ Test inMemoryRepositoryFiltersBySetLogAndStudent() passed after 0.001 seconds.
+◇ Test preparingPresentationTakesPriorityOverAnExistingRow() started.
+✔ Test preparingPresentationTakesPriorityOverAnExistingRow() passed after 0.001 seconds.
+◇ Test replacementPreparationNeverShowsAttachedOrChoicesState() started.
+✔ Test replacementPreparationNeverShowsAttachedOrChoicesState() passed after 0.001 seconds.
+◇ Test preparingControlsShowProgressWithoutActions() started.
+✔ Test preparingControlsShowProgressWithoutActions() passed after 0.003 seconds.
+◇ Test viewModelTracksUploadLifecycleThroughEvents() started.
+✔ Test viewModelTracksUploadLifecycleThroughEvents() passed after 0.012 seconds.
+◇ Test viewModelSurfacesDurationLimitError() started.
+✔ Test viewModelSurfacesDurationLimitError() passed after 0.001 seconds.
+◇ Test viewModelRemoveClearsRowState() started.
+✔ Test viewModelRemoveClearsRowState() passed after 0.022 seconds.
+◇ Test viewModelConsentFlagPersistsToDefaults() started.
+✔ Test viewModelConsentFlagPersistsToDefaults() passed after 0.001 seconds.
+◇ Test viewModelExposesUploadDurationLimitAndProcessingErrors() started.
+✔ Test viewModelExposesUploadDurationLimitAndProcessingErrors() passed after 0.001 seconds.
+◇ Test viewModelSurfacesMissingLocalVideoWhenRetryCannotRecover() started.
+✔ Test viewModelSurfacesMissingLocalVideoWhenRetryCannotRecover() passed after 0.022 seconds.
+◇ Test chunkerCountsExactMultipleWithoutTrailingEmptyPart() started.
+✔ Test chunkerCountsExactMultipleWithoutTrailingEmptyPart() passed after 0.001 seconds.
+◇ Test chunkerAddsPartForRemainder() started.
+✔ Test chunkerAddsPartForRemainder() passed after 0.001 seconds.
+◇ Test chunkerHandlesFileSmallerThanOnePart() started.
+✔ Test chunkerHandlesFileSmallerThanOnePart() passed after 0.001 seconds.
+◇ Test chunkerRejectsEmptyFile() started.
+✔ Test chunkerRejectsEmptyFile() passed after 0.001 seconds.
+◇ Test chunkerReadsExactByteSlices() started.
+✔ Test chunkerReadsExactByteSlices() passed after 0.001 seconds.
+◇ Test chunkerThrowsWhenReadingPastTheEnd() started.
+✔ Test chunkerThrowsWhenReadingPastTheEnd() passed after 0.001 seconds.
+◇ Test chunkerFilePartsMatchInMemorySlicesByteForByte() started.
+✔ Test chunkerFilePartsMatchInMemorySlicesByteForByte() passed after 0.001 seconds.
+◇ Test "Eligible H.264 video without audio uses passthrough" started.
+✔ Test "Eligible H.264 video without audio uses passthrough" passed after 0.001 seconds.
+◇ Test "Video bitrate boundary is inclusive" started.
+✔ Test "Video bitrate boundary is inclusive" passed after 0.001 seconds.
+◇ Test "Unknown, non-positive, or non-finite video bitrate transcodes" started.
+✔ Test "Unknown, non-positive, or non-finite video bitrate transcodes" passed after 0.001 seconds.
+◇ Test "Rendered long-edge boundary is inclusive in landscape and portrait" started.
+✔ Test "Rendered long-edge boundary is inclusive in landscape and portrait" passed after 0.001 seconds.
+◇ Test "Invalid source geometry transcodes" started.
+✔ Test "Invalid source geometry transcodes" passed after 0.001 seconds.
+◇ Test "Only a known H.264 video codec can passthrough" started.
+✔ Test "Only a known H.264 video codec can passthrough" passed after 0.001 seconds.
+◇ Test "Every video format description must be H.264" started.
+✔ Test "Every video format description must be H.264" passed after 0.001 seconds.
+◇ Test "AAC audio bitrate boundary is inclusive" started.
+✔ Test "AAC audio bitrate boundary is inclusive" passed after 0.001 seconds.
+◇ Test "Audio must be known, positive-rate AAC" started.
+✔ Test "Audio must be known, positive-rate AAC" passed after 0.001 seconds.
+◇ Test "Every audio format description must be AAC" started.
+✔ Test "Every audio format description must be AAC" passed after 0.001 seconds.
+◇ Test "Passthrough failure retries through a fresh transcode attempt" started.
+✔ Test "Passthrough failure retries through a fresh transcode attempt" passed after 0.001 seconds.
+◇ Test "Passthrough cancellation never starts a transcode retry" started.
+✔ Test "Passthrough cancellation never starts a transcode retry" passed after 0.001 seconds.
+◇ Test "Ineligible source starts directly on the transcode path" started.
+✔ Test "Ineligible source starts directly on the transcode path" passed after 0.001 seconds.
+◇ Test trimCompletionSaveDeliversEditedURLOnceAndRemovesSource() started.
+✔ Test trimCompletionSaveDeliversEditedURLOnceAndRemovesSource() passed after 0.001 seconds.
+◇ Test trimCompletionSaveKeepsSourceWhenEditedInPlace() started.
+✔ Test trimCompletionSaveKeepsSourceWhenEditedInPlace() passed after 0.001 seconds.
+◇ Test trimCompletionCancelRemovesSourceAndIgnoresLaterSave() started.
+✔ Test trimCompletionCancelRemovesSourceAndIgnoresLaterSave() passed after 0.001 seconds.
+◇ Test trimCompletionFailureRemovesSourceAndReportsOnce() started.
+✔ Test trimCompletionFailureRemovesSourceAndReportsOnce() passed after 0.001 seconds.
+◇ Test failedTrimExportReportsFailureIdempotently() started.
+✔ Test failedTrimExportReportsFailureIdempotently() passed after 0.001 seconds.
+◇ Test singleShotRunsBodyExactlyOnce() started.
+✔ Test singleShotRunsBodyExactlyOnce() passed after 0.001 seconds.
+◇ Test recorderTrimWorkingCopyPreservesOriginalUntilEditIsAccepted() started.
+✔ Test recorderTrimWorkingCopyPreservesOriginalUntilEditIsAccepted() passed after 0.001 seconds.
+◇ Test acceptingRecorderTrimRemovesOriginalAndKeepsEditedFile() started.
+✔ Test acceptingRecorderTrimRemovesOriginalAndKeepsEditedFile() passed after 0.001 seconds.
+◇ Test trimSuggestionHidesForCurrentSessionAfterCompletedTrim() started.
+✔ Test trimSuggestionHidesForCurrentSessionAfterCompletedTrim() passed after 0.001 seconds.
+◇ Test trimSuggestionPermanentDismissalPersists() started.
+✔ Test trimSuggestionPermanentDismissalPersists() passed after 0.001 seconds.
+◇ Test trimSessionDismissalAndRecorderShutdownCleanBothOwnedFilesOnce() started.
+✔ Test trimSessionDismissalAndRecorderShutdownCleanBothOwnedFilesOnce() passed after 0.001 seconds.
+◇ Test realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer() started.
+✔ Test realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer() passed after 0.034 seconds.
+◇ Test dismissDuringExportWinsTheSingleShotAndDeletesTheOrphanOutput() started.
+✔ Test dismissDuringExportWinsTheSingleShotAndDeletesTheOrphanOutput() passed after 0.011 seconds.
+◇ Test cancelledTrimExportLeavesTheOutcomeToTeardown() started.
+✔ Test cancelledTrimExportLeavesTheOutcomeToTeardown() passed after 0.001 seconds.
+◇ Test exportCompletingAfterCancellationDiscardsItsOutput() started.
+✔ Test exportCompletingAfterCancellationDiscardsItsOutput() passed after 0.011 seconds.
+◇ Test shortVideoTrimDefaultsToFullSelection() started.
+✔ Test shortVideoTrimDefaultsToFullSelection() passed after 0.001 seconds.
+◇ Test longVideoTrimDefaultsToMaximumDuration() started.
+✔ Test longVideoTrimDefaultsToMaximumDuration() passed after 0.001 seconds.
+◇ Test trimSelectionNeverExceedsMaximumWhenStartLeadsTheDrag() started.
+✔ Test trimSelectionNeverExceedsMaximumWhenStartLeadsTheDrag() passed after 0.001 seconds.
+◇ Test trimSelectionNeverExceedsMaximumWhenEndLeadsTheDrag() started.
+✔ Test trimSelectionNeverExceedsMaximumWhenEndLeadsTheDrag() passed after 0.001 seconds.
+◇ Test trimHandlesClampToSourceAndKeepNonemptySelection() started.
+✔ Test trimHandlesClampToSourceAndKeepNonemptySelection() passed after 0.001 seconds.
+◇ Test trimEndHandlePushesStartWhenDraggedPastTheWindow() started.
+✔ Test trimEndHandlePushesStartWhenDraggedPastTheWindow() passed after 0.001 seconds.
+◇ Test trimStartHandlePushesEndWhenDraggedPastTheWindow() started.
+✔ Test trimStartHandlePushesEndWhenDraggedPastTheWindow() passed after 0.001 seconds.
+◇ Test trimStartHandlePushesEndOutToTheWindowMaximum() started.
+✔ Test trimStartHandlePushesEndOutToTheWindowMaximum() passed after 0.001 seconds.
+◇ Test overlappingRemoveKeepsTheFirstTeardownMarkerUntilDeletionFinishes() started.
+✔ Test overlappingRemoveKeepsTheFirstTeardownMarkerUntilDeletionFinishes() passed after 0.012 seconds.
+◇ Test retryTimerCannotRestartARecordRemovedDuringItsFetch() started.
+✔ Test retryTimerCannotRestartARecordRemovedDuringItsFetch() passed after 0.011 seconds.
+◇ Test terminalFailureCannotResurrectARecordRemovedDuringCancellation() started.
+✔ Test terminalFailureCannotResurrectARecordRemovedDuringCancellation() passed after 0.012 seconds.
+◇ Test explicitRetryRejectsADeletedHistoricalFetchSnapshot() started.
+✔ Test explicitRetryRejectsADeletedHistoricalFetchSnapshot() passed after 0.022 seconds.
+◇ Test backgroundWakeRejectsADeletedHistoricalFetchSnapshot() started.
+✔ Test backgroundWakeRejectsADeletedHistoricalFetchSnapshot() passed after 0.023 seconds.
+◇ Test terminalFailurePersistsFailedBeforeQueuedChunkCleanup() started.
+✔ Test terminalFailurePersistsFailedBeforeQueuedChunkCleanup() passed after 0.001 seconds.
+◇ Test terminalFailureDoesNotDependOnDurableChunkCleanup() started.
+✔ Test terminalFailureDoesNotDependOnDurableChunkCleanup() passed after 0.001 seconds.
+◇ Test launchRecoveryRemovesUnqueuedFailedChunkOrphan() started.
+✔ Test launchRecoveryRemovesUnqueuedFailedChunkOrphan() passed after 0.001 seconds.
+◇ Test launchRecoveryRemovesUnqueuedUploadedChunkOrphan() started.
+✔ Test launchRecoveryRemovesUnqueuedUploadedChunkOrphan() passed after 0.001 seconds.
+◇ Test coldStartReconcilesComplete409AfterTerminalSaveInterruption() started.
+✔ Test coldStartReconcilesComplete409AfterTerminalSaveInterruption() passed after 0.011 seconds.
+◇ Test coldStartRetriesFailedTerminalSaveBeforeChunkCleanup() started.
+✔ Test coldStartRetriesFailedTerminalSaveBeforeChunkCleanup() passed after 0.001 seconds.
+◇ Test uploadManagerReconcilesReadyComplete409AsUploaded() started.
+✔ Test uploadManagerReconcilesReadyComplete409AsUploaded() passed after 0.011 seconds.
+◇ Test uploadManagerTreatsTerminalComplete409AsFailed(status:) started.
+◇ Test case passing 1 argument status → .aborted to uploadManagerTreatsTerminalComplete409AsFailed(status:) started.
+◇ Test case passing 1 argument status → .failed to uploadManagerTreatsTerminalComplete409AsFailed(status:) started.
+✔ Test uploadManagerTreatsTerminalComplete409AsFailed(status:) with 2 test cases passed after 0.023 seconds.
+◇ Test uploadManagerRetriesTransientComplete409(status:) started.
+◇ Test case passing 1 argument status → .completing to uploadManagerRetriesTransientComplete409(status:) started.
+◇ Test case passing 1 argument status → nil to uploadManagerRetriesTransientComplete409(status:) started.
+✔ Test uploadManagerRetriesTransientComplete409(status:) with 2 test cases passed after 0.022 seconds.
+◇ Test complete409PayloadDecodesBackendStatus() started.
+✔ Test complete409PayloadDecodesBackendStatus() passed after 0.001 seconds.
+◇ Test overlappingSessionFinishCallbacksShareOneDrainWriter() started.
+✔ Test overlappingSessionFinishCallbacksShareOneDrainWriter() passed after 0.184 seconds.
+◇ Test backgroundFailureIsPersistedOnceBeforeHandlerAnd403AbortsOnce() started.
+✔ Test backgroundFailureIsPersistedOnceBeforeHandlerAnd403AbortsOnce() passed after 0.022 seconds.
+◇ Test newerInMemoryGenerationRejectsOldEventDuringPersistence() started.
+✔ Test newerInMemoryGenerationRejectsOldEventDuringPersistence() passed after 0.023 seconds.
+◇ Test sessionFinishedDuringPersistenceDoesNotRollBackMemoryGeneration() started.
+✔ Test sessionFinishedDuringPersistenceDoesNotRollBackMemoryGeneration() passed after 0.034 seconds.
+◇ Test supersededWriterExitDoesNotClearNewWriterSlot() started.
+✔ Test supersededWriterExitDoesNotClearNewWriterSlot() passed after 0.033 seconds.
+◇ Test terminalTeardownInvalidatesSuspendedRecoveryChunkWriter() started.
+✔ Test terminalTeardownInvalidatesSuspendedRecoveryChunkWriter() passed after 0.023 seconds.
+◇ Test staleRecoveryLoopCannotInterfereWithImmediateRetryOfSameRecord() started.
+✔ Test staleRecoveryLoopCannotInterfereWithImmediateRetryOfSameRecord() passed after 0.047 seconds.
+◇ Test uploadGenerationNeverReusesAReclaimedValue() started.
+✔ Test uploadGenerationNeverReusesAReclaimedValue() passed after 0.001 seconds.
+◇ Test foregroundWriterDoesNotRecreatePartsAfterRemovalDuringUploadingSave() started.
+✔ Test foregroundWriterDoesNotRecreatePartsAfterRemovalDuringUploadingSave() passed after 0.012 seconds.
+◇ Test sameGenerationSiblingCallbacksCompleteAcrossSeparateWakes() started.
+✔ Test sameGenerationSiblingCallbacksCompleteAcrossSeparateWakes() passed after 0.022 seconds.
+◇ Test persistedGenerationRejectsOlderEventThatArrivesFirstAfterRestart() started.
+✔ Test persistedGenerationRejectsOlderEventThatArrivesFirstAfterRestart() passed after 0.022 seconds.
+◇ Test manualRecoveryCancelsLegacyTasksAndRestartsFromPersistedRecord() started.
+✔ Test manualRecoveryCancelsLegacyTasksAndRestartsFromPersistedRecord() passed after 0.011 seconds.
+◇ Test manualRecoveryHarvestsEnumeratedZombiePartsAndRestartsMissingParts() started.
+✔ Test manualRecoveryHarvestsEnumeratedZombiePartsAndRestartsMissingParts() passed after 0.012 seconds.
+◇ Test restoredCancellationWithoutOSHandlerDrainsAfterQuiescence() started.
+✔ Test restoredCancellationWithoutOSHandlerDrainsAfterQuiescence() passed after 0.124 seconds.
+◇ Test handlerRegistrationDuringGenerationCommitCannotRevokeManualClaim() started.
+✔ Test handlerRegistrationDuringGenerationCommitCannotRevokeManualClaim() passed after 0.033 seconds.
+◇ Test uploadManagerRunsInitiatePartsCompleteInOrder() started.
+✔ Test uploadManagerRunsInitiatePartsCompleteInOrder() passed after 0.011 seconds.
+◇ Test uploadManagerRetriesTransientPartFailures() started.
+✔ Test uploadManagerRetriesTransientPartFailures() passed after 0.011 seconds.
+◇ Test uploadManagerMarksFailedAndAbortsAfterRetryExhaustion() started.
+✔ Test uploadManagerMarksFailedAndAbortsAfterRetryExhaustion() passed after 0.011 seconds.
+◇ Test uploadManagerRejectsVideosOverTheDurationLimit() started.
+✔ Test uploadManagerRejectsVideosOverTheDurationLimit() passed after 0.001 seconds.
+◇ Test removeCancelsInFlightUploadAndAborts() started.
+✔ Test removeCancelsInFlightUploadAndAborts() passed after 0.013 seconds.
+◇ Test removeUploadedAttachmentOnlyDeletesLocalAssociation() started.
+✔ Test removeUploadedAttachmentOnlyDeletesLocalAssociation() passed after 0.011 seconds.
+◇ Test failedLocalDeletionPersistsIntentForColdStartCleanup() started.
+✔ Test failedLocalDeletionPersistsIntentForColdStartCleanup() passed after 0.001 seconds.
+◇ Test cleanupTreatsReadyAttachmentConflictAsTerminal() started.
+✔ Test cleanupTreatsReadyAttachmentConflictAsTerminal() passed after 0.001 seconds.
+◇ Test retryAfterFailureReinitiatesFromScratch() started.
+✔ Test retryAfterFailureReinitiatesFromScratch() passed after 0.022 seconds.
+◇ Test recoverInterruptedUploadsMarksStaleRecordsFailed() started.
+✔ Test recoverInterruptedUploadsMarksStaleRecordsFailed() passed after 0.001 seconds.
+◇ Test enqueueReplacesEarlierVideoOnTheSameSet() started.
+✔ Test enqueueReplacesEarlierVideoOnTheSameSet() passed after 0.022 seconds.
+◇ Test coldStartCleanupDeletesPreviousDayUploadedFileAndClearsReference() started.
+✔ Test coldStartCleanupDeletesPreviousDayUploadedFileAndClearsReference() passed after 0.001 seconds.
+◇ Test partURLMapRejectsDuplicateAndOutOfRangeNumbers() started.
+✔ Test partURLMapRejectsDuplicateAndOutOfRangeNumbers() passed after 0.001 seconds.
+◇ Test partPersistenceRechecksGenerationAfterItsFetchSuspends() started.
+✔ Test partPersistenceRechecksGenerationAfterItsFetchSuspends() passed after 0.011 seconds.
+◇ Test partPersistenceCASRejectsGenerationAdvancedWhileCommitSuspends() started.
+✔ Test partPersistenceCASRejectsGenerationAdvancedWhileCommitSuspends() passed after 0.011 seconds.
+◇ Test terminalFailureRemovesChunkFilesButKeepsRetryableVideo() started.
+✔ Test terminalFailureRemovesChunkFilesButKeepsRetryableVideo() passed after 0.011 seconds.
+◇ Test expiredOSSSignatureAbortsAndReinitiatesWholeUpload() started.
+✔ Test expiredOSSSignatureAbortsAndReinitiatesWholeUpload() passed after 0.011 seconds.
+◇ Test restoredBackgroundEventsPersistETagsThenSendComplete() started.
+✔ Test restoredBackgroundEventsPersistETagsThenSendComplete() passed after 0.022 seconds.
+◇ Test deterministic4xxFailsOnceAndSendsAggregatedNotification() started.
+✔ Test deterministic4xxFailsOnceAndSendsAggregatedNotification() passed after 0.011 seconds.
+◇ Test restoredBackgroundBatchDoesNotReuploadPartsWhoseCallbacksWereQueued() started.
+✔ Test restoredBackgroundBatchDoesNotReuploadPartsWhoseCallbacksWereQueued() passed after 0.010 seconds.
+◇ Test transientFailurePreservesSessionAndCompletedETags() started.
+✔ Test transientFailurePreservesSessionAndCompletedETags() passed after 0.011 seconds.
+◇ Test failedAbortRemainsQueuedAfterLocalDeletionAndRetriesOnRecovery() started.
+✔ Test failedAbortRemainsQueuedAfterLocalDeletionAndRetriesOnRecovery() passed after 0.013 seconds.
+◇ Test backgroundCompletionWaitsForRestoredETagPersistenceAndComplete() started.
+✔ Test backgroundCompletionWaitsForRestoredETagPersistenceAndComplete() passed after 0.217 seconds.
+◇ Test backgroundWakeSchedulesOnlyNextBatchThenReleasesHandler() started.
+✔ Test backgroundWakeSchedulesOnlyNextBatchThenReleasesHandler() passed after 0.011 seconds.
+◇ Test backgroundWakePlannerCompletesOnlyWhenEveryETagExists() started.
+✔ Test backgroundWakePlannerCompletesOnlyWhenEveryETagExists() passed after 0.001 seconds.
+◇ Test backgroundWakePlannerFillsOnlyAvailableBackgroundTaskSlots() started.
+✔ Test backgroundWakePlannerFillsOnlyAvailableBackgroundTaskSlots() passed after 0.001 seconds.
+◇ Test backgroundWakePlannerRequestsPreparationForMissingRemoteMetadata() started.
+✔ Test backgroundWakePlannerRequestsPreparationForMissingRemoteMetadata() passed after 0.001 seconds.
+◇ Test emptyRestoredBatchStillCompletesPersistedPipelineBeforeOSHandler() started.
+✔ Test emptyRestoredBatchStillCompletesPersistedPipelineBeforeOSHandler() passed after 0.204 seconds.
+◇ Test uploadManagerDeletesRetainedSourceAfterSuccess() started.
+✔ Test uploadManagerDeletesRetainedSourceAfterSuccess() passed after 0.011 seconds.
+◇ Test uploadManagerRetainsManagedSourceAfterExportFailure() started.
+✔ Test uploadManagerRetainsManagedSourceAfterExportFailure() passed after 0.011 seconds.
+◇ Test retryReexportsFromRetainedSourceWhenExportedFileIsMissing() started.
+✔ Test retryReexportsFromRetainedSourceWhenExportedFileIsMissing() passed after 0.022 seconds.
+◇ Test coldStartCleanupDeletesUploadedAndOrphanSourceFiles() started.
+✔ Test coldStartCleanupDeletesUploadedAndOrphanSourceFiles() passed after 0.001 seconds.
+◇ Test cleanupDoesNotMistakeAnotherStudentsFailedSourceForAnOrphan() started.
+✔ Test cleanupDoesNotMistakeAnotherStudentsFailedSourceForAnOrphan() passed after 0.001 seconds.
+◇ Test coldStartFlushesDurableSourceCleanupIntent() started.
+✔ Test coldStartFlushesDurableSourceCleanupIntent() passed after 0.001 seconds.
+◇ Test cleanupSparesMovedSourceWhoseRecordIsNotYetSaved() started.
+✔ Test cleanupSparesMovedSourceWhoseRecordIsNotYetSaved() passed after 0.022 seconds.
+◇ Test enqueueLeavesNoResidueWhenFirstSaveThrows() started.
+✔ Test enqueueLeavesNoResidueWhenFirstSaveThrows() passed after 0.001 seconds.
+◇ Test removalDuringLegacyCancellationLeaksNoWakeSideEffects() started.
+✔ Test removalDuringLegacyCancellationLeaksNoWakeSideEffects() passed after 0.023 seconds.
+◇ Test removalDuringPendingPartLookupLeaksNoWakeSideEffects() started.
+✔ Test removalDuringPendingPartLookupLeaksNoWakeSideEffects() passed after 0.023 seconds.
+◇ Test removalDuringManualZombieHarvestDoesNotRestartUpload() started.
+✔ Test removalDuringManualZombieHarvestDoesNotRestartUpload() passed after 0.012 seconds.
+◇ Test osWakeRegistrationDuringRecoveryWinsBeforeManualHarvest() started.
+✔ Test osWakeRegistrationDuringRecoveryWinsBeforeManualHarvest() passed after 0.022 seconds.
+◇ Test osWakeAfterManualClaimCannotStartASecondWriter() started.
+✔ Test osWakeAfterManualClaimCannotStartASecondWriter() passed after 0.033 seconds.
+◇ Test oldPartAndCancelEventsCannotWakeWriterDuringManualHarvest() started.
+✔ Test oldPartAndCancelEventsCannotWakeWriterDuringManualHarvest() passed after 0.044 seconds.
+◇ Test weekOverviewViewModelLoadsDaysAndLogs() started.
+✔ Test weekOverviewViewModelLoadsDaysAndLogs() passed after 0.001 seconds.
+◇ Test weekOverviewViewModelHandlesEmptyPlan() started.
+✔ Test weekOverviewViewModelHandlesEmptyPlan() passed after 0.001 seconds.
+◇ Test weekOverviewRetainsFullCycleForCrossWeekNextTrainingLookup() started.
+✔ Test weekOverviewRetainsFullCycleForCrossWeekNextTrainingLookup() passed after 0.001 seconds.
+◇ Test initialLoadUsesNewlyPublishedPlanInOnePass() started.
+✔ Test initialLoadUsesNewlyPublishedPlanInOnePass() passed after 0.001 seconds.
+◇ Test initialLoadFallsBackToCachedPlanWhenRefreshFails() started.
+✔ Test initialLoadFallsBackToCachedPlanWhenRefreshFails() passed after 0.001 seconds.
+◇ Test weekOverviewKeepsLogsRecordedAfterScheduledPlanEnd() started.
+✔ Test weekOverviewKeepsLogsRecordedAfterScheduledPlanEnd() passed after 0.001 seconds.
+◇ Test weekOverviewKeepsLogsRecordedBeforeCoachShift() started.
+✔ Test weekOverviewKeepsLogsRecordedBeforeCoachShift() passed after 0.001 seconds.
+◇ Suite WorkoutCompletionPresentationTests started.
+◇ Test aggregatesCompletedRowsUsingMockupCompletionRules() started.
+✔ Test aggregatesCompletedRowsUsingMockupCompletionRules() passed after 0.001 seconds.
+◇ Test personalRecordRequiresMoreWeightOrEqualWeightWithMoreReps() started.
+✔ Test personalRecordRequiresMoreWeightOrEqualWeightWithMoreReps() passed after 0.001 seconds.
+◇ Test missingStreakStaysHiddenAtThePresentationBoundary() started.
+✔ Test missingStreakStaysHiddenAtThePresentationBoundary() passed after 0.001 seconds.
+◇ Test coachNameContainingRoleIsNotDuplicated(_:) started.
+◇ Test case passing 1 argument coachName → "周教练" to coachNameContainingRoleIsNotDuplicated(_:) started.
+◇ Test case passing 1 argument coachName → "演示教练" to coachNameContainingRoleIsNotDuplicated(_:) started.
+✔ Test coachNameContainingRoleIsNotDuplicated(_:) with 2 test cases passed after 0.001 seconds.
+◇ Test rpeUsesOneDecimalWithRoundHalfUpSemantics() started.
+✔ Test rpeUsesOneDecimalWithRoundHalfUpSemantics() passed after 0.001 seconds.
+◇ Test wholeNumberMainRPEDropsTheDecimalWhileAverageKeepsIt() started.
+✔ Test wholeNumberMainRPEDropsTheDecimalWhileAverageKeepsIt() passed after 0.001 seconds.
+◇ Test fractionalSetsAveragingToAnExactWholeStillDropTheDecimal() started.
+✔ Test fractionalSetsAveragingToAnExactWholeStillDropTheDecimal() passed after 0.001 seconds.
+◇ Test fractionalMainRPEKeepsOneDecimalEvenWhenItRoundsToAWhole() started.
+✔ Test fractionalMainRPEKeepsOneDecimalEvenWhenItRoundsToAWhole() passed after 0.001 seconds.
+◇ Test planComparisonIncludesBoundariesAboveAndBelow() started.
+✔ Test planComparisonIncludesBoundariesAboveAndBelow() passed after 0.001 seconds.
+✔ Suite WorkoutCompletionPresentationTests passed after 0.001 seconds.
+◇ Suite WorkoutDatePolicyTests started.
+◇ Test sharedDayRangeSpansFourAMToTheNextFourAM() started.
+✔ Test sharedDayRangeSpansFourAMToTheNextFourAM() passed after 0.001 seconds.
+◇ Test shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 0 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 1 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 2 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 3 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 4 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 5 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 6 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 7 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 8 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 9 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 10 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 11 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 12 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 13 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 14 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 15 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 16 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 17 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 18 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 19 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 20 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 21 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 22 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+◇ Test case passing 1 argument hour → 23 to shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) started.
+✔ Test shanghaiGymDayMatchesLegacyElapsedFourHourBucketing(hour:) with 24 test cases passed after 0.001 seconds.
+◇ Test wallClockCutoffChangesGymDayAtExactlyFourAM() started.
+✔ Test wallClockCutoffChangesGymDayAtExactlyFourAM() passed after 0.001 seconds.
+◇ Test newYorkGymDayMatchesBackendWallClockSemantics() started.
+✔ Test newYorkGymDayMatchesBackendWallClockSemantics() passed after 0.001 seconds.
+◇ Test springDSTUsesFourAMWallClockInsteadOfFourElapsedHours() started.
+✔ Test springDSTUsesFourAMWallClockInsteadOfFourElapsedHours() passed after 0.001 seconds.
+◇ Test fallDSTUsesFourAMWallClockInsteadOfFourElapsedHours() started.
+✔ Test fallDSTUsesFourAMWallClockInsteadOfFourElapsedHours() passed after 0.001 seconds.
+◇ Test deviceCalendarGymDayRangeRollsAtFourAM() started.
+✔ Test deviceCalendarGymDayRangeRollsAtFourAM() passed after 0.001 seconds.
+✔ Suite WorkoutDatePolicyTests passed after 0.001 seconds.
+✔ Test run with 1018 tests in 46 suites passed after 6.461 seconds.

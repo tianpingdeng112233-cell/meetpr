@@ -51,7 +51,7 @@ extension TodayWorkoutViewModel {
       return .unavailableWithoutReason
     }
     let target = drafts[targetIndex]
-    guard target.prescribed.weightKg == nil else {
+    guard !target.isExtra, !target.isStudentAdded, target.prescribed.weightKg == nil else {
       return .unavailableWithoutReason
     }
 
@@ -337,7 +337,7 @@ extension TodayWorkoutViewModel {
           existingLogs: existingLogs,
           onboardingProfile: onboardingProfile
         )
-      }
+      } + StudentAddedRows.restoredExtras(exercise: exercise, logs: existingLogs)
     }
   }
 
@@ -372,7 +372,8 @@ extension TodayWorkoutViewModel {
       completed: existingLog?.completed ?? false,
       failed: existingLog?.failed ?? false,
       assumed: existingLog?.assumed ?? false,
-      loggedSetID: existingLog?.id
+      loggedSetID: existingLog?.id,
+      recordedAt: existingLog?.loggedAt
     )
   }
 
