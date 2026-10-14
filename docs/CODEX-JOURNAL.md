@@ -1,3 +1,9 @@
+## 2026-10-14 · Spec 092 · 训练历史行样式修复（P1）
+
+按 David 截图与明确格式，额外组和学员自加组复用 `HistorySetRow`：左侧「额外」或「第 N 组」，右侧统一重量/次数/RPE，去掉独立勾号与 kg 前空格；自加动作标题沿用计划动作 body13 bold，附小灰字「自加」。原处方组的已记录、未记录状态样式保持一致。
+
+两项渲染回归先红后绿，StudentKit 全量 1020 项、strict format/lint 通过；Standards 与 Spec 独立审查各 0 findings。MeetPR / Debug 已成功构建并安装运行到 iPhone 12（iOS 26.5）。真机目标历史截图待核对。证据见 [验证摘要](evidence/092-history-style/verification.txt) 与 [审查摘要](evidence/092-history-style/review.txt)。本次不含既有 Xcode scheme/用户状态与 xcstrings 工作区改动。
+
 ## 2026-10-14 · Spec 092 · PR 整合修复（P1）
 
 David 直接授权先合 #364，再把 `release/1.0` 合入 #363。#364 已合为 `c65795c2`；教练父提交 `69a327fd`。自动合并复现 Networking 的 `planDayID` 重复声明与 CodingKey 重复值编译错误；共享 `SetLogDTOs.swift` 恢复成 #364 的唯一版本（`exerciseID` 后接 `planDayID`）。教练实际调用独立的 `CoachSetLogDTO`，核对后无须修改调用点。两端 Demo 接线、JOURNAL 历史均保留，verification 冲突按两端历史摘要合并。

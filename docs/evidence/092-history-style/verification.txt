@@ -1,0 +1,17 @@
+2026-10-14 — training history row style follow-up
+
+RED: extra-set rendered output failed to find 12kg × 10 on the original implementation.
+GREEN: extra-set correction passed all 9 SetNumberSurfaceTests.
+RED: self-added rendering failed the body(size13, bold) font and numbered-row expectations.
+GREEN: both fixes passed all 10 SetNumberSurfaceTests.
+Full StudentKit: 1020 tests passed across 46 suites.
+Strict swift-format and SwiftLint (3 changed Swift files): PASS.
+git diff --check: PASS.
+
+Device build: MeetPR / Debug / Tianping iPhone 12 / iOS 26.5: PASS.
+Xcode build log: 7A99A9F2-B40A-4BD3-A80C-4873E55EF6A3.xcactivitylog; status S, 0 errors, 0 warnings.
+Install and launch: Xcode reports Running MeetPR on Tianping的iPhone.
+Physical-device screenshot comparison: pending target record navigation.
+Environment: first full-test/device-build attempt stopped on ENOSPC before validation.
+Removed only this session’s rebuildable 092-integration-derived cache. XcodeBuildMCP transport then closed; full StudentKit rerun used SwiftPM CLI, device build uses Xcode UI.
+Raw outputs remain outside Git in /Users/david/Projects/scratch/092-history-style/ and XcodeBuildMCP local logs.
