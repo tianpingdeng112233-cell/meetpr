@@ -51,7 +51,7 @@ public enum AuthRepositoryError: Error, Sendable, Equatable {
 
   public var clearsBootstrapSession: Bool {
     switch self {
-    case .backend(401, .invalidRefresh, _), .backend(401, .refreshExpired, _):
+    case .backend(401, _, _):
       true
     case .backend(400, _, _):
       // A 400 on /auth/refresh means the request itself is malformed — retrying the

@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import Observation
 import RepositoryContracts
 
@@ -81,7 +82,7 @@ public final class TodayWorkoutViewModel {
         state = .idle
         return
       }
-      state = .error(error.localizedDescription)
+      state = .error(Self.errorMessage(for: error))
     }
   }
 
@@ -190,7 +191,7 @@ public final class TodayWorkoutViewModel {
         state = .loaded(plan: plan, drafts: drafts)
         return
       }
-      state = .error(error.localizedDescription)
+      state = .error(Self.errorMessage(for: error))
     }
   }
 
@@ -256,6 +257,15 @@ public final class TodayWorkoutViewModel {
 
   private func isCurrentLoad(_ generation: Int) -> Bool {
     generation == loadGeneration
+  }
+
+  private static func errorMessage(for error: Error) -> String {
+    switch error {
+    case is SessionStateReaderError, APIError.authInvalid:
+      return "登录已过期,请重新登录"
+    default:
+      return "操作失败,请稍后重试"
+    }
   }
 
 }

@@ -2,6 +2,7 @@ import CoreModels
 import Foundation
 
 public enum SessionStateReaderError: Error, Equatable, Sendable {
+  case authenticationExpired
   case missingAccessToken
   case missingCurrentUser
 }
