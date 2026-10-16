@@ -22,48 +22,74 @@ public final class TodayWorkoutViewModel {
   public private(set) var state: State = .idle
   /// Set when a completed set breaks the exercise's e1RM record; the view
   /// presents PRBanner and calls `acknowledgePR` on dismiss (spec 028).
-  public private(set) var pendingPRBanner: PRBreakthroughEvent?
+  public internal(set) var pendingPRBanner: PRBreakthroughEvent?
   /// Inter-set rest countdown (spec 030 §B). Purely local, never persisted.
   public private(set) var restTimer: RestTimerState?
   public private(set) var planContext: TodayWorkoutPlanContext?
   public private(set) var exerciseReferences: [UUID: ExerciseReference] = [:]
+  public internal(set) var sessionPage: TodayWorkoutSessionPage = .loading
+  public private(set) var lastCompletedDurationSeconds: Int?
 
   private let plans: any StudentPlanRepository
   private let logs: any StudentTrainingLogRepository
-  private let e1rmRepo: any E1RMRepository
+  let e1rmRepo: any E1RMRepository
   private let onboarding: any OnboardingProfileReading
-  private let now: @Sendable () -> Date
-  private var currentStudentID: UUID?
-  private var currentOnboarding: OnboardingProfile?
-  private var loadGeneration = 0
+  let sessions: any TrainingSessionRepository
+  let now: @Sendable () -> Date
+  let recentCompletedDurationStore: any RecentCompletedSessionDurationStoring
+  let sessionActivityCenter: TrainingSessionActivityCenter
+  var currentStudentID: UUID?
+  var currentOnboarding: OnboardingProfile?
+  var loadGeneration = 0
+  var sessionStartGeneration = 0
+  var viewingToday = true
+  var currentGymDay: String?
+  var localSessionOverride: LocalSessionOverride?
+  var sessionStartTask: Task<Void, Never>?
 
   public init(
     plans: any StudentPlanRepository,
     logs: any StudentTrainingLogRepository,
     e1rm: any E1RMRepository = InMemoryE1RMRepository(),
     onboarding: any OnboardingProfileReading = InMemoryOnboardingRepository(studentId: UUID()),
+    sessions: any TrainingSessionRepository = InMemoryTrainingSessionRepository(),
+    sessionActivityCenter: TrainingSessionActivityCenter = TrainingSessionActivityCenter(),
+    recentCompletedDurationStore: any RecentCompletedSessionDurationStoring =
+      UserDefaultsSessionDurationStore(),
     now: @escaping @Sendable () -> Date = { Date() }
   ) {
     self.plans = plans
     self.logs = logs
     self.e1rmRepo = e1rm
     self.onboarding = onboarding
+    self.sessions = sessions
+    self.sessionActivityCenter = sessionActivityCenter
+    self.recentCompletedDurationStore = recentCompletedDurationStore
     self.now = now
   }
 
-  public func load(date: Date, studentID: UUID) async {
+  public func load(date: Date, sessionDate: Date? = nil, studentID: UUID) async {
     currentStudentID = studentID
     loadGeneration += 1
     let generation = loadGeneration
+    let issuedStartGeneration = sessionStartGeneration
+    viewingToday = sessionDate == nil
     state = .loading
+    sessionPage =
+      sessionDate == nil
+      ? localSessionOverride.map { Self.resolveSessionPage(for: $0.session) } ?? .loading
+      : .loading
     do {
+      let fetchedSession = try? await sessions.fetchSession(on: sessionDate)
+      let recentCompletedSession = await sessions.recentCompletedSession(before: date)
+      let persistedDuration = recentCompletedDurationStore.durationSeconds(studentID: studentID)
       currentOnboarding = try? await onboarding.fetchProfile(studentId: studentID)
       let plan = try await plans.fetchCurrentPlan(studentID: studentID)
-      guard isCurrentLoad(generation) else { return }
+      guard generation == loadGeneration else { return }
       planContext = Self.planContext(from: plan, selectedDate: date)
 
       guard let day = try await loadDay(from: plan, date: date, studentID: studentID) else {
-        guard isCurrentLoad(generation) else { return }
+        guard generation == loadGeneration else { return }
         exerciseReferences = [:]
         state = .rest
         return
@@ -72,11 +98,20 @@ public final class TodayWorkoutViewModel {
       let existingLogs = try await logs.fetchLogs(studentID: studentID, in: dayRange)
       let drafts = Self.makeDrafts(for: day, existingLogs: existingLogs)
       let references = try await exerciseReferences(for: day, studentID: studentID)
-      guard isCurrentLoad(generation) else { return }
+      guard generation == loadGeneration else { return }
       exerciseReferences = references
+      applyFetchedSession(
+        fetchedSession,
+        isToday: sessionDate == nil,
+        issuedStartGeneration: issuedStartGeneration
+      )
+      lastCompletedDurationSeconds = recentCompletedSession?.durationSeconds ?? persistedDuration
+      if let duration = recentCompletedSession?.durationSeconds {
+        recentCompletedDurationStore.record(durationSeconds: duration, studentID: studentID)
+      }
       state = .loaded(plan: day, drafts: drafts)
     } catch {
-      guard isCurrentLoad(generation) else { return }
+      guard generation == loadGeneration else { return }
       if error.isTaskCancellation {
         state = .idle
         return
@@ -175,6 +210,10 @@ public final class TodayWorkoutViewModel {
       nextDrafts[rowIndex] = draft
       state = .loaded(plan: plan, drafts: nextDrafts)
 
+      if !nextDrafts.isEmpty && nextDrafts.allSatisfy(\.completed) {
+        await completeSessionLocally(at: now())
+      }
+
       // Spec 028 hook: compute e1RM + detect PR only on the false→true edge,
       // so un-checking and re-checking the same set can't farm PR events.
       // Spec 030 rides the same edge for the rest timer.
@@ -252,126 +291,5 @@ public final class TodayWorkoutViewModel {
     default:
       return
     }
-  }
-
-  private func isCurrentLoad(_ generation: Int) -> Bool {
-    generation == loadGeneration
-  }
-
-}
-
-// MARK: - Draft building & e1RM/PR side effects
-
-@available(iOS 17.0, macOS 14.0, *)
-extension TodayWorkoutViewModel {
-  func exerciseReferences(
-    for day: StudentPlanDay,
-    studentID: UUID
-  ) async throws -> [UUID: ExerciseReference] {
-    let familyByExercise = Dictionary(
-      day.exercises.map {
-        (
-          $0.exercise.id,
-          resolveCompetitionFamily(exercise: $0.exercise, onboarding: currentOnboarding)
-        )
-      },
-      uniquingKeysWith: { first, _ in first })
-    let exerciseIDs = Set(day.exercises.map(\.exercise.id))
-    let e1rmRepo = self.e1rmRepo
-    return try await withThrowingTaskGroup(of: (UUID, ExerciseReference?).self) { group in
-      for exerciseID in exerciseIDs {
-        let family = familyByExercise[exerciseID].flatMap { $0 }
-        group.addTask {
-          let points = try await e1rmRepo.fetchHistory(studentId: studentID, exerciseId: exerciseID)
-          // Last/Best keep raw semantics but only over eligible sets
-          // (spec 050 §2) — an RPE-6 warm-up is no reference.
-          let selected = lastAndBest(
-            from: E1RMSeries.eligibleRaw(points: points, family: family))
-          let reference = ExerciseReference(
-            last: selected.last.map(ExerciseReferenceSet.init(point:)),
-            best: selected.best.map(ExerciseReferenceSet.init(point:))
-          )
-          return (exerciseID, reference.hasValue ? reference : nil)
-        }
-      }
-
-      var references: [UUID: ExerciseReference] = [:]
-      for try await (exerciseID, reference) in group {
-        if let reference {
-          references[exerciseID] = reference
-        }
-      }
-      return references
-    }
-  }
-
-  static func makeDrafts(
-    for day: StudentPlanDay,
-    existingLogs: [StudentSetLog]
-  ) -> [SetRowDraft] {
-    day.exercises.flatMap { exercise in
-      exercise.prescribedSets.map { set in
-        makeDraft(exercise: exercise, set: set, existingLogs: existingLogs)
-      }
-    }
-  }
-
-  static func makeDraft(
-    exercise: StudentPlanExercise,
-    set: PrescribedSet,
-    existingLogs: [StudentSetLog]
-  ) -> SetRowDraft {
-    let existingLog = existingLogs.first {
-      $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex
-    }
-    return SetRowDraft(
-      id: set.id,
-      planExerciseID: exercise.id,
-      exerciseID: exercise.exercise.id,
-      exerciseName: exercise.exercise.name,
-      prescribed: set,
-      actualWeight: existingLog?.weightKg ?? set.weightKg,
-      actualReps: existingLog?.reps ?? set.reps,
-      actualRPE: existingLog?.rpe ?? set.rpe ?? 8,
-      completed: existingLog?.completed ?? false,
-      failed: existingLog?.failed ?? false,
-      loggedSetID: existingLog?.id
-    )
-  }
-
-  func recordE1RMPoint(
-    for draft: SetRowDraft,
-    log: StudentSetLog,
-    studentID: UUID
-  ) async {
-    // Shared pipeline (spec 050 §3): eligibility gate + noise-banded PR.
-    let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
-    let event = await recorder.record(
-      E1RMRecorder.Input(
-        studentID: studentID,
-        exerciseID: draft.exerciseID,
-        family: exerciseFamily(planExerciseID: draft.planExerciseID),
-        setLogID: log.id,
-        weightKg: log.weightKg,
-        reps: log.reps,
-        rpe: draft.actualRPE,
-        failed: log.failed
-      ))
-    if let event {
-      pendingPRBanner = event
-    }
-  }
-
-  private func exerciseFamily(planExerciseID: UUID) -> LiftFamily? {
-    let day: StudentPlanDay?
-    switch state {
-    case .loaded(let plan, _), .recording(let plan, _, _):
-      day = plan
-    default:
-      day = nil
-    }
-    guard let exercise = day?.exercises.first(where: { $0.id == planExerciseID })?.exercise
-    else { return nil }
-    return resolveCompetitionFamily(exercise: exercise, onboarding: currentOnboarding)
   }
 }

@@ -5,10 +5,8 @@ import SwiftUI
 struct NotificationCenterSheet: View {
   let planNotice: DashboardPlanNotice?
   let feedbackUnreadCount: Int
-  let evaluationUnreadCount: Int
   let onOpenPlan: () -> Void
   let onOpenFeedback: () -> Void
-  let onOpenEvaluation: () -> Void
   @Environment(\.dismiss) private var dismiss
 
   var body: some View {
@@ -28,14 +26,6 @@ struct NotificationCenterSheet: View {
             title: "\(feedbackUnreadCount) 条未读反馈",
             subtitle: "查看教练最近的训练反馈",
             action: close(after: onOpenFeedback)
-          )
-        }
-        if evaluationUnreadCount > 0 {
-          NotificationActionRow(
-            systemImage: "checkmark.seal",
-            title: "评估已完成",
-            subtitle: "打开完整评估总结",
-            action: close(after: onOpenEvaluation)
           )
         }
         if isEmpty {
@@ -60,7 +50,7 @@ struct NotificationCenterSheet: View {
   }
 
   private var isEmpty: Bool {
-    planNotice == nil && feedbackUnreadCount == 0 && evaluationUnreadCount == 0
+    planNotice == nil && feedbackUnreadCount == 0
   }
 
   private func close(after action: @escaping () -> Void) -> () -> Void {

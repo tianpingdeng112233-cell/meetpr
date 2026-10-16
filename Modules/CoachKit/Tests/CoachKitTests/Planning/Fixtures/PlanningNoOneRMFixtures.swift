@@ -9,7 +9,7 @@ extension PlanningFixtures {
     CoachStudentSummary(
       id: uuid(14),
       displayName: "赵安然",
-      status: .inEvaluation(remainingDays: 6, remainingHours: 2)
+      status: .active
     )
   }
 }

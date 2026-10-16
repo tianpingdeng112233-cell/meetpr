@@ -16,46 +16,44 @@ public struct RenameCoachStudentRequestDTO: Codable, Equatable, Sendable {
   }
 }
 
-/// The roster row's active-evaluation window (backend fix #20, spec 033 D2
-/// revision): present exactly while the pair has an uncompleted evaluation
-/// period. iOS derives the remaining-time badge from `expectedEndAt` plus a
-/// local now — `overdue` is the server's read-time flag.
-public struct CoachStudentEvaluationDTO: Codable, Equatable, Sendable {
-  public let id: UUID
-  public let expectedEndAt: Date
-  public let overdue: Bool
+public struct CoachStudentRecentWeekDTO: Codable, Equatable, Sendable {
+  public let trainedDays: Int
+  public let plannedDays: Int
 
-  public init(id: UUID, expectedEndAt: Date, overdue: Bool) {
-    self.id = id
-    self.expectedEndAt = expectedEndAt
-    self.overdue = overdue
+  public init(trainedDays: Int, plannedDays: Int) {
+    self.trainedDays = trainedDays
+    self.plannedDays = plannedDays
   }
 }
 
 /// GET /coach/students item. Real wire (handlers/coach-students.ts since
 /// backend #9): `{ id, display_name, profile: { user_id, display_name,
-/// created_at }, status, evaluation }` — the previous flat
+/// created_at }, status, ... }` — the previous flat
 /// `{ user_id, created_at }` decode never matched staging (drift fixed with
-/// spec 033 D2). Decoding falls back to the flat keys defensively.
+/// spec 033 D2). Decoding falls back to the flat keys defensively and ignores
+/// retired or future response fields.
 public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
   public let userID: UUID
   public let displayName: String
   public let createdAt: Date
   public let status: String
-  public let evaluation: CoachStudentEvaluationDTO?
+  public let competitionDate: String?
+  public let recentFourWeeks: [CoachStudentRecentWeekDTO]?
 
   public init(
     userID: UUID,
     displayName: String,
     createdAt: Date,
     status: String,
-    evaluation: CoachStudentEvaluationDTO? = nil
+    competitionDate: String? = nil,
+    recentFourWeeks: [CoachStudentRecentWeekDTO]? = nil
   ) {
     self.userID = userID
     self.displayName = displayName
     self.createdAt = createdAt
     self.status = status
-    self.evaluation = evaluation
+    self.competitionDate = competitionDate
+    self.recentFourWeeks = recentFourWeeks
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -65,7 +63,8 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
     case createdAt
     case profile
     case status
-    case evaluation
+    case competitionDate
+    case recent4W
   }
 
   private struct ProfileDTO: Codable, Equatable, Sendable {
@@ -97,7 +96,11 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
       )
     }
     status = try container.decodeIfPresent(String.self, forKey: .status) ?? "active"
-    evaluation = try container.decodeIfPresent(CoachStudentEvaluationDTO.self, forKey: .evaluation)
+    competitionDate = try container.decodeIfPresent(String.self, forKey: .competitionDate)
+    recentFourWeeks = try container.decodeIfPresent(
+      [CoachStudentRecentWeekDTO].self,
+      forKey: .recent4W
+    )
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -109,6 +112,7 @@ public struct CoachStudentSummaryDTO: Codable, Equatable, Sendable {
       forKey: .profile
     )
     try container.encode(status, forKey: .status)
-    try container.encodeIfPresent(evaluation, forKey: .evaluation)
+    try container.encodeIfPresent(competitionDate, forKey: .competitionDate)
+    try container.encodeIfPresent(recentFourWeeks, forKey: .recent4W)
   }
 }

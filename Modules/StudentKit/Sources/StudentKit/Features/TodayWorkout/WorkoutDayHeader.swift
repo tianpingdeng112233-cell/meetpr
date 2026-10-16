@@ -7,6 +7,7 @@ struct WorkoutDayHeader: View {
   let day: StudentPlanDay
   let context: TodayWorkoutPlanContext?
   let readinessFiled: Bool
+  let sessionElapsedSeconds: Int?
 
   var body: some View {
     VStack(alignment: .leading, spacing: 6) {
@@ -15,6 +16,9 @@ struct WorkoutDayHeader: View {
           .font(.title2.bold())
           .foregroundStyle(Color.MeetPR.fgPrimary)
         Spacer()
+        if let sessionElapsedSeconds {
+          TrainingSessionTimerChip(seconds: sessionElapsedSeconds)
+        }
         readinessBadge
       }
 

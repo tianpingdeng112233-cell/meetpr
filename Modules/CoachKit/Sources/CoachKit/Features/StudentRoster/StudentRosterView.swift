@@ -5,7 +5,7 @@ import SwiftUI
 
 /// Coach 学员 tab, reskinned to the design's `RosterList` layout: a custom
 /// large-title "学员" header, the 今日分诊 strip, and the roster grouped by
-/// lifecycle status (评估期内 / 活跃 / 异常) into bordered card surfaces of
+/// lifecycle status (活跃 / 异常) into bordered card surfaces of
 /// dot + name/sub + status badge + chevron rows. This tab shows ONLY accepted
 /// students' status; new-student requests live in the 接收 tab. Binds verbatim
 /// to `StudentRosterViewModel`; navigation, search, refresh, and the
@@ -159,9 +159,6 @@ struct StudentRosterView: View {
             StudentDetailView(
               summary: row.student,
               context: context,
-              onEvaluationCompleted: { [viewModel] in
-                viewModel.markStudentActive(row.student.id)
-              },
               onStudentRenamed: { [viewModel] renamed in
                 viewModel.applyRenamedStudent(renamed)
               }
@@ -199,12 +196,6 @@ struct StudentRosterView: View {
                 StudentDetailView(
                   summary: row.student,
                   context: context,
-                  // Both completion paths (banner [完成评估] and the summary
-                  // editor chain) report back here, so the roster row drops its
-                  // 评估中 status without waiting for the next full refresh.
-                  onEvaluationCompleted: { [viewModel] in
-                    viewModel.markStudentActive(row.student.id)
-                  },
                   onStudentRenamed: { [viewModel] renamed in
                     viewModel.applyRenamedStudent(renamed)
                   }
@@ -220,23 +211,20 @@ struct StudentRosterView: View {
     }
   }
 
-  /// `filteredRows` partitioned into the design's three lifecycle groups,
+  /// `filteredRows` partitioned into the design's two lifecycle groups,
   /// preserving the model's existing ordering within each. Empty groups are
   /// dropped so the section header count is never `· 0`.
   private var statusGroups: [RosterStatusGroup] {
     let rows = viewModel.filteredRows
-    var evaluating: [StudentRosterRowModel] = []
     var active: [StudentRosterRowModel] = []
     var abnormal: [StudentRosterRowModel] = []
     for row in rows {
       switch row.student.status {
-      case .inEvaluation: evaluating.append(row)
       case .active: active.append(row)
       case .abnormal: abnormal.append(row)
       }
     }
     return [
-      RosterStatusGroup(id: "evaluating", title: "评估期内", rows: evaluating),
       RosterStatusGroup(id: "active", title: "活跃", rows: active),
       RosterStatusGroup(id: "abnormal", title: "异常", rows: abnormal),
     ].filter { !$0.rows.isEmpty }
@@ -251,10 +239,12 @@ struct StudentRosterView: View {
         .frame(width: 9, height: 9)
 
       VStack(alignment: .leading, spacing: 3) {
-        Text(row.student.displayName)
-          .font(.system(size: 17, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.fgPrimary)
-          .lineLimit(1)
+        StudentNameWithCompetitionPill(
+          displayName: row.student.displayName,
+          competitionCountdownText: row.competitionCountdownText,
+          font: .system(size: 17, weight: .semibold),
+          minimumScaleFactor: 1
+        )
         Text(subtitle(for: row))
           .font(.system(size: 13))
           .foregroundStyle(Color.MeetPR.fgTertiary)
@@ -263,7 +253,12 @@ struct StudentRosterView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
 
       let badge = badge(for: row)
-      StatusBadge(status: badge.status, title: badge.title)
+      VStack(alignment: .trailing, spacing: 4) {
+        StatusBadge(status: badge.status, title: badge.title)
+        if let attendanceBarTones = row.attendanceBarTones {
+          StudentAttendanceMiniBars(tones: attendanceBarTones)
+        }
+      }
 
       Image(systemName: "chevron.right")
         .font(.system(size: 15))
@@ -282,9 +277,8 @@ struct StudentRosterView: View {
     .accessibilityLabel(row.student.displayName)
   }
 
-  /// Status dot color mirrors `StudentRosterRow`'s badge intent: needs-attention
-  /// rows go red/amber by signal, evaluation amber, active green when this week
-  /// is met else fgPrimary, abnormal amber.
+  /// Status dot color: needs-attention rows go red/amber by signal, active
+  /// green when this week is met else fgPrimary, abnormal amber.
   private func dotColor(for row: StudentRosterRowModel) -> Color {
     if row.needsAttention {
       let notTrained = row.triageSignals.contains { signal in
@@ -294,8 +288,6 @@ struct StudentRosterView: View {
       return notTrained ? Color.MeetPR.brandRed : Color.MeetPR.amber
     }
     switch row.student.status {
-    case .inEvaluation:
-      return Color.MeetPR.amber
     case .active:
       if row.plannedTrainingDays > 0 && row.completedTrainingDays >= row.plannedTrainingDays {
         return Color.MeetPR.green
@@ -306,8 +298,8 @@ struct StudentRosterView: View {
     }
   }
 
-  /// Real second line: completion + last-active for active rows; the status text
-  /// (评估期 N 天 / N 天未训练 / W停滞) for evaluation/abnormal rows. The design's
+  /// Real second line: completion + last-active for active rows; abnormal
+  /// status text for abnormal rows. The design's
   /// "W3D1 · 训练中 · 第3/4组 / 3视频待看 / 09:00" live-session strings have no
   /// backing field in the row model — degraded to the data we actually have.
   private func subtitle(for row: StudentRosterRowModel) -> String {
@@ -318,7 +310,7 @@ struct StudentRosterView: View {
     switch row.student.status {
     case .active:
       return row.completionText + " · " + lastActiveText(row)
-    case .inEvaluation, .abnormal:
+    case .abnormal:
       return row.statusText
     }
   }
@@ -330,8 +322,8 @@ struct StudentRosterView: View {
     return "上次活跃 \(CoachStudentFormatting.relativeText(lastActiveAt))"
   }
 
-  /// Reuses the real `StudentRosterRow` badge mapping verbatim so the reskin and
-  /// the existing row agree on status copy/color.
+  /// Status badge mapping for the two surviving lifecycle groups plus the
+  /// needs-attention override.
   private func badge(for row: StudentRosterRowModel) -> (status: StatusBadge.Status, title: String)
   {
     if row.needsAttention {
@@ -346,8 +338,6 @@ struct StudentRosterView: View {
         return (.ready, "本周 \(row.completedTrainingDays)/\(row.plannedTrainingDays)")
       }
       return (.pending, "本周 \(row.completedTrainingDays)/\(row.plannedTrainingDays)")
-    case .inEvaluation:
-      return (.pending, row.statusText)
     case .abnormal:
       return (.overdue, row.statusText)
     }
@@ -372,7 +362,7 @@ struct StudentRosterView: View {
   }
 }
 
-/// One lifecycle group (评估期内 / 活跃 / 异常) of roster rows.
+/// One lifecycle group (活跃 / 异常) of roster rows.
 @available(iOS 17.0, macOS 14.0, *)
 private struct RosterStatusGroup: Identifiable {
   let id: String

@@ -71,6 +71,52 @@ import Testing
   @Test func emptyDayReturnsEmpty() {
     #expect(MainLiftExerciseFamilyResolver.families(in: day([])).isEmpty)
   }
+
+  @Test func sharedDayNameCoversEverySBDCombination() {
+    let cases: [([StudentPlanExercise], String)] = [
+      ([exercise("深蹲", .mainLift, .squat)], "S 日"),
+      ([exercise("卧推", .mainLift, .bench)], "B 日"),
+      ([exercise("硬拉", .mainLift, .deadlift)], "D 日"),
+      (
+        [
+          exercise("深蹲", .mainLift, .squat),
+          exercise("卧推", .mainLift, .bench),
+        ],
+        "SB 日"
+      ),
+      (
+        [
+          exercise("深蹲", .mainLift, .squat),
+          exercise("硬拉", .mainLift, .deadlift),
+        ],
+        "SD 日"
+      ),
+      (
+        [
+          exercise("卧推", .mainLift, .bench),
+          exercise("硬拉", .mainLift, .deadlift),
+        ],
+        "BD 日"
+      ),
+      (
+        [
+          exercise("硬拉", .mainLift, .deadlift),
+          exercise("深蹲", .mainLift, .squat),
+          exercise("卧推", .mainLift, .bench),
+        ],
+        "SBD 日"
+      ),
+      ([exercise("划船", .accessory, nil)], "辅助日"),
+    ]
+
+    for (exercises, expected) in cases {
+      #expect(MainLiftExerciseFamilyResolver.dayName(in: day(exercises)) == expected)
+    }
+  }
+
+  @Test func sharedDayNameDistinguishesNoPlan() {
+    #expect(MainLiftExerciseFamilyResolver.dayName(in: nil) == nil)
+  }
 }
 
 // MARK: - Builders

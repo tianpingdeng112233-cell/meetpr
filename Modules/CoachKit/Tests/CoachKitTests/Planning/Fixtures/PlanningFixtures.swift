@@ -9,7 +9,7 @@ enum PlanningFixtures {
   static let now = Date(timeIntervalSince1970: 1_766_630_400)
   static let planID = uuid(1)
   static let coachID = uuid(2)
-  static let evaluationStudentID = uuid(10)
+  static let firstActiveStudentID = uuid(10)
   static let activeStudentID = uuid(11)
   static let secondActiveStudentID = uuid(12)
   static let abnormalStudentID = uuid(13)
@@ -33,9 +33,9 @@ enum PlanningFixtures {
   static func students() -> [CoachStudentSummary] {
     [
       CoachStudentSummary(
-        id: evaluationStudentID,
+        id: firstActiveStudentID,
         displayName: "王小明",
-        status: .inEvaluation(remainingDays: 4, remainingHours: 13)
+        status: .active
       ),
       CoachStudentSummary(
         id: activeStudentID,

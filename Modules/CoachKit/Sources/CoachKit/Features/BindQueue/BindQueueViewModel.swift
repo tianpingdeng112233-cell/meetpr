@@ -54,23 +54,12 @@ final class BindQueueViewModel {
   }
 
   /// True on success (caller refreshes the roster — a new student appeared).
-  /// `skipReason` is only carried on the skip branch and only when non-blank
-  /// (zod superRefine alignment, spec 033 §5).
-  func accept(_ item: CoachBindRequestItem, skipEvaluation: Bool, skipReason: String?) async
-    -> Bool
-  {
+  func accept(_ item: CoachBindRequestItem) async -> Bool {
     bannerMessage = nil
-    let trimmedReason = skipReason?.trimmingCharacters(in: .whitespacesAndNewlines)
-    let reason = (skipEvaluation && trimmedReason?.isEmpty == false) ? trimmedReason : nil
     do {
-      let outcome = try await repository.accept(
-        requestID: item.id,
-        skipEvaluation: skipEvaluation,
-        skipReason: reason
-      )
+      try await repository.accept(requestID: item.id)
       items.removeAll { $0.id == item.id }
-      toastMessage =
-        outcome.evaluation == nil ? "已接收" : "已接收,评估期 7 天开始"
+      toastMessage = "已接收"
       return true
     } catch let error as CoachBindQueueError {
       bannerMessage = Self.bannerText(for: error)

@@ -9,6 +9,8 @@ struct StudentRosterRowModel: Hashable, Identifiable, Sendable {
   let completedTrainingDays: Int
   let lastActiveAt: Date?
   let triageSignals: [TriageSignal]
+  let competitionCountdownText: String?
+  let attendanceBarTones: [RosterAttendanceBarTone]?
 
   var id: UUID { student.id }
 
@@ -88,27 +90,6 @@ final class StudentRosterViewModel {
     await refresh()
   }
 
-  /// Evaluation completed from the detail page (Codex review P1): flip the
-  /// row to active in place — a full refresh would flash `.loading` over the
-  /// whole roster for a one-field change. The next pull-to-refresh converges
-  /// with the server anyway.
-  func markStudentActive(_ studentID: UUID) {
-    rows = rows.map { row in
-      guard row.student.id == studentID else { return row }
-      return StudentRosterRowModel(
-        student: CoachStudentSummary(
-          id: row.student.id,
-          displayName: row.student.displayName,
-          status: .active
-        ),
-        plannedTrainingDays: row.plannedTrainingDays,
-        completedTrainingDays: row.completedTrainingDays,
-        lastActiveAt: row.lastActiveAt,
-        triageSignals: row.triageSignals
-      )
-    }
-  }
-
   func applyRenamedStudent(_ renamed: CoachStudentSummary) {
     rows = rows.map { row in
       guard row.student.id == renamed.id else { return row }
@@ -117,7 +98,12 @@ final class StudentRosterViewModel {
         plannedTrainingDays: row.plannedTrainingDays,
         completedTrainingDays: row.completedTrainingDays,
         lastActiveAt: row.lastActiveAt,
-        triageSignals: row.triageSignals
+        triageSignals: row.triageSignals,
+        competitionCountdownText: CompetitionCountdownText.make(
+          competitionDate: renamed.competitionDate,
+          relativeTo: now()
+        ),
+        attendanceBarTones: renamed.recentFourWeeks?.map(RosterAttendanceBarTone.map)
       )
     }
   }
@@ -178,8 +164,8 @@ final class StudentRosterViewModel {
     feedback: any StudentFeedbackRepository,
     now: @Sendable () -> Date
   ) async -> StudentRosterRowModel {
+    let timestamp = now()
     do {
-      let timestamp = now()
       let plan = try await plans.fetchCurrentPlan(studentID: summary.id)
       let range = Self.logFetchRange(for: plan, now: timestamp)
       async let logs = trainingLogs.fetchLogs(studentID: summary.id, in: range)
@@ -197,7 +183,12 @@ final class StudentRosterViewModel {
         plannedTrainingDays: 0,
         completedTrainingDays: 0,
         lastActiveAt: nil,
-        triageSignals: []
+        triageSignals: [],
+        competitionCountdownText: CompetitionCountdownText.make(
+          competitionDate: summary.competitionDate,
+          relativeTo: timestamp
+        ),
+        attendanceBarTones: summary.recentFourWeeks?.map(RosterAttendanceBarTone.map)
       )
     }
   }
@@ -229,7 +220,12 @@ final class StudentRosterViewModel {
       plannedTrainingDays: plannedDays.count,
       completedTrainingDays: completedDays.count,
       lastActiveAt: latestLog,
-      triageSignals: triageSignals
+      triageSignals: triageSignals,
+      competitionCountdownText: CompetitionCountdownText.make(
+        competitionDate: summary.competitionDate,
+        relativeTo: now
+      ),
+      attendanceBarTones: summary.recentFourWeeks?.map(RosterAttendanceBarTone.map)
     )
   }
 

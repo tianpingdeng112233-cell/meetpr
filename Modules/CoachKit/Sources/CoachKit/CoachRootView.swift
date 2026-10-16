@@ -11,11 +11,12 @@ public struct CoachRootView: View {
   private let inviteCodes: any InviteCodeRepository
   private let detailContext: CoachStudentDetailContext
   private let draftStore: DraftStore
+  @State private var tabSelection: CoachTabSelection
   @State private var rosterViewModel: StudentRosterViewModel
   @State private var queueViewModel: BindQueueViewModel
   @State private var videoQueueViewModel: CoachVideoQueueViewModel
+  @State private var dashboardViewModel: CoachDashboardViewModel
   @State private var profileViewModel: CoachMyProfileViewModel
-  @State private var selectedTab: CoachTab = .today
 
   @MainActor
   public init(
@@ -28,31 +29,26 @@ public struct CoachRootView: View {
     readiness: any ReadinessRepository = EmptyReadinessRepository(),
     familyMapProvider: (any CoachPlanFamilyMapProviding)? = nil,
     bindQueue: (any CoachBindQueueRepository)? = nil,
-    evaluations: (any EvaluationRepository)? = nil,
-    evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
     studentProfiles: (any OnboardingProfileReading)? = nil,
     videoQueue: (any CoachVideoQueueRepository)? = nil,
+    dashboard: (any CoachDashboardRepository)? = nil,
+    tabSelection: CoachTabSelection = CoachTabSelection(),
     onLogout: @escaping @MainActor () async -> Void = {},
     draftStore: DraftStore = DraftStore.shared
   ) {
-    self.repository = repository
-    self.studentPlans = studentPlans
+    (self.repository, self.studentPlans) = (repository, studentPlans)
     self.studentLogs = studentLogs
     self.feedback = feedback
     self.inviteCodes = inviteCodes ?? InMemoryInviteCodeRepository()
     self.draftStore = draftStore
+    _tabSelection = State(initialValue: tabSelection)
     let resolvedQueue =
-      bindQueue ?? InMemoryCoachBindQueueRepository(coachId: UUID())
-    let resolvedEvaluations = evaluations ?? InMemoryCoachEvaluationRepository()
-    let resolvedSummaries =
-      evaluationSummaries ?? InMemoryCoachEvaluationSummaryRepository(coachId: UUID())
+      bindQueue ?? InMemoryCoachBindQueueRepository()
     let resolvedProfiles = studentProfiles ?? InMemoryCoachStudentProfileReader()
     detailContext = CoachStudentDetailContext(
       plans: studentPlans,
       trainingLogs: studentLogs,
       feedback: feedback,
-      evaluations: resolvedEvaluations,
-      summaries: resolvedSummaries,
       profiles: resolvedProfiles,
       videos: studentVideos,
       readiness: readiness,
@@ -80,21 +76,31 @@ public struct CoachRootView: View {
     _videoQueueViewModel = State(
       initialValue: CoachVideoQueueViewModel(repository: resolvedVideoQueue)
     )
+    let resolvedDashboard =
+      dashboard
+      ?? InMemoryCoachDashboardRepository(
+        signals: CoachDemoSeed.dashboardSignals(),
+        dailyDigestBody: CoachDemoSeed.dailyDigestBody
+      )
+    _dashboardViewModel = State(
+      initialValue: CoachDashboardViewModel(repository: resolvedDashboard)
+    )
     _profileViewModel = State(
       initialValue: CoachMyProfileViewModel(logoutAction: onLogout)
     )
   }
 
   public var body: some View {
-    TabView(selection: $selectedTab) {
+    @Bindable var tabSelection = tabSelection
+    TabView(selection: $tabSelection.selectedTab) {
       CoachDashboardView(
         attentionCount: rosterViewModel.pendingAttentionCount,
         pendingCount: queueViewModel.pendingCount,
         context: detailContext,
         rows: rosterViewModel.rows,
-        onOpenReceiving: { selectedTab = .receiving },
-        onOpenRoster: { selectedTab = .students },
-        onEvaluationCompleted: { rosterViewModel.markStudentActive($0) }
+        onOpenReceiving: { tabSelection.select(.receiving) },
+        onOpenRoster: { tabSelection.select(.students) },
+        viewModel: dashboardViewModel
       )
       .tag(CoachTab.today)
       .tabItem {
@@ -143,15 +149,8 @@ public struct CoachRootView: View {
       await rosterViewModel.loadIfNeeded()
       await queueViewModel.loadIfNeeded()
       await videoQueueViewModel.loadIfNeeded()
+      await dashboardViewModel.loadIfNeeded()
     }
     .tint(Color.MeetPR.brandRed)
   }
-}
-
-private enum CoachTab: Hashable {
-  case today
-  case students
-  case planning
-  case receiving
-  case profile
 }

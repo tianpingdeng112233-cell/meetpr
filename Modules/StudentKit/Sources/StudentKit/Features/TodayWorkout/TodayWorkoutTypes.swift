@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import RepositoryContracts
 
 // Top-level homes for TodayWorkoutViewModel's value types (typealiased back
 // onto the VM) — keeps the @Observable class body inside SwiftLint's
@@ -107,6 +108,68 @@ public struct TodayWorkoutPlanContext: Equatable, Sendable {
       trainingMax: trainingMax,
       tmSetAt: tmSetAt
     )
+  }
+}
+
+public enum TodayWorkoutSessionPage: Equatable, Sendable {
+  case loading
+  case overview
+  case inProgress(TrainingSession)
+  case completed(TrainingSession)
+}
+
+public protocol RecentCompletedSessionDurationStoring: Sendable {
+  func durationSeconds(studentID: UUID) -> Int?
+  func record(durationSeconds: Int, studentID: UUID)
+}
+
+/// Persists the optional overview stat without adding a backend history
+/// endpoint. The suite name makes cold-start behavior independently testable.
+public struct UserDefaultsSessionDurationStore: RecentCompletedSessionDurationStoring {
+  private let suiteName: String?
+
+  public init(suiteName: String? = nil) {
+    self.suiteName = suiteName
+  }
+
+  public func durationSeconds(studentID: UUID) -> Int? {
+    let key = Self.key(studentID)
+    guard defaults.object(forKey: key) != nil else { return nil }
+    return defaults.integer(forKey: key)
+  }
+
+  public func record(durationSeconds: Int, studentID: UUID) {
+    defaults.set(max(0, durationSeconds), forKey: Self.key(studentID))
+  }
+
+  private var defaults: UserDefaults {
+    suiteName.flatMap { UserDefaults(suiteName: $0) } ?? .standard
+  }
+
+  private static func key(_ studentID: UUID) -> String {
+    "meetpr.training.recent_completed_duration.\(studentID.uuidString)"
+  }
+}
+
+enum TrainingSessionTimer {
+  static func elapsedSeconds(for page: TodayWorkoutSessionPage, now: Date) -> Int? {
+    switch page {
+    case .loading, .overview:
+      return nil
+    case .inProgress(let session):
+      return max(0, Int(now.timeIntervalSince(session.startedAt)))
+    case .completed(let session):
+      return max(0, session.durationSeconds)
+    }
+  }
+
+  static func text(seconds: Int) -> String {
+    let clamped = max(0, seconds)
+    return "\(clamped / 60):\(twoDigit(clamped % 60))"
+  }
+
+  private static func twoDigit(_ value: Int) -> String {
+    value < 10 ? "0\(value)" : "\(value)"
   }
 }
 

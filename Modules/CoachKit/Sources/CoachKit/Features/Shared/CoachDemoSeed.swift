@@ -2,9 +2,7 @@ import CoreModels
 import Foundation
 import RepositoryContracts
 
-/// Demo fixtures for the coach evaluation funnel (spec 033 §与 031/032 的
-/// 接口契约): one pending receive-queue request plus evaluation periods for
-/// the two in-evaluation preview roster students.
+/// Demo fixtures for the coach receive queue and video inbox.
 public enum CoachDemoSeed {
   /// Matches InMemoryPlanRepository's preview roster ids (uuid(4) 王晨曦,
   /// uuid(10) 赵安然).
@@ -14,6 +12,44 @@ public enum CoachDemoSeed {
 
   public static let queueStudentID = UUID(
     uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x42))
+
+  public static func dashboardSignals(now: Date = Date()) -> [CoachSignal] {
+    [
+      CoachSignal(
+        id: signalID(1),
+        studentID: previewStudentID(4),
+        studentName: "王晨曦",
+        type: .missedTraining,
+        severity: .red,
+        reason: "周一至周三无打卡（已连续 3 个训练日）",
+        openedAt: now.addingTimeInterval(-1_800)
+      ),
+      CoachSignal(
+        id: signalID(2),
+        studentID: previewStudentID(2),
+        studentName: "张以恒",
+        type: .weightFailed,
+        severity: .yellow,
+        reason: "比赛式传统硬拉 210kg 被压，今天已出现 2 次失败组",
+        openedAt: now.addingTimeInterval(-3_600)
+      ),
+      CoachSignal(
+        id: signalID(3),
+        studentID: previewStudentID(8),
+        studentName: "李嘉宁",
+        type: .personalRecord,
+        severity: .green,
+        reason: "卧推 e1RM 提升至 102.5kg，刷新近 28 天最佳",
+        openedAt: now.addingTimeInterval(-7_200)
+      ),
+    ]
+  }
+
+  public static let dailyDigestBody = "昨天 · 3 练完 · 1 缺练 · 1 被压 · 1 破 PR"
+
+  private static func signalID(_ byte: UInt8) -> UUID {
+    UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, byte))
+  }
 
   /// One pending request with the full 9-item summary (submitted 2h ago).
   public static func pendingBindRequests(now: Date = Date()) -> [CoachBindRequestItem] {
@@ -41,28 +77,6 @@ public enum CoachDemoSeed {
           uploadCount: 4
         )
       )
-    ]
-  }
-
-  /// Live evaluation periods matching the preview roster's in-evaluation
-  /// students (王晨曦 4 天 13 小时 / 赵安然 6 天 2 小时).
-  public static func evaluationPeriods(coachId: UUID, now: Date = Date()) -> [EvaluationPeriod] {
-    func period(studentByte: UInt8, bindByte: UInt8, remaining: TimeInterval) -> EvaluationPeriod {
-      let expectedEnd = now.addingTimeInterval(remaining)
-      return EvaluationPeriod(
-        id: UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, studentByte)),
-        studentId: previewStudentID(studentByte),
-        coachId: coachId,
-        bindRequestId: UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, bindByte)),
-        startedAt: expectedEnd.addingTimeInterval(-7 * 86_400),
-        expectedEndAt: expectedEnd,
-        inProgress: true,
-        overdue: false
-      )
-    }
-    return [
-      period(studentByte: 4, bindByte: 4, remaining: (4 * 24 + 13) * 3_600),
-      period(studentByte: 10, bindByte: 10, remaining: (6 * 24 + 2) * 3_600),
     ]
   }
 

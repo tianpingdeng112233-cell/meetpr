@@ -17,11 +17,11 @@ import Testing
 
   await viewModel.load(studentID: studentID)
   #expect(viewModel.planNotice?.weekIndex == plan.weekIndex)
-  #expect(viewModel.hasUnread(feedbackUnreadCount: 0, evaluationUnreadCount: 0))
+  #expect(viewModel.hasUnread(feedbackUnreadCount: 0))
 
   viewModel.markCurrentPlanSeen()
   #expect(viewModel.planNotice == nil)
-  #expect(!viewModel.hasUnread(feedbackUnreadCount: 0, evaluationUnreadCount: 0))
+  #expect(!viewModel.hasUnread(feedbackUnreadCount: 0))
 
   await viewModel.load(studentID: studentID)
   #expect(viewModel.planNotice == nil)
@@ -42,9 +42,8 @@ import Testing
 
   await viewModel.load(studentID: studentID)
 
-  #expect(!viewModel.hasUnread(feedbackUnreadCount: 0, evaluationUnreadCount: 0))
-  #expect(viewModel.hasUnread(feedbackUnreadCount: 1, evaluationUnreadCount: 0))
-  #expect(viewModel.hasUnread(feedbackUnreadCount: 0, evaluationUnreadCount: 1))
+  #expect(!viewModel.hasUnread(feedbackUnreadCount: 0))
+  #expect(viewModel.hasUnread(feedbackUnreadCount: 1))
 }
 
 @Test func userDefaultsPlanSeenStorePersistsPerStudentAndSignature() throws {

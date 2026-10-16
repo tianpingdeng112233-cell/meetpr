@@ -21,12 +21,14 @@ public struct StudentRootView: View {
   private let soloCatalog: [Exercise]
   private let pendingSetLogCount: @Sendable (UUID) async -> Int
   private let sessionReviews: (any SessionReviewRepository)?
+  private let trainingSessions: any TrainingSessionRepository
   private let account: (any AccountRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
-  @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
+  @State private var sessionActivityCenter = TrainingSessionActivityCenter()
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
   @State private var trainingTodayPulse = 0
+  @State private var trainingTabEntryPulse = 0
   @State private var pendingImportedHistoryReview: PendingImportedHistoryReview?
   @State private var importedHistoryReviewQueue: [PendingImportedHistoryReview] = []
   @State private var importedHistoryRefreshToken = 0
@@ -66,13 +68,12 @@ public struct StudentRootView: View {
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
     onboarding: (any OnboardingRepository)? = nil,
-    evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
-    summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
     trainingMode: TrainingMode = .coached,
     soloCatalog: [Exercise] = [],
     pendingSetLogCount: (@Sendable (UUID) async -> Int)? = nil,
     sessionReviews: (any SessionReviewRepository)? = nil,
+    trainingSessions: (any TrainingSessionRepository)? = nil,
     account: (any AccountRepository)? = nil
   ) {
     self.studentID = studentID
@@ -87,6 +88,10 @@ public struct StudentRootView: View {
     self.soloCatalog = soloCatalog
     self.pendingSetLogCount = pendingSetLogCount ?? { _ in 0 }
     self.sessionReviews = sessionReviews
+    self.trainingSessions =
+      trainingSessions
+      ?? (logs as? BackendStudentTrainingLogRepository)?.trainingSessions
+      ?? Self.demoTrainingSessions()
     self.account = account
     let resolvedOnboarding =
       onboarding
@@ -111,13 +116,6 @@ public struct StudentRootView: View {
     )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
-    )
-    self._evaluationSummaryViewModel = State(
-      initialValue: StudentEvaluationSummaryViewModel(
-        summaries: evaluationSummaries ?? InMemoryEvaluationSummaryRepository(),
-        plans: plans,
-        readStore: summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
-      )
     )
   }
 
@@ -174,7 +172,7 @@ public struct StudentRootView: View {
             onboarding: onboarding,
             e1rm: e1rm,
             feedbackViewModel: feedbackViewModel,
-            evaluationSummaryViewModel: evaluationSummaryViewModel,
+            trainingSessions: trainingSessions, sessionActivityCenter: sessionActivityCenter,
             onStartWorkout: {
               trainingTodayPulse += 1
               selectedTab = .training
@@ -202,7 +200,9 @@ public struct StudentRootView: View {
             studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
             onboarding: onboarding, readiness: readiness, videoUploads: videoUploads,
             resetToTodayPulse: trainingTodayPulse,
-            sessionReviews: sessionReviews, planRevision: planRevision
+            sessionReviews: sessionReviews, trainingSessions: trainingSessions,
+            sessionActivityCenter: sessionActivityCenter,
+            tabEntryPulse: trainingTabEntryPulse, planRevision: planRevision
           )
         }
       }
@@ -234,7 +234,6 @@ public struct StudentRootView: View {
         plans: plans,
         e1rm: e1rm,
         onboarding: onboarding,
-        evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
         trainingMode: trainingMode,
         soloCatalog: soloCatalog,
@@ -245,13 +244,14 @@ public struct StudentRootView: View {
       .tabItem {
         Label("我的", systemImage: "person")
       }
-      // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
-      // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
-      .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
+      .badge(pendingPRCount)
     }
     // Acking PRs on the growth tab must clear the profile badge when the
     // student switches away (spec 051 §2 — same staleness family as U6).
     .onChange(of: selectedTab) { _, tab in
+      if tab == .training {
+        trainingTabEntryPulse += 1
+      }
       Task {
         if tab == .growth {
           await runImportedHistoryBackfill()
@@ -263,7 +263,6 @@ public struct StudentRootView: View {
       if feedbackViewModel.state == .idle {
         await feedbackViewModel.load(studentID: studentID)
       }
-      await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
       await runImportedHistoryBackfill()
     }
@@ -277,6 +276,22 @@ public struct StudentRootView: View {
 }
 
 extension StudentRootView {
+  fileprivate static func demoTrainingSessions(
+    now: Date = Date()
+  ) -> any TrainingSessionRepository {
+    let previousStart = now.addingTimeInterval(-86_400 - 3_240)
+    let previousEnd = previousStart.addingTimeInterval(3_240)
+    return InMemoryTrainingSessionRepository(seed: [
+      TrainingSession(
+        status: .completed,
+        startedAt: previousStart,
+        lastSetAt: previousEnd,
+        completedAt: previousEnd,
+        durationSeconds: 3_240
+      )
+    ])
+  }
+
   @MainActor
   fileprivate func runImportedHistoryBackfill() async {
     guard let result = try? await importedHistoryBackfill.backfill(studentID: studentID) else {

@@ -1,19 +1,13 @@
 import DesignSystem
 import SwiftUI
 
-/// The accept confirm modal. 2026-07-13 (David): the evaluation period is
-/// sealed for beta — the spec 033 §5 two-choice (7-day evaluation vs skip)
-/// and the optional skip reason are DELETED from this file (git history
-/// holds them; restore from there when the evaluation period returns), and
-/// every accept sends `skipEvaluation: true`. The rest of the evaluation
-/// feature code (EvaluationPeriodView, repositories, coach editor) stays
-/// dormant in place — defer ≠ delete.
+/// The accept confirm modal.
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 struct AcceptBindRequestSheet: View {
   let studentName: String
   /// Returns true on success → the sheet dismisses itself.
-  let onConfirm: (_ skipEvaluation: Bool, _ skipReason: String?) async -> Bool
+  let onConfirm: () async -> Bool
 
   @State private var isSubmitting = false
   @Environment(\.dismiss) private var dismiss
@@ -57,8 +51,7 @@ struct AcceptBindRequestSheet: View {
     guard !isSubmitting else { return }
     isSubmitting = true
     Task {
-      // Evaluation sealed for beta: always the skip branch, no reason.
-      let succeeded = await onConfirm(true, nil)
+      let succeeded = await onConfirm()
       isSubmitting = false
       if succeeded {
         dismiss()

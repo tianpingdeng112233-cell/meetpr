@@ -2,15 +2,12 @@ import Foundation
 import RepositoryContracts
 
 /// Repository bundle threaded CoachRootView → StudentRosterView →
-/// StudentDetailView (spec 033). Keeps view initializers stable while the
-/// evaluation funnel adds read/write surfaces.
+/// StudentDetailView (spec 033).
 @MainActor
 struct CoachStudentDetailContext {
   let plans: any StudentPlanRepository
   let trainingLogs: any StudentTrainingLogRepository
   let feedback: any StudentFeedbackRepository
-  let evaluations: any EvaluationRepository
-  let summaries: any EvaluationSummaryRepository
   let profiles: any OnboardingProfileReading
   /// Video wall + readiness row + growth mapping (spec 029 second pass).
   let videos: any CoachStudentVideoRepository

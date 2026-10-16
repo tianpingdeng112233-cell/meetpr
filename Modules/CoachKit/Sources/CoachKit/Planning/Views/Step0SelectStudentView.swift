@@ -21,14 +21,6 @@ public struct Step0SelectStudentView: View {
         }
 
         studentSection(
-          title: "评估期内",
-          students: students { status in
-            if case .inEvaluation = status { return true }
-            return false
-          }
-        )
-
-        studentSection(
           title: "活跃",
           students: students { status in
             if case .active = status { return true }
@@ -137,8 +129,6 @@ private struct StudentRow: View {
 
   private var leadingIcon: String {
     switch student.status {
-    case .inEvaluation:
-      "⚠️"
     case .active:
       "•"
     case .abnormal:
@@ -148,8 +138,6 @@ private struct StudentRow: View {
 
   private var subtitle: String {
     switch student.status {
-    case .inEvaluation(let days, let hours):
-      "评估期 \(days) 天 \(hours) 时剩"
     case .active:
       "可创建计划"
     case .abnormal(let reason):

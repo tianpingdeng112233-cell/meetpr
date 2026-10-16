@@ -95,6 +95,20 @@ enum MainLiftExerciseFamilyResolver {
     }
     return dashboardFamilies.filter(present.contains)
   }
+
+  /// Shared S/B/D badge text. `nil` distinguishes no plan from a planned day
+  /// containing accessories only.
+  static func shorthand(in day: StudentPlanDay?) -> String? {
+    guard let day else { return nil }
+    return families(in: day).map(\.trainingLetter).joined()
+  }
+
+  /// Shared student-facing training-day name used by the week strip and the
+  /// pre-session overview.
+  static func dayName(in day: StudentPlanDay?) -> String? {
+    guard let shorthand = shorthand(in: day) else { return nil }
+    return shorthand.isEmpty ? "辅助日" : "\(shorthand) 日"
+  }
 }
 
 extension LiftFamily {
@@ -103,6 +117,14 @@ extension LiftFamily {
     case .squat: "深蹲"
     case .bench: "卧推"
     case .deadlift: "硬拉"
+    }
+  }
+
+  fileprivate var trainingLetter: String {
+    switch self {
+    case .squat: "S"
+    case .bench: "B"
+    case .deadlift: "D"
     }
   }
 }
