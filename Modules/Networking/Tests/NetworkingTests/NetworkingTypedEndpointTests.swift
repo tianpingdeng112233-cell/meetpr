@@ -168,8 +168,7 @@ private struct TypedEndpointResponseStub: Sendable {
             "display_name": "王馨伟",
             "created_at": "2026-05-22T12:00:00Z"
           },
-          "status": "active",
-          "evaluation": null
+          "status": "active"
         }
         """#
       return Data(studentJSON.utf8)

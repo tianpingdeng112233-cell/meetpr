@@ -8,15 +8,14 @@ import SwiftUI
 /// the coach-managed training baseline (locked 1RMs), recovery/injury rows that
 /// the coach can see, and preference/basic-info rows. Each editable row reuses
 /// the existing `ProfileCardEditView` flow (same field sections as onboarding,
-/// same save path — no behavior drift). 成长曲线 / 评估总结 / 退出登录 are kept
-/// in a "更多" section beneath.
+/// same save path — no behavior drift). 成长曲线 / 退出登录 are kept in a
+/// "更多" section beneath.
 @available(iOS 17.0, macOS 14.0, *)
 public struct MyProfileView: View {
   private let studentID: UUID
   private let plans: any StudentPlanRepository
   private let e1rm: any E1RMRepository
   private let onboarding: any OnboardingRepository
-  private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   /// nil hides the row (demo/previews); live wiring passes Session.logout.
   private let onLogout: (@MainActor () async -> Void)?
   private let trainingMode: TrainingMode
@@ -31,7 +30,6 @@ public struct MyProfileView: View {
     plans: any StudentPlanRepository,
     e1rm: any E1RMRepository,
     onboarding: any OnboardingRepository,
-    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
     trainingMode: TrainingMode = .coached,
     soloCatalog: [Exercise] = [],
@@ -42,7 +40,6 @@ public struct MyProfileView: View {
     self.plans = plans
     self.e1rm = e1rm
     self.onboarding = onboarding
-    self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onLogout = onLogout
     self.trainingMode = trainingMode
     self.soloCatalog = soloCatalog
@@ -234,11 +231,6 @@ public struct MyProfileView: View {
     push && trainingMode != .selfTrain
   }
 
-  /// 评估总结 is a coach deliverable — solo profiles never surface it (spec 046 §3).
-  static func showsEvaluationSummary(trainingMode: TrainingMode) -> Bool {
-    trainingMode == .coached
-  }
-
   private var notifyBadge: some View {
     Text("通知教练")
       .font(.system(size: 10, design: .monospaced))
@@ -265,20 +257,6 @@ public struct MyProfileView: View {
         moreRow(icon: "chart.xyaxis.line", title: "成长曲线")
       }
       .buttonStyle(.plain)
-
-      // 评估总结 is a coach deliverable (spec 046 §3 solo 零教练字样): a solo
-      // profile never shows it, even if an evaluation VM were injected.
-      if Self.showsEvaluationSummary(trainingMode: trainingMode),
-        let evaluationSummaryViewModel, let summary = evaluationSummaryViewModel.summary
-      {
-        divider
-        NavigationLink {
-          EvaluationSummaryView(summary: summary) { evaluationSummaryViewModel.markRead() }
-        } label: {
-          moreRow(icon: "doc.text", title: "评估总结", showsDot: evaluationSummaryViewModel.isUnread)
-        }
-        .buttonStyle(.plain)
-      }
 
       if let onLogout {
         divider

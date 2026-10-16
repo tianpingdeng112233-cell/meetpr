@@ -252,8 +252,6 @@ private struct PlanningWorkspacePresenter<PresentedContent: View>: ViewModifier 
         plans: planReader,
         trainingLogs: EmptyStudentTrainingLogRepository(),
         feedback: EmptyStudentFeedbackRepository(),
-        evaluations: InMemoryCoachEvaluationRepository(),
-        summaries: InMemoryCoachEvaluationSummaryRepository(coachId: uuid(90)),
         profiles: InMemoryCoachStudentProfileReader(profiles: profiles()),
         videos: InMemoryCoachStudentVideoRepository(),
         readiness: EmptyReadinessRepository(),

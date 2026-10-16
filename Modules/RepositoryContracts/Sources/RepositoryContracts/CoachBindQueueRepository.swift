@@ -113,34 +113,15 @@ public struct CoachBindRequestOnboardingSummary: Hashable, Sendable {
   }
 }
 
-/// Lightweight accept/reject response shape (spec 033 §1): just enough for
-/// the queue to verify the transition; not the spec-002 entity.
-public struct BindRequestDecision: Hashable, Sendable {
-  public let id: UUID
-  public let status: BindRequestStatus
-  public let skipEvaluation: Bool
-  public let skipReason: String?
-
-  public init(id: UUID, status: BindRequestStatus, skipEvaluation: Bool, skipReason: String?) {
-    self.id = id
-    self.status = status
-    self.skipEvaluation = skipEvaluation
-    self.skipReason = skipReason
-  }
-}
-
 /// Coach receive queue (spec 033 §2-§5). Maps 1:1 onto the backend
 /// /coach/bind-requests endpoints. No cache by design: the queue is lazily
 /// expired server-side and must be live.
 public protocol CoachBindQueueRepository: Sendable {
   /// Pending requests, submitted_at ASC (server order preserved).
   func fetchQueue() async throws -> [CoachBindRequestItem]
-  /// `skipReason` is only legal when `skipEvaluation` is true (zod
-  /// superRefine; the UI guarantees it, the wire never carries it
-  /// otherwise). The evaluation period is non-nil exactly when
-  /// `skipEvaluation` is false. Throws `CoachBindQueueError`.
-  func accept(requestID: UUID, skipEvaluation: Bool, skipReason: String?) async throws
-    -> (request: BindRequestDecision, evaluation: EvaluationPeriod?)
+  /// Accepts with the fixed compatibility body defined by Networking.
+  /// Throws `CoachBindQueueError`.
+  func accept(requestID: UUID) async throws
   /// Silent neutral rejection — strict empty body, no reason field
   /// (spec 033 D10). Throws `CoachBindQueueError`.
   func reject(requestID: UUID) async throws

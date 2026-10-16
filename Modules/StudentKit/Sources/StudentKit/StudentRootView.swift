@@ -23,7 +23,6 @@ public struct StudentRootView: View {
   private let sessionReviews: (any SessionReviewRepository)?
   private let account: (any AccountRepository)?
   @State private var feedbackViewModel: FeedbackInboxViewModel
-  @State private var evaluationSummaryViewModel: StudentEvaluationSummaryViewModel
   @State private var selectedTab: StudentTab = .today
   @State private var pendingPRCount = 0
   @State private var trainingTodayPulse = 0
@@ -66,8 +65,6 @@ public struct StudentRootView: View {
     readiness: any ReadinessRepository = InMemoryReadinessRepository(),
     videoUploads: VideoUploadServices? = nil,
     onboarding: (any OnboardingRepository)? = nil,
-    evaluationSummaries: (any EvaluationSummaryRepository)? = nil,
-    summaryReadStore: (any EvaluationSummaryReadStoring)? = nil,
     onLogout: (@MainActor () async -> Void)? = nil,
     trainingMode: TrainingMode = .coached,
     soloCatalog: [Exercise] = [],
@@ -111,13 +108,6 @@ public struct StudentRootView: View {
     )
     self._feedbackViewModel = State(
       initialValue: FeedbackInboxViewModel(repository: feedback)
-    )
-    self._evaluationSummaryViewModel = State(
-      initialValue: StudentEvaluationSummaryViewModel(
-        summaries: evaluationSummaries ?? InMemoryEvaluationSummaryRepository(),
-        plans: plans,
-        readStore: summaryReadStore ?? UserDefaultsEvaluationSummaryReadStore()
-      )
     )
   }
 
@@ -174,7 +164,6 @@ public struct StudentRootView: View {
             onboarding: onboarding,
             e1rm: e1rm,
             feedbackViewModel: feedbackViewModel,
-            evaluationSummaryViewModel: evaluationSummaryViewModel,
             onStartWorkout: {
               trainingTodayPulse += 1
               selectedTab = .training
@@ -234,7 +223,6 @@ public struct StudentRootView: View {
         plans: plans,
         e1rm: e1rm,
         onboarding: onboarding,
-        evaluationSummaryViewModel: evaluationSummaryViewModel,
         onLogout: onLogout,
         trainingMode: trainingMode,
         soloCatalog: soloCatalog,
@@ -245,9 +233,7 @@ public struct StudentRootView: View {
       .tabItem {
         Label("我的", systemImage: "person")
       }
-      // PR acknowledgements + unread evaluation summary red dot (spec 033 D7).
-      // Feedback unread now surfaces via the 今日 notification bell, not a tab badge.
-      .badge(pendingPRCount + evaluationSummaryViewModel.unreadBadgeCount)
+      .badge(pendingPRCount)
     }
     // Acking PRs on the growth tab must clear the profile badge when the
     // student switches away (spec 051 §2 — same staleness family as U6).
@@ -263,7 +249,6 @@ public struct StudentRootView: View {
       if feedbackViewModel.state == .idle {
         await feedbackViewModel.load(studentID: studentID)
       }
-      await evaluationSummaryViewModel.load(studentID: studentID)
       pendingPRCount = (try? await e1rm.unacknowledgedPRs(studentId: studentID).count) ?? 0
       await runImportedHistoryBackfill()
     }

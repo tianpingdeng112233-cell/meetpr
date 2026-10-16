@@ -88,27 +88,6 @@ final class StudentRosterViewModel {
     await refresh()
   }
 
-  /// Evaluation completed from the detail page (Codex review P1): flip the
-  /// row to active in place — a full refresh would flash `.loading` over the
-  /// whole roster for a one-field change. The next pull-to-refresh converges
-  /// with the server anyway.
-  func markStudentActive(_ studentID: UUID) {
-    rows = rows.map { row in
-      guard row.student.id == studentID else { return row }
-      return StudentRosterRowModel(
-        student: CoachStudentSummary(
-          id: row.student.id,
-          displayName: row.student.displayName,
-          status: .active
-        ),
-        plannedTrainingDays: row.plannedTrainingDays,
-        completedTrainingDays: row.completedTrainingDays,
-        lastActiveAt: row.lastActiveAt,
-        triageSignals: row.triageSignals
-      )
-    }
-  }
-
   func applyRenamedStudent(_ renamed: CoachStudentSummary) {
     rows = rows.map { row in
       guard row.student.id == renamed.id else { return row }

@@ -1,10 +1,9 @@
-// swiftlint:disable file_length type_body_length
 import DesignSystem
 import Foundation
 import SwiftUI
 
 /// Coach 今日 tab — reskinned 1:1 to `DKCoachDashboard` (今日仪表盘): a custom
-/// large-title header, a red new-student-request card, a 3-stat overview, and a
+/// large-title header, a red new-student-request card, a 2-stat overview, and a
 /// "今日 — 学员" triage list. Every figure is bound to the REAL coach view models
 /// (`StudentRosterViewModel` triage rows + `BindQueueViewModel.pendingCount`);
 /// where the mock invents data the model does not carry (per-row 训练中 / 就绪 /
@@ -29,10 +28,6 @@ struct CoachDashboardView: View {
   var rows: [StudentRosterRowModel] = []
   var onOpenReceiving: @MainActor () -> Void = {}
   var onOpenRoster: @MainActor () -> Void = {}
-  /// Forwards an evaluation completion to `StudentRosterViewModel` so the row
-  /// sheds its 评估中 status without waiting for the next refresh — mirrors the
-  /// 学员 tab's triage rows.
-  var onEvaluationCompleted: @MainActor (UUID) -> Void = { _ in }
 
   var body: some View {
     NavigationStack {
@@ -107,20 +102,14 @@ struct CoachDashboardView: View {
     .buttonStyle(.plain)
   }
 
-  // MARK: - 3-stat overview
+  // MARK: - 2-stat overview
 
-  /// Three at-a-glance counts. All derive from real data: 活跃 / 评估期 from the
-  /// roster snapshot status, 待关注 from the triage count. The mock's third
-  /// column was "待反馈 · 视频 12" — the dashboard has no video-review field, so
-  /// it is substituted with the real 待关注 (triage) count, which IS actionable
-  /// from this screen.
+  /// Two at-a-glance counts derived from real roster and triage data.
   private var statsCard: some View {
     HStack(spacing: 0) {
-      statColumn(label: "学员", value: activeCount, unit: "活跃", valueColor: Color.MeetPR.fgPrimary)
-      divider
       statColumn(
-        label: "评估期", value: inEvaluationCount, unit: "进行中",
-        valueColor: inEvaluationCount > 0 ? Color.MeetPR.amber : Color.MeetPR.fgPrimary)
+        label: "学员", value: activeCount, unit: "活跃",
+        valueColor: Color.MeetPR.fgPrimary)
       divider
       Button(action: onOpenRoster) {
         statContent(
@@ -192,11 +181,7 @@ struct CoachDashboardView: View {
       VStack(spacing: 0) {
         ForEach(Array(todayRows.enumerated()), id: \.element.id) { index, row in
           NavigationLink {
-            StudentDetailView(
-              summary: row.student,
-              context: context,
-              onEvaluationCompleted: { onEvaluationCompleted(row.student.id) }
-            )
+            StudentDetailView(summary: row.student, context: context)
           } label: {
             athleteRow(row, showsTopBorder: index > 0)
           }
@@ -273,15 +258,8 @@ struct CoachDashboardView: View {
     rows.filter { $0.student.status == .active }.count
   }
 
-  private var inEvaluationCount: Int {
-    rows.filter {
-      if case .inEvaluation = $0.student.status { return true }
-      return false
-    }.count
-  }
-
   /// Red for a missed-training signal (most urgent), amber for awaiting-reply /
-  /// evaluation, green for an active student in good standing — mirrors the
+  /// feedback, green for an active student in good standing — mirrors the
   /// mock's per-row dot color semantics using REAL triage state.
   private func dotColor(for row: StudentRosterRowModel) -> Color {
     if row.triageSignals.contains(where: {
@@ -291,27 +269,22 @@ struct CoachDashboardView: View {
       return Color.MeetPR.brandRed
     }
     if !row.triageSignals.isEmpty { return Color.MeetPR.amber }
-    if case .inEvaluation = row.student.status { return Color.MeetPR.amber }
     return Color.MeetPR.green
   }
 
-  /// Real subtitle: completion progress + a triage hint when present, else the
-  /// student status text. No fabricated "W3D1 · 第 3/4 组 · 09:00".
+  /// Real subtitle: completion progress + a triage hint when present.
   private func subtitle(for row: StudentRosterRowModel) -> String {
     let triage = StudentTriageSignalCalculator.summaryText(for: row.triageSignals)
     if !triage.isEmpty {
       return "\(row.completionText) · \(triage)"
-    }
-    if case .inEvaluation = row.student.status {
-      return row.statusText
     }
     return row.completionText
   }
 
   /// Maps real triage / status to the design's badge vocabulary. The mock's
   /// 训练中 (live) / 就绪 (ready) / e1RM PR badges have no backing signal on the
-  /// roster model, so they are not fabricated — only 逾期 (missed-training) and
-  /// 评估中 (in-evaluation) map to real state; everything else shows no badge.
+  /// roster model, so they are not fabricated — only real triage signals map
+  /// to badges.
   private func badge(for row: StudentRosterRowModel) -> (status: StatusBadge.Status, title: String)?
   {
     if row.triageSignals.contains(where: {
@@ -322,9 +295,6 @@ struct CoachDashboardView: View {
     }
     if row.triageSignals.contains(.awaitingReply) {
       return (.overdue, "待回复")
-    }
-    if case .inEvaluation = row.student.status {
-      return (.pending, "评估中")
     }
     return nil
   }
@@ -371,7 +341,7 @@ struct CoachDashboardView: View {
           student: CoachStudentSummary(
             id: uuid(3),
             displayName: "马伟",
-            status: .inEvaluation(remainingDays: 4, remainingHours: 0)
+            status: .active
           ),
           plannedTrainingDays: 3,
           completedTrainingDays: 3,
@@ -389,14 +359,12 @@ struct CoachDashboardView: View {
     }
 
     /// In-memory detail dependencies so the preview exercises the row → detail
-    /// push; mirrors `TriageStripSection`'s preview context.
+    /// push.
     static var context: CoachStudentDetailContext {
       CoachStudentDetailContext(
         plans: EmptyStudentPlanRepository(),
         trainingLogs: EmptyStudentTrainingLogRepository(),
         feedback: EmptyStudentFeedbackRepository(),
-        evaluations: InMemoryCoachEvaluationRepository(),
-        summaries: InMemoryCoachEvaluationSummaryRepository(coachId: uuid(30)),
         profiles: InMemoryCoachStudentProfileReader(),
         videos: InMemoryCoachStudentVideoRepository(),
         readiness: EmptyReadinessRepository(),
@@ -418,4 +386,3 @@ struct CoachDashboardView: View {
     .preferredColorScheme(.dark)
   }
 #endif
-// swiftlint:enable file_length type_body_length

@@ -1,4 +1,4 @@
-// swiftlint:disable file_length type_body_length
+// swiftlint:disable type_body_length
 import DesignSystem
 import RepositoryContracts
 import SwiftUI
@@ -9,12 +9,9 @@ struct StudentDetailView: View {
   @Bindable private var viewModel: StudentDetailViewModel
   @State private var videoGridViewModel: StudentVideoGridViewModel
   @State private var growthViewModel: StudentGrowthViewModel
-  @State private var evaluationViewModel: EvaluationBannerViewModel
   private let context: CoachStudentDetailContext
   private let onStudentRenamed: (@MainActor (CoachStudentSummary) -> Void)?
   @State private var showComposer = false
-  @State private var showSummaryEditor = false
-  @State private var showAdaptationPlanning = false
   @State private var showRenamePrompt = false
   @State private var renameText = ""
   @State private var renameFailureMessage: String?
@@ -22,7 +19,6 @@ struct StudentDetailView: View {
   init(
     summary: CoachStudentSummary,
     context: CoachStudentDetailContext,
-    onEvaluationCompleted: (@MainActor () -> Void)? = nil,
     onStudentRenamed: (@MainActor (CoachStudentSummary) -> Void)? = nil
   ) {
     viewModel = StudentDetailViewModel(
@@ -44,14 +40,6 @@ struct StudentDetailView: View {
         familyMapProvider: context.familyMapProvider
       )
     )
-    _evaluationViewModel = State(
-      initialValue: EvaluationBannerViewModel(
-        studentID: summary.id,
-        evaluations: context.evaluations,
-        summaries: context.summaries,
-        onCompleted: onEvaluationCompleted
-      )
-    )
     self.context = context
     self.onStudentRenamed = onStudentRenamed
   }
@@ -59,24 +47,6 @@ struct StudentDetailView: View {
   var body: some View {
     VStack(spacing: 0) {
       header
-
-      if evaluationViewModel.loadFailed {
-        EvaluationLoadFailureStrip {
-          Task { await evaluationViewModel.load() }
-        }
-        .padding(.horizontal, MeetPRSpacing.base)
-        .padding(.top, MeetPRSpacing.sm)
-      } else if evaluationViewModel.isBannerVisible {
-        EvaluationStatusBanner(
-          viewModel: evaluationViewModel,
-          hasPublishedPlan: viewModel.plan != nil,
-          onSendAdaptationWeek: { showAdaptationPlanning = true },
-          onViewAdaptationWeek: { viewModel.select(.execution) },
-          onOpenSummary: { showSummaryEditor = true }
-        )
-        .padding(.horizontal, MeetPRSpacing.base)
-        .padding(.top, MeetPRSpacing.sm)
-      }
 
       sectionTabs
 
@@ -87,7 +57,7 @@ struct StudentDetailView: View {
         // and readiness row points here). Growth keeps its own cache, so the
         // pull refreshes whichever data the visible section reads.
         .refreshable { [viewModel, growthViewModel] in
-          if await viewModel.selectedSection == .growth {
+          if viewModel.selectedSection == .growth {
             await growthViewModel.load(studentID: viewModel.summary.id)
           } else {
             await viewModel.refresh()
@@ -106,22 +76,6 @@ struct StudentDetailView: View {
         viewModel.appendPostedFeedback(item)
       }
     }
-    .navigationDestination(isPresented: $showSummaryEditor) {
-      summaryEditor
-    }
-    .onChange(of: showSummaryEditor) { _, isShowing in
-      if !isShowing {
-        // Returning from the editor: refresh the overview summary card.
-        Task { await evaluationViewModel.reloadSummary() }
-      }
-    }
-    .modifier(
-      AdaptationPlanningPresenter(
-        isPresented: $showAdaptationPlanning,
-        student: viewModel.summary,
-        context: context
-      )
-    )
     .alert("修改学员姓名", isPresented: $showRenamePrompt) {
       TextField("学员姓名", text: $renameText)
       Button("取消", role: .cancel) {}
@@ -145,7 +99,6 @@ struct StudentDetailView: View {
     }
     .task {
       await viewModel.loadIfNeeded()
-      await evaluationViewModel.load()
     }
   }
 
@@ -249,14 +202,9 @@ struct StudentDetailView: View {
     }
   }
 
-  /// Status line beneath the name. Mirrors the mock's "教练 · 学员" identity
-  /// framing using the real `CoachStudentStatus` rather than fabricated
-  /// W3D1 live-session strings.
+  /// Status line beneath the name using the real active/abnormal state.
   private var statusLine: String {
     switch viewModel.summary.status {
-    case .inEvaluation(let days, let hours):
-      if days > 0 { return "学员 · 评估期 · 还剩 \(days) 天" }
-      return "学员 · 评估期 · 还剩 \(hours) 小时"
     case .active:
       return "学员 · 活跃"
     case .abnormal:
@@ -264,13 +212,9 @@ struct StudentDetailView: View {
     }
   }
 
-  /// Maps the real lifecycle status to a `StatusBadge`. No fabricated copy —
-  /// the evaluation countdown text comes straight from the status payload.
+  /// Maps the visible lifecycle status to a `StatusBadge`.
   private var statusBadge: (status: StatusBadge.Status, title: String) {
     switch viewModel.summary.status {
-    case .inEvaluation(let days, let hours):
-      let amount = days > 0 ? "评估期 \(days)天" : "评估期 \(hours)时"
-      return (.pending, amount)
     case .active:
       return (.ready, "活跃")
     case .abnormal:
@@ -296,22 +240,6 @@ struct StudentDetailView: View {
       .pickerStyle(.segmented)
     }
     .padding(MeetPRSpacing.base)
-  }
-
-  private var summaryEditor: some View {
-    EvaluationSummaryEditorView(
-      viewModel: EvaluationSummaryEditorViewModel(
-        student: viewModel.summary,
-        evaluation: evaluationViewModel.evaluation,
-        summaries: context.summaries,
-        evaluations: context.evaluations,
-        profiles: context.profiles,
-        onEvaluationCompleted: { completed in
-          evaluationViewModel.markEvaluationCompleted(completed)
-        }
-      ),
-      context: context
-    )
   }
 
   // MARK: - Content states (reskinned loading / failure)
@@ -375,12 +303,8 @@ struct StudentDetailView: View {
         readiness: viewModel.todayReadiness,
         recentVideos: viewModel.recentVideos,
         videosUnavailable: viewModel.videosUnavailable,
-        evaluationSummary: evaluationViewModel.summary,
         onSelectSection: { section in
           viewModel.select(section)
-        },
-        onOpenEvaluationSummary: {
-          showSummaryEditor = true
         }
       )
     case .execution:
@@ -405,57 +329,4 @@ struct StudentDetailView: View {
   }
 }
 
-/// Transport-failure fallback for the evaluation strip (Codex review P2):
-/// without it a network blip silently hides a live evaluation banner and the
-/// page reads as "no evaluation".
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct EvaluationLoadFailureStrip: View {
-  let onRetry: () -> Void
-
-  var body: some View {
-    Card(accessibilityLabel: "评估状态加载失败") {
-      HStack(spacing: MeetPRSpacing.sm) {
-        Text("评估状态加载失败")
-          .font(Font.MeetPR.footnote)
-          .foregroundStyle(Color.MeetPR.fgSecondary)
-        Spacer()
-        SecondaryButton("重试") {
-          onRetry()
-        }
-      }
-    }
-  }
-}
-
-/// fullScreenCover on iOS / sheet on macOS for the adaptation-week planning
-/// entry (spec 033 §7).
-@MainActor
-@available(iOS 17.0, macOS 14.0, *)
-private struct AdaptationPlanningPresenter: ViewModifier {
-  @Binding var isPresented: Bool
-  let student: CoachStudentSummary
-  let context: CoachStudentDetailContext
-
-  func body(content: Content) -> some View {
-    #if os(iOS)
-      content.fullScreenCover(isPresented: $isPresented) {
-        planning
-      }
-    #else
-      content.sheet(isPresented: $isPresented) {
-        planning
-      }
-    #endif
-  }
-
-  private var planning: some View {
-    PlanningCoordinatorView(
-      repository: context.planning,
-      draftStore: context.draftStore,
-      intent: .adaptationWeek(student),
-      profiles: context.profiles
-    )
-  }
-}
-// swiftlint:enable file_length type_body_length
+// swiftlint:enable type_body_length

@@ -19,7 +19,6 @@ public struct DashboardView: View {
   private let onboarding: any OnboardingProfileReading
   private let e1rm: any E1RMRepository
   private let feedbackViewModel: FeedbackInboxViewModel
-  private let evaluationSummaryViewModel: StudentEvaluationSummaryViewModel?
   private let onStartWorkout: () -> Void
   private let onSeeAllFeedback: () -> Void
   private let onPlanChanged: () -> Void
@@ -28,7 +27,6 @@ public struct DashboardView: View {
   @State private var e1rmTrendViewModel: DashboardE1RMTrendViewModel
   @State private var profileMetricsViewModel: DashboardProfileMetricsViewModel
   @State private var showsNotifications = false
-  @State private var showsEvaluationSummary = false
   @State private var dayChangeTick = 0
   @State private var dayShiftAlert: DashboardDayShiftAlert?
   @State private var isUpdatingDayShift = false
@@ -43,7 +41,6 @@ public struct DashboardView: View {
     onboarding: any OnboardingProfileReading,
     e1rm: any E1RMRepository,
     feedbackViewModel: FeedbackInboxViewModel,
-    evaluationSummaryViewModel: StudentEvaluationSummaryViewModel? = nil,
     onStartWorkout: @escaping () -> Void,
     onSeeAllFeedback: @escaping () -> Void,
     onPlanChanged: @escaping () -> Void = {}
@@ -55,7 +52,6 @@ public struct DashboardView: View {
     self.onboarding = onboarding
     self.e1rm = e1rm
     self.feedbackViewModel = feedbackViewModel
-    self.evaluationSummaryViewModel = evaluationSummaryViewModel
     self.onStartWorkout = onStartWorkout
     self.onSeeAllFeedback = onSeeAllFeedback
     self.onPlanChanged = onPlanChanged
@@ -80,11 +76,6 @@ public struct DashboardView: View {
       ScrollView {
         VStack(alignment: .leading, spacing: 0) {
           header
-
-          if let evaluationSummaryViewModel {
-            EvaluationCompletedCard(viewModel: evaluationSummaryViewModel)
-              .padding(.top, 16)
-          }
 
           weekProgressBar
             .padding(.top, 16)
@@ -120,21 +111,12 @@ public struct DashboardView: View {
       .scrollContentBackground(.hidden)
       .background(Color.MeetPR.bg)
       .hideNavigationBar()
-      .navigationDestination(isPresented: $showsEvaluationSummary) {
-        if let summary = evaluationSummaryViewModel?.summary {
-          EvaluationSummaryView(summary: summary) {
-            evaluationSummaryViewModel?.markRead()
-          }
-        }
-      }
       .sheet(isPresented: $showsNotifications) {
         NotificationCenterSheet(
           planNotice: notificationsViewModel.planNotice,
           feedbackUnreadCount: feedbackViewModel.unreadCount,
-          evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0,
           onOpenPlan: openPlanNotification,
-          onOpenFeedback: onSeeAllFeedback,
-          onOpenEvaluation: { showsEvaluationSummary = true }
+          onOpenFeedback: onSeeAllFeedback
         )
         .presentationDetents([.medium])
       }
@@ -690,10 +672,7 @@ public struct DashboardView: View {
   }
 
   private var hasUnreadNotifications: Bool {
-    notificationsViewModel.hasUnread(
-      feedbackUnreadCount: feedbackViewModel.unreadCount,
-      evaluationUnreadCount: evaluationSummaryViewModel?.unreadBadgeCount ?? 0
-    )
+    notificationsViewModel.hasUnread(feedbackUnreadCount: feedbackViewModel.unreadCount)
   }
 
   // MARK: - Loading
@@ -703,11 +682,8 @@ public struct DashboardView: View {
     // resets the in-flight VM to `.idle` (see Error.isTaskCancellation);
     // gating the whole reload on the week VM alone would strand any later VM
     // at `.idle` with no retry. Mirrors TrainingHistoryView.loadIfNeeded.
-    // (StudentEvaluationSummaryViewModel has no `.idle` state, so it rides the
-    // week VM's first-load.)
     if weekViewModel.state == .idle {
       await weekViewModel.load(studentID: studentID)
-      await evaluationSummaryViewModel?.load(studentID: studentID)
     }
     if feedbackViewModel.state == .idle {
       await feedbackViewModel.load(studentID: studentID)
@@ -726,7 +702,6 @@ public struct DashboardView: View {
   private func reload() async {
     await weekViewModel.load(studentID: studentID)
     await feedbackViewModel.load(studentID: studentID)
-    await evaluationSummaryViewModel?.load(studentID: studentID)
     await notificationsViewModel.load(studentID: studentID)
     await e1rmTrendViewModel.load(studentID: studentID)
     await profileMetricsViewModel.load(studentID: studentID)

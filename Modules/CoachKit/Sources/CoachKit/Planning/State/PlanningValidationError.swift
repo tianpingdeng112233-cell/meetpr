@@ -3,7 +3,6 @@ import Foundation
 public enum PlanningValidationError: Error, Equatable, LocalizedError, Sendable {
   case missingStudent
   case invalidDuration
-  case evaluationStudentRequiresOneWeek
   case invalidFrequency
   case assignmentOutsideTrainingDays
   case incompleteMainLiftVariants
@@ -16,8 +15,6 @@ public enum PlanningValidationError: Error, Equatable, LocalizedError, Sendable 
       "请选择学员。"
     case .invalidDuration:
       "请选择 1 周或 4 周计划。"
-    case .evaluationStudentRequiresOneWeek:
-      "评估期内学员只能安排 1 周适应计划。"
     case .invalidFrequency:
       "三大项频率需要和训练日分配数量一致。"
     case .assignmentOutsideTrainingDays:
