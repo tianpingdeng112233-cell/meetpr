@@ -7,6 +7,7 @@ struct AuthSecureField: View {
   private let placeholder: String
   private let helperText: String?
   private let errorMessage: String?
+  private let usesEmailTypography: Bool
 
   @Binding private var text: String
   @FocusState private var isFocused: Bool
@@ -17,13 +18,15 @@ struct AuthSecureField: View {
     text: Binding<String>,
     placeholder: String = "",
     helperText: String? = nil,
-    errorMessage: String? = nil
+    errorMessage: String? = nil,
+    usesEmailTypography: Bool = false
   ) {
     self.label = label
     self._text = text
     self.placeholder = placeholder
     self.helperText = helperText
     self.errorMessage = errorMessage
+    self.usesEmailTypography = usesEmailTypography
   }
 
   var body: some View {
@@ -31,8 +34,12 @@ struct AuthSecureField: View {
       HStack(spacing: MeetPRSpacing.point10) {
         VStack(alignment: .leading, spacing: MeetPRSpacing.point5) {
           Text(label)
-            .font(.MeetPR.mono(size: 9.5, weight: .bold))
-            .tracking(1.33)
+            .font(
+              usesEmailTypography
+                ? .MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold)
+                : .MeetPR.mono(size: 9.5, weight: .bold)
+            )
+            .tracking(usesEmailTypography ? 0 : 1.33)
             .foregroundStyle(labelColor)
 
           Group {
@@ -50,8 +57,12 @@ struct AuthSecureField: View {
               )
             }
           }
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .semibold))
-          .tracking(2.52)
+          .font(
+            usesEmailTypography
+              ? .MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold)
+              : .MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .semibold)
+          )
+          .tracking(usesEmailTypography ? 0 : 2.52)
           .foregroundStyle(Color.MeetPR.textPrimary)
           .tint(Color.MeetPR.gold500)
           .focused($isFocused)

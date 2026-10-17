@@ -89,7 +89,7 @@ struct CoachMyProfileView: View {
       .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $isInviteCodesPresented) {
-        InviteCodesView(repository: inviteCodes)
+        InviteCodesView(repository: inviteCodes, coachName: viewModel.displayName)
       }
     }
     .task { await codesViewModel.loadIfNeeded() }
@@ -299,10 +299,13 @@ extension CoachMyProfileView {
 
   private func copy(_ code: InviteCode) {
     #if os(iOS)
-      UIPasteboard.general.string = code.code
+      UIPasteboard.general.string = CoachInvitationMessage.text(
+        code: code.code, coachName: viewModel.displayName)
     #elseif os(macOS)
       NSPasteboard.general.clearContents()
-      NSPasteboard.general.setString(code.code, forType: .string)
+      NSPasteboard.general.setString(
+        CoachInvitationMessage.text(code: code.code, coachName: viewModel.displayName),
+        forType: .string)
     #endif
     codesViewModel.markCopied(code)
     showToast(CoachMyProfileStrings.copied)

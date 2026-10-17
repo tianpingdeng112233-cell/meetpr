@@ -1,4 +1,5 @@
 import Foundation
+import Networking
 import Observation
 
 enum GlobalAuthValidation {
@@ -23,41 +24,41 @@ enum GlobalAuthValidation {
 }
 
 enum GlobalAuthErrorMessage {
-  static func message(for error: Error) -> String? {
+  static func message(for error: Error, buildTrack: MeetPRBuildTrack = .global) -> String? {
     if let oauthError = error as? GlobalOAuthError, oauthError == .cancelled {
       return nil
     }
     guard let authError = error as? AuthRepositoryError else {
-      return "Sign-in is temporarily unavailable"
+      return EmailAuthStrings.text("auth.unavailable", track: buildTrack)
     }
     switch authError {
     case .backend(_, let code, _):
-      return message(for: code)
+      return message(for: code, buildTrack: buildTrack)
     case .decoding, .network, .server:
-      return "Sign-in is temporarily unavailable"
+      return EmailAuthStrings.text("auth.unavailable", track: buildTrack)
     }
   }
 
-  private static func message(for code: AuthErrorCode) -> String {
+  private static func message(for code: AuthErrorCode, buildTrack: MeetPRBuildTrack) -> String {
     switch code {
     case .invalidCredentials:
-      return "Incorrect email or password"
+      return EmailAuthStrings.text("auth.invalidCredentials", track: buildTrack)
     case .invalidIdentityToken:
-      return "We couldn't verify this sign-in. Please try again"
+      return EmailAuthStrings.text("auth.invalidIdentityToken", track: buildTrack)
     case .emailTaken:
-      return "An account already exists for this email"
-    case .invalidResetCode:
-      return "That code is invalid or has expired"
+      return EmailAuthStrings.text("auth.emailTaken", track: buildTrack)
+    case .invalidResetCode, .invalidSignupCode:
+      return EmailAuthStrings.text("auth.invalidSignupCode", track: buildTrack)
     case .registrationDisabled, .registrationNotAllowed:
-      return "Account creation is currently unavailable"
+      return EmailAuthStrings.text("auth.registrationUnavailable", track: buildTrack)
     case .invalidTimezone:
-      return "Your device timezone isn't supported"
+      return EmailAuthStrings.text("auth.invalidTimezone", track: buildTrack)
     case .rateLimited:
-      return "Too many attempts. Please try again later"
+      return EmailAuthStrings.text("auth.rateLimited", track: buildTrack)
     case .validationError:
-      return "Check your details and try again"
+      return EmailAuthStrings.text("auth.validationError", track: buildTrack)
     case .invalidRefresh, .phoneTaken, .refreshExpired:
-      return "Sign-in is temporarily unavailable"
+      return EmailAuthStrings.text("auth.unavailable", track: buildTrack)
     }
   }
 }
@@ -74,7 +75,13 @@ final class GlobalLoginViewModel {
 
   @ObservationIgnored private let googleOAuth: any GoogleOAuthAuthorizing
 
-  init(googleOAuth: any GoogleOAuthAuthorizing = GoogleOAuthService()) {
+  let buildTrack: MeetPRBuildTrack
+
+  init(
+    googleOAuth: any GoogleOAuthAuthorizing = GoogleOAuthService(),
+    buildTrack: MeetPRBuildTrack = .global
+  ) {
+    self.buildTrack = buildTrack
     self.googleOAuth = googleOAuth
   }
 
@@ -94,7 +101,7 @@ final class GlobalLoginViewModel {
     do {
       appleChallenge = try await session.fetchAuthChallenge()
     } catch {
-      toastMessage = GlobalAuthErrorMessage.message(for: error)
+      toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
     }
   }
 
@@ -142,7 +149,7 @@ final class GlobalLoginViewModel {
     do {
       try await operation()
     } catch {
-      toastMessage = GlobalAuthErrorMessage.message(for: error)
+      toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
     }
     isSubmitting = false
   }
@@ -152,7 +159,56 @@ final class GlobalLoginViewModel {
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 final class GlobalRegisterViewModel {
-  var email = ""
+  let buildTrack: MeetPRBuildTrack
+  var email = "" {
+    didSet {
+      guard email != oldValue else { return }
+      code = ""
+      sentEmail = nil
+      cooldownRemaining = 0
+      toastMessage = nil
+      codeError = nil
+      shouldOfferSignIn = false
+    }
+  }
+  private(set) var sentEmail: String?
+  private(set) var cooldownRemaining = 0
+  private(set) var isSendingCode = false
+
+  var canSendCode: Bool {
+    GlobalAuthValidation.isValidEmail(email) && cooldownRemaining == 0 && !isSendingCode
+      && !isSubmitting
+  }
+
+  func tickCooldown() {
+    cooldownRemaining = max(0, cooldownRemaining - 1)
+  }
+
+  func sendCode(using session: Session) async {
+    guard canSendCode else { return }
+    let recipient = email
+    isSendingCode = true
+    toastMessage = nil
+    defer { isSendingCode = false }
+    do {
+      try await session.requestSignupCode(email: recipient)
+      guard email == recipient else { return }
+      codeError = nil
+      sentEmail = recipient
+      cooldownRemaining = 60
+    } catch {
+      guard email == recipient else { return }
+      toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
+    }
+  }
+  private(set) var codeError: String?
+  private(set) var shouldOfferSignIn = false
+  var code = "" { didSet { if code != oldValue { codeError = nil } } }
+  var confirmPassword = ""
+
+  init(buildTrack: MeetPRBuildTrack = .global) {
+    self.buildTrack = buildTrack
+  }
   var password = ""
   var isSubmitting = false
   var toastMessage: String?
@@ -160,6 +216,8 @@ final class GlobalRegisterViewModel {
   var canSubmit: Bool {
     GlobalAuthValidation.isValidEmail(email)
       && GlobalAuthValidation.isValidPassword(password)
+      && (buildTrack == .global
+        || (GlobalAuthValidation.isValidResetCode(code) && password == confirmPassword))
       && !isSubmitting
   }
 
@@ -167,10 +225,28 @@ final class GlobalRegisterViewModel {
     guard canSubmit else { return }
     isSubmitting = true
     toastMessage = nil
+    codeError = nil
+    shouldOfferSignIn = false
     do {
-      try await session.registerWithEmail(email: email, password: password)
+      try await session.registerWithEmail(
+        email: email, password: password, code: buildTrack == .china ? code : nil)
     } catch {
-      toastMessage = GlobalAuthErrorMessage.message(for: error)
+      if buildTrack == .china,
+        case .backend(_, let code, _) = error as? AuthRepositoryError
+      {
+        switch code {
+        case .invalidSignupCode:
+          codeError = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
+          cooldownRemaining = 0
+        case .emailTaken:
+          shouldOfferSignIn = true
+          toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
+        default:
+          toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
+        }
+      } else {
+        toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
+      }
     }
     isSubmitting = false
   }
@@ -180,6 +256,8 @@ final class GlobalRegisterViewModel {
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)
 final class GlobalForgotPasswordViewModel {
+  let buildTrack: MeetPRBuildTrack
+  init(buildTrack: MeetPRBuildTrack = .global) { self.buildTrack = buildTrack }
   enum Step: Sendable, Equatable {
     case email
     case reset
@@ -210,7 +288,7 @@ final class GlobalForgotPasswordViewModel {
       try await session.requestPasswordReset(email: email)
       step = .reset
     } catch {
-      toastMessage = GlobalAuthErrorMessage.message(for: error)
+      toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
     }
     isSubmitting = false
   }
@@ -224,7 +302,7 @@ final class GlobalForgotPasswordViewModel {
       isSubmitting = false
       return true
     } catch {
-      toastMessage = GlobalAuthErrorMessage.message(for: error)
+      toastMessage = GlobalAuthErrorMessage.message(for: error, buildTrack: buildTrack)
       isSubmitting = false
       return false
     }

@@ -32,10 +32,14 @@ extension Session {
     await reportTimezoneAfterLoginIfNeeded(result: result, timezone: timezone)
   }
 
-  public func registerWithEmail(email: String, password: String) async throws {
+  public func registerWithEmail(email: String, password: String, code: String? = nil) async throws {
     let timezone = currentTimezoneIdentifier()
     let result = try await authenticate {
-      try await auth.registerWithEmail(email: email, password: password, timezone: timezone)
+      if let code {
+        return try await auth.registerWithEmail(
+          email: email, password: password, timezone: timezone, code: code)
+      }
+      return try await auth.registerWithEmail(email: email, password: password, timezone: timezone)
     }
     await timezoneStore.saveReportedIdentifier(timezone, for: result.user.id)
   }
@@ -55,6 +59,10 @@ extension Session {
       generation: currentSessionGeneration(),
       timezone: timezone
     )
+  }
+
+  public func requestSignupCode(email: String) async throws {
+    try await auth.requestSignupCode(email: email)
   }
 
   public func requestPasswordReset(email: String) async throws {

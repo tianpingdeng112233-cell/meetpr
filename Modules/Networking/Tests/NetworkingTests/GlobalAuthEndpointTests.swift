@@ -150,3 +150,20 @@ private actor GlobalAuthRequestCapture {
     capturedRequests
   }
 }
+
+@Test func chinaEmailRegistrationSendsVerificationCodeWithoutChangingGlobalPayload() async throws {
+  let fixture = makeGlobalAuthFixture()
+  try await fixture.client.requestSignupCode(EmailForgotRequestDTO(email: "athlete@example.com"))
+  _ = try await fixture.client.registerWithEmail(
+    EmailRegisterRequestDTO(
+      email: "athlete@example.com", password: "password123", role: .coachedStudent, code: "123456")
+  )
+  let requests = await fixture.capture.requests()
+  #expect(requests[0].url?.path() == "/auth/email/register/code")
+  #expect(try jsonBody(requests[0])["email"] as? String == "athlete@example.com")
+  #expect(try jsonBody(requests[1])["code"] as? String == "123456")
+  let global = try JSONEncoder().encode(
+    EmailRegisterRequestDTO(
+      email: "global@example.com", password: "password123", role: .coachedStudent))
+  #expect((try JSONSerialization.jsonObject(with: global) as? [String: Any])?["code"] == nil)
+}

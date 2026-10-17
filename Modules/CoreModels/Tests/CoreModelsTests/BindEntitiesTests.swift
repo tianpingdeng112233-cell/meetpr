@@ -93,3 +93,10 @@ import Testing
   // Non-canonical lengths pass through untouched.
   #expect(InviteCodeFormat.grouped("ABC") == "ABC")
 }
+
+@Test func extractsInviteCodeFromMessagePreferringLink() {
+  #expect(
+    InviteCodeFormat.extract("邀请码 ABCD234567，安装 http://localhost/i/XK7MPQ2RVT") == "XK7MPQ2RVT")
+  #expect(InviteCodeFormat.extract("邀请码：xk7m-pq2-rvt。") == "XK7MPQ2RVT")
+  #expect(InviteCodeFormat.extract("unrelated text") == nil)
+}

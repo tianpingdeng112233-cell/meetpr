@@ -47,6 +47,7 @@ public struct AuthValidationIssue: Sendable, Equatable {
 public enum AuthErrorCode: String, Sendable, Equatable {
   case invalidCredentials = "AUTH_INVALID_CREDENTIALS"
   case invalidIdentityToken = "AUTH_INVALID_IDENTITY_TOKEN"
+  case invalidSignupCode = "AUTH_INVALID_SIGNUP_CODE"
   case invalidResetCode = "AUTH_INVALID_RESET_CODE"
   case invalidTimezone = "INVALID_TIMEZONE"
   case emailTaken = "AUTH_EMAIL_TAKEN"
@@ -93,11 +94,26 @@ public protocol AuthRepository: Sendable {
   func signInWithGoogle(idToken: String, timezone: String) async throws -> AuthResult
   func registerWithEmail(email: String, password: String, timezone: String) async throws
     -> AuthResult
+  func registerWithEmail(email: String, password: String, timezone: String, code: String)
+    async throws -> AuthResult
   func loginWithEmail(email: String, password: String) async throws -> AuthResult
+  func requestSignupCode(email: String) async throws
   func requestPasswordReset(email: String) async throws
   func resetPassword(email: String, code: String, newPassword: String) async throws
   func updateTimezone(_ timezone: String, accessToken: String) async throws
   func refresh(refreshToken: String) async throws -> TokenPair
+}
+
+extension AuthRepository {
+  public func registerWithEmail(email: String, password: String, timezone: String, code: String)
+    async throws -> AuthResult
+  {
+    throw AuthRepositoryError.backend(statusCode: 403, code: .registrationDisabled, issues: [])
+  }
+
+  public func requestSignupCode(email: String) async throws {
+    throw AuthRepositoryError.backend(statusCode: 403, code: .registrationDisabled, issues: [])
+  }
 }
 
 public struct NetworkingAuthRepository: AuthRepository {

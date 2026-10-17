@@ -14,7 +14,7 @@ public struct AuthFlowView: View {
     NavigationStack {
       switch buildTrack {
       case .china:
-        LoginView()
+        GlobalLoginView(buildTrack: .china)
       case .global:
         GlobalLoginView()
       }

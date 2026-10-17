@@ -33,6 +33,10 @@ extension APIClient {
     try await postGlobalJSON(request, to: .authGoogle, as: AuthResultDTO.self)
   }
 
+  public func requestSignupCode(_ request: EmailForgotRequestDTO) async throws {
+    try await postGlobalJSONNoContent(request, to: .authEmailRegisterCode)
+  }
+
   public func registerWithEmail(_ request: EmailRegisterRequestDTO) async throws -> AuthResultDTO {
     try await postGlobalJSON(request, to: .authEmailRegister, as: AuthResultDTO.self)
   }

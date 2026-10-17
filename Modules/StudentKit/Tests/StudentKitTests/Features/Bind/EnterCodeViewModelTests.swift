@@ -213,3 +213,10 @@ private func makeViewModel(
   #expect(EnterCodeView.sanitized("xk7") == "XK7")
   #expect(EnterCodeView.sanitized("") == "")
 }
+
+@MainActor
+@Test func invitationMessagePasteAndDirectEntryExtractTheLinkBeforeTruncation() {
+  let message = "Install MeetPR: http://localhost:3000/i/XK7MPQ2RVT then register"
+  #expect(InviteCodePaste.validCode(from: message) == "XK7MPQ2RVT")
+  #expect(EnterCodeView.sanitized(message) == "XK7MPQ2RVT")
+}

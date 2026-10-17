@@ -153,3 +153,17 @@ extension APIClient {
     }
   }
 }
+
+@MainActor
+@Test func chinaRegistrationPassesCodeThroughSessionAndRepository() async throws {
+  let capture = RequestCapture()
+  let api = try APIClient.stub(data: AuthTestSupport.authResultData(), capture: capture)
+  let session = Session(auth: NetworkingAuthRepository(api: api), tokenStore: InMemoryTokenStore())
+  try await session.registerWithEmail(
+    email: "new@example.com", password: "password123", code: "654321")
+  let body = try #require(await capture.body())
+  let payload = try #require(JSONSerialization.jsonObject(with: body) as? [String: Any])
+  #expect(payload["code"] as? String == "654321")
+  #expect(payload["role"] as? String == "coached_student")
+  #expect(payload["confirmPassword"] == nil)
+}
