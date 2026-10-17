@@ -1,16 +1,20 @@
 import DesignSystem
+import Networking
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct GlobalForgotPasswordView: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(Session.self) private var environmentSession
-  @State private var viewModel = GlobalForgotPasswordViewModel()
+  @State private var viewModel: GlobalForgotPasswordViewModel
+  private let buildTrack: MeetPRBuildTrack
 
   private let sessionOverride: Session?
   private let onPasswordReset: () -> Void
 
-  public init(onPasswordReset: @escaping () -> Void) {
+  public init(buildTrack: MeetPRBuildTrack = .global, onPasswordReset: @escaping () -> Void) {
+    self.buildTrack = buildTrack
+    _viewModel = State(initialValue: GlobalForgotPasswordViewModel(buildTrack: buildTrack))
     sessionOverride = nil
     self.onPasswordReset = onPasswordReset
   }
@@ -20,6 +24,7 @@ public struct GlobalForgotPasswordView: View {
     session: Session? = nil,
     onPasswordReset: @escaping () -> Void
   ) {
+    buildTrack = viewModel.buildTrack
     _viewModel = State(initialValue: viewModel)
     sessionOverride = session
     self.onPasswordReset = onPasswordReset
@@ -30,24 +35,26 @@ public struct GlobalForgotPasswordView: View {
 
     ScrollView {
       VStack(alignment: .leading, spacing: 0) {
-        GlobalAuthHero(title: "Reset your\npassword")
+        GlobalAuthHero(
+          title: text(viewModel.step == .email ? "auth.forgotTitle" : "auth.resetTitle"))
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
           if viewModel.step == .email {
-            Text("Enter the email address linked to your account.")
+            Text(text("auth.forgotSubtitle"))
               .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
               .foregroundStyle(Color.MeetPR.textTertiary)
 
             GlobalEmailField(
-              "EMAIL",
+              text("auth.email"),
               text: $viewModel.email,
-              placeholder: "you@example.com",
-              errorMessage: emailError
+              placeholder: text("auth.emailPlaceholder"),
+              errorMessage: emailError,
+              usesEmailTypography: buildTrack == .china
             )
             .accessibilityIdentifier("global.forgot.email")
 
             GlobalAuthButton(
-              title: "Send code",
+              title: text("auth.sendCode"),
               isLoading: viewModel.isSubmitting,
               isDisabled: !viewModel.canSendCode
             ) {
@@ -55,40 +62,49 @@ public struct GlobalForgotPasswordView: View {
             }
             .accessibilityIdentifier("global.forgot.send")
           } else {
-            Text("If an account exists, we've sent a code.")
+            Text(text("auth.resetSent"))
               .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .semibold))
               .foregroundStyle(Color.MeetPR.textTertiary)
 
-            TextField("6-digit code", text: $viewModel.code)
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .semibold))
-              .textFieldStyle(.plain)
-              .padding(MeetPRSpacing.point14)
-              .background(Color.MeetPR.surfaceCard)
-              .clipShape(.rect(cornerRadius: MeetPRRadius.point14))
-              .overlay {
-                RoundedRectangle(cornerRadius: MeetPRRadius.point14)
-                  .stroke(Color.MeetPR.borderSubtle, lineWidth: MeetPRSpacing.point1)
-              }
-              #if os(iOS)
-                .keyboardType(.numberPad)
-                .textContentType(.oneTimeCode)
-              #endif
-              .onChange(of: viewModel.code) { _, newValue in
-                viewModel.code = String(GlobalAuthValidation.asciiDigits(from: newValue).prefix(6))
-              }
-              .accessibilityIdentifier("global.forgot.code")
+            TextField(
+              "", text: $viewModel.code,
+              prompt: Text(text("auth.codePlaceholder")).foregroundStyle(
+                buildTrack == .china ? Color.MeetPR.textDisabled : Color.secondary)
+            )
+            .font(
+              buildTrack == .china
+                ? .MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold)
+                : .MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .semibold)
+            )
+            .textFieldStyle(.plain)
+            .padding(MeetPRSpacing.point14)
+            .background(Color.MeetPR.surfaceCard)
+            .clipShape(.rect(cornerRadius: MeetPRRadius.point14))
+            .overlay {
+              RoundedRectangle(cornerRadius: MeetPRRadius.point14)
+                .stroke(Color.MeetPR.borderSubtle, lineWidth: MeetPRSpacing.point1)
+            }
+            #if os(iOS)
+              .keyboardType(.numberPad)
+              .textContentType(.oneTimeCode)
+            #endif
+            .onChange(of: viewModel.code) { _, newValue in
+              viewModel.code = String(GlobalAuthValidation.asciiDigits(from: newValue).prefix(6))
+            }
+            .accessibilityIdentifier("global.forgot.code")
 
             AuthSecureField(
-              "NEW PASSWORD",
+              text("auth.newPassword"),
               text: $viewModel.newPassword,
-              placeholder: "At least 8 characters",
-              helperText: "8–72 characters",
-              errorMessage: passwordError
+              placeholder: text("auth.newPasswordPlaceholder"),
+              helperText: text("auth.passwordHelper"),
+              errorMessage: passwordError,
+              usesEmailTypography: buildTrack == .china
             )
             .accessibilityIdentifier("global.forgot.password")
 
             GlobalAuthButton(
-              title: "Reset password",
+              title: text("auth.resetButton"),
               isLoading: viewModel.isSubmitting,
               isDisabled: !viewModel.canResetPassword
             ) {
@@ -116,7 +132,7 @@ public struct GlobalForgotPasswordView: View {
       .frame(maxWidth: .infinity)
     }
     .background { GlobalAuthBackground() }
-    .navigationTitle("Forgot password")
+    .navigationTitle(text("auth.forgotHeader"))
     .globalInlineNavigationTitle()
   }
 
@@ -124,7 +140,7 @@ public struct GlobalForgotPasswordView: View {
     guard !viewModel.email.isEmpty, !GlobalAuthValidation.isValidEmail(viewModel.email) else {
       return nil
     }
-    return "Enter a valid email address"
+    return text("auth.invalidEmail")
   }
 
   private var session: Session {
@@ -136,6 +152,10 @@ public struct GlobalForgotPasswordView: View {
       !viewModel.newPassword.isEmpty,
       !GlobalAuthValidation.isValidPassword(viewModel.newPassword)
     else { return nil }
-    return "Use 8–72 characters"
+    return text("auth.invalidPassword")
   }
+  private func text(_ key: String) -> String {
+    EmailAuthStrings.text(key, track: buildTrack)
+  }
+
 }

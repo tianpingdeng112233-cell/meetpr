@@ -20370,6 +20370,40 @@
           }
         }
       }
+    },
+    "student.inviteCode.paste": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste invite code"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粘贴邀请码"
+          }
+        }
+      }
+    },
+    "student.inviteCode.pasteEmpty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No invite code found in what you copied"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制的内容里没有找到邀请码"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

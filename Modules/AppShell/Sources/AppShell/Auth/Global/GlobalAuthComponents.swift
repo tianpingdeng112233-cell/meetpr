@@ -32,6 +32,7 @@ struct GlobalEmailField: View {
   private let label: String
   private let placeholder: String
   private let errorMessage: String?
+  private let usesEmailTypography: Bool
 
   @Binding private var text: String
   @FocusState private var isFocused: Bool
@@ -40,20 +41,26 @@ struct GlobalEmailField: View {
     _ label: String,
     text: Binding<String>,
     placeholder: String,
-    errorMessage: String? = nil
+    errorMessage: String? = nil,
+    usesEmailTypography: Bool = false
   ) {
     self.label = label
     _text = text
     self.placeholder = placeholder
     self.errorMessage = errorMessage
+    self.usesEmailTypography = usesEmailTypography
   }
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.point6) {
       VStack(alignment: .leading, spacing: MeetPRSpacing.point5) {
         Text(label)
-          .font(.MeetPR.mono(size: 9.5, weight: .bold))
-          .tracking(1.33)
+          .font(
+            usesEmailTypography
+              ? .MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold)
+              : .MeetPR.mono(size: 9.5, weight: .bold)
+          )
+          .tracking(usesEmailTypography ? 0 : 1.33)
           .foregroundStyle(labelColor)
 
         TextField(

@@ -93,7 +93,12 @@ import ViewInspector
   let sut = AuthFlowView().environment(session)
   let inspected = try sut.inspect()
 
-  #expect(try inspected.find(text: "Better than\nyesterday").string() == "Better than\nyesterday")
+  #expect(throws: Never.self) {
+    try inspected.find(viewWithAccessibilityIdentifier: "global.login.email")
+  }
+  #expect(throws: (any Error).self) {
+    try inspected.find(viewWithAccessibilityIdentifier: "global.login.apple")
+  }
 }
 
 @MainActor

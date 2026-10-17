@@ -5,6 +5,7 @@ public enum Endpoint: Equatable, Sendable {
   case authEmailForgot
   case authEmailLogin
   case authEmailRegister
+  case authEmailRegisterCode
   case authEmailReset
   case authGoogle
   case authLogin
@@ -26,6 +27,8 @@ public enum Endpoint: Equatable, Sendable {
       "/auth/email/forgot"
     case .authEmailLogin:
       "/auth/email/login"
+    case .authEmailRegisterCode:
+      "/auth/email/register/code"
     case .authEmailRegister:
       "/auth/email/register"
     case .authEmailReset:

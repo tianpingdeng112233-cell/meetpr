@@ -1,5 +1,6 @@
 import CoreModels
 import DesignSystem
+import Networking
 import SwiftUI
 
 /// One-off geometry from the 4b mockup that has no scale-token equivalent.
@@ -103,13 +104,18 @@ struct InviteCodeEntry: View {
 
         Spacer(minLength: MeetPRSpacing.space2)
 
-        Button(action: onPaste) {
-          Label(StudentStrings.localized(.inviteCodeEntry005), systemImage: "doc.on.clipboard")
+        if BuildConfig.buildTrack == .china {
+          Button(action: onPaste) {
+            Label(
+              String(localized: "student.inviteCode.paste", bundle: .module),
+              systemImage: "doc.on.clipboard"
+            )
             .font(Font.MeetPR.body(size: 12.5, weight: .semibold))
             .foregroundStyle(Color.MeetPR.goldText)
+          }
+          .accessibilityHint(
+            StudentStrings.replacing(.inviteCodeEntry006, values: ["\(InviteCodeFormat.length)"]))
         }
-        .accessibilityHint(
-          StudentStrings.replacing(.inviteCodeEntry006, values: ["\(InviteCodeFormat.length)"]))
       }
 
       if let pasteError {

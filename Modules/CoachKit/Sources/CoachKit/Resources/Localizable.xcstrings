@@ -15335,6 +15335,57 @@
           }
         }
       }
+    },
+    "coach.invites.message": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I'm using MeetPR to plan your training and review your lift videos.\n1. Install the app: {0}\n2. Open it and create an account\n3. On the invite code screen, tap Paste invite code, or enter: {1}\nOnce I accept, your plan will show up. — {2}"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我在用 MeetPR 给你排训练计划和看动作视频。\n1. 点这个链接安装 App：{0}\n2. 打开 App 注册账号\n3. 在「输入邀请码」页点「粘贴邀请码」，或输入：{1}\n我这边确认后你就能看到训练计划了。—— {2}"
+          }
+        }
+      }
+    },
+    "coach.invites.share": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享"
+          }
+        }
+      }
+    },
+    "coach.invites.fallbackName": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -69,6 +69,18 @@ extension NetworkingAuthRepository {
     }
   }
 
+  public func registerWithEmail(email: String, password: String, timezone: String, code: String)
+    async throws -> AuthResult
+  {
+    do {
+      return try Self.result(
+        from: await api.registerWithEmail(
+          EmailRegisterRequestDTO(
+            email: email, password: password, role: .coachedStudent, timezone: timezone, code: code)
+        ))
+    } catch { throw Self.map(error) }
+  }
+
   public func loginWithEmail(email: String, password: String) async throws -> AuthResult {
     do {
       let response = try await api.loginWithEmail(
@@ -76,6 +88,12 @@ extension NetworkingAuthRepository {
       )
       return try Self.result(from: response)
     } catch {
+      throw Self.map(error)
+    }
+  }
+
+  public func requestSignupCode(email: String) async throws {
+    do { try await api.requestSignupCode(EmailForgotRequestDTO(email: email)) } catch {
       throw Self.map(error)
     }
   }
@@ -139,8 +157,18 @@ extension InMemoryAuthRepository {
     try globalResult(identifier: email)
   }
 
+  public func registerWithEmail(email: String, password: String, timezone: String, code: String)
+    async throws -> AuthResult
+  {
+    try globalResult(identifier: email)
+  }
+
   public func loginWithEmail(email: String, password: String) async throws -> AuthResult {
     try globalResult(identifier: email)
+  }
+
+  public func requestSignupCode(email: String) async throws {
+    if let forcedError { throw forcedError }
   }
 
   public func requestPasswordReset(email: String) async throws {

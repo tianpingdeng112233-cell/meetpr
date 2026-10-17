@@ -1571,3 +1571,12 @@ David 本轮直接授权保留上一轮工作区、完成全量测试和模拟�
 - Spec：初轮比赛动作基线、目录失败丢行两项修复；第二轮缺目录重建 PB 的 P2 补先红后绿回归并修复，定向复核 CLEAN。无未决 blocker；正式验收仍由 Opus 按原清单执行。
 - David 最终确认 PR 指向 release/1.0，不合并；基线 7acf289c8578663e3b8155544514f080f9795743。未 rebase 或修改其他工作树。
 - 指定模拟器已关机。生成目录移入本树 gitignore 的 .build/spec092-derived，最终 Demo app 位于其中 Build/Products/DemoStudent-iphonesimulator/MeetPR.app；未清理其他任务产物。
+
+## 2026-10-17 · Spec 093 I1/I2 开发自测
+
+- 工作树 `MeetPR-wt-093`，分支 `feat/093-cn-email-onboarding`，从 release/1.0 `f2d44394` 接续。依据 RN spec093 SPEC/CARDS/IOS-HANDOFF，SPEC 优先；不改 RELEASES/NEXT-RELEASE，本轮由主代理统一 commit/push/PR，不合并。
+- I1：CN 复用 Global 邮箱页，4 字段注册 + 发码冷却/换邮箱/错误/返回登录；旧 Session/Keychain/主界面入口保留；Global 默认邮箱/OAuth行为保留。按 David 截图定向修正 CN 输入字体，未另做设计。
+- I2：两轨识别完整邀请消息/链接，CN 点击粘贴、两处复制完整消息、永久码系统分享；Global 纯码。详见 [原始证据与复现](evidence/spec093-2026-10-17/README.md)。5 模块 1891 项通过，CN Xcode 编译通过；新行为先红后绿，独立双轴审查后的错误态/提交锁定/登录入口等已定向返修。
+- 环境偏差已披露并只读审计：`build_run_sim` 未应用 localhost env，修正前的合成邮箱操作误请求国内 staging，确认新增注册验证码3条；同一邮箱新增重置码0条、两个合成邮箱新增 users 0条（2026-10-17 04:30 UTC 之后）。未提交注册/重置密码，未清理或回滚远端。邮件投递状态未核实。显式 `launch_app_sim(env:)` 并核对本地请求日志后重拍截图。详细边界、时间和私有原始记录指针见证据 README。
+- 真实邮件、双端真实找回密码、beta24已登录升级由 David 按最新卡手测；staging全链路与旧账号数据留主流程部署批准后执行。本轮未发布。
+- 补证完成：Global / Global 配置 Xcode 编译191.1s通过；Apple/Google/邮箱入口、Global无粘贴/无分享、复制纯码已亲看。CN整段消息/裸链接/无关文本粘贴、教练两处复制和系统分享预览都有实际模拟器图，索引见上述README。裸链接通过姓名框本地中转剪贴板，未提交绑定。后续全链路仍以部署后验收为准。

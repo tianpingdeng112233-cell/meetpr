@@ -116,6 +116,7 @@ struct EnterCodeView: View {
   /// (so an `O` or `0` never lands in a box that can never validate), then cap
   /// at the code length.
   static func sanitized(_ raw: String) -> String {
+    if let extracted = InviteCodeFormat.extract(raw) { return extracted }
     let normalized = InviteCodeFormat.normalize(raw)
       .filter { InviteCodeFormat.alphabet.contains($0) }
     return String(normalized.prefix(InviteCodeFormat.length))
@@ -129,8 +130,7 @@ struct EnterCodeView: View {
     #endif
 
     guard let pastedCode else {
-      pasteError = StudentStrings.replacing(
-        .enterCodeView005, values: ["\(InviteCodeFormat.length)"])
+      pasteError = String(localized: "student.inviteCode.pasteEmpty", bundle: .module)
       return
     }
 
@@ -158,7 +158,6 @@ struct EnterCodeView: View {
 enum InviteCodePaste {
   static func validCode(from clipboardText: String?) -> String? {
     guard let clipboardText else { return nil }
-    let normalized = InviteCodeFormat.normalize(clipboardText)
-    return InviteCodeFormat.isValid(normalized) ? normalized : nil
+    return InviteCodeFormat.extract(clipboardText)
   }
 }

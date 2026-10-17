@@ -130,12 +130,16 @@ public struct EmailRegisterRequestDTO: Codable, Equatable, Sendable {
   public let password: String
   public let role: UserRole
   public let timezone: String?
+  public let code: String?
 
-  public init(email: String, password: String, role: UserRole, timezone: String? = nil) {
+  public init(
+    email: String, password: String, role: UserRole, timezone: String? = nil, code: String? = nil
+  ) {
     self.email = email
     self.password = password
     self.role = role
     self.timezone = timezone
+    self.code = code
   }
 }
 

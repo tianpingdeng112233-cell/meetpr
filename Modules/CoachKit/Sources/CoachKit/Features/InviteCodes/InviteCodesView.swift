@@ -1,5 +1,6 @@
 import CoreModels
 import DesignSystem
+import Networking
 import RepositoryContracts
 import SwiftUI
 
@@ -7,12 +8,14 @@ import SwiftUI
 /// time-limited codes below, defunct codes sunk into their own section.
 @available(iOS 17.0, macOS 14.0, *)
 struct InviteCodesView: View {
+  private let coachName: String?
   @State private var viewModel: InviteCodesViewModel
   @State private var createSheet: CreateCodeSheetKind?
   @State private var confirmRegenerate = false
   @State private var revokeTarget: InviteCode?
 
-  init(repository: any InviteCodeRepository) {
+  init(repository: any InviteCodeRepository, coachName: String? = nil) {
+    self.coachName = coachName
     self._viewModel = State(initialValue: InviteCodesViewModel(repository: repository))
   }
 
@@ -98,6 +101,14 @@ struct InviteCodesView: View {
                 : InviteCodeStrings.copy
             ) {
               copy(code)
+            }
+            if BuildConfig.buildTrack == .china {
+              ShareLink(item: CoachInvitationMessage.text(code: code.code, coachName: coachName)) {
+                Label(
+                  CoachLocalization.localized("coach.invites.share"),
+                  systemImage: "square.and.arrow.up")
+              }
+              .accessibilityIdentifier("coach.invites.share")
             }
             SecondaryButton(InviteCodeStrings.regenerate) {
               confirmRegenerate = true
@@ -205,13 +216,14 @@ struct InviteCodesView: View {
     }
   }
 
-  /// Clipboard always gets the raw ungrouped 10 chars (spec 031 D11).
+  /// CN copies the invitation message; Global retains the raw code.
   private func copy(_ code: InviteCode) {
+    let message = CoachInvitationMessage.text(code: code.code, coachName: coachName)
     #if os(iOS)
-      UIPasteboard.general.string = code.code
+      UIPasteboard.general.string = message
     #elseif os(macOS)
       NSPasteboard.general.clearContents()
-      NSPasteboard.general.setString(code.code, forType: .string)
+      NSPasteboard.general.setString(message, forType: .string)
     #endif
     viewModel.markCopied(code)
     Task {

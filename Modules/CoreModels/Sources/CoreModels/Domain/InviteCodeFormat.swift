@@ -17,6 +17,23 @@ public enum InviteCodeFormat {
     raw.uppercased().filter { $0 != " " && $0 != "-" }
   }
 
+  /// Extracts a complete code before the input field applies its length limit.
+  /// A link wins over other codes in the surrounding invitation message.
+  public static func extract(_ text: String) -> String? {
+    let upper = text.uppercased()
+    if let range = upper.range(of: #"/I/([A-Z0-9]{10})(?![A-Z0-9])"#, options: .regularExpression) {
+      let code = String(upper[range].dropFirst(3))
+      return isValid(code) ? code : nil
+    }
+    let normalized = normalize(text.trimmingCharacters(in: .whitespacesAndNewlines))
+    if isValid(normalized) { return normalized }
+    let characters = "[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]"
+    let pattern =
+      "(?<![A-Z0-9])(\(characters){4})[ -]?(\(characters){3})[ -]?(\(characters){3})(?![A-Z0-9])"
+    guard let range = upper.range(of: pattern, options: .regularExpression) else { return nil }
+    return normalize(String(upper[range]))
+  }
+
   /// True when `normalized` is exactly 10 chars of the locked alphabet.
   /// Call with already-normalized input.
   public static func isValid(_ normalized: String) -> Bool {

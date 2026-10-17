@@ -1,49 +1,93 @@
 import DesignSystem
+import Networking
 import SwiftUI
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct GlobalRegisterView: View {
+  @Environment(\.dismiss) private var dismiss
   @Environment(Session.self) private var session
-  @State private var viewModel = GlobalRegisterViewModel()
+  @State private var viewModel: GlobalRegisterViewModel
+  private let buildTrack: MeetPRBuildTrack
 
-  public init() {}
+  public init(buildTrack: MeetPRBuildTrack = .global) {
+    self.buildTrack = buildTrack
+    _viewModel = State(initialValue: GlobalRegisterViewModel(buildTrack: buildTrack))
+  }
+
+  init(viewModel: GlobalRegisterViewModel) {
+    buildTrack = viewModel.buildTrack
+    _viewModel = State(initialValue: viewModel)
+  }
 
   public var body: some View {
     @Bindable var viewModel = viewModel
 
     ScrollView {
       VStack(alignment: .leading, spacing: 0) {
-        GlobalAuthHero(title: "Create your\naccount")
+        GlobalAuthHero(title: text("auth.registerTitle"))
 
         VStack(alignment: .leading, spacing: MeetPRSpacing.point14) {
-          Text("Join your coach and start building better training days.")
+          Text(text("auth.registerSubtitle"))
             .font(.MeetPR.body(size: MeetPRFontMetrics.size13))
             .foregroundStyle(Color.MeetPR.textTertiary)
 
           GlobalEmailField(
-            "EMAIL",
+            text("auth.email"),
             text: $viewModel.email,
-            placeholder: "you@example.com",
-            errorMessage: emailError
+            placeholder: text("auth.emailPlaceholder"),
+            errorMessage: emailError,
+            usesEmailTypography: buildTrack == .china
           )
           .accessibilityIdentifier("global.register.email")
+          .disabled(buildTrack == .china && viewModel.isSubmitting)
+
+          if buildTrack == .china {
+            SignupCodeField(
+              viewModel: viewModel,
+              onSendCode: {
+                await viewModel.sendCode(using: session)
+              }, onSignIn: { dismiss() }
+            )
+            .disabled(buildTrack == .china && viewModel.isSubmitting)
+          }
 
           AuthSecureField(
-            "PASSWORD",
+            text("auth.password"),
             text: $viewModel.password,
-            placeholder: "At least 8 characters",
-            helperText: "8–72 characters",
-            errorMessage: passwordError
+            placeholder: text("auth.passwordPlaceholder"),
+            helperText: text("auth.passwordHelper"),
+            errorMessage: passwordError,
+            usesEmailTypography: buildTrack == .china
           )
           .accessibilityIdentifier("global.register.password")
+          .disabled(buildTrack == .china && viewModel.isSubmitting)
+
+          if buildTrack == .china {
+            AuthSecureField(
+              text("auth.confirmPassword"), text: $viewModel.confirmPassword,
+              placeholder: text("auth.confirmPlaceholder"),
+              errorMessage: viewModel.confirmPassword.isEmpty
+                || viewModel.confirmPassword == viewModel.password
+                ? nil : text("auth.passwordMismatch"),
+              usesEmailTypography: true
+            )
+            .accessibilityIdentifier("china.register.confirmPassword")
+            .disabled(buildTrack == .china && viewModel.isSubmitting)
+          }
 
           if let toastMessage = viewModel.toastMessage {
             GlobalAuthToast(message: toastMessage)
               .accessibilityIdentifier("global.register.toast")
           }
 
+          if viewModel.shouldOfferSignIn {
+            Button(text("auth.goSignIn")) { dismiss() }
+              .disabled(buildTrack == .china && viewModel.isSubmitting)
+              .accessibilityIdentifier("china.register.signIn")
+          }
+
           GlobalAuthButton(
-            title: "Create account",
+            title: text("auth.registerButton"),
             isLoading: viewModel.isSubmitting,
             isDisabled: !viewModel.canSubmit
           ) {
@@ -60,15 +104,22 @@ public struct GlobalRegisterView: View {
       .frame(maxWidth: .infinity)
     }
     .background { GlobalAuthBackground() }
-    .navigationTitle("Create account")
+    .navigationTitle(text("auth.createAccount"))
     .globalInlineNavigationTitle()
+    .task {
+      guard buildTrack == .china else { return }
+      while !Task.isCancelled {
+        do { try await Task.sleep(for: .seconds(1)) } catch { return }
+        viewModel.tickCooldown()
+      }
+    }
   }
 
   private var emailError: String? {
     guard !viewModel.email.isEmpty, !GlobalAuthValidation.isValidEmail(viewModel.email) else {
       return nil
     }
-    return "Enter a valid email address"
+    return text("auth.invalidEmail")
   }
 
   private var passwordError: String? {
@@ -76,6 +127,10 @@ public struct GlobalRegisterView: View {
       !viewModel.password.isEmpty,
       !GlobalAuthValidation.isValidPassword(viewModel.password)
     else { return nil }
-    return "Use 8–72 characters"
+    return text("auth.invalidPassword")
   }
+  private func text(_ key: String) -> String {
+    EmailAuthStrings.text(key, track: buildTrack)
+  }
+
 }
