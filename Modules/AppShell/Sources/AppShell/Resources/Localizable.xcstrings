@@ -58,7 +58,7 @@
     "auth.forgotLink": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Forgot password?"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"忘记密码？"}}}},
     "auth.forgotHeader": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Forgot password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"找回密码"}}}},
     "auth.globalSlogan": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Better than\nyesterday"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"Better than\nyesterday"}}}},
-    "auth.chinaSlogan": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Meet Your\nPersonal Record\nHere."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"Meet Your\nPersonal Record\nHere."}}}},
+    "auth.chinaSlogan": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Meet Your\nPR Here."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"Meet Your\nPR Here."}}}},
     "auth.or": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"or"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"或"}}}},
     "auth.google": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Continue with Google"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"使用 Google 继续"}}}},
     "auth.consent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"By continuing, you agree to our"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"继续即表示你同意我们的"}}}},
