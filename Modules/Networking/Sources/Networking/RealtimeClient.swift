@@ -267,11 +267,12 @@ private final class URLSessionRealtimeConnection: RealtimeConnection, @unchecked
 
   func sendPing() async throws {
     try await withCheckedThrowingContinuation { (continuation: VoidThrowingContinuation) in
+      let resumer = ResumeOnce<Void> { continuation.resume(with: $0) }
       task.sendPing { error in
         if let error {
-          continuation.resume(throwing: error)
+          resumer.resume(with: .failure(error))
         } else {
-          continuation.resume()
+          resumer.resume(with: .success(()))
         }
       }
     }
