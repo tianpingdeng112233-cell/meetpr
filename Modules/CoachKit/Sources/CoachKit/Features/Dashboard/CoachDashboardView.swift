@@ -435,17 +435,10 @@ private struct CoachWeekOverviewCard: View {
   }
 
   private var legendBars: some View {
-    HStack(spacing: MeetPRSpacing.point3) {
+    CoachWeekLegendLayout(weights: summary.legend.map(\.count), spacing: MeetPRSpacing.point3) {
       ForEach(summary.legend) { legend in
         Capsule()
           .fill(color(for: legend.group))
-          .frame(maxWidth: .infinity)
-          .containerRelativeFrame(
-            .horizontal,
-            count: max(1, summary.rows.count),
-            span: legend.count,
-            spacing: MeetPRSpacing.point3
-          )
       }
     }
     .frame(height: MeetPRSpacing.space2)
