@@ -11283,13 +11283,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "退出后需重新用手机号登录。"
+            "value": "退出后需要重新登录。"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "You will need to sign in again with your phone number."
+            "value": "You'll need to sign in again."
           }
         }
       }
