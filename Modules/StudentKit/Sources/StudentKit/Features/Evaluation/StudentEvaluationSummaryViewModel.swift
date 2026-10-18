@@ -51,8 +51,22 @@ public final class StudentEvaluationSummaryViewModel {
 
   public func load(studentID: UUID) async {
     self.studentID = studentID
-    summary = try? await summaries.fetchSummary(studentID: studentID)
-    currentPlan = try? await plans.fetchCurrentPlan(studentID: studentID)
+    let loadedSummary: EvaluationSummary?
+    let loadedPlan: StudentPlanView?
+    do {
+      loadedSummary = try await summaries.fetchSummary(studentID: studentID)
+    } catch {
+      if error.isTaskCancellation { return }
+      loadedSummary = nil
+    }
+    do {
+      loadedPlan = try await plans.fetchCurrentPlan(studentID: studentID)
+    } catch {
+      if error.isTaskCancellation { return }
+      loadedPlan = nil
+    }
+    summary = loadedSummary
+    currentPlan = loadedPlan
     recomputeUnread()
   }
 

@@ -1,5 +1,6 @@
 import CoreModels
 import Foundation
+import Networking
 import RepositoryContracts
 
 @testable import CoachKit
@@ -151,6 +152,13 @@ struct CoachFeatureTestError: Error, Equatable {}
 
 actor StubCoachPlanRepository: PlanRepository {
   var students: [CoachStudentSummary]
+  var catalog: [Exercise] = []
+  var catalogError: Error?
+  var coachLogs: [CoachSetLogDTO]?
+  var suspendFetch = false
+  private(set) var isSuspended = false
+
+  func suspendNextFetch() { suspendFetch = true }
   var error: Error?
 
   init(students: [CoachStudentSummary], error: Error? = nil) {
@@ -158,13 +166,25 @@ actor StubCoachPlanRepository: PlanRepository {
     self.error = error
   }
 
+  func setError(_ error: Error?) { self.error = error }
+
   func fetchStudents() async throws -> [CoachStudentSummary] {
+    if suspendFetch {
+      isSuspended = true
+      defer { isSuspended = false }
+      try await Task.sleep(for: .seconds(30))
+    }
     if let error { throw error }
     return students
   }
 
+  func fetchCoachLogs(studentID: UUID, in range: ClosedRange<Date>) async throws
+    -> [CoachSetLogDTO]?
+  { coachLogs }
+
   func fetchMainLiftCatalog() async throws -> [Exercise] {
-    []
+    if let catalogError { throw catalogError }
+    return catalog
   }
 
   func fetchAccessoryExercises(filters: AccessoryFilters) async throws -> [Exercise] {
@@ -180,6 +200,8 @@ actor StubCoachPlanRepository: PlanRepository {
 }
 
 actor StubStudentPlanRepository: StudentPlanRepository {
+  var fetchError: Error?
+  func setFetchError(_ error: Error?) { fetchError = error }
   var plans: [UUID: StudentPlanView]
 
   init(plans: [UUID: StudentPlanView]) {
@@ -187,7 +209,8 @@ actor StubStudentPlanRepository: StudentPlanRepository {
   }
 
   func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
-    plans[studentID]
+    if let fetchError { throw fetchError }
+    return plans[studentID]
   }
 
   func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? {

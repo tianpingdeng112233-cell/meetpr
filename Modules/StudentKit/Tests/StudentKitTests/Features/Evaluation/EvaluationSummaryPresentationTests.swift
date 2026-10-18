@@ -69,13 +69,19 @@ private func makePlan(kind: PlanKind) -> StudentPlanView {
 // MARK: - View model wiring
 
 private actor StubSummaryRepository: EvaluationSummaryRepository {
-  let summary: EvaluationSummary?
+  var fetchError: Error?
+  func setError(_ error: Error?) { fetchError = error }
+  var summary: EvaluationSummary?
+  func setSummary(_ summary: EvaluationSummary?) { self.summary = summary }
 
   init(summary: EvaluationSummary?) {
     self.summary = summary
   }
 
-  func fetchSummary(studentID: UUID) async throws -> EvaluationSummary? { summary }
+  func fetchSummary(studentID: UUID) async throws -> EvaluationSummary? {
+    if let fetchError { throw fetchError }
+    return summary
+  }
 
   func putSummary(
     studentID: UUID,
@@ -89,13 +95,18 @@ private actor StubSummaryRepository: EvaluationSummaryRepository {
 }
 
 private actor StubPlansRepository: StudentPlanRepository {
+  var fetchError: Error?
+  func setError(_ error: Error?) { fetchError = error }
   let plan: StudentPlanView?
 
   init(plan: StudentPlanView?) {
     self.plan = plan
   }
 
-  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? { plan }
+  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    if let fetchError { throw fetchError }
+    return plan
+  }
   func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? { nil }
   func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] { [] }
 }
@@ -159,4 +170,42 @@ private actor StubPlansRepository: StudentPlanRepository {
   #expect(viewModel.showsDashboardCard)
   // A regular plan exists → no waiting row.
   #expect(!viewModel.showsAwaitingFirstPlan)
+}
+
+@MainActor
+@Test(arguments: [true, false])
+func summaryRefreshCancellationKeepsSummaryAndPlan(urlCancellation: Bool) async {
+  let summary = makeSummary()
+  let plan = makePlan(kind: .regular)
+  let summaries = StubSummaryRepository(summary: summary)
+  let plans = StubPlansRepository(plan: plan)
+  let model = StudentEvaluationSummaryViewModel(
+    summaries: summaries, plans: plans, readStore: InMemoryEvaluationSummaryReadStore())
+  await model.load(studentID: studentID)
+  let error: any Error = urlCancellation ? URLError(.cancelled) : CancellationError()
+  await summaries.setError(error)
+  await plans.setError(error)
+  await model.load(studentID: studentID)
+  #expect(model.summary == summary)
+  #expect(model.currentPlan == plan)
+  #expect(model.isUnread)
+}
+
+@MainActor
+@Test func summaryRefreshCancellationAfterSummaryKeepsConsistentSnapshot() async {
+  let summary = makeSummary()
+  let plan = makePlan(kind: .regular)
+  let summaries = StubSummaryRepository(summary: summary)
+  let plans = StubPlansRepository(plan: plan)
+  let model = StudentEvaluationSummaryViewModel(
+    summaries: summaries, plans: plans, readStore: InMemoryEvaluationSummaryReadStore(),
+    now: { baseDate })
+  await model.load(studentID: studentID)
+  model.markRead()
+  await summaries.setSummary(makeSummary(lastUpdatedAt: baseDate.addingTimeInterval(60)))
+  await plans.setError(URLError(.cancelled))
+  await model.load(studentID: studentID)
+  #expect(model.summary == summary)
+  #expect(model.currentPlan == plan)
+  #expect(!model.isUnread)
 }

@@ -117,12 +117,17 @@ final class StudentRosterViewModel {
   }
 
   func refresh() async {
-    state = .loading
+    let previousState = state
+    if state != .loaded { state = .loading }
     do {
       let summaries = try await students.fetchStudents()
-      rows = await loadRows(for: summaries)
+      rows = try await loadRows(for: summaries)
       state = .loaded
     } catch {
+      if error.isTaskCancellation {
+        state = previousState
+        return
+      }
       rows = []
       state = .failed(CoachLocalization.localized("coach.roster.error.load"))
     }
@@ -131,7 +136,9 @@ final class StudentRosterViewModel {
   /// Per-student fetches fan out concurrently (029 follow-up: the first pass
   /// pulled plan/logs/feedback serially per row, so the roster's first paint
   /// degraded linearly with student count). Results keep the summaries' order.
-  private func loadRows(for summaries: [CoachStudentSummary]) async -> [StudentRosterRowModel] {
+  private func loadRows(for summaries: [CoachStudentSummary]) async throws
+    -> [StudentRosterRowModel]
+  {
     let plans = self.plans
     let trainingLogs = CoachTrainingLogReader(planning: students, fallback: self.trainingLogs)
     let feedback = self.feedback
@@ -140,12 +147,12 @@ final class StudentRosterViewModel {
     // the plan/log/feedback endpoints with 3N simultaneous calls (Codex P2;
     // an aggregated roster-summary endpoint is the post-V0.1 fix, FOLLOWUPS).
     let maxConcurrent = 4
-    return await withTaskGroup(of: (Int, StudentRosterRowModel).self) { group in
+    return try await withThrowingTaskGroup(of: (Int, StudentRosterRowModel).self) { group in
       var iterator = summaries.enumerated().makeIterator()
       func submitNext() {
         guard let (index, summary) = iterator.next() else { return }
         group.addTask {
-          let row = await Self.loadRow(
+          let row = try await Self.loadRow(
             for: summary,
             plans: plans,
             trainingLogs: trainingLogs,
@@ -157,7 +164,7 @@ final class StudentRosterViewModel {
       }
       for _ in 0..<maxConcurrent { submitNext() }
       var ordered = [StudentRosterRowModel?](repeating: nil, count: summaries.count)
-      for await (index, row) in group {
+      for try await (index, row) in group {
         ordered[index] = row
         submitNext()
       }
@@ -171,7 +178,7 @@ final class StudentRosterViewModel {
     trainingLogs: CoachTrainingLogReader,
     feedback: any StudentFeedbackRepository,
     now: @Sendable () -> Date
-  ) async -> StudentRosterRowModel {
+  ) async throws -> StudentRosterRowModel {
     do {
       let timestamp = now()
       let plan = try await plans.fetchCurrentPlan(studentID: summary.id)
@@ -186,6 +193,7 @@ final class StudentRosterViewModel {
         now: timestamp
       )
     } catch {
+      if error.isTaskCancellation { throw error }
       return StudentRosterRowModel(
         student: summary,
         lastActiveAt: nil,

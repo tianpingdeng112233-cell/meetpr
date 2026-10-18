@@ -71,6 +71,7 @@ final class CoachVideoQueueViewModel {
   }
 
   func refresh() async {
+    let previousState = state
     refreshGeneration += 1
     let requestGeneration = refreshGeneration
     let requestMutationGeneration = mutationGeneration
@@ -87,6 +88,10 @@ final class CoachVideoQueueViewModel {
       state = .loaded
     } catch {
       guard requestGeneration == refreshGeneration else { return }
+      if error.isTaskCancellation {
+        state = previousState
+        return
+      }
       // Keep the last snapshot on transport failure; an empty failed queue
       // collapses the segment, same as empty.
       if state != .loaded { state = .failed }

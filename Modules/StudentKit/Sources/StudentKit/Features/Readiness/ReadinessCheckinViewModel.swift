@@ -99,9 +99,13 @@ public final class ReadinessCheckinViewModel {
 
   public func load(studentId: UUID) async {
     let day = todayString
-    if let checkin = try? await repo.fetchCheckin(studentId: studentId, checkinDate: day) {
-      gate = .done(checkin)
-      return
+    do {
+      if let checkin = try await repo.fetchCheckin(studentId: studentId, checkinDate: day) {
+        gate = .done(checkin)
+        return
+      }
+    } catch {
+      if error.isTaskCancellation { return }
     }
     gate = skipStore.isSkipped(studentId: studentId, checkinDate: day) ? .skippedToday : .needed
   }

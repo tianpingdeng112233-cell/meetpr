@@ -34,6 +34,8 @@ public final class MyProfileViewModel {
   }
 
   public func reload() async {
+    let previousState = state
+    let previouslyFailed = isFailed
     if state == .idle { state = .loading }
     isFailed = false
     do {
@@ -43,6 +45,11 @@ public final class MyProfileViewModel {
         state = .empty
       }
     } catch {
+      if error.isTaskCancellation {
+        state = previousState
+        isFailed = previouslyFailed
+        return
+      }
       isFailed = true
       if case .loaded = state { return }  // keep showing the last snapshot
       state = .failed

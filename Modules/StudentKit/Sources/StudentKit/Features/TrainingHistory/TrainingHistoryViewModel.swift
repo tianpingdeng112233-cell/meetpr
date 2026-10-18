@@ -61,13 +61,17 @@ public final class TrainingHistoryViewModel {
           studentID: studentID,
           in: Self.allHistoryStart...max(timestamp, todayNoon))
         fetchedLogs = all.planned
-        addedLogs = all.added
         if let reader = plans as? any ExerciseCatalogReading {
-          catalog =
-            (try? await reader.fetchExerciseCatalog()) ?? days.flatMap(\.exercises).map(\.exercise)
+          do {
+            catalog = try await reader.fetchExerciseCatalog()
+          } catch {
+            if error.isTaskCancellation { throw error }
+            catalog = days.flatMap(\.exercises).map(\.exercise)
+          }
         } else {
           catalog = days.flatMap(\.exercises).map(\.exercise)
         }
+        addedLogs = all.added
       } else {
         fetchedLogs = try await logs.fetchLogs(
           studentID: studentID,
