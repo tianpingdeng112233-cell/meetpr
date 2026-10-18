@@ -275,6 +275,22 @@ struct CoachLocalizationTests {
   }
 }
 
+extension CoachLocalizationTests {
+  @Test("logout message does not prescribe a login identity")
+  func logoutMessageIsIndependentOfLoginIdentity() throws {
+    let key = "coach.profile.logoutMessage"
+    let expected = ["zh-Hans": "退出后需要重新登录。", "en": "You'll need to sign in again."]
+    let translations = try loadCatalog().strings[key]?.localizations
+    for (language, message) in expected {
+      #expect(translations?[language]?.otherValue == message)
+    }
+
+    // SwiftPM copies xcstrings without compiling them; Xcode resolves the runtime value.
+    let message = CoachMyProfileStrings.logoutMessage
+    #expect(message == key || expected.values.contains(message))
+  }
+}
+
 private struct Catalog: Decodable {
   let strings: [String: Entry]
 
