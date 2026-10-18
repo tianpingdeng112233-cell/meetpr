@@ -39,6 +39,8 @@
 - 只有已补邮箱身份的账号能在本包退出后登回（B0 已补两个老账号）。
 
 ### 测试反馈
+- **2026-10-18 David 人工验收 spec 093 通过**（[iOS 收货记录](docs/acceptance-spec093-ios-2026-10-18.md)）：iPhone 经 App Store → TestFlight → MeetPR 安装引导可走通；教练申请 → 审批 → 欢迎信设密 → 两端邮箱登录；新学员注册 → 提交邀请码 → 教练接受绑定；老用户覆盖升级后绑定、计划、历史正常；两端找回密码。邮件 Gmail、163 进收件箱，QQ「测试正常」未明确落点。后端国内 staging 镜像 `e788574a`（[run 39089552055](https://github.com/tianpingdeng112233-cell/MeetPR-backend/actions/runs/39089552055)）。
+- Ceshi 分发状态：仍只有上方 10-18 截图（正在提交 Beta App Review），审核结果与本次安装走的组 / 链接未核实。
 
 ---
 
