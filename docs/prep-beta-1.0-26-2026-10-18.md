@@ -14,8 +14,11 @@ David 2026-10-18「ios切包发步」。`NEXT-RELEASE.md`「本版将包含」�
 | --- | --- |
 | #369 / #370 PR CI | 均三项全绿（Swift Build & Test / swift-format / SwiftLint）后合入 |
 | 真机 | #370 David iPhone 12（Release 构建）反复下拉刷新复测通过 |
-| tag CI | 见下方补记 |
+| tag CI | run 39116452594 首次全绿（Swift Build & Test / swift-format / SwiftLint），sha `8830b7ac` |
 | ASC 最高上传 | 25（David 2026-10-18 截图确认） |
+
+## Demo
+双端 demo 树 `MeetPR-demo-latest` detached 到 `beta/1.0-26`：教练 `MeetPR-Demo`/Demo → iPhone 17，学员 `MeetPR-DemoStudent`/DemoStudent → iPhone 17 Pro，均 build/run 成功、0 warning/error，已安装容器 `CFBundleVersion` 实读均为 26。
 
 ## 交付
 tag CI 全绿后：Xcode 打开 `~/Projects/apps/MeetPR-release`，Scheme `MeetPR` / Any iOS Device (arm64) → Product → Archive → Distribute → Upload。上传后把 NEXT-RELEASE「本版将包含」挪入 RELEASES.md 作 1.0(26) 一节，目标号改 27。
