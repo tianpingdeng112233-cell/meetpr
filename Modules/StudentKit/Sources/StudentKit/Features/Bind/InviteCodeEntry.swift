@@ -46,6 +46,7 @@ struct InviteCodeEntry: View {
   let errorMessage: String?
   let pasteError: String?
   let onPaste: () -> Void
+  var buildTrack: MeetPRBuildTrack = BuildConfig.buildTrack
   @FocusState private var isFocused: Bool
 
   private let columns = Array(
@@ -104,18 +105,18 @@ struct InviteCodeEntry: View {
 
         Spacer(minLength: MeetPRSpacing.space2)
 
-        if BuildConfig.buildTrack == .china {
-          Button(action: onPaste) {
-            Label(
-              String(localized: "student.inviteCode.paste", bundle: .module),
-              systemImage: "doc.on.clipboard"
-            )
-            .font(Font.MeetPR.body(size: 12.5, weight: .semibold))
-            .foregroundStyle(Color.MeetPR.goldText)
-          }
-          .accessibilityHint(
-            StudentStrings.replacing(.inviteCodeEntry006, values: ["\(InviteCodeFormat.length)"]))
+        Button(action: onPaste) {
+          Label(
+            buildTrack == .china
+              ? String(localized: "student.inviteCode.paste", bundle: .module)
+              : StudentStrings.localized(.inviteCodeEntry005),
+            systemImage: "doc.on.clipboard"
+          )
+          .font(Font.MeetPR.body(size: 12.5, weight: .semibold))
+          .foregroundStyle(Color.MeetPR.goldText)
         }
+        .accessibilityHint(
+          StudentStrings.replacing(.inviteCodeEntry006, values: ["\(InviteCodeFormat.length)"]))
       }
 
       if let pasteError {
