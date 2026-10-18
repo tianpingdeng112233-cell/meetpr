@@ -39,7 +39,7 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
       )
       // The video's exercise name comes from the coach's authored plan (the main
       // lift / variation the set was logged against), not a free-form string.
-      let exerciseNamesByID = await exerciseNames(forStudent: student.id)
+      let exerciseNamesByID = try await exerciseNames(forStudent: student.id)
       for video in studentVideos {
         // Unlinked uploads (no plan slot) can't be feedback-tracked by
         // planExerciseID — including them would leave a clip that never drops
@@ -69,8 +69,15 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
   /// `[planExerciseID: exercise name]` from the student's current plan — maps a
   /// video's linked slot to the coach-programmed 主项/变式 name. Empty when the
   /// plan can't be fetched (the row then shows time + size only).
-  private func exerciseNames(forStudent studentID: UUID) async -> [UUID: String] {
-    guard let plan = try? await plans.fetchCurrentPlan(studentID: studentID) else { return [:] }
+  private func exerciseNames(forStudent studentID: UUID) async throws -> [UUID: String] {
+    let plan: StudentPlanView?
+    do {
+      plan = try await plans.fetchCurrentPlan(studentID: studentID)
+    } catch {
+      if error.isTaskCancellation { throw error }
+      return [:]
+    }
+    guard let plan else { return [:] }
     return Dictionary(
       plan.days.flatMap(\.exercises).map {
         ($0.id, $0.exercise.name)

@@ -201,34 +201,40 @@ final class StudentDetailViewModel {
   }
 
   func refresh(now currentDate: Date) async {
-    state = .loading
+    let previousState = state
+    if state != .loaded { state = .loading }
     do {
       let loadedPlan = try await plans.fetchCurrentPlan(studentID: summary.id)
       let range = Self.weekRange(for: loadedPlan, now: currentDate)
       let loadedLogs = try await CoachTrainingLogReader(planning: planning, fallback: trainingLogs)
         .fetch(studentID: summary.id, range: range)
-      self.loadedLogs = loadedLogs
       let loadedFeedback = try await feedback.fetchInbox(studentID: summary.id)
 
-      plan = loadedPlan
-      executionDays = Self.makeExecutionDays(
+      var loadedDays = Self.makeExecutionDays(
         plan: loadedPlan,
         coachLogs: loadedLogs,
         now: currentDate
       )
       if loadedLogs.contains(where: \.adhoc) {
-        let catalog = await CoachDayExerciseCatalog.load(planning: planning)
-        executionDays = executionDays.map { day in
+        let catalog = try await CoachDayExerciseCatalog.load(planning: planning)
+        loadedDays = loadedDays.map { day in
           var resolved = day
           resolved.exerciseCatalog = catalog
           return resolved
         }
       }
+      self.loadedLogs = loadedLogs
+      plan = loadedPlan
+      executionDays = loadedDays
       feedbackItems = loadedFeedback.sorted { $0.postedAt > $1.postedAt }
       overview = Self.makeOverview(
         days: executionDays, feedback: feedbackItems, allLogs: loadedLogs)
       state = .loaded
     } catch {
+      if error.isTaskCancellation {
+        state = previousState
+        return
+      }
       state = .failed(CoachStudentDetailStrings.text("coach.studentDetail.error.load"))
       return
     }
@@ -244,6 +250,7 @@ final class StudentDetailViewModel {
       videos = try await videoWall.fetchVideos(studentID: summary.id)
       videosUnavailable = false
     } catch {
+      if error.isTaskCancellation { return }
       videos = []
       videosUnavailable = true
     }
@@ -257,6 +264,7 @@ final class StudentDetailViewModel {
       )
       todayReadiness = checkin.map(ReadinessRowState.loaded) ?? .notFiled
     } catch {
+      if error.isTaskCancellation { return }
       todayReadiness = .unavailable
     }
   }
@@ -269,6 +277,7 @@ final class StudentDetailViewModel {
         profileState = .unavailable
       }
     } catch {
+      if error.isTaskCancellation { return }
       profileState = .unavailable
     }
   }

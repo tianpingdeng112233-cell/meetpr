@@ -88,7 +88,12 @@ final class ProgressDataModel {
     guard !isLoading else { return }
     isLoading = true
     defer { isLoading = false }
-    profile = try? await onboarding?.fetchProfile(studentId: studentID)
+    do {
+      profile = try await onboarding?.fetchProfile(studentId: studentID)
+    } catch {
+      if error.isTaskCancellation { return }
+      profile = nil
+    }
     await history.load(studentID: studentID)
     await growth.load(studentID: studentID)
     allSnapshots = snapshots(range: .all)

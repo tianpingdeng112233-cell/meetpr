@@ -43,11 +43,16 @@ final class BindQueueViewModel {
   }
 
   func refresh() async {
+    let previousState = state
     if state == .idle { state = .loading }
     do {
       items = try await repository.fetchQueue()
       state = .loaded
     } catch {
+      if error.isTaskCancellation {
+        state = previousState
+        return
+      }
       // Keep the last snapshot on transport failure; an empty failed queue
       // collapses the section, same as empty.
       if state != .loaded { state = .failed }

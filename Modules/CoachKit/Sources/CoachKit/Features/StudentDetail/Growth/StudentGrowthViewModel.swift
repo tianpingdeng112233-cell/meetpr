@@ -75,7 +75,8 @@ final class StudentGrowthViewModel {
   }
 
   func load(studentID: UUID, now currentDate: Date) async {
-    state = .loading
+    let previousState = state
+    if state != .loaded { state = .loading }
     referenceDate = currentDate
     do {
       let snapshot = try await exerciseStats.fetchExerciseStats(studentID: studentID)
@@ -90,6 +91,10 @@ final class StudentGrowthViewModel {
       state = .loaded
       refreshVisiblePoints()
     } catch {
+      if error.isTaskCancellation {
+        state = previousState
+        return
+      }
       state = .failed(CoachGrowthStrings.loadFailed)
     }
   }

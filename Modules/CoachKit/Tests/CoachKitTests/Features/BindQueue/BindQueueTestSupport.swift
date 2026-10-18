@@ -79,6 +79,8 @@ struct RecordedAccept: Equatable {
 
 /// Scripted queue repository: counts calls, throws per-action errors.
 actor StubBindQueueRepository: CoachBindQueueRepository {
+  var fetchError: Error?
+  func setFetchError(_ error: Error?) { fetchError = error }
   var queue: [CoachBindRequestItem]
   var acceptError: Error?
   var rejectError: Error?
@@ -101,6 +103,7 @@ actor StubBindQueueRepository: CoachBindQueueRepository {
 
   func fetchQueue() async throws -> [CoachBindRequestItem] {
     fetchCount += 1
+    if let fetchError { throw fetchError }
     return queue
   }
 

@@ -364,9 +364,13 @@ public struct DashboardView: View {
     // Upper bound: PR events carry no plan-week identity, so clamp to the
     // end of the week's last plan day to mirror the card's other stats.
     let weekEnd = lastDay.addingTimeInterval(86_400)
-    let events =
-      (try? await e1rm.prEvents(studentId: studentID, since: firstDay)) ?? []
-    newPRCount = events.filter { $0.occurredAt < weekEnd }.count
+    do {
+      let events = try await e1rm.prEvents(studentId: studentID, since: firstDay)
+      newPRCount = events.filter { $0.occurredAt < weekEnd }.count
+    } catch {
+      if error.isTaskCancellation { return }
+      newPRCount = 0
+    }
   }
 
   private var notificationHost: some ViewModifier {

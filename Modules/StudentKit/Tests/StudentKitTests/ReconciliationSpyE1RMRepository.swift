@@ -5,6 +5,8 @@ import RepositoryContracts
 @testable import StudentKit
 
 actor ReconciliationSpyE1RMRepository: E1RMRepository {
+  private var familyFetchError: Error?
+  func setFamilyFetchError(_ error: Error?) { familyFetchError = error }
   private let backing: InMemoryE1RMRepository
   private var beforeNextConditionalReplace: (@Sendable () async -> Void)?
   private var pausesNextWeightBaseline = false
@@ -131,7 +133,8 @@ actor ReconciliationSpyE1RMRepository: E1RMRepository {
     studentId: UUID,
     family: LiftFamily
   ) async throws -> [E1RMHistoryPoint] {
-    try await backing.fetchHistory(studentId: studentId, family: family)
+    if let familyFetchError { throw familyFetchError }
+    return try await backing.fetchHistory(studentId: studentId, family: family)
   }
 
   func maxBefore(

@@ -60,16 +60,21 @@ final class PlanningWorkspaceViewModel {
   }
 
   func refresh() async {
-    state = .loading
+    let previousState = state
+    if state != .loaded { state = .loading }
     do {
       let students = try await repository.fetchStudents()
       let drafts = loadDraftRows(for: students)
+      let loaded = try await loadPlanRows(for: students, draftIDs: Set(drafts.map(\.id)))
       draftRows = drafts
-      let loaded = await loadPlanRows(for: students, draftIDs: Set(drafts.map(\.id)))
       needsPlanningRows = loaded.needsPlanning
       recentPublishedRows = loaded.recentPublished
       state = .loaded
     } catch {
+      if error.isTaskCancellation {
+        state = previousState
+        return
+      }
       draftRows = []
       needsPlanningRows = []
       recentPublishedRows = []
@@ -100,8 +105,8 @@ final class PlanningWorkspaceViewModel {
   private func loadPlanRows(
     for students: [CoachStudentSummary],
     draftIDs: Set<UUID>
-  ) async -> PlanningWorkspaceRows {
-    let results = await loadStudentRows(for: students)
+  ) async throws -> PlanningWorkspaceRows {
+    let results = try await loadStudentRows(for: students)
     return PlanningWorkspaceRows(
       needsPlanning: results.compactMap(\.need).filter { !draftIDs.contains($0.id) },
       recentPublished: Array(
@@ -115,18 +120,18 @@ final class PlanningWorkspaceViewModel {
 
   private func loadStudentRows(
     for students: [CoachStudentSummary]
-  ) async -> [PlanningWorkspaceStudentRows] {
+  ) async throws -> [PlanningWorkspaceStudentRows] {
     let studentPlans = self.studentPlans
     let profiles = self.profiles
     let timestamp = now()
     let calendar = self.calendar
 
-    return await withTaskGroup(of: (Int, PlanningWorkspaceStudentRows).self) { group in
+    return try await withThrowingTaskGroup(of: (Int, PlanningWorkspaceStudentRows).self) { group in
       var iterator = students.enumerated().makeIterator()
       func submitNext() {
         guard let (index, student) = iterator.next() else { return }
         group.addTask {
-          let rows = await PlanningWorkspaceStudentLoader.load(
+          let rows = try await PlanningWorkspaceStudentLoader.load(
             student: student,
             studentPlans: studentPlans,
             profiles: profiles,
@@ -139,7 +144,7 @@ final class PlanningWorkspaceViewModel {
 
       for _ in 0..<Self.maxConcurrentStudentLoads { submitNext() }
       var ordered = [PlanningWorkspaceStudentRows?](repeating: nil, count: students.count)
-      for await (index, rows) in group {
+      for try await (index, rows) in group {
         ordered[index] = rows
         submitNext()
       }
@@ -165,22 +170,29 @@ private enum PlanningWorkspaceStudentLoader {
     profiles: (any OnboardingProfileReading)?,
     now: Date,
     calendar: Calendar
-  ) async -> PlanningWorkspaceStudentRows {
+  ) async throws -> PlanningWorkspaceStudentRows {
     let plan: StudentPlanView?
     do {
       plan = try await studentPlans.fetchCurrentPlan(studentID: student.id)
     } catch {
+      if error.isTaskCancellation { throw error }
       return PlanningWorkspaceStudentRows(need: nil, recent: nil)
     }
 
     guard let plan else {
       return PlanningWorkspaceStudentRows(
-        need: await needRow(student: student, reason: .noCurrentPlan, profiles: profiles),
+        need: try await needRow(student: student, reason: .noCurrentPlan, profiles: profiles),
         recent: nil
       )
     }
 
-    let cycleDays = (try? await studentPlans.fetchCycleDays(studentID: student.id)) ?? []
+    let cycleDays: [StudentPlanDay]
+    do {
+      cycleDays = try await studentPlans.fetchCycleDays(studentID: student.id)
+    } catch {
+      if error.isTaskCancellation { throw error }
+      cycleDays = []
+    }
     let reason = PlanningWorkspaceSummary.planNeedReason(
       plan: plan,
       cycleDays: cycleDays,
@@ -189,7 +201,7 @@ private enum PlanningWorkspaceStudentLoader {
     )
     let need: PlanningNeededRowModel?
     if let reason {
-      need = await needRow(student: student, reason: reason, profiles: profiles)
+      need = try await needRow(student: student, reason: reason, profiles: profiles)
     } else {
       need = nil
     }
@@ -206,12 +218,12 @@ private enum PlanningWorkspaceStudentLoader {
     student: CoachStudentSummary,
     reason: PlanningPlanNeedReason,
     profiles: (any OnboardingProfileReading)?
-  ) async -> PlanningNeededRowModel {
+  ) async throws -> PlanningNeededRowModel {
     PlanningNeededRowModel(
       student: student,
       reason: reason,
       summary: reason.title,
-      profile: await profile(for: student.id, profiles: profiles)
+      profile: try await profile(for: student.id, profiles: profiles)
     )
   }
 
@@ -238,8 +250,13 @@ private enum PlanningWorkspaceStudentLoader {
   private static func profile(
     for studentID: UUID,
     profiles: (any OnboardingProfileReading)?
-  ) async -> OnboardingProfile? {
+  ) async throws -> OnboardingProfile? {
     guard let profiles else { return nil }
-    return try? await profiles.fetchProfile(studentId: studentID)
+    do {
+      return try await profiles.fetchProfile(studentId: studentID)
+    } catch {
+      if error.isTaskCancellation { throw error }
+      return nil
+    }
   }
 }

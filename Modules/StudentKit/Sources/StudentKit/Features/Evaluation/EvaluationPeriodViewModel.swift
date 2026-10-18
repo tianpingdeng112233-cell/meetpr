@@ -55,14 +55,25 @@ public final class EvaluationPeriodViewModel {
       }
       state = .active(evaluation)
     } catch {
+      if error.isTaskCancellation { return }
       if state == .loading { state = .failed }
       return
     }
 
     // Secondary content degrades quietly — the countdown is the page.
-    adaptationPlan = try? await plans.fetchCurrentPlan(studentID: studentID)
-    let inbox = (try? await feedback.fetchInbox(studentID: studentID)) ?? []
-    latestMessages = Array(inbox.sorted { $0.postedAt > $1.postedAt }.prefix(3))
+    do {
+      adaptationPlan = try await plans.fetchCurrentPlan(studentID: studentID)
+    } catch {
+      if error.isTaskCancellation { return }
+      adaptationPlan = nil
+    }
+    do {
+      let inbox = try await feedback.fetchInbox(studentID: studentID)
+      latestMessages = Array(inbox.sorted { $0.postedAt > $1.postedAt }.prefix(3))
+    } catch {
+      if error.isTaskCancellation { return }
+      latestMessages = []
+    }
   }
 
   /// "评估期还剩: 4 天 13 小时"; overdue shows the neutral closing copy —

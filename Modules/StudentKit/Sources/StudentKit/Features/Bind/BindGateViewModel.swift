@@ -113,6 +113,7 @@ public final class BindGateViewModel {
     do {
       mine = try await bind.myBindRequest()
     } catch {
+      if error.isTaskCancellation { return state }
       return .failed
     }
 
@@ -150,6 +151,7 @@ public final class BindGateViewModel {
     do {
       evaluation = try await evaluations.fetchMyEvaluation()
     } catch {
+      if error.isTaskCancellation { return state }
       return .failed
     }
     guard let evaluation, evaluation.completedAt == nil else {
@@ -240,6 +242,7 @@ public final class BindGateViewModel {
       // and an invalid stale code then resolves through `.invalidCode`.
       return await candidateAfterConflict()
     } catch {
+      if error.isTaskCancellation { return state }
       // Transport failure: keep the stash, surface a neutral notice; the
       // next load retries automatically.
       return .needsCode(prefillDisplayName: pending.displayName, notice: .network)
@@ -254,6 +257,7 @@ public final class BindGateViewModel {
     do {
       mine = try await bind.myBindRequest()
     } catch {
+      if error.isTaskCancellation { return state }
       return .failed
     }
 

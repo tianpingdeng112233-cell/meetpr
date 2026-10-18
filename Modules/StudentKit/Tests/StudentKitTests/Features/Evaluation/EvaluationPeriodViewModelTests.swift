@@ -61,25 +61,35 @@ private actor StubMyEvaluationRepository: EvaluationRepository {
 }
 
 private actor StubPlanRepository: StudentPlanRepository {
+  var error: Error?
+  func setError(_ error: Error?) { self.error = error }
   var plan: StudentPlanView?
 
   init(plan: StudentPlanView? = nil) {
     self.plan = plan
   }
 
-  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? { plan }
+  func fetchCurrentPlan(studentID: UUID) async throws -> StudentPlanView? {
+    if let error { throw error }
+    return plan
+  }
   func fetchDay(studentID: UUID, date: Date) async throws -> StudentPlanDay? { nil }
   func fetchCycleDays(studentID: UUID) async throws -> [StudentPlanDay] { plan?.days ?? [] }
 }
 
 private actor StubInboxRepository: StudentFeedbackRepository {
+  var error: Error?
+  func setError(_ error: Error?) { self.error = error }
   var inbox: [CoachFeedback]
 
   init(inbox: [CoachFeedback] = []) {
     self.inbox = inbox
   }
 
-  func fetchInbox(studentID: UUID) async throws -> [CoachFeedback] { inbox }
+  func fetchInbox(studentID: UUID) async throws -> [CoachFeedback] {
+    if let error { throw error }
+    return inbox
+  }
 
   func postFeedback(
     studentID: UUID, dayDate: Date?, planExerciseID: UUID?, text: String
@@ -215,4 +225,30 @@ private func makeViewModel(
   await viewModel.refresh()
 
   #expect(viewModel.state == .failed)
+}
+
+@MainActor
+@Test(arguments: [true, false])
+func evaluationRefreshCancellationKeepsSecondaryContent(urlCancellation: Bool) async {
+  let error: any Error = urlCancellation ? URLError(.cancelled) : CancellationError()
+  let plan = StudentPlanView(cycleID: UUID(), weekIndex: 1, startDate: Date(), days: [])
+  let plans = StubPlanRepository(plan: plan)
+  let messages = [EvaluationFixtures.feedback(text: "Feedback", offset: 0)]
+  let feedback = StubInboxRepository(inbox: messages)
+  let model = EvaluationPeriodViewModel(
+    studentID: EvaluationFixtures.studentID,
+    evaluations: StubMyEvaluationRepository(period: EvaluationFixtures.period()),
+    plans: plans, feedback: feedback)
+  await model.refresh()
+  await plans.setError(error)
+  await feedback.setError(error)
+  await model.refresh()
+  #expect(model.adaptationPlan == plan)
+  #expect(model.latestMessages == messages)
+  let initial = EvaluationPeriodViewModel(
+    studentID: EvaluationFixtures.studentID,
+    evaluations: StubMyEvaluationRepository(period: nil, error: error),
+    plans: plans, feedback: feedback)
+  await initial.refresh()
+  #expect(initial.state == .loading)
 }

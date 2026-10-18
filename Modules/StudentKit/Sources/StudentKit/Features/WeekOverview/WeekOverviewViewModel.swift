@@ -40,8 +40,6 @@ public final class WeekOverviewViewModel {
         studentID: studentID,
         serverAuthoritative: serverAuthoritative
       )
-      self.plan = plan
-      planStartDate = plan?.startDate
       let weekIndex =
         plan.flatMap { StudentPlanSequence.cursorDay(in: $0)?.weekNumber }
         ?? plan?.days.map(\.weekNumber).max()
@@ -49,7 +47,6 @@ public final class WeekOverviewViewModel {
       // The current-plan projection already contains the whole cycle. Calling
       // fetchCycleDays would resolve the same projection a second time.
       let allDays = plan.map(StudentPlanSequence.orderedDays(in:)) ?? []
-      cycleDays = allDays
       let days = Self.currentWeekDays(
         from: allDays, weekIndex: weekIndex)
       let fetchedLogs: [StudentSetLog]
@@ -58,6 +55,9 @@ public final class WeekOverviewViewModel {
       } else {
         fetchedLogs = []
       }
+      self.plan = plan
+      planStartDate = plan?.startDate
+      cycleDays = allDays
       state = .loaded(days: days, logs: fetchedLogs, weekIndex: weekIndex)
     } catch {
       if error.isTaskCancellation {
@@ -95,6 +95,7 @@ public final class WeekOverviewViewModel {
     do {
       return try await plans.refreshCurrentPlan(studentID: studentID)
     } catch {
+      if error.isTaskCancellation { throw error }
       // Full refreshes prefer the server so a newly published plan wins in one
       // pass. The existing cache remains the offline fallback.
       return try await plans.fetchCurrentPlan(studentID: studentID)

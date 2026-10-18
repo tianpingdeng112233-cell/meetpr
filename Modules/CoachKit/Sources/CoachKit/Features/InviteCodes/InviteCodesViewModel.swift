@@ -36,10 +36,15 @@ public final class InviteCodesViewModel {
   }
 
   public func reload() async {
+    let previousState = state
     if case .loaded = state {} else { state = .loading }
     do {
       state = .loaded(try await repository.listCodes())
     } catch {
+      if error.isTaskCancellation {
+        state = previousState
+        return
+      }
       if case .loaded = state { return }
       state = .failed
     }
