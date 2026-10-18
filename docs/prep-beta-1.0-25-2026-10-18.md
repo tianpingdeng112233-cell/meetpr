@@ -16,7 +16,7 @@ David 2026-10-18「部署落地页，然后切 25 的包」。`NEXT-RELEASE.md`�
 | #367 / #368 PR CI | 均三项全绿后 squash 合入 |
 | 真机 | David 2026-10-18 复测 #368 键盘遮挡已修 |
 | 发包闸门（SPEC §5） | 已解除：国内后端 `e788574` 已部署（deploy run 39089552055），`/i/<码>` 落地页在线，失效码显示「邀请已失效」，页面带 TestFlight `join/aKmSgx4b` 与安卓 APK 链接 |
-| tag CI | 推送后触发，结果待补 |
+| tag CI | run 39094955506 第 2 次全绿（Swift Build & Test / swift-format / SwiftLint）；首次为自托管 runner 拉 ViewInspector HTTP2 报错，未改代码重跑 |
 | ASC 最高上传 | 24（David 2026-10-18 截图） |
 
 ## 交付
