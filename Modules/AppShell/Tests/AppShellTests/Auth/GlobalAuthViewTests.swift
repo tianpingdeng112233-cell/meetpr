@@ -1,9 +1,70 @@
 import AuthenticationServices
 import Foundation
+import Networking
+import SwiftUI
 import Testing
 import ViewInspector
 
 @testable import AppShell
+
+/// Pins the focus-to-scroll wiring; keyboard geometry still needs simulator verification.
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test(arguments: [MeetPRBuildTrack.china, .global])
+func emailAuthFormsExposeFocusedFieldsAsScrollTargets(track: MeetPRBuildTrack) throws {
+  try expectAuthScrollTargets(
+    GlobalLoginView(buildTrack: track),
+    identifiers: ["global.login.email", "global.login.password"]
+  )
+  try expectAuthScrollTargets(
+    GlobalRegisterView(buildTrack: track),
+    identifiers: track == .china
+      ? [
+        "global.register.email", "china.register.code", "global.register.password",
+        "china.register.confirmPassword",
+      ] : ["global.register.email", "global.register.password"]
+  )
+  try expectAuthScrollTargets(
+    GlobalForgotPasswordView(buildTrack: track, onPasswordReset: {}),
+    identifiers: ["global.forgot.email"]
+  )
+  let reset = GlobalForgotPasswordViewModel(buildTrack: track)
+  reset.step = .reset
+  try expectAuthScrollTargets(
+    GlobalForgotPasswordView(viewModel: reset, onPasswordReset: {}),
+    identifiers: ["global.forgot.code", "global.forgot.password"]
+  )
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+private func expectAuthScrollTargets<Content: View>(
+  _ view: Content, identifiers: [String]
+) throws {
+  let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
+  let inspected = try view.environment(session).inspect()
+  let scroll = try inspected.find(ViewType.ScrollViewReader.self)
+  for identifier in identifiers {
+    #expect(
+      try scroll.find(viewWithAccessibilityIdentifier: identifier).id() as? String == identifier
+    )
+  }
+}
+
+@MainActor
+@available(iOS 17.0, macOS 14.0, *)
+@Test func chinaLoginUsesApprovedTwoLineSloganInBothLanguages() throws {
+  let session = Session(auth: InMemoryAuthRepository(), tokenStore: InMemoryTokenStore())
+  let inspected = try GlobalLoginView(buildTrack: .china).environment(session).inspect()
+  let slogan = EmailAuthStrings.text("auth.chinaSlogan", track: .china)
+
+  #expect(
+    try LocalizationCatalogTestSupport.simplifiedChineseSource(
+      inspected.find(text: slogan).string(), key: "auth.chinaSlogan"
+    ) == "Meet Your\nPR Here."
+  )
+  #expect(EmailAuthStrings.text("auth.chinaSlogan", track: .global) == "Meet Your\nPR Here.")
+}
 
 @MainActor
 @available(iOS 17.0, macOS 14.0, *)

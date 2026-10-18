@@ -22,7 +22,7 @@ public struct GlobalRegisterView: View {
   public var body: some View {
     @Bindable var viewModel = viewModel
 
-    ScrollView {
+    AuthFormScrollView {
       VStack(alignment: .leading, spacing: 0) {
         GlobalAuthHero(title: text("auth.registerTitle"))
 
@@ -38,7 +38,7 @@ public struct GlobalRegisterView: View {
             errorMessage: emailError,
             usesEmailTypography: buildTrack == .china
           )
-          .accessibilityIdentifier("global.register.email")
+          .authScrollTarget("global.register.email")
           .disabled(buildTrack == .china && viewModel.isSubmitting)
 
           if buildTrack == .china {
@@ -48,6 +48,7 @@ public struct GlobalRegisterView: View {
                 await viewModel.sendCode(using: session)
               }, onSignIn: { dismiss() }
             )
+            .authScrollTarget("china.register.code")
             .disabled(buildTrack == .china && viewModel.isSubmitting)
           }
 
@@ -59,7 +60,7 @@ public struct GlobalRegisterView: View {
             errorMessage: passwordError,
             usesEmailTypography: buildTrack == .china
           )
-          .accessibilityIdentifier("global.register.password")
+          .authScrollTarget("global.register.password")
           .disabled(buildTrack == .china && viewModel.isSubmitting)
 
           if buildTrack == .china {
@@ -71,7 +72,7 @@ public struct GlobalRegisterView: View {
                 ? nil : text("auth.passwordMismatch"),
               usesEmailTypography: true
             )
-            .accessibilityIdentifier("china.register.confirmPassword")
+            .authScrollTarget("china.register.confirmPassword")
             .disabled(buildTrack == .china && viewModel.isSubmitting)
           }
 

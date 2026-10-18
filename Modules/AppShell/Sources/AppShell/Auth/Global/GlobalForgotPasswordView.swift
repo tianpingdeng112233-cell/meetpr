@@ -33,7 +33,7 @@ public struct GlobalForgotPasswordView: View {
   public var body: some View {
     @Bindable var viewModel = viewModel
 
-    ScrollView {
+    AuthFormScrollView {
       VStack(alignment: .leading, spacing: 0) {
         GlobalAuthHero(
           title: text(viewModel.step == .email ? "auth.forgotTitle" : "auth.resetTitle"))
@@ -51,7 +51,7 @@ public struct GlobalForgotPasswordView: View {
               errorMessage: emailError,
               usesEmailTypography: buildTrack == .china
             )
-            .accessibilityIdentifier("global.forgot.email")
+            .authScrollTarget("global.forgot.email")
 
             GlobalAuthButton(
               title: text("auth.sendCode"),
@@ -91,7 +91,7 @@ public struct GlobalForgotPasswordView: View {
             .onChange(of: viewModel.code) { _, newValue in
               viewModel.code = String(GlobalAuthValidation.asciiDigits(from: newValue).prefix(6))
             }
-            .accessibilityIdentifier("global.forgot.code")
+            .authScrollTarget("global.forgot.code")
 
             AuthSecureField(
               text("auth.newPassword"),
@@ -101,7 +101,7 @@ public struct GlobalForgotPasswordView: View {
               errorMessage: passwordError,
               usesEmailTypography: buildTrack == .china
             )
-            .accessibilityIdentifier("global.forgot.password")
+            .authScrollTarget("global.forgot.password")
 
             GlobalAuthButton(
               title: text("auth.resetButton"),
