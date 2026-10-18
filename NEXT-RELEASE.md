@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (26)
 - 基底：`beta/1.0-25` @ `a8e39fd3`；David 于 2026-10-18 截图确认 1.0(25) 已上传，内容已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：26（切包时 `agvtool new-version 26`），marketing version 保持 1.0。
+- build 号：26（2026-10-18 已 `agvtool new-version 26`，tag `beta/1.0-26`，[切包记录](docs/prep-beta-1.0-26-2026-10-18.md)），marketing version 保持 1.0。
 
 ## 本版将包含
 - **教练「退出登录」弹窗去掉「手机号」（#369，T0·P1，2026-10-18 落线 `686d946a`）**：spec 093 改邮箱登录后，弹窗仍写「退出后需重新用手机号登录」，David 在 1.0(25) 上发现；改为「退出后需要重新登录。」。两端全仓扫描无其他可达的手机号登录文案（旧 LoginView/SignupView 不可达）。安卓 meetpr-rn#97 同步。
