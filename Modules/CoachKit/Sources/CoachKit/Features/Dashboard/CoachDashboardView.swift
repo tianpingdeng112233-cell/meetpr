@@ -435,17 +435,22 @@ private struct CoachWeekOverviewCard: View {
   }
 
   private var legendBars: some View {
-    HStack(spacing: MeetPRSpacing.point3) {
-      ForEach(summary.legend) { legend in
-        Capsule()
-          .fill(color(for: legend.group))
-          .frame(maxWidth: .infinity)
-          .containerRelativeFrame(
-            .horizontal,
-            count: max(1, summary.rows.count),
-            span: legend.count,
-            spacing: MeetPRSpacing.point3
-          )
+    // Read the bar's local width, not an ancestor scroll container's width.
+    // containerRelativeFrame here can prevent the cold-launch layout from settling.
+    GeometryReader { geometry in
+      HStack(spacing: MeetPRSpacing.point3) {
+        ForEach(summary.legend) { legend in
+          Capsule()
+            .fill(color(for: legend.group))
+            .frame(
+              width: max(
+                0,
+                (geometry.size.width + MeetPRSpacing.point3)
+                  * CGFloat(legend.count) / CGFloat(max(1, summary.rows.count))
+                  - MeetPRSpacing.point3
+              )
+            )
+        }
       }
     }
     .frame(height: MeetPRSpacing.space2)

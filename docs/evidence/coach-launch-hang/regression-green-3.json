@@ -1,0 +1,1 @@
+{"name":"regression-green-3","fixture":true,"extraArgs":[],"exitCode":0,"output":"COACH-LAUNCH-REGRESSION PASS mainResponse=0.000137 seconds","watchdogWallMs":5051,"targets":10,"fixtureLoaded":true,"tapResponseMs":1054}
