@@ -1,0 +1,1 @@
+{"name":"regression-red","fixture":true,"extraArgs":[],"exitCode":1,"output":"COACH-LAUNCH-REGRESSION FAIL mainResponse>3s","watchdogWallMs":5091,"targets":0,"fixtureLoaded":false,"tapResponseMs":null}

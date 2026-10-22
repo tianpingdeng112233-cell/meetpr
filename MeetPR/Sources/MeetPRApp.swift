@@ -163,12 +163,14 @@ struct MeetPRApp: App {
       draftStore: DraftStore
     ) -> RootView {
       let markerRepository = makeDemoVideoMarkers(studentState: studentState)
+      let launchHangRepositories = makeLaunchHangRepositories()
       let studentLogs = InMemoryStudentTrainingLogRepository(
         seed: studentState.logs + CoachDemoSeed.pendingVideoSetLogs(),
         added: StudentDemoSeed.makeStudentAddedLogs(plan: studentState.plan)
       )
       return RootView(
-        coachPlans: InMemoryPlanRepository.preview(store: planStore),
+        coachPlans: launchHangRepositories?.plans
+          ?? InMemoryPlanRepository.preview(store: planStore),
         // Demo coach: personal (used 23) + unused single-use + 6-day
         // time-limited seed codes (spec 031 D10).
         coachInviteCodes: InMemoryInviteCodeRepository(
@@ -179,7 +181,8 @@ struct MeetPRApp: App {
         coachEvaluations: funnel.evaluations,
         coachEvaluationSummaries: funnel.summaries,
         coachStudentProfiles: funnel.profiles,
-        studentPlans: InMemoryStudentPlanRepository(store: planStore),
+        studentPlans: launchHangRepositories?.studentPlans
+          ?? InMemoryStudentPlanRepository(store: planStore),
         studentLogs: ProgressDemoScenario.logRepository(wrapping: studentLogs),
         studentFeedback: makeDemoStudentFeedback(studentState: studentState),
         videoMarkers: markerRepository,
@@ -213,6 +216,17 @@ struct MeetPRApp: App {
         draftStore: draftStore,
         analyticsMode: .disabled
       )
+    }
+
+    private static func makeLaunchHangRepositories() -> (
+      plans: any PlanRepository, studentPlans: any StudentPlanRepository
+    )? {
+      #if COACH_LAUNCH_HANG_TESTING
+        ProcessInfo.processInfo.arguments.contains("-coach-launch-hang-fixture")
+          ? CoachFlexibleDayDemoView.launchHangRepositories() : nil
+      #else
+        nil
+      #endif
     }
 
     private static func makeDemoExerciseStats(
@@ -506,6 +520,11 @@ struct MeetPRApp: App {
     WindowGroup {
       appContent
         .environment(session)
+        #if DEMO_MODE && COACH_LAUNCH_HANG_TESTING
+          .onAppear {
+            CoachLaunchHangProbe.start()
+          }
+        #endif
         .task {
           await session.bootstrap()
         }

@@ -1,5 +1,30 @@
 - 2026-10-22 未提交（`fix/invite-share-wechat`，P1）— 按 David 拍板更新中英分享标题，缺名/空白名使用独立整句 fallback；完成或取消分享经 MainActor 清除 `isSharing`。保留上一轮单 URL 分享实现。有名与缺名分别先红后绿，CoachKit macOS 477 测试、4 文件 strict format/lint、diff check 通过；关闭回调无 macOS UIKit seam，未硬造单测；iOS 编译/真机交 Opus，未 commit/push。[证据](evidence/invite-share/TITLE-DISMISS-VERIFICATION.md)。
 
+## 2026-10-21 · P0 教练冷启动卡顿（开发修复与自测完成，未提交）
+
+- 工作树 `MeetPR-wt-coach-launch-hang` / `fix/coach-launch-hang`，基线 `b2afd513`。David 明确要求不 commit/push、不改变导航/tab/视觉；本条只记录开发取证，不更新发布正典。
+- Phase 1：真实 `MeetPRApp → RootView → CoachRootView → Today`，仅 Demo 仓库注入已有 092 两学员 fixture。首屏已画出空态后主线程不返回；3/3 次后台 watchdog 报 `mainResponse>3s`，自动化 0 targets。默认 Demo 周概况为空：主线程 0.043209 ms，Profile 点击至目标页 1015 ms。探针判定约 5 秒，截图/JSON 在 `docs/evidence/coach-launch-hang/`。初版 harness 过早读文件的三次结果明确标记 ERROR，不算红例。
+- 已执行的单条 agent 命令（functions.exec）：`const s = await tools.exec_command({cmd:"cat scripts/diagnose-coach-launch-hang.js"}); text(await eval(s.output)(tools,{name:"baseline-red-1",screenshot:true}));`。脱敏输出：`exitCode=1, FAIL mainResponse>3s, watchdogWallMs=4886, targets=0`。无需账号/人工点击；后续绿色同时断言 Profile 页面可达。
+- Phase 2：依次只减学员数、日志、训练日；1 学员 → 红，去日志 → 红，1 学员/1 日/0 日志 → 红；再去最后 1 日 → 绿（0.039125 ms / 点击 995 ms）。最小触发数据为真实首页路径的一名有训练日学员。无网络、实时服务或 Swift Charts 依赖参与此 fixture；生产账号/真机尚未复现。导航/tab 保持不变。
+
+### Phase 3：排序假设（在实验前记录）
+
+| 排序 | 假设 | 可证伪预测 |
+| --- | --- | --- |
+| 1 | 周概况比例条的 containerRelativeFrame 对外层容器尺寸形成布局反馈 | 只用父布局分配相同比例宽度替换该尺寸查询，watchdog 转绿；只移除其他数据无效 |
+| 2 | 非空训练日触发周汇总/行模型计算不返回 | 若计算是原因，其返回探针不会出现；若返回用时短且显示前已完成则排除 |
+| 3 | 保留的 tab host 与非空名单在尺寸更新时循环 | 若仅比例条替换后、完整原 tab host 与相同名单均恢复，可排除该结构是本次必要原因；不改导航来验证 |
+
+### Phase 4–6：因果验证、修复与清理
+
+- Phase 4 完成：只移除比例条的 `containerRelativeFrame` 祖先尺寸查询，完整 fixture 转绿（0.028292 ms / 点击 1059 ms）；恢复原语句再次红（>3000 ms）。假设 1 获支持；汇总算法与 tab host 原样保留仍恢复，假设 2/3 排除为本次必要原因。未取得 Instruments/sample 堆栈，不声称定位到 SwiftUI 内部具体函数。
+- Phase 5 完成：把真实 App 冷启动 watchdog + fixture 已加载 + Profile 可达保留为回归 seam；修前 `regression-red` 明确 exit 1。最终用固定高度 GeometryReader 的局部可用宽度按原 count/span/spacing 公式分配比例条，未改导航、数据、颜色或内容。最终 3/3 绿：主线程 0.074542 / 0.047875 / 0.040083 ms，点击 2277 / 1572 / 1040 ms。截图亲看，四个 tab 与周表均在。
+- 工程验证：CoachKit 472 + AppShell 118 + DesignSystem 73 全量通过，MeetPR / Debug 构建通过，宿主 9 项通过，共 672 项；严格 format/lint 和 diff check 通过。依赖下载受阻后在本树建立离线测试副本，1209 源码/资源逐字节校验，ViewInspector 0.10.3 的 126 个文件按 Git blob SHA 校验；只改生成副本依赖地址，正式 manifest 未改。shell 的两项 Keychain 测试读回失败，原生 MCP 全量重跑 118 项通过，未跳过/改弱测试。
+- 独立 Standards：1 个 P2（watchdog 需显式比较 3s，而非仅检查返回）；修复后定向复核 CLEAN。Spec：CLEAN。没有未决实现 blocker；不代替真实设备验收。
+- Phase 6 完成：完整最初 fixture 再跑通过；一次性最小化参数/等宽实验已移除；源码与回归脚本无临时调试前缀。原始证据保留旧日志字符串，未伪称整仓历史文本 grep 为空。回归 harness 明确标记且只在 `DEMO_MODE && COACH_LAUNCH_HANG_TESTING` 下启用，普通 Demo/正式包不运行 watchdog。
+- 未验：David 真机、真实账号、iOS 17/26.4、多分组比例条实屏。此次完全离线即可复现，根因在 iOS SwiftUI 布局；未发现共享后端同步等待，Android RN 未读/未运行，不能推断同因。
+- 完整命令、失败尝试、数字、截图、离线测试边界与审查记录：[证据 README](evidence/coach-launch-hang/README.md)。未来 commit message 草稿：`Fix coach cold-launch layout hang by sizing week legend locally [P0]`。没有 commit/push，没有改发布正典。
+
 ## 2026-10-14 · 1.0(24) 切包（P1）
 
 David 下令「发车」。build 23→24（五处 `CURRENT_PROJECT_VERSION`），marketing 1.0 不变；基底发版线 `9935bd95`，NEXT-RELEASE 补登记 spec 092（#364 / #363）。annotated tag `beta/1.0-24` 指向本切包提交，tag CI 与 Archive / Upload 待完成。[切包记录](prep-beta-1.0-24-2026-10-14.md)。

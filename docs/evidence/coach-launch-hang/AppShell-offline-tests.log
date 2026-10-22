@@ -1,0 +1,854 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/Caches/org.swift.swiftpm is not accessible or not writable, disabling user-level cache features.
+[0/1] Planning build
+Building for debugging...
+[0/11] /Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-shared/arm64-apple-macosx/debug/AppShellPackageTests.derived/runner.swift
+[1/12] Copying Localizable.xcstrings
+[2/12] Copying Info.plist
+[2/12] Write sources
+[4/12] Copying Info.plist
+[4/12] Copying Localizable.xcstrings
+[5/12] Write sources
+[9/12] Write swift-version--58304C5D6DBC2206.txt
+[11/236] Compiling StudentKit EvaluationPeriodViewModel.swift
+[12/236] Compiling StudentKit EvaluationSummaryReadStore.swift
+[13/236] Compiling StudentKit EvaluationSummaryView.swift
+[14/236] Compiling StudentKit StudentEvaluationSummaryViewModel.swift
+[15/236] Compiling StudentKit FeedbackArchiveCoverModifier.swift
+[16/236] Compiling StudentKit FeedbackDetailView.swift
+[17/236] Compiling StudentKit FeedbackInboxView.swift
+[18/236] Compiling StudentKit FeedbackInboxViewModel.swift
+[19/236] Compiling StudentKit FeedbackVideoPresentation.swift
+[20/236] Compiling StudentKit ImportedHistoryReviewAlert.swift
+[21/236] Compiling StudentKit AccessoryRestSettings.swift
+[22/236] Compiling StudentKit AccountSecuritySheets.swift
+[23/236] Compiling StudentKit AccountSecurityViewModels.swift
+[24/236] Compiling StudentKit AppearancePreferenceRow.swift
+[25/236] Compiling StudentKit ExportDataSheet.swift
+[26/236] Compiling StudentKit GrowthCurveView.swift
+[27/236] Compiling StudentKit GrowthCurveViewModel.swift
+[28/236] Compiling StudentKit MainLiftExerciseFamilyResolver.swift
+[29/236] Compiling StudentKit MyProfileV3Presentation.swift
+[30/236] Compiling StudentKit MyProfileView.swift
+[31/236] Compiling StudentKit MyProfileViewModel.swift
+[32/236] Compiling StudentKit OnboardingSummaryFormatter.swift
+[33/236] Compiling StudentKit ProfileCardsSection.swift
+[34/236] Compiling StudentKit ProfileDetailPage.swift
+[35/236] Compiling StudentKit ProfileHomeContent.swift
+[36/260] Compiling StudentKit ProfileIdentity.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[37/260] Compiling StudentKit ProfileIdentityCard.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[38/260] Compiling StudentKit ProfileMenuValues.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[39/260] Compiling StudentKit ProfilePageRows.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[40/260] Compiling StudentKit ProfileSettingsContent.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[41/260] Compiling StudentKit RestTimerPreferenceRow.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[42/260] Compiling StudentKit RestTimerSettingsView.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[43/260] Compiling StudentKit StudentRestTimerSettings.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[44/260] Compiling StudentKit TrainingLogCSVExporter.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[45/260] Compiling StudentKit TrainingReminderPreferenceRow.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[46/260] Compiling StudentKit TrainingReminderScheduling.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[47/260] Compiling StudentKit TrainingReminderSettings.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[48/260] Compiling StudentKit TrainingReminderSettingsView.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[49/260] Compiling StudentKit TrainingReminderSettingsViewModel.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[50/260] Compiling StudentKit BodyWeightField.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[51/260] Compiling StudentKit DateOnlyField.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[52/260] Compiling StudentKit EquipmentCatalog.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[53/260] Compiling StudentKit LocalOnboardingDraftStore.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[54/260] Compiling StudentKit MeetFieldsSection.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[55/260] Compiling StudentKit OnboardingDraft.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[56/260] Compiling StudentKit OnboardingFieldComponents.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[57/260] Compiling StudentKit OnboardingLabels.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[58/260] Compiling StudentKit OnboardingWizardView.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[59/260] Compiling StudentKit OnboardingWizardViewModel.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[60/260] Compiling StudentKit OneRMEstimator.swift
+/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/offline-tests/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122:23: warning: expression of type 'Bool?' is unused [#no-usage]
+120 |     let requests = TrainingReminderSchedule.requests(for: settings)
+121 |     let operation = Task { () -> Bool in
+122 |       await previous?.value
+    |                       `- warning: expression of type 'Bool?' is unused [#no-usage]
+123 |       let identifiers = await center.pendingRequestIdentifiers()
+124 |         .filter { $0.hasPrefix(TrainingReminderSchedule.identifierPrefix) }
+[61/284] Compiling StudentKit StudentAddedLedgerRepair.swift
+[62/284] Compiling StudentKit TrainingHistoryView.swift
+[63/284] Compiling StudentKit TrainingHistoryViewModel.swift
+[64/284] Compiling StudentKit VolumeIntensityChart.swift
+[65/284] Compiling StudentKit AVFoundationVideoExporter+Passthrough.swift
+[66/284] Compiling StudentKit AVFoundationVideoExporter.swift
+[67/284] Compiling StudentKit AssetWriterCoordinator.swift
+[68/284] Compiling StudentKit BackgroundUploadCompletionRegistry.swift
+[69/284] Compiling StudentKit BackgroundUploadWakeInput.swift
+[70/284] Compiling StudentKit BackgroundUploadWakePlanner.swift
+[71/284] Compiling StudentKit BackgroundVideoPartUploader.swift
+[72/284] Compiling StudentKit CameraPreviewView.swift
+[73/284] Compiling StudentKit CameraRecorderComponents.swift
+[74/284] Compiling StudentKit CameraRecorderView.swift
+[75/284] Compiling StudentKit LoopingVideoPlayer.swift
+[76/284] Compiling StudentKit RecorderAssetWriter.swift
+[77/284] Compiling StudentKit RecorderCapturePipeline.swift
+[78/284] Compiling StudentKit RecorderEncodingConfiguration.swift
+[79/284] Compiling StudentKit RecorderSessionController.swift
+[80/284] Compiling StudentKit RecorderSessionWorker.swift
+[81/284] Compiling StudentKit RecorderStateMachine.swift
+[82/284] Compiling StudentKit RecorderTrimSuggestionPreference.swift
+[83/284] Compiling StudentKit RecorderVideoTrimFiles.swift
+[84/284] Compiling StudentKit LocalVideoCleanupStore.swift
+[85/308] Compiling StudentKit PassthroughVideoTrimExporter.swift
+[86/308] Compiling StudentKit RemoteAttachmentCleanupStore.swift
+[87/308] Compiling StudentKit RestoredBackgroundRecord.swift
+[88/308] Compiling StudentKit RetainedVideoCleanupPolicy.swift
+[89/308] Compiling StudentKit SetEntryVideoPlaybackState.swift
+[90/308] Compiling StudentKit SetEntryVideoPlayer.swift
+[91/308] Compiling StudentKit SetEntryVideoPlayerView.swift
+[92/308] Compiling StudentKit SetEntryVideoProgress.swift
+[93/308] Compiling StudentKit SetVideoPlaybackView.swift
+[94/308] Compiling StudentKit UploadFailureNavigation.swift
+[95/308] Compiling StudentKit UploadFailureNotifier.swift
+[96/308] Compiling StudentKit UploadNetworkMonitor.swift
+[97/308] Compiling StudentKit UploadRetryScheduler.swift
+[98/308] Compiling StudentKit VideoAttachmentPlaybackSource.swift
+[99/308] Compiling StudentKit VideoAttachmentSection.swift
+[100/308] Compiling StudentKit VideoAttachmentV3Controls.swift
+[101/308] Compiling StudentKit VideoAttachmentV3Previews.swift
+[102/308] Compiling StudentKit VideoAttachmentViewModel.swift
+[103/308] Compiling StudentKit VideoFileChunker.swift
+[104/308] Compiling StudentKit VideoLibrarySaver.swift
+[105/308] Compiling StudentKit VideoPassthroughEligibility.swift
+[106/308] Compiling StudentKit VideoPrivacyCopy.swift
+[107/308] Compiling StudentKit VideoTrimCompletion.swift
+[108/308] Compiling StudentKit VideoTrimSelection.swift
+[109/332] Emitting module StudentKit
+[110/332] Compiling StudentKit Step1BasicsSection.swift
+[111/332] Compiling StudentKit Step2BackgroundSection.swift
+[112/332] Compiling StudentKit Step3StrengthSection.swift
+[113/332] Compiling StudentKit Step4EnvironmentSection.swift
+[114/332] Compiling StudentKit Step5RecoverySection.swift
+[115/332] Compiling StudentKit Step6MaterialsSection.swift
+[116/332] Compiling StudentKit Step7ExtrasSection.swift
+[117/332] Compiling StudentKit UnitDisplay.swift
+[118/332] Compiling StudentKit ReadinessCheckinSheet.swift
+[119/332] Compiling StudentKit ReadinessCheckinViewModel.swift
+[120/332] Compiling StudentKit E1RMCoachRPEReconciler.swift
+[121/332] Compiling StudentKit E1RMCompetitionLiftGate.swift
+[122/332] Compiling StudentKit E1RMCompetitionLiftMigration.swift
+[123/332] Compiling StudentKit E1RMEligibility.swift
+[124/332] Compiling StudentKit E1RMHistoryReplayService.swift
+[125/332] Compiling StudentKit E1RMImportedBaselineRepair.swift
+[126/332] Compiling StudentKit E1RMPolicy.swift
+[127/332] Compiling StudentKit E1RMRecorder.swift
+[128/332] Compiling StudentKit E1RMSeries.swift
+[129/332] Compiling StudentKit ImportedHistoryBackfill.swift
+[130/332] Compiling StudentKit ImportedHistoryReviewQueue.swift
+[131/332] Compiling StudentKit MeetClass.swift
+[132/332] Compiling StudentKit ProfileCoachNotificationNote.swift
+[133/332] Compiling StudentKit StudentMenuRow.swift
+[134/332] Compiling StudentKit StudentSelectionBlock.swift
+[135/332] Compiling StudentKit GrowthComparisonCard.swift
+[136/332] Compiling StudentKit GrowthE1RMCard.swift
+[137/332] Compiling StudentKit GrowthE1RMDetail.swift
+[138/332] Compiling StudentKit GrowthE1RMDetailSheet.swift
+[139/332] Compiling StudentKit GrowthEmptyStates.swift
+[140/332] Compiling StudentKit GrowthHistoryStatsCard.swift
+[141/332] Compiling StudentKit GrowthProfileV3Previews.swift
+[142/332] Compiling StudentKit GrowthScreenHeader.swift
+[143/332] Compiling StudentKit GrowthScreenPresentation.swift
+[144/332] Compiling StudentKit GrowthTotalCard.swift
+[145/332] Compiling StudentKit GrowthTotalPresentation.swift
+[146/332] Compiling StudentKit GrowthWindowSparseTrendState.swift
+[147/332] Compiling StudentKit HistoryEntriesView.swift
+[148/332] Compiling StudentKit ProgressDashboardView.swift
+[149/332] Compiling StudentKit ProgressDataModel.swift
+[150/332] Compiling StudentKit ProgressDetailPage.swift
+[151/332] Compiling StudentKit ProgressE1RMPage.swift
+[152/332] Compiling StudentKit ProgressE1RMSelection.swift
+[153/332] Compiling StudentKit ProgressMenuContent.swift
+[154/332] Compiling StudentKit ProgressMenuValues.swift
+[155/332] Compiling StudentKit ProgressMetrics.swift
+[156/332] Compiling StudentKit StudentAddedDerivedHistory.swift
+[157/332] Compiling StudentKit StudentAddedHistory.swift
+[158/332] Compiling StudentKit StudentAddedHistoryRows.swift
+[159/332] Compiling StudentKit BodyWeightInput.swift
+[160/332] Compiling StudentKit AccessoryDemoScenario.swift
+[161/332] Compiling StudentKit ProfileDemoScene.swift
+[162/332] Compiling StudentKit ProgressDemoScenario.swift
+[163/332] Compiling StudentKit StudentAddedDemoScenario.swift
+[164/332] Compiling StudentKit StudentDemoEmptyStateSeed.swift
+[165/332] Compiling StudentKit StudentDemoFeedbackVideo.swift
+[166/332] Compiling StudentKit StudentDemoSeed.swift
+[167/332] Compiling StudentKit StudentRootDemoPlanStore.swift
+[168/332] Compiling StudentKit TrainingFlowDemoScenario.swift
+[169/332] Compiling StudentKit TrainingStripDemoScenario.swift
+[170/332] Compiling StudentKit BindEnterCodeSubviews.swift
+[171/332] Compiling StudentKit BindGateView.swift
+[172/332] Compiling StudentKit BindGateViewModel.swift
+[173/332] Compiling StudentKit EnterCodeView.swift
+[174/332] Compiling StudentKit EnterCodeViewModel.swift
+[175/332] Compiling StudentKit InviteCodeEntry.swift
+[176/332] Compiling StudentKit PendingBindCodeStore.swift
+[177/332] Compiling StudentKit PendingBindView.swift
+[178/332] Compiling StudentKit PendingBindViewModel.swift
+[179/332] Compiling StudentKit DashboardChevron.swift
+[180/332] Compiling StudentKit DashboardComponents.swift
+[181/332] Compiling StudentKit DashboardDaySelection.swift
+[182/332] Compiling StudentKit DashboardE1RMRail.swift
+[183/332] Compiling StudentKit DashboardE1RMTrendViewModel.swift
+[184/332] Compiling StudentKit SessionSummaryView.swift
+[185/332] Compiling StudentKit SetDisplayNumber.swift
+[186/332] Compiling StudentKit SetEntryAnalytics.swift
+[187/332] Compiling StudentKit SetEntryPlateLoadout.swift
+[188/332] Compiling StudentKit SetEntryRPE.swift
+[189/332] Compiling StudentKit SetEntryRPEScale.swift
+[190/332] Compiling StudentKit SetEntrySheet.swift
+[191/332] Compiling StudentKit SetEntryValue.swift
+[192/332] Compiling StudentKit SetVideoUploadIndicator.swift
+[193/332] Compiling StudentKit StudentAddedExerciseSection.swift
+[194/332] Compiling StudentKit StudentAddedInlineRows.swift
+[195/332] Compiling StudentKit StudentAddedPreviousSession.swift
+[196/332] Compiling StudentKit StudentAddedRows.swift
+[197/332] Compiling StudentKit StudentExercisePicker.swift
+[198/332] Compiling StudentKit StudentExerciseTag.swift
+[199/332] Compiling StudentKit StudentSessionSummary.swift
+[200/332] Compiling StudentKit TodaySetRefSharingSource.swift
+[201/332] Compiling StudentKit TodayWorkoutExerciseSection.swift
+[202/332] Compiling StudentKit TodayWorkoutPlanHandoff.swift
+[203/332] Compiling StudentKit TodayWorkoutPresentation.swift
+[204/332] Compiling StudentKit TodayWorkoutScreen.swift
+[205/332] Compiling StudentKit TodayWorkoutSelectionResolver.swift
+[206/332] Compiling StudentKit TodayWorkoutTypes.swift
+[207/332] Compiling StudentKit TodayWorkoutV3Previews.swift
+[208/332] Compiling StudentKit TodayWorkoutView.swift
+[209/332] Compiling StudentKit AccessoryClassification.swift
+[210/332] Compiling StudentKit AccessoryHistory.swift
+[211/332] Compiling StudentKit AccessoryLogCard.swift
+[212/332] Compiling StudentKit AccessoryLogRow.swift
+[213/332] Compiling StudentKit AccessoryRow.swift
+[214/332] Compiling StudentKit AccessoryWorkoutHero.swift
+[215/332] Compiling StudentKit CoachNoteDisplay.swift
+[216/332] Compiling StudentKit CompletedDayOverviewCard.swift
+[217/332] Compiling StudentKit CompletedDayPresentation.swift
+[218/332] Compiling StudentKit CompletedTrainingExercise.swift
+[219/332] Compiling StudentKit DayCompletionBanner.swift
+[220/332] Compiling StudentKit ExtraSetControls.swift
+[221/332] Compiling StudentKit FlexibleTrainingDay.swift
+[222/332] Compiling StudentKit HoldToCompleteGestureState.swift
+[223/332] Compiling StudentKit PctAnchorResolver.swift
+[224/332] Compiling StudentKit QuickLogPlan.swift
+[225/332] Compiling StudentKit QuickLogSheet.swift
+[226/332] Compiling StudentKit RemoveStudentSetButton.swift
+[227/332] Compiling StudentKit RestTimerActivityControlling.swift
+[228/332] Compiling StudentKit RestTimerExplanationPresentation.swift
+[229/332] Compiling StudentKit RestTimerExplanationView.swift
+[230/332] Compiling StudentKit RestTimerOverlay.swift
+[231/332] Compiling StudentKit RestTimerPolicy.swift
+[232/332] Compiling StudentKit SessionReflectionStore.swift
+[233/332] Compiling StudentKit SessionReviewStore.swift
+[234/332] Compiling StudentKit TodayWorkoutViewModel+DraftBuilding.swift
+[235/332] Compiling StudentKit TodayWorkoutViewModel+RecordingError.swift
+[236/332] Compiling StudentKit TodayWorkoutViewModel.swift
+[237/332] Compiling StudentKit TrainingCalendarLogic.swift
+[238/332] Compiling StudentKit TrainingCompletionAvailability.swift
+[239/332] Compiling StudentKit TrainingDayPreview.swift
+[240/332] Compiling StudentKit TrainingDayProgress.swift
+[241/332] Compiling StudentKit TrainingExerciseProgress.swift
+[242/332] Compiling StudentKit TrainingFlowPresentation.swift
+[243/332] Compiling StudentKit TrainingFlowScroll.swift
+[244/332] Compiling StudentKit TrainingSequenceCalendarCell.swift
+[245/332] Compiling StudentKit TrainingSetProgress.swift
+[246/332] Compiling StudentKit TrainingSetProgressBar.swift
+[247/332] Compiling StudentKit TrainingWeekCalendarRow.swift
+[248/332] Compiling StudentKit TrainingWeekHeaderLayout.swift
+[249/332] Compiling StudentKit TrainingWeekPresentation.swift
+[250/332] Compiling StudentKit TrainingWeekStrip.swift
+[251/332] Compiling StudentKit W4V3Previews.swift
+[252/332] Compiling StudentKit WorkoutCompletionFlowView.swift
+[253/332] Compiling StudentKit WorkoutCompletionPresentation.swift
+[254/332] Compiling StudentKit WorkoutCompletionRequest.swift
+[255/332] Compiling StudentKit WorkoutDatePolicy.swift
+[256/332] Compiling StudentKit AllHistoryScreen.swift
+[257/332] Compiling StudentKit DayDetailView.swift
+[258/332] Compiling StudentKit DashboardEmptyStatePresentation.swift
+[259/332] Compiling StudentKit DashboardFeedbackCard.swift
+[260/332] Compiling StudentKit DashboardFeedbackEmptyCards.swift
+[261/332] Compiling StudentKit DashboardFeedbackText.swift
+[262/332] Compiling StudentKit DashboardHeader.swift
+[263/332] Compiling StudentKit DashboardNotificationsViewModel.swift
+[264/332] Compiling StudentKit DashboardNutritionCard.swift
+[265/332] Compiling StudentKit DashboardOverviewCard.swift
+[266/332] Compiling StudentKit DashboardPlanWaitingState.swift
+[267/332] Compiling StudentKit DashboardPrimaryAction.swift
+[268/332] Compiling StudentKit DashboardProfileEditor.swift
+[269/332] Compiling StudentKit DashboardProfileMetrics.swift
+[270/332] Compiling StudentKit DashboardProfileMetricsView.swift
+[271/332] Compiling StudentKit DashboardTodayPresentation.swift
+[272/332] Compiling StudentKit DashboardTodayScreen.swift
+[273/332] Compiling StudentKit DashboardV3Previews.swift
+[274/332] Compiling StudentKit DashboardView.swift
+[275/332] Compiling StudentKit DashboardWeekCalendar.swift
+[276/332] Compiling StudentKit E1RMTrendRow+Sparkline.swift
+[277/332] Compiling StudentKit EvaluationCompletedCard.swift
+[278/332] Compiling StudentKit StudentBlackGoldChatView.swift
+[279/332] Compiling StudentKit StudentChatTimeline.swift
+[280/332] Compiling StudentKit StudentNotificationComponents.swift
+[281/332] Compiling StudentKit StudentTodayRefreshThrottle.swift
+[282/332] Compiling StudentKit EvaluationPeriodView.swift
+[283/332] Compiling StudentKit VideoTrimThumbnailGenerator.swift
+[284/332] Compiling StudentKit VideoTrimTimeline.swift
+[285/332] Compiling StudentKit VideoTrimView.swift
+[286/332] Compiling StudentKit VideoUploadManager+BackgroundEventDrain.swift
+[287/332] Compiling StudentKit VideoUploadManager+Cleanup.swift
+[288/332] Compiling StudentKit VideoUploadManager+Generation.swift
+[289/332] Compiling StudentKit VideoUploadManager+Pipeline.swift
+[290/332] Compiling StudentKit VideoUploadManager+Playback.swift
+[291/332] Compiling StudentKit VideoUploadManager+Recovery.swift
+[292/332] Compiling StudentKit VideoUploadManager+Restore.swift
+[293/332] Compiling StudentKit VideoUploadManager+Retry.swift
+[294/332] Compiling StudentKit VideoUploadManager.swift
+[295/332] Compiling StudentKit VideoUploadServiceLive.swift
+[296/332] Compiling StudentKit VideoUploadServices.swift
+[297/332] Compiling StudentKit VideoUploadTypes.swift
+[298/332] Compiling StudentKit WeekOverviewViewModel.swift
+[299/332] Compiling StudentKit AccountRepositories.swift
+[300/332] Compiling StudentKit BackendBindRepository.swift
+[301/332] Compiling StudentKit BackendOnboardingRepository.swift
+[302/332] Compiling StudentKit BackendReadinessRepository.swift
+[303/332] Compiling StudentKit BackendStudentEvaluationRepositories.swift
+[304/332] Compiling StudentKit BackendStudentFeedbackRepository.swift
+[305/332] Compiling StudentKit BackendStudentPlanRepository.swift
+[306/332] Compiling StudentKit BackendStudentTrainingLogRepository.swift
+[307/332] Compiling StudentKit BackendVideoAttachmentRepository.swift
+[308/332] Compiling StudentKit ImportedHistoryReviewStore.swift
+[309/332] Compiling StudentKit InMemoryBindRepository.swift
+[310/332] Compiling StudentKit InMemoryE1RMRepository.swift
+[311/332] Compiling StudentKit InMemoryOnboardingRepository.swift
+[312/332] Compiling StudentKit InMemoryReadinessRepository.swift
+[313/332] Compiling StudentKit InMemoryStudentEvaluationRepositories.swift
+[314/332] Compiling StudentKit InMemoryStudentFeedbackRepository.swift
+[315/332] Compiling StudentKit InMemoryStudentPlanRepository.swift
+[316/332] Compiling StudentKit InMemoryStudentTrainingLogRepository.swift
+[317/332] Compiling StudentKit InMemoryVideoAttachmentRepository.swift
+[318/332] Compiling StudentKit LocalE1RMRepository.swift
+[319/332] Compiling StudentKit PlanCalendarDayIdentity.swift
+[320/332] Compiling StudentKit StudentAddedLogError.swift
+[321/332] Compiling StudentKit StudentAddedLogRepository.swift
+[322/332] Compiling StudentKit StudentPlanProjection.swift
+[323/332] Compiling StudentKit StudentExerciseName.swift
+[324/332] Compiling StudentKit StudentFormatting.swift
+[325/332] Compiling StudentKit StudentNotificationRouting.swift
+[326/332] Compiling StudentKit StudentRootView.swift
+[327/332] Compiling StudentKit StudentStrings.swift
+[328/332] Compiling StudentKit StudentTabAccessibilityHost.swift
+[329/332] Compiling StudentKit StudentTrainingPlanRefreshTrigger.swift
+[330/332] Compiling StudentKit resource_bundle_accessor.swift
+[331/368] Emitting module AppShell
+[332/371] Compiling AppShell PushRegistrar.swift
+[333/371] Compiling AppShell PushRegistrationStateMachine.swift
+[334/371] Compiling AppShell RootView+Push.swift
+[335/371] Compiling AppShell SignupView.swift
+[336/371] Compiling AppShell TimezoneStore.swift
+[337/371] Compiling AppShell TokenStore.swift
+[338/371] Compiling AppShell AuthFlowView.swift
+[339/371] Compiling AppShell ChatSessionController.swift
+[340/371] Compiling AppShell DemoChatSeed.swift
+[341/371] Compiling AppShell InMemoryPlanStore.swift
+[342/371] Compiling AppShell RootViewDemoDefaults.swift
+[343/371] Compiling AppShell AuthPhoneField.swift
+[344/371] Compiling AppShell AuthRepository.swift
+[345/371] Compiling AppShell AuthSecureField.swift
+[346/371] Compiling AppShell DemoAuthRepository.swift
+[347/371] Compiling AppShell Session+GlobalAuth.swift
+[348/371] Compiling AppShell SignupCodeField.swift
+[349/371] Compiling AppShell LoginView.swift
+[350/371] Compiling AppShell Session+PhoneAuth.swift
+[351/371] Compiling AppShell EmailAuthStrings.swift
+[352/371] Compiling AppShell GlobalAuthComponents.swift
+[353/371] Compiling AppShell GlobalAuthCrypto.swift
+[354/371] Compiling AppShell GlobalAuthViewModels.swift
+[355/371] Compiling AppShell GlobalForgotPasswordView.swift
+[356/371] Compiling AppShell GlobalLoginView.swift
+[357/371] Compiling AppShell GlobalRegisterView.swift
+[358/371] Compiling AppShell GoogleOAuthService.swift
+[359/371] Compiling AppShell DemoTokenStore.swift
+[360/371] Compiling AppShell DemoUserSeed.swift
+[361/371] Compiling AppShell AuthFormScrollView.swift
+[362/371] Compiling AppShell AuthRepository+Global.swift
+[363/371] Compiling AppShell AnalyticsPrivacyNotice.swift
+[364/371] Compiling AppShell AnalyticsRootModifier.swift
+[365/371] Compiling AppShell AppShellStrings.swift
+[366/371] Compiling AppShell AuthFormViewModel.swift
+[367/371] Compiling AppShell RootView.swift
+[368/371] Compiling AppShell Session.swift
+[369/371] Compiling AppShell resource_bundle_accessor.swift
+[370/394] Compiling AppShellTests AuthRepositoryTests.swift
+[371/394] Compiling AppShellTests AuthTestSupport.swift
+[372/394] Compiling AppShellTests ChinaEmailRegistrationTests.swift
+[373/394] Compiling AppShellTests DemoChatSeedTests.swift
+[374/394] Compiling AppShellTests PlanProjectionIntegrationTests.swift
+[375/394] Compiling AppShellTests GlobalAuthViewModelTests.swift
+[376/394] Compiling AppShellTests GlobalAuthViewTests.swift
+[377/394] Compiling AppShellTests GlobalOAuthTests.swift
+[378/394] Emitting module AppShellTests
+[379/394] Compiling AppShellTests ChatSessionControllerTests.swift
+[380/394] Compiling AppShellTests ChatSessionRealtimeLifecycleTests.swift
+[381/394] Compiling AppShellTests LocalizationCatalogTestSupport.swift
+[382/394] Compiling AppShellTests PushRegistrarTests.swift
+[383/394] Compiling AppShellTests AnalyticsPrivacyNoticeTests.swift
+[384/394] Compiling AppShellTests AuthFlowSnapshotTests.swift
+[385/394] Compiling AppShellTests AuthFormViewModelTests.swift
+[386/394] Compiling AppShellTests SessionTests.swift
+[387/394] Compiling AppShellTests TokenStoreTests.swift
+[388/394] Compiling AppShellTests GlobalSessionTests.swift
+[389/394] Compiling AppShellTests SessionRefreshHardFailureTests.swift
+[390/394] Compiling AppShellTests DemoAuthRepositoryTests.swift
+[391/394] Compiling AppShellTests DemoSessionBootstrapTests.swift
+[392/394] Compiling AppShellTests DemoTokenStoreTests.swift
+[393/396] Compiling AppShellTests PushRegistrationStateMachineTests.swift
+[394/396] Compiling AppShellTests StudentE1RMMigrationGateTests.swift
+[395/398] Compiling AppShellPackageTests runner.swift
+[396/398] Emitting module AppShellPackageTests
+[396/398] Write Objects.LinkFileList
+[397/398] Linking AppShellPackageTests
+Build complete! (21.53s)
+Test Suite 'All tests' started at 2026-10-21 10:50:10.320.
+Test Suite 'All tests' passed at 2026-10-21 10:50:10.320.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test demoTokenStoreStartsWithRefreshToken() started.
+◇ Test mapsAuthErrorsToChineseToastMessages() started.
+◇ Test signupRequiresRoleButLoginDoesNot() started.
+◇ Test deniedAuthorizationDoesNotRequestAgain() started.
+◇ Test loginViewOmitsDeferredAndDeadEndActions() started.
+◇ Test signupViewRendersThreeRoleOptions() started.
+◇ Test staleUnauthorizedResponseReusesAlreadyRotatedAccessToken() started.
+◇ Test demoTokenStoreCachesInjectedUser() started.
+◇ Test analyticsPrivacyCopyUsesAccountLifetimeInBothTracksAndLanguages() started.
+◇ Test forgotPasswordInvalidCodeRendersToast() started.
+◇ Test coachChatSessionUsesAuthenticatedUserAndReusesSessionGraph() started.
+◇ Test signupCooldownExpiresAndNeverBecomesNegative() started.
+◇ Test accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test studentChatSessionReusesGraphAndRefreshesBindingOncePerInvalidationWindow() started.
+◇ Test logoutRunsCleanupBeforeClearingAccessToken() started.
+◇ Test emailTakenOffersSignInAndEditingEmailClearsIt() started.
+◇ Test signupAuthenticatesAndPersistsTokens() started.
+◇ Test mapsPhoneTakenErrorCode() started.
+◇ Test accessTokenRefreshesExpiredJWTBeforeReturningIt() started.
+◇ Test inMemoryTokenStoreOverwritesTokens() started.
+◇ Test emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test pendingRouteIsOverwrittenByNewerPushesAndConsumedExactlyOnce() started.
+◇ Test sameCoachRefreshKeepsSessionCoordinatorAndInFlightWork() started.
+◇ Test rejectedAccessTokenWithRefreshBadRequestLogsOut() started.
+◇ Test demoTokenStoreSaveDoesNotOverrideSeededValues() started.
+◇ Test coachBindingInvalidationRouteIsNoOp() started.
+◇ Test loginPrependsChinaCodeAndMapsTokens() started.
+◇ Test refreshMapsTokenPair() started.
+◇ Test inMemoryTokenStoreSavesAndLoadsCachedUser() started.
+◇ Test demoSignupReturnsSeededCoachAndTokens() started.
+◇ Test returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test chinaRegistrationLocksAllInputsDuringSubmission() started.
+◇ Test chinaSignupRejectsInvalidCodeWithoutCreatingSession() started.
+◇ Test bindingTransitionBlocksOldCoachGraphUntilNewContextIsPublished() started.
+◇ Test failedForegroundTimezoneReportRetriesAtNextActivation() started.
+◇ Test inMemoryTokenStoreSavesAndLoadsTokens() started.
+◇ Test submitSuccessAuthenticatesThroughSession() started.
+◇ Test bootstrapSkipsTimezonePatchWhenIdentifierMatches() started.
+◇ Test lateStudentActivationCannotPublishAfterLogout() started.
+◇ Test invalidSignupCodeReplacesSentReceiptButKeepsSignInHelp() started.
+◇ Test studentDemoChatSeedKeepsCanonicalConversationSnapshot() started.
+◇ Test failedUploadRetriesOnNextActivation() started.
+◇ Test changedDeviceTokenUploadsWithinTheSameSession() started.
+◇ Test forgotPasswordMovesToCodeThenMapsInvalidCode() started.
+◇ Test forgotPasswordResetStepRendersCodeAndNewPassword() started.
+◇ Test returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test mapsInvalidCredentialsErrorCode() started.
+◇ Test signupPreservesGlobalE164PhoneNumber() started.
+◇ Test backgroundIntentRecordedBeforeActivationBlocksConnect() started.
+◇ Test globalLoginRendersThreeEnglishChannelsAndPrivacyLink() started.
+◇ Test automaticRefreshFailureRunsLogoutCleanupBeforeTokenClear() started.
+◇ Test mapsValidationErrorIssues() started.
+◇ Test validatesChineseNationalPhoneNumbers() started.
+◇ Test bootstrapWithRefreshSuccessAuthenticatesCachedUserAndRotatesTokens() started.
+◇ Test chinaBootstrapNeverReportsTimezone() started.
+◇ Test bootstrapWithUnknownRefreshFailureClearsStoreAndReturnsAnonymous() started.
+◇ Test globalEmailLoginAuthenticatesCoachedStudent() started.
+◇ Test logoutClearsStoreAndCallsLogoutHookOnce() started.
+◇ Test demoLoginReturnsSeededCoachAndTokens() started.
+◇ Test cancellingAppleSignInDoesNotShowErrorToast() started.
+◇ Test authFlowRoutesGlobalTrackToGlobalLogin() started.
+◇ Test staleUploadFromPreviousSessionAlwaysLandsBeforeTheCurrentOnes() started.
+◇ Test bootstrapIsNoOpWhenSessionAlreadyAuthenticated() started.
+◇ Test chinaRegistrationRequiresCodeAndMatchingConfirmation() started.
+◇ Test bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test globalRegistrationUsesFixedCoachedStudentRole() started.
+◇ Test demoSessionBootstrapAuthenticatesSeededCoach() started.
+◇ Test appleChallengeIsHashedBeforeAuthorizationRequest() started.
+◇ Test chinaRegistrationPassesCodeThroughSessionAndRepository() started.
+◇ Test demoRefreshIsDeterministic() started.
+◇ Test demoTokenStoreStartsWithCachedCoach() started.
+◇ Test rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test authFlowStartsAtLogin() started.
+◇ Test submitFailureStopsLoadingAndStoresToast() started.
+◇ Test mapsRateLimitedErrorCode() started.
+◇ Test passwordStartsMaskedWithAReachableRevealButton() started.
+◇ Test analyticsPrivacyBodySelectsTheRequestedBuildTrack() started.
+◇ Test forgotPasswordStartsAtEmailStep() started.
+◇ Test demoLoginReturnsInjectedUser() started.
+◇ Test globalAuthErrorsHaveHumanReadableMessages() started.
+◇ Test appleNonceHashUsesLowercaseSHA256Hex() started.
+◇ Test demoSessionRefreshDoesNotThrow() started.
+◇ Test demoTokenStoreStartsWithAccessToken() started.
+◇ Test globalGoogleLoginPassesIDTokenThroughSession() started.
+◇ Test resetCodeAcceptsOnlySixASCIIDigits() started.
+◇ Test demoTokenStoreClearKeepsSeededValues() started.
+◇ Test loginViewRendersPhonePasswordAndSubmitButton() started.
+◇ Test signupPrependsChinaCodeAndMapsUserDefaults() started.
+◇ Test foregroundReportsChangedTimezoneOnceAndSkipsUnchangedValue() started.
+◇ Test changingSignupEmailClearsCodeReceiptAndCooldown() started.
+◇ Test demoRefreshReturnsSeededTokenPair() started.
+◇ Test keychainTokenStoreSavesReadsAndClearsTokens() started.
+◇ Test loginSubmitIsDisabledForEmptyForm() started.
+◇ Test globalRegistrationHasNoRolePicker() started.
+◇ Test invalidSignupCodeEndsActiveCooldownAndOffersResend() started.
+◇ Test deviceTokenConvertsToLowercaseTwoDigitHex() started.
+◇ Test case passing 1 argument error → .network to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test forgotPasswordSuccessInvokesLoginMessageCallback() started.
+◇ Test analyticsPrivacyBodyScrollsWithoutTruncationAndKeepsActionsOutside() started.
+◇ Test rejectedAccessTokenRefreshesWithoutLoggingOut() started.
+◇ Test inMemoryTokenStoreClearRemovesTokensAndUser() started.
+◇ Test case passing 1 argument track → .china to emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test coachPublishProjectionIsReadableByStudentFetchViaSharedStore() started.
+◇ Test activationWithoutRealtimeFactoryProducesNoClient() started.
+◇ Test case passing 1 argument track → .global to emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) started.
+◇ Test bootstrapWithoutCompleteCacheClearsStoreAndStaysAnonymous() started.
+◇ Test accountSwitchReportsTimezoneForEachUserOnTheSameDevice() started.
+◇ Test evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test bootstrapReportsTimezoneOnlyWhenItDrifts() started.
+◇ Test globalRegistrationPassesCurrentTimezoneAndPersistsIt() started.
+◇ Test reloginUploadsAnUnchangedTokenForTheNewSession() started.
+◇ Test chinaLoginUsesApprovedTwoLineSloganInBothLanguages() started.
+◇ Test globalLoginPlacesEmailAndLinksBeforeSocialSignIn() started.
+◇ Test googleTokenExchangeUsesPKCEWithoutClientSecretAndParsesIDToken() started.
+◇ Test loginAuthenticatesAndPersistsTokens() started.
+◇ Test keychainTokenStoreRoundTripsCachedUser() started.
+◇ Test validationErrorToastUsesFirstBackendIssue() started.
+◇ Test bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test demoSessionLogoutIsLocalAndFreshBootstrapRestoresCoach() started.
+◇ Test case passing 1 argument channel → .apple to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument channel → .google to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test case passing 1 argument channel → .email to returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) started.
+◇ Test googlePKCEUsesS256AndExpectedAuthorizationParameters() started.
+◇ Test validatesPasswordLengthAndBcryptByteLimit() started.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument error → .decoding to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument channel → .apple to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument channel → .google to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument channel → .email to returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument code → .invalidCredentials to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .invalidRefresh to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .phoneTaken to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .rateLimited to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .refreshExpired to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .validationError to bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) started.
+◇ Test case passing 1 argument code → .invalidRefresh to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .phoneTaken to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .refreshExpired to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .rateLimited to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .validationError to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+◇ Test case passing 1 argument code → .invalidCredentials to rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) started.
+✔ Test deniedAuthorizationDoesNotRequestAgain() passed after 0.004 seconds.
+✔ Test inMemoryTokenStoreOverwritesTokens() passed after 0.004 seconds.
+◇ Test case passing 1 argument error → .network to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument role → .coachedStudent to evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument role → .selfTrainStudent to evaluationAndTabStudentEntriesShareMigrationGate(role:) started.
+✔ Test coachBindingInvalidationRouteIsNoOp() passed after 0.005 seconds.
+◇ Test case passing 1 argument error → .decoding to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+✔ Test inMemoryTokenStoreSavesAndLoadsTokens() passed after 0.005 seconds.
+✔ Test failedUploadRetriesOnNextActivation() passed after 0.005 seconds.
+✔ Test inMemoryTokenStoreSavesAndLoadsCachedUser() passed after 0.005 seconds.
+✔ Test changedDeviceTokenUploadsWithinTheSameSession() passed after 0.005 seconds.
+✔ Test analyticsPrivacyCopyUsesAccountLifetimeInBothTracksAndLanguages() passed after 0.005 seconds.
+✔ Test refreshMapsTokenPair() passed after 0.005 seconds.
+✔ Test mapsInvalidCredentialsErrorCode() passed after 0.005 seconds.
+✔ Test mapsPhoneTakenErrorCode() passed after 0.005 seconds.
+✔ Test demoTokenStoreCachesInjectedUser() passed after 0.005 seconds.
+✔ Test mapsValidationErrorIssues() passed after 0.004 seconds.
+✔ Test demoTokenStoreStartsWithRefreshToken() passed after 0.005 seconds.
+✔ Test demoRefreshIsDeterministic() passed after 0.004 seconds.
+✔ Test demoLoginReturnsSeededCoachAndTokens() passed after 0.004 seconds.
+✔ Test demoSignupReturnsSeededCoachAndTokens() passed after 0.005 seconds.
+✔ Test demoLoginReturnsInjectedUser() passed after 0.004 seconds.
+✔ Test mapsRateLimitedErrorCode() passed after 0.004 seconds.
+✔ Test demoTokenStoreSaveDoesNotOverrideSeededValues() passed after 0.005 seconds.
+✔ Test analyticsPrivacyBodySelectsTheRequestedBuildTrack() passed after 0.004 seconds.
+✔ Test demoTokenStoreStartsWithCachedCoach() passed after 0.004 seconds.
+✔ Test appleNonceHashUsesLowercaseSHA256Hex() passed after 0.004 seconds.
+✔ Test demoTokenStoreStartsWithAccessToken() passed after 0.004 seconds.
+✔ Test demoRefreshReturnsSeededTokenPair() passed after 0.004 seconds.
+✔ Test signupPreservesGlobalE164PhoneNumber() passed after 0.005 seconds.
+✔ Test deviceTokenConvertsToLowercaseTwoDigitHex() passed after 0.004 seconds.
+✔ Test loginPrependsChinaCodeAndMapsTokens() passed after 0.005 seconds.
+✔ Test resetCodeAcceptsOnlySixASCIIDigits() passed after 0.004 seconds.
+✔ Test inMemoryTokenStoreClearRemovesTokensAndUser() passed after 0.004 seconds.
+✔ Test demoTokenStoreClearKeepsSeededValues() passed after 0.004 seconds.
+✔ Test reloginUploadsAnUnchangedTokenForTheNewSession() passed after 0.004 seconds.
+✔ Test globalAuthErrorsHaveHumanReadableMessages() passed after 0.004 seconds.
+✔ Test googlePKCEUsesS256AndExpectedAuthorizationParameters() passed after 0.003 seconds.
+✔ Test signupPrependsChinaCodeAndMapsUserDefaults() passed after 0.004 seconds.
+✔ Test mapsAuthErrorsToChineseToastMessages() passed after 0.005 seconds.
+✔ Test studentDemoChatSeedKeepsCanonicalConversationSnapshot() passed after 0.005 seconds.
+✔ Test coachPublishProjectionIsReadableByStudentFetchViaSharedStore() passed after 0.004 seconds.
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() recorded an issue at TokenStoreTests.swift:54:3: Expectation failed: await store.accessToken() == "access-1"
+✘ Test keychainTokenStoreRoundTripsCachedUser() recorded an issue at TokenStoreTests.swift:72:3: Expectation failed: await store.cachedUser() == user
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() recorded an issue at TokenStoreTests.swift:55:3: Expectation failed: await store.refreshToken() == "refresh-1"
+✘ Test keychainTokenStoreRoundTripsCachedUser() failed after 0.008 seconds with 1 issue.
+✘ Test keychainTokenStoreSavesReadsAndClearsTokens() failed after 0.009 seconds with 2 issues.
+✔ Test loginViewOmitsDeferredAndDeadEndActions() passed after 0.059 seconds.
+✔ Test signupRequiresRoleButLoginDoesNot() passed after 0.059 seconds.
+✔ Test signupViewRendersThreeRoleOptions() passed after 0.141 seconds.
+✔ Test pendingRouteIsOverwrittenByNewerPushesAndConsumedExactlyOnce() passed after 0.141 seconds.
+✔ Test emailAuthFormsExposeFocusedFieldsAsScrollTargets(track:) with 2 test cases passed after 0.220 seconds.
+✔ Test chinaRegistrationLocksAllInputsDuringSubmission() passed after 0.235 seconds.
+✔ Test forgotPasswordResetStepRendersCodeAndNewPassword() passed after 0.254 seconds.
+✔ Test globalLoginRendersThreeEnglishChannelsAndPrivacyLink() passed after 0.316 seconds.
+✔ Test validatesChineseNationalPhoneNumbers() passed after 0.317 seconds.
+✔ Test authFlowRoutesGlobalTrackToGlobalLogin() passed after 0.384 seconds.
+✔ Test chinaRegistrationRequiresCodeAndMatchingConfirmation() passed after 0.384 seconds.
+✔ Test authFlowStartsAtLogin() passed after 0.438 seconds.
+✔ Test passwordStartsMaskedWithAReachableRevealButton() passed after 0.448 seconds.
+✔ Test forgotPasswordStartsAtEmailStep() passed after 0.459 seconds.
+✔ Test loginViewRendersPhonePasswordAndSubmitButton() passed after 0.534 seconds.
+✔ Test loginSubmitIsDisabledForEmptyForm() passed after 0.538 seconds.
+✔ Test globalRegistrationHasNoRolePicker() passed after 0.555 seconds.
+✔ Test analyticsPrivacyBodyScrollsWithoutTruncationAndKeepsActionsOutside() passed after 0.838 seconds.
+✔ Test chinaLoginUsesApprovedTwoLineSloganInBothLanguages() passed after 0.844 seconds.
+✔ Test validationErrorToastUsesFirstBackendIssue() passed after 0.844 seconds.
+✔ Test globalLoginPlacesEmailAndLinksBeforeSocialSignIn() passed after 0.931 seconds.
+✔ Test evaluationAndTabStudentEntriesShareMigrationGate(role:) with 2 test cases passed after 0.932 seconds.
+✔ Test validatesPasswordLengthAndBcryptByteLimit() passed after 0.932 seconds.
+✔ Test forgotPasswordInvalidCodeRendersToast() passed after 0.938 seconds.
+✔ Test signupCooldownExpiresAndNeverBecomesNegative() passed after 0.937 seconds.
+✔ Test sameCoachRefreshKeepsSessionCoordinatorAndInFlightWork() passed after 0.937 seconds.
+✔ Test appleChallengeIsHashedBeforeAuthorizationRequest() passed after 0.946 seconds.
+✔ Test demoSessionRefreshDoesNotThrow() passed after 0.949 seconds.
+✔ Test changingSignupEmailClearsCodeReceiptAndCooldown() passed after 0.948 seconds.
+✔ Test activationWithoutRealtimeFactoryProducesNoClient() passed after 0.948 seconds.
+✔ Test coachChatSessionUsesAuthenticatedUserAndReusesSessionGraph() passed after 0.950 seconds.
+✔ Test forgotPasswordSuccessInvokesLoginMessageCallback() passed after 0.957 seconds.
+✔ Test googleTokenExchangeUsesPKCEWithoutClientSecretAndParsesIDToken() passed after 0.957 seconds.
+✔ Test emailTakenOffersSignInAndEditingEmailClearsIt() passed after 0.958 seconds.
+✔ Test chinaSignupRejectsInvalidCodeWithoutCreatingSession() passed after 0.958 seconds.
+✔ Test forgotPasswordMovesToCodeThenMapsInvalidCode() passed after 0.958 seconds.
+✔ Test demoSessionBootstrapAuthenticatesSeededCoach() passed after 0.958 seconds.
+✔ Test cancellingAppleSignInDoesNotShowErrorToast() passed after 0.959 seconds.
+✔ Test submitFailureStopsLoadingAndStoresToast() passed after 0.961 seconds.
+✔ Test bindingTransitionBlocksOldCoachGraphUntilNewContextIsPublished() passed after 0.961 seconds.
+✔ Test submitSuccessAuthenticatesThroughSession() passed after 0.961 seconds.
+✔ Test invalidSignupCodeReplacesSentReceiptButKeepsSignInHelp() passed after 0.969 seconds.
+✔ Test invalidSignupCodeEndsActiveCooldownAndOffersResend() passed after 0.969 seconds.
+✔ Test bootstrapWithoutCompleteCacheClearsStoreAndStaysAnonymous() passed after 0.969 seconds.
+✔ Test chinaBootstrapNeverReportsTimezone() passed after 0.970 seconds.
+✔ Test bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) with 4 test cases passed after 0.969 seconds.
+✔ Test bootstrapSkipsTimezonePatchWhenIdentifierMatches() passed after 0.970 seconds.
+✔ Test bootstrapWithUnknownRefreshFailureClearsStoreAndReturnsAnonymous() passed after 0.970 seconds.
+✔ Test globalRegistrationPassesCurrentTimezoneAndPersistsIt() passed after 0.969 seconds.
+✔ Test bootstrapIsNoOpWhenSessionAlreadyAuthenticated() passed after 0.970 seconds.
+✔ Test signupAuthenticatesAndPersistsTokens() passed after 0.970 seconds.
+✔ Test bootstrapWithAnyRecognizedUnauthorizedErrorClearsStoreAndReturnsAnonymous(code:) with 6 test cases passed after 0.970 seconds.
+✔ Test demoSessionLogoutIsLocalAndFreshBootstrapRestoresCoach() passed after 0.968 seconds.
+✔ Test studentChatSessionReusesGraphAndRefreshesBindingOncePerInvalidationWindow() passed after 0.970 seconds.
+✔ Test logoutRunsCleanupBeforeClearingAccessToken() passed after 0.970 seconds.
+✔ Test returningUserLoginLeavesTimezoneMarkerUnchangedWhenPatchFails(channel:) with 3 test cases passed after 0.970 seconds.
+✔ Test loginAuthenticatesAndPersistsTokens() passed after 0.969 seconds.
+✔ Test globalRegistrationUsesFixedCoachedStudentRole() passed after 0.970 seconds.
+✔ Test bootstrapWithRefreshSuccessAuthenticatesCachedUserAndRotatesTokens() passed after 0.970 seconds.
+✔ Test returningUserLoginReportsDriftedTimezoneBeforePersistingMarker(channel:) with 3 test cases passed after 0.970 seconds.
+✔ Test logoutClearsStoreAndCallsLogoutHookOnce() passed after 0.970 seconds.
+✔ Test bootstrapReportsTimezoneOnlyWhenItDrifts() passed after 0.969 seconds.
+✔ Test failedForegroundTimezoneReportRetriesAtNextActivation() passed after 0.970 seconds.
+✔ Test foregroundReportsChangedTimezoneOnceAndSkipsUnchangedValue() passed after 0.970 seconds.
+✔ Test rejectedAccessTokenRefreshesWithoutLoggingOut() passed after 0.970 seconds.
+✔ Test globalEmailLoginAuthenticatesCoachedStudent() passed after 0.971 seconds.
+✔ Test staleUnauthorizedResponseReusesAlreadyRotatedAccessToken() passed after 0.971 seconds.
+✔ Test accessTokenRefreshesExpiredJWTBeforeReturningIt() passed after 0.971 seconds.
+✔ Test rejectedAccessTokenWithRefreshBadRequestLogsOut() passed after 0.971 seconds.
+✔ Test automaticRefreshFailureRunsLogoutCleanupBeforeTokenClear() passed after 0.971 seconds.
+✔ Test rejectedAccessTokenWithAnyRecognizedUnauthorizedErrorLogsOut(code:) with 6 test cases passed after 0.971 seconds.
+✔ Test accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) with 4 test cases passed after 0.971 seconds.
+✔ Test chinaRegistrationPassesCodeThroughSessionAndRepository() passed after 0.971 seconds.
+✔ Test globalGoogleLoginPassesIDTokenThroughSession() passed after 0.971 seconds.
+✔ Test accountSwitchReportsTimezoneForEachUserOnTheSameDevice() passed after 0.970 seconds.
+✔ Test lateStudentActivationCannotPublishAfterLogout() passed after 0.972 seconds.
+✔ Test backgroundIntentRecordedBeforeActivationBlocksConnect() passed after 0.972 seconds.
+✔ Test staleUploadFromPreviousSessionAlwaysLandsBeforeTheCurrentOnes() passed after 0.977 seconds.
+✘ Test run with 118 tests in 0 suites failed after 0.978 seconds with 3 issues.
