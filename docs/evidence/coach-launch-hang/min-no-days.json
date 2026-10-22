@@ -1,0 +1,1 @@
+{"name":"min-no-days","fixture":true,"extraArgs":["-coach-hang-one-student","-coach-hang-no-logs","-coach-hang-one-day","-coach-hang-no-days"],"exitCode":0,"output":"[DEBUG-coachhang] PASS mainResponse=3.9125e-05 seconds","watchdogWallMs":4989,"targets":8,"tapResponseMs":995}

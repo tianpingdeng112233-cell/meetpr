@@ -1,0 +1,510 @@
+{
+  "tag": "0.10.3",
+  "tree": "e9a06346499a3a889165647e3f23f8a7b2609a1c",
+  "files": [
+    {
+      "path": "LICENSE",
+      "gitBlob": "a0cd94349b9b23115085464f58dfa8ab24fe72ff"
+    },
+    {
+      "path": "Package.swift",
+      "gitBlob": "9d7dbeeaccb6d38d187f3a2cefdcaf0fab9dc88b"
+    },
+    {
+      "path": "Sources/ViewInspector/BaseTypes.swift",
+      "gitBlob": "0d38f56c7c1bcf0322b89b7580514c3bc228a209"
+    },
+    {
+      "path": "Sources/ViewInspector/ContentExtraction.swift",
+      "gitBlob": "1313f944ff6f9b80c0bde4c3f04d7a6f95e1eb40"
+    },
+    {
+      "path": "Sources/ViewInspector/EnvironmentInjection.swift",
+      "gitBlob": "3b9c239f750f67fc46f757a5d5514d4d4193187c"
+    },
+    {
+      "path": "Sources/ViewInspector/InspectableView+RandomAccessCollection.swift",
+      "gitBlob": "c1853ca118553ba346d023ac6a0845be923d317f"
+    },
+    {
+      "path": "Sources/ViewInspector/InspectableView.swift",
+      "gitBlob": "87fa764547d549fa20564da4ef760f2f98f4bae4"
+    },
+    {
+      "path": "Sources/ViewInspector/InspectionEmissary.swift",
+      "gitBlob": "2d02b75aacc1405e3aeafcb00a7d88a7b7c33899"
+    },
+    {
+      "path": "Sources/ViewInspector/Inspector.swift",
+      "gitBlob": "a27718f0985f963c0d28e753034a973d34b8784e"
+    },
+    {
+      "path": "Sources/ViewInspector/LazyGroup.swift",
+      "gitBlob": "8271089b53d16d772cfa7380632fadcd5c4cf821"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/AccessibilityModifiers.swift",
+      "gitBlob": "cefe57f911397917fa764fd3057c23a2b3a763d1"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/AnimationModifiers.swift",
+      "gitBlob": "0b41853dd8a79c8760dcfbeaff23c98f1ac53264"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/ConfigurationModifiers.swift",
+      "gitBlob": "73c27d4799c3c1562bf57e8864fb4ce38e051911"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/CustomStyleModifiers.swift",
+      "gitBlob": "1ffa840c0387293b0a0b5723c771f1f2f5f69571"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/EnvironmentModifiers.swift",
+      "gitBlob": "aeee5f41e9bbebab1a970ea4259ceca866a502de"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/EventsModifiers.swift",
+      "gitBlob": "a3afe07af9b97df03c46e094afec74f4864abf20"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/GestureModifiers.swift",
+      "gitBlob": "c39a340ad33f0fe371dd57d9d89cd8c5be8d438c"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/InteractionModifiers.swift",
+      "gitBlob": "ea5a4e105d557803ec588e194de11716e8ee0f46"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/NavigationBarModifiers.swift",
+      "gitBlob": "5c4f91eb0cec78020020f8e47b80ad271bf02b7a"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/PositioningModifiers.swift",
+      "gitBlob": "3961e314446733b876459a2d549e963f5f1b59c1"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/PreviewModifiers.swift",
+      "gitBlob": "a5b0655ca3ed1675097a96e23bc027a37eca10f8"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/SizingModifiers.swift",
+      "gitBlob": "3db7bf2a47d6a8892f5cf93269a5964a9303f4f7"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/TextInputModifiers.swift",
+      "gitBlob": "1542c93e71d424c1f45ecae42a308f802d256aee"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/TransformingModifiers.swift",
+      "gitBlob": "b824b55290b868495f51cf8fca8f914712da6fc6"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/TransitiveModifiers.swift",
+      "gitBlob": "10d9e44569e9a8cd8d2babb55a0e42e6b8cde183"
+    },
+    {
+      "path": "Sources/ViewInspector/Modifiers/VisualEffectModifiers.swift",
+      "gitBlob": "aa97968dfa1bfed3e274a832b359d190c99a0082"
+    },
+    {
+      "path": "Sources/ViewInspector/PopupPresenter.swift",
+      "gitBlob": "4a51cb505660af4f6e0601b4da37a573e8290a99"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ActionSheet.swift",
+      "gitBlob": "7178a2596dfab1138d61730df96d3ed64598d954"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Alert.swift",
+      "gitBlob": "f744915ba90182c157215525a536ac3a5fa69b1d"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/AngularGradient.swift",
+      "gitBlob": "5d472a9c2fde4d4943543ae0bb6a98ac3faa682b"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/AnyView.swift",
+      "gitBlob": "fe99b1dfa101344b4427104bcc392f1debd84123"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/AsyncImage.swift",
+      "gitBlob": "2fb3e13e9503fab518b4e406701ae71f3a3cd8f7"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Button.swift",
+      "gitBlob": "f55f1107f874022ccfe054139ad185b32f3d5ce7"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Canvas.swift",
+      "gitBlob": "56e3bbfa10dd7cc6e1b92bbda1e16b6871a11e28"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ClassifiedView.swift",
+      "gitBlob": "0e77cc827917bdb7edf4cf67ed84af83b4c25933"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Color.swift",
+      "gitBlob": "74fbf93bcdec2f029ff287ef2d382ce58e9c12e4"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ColorPicker.swift",
+      "gitBlob": "4a45b2e8d297c28d3feda5e70e1b963deff8ffad"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ConditionalContent.swift",
+      "gitBlob": "c53c1cd69c7b31c88cbecf13c3143f972aa7a98c"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ConfirmationDialog.swift",
+      "gitBlob": "695d92abfafe219ef749a40a14da253f20758c62"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ContentUnavailableView.swift",
+      "gitBlob": "de3a13501715de99f773f6c103f62a76765c417e"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ControlGroup.swift",
+      "gitBlob": "6fd59d6767d4498ee5df9e0b6f2ddb87906f33e3"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/CustomView.swift",
+      "gitBlob": "6951dbbda461bf2a894a031e3f04f3224e209424"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/CustomViewModifier.swift",
+      "gitBlob": "68a2ed1582dbc5741094f65056a39e980c17e877"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/DatePicker.swift",
+      "gitBlob": "d7771163c7d2bb3600552919e20bcea54553dc7e"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/DelayedPreferenceView.swift",
+      "gitBlob": "9b3b76b34bb47d563291b8fe47c50081442175f7"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/DisclosureGroup.swift",
+      "gitBlob": "bff22132e5c8738cd247c555e19c9b3684f5463c"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Divider.swift",
+      "gitBlob": "eca1954908c3000de8dae9fd2127c0c563f30078"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/EditButton.swift",
+      "gitBlob": "96fbd378e07facbd7a88857de3814b494d660020"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/EllipticalGradient.swift",
+      "gitBlob": "50b926411671b5e211affe637eb55dbf8d003cd2"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/EmptyView.swift",
+      "gitBlob": "dd18526fd869662762ba976260861ab48f689dfb"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/EquatableView.swift",
+      "gitBlob": "31c9b77bec7fbda7474cd78931d90a9963513fa1"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ForEach.swift",
+      "gitBlob": "6a2253ca22939a29b8e48863b6cd8b1f0a586a7a"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Form.swift",
+      "gitBlob": "b1dd0f05b06cee78fbe8ba2f051ef73fc1987cc5"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/GeometryReader.swift",
+      "gitBlob": "f866aea4992edc2fa6e4be3bde99e859da5d4420"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Gesture.swift",
+      "gitBlob": "4a0050f47a832258d1c1851b9dffb53c391bff6f"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Grid.swift",
+      "gitBlob": "5b9e86e3390215af17e70f13a716a3c1af914a4a"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Group.swift",
+      "gitBlob": "cf255b9012220f7935801030c81f495a83a0695c"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/GroupBox.swift",
+      "gitBlob": "057542a274acd153c2c219a15b4b19e2dc36d991"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/HSplitView.swift",
+      "gitBlob": "820b7d02b96f94226f17341dff138c3fdf62d0ef"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/HStack.swift",
+      "gitBlob": "91e7d14bc21adf887484963f05e68e3cf64d23c8"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/HelpView.swift",
+      "gitBlob": "20140c1b2af30547226ba5c27f6209091a41bd28"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/IDView.swift",
+      "gitBlob": "856b2b23af69f428bd4d92c6ad2b6ed9a194e9fb"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Image.swift",
+      "gitBlob": "7d3abdc16caba41bec1cf3c8e937ad9718fcc512"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Label.swift",
+      "gitBlob": "0da46c2bc77739dfa2edaf7892947363293d0c5d"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/LabeledContent.swift",
+      "gitBlob": "35e6ed5dc129ac0af1ad30d1ace50a51ae97b39e"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/LazyHGrid.swift",
+      "gitBlob": "7e4c95a83deae810a3f89f61fd125c9aeeb2f216"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/LazyHStack.swift",
+      "gitBlob": "baa8a667335130c8422ddaf89c7ffb882bcb8d4e"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/LazyVGrid.swift",
+      "gitBlob": "31133acf9355d3e4f5124536a218dfc768d08de4"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/LazyVStack.swift",
+      "gitBlob": "1661c4a12a6af4f6caef5429eab6aa39597a8868"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/LinearGradient.swift",
+      "gitBlob": "abc5163ccb761a82a72e6c8946d0e2d4dc70ff85"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Link.swift",
+      "gitBlob": "0f581cae27d1a2450de5b1ca30efb35767af47bd"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/List.swift",
+      "gitBlob": "9ed6b4e99ace1291f0b13e53a392b4acb2bf5ecd"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/LocationButton.swift",
+      "gitBlob": "86eaaa97271d78e850eb9260e8e4e30856a8ef2b"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Map.swift",
+      "gitBlob": "c3def9eab63bc63c01b028db3ba3c6470b24436a"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/MapAnnotation.swift",
+      "gitBlob": "0eabdb86cad9e987cee9d93c7a32401b5cd903ba"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Menu.swift",
+      "gitBlob": "8d8ba3375e11ea8664d40dbb640d0d42a09b03da"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/MenuButton.swift",
+      "gitBlob": "6f131b2a7f399db3ca45e5be51890db715cc4d14"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/MultiDatePicker.swift",
+      "gitBlob": "763accce52efcb5d30427fd97409ad4907dff85b"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/NavigationDestination.swift",
+      "gitBlob": "a530026d77b21eb395565be1997c949d3507d14f"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/NavigationLink.swift",
+      "gitBlob": "45ad7318ae8e209f2c003905eed89134abd7dbf3"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/NavigationSplitView.swift",
+      "gitBlob": "0a6651b00e683b2770c3821ed08267eae10e48ec"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/NavigationStack.swift",
+      "gitBlob": "91a4ddba6fa72b74302046df517ef0f5baea61ff"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/NavigationView.swift",
+      "gitBlob": "5d85a312ae375c87be3c02d777e587f6212ad6b0"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/OptionalContent.swift",
+      "gitBlob": "d82a87a0822bb3ef223863bbc88f08ce3439572b"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/OutlineGroup.swift",
+      "gitBlob": "7e747d91bb9d11c54d72bd53ee087550af47780b"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Overlay.swift",
+      "gitBlob": "cf90be20e75d465d01e8abba6da5a943a512f481"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/PasteButton.swift",
+      "gitBlob": "f8b223e1d064786cb56101aa3463d6f7442891a4"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Picker.swift",
+      "gitBlob": "e663a7688a8cdb9573df6d14c6aa18f02bba5caf"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Popover.swift",
+      "gitBlob": "aa2f5b83e6f1423dda606294ec12c5cb84b28435"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/PopoverContent.swift",
+      "gitBlob": "96ba9395454cffcc3ed0b603f60d7651eafbcd1a"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ProgressView.swift",
+      "gitBlob": "451ad68d9f06ba924a4145dcca7343d0b300d57f"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/RadialGradient.swift",
+      "gitBlob": "5e854839eace0ec2e9c1d7605632f11d5e479ca4"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/SafeAreaInset.swift",
+      "gitBlob": "100ee225eec4774eaab463f186a031b4e79c8694"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ScrollView.swift",
+      "gitBlob": "cb3bd032dbbb14b2d6f507355553ce5f3e5d1165"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ScrollViewReader.swift",
+      "gitBlob": "5573ed8503af3fc72d1c0a09ab2a7685df44dc29"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Section.swift",
+      "gitBlob": "e855a3cb04773dfed9f5c54afd2c64b3a09ea0c9"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/SecureField.swift",
+      "gitBlob": "3deb55c98c81e03fb1bbe57a9ea978fbf3736c3d"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Shape.swift",
+      "gitBlob": "d858ed82e0c6ee4c8846ff0d27a0824983eecdbd"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ShareLink.swift",
+      "gitBlob": "68efd2eabdbc69790de39115d106ffa322bb6d0d"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Sheet.swift",
+      "gitBlob": "12a3104c8e396b24d5f6a8499bb60ddac0de54f9"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/SignInWithAppleButton.swift",
+      "gitBlob": "203c6def96cf283cda4d42c4021584ce084de112"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Slider.swift",
+      "gitBlob": "30c96f0992b5dbf906cbcd1d78888992ad5cafc8"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Spacer.swift",
+      "gitBlob": "c34e1588839f298305c376580e7ecc9aeb872f5a"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Stepper.swift",
+      "gitBlob": "ea9728f841b19f61cb9693c82cf91b7a05d9eaab"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/StyleConfiguration.swift",
+      "gitBlob": "166b25e9b11eb73ee1f4d2156d2661f0655cf824"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/SubscriptionView.swift",
+      "gitBlob": "d658c7e8b57bd3cf945d5f4851993e8d43e086da"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TabView.swift",
+      "gitBlob": "fd59f7cb4a59b6318d681ac238ce5ff24748faf2"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Text.swift",
+      "gitBlob": "f5e219654987853ca7393b2b4125f3a8646feb95"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TextAttributes.swift",
+      "gitBlob": "d863323a7c988782b98eb2fe435998c7ea41f9e7"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TextEditor.swift",
+      "gitBlob": "9bdf9d0320eea295005f800023bf44102fbe74a8"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TextField.swift",
+      "gitBlob": "da78e4ba2c730b3fe9b5a90439c280626b68aa45"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TimelineView.swift",
+      "gitBlob": "e9469be86b4ff175eedf3c1967b5c7f54a830eca"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Toggle.swift",
+      "gitBlob": "dab15ccb11d6a2723a47d598b7f85ea03236678a"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/Toolbar.swift",
+      "gitBlob": "dea075ca940940bc8b3865e93bfe97144875fc32"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TouchBar.swift",
+      "gitBlob": "359534526b4741e192352fe0058dd8999995eb33"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TreeView.swift",
+      "gitBlob": "bb9a33440c98939227bf9e2a20e4f1c01fd51bc1"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/TupleView.swift",
+      "gitBlob": "30d73cd5f9715249479d0d62c7982b48aea8aebe"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/UnaryViewAdaptor.swift",
+      "gitBlob": "6d4c66885f019efff84aed5befc8b017a0c697ae"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/VSplitView.swift",
+      "gitBlob": "a2fd54f4dd403e97fd3b2e345ab2bab62fea8617"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/VStack.swift",
+      "gitBlob": "ec1a269ef79a4ac01e8b09f405a36df12052bb55"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/VideoPlayer.swift",
+      "gitBlob": "30971cefb4427440ed9b7ff62f9acbe60b4f94fc"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ViewThatFits.swift",
+      "gitBlob": "314346b07af6e5c09f61f118e8275d6483d59584"
+    },
+    {
+      "path": "Sources/ViewInspector/SwiftUI/ZStack.swift",
+      "gitBlob": "6a27dfc5c16d98a1898c2022a7ced8bbf55e8562"
+    },
+    {
+      "path": "Sources/ViewInspector/ViewHosting.swift",
+      "gitBlob": "8fa6ad6e9f11e35b1e3d720e9c92e3493d041e35"
+    },
+    {
+      "path": "Sources/ViewInspector/ViewSearch.swift",
+      "gitBlob": "dd57a1c6b06826a2605edef9446abd5883b7c64b"
+    },
+    {
+      "path": "Sources/ViewInspector/ViewSearchIndex.swift",
+      "gitBlob": "afb0b462fbfe7dbfb095ffbd45348f9e919c66e3"
+    }
+  ]
+}

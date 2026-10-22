@@ -1,0 +1,10 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+Fetching https://github.com/nalexn/ViewInspector
+warning: 'viewinspector': skipping cache due to an error: Failed to clone repository https://github.com/nalexn/ViewInspector:
+    Cloning into bare repository '/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/.build/spm-cache/repositories/ViewInspector-8f6ae9a2'...
+    fatal: unable to access 'https://github.com/nalexn/ViewInspector/': Failed to connect to 127.0.0.1 port 18083 after 0 ms: Couldn't connect to server
+error: Failed to clone repository https://github.com/nalexn/ViewInspector:
+    Cloning into bare repository '/Users/david/Projects/apps/MeetPR-wt-coach-launch-hang/Modules/CoachKit/.build/repositories/ViewInspector-8f6ae9a2'...
+    fatal: unable to access 'https://github.com/nalexn/ViewInspector/': Failed to connect to 127.0.0.1 port 18083 after 0 ms: Couldn't connect to server

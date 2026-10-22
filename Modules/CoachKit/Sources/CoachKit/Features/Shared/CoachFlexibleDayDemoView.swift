@@ -8,6 +8,15 @@ import SwiftUI
 /// Launch-only fixture host; the normal coach Demo route is unchanged.
 @MainActor
 public struct CoachFlexibleDayDemoView: View {
+  /// Regression fixture injection through the real app root, not a replacement screen.
+  public static func launchHangRepositories() -> (
+    plans: any PlanRepository, studentPlans: any StudentPlanRepository
+  ) {
+    let repository = CoachFlexibleDayDemoRepository(
+      fixture: CoachFlexibleDayDemoFixture(now: Date()))
+    return (repository, repository)
+  }
+
   @State private var state = CoachFlexibleDayDemoState()
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 

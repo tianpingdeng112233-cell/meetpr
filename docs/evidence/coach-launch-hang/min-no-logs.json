@@ -1,0 +1,1 @@
+{"name":"min-no-logs","fixture":true,"extraArgs":["-coach-hang-one-student","-coach-hang-no-logs"],"exitCode":1,"output":"[DEBUG-coachhang] FAIL mainResponse>3s","watchdogWallMs":4857,"targets":0,"tapResponseMs":null}
