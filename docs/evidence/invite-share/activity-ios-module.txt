@@ -1,0 +1,574 @@
+error: emit-module command failed with exit code 1 (use -v to see invocation)
+sandbox-exec: sandbox_apply: Operation not permitted
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:5:20: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 3 |
+ 4 | @Model
+ 5 | public final class DraftPlanDay {
+   |                    `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var dayOfWeek: Int = 1
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:6:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 4 | @Model
+ 5 | public final class DraftPlanDay {
+ 6 |   public var id: UUID = UUID()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 7 |   public var dayOfWeek: Int = 1
+ 8 |   public var weekNumber: Int = 1
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:7:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 5 | public final class DraftPlanDay {
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var dayOfWeek: Int = 1
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 8 |   public var weekNumber: Int = 1
+ 9 |   public var sortOrder: Int = 0
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:8:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var dayOfWeek: Int = 1
+ 8 |   public var weekNumber: Int = 1
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 9 |   public var sortOrder: Int = 0
+10 |   public var assignedLiftFamilyRawValues: [String] = []
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:9:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 7 |   public var dayOfWeek: Int = 1
+ 8 |   public var weekNumber: Int = 1
+ 9 |   public var sortOrder: Int = 0
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+10 |   public var assignedLiftFamilyRawValues: [String] = []
+11 |   public var plan: DraftTrainingPlan?
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:10:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 8 |   public var weekNumber: Int = 1
+ 9 |   public var sortOrder: Int = 0
+10 |   public var assignedLiftFamilyRawValues: [String] = []
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+11 |   public var plan: DraftTrainingPlan?
+12 |
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:11:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 9 |   public var sortOrder: Int = 0
+10 |   public var assignedLiftFamilyRawValues: [String] = []
+11 |   public var plan: DraftTrainingPlan?
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+12 |
+13 |   @Relationship(deleteRule: .cascade, inverse: \DraftPlanExercise.day)
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:14:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+12 |
+13 |   @Relationship(deleteRule: .cascade, inverse: \DraftPlanExercise.day)
+14 |   public var draftExercises: [DraftPlanExercise] = []
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+15 |
+16 |   public init(
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:5:20: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 3 |
+ 4 | @Model
+ 5 | public final class DraftPlanExercise {
+   |                    `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var exerciseID: UUID = UUID()
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:6:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 4 | @Model
+ 5 | public final class DraftPlanExercise {
+ 6 |   public var id: UUID = UUID()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 7 |   public var exerciseID: UUID = UUID()
+ 8 |   public var isMainLift: Bool = true
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:7:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 5 | public final class DraftPlanExercise {
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var exerciseID: UUID = UUID()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 8 |   public var isMainLift: Bool = true
+ 9 |   public var sortOrder: Int = 0
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:8:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var exerciseID: UUID = UUID()
+ 8 |   public var isMainLift: Bool = true
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 9 |   public var sortOrder: Int = 0
+10 |   public var notes: String?
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:9:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 7 |   public var exerciseID: UUID = UUID()
+ 8 |   public var isMainLift: Bool = true
+ 9 |   public var sortOrder: Int = 0
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+10 |   public var notes: String?
+11 |   public var setsData: Data?
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:10:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 8 |   public var isMainLift: Bool = true
+ 9 |   public var sortOrder: Int = 0
+10 |   public var notes: String?
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+11 |   public var setsData: Data?
+12 |   public var day: DraftPlanDay?
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:11:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 9 |   public var sortOrder: Int = 0
+10 |   public var notes: String?
+11 |   public var setsData: Data?
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+12 |   public var day: DraftPlanDay?
+13 |
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:12:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+10 |   public var notes: String?
+11 |   public var setsData: Data?
+12 |   public var day: DraftPlanDay?
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+13 |
+14 |   public init(
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:5:20: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 3 |
+ 4 | @Model
+ 5 | public final class DraftTrainingPlan {
+   |                    `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var traineeID: UUID = UUID()
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:5:20: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 3 |
+ 4 | @Model
+ 5 | public final class DraftPlanExercise {
+   |                    `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var exerciseID: UUID = UUID()
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanExercise.swift:14:10: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+12 |   public var day: DraftPlanDay?
+13 |
+14 |   public init(
+   |          `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+15 |     id: UUID = UUID(),
+16 |     exerciseID: UUID,
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:5:20: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 3 |
+ 4 | @Model
+ 5 | public final class DraftTrainingPlan {
+   |                    `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var traineeID: UUID = UUID()
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:6:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 4 | @Model
+ 5 | public final class DraftTrainingPlan {
+ 6 |   public var id: UUID = UUID()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 7 |   public var traineeID: UUID = UUID()
+ 8 |   public var coachID: UUID?
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:7:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 5 | public final class DraftTrainingPlan {
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var traineeID: UUID = UUID()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 8 |   public var coachID: UUID?
+ 9 |   public var name: String = ""
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:8:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var traineeID: UUID = UUID()
+ 8 |   public var coachID: UUID?
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 9 |   public var name: String = ""
+10 |   public var startDate: Date = Date()
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:9:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 7 |   public var traineeID: UUID = UUID()
+ 8 |   public var coachID: UUID?
+ 9 |   public var name: String = ""
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+10 |   public var startDate: Date = Date()
+11 |   public var endDate: Date = Date()
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:10:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 8 |   public var coachID: UUID?
+ 9 |   public var name: String = ""
+10 |   public var startDate: Date = Date()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+11 |   public var endDate: Date = Date()
+12 |   public var planWeeks: Int = 1
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:11:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 9 |   public var name: String = ""
+10 |   public var startDate: Date = Date()
+11 |   public var endDate: Date = Date()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+12 |   public var planWeeks: Int = 1
+13 |   public var currentStepRawValue: Int = 0
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:12:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+10 |   public var startDate: Date = Date()
+11 |   public var endDate: Date = Date()
+12 |   public var planWeeks: Int = 1
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+13 |   public var currentStepRawValue: Int = 0
+14 |   public var lastSavedAt: Date = Date()
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:13:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+11 |   public var endDate: Date = Date()
+12 |   public var planWeeks: Int = 1
+13 |   public var currentStepRawValue: Int = 0
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+14 |   public var lastSavedAt: Date = Date()
+15 |   public var progressionRulesData: Data?
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:14:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+12 |   public var planWeeks: Int = 1
+13 |   public var currentStepRawValue: Int = 0
+14 |   public var lastSavedAt: Date = Date()
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+15 |   public var progressionRulesData: Data?
+16 |
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:15:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+13 |   public var currentStepRawValue: Int = 0
+14 |   public var lastSavedAt: Date = Date()
+15 |   public var progressionRulesData: Data?
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+16 |
+17 |   @Relationship(deleteRule: .cascade, inverse: \DraftPlanDay.plan)
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:18:14: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+16 |
+17 |   @Relationship(deleteRule: .cascade, inverse: \DraftPlanDay.plan)
+18 |   public var draftDays: [DraftPlanDay] = []
+   |              `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+19 |
+20 |   public init(
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:16:10: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+14 |   public var draftExercises: [DraftPlanExercise] = []
+15 |
+16 |   public init(
+   |          `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+17 |     id: UUID = UUID(),
+18 |     dayOfWeek: Int,
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:18:14: error: external macro implementation type 'SwiftDataMacros.RelationshipPropertyMacro' could not be found for macro 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+16 |
+17 |   @Relationship(deleteRule: .cascade, inverse: \DraftPlanDay.plan)
+18 |   public var draftDays: [DraftPlanDay] = []
+   |              `- error: external macro implementation type 'SwiftDataMacros.RelationshipPropertyMacro' could not be found for macro 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+19 |
+20 |   public init(
+
+SwiftData.Relationship:3:30: note: 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(peer) public macro Relationship(_ options: Schema.Relationship.Option..., deleteRule: Schema.Relationship.DeleteRule = .nullify, minimumModelCount: Int? = 0, maximumModelCount: Int? = 0, originalName: String? = nil, inverse: AnyKeyPath? = nil, hashModifier: String? = nil) = #externalMacro(module: "SwiftDataMacros", type: "RelationshipPropertyMacro")
+  |                              `- note: 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftTrainingPlan.swift:20:10: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+18 |   public var draftDays: [DraftPlanDay] = []
+19 |
+20 |   public init(
+   |          `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+21 |     id: UUID = UUID(),
+22 |     traineeID: UUID,
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:5:20: error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 3 |
+ 4 | @Model
+ 5 | public final class DraftPlanDay {
+   |                    `- error: external macro implementation type 'SwiftDataMacros.PersistentModelMacro' could not be found for macro 'Model()'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+ 6 |   public var id: UUID = UUID()
+ 7 |   public var dayOfWeek: Int = 1
+
+SwiftData.Model:3:373: note: 'Model()' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(member, conformances: Observable, PersistentModel, Sendable, names: named(_$backingData), named(persistentBackingData), named(schemaMetadata), named(init), named(_$observationRegistrar), named(_SwiftDataNoType), named(access), named(withMutation)) @attached(memberAttribute) @attached(extension, conformances: Observable, PersistentModel, Sendable) public macro Model() = #externalMacro(module: "SwiftDataMacros", type: "PersistentModelMacro")
+  |                                                                                                                                                                                                                                                                                                                                                                                     `- note: 'Model()' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Drafts/DraftPlanDay.swift:14:14: error: external macro implementation type 'SwiftDataMacros.RelationshipPropertyMacro' could not be found for macro 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+12 |
+13 |   @Relationship(deleteRule: .cascade, inverse: \DraftPlanExercise.day)
+14 |   public var draftExercises: [DraftPlanExercise] = []
+   |              `- error: external macro implementation type 'SwiftDataMacros.RelationshipPropertyMacro' could not be found for macro 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
+15 |
+16 |   public init(
+
+SwiftData.Relationship:3:30: note: 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)' declared here
+1 | @available(swift 5.9)
+2 | @available(macOS 14, iOS 17, tvOS 17, watchOS 10, *)
+3 | @attached(peer) public macro Relationship(_ options: Schema.Relationship.Option..., deleteRule: Schema.Relationship.DeleteRule = .nullify, minimumModelCount: Int? = 0, maximumModelCount: Int? = 0, originalName: String? = nil, inverse: AnyKeyPath? = nil, hashModifier: String? = nil) = #externalMacro(module: "SwiftDataMacros", type: "RelationshipPropertyMacro")
+  |                              `- note: 'Relationship(_:deleteRule:minimumModelCount:maximumModelCount:originalName:inverse:hashModifier:)' declared here
+
+Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationActivityItemSource.swift:7:60: warning: conformance of 'CoachInvitationActivityItemSource' to protocol 'UIActivityItemSource' crosses into main actor-isolated code and can cause data races; this is an error in the Swift 6 language mode [#ConformanceIsolation]
+ 5 |   /// Share extensions receive one URL; text-friendly system activities receive one message.
+ 6 |   @MainActor
+ 7 |   final class CoachInvitationActivityItemSource: NSObject, UIActivityItemSource {
+   |               |                                            |- warning: conformance of 'CoachInvitationActivityItemSource' to protocol 'UIActivityItemSource' crosses into main actor-isolated code and can cause data races; this is an error in the Swift 6 language mode [#ConformanceIsolation]
+   |               |                                            |- note: isolate this conformance to the main actor with '@MainActor'
+   |               |                                            `- note: turn data races into runtime errors with '@preconcurrency'
+   |               `- note: mark all declarations used in the conformance 'nonisolated'
+ 8 |     private let inviteURL: URL
+ 9 |     private let message: String
+   :
+17 |     }
+18 |
+19 |     func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController)
+   |          `- note: main actor-isolated instance method 'activityViewControllerPlaceholderItem' cannot satisfy nonisolated requirement
+20 |       -> Any
+21 |     {
+   :
+23 |     }
+24 |
+25 |     func activityViewController(
+   |          `- note: main actor-isolated instance method 'activityViewController(_:itemForActivityType:)' cannot satisfy nonisolated requirement
+26 |       _ activityViewController: UIActivityViewController,
+27 |       itemForActivityType activityType: UIActivity.ActivityType?
+   :
+35 |     }
+36 |
+37 |     func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController)
+   |          `- note: main actor-isolated instance method 'activityViewControllerLinkMetadata' cannot satisfy nonisolated requirement
+38 |       -> LPLinkMetadata?
+39 |     {
+   :
+48 |     }
+49 |
+50 |     func activityViewController(
+   |          `- note: main actor-isolated instance method 'activityViewController(_:subjectForActivityType:)' cannot satisfy nonisolated requirement
+51 |       _ activityViewController: UIActivityViewController,
+52 |       subjectForActivityType activityType: UIActivity.ActivityType?
+
+Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+
+[#ConformanceIsolation]: <https://docs.swift.org/compiler/documentation/diagnostics/conformance-isolation>
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>

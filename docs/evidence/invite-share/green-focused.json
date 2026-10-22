@@ -1,0 +1,51 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\n🧪 Swift Package Test\n\nWarnings (4):\n\n  ⚠ static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15\n\n  ⚠ stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26\n\n  ⚠ mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52\n\n  ⚠ mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81\n\n✅ 5 tests passed, 0 failed, 0 skipped (⏱️ 60.3s)\n  └ Files:\n     └── ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-24-23-826Z_pid96140_2fe98ae0.log — Build Logs\n"
+    }
+  ],
+  "structuredContent": {
+    "schema": "xcodebuildmcp.output.test-result",
+    "schemaVersion": "2",
+    "didError": false,
+    "error": null,
+    "data": {
+      "summary": {
+        "status": "SUCCEEDED",
+        "durationMs": 60331,
+        "counts": {
+          "passed": 5,
+          "failed": 0,
+          "skipped": 0
+        },
+        "target": "swift-package"
+      },
+      "artifacts": {
+        "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-24-23-826Z_pid96140_2fe98ae0.log"
+      },
+      "diagnostics": {
+        "warnings": [
+          {
+            "message": "static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15"
+          },
+          {
+            "message": "stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26"
+          },
+          {
+            "message": "mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52"
+          },
+          {
+            "message": "mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81"
+          }
+        ],
+        "errors": [],
+        "testFailures": []
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\n🔨 Build\n\n✅ Build succeeded. (⏱️ 98.5s)\n  └ Files:\n     └── ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/build_sim_2026-10-22T03-33-12-281Z_pid96140_67a0553c.log — Build Logs\n\nNext steps:\n1. Get built app path in simulator derived data: get_sim_app_path({ simulatorId: \"BBE9EB95-01DE-452E-866C-3DD0B62F9BDA\", scheme: \"MeetPR-Demo\", platform: \"iOS Simulator\", derivedDataPath: \"/Users/david/Projects/apps/MeetPR-wt-invite-share/.build/invite-share-derived\" })\n"
+    }
+  ],
+  "structuredContent": {
+    "schema": "xcodebuildmcp.output.build-result",
+    "schemaVersion": "3",
+    "didError": false,
+    "error": null,
+    "data": {
+      "summary": {
+        "status": "SUCCEEDED",
+        "durationMs": 98471,
+        "target": "simulator"
+      },
+      "artifacts": {
+        "buildLogPath": "~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/build_sim_2026-10-22T03-33-12-281Z_pid96140_67a0553c.log"
+      },
+      "diagnostics": {
+        "warnings": [],
+        "errors": []
+      }
+    },
+    "nextSteps": [
+      "Get built app path in simulator derived data: get_sim_app_path({ simulatorId: \"BBE9EB95-01DE-452E-866C-3DD0B62F9BDA\", scheme: \"MeetPR-Demo\", platform: \"iOS Simulator\", derivedDataPath: \"/Users/david/Projects/apps/MeetPR-wt-invite-share/.build/invite-share-derived\" })"
+    ]
+  }
+}
