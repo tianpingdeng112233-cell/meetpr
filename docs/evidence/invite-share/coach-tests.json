@@ -1,0 +1,275 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\n🧪 Swift Package Test\n\nWarnings (2):\n\n  ⚠ static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15\n\n  ⚠ stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26\n\n✅ 476 tests passed, 0 failed, 0 skipped (⏱️ 49.8s)\n  └ Files:\n     └── ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-26-03-538Z_pid96140_a8cfbf51.log — Build Logs\n"
+    }
+  ],
+  "structuredContent": {
+    "schema": "xcodebuildmcp.output.test-result",
+    "schemaVersion": "2",
+    "didError": false,
+    "error": null,
+    "data": {
+      "summary": {
+        "status": "SUCCEEDED",
+        "durationMs": 49824,
+        "counts": {
+          "passed": 476,
+          "failed": 0,
+          "skipped": 0
+        },
+        "target": "swift-package"
+      },
+      "artifacts": {
+        "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-26-03-538Z_pid96140_a8cfbf51.log"
+      },
+      "diagnostics": {
+        "warnings": [
+          {
+            "message": "static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15"
+          },
+          {
+            "message": "stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26"
+          }
+        ],
+        "errors": [],
+        "testFailures": []
+      },
+      "testCases": [
+        {
+          "test": "returns no rows when every source is empty or non-actionable",
+          "status": "passed",
+          "durationMs": 878
+        },
+        {
+          "test": "orders videos, unread, missed training, then applications",
+          "status": "passed",
+          "durationMs": 878
+        },
+        {
+          "test": "an empty current week never falls back to whole-plan totals",
+          "status": "passed",
+          "durationMs": 249
+        },
+        {
+          "test": "the same retained dates remap when Sunday rolls into Monday",
+          "status": "passed",
+          "durationMs": 249
+        },
+        {
+          "test": "column mapping uses the supplied positive or negative time zone",
+          "status": "passed",
+          "durationMs": 249
+        },
+        {
+          "test": "aggregates real plan dates into Monday through Sunday cells",
+          "status": "passed",
+          "durationMs": 249
+        },
+        {
+          "test": "current-week training days produce the expected progress and cells",
+          "status": "passed",
+          "durationMs": 249
+        },
+        {
+          "test": "ISO week and columns stay correct across a calendar-year boundary",
+          "status": "passed",
+          "durationMs": 249
+        },
+        {
+          "test": "exercise display uses catalog English without changing the canonical name",
+          "status": "passed",
+          "durationMs": 247
+        },
+        {
+          "test": "critical Chinese source strings stay byte-exact",
+          "status": "passed",
+          "durationMs": 247
+        },
+        {
+          "test": "a log outside the pairing window never counts as completion",
+          "status": "passed",
+          "durationMs": 243
+        },
+        {
+          "test": "completion is re-decided per calendar, not frozen at fetch time",
+          "status": "passed",
+          "durationMs": 243
+        },
+        {
+          "test": "post-send navigation resolves from the latest remaining queue",
+          "status": "passed",
+          "durationMs": 217
+        },
+        {
+          "test": "missing RPE stays absent instead of becoming zero",
+          "status": "passed",
+          "durationMs": 216
+        },
+        {
+          "test": "RPE formats whole and half values without decimal noise",
+          "status": "passed",
+          "durationMs": 216
+        },
+        {
+          "test": "unlinked video resolves no set-info card",
+          "status": "passed",
+          "durationMs": 216
+        },
+        {
+          "test": "global queue advances across students and wraps after its final item",
+          "status": "passed",
+          "durationMs": 216
+        },
+        {
+          "test": "pending video badge reuses resolved set data and display-ready ordinal",
+          "status": "passed",
+          "durationMs": 216
+        },
+        {
+          "test": "empty queue has no position or post-send next item",
+          "status": "passed",
+          "durationMs": 216
+        },
+        {
+          "test": "zero-based set index displays as one-based",
+          "status": "passed",
+          "durationMs": 216
+        },
+        {
+          "test": "formats the mockup month-day and weekday with an explicit calendar",
+          "status": "passed",
+          "durationMs": 212
+        },
+        {
+          "test": "active and in-evaluation students read as 活跃",
+          "status": "passed",
+          "durationMs": 212
+        },
+        {
+          "test": "abnormal students read as 待关注, not 活跃",
+          "status": "passed",
+          "durationMs": 212
+        },
+        {
+          "test": "unknown status shows no subtitle instead of claiming active",
+          "status": "passed",
+          "durationMs": 212
+        },
+        {
+          "test": "native interpolation preserves byte-exact Chinese rendering",
+          "status": "passed",
+          "durationMs": 202
+        },
+        {
+          "test": "native plural interpolation selects English variants at runtime",
+          "status": "passed",
+          "durationMs": 198
+        },
+        {
+          "test": "count strings provide an English singular variation",
+          "status": "passed",
+          "durationMs": 252
+        },
+        {
+          "test": "every countable English value is plural-aware",
+          "status": "passed",
+          "durationMs": 254
+        },
+        {
+          "test": "every string has complete Chinese and English translations",
+          "status": "passed",
+          "durationMs": 259
+        },
+        {
+          "test": "English catalog does not contain generated placeholder labels",
+          "status": "passed",
+          "durationMs": 267
+        },
+        {
+          "test": "logout message does not prescribe a login identity",
+          "status": "passed",
+          "durationMs": 274
+        },
+        {
+          "test": "single-student video list renders loading, failure, and empty distinctly",
+          "status": "passed",
+          "durationMs": 1011
+        },
+        {
+          "test": "planning step zero replaces empty student sections with guidance",
+          "status": "passed",
+          "durationMs": 2504
+        },
+        {
+          "test": "roster shows loading before empty and distinguishes search misses",
+          "status": "passed",
+          "durationMs": 3029
+        },
+        {
+          "test": "dashboard with zero students shows invitation guidance",
+          "status": "passed",
+          "durationMs": 3834
+        },
+        {
+          "test": "receiving inbox never renders empty before its initial load finishes",
+          "status": "passed",
+          "durationMs": 4011
+        },
+        {
+          "test": "student detail replaces the zero-progress plan shell with guidance",
+          "status": "passed",
+          "durationMs": 4086
+        },
+        {
+          "test": "empty student list stays alive while the global workbench advances",
+          "status": "passed",
+          "durationMs": 3517
+        },
+        {
+          "test": "missing RPE card renders the localized em dash",
+          "status": "passed",
+          "durationMs": 3565
+        },
+        {
+          "test": "planned first set log renders hash one",
+          "status": "passed",
+          "durationMs": 5044
+        },
+        {
+          "test": "free first set log renders hash one",
+          "status": "passed",
+          "durationMs": 5044
+        },
+        {
+          "test": "marker write failures surface instead of silently dropping the action",
+          "status": "passed",
+          "durationMs": 16486
+        },
+        {
+          "test": "markers resolved for a previous video never render under a newer one",
+          "status": "passed",
+          "durationMs": 16523
+        },
+        {
+          "test": "rapid item changes reject stale playback and set-log results",
+          "status": "passed",
+          "durationMs": 16510
+        },
+        {
+          "test": "video set information distinguishes unlinked videos from load failures",
+          "status": "passed",
+          "durationMs": 16521
+        },
+        {
+          "test": "marker actions update the current item and marker load failures stay hidden",
+          "status": "passed",
+          "durationMs": 16514
+        }
+      ]
+    }
+  }
+}

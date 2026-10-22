@@ -15386,6 +15386,91 @@
           }
         }
       }
+    },
+    "coach.invites.shareTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach {0} invited you to train with them on MeetPR"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} 教练邀请你在 MeetPR 跟练训练计划"
+          }
+        }
+      }
+    },
+    "coach.invites.shareTitleFallback": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your coach invited you to train with them on MeetPR"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的教练邀请你在 MeetPR 跟练训练计划"
+          }
+        }
+      }
+    },
+    "coach.invites.shareToStudent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share with student"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分享给学员"
+          }
+        }
+      }
+    },
+    "coach.invites.copyMessage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy invite message"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制邀请语"
+          }
+        }
+      }
+    },
+    "coach.invites.manage": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "管理"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -26,29 +26,7 @@ public struct PrimaryButton: View {
 
   public var body: some View {
     Button(action: handleTap) {
-      VStack(spacing: MeetPRSpacing.zero) {
-        if isLoading {
-          Rectangle()
-            .fill(Color.MeetPR.gold500)
-            .frame(height: 1)
-        }
-
-        Text(title)
-          .font(Font.MeetPR.body(size: MeetPRFontMetrics.size16, weight: .semibold))
-          .foregroundStyle(Color.MeetPR.textSecondary)
-          .lineLimit(2)
-          .multilineTextAlignment(.center)
-          .padding(.horizontal, MeetPRSpacing.lg)
-          .padding(.vertical, MeetPRSpacing.point14)
-          .frame(maxWidth: isFullWidth ? .infinity : nil)
-          .frame(minHeight: 44)
-      }
-      .background(Color.MeetPR.surfaceCard)
-      .overlay {
-        RoundedRectangle(cornerRadius: MeetPRRadius.pill)
-          .stroke(Color.MeetPR.borderDefault, lineWidth: 1)
-      }
-      .clipShape(.rect(cornerRadius: MeetPRRadius.pill))
+      PrimaryButtonLabel(title, isLoading: isLoading, isFullWidth: isFullWidth)
     }
     .buttonStyle(PressScaleButtonStyle(isDisabled: isDisabled || isLoading))
     .disabled(isDisabled || isLoading)

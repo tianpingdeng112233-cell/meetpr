@@ -1,0 +1,6 @@
+Linting Swift files at paths Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationMessage.swift, Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationActions.swift, Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationActivitySheet.swift, Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationMessageTests.swift
+Linting 'CoachInvitationActions.swift' (1/4)
+Linting 'CoachInvitationMessageTests.swift' (4/4)
+Linting 'CoachInvitationActivitySheet.swift' (2/4)
+Linting 'CoachInvitationMessage.swift' (3/4)
+Done linting! Found 0 violations, 0 serious in 4 files.

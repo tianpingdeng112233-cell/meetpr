@@ -18,7 +18,7 @@ import Testing
       code: "XK7MPQ2RVT", coachName: nil, buildTrack: .global, baseURL: base) == "XK7MPQ2RVT")
 }
 
-private func invitationBundle() throws -> Bundle {
+private func invitationBundle(language: String = "en") throws -> Bundle {
   // SwiftPM copies xcstrings without compiling them; use the real catalog in a temporary bundle.
   let source = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
     .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
@@ -27,10 +27,13 @@ private func invitationBundle() throws -> Bundle {
     JSONSerialization.jsonObject(with: Data(contentsOf: source)) as? [String: Any])
   let strings = try #require(catalog["strings"] as? [String: Any])
   var translated: [String: String] = [:]
-  for key in ["coach.invites.message", "coach.invites.fallbackName"] {
+  for key in [
+    "coach.invites.message", "coach.invites.fallbackName", "coach.invites.shareTitle",
+    "coach.invites.shareTitleFallback",
+  ] {
     let entry = try #require(strings[key] as? [String: Any])
     let languages = try #require(entry["localizations"] as? [String: Any])
-    let english = try #require(languages["en"] as? [String: Any])
+    let english = try #require(languages[language] as? [String: Any])
     let unit = try #require(english["stringUnit"] as? [String: String])
     translated[key] = unit["value"]
   }
@@ -41,4 +44,45 @@ private func invitationBundle() throws -> Bundle {
     fromPropertyList: translated, format: .xml, options: 0)
   try data.write(to: directory.appending(path: "Localizable.strings"))
   return try #require(Bundle(url: directory))
+}
+
+@Test func inviteURLUsesBackendBaseAndUngroupedCode() throws {
+  let base = try #require(URL(string: "https://example.com/backend/"))
+  let url = CoachInvitationMessage.inviteURL(code: "XK7MPQ2RVT", baseURL: base)
+  #expect(url.absoluteString == "https://example.com/backend/i/XK7MPQ2RVT")
+  let fixture = try invitationBundle()
+  defer { try? FileManager.default.removeItem(at: fixture.bundleURL) }
+  #expect(
+    CoachInvitationMessage.text(
+      code: "XK7MPQ2RVT", coachName: nil, buildTrack: .china, baseURL: base,
+      bundle: fixture
+    ).contains(url.absoluteString))
+}
+
+@Test(arguments: ["en", "zh-Hans"])
+func inviteShareTitleUsesTrimmedCoachName(language: String) throws {
+  let fixture = try invitationBundle(language: language)
+  defer { try? FileManager.default.removeItem(at: fixture.bundleURL) }
+  let locale = Locale(identifier: language)
+  #expect(
+    CoachInvitationMessage.shareTitle(
+      coachName: "  Alex  ", locale: locale, bundle: fixture)
+      == (language == "en"
+        ? "Coach Alex invited you to train with them on MeetPR" : "Alex 教练邀请你在 MeetPR 跟练训练计划"))
+}
+
+@Test(arguments: ["en", "zh-Hans"])
+func inviteShareTitleUsesLocalizedFallback(language: String) throws {
+  let fixture = try invitationBundle(language: language)
+  defer { try? FileManager.default.removeItem(at: fixture.bundleURL) }
+  let locale = Locale(identifier: language)
+  for name in [nil, "", "  \n "] as [String?] {
+    #expect(
+      CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture)
+        == (language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划"))
+    #expect(
+      CoachInvitationMessage.text(
+        code: "XK7MPQ2RVT", coachName: name, buildTrack: .global) == "XK7MPQ2RVT")
+  }
 }

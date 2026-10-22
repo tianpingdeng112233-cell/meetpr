@@ -1,0 +1,22 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-22 07:41:02.043.
+Test Suite 'CoachKitPackageTests.xctest' started at 2026-10-22 07:41:02.045.
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 07:41:02.045.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-22 07:41:02.045.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test inviteShareTitleUsesTrimmedNameAndLocalizedFallback(language:) started.
+◇ Test case passing 1 argument language → "en" to inviteShareTitleUsesTrimmedNameAndLocalizedFallback(language:) started.
+◇ Test case passing 1 argument language → "zh-Hans" to inviteShareTitleUsesTrimmedNameAndLocalizedFallback(language:) started.
+✘ Test inviteShareTitleUsesTrimmedNameAndLocalizedFallback(language:) recorded an issue with 1 argument language → "zh-Hans" at CoachInvitationMessageTests.swift:64:3: Expectation failed: (CoachInvitationMessage.shareTitle(
+      coachName: "  Alex  ", locale: locale, bundle: fixture) → "Alex邀请你加入 MeetPR") == ((language == "en"
+        ? "Coach Alex invited you to train with them on MeetPR" : "Alex 教练邀请你在 MeetPR 跟练训练计划") → "Alex 教练邀请你在 MeetPR 跟练训练计划")
+✘ Test inviteShareTitleUsesTrimmedNameAndLocalizedFallback(language:) recorded an issue with 1 argument language → "en" at CoachInvitationMessageTests.swift:64:3: Expectation failed: (CoachInvitationMessage.shareTitle(
+      coachName: "  Alex  ", locale: locale, bundle: fixture) → "Alex invited you to MeetPR") == ((language == "en"
+        ? "Coach Alex invited you to train with them on MeetPR" : "Alex 教练邀请你在 MeetPR 跟练训练计划") → "Coach Alex invited you to train with them on MeetPR")
+✘ Test inviteShareTitleUsesTrimmedNameAndLocalizedFallback(language:) with 2 test cases failed after 0.018 seconds with 2 issues.
+✘ Test run with 1 test in 0 suites failed after 0.019 seconds with 2 issues.

@@ -1,3 +1,5 @@
+- 2026-10-22 未提交（`fix/invite-share-wechat`，P1）— 按 David 拍板更新中英分享标题，缺名/空白名使用独立整句 fallback；完成或取消分享经 MainActor 清除 `isSharing`。保留上一轮单 URL 分享实现。有名与缺名分别先红后绿，CoachKit macOS 477 测试、4 文件 strict format/lint、diff check 通过；关闭回调无 macOS UIKit seam，未硬造单测；iOS 编译/真机交 Opus，未 commit/push。[证据](evidence/invite-share/TITLE-DISMISS-VERIFICATION.md)。
+
 ## 2026-10-21 · P0 教练冷启动卡顿（开发修复与自测完成，未提交）
 
 - 工作树 `MeetPR-wt-coach-launch-hang` / `fix/coach-launch-hang`，基线 `b2afd513`。David 明确要求不 commit/push、不改变导航/tab/视觉；本条只记录开发取证，不更新发布正典。
@@ -1605,3 +1607,24 @@ David 本轮直接授权保留上一轮工作区、完成全量测试和模拟�
 - 环境偏差已披露并只读审计：`build_run_sim` 未应用 localhost env，修正前的合成邮箱操作误请求国内 staging，确认新增注册验证码3条；同一邮箱新增重置码0条、两个合成邮箱新增 users 0条（2026-10-17 04:30 UTC 之后）。未提交注册/重置密码，未清理或回滚远端。邮件投递状态未核实。显式 `launch_app_sim(env:)` 并核对本地请求日志后重拍截图。详细边界、时间和私有原始记录指针见证据 README。
 - 真实邮件、双端真实找回密码、beta24已登录升级由 David 按最新卡手测；staging全链路与旧账号数据留主流程部署批准后执行。本轮未发布。
 - 补证完成：Global / Global 配置 Xcode 编译191.1s通过；Apple/Google/邮箱入口、Global无粘贴/无分享、复制纯码已亲看。CN整段消息/裸链接/无关文本粘贴、教练两处复制和系统分享预览都有实际模拟器图，索引见上述README。裸链接通过姓名框本地中转剪贴板，未提交绑定。后续全链路仍以部署后验收为准。
+
+
+## 2026-10-22 · P0 教练码微信分享（方案 A，未提交）
+
+- 工作树 `MeetPR-wt-invite-share` / 分支 `fix/invite-share-wechat`，基于 `origin/release/1.0 @ b2afd513`；David 直接批准方案 A。未 commit/push，未改发布台账或 build 号。
+- CN 改用邀请 URL 作为 ShareLink item，完整邀请语作 message，双语标题与既有 App 图标作预览；inviteURL 与复制邀请语共用链接源，缺名用既有 fallback。新增四个中英 xcstrings key。
+- CN「我的」永久码卡片改为独立管理入口、满宽分享/复制邀请语按钮；管理页同序按钮，重新生成移至右上菜单并保留二次确认。Global 保留原布局与裸码复制；无永久码/加载/失败沿用旧分支。
+- 新增仅 Demo 的 `-demo-invite-share-cn` / `-demo-invite-share-dark` 参数；PrimaryButton 抽出同样式 label 供原生 ShareLink 使用，不嵌套按钮。
+- 先红后绿：新增 4 项测试，含中英参数化标题/fallback、URL 同源、ViewInspector 按钮顺序及 Global 无分享；定向 5 项通过。全量 CoachKit **476** + DesignSystem **73** = **549** 通过；MeetPR-Demo / Demo 构建成功、**0 error**；10 个 Swift 文件 swift-format / SwiftLint 通过，diff check 通过。
+- 中文浅/深色卡片、管理页、两处分享面板、菜单共 10 张截图，另有重新生成确认图，均已亲看。原始结果、截图、复现参数和开发自审：[证据索引](evidence/invite-share/README.md)。
+- 环境恢复：DesignSystem 首次依赖下载超时后复用本 worktree 既有 ViewInspector 离线通过；Demo 冷构建超过 MCP 等待窗口后后台继续，最终增量构建取得成功结果。
+- 未验：微信真机扩展发现、发送和接收。模拟器只能验证 URL 分享面板与预览，不能代替真机验收；正式收货留 David / Opus。
+
+
+## 2026-10-22 · P0 invite-share H1 单 item 定向修改（未提交，验收未完成）
+
+- 工作树 `MeetPR-wt-invite-share` / `fix/invite-share-wechat`，基线 `e65a9a6a`（PR #374）；按本轮任务不 commit/push，不改发布台账。
+- iOS 改为 `UIActivityViewController` + 单个 item source；微信等扩展返回邀请 URL，message/mail/copyToPasteboard 返回完整邀请语。placeholder/metadata/subject 沿用同一邀请 URL、标题及 InviteShareIcon；两处按钮与布局、复制和 Global 分支保留。
+- 新增 1 项 iOS 回调测试：旧模块下缺少 item source 编译红；新源与新测试窄范围 iOS typecheck exit 0，无诊断。**新增测试尚未实际运行，不记为红→绿完成。** macOS CoachKit 全量 476 项通过（iOS 新测试被条件编译排除）；4 文件 swift-format/SwiftLint 通过，diff check 通过。Standards / Spec 独立只读审查均无未决代码问题。
+- 验证阻塞：本会话无 XcodeBuildMCP；CLI Demo build exit 65（Missing package product），CoreSimulator connection refused，未能运行新增 iOS 测试或生成 `zh-light-share-activity.jpg`，未确认本轮预览标题/图标。不得沿用上一轮成功证据充数。
+- **H1 状态：代码已改、微信真机未验。** 不宣布微信修好；微信真机环仍由 Opus 执行。详细命令、原始输出及未完成 gate：[本轮证据](evidence/invite-share/ACTIVITY-VERIFICATION.md)。

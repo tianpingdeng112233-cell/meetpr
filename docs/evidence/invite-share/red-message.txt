@@ -1,0 +1,4 @@
+2026-10-22: XcodeBuildMCP swift_package_test CoachKit filter inviteURLUsesBackend|inviteShareTitle|chinaInviteCopy
+FAILED (286.9s), before implementation.
+CoachInvitationMessageTests.swift:48: no member inviteURL
+CoachInvitationMessageTests.swift:62,67: no member shareTitle

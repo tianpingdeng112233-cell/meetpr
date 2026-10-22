@@ -1,0 +1,37 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\n🧪 Swift Package Test\n\nErrors (2):\n\n  ✗ warning: 'viewinspector': skipping cache due to an error: Couldn’t fetch updates from remote repositories:\n    fatal: unable to access 'https://github.com/nalexn/ViewInspector/': Failed to connect to github.com port 443 after 75017 ms: Couldn't connect to server\n\n  ✗ Failed to clone repository https://github.com/nalexn/ViewInspector:\n    Cloning into bare repository '/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/DesignSystem/.build/repositories/ViewInspector-8f6ae9a2'...\n    fatal: unable to access 'https://github.com/nalexn/ViewInspector/': Failed to connect to github.com port 443 after 75015 ms: Couldn't connect to server\n\n❌ Test failed. (⏱️ 151.7s)\n  └ Files:\n     └── ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-26-53-405Z_pid96140_35a378c8.log — Build Logs\n"
+    }
+  ],
+  "structuredContent": {
+    "schema": "xcodebuildmcp.output.test-result",
+    "schemaVersion": "2",
+    "didError": true,
+    "error": "Tests failed",
+    "data": {
+      "summary": {
+        "status": "FAILED",
+        "durationMs": 151668,
+        "target": "swift-package"
+      },
+      "artifacts": {
+        "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-26-53-405Z_pid96140_35a378c8.log"
+      },
+      "diagnostics": {
+        "warnings": [],
+        "errors": [
+          {
+            "message": "warning: 'viewinspector': skipping cache due to an error: Couldn’t fetch updates from remote repositories:\nfatal: unable to access 'https://github.com/nalexn/ViewInspector/': Failed to connect to github.com port 443 after 75017 ms: Couldn't connect to server"
+          },
+          {
+            "message": "Failed to clone repository https://github.com/nalexn/ViewInspector:\nCloning into bare repository '/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/DesignSystem/.build/repositories/ViewInspector-8f6ae9a2'...\nfatal: unable to access 'https://github.com/nalexn/ViewInspector/': Failed to connect to github.com port 443 after 75015 ms: Couldn't connect to server"
+          }
+        ],
+        "testFailures": []
+      }
+    }
+  },
+  "isError": true
+}
