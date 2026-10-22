@@ -1,0 +1,3 @@
+Source: .build/094-keychain-status.log
+SecItemAdd: 100001 UNIX[Operation not permitted]
+SecItemDelete: -25300

@@ -1,0 +1,88 @@
+Source: .build/094-tests/ChatUI.log
+Build complete! (43.62s)
+✔ Test "conversation timeline shows loading before the first empty state" passed after 0.029 seconds.
+✔ Test inMemoryOpenConversationIsIdempotent() passed after 0.030 seconds.
+✔ Test inMemoryUnreadAggregationUsesCurrentUserPerspective() passed after 0.030 seconds.
+✔ Test "conversation empty-state copy is localized in Chinese and English" passed after 0.031 seconds.
+✔ Test missingNewlineHasNoNoteArea() passed after 0.030 seconds.
+✔ Test footerCopyReusesDeliveredAndReadStates() passed after 0.030 seconds.
+✔ Test explicitEmptyNoteIsPreservedAsEmptyString() passed after 0.030 seconds.
+✔ Test inMemoryMarkReadIsMonotonic() passed after 0.031 seconds.
+✔ Test inMemorySendSetRefPreservesStructuredCardPayload() passed after 0.031 seconds.
+✔ Test confirmationCopyNeverCallsAPlannedSetARecord() passed after 0.032 seconds.
+✔ Test chatImageDownsamplerRejectsInvalidImageData() passed after 0.032 seconds.
+✔ Test inMemorySendAppendsAndUpdatesConversation() passed after 0.004 seconds.
+✔ Test "component preserves display-ready set ordinals without incrementing" passed after 0.003 seconds.
+✔ Test "optional fields disappear without placeholder content" passed after 0.003 seconds.
+✔ Test setNumberIsRenderedWithoutOffset() passed after 0.032 seconds.
+✔ Test logoutDropsUnsentStagedIntent() passed after 0.025 seconds.
+✔ Test notePreservesEveryCharacterAfterFirstNewline() passed after 0.033 seconds.
+✔ Test "portrait preferred transform swaps render dimensions and normalizes origin" passed after 0.004 seconds.
+✔ Test "metrics use the app's zero-or-one-decimal display convention" passed after 0.005 seconds.
+✔ Test attachmentSummaryOmitsMissingFieldsAndNoteOccupiesTheTopRegion() passed after 0.034 seconds.
+✔ Test mismatchedBodyFallsBackToPlainText() passed after 0.030 seconds.
+✔ Test goldenFixturesProduceExactCardFieldsAndMissingShapes() passed after 0.036 seconds.
+✔ Test setReferenceWireRoundTripIsStableAcrossSenderAndReceiverLocales() passed after 0.036 seconds.
+✔ Test emptyConversationFinishesInitialLoadOnlyAfterSuccessfulFetch() passed after 0.123 seconds.
+✔ Test failedInitialConversationLoadStaysOutOfTheEmptyState() passed after 0.123 seconds.
+✔ Test "scrubbing keeps the drag position isolated from timeline polling" passed after 0.122 seconds.
+✔ Test "default configuration preserves legacy chat and student playback semantics" passed after 0.122 seconds.
+✔ Test "workbench configuration owns the expanded playback-rate semantics" passed after 0.122 seconds.
+✔ Test "workbench uses the four prototype playback rates" passed after 0.122 seconds.
+✔ Test "timeline renders minute and zero-padded second values" passed after 0.122 seconds.
+✔ Test "scrubber seek conversion clamps invalid and out-of-range positions" passed after 0.122 seconds.
+✔ Test "badge and coach consent default to the legacy nil path" passed after 0.122 seconds.
+✔ Test "marker seek conversion uses millisecond timescale and clamps to duration" passed after 0.122 seconds.
+✔ Test pickerRequiresASelectionUnlessTheEntryProvidesOne() passed after 0.122 seconds.
+✔ Test coordinatorRejectsOverLimitCanonicalBodyWithoutDiscardingStage() passed after 0.122 seconds.
+✔ Test canonicalBodyOverUTF16LimitShowsErrorAndKeepsStagedSnapshot() passed after 0.122 seconds.
+✔ Test pickerGroupsSetsByExerciseAndShowsTheSelectedSummary() passed after 0.122 seconds.
+✔ Test applyReadStateAtomicallyUpdatesConversationAndTotal() passed after 0.122 seconds.
+✔ Test nilImageURLShowsPlaceholderWithoutRenewalRequest() passed after 0.132 seconds.
+✔ Test deallocatedConversationReleasesItsRouterSubscriptions() passed after 0.129 seconds.
+✔ Test successfulSetRefWithReadyVideoNeverEntersImageCleanupPath() passed after 0.132 seconds.
+✔ Test canonicalBodyAtUTF16LimitSendsIncludingAnEmoji() passed after 0.131 seconds.
+✔ Test postFirstIsConfirmedUntilViewModelAcknowledgesIt() passed after 0.138 seconds.
+✔ Test textSendTrimsWhitespaceAndRejectsEmptyOrOversizedInput() passed after 0.137 seconds.
+✔ Test catchUpStopsWhenSequenceDoesNotAdvance() passed after 0.144 seconds.
+✔ Test historyPrependDeduplicatesAndPreservesSequenceOrder() passed after 0.144 seconds.
+✔ Test successfulEmptyPollRecoversFailedInitialLoadIntoEmptyState() passed after 0.144 seconds.
+✔ Test refreshLandingAfterMarkReadCannotResurrectTheBadge() passed after 0.143 seconds.
+✔ Test stagedUploadingVideoCanSendBeforeUploadIsReady() passed after 0.140 seconds.
+✔ Test concurrentSendsAreKeptAsIndependentOutboxItems() passed after 0.145 seconds.
+✔ Test ownCardRenewalFailureKeepsMessageAndMarksVideoUnavailable() passed after 0.150 seconds.
+✔ Test readReceiptUsesInclusiveSequenceBoundary() passed after 0.155 seconds.
+✔ Test emptyConversationUsesLatestThenSwitchesToAfterMaximumSequence() passed after 0.155 seconds.
+✔ Test stagedIntentKeepsFrozenClientIDWhenComposerAddsNote() passed after 0.151 seconds.
+✔ Test successfulSendWhilePoppedIsTransferredOnReentry() passed after 0.157 seconds.
+✔ Test bindRequiredDoesNotSelfDeadlockAndCallbackFiresOnce() passed after 0.156 seconds.
+✔ Test routerBroadcastsOneSourceEventToIndependentSubscribers() passed after 0.155 seconds.
+✔ Test uploadSurvivesSheetDismissAndReadyAutomaticallySends() passed after 0.151 seconds.
+✔ Test logoutCancelsWaitingIntentWithoutImageCleanup() passed after 0.151 seconds.
+✔ Test expiredURLRenewsBeforePlayback() passed after 0.151 seconds.
+✔ Test playbackFailureReplacesURLUsingExactSingleMessageQuery() passed after 0.151 seconds.
+✔ Test imageLoadFailureForcesExactlyOneRenewalWithoutExpiry() passed after 0.155 seconds.
+✔ Test expiredImageOutsideLatestPageRenewsInPlaceWithBeforeQuery() passed after 0.155 seconds.
+✔ Test failedRetryReusesClientIDAndNeverEntersImageCleanupPath() passed after 0.158 seconds.
+✔ Test intentFreezesSnapshotAndRepeatedTriggerUsesOneClientID() passed after 0.163 seconds.
+✔ Test pollFirstReconcilesAndLatePostCannotReviveBubble() passed after 0.169 seconds.
+✔ Test renewalTargetDisappearingDeletesLocalMessage() passed after 0.167 seconds.
+✔ Test opponentUsingSameClientIDDoesNotReconcileCurrentUsersPendingItem() passed after 0.168 seconds.
+✔ Test oneTickCatchesUpMoreThanTwoPages() passed after 0.168 seconds.
+✔ Test failedSendSurvivesReentryAndRetryReusesClientID() passed after 0.173 seconds.
+✔ Test cancellationGenerationDiscardsLateNonCooperativeResponse() passed after 0.173 seconds.
+✔ Test staleRefreshResponseCannotOverwriteNewerSnapshot() passed after 0.171 seconds.
+✔ Test sendEnqueuedDuringCleanupDoesNotOutliveIt() passed after 0.173 seconds.
+✔ Test staleLoadCannotResurrectMessageDeletedDuringRenewal() passed after 0.168 seconds.
+✔ Test repeatedStartCreatesOneThirtySecondPoller() passed after 0.171 seconds.
+✔ Test cancelAllWaitsForImageCleanup() passed after 0.173 seconds.
+✔ Test repeatedPollingStartHasOneOwnerAndCancellationIsNotAnError() passed after 0.173 seconds.
+✔ Test staleMarkReadResponseCannotOverwriteNewerInboxState() passed after 0.173 seconds.
+✔ Test retryDuringCleanupDoesNotOutliveIt() passed after 0.174 seconds.
+✔ Test chatReadAdvancesReceiptWithoutGoingBackwards() passed after 0.173 seconds.
+✔ Test conversationConnectedStateSuspendsThreeSecondPolling() passed after 0.178 seconds.
+✔ Test conversationFiltersEventsAndCoalescesDenseRefreshes() passed after 0.199 seconds.
+✔ Test inboxSuspendsPollingWhileConnectedAndRestoresItWhenDisconnected() passed after 0.213 seconds.
+✘ Test "export preserves orientation, audio, duration, and burns the badge into every segment" recorded an issue at VideoBadgeExporterTests.swift:10:4: Caught error: Error Domain=AVFoundationErrorDomain Code=-11800 "The operation could not be completed" UserInfo={NSLocalizedFailureReason=An unknown error occurred (-12903), NSLocalizedDescription=The operation could not be completed, NSUnderlyingError=0xbbec14930 {Error Domain=NSOSStatusErrorDomain Code=-12903 "(null)"}}
+✘ Test "export preserves orientation, audio, duration, and burns the badge into every segment" failed after 0.507 seconds with 1 issue.
+✘ Test run with 84 tests in 15 suites failed after 0.512 seconds with 1 issue.

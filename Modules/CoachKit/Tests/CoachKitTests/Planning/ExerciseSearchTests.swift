@@ -38,3 +38,11 @@ private func makeExercise(name: String, nameEn: String? = nil) -> Exercise {
     createdAt: Date(timeIntervalSince1970: 0)
   )
 }
+
+@Test(arguments: [
+  ("臥推", "杠铃卧推"), ("硬舉", "传统硬拉"), ("相撲硬舉", "相扑硬拉"),
+  ("二頭彎舉", "二头弯举"), ("槓鈴", "杠铃卧推"),
+])
+func accessorySearchAcceptsTraditionalChinese(query: String, canonical: String) {
+  #expect(ExerciseSearch.matches(makeExercise(name: canonical), query: query))
+}

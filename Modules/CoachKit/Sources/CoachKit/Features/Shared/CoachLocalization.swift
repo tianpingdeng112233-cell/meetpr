@@ -28,14 +28,20 @@ enum CoachLocalization {
   /// Exercise names are catalog data, not translatable UI copy. English
   /// presentation always uses the catalog's canonical `nameEn` value.
   static func exerciseName(_ exercise: Exercise, locale: Locale = .current) -> String {
-    guard locale.language.languageCode == .english else { return exercise.name }
+    guard locale.language.languageCode == .english else {
+      return CatalogExerciseName.display(exercise, locale: locale)
+    }
     // A missing nameEn is deliberate for coach-authored exercises: their
     // Chinese canonical name is user content and remains the English fallback.
     return exercise.nameEn ?? exercise.name
   }
 
-  static func exerciseName(_ canonicalName: String, locale: Locale = .current) -> String {
-    guard locale.language.languageCode == .english else { return canonicalName }
+  static func exerciseName(
+    _ canonicalName: String, isCatalog: Bool = false, locale: Locale = .current
+  ) -> String {
+    guard locale.language.languageCode == .english else {
+      return CatalogExerciseName.display(canonicalName, isCatalog: isCatalog, locale: locale)
+    }
     // Catalog lookup omits coach-authored exercises without nameEn, so retain
     // their user-provided Chinese canonical name instead of hiding the value.
     return exerciseEnglishNames[canonicalName] ?? canonicalName

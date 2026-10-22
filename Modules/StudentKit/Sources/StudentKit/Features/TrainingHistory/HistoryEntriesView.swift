@@ -190,9 +190,11 @@ private struct ExerciseFilterSheet: View {
   @FocusState private var searchFocused: Bool
 
   private var filteredNames: [String] {
-    let trimmed = query.trimmingCharacters(in: .whitespaces)
+    let trimmed = ExerciseSearchText.simplified(query.trimmingCharacters(in: .whitespaces))
     guard !trimmed.isEmpty else { return exerciseNames }
-    return exerciseNames.filter { $0.localizedCaseInsensitiveContains(trimmed) }
+    return exerciseNames.filter {
+      ExerciseSearchText.matches($0, query: trimmed)
+    }
   }
 
   var body: some View {

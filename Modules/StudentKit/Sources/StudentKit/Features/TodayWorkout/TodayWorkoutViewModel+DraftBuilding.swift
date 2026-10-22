@@ -356,6 +356,7 @@ extension TodayWorkoutViewModel {
       exerciseID: exercise.exercise.id,
       exerciseName: exercise.exercise.name,
       exerciseNameEn: exercise.exercise.nameEn,
+      isCatalogExercise: exercise.exercise.createdByCoachID == nil,
       isAccessory: AccessoryClassification.isAccessory(
         exerciseType: exercise.exercise.exerciseType),
       isMainLift: exercise.exercise.exerciseType == .mainLift,

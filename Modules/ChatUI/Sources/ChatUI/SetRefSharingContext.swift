@@ -29,6 +29,7 @@ public struct SetRefShareCandidate: Identifiable, Sendable {
   public let source: SetRefSourceSnapshot
   public let video: SetRefShareVideo?
   public let exerciseID: UUID?
+  public let isCatalogExercise: Bool
   public let exerciseOrder: Int
   public let weekCode: String?
 
@@ -37,6 +38,7 @@ public struct SetRefShareCandidate: Identifiable, Sendable {
     source: SetRefSourceSnapshot,
     video: SetRefShareVideo? = nil,
     exerciseID: UUID? = nil,
+    isCatalogExercise: Bool = false,
     exerciseOrder: Int = 0,
     weekCode: String? = nil
   ) {
@@ -44,6 +46,7 @@ public struct SetRefShareCandidate: Identifiable, Sendable {
     self.source = source
     self.video = video
     self.exerciseID = exerciseID
+    self.isCatalogExercise = isCatalogExercise
     self.exerciseOrder = exerciseOrder
     self.weekCode = weekCode
   }

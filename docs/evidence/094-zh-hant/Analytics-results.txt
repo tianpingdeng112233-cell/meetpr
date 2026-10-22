@@ -1,0 +1,33 @@
+Source: .build/094-tests/Analytics.log
+Build complete! (130.92s)
+✔ Test runtimeDisabledAnalyticsNeverConstructsItsDiskBackedCore() passed after 0.037 seconds.
+✔ Test analyticsEnumValuesMirrorBackendRegistry() passed after 0.036 seconds.
+✔ Test feedbackTextIsTrimmedAndCappedAtFiveHundredCharacters() passed after 0.037 seconds.
+✔ Test queuePersistsAcrossColdStart() passed after 0.037 seconds.
+✔ Test unresolvedKillSwitchConfigPreventsFlushEvenWhenPrivacyGateIsOpen() passed after 0.036 seconds.
+✔ Test corruptQueueFileReadsAsEmptyWithoutCrashing() passed after 0.036 seconds.
+✔ Test disabledCoreProducesNoDiskQueueWrites() passed after 0.036 seconds.
+✔ Test analyticsEventNamesUseBackendRegistryValues() passed after 0.036 seconds.
+✔ Test serverFailureRetriesToCapAndRetainsBatch() passed after 0.037 seconds.
+✔ Test feedbackIsCappedThenRequiresRepeated413BeforeIsolation() passed after 0.037 seconds.
+✔ Test configFailureIsFailOpenAndRetainsQueue() passed after 0.037 seconds.
+✔ Test zeroSampleRateStablyDrainsQueue() passed after 0.037 seconds.
+✔ Test unexpectedSingleEvent413IsRetainedAfterBoundedAttempts() passed after 0.037 seconds.
+✔ Test killSwitchDisabledDrainsQueue() passed after 0.037 seconds.
+✔ Test flusherDeletesOnlyAfterExact204() passed after 0.037 seconds.
+✔ Test queueDropsEventsOlderThanSevenDays() passed after 0.041 seconds.
+✔ Test flusherSplits413BatchAndDoesNotWedge() passed after 0.042 seconds.
+✔ Test sessionOnlyResetsAfterThirtyMinutesInBackground() passed after 0.036 seconds.
+✔ Test rateLimitRetriesToCapWithBackoffAndRetainsBatch() passed after 0.042 seconds.
+✔ Test frictionSignalAndTextUseSeparateEndpointsWithSameEventID() passed after 0.046 seconds.
+✔ Test pendingCrashBecomesOneClientErrorOnNextConfigure() passed after 0.048 seconds.
+✔ Test anonIDPersistsAndSequenceIsMonotonic() passed after 0.048 seconds.
+✔ Test privacyGateKeepsEventsOnDeviceUntilConfirmed() passed after 0.054 seconds.
+✔ Test reEditRequiresCountOfAtLeastTwo() passed after 0.074 seconds.
+✔ Test submittedTextUsesSignalEventIdentifier() passed after 0.074 seconds.
+✔ Test unavailableAnalyticsSuppressesFrictionPrompt() passed after 0.083 seconds.
+✔ Test locallyOversizeSingleEventIsReplacedByClientError() passed after 0.086 seconds.
+✔ Test skippingStartsCooldownAndDoesNotSubmitText() passed after 0.114 seconds.
+✔ Test frictionPromptAppearsOnlyOncePerSession() passed after 0.117 seconds.
+✔ Test queueCapsAtOneThousandAndDropsOldest() passed after 12.462 seconds.
+✔ Test run with 30 tests in 0 suites passed after 12.464 seconds.

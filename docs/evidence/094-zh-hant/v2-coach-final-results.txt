@@ -1,0 +1,460 @@
+Source: .build/094-v2-tests/CoachKit-final.log
+
+◇ Test rosterMovesToFailedStateWhenStudentsCannotLoad() started.
+◇ Test videoQueueLoadFailureMovesToFailed() started.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david/Library/Application Support/default.store
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777233
+CoreData: error:   File Size: 		90112 bytes
+CoreData: error:   File inode: 		434287
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+CoreData: error: -
+CoreData: error:   644
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Information for file system
+CoreData: error: ---------------------------
+CoreData: error:   File system type: 		0x1a
+CoreData: error:   File system flags: 		0x4909080
+CoreData: error:   MNT_JOURNALED
+CoreData: error:   Total data blocks: 		120686613
+CoreData: error:   Free data blocks: 		2229625
+CoreData: error:   Free blocks for nonsuperuser:	2229625
+CoreData: error:   Total i-nodes: 			95431146
+CoreData: error:   File system ID: 		0x1000011, 0x1a
+CoreData: error:   Free i-nodes: 			89185000
+CoreData: error:   Owner UID: 			0
+CoreData: error:   Filesystem type name: 		apfs
+CoreData: error:   Mount on name: 			/System/Volumes/Data
+CoreData: error:   Mount from name: 		/dev/disk3s5
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david/Library/Application Support
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777233
+CoreData: error:   File Size: 		2624 bytes
+CoreData: error:   File inode: 		381341
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   700
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david/Library
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777233
+CoreData: error:   File Size: 		3040 bytes
+CoreData: error:   File inode: 		381340
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   700
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users/david
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777233
+CoreData: error:   File Size: 		2176 bytes
+CoreData: error:   File inode: 		381333
+CoreData: error:   File user ID: 		501
+CoreData: error:   File group ID: 		20
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   750
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /Users
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777233
+CoreData: error:   File Size: 		160 bytes
+CoreData: error:   File inode: 		18416
+CoreData: error:   File user ID: 		0
+CoreData: error:   File group ID: 		80
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   755
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+CoreData: error: Executing as effective user 501
+CoreData: error: Information for /
+CoreData: error: ---------------------------
+CoreData: error:   File Device ID: 	0
+CoreData: error:   Device ID: 		16777233
+CoreData: error:   File Size: 		704 bytes
+CoreData: error:   File inode: 		2
+CoreData: error:   File user ID: 		0
+CoreData: error:   File group ID: 		0
+CoreData: error:   File Permissions:
+CoreData: error: d
+CoreData: error:   755
+CoreData: error:   file is not a symbolic link
+CoreData: error:   Sandbox access to file-write-data denied
+✔ Test rosterMovesToFailedStateWhenStudentsCannotLoad() passed after 0.651 seconds.
+✔ Test videoQueueLoadFailureMovesToFailed() passed after 0.648 seconds.
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+CoreData: error: unable to check registration for posting store changed notification
+✔ Test run with 480 tests in 14 suites passed after 1.603 seconds.

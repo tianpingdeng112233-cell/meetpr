@@ -37,9 +37,11 @@ enum StudentExerciseTag: String, CaseIterable, Sendable {
   }
 
   func matches(_ exercise: Exercise, search: String) -> Bool {
-    let query = search.trimmingCharacters(in: .whitespacesAndNewlines)
+    let query = ExerciseSearchText.simplified(
+      search.trimmingCharacters(in: .whitespacesAndNewlines))
     return Self.tags(for: exercise).contains(self)
-      && (query.isEmpty || exercise.name.localizedStandardContains(query)
+      && (query.isEmpty
+        || ExerciseSearchText.matches(exercise.name, query: query)
         || exercise.nameEn?.localizedStandardContains(query) == true)
   }
 }

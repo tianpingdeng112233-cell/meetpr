@@ -15,10 +15,10 @@ private func fullCatalog() -> [Exercise] {
 }
 
 @available(iOS 17.0, macOS 14.0, *)
-@Test func bundledAliasSeedHasSixtyOneEntries() {
+@Test func bundledAliasSeedIncludesTaiwanVocabulary() {
   let table = ExerciseAliasTable.bundled()
   #expect(table.version == 1)
-  #expect(table.aliases.count == 61)
+  #expect(table.aliases.count == 78)
 }
 
 // Guardrail: every canonical must fold-resolve to exactly one exercise in the full

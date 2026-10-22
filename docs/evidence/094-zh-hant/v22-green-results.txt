@@ -1,0 +1,6 @@
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.011s
+
+OK
+10 catalogs, 2344 keys; placeholders, glossary, simplified-only scan OK

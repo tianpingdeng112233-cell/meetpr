@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 
 enum CoachTodayFormatting {
@@ -14,7 +15,9 @@ enum CoachTodayFormatting {
       timeZone: calendar.timeZone
     )
     let monthDay = date.formatted(style.month(.wide).day())
-    let weekday = date.formatted(style.weekday(.wide))
+    let width: Date.FormatStyle.Symbol.Weekday =
+      InterfaceLanguage(locale: locale) == .traditionalChinese ? .abbreviated : .wide
+    let weekday = date.formatted(style.weekday(width))
     return "\(monthDay) · \(weekday)"
   }
 }

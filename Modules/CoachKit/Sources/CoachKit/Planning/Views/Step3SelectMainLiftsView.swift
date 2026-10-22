@@ -206,8 +206,7 @@ private struct VariantPickerSheet: View {
     let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
     if trimmed.isEmpty { return variants }
     return variants.filter { exercise in
-      exercise.name.localizedStandardContains(trimmed)
-        || (exercise.nameEn?.localizedStandardContains(trimmed) ?? false)
+      ExerciseSearch.matches(exercise, query: trimmed)
     }
   }
 }

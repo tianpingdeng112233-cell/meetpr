@@ -1,0 +1,13 @@
+Source: .build/094-tempo-red.log
+Build complete! (383.17s)
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 09:19:56.262.
+Test Suite 'Selected tests' passed at 2026-10-22 09:19:56.263.
+✔ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() passed after 0.076 seconds.
+✔ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) with 5 test cases passed after 0.109 seconds.
+✘ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() recorded an issue at TraditionalChinesePresentationTests.swift:37:3: Expectation failed: (parsed.name → "節奏深蹲310") == "節奏深蹲"
+✘ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() recorded an issue at TraditionalChinesePresentationTests.swift:38:3: Expectation failed: (parsed.tempoNote → nil) == (SetLineParser.stripTempoSuffix("节奏深蹲310").tempoNote → "节奏3-1-0")
+✘ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() recorded an issue at TraditionalChinesePresentationTests.swift:39:3: Expectation failed: SetLineParser.isTempoContext(exerciseName: "離心臥推", intensityCell: "")
+✘ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() failed after 0.122 seconds with 3 issues.
+✔ Test traditionalSetInputMatchesSimplifiedParsing() passed after 0.127 seconds.
+✔ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() passed after 1.122 seconds.
+✘ Test run with 5 tests in 0 suites failed after 1.123 seconds with 3 issues.

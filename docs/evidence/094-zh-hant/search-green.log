@@ -1,0 +1,7 @@
+Extracted test results; original build output retained in .build/094-evidence-originals/search-green.log
+Build complete! (208.69s)
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 08:58:07.944.
+Test Suite 'Selected tests' passed at 2026-10-22 08:58:07.944.
+◇ Test run started.
+✔ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) with 5 test cases passed after 0.074 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.075 seconds.

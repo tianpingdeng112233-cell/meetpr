@@ -44,14 +44,17 @@ public final class APIClient: Sendable {
   public let baseURL: URL
   public let errorStream: AsyncStream<APIError>
 
+  private let preferredLocalization: String?
   private let transport: Transport
   private let errorContinuation: AsyncStream<APIError>.Continuation
   private let unauthorizedRecoveryStore = UnauthorizedRecoveryStore()
 
   public init(
     environment: [String: String] = ProcessInfo.processInfo.environment,
+    preferredLocalization: String? = nil,
     transport: Transport? = nil
   ) {
+    self.preferredLocalization = preferredLocalization
     baseURL = BuildConfig.backendBaseURL(environment: environment)
 
     self.transport =
@@ -278,6 +281,9 @@ public final class APIClient: Sendable {
     unauthorizedAccessToken: String? = nil,
     additionalAcceptedStatusCodes: Set<Int> = []
   ) async throws -> APIResponse {
+    var request = request
+    let language = preferredLocalization.map { InterfaceLanguage(localization: $0) } ?? .current
+    request.setValue(language.rawValue, forHTTPHeaderField: "X-MeetPR-Locale")
     var response = try await transport(request)
 
     if response.statusCode == 401,

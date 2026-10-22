@@ -18,6 +18,7 @@ public struct PendingVideoItem: Hashable, Identifiable, Sendable {
   /// Display only; nil when the inbox can't resolve a name (e.g. the live
   /// aggregate path, which carries metadata but not the plan).
   public let exerciseName: String?
+  public let isCatalogExercise: Bool
   /// Feedback scope — the training day the linked set was logged (nil if unlinked).
   public let dayDate: Date?
   /// Newest-first sort key (`StudentVideo.displayDate`).
@@ -31,6 +32,7 @@ public struct PendingVideoItem: Hashable, Identifiable, Sendable {
     setLogID: UUID? = nil,
     planExerciseID: UUID? = nil,
     exerciseName: String? = nil,
+    isCatalogExercise: Bool = false,
     dayDate: Date? = nil,
     uploadedAt: Date,
     sizeBytes: Int64
@@ -41,6 +43,7 @@ public struct PendingVideoItem: Hashable, Identifiable, Sendable {
     self.setLogID = setLogID
     self.planExerciseID = planExerciseID
     self.exerciseName = exerciseName
+    self.isCatalogExercise = isCatalogExercise
     self.dayDate = dayDate
     self.uploadedAt = uploadedAt
     self.sizeBytes = sizeBytes

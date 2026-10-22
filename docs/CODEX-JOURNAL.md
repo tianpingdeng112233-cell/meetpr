@@ -1628,3 +1628,100 @@ David 本轮直接授权保留上一轮工作区、完成全量测试和模拟�
 - 新增 1 项 iOS 回调测试：旧模块下缺少 item source 编译红；新源与新测试窄范围 iOS typecheck exit 0，无诊断。**新增测试尚未实际运行，不记为红→绿完成。** macOS CoachKit 全量 476 项通过（iOS 新测试被条件编译排除）；4 文件 swift-format/SwiftLint 通过，diff check 通过。Standards / Spec 独立只读审查均无未决代码问题。
 - 验证阻塞：本会话无 XcodeBuildMCP；CLI Demo build exit 65（Missing package product），CoreSimulator connection refused，未能运行新增 iOS 测试或生成 `zh-light-share-activity.jpg`，未确认本轮预览标题/图标。不得沿用上一轮成功证据充数。
 - **H1 状态：代码已改、微信真机未验。** 不宣布微信修好；微信真机环仍由 Opus 执行。详细命令、原始输出及未完成 gate：[本轮证据](evidence/invite-share/ACTIVITY-VERIFICATION.md)。
+## 2026-10-22 · Spec 094-iOS 开发实装（未完成交付）
+
+- 本树 `MeetPR-wt-094-zh-hant` / `feat/094-zh-hant`，基线 `6c5466a0`；按 Claude 卡执行，开工临时文件试写通过。不 push/PR，不动发布正典、build 号或 tag。
+- 已实装 v1 术语表对应的十份 xcstrings（2344 key）、权限繁体、生成动作展示与输入映射、来源保护、双字形搜索/导入、週字星期、三条自有 API 通道 Accept-Language。zh-Hans/en 树与基线一致，原目录/aliases 未改。细节、命令、红绿断言和原始日志指针见 [开发证据](evidence/094-zh-hant/README.md)。
+- CARD 三个 seam 均先红后绿；追加 tempo、同名用户动作、Demo 影片来源回归。CoachKit 最终478项全绿；另 Analytics30/CoreModels160/DesignSystem74/Networking141/RepositoryContracts6全绿。StudentKit新增3项独立通过。
+- 九包未全绿：AppShell Keychain两测试失败，最小探针 `SecItemAdd: 100001 UNIX[Operation not permitted]`；ChatUI视频编码 -12903；StudentKit视频导出及后台上传超时共33 issue，两项上传用例独跑绿、视频独跑仍红。没有跳过失败后宣称通过。主工程初轮9项绿，最终改动后复验与截图结果待补。
+- strict lint / swift-format 已在改动Swift文件通过，最终Demo fixture追加后还需一次复核。独立 Standards 二轮 CLEAN；Spec 二轮Demo来源标志漏接已定向修复并获测试绿。无来源的 SetRefV1 / CoachFeedbackVideo 原文保留，完整覆盖边界仍待裁决。
+- 执行中外部把 GLOSSARY 更新为v2（課表/反饋/下數、别名/导入语法），与 CARD aliases 不变约束冲突，已请求确认。未覆盖外部文档；当前生成器 `--check` 对新v2报 Stale generated file（AppShell xcstrings），不宣称v2完成。
+- 部分资源首次暂存成功，后续暂存/commit被沙箱拒绝：`fatal: Unable to create '/Users/david/Projects/apps/MeetPR/.git/worktrees/MeetPR-wt-094-zh-hant/index.lock': Operation not permitted`。无新增commit；没有绕过权限或换目录。未来每笔提交须包含 David 指定的 Claude Opus 5.5 Co-Authored-By 末行。
+
+### v2 返修
+
+- 收到并执行同目录 `AMEND-v2.md`，覆盖前述 v1 范围疑问；GLOSSARY v2.1 的課表、反饋、杆→槓、杠杆→槓桿已生成。长词先覆写；reps 用显式 key 白名单，其他「次」义保留。追加台湾动作别名 17 条，原 61 条逐项未变；原 catalog 字节不变，zh-Hans/en 树逐项未变。
+- 搜索统一繁→简、杆字形与数字规格括号规范化；保留 PIN／纯单腿等语义括号。教练选择、现有导入 matcher、学员 tag 与历史筛选共用 matcher。AMEND 第 3 项解析／Excel 表头只适用于网页，iOS 未扩范围，Spec reviewer 已核实。
+- 红阶段：v2 生成 2 个断言及新 key 参数失败，台湾别名 18 断言失败；v2.1 杆类名称覆写有合成输入回归。实现后 `.build/zh-hant-tools/bin/python -m unittest discover -s scripts/zh-hant -p test_generation.py` 4 项通过；`scripts/generate-zh-hant.py --check` 10 目录／2344 key 通过。CoachKit 全量 480 通过（旧别名数61断言已先失败后更新78）。
+- 为生成字典数据保留 OpenCC LICENSE/NOTICE 到 CoreModels Resources；来源是固定的开发期 OpenCC 0.1.7，未增加运行时依赖。
+- reps 命中的全部 55 个 key（实际转换仍基于 key 内的 reps 字词，不改变其他内容）：
+
+```text
+chat.load
+coach.planning.common.reps
+coach.planning.count.rep %lld
+coach.planning.count.repPlural %lld
+coach.planning.count.setsAndReps %lld %@ %lld
+coach.planning.editor.addRepMaximum
+coach.planning.editor.removeRepMaximum
+coach.planning.editor.repMaximum
+coach.planning.progression.repDecrease
+coach.planning.progression.repIncrease
+coach.planning.step4.setRepIntensity %lld %@ %@
+coach.planning.step4.setRepsIntensity %lld %@ %@
+coach.planning.step4.setsRepIntensity %lld %@ %@
+coach.planning.step4.setsRepsIntensity %lld %@ %@
+coach.planning.validation.incompleteWeekOneSetSpecs
+coach.planning.validation.invalidWeekOneSetSpec
+coach.videoFeedback.reps
+coach.videoFeedback.repsValue %lld
+designSystem.numberPad.enterReps
+designSystem.preview.timesUnit
+designSystem.reps
+designSystem.repsUnit
+designSystem.setRow.metrics %@ %@ %@
+student.accessory.repsLabel
+student.e1rmSourceRTS
+student.exportDataSheet.copy005
+student.feedbackVideoPresentation.copy002
+student.feedbackVideoPresentation.copy002.one
+student.feedbackVideoPresentation.copy003
+student.feedbackVideoPresentation.copy003.one
+student.growthCurveView.copy010
+student.quickLog.copy009
+student.quickLog.copy019
+student.sessionSummaryView.copy008
+student.setEntryRpe.copy001
+student.setEntryRpe.copy002
+student.setEntryRpe.copy003
+student.setEntryRpe.copy004
+student.setEntryRpe.copy005
+student.setEntryRpe.copy006
+student.setEntryRpe.copy007
+student.setEntryRpe.copy008
+student.setEntryRpe.copy009
+student.setEntryRpe.copy010
+student.setEntrySheet.copy003
+student.setEntrySheet.copy004
+student.step3StrengthSection.copy008
+student.step3StrengthSection.copy009
+student.step3StrengthSection.copy010
+student.step3StrengthSection.copy014
+student.todayWorkoutScreen.copy012
+student.todayWorkoutTypes.copy003
+student.todayWorkoutTypes.copy004
+student.workoutCompletionPresentation.copy003
+student.workoutCompletionPresentation.copy003.one
+```
+
+### 语言头返修
+
+- 按 `AMEND-header.md` 和 SPEC 最新共享契约，把 APIClient／RealtimeClient／EventFlusher 显式语言头改为 `X-MeetPR-Locale`。未登录 auth、更新检查复用 APIClient；不手动覆盖 Accept-Language，不改 OAuth／OSS 第三方请求。语言 seam 覆盖 zh-Hans/Hant/en 及区域回退，显式 Hans 优先于 TW 区域。
+- 先改断言跑红：API/WebSocket 3 测试共 75 issue，analytics 1 测试4 issue；实现后 Networking 141、Analytics 30 全量通过。验证默认请求未手动设 Accept-Language、传入值逐字保留、自定义头在401重试保留。日志摘录见 `docs/evidence/094-zh-hant/header-*-results.txt`。
+
+### 最终开发验证与待收货
+
+- 40 个变更 Swift 文件按仓配置 `swiftlint lint --strict`、`xcrun swift-format lint --strict` 通过，生成器检查、Python 4 项、`git diff --check` 通过。原始日志 `.build/094-lint-final.log`、`.build/094-format-final.log`。
+- 最后全量：Analytics30／CoachKit480／CoreModels160／DesignSystem74／Networking141／RepositoryContracts6 通过。AppShell118项中Keychain两测试共3issue；ChatUI84项中视频编码失败；StudentKit1036项重跑仅剩15个视频导出issue，上传超时不再复现。保留原失败，不跳过测试。详见 [最终证据与命令](evidence/094-zh-hant/README.md)。
+- 主工程最终 MeetPR / Debug / iPhone17ProMax iOS26.5，XcodeBuildMCP `test_sim` 9通过、0失败、0跳过，28.9s；`DerivedData/094-main-final-tests.xcresult`。这是最终代码与新增归属资源后的复验。
+- 同模拟器用 `-AppleLanguages "(zh-Hant)" -AppleLocale zh_TW` 启动，亲眼核对并保存教练首页、学员今日训练两图到 `docs/evidence/094-zh-hant/`。Demo构建只用命令行关闭优化加速，工程配置未改。截图显示課表/反饋/週/下數等繁体用语，用户姓名与教练备注仍为原文。
+- 双轴最终定向复核 Standards CLEAN、Spec CLEAN，无新增 finding；旧无来源快照／反馈名称边界仍待 Opus 裁决，本记录不代表正式验收。九包全绿要求尚未达成。
+- 按两份 AMEND 的不 commit 要求保持未提交工作区。此前 Git 写权限原始拒绝仍见本卡首段，未再尝试 Git 写入；无 push／PR／build号／tag／NEXT-RELEASE改动。未来提交末行必须为 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`。
+
+### v2.2 返修（2026-10-22）
+
+- 基于 Opus 提交 `1b985255`，本工作树临时文件试写成功。按 `AMEND-v22.md` 与已更新的术语表重跑生成器：AppShell／CoachKit／StudentKit 共 31 条繁体文案改用「發布／取得」，生成的搜索映射同步增加「取得→获取」。生成器逻辑无需修改；网页 title 项不适用于本仓。
+- 沿用 Python 生成测试 seam，新增 1 项参数化回归覆盖两处「發布給學員」和「取得驗證碼」：旧产物 3 个断言失败，重新生成后 5 项全绿；[红阶段](evidence/094-zh-hant/v22-red-results.txt)、[绿阶段及生成检查](evidence/094-zh-hant/v22-green-results.txt)。`--check` 对 10 目录／2344 key 的占位符、术语、简体特有字与产物一致性校验通过。全部 zh-Hans/en 树与 HEAD 逐项一致；动作 catalog、aliases、展示名表字节不变。
+- XcodeBuildMCP：DesignSystem `TraditionalChineseCatalogTests` 1 项通过；CoreModels 全量 160 项通过。MeetPR／Debug／iPhone 17 Pro Max iOS 26.5 编译并启动成功（41.4s，无 warning/error），使用本树 `.build/094-simulator`；以 `-AppleLanguages (zh-Hant) -AppleLocale zh_TW` 亲看注册页「取得驗證碼」，[截图](evidence/094-zh-hant/v22-register-zh-Hant.jpg)。未提交注册或请求验证码。
+- 全仓 `swiftlint lint --strict --config .swiftlint.yml`：1220 文件零违规；`xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules` 通过；Python 编译与 `git diff --check` 通过。日志 `.build/094-v22-lint.log`、`.build/094-v22-format.log`；MCP 原始日志目录 `~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-094-zh-hant-6bf212735501/logs/`，本轮 build `build_run_sim_2026-10-22T09-45-01-503Z_pid87085_8a9e3243.log`，目录测试 `swift_package_test_2026-10-22T09-45-42-937Z_pid87085_4455b78b.log`，CoreModels `swift_package_test_2026-10-22T09-46-33-656Z_pid87085_2ece3e6a.log`。
+- 本轮为术语资源定向返修，未重跑上一轮九包全量，既有失败与待裁决事项仍按前文记录；开发自检不替代 Opus 验收。保留来时的 GLOSSARY／AMEND 改动，不 commit、不 push，不改发布正典。

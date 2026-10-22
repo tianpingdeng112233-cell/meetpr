@@ -1,10 +1,98 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
-    "analytics.friction.placeholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"What felt awkward?"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"哪里让你不顺手?"}}}},
-    "analytics.friction.send": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Send"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"发送"}}}},
-    "analytics.friction.skip": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Skip"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"跳过"}}}},
-    "analytics.friction.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Stuck? Tell us in one sentence"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"卡住了?一句话告诉我们"}}}}
+    "analytics.friction.placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What felt awkward?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "哪里让你不顺手?"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "哪裡讓你不順手?"
+          }
+        }
+      }
+    },
+    "analytics.friction.send": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳送"
+          }
+        }
+      }
+    },
+    "analytics.friction.skip": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳過"
+          }
+        }
+      }
+    },
+    "analytics.friction.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stuck? Tell us in one sentence"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卡住了?一句话告诉我们"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "卡住了?一句話告訴我們"
+          }
+        }
+      }
+    }
   },
   "version": "1.0"
 }

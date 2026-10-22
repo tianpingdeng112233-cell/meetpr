@@ -1,0 +1,4 @@
+Source: .build/094-tests/CoachKit-final.log
+◇ Test traditionalDemoVideoNamesUseCatalogProvenance() started.
+✔ Test traditionalDemoVideoNamesUseCatalogProvenance() passed after 0.470 seconds.
+✔ Test run with 478 tests in 14 suites passed after 48.073 seconds.

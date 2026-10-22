@@ -1,0 +1,8 @@
+Source: .build/094-student-isolated.log
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-10-22 09:42:27.919.
+Test Suite 'Selected tests' passed at 2026-10-22 09:42:27.919.
+✔ Test traditionalTrainingDraftPreservesSameNamedCustomExercise() passed after 0.027 seconds.
+✔ Test traditionalStudentNamesPreserveUserAuthoredExercises() passed after 0.074 seconds.
+✔ Test persistedGenerationRejectsOlderEventThatArrivesFirstAfterRestart() passed after 0.088 seconds.
+✔ Test traditionalStudentWeekdayAndReminderUseWeekCharacter() passed after 0.461 seconds.
+✔ Test run with 4 tests in 0 suites passed after 0.472 seconds.

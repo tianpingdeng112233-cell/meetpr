@@ -1621,6 +1621,7 @@ extension TodayWorkoutViewModel {
     var draft = SetRowDraft(
       id: UUID(), planExerciseID: exercise.id, exerciseID: exercise.id,
       exerciseName: exercise.name, exerciseNameEn: exercise.nameEn,
+      isCatalogExercise: exercise.createdByCoachID == nil,
       isAccessory: exercise.isAccessory,
       liftFamily: exercise.mainLiftFamily,
       prescribed: PrescribedSet(id: UUID(), setIndex: index))

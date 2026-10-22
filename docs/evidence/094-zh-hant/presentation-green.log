@@ -1,0 +1,11 @@
+Extracted test results; original build output retained in .build/094-evidence-originals/presentation-green.log
+Build complete! (177.42s)
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 09:24:03.321.
+Test Suite 'Selected tests' passed at 2026-10-22 09:24:03.321.
+◇ Test run started.
+✔ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() passed after 0.030 seconds.
+✔ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() passed after 0.182 seconds.
+✔ Test traditionalSetInputMatchesSimplifiedParsing() passed after 0.186 seconds.
+✔ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) with 5 test cases passed after 0.232 seconds.
+✔ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() passed after 2.118 seconds.
+✔ Test run with 5 tests in 0 suites passed after 2.118 seconds.

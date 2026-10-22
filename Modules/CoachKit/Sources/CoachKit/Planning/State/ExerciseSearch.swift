@@ -11,18 +11,17 @@ import Foundation
 enum ExerciseSearch {
   /// Folds the interchangeable 杆 / 杠 characters to a single canonical form.
   static func fold(_ text: String) -> String {
-    text.replacing("杆", with: "杠")
+    ExerciseSearchText.searchKey(text)
   }
 
   /// Whether `exercise` matches `query` by Chinese or English name — tolerant of
   /// the 杆 / 杠 spelling difference and of locale (case, width, diacritics).
   static func matches(_ exercise: Exercise, query: String) -> Bool {
-    let folded = fold(query)
-    if fold(exercise.name).localizedStandardContains(folded) {
+    if ExerciseSearchText.matches(exercise.name, query: query) {
       return true
     }
     if let nameEn = exercise.nameEn {
-      return fold(nameEn).localizedStandardContains(folded)
+      return ExerciseSearchText.matches(nameEn, query: query)
     }
     return false
   }

@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 
 private typealias VoidThrowingContinuation = CheckedContinuation<Void, any Error>
@@ -203,6 +204,7 @@ public actor RealtimeClient {
     }
     realtimeURL.append(path: "realtime")
     var request = URLRequest(url: realtimeURL)
+    request.setValue(InterfaceLanguage.current.rawValue, forHTTPHeaderField: "X-MeetPR-Locale")
     request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
     return request
   }

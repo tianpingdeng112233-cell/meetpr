@@ -1,0 +1,13 @@
+Extracted test results; original build output retained in .build/094-evidence-originals/presentation-red.log
+Build complete! (48.42s)
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 09:03:00.537.
+Test Suite 'Selected tests' passed at 2026-10-22 09:03:00.537.
+◇ Test run started.
+✘ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() recorded an issue at TraditionalChinesePresentationTests.swift:9:3: Expectation failed: (CoachLocalization.exerciseName("比赛式传统硬拉", locale: locale) → "比赛式传统硬拉") == "比賽式傳統硬舉"
+✘ Test traditionalSetInputMatchesSimplifiedParsing() recorded an issue at TraditionalChinesePresentationTests.swift:18:3: Expectation failed: (SetLineParser.parseSetsReps("4組") → nil) == (SetLineParser.parseSetsReps("4组") → SetCountReps(count: 4, reps: nil, repsMax: nil, openEnded: true))
+✘ Test traditionalSetInputMatchesSimplifiedParsing() recorded an issue at TraditionalChinesePresentationTests.swift:19:3: Expectation failed: (SetLineParser.expand(setsCell: "4*3", intensityCell: "D100/L110 遞增5kg").map(\.weightKg) → [nil, nil, nil, nil]) == (SetLineParser.expand(setsCell: "4*3", intensityCell: "D100/L110 递增5kg").map(\.weightKg) → [Optional(100), Optional(105), Optional(110), Optional(110)])
+✘ Test traditionalSetInputMatchesSimplifiedParsing() failed after 0.017 seconds with 2 issues.
+✘ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() recorded an issue at TraditionalChinesePresentationTests.swift:14:3: Expectation failed: (CoachTodayFormatting.dateText(date, locale: locale) → "8月18日 · 星期日").contains("週日")
+✘ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() failed after 0.030 seconds with 2 issues.
+✔ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() passed after 26.041 seconds.
+✘ Test run with 3 tests in 0 suites failed after 26.046 seconds with 4 issues.

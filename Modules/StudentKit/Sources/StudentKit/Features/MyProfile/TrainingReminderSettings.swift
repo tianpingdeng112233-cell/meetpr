@@ -112,7 +112,8 @@ enum TrainingReminderCopy {
     if locale.language.languageCode?.identifier == "en" {
       days = names.joined(separator: " · ")
     } else {
-      days = "周" + names.joined(separator: "·")
+      let prefix = InterfaceLanguage(locale: locale) == .traditionalChinese ? "週" : "周"
+      days = prefix + names.joined(separator: "·")
     }
     return "\(days) \(timeText(for: settings))"
   }

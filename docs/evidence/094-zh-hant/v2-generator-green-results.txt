@@ -1,0 +1,4 @@
+Source: .build/094-v2-generation-green.log
+
+Ran 4 tests in 0.014s
+OK

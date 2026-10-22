@@ -81,7 +81,9 @@ struct TodaySetRefSharingSource: Sendable {
           id: log.id,
           source: source,
           video: videoBySetLogID[log.id].map(makeShareVideo),
-          exerciseID: exercise.id, exerciseOrder: exercise.sequenceIndex,
+          exerciseID: exercise.id,
+          isCatalogExercise: exercise.exercise.createdByCoachID == nil,
+          exerciseOrder: exercise.sequenceIndex,
           weekCode: TrainingSequenceText.code(for: day, in: plan?.days ?? [])
         )
       }
@@ -114,7 +116,8 @@ struct TodaySetRefSharingSource: Sendable {
     return (loggedCandidates + plannedCandidates).map { candidate in
       SetRefShareCandidate(
         id: candidate.id, source: candidate.source, video: candidate.video,
-        exerciseID: candidate.exerciseID, exerciseOrder: candidate.exerciseOrder,
+        exerciseID: candidate.exerciseID,
+        isCatalogExercise: candidate.isCatalogExercise, exerciseOrder: candidate.exerciseOrder,
         weekCode: TrainingSequenceText.code(for: day, in: plan?.days ?? []))
     }
   }
@@ -142,7 +145,9 @@ struct TodaySetRefSharingSource: Sendable {
     }
     return SetRefShareCandidate(
       id: set.id, source: source,
-      exerciseID: exercise.id, exerciseOrder: exercise.sequenceIndex)
+      exerciseID: exercise.id,
+      isCatalogExercise: exercise.exercise.createdByCoachID == nil,
+      exerciseOrder: exercise.sequenceIndex)
   }
 }
 

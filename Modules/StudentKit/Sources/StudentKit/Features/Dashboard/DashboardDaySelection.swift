@@ -37,13 +37,7 @@ struct DashboardSessionOverview: Equatable, Sendable {
       locale: locale)
     summary = StudentStrings.replacing(.overviewSummary, values: [exercises, sets], locale: locale)
     exerciseNames = day.exercises.sorted { $0.sequenceIndex < $1.sequenceIndex }.map { slot in
-      if locale.language.languageCode?.identifier == "en",
-        let english = slot.exercise.nameEn?.trimmingCharacters(in: .whitespacesAndNewlines),
-        !english.isEmpty
-      {
-        return english
-      }
-      return slot.exercise.name
+      StudentExerciseName.display(slot.exercise, locale: locale)
     }.joined(separator: " · ")
   }
 

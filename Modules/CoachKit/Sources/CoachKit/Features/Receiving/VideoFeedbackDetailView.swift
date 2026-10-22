@@ -42,7 +42,7 @@ struct VideoFeedbackDetailView: View {
       VideoFeedbackHeader(
         studentName: detailModel.currentItem.studentDisplayName,
         exerciseName: detailModel.currentItem.exerciseName.map {
-          CoachLocalization.exerciseName($0)
+          CoachLocalization.exerciseName($0, isCatalog: detailModel.currentItem.isCatalogExercise)
         }
           ?? CoachVideoFeedbackStrings.trainingVideo,
         meta: headerMeta,

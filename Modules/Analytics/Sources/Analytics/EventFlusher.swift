@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 import Network
 
@@ -245,6 +246,7 @@ actor EventFlusher {
       url.append(path: String(component))
     }
     var request = URLRequest(url: url)
+    request.setValue(InterfaceLanguage.current.rawValue, forHTTPHeaderField: "X-MeetPR-Locale")
     request.httpMethod = method
     request.setValue("application/json", forHTTPHeaderField: "accept")
     if method == "POST" {

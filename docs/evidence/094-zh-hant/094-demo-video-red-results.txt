@@ -1,0 +1,7 @@
+Source: .build/094-demo-video-red.log
+Build complete! (150.81s)
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 09:46:48.795.
+Test Suite 'Selected tests' passed at 2026-10-22 09:46:48.795.
+✘ Test traditionalDemoVideoNamesUseCatalogProvenance() recorded an issue at TraditionalChinesePresentationTests.swift:48:3: Expectation failed: (names → ["比赛式深蹲", "暂停深蹲", "比赛式卧推", "比赛式卧推", "窄握卧推", "比赛式传统硬拉"]) == ["比賽式深蹲", "暫停深蹲", "比賽式臥推", "比賽式臥推", "窄握臥推", "比賽式傳統硬舉"]
+✘ Test traditionalDemoVideoNamesUseCatalogProvenance() failed after 0.004 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.004 seconds with 1 issue.

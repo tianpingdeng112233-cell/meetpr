@@ -1,0 +1,3 @@
+Source: .build/094-lint-final.log
+
+Done linting! Found 0 violations, 0 serious in 40 files.

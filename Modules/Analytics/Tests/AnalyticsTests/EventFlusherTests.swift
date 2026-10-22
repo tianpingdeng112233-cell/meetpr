@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 import Testing
 
@@ -8,7 +9,10 @@ import Testing
   await queue.enqueue(makeEvent())
   let status = LockedStatus(500)
   let flusher = makeFlusher(queue: queue) { request, _ in
-    (Data(), try makeHTTPResponse(status: status.value, url: try #require(request.url)))
+    #expect(
+      request.value(forHTTPHeaderField: "X-MeetPR-Locale") == InterfaceLanguage.current.rawValue)
+    #expect(request.value(forHTTPHeaderField: "Accept-Language") == nil)
+    return (Data(), try makeHTTPResponse(status: status.value, url: try #require(request.url)))
   }
 
   await flusher.flush()

@@ -24,7 +24,9 @@ enum StudentFormatting {
     locale: Locale = .current,
     timeZone: TimeZone = .current
   ) -> String {
-    var style = Date.FormatStyle.dateTime.weekday(.wide).locale(locale)
+    let width: Date.FormatStyle.Symbol.Weekday =
+      InterfaceLanguage(locale: locale) == .traditionalChinese ? .abbreviated : .wide
+    var style = Date.FormatStyle.dateTime.weekday(width).locale(locale)
     style.timeZone = timeZone
     return date.formatted(style)
   }

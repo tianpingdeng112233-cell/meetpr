@@ -1,0 +1,3 @@
+Source: .build/094-header-analytics-green.log
+
+✔ Test run with 30 tests in 0 suites passed after 1.689 seconds.
