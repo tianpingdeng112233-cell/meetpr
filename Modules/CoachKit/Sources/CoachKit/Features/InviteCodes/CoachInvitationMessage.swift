@@ -26,8 +26,12 @@ enum CoachInvitationMessage {
   static func shareTitle(
     coachName: String?, locale: Locale = .current, bundle: Bundle = .module
   ) -> String {
-    String(localized: "coach.invites.shareTitle", bundle: bundle, locale: locale)
-      .replacing("{0}", with: signature(coachName: coachName, locale: locale, bundle: bundle))
+    let name = coachName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    guard !name.isEmpty else {
+      return String(localized: "coach.invites.shareTitleFallback", bundle: bundle, locale: locale)
+    }
+    return String(localized: "coach.invites.shareTitle", bundle: bundle, locale: locale)
+      .replacing("{0}", with: name)
   }
 
   private static func signature(coachName: String?, locale: Locale, bundle: Bundle) -> String {

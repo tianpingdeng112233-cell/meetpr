@@ -1,0 +1,31 @@
+Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActivityItemSourceTests.swift:12:18: error: cannot find 'CoachInvitationActivityItemSource' in scope
+10 |   @Test func invitationActivitySharesOneURLOrCompleteTextWithPreview() throws {
+11 |     let code = "XK7MPQ2RVT"
+12 |     let source = CoachInvitationActivityItemSource(code: code, coachName: "Alex")
+   |                  `- error: cannot find 'CoachInvitationActivityItemSource' in scope
+13 |     let controller = UIActivityViewController(activityItems: [source], applicationActivities: nil)
+14 |     let inviteURL = CoachInvitationMessage.inviteURL(code: code)
+
+Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActivityItemSourceTests.swift:38:80: error: cannot infer contextual base in reference to member 'mail'
+36 |     #expect(metadata.url == inviteURL)
+37 |     #expect(metadata.iconProvider?.canLoadObject(ofClass: UIImage.self) == true)
+38 |     #expect(source.activityViewController(controller, subjectForActivityType: .mail) == title)
+   |                                                                                `- error: cannot infer contextual base in reference to member 'mail'
+39 |   }
+40 | #endif
+
+Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActivityItemSourceTests.swift:25:18: warning: no calls to throwing functions occur within 'try' expression
+23 |     }
+24 |     for activity in [UIActivity.ActivityType.message, .mail, .copyToPasteboard] {
+25 |       let text = try #require(
+   |                  `- warning: no calls to throwing functions occur within 'try' expression
+26 |         source.activityViewController(controller, itemForActivityType: activity) as? String)
+27 |       #expect(
+
+Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActivityItemSourceTests.swift:33:20: warning: no calls to throwing functions occur within 'try' expression
+31 |
+32 |     let title = CoachInvitationMessage.shareTitle(coachName: "Alex")
+33 |     let metadata = try #require(source.activityViewControllerLinkMetadata(controller))
+   |                    `- warning: no calls to throwing functions occur within 'try' expression
+34 |     #expect(metadata.title == title)
+35 |     #expect(metadata.originalURL == inviteURL)

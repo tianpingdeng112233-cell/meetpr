@@ -1,0 +1,11 @@
+./docs/evidence/invite-share/title-named-red.txt:16:      coachName: "  Alex  ", locale: locale, bundle: fixture) → "Alex邀请你加入 MeetPR") == ((language == "en"
+./docs/evidence/invite-share/title-named-red.txt:19:      coachName: "  Alex  ", locale: locale, bundle: fixture) → "Alex invited you to MeetPR") == ((language == "en"
+./docs/evidence/invite-share/README.md:45:额外核对：[重新生成二次确认](zh-light-regenerate-confirmation.jpg)，通过点外部取消，未执行重新生成。分享面板均显示现有 App 图标和「演示教练邀请你加入 MeetPR」。自动化快照偶发超时后已重新取快照、检查实际图像并重拍。
+./Modules/CoachKit/Sources/CoachKit/Resources/Localizable.xcstrings:15373:    "coach.invites.fallbackName": {
+./Modules/CoachKit/Sources/CoachKit/Resources/Localizable.xcstrings:15390:    "coach.invites.shareTitle": {
+./Modules/CoachKit/Sources/CoachKit/Resources/Localizable.xcstrings:15407:    "coach.invites.shareTitleFallback": {
+./Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationMessage.swift:31:      return String(localized: "coach.invites.shareTitleFallback", bundle: bundle, locale: locale)
+./Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationMessage.swift:33:    return String(localized: "coach.invites.shareTitle", bundle: bundle, locale: locale)
+./Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationMessage.swift:40:      ? String(localized: "coach.invites.fallbackName", bundle: bundle, locale: locale)
+./Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationMessageTests.swift:31:    "coach.invites.message", "coach.invites.fallbackName", "coach.invites.shareTitle",
+./Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationMessageTests.swift:32:    "coach.invites.shareTitleFallback",

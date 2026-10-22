@@ -1,0 +1,55 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+[0/1] Planning build
+Building for debugging...
+[0/4] Write sources
+[0/4] Copying Localizable.xcstrings
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/5] Emitting module DesignSystem
+[5/6] Emitting module CoachKit
+/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15:14: warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+13 |   /// `false` while in-app import is frozen in favour of the web editor. Flip to
+14 |   /// `true` to re-enable the full flow; override in previews/tests as needed.
+15 |   static var isEnabled: Bool = false
+   |              |- warning: static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]
+   |              |- note: convert 'isEnabled' to a 'let' constant to make 'Sendable' shared state immutable
+   |              |- note: add '@MainActor' to make static property 'isEnabled' part of global actor 'MainActor'
+   |              `- note: disable concurrency-safety checks if accesses are protected by an external synchronization mechanism
+16 | }
+17 |
+
+/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26:15: warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+24 |
+25 | public struct UserDefaultsWeightPercentPresetStore: WeightPercentPresetStoring {
+26 |   private let defaults: UserDefaults
+   |               `- warning: stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode
+27 |   private let key = "coach.planning.weightPercentPresets"
+28 |
+
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk/System/Library/Frameworks/Foundation.framework/Headers/NSUserDefaults.h:49:12: note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 47 |  NSUserDefaults can be observed using Key-Value Observing for any key stored in it. Using NSKeyValueObservingOptionPrior to observe changes from other processes or devices will behave as though NSKeyValueObservingOptionPrior was not specified.
+ 48 |  */
+ 49 | @interface NSUserDefaults : NSObject {
+    |            `- note: class 'UserDefaults' does not conform to the 'Sendable' protocol
+ 50 | @private
+ 51 |     id _kvo_;
+
+[#MutableGlobalVariable]: <https://docs.swift.org/compiler/documentation/diagnostics/mutable-global-variable>
+[6/8] Emitting module CoachKitTests
+[7/8] Compiling CoachKitTests CoachInvitationMessageTests.swift
+[7/9] Write Objects.LinkFileList
+[8/9] Linking CoachKitPackageTests
+Build complete! (19.70s)
+Test Suite 'Selected tests' started at 2026-10-22 07:41:40.141.
+Test Suite 'CoachKitPackageTests.xctest' started at 2026-10-22 07:41:40.143.
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 07:41:40.143.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-22 07:41:40.143.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test inviteShareTitleUsesTrimmedCoachName(language:) started.
+◇ Test case passing 1 argument language → "zh-Hans" to inviteShareTitleUsesTrimmedCoachName(language:) started.
+◇ Test case passing 1 argument language → "en" to inviteShareTitleUsesTrimmedCoachName(language:) started.
+✔ Test inviteShareTitleUsesTrimmedCoachName(language:) with 2 test cases passed after 0.014 seconds.
+✔ Test run with 1 test in 0 suites passed after 0.015 seconds.

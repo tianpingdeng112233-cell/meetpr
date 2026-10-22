@@ -1,0 +1,3 @@
+$ swift format lint --strict Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationActions.swift Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationActivityItemSource.swift Modules/CoachKit/Sources/CoachKit/Features/InviteCodes/CoachInvitationActivitySheet.swift Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActivityItemSourceTests.swift
+
+exit: 0

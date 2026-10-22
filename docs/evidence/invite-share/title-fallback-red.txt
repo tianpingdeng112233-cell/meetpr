@@ -1,0 +1,35 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Emitting module CoachKitTests
+[4/5] Compiling CoachKitTests CoachInvitationMessageTests.swift
+[4/6] Write Objects.LinkFileList
+[5/6] Linking CoachKitPackageTests
+Build complete! (7.91s)
+Test Suite 'Selected tests' started at 2026-10-22 07:42:07.193.
+Test Suite 'CoachKitPackageTests.xctest' started at 2026-10-22 07:42:07.194.
+Test Suite 'CoachKitPackageTests.xctest' passed at 2026-10-22 07:42:07.194.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-22 07:42:07.194.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test inviteShareTitleUsesLocalizedFallback(language:) started.
+◇ Test case passing 1 argument language → "zh-Hans" to inviteShareTitleUsesLocalizedFallback(language:) started.
+◇ Test case passing 1 argument language → "en" to inviteShareTitleUsesLocalizedFallback(language:) started.
+✘ Test inviteShareTitleUsesLocalizedFallback(language:) recorded an issue with 1 argument language → "en" at CoachInvitationMessageTests.swift:77:5: Expectation failed: (CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture) → "Coach Coach invited you to train with them on MeetPR") == ((language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划") → "Your coach invited you to train with them on MeetPR")
+✘ Test inviteShareTitleUsesLocalizedFallback(language:) recorded an issue with 1 argument language → "zh-Hans" at CoachInvitationMessageTests.swift:77:5: Expectation failed: (CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture) → "教练 教练邀请你在 MeetPR 跟练训练计划") == ((language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划") → "你的教练邀请你在 MeetPR 跟练训练计划")
+✘ Test inviteShareTitleUsesLocalizedFallback(language:) recorded an issue with 1 argument language → "zh-Hans" at CoachInvitationMessageTests.swift:77:5: Expectation failed: (CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture) → "教练 教练邀请你在 MeetPR 跟练训练计划") == ((language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划") → "你的教练邀请你在 MeetPR 跟练训练计划")
+✘ Test inviteShareTitleUsesLocalizedFallback(language:) recorded an issue with 1 argument language → "en" at CoachInvitationMessageTests.swift:77:5: Expectation failed: (CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture) → "Coach Coach invited you to train with them on MeetPR") == ((language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划") → "Your coach invited you to train with them on MeetPR")
+✘ Test inviteShareTitleUsesLocalizedFallback(language:) recorded an issue with 1 argument language → "zh-Hans" at CoachInvitationMessageTests.swift:77:5: Expectation failed: (CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture) → "教练 教练邀请你在 MeetPR 跟练训练计划") == ((language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划") → "你的教练邀请你在 MeetPR 跟练训练计划")
+✘ Test inviteShareTitleUsesLocalizedFallback(language:) recorded an issue with 1 argument language → "en" at CoachInvitationMessageTests.swift:77:5: Expectation failed: (CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture) → "Coach Coach invited you to train with them on MeetPR") == ((language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划") → "Your coach invited you to train with them on MeetPR")
+✘ Test inviteShareTitleUsesLocalizedFallback(language:) with 2 test cases failed after 0.016 seconds with 6 issues.
+✘ Test run with 1 test in 0 suites failed after 0.016 seconds with 6 issues.

@@ -27,7 +27,10 @@ private func invitationBundle(language: String = "en") throws -> Bundle {
     JSONSerialization.jsonObject(with: Data(contentsOf: source)) as? [String: Any])
   let strings = try #require(catalog["strings"] as? [String: Any])
   var translated: [String: String] = [:]
-  for key in ["coach.invites.message", "coach.invites.fallbackName", "coach.invites.shareTitle"] {
+  for key in [
+    "coach.invites.message", "coach.invites.fallbackName", "coach.invites.shareTitle",
+    "coach.invites.shareTitleFallback",
+  ] {
     let entry = try #require(strings[key] as? [String: Any])
     let languages = try #require(entry["localizations"] as? [String: Any])
     let english = try #require(languages[language] as? [String: Any])
@@ -57,19 +60,27 @@ private func invitationBundle(language: String = "en") throws -> Bundle {
 }
 
 @Test(arguments: ["en", "zh-Hans"])
-func inviteShareTitleUsesTrimmedNameAndLocalizedFallback(language: String) throws {
+func inviteShareTitleUsesTrimmedCoachName(language: String) throws {
   let fixture = try invitationBundle(language: language)
   defer { try? FileManager.default.removeItem(at: fixture.bundleURL) }
   let locale = Locale(identifier: language)
   #expect(
     CoachInvitationMessage.shareTitle(
       coachName: "  Alex  ", locale: locale, bundle: fixture)
-      == (language == "en" ? "Alex invited you to MeetPR" : "Alex邀请你加入 MeetPR"))
+      == (language == "en"
+        ? "Coach Alex invited you to train with them on MeetPR" : "Alex 教练邀请你在 MeetPR 跟练训练计划"))
+}
+
+@Test(arguments: ["en", "zh-Hans"])
+func inviteShareTitleUsesLocalizedFallback(language: String) throws {
+  let fixture = try invitationBundle(language: language)
+  defer { try? FileManager.default.removeItem(at: fixture.bundleURL) }
+  let locale = Locale(identifier: language)
   for name in [nil, "", "  \n "] as [String?] {
-    let fallback = String(localized: "coach.invites.fallbackName", bundle: fixture, locale: locale)
     #expect(
       CoachInvitationMessage.shareTitle(coachName: name, locale: locale, bundle: fixture)
-        == (language == "en" ? "\(fallback) invited you to MeetPR" : "\(fallback)邀请你加入 MeetPR"))
+        == (language == "en"
+          ? "Your coach invited you to train with them on MeetPR" : "你的教练邀请你在 MeetPR 跟练训练计划"))
     #expect(
       CoachInvitationMessage.text(
         code: "XK7MPQ2RVT", coachName: name, buildTrack: .global) == "XK7MPQ2RVT")

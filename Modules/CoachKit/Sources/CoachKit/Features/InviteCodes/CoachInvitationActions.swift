@@ -37,20 +37,39 @@ struct CoachInvitationShareLink: View {
   let code: String
   let coachName: String?
 
+  @State private var isSharing = false
+
   var body: some View {
-    let title = CoachInvitationMessage.shareTitle(coachName: coachName)
-    ShareLink(
-      item: CoachInvitationMessage.inviteURL(code: code),
-      subject: Text(title),
-      message: Text(
-        CoachInvitationMessage.text(code: code, coachName: coachName, buildTrack: .china)),
-      preview: SharePreview(title, image: Image("InviteShareIcon", bundle: .module))
-    ) {
-      PrimaryButtonLabel(
-        CoachLocalization.localized("coach.invites.shareToStudent"),
-        systemImage: "square.and.arrow.up", isFullWidth: true)
-    }
-    .buttonStyle(PressScaleButtonStyle())
-    .accessibilityIdentifier("coach.invites.share")
+    #if os(iOS)
+      Button {
+        isSharing = true
+      } label: {
+        PrimaryButtonLabel(
+          CoachLocalization.localized("coach.invites.shareToStudent"),
+          systemImage: "square.and.arrow.up", isFullWidth: true)
+      }
+      .buttonStyle(PressScaleButtonStyle())
+      .accessibilityIdentifier("coach.invites.share")
+      .sheet(isPresented: $isSharing) {
+        CoachInvitationActivitySheet(code: code, coachName: coachName) {
+          isSharing = false
+        }
+      }
+    #else
+      let title = CoachInvitationMessage.shareTitle(coachName: coachName)
+      ShareLink(
+        item: CoachInvitationMessage.inviteURL(code: code),
+        subject: Text(title),
+        message: Text(
+          CoachInvitationMessage.text(code: code, coachName: coachName, buildTrack: .china)),
+        preview: SharePreview(title, image: Image("InviteShareIcon", bundle: .module))
+      ) {
+        PrimaryButtonLabel(
+          CoachLocalization.localized("coach.invites.shareToStudent"),
+          systemImage: "square.and.arrow.up", isFullWidth: true)
+      }
+      .buttonStyle(PressScaleButtonStyle())
+      .accessibilityIdentifier("coach.invites.share")
+    #endif
   }
 }

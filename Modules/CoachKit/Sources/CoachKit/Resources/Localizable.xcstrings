@@ -15393,13 +15393,30 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0} invited you to MeetPR"
+            "value": "Coach {0} invited you to train with them on MeetPR"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "{0}邀请你加入 MeetPR"
+            "value": "{0} 教练邀请你在 MeetPR 跟练训练计划"
+          }
+        }
+      }
+    },
+    "coach.invites.shareTitleFallback": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your coach invited you to train with them on MeetPR"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的教练邀请你在 MeetPR 跟练训练计划"
           }
         }
       }
