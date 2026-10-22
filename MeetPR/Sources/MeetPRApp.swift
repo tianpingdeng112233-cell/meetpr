@@ -450,6 +450,10 @@ struct MeetPRApp: App {
 
   private var preferredAppColorScheme: ColorScheme? {
     #if DEMO_MODE && !DEMO_USER_STUDENT
+      if ProcessInfo.processInfo.arguments.contains("-demo-invite-share-cn") {
+        return ProcessInfo.processInfo.arguments.contains("-demo-invite-share-dark")
+          ? .dark : .light
+      }
       if ProcessInfo.processInfo.arguments.contains("-spec092-coach"),
         ProcessInfo.processInfo.arguments.contains("-spec092-dark")
       {
@@ -488,6 +492,10 @@ struct MeetPRApp: App {
         CoachFlexibleDayDemoView()
       } else {
         rootView
+          .environment(
+            \.coachInvitationBuildTrack,
+            ProcessInfo.processInfo.arguments.contains("-demo-invite-share-cn")
+              ? .china : BuildConfig.buildTrack)
       }
     #else
       rootView

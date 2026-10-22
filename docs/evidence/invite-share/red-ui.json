@@ -1,0 +1,79 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\n🧪 Swift Package Test\n\nErrors (9):\n\n  ✗ cannot find 'CoachInvitationActions' in scope\n    9 | @MainActor\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:11\n\n  ✗ |                 `- error: cannot find 'CoachInvitationActions' in scope\n\n  ✗ cannot find 'CoachInvitationShareLink' in scope\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:13\n\n  ✗ |                      `- error: cannot find 'CoachInvitationShareLink' in scope\n\n  ✗ extra arguments at positions #3, #4 in call\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:24\n\n  ✗ |                                     `- error: extra arguments at positions #3, #4 in call\n\n  ✗ cannot find 'CoachInvitationActions' in scope\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:27\n\n  ✗ |                                           `- error: cannot find 'CoachInvitationActions' in scope\n\n  ✗ fatalError\n\nWarnings (4):\n\n  ⚠ static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15\n\n  ⚠ stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26\n\n  ⚠ mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52\n\n  ⚠ mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]\n    /Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81\n\n❌ Test failed. (⏱️ 35.5s)\n  └ Files:\n     └── ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-22-30-404Z_pid96140_b714030f.log — Build Logs\n"
+    }
+  ],
+  "structuredContent": {
+    "schema": "xcodebuildmcp.output.test-result",
+    "schemaVersion": "2",
+    "didError": true,
+    "error": "Tests failed",
+    "data": {
+      "summary": {
+        "status": "FAILED",
+        "durationMs": 35523,
+        "target": "swift-package"
+      },
+      "artifacts": {
+        "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-invite-share-08d6b698c9c1/logs/swift_package_test_2026-10-22T03-22-30-404Z_pid96140_b714030f.log"
+      },
+      "diagnostics": {
+        "warnings": [
+          {
+            "message": "static property 'isEnabled' is not concurrency-safe because it is nonisolated global shared mutable state; this is an error in the Swift 6 language mode [#MutableGlobalVariable]",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/Import/PlanImportCapability.swift:15"
+          },
+          {
+            "message": "stored property 'defaults' of 'Sendable'-conforming struct 'UserDefaultsWeightPercentPresetStore' has non-Sendable type 'UserDefaults'; this is an error in the Swift 6 language mode",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Sources/CoachKit/Planning/State/WeightPercentPresets.swift:26"
+          },
+          {
+            "message": "mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:52"
+          },
+          {
+            "message": "mutation of captured var 'counter' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Planning/Import/ImportAssemblerTests.swift:81"
+          }
+        ],
+        "errors": [
+          {
+            "message": "cannot find 'CoachInvitationActions' in scope\n9 | @MainActor",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:11"
+          },
+          {
+            "message": "|                 `- error: cannot find 'CoachInvitationActions' in scope"
+          },
+          {
+            "message": "cannot find 'CoachInvitationShareLink' in scope",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:13"
+          },
+          {
+            "message": "|                      `- error: cannot find 'CoachInvitationShareLink' in scope"
+          },
+          {
+            "message": "extra arguments at positions #3, #4 in call",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:24"
+          },
+          {
+            "message": "|                                     `- error: extra arguments at positions #3, #4 in call"
+          },
+          {
+            "message": "cannot find 'CoachInvitationActions' in scope",
+            "location": "/Users/david/Projects/apps/MeetPR-wt-invite-share/Modules/CoachKit/Tests/CoachKitTests/Features/InviteCodes/CoachInvitationActionsTests.swift:27"
+          },
+          {
+            "message": "|                                           `- error: cannot find 'CoachInvitationActions' in scope"
+          },
+          {
+            "message": "fatalError"
+          }
+        ],
+        "testFailures": []
+      }
+    }
+  },
+  "isError": true
+}

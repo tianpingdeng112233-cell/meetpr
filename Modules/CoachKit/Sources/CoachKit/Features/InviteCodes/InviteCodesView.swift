@@ -9,12 +9,17 @@ import SwiftUI
 @available(iOS 17.0, macOS 14.0, *)
 struct InviteCodesView: View {
   private let coachName: String?
+  private let buildTrack: MeetPRBuildTrack
   @State private var viewModel: InviteCodesViewModel
   @State private var createSheet: CreateCodeSheetKind?
   @State private var confirmRegenerate = false
   @State private var revokeTarget: InviteCode?
 
-  init(repository: any InviteCodeRepository, coachName: String? = nil) {
+  init(
+    repository: any InviteCodeRepository, coachName: String? = nil,
+    buildTrack: MeetPRBuildTrack = BuildConfig.buildTrack
+  ) {
+    self.buildTrack = buildTrack
     self.coachName = coachName
     self._viewModel = State(initialValue: InviteCodesViewModel(repository: repository))
   }
@@ -31,6 +36,22 @@ struct InviteCodesView: View {
     .background(Color.MeetPR.bgBase)
     .tint(Color.MeetPR.gold500)
     .navigationTitle(InviteCodeStrings.navigationTitle)
+    .toolbar {
+      if buildTrack == .china, viewModel.activePersonalCode != nil {
+        ToolbarItem(placement: .primaryAction) {
+          Menu {
+            Button(InviteCodeStrings.regenerate, role: .destructive) {
+              confirmRegenerate = true
+            }
+            .disabled(viewModel.isMutating)
+          } label: {
+            Image(systemName: "ellipsis")
+          }
+          .accessibilityLabel(CoachLocalization.localized("coach.invites.manage"))
+          .accessibilityIdentifier("coach.invites.menu")
+        }
+      }
+    }
     .task {
       await viewModel.loadIfNeeded()
     }
@@ -89,29 +110,31 @@ struct InviteCodesView: View {
       if let code = viewModel.activePersonalCode {
         VStack(alignment: .leading, spacing: MeetPRSpacing.md) {
           Text(InviteCodeFormat.grouped(code.code))
-            .font(.system(size: 28, weight: .bold, design: .monospaced))
+            .font(
+              .MeetPR.system(size: MeetPRFontMetrics.size28, weight: .bold, design: .monospaced)
+            )
             .foregroundStyle(Color.MeetPR.textPrimary)
           Text(InviteCodeStrings.usedCount(code.usedCount))
             .font(Font.MeetPR.caption)
             .foregroundStyle(Color.MeetPR.textSecondary)
-          HStack(spacing: MeetPRSpacing.md) {
-            SecondaryButton(
-              viewModel.copiedCodeID == code.id
-                ? InviteCodeStrings.copied
-                : InviteCodeStrings.copy
+          if buildTrack == .china {
+            CoachInvitationActions(
+              code: code.code, coachName: coachName,
+              isCopied: viewModel.copiedCodeID == code.id
             ) {
               copy(code)
             }
-            if BuildConfig.buildTrack == .china {
-              ShareLink(item: CoachInvitationMessage.text(code: code.code, coachName: coachName)) {
-                Label(
-                  CoachLocalization.localized("coach.invites.share"),
-                  systemImage: "square.and.arrow.up")
+          } else {
+            HStack(spacing: MeetPRSpacing.md) {
+              SecondaryButton(
+                viewModel.copiedCodeID == code.id
+                  ? InviteCodeStrings.copied : InviteCodeStrings.copy
+              ) {
+                copy(code)
               }
-              .accessibilityIdentifier("coach.invites.share")
-            }
-            SecondaryButton(InviteCodeStrings.regenerate) {
-              confirmRegenerate = true
+              SecondaryButton(InviteCodeStrings.regenerate) {
+                confirmRegenerate = true
+              }
             }
           }
         }
@@ -218,7 +241,8 @@ struct InviteCodesView: View {
 
   /// CN copies the invitation message; Global retains the raw code.
   private func copy(_ code: InviteCode) {
-    let message = CoachInvitationMessage.text(code: code.code, coachName: coachName)
+    let message = CoachInvitationMessage.text(
+      code: code.code, coachName: coachName, buildTrack: buildTrack)
     #if os(iOS)
       UIPasteboard.general.string = message
     #elseif os(macOS)

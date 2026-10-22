@@ -1,6 +1,7 @@
 import CoreModels
 import DesignSystem
 import Foundation
+import Networking
 import RepositoryContracts
 import SwiftUI
 
@@ -15,6 +16,8 @@ struct CoachMyProfileView: View {
   @Bindable private var viewModel: CoachMyProfileViewModel
   private let inviteCodes: any InviteCodeRepository
   private let privacyPolicyURL: URL?
+  private let buildTrack: MeetPRBuildTrack?
+  @Environment(\.coachInvitationBuildTrack) private var environmentTrack
   @State private var codesViewModel: InviteCodesViewModel
   @State private var presentedOverlay: CoachProfileOverlay?
   @State private var isInviteCodesPresented = false
@@ -24,12 +27,16 @@ struct CoachMyProfileView: View {
   init(
     viewModel: CoachMyProfileViewModel,
     inviteCodes: any InviteCodeRepository,
-    privacyPolicyURL: URL? = nil
+    privacyPolicyURL: URL? = nil,
+    buildTrack: MeetPRBuildTrack? = nil,
+    codesViewModel: InviteCodesViewModel? = nil
   ) {
     self.viewModel = viewModel
     self.inviteCodes = inviteCodes
     self.privacyPolicyURL = privacyPolicyURL
-    self._codesViewModel = State(initialValue: InviteCodesViewModel(repository: inviteCodes))
+    self.buildTrack = buildTrack
+    self._codesViewModel = State(
+      initialValue: codesViewModel ?? InviteCodesViewModel(repository: inviteCodes))
   }
 
   @ViewBuilder
@@ -89,7 +96,9 @@ struct CoachMyProfileView: View {
       .background(Color.MeetPR.bgBase)
       .hideNavigationBar()
       .navigationDestination(isPresented: $isInviteCodesPresented) {
-        InviteCodesView(repository: inviteCodes, coachName: viewModel.displayName)
+        InviteCodesView(
+          repository: inviteCodes, coachName: viewModel.displayName,
+          buildTrack: invitationBuildTrack)
       }
     }
     .task { await codesViewModel.loadIfNeeded() }
@@ -113,7 +122,21 @@ extension CoachMyProfileView {
       .accessibilityIdentifier("coach.profile.displayName")
   }
 
+  private var invitationBuildTrack: MeetPRBuildTrack { buildTrack ?? environmentTrack }
+
+  @ViewBuilder
   private var inviteCard: some View {
+    if invitationBuildTrack == .china, let code = codesViewModel.activePersonalCode {
+      CoachInvitationCard(
+        code: code, coachName: viewModel.displayName,
+        isCopied: codesViewModel.copiedCodeID == code.id,
+        onManage: { isInviteCodesPresented = true }, onCopy: { copy(code) })
+    } else {
+      legacyInviteCard
+    }
+  }
+
+  private var legacyInviteCard: some View {
     ZStack(alignment: .topTrailing) {
       Button {
         isInviteCodesPresented = true
@@ -300,11 +323,12 @@ extension CoachMyProfileView {
   private func copy(_ code: InviteCode) {
     #if os(iOS)
       UIPasteboard.general.string = CoachInvitationMessage.text(
-        code: code.code, coachName: viewModel.displayName)
+        code: code.code, coachName: viewModel.displayName, buildTrack: invitationBuildTrack)
     #elseif os(macOS)
       NSPasteboard.general.clearContents()
       NSPasteboard.general.setString(
-        CoachInvitationMessage.text(code: code.code, coachName: viewModel.displayName),
+        CoachInvitationMessage.text(
+          code: code.code, coachName: viewModel.displayName, buildTrack: invitationBuildTrack),
         forType: .string)
     #endif
     codesViewModel.markCopied(code)
@@ -318,6 +342,7 @@ extension CoachMyProfileView {
       try? await Task.sleep(for: .seconds(2))
       guard !Task.isCancelled else { return }
       toastMessage = nil
+      codesViewModel.clearCopied()
     }
   }
 
