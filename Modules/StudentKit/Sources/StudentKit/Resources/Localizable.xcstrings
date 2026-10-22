@@ -1491,7 +1491,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "無法獲取繫結狀態"
+            "value": "無法取得繫結狀態"
           }
         }
       }
@@ -3124,7 +3124,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": " 前釋出"
+            "value": " 前發布"
           }
         }
       }
@@ -3423,7 +3423,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "下一份課表由教練釋出。釋出後這裡會直接出現 W1D1。"
+            "value": "下一份課表由教練發布。發布後這裡會直接出現 W1D1。"
           }
         }
       }
@@ -6091,7 +6091,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "無法獲取評估狀態"
+            "value": "無法取得評估狀態"
           }
         }
       }
@@ -6735,7 +6735,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "播放連結獲取失敗，請重試"
+            "value": "播放連結取得失敗，請重試"
           }
         }
       }
@@ -6896,7 +6896,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "播放連結獲取失敗，請重試"
+            "value": "播放連結取得失敗，請重試"
           }
         }
       }
@@ -17706,7 +17706,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "教練釋出了新課表"
+            "value": "教練發布了新課表"
           }
         }
       }

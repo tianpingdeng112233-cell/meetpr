@@ -1,0 +1,43 @@
+...FFF.
+======================================================================
+FAIL: test_publish_and_get_code_use_v22_vocabulary (test_generation.TaiwanVocabularyTests.test_publish_and_get_code_use_v22_vocabulary) (key='coach.import.publishToStudent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/david/Projects/apps/MeetPR-wt-094-zh-hant/scripts/zh-hant/test_generation.py", line 25, in test_publish_and_get_code_use_v22_vocabulary
+    self.assertEqual(entry['zh-Hant']['stringUnit']['value'], expected)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '釋出給學員' != '發布給學員'
+- 釋出給學員
++ 發布給學員
+
+
+======================================================================
+FAIL: test_publish_and_get_code_use_v22_vocabulary (test_generation.TaiwanVocabularyTests.test_publish_and_get_code_use_v22_vocabulary) (key='coach.planning.step7.publishToStudent')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/david/Projects/apps/MeetPR-wt-094-zh-hant/scripts/zh-hant/test_generation.py", line 25, in test_publish_and_get_code_use_v22_vocabulary
+    self.assertEqual(entry['zh-Hant']['stringUnit']['value'], expected)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '釋出給學員' != '發布給學員'
+- 釋出給學員
++ 發布給學員
+
+
+======================================================================
+FAIL: test_publish_and_get_code_use_v22_vocabulary (test_generation.TaiwanVocabularyTests.test_publish_and_get_code_use_v22_vocabulary) (key='auth.getCode')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/david/Projects/apps/MeetPR-wt-094-zh-hant/scripts/zh-hant/test_generation.py", line 25, in test_publish_and_get_code_use_v22_vocabulary
+    self.assertEqual(entry['zh-Hant']['stringUnit']['value'], expected)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '獲取驗證碼' != '取得驗證碼'
+- 獲取驗證碼
+? -
++ 取得驗證碼
+?  +
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.014s
+
+FAILED (failures=3)

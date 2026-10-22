@@ -11,6 +11,19 @@ SPEC.loader.exec_module(generator)
 
 
 class TaiwanVocabularyTests(unittest.TestCase):
+    def test_publish_and_get_code_use_v22_vocabulary(self):
+        cases = (
+            ('CoachKit', 'coach.import.publishToStudent', '发布给学员', '發布給學員'),
+            ('CoachKit', 'coach.planning.step7.publishToStudent', '发布给学员', '發布給學員'),
+            ('AppShell', 'auth.getCode', '获取验证码', '取得驗證碼'),
+        )
+        for module, key, source, expected in cases:
+            with self.subTest(key=key):
+                self.assertEqual(generator.translate(source, key=key), expected)
+                path = generator.ROOT / f'Modules/{module}/Sources/{module}/Resources/Localizable.xcstrings'
+                entry = json.loads(path.read_text())['strings'][key]['localizations']
+                self.assertEqual(entry['zh-Hant']['stringUnit']['value'], expected)
+
     def test_plan_and_feedback_compounds(self):
         self.assertEqual(generator.translate('发布训练计划并提交视频反馈'), '發布課表並提交影片反饋')
         self.assertEqual(generator.translate('计划编辑器'), '課表編輯器')

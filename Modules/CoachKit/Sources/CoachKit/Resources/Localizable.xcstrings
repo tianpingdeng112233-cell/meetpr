@@ -3715,7 +3715,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "註冊資料暫時無法獲取"
+            "value": "註冊資料暫時無法取得"
           }
         }
       }
@@ -3991,7 +3991,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "暫時無法獲取"
+            "value": "暫時無法取得"
           }
         }
       }
@@ -4519,7 +4519,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "完成後即可釋出正式 4 週課表。還沒寫評估總結的話,建議先寫總結再完成。"
+            "value": "完成後即可發布正式 4 週課表。還沒寫評估總結的話,建議先寫總結再完成。"
           }
         }
       }
@@ -6344,7 +6344,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還有「待你定」的項——補齊重量/RPE、繫結動作後才能釋出。"
+            "value": "還有「待你定」的項——補齊重量/RPE、繫結動作後才能發布。"
           }
         }
       }
@@ -6551,7 +6551,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "釋出失敗：{message}"
+            "value": "發布失敗：{message}"
           }
         }
       }
@@ -6574,7 +6574,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "釋出給學員"
+            "value": "發布給學員"
           }
         }
       }
@@ -6597,7 +6597,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "可釋出"
+            "value": "可發布"
           }
         }
       }
@@ -6620,7 +6620,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "已釋出給 {student}"
+            "value": "已發布給 {student}"
           }
         }
       }
@@ -11354,7 +11354,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "評估期內只能釋出 1 週適應週課表。先完成評估,或改發適應週。"
+            "value": "評估期內只能發布 1 週適應週課表。先完成評估,或改發適應週。"
           }
         }
       }
@@ -11377,7 +11377,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "釋出失敗,請稍後重試"
+            "value": "發布失敗,請稍後重試"
           }
         }
       }
@@ -11400,7 +11400,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "缺少課表或學員資訊,無法釋出"
+            "value": "缺少課表或學員資訊,無法發布"
           }
         }
       }
@@ -12945,7 +12945,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "以下專案需要補全後才能釋出：\n\n{issues}"
+            "value": "以下專案需要補全後才能發布：\n\n{issues}"
           }
         }
       }
@@ -12968,7 +12968,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "釋出失敗"
+            "value": "發布失敗"
           }
         }
       }
@@ -12991,7 +12991,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "釋出給學員"
+            "value": "發布給學員"
           }
         }
       }
@@ -13014,7 +13014,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "釋出中…"
+            "value": "發布中…"
           }
         }
       }
@@ -18189,7 +18189,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "播放連結獲取失敗，請重試"
+            "value": "播放連結取得失敗，請重試"
           }
         }
       }
@@ -19616,7 +19616,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "已釋出"
+            "value": "已發布"
           }
         }
       }
@@ -20089,7 +20089,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "最近釋出"
+            "value": "最近發布"
           }
         }
       }
@@ -20227,7 +20227,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "預覽釋出"
+            "value": "預覽發布"
           }
         }
       }
@@ -20342,7 +20342,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "為學員排週期 · 續編草稿 · 回看已釋出"
+            "value": "為學員排週期 · 續編草稿 · 回看已發布"
           }
         }
       }

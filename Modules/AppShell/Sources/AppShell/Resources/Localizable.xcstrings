@@ -1744,7 +1744,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "獲取驗證碼"
+            "value": "取得驗證碼"
           }
         }
       }
@@ -1790,7 +1790,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "重新獲取"
+            "value": "重新取得"
           }
         }
       }
@@ -1997,7 +1997,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "驗證碼不對或已過期，請重新獲取"
+            "value": "驗證碼不對或已過期，請重新取得"
           }
         }
       }
@@ -2020,7 +2020,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "驗證碼不對或已過期，請重新獲取"
+            "value": "驗證碼不對或已過期，請重新取得"
           }
         }
       }

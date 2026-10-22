@@ -1696,3 +1696,11 @@ student.workoutCompletionPresentation.copy003.one
 - 同模拟器用 `-AppleLanguages "(zh-Hant)" -AppleLocale zh_TW` 启动，亲眼核对并保存教练首页、学员今日训练两图到 `docs/evidence/094-zh-hant/`。Demo构建只用命令行关闭优化加速，工程配置未改。截图显示課表/反饋/週/下數等繁体用语，用户姓名与教练备注仍为原文。
 - 双轴最终定向复核 Standards CLEAN、Spec CLEAN，无新增 finding；旧无来源快照／反馈名称边界仍待 Opus 裁决，本记录不代表正式验收。九包全绿要求尚未达成。
 - 按两份 AMEND 的不 commit 要求保持未提交工作区。此前 Git 写权限原始拒绝仍见本卡首段，未再尝试 Git 写入；无 push／PR／build号／tag／NEXT-RELEASE改动。未来提交末行必须为 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`。
+
+### v2.2 返修（2026-10-22）
+
+- 基于 Opus 提交 `1b985255`，本工作树临时文件试写成功。按 `AMEND-v22.md` 与已更新的术语表重跑生成器：AppShell／CoachKit／StudentKit 共 31 条繁体文案改用「發布／取得」，生成的搜索映射同步增加「取得→获取」。生成器逻辑无需修改；网页 title 项不适用于本仓。
+- 沿用 Python 生成测试 seam，新增 1 项参数化回归覆盖两处「發布給學員」和「取得驗證碼」：旧产物 3 个断言失败，重新生成后 5 项全绿；[红阶段](evidence/094-zh-hant/v22-red-results.txt)、[绿阶段及生成检查](evidence/094-zh-hant/v22-green-results.txt)。`--check` 对 10 目录／2344 key 的占位符、术语、简体特有字与产物一致性校验通过。全部 zh-Hans/en 树与 HEAD 逐项一致；动作 catalog、aliases、展示名表字节不变。
+- XcodeBuildMCP：DesignSystem `TraditionalChineseCatalogTests` 1 项通过；CoreModels 全量 160 项通过。MeetPR／Debug／iPhone 17 Pro Max iOS 26.5 编译并启动成功（41.4s，无 warning/error），使用本树 `.build/094-simulator`；以 `-AppleLanguages (zh-Hant) -AppleLocale zh_TW` 亲看注册页「取得驗證碼」，[截图](evidence/094-zh-hant/v22-register-zh-Hant.jpg)。未提交注册或请求验证码。
+- 全仓 `swiftlint lint --strict --config .swiftlint.yml`：1220 文件零违规；`xcrun swift-format lint --configuration .swift-format --recursive --strict MeetPR MeetPRTests Modules` 通过；Python 编译与 `git diff --check` 通过。日志 `.build/094-v22-lint.log`、`.build/094-v22-format.log`；MCP 原始日志目录 `~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-094-zh-hant-6bf212735501/logs/`，本轮 build `build_run_sim_2026-10-22T09-45-01-503Z_pid87085_8a9e3243.log`，目录测试 `swift_package_test_2026-10-22T09-45-42-937Z_pid87085_4455b78b.log`，CoreModels `swift_package_test_2026-10-22T09-46-33-656Z_pid87085_2ece3e6a.log`。
+- 本轮为术语资源定向返修，未重跑上一轮九包全量，既有失败与待裁决事项仍按前文记录；开发自检不替代 Opus 验收。保留来时的 GLOSSARY／AMEND 改动，不 commit、不 push，不改发布正典。
