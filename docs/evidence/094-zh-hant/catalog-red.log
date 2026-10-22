@@ -1,0 +1,9 @@
+Extracted test results; original build output retained in .build/094-evidence-originals/catalog-red.log
+Build complete! (127.27s)
+Test Suite 'DesignSystemPackageTests.xctest' passed at 2026-10-22 08:46:43.446.
+Test Suite 'Selected tests' passed at 2026-10-22 08:46:43.446.
+◇ Test run started.
+✘ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() recorded an issue at TraditionalChineseCatalogTests.swift:21:26: Expectation failed: (locales["zh-Hant"] → nil) as? ([String: Any] → Optional<Any>)
+✘ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() failed after 0.003 seconds with 1 issue.
+✘ Suite TraditionalChineseCatalogTests failed after 0.003 seconds with 1 issue.
+✘ Test run with 1 test in 1 suite failed after 0.004 seconds with 1 issue.

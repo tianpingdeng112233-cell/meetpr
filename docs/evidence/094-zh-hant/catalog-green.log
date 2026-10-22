@@ -1,0 +1,8 @@
+Extracted test results; original build output retained in .build/094-evidence-originals/catalog-green.log
+Build complete! (0.62s)
+Test Suite 'DesignSystemPackageTests.xctest' passed at 2026-10-22 08:49:54.870.
+Test Suite 'Selected tests' passed at 2026-10-22 08:49:54.870.
+◇ Test run started.
+✔ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() passed after 18.662 seconds.
+✔ Suite TraditionalChineseCatalogTests passed after 18.663 seconds.
+✔ Test run with 1 test in 1 suite passed after 18.663 seconds.

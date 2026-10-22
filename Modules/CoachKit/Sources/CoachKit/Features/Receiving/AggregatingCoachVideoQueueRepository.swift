@@ -55,7 +55,9 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
             studentDisplayName: student.displayName,
             setLogID: video.setLogID,
             planExerciseID: exerciseID,
-            exerciseName: exerciseNamesByID[exerciseID],
+            exerciseName: exerciseNamesByID[exerciseID]?.name,
+            isCatalogExercise: exerciseNamesByID[exerciseID]?.createdByCoachID == nil
+              && exerciseNamesByID[exerciseID] != nil,
             dayDate: video.loggedAt.map { Calendar(identifier: .gregorian).startOfDay(for: $0) },
             uploadedAt: video.displayDate,
             sizeBytes: video.sizeBytes
@@ -69,7 +71,7 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
   /// `[planExerciseID: exercise name]` from the student's current plan — maps a
   /// video's linked slot to the coach-programmed 主项/变式 name. Empty when the
   /// plan can't be fetched (the row then shows time + size only).
-  private func exerciseNames(forStudent studentID: UUID) async throws -> [UUID: String] {
+  private func exerciseNames(forStudent studentID: UUID) async throws -> [UUID: Exercise] {
     let plan: StudentPlanView?
     do {
       plan = try await plans.fetchCurrentPlan(studentID: studentID)
@@ -80,7 +82,7 @@ public struct AggregatingCoachVideoQueueRepository: CoachVideoQueueRepository {
     guard let plan else { return [:] }
     return Dictionary(
       plan.days.flatMap(\.exercises).map {
-        ($0.id, $0.exercise.name)
+        ($0.id, $0.exercise)
       },
       uniquingKeysWith: { first, _ in first }
     )

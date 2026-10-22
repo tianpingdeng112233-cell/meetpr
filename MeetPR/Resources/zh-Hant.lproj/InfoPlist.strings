@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "MeetPR 需要使用相機拍攝你的訓練影片,供你繫結的教練檢視動作並給出反饋。";
+"NSMicrophoneUsageDescription" = "拍攝訓練影片時需要錄製聲音(例如槓鈴落地與口令),用於教練回看。";
+"NSPhotoLibraryAddUsageDescription" = "MeetPR 需要向相簿新增拍攝或帶訓練角標的匯出影片,便於你留存和分享訓練記錄。";
+"NSPhotoLibraryUsageDescription" = "MeetPR 需要訪問相簿,以便你選擇已拍好的訓練影片上傳給教練。";

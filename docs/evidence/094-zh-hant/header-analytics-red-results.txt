@@ -1,0 +1,7 @@
+Source: .build/094-analytics-header-red.log
+
+✘ Test flusherDeletesOnlyAfterExact204() recorded an issue at EventFlusherTests.swift:12:5: Expectation failed: (request.value(forHTTPHeaderField: "X-MeetPR-Locale") → nil) == (InterfaceLanguage.current.rawValue → "en")
+✘ Test flusherDeletesOnlyAfterExact204() recorded an issue at EventFlusherTests.swift:13:5: Expectation failed: (request.value(forHTTPHeaderField: "Accept-Language") → "en") == nil
+✘ Test flusherDeletesOnlyAfterExact204() recorded an issue at EventFlusherTests.swift:12:5: Expectation failed: (request.value(forHTTPHeaderField: "X-MeetPR-Locale") → nil) == (InterfaceLanguage.current.rawValue → "en")
+✘ Test flusherDeletesOnlyAfterExact204() recorded an issue at EventFlusherTests.swift:13:5: Expectation failed: (request.value(forHTTPHeaderField: "Accept-Language") → "en") == nil
+✘ Test run with 1 test in 0 suites failed after 0.005 seconds with 4 issues.

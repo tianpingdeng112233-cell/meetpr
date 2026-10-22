@@ -1,0 +1,46 @@
+Source: .build/094-v2-tests/StudentKit.log
+
+◇ Test terminalFailurePersistsFailedBeforeQueuedChunkCleanup() started.
+◇ Test uploadManagerMarksFailedAndAbortsAfterRetryExhaustion() started.
+◇ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() started.
+◇ Test cleanupDoesNotMistakeAnotherStudentsFailedSourceForAnOrphan() started.
+◇ Test coldStartRetriesFailedTerminalSaveBeforeChunkCleanup() started.
+◇ Test uploadManagerTreatsTerminalComplete409AsFailed(status:) started.
+◇ Test recoverInterruptedUploadsMarksStaleRecordsFailed() started.
+◇ Test launchRecoveryRemovesUnqueuedFailedChunkOrphan() started.
+◇ Test recordFailureKeepsPrefixAndRetryContinuesAtFailedSet() started.
+◇ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() started.
+◇ Test incompleteAndFailedSetsProduceNeitherPointNorPR() started.
+◇ Test partitionHandlesPartialSkippedFailedAssumedAndCancellation() started.
+◇ Test manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() started.
+✘ Test "Eligible source is remuxed without re-encoding its video samples" recorded an issue at AVFoundationVideoExporterTests.swift:37:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test "Downscaled portrait export rescales the transform translation" recorded an issue at AVFoundationVideoExporterTests.swift:150:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test passthroughTrimKeepsOnlySamplesFromTheSelectedRange() recorded an issue at PassthroughVideoTrimExporterTests.swift:51:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" recorded an issue at AVFoundationVideoExporterTests.swift:9:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test "High-bitrate 1080p export caps dimensions and bitrate without resampling frames" recorded an issue at AVFoundationVideoExporterTests.swift:180:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test "Video export preserves the full portrait preferred transform" recorded an issue at AVFoundationVideoExporterTests.swift:128:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test passthroughTrimExportsRequestedRangeWithoutReencoding() recorded an issue at PassthroughVideoTrimExporterTests.swift:7:2: Caught error: .unavailable("The operation could not be completed")
+◇ Test case passing 1 argument status → .failed to uploadManagerTreatsTerminalComplete409AsFailed(status:) started.
+◇ Test case passing 1 argument status → .aborted to uploadManagerTreatsTerminalComplete409AsFailed(status:) started.
+✔ Test terminalFailurePersistsFailedBeforeQueuedChunkCleanup() passed after 0.105 seconds.
+✘ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() recorded an issue at PassthroughVideoTrimExporterTests.swift:94:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test realMediaTrimHandoffUsesEditedURLForEveryReviewConsumer() recorded an issue at VideoTrimCompletionTests.swift:168:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test "Cancelling video export removes its partial output" recorded an issue at AVFoundationVideoExporterTests.swift:247:2: Caught error: .unavailable("The operation could not be completed")
+✔ Test cleanupDoesNotMistakeAnotherStudentsFailedSourceForAnOrphan() passed after 0.116 seconds.
+✘ Test passthroughTrimOutputNeverOvershootsTheSelectionCap() recorded an issue at PassthroughVideoTrimExporterTests.swift:144:2: Caught error: .unavailable("The operation could not be completed")
+✔ Test coldStartRetriesFailedTerminalSaveBeforeChunkCleanup() passed after 0.121 seconds.
+✔ Test recoverInterruptedUploadsMarksStaleRecordsFailed() passed after 0.119 seconds.
+✔ Test launchRecoveryRemovesUnqueuedFailedChunkOrphan() passed after 0.119 seconds.
+✔ Test incompleteAndFailedSetsProduceNeitherPointNorPR() passed after 0.115 seconds.
+✔ Test previousAddedSessionUsesMatchingIndexAndIgnoresFailed() passed after 0.148 seconds.
+✔ Test uploadManagerTreatsTerminalComplete409AsFailed(status:) with 2 test cases passed after 0.166 seconds.
+✘ Test "Video export transcodes source audio to AAC" recorded an issue with 1 argument channelCount → 2 at AVFoundationVideoExporterTests.swift:219:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test "Video export transcodes source audio to AAC" recorded an issue with 1 argument channelCount → 1 at AVFoundationVideoExporterTests.swift:219:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test "Eligible AAC audio is remuxed without re-encoding either media stream" recorded an issue at AVFoundationVideoExporterTests.swift:72:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test passthroughTrimKeepsTheAudioTrack() recorded an issue at PassthroughVideoTrimExporterTests.swift:117:2: Caught error: .unavailable("The operation could not be completed")
+✔ Test uploadManagerMarksFailedAndAbortsAfterRetryExhaustion() passed after 0.199 seconds.
+✔ Test partitionHandlesPartialSkippedFailedAssumedAndCancellation() passed after 0.864 seconds.
+✔ Test manualCompletionUnlocksOnlyAfterARecordedSetFailedIncluded() passed after 0.828 seconds.
+✔ Test recordFailureKeepsPrefixAndRetryContinuesAtFailedSet() passed after 1.758 seconds.
+✔ Test accessoryFinalPendingSetDoesNotRestWhenAnotherSetFailed() passed after 1.757 seconds.
+✘ Test run with 1036 tests in 49 suites failed after 2.158 seconds with 15 issues.

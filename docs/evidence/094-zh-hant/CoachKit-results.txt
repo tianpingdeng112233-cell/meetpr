@@ -1,0 +1,480 @@
+Source: .build/094-tests/CoachKit.log
+Build complete! (147.30s)
+✔ Test detectsDateRowsAndSplitsBlocks() passed after 3.489 seconds.
+✔ Test projectionOrdersMainLiftBeforeAccessoryBySortOrder() passed after 3.490 seconds.
+✔ Test inMemorySendFeedbackDropsExactVideoAndScopesIt() passed after 3.490 seconds.
+✔ Test inMemoryPlaybackURLHitAndMiss() passed after 3.491 seconds.
+✔ Test draftSetSpecRoundTripsWeightMode() passed after 3.491 seconds.
+✔ Test planningStepCodableRoundTripsEveryCase() passed after 3.491 seconds.
+✔ Test weekDerivationAppliesSetsIncreaseAndDecreaseClamp() passed after 3.491 seconds.
+✔ Test aggregatorExcludesAnsweredAndUnlinkedKeepsUnanswered() passed after 3.494 seconds.
+✔ Test planNeedReasonDetectsMissingCurrentPlan() passed after 3.494 seconds.
+✔ Test draftProgressionRulePreservesExerciseIDSet() passed after 3.494 seconds.
+✔ Test weightInputFieldKgToPercentRoundsResultToHalfPercent() passed after 3.493 seconds.
+✔ Test weekDerivationAppliesRPEDecreaseAndClamps() passed after 3.494 seconds.
+✔ Test trailingAndRepeatedOperatorsAreForgiving() passed after 3.497 seconds.
+✔ Test muscleGroupTextCoversAllEightAllowedGroups() passed after 3.497 seconds.
+✔ Test profileSummaryFormatsKeyFields() passed after 3.497 seconds.
+✔ Test projectionComputesDayDateFromStartDateWeekAndDayOfWeek() passed after 3.495 seconds.
+✔ Test trainingYearsNotchLabels() passed after 3.496 seconds.
+✔ Test personalPermanentNeverExpiresOrExhausts() passed after 3.495 seconds.
+✔ Test projectionSortsDaysChronologicallyByDayOfWeek() passed after 3.495 seconds.
+✔ Test notTrainedSignalIgnoresTodayAndCompletedDays() passed after 3.495 seconds.
+✔ Test weightInputFieldRoundsRawInputBeforeConverting() passed after 3.495 seconds.
+✔ Test coachInboxPrioritizesVideosThenUnreadThenRecency() passed after 3.497 seconds.
+✔ Test waitingTextScalesWithElapsedTime() passed after 3.497 seconds.
+✔ Test statusIsActiveForUnusedSingleUse() passed after 3.497 seconds.
+✔ Test projectionYieldsNoSetsWhenEveryPlanSetIsCorrupt() passed after 3.494 seconds.
+✔ Test defaultStartDateIsNextMonday() passed after 3.497 seconds.
+✔ Test weightInputFieldZeroOneRMReturnsZero() passed after 3.494 seconds.
+✔ Test inMemoryReturnsSeedNewestFirst() passed after 3.494 seconds.
+✔ Test coachEvaluationSealKeepsEvaluationBannerAndLoadingDormant() passed after 3.494 seconds.
+✔ Test equipmentFilterFollowsGymTierTable() passed after 3.495 seconds.
+✔ Test weekDerivationAppliesWeightIncrease() passed after 3.494 seconds.
+✔ Test weekDerivationReturnsW1Baseline() passed after 3.494 seconds.
+✔ Test inMemoryListIsNewestFirst() passed after 3.494 seconds.
+✔ Test accessorySearchFoldsBarCharacterAcrossSpellings() passed after 3.494 seconds.
+✔ Test exactMatchWinsOverAlias() passed after 3.497 seconds.
+✔ Test weightInputFieldRoundTripStableAtCommonBenchmark() passed after 3.494 seconds.
+✔ Test barCharacterFoldsBothWays() passed after 3.494 seconds.
+✔ Test percentPresetStoreRoundTripsNormalized() passed after 3.495 seconds.
+✔ Test singleWeightAppliesToEverySet() passed after 3.495 seconds.
+✔ Test weekDerivationUsesHigherDisplayOrderForSameDimension() passed after 3.494 seconds.
+✔ Test draftProgressSummaryMapsStepNameAndWeeks() passed after 3.494 seconds.
+✔ Test corruptDateRowSecondWeekStillParses() passed after 3.497 seconds.
+✔ Test unmatchedNameDoesNotBind() passed after 3.494 seconds.
+✔ Test publishesThroughRepository() passed after 3.494 seconds.
+✔ Test coachInboxCoalescesDuplicateStudentConversationsToTheLatest() passed after 3.493 seconds.
+✔ Test planNeedReasonDetectsCycleEndingThisWeek() passed after 3.493 seconds.
+✔ Test backoffKeepsCueAndType() passed after 3.494 seconds.
+✔ Test aliasBindsWhenNoExactMatch() passed after 3.494 seconds.
+✔ Test accessorySearchMatchesEnglishNameCaseInsensitively() passed after 3.494 seconds.
+✔ Test projectionSkipsExerciseMissingFromCatalog() passed after 3.494 seconds.
+✔ Test statusFlipsToExpiredAtBoundary() passed after 3.493 seconds.
+✔ Test sharedRPE() passed after 3.493 seconds.
+✔ Test aggregatorLinkedClipDropsAfterSendAndRefetch() passed after 3.493 seconds.
+✔ Test corruptDateRowStillOpensABlock() passed after 3.493 seconds.
+✔ Test steppersClampAtZeroAndStayOnHalfGrid() passed after 3.496 seconds.
+✔ Test projectionWeightModeSetHasWeightAndNilRPE() passed after 3.494 seconds.
+✔ Test dayColumnsUseFiveColumnStride() passed after 3.494 seconds.
+✔ Test backendPublishPlanThrowsWhenAChildCreateFailsAndDoesNotPublish() passed after 3.498 seconds.
+✔ Test accessoryFiltersAreEquatableAndHashable() passed after 3.495 seconds.
+✔ Test planNeedReasonSkipsRunningCycle() passed after 3.495 seconds.
+✔ Test inMemoryRevokeIsIdempotent() passed after 3.497 seconds.
+✔ Test weightInputFieldKgToPercentBasicConversion() passed after 3.507 seconds.
+✔ Test weekDerivationAppliesRepsIncreaseAndDecreaseClamp() passed after 3.508 seconds.
+✔ Test incompleteSelectionThrows() passed after 3.493 seconds.
+✔ Test oneRMsMapPerFamilyDroppingMissing() passed after 3.494 seconds.
+✔ Test triageSignalsCanCoexistForOneStudent() passed after 3.511 seconds.
+✔ Test coachInboxUnifiesChatAndVideoStudentsWithoutDuplicates() passed after 3.539 seconds.
+✔ Test notTrainedSignalCountsMissesAboveThreshold() passed after 3.543 seconds.
+✔ Test weekDerivationCombinesDifferentDimensions() passed after 3.543 seconds.
+✔ Test aggregatorCarriesStudentVideoSetLogID() passed after 3.543 seconds.
+✔ Test padDigitsAppendWithTwoDecimalPlaces() passed after 3.544 seconds.
+✔ Test notTrainedSignalDoesNotCountShiftedOriginalDates() passed after 3.543 seconds.
+✔ Test weightInputFieldPercentToKgBasicConversion() passed after 3.543 seconds.
+✔ Test draftSetSpecPreservesNonNilRepsMax() passed after 3.543 seconds.
+✔ Test weekDerivationAppliesRPEIncrease() passed after 3.543 seconds.
+✔ Test percentPresetsNormalizeClampDedupeSortCap() passed after 3.542 seconds.
+✔ Test trainingDayTokensMapToWeekdayInts() passed after 3.542 seconds.
+✔ Test exerciseMustBeBoundAndAllSetsComplete() passed after 3.542 seconds.
+✔ Test tempoSuffixStrippedFromName() passed after 3.542 seconds.
+✔ Test coachInboxIsEmptyOnlyWhenBothSourcesAreEmpty() passed after 3.542 seconds.
+✔ Test perSetRPEFromFloatDigits() passed after 3.542 seconds.
+✔ Test revokedWinsOverEverything() passed after 3.542 seconds.
+✔ Test noSignalWhenRecentLogAlreadyHasFeedback() passed after 3.542 seconds.
+✔ Test restDayHasNoExercises() passed after 3.542 seconds.
+✔ Test accessoryFiltersIsEmptyTracksAnySelectedFacet() passed after 3.542 seconds.
+✔ Test divideByZeroShowsPlaceholderAndCommitsZero() passed after 3.542 seconds.
+✔ Test profileSummaryReturnsNilForEmptyFields() passed after 3.542 seconds.
+✔ Test projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() passed after 3.542 seconds.
+✔ Test perSetWeightList() passed after 3.542 seconds.
+✔ Test assembledTreeIsInternallyLinked() passed after 3.542 seconds.
+✔ Test oneRMTrioStripsTrailingZeros() passed after 3.542 seconds.
+✔ Test inMemoryRepositoryStoresPublishedPlans() passed after 3.542 seconds.
+✔ Test readinessFatigueTextOrdersByAllowedChipOrder() passed after 3.542 seconds.
+✔ Test weekDerivationDefaultsSkippedWeeksToPreviousWeek() passed after 3.542 seconds.
+✔ Test accessoryRepositoryReturnsEmptyArrayForNoMatches() passed after 3.549 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetSingleValue() passed after 3.543 seconds.
+✔ Test singleLegDeadliftAndSingleLegRDLStayDistinct() passed after 3.552 seconds.
+✔ Test accessoryRepositoryFiltersAcrossFacetsAsAnd() passed after 3.551 seconds.
+✔ Test traditionalCatalogNamesAndWeekdaysUseTaiwanVocabulary() passed after 3.556 seconds.
+✔ Test accessoryRepositoryFiltersSingleFacetMultipleValuesAsOr() passed after 3.556 seconds.
+✔ Test insertingBaseReplacesCurrentOperand() passed after 3.552 seconds.
+✔ Test previewRepositoryStudentIDsAreStableAcrossLaunches() passed after 3.556 seconds.
+✔ Test previewCatalogHasNoDuplicateChineseNames() passed after 3.549 seconds.
+✔ Test traditionalImportedNamesResolveToSimplifiedCanonicalNames() passed after 3.554 seconds.
+✔ Test previewCatalogAllExercisesHaveValidEnums() passed after 3.560 seconds.
+✔ Test weightInputFieldPercentToKgRoundsResultToHalfKg() passed after 3.549 seconds.
+✔ Test weightInputFieldNegativeOneRMReturnsZero() passed after 3.543 seconds.
+✔ Test expiringSoonOnlyWithin24Hours() passed after 3.549 seconds.
+✔ Test percentOfBaseLandsOnPlateGrid() passed after 3.549 seconds.
+✔ Test projectionMapsRepsMaxRangeToRepsMaxFieldLeavingRepsNil() passed after 3.549 seconds.
+✔ Test accessoryFiltersEmptyStaticHasNoFacetSelections() passed after 3.548 seconds.
+✔ Test notTrainedSignalStaysSilentBelowThreshold() passed after 3.548 seconds.
+✔ Test previewCatalogCoversAllLiftFamilies() passed after 3.559 seconds.
+✔ Test notTrainedSignalFiresAtThreshold() passed after 3.550 seconds.
+✔ Test traditionalSetInputMatchesSimplifiedParsing() passed after 3.551 seconds.
+✔ Test aliasSeedRowsBindToCanonical(rawName:canonical:) with 24 test cases passed after 3.559 seconds.
+✔ Test weekDerivationUsesCustomSequenceBySortedAppliedWeek() passed after 3.565 seconds.
+✔ Test draftStartsEmptyForZeroAndFormattedOtherwise() passed after 3.565 seconds.
+✔ Test progressionRuleTypeRawValuesStaySnakeCase() passed after 3.565 seconds.
+✔ Test inMemoryRevokeUnknownIdThrowsNotFound() passed after 3.566 seconds.
+✔ Test messageBadgeIncludesVideosAndChatUnread() passed after 3.565 seconds.
+✔ Test percentTopLeftEmptyWithCue() passed after 3.549 seconds.
+✔ Test customProgressionRuleRoundTripsSequenceAndDimension() passed after 3.566 seconds.
+✔ Test planNeedReasonDetectsEndedCycle() passed after 3.570 seconds.
+✔ Test ladderHandlesFractionalStep() passed after 3.570 seconds.
+✔ Test localDayStringMatchesCheckinDateWireShape() passed after 3.579 seconds.
+✔ Test exactFoldBindsLowBarSquat() passed after 3.578 seconds.
+✔ Test exactlyOneCoachTabLayerIsInteractiveAndAccessible() passed after 3.578 seconds.
+✔ Test statusIsUsedWhenSingleUseBudgetExhausted() passed after 3.578 seconds.
+✔ Test statusCountsRemainingDaysForTimeLimited() passed after 3.585 seconds.
+✔ Test weekDerivationDispatchesCustomRuleToEachDimension() passed after 3.582 seconds.
+✔ Test aggregatorSendFeedbackPostsThroughFeedbackRepo() passed after 3.583 seconds.
+✔ Test projectionFiltersDaysByWeekIndexPickingThatWeeksValues() passed after 3.582 seconds.
+✔ Test coachCompleteRequiresRealLoad() passed after 3.590 seconds.
+✔ Test amrapDefersRepsAndKeepsCue() passed after 3.590 seconds.
+✔ Test aggregatorSkipsStudentsWithNoVideos() passed after 3.590 seconds.
+✔ Test readinessFatigueTextHandlesNoFatigue() passed after 3.589 seconds.
+✔ Test assemblesPerSetTargetsAndRenumbersWeeks() passed after 3.589 seconds.
+✔ Test inMemoryRepositoryFiltersMainLiftCatalog() passed after 3.588 seconds.
+✔ Test projectionReturnsEmptyDaysWhenNoDayMatchesWeekIndex() passed after 3.588 seconds.
+✔ Test projectionMapsSingleWeekSingleExerciseHappyPath() passed after 3.591 seconds.
+✔ Test backendPublishPlanCreatesTreeBeforePublishingWithServerIDs() passed after 3.591 seconds.
+✔ Test projectionDropsCorruptZeroSetNumberAndKeepsLegalSetsUncollided() passed after 3.587 seconds.
+✔ Test ageDerivesFromBirthDateClientSide() passed after 3.587 seconds.
+✔ Test draftSetSpecRoundTripsRPEMode() passed after 3.588 seconds.
+✔ Test operationsEvaluateWithMultiplicationPrecedence() passed after 3.590 seconds.
+✔ Test previewCatalogTotalCountIsTwelveSixteen() passed after 3.599 seconds.
+✔ Test readinessScalesTextShowsRawValuesWithoutInversion() passed after 3.592 seconds.
+✔ Test tempoFloatBecomesCoachNote() passed after 3.592 seconds.
+✔ Test parsesTwoWeekFixtureStructure() passed after 3.592 seconds.
+✔ Test triageSignalsCanScopeLogsAndFeedbackToOneStudent() passed after 3.616 seconds.
+✔ Test previewCatalogContainsFourSyntheticCompetitionLifts() passed after 3.689 seconds.
+✔ Test weekDerivationIgnoresRulesForOtherExercises() passed after 3.681 seconds.
+✔ Test inMemoryRepositoryPublishWritesStudentProjectionToStore() passed after 3.681 seconds.
+✔ Test draftSetSpecPreservesNilRepsMax() passed after 3.685 seconds.
+✔ Test degradedSummaryReportsIncomplete() passed after 3.701 seconds.
+✔ Test accessorySearchAcceptsTraditionalChinese(query:canonical:) with 5 test cases passed after 3.706 seconds.
+✔ Test awaitingReplySignalReusesRecentLogWithoutFeedbackRule() passed after 3.713 seconds.
+✔ Test publishableNeedsAtLeastOneSelectedWeekAllComplete() passed after 3.719 seconds.
+✔ Test projectionExpandsMultipleSetsSortedBySetNumber() passed after 3.719 seconds.
+✔ Test draftProgressionRuleEncodesDecimalAsString() passed after 3.719 seconds.
+✔ Test aggregatorKeepsLegacyExerciseScopeHidingEveryClipOnThatExercise() passed after 3.719 seconds.
+✔ Test draftSetSpecRoundTripsRestFields() passed after 3.718 seconds.
+✔ Test dumbbellShoulderPressAliasBindsOnceStaleSeedNameIsGone() passed after 3.729 seconds.
+✔ Test setNeedsRepsAndAValidTarget() passed after 3.718 seconds.
+✔ Test aggregatorOnlyDropsTheAnsweredVideoWhenExerciseHasMultipleClips() passed after 3.718 seconds.
+✔ Test coachInboxUsesStudentIDAsStableTieBreakerForSameName() passed after 3.718 seconds.
+✔ Test chinaInviteCopyIncludesLinkGroupedCodeAndCoachWhileGlobalCopiesCode() passed after 3.718 seconds.
+✔ Test projectionMatchesStudentGoldenMatrixForAllForms() passed after 3.743 seconds.
+✔ Test ladderClampsAtCap() passed after 3.745 seconds.
+✔ Test newCatalogExercisesBindExactly(name:) with 5 test cases passed after 4.294 seconds.
+✔ Test percentStyleMathViaMultiply() passed after 4.296 seconds.
+✔ Test inMemoryRepositoryFetchesAllStudents() passed after 4.532 seconds.
+✔ Test projectionRPEModeSetRoutesValueToRPEFieldLeavingWeightNil() passed after 4.532 seconds.
+✔ Test aggregatorResolvesExerciseNameFromPlan() passed after 4.550 seconds.
+✔ Test multiLineCellSplitsIntoAccessories() passed after 4.549 seconds.
+✔ Test endDateSpansSelectedWeeks() passed after 4.549 seconds.
+✔ Test parsesSetsAndRepsForms() passed after 4.548 seconds.
+✔ Test accessoryRepositoryEmptyFilterReturnsAllAccessoriesOnly() passed after 4.587 seconds.
+✔ Test weekDerivationCarriesRestFieldsUnchanged() passed after 4.572 seconds.
+✔ Test coachInboxCountAddsPendingVideosAndUnreadMessages() passed after 4.572 seconds.
+✔ Test "a log outside the pairing window never counts as completion" passed after 4.572 seconds.
+✔ Test weekDerivationAppliesWeightDecrease() passed after 4.583 seconds.
+✔ Test "completion is re-decided per calendar, not frozen at fetch time" passed after 4.572 seconds.
+✔ Test deselectingFirstWeekRenumbersRemainingToOne() passed after 4.576 seconds.
+✔ Test demoSeedPendingVideosAreWellFormed() passed after 4.540 seconds.
+✔ Test "active and in-evaluation students read as 活跃" passed after 4.540 seconds.
+✔ Test "abnormal students read as 待关注, not 活跃" passed after 4.540 seconds.
+✔ Test "unknown status shows no subtitle instead of claiming active" passed after 4.540 seconds.
+✔ Test coachDemoInboxUsesRosterIDsWithoutDuplicateStudents() passed after 4.584 seconds.
+✔ Test bundledAliasSeedHasSixtyOneEntries() passed after 4.540 seconds.
+✔ Test traditionalTempoNamesKeepOriginalNameAndParseSameCue() passed after 4.547 seconds.
+✔ Test "formats the mockup month-day and weekday with an explicit calendar" passed after 4.526 seconds.
+✔ Test previewCatalogCoversAllExerciseTypes() passed after 4.600 seconds.
+✔ Test planningNumberFieldTextFieldClampsBelowRange() passed after 4.625 seconds.
+✔ Test daySectionsGroupByTrainingDayNewestFirst() passed after 4.625 seconds.
+✔ Test planningNumberFieldTextFieldUpdateRoundsToIncrement() passed after 4.624 seconds.
+✔ Test coachProfileLogoutRunsInjectedAction() passed after 4.624 seconds.
+✔ Test intensityModeToggleRendersBothModes() passed after 4.628 seconds.
+✔ Test planningCountPickerDecrementDisabledAtLowerBound() passed after 4.627 seconds.
+✔ Test "missing RPE stays absent instead of becoming zero" passed after 1.950 seconds.
+✔ Test "RPE formats whole and half values without decimal noise" passed after 1.950 seconds.
+✔ Test "unlinked video resolves no set-info card" passed after 1.950 seconds.
+✔ Test "zero-based set index displays as one-based" passed after 1.950 seconds.
+✔ Test "post-send navigation resolves from the latest remaining queue" passed after 1.968 seconds.
+✔ Test "pending video badge reuses resolved set data and display-ready ordinal" passed after 1.968 seconds.
+✔ Test "empty queue has no position or post-send next item" passed after 1.968 seconds.
+✔ Test "orders videos, unread, missed training, then applications" passed after 2.012 seconds.
+✔ Test "exercise display uses catalog English without changing the canonical name" passed after 1.783 seconds.
+✔ Test "returns no rows when every source is empty or non-actionable" passed after 2.014 seconds.
+✔ Test "global queue advances across students and wraps after its final item" passed after 1.972 seconds.
+✔ Test "critical Chinese source strings stay byte-exact" passed after 1.781 seconds.
+✔ Test "column mapping uses the supplied positive or negative time zone" passed after 1.297 seconds.
+✔ Test "ISO week and columns stay correct across a calendar-year boundary" passed after 1.300 seconds.
+✔ Test "current-week training days produce the expected progress and cells" passed after 1.300 seconds.
+✔ Test "the same retained dates remap when Sunday rolls into Monday" passed after 1.299 seconds.
+✔ Test "aggregates real plan dates into Monday through Sunday cells" passed after 1.301 seconds.
+✔ Test "native plural interpolation selects English variants at runtime" passed after 1.299 seconds.
+✔ Test crossWeekOwnershipFallsBackToCalendarDate() passed after 1.299 seconds.
+✔ Test adhocOwnershipUsesTheSameWeekRule() passed after 1.304 seconds.
+✔ Test "an empty current week never falls back to whole-plan totals" passed after 1.297 seconds.
+✔ Test unfinishedTrainingSettlementAndLegacyFallback() passed after 1.304 seconds.
+✔ Test previewCatalogHasNoDuplicateIDs() passed after 4.650 seconds.
+✔ Test sameWeekJumpDoesNotCompleteEarlierDay() passed after 1.312 seconds.
+✔ Test "native interpolation preserves byte-exact Chinese rendering" passed after 1.317 seconds.
+✔ Test previewCatalogCompetitionStancesMatchBackendMetadata() passed after 4.658 seconds.
+✔ Test accessoryFilterSectionRendersThreeFacetRowsAndAllChips() passed after 4.696 seconds.
+✔ Test "logout message does not prescribe a login identity" passed after 1.841 seconds.
+✔ Test "every countable English value is plural-aware" passed after 1.822 seconds.
+✔ Test "count strings provide an English singular variation" passed after 1.897 seconds.
+✔ Test "English catalog does not contain generated placeholder labels" passed after 2.042 seconds.
+✔ Test "every string has complete Chinese and English translations" passed after 2.226 seconds.
+✔ Test detailExecutionUsesEffectiveShiftedDateWithoutPerDayMarker() passed after 5.234 seconds.
+✔ Test unmatchedNameFallsThroughToCandidates() passed after 5.731 seconds.
+✔ Test draftStoreDeleteDraftRemovesMatchingTrainee() passed after 5.936 seconds.
+✔ Test videoGridGroupsByLoggedDayNewestFirstAndFallsBackToCreatedAt() passed after 5.940 seconds.
+✔ Test draftStoreLoadDraftKeepsOtherStudents() passed after 6.191 seconds.
+✔ Test "roster shows loading before empty and distinguishes search misses" passed after 6.308 seconds.
+✔ Test draftStoreDeleteAllRemovesEveryDraft() passed after 6.656 seconds.
+✔ Test exerciseUsageTrackerStartsAtZero() passed after 7.638 seconds.
+✔ Test assemblerAppliesWeeklyRuleWhileSetsStayUnderPerWeekExercise() passed after 7.741 seconds.
+✔ Test detailDefinesFiveSectionsInSpecOrder() passed after 7.797 seconds.
+✔ Test draftTrainingPlanMapsToDomainPlan() passed after 7.817 seconds.
+✔ Test weightInputFieldShowsPercentConversionWhenOneRMExists() passed after 8.022 seconds.
+✔ Test "single-student video list renders loading, failure, and empty distinctly" passed after 8.303 seconds.
+✔ Test weekStartAnchorsToPlanWeekContainingToday() passed after 8.455 seconds.
+✔ Test draftMappingDecodeSetSpecReturnsNilForNilData() passed after 8.569 seconds.
+✔ Test planningNumberFieldDecrementButtonSubtractsStep() passed after 8.907 seconds.
+✔ Test composerClearsExerciseWhenLinkedDayChanges() passed after 8.907 seconds.
+✔ Test planningNumberFieldEditingValueCanPersistBeforeBlur() passed after 9.000 seconds.
+✔ Test "student detail replaces the zero-progress plan shell with guidance" passed after 9.144 seconds.
+✔ Test executionDaysShowCurrentPlanWeekRows() passed after 9.176 seconds.
+✔ Test planningNumberFieldIncrementDisabledAtUpperBound() passed after 9.219 seconds.
+✔ Test everyAliasCanonicalResolvesUniquely() passed after 10.187 seconds.
+✔ Test coachShellRoutesDashboardAndRosterChatThroughMessagesTab() passed after 10.767 seconds.
+✔ Test domainPlanDaysAndExercisesRebuildDraft() passed after 10.789 seconds.
+✔ Test "dashboard with zero students shows invitation guidance" passed after 10.837 seconds.
+✔ Test "planning step zero replaces empty student sections with guidance" passed after 10.867 seconds.
+✔ Test planningCountPickerIncrementDisabledAtUpperBound() passed after 10.896 seconds.
+✔ Test "receiving inbox never renders empty before its initial load finishes" passed after 10.896 seconds.
+✔ Test draftDaysMapToDomainDays() passed after 10.896 seconds.
+✔ Test draftMappingEncodesRulesEmptyAndNonEmpty() passed after 10.895 seconds.
+✔ Test accessoryMatchListSectionAddButtonTriggersCallback() passed after 11.017 seconds.
+✔ Test weightInputFieldExplainsMissingOneRM() passed after 11.038 seconds.
+✔ Test draftMappingExpandsSetSpecToPlanSets() passed after 11.229 seconds.
+✔ Test planningCountPickerEnumeratesTagsByStepWithinRange() passed after 11.270 seconds.
+✔ Test detailBucketsUTCPlusEightEarlyMorningLogIntoLocalPlanDay() passed after 11.270 seconds.
+✔ Test coachProfileUsesBackendNameWhenPresent() passed after 11.270 seconds.
+✔ Test exerciseUsageTrackerResetClearsCounts() passed after 11.418 seconds.
+✔ Test acceptSheetSealsEvaluationChoice() passed after 11.636 seconds.
+✔ Test exerciseUsageTrackerIncrementsCount() passed after 11.663 seconds.
+✔ Test planningCountPickerClampsExternalValueAboveUpperBound() passed after 11.697 seconds.
+✔ Test planningCountPickerIncrementSnapsOffGridValueToNextTag() passed after 11.809 seconds.
+✔ Test planningNumberFieldFormattedDisplayFormatsValue() passed after 11.811 seconds.
+✔ Test planningNumberFieldIncrementButtonAddsStep() passed after 12.414 seconds.
+✔ Test dayChipBarRendersAssignedDayChips() passed after 12.608 seconds.
+✔ Test planningCountPickerTagValueRoundTrips() passed after 12.620 seconds.
+✔ Test exerciseUsageTrackerPersistsAcrossInstancesInSameSuite() passed after 12.771 seconds.
+✔ Test assemblerMaterializesEveryWeekFromTheW1Draft() passed after 12.772 seconds.
+✔ Test exerciseUsageTrackerTracksMultipleIDsIndependently() passed after 12.805 seconds.
+✔ Test draftMappingEncodesAndDecodesSetSpec() passed after 12.845 seconds.
+✔ Test draftExercisesMapToDomainExercises() passed after 12.845 seconds.
+✔ Test assemblerPublishesRestSecondsUsingPerSetSingleThenAutoPriority() passed after 12.845 seconds.
+✔ Test weekStartWithoutPlanKeepsTrailingSevenDayWindow() passed after 12.845 seconds.
+✔ Test planningNumberFieldIncrementButtonCommitsPendingTextFirst() passed after 13.236 seconds.
+✔ Test planningCountPickerDecrementButtonSubtractsStep() passed after 13.384 seconds.
+✔ Test planningNumberFieldTextFieldClampsAboveRange() passed after 13.384 seconds.
+✔ Test weekStartClampsToCycleBounds() passed after 13.421 seconds.
+✔ Test planningNumberFieldDecrementDisabledAtLowerBound() passed after 13.482 seconds.
+✔ Test planningCountPickerIncrementButtonAddsStep() passed after 13.526 seconds.
+✔ Test coachRootViewInitializes() passed after 13.748 seconds.
+✔ Test assemblerSkipsSetsForExercisesWithoutAW1Spec() passed after 14.072 seconds.
+✔ Test planningCountPickerSnapsValueOutsideGrid() passed after 14.152 seconds.
+✔ Test planningNumberFieldEmptyInputResetsToZero() passed after 15.381 seconds.
+✔ Test coachProfileFallsBackWhenBackendNameIsMissing(_:) with 3 test cases passed after 15.387 seconds.
+✔ Test rosterRowRetainsPlanDatesInsteadOfRefreshTimeWeekColumns() passed after 15.382 seconds.
+✔ Test sealedStudentDetailDoesNotRenderEvaluationBanner() passed after 15.382 seconds.
+✔ Test draftStoreSavesAndLoadsDraft() passed after 15.440 seconds.
+✔ Test emptyStateHasNoPersonalCode() passed after 15.614 seconds.
+✔ Test "empty student list stays alive while the global workbench advances" passed after 12.936 seconds.
+✔ Test "missing RPE card renders the localized em dash" passed after 13.399 seconds.
+✔ Test laggingStudentTrainsAcrossWeeksWithoutMissedReminder() passed after 12.723 seconds.
+✔ Test detailOverviewRosterAndReminderShareCompletion() passed after 12.725 seconds.
+✔ Test latestActivityIncludesLogsNotPlacedInDisplayedWeek() passed after 12.731 seconds.
+✔ Test demoSeedHasPersonalPlusTwoSecondaryCodes() passed after 16.289 seconds.
+✔ Test transportFailureSurfacesRetryStateInsteadOfHidingBanner() passed after 16.426 seconds.
+✔ Test acceptSheetConfirmAlwaysSendsSkipWithNoReason() passed after 16.426 seconds.
+✔ Test videoGridPlayFailureShowsRetryableErrorWithoutPresenting() passed after 16.424 seconds.
+✔ Test videoGridPlayExchangesIDForPresignedURL() passed after 16.422 seconds.
+✔ Test queueLoadsPendingItemsAndExposesCount() passed after 16.425 seconds.
+✔ Test studentGroupsAreOnePerStudentNewestUploadFirst() passed after 16.425 seconds.
+✔ Test growthMissingSeriesLoadsAsExistingEmptyState() passed after 16.460 seconds.
+✔ Test loadEntersFirstSaveModeWithoutExistingSummary() passed after 16.460 seconds.
+✔ Test rosterMovesToFailedStateWhenStudentsCannotLoad() passed after 16.458 seconds.
+✔ Test composerSurfacesSendFailure() passed after 16.457 seconds.
+✔ Test growthMapsBackendSeriesAndHeadlineWithoutDecimalPrecisionLoss() passed after 16.458 seconds.
+✔ Test videoQueueLoadFailureMovesToFailed() passed after 16.456 seconds.
+✔ Test requiredFieldsGateSaving() passed after 16.454 seconds.
+✔ Test growthFiltersBackendPointsBySelectedFamilyAndWindow() passed after 16.456 seconds.
+✔ Test videoQueueLoadsItemsNewestFirst() passed after 16.477 seconds.
+✔ Test videoQueueRejectsBlankFeedbackWithoutDropping() passed after 16.479 seconds.
+✔ Test loadPrefillsEditModeFromExistingSummary() passed after 16.469 seconds.
+✔ Test composerRejectsEmptyText() passed after 18.730 seconds.
+✔ Test cancelledInitialLoadReturnsToIdle() passed after 18.855 seconds.
+✔ Test videoQueueSendFeedbackDropsRowAndToasts() passed after 19.304 seconds.
+✔ Test videoQueueSendFailureKeepsRowAndBanners() passed after 19.304 seconds.
+✔ Test statusTextCountsDownFromExpectedEnd() passed after 19.306 seconds.
+✔ Test bannerVisibleOnlyForLiveEvaluation() passed after 19.303 seconds.
+✔ Test editorCompletionChainNotifiesCompletionCallback() passed after 19.295 seconds.
+✔ Test noEvaluationIsNotALoadFailure() passed after 19.293 seconds.
+✔ Test prefillProfileMissReturnsNilWithNotice() passed after 19.289 seconds.
+✔ Test directMessageEntryCarriesStudentNameIntoEmptyConversation() passed after 19.287 seconds.
+✔ Test statusTextFlipsToOverdueCopyPastExpectedEnd() passed after 19.281 seconds.
+✔ Test composerSendsTrimmedTextWithOptionalLinks() passed after 19.280 seconds.
+✔ Test rendersOneExtraGroupCaptionAndSeparateAddedCard() passed after 19.249 seconds.
+✔ Test extraSetsStayOutsidePrescribedFractionAndAddedExercisesGroupByOwner() passed after 19.249 seconds.
+✔ Test accessibleRowRetainsFullSetMetricsWithoutExtraLabel() passed after 19.249 seconds.
+✔ Test unchangedPlannedOnlyDetailHasNoAddedCaption() passed after 19.248 seconds.
+✔ Test "free first set log renders hash one" passed after 19.142 seconds.
+✔ Test "planned first set log renders hash one" passed after 19.135 seconds.
+✔ Test blankFlowWithEvaluationStudentForcesAdaptationKind() passed after 19.921 seconds.
+✔ Test blankFlowOneRMStaysNil() passed after 20.686 seconds.
+✔ Test navigationMovesForwardAndBackWithoutDroppingFields() passed after 20.694 seconds.
+✔ Test staleAssignmentOutsidePreferredSlotsStaysVisible() passed after 21.256 seconds.
+✔ Test blankFlowKeepsAllSevenSlots() passed after 21.443 seconds.
+✔ Test legacyFillW1IntensityDraftRestoresToSingleStep4() passed after 21.569 seconds.
+✔ Test bootstrapRestoresSavedDraftStepAndAssignments() passed after 21.602 seconds.
+✔ Test adaptationIntentPresetsStudentDurationAndKind() passed after 21.606 seconds.
+✔ Test preferredDaysBecomeTheOnlySlotsLabeledByRank() passed after 21.734 seconds.
+✔ Test saveDraftNeverNotifiesInFirstSaveMode() passed after 21.787 seconds.
+✔ Test step2RendersDisabledTemplateEntrypoints() passed after 22.596 seconds.
+✔ Test editModeSaveUsesNotifyCheckbox() passed after 22.742 seconds.
+✔ Test blankSkipReasonIsDroppedNotSentEmpty() passed after 22.866 seconds.
+✔ Test transportFailureOnCompleteKeepsBannerWithError() passed after 22.879 seconds.
+✔ Test evaluationStudentCannotSelectFourWeeks() passed after 22.879 seconds.
+✔ Test firstRegularPlanIntentWithNilProfileResumesExistingDraft() passed after 22.916 seconds.
+✔ Test finishWritesDraftAndMarksFlowFinished() passed after 22.951 seconds.
+✔ Test generatePersonalCodeShowsUpAfterReload() passed after 22.951 seconds.
+✔ Test completeNotifiesCompletionCallback() passed after 22.998 seconds.
+✔ Test assignmentValidationRequiresFrequencyToMatchAssignedLifts() passed after 23.134 seconds.
+✔ Test failedCompleteDoesNotNotifyCompletionCallback() passed after 23.151 seconds.
+✔ Test skipEvaluationStudentChainSkipsCompleteStep() passed after 23.244 seconds.
+✔ Test acceptIntoEvaluationRemovesItemAndReportsEvaluationToast() passed after 23.267 seconds.
+✔ Test firstRegularIntentStaysRegularDespiteStaleEvaluationStatus() passed after 23.309 seconds.
+✔ Test step3RendersPerDayMainLiftPickers() passed after 23.860 seconds.
+✔ Test step1ShowsOnlyFourWeekCardForRegularStudent() passed after 24.343 seconds.
+✔ Test adaptationDraftNameUsesAdaptationTemplate() passed after 24.426 seconds.
+✔ Test acceptSkippingEvaluationCarriesTrimmedReasonOnlyOnSkipBranch() passed after 24.609 seconds.
+✔ Test step0RendersThreeStudentSections() passed after 25.861 seconds.
+✔ Test restoredConfigureRulesPathDoesNotDuplicateStep4() passed after 25.878 seconds.
+✔ Test workspaceViewModelEmptyCoachFallsBackToNoSections() passed after 26.065 seconds.
+✔ Test rejectRemovesItemSilently() passed after 26.120 seconds.
+✔ Test step1ShowsOnlyOneWeekCardForEvaluationStudent() passed after 26.891 seconds.
+✔ Test rejectExpiredBannerAndRefresh() passed after 26.887 seconds.
+✔ Test acceptNeverSendsReasonOnEvaluationBranchEvenIfProvided() passed after 26.890 seconds.
+✔ Test bootstrapLoadsStudentsAndCatalog() passed after 26.890 seconds.
+✔ Test timeLimitedCreationCarriesExpiry() passed after 26.892 seconds.
+✔ Test prefilledOneRMFeedsOneRMLookupForMainLifts() passed after 27.041 seconds.
+✔ Test step6UpdateRuleMutatesByID() passed after 27.315 seconds.
+✔ Test step4AddAccessoryWritesDraftWithPerDaySortOrder() passed after 27.408 seconds.
+✔ Test step6ViewRendersEmptyRulesState() passed after 27.915 seconds.
+✔ Test bannerHiddenWhenNoEvaluationOrCompleted() passed after 27.931 seconds.
+✔ Test step5ToggleIntensityModePreservesPreviousValues() passed after 28.740 seconds.
+✔ Test step5OneRMOnlyAvailableForMainLiftFamily() passed after 28.836 seconds.
+✔ Test step6AddRuleAppendsWithDisplayOrder() passed after 34.759 seconds.
+✔ Test step6RuleRequiresExerciseBeforeShowingValues() passed after 37.283 seconds.
+✔ Test videoQueuePlanCancellationKeepsExerciseNames(urlCancellation:) with 2 test cases passed after 33.920 seconds.
+✔ Test staleRefreshCannotRestoreVideoAfterFeedbackSend() passed after 37.307 seconds.
+✔ Test step6DeleteRuleRemovesAndReorders() passed after 37.941 seconds.
+✔ Test step4ProceedAllowsEmptyAccessoryDays() passed after 37.988 seconds.
+✔ Test step6UncoveredExercisesUpdatesAfterRuleAssignment() passed after 38.496 seconds.
+✔ Test step5UpdateW1SetSpecWritesDraftData() passed after 38.541 seconds.
+✔ Test completionChainDegradesWhenCompleteFailsButSummarySaved() passed after 38.540 seconds.
+✔ Test step5RestSecondsPerSetClampsToSetCount() passed after 38.593 seconds.
+✔ Test completeHidesBannerOnSuccess() passed after 38.611 seconds.
+✔ Test step5ZeroOneRMIsTreatedAsUnavailable() passed after 38.611 seconds.
+✔ Test step4ViewRendersMainLiftAndAccessoryCards() passed after 38.841 seconds.
+✔ Test prefilledEquipmentSeedsDefaultAccessoryFilters() passed after 38.858 seconds.
+✔ Test step5ProceedRoutesOneWeekPlanDirectlyToPreview() passed after 39.282 seconds.
+✔ Test step7SetCurrentPreviewWeekClampsToPlanBounds() passed after 40.126 seconds.
+✔ Test step7CurrentPreviewWeekDefaultsToOne() passed after 40.561 seconds.
+✔ Test blankFlowLoadsSlotsFromSelectedStudentProfile() passed after 40.561 seconds.
+✔ Test completionChainIgnoresConcurrentCompleteConflict() passed after 42.423 seconds.
+✔ Test weekCardRendersDaySectionsAndRows() passed after 42.431 seconds.
+✔ Test weekCardRendersDerivedWeekFooter() passed after 43.150 seconds.
+✔ Test weightEntryBasesOfferOneRMAndSameDayMainTopWeight() passed after 43.232 seconds.
+✔ Test step7ViewRendersFourWeekTabTitles() passed after 47.119 seconds.
+✔ Test step4SwitchToDayLoadsAccessoriesForSelectedDay() passed after 47.545 seconds.
+✔ Test step5RPEValueIsClampedIntoRange() passed after 47.565 seconds.
+✔ Test accessoryLibrarySheetRendersFilterAndMatchSections() passed after 48.487 seconds.
+✔ Test step7DerivedPreviewReflectsWeightRule() passed after 49.769 seconds.
+✔ Test step7SetCurrentPreviewWeekLeavesDraftLastSavedAtUnchanged() passed after 50.535 seconds.
+✔ Test directMessageEntryReopensTheSameConversation() passed after 50.974 seconds.
+✔ Test step6ToggleRuleExerciseAddsAndRemovesDraftExerciseID() passed after 50.975 seconds.
+✔ Test weekCardRendersOneWeekTitle() passed after 52.201 seconds.
+✔ Test step5ProceedAutoFillsMissingSetSpecsWithDefaults() passed after 52.487 seconds.
+✔ Test blankFlowLoadsOneRMAndEquipmentFromProfile() passed after 52.534 seconds.
+✔ Test step4DeleteAccessoryRemovesOnlySelectedAccessory() passed after 52.660 seconds.
+✔ Test step6ProceedAllowsEmptyRules() passed after 52.899 seconds.
+✔ Test step5TargetRepsIsClampedToAtLeastOne() passed after 53.096 seconds.
+✔ Test step6RuleIncrementRoundsToPlanningIncrement() passed after 53.276 seconds.
+✔ Test step6ViewRendersUncoveredSummary() passed after 53.919 seconds.
+✔ Test step5ProceedRoutesFourWeekPlanToRules() passed after 54.255 seconds.
+✔ Test concurrentCompleteConflictReadsAsSuccessAndRefreshes() passed after 54.557 seconds.
+✔ Test step6ToggleAppliedWeekNeverAddsW1() passed after 54.952 seconds.
+✔ Test step5WeightValueRoundsToHalfKilogramIncrement() passed after 55.038 seconds.
+✔ Test step4ScreenRendersSelectedSectionAndLibraryButton() passed after 57.814 seconds.
+✔ Test adaptationIntentLoadsSlotsOnBootstrap() passed after 57.822 seconds.
+✔ Test completionIssuesFlagsZeroWeightThenClearsWhenFilled() passed after 57.902 seconds.
+✔ Test step6ToggleAppliedWeekAddsAndRemovesW2ToW4() passed after 58.062 seconds.
+✔ Test step5SetCountIsClampedToAtLeastOne() passed after 58.217 seconds.
+✔ Test retryAfterTransportFailureRecoversBanner() passed after 58.216 seconds.
+✔ Test step6ViewRendersSingleRuleChips() passed after 61.263 seconds.
+✔ Test step6CustomSequenceLengthTracksAppliedWeeks() passed after 61.795 seconds.
+✔ Test step4UpdateFiltersReloadsMatchesForDay() passed after 61.828 seconds.
+✔ Test growthFailureRendersRetryAndRetrySuccessShowsData() passed after 61.813 seconds.
+✔ Test revokeMovesCodeToDefunctSection() passed after 61.888 seconds.
+✔ Test repickingAnotherStudentDropsPreviousStudentSlots() passed after 61.889 seconds.
+✔ Test completionChainRunsPutThenCompleteThenSoftRecommendation() passed after 61.890 seconds.
+✔ Test step7PublishOfCompletePlanFinishesWithoutIssues() passed after 62.051 seconds.
+✔ Test regenerateRevokesOldPersonalCode() passed after 62.038 seconds.
+✔ Test step6CustomRuleRestoresExerciseValuesAfterSwitchingActions() passed after 62.061 seconds.
+✔ Test growthCancellation(urlCancellation:) with 2 test cases passed after 61.915 seconds.
+✔ Test intentResumesExistingDraftInsteadOfOverwriting() passed after 62.069 seconds.
+✔ Test detailLoadsVideoWallAndTodayReadiness() passed after 62.122 seconds.
+✔ Test step4KeepsFiltersAndSelectionsIndependentPerDay() passed after 62.126 seconds.
+✔ Test detailAppendPostedFeedbackRefreshesLatestOverview() passed after 62.121 seconds.
+✔ Test detailLoadsExecutionAndFeedbackSummaries() passed after 62.118 seconds.
+✔ Test detailVideoWallFailureDegradesInPlaceWithoutBlankingDetail() passed after 62.108 seconds.
+✔ Test bindQueueCancellation(urlCancellation:) with 2 test cases passed after 61.989 seconds.
+✔ Test videoQueueCancellation(urlCancellation:) with 2 test cases passed after 61.989 seconds.
+✔ Test inviteCodesCancellation(urlCancellation:) with 2 test cases passed after 61.989 seconds.
+✔ Test workspaceViewModelLoadsDraftNeedsAndRecentSections() passed after 62.138 seconds.
+✔ Test rosterLogFetchRangeCoversRecentWindowBeforePlanStart() passed after 62.160 seconds.
+✔ Test step5W1SetSpecRestoresFromDraftStore() passed after 62.411 seconds.
+✔ Test rosterLoadsStudentsAndComputesAttentionBadge() passed after 62.439 seconds.
+✔ Test "marker write failures surface instead of silently dropping the action" passed after 62.441 seconds.
+✔ Test markStudentActiveDropsInEvaluationBadgeInPlace() passed after 62.433 seconds.
+✔ Test rosterTriageSignalsStayScopedPerStudent() passed after 62.436 seconds.
+✔ Test workspaceCancellation(urlCancellation:) with 2 test cases passed after 62.305 seconds.
+✔ Test step4BootstrapRestoresCurrentDayAndSelectedAccessories() passed after 62.456 seconds.
+✔ Test workspaceChildCancellationKeepsRows(urlCancellation:) with 2 test cases passed after 59.068 seconds.
+✔ Test cancelledRefreshKeepsLoadedRows(urlCancellation:) with 2 test cases passed after 62.376 seconds.
+✔ Test realRefreshFailureStillFails() passed after 62.374 seconds.
+✔ Test "rapid item changes reject stale playback and set-log results" passed after 62.459 seconds.
+✔ Test "markers resolved for a previous video never render under a newer one" passed after 62.452 seconds.
+✔ Test detailCancellation(urlCancellation:) with 2 test cases passed after 62.315 seconds.
+✔ Test "video set information distinguishes unlinked videos from load failures" passed after 62.454 seconds.
+✔ Test "marker actions update the current item and marker load failures stay hidden" passed after 62.472 seconds.
+✔ Test detailReadinessDistinguishesNotFiledFromFetchFailure() passed after 62.450 seconds.
+✔ Test loadedRosterStaysVisibleUntilRefreshIsCancelled() passed after 62.397 seconds.
+✔ Test detailSecondaryCancellationKeepsSections(urlCancellation:) with 2 test cases passed after 59.090 seconds.
+✔ Test refreshShowsServerCatalogNameAndRemovesDeletedAddedSets() passed after 62.474 seconds.
+✔ Test rosterChildCancellationKeepsCompleteRows(urlCancellation:) with 2 test cases passed after 59.107 seconds.
+✔ Test detailCatalogCancellationKeepsServerNames(urlCancellation:) with 2 test cases passed after 59.097 seconds.
+✔ Test acceptMachineCodeErrorsBannerAndForceRefresh() passed after 62.479 seconds.
+✔ Test growthLoadingRendersProgressWithoutFlashingEmptyState() passed after 62.694 seconds.
+✔ Test run with 477 tests in 14 suites passed after 62.738 seconds.

@@ -1,0 +1,8 @@
+Previously initiated MCP run; tool response timed out at 300 seconds, persisted log later completed.
+Source: /Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-094-zh-hant-6bf212735501/logs/swift_package_test_2026-10-22T08-39-55-785Z_pid93668_9c8108ea.log
+Build complete! (394.92s)
+◇ Test keychainTokenStoreRoundTripsCachedUser() started.
+◇ Test keychainTokenStoreSavesReadsAndClearsTokens() started.
+✔ Test keychainTokenStoreRoundTripsCachedUser() passed after 0.261 seconds.
+✔ Test keychainTokenStoreSavesReadsAndClearsTokens() passed after 0.361 seconds.
+✔ Test run with 2 tests in 0 suites passed after 0.361 seconds.

@@ -15,6 +15,12 @@
             "state": "translated",
             "value": "取消"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
         }
       }
     },
@@ -31,6 +37,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "确定"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確定"
           }
         }
       }
@@ -49,6 +61,12 @@
             "state": "translated",
             "value": "操作进行中"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "操作進行中"
+          }
         }
       }
     },
@@ -65,6 +83,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "执行此操作"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "執行此操作"
           }
         }
       }
@@ -83,6 +107,12 @@
             "state": "translated",
             "value": "顺延一天"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "順延一天"
+          }
         }
       }
     },
@@ -100,6 +130,12 @@
             "state": "translated",
             "value": "退出登录"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登出"
+          }
         }
       }
     },
@@ -113,6 +149,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "蹲·推·拉"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "蹲·推·拉"
@@ -134,6 +176,12 @@
             "state": "translated",
             "value": "开始训练"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始訓練"
+          }
         }
       }
     },
@@ -147,6 +195,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "深色"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "深色"
@@ -168,6 +222,12 @@
             "state": "translated",
             "value": "浅色"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "淺色"
+          }
         }
       }
     },
@@ -185,6 +245,12 @@
             "state": "translated",
             "value": "跟随系统"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跟隨系統"
+          }
         }
       }
     },
@@ -198,6 +264,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "平均 RPE"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "平均 RPE"
@@ -219,6 +291,12 @@
             "state": "translated",
             "value": "日期"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "日期"
+          }
         }
       }
     },
@@ -235,6 +313,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "线段"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "線段"
           }
         }
       }
@@ -253,6 +337,12 @@
             "state": "translated",
             "value": "训练容量"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練容量"
+          }
         }
       }
     },
@@ -270,6 +360,12 @@
             "state": "translated",
             "value": "训练容量 kg"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "訓練容量 kg"
+          }
         }
       }
     },
@@ -283,6 +379,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已收起"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "已收起"
@@ -304,6 +406,12 @@
             "state": "translated",
             "value": "%@月%@日"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@月%@日"
+          }
         }
       }
     },
@@ -317,6 +425,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@%@日，%@"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "%@%@日，%@"
@@ -338,6 +452,12 @@
             "state": "translated",
             "value": "已完成"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已完成"
+          }
         }
       }
     },
@@ -354,6 +474,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "未来"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未來"
           }
         }
       }
@@ -372,6 +498,12 @@
             "state": "translated",
             "value": "有计划，未完成"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有課表，未完成"
+          }
         }
       }
     },
@@ -385,6 +517,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "休息日"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "休息日"
@@ -406,6 +544,12 @@
             "state": "translated",
             "value": "今天"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天"
+          }
         }
       }
     },
@@ -422,6 +566,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "e1RM 成长曲线，共 %@ 个主线数据点"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 成長曲線，共 %@ 個主線資料點"
           }
         }
       }
@@ -440,6 +590,12 @@
             "state": "translated",
             "value": "e1RM 成长曲线，共 %@ 个主线数据点"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "e1RM 成長曲線，共 %@ 個主線資料點"
+          }
         }
       }
     },
@@ -456,6 +612,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "虚线 = 导入的历史记录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "虛線 = 匯入的歷史記錄"
           }
         }
       }
@@ -474,6 +636,12 @@
             "state": "translated",
             "value": " · %@ 组未完成"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · %@ 組未完成"
+          }
         }
       }
     },
@@ -490,6 +658,12 @@
           "stringUnit": {
             "state": "translated",
             "value": " · %@ 组未完成"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " · %@ 組未完成"
           }
         }
       }
@@ -508,6 +682,12 @@
             "state": "translated",
             "value": "%@ / %@ 组已记录"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ / %@ 組已記錄"
+          }
         }
       }
     },
@@ -524,6 +704,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 组 · %@%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 組 · %@%@"
           }
         }
       }
@@ -542,6 +728,12 @@
             "state": "translated",
             "value": "%@ 组 · %@%@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 組 · %@%@"
+          }
         }
       }
     },
@@ -559,6 +751,12 @@
             "state": "translated",
             "value": "已展开"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已展開"
+          }
         }
       }
     },
@@ -572,6 +770,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "退格"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "退格"
@@ -593,6 +797,12 @@
             "state": "translated",
             "value": "小数点"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "小數點"
+          }
         }
       }
     },
@@ -609,6 +819,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "输入次数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入下數"
           }
         }
       }
@@ -627,6 +843,12 @@
             "state": "translated",
             "value": "输入重量"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入重量"
+          }
         }
       }
     },
@@ -643,6 +865,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "仅 2.5kg 赛扣"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "僅 2.5kg 賽扣"
           }
         }
       }
@@ -661,6 +889,12 @@
             "state": "translated",
             "value": "空杠 20kg"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空槓 20kg"
+          }
         }
       }
     },
@@ -677,6 +911,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ + 2.5kg 赛扣"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ + 2.5kg 賽扣"
           }
         }
       }
@@ -695,6 +935,12 @@
             "state": "translated",
             "value": "体重"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "體重"
+          }
         }
       }
     },
@@ -711,6 +957,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "已通知教练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已通知教練"
           }
         }
       }
@@ -729,6 +981,12 @@
             "state": "translated",
             "value": "张教练 · 顶组 + 减载"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "張教練 · 頂組 + 減量"
+          }
         }
       }
     },
@@ -746,6 +1004,12 @@
             "state": "translated",
             "value": "当前"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "當前"
+          }
         }
       }
     },
@@ -759,6 +1023,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "天"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "天"
@@ -780,6 +1050,12 @@
             "state": "translated",
             "value": "距比赛"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "距比賽"
+          }
         }
       }
     },
@@ -796,6 +1072,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "硬拉"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "硬舉"
           }
         }
       }
@@ -814,6 +1096,12 @@
             "state": "translated",
             "value": "注意启动时股四的蹬地"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注意啟動時股四的蹬地"
+          }
         }
       }
     },
@@ -827,6 +1115,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "王五"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "王五"
@@ -848,6 +1142,12 @@
             "state": "translated",
             "value": "中周期 · 第 03 / 04 周"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中週期 · 第 03 / 04 週"
+          }
         }
       }
     },
@@ -865,6 +1165,12 @@
             "state": "translated",
             "value": "漏练"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "漏練"
+          }
         }
       }
     },
@@ -878,6 +1184,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次 170kg×3 @8 · 最佳 175kg×3 @8.5"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "上次 170kg×3 @8 · 最佳 175kg×3 @8.5"
@@ -899,6 +1211,12 @@
             "state": "translated",
             "value": "上次 87.5kg×2 @6 · 最佳 90kg×2 @6"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上次 87.5kg×2 @6 · 最佳 90kg×2 @6"
+          }
         }
       }
     },
@@ -915,6 +1233,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "连胜"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "連勝"
           }
         }
       }
@@ -933,6 +1257,12 @@
             "state": "translated",
             "value": "SBD 力量块"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SBD 力量塊"
+          }
         }
       }
     },
@@ -949,6 +1279,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "节奏卧推"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "節奏臥推"
           }
         }
       }
@@ -967,6 +1303,12 @@
             "state": "translated",
             "value": "3 天未训练"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 天未訓練"
+          }
         }
       }
     },
@@ -984,6 +1326,12 @@
             "state": "translated",
             "value": "次"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下"
+          }
         }
       }
     },
@@ -997,6 +1345,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今日"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "今日"
@@ -1018,6 +1372,12 @@
             "state": "translated",
             "value": "本周进度 %@ %%"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本週進度 %@ %%"
+          }
         }
       }
     },
@@ -1034,6 +1394,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "次数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下數"
           }
         }
       }
@@ -1052,6 +1418,12 @@
             "state": "translated",
             "value": "次"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下"
+          }
         }
       }
     },
@@ -1068,6 +1440,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "第 %@ 组，%@，%@，%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %@ 組，%@，%@，%@"
           }
         }
       }
@@ -1086,6 +1464,12 @@
             "state": "translated",
             "value": "本组完成"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本組完成"
+          }
         }
       }
     },
@@ -1102,6 +1486,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "本组失败"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本組失敗"
           }
         }
       }
@@ -1120,6 +1510,12 @@
             "state": "translated",
             "value": "%@，%@ 次，RPE %@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，%@ 下，RPE %@"
+          }
         }
       }
     },
@@ -1136,6 +1532,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "暂无建议重量"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫無建議重量"
           }
         }
       }
@@ -1154,6 +1556,12 @@
             "state": "translated",
             "value": "尚未记录"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未記錄"
+          }
         }
       }
     },
@@ -1171,6 +1579,12 @@
             "state": "translated",
             "value": "轻点编辑本组"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輕點編輯本組"
+          }
         }
       }
     },
@@ -1184,6 +1598,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 千克"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "%@ 千克"
@@ -1205,6 +1625,12 @@
             "state": "translated",
             "value": "%@，%@ %@%@"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，%@ %@%@"
+          }
         }
       }
     },
@@ -1221,6 +1647,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "，变化 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "，變化 %@"
           }
         }
       }
@@ -1239,6 +1671,12 @@
             "state": "translated",
             "value": "已附视频"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已附影片"
+          }
         }
       }
     },
@@ -1255,6 +1693,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "无视频"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無影片"
           }
         }
       }
@@ -1273,6 +1717,12 @@
             "state": "translated",
             "value": "视频上传失败"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影片上傳失敗"
+          }
         }
       }
     },
@@ -1290,6 +1740,12 @@
             "state": "translated",
             "value": "视频上传失败，轻点重试"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "影片上傳失敗，輕點重試"
+          }
         }
       }
     },
@@ -1303,6 +1759,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "五"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "五"
@@ -1324,6 +1786,12 @@
             "state": "translated",
             "value": "一"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一"
+          }
         }
       }
     },
@@ -1337,6 +1805,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "四"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "四"
@@ -1358,6 +1832,12 @@
             "state": "translated",
             "value": "二"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "二"
+          }
         }
       }
     },
@@ -1375,6 +1855,12 @@
             "state": "translated",
             "value": "三"
           }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "三"
+          }
         }
       }
     },
@@ -1388,6 +1874,12 @@
           }
         },
         "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重量"
+          }
+        },
+        "zh-Hant": {
           "stringUnit": {
             "state": "translated",
             "value": "重量"

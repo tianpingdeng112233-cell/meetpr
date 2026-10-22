@@ -148,7 +148,9 @@ struct StudentPendingVideosView: View {
         }
         VStack(alignment: .leading, spacing: 4) {
           Text(
-            item.exerciseName.map { CoachLocalization.exerciseName($0) }
+            item.exerciseName.map {
+              CoachLocalization.exerciseName($0, isCatalog: item.isCatalogExercise)
+            }
               ?? CoachVideoFeedbackStrings.trainingVideo
           )
           .font(.system(size: 16, weight: .semibold))
@@ -169,7 +171,9 @@ struct StudentPendingVideosView: View {
     }
     .accessibilityLabel(
       CoachVideoFeedbackStrings.rowAccessibility(
-        exerciseName: item.exerciseName.map { CoachLocalization.exerciseName($0) }
+        exerciseName: item.exerciseName.map {
+          CoachLocalization.exerciseName($0, isCatalog: item.isCatalogExercise)
+        }
           ?? CoachVideoFeedbackStrings.trainingVideo
       )
     )

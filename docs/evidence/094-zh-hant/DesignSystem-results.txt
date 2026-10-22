@@ -1,0 +1,78 @@
+Source: .build/094-tests/DesignSystem.log
+Build complete! (71.05s)
+◇ Test "ExerciseCard summary includes failed-set suffix" started.
+✔ Test defaultPreferenceIsLight() passed after 0.025 seconds.
+✔ Test systemFollowsDeviceAppearance() passed after 0.025 seconds.
+✔ Test unknownStoredValueFallsBackToSystem() passed after 0.026 seconds.
+✔ Test explicitCasesPinTheirScheme() passed after 0.026 seconds.
+✔ Test "surviving curves match feedback and reward transitions" passed after 0.025 seconds.
+✔ Test "roll-up haptics preserve the mockup's vibrate pattern" passed after 0.025 seconds.
+✔ Test "timing values match the interactive dark mockup" passed after 0.025 seconds.
+✔ Test "celebration sparks are eighteen particles staggered in six lanes" passed after 0.025 seconds.
+✔ Test "roll-up keyframes match the mockup's WAAPI segments" passed after 0.025 seconds.
+✔ Test "Collars subtract 2.5kg per side without changing plate rules" passed after 0.025 seconds.
+✔ Test "175kg greedily loads three 25s and a 2.5 per side" passed after 0.025 seconds.
+✔ Test "missing custom font resolves to the system fallback branch" passed after 0.025 seconds.
+✔ Test "PostScript names match inspected font assets" passed after 0.025 seconds.
+✔ Test "20kg and 500kg boundaries are clamped" passed after 0.025 seconds.
+✔ Test "font sizes match the complete mockup type scale" passed after 0.025 seconds.
+✔ Test "headline emboss preserves both theme recipes" passed after 0.025 seconds.
+✔ Test "radius values match the six-step v3 scale" passed after 0.025 seconds.
+✔ Test "spacing values match the 4pt black-gold grid" passed after 0.025 seconds.
+✔ Test "tracking values match the black-gold labels" passed after 0.024 seconds.
+✔ Test labelsAreStable() passed after 0.027 seconds.
+✔ Test "20kg is an empty bar" passed after 0.025 seconds.
+✔ Test "CTA molds preserve every CSS shadow layer" passed after 0.025 seconds.
+✔ Test "SE_SPEC and SE_DIM tables are complete" passed after 0.025 seconds.
+✔ Test "Plate and steel gradient locations match source" passed after 0.025 seconds.
+✔ Test "Reps snap to whole values within bounds" passed after 0.025 seconds.
+✔ Test "Accessory weight floor of 0 allows sub-20 loads" passed after 0.025 seconds.
+✔ Test "Weight snaps by quarter kilo within bounds" passed after 0.025 seconds.
+✔ Test "Accessibility text matches empty, collar-only, and loaded branches" passed after 0.032 seconds.
+✔ Test "CTA and shadow tokens match both v3 themes" passed after 0.080 seconds.
+✔ Test "mockup shell tokens match both v3 themes" passed after 0.081 seconds.
+✔ Test "border tokens match both v3 themes" passed after 0.082 seconds.
+✔ Test "surface tokens match both v3 themes" passed after 0.082 seconds.
+✔ Test "gold tokens match both v3 themes" passed after 0.081 seconds.
+✔ Test "text tokens match both v3 themes" passed after 0.081 seconds.
+✔ Test "semantic tokens match both v3 themes" passed after 0.082 seconds.
+✔ Test "Every 0.25kg input uses valid descending denominations" passed after 0.219 seconds.
+✔ Test "zero-based first set renders hash one" passed after 1.265 seconds.
+✔ Test "ElevatedCard instantiates" passed after 1.265 seconds.
+✔ Test "StatTile instantiates" passed after 1.265 seconds.
+✔ Test "MeetPRListRow instantiates" passed after 1.265 seconds.
+✔ Test "Card instantiates" passed after 1.265 seconds.
+✔ Test "InitialAvatar instantiates" passed after 1.265 seconds.
+✔ Test "SetRow instantiates" passed after 1.265 seconds.
+✔ Test "SecondaryButton instantiates" passed after 1.265 seconds.
+✔ Test "weight unit exposes both supported cases" passed after 1.264 seconds.
+✔ Test "IconButton instantiates" passed after 1.264 seconds.
+✔ Test "DangerButton instantiates" passed after 1.264 seconds.
+✔ Test "PRBadge instantiates" passed after 1.264 seconds.
+✔ Test "ExerciseCard instantiates" passed after 1.264 seconds.
+✔ Test "BrandPrimaryButton instantiates" passed after 1.264 seconds.
+✔ Test "Eyebrow instantiates" passed after 1.264 seconds.
+✔ Test "NumericInput instantiates" passed after 1.264 seconds.
+✔ Test "MeetPRTabBar preserves student defaults and supports a coach palette" passed after 1.264 seconds.
+✔ Test "StatusBadge instantiates" passed after 1.266 seconds.
+✔ Test "StatTile accepts String, Double, and Int values" passed after 1.263 seconds.
+✔ Test "SetRow and GoldCTA SVG metrics match dc source" passed after 1.263 seconds.
+✔ Test labelIncludesCollarOnlyWhenShown() passed after 1.263 seconds.
+✔ Test "MeetPRTextField instantiates" passed after 1.264 seconds.
+✔ Test collarOnlyLoadStillAnnouncesCollar() passed after 1.263 seconds.
+✔ Test "PrimaryButton instantiates" passed after 1.263 seconds.
+✔ Test "Product/presentation defaults are mapped without data defaults" passed after 1.263 seconds.
+✔ Test "ExerciseCard partial recorded sets still produce a receipt" passed after 1.263 seconds.
+✔ Test "ExerciseCard collapsed source and canonical radius are locked" passed after 1.263 seconds.
+✔ Test "English count-sensitive copy has singular variants" passed after 1.263 seconds.
+✔ Test "Frozen W0 entries retain legacy parameters" passed after 1.263 seconds.
+✔ Test "demo catalog instantiates" passed after 1.263 seconds.
+✔ Test "ExerciseCard summary includes failed-set suffix" passed after 1.264 seconds.
+✔ Test "Untouched accessory weight and RPE keep their decimals" with 2 test cases passed after 1.263 seconds.
+✔ Test "Typed keypad decimal replaces the localized placeholder" with 2 test cases passed after 1.263 seconds.
+✔ Test "Next and sync forward the untouched value" with 2 test cases passed after 1.263 seconds.
+✔ Test "RPESlider instantiates" passed after 1.265 seconds.
+✔ Test "Untouched localized weight keeps its original value" with 2 test cases passed after 1.263 seconds.
+✔ Test "GoldCTA instantiates all variants" passed after 1.263 seconds.
+✔ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() passed after 1.337 seconds.
+✔ Test run with 74 tests in 17 suites passed after 1.342 seconds.

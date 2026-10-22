@@ -60,7 +60,9 @@ extension SetRefPickerPresentation {
   var sendSummary: String? {
     selectedCandidate.map {
       ChatStrings.setRefSendSummary(
-        setNumber: $0.source.setNumber, exerciseName: $0.source.exerciseName)
+        setNumber: $0.source.setNumber,
+        exerciseName: CatalogExerciseName.display(
+          $0.source.exerciseName, isCatalog: $0.isCatalogExercise))
     }
   }
 
@@ -75,7 +77,9 @@ extension SetRefPickerPresentation {
       } else {
         result.append(
           SetRefPickerGroup(
-            id: key, exerciseName: candidate.source.exerciseName,
+            id: key,
+            exerciseName: CatalogExerciseName.display(
+              candidate.source.exerciseName, isCatalog: candidate.isCatalogExercise),
             weekCode: candidate.weekCode, candidates: [candidate]))
       }
     }

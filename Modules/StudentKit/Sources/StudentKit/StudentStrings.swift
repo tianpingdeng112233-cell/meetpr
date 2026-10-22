@@ -1,3 +1,4 @@
+import CoreModels
 import Foundation
 
 // The generated key namespace intentionally keeps the module's catalog behind
@@ -1339,7 +1340,7 @@ enum StudentStrings {
       let key = accessibility ? "daysBehindAccessibility" : "daysBehind"
       let variant = isEnglish(locale) && count == 1 ? "one" : "other"
       if let template = macOSSwiftPMCatalog["student.trainingWeek.\(key) %lld.\(variant)"]?[
-        isEnglish(locale) ? "en" : "zh-Hans"]
+        InterfaceLanguage(locale: locale).rawValue]
       {
         return template.replacing("%lld", with: String(count))
       }
@@ -1362,7 +1363,7 @@ enum StudentStrings {
 
   /// Fixture names represent bilingual server fields, independent of the app's chosen language.
   static func fixtureName(_ key: Key, locale: Locale) -> String {
-    let language = isEnglish(locale) ? "en" : "zh-Hans"
+    let language = InterfaceLanguage(locale: locale).rawValue
     guard let path = Bundle.module.path(forResource: language, ofType: "lproj"),
       let bundle = Bundle(path: path)
     else { return localized(key, locale: locale) }
@@ -1400,7 +1401,7 @@ enum StudentStrings {
         let strings = root["strings"] as? [String: Any],
         let entry = strings[key] as? [String: Any],
         let localizations = entry["localizations"] as? [String: Any],
-        let payload = localizations[isEnglish(locale) ? "en" : "zh-Hans"] as? [String: Any],
+        let payload = localizations[InterfaceLanguage(locale: locale).rawValue] as? [String: Any],
         let variations = payload["variations"] as? [String: Any],
         let plural = variations["plural"] as? [String: Any],
         let form = plural[isEnglish(locale) && count == 1 ? "one" : "other"] as? [String: Any],
@@ -1437,7 +1438,7 @@ enum StudentStrings {
   private static func resolved(_ localized: String, locale: Locale) -> String {
     #if DEBUG && os(macOS)
       guard localized.hasPrefix("student."),
-        let value = macOSSwiftPMCatalog[localized]?[isEnglish(locale) ? "en" : "zh-Hans"]
+        let value = macOSSwiftPMCatalog[localized]?[InterfaceLanguage(locale: locale).rawValue]
       else {
         return localized
       }

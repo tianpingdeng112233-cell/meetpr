@@ -216,7 +216,7 @@ enum SetLineParser {
   // MARK: - tempo helpers
 
   static func isTempoContext(exerciseName: String, intensityCell: String) -> Bool {
-    let name = exerciseName
+    let name = ExerciseSearchText.simplified(exerciseName)
     if name.contains("节奏") || name.contains("离心") || name.contains("暂停") { return true }
     return normalize(intensityCell).contains("%top")
   }
@@ -244,7 +244,7 @@ enum SetLineParser {
   // MARK: - utilities
 
   private static func normalize(_ raw: String) -> String {
-    raw.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    ExerciseSearchText.simplified(raw).trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
   }
 
   private static func firstNonEmpty(_ values: String?...) -> String {

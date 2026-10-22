@@ -1,0 +1,8 @@
+Extracted test results; original build output retained in .build/094-evidence-originals/network-green.log
+Build complete! (29.73s)
+Test Suite 'NetworkingPackageTests.xctest' passed at 2026-10-22 08:54:25.898.
+Test Suite 'Selected tests' passed at 2026-10-22 08:54:25.898.
+◇ Test run started.
+✔ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) with 10 test cases passed after 0.017 seconds.
+✔ Test apiRequestsExplicitlyOverrideSessionLanguageHeader() passed after 0.022 seconds.
+✔ Test run with 2 tests in 0 suites passed after 0.022 seconds.

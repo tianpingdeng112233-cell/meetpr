@@ -25,6 +25,9 @@ import Testing
     #expect(request.url?.path == "/api/realtime")
     #expect(request.url?.query == nil)
     #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer secret-token")
+    #expect(
+      request.value(forHTTPHeaderField: "X-MeetPR-Locale") == InterfaceLanguage.current.rawValue)
+    #expect(request.value(forHTTPHeaderField: "Accept-Language") == nil)
 
     await client.disconnect()
     #expect(await realtimeEventually { await connection.wasCancelled })

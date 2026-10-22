@@ -1,99 +1,2145 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
-    "appShell.acknowledge": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Got it"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"知道了"}}}},
-    "appShell.auth.hidePassword": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Hide password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"隐藏密码"}}}},
-    "appShell.auth.invalidCredentials": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Incorrect phone number or password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"手机号或密码错误"}}}},
-    "appShell.auth.invalidPassword": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Password must be 8 characters or more and no more than 72 bytes"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"密码至少 8 字符,最多 72 字节"}}}},
-    "appShell.auth.invalidPhone": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Enter a valid phone number"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"手机号格式不正确"}}}},
-    "appShell.auth.invalidPhoneWithPrefix": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Enter a valid phone number (starting with +86)"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"手机号格式不对(+86 开头)"}}}},
-    "appShell.auth.networkUnstable": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Network connection is unstable. Try again."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"网络不稳定,重试"}}}},
-    "appShell.auth.password": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"密码"}}}},
-    "appShell.auth.passwordInputHint": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Enter password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"输入密码"}}}},
-    "appShell.auth.phoneHelper": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"11-digit mainland China phone number"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"中国大陆 11 位手机号"}}}},
-    "appShell.auth.phoneInputHint": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Enter phone number"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"输入手机号"}}}},
-    "appShell.auth.phoneNumber": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Phone number"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"手机号"}}}},
-    "appShell.auth.phoneTaken": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"This phone number is already registered"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"该手机号已注册"}}}},
-    "appShell.auth.rateLimited": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Too many requests. Try again later."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"请求过于频繁,请稍后重试"}}}},
-    "appShell.auth.requestFailed": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Request failed. Try again later."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"请求失败,请稍后重试"}}}},
-    "appShell.auth.showPassword": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Show password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"显示密码"}}}},
-    "appShell.demo.coach": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Demo Coach"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"演示教练"}}}},
-    "appShell.demo.student": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Demo Student"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"演示学员"}}}},
-    "appShell.login.consent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"By continuing, you agree to the"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"继续即表示同意"}}}},
-    "appShell.login.instructions": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sign in with your phone number and password."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"用手机号和密码登录。"}}}},
-    "appShell.login.signIn": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sign in"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"登录"}}}},
-    "appShell.privacy.analytics.body": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"To improve the training experience, MeetPR collects product interactions, an anonymous device identifier, and feedback text you choose to provide. This data is used only for product functionality, stored on our self-hosted Alibaba Cloud infrastructure in mainland China, and is not shared with third-party analytics SDKs, transferred overseas, or used for tracking or advertising. We keep it while your account exists; if you delete your account, it is unlinked from you and becomes anonymous records that can no longer identify you. Uninstalling clears the anonymous installation identifier. You can delete your account or contact us to request deletion."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"为改进训练流程，MeetPR 会收集产品交互、匿名设备标识，以及你主动填写的反馈文本。数据仅用于产品功能，留存在境内自建阿里云，不接入第三方统计 SDK、不出境，也不用于追踪或广告。账号存续期间我们会保留这些数据；删除账号后，它们会与你断开关联，成为无法识别你的匿名记录。卸载会清除匿名安装标识，你可通过删除账号或联系我们请求删除。"}}}},
-    "appShell.privacy.analytics.body.global": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"To improve the training experience, MeetPR collects product interactions, an anonymous device identifier, and feedback text you choose to provide. This data is used only for product functionality and is stored on our own DigitalOcean infrastructure in the United States. It is not shared with third-party analytics SDKs and is not used for tracking or advertising. We keep it while your account exists; if you delete your account, it is unlinked from you and becomes anonymous records that can no longer identify you. Uninstalling clears the anonymous installation identifier. You can delete your account or contact us to request deletion."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"为改进训练流程，MeetPR 会收集产品交互、匿名设备标识，以及你主动填写的反馈文本。数据仅用于产品功能，存放在我们位于美国的 DigitalOcean 自有服务器上，不接入第三方统计 SDK，也不用于追踪或广告。账号存续期间我们会保留这些数据；删除账号后，它们会与你断开关联，成为无法识别你的匿名记录。卸载会清除匿名安装标识，你可通过删除账号或联系我们请求删除。"}}}},
-    "appShell.privacy.analytics.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"About usage data"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"使用数据说明"}}}},
-    "appShell.privacy.policy": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Privacy Policy"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"隐私政策"}}}},
-    "appShell.root.validatingSession": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Verifying session…"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"正在验证会话…"}}}},
-    "appShell.signup.eyebrow": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"SIGN UP · ROLE"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"注册 · 角色"}}}},
-    "appShell.signup.multiRoleLater": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Multi-role support will be considered for V1.5."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"多角色支持在 V1.5 评估。"}}}},
-    "appShell.signup.passwordMaximum": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"72 bytes maximum"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"最多 72 字节"}}}},
-    "appShell.signup.passwordMinimum": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"At least 8 characters"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"至少 8 字符"}}}},
-    "appShell.signup.role.coach": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Coach"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"教练"}}}},
-    "appShell.signup.role.coach.description": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Program cycles · Review athletes · Give video feedback"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"编排周期 · 审阅学员 · 反馈视频"}}}},
-    "appShell.signup.role.coachedStudent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Athlete · With a coach"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"学员 · 有教练"}}}},
-    "appShell.signup.role.coachedStudent.description": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Receive plans · Log training · Upload videos"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"接收计划 · 记录训练 · 上传视频"}}}},
-    "appShell.signup.role.selfTrainingStudent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Athlete · Self-coached"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"学员 · 自己练"}}}},
-    "appShell.signup.role.selfTrainingStudent.description": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Choose a program · Train independently"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"选择训练模板 · 自主跟练"}}}},
-    "appShell.signup.roleLocked": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Your role is locked after sign-up."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"注册后角色将锁定。"}}}},
-    "appShell.signup.signUp": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sign up"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"注册"}}}},
-    "appShell.signup.title": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Choose your role"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"选择你的角色"}}}},
-    "auth.signupHelpPrefix": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Didn't get it? Check your spam folder. If you already have an account, "}},"zh-Hans":{"stringUnit":{"state":"translated","value":"没收到？看看垃圾箱；如果你已经注册过，请直接"}}}},
-    "auth.signupHelpAction": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"sign in"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"登录"}}}},
-    "auth.signupHelpSuffix": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"。"}}}},
-    "auth.email": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"EMAIL"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"邮箱"}}}},
-    "auth.emailPlaceholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"you@example.com"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"you@example.com"}}}},
-    "auth.invalidEmail": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Enter a valid email address"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"请输入有效的邮箱地址"}}}},
-    "auth.password": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"PASSWORD"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"密码"}}}},
-    "auth.passwordPlaceholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"At least 8 characters"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"设置登录密码"}}}},
-    "auth.loginPasswordPlaceholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":""}},"zh-Hans":{"stringUnit":{"state":"translated","value":"输入密码"}}}},
-    "auth.passwordHelper": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"8–72 characters"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"8–72 位"}}}},
-    "auth.invalidPassword": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Use 8–72 characters"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"请输入 8–72 位密码"}}}},
-    "auth.signIn": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sign in"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"登录"}}}},
-    "auth.goSignIn": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sign in"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"去登录"}}}},
-    "auth.createAccount": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Create account"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"注册账号"}}}},
-    "auth.registerButton": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Create account"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"注册"}}}},
-    "auth.forgotLink": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Forgot password?"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"忘记密码？"}}}},
-    "auth.forgotHeader": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Forgot password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"找回密码"}}}},
-    "auth.globalSlogan": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Better than\nyesterday"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"Better than\nyesterday"}}}},
-    "auth.chinaSlogan": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Meet Your\nPR Here."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"Meet Your\nPR Here."}}}},
-    "auth.or": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"or"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"或"}}}},
-    "auth.google": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Continue with Google"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"使用 Google 继续"}}}},
-    "auth.consent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"By continuing, you agree to our"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"继续即表示你同意我们的"}}}},
-    "auth.privacy": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Privacy Policy"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"隐私政策"}}}},
-    "auth.registerTitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Create your\naccount"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"创建账号"}}}},
-    "auth.registerSubtitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Join your coach and start building better training days."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"加入你的教练，把每个训练日练得更好。"}}}},
-    "auth.forgotTitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Reset your\npassword"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"找回密码"}}}},
-    "auth.resetTitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Reset your\npassword"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"重置密码"}}}},
-    "auth.forgotSubtitle": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Enter the email address linked to your account."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"填写注册邮箱，我们会发一个验证码给你。"}}}},
-    "auth.resetSent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"If an account exists, we've sent a code."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"如果这个邮箱注册过，验证码已经发出。"}}}},
-    "auth.newPassword": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"NEW PASSWORD"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"新密码"}}}},
-    "auth.newPasswordPlaceholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"At least 8 characters"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"设置新密码"}}}},
-    "auth.resetButton": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Reset password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"重置密码"}}}},
-    "auth.sendCode": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Send code"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"发送验证码"}}}},
-    "auth.passwordUpdated": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Password updated, sign in with your new password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"密码已更新，请使用新密码登录"}}}},
-    "auth.signupCode": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Verification code"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"验证码"}}}},
-    "auth.codePlaceholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"6-digit code"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"6 位数字"}}}},
-    "auth.getCode": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Get code"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"获取验证码"}}}},
-    "auth.resendCountdown": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Resend in {n}s"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"{n} 秒后重发"}}}},
-    "auth.resend": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Resend"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"重新获取"}}}},
-    "auth.signupSent": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sent to {email}. Valid for 10 minutes."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"已发送到 {email}，10 分钟内有效"}}}},
-    "auth.confirmPassword": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Confirm password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"确认密码"}}}},
-    "auth.confirmPlaceholder": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Re-enter password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"再输入一次密码"}}}},
-    "auth.passwordMismatch": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Passwords don't match"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"两次输入的密码不一致"}}}},
-    "auth.signupHelp": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Didn't get it? Check your spam folder. If you already have an account, sign in."}},"zh-Hans":{"stringUnit":{"state":"translated","value":"没收到？看看垃圾箱；如果你已经注册过，请直接登录。"}}}},
-    "auth.invalidCredentials": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Incorrect email or password"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"邮箱或密码错误"}}}},
-    "auth.invalidIdentityToken": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"We couldn't verify this sign-in. Please try again"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"无法验证此次登录，请重试"}}}},
-    "auth.emailTaken": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"An account already exists for this email"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"这个邮箱已经注册过了，请直接登录"}}}},
-    "auth.invalidResetCode": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"That code is invalid or has expired"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"验证码不对或已过期，请重新获取"}}}},
-    "auth.invalidSignupCode": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"That code is invalid or has expired"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"验证码不对或已过期，请重新获取"}}}},
-    "auth.registrationUnavailable": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Account creation is currently unavailable"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"暂时无法创建账号"}}}},
-    "auth.invalidTimezone": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Your device timezone isn't supported"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"不支持设备当前的时区"}}}},
-    "auth.rateLimited": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Too many attempts. Please try again later"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"尝试次数过多，请稍后重试"}}}},
-    "auth.validationError": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Check your details and try again"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"请检查填写的信息后重试"}}}},
-    "auth.unavailable": {"extractionState":"manual","localizations":{"en":{"stringUnit":{"state":"translated","value":"Sign-in is temporarily unavailable"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"暂时无法登录，请稍后重试"}}}}
+    "appShell.acknowledge": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "知道了"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "知道了"
+          }
+        }
+      }
+    },
+    "appShell.auth.hidePassword": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱藏密碼"
+          }
+        }
+      }
+    },
+    "appShell.auth.invalidCredentials": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incorrect phone number or password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机号或密码错误"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機號碼或密碼錯誤"
+          }
+        }
+      }
+    },
+    "appShell.auth.invalidPassword": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password must be 8 characters or more and no more than 72 bytes"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码至少 8 字符,最多 72 字节"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密碼至少 8 字元,最多 72 位元組"
+          }
+        }
+      }
+    },
+    "appShell.auth.invalidPhone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid phone number"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机号格式不正确"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機號碼格式不正確"
+          }
+        }
+      }
+    },
+    "appShell.auth.invalidPhoneWithPrefix": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid phone number (starting with +86)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机号格式不对(+86 开头)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機號碼格式不對(+86 開頭)"
+          }
+        }
+      }
+    },
+    "appShell.auth.networkUnstable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network connection is unstable. Try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网络不稳定,重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網路不穩定,重試"
+          }
+        }
+      }
+    },
+    "appShell.auth.password": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密碼"
+          }
+        }
+      }
+    },
+    "appShell.auth.passwordInputHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入密碼"
+          }
+        }
+      }
+    },
+    "appShell.auth.phoneHelper": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "11-digit mainland China phone number"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中国大陆 11 位手机号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "中國大陸 11 位手機號碼"
+          }
+        }
+      }
+    },
+    "appShell.auth.phoneInputHint": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter phone number"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入手机号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入手機號碼"
+          }
+        }
+      }
+    },
+    "appShell.auth.phoneNumber": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phone number"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機號碼"
+          }
+        }
+      }
+    },
+    "appShell.auth.phoneTaken": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This phone number is already registered"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该手机号已注册"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該手機號碼已註冊"
+          }
+        }
+      }
+    },
+    "appShell.auth.rateLimited": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many requests. Try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求过于频繁,请稍后重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請求過於頻繁,請稍後重試"
+          }
+        }
+      }
+    },
+    "appShell.auth.requestFailed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request failed. Try again later."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请求失败,请稍后重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請求失敗,請稍後重試"
+          }
+        }
+      }
+    },
+    "appShell.auth.showPassword": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "顯示密碼"
+          }
+        }
+      }
+    },
+    "appShell.demo.coach": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demo Coach"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示教练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示教練"
+          }
+        }
+      }
+    },
+    "appShell.demo.student": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demo Student"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示学员"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "演示學員"
+          }
+        }
+      }
+    },
+    "appShell.login.consent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By continuing, you agree to the"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续即表示同意"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "繼續即表示同意"
+          }
+        }
+      }
+    },
+    "appShell.login.instructions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in with your phone number and password."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用手机号和密码登录。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用手機號碼和密碼登入。"
+          }
+        }
+      }
+    },
+    "appShell.login.signIn": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登入"
+          }
+        }
+      }
+    },
+    "appShell.privacy.analytics.body": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To improve the training experience, MeetPR collects product interactions, an anonymous device identifier, and feedback text you choose to provide. This data is used only for product functionality, stored on our self-hosted Alibaba Cloud infrastructure in mainland China, and is not shared with third-party analytics SDKs, transferred overseas, or used for tracking or advertising. We keep it while your account exists; if you delete your account, it is unlinked from you and becomes anonymous records that can no longer identify you. Uninstalling clears the anonymous installation identifier. You can delete your account or contact us to request deletion."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为改进训练流程，MeetPR 会收集产品交互、匿名设备标识，以及你主动填写的反馈文本。数据仅用于产品功能，留存在境内自建阿里云，不接入第三方统计 SDK、不出境，也不用于追踪或广告。账号存续期间我们会保留这些数据；删除账号后，它们会与你断开关联，成为无法识别你的匿名记录。卸载会清除匿名安装标识，你可通过删除账号或联系我们请求删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為改進訓練流程，MeetPR 會收集產品互動、匿名裝置標識，以及你主動填寫的反饋文字。資料僅用於產品功能，留存在境內自建阿里雲，不接入第三方統計 SDK、不出境，也不用於追蹤或廣告。帳號存續期間我們會保留這些資料；刪除帳號後，它們會與你斷開關聯，成為無法識別你的匿名記錄。解除安裝會清除匿名安裝標識，你可透過刪除帳號或聯絡我們請求刪除。"
+          }
+        }
+      }
+    },
+    "appShell.privacy.analytics.body.global": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To improve the training experience, MeetPR collects product interactions, an anonymous device identifier, and feedback text you choose to provide. This data is used only for product functionality and is stored on our own DigitalOcean infrastructure in the United States. It is not shared with third-party analytics SDKs and is not used for tracking or advertising. We keep it while your account exists; if you delete your account, it is unlinked from you and becomes anonymous records that can no longer identify you. Uninstalling clears the anonymous installation identifier. You can delete your account or contact us to request deletion."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为改进训练流程，MeetPR 会收集产品交互、匿名设备标识，以及你主动填写的反馈文本。数据仅用于产品功能，存放在我们位于美国的 DigitalOcean 自有服务器上，不接入第三方统计 SDK，也不用于追踪或广告。账号存续期间我们会保留这些数据；删除账号后，它们会与你断开关联，成为无法识别你的匿名记录。卸载会清除匿名安装标识，你可通过删除账号或联系我们请求删除。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為改進訓練流程，MeetPR 會收集產品互動、匿名裝置標識，以及你主動填寫的反饋文字。資料僅用於產品功能，存放在我們位於美國的 DigitalOcean 自有伺服器上，不接入第三方統計 SDK，也不用於追蹤或廣告。帳號存續期間我們會保留這些資料；刪除帳號後，它們會與你斷開關聯，成為無法識別你的匿名記錄。解除安裝會清除匿名安裝標識，你可透過刪除帳號或聯絡我們請求刪除。"
+          }
+        }
+      }
+    },
+    "appShell.privacy.analytics.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About usage data"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用数据说明"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用資料說明"
+          }
+        }
+      }
+    },
+    "appShell.privacy.policy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐私政策"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱私政策"
+          }
+        }
+      }
+    },
+    "appShell.root.validatingSession": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifying session…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在验证会话…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在驗證會話…"
+          }
+        }
+      }
+    },
+    "appShell.signup.eyebrow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SIGN UP · ROLE"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注册 · 角色"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "註冊 · 角色"
+          }
+        }
+      }
+    },
+    "appShell.signup.multiRoleLater": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Multi-role support will be considered for V1.5."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多角色支持在 V1.5 评估。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "多角色支援在 V1.5 評估。"
+          }
+        }
+      }
+    },
+    "appShell.signup.passwordMaximum": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "72 bytes maximum"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最多 72 字节"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最多 72 位元組"
+          }
+        }
+      }
+    },
+    "appShell.signup.passwordMinimum": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At least 8 characters"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "至少 8 字符"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "至少 8 字元"
+          }
+        }
+      }
+    },
+    "appShell.signup.role.coach": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教練"
+          }
+        }
+      }
+    },
+    "appShell.signup.role.coach.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Program cycles · Review athletes · Give video feedback"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编排周期 · 审阅学员 · 反馈视频"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "編排週期 · 審閱學員 · 反饋影片"
+          }
+        }
+      }
+    },
+    "appShell.signup.role.coachedStudent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Athlete · With a coach"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员 · 有教练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "學員 · 有教練"
+          }
+        }
+      }
+    },
+    "appShell.signup.role.coachedStudent.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receive plans · Log training · Upload videos"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收计划 · 记录训练 · 上传视频"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收課表 · 記錄訓練 · 上傳影片"
+          }
+        }
+      }
+    },
+    "appShell.signup.role.selfTrainingStudent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Athlete · Self-coached"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "学员 · 自己练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "學員 · 自己練"
+          }
+        }
+      }
+    },
+    "appShell.signup.role.selfTrainingStudent.description": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a program · Train independently"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择训练模板 · 自主跟练"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇訓練範本 · 自主跟練"
+          }
+        }
+      }
+    },
+    "appShell.signup.roleLocked": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your role is locked after sign-up."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注册后角色将锁定。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "註冊后角色將鎖定。"
+          }
+        }
+      }
+    },
+    "appShell.signup.signUp": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign up"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注册"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "註冊"
+          }
+        }
+      }
+    },
+    "appShell.signup.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your role"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择你的角色"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇你的角色"
+          }
+        }
+      }
+    },
+    "auth.signupHelpPrefix": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Didn't get it? Check your spam folder. If you already have an account, "
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没收到？看看垃圾箱；如果你已经注册过，请直接"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒收到？看看垃圾箱；如果你已經註冊過，請直接"
+          }
+        }
+      }
+    },
+    "auth.signupHelpAction": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sign in"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登入"
+          }
+        }
+      }
+    },
+    "auth.signupHelpSuffix": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "。"
+          }
+        }
+      }
+    },
+    "auth.email": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMAIL"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邮箱"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "電子郵件"
+          }
+        }
+      }
+    },
+    "auth.emailPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "you@example.com"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "you@example.com"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "you@example.com"
+          }
+        }
+      }
+    },
+    "auth.invalidEmail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid email address"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入有效的邮箱地址"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入有效的信箱地址"
+          }
+        }
+      }
+    },
+    "auth.password": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PASSWORD"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密碼"
+          }
+        }
+      }
+    },
+    "auth.passwordPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At least 8 characters"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置登录密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定登入密碼"
+          }
+        }
+      }
+    },
+    "auth.loginPasswordPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ""
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸入密碼"
+          }
+        }
+      }
+    },
+    "auth.passwordHelper": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8–72 characters"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8–72 位"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "8–72 位"
+          }
+        }
+      }
+    },
+    "auth.invalidPassword": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use 8–72 characters"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请输入 8–72 位密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請輸入 8–72 位密碼"
+          }
+        }
+      }
+    },
+    "auth.signIn": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "登入"
+          }
+        }
+      }
+    },
+    "auth.goSignIn": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去登录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "去登入"
+          }
+        }
+      }
+    },
+    "auth.createAccount": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create account"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注册账号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "註冊帳號"
+          }
+        }
+      }
+    },
+    "auth.registerButton": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create account"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "注册"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "註冊"
+          }
+        }
+      }
+    },
+    "auth.forgotLink": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forgot password?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘记密码？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘記密碼？"
+          }
+        }
+      }
+    },
+    "auth.forgotHeader": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forgot password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找回密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找回密碼"
+          }
+        }
+      }
+    },
+    "auth.globalSlogan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Better than\nyesterday"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Better than\nyesterday"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Better than\nyesterday"
+          }
+        }
+      }
+    },
+    "auth.chinaSlogan": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meet Your\nPR Here."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meet Your\nPR Here."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meet Your\nPR Here."
+          }
+        }
+      }
+    },
+    "auth.or": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "or"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "或"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "或"
+          }
+        }
+      }
+    },
+    "auth.google": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with Google"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 Google 继续"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 Google 繼續"
+          }
+        }
+      }
+    },
+    "auth.consent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By continuing, you agree to our"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续即表示你同意我们的"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "繼續即表示你同意我們的"
+          }
+        }
+      }
+    },
+    "auth.privacy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Privacy Policy"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐私政策"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隱私政策"
+          }
+        }
+      }
+    },
+    "auth.registerTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create your\naccount"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建账号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立帳號"
+          }
+        }
+      }
+    },
+    "auth.registerSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Join your coach and start building better training days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入你的教练，把每个训练日练得更好。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入你的教練，把每個訓練日練得更好。"
+          }
+        }
+      }
+    },
+    "auth.forgotTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset your\npassword"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找回密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "找回密碼"
+          }
+        }
+      }
+    },
+    "auth.resetTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset your\npassword"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置密碼"
+          }
+        }
+      }
+    },
+    "auth.forgotSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter the email address linked to your account."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "填写注册邮箱，我们会发一个验证码给你。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "填寫註冊信箱，我們會發一個驗證碼給你。"
+          }
+        }
+      }
+    },
+    "auth.resetSent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If an account exists, we've sent a code."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如果这个邮箱注册过，验证码已经发出。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如果這個信箱註冊過，驗證碼已經發出。"
+          }
+        }
+      }
+    },
+    "auth.newPassword": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NEW PASSWORD"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新密碼"
+          }
+        }
+      }
+    },
+    "auth.newPasswordPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At least 8 characters"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置新密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定新密碼"
+          }
+        }
+      }
+    },
+    "auth.resetButton": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置密碼"
+          }
+        }
+      }
+    },
+    "auth.sendCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send code"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送验证码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳送驗證碼"
+          }
+        }
+      }
+    },
+    "auth.passwordUpdated": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password updated, sign in with your new password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密码已更新，请使用新密码登录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密碼已更新，請使用新密碼登入"
+          }
+        }
+      }
+    },
+    "auth.signupCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verification code"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "验证码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "驗證碼"
+          }
+        }
+      }
+    },
+    "auth.codePlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6-digit code"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 位数字"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 位數字"
+          }
+        }
+      }
+    },
+    "auth.getCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get code"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "获取验证码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "獲取驗證碼"
+          }
+        }
+      }
+    },
+    "auth.resendCountdown": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resend in {n}s"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} 秒后重发"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{n} 秒後重發"
+          }
+        }
+      }
+    },
+    "auth.resend": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resend"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新获取"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新獲取"
+          }
+        }
+      }
+    },
+    "auth.signupSent": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sent to {email}. Valid for 10 minutes."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已发送到 {email}，10 分钟内有效"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已傳送到 {email}，10 分鐘內有效"
+          }
+        }
+      }
+    },
+    "auth.confirmPassword": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "确认密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "確認密碼"
+          }
+        }
+      }
+    },
+    "auth.confirmPlaceholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-enter password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再输入一次密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再輸入一次密碼"
+          }
+        }
+      }
+    },
+    "auth.passwordMismatch": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwords don't match"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "两次输入的密码不一致"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "兩次輸入的密碼不一致"
+          }
+        }
+      }
+    },
+    "auth.signupHelp": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Didn't get it? Check your spam folder. If you already have an account, sign in."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没收到？看看垃圾箱；如果你已经注册过，请直接登录。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "沒收到？看看垃圾箱；如果你已經註冊過，請直接登入。"
+          }
+        }
+      }
+    },
+    "auth.invalidCredentials": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Incorrect email or password"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "邮箱或密码错误"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "信箱或密碼錯誤"
+          }
+        }
+      }
+    },
+    "auth.invalidIdentityToken": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We couldn't verify this sign-in. Please try again"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法验证此次登录，请重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法驗證此次登入，請重試"
+          }
+        }
+      }
+    },
+    "auth.emailTaken": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An account already exists for this email"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个邮箱已经注册过了，请直接登录"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這個信箱已經註冊過了，請直接登入"
+          }
+        }
+      }
+    },
+    "auth.invalidResetCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That code is invalid or has expired"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "验证码不对或已过期，请重新获取"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "驗證碼不對或已過期，請重新獲取"
+          }
+        }
+      }
+    },
+    "auth.invalidSignupCode": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That code is invalid or has expired"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "验证码不对或已过期，请重新获取"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "驗證碼不對或已過期，請重新獲取"
+          }
+        }
+      }
+    },
+    "auth.registrationUnavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account creation is currently unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法创建账号"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法建立帳號"
+          }
+        }
+      }
+    },
+    "auth.invalidTimezone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your device timezone isn't supported"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不支持设备当前的时区"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不支援裝置當前的時區"
+          }
+        }
+      }
+    },
+    "auth.rateLimited": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many attempts. Please try again later"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尝试次数过多，请稍后重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "嘗試次數過多，請稍後重試"
+          }
+        }
+      }
+    },
+    "auth.validationError": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your details and try again"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请检查填写的信息后重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請檢查填寫的資訊後重試"
+          }
+        }
+      }
+    },
+    "auth.unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in is temporarily unavailable"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂时无法登录，请稍后重试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暫時無法登入，請稍後重試"
+          }
+        }
+      }
+    }
   },
   "version": "1.0"
 }

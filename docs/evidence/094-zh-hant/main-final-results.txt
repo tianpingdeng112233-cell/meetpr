@@ -1,0 +1,7 @@
+XcodeBuildMCP test_sim
+Scheme: MeetPR
+Configuration: Debug
+Simulator: 2B4DCD56-C0EB-4762-914A-1487A67196BA (iPhone 17 Pro Max, iOS 26.5)
+Result: 9 passed, 0 failed, 0 skipped; 28.9s
+Result bundle: DerivedData/094-main-final-tests.xcresult
+Build log: ~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-094-zh-hant-6bf212735501/logs/test_sim_2026-10-22T09-29-57-490Z_pid93668_964cad1d.log

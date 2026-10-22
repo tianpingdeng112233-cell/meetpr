@@ -1,0 +1,6 @@
+Source: .build/094-script-precedence-red.log
+
+✘ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) recorded an issue with 2 arguments localization → "zh-Hans-TW", expected → "zh-Hans" at APIClientTests.swift:77:5: Expectation failed: (request.value(forHTTPHeaderField: "Accept-Language") → "zh-Hant") == (expected → "zh-Hans")
+✘ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) recorded an issue with 2 arguments localization → "zh-Hans-TW", expected → "zh-Hans" at APIClientTests.swift:77:5: Expectation failed: (request.value(forHTTPHeaderField: "Accept-Language") → "zh-Hant") == (expected → "zh-Hans")
+✘ Test apiRequestsUseOneNegotiatedLanguage(localization:expected:) recorded an issue with 2 arguments localization → "zh-Hans-TW", expected → "zh-Hans" at APIClientTests.swift:77:5: Expectation failed: (request.value(forHTTPHeaderField: "Accept-Language") → "zh-Hant") == (expected → "zh-Hans")
+✘ Test run with 1 test in 0 suites failed after 0.199 seconds with 3 issues.

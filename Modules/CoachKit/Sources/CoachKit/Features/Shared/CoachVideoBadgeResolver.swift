@@ -35,7 +35,9 @@ enum CoachVideoBadgeResolver {
     coachName: String?
   ) -> VideoBadgeInfo {
     VideoBadgeInfo(
-      exerciseName: item.exerciseName.map { CoachLocalization.exerciseName($0) },
+      exerciseName: item.exerciseName.map {
+        CoachLocalization.exerciseName($0, isCatalog: item.isCatalogExercise)
+      },
       weightKg: setInfo?.weightKg,
       reps: setInfo?.reps,
       rpe: setInfo?.rpe,

@@ -45,6 +45,7 @@ enum StudentAddedRows {
     var draft = TodayWorkoutSetRowDraft(
       id: set.id, planExerciseID: exercise.id, exerciseID: exercise.exercise.id,
       exerciseName: exercise.exercise.name, exerciseNameEn: exercise.exercise.nameEn,
+      isCatalogExercise: exercise.exercise.createdByCoachID == nil,
       isAccessory: exercise.exercise.isAccessory,
       isMainLift: exercise.exercise.exerciseType == .mainLift,
       planExerciseSortOrder: exercise.sequenceIndex, prescribed: set,

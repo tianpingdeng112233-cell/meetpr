@@ -1,0 +1,9 @@
+Source: .build/094-tests/RepositoryContracts.log
+Build complete! (4.80s)
+✔ Test chatMessageQueryAcceptsPositiveSequence() passed after 0.001 seconds.
+✔ Test chatMessageQueryAcceptsLimitBoundaries() passed after 0.001 seconds.
+✔ Test chatMessageQueryRejectsZeroSequence() passed after 0.001 seconds.
+✔ Test "in-memory video markers create, sort, isolate by video, and delete" passed after 0.001 seconds.
+✔ Test "pending video carries its optional set-log link" passed after 0.001 seconds.
+✔ Test chatMessageQueryRejectsLimitOutsideBackendRange() passed after 0.001 seconds.
+✔ Test run with 6 tests in 0 suites passed after 0.001 seconds.

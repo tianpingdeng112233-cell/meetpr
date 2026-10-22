@@ -20,6 +20,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   public let exerciseID: UUID
   public let exerciseName: String
   public let exerciseNameEn: String?
+  public let isCatalogExercise: Bool
   public let isAccessory: Bool
   /// Coach-assigned plan role (`ExerciseType.mainLift`) — gates the e1RM-based
   /// weight suggestion; variations and accessories fill last logged weight
@@ -49,6 +50,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     exerciseID: UUID,
     exerciseName: String,
     exerciseNameEn: String? = nil,
+    isCatalogExercise: Bool = false,
     isAccessory: Bool,
     isMainLift: Bool = false,
     liftFamily: LiftFamily? = nil,
@@ -68,6 +70,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.exerciseID = exerciseID
     self.exerciseName = exerciseName
     self.exerciseNameEn = exerciseNameEn
+    self.isCatalogExercise = isCatalogExercise
     self.isAccessory = isAccessory
     self.isMainLift = isMainLift
     self.liftFamily = liftFamily
@@ -87,12 +90,14 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     !isAccessory
   }
 
-  public var displayExerciseName: String {
-    guard Locale.current.language.languageCode?.identifier == "en",
+  public var displayExerciseName: String { displayExerciseName(locale: .current) }
+
+  public func displayExerciseName(locale: Locale) -> String {
+    guard locale.language.languageCode?.identifier == "en",
       let exerciseNameEn = exerciseNameEn?.trimmingCharacters(in: .whitespacesAndNewlines),
       !exerciseNameEn.isEmpty
     else {
-      return exerciseName
+      return CatalogExerciseName.display(exerciseName, isCatalog: isCatalogExercise, locale: locale)
     }
     return exerciseNameEn
   }

@@ -1,0 +1,10 @@
+OpenCC-Python
+Copyright 2016
+
+This product includes dictionary data and configurations developed by
+[OpenCC](https://github.com/BYVoid/OpenCC).
+
+MeetPR generated exercise name/search tables use these dictionaries with
+project-specific Taiwan vocabulary and exercise alias overrides (spec 094).
+Generator and pinned development dependency: scripts/generate-zh-hant.py,
+scripts/zh-hant/requirements.txt. No OpenCC runtime library is bundled.

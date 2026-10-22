@@ -7,7 +7,7 @@ enum StudentExerciseName {
       let nameEn = exercise.nameEn?.trimmingCharacters(in: .whitespacesAndNewlines),
       !nameEn.isEmpty
     else {
-      return exercise.name
+      return CatalogExerciseName.display(exercise, locale: locale)
     }
     return nameEn
   }

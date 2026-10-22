@@ -1,0 +1,7 @@
+Source: .build/094-student-media-isolated.log
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-10-22 09:48:46.413.
+Test Suite 'Selected tests' passed at 2026-10-22 09:48:46.413.
+✔ Test backgroundWakeSchedulesOnlyNextBatchThenReleasesHandler() passed after 0.042 seconds.
+✘ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() recorded an issue at PassthroughVideoTrimExporterTests.swift:94:2: Caught error: .unavailable("The operation could not be completed")
+✘ Test passthroughTrimOfAShortSourceKeepsTheWholeClip() failed after 0.545 seconds with 1 issue.
+✘ Test run with 2 tests in 0 suites failed after 0.546 seconds with 1 issue.
