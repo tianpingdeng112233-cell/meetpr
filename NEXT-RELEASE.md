@@ -6,16 +6,13 @@
 
 ## 🎯 目标：1.0 (27)
 - 基底：`beta/1.0-26` @ `8830b7ac`；David 于 2026-10-22 截图确认 1.0(26) 已上传，内容已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：27（2026-10-22 P0 切包 `agvtool new-version 27`，tag `beta/1.0-27` @ `dfc65d36`），marketing version 保持 1.0。
+- build 号：27（2026-10-22 P0 切包 `agvtool new-version 27`，原 tag `beta/1.0-27` @ `dfc65d36`；同日 27 未上传 ASC，David 拍板并入 #375 繁体后**重切**，新 tag 见本节下方切包记录），marketing version 保持 1.0。
 
 ## 本版将包含
 
 - **P0 教练冷启动卡死（#373，T1·P0，2026-10-22 落线 `82f4afd4`）**：David 报教练首次打开 App 首页卡住点不动。根因：首页「本周概况」比例条用 `containerRelativeFrame` 查询外层滚动容器尺寸，只要有学员本周有训练日，冷启动布局就不收敛、主线程卡死。改为比例条按自身宽度计算，视觉不变。修前探针 3/3 红（iOS 26.5），Opus 在 26.4 撤修复复跑仍红，修后全绿；CoachKit 472 绿；David iPhone 12 真机装 Release 构建试用。回归探针只在 `COACH_LAUNCH_HANG_TESTING` 编译开关下存在。
 - **P0 教练码分享到微信 + 按钮改版（#374，T1·P0，2026-10-22 落线 `3ea5bd5a`）**：原分享是「链接+文字」混合载荷，微信报「不支持的分享类型」；改为只交给微信一个邀请链接（短信/邮件/复制仍给完整邀请语），David 真机发微信成功。「我的」卡片与邀请码页改为满宽「分享给学员」+「复制邀请语」，右上「管理 ›」，「重新生成」挪进「…」；分享标题「{教练名} 教练邀请你在 MeetPR 跟练训练计划」。仅国内版。配套后端 #319 已部署国内 staging（`07a8ed31`，邀请页卡片标题带教练名，同批带上 #318 网页去快捷回复），安卓 meetpr-rn#101 已合。
-
-## 下一班 1.0 (28) 候选（1.0(27) 已切 tag，不含以下）
-
-- **繁体中文（台湾用语）适配（#375，T2·P1，2026-10-22 David 放行，落线 `3432bd35`）**：台湾外部教练要来内测。系统语言为繁体（zh-Hant/TW/HK/MO）时全 App、InfoPlist、小组件显示台湾用语（課表、下數、反饋、健力、臥推/硬舉、槓、發布）；简体与英文零变化。文案由简体经 OpenCC s2twp + 审定术语表生成；动作库名称繁体显示，自建名/备注/聊天原文；搜索与导入认繁体及台湾写法（滑輪下拉→高位下拉）。请求带 `X-MeetPR-Locale`，配套后端 #321（迁移 0077）、网页 #128、安卓 meetpr-rn#103 同批。九包本机全绿（Analytics 30 / AppShell 118 / ChatUI 84 / CoachKit 485 / CoreModels 160 / DesignSystem 74 / Networking 141 / RepositoryContracts 6 / StudentKit 1036）。切包前需：繁体模拟器看教练与学员主流程、简体老用户升级首屏。
+- **繁体中文（台湾用语）适配（#375，T2·P1，2026-10-22 David 放行，落线 `3432bd35`；同日 David 拍 A 并入 27 重切）**：台湾外部教练要来内测。系统语言为繁体（zh-Hant/TW/HK/MO）时全 App、InfoPlist、小组件显示台湾用语（課表、下數、反饋、健力、臥推/硬舉、槓、發布）；简体与英文零变化。文案由简体经 OpenCC s2twp + 审定术语表生成；动作库名称繁体显示，自建名/备注/聊天原文；搜索与导入认繁体及台湾写法（滑輪下拉→高位下拉）。请求带 `X-MeetPR-Locale`，配套后端 #321（迁移 0077）、网页 #128、安卓 meetpr-rn#103 同批。九包本机全绿（Analytics 30 / AppShell 118 / ChatUI 84 / CoachKit 485 / CoreModels 160 / DesignSystem 74 / Networking 141 / RepositoryContracts 6 / StudentKit 1036）。重切时 Opus 在模拟器验繁体教练/学员主流程与简体老用户首屏。
 
 ## 延期候选（未排期，前置解锁后另行排期）
 
