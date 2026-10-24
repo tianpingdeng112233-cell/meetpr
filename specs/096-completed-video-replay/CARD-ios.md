@@ -25,3 +25,10 @@ SPEC 验收清单 1–10 中 iOS 部分全部自测；学员 Demo（configuratio
 
 ## 交付
 JOURNAL 写 `docs/journal/2026-10-24-096-B.md`（做了什么、偏差、证据路径）。不 commit、不 push，留工作区给 Opus 收货。
+
+## 范围补充（2026-10-24 Opus 批，回应 JOURNAL 096-B 首节）
+准予以下三处，均只做接线，不改 tab、导航结构或产品行为：
+- `StudentRootView.swift`：给 TodayWorkoutView 传反馈依赖、给 TrainingHistoryView 传视频依赖。
+- StudentKit `Repository/` 下新增学员侧只读视频仓储，只调用现有 `studentVideos` 与播放地址接口；不改 CoachKit、不改后端。
+- `Features/VideoUpload/VideoUploadServices.swift`：组装上述只读视频源，现有上传行为不变。
+- Demo fixture：只补本卡截图所需的视频、点评和历史记录。
