@@ -97,6 +97,7 @@ private struct CompletedTrainingSetTable: View {
           status: record.status, videoState: record.videoState,
           indexAccessibilityIdentifier: record.indexAccessibilityIdentifier,
           prescriptionDisplay: record.prescriptionDisplay,
+          repsText: record.repsText,
           onEdit: { onEdit(row) }, onVideoAction: { onVideoAction(row) })
       }
       if !exercise.note.isEmpty {

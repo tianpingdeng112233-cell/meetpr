@@ -108,7 +108,8 @@ public enum PlanToStudentProjection {
       loadMode: planSet.loadMode,
       reps: isRange ? nil : planSet.targetReps,
       repsMax: planSet.targetRepsMax,
-      restSeconds: restSeconds(for: planSet)
+      restSeconds: restSeconds(for: planSet),
+      setType: planSet.setType
     )
   }
 

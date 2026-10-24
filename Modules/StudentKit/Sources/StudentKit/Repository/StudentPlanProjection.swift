@@ -98,7 +98,8 @@ enum StudentPlanProjection {
       reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
       restSeconds: isAccessory ? planSet.restSeconds : restSeconds(for: planSet),
-      coachNote: planSet.coachNote
+      coachNote: planSet.coachNote,
+      setType: planSet.setType
     )
   }
 

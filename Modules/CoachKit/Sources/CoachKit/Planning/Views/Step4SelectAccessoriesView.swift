@@ -211,12 +211,10 @@ private struct MainLiftSummaryRow: View {
     let spec =
       viewModel.setSpec(for: draftExercise.id)
       ?? viewModel.defaultSetSpec(for: draftExercise)
-    let repsText =
-      if let targetRepsMax = spec.targetRepsMax {
-        "\(spec.targetReps)-\(targetRepsMax)"
-      } else {
-        "\(spec.targetReps)"
-      }
+    if spec.setType == .failed {
+      return "\(PlanningDisplay.setAndRepCount(spec)) · \(intensityValueText(for: spec))"
+    }
+    let repsText = PlanningDisplay.repsText(spec)
 
     return CoachPlanningStrings.setRepIntensity(
       sets: spec.setCount,

@@ -108,7 +108,7 @@ private struct WeekExerciseRow: View {
             StatusBadge(status: .live, title: CoachPlanningStrings.mainLift)
           }
         }
-        Text(CoachPlanningStrings.setAndRepCount(sets: spec.setCount, reps: spec.targetReps))
+        Text(PlanningDisplay.setAndRepCount(spec))
           .font(Font.MeetPR.footnote)
           .foregroundStyle(Color.MeetPR.fgSecondary)
       }
@@ -151,7 +151,7 @@ private struct ExercisePeekView: View {
       Text(title)
         .font(Font.MeetPR.headline)
         .foregroundStyle(Color.MeetPR.fgPrimary)
-      Text(CoachPlanningStrings.setAndRepCount(sets: spec.setCount, reps: spec.targetReps))
+      Text(PlanningDisplay.setAndRepCount(spec))
       Text(detail)
       if let notes = spec.notes, !notes.isEmpty {
         Text(notes)

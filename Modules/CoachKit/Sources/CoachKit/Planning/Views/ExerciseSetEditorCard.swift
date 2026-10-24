@@ -9,6 +9,7 @@ public struct ExerciseSetEditorCard: View {
   private let draftExercise: DraftPlanExercise
   private let onDelete: (@MainActor () -> Void)?
 
+  @State private var setType: SetType
   @State private var specID: UUID
   @State private var setCount: Int
   @State private var targetReps: Int
@@ -29,6 +30,7 @@ public struct ExerciseSetEditorCard: View {
     self.onDelete = onDelete
     let spec =
       viewModel.setSpec(for: draftExercise.id) ?? viewModel.defaultSetSpec(for: draftExercise)
+    self._setType = State(initialValue: spec.setType)
     self._specID = State(initialValue: spec.id)
     self._setCount = State(initialValue: spec.setCount)
     self._targetReps = State(initialValue: spec.targetReps)
@@ -84,25 +86,33 @@ public struct ExerciseSetEditorCard: View {
             persist()
           }
 
-          PlanningCountPicker(
-            label: CoachPlanningStrings.reps,
-            value: targetRepsBinding,
-            range: 1...50,
-            step: 1
-          )
-          .onChange(of: targetReps) { _, newReps in
-            if let currentMax = targetRepsMax, currentMax < newReps {
-              targetRepsMax = newReps
+          if setType == .failed {
+            LabeledContent(CoachPlanningStrings.reps) {
+              Text(PlanningDisplay.repsText(currentSpec()))
             }
-            persist()
+          } else {
+            PlanningCountPicker(
+              label: CoachPlanningStrings.reps,
+              value: targetRepsBinding,
+              range: 1...50,
+              step: 1
+            )
+            .onChange(of: targetReps) { _, newReps in
+              if let currentMax = targetRepsMax, currentMax < newReps {
+                targetRepsMax = newReps
+              }
+              persist()
+            }
           }
         }
 
-        OptionalRepsMaxRow(
-          value: $targetRepsMax,
-          minimum: targetReps
-        )
-        .onChange(of: targetRepsMax) { _, _ in persist() }
+        if setType != .failed {
+          OptionalRepsMaxRow(
+            value: $targetRepsMax,
+            minimum: targetReps
+          )
+          .onChange(of: targetRepsMax) { _, _ in persist() }
+        }
 
         ExerciseRestEditorSection(
           setCount: setCount,
@@ -213,6 +223,7 @@ public struct ExerciseSetEditorCard: View {
       targetRepsMax: targetRepsMax,
       intensityMode: intensityMode,
       targetValue: targetValue,
+      setType: setType,
       restSeconds: restSeconds,
       restSecondsPerSet: restSecondsPerSet
     )
@@ -244,6 +255,7 @@ public struct ExerciseSetEditorCard: View {
     guard let spec = viewModel.setSpec(for: draftExercise.id) else { return }
     specID = spec.id
     setCount = spec.setCount
+    setType = spec.setType
     targetReps = spec.targetReps
     targetRepsMax = spec.targetRepsMax
     intensityMode = spec.intensityMode

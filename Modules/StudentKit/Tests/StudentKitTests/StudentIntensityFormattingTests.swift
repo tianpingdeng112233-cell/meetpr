@@ -445,3 +445,33 @@ private func intensityDay(
 
   #expect(presentation.exercises.first?.prescriptionSummary == "150kg × 5 · 2 组")
 }
+
+@MainActor
+@Test func failedPlannedRowAndMixedSummaryHidePlaceholder() throws {
+  let working = PrescribedSet(id: UUID(), setIndex: 0, weightKg: 100, reps: 5)
+  let failed = PrescribedSet(id: UUID(), setIndex: 1, weightKg: 80, reps: 1, setType: .failed)
+  let presentation = intensityPresentation(prescribed: [working, failed, failed])
+  let exercise = try #require(presentation.exercises.first)
+  #expect(exercise.rows[0].record.repsText == nil)
+  #expect(exercise.rows[1].record.repsText != nil)
+  let summary = try #require(exercise.prescriptionSummary)
+  #expect(summary.contains("100kg x 5"))
+  #expect(summary.contains("80kg x "))
+  #expect(!summary.contains("80kg x 1"))
+  #expect(summary.contains(" + "))
+}
+
+@MainActor
+@Test func loggedRepsStayNumericForFailedPrescription() throws {
+  let set = PrescribedSet(id: UUID(), setIndex: 0, weightKg: 80, reps: 1, setType: .failed)
+  let day = intensityDay(prescribed: [set])
+  var draft = try #require(TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: []).first)
+  draft.actualReps = 12
+  draft.completed = true
+  let record = TodayWorkoutPresentation.record(from: draft, index: 1, videoState: .none)
+  #expect(record.reps == 12)
+  #expect(record.repsText == nil)
+  draft.completed = false
+  draft.failed = true
+  #expect(TodayWorkoutPresentation.record(from: draft, index: 1, videoState: .none).repsText == nil)
+}

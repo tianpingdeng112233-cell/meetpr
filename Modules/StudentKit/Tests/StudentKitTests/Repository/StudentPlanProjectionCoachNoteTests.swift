@@ -158,7 +158,7 @@ import Testing
 
 // swiftlint:disable:next function_body_length
 private func projectionFixture(
-  setNumber: Int
+  setNumber: Int, setType: SetType = .working
 ) -> (tree: TrainingPlanTree, catalogExercise: Exercise) {
   let planID = UUID()
   let dayID = UUID()
@@ -199,7 +199,7 @@ private func projectionFixture(
     targetReps: 5,
     intensityMode: .weight,
     targetValue: 100,
-    setType: .working,
+    setType: setType,
     createdAt: timestamp
   )
   let catalogExercise = Exercise(
@@ -222,4 +222,12 @@ private func projectionFixture(
     ),
     catalogExercise
   )
+}
+
+@Test func studentProjectionPreservesFailedSetType() throws {
+  let fixture = projectionFixture(setNumber: 1, setType: .failed)
+  let view = StudentPlanProjection.project(
+    tree: fixture.tree, catalog: [fixture.catalogExercise], weekIndex: 1)
+  let set = try #require(view.days.first?.exercises.first?.prescribedSets.first)
+  #expect(set.setType == .failed)
 }

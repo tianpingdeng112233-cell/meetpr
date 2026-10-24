@@ -29,7 +29,13 @@ struct IntensityReviewSection: View {
       }
 
       HStack(spacing: 8) {
-        labeledField(CoachPlanningStrings.reps, text: intText($set.targetReps))
+        if set.setType == .failed {
+          LabeledContent(CoachPlanningStrings.reps) {
+            Text(PlannedRepsText.text(reps: nil, toFailure: true))
+          }
+        } else {
+          labeledField(CoachPlanningStrings.reps, text: intText($set.targetReps))
+        }
         labeledField(CoachImportStrings.weightKilograms, text: decimalText($set.weightKg))
         labeledField("RPE", text: decimalText($set.rpe))
       }

@@ -82,6 +82,9 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
 
     var prescriptionSummary: String? {
       let rows = prescribedRows
+      if rows.contains(where: { $0.draft.prescribed.setType == .failed }) {
+        return StudentFormatting.prescriptionSummary(rows.map(\.draft.prescribed))
+      }
       guard rows.contains(where: { !$0.draft.prescribed.isLegacyPrescription }) else {
         return nil
       }
@@ -288,7 +291,9 @@ struct TodayWorkoutPresentation: Equatable, Sendable {
       status: draft.failed ? .failed : (draft.completed ? .done : .pending),
       videoState: videoState,
       indexAccessibilityIdentifier: "todayWorkout.set.\(draft.id.uuidString).number",
-      prescriptionDisplay: prescriptionDisplay
+      prescriptionDisplay: prescriptionDisplay,
+      repsText: !draft.completed && !draft.failed && draft.prescribed.setType == .failed
+        ? PlannedRepsText.text(reps: nil, toFailure: true) : nil
     )
   }
 

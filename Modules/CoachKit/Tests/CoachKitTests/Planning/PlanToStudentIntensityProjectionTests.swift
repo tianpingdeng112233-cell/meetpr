@@ -140,3 +140,17 @@ private func goldenMatrixSets(exerciseID: UUID) -> [PlanSet] {
   #expect(projected[9].intensity == nil)
   #expect(projected[9].isLegacyPrescription)
 }
+
+@Test func coachProjectionPreservesFailedSetType() throws {
+  let day = ProjFixtures.day(id: ProjFixtures.uuid(50), week: 1, dayOfWeek: 1, sortOrder: 0)
+  let exercise = ProjFixtures.exercise(
+    id: ProjFixtures.uuid(60), dayID: day.id, exerciseID: ProjFixtures.squatID,
+    isMain: true, sortOrder: 0)
+  let set = PlanSet(
+    id: UUID(), planExerciseID: exercise.id, setNumber: 1, targetReps: 1,
+    intensityMode: .weight, targetValue: 100, setType: .failed, createdAt: Date())
+  let view = PlanToStudentProjection.project(
+    plan: ProjFixtures.plan(), days: [day], exercises: [exercise], sets: [set],
+    catalog: ProjFixtures.catalog(), weekIndex: 1)
+  #expect(view.days.first?.exercises.first?.prescribedSets.first?.setType == .failed)
+}

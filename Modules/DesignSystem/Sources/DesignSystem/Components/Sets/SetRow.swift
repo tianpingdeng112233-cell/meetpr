@@ -24,6 +24,7 @@ public struct SetRow: View {
   let index: Int
   let weight: Double?
   let reps: Int
+  private let repsText: String?
   let rpe: Double
   let status: Status
   let videoState: VideoState
@@ -41,12 +42,14 @@ public struct SetRow: View {
     videoState: VideoState,
     indexAccessibilityIdentifier: String? = nil,
     prescriptionDisplay: ExerciseSetRecord.PrescriptionDisplay? = nil,
+    repsText: String? = nil,
     onEdit: (@MainActor () -> Void)? = nil,
     onVideoAction: (@MainActor () -> Void)? = nil
   ) {
     self.index = index
     self.weight = weight
     self.reps = reps
+    self.repsText = repsText
     self.rpe = rpe
     self.status = status
     self.videoState = videoState
@@ -91,7 +94,7 @@ public struct SetRow: View {
 
       weightMetric
 
-      Text(reps.formatted())
+      Text(repsText ?? reps.formatted())
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size14))
         .foregroundStyle(valueColor)
         .frame(maxWidth: .infinity)
@@ -271,7 +274,7 @@ public struct SetRow: View {
       ?? DesignSystemStrings.noSuggestedWeight
     let metrics = DesignSystemStrings.setMetrics(
       weight: weightText,
-      reps: reps,
+      reps: repsText ?? String(reps),
       rpe: prescriptionDisplay?.rpeText ?? numberText(rpe, alwaysShowsFraction: true)
     )
     return DesignSystemStrings.setAccessibilityLabel(

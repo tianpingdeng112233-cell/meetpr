@@ -1,4 +1,5 @@
 import CoreModels
+import DesignSystem
 import Foundation
 
 struct PercentagePrescriptionPresentation: Equatable, Sendable {
@@ -78,26 +79,20 @@ enum StudentFormatting {
 
   static func prescribed(
     _ set: PrescribedSet,
-    percentageOutcome: SetWeightSuggestionOutcome? = nil
+    percentageOutcome: SetWeightSuggestionOutcome? = nil,
+    locale: Locale = .current
   ) -> String {
     // Legacy rows (load_mode == null) keep the pre-072 string byte-for-byte;
     // only new-form rows get the six-form rendering (spec 072 §1.4).
     if set.isLegacyPrescription {
-      let reps: String
-      if let lowerBound = set.reps, let upperBound = set.repsMax {
-        reps = "\(lowerBound)-\(upperBound)"
-      } else {
-        reps = set.reps.map(String.init) ?? "-"
-      }
+      let reps = PlannedRepsText.text(
+        reps: set.reps, repsMax: set.repsMax, toFailure: set.setType == .failed,
+        rangeSeparator: "-", locale: locale)
       return "\(decimal(set.weightKg))kg x \(reps)"
     }
 
-    let reps: String
-    if let lowerBound = set.reps, let upperBound = set.repsMax {
-      reps = "\(lowerBound)–\(upperBound)"
-    } else {
-      reps = set.reps.map(String.init) ?? "-"
-    }
+    let reps = PlannedRepsText.text(
+      reps: set.reps, repsMax: set.repsMax, toFailure: set.setType == .failed, locale: locale)
     if case .weightRange(let low, let high) = set.intensity {
       return "\(weightDecimal(low))–\(weightDecimal(high))kg × \(reps)"
     }
@@ -120,6 +115,23 @@ enum StudentFormatting {
       return "\(intensityText(intensity)) × \(reps)"
     }
     return "× \(reps)"
+  }
+
+  /// Group consecutive identical prescriptions without losing failed back-off sets.
+  static func prescriptionSummary(_ sets: [PrescribedSet]) -> String {
+    var groups: [(text: String, count: Int)] = []
+    for set in sets {
+      let text = prescribed(set)
+      if let index = groups.indices.last, groups[index].text == text {
+        groups[index].count += 1
+      } else {
+        groups.append((text, 1))
+      }
+    }
+    return groups.map { group in
+      let count = StudentStrings.replacing(.todayWorkoutScreen019, values: [String(group.count)])
+      return "\(group.text) · \(count)"
+    }.joined(separator: " + ")
   }
 
   static func intensityText(_ intensity: PrescribedIntensity) -> String {

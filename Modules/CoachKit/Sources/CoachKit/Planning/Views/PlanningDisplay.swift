@@ -1,7 +1,21 @@
 import CoreModels
+import DesignSystem
 import Foundation
 
 enum PlanningDisplay {
+  static func repsText(_ spec: DraftSetSpec, locale: Locale = .current) -> String {
+    PlannedRepsText.text(
+      reps: spec.targetReps, repsMax: spec.targetRepsMax, toFailure: spec.setType == .failed,
+      rangeSeparator: "-", locale: locale)
+  }
+
+  static func setAndRepCount(_ spec: DraftSetSpec) -> String {
+    guard spec.setType == .failed else {
+      return CoachPlanningStrings.setAndRepCount(sets: spec.setCount, reps: spec.targetReps)
+    }
+    return "\(CoachPlanningStrings.setCount(spec.setCount)) × \(repsText(spec))"
+  }
+
   static func liftName(_ family: LiftFamily) -> String {
     switch family {
     case .squat:

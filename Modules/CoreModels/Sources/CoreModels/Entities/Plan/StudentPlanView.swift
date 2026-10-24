@@ -259,6 +259,8 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
   public let loadMode: PlanLoadMode?
   public let reps: Int?
   public let repsMax: Int?
+  /// Missing pre-015 cached values mean a normal working set.
+  public let setType: SetType?
   public let restSeconds: Int?
   /// Student-visible coach cue for this set (spec 043 §G): the original
   /// shorthand the coach kept as context next to the structured target.
@@ -276,7 +278,8 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     repsMax: Int? = nil,
     rpe: Decimal? = nil,
     restSeconds: Int? = nil,
-    coachNote: String? = nil
+    coachNote: String? = nil,
+    setType: SetType? = .working
   ) {
     self.id = id
     self.setIndex = setIndex
@@ -292,6 +295,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     self.repsMax = repsMax
     self.restSeconds = restSeconds
     self.coachNote = coachNote
+    self.setType = setType
   }
 
   public init(from decoder: Decoder) throws {
@@ -317,6 +321,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     loadMode = try container.decodeIfPresent(PlanLoadMode.self, forKey: .loadMode)
     restSeconds = try container.decodeIfPresent(Int.self, forKey: .restSeconds)
     coachNote = try container.decodeIfPresent(String.self, forKey: .coachNote)
+    setType = try container.decodeIfPresent(SetType.self, forKey: .setType) ?? .working
   }
 
   public func encode(to encoder: Encoder) throws {
@@ -332,6 +337,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
     try container.encodeIfPresent(restSeconds, forKey: .restSeconds)
     try container.encodeIfPresent(coachNote, forKey: .coachNote)
+    try container.encodeIfPresent(setType, forKey: .setType)
   }
 
   private enum CodingKeys: String, CodingKey {
@@ -346,6 +352,7 @@ public struct PrescribedSet: Codable, Hashable, Sendable, Identifiable {
     case rpe
     case restSeconds
     case coachNote
+    case setType
   }
 
   /// Compatibility accessor for legacy RPE-only consumers. Other intensity

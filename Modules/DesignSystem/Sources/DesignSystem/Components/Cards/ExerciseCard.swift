@@ -31,6 +31,8 @@ public struct ExerciseSetRecord: Equatable, Sendable {
   public let index: Int
   public let weight: Double?
   public let reps: Int
+  /// Override for a pending prescription; actual records stay numeric.
+  public let repsText: String?
   public let rpe: Double
   public let status: SetRow.Status
   public let videoState: SetRow.VideoState
@@ -45,11 +47,13 @@ public struct ExerciseSetRecord: Equatable, Sendable {
     status: SetRow.Status,
     videoState: SetRow.VideoState,
     indexAccessibilityIdentifier: String? = nil,
-    prescriptionDisplay: PrescriptionDisplay? = nil
+    prescriptionDisplay: PrescriptionDisplay? = nil,
+    repsText: String? = nil
   ) {
     self.index = index
     self.weight = weight
     self.reps = reps
+    self.repsText = repsText
     self.rpe = rpe
     self.status = status
     self.videoState = videoState
@@ -171,6 +175,7 @@ public struct ExerciseCard: View {
             videoState: set.videoState,
             indexAccessibilityIdentifier: set.indexAccessibilityIdentifier,
             prescriptionDisplay: set.prescriptionDisplay,
+            repsText: set.repsText,
             onEdit: { onEditSet(set) },
             onVideoAction: { onVideoAction(set) }
           )

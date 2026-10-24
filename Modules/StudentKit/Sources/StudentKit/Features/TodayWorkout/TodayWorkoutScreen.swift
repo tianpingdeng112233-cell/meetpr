@@ -746,14 +746,16 @@ private struct TodayWorkoutHero: View {
 
           Spacer()
 
-          Text("×\(row.record.reps)")
+          Text("×\(row.record.repsText ?? String(row.record.reps))")
             .font(.MeetPR.body(size: MeetPRFontMetrics.size20, weight: .bold))
             .foregroundStyle(Color.MeetPR.textPrimary)
             .padding(.bottom, MeetPRSpacing.space2)
-          Text(StudentStrings.localized(.todayWorkoutScreen012))
-            .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
-            .foregroundStyle(Color.MeetPR.textMuted)
-            .padding(.bottom, MeetPRSpacing.point9)
+          if row.record.repsText == nil {
+            Text(StudentStrings.localized(.todayWorkoutScreen012))
+              .font(.MeetPR.body(size: MeetPRFontMetrics.size12))
+              .foregroundStyle(Color.MeetPR.textMuted)
+              .padding(.bottom, MeetPRSpacing.point9)
+          }
         }
 
         if row.usesLegacyHero {

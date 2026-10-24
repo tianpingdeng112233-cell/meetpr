@@ -4,9 +4,12 @@ import Foundation
 /// Spec 090 acceptance only. The ordinary Demo and the 086/089 flags are unchanged.
 enum TrainingFlowDemoScenario {
   static var enabled: Bool {
-    ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("--spec090-") }
+    usesFailedReps || ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("--spec090-") }
   }
   static var usesPounds: Bool { has("lb") }
+  private static var usesFailedReps: Bool {
+    ProcessInfo.processInfo.arguments.contains("--spec015-failed")
+  }
 
   static func configure(_ plan: StudentPlanView) -> StudentPlanView {
     guard enabled, plan.days.count > 3,
@@ -20,9 +23,12 @@ enum TrainingFlowDemoScenario {
         StudentPlanExercise(
           id: identifier(10 + exerciseIndex), exercise: exercise, sequenceIndex: exerciseIndex,
           prescribedSets: (0..<(exerciseIndex == 2 ? 2 : 3)).map { setIndex in
-            PrescribedSet(
+            let toFailure = usesFailedReps && (exerciseIndex != 0 || setIndex > 0)
+            return PrescribedSet(
               id: identifier(100 + exerciseIndex * 10 + setIndex), setIndex: setIndex,
-              weightKg: exerciseIndex == 0 ? 175 : 60, reps: exerciseIndex == 0 ? 3 : 12, rpe: 8)
+              weightKg: exerciseIndex == 0 ? 175 : 60,
+              reps: toFailure ? 1 : (exerciseIndex == 0 ? 3 : 12), rpe: 8,
+              setType: toFailure ? .failed : .working)
           }, notes: main.notes)
       }
       return StudentPlanDay(

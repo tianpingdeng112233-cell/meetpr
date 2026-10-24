@@ -161,7 +161,7 @@ extension DesignSystemStrings {
     String(localized: "designSystem.setRow.weight \(weight)", bundle: .module)
   }
 
-  static func setMetrics(weight: String, reps: Int, rpe: String) -> String {
+  static func setMetrics(weight: String, reps: String, rpe: String) -> String {
     let formattedReps = String(reps)
     return String(
       localized: "designSystem.setRow.metrics \(weight) \(formattedReps) \(rpe)",
