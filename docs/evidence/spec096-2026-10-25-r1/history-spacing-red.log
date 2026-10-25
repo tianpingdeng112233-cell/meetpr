@@ -1,0 +1,30 @@
+Building for debugging...
+[0/3] Write sources
+[1/3] Write swift-version--58304C5D6DBC2206.txt
+[3/5] Compiling StudentKit CompletedSetVideoButton.swift
+[4/5] Emitting module StudentKit
+[5/8] Compiling StudentKit HistorySetRow.swift
+[6/8] Compiling StudentKit HistoryEntriesView.swift
+[7/8] Compiling StudentKit CompletedDayOverviewCard.swift
+[8/10] Compiling StudentKitTests CompletedVideoLayoutTests.swift
+[9/10] Emitting module StudentKitTests
+[9/11] Write Objects.LinkFileList
+[10/11] Linking StudentKitPackageTests
+Build complete! (10.86s)
+Test Suite 'Selected tests' started at 2026-10-25 02:22:50.671.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-10-25 02:22:50.672.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-10-25 02:22:50.672.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-25 02:22:50.672.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CompletedVideoLayoutTests started.
+◇ Test playbackAndUploadKeepTheOriginalTextRowHeight() started.
+◇ Test historyReservationAddsOnlyTheIconAndEightPointGap() started.
+✔ Test playbackAndUploadKeepTheOriginalTextRowHeight() passed after 0.062 seconds.
+✘ Test historyReservationAddsOnlyTheIconAndEightPointGap() recorded an issue at CompletedVideoLayoutTests.swift:32:7: Expectation failed: (reserved.height → 16.0) == (original.height → 14.0)
+✘ Test historyReservationAddsOnlyTheIconAndEightPointGap() failed after 0.074 seconds with 1 issue.
+✘ Suite CompletedVideoLayoutTests failed after 0.074 seconds with 1 issue.
+✘ Test run with 2 tests in 1 suite failed after 0.074 seconds with 1 issue.

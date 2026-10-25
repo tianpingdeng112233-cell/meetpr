@@ -1,0 +1,32 @@
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[2/5] Write swift-version--58304C5D6DBC2206.txt
+[4/7] Emitting module StudentKit
+[5/7] Compiling StudentKit CompletedSetVideoButton.swift
+[6/10] Compiling StudentKit HistoryEntriesView.swift
+[7/10] Compiling StudentKit HistorySetRow.swift
+[8/10] Compiling StudentKit CompletedDayOverviewCard.swift
+[9/12] Compiling StudentKitTests CompletedVideoLayoutTests.swift
+[10/12] Emitting module StudentKitTests
+[10/12] Write Objects.LinkFileList
+[11/12] Linking StudentKitPackageTests
+Build complete! (15.63s)
+Test Suite 'Selected tests' started at 2026-10-25 02:22:33.715.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-10-25 02:22:33.717.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-10-25 02:22:33.717.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-25 02:22:33.717.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite CompletedVideoLayoutTests started.
+◇ Test playbackAndUploadKeepTheOriginalTextRowHeight() started.
+✘ Test playbackAndUploadKeepTheOriginalTextRowHeight() recorded an issue at CompletedVideoLayoutTests.swift:15:7: Expectation failed: (size(playback.font(.MeetPR.mono(size: 13))).height → 44.0) == (reference.height → 16.0)
+✘ Test playbackAndUploadKeepTheOriginalTextRowHeight() recorded an issue at CompletedVideoLayoutTests.swift:22:9: Expectation failed: (size(indicator.font(.MeetPR.mono(size: 13))).height → 44.0) == (reference.height → 16.0)
+✘ Test playbackAndUploadKeepTheOriginalTextRowHeight() recorded an issue at CompletedVideoLayoutTests.swift:22:9: Expectation failed: (size(indicator.font(.MeetPR.mono(size: 13))).height → 44.0) == (reference.height → 16.0)
+✘ Test playbackAndUploadKeepTheOriginalTextRowHeight() recorded an issue at CompletedVideoLayoutTests.swift:22:9: Expectation failed: (size(indicator.font(.MeetPR.mono(size: 13))).height → 44.0) == (reference.height → 16.0)
+✘ Test playbackAndUploadKeepTheOriginalTextRowHeight() failed after 0.163 seconds with 4 issues.
+✘ Suite CompletedVideoLayoutTests failed after 0.163 seconds with 4 issues.
+✘ Test run with 1 test in 1 suite failed after 0.163 seconds with 4 issues.

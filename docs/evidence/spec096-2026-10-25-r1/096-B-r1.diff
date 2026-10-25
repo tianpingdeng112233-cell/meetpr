@@ -1,0 +1,599 @@
+--- a/Modules/DesignSystem/Sources/DesignSystem/Tokens/VideoColors.swift
++++ b/Modules/DesignSystem/Sources/DesignSystem/Tokens/VideoColors.swift
+@@ -8,6 +8,8 @@
+   public static let completedVideoReviewFill = Color(
+     red: 17 / 255, green: 24 / 255, blue: 39 / 255
+   ).opacity(0.72)
++  public static let completedVideoReviewBorder = Color.white.opacity(0.18)
++  public static let completedVideoCloseFill = Color.black.opacity(0.45)
+
+   /// Coach video-workbench playback stage fill (RGB 27/37/52).
+   public static let videoStageFill = Color(
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayOverviewCard.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayOverviewCard.swift
+@@ -141,7 +141,7 @@
+                 .frame(maxWidth: .infinity, alignment: .leading)
+               CompletedSetVideoButton(
+                 video: row.video, upload: replay?.uploadState(setLogID: row.setLogID),
+-                number: row.number
++                number: row.number, reservesSpace: exercise.reservesVideoSpace
+               ) { video in
+                 replay?.open(video, badge: row.badge)
+               }
+@@ -149,6 +149,7 @@
+             .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+           }
+         }
++        .modifier(CompletedVideoHitRouting())
+         .padding(.horizontal, MeetPRSpacing.point13)
+         .padding(.bottom, MeetPRSpacing.point11)
+       }
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayPresentation.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayPresentation.swift
+@@ -12,6 +12,7 @@
+     let prescribedCount: Int
+     let loggedCount: Int
+     let rows: [Row]
++    let reservesVideoSpace: Bool
+
+     var isComplete: Bool { isAdded || (prescribedCount > 0 && loggedCount == prescribedCount) }
+
+@@ -69,12 +70,16 @@
+     unit: UnitPreference, videos: [StudentVideo] = [], local: [VideoAttachment] = []
+   ) {
+     var groups = presentation.exercises.map { exercise in
+-      Exercise(
++      let rows = exercise.rows
++        .filter { !$0.draft.isExtra || $0.draft.completed || $0.draft.failed }
++        .map { Row(draft: $0.draft, unit: unit, videos: videos, local: local) }
++      return Exercise(
+         id: exercise.id, name: exercise.name, number: exercise.stableIndex + 1,
+         isAdded: false, prescribedCount: exercise.prescribedRows.count,
+         loggedCount: exercise.prescribedRows.count { $0.draft.completed || $0.draft.failed },
+-        rows: exercise.rows.filter { !$0.draft.isExtra || $0.draft.completed || $0.draft.failed }
+-          .map { Row(draft: $0.draft, unit: unit, videos: videos, local: local) })
++        rows: rows,
++        reservesVideoSpace: TrainingHistoryVideoPresentation.reservesVideoSpace(
++          setLogIDs: rows.map(\.setLogID), videos: videos, local: local))
+     }
+     var seen: Set<UUID> = []
+     for draft in addedDrafts where draft.isStudentAdded && seen.insert(draft.exerciseID).inserted {
+@@ -84,7 +89,9 @@
+           id: draft.exerciseID, name: draft.displayExerciseName, number: groups.count + 1,
+           isAdded: true, prescribedCount: 0,
+           loggedCount: rows.count { $0.completed || $0.failed },
+-          rows: rows.map { Row(draft: $0, unit: unit, videos: videos, local: local) }))
++          rows: rows.map { Row(draft: $0, unit: unit, videos: videos, local: local) },
++          reservesVideoSpace: TrainingHistoryVideoPresentation.reservesVideoSpace(
++            setLogIDs: rows.map(\.loggedSetID), videos: videos, local: local)))
+     }
+     exercises = groups
+   }
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideoButton.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideoButton.swift
+@@ -6,27 +6,44 @@
+   let video: CompletedSetVideo?
+   let upload: VideoAttachment?
+   let number: Int
++  var reservesSpace = false
+   let onPlay: (CompletedSetVideo) -> Void
+
+   var body: some View {
+-    if let video {
+-      Button {
+-        onPlay(video)
+-      } label: {
+-        Image(systemName: "play.circle")
+-          .font(.MeetPR.system(size: MeetPRFontMetrics.size22, weight: .light))
+-          .foregroundStyle(Color.MeetPR.completedVideoPlay)
+-          .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+-          .contentShape(.rect)
+-      }
+-      .buttonStyle(.plain)
+-      .accessibilityLabel(
+-        String(localized: "student.completedVideo.playSet \(number)", bundle: .module)
+-      )
+-      .accessibilityIdentifier("completedVideo.play.\(number)")
+-    } else if let upload {
+-      SetVideoUploadIndicator(status: upload.status, progress: 0, size: MeetPRFontMetrics.size22)
++    if reservesSpace || video != nil || upload != nil {
++      // Inherit the row's text height/baseline; the overlay owns the larger hit area.
++      Text(verbatim: " ")
++        .hidden()
++        .accessibilityHidden(true)
++        .frame(width: MeetPRSpacing.point22)
++        .overlay {
++          if let video {
++            playbackButton(video)
++          } else if let upload {
++            SetVideoUploadIndicator(
++              status: upload.status, progress: 0, size: MeetPRFontMetrics.size22)
++          }
++        }
++    }
++  }
++
++  private func playbackButton(_ video: CompletedSetVideo) -> some View {
++    Button {
++      onPlay(video)
++    } label: {
++      Image(systemName: "play.circle")
++        .font(.MeetPR.system(size: MeetPRFontMetrics.size22, weight: .light))
++        .foregroundStyle(Color.MeetPR.completedVideoPlay)
+         .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
++        .contentShape(.rect)
+     }
++    .buttonStyle(.plain)
++    .accessibilityLabel(
++      String(localized: "student.completedVideo.playSet \(number)", bundle: .module)
++    )
++    .accessibilityIdentifier("completedVideo.play.\(number)")
++    .anchorPreference(key: CompletedVideoHitRegions.self, value: .bounds) { anchor in
++      [number: CompletedVideoHitRegion(bounds: anchor, play: { onPlay(video) })]
++    }
+   }
+ }
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoHitRouting.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoHitRouting.swift
+@@ -0,0 +1,43 @@
++import DesignSystem
++import SwiftUI
++
++struct CompletedVideoHitRegion {
++  let bounds: Anchor<CGRect>
++  let play: () -> Void
++}
++
++struct CompletedVideoHitRegions: PreferenceKey {
++  static var defaultValue: [Int: CompletedVideoHitRegion] { [:] }
++
++  static func reduce(
++    value: inout [Int: CompletedVideoHitRegion], nextValue: () -> [Int: CompletedVideoHitRegion]
++  ) {
++    value.merge(nextValue(), uniquingKeysWith: { _, new in new })
++  }
++}
++
++/// Routes pointer taps across overlapping targets without changing row layout.
++/// The original Buttons retain their keyboard and accessibility actions.
++struct CompletedVideoHitRouting: ViewModifier {
++  func body(content: Content) -> some View {
++    content.overlayPreferenceValue(CompletedVideoHitRegions.self) { targets in
++      GeometryReader { geometry in
++        let regions = targets.mapValues { geometry[$0.bounds] }
++        Color.clear
++          .contentShape(
++            Path { path in
++              for region in regions.values { path.addRect(region) }
++            }
++          )
++          .onTapGesture { point in
++            guard
++              let number = TrainingHistoryVideoPresentation.playbackNumber(at: point, in: regions)
++            else { return }
++            targets[number]?.play()
++          }
++          .accessibilityHidden(true)
++      }
++      .padding(-MeetPRSpacing.point22)
++    }
++  }
++}
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistoryEntriesView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistoryEntriesView.swift
+@@ -10,6 +10,7 @@
+   @Binding var selectedExerciseName: String?
+   var addedLogs: [StudentAddedSetLog] = []
+   var catalog: [Exercise] = []
++  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
+
+   static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
+     StudentStrings.replacing(
+@@ -98,7 +99,10 @@
+   }
+
+   private func exerciseBlock(_ exercise: StudentPlanExercise, logs: [StudentSetLog]) -> some View {
+-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
++    let reservesVideoSpace = TrainingHistoryVideoPresentation.reservesVideoSpace(
++      setLogIDs: logs.filter { $0.planExerciseID == exercise.id }.map(\.id),
++      videos: replay?.videos ?? [], local: replay?.local ?? [])
++    return VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+       Divider().overlay(Color.MeetPR.borderDefault)
+       Text(StudentExerciseName.display(exercise.exercise))
+         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
+@@ -112,7 +116,8 @@
+         HistorySetRow(
+           set: set,
+           exerciseName: StudentExerciseName.display(exercise.exercise),
+-          log: logs.first { $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex }
++          log: logs.first { $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex },
++          reservesVideoSpace: reservesVideoSpace
+         )
+       }
+       ForEach(
+@@ -124,6 +129,7 @@
+           label: StudentStrings.localized(.addedExtra),
+           result: StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe),
+           completed: log.completed, setLogID: log.id, setIndex: log.setIndex,
++          reservesVideoSpace: reservesVideoSpace,
+           badge: VideoBadgeInfo(
+             exerciseName: StudentExerciseName.display(exercise.exercise),
+             weightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue, reps: log.reps,
+@@ -133,6 +139,7 @@
+       }
+
+     }
++    .modifier(CompletedVideoHitRouting())
+   }
+ }
+
+@@ -334,67 +341,3 @@
+       : Color.MeetPR.goldText
+   }
+ }
+-
+-@available(iOS 17.0, macOS 14.0, *)
+-struct HistorySetRow: View {
+-  let label: String
+-  let result: String
+-  let completed: Bool?
+-  let setLogID: UUID?
+-  let setIndex: Int
+-  let badge: VideoBadgeInfo
+-  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
+-
+-  init(set: PrescribedSet, exerciseName: String = "", log: StudentSetLog?) {
+-    setLogID = log?.id
+-    setIndex = set.setIndex
+-    badge = VideoBadgeInfo(
+-      exerciseName: exerciseName,
+-      weightKg: log.map { NSDecimalNumber(decimal: $0.weightKg).doubleValue },
+-      reps: log?.reps, rpe: log?.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
+-      setOrdinal: set.setIndex + 1)
+-    label = HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex)
+-    result =
+-      log.map {
+-        StudentFormatting.result(weightKg: $0.weightKg, reps: $0.reps, rpe: $0.rpe)
+-      } ?? StudentFormatting.prescribed(set)
+-    completed = log?.completed
+-  }
+-
+-  init(
+-    label: String, result: String, completed: Bool, setLogID: UUID? = nil, setIndex: Int = 0,
+-    badge: VideoBadgeInfo = VideoBadgeInfo()
+-  ) {
+-    self.setLogID = setLogID
+-    self.setIndex = setIndex
+-    self.badge = badge
+-    self.label = label
+-    self.result = result
+-    self.completed = completed
+-  }
+-
+-  var body: some View {
+-    HStack {
+-      Text(label)
+-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
+-        .foregroundStyle(Color.MeetPR.textMuted)
+-      Spacer()
+-      Text(result)
+-        .font(
+-          .MeetPR.mono(size: MeetPRFontMetrics.size11, weight: completed == nil ? .medium : .bold)
+-        )
+-        .foregroundStyle(resultColor)
+-      let video = TrainingHistoryVideoPresentation(
+-        setLogID: setLogID, setIndex: setIndex, videos: replay?.videos ?? [],
+-        local: replay?.local ?? [])
+-      CompletedSetVideoButton(
+-        video: video.video, upload: replay?.uploadState(setLogID: setLogID), number: video.number
+-      ) { replay?.open($0, badge: badge) }
+-    }
+-  }
+-
+-  private var resultColor: Color {
+-    guard let completed else { return Color.MeetPR.textMuted }
+-    return completed ? Color.MeetPR.success : Color.MeetPR.textSecondary
+-  }
+-}
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistorySetRow.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistorySetRow.swift
+@@ -0,0 +1,76 @@
++import ChatUI
++import CoreModels
++import DesignSystem
++import SwiftUI
++
++@available(iOS 17.0, macOS 14.0, *)
++struct HistorySetRow: View {
++  let label: String
++  let result: String
++  let completed: Bool?
++  let setLogID: UUID?
++  let setIndex: Int
++  let badge: VideoBadgeInfo
++  let reservesVideoSpace: Bool
++  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
++
++  init(
++    set: PrescribedSet, exerciseName: String = "", log: StudentSetLog?,
++    reservesVideoSpace: Bool = false
++  ) {
++    self.reservesVideoSpace = reservesVideoSpace
++    setLogID = log?.id
++    setIndex = set.setIndex
++    badge = VideoBadgeInfo(
++      exerciseName: exerciseName,
++      weightKg: log.map { NSDecimalNumber(decimal: $0.weightKg).doubleValue },
++      reps: log?.reps, rpe: log?.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
++      setOrdinal: set.setIndex + 1)
++    label = HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex)
++    result =
++      log.map {
++        StudentFormatting.result(weightKg: $0.weightKg, reps: $0.reps, rpe: $0.rpe)
++      } ?? StudentFormatting.prescribed(set)
++    completed = log?.completed
++  }
++
++  init(
++    label: String, result: String, completed: Bool, setLogID: UUID? = nil, setIndex: Int = 0,
++    reservesVideoSpace: Bool = false, badge: VideoBadgeInfo = VideoBadgeInfo()
++  ) {
++    self.reservesVideoSpace = reservesVideoSpace
++    self.setLogID = setLogID
++    self.setIndex = setIndex
++    self.badge = badge
++    self.label = label
++    self.result = result
++    self.completed = completed
++  }
++
++  var body: some View {
++    HStack(spacing: MeetPRSpacing.space2) {
++      Text(label)
++        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
++        .foregroundStyle(Color.MeetPR.textMuted)
++      Spacer()
++      Text(result)
++        .font(
++          .MeetPR.mono(size: MeetPRFontMetrics.size11, weight: completed == nil ? .medium : .bold)
++        )
++        .foregroundStyle(resultColor)
++      let video = TrainingHistoryVideoPresentation(
++        setLogID: setLogID, setIndex: setIndex, videos: replay?.videos ?? [],
++        local: replay?.local ?? [])
++      CompletedSetVideoButton(
++        video: video.video, upload: replay?.uploadState(setLogID: setLogID), number: video.number,
++        reservesSpace: reservesVideoSpace
++      ) { replay?.open($0, badge: badge) }
++    }
++    .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
++  }
++
++  private var resultColor: Color {
++    guard let completed else { return Color.MeetPR.textMuted }
++    return completed ? Color.MeetPR.success : Color.MeetPR.textSecondary
++  }
++}
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistoryRows.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistoryRows.swift
+@@ -6,10 +6,14 @@
+ struct StudentAddedHistoryRows: View {
+   let logs: [StudentAddedSetLog]
+   let catalog: [Exercise]
++  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
+
+   var body: some View {
+     let groups = Dictionary(grouping: logs, by: \.exerciseID)
+     ForEach(groups.keys.sorted { $0.uuidString < $1.uuidString }, id: \.self) { id in
++      let reservesVideoSpace = TrainingHistoryVideoPresentation.reservesVideoSpace(
++        setLogIDs: (groups[id] ?? []).map(\.id),
++        videos: replay?.videos ?? [], local: replay?.local ?? [])
+       VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+         Divider().overlay(Color.MeetPR.borderDefault)
+         HStack {
+@@ -25,6 +29,7 @@
+             label: HistoryEntriesView.setLabel(forZeroBasedIndex: log.setIndex),
+             result: StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe),
+             completed: log.completed, setLogID: log.id, setIndex: log.setIndex,
++            reservesVideoSpace: reservesVideoSpace,
+             badge: VideoBadgeInfo(
+               exerciseName: catalog.first(where: { $0.id == id }).map {
+                 StudentExerciseName.display($0)
+@@ -35,6 +40,7 @@
+           )
+         }
+       }
++      .modifier(CompletedVideoHitRouting())
+     }
+   }
+ }
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryVideoPresentation.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryVideoPresentation.swift
+@@ -6,6 +6,24 @@
+   let number: Int
+   let video: CompletedSetVideo?
+
++  /// Dense rows retain 44pt hit regions; overlap belongs to the closest icon.
++  static func playbackNumber(at point: CGPoint, in regions: [Int: CGRect]) -> Int? {
++    regions.filter { $0.value.contains(point) }.min { first, second in
++      let firstDistance = abs(first.value.midY - point.y)
++      let secondDistance = abs(second.value.midY - point.y)
++      return firstDistance == secondDistance
++        ? first.key < second.key : firstDistance < secondDistance
++    }?.key
++  }
++
++  static func reservesVideoSpace(
++    setLogIDs: [UUID?], videos: [StudentVideo], local: [VideoAttachment]
++  ) -> Bool {
++    let identifiers = Set(setLogIDs.compactMap { $0 })
++    return videos.contains { $0.setLogID.map { identifiers.contains($0) } ?? false }
++      || local.contains { identifiers.contains($0.setLogID) }
++  }
++
+   init(setLogID: UUID?, setIndex: Int, videos: [StudentVideo], local: [VideoAttachment]) {
+     number = SetIndexDisplay.number(forZeroBasedIndex: setIndex)
+     video = CompletedSetVideo.resolve(setLogID: setLogID, videos: videos, local: local)
+--- a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/CompletedVideoPlayerHeader.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/CompletedVideoPlayerHeader.swift
+@@ -11,7 +11,7 @@
+         Image(systemName: "xmark")
+           .font(.MeetPR.bodyEmphasis)
+           .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+-          .background(.black.opacity(0.45), in: .circle)
++          .background(Color.MeetPR.completedVideoCloseFill, in: .circle)
+       }
+       .accessibilityLabel(String(localized: "student.completedVideo.close", bundle: .module))
+       .accessibilityIdentifier("completedVideo.close")
+@@ -26,7 +26,7 @@
+           .padding(.horizontal, MeetPRSpacing.space3)
+           .frame(minHeight: MeetPRSpacing.point30)
+           .background(Color.MeetPR.completedVideoReviewFill, in: .capsule)
+-          .overlay { Capsule().stroke(.white.opacity(0.18), lineWidth: 1) }
++          .overlay { Capsule().stroke(Color.MeetPR.completedVideoReviewBorder, lineWidth: 1) }
+           .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+           .contentShape(.rect)
+         }
+--- a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/CompletedVideoReplayTests.swift
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/CompletedVideoReplayTests.swift
+@@ -6,6 +6,36 @@
+
+ @MainActor
+ struct CompletedVideoReplayTests {
++  @Test func completedExerciseReservesVideoSpaceForItsRowsOnly() throws {
++    let day = try #require(StudentDemoSeed.makePlanView().days.first)
++    var drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
++    let setLogID = UUID()
++    drafts[0].loggedSetID = setLogID
++    drafts[0].completed = true
++    let presentation = TodayWorkoutPresentation(
++      day: day, drafts: drafts, references: [:], started: true)
++    let empty = CompletedDayPresentation(
++      presentation: presentation, addedDrafts: [], unit: .kg)
++    #expect(empty.exercises.allSatisfy { !$0.reservesVideoSpace })
++    let withVideo = CompletedDayPresentation(
++      presentation: presentation, addedDrafts: [], unit: .kg,
++      videos: [video(setLogID: setLogID, at: 10)])
++    #expect(try #require(withVideo.exercises.first).reservesVideoSpace)
++    #expect(withVideo.exercises.dropFirst().allSatisfy { !$0.reservesVideoSpace })
++    for status in [VideoAttachment.Status.pending, .uploading, .failed] {
++      let upload = VideoAttachment(
++        id: UUID(), setLogID: setLogID, studentID: UUID(), status: status,
++        contentType: "video/mp4", durationSeconds: 8, sizeBytes: 100,
++        localFileName: "clip.mp4", recordedAt: .now)
++      let uploading = CompletedDayPresentation(
++        presentation: presentation, addedDrafts: [], unit: .kg, local: [upload])
++      let exercise = try #require(uploading.exercises.first)
++      #expect(exercise.reservesVideoSpace)
++      #expect(exercise.rows.allSatisfy { $0.video == nil })
++      #expect(uploading.exercises.dropFirst().allSatisfy { !$0.reservesVideoSpace })
++    }
++  }
++
+   @Test func completedRowsUseServerSetLogIDsAndNewestVideo() throws {
+     let day = try #require(StudentDemoSeed.makePlanView().days.first)
+     var drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
+--- a/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/CompletedVideoLayoutTests.swift
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/CompletedVideoLayoutTests.swift
+@@ -0,0 +1,41 @@
++#if os(macOS)
++  import AppKit
++  import CoreModels
++  import DesignSystem
++  import SwiftUI
++  import Testing
++
++  @testable import StudentKit
++
++  @MainActor
++  struct CompletedVideoLayoutTests {
++    @Test func playbackAndUploadKeepTheOriginalTextRowHeight() {
++      let reference = size(Text("100 kg × 5").font(.MeetPR.mono(size: 13)))
++      let playback = CompletedSetVideoButton(video: .remote(UUID()), upload: nil, number: 1) { _ in
++      }
++      #expect(size(playback.font(.MeetPR.mono(size: 13))).height == reference.height)
++      for status in [VideoAttachment.Status.pending, .uploading, .failed] {
++        let upload = VideoAttachment(
++          id: UUID(), setLogID: UUID(), studentID: UUID(), status: status,
++          contentType: "video/mp4", durationSeconds: 8, sizeBytes: 100,
++          localFileName: "clip.mp4", recordedAt: .now)
++        let indicator = CompletedSetVideoButton(video: nil, upload: upload, number: 1) { _ in }
++        #expect(size(indicator.font(.MeetPR.mono(size: 13))).height == reference.height)
++      }
++    }
++
++    @Test func historyReservationAddsOnlyTheIconAndEightPointGap() {
++      let original = size(
++        HistorySetRow(label: "1", result: "100 kg × 5", completed: true))
++      let reserved = size(
++        HistorySetRow(
++          label: "1", result: "100 kg × 5", completed: true, reservesVideoSpace: true))
++      #expect(reserved.height == original.height)
++      #expect(abs(reserved.width - original.width - 30) < 0.01)
++    }
++
++    private func size(_ view: some View) -> CGSize {
++      NSHostingView(rootView: view).fittingSize
++    }
++  }
++#endif
+--- a/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/TrainingHistoryVideoTests.swift
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/TrainingHistoryVideoTests.swift
+@@ -5,6 +5,57 @@
+ @testable import StudentKit
+
+ struct TrainingHistoryVideoTests {
++  @Test func videoSpaceBelongsOnlyToTheBlockContainingTheVideoOrUpload() {
++    let first = UUID()
++    let second = UUID()
++    let unrelated = UUID()
++    let video = StudentVideo(
++      id: UUID(), setLogID: second, planExerciseID: nil, contentType: "video/mp4",
++      sizeBytes: 100, filename: nil, createdAt: .now, loggedAt: nil)
++    #expect(
++      TrainingHistoryVideoPresentation.reservesVideoSpace(
++        setLogIDs: [first, second, nil], videos: [video], local: []))
++    #expect(
++      !TrainingHistoryVideoPresentation.reservesVideoSpace(
++        setLogIDs: [unrelated, nil], videos: [video], local: []))
++    #expect(
++      !TrainingHistoryVideoPresentation.reservesVideoSpace(
++        setLogIDs: [first, second], videos: [], local: []))
++    for status in [VideoAttachment.Status.pending, .uploading, .failed, .uploaded] {
++      let upload = VideoAttachment(
++        id: UUID(), setLogID: second, studentID: UUID(), status: status,
++        contentType: "video/mp4", durationSeconds: 8, sizeBytes: 100,
++        localFileName: "clip.mp4", recordedAt: .now)
++      #expect(
++        TrainingHistoryVideoPresentation.reservesVideoSpace(
++          setLogIDs: [first, second], videos: [], local: [upload]))
++      #expect(
++        !TrainingHistoryVideoPresentation.reservesVideoSpace(
++          setLogIDs: [unrelated, nil], videos: [], local: [upload]))
++    }
++  }
++
++  @Test func overlappingVideoTargetsChooseTheNearestIcon() {
++    let regions = [
++      1: CGRect(x: 0, y: 0, width: 44, height: 44),
++      2: CGRect(x: 0, y: 20, width: 44, height: 44),
++    ]
++    #expect(
++      TrainingHistoryVideoPresentation.playbackNumber(at: CGPoint(x: 22, y: 22), in: regions) == 1)
++    #expect(
++      TrainingHistoryVideoPresentation.playbackNumber(at: CGPoint(x: 22, y: 42), in: regions) == 2)
++    #expect(
++      TrainingHistoryVideoPresentation.playbackNumber(at: CGPoint(x: 1, y: 1), in: regions) == 1)
++    #expect(
++      TrainingHistoryVideoPresentation.playbackNumber(at: CGPoint(x: 43, y: 63), in: regions) == 2)
++    #expect(
++      TrainingHistoryVideoPresentation.playbackNumber(at: CGPoint(x: 50, y: 22), in: regions) == nil
++    )
++    #expect(
++      TrainingHistoryVideoPresentation.playbackNumber(at: CGPoint(x: 22, y: 80), in: regions) == nil
++    )
++  }
++
+   @Test func historyUsesActualLogIDForExtraAndStudentAddedSets() {
+     let setID = UUID()
+     let video = StudentVideo(

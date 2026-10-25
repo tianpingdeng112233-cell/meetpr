@@ -1,0 +1,32 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/Caches/org.swift.swiftpm is not accessible or not writable, disabling user-level cache features.
+warning: 'studentkit': failed storing manifest for 'studentkit' in cache: attempt to write a readonly database
+Building for debugging...
+[0/10] Copying Localizable.xcstrings
+[1/10] Write sources
+[3/11] Copying Localizable.xcstrings
+[8/13] Copying exercise-search-zh-Hant.json
+[9/12] Copying exercise-names-zh-Hant.json
+[10/12] Write swift-version--58304C5D6DBC2206.txt
+[12/14] Emitting module StudentKit
+[13/14] Compiling StudentKit TodayWorkoutView.swift
+[14/16] Compiling StudentKitTests SetEntryVideoPlayerTests.swift
+/Users/david/Projects/apps/MeetPR-wt-096/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/SetEntryVideoPlayerTests.swift:12:74: error: argument passed to call that takes no arguments
+ 10 | @Suite @MainActor struct SetEntryVideoPlayerTests {
+ 11 |   @Test func readOnlyPlaybackKeepsPlayingIntentAcrossAutomaticURLRefresh() async throws {
+ 12 |     let playback = SetEntryVideoPlayer(preservesPlaybackIntentOnFailure: true)
+    |                                                                          `- error: argument passed to call that takes no arguments
+ 13 |     defer { playback.stop() }
+ 14 |     let missing = URL(filePath: "/tmp/096-missing-" + UUID().uuidString + ".mp4")
+
+/Users/david/Projects/apps/MeetPR-wt-096/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/SetEntryVideoPlayerTests.swift:15:50: error: cannot infer contextual base in reference to member 'remote'
+ 13 |     defer { playback.stop() }
+ 14 |     let missing = URL(filePath: "/tmp/096-missing-" + UUID().uuidString + ".mp4")
+ 15 |     playback.load(attachmentID: UUID(), source: .remote(missing))
+    |                                                  `- error: cannot infer contextual base in reference to member 'remote'
+ 16 |     playback.togglePlayback()
+ 17 |     for _ in 0..<200 where !playback.hasError {
+[15/16] Emitting module StudentKitTests
+error: fatalError

@@ -95,7 +95,7 @@ public enum StudentDemoSeed {
         let sets = isCursor ? Array(exercise.prescribedSets.prefix(2)) : exercise.prescribedSets
         return sets.map { set in
           StudentSetLog(
-            id: UUID(),
+            id: set.id,
             studentID: studentID,
             planExerciseID: exercise.id,
             setIndex: set.setIndex,

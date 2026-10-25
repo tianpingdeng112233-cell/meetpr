@@ -8,6 +8,51 @@ import ViewInspector
 @testable import StudentKit
 
 @Suite @MainActor struct SetEntryVideoPlayerTests {
+  @Test func readOnlyPlaybackKeepsPlayingIntentAcrossAutomaticURLRefresh() async throws {
+    let playback = SetEntryVideoPlayer(preservesPlaybackIntentOnFailure: true)
+    defer { playback.stop() }
+    let missing = URL(filePath: "/tmp/096-missing-" + UUID().uuidString + ".mp4")
+    playback.load(attachmentID: UUID(), source: .remote(missing))
+    playback.togglePlayback()
+    for _ in 0..<200 where !playback.hasError {
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(playback.hasError)
+    #expect(playback.state.isPlaying)
+    var refreshes = 0
+    await playback.retry { _ in
+      refreshes += 1
+      return URL(filePath: "/tmp/refreshed-clip.mp4")
+    }
+    #expect(refreshes == 1)
+    #expect(playback.state.isPlaying)
+    #expect(!playback.hasError)
+  }
+
+  @Test func completedReplayIsReadOnlyAndRoutesReview() throws {
+    let playback = SetEntryVideoPlayer()
+    var closed = false
+    var reviewed = false
+    let view = SetEntryVideoPlayerView(
+      playback: playback, badge: VideoBadgeInfo(exerciseName: "Squat", setOrdinal: 2),
+      readOnly: true, onClose: { closed = true }, onReview: { reviewed = true }, retry: {})
+    let inspected = try view.inspect()
+    try inspected.find(viewWithAccessibilityIdentifier: "completedVideo.close").button().tap()
+    try inspected.find(viewWithAccessibilityIdentifier: "completedVideo.review").button().tap()
+    #expect(closed && reviewed)
+    #expect(throws: (any Error).self) {
+      try inspected.find(button: StudentStrings.localized(.setEntryVideoExpand))
+    }
+    for key in [
+      StudentStrings.Key.videoAttachmentV3Controls001,
+      .videoAttachmentV3Controls004, .videoAttachmentV3Controls005,
+    ] {
+      #expect(throws: (any Error).self) {
+        try inspected.find(button: StudentStrings.localized(key))
+      }
+    }
+  }
+
   @Test(arguments: [false, true])
   func centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded: Bool) throws {
     let playback = SetEntryVideoPlayer()

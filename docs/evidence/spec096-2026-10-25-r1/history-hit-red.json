@@ -1,0 +1,96 @@
+{
+  "schema": "xcodebuildmcp.output.ui-action-result",
+  "schemaVersion": "2",
+  "didError": false,
+  "error": null,
+  "data": {
+    "summary": {
+      "status": "SUCCEEDED"
+    },
+    "action": {
+      "type": "tap",
+      "elementRef": "e44",
+      "x": 367,
+      "y": 495
+    },
+    "artifacts": {
+      "simulatorId": "A5119984-9A8D-415C-83D4-E7145351FA79"
+    },
+    "capture": {
+      "type": "runtime-snapshot",
+      "rs": "1",
+      "screenHash": "1tzwtae",
+      "seq": 21,
+      "count": 184,
+      "targets": [
+        "e15|tap|button|返回||BackButton",
+        "e30|tap|button|按动作筛选，当前全部动作||",
+        "e44|tap|button|播放第 1 组视频||completedVideo.play.1",
+        "e47|tap|button|播放第 2 组视频||completedVideo.play.2",
+        "e56|tap|button|播放第 1 组视频||completedVideo.play.1",
+        "e59|tap|button|播放第 2 组视频||completedVideo.play.2",
+        "e163|tap|button|今日||",
+        "e164|tap|button|训练||",
+        "e165|tap|button|成长||",
+        "e166|tap|button|我的||",
+        "e176|tap|button|关闭视频||completedVideo.close",
+        "e178|tap|button|暂停||pause.fill",
+        "e182|tap|button|播放速度||"
+      ],
+      "scroll": [
+        "e28|swipe|scroll-view|||"
+      ],
+      "text": [
+        "e21|text|text|训练次数||",
+        "e23|text|text|训练周||",
+        "e25|text|text|训练总容量||",
+        "e22|text|text|2||",
+        "e24|text|text|1||",
+        "e26|text|text|3,525||",
+        "e27|text|text|kg||",
+        "e32|text|text|全部动作||",
+        "e31|text|text|按动作筛选||",
+        "e34|text|text|第 1 周||",
+        "e35|text|text|10月22日||",
+        "e36|text|text|3/3 组||",
+        "e37|text|text|星期四||",
+        "e38|text|text|深蹲||",
+        "e39|text|text|教练备注 节奏310,底部不停顿||",
+        "e40|text|text|教练备注||",
+        "e41|text|text|节奏310,底部不停顿||",
+        "e42|text|text|第 1 组||",
+        "e43|text|text|142.5kg × 5 @ RPE 7.5||",
+        "e45|text|text|第 2 组||",
+        "e46|text|text|142.5kg × 5 @ RPE 7.5||",
+        "e48|text|text|第 3 组||",
+        "e49|text|text|142.5kg × 5 @ RPE 7.5||",
+        "e50|text|text|10月23日||",
+        "e51|text|text|3/3 组||",
+        "e52|text|text|星期五||",
+        "e53|text|text|卧推||",
+        "e54|text|text|第 1 组||",
+        "e55|text|text|92.5kg × 5 @ RPE 8||",
+        "e57|text|text|第 2 组||",
+        "e58|text|text|92.5kg × 5 @ RPE 8||",
+        "e60|text|text|第 3 组||",
+        "e61|text|text|92.5kg × 5 @ RPE 8||",
+        "e177|text|text|深蹲 · 第 2 组 · 142.5kg × 5 · RPE 7.5||",
+        "e62|text|text|10月24日||",
+        "e63|text|text|0/3 组||",
+        "e64|text|text|星期六||",
+        "e180|text|text|0:02||",
+        "e181|text|text|0:14||",
+        "e65|text|text|硬拉||",
+        "e66|text|text|教练备注 D170/L190 递增5kg,顶组留一,腰部有感觉就停||",
+        "e67|text|text|教练备注||",
+        "e68|text|text|D170/L190 递增5kg,顶组留一,腰部有感觉就停||"
+      ],
+      "udid": "A5119984-9A8D-415C-83D4-E7145351FA79"
+    }
+  },
+  "nextSteps": [
+    "Batch same-screen taps: batch({ simulatorId: \"A5119984-9A8D-415C-83D4-E7145351FA79\", steps: [{\"action\":\"tap\",\"elementRef\":\"e15\"},{\"action\":\"tap\",\"elementRef\":\"e30\"}] })",
+    "Tap an elementRef: tap({ simulatorId: \"A5119984-9A8D-415C-83D4-E7145351FA79\", elementRef: \"e15\" })",
+    "Scroll visible content: swipe({ simulatorId: \"A5119984-9A8D-415C-83D4-E7145351FA79\", withinElementRef: \"e28\", direction: \"up\", distance: 0.5 })"
+  ]
+}

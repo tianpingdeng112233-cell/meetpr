@@ -5,9 +5,14 @@ import Networking
 /// startup and threaded down to TodayWorkoutView.
 public struct VideoUploadServices: Sendable {
   public let manager: VideoUploadManager
+  public let replayRepository: (any StudentReplayVideoRepository)?
 
-  public init(manager: VideoUploadManager) {
+  public init(
+    manager: VideoUploadManager,
+    replayRepository: (any StudentReplayVideoRepository)? = nil
+  ) {
     self.manager = manager
+    self.replayRepository = replayRepository
   }
 
   /// Demo/preview wiring: real AVFoundation export, loopback "uploads" that
@@ -18,7 +23,8 @@ public struct VideoUploadServices: Sendable {
         service: LoopbackVideoUploadService(),
         exporter: AVFoundationVideoExporter(),
         repository: InMemoryVideoAttachmentRepository(seed: AccessoryDemoScenario.videoAttachments)
-      )
+      ),
+      replayRepository: CompletedVideoDemoRepository()
     )
   }
 
@@ -34,6 +40,8 @@ public struct VideoUploadServices: Sendable {
       failureNotifier: UploadFailureNotifier(),
       enableNetworkMonitoring: true
     )
-    return VideoUploadServices(manager: manager)
+    return VideoUploadServices(
+      manager: manager,
+      replayRepository: BackendStudentReplayVideoRepository(api: api, session: session))
   }
 }
