@@ -6,7 +6,7 @@
 
 ## 🎯 目标：1.0 (28)
 - 基底：`beta/1.0-27` @ `9d521094`；David 于 2026-10-23 截图确认 1.0(27) 已上传，内容已挪入 [RELEASES.md](./RELEASES.md)。
-- build 号：28（切包时 `agvtool new-version 28`），marketing version 保持 1.0。
+- build 号：28（2026-10-25 已 `agvtool new-version 28`），marketing version 保持 1.0。切包 tag `beta/1.0-28`。
 
 ## 本版将包含
 
