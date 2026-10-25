@@ -8,11 +8,37 @@ struct SetEntryVideoPlayerView: View {
   let playback: SetEntryVideoPlayer
   let badge: VideoBadgeInfo?
   var isInline = false
+  var readOnly = false
+  var showsPlaybackError = true
+  var onClose: (() -> Void)?
+  var onReview: (() -> Void)?
   let retry: () -> Void
 
   var body: some View {
     Group {
-      if playback.state.isExpanded && !isInline {
+      if readOnly {
+        SetEntryVideoStage(playback: playback, role: .expanded)
+          .ignoresSafeArea()
+          .overlay(alignment: .top) {
+            CompletedVideoPlayerHeader(close: { onClose?() }, onReview: onReview)
+          }
+          .overlay(alignment: .bottom) {
+            VStack(spacing: MeetPRSpacing.sm) {
+              if let badge {
+                Text(
+                  [badge.exerciseName, SetEntryVideoDetails.text(badge)]
+                    .compactMap { $0 }.joined(separator: " · ")
+                )
+                .font(.MeetPR.footnote)
+                .foregroundStyle(.white.opacity(0.8))
+                .padding(.horizontal, MeetPRSpacing.sm)
+              }
+              SetEntryVideoControlBar(
+                playback: playback, allowsExpansion: false, showsError: showsPlaybackError,
+                retry: retry)
+            }
+          }
+      } else if playback.state.isExpanded && !isInline {
         SetEntryVideoStage(playback: playback, role: .expanded)
           .ignoresSafeArea()
           .overlay(alignment: .top) {
@@ -32,9 +58,13 @@ struct SetEntryVideoPlayerView: View {
         .clipShape(.rect(cornerRadius: MeetPRRadius.card))
       }
     }
-    .accessibilityAction(.escape) { playback.state.handleBack() }
+    .accessibilityAction(.escape) {
+      if readOnly { onClose?() } else { playback.state.handleBack() }
+    }
     #if os(macOS)
-      .onExitCommand { playback.state.handleBack() }
+      .onExitCommand {
+        if readOnly { onClose?() } else { playback.state.handleBack() }
+      }
     #endif
   }
 }
@@ -71,15 +101,17 @@ private struct SetEntryVideoStage: View {
 
 private struct SetEntryVideoControlBar: View {
   let playback: SetEntryVideoPlayer
+  var allowsExpansion = true
+  var showsError = true
   let retry: () -> Void
 
   var body: some View {
     VStack(spacing: MeetPRSpacing.xs) {
-      if playback.hasError {
+      if playback.hasError && showsError {
         Button(StudentStrings.localized(.videoAttachmentSection002), action: retry)
           .font(.MeetPR.footnote)
       }
-      SetEntryVideoControls(playback: playback)
+      SetEntryVideoControls(playback: playback, allowsExpansion: allowsExpansion)
     }
     .foregroundStyle(.white)
     .background(.black.opacity(0.75))
@@ -88,6 +120,7 @@ private struct SetEntryVideoControlBar: View {
 
 private struct SetEntryVideoControls: View {
   let playback: SetEntryVideoPlayer
+  let allowsExpansion: Bool
   @State private var showsSpeeds = false
 
   var body: some View {
@@ -135,19 +168,21 @@ private struct SetEntryVideoControls: View {
         .background(Color.MeetPR.videoStageFill, in: .rect(cornerRadius: MeetPRRadius.md))
         .presentationCompactAdaptation(.popover)
       }
-      Button {
-        showsSpeeds = false
-        playback.state.toggleExpanded()
-      } label: {
-        Image(
-          systemName: playback.state.isExpanded
-            ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
-        )
-        .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+      if allowsExpansion {
+        Button {
+          showsSpeeds = false
+          playback.state.toggleExpanded()
+        } label: {
+          Image(
+            systemName: playback.state.isExpanded
+              ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
+          )
+          .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+        }
+        .accessibilityLabel(
+          StudentStrings.localized(
+            playback.state.isExpanded ? .setEntryVideoCollapse : .setEntryVideoExpand))
       }
-      .accessibilityLabel(
-        StudentStrings.localized(
-          playback.state.isExpanded ? .setEntryVideoCollapse : .setEntryVideoExpand))
     }
     .buttonStyle(.plain)
     .tint(.white)
@@ -163,25 +198,6 @@ private struct SetEntryVideoHeader: View {
   let badge: VideoBadgeInfo?
   let collapse: () -> Void
 
-  private static func details(_ badge: VideoBadgeInfo) -> String {
-    var parts: [String] = []
-    if let number = badge.setOrdinal {
-      parts.append(StudentStrings.replacing(.setEntryVideoSet, values: [String(number)]))
-    }
-    let weight = badge.weightKg.flatMap { $0.isFinite ? metric($0) + "kg" : nil }
-    let reps = badge.reps.map { String($0) }
-    let load = [weight, reps].compactMap { $0 }.joined(separator: " × ")
-    if !load.isEmpty { parts.append(load) }
-    if let rpe = badge.rpe, rpe.isFinite { parts.append("RPE " + metric(rpe)) }
-    return parts.joined(separator: " · ")
-  }
-
-  private static func metric(_ value: Double) -> String {
-    value.formatted(
-      .number.grouping(.never).precision(.fractionLength(0...1))
-        .locale(Locale(identifier: "en_US_POSIX")))
-  }
-
   var body: some View {
     HStack(spacing: MeetPRSpacing.sm) {
       Button(action: collapse) {
@@ -192,7 +208,7 @@ private struct SetEntryVideoHeader: View {
       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
         if let name = badge?.exerciseName { Text(name).font(.MeetPR.bodyEmphasis) }
         if let badge {
-          Text(Self.details(badge))
+          Text(SetEntryVideoDetails.text(badge))
             .font(.MeetPR.footnote)
         }
       }

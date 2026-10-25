@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import SwiftUI
@@ -9,6 +10,7 @@ struct HistoryEntriesView: View {
   @Binding var selectedExerciseName: String?
   var addedLogs: [StudentAddedSetLog] = []
   var catalog: [Exercise] = []
+  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
 
   static func setLabel(forZeroBasedIndex setIndex: Int) -> String {
     StudentStrings.replacing(
@@ -97,7 +99,10 @@ struct HistoryEntriesView: View {
   }
 
   private func exerciseBlock(_ exercise: StudentPlanExercise, logs: [StudentSetLog]) -> some View {
-    VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
+    let reservesVideoSpace = TrainingHistoryVideoPresentation.reservesVideoSpace(
+      setLogIDs: logs.filter { $0.planExerciseID == exercise.id }.map(\.id),
+      videos: replay?.videos ?? [], local: replay?.local ?? [])
+    return VStack(alignment: .leading, spacing: MeetPRSpacing.sm) {
       Divider().overlay(Color.MeetPR.borderDefault)
       Text(StudentExerciseName.display(exercise.exercise))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .bold))
@@ -110,7 +115,9 @@ struct HistoryEntriesView: View {
       ForEach(exercise.prescribedSets) { set in
         HistorySetRow(
           set: set,
-          log: logs.first { $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex }
+          exerciseName: StudentExerciseName.display(exercise.exercise),
+          log: logs.first { $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex },
+          reservesVideoSpace: reservesVideoSpace
         )
       }
       ForEach(
@@ -121,11 +128,18 @@ struct HistoryEntriesView: View {
         HistorySetRow(
           label: StudentStrings.localized(.addedExtra),
           result: StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe),
-          completed: log.completed
+          completed: log.completed, setLogID: log.id, setIndex: log.setIndex,
+          reservesVideoSpace: reservesVideoSpace,
+          badge: VideoBadgeInfo(
+            exerciseName: StudentExerciseName.display(exercise.exercise),
+            weightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue, reps: log.reps,
+            rpe: log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
+            setOrdinal: log.setIndex + 1)
         )
       }
 
     }
+    .modifier(CompletedVideoHitRouting())
   }
 }
 
@@ -325,46 +339,5 @@ private struct HistoryDayHeader: View {
     progress.total > 0 && progress.completed == progress.total
       ? Color.MeetPR.success
       : Color.MeetPR.goldText
-  }
-}
-
-@available(iOS 17.0, macOS 14.0, *)
-struct HistorySetRow: View {
-  let label: String
-  let result: String
-  let completed: Bool?
-
-  init(set: PrescribedSet, log: StudentSetLog?) {
-    label = HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex)
-    result =
-      log.map {
-        StudentFormatting.result(weightKg: $0.weightKg, reps: $0.reps, rpe: $0.rpe)
-      } ?? StudentFormatting.prescribed(set)
-    completed = log?.completed
-  }
-
-  init(label: String, result: String, completed: Bool) {
-    self.label = label
-    self.result = result
-    self.completed = completed
-  }
-
-  var body: some View {
-    HStack {
-      Text(label)
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .medium))
-        .foregroundStyle(Color.MeetPR.textMuted)
-      Spacer()
-      Text(result)
-        .font(
-          .MeetPR.mono(size: MeetPRFontMetrics.size11, weight: completed == nil ? .medium : .bold)
-        )
-        .foregroundStyle(resultColor)
-    }
-  }
-
-  private var resultColor: Color {
-    guard let completed else { return Color.MeetPR.textMuted }
-    return completed ? Color.MeetPR.success : Color.MeetPR.textSecondary
   }
 }

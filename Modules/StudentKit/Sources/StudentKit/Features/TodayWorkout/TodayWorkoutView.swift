@@ -31,6 +31,7 @@ public struct TodayWorkoutView: View {
   @State private var restTimerHeight: CGFloat = 0
   @State private var viewModel: TodayWorkoutViewModel
   @State private var readinessViewModel: ReadinessCheckinViewModel
+  @State private var replay: CompletedVideoReplayModel
   @State private var videoViewModel: VideoAttachmentViewModel
   @State private var selectedDayID: UUID?
   @State private var editing: EditingTarget?
@@ -75,6 +76,7 @@ public struct TodayWorkoutView: View {
     restTimerActivityController: any RestTimerActivityControlling =
       NoOpRestTimerActivityController(),
     videoUploads: VideoUploadServices? = nil,
+    feedbackViewModel: FeedbackInboxViewModel? = nil,
     planHandoff: TodayWorkoutPlanHandoff? = nil,
     jumpToTodayToken: Int = 0,
     uploadFailureDestination: UploadFailureDestination? = nil,
@@ -131,8 +133,11 @@ public struct TodayWorkoutView: View {
     self._readinessViewModel = State(
       initialValue: ReadinessCheckinViewModel(repo: readiness)
     )
+    let services = videoUploads ?? .demo()
+    self._replay = State(
+      initialValue: CompletedVideoReplayModel(services: services, feedback: feedbackViewModel))
     self._videoViewModel = State(
-      initialValue: VideoAttachmentViewModel(manager: (videoUploads ?? .demo()).manager)
+      initialValue: VideoAttachmentViewModel(manager: services.manager)
     )
   }
 
@@ -224,6 +229,9 @@ public struct TodayWorkoutView: View {
         )
       )
     }
+    .environment(replay)
+    .modifier(CompletedVideoReplayHost(model: replay))
+    .task { await replay.load(studentID: studentID) }
     .safeAreaInset(edge: .bottom) {
       VStack(spacing: 0) {
         if !showingHistory, case .workout(let presentation) = screenContent,
@@ -633,6 +641,7 @@ public struct TodayWorkoutView: View {
   }
 
   private func reloadCurrentDay() async {
+    await replay.load(studentID: studentID)
     await loadWorkout(for: nil)
     returnToCurrentDay()
   }

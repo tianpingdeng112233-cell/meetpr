@@ -1,0 +1,26 @@
+warning: '--skip-update' option is deprecated and will be removed in a future release
+warning: /Users/david/Library/org.swift.swiftpm/configuration is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/org.swift.swiftpm/security is not accessible or not writable, disabling user-level cache features.
+warning: /Users/david/Library/Caches/org.swift.swiftpm is not accessible or not writable, disabling user-level cache features.
+warning: 'studentkit': failed storing manifest for 'studentkit' in cache: attempt to write a readonly database
+warning: 'coremodels': failed storing manifest for 'coremodels' in cache: attempt to write a readonly database
+warning: 'repositorycontracts': failed storing manifest for 'repositorycontracts' in cache: attempt to write a readonly database
+warning: 'viewinspector': failed storing manifest for 'viewinspector' in cache: attempt to write a readonly database
+warning: 'analytics': failed storing manifest for 'analytics' in cache: attempt to write a readonly database
+warning: 'networking': failed storing manifest for 'networking' in cache: attempt to write a readonly database
+warning: 'designsystem': failed storing manifest for 'designsystem' in cache: attempt to write a readonly database
+warning: 'chatui': failed storing manifest for 'chatui' in cache: attempt to write a readonly database
+[0/1] Planning build
+Test Suite 'Selected tests' started at 2026-10-24 14:31:27.149.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-10-24 14:31:27.152.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-10-24 14:31:27.152.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-10-24 14:31:27.152.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" started.
+✘ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" recorded an issue at AVFoundationVideoExporterTests.swift:9:2: Caught error: .unavailable("Cannot Encode")
+✘ Test "Video export produces a readable, fast-start H.264 MP4 without upscaling" failed after 0.118 seconds with 1 issue.
+✘ Test run with 1 test in 0 suites failed after 0.119 seconds with 1 issue.

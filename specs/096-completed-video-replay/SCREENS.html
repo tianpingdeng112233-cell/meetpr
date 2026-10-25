@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>回看视频屏幕稿</title>
+<style>
+:root{
+  --bg:#F5F6F8; --inset:#FAFAFB; --card:#FFFFFF; --bsub:#E5E7EB; --bstr:#D1D5DB;
+  --t1:#111827; --t2:#4B5563; --t3:#5C6371; --muted:#9CA3AF;
+  --ok:#15803D; --okTint:rgba(21,128,61,.14); --gold:#D97706; --goldText:#9A4A06; --danger:#E5484D;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#E9EBEF;font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;color:var(--t1)}
+header{max-width:1180px;margin:0 auto;padding:28px 16px 8px}
+h1{font-size:20px;margin:0 0 6px}
+header p{margin:0;color:var(--t2);font-size:14px;line-height:1.6}
+.row{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;max-width:1180px;margin:0 auto;padding:20px 16px 48px}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.cap{font-size:13px;color:var(--t2);max-width:340px;text-align:center;line-height:1.5}
+.cap b{color:var(--t1)}
+.phone{width:340px;height:700px;border-radius:36px;background:var(--bg);border:8px solid #1F2229;overflow:hidden;position:relative;display:flex;flex-direction:column}
+.status{height:30px;flex:none}
+.top{padding:4px 18px 10px;flex:none}
+.top .day{font-size:22px;font-weight:800}
+.top .sub{display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-top:4px}
+.top .sub a{color:var(--goldText);text-decoration:none}
+.scroll{flex:1;overflow:hidden;padding:0 14px}
+/* completed card */
+.done{background:var(--inset);border:1px solid var(--bstr);border-radius:0 16px 16px 0;padding:16px 14px 12px 17px;position:relative;display:flex;flex-direction:column;gap:12px}
+.done:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ok)}
+.done .h{display:flex;align-items:center;gap:8px}
+.done .h .title{font-size:20px;font-weight:800;flex:1}
+.pill{display:flex;align-items:center;gap:4px;padding:0 12px;height:32px;border-radius:99px;background:var(--okTint);color:var(--ok);font-size:12px;font-weight:700}
+.meta{font-family:var(--mono);font-size:11px;color:var(--t3)}
+.ex{background:var(--card);border:1px solid var(--bsub);border-radius:12px}
+.ex .eh{display:flex;align-items:center;gap:10px;padding:10px 12px;min-height:44px}
+.chk{width:22px;height:22px;border-radius:7px;background:var(--okTint);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+.ex .name{flex:1;font-size:14px;font-weight:700}
+.ex .cnt{font-family:var(--mono);font-size:11px;color:var(--t3)}
+.ex .chev{color:var(--muted);font-size:13px}
+.sets{padding:0 12px 8px}
+.set{display:flex;align-items:center;gap:8px;min-height:36px}
+.set .n{width:30px;font-family:var(--mono);font-size:12px;color:var(--t3)}
+.set .v{flex:1;font-family:var(--mono);font-size:12.5px}
+.set .v.fail{color:var(--danger)}
+.play{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex:none}
+.play svg{width:22px;height:22px}
+.undo{align-self:flex-end;font-size:12px;color:var(--t3);padding:6px 0}
+.hl{outline:2px dashed var(--gold);outline-offset:1px;border-radius:50%}
+/* player */
+.player{background:#000;color:#fff}
+.player .status{background:#000}
+.stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center}
+.frame{position:absolute;inset:0;background:
+  radial-gradient(ellipse at 50% 45%,#3b3f47 0,#16181c 60%,#0b0c0e 100%)}
+.lifter{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:150px;height:200px;opacity:.55}
+.close{position:absolute;left:14px;top:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font-size:18px}
+.badge{position:absolute;right:12px;top:14px;display:flex;align-items:center;gap:4px;height:30px;padding:0 10px 0 12px;border-radius:99px;background:rgba(17,24,39,.72);border:1px solid rgba(255,255,255,.18);font-size:12px;font-weight:600}
+.badge .arr{opacity:.7}
+.info{position:absolute;left:0;right:0;bottom:84px;text-align:center;font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.8)}
+.ctrl{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 22px;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.bar{height:3px;background:rgba(255,255,255,.25);border-radius:2px;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:38%;background:#fff;border-radius:2px}
+.bar b{position:absolute;left:38%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff}
+.ctl{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.75)}
+.ctl .pp{font-size:20px;color:#fff}
+/* history */
+.hcard{background:var(--card);border:1px solid var(--bsub);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.hcard .hh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.hcard .d{font-weight:800;font-size:15px}
+.hcard .w{font-size:11px;color:var(--t3);margin-left:6px;font-weight:400}
+.hcard .p{font-family:var(--mono);font-size:12px;color:var(--ok)}
+.hex{font-size:13px;font-weight:700;margin:8px 0 2px}
+.hset{display:flex;align-items:center;min-height:34px}
+.hset .n{width:48px;font-size:12px;color:var(--t3)}
+.hset .v{flex:1;font-family:var(--mono);font-size:12.5px;color:var(--ok)}
+.navback{font-size:13px;color:var(--t2)}
+.notes{max-width:1100px;margin:0 auto;padding:0 16px 40px;font-size:13px;color:var(--t2);line-height:1.7}
+.notes h2{font-size:15px;color:var(--t1);margin:0 0 6px}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) body{background:#1a1c20} :root:not([data-theme="light"]) header p,:root:not([data-theme="light"]) .cap,:root:not([data-theme="light"]) .notes{color:#C8C8CC} :root:not([data-theme="light"]) h1,:root:not([data-theme="light"]) .cap b,:root:not([data-theme="light"]) .notes h2{color:#EDEDED} }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.25" fill="none" stroke="#9CA3AF" stroke-width="1.5"/><path d="M10 8.3v7.4c0 .4.45.65.8.43l5.7-3.7a.5.5 0 0 0 0-.86l-5.7-3.7a.5.5 0 0 0-.8.43z" fill="#9CA3AF"/></symbol>
+</svg>
+<header>
+  <h1>spec 096 · 已完成训练回看视频（安卓与 iOS 同稿）</h1>
+  <p>只新增两样东西：每组行尾的灰色播放图标，以及播放时右上角的「教练已点评」。其他布局、间距、文案都照现状不变。</p>
+</header>
+
+<div class="row">
+  <!-- 1 completed card -->
+  <div class="col">
+    <div class="phone">
+      <div class="status"></div>
+      <div class="top"><div class="day">W3D2</div><div class="sub"><span>W3 · 2 / 4</span><a>训练记录 ›</a></div></div>
+      <div class="scroll">
+        <div class="done">
+          <div class="h"><div class="title">今日训练</div><div class="pill">✓ 已完成</div></div>
+          <div class="meta">共 3 个动作 · 11 组</div>
+          <div class="ex">
+            <div class="eh"><div class="chk">✓</div><div class="name">深蹲</div><div class="cnt">已记 4/4 组</div><div class="chev">⌄</div></div>
+            <div class="sets">
+              <div class="set"><span class="n">1</span><span class="v">150 kg × 5 · RPE 7</span></div>
+              <div class="set"><span class="n">2</span><span class="v">160 kg × 3 · RPE 8</span><span class="play"><svg><use href="#play"/></svg></span></div>
+              <div class="set"><span class="n">3</span><span class="v">170 kg × 2 · RPE 9</span><span class="play"><svg><use href="#play"/></svg></span></div>
+              <div class="set"><span class="n">4</span><span class="v">150 kg × 5 · RPE 7.5</span></div>
+            </div>
+          </div>
+          <div class="ex"><div class="eh"><div class="chk">✓</div><div class="name">卧推</div><div class="cnt">已记 4/4 组</div><div class="chev">›</div></div></div>
+          <div class="ex"><div class="eh"><div class="chk">✓</div><div class="name">罗马尼亚硬拉</div><div class="cnt">已记 3/3 组</div><div class="chev">›</div></div></div>
+          <div class="undo">撤销完成</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><b>① 总结卡展开</b><br>有视频的组在行尾放播放图标（36pt 点击区，图标 22pt，灰色 #9CA3AF）；没视频的组行尾留空。有没有点评，图标都一样。</div>
+  </div>
+
+  <!-- 2 player -->
+  <div class="col">
+    <div class="phone player">
+      <div class="status"></div>
+      <div class="stage">
+        <div class="frame"></div>
+        <svg class="lifter" viewBox="0 0 150 200"><rect x="5" y="70" width="140" height="6" rx="3" fill="#cfd3da"/><rect x="0" y="52" width="14" height="42" rx="3" fill="#b9504a"/><rect x="136" y="52" width="14" height="42" rx="3" fill="#b9504a"/><circle cx="75" cy="52" r="14" fill="#8a8f98"/><rect x="58" y="72" width="34" height="62" rx="12" fill="#8a8f98"/><rect x="56" y="132" width="14" height="60" rx="6" fill="#8a8f98"/><rect x="80" y="132" width="14" height="60" rx="6" fill="#8a8f98"/></svg>
+        <div class="close">✕</div>
+        <div class="badge">教练已点评 <span class="arr">›</span></div>
+        <div class="info">深蹲 · 第 3 组 · 170 kg × 2 · RPE 9</div>
+        <div class="ctrl">
+          <div class="bar"><i></i><b></b></div>
+          <div class="ctl"><span>0:07</span><span class="pp">❚❚</span><span>0:18</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><b>② 回看播放中</b><br>沿用训练中的单组播放器，只读：没有删除、重录、换片。被点评过的视频右上角显示「教练已点评 ›」，点它跳到反馈详情；没点评就不显示。</div>
+  </div>
+
+  <!-- 3 history -->
+  <div class="col">
+    <div class="phone">
+      <div class="status"></div>
+      <div class="top"><div class="navback">‹ 训练记录</div></div>
+      <div class="scroll">
+        <div class="hcard">
+          <div class="hh"><span class="d">10月22日<span class="w">周三</span></span><span class="p">11/11 组</span></div>
+          <div class="hex">深蹲</div>
+          <div class="hset"><span class="n">第 1 组</span><span class="v">150 kg × 5 @ RPE 7.0</span></div>
+          <div class="hset"><span class="n">第 2 组</span><span class="v">160 kg × 3 @ RPE 8.0</span><span class="play"><svg><use href="#play"/></svg></span></div>
+          <div class="hset"><span class="n">第 3 组</span><span class="v">170 kg × 2 @ RPE 9.0</span><span class="play"><svg><use href="#play"/></svg></span></div>
+          <div class="hex">卧推</div>
+          <div class="hset"><span class="n">第 1 组</span><span class="v">100 kg × 5 @ RPE 7.5</span></div>
+          <div class="hset"><span class="n">第 2 组</span><span class="v">105 kg × 3 @ RPE 8.5</span><span class="play"><svg><use href="#play"/></svg></span></div>
+        </div>
+        <div class="hcard">
+          <div class="hh"><span class="d">10月20日<span class="w">周一</span></span><span class="p">9/9 组</span></div>
+          <div class="hex">硬拉</div>
+          <div class="hset"><span class="n">第 1 组</span><span class="v">200 kg × 3 @ RPE 8.0</span><span class="play"><svg><use href="#play"/></svg></span></div>
+          <div class="hset"><span class="n">第 2 组</span><span class="v">200 kg × 3 @ RPE 8.5</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><b>③ 训练记录页</b><br>同一个图标放在每组行尾，点开进入 ② 同一个播放器。</div>
+  </div>
+</div>
+
+<div class="notes">
+  <h2>不画、照现状</h2>
+  上传中或上传失败的组：沿用现有上传状态小图标，不出播放图标，传完自动换成播放图标。撤销完成后回到训练中的样子，视频入口与现在一致。iOS 用 SF Symbol <code>play.circle</code>（细线），安卓用 MaterialCommunityIcons <code>play-circle-outline</code>，颜色照参考图取浅灰 #9CA3AF（比 textMuted 浅，暗色模式用 #6B6B72）。
+</div>
+</body>
+</html>

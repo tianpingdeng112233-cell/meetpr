@@ -1,0 +1,49 @@
+{
+  "base": "cdc7bc59",
+  "branch": "feat/096-completed-video-replay",
+  "studentKit": {
+    "passed": 1042,
+    "failed": 0,
+    "runner": "XcodeBuildMCP swift_package_test"
+  },
+  "designSystem": {
+    "passed": 74,
+    "failed": 0,
+    "runner": "swift test"
+  },
+  "mainProject": {
+    "passed": 9,
+    "failed": 0,
+    "scheme": "MeetPR",
+    "configuration": "Debug"
+  },
+  "demo": {
+    "scheme": "MeetPR-DemoStudent",
+    "configuration": "Demo",
+    "condition": "DEMO_MODE DEMO_USER_STUDENT",
+    "device": "iPhone 17",
+    "runtime": "iOS 26.5"
+  },
+  "swiftlint": {
+    "strict": true,
+    "changedSwiftFiles": 26,
+    "passed": true
+  },
+  "swiftFormat": {
+    "strict": true,
+    "changedSwiftFiles": 26,
+    "passed": true
+  },
+  "zhHant": {
+    "generator": "scripts/generate-zh-hant.py --check",
+    "catalogs": 10,
+    "keys": 2352,
+    "passed": true
+  },
+  "review": {
+    "Standards": "CLEAN",
+    "Spec": "CLEAN"
+  },
+  "committed": false,
+  "pushed": false
+}

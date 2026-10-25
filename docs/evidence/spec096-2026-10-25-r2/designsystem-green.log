@@ -1,0 +1,356 @@
+Fetching https://github.com/nalexn/ViewInspector from cache
+Fetched https://github.com/nalexn/ViewInspector from cache (0.03s)
+Creating working copy for https://github.com/nalexn/ViewInspector
+Working copy of https://github.com/nalexn/ViewInspector resolved at 0.10.3
+Building for debugging...
+[0/10] /Users/david/Projects/apps/MeetPR-wt-096/Modules/DesignSystem/.build/arm64-apple-macosx/debug/DesignSystemPackageTests.derived/runner.swift
+[1/10] Write sources
+[3/10] Copying Info.plist
+[3/10] Write sources
+[3/10] Copying Localizable.xcstrings
+[7/10] Write swift-version--58304C5D6DBC2206.txt
+[9/181] Compiling ViewInspector PreviewModifiers.swift
+[10/181] Compiling ViewInspector SizingModifiers.swift
+[11/181] Compiling ViewInspector TextInputModifiers.swift
+[12/181] Compiling ViewInspector TransformingModifiers.swift
+[13/181] Compiling ViewInspector TransitiveModifiers.swift
+[14/181] Compiling ViewInspector VisualEffectModifiers.swift
+[15/181] Compiling ViewInspector PopupPresenter.swift
+[16/181] Emitting module DesignSystem
+[17/181] Compiling ViewInspector Alert.swift
+[18/181] Compiling ViewInspector AngularGradient.swift
+[19/181] Compiling ViewInspector AnyView.swift
+[20/181] Compiling ViewInspector AsyncImage.swift
+[21/181] Compiling ViewInspector Button.swift
+[22/181] Compiling ViewInspector Canvas.swift
+[23/181] Compiling ViewInspector OptionalContent.swift
+[24/181] Compiling ViewInspector OutlineGroup.swift
+[25/181] Compiling ViewInspector Overlay.swift
+[26/181] Compiling ViewInspector PasteButton.swift
+[27/181] Compiling ViewInspector Picker.swift
+[28/181] Compiling ViewInspector Popover.swift
+[29/181] Compiling ViewInspector PopoverContent.swift
+[30/181] Compiling ViewInspector LazyHStack.swift
+[31/181] Compiling ViewInspector LazyVGrid.swift
+[32/181] Compiling ViewInspector LazyVStack.swift
+[33/181] Compiling ViewInspector LinearGradient.swift
+[34/181] Compiling ViewInspector Link.swift
+[35/181] Compiling ViewInspector List.swift
+[36/181] Compiling ViewInspector BaseTypes.swift
+[37/181] Compiling ViewInspector ContentExtraction.swift
+[38/181] Compiling ViewInspector EnvironmentInjection.swift
+[39/181] Compiling ViewInspector InspectableView+RandomAccessCollection.swift
+[40/181] Compiling ViewInspector InspectableView.swift
+[41/181] Compiling ViewInspector InspectionEmissary.swift
+[42/181] Compiling ViewInspector Inspector.swift
+[43/181] Compiling ViewInspector LazyGroup.swift
+[44/181] Compiling ViewInspector AccessibilityModifiers.swift
+[45/181] Compiling ViewInspector AnimationModifiers.swift
+[46/181] Compiling ViewInspector ConfigurationModifiers.swift
+[47/181] Compiling ViewInspector CustomStyleModifiers.swift
+[48/181] Compiling ViewInspector EnvironmentModifiers.swift
+[49/181] Compiling ViewInspector ClassifiedView.swift
+[50/181] Compiling ViewInspector Color.swift
+[51/181] Compiling ViewInspector ColorPicker.swift
+[52/181] Compiling ViewInspector ConditionalContent.swift
+[53/181] Compiling ViewInspector ConfirmationDialog.swift
+[54/181] Compiling ViewInspector ContentUnavailableView.swift
+[55/181] Compiling ViewInspector ActionSheet.swift
+[56/181] Compiling ViewInspector NavigationDestination.swift
+[57/181] Compiling ViewInspector NavigationLink.swift
+[58/181] Compiling ViewInspector NavigationSplitView.swift
+[59/181] Compiling ViewInspector NavigationStack.swift
+[60/181] Compiling ViewInspector NavigationView.swift
+[61/181] Compiling ViewInspector ControlGroup.swift
+[62/181] Compiling ViewInspector EventsModifiers.swift
+[63/181] Compiling ViewInspector GestureModifiers.swift
+[64/181] Compiling ViewInspector InteractionModifiers.swift
+[65/181] Compiling ViewInspector NavigationBarModifiers.swift
+[66/181] Compiling ViewInspector PositioningModifiers.swift
+[67/187] Compiling DesignSystem SemanticTone.swift
+[68/187] Compiling DesignSystem Spacing.swift
+[69/187] Compiling DesignSystem Typography.swift
+[70/187] Compiling DesignSystem VideoColors.swift
+[71/187] Compiling DesignSystem VisualEffects.swift
+[72/187] Compiling DesignSystem resource_bundle_accessor.swift
+[73/187] Emitting module ViewInspector
+[74/199] Compiling ViewInspector Gesture.swift
+[75/199] Compiling ViewInspector Grid.swift
+[76/199] Compiling ViewInspector Group.swift
+[77/199] Compiling ViewInspector GroupBox.swift
+[78/199] Compiling ViewInspector HSplitView.swift
+[79/199] Compiling ViewInspector HStack.swift
+[80/199] Compiling ViewInspector HelpView.swift
+[81/199] Compiling ViewInspector IDView.swift
+[82/199] Compiling ViewInspector Image.swift
+[83/199] Compiling ViewInspector Label.swift
+[84/199] Compiling ViewInspector LabeledContent.swift
+[85/199] Compiling ViewInspector LazyHGrid.swift
+[99/199] Compiling ViewInspector Spacer.swift
+[100/199] Compiling ViewInspector Stepper.swift
+[101/199] Compiling ViewInspector StyleConfiguration.swift
+[102/199] Compiling ViewInspector SubscriptionView.swift
+[103/199] Compiling ViewInspector TabView.swift
+[104/199] Compiling ViewInspector Text.swift
+[105/199] Compiling ViewInspector TextAttributes.swift
+[106/199] Compiling ViewInspector TextEditor.swift
+[107/199] Compiling ViewInspector TextField.swift
+[108/199] Compiling ViewInspector TimelineView.swift
+[109/199] Compiling ViewInspector Toggle.swift
+[110/199] Compiling ViewInspector Toolbar.swift
+[148/199] Compiling ViewInspector CustomView.swift
+[149/199] Compiling ViewInspector CustomViewModifier.swift
+[150/199] Compiling ViewInspector DatePicker.swift
+[151/199] Compiling ViewInspector DelayedPreferenceView.swift
+[152/199] Compiling ViewInspector DisclosureGroup.swift
+[153/199] Compiling ViewInspector Divider.swift
+[154/199] Compiling ViewInspector EditButton.swift
+[155/199] Compiling ViewInspector EllipticalGradient.swift
+[156/199] Compiling ViewInspector EmptyView.swift
+[157/199] Compiling ViewInspector EquatableView.swift
+[158/199] Compiling ViewInspector ForEach.swift
+[159/199] Compiling ViewInspector Form.swift
+[160/199] Compiling ViewInspector GeometryReader.swift
+[161/199] Compiling ViewInspector ProgressView.swift
+[162/199] Compiling ViewInspector RadialGradient.swift
+[163/199] Compiling ViewInspector SafeAreaInset.swift
+[164/199] Compiling ViewInspector ScrollView.swift
+[165/199] Compiling ViewInspector ScrollViewReader.swift
+[166/199] Compiling ViewInspector Section.swift
+[167/199] Compiling ViewInspector SecureField.swift
+[168/199] Compiling ViewInspector Shape.swift
+[169/199] Compiling ViewInspector ShareLink.swift
+[170/199] Compiling ViewInspector Sheet.swift
+[171/199] Compiling ViewInspector SignInWithAppleButton.swift
+[172/199] Compiling ViewInspector Slider.swift
+[186/199] Compiling ViewInspector TouchBar.swift
+[187/199] Compiling ViewInspector TreeView.swift
+[188/199] Compiling ViewInspector TupleView.swift
+[189/199] Compiling ViewInspector UnaryViewAdaptor.swift
+[190/199] Compiling ViewInspector VSplitView.swift
+[191/199] Compiling ViewInspector VStack.swift
+[192/199] Compiling ViewInspector VideoPlayer.swift
+[193/199] Compiling ViewInspector ViewThatFits.swift
+[194/199] Compiling ViewInspector ZStack.swift
+[195/199] Compiling ViewInspector ViewHosting.swift
+[196/199] Compiling ViewInspector ViewSearch.swift
+[197/199] Compiling ViewInspector ViewSearchIndex.swift
+[198/215] Compiling DesignSystemTests SetReadOnlyCellTests.swift
+[199/215] Compiling DesignSystemTests SpacingTests.swift
+[200/215] Compiling DesignSystemTests ComponentsSmokeTests.swift
+[201/215] Compiling DesignSystemTests DesignSystemDemoTests.swift
+[202/215] Compiling DesignSystemTests LocalizationCatalogTestSupport.swift
+[203/215] Compiling DesignSystemTests MotionTests.swift
+[204/215] Compiling DesignSystemTests AppearanceTests.swift
+[205/215] Compiling DesignSystemTests ColorsTests.swift
+[206/215] Compiling DesignSystemTests NumberPadShortcutTests.swift
+[207/215] Compiling DesignSystemTests PlateBreakdownTests.swift
+[208/215] Emitting module DesignSystemTests
+[209/215] Compiling DesignSystemTests VisualEffectsTests.swift
+[210/215] Compiling DesignSystemTests TraditionalChineseCatalogTests.swift
+[211/215] Compiling DesignSystemTests TypographyTests.swift
+[212/215] Compiling DesignSystemTests PlateLoadoutAccessibilityTests.swift
+[213/215] Compiling DesignSystemTests RadiusTests.swift
+[214/216] Compiling DesignSystemTests W1ContractTests.swift
+[215/218] Compiling DesignSystemPackageTests runner.swift
+[216/218] Emitting module DesignSystemPackageTests
+[216/218] Write Objects.LinkFileList
+[217/218] Linking DesignSystemPackageTests
+Build complete! (17.41s)
+Test Suite 'All tests' started at 2026-10-25 02:44:16.113.
+Test Suite 'All tests' passed at 2026-10-25 02:44:16.115.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite TraditionalChineseCatalogTests started.
+◇ Suite "SetReadOnlyCell" started.
+◇ Suite "MeetPR typography tokens" started.
+◇ Suite "NumberPad snapping" started.
+◇ Suite PlateLoadoutAccessibilityTests started.
+◇ Suite MeetPRAppearanceTests started.
+◇ Suite "Number pad shortcuts" started.
+◇ Suite "Plate breakdown" started.
+◇ Suite "MeetPR spacing tokens" started.
+◇ Suite "MeetPR v3 visual-effect tokens" started.
+◇ Suite "MeetPR component smoke tests" started.
+◇ Suite "Design system demo" started.
+◇ Suite "MeetPR motion tokens" started.
+◇ Suite "MeetPR radius tokens" started.
+◇ Suite "W1 PlateVisual source contracts" started.
+◇ Suite "MeetPR black-gold color tokens" started.
+◇ Suite "W1 v3 component contracts" started.
+◇ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() started.
+◇ Test "zero-based first set renders hash one" started.
+◇ Test "Reps snap to whole values within bounds" started.
+◇ Test "PostScript names match inspected font assets" started.
+◇ Test "font sizes match the complete mockup type scale" started.
+◇ Test "Weight snaps by quarter kilo within bounds" started.
+◇ Test "Accessory weight floor of 0 allows sub-20 loads" started.
+◇ Test "tracking values match the black-gold labels" started.
+◇ Test "Next and sync forward the untouched value" started.
+◇ Test "missing custom font resolves to the system fallback branch" started.
+◇ Test systemFollowsDeviceAppearance() started.
+◇ Test defaultPreferenceIsLight() started.
+◇ Test "Typed keypad decimal replaces the localized placeholder" started.
+◇ Test "Accessibility text matches empty, collar-only, and loaded branches" started.
+◇ Test explicitCasesPinTheirScheme() started.
+◇ Test "Collars subtract 2.5kg per side without changing plate rules" started.
+◇ Test "spacing values match the 4pt black-gold grid" started.
+◇ Test unknownStoredValueFallsBackToSystem() started.
+◇ Test "PRBadge instantiates" started.
+◇ Test "demo catalog instantiates" started.
+◇ Test "Untouched localized weight keeps its original value" started.
+◇ Test "headline emboss preserves both theme recipes" started.
+◇ Test "20kg is an empty bar" started.
+◇ Test "175kg greedily loads three 25s and a 2.5 per side" started.
+◇ Test "surviving curves match feedback and reward transitions" started.
+◇ Test "RPESlider instantiates" started.
+◇ Test "roll-up haptics preserve the mockup's vibrate pattern" started.
+◇ Test "MeetPRTabBar preserves student defaults and supports a coach palette" started.
+◇ Test "Every 0.25kg input uses valid descending denominations" started.
+◇ Test "CTA molds preserve every CSS shadow layer" started.
+◇ Test "20kg and 500kg boundaries are clamped" started.
+◇ Test "MeetPRListRow instantiates" started.
+◇ Test "timing values match the interactive dark mockup" started.
+◇ Test "celebration sparks are eighteen particles staggered in six lanes" started.
+◇ Test labelsAreStable() started.
+◇ Test "ElevatedCard instantiates" started.
+◇ Test "Untouched accessory weight and RPE keep their decimals" started.
+◇ Test "BrandPrimaryButton instantiates" started.
+◇ Test "NumericInput instantiates" started.
+◇ Test "InitialAvatar instantiates" started.
+◇ Test "GoldCTA instantiates all variants" started.
+◇ Test collarOnlyLoadStillAnnouncesCollar() started.
+◇ Test "SecondaryButton instantiates" started.
+◇ Test "ExerciseCard instantiates" started.
+◇ Test "PrimaryButton instantiates" started.
+◇ Test "MeetPRTextField instantiates" started.
+◇ Test "weight unit exposes both supported cases" started.
+◇ Test "IconButton instantiates" started.
+◇ Test labelIncludesCollarOnlyWhenShown() started.
+◇ Test "Eyebrow instantiates" started.
+◇ Test "DangerButton instantiates" started.
+◇ Test "SetRow instantiates" started.
+◇ Test "Card instantiates" started.
+◇ Test "StatusBadge instantiates" started.
+◇ Test "roll-up keyframes match the mockup's WAAPI segments" started.
+◇ Test "Plate and steel gradient locations match source" started.
+◇ Test case passing 1 argument title → "Next" to "Next and sync forward the untouched value" started.
+◇ Test case passing 1 argument title → "Sync" to "Next and sync forward the untouched value" started.
+◇ Test "StatTile instantiates" started.
+◇ Test case passing 1 argument localeIdentifier → "de_DE" to "Typed keypad decimal replaces the localized placeholder" started.
+◇ Test "mockup shell tokens match both v3 themes" started.
+◇ Test "radius values match the six-step v3 scale" started.
+◇ Test "SetRow and GoldCTA SVG metrics match dc source" started.
+◇ Test "text tokens match both v3 themes" started.
+◇ Test "semantic tokens match both v3 themes" started.
+◇ Test case passing 1 argument localeIdentifier → "fr_FR" to "Typed keypad decimal replaces the localized placeholder" started.
+◇ Test "border tokens match both v3 themes" started.
+◇ Test case passing 1 argument localeIdentifier → "de_DE" to "Untouched localized weight keeps its original value" started.
+◇ Test case passing 1 argument localeIdentifier → "fr_FR" to "Untouched localized weight keeps its original value" started.
+◇ Test "ExerciseCard summary includes failed-set suffix" started.
+◇ Test "English count-sensitive copy has singular variants" started.
+◇ Test "gold tokens match both v3 themes" started.
+◇ Test "Frozen W0 entries retain legacy parameters" started.
+◇ Test "ExerciseCard collapsed source and canonical radius are locked" started.
+◇ Test "CTA and shadow tokens match both v3 themes" started.
+◇ Test "surface tokens match both v3 themes" started.
+◇ Test "StatTile accepts String, Double, and Int values" started.
+◇ Test "Product/presentation defaults are mapped without data defaults" started.
+◇ Test "ExerciseCard partial recorded sets still produce a receipt" started.
+◇ Test "SE_SPEC and SE_DIM tables are complete" started.
+◇ Test case passing 1 argument localeIdentifier → "de_DE" to "Untouched accessory weight and RPE keep their decimals" started.
+◇ Test case passing 1 argument localeIdentifier → "fr_FR" to "Untouched accessory weight and RPE keep their decimals" started.
+✔ Test defaultPreferenceIsLight() passed after 0.001 seconds.
+✔ Test "spacing values match the 4pt black-gold grid" passed after 0.001 seconds.
+✔ Test "tracking values match the black-gold labels" passed after 0.001 seconds.
+✔ Test "missing custom font resolves to the system fallback branch" passed after 0.001 seconds.
+✔ Test explicitCasesPinTheirScheme() passed after 0.001 seconds.
+✔ Test unknownStoredValueFallsBackToSystem() passed after 0.001 seconds.
+✔ Test "PostScript names match inspected font assets" passed after 0.001 seconds.
+✔ Test "Collars subtract 2.5kg per side without changing plate rules" passed after 0.001 seconds.
+✔ Test systemFollowsDeviceAppearance() passed after 0.001 seconds.
+✔ Test "font sizes match the complete mockup type scale" passed after 0.001 seconds.
+✔ Test "surviving curves match feedback and reward transitions" passed after 0.001 seconds.
+✔ Test "headline emboss preserves both theme recipes" passed after 0.004 seconds.
+✔ Test "175kg greedily loads three 25s and a 2.5 per side" passed after 0.004 seconds.
+✔ Test "20kg is an empty bar" passed after 0.004 seconds.
+✔ Test "20kg and 500kg boundaries are clamped" passed after 0.004 seconds.
+✔ Test "roll-up haptics preserve the mockup's vibrate pattern" passed after 0.004 seconds.
+✔ Test "timing values match the interactive dark mockup" passed after 0.004 seconds.
+✔ Test "celebration sparks are eighteen particles staggered in six lanes" passed after 0.004 seconds.
+✔ Test "CTA molds preserve every CSS shadow layer" passed after 0.004 seconds.
+✔ Test "Reps snap to whole values within bounds" passed after 0.005 seconds.
+✔ Test "Accessory weight floor of 0 allows sub-20 loads" passed after 0.005 seconds.
+✔ Test "Weight snaps by quarter kilo within bounds" passed after 0.005 seconds.
+✔ Test "radius values match the six-step v3 scale" passed after 0.004 seconds.
+✔ Test "Plate and steel gradient locations match source" passed after 0.004 seconds.
+✔ Test "roll-up keyframes match the mockup's WAAPI segments" passed after 0.004 seconds.
+✔ Test labelsAreStable() passed after 0.005 seconds.
+✔ Test "SE_SPEC and SE_DIM tables are complete" passed after 0.004 seconds.
+✔ Suite "MeetPR typography tokens" passed after 0.005 seconds.
+✔ Suite "MeetPR spacing tokens" passed after 0.005 seconds.
+✔ Suite "MeetPR motion tokens" passed after 0.005 seconds.
+✔ Suite "MeetPR v3 visual-effect tokens" passed after 0.005 seconds.
+✔ Suite "NumberPad snapping" passed after 0.005 seconds.
+✔ Suite "MeetPR radius tokens" passed after 0.005 seconds.
+✔ Suite "W1 PlateVisual source contracts" passed after 0.005 seconds.
+✔ Suite MeetPRAppearanceTests passed after 0.005 seconds.
+✔ Test "Accessibility text matches empty, collar-only, and loaded branches" passed after 0.005 seconds.
+✔ Test "Every 0.25kg input uses valid descending denominations" passed after 0.019 seconds.
+✔ Suite "Plate breakdown" passed after 0.019 seconds.
+✔ Test "mockup shell tokens match both v3 themes" passed after 0.029 seconds.
+✔ Test "CTA and shadow tokens match both v3 themes" passed after 0.029 seconds.
+✔ Test "border tokens match both v3 themes" passed after 0.029 seconds.
+✔ Test "surface tokens match both v3 themes" passed after 0.029 seconds.
+✔ Test "gold tokens match both v3 themes" passed after 0.029 seconds.
+✔ Test "text tokens match both v3 themes" passed after 0.029 seconds.
+✔ Test "semantic tokens match both v3 themes" passed after 0.029 seconds.
+✔ Suite "MeetPR black-gold color tokens" passed after 0.030 seconds.
+✔ Test "zero-based first set renders hash one" passed after 0.049 seconds.
+✔ Suite "SetReadOnlyCell" passed after 0.049 seconds.
+✔ Test "Next and sync forward the untouched value" with 2 test cases passed after 0.049 seconds.
+✔ Test "PRBadge instantiates" passed after 0.051 seconds.
+✔ Test "RPESlider instantiates" passed after 0.051 seconds.
+✔ Test "MeetPRListRow instantiates" passed after 0.050 seconds.
+✔ Test "demo catalog instantiates" passed after 0.051 seconds.
+✔ Test "Typed keypad decimal replaces the localized placeholder" with 2 test cases passed after 0.051 seconds.
+✔ Test "ElevatedCard instantiates" passed after 0.050 seconds.
+✔ Test "Untouched accessory weight and RPE keep their decimals" with 2 test cases passed after 0.050 seconds.
+✔ Test "SecondaryButton instantiates" passed after 0.050 seconds.
+✔ Test "Untouched localized weight keeps its original value" with 2 test cases passed after 0.051 seconds.
+✔ Test collarOnlyLoadStillAnnouncesCollar() passed after 0.050 seconds.
+✔ Test "BrandPrimaryButton instantiates" passed after 0.051 seconds.
+✔ Test "PrimaryButton instantiates" passed after 0.050 seconds.
+✔ Test "weight unit exposes both supported cases" passed after 0.050 seconds.
+✔ Test "MeetPRTabBar preserves student defaults and supports a coach palette" passed after 0.051 seconds.
+✔ Test labelIncludesCollarOnlyWhenShown() passed after 0.050 seconds.
+✔ Test "IconButton instantiates" passed after 0.050 seconds.
+✔ Test "DangerButton instantiates" passed after 0.050 seconds.
+✔ Test "Eyebrow instantiates" passed after 0.050 seconds.
+✔ Test "SetRow instantiates" passed after 0.050 seconds.
+✔ Test "StatTile instantiates" passed after 0.050 seconds.
+✔ Test "Card instantiates" passed after 0.050 seconds.
+✔ Test "GoldCTA instantiates all variants" passed after 0.050 seconds.
+✔ Test "SetRow and GoldCTA SVG metrics match dc source" passed after 0.050 seconds.
+✔ Test "StatusBadge instantiates" passed after 0.050 seconds.
+✔ Test "Frozen W0 entries retain legacy parameters" passed after 0.050 seconds.
+✔ Test "MeetPRTextField instantiates" passed after 0.050 seconds.
+✔ Test "ExerciseCard summary includes failed-set suffix" passed after 0.050 seconds.
+✔ Test "InitialAvatar instantiates" passed after 0.050 seconds.
+✔ Test "NumericInput instantiates" passed after 0.051 seconds.
+✔ Test "StatTile accepts String, Double, and Int values" passed after 0.050 seconds.
+✔ Test "Product/presentation defaults are mapped without data defaults" passed after 0.050 seconds.
+✔ Test "ExerciseCard collapsed source and canonical radius are locked" passed after 0.050 seconds.
+✔ Test "English count-sensitive copy has singular variants" passed after 0.050 seconds.
+✔ Test "ExerciseCard instantiates" passed after 0.050 seconds.
+✔ Test "ExerciseCard partial recorded sets still produce a receipt" passed after 0.050 seconds.
+✔ Suite "Design system demo" passed after 0.051 seconds.
+✔ Suite PlateLoadoutAccessibilityTests passed after 0.051 seconds.
+✔ Suite "W1 v3 component contracts" passed after 0.051 seconds.
+✔ Suite "Number pad shortcuts" passed after 0.051 seconds.
+✔ Suite "MeetPR component smoke tests" passed after 0.051 seconds.
+✔ Test everyCatalogPreservesTraditionalChineseStructureAndPlaceholders() passed after 0.055 seconds.
+✔ Suite TraditionalChineseCatalogTests passed after 0.055 seconds.
+✔ Test run with 74 tests in 17 suites passed after 0.055 seconds.

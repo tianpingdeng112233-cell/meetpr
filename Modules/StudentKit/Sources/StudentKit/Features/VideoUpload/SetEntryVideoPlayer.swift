@@ -6,6 +6,11 @@ import Observation
 @MainActor @Observable
 final class SetEntryVideoPlayer {
   let state = SetEntryVideoPlaybackState()
+  private let preservesPlaybackIntentOnFailure: Bool
+
+  init(preservesPlaybackIntentOnFailure: Bool = false) {
+    self.preservesPlaybackIntentOnFailure = preservesPlaybackIntentOnFailure
+  }
   private(set) var player: AVPlayer?
   private(set) var attachmentID: UUID?
   private(set) var hasError = false
@@ -131,7 +136,9 @@ final class SetEntryVideoPlayer {
     hasError = item.status == .failed
     state.updateDuration(item.duration.seconds)
     if !isSeeking { state.seek(to: player.currentTime().seconds) }
-    if hasError || (state.duration > 0 && state.position >= state.duration) {
+    if (hasError && !preservesPlaybackIntentOnFailure)
+      || (state.duration > 0 && state.position >= state.duration)
+    {
       state.pause()
     }
   }

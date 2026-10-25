@@ -7,6 +7,7 @@ import SwiftUI
 struct AllHistoryScreen: View {
   let viewModel: TrainingHistoryViewModel
   let studentID: UUID
+  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
   @State private var selectedExerciseName: String?
 
   var body: some View {
@@ -58,6 +59,11 @@ struct AllHistoryScreen: View {
     #endif
     .task {
       await viewModel.load(studentID: studentID)
+      await replay?.load(studentID: studentID)
+    }
+    .refreshable {
+      await viewModel.load(studentID: studentID)
+      await replay?.load(studentID: studentID)
     }
   }
 }

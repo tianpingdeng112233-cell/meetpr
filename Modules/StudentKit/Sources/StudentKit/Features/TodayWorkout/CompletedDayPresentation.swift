@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import Foundation
 
@@ -11,6 +12,7 @@ struct CompletedDayPresentation: Equatable, Sendable {
     let prescribedCount: Int
     let loggedCount: Int
     let rows: [Row]
+    let reservesVideoSpace: Bool
 
     var isComplete: Bool { isAdded || (prescribedCount > 0 && loggedCount == prescribedCount) }
 
@@ -27,12 +29,26 @@ struct CompletedDayPresentation: Equatable, Sendable {
   struct Row: Equatable, Sendable, Identifiable {
     let id: UUID
     let number: Int
+    let setLogID: UUID?
     let isExtra: Bool
     let failed: Bool
     let result: String
+    let video: CompletedSetVideo?
+    let badge: VideoBadgeInfo
 
-    init(draft: TodayWorkoutSetRowDraft, unit: UnitPreference) {
+    init(
+      draft: TodayWorkoutSetRowDraft, unit: UnitPreference, videos: [StudentVideo],
+      local: [VideoAttachment]
+    ) {
+      video = CompletedSetVideo.resolve(setLogID: draft.loggedSetID, videos: videos, local: local)
+      badge = VideoBadgeInfo(
+        exerciseName: draft.displayExerciseName,
+        weightKg: draft.actualWeight.map { NSDecimalNumber(decimal: $0).doubleValue },
+        reps: draft.actualReps,
+        rpe: draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue },
+        setOrdinal: draft.prescribed.setIndex + 1)
       id = draft.id
+      setLogID = draft.loggedSetID
       number = draft.prescribed.setIndex + 1
       isExtra = draft.isExtra
       failed = draft.failed
@@ -51,15 +67,19 @@ struct CompletedDayPresentation: Equatable, Sendable {
 
   init(
     presentation: TodayWorkoutPresentation, addedDrafts: [TodayWorkoutSetRowDraft],
-    unit: UnitPreference
+    unit: UnitPreference, videos: [StudentVideo] = [], local: [VideoAttachment] = []
   ) {
     var groups = presentation.exercises.map { exercise in
-      Exercise(
+      let rows = exercise.rows
+        .filter { !$0.draft.isExtra || $0.draft.completed || $0.draft.failed }
+        .map { Row(draft: $0.draft, unit: unit, videos: videos, local: local) }
+      return Exercise(
         id: exercise.id, name: exercise.name, number: exercise.stableIndex + 1,
         isAdded: false, prescribedCount: exercise.prescribedRows.count,
         loggedCount: exercise.prescribedRows.count { $0.draft.completed || $0.draft.failed },
-        rows: exercise.rows.filter { !$0.draft.isExtra || $0.draft.completed || $0.draft.failed }
-          .map { Row(draft: $0.draft, unit: unit) })
+        rows: rows,
+        reservesVideoSpace: TrainingHistoryVideoPresentation.reservesVideoSpace(
+          setLogIDs: rows.map(\.setLogID), videos: videos, local: local))
     }
     var seen: Set<UUID> = []
     for draft in addedDrafts where draft.isStudentAdded && seen.insert(draft.exerciseID).inserted {
@@ -69,7 +89,9 @@ struct CompletedDayPresentation: Equatable, Sendable {
           id: draft.exerciseID, name: draft.displayExerciseName, number: groups.count + 1,
           isAdded: true, prescribedCount: 0,
           loggedCount: rows.count { $0.completed || $0.failed },
-          rows: rows.map { Row(draft: $0, unit: unit) }))
+          rows: rows.map { Row(draft: $0, unit: unit, videos: videos, local: local) },
+          reservesVideoSpace: TrainingHistoryVideoPresentation.reservesVideoSpace(
+            setLogIDs: rows.map(\.loggedSetID), videos: videos, local: local)))
     }
     exercises = groups
   }
