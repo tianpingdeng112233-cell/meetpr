@@ -1,0 +1,75 @@
+--- MeetPR/Sources/MeetPRApp.swift
++++ MeetPR/Sources/MeetPRApp.swift
+@@ -136,7 +136,7 @@
+       // Seed the student projection so the demo shows a real plan (today/week)
+       // without a coach publish round-trip.
+       let planStore = InMemoryPlanStore(
+-        seed: studentState.plan.map { [StudentDemoSeed.studentID: $0] } ?? [:])
++        seed: firstRunEvidencePlan(studentState.plan).map { [StudentDemoSeed.studentID: $0] } ?? [:])
+       let chat = makeDemoChatDependencies(
+         user: demoUser,
+         draftStore: draftStore,
+@@ -153,6 +153,29 @@
+         ),
+         session: chat.session
+       )
++    }
++
++    // Temporary spec095 evidence injection; removed after simulator capture.
++    private static func firstRunEvidencePlan(_ plan: StudentPlanView?) -> StudentPlanView? {
++      guard ProcessInfo.processInfo.arguments.contains("-spec095-first-run"), let plan else { return plan }
++      return StudentPlanView(
++        cycleID: plan.cycleID, weekIndex: plan.weekIndex, startDate: plan.startDate,
++        endDate: plan.endDate, days: plan.days.map {
++          StudentPlanDay(id: $0.id, weekNumber: $0.weekNumber, dayOfWeek: $0.dayOfWeek,
++            sortOrder: $0.sortOrder, date: $0.date, exercises: $0.exercises)
++        })
++    }
++
++    private static func firstRunEvidenceRequest(_ plan: StudentPlanView?) -> BindRequest {
++      let old = StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
++      guard ProcessInfo.processInfo.arguments.contains("-spec095-first-run") else { return old }
++      return BindRequest(
++        id: UUID(), studentId: old.studentId, coachId: old.coachId,
++        coachDisplayName: "王教练", status: .accepted, submittedAt: Date(),
++        respondedAt: Date(), expiredAt: Date(), firstRun: .init(
++          bindingPlanCount: plan == nil ? 0 : 1, hasSettledDay: false,
++          firstPlan: plan.map { .init(id: $0.cycleID, publishedAt: Date(), planWeeks: 2,
++            dayCount: $0.days.count, hasSettledDay: false) }))
+     }
+
+     private static func makeDemoRootView(
+@@ -202,7 +225,7 @@
+             ]
+             : [:],
+           seed: ProcessInfo.processInfo.arguments.contains("-spec085-onboarding")
+-            ? nil : StudentDemoSeed.makeAcceptedBindRequest(studentID: StudentDemoSeed.studentID)
++            ? nil : firstRunEvidenceRequest(studentState.plan)
+         ),
+         studentOnboarding: InMemoryOnboardingRepository(
+           studentId: StudentDemoSeed.studentID,
+--- Modules/AppShell/Sources/AppShell/RootView+Push.swift
++++ Modules/AppShell/Sources/AppShell/RootView+Push.swift
+@@ -1,11 +1,21 @@
+ import CoreModels
+ import StudentKit
+ import SwiftUI
++#if os(iOS)
++import UserNotifications
++#endif
+
+ @available(iOS 17.0, macOS 14.0, *)
+ extension RootView {
+   var studentNotificationPermissionActions: StudentNotificationPermissionActions {
+-    StudentNotificationPermissionActions(
++    #if os(iOS)
++    if ProcessInfo.processInfo.arguments.contains("-spec095-first-run") {
++      return StudentNotificationPermissionActions(
++        canRequest: { await UNUserNotificationCenter.current().notificationSettings().authorizationStatus == .notDetermined },
++        request: { try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) })
++    }
++    #endif
++    return StudentNotificationPermissionActions(
+       canRequest: { await pushRegistrar?.canRequestNotificationPermission() ?? false },
+       request: { await pushRegistrar?.requestNotificationPermission() }
+     )

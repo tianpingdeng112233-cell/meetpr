@@ -3,6 +3,11 @@ import Testing
 
 @testable import CoreModels
 
+@Test func bindAcceptedPushRequestsAnAuthoritativeBindingRefresh() {
+  #expect(PushPayloadParser.route(from: PushPayloadValues(kind: "bind_accepted")) == .bindAccepted)
+  #expect(PushForegroundPresentation.policy(for: "bind_accepted") == .bannerAndSound)
+}
+
 @Test func parsesAllSupportedPushRoutes() throws {
   let conversationID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
   let studentID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000002"))

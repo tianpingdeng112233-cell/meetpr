@@ -5,6 +5,19 @@ import Testing
 @testable import AppShell
 
 @MainActor
+@Test func bindAcceptedPushRefreshesTheGateEvenBeforeAuthentication() {
+  let registrar = PushRegistrar(
+    authorizationStatusProvider: { .allowed }, authorizationRequester: { true },
+    remoteRegistration: {}, accessTokenProvider: { "access" }, tokenUploader: { _, _ in }
+  )
+  registrar.receiveNotificationPayload(PushPayloadValues(kind: "bind_accepted"))
+  #expect(registrar.bindingRefreshRevision == 1)
+  #expect(registrar.pendingRoute == nil)
+  registrar.receiveNotificationPayload(PushPayloadValues(kind: "bind_accepted"))
+  #expect(registrar.bindingRefreshRevision == 2)
+}
+
+@MainActor
 @available(iOS 17.0, macOS 14.0, *)
 @Test func staleUploadFromPreviousSessionAlwaysLandsBeforeTheCurrentOnes() async {
   let uploader = PushUploadRecorder()

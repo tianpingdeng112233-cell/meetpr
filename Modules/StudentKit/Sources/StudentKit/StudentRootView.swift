@@ -235,7 +235,9 @@ extension StudentRootView {
           todayRefreshThrottle.recordFullRefresh(at: Date())
         },
         onPlanChanged: propagatePlanProjection,
-        pushedConversationID: pushedConversationIDBinding
+        pushedConversationID: pushedConversationIDBinding,
+        onOpenProfile: { selectedTab = .profile },
+        isVisible: selectedTab == .today
       )
       .studentTabLayer(shell.layer(for: .today), store: tabHostStore)
 
@@ -443,7 +445,7 @@ extension StudentRootView {
         trainingPlanRefreshTrigger.handlePushRoute(route)
       }
       openPlanNotification()
-    case .missedTraining, .prCongrats, .videoPending, .bindRequest, .planShift:
+    case .missedTraining, .prCongrats, .videoPending, .bindRequest, .bindAccepted, .planShift:
       pushRoute = nil
     }
   }

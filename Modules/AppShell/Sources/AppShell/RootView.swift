@@ -170,9 +170,7 @@ public struct RootView: View {
         studentEntry(for: user)
       }
     }
-    .onAppear {
-      pushRegistrar?.authenticatedRootDidAppear()
-    }
+    .onAppear { pushRegistrar?.authenticatedRootDidAppear(role: user.role) }
   }
 
   static func authenticatedDestination(for role: UserRole) -> AuthenticatedDestination {
@@ -264,6 +262,8 @@ extension RootView {
       bind: studentBind,
       stash: pendingBindStore,
       evaluations: studentEvaluations,
+      notificationPermission: studentNotificationPermissionActions,
+      bindingRefreshRevision: pushRegistrar?.bindingRefreshRevision ?? 0,
       isOnboardingComplete: {
         // Fetch failure reads as "incomplete" (`try?` flattens the error and
         // the 404 into nil): worst case is one extra trip through the wizard

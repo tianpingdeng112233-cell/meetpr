@@ -35,6 +35,8 @@ public struct BindGateView<
   /// Pre-bind pages are outside the 5 tabs, so without this the account is
   /// trapped (no way back to login). nil hides the affordance (demo).
   private let onLogout: (@MainActor () async -> Void)?
+  private let notificationPermission: StudentNotificationPermissionActions
+  private let bindingRefreshRevision: Int
   private let onboardingFlow: OnboardingFlowBuilder
   private let evaluationFlow: EvaluationFlowBuilder
   private let content: MainContentBuilder
@@ -44,6 +46,8 @@ public struct BindGateView<
     bind: any BindRepository,
     stash: any PendingBindCodeStoring,
     evaluations: (any EvaluationRepository)? = nil,
+    notificationPermission: StudentNotificationPermissionActions = .init(),
+    bindingRefreshRevision: Int = 0,
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
     onboardingProfile: @escaping @Sendable () async -> OnboardingProfile? = { nil },
     onLogout: (@MainActor () async -> Void)? = nil,
@@ -61,6 +65,8 @@ public struct BindGateView<
     self.isOnboardingComplete = isOnboardingComplete
     self.onboardingProfile = onboardingProfile
     self.onLogout = onLogout
+    self.notificationPermission = notificationPermission
+    self.bindingRefreshRevision = bindingRefreshRevision
     self.onboardingFlow = onboardingFlow
     self.evaluationFlow = evaluationFlow
     self.content = content
@@ -78,8 +84,8 @@ public struct BindGateView<
 
   public var body: some View {
     gateBody
-      .task {
-        if viewModel.state == .loading {
+      .task(id: bindingRefreshRevision) {
+        if viewModel.state == .loading || bindingRefreshRevision > 0 {
           await viewModel.load()
         }
       }
@@ -88,7 +94,7 @@ public struct BindGateView<
         // latter is how server-side unbinds and coach changes are discovered.
         guard newPhase == .active else { return }
         switch viewModel.state {
-        case .pendingAcceptance, .bound:
+        case .pendingAcceptance, .bound, .welcome:
           Task { await viewModel.refresh() }
         case .loading, .needsCode, .needsOnboarding, .evaluationActive, .failed:
           break
@@ -134,20 +140,32 @@ public struct BindGateView<
           request: request,
           bind: bind,
           onboardingProfile: onboardingProfile,
+          notificationPermission: notificationPermission,
           onCancelled: { viewModel.handleCancelled() },
           onStateMayHaveChanged: { await viewModel.refresh() }
         )
       )
+      .task(id: scenePhase) {
+        guard scenePhase == .active else { return }
+        await viewModel.pollPendingAcceptance()
+      }
     case .evaluationActive(_, let evaluation):
       evaluationFlow(evaluation) {
         // Coach completed the evaluation → reconverge to .bound (5 tabs).
         await viewModel.load()
       }
+    case .welcome(let request):
+      BindWelcomeView(request: request, permission: notificationPermission) {
+        viewModel.continueFromWelcome()
+      }
+      .id(request.id)
     case .bound(let request):
       content(
         ActiveCoachContext(bindRequest: request),
         { await viewModel.refresh() }
       )
+      .environment(\.bindFirstRun, viewModel.firstRun)
+      .environment(\.refreshBindFirstRun, { await viewModel.refreshFirstRun() })
     case .failed:
       withLogoutCorner(failedView)
     }
@@ -240,6 +258,7 @@ private struct PendingBindStateView: View {
   let request: BindRequest
   let bind: any BindRepository
   let onboardingProfile: @Sendable () async -> OnboardingProfile?
+  let notificationPermission: StudentNotificationPermissionActions
   let onCancelled: () -> Void
   let onStateMayHaveChanged: () async -> Void
   @State private var materials: PendingMaterialsSummary?
@@ -249,6 +268,7 @@ private struct PendingBindStateView: View {
       request: request,
       materialsSummary: materials,
       bind: bind,
+      notificationPermission: notificationPermission,
       onCancelled: onCancelled,
       onStateMayHaveChanged: onStateMayHaveChanged
     )

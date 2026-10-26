@@ -1,7 +1,48 @@
+import CoreModels
 import Foundation
 import Testing
 
 @testable import AppShell
+
+@Test(arguments: [UserRole.coach, .selfTrainStudent])
+func otherRolesStillRequestNotificationPermissionOnActivation(role: UserRole) {
+  var state = PushRegistrationStateMachine()
+  _ = state.beginAuthenticatedSession(role: role)
+  #expect(state.actionsForActivation(authorization: .notDetermined) == [.requestAuthorization])
+  #expect(state.actionsForActivation(authorization: .notDetermined).isEmpty)
+}
+
+@Test func authorizedCoachedStudentStillRegistersAndUploadsDeviceToken() throws {
+  var state = PushRegistrationStateMachine()
+  _ = state.beginAuthenticatedSession(role: .coachedStudent)
+  #expect(state.actionsForActivation(authorization: .allowed) == [.registerForRemoteNotifications])
+  let action = try #require(state.receivedDeviceToken("00ff").first)
+  guard case .upload(let key) = action else {
+    Issue.record("Expected authorized student's device token upload")
+    return
+  }
+  #expect(key.token == "00ff")
+}
+
+@Test func reminderCannotRequestWithoutAnAuthenticatedSession() {
+  var state = PushRegistrationStateMachine()
+  #expect(state.actionsForReminder(authorization: .notDetermined).isEmpty)
+}
+
+@Test func coachedStudentWaitsForAnExplicitNotificationRequest() {
+  var state = PushRegistrationStateMachine()
+  _ = state.beginAuthenticatedSession(role: .coachedStudent)
+  #expect(state.actionsForActivation(authorization: .notDetermined).isEmpty)
+}
+
+@Test func coachedStudentCanRequestNotificationsOnceFromAReminderButton() {
+  var state = PushRegistrationStateMachine()
+  _ = state.beginAuthenticatedSession(role: .coachedStudent)
+  #expect(state.actionsForReminder(authorization: .notDetermined) == [.requestAuthorization])
+  #expect(state.actionsForReminder(authorization: .notDetermined).isEmpty)
+  #expect(state.authorizationResolved(granted: true) == [.registerForRemoteNotifications])
+  #expect(state.actionsForReminder(authorization: .denied).isEmpty)
+}
 
 @Test func deniedAuthorizationDoesNotRequestAgain() {
   var state = PushRegistrationStateMachine()
