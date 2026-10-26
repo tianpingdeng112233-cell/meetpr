@@ -28,6 +28,7 @@ first_run: null | {
 - `status != accepted` 时 `first_run = null`。
 - 候选计划（同教练、同学员、非 draft）中只要有 `published_at` 为空的，返回 `first_run = null`（判定不了，宁可不出新东西）。
 - 「已结算」按现有 plan_days 的结算字段（与学员端 `completed_at` 同源）。
+- `first_plan` 只在第一份计划当前 `status = published` 时返回，否则为 null（学员端打不开暂停/已完成的计划，避免「开始 W1D1」打不开）。`binding_plan_count` 与顶层 `has_settled_day` 不受影响。（2026-10-26 收货补）
 
 ## 客户端规则（替换 SPEC「判定口径」里依赖客户端拉计划的做法）
 
