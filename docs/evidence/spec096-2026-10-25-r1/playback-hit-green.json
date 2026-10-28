@@ -1,0 +1,46 @@
+{
+  "summary": [
+    {
+      "requested": 1,
+      "actual": "e119|text|text|深蹲 · 第 1 组 · 142.5kg × 5 · RPE 7.5||",
+      "action": {
+        "type": "tap",
+        "elementRef": "e86",
+        "x": 342,
+        "y": 429
+      }
+    },
+    {
+      "requested": 2,
+      "actual": "e116|text|text|深蹲 · 第 2 组 · 142.5kg × 5 · RPE 7.5||",
+      "action": {
+        "type": "tap",
+        "elementRef": "e90",
+        "x": 342,
+        "y": 450
+      }
+    }
+  ],
+  "history": [
+    {
+      "requested": 1,
+      "actual": "e180|text|text|深蹲 · 第 1 组 · 142.5kg × 5 · RPE 7.5||",
+      "action": {
+        "type": "tap",
+        "elementRef": "e44",
+        "x": 367,
+        "y": 495
+      }
+    },
+    {
+      "requested": 2,
+      "actual": "e177|text|text|深蹲 · 第 2 组 · 142.5kg × 5 · RPE 7.5||",
+      "action": {
+        "type": "tap",
+        "elementRef": "e47",
+        "x": 367,
+        "y": 517
+      }
+    }
+  ]
+}

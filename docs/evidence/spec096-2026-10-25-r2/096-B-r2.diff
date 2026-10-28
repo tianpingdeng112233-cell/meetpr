@@ -1,0 +1,71 @@
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideoButton.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideoButton.swift
+@@ -15,13 +15,13 @@
+       Text(verbatim: " ")
+         .hidden()
+         .accessibilityHidden(true)
+-        .frame(width: MeetPRSpacing.point22)
++        .frame(width: MeetPRFontMetrics.size18)
+         .overlay {
+           if let video {
+             playbackButton(video)
+           } else if let upload {
+             SetVideoUploadIndicator(
+-              status: upload.status, progress: 0, size: MeetPRFontMetrics.size22)
++              status: upload.status, progress: 0, size: MeetPRFontMetrics.size18)
+           }
+         }
+     }
+@@ -32,7 +32,7 @@
+       onPlay(video)
+     } label: {
+       Image(systemName: "play.circle")
+-        .font(.MeetPR.system(size: MeetPRFontMetrics.size22, weight: .light))
++        .font(.MeetPR.system(size: MeetPRFontMetrics.size18, weight: .light))
+         .foregroundStyle(Color.MeetPR.completedVideoPlay)
+         .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
+         .contentShape(.rect)
+--- a/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/CompletedVideoLayoutTests.swift
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/CompletedVideoLayoutTests.swift
+@@ -4,16 +4,22 @@
+   import DesignSystem
+   import SwiftUI
+   import Testing
++  import ViewInspector
+
+   @testable import StudentKit
+
+   @MainActor
+   struct CompletedVideoLayoutTests {
+-    @Test func playbackAndUploadKeepTheOriginalTextRowHeight() {
++    @Test func playbackAndUploadUseEighteenPointsAndKeepTheOriginalTextRowHeight() throws {
+       let reference = size(Text("100 kg × 5").font(.MeetPR.mono(size: 13)))
+       let playback = CompletedSetVideoButton(video: .remote(UUID()), upload: nil, number: 1) { _ in
+       }
+       #expect(size(playback.font(.MeetPR.mono(size: 13))).height == reference.height)
++      #expect(size(playback).width == 18)
++      let playbackImage = try playback.inspect().find(ViewType.Image.self)
++      #expect(try playbackImage.font() == Font.MeetPR.system(size: 18, weight: .light))
++      #expect(try playbackImage.fixedFrame().width == 44)
++      #expect(try playbackImage.fixedFrame().height == 44)
+       for status in [VideoAttachment.Status.pending, .uploading, .failed] {
+         let upload = VideoAttachment(
+           id: UUID(), setLogID: UUID(), studentID: UUID(), status: status,
+@@ -21,6 +27,8 @@
+           localFileName: "clip.mp4", recordedAt: .now)
+         let indicator = CompletedSetVideoButton(video: nil, upload: upload, number: 1) { _ in }
+         #expect(size(indicator.font(.MeetPR.mono(size: 13))).height == reference.height)
++        #expect(size(indicator).width == 18)
++        #expect(try indicator.inspect().find(ViewType.Image.self).font() == Font.system(size: 18))
+       }
+     }
+
+@@ -31,7 +39,7 @@
+         HistorySetRow(
+           label: "1", result: "100 kg × 5", completed: true, reservesVideoSpace: true))
+       #expect(reserved.height == original.height)
+-      #expect(abs(reserved.width - original.width - 30) < 0.01)
++      #expect(abs(reserved.width - original.width - 26) < 0.01)
+     }
+
+     private func size(_ view: some View) -> CGSize {

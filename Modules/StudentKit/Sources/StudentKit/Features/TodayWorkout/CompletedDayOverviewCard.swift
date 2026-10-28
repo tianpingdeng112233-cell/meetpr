@@ -1,3 +1,4 @@
+import ChatUI
 import CoreModels
 import DesignSystem
 import SwiftUI
@@ -8,6 +9,7 @@ struct CompletedDayOverviewCard: View {
   let unit: UnitPreference
   let canUndo: Bool
   let onUndo: () -> Void
+  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
   @State private var expanded: Set<UUID> = []
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -38,7 +40,8 @@ struct CompletedDayOverviewCard: View {
       .foregroundStyle(Color.MeetPR.textTertiary)
 
       let overview = CompletedDayPresentation(
-        presentation: presentation, addedDrafts: drafts, unit: unit)
+        presentation: presentation, addedDrafts: drafts, unit: unit, videos: replay?.videos ?? [],
+        local: replay?.local ?? [])
       ForEach(overview.exercises) { exercise in
         CompletedDayExerciseRow(
           exercise: exercise, expanded: expanded.contains(exercise.id)
@@ -82,6 +85,7 @@ private struct CompletedDayExerciseRow: View {
   let exercise: CompletedDayPresentation.Exercise
   let expanded: Bool
   let onToggle: () -> Void
+  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
@@ -135,10 +139,17 @@ private struct CompletedDayExerciseRow: View {
               Text(row.result)
                 .foregroundStyle(row.failed ? Color.MeetPR.danger : Color.MeetPR.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
+              CompletedSetVideoButton(
+                video: row.video, upload: replay?.uploadState(setLogID: row.setLogID),
+                number: row.number, reservesSpace: exercise.reservesVideoSpace
+              ) { video in
+                replay?.open(video, badge: row.badge)
+              }
             }
             .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
           }
         }
+        .modifier(CompletedVideoHitRouting())
         .padding(.horizontal, MeetPRSpacing.point13)
         .padding(.bottom, MeetPRSpacing.point11)
       }

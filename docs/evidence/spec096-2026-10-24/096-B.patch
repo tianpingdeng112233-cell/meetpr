@@ -1,0 +1,1312 @@
+diff --git a/Modules/DesignSystem/Sources/DesignSystem/Tokens/VideoColors.swift b/Modules/DesignSystem/Sources/DesignSystem/Tokens/VideoColors.swift
+index 63c7c99c..e80df040 100644
+--- a/Modules/DesignSystem/Sources/DesignSystem/Tokens/VideoColors.swift
++++ b/Modules/DesignSystem/Sources/DesignSystem/Tokens/VideoColors.swift
+@@ -1,6 +1,14 @@
+ import SwiftUI
+
+ extension Color.MeetPR {
++  public static let completedVideoPlay = Color(
++    light: Color(red: 156 / 255, green: 163 / 255, blue: 175 / 255),
++    dark: Color(red: 107 / 255, green: 107 / 255, blue: 114 / 255)
++  )
++  public static let completedVideoReviewFill = Color(
++    red: 17 / 255, green: 24 / 255, blue: 39 / 255
++  ).opacity(0.72)
++
+   /// Coach video-workbench playback stage fill (RGB 27/37/52).
+   public static let videoStageFill = Color(
+     red: 27 / 255,
+diff --git a/Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift b/Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift
+index 8e55b147..1040897e 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Demo/StudentDemoSeed.swift
+@@ -95,7 +95,7 @@ public enum StudentDemoSeed {
+         let sets = isCursor ? Array(exercise.prescribedSets.prefix(2)) : exercise.prescribedSets
+         return sets.map { set in
+           StudentSetLog(
+-            id: UUID(),
++            id: set.id,
+             studentID: studentID,
+             planExerciseID: exercise.id,
+             setIndex: set.setIndex,
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayOverviewCard.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayOverviewCard.swift
+index 8c4b2af3..91b1ba42 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayOverviewCard.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayOverviewCard.swift
+@@ -1,3 +1,4 @@
++import ChatUI
+ import CoreModels
+ import DesignSystem
+ import SwiftUI
+@@ -8,6 +9,7 @@ struct CompletedDayOverviewCard: View {
+   let unit: UnitPreference
+   let canUndo: Bool
+   let onUndo: () -> Void
++  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
+   @State private var expanded: Set<UUID> = []
+   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+@@ -38,7 +40,8 @@ struct CompletedDayOverviewCard: View {
+       .foregroundStyle(Color.MeetPR.textTertiary)
+
+       let overview = CompletedDayPresentation(
+-        presentation: presentation, addedDrafts: drafts, unit: unit)
++        presentation: presentation, addedDrafts: drafts, unit: unit, videos: replay?.videos ?? [],
++        local: replay?.local ?? [])
+       ForEach(overview.exercises) { exercise in
+         CompletedDayExerciseRow(
+           exercise: exercise, expanded: expanded.contains(exercise.id)
+@@ -82,6 +85,7 @@ private struct CompletedDayExerciseRow: View {
+   let exercise: CompletedDayPresentation.Exercise
+   let expanded: Bool
+   let onToggle: () -> Void
++  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
+   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+   var body: some View {
+@@ -135,6 +139,12 @@ private struct CompletedDayExerciseRow: View {
+               Text(row.result)
+                 .foregroundStyle(row.failed ? Color.MeetPR.danger : Color.MeetPR.textPrimary)
+                 .frame(maxWidth: .infinity, alignment: .leading)
++              CompletedSetVideoButton(
++                video: row.video, upload: replay?.uploadState(setLogID: row.setLogID),
++                number: row.number
++              ) { video in
++                replay?.open(video, badge: row.badge)
++              }
+             }
+             .font(.MeetPR.mono(size: MeetPRFontMetrics.size13))
+           }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayPresentation.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayPresentation.swift
+index d5605ff1..404483e4 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayPresentation.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedDayPresentation.swift
+@@ -1,3 +1,4 @@
++import ChatUI
+ import CoreModels
+ import Foundation
+
+@@ -27,12 +28,26 @@ struct CompletedDayPresentation: Equatable, Sendable {
+   struct Row: Equatable, Sendable, Identifiable {
+     let id: UUID
+     let number: Int
++    let setLogID: UUID?
+     let isExtra: Bool
+     let failed: Bool
+     let result: String
++    let video: CompletedSetVideo?
++    let badge: VideoBadgeInfo
+
+-    init(draft: TodayWorkoutSetRowDraft, unit: UnitPreference) {
++    init(
++      draft: TodayWorkoutSetRowDraft, unit: UnitPreference, videos: [StudentVideo],
++      local: [VideoAttachment]
++    ) {
++      video = CompletedSetVideo.resolve(setLogID: draft.loggedSetID, videos: videos, local: local)
++      badge = VideoBadgeInfo(
++        exerciseName: draft.displayExerciseName,
++        weightKg: draft.actualWeight.map { NSDecimalNumber(decimal: $0).doubleValue },
++        reps: draft.actualReps,
++        rpe: draft.actualRPE.map { NSDecimalNumber(decimal: $0).doubleValue },
++        setOrdinal: draft.prescribed.setIndex + 1)
+       id = draft.id
++      setLogID = draft.loggedSetID
+       number = draft.prescribed.setIndex + 1
+       isExtra = draft.isExtra
+       failed = draft.failed
+@@ -51,7 +66,7 @@ struct CompletedDayPresentation: Equatable, Sendable {
+
+   init(
+     presentation: TodayWorkoutPresentation, addedDrafts: [TodayWorkoutSetRowDraft],
+-    unit: UnitPreference
++    unit: UnitPreference, videos: [StudentVideo] = [], local: [VideoAttachment] = []
+   ) {
+     var groups = presentation.exercises.map { exercise in
+       Exercise(
+@@ -59,7 +74,7 @@ struct CompletedDayPresentation: Equatable, Sendable {
+         isAdded: false, prescribedCount: exercise.prescribedRows.count,
+         loggedCount: exercise.prescribedRows.count { $0.draft.completed || $0.draft.failed },
+         rows: exercise.rows.filter { !$0.draft.isExtra || $0.draft.completed || $0.draft.failed }
+-          .map { Row(draft: $0.draft, unit: unit) })
++          .map { Row(draft: $0.draft, unit: unit, videos: videos, local: local) })
+     }
+     var seen: Set<UUID> = []
+     for draft in addedDrafts where draft.isStudentAdded && seen.insert(draft.exerciseID).inserted {
+@@ -69,7 +84,7 @@ struct CompletedDayPresentation: Equatable, Sendable {
+           id: draft.exerciseID, name: draft.displayExerciseName, number: groups.count + 1,
+           isAdded: true, prescribedCount: 0,
+           loggedCount: rows.count { $0.completed || $0.failed },
+-          rows: rows.map { Row(draft: $0, unit: unit) }))
++          rows: rows.map { Row(draft: $0, unit: unit, videos: videos, local: local) }))
+     }
+     exercises = groups
+   }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift
+index bc45aa30..95d43d69 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/TodayWorkoutView.swift
+@@ -31,6 +31,7 @@ public struct TodayWorkoutView: View {
+   @State private var restTimerHeight: CGFloat = 0
+   @State private var viewModel: TodayWorkoutViewModel
+   @State private var readinessViewModel: ReadinessCheckinViewModel
++  @State private var replay: CompletedVideoReplayModel
+   @State private var videoViewModel: VideoAttachmentViewModel
+   @State private var selectedDayID: UUID?
+   @State private var editing: EditingTarget?
+@@ -75,6 +76,7 @@ public struct TodayWorkoutView: View {
+     restTimerActivityController: any RestTimerActivityControlling =
+       NoOpRestTimerActivityController(),
+     videoUploads: VideoUploadServices? = nil,
++    feedbackViewModel: FeedbackInboxViewModel? = nil,
+     planHandoff: TodayWorkoutPlanHandoff? = nil,
+     jumpToTodayToken: Int = 0,
+     uploadFailureDestination: UploadFailureDestination? = nil,
+@@ -131,8 +133,11 @@ public struct TodayWorkoutView: View {
+     self._readinessViewModel = State(
+       initialValue: ReadinessCheckinViewModel(repo: readiness)
+     )
++    let services = videoUploads ?? .demo()
++    self._replay = State(
++      initialValue: CompletedVideoReplayModel(services: services, feedback: feedbackViewModel))
+     self._videoViewModel = State(
+-      initialValue: VideoAttachmentViewModel(manager: (videoUploads ?? .demo()).manager)
++      initialValue: VideoAttachmentViewModel(manager: services.manager)
+     )
+   }
+
+@@ -224,6 +229,9 @@ public struct TodayWorkoutView: View {
+         )
+       )
+     }
++    .environment(replay)
++    .modifier(CompletedVideoReplayHost(model: replay))
++    .task { await replay.load(studentID: studentID) }
+     .safeAreaInset(edge: .bottom) {
+       VStack(spacing: 0) {
+         if !showingHistory, case .workout(let presentation) = screenContent,
+@@ -633,6 +641,7 @@ public struct TodayWorkoutView: View {
+   }
+
+   private func reloadCurrentDay() async {
++    await replay.load(studentID: studentID)
+     await loadWorkout(for: nil)
+     returnToCurrentDay()
+   }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/AllHistoryScreen.swift b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/AllHistoryScreen.swift
+index ef98c087..9dd38a71 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/AllHistoryScreen.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/AllHistoryScreen.swift
+@@ -7,6 +7,7 @@ import SwiftUI
+ struct AllHistoryScreen: View {
+   let viewModel: TrainingHistoryViewModel
+   let studentID: UUID
++  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
+   @State private var selectedExerciseName: String?
+
+   var body: some View {
+@@ -58,6 +59,11 @@ struct AllHistoryScreen: View {
+     #endif
+     .task {
+       await viewModel.load(studentID: studentID)
++      await replay?.load(studentID: studentID)
++    }
++    .refreshable {
++      await viewModel.load(studentID: studentID)
++      await replay?.load(studentID: studentID)
+     }
+   }
+ }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistoryEntriesView.swift b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistoryEntriesView.swift
+index 3ddcf85d..535eb356 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistoryEntriesView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/HistoryEntriesView.swift
+@@ -1,3 +1,4 @@
++import ChatUI
+ import CoreModels
+ import DesignSystem
+ import SwiftUI
+@@ -110,6 +111,7 @@ struct HistoryEntriesView: View {
+       ForEach(exercise.prescribedSets) { set in
+         HistorySetRow(
+           set: set,
++          exerciseName: StudentExerciseName.display(exercise.exercise),
+           log: logs.first { $0.planExerciseID == exercise.id && $0.setIndex == set.setIndex }
+         )
+       }
+@@ -121,7 +123,12 @@ struct HistoryEntriesView: View {
+         HistorySetRow(
+           label: StudentStrings.localized(.addedExtra),
+           result: StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe),
+-          completed: log.completed
++          completed: log.completed, setLogID: log.id, setIndex: log.setIndex,
++          badge: VideoBadgeInfo(
++            exerciseName: StudentExerciseName.display(exercise.exercise),
++            weightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue, reps: log.reps,
++            rpe: log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
++            setOrdinal: log.setIndex + 1)
+         )
+       }
+
+@@ -333,8 +340,19 @@ struct HistorySetRow: View {
+   let label: String
+   let result: String
+   let completed: Bool?
++  let setLogID: UUID?
++  let setIndex: Int
++  let badge: VideoBadgeInfo
++  @Environment(CompletedVideoReplayModel.self) private var replay: CompletedVideoReplayModel?
+
+-  init(set: PrescribedSet, log: StudentSetLog?) {
++  init(set: PrescribedSet, exerciseName: String = "", log: StudentSetLog?) {
++    setLogID = log?.id
++    setIndex = set.setIndex
++    badge = VideoBadgeInfo(
++      exerciseName: exerciseName,
++      weightKg: log.map { NSDecimalNumber(decimal: $0.weightKg).doubleValue },
++      reps: log?.reps, rpe: log?.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
++      setOrdinal: set.setIndex + 1)
+     label = HistoryEntriesView.setLabel(forZeroBasedIndex: set.setIndex)
+     result =
+       log.map {
+@@ -343,7 +361,13 @@ struct HistorySetRow: View {
+     completed = log?.completed
+   }
+
+-  init(label: String, result: String, completed: Bool) {
++  init(
++    label: String, result: String, completed: Bool, setLogID: UUID? = nil, setIndex: Int = 0,
++    badge: VideoBadgeInfo = VideoBadgeInfo()
++  ) {
++    self.setLogID = setLogID
++    self.setIndex = setIndex
++    self.badge = badge
+     self.label = label
+     self.result = result
+     self.completed = completed
+@@ -360,6 +384,12 @@ struct HistorySetRow: View {
+           .MeetPR.mono(size: MeetPRFontMetrics.size11, weight: completed == nil ? .medium : .bold)
+         )
+         .foregroundStyle(resultColor)
++      let video = TrainingHistoryVideoPresentation(
++        setLogID: setLogID, setIndex: setIndex, videos: replay?.videos ?? [],
++        local: replay?.local ?? [])
++      CompletedSetVideoButton(
++        video: video.video, upload: replay?.uploadState(setLogID: setLogID), number: video.number
++      ) { replay?.open($0, badge: badge) }
+     }
+   }
+
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistoryRows.swift b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistoryRows.swift
+index 4eb43449..dd6c2294 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistoryRows.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/StudentAddedHistoryRows.swift
+@@ -1,3 +1,4 @@
++import ChatUI
+ import CoreModels
+ import DesignSystem
+ import SwiftUI
+@@ -23,7 +24,14 @@ struct StudentAddedHistoryRows: View {
+           HistorySetRow(
+             label: HistoryEntriesView.setLabel(forZeroBasedIndex: log.setIndex),
+             result: StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe),
+-            completed: log.completed
++            completed: log.completed, setLogID: log.id, setIndex: log.setIndex,
++            badge: VideoBadgeInfo(
++              exerciseName: catalog.first(where: { $0.id == id }).map {
++                StudentExerciseName.display($0)
++              },
++              weightKg: NSDecimalNumber(decimal: log.weightKg).doubleValue, reps: log.reps,
++              rpe: log.rpe.map { NSDecimalNumber(decimal: $0).doubleValue },
++              setOrdinal: log.setIndex + 1)
+           )
+         }
+       }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryView.swift b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryView.swift
+index 20d0dee3..53610dd4 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryView.swift
+@@ -14,6 +14,7 @@ public struct TrainingHistoryView: View {
+   private let notifications: StudentNotificationsCoordinator?
+   private let onOpenPlanNotification: () -> Void
+   private let onOpenToday: () -> Void
++  @State private var replay: CompletedVideoReplayModel
+   @State private var model: ProgressDataModel
+   @State private var path: [ProgressMenuDestination] = []
+   @State private var showsNotifications = false
+@@ -26,6 +27,7 @@ public struct TrainingHistoryView: View {
+     e1rm: any E1RMRepository,
+     onboarding: (any OnboardingProfileReading)? = nil,
+     feedbackViewModel: FeedbackInboxViewModel? = nil,
++    videoUploads: VideoUploadServices? = nil,
+     importedHistoryRefreshToken: Int = 0,
+     onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil,
+     notifications: StudentNotificationsCoordinator? = nil,
+@@ -38,6 +40,9 @@ public struct TrainingHistoryView: View {
+     self.notifications = notifications
+     self.onOpenPlanNotification = onOpenPlanNotification
+     self.onOpenToday = onOpenToday
++    self._replay = State(
++      initialValue: CompletedVideoReplayModel(
++        services: videoUploads ?? .demo(), feedback: feedbackViewModel))
+     self._model = State(
+       initialValue: ProgressDataModel(
+         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+@@ -82,6 +87,8 @@ public struct TrainingHistoryView: View {
+       )
+       .refreshable { await reload() }
+     }
++    .environment(replay)
++    .modifier(CompletedVideoReplayHost(model: replay))
+     .background(Color.MeetPR.bgBase)
+     .task {
+       await model.load()
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayer.swift b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayer.swift
+index 7d28daad..e4a411a3 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayer.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayer.swift
+@@ -6,6 +6,11 @@ import Observation
+ @MainActor @Observable
+ final class SetEntryVideoPlayer {
+   let state = SetEntryVideoPlaybackState()
++  private let preservesPlaybackIntentOnFailure: Bool
++
++  init(preservesPlaybackIntentOnFailure: Bool = false) {
++    self.preservesPlaybackIntentOnFailure = preservesPlaybackIntentOnFailure
++  }
+   private(set) var player: AVPlayer?
+   private(set) var attachmentID: UUID?
+   private(set) var hasError = false
+@@ -131,7 +136,9 @@ final class SetEntryVideoPlayer {
+     hasError = item.status == .failed
+     state.updateDuration(item.duration.seconds)
+     if !isSeeking { state.seek(to: player.currentTime().seconds) }
+-    if hasError || (state.duration > 0 && state.position >= state.duration) {
++    if (hasError && !preservesPlaybackIntentOnFailure)
++      || (state.duration > 0 && state.position >= state.duration)
++    {
+       state.pause()
+     }
+   }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayerView.swift b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayerView.swift
+index f835d07c..01c10614 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayerView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoPlayerView.swift
+@@ -8,11 +8,37 @@ struct SetEntryVideoPlayerView: View {
+   let playback: SetEntryVideoPlayer
+   let badge: VideoBadgeInfo?
+   var isInline = false
++  var readOnly = false
++  var showsPlaybackError = true
++  var onClose: (() -> Void)?
++  var onReview: (() -> Void)?
+   let retry: () -> Void
+
+   var body: some View {
+     Group {
+-      if playback.state.isExpanded && !isInline {
++      if readOnly {
++        SetEntryVideoStage(playback: playback, role: .expanded)
++          .ignoresSafeArea()
++          .overlay(alignment: .top) {
++            CompletedVideoPlayerHeader(close: { onClose?() }, onReview: onReview)
++          }
++          .overlay(alignment: .bottom) {
++            VStack(spacing: MeetPRSpacing.sm) {
++              if let badge {
++                Text(
++                  [badge.exerciseName, SetEntryVideoDetails.text(badge)]
++                    .compactMap { $0 }.joined(separator: " · ")
++                )
++                .font(.MeetPR.footnote)
++                .foregroundStyle(.white.opacity(0.8))
++                .padding(.horizontal, MeetPRSpacing.sm)
++              }
++              SetEntryVideoControlBar(
++                playback: playback, allowsExpansion: false, showsError: showsPlaybackError,
++                retry: retry)
++            }
++          }
++      } else if playback.state.isExpanded && !isInline {
+         SetEntryVideoStage(playback: playback, role: .expanded)
+           .ignoresSafeArea()
+           .overlay(alignment: .top) {
+@@ -32,9 +58,13 @@ struct SetEntryVideoPlayerView: View {
+         .clipShape(.rect(cornerRadius: MeetPRRadius.card))
+       }
+     }
+-    .accessibilityAction(.escape) { playback.state.handleBack() }
++    .accessibilityAction(.escape) {
++      if readOnly { onClose?() } else { playback.state.handleBack() }
++    }
+     #if os(macOS)
+-      .onExitCommand { playback.state.handleBack() }
++      .onExitCommand {
++        if readOnly { onClose?() } else { playback.state.handleBack() }
++      }
+     #endif
+   }
+ }
+@@ -71,15 +101,17 @@ private struct SetEntryVideoStage: View {
+
+ private struct SetEntryVideoControlBar: View {
+   let playback: SetEntryVideoPlayer
++  var allowsExpansion = true
++  var showsError = true
+   let retry: () -> Void
+
+   var body: some View {
+     VStack(spacing: MeetPRSpacing.xs) {
+-      if playback.hasError {
++      if playback.hasError && showsError {
+         Button(StudentStrings.localized(.videoAttachmentSection002), action: retry)
+           .font(.MeetPR.footnote)
+       }
+-      SetEntryVideoControls(playback: playback)
++      SetEntryVideoControls(playback: playback, allowsExpansion: allowsExpansion)
+     }
+     .foregroundStyle(.white)
+     .background(.black.opacity(0.75))
+@@ -88,6 +120,7 @@ private struct SetEntryVideoControlBar: View {
+
+ private struct SetEntryVideoControls: View {
+   let playback: SetEntryVideoPlayer
++  let allowsExpansion: Bool
+   @State private var showsSpeeds = false
+
+   var body: some View {
+@@ -135,19 +168,21 @@ private struct SetEntryVideoControls: View {
+         .background(Color.MeetPR.videoStageFill, in: .rect(cornerRadius: MeetPRRadius.md))
+         .presentationCompactAdaptation(.popover)
+       }
+-      Button {
+-        showsSpeeds = false
+-        playback.state.toggleExpanded()
+-      } label: {
+-        Image(
+-          systemName: playback.state.isExpanded
+-            ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
+-        )
+-        .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
++      if allowsExpansion {
++        Button {
++          showsSpeeds = false
++          playback.state.toggleExpanded()
++        } label: {
++          Image(
++            systemName: playback.state.isExpanded
++              ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right"
++          )
++          .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
++        }
++        .accessibilityLabel(
++          StudentStrings.localized(
++            playback.state.isExpanded ? .setEntryVideoCollapse : .setEntryVideoExpand))
+       }
+-      .accessibilityLabel(
+-        StudentStrings.localized(
+-          playback.state.isExpanded ? .setEntryVideoCollapse : .setEntryVideoExpand))
+     }
+     .buttonStyle(.plain)
+     .tint(.white)
+@@ -163,25 +198,6 @@ private struct SetEntryVideoHeader: View {
+   let badge: VideoBadgeInfo?
+   let collapse: () -> Void
+
+-  private static func details(_ badge: VideoBadgeInfo) -> String {
+-    var parts: [String] = []
+-    if let number = badge.setOrdinal {
+-      parts.append(StudentStrings.replacing(.setEntryVideoSet, values: [String(number)]))
+-    }
+-    let weight = badge.weightKg.flatMap { $0.isFinite ? metric($0) + "kg" : nil }
+-    let reps = badge.reps.map { String($0) }
+-    let load = [weight, reps].compactMap { $0 }.joined(separator: " × ")
+-    if !load.isEmpty { parts.append(load) }
+-    if let rpe = badge.rpe, rpe.isFinite { parts.append("RPE " + metric(rpe)) }
+-    return parts.joined(separator: " · ")
+-  }
+-
+-  private static func metric(_ value: Double) -> String {
+-    value.formatted(
+-      .number.grouping(.never).precision(.fractionLength(0...1))
+-        .locale(Locale(identifier: "en_US_POSIX")))
+-  }
+-
+   var body: some View {
+     HStack(spacing: MeetPRSpacing.sm) {
+       Button(action: collapse) {
+@@ -192,7 +208,7 @@ private struct SetEntryVideoHeader: View {
+       VStack(alignment: .leading, spacing: MeetPRSpacing.xs) {
+         if let name = badge?.exerciseName { Text(name).font(.MeetPR.bodyEmphasis) }
+         if let badge {
+-          Text(Self.details(badge))
++          Text(SetEntryVideoDetails.text(badge))
+             .font(.MeetPR.footnote)
+         }
+       }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoUploadServices.swift b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoUploadServices.swift
+index 2133bf63..8cda4fb5 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoUploadServices.swift
++++ b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/VideoUploadServices.swift
+@@ -5,9 +5,14 @@ import Networking
+ /// startup and threaded down to TodayWorkoutView.
+ public struct VideoUploadServices: Sendable {
+   public let manager: VideoUploadManager
++  public let replayRepository: (any StudentReplayVideoRepository)?
+
+-  public init(manager: VideoUploadManager) {
++  public init(
++    manager: VideoUploadManager,
++    replayRepository: (any StudentReplayVideoRepository)? = nil
++  ) {
+     self.manager = manager
++    self.replayRepository = replayRepository
+   }
+
+   /// Demo/preview wiring: real AVFoundation export, loopback "uploads" that
+@@ -18,7 +23,8 @@ public struct VideoUploadServices: Sendable {
+         service: LoopbackVideoUploadService(),
+         exporter: AVFoundationVideoExporter(),
+         repository: InMemoryVideoAttachmentRepository(seed: AccessoryDemoScenario.videoAttachments)
+-      )
++      ),
++      replayRepository: CompletedVideoDemoRepository()
+     )
+   }
+
+@@ -34,6 +40,8 @@ public struct VideoUploadServices: Sendable {
+       failureNotifier: UploadFailureNotifier(),
+       enableNetworkMonitoring: true
+     )
+-    return VideoUploadServices(manager: manager)
++    return VideoUploadServices(
++      manager: manager,
++      replayRepository: BackendStudentReplayVideoRepository(api: api, session: session))
+   }
+ }
+diff --git a/Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings b/Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings
+index a53d1ce2..55ad9958 100644
+--- a/Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings
++++ b/Modules/StudentKit/Sources/StudentKit/Resources/Localizable.xcstrings
+@@ -27604,6 +27604,75 @@
+           }
+         }
+       }
++    },
++    "student.completedVideo.close": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Close video"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "关闭视频"
++          }
++        },
++        "zh-Hant": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "關閉影片"
++          }
++        }
++      }
++    },
++    "student.completedVideo.playSet %lld": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Play video for set %1$lld"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "播放第 %1$lld 组视频"
++          }
++        },
++        "zh-Hant": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "播放第 %1$lld 組影片"
++          }
++        }
++      }
++    },
++    "student.completedVideo.reviewed": {
++      "extractionState": "manual",
++      "localizations": {
++        "en": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "Coach reviewed"
++          }
++        },
++        "zh-Hans": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "教练已点评"
++          }
++        },
++        "zh-Hant": {
++          "stringUnit": {
++            "state": "translated",
++            "value": "教練已點評"
++          }
++        }
++      }
+     }
+   },
+   "version": "1.0"
+diff --git a/Modules/StudentKit/Sources/StudentKit/StudentRootView.swift b/Modules/StudentKit/Sources/StudentKit/StudentRootView.swift
+index 62034f41..27d96174 100644
+--- a/Modules/StudentKit/Sources/StudentKit/StudentRootView.swift
++++ b/Modules/StudentKit/Sources/StudentKit/StudentRootView.swift
+@@ -245,6 +245,7 @@ extension StudentRootView {
+         restTimerSettings: restTimerSettings,
+         restTimerActivityController: restTimerActivityController,
+         videoUploads: videoUploads,
++        feedbackViewModel: feedbackViewModel,
+         planHandoff: workoutPlanHandoff,
+         jumpToTodayToken: trainingJumpToken,
+         uploadFailureDestination: uploadFailureDestination,
+@@ -264,6 +265,7 @@ extension StudentRootView {
+         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
+         onboarding: onboarding,
+         feedbackViewModel: feedbackViewModel,
++        videoUploads: videoUploads,
+         importedHistoryRefreshToken: importedHistoryRefreshToken,
+         onImportedHistoryRefresh: { await runImportedHistoryBackfill() },
+         notifications: notifications,
+diff --git a/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/SetEntryVideoPlayerTests.swift b/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/SetEntryVideoPlayerTests.swift
+index a3259db0..f0798f11 100644
+--- a/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/SetEntryVideoPlayerTests.swift
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/SetEntryVideoPlayerTests.swift
+@@ -8,6 +8,51 @@ import ViewInspector
+ @testable import StudentKit
+
+ @Suite @MainActor struct SetEntryVideoPlayerTests {
++  @Test func readOnlyPlaybackKeepsPlayingIntentAcrossAutomaticURLRefresh() async throws {
++    let playback = SetEntryVideoPlayer(preservesPlaybackIntentOnFailure: true)
++    defer { playback.stop() }
++    let missing = URL(filePath: "/tmp/096-missing-" + UUID().uuidString + ".mp4")
++    playback.load(attachmentID: UUID(), source: .remote(missing))
++    playback.togglePlayback()
++    for _ in 0..<200 where !playback.hasError {
++      try await Task.sleep(for: .milliseconds(20))
++    }
++    #expect(playback.hasError)
++    #expect(playback.state.isPlaying)
++    var refreshes = 0
++    await playback.retry { _ in
++      refreshes += 1
++      return URL(filePath: "/tmp/refreshed-clip.mp4")
++    }
++    #expect(refreshes == 1)
++    #expect(playback.state.isPlaying)
++    #expect(!playback.hasError)
++  }
++
++  @Test func completedReplayIsReadOnlyAndRoutesReview() throws {
++    let playback = SetEntryVideoPlayer()
++    var closed = false
++    var reviewed = false
++    let view = SetEntryVideoPlayerView(
++      playback: playback, badge: VideoBadgeInfo(exerciseName: "Squat", setOrdinal: 2),
++      readOnly: true, onClose: { closed = true }, onReview: { reviewed = true }, retry: {})
++    let inspected = try view.inspect()
++    try inspected.find(viewWithAccessibilityIdentifier: "completedVideo.close").button().tap()
++    try inspected.find(viewWithAccessibilityIdentifier: "completedVideo.review").button().tap()
++    #expect(closed && reviewed)
++    #expect(throws: (any Error).self) {
++      try inspected.find(button: StudentStrings.localized(.setEntryVideoExpand))
++    }
++    for key in [
++      StudentStrings.Key.videoAttachmentV3Controls001,
++      .videoAttachmentV3Controls004, .videoAttachmentV3Controls005,
++    ] {
++      #expect(throws: (any Error).self) {
++        try inspected.find(button: StudentStrings.localized(key))
++      }
++    }
++  }
++
+   @Test(arguments: [false, true])
+   func centralPlayButtonFollowsPlaybackAndRestartsAtEnd(expanded: Bool) throws {
+     let playback = SetEntryVideoPlayer()
+diff --git a/Modules/StudentKit/Sources/StudentKit/Demo/CompletedVideoDemoRepository.swift b/Modules/StudentKit/Sources/StudentKit/Demo/CompletedVideoDemoRepository.swift
+new file mode 100644
+index 00000000..4b3ffadb
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Demo/CompletedVideoDemoRepository.swift
+@@ -0,0 +1,25 @@
++import CoreModels
++import Foundation
++
++/// Reuses the bundled clip and existing Demo feedback; no network or persisted data.
++struct CompletedVideoDemoRepository: StudentReplayVideoRepository {
++  func fetchVideos(studentID: UUID) async throws -> [StudentVideo] {
++    guard studentID == StudentDemoSeed.studentID else { return [] }
++    let logs = StudentDemoSeed.makeHistoricalLogs(studentID: studentID)
++    return logs.enumerated().compactMap { index, log in
++      guard log.setIndex == 0 || log.setIndex == 1 else { return nil }
++      let id = index == 0 ? StudentDemoSeed.makeFeedback().first?.videoID ?? log.id : log.id
++      return StudentVideo(
++        id: id, setLogID: log.id, planExerciseID: log.planExerciseID,
++        contentType: "video/mp4", sizeBytes: 1, filename: "coach-demo-video.mp4",
++        createdAt: log.loggedAt, loggedAt: log.loggedAt)
++    }
++  }
++
++  func playbackURL(videoID: UUID) async throws -> URL {
++    guard let url = Bundle.main.url(forResource: "coach-demo-video", withExtension: "mp4") else {
++      throw VideoAttachmentPlaybackError.unavailable
++    }
++    return url
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideo.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideo.swift
+new file mode 100644
+index 00000000..cca06606
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideo.swift
+@@ -0,0 +1,27 @@
++import CoreModels
++import Foundation
++
++/// A read-only route; local IDs belong to the upload queue, remote IDs to the server.
++enum CompletedSetVideo: Equatable, Sendable {
++  case local(UUID)
++  case remote(UUID)
++
++  static func resolve(
++    setLogID: UUID?, videos: [StudentVideo], local: [VideoAttachment] = []
++  ) -> Self? {
++    guard let setLogID else { return nil }
++    let remote = videos.filter { $0.setLogID == setLogID }.max { $0.createdAt < $1.createdAt }
++    let attachment = local.filter { $0.setLogID == setLogID }.max { $0.recordedAt < $1.recordedAt }
++    if let attachment,
++      remote == nil || attachment.remoteAttachmentID == remote?.id
++        || attachment.recordedAt >= (remote?.createdAt ?? .distantPast)
++    {
++      return attachment.status == .uploaded ? .local(attachment.id) : nil
++    }
++    return remote.map { .remote($0.id) }
++  }
++  static func latestFeedback(videoID: UUID?, items: [CoachFeedback]) -> CoachFeedback? {
++    guard let videoID else { return nil }
++    return items.filter { $0.videoID == videoID }.max { $0.postedAt < $1.postedAt }
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideoButton.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideoButton.swift
+new file mode 100644
+index 00000000..f9daa733
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedSetVideoButton.swift
+@@ -0,0 +1,32 @@
++import CoreModels
++import DesignSystem
++import SwiftUI
++
++struct CompletedSetVideoButton: View {
++  let video: CompletedSetVideo?
++  let upload: VideoAttachment?
++  let number: Int
++  let onPlay: (CompletedSetVideo) -> Void
++
++  var body: some View {
++    if let video {
++      Button {
++        onPlay(video)
++      } label: {
++        Image(systemName: "play.circle")
++          .font(.MeetPR.system(size: MeetPRFontMetrics.size22, weight: .light))
++          .foregroundStyle(Color.MeetPR.completedVideoPlay)
++          .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
++          .contentShape(.rect)
++      }
++      .buttonStyle(.plain)
++      .accessibilityLabel(
++        String(localized: "student.completedVideo.playSet \(number)", bundle: .module)
++      )
++      .accessibilityIdentifier("completedVideo.play.\(number)")
++    } else if let upload {
++      SetVideoUploadIndicator(status: upload.status, progress: 0, size: MeetPRFontMetrics.size22)
++        .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
++    }
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayHost.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayHost.swift
+new file mode 100644
+index 00000000..ffbf5ace
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayHost.swift
+@@ -0,0 +1,17 @@
++import SwiftUI
++
++struct CompletedVideoReplayHost: ViewModifier {
++  @Bindable var model: CompletedVideoReplayModel
++
++  func body(content: Content) -> some View {
++    #if os(iOS)
++      content.fullScreenCover(item: $model.selected) { request in
++        CompletedVideoReplayView(model: model, request: request)
++      }
++    #else
++      content.sheet(item: $model.selected) { request in
++        CompletedVideoReplayView(model: model, request: request)
++      }
++    #endif
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayModel.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayModel.swift
+new file mode 100644
+index 00000000..d7cede6c
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayModel.swift
+@@ -0,0 +1,110 @@
++import ChatUI
++import CoreModels
++import Foundation
++import Observation
++
++@MainActor @Observable
++final class CompletedVideoReplayModel {
++  struct Request: Identifiable {
++    let id = UUID()
++    let video: CompletedSetVideo
++    let badge: VideoBadgeInfo
++  }
++
++  private(set) var videos: [StudentVideo] = []
++  private var attachments: [UUID: VideoAttachment] = [:]
++  var selected: Request?
++  let feedback: FeedbackInboxViewModel?
++  private let services: VideoUploadServices
++  @ObservationIgnored nonisolated(unsafe) private var observer: Task<Void, Never>?
++
++  init(services: VideoUploadServices, feedback: FeedbackInboxViewModel?) {
++    self.services = services
++    self.feedback = feedback
++  }
++
++  deinit { observer?.cancel() }
++
++  var local: [VideoAttachment] { Array(attachments.values) }
++
++  func load(studentID: UUID) async {
++    if observer == nil {
++      let events = await services.manager.events()
++      if let stored = try? await services.manager.repository.fetchAll(studentID: studentID) {
++        attachments = Dictionary(uniqueKeysWithValues: stored.map { ($0.id, $0) })
++      }
++      observer = Task { [weak self] in
++        for await event in events {
++          guard !Task.isCancelled else { return }
++          self?.apply(event, studentID: studentID)
++        }
++      }
++    }
++    if let repository = services.replayRepository,
++      let remote = try? await repository.fetchVideos(studentID: studentID)
++    {
++      videos = remote
++    }
++    await feedback?.load(studentID: studentID)
++  }
++
++  func uploadState(setLogID: UUID?) -> VideoAttachment? {
++    guard let setLogID else { return nil }
++    let latest = local.filter { $0.setLogID == setLogID }.max { $0.recordedAt < $1.recordedAt }
++    guard let latest, latest.status != .uploaded,
++      CompletedSetVideo.resolve(setLogID: setLogID, videos: videos, local: local) == nil
++    else { return nil }
++    return latest
++  }
++
++  func open(_ video: CompletedSetVideo, badge: VideoBadgeInfo) {
++    selected = Request(video: video, badge: badge)
++  }
++
++  func review(for video: CompletedSetVideo) -> CoachFeedback? {
++    let remoteID: UUID?
++    switch video {
++    case .local(let id): remoteID = attachments[id]?.remoteAttachmentID
++    case .remote(let id): remoteID = id
++    }
++    return CompletedSetVideo.latestFeedback(videoID: remoteID, items: feedback?.items ?? [])
++  }
++
++  func source(for video: CompletedSetVideo) async throws -> VideoAttachmentPlaybackSource {
++    switch video {
++    case .local(let id):
++      guard let source = try await services.manager.playbackSource(attachmentID: id) else {
++        throw VideoAttachmentPlaybackError.unavailable
++      }
++      return source
++    case .remote(let id):
++      let url = try await freshURL(for: .remote(id))
++      return url.isFileURL ? .local(url) : .remote(url)
++    }
++  }
++
++  func freshURL(for video: CompletedSetVideo) async throws -> URL {
++    switch video {
++    case .local(let id):
++      return try await services.manager.freshRemotePlaybackURL(attachmentID: id)
++    case .remote(let id):
++      guard let repository = services.replayRepository else {
++        throw VideoAttachmentPlaybackError.unavailable
++      }
++      return try await repository.playbackURL(videoID: id)
++    }
++  }
++
++  private func apply(_ event: VideoUploadEvent, studentID: UUID) {
++    switch event {
++    case .updated(let attachment, _) where attachment.studentID == studentID:
++      attachments[attachment.id] = attachment
++    case .removed(_, let attachmentID):
++      if let remoteID = attachments[attachmentID]?.remoteAttachmentID {
++        videos.removeAll { $0.id == remoteID }
++      }
++      attachments[attachmentID] = nil
++    default: break
++    }
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayView.swift b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayView.swift
+new file mode 100644
+index 00000000..893c692b
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/CompletedVideoReplayView.swift
+@@ -0,0 +1,81 @@
++import CoreModels
++import DesignSystem
++import SwiftUI
++
++struct CompletedVideoReplayView: View {
++  let model: CompletedVideoReplayModel
++  let request: CompletedVideoReplayModel.Request
++  @State private var playback = SetEntryVideoPlayer(preservesPlaybackIntentOnFailure: true)
++  @State private var errorMessage: String?
++  @State private var showsReview = false
++  @State private var automaticallyRetried = false
++  @State private var isRefreshing = false
++  @Environment(\.dismiss) private var dismiss
++
++  var body: some View {
++    NavigationStack {
++      Group {
++        if let errorMessage {
++          ContentUnavailableView {
++            Label(errorMessage, systemImage: "exclamationmark.triangle")
++          } actions: {
++            Button(StudentStrings.localized(.videoAttachmentSection002)) {
++              Task { await load() }
++            }
++            Button(StudentStrings.localized(.setEntryVideoCollapse)) { dismiss() }
++          }
++        } else {
++          SetEntryVideoPlayerView(
++            playback: playback, badge: request.badge, readOnly: true,
++            showsPlaybackError: automaticallyRetried && !isRefreshing,
++            onClose: { dismiss() },
++            onReview: model.review(for: request.video) == nil
++              ? nil
++              : {
++                if playback.state.isPlaying { playback.togglePlayback() }
++                showsReview = true
++              }, retry: { Task { await retry() } })
++        }
++      }
++      .background(.black)
++      #if os(iOS)
++        .toolbar(.hidden, for: .navigationBar)
++      #endif
++      .navigationDestination(isPresented: $showsReview) {
++        if let review = model.review(for: request.video) {
++          FeedbackDetailView(item: review, viewModel: model.feedback)
++            #if os(iOS)
++              .toolbar(.visible, for: .navigationBar)
++            #endif
++        }
++      }
++    }
++    .task { await load() }
++    .onChange(of: playback.hasError) { _, failed in
++      guard failed, !automaticallyRetried else { return }
++      automaticallyRetried = true
++      Task { await retry() }
++    }
++    .onDisappear { playback.stop() }
++  }
++
++  private func load() async {
++    errorMessage = nil
++    do {
++      let source = try await model.source(for: request.video)
++      try Task.checkCancellation()
++      playback.load(attachmentID: request.id, source: source)
++      if !playback.state.isExpanded { playback.state.toggleExpanded() }
++      playback.togglePlayback()
++    } catch {
++      guard !error.isTaskCancellation else { return }
++      errorMessage = StudentStrings.localized(.videoAttachmentSection004)
++    }
++  }
++
++  private func retry() async {
++    isRefreshing = true
++    defer { isRefreshing = false }
++    await playback.retry { _ in try await model.freshURL(for: request.video) }
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryVideoPresentation.swift b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryVideoPresentation.swift
+new file mode 100644
+index 00000000..2eb3f639
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/TrainingHistory/TrainingHistoryVideoPresentation.swift
+@@ -0,0 +1,13 @@
++import CoreModels
++import DesignSystem
++import Foundation
++
++struct TrainingHistoryVideoPresentation: Equatable, Sendable {
++  let number: Int
++  let video: CompletedSetVideo?
++
++  init(setLogID: UUID?, setIndex: Int, videos: [StudentVideo], local: [VideoAttachment]) {
++    number = SetIndexDisplay.number(forZeroBasedIndex: setIndex)
++    video = CompletedSetVideo.resolve(setLogID: setLogID, videos: videos, local: local)
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/CompletedVideoPlayerHeader.swift b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/CompletedVideoPlayerHeader.swift
+new file mode 100644
+index 00000000..5aa5011e
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/CompletedVideoPlayerHeader.swift
+@@ -0,0 +1,40 @@
++import DesignSystem
++import SwiftUI
++
++struct CompletedVideoPlayerHeader: View {
++  let close: () -> Void
++  let onReview: (() -> Void)?
++
++  var body: some View {
++    HStack(alignment: .top) {
++      Button(action: close) {
++        Image(systemName: "xmark")
++          .font(.MeetPR.bodyEmphasis)
++          .frame(width: MeetPRSpacing.minimumHitTarget, height: MeetPRSpacing.minimumHitTarget)
++          .background(.black.opacity(0.45), in: .circle)
++      }
++      .accessibilityLabel(String(localized: "student.completedVideo.close", bundle: .module))
++      .accessibilityIdentifier("completedVideo.close")
++      Spacer(minLength: MeetPRSpacing.sm)
++      if let onReview {
++        Button(action: onReview) {
++          HStack(spacing: MeetPRSpacing.space1) {
++            Text(String(localized: "student.completedVideo.reviewed", bundle: .module))
++            Image(systemName: "chevron.right").opacity(0.7)
++          }
++          .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .semibold))
++          .padding(.horizontal, MeetPRSpacing.space3)
++          .frame(minHeight: MeetPRSpacing.point30)
++          .background(Color.MeetPR.completedVideoReviewFill, in: .capsule)
++          .overlay { Capsule().stroke(.white.opacity(0.18), lineWidth: 1) }
++          .frame(minHeight: MeetPRSpacing.minimumHitTarget)
++          .contentShape(.rect)
++        }
++        .accessibilityIdentifier("completedVideo.review")
++      }
++    }
++    .buttonStyle(.plain)
++    .foregroundStyle(.white)
++    .padding(MeetPRSpacing.sm)
++  }
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoDetails.swift b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoDetails.swift
+new file mode 100644
+index 00000000..9a97c510
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Features/VideoUpload/SetEntryVideoDetails.swift
+@@ -0,0 +1,24 @@
++import ChatUI
++import Foundation
++
++enum SetEntryVideoDetails {
++  static func text(_ badge: VideoBadgeInfo) -> String {
++    var parts: [String] = []
++    if let number = badge.setOrdinal {
++      parts.append(StudentStrings.replacing(.setEntryVideoSet, values: [String(number)]))
++    }
++    let weight = badge.weightKg.flatMap { $0.isFinite ? metric($0) + "kg" : nil }
++    let reps = badge.reps.map { String($0) }
++    let load = [weight, reps].compactMap { $0 }.joined(separator: " × ")
++    if !load.isEmpty { parts.append(load) }
++    if let rpe = badge.rpe, rpe.isFinite { parts.append("RPE " + metric(rpe)) }
++    return parts.joined(separator: " · ")
++  }
++
++  private static func metric(_ value: Double) -> String {
++    value.formatted(
++      .number.grouping(.never).precision(.fractionLength(0...1))
++        .locale(Locale(identifier: "en_US_POSIX")))
++  }
++
++}
+diff --git a/Modules/StudentKit/Sources/StudentKit/Repository/StudentReplayVideoRepository.swift b/Modules/StudentKit/Sources/StudentKit/Repository/StudentReplayVideoRepository.swift
+new file mode 100644
+index 00000000..48023912
+--- /dev/null
++++ b/Modules/StudentKit/Sources/StudentKit/Repository/StudentReplayVideoRepository.swift
+@@ -0,0 +1,35 @@
++import CoreModels
++import Foundation
++import Networking
++
++/// Read-only access to server history, independent of the on-device upload queue.
++public protocol StudentReplayVideoRepository: Sendable {
++  func fetchVideos(studentID: UUID) async throws -> [StudentVideo]
++  func playbackURL(videoID: UUID) async throws -> URL
++}
++
++public actor BackendStudentReplayVideoRepository: StudentReplayVideoRepository {
++  private let api: APIClient
++  private let session: any SessionStateReader
++
++  public init(api: APIClient, session: any SessionStateReader) {
++    self.api = api
++    self.session = session
++  }
++
++  public func fetchVideos(studentID: UUID) async throws -> [StudentVideo] {
++    let token = try await session.accessToken()
++    return try await api.studentVideos(studentID: studentID, accessToken: token).videos.map {
++      $0.toDomain()
++    }
++  }
++
++  public func playbackURL(videoID: UUID) async throws -> URL {
++    let token = try await session.accessToken()
++    let response = try await api.attachmentURL(attachmentID: videoID, accessToken: token)
++    guard let url = URL(string: response.url) else {
++      throw VideoAttachmentPlaybackError.unavailable
++    }
++    return url
++  }
++}
+diff --git a/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/CompletedVideoReplayTests.swift b/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/CompletedVideoReplayTests.swift
+new file mode 100644
+index 00000000..883f4c2a
+--- /dev/null
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/CompletedVideoReplayTests.swift
+@@ -0,0 +1,72 @@
++import CoreModels
++import Foundation
++import Testing
++
++@testable import StudentKit
++
++@MainActor
++struct CompletedVideoReplayTests {
++  @Test func completedRowsUseServerSetLogIDsAndNewestVideo() throws {
++    let day = try #require(StudentDemoSeed.makePlanView().days.first)
++    var drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
++    drafts[0].completed = true
++    let setLogID = UUID()
++    drafts[0].loggedSetID = setLogID
++    let older = video(setLogID: setLogID, at: 10)
++    let latest = video(setLogID: setLogID, at: 20)
++    let overview = CompletedDayPresentation(
++      presentation: TodayWorkoutPresentation(
++        day: day, drafts: drafts, references: [:], started: true),
++      addedDrafts: [], unit: .kg, videos: [latest, older])
++    let rows = try #require(overview.exercises.first).rows
++    #expect(rows[0].video == .remote(latest.id))
++    #expect(rows[1].video == nil)
++  }
++
++  @Test func unfinishedUploadSuppressesOlderServerVideoAndUploadedBecomesPlayable() {
++    let setID = UUID()
++    let server = video(setLogID: setID, at: 10)
++    var local = VideoAttachment(
++      id: UUID(), setLogID: setID, studentID: UUID(), status: .uploading,
++      contentType: "video/mp4", durationSeconds: 8, sizeBytes: 100,
++      localFileName: "clip.mp4", recordedAt: Date(timeIntervalSince1970: 20))
++    for status in [VideoAttachment.Status.pending, .uploading, .failed] {
++      local.status = status
++      #expect(CompletedSetVideo.resolve(setLogID: setID, videos: [server], local: [local]) == nil)
++    }
++    local.status = .uploaded
++    #expect(
++      CompletedSetVideo.resolve(setLogID: setID, videos: [server], local: [local])
++        == .local(local.id))
++    let newerServer = video(setLogID: setID, at: 30)
++    #expect(
++      CompletedSetVideo.resolve(setLogID: setID, videos: [newerServer], local: [local])
++        == .remote(newerServer.id))
++  }
++
++  @Test func reviewedMeansLatestFeedbackForExactVideoID() {
++    let videoID = UUID()
++    let older = feedback(videoID: videoID, at: 10)
++    let latest = feedback(videoID: videoID, at: 30)
++    let unrelated = feedback(videoID: UUID(), at: 40)
++    #expect(
++      CompletedSetVideo.latestFeedback(videoID: videoID, items: [latest, unrelated, older])?.id
++        == latest.id)
++    #expect(CompletedSetVideo.latestFeedback(videoID: videoID, items: [unrelated]) == nil)
++    #expect(
++      CompletedSetVideo.latestFeedback(videoID: nil, items: [feedback(videoID: nil, at: 50)]) == nil
++    )
++  }
++
++  private func feedback(videoID: UUID?, at seconds: Double) -> CoachFeedback {
++    CoachFeedback(
++      id: UUID(), coachID: UUID(), studentID: UUID(), videoID: videoID,
++      text: "Review", postedAt: Date(timeIntervalSince1970: seconds))
++  }
++
++  private func video(setLogID: UUID, at seconds: Double) -> StudentVideo {
++    StudentVideo(
++      id: UUID(), setLogID: setLogID, planExerciseID: nil, contentType: "video/mp4",
++      sizeBytes: 100, filename: nil, createdAt: Date(timeIntervalSince1970: seconds), loggedAt: nil)
++  }
++}
+diff --git a/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/TrainingHistoryVideoTests.swift b/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/TrainingHistoryVideoTests.swift
+new file mode 100644
+index 00000000..afca0384
+--- /dev/null
++++ b/Modules/StudentKit/Tests/StudentKitTests/Features/TrainingHistory/TrainingHistoryVideoTests.swift
+@@ -0,0 +1,22 @@
++import CoreModels
++import Foundation
++import Testing
++
++@testable import StudentKit
++
++struct TrainingHistoryVideoTests {
++  @Test func historyUsesActualLogIDForExtraAndStudentAddedSets() {
++    let setID = UUID()
++    let video = StudentVideo(
++      id: UUID(), setLogID: setID, planExerciseID: nil, contentType: "video/mp4",
++      sizeBytes: 100, filename: nil, createdAt: .now, loggedAt: nil)
++    let presentation = TrainingHistoryVideoPresentation(
++      setLogID: setID, setIndex: 5, videos: [video], local: [])
++    #expect(presentation.video == .remote(video.id))
++    #expect(presentation.number == 6)
++    #expect(
++      TrainingHistoryVideoPresentation(
++        setLogID: nil, setIndex: 0, videos: [video], local: []
++      ).video == nil)
++  }
++}

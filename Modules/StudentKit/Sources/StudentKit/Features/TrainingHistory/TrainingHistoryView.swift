@@ -14,6 +14,7 @@ public struct TrainingHistoryView: View {
   private let notifications: StudentNotificationsCoordinator?
   private let onOpenPlanNotification: () -> Void
   private let onOpenToday: () -> Void
+  @State private var replay: CompletedVideoReplayModel
   @State private var model: ProgressDataModel
   @State private var path: [ProgressMenuDestination] = []
   @State private var showsNotifications = false
@@ -26,6 +27,7 @@ public struct TrainingHistoryView: View {
     e1rm: any E1RMRepository,
     onboarding: (any OnboardingProfileReading)? = nil,
     feedbackViewModel: FeedbackInboxViewModel? = nil,
+    videoUploads: VideoUploadServices? = nil,
     importedHistoryRefreshToken: Int = 0,
     onImportedHistoryRefresh: (@MainActor () async -> Void)? = nil,
     notifications: StudentNotificationsCoordinator? = nil,
@@ -38,6 +40,9 @@ public struct TrainingHistoryView: View {
     self.notifications = notifications
     self.onOpenPlanNotification = onOpenPlanNotification
     self.onOpenToday = onOpenToday
+    self._replay = State(
+      initialValue: CompletedVideoReplayModel(
+        services: videoUploads ?? .demo(), feedback: feedbackViewModel))
     self._model = State(
       initialValue: ProgressDataModel(
         studentID: studentID, plans: plans, logs: logs, e1rm: e1rm,
@@ -82,6 +87,8 @@ public struct TrainingHistoryView: View {
       )
       .refreshable { await reload() }
     }
+    .environment(replay)
+    .modifier(CompletedVideoReplayHost(model: replay))
     .background(Color.MeetPR.bgBase)
     .task {
       await model.load()
