@@ -1,0 +1,167 @@
+Spec 095 card I — raw verification excerpts; repeated runs are not additive.
+
+
+build_run_sim_2026-10-26T03-45-34-495Z_pid67080_e6ba0807.log
+** BUILD SUCCEEDED **
+
+build_sim_2026-10-26T03-39-53-445Z_pid67080_11451a4f.log
+** BUILD SUCCEEDED **
+
+build_sim_2026-10-26T03-41-20-703Z_pid67080_8527bfb1.log
+** BUILD SUCCEEDED **
+
+build_sim_2026-10-26T03-54-16-159Z_pid67080_3c7a5e49.log
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/MeetPRApp.swift:8:8: error: unable to resolve module dependency: 'RepositoryContracts'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/AppDelegate.swift:1:8: error: Unable to resolve module dependency: 'AppShell'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/AppDelegate.swift:2:8: error: Unable to resolve module dependency: 'StudentKit'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/MeetPRApp.swift:3:8: error: Unable to resolve module dependency: 'ChatUI'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/MeetPRApp.swift:4:8: error: Unable to resolve module dependency: 'CoachKit'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/MeetPRApp.swift:5:8: error: Unable to resolve module dependency: 'CoreModels'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/MeetPRApp.swift:6:8: error: Unable to resolve module dependency: 'DesignSystem'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/MeetPRApp.swift:7:8: error: Unable to resolve module dependency: 'Networking'
+/Users/david/Projects/apps/MeetPR-wt-095/MeetPR/Sources/MeetPRApp.swift:8:8: error: Unable to resolve module dependency: 'RepositoryContracts'
+** BUILD FAILED **
+
+build_sim_2026-10-26T03-54-53-746Z_pid67080_d1e4da63.log
+** BUILD SUCCEEDED **
+
+swift_package_test_2026-10-26T03-32-32-470Z_pid67080_db9f74c7.log
+✔ Test run with 4 tests in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-32-57-077Z_pid67080_56f331eb.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:9:46: error: argument passed to call that takes no arguments
+   |                                              `- error: argument passed to call that takes no arguments
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:9:46: error: cannot infer contextual base in reference to member 'coachedStudent'
+   |                                              `- error: cannot infer contextual base in reference to member 'coachedStudent'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:9:46: error: argument passed to call that takes no arguments
+   |                                              `- error: argument passed to call that takes no arguments
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:9:46: error: cannot infer contextual base in reference to member 'coachedStudent'
+   |                                              `- error: cannot infer contextual base in reference to member 'coachedStudent'
+error: fatalError
+
+swift_package_test_2026-10-26T03-33-55-288Z_pid67080_650c226a.log
+✔ Test run with 1 test in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-34-13-666Z_pid67080_c325b4ae.log
+    |                                                                        `- error: reference to member 'requestAuthorization' cannot be resolved without a contextual type
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:17:17: error: value of type 'PushRegistrationStateMachine' has no member 'actionsForReminder'
+    |                 `- error: value of type 'PushRegistrationStateMachine' has no member 'actionsForReminder'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:17:52: error: cannot infer contextual base in reference to member 'notDetermined'
+    |                                                    `- error: cannot infer contextual base in reference to member 'notDetermined'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:19:17: error: value of type 'PushRegistrationStateMachine' has no member 'actionsForReminder'
+    |                 `- error: value of type 'PushRegistrationStateMachine' has no member 'actionsForReminder'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/AppShell/Tests/AppShellTests/PushRegistrationStateMachineTests.swift:19:52: error: cannot infer contextual base in reference to member 'denied'
+    |                                                    `- error: cannot infer contextual base in reference to member 'denied'
+error: fatalError
+
+swift_package_test_2026-10-26T03-34-26-589Z_pid67080_4704ffd6.log
+✔ Test run with 2 tests in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-35-22-607Z_pid67080_3c527efb.log
+    |                          `- error: cannot infer contextual base in reference to member 'bound'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindGateViewModelTests.swift:16:19: error: extra argument 'pollingSleep' in call
+    |                   `- error: extra argument 'pollingSleep' in call
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindGateViewModelTests.swift:23:26: error: cannot infer contextual base in reference to member 'bound'
+    |                          `- error: cannot infer contextual base in reference to member 'bound'
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindGateViewModelTests.swift:16:19: error: extra argument 'pollingSleep' in call
+    |                   `- error: extra argument 'pollingSleep' in call
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindGateViewModelTests.swift:23:26: error: cannot infer contextual base in reference to member 'bound'
+    |                          `- error: cannot infer contextual base in reference to member 'bound'
+error: fatalError
+
+swift_package_test_2026-10-26T03-36-26-613Z_pid67080_bade15b1.log
+✔ Test run with 1 test in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-36-58-382Z_pid67080_e851efca.log
+✘ Test pendingPollingRetriesAfterATransientFailure() recorded an issue at BindGateViewModelTests.swift:21:3: Expectation failed: (gate.state → .failed) == (.bound(accepted) → .bound(CoreModels.BindRequest(id: 0A000000-0000-0000-0000-00000000000F, studentId: 0A000000-0000-0000-0000-000000000001, coachId: 0A000000-0000-0000-0000-000000000002, coachDisplayName: Optional("David"), inviteCodeId: Optional(9A8DD165-A326-4067-B748-BE54836F50AD), status: CoreModels.BindRequestStatus.accepted, submittedAt: 2026-05-28 20:26:40 +0000, respondedAt: nil, expiredAt: 2026-06-04 20:26:40 +0000, skipEvaluation: false, skipReason: nil)))
+✘ Test run with 1 test in 0 suites failed after 0.008 seconds with 1 issue.
+
+swift_package_test_2026-10-26T03-37-18-613Z_pid67080_e97e4879.log
+✔ Test run with 2 tests in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-38-33-026Z_pid67080_b23c33a4.log
+✔ Test run with 2 tests in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-39-15-309Z_pid67080_3862f5ec.log
+/Users/david/Projects/apps/MeetPR-wt-095/Modules/CoreModels/Tests/CoreModelsTests/PushNotificationRoutingTests.swift:7:87: error: type 'PushRouteIntent?' has no member 'bindAccepted'
+    |                                                                                       `- error: type 'PushRouteIntent?' has no member 'bindAccepted'
+error: fatalError
+
+swift_package_test_2026-10-26T03-39-32-588Z_pid67080_148ee661.log
+✔ Test run with 1 test in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-40-39-752Z_pid67080_383d0069.log
+◇ Test case passing 1 argument error → .network to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument error → .decoding to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .decoding to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+◇ Test case passing 1 argument error → .server(statusCode: 503) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) started.
+◇ Test case passing 1 argument error → .backend(statusCode: 429, code: AppShell.AuthErrorCode.rateLimited, issues: []) to accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) started.
+✔ Test bootstrapWithTransientRefreshFailureKeepsSessionAndCredentials(error:) with 4 test cases passed after 0.997 seconds.
+✔ Test accessTokenTransientRefreshFailureKeepsAuthenticatedSession(error:) with 4 test cases passed after 0.998 seconds.
+✔ Test run with 124 tests in 0 suites passed after 1.005 seconds.
+
+swift_package_test_2026-10-26T03-40-51-471Z_pid67080_e7e56f7e.log
+✔ Test run with 161 tests in 2 suites passed after 0.020 seconds.
+
+swift_package_test_2026-10-26T03-42-08-875Z_pid67080_cd1af0b8.log
+✔ Test run with 1040 tests in 49 suites passed after 5.583 seconds.
+
+swift_package_test_2026-10-26T03-43-32-044Z_pid67080_a6e33a9b.log
+✔ Test run with 30 tests in 0 suites passed after 4.694 seconds.
+
+swift_package_test_2026-10-26T03-44-05-861Z_pid67080_a767ba42.log
+✔ Test run with 6 tests in 0 suites passed after 0.001 seconds.
+
+swift_package_test_2026-10-26T03-44-19-928Z_pid67080_09a1b09f.log
+✔ Test run with 141 tests in 3 suites passed after 0.040 seconds.
+
+swift_package_test_2026-10-26T03-44-38-816Z_pid67080_b8136528.log
+warning: 'viewinspector': skipping cache due to an error: Couldn’t fetch updates from remote repositories:
+error: Failed to clone repository https://github.com/nalexn/ViewInspector:
+
+swift_package_test_2026-10-26T03-46-23-083Z_pid67080_5c155b28.log
+✘ Test analyticsEventNamesUseDeclaredContractValues() recorded an issue at AnalyticsSmokeTests.swift:35:3: Expectation failed: (actual → ["eval_summary_action": Set(["stage", "student_id"]), "validation_error": Set(["flow", "field"]), "nav_back": Set(["in_flow", "from_screen"]), "app_open": Set(["cold"]), "flow_cancel": Set(["flow", "from_screen"]), "coach_feedback_sent": Set(["kind", "student_id"]), "bind_coach_action": Set(["stage"]), "coach_plan_assigned": Set(["student_id"]), "field_re_edit": Set(["field", "count", "flow"]), "progress_viewed": Set(["tab"]), "friction_feedback": Set(["trigger", "flow", "from_screen"]), "onboarding_step": Set(["step_name", "step_index"]), "coach_intake_action": Set(["stage", "student_id"]), "workout_log_start": Set(["plan_id", "source"]), "client_error": Set(["screen", "domain", "code"]), "coach_open_student": Set(["student_id"]), "media_upload": Set(["stage", "context", "bytes"]), "onboarding_complete": Set(["n_steps_filled", "used_draft_resume"]), "set_logged": Set(["has_video", "set_index", "exercise_id", "outcome"]), "plan_viewed": Set(["plan_id"]), "screen_view": Set(["screen"]), "workout_log_save": Set(["n_sets", "duration_ms"])]) == (expected → ["workout_log_start": Set(["plan_id", "source"]), "coach_feedback_sent": Set(["student_id", "kind"]), "coach_open_student": Set(["student_id"]), "eval_summary_action": Set(["stage", "student_id"]), "client_error": Set(["screen", "domain", "code"]), "plan_viewed": Set(["plan_id"]), "flow_cancel": Set(["from_screen", "flow"]), "bind_coach_action": Set(["stage"]), "progress_viewed": Set(["tab"]), "onboarding_step": Set(["step_name", "step_index"]), "nav_back": Set(["in_flow", "from_screen"]), "coach_intake_action": Set(["stage", "student_id"]), "friction_feedback": Set(["trigger", "flow", "from_screen"]), "app_open": Set(["cold"]), "workout_log_save": Set(["duration_ms", "n_sets"]), "notification_permission_action": Set(["source", "stage", "result"]), "coach_plan_assigned": Set(["student_id"]), "screen_view": Set(["screen"]), "validation_error": Set(["field", "flow"]), "set_logged": Set(["exercise_id", "has_video", "set_index", "outcome"]), "field_re_edit": Set(["field", "flow", "count"]), "onboarding_complete": Set(["n_steps_filled", "used_draft_resume"]), "media_upload": Set(["stage", "context", "bytes"])])
+✘ Test run with 1 test in 0 suites failed after 0.003 seconds with 1 issue.
+
+swift_package_test_2026-10-26T03-46-42-970Z_pid67080_ef116909.log
+✔ Test run with 30 tests in 0 suites passed after 3.577 seconds.
+
+swift_package_test_2026-10-26T03-48-42-397Z_pid67080_e77a7abd.log
+✔ Test run with 84 tests in 15 suites passed after 0.590 seconds.
+
+swift_package_test_2026-10-26T03-49-04-078Z_pid67080_389ef2d5.log
+warning: 'viewinspector': skipping cache due to an error: Couldn’t fetch updates from remote repositories:
+error: Failed to clone repository https://github.com/nalexn/ViewInspector:
+
+swift_package_test_2026-10-26T03-52-39-915Z_pid67080_da038909.log
+✔ Test run with 1040 tests in 49 suites passed after 2.416 seconds.
+
+test_sim_2026-10-26T03-51-31-844Z_pid67080_bfbbafef.log
+** TEST BUILD SUCCEEDED **
+✔ Test run with 9 tests in 1 suite passed after 0.028 seconds.
+
+DesignSystem cached-scratch direct invocation:
+swift test --package-path Modules/DesignSystem --scratch-path Modules/AppShell/.build --skip-update
+Exit 0; Test run with 74 tests in 17 suites passed after 0.058 seconds.
+
+.build/spec095-tests/AppShell.log
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted
+
+.build/spec095-tests/CoachKit-local-cache.log
+sandbox-exec: sandbox_apply: Operation not permitted
+sandbox-exec: sandbox_apply: Operation not permitted
+
+.build/spec095-tests/CoachKit.log
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted
+
+.build/spec095-tests/DesignSystem.log
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted
+
+.build/spec095-tests/StudentKit.log
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted
+<unknown>:0: error: error opening '/Users/david/.cache/clang/ModuleCache/Swift-1IEYM950OGIQC.swiftmodule' for output: /Users/david/.cache/clang/ModuleCache: Operation not permitted

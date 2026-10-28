@@ -15,6 +15,7 @@ import Observation
 @MainActor
 public final class PushRegistrar {
   public private(set) var pendingRoute: PushRouteIntent?
+  public private(set) var bindingRefreshRevision = 0
 
   @ObservationIgnored private let authorizationStatusProvider:
     @Sendable () async -> PushAuthorizationState
@@ -50,9 +51,24 @@ public final class PushRegistrar {
     self.tokenUploader = tokenUploader
   }
 
-  public func authenticatedRootDidAppear() {
-    guard stateMachine.beginAuthenticatedSession() else { return }
+  public func authenticatedRootDidAppear(role: UserRole = .coach) {
+    guard stateMachine.beginAuthenticatedSession(role: role) else { return }
     scheduleActivation()
+  }
+
+  public func canRequestNotificationPermission() async -> Bool {
+    await authorizationStatusProvider() == .notDetermined
+  }
+
+  /// Called only from an explicit reminder button, never from activation.
+  /// nil means no request was made or the OS request failed.
+  public func requestNotificationPermission() async -> Bool? {
+    guard let sessionID = stateMachine.activeSessionID else { return nil }
+    let authorization = await authorizationStatusProvider()
+    guard !Task.isCancelled, stateMachine.activeSessionID == sessionID,
+      stateMachine.actionsForReminder(authorization: authorization) == [.requestAuthorization]
+    else { return nil }
+    return await requestAuthorization()
   }
 
   public func authenticatedSessionDidEnd() {
@@ -79,6 +95,10 @@ public final class PushRegistrar {
 
   public func receiveNotificationPayload(_ payload: PushPayloadValues) {
     guard let route = PushPayloadParser.route(from: payload) else { return }
+    if route == .bindAccepted {
+      bindingRefreshRevision &+= 1
+      return
+    }
     pendingRoute = route
   }
 
@@ -97,7 +117,9 @@ public final class PushRegistrar {
   }
 
   private func activate() async {
+    let sessionID = stateMachine.activeSessionID
     let authorization = await authorizationStatusProvider()
+    guard !Task.isCancelled, stateMachine.activeSessionID == sessionID else { return }
     perform(stateMachine.actionsForActivation(authorization: authorization))
   }
 
@@ -106,7 +128,7 @@ public final class PushRegistrar {
       switch action {
       case .requestAuthorization:
         Task { @MainActor [weak self] in
-          await self?.requestAuthorization()
+          _ = await self?.requestAuthorization()
         }
       case .registerForRemoteNotifications:
         remoteRegistration()
@@ -116,15 +138,20 @@ public final class PushRegistrar {
     }
   }
 
-  private func requestAuthorization() async {
+  private func requestAuthorization() async -> Bool? {
+    guard let sessionID = stateMachine.activeSessionID else { return nil }
     do {
       let granted = try await authorizationRequester()
+      guard stateMachine.activeSessionID == sessionID else { return nil }
       perform(stateMachine.authorizationResolved(granted: granted))
+      return granted
     } catch {
+      guard stateMachine.activeSessionID == sessionID else { return nil }
       stateMachine.authorizationRequestFailed()
       Self.logger.warning(
         "notification_authorization_request_failed \(String(describing: error), privacy: .public)"
       )
+      return nil
     }
   }
 

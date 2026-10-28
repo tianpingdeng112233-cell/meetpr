@@ -5,8 +5,8 @@ import RepositoryContracts
 import SwiftUI
 
 /// Waiting-for-coach page (spec 031 §7). Refresh paths: pull-to-refresh,
-/// onAppear, and scenePhase → .active (handled by BindGateView). APNs app
-/// registration/routing is owned by spec 067; this state still uses refresh.
+/// foreground return and a visible/active 30-second task (BindGateView).
+/// AppShell owns APNs registration and routes acceptance taps to the gate.
 @available(iOS 17.0, macOS 14.0, *)
 struct PendingBindView: View {
   let request: BindRequest
@@ -16,11 +16,13 @@ struct PendingBindView: View {
   let onStateMayHaveChanged: () async -> Void
   @State private var viewModel: PendingBindViewModel
   @State private var showsCancelConfirm = false
+  @Environment(\.scenePhase) private var scenePhase
 
   init(
     request: BindRequest,
     materialsSummary: PendingMaterialsSummary?,
     bind: any RepositoryContracts.BindRepository,
+    notificationPermission: StudentNotificationPermissionActions = .init(),
     onCancelled: @escaping () -> Void,
     onStateMayHaveChanged: @escaping () async -> Void
   ) {
@@ -28,7 +30,9 @@ struct PendingBindView: View {
     self.materialsSummary = materialsSummary
     self.onCancelled = onCancelled
     self.onStateMayHaveChanged = onStateMayHaveChanged
-    self._viewModel = State(initialValue: PendingBindViewModel(bind: bind))
+    self._viewModel = State(
+      initialValue: PendingBindViewModel(bind: bind, notificationPermission: notificationPermission)
+    )
   }
 
   var body: some View {
@@ -58,6 +62,14 @@ struct PendingBindView: View {
           .font(Font.MeetPR.caption)
           .foregroundStyle(Color.MeetPR.textTertiary)
 
+        #if os(iOS)
+          if viewModel.canRequestNotificationPermission {
+            PendingBindReminderCard(isRequesting: viewModel.isRequestingNotificationPermission) {
+              Task { _ = await viewModel.requestNotificationPermission() }
+            }
+          }
+        #endif
+
         if let cancelError = viewModel.cancelError {
           Text(cancelError)
             .font(Font.MeetPR.caption)
@@ -74,6 +86,10 @@ struct PendingBindView: View {
     .scrollContentBackground(.hidden)
     .background(Color.MeetPR.bgBase)
     .onAppear { Analytics.shared.screen(.pendingBind) }
+    .task(id: scenePhase) {
+      guard scenePhase == .active else { return }
+      await viewModel.refreshNotificationPermission()
+    }
     .refreshable {
       await onStateMayHaveChanged()
     }

@@ -1,3 +1,4 @@
+import Analytics
 import Foundation
 import RepositoryContracts
 import Testing
@@ -67,4 +68,32 @@ import Testing
   #expect(
     PendingBindViewModel.waitingDescription(
       since: start, now: start.addingTimeInterval(-300)) == "0 分钟")
+}
+
+@MainActor
+@Test(arguments: [true, false])
+func welcomePermissionTracksSourceAndStaysOnScreen(allowed: Bool) async {
+  var undecided = true
+  var events: [(AnalyticsEvent, [String: AnalyticsValue])] = []
+  let model = BindWelcomeViewModel(
+    permission: .init(
+      canRequest: { undecided },
+      request: {
+        undecided = false
+        return allowed
+      }),
+    track: { events.append(($0, $1)) })
+  await model.refreshPermission()
+  #expect(model.canRequestPermission)
+  await model.requestPermission()
+  #expect(!model.canRequestPermission)
+  #expect(!model.isRequesting)
+  #expect(events.count == 2)
+  #expect(events[0].0 == .notificationPermissionAction)
+  #expect(events[0].1 == ["source": .enumCase("welcome"), "stage": .enumCase("clicked")])
+  #expect(
+    events[1].1 == [
+      "source": .enumCase("welcome"), "stage": .enumCase("resolved"),
+      "result": .enumCase(allowed ? "allowed" : "denied"),
+    ])
 }

@@ -16,7 +16,8 @@ enum BindFixtures {
     submittedAt: Date = referenceDate,
     coachId: UUID = BindFixtures.coachId,
     coachDisplayName: String? = "David",
-    skipEvaluation: Bool = false
+    skipEvaluation: Bool = false,
+    firstRun: BindFirstRun? = nil
   ) -> BindRequest {
     BindRequest(
       id: UUID(uuidString: "0a000000-0000-0000-0000-00000000000f")!,
@@ -28,7 +29,8 @@ enum BindFixtures {
       submittedAt: submittedAt,
       respondedAt: nil,
       expiredAt: submittedAt.addingTimeInterval(7 * 86_400),
-      skipEvaluation: skipEvaluation
+      skipEvaluation: skipEvaluation,
+      firstRun: firstRun
     )
   }
 

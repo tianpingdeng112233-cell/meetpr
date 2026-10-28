@@ -187,3 +187,39 @@ import Testing
 private func jsonString<Value: Encodable>(_ value: Value) throws -> String {
   String(bytes: try MeetPRCodec.encoder.encode(value), encoding: .utf8) ?? ""
 }
+
+@Test(arguments: ["", ",\"first_run\":null"])
+func firstRunMissingOrNullKeepsLegacyContract(field: String) throws {
+  let json = """
+    {"id":"b1000000-0000-0000-0000-000000000001",
+    "student_id":"b1000000-0000-0000-0000-000000000002",
+    "coach_id":"b1000000-0000-0000-0000-000000000003",
+    "status":"accepted","submitted_at":"2026-10-26T08:00:00Z",
+    "expired_at":"2026-11-02T08:00:00Z","skip_evaluation":true\(field)}
+    """
+  let dto = try MeetPRCodec.decoder.decode(BindRequestDTO.self, from: Data(json.utf8))
+  #expect(dto.firstRun == nil)
+  #expect(dto.toDomain().firstRun == nil)
+}
+
+@Test func firstRunDecodesServerPlanSummary() throws {
+  let json = """
+    {"id":"b1000000-0000-0000-0000-000000000001",
+    "student_id":"b1000000-0000-0000-0000-000000000002",
+    "coach_id":"b1000000-0000-0000-0000-000000000003",
+    "status":"accepted","submitted_at":"2026-10-26T08:00:00Z",
+    "expired_at":"2026-11-02T08:00:00Z","skip_evaluation":true,
+    "first_run":{"binding_plan_count":2,"has_settled_day":false,"first_plan":{
+      "id":"b1000000-0000-0000-0000-000000000004","published_at":"2026-10-26T09:00:00Z",
+      "plan_weeks":4,"day_count":12,"has_settled_day":false}}}
+    """
+  let value = try MeetPRCodec.decoder.decode(BindRequestDTO.self, from: Data(json.utf8)).toDomain()
+  #expect(value.firstRun?.bindingPlanCount == 2)
+  #expect(value.firstRun?.hasSettledDay == false)
+  #expect(
+    value.firstRun?.firstPlan?.id.uuidString.lowercased() == "b1000000-0000-0000-0000-000000000004")
+  #expect(value.firstRun?.firstPlan?.planWeeks == 4)
+  #expect(value.firstRun?.firstPlan?.dayCount == 12)
+  #expect(value.firstRun?.firstPlan?.hasSettledDay == false)
+  #expect(value.firstRun?.firstPlan?.publishedAt == Date(timeIntervalSince1970: 1_793_005_200))
+}

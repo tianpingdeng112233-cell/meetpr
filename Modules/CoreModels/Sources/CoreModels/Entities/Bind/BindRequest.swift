@@ -23,6 +23,7 @@ public struct BindRequest: Codable, Hashable, Sendable, Identifiable {
   public let expiredAt: Date
   public let skipEvaluation: Bool
   public let skipReason: String?
+  public let firstRun: BindFirstRun?
 
   public init(
     id: UUID,
@@ -35,7 +36,8 @@ public struct BindRequest: Codable, Hashable, Sendable, Identifiable {
     respondedAt: Date? = nil,
     expiredAt: Date,
     skipEvaluation: Bool = false,
-    skipReason: String? = nil
+    skipReason: String? = nil,
+    firstRun: BindFirstRun? = nil
   ) {
     self.id = id
     self.studentId = studentId
@@ -48,5 +50,6 @@ public struct BindRequest: Codable, Hashable, Sendable, Identifiable {
     self.expiredAt = expiredAt
     self.skipEvaluation = skipEvaluation
     self.skipReason = skipReason
+    self.firstRun = firstRun
   }
 }

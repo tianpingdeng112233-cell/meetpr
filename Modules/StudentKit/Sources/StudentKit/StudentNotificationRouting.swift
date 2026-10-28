@@ -45,7 +45,8 @@ enum StudentNotificationRoute: Hashable {
     switch intent {
     case .planShifted, .planShiftUndone, .planUpdated, .planPublished:
       .plan
-    case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest, .planShift:
+    case .chatMessage, .missedTraining, .prCongrats, .videoPending, .bindRequest, .bindAccepted,
+      .planShift:
       nil
     }
   }

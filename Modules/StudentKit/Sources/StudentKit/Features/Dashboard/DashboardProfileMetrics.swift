@@ -6,6 +6,7 @@ import RepositoryContracts
 struct DashboardProfileMetrics: Equatable, Sendable {
   let bodyWeightText: String?
   let competition: CompetitionCountdown?
+  var hasCompetitionDate = false
 
   var isEmpty: Bool {
     bodyWeightText == nil && competition == nil
@@ -26,7 +27,8 @@ enum CompetitionCountdownPresenter {
   ) -> DashboardProfileMetrics {
     DashboardProfileMetrics(
       bodyWeightText: profile?.weightKg.map { "\(BodyWeightInput.text(kg: $0, unit: .kg)) kg" },
-      competition: countdown(from: profile, now: now, calendar: calendar)
+      competition: countdown(from: profile, now: now, calendar: calendar),
+      hasCompetitionDate: profile?.competitionDate != nil
     )
   }
 

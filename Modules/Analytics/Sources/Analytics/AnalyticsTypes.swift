@@ -9,6 +9,12 @@ public enum AnalyticsEvent: String, Codable, CaseIterable, Sendable {
   case onboardingStep = "onboarding_step"
   case onboardingComplete = "onboarding_complete"
   case bindCoachAction = "bind_coach_action"
+  case notificationPermissionAction = "notification_permission_action"
+  case bindWelcomeViewed = "bind_welcome_viewed"
+  case bindWelcomeContinue = "bind_welcome_continue"
+  case firstPlanViewed = "first_plan_viewed"
+  case firstPlanStart = "first_plan_start"
+  case firstPlanDismiss = "first_plan_dismiss"
   case planViewed = "plan_viewed"
   case progressViewed = "progress_viewed"
   case coachOpenStudent = "coach_open_student"
@@ -166,6 +172,9 @@ extension AnalyticsEvent {
     case .onboardingStep: ["step_index", "step_name"]
     case .onboardingComplete: ["n_steps_filled", "used_draft_resume"]
     case .bindCoachAction: ["stage"]
+    case .bindWelcomeViewed, .bindWelcomeContinue: []
+    case .firstPlanViewed, .firstPlanStart, .firstPlanDismiss: ["plan_id"]
+    case .notificationPermissionAction: ["source", "stage", "result"]
     case .planViewed: ["plan_id"]
     case .progressViewed: ["tab"]
     case .coachOpenStudent: ["student_id"]

@@ -42,6 +42,7 @@ public enum BindGateState: Equatable, Sendable {
   case evaluationActive(BindRequest, EvaluationPeriod)
   /// → 5-tab main content.
   case bound(BindRequest)
+  case welcome(BindRequest)
   /// `mine` fetch failed → full-screen retry. Never falls through to the
   /// 5 tabs: an unbound student in the main UI sees misleading empty plans
   /// (spec 031 risk 3).
@@ -69,6 +70,8 @@ public final class BindGateViewModel {
   /// deliberately leaves this at zero.
   public private(set) var acceptanceRevision = 0
 
+  let firstRun: BindFirstRunExperience
+
   private let bind: any BindRepository
   private let stash: any PendingBindCodeStoring
   private let isOnboardingComplete: @Sendable () async -> Bool
@@ -81,6 +84,7 @@ public final class BindGateViewModel {
   /// Orders overlapping `load()` / `refresh()` fetches so the newest wins,
   /// rather than whichever happens to return last.
   private var fetchGeneration: UInt64 = 0
+  private let pollingSleep: @Sendable (Duration) async throws -> Void
 
   public init(
     studentId: UUID,
@@ -88,16 +92,22 @@ public final class BindGateViewModel {
     stash: any PendingBindCodeStoring,
     isOnboardingComplete: @escaping @Sendable () async -> Bool,
     evaluations: (any EvaluationRepository)? = nil,
+    firstRunDefaults: UserDefaults = .standard,
+    pollingSleep: @escaping @Sendable (Duration) async throws -> Void = {
+      try await Task.sleep(for: $0)
+    },
     willApplyBindingChange:
       @escaping @MainActor @Sendable (
         _ oldCoachID: UUID?, _ newCoachID: UUID?
       ) async -> Void = { _, _ in }
   ) {
+    self.firstRun = BindFirstRunExperience(studentID: studentId, defaults: firstRunDefaults)
     self.studentId = studentId
     self.bind = bind
     self.stash = stash
     self.isOnboardingComplete = isOnboardingComplete
     self.evaluations = evaluations
+    self.pollingSleep = pollingSleep
     self.willApplyBindingChange = willApplyBindingChange
   }
 
@@ -174,6 +184,41 @@ public final class BindGateViewModel {
     await apply(candidate, generation: generation)
   }
 
+  /// Dashboard refreshes must not replace a usable bound screen on a transient failure.
+  public func refreshFirstRun() async {
+    switch state {
+    case .bound, .welcome: break
+    default: return
+    }
+    fetchGeneration &+= 1
+    let generation = fetchGeneration
+    let candidate = await fetchCandidateState()
+    guard candidate != .failed else { return }
+    await apply(candidate, generation: generation)
+  }
+
+  /// The pending page owns this task and cancels it on disappearance or when
+  /// the scene stops being active. No timer survives behind another screen.
+  public func pollPendingAcceptance() async {
+    while case .pendingAcceptance = state, !Task.isCancelled {
+      do {
+        try await pollingSleep(.seconds(30))
+      } catch {
+        return
+      }
+      guard !Task.isCancelled, case .pendingAcceptance = state else { return }
+      fetchGeneration &+= 1
+      let generation = fetchGeneration
+      let candidate = await fetchCandidateState()
+      // A background check must not evict the waiting page on a transient
+      // transport failure. Keep waiting and retry on the next interval.
+      guard !Task.isCancelled else { return }
+      if candidate != .failed {
+        await apply(candidate, generation: generation)
+      }
+    }
+  }
+
   // MARK: - Enter-code page callbacks
 
   public func handleSubmitted(_ outcome: EnterCodeViewModel.SubmitOutcome) async {
@@ -205,6 +250,12 @@ public final class BindGateViewModel {
     case .needsReload:
       await load()
     }
+  }
+
+  public func continueFromWelcome() {
+    guard case .welcome(let request) = state else { return }
+    firstRun.continueFromWelcome()
+    state = .bound(request)
   }
 
   // MARK: - Pending page callbacks
@@ -293,7 +344,13 @@ public final class BindGateViewModel {
         return
       }
     }
-    state = candidate
+    if case .bound(let request) = candidate {
+      firstRun.update(request)
+      state = firstRun.showsWelcome ? .welcome(request) : candidate
+    } else {
+      firstRun.update(nil)
+      state = candidate
+    }
     if case .pendingAcceptance = oldState, case .bound = candidate {
       acceptanceRevision += 1
     }
@@ -301,7 +358,7 @@ public final class BindGateViewModel {
 
   private static func activeCoachID(in state: BindGateState) -> UUID? {
     switch state {
-    case .bound(let request): request.coachId
+    case .bound(let request), .welcome(let request): request.coachId
     case .loading, .needsCode, .needsOnboarding, .pendingAcceptance,
       .evaluationActive, .failed:
       nil

@@ -44,6 +44,8 @@ struct DashboardTodayScreenModel {
   let notificationUnreadCount: Int
   let weekContentState: DashboardWeekContentState
   let now: Date
+  var firstRun: BindFirstRun?
+  var firstPlan: BindFirstRun.FirstPlan?
 }
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -62,6 +64,11 @@ struct DashboardTodayScreen: View {
   var onOpenWorkoutDay: (UUID) -> Void = { _ in }
   var selectionResetToken = 0
   @State private var selection = DashboardDaySelection()
+  var onOpenProfile: () -> Void = {}
+  var onStartFirstPlan: () -> Void = {}
+  var onDismissFirstPlan: () -> Void = {}
+  var isStartingFirstPlan = false
+  var isVisible = true
   var onEditProfile: (ProfileCardKind) -> Void = { _ in }
 
   private var sequence: StudentPlanSequence {
@@ -115,23 +122,39 @@ struct DashboardTodayScreen: View {
         onOpenNotifications: onOpenNotifications
       )
 
+      if let plan = model.firstPlan {
+        DashboardFirstPlanCard(
+          plan: plan, coachName: model.coachName, isStarting: isStartingFirstPlan,
+          isVisible: isVisible,
+          onStart: onStartFirstPlan, onDismiss: onDismissFirstPlan)
+      }
+
       switch model.weekContentState {
       case .initial, .loading:
         DashboardTodayLoadingSkeleton()
       case .failed(let message):
         DashboardInlineFailureCard(message: message, retry: onRetryWeek)
       case .loaded where sequence.orderedDays.isEmpty:
-        DashboardPlanWaitingState(
-          coachName: model.coachName,
-          nextWeekIndex: 1,
-          summary: DashboardTodayPresentation.weekSummary(
-            days: model.days,
-            logs: model.logs,
-            newPRCount: model.newPRCount
-          ),
-          onMessageCoach: onMessageCoach
-        )
+        if DashboardTodayPresentation.showsNewStudentWaiting(
+          isWaiting: true, firstRun: model.firstRun
+        ) {
+          DashboardNewStudentWaitingCard(
+            coachName: model.coachName, showsMeetDate: showsMeetDate,
+            onMessageCoach: onMessageCoach, onOpenProfile: onOpenProfile,
+            onEditMeet: { onEditProfile(.competition) })
+        } else {
+          DashboardPlanWaitingState(
+            coachName: model.coachName,
+            nextWeekIndex: 1,
+            summary: DashboardTodayPresentation.weekSummary(
+              days: model.days,
+              logs: model.logs,
+              newPRCount: model.newPRCount
+            ),
+            onMessageCoach: onMessageCoach
+          )
 
+        }
         profileMetricsContent
       case .loaded:
         DashboardFeedbackCard(
@@ -223,6 +246,10 @@ struct DashboardTodayScreen: View {
         onContinue: onStartWorkout
       )
     }
+  }
+
+  private var showsMeetDate: Bool {
+    DashboardTodayPresentation.showsMeetDateGuidance(metrics: model.metricsState)
   }
 
   private var pendingFeedback: DashboardPendingFeedbackPresentation? {
