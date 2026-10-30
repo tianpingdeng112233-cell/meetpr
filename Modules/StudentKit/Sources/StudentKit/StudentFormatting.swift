@@ -80,6 +80,12 @@ enum StudentFormatting {
     _ set: PrescribedSet,
     percentageOutcome: SetWeightSuggestionOutcome? = nil
   ) -> String {
+    if set.hasUnspecifiedLoad {
+      let label = StudentStrings.localized(
+        set.isBodyweight ? .loadTypeBodyweight : .loadTypeFreeWeight)
+      let target = set.intensity.map { " · " + intensityText($0) } ?? ""
+      return "\(label) × \(loadTypeReps(set))\(target)"
+    }
     // Legacy rows (load_mode == null) keep the pre-072 string byte-for-byte;
     // only new-form rows get the six-form rendering (spec 072 §1.4).
     if set.isLegacyPrescription {
@@ -120,6 +126,12 @@ enum StudentFormatting {
       return "\(intensityText(intensity)) × \(reps)"
     }
     return "× \(reps)"
+  }
+
+  static func loadTypeReps(_ set: PrescribedSet) -> String {
+    guard let reps = set.reps, reps > 0 else { return StudentStrings.localized(.loadTypeFailure) }
+    if let maximum = set.repsMax { return "\(reps)–\(maximum)" }
+    return String(reps)
   }
 
   static func intensityText(_ intensity: PrescribedIntensity) -> String {

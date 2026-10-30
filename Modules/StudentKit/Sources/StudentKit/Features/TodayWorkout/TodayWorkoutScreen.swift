@@ -791,7 +791,8 @@ private struct TodayWorkoutHero: View {
         }
 
         if let lowerNote = CoachNoteDisplay.heroLowerNote(
-          isEditable: isEditable, notes: exercise.note, coachNote: row.draft.prescribed.coachNote)
+          isEditable: isEditable, notes: exercise.note,
+          coachNote: row.draft.prescribed.visibleCoachNote)
         {
           VStack(alignment: .leading, spacing: MeetPRSpacing.point3) {
             Text(StudentStrings.localized(.todayWorkoutScreen014))
@@ -951,7 +952,10 @@ private struct TodayWorkoutExerciseList: View {
 
   var body: some View {
     ForEach(exercises) { exercise in
-      if let viewModel, exercise.rows.first?.draft.isAccessory == true, editable {
+      if let viewModel, editable,
+        exercise.rows.first?.draft.isAccessory == true
+          || exercise.rows.contains(where: { $0.draft.prescribed.hasUnspecifiedLoad })
+      {
         VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
           Text(exercise.name).font(.headline)
           AccessoryLogCard(

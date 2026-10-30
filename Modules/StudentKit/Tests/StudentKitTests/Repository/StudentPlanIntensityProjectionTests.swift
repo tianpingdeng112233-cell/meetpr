@@ -1,9 +1,123 @@
+import ChatUI
 import CoreModels
 import Foundation
 import Networking
 import Testing
+import ViewInspector
 
 @testable import StudentKit
+
+@MainActor
+@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight], [nil, Decimal(8)])
+func loadTypeLegacyProjectionDoesNotInventIntensity(
+  mode: PlanLoadMode, targetRPE: Decimal?
+) throws {
+  let plan = loadTypeProjection(mode: mode, targetRPE: targetRPE)
+  let day = try #require(plan.days.first)
+  let set = try #require(day.exercises.first?.prescribedSets.first)
+  let drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
+  let draft = try #require(drafts.first)
+  let label = mode == .bodyweight ? "自重" : "自选重量"
+  let expected = targetRPE == nil ? "\(label) × 5" : "\(label) × 5 · RPE 8"
+  #expect(StudentFormatting.prescribed(set) == expected)
+  #expect(HistorySetRow(set: set, log: nil).result == expected)
+  let header = LoadTypePrescriptionHeader(set: set, count: 1)
+  let summary = targetRPE == nil ? "1 × 5" : "1 × 5 · 目标 RPE 8"
+  #expect(try header.inspect().find(text: summary).string() == summary)
+  let presentation = TodayWorkoutPresentation(
+    day: day, drafts: drafts, references: [:], started: true)
+  #expect(presentation.exercises.first?.prescriptionSummary == "\(expected) · 1 组")
+  #expect(presentation.currentRow?.record.rpe == (targetRPE == nil ? 0 : 8))
+  #expect(draft.actualRPE == targetRPE)
+  let row = AccessoryRow(draft: draft, previous: nil, unit: .kg)
+  #expect(row.input.rpe.isEmpty)
+  #expect(row.rpePlaceholder == (targetRPE == nil ? "" : "8"))
+}
+
+private func loadTypeProjection(
+  mode: PlanLoadMode, targetRPE: Decimal? = nil,
+  rpeLow: Decimal? = nil, rpeHigh: Decimal? = nil,
+  rirTarget: Int? = nil, targetPct: Decimal? = nil
+) -> StudentPlanView {
+  let fixture = intensityProjectionFixture()
+  let set = projectionSet(
+    exerciseID: fixture.tree.sets[0].planExerciseID, timestamp: .distantPast, number: 1,
+    legacyMode: .rpe, legacyValue: 10, loadMode: mode, targetPct: targetPct,
+    targetRPE: targetRPE, rirTarget: rirTarget,
+    rpeLow: rpeLow, rpeHigh: rpeHigh)
+  return StudentPlanProjection.project(
+    tree: TrainingPlanTree(
+      plan: fixture.tree.plan, days: fixture.tree.days,
+      exercises: fixture.tree.exercises, sets: [set]),
+    catalog: [fixture.catalogExercise], weekIndex: 1)
+}
+
+@MainActor
+@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight])
+func loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode: PlanLoadMode) throws {
+  let plan = loadTypeProjection(mode: mode, rpeLow: 7, rpeHigh: 9)
+  let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
+  let label = mode == .bodyweight ? "自重" : "自选重量"
+  #expect(StudentFormatting.prescribed(set) == "\(label) × 5 · RPE 7–9")
+  let header = LoadTypePrescriptionHeader(set: set, count: 1)
+  #expect(
+    try header.inspect().find(text: "1 × 5 · 目标 RPE 7–9").string()
+      == "1 × 5 · 目标 RPE 7–9")
+  #expect(set.rpe == nil)
+}
+
+@MainActor
+@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight], [nil, Decimal(8)])
+func loadTypeLegacyProjectionEntryPreservesOptionalRPE(
+  mode: PlanLoadMode, targetRPE: Decimal?
+) async throws {
+  let plan = loadTypeProjection(mode: mode, targetRPE: targetRPE)
+  let day = try #require(plan.days.first)
+  let studentID = UUID()
+  let model = TodayWorkoutViewModel(
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    logs: InMemoryStudentTrainingLogRepository())
+  await model.load(dayID: day.id, studentID: studentID)
+  model.updateWeight(rowIndex: 0, weight: 20)
+  let draft = try #require(model.currentDrafts?.first)
+  let sheet = SetEntrySheet(rowIndex: 0, draft: draft, setNumber: 1, viewModel: model)
+  try sheet.inspect().find(button: StudentStrings.localized(.setEntrySheet012)).tap()
+  #expect(model.currentDrafts?.first?.actualRPE == targetRPE)
+}
+
+@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight], [nil, Decimal(8)])
+func loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(
+  mode: PlanLoadMode, targetRPE: Decimal?
+) async throws {
+  let plan = loadTypeProjection(mode: mode, targetRPE: targetRPE)
+  let studentID = UUID()
+  let source = TodaySetRefSharingSource(
+    studentID: studentID,
+    plans: InMemoryStudentPlanRepository(store: TestStudentPlanStore(seed: [studentID: plan])),
+    logs: InMemoryStudentTrainingLogRepository(), videoManager: VideoUploadServices.demo().manager)
+  let candidate = try #require(try await source.loadCandidates().first)
+  #expect(candidate.source.rpe == (targetRPE == nil ? nil : "8"))
+  let reference = try SetRefV1.normalizingSource(candidate.source)
+  let line = ChatSetRefDisplayFormatter.firstLine(for: reference)
+  #expect(!line.contains("RPE 10"))
+  #expect(line.contains("RPE") == (targetRPE != nil))
+}
+
+@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight])
+func loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode: PlanLoadMode) throws {
+  let plans = [
+    loadTypeProjection(mode: mode, rirTarget: 2),
+    loadTypeProjection(mode: mode, targetPct: 75),
+    loadTypeProjection(mode: mode, rpeLow: 7),
+  ]
+  let label = mode == .bodyweight ? "自重" : "自选重量"
+  let expected = ["\(label) × 5 · RIR 2", "\(label) × 5 · 75%", "\(label) × 5"]
+  for (plan, text) in zip(plans, expected) {
+    let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
+    #expect(StudentFormatting.prescribed(set) == text)
+    #expect(set.rpe == nil)
+  }
+}
 
 @Test func studentProjectionUsesCanonicalIntensityFieldsAndIgnoresLegacyProjection() throws {
   let fixture = intensityProjectionFixture()

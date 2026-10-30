@@ -18,9 +18,10 @@ enum AccessoryDemoScenario {
       let sets = (0..<3).map { index in
         PrescribedSet(
           id: identifier(100 + index), setIndex: index,
-          weightKg: has("rpe") || has("bodyweight") ? nil : 60,
+          weightKg: has("rpe") || has("bodyweight") || has("free-weight") ? nil : 60,
           intensity: has("bodyweight") ? .rir(2) : .rpe(8),
-          loadMode: has("bodyweight") ? .rir : has("rpe") ? .rpe : .fixedWeight,
+          loadMode: has("bodyweight")
+            ? .bodyweight : has("free-weight") ? .freeWeight : has("rpe") ? .rpe : .fixedWeight,
           reps: 12, restSeconds: has("coach-rest") ? 75 : nil,
           coachNote: has("bodyweight") ? "bodyweight" : index == 1 ? "3-1-1" : nil)
       }

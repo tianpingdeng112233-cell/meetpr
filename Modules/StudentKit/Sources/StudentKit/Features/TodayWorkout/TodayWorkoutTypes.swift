@@ -87,7 +87,15 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   }
 
   public var allowsPlateLoadingGuidance: Bool {
-    !isAccessory
+    !isAccessory && !prescribed.hasUnspecifiedLoad
+  }
+
+  var missingFreeWeightMessage: String? {
+    guard prescribed.loadMode == .freeWeight,
+      actualWeight.map({ !$0.isNaN && $0 >= 0 }) != true
+    else { return nil }
+    return StudentStrings.replacing(
+      .loadTypeMissingWeight, values: [String(prescribed.setIndex + 1)])
   }
 
   public var displayExerciseName: String { displayExerciseName(locale: .current) }

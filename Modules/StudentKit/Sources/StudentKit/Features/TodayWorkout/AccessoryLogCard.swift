@@ -10,47 +10,101 @@ struct AccessoryLogCard: View {
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   @State private var edits: [UUID: AccessoryRow] = [:]
   @State private var showsSkipped = false
+  @State private var attemptedRows: Set<UUID> = []
+
+  private var hasLoadTypes: Bool {
+    exercise.rows.contains { $0.draft.prescribed.hasUnspecifiedLoad }
+  }
+
+  private var hasUniformLoadTypePrescription: Bool {
+    guard let first = exercise.prescribedRows.first?.draft.prescribed else { return false }
+    return exercise.prescribedRows.allSatisfy {
+      let set = $0.draft.prescribed
+      return set.loadMode == first.loadMode && set.isBodyweight == first.isBodyweight
+        && set.reps == first.reps && set.repsMax == first.repsMax
+        && set.intensity == first.intensity
+    }
+  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
-      AccessoryColumns {
-        ForEach(
-          [
-            StudentStrings.localized(.accessorySet), StudentStrings.localized(.accessoryLast),
-            UnitDisplay.weightUnitSuffix(unit).uppercased(),
-            StudentStrings.localized(.setEntrySheet003), "RPE",
-            StudentStrings.localized(.workoutCompletionFlowView003),
-          ], id: \.self
-        ) { label in
-          Text(label)
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-            .foregroundStyle(Color.MeetPR.textMuted)
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-            .frame(maxWidth: .infinity)
+      if !hasLoadTypes {
+        AccessoryColumns {
+          ForEach(
+            [
+              StudentStrings.localized(.accessorySet), StudentStrings.localized(.accessoryLast),
+              UnitDisplay.weightUnitSuffix(unit).uppercased(),
+              StudentStrings.localized(.setEntrySheet003), "RPE",
+              StudentStrings.localized(.workoutCompletionFlowView003),
+            ], id: \.self
+          ) { label in
+            Text(label)
+              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+              .foregroundStyle(Color.MeetPR.textMuted)
+              .lineLimit(1)
+              .minimumScaleFactor(0.5)
+              .frame(maxWidth: .infinity)
+          }
         }
       }
       ForEach(exercise.rows) { presentationRow in
-        AccessoryLogRow(
-          row: Binding(
-            get: { row(for: presentationRow) },
-            set: { edits[presentationRow.id] = $0 }),
-          number: presentationRow.record.index,
-          isSaving: viewModel.accessorySavingIDs.contains(presentationRow.id),
-          isDisabled: viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty,
-          showsValidation: showsSkipped,
-          onEdit: { onEdit(presentationRow) },
-          onSave: {
-            let input = row(for: presentationRow)
-            Task { await viewModel.saveAccessoryRow(input) }
+        if presentationRow.draft.prescribed.hasUnspecifiedLoad {
+          if presentationRow.id == exercise.rows.first?.id || !hasUniformLoadTypePrescription {
+            LoadTypePrescriptionHeader(
+              set: presentationRow.draft.prescribed,
+              count: hasUniformLoadTypePrescription ? exercise.prescribedRows.count : 1)
           }
-        )
+          LoadTypeLogRow(
+            row: Binding(
+              get: { row(for: presentationRow) }, set: { edits[presentationRow.id] = $0 }),
+            number: presentationRow.record.index,
+            isSaving: viewModel.accessorySavingIDs.contains(presentationRow.id),
+            isDisabled: viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty,
+            showsValidation: showsSkipped || attemptedRows.contains(presentationRow.id),
+            onEdit: { onEdit(presentationRow) },
+            onSave: {
+              attemptedRows.insert(presentationRow.id)
+              let input = row(for: presentationRow)
+              guard input.isWritable || input.isCancellation else { return }
+              Task { await viewModel.saveAccessoryRow(input) }
+            })
+          if let note = row(for: presentationRow).extraNote {
+            Text(note).font(.caption).foregroundStyle(Color.MeetPR.coachNoteText)
+          }
+        } else {
+          AccessoryLogRow(
+            row: Binding(
+              get: { row(for: presentationRow) },
+              set: { edits[presentationRow.id] = $0 }),
+            number: presentationRow.record.index,
+            isSaving: viewModel.accessorySavingIDs.contains(presentationRow.id),
+            isDisabled: viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty,
+            showsValidation: showsSkipped,
+            onEdit: { onEdit(presentationRow) },
+            onSave: {
+              let input = row(for: presentationRow)
+              Task { await viewModel.saveAccessoryRow(input) }
+            }
+          )
+        }
         if presentationRow.draft.isExtra {
           HStack {
             Spacer()
             RemoveStudentSetButton(row: presentationRow, viewModel: viewModel)
           }
         }
+      }
+      ForEach(
+        exercise.rows.filter {
+          (showsSkipped || attemptedRows.contains($0.id))
+            && $0.draft.prescribed.loadMode == .freeWeight && row(for: $0).weightKg == nil
+        }
+      ) { row in
+        Text(StudentStrings.replacing(.loadTypeMissingWeight, values: [String(row.record.index)]))
+          .font(.caption)
+          .foregroundStyle(Color.MeetPR.danger)
+          .fixedSize(horizontal: false, vertical: true)
+          .accessibilityIdentifier("accessory.set.\(row.record.index).weightError")
       }
       ExtraSetControls(
         exercise: exercise, viewModel: viewModel, editable: true, onEdit: onEdit,
@@ -103,7 +157,8 @@ struct AccessoryLogCard: View {
   private func row(for row: TodayWorkoutPresentation.Row) -> AccessoryRow {
     var source = AccessoryRow(
       draft: row.draft,
-      previous: row.draft.isExtra ? nil : previousLogs[row.draft.prescribed.setIndex], unit: unit,
+      previous: row.draft.isExtra ? nil : previousLogs[row.draft.prescribed.setIndex],
+      unit: row.draft.prescribed.hasUnspecifiedLoad ? .kg : unit,
       hasVideo: row.record.videoState != .none)
     if let edit = edits[row.id], edit.draft == source.draft, edit.unit == source.unit {
       source.input = edit.input

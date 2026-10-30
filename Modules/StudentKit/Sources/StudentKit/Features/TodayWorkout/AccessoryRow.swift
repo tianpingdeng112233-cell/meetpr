@@ -20,12 +20,9 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
   var input: AccessoryInput
 
   var id: UUID { draft.id }
-  var isBodyweight: Bool {
-    let note = draft.prescribed.coachNote ?? ""
-    return note.localizedStandardContains("bodyweight") || note.contains("自重")
-  }
+  var isBodyweight: Bool { draft.prescribed.isBodyweight }
   var extraNote: String? {
-    isBodyweight ? nil : CoachNoteDisplay.text(draft.prescribed.coachNote)
+    draft.prescribed.visibleCoachNote
   }
   var isRecorded: Bool { draft.completed || draft.failed }
   var isCancellation: Bool { draft.completed && !draft.failed && input == initialInput }
@@ -38,7 +35,7 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
     }
   }
   var weightKg: Decimal? {
-    if isBodyweight { return 0 }
+    if isBodyweight && input.weight.trimmingCharacters(in: .whitespaces).isEmpty { return 0 }
     guard let value = Self.number(input.weight), value >= 0 else { return nil }
     return UnitDisplay.rounded(unit == .lb ? value / UnitDisplay.lbPerKg : value, scale: 2)
   }
@@ -80,7 +77,7 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
 
   mutating func usePrevious() {
     guard let previousReps else { return }
-    if !isBodyweight { input.weight = UnitDisplay.weightText(kg: previousWeight, unit: unit) }
+    input.weight = UnitDisplay.weightText(kg: previousWeight, unit: unit)
     input.reps = String(previousReps)
   }
 

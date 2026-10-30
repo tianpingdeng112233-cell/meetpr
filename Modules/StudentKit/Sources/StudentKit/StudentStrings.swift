@@ -33,6 +33,20 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let loadTypeFreeWeight = Key("student.loadType.freeWeight")
+    static let loadTypeBodyweight = Key("student.loadType.bodyweight")
+    static let loadTypeFreeWeightHint = Key("student.loadType.freeWeightHint")
+    static let loadTypeBodyweightHint = Key("student.loadType.bodyweightHint")
+    static let loadTypeRequiredWeight = Key("student.loadType.requiredWeight")
+    static let loadTypeOptionalWeight = Key("student.loadType.optionalWeight")
+    static let loadTypeRequiredPlaceholder = Key("student.loadType.requiredPlaceholder")
+    static let loadTypeOptionalPlaceholder = Key("student.loadType.optionalPlaceholder")
+    static let loadTypeMissingWeight = Key("student.loadType.missingWeight")
+    static let loadTypeSet = Key("student.loadType.set")
+    static let loadTypeComplete = Key("student.loadType.complete")
+    static let loadTypeUndo = Key("student.loadType.undo")
+    static let loadTypeTarget = Key("student.loadType.target")
+    static let loadTypeFailure = Key("student.loadType.failure")
     static let addedCancel = Key("student.added.cancel")
     static let addedAddSet = Key("student.added.addSet")
     static let addedExtra = Key("student.added.extra")

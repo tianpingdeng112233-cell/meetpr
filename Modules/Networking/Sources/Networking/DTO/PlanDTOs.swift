@@ -255,8 +255,8 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
   public let setNumber: Int
   public let targetReps: Int
   public let targetRepsMax: Int?
-  public let intensityMode: IntensityMode
-  public let targetValue: Decimal
+  public let intensityMode: IntensityMode?
+  public let targetValue: Decimal?
   public let loadMode: PlanLoadMode?
   public let targetPct: Decimal?
   public let percentageAnchor: PercentageAnchor?
@@ -279,8 +279,8 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     setNumber: Int,
     targetReps: Int,
     targetRepsMax: Int? = nil,
-    intensityMode: IntensityMode,
-    targetValue: Decimal,
+    intensityMode: IntensityMode?,
+    targetValue: Decimal?,
     loadMode: PlanLoadMode? = nil,
     targetPct: Decimal? = nil,
     percentageAnchor: PercentageAnchor? = nil,
@@ -326,8 +326,8 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     setNumber = try container.decode(Int.self, forKey: .setNumber)
     targetReps = try container.decode(Int.self, forKey: .targetReps)
     targetRepsMax = try container.decodeIfPresent(Int.self, forKey: .targetRepsMax)
-    intensityMode = try container.decode(IntensityMode.self, forKey: .intensityMode)
-    targetValue = try container.decodeDecimal(forKey: .targetValue)
+    intensityMode = try container.decodeIfPresent(IntensityMode.self, forKey: .intensityMode)
+    targetValue = try container.decodeDecimalIfPresent(forKey: .targetValue)
     loadMode = try container.decodeIfPresent(PlanLoadMode.self, forKey: .loadMode)
     targetPct = try container.decodeDecimalIfPresent(forKey: .targetPct)
     percentageAnchor = PercentageAnchor(
@@ -353,8 +353,8 @@ public struct PlanSetDTO: Codable, Equatable, Sendable {
     try container.encode(setNumber, forKey: .setNumber)
     try container.encode(targetReps, forKey: .targetReps)
     try container.encodeIfPresent(targetRepsMax, forKey: .targetRepsMax)
-    try container.encode(intensityMode, forKey: .intensityMode)
-    try container.encodeDecimalString(targetValue, forKey: .targetValue)
+    try container.encodeIfPresent(intensityMode, forKey: .intensityMode)
+    try container.encodeDecimalStringIfPresent(targetValue, forKey: .targetValue)
     try container.encodeIfPresent(loadMode, forKey: .loadMode)
     try container.encodeDecimalStringIfPresent(targetPct, forKey: .targetPct)
     try container.encodeIfPresent(percentageAnchor?.rawValue, forKey: .percentageAnchor)

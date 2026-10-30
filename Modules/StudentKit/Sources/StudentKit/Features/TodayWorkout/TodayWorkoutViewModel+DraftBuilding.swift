@@ -51,7 +51,9 @@ extension TodayWorkoutViewModel {
       return .unavailableWithoutReason
     }
     let target = drafts[targetIndex]
-    guard !target.isExtra, !target.isStudentAdded, target.prescribed.weightKg == nil else {
+    guard !target.isExtra, !target.isStudentAdded, target.prescribed.weightKg == nil,
+      !target.prescribed.hasUnspecifiedLoad
+    else {
       return .unavailableWithoutReason
     }
 
@@ -368,8 +370,10 @@ extension TodayWorkoutViewModel {
       prescribed: set,
       actualWeight: existingLog?.weightKg ?? set.weightKg,
       actualReps: existingLog?.reps ?? set.reps,
-      actualRPE: exercise.exercise.isAccessory && existingLog != nil
-        ? existingLog?.rpe : existingLog?.rpe ?? set.rpe ?? 8,
+      actualRPE: set.loadMode == .bodyweight || set.loadMode == .freeWeight
+        ? (existingLog == nil ? set.rpe : existingLog?.rpe)
+        : exercise.exercise.isAccessory && existingLog != nil
+          ? existingLog?.rpe : existingLog?.rpe ?? set.rpe ?? 8,
       completed: existingLog?.completed ?? false,
       failed: existingLog?.failed ?? false,
       assumed: existingLog?.assumed ?? false,
