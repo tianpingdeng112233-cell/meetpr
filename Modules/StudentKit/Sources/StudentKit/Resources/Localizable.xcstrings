@@ -1,6 +1,75 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "student.accessory.effortSwitch": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换 RPE / RIR"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切換 RPE / RIR"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch RPE / RIR"
+          }
+        }
+      }
+    },
+    "student.accessory.rirLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 组 RIR"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 組 RIR"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set {0} RIR"
+          }
+        }
+      }
+    },
+    "student.accessory.recordedEffort": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 组已记录 {1}"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 組已記錄 {1}"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set {0} recorded as {1}"
+          }
+        }
+      }
+    },
     "student.completedDay.addedSets %lld": {
       "extractionState": "manual",
       "localizations": {

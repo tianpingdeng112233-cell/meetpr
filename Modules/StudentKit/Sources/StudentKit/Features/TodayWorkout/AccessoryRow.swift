@@ -1,10 +1,16 @@
 import CoreModels
 import Foundation
 
+enum ActualEffortMode: String, Sendable {
+  case rpe, rir
+  var label: String { rawValue.uppercased() }
+}
+
 struct AccessoryInput: Equatable, Sendable {
   var weight: String
   var reps: String
   var rpe: String
+  var effortMode: ActualEffortMode = .rpe
 }
 
 /// A display-unit editing buffer. Persisted drafts and wire values remain kilograms.
@@ -28,11 +34,22 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
   var isCancellation: Bool { draft.completed && !draft.failed && input == initialInput }
   var weightPlaceholder: String { UnitDisplay.weightText(kg: previousWeight, unit: unit) }
   var rpePlaceholder: String {
-    switch draft.prescribed.intensity {
-    case .rir(let value): "RIR \(value)"
-    case .rpe(let value): SetEntryValue.text(value)
-    default: draft.prescribed.rpe.map(SetEntryValue.text) ?? ""
+    switch (input.effortMode, draft.prescribed.intensity) {
+    case (.rir, .rir(let value)): String(value)
+    case (.rpe, .rpe(let value)): SetEntryValue.text(value)
+    default: ""
     }
+  }
+  mutating func switchEffort(to mode: ActualEffortMode) {
+    guard draft.isAccessory, draft.loggedSetID == nil else { return }
+    input.effortMode = mode
+    input.rpe = ""
+  }
+  var rir: Int? {
+    guard input.effortMode == .rir, let value = Int(input.rpe), (0...9).contains(value) else {
+      return nil
+    }
+    return value
   }
   var weightKg: Decimal? {
     if isBodyweight && input.weight.trimmingCharacters(in: .whitespaces).isEmpty { return 0 }
@@ -46,11 +63,15 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
     return value
   }
   var rpe: Decimal? {
-    guard !input.rpe.isEmpty, let value = Self.number(input.rpe) else { return nil }
+    guard input.effortMode == .rpe, !input.rpe.isEmpty, let value = Self.number(input.rpe) else {
+      return nil
+    }
     return SetEntryValue.snapRPE(value)
   }
   var isRPEValid: Bool {
-    input.rpe.isEmpty || Self.number(input.rpe).map { (5...10).contains($0) } == true
+    input.rpe.isEmpty
+      || (input.effortMode == .rir
+        ? rir != nil : Self.number(input.rpe).map { (5...10).contains($0) } == true)
   }
   var isWritable: Bool { weightKg != nil && reps != nil && isRPEValid }
 
@@ -70,7 +91,12 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
         unit: unit),
       reps: (draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax).map(String.init)
         ?? "",
-      rpe: draft.loggedSetID == nil ? "" : draft.actualRPE.map(SetEntryValue.text) ?? ""
+      rpe: draft.loggedSetID == nil
+        ? "" : draft.actualRIR.map(String.init) ?? draft.actualRPE.map(SetEntryValue.text) ?? "",
+      effortMode: draft.actualRIR != nil
+        ? .rir
+        : draft.loggedSetID != nil
+          ? .rpe : draft.isAccessory && Self.hasRIRTarget(draft) ? .rir : .rpe
     )
     self.initialInput = input
     self.input = input
@@ -88,6 +114,11 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
         $0.draft.prescribed.setIndex < $1.draft.prescribed.setIndex
       }
     return (pending.filter(\.isWritable), pending.filter { !$0.isWritable })
+  }
+
+  private static func hasRIRTarget(_ draft: TodayWorkoutSetRowDraft) -> Bool {
+    if case .rir = draft.prescribed.intensity { return true }
+    return false
   }
 
   private static func number(_ text: String) -> Decimal? {

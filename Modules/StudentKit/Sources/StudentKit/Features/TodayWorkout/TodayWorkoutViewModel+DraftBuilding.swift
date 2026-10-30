@@ -374,6 +374,7 @@ extension TodayWorkoutViewModel {
         ? (existingLog == nil ? set.rpe : existingLog?.rpe)
         : exercise.exercise.isAccessory && existingLog != nil
           ? existingLog?.rpe : existingLog?.rpe ?? set.rpe ?? 8,
+      actualRIR: existingLog?.actualRIR,
       completed: existingLog?.completed ?? false,
       failed: existingLog?.failed ?? false,
       assumed: existingLog?.assumed ?? false,

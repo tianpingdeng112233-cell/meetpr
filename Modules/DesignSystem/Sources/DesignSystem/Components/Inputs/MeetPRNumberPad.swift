@@ -7,6 +7,7 @@ public struct MeetPRNumberPad: View {
     case weight
     case reps
     case rpe
+    case rir
   }
 
   let field: Field
@@ -60,6 +61,8 @@ public struct MeetPRNumberPad: View {
       return (clamped * 4).rounded() / 4
     case .reps:
       return min(max(raw.rounded(), 1), 100)
+    case .rir:
+      return min(max(raw.rounded(), 0), 9)
     case .rpe:
       return (min(max(raw, 5), 10) * 2).rounded() / 2
     }
@@ -86,7 +89,7 @@ public struct MeetPRNumberPad: View {
         ForEach(["1", "2", "3", "4", "5", "6", "7", "8", "9"], id: \.self) {
           keypadButton($0)
         }
-        keypadButton(".", isDisabled: field == .reps)
+        keypadButton(".", isDisabled: field == .reps || field == .rir)
         keypadButton("0")
         deleteButton
       }
@@ -166,7 +169,7 @@ public struct MeetPRNumberPad: View {
         .accessibilityLabel(
           field == .weight
             ? DesignSystemStrings.weight
-            : field == .reps ? DesignSystemStrings.reps : "RPE"
+            : field == .reps ? DesignSystemStrings.reps : field == .rir ? "RIR" : "RPE"
         )
         .accessibilityValue(text.isEmpty ? initialValueText : text)
 
@@ -187,6 +190,7 @@ public struct MeetPRNumberPad: View {
     case .weight: DesignSystemStrings.enterWeight
     case .reps: DesignSystemStrings.enterReps
     case .rpe: "RPE"
+    case .rir: "RIR"
     }
   }
 
@@ -194,7 +198,7 @@ public struct MeetPRNumberPad: View {
     switch field {
     case .weight: "KG"
     case .reps: DesignSystemStrings.repsUnit
-    case .rpe: nil
+    case .rpe, .rir: nil
     }
   }
 
@@ -236,13 +240,16 @@ public struct MeetPRNumberPad: View {
 
   private func append(_ character: String) {
     if character == "." {
-      guard field != .reps, !text.isEmpty, !text.contains("."), text.count <= 4 else {
+      guard field != .reps, field != .rir, !text.isEmpty, !text.contains("."), text.count <= 4
+      else {
         return
       }
       text.append(character)
     } else {
       let digitCount = text.filter(\.isNumber).count
-      guard digitCount < (field == .reps ? 3 : field == .rpe ? 2 : 5) else { return }
+      guard digitCount < (field == .rir ? 1 : field == .reps ? 3 : field == .rpe ? 2 : 5) else {
+        return
+      }
       text = text == "0" ? character : text + character
     }
     feedbackTrigger += 1

@@ -127,7 +127,8 @@ struct HistoryEntriesView: View {
       ) { log in
         HistorySetRow(
           label: StudentStrings.localized(.addedExtra),
-          result: StudentFormatting.result(weightKg: log.weightKg, reps: log.reps, rpe: log.rpe),
+          result: StudentFormatting.result(
+            weightKg: log.weightKg, reps: log.reps, rpe: log.rpe, actualRIR: log.actualRIR),
           completed: log.completed, setLogID: log.id, setIndex: log.setIndex,
           reservesVideoSpace: reservesVideoSpace,
           badge: VideoBadgeInfo(

@@ -34,6 +34,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
   public var prescribed: PrescribedSet
   public var actualWeight: Decimal?
   public var actualReps: Int?
+  public var actualRIR: Int?
   public var actualRPE: Decimal?
   public var completed: Bool
   public var failed: Bool
@@ -59,6 +60,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     actualWeight: Decimal? = nil,
     actualReps: Int? = nil,
     actualRPE: Decimal? = nil,
+    actualRIR: Int? = nil,
     completed: Bool = false,
     failed: Bool = false,
     assumed: Bool = false,
@@ -79,6 +81,7 @@ public struct TodayWorkoutSetRowDraft: Equatable, Sendable, Identifiable {
     self.actualWeight = actualWeight
     self.actualReps = actualReps
     self.actualRPE = actualRPE
+    self.actualRIR = actualRIR
     self.completed = completed
     self.failed = failed
     self.assumed = assumed

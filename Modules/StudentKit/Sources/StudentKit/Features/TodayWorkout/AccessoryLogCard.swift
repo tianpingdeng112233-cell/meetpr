@@ -9,8 +9,26 @@ struct AccessoryLogCard: View {
   let previousLogs: [Int: StudentSetLog]
   let onEdit: (TodayWorkoutPresentation.Row) -> Void
   @State private var edits: [UUID: AccessoryRow] = [:]
+  @State private var effortModeOverride: ActualEffortMode?
   @State private var showsSkipped = false
   @State private var attemptedRows: Set<UUID> = []
+
+  private var allowsRIR: Bool { exercise.rows.allSatisfy { $0.draft.isAccessory } }
+  private var effortMode: ActualEffortMode {
+    effortModeOverride ?? exercise.rows.first(where: { $0.draft.loggedSetID == nil }).map {
+      row(for: $0).input.effortMode
+    } ?? exercise.rows.first.map { row(for: $0).input.effortMode } ?? .rpe
+  }
+
+  private func switchEffort() {
+    let mode: ActualEffortMode = effortMode == .rpe ? .rir : .rpe
+    for presentationRow in exercise.rows where presentationRow.draft.loggedSetID == nil {
+      var input = row(for: presentationRow)
+      input.switchEffort(to: mode)
+      edits[presentationRow.id] = input
+    }
+    effortModeOverride = mode
+  }
 
   private var hasBodyweight: Bool {
     exercise.rows.contains { $0.draft.prescribed.isBodyweight }
@@ -40,27 +58,40 @@ struct AccessoryLogCard: View {
         .font(.caption)
         .foregroundStyle(Color.MeetPR.textSecondary)
       }
-      if exercise.rows.contains(where: { $0.draft.prescribed.loadMode != .freeWeight }) {
+      if allowsRIR || exercise.rows.contains(where: { $0.draft.prescribed.loadMode != .freeWeight })
+      {
         AccessoryColumns {
           ForEach(
             [
               StudentStrings.localized(.accessorySet), StudentStrings.localized(.accessoryLast),
               UnitDisplay.weightUnitSuffix(unit).uppercased(),
-              StudentStrings.localized(.setEntrySheet003), "RPE",
+              StudentStrings.localized(.setEntrySheet003), effortMode.label,
               StudentStrings.localized(.workoutCompletionFlowView003),
             ], id: \.self
           ) { label in
-            Text(label)
-              .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
-              .foregroundStyle(Color.MeetPR.textMuted)
-              .lineLimit(1)
-              .minimumScaleFactor(0.5)
-              .frame(maxWidth: .infinity)
+            Group {
+              if label == effortMode.label && allowsRIR {
+                Button(action: switchEffort) { EffortToggleLabel(text: label) }
+                  .buttonStyle(.plain)
+                  .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+                  .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
+                  .disabled(
+                    viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty
+                      || !exercise.rows.contains(where: { $0.draft.loggedSetID == nil }))
+              } else {
+                Text(label)
+              }
+            }
+            .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
+            .foregroundStyle(Color.MeetPR.textMuted)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .frame(maxWidth: .infinity)
           }
         }
       }
       ForEach(exercise.rows) { presentationRow in
-        if presentationRow.draft.prescribed.loadMode == .freeWeight {
+        if presentationRow.draft.prescribed.loadMode == .freeWeight && !allowsRIR {
           if presentationRow.id == exercise.rows.first?.id || !hasUniformLoadTypePrescription {
             LoadTypePrescriptionHeader(
               set: presentationRow.draft.prescribed,
@@ -84,6 +115,13 @@ struct AccessoryLogCard: View {
             Text(note).font(.caption).foregroundStyle(Color.MeetPR.coachNoteText)
           }
         } else {
+          if presentationRow.draft.prescribed.loadMode == .freeWeight && allowsRIR {
+            if presentationRow.id == exercise.rows.first?.id || !hasUniformLoadTypePrescription {
+              LoadTypePrescriptionHeader(
+                set: presentationRow.draft.prescribed,
+                count: hasUniformLoadTypePrescription ? exercise.prescribedRows.count : 1)
+            }
+          }
           if presentationRow.draft.prescribed.isBodyweight && !hasUniformLoadTypePrescription {
             LoadTypePrescriptionHeader(set: presentationRow.draft.prescribed, count: 1)
           }
@@ -92,11 +130,13 @@ struct AccessoryLogCard: View {
               get: { row(for: presentationRow) },
               set: { edits[presentationRow.id] = $0 }),
             number: presentationRow.record.index,
+            columnEffortMode: effortMode,
             isSaving: viewModel.accessorySavingIDs.contains(presentationRow.id),
             isDisabled: viewModel.accessoryBatchInFlight || !viewModel.accessorySavingIDs.isEmpty,
-            showsValidation: showsSkipped,
+            showsValidation: showsSkipped || attemptedRows.contains(presentationRow.id),
             onEdit: { onEdit(presentationRow) },
             onSave: {
+              attemptedRows.insert(presentationRow.id)
               let input = row(for: presentationRow)
               Task { await viewModel.saveAccessoryRow(input) }
             }
@@ -173,10 +213,12 @@ struct AccessoryLogCard: View {
     var source = AccessoryRow(
       draft: row.draft,
       previous: row.draft.isExtra ? nil : previousLogs[row.draft.prescribed.setIndex],
-      unit: row.draft.prescribed.loadMode == .freeWeight ? .kg : unit,
+      unit: row.draft.prescribed.loadMode == .freeWeight && !allowsRIR ? .kg : unit,
       hasVideo: row.record.videoState != .none)
     if let edit = edits[row.id], edit.draft == source.draft, edit.unit == source.unit {
       source.input = edit.input
+    } else if let effortModeOverride, source.draft.loggedSetID == nil {
+      source.switchEffort(to: effortModeOverride)
     }
     return source
   }
@@ -212,5 +254,21 @@ struct AccessoryColumns: Layout {
   private func widths(_ width: CGFloat) -> [CGFloat] {
     let available = max(0, width - gap * CGFloat(weights.count - 1))
     return weights.map { available * $0 / weights.reduce(0, +) }
+  }
+}
+
+/// A compact visible control with the surrounding button retaining its touch target.
+struct EffortToggleLabel: View {
+  let text: String
+  var body: some View {
+    Text(text)
+      .font(.MeetPR.mono(size: MeetPRFontMetrics.size11, weight: .semibold))
+      .foregroundStyle(Color.MeetPR.textPrimary)
+      .padding(.horizontal, MeetPRSpacing.space2)
+      .padding(.vertical, MeetPRSpacing.space1)
+      .background(Color.MeetPR.surfaceRaised, in: .rect(cornerRadius: MeetPRRadius.micro))
+      .overlay(
+        RoundedRectangle(cornerRadius: MeetPRRadius.micro).strokeBorder(
+          Color.MeetPR.borderStrong, lineWidth: 1))
   }
 }

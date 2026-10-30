@@ -28,7 +28,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
         setIndex: log.setIndex,
         weightKg: log.weightKg,
         reps: log.reps,
-        rpe: log.rpe,
+        rpe: log.rpe, actualRIR: log.actualRIR,
         completed: log.completed,
         loggedDate: log.loggedDate,
         failed: log.failed
@@ -49,7 +49,7 @@ public actor BackendStudentTrainingLogRepository: StudentTrainingLogRepository {
       loggedDate: log.loggedDate,
       weightKg: log.weightKg,
       reps: log.reps,
-      rpe: log.rpe,
+      rpe: log.rpe, actualRIR: log.actualRIR,
       coachRPE: log.coachRPE,
       completed: log.completed,
       failed: log.failed,
@@ -132,6 +132,7 @@ extension BackendStudentTrainingLogRepository: StudentAddedLogRepository {
       id: response.id, studentID: log.studentID, planDayID: log.planDayID,
       exerciseID: log.exerciseID, setIndex: log.setIndex, loggedAt: response.loggedAt,
       loggedDate: log.loggedDate, weightKg: log.weightKg, reps: log.reps, rpe: log.rpe,
+      actualRIR: log.actualRIR,
       coachRPE: log.coachRPE, completed: log.completed, failed: log.failed)
     addedCache[log.studentID, default: []].removeAll { $0.id == saved.id }
     addedCache[log.studentID, default: []].append(saved)

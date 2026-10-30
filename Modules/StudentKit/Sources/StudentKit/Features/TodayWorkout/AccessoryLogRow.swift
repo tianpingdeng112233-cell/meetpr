@@ -4,6 +4,7 @@ import SwiftUI
 struct AccessoryLogRow: View {
   @Binding var row: AccessoryRow
   let number: Int
+  var columnEffortMode: ActualEffortMode = .rpe
   let isSaving: Bool
   let isDisabled: Bool
   let showsValidation: Bool
@@ -16,6 +17,15 @@ struct AccessoryLogRow: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space1) {
+      if row.input.effortMode != columnEffortMode {
+        Text(
+          row.draft.loggedSetID != nil
+            ? StudentStrings.replacing(
+              .accessoryRecordedEffort, values: [String(number), row.input.effortMode.label])
+            : row.input.effortMode.label
+        )
+        .font(.caption2).foregroundStyle(Color.MeetPR.textSecondary)
+      }
       AccessoryColumns {
         Button(action: onEdit) {
           VStack(spacing: MeetPRSpacing.zero) {
@@ -131,12 +141,17 @@ struct AccessoryLogRow: View {
       .accessibilityLabel(
         copy(
           field == .weight
-            ? .accessoryWeightLabel : field == .reps ? .accessoryRepsLabel : .accessoryRpeLabel)
+            ? .accessoryWeightLabel
+            : field == .reps
+              ? .accessoryRepsLabel
+              : row.input.effortMode == .rir ? .accessoryRirLabel : .accessoryRpeLabel)
       )
       .accessibilityIdentifier("accessory.set.\(number).\(field)")
       .onChange(of: row.input.weight) { _, _ in editedWeight = true }
       #if os(iOS)
-        .keyboardType(field == .reps ? .numberPad : .decimalPad)
+        .keyboardType(
+          (field == .reps || (field == .rpe && row.input.effortMode == .rir))
+            ? .numberPad : .decimalPad)
       #endif
   }
 
