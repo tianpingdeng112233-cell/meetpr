@@ -39,7 +39,7 @@ struct AccessoryLogRow: View {
           Text(
             row.previousReps.map {
               [
-                row.isBodyweight ? StudentStrings.localized(.accessoryBw) : row.weightPlaceholder,
+                row.weightPlaceholder,
                 String($0),
               ].joined(separator: " × ")
             } ?? "—"
@@ -52,17 +52,11 @@ struct AccessoryLogRow: View {
         .foregroundStyle(Color.MeetPR.textMuted)
         .disabled(row.previousReps == nil)
         .accessibilityLabel(copy(.accessoryUseLast))
-        if row.isBodyweight {
-          Text(StudentStrings.localized(.accessoryBw))
-            .font(.MeetPR.mono(size: MeetPRFontMetrics.size14, weight: .bold))
-            .lineLimit(1).minimumScaleFactor(0.5)
-            .frame(maxWidth: .infinity)
-        } else {
-          field(
-            .weight, text: $row.input.weight, placeholder: row.weightPlaceholder,
-            invalid: row.weightKg == nil
-              && (!row.input.weight.isEmpty || editedWeight || showsValidation))
-        }
+        field(
+          .weight, text: $row.input.weight,
+          placeholder: row.isBodyweight ? "0" : row.weightPlaceholder,
+          invalid: row.weightKg == nil
+            && (!row.input.weight.isEmpty || editedWeight || showsValidation))
         field(.reps, text: $row.input.reps, placeholder: "", invalid: row.reps == nil)
         field(
           .rpe, text: $row.input.rpe, placeholder: row.isRecorded ? "" : row.rpePlaceholder,

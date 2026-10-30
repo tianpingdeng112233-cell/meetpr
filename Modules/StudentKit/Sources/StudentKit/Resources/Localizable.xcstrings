@@ -27789,19 +27789,42 @@
         }
       }
     },
+    "student.loadType.extraWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "额外负重 {0}"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "額外負重 {0}"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extra weight {0}"
+          }
+        }
+      }
+    },
     "student.loadType.optionalWeight": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "额外负重 kg · 选填"
+            "value": "额外负重 kg"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "額外負重 kg · 選填"
+            "value": "額外負重 kg"
           }
         },
         "en": {

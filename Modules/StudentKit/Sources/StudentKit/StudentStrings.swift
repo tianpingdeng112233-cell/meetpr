@@ -38,6 +38,7 @@ enum StudentStrings {
     static let loadTypeFreeWeightHint = Key("student.loadType.freeWeightHint")
     static let loadTypeBodyweightHint = Key("student.loadType.bodyweightHint")
     static let loadTypeRequiredWeight = Key("student.loadType.requiredWeight")
+    static let loadTypeExtraWeight = Key("student.loadType.extraWeight")
     static let loadTypeOptionalWeight = Key("student.loadType.optionalWeight")
     static let loadTypeRequiredPlaceholder = Key("student.loadType.requiredPlaceholder")
     static let loadTypeOptionalPlaceholder = Key("student.loadType.optionalPlaceholder")

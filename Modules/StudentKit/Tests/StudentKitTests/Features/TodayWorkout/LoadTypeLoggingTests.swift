@@ -8,6 +8,9 @@ import Testing
 @Test func loadTypeBodyweightAcceptsEmptyAndPreservesExtraWeight() throws {
   var row = loadTypeRow(mode: .bodyweight)
   #expect(row.isBodyweight)
+  #expect(row.input.weight == "0")
+  #expect(!row.draft.completed)
+  row.input.weight = ""
   #expect(row.isWritable)
   #expect(row.weightKg == 0)
   row.input.weight = "12.5"

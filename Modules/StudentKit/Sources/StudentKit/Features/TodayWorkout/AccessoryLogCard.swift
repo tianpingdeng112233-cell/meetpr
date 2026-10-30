@@ -12,8 +12,8 @@ struct AccessoryLogCard: View {
   @State private var showsSkipped = false
   @State private var attemptedRows: Set<UUID> = []
 
-  private var hasLoadTypes: Bool {
-    exercise.rows.contains { $0.draft.prescribed.hasUnspecifiedLoad }
+  private var hasBodyweight: Bool {
+    exercise.rows.contains { $0.draft.prescribed.isBodyweight }
   }
 
   private var hasUniformLoadTypePrescription: Bool {
@@ -28,7 +28,19 @@ struct AccessoryLogCard: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: MeetPRSpacing.space2) {
-      if !hasLoadTypes {
+      if hasBodyweight {
+        if hasUniformLoadTypePrescription, let first = exercise.prescribedRows.first {
+          LoadTypePrescriptionHeader(
+            set: first.draft.prescribed, count: exercise.prescribedRows.count)
+        }
+        Text(
+          StudentStrings.replacing(
+            .loadTypeExtraWeight, values: [UnitDisplay.weightUnitSuffix(unit)])
+        )
+        .font(.caption)
+        .foregroundStyle(Color.MeetPR.textSecondary)
+      }
+      if exercise.rows.contains(where: { $0.draft.prescribed.loadMode != .freeWeight }) {
         AccessoryColumns {
           ForEach(
             [
@@ -48,7 +60,7 @@ struct AccessoryLogCard: View {
         }
       }
       ForEach(exercise.rows) { presentationRow in
-        if presentationRow.draft.prescribed.hasUnspecifiedLoad {
+        if presentationRow.draft.prescribed.loadMode == .freeWeight {
           if presentationRow.id == exercise.rows.first?.id || !hasUniformLoadTypePrescription {
             LoadTypePrescriptionHeader(
               set: presentationRow.draft.prescribed,
@@ -72,6 +84,9 @@ struct AccessoryLogCard: View {
             Text(note).font(.caption).foregroundStyle(Color.MeetPR.coachNoteText)
           }
         } else {
+          if presentationRow.draft.prescribed.isBodyweight && !hasUniformLoadTypePrescription {
+            LoadTypePrescriptionHeader(set: presentationRow.draft.prescribed, count: 1)
+          }
           AccessoryLogRow(
             row: Binding(
               get: { row(for: presentationRow) },
@@ -158,7 +173,7 @@ struct AccessoryLogCard: View {
     var source = AccessoryRow(
       draft: row.draft,
       previous: row.draft.isExtra ? nil : previousLogs[row.draft.prescribed.setIndex],
-      unit: row.draft.prescribed.hasUnspecifiedLoad ? .kg : unit,
+      unit: row.draft.prescribed.loadMode == .freeWeight ? .kg : unit,
       hasVideo: row.record.videoState != .none)
     if let edit = edits[row.id], edit.draft == source.draft, edit.unit == source.unit {
       source.input = edit.input

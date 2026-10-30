@@ -66,7 +66,8 @@ struct AccessoryRow: Equatable, Sendable, Identifiable {
     let input = AccessoryInput(
       weight: UnitDisplay.weightText(
         kg: draft.loggedSetID == nil && !draft.isExtra && !draft.isStudentAdded
-          ? draft.prescribed.weightKg : draft.actualWeight, unit: unit),
+          ? (draft.prescribed.isBodyweight ? 0 : draft.prescribed.weightKg) : draft.actualWeight,
+        unit: unit),
       reps: (draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax).map(String.init)
         ?? "",
       rpe: draft.loggedSetID == nil ? "" : draft.actualRPE.map(SetEntryValue.text) ?? ""

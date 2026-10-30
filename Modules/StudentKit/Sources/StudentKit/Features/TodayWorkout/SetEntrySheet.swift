@@ -81,7 +81,7 @@ struct SetEntrySheet: View {
     _showsRPEPlaceholder = State(initialValue: seed.prescribed.rpe == nil)
     let weight: Decimal?
     if seed.isExtra || seed.prescribed.hasUnspecifiedLoad {
-      weight = seed.actualWeight
+      weight = seed.actualWeight ?? (seed.prescribed.isBodyweight ? 0 : nil)
     } else if seed.prescribed.isLegacyPrescription {
       // Pre-072 chain, unchanged for legacy rows: barbell lifts floor at the
       // empty bar (20kg); accessories legitimately go below, down to 0.
