@@ -4,6 +4,72 @@ import Testing
 
 @testable import CoachKit
 
+@Test(arguments: ["自重", "自重 慢下放", "BODYWEIGHT"])
+func legacyMarkerCoachProjectionIgnoresCompatibilityRPE(note: String) throws {
+  let set = try #require(
+    legacyMarkerCoachProjection(coachNote: note)
+      .days.first?.exercises.first?.prescribedSets.first)
+  #expect(set.isBodyweight)
+  #expect(set.weightKg == nil)
+  #expect(set.intensity == nil)
+  #expect(set.rpe == nil)
+  #expect(set.visibleCoachNote == (note == "自重 慢下放" ? "慢下放" : nil))
+}
+
+private func legacyMarkerCoachProjection(
+  coachNote: String?, targetRPE: Decimal? = nil,
+  rirTarget: Int? = nil, targetPct: Decimal? = nil,
+  rpeLow: Decimal? = nil, rpeHigh: Decimal? = nil,
+  loadMode: PlanLoadMode? = nil, legacyValue: Decimal = 10, legacyMode: IntensityMode = .rpe
+) -> StudentPlanView {
+  let day = ProjFixtures.day(id: ProjFixtures.uuid(50), week: 1, dayOfWeek: 1, sortOrder: 0)
+  let exercise = ProjFixtures.exercise(
+    id: ProjFixtures.uuid(60), dayID: day.id, exerciseID: ProjFixtures.squatID,
+    isMain: true, sortOrder: 0)
+  let set = PlanSet(
+    id: UUID(), planExerciseID: exercise.id, setNumber: 1, targetReps: 5,
+    intensityMode: legacyMode, targetValue: legacyValue, loadMode: loadMode,
+    targetPct: targetPct, targetRPE: targetRPE, rirTarget: rirTarget,
+    rpeLow: rpeLow, rpeHigh: rpeHigh, setType: .working,
+    coachNote: coachNote, createdAt: .distantPast)
+  return PlanToStudentProjection.project(
+    plan: ProjFixtures.plan(), days: [day], exercises: [exercise], sets: [set],
+    catalog: ProjFixtures.catalog(), weekIndex: 1)
+}
+
+@Test(arguments: [IntensityMode.weight, .rpe])
+func legacyRealCoachPrescriptionKeepsLoadAndNote(mode: IntensityMode) throws {
+  let plan = legacyMarkerCoachProjection(
+    coachNote: "自重", legacyValue: mode == .weight ? 135 : 8, legacyMode: mode)
+  let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
+  #expect(!set.isBodyweight)
+  #expect(set.weightKg == (mode == .weight ? 135 : nil))
+  #expect(set.intensity == (mode == .rpe ? .rpe(8) : nil))
+  #expect(set.visibleCoachNote == "自重")
+}
+
+@Test func legacyMarkerCoachProjectionKeepsCanonicalIntensity() throws {
+  let plans = [
+    legacyMarkerCoachProjection(coachNote: "自重", targetRPE: 8),
+    legacyMarkerCoachProjection(coachNote: "自重", rirTarget: 2),
+    legacyMarkerCoachProjection(coachNote: "自重", targetPct: 75),
+    legacyMarkerCoachProjection(coachNote: "自重", rpeLow: 7, rpeHigh: 9),
+    legacyMarkerCoachProjection(coachNote: "自重", rpeLow: 7),
+    legacyMarkerCoachProjection(coachNote: nil, legacyValue: 8),
+    legacyMarkerCoachProjection(coachNote: "自重", targetRPE: 8, loadMode: .rpe),
+  ]
+  let expected: [PrescribedIntensity?] = [
+    .rpe(8), .rir(2), .percentage(75), .rpeRange(7, 9), nil, .rpe(8), .rpe(8),
+  ]
+  for (plan, intensity) in zip(plans, expected) {
+    let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
+    #expect(set.intensity == intensity)
+  }
+  let explicit = try #require(plans.last?.days.first?.exercises.first?.prescribedSets.first)
+  #expect(!explicit.isBodyweight)
+  #expect(explicit.visibleCoachNote == "自重")
+}
+
 @available(iOS 17.0, macOS 14.0, *)
 @Test func projectionUsesCanonicalLoadFieldsInsteadOfLegacyProjection() throws {
   let day = ProjFixtures.day(id: ProjFixtures.uuid(50), week: 1, dayOfWeek: 1, sortOrder: 0)

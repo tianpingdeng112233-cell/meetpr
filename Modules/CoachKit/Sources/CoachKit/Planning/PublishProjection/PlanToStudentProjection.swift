@@ -105,17 +105,25 @@ public enum PlanToStudentProjection {
       weightKg: prescription.weightKg,
       intensity: prescription.intensity,
       percentageAnchor: prescription.percentageAnchor,
-      loadMode: planSet.loadMode,
+      loadMode: effectiveLoadMode(for: planSet),
       reps: isRange ? nil : planSet.targetReps,
       repsMax: planSet.targetRepsMax,
-      restSeconds: restSeconds(for: planSet)
+      restSeconds: restSeconds(for: planSet),
+      coachNote: planSet.coachNote
     )
+  }
+
+  private static func effectiveLoadMode(for planSet: PlanSet) -> PlanLoadMode? {
+    let isLegacyBodyweight = isLegacyBodyweightProjection(
+      loadMode: planSet.loadMode, intensityMode: planSet.intensityMode,
+      targetValue: planSet.targetValue, coachNote: planSet.coachNote)
+    return planSet.loadMode ?? (isLegacyBodyweight ? .bodyweight : nil)
   }
 
   private static func prescription(
     for planSet: PlanSet
   ) -> Prescription {
-    guard let loadMode = planSet.loadMode else {
+    guard let loadMode = effectiveLoadMode(for: planSet) else {
       return Prescription(
         weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
         intensity: planSet.intensityMode == .rpe
@@ -145,6 +153,9 @@ public enum PlanToStudentProjection {
         planSet.targetRPE.map(PrescribedIntensity.rpe)
         ?? planSet.rirTarget.map(PrescribedIntensity.rir)
         ?? planSet.targetPct.map(PrescribedIntensity.percentage)
+        ?? range(planSet.rpeLow, planSet.rpeHigh).map {
+          PrescribedIntensity.rpeRange($0.0, $0.1)
+        }
     case .fixedWeight:
       intensity = nil
     }

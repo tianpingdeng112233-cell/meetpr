@@ -3,8 +3,13 @@ import Foundation
 extension PrescribedSet {
   public var isBodyweight: Bool {
     if let loadMode { return loadMode == .bodyweight }
-    return coachNote?.range(of: "自重|bodyweight", options: [.regularExpression, .caseInsensitive])
-      != nil
+    // Legacy read models split the wire target into weightKg and rpe.
+    // An explicit weight takes precedence, even when an RPE is also present.
+    return isLegacyBodyweightProjection(
+      loadMode: loadMode,
+      intensityMode: weightKg == nil ? .rpe : .weight,
+      targetValue: weightKg ?? rpe,
+      coachNote: coachNote)
   }
 
   public var hasUnspecifiedLoad: Bool { loadMode == .freeWeight || isBodyweight }

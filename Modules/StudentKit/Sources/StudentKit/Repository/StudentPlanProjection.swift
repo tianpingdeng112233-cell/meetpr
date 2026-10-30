@@ -94,7 +94,7 @@ enum StudentPlanProjection {
       weightKg: prescription.weightKg,
       intensity: prescription.intensity,
       percentageAnchor: prescription.percentageAnchor,
-      loadMode: planSet.loadMode,
+      loadMode: effectiveLoadMode(for: planSet),
       reps: planSet.targetReps,
       repsMax: planSet.targetRepsMax,
       restSeconds: isAccessory ? planSet.restSeconds : restSeconds(for: planSet),
@@ -102,10 +102,17 @@ enum StudentPlanProjection {
     )
   }
 
+  private static func effectiveLoadMode(for planSet: PlanSet) -> PlanLoadMode? {
+    let isLegacyBodyweight = isLegacyBodyweightProjection(
+      loadMode: planSet.loadMode, intensityMode: planSet.intensityMode,
+      targetValue: planSet.targetValue, coachNote: planSet.coachNote)
+    return planSet.loadMode ?? (isLegacyBodyweight ? .bodyweight : nil)
+  }
+
   private static func prescription(
     for planSet: PlanSet
   ) -> Prescription {
-    guard let loadMode = planSet.loadMode else {
+    guard let loadMode = effectiveLoadMode(for: planSet) else {
       return Prescription(
         weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
         intensity: planSet.intensityMode == .rpe

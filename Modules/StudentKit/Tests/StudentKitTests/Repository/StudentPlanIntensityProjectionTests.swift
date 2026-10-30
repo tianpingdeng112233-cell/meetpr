@@ -7,17 +7,82 @@ import ViewInspector
 
 @testable import StudentKit
 
+@Test(arguments: ["自重", "自重 慢下放", "BODYWEIGHT"])
+func legacyMarkerBodyweightProjectionIgnoresCompatibilityRPE(note: String) throws {
+  let plan = loadTypeProjection(mode: nil, coachNote: note)
+  let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
+  #expect(set.isBodyweight)
+  #expect(set.weightKg == nil)
+  #expect(set.intensity == nil)
+  #expect(set.rpe == nil)
+  #expect(StudentFormatting.prescribed(set) == "自重 × 5")
+  #expect(set.visibleCoachNote == (note == "自重 慢下放" ? "慢下放" : nil))
+}
+
 @MainActor
-@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight], [nil, Decimal(8)])
+@Test(arguments: [IntensityMode.weight, .rpe], [nil, "自重", "自重 慢下放", "BODYWEIGHT"])
+func legacyRealPrescriptionKeepsLoadAndNote(mode: IntensityMode, note: String?) throws {
+  let view = loadTypeProjection(
+    mode: nil, coachNote: note, legacyMode: mode, legacyValue: mode == .weight ? 135 : 8)
+  let set = try #require(view.days.first?.exercises.first?.prescribedSets.first)
+  #expect(!set.isBodyweight)
+  #expect(set.weightKg == (mode == .weight ? 135 : nil))
+  #expect(set.intensity == (mode == .rpe ? .rpe(8) : nil))
+  #expect(set.visibleCoachNote == note)
+  let day = try #require(view.days.first)
+  let drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
+  let row = AccessoryRow(draft: drafts[0], previous: nil, unit: .kg)
+  if mode == .rpe { #expect(row.rpePlaceholder == "8") }
+}
+
+@MainActor
+@Test func legacyMarkerBodyweightJSONDecodesAndProjectsWithoutRPE10() throws {
+  let fixture = intensityProjectionFixture()
+  let json = """
+    {
+      "id": "90000000-0000-0000-0000-000000000001",
+      "plan_exercise_id": "\(fixture.tree.exercises[0].id)",
+      "set_number": 1,
+      "target_reps": 0,
+      "load_mode": null,
+      "intensity_mode": "rpe",
+      "target_value": "10.00",
+      "coach_note": "自重",
+      "set_type": "working",
+      "created_at": "2026-10-30T00:00:00Z"
+    }
+    """
+  let decoded = try MeetPRCodec.decoder.decode(PlanSetDTO.self, from: Data(json.utf8)).toDomain()
+  #expect(decoded.loadMode == nil)
+  #expect(decoded.intensityMode == .rpe)
+  #expect(decoded.targetValue == 10)
+  let plan = StudentPlanProjection.project(
+    tree: TrainingPlanTree(
+      plan: fixture.tree.plan, days: fixture.tree.days,
+      exercises: fixture.tree.exercises, sets: [decoded]),
+    catalog: [fixture.catalogExercise], weekIndex: 1)
+  let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
+  #expect(set.isBodyweight)
+  #expect(set.weightKg == nil)
+  #expect(set.intensity == nil)
+  #expect(set.rpe == nil)
+  #expect(set.visibleCoachNote == nil)
+  let header = LoadTypePrescriptionHeader(set: set, count: 3)
+  #expect(try header.inspect().find(text: "3 × 力竭").string() == "3 × 力竭")
+}
+
+@MainActor
+@Test(arguments: [PlanLoadMode?.none, .bodyweight, .freeWeight], [nil, Decimal(8)])
 func loadTypeLegacyProjectionDoesNotInventIntensity(
-  mode: PlanLoadMode, targetRPE: Decimal?
+  mode: PlanLoadMode?, targetRPE: Decimal?
 ) throws {
-  let plan = loadTypeProjection(mode: mode, targetRPE: targetRPE)
+  let plan = loadTypeProjection(
+    mode: mode, targetRPE: targetRPE, coachNote: mode == nil ? "自重" : nil)
   let day = try #require(plan.days.first)
   let set = try #require(day.exercises.first?.prescribedSets.first)
   let drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
   let draft = try #require(drafts.first)
-  let label = mode == .bodyweight ? "自重" : "自选重量"
+  let label = mode == .freeWeight ? "自选重量" : "自重"
   let expected = targetRPE == nil ? "\(label) × 5" : "\(label) × 5 · RPE 8"
   #expect(StudentFormatting.prescribed(set) == expected)
   #expect(HistorySetRow(set: set, log: nil).result == expected)
@@ -35,16 +100,17 @@ func loadTypeLegacyProjectionDoesNotInventIntensity(
 }
 
 private func loadTypeProjection(
-  mode: PlanLoadMode, targetRPE: Decimal? = nil,
+  mode: PlanLoadMode?, targetRPE: Decimal? = nil,
   rpeLow: Decimal? = nil, rpeHigh: Decimal? = nil,
-  rirTarget: Int? = nil, targetPct: Decimal? = nil
+  rirTarget: Int? = nil, targetPct: Decimal? = nil,
+  coachNote: String? = nil, legacyMode: IntensityMode = .rpe, legacyValue: Decimal = 10
 ) -> StudentPlanView {
   let fixture = intensityProjectionFixture()
-  let set = projectionSet(
+  let set = intensityProjectionSet(
     exerciseID: fixture.tree.sets[0].planExerciseID, timestamp: .distantPast, number: 1,
-    legacyMode: .rpe, legacyValue: 10, loadMode: mode, targetPct: targetPct,
+    legacyMode: legacyMode, legacyValue: legacyValue, loadMode: mode, targetPct: targetPct,
     targetRPE: targetRPE, rirTarget: rirTarget,
-    rpeLow: rpeLow, rpeHigh: rpeHigh)
+    rpeLow: rpeLow, rpeHigh: rpeHigh, coachNote: coachNote)
   return StudentPlanProjection.project(
     tree: TrainingPlanTree(
       plan: fixture.tree.plan, days: fixture.tree.days,
@@ -53,11 +119,12 @@ private func loadTypeProjection(
 }
 
 @MainActor
-@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight])
-func loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode: PlanLoadMode) throws {
-  let plan = loadTypeProjection(mode: mode, rpeLow: 7, rpeHigh: 9)
+@Test(arguments: [PlanLoadMode?.none, .bodyweight, .freeWeight])
+func loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode: PlanLoadMode?) throws {
+  let plan = loadTypeProjection(
+    mode: mode, rpeLow: 7, rpeHigh: 9, coachNote: mode == nil ? "自重" : nil)
   let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
-  let label = mode == .bodyweight ? "自重" : "自选重量"
+  let label = mode == .freeWeight ? "自选重量" : "自重"
   #expect(StudentFormatting.prescribed(set) == "\(label) × 5 · RPE 7–9")
   let header = LoadTypePrescriptionHeader(set: set, count: 1)
   #expect(
@@ -67,11 +134,12 @@ func loadTypeLegacyProjectionKeepsCanonicalIntensityRange(mode: PlanLoadMode) th
 }
 
 @MainActor
-@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight], [nil, Decimal(8)])
+@Test(arguments: [PlanLoadMode?.none, .bodyweight, .freeWeight], [nil, Decimal(8)])
 func loadTypeLegacyProjectionEntryPreservesOptionalRPE(
-  mode: PlanLoadMode, targetRPE: Decimal?
+  mode: PlanLoadMode?, targetRPE: Decimal?
 ) async throws {
-  let plan = loadTypeProjection(mode: mode, targetRPE: targetRPE)
+  let plan = loadTypeProjection(
+    mode: mode, targetRPE: targetRPE, coachNote: mode == nil ? "自重" : nil)
   let day = try #require(plan.days.first)
   let studentID = UUID()
   let model = TodayWorkoutViewModel(
@@ -85,11 +153,12 @@ func loadTypeLegacyProjectionEntryPreservesOptionalRPE(
   #expect(model.currentDrafts?.first?.actualRPE == targetRPE)
 }
 
-@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight], [nil, Decimal(8)])
+@Test(arguments: [PlanLoadMode?.none, .bodyweight, .freeWeight], [nil, Decimal(8)])
 func loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(
-  mode: PlanLoadMode, targetRPE: Decimal?
+  mode: PlanLoadMode?, targetRPE: Decimal?
 ) async throws {
-  let plan = loadTypeProjection(mode: mode, targetRPE: targetRPE)
+  let plan = loadTypeProjection(
+    mode: mode, targetRPE: targetRPE, coachNote: mode == nil ? "自重" : nil)
   let studentID = UUID()
   let source = TodaySetRefSharingSource(
     studentID: studentID,
@@ -103,14 +172,15 @@ func loadTypeLegacyProjectionChatUsesOnlyCanonicalRPE(
   #expect(line.contains("RPE") == (targetRPE != nil))
 }
 
-@Test(arguments: [PlanLoadMode.bodyweight, .freeWeight])
-func loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode: PlanLoadMode) throws {
+@Test(arguments: [PlanLoadMode?.none, .bodyweight, .freeWeight])
+func loadTypeLegacyProjectionKeepsRIRPercentageAndIncompleteRange(mode: PlanLoadMode?) throws {
+  let note = mode == nil ? "自重" : nil
   let plans = [
-    loadTypeProjection(mode: mode, rirTarget: 2),
-    loadTypeProjection(mode: mode, targetPct: 75),
-    loadTypeProjection(mode: mode, rpeLow: 7),
+    loadTypeProjection(mode: mode, rirTarget: 2, coachNote: note),
+    loadTypeProjection(mode: mode, targetPct: 75, coachNote: note),
+    loadTypeProjection(mode: mode, rpeLow: 7, coachNote: note),
   ]
-  let label = mode == .bodyweight ? "自重" : "自选重量"
+  let label = mode == .freeWeight ? "自选重量" : "自重"
   let expected = ["\(label) × 5 · RIR 2", "\(label) × 5 · 75%", "\(label) × 5"]
   for (plan, text) in zip(plans, expected) {
     let set = try #require(plan.days.first?.exercises.first?.prescribedSets.first)
@@ -216,7 +286,7 @@ private func intensityProjectionFixture() -> (
     isMainLift: true,
     sortOrder: 0
   )
-  let sets = projectionSets(planExerciseID: planExerciseID, timestamp: timestamp)
+  let sets = intensityProjectionSets(planExerciseID: planExerciseID, timestamp: timestamp)
   let catalogExercise = projectionCatalogExercise(id: catalogID, timestamp: timestamp)
   return (
     TrainingPlanTree(plan: plan, days: [day], exercises: [exercise], sets: sets),
@@ -247,86 +317,6 @@ private func projectionCatalogExercise(id: UUID, timestamp: Date) -> Exercise {
     isCompetitionLift: true,
     muscleGroups: [.quad],
     equipment: [.barbell],
-    createdAt: timestamp
-  )
-}
-
-private func projectionSets(planExerciseID: UUID, timestamp: Date) -> [PlanSet] {
-  [
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 1,
-      legacyMode: .rpe, legacyValue: 7.1, loadMode: .percentage, targetPct: 72.5,
-      percentageAnchor: .e1RM),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 2,
-      legacyMode: .weight, legacyValue: 999, loadMode: .rpe, targetRPE: 8.5),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 3,
-      legacyMode: .rpe, legacyValue: 8, loadMode: .rir, rirTarget: 2),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 4,
-      legacyMode: .weight, legacyValue: 165, loadMode: .weightRange,
-      weightLow: 165, weightHigh: 175),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 5,
-      legacyMode: .rpe, legacyValue: 8, loadMode: .rpeRange,
-      rpeLow: 9, rpeHigh: 9.5),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 6,
-      legacyMode: .weight, legacyValue: 999, loadMode: .fixedWeight,
-      targetWeight: 170),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 7,
-      legacyMode: .weight, legacyValue: 170, loadMode: .rpe,
-      targetRPE: 9, targetWeight: 170),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 8,
-      legacyMode: .weight, legacyValue: 150, loadMode: .percentage,
-      targetWeight: 150),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 9,
-      legacyMode: .rpe, legacyValue: 8),
-    projectionSet(
-      exerciseID: planExerciseID, timestamp: timestamp, number: 10,
-      legacyMode: .weight, legacyValue: 140),
-  ]
-}
-
-private func projectionSet(
-  exerciseID: UUID,
-  timestamp: Date,
-  number: Int,
-  legacyMode: IntensityMode,
-  legacyValue: Decimal,
-  loadMode: PlanLoadMode? = nil,
-  targetPct: Decimal? = nil,
-  percentageAnchor: PercentageAnchor? = nil,
-  targetRPE: Decimal? = nil,
-  rirTarget: Int? = nil,
-  rpeLow: Decimal? = nil,
-  rpeHigh: Decimal? = nil,
-  weightLow: Decimal? = nil,
-  weightHigh: Decimal? = nil,
-  targetWeight: Decimal? = nil
-) -> PlanSet {
-  PlanSet(
-    id: UUID(),
-    planExerciseID: exerciseID,
-    setNumber: number,
-    targetReps: 5,
-    intensityMode: legacyMode,
-    targetValue: legacyValue,
-    loadMode: loadMode,
-    targetPct: targetPct,
-    percentageAnchor: percentageAnchor,
-    targetRPE: targetRPE,
-    rirTarget: rirTarget,
-    rpeLow: rpeLow,
-    rpeHigh: rpeHigh,
-    weightLow: weightLow,
-    weightHigh: weightHigh,
-    targetWeight: targetWeight,
-    setType: .working,
     createdAt: timestamp
   )
 }
