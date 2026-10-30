@@ -27,6 +27,7 @@ struct SetEntrySheet: View {
   @State private var weightText: String
   @State private var repsText: String
   @State private var rpeText: String
+  @State private var effortMode: ActualEffortMode
   @State private var activeNumberPad: MeetPRNumberPad.Field?
   @State private var focusedField: SetEntryNumberField?
   @State var collarOn: Bool
@@ -81,7 +82,7 @@ struct SetEntrySheet: View {
     _showsRPEPlaceholder = State(initialValue: seed.prescribed.rpe == nil)
     let weight: Decimal?
     if seed.isExtra || seed.prescribed.hasUnspecifiedLoad {
-      weight = seed.actualWeight
+      weight = seed.actualWeight ?? (seed.prescribed.isBodyweight ? 0 : nil)
     } else if seed.prescribed.isLegacyPrescription {
       // Pre-072 chain, unchanged for legacy rows: barbell lifts floor at the
       // empty bar (20kg); accessories legitimately go below, down to 0.
@@ -98,14 +99,18 @@ struct SetEntrySheet: View {
         seed.actualWeight ?? seed.prescribed.weightKg ?? suggestionOutcome.suggestion?.weightKg
     }
     let reps = seed.actualReps ?? seed.prescribed.reps ?? seed.prescribed.repsMax ?? 0
+    let effortRow = AccessoryRow(draft: seed, previous: nil, unit: .kg)
+    _effortMode = State(initialValue: effortRow.input.effortMode)
     let rpe = seed.actualRPE ?? seed.prescribed.rpe ?? 8
     _weightText = State(initialValue: weight.map(SetEntryValue.text) ?? "")
     _repsText = State(initialValue: reps.formatted())
     _rpeText = State(
-      initialValue: seed.isExtra || seed.prescribed.loadMode == .bodyweight
-        || seed.prescribed.loadMode == .freeWeight
-        ? seed.actualRPE.map(SetEntryValue.text) ?? ""
-        : SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
+      initialValue: seed.isAccessory
+        ? effortRow.input.rpe
+        : seed.isExtra || seed.prescribed.loadMode == .bodyweight
+          || seed.prescribed.loadMode == .freeWeight
+          ? seed.actualRPE.map(SetEntryValue.text) ?? ""
+          : SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
   }
 
   var body: some View {
@@ -292,7 +297,7 @@ struct SetEntrySheet: View {
       weightKg: SetEntryValue.enteredWeight(from: weightText)
         .map { NSDecimalNumber(decimal: $0).doubleValue },
       reps: SetEntryValue.enteredReps(from: repsText),
-      rpe: SetEntryValue.enteredRPE(from: rpeText)
+      rpe: (effortMode == .rpe ? SetEntryValue.enteredRPE(from: rpeText) : nil)
         .map { NSDecimalNumber(decimal: $0).doubleValue },
       setOrdinal: setNumber,
       coachName: coachName
@@ -461,22 +466,46 @@ struct SetEntrySheet: View {
   private var rpeSection: some View {
     VStack(spacing: MeetPRSpacing.space2) {
       HStack {
-        Text("RPE")
-          .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
-          .tracking(0.96)
-          .foregroundStyle(Color.MeetPR.textMuted)
+        Group {
+          if draft.isAccessory && draft.loggedSetID == nil {
+            Button {
+              effortMode = effortMode == .rpe ? .rir : .rpe
+              rpeText = ""
+              showsRPEPlaceholder = true
+            } label: {
+              EffortToggleLabel(text: effortMode.label)
+            }
+            .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+            .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
+          } else {
+            Text(effortMode.label)
+          }
+        }
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
+        .tracking(0.96)
+        .foregroundStyle(Color.MeetPR.textMuted)
         Spacer()
-        Text("5–10 · 0.5")
+        Text(effortMode == .rir ? "0–9 · 1" : "5–10 · 0.5")
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
           .foregroundStyle(Color.MeetPR.textMuted)
       }
 
-      SetEntryRPEScale(
-        value: rpeBinding,
-        placeholder: showsRPEPlaceholder
-          ? StudentStrings.localized(.todayWorkoutTypes028)
-          : nil
-      )
+      if effortMode == .rir {
+        TextField("0–9", text: $rpeText)
+          .textFieldStyle(.roundedBorder)
+          .font(.body.monospacedDigit())
+          .accessibilityLabel("RIR")
+          #if os(iOS)
+            .keyboardType(.numberPad)
+          #endif
+      } else {
+        SetEntryRPEScale(
+          value: rpeBinding,
+          placeholder: showsRPEPlaceholder || rpeText.isEmpty
+            ? StudentStrings.localized(.todayWorkoutTypes028)
+            : nil
+        )
+      }
     }
   }
 
@@ -496,7 +525,7 @@ struct SetEntrySheet: View {
     switch field {
     case .weight: focusedField = .weight
     case .reps: focusedField = .reps
-    case .rpe: return
+    case .rpe, .rir: return
     }
     activeNumberPad = field
   }
@@ -525,7 +554,7 @@ struct SetEntrySheet: View {
             updateWeight(Decimal(value))
           case .reps:
             repsText = Int(value).formatted()
-          case .rpe:
+          case .rpe, .rir:
             break
           }
           closeNumberPad()
@@ -606,15 +635,21 @@ extension SetEntrySheet {
       rowIndex: rowIndex,
       weight: draft.prescribed.hasUnspecifiedLoad ? enteredLoadTypeWeight : weightValue)
     viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
-    viewModel.updateRPE(
+    viewModel.updateEffort(
       rowIndex: rowIndex,
-      rpe: draft.isExtra || draft.prescribed.loadMode == .bodyweight
-        || draft.prescribed.loadMode == .freeWeight
-        ? SetEntryValue.enteredRPE(from: rpeText) : rpeValue)
+      rpe: effortMode == .rir
+        ? nil
+        : draft.isAccessory || draft.isExtra || draft.prescribed.hasUnspecifiedLoad
+          ? SetEntryValue.enteredRPE(from: rpeText) : rpeValue,
+      rir: effortMode == .rir ? Int(rpeText) : nil)
+
   }
 
   fileprivate func save(failed: Bool) {
     attemptedCompletion = true
+    if effortMode == .rir && !rpeText.isEmpty {
+      guard let value = Int(rpeText), (0...9).contains(value) else { return }
+    }
     guard !draft.prescribed.hasUnspecifiedLoad || enteredLoadTypeWeight != nil else { return }
     closeNumberPad()
     syncDraftEdits()

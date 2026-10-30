@@ -14,6 +14,7 @@ public struct CreateStudentAddedSetRequestDTO: Encodable, Sendable {
     try container.encodeDecimalString(log.weightKg, forKey: .weightKg)
     try container.encode(log.reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(log.rpe, forKey: .rpe)
+    try container.encode(log.actualRIR, forKey: .actualRIR)
     try container.encode(log.completed, forKey: .completed)
     try container.encode(log.failed, forKey: .failed)
     try container.encode(log.loggedDate, forKey: .loggedDate)
@@ -22,6 +23,7 @@ public struct CreateStudentAddedSetRequestDTO: Encodable, Sendable {
   private enum Keys: String, CodingKey {
     case planDayID = "planDayId"
     case exerciseID = "exerciseId"
+    case actualRIR = "actualRir"
     case setIndex, weightKg, reps, rpe, completed, failed, loggedDate
   }
 }

@@ -149,3 +149,22 @@ import Testing
   #expect(result.added?.weightKg == 50)
   #expect(result.added?.setIndex == 0)
 }
+
+@MainActor
+@Test func restoredAccessoryExtraKeepsActualRIRWhenWeightChanges() throws {
+  let exercise = Exercise(
+    id: UUID(), name: "Row", exerciseType: .accessory, isCompetitionLift: false, muscleGroups: [],
+    equipment: [], createdAt: Date())
+  let prescribed = StudentPlanExercise(
+    id: UUID(), exercise: exercise, sequenceIndex: 0,
+    prescribedSets: [PrescribedSet(id: UUID(), setIndex: 0, reps: 10)])
+  let log = StudentSetLog(
+    id: UUID(), studentID: UUID(), planExerciseID: prescribed.id, setIndex: 1, loggedAt: Date(),
+    weightKg: 20, reps: 10, actualRIR: 2, completed: true)
+  let draft = try #require(StudentAddedRows.restoredExtras(exercise: prescribed, logs: [log]).first)
+  var row = AccessoryRow(draft: draft, previous: nil, unit: .kg)
+  row.input.weight = "25"
+  #expect(row.rir == 2 && row.rpe == nil && row.weightKg == 25)
+  row.switchEffort(to: .rpe)
+  #expect(row.rir == 2)
+}

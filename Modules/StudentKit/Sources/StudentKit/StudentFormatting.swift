@@ -274,15 +274,21 @@ enum StudentFormatting {
     )
   }
 
+}
+
+extension StudentFormatting {
   /// A logged/achieved set line, e.g. "142.5kg × 5 @ RPE 7.5". Weight and RPE are
   /// dropped when absent (RPE-only or bodyweight work).
-  static func result(weightKg: Decimal?, reps: Int, rpe: Decimal?) -> String {
+  static func result(weightKg: Decimal?, reps: Int, rpe: Decimal?, actualRIR: Int? = nil) -> String
+  {
     var line = ""
     if let weightKg {
       line += "\(decimal(weightKg))kg × "
     }
     line += "\(reps)"
-    if let rpe {
+    if let actualRIR {
+      line += " @ RIR \(actualRIR)"
+    } else if let rpe {
       line += " @ RPE \(decimal(rpe))"
     }
     return line

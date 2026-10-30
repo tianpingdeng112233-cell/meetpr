@@ -18,13 +18,12 @@ struct LoadTypePrescriptionHeader: View {
           LoadTypeBadge(isBodyweight: set.isBodyweight)
         }
       }
-      Text(
-        StudentStrings.localized(
-          set.isBodyweight ? .loadTypeBodyweightHint : .loadTypeFreeWeightHint)
-      )
-      .font(.caption)
-      .foregroundStyle(Color.MeetPR.textSecondary)
-      .fixedSize(horizontal: false, vertical: true)
+      if !set.isBodyweight {
+        Text(StudentStrings.localized(.loadTypeFreeWeightHint))
+          .font(.caption)
+          .foregroundStyle(Color.MeetPR.textSecondary)
+          .fixedSize(horizontal: false, vertical: true)
+      }
     }
   }
 

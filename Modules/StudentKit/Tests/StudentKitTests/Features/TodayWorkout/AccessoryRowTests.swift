@@ -33,7 +33,7 @@ import Testing
   #expect(rows[1].weightPlaceholder == "55")
   #expect(!rows[1].isWritable)
   #expect(rows[2].isBodyweight)
-  #expect(rows[2].rpePlaceholder == "RIR 2")
+  #expect(rows[2].rpePlaceholder == "2")
   #expect(rows[2].weightKg == 0)
   #expect(rows[2].extraNote == nil)
   #expect(AccessoryRow.selection(rows).writable.map(\.id) == [sets[0].id, sets[2].id])

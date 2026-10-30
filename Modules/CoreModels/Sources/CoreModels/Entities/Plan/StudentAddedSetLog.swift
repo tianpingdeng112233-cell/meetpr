@@ -14,6 +14,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
   public let loggedDate: String?
   public let weightKg: Decimal
   public let reps: Int
+  public let actualRIR: Int?
   public let rpe: Decimal?
   public let coachRPE: Decimal?
   public let completed: Bool
@@ -31,6 +32,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
+    actualRIR: Int? = nil,
     coachRPE: Decimal? = nil,
     completed: Bool,
     failed: Bool = false,
@@ -46,6 +48,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     self.weightKg = weightKg
     self.reps = reps
     self.rpe = rpe
+    self.actualRIR = actualRIR
     self.coachRPE = coachRPE
     self.completed = completed
     self.failed = failed
@@ -64,6 +67,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     weightKg = try container.decodeDecimal(forKey: .weightKg)
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
+    actualRIR = try container.decodeIfPresent(Int.self, forKey: .actualRIR)
     coachRPE = try container.decodeDecimalIfPresent(forKey: .coachRPE)
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
@@ -82,6 +86,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
+    try container.encodeIfPresent(actualRIR, forKey: .actualRIR)
     try container.encodeDecimalStringIfPresent(coachRPE, forKey: .coachRPE)
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
@@ -99,6 +104,7 @@ public struct StudentAddedSetLog: Codable, Hashable, Sendable, Identifiable {
     case weightKg
     case reps
     case rpe
+    case actualRIR = "actualRir"
     case coachRPE = "coachRpe"
     case completed
     case failed

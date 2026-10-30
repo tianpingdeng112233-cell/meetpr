@@ -31,7 +31,7 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         loggedDate: log.loggedDate,
         weightKg: log.weightKg,
         reps: log.reps,
-        rpe: log.rpe,
+        rpe: log.rpe, actualRIR: log.actualRIR,
         coachRPE: log.coachRPE,
         completed: log.completed,
         failed: log.failed,
@@ -49,7 +49,7 @@ public actor InMemoryStudentTrainingLogRepository: StudentTrainingLogRepository 
         loggedDate: log.loggedDate,
         weightKg: log.weightKg,
         reps: log.reps,
-        rpe: log.rpe,
+        rpe: log.rpe, actualRIR: log.actualRIR,
         coachRPE: log.coachRPE,
         completed: log.completed,
         failed: log.failed,
@@ -104,7 +104,8 @@ extension InMemoryStudentTrainingLogRepository: StudentAddedLogRepository {
       id: index.map { addedLogs[$0].id } ?? log.id, studentID: log.studentID,
       planDayID: log.planDayID, exerciseID: log.exerciseID, setIndex: log.setIndex,
       loggedAt: log.loggedAt, loggedDate: log.loggedDate, weightKg: log.weightKg,
-      reps: log.reps, rpe: log.rpe, completed: log.completed, failed: log.failed)
+      reps: log.reps, rpe: log.rpe, actualRIR: log.actualRIR, completed: log.completed,
+      failed: log.failed)
     if let index { addedLogs[index] = saved } else { addedLogs.append(saved) }
     return saved
   }

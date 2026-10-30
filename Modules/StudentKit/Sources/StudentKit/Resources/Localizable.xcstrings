@@ -1,6 +1,75 @@
 {
   "sourceLanguage": "zh-Hans",
   "strings": {
+    "student.accessory.effortSwitch": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换 RPE / RIR"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切換 RPE / RIR"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch RPE / RIR"
+          }
+        }
+      }
+    },
+    "student.accessory.rirLabel": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 组 RIR"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 組 RIR"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set {0} RIR"
+          }
+        }
+      }
+    },
+    "student.accessory.recordedEffort": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 组已记录 {1}"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 組已記錄 {1}"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set {0} recorded as {1}"
+          }
+        }
+      }
+    },
     "student.completedDay.addedSets %lld": {
       "extractionState": "manual",
       "localizations": {
@@ -27789,19 +27858,42 @@
         }
       }
     },
+    "student.loadType.extraWeight": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "额外负重 {0}"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "額外負重 {0}"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extra weight {0}"
+          }
+        }
+      }
+    },
     "student.loadType.optionalWeight": {
       "extractionState": "manual",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "额外负重 kg · 选填"
+            "value": "额外负重 kg"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "額外負重 kg · 選填"
+            "value": "額外負重 kg"
           }
         },
         "en": {

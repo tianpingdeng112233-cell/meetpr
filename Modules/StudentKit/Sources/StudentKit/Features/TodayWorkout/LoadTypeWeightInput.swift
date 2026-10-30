@@ -14,8 +14,7 @@ struct LoadTypeWeightInput: View {
       .font(.caption)
       .foregroundStyle(invalid ? Color.MeetPR.danger : Color.MeetPR.textSecondary)
       TextField(
-        StudentStrings.localized(
-          isBodyweight ? .loadTypeOptionalPlaceholder : .loadTypeRequiredPlaceholder),
+        isBodyweight ? "0" : StudentStrings.localized(.loadTypeRequiredPlaceholder),
         text: $text
       )
       .textFieldStyle(.plain)

@@ -8,6 +8,9 @@ import Testing
 @Test func loadTypeBodyweightAcceptsEmptyAndPreservesExtraWeight() throws {
   var row = loadTypeRow(mode: .bodyweight)
   #expect(row.isBodyweight)
+  #expect(row.input.weight == "0")
+  #expect(!row.draft.completed)
+  row.input.weight = ""
   #expect(row.isWritable)
   #expect(row.weightKg == 0)
   row.input.weight = "12.5"
@@ -135,4 +138,58 @@ private struct LoadTypeFixture {
   let logs: InMemoryStudentTrainingLogRepository
   let exerciseID: UUID
   let dayID: UUID
+}
+
+@Test func actualRIRSurvivesLogCodableRoundTrip() throws {
+  let log = StudentSetLog(
+    id: UUID(), studentID: UUID(), planExerciseID: UUID(), setIndex: 0,
+    loggedAt: .distantPast, weightKg: 20, reps: 10, completed: true)
+  let encoder = JSONEncoder()
+  var object = try #require(
+    JSONSerialization.jsonObject(with: encoder.encode(log)) as? [String: Any])
+  object["actualRir"] = 2
+  let decoded = try JSONDecoder().decode(
+    StudentSetLog.self, from: JSONSerialization.data(withJSONObject: object))
+  let saved = try #require(
+    JSONSerialization.jsonObject(with: encoder.encode(decoded)) as? [String: Any])
+  #expect(saved["actualRir"] as? Int == 2)
+}
+
+@MainActor
+@Test func accessoryEffortSwitchClearsOnlyUnrecordedEffortAndPreservesSavedRIR() {
+  var row = loadTypeRow(mode: .bodyweight)
+  row.input.weight = "20"
+  row.input.reps = "12"
+  row.input.rpe = "8"
+  row.switchEffort(to: .rir)
+  #expect(row.input.weight == "20" && row.input.reps == "12" && row.input.rpe.isEmpty)
+  row.input.rpe = "2"
+  #expect(row.rir == 2 && row.rpe == nil && row.isWritable)
+  row.input.rpe = "0"
+  #expect(row.rir == 0 && row.isWritable)
+  row.input.rpe = "2.5"
+  #expect(!row.isWritable)
+  var saved = row.draft
+  saved.loggedSetID = UUID()
+  saved.completed = true
+  saved.actualRIR = 2
+  saved.actualRPE = nil
+  var recorded = AccessoryRow(draft: saved, previous: nil, unit: .kg)
+  recorded.switchEffort(to: .rpe)
+  #expect(recorded.input.effortMode == .rir && recorded.input.rpe == "2")
+}
+
+@MainActor
+@Test func accessoryActualRIRSaveAndReloadKeepsOriginalMetric() async throws {
+  let fixture = await loadTypeFixture(mode: .bodyweight)
+  var row = AccessoryRow(
+    draft: try #require(fixture.model.currentDrafts?.first), previous: nil, unit: .kg)
+  row.switchEffort(to: .rir)
+  row.input.rpe = "2"
+  #expect(await fixture.model.saveAccessoryRow(row))
+  await fixture.model.load(dayID: fixture.dayID, studentID: StudentDemoSeed.studentID)
+  let reloaded = AccessoryRow(
+    draft: try #require(fixture.model.currentDrafts?.first), previous: nil, unit: .kg)
+  #expect(reloaded.input.effortMode == .rir && reloaded.input.rpe == "2")
+  #expect(reloaded.draft.actualRPE == nil && reloaded.draft.actualRIR == 2)
 }

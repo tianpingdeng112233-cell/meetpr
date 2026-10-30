@@ -131,7 +131,7 @@ extension SetLogDTO {
       loggedDate: loggedDate,
       weightKg: weightKg,
       reps: reps,
-      rpe: rpe,
+      rpe: rpe, actualRIR: actualRIR,
       coachRPE: coachRPE,
       completed: completed,
       failed: failed,

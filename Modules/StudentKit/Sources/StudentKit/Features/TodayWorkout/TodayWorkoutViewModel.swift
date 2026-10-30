@@ -502,6 +502,7 @@ public final class TodayWorkoutViewModel {
       }
       if editedFields.contains(.rpe) {
         mergedDraft.actualRPE = currentDraft.actualRPE
+        mergedDraft.actualRIR = currentDraft.actualRIR
       }
       return mergedDraft
     }
@@ -658,7 +659,14 @@ public final class TodayWorkoutViewModel {
   }
 
   public func updateRPE(rowIndex: Int, rpe: Decimal?) {
-    mutateDraft(rowIndex: rowIndex, editedField: .rpe) { $0.actualRPE = rpe }
+    updateEffort(rowIndex: rowIndex, rpe: rpe, rir: nil)
+  }
+
+  func updateEffort(rowIndex: Int, rpe: Decimal?, rir: Int?) {
+    mutateDraft(rowIndex: rowIndex, editedField: .rpe) {
+      $0.actualRPE = rpe
+      $0.actualRIR = rir
+    }
   }
 
   public func toggleComplete(rowIndex: Int) async {
@@ -731,7 +739,7 @@ public final class TodayWorkoutViewModel {
         ? original.prescribed.weightKg : original.actualWeight
       updateWeight(rowIndex: index, weight: preservesWeight ? originalWeight : row.weightKg)
       updateReps(rowIndex: index, reps: row.reps)
-      updateRPE(rowIndex: index, rpe: row.rpe)
+      updateEffort(rowIndex: index, rpe: row.rpe, rir: row.rir)
     }
     if startsRestTimer && !row.isCancellation { inlineCompletionFeedback += 1 }
     if original.isStudentAdded {
@@ -745,7 +753,7 @@ public final class TodayWorkoutViewModel {
     {
       updateWeight(rowIndex: index, weight: original.actualWeight)
       updateReps(rowIndex: index, reps: original.actualReps)
-      updateRPE(rowIndex: index, rpe: original.actualRPE)
+      updateEffort(rowIndex: index, rpe: original.actualRPE, rir: original.actualRIR)
     }
     return result
   }
@@ -946,6 +954,7 @@ public final class TodayWorkoutViewModel {
     drafts[index].actualWeight = persisted.weightKg
     drafts[index].actualReps = persisted.reps
     drafts[index].actualRPE = persisted.rpe
+    drafts[index].actualRIR = persisted.actualRIR
     drafts[index].completed = persisted.completed
     drafts[index].failed = persisted.failed
     drafts[index].assumed = false
@@ -1189,7 +1198,7 @@ public final class TodayWorkoutViewModel {
       loggedDate: loggedDate,
       weightKg: draft.actualWeight ?? draft.prescribed.weightKg ?? 0,
       reps: draft.actualReps ?? draft.prescribed.reps ?? draft.prescribed.repsMax ?? 0,
-      rpe: draft.actualRPE,
+      rpe: draft.actualRPE, actualRIR: draft.actualRIR,
       completed: completed,
       failed: failed
     )
@@ -1656,7 +1665,8 @@ extension TodayWorkoutViewModel {
       id: draft.loggedSetID ?? UUID(), studentID: studentID, planDayID: day.id,
       exerciseID: draft.exerciseID, setIndex: draft.prescribed.setIndex,
       loggedAt: now(), loggedDate: pinned, weightKg: draft.actualWeight ?? 0,
-      reps: draft.actualReps ?? 0, rpe: draft.actualRPE, completed: completed)
+      reps: draft.actualReps ?? 0, rpe: draft.actualRPE, actualRIR: draft.actualRIR,
+      completed: completed)
     do {
       let saved = try await repository.recordAddedSet(log)
       addedLogs.removeAll { $0.id == saved.id }
@@ -1678,8 +1688,7 @@ extension TodayWorkoutViewModel {
       if draft.loggedSetID != nil {
         await repairStudentDerived(setID: saved.id, studentID: studentID)
       }
-      let recorder = E1RMRecorder(e1rm: e1rmRepo, now: now)
-      _ = await recorder.record(
+      _ = await E1RMRecorder(e1rm: e1rmRepo, now: now).record(
         E1RMRecorder.Input(
           studentID: studentID, exerciseID: draft.exerciseID, family: draft.liftFamily,
           setLogID: saved.id, weightKg: saved.weightKg, reps: saved.reps,
@@ -1780,6 +1789,7 @@ extension TodayWorkoutViewModel {
         draft.actualWeight = log.weightKg
         draft.actualReps = log.reps
         draft.actualRPE = log.rpe
+        draft.actualRIR = log.actualRIR
         draft.completed = log.completed
         draft.failed = log.failed
         draft.loggedSetID = log.id
@@ -1798,6 +1808,7 @@ extension TodayWorkoutViewModel {
         merged.actualWeight = cached.actualWeight
         merged.actualReps = cached.actualReps
         merged.actualRPE = cached.actualRPE
+        merged.actualRIR = cached.actualRIR
         merged.loggedSetID = authoritative.loggedSetID
         merged.completed = authoritative.completed
         merged.failed = authoritative.failed

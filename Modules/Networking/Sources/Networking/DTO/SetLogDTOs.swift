@@ -6,6 +6,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
   public let setIndex: Int
   public let weightKg: Decimal
   public let reps: Int
+  public let actualRIR: Int?
   public let rpe: Decimal?
   public let completed: Bool
   public let loggedDate: String?
@@ -17,6 +18,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
+    actualRIR: Int? = nil,
     completed: Bool,
     loggedDate: String? = nil,
     failed: Bool = false
@@ -26,6 +28,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     self.weightKg = weightKg
     self.reps = reps
     self.rpe = rpe
+    self.actualRIR = actualRIR
     self.completed = completed
     self.loggedDate = loggedDate
     self.failed = failed
@@ -38,6 +41,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
+    try container.encode(actualRIR, forKey: .actualRIR)
     try container.encode(completed, forKey: .completed)
     try container.encodeIfPresent(loggedDate, forKey: .loggedDate)
     try container.encode(failed, forKey: .failed)
@@ -49,6 +53,7 @@ public struct CreateSetLogRequestDTO: Encodable, Equatable, Sendable {
     case weightKg
     case reps
     case rpe
+    case actualRIR = "actualRir"
     case completed
     case loggedDate
     case failed
@@ -87,6 +92,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
   public let setIndex: Int
   public let weightKg: Decimal
   public let reps: Int
+  public let actualRIR: Int?
   public let rpe: Decimal?
   public let coachRPE: Decimal?
   public let completed: Bool
@@ -106,6 +112,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     weightKg: Decimal,
     reps: Int,
     rpe: Decimal? = nil,
+    actualRIR: Int? = nil,
     coachRPE: Decimal? = nil,
     completed: Bool,
     failed: Bool = false,
@@ -122,6 +129,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     self.weightKg = weightKg
     self.reps = reps
     self.rpe = rpe
+    self.actualRIR = actualRIR
     self.coachRPE = coachRPE
     self.completed = completed
     self.failed = failed
@@ -141,6 +149,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     weightKg = try container.decodeDecimal(forKey: .weightKg)
     reps = try container.decode(Int.self, forKey: .reps)
     rpe = try container.decodeDecimalIfPresent(forKey: .rpe)
+    actualRIR = try container.decodeIfPresent(Int.self, forKey: .actualRIR)
     coachRPE = try container.decodeDecimalIfPresent(forKey: .coachRPE)
     completed = try container.decode(Bool.self, forKey: .completed)
     failed = try container.decodeIfPresent(Bool.self, forKey: .failed) ?? false
@@ -160,6 +169,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     try container.encodeDecimalString(weightKg, forKey: .weightKg)
     try container.encode(reps, forKey: .reps)
     try container.encodeDecimalStringIfPresent(rpe, forKey: .rpe)
+    try container.encodeIfPresent(actualRIR, forKey: .actualRIR)
     try container.encodeDecimalStringIfPresent(coachRPE, forKey: .coachRPE)
     try container.encode(completed, forKey: .completed)
     try container.encode(failed, forKey: .failed)
@@ -178,6 +188,7 @@ public struct SetLogDTO: Codable, Equatable, Sendable {
     case weightKg
     case reps
     case rpe
+    case actualRIR = "actualRir"
     case coachRPE = "coachRpe"
     case completed
     case failed
