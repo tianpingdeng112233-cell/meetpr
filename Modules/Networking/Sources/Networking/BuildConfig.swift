@@ -6,6 +6,23 @@ public enum MeetPRBuildTrack: Sendable, Equatable {
 }
 
 public enum BuildConfig {
+  public static func buildNumber(infoDictionary: [String: Any]? = Bundle.main.infoDictionary)
+    -> Int?
+  {
+    guard let raw = infoDictionary?["CFBundleVersion"] as? String,
+      let build = Int(raw), build >= 0
+    else { return nil }
+    return build
+  }
+
+  public static func updateURL(infoDictionary: [String: Any]? = Bundle.main.infoDictionary) -> URL?
+  {
+    guard let raw = infoDictionary?["MeetPRUpdateURL"] as? String,
+      let url = URL(string: raw), url.scheme == "https", url.host != nil
+    else { return nil }
+    return url
+  }
+
   static let buildTrackInfoDictionaryKey = "MeetPRBuildTrack"
 
   public static let productionBackendBaseURL = "http://121.40.160.241:3000"

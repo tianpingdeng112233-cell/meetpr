@@ -33,8 +33,14 @@ struct SetEntrySheet: View {
   @State var isAutomaticWeight: Bool
   @State private var videoPlayback = SetEntryVideoPlayer()
   @State private var showsRPEPlaceholder: Bool
+  @State private var attemptedCompletion = false
 
   var weightValue: Decimal { SetEntryValue.weight(from: weightText) }
+  private var enteredLoadTypeWeight: Decimal? {
+    var row = AccessoryRow(draft: draft, previous: nil, unit: .kg)
+    row.input.weight = weightText
+    return row.weightKg
+  }
   /// Barbell lifts floor at the empty bar (20kg); accessories go down to 0.
   private var weightFloor: Decimal { draft.isAccessory ? 0 : 20 }
   private var repsValue: Int { SetEntryValue.reps(from: repsText) }
@@ -74,7 +80,7 @@ struct SetEntrySheet: View {
     )
     _showsRPEPlaceholder = State(initialValue: seed.prescribed.rpe == nil)
     let weight: Decimal?
-    if seed.isExtra {
+    if seed.isExtra || seed.prescribed.hasUnspecifiedLoad {
       weight = seed.actualWeight
     } else if seed.prescribed.isLegacyPrescription {
       // Pre-072 chain, unchanged for legacy rows: barbell lifts floor at the
@@ -96,7 +102,8 @@ struct SetEntrySheet: View {
     _weightText = State(initialValue: weight.map(SetEntryValue.text) ?? "")
     _repsText = State(initialValue: reps.formatted())
     _rpeText = State(
-      initialValue: seed.isExtra
+      initialValue: seed.isExtra || seed.prescribed.loadMode == .bodyweight
+        || seed.prescribed.loadMode == .freeWeight
         ? seed.actualRPE.map(SetEntryValue.text) ?? ""
         : SetEntryValue.text(SetEntryValue.snapRPE(rpe)))
   }
@@ -113,20 +120,26 @@ struct SetEntrySheet: View {
 
           VStack(spacing: MeetPRSpacing.space3) {
             VStack(spacing: MeetPRSpacing.space2) {
-              numberStepper(
-                label: StudentStrings.localized(.setEntrySheet001),
-                annotation: "± 2.5",
-                value: weightText,
-                unit: "KG",
-                isAutomatic: isAutomaticWeight,
-                onDecrement: {
-                  updateWeight(max(weightFloor, weightValue - Decimal(25) / 10))
-                },
-                onIncrement: {
-                  updateWeight(weightValue + Decimal(25) / 10)
-                },
-                onOpenPad: { openNumberPad(.weight) }
-              )
+              if draft.prescribed.hasUnspecifiedLoad {
+                LoadTypeWeightInput(
+                  text: $weightText, isBodyweight: draft.prescribed.isBodyweight,
+                  invalid: attemptedCompletion && enteredLoadTypeWeight == nil)
+              } else {
+                numberStepper(
+                  label: StudentStrings.localized(.setEntrySheet001),
+                  annotation: "± 2.5",
+                  value: weightText,
+                  unit: "KG",
+                  isAutomatic: isAutomaticWeight,
+                  onDecrement: {
+                    updateWeight(max(weightFloor, weightValue - Decimal(25) / 10))
+                  },
+                  onIncrement: {
+                    updateWeight(weightValue + Decimal(25) / 10)
+                  },
+                  onOpenPad: { openNumberPad(.weight) }
+                )
+              }
 
               if let annotation = suggestionOutcomeSnapshot.suggestion?.percentageAnnotation {
                 Text(annotation)
@@ -529,8 +542,19 @@ struct SetEntrySheet: View {
       SetEntryCompleteButton {
         save(failed: false)
       }
-      .disabled(!SetEntryValue.allowsCompletion(weightText: weightText))
-      .opacity(SetEntryValue.allowsCompletion(weightText: weightText) ? 1 : 0.45)
+      .disabled(
+        !draft.prescribed.hasUnspecifiedLoad
+          && !SetEntryValue.allowsCompletion(weightText: weightText)
+      )
+      .opacity(
+        draft.prescribed.hasUnspecifiedLoad
+          || SetEntryValue.allowsCompletion(weightText: weightText) ? 1 : 0.45)
+      if attemptedCompletion, draft.prescribed.loadMode == .freeWeight,
+        enteredLoadTypeWeight == nil
+      {
+        Text(StudentStrings.replacing(.loadTypeMissingWeight, values: [String(setNumber)]))
+          .font(.caption).foregroundStyle(Color.MeetPR.danger)
+      }
 
       Button {
         save(failed: true)
@@ -578,15 +602,20 @@ extension SetEntrySheet {
   }
 
   fileprivate func syncDraftEdits() {
-    viewModel.updateWeight(rowIndex: rowIndex, weight: weightValue)
+    viewModel.updateWeight(
+      rowIndex: rowIndex,
+      weight: draft.prescribed.hasUnspecifiedLoad ? enteredLoadTypeWeight : weightValue)
     viewModel.updateReps(rowIndex: rowIndex, reps: repsValue)
     viewModel.updateRPE(
       rowIndex: rowIndex,
-      rpe: draft.isExtra
+      rpe: draft.isExtra || draft.prescribed.loadMode == .bodyweight
+        || draft.prescribed.loadMode == .freeWeight
         ? SetEntryValue.enteredRPE(from: rpeText) : rpeValue)
   }
 
   fileprivate func save(failed: Bool) {
+    attemptedCompletion = true
+    guard !draft.prescribed.hasUnspecifiedLoad || enteredLoadTypeWeight != nil else { return }
     closeNumberPad()
     syncDraftEdits()
     Task {

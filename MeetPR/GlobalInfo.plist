@@ -29,6 +29,9 @@
 			</array>
 		</dict>
 	</array>
+	<!-- David: fill in the TestFlight distribution URL before raising MIN_IOS_BUILD. -->
+	<key>MeetPRUpdateURL</key>
+	<string></string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>UIAppFonts</key>

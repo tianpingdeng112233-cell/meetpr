@@ -708,7 +708,8 @@ public final class TodayWorkoutViewModel {
       plan.completedAt == nil,
       FlexibleTrainingDay.canWrite(plan, in: planDays),
       let index = drafts.firstIndex(where: { $0.id == row.id }),
-      drafts[index].isAccessory || drafts[index].isStudentAdded,
+      drafts[index].isAccessory || drafts[index].isStudentAdded
+        || drafts[index].prescribed.hasUnspecifiedLoad,
       drafts[index] == row.draft
     else { return false }
     guard !row.isCancellation || row.draft.isStudentAdded || accessoryVideosLoaded else {
@@ -854,6 +855,10 @@ public final class TodayWorkoutViewModel {
         setIndex: entry.log.setIndex
       )
       guard !quickLogWrittenSlots.contains(slot) else { continue }
+      if let message = entry.draft.missingFreeWeightMessage {
+        actionErrorMessage = message
+        return .partialFailure(writtenCount: quickLogWrittenCount(entries), failedIndex: index)
+      }
       do {
         let persisted = try await logs.recordSet(entry.log)
         quickLogWrittenSlots.insert(slot)
@@ -873,19 +878,18 @@ public final class TodayWorkoutViewModel {
           occurredAt: plan.loggedAt
         )
       } catch {
-        let writtenCount = entries.count { candidate in
-          quickLogWrittenSlots.contains(
-            QuickLogSlot(
-              planExerciseID: candidate.log.planExerciseID,
-              setIndex: candidate.log.setIndex
-            )
-          )
-        }
-        return .partialFailure(writtenCount: writtenCount, failedIndex: index)
+        return .partialFailure(writtenCount: quickLogWrittenCount(entries), failedIndex: index)
       }
     }
 
     return await completeDay(day) ? .completed : .completionFailed
+  }
+
+  private func quickLogWrittenCount(_ entries: [QuickLogPlan.Entry]) -> Int {
+    entries.count {
+      quickLogWrittenSlots.contains(
+        QuickLogSlot(planExerciseID: $0.log.planExerciseID, setIndex: $0.log.setIndex))
+    }
   }
 
   func makeQuickLogPlan() -> QuickLogPlan? {
@@ -1059,6 +1063,12 @@ public final class TodayWorkoutViewModel {
     )
   }
 
+  private func validateCompletion(_ draft: TodayWorkoutSetRowDraft, completed: Bool) -> Bool {
+    guard let message = completed ? draft.missingFreeWeightMessage : nil else { return true }
+    actionErrorMessage = message
+    return false
+  }
+
   // Keeping the repository write, durable e1RM effects, and generation-gated
   // UI merge together makes their required ordering explicit.
   // swiftlint:disable:next function_body_length
@@ -1070,7 +1080,8 @@ public final class TodayWorkoutViewModel {
       return false
     }
     guard case .loaded(let plan, let drafts) = state, drafts.indices.contains(rowIndex),
-      FlexibleTrainingDay.canWrite(plan, in: planDays)
+      FlexibleTrainingDay.canWrite(plan, in: planDays),
+      validateCompletion(drafts[rowIndex], completed: completed)
     else { return false }
     actionErrorMessage = nil
     let nextDrafts = drafts

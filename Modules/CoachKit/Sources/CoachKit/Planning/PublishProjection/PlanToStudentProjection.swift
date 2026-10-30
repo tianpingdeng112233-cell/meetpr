@@ -118,7 +118,8 @@ public enum PlanToStudentProjection {
     guard let loadMode = planSet.loadMode else {
       return Prescription(
         weightKg: planSet.intensityMode == .weight ? planSet.targetValue : nil,
-        intensity: planSet.intensityMode == .rpe ? .rpe(planSet.targetValue) : nil,
+        intensity: planSet.intensityMode == .rpe
+          ? planSet.targetValue.map(PrescribedIntensity.rpe) : nil,
         percentageAnchor: nil
       )
     }
@@ -139,13 +140,18 @@ public enum PlanToStudentProjection {
       intensity = range(planSet.weightLow, planSet.weightHigh).map {
         PrescribedIntensity.weightRange($0.0, $0.1)
       }
+    case .freeWeight, .bodyweight:
+      intensity =
+        planSet.targetRPE.map(PrescribedIntensity.rpe)
+        ?? planSet.rirTarget.map(PrescribedIntensity.rir)
+        ?? planSet.targetPct.map(PrescribedIntensity.percentage)
     case .fixedWeight:
       intensity = nil
     }
     let percentageAnchor =
-      loadMode == .percentage ? planSet.percentageAnchor ?? .registeredOneRM : nil
+      planSet.targetPct != nil ? planSet.percentageAnchor ?? .registeredOneRM : nil
     return Prescription(
-      weightKg: planSet.targetWeight,
+      weightKg: loadMode == .freeWeight || loadMode == .bodyweight ? nil : planSet.targetWeight,
       intensity: intensity,
       percentageAnchor: percentageAnchor
     )
@@ -168,6 +174,8 @@ public enum PlanToStudentProjection {
       rpe = planSet.targetRPE
     case .rpeRange:
       rpe = planSet.rpeLow
+    case .freeWeight, .bodyweight:
+      rpe = planSet.targetRPE
     case .percentage, .rir, .weightRange, .fixedWeight:
       rpe = nil
     }

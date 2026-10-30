@@ -9,6 +9,47 @@ struct StudentStringsTests {
   private let chinese = Locale(identifier: "zh-Hans")
   private let english = Locale(identifier: "en")
 
+  @Test(
+    "Load type copy substitutes the set number in every language",
+    arguments: ["zh-Hans", "zh-Hant", "en"]
+  )
+  func loadTypeSetNumberReplacement(language: String) {
+    for key: StudentStrings.Key in [.loadTypeSet, .loadTypeMissingWeight] {
+      let output = StudentStrings.replacing(
+        key, values: ["2"], locale: Locale(identifier: language))
+      #expect(output.contains("2"))
+      #expect(!output.contains("%@"))
+      #expect(!output.contains("{0}"))
+    }
+  }
+
+  @Test("Load type catalog values never use printf placeholders")
+  func loadTypeCatalogPlaceholderGuard() throws {
+    let catalogURL = URL(fileURLWithPath: #filePath)
+      .deletingLastPathComponent()
+      .deletingLastPathComponent()
+      .deletingLastPathComponent()
+      .appending(path: "Sources/StudentKit/Resources/Localizable.xcstrings")
+    let root = try #require(
+      JSONSerialization.jsonObject(with: Data(contentsOf: catalogURL)) as? [String: Any])
+    let strings = try #require(root["strings"] as? [String: Any])
+    let entries = strings.filter { $0.key.hasPrefix("student.loadType.") }
+    #expect(!entries.isEmpty)
+    for (key, entry) in entries {
+      let values = catalogValues(in: entry)
+      #expect(!values.isEmpty, "Missing localized values for \(key)")
+      for value in values {
+        #expect(!value.contains("%@"), "\(key): \(value)")
+      }
+    }
+  }
+
+  private func catalogValues(in node: Any) -> [String] {
+    guard let object = node as? [String: Any] else { return [] }
+    if let value = object["value"] as? String { return [value] }
+    return object.values.flatMap { catalogValues(in: $0) }
+  }
+
   @Test("Critical Chinese copy remains byte-identical")
   func criticalChineseCopy() {
     #expect(
