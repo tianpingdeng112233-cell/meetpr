@@ -13,14 +13,14 @@ import Testing
     PrescribedSet(id: UUID(), setIndex: 0, weightKg: 60, reps: 12, rpe: 8),
     PrescribedSet(id: UUID(), setIndex: 1, weightKg: nil, intensity: .rpe(8), reps: 12),
     PrescribedSet(
-      id: UUID(), setIndex: 2, weightKg: nil, intensity: .rir(2), reps: 8,
+      id: UUID(), setIndex: 2, weightKg: nil, intensity: .rir(2), loadMode: .bodyweight, reps: 8,
       coachNote: "bodyweight"),
   ]
   let planExercise = StudentPlanExercise(
     id: UUID(), exercise: exercise, sequenceIndex: 0, prescribedSets: sets)
   let day = StudentPlanDay(id: UUID(), date: Date(), exercises: [planExercise])
   let drafts = TodayWorkoutViewModel.makeDrafts(for: day, existingLogs: [])
-  #expect(drafts.map(\.actualRPE) == [8, 8, 8])
+  #expect(drafts.map(\.actualRPE) == [8, 8, nil])
   let previous = StudentSetLog(
     id: UUID(), studentID: UUID(), planExerciseID: UUID(), setIndex: 1,
     loggedAt: .distantPast, weightKg: 55, reps: 10, rpe: 7, completed: true)

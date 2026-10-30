@@ -27,7 +27,7 @@ import Testing
 
 @MainActor
 @Test func loadTypeLegacyBodyweightRetainsOtherCoachCuesAndExtraWeight() {
-  var row = loadTypeRow(mode: nil, note: "自重 · 慢下放")
+  var row = loadTypeRow(mode: nil, note: "自重 · 慢下放", rpe: 10)
   #expect(row.isBodyweight && row.isWritable)
   #expect(row.extraNote == "慢下放")
   row.input.weight = "10"
@@ -35,7 +35,8 @@ import Testing
 }
 
 @MainActor
-private func loadTypeRow(mode: PlanLoadMode?, note: String? = nil) -> AccessoryRow {
+private func loadTypeRow(mode: PlanLoadMode?, note: String? = nil, rpe: Decimal = 8) -> AccessoryRow
+{
   let exercise = Exercise(
     id: UUID(), name: "Row", exerciseType: .accessory, isCompetitionLift: false,
     muscleGroups: [], equipment: [], createdAt: .distantPast)
@@ -43,7 +44,7 @@ private func loadTypeRow(mode: PlanLoadMode?, note: String? = nil) -> AccessoryR
     id: UUID(), exercise: exercise, sequenceIndex: 0,
     prescribedSets: [
       PrescribedSet(
-        id: UUID(), setIndex: 0, intensity: .rpe(8), loadMode: mode, reps: 15,
+        id: UUID(), setIndex: 0, intensity: .rpe(rpe), loadMode: mode, reps: 15,
         coachNote: note)
     ])
   let draft = TodayWorkoutViewModel.makeDraft(
