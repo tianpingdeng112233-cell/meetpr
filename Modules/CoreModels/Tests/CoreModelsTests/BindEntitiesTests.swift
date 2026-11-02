@@ -65,6 +65,46 @@ import Testing
   #expect(json.contains(#""skip_evaluation":false"#))
 }
 
+// MARK: - Ended bindings (spec 098)
+
+@Test func bindRequestDecodesEndedAt() throws {
+  let json = """
+    {
+      "id": "50000000-0000-0000-0000-000000000001",
+      "student_id": "50000000-0000-0000-0000-000000000002",
+      "coach_id": "50000000-0000-0000-0000-000000000003",
+      "status": "cancelled",
+      "submitted_at": "2026-10-01T10:00:00Z",
+      "expired_at": "2026-10-08T10:00:00Z",
+      "skip_evaluation": false,
+      "ended_at": "2026-11-02T10:00:00Z"
+    }
+    """
+  let request = try MeetPRCodec.decoder.decode(BindRequest.self, from: Data(json.utf8))
+  #expect(request.endedAt == Date(timeIntervalSince1970: 1_793_613_600))
+  let encoded = try encodedJSONString(request)
+  #expect(encoded.contains(#""ended_at":"2026-11-02T10:00:00Z""#))
+}
+
+@Test(arguments: ["", #", "ended_at": null"#])
+func bindRequestDecodesWithoutEndedAt(endedField: String) throws {
+  let json = """
+    {
+      "id": "50000000-0000-0000-0000-000000000001",
+      "student_id": "50000000-0000-0000-0000-000000000002",
+      "coach_id": "50000000-0000-0000-0000-000000000003",
+      "status": "cancelled",
+      "submitted_at": "2026-10-01T10:00:00Z",
+      "expired_at": "2026-10-08T10:00:00Z",
+      "skip_evaluation": false
+      \(endedField)
+    }
+    """
+  let request = try MeetPRCodec.decoder.decode(BindRequest.self, from: Data(json.utf8))
+  #expect(request.endedAt == nil)
+  #expect(request.status == .cancelled)
+}
+
 // MARK: - InviteCodeFormat (spec 031 D3/D11, coupled to backend spec 005 D4)
 
 @Test func normalizeUppercasesAndStripsSeparators() {
