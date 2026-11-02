@@ -583,16 +583,19 @@ private struct QuickLogColumnHeaders: View {
       Text("#").frame(width: MeetPRSpacing.space6, alignment: .leading)
       Text(StudentStrings.localized(.quickLog008)).frame(maxWidth: .infinity, alignment: .leading)
       Text(StudentStrings.localized(.quickLog009)).frame(maxWidth: .infinity, alignment: .leading)
-      Group {
+      HStack(spacing: 0) {
         if let onSwitch {
-          Button(action: onSwitch) { EffortToggleLabel(text: effortLabel) }.frame(
-            minHeight: MeetPRSpacing.minimumHitTarget
-          ).accessibilityLabel(
-            StudentStrings.localized(.accessoryEffortSwitch))
+          Button(action: onSwitch) { EffortToggleLabel(text: effortLabel) }
+            .frame(
+              minWidth: MeetPRSpacing.minimumHitTarget,
+              minHeight: MeetPRSpacing.minimumHitTarget
+            )
+            .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
         } else {
-          Text(effortLabel)
+          Text(effortLabel).frame(minWidth: MeetPRSpacing.minimumHitTarget)
         }
-      }.frame(maxWidth: .infinity, alignment: .leading)
+        EffortExplainerButton(kind: effortLabel == "RIR" ? .rir : .rpe)
+      }.frame(minWidth: 88, maxWidth: .infinity, alignment: .leading)
       Text(StudentStrings.localized(.quickLog011)).frame(width: MeetPRSpacing.point32)
     }
     .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
@@ -626,7 +629,9 @@ private struct QuickLogSetRow: View {
         row.effortMode == .rir
           ? row.draft.actualRIR.map(String.init) ?? "—"
           : StudentFormatting.decimal(row.draft.actualRPE),
-        unit: row.effortMode.label, field: .rpe)
+        unit: row.effortMode.label, field: .rpe
+      )
+      .frame(minWidth: 88)
       Button(
         action: onToggle,
         label: {

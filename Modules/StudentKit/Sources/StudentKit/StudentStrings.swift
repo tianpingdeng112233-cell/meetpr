@@ -33,6 +33,18 @@ enum StudentStrings {
 
   // swiftlint:disable:next type_body_length
   struct Key {
+    static let effortExplainerRirRemaining = Key(
+      "student.effortExplainer.rirRemaining", one: "student.effortExplainer.rirRemainingOne")
+    static let effortExplainerRpeTitle = Key("student.effortExplainer.rpeTitle")
+    static let effortExplainerRpeSubtitle = Key("student.effortExplainer.rpeSubtitle")
+    static let effortExplainerRpeClosing = Key("student.effortExplainer.rpeClosing")
+    static let effortExplainerRpeHelp = Key("student.effortExplainer.rpeHelp")
+    static let effortExplainerRirTitle = Key("student.effortExplainer.rirTitle")
+    static let effortExplainerRirSubtitle = Key("student.effortExplainer.rirSubtitle")
+    static let effortExplainerRirExample = Key("student.effortExplainer.rirExample")
+    static let effortExplainerRirClosing = Key("student.effortExplainer.rirClosing")
+    static let effortExplainerRirHelp = Key("student.effortExplainer.rirHelp")
+    static let effortExplainerClose = Key("student.effortExplainer.close")
     static let loadTypeFreeWeight = Key("student.loadType.freeWeight")
     static let loadTypeBodyweight = Key("student.loadType.bodyweight")
     static let loadTypeFreeWeightHint = Key("student.loadType.freeWeightHint")
