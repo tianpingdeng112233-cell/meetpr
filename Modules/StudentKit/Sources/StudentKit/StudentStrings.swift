@@ -268,6 +268,8 @@ enum StudentStrings {
     static let bindGateViewModel002 = Key("student.bindGateViewModel.copy002")
     static let bindGateViewModel003 = Key("student.bindGateViewModel.copy003")
     static let bindGateViewModel004 = Key("student.bindGateViewModel.copy004")
+    static let bindGateViewModel005 = Key("student.bindGateViewModel.copy005")
+    static let bindGateViewModel006 = Key("student.bindGateViewModel.copy006")
     static let cameraRecorderComponents001 = Key("student.cameraRecorderComponents.copy001")
     static let cameraRecorderComponents002 = Key(
       "student.cameraRecorderComponents.copy002",

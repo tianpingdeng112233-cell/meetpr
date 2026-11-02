@@ -28031,7 +28031,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "撤銷"
+            "value": "復原"
           }
         },
         "en": {
@@ -28084,6 +28084,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "Failure"
+          }
+        }
+      }
+    },
+    "student.bindGateViewModel.copy005": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} has unlinked you\nYour training history is kept. Enter an invite code to link again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}已与你解绑\n训练记录都还在，输入邀请码可重新绑定"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0}已與你解綁\n訓練記錄都還在，輸入邀請碼可重新繫結"
+          }
+        }
+      }
+    },
+    "student.bindGateViewModel.copy006": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your coach has unlinked you\nYour training history is kept. Enter an invite code to link again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教练已与你解绑\n训练记录都还在，输入邀请码可重新绑定"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "教練已與你解綁\n訓練記錄都還在，輸入邀請碼可重新繫結"
           }
         }
       }

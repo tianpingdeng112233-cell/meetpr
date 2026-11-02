@@ -9,31 +9,6 @@ import Testing
 // mine ∈ {nil, pending, accepted, rejected, expired, cancelled}
 // × stash ∈ {none, some} × onboardingComplete ∈ {true, false}.
 
-@MainActor
-private struct GateHarness {
-  let gate: BindGateViewModel
-  let repo: ScriptedBindRepository
-  let stash: StashSpy
-}
-
-@MainActor
-private func makeGate(
-  mine: ScriptedBindRepository.MineResult,
-  extraMine: [ScriptedBindRepository.MineResult] = [],
-  submit: [ScriptedBindRepository.SubmitResult] = [],
-  stash: StashSpy = StashSpy(),
-  onboardingComplete: Bool = true
-) -> GateHarness {
-  let repo = ScriptedBindRepository(mine: [mine] + extraMine, submit: submit)
-  let gate = BindGateViewModel(
-    studentId: BindFixtures.studentId,
-    bind: repo,
-    stash: stash,
-    isOnboardingComplete: { onboardingComplete }
-  )
-  return GateHarness(gate: gate, repo: repo, stash: stash)
-}
-
 // MARK: - Direct states (no stash)
 
 @MainActor
@@ -93,6 +68,40 @@ private func makeGate(
   let harness = makeGate(mine: .success(BindFixtures.request(status: .cancelled)))
   await harness.gate.load()
   #expect(harness.gate.state == .needsCode(prefillDisplayName: nil, notice: nil))
+}
+
+@MainActor
+@Test func cancelledEndedBindingShowsCoachNotice() async throws {
+  let request = BindFixtures.request(
+    status: .cancelled, coachDisplayName: "David", endedAt: BindFixtures.referenceDate)
+  let harness = makeGate(mine: .success(request))
+  await harness.gate.load()
+
+  guard case .needsCode(_, let notice) = harness.gate.state else {
+    Issue.record("An ended binding must return to the invite-code page")
+    return
+  }
+  let message = try #require(notice).message
+  #expect(notice == .coachUnlinked(coachDisplayName: "David"))
+  #expect(message.contains("David"))
+  #expect(message.contains("\n"))
+}
+
+@MainActor
+@Test(arguments: [nil, "", " \n\t "] as [String?])
+func cancelledEndedBindingWithoutCoachNameUsesFallback(coachName: String?) async throws {
+  let request = BindFixtures.request(
+    status: .cancelled, coachDisplayName: coachName, endedAt: BindFixtures.referenceDate)
+  let harness = makeGate(mine: .success(request))
+  await harness.gate.load()
+
+  #expect(
+    harness.gate.state
+      == .needsCode(prefillDisplayName: nil, notice: .coachUnlinked(coachDisplayName: nil)))
+  guard case .needsCode(_, let notice) = harness.gate.state else { return }
+  let message = try #require(notice).message
+  #expect(message.first?.isWhitespace == false)
+  #expect(!message.hasPrefix("已"))
 }
 
 @MainActor
