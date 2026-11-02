@@ -67,8 +67,6 @@ public actor InMemoryOnboardingRepository: OnboardingRepository {
     "unit_preference", "gender", "birth_date", "height_cm", "weight_kg",
     "training_years", "squat_stance", "deadlift_style",
     "squat_1rm_kg", "bench_1rm_kg", "deadlift_1rm_kg",
-    "training_days", "gym_tier",
-    "daily_life_intensity", "life_stress", "recovery_speed", "sleep_hours",
     "is_competing",
   ]
 
@@ -88,12 +86,6 @@ public actor InMemoryOnboardingRepository: OnboardingRepository {
     check(profile.squat1RMKg == nil, "squat_1rm_kg")
     check(profile.bench1RMKg == nil, "bench_1rm_kg")
     check(profile.deadlift1RMKg == nil, "deadlift_1rm_kg")
-    check(profile.trainingDays.isEmpty, "training_days")
-    check(profile.gymTier == nil, "gym_tier")
-    check(profile.dailyLifeIntensity == nil, "daily_life_intensity")
-    check(profile.lifeStress == nil, "life_stress")
-    check(profile.recoverySpeed == nil, "recovery_speed")
-    check(profile.sleepHours == nil, "sleep_hours")
     check(profile.isCompeting == nil, "is_competing")
     // Conditionally required (is_competing = true).
     check(profile.isCompeting == true && profile.competitionDate == nil, "competition_date")

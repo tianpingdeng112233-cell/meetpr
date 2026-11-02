@@ -20,12 +20,11 @@ import ViewInspector
     try rows.map { try $0.actualView().label } == [
       StudentStrings.localized(.profileCardsSection002),
       StudentStrings.localized(.myProfileView011),
-      StudentStrings.localized(.myProfileView012), StudentStrings.localized(.myProfileView007),
     ])
   #expect(try rows[0].actualView().value == "178 cm · 83.00 kg")
   let buttons = try view.inspect().findAll(ViewType.Button.self)
   for button in buttons { try button.tap() }
-  #expect(opened == [.basics, .background, .environment, .materials])
+  #expect(opened == [.basics, .background])
   let repository = InMemoryOnboardingRepository(studentId: profile.userId, seed: profile)
   let model = MyProfileViewModel(studentId: profile.userId, repo: repository)
   await model.loadIfNeeded()
@@ -52,14 +51,12 @@ import ViewInspector
   let rows = try view.inspect().findAll(MyProfileValueRow.self)
   #expect(
     try rows.map { try $0.actualView().label } == [
-      StudentStrings.localized(.myProfileView004), StudentStrings.localized(.myProfileView005),
+      StudentStrings.localized(.myProfileView005)
     ])
-  #expect(try rows[0].actualView().value == "中等强度 · 较高压力 · 约2天恢复")
-  #expect(try rows[1].actualView().value == "肩部伤病")
+  #expect(try rows[0].actualView().value == "肩部伤病")
   let buttons = try view.inspect().findAll(ViewType.Button.self)
   try buttons[0].tap()
-  #expect(readinessOpened)
-  try buttons[1].tap()
+  #expect(!readinessOpened)
   #expect(editor == .injuries)
 }
 
@@ -119,4 +116,21 @@ import ViewInspector
     ])
   #expect(try inspected.findAll(AppearancePreferenceRow.self).count == 1)
   #expect(try inspected.findAll(ProfileSignOutButton.self).count == 1)
+}
+
+@MainActor
+@Test func spec095ArchiveCardsHideRetiredEditorsForExistingProfiles() throws {
+  let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
+  let repo = InMemoryOnboardingRepository(studentId: profile.userId, seed: profile)
+  let model = MyProfileViewModel(studentId: profile.userId, repo: repo)
+  let view = ProfileCardsSection(profile: profile, viewModel: model)
+  let links = try view.inspect().findAll(ViewType.NavigationLink.self)
+  #expect(links.count == 5)
+  for key: StudentStrings.Key in [
+    .profileCardsSection004, .profileCardsSection005, .profileCardsSection006,
+  ] {
+    #expect(throws: (any Error).self) {
+      try view.inspect().find(text: StudentStrings.localized(key))
+    }
+  }
 }

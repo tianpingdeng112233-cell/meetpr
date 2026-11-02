@@ -4,7 +4,7 @@ import DesignSystem
 import RepositoryContracts
 import SwiftUI
 
-/// 7-step onboarding wizard (spec 032 §4). Rendered through the BindGate's
+/// 4-step onboarding wizard (spec 095 amendment). Rendered through the BindGate's
 /// `.needsOnboarding` slot: an interstitial ("继续填写") presents the wizard
 /// full screen so 保存并退出 has somewhere to land.
 @available(iOS 17.0, macOS 14.0, *)
@@ -77,9 +77,6 @@ struct OnboardingWizardView: View {
     StudentStrings.localized(.onboardingWizardView004),
     StudentStrings.localized(.onboardingWizardView005),
     StudentStrings.localized(.onboardingWizardView006),
-    StudentStrings.localized(.onboardingWizardView007),
-    StudentStrings.localized(.onboardingWizardView008),
-    StudentStrings.localized(.onboardingWizardView009),
     StudentStrings.localized(.onboardingWizardView010),
   ]
 
@@ -87,7 +84,10 @@ struct OnboardingWizardView: View {
     NavigationStack {
       content
         .background(Color.MeetPR.bgBase)
-        .navigationTitle("Step \(viewModel.step) of \(OnboardingDraft.stepCount)")
+        .navigationTitle(
+          StudentStrings.replacing(
+            .onboardingProgress, values: ["\(viewModel.step)", "\(OnboardingDraft.stepCount)"])
+        )
         #if os(iOS)
           .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -166,12 +166,6 @@ struct OnboardingWizardView: View {
       Step2BackgroundSection(draft: $viewModel.draft, highlighted: viewModel.highlightedFields)
     case 3:
       Step3StrengthSection(draft: $viewModel.draft, highlighted: viewModel.highlightedFields)
-    case 4:
-      Step4EnvironmentSection(draft: $viewModel.draft, highlighted: viewModel.highlightedFields)
-    case 5:
-      Step5RecoverySection(draft: $viewModel.draft, highlighted: viewModel.highlightedFields)
-    case 6:
-      Step6MaterialsSection(draft: $viewModel.draft, highlighted: viewModel.highlightedFields)
     default:
       Step7ExtrasSection(draft: $viewModel.draft, highlighted: viewModel.highlightedFields)
     }
@@ -224,7 +218,7 @@ struct OnboardingWizardView: View {
 
   private func trackCurrentStep() {
     let names: [OnboardingStepName] = [
-      .goal, .experience, .lifts, .schedule, .competition, .equipment, .review,
+      .goal, .experience, .lifts, .review,
     ]
     guard names.indices.contains(viewModel.step - 1) else { return }
     Analytics.shared.onboardingStep(index: viewModel.step, name: names[viewModel.step - 1])

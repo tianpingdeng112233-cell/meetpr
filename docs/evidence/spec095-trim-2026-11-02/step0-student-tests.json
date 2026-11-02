@@ -1,0 +1,713 @@
+{
+  "schema": "xcodebuildmcp.output.test-result",
+  "summary": {
+    "status": "FAILED",
+    "durationMs": 285443,
+    "counts": {
+      "passed": 1076,
+      "failed": 13,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T02-46-37-280Z_pid87679_8c0d3124.log"
+  },
+  "diagnostics": {
+    "warnings": [
+      {
+        "message": "expression of type 'Bool?' is unused [#no-usage]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Sources/StudentKit/Features/MyProfile/TrainingReminderScheduling.swift:122"
+      },
+      {
+        "message": "sending 'session' risks causing data races; this is an error in the Swift 6 language mode [#SendingRisksDataRace]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/VideoTrimCompletionTests.swift:77"
+      },
+      {
+        "message": "sending 'session' risks causing data races; this is an error in the Swift 6 language mode [#SendingRisksDataRace]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/VideoTrimCompletionTests.swift:78"
+      },
+      {
+        "message": "sending 'session' risks causing data races; this is an error in the Swift 6 language mode [#SendingRisksDataRace]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/VideoTrimCompletionTests.swift:231"
+      },
+      {
+        "message": "sending 'session' risks causing data races; this is an error in the Swift 6 language mode [#SendingRisksDataRace]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/VideoTrimCompletionTests.swift:258"
+      },
+      {
+        "message": "sending 'session' risks causing data races; this is an error in the Swift 6 language mode [#SendingRisksDataRace]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/VideoUpload/VideoTrimCompletionTests.swift:278"
+      },
+      {
+        "message": "no calls to throwing functions occur within 'try' expression",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:103"
+      },
+      {
+        "message": "no calls to throwing functions occur within 'try' expression",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/MyProfile/ProfileDetailPagesTests.swift:115"
+      },
+      {
+        "message": "no calls to throwing functions occur within 'try' expression",
+        "location": "macro expansion #expect:1"
+      },
+      {
+        "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:78"
+      },
+      {
+        "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:81"
+      },
+      {
+        "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:89"
+      },
+      {
+        "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Onboarding/OnboardingTestSupport.swift:92"
+      },
+      {
+        "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:86"
+      },
+      {
+        "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:89"
+      },
+      {
+        "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:98"
+      },
+      {
+        "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:101"
+      },
+      {
+        "message": "instance method 'lock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:110"
+      },
+      {
+        "message": "instance method 'unlock' is unavailable from asynchronous contexts; Use async-safe scoped locking instead; this is an error in the Swift 6 language mode",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/BindTestSupport.swift:113"
+      },
+      {
+        "message": "call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]",
+        "location": "macro expansion #expect:1"
+      },
+      {
+        "message": "call to main actor-isolated static method 'sanitized' in a synchronous nonisolated context [#ActorIsolatedCall]",
+        "location": "/Users/david/Projects/apps/MeetPR-wt-095/Modules/StudentKit/Tests/StudentKitTests/Features/Bind/EnterCodeViewModelTests.swift:206"
+      }
+    ],
+    "errors": [
+      {
+        "message": "✘ Test newerInMemoryGenerationRejectsOldEventDuringPersistence() recorded an issue at VideoUploadGenerationPersistenceRaceTests.swift:8:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test backgroundFailureIsPersistedOnceBeforeHandlerAnd403AbortsOnce() recorded an issue at VideoUploadFailureRaceTests.swift:8:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test removalDuringPendingPartLookupLeaksNoWakeSideEffects() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:22:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test removalDuringLegacyCancellationLeaksNoWakeSideEffects() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:7:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test osWakeAfterManualClaimCannotStartASecondWriter() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:80:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test handlerRegistrationDuringGenerationCommitCannotRevokeManualClaim() recorded an issue at VideoUploadHarvestClaimRaceTests.swift:8:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test sessionFinishedDuringPersistenceDoesNotRollBackMemoryGeneration() recorded an issue at VideoUploadGenerationPersistenceRaceTests.swift:57:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test productionUploaderPairsContinuationWithBackgroundEvents() recorded an issue at BackgroundVideoPartUploaderTests.swift:20:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test emptyRestoredBatchStillCompletesPersistedPipelineBeforeOSHandler() recorded an issue at VideoUploadRecoveryTests.swift:322:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test terminalTeardownInvalidatesSuspendedRecoveryChunkWriter() recorded an issue at VideoUploadGenerationRaceTests.swift:8:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test osWakeRegistrationDuringRecoveryWinsBeforeManualHarvest() recorded an issue at VideoUploadWakeRemovalRaceTests.swift:53:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test productionUploaderDefersFailureToRestoredEventOwner() recorded an issue at BackgroundVideoPartUploaderTests.swift:69:2: Caught error: TimeoutError()"
+      },
+      {
+        "message": "✘ Test staleRecoveryLoopCannotInterfereWithImmediateRetryOfSameRecord() recorded an issue at VideoUploadGenerationRaceTests.swift:47:2: Caught error: TimeoutError()"
+      }
+    ],
+    "testFailures": []
+  },
+  "testCases": [
+    {
+      "test": "Recording lifecycle advances through explicit start and stop states",
+      "status": "passed",
+      "durationMs": 125
+    },
+    {
+      "test": "Badge-facing parsers hide untouched fields instead of clamping them",
+      "status": "passed",
+      "durationMs": 133
+    },
+    {
+      "test": "Closing invalidates every in-flight recorder completion",
+      "status": "passed",
+      "durationMs": 133
+    },
+    {
+      "suite": "Recorder video writer settings enforce the upload-ready H",
+      "test": "264 budget",
+      "status": "passed",
+      "durationMs": 132
+    },
+    {
+      "test": "Video bitrate boundary is inclusive",
+      "status": "passed",
+      "durationMs": 157
+    },
+    {
+      "suite": "Eligible H",
+      "test": "264 video without audio uses passthrough",
+      "status": "passed",
+      "durationMs": 159
+    },
+    {
+      "test": "the 500 MB guardrail removes only when total bytes exceed the exact limit",
+      "status": "passed",
+      "durationMs": 195
+    },
+    {
+      "test": "today's uploaded video is retained",
+      "status": "passed",
+      "durationMs": 195
+    },
+    {
+      "test": "cleanup never removes in-flight or failed files",
+      "status": "passed",
+      "durationMs": 195
+    },
+    {
+      "test": "a previous-day uploaded video is removed",
+      "status": "passed",
+      "durationMs": 197
+    },
+    {
+      "test": "device-local day handles midnight across a daylight-saving transition",
+      "status": "passed",
+      "durationMs": 257
+    },
+    {
+      "test": "over-limit cleanup removes oldest uploaded files until within the limit",
+      "status": "passed",
+      "durationMs": 347
+    },
+    {
+      "test": "A stale automatic-stop callback cannot stop a newer recording",
+      "status": "passed",
+      "durationMs": 445
+    },
+    {
+      "test": "Interrupting stop prevents its late result from entering review",
+      "status": "passed",
+      "durationMs": 446
+    },
+    {
+      "test": "Recorder audio writer settings encode mono AAC at 96 kbps",
+      "status": "passed",
+      "durationMs": 448
+    },
+    {
+      "test": "Ineligible source starts directly on the transcode path",
+      "status": "passed",
+      "durationMs": 458
+    },
+    {
+      "test": "Writer failure during start enters failed and rejects the late start completion",
+      "status": "passed",
+      "durationMs": 454
+    },
+    {
+      "test": "Writer failure during recording enters failed",
+      "status": "passed",
+      "durationMs": 460
+    },
+    {
+      "test": "Audio must be known, positive-rate AAC",
+      "status": "passed",
+      "durationMs": 463
+    },
+    {
+      "test": "A cancel that races the finishWriting success still resolves as cancellation",
+      "status": "passed",
+      "durationMs": 458
+    },
+    {
+      "test": "Invalid source geometry transcodes",
+      "status": "passed",
+      "durationMs": 460
+    },
+    {
+      "test": "Permission denial can re-enter preparation after Settings authorization",
+      "status": "passed",
+      "durationMs": 459
+    },
+    {
+      "test": "Rendered long-edge boundary is inclusive in landscape and portrait",
+      "status": "passed",
+      "durationMs": 459
+    },
+    {
+      "test": "Interrupting start invalidates its late completion and recording generation",
+      "status": "passed",
+      "durationMs": 458
+    },
+    {
+      "test": "AAC audio bitrate boundary is inclusive",
+      "status": "passed",
+      "durationMs": 464
+    },
+    {
+      "suite": "Only a known H",
+      "test": "264 video codec can passthrough",
+      "status": "passed",
+      "durationMs": 465
+    },
+    {
+      "test": "Every audio format description must be AAC",
+      "status": "passed",
+      "durationMs": 464
+    },
+    {
+      "test": "Unknown, non-positive, or non-finite video bitrate transcodes",
+      "status": "passed",
+      "durationMs": 463
+    },
+    {
+      "suite": "Every video format description must be H",
+      "test": "264",
+      "status": "passed",
+      "durationMs": 460
+    },
+    {
+      "test": "Passthrough cancellation never starts a transcode retry",
+      "status": "passed",
+      "durationMs": 460
+    },
+    {
+      "test": "Passthrough failure retries through a fresh transcode attempt",
+      "status": "passed",
+      "durationMs": 466
+    },
+    {
+      "test": "Invalid source errors retain the underlying reason and remove output",
+      "status": "passed",
+      "durationMs": 519
+    },
+    {
+      "test": "A single Sunday uses Calendar weekday one",
+      "status": "passed",
+      "durationMs": 399
+    },
+    {
+      "test": "An enabled reminder with no weekdays produces no requests",
+      "status": "passed",
+      "durationMs": 399
+    },
+    {
+      "test": "Summary is localized in Chinese and English",
+      "status": "passed",
+      "durationMs": 399
+    },
+    {
+      "test": "Default settings are off with Monday Wednesday Friday at 20:00",
+      "status": "passed",
+      "durationMs": 399
+    },
+    {
+      "test": "A disabled reminder produces no requests",
+      "status": "passed",
+      "durationMs": 397
+    },
+    {
+      "test": "Multiple weekdays produce one deterministic request each",
+      "status": "passed",
+      "durationMs": 399
+    },
+    {
+      "test": "Preferences are stored per student and never bleed across accounts",
+      "status": "passed",
+      "durationMs": 405
+    },
+    {
+      "test": "Dynamic Chinese templates preserve the original result",
+      "status": "passed",
+      "durationMs": 392
+    },
+    {
+      "test": "Catalog exercise names use nameEn only for English display",
+      "status": "passed",
+      "durationMs": 392
+    },
+    {
+      "test": "Load type copy substitutes the set number in every language",
+      "status": "passed",
+      "durationMs": 392
+    },
+    {
+      "test": "Critical Chinese copy remains byte-identical",
+      "status": "passed",
+      "durationMs": 392
+    },
+    {
+      "test": "English count copy selects singular and plural catalog entries",
+      "status": "passed",
+      "durationMs": 392
+    },
+    {
+      "test": "Critical English copy is available",
+      "status": "passed",
+      "durationMs": 392
+    },
+    {
+      "test": "List punctuation follows locale without changing Chinese output",
+      "status": "passed",
+      "durationMs": 392
+    },
+    {
+      "test": "Load type catalog values never use printf placeholders",
+      "status": "passed",
+      "durationMs": 393
+    },
+    {
+      "test": "English count copy uses the designated placeholder",
+      "status": "passed",
+      "durationMs": 393
+    },
+    {
+      "test": "an uploaded video resolves to its backend attachment id",
+      "status": "passed",
+      "durationMs": 365
+    },
+    {
+      "test": "failed recorded rows remain shareable",
+      "status": "passed",
+      "durationMs": 364
+    },
+    {
+      "test": "equal completion timestamps prefer larger sequence then set index",
+      "status": "passed",
+      "durationMs": 364
+    },
+    {
+      "test": "entry requires an available set, an active coach, and sharing wiring",
+      "status": "passed",
+      "durationMs": 365
+    },
+    {
+      "test": "gym-day candidates include 00:00-03:59 and exclude adjacent days",
+      "status": "passed",
+      "durationMs": 362
+    },
+    {
+      "test": "every recorded row is selectable and replaces its planned candidate",
+      "status": "passed",
+      "durationMs": 365
+    },
+    {
+      "test": "most recently completed set is the first picker candidate",
+      "status": "passed",
+      "durationMs": 362
+    },
+    {
+      "test": "planned candidates map intensity and ranges without rounding invalid values",
+      "status": "passed",
+      "durationMs": 365
+    },
+    {
+      "test": "local file wins without requesting a cloud URL",
+      "status": "passed",
+      "durationMs": 135
+    },
+    {
+      "test": "missing local file requests a fresh cloud URL on every play",
+      "status": "passed",
+      "durationMs": 134
+    },
+    {
+      "test": "Turning reminders off clears the prefix and leaves unrelated requests",
+      "status": "passed",
+      "durationMs": 415
+    },
+    {
+      "test": "A failed add rolls the partial schedule back to empty",
+      "status": "passed",
+      "durationMs": 420
+    },
+    {
+      "test": "Changing settings removes only reminder requests before rescheduling",
+      "status": "passed",
+      "durationMs": 412
+    },
+    {
+      "test": "Reconcile clears stale reminders left by a bypassed logout",
+      "status": "passed",
+      "durationMs": 419
+    },
+    {
+      "test": "Logout cleanup clears only training reminder requests",
+      "status": "passed",
+      "durationMs": 415
+    },
+    {
+      "test": "Reconcile disables the stored preference when permission is gone",
+      "status": "passed",
+      "durationMs": 420
+    },
+    {
+      "test": "Reconcile reschedules an enabled authorized preference",
+      "status": "passed",
+      "durationMs": 420
+    },
+    {
+      "test": "an in-flight video maps the manager ready event",
+      "status": "passed",
+      "durationMs": 378
+    },
+    {
+      "test": "Video export preserves the full portrait preferred transform",
+      "status": "passed",
+      "durationMs": 4264
+    },
+    {
+      "test": "Stored preferences win over the recommended training days",
+      "status": "passed",
+      "durationMs": 5826
+    },
+    {
+      "suite": "Video export produces a readable, fast-start H",
+      "test": "264 MP4 without upscaling",
+      "status": "passed",
+      "durationMs": 5912
+    },
+    {
+      "test": "remote playback retry requests a fresh cloud URL",
+      "status": "passed",
+      "durationMs": 5596
+    },
+    {
+      "test": "local playback retry reopens the same file without refreshing cloud URL",
+      "status": "passed",
+      "durationMs": 5598
+    },
+    {
+      "test": "Downscaled portrait export rescales the transform translation",
+      "status": "passed",
+      "durationMs": 6582
+    },
+    {
+      "test": "Eligible AAC audio is remuxed without re-encoding either media stream",
+      "status": "passed",
+      "durationMs": 6614
+    },
+    {
+      "test": "Recommended training days seed the defaults until the student saves",
+      "status": "passed",
+      "durationMs": 6686
+    },
+    {
+      "test": "Video export transcodes source audio to AAC",
+      "status": "passed",
+      "durationMs": 6980
+    },
+    {
+      "test": "Eligible source is remuxed without re-encoding its video samples",
+      "status": "passed",
+      "durationMs": 7020
+    },
+    {
+      "test": "an assumed log row is selectable and a planned workout shows the entry",
+      "status": "passed",
+      "durationMs": 7052
+    },
+    {
+      "test": "loaded empty feedback renders guidance only after loading finishes",
+      "status": "passed",
+      "durationMs": 7079
+    },
+    {
+      "test": "v3 set row stays free of a per-row ask-coach entry",
+      "status": "passed",
+      "durationMs": 7981
+    },
+    {
+      "test": "Global retains the shipped paste button and action",
+      "status": "passed",
+      "durationMs": 7960
+    },
+    {
+      "test": "CN retains its invitation paste label and action",
+      "status": "passed",
+      "durationMs": 7960
+    },
+    {
+      "test": "planning state retains the profile metrics row",
+      "status": "passed",
+      "durationMs": 7951
+    },
+    {
+      "test": "account actions remain reachable in profile fallback states",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "dashboard restores the structured loading skeleton",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "rest day cursor restores the header badge",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "week error and interrupted idle resolve to retry states",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "e1RM failure stays distinct from true empty history",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "empty dashboard metrics render both actionable placeholders",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "week errors do not render the planning empty state",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "volume chart exposes its own insufficient-data state",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "profile metrics failures stay visible instead of disappearing",
+      "status": "passed",
+      "durationMs": 7997
+    },
+    {
+      "test": "day detail renders source index zero as set one",
+      "status": "passed",
+      "durationMs": 7837
+    },
+    {
+      "test": "set entry sheet renders a source-zero draft as set one",
+      "status": "passed",
+      "durationMs": 7837
+    },
+    {
+      "test": "feedback detail renders source index zero as set one",
+      "status": "passed",
+      "durationMs": 7837
+    },
+    {
+      "test": "history extra sets use the standard result format without a checkmark",
+      "status": "passed",
+      "durationMs": 7837
+    },
+    {
+      "test": "v3 set row renders source index zero as set one",
+      "status": "passed",
+      "durationMs": 7837
+    },
+    {
+      "test": "history entries render source index zero as set one",
+      "status": "passed",
+      "durationMs": 7838
+    },
+    {
+      "test": "dashboard feedback label renders source index zero as set one",
+      "status": "passed",
+      "durationMs": 7837
+    },
+    {
+      "test": "self-added history uses standard exercise typography and numbered result rows",
+      "status": "passed",
+      "durationMs": 7837
+    },
+    {
+      "test": "Schedule failure falls the toggle and the stored preference back to off",
+      "status": "passed",
+      "durationMs": 8118
+    },
+    {
+      "test": "Allowed authorization enables and schedules the defaults",
+      "status": "passed",
+      "durationMs": 8121
+    },
+    {
+      "test": "video markers load, hide only when unavailable, and surface other failures",
+      "status": "passed",
+      "durationMs": 8215
+    },
+    {
+      "test": "Foreground refresh clears the denied banner once authorized",
+      "status": "passed",
+      "durationMs": 8129
+    },
+    {
+      "test": "Denied authorization rolls the toggle back and is not requested again",
+      "status": "passed",
+      "durationMs": 8132
+    },
+    {
+      "test": "Foreground refresh rolls back when permission was revoked in Settings",
+      "status": "passed",
+      "durationMs": 8138
+    },
+    {
+      "test": "High-bitrate 1080p export caps dimensions and bitrate without resampling frames",
+      "status": "passed",
+      "durationMs": 8706
+    },
+    {
+      "test": "all recorded hides the hero and its ask-coach entry (spec 090)",
+      "status": "passed",
+      "durationMs": 9209
+    },
+    {
+      "test": "Cancelling video export removes its partial output",
+      "status": "passed",
+      "durationMs": 9530
+    },
+    {
+      "test": "in-progress hero owns the only ask-coach entry",
+      "status": "passed",
+      "durationMs": 9775
+    },
+    {
+      "test": "today workout hero stored-index path renders source index zero as set one",
+      "status": "passed",
+      "durationMs": 9841
+    },
+    {
+      "test": "today workout table offset path renders source index zero as set one",
+      "status": "passed",
+      "durationMs": 10241
+    },
+    {
+      "test": "Custom preference uses actual RPE bands",
+      "status": "passed",
+      "durationMs": 11981
+    }
+  ]
+}

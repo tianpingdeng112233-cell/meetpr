@@ -24,8 +24,13 @@ public actor LocalOnboardingDraftStore {
   }
 
   public func load(studentId: UUID) -> OnboardingDraft? {
-    guard let data = try? Data(contentsOf: fileURL(studentId)) else { return nil }
-    return try? decoder.decode(OnboardingDraft.self, from: data)
+    guard let data = try? Data(contentsOf: fileURL(studentId)),
+      var draft = try? decoder.decode(OnboardingDraft.self, from: data)
+    else { return nil }
+    // Legacy steps 4–6 advance to extras (old 7, now 4). Keep all stored
+    // values for compatibility; the patch builders omit retired fields.
+    draft.furthestStep = min(max(draft.furthestStep, 1), OnboardingDraft.stepCount)
+    return draft
   }
 
   public func save(_ draft: OnboardingDraft, studentId: UUID) throws {

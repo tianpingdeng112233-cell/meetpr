@@ -89,7 +89,24 @@ public final class PendingBindViewModel {
     }
   }
 
-  /// "已等待: 2 小时 14 分" — minute granularity, refreshed by TimelineView.
+  /// Match the welcome screen's name handling without duplicating coach titles.
+  public nonisolated static func waitingSubtitle(
+    coachDisplayName: String?, locale: Locale = .current
+  ) -> String {
+    let name = coachDisplayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    guard !name.isEmpty else {
+      return StudentStrings.localized(.pendingBindWaitingUnnamed, locale: locale)
+    }
+    let includesTitle =
+      name.contains("教练") || name.contains("教練")
+      || (locale.language.languageCode?.identifier == "en"
+        && name.localizedCaseInsensitiveContains("coach"))
+    return StudentStrings.replacing(
+      includesTitle ? .pendingBindWaitingNamed : .pendingBindView002,
+      values: [name], locale: locale)
+  }
+
+  /// Minute granularity, refreshed by TimelineView.
   public nonisolated static func waitingDescription(since submittedAt: Date, now: Date) -> String {
     let seconds = max(0, now.timeIntervalSince(submittedAt))
     let totalMinutes = Int(seconds / 60)

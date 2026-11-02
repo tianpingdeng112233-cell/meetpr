@@ -5,6 +5,32 @@ import Testing
 
 @testable import StudentKit
 
+@Test func spec095PendingSubtitleHandlesEmptyNamedAndCoachNamesInAllLocales() {
+  for (language, empty, named, titled, profileTitle) in [
+    ("zh-Hans", "等待教练接收", "等待教练 王磊 接收", "等待王教练接收", "基础资料"),
+    ("zh-Hant", "等待教練接收", "等待教練 王磊 接收", "等待王教练接收", "基礎資料"),
+    (
+      "en", "Waiting for your coach to accept", "Waiting for coach 王磊 to accept",
+      "Waiting for 王教练 to accept", "Basic profile"
+    ),
+  ] {
+    let locale = Locale(identifier: language)
+    for name: String? in [nil, "", "  \n "] {
+      #expect(PendingBindViewModel.waitingSubtitle(coachDisplayName: name, locale: locale) == empty)
+    }
+    #expect(PendingBindViewModel.waitingSubtitle(coachDisplayName: "王磊", locale: locale) == named)
+    #expect(PendingBindViewModel.waitingSubtitle(coachDisplayName: "王教练", locale: locale) == titled)
+    #expect(StudentStrings.localized(.pendingBindView011, locale: locale) == profileTitle)
+  }
+  #expect(
+    PendingBindViewModel.waitingSubtitle(
+      coachDisplayName: "王教練", locale: Locale(identifier: "zh-Hant")) == "等待王教練接收")
+  #expect(
+    PendingBindViewModel.waitingSubtitle(
+      coachDisplayName: "Coach Wang", locale: Locale(identifier: "en"))
+      == "Waiting for Coach Wang to accept")
+}
+
 // MARK: - Cancel outcomes (spec 031 §7 / risk 4)
 
 @MainActor

@@ -1,0 +1,20 @@
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 59082,
+    "counts": {
+      "passed": 84,
+      "failed": 0,
+      "skipped": 0
+    },
+    "target": "swift-package"
+  },
+  "artifacts": {
+    "buildLogPath": "/Users/david/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/swift_package_test_2026-11-02T03-11-54-140Z_pid87679_928b57d8.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": [],
+    "testFailures": []
+  }
+}

@@ -40,21 +40,6 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
   #expect(OnboardingSummaryFormatter.oneRM(fullProfile()) == "S 180 · B 120 · D 220 (kg)")
 }
 
-@Test func environmentSummaryOrdersDaysAndShowsTier() {
-  #expect(
-    OnboardingSummaryFormatter.environment(fullProfile()) == "周一·三·五·六 (4天/周) · 商业健身房")
-}
-
-@Test func recoverySummaryUsesWikiScaleLabels() {
-  #expect(
-    OnboardingSummaryFormatter.recovery(fullProfile()) == "强度:中等 压力:较高 恢复:约2天 睡眠:7h")
-}
-
-@Test func materialsSummaryHidesZeroUploads() {
-  // Demo profile has no uploads (degraded Step 6) → only muscle groups.
-  #expect(OnboardingSummaryFormatter.materials(fullProfile()) == "想增强:股四头/腘绳肌/肩")
-}
-
 @Test func competitionSummaryShowsDateAndClassOrOptOut() {
   let profile = fullProfile()
   #expect(
@@ -65,7 +50,7 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
   draft.isCompeting = false
   draft.competitionDate = nil
   let optedOut = InMemoryOnboardingRepository.applied(
-    draft.patch(forStep: 7),
+    draft.patch(forStep: 4),
     to: profile,
     updatedAt: now
   )
@@ -81,8 +66,6 @@ private let now = DateOnly.date(from: "2026-06-11") ?? Date()
   let profile = emptyProfile()
   #expect(OnboardingSummaryFormatter.basics(profile, now: now) == "未填写")
   #expect(OnboardingSummaryFormatter.oneRM(profile) == "未填写")
-  #expect(OnboardingSummaryFormatter.recovery(profile) == "未填写")
-  #expect(OnboardingSummaryFormatter.materials(profile) == "未上传资料")
 }
 
 @Test func spec085ProfileMeetAndNoteHaveIndependentSummaries() {

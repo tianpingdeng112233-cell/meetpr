@@ -135,16 +135,23 @@ public struct BindGateView<
         await viewModel.handleHandoff(outcome)
       }
     case .pendingAcceptance(let request):
-      withLogoutCorner(
-        PendingBindStateView(
-          request: request,
-          bind: bind,
-          onboardingProfile: onboardingProfile,
-          notificationPermission: notificationPermission,
-          onCancelled: { viewModel.handleCancelled() },
-          onStateMayHaveChanged: { await viewModel.refresh() }
-        )
+      PendingBindStateView(
+        request: request,
+        bind: bind,
+        onboardingProfile: onboardingProfile,
+        notificationPermission: notificationPermission,
+        onCancelled: { viewModel.handleCancelled() },
+        onStateMayHaveChanged: { await viewModel.refresh() }
       )
+      .safeAreaInset(edge: .top, spacing: 0) {
+        if let onLogout {
+          GateLogoutButton(onLogout: onLogout)
+            .frame(
+              maxWidth: .infinity, minHeight: MeetPRSpacing.minimumHitTarget, alignment: .trailing
+            )
+            .background(Color.MeetPR.bgBase)
+        }
+      }
       .task(id: scenePhase) {
         guard scenePhase == .active else { return }
         await viewModel.pollPendingAcceptance()

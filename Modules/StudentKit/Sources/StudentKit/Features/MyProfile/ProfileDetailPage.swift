@@ -66,23 +66,7 @@ struct ProfileDetailRows: View {
         row(
           .background, title: StudentStrings.localized(.myProfileView011),
           value: summary.trainingBackground)
-        MyProfileDivider()
-        row(
-          .environment, title: StudentStrings.localized(.myProfileView012),
-          value: summary.trainingEnvironment)
-        MyProfileDivider()
-        row(
-          .materials, title: StudentStrings.localized(.myProfileView007),
-          value: summary.muscleGroups)
       } else {
-        Button(action: onReadiness) {
-          MyProfileValueRow(
-            label: StudentStrings.localized(.myProfileView004),
-            value: summary.recoveryChips.isEmpty
-              ? StudentStrings.localized(.myProfileV3Presentation010)
-              : summary.recoveryChips.joined(separator: " · "))
-        }
-        MyProfileDivider()
         row(
           .injuries, title: StudentStrings.localized(.myProfileView005),
           value: summary.injuryChips.joined(separator: " · "))

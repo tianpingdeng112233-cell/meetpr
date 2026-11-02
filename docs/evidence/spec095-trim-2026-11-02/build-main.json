@@ -1,0 +1,14 @@
+{
+  "summary": {
+    "status": "SUCCEEDED",
+    "durationMs": 139736,
+    "target": "simulator"
+  },
+  "artifacts": {
+    "buildLogPath": "~/Library/Developer/XcodeBuildMCP/workspaces/MeetPR-wt-095-605b5755b0fb/logs/build_sim_2026-11-02T03-08-54-518Z_pid87679_6b189c8e.log"
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

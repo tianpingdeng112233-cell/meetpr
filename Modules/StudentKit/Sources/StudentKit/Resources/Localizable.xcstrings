@@ -12128,19 +12128,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Complete onboarding profile"
+            "value": "Basic profile"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "onboarding 完整资料"
+            "value": "基础资料"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "onboarding 完整資料"
+            "value": "基礎資料"
           }
         }
       }
@@ -28728,6 +28728,75 @@
           "stringUnit": {
             "state": "translated",
             "value": "Failure"
+          }
+        }
+      }
+    },
+    "student.onboarding.progress": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Step {0} of {1}"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 步 / 共 {1} 步"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 {0} 步 / 共 {1} 步"
+          }
+        }
+      }
+    },
+    "student.pendingBind.waitingNamed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for {0} to accept"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待{0}接收"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待{0}接收"
+          }
+        }
+      }
+    },
+    "student.pendingBind.waitingUnnamed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for your coach to accept"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待教练接收"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等待教練接收"
           }
         }
       }

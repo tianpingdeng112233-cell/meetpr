@@ -43,10 +43,7 @@ struct PendingBindView: View {
             .font(Font.MeetPR.title1)
             .foregroundStyle(Color.MeetPR.textPrimary)
           Text(
-            StudentStrings.replacing(
-              .pendingBindView002,
-              values: ["\(request.coachDisplayName ?? StudentStrings.localized(.bindGateView004))"]
-            )
+            PendingBindViewModel.waitingSubtitle(coachDisplayName: request.coachDisplayName)
           )
           .font(Font.MeetPR.body)
           .foregroundStyle(Color.MeetPR.textSecondary)

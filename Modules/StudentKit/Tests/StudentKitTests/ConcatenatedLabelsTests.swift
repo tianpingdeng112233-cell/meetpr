@@ -49,16 +49,3 @@ private func labelDay(_ families: [LiftFamily]) -> StudentPlanDay {
     )
   }
 }
-
-@Test func recoveryChipsUseWholeLocalizedPhrases() {
-  let profile = StudentDemoSeed.makeOnboardingProfile(studentID: StudentDemoSeed.studentID)
-  for (language, expected) in [
-    ("en", ["Medium Intensity", "High Stress", "About 2 days Recovery"]),
-    ("zh-Hans", ["中等强度", "较高压力", "约2天恢复"]),
-  ] {
-    #expect(
-      MyProfileV3Presentation.recoveryChips(
-        profile: profile, readiness: nil, locale: Locale(identifier: language)
-      ) == expected)
-  }
-}

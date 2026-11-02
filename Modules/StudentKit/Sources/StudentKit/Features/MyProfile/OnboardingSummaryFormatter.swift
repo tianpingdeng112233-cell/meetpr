@@ -1,7 +1,7 @@
 import CoreModels
 import Foundation
 
-/// One-line summaries for the nine archive cards (spec 032 §7, wiki line
+/// One-line summaries for the retained archive cards (spec 032 §7, wiki line
 /// sketches). Age is computed client-side from the date-only birth string
 /// (backend D13 — coach side 033 must use the same whole-year calendar
 /// difference so both ends agree).
@@ -51,98 +51,6 @@ public enum OnboardingSummaryFormatter {
     }
     guard !parts.isEmpty else { return placeholder }
     return parts.joined(separator: " · ") + " (kg)"
-  }
-
-  /// "周一·三·五·六 (4天/周) · 商业健身房"
-  public static func environment(_ profile: OnboardingProfile) -> String {
-    var parts: [String] = []
-    if !profile.trainingDays.isEmpty {
-      let ordered = TrainingDay.allCases.filter { profile.trainingDays.contains($0) }
-      var dayText = ordered.map(OnboardingLabels.shortLabel).joined(separator: "·")
-      dayText = StudentStrings.localized(.onboardingSummaryFormatter004) + dayText
-      parts.append(
-        StudentStrings.replacing(
-          .onboardingSummaryFormatter005, values: ["\(dayText)", "\(ordered.count)"]))
-    }
-    if let tier = profile.gymTier { parts.append(OnboardingLabels.label(tier)) }
-    return joined(parts)
-  }
-
-  /// "强度:中等 压力:较高 恢复:正常 睡眠:7h"
-  public static func recovery(_ profile: OnboardingProfile) -> String {
-    var parts: [String] = []
-    if let value = profile.dailyLifeIntensity {
-      let label = OnboardingLabels.scaleLabel(
-        OnboardingLabels.dailyLifeIntensityLabels,
-        notch: value
-      )
-      parts.append(
-        StudentStrings.replacing(
-          .onboardingSummaryFormatter006,
-          values: [label])
-      )
-    }
-    if let value = profile.lifeStress {
-      parts.append(
-        StudentStrings.replacing(
-          .onboardingSummaryFormatter007,
-          values: [
-            "\(OnboardingLabels.scaleLabel(OnboardingLabels.lifeStressLabels, notch: value))"
-          ]))
-    }
-    if let value = profile.recoverySpeed {
-      parts.append(
-        StudentStrings.replacing(
-          .onboardingSummaryFormatter008,
-          values: [
-            "\(OnboardingLabels.scaleLabel(OnboardingLabels.recoverySpeedLabels, notch: value))"
-          ])
-      )
-    }
-    if let value = profile.sleepHours {
-      parts.append(
-        StudentStrings.replacing(
-          .onboardingSummaryFormatter009,
-          values: [
-            "\(OnboardingLabels.scaleLabel(OnboardingLabels.sleepHoursLabels, notch: value))"
-          ]))
-    }
-    return parts.isEmpty ? placeholder : parts.joined(separator: " ")
-  }
-
-  /// "上传 4 份 · 想增强:股四头/腘绳肌/肩" (upload count hidden when 0 —
-  /// degraded Step 6).
-  public static func materials(_ profile: OnboardingProfile) -> String {
-    var parts: [String] = []
-    if !profile.uploadAttachmentIds.isEmpty {
-      parts.append(
-        StudentStrings.replacing(
-          .onboardingSummaryFormatter010, values: ["\(profile.uploadAttachmentIds.count)"]))
-    }
-    if !profile.muscleGroupsToStrengthen.isEmpty {
-      let names = profile.muscleGroupsToStrengthen.map { group in
-        group == .back
-          ? StudentStrings.localized(.onboardingSummaryFormatter011)
-          : OnboardingLabels.strengthenLabel(group)
-      }
-      parts.append(
-        StudentStrings.replacing(
-          .onboardingSummaryFormatter012, values: ["\(names.joined(separator: "/"))"]))
-    }
-    return parts.isEmpty
-      ? StudentStrings.localized(.onboardingSummaryFormatter013) : parts.joined(separator: " · ")
-  }
-
-  /// "股四头 / 腘绳肌 / 肩" — just the strengthen targets (no upload count),
-  /// for the profile's "想增强肌群" row.
-  public static func muscleGroups(_ profile: OnboardingProfile) -> String {
-    guard !profile.muscleGroupsToStrengthen.isEmpty else { return placeholder }
-    let names = profile.muscleGroupsToStrengthen.map { group in
-      group == .back
-        ? StudentStrings.localized(.onboardingSummaryFormatter011)
-        : OnboardingLabels.strengthenLabel(group)
-    }
-    return names.joined(separator: " / ")
   }
 
   /// "备赛: 2026-07-25 · IPF 83kg" / "暂不备赛"

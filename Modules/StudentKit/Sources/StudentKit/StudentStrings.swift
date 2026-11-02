@@ -59,6 +59,10 @@ enum StudentStrings {
     static let firstPlanDismiss = Key("student.firstPlanDismiss")
     static let firstPlanUnavailable = Key("student.firstPlanUnavailable")
 
+    static let pendingBindWaitingUnnamed = Key("student.pendingBind.waitingUnnamed")
+    static let pendingBindWaitingNamed = Key("student.pendingBind.waitingNamed")
+    static let onboardingProgress = Key("student.onboarding.progress")
+
     static let bindReminderTitle = Key("student.bindReminder.title")
     static let bindReminderBody = Key("student.bindReminder.body")
     static let bindReminderEnable = Key("student.bindReminder.enable")
