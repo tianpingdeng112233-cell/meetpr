@@ -53,6 +53,7 @@ def glossary():
                 result.update(zip(sources, targets))
     # The approved v2 compound examples use 發布 for publishing a training plan.
     result.update({'发布训练计划': '發布課表', '发布计划': '發布課表'})
+    result['估不准没关系，选最接近的就行'] = '估不準沒關係，選最接近的就行'
     return result
 
 
@@ -117,6 +118,7 @@ def taiwan_aliases():
 def main():
     check = argparse.ArgumentParser()
     check.add_argument('--check', action='store_true')
+    check.add_argument('--keys', nargs='+', help='Generate or check only these catalog keys')
     args = check.parse_args()
     forbidden = set(simplified_only().strip())
     outputs = {ROOT / 'scripts/zh-hant/simplified-only.txt': simplified_only()}
@@ -124,12 +126,20 @@ def main():
     catalogs += [ROOT / 'MeetPR/Resources/Localizable.xcstrings',
                  ROOT / 'Widgets/MeetPRWidgets/Localizable.xcstrings']
     count = 0
+    requested_keys = set(args.keys or [])
+    matched_keys = set()
+    selected_catalogs = set()
     for path in catalogs:
         catalog = json.loads(path.read_text())
         for key, entry in catalog['strings'].items():
+            if requested_keys and key not in requested_keys:
+                continue
             entry['localizations']['zh-Hant'] = translate_tree(copy.deepcopy(entry['localizations']['zh-Hans']), key)
+            matched_keys.add(key)
+            selected_catalogs.add(path)
             count += 1
         outputs[path] = json.dumps(catalog, ensure_ascii=False, indent=2) + '\n'
+    assert requested_keys <= matched_keys, f'Unknown catalog keys: {sorted(requested_keys - matched_keys)}'
     for path in (ROOT / 'MeetPR').glob('**/zh-Hans.lproj/InfoPlist.strings'):
         target = path.parent.parent / 'zh-Hant.lproj/InfoPlist.strings'
         outputs[target] = re.sub(r'(=\s*")(.*?)(";)',
@@ -181,6 +191,8 @@ def main():
     outputs[resource_root / 'exercise-search-zh-Hant.json'] = json.dumps(
         {'phrases': reverse, 'characters': chars, 'aliases': search_aliases}, ensure_ascii=False, indent=2) + '\n'
     for path, output in outputs.items():
+        if requested_keys and path not in selected_catalogs:
+            continue
         if path.suffix == '.xcstrings':
             def values(node):
                 if isinstance(node, dict):
@@ -189,7 +201,9 @@ def main():
                             yield val
                         else:
                             yield from values(val)
-            for entry in json.loads(output)['strings'].values():
+            for key, entry in json.loads(output)['strings'].items():
+                if requested_keys and key not in requested_keys:
+                    continue
                 for val in values(entry['localizations']['zh-Hant']):
                     assert not set(val) & forbidden, (path, val, set(val) & forbidden)
         elif path.name == 'InfoPlist.strings':

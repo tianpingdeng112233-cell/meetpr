@@ -1,0 +1,69 @@
+[0/1] Planning build
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+Build complete! (5.52s)
+Test Suite 'Selected tests' started at 2026-11-02 03:30:32.005.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-02 03:30:32.009.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-02 03:30:32.009.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-02 03:30:32.009.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.004) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetEntryRPEScaleTests started.
+◇ Test indexRoundTripsEveryStop() started.
+◇ Test scrubIntentSplitsHorizontalFromVertical() started.
+◇ Test valueRoundsAtTheMidpointBetweenTwoTicks() started.
+◇ Test snapClampsAndRoundsToHalfSteps() started.
+◇ Test decimalSnapAlignsNonHalfStepSeed() started.
+◇ Test aScrollThatReturnsToItsStartStillRefusesToWrite() started.
+◇ Test onlyAnUncommittedTouchWritesOnRelease() started.
+◇ Test valueSnapsToTheNearestTickCentre() started.
+◇ Test valueRejectsStripsTooNarrowToHoldElevenCells() started.
+◇ Test cellGeometryAccountsForTheGapsBetweenTicks() started.
+◇ Test rpeTextBridgeSnapsClampsAndRoundTrips() started.
+◇ Test valueClampsOutsideTheStrip() started.
+◇ Test scrubIntentStaysUndecidedUntilTheFingerTravels() started.
+◇ Test tickHeightsAndLitRangeMatchV3Contract() started.
+◇ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() started.
+◇ Test lockedIntentHoldsForTheRestOfTheGesture() started.
+◇ Test descriptionMapsEveryHalfStepToRIRCopy() started.
+✔ Test decimalSnapAlignsNonHalfStepSeed() passed after 0.001 seconds.
+✔ Test valueClampsOutsideTheStrip() passed after 0.001 seconds.
+✔ Test cellGeometryAccountsForTheGapsBetweenTicks() passed after 0.001 seconds.
+✔ Test valueRejectsStripsTooNarrowToHoldElevenCells() passed after 0.001 seconds.
+✔ Test snapClampsAndRoundsToHalfSteps() passed after 0.001 seconds.
+✔ Test valueSnapsToTheNearestTickCentre() passed after 0.001 seconds.
+✔ Test lockedIntentHoldsForTheRestOfTheGesture() passed after 0.001 seconds.
+✔ Test scrubIntentSplitsHorizontalFromVertical() passed after 0.001 seconds.
+✔ Test indexRoundTripsEveryStop() passed after 0.001 seconds.
+✔ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() passed after 0.001 seconds.
+✔ Test scrubIntentStaysUndecidedUntilTheFingerTravels() passed after 0.001 seconds.
+✔ Test aScrollThatReturnsToItsStartStillRefusesToWrite() passed after 0.001 seconds.
+✔ Test onlyAnUncommittedTouchWritesOnRelease() passed after 0.001 seconds.
+✔ Test valueRoundsAtTheMidpointBetweenTwoTicks() passed after 0.001 seconds.
+✔ Test tickHeightsAndLitRangeMatchV3Contract() passed after 0.001 seconds.
+✔ Test rpeTextBridgeSnapsClampsAndRoundTrips() passed after 0.012 seconds.
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:186:5: Expectation failed: (SetEntryRPE.descriptions → ["还能多做 5 次", "还能多做 4-5 次", "还能多做 4 次", "还能多做 3-4 次", "还能多做 3 次", "还能多做 2-3 次", "还能多做 2 次", "还能多做 1-2 次", "还能多做 1 次", "或许还能多做 1 次", "力竭，无保留"]) == (expected → ["还剩 4–6 次", "还剩 4–6 次", "还剩 4–6 次", "还剩 3–4 次", "还剩 3 次", "还剩 2–3 次", "还剩 2 次", "还剩 1–2 次", "还剩 1 次", "做不了下一次，但能再加点重", "做不动了"])
+± inserted ["还能多做 5 次", "还能多做 4-5 次", "还能多做 4 次", "还能多做 3-4 次", "还能多做 3 次", "还能多做 2-3 次", "还能多做 2 次", "还能多做 1-2 次", "还能多做 1 次", "或许还能多做 1 次", "力竭，无保留"], removed ["还剩 4–6 次", "还剩 4–6 次", "还剩 4–6 次", "还剩 3–4 次", "还剩 3 次", "还剩 2–3 次", "还剩 2 次", "还剩 1–2 次", "还剩 1 次", "做不了下一次，但能再加点重", "做不动了"]
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 5 次") == (copy → "还剩 4–6 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 4-5 次") == (copy → "还剩 4–6 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 4 次") == (copy → "还剩 4–6 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 3-4 次") == (copy → "还剩 3–4 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 3 次") == (copy → "还剩 3 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 2-3 次") == (copy → "还剩 2–3 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 2 次") == (copy → "还剩 2 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 1-2 次") == (copy → "还剩 1–2 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "还能多做 1 次") == (copy → "还剩 1 次")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "或许还能多做 1 次") == (copy → "做不了下一次，但能再加点重")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:188:7: Expectation failed: (SetEntryRPE.description(5 + Double(index) * 0.5) → "力竭，无保留") == (copy → "做不动了")
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:190:5: Expectation failed: (SetEntryRPE.description(8.2) → "还能多做 2 次") == "还剩 2 次"
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:191:5: Expectation failed: (SetEntryRPE.description(4.0) → "还能多做 5 次") == "还剩 4–6 次"
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() recorded an issue at SetEntryRPEScaleTests.swift:192:5: Expectation failed: (SetEntryRPE.description(11.0) → "力竭，无保留") == "做不动了"
+✘ Test descriptionMapsEveryHalfStepToRIRCopy() failed after 0.053 seconds with 15 issues.
+✘ Suite SetEntryRPEScaleTests failed after 0.054 seconds with 15 issues.
+↳ /// The RPE tick-scale replaced the +/- stepper; these lock in the pure bucket /
+↳ /// snap / describe math and the Double↔text bridge the view leans on, including
+↳ /// the boundaries the review flagged (non-0.5 seed, end clamps, zero width).
+✘ Test run with 17 tests in 1 suite failed after 0.055 seconds with 15 issues.

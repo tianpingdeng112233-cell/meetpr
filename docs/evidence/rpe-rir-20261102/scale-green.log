@@ -1,0 +1,53 @@
+Building for debugging...
+[0/2] Write swift-version--58304C5D6DBC2206.txt
+[1/4] Copying Localizable.xcstrings
+[4/7] Copying exercise-names-zh-Hant.json
+[4/7] Copying exercise-search-zh-Hant.json
+[6/8] Copying Localizable.xcstrings
+Build complete! (0.40s)
+Test Suite 'Selected tests' started at 2026-11-02 03:30:45.280.
+Test Suite 'StudentKitPackageTests.xctest' started at 2026-11-02 03:30:45.285.
+Test Suite 'StudentKitPackageTests.xctest' passed at 2026-11-02 03:30:45.285.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'Selected tests' passed at 2026-11-02 03:30:45.285.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.005) seconds
+◇ Test run started.
+↳ Testing Library Version: 1902
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite SetEntryRPEScaleTests started.
+◇ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() started.
+◇ Test lockedIntentHoldsForTheRestOfTheGesture() started.
+◇ Test aScrollThatReturnsToItsStartStillRefusesToWrite() started.
+◇ Test indexRoundTripsEveryStop() started.
+◇ Test valueRejectsStripsTooNarrowToHoldElevenCells() started.
+◇ Test snapClampsAndRoundsToHalfSteps() started.
+◇ Test tickHeightsAndLitRangeMatchV3Contract() started.
+◇ Test valueSnapsToTheNearestTickCentre() started.
+◇ Test onlyAnUncommittedTouchWritesOnRelease() started.
+◇ Test cellGeometryAccountsForTheGapsBetweenTicks() started.
+◇ Test scrubIntentStaysUndecidedUntilTheFingerTravels() started.
+◇ Test rpeTextBridgeSnapsClampsAndRoundTrips() started.
+◇ Test valueClampsOutsideTheStrip() started.
+◇ Test scrubIntentSplitsHorizontalFromVertical() started.
+◇ Test decimalSnapAlignsNonHalfStepSeed() started.
+◇ Test valueRoundsAtTheMidpointBetweenTwoTicks() started.
+◇ Test descriptionMapsEveryHalfStepToRIRCopy() started.
+✔ Test onlyAnUncommittedTouchWritesOnRelease() passed after 0.001 seconds.
+✔ Test valueSnapsToTheNearestTickCentre() passed after 0.002 seconds.
+✔ Test valueRejectsStripsTooNarrowToHoldElevenCells() passed after 0.002 seconds.
+✔ Test valueClampsOutsideTheStrip() passed after 0.001 seconds.
+✔ Test snapClampsAndRoundsToHalfSteps() passed after 0.001 seconds.
+✔ Test indexRoundTripsEveryStop() passed after 0.002 seconds.
+✔ Test decimalSnapAlignsNonHalfStepSeed() passed after 0.001 seconds.
+✔ Test scrubIntentSplitsHorizontalFromVertical() passed after 0.001 seconds.
+✔ Test lockedIntentHoldsForTheRestOfTheGesture() passed after 0.002 seconds.
+✔ Test aScrollThatReturnsToItsStartStillRefusesToWrite() passed after 0.002 seconds.
+✔ Test valueRoundsAtTheMidpointBetweenTwoTicks() passed after 0.001 seconds.
+✔ Test scrubIntentStaysUndecidedUntilTheFingerTravels() passed after 0.002 seconds.
+✔ Test cellGeometryAccountsForTheGapsBetweenTicks() passed after 0.001 seconds.
+✔ Test aFlickThatCrossesTheThresholdOnItsLastFrameStillScrubs() passed after 0.002 seconds.
+✔ Test tickHeightsAndLitRangeMatchV3Contract() passed after 0.002 seconds.
+✔ Test rpeTextBridgeSnapsClampsAndRoundTrips() passed after 0.012 seconds.
+✔ Test descriptionMapsEveryHalfStepToRIRCopy() passed after 0.040 seconds.
+✔ Suite SetEntryRPEScaleTests passed after 0.041 seconds.
+✔ Test run with 17 tests in 1 suite passed after 0.042 seconds.

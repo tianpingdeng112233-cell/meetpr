@@ -1,0 +1,46 @@
+Building for debugging...
+[0/2] Copying Localizable.xcstrings
+[1/4] Write sources
+[2/4] Write swift-version--58304C5D6DBC2206.txt
+[4/6] Emitting module StudentKitTests
+[5/6] Compiling StudentKitTests EffortExplainerTests.swift
+/Users/david/Projects/apps/MeetPR-wt-100/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/EffortExplainerTests.swift:59:31: error: type 'EffortExplainer' has no member 'rirStepperCopy'
+57 |     ]
+58 |     for (input, zhHans, en) in examples {
+59 |       #expect(EffortExplainer.rirStepperCopy(input, locale: chinese) == zhHans)
+   |                               `- error: type 'EffortExplainer' has no member 'rirStepperCopy'
+60 |       #expect(EffortExplainer.rirStepperCopy(input, locale: english) == en)
+61 |     }
+
+/Users/david/Projects/apps/MeetPR-wt-100/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/EffortExplainerTests.swift:60:31: error: type 'EffortExplainer' has no member 'rirStepperCopy'
+58 |     for (input, zhHans, en) in examples {
+59 |       #expect(EffortExplainer.rirStepperCopy(input, locale: chinese) == zhHans)
+60 |       #expect(EffortExplainer.rirStepperCopy(input, locale: english) == en)
+   |                               `- error: type 'EffortExplainer' has no member 'rirStepperCopy'
+61 |     }
+62 |     #expect(EffortExplainer.rirStepperCopy("", locale: chinese) == nil)
+
+/Users/david/Projects/apps/MeetPR-wt-100/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/EffortExplainerTests.swift:62:29: error: type 'EffortExplainer' has no member 'rirStepperCopy'
+60 |       #expect(EffortExplainer.rirStepperCopy(input, locale: english) == en)
+61 |     }
+62 |     #expect(EffortExplainer.rirStepperCopy("", locale: chinese) == nil)
+   |                             `- error: type 'EffortExplainer' has no member 'rirStepperCopy'
+63 |     #expect(EffortExplainer.rirStepperCopy("", locale: english) == nil)
+64 |     for invalid in ["-1", "10", "1.5", "abc"] {
+
+/Users/david/Projects/apps/MeetPR-wt-100/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/EffortExplainerTests.swift:63:29: error: type 'EffortExplainer' has no member 'rirStepperCopy'
+61 |     }
+62 |     #expect(EffortExplainer.rirStepperCopy("", locale: chinese) == nil)
+63 |     #expect(EffortExplainer.rirStepperCopy("", locale: english) == nil)
+   |                             `- error: type 'EffortExplainer' has no member 'rirStepperCopy'
+64 |     for invalid in ["-1", "10", "1.5", "abc"] {
+65 |       #expect(EffortExplainer.rirStepperCopy(invalid, locale: english) == nil)
+
+/Users/david/Projects/apps/MeetPR-wt-100/Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/EffortExplainerTests.swift:65:31: error: type 'EffortExplainer' has no member 'rirStepperCopy'
+63 |     #expect(EffortExplainer.rirStepperCopy("", locale: english) == nil)
+64 |     for invalid in ["-1", "10", "1.5", "abc"] {
+65 |       #expect(EffortExplainer.rirStepperCopy(invalid, locale: english) == nil)
+   |                               `- error: type 'EffortExplainer' has no member 'rirStepperCopy'
+66 |     }
+67 |   }
+error: fatalError

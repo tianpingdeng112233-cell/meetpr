@@ -15118,19 +15118,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 5 reps"
+            "value": "4–6 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 5 次"
+            "value": "还剩 4–6 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 5 下"
+            "value": "還剩 4–6 下"
           }
         }
       }
@@ -15141,19 +15141,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 4-5 reps"
+            "value": "4–6 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 4-5 次"
+            "value": "还剩 4–6 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 4-5 下"
+            "value": "還剩 4–6 下"
           }
         }
       }
@@ -15164,19 +15164,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 4 reps"
+            "value": "4–6 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 4 次"
+            "value": "还剩 4–6 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 4 下"
+            "value": "還剩 4–6 下"
           }
         }
       }
@@ -15187,19 +15187,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 3-4 reps"
+            "value": "3–4 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 3-4 次"
+            "value": "还剩 3–4 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 3-4 下"
+            "value": "還剩 3–4 下"
           }
         }
       }
@@ -15210,19 +15210,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 3 reps"
+            "value": "3 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 3 次"
+            "value": "还剩 3 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 3 下"
+            "value": "還剩 3 下"
           }
         }
       }
@@ -15233,19 +15233,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 2-3 reps"
+            "value": "2–3 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 2-3 次"
+            "value": "还剩 2–3 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 2-3 下"
+            "value": "還剩 2–3 下"
           }
         }
       }
@@ -15256,19 +15256,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 2 reps"
+            "value": "2 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 2 次"
+            "value": "还剩 2 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 2 下"
+            "value": "還剩 2 下"
           }
         }
       }
@@ -15279,19 +15279,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 1-2 reps"
+            "value": "1–2 reps left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 1-2 次"
+            "value": "还剩 1–2 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 1-2 下"
+            "value": "還剩 1–2 下"
           }
         }
       }
@@ -15302,19 +15302,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could do 1 rep"
+            "value": "1 rep left"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "还能多做 1 次"
+            "value": "还剩 1 次"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "還能多做 1 下"
+            "value": "還剩 1 下"
           }
         }
       }
@@ -15325,19 +15325,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Could maybe do 1 rep"
+            "value": "No more reps, but could add a little weight"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "或许还能多做 1 次"
+            "value": "做不了下一次，但能再加点重"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "或許還能多做 1 下"
+            "value": "做不了下一下，但能再加點重"
           }
         }
       }
@@ -15348,19 +15348,19 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Failure, no reps in reserve"
+            "value": "Couldn't do another rep"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "力竭，无保留"
+            "value": "做不动了"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "力竭，無保留"
+            "value": "做不動了"
           }
         }
       }
@@ -28130,6 +28130,282 @@
           "stringUnit": {
             "state": "translated",
             "value": "教練已與你解綁\n訓練記錄都還在，輸入邀請碼可重新繫結"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.close": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "關閉"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rirClosing": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一次也做不动了就填 0"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't do another rep? Enter 0."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一下也做不動了就填 0"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rirExample": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例：做了 6 次，觉得最多能做 8 次 → 填 2"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Example: you did 6 and could have done 8 → enter 2"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "例：做了 6 下，覺得最多能做 8 下 → 填 2"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rirHelp": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RIR 是什么"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What is RIR"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RIR 是什麼"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rirSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这组做完，同样的重量还能再做几次，就填几"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After the set, how many more reps could you do with the same weight? Enter that number."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這組做完，同樣的重量還能再做幾下，就填幾"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rirTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RIR · 还能再做几次"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RIR · Reps left in the tank"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RIR · 還能再做幾下"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rpeClosing": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "估不准没关系，选最接近的就行"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not sure? Pick the closest one."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "估不準沒關係，選最接近的就行"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rpeHelp": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 是什么"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What is RPE"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE 是什麼"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rpeSubtitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "满分 10，越高越吃力"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Out of 10. Higher means harder."
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "滿分 10，越高越吃力"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rpeTitle": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE · 这组有多吃力"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE · How hard was that set"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RPE · 這組有多吃力"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rirRemaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还剩 {0} 次"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} reps left"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "還剩 {0} 下"
+          }
+        }
+      }
+    },
+    "student.effortExplainer.rirRemainingOne": {
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还剩 {0} 次"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "{0} rep left"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "還剩 {0} 下"
           }
         }
       }

@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/david/Projects/apps/MeetPR-wt-100/scripts/generate-zh-hant.py", line 210, in <module>
+    main()
+    ~~~~^^
+  File "/Users/david/Projects/apps/MeetPR-wt-100/scripts/generate-zh-hant.py", line 199, in main
+    assert path.exists() and path.read_text() == output, f'Stale generated file: {path}'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Stale generated file: /Users/david/Projects/apps/MeetPR-wt-100/Modules/AppShell/Sources/AppShell/Resources/Localizable.xcstrings

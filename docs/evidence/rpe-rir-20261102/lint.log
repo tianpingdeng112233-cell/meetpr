@@ -1,0 +1,11 @@
+Linting Swift files at paths Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/EffortExplainer.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/EffortExplainerCard.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/SetEntrySheet.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/AccessoryLogCard.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/QuickLogSheet.swift, Modules/StudentKit/Sources/StudentKit/Features/TodayWorkout/SetEntryRPEScale.swift, Modules/StudentKit/Sources/StudentKit/StudentStrings.swift, Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/EffortExplainerTests.swift, Modules/StudentKit/Tests/StudentKitTests/Features/TodayWorkout/SetEntryRPEScaleTests.swift
+Linting 'EffortExplainer.swift' (1/9)
+Linting 'EffortExplainerCard.swift' (2/9)
+Linting 'SetEntrySheet.swift' (3/9)
+Linting 'AccessoryLogCard.swift' (4/9)
+Linting 'QuickLogSheet.swift' (5/9)
+Linting 'SetEntryRPEScale.swift' (6/9)
+Linting 'StudentStrings.swift' (7/9)
+Linting 'EffortExplainerTests.swift' (8/9)
+Linting 'SetEntryRPEScaleTests.swift' (9/9)
+Done linting! Found 0 violations, 0 serious in 9 files.

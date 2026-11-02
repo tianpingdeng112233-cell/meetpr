@@ -465,7 +465,7 @@ struct SetEntrySheet: View {
 
   private var rpeSection: some View {
     VStack(spacing: MeetPRSpacing.space2) {
-      HStack {
+      HStack(spacing: 0) {
         Group {
           if draft.isAccessory && draft.loggedSetID == nil {
             Button {
@@ -475,7 +475,10 @@ struct SetEntrySheet: View {
             } label: {
               EffortToggleLabel(text: effortMode.label)
             }
-            .frame(minHeight: MeetPRSpacing.minimumHitTarget)
+            .frame(
+              minWidth: MeetPRSpacing.minimumHitTarget,
+              minHeight: MeetPRSpacing.minimumHitTarget
+            )
             .accessibilityLabel(StudentStrings.localized(.accessoryEffortSwitch))
           } else {
             Text(effortMode.label)
@@ -484,6 +487,7 @@ struct SetEntrySheet: View {
         .font(.MeetPR.mono(size: MeetPRFontMetrics.size12, weight: .medium))
         .tracking(0.96)
         .foregroundStyle(Color.MeetPR.textMuted)
+        EffortExplainerButton(kind: effortMode)
         Spacer()
         Text(effortMode == .rir ? "0–9 · 1" : "5–10 · 0.5")
           .font(.MeetPR.mono(size: MeetPRFontMetrics.size10))
@@ -498,6 +502,7 @@ struct SetEntrySheet: View {
           #if os(iOS)
             .keyboardType(.numberPad)
           #endif
+        EffortRIRHint(value: rpeText)
       } else {
         SetEntryRPEScale(
           value: rpeBinding,

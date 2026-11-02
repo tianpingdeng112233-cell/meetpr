@@ -14,7 +14,7 @@ import SwiftUI
 struct SetEntryRPEScale: View {
   @Binding var value: Double
   let placeholder: String?
-  @State private var bubbleWidth: CGFloat = 0
+  @State private var bubbleSize: CGSize = .zero
   /// What this gesture turned out to mean. Written and read only by
   /// `onChanged`/`onEnded` — one chain, in the order SwiftUI defines for a
   /// single gesture. Nothing else touches it, so the release decision can never
@@ -49,6 +49,7 @@ struct SetEntryRPEScale: View {
   var body: some View {
     VStack(spacing: MeetPRSpacing.point10) {
       header
+        .frame(minHeight: bubbleSize.height)
       tickStrip
     }
     .padding(.horizontal, MeetPRSpacing.point14)
@@ -91,8 +92,7 @@ struct SetEntryRPEScale: View {
       Text(placeholder ?? SetEntryRPE.description(activeValue))
         .font(.MeetPR.body(size: MeetPRFontMetrics.size13, weight: .medium))
         .foregroundStyle(Color.MeetPR.textMuted)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
+        .fixedSize(horizontal: false, vertical: true)
         .opacity(isScrubbing ? 0 : 1)
     }
   }
@@ -114,8 +114,11 @@ struct SetEntryRPEScale: View {
         .simultaneousGesture(scrubGesture(width: proxy.size.width))
 
         if isScrubbing {
-          scrubBubble
-            .offset(x: bubbleOffset(stripWidth: proxy.size.width), y: -MeetPRSpacing.point36)
+          scrubBubble(maxWidth: proxy.size.width)
+            .offset(
+              x: bubbleOffset(stripWidth: proxy.size.width),
+              y: -bubbleSize.height - MeetPRSpacing.point10
+            )
             .allowsHitTesting(false)
         }
       }
@@ -131,27 +134,23 @@ struct SetEntryRPEScale: View {
   // implementation's own — gold500 to read as "this is the selected stop",
   // reusing the header's two pieces of copy so nothing new is invented.
 
-  private var scrubBubble: some View {
-    HStack(spacing: MeetPRSpacing.point6) {
-      Text(SetEntryRPE.text(activeValue))
-        .font(.MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .bold))
-        .monospacedDigit()
-
-      Text(SetEntryRPE.description(activeValue))
-        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+  private func scrubBubble(maxWidth: CGFloat) -> some View {
+    ViewThatFits(in: .horizontal) {
+      SetEntryRPEBubbleContent(value: activeValue).fixedSize()
+      SetEntryRPEBubbleContent(value: activeValue)
+        .fixedSize(horizontal: false, vertical: true)
     }
+    .frame(maxWidth: maxWidth - 2 * MeetPRSpacing.point10)
     .foregroundStyle(Color.MeetPR.inkOnGold)
-    .lineLimit(1)
-    .fixedSize()
     .padding(.horizontal, MeetPRSpacing.point10)
     .padding(.vertical, MeetPRSpacing.point6)
     .background(Capsule().fill(Color.MeetPR.gold500))
     .background(
       GeometryReader { bubble in
-        Color.clear.preference(key: ScrubBubbleWidthKey.self, value: bubble.size.width)
+        Color.clear.preference(key: ScrubBubbleSizeKey.self, value: bubble.size)
       }
     )
-    .onPreferenceChange(ScrubBubbleWidthKey.self) { bubbleWidth = $0 }
+    .onPreferenceChange(ScrubBubbleSizeKey.self) { bubbleSize = $0 }
   }
 
   /// Centre the bubble over the active tick, then keep it inside the strip so a
@@ -162,7 +161,7 @@ struct SetEntryRPEScale: View {
       width: stripWidth,
       spacing: MeetPRSpacing.point3
     )
-    return min(max(0, center - bubbleWidth / 2), max(0, stripWidth - bubbleWidth))
+    return min(max(0, center - bubbleSize.width / 2), max(0, stripWidth - bubbleSize.width))
   }
 
   /// Pure presentation. VoiceOver reaches the control through the card's own
@@ -252,12 +251,11 @@ struct SetEntryRPEScale: View {
   private static let inactiveLabel = Color(red: 82 / 255, green: 82 / 255, blue: 82 / 255)
 }
 
-/// Measured width of the scrub bubble, so it can be centred over the active
-/// tick without overhanging the strip.
-private struct ScrubBubbleWidthKey: PreferenceKey {
-  static let defaultValue: CGFloat = 0
+/// Measured bubble size keeps long, enlarged hints above the ticks and inside the card.
+private struct ScrubBubbleSizeKey: PreferenceKey {
+  static let defaultValue: CGSize = .zero
 
-  static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+  static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
     value = nextValue()
   }
 }
@@ -298,5 +296,20 @@ private struct SetEntryRPEPreviewRow: View {
 
   var body: some View {
     SetEntryRPEScale(value: $value)
+  }
+}
+
+private struct SetEntryRPEBubbleContent: View {
+  let value: Double
+
+  var body: some View {
+    HStack(spacing: MeetPRSpacing.point6) {
+      Text(SetEntryRPE.text(value))
+        .font(.MeetPR.mono(size: MeetPRFontMetrics.size18, weight: .bold))
+        .monospacedDigit()
+        .fixedSize()
+      Text(SetEntryRPE.description(value))
+        .font(.MeetPR.body(size: MeetPRFontMetrics.size12, weight: .medium))
+    }
   }
 }
