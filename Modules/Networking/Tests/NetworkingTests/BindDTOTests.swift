@@ -101,6 +101,48 @@ import Testing
   #expect(domain.respondedAt == nil)
 }
 
+@Test func bindRequestDTOPreservesEndedAt() throws {
+  let json = """
+    {
+      "id": "b1000000-0000-0000-0000-000000000001",
+      "student_id": "b1000000-0000-0000-0000-000000000002",
+      "coach_id": "b1000000-0000-0000-0000-000000000003",
+      "coach_display_name": "David",
+      "status": "cancelled",
+      "submitted_at": "2026-10-01T10:00:00.000Z",
+      "expired_at": "2026-10-08T10:00:00.000Z",
+      "skip_evaluation": false,
+      "ended_at": "2026-11-02T10:00:00.000Z"
+    }
+    """
+  let domain = try MeetPRCodec.decoder.decode(BindRequestDTO.self, from: Data(json.utf8))
+    .toDomain()
+
+  #expect(domain.endedAt == Date(timeIntervalSince1970: 1_793_613_600))
+  #expect(domain.status == .cancelled)
+  #expect(domain.coachDisplayName == "David")
+}
+
+@Test func bindRequestDTODecodesWithoutEndedAt() throws {
+  let json = """
+    {
+      "id": "b1000000-0000-0000-0000-000000000001",
+      "student_id": "b1000000-0000-0000-0000-000000000002",
+      "coach_id": "b1000000-0000-0000-0000-000000000003",
+      "status": "cancelled",
+      "submitted_at": "2026-10-01T10:00:00.000Z",
+      "expired_at": "2026-10-08T10:00:00.000Z",
+      "skip_evaluation": false
+    }
+    """
+  let dto = try MeetPRCodec.decoder.decode(BindRequestDTO.self, from: Data(json.utf8))
+  let domain = dto.toDomain()
+
+  #expect(dto.endedAt == nil)
+  #expect(domain.endedAt == nil)
+  #expect(domain.status == .cancelled)
+}
+
 @Test func myBindRequestResponseDecodesNullAndValue() throws {
   let nullJson = #"{ "bind_request": null }"#
   let nullDTO = try MeetPRCodec.decoder.decode(

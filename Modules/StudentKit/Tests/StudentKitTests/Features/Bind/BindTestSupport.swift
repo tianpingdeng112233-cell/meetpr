@@ -16,7 +16,8 @@ enum BindFixtures {
     submittedAt: Date = referenceDate,
     coachId: UUID = BindFixtures.coachId,
     coachDisplayName: String? = "David",
-    skipEvaluation: Bool = false
+    skipEvaluation: Bool = false,
+    endedAt: Date? = nil
   ) -> BindRequest {
     BindRequest(
       id: UUID(uuidString: "0a000000-0000-0000-0000-00000000000f")!,
@@ -27,6 +28,7 @@ enum BindFixtures {
       status: status,
       submittedAt: submittedAt,
       respondedAt: nil,
+      endedAt: endedAt,
       expiredAt: submittedAt.addingTimeInterval(7 * 86_400),
       skipEvaluation: skipEvaluation
     )
@@ -142,4 +144,31 @@ final class StashSpy: PendingBindCodeStoring, @unchecked Sendable {
     defer { lock.unlock() }
     storage[studentId] = nil
   }
+}
+
+// MARK: - Bind gate harness
+
+@MainActor
+struct GateHarness {
+  let gate: BindGateViewModel
+  let repo: ScriptedBindRepository
+  let stash: StashSpy
+}
+
+@MainActor
+func makeGate(
+  mine: ScriptedBindRepository.MineResult,
+  extraMine: [ScriptedBindRepository.MineResult] = [],
+  submit: [ScriptedBindRepository.SubmitResult] = [],
+  stash: StashSpy = StashSpy(),
+  onboardingComplete: Bool = true
+) -> GateHarness {
+  let repo = ScriptedBindRepository(mine: [mine] + extraMine, submit: submit)
+  let gate = BindGateViewModel(
+    studentId: BindFixtures.studentId,
+    bind: repo,
+    stash: stash,
+    isOnboardingComplete: { onboardingComplete }
+  )
+  return GateHarness(gate: gate, repo: repo, stash: stash)
 }
